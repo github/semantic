@@ -304,10 +304,10 @@ instance Listable1 Comment.Comment where
   liftTiers _ = cons1 Comment.Comment
 
 instance Listable1 Declaration.Function where
-  liftTiers tiers = liftCons3 tiers (liftTiers tiers) tiers Declaration.Function
+  liftTiers tiers = liftCons4 (liftTiers tiers) tiers (liftTiers tiers) tiers Declaration.Function
 
 instance Listable1 Declaration.Method where
-  liftTiers tiers = liftCons4 tiers tiers (liftTiers tiers) tiers Declaration.Method
+  liftTiers tiers = liftCons5 (liftTiers tiers) tiers tiers (liftTiers tiers) tiers Declaration.Method
 
 instance Listable1 Statement.If where
   liftTiers tiers = liftCons3 tiers tiers tiers Statement.If

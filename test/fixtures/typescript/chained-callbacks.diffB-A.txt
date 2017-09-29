@@ -1,16 +1,24 @@
 (Program
-  (ExpressionStatements
-    (FunctionCall
-      (Identifier)
+  (Call
+    (MemberAccess
+      (This)
     { (Identifier)
-    ->(Identifier) }
-      (Function
-        (Params
-          (Other "required_parameter"
-            (Identifier)))
+    ->(Identifier) })
+    (Function
+      (Empty)
+      (Empty)
+      (Empty)
+      (RequiredParameter
+        (Empty)
+        (Empty)
+        (Assignment
+          (Identifier)
+          (Empty)))
+      (
         (Return
           (MemberAccess
           { (Identifier)
           ->(Identifier) }
           { (Identifier)
-          ->(Identifier) }))))))
+          ->(Identifier) }))))
+    (Empty)))

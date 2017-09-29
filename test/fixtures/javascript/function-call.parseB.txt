@@ -1,6 +1,6 @@
 (Program
-  (ExpressionStatements
-    (FunctionCall
-      (Identifier)
-      (Identifier)
-      (StringLiteral))))
+  (Call
+    (Identifier)
+    (Identifier)
+    (TextElement)
+    (Empty)))

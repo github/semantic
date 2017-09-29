@@ -1,3 +1,2 @@
 (Program
-  (ExpressionStatements
-    (StringLiteral)))
+  (TextElement))

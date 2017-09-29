@@ -1,5 +1,4 @@
 (Program
-  (ExpressionStatements
-    (SubscriptAccess
-      (Identifier)
-      (StringLiteral))))
+  (Subscript
+    (Identifier)
+    (TextElement)))

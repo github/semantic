@@ -1,8 +1,14 @@
-(ParseError
+(Program
   (Module
     (Identifier))
-  (Identifier)
-  (Args)
-  (Identifier)
-  (StringLiteral)
-  (StringLiteral))
+  (Other "import_declaration"
+    (Import
+      (StringLiteral))
+    (Import
+      (StringLiteral))
+    (Import
+      (Identifier)
+      (StringLiteral)))
+  (Function
+    (Identifier)
+    (Args)))

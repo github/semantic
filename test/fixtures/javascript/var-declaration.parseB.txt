@@ -1,9 +1,14 @@
 (Program
-  (Other "variable_declaration"
-    (VarDecl
-      (Identifier))
-    (VarAssignment
+  (VariableDeclaration
+    (Assignment
+      (Empty)
       (Identifier)
-      (Object))
-    (VarDecl
-      (Identifier))))
+      (Empty))
+    (Assignment
+      (Empty)
+      (Identifier)
+      (Hash))
+    (Assignment
+      (Empty)
+      (Identifier)
+      (Empty))))

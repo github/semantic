@@ -1,0 +1,1 @@
+var a = <Text {...css(styles.titleText)}>{children}</Text>

@@ -117,11 +117,11 @@ equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax
                 -> Term (Union fs) ann2
                 -> Bool
 equivalentTerms t1@(Term (In _ u1)) t2@(Term (In _ u2))
-  | Just (Declaration.Method _ identifier1 _ _) <- prj u1
-  , Just (Declaration.Method _ identifier2 _ _) <- prj u2
+  | Just (Declaration.Method _ _ identifier1 _ _) <- prj u1
+  , Just (Declaration.Method _ _ identifier2 _ _) <- prj u2
   = equivalentTerms identifier1 identifier2
-  | Just (Declaration.Function identifier1 _ _) <- prj u1
-  , Just (Declaration.Function identifier2 _ _) <- prj u2
+  | Just (Declaration.Function _ identifier1 _ _) <- prj u1
+  , Just (Declaration.Function _ identifier2 _ _) <- prj u2
   = equivalentTerms identifier1 identifier2
   | Just (Syntax.Context _ s1) <- prj u1
   , Just (Syntax.Context _ s2) <- prj u2

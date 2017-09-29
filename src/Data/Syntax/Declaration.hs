@@ -8,7 +8,7 @@ import Data.Functor.Classes.Show.Generic
 import Data.Mergeable
 import GHC.Generics
 
-data Function a = Function { functionName :: !a, functionParameters :: ![a], functionBody :: !a }
+data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
 
 instance Eq1 Function where liftEq = genericLiftEq
@@ -16,11 +16,23 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: How should we represent function types, where applicable?
 
-data Method a = Method { methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
+data Method a = Method { methodContext :: ![a], methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
 
 instance Eq1 Method where liftEq = genericLiftEq
 instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
+
+data RequiredParameter a = RequiredParameter { requiredParameter :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 RequiredParameter where liftEq = genericLiftEq
+instance Show1 RequiredParameter where liftShowsPrec = genericLiftShowsPrec
+
+data OptionalParameter a = OptionalParameter { optionalParameter :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 OptionalParameter where liftEq = genericLiftEq
+instance Show1 OptionalParameter where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Should we replace this with Function and differentiate by context?
 -- TODO: How should we distinguish class/instance methods?
@@ -32,7 +44,7 @@ instance Eq1 Variable where liftEq = genericLiftEq
 instance Show1 Variable where liftShowsPrec = genericLiftShowsPrec
 
 
-data Class a = Class { classIdentifier :: !a, classSuperclasses :: ![a], classBody :: ![a] }
+data Class a = Class { classContext :: ![a], classIdentifier :: !a, classSuperclasses :: ![a], classBody :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
 
 instance Eq1 Class where liftEq = genericLiftEq

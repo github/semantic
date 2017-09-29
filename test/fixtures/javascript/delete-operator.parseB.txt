@@ -1,7 +1,5 @@
 (Program
-  (ExpressionStatements
-    (Operator
-      (Other "delete")
-      (MemberAccess
-        (Identifier)
-        (Identifier)))))
+  (Delete
+    (MemberAccess
+      (Identifier)
+      (Identifier))))

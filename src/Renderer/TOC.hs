@@ -118,21 +118,21 @@ declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syn
                    -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
 declarationAlgebra Blob{..} (In a r)
   -- Do not summarize anonymous functions
-  | Just (Declaration.Function (identifier, _) _ _) <- prj r
+  | Just (Declaration.Function _ (identifier, _) _ _) <- prj r
   , Just Syntax.Empty <- prj (unwrap identifier)
   = Nothing
 
   -- Named functions
-  | Just (Declaration.Function (identifier, _) _ _) <- prj r
+  | Just (Declaration.Function _ (identifier, _) _ _) <- prj r
   = Just $ FunctionDeclaration (getSource (extract identifier))
 
   -- Methods without a receiver
-  | Just (Declaration.Method (receiver, _) (identifier, _) _ _) <- prj r
+  | Just (Declaration.Method _ (receiver, _) (identifier, _) _ _) <- prj r
   , Just Syntax.Empty <- prj (unwrap receiver)
   = Just $ MethodDeclaration (getSource (extract identifier))
 
   -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
-  | Just (Declaration.Method (receiver, _) (identifier, _) _ _) <- prj r
+  | Just (Declaration.Method _ (receiver, _) (identifier, _) _ _) <- prj r
   = Just $ MethodDeclaration (getSource (extract receiver) <> "." <> getSource (extract identifier))
 
   | Just err@Syntax.Error{} <- prj r

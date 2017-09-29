@@ -1,8 +1,8 @@
 (Program
-  (For
+  (ForEach
     (Identifier)
     (Identifier)
-    (ExpressionStatements
-      (ExpressionStatements
-        (FunctionCall
-          (Identifier))))))
+    (
+      (Call
+        (Identifier)
+        (Empty)))))

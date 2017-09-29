@@ -1,4 +1,2 @@
 (Program
-  (ExpressionStatements
-  { (TemplateString)
-  ->(TemplateString) }))
+  (String))

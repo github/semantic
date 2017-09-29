@@ -1,2 +1,4 @@
 (Program
-  (Comment))
+  (Context
+    (Comment)
+    (Empty)))

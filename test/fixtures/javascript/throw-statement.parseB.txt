@@ -1,6 +1,7 @@
 (Program
   (Throw
-    (Constructor
-      (FunctionCall
+    (New
+      (Call
         (Identifier)
-        (StringLiteral)))))
+        (TextElement)
+        (Empty)))))

@@ -9,7 +9,7 @@ import Data.Mergeable
 import GHC.Generics
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
-data Call a = Call { callFunction :: !a, callParams :: ![a], callBlock :: !a }
+data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
 
 instance Eq1 Call where liftEq = genericLiftEq
@@ -53,6 +53,27 @@ data Boolean a
 instance Eq1 Boolean where liftEq = genericLiftEq
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
+-- | Javascript delete operator
+newtype Delete a = Delete a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Delete where liftEq = genericLiftEq
+instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
+
+-- | Javascript void operator
+newtype Void a = Void a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Void where liftEq = genericLiftEq
+instance Show1 Void where liftShowsPrec = genericLiftShowsPrec
+
+-- | Javascript typeof operator
+newtype Typeof a = Typeof a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Typeof where liftEq = genericLiftEq
+instance Show1 Typeof where liftShowsPrec = genericLiftShowsPrec
+
 -- | Bitwise operators.
 data Bitwise a
   = BOr !a !a
@@ -89,6 +110,13 @@ data Enumeration a = Enumeration { enumerationStart :: !a, enumerationEnd :: !a,
 
 instance Eq1 Enumeration where liftEq = genericLiftEq
 instance Show1 Enumeration where liftShowsPrec = genericLiftShowsPrec
+
+-- | InstanceOf (e.g. a instanceof b in JavaScript
+data InstanceOf a = InstanceOf { instanceOfSubject :: !a, instanceOfObject :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 InstanceOf where liftEq = genericLiftEq
+instance Show1 InstanceOf where liftShowsPrec = genericLiftShowsPrec
 
 -- | ScopeResolution (e.g. import a.b in Python or a::b in C++)
 data ScopeResolution a

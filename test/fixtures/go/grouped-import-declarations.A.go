@@ -1,9 +1,10 @@
 package main
 
-func main() {
 import (
-"net/http"
+  "net/http"
   . "some/dsl"
   alias "some/package"
 )
+
+func main() {
 }

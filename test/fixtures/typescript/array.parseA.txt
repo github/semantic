@@ -1,4 +1,3 @@
 (Program
-  (ExpressionStatements
-    (ArrayLiteral
-      (StringLiteral))))
+  (Array
+    (TextElement)))

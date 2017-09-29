@@ -1,8 +1,9 @@
 (Program
-  (Other "lexical_declaration"
-    (VarAssignment
+  (VariableDeclaration
+    (Assignment
+      (Annotation
+        (Union
+          (TypeIdentifier)
+          (TypeIdentifier)))
       (Identifier)
-      (Ty
-        (Other "union_type"
-          (Identifier)
-          (Identifier))))))
+      (Empty))))

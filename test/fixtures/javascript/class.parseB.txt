@@ -1,25 +1,51 @@
 (Program
-  (ExpressionStatements
-    (Class
+  (Class
+    (Identifier)
+    (Method
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
       (Identifier)
-      (Method
-        (Identifier)
-        (Params
-          (Other "required_parameter"
-            (Identifier)))
+      (RequiredParameter
+        (Empty)
+        (Empty)
+        (Assignment
+          (Identifier)
+          (Empty)))
+      (
         (Return
-          (Identifier)))
-      (Method
-        (Identifier)
-        (Params
-          (Other "required_parameter"
-            (Identifier)))
+          (Identifier))))
+    (Method
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
+      (Identifier)
+      (RequiredParameter
+        (Empty)
+        (Empty)
+        (Assignment
+          (Identifier)
+          (Empty)))
+      (
         (Return
-          (Identifier)))
-      (Method
-        (Identifier)
-        (Params
-          (Other "required_parameter"
-            (Identifier)))
+          (Identifier))))
+    (Method
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
+      (Identifier)
+      (RequiredParameter
+        (Empty)
+        (Empty)
+        (Assignment
+          (Identifier)
+          (Empty)))
+      (
         (Return
           (Identifier))))))

@@ -9,6 +9,7 @@ module Parser
 , markdownParser
 , pythonParser
 , rubyParser
+, typescriptParser
 ) where
 
 import qualified CMarkGFM
@@ -27,6 +28,7 @@ import qualified Language.JSON.Syntax as JSON
 import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
+import qualified Language.TypeScript.Syntax as TypeScript
 import Syntax hiding (Go)
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import TreeSitter.Go
@@ -71,6 +73,9 @@ pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
 
 jsonParser :: Parser JSON.Term
 jsonParser = AssignmentParser (ASTParser tree_sitter_json) JSON.assignment
+
+typescriptParser :: Parser TypeScript.Term
+typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
 
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
