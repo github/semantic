@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, TypeOperators #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveDataTypeable, GADTs, TypeOperators #-}
 module Semantic
 ( parseBlobs
 , parseBlob
@@ -8,7 +8,9 @@ module Semantic
 ) where
 
 import Control.Applicative ((<|>))
+import Control.Exception
 import Control.Monad ((<=<))
+import Control.Monad.Error.Class
 import Data.Bifunctor
 import Data.Blob
 import Data.ByteString (ByteString)
@@ -19,6 +21,7 @@ import Data.Output
 import Data.Record
 import Data.Syntax.Algebra
 import Data.Term
+import Data.Typeable
 import Info
 import Interpreter
 import qualified Language
@@ -45,25 +48,29 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (ToCTermRenderer, Just Language.Python) -> parse pythonParser blob >>= decorate (declarationAlgebra blob) >>= render (renderToCTerm blob)
   (ToCTermRenderer, Just Language.TypeScript) -> parse typescriptParser blob >>= decorate (declarationAlgebra blob) >>= render (renderToCTerm blob)
   (ToCTermRenderer, Just Language.Ruby) -> parse rubyParser blob >>= decorate (declarationAlgebra blob) >>= render (renderToCTerm blob)
-  (ToCTermRenderer, _) -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob) >>= render (renderToCTerm blob)
+  (ToCTermRenderer, _) | Just syntaxParser <- syntaxParser -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob) >>= render (renderToCTerm blob)
   (JSONTermRenderer, Just Language.JSON) -> parse jsonParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
   (JSONTermRenderer, Just Language.Markdown) -> parse markdownParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
   (JSONTermRenderer, Just Language.Python) -> parse pythonParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
   (JSONTermRenderer, Just Language.TypeScript) -> parse typescriptParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
   (JSONTermRenderer, Just Language.Ruby) -> parse rubyParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
-  (JSONTermRenderer, _) -> parse syntaxParser blob >>= decorate syntaxIdentifierAlgebra >>= render (renderJSONTerm blob)
+  (JSONTermRenderer, _) | Just syntaxParser <- syntaxParser -> parse syntaxParser blob >>= decorate syntaxIdentifierAlgebra >>= render (renderJSONTerm blob)
   (SExpressionTermRenderer, Just Language.JSON) -> parse jsonParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, Just Language.Markdown) -> parse markdownParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, Just Language.Python) -> parse pythonParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, Just Language.TypeScript) -> parse typescriptParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, Just Language.Ruby) -> parse rubyParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
-  (SExpressionTermRenderer, _) -> parse syntaxParser blob >>= render renderSExpressionTerm . fmap keepCategory
+  (SExpressionTermRenderer, _) | Just syntaxParser <- syntaxParser -> parse syntaxParser blob >>= render renderSExpressionTerm . fmap keepCategory
   (IdentityTermRenderer, Just Language.JSON) -> pure Nothing
   (IdentityTermRenderer, Just Language.Markdown) -> pure Nothing
   (IdentityTermRenderer, Just Language.Python) -> pure Nothing
   (IdentityTermRenderer, Just Language.TypeScript) -> pure Nothing
-  (IdentityTermRenderer, _) -> Just <$> parse syntaxParser blob
-  where syntaxParser = fromMaybe LineByLineParser (blobLanguage >>= parserForLanguage)
+  (IdentityTermRenderer, _) | Just syntaxParser <- syntaxParser -> Just <$> parse syntaxParser blob
+  _ -> throwError (SomeException (NoParserForLanguage blobLanguage))
+  where syntaxParser = blobLanguage >>= parserForLanguage
+
+newtype NoParserForLanguage = NoParserForLanguage (Maybe Language.Language)
+  deriving (Eq, Exception, Ord, Show, Typeable)
 
 
 diffBlobPairs :: Output output => DiffRenderer output -> [Both Blob] -> Task ByteString
