@@ -69,7 +69,7 @@ spec = parallel $ do
 
     it "summarizes changed methods" $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
-      Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
+      Just diff <- runTask (parseAndDiffBlobPair sourceBlobs rubyParser)
       diffTOC diff `shouldBe`
         [ JSONSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
         , JSONSummary "Method" "bar" (sourceSpanBetween (4, 1) (6, 4)) "modified"
@@ -89,25 +89,25 @@ spec = parallel $ do
 
     it "summarizes Go methods with receivers with special formatting" $ do
       sourceBlobs <- blobsForPaths (both "go/method-with-receiver.A.go" "go/method-with-receiver.B.go")
-      Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
+      Just diff <- runTask (parseAndDiffBlobPair sourceBlobs rubyParser)
       diffTOC diff `shouldBe`
         [ JSONSummary "Method" "(*apiClient) CheckAuth" (sourceSpanBetween (3,1) (3,101)) "added" ]
 
     it "summarizes Ruby methods that start with two identifiers" $ do
       sourceBlobs <- blobsForPaths (both "ruby/method-starts-with-two-identifiers.A.rb" "ruby/method-starts-with-two-identifiers.B.rb")
-      Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
+      Just diff <- runTask (parseAndDiffBlobPair sourceBlobs rubyParser)
       diffTOC diff `shouldBe`
         [ JSONSummary "Method" "foo" (sourceSpanBetween (1, 1) (4, 4)) "modified" ]
 
     it "handles unicode characters in file" $ do
       sourceBlobs <- blobsForPaths (both "ruby/unicode.A.rb" "ruby/unicode.B.rb")
-      Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
+      Just diff <- runTask (parseAndDiffBlobPair sourceBlobs rubyParser)
       diffTOC diff `shouldBe`
         [ JSONSummary "Method" "foo" (sourceSpanBetween (6, 1) (7, 4)) "added" ]
 
     it "properly slices source blob that starts with a newline and has multi-byte chars" $ do
       sourceBlobs <- blobsForPaths (both "javascript/starts-with-newline.js" "javascript/starts-with-newline.js")
-      Just diff <- runTask (diffBlobPair IdentityDiffRenderer sourceBlobs)
+      Just diff <- runTask (parseAndDiffBlobPair sourceBlobs rubyParser)
       diffTOC diff `shouldBe` []
 
     prop "inserts of methods and functions are summarized" $
