@@ -18,10 +18,10 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
+import qualified Data.Term as Term
 import Data.Union
 import GHC.Stack
 import Language.Go.Grammar as Grammar
-import qualified Term
 
 type Syntax =
   '[ Comment.Comment
@@ -40,6 +40,7 @@ type Syntax =
    , Literal.KeyValue
    , Literal.TextElement
    , Statement.Assignment
+   , Syntax.Context
    , Syntax.Error
    , Syntax.Empty
    , Syntax.Identifier
@@ -222,14 +223,15 @@ block :: Assignment
 block = symbol Block *> children expressions
 
 callExpression :: Assignment
-callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Call <$> identifier <*> pure [] <*> emptyTerm)
+callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Call <$> pure [] <*> identifier <*> pure [] <*> emptyTerm)
 
 constVarDeclaration :: Assignment
 constVarDeclaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
 
 constVarSpecification :: Assignment
 constVarSpecification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> children (Statement.Assignment
-                                                                           <$> (annotatedLHS <|> identifiers)
+                                                                           <$> pure []
+                                                                           <*> (annotatedLHS <|> identifiers)
                                                                            <*> expressions)
     where
       annotatedLHS = makeTerm <$> location <*> (Type.Annotation
@@ -243,7 +245,7 @@ functionDeclaration :: Assignment
 functionDeclaration = mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> typedIdentifier <*> parameters <*> types <*> block)
   where parameters = symbol Parameters *> children (many expression)
         types = symbol Parameters *> children expressions <|> emptyTerm
-        mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Function name' params' block')) types')
+        mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Function [] name' params' block')) types')
 
 importDeclaration :: Assignment
 importDeclaration = makeTerm <$> symbol ImportDeclaration <*> children (Declaration.Import <$> many expression)
@@ -255,14 +257,14 @@ methodDeclaration :: Assignment
 methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> children ((,,,,) <$> receiver <*> identifier <*> parameters <*> expression <*> block)
   where parameters = symbol Parameters *> children (symbol ParameterDeclaration *> children (many typedIdentifier))
         receiver = symbol Parameters *> children (symbol ParameterDeclaration *> children typedIdentifier)
-        mkTypedMethodDeclaration loc (receiver', name', parameters', type'', body') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Method receiver' name' parameters' body')) type'')
+        mkTypedMethodDeclaration loc (receiver', name', parameters', type'', body') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Method [] receiver' name' parameters' body')) type'')
 
 methodSpec :: Assignment
 methodSpec =  mkMethodSpec <$> symbol MethodSpec <*> children ((,,,,) <$> empty <*> identifier <*> parameters <*> (expression <|> parameters <|> emptyTerm) <*> empty)
   where parameters = makeTerm <$> symbol Parameters <*> children (many expression)
         empty = makeTerm <$> location <*> pure Syntax.Empty
         mkMethodSpec loc (receiver', name', params, optionaltypeLiteral, body') = makeTerm loc $ Type.Annotation (mkMethod loc receiver' name' params body') optionaltypeLiteral
-        mkMethod loc empty' name' params empty'' = makeTerm loc $ Declaration.Method empty' name' (pure params) empty''
+        mkMethod loc empty' name' params empty'' = makeTerm loc $ Declaration.Method [] empty' name' (pure params) empty''
 
 packageClause :: Assignment
 packageClause = makeTerm <$> symbol PackageClause <*> children (Declaration.Module <$> identifier <*> pure [])
