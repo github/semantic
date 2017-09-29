@@ -18,10 +18,6 @@ import Test.Hspec.Expectations.Pretty
 spec :: Spec
 spec = parallel $ do
   describe "parseBlob" $ do
-    it "parses in the specified language" $ do
-      Just term <- runTask $ parseBlob IdentityTermRenderer methodsBlob
-      void term `shouldBe` Term (() `In` Indexed [ Term (() `In` Method [] (Term (() `In` Leaf "foo")) Nothing [] []) ])
-
     it "throws if not given a language" $ do
       runTask (parseBlob SExpressionTermRenderer methodsBlob { blobLanguage = Nothing }) `shouldThrow` (\ code -> case code of
         ExitFailure 1 -> True
