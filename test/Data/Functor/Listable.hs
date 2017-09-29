@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, TypeOperators #-}
+{-# LANGUAGE DataKinds, ScopedTypeVariables, TypeOperators #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Data.Functor.Listable
 ( Listable(..)
@@ -24,6 +24,7 @@ module Data.Functor.Listable
 , ListableF(..)
 , addWeight
 , ofWeight
+, ListableSyntax
 ) where
 
 import qualified Category
@@ -31,21 +32,27 @@ import Control.Monad.Free as Free
 import Control.Monad.Trans.Free as FreeF
 import Data.ByteString (ByteString)
 import Data.Char (chr)
+import Data.Diff
 import Data.Functor.Both
+import Data.List.NonEmpty
+import Data.Patch
 import Data.Range
 import Data.Record
 import Data.Semigroup
 import Data.Source
 import Data.Span
+import qualified Data.Syntax as Syntax
+import qualified Data.Syntax.Comment as Comment
+import qualified Data.Syntax.Declaration as Declaration
+import qualified Data.Syntax.Statement as Statement
+import Data.Term
 import Data.Text as T (Text, pack)
 import qualified Data.Text.Encoding as T
 import Data.These
-import Diff
-import Patch
+import Data.Union
 import Renderer.TOC
 import RWS
-import Syntax
-import Term
+import Syntax as S
 import Test.LeanCheck
 
 type Tier a = [a]
@@ -68,6 +75,13 @@ class Listable2 l where
 -- | A suitable definition of 'tiers' for 'Listable2' type constructors parameterized by 'Listable' types.
 tiers2 :: (Listable a, Listable b, Listable2 l) => [Tier (l a b)]
 tiers2 = liftTiers2 tiers tiers
+
+
+class Listable3 l where
+  liftTiers3 :: [Tier a] -> [Tier b] -> [Tier c] -> [Tier (l a b c)]
+
+tiers3 :: (Listable3 l, Listable a, Listable b, Listable c) => [Tier (l a b c)]
+tiers3 = liftTiers3 tiers tiers tiers
 
 
 -- | Lifts a unary constructor to a list of tiers, given a list of tiers for its argument.
@@ -126,6 +140,9 @@ instance Listable1 [] where
   liftTiers tiers = go
     where go = cons0 [] \/ liftCons2 tiers go (:)
 
+instance Listable1 NonEmpty where
+  liftTiers tiers = liftCons2 tiers (liftTiers tiers) (:|)
+
 instance Listable2 p => Listable1 (Join p) where
   liftTiers tiers = liftCons1 (liftTiers2 tiers tiers) Join
 
@@ -165,22 +182,19 @@ instance (Listable1 f, Listable a) => Listable (Term f a) where
   tiers = tiers1
 
 
-instance Listable1 f => Listable2 (DiffF f) where
-  liftTiers2 annTiers recurTiers
-    =  liftCons1 (liftTiers (liftTiers2 annTiers recurTiers)) Patch
-    \/ liftCons1 (liftTiers2 (liftTiers2 annTiers annTiers) recurTiers) Merge
+instance (Listable1 syntax) => Listable3 (DiffF syntax) where
+  liftTiers3 ann1Tiers ann2Tiers recurTiers
+    =  liftCons1 (liftTiers2 (liftTiers2 ann1Tiers recurTiers) (liftTiers2 ann2Tiers recurTiers)) Patch
+    \/ liftCons1 (liftTiers2 (liftTiers2 ann1Tiers ann2Tiers) recurTiers) Merge
 
-instance (Listable1 f, Listable a) => Listable1 (DiffF f a) where
-  liftTiers = liftTiers2 tiers
+instance (Listable1 syntax, Listable ann1, Listable ann2, Listable recur) => Listable (DiffF syntax ann1 ann2 recur) where
+  tiers = tiers3
 
-instance (Listable1 f, Listable a, Listable b) => Listable (DiffF f a b) where
-  tiers = tiers1
+instance Listable1 f => Listable2 (Diff f) where
+  liftTiers2 annTiers1 annTiers2 = go where go = liftCons1 (liftTiers3 annTiers1 annTiers2 go) Diff
 
-instance Listable1 f => Listable1 (Diff f) where
-  liftTiers annTiers = go where go = liftCons1 (liftTiers2 annTiers go) Diff
-
-instance (Listable1 f, Listable a) => Listable (Diff f a) where
-  tiers = tiers1
+instance (Listable1 syntax, Listable ann1, Listable ann2) => Listable (Diff syntax ann1 ann2) where
+  tiers = tiers2
 
 
 instance (Listable head, Listable (Record tail)) => Listable (Record (head ': tail)) where
@@ -211,11 +225,11 @@ instance Listable Category.Category where
        \/ cons0 Category.SingletonMethod
 
 
-instance Listable1 Patch where
-  liftTiers t = liftCons1 t Insert \/ liftCons1 t Delete \/ liftCons2 t t Replace
+instance Listable2 Patch where
+  liftTiers2 t1 t2 = liftCons1 t2 Insert \/ liftCons1 t1 Delete \/ liftCons2 t1 t2 Replace
 
-instance Listable a => Listable (Patch a) where
-  tiers = tiers1
+instance (Listable a, Listable b) => Listable (Patch a b) where
+  tiers = tiers2
 
 
 instance Listable1 Syntax where
@@ -238,11 +252,11 @@ instance Listable1 Syntax where
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Switch
     \/ liftCons2 recur (liftTiers recur) Case
     \/ liftCons1 (liftTiers recur) Select
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) Syntax.Object
-    \/ liftCons2 recur recur Syntax.Pair
+    \/ liftCons2 (liftTiers recur) (liftTiers recur) S.Object
+    \/ liftCons2 recur recur S.Pair
     \/ liftCons1 (pack `mapT` tiers) Comment
     \/ liftCons2 (liftTiers recur) (liftTiers recur) Commented
-    \/ liftCons1 (liftTiers recur) Syntax.ParseError
+    \/ liftCons1 (liftTiers recur) S.ParseError
     \/ liftCons2 (liftTiers recur) (liftTiers recur) For
     \/ liftCons2 recur recur DoWhile
     \/ liftCons2 recur (liftTiers recur) While
@@ -250,7 +264,7 @@ instance Listable1 Syntax where
     \/ liftCons1 recur Throw
     \/ liftCons1 recur Constructor
     \/ liftCons4 (liftTiers recur) (liftTiers recur) (liftTiers recur) (liftTiers recur) Try
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) Syntax.Array
+    \/ liftCons2 (liftTiers recur) (liftTiers recur) S.Array
     \/ liftCons3 recur (liftTiers recur) (liftTiers recur) Class
     \/ liftCons5 (liftTiers recur) recur (liftTiers recur) (liftTiers recur) (liftTiers recur) Method
     \/ liftCons2 recur (liftTiers recur) If
@@ -277,6 +291,49 @@ instance Listable1 Syntax where
 
 instance Listable recur => Listable (Syntax recur) where
   tiers = tiers1
+
+
+instance (Listable1 f, Listable1 (Union (g ': fs))) => Listable1 (Union (f ': g ': fs)) where
+  liftTiers tiers = (inj `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)) \/ (weaken `mapT` ((liftTiers :: [Tier a] -> [Tier (Union (g ': fs) a)]) tiers))
+
+instance Listable1 f => Listable1 (Union '[f]) where
+  liftTiers tiers = inj `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)
+
+
+instance Listable1 Comment.Comment where
+  liftTiers _ = cons1 Comment.Comment
+
+instance Listable1 Declaration.Function where
+  liftTiers tiers = liftCons4 (liftTiers tiers) tiers (liftTiers tiers) tiers Declaration.Function
+
+instance Listable1 Declaration.Method where
+  liftTiers tiers = liftCons5 (liftTiers tiers) tiers tiers (liftTiers tiers) tiers Declaration.Method
+
+instance Listable1 Statement.If where
+  liftTiers tiers = liftCons3 tiers tiers tiers Statement.If
+
+instance Listable1 Statement.Return where
+  liftTiers tiers = liftCons1 tiers Statement.Return
+
+instance Listable1 Syntax.Context where
+  liftTiers tiers = liftCons2 (liftTiers tiers) tiers Syntax.Context
+
+instance Listable1 Syntax.Empty where
+  liftTiers _ = cons0 Syntax.Empty
+
+instance Listable1 Syntax.Identifier where
+  liftTiers _ = cons1 Syntax.Identifier
+
+type ListableSyntax = Union
+  '[ Comment.Comment
+   , Declaration.Function
+   , Declaration.Method
+   , Statement.If
+   , Syntax.Context
+   , Syntax.Empty
+   , Syntax.Identifier
+   , []
+   ]
 
 
 instance Listable1 Gram where

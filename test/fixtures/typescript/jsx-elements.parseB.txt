@@ -1,0 +1,18 @@
+(Program
+  (VariableDeclaration
+    (Assignment
+      (Empty)
+      (Identifier)
+      (JsxElement
+        (JsxOpeningElement
+          (Identifier)
+          (JsxAttribute
+            (Identifier)
+            (JsxExpression
+              (MemberAccess
+                (Identifier)
+                (Identifier)))))
+        (JsxExpression
+          (Identifier))
+        (JsxClosingElement
+          (Identifier))))))

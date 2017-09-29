@@ -10,6 +10,7 @@ module Parser
 , markdownParser
 , pythonParser
 , rubyParser
+, typescriptParser
 ) where
 
 import qualified CMarkGFM
@@ -19,6 +20,7 @@ import Data.Record
 import Data.Source as Source
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
+import Data.Term
 import Data.Union
 import Foreign.Ptr
 import Info hiding (Empty, Go)
@@ -28,8 +30,8 @@ import qualified Language.JSON.Syntax as JSON
 import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Python.Syntax as Python
 import qualified Language.Ruby.Syntax as Ruby
+import qualified Language.TypeScript.Syntax as TypeScript
 import Syntax hiding (Go)
-import Term
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import TreeSitter.Go
 import TreeSitter.Python
@@ -47,14 +49,14 @@ data Parser term where
                    -> Assignment ast grammar (Term (Union fs) (Record Location)) -- ^ An assignment from AST onto 'Term's.
                    -> Parser (Term (Union fs) (Record Location))                 -- ^ A parser producing 'Term's.
   -- | A tree-sitter parser.
-  TreeSitterParser :: Ptr TS.Language -> Parser (SyntaxTerm DefaultFields)
+  TreeSitterParser :: Ptr TS.Language -> Parser (Term Syntax (Record DefaultFields))
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
   -- | A parser which will parse any input 'Source' into a top-level 'Term' whose children are leaves consisting of the 'Source's lines.
-  LineByLineParser :: Parser (SyntaxTerm DefaultFields)
+  LineByLineParser :: Parser (Term Syntax (Record DefaultFields))
 
 -- | Return a 'Language'-specific 'Parser', if one exists, falling back to the 'LineByLineParser'.
-parserForLanguage :: Maybe Language -> Parser (SyntaxTerm DefaultFields)
+parserForLanguage :: Maybe Language -> Parser (Term Syntax (Record DefaultFields))
 parserForLanguage Nothing = LineByLineParser
 parserForLanguage (Just language) = case language of
   Go -> TreeSitterParser tree_sitter_go
@@ -77,11 +79,14 @@ pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
 jsonParser :: Parser JSON.Term
 jsonParser = AssignmentParser (ASTParser tree_sitter_json) JSON.assignment
 
+typescriptParser :: Parser TypeScript.Term
+typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScript.assignment
+
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
 
 -- | A fallback parser that treats a file simply as rows of strings.
-lineByLineParser :: Source -> SyntaxTerm DefaultFields
+lineByLineParser :: Source -> Term Syntax (Record DefaultFields)
 lineByLineParser source = termIn (totalRange source :. Program :. totalSpan source :. Nil) (Indexed (zipWith toLine [1..] (sourceLineRanges source)))
   where toLine line range = termIn (range :. Program :. Span (Pos line 1) (Pos line (end range)) :. Nil) (Leaf (toText (slice range source)))

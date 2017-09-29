@@ -96,9 +96,14 @@ newtype Symbol a = Symbol { symbolContent :: ByteString }
 instance Eq1 Symbol where liftEq = genericLiftEq
 instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 
+newtype Regex a = Regex { regexContent :: ByteString }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Regex where liftEq = genericLiftEq
+instance Show1 Regex where liftShowsPrec = genericLiftShowsPrec
+
 -- TODO: Heredoc-style string literals?
 -- TODO: Character literals.
--- TODO: Regular expressions.
 
 
 -- Collections
@@ -147,4 +152,3 @@ instance Show1 Channel where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Object literals as distinct from hash literals? Or coalesce object/hash literals into “key-value literals”?
 -- TODO: Function literals (lambdas, procs, anonymous functions, what have you).
--- TODO: Regexp literals.

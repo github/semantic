@@ -1,21 +1,28 @@
 (Program
   (Function
-    (Other "type_parameters"
-    {+(Other "type_parameter"
-      {+(Identifier)+})+}
-    {-(Other "required_parameter"
-      {-(Identifier)-})-}
-    {-(Other "required_parameter"
-      {-(Identifier)-})-})
-  { (Ty
-    {-(Identifier)-})
-  ->(Params
-    {+(Other "required_parameter"
-      {+(Identifier)+})+}
-    {+(Other "required_parameter"
-      {+(Identifier)+})+}) }
-  {+(Ty
-    {+(Other "predefined_type")+})+}
-    (ExpressionStatements
-    { (Identifier)
-    ->(Identifier) })))
+  {+(TypeParameters
+    {+(TypeParameter
+      {+(Identifier)+}
+      {+(Empty)+})+})+}
+  {+(Annotation
+    {+(PredefinedType)+})+}
+  {-(Empty)-}
+  {-(Annotation
+    {-(TypeIdentifier)-})-}
+    (Empty)
+    (RequiredParameter
+      (Empty)
+      (Empty)
+      (Assignment
+        (Identifier)
+        (Empty)))
+    (RequiredParameter
+      (Empty)
+      (Empty)
+      (Assignment
+        (Identifier)
+        (Empty)))
+    (
+    {+(Identifier)+}
+    {-(Identifier)-}))
+  (Empty))

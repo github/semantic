@@ -1,31 +1,60 @@
 (Program
-  (ExpressionStatements
-    (Class
-      (Identifier)
-    {+(FieldDecl
-      {+(Identifier)+}
-      {+(NumberLiteral)+})+}
-      (Method
-      { (Identifier)
-      ->(Identifier) }
-        (Params
-          (Other "required_parameter"
-            (Identifier)))
+  (Class
+    (Identifier)
+  {+(PublicFieldDefinition
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Identifier)+}
+    {+(Float)+})+}
+    (Method
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
+    { (Identifier)
+    ->(Identifier) }
+      (RequiredParameter
+        (Empty)
+        (Empty)
+        (Assignment
+          (Identifier)
+          (Empty)))
+      (
         (Return
-          (Identifier)))
-      (Method
-      { (Identifier)
-      ->(Identifier) }
-        (Params
-          (Other "required_parameter"
-            (Identifier)))
+          (Identifier))))
+    (Method
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
+    { (Identifier)
+    ->(Identifier) }
+      (RequiredParameter
+        (Empty)
+        (Empty)
+        (Assignment
+          (Identifier)
+          (Empty)))
+      (
         (Return
-          (Identifier)))
-      (Method
-      { (Identifier)
-      ->(Identifier) }
-        (Params
-          (Other "required_parameter"
-            (Identifier)))
+          (Identifier))))
+    (Method
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
+      (Empty)
+    { (Identifier)
+    ->(Identifier) }
+      (RequiredParameter
+        (Empty)
+        (Empty)
+        (Assignment
+          (Identifier)
+          (Empty)))
+      (
         (Return
           (Identifier))))))

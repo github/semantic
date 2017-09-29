@@ -1,16 +1,22 @@
 (Program
-  (Interface
+  (InterfaceDeclaration
+    (TypeParameters
+      (TypeParameter
+        (Identifier)
+        (Empty)))
+    (Empty)
     (Identifier)
-    (Other "type_parameters"
-      (Other "type_parameter"
-        (Identifier)))
-    (Other "property_signature"
-      (Identifier)
-      (Ty
-        (Other "literal_type"
-          (StringLiteral))))
-    (Other "property_signature"
-      (Other "readonly")
-      (Identifier)
-      (Ty
+    (ObjectType
+      (PropertySignature
+        (Empty)
+        (Empty)
+        (Annotation
+          (LiteralType
+            (TextElement)))
+        (Identifier))
+      (PropertySignature
+        (Empty)
+        (Readonly)
+        (Annotation
+          (TypeIdentifier))
         (Identifier)))))

@@ -1,11 +1,22 @@
-(ParseError
+(Program
   (Module
     (Identifier))
-  (Identifier)
-  (Args)
-  (VarAssignment
+  (Function
     (Identifier)
-    (Other "expression_list"
-    { (NumberLiteral)
-    ->(NumberLiteral) }
-      (Identifier))))
+    (Args)
+    (Other "const_declaration"
+      (VarAssignment
+        (Identifier)
+        (Other "expression_list"
+        { (NumberLiteral)
+        ->(NumberLiteral) }))
+      (VarAssignment
+        (Identifier)
+        (Other "expression_list"
+        { (NumberLiteral)
+        ->(NumberLiteral) }))
+      (VarAssignment
+        (Identifier)
+        (Other "expression_list"
+        { (NumberLiteral)
+        ->(NumberLiteral) })))))

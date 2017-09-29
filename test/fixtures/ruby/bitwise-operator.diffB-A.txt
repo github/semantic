@@ -1,15 +1,16 @@
 (Program
-  (Binary
-    (Identifier)
-  { (Other "&")
-  ->(Other "|") }
-    (Identifier))
-  (Binary
-    (Identifier)
-  { (Other "<<")
-  ->(Other ">>") }
-    (Identifier))
-{+(Binary
+{+(BOr
   {+(Identifier)+}
-  {+(Other "^")+}
-  {+(Identifier)+})+})
+  {+(Identifier)+})+}
+{+(RShift
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+{+(BXOr
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+{-(BAnd
+  {-(Identifier)-}
+  {-(Identifier)-})-}
+{-(LShift
+  {-(Identifier)-}
+  {-(Identifier)-})-})

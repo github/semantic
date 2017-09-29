@@ -1,21 +1,22 @@
 {-# LANGUAGE DataKinds, GADTs, RankNTypes, TypeOperators #-}
 module Language.JSON.Syntax
-  ( assignment
-  , Syntax
-  , Grammar
-  , Term)
-  where
+( assignment
+, Syntax
+, Grammar
+, Term)
+where
 
+import Data.Record
 import Data.Syntax (makeTerm, parseError)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
+import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Literal as Literal
-import Language.JSON.Grammar as Grammar
-import qualified Term
-import Data.Record
+import qualified Data.Term as Term
 import Data.Union
 import GHC.Stack
+import Language.JSON.Grammar as Grammar
 
 type Syntax =
   [ Literal.Array
@@ -26,6 +27,10 @@ type Syntax =
   , Literal.Null
   , Literal.String
   , Literal.TextElement
+   -- NB: Diffing requires Methods, Functions, and Context in the union.
+  , Declaration.Method
+  , Declaration.Function
+  , Syntax.Context
   , Syntax.Error
   , []
   ]

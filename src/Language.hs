@@ -5,10 +5,10 @@ import Control.Comonad.Trans.Cofree
 import Data.Aeson
 import Data.Foldable
 import Data.Record
+import Data.Term
 import GHC.Generics
 import Info
 import qualified Syntax as S
-import Term
 
 -- | A programming language.
 data Language
@@ -53,13 +53,13 @@ toTuple child | S.Fixed [key,value] <- unwrap child = [termIn (extract child) (S
 toTuple child | S.Leaf c <- unwrap child = [termIn (extract child) (S.Comment c)]
 toTuple child = pure child
 
-toPublicFieldDefinition :: HasField fields Category => [SyntaxTerm fields] -> Maybe (S.Syntax (SyntaxTerm fields))
+toPublicFieldDefinition :: HasField fields Category => [Term S.Syntax (Record fields)] -> Maybe (S.Syntax (Term S.Syntax (Record fields)))
 toPublicFieldDefinition children = case break (\x -> category (extract x) == Identifier) children of
   (prev, [identifier, assignment]) -> Just $ S.VarAssignment (prev ++ [identifier]) assignment
   (_, [_]) -> Just $ S.VarDecl children
   _ -> Nothing
 
-toInterface :: HasField fields Category => [SyntaxTerm fields] -> Maybe (S.Syntax (SyntaxTerm fields))
+toInterface :: HasField fields Category => [Term S.Syntax (Record fields)] -> Maybe (S.Syntax (Term S.Syntax (Record fields)))
 toInterface (id : rest) = case break (\x -> category (extract x) == Other "object_type") rest of
   (clauses, [body]) -> Just $ S.Interface id clauses (toList (unwrap body))
   _ -> Nothing

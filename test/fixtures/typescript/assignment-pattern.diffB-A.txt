@@ -1,10 +1,11 @@
 (Program
-  (Other "variable_declaration"
-    (VarAssignment
-      (Other "object_pattern"
-        (Other "assignment_pattern"
-        { (Identifier)
-        ->(Identifier) }
-        { (NumberLiteral)
-        ->(NumberLiteral) }))
+  (VariableDeclaration
+    (Assignment
+      (Empty)
+      (Hash
+        (Assignment
+        { (ShorthandPropertyIdentifier)
+        ->(ShorthandPropertyIdentifier) }
+        { (Float)
+        ->(Float) }))
       (Identifier))))

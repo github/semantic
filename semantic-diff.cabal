@@ -18,18 +18,20 @@ library
                      , Category
                      , Data.Align.Generic
                      , Data.Blob
+                     , Data.Diff
                      , Data.Error
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
                      , Data.Functor.Classes.Show.Generic
                      , Data.JSON.Fields
                      , Data.Mergeable
-                     , Data.Mergeable.Generic
                      , Data.Output
+                     , Data.Patch
                      , Data.Range
                      , Data.Record
                      , Data.Source
                      , Data.Span
+                     , Data.SplitDiff
                      , Data.Syntax
                      , Data.Syntax.Algebra
                      , Data.Syntax.Assignment
@@ -41,8 +43,7 @@ library
                      , Data.Syntax.Markup
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
-                     , Decorators
-                     , Diff
+                     , Data.Term
                      , Files
                      , Info
                      , Interpreter
@@ -58,12 +59,12 @@ library
                      , Language.Ruby.Grammar
                      , Language.Ruby.Syntax
                      , Language.TypeScript
+                     , Language.TypeScript.Grammar
                      , Language.TypeScript.Syntax
                      , Language.Python
                      , Language.Python.Grammar
                      , Language.Python.Syntax
                      , Parser
-                     , Patch
                      , Paths_semantic_diff
                      , Renderer
                      , Renderer.JSON
@@ -77,10 +78,7 @@ library
                      , Semantic.Util
                      , SemanticCmdLine
                      , SES
-                     , SES.Myers
-                     , SplitDiff
                      , Syntax
-                     , Term
                      , TreeSitter
   build-depends:       base >= 4.8 && < 5
                      , aeson
@@ -139,24 +137,6 @@ executable semantic
   default-language:    Haskell2010
   default-extensions:  FlexibleInstances, OverloadedStrings, RecordWildCards
 
-executable slurp
-  hs-source-dirs:      app
-  main-is:             Slurp.hs
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
-  build-depends:       base
-                     , aeson
-                     , base64-bytestring
-                     , bytestring
-                     , filepath
-                     , github
-                     , netrc
-                     , regex-compat
-                     , text
-                     , text-conversions
-                     , vector
-  default-language:    Haskell2010
-  default-extensions:  FlexibleInstances, OverloadedStrings, RecordWildCards
-
 test-suite test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
@@ -172,7 +152,7 @@ test-suite test
                      , SemanticCmdLineSpec
                      , InterpreterSpec
                      , PatchOutputSpec
-                     , SES.Myers.Spec
+                     , SES.Spec
                      , SourceSpec
                      , SpecHelpers
                      , TermSpec
@@ -185,6 +165,7 @@ test-suite test
                      , bifunctors
                      , bytestring
                      , comonad
+                     , effects
                      , filepath
                      , free
                      , Glob

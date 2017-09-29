@@ -1,7 +1,11 @@
 (Program
   (Method
+    (Empty)
     (Identifier)
-    (Begin
-    {+(MethodCall
-      {+(Identifier)+}
-      {+(StringLiteral)+})+})))
+    (
+      (Try
+      { ([])
+      ->(Call
+        {+(Identifier)+}
+        {+(TextElement)+}
+        {+(Empty)+}) }))))

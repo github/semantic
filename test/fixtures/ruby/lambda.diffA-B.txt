@@ -1,43 +1,48 @@
 (Program
-{+(MethodCall
-  {+(Identifier)+}
-  {+(Params
-    {+(Identifier)+})+}
-  {+(Binary
+{-(Call
+  {-(Identifier)-}
+  {-(Hash)-}
+  {-(Empty)-})-}
+  (Call
+    (Identifier)
+    (Function
+      (Empty)
     {+(Identifier)+}
-    {+(Other "+")+}
-    {+(IntegerLiteral)+})+})+}
-{-(MethodCall
+    { (Identifier)
+    ->(Plus
+      {+(Identifier)+}
+      {+(Integer)+}) }))
+{-(Call
   {-(Identifier)-}
-  {-(Object)-})-}
-{-(MethodCall
-  {-(Identifier)-}
-  {-(Identifier)-})-}
-{-(MethodCall
-  {-(Identifier)-}
-  {-(Params
+  {-(Function
+    {-(Empty)-}
     {-(Identifier)-}
-    {-(KeywordParameter
-      {-(Identifier)-}
-      {-(Boolean)-})-}
-    {-(OptionalParameter
-      {-(Identifier)-}
-      {-(Identifier)-})-})-}
-  {-(IntegerLiteral)-})-}
-{-(AnonymousFunction
-  {-(ExpressionStatements)-})-}
-{-(AnonymousFunction
-  {-(ExpressionStatements
+    {-(Identifier)-}
+    {-(Identifier)-}
+    {-(Integer)-})-})-}
+{-(Function
+  {-(Empty)-}
+  {-(Function
+    {-(Empty)-}
+    {-([])-})-})-}
+{-(Function
+  {-(Empty)-}
+  {-(Function
+    {-(Empty)-}
     {-(Identifier)-})-})-}
-{-(AnonymousFunction
+{-(Function
+  {-(Empty)-}
   {-(Identifier)-}
-  {-(ExpressionStatements
-    {-(IntegerLiteral)-})-})-}
-{-(AnonymousFunction
+  {-(Function
+    {-(Empty)-}
+    {-(Integer)-})-})-}
+{-(Function
+  {-(Empty)-}
   {-(Identifier)-}
-  {-(SplatParameter
-    {-(Identifier)-})-}
-  {-(Other "destructured_parameter"
+  {-(Identifier)-}
+  {-(
     {-(Identifier)-}
     {-(Identifier)-})-}
-  {-(ExpressionStatements)-})-})
+  {-(Function
+    {-(Empty)-}
+    {-([])-})-})-})

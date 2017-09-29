@@ -8,6 +8,7 @@ import Control.Monad.State
 import Data.Align hiding (align)
 import Data.Bifunctor
 import Data.Bifunctor.Join
+import Data.Diff
 import Data.Functor.Both as Both hiding (fst, snd)
 import Data.Functor.Listable
 import Data.List (nub, sort)
@@ -17,12 +18,11 @@ import Data.Range
 import Data.Record
 import Data.Semigroup ((<>))
 import qualified Data.Source as Source
+import Data.SplitDiff
+import Data.Term
 import qualified Data.Text as Text
 import Data.These
-import Diff
-import SplitDiff
 import Syntax
-import Term
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
@@ -258,7 +258,7 @@ instance Listable BranchElement where
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap fst <$> numbered))
 
-align :: Both Source.Source -> Diff Syntax (Record '[Range]) -> PrettyDiff (SplitDiff [] (Record '[Range]))
+align :: Both Source.Source -> Diff Syntax (Record '[Range]) (Record '[Range]) -> PrettyDiff (SplitDiff [] (Record '[Range]))
 align sources = PrettyDiff sources . fmap (fmap (getRange &&& id)) . alignDiff sources
 
 info :: Int -> Int -> Record '[Range]

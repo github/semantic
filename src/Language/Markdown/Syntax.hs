@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, GADTs, RankNTypes, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, RankNTypes, TypeOperators #-}
 module Language.Markdown.Syntax
 ( assignment
 , Syntax
@@ -14,13 +14,14 @@ import Data.Syntax (makeTerm)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
+import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Markup as Markup
+import Data.Term as Term (Term(..), TermF(..), termIn, unwrap)
 import qualified Data.Text as Text
 import Data.Text.Encoding (encodeUtf8)
 import Data.Union
 import GHC.Stack
 import Language.Markdown as Grammar (Grammar(..))
-import Term (Term(..), TermF(..), termIn, unwrap)
 
 type Syntax =
   '[ Markup.Document
@@ -45,6 +46,10 @@ type Syntax =
    , Markup.Strong
    , Markup.Text
    , Markup.Strikethrough
+   -- NB: Diffing requires Methods, Functions, and Context in the union.
+   , Declaration.Method
+   , Declaration.Function
+   , Syntax.Context
    -- Assignment errors; cmark does not provide parse errors.
    , Syntax.Error
    , []

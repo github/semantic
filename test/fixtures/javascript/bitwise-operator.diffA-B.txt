@@ -1,7 +1,5 @@
 (Program
-  (ExpressionStatements
-    (BitwiseOperator
-      (Identifier)
-      (Other ">>")
-    { (Identifier)
-    ->(Identifier) })))
+  (RShift
+    (Identifier)
+  { (Identifier)
+  ->(Identifier) }))

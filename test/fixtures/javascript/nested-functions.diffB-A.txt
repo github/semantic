@@ -1,29 +1,49 @@
 (Program
-  (ExpressionStatements
-    (Function
-      (Identifier)
-      (Params
-        (Other "required_parameter"
-          (Identifier))
-        (Other "required_parameter"
-          (Identifier)))
-      (ExpressionStatements
-        (Function
-          (Identifier)
-          (Params
-            (Other "required_parameter"
+  (Function
+    (Empty)
+    (Empty)
+    (Identifier)
+    (RequiredParameter
+      (Empty)
+      (Empty)
+      (Assignment
+        (Identifier)
+        (Empty)))
+    (RequiredParameter
+      (Empty)
+      (Empty)
+      (Assignment
+        (Identifier)
+        (Empty)))
+    (
+      (Function
+        (Empty)
+        (Empty)
+        (Identifier)
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Assignment
+            (Identifier)
+            (Empty)))
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Assignment
+            (Identifier)
+            (Empty)))
+        (
+          (Call
+            (MemberAccess
+              (Identifier)
               (Identifier))
-            (Other "required_parameter"
-              (Identifier)))
-          (ExpressionStatements
-            (FunctionCall
+          {+(Identifier)+}
+          {-(Identifier)-}
+            (Empty))
+          (Call
+            (MemberAccess
               (Identifier)
-              (Identifier)
-            { (Identifier)
-            ->(Identifier) }))
-          (ExpressionStatements
-            (FunctionCall
-              (Identifier)
-              (Identifier)
-            { (Identifier)
-            ->(Identifier) })))))))
+              (Identifier))
+          {+(Identifier)+}
+          {-(Identifier)-}
+            (Empty)))))))

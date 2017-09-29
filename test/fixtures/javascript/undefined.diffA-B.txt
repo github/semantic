@@ -1,5 +1,4 @@
 (Program
 {+(Return
-  {+(Identifier)+})+}
-{-(ExpressionStatements
-  {-(Identifier)-})-})
+  {+(Undefined)+})+}
+{-(Undefined)-})

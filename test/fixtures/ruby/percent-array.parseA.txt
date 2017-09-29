@@ -1,2 +1,2 @@
 (Program
-  (ArrayLiteral))
+  (Array))

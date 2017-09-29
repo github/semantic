@@ -1,21 +1,23 @@
 (Program
-{+(Call
-  {+(Identifier)+}
+  (Call
+    (Identifier)
   {+(TextElement)+}
-  {+(Empty)+})+}
+  {-(TextElement)-}
+  {-(Identifier)-}
+    (Empty))
   (Call
     (Identifier)
     (TextElement)
   {+(Null)+}
   {-(Identifier)-}
-    (Empty))
-  (Call
-    (Identifier)
-    (TextElement)
-  {+(Identifier)+}
-    (Identifier)
   {-(Identifier)-}
     (Empty))
+{+(Call
+  {+(Identifier)+}
+  {+(TextElement)+}
+  {+(Identifier)+}
+  {+(Identifier)+}
+  {+(Empty)+})+}
 {-(Call
   {-(Identifier)-}
   {-(TextElement)-}

@@ -1,14 +1,23 @@
 (Program
   (Function
+    (Empty)
+    (Empty)
   { (Identifier)
   ->(Identifier) }
-  { (Params)
-  ->(Params
-    {+(Other "required_parameter"
-      {+(Identifier)+})+}
-    {+(Other "required_parameter"
-      {+(Identifier)+})+}) }
-  {+(ExpressionStatements
-    {+(Identifier)+})+}
-  {-(Return
-    {-(Boolean)-})-}))
+  {+(RequiredParameter
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Assignment
+      {+(Identifier)+}
+      {+(Empty)+})+})+}
+  {+(RequiredParameter
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Assignment
+      {+(Identifier)+}
+      {+(Empty)+})+})+}
+    (
+    {+(Identifier)+}
+    {-(Return
+      {-(Boolean)-})-}))
+  (Empty))

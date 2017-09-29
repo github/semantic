@@ -1,4 +1,3 @@
 (Program
-  (ExpressionStatements
-  { (NumberLiteral)
-  ->(NumberLiteral) }))
+{+(Float)+}
+{-(Float)-})

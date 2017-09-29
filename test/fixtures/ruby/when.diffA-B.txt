@@ -1,19 +1,23 @@
 (Program
-  (Case
+  (Match
     (Identifier)
-    (When
-      (Args
-        (Identifier))
-    {+(Identifier)+}
-    {+(When
-      {+(Args
-        {+(Identifier)+})+}
-      {+(Args
-        {+(Identifier)+})+}
-      {+(Else
-        {+(Identifier)+})+})+}))
-{-(Case
-  {-(When
-    {-(Args
-      {-(Boolean)-})-}
-    {-(StringLiteral)-})-})-})
+    (
+      (Pattern
+        (
+          (Identifier))
+        (
+        {+(Identifier)+}
+        {+(Pattern
+          {+(
+            {+(Identifier)+}
+            {+(Identifier)+})+}
+          {+(
+            {+(Identifier)+})+})+}))))
+{-(Match
+  {-(Empty)-}
+  {-(
+    {-(Pattern
+      {-(
+        {-(Boolean)-})-}
+      {-(
+        {-(TextElement)-})-})-})-})-})

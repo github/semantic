@@ -5,20 +5,29 @@
     {+(
       {+(Identifier)+})+})+}
   {+(Empty)+})+}
-{+(Annotation
-  {+(Function
-    {+(Identifier)+}
-    {+(Identifier)+}
-    {+(
-      {+(Identifier)+})+})+}
-  {+(Empty)+})+}
+{-(Annotation
+  {-(Function
+    {-(Identifier)-}
+    {-(Identifier)-}
+    {-(Identifier)-}
+    {-(
+      {-(Identifier)-})-})-}
+  {-(Empty)-})-}
   (Annotation
     (Function
       (Identifier)
+    {+(Identifier)+}
+      (
+      {+(Identifier)+}
+      {-(Identifier)-}))
+    (Empty))
+  (Annotation
+    (Function
     { (Identifier)
     ->(Identifier) }
-    { (Identifier)
-    ->(Identifier) }
+    {+(Identifier)+}
+    {+(Identifier)+}
+    {-(Identifier)-}
       (
       {+(Identifier)+}
       {-(Identifier)-}))
@@ -32,40 +41,18 @@
     {+(
       {+(Identifier)+})+})+}
   {+(Empty)+})+}
-{+(Annotation
-  {+(Function
+  (Annotation
+    (Function
+      (Identifier)
+      (Annotation
+        (Assignment
+          (Identifier)
+        { (Integer)
+        ->(TextElement) })
+      { (Identifier)
+      ->(Identifier) })
     {+(Identifier)+}
-    {+(Annotation
-      {+(Assignment
-        {+(Identifier)+}
-        {+(TextElement)+})+}
-      {+(Identifier)+})+}
-    {+(Identifier)+}
-    {+(
-      {+(Identifier)+})+})+}
-  {+(Empty)+})+}
-{-(Annotation
-  {-(Function
     {-(Identifier)-}
-    {-(
-      {-(Identifier)-})-})-}
-  {-(Empty)-})-}
-{-(Annotation
-  {-(Function
-    {-(Identifier)-}
-    {-(Identifier)-}
-    {-(
-      {-(Identifier)-})-})-}
-  {-(Empty)-})-}
-{-(Annotation
-  {-(Function
-    {-(Identifier)-}
-    {-(Annotation
-      {-(Assignment
-        {-(Identifier)-}
-        {-(Integer)-})-}
-      {-(Identifier)-})-}
-    {-(Identifier)-}
-    {-(
-      {-(Identifier)-})-})-}
-  {-(Empty)-})-})
+      (
+        (Identifier)))
+    (Empty)))

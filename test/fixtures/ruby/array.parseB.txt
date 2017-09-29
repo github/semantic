@@ -1,5 +1,5 @@
 (Program
-  (ArrayLiteral
-    (StringLiteral)
-    (StringLiteral)
-    (StringLiteral)))
+  (Array
+    (TextElement)
+    (TextElement)
+    (TextElement)))

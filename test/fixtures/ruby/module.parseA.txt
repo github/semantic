@@ -1,8 +1,7 @@
 (Program
   (Module
-    (Constant))
+    (Identifier))
   (Module
-    (ScopeOperator
-      (Constant)
-      (Other "::")
-      (Constant))))
+    (ScopeResolution
+      (Identifier)
+      (Identifier))))

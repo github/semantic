@@ -1,7 +1,7 @@
 (Program
-  (ExpressionStatements
-    (BooleanOperator
-      (Identifier)
-    { (Other "&&")
-    ->(Other "||") }
-      (Identifier))))
+{+(Or
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+{-(And
+  {-(Identifier)-}
+  {-(Identifier)-})-})

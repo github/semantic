@@ -2,11 +2,15 @@
   (If
   { (Identifier)
   ->(Identifier) }
-  {+(Identifier)+}
-  {+(Elsif
+    (
+    {+(Identifier)+})
+  { (Empty)
+  ->(If
     {+(Identifier)+}
-    {+(Identifier)+}
-    {+(Else
-      {+(Identifier)+})+})+})
+    {+(
+      {+(Identifier)+})+}
+    {+(Identifier)+}) })
 {-(If
-  {-(Identifier)-})-})
+  {-(Identifier)-}
+  {-([])-}
+  {-(Empty)-})-})

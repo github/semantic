@@ -1,10 +1,8 @@
 (Program
-  (ExpressionStatements
-    (Operator
-      (Other "delete")
-    { (SubscriptAccess
-      {-(Identifier)-}
-      {-(StringLiteral)-})
-    ->(MemberAccess
-      {+(Identifier)+}
-      {+(Identifier)+}) })))
+  (Delete
+  { (Subscript
+    {-(Identifier)-}
+    {-(TextElement)-})
+  ->(MemberAccess
+    {+(Identifier)+}
+    {+(Identifier)+}) }))

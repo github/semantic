@@ -1,58 +1,113 @@
 (Program
-  (ExpressionStatements
-    (Class
+  (Class
+    (TypeParameter
     { (Identifier)
     ->(Identifier) }
-      (Other "type_parameters"
-        (Other "type_parameter"
-        { (Identifier)
-        ->(Identifier) }))
-      (Other "class_heritage"
-        (Other "extends_clause"
-        { (Identifier)
-        ->(Identifier) }))
-    {+(Method
-      {+(Identifier)+}
-      {+(Params
-        {+(Other "required_parameter"
-          {+(Identifier)+})+})+}
+      (Empty))
+  { (Identifier)
+  ->(Identifier) }
+    (ExtendsClause
+    {+(TypeIdentifier)+}
+    {-(TypeIdentifier)-})
+  {+(Method
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Identifier)+}
+    {+(RequiredParameter
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Assignment
+        {+(Identifier)+}
+        {+(Empty)+})+})+}
+    {+(
       {+(Return
-        {+(Identifier)+})+})+}
-    {+(Method
-      {+(Identifier)+}
-      {+(Params
-        {+(Other "required_parameter"
-          {+(Identifier)+})+})+}
+        {+(Identifier)+})+})+})+}
+  {+(Method
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Identifier)+}
+    {+(RequiredParameter
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Assignment
+        {+(Identifier)+}
+        {+(Empty)+})+})+}
+    {+(
       {+(Return
-        {+(Identifier)+})+})+}
-    {+(Method
-      {+(Identifier)+}
-      {+(Params
-        {+(Other "required_parameter"
-          {+(Identifier)+})+})+}
+        {+(Identifier)+})+})+})+}
+  {+(Method
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Identifier)+}
+    {+(RequiredParameter
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Assignment
+        {+(Identifier)+}
+        {+(Empty)+})+})+}
+    {+(
       {+(Return
-        {+(Identifier)+})+})+}
-    {-(FieldDecl
-      {-(Identifier)-}
-      {-(NumberLiteral)-})-}
-    {-(Method
-      {-(Identifier)-}
-      {-(Params
-        {-(Other "required_parameter"
-          {-(Identifier)-})-})-}
+        {+(Identifier)+})+})+})+}
+  {-(PublicFieldDefinition
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Identifier)-}
+    {-(Float)-})-}
+  {-(Method
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Identifier)-}
+    {-(RequiredParameter
+      {-(Empty)-}
+      {-(Empty)-}
+      {-(Assignment
+        {-(Identifier)-}
+        {-(Empty)-})-})-}
+    {-(
       {-(Return
-        {-(Identifier)-})-})-}
-    {-(Method
-      {-(Identifier)-}
-      {-(Params
-        {-(Other "required_parameter"
-          {-(Identifier)-})-})-}
+        {-(Identifier)-})-})-})-}
+  {-(Method
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Identifier)-}
+    {-(RequiredParameter
+      {-(Empty)-}
+      {-(Empty)-}
+      {-(Assignment
+        {-(Identifier)-}
+        {-(Empty)-})-})-}
+    {-(
       {-(Return
-        {-(Identifier)-})-})-}
-    {-(Method
-      {-(Identifier)-}
-      {-(Params
-        {-(Other "required_parameter"
-          {-(Identifier)-})-})-}
+        {-(Identifier)-})-})-})-}
+  {-(Method
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Identifier)-}
+    {-(RequiredParameter
+      {-(Empty)-}
+      {-(Empty)-}
+      {-(Assignment
+        {-(Identifier)-}
+        {-(Empty)-})-})-}
+    {-(
       {-(Return
-        {-(Identifier)-})-})-})))
+        {-(Identifier)-})-})-})-}))

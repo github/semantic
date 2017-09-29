@@ -1,70 +1,103 @@
 (Program
   (Export
-    (Other "export_specifier"
-      (Identifier))
-    (Other "export_specifier"
-      (Identifier))
-    (Other "export_specifier"
-      (Identifier))
-    (Other "export_specifier"
-      (Identifier)))
+    (ExportClause
+      (ImportExportSpecifier
+        (Identifier)
+        (Empty))
+      (ImportExportSpecifier
+        (Identifier)
+        (Empty))
+      (ImportExportSpecifier
+        (Identifier)
+        (Empty))
+      (ImportExportSpecifier
+        (Identifier)
+        (Empty))))
   (Export
-    (Other "export_specifier"
-      (Identifier)
-      (Identifier))
-    (Other "export_specifier"
-      (Identifier)
-      (Identifier))
-    (Other "export_specifier"
-      (Identifier)))
+    (ExportClause
+      (ImportExportSpecifier
+        (Identifier)
+        (Identifier))
+      (ImportExportSpecifier
+        (Identifier)
+        (Identifier))
+      (ImportExportSpecifier
+        (Identifier)
+        (Empty))))
   (Export
-    (VarDecl
-      (Identifier))
-    (VarDecl
-      (Identifier))
-    (VarDecl
-      (Identifier)))
+    (VariableDeclaration
+      (Assignment
+        (Empty)
+        (Identifier)
+        (Empty))
+      (Assignment
+        (Empty)
+        (Identifier)
+        (Empty))
+      (Assignment
+        (Empty)
+        (Identifier)
+        (Empty))))
   (Export
-    (VarAssignment
-      (Identifier)
-      (Identifier))
-    (VarAssignment
-      (Identifier)
-      (Identifier))
-    (VarDecl
-      (Identifier))
-    (VarDecl
-      (Identifier)))
+    (VariableDeclaration
+      (Assignment
+        (Empty)
+        (Identifier)
+        (Identifier))
+      (Assignment
+        (Empty)
+        (Identifier)
+        (Identifier))
+      (Assignment
+        (Empty)
+        (Identifier)
+        (Empty))
+      (Assignment
+        (Empty)
+        (Identifier)
+        (Empty))))
   (Export
     (Identifier))
   (Export
     (Function
+      (Empty)
+      (Empty)
       (Identifier)
-      (Params)))
+      ([])))
   (Export
     (Function
-      (Params)))
+      (Empty)
+      (Empty)
+      (Empty)
+      ([])))
   (Export
-    (Other "export_specifier"
-      (Identifier)
-      (Identifier)))
+    (ExportClause
+      (ImportExportSpecifier
+        (Identifier)
+        (Identifier))))
   (Export
-    (StringLiteral))
+    (TextElement))
   (Export
-    (StringLiteral)
-    (Other "export_specifier"
-      (Identifier))
-    (Other "export_specifier"
-      (Identifier))
-    (Other "export_specifier"
-      (Identifier)))
+    (ExportClause
+      (ImportExportSpecifier
+        (Identifier)
+        (Empty))
+      (ImportExportSpecifier
+        (Identifier)
+        (Empty))
+      (ImportExportSpecifier
+        (Identifier)
+        (Empty)))
+    (TextElement))
   (Export
-    (StringLiteral)
-    (Other "export_specifier"
-      (Identifier)
-      (Identifier))
-    (Other "export_specifier"
-      (Identifier)
-      (Identifier))
-    (Other "export_specifier"
-      (Identifier))))
+    (ExportClause
+      (ImportExportSpecifier
+        (Identifier)
+        (Identifier))
+      (ImportExportSpecifier
+        (Identifier)
+        (Identifier))
+      (ImportExportSpecifier
+        (Identifier)
+        (Empty)))
+    (TextElement)))

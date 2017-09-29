@@ -1,3 +1,4 @@
 (Program
   (Return
-  {+(NumberLiteral)+}))
+  { (Empty)
+  ->(Float) }))

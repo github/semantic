@@ -1,12 +1,13 @@
 (Program
-  (ExpressionStatements
-    (Function
-      (Identifier)
-      (Params)
-      (Other "variable_declaration"
-        (VarAssignment
+  (Function
+    (Empty)
+    (Empty)
+    (Identifier)
+    (
+      (VariableDeclaration
+        (Assignment
+          (Empty)
           (Identifier)
-          (NumberLiteral)))
-      (ExpressionStatements
-        (Yield
-          (Identifier))))))
+          (Float)))
+      (Yield
+        (Identifier)))))

@@ -1,10 +1,9 @@
 (Program
   (Assignment
-    (Args
+    (
       (Identifier)
-      (SplatParameter
-        (Identifier)))
-    (ArrayLiteral
-      (IntegerLiteral)
-      (IntegerLiteral)
-      (IntegerLiteral))))
+      (Identifier))
+    (Array
+      (Integer)
+      (Integer)
+      (Integer))))

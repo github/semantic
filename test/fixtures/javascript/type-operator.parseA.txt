@@ -1,5 +1,3 @@
 (Program
-  (ExpressionStatements
-    (Operator
-      (Other "typeof")
-      (Identifier))))
+  (Typeof
+    (Identifier)))

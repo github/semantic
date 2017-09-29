@@ -1,5 +1,5 @@
 (Program
 {+(Identifier)+}
-  (BeginBlock
-  { (Identifier)
-  ->(Identifier) }))
+  (ScopeEntry
+  {+(Identifier)+}
+  {-(Identifier)-}))

@@ -1,34 +1,35 @@
 (Program
-  (Object
-    (Pair
+  (Hash
+    (KeyValue
     { (Identifier)
-    ->(SymbolLiteral) }
-    { (StringLiteral)
-    ->(StringLiteral) })
-    (Pair
+    ->(Symbol) }
+    { (TextElement)
+    ->(TextElement) })
+    (KeyValue
     { (Identifier)
-    ->(SymbolLiteral) }
-    { (IntegerLiteral)
-    ->(IntegerLiteral) })
-    (Pair
+    ->(Symbol) }
+    { (Integer)
+    ->(Integer) })
+    (KeyValue
     { (Identifier)
-    ->(StringLiteral) }
+    ->(TextElement) }
     { (Boolean)
     ->(Boolean) })
-  {+(Pair
-    {+(SymbolLiteral)+}
-    {+(IntegerLiteral)+})+})
-{+(Object)+}
-{+(Object
-  {+(Comment)+}
-  {+(Pair
+  {+(KeyValue
+    {+(Symbol)+}
+    {+(Integer)+})+})
+{+(Hash)+}
+{+(Hash
+  {+(KeyValue
     {+(Identifier)+}
-    {+(IntegerLiteral)+})+}
-  {+(Comment)+}
-  {+(Comment)+}
-  {+(Pair
-    {+(StringLiteral)+}
-    {+(IntegerLiteral)+})+}
-  {+(Comment)+})+}
-{+(Object
-  {+(Comment)+})+})
+    {+(Integer)+})+}
+  {+(KeyValue
+    {+(TextElement)+}
+    {+(Integer)+})+}
+  {+(Context
+    {+(Comment)+}
+    {+(Empty)+})+})+}
+{+(Hash
+  {+(Context
+    {+(Comment)+}
+    {+(Empty)+})+})+})

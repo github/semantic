@@ -1,17 +1,19 @@
 (Program
-  (Switch
-  { (NumberLiteral)
-  ->(NumberLiteral) }
-    (Case
-      (NumberLiteral)
-      (ExpressionStatements
-        (NumberLiteral)))
-    (Case
-      (NumberLiteral)
-      (ExpressionStatements
-      { (NumberLiteral)
-      ->(NumberLiteral) }))
-    (Case
-      (NumberLiteral)
-      (ExpressionStatements
-        (NumberLiteral)))))
+  (Match
+  { (Float)
+  ->(Float) }
+    (
+      (Pattern
+        (Float)
+        (
+          (Float)))
+      (Pattern
+        (Float)
+        (
+        {+(Float)+}
+        {-(Float)-}))
+      (Pattern
+        (Float)
+        (
+          (Float)))))
+  (Empty))

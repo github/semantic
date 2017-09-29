@@ -1,6 +1,4 @@
 (Program
-  (ExpressionStatements
-    (RelationalOperator
-      (Identifier)
-      (Other "<")
-      (Identifier))))
+  (LessThan
+    (Identifier)
+    (Identifier)))

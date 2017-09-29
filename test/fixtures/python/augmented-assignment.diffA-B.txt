@@ -16,13 +16,12 @@
   ->(DividedBy
     {+(Identifier)+}
     {+(Integer)+}) })
-{+(Assignment
-  {+(Identifier)+}
-  {+(Plus
-    {+(Identifier)+}
-    {+(Integer)+})+})+}
-{-(Assignment
-  {-(Identifier)-}
-  {-(DividedBy
+  (Assignment
+  { (Identifier)
+  ->(Identifier) }
+  { (DividedBy
     {-(Identifier)-}
-    {-(Integer)-})-})-})
+    {-(Integer)-})
+  ->(Plus
+    {+(Identifier)+}
+    {+(Integer)+}) }))

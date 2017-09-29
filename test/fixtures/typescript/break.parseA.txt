@@ -2,21 +2,20 @@
   (For
     (Assignment
       (Identifier)
-      (NumberLiteral))
-    (RelationalOperator
+      (Float))
+    (LessThan
       (Identifier)
-      (Other "<")
-      (NumberLiteral))
-    (MathOperator
-      (Identifier)
-      (Other "++"))
-    (ExpressionStatements
+      (Float))
+    (Update
+      (Identifier))
+    (
       (If
-        (RelationalOperator
+        (Equal
           (Identifier)
-          (Other "===")
-          (NumberLiteral))
-        (ExpressionStatements
-          (Break)))
-      (ExpressionStatements
-        (Identifier)))))
+          (Float))
+        (
+          (Break
+            (Empty)))
+        (Empty))
+      (Empty)
+      (Identifier))))

@@ -1,12 +1,15 @@
 (Program
-  (Other "variable_declaration"
-  {+(VarAssignment
-    {+(Identifier)+}
-    {+(NumberLiteral)+})+}
-  {-(VarDecl
-    {-(Identifier)-})-}
-  {-(VarAssignment
+  (VariableDeclaration
+    (Assignment
+      (Empty)
+      (Identifier)
+    { (Empty)
+    ->(Float) })
+  {-(Assignment
+    {-(Empty)-}
     {-(Identifier)-}
-    {-(Object)-})-}
-  {-(VarDecl
-    {-(Identifier)-})-}))
+    {-(Hash)-})-}
+  {-(Assignment
+    {-(Empty)-}
+    {-(Identifier)-}
+    {-(Empty)-})-}))

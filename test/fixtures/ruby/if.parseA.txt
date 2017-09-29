@@ -1,9 +1,10 @@
 (Program
   (If
     (Identifier)
-    (Identifier)
-    (Elsif
+    (
+      (Identifier))
+    (If
       (Identifier)
-      (Identifier)
-      (Else
-        (Identifier)))))
+      (
+        (Identifier))
+      (Identifier))))
