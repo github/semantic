@@ -66,10 +66,10 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (IdentityTermRenderer, Just Language.Python) -> pure Nothing
   (IdentityTermRenderer, Just Language.TypeScript) -> pure Nothing
   (IdentityTermRenderer, _) | Just syntaxParser <- syntaxParser -> Just <$> parse syntaxParser blob
-  _ -> throwError (SomeException (NoParserForLanguage blobLanguage))
+  _ -> throwError (SomeException (NoParserForLanguage blobPath blobLanguage))
   where syntaxParser = blobLanguage >>= parserForLanguage
 
-newtype NoParserForLanguage = NoParserForLanguage (Maybe Language.Language)
+data NoParserForLanguage = NoParserForLanguage FilePath (Maybe Language.Language)
   deriving (Eq, Exception, Ord, Show, Typeable)
 
 
