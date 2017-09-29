@@ -100,7 +100,6 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (SExpressionDiffRenderer, Just Language.Ruby) -> run (decorate constructorLabel <=< parse rubyParser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
   (SExpressionDiffRenderer, Just Language.TypeScript) -> run (decorate constructorLabel <=< parse typescriptParser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
   (SExpressionDiffRenderer, _) | Just syntaxParser <- syntaxParser -> run (parse syntaxParser) diffSyntaxTerms (renderSExpressionDiff . bimap keepCategory keepCategory)
-  (IdentityDiffRenderer, _) | Just syntaxParser <- syntaxParser -> run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms Just
   _ -> throwError (SomeException (NoParserForLanguage effectivePath effectiveLanguage))
   where (effectivePath, effectiveLanguage) = case runJoin blobs of
           (Blob { blobLanguage = Just lang, blobPath = path }, _) -> (path, Just lang)
