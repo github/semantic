@@ -54,9 +54,8 @@ data Parser term where
   LineByLineParser :: Parser (Term Syntax (Record DefaultFields))
 
 -- | Return a 'Language'-specific 'Parser', if one exists, falling back to the 'LineByLineParser'.
-parserForLanguage :: Maybe Language -> Parser (Term Syntax (Record DefaultFields))
-parserForLanguage Nothing = LineByLineParser
-parserForLanguage (Just language) = case language of
+parserForLanguage :: Language -> Parser (Term Syntax (Record DefaultFields))
+parserForLanguage language = case language of
   Go -> TreeSitterParser tree_sitter_go
   JavaScript -> TreeSitterParser tree_sitter_typescript
   JSON -> TreeSitterParser tree_sitter_json
