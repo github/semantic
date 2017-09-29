@@ -2,7 +2,7 @@
   (VariableDeclaration
     (Assignment
       (Annotation
-        (Function
+        (FunctionType
           (Empty)
           (TypeIdentifier)))
       (Identifier)
