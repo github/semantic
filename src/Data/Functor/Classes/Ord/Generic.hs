@@ -1,4 +1,9 @@
-module Data.Functor.Classes.Ord.Generic where
+module Data.Functor.Classes.Ord.Generic
+( Ord1(..)
+, genericLiftCompare
+) where
+
+import Data.Functor.Classes
 import GHC.Generics
 
 -- | Generically-derivable lifting of the 'Ord' class to unary type constructors.
