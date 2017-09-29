@@ -3,7 +3,6 @@ module Parser
 ( Parser(..)
 -- Syntax parsers
 , parserForLanguage
-, lineByLineParser
 -- À la carte parsers
 , jsonParser
 , markdownParser
@@ -16,7 +15,6 @@ import qualified CMarkGFM
 import Data.Functor.Classes (Eq1)
 import Data.Ix
 import Data.Record
-import Data.Source as Source
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
 import Data.Term
@@ -76,9 +74,3 @@ typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScrip
 
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
-
-
--- | A fallback parser that treats a file simply as rows of strings.
-lineByLineParser :: Source -> Term Syntax (Record DefaultFields)
-lineByLineParser source = termIn (totalRange source :. Program :. totalSpan source :. Nil) (Indexed (zipWith toLine [1..] (sourceLineRanges source)))
-  where toLine line range = termIn (range :. Program :. Span (Pos line 1) (Pos line (end range)) :. Nil) (Leaf (toText (slice range source)))
