@@ -19,17 +19,13 @@ module Renderer
 
 import Data.Aeson (Value)
 import Data.ByteString (ByteString)
-import Data.Diff
 import qualified Data.Map as Map
 import Data.Output
-import Data.Record
 import Data.Text (Text)
-import Info (DefaultFields)
 import Renderer.JSON as R
 import Renderer.Patch as R
 import Renderer.SExpression as R
 import Renderer.TOC as R
-import Syntax as S
 
 -- | Specification of renderers for diffs, producing output in the parameter type.
 data DiffRenderer output where
@@ -43,8 +39,6 @@ data DiffRenderer output where
   JSONDiffRenderer :: DiffRenderer (Map.Map Text Value)
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
   SExpressionDiffRenderer :: DiffRenderer ByteString
-  -- | “Render” by returning the computed 'Diff'. This renderer is not surfaced in the command-line interface, and is intended strictly for tests. Further, as it cannot render à la carte terms, it should be regarded as a (very) short-term hack until such time as we have a better idea for TOCSpec.hs.
-  IdentityDiffRenderer :: DiffRenderer (Maybe (Diff Syntax (Record (Maybe Declaration ': DefaultFields)) (Record (Maybe Declaration ': DefaultFields))))
 
 deriving instance Eq (DiffRenderer output)
 deriving instance Show (DiffRenderer output)
