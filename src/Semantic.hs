@@ -82,14 +82,14 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (OldToCDiffRenderer, Just Language.Python) -> run (\ blob -> parse pythonParser blob >>= decorate (declarationAlgebra blob)) diffTerms (renderToCDiff blobs)
   (OldToCDiffRenderer, _) -> run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms (renderToCDiff blobs)
 
-  (ToCDiffRenderer, Just Language.Go) -> run (\ blob -> parse goParser blob >>= decorate (declarationAlgebra blob)) diffRecursively (renderToCDiff blobs)
+  (ToCDiffRenderer, Just Language.Go) -> run (\ blob -> parse goParser blob >>= decorate (declarationAlgebra blob)) diffTerms (renderToCDiff blobs)
   (ToCDiffRenderer, Just Language.Markdown) -> run (\ blob -> parse markdownParser blob >>= decorate (markupSectionAlgebra blob)) diffTerms (renderToCDiff blobs)
   (ToCDiffRenderer, Just Language.Python) -> run (\ blob -> parse pythonParser blob >>= decorate (declarationAlgebra blob)) diffTerms (renderToCDiff blobs)
   (ToCDiffRenderer, Just Language.Ruby) -> run (\ blob -> parse rubyParser blob >>= decorate (declarationAlgebra blob)) diffTerms (renderToCDiff blobs)
   (ToCDiffRenderer, Just Language.TypeScript) -> run (\ blob -> parse typescriptParser blob >>= decorate (declarationAlgebra blob)) diffTerms (renderToCDiff blobs)
   (ToCDiffRenderer, _) -> run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms (renderToCDiff blobs)
 
-  (JSONDiffRenderer, Just Language.Go) -> run (parse goParser) diffRecursively (renderJSONDiff blobs)
+  (JSONDiffRenderer, Just Language.Go) -> run (parse goParser) diffTerms (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.JSON) -> run (parse jsonParser) diffTerms (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffTerms (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffTerms (renderJSONDiff blobs)
@@ -97,7 +97,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (JSONDiffRenderer, Just Language.TypeScript) -> run (parse typescriptParser) diffTerms (renderJSONDiff blobs)
   (JSONDiffRenderer, _) -> run (decorate syntaxIdentifierAlgebra <=< parse syntaxParser) diffSyntaxTerms (renderJSONDiff blobs)
 
-  (PatchDiffRenderer, Just Language.Go) -> run (parse goParser) diffRecursively (renderPatch blobs)
+  (PatchDiffRenderer, Just Language.Go) -> run (parse goParser) diffTerms (renderPatch blobs)
   (PatchDiffRenderer, Just Language.JSON) -> run (parse jsonParser) diffTerms (renderPatch blobs)
   (PatchDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffTerms (renderPatch blobs)
   (PatchDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffTerms (renderPatch blobs)
@@ -105,7 +105,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (PatchDiffRenderer, Just Language.TypeScript) -> run (parse typescriptParser) diffTerms (renderPatch blobs)
   (PatchDiffRenderer, _) -> run (parse syntaxParser) diffSyntaxTerms (renderPatch blobs)
 
-  (SExpressionDiffRenderer, Just Language.Go) -> run (decorate constructorLabel <=< parse goParser) diffRecursively (renderSExpressionDiff . fmap keepConstructorLabel)
+  (SExpressionDiffRenderer, Just Language.Go) -> run (decorate constructorLabel <=< parse goParser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
   (SExpressionDiffRenderer, Just Language.JSON) -> run (decorate constructorLabel <=< parse jsonParser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
   (SExpressionDiffRenderer, Just Language.Markdown) -> run (decorate constructorLabel <=< parse markdownParser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
   (SExpressionDiffRenderer, Just Language.Python) -> run (decorate constructorLabel <=< parse pythonParser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
