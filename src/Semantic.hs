@@ -7,7 +7,6 @@ module Semantic
 , diffTermPair
 ) where
 
-import Control.Applicative ((<|>))
 import Control.Exception
 import Control.Monad ((<=<))
 import Control.Monad.Error.Class
@@ -16,7 +15,6 @@ import Data.Blob
 import Data.ByteString (ByteString)
 import Data.Diff
 import Data.Functor.Both as Both
-import Data.Maybe (fromMaybe)
 import Data.Output
 import Data.Record
 import Data.Syntax.Algebra
@@ -81,35 +79,39 @@ diffBlobPair :: DiffRenderer output -> Both Blob -> Task output
 diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (OldToCDiffRenderer, Just Language.Markdown) -> run (\ blob -> parse markdownParser blob >>= decorate (markupSectionAlgebra blob)) diffTerms (renderToCDiff blobs)
   (OldToCDiffRenderer, Just Language.Python) -> run (\ blob -> parse pythonParser blob >>= decorate (declarationAlgebra blob)) diffTerms (renderToCDiff blobs)
-  (OldToCDiffRenderer, _) -> run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms (renderToCDiff blobs)
+  (OldToCDiffRenderer, _) | Just syntaxParser <- syntaxParser -> run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms (renderToCDiff blobs)
 
   (ToCDiffRenderer, Just Language.Markdown) -> run (\ blob -> parse markdownParser blob >>= decorate (markupSectionAlgebra blob)) diffTerms (renderToCDiff blobs)
   (ToCDiffRenderer, Just Language.Python) -> run (\ blob -> parse pythonParser blob >>= decorate (declarationAlgebra blob)) diffTerms (renderToCDiff blobs)
   (ToCDiffRenderer, Just Language.Ruby) -> run (\ blob -> parse rubyParser blob >>= decorate (declarationAlgebra blob)) diffTerms (renderToCDiff blobs)
   (ToCDiffRenderer, Just Language.TypeScript) -> run (\ blob -> parse typescriptParser blob >>= decorate (declarationAlgebra blob)) diffTerms (renderToCDiff blobs)
-  (ToCDiffRenderer, _) -> run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms (renderToCDiff blobs)
+  (ToCDiffRenderer, _) | Just syntaxParser <- syntaxParser -> run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms (renderToCDiff blobs)
 
   (JSONDiffRenderer, Just Language.JSON) -> run (parse jsonParser) diffTerms (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffTerms (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffTerms (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.Ruby) -> run (parse rubyParser) diffTerms (renderJSONDiff blobs)
   (JSONDiffRenderer, Just Language.TypeScript) -> run (parse typescriptParser) diffTerms (renderJSONDiff blobs)
-  (JSONDiffRenderer, _) -> run (decorate syntaxIdentifierAlgebra <=< parse syntaxParser) diffSyntaxTerms (renderJSONDiff blobs)
+  (JSONDiffRenderer, _) | Just syntaxParser <- syntaxParser -> run (decorate syntaxIdentifierAlgebra <=< parse syntaxParser) diffSyntaxTerms (renderJSONDiff blobs)
   (PatchDiffRenderer, Just Language.JSON) -> run (parse jsonParser) diffTerms (renderPatch blobs)
   (PatchDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffTerms (renderPatch blobs)
   (PatchDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffTerms (renderPatch blobs)
   (PatchDiffRenderer, Just Language.Ruby) -> run (parse rubyParser) diffTerms (renderPatch blobs)
   (PatchDiffRenderer, Just Language.TypeScript) -> run (parse typescriptParser) diffTerms (renderPatch blobs)
-  (PatchDiffRenderer, _) -> run (parse syntaxParser) diffSyntaxTerms (renderPatch blobs)
+  (PatchDiffRenderer, _) | Just syntaxParser <- syntaxParser -> run (parse syntaxParser) diffSyntaxTerms (renderPatch blobs)
   (SExpressionDiffRenderer, Just Language.JSON) -> run (decorate constructorLabel <=< parse jsonParser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
   (SExpressionDiffRenderer, Just Language.Markdown) -> run (decorate constructorLabel <=< parse markdownParser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
   (SExpressionDiffRenderer, Just Language.Python) -> run (decorate constructorLabel <=< parse pythonParser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
   (SExpressionDiffRenderer, Just Language.Ruby) -> run (decorate constructorLabel <=< parse rubyParser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
   (SExpressionDiffRenderer, Just Language.TypeScript) -> run (decorate constructorLabel <=< parse typescriptParser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
-  (SExpressionDiffRenderer, _) -> run (parse syntaxParser) diffSyntaxTerms (renderSExpressionDiff . bimap keepCategory keepCategory)
-  (IdentityDiffRenderer, _) -> run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms Just
-  where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)
-        syntaxParser = fromMaybe LineByLineParser (effectiveLanguage >>= parserForLanguage)
+  (SExpressionDiffRenderer, _) | Just syntaxParser <- syntaxParser -> run (parse syntaxParser) diffSyntaxTerms (renderSExpressionDiff . bimap keepCategory keepCategory)
+  (IdentityDiffRenderer, _) | Just syntaxParser <- syntaxParser -> run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms Just
+  _ -> throwError (SomeException (NoParserForLanguage effectivePath effectiveLanguage))
+  where (effectivePath, effectiveLanguage) = case runJoin blobs of
+          (Blob { blobLanguage = Just lang, blobPath = path }, _) -> (path, Just lang)
+          (_, Blob { blobLanguage = Just lang, blobPath = path }) -> (path, Just lang)
+          (Blob { blobPath = path }, _)                           -> (path, Nothing)
+        syntaxParser = effectiveLanguage >>= parserForLanguage
 
         run :: Functor syntax => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Diff syntax ann ann -> output) -> Task output
         run parse diff renderer = distributeFor blobs parse >>= runBothWith (diffTermPair blobs diff) >>= render renderer
