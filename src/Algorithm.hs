@@ -203,7 +203,3 @@ instance GDiffable U1 where
 -- | Diff two 'Diffable' containers of parameters.
 instance Diffable f => GDiffable (Rec1 f) where
   galgorithmFor a b = Rec1 <$> algorithmFor (unRec1 a) (unRec1 b)
-
--- | Diff two maybes holding parameters.
-instance Diffable' (Rec1 Maybe) where
-  algorithmFor' (Rec1 a) (Rec1 b) = Just $ Rec1 <$> diffMaybe a b
