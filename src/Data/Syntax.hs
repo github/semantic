@@ -8,10 +8,11 @@ import Data.Align.Generic
 import Data.ByteString (ByteString)
 import qualified Data.Error as Error
 import Data.Foldable (asum, toList)
-import Data.Function ((&))
+import Data.Function ((&), on)
 import Data.Ix
 import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
 import Data.Functor.Classes.Eq.Generic
+import Data.Functor.Classes.Ord.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Mergeable
 import Data.Record
@@ -101,22 +102,25 @@ infixContext context left right operators = uncurry (&) <$> postContextualizeThr
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
 newtype Identifier a = Identifier ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Identifier where liftEq = genericLiftEq
+instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 newtype Program a = Program [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Program where liftEq = genericLiftEq
+instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 AccessibilityModifier where liftEq = genericLiftEq
+instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare
 instance Show1 AccessibilityModifier where liftShowsPrec = genericLiftShowsPrec
 
 
@@ -124,7 +128,7 @@ instance Show1 AccessibilityModifier where liftShowsPrec = genericLiftShowsPrec
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Empty where liftEq _ _ _ = True
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
@@ -132,9 +136,10 @@ instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Error where liftEq = genericLiftEq
+instance Ord1 Error where liftCompare = genericLiftCompare
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 
 errorSyntax :: Error.Error String -> [a] -> Error a
@@ -160,10 +165,11 @@ instance Ord ErrorStack where
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Diffable Context where
   subalgorithmFor blur focus (Context n1 s1) = Context <$> traverse blur n1 <*> focus s1
 
 instance Eq1 Context where liftEq = genericLiftEq
+instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
