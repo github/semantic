@@ -23,7 +23,6 @@ import Data.Diff
 import qualified Data.Map as Map
 import Data.Output
 import Data.Record
-import Data.Term
 import Data.Text (Text)
 import Info (DefaultFields)
 import Renderer.JSON as R
