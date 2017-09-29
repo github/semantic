@@ -3,8 +3,6 @@ module Data.Functor.Classes.Show.Generic
 ( Show1(..)
 , genericLiftShowsPrec
 , genericLiftShowList
-, gliftShowsPrec
-, gliftShowList
 ) where
 
 import Data.Functor.Classes
