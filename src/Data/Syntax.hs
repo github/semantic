@@ -53,7 +53,7 @@ handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pur
 
 -- | Catch parse errors into an error term.
 parseError :: (HasCallStack, Error :< fs, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
-parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (getCallStack (freezeCallStack callStack)) [] (Just "ParseError") [])
+parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (ErrorStack (getCallStack (freezeCallStack callStack))) [] (Just "ParseError") [])
 
 
 -- | Match context terms before a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.
@@ -131,17 +131,32 @@ instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 
 -- | Syntax representing a parsing or assignment error.
-data Error a = Error { errorCallStack :: [([Char], SrcLoc)], errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
+data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 
 errorSyntax :: Error.Error String -> [a] -> Error a
-errorSyntax Error.Error{..} = Error (getCallStack callStack) errorExpected errorActual
+errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorExpected errorActual
 
 unError :: Span -> Error a -> Error.Error String
-unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList errorCallStack)) (Error.Error span errorExpected errorActual)
+unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList (unErrorStack errorCallStack))) (Error.Error span errorExpected errorActual)
+
+newtype ErrorStack = ErrorStack { unErrorStack :: [(String, SrcLoc)] }
+  deriving (Eq, Show)
+
+instance Ord ErrorStack where
+  compare = liftCompare (liftCompare compareSrcLoc) `on` unErrorStack
+    where compareSrcLoc s1 s2 = mconcat
+            [ (compare `on` srcLocPackage) s1 s2
+            , (compare `on` srcLocModule) s1 s2
+            , (compare `on` srcLocFile) s1 s2
+            , (compare `on` srcLocStartLine) s1 s2
+            , (compare `on` srcLocStartCol) s1 s2
+            , (compare `on` srcLocEndLine) s1 s2
+            , (compare `on` srcLocEndCol) s1 s2
+            ]
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
