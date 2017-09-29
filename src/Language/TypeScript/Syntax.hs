@@ -958,7 +958,7 @@ intersectionType :: Assignment
 intersectionType = makeTerm <$> symbol IntersectionType <*> children (Language.TypeScript.Syntax.Intersection <$> ty <*> ty)
 
 functionTy :: Assignment
-functionTy = makeTerm <$> symbol FunctionType <*> children (Language.TypeScript.Syntax.FunctionType <$> (fromMaybe <$> emptyTerm <*> optional typeParameters) <*> formalParameters <*> ty)
+functionTy = makeTerm <$> symbol Grammar.FunctionType <*> children (Language.TypeScript.Syntax.FunctionType <$> (fromMaybe <$> emptyTerm <*> optional typeParameters) <*> formalParameters <*> ty)
 
 tupleType :: Assignment
 tupleType = makeTerm <$> symbol TupleType <*> children (Language.TypeScript.Syntax.Tuple <$> many (term ty))
