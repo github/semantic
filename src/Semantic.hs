@@ -14,6 +14,7 @@ import Data.Blob
 import Data.ByteString (ByteString)
 import Data.Diff
 import Data.Functor.Both as Both
+import Data.Maybe (fromMaybe)
 import Data.Output
 import Data.Record
 import Data.Syntax.Algebra
@@ -62,7 +63,7 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (IdentityTermRenderer, Just Language.Python) -> pure Nothing
   (IdentityTermRenderer, Just Language.TypeScript) -> pure Nothing
   (IdentityTermRenderer, _) -> Just <$> parse syntaxParser blob
-  where syntaxParser = maybe LineByLineParser parserForLanguage blobLanguage
+  where syntaxParser = fromMaybe LineByLineParser (blobLanguage >>= parserForLanguage)
 
 
 diffBlobPairs :: Output output => DiffRenderer output -> [Both Blob] -> Task ByteString
@@ -101,7 +102,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (SExpressionDiffRenderer, _) -> run (parse syntaxParser) diffSyntaxTerms (renderSExpressionDiff . bimap keepCategory keepCategory)
   (IdentityDiffRenderer, _) -> run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms Just
   where effectiveLanguage = runBothWith (<|>) (blobLanguage <$> blobs)
-        syntaxParser = maybe LineByLineParser parserForLanguage effectiveLanguage
+        syntaxParser = fromMaybe LineByLineParser (effectiveLanguage >>= parserForLanguage)
 
         run :: Functor syntax => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Diff syntax ann ann -> output) -> Task output
         run parse diff renderer = distributeFor blobs parse >>= runBothWith (diffTermPair blobs diff) >>= render renderer

@@ -54,15 +54,15 @@ data Parser term where
   LineByLineParser :: Parser (Term Syntax (Record DefaultFields))
 
 -- | Return a 'Language'-specific 'Parser', if one exists, falling back to the 'LineByLineParser'.
-parserForLanguage :: Language -> Parser (Term Syntax (Record DefaultFields))
+parserForLanguage :: Language -> Maybe (Parser (Term Syntax (Record DefaultFields)))
 parserForLanguage language = case language of
-  Go -> TreeSitterParser tree_sitter_go
-  JavaScript -> TreeSitterParser tree_sitter_typescript
-  JSON -> TreeSitterParser tree_sitter_json
-  JSX -> TreeSitterParser tree_sitter_typescript
-  Ruby -> TreeSitterParser tree_sitter_ruby
-  TypeScript -> TreeSitterParser tree_sitter_typescript
-  _ -> LineByLineParser
+  Go         -> Just (TreeSitterParser tree_sitter_go)
+  JavaScript -> Just (TreeSitterParser tree_sitter_typescript)
+  JSON       -> Just (TreeSitterParser tree_sitter_json)
+  JSX        -> Just (TreeSitterParser tree_sitter_typescript)
+  Ruby       -> Just (TreeSitterParser tree_sitter_ruby)
+  TypeScript -> Just (TreeSitterParser tree_sitter_typescript)
+  _ -> Nothing
 
 rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
