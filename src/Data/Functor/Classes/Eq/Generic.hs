@@ -2,7 +2,6 @@
 module Data.Functor.Classes.Eq.Generic
 ( Eq1(..)
 , genericLiftEq
-, gliftEq
 ) where
 
 import Control.Comonad.Cofree as Cofree
