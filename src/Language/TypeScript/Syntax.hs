@@ -12,13 +12,12 @@ import Algorithm
 import GHC.Generics
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Show.Generic
-import Data.Foldable (asum)
 import Data.ByteString (ByteString)
 import Data.Align.Generic
 import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Maybe (catMaybes)
-import Data.Syntax (emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1, contextualize)
+import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm1, postContextualize)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -31,10 +30,10 @@ import qualified Data.Syntax.Type as Type
 import Data.Union
 import GHC.Stack
 import Language.TypeScript.Grammar as Grammar
-import qualified Term
-import Data.List.Split (chunksOf)
-import Data.List.NonEmpty (NonEmpty(..))
-
+import qualified Data.Term as Term
+import Data.List.NonEmpty (some1)
+import Data.Function (on)
+import Data.Foldable (toList)
 
 -- | The type of TypeScript syntax.
 type Syntax = '[
@@ -55,6 +54,7 @@ type Syntax = '[
   , Expression.Delete
   , Expression.Void
   , Expression.Typeof
+  , Expression.InstanceOf
   , Literal.Array
   , Literal.Boolean
   , Literal.Float
@@ -119,7 +119,7 @@ type Syntax = '[
   , Language.TypeScript.Syntax.LiteralType
   , Language.TypeScript.Syntax.Union
   , Language.TypeScript.Syntax.Intersection
-  , Language.TypeScript.Syntax.Function
+  , Language.TypeScript.Syntax.FunctionType
   , Language.TypeScript.Syntax.Tuple
   , Language.TypeScript.Syntax.Constructor
   , Language.TypeScript.Syntax.TypeAssertion
@@ -147,7 +147,6 @@ type Syntax = '[
   , Language.TypeScript.Syntax.RequiredParameter
   , Language.TypeScript.Syntax.RestParameter
   , Language.TypeScript.Syntax.PropertySignature
-  , Language.TypeScript.Syntax.ExpressionStatement
   , Language.TypeScript.Syntax.ImportExportSpecifier
   , Language.TypeScript.Syntax.ExportClause
   , Language.TypeScript.Syntax.Export
@@ -170,7 +169,8 @@ type Syntax = '[
   , Language.TypeScript.Syntax.Update
   , Language.TypeScript.Syntax.Await
   , Language.TypeScript.Syntax.PublicFieldDefinition
-  , Type.Visibility
+  , Language.TypeScript.Syntax.VariableDeclaration
+  , Language.TypeScript.Syntax.ComputedPropertyName
   , []
   ]
 
@@ -178,7 +178,7 @@ type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 -- | ShorthandPropertyIdentifier used in object patterns such as var baz = { foo } to mean var baz = { foo: foo }
-data ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier ByteString
+newtype ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier ByteString
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 ShorthandPropertyIdentifier where liftEq = genericLiftEq
@@ -196,17 +196,17 @@ data Intersection a = Intersection { intersectionLeft :: !a, intersectionRight :
 instance Eq1 Intersection where liftEq = genericLiftEq
 instance Show1 Intersection where liftShowsPrec = genericLiftShowsPrec
 
-data PublicFieldDefinition a = PublicFieldDefinition { publicFieldPropertyName :: !a, publicFieldValue :: !a }
+data PublicFieldDefinition a = PublicFieldDefinition { publicFieldContext :: ![a], publicFieldPropertyName :: !a, publicFieldValue :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 PublicFieldDefinition where liftEq = genericLiftEq
 instance Show1 PublicFieldDefinition where liftShowsPrec = genericLiftShowsPrec
 
-data Function a = Function { functionTypeParameters :: !a, functionFormalParameters :: ![a], functionType :: !a }
+data FunctionType a = FunctionType { functionTypeParameters :: !a, functionFormalParameters :: ![a], functionType :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
-instance Eq1 Function where liftEq = genericLiftEq
-instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 FunctionType where liftEq = genericLiftEq
+instance Show1 FunctionType where liftShowsPrec = genericLiftShowsPrec
 
 data AmbientFunction a = AmbientFunction { ambientFunctionContext :: ![a], ambientFunctionIdentifier :: !a, ambientFunctionParameters :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -220,19 +220,19 @@ data ImportRequireClause a = ImportRequireClause { importRequireIdentifier :: !a
 instance Eq1 ImportRequireClause where liftEq = genericLiftEq
 instance Show1 ImportRequireClause where liftShowsPrec = genericLiftShowsPrec
 
-data ImportClause a = ImportClause { importClauseElements :: ![a] }
+newtype ImportClause a = ImportClause { importClauseElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 ImportClause where liftEq = genericLiftEq
 instance Show1 ImportClause where liftShowsPrec = genericLiftShowsPrec
 
-data NamespaceImport a = NamespaceImport { namespaceImportSubject :: !a }
+newtype NamespaceImport a = NamespaceImport { namespaceImportSubject :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 NamespaceImport where liftEq = genericLiftEq
 instance Show1 NamespaceImport where liftShowsPrec = genericLiftShowsPrec
 
-data Tuple a = Tuple { tupleElements :: ![a] }
+newtype Tuple a = Tuple { tupleElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Tuple where liftEq = genericLiftEq
@@ -262,31 +262,37 @@ data Cast a =  Cast { castSubject :: !a, castType :: !a }
 instance Eq1 Cast where liftEq = genericLiftEq
 instance Show1 Cast where liftShowsPrec = genericLiftShowsPrec
 
-data Annotation a = Annotation { typeAnnotation :: !a }
+newtype Annotation a = Annotation { annotationType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Annotation where liftEq = genericLiftEq
 instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
 
-data Constraint a = Constraint { constraintType :: !a }
+newtype ComputedPropertyName a = ComputedPropertyName a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 ComputedPropertyName where liftEq = genericLiftEq
+instance Show1 ComputedPropertyName where liftShowsPrec = genericLiftShowsPrec
+
+newtype Constraint a = Constraint { constraintType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Constraint where liftEq = genericLiftEq
 instance Show1 Constraint where liftShowsPrec = genericLiftShowsPrec
 
-data ParenthesizedType a = ParenthesizedType { parenthesizedType :: !a }
+newtype ParenthesizedType a = ParenthesizedType { parenthesizedType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 ParenthesizedType where liftEq = genericLiftEq
 instance Show1 ParenthesizedType where liftShowsPrec = genericLiftShowsPrec
 
-data PredefinedType a = PredefinedType { predefinedType :: !ByteString }
+newtype PredefinedType a = PredefinedType { predefinedType :: ByteString }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 PredefinedType where liftEq = genericLiftEq
 instance Show1 PredefinedType where liftShowsPrec = genericLiftShowsPrec
 
-data TypeIdentifier a = TypeIdentifier ByteString
+newtype TypeIdentifier a = TypeIdentifier ByteString
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 TypeIdentifier where liftEq = genericLiftEq
@@ -316,19 +322,19 @@ data TypePredicate a = TypePredicate { typePredicateIdentifier :: !a, typePredic
 instance Eq1 TypePredicate where liftEq = genericLiftEq
 instance Show1 TypePredicate where liftShowsPrec = genericLiftShowsPrec
 
-data ObjectType a = ObjectType { objectTypeElements :: ![a] }
+newtype ObjectType a = ObjectType { objectTypeElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 ObjectType where liftEq = genericLiftEq
 instance Show1 ObjectType where liftShowsPrec = genericLiftShowsPrec
 
-data Export a = Export { exportElements :: ![a] }
+newtype Export a = Export { exportElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Export where liftEq = genericLiftEq
 instance Show1 Export where liftShowsPrec = genericLiftShowsPrec
 
-data ExportClause a = ExportClause { exportClauseElements :: ![a] }
+newtype ExportClause a = ExportClause { exportClauseElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 ExportClause where liftEq = genericLiftEq
@@ -340,7 +346,7 @@ data ImportExportSpecifier a = ImportExportSpecifier { specifierSubject :: !a, s
 instance Eq1 ImportExportSpecifier where liftEq = genericLiftEq
 instance Show1 ImportExportSpecifier where liftShowsPrec = genericLiftShowsPrec
 
-data NamedImports a = NamedImports { namedImportElements :: ![a] }
+newtype NamedImports a = NamedImports { namedImportElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 NamedImports where liftEq = genericLiftEq
@@ -352,7 +358,7 @@ data With a = With { withExpression :: !a, withBody :: !a }
 instance Eq1 With where liftEq = genericLiftEq
 instance Show1 With where liftShowsPrec = genericLiftShowsPrec
 
-data AmbientDeclaration a = AmbientDeclaration { ambientDeclarationBody :: !a }
+newtype AmbientDeclaration a = AmbientDeclaration { ambientDeclarationBody :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 AmbientDeclaration where liftEq = genericLiftEq
@@ -376,61 +382,61 @@ data TypeAliasDeclaration a = TypeAliasDeclaration { typeAliasDeclarationContext
 instance Eq1 TypeAliasDeclaration where liftEq = genericLiftEq
 instance Show1 TypeAliasDeclaration where liftShowsPrec = genericLiftShowsPrec
 
-data ExtendsClause a = ExtendsClause { extendsClauseTypes :: ![a] }
+newtype ExtendsClause a = ExtendsClause { extendsClauseTypes :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 ExtendsClause where liftEq = genericLiftEq
 instance Show1 ExtendsClause where liftShowsPrec = genericLiftShowsPrec
 
-data Import a = Import { importElements :: ![a] }
+newtype Import a = Import { importElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Import where liftEq = genericLiftEq
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
-data ArrayType a = ArrayType { arrayType :: !a }
+newtype ArrayType a = ArrayType { arrayType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 ArrayType where liftEq = genericLiftEq
 instance Show1 ArrayType where liftShowsPrec = genericLiftShowsPrec
 
-data FlowMaybeType a = FlowMaybeType { flowMaybeType :: !a }
+newtype FlowMaybeType a = FlowMaybeType { flowMaybeType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 FlowMaybeType where liftEq = genericLiftEq
 instance Show1 FlowMaybeType where liftShowsPrec = genericLiftShowsPrec
 
-data TypeQuery a = TypeQuery { typeQuerySubject :: !a }
+newtype TypeQuery a = TypeQuery { typeQuerySubject :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 TypeQuery where liftEq = genericLiftEq
 instance Show1 TypeQuery where liftShowsPrec = genericLiftShowsPrec
 
-data IndexTypeQuery a = IndexTypeQuery { indexTypeQuerySubject :: !a }
+newtype IndexTypeQuery a = IndexTypeQuery { indexTypeQuerySubject :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 IndexTypeQuery where liftEq = genericLiftEq
 instance Show1 IndexTypeQuery where liftShowsPrec = genericLiftShowsPrec
 
-data TypeArguments a = TypeArguments { typeArguments :: ![a] }
+newtype TypeArguments a = TypeArguments { typeArguments :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 TypeArguments where liftEq = genericLiftEq
 instance Show1 TypeArguments where liftShowsPrec = genericLiftShowsPrec
 
-data ThisType a = ThisType ByteString
+newtype ThisType a = ThisType ByteString
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 ThisType where liftEq = genericLiftEq
 instance Show1 ThisType where liftShowsPrec = genericLiftShowsPrec
 
-data ExistentialType a = ExistentialType ByteString
+newtype ExistentialType a = ExistentialType ByteString
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 ExistentialType where liftEq = genericLiftEq
 instance Show1 ExistentialType where liftShowsPrec = genericLiftShowsPrec
 
-data LiteralType a = LiteralType { literalTypeSubject :: !a }
+newtype LiteralType a = LiteralType { literalTypeSubject :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 LiteralType where liftEq = genericLiftEq
@@ -455,7 +461,7 @@ data ConstructSignature a = ConstructSignature { constructSignatureTypeParameter
 instance Eq1 ConstructSignature where liftEq = genericLiftEq
 instance Show1 ConstructSignature where liftShowsPrec = genericLiftShowsPrec
 
-data IndexSignature a = IndexSignature { indexSignatureSubject :: !a }
+newtype IndexSignature a = IndexSignature { indexSignatureSubject :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 IndexSignature where liftEq = genericLiftEq
@@ -472,12 +478,6 @@ data Debugger a = Debugger
 
 instance Eq1 Debugger where liftEq = genericLiftEq
 instance Show1 Debugger where liftShowsPrec = genericLiftShowsPrec
-
-data ExpressionStatement a = ExpressionStatement { expressionStatement :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 ExpressionStatement where liftEq = genericLiftEq
-instance Show1 ExpressionStatement where liftShowsPrec = genericLiftShowsPrec
 
 data ForOf a = ForOf { forOfBinding :: !a, forOfSubject :: !a, forOfBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -497,25 +497,25 @@ data LabeledStatement a = LabeledStatement { labeledStatementIdentifier :: !a, l
 instance Eq1 LabeledStatement where liftEq = genericLiftEq
 instance Show1 LabeledStatement where liftShowsPrec = genericLiftShowsPrec
 
-data NonNullExpression a = NonNullExpression { nonNullExpression :: !a }
+newtype NonNullExpression a = NonNullExpression { nonNullExpression :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 NonNullExpression where liftEq = genericLiftEq
 instance Show1 NonNullExpression where liftShowsPrec = genericLiftShowsPrec
 
-data Update a = Update { updateSubject :: !a }
+newtype Update a = Update { updateSubject :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Update where liftEq = genericLiftEq
 instance Show1 Update where liftShowsPrec = genericLiftShowsPrec
 
-data Await a = Await { awaitSubject :: !a }
+newtype Await a = Await { awaitSubject :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Await where liftEq = genericLiftEq
 instance Show1 Await where liftShowsPrec = genericLiftShowsPrec
 
-data New a = New { newSubject :: !a }
+newtype New a = New { newSubject :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 New where liftEq = genericLiftEq
@@ -563,13 +563,13 @@ data JsxElement a = JsxElement { jsxOpeningElement :: !a,  jsxElements :: ![a], 
 instance Eq1 JsxElement where liftEq = genericLiftEq
 instance Show1 JsxElement where liftShowsPrec = genericLiftShowsPrec
 
-data JsxText a = JsxText ByteString
+newtype JsxText a = JsxText ByteString
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 JsxText where liftEq = genericLiftEq
 instance Show1 JsxText where liftShowsPrec = genericLiftShowsPrec
 
-data JsxExpression a = JsxExpression { jsxExpression :: !a }
+newtype JsxExpression a = JsxExpression { jsxExpression :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 JsxExpression where liftEq = genericLiftEq
@@ -581,7 +581,7 @@ data JsxOpeningElement a = JsxOpeningElement { jsxOpeningElementIdentifier :: !a
 instance Eq1 JsxOpeningElement where liftEq = genericLiftEq
 instance Show1 JsxOpeningElement where liftShowsPrec = genericLiftShowsPrec
 
-data JsxClosingElement a = JsxClosingElement { jsxClosingElementIdentifier :: !a }
+newtype JsxClosingElement a = JsxClosingElement { jsxClosingElementIdentifier :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 JsxClosingElement where liftEq = genericLiftEq
@@ -599,7 +599,7 @@ data JsxAttribute a = JsxAttribute { jsxAttributeTarget :: !a, jsxAttributeValue
 instance Eq1 JsxAttribute where liftEq = genericLiftEq
 instance Show1 JsxAttribute where liftShowsPrec = genericLiftShowsPrec
 
-data ImplementsClause a = ImplementsClause { implementsClauseTypes :: ![a] }
+newtype ImplementsClause a = ImplementsClause { implementsClauseTypes :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 ImplementsClause where liftEq = genericLiftEq
@@ -629,23 +629,72 @@ data RestParameter a = RestParameter { restParameterContext :: ![a], restParamet
 instance Eq1 RestParameter where liftEq = genericLiftEq
 instance Show1 RestParameter where liftShowsPrec = genericLiftShowsPrec
 
+newtype VariableDeclaration a = VariableDeclaration { variableDeclarations :: [a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 VariableDeclaration where liftEq = genericLiftEq
+instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
+
 -- | Assignment from AST in Ruby’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> many statement)
+assignment = makeTerm <$> symbol Program <*> children (Syntax.Program <$> many statement) <|> parseError
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 term :: Assignment -> Assignment
-term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context . (\ (a:as) -> a:|as) <$> some comment <*> emptyTerm)
+term term = many comment *> term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
 
 expression :: Assignment
-expression = handleError (term everything)
-  where everything = asum . fmap asum $ chunksOf 4 [typeAssertion, asExpression, nonNullExpression', importAlias', internalModule, super, abstractClass, object, array, jsxElement, jsxSelfClosingElement, class', anonymousClass, function, arrowFunction, assignmentExpression, augmentedAssignmentExpression, awaitExpression, unaryExpression, binaryExpression, ternaryExpression, updateExpression, callExpression, memberExpression, newExpression, parenthesizedExpression, subscriptExpression, yieldExpression, thisExpression, number, string, templateString, regex, true, false, null', undefined', identifier]
+expression = term (handleError everything)
+  where
+    everything = choice [
+      typeAssertion,
+      asExpression,
+      nonNullExpression',
+      importAlias',
+      internalModule,
+      super,
+      abstractClass,
+      object,
+      array,
+      jsxElement,
+      jsxSelfClosingElement,
+      class',
+      anonymousClass,
+      function,
+      arrowFunction,
+      assignmentExpression,
+      augmentedAssignmentExpression,
+      awaitExpression,
+      unaryExpression,
+      binaryExpression,
+      ternaryExpression,
+      updateExpression,
+      callExpression,
+      memberExpression,
+      newExpression,
+      parenthesizedExpression,
+      subscriptExpression,
+      yieldExpression,
+      thisExpression,
+      number,
+      string,
+      templateString,
+      regex,
+      true,
+      false,
+      null',
+      undefined',
+      identifier
+      ]
 
 undefined' :: Assignment
 undefined' = makeTerm <$> symbol Grammar.Undefined <*> (Language.TypeScript.Syntax.Undefined <$ source)
 
 assignmentExpression :: Assignment
-assignmentExpression = makeTerm' <$> symbol AssignmentExpression <*> children (infixTerm (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) expression [
+assignmentExpression = makeTerm <$> symbol AssignmentExpression <*> children (Statement.Assignment [] <$> (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) <*> expression)
+
+augmentedAssignmentExpression :: Assignment
+augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpression <*> children (infixTerm (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) expression [
   assign Expression.Plus <$ symbol AnonPlusEqual
   , assign Expression.Minus <$ symbol AnonMinusEqual
   , assign Expression.Times <$ symbol AnonStarEqual
@@ -655,10 +704,8 @@ assignmentExpression = makeTerm' <$> symbol AssignmentExpression <*> children (i
   , assign Expression.BAnd <$ symbol AnonAmpersandEqual
   , assign Expression.BOr <$ symbol AnonPipeEqual ])
   where assign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Data.Union.Union Syntax Term
-        assign c l r = inj (Statement.Assignment l (makeTerm1 (c l r)))
+        assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
 
-augmentedAssignmentExpression :: Assignment
-augmentedAssignmentExpression = makeTerm <$> symbol AugmentedAssignmentExpression <*> children (Statement.Assignment <$> (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) <*> expression)
 
 awaitExpression :: Assignment
 awaitExpression = makeTerm <$> symbol Grammar.AwaitExpression <*> children (Language.TypeScript.Syntax.Await <$> expression)
@@ -666,16 +713,16 @@ awaitExpression = makeTerm <$> symbol Grammar.AwaitExpression <*> children (Lang
 unaryExpression :: Assignment
 unaryExpression = symbol Grammar.UnaryExpression >>= \ loc ->
   makeTerm loc . Expression.Not <$> children ((symbol AnonTilde <|> symbol AnonBang) *> expression)
-  <|> makeTerm loc . Expression.Negate <$> ((symbol AnonMinus <|> symbol AnonPlus) *> expression)
-  <|> makeTerm loc . Expression.Typeof <$> (symbol AnonTypeof *> expression)
-  <|> makeTerm loc . Expression.Void <$> (symbol AnonVoid *> expression)
-  <|> makeTerm loc . Expression.Delete <$> (symbol AnonDelete *> expression)
+  <|> makeTerm loc . Expression.Negate <$> children ((symbol AnonMinus <|> symbol AnonPlus) *> expression)
+  <|> makeTerm loc . Expression.Typeof <$> children (symbol AnonTypeof *> expression)
+  <|> makeTerm loc . Expression.Void <$> children (symbol AnonVoid *> expression)
+  <|> makeTerm loc . Expression.Delete <$> children (symbol AnonDelete *> expression)
 
 ternaryExpression :: Assignment
 ternaryExpression = makeTerm <$> symbol Grammar.TernaryExpression <*> children (Statement.If <$> expression <*> expression <*> expression)
 
 memberExpression :: Assignment
-memberExpression = makeTerm <$> symbol Grammar.MemberExpression <*> children (Expression.MemberAccess <$> expression <*> propertyIdentifier)
+memberExpression = makeTerm <$> symbol Grammar.MemberExpression <*> children (Expression.MemberAccess <$> postContextualize comment expression <*> propertyIdentifier)
 
 newExpression :: Assignment
 newExpression = makeTerm <$> symbol Grammar.NewExpression <*> children (Language.TypeScript.Syntax.New <$> expression)
@@ -702,7 +749,7 @@ abstractClass :: Assignment
 abstractClass = makeTerm <$> symbol Grammar.AbstractClass <*> (Language.TypeScript.Syntax.AbstractClass <$> identifier <*> (typeParameters <|> emptyTerm) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
 
 classHeritage' :: HasCallStack => Assignment.Assignment [] Grammar [Term]
-classHeritage' = symbol Grammar.ClassHeritage *> children (((\a b -> a : b : []) <$> extendsClause' <*> implementsClause') <|> (pure <$> implementsClause'))
+classHeritage' = symbol Grammar.ClassHeritage *> children (((++) `on` toList) <$> optional extendsClause' <*> optional implementsClause')
 
 extendsClause' :: Assignment
 extendsClause' = makeTerm <$> symbol Grammar.ExtendsClause <*> children (Language.TypeScript.Syntax.ExtendsClause <$> many ty)
@@ -714,22 +761,22 @@ super :: Assignment
 super = makeTerm <$> symbol Grammar.Super <*> (Language.TypeScript.Syntax.Super <$ source)
 
 typeAssertion :: Assignment
-typeAssertion = makeTerm <$> symbol Grammar.TypeAssertion <*> (Language.TypeScript.Syntax.TypeAssertion <$> typeArguments' <*> expression)
+typeAssertion = makeTerm <$> symbol Grammar.TypeAssertion <*> children (Language.TypeScript.Syntax.TypeAssertion <$> typeArguments' <*> expression)
 
 asExpression :: Assignment
-asExpression = makeTerm <$> symbol AsExpression <*> (Language.TypeScript.Syntax.Cast <$> expression <*> (ty <|> templateString))
+asExpression = makeTerm <$> symbol AsExpression <*> children (Language.TypeScript.Syntax.Cast <$> expression <*> (ty <|> templateString))
 
 templateString :: Assignment
-templateString = makeTerm <$> symbol TemplateString <*> (Literal.String <$> many templateSubstitution)
+templateString = makeTerm <$> symbol TemplateString <*> children (Literal.String <$> many (term templateSubstitution))
 
 templateSubstitution :: Assignment
 templateSubstitution = symbol TemplateSubstitution *> children expression
 
 nonNullExpression' :: Assignment
-nonNullExpression' = makeTerm <$> symbol Grammar.NonNullExpression <*> (Language.TypeScript.Syntax.NonNullExpression <$> expression)
+nonNullExpression' = makeTerm <$> symbol Grammar.NonNullExpression <*> children (Language.TypeScript.Syntax.NonNullExpression <$> expression)
 
 importAlias' :: Assignment
-importAlias' = makeTerm <$> symbol Grammar.ImportAlias <*> (Language.TypeScript.Syntax.ImportAlias <$> identifier <*> (identifier <|> nestedIdentifier))
+importAlias' = makeTerm <$> symbol Grammar.ImportAlias <*> children (Language.TypeScript.Syntax.ImportAlias <$> identifier <*> (identifier <|> nestedIdentifier))
 
 number :: Assignment
 number = makeTerm <$> symbol Grammar.Number <*> (Literal.Float <$> source)
@@ -747,40 +794,26 @@ expressions :: Assignment
 expressions = makeTerm <$> location <*> many expression
 
 identifier :: Assignment
-identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
-
-literal :: Assignment
-literal =
-      makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
-  <|> makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
-  <|> makeTerm <$> symbol Grammar.Number <*> (Literal.Float <$> source)
-  <|> makeTerm <$> symbol Grammar.Null <*> (Literal.Null <$ source)
-   -- TODO: Do we want to represent the difference between .. and ...
-  <|> makeTerm <$> symbol Array <*> children (Literal.Array <$> many expression)
-  <|> makeTerm <$> symbol Object <*> children (Literal.Hash <$> many pair)
-  -- TODO: Handle interpolation
-  <|> makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
-  -- TODO: Handle interpolation, dedicated literal?
-  <|> makeTerm <$> symbol Regex <*> (Literal.TextElement <$> source)
+identifier = (makeTerm <$> symbol Identifier' <*> (Syntax.Identifier <$> source)) <|> (makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source))
 
 class' :: Assignment
-class' = makeClass <$> symbol Class <*> children ((,,,) <$> expression <*> (many typeParameter' <|> pure []) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
+class' = makeClass <$> symbol Class <*> children ((,,,) <$> identifier <*> ((symbol TypeParameters *> children (many (term typeParameter'))) <|> pure []) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
   where makeClass loc (expression, typeParams, classHeritage, statements) = makeTerm loc (Declaration.Class typeParams expression classHeritage statements)
 
 object :: Assignment
-object = makeTerm <$> symbol Object <*> children (Literal.Hash <$> many (pair <|> spreadElement <|> methodDefinition <|> assignmentPattern <|> shorthandPropertyIdentifier))
+object = (makeTerm <$> (symbol Object <|> symbol ObjectPattern) <*> children (Literal.Hash <$> many (term ((pair <|> spreadElement <|> methodDefinition <|> assignmentPattern <|> shorthandPropertyIdentifier)))))
 
 array :: Assignment
-array = makeTerm <$> symbol Array <*> children (Literal.Array <$> many (expression <|> spreadElement))
+array = makeTerm <$> (symbol Array <|> symbol ArrayPattern) <*> children (Literal.Array <$> many (term (expression <|> spreadElement)))
 
 jsxElement :: Assignment
-jsxElement = makeTerm <$> symbol Grammar.JsxElement <*> children (Language.TypeScript.Syntax.JsxElement <$> jsxOpeningElement' <*> many (jsxElement <|> jsxSelfClosingElement <|> jsxExpression' <|> jsxText) <*> jsxClosingElement')
+jsxElement = makeTerm <$> symbol Grammar.JsxElement <*> children (Language.TypeScript.Syntax.JsxElement <$> jsxOpeningElement' <*> many (term (jsxElement <|> jsxSelfClosingElement <|> jsxExpression' <|> jsxText)) <*> jsxClosingElement')
 
 jsxSelfClosingElement :: Assignment
-jsxSelfClosingElement = makeTerm <$> symbol Grammar.JsxSelfClosingElement <*> children (Language.TypeScript.Syntax.JsxSelfClosingElement <$> identifier <*> many jsxAttribute)
+jsxSelfClosingElement = makeTerm <$> symbol Grammar.JsxSelfClosingElement <*> children (Language.TypeScript.Syntax.JsxSelfClosingElement <$> identifier <*> many (term (jsxAttribute <|> jsxExpression')))
 
 jsxOpeningElement' :: Assignment
-jsxOpeningElement' = makeTerm <$> symbol Grammar.JsxOpeningElement <*> children (Language.TypeScript.Syntax.JsxOpeningElement <$> identifier <*> many jsxAttribute)
+jsxOpeningElement' = makeTerm <$> symbol Grammar.JsxOpeningElement <*> children (Language.TypeScript.Syntax.JsxOpeningElement <$> identifier <*> many (term (jsxAttribute <|> jsxExpression')))
 
 jsxExpression' :: Assignment
 jsxExpression' = makeTerm <$> symbol Grammar.JsxExpression <*> children (Language.TypeScript.Syntax.JsxExpression <$> (expression <|> sequenceExpression <|> spreadElement))
@@ -810,7 +843,7 @@ accessibilityModifier' :: Assignment
 accessibilityModifier' = makeTerm <$> symbol AccessibilityModifier <*> children (Syntax.Identifier <$> source)
 
 destructuringPattern :: Assignment
-destructuringPattern = makeTerm <$> symbol ObjectPattern <*> (Literal.Hash <$> many (pair <|> spreadElement <|> methodDefinition <|> assignmentPattern <|> shorthandPropertyIdentifier))
+destructuringPattern = object <|> array
 
 spreadElement :: Assignment
 spreadElement = symbol SpreadElement *> children expression
@@ -821,7 +854,7 @@ readonly' = makeTerm <$> symbol Readonly <*> (Type.Readonly <$ source)
 methodDefinition :: Assignment
 methodDefinition = makeMethod <$>
   symbol MethodDefinition
-  <*> children ((,,,,,) <$> (fromMaybe <$> emptyTerm <*> optional accessibilityModifier') <*> (fromMaybe <$> emptyTerm <*> optional readonly') <*> emptyTerm <*> emptyTerm <*> callSignatureParts <*> statementBlock)
+  <*> children ((,,,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (readonly' <|> emptyTerm) <*> emptyTerm <*> propertyName <*> callSignatureParts <*> statementBlock)
   where
     makeMethod loc (modifier, readonly, receiver, propertyName', (typeParameters', params, ty'), statements) = makeTerm loc (Declaration.Method [modifier, readonly, typeParameters', ty'] receiver propertyName' params statements)
 
@@ -838,26 +871,26 @@ indexSignature :: Assignment
 indexSignature = makeTerm <$> symbol Grammar.IndexSignature <*> children (Language.TypeScript.Syntax.IndexSignature <$> (identifier <|> typeAnnotation'))
 
 methodSignature :: Assignment
-methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> children ((,,,) <$> (fromMaybe <$> emptyTerm <*> optional accessibilityModifier') <*> (fromMaybe <$> emptyTerm <*> optional readonly') <*> propertyName <*> callSignatureParts)
+methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> children ((,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (readonly' <|> emptyTerm) <*> propertyName <*> callSignatureParts)
   where makeMethodSignature loc (modifier, readonly, propertyName, (typeParams, params, annotation)) = makeTerm loc (Language.TypeScript.Syntax.MethodSignature [modifier, readonly, typeParams, annotation] propertyName params)
 
 formalParameters :: HasCallStack => Assignment.Assignment [] Grammar [Term]
-formalParameters = symbol FormalParameters *> children (many parameter)
+formalParameters = symbol FormalParameters *> children (many (term parameter))
 
 typeParameters :: Assignment
-typeParameters = makeTerm <$> symbol TypeParameters <*> children (Type.TypeParameters <$> many typeParameter')
+typeParameters = makeTerm <$> symbol TypeParameters <*> children (Type.TypeParameters <$> many (term typeParameter'))
 
 typeAnnotation' :: Assignment
 typeAnnotation' = makeTerm <$> symbol TypeAnnotation <*> children (Language.TypeScript.Syntax.Annotation <$> ty)
 
 typeParameter' :: Assignment
-typeParameter' = makeTerm <$> symbol Grammar.TypeParameter <*> children (Language.TypeScript.Syntax.TypeParameter <$> ty <*> (fromMaybe <$> emptyTerm <*> optional constraint))
+typeParameter' = makeTerm <$> symbol Grammar.TypeParameter <*> children (Language.TypeScript.Syntax.TypeParameter <$> identifier <*> (constraint <|> emptyTerm))
 
 constraint :: Assignment
 constraint = makeTerm <$> symbol Grammar.Constraint <*> children (Language.TypeScript.Syntax.Constraint <$> ty)
 
 function :: Assignment
-function = makeFunction <$> (symbol Grammar.Function <|> symbol Grammar.GeneratorFunction) <*> children ((,,) <$> identifier <*> callSignatureParts <*> statementBlock)
+function = makeFunction <$> (symbol Grammar.Function <|> symbol Grammar.GeneratorFunction) <*> children ((,,) <$> (identifier <|> emptyTerm) <*> callSignatureParts <*> statementBlock)
   where makeFunction loc (id, (typeParams, params, annotation), statements) = makeTerm loc (Declaration.Function [typeParams, annotation] id params statements)
 
 ambientFunction :: Assignment
@@ -889,13 +922,13 @@ genericType :: Assignment
 genericType = makeTerm <$> symbol Grammar.GenericType <*> children (Language.TypeScript.Syntax.GenericType <$> (typeIdentifier <|> nestedTypeIdentifier) <*> typeArguments')
 
 typeArguments' :: Assignment
-typeArguments' = makeTerm <$> symbol Grammar.TypeArguments <*> children (Language.TypeScript.Syntax.TypeArguments <$> some ty)
+typeArguments' = makeTerm <$> symbol Grammar.TypeArguments <*> children (Language.TypeScript.Syntax.TypeArguments <$> some (term ty))
 
 typePredicate :: Assignment
 typePredicate = makeTerm <$> symbol Grammar.TypePredicate <*> children (Language.TypeScript.Syntax.TypePredicate <$> identifier <*> ty)
 
 objectType :: Assignment
-objectType = makeTerm <$> symbol Grammar.ObjectType <*> children (Language.TypeScript.Syntax.ObjectType <$> some (exportStatement <|> propertySignature <|> callSignature <|> constructSignature <|> indexSignature <|> methodSignature))
+objectType = makeTerm <$> symbol Grammar.ObjectType <*> children (Language.TypeScript.Syntax.ObjectType <$> many (term (exportStatement <|> propertySignature <|> callSignature <|> constructSignature <|> indexSignature <|> methodSignature)))
 
 arrayTy :: Assignment
 arrayTy = makeTerm <$> symbol Grammar.ArrayType <*> children (Language.TypeScript.Syntax.ArrayType <$> ty)
@@ -925,10 +958,10 @@ intersectionType :: Assignment
 intersectionType = makeTerm <$> symbol IntersectionType <*> children (Language.TypeScript.Syntax.Intersection <$> ty <*> ty)
 
 functionTy :: Assignment
-functionTy = makeTerm <$> symbol FunctionType <*> children (Language.TypeScript.Syntax.Function <$> (fromMaybe <$> emptyTerm <*> optional typeParameters) <*> formalParameters <*> ty)
+functionTy = makeTerm <$> symbol Grammar.FunctionType <*> children (Language.TypeScript.Syntax.FunctionType <$> (fromMaybe <$> emptyTerm <*> optional typeParameters) <*> formalParameters <*> ty)
 
 tupleType :: Assignment
-tupleType = makeTerm <$> symbol TupleType <*> children (Language.TypeScript.Syntax.Tuple <$> many ty)
+tupleType = makeTerm <$> symbol TupleType <*> children (Language.TypeScript.Syntax.Tuple <$> many (term ty))
 
 constructorTy :: Assignment
 constructorTy = makeTerm <$> symbol ConstructorType <*> children (Language.TypeScript.Syntax.Constructor <$> (fromMaybe <$> emptyTerm <*> optional typeParameters) <*> formalParameters <*> ty)
@@ -937,24 +970,38 @@ statementBlock :: Assignment
 statementBlock = makeTerm <$> symbol StatementBlock <*> children (many statement)
 
 classBodyStatements :: HasCallStack => Assignment.Assignment [] Grammar [Term]
-classBodyStatements = symbol ClassBody *> children (many (methodDefinition <|> publicFieldDefinition <|> comment))
+classBodyStatements = symbol ClassBody *> children (many (term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature)))
 
 publicFieldDefinition :: Assignment
-publicFieldDefinition = makeTerm <$> symbol Grammar.PublicFieldDefinition <*> (Language.TypeScript.Syntax.PublicFieldDefinition <$> propertyName <*> (expression <|> emptyTerm))
+publicFieldDefinition = makeField <$> symbol Grammar.PublicFieldDefinition <*> children ((,,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (readonly' <|> emptyTerm) <*> propertyName <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
+  where makeField loc (modifier, readonly, propertyName, annotation, expression) = makeTerm loc (Language.TypeScript.Syntax.PublicFieldDefinition [modifier, readonly, annotation] propertyName expression)
 
 
 statement :: Assignment
-statement = handleError $ (term everything)
+statement = term (handleError everything)
   where
-  everything = foldr1 (<|>) . fmap (foldr1 (<|>)) $ chunksOf 4 [
-    exportStatement
-    , importStatement
-    , debuggerStatement
-    , expressionStatement'
-    , returnStatement
-    , throwStatement
-    , emptyStatement
-    , labeledStatement ]
+    everything = choice [
+      exportStatement
+      , importStatement
+      , debuggerStatement
+      , expressionStatement'
+      , declaration
+      , statementBlock
+      , ifStatement
+      , switchStatement
+      , forStatement
+      , forInStatement
+      , forOfStatement
+      , whileStatement
+      , doStatement
+      , tryStatement
+      , withStatement
+      , breakStatement
+      , continueStatement
+      , returnStatement
+      , throwStatement
+      , emptyStatement
+      , labeledStatement ]
 
 forOfStatement :: Assignment
 forOfStatement = makeTerm <$> symbol ForOfStatement <*> children (Language.TypeScript.Syntax.ForOf <$> expression <*> expression <*> statement)
@@ -984,13 +1031,13 @@ labeledStatement :: Assignment
 labeledStatement = makeTerm <$> symbol Grammar.LabeledStatement <*> children (Language.TypeScript.Syntax.LabeledStatement <$> (symbol StatementIdentifier *> children identifier) <*> statement)
 
 importStatement :: Assignment
-importStatement = makeTerm <$> symbol Grammar.ImportStatement <*> children (Language.TypeScript.Syntax.Import <$> (((\a b -> a : b : []) <$> importClause <*> fromClause) <|> (pure <$> (importRequireClause <|> string))))
+importStatement = makeTerm <$> symbol Grammar.ImportStatement <*> children (Language.TypeScript.Syntax.Import <$> (((\a b -> [a, b]) <$> importClause <*> fromClause) <|> (pure <$> (importRequireClause <|> string))))
 
 importClause :: Assignment
-importClause = makeTerm <$> symbol Grammar.ImportClause <*> children (Language.TypeScript.Syntax.ImportClause <$> ((pure <$> (namespaceImport <|> namedImports)) <|> ((\a b -> [a, b]) <$> identifier <*> (namespaceImport <|> namedImports))))
+importClause = makeTerm <$> symbol Grammar.ImportClause <*> children (Language.TypeScript.Syntax.ImportClause <$> (((\a b -> [a, b]) <$> identifier <*> (namespaceImport <|> namedImports)) <|> (pure <$> (namespaceImport <|> namedImports <|> identifier))))
 
 namedImports :: Assignment
-namedImports = makeTerm <$> symbol Grammar.NamedImports <*> children (Language.TypeScript.Syntax.NamedImports <$> many importExportSpecifier)
+namedImports = makeTerm <$> symbol Grammar.NamedImports <*> children (Language.TypeScript.Syntax.NamedImports <$> many (term importExportSpecifier))
 
 namespaceImport :: Assignment
 namespaceImport = makeTerm <$> symbol Grammar.NamespaceImport <*> children (Language.TypeScript.Syntax.NamespaceImport <$> identifier)
@@ -1002,40 +1049,54 @@ debuggerStatement :: Assignment
 debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> (Language.TypeScript.Syntax.Debugger <$ source)
 
 expressionStatement' :: Assignment
-expressionStatement' = makeTerm <$> symbol Grammar.ExpressionStatement <*> children (Language.TypeScript.Syntax.ExpressionStatement <$> (expression <|> sequenceExpression))
+expressionStatement' = symbol ExpressionStatement *> children (expression <|> sequenceExpression)
 
 declaration :: Assignment
-declaration = handleError $ term everything
-  where everything = asum . fmap asum $ chunksOf 4 [ exportStatement, importAlias', function, internalModule, ambientFunction, class', module', variableDeclaration, typeAliasDeclaration, enumDeclaration, interfaceDeclaration, ambientDeclaration ]
+declaration = everything
+  where
+    everything = choice [
+      exportStatement,
+      importAlias',
+      function,
+      internalModule,
+      ambientFunction,
+      class',
+      module',
+      variableDeclaration,
+      typeAliasDeclaration,
+      enumDeclaration,
+      interfaceDeclaration,
+      ambientDeclaration
+      ]
 
 typeAliasDeclaration :: Assignment
 typeAliasDeclaration = makeTypeAliasDecl <$> symbol Grammar.TypeAliasDeclaration <*> children ((,,) <$> identifier <*> (typeParameters <|> emptyTerm) <*> ty)
   where makeTypeAliasDecl loc (identifier, typeParams, body) = makeTerm loc (Language.TypeScript.Syntax.TypeAliasDeclaration [typeParams] identifier body)
 
 enumDeclaration :: Assignment
-enumDeclaration = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Language.TypeScript.Syntax.EnumDeclaration <$> identifier <*> many (propertyName <|> enumAssignment))
+enumDeclaration = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Language.TypeScript.Syntax.EnumDeclaration <$> identifier <*> many (term (propertyName <|> enumAssignment)))
 
 enumAssignment :: Assignment
-enumAssignment = makeTerm <$> symbol Grammar.EnumAssignment <*> children (Statement.Assignment <$> propertyName <*> expression)
+enumAssignment = makeTerm <$> symbol Grammar.EnumAssignment <*> children (Statement.Assignment [] <$> propertyName <*> expression)
 
 interfaceDeclaration :: Assignment
 interfaceDeclaration = makeInterfaceDecl <$> symbol Grammar.InterfaceDeclaration <*> children ((,,,) <$> identifier <*> (typeParameters <|> emptyTerm) <*> (extendsClause <|> emptyTerm) <*> objectType)
   where makeInterfaceDecl loc (identifier, typeParams, clause, objectType) = makeTerm loc (Language.TypeScript.Syntax.InterfaceDeclaration [typeParams, clause] identifier objectType)
 
 extendsClause :: Assignment
-extendsClause = makeTerm <$> symbol Grammar.ExtendsClause <*> children (Language.TypeScript.Syntax.ExtendsClause <$> many ty)
+extendsClause = makeTerm <$> symbol Grammar.ExtendsClause <*> children (Language.TypeScript.Syntax.ExtendsClause <$> many (term ty))
 
 ambientDeclaration :: Assignment
-ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> children (Language.TypeScript.Syntax.AmbientDeclaration <$> (declaration <|> statementBlock))
+ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> children (Language.TypeScript.Syntax.AmbientDeclaration <$> choice [declaration, statementBlock])
 
 exportStatement :: Assignment
-exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (Language.TypeScript.Syntax.Export <$> ((pure <$> (fromClause <|> exportClause <|> declaration <|> expression <|> identifier <|> importAlias')) <|> ((\a b -> [a, b]) <$> exportClause <*> fromClause)))
+exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (Language.TypeScript.Syntax.Export <$> (((\a b -> [a, b]) <$> exportClause <*> fromClause) <|> (pure <$> (fromClause <|> exportClause <|> declaration <|> expression <|> identifier <|> importAlias'))))
 
 fromClause :: Assignment
 fromClause = string
 
 exportClause :: Assignment
-exportClause = makeTerm <$> symbol Grammar.ExportClause <*> children (Language.TypeScript.Syntax.ExportClause <$> many importExportSpecifier)
+exportClause = makeTerm <$> symbol Grammar.ExportClause <*> children (Language.TypeScript.Syntax.ExportClause <$> many (term importExportSpecifier))
 
 importExportSpecifier :: Assignment
 importExportSpecifier = makeTerm <$> (symbol Grammar.ExportSpecifier <|> symbol Grammar.ImportSpecifier) <*> children (Language.TypeScript.Syntax.ImportExportSpecifier <$> identifier <*> (identifier <|> emptyTerm))
@@ -1045,17 +1106,20 @@ propertySignature = makePropertySignature <$> symbol Grammar.PropertySignature <
   where makePropertySignature loc (modifier, readonly, propertyName, annotation) = makeTerm loc (Language.TypeScript.Syntax.PropertySignature [modifier, readonly, annotation] propertyName)
 
 propertyName :: Assignment
-propertyName = (makeTerm <$> symbol PropertyIdentifier <*> (Syntax.Identifier <$> source)) <|> string <|> number
+propertyName = (makeTerm <$> symbol PropertyIdentifier <*> (Syntax.Identifier <$> source)) <|> string <|> number <|> computedPropertyName
+
+computedPropertyName :: Assignment
+computedPropertyName = makeTerm <$> symbol Grammar.ComputedPropertyName <*> children (Language.TypeScript.Syntax.ComputedPropertyName <$> expression)
 
 assignmentPattern :: Assignment
-assignmentPattern = makeTerm <$> symbol AssignmentPattern <*> children (Statement.Assignment <$> shorthandPropertyIdentifier <*> expression)
+assignmentPattern = makeTerm <$> symbol AssignmentPattern <*> children (Statement.Assignment [] <$> shorthandPropertyIdentifier <*> expression)
 
 shorthandPropertyIdentifier :: Assignment
 shorthandPropertyIdentifier = makeTerm <$> symbol Grammar.ShorthandPropertyIdentifier <*> (Language.TypeScript.Syntax.ShorthandPropertyIdentifier <$> source)
 
 requiredParameter :: Assignment
 requiredParameter = makeRequiredParameter <$> symbol Grammar.RequiredParameter <*> children ((,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (identifier <|> destructuringPattern) <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
-  where makeRequiredParameter loc (modifier, identifier, annotation, initializer) = makeTerm loc (Language.TypeScript.Syntax.RequiredParameter [modifier, annotation] (makeTerm loc (Statement.Assignment identifier initializer)))
+  where makeRequiredParameter loc (modifier, identifier, annotation, initializer) = makeTerm loc (Language.TypeScript.Syntax.RequiredParameter [modifier, annotation] (makeTerm loc (Statement.Assignment [] identifier initializer)))
 
 restParameter :: Assignment
 restParameter = makeRestParameter <$> symbol Grammar.RestParameter <*> children ((,) <$> identifier <*> (typeAnnotation' <|> emptyTerm))
@@ -1063,7 +1127,7 @@ restParameter = makeRestParameter <$> symbol Grammar.RestParameter <*> children 
 
 optionalParameter :: Assignment
 optionalParameter = makeOptionalParam <$> symbol Grammar.OptionalParameter <*> children ((,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (identifier <|> destructuringPattern) <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
-  where makeOptionalParam loc (modifier, subject, annotation, initializer) = makeTerm loc (Language.TypeScript.Syntax.OptionalParameter [modifier, annotation] (makeTerm loc (Statement.Assignment subject initializer)))
+  where makeOptionalParam loc (modifier, subject, annotation, initializer) = makeTerm loc (Language.TypeScript.Syntax.OptionalParameter [modifier, annotation] (makeTerm loc (Statement.Assignment [] subject initializer)))
 
 internalModule :: Assignment
 internalModule = makeTerm <$> symbol Grammar.InternalModule <*> children (Language.TypeScript.Syntax.InternalModule <$> (string <|> identifier <|> nestedIdentifier) <*> statements)
@@ -1089,13 +1153,14 @@ whileStatement :: Assignment
 whileStatement = makeTerm <$> symbol WhileStatement <*> children (Statement.While <$> expression <*> statement)
 
 forStatement :: Assignment
-forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.For <$> (variableDeclaration <|> expressionStatement' <|> emptyStatement) <*> (expression <|> emptyStatement) <*> (expression <|> emptyTerm) <*> statement)
+forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.For <$> (variableDeclaration <|> expressionStatement' <|> emptyStatement) <*> (expressionStatement' <|> emptyStatement) <*> (expression <|> emptyTerm) <*> statement)
 
 variableDeclaration :: Assignment
-variableDeclaration = makeTerm <$> (symbol VariableDeclaration <|> symbol LexicalDeclaration) <*> children (many variableDeclarator)
+variableDeclaration = (makeTerm <$> (symbol Grammar.VariableDeclaration <|> symbol Grammar.LexicalDeclaration) <*> children (Language.TypeScript.Syntax.VariableDeclaration <$> many (term variableDeclarator)))
 
 variableDeclarator :: Assignment
-variableDeclarator = makeTerm <$> (symbol VariableDeclarator) <*> children (Statement.Assignment <$> (identifier <|> destructuringPattern) <*> (expression <|> emptyTerm))
+variableDeclarator = makeVarDecl <$> symbol VariableDeclarator <*> children ((,,) <$> (identifier <|> destructuringPattern) <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
+  where makeVarDecl loc (subject, annotations, value) = makeTerm loc (Statement.Assignment [annotations] subject value)
 
 parenthesizedExpression :: Assignment
 parenthesizedExpression = symbol ParenthesizedExpression *> children (expression <|> sequenceExpression)
@@ -1103,20 +1168,20 @@ parenthesizedExpression = symbol ParenthesizedExpression *> children (expression
 switchStatement :: Assignment
 switchStatement = makeTerm <$> symbol SwitchStatement <*> children (Statement.Match <$> parenthesizedExpression <*> switchBody)
   where
-    switchBody =  symbol SwitchBody *> children (makeTerm <$> location <*> many switchCase)
-    switchCase = makeTerm <$> (symbol SwitchCase <|> symbol SwitchDefault) <*> children (Statement.Pattern <$> (makeTerm <$> location <*> some expression) <*> (makeTerm <$> location <*> many statement))
+    switchBody =  symbol SwitchBody *> children (makeTerm <$> location <*> many (term switchCase))
+    switchCase = makeTerm <$> (symbol SwitchCase <|> symbol SwitchDefault) <*> children (Statement.Pattern <$> (expression <|> emptyTerm) <*> (makeTerm <$> location <*> many statement))
 
 subscriptExpression :: Assignment
 subscriptExpression = makeTerm <$> symbol SubscriptExpression <*> children (Expression.Subscript <$> expression <*> (pure <$> expression))
 
 pair :: Assignment
-pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression)
+pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> propertyName <*> expression)
 
 callExpression :: Assignment
 callExpression = makeCall <$> symbol CallExpression <*> children ((,,,) <$> (expression <|> super <|> function) <*> (typeArguments <|> pure []) <*> (arguments <|> (pure <$> templateString)) <*> emptyTerm)
   where makeCall loc (subject, typeArgs, args, body) = makeTerm loc (Expression.Call typeArgs subject args body)
-        arguments = symbol Arguments *> children (many (expression <|> spreadElement))
-        typeArguments = symbol Grammar.TypeArguments *> children (many ty)
+        arguments = symbol Arguments *> children (many (term (expression <|> spreadElement)))
+        typeArguments = symbol Grammar.TypeArguments *> children (some (term ty))
 
 tryStatement :: Assignment
 tryStatement = makeTry <$> symbol TryStatement <*> children ((,,) <$> statementBlock <*> optional catchClause <*> optional finallyClause)
@@ -1132,11 +1197,13 @@ binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm
   , (inj .) . Expression.Times            <$ symbol AnonStar
   , (inj .) . Expression.DividedBy        <$ symbol AnonSlash
   , (inj .) . Expression.Modulo           <$ symbol AnonPercent
+  , (inj .) . Expression.Member           <$ symbol AnonIn
   , (inj .) . Expression.And              <$ symbol AnonAmpersandAmpersand
   , (inj .) . Expression.BAnd             <$ symbol AnonAmpersand
   , (inj .) . Expression.Or               <$ symbol AnonPipePipe
   , (inj .) . Expression.BOr              <$ symbol AnonPipe
   , (inj .) . Expression.BXOr             <$ symbol AnonCaret
+  , (inj .) . Expression.InstanceOf       <$ symbol AnonInstanceof
   , (inj .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual)
   , (inj .) . invert Expression.Equal     <$ (symbol AnonBangEqual <|> symbol AnonBangEqualEqual)
   , (inj .) . Expression.LShift           <$ symbol AnonLAngleLAngle

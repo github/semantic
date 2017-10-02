@@ -1,7 +1,5 @@
 (Program
-  (ExpressionStatements
-    (Operator
-      (Other "delete")
-      (SubscriptAccess
-        (Identifier)
-        (StringLiteral)))))
+  (Delete
+    (Subscript
+      (Identifier)
+      (TextElement))))

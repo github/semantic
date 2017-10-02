@@ -13,15 +13,12 @@
               (Identifier))
             (
               (Identifier)))
-          (
-            (Identifier))))
+          (Identifier)))
       (Else
         (Empty)
-        (
-          (Identifier)))
+        (Identifier))
       (Finally
-        (
-          (Identifier)))))
+        (Identifier))))
   (Method
     (Empty)
     (Identifier)

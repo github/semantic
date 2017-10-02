@@ -1,12 +1,11 @@
 (Program
-  (ExpressionStatements
-    (Object
-      (Pair
-        (StringLiteral)
-        (StringLiteral))
-    {-(Pair
-        (StringLiteral)
-        (StringLiteral))-}
-    {-(Pair
-        (StringLiteral)
-        (StringLiteral))-})))
+  (Hash
+    (KeyValue
+      (TextElement)
+      (TextElement))
+  {-(KeyValue
+    {-(TextElement)-}
+    {-(TextElement)-})-}
+  {-(KeyValue
+    {-(TextElement)-}
+    {-(TextElement)-})-}))

@@ -2,6 +2,5 @@
   (While
     (Not
       (Identifier))
-    (
-      (Break
-        (Empty)))))
+    (Break
+      (Empty))))

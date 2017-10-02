@@ -5,13 +5,12 @@
     ([]
     {-(Identifier)-})
   { (If
-      (Identifier)
-      (
-        (Identifier))
-      (
-        (Identifier)))
+    {-(Identifier)-}
+    {-(
+      {-(Identifier)-})-}
+    {-(Identifier)-})
   ->(Empty) })
 {+(If
-    (Identifier)
-    ([])
-    (Empty))+})
+  {+(Identifier)+}
+  {+([])+}
+  {+(Empty)+})+})

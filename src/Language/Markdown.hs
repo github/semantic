@@ -5,13 +5,12 @@ module Language.Markdown
 , toGrammar
 ) where
 
-import Control.Comonad.Cofree as Cofree
-import Control.Comonad.Trans.Cofree as CofreeF (CofreeF(..))
 import CMarkGFM
 import Data.Ix
 import Data.Range
 import Data.Span
 import Data.Source
+import Data.Term
 import qualified Data.Syntax.Assignment as A (AST, Node(..))
 import TreeSitter.Language (Symbol(..), SymbolType(..))
 
@@ -50,13 +49,13 @@ exts = [
   , extTagfilter
   ]
 
-cmarkParser :: Source -> A.AST (CofreeF [] NodeType) Grammar
+cmarkParser :: Source -> A.AST (TermF [] NodeType) Grammar
 cmarkParser source = toTerm (totalRange source) (totalSpan source) $ commonmarkToNode [ optSourcePos, optSafe ] exts (toText source)
-  where toTerm :: Range -> Span -> Node -> A.AST (CofreeF [] NodeType) Grammar
+  where toTerm :: Range -> Span -> Node -> A.AST (TermF [] NodeType) Grammar
         toTerm within withinSpan (Node position t children) =
           let range = maybe within (spanToRangeInLineRanges lineRanges . toSpan) position
               span = maybe withinSpan toSpan position
-          in (A.Node (toGrammar t) range span) Cofree.:< (t CofreeF.:< (toTerm range span <$> children))
+          in termIn (A.Node (toGrammar t) range span) (In t (toTerm range span <$> children))
 
         toSpan PosInfo{..} = Span (Pos startLine startColumn) (Pos (max startLine endLine) (succ (if endLine <= startLine then max startColumn endColumn else endColumn)))
 

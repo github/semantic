@@ -1,17 +1,18 @@
 (Program
-  (Other "type_alias_declaration"
+  (TypeAliasDeclaration
+    (Empty)
     (Identifier)
-    (Other "union_type"
-      (Other "union_type"
-        (Other "union_type"
-          (Other "predefined_type")
-          (Other "predefined_type"))
-        (Identifier))
-      (Other "generic_type"
-        (Identifier)
-        (Other "type_arguments"
-          (Other "union_type"
-            (Other "union_type"
-              (Other "predefined_type")
-              (Other "predefined_type"))
-            (Identifier)))))))
+    (Union
+      (Union
+        (Union
+          (PredefinedType)
+          (PredefinedType))
+        (TypeIdentifier))
+      (GenericType
+        (TypeIdentifier)
+        (TypeArguments
+          (Union
+            (Union
+              (PredefinedType)
+              (PredefinedType))
+            (TypeIdentifier)))))))

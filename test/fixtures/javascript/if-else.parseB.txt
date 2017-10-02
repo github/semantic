@@ -1,21 +1,16 @@
 (Program
   (If
     (Identifier)
-    (ExpressionStatements
-      (Identifier))
+    (Identifier)
     (If
       (Identifier)
-      (ExpressionStatements
-        (ExpressionStatements
-          (Identifier)))
+      (
+        (Identifier))
       (If
         (Identifier)
-        (ExpressionStatements
-          (Identifier))
+        (Identifier)
         (If
           (Identifier)
-          (ExpressionStatements
-            (ExpressionStatements
-              (Identifier)))
-          (ExpressionStatements
-            (Identifier)))))))
+          (
+            (Identifier))
+          (Identifier))))))

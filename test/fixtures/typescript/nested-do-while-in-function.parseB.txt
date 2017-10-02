@@ -1,16 +1,25 @@
 (Program
-  (ExpressionStatements
-    (Function
-      (Identifier)
-      (Params
-        (Other "required_parameter"
-          (Identifier))
-        (Other "required_parameter"
-          (Identifier)))
+  (Function
+    (Empty)
+    (Empty)
+    (Identifier)
+    (RequiredParameter
+      (Empty)
+      (Empty)
+      (Assignment
+        (Identifier)
+        (Empty)))
+    (RequiredParameter
+      (Empty)
+      (Empty)
+      (Assignment
+        (Identifier)
+        (Empty)))
+    (
       (DoWhile
-        (ExpressionStatements
-          (ExpressionStatements
-            (FunctionCall
-              (Identifier)
-              (Identifier))))
-        (Identifier)))))
+        (Identifier)
+        (
+          (Call
+            (Identifier)
+            (Identifier)
+            (Empty)))))))

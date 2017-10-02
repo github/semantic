@@ -5,16 +5,12 @@
     (Identifier)
     (Empty))
 {+(Context
-    (Comment)
+  {+(Comment)+}
     (Call
       (Identifier)
       (Identifier)
-      (Identifier)
+    {+(Identifier)+}
       (Empty)))+}
-{-(Call
-    (Identifier)
-    (Identifier)
-    (Empty))-}
 {-(Context
-    (Comment)
-    (Empty))-})
+  {-(Comment)-}
+  {-(Empty)-})-})

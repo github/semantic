@@ -9,8 +9,8 @@ module Language.Ruby.Syntax
 import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Functor (void)
-import Data.List.NonEmpty (NonEmpty(..))
-import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
+import Data.List.NonEmpty (some1)
+import Data.Syntax (postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -19,10 +19,10 @@ import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
+import qualified Data.Term as Term
 import Data.Union
 import GHC.Stack
 import Language.Ruby.Grammar as Grammar
-import qualified Term
 
 -- | The type of Ruby syntax.
 type Syntax = '[
@@ -83,58 +83,67 @@ type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression)
+assignment = makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression) <|> parseError
 
 expression :: Assignment
-expression = handleError . term $
-      alias
-  <|> assignment'
-  <|> begin
-  <|> beginBlock
-  <|> binary
-  <|> block
-  <|> call
-  <|> case'
-  <|> class'
-  <|> conditional
-  <|> emptyStatement
-  <|> endBlock
-  <|> for
-  <|> heredoc
-  <|> identifier
-  <|> if'
-  <|> keyword
-  <|> lambda
-  <|> literal
-  <|> method
-  <|> methodCall
-  <|> mk Break Statement.Break
-  <|> mk Next Statement.Continue
-  <|> mk Redo Statement.Retry
-  <|> mk Retry Statement.Retry
-  <|> mk Return Statement.Return
-  <|> mk Yield Statement.Yield
-  <|> module'
-  <|> pair
-  <|> parenthesized_expressions
-  <|> rescue
-  <|> scopeResolution
-  <|> singletonClass
-  <|> singletonMethod
-  <|> subscript
-  <|> unary
-  <|> undef
-  <|> unless
-  <|> until'
-  <|> while'
-  <|> parseError
-  where mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children expressions))
+expression = term (handleError (choice expressionChoices))
+
+expressionChoices :: [Assignment.Assignment [] Grammar Term]
+expressionChoices =
+  [ alias
+  , assignment'
+  , begin
+  , beginBlock
+  , binary
+  , block
+  , call
+  , case'
+  , class'
+  , conditional
+  , emptyStatement
+  , endBlock
+  , for
+  , heredoc
+  , identifier
+  , if'
+  , keyword
+  , lambda
+  , literal
+  , method
+  , methodCall
+  , mk Break Statement.Break
+  , mk Next Statement.Continue
+  , mk Redo Statement.Retry
+  , mk Retry Statement.Retry
+  , mk Return Statement.Return
+  , mk Yield Statement.Yield
+  , module'
+  , pair
+  , parenthesized_expressions
+  , parseError
+  , rescue
+  , scopeResolution
+  , singletonClass
+  , singletonMethod
+  , subscript
+  , unary
+  , undef
+  , unless
+  , until'
+  , while'
+  ]
+  where
+    mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children expressions))
 
 expressions :: Assignment
-expressions = makeTerm <$> location <*> many expression
+expressions = mk <$> location <*> many expression
+  where mk _ [a] = a
+        mk loc children = makeTerm loc children
 
 parenthesized_expressions :: Assignment
-parenthesized_expressions = makeTerm <$> symbol ParenthesizedStatements <*> children (many expression)
+parenthesized_expressions = mk <$> symbol ParenthesizedStatements <*> children (many expression)
+  where mk _ [a] = a
+        mk loc children = makeTerm loc children
 
 identifier :: Assignment
 identifier =
@@ -168,10 +177,10 @@ literal =
    -- TODO: Do we want to represent the difference between .. and ...
   <|> makeTerm <$> symbol Range <*> children (Expression.Enumeration <$> expression <*> expression <*> emptyTerm)
   <|> makeTerm <$> symbol Array <*> children (Literal.Array <$> many expression)
-  <|> makeTerm <$> symbol Hash  <*> children (Literal.Hash <$> (many . term) pair)
+  <|> makeTerm <$> symbol Hash  <*> children (Literal.Hash <$> many expression)
   <|> makeTerm <$> symbol Subshell <*> (Literal.TextElement <$> source)
   <|> makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
-  <|> makeTerm <$> symbol ChainedString <*> children (many (term (makeTerm <$> symbol String <*> (Literal.TextElement <$> source))))
+  <|> makeTerm <$> symbol ChainedString <*> children (many (makeTerm <$> symbol String <*> (Literal.TextElement <$> source)))
   <|> makeTerm <$> symbol Regex <*> (Literal.Regex <$> source)
   <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
 
@@ -214,12 +223,12 @@ parameter =
   <|> mk OptionalParameter
   <|> makeTerm <$> symbol DestructuredParameter <*> children (many parameter)
   <|> expression
-  <|> parseError
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 method :: Assignment
-method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> pure [] <*> emptyTerm <*> expression <*> params <*> expressions)
+method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> pure [] <*> emptyTerm <*> expression <*> params <*> expressions')
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
+        expressions' = makeTerm <$> location <*> many expression
 
 singletonMethod :: Assignment
 singletonMethod = makeTerm <$> symbol SingletonMethod <*> children (Declaration.Method <$> pure [] <*> expression <*> expression <*> params <*> expressions)
@@ -249,20 +258,19 @@ undef = makeTerm <$> symbol Undef <*> children (Expression.Call <$> pure [] <*> 
   where name = makeTerm <$> location <*> (Syntax.Identifier <$> source)
 
 if' :: Assignment
-if' =  ifElsif If
-   <|> makeTerm <$> symbol IfModifier <*> children (flip Statement.If <$> expression <*> expression <*> emptyTerm)
+if' =   ifElsif If
+    <|> makeTerm <$> symbol IfModifier <*> children (flip Statement.If <$> expression <*> expression <*> emptyTerm)
   where
-    ifElsif s = makeTerm <$> symbol s <*> children (Statement.If <$> expression <*> expressions' <*> (fromMaybe <$> emptyTerm <*> optional (ifElsif Elsif <|> else')))
-    expressions' = makeTerm <$> location <*> manyTill expression (void (symbol Else) <|> void (symbol Elsif) <|> eof)
-
-else' :: Assignment
-else' = makeTerm <$> symbol Else <*> children (many expression)
+    ifElsif s = makeTerm <$> symbol s <*> children (Statement.If <$> expression <*> expressions' <*> (elsif' <|> else' <|> emptyTerm))
+    expressions' = makeTerm <$> location <*> manyTermsTill expression (void (symbol Else) <|> void (symbol Elsif) <|> eof)
+    elsif' = postContextualize comment (ifElsif Elsif)
+    else' = postContextualize comment (symbol Else *> children expressions)
 
 unless :: Assignment
-unless =
-      makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert expression <*> expressions' <*> (fromMaybe <$> emptyTerm <*> optional else'))
-  <|> makeTerm <$> symbol UnlessModifier <*> children (flip Statement.If <$> expression <*> invert expression <*> emptyTerm)
-  where expressions' = makeTerm <$> location <*> manyTill expression (void (symbol Else) <|> eof)
+unless =   makeTerm <$> symbol Unless         <*> children      (Statement.If <$> invert expression <*> expressions' <*> (else' <|> emptyTerm))
+       <|> makeTerm <$> symbol UnlessModifier <*> children (flip Statement.If <$> expression <*> invert expression <*> emptyTerm)
+  where expressions' = makeTerm <$> location <*> manyTermsTill expression (void (symbol Else) <|> eof)
+        else' = postContextualize comment (symbol Else *> children expressions)
 
 while' :: Assignment
 while' =
@@ -275,7 +283,7 @@ until' =
   <|> makeTerm <$> symbol UntilModifier <*> children (flip Statement.While <$> expression <*> invert expression)
 
 for :: Assignment
-for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> (makeTerm <$> location <*> manyTill expression (symbol In)) <*> inClause <*> expressions)
+for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> (makeTerm <$> location <*> manyTermsTill expression (symbol In)) <*> inClause <*> expressions)
   where inClause = symbol In *> children (expression)
 
 case' :: Assignment
@@ -283,14 +291,14 @@ case' = makeTerm <$> symbol Case <*> children (Statement.Match <$> (symbol When 
   where
     whens = makeTerm <$> location <*> many (when' <|> else' <|> expression)
     when' = makeTerm <$> symbol When <*> children (Statement.Pattern <$> (makeTerm <$> location <*> some pattern) <*> whens)
-    pattern = symbol Pattern *> children ((symbol SplatArgument *> children expression) <|> expression)
+    pattern = postContextualize comment (symbol Pattern *> children ((symbol SplatArgument *> children expression) <|> expression))
+    else' = postContextualize comment (symbol Else *> children expressions)
 
 subscript :: Assignment
 subscript = makeTerm <$> symbol ElementReference <*> children (Expression.Subscript <$> expression <*> many expression)
 
 pair :: Assignment
-pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression)
-   <|> makeTerm <$> token  Pair <*> pure Syntax.Empty
+pair =   makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> (expression <|> emptyTerm))
 
 methodCall :: Assignment
 methodCall = makeTerm <$> symbol MethodCall <*> children (Expression.Call <$> pure [] <*> expression <*> args <*> (block <|> emptyTerm))
@@ -317,7 +325,7 @@ begin :: Assignment
 begin = makeTerm <$> symbol Begin <*> children (Statement.Try <$> expressions <*> many rescue)
 
 assignment' :: Assignment
-assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.Assignment <$> lhs <*> rhs)
+assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.Assignment [] <$> lhs <*> rhs)
           <|> makeTerm' <$> symbol OperatorAssignment <*> children (infixTerm lhs expression
                 [ assign Expression.Plus      <$ symbol AnonPlusEqual
                 , assign Expression.Minus     <$ symbol AnonMinusEqual
@@ -335,7 +343,7 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
                 ])
   where
     assign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
-    assign c l r = inj (Statement.Assignment l (makeTerm1 (c l r)))
+    assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
 
     lhs  = makeTerm <$> symbol LeftAssignmentList  <*> children (many expr) <|> expr
     rhs  = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr
@@ -354,7 +362,7 @@ unary = symbol Unary >>= \ location ->
 
 -- TODO: Distinguish `===` from `==` ?
 -- TODO: Distinuish `=~` and `!~` ?
-binary  :: Assignment
+binary :: Assignment
 binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expression
   [ (inj .) . Expression.Plus             <$ symbol AnonPlus
   , (inj .) . Expression.Minus            <$ symbol AnonMinus'
@@ -393,7 +401,11 @@ invert term = makeTerm <$> location <*> fmap Expression.Not term
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 term :: Assignment -> Assignment
-term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context . (\ (a:as) -> a:|as) <$> some comment <*> emptyTerm)
+term term = many comment *> term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
+
+-- | Match a series of terms or comments until a delimiter is matched.
+manyTermsTill :: Show b => Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
+manyTermsTill step end = manyTill (step <|> comment) end
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: HasCallStack

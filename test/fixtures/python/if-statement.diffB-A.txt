@@ -3,16 +3,15 @@
   { (Identifier)
   ->(Identifier) }
     (
-    { (Identifier)
-    ->(Identifier) }
-    { (Identifier)
-    ->(Identifier) })
+    {-(Identifier)-}
+      (Identifier)
+    {+(Identifier)+})
   { (Empty)
   ->(If
-      (Identifier)
-      (
-        (Identifier)
-        (Identifier))
-      (
-        (Identifier)
-        (Identifier))) }))
+    {+(Identifier)+}
+    {+(
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(
+      {+(Identifier)+}
+      {+(Identifier)+})+}) }))

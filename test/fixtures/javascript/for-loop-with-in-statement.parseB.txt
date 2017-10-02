@@ -1,22 +1,18 @@
 (Program
   (For
-    (BooleanOperator
-      (Operator
+    (And
+      (Member
         (Identifier)
-        (Other "in")
         (Identifier))
-      (Other "&&")
       (Assignment
         (Identifier)
-        (NumberLiteral)))
-    (RelationalOperator
+        (Float)))
+    (LessThan
       (Identifier)
-      (Other "<")
       (Identifier))
-    (MathOperator
-      (Identifier)
-      (Other "++"))
-    (ExpressionStatements
-      (ExpressionStatements
-        (FunctionCall
-          (Identifier))))))
+    (Update
+      (Identifier))
+    (
+      (Call
+        (Identifier)
+        (Empty)))))

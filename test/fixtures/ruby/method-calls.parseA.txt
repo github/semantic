@@ -32,9 +32,7 @@
     (Function
       (Empty)
       (Identifier)
-      (
-        (Function
-          (Empty)
-          (
-            (Integer)))))
+      (Function
+        (Empty)
+        (Integer)))
     (Empty)))

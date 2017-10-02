@@ -1,7 +1,8 @@
 (Program
   (While
     (Identifier)
-    (ExpressionStatements
-      (ExpressionStatements
-        (FunctionCall
-          (Identifier))))))
+    (
+      (Call
+        (Identifier)
+        (Empty))))
+  (Empty))

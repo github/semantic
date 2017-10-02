@@ -1,14 +1,21 @@
 {-# OPTIONS_GHC -fno-warn-orphans -funbox-strict-fields #-}
-module Data.Functor.Both (Both, both, runBothWith, fst, snd, module X) where
+module Data.Functor.Both
+( Both
+, both
+, runBothWith
+, fst
+, snd
+, module X
+) where
 
-import Control.DeepSeq
 import Data.Bifunctor.Join as X
+import Data.Functor.Classes
 import Data.Semigroup
 import Prelude hiding (fst, snd)
 import qualified Prelude
 
 -- | A computation over both sides of a pair.
-type Both a = Join (,) a
+type Both = Join (,)
 
 -- | Given two operands returns a functor operating on `Both`. This is a curried synonym for Both.
 both :: a -> a -> Both a
@@ -34,4 +41,9 @@ instance (Semigroup a, Monoid a) => Monoid (Join (,) a) where
 instance (Semigroup a) => Semigroup (Join (,) a) where
   a <> b = Join $ runJoin a <> runJoin b
 
-instance NFData a => NFData (Join (,) a)
+
+instance Eq2 p => Eq1 (Join p) where
+  liftEq eq (Join a1) (Join a2) = liftEq2 eq eq a1 a2
+
+instance Show2 p => Show1 (Join p) where
+  liftShowsPrec sp sl d = showsUnaryWith (liftShowsPrec2 sp sl sp sl) "Join" d . runJoin

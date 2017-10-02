@@ -3,13 +3,12 @@ module AlignmentSpec where
 
 import Alignment
 import Control.Arrow ((&&&))
-import Control.Comonad.Cofree (Cofree, hoistCofree)
-import Control.Monad.Free (Free, wrap)
+import Control.Monad.Free (wrap)
 import Control.Monad.State
 import Data.Align hiding (align)
 import Data.Bifunctor
 import Data.Bifunctor.Join
-import Data.Foldable (toList)
+import Data.Diff
 import Data.Functor.Both as Both hiding (fst, snd)
 import Data.Functor.Listable
 import Data.List (nub, sort)
@@ -19,12 +18,11 @@ import Data.Range
 import Data.Record
 import Data.Semigroup ((<>))
 import qualified Data.Source as Source
+import Data.SplitDiff
+import Data.Term
 import qualified Data.Text as Text
 import Data.These
-import Patch
-import SplitDiff
 import Syntax
-import Term
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
@@ -66,134 +64,134 @@ spec = parallel $ do
   describe "alignDiff" $ do
     it "aligns identical branches on a single line" $
       let sources = both (Source.fromText "[ foo ]") (Source.fromText "[ foo ]") in
-      align sources (pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ]) `shouldBe` prettyDiff sources
-        [ Join (These (info 0 7 `branch` [ info 2 5 `leaf` "foo" ])
-                      (info 0 7 `branch` [ info 2 5 `leaf` "foo" ])) ]
+      align sources ((info 0 7, info 0 7) `merge` Indexed [ (info 2 5, info 2 5) `merge` Leaf "foo" ]) `shouldBe` prettyDiff sources
+        [ Join (These (wrap $ info 0 7 `In` [ wrap $ info 2 5 `In` [] ])
+                      (wrap $ info 0 7 `In` [ wrap $ info 2 5 `In` [] ])) ]
 
     it "aligns identical branches spanning multiple lines" $
       let sources = both (Source.fromText "[\nfoo\n]") (Source.fromText "[\nfoo\n]") in
-      align sources (pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ]) `shouldBe` prettyDiff sources
-        [ Join (These (info 0 2 `branch` [])
-                      (info 0 2 `branch` []))
-        , Join (These (info 2 6 `branch` [ info 2 5 `leaf` "foo" ])
-                      (info 2 6 `branch` [ info 2 5 `leaf` "foo" ]))
-        , Join (These (info 6 7 `branch` [])
-                      (info 6 7 `branch` []))
+      align sources ((info 0 7, info 0 7) `merge` Indexed [ (info 2 5, info 2 5) `merge` Leaf "foo" ]) `shouldBe` prettyDiff sources
+        [ Join (These (wrap $ info 0 2 `In` [])
+                      (wrap $ info 0 2 `In` []))
+        , Join (These (wrap $ info 2 6 `In` [ wrap $ info 2 5 `In` [] ])
+                      (wrap $ info 2 6 `In` [ wrap $ info 2 5 `In` [] ]))
+        , Join (These (wrap $ info 6 7 `In` [])
+                      (wrap $ info 6 7 `In` []))
         ]
 
     it "aligns reformatted branches" $
       let sources = both (Source.fromText "[ foo ]") (Source.fromText "[\nfoo\n]") in
-      align sources (pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ]) `shouldBe` prettyDiff sources
-        [ Join (That  (info 0 2 `branch` []))
-        , Join (These (info 0 7 `branch` [ info 2 5 `leaf` "foo" ])
-                      (info 2 6 `branch` [ info 2 5 `leaf` "foo" ]))
-        , Join (That  (info 6 7 `branch` []))
+      align sources ((info 0 7, info 0 7) `merge` Indexed [ (info 2 5, info 2 5) `merge` Leaf "foo" ]) `shouldBe` prettyDiff sources
+        [ Join (That  (wrap $ info 0 2 `In` []))
+        , Join (These (wrap $ info 0 7 `In` [ wrap $ info 2 5 `In` [] ])
+                      (wrap $ info 2 6 `In` [ wrap $ info 2 5 `In` [] ]))
+        , Join (That  (wrap $ info 6 7 `In` []))
         ]
 
     it "aligns nodes following reformatted branches" $
       let sources = both (Source.fromText "[ foo ]\nbar\n") (Source.fromText "[\nfoo\n]\nbar\n") in
-      align sources (pure (info 0 12) `branch` [ pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ], pure (info 8 11) `leaf` "bar" ]) `shouldBe` prettyDiff sources
-        [ Join (That  (info 0 2 `branch` [ info 0 2 `branch` [] ]))
-        , Join (These (info 0 8 `branch` [ info 0 7 `branch` [ info 2 5 `leaf` "foo" ] ])
-                      (info 2 6 `branch` [ info 2 6 `branch` [ info 2 5 `leaf` "foo" ] ]))
-        , Join (That  (info 6 8 `branch` [ info 6 7 `branch` [] ]))
-        , Join (These (info 8 12 `branch` [ info 8 11 `leaf` "bar" ])
-                      (info 8 12 `branch` [ info 8 11 `leaf` "bar" ]))
-        , Join (These (info 12 12 `branch` [])
-                      (info 12 12 `branch` []))
+      align sources ((info 0 12, info 0 12) `merge` Indexed [ (info 0 7, info 0 7) `merge` Indexed [ (info 2 5, info 2 5) `merge` Leaf "foo" ], (info 8 11, info 8 11) `merge` Leaf "bar" ]) `shouldBe` prettyDiff sources
+        [ Join (That  (wrap $ info 0 2   `In` [ wrap $ info 0 2  `In` [] ]))
+        , Join (These (wrap $ info 0 8   `In` [ wrap $ info 0 7  `In` [ wrap $ info 2 5 `In` [] ] ])
+                      (wrap $ info 2 6   `In` [ wrap $ info 2 6  `In` [ wrap $ info 2 5 `In` [] ] ]))
+        , Join (That  (wrap $ info 6 8   `In` [ wrap $ info 6 7  `In` [] ]))
+        , Join (These (wrap $ info 8 12  `In` [ wrap $ info 8 11 `In` [] ])
+                      (wrap $ info 8 12  `In` [ wrap $ info 8 11 `In` [] ]))
+        , Join (These (wrap $ info 12 12 `In` [])
+                      (wrap $ info 12 12 `In` []))
         ]
 
     it "aligns identical branches with multiple children on the same line" $
       let sources = pure (Source.fromText "[ foo, bar ]") in
-      align sources (pure (info 0 12) `branch` [ pure (info 2 5) `leaf` "foo", pure (info 7 10) `leaf` "bar" ]) `shouldBe` prettyDiff sources
-        [ Join (runBothWith These (pure (info 0 12 `branch` [ info 2 5 `leaf` "foo", info 7 10 `leaf` "bar" ])) ) ]
+      align sources ((info 0 12, info 0 12) `merge` Indexed [ (info 2 5, info 2 5) `merge` Leaf "foo", (info 7 10, info 7 10) `merge` Leaf "bar" ]) `shouldBe` prettyDiff sources
+        [ Join (runBothWith These (pure (wrap $ info 0 12 `In` [ wrap $ info 2 5 `In` [], wrap $ info 7 10 `In` [] ])) ) ]
 
     it "aligns insertions" $
       let sources = both (Source.fromText "a") (Source.fromText "a\nb") in
-      align sources (both (info 0 1) (info 0 3) `branch` [ pure (info 0 1) `leaf` "a", insert (info 2 3 `leaf` "b") ]) `shouldBe` prettyDiff sources
-        [ Join (These (info 0 1 `branch` [ info 0 1 `leaf` "a" ])
-                      (info 0 2 `branch` [ info 0 1 `leaf` "a" ]))
-        , Join (That  (info 2 3 `branch` [ insert (info 2 3 `leaf` "b") ]))
+      align sources ((info 0 1, info 0 3) `merge` Indexed [ (info 0 1, info 0 1) `merge` Leaf "a", inserting (Term (info 2 3 `In` Leaf "b")) ]) `shouldBe` prettyDiff sources
+        [ Join (These (wrap $ info 0 1 `In` [ wrap $ info 0 1 `In` [] ])
+                      (wrap $ info 0 2 `In` [ wrap $ info 0 1 `In` [] ]))
+        , Join (That  (wrap $ info 2 3 `In` [ pure (SplitInsert (Term (info 2 3 `In` []))) ]))
         ]
 
     it "aligns total insertions" $
       let sources = both (Source.fromText "") (Source.fromText "a") in
-      align sources (insert (info 0 1 `leaf` "a")) `shouldBe` prettyDiff sources
-        [ Join (That (insert (info 0 1 `leaf` "a"))) ]
+      align sources (inserting (Term (info 0 1 `In` Leaf "a"))) `shouldBe` prettyDiff sources
+        [ Join (That (pure (SplitInsert (Term (info 0 1 `In` []))))) ]
 
     it "aligns insertions into empty branches" $
       let sources = both (Source.fromText "[ ]") (Source.fromText "[a]") in
-      align sources (pure (info 0 3) `branch` [ insert (info 1 2 `leaf` "a") ]) `shouldBe` prettyDiff sources
-        [ Join (That  (info 0 3 `branch` [ insert (info 1 2 `leaf` "a") ]))
-        , Join (This  (info 0 3 `branch` []))
+      align sources ((info 0 3, info 0 3) `merge` Indexed [ inserting (Term (info 1 2 `In` Leaf "a")) ]) `shouldBe` prettyDiff sources
+        [ Join (That  (wrap $ info 0 3 `In` [ pure (SplitInsert (Term (info 1 2 `In` []))) ]))
+        , Join (This  (wrap $ info 0 3 `In` []))
         ]
 
     it "aligns symmetrically following insertions" $
       let sources = both (Source.fromText "a\nc") (Source.fromText "a\nb\nc") in
-      align sources (both (info 0 3) (info 0 5) `branch` [ pure (info 0 1) `leaf` "a", insert (info 2 3 `leaf` "b"), both (info 2 3) (info 4 5) `leaf` "c" ])
+      align sources ((info 0 3, info 0 5) `merge` Indexed [ (info 0 1, info 0 1) `merge` Leaf "a", inserting (Term (info 2 3 `In` Leaf "b")), (info 2 3, info 4 5) `merge` Leaf "c" ])
         `shouldBe` prettyDiff sources
-        [ Join (These (info 0 2 `branch` [ info 0 1 `leaf` "a" ])
-                      (info 0 2 `branch` [ info 0 1 `leaf` "a" ]))
-        , Join (That  (info 2 4 `branch` [ insert (info 2 3 `leaf` "b") ]))
-        , Join (These (info 2 3 `branch` [ info 2 3 `leaf` "c" ])
-                      (info 4 5 `branch` [ info 4 5 `leaf` "c" ]))
+        [ Join (These (wrap $ info 0 2 `In` [ wrap $ info 0 1 `In` [] ])
+                      (wrap $ info 0 2 `In` [ wrap $ info 0 1 `In` [] ]))
+        , Join (That  (wrap $ info 2 4 `In` [ pure (SplitInsert (Term (info 2 3 `In` []))) ]))
+        , Join (These (wrap $ info 2 3 `In` [ wrap $ info 2 3 `In` [] ])
+                      (wrap $ info 4 5 `In` [ wrap $ info 4 5 `In` [] ]))
         ]
 
     it "symmetrical nodes force the alignment of asymmetrical nodes on both sides" $
       let sources = both (Source.fromText "[ a, b ]") (Source.fromText "[ b, c ]") in
-      align sources (pure (info 0 8) `branch` [ delete (info 2 3 `leaf` "a"), both (info 5 6) (info 2 3) `leaf` "b", insert (info 5 6 `leaf` "c") ]) `shouldBe` prettyDiff sources
-        [ Join (These (info 0 8 `branch` [ delete (info 2 3 `leaf` "a"), info 5 6 `leaf` "b" ])
-                      (info 0 8 `branch` [ info 2 3 `leaf` "b", insert (info 5 6 `leaf` "c") ])) ]
+      align sources ((info 0 8, info 0 8) `merge` Indexed [ deleting (Term (info 2 3 `In` Leaf "a")), (info 5 6, info 2 3) `merge` Leaf "b", inserting (Term (info 5 6 `In` Leaf "c")) ]) `shouldBe` prettyDiff sources
+        [ Join (These (wrap $ info 0 8 `In` [ pure (SplitDelete (Term (info 2 3 `In` []))), wrap $ info 5 6 `In` [] ])
+                      (wrap $ info 0 8 `In` [ wrap $ info 2 3 `In` [], pure (SplitInsert (Term (info 5 6 `In` []))) ])) ]
 
     it "when one of two symmetrical nodes must be split, splits the latter" $
       let sources = both (Source.fromText "[ a, b ]") (Source.fromText "[ a\n, b\n]") in
-      align sources (both (info 0 8) (info 0 9) `branch` [ pure (info 2 3) `leaf` "a", both (info 5 6) (info 6 7) `leaf` "b" ]) `shouldBe` prettyDiff sources
-        [ Join (These (info 0 8 `branch` [ info 2 3 `leaf` "a", info 5 6 `leaf` "b" ])
-                      (info 0 4 `branch` [ info 2 3 `leaf` "a" ]))
-        , Join (That  (info 4 8 `branch` [ info 6 7 `leaf` "b" ]))
-        , Join (That  (info 8 9 `branch` []))
+      align sources ((info 0 8, info 0 9) `merge` Indexed [ (info 2 3, info 2 3) `merge` Leaf "a", (info 5 6, info 6 7) `merge` Leaf "b" ]) `shouldBe` prettyDiff sources
+        [ Join (These (wrap $ info 0 8 `In` [ wrap $ info 2 3 `In` [], wrap $ info 5 6 `In` [] ])
+                      (wrap $ info 0 4 `In` [ wrap $ info 2 3 `In` [] ]))
+        , Join (That  (wrap $ info 4 8 `In` [ wrap $ info 6 7 `In` [] ]))
+        , Join (That  (wrap $ info 8 9 `In` []))
         ]
 
     it "aligns deletions before insertions" $
       let sources = both (Source.fromText "[ a ]") (Source.fromText "[ b ]") in
-      align sources (pure (info 0 5) `branch` [ delete (info 2 3 `leaf` "a"), insert (info 2 3 `leaf` "b") ]) `shouldBe` prettyDiff sources
-        [ Join (This (info 0 5 `branch` [ delete (info 2 3 `leaf` "a") ]))
-        , Join (That (info 0 5 `branch` [ insert (info 2 3 `leaf` "b") ]))
+      align sources ((info 0 5, info 0 5) `merge` Indexed [ deleting (Term (info 2 3 `In` Leaf "a")), inserting (Term (info 2 3 `In` Leaf "b")) ]) `shouldBe` prettyDiff sources
+        [ Join (This  (wrap $ info 0 5 `In` [ pure (SplitDelete (Term (info 2 3 `In` []))) ]))
+        , Join (That  (wrap $ info 0 5 `In` [ pure (SplitInsert (Term (info 2 3 `In` []))) ]))
         ]
 
     it "aligns context-only lines symmetrically" $
       let sources = both (Source.fromText "[\n  a\n,\n  b\n]") (Source.fromText "[\n  a, b\n\n\n]") in
-      align sources (both (info 0 13) (info 0 12) `branch` [ pure (info 4 5) `leaf` "a", both (info 10 11) (info 7 8) `leaf` "b" ]) `shouldBe` prettyDiff sources
-        [ Join (These (info 0 2 `branch` [])
-                      (info 0 2 `branch` []))
-        , Join (These (info 2 6 `branch` [ info 4 5 `leaf` "a" ])
-                      (info 2 9 `branch` [ info 4 5 `leaf` "a", info 7 8 `leaf` "b" ]))
-        , Join (These (info 6 8 `branch` [])
-                      (info 9 10 `branch` []))
-        , Join (This  (info 8 12 `branch` [ info 10 11 `leaf` "b" ]))
-        , Join (These (info 12 13 `branch` [])
-                      (info 10 11 `branch` []))
-        , Join (That  (info 11 12 `branch` []))
+      align sources ((info 0 13, info 0 12) `merge` Indexed [ (info 4 5, info 4 5) `merge` Leaf "a", (info 10 11, info 7 8) `merge` Leaf "b" ]) `shouldBe` prettyDiff sources
+        [ Join (These (wrap $ info 0 2 `In` [])
+                      (wrap $ info 0 2 `In` []))
+        , Join (These (wrap $ info 2 6 `In` [ wrap $ info 4 5 `In` [] ])
+                      (wrap $ info 2 9 `In` [ wrap $ info 4 5 `In` [], wrap $ info 7 8 `In` [] ]))
+        , Join (These (wrap $ info 6 8 `In` [])
+                      (wrap $ info 9 10 `In` []))
+        , Join (This  (wrap $ info 8 12 `In` [ wrap $ info 10 11 `In` [] ]))
+        , Join (These (wrap $ info 12 13 `In` [])
+                      (wrap $ info 10 11 `In` []))
+        , Join (That  (wrap $ info 11 12 `In` []))
         ]
 
     it "aligns asymmetrical nodes preceding their symmetrical siblings conservatively" $
       let sources = both (Source.fromText "[ b, c ]") (Source.fromText "[ a\n, c\n]") in
-      align sources (both (info 0 8) (info 0 9) `branch` [ insert (info 2 3 `leaf` "a"), delete (info 2 3 `leaf` "b"), both (info 5 6) (info 6 7) `leaf` "c" ]) `shouldBe` prettyDiff sources
-        [ Join (That  (info 0 4 `branch` [ insert (info 2 3 `leaf` "a") ]))
-        , Join (These (info 0 8 `branch` [ delete (info 2 3 `leaf` "b"), info 5 6 `leaf` "c" ])
-                      (info 4 8 `branch` [ info 6 7 `leaf` "c" ]))
-        , Join (That  (info 8 9 `branch` []))
+      align sources ((info 0 8, info 0 9) `merge` Indexed [ inserting (Term (info 2 3 `In` Leaf "a")), deleting (Term (info 2 3 `In` Leaf "b")), (info 5 6, info 6 7) `merge` Leaf "c" ]) `shouldBe` prettyDiff sources
+        [ Join (That  (wrap $ info 0 4 `In` [ pure (SplitInsert (Term (info 2 3 `In` []))) ]))
+        , Join (These (wrap $ info 0 8 `In` [ pure (SplitDelete (Term (info 2 3 `In` []))), wrap $ info 5 6 `In` [] ])
+                      (wrap $ info 4 8 `In` [ wrap $ info 6 7 `In` [] ]))
+        , Join (That  (wrap $ info 8 9 `In` []))
         ]
 
     it "aligns symmetrical reformatted nodes" $
       let sources = both (Source.fromText "a [ b ]\nc") (Source.fromText "a [\nb\n]\nc") in
-      align sources (pure (info 0 9) `branch` [ pure (info 0 1) `leaf` "a", pure (info 2 7) `branch` [ pure (info 4 5) `leaf` "b" ], pure (info 8 9) `leaf` "c" ]) `shouldBe` prettyDiff sources
-        [ Join (These (info 0 8 `branch` [ info 0 1 `leaf` "a", info 2 7 `branch` [ info 4 5 `leaf` "b" ] ])
-                      (info 0 4 `branch` [ info 0 1 `leaf` "a", info 2 4 `branch` [] ]))
-        , Join (That  (info 4 6 `branch` [ info 4 6 `branch` [ info 4 5 `leaf` "b" ] ]))
-        , Join (That  (info 6 8 `branch` [ info 6 7 `branch` [] ]))
-        , Join (These (info 8 9 `branch` [ info 8 9 `leaf` "c" ])
-                      (info 8 9 `branch` [ info 8 9 `leaf` "c" ]))
+      align sources ((info 0 9, info 0 9) `merge` Indexed [ (info 0 1, info 0 1) `merge` Leaf "a", (info 2 7, info 2 7) `merge` Indexed [ (info 4 5, info 4 5) `merge` Leaf "b" ], (info 8 9, info 8 9) `merge` Leaf "c" ]) `shouldBe` prettyDiff sources
+        [ Join (These (wrap $ info 0 8 `In` [ wrap $ info 0 1 `In` [], wrap $ info 2 7 `In` [ wrap $ info 4 5 `In` [] ] ])
+                      (wrap $ info 0 4 `In` [ wrap $ info 0 1 `In` [], wrap $ info 2 4 `In` [] ]))
+        , Join (That  (wrap $ info 4 6 `In` [ wrap $ info 4 6 `In` [ wrap $ info 4 5 `In` [] ] ]))
+        , Join (That  (wrap $ info 6 8 `In` [ wrap $ info 6 7 `In` [] ]))
+        , Join (These (wrap $ info 8 9 `In` [ wrap $ info 8 9 `In` [] ])
+                      (wrap $ info 8 9 `In` [ wrap $ info 8 9 `In` [] ]))
         ]
 
   describe "numberedRows" $ do
@@ -260,14 +258,14 @@ instance Listable BranchElement where
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap fst <$> numbered))
 
-align :: Both Source.Source -> ConstructibleFree Syntax (Patch (Term Syntax (Record '[Range]))) (Both (Record '[Range])) -> PrettyDiff (SplitDiff [] (Record '[Range]))
-align sources = PrettyDiff sources . fmap (fmap (getRange &&& id)) . alignDiff sources . deconstruct
+align :: Both Source.Source -> Diff Syntax (Record '[Range]) (Record '[Range]) -> PrettyDiff (SplitDiff [] (Record '[Range]))
+align sources = PrettyDiff sources . fmap (fmap (getRange &&& id)) . alignDiff sources
 
 info :: Int -> Int -> Record '[Range]
 info start end = Range start end :. Nil
 
-prettyDiff :: Both Source.Source -> [Join These (ConstructibleFree [] (SplitPatch (Term [] (Record '[Range]))) (Record '[Range]))] -> PrettyDiff (SplitDiff [] (Record '[Range]))
-prettyDiff sources = PrettyDiff sources . fmap (fmap ((getRange &&& id) . deconstruct))
+prettyDiff :: Both Source.Source -> [Join These (SplitDiff [] (Record '[Range]))] -> PrettyDiff (SplitDiff [] (Record '[Range]))
+prettyDiff sources = PrettyDiff sources . fmap (fmap ((getRange &&& id)))
 
 data PrettyDiff a = PrettyDiff { unPrettySources :: Both Source.Source, unPrettyLines :: [Join These (Range, a)] }
   deriving Eq
@@ -280,46 +278,3 @@ instance Show (PrettyDiff a) where
           showDiff (range, _) = filter (/= '\n') . Text.unpack . Source.toText . Source.slice range
           pad n string = (<>) (take n string) (replicate (max 0 (n - length string)) ' ')
           toBoth them = showDiff <$> them `applyThese` modifyJoin (uncurry These) sources
-
-newtype ConstructibleFree f patch annotation = ConstructibleFree { deconstruct :: Free (CofreeF f annotation) patch }
-
-
-class PatchConstructible p where
-  insert :: Term Syntax (Record '[Range]) -> p
-  delete :: Term Syntax (Record '[Range]) -> p
-
-instance PatchConstructible (Patch (Term Syntax (Record '[Range]))) where
-  insert = Insert
-  delete = Delete
-
-instance PatchConstructible (SplitPatch (Term Syntax (Record '[Range]))) where
-  insert = SplitInsert
-  delete = SplitDelete
-
-instance PatchConstructible (SplitPatch (Term [] (Record '[Range]))) where
-  insert = SplitInsert . hoistCofree toList
-  delete = SplitDelete . hoistCofree toList
-
-instance (Functor f, PatchConstructible patch) => PatchConstructible (ConstructibleFree f patch annotation) where
-  insert = ConstructibleFree . pure . insert
-  delete = ConstructibleFree . pure . delete
-
-class SyntaxConstructible s where
-  leaf :: annotation -> Text.Text -> s annotation
-  branch :: annotation -> [s annotation] -> s annotation
-
-instance SyntaxConstructible (ConstructibleFree Syntax patch) where
-  leaf info = ConstructibleFree . wrap . (info :<) . Leaf
-  branch info = ConstructibleFree . wrap . (info :<) . Indexed . fmap deconstruct
-
-instance SyntaxConstructible (ConstructibleFree [] patch) where
-  leaf info = ConstructibleFree . wrap . (info :<) . const []
-  branch info = ConstructibleFree . wrap . (info :<) . fmap deconstruct
-
-instance SyntaxConstructible (Cofree Syntax) where
-  info `leaf` value = cofree $ info :< Leaf value
-  info `branch` children = cofree $ info :< Indexed children
-
-instance SyntaxConstructible (Cofree []) where
-  info `leaf` _ = cofree $ info :< []
-  info `branch` children = cofree $ info :< children

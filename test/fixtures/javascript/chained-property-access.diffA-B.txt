@@ -1,17 +1,23 @@
 (Program
   (Return
-    (FunctionCall
-      (FunctionCall
-        (FunctionCall
-          (Identifier)
-          (Identifier))
-        (Identifier)
-        (MemberAccess
-        { (Identifier)
-        ->(Identifier) }
-          (Identifier)))
-      (Identifier)
+    (Call
+      (MemberAccess
+        (Call
+          (MemberAccess
+            (Call
+              (MemberAccess
+                (Identifier)
+                (Identifier))
+              (Empty))
+            (Identifier))
+          (MemberAccess
+          { (Identifier)
+          ->(Identifier) }
+            (Identifier))
+          (Empty))
+        (Identifier))
       (MemberAccess
       { (Identifier)
       ->(Identifier) }
-        (Identifier)))))
+        (Identifier))
+      (Empty))))

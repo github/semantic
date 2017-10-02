@@ -12,9 +12,9 @@ import Data.Range
 import Data.Source
 import Data.Span
 import qualified Data.Syntax.Assignment as A
+import Data.Term
 import Foreign
 import Foreign.Marshal.Array (allocaArray)
-import Term
 import qualified TreeSitter.Document as TS
 import qualified TreeSitter.Node as TS
 import qualified TreeSitter.Language as TS
@@ -38,7 +38,7 @@ toAST node@TS.Node{..} = do
   children <- allocaArray count $ \ childNodesPtr -> do
     _ <- with nodeTSNode (\ nodePtr -> TS.ts_node_copy_child_nodes nullPtr nodePtr childNodesPtr (fromIntegral count))
     peekArray count childNodesPtr
-  pure $! A.Node (toEnum (min (fromIntegral nodeSymbol) (fromEnum (maxBound :: grammar)))) (nodeRange node) (nodeSpan node) :< children
+  pure $! In (A.Node (toEnum (min (fromIntegral nodeSymbol) (fromEnum (maxBound :: grammar)))) (nodeRange node) (nodeSpan node)) children
 
 anaM :: (Corecursive t, Monad m, Traversable (Base t)) => (a -> m (Base t a)) -> a -> m t
 anaM g = a where a = pure . embed <=< traverse a <=< g

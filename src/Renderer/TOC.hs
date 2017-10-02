@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, RankNTypes, TypeOperators #-}
+{-# LANGUAGE MultiParamTypeClasses, RankNTypes, TypeOperators, ScopedTypeVariables #-}
 module Renderer.TOC
 ( renderToCDiff
 , renderToCTerm
@@ -16,46 +16,40 @@ module Renderer.TOC
 , entrySummary
 ) where
 
-import Control.Comonad (extract)
-import Control.Comonad.Cofree (unwrap)
-import Control.DeepSeq
-import Control.Monad.Free (iter)
 import Data.Aeson
-import Data.Align (crosswalk)
-import Data.Bifunctor (bimap, first)
+import Data.Align (bicrosswalk)
+import Data.Bifoldable (bifoldMap)
+import Data.Bifunctor (bimap)
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
+import Data.Diff
 import Data.Error as Error (Error(..), showExpectation)
 import Data.Foldable (fold, foldl', toList)
 import Data.Functor.Both hiding (fst, snd)
-import qualified Data.Functor.Both as Both
 import Data.Functor.Foldable (cata)
-import Data.Functor.Listable
 import Data.Function (on)
 import Data.List.NonEmpty (nonEmpty)
+import Data.List (sortOn)
 import Data.Maybe (fromMaybe, mapMaybe)
 import Data.Output
+import Data.Patch
 import Data.Range
 import Data.Record
 import Data.Semigroup ((<>), sconcat)
 import Data.Source as Source
 import Data.Span
+import Data.Term
 import Data.Text (toLower)
 import qualified Data.Text as T
-import Data.Text.Listable
-import Data.These
 import Data.Union
-import Diff
 import GHC.Generics
 import Language
-import Patch
 import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
 import Data.Syntax.Algebra (RAlgebra)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Markup as Markup
-import Term
 
 data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }
   deriving (Eq, Show)
@@ -94,21 +88,21 @@ data Declaration
   | FunctionDeclaration { declarationIdentifier :: T.Text }
   | SectionDeclaration  { declarationIdentifier :: T.Text, declarationLevel :: Int }
   | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationLanguage :: Maybe Language }
-  deriving (Eq, Generic, NFData, Show)
+  deriving (Eq, Generic, Show)
 
 getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe Declaration
 getDeclaration = getField
 
 -- | Produce the annotations of nodes representing declarations.
 declaration :: HasField fields (Maybe Declaration) => TermF f (Record fields) a -> Maybe (Record fields)
-declaration (annotation :< _) = annotation <$ (getField annotation :: Maybe Declaration)
+declaration (In annotation _) = annotation <$ (getField annotation :: Maybe Declaration)
 
 
 -- | Compute 'Declaration's for methods and functions.
-declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syntax.Error :< fs, Syntax.Empty :< fs, Apply1 Functor fs, HasField fields Range, HasField fields Span)
+declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syntax.Empty :< fs, Syntax.Error :< fs, Apply Functor fs, HasField fields Range, HasField fields Span)
                    => Blob
                    -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-declarationAlgebra Blob{..} (a :< r)
+declarationAlgebra Blob{..} (In a r)
   -- Do not summarize anonymous functions
   | Just (Declaration.Function _ (identifier, _) _ _) <- prj r
   , Just Syntax.Empty <- prj (unwrap identifier)
@@ -130,13 +124,14 @@ declarationAlgebra Blob{..} (a :< r)
   | Just err@Syntax.Error{} <- prj r
   = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (getField a) err))) blobLanguage
   | otherwise = Nothing
+
   where getSource = toText . flip Source.slice blobSource . getField
 
 -- | Compute 'Declaration's with the headings of 'Markup.Section's.
-markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error :< fs, HasField fields Range, HasField fields Span, Apply1 Functor fs, Apply1 Foldable fs)
+markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error :< fs, HasField fields Range, HasField fields Span, Apply Functor fs, Apply Foldable fs)
                      => Blob
                      -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-markupSectionAlgebra Blob{..} (a :< r)
+markupSectionAlgebra Blob{..} (In a r)
   | Just (Markup.Section level (heading, _) _) <- prj r = Just $ SectionDeclaration (maybe (getSource (extract heading)) (firstLine . toText . flip Source.slice blobSource . sconcat) (nonEmpty (getField . extract <$> toList (unwrap heading)))) level
   | Just err@Syntax.Error{} <- prj r = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (getField a) err))) blobLanguage
   | otherwise = Nothing
@@ -158,15 +153,17 @@ data Entry a
 
 -- | Compute a table of contents for a diff characterized by a function mapping relevant nodes onto values in Maybe.
 tableOfContentsBy :: (Foldable f, Functor f)
-                  => (forall b. TermF f annotation b -> Maybe a) -- ^ A function mapping relevant nodes onto values in Maybe.
-                  -> Diff f annotation                           -- ^ The diff to compute the table of contents for.
-                  -> [Entry a]                                   -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
-tableOfContentsBy selector = fromMaybe [] . iter diffAlgebra . fmap (Just . fmap patchEntry . crosswalk (termTableOfContentsBy selector))
-  where diffAlgebra r = case (selector (first Both.snd r), fold r) of
-          (Just a, Nothing) -> Just [Unchanged a]
-          (Just a, Just []) -> Just [Changed a]
-          (_     , entries) -> entries
-        patchEntry = these Deleted Inserted (const Replaced) . unPatch
+                  => (forall b. TermF f ann b -> Maybe a) -- ^ A function mapping relevant nodes onto values in Maybe.
+                  -> Diff f ann ann                       -- ^ The diff to compute the table of contents for.
+                  -> [Entry a]                            -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
+tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
+  Patch patch -> (pure . patchEntry <$> bicrosswalk selector selector patch) <> bifoldMap fold fold patch <> Just []
+  Merge (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
+    (Just a, Nothing) -> Just [Unchanged a]
+    (Just a, Just []) -> Just [Changed a]
+    (_     , entries) -> entries)
+
+  where patchEntry = patch Deleted Inserted (const Replaced)
 
 termTableOfContentsBy :: (Foldable f, Functor f)
                       => (forall b. TermF f annotation b -> Maybe a)
@@ -176,18 +173,33 @@ termTableOfContentsBy selector = cata termAlgebra
   where termAlgebra r | Just a <- selector r = [a]
                       | otherwise = fold r
 
-dedupe :: HasField fields (Maybe Declaration) => [Entry (Record fields)] -> [Entry (Record fields)]
-dedupe = foldl' go []
-  where go xs x | (_, _:_) <- find (exactMatch `on` entryPayload) x xs = xs
-                | (front, similar : back) <- find (similarMatch `on` entryPayload) x xs =
-                  front <> (Replaced (entryPayload similar) : back)
-                | otherwise = xs <> [x]
 
-        find p x = List.break (p x)
-        exactMatch = (==) `on` getDeclaration
-        similarMatch a b = sameCategory a b && similarDeclaration a b
-        sameCategory = (==) `on` fmap toCategoryName . getDeclaration
-        similarDeclaration = (==) `on` fmap (toLower . declarationIdentifier) . getDeclaration
+newtype DedupeKey = DedupeKey (Maybe T.Text, Maybe T.Text) deriving (Eq, Ord)
+
+-- Dedupe entries in a final pass. This catches two specific scenarios with
+-- different behaviors:
+-- 1. Identical entries are in the list.
+--    Action: take the first one, drop all subsequent.
+-- 2. Two similar entries (defined by a case insensitive comparision of their
+--    identifiers) are in the list.
+--    Action: Combine them into a single Replaced entry.
+dedupe :: forall fields. HasField fields (Maybe Declaration) => [Entry (Record fields)] -> [Entry (Record fields)]
+dedupe = let tuples = sortOn fst . Map.elems . snd . foldl' go (0, Map.empty) in (fmap . fmap) snd tuples
+  where
+    go :: HasField fields (Maybe Declaration)
+       => (Int, Map.Map DedupeKey (Int, Entry (Record fields)))
+       -> Entry (Record fields)
+       -> (Int, Map.Map DedupeKey (Int, Entry (Record fields)))
+    go (index, m) x | Just (_, similar) <- Map.lookup (dedupeKey x) m
+                    = if exactMatch similar x
+                      then (succ index, m)
+                      else
+                        let replacement = Replaced (entryPayload similar)
+                        in (succ index, Map.insert (dedupeKey replacement) (index, replacement) m)
+                    | otherwise = (succ index, Map.insert (dedupeKey x) (index, x) m)
+
+    dedupeKey entry = DedupeKey ((fmap toCategoryName . getDeclaration . entryPayload) entry, (fmap (toLower . declarationIdentifier) . getDeclaration . entryPayload) entry)
+    exactMatch = (==) `on` (getDeclaration . entryPayload)
 
 -- | Construct a 'JSONSummary' from an 'Entry'. Returns 'Nothing' for 'Unchanged' patches.
 entrySummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Entry (Record fields) -> Maybe JSONSummary
@@ -205,7 +217,7 @@ recordSummary record = case getDeclaration record of
   Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (getField record)
   Nothing -> const Nothing
 
-renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Both Blob -> Diff f (Record fields) -> Summaries
+renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Both Blob -> Diff f (Record fields) (Record fields) -> Summaries
 renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
@@ -220,7 +232,7 @@ renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition 
   where toMap [] = mempty
         toMap as = Map.singleton (T.pack blobPath) (toJSON <$> as)
 
-diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) -> [JSONSummary]
+diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [JSONSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
 
 termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Term f (Record fields) -> [JSONSummary]
@@ -233,9 +245,3 @@ toCategoryName declaration = case declaration of
   MethodDeclaration _ -> "Method"
   SectionDeclaration _ l -> "Heading " <> T.pack (show l)
   ErrorDeclaration{} -> "ParseError"
-
-instance Listable Declaration where
-  tiers
-    =  cons1 (MethodDeclaration . unListableText)
-    \/ cons1 (FunctionDeclaration . unListableText)
-    \/ cons1 (flip ErrorDeclaration Nothing . unListableText)

@@ -24,11 +24,11 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
+import qualified Data.Term as Term
 import Data.Union
 import GHC.Generics
 import GHC.Stack
 import Language.Go.Grammar as Grammar
-import qualified Term
 
 type Syntax =
   '[ Comment.Comment
@@ -105,7 +105,7 @@ constVarDeclaration :: Assignment
 constVarDeclaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
 
 constVarSpecification :: Assignment
-constVarSpecification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> children (Statement.Assignment
+constVarSpecification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> children (Statement.Assignment []
                                                                            <$> (annotatedLHS <|> identifiers)
                                                                            <*> expressions)
     where

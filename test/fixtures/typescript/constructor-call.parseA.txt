@@ -1,8 +1,9 @@
 (Program
-  (ExpressionStatements
-    (Constructor
-      (FunctionCall
+  (New
+    (Call
+      (MemberAccess
         (Identifier)
-        (Identifier)
-        (NumberLiteral)
-        (StringLiteral)))))
+        (Identifier))
+      (Float)
+      (TextElement)
+      (Empty))))

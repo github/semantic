@@ -1,44 +1,56 @@
 (Program
   (Import
-    (StringLiteral)
-    (Identifier))
+    (ImportClause
+      (Identifier))
+    (TextElement))
   (Import
-    (StringLiteral)
-    (Other "namespace_import"
-      (Identifier)))
+    (ImportClause
+      (NamespaceImport
+        (Identifier)))
+    (TextElement))
   (Import
-    (StringLiteral)
-    (Other "named_imports"
-      (Other "import_specifier"
-        (Identifier))))
+    (ImportClause
+      (NamedImports
+        (ImportExportSpecifier
+          (Identifier)
+          (Empty))))
+    (TextElement))
   (Import
-    (StringLiteral)
-    (Other "named_imports"
-      (Other "import_specifier"
-        (Identifier))
-      (Other "import_specifier"
-        (Identifier))))
+    (ImportClause
+      (NamedImports
+        (ImportExportSpecifier
+          (Identifier)
+          (Empty))
+        (ImportExportSpecifier
+          (Identifier)
+          (Empty))))
+    (TextElement))
   (Import
-    (StringLiteral)
-    (Other "named_imports"
-      (Other "import_specifier"
-        (Identifier))
-      (Other "import_specifier"
-        (Identifier)
-        (Identifier))))
+    (ImportClause
+      (NamedImports
+        (ImportExportSpecifier
+          (Identifier)
+          (Empty))
+        (ImportExportSpecifier
+          (Identifier)
+          (Identifier))))
+    (TextElement))
   (Import
-    (StringLiteral)
-    (Identifier)
-    (Other "named_imports"
-      (Other "import_specifier"
-        (Identifier))
-      (Other "import_specifier"
-        (Identifier)
-        (Identifier))))
+    (ImportClause
+      (Identifier)
+      (NamedImports
+        (ImportExportSpecifier
+          (Identifier)
+          (Empty))
+        (ImportExportSpecifier
+          (Identifier)
+          (Identifier))))
+    (TextElement))
   (Import
-    (StringLiteral)
-    (Identifier)
-    (Other "namespace_import"
-      (Identifier)))
+    (ImportClause
+      (Identifier)
+      (NamespaceImport
+        (Identifier)))
+    (TextElement))
   (Import
-    (StringLiteral)))
+    (TextElement)))

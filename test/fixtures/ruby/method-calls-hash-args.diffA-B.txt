@@ -5,6 +5,6 @@
       (Symbol)
       (Boolean))
   {+(KeyValue
-      (Symbol)
-      (Integer))+}
+    {+(Symbol)+}
+    {+(Integer)+})+}
     (Empty)))

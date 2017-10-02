@@ -1,12 +1,14 @@
 (Program
-  (Other "lexical_declaration"
-    (VarAssignment
+  (VariableDeclaration
+    (Assignment
+      (Annotation
+        (TypeIdentifier))
       (Identifier)
-      (Ty
-        (Identifier))))
-  (Other "lexical_declaration"
-    (VarAssignment
+      (Empty)))
+  (VariableDeclaration
+    (Assignment
+      (Annotation
+        (TypeQuery
+          (Identifier)))
       (Identifier)
-      (Ty
-        (Other "type_query"
-          (Identifier))))))
+      (Empty))))

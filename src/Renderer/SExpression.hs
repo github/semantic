@@ -4,49 +4,41 @@ module Renderer.SExpression
 , renderSExpressionTerm
 ) where
 
-import Control.Comonad.Trans.Cofree hiding (runCofree)
-import Control.Monad.Trans.Free hiding (runFree)
-import Data.Bifunctor.Join
-import Data.ByteString.Char8 hiding (foldr, spanEnd)
+import Data.ByteString.Char8 hiding (intersperse, foldr, spanEnd, length, null)
+import Data.Diff
+import Data.Functor.Foldable (cata)
+import Data.Patch
 import Data.Record
 import Data.Semigroup
-import Diff
-import Patch
+import Data.Term
 import Prelude hiding (replicate)
-import Term
 
 -- | Returns a ByteString SExpression formatted diff.
-renderSExpressionDiff :: (ConstrainAll Show fields, Foldable f) => Diff f (Record fields) -> ByteString
-renderSExpressionDiff diff = printDiff diff 0 <> "\n"
+renderSExpressionDiff :: (ConstrainAll Show fields, Foldable syntax, Functor syntax) => Diff syntax (Record fields) (Record fields) -> ByteString
+renderSExpressionDiff diff = cata printDiffF diff 0 <> "\n"
 
 -- | Returns a ByteString SExpression formatted term.
-renderSExpressionTerm :: (ConstrainAll Show fields, Foldable f) => Term f (Record fields) -> ByteString
-renderSExpressionTerm term = printTerm term 0 <> "\n"
+renderSExpressionTerm :: (ConstrainAll Show fields, Foldable syntax, Functor syntax) => Term syntax (Record fields) -> ByteString
+renderSExpressionTerm term = cata (\ term n -> nl n <> replicate (2 * n) ' ' <> printTermF term n) term 0 <> "\n"
 
-printDiff :: (ConstrainAll Show fields, Foldable f) => Diff f (Record fields) -> Int -> ByteString
-printDiff diff level = case runFree diff of
-  Pure patch -> case patch of
-    Insert term -> pad (level - 1) <> "{+" <> printTerm term level <> "+}"
-    Delete term -> pad (level - 1) <> "{-" <> printTerm term level <> "-}"
-    Replace a b -> pad (level - 1) <> "{ " <> printTerm a level <> pad (level - 1) <> "->" <> printTerm b level <> " }"
-  Free (Join (_, annotation) :< syntax) -> pad' level <> "(" <> showAnnotation annotation <> foldr (\d acc -> printDiff d (level + 1) <> acc) "" syntax <> ")"
-  where
-    pad' :: Int -> ByteString
-    pad' n = if n < 1 then "" else pad n
-    pad :: Int -> ByteString
-    pad n | n < 0 = ""
-          | n < 1 = "\n"
-          | otherwise = "\n" <> replicate (2 * n) ' '
+printDiffF :: (ConstrainAll Show fields, Foldable syntax, Functor syntax) => DiffF syntax (Record fields) (Record fields) (Int -> ByteString) -> Int -> ByteString
+printDiffF diff n = case diff of
+  Patch (Delete term) -> nl n <> pad (n - 1) <> "{-" <> printTermF term n <> "-}"
+  Patch (Insert term) -> nl n <> pad (n - 1) <> "{+" <> printTermF term n <> "+}"
+  Patch (Replace term1 term2) -> nl n       <> pad (n - 1) <> "{ " <> printTermF term1 n
+                              <> nl (n + 1) <> pad (n - 1) <> "->" <> printTermF term2 n <> " }"
+  Merge (In (_, ann) syntax) -> nl n <> pad n <> "(" <> showAnnotation ann <> foldMap (\ d -> d (n + 1)) syntax <> ")"
 
-printTerm :: (ConstrainAll Show fields, Foldable f) => Term f (Record fields) -> Int -> ByteString
-printTerm term level = go term level 0
-  where
-    pad :: Int -> Int -> ByteString
-    pad p n | n < 1 = ""
-            | otherwise = "\n" <> replicate (2 * (p + n)) ' '
-    go :: (ConstrainAll Show fields, Foldable f) => Term f (Record fields) -> Int -> Int -> ByteString
-    go term parentLevel level = case runCofree term of
-      (annotation :< syntax) -> pad parentLevel level <> "(" <> showAnnotation annotation <> foldr (\t acc -> go t parentLevel (level + 1) <> acc) "" syntax <> ")"
+printTermF :: (ConstrainAll Show fields, Foldable syntax, Functor syntax) => TermF syntax (Record fields) (Int -> ByteString) -> Int -> ByteString
+printTermF (In annotation syntax) n = "(" <> showAnnotation annotation <> foldMap (\t -> t (n + 1)) syntax <> ")"
+
+nl :: Int -> ByteString
+nl n | n <= 0    = ""
+     | otherwise = "\n"
+
+pad :: Int -> ByteString
+pad n = replicate (2 * n) ' '
+
 
 showAnnotation :: ConstrainAll Show fields => Record fields -> ByteString
 showAnnotation Nil = ""

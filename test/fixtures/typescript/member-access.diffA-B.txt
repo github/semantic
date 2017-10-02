@@ -1,6 +1,5 @@
 (Program
-  (ExpressionStatements
-    (MemberAccess
-      (Identifier)
-    { (Identifier)
-    ->(Identifier) })))
+  (MemberAccess
+    (Identifier)
+  { (Identifier)
+  ->(Identifier) }))

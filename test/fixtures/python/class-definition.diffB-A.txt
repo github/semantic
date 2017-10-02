@@ -14,9 +14,9 @@
           ->(Identifier) })))
       (Empty)))
 {+(Class
-    (Identifier)
-    (NoOp
-      (Empty)))+}
+  {+(Identifier)+}
+  {+(NoOp
+    {+(Empty)+})+})+}
   (Class
     (Identifier)
   {+(Identifier)+}

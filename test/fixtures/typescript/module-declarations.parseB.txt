@@ -1,4 +1,4 @@
 (Program
-  (Other "ambient_declaration"
-    (Namespace
+  (AmbientDeclaration
+    (InternalModule
       (Identifier))))

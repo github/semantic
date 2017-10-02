@@ -1,11 +1,11 @@
 (Program
-  (For
+  (ForEach
   { (Identifier)
   ->(Identifier) }
   { (Identifier)
   ->(Identifier) }
-    (ExpressionStatements
-      (ExpressionStatements
-        (FunctionCall
-        { (Identifier)
-        ->(Identifier) })))))
+    (
+      (Call
+      { (Identifier)
+      ->(Identifier) }
+        (Empty)))))

@@ -14,17 +14,12 @@
       (Integer)))
   (Hash)
   (Hash
-    (Context
-      (Comment)
-      (KeyValue
-        (Identifier)
-        (Integer)))
-    (Context
-      (Comment)
-      (Comment)
-      (KeyValue
-        (TextElement)
-        (Integer)))
+    (KeyValue
+      (Identifier)
+      (Integer))
+    (KeyValue
+      (TextElement)
+      (Integer))
     (Context
       (Comment)
       (Empty)))

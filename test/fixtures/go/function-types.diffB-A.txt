@@ -1,18 +1,4 @@
-{ (ParseError
-  (Module
-    (Identifier))
-  (Identifier)
-  (Args)
-  (TypeDecl
-    (Identifier)
-    (FunctionTy
-      (Args
-        (Identifier))
-      (Identifier)))
-  (Identifier)
-  (Args
-    (Identifier)
-    (Identifier)))->(Program
+(Program
   (Module
     (Identifier))
   (Function
@@ -20,17 +6,25 @@
     (Args)
     (Other "type_declaration"
       (TypeDecl
-        (Identifier)
+      { (Identifier)
+      ->(Identifier) }
         (FunctionTy
           (Args
-            (Identifier))
-          (Identifier)))
+          { (Identifier)
+          ->(Identifier) })
+        { (Identifier)
+        ->(Identifier) }))
       (TypeDecl
-        (Identifier)
+      { (Identifier)
+      ->(Identifier) }
         (FunctionTy
           (Args
+          {-(Identifier)-}
             (Identifier)
-            (Identifier))
+          {+(Identifier)+})
           (Args
-            (Identifier)
-            (Identifier))))))) }
+          {+(Identifier)+}
+          {-(ParameterDecl
+            {-(ChannelTy
+              {-(Identifier)-})-})-}
+            (Identifier)))))))

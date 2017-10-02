@@ -33,6 +33,7 @@ import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
 import Data.Blob
 import qualified Data.ByteString as B
+import Data.Diff
 import qualified Data.Error as Error
 import Data.Foldable (fold, for_)
 import Data.Functor.Both as Both hiding (snd)
@@ -42,11 +43,11 @@ import Data.Semigroup ((<>))
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import qualified Data.Syntax.Assignment as Assignment
+import Data.Term
 import qualified Data.Time.Clock as Time
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
 import Data.Union
-import Diff
 import qualified Files
 import GHC.Conc (atomically)
 import Language
@@ -54,7 +55,6 @@ import Language.Markdown
 import Parser
 import System.Exit (die)
 import System.IO (Handle, hPutStr, stderr)
-import Term
 import TreeSitter
 import Semantic.Log
 
@@ -66,7 +66,7 @@ data TaskF output where
   Time :: String -> [(String, String)] -> Task output -> TaskF output
   Parse :: Parser term -> Blob -> TaskF term
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
-  Diff :: Differ f a -> Both (Term f a) -> TaskF (Diff f a)
+  Diff :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
   Render :: Renderer input output -> input -> TaskF output
   Distribute :: Traversable t => t (Task output) -> TaskF (t output)
 
@@ -81,7 +81,7 @@ data TaskF output where
 type Task = Freer TaskF
 
 -- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
-type Differ f a = Both (Term f a) -> Diff f a
+type Differ syntax ann1 ann2 = Term syntax ann1 -> Term syntax ann2 -> Diff syntax ann1 ann2
 
 -- | A function to render terms or diffs.
 type Renderer i o = i -> o
@@ -116,8 +116,8 @@ decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fiel
 decorate algebra term = Decorate algebra term `Then` return
 
 -- | A 'Task' which diffs a pair of terms using the supplied 'Differ' function.
-diff :: Differ f a -> Both (Term f a) -> Task (Diff f a)
-diff differ terms = Diff differ terms `Then` return
+diff :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
+diff differ term1 term2 = Semantic.Task.Diff differ term1 term2 `Then` return
 
 -- | A 'Task' which renders some input using the supplied 'Renderer' function.
 render :: Renderer input output -> input -> Task output
@@ -181,7 +181,7 @@ runTaskWithOptions options task = do
                     either (pure . Left) yield res
                   Parse parser blob -> go (runParser options blob parser) >>= either (pure . Left) yield
                   Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield
-                  Diff differ terms -> pure (differ terms) >>= yield
+                  Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2) >>= yield
                   Render renderer input -> pure (renderer input) >>= yield
                   Distribute tasks -> Async.mapConcurrently go tasks >>= either (pure . Left) yield . sequenceA . withStrategy (parTraversable (parTraversable rseq))
                   LiftIO action -> action >>= yield
@@ -204,20 +204,20 @@ runParser Options{..} blob@Blob{..} = go
             logTiming "ts ast parse" $
               liftIO ((Right <$> parseToAST language blob) `catchError` (pure . Left . toException)) >>= either throwError pure
           AssignmentParser parser assignment -> do
-            ast <- go parser `catchError` \ err -> writeLog Error "failed parsing" blobFields >> throwError err
+            ast <- go parser `catchError` \ err -> writeLog Error "failed parsing" (("tag", "parse") : blobFields) >> throwError err
             logTiming "assign" $ case Assignment.assign blobSource assignment ast of
               Left err -> do
                 let formatted = Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err
-                writeLog Error formatted blobFields
+                writeLog Error formatted (("tag", "assign") : blobFields)
                 throwError (toException err)
               Right term -> do
                 for_ (errors term) $ \ err ->
-                  writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) blobFields
+                  writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("tag", "assign") : blobFields)
                 pure term
           MarkdownParser -> logTiming "cmark parse" $ pure (cmarkParser blobSource)
-        blobFields = [ ("path", blobPath), ("language", maybe "" show blobLanguage) ]
-        errors :: (Syntax.Error :< fs, Apply1 Foldable fs, Apply1 Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
-        errors = cata $ \ (a :< syntax) -> case syntax of
+        blobFields = ("path", blobPath) : maybe [] (pure . (,) "language" . show) blobLanguage
+        errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
+        errors = cata $ \ (In a syntax) -> case syntax of
           _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (getField a) err]
           _ -> fold syntax
         logTiming :: String -> Task a -> Task a

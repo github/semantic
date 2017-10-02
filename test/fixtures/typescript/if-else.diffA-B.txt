@@ -2,29 +2,24 @@
   (If
   { (Identifier)
   ->(Identifier) }
-    (ExpressionStatements
-    { (Identifier)
-    ->(Identifier) })
+  { (Identifier)
+  ->(Identifier) }
     (If
     { (Identifier)
     ->(Identifier) }
-      (ExpressionStatements
-      {+(ExpressionStatements
-          (Identifier))+}
-      {-(Identifier)-})
+    { (Identifier)
+    ->(
+      {+(Identifier)+}) }
       (If
       { (Identifier)
       ->(Identifier) }
-        (ExpressionStatements
-        { (Identifier)
-        ->(Identifier) })
+      { (Identifier)
+      ->(Identifier) }
         (If
         { (Identifier)
         ->(Identifier) }
-          (ExpressionStatements
-          {+(ExpressionStatements
-              (Identifier))+}
-          {-(Identifier)-})
-          (ExpressionStatements
-          { (Identifier)
-          ->(Identifier) }))))))
+        { (Identifier)
+        ->(
+          {+(Identifier)+}) }
+        { (Identifier)
+        ->(Identifier) })))))

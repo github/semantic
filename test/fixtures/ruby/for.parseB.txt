@@ -6,8 +6,7 @@
       (Integer)
       (Integer)
       (Integer))
-    (
-      (Call
-        (Identifier)
-        (Identifier)
-        (Empty)))))
+    (Call
+      (Identifier)
+      (Identifier)
+      (Empty))))

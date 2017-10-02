@@ -1,42 +1,38 @@
 (Program
 {+(ForEach
-    (
-      (Identifier))
-    (Identifier)
-    (
-      (Identifier)))+}
+  {+(
+    {+(Identifier)+})+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {+(ForEach
-    (
-      (Identifier)
-      (Identifier))
-    (Identifier)
-    (
-      (Identifier)))+}
+  {+(
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
   (ForEach
     (
-    { (Identifier)
-    ->(Identifier) })
+    {+(Identifier)+}
+    {-(Identifier)-})
   { (Array
-      (Integer)
-      (Integer)
-      (Integer))
+    {-(Integer)-}
+    {-(Integer)-}
+    {-(Integer)-})
   ->(Enumeration
-      (Integer)
-      (Integer)
-      (Empty)) }
-    (
-    { (Call
-        (Identifier)
-        (Identifier)
-        (Empty))
-    ->(Boolean) }))
+    {+(Integer)+}
+    {+(Integer)+}
+    {+(Empty)+}) }
+  { (Call
+    {-(Identifier)-}
+    {-(Identifier)-}
+    {-(Empty)-})
+  ->(Boolean) })
 {+(ForEach
-    (
-      (Identifier)
-      (Identifier))
-    (Enumeration
-      (Integer)
-      (Integer)
-      (Empty))
-    (
-      (Boolean)))+})
+  {+(
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(Enumeration
+    {+(Integer)+}
+    {+(Integer)+}
+    {+(Empty)+})+}
+  {+(Boolean)+})+})

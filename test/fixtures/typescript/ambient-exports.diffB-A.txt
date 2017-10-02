@@ -1,19 +1,27 @@
 (Program
   (Export
-  { (Function
-      (Identifier)
-      (Params
-        (Other "required_parameter"
-          (Identifier)
-          (Ty
-            (Other "predefined_type")))
-        (Other "required_parameter"
-          (Identifier)
-          (Ty
-            (Other "predefined_type"))))
-      (Return
-        (Object
-          (Identifier)
-          (Identifier))))
-  ->(Class
-      (Identifier)) }))
+  {+(Class
+    {+(Identifier)+})+}
+  {-(Function
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Identifier)-}
+    {-(RequiredParameter
+      {-(Empty)-}
+      {-(Annotation
+        {-(PredefinedType)-})-}
+      {-(Assignment
+        {-(Identifier)-}
+        {-(Empty)-})-})-}
+    {-(RequiredParameter
+      {-(Empty)-}
+      {-(Annotation
+        {-(PredefinedType)-})-}
+      {-(Assignment
+        {-(Identifier)-}
+        {-(Empty)-})-})-}
+    {-(
+      {-(Return
+        {-(Hash
+          {-(ShorthandPropertyIdentifier)-}
+          {-(ShorthandPropertyIdentifier)-})-})-})-})-}))

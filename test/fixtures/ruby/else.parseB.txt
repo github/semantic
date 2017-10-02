@@ -6,7 +6,6 @@
         (Empty))
       (Else
         (Empty)
-        (
-          (Call
-            (Identifier)
-            (Empty)))))))
+        (Call
+          (Identifier)
+          (Empty))))))

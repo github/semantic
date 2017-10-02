@@ -8,17 +8,16 @@
         (
         {+(Identifier)+}
         {+(Pattern
-            (
-              (Identifier)
-              (Identifier))
-            (
-              (
-                (Identifier))))+}))))
+          {+(
+            {+(Identifier)+}
+            {+(Identifier)+})+}
+          {+(
+            {+(Identifier)+})+})+}))))
 {-(Match
-    (Empty)
-    (
-      (Pattern
-        (
-          (Boolean))
-        (
-          (TextElement)))))-})
+  {-(Empty)-}
+  {-(
+    {-(Pattern
+      {-(
+        {-(Boolean)-})-}
+      {-(
+        {-(TextElement)-})-})-})-})-})

@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, DeriveGeneric, DeriveAnyClass #-}
 module Language where
 
-import Control.DeepSeq
 import Data.Aeson
 import GHC.Generics
 
@@ -15,7 +14,7 @@ data Language
     | Python
     | Ruby
     | TypeScript
-    deriving (Show, Eq, Read, Generic, NFData, ToJSON)
+    deriving (Eq, Generic, Ord, Read, Show, ToJSON)
 
 -- | Returns a Language based on the file extension (including the ".").
 languageForType :: String -> Maybe Language

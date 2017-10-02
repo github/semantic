@@ -1,9 +1,10 @@
 (Program
-  (For
+  (ForOf
     (Identifier)
     (Identifier)
-    (ExpressionStatements
-      (ExpressionStatements
-        (FunctionCall
-          (Identifier)
-          (Identifier))))))
+    (
+      (Call
+        (Identifier)
+        (Identifier)
+        (Empty))))
+  (Empty))

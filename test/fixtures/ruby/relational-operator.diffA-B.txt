@@ -1,18 +1,18 @@
 (Program
 {+(Comparison
-    (Identifier)
-    (Identifier))+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
   (Equal
     (Identifier)
     (Identifier))
 {+(Assignment
-    (Identifier)
-    (Not
-      (Identifier)))+}
+  {+(Identifier)+}
+  {+(Not
+    {+(Identifier)+})+})+}
 {-(Not
-    (Equal
-      (Identifier)
-      (Identifier)))-}
+  {-(Equal
+    {-(Identifier)-}
+    {-(Identifier)-})-})-}
 {-(Equal
-    (Identifier)
-    (Identifier))-})
+  {-(Identifier)-}
+  {-(Identifier)-})-})

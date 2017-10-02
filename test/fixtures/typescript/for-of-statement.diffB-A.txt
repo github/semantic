@@ -1,12 +1,13 @@
 (Program
-  (For
+  (ForOf
   { (Identifier)
   ->(Identifier) }
   { (Identifier)
   ->(Identifier) }
-    (ExpressionStatements
-      (ExpressionStatements
-        (FunctionCall
-          (Identifier)
-        { (Identifier)
-        ->(Identifier) })))))
+    (
+      (Call
+        (Identifier)
+      {+(Identifier)+}
+      {-(Identifier)-}
+        (Empty))))
+  (Empty))

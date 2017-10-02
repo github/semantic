@@ -10,28 +10,27 @@ module Alignment
 
 import Data.Bifunctor (bimap, first, second)
 import Control.Arrow ((***))
-import Control.Comonad (extract)
 import Control.Monad (join)
-import Control.Monad.Free
+import Control.Monad.Free (wrap)
 import Data.Align
 import Data.Bifunctor.Join
+import Data.Diff
 import Data.Foldable (toList)
 import Data.Function (on)
 import Data.Functor.Both
-import Data.Functor.Foldable
+import Data.Functor.Foldable (cata)
 import Data.Functor.Identity
 import Data.List (partition, sortBy)
 import Data.Maybe (catMaybes, fromJust, listToMaybe)
+import Data.Patch
 import Data.Range
+import Data.Record
 import Data.Semigroup ((<>))
 import Data.Source
-import Data.Record
+import Data.SplitDiff
+import Data.Term
 import Data.These
-import Diff
-import Patch
 import Prelude hiding (fst, snd)
-import SplitDiff
-import Term
 
 -- | Assign line numbers to the lines on each side of a list of rows.
 numberedRows :: [Join These a] -> [Join These (Int, a)]
@@ -46,11 +45,13 @@ hasChanges :: (Foldable f, Functor f) => SplitDiff f annotation -> Bool
 hasChanges = or . (True <$)
 
 -- | Align a Diff into a list of Join These SplitDiffs representing the (possibly blank) lines on either side.
-alignDiff :: Traversable f => HasField fields Range => Both Source -> Diff f (Record fields) -> [Join These (SplitDiff [] (Record fields))]
-alignDiff sources diff = iter (alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources) (alignPatch sources <$> diff)
+alignDiff :: (HasField fields Range, Traversable f) => Both Source -> Diff f (Record fields) (Record fields) -> [Join These (SplitDiff [] (Record fields))]
+alignDiff sources = cata $ \ diff -> case diff of
+  Patch patch                    -> alignPatch sources patch
+  Merge (In (ann1, ann2) syntax) -> alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources (In (both ann1 ann2) syntax)
 
 -- | Align the contents of a patch into a list of lines on the corresponding side(s) of the diff.
-alignPatch :: forall fields f. (Traversable f, HasField fields Range) => Both Source -> Patch (Term f (Record fields)) -> [Join These (SplitDiff [] (Record fields))]
+alignPatch :: forall fields f. (Traversable f, HasField fields Range) => Both Source -> Patch (TermF f (Record fields) [Join These (SplitDiff [] (Record fields))]) (TermF f (Record fields) [Join These (SplitDiff [] (Record fields))]) -> [Join These (SplitDiff [] (Record fields))]
 alignPatch sources patch = case patch of
   Delete term -> fmap (pure . SplitDelete) <$> alignSyntax' this (fst sources) term
   Insert term -> fmap (pure . SplitInsert) <$> alignSyntax' that (snd sources) term
@@ -58,19 +59,19 @@ alignPatch sources patch = case patch of
     (alignSyntax' this (fst sources) term1)
     (alignSyntax' that (snd sources) term2)
   where getRange = getField . extract
-        alignSyntax' :: (forall a. Identity a -> Join These a) -> Source -> Term f (Record fields) -> [Join These (Term [] (Record fields))]
-        alignSyntax' side source term = hylo (alignSyntax side cofree getRange (Identity source)) runCofree (Identity <$> term)
+        alignSyntax' :: (forall a. Identity a -> Join These a) -> Source -> TermF f (Record fields) [Join These (SplitDiff [] (Record fields))] -> [Join These (Term [] (Record fields))]
+        alignSyntax' side source = alignSyntax side Term getRange (Identity source) . bimap Identity (fmap (fmap unSplit))
         this = Join . This . runIdentity
         that = Join . That . runIdentity
 
 -- | The Applicative instance f is either Identity or Both. Identity is for Terms in Patches, Both is for Diffs in unchanged portions of the diff.
 alignSyntax :: (Applicative f, HasField fields Range, Foldable g) => (forall a. f a -> Join These a) -> (TermF [] (Record fields) term -> term) -> (term -> Range) -> f Source -> TermF g (f (Record fields)) [Join These term] -> [Join These term]
-alignSyntax toJoinThese toNode getRange sources (infos :< syntax) =
+alignSyntax toJoinThese toNode getRange sources (In infos syntax) =
   catMaybes $ wrapInBranch <$> alignBranch getRange (join (toList syntax)) bothRanges
   where bothRanges = modifyJoin (fromThese [] []) lineRanges
         lineRanges = toJoinThese $ sourceLineRangesWithin . getField <$> infos <*> sources
         wrapInBranch = applyThese $ toJoinThese (makeNode <$> infos)
-        makeNode info (range, children) = toNode (setField info range :< children)
+        makeNode info (range, children) = toNode (In (setField info range) children)
 
 -- | Given a function to get the range, a list of already-aligned children, and the lists of ranges spanned by a branch, return the aligned lines.
 alignBranch :: (term -> Range) -> [Join These term] -> Both [Range] -> [Join These (Range, [term])]

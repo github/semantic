@@ -9,6 +9,6 @@
       (Identifier)
       ([]
       {-(Call
-          (Identifier)
-          (Empty))-})
+        {-(Identifier)-}
+        {-(Empty)-})-})
       (Empty))))

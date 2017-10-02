@@ -1,9 +1,10 @@
 (Program
   (DoWhile
-    (ExpressionStatements
-      (ExpressionStatements
-        (FunctionCall
+    (Boolean)
+    (
+      (Call
+        (MemberAccess
           (Identifier)
-          (Identifier)
-          (Identifier))))
-    (Boolean)))
+          (Identifier))
+        (Identifier)
+        (Empty)))))

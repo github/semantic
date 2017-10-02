@@ -2,6 +2,6 @@
   (If
   { (Identifier)
   ->(Not
-      (Identifier)) }
+    {+(Identifier)+}) }
     (Identifier)
     (Empty)))

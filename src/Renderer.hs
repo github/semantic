@@ -16,8 +16,7 @@ module Renderer
 , File(..)
 ) where
 
-import Control.DeepSeq
-import Data.Aeson (Value, (.=))
+import Data.Aeson (Value)
 import Data.ByteString (ByteString)
 import qualified Data.Map as Map
 import Data.Output
@@ -61,10 +60,3 @@ data SomeRenderer f where
   SomeRenderer :: (Output output, Show (f output)) => f output -> SomeRenderer f
 
 deriving instance Show (SomeRenderer f)
-
-
-newtype Identifier = Identifier Text
-  deriving (Eq, NFData, Show)
-
-instance ToJSONFields Identifier where
-  toJSONFields (Identifier i) = ["identifier" .= i]

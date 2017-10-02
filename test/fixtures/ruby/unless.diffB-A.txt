@@ -6,10 +6,9 @@
     (
     {+(Identifier)+})
   { (Empty)
-  ->(
-      (Identifier)) })
+  ->(Identifier) })
 {-(If
-    (Not
-      (Identifier))
-    ([])
-    (Empty))-})
+  {-(Not
+    {-(Identifier)-})-}
+  {-([])-}
+  {-(Empty)-})-})

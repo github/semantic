@@ -4,16 +4,15 @@
     (
       (Pattern
         (
-        { (Identifier)
-        ->(Identifier) })
+        {+(Identifier)+}
+        {-(Identifier)-})
         (
-        { (Identifier)
-        ->(Pattern
-            (
-              (Identifier)
-              (Identifier))
-            (
-              (Identifier)
-              ([]))) }
-        {-(
-            (Identifier))-})))))
+        {+(Pattern
+          {+(
+            {+(Identifier)+}
+            {+(Identifier)+})+}
+          {+(
+            {+(Identifier)+}
+            {+([])+})+})+}
+        {-(Identifier)-}
+        {-(Identifier)-})))))

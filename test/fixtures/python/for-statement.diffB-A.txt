@@ -1,34 +1,34 @@
 (Program
 {+(Else
-    (ForEach
-      (
-        (Identifier)
-        (Identifier))
-      (Identifier)
-      (
-        (Call
-          (Identifier)
-          (Identifier)
-          (Empty))
-        (ForEach
-          (
-            (Identifier)
-            (Identifier))
-          (Identifier)
-          (
-            (Call
-              (Identifier)
-              (Identifier)
-              (Empty))))))
-    (
-      (Call
-        (Identifier)
-        (Identifier)
-        (Empty))))+}
+  {+(ForEach
+    {+(
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(Identifier)+}
+    {+(
+      {+(Call
+        {+(Identifier)+}
+        {+(Identifier)+}
+        {+(Empty)+})+}
+      {+(ForEach
+        {+(
+          {+(Identifier)+}
+          {+(Identifier)+})+}
+        {+(Identifier)+}
+        {+(
+          {+(Call
+            {+(Identifier)+}
+            {+(Identifier)+}
+            {+(Empty)+})+})+})+})+})+}
+  {+(
+    {+(Call
+      {+(Identifier)+}
+      {+(Identifier)+}
+      {+(Empty)+})+})+})+}
   (ForEach
     (
-    { (Identifier)
-    ->(Identifier) })
+    {+(Identifier)+}
+    {-(Identifier)-})
     (Array
       (Tuple
         (Integer))
@@ -37,31 +37,31 @@
       (Tuple
         (Integer)))
     (
-    { (Identifier)
-    ->(Identifier) }))
+    {+(Identifier)+}
+    {-(Identifier)-}))
 {-(Else
-    (ForEach
-      (
-        (Identifier)
-        (Identifier))
-      (Identifier)
-      (
-        (Call
-          (Identifier)
-          (Identifier)
-          (Empty))
-        (ForEach
-          (
-            (Identifier)
-            (Identifier))
-          (Identifier)
-          (
-            (Call
-              (Identifier)
-              (Identifier)
-              (Empty))))))
-    (
-      (Call
-        (Identifier)
-        (Identifier)
-        (Empty))))-})
+  {-(ForEach
+    {-(
+      {-(Identifier)-}
+      {-(Identifier)-})-}
+    {-(Identifier)-}
+    {-(
+      {-(Call
+        {-(Identifier)-}
+        {-(Identifier)-}
+        {-(Empty)-})-}
+      {-(ForEach
+        {-(
+          {-(Identifier)-}
+          {-(Identifier)-})-}
+        {-(Identifier)-}
+        {-(
+          {-(Call
+            {-(Identifier)-}
+            {-(Identifier)-}
+            {-(Empty)-})-})-})-})-})-}
+  {-(
+    {-(Call
+      {-(Identifier)-}
+      {-(Identifier)-}
+      {-(Empty)-})-})-})-})

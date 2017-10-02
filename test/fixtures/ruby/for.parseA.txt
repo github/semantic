@@ -3,15 +3,13 @@
     (
       (Identifier))
     (Identifier)
-    (
-      (Identifier)))
+    (Identifier))
   (ForEach
     (
       (Identifier)
       (Identifier))
     (Identifier)
-    (
-      (Identifier)))
+    (Identifier))
   (ForEach
     (
       (Identifier))
@@ -19,8 +17,7 @@
       (Integer)
       (Integer)
       (Empty))
-    (
-      (Boolean)))
+    (Boolean))
   (ForEach
     (
       (Identifier)
@@ -29,5 +26,4 @@
       (Integer)
       (Integer)
       (Empty))
-    (
-      (Boolean))))
+    (Boolean)))

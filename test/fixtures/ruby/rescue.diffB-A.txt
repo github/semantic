@@ -1,58 +1,52 @@
 (Program
-{+(Try
-    (
-      (Identifier)
-      (Catch
-        (
-          (
-            (Identifier)))
-        (Catch
-          (
-            (
-              (Identifier)
-              (Identifier))
-            (
-              (Identifier)))
-          (
-            (Identifier))))
-      (Else
-        (Empty)
-        (
-          (Identifier)))
-      (Finally
-        (
-          (Identifier)))))+}
-{+(Method
-    (Empty)
-    (Identifier)
-    (
-      (Catch
-        (
-          (
-            (Identifier)))
-        (Catch
-          (
-            (
-              (Identifier)
-              (Identifier))
-            (
-              (Identifier)))
-          ([])))
-      (Else
-        (Empty)
-        ([]))
-      (Finally
-        ([]))))+}
   (Try
-  { (
+    (
       (Identifier)
-      (Catch
-        (
-          (
-            (Identifier)))
-        (
-          (Identifier))))
-  ->(Identifier) }
+    {+(Catch
+      {+(
+        {+(
+          {+(Identifier)+})+})+}
+      {+(Catch
+        {+(
+          {+(
+            {+(Identifier)+}
+            {+(Identifier)+})+}
+          {+(
+            {+(Identifier)+})+})+}
+        {+(Identifier)+})+})+}
+    {+(Else
+      {+(Empty)+}
+      {+(Identifier)+})+}
+    {+(Finally
+      {+(Identifier)+})+}
+    {-(Catch
+      {-(
+        {-(
+          {-(Identifier)-})-})-}
+      {-(Identifier)-})-}))
+{+(Method
+  {+(Empty)+}
+  {+(Identifier)+}
+  {+(
+    {+(Catch
+      {+(
+        {+(
+          {+(Identifier)+})+})+}
+      {+(Catch
+        {+(
+          {+(
+            {+(Identifier)+}
+            {+(Identifier)+})+}
+          {+(
+            {+(Identifier)+})+})+}
+        {+([])+})+})+}
+    {+(Else
+      {+(Empty)+}
+      {+([])+})+}
+    {+(Finally
+      {+([])+})+})+})+}
+{+(Try
+  {+(Identifier)+}
   {+(Catch
-      (Null)
-      (Empty))+}))
+    {+(Null)+}
+    {+(Empty)+})+})+})

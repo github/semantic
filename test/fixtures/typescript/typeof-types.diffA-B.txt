@@ -1,15 +1,17 @@
 (Program
-  (Other "lexical_declaration"
-    (VarAssignment
+  (VariableDeclaration
+    (Assignment
+      (Annotation
+      { (TypeIdentifier)
+      ->(TypeQuery
+        {+(Identifier)+}) })
       (Identifier)
-      (Ty
-      { (Identifier)
-      ->(Other "type_query"
-          (Identifier)) })))
-  (Other "lexical_declaration"
-    (VarAssignment
+      (Empty)))
+  (VariableDeclaration
+    (Assignment
+      (Annotation
+      { (TypeQuery
+        {-(Identifier)-})
+      ->(TypeIdentifier) })
       (Identifier)
-      (Ty
-      { (Other "type_query"
-          (Identifier))
-      ->(Identifier) }))))
+      (Empty))))

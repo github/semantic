@@ -2,7 +2,6 @@
   (While
   { (Identifier)
   ->(Not
-      (Identifier)) }
-    (
-      (Break
-        (Empty)))))
+    {+(Identifier)+}) }
+    (Break
+      (Empty))))

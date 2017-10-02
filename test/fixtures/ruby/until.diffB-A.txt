@@ -2,9 +2,9 @@
   (While
     (Not
       (Identifier))
-    ([]
-    {-(Identifier)-}))
+  { (Identifier)
+  ->([]) })
 {+(While
-    (Not
-      (Identifier))
-    (Identifier))+})
+  {+(Not
+    {+(Identifier)+})+}
+  {+(Identifier)+})+})
