@@ -141,5 +141,14 @@ newtype Set a = Set { setElements :: [a] }
 instance Eq1 Set where liftEq = genericLiftEq
 instance Show1 Set where liftShowsPrec = genericLiftShowsPrec
 
+-- Misc
+
+-- A channel type in Go
+newtype Channel a = Channel { channelContent :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Channel where liftEq = genericLiftEq
+instance Show1 Channel where liftShowsPrec = genericLiftShowsPrec
+
 -- TODO: Object literals as distinct from hash literals? Or coalesce object/hash literals into “key-value literals”?
 -- TODO: Function literals (lambdas, procs, anonymous functions, what have you).
