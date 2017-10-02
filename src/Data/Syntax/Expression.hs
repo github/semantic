@@ -140,3 +140,17 @@ newtype NonNullExpression a = NonNullExpression { nonNullExpression :: a }
 instance Eq1 NonNullExpression where liftEq = genericLiftEq
 instance Show1 NonNullExpression where liftShowsPrec = genericLiftShowsPrec
 
+-- | An await expression in Javascript or C#.
+newtype Await a = Await { awaitSubject :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Await where liftEq = genericLiftEq
+instance Show1 Await where liftShowsPrec = genericLiftShowsPrec
+
+-- | An object constructor call in Javascript, Java, etc.
+newtype New a = New { newSubject :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 New where liftEq = genericLiftEq
+instance Show1 New where liftShowsPrec = genericLiftShowsPrec
+

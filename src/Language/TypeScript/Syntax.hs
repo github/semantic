@@ -59,6 +59,8 @@ type Syntax = '[
   , Expression.Void
   , Expression.Typeof
   , Expression.InstanceOf
+  , Expression.New
+  , Expression.Await
   , Literal.Array
   , Literal.Boolean
   , Literal.Float
@@ -165,9 +167,7 @@ type Syntax = '[
   , Language.TypeScript.Syntax.With
   , Language.TypeScript.Syntax.ForOf
   , Language.TypeScript.Syntax.This
-  , Language.TypeScript.Syntax.New
   , Language.TypeScript.Syntax.Update
-  , Language.TypeScript.Syntax.Await
   , Language.TypeScript.Syntax.ComputedPropertyName
   , []
   ]
@@ -489,18 +489,6 @@ newtype Update a = Update { _updateSubject :: a }
 instance Eq1 Update where liftEq = genericLiftEq
 instance Show1 Update where liftShowsPrec = genericLiftShowsPrec
 
-newtype Await a = Await { _awaitSubject :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 Await where liftEq = genericLiftEq
-instance Show1 Await where liftShowsPrec = genericLiftShowsPrec
-
-newtype New a = New { _newSubject :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 New where liftEq = genericLiftEq
-instance Show1 New where liftShowsPrec = genericLiftShowsPrec
-
 data ImportAlias a = ImportAlias { _importAliasSubject :: !a, _importAlias :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
@@ -676,7 +664,7 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
 
 
 awaitExpression :: Assignment
-awaitExpression = makeTerm <$> symbol Grammar.AwaitExpression <*> children (Language.TypeScript.Syntax.Await <$> expression)
+awaitExpression = makeTerm <$> symbol Grammar.AwaitExpression <*> children (Expression.Await <$> expression)
 
 unaryExpression :: Assignment
 unaryExpression = symbol Grammar.UnaryExpression >>= \ loc ->
@@ -693,7 +681,7 @@ memberExpression :: Assignment
 memberExpression = makeTerm <$> symbol Grammar.MemberExpression <*> children (Expression.MemberAccess <$> postContextualize comment expression <*> propertyIdentifier)
 
 newExpression :: Assignment
-newExpression = makeTerm <$> symbol Grammar.NewExpression <*> children (Language.TypeScript.Syntax.New <$> expression)
+newExpression = makeTerm <$> symbol Grammar.NewExpression <*> children (Expression.New <$> expression)
 
 updateExpression :: Assignment
 updateExpression = makeTerm <$> symbol Grammar.UpdateExpression <*> children (Language.TypeScript.Syntax.Update <$> expression)
