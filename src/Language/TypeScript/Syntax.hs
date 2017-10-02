@@ -40,6 +40,7 @@ type Syntax = '[
   , Declaration.Class
   , Declaration.Function
   , Declaration.Method
+  , Declaration.InterfaceDeclaration
   , Declaration.PublicFieldDefinition
   , Declaration.VariableDeclaration
   , Declaration.Module
@@ -150,7 +151,6 @@ type Syntax = '[
   , Language.TypeScript.Syntax.ExportClause
   , Language.TypeScript.Syntax.Export
   , Language.TypeScript.Syntax.AmbientDeclaration
-  , Language.TypeScript.Syntax.InterfaceDeclaration
   , Language.TypeScript.Syntax.EnumDeclaration
   , Language.TypeScript.Syntax.TypeAliasDeclaration
   , Language.TypeScript.Syntax.ExtendsClause
@@ -355,12 +355,6 @@ newtype AmbientDeclaration a = AmbientDeclaration { _ambientDeclarationBody :: a
 
 instance Eq1 AmbientDeclaration where liftEq = genericLiftEq
 instance Show1 AmbientDeclaration where liftShowsPrec = genericLiftShowsPrec
-
-data InterfaceDeclaration a = InterfaceDeclaration { _interfaceDeclarationContext :: ![a], _interfaceDeclarationIdentifier :: !a, _interfaceDeclarationBody :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 InterfaceDeclaration where liftEq = genericLiftEq
-instance Show1 InterfaceDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 data EnumDeclaration a = EnumDeclaration { _enumDeclarationIdentifier :: !a, _enumDeclarationBody :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -1058,7 +1052,7 @@ enumAssignment = makeTerm <$> symbol Grammar.EnumAssignment <*> children (Statem
 
 interfaceDeclaration :: Assignment
 interfaceDeclaration = makeInterfaceDecl <$> symbol Grammar.InterfaceDeclaration <*> children ((,,,) <$> identifier <*> (typeParameters <|> emptyTerm) <*> (extendsClause <|> emptyTerm) <*> objectType)
-  where makeInterfaceDecl loc (identifier, typeParams, clause, objectType) = makeTerm loc (Language.TypeScript.Syntax.InterfaceDeclaration [typeParams, clause] identifier objectType)
+  where makeInterfaceDecl loc (identifier, typeParams, clause, objectType) = makeTerm loc (Declaration.InterfaceDeclaration [typeParams, clause] identifier objectType)
 
 extendsClause :: Assignment
 extendsClause = makeTerm <$> symbol Grammar.ExtendsClause <*> children (Language.TypeScript.Syntax.ExtendsClause <$> many (term ty))

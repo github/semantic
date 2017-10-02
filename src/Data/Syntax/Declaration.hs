@@ -44,6 +44,13 @@ newtype VariableDeclaration a = VariableDeclaration { variableDeclarations :: [a
 instance Eq1 VariableDeclaration where liftEq = genericLiftEq
 instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 
+-- | A TypeScript/Java style interface declaration to implement.
+data InterfaceDeclaration a = InterfaceDeclaration { interfaceDeclarationContext :: ![a], interfaceDeclarationIdentifier :: !a, interfaceDeclarationBody :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 InterfaceDeclaration where liftEq = genericLiftEq
+instance Show1 InterfaceDeclaration where liftShowsPrec = genericLiftShowsPrec
+
 -- | A public field definition such as a field definition in a JavaScript class.
 data PublicFieldDefinition a = PublicFieldDefinition { publicFieldContext :: ![a], publicFieldPropertyName :: !a, publicFieldValue :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
