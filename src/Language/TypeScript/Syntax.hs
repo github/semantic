@@ -48,6 +48,7 @@ type Syntax = '[
   , Expression.Bitwise
   , Expression.Boolean
   , Expression.Call
+  , Expression.Cast
   , Expression.Comparison
   , Expression.Enumeration
   , Expression.MemberAccess
@@ -127,7 +128,6 @@ type Syntax = '[
   , Language.TypeScript.Syntax.Tuple
   , Language.TypeScript.Syntax.Constructor
   , Language.TypeScript.Syntax.TypeAssertion
-  , Language.TypeScript.Syntax.Cast
   , Language.TypeScript.Syntax.ImportAlias
   , Language.TypeScript.Syntax.Debugger
   , Language.TypeScript.Syntax.ShorthandPropertyIdentifier
@@ -247,12 +247,6 @@ data TypeAssertion a = TypeAssertion { _typeAssertionParameters :: !a, _typeAsse
 
 instance Eq1 TypeAssertion where liftEq = genericLiftEq
 instance Show1 TypeAssertion where liftShowsPrec = genericLiftShowsPrec
-
-data Cast a =  Cast { _castSubject :: !a, _castType :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 Cast where liftEq = genericLiftEq
-instance Show1 Cast where liftShowsPrec = genericLiftShowsPrec
 
 newtype Annotation a = Annotation { _annotationType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -720,7 +714,7 @@ typeAssertion :: Assignment
 typeAssertion = makeTerm <$> symbol Grammar.TypeAssertion <*> children (Language.TypeScript.Syntax.TypeAssertion <$> typeArguments' <*> expression)
 
 asExpression :: Assignment
-asExpression = makeTerm <$> symbol AsExpression <*> children (Language.TypeScript.Syntax.Cast <$> expression <*> (ty <|> templateString))
+asExpression = makeTerm <$> symbol AsExpression <*> children (Expression.Cast <$> expression <*> (ty <|> templateString))
 
 templateString :: Assignment
 templateString = makeTerm <$> symbol TemplateString <*> children (Literal.String <$> many (term templateSubstitution))

@@ -154,3 +154,10 @@ newtype New a = New { newSubject :: a }
 instance Eq1 New where liftEq = genericLiftEq
 instance Show1 New where liftShowsPrec = genericLiftShowsPrec
 
+-- | A cast expression to a specified type.
+data Cast a =  Cast { castSubject :: !a, castType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Cast where liftEq = genericLiftEq
+instance Show1 Cast where liftShowsPrec = genericLiftShowsPrec
+
