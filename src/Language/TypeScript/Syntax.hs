@@ -93,7 +93,6 @@ type Syntax = '[
   , Syntax.Identifier
   , Syntax.Program
   , Syntax.Context
-  , Type.Annotation
   , Type.Readonly
   , Type.TypeParameters
   , Language.TypeScript.Syntax.TypeParameter
@@ -161,6 +160,7 @@ type Syntax = '[
   , Language.TypeScript.Syntax.LabeledStatement
   , Language.TypeScript.Syntax.NamedImports
   , Language.TypeScript.Syntax.NamespaceImport
+  , Language.TypeScript.Syntax.Annotation
   , Language.TypeScript.Syntax.Import
   , Language.TypeScript.Syntax.With
   , Language.TypeScript.Syntax.ForOf
@@ -954,7 +954,7 @@ classBodyStatements = symbol ClassBody *> children (many (term (methodDefinition
 
 publicFieldDefinition :: Assignment
 publicFieldDefinition = makeField <$> symbol Grammar.PublicFieldDefinition <*> children ((,,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (readonly' <|> emptyTerm) <*> propertyName <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
-  where makeField loc (modifier, readonly, propertyName, annotation, expression) = makeTerm loc (Language.TypeScript.Syntax.PublicFieldDefinition [modifier, readonly, annotation] propertyName expression)
+  where makeField loc (modifier, readonly, propertyName, annotation, expression) = makeTerm loc (Declaration.PublicFieldDefinition [modifier, readonly, annotation] propertyName expression)
 
 
 statement :: Assignment
