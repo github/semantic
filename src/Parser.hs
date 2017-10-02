@@ -3,7 +3,6 @@ module Parser
 ( Parser(..)
 -- Syntax parsers
 , parserForLanguage
-, lineByLineParser
 -- À la carte parsers
 , jsonParser
 , markdownParser
@@ -16,7 +15,6 @@ import qualified CMarkGFM
 import Data.Functor.Classes (Eq1)
 import Data.Ix
 import Data.Record
-import Data.Source as Source
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment
 import Data.Term
@@ -50,20 +48,17 @@ data Parser term where
   TreeSitterParser :: Ptr TS.Language -> Parser (Term Syntax (Record DefaultFields))
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
-  -- | A parser which will parse any input 'Source' into a top-level 'Term' whose children are leaves consisting of the 'Source's lines.
-  LineByLineParser :: Parser (Term Syntax (Record DefaultFields))
 
 -- | Return a 'Language'-specific 'Parser', if one exists, falling back to the 'LineByLineParser'.
-parserForLanguage :: Maybe Language -> Parser (Term Syntax (Record DefaultFields))
-parserForLanguage Nothing = LineByLineParser
-parserForLanguage (Just language) = case language of
-  Go -> TreeSitterParser tree_sitter_go
-  JavaScript -> TreeSitterParser tree_sitter_typescript
-  JSON -> TreeSitterParser tree_sitter_json
-  JSX -> TreeSitterParser tree_sitter_typescript
-  Ruby -> TreeSitterParser tree_sitter_ruby
-  TypeScript -> TreeSitterParser tree_sitter_typescript
-  _ -> LineByLineParser
+parserForLanguage :: Language -> Maybe (Parser (Term Syntax (Record DefaultFields)))
+parserForLanguage language = case language of
+  Go         -> Just (TreeSitterParser tree_sitter_go)
+  JavaScript -> Just (TreeSitterParser tree_sitter_typescript)
+  JSON       -> Just (TreeSitterParser tree_sitter_json)
+  JSX        -> Just (TreeSitterParser tree_sitter_typescript)
+  Ruby       -> Just (TreeSitterParser tree_sitter_ruby)
+  TypeScript -> Just (TreeSitterParser tree_sitter_typescript)
+  _ -> Nothing
 
 rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
@@ -79,9 +74,3 @@ typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScrip
 
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
-
-
--- | A fallback parser that treats a file simply as rows of strings.
-lineByLineParser :: Source -> Term Syntax (Record DefaultFields)
-lineByLineParser source = termIn (totalRange source :. Program :. totalSpan source :. Nil) (Indexed (zipWith toLine [1..] (sourceLineRanges source)))
-  where toLine line range = termIn (range :. Program :. Span (Pos line 1) (Pos line (end range)) :. Nil) (Leaf (toText (slice range source)))
