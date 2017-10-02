@@ -4,29 +4,22 @@ module Semantic
 , parseBlob
 , diffBlobPairs
 , diffBlobPair
-, parseAndDiffBlobPair
 , diffTermPair
 ) where
 
-import Algorithm (Diffable)
 import Control.Exception
 import Control.Monad ((<=<))
 import Control.Monad.Error.Class
-import Data.Align.Generic (GAlign)
 import Data.Bifunctor
 import Data.Blob
 import Data.ByteString (ByteString)
 import Data.Diff
 import Data.Functor.Both as Both
-import Data.Functor.Classes
 import Data.Output
 import Data.Record
 import Data.Syntax.Algebra
-import qualified Data.Syntax as Syntax
-import qualified Data.Syntax.Declaration as Declaration
 import Data.Term
 import Data.Typeable
-import Data.Union
 import Info
 import Interpreter
 import qualified Language
@@ -116,9 +109,6 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
 
         run :: Functor syntax => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Diff syntax ann ann -> output) -> Task output
         run parse diff renderer = distributeFor blobs parse >>= runBothWith (diffTermPair blobs diff) >>= render renderer
-
-parseAndDiffBlobPair :: (Apply Diffable syntax, Apply Foldable syntax, Apply Functor syntax, Apply GAlign syntax, Apply Show1 syntax, Apply Traversable syntax, Declaration.Function :< syntax, Declaration.Method :< syntax, Syntax.Context :< syntax) => Both Blob -> Parser (Term (Union syntax) (Record fields)) -> Task (Diff (Union syntax) (Record fields) (Record fields))
-parseAndDiffBlobPair blobs parser = distributeFor blobs (parse parser) >>= runBothWith (diffTermPair blobs diffTerms)
 
 -- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
 diffTermPair :: Functor syntax => Both Blob -> Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)

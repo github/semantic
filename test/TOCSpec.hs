@@ -2,13 +2,16 @@
 {-# LANGUAGE DataKinds, TypeOperators #-}
 module TOCSpec where
 
-import Category as C
+import Algorithm hiding (diff)
+import Category as C hiding (Go)
 import Data.Aeson
+import Data.Align.Generic
 import Data.Bifunctor
 import Data.Blob
 import Data.ByteString (ByteString)
 import Data.Diff
 import Data.Functor.Both
+import Data.Functor.Classes
 import Data.Functor.Listable
 import Data.Maybe (fromMaybe)
 import Data.Monoid (Last(..))
@@ -17,10 +20,13 @@ import Data.Patch
 import Data.Record
 import Data.Semigroup ((<>))
 import Data.Source
+import qualified Data.Syntax as Syntax
+import qualified Data.Syntax.Declaration as Declaration
 import Data.Term
 import Data.Text (Text)
 import Data.These
-import Info
+import Data.Union
+import Info hiding (Go)
 import Interpreter
 import Language
 import Prelude hiding (readFile)
@@ -31,7 +37,7 @@ import Semantic
 import Semantic.Task
 import Semantic.Util
 import SpecHelpers
-import Syntax as S
+import Syntax as S hiding (Go)
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
@@ -69,7 +75,7 @@ spec = parallel $ do
 
     it "summarizes changed methods" $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
-      Just diff <- runTask (parseAndDiffBlobPair sourceBlobs rubyParser)
+      diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
         [ JSONSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
         , JSONSummary "Method" "bar" (sourceSpanBetween (4, 1) (6, 4)) "modified"
@@ -89,25 +95,26 @@ spec = parallel $ do
 
     it "summarizes Go methods with receivers with special formatting" $ do
       sourceBlobs <- blobsForPaths (both "go/method-with-receiver.A.go" "go/method-with-receiver.B.go")
-      Just diff <- runTask (parseAndDiffBlobPair sourceBlobs rubyParser)
+      let Just goParser = parserForLanguage Go
+      diff <- runTask $ distributeFor sourceBlobs (\ blob -> parse goParser blob >>= decorate (syntaxDeclarationAlgebra blob)) >>= runBothWith (diffTermPair sourceBlobs diffSyntaxTerms)
       diffTOC diff `shouldBe`
         [ JSONSummary "Method" "(*apiClient) CheckAuth" (sourceSpanBetween (3,1) (3,101)) "added" ]
 
     it "summarizes Ruby methods that start with two identifiers" $ do
       sourceBlobs <- blobsForPaths (both "ruby/method-starts-with-two-identifiers.A.rb" "ruby/method-starts-with-two-identifiers.B.rb")
-      Just diff <- runTask (parseAndDiffBlobPair sourceBlobs rubyParser)
+      diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
         [ JSONSummary "Method" "foo" (sourceSpanBetween (1, 1) (4, 4)) "modified" ]
 
     it "handles unicode characters in file" $ do
       sourceBlobs <- blobsForPaths (both "ruby/unicode.A.rb" "ruby/unicode.B.rb")
-      Just diff <- runTask (parseAndDiffBlobPair sourceBlobs rubyParser)
+      diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
         [ JSONSummary "Method" "foo" (sourceSpanBetween (6, 1) (7, 4)) "added" ]
 
     it "properly slices source blob that starts with a newline and has multi-byte chars" $ do
       sourceBlobs <- blobsForPaths (both "javascript/starts-with-newline.js" "javascript/starts-with-newline.js")
-      Just diff <- runTask (parseAndDiffBlobPair sourceBlobs rubyParser)
+      diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe` []
 
     prop "inserts of methods and functions are summarized" $
