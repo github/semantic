@@ -77,9 +77,8 @@ spec = parallel $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ JSONSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
-        , JSONSummary "Method" "bar" (sourceSpanBetween (4, 1) (6, 4)) "modified"
-        , JSONSummary "Method" "baz" (sourceSpanBetween (4, 1) (5, 4)) "removed" ]
+        [ JSONSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "modified"
+        , JSONSummary "Method" "bar" (sourceSpanBetween (4, 1) (6, 4)) "modified" ]
 
     it "dedupes changes in same parent method" $ do
       sourceBlobs <- blobsForPaths (both "javascript/duplicate-parent.A.js" "javascript/duplicate-parent.B.js")
