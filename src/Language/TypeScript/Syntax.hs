@@ -103,7 +103,6 @@ type Syntax = '[
   , Language.TypeScript.Syntax.GenericType
   , Language.TypeScript.Syntax.TypeArguments
   , Language.TypeScript.Syntax.TypePredicate
-  , Language.TypeScript.Syntax.Annotation
   , Language.TypeScript.Syntax.CallSignature
   , Language.TypeScript.Syntax.ConstructSignature
   , Language.TypeScript.Syntax.ArrayType
@@ -260,12 +259,6 @@ data Cast a =  Cast { _castSubject :: !a, _castType :: !a }
 
 instance Eq1 Cast where liftEq = genericLiftEq
 instance Show1 Cast where liftShowsPrec = genericLiftShowsPrec
-
-newtype Annotation a = Annotation { _annotationType :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 Annotation where liftEq = genericLiftEq
-instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
 
 newtype ComputedPropertyName a = ComputedPropertyName a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -880,7 +873,7 @@ typeParameters :: Assignment
 typeParameters = makeTerm <$> symbol TypeParameters <*> children (Type.TypeParameters <$> many (term typeParameter'))
 
 typeAnnotation' :: Assignment
-typeAnnotation' = makeTerm <$> symbol TypeAnnotation <*> children (Language.TypeScript.Syntax.Annotation <$> ty)
+typeAnnotation' = makeTerm <$> symbol TypeAnnotation <*> children (Type.Annotation <$> ty)
 
 typeParameter' :: Assignment
 typeParameter' = makeTerm <$> symbol Grammar.TypeParameter <*> children (Language.TypeScript.Syntax.TypeParameter <$> identifier <*> (constraint <|> emptyTerm))
