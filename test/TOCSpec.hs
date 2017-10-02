@@ -2,16 +2,13 @@
 {-# LANGUAGE DataKinds, TypeOperators #-}
 module TOCSpec where
 
-import Algorithm hiding (diff)
 import Category as C hiding (Go)
 import Data.Aeson
-import Data.Align.Generic
 import Data.Bifunctor
 import Data.Blob
 import Data.ByteString (ByteString)
 import Data.Diff
 import Data.Functor.Both
-import Data.Functor.Classes
 import Data.Functor.Listable
 import Data.Maybe (fromMaybe)
 import Data.Monoid (Last(..))
@@ -20,12 +17,9 @@ import Data.Patch
 import Data.Record
 import Data.Semigroup ((<>))
 import Data.Source
-import qualified Data.Syntax as Syntax
-import qualified Data.Syntax.Declaration as Declaration
 import Data.Term
 import Data.Text (Text)
 import Data.These
-import Data.Union
 import Info hiding (Go)
 import Interpreter
 import Language
