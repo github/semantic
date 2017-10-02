@@ -59,11 +59,6 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (SExpressionTermRenderer, Just Language.TypeScript) -> parse typescriptParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, Just Language.Ruby) -> parse rubyParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, _) | Just syntaxParser <- syntaxParser -> parse syntaxParser blob >>= render renderSExpressionTerm . fmap keepCategory
-  (IdentityTermRenderer, Just Language.JSON) -> pure Nothing
-  (IdentityTermRenderer, Just Language.Markdown) -> pure Nothing
-  (IdentityTermRenderer, Just Language.Python) -> pure Nothing
-  (IdentityTermRenderer, Just Language.TypeScript) -> pure Nothing
-  (IdentityTermRenderer, _) | Just syntaxParser <- syntaxParser -> Just <$> parse syntaxParser blob
   _ -> throwError (SomeException (NoParserForLanguage blobPath blobLanguage))
   where syntaxParser = blobLanguage >>= parserForLanguage
 
@@ -105,7 +100,6 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (SExpressionDiffRenderer, Just Language.Ruby) -> run (decorate constructorLabel <=< parse rubyParser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
   (SExpressionDiffRenderer, Just Language.TypeScript) -> run (decorate constructorLabel <=< parse typescriptParser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
   (SExpressionDiffRenderer, _) | Just syntaxParser <- syntaxParser -> run (parse syntaxParser) diffSyntaxTerms (renderSExpressionDiff . bimap keepCategory keepCategory)
-  (IdentityDiffRenderer, _) | Just syntaxParser <- syntaxParser -> run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms Just
   _ -> throwError (SomeException (NoParserForLanguage effectivePath effectiveLanguage))
   where (effectivePath, effectiveLanguage) = case runJoin blobs of
           (Blob { blobLanguage = Just lang, blobPath = path }, _) -> (path, Just lang)

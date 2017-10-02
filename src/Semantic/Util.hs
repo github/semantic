@@ -49,10 +49,3 @@ diffWithParser :: (HasField fields Data.Span.Span,
 diffWithParser parser = run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))
   where
     run parse sourceBlobs = distributeFor sourceBlobs parse >>= runBothWith (diffTermPair sourceBlobs diffTerms)
-
-    -- diffRecursively :: (Declaration.Method :< fs, Declaration.Function :< fs, Apply Eq1 fs, Apply GAlign fs, Apply Show1 fs, Apply Foldable fs, Apply Functor fs, Apply Traversable fs, Apply Diffable fs)
-    --                 => Term (Union fs) (Record fields1)
-    --                 -> Term (Union fs) (Record fields2)
-    --                 -> Diff (Union fs) (Record fields1) (Record fields2)
-    -- diffRecursively = decoratingWith constructorNameAndConstantFields constructorNameAndConstantFields (diffTermsWith algorithmForTerms comparableByConstructor equivalentTerms)
-
