@@ -770,9 +770,6 @@ true = makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
 false :: Assignment
 false = makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
 
-expressions :: Assignment
-expressions = makeTerm <$> location <*> many expression
-
 identifier :: Assignment
 identifier = (makeTerm <$> symbol Identifier' <*> (Syntax.Identifier <$> source)) <|> (makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source))
 
