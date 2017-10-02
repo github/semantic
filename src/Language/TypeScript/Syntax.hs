@@ -44,6 +44,7 @@ type Syntax = '[
   , Declaration.PublicFieldDefinition
   , Declaration.VariableDeclaration
   , Declaration.TypeAliasDeclaration
+  , Declaration.Import
   , Declaration.Module
   , Expression.Arithmetic
   , Expression.Bitwise
@@ -163,7 +164,6 @@ type Syntax = '[
   , Language.TypeScript.Syntax.NamedImports
   , Language.TypeScript.Syntax.NamespaceImport
   , Language.TypeScript.Syntax.Annotation
-  , Language.TypeScript.Syntax.Import
   , Language.TypeScript.Syntax.With
   , Language.TypeScript.Syntax.ForOf
   , Language.TypeScript.Syntax.This
@@ -361,12 +361,6 @@ newtype ExtendsClause a = ExtendsClause { _extendsClauseTypes :: [a] }
 
 instance Eq1 ExtendsClause where liftEq = genericLiftEq
 instance Show1 ExtendsClause where liftShowsPrec = genericLiftShowsPrec
-
-newtype Import a = Import { _importElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 Import where liftEq = genericLiftEq
-instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 newtype ArrayType a = ArrayType { _arrayType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -972,7 +966,7 @@ labeledStatement :: Assignment
 labeledStatement = makeTerm <$> symbol Grammar.LabeledStatement <*> children (Language.TypeScript.Syntax.LabeledStatement <$> (symbol StatementIdentifier *> children identifier) <*> statement)
 
 importStatement :: Assignment
-importStatement = makeTerm <$> symbol Grammar.ImportStatement <*> children (Language.TypeScript.Syntax.Import <$> (((\a b -> [a, b]) <$> importClause <*> fromClause) <|> (pure <$> (importRequireClause <|> string))))
+importStatement = makeTerm <$> symbol Grammar.ImportStatement <*> children (Declaration.Import <$> (((\a b -> [a, b]) <$> importClause <*> fromClause) <|> (pure <$> (importRequireClause <|> string))))
 
 importClause :: Assignment
 importClause = makeTerm <$> symbol Grammar.ImportClause <*> children (Language.TypeScript.Syntax.ImportClause <$> (((\a b -> [a, b]) <$> identifier <*> (namespaceImport <|> namedImports)) <|> (pure <$> (namespaceImport <|> namedImports <|> identifier))))
