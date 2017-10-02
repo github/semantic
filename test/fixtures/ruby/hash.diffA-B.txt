@@ -20,12 +20,17 @@
     {-(Integer)-})-})
 {-(Hash)-}
 {-(Hash
-  {-(KeyValue
-    {-(Identifier)-}
-    {-(Integer)-})-}
-  {-(KeyValue
-    {-(TextElement)-}
-    {-(Integer)-})-}
+  {-(Context
+    {-(Comment)-}
+    {-(KeyValue
+      {-(Identifier)-}
+      {-(Integer)-})-})-}
+  {-(Context
+    {-(Comment)-}
+    {-(Comment)-}
+    {-(KeyValue
+      {-(TextElement)-}
+      {-(Integer)-})-})-}
   {-(Context
     {-(Comment)-}
     {-(Empty)-})-})-}
