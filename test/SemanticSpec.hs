@@ -11,19 +11,17 @@ import Renderer
 import Semantic
 import Semantic.Task
 import Syntax
+import System.Exit
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
 
 spec :: Spec
 spec = parallel $ do
   describe "parseBlob" $ do
-    it "parses in the specified language" $ do
-      Just term <- runTask $ parseBlob IdentityTermRenderer methodsBlob
-      void term `shouldBe` Term (() `In` Indexed [ Term (() `In` Method [] (Term (() `In` Leaf "foo")) Nothing [] []) ])
-
-    it "parses line by line if not given a language" $ do
-      Just term <- runTask $ parseBlob IdentityTermRenderer methodsBlob { blobLanguage = Nothing }
-      void term `shouldBe` Term (() `In` Indexed [ Term (() `In` Leaf "def foo\n"), Term (() `In` Leaf "end\n"), Term (() `In` Leaf "") ])
+    it "throws if not given a language" $ do
+      runTask (parseBlob SExpressionTermRenderer methodsBlob { blobLanguage = Nothing }) `shouldThrow` (\ code -> case code of
+        ExitFailure 1 -> True
+        _ -> False)
 
     it "renders with the specified renderer" $ do
       output <- runTask $ parseBlob SExpressionTermRenderer methodsBlob
