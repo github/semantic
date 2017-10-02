@@ -37,6 +37,21 @@ instance Show1 OptionalParameter where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Should we replace this with Function and differentiate by context?
 -- TODO: How should we distinguish class/instance methods?
 
+-- | A declaration of possibly many variables such as var foo = 5, bar = 6 in JavaScript.
+newtype VariableDeclaration a = VariableDeclaration { variableDeclarations :: [a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 VariableDeclaration where liftEq = genericLiftEq
+instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+-- | A public field definition such as a field definition in a JavaScript class.
+data PublicFieldDefinition a = PublicFieldDefinition { publicFieldContext :: ![a], publicFieldPropertyName :: !a, publicFieldValue :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 PublicFieldDefinition where liftEq = genericLiftEq
+instance Show1 PublicFieldDefinition where liftShowsPrec = genericLiftShowsPrec
+
+
 data Variable a = Variable { variableName :: !a, variableType :: !a, variableValue :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
 

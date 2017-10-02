@@ -40,6 +40,8 @@ type Syntax = '[
   , Declaration.Class
   , Declaration.Function
   , Declaration.Method
+  , Declaration.PublicFieldDefinition
+  , Declaration.VariableDeclaration
   , Declaration.Module
   , Expression.Arithmetic
   , Expression.Bitwise
@@ -166,8 +168,6 @@ type Syntax = '[
   , Language.TypeScript.Syntax.New
   , Language.TypeScript.Syntax.Update
   , Language.TypeScript.Syntax.Await
-  , Language.TypeScript.Syntax.PublicFieldDefinition
-  , Language.TypeScript.Syntax.VariableDeclaration
   , Language.TypeScript.Syntax.ComputedPropertyName
   , []
   ]
@@ -193,12 +193,6 @@ data Intersection a = Intersection { _intersectionLeft :: !a, _intersectionRight
 
 instance Eq1 Intersection where liftEq = genericLiftEq
 instance Show1 Intersection where liftShowsPrec = genericLiftShowsPrec
-
-data PublicFieldDefinition a = PublicFieldDefinition { _publicFieldContext :: ![a], _publicFieldPropertyName :: !a, _publicFieldValue :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 PublicFieldDefinition where liftEq = genericLiftEq
-instance Show1 PublicFieldDefinition where liftShowsPrec = genericLiftShowsPrec
 
 data FunctionType a = FunctionType { _functionTypeParameters :: !a, _functionFormalParameters :: ![a], _functionType :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -614,12 +608,6 @@ data RestParameter a = RestParameter { _restParameterContext :: ![a], _restParam
 
 instance Eq1 RestParameter where liftEq = genericLiftEq
 instance Show1 RestParameter where liftShowsPrec = genericLiftShowsPrec
-
-newtype VariableDeclaration a = VariableDeclaration { _variableDeclarations :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 VariableDeclaration where liftEq = genericLiftEq
-instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 -- | Assignment from AST in Ruby’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
@@ -1142,7 +1130,7 @@ forStatement :: Assignment
 forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.For <$> (variableDeclaration <|> expressionStatement' <|> emptyStatement) <*> (expressionStatement' <|> emptyStatement) <*> (expression <|> emptyTerm) <*> statement)
 
 variableDeclaration :: Assignment
-variableDeclaration = (makeTerm <$> (symbol Grammar.VariableDeclaration <|> symbol Grammar.LexicalDeclaration) <*> children (Language.TypeScript.Syntax.VariableDeclaration <$> many (term variableDeclarator)))
+variableDeclaration = (makeTerm <$> (symbol Grammar.VariableDeclaration <|> symbol Grammar.LexicalDeclaration) <*> children (Declaration.VariableDeclaration <$> many (term variableDeclarator)))
 
 variableDeclarator :: Assignment
 variableDeclarator = makeVarDecl <$> symbol VariableDeclarator <*> children ((,,) <$> (identifier <|> destructuringPattern) <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
