@@ -43,6 +43,7 @@ type Syntax = '[
   , Declaration.InterfaceDeclaration
   , Declaration.PublicFieldDefinition
   , Declaration.VariableDeclaration
+  , Declaration.TypeAliasDeclaration
   , Declaration.Module
   , Expression.Arithmetic
   , Expression.Bitwise
@@ -154,7 +155,6 @@ type Syntax = '[
   , Language.TypeScript.Syntax.Export
   , Language.TypeScript.Syntax.AmbientDeclaration
   , Language.TypeScript.Syntax.EnumDeclaration
-  , Language.TypeScript.Syntax.TypeAliasDeclaration
   , Language.TypeScript.Syntax.ExtendsClause
   , Language.TypeScript.Syntax.AmbientFunction
   , Language.TypeScript.Syntax.ImportRequireClause
@@ -355,12 +355,6 @@ data EnumDeclaration a = EnumDeclaration { _enumDeclarationIdentifier :: !a, _en
 
 instance Eq1 EnumDeclaration where liftEq = genericLiftEq
 instance Show1 EnumDeclaration where liftShowsPrec = genericLiftShowsPrec
-
-data TypeAliasDeclaration a = TypeAliasDeclaration { _typeAliasDeclarationContext :: ![a], _typeAliasDeclarationIdentifier :: !a, _typeAliasDeclarationType :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 TypeAliasDeclaration where liftEq = genericLiftEq
-instance Show1 TypeAliasDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 newtype ExtendsClause a = ExtendsClause { _extendsClauseTypes :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
@@ -1018,7 +1012,7 @@ declaration = everything
 
 typeAliasDeclaration :: Assignment
 typeAliasDeclaration = makeTypeAliasDecl <$> symbol Grammar.TypeAliasDeclaration <*> children ((,,) <$> identifier <*> (typeParameters <|> emptyTerm) <*> ty)
-  where makeTypeAliasDecl loc (identifier, typeParams, body) = makeTerm loc (Language.TypeScript.Syntax.TypeAliasDeclaration [typeParams] identifier body)
+  where makeTypeAliasDecl loc (identifier, typeParams, body) = makeTerm loc (Declaration.TypeAliasDeclaration [typeParams] identifier body)
 
 enumDeclaration :: Assignment
 enumDeclaration = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Language.TypeScript.Syntax.EnumDeclaration <$> identifier <*> many (term (propertyName <|> enumAssignment)))

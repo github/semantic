@@ -160,4 +160,3 @@ data Cast a =  Cast { castSubject :: !a, castType :: !a }
 
 instance Eq1 Cast where liftEq = genericLiftEq
 instance Show1 Cast where liftShowsPrec = genericLiftShowsPrec
-

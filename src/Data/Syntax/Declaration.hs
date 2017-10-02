@@ -112,10 +112,16 @@ data Comprehension a = Comprehension { comprehensionValue :: !a, comprehensionBo
 instance Eq1 Comprehension where liftEq = genericLiftEq
 instance Show1 Comprehension where liftShowsPrec = genericLiftShowsPrec
 
-
 -- | Import declarations.
 data Import a = Import { importContent :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
 
 instance Eq1 Import where liftEq = genericLiftEq
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
+
+-- | Type alias declarations in Javascript/Haskell, etc.
+data TypeAliasDeclaration a = TypeAliasDeclaration { typeAliasDeclarationContext :: ![a], typeAliasDeclarationIdentifier :: !a, typeAliasDeclarationType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 TypeAliasDeclaration where liftEq = genericLiftEq
+instance Show1 TypeAliasDeclaration where liftShowsPrec = genericLiftShowsPrec
