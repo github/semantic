@@ -132,3 +132,11 @@ data ScopeResolution a
 
 instance Eq1 ScopeResolution where liftEq = genericLiftEq
 instance Show1 ScopeResolution where liftShowsPrec = genericLiftShowsPrec
+
+-- | A non-null expression such as Typescript or Swift's ! expression.
+newtype NonNullExpression a = NonNullExpression { nonNullExpression :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 NonNullExpression where liftEq = genericLiftEq
+instance Show1 NonNullExpression where liftShowsPrec = genericLiftShowsPrec
+

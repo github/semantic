@@ -51,6 +51,7 @@ type Syntax = '[
   , Expression.Comparison
   , Expression.Enumeration
   , Expression.MemberAccess
+  , Expression.NonNullExpression
   , Expression.ScopeResolution
   , Expression.SequenceExpression
   , Expression.Subscript
@@ -126,7 +127,6 @@ type Syntax = '[
   , Language.TypeScript.Syntax.TypeAssertion
   , Language.TypeScript.Syntax.Cast
   , Language.TypeScript.Syntax.ImportAlias
-  , Language.TypeScript.Syntax.NonNullExpression
   , Language.TypeScript.Syntax.Debugger
   , Language.TypeScript.Syntax.ShorthandPropertyIdentifier
   , Language.TypeScript.Syntax.InternalModule
@@ -483,12 +483,6 @@ data LabeledStatement a = LabeledStatement { _labeledStatementIdentifier :: !a, 
 instance Eq1 LabeledStatement where liftEq = genericLiftEq
 instance Show1 LabeledStatement where liftShowsPrec = genericLiftShowsPrec
 
-newtype NonNullExpression a = NonNullExpression { _nonNullExpression :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 NonNullExpression where liftEq = genericLiftEq
-instance Show1 NonNullExpression where liftShowsPrec = genericLiftShowsPrec
-
 newtype Update a = Update { _updateSubject :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
@@ -747,7 +741,7 @@ templateSubstitution :: Assignment
 templateSubstitution = symbol TemplateSubstitution *> children expression
 
 nonNullExpression' :: Assignment
-nonNullExpression' = makeTerm <$> symbol Grammar.NonNullExpression <*> children (Language.TypeScript.Syntax.NonNullExpression <$> expression)
+nonNullExpression' = makeTerm <$> symbol Grammar.NonNullExpression <*> children (Expression.NonNullExpression <$> expression)
 
 importAlias' :: Assignment
 importAlias' = makeTerm <$> symbol Grammar.ImportAlias <*> children (Language.TypeScript.Syntax.ImportAlias <$> identifier <*> (identifier <|> nestedIdentifier))
