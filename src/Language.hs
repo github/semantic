@@ -20,7 +20,7 @@ data Language
     | Python
     | Ruby
     | TypeScript
-    deriving (Show, Eq, Read, Generic, ToJSON)
+    deriving (Eq, Generic, Ord, Read, Show, ToJSON)
 
 -- | Returns a Language based on the file extension (including the ".").
 languageForType :: String -> Maybe Language
