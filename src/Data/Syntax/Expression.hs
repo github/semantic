@@ -60,6 +60,13 @@ newtype Delete a = Delete a
 instance Eq1 Delete where liftEq = genericLiftEq
 instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
 
+-- | A sequence expression such as Javascript or C's comma operator.
+data SequenceExpression a = SequenceExpression { _firstExpression :: !a, _secondExpression :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 SequenceExpression where liftEq = genericLiftEq
+instance Show1 SequenceExpression where liftShowsPrec = genericLiftShowsPrec
+
 -- | Javascript void operator
 newtype Void a = Void a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)

@@ -49,6 +49,7 @@ type Syntax = '[
   , Expression.Enumeration
   , Expression.MemberAccess
   , Expression.ScopeResolution
+  , Expression.SequenceExpression
   , Expression.Subscript
   , Expression.Delete
   , Expression.Void
@@ -140,7 +141,6 @@ type Syntax = '[
   , Language.TypeScript.Syntax.JsxClosingElement
   , Language.TypeScript.Syntax.JsxExpression
   , Language.TypeScript.Syntax.JsxAttribute
-  , Language.TypeScript.Syntax.SequenceExpression
   , Language.TypeScript.Syntax.OptionalParameter
   , Language.TypeScript.Syntax.RequiredParameter
   , Language.TypeScript.Syntax.RestParameter
@@ -597,12 +597,6 @@ newtype ImplementsClause a = ImplementsClause { _implementsClauseTypes :: [a] }
 instance Eq1 ImplementsClause where liftEq = genericLiftEq
 instance Show1 ImplementsClause where liftShowsPrec = genericLiftShowsPrec
 
-data SequenceExpression a = SequenceExpression { _firstExpression :: !a, _secondExpression :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 SequenceExpression where liftEq = genericLiftEq
-instance Show1 SequenceExpression where liftShowsPrec = genericLiftShowsPrec
-
 data OptionalParameter a = OptionalParameter { _optionalParameterContext :: ![a], _optionalParameterSubject :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
@@ -823,7 +817,7 @@ propertyIdentifier :: Assignment
 propertyIdentifier = makeTerm <$> symbol PropertyIdentifier <*> (Syntax.Identifier <$> source)
 
 sequenceExpression :: Assignment
-sequenceExpression = makeTerm <$> symbol Grammar.SequenceExpression <*> children (Language.TypeScript.Syntax.SequenceExpression <$> expression <*> (sequenceExpression <|> expression))
+sequenceExpression = makeTerm <$> symbol Grammar.SequenceExpression <*> children (Expression.SequenceExpression <$> expression <*> (sequenceExpression <|> expression))
 
 parameter :: Assignment
 parameter =
