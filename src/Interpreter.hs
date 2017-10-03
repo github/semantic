@@ -20,7 +20,6 @@ import Data.Syntax.Algebra
 import qualified Data.Syntax.Declaration as Declaration
 import Data.Term
 import Data.Text (Text)
-import Data.These
 import Data.Union
 import Info hiding (Empty, Return)
 import RWS
@@ -35,7 +34,7 @@ diffSyntaxTerms :: (HasField fields1 Category, HasField fields2 Category)
 diffSyntaxTerms = decoratingWith comparableByCategory (equalTerms comparableByCategory) getLabel getLabel
 
 -- | Diff two à la carte terms recursively.
-diffTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply Diffable fs, Apply Foldable fs, Apply Functor fs, Apply GAlign fs, Apply Show1 fs, Apply Traversable fs)
+diffTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply Diffable fs, Apply Eq1 fs, Apply Foldable fs, Apply Functor fs, Apply GAlign fs, Apply Show1 fs, Apply Traversable fs)
           => Term (Union fs) (Record fields1)
           -> Term (Union fs) (Record fields2)
           -> Diff (Union fs) (Record fields1) (Record fields2)
@@ -112,7 +111,7 @@ comparableByConstructor (In _ u1) (In _ u2)
 -- | Equivalency relation for terms. Equivalence is determined by functions and
 -- methods with equal identifiers/names and recursively by equivalent terms with
 -- identical shapes.
-equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply Foldable fs, Apply GAlign fs)
+equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply Eq1 fs, Apply Foldable fs)
                 => Term (Union fs) ann1
                 -> Term (Union fs) ann2
                 -> Bool
@@ -130,6 +129,4 @@ equivalentTerms t1@(Term (In _ u1)) t2@(Term (In _ u2))
   = equivalentTerms s1 t2
   | Just (Syntax.Context _ s2) <- prj u2
   = equivalentTerms t1 s2
-  | Just aligned <- galignWith (Just . these (const False) (const False) equivalentTerms) u1 u2
-  = and aligned
-  | otherwise = False
+  | otherwise = liftEq equivalentTerms u1 u2
