@@ -48,6 +48,31 @@ instance Show1 OptionalParameter where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Should we replace this with Function and differentiate by context?
 -- TODO: How should we distinguish class/instance methods?
 
+-- | A declaration of possibly many variables such as var foo = 5, bar = 6 in JavaScript.
+newtype VariableDeclaration a = VariableDeclaration { variableDeclarations :: [a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 VariableDeclaration where liftEq = genericLiftEq
+instance Ord1 VariableDeclaration where liftCompare = genericLiftCompare
+instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+-- | A TypeScript/Java style interface declaration to implement.
+data InterfaceDeclaration a = InterfaceDeclaration { interfaceDeclarationContext :: ![a], interfaceDeclarationIdentifier :: !a, interfaceDeclarationBody :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 InterfaceDeclaration where liftEq = genericLiftEq
+instance Ord1 InterfaceDeclaration where liftCompare = genericLiftCompare
+instance Show1 InterfaceDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+-- | A public field definition such as a field definition in a JavaScript class.
+data PublicFieldDefinition a = PublicFieldDefinition { publicFieldContext :: ![a], publicFieldPropertyName :: !a, publicFieldValue :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 PublicFieldDefinition where liftEq = genericLiftEq
+instance Ord1 PublicFieldDefinition where liftCompare = genericLiftCompare
+instance Show1 PublicFieldDefinition where liftShowsPrec = genericLiftShowsPrec
+
+
 data Variable a = Variable { variableName :: !a, variableType :: !a, variableValue :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
@@ -108,7 +133,6 @@ instance Eq1 Comprehension where liftEq = genericLiftEq
 instance Ord1 Comprehension where liftCompare = genericLiftCompare
 instance Show1 Comprehension where liftShowsPrec = genericLiftShowsPrec
 
-
 -- | Import declarations.
 data Import a = Import { importContent :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -116,3 +140,11 @@ data Import a = Import { importContent :: ![a] }
 instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
+
+-- | Type alias declarations in Javascript/Haskell, etc.
+data TypeAliasDeclaration a = TypeAliasDeclaration { typeAliasDeclarationContext :: ![a], typeAliasDeclarationIdentifier :: !a, typeAliasDeclarationType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 TypeAliasDeclaration where liftEq = genericLiftEq
+instance Ord1 TypeAliasDeclaration where liftCompare = genericLiftCompare
+instance Show1 TypeAliasDeclaration where liftShowsPrec = genericLiftShowsPrec
