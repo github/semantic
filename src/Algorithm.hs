@@ -41,7 +41,7 @@ type Algorithm term1 term2 result = Freer (AlgorithmF term1 term2 result)
 
 -- | Diff two terms without specifying the algorithm to be used.
 diff :: term1 -> term2 -> Algorithm term1 term2 result result
-diff = (liftF .) . Algorithm.Diff
+diff a1 a2 = Algorithm.Diff a1 a2 `Then` return
 
 -- | Diff a These of terms without specifying the algorithm to be used.
 diffThese :: These term1 term2 -> Algorithm term1 term2 result result
@@ -49,30 +49,30 @@ diffThese = these byDeleting byInserting diff
 
 -- | Diff a pair of optional terms without specifying the algorithm to be used.
 diffMaybe :: Maybe term1 -> Maybe term2 -> Algorithm term1 term2 result (Maybe result)
-diffMaybe (Just a) (Just b) = Just <$> diff a b
-diffMaybe (Just a) _        = Just <$> byDeleting a
-diffMaybe _        (Just b) = Just <$> byInserting b
-diffMaybe _        _        = pure Nothing
+diffMaybe (Just a1) (Just a2) = Just <$> diff a1 a2
+diffMaybe (Just a1) _         = Just <$> byDeleting a1
+diffMaybe _         (Just a2) = Just <$> byInserting a2
+diffMaybe _         _         = pure Nothing
 
 -- | Diff two terms linearly.
 linearly :: term1 -> term2 -> Algorithm term1 term2 result result
-linearly f1 f2 = liftF (Linear f1 f2)
+linearly f1 f2 = Linear f1 f2 `Then` return
 
 -- | Diff two terms using RWS.
 byRWS :: [term1] -> [term2] -> Algorithm term1 term2 result [result]
-byRWS a b = liftF (RWS a b)
+byRWS as1 as2 = RWS as1 as2 `Then` return
 
 -- | Delete a term.
 byDeleting :: term1 -> Algorithm term1 term2 result result
-byDeleting = liftF . Delete
+byDeleting a1 = Delete a1 `Then` return
 
 -- | Insert a term.
 byInserting :: term2 -> Algorithm term1 term2 result result
-byInserting = liftF . Insert
+byInserting a2 = Insert a2 `Then` return
 
 -- | Replace one term with another.
 byReplacing :: term1 -> term2 -> Algorithm term1 term2 result result
-byReplacing = (liftF .) . Replace
+byReplacing a1 a2 = Replace a1 a2 `Then` return
 
 
 instance (Show term1, Show term2) => Show1 (AlgorithmF term1 term2 result) where
@@ -90,9 +90,9 @@ instance (Show term1, Show term2) => Show1 (AlgorithmF term1 term2 result) where
 instance Alternative (Algorithm term1 term2 result) where
   empty = Empty `Then` return
 
-  (Empty `Then` _) <|> b = b
-  a <|> (Empty `Then` _) = a
-  a <|> b = Alt a b `Then` id
+  (Empty `Then` _) <|> a2               = a2
+  a1               <|> (Empty `Then` _) = a1
+  a1               <|> a2               = Alt a1 a2 `Then` id
 
 
 -- | Diff two terms based on their generic Diffable instances. If the terms are not diffable
@@ -163,7 +163,7 @@ instance Diffable [] where
 
 -- | Diff two non-empty lists using RWS.
 instance Diffable NonEmpty where
-  algorithmFor (a:|as) (b:|bs) = (\ (d:ds) -> d:|ds) <$> byRWS (a:as) (b:bs)
+  algorithmFor (a1:|as1) (a2:|as2) = (\ (a:as) -> a:|as) <$> byRWS (a1:as1) (a2:as2)
 
 -- | A generic type class for diffing two terms defined by the Generic1 interface.
 class GDiffable f where
@@ -171,7 +171,7 @@ class GDiffable f where
 
 -- | Diff two constructors (M1 is the Generic1 newtype for meta-information (possibly related to type constructors, record selectors, and data types))
 instance GDiffable f => GDiffable (M1 i c f) where
-  galgorithmFor (M1 a) (M1 b) = M1 <$> galgorithmFor a b
+  galgorithmFor (M1 a1) (M1 a2) = M1 <$> galgorithmFor a1 a2
 
 -- | Diff the fields of a product type.
 -- i.e. data Foo a b = Foo a b (the 'Foo a b' is captured by 'a :*: b').
@@ -181,19 +181,19 @@ instance (GDiffable f, GDiffable g) => GDiffable (f :*: g) where
 -- | Diff the constructors of a sum type.
 -- i.e. data Foo a = Foo a | Bar a (the 'Foo a' is captured by L1 and 'Bar a' is R1).
 instance (GDiffable f, GDiffable g) => GDiffable (f :+: g) where
-  galgorithmFor (L1 a) (L1 b) = L1 <$> galgorithmFor a b
-  galgorithmFor (R1 a) (R1 b) = R1 <$> galgorithmFor a b
+  galgorithmFor (L1 a1) (L1 a2) = L1 <$> galgorithmFor a1 a2
+  galgorithmFor (R1 b1) (R1 b2) = R1 <$> galgorithmFor b1 b2
   galgorithmFor _ _ = empty
 
 -- | Diff two parameters (Par1 is the Generic1 newtype representing a type parameter).
 -- i.e. data Foo a = Foo a (the 'a' is captured by Par1).
 instance GDiffable Par1 where
-  galgorithmFor (Par1 a) (Par1 b) = Par1 <$> diff a b
+  galgorithmFor (Par1 a1) (Par1 a2) = Par1 <$> diff a1 a2
 
 -- | Diff two constant parameters (K1 is the Generic1 newtype representing type parameter constants).
 -- i.e. data Foo = Foo Int (the 'Int' is a constant parameter).
 instance Eq c => GDiffable (K1 i c) where
-  galgorithmFor (K1 a) (K1 b) = guard (a == b) *> pure (K1 a)
+  galgorithmFor (K1 a1) (K1 a2) = guard (a1 == a2) *> pure (K1 a1)
 
 -- | Diff two terms whose constructors contain 0 type parameters.
 -- i.e. data Foo = Foo.
@@ -202,4 +202,4 @@ instance GDiffable U1 where
 
 -- | Diff two 'Diffable' containers of parameters.
 instance Diffable f => GDiffable (Rec1 f) where
-  galgorithmFor a b = Rec1 <$> algorithmFor (unRec1 a) (unRec1 b)
+  galgorithmFor a1 a2 = Rec1 <$> algorithmFor (unRec1 a1) (unRec1 a2)
