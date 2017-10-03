@@ -156,7 +156,7 @@ genericAlgorithmFor :: (Generic1 f, GDiffable (Rep1 f))
                     => f term1
                     -> f term2
                     -> Algorithm term1 term2 result (f result)
-genericAlgorithmFor a b = to1 <$> galgorithmFor (from1 a) (from1 b)
+genericAlgorithmFor a1 a2 = to1 <$> galgorithmFor (from1 a1) (from1 a2)
 
 
 -- | Diff a Union of Syntax terms. Left is the "rest" of the Syntax terms in the Union,
