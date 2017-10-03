@@ -13,9 +13,7 @@ import Data.Functor.Classes
 import Data.Hashable (Hashable)
 import Data.Maybe (fromMaybe)
 import Data.Record
-import qualified Data.Syntax as Syntax
 import Data.Syntax.Algebra
-import qualified Data.Syntax.Declaration as Declaration
 import Data.Term
 import Data.Text (Text)
 import Data.Union
@@ -32,7 +30,7 @@ diffSyntaxTerms :: (HasField fields1 Category, HasField fields2 Category)
 diffSyntaxTerms = decoratingWith comparableByCategory (equalTerms comparableByCategory) getLabel getLabel
 
 -- | Diff two à la carte terms recursively.
-diffTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply Diffable fs, Apply Eq1 fs, Apply Foldable fs, Apply Functor fs, Apply GAlign fs, Apply Show1 fs, Apply Traversable fs)
+diffTerms :: (Apply Diffable fs, Apply Eq1 fs, Apply Foldable fs, Apply Functor fs, Apply GAlign fs, Apply Show1 fs, Apply Traversable fs)
           => Term (Union fs) (Record fields1)
           -> Term (Union fs) (Record fields2)
           -> Diff (Union fs) (Record fields1) (Record fields2)
