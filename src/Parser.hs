@@ -51,18 +51,18 @@ data Parser term where
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
 
-data SomeParser where
-  SomeParser :: Parser (Term (Union fs) (Record Location)) -> SomeParser
+data SomeParser typeclass where
+  SomeParser :: Apply typeclass fs => { unSomeParser :: Parser (Term (Union fs) (Record Location)) } -> SomeParser typeclass
 
-someParser :: Language -> Maybe SomeParser
-someParser Go         = Nothing
-someParser JavaScript = Just (SomeParser typescriptParser)
-someParser JSON       = Just (SomeParser jsonParser)
-someParser JSX        = Just (SomeParser typescriptParser)
-someParser Markdown   = Just (SomeParser markdownParser)
-someParser Python     = Just (SomeParser pythonParser)
-someParser Ruby       = Just (SomeParser rubyParser)
-someParser TypeScript = Just (SomeParser typescriptParser)
+someParser :: (Apply typeclass JSON.Syntax, Apply typeclass Markdown.Syntax, Apply typeclass Python.Syntax, Apply typeclass Ruby.Syntax, Apply typeclass TypeScript.Syntax) => proxy typeclass -> Language -> Maybe (SomeParser typeclass)
+someParser _ Go         = Nothing
+someParser _ JavaScript = Just (SomeParser typescriptParser)
+someParser _ JSON       = Just (SomeParser jsonParser)
+someParser _ JSX        = Just (SomeParser typescriptParser)
+someParser _ Markdown   = Just (SomeParser markdownParser)
+someParser _ Python     = Just (SomeParser pythonParser)
+someParser _ Ruby       = Just (SomeParser rubyParser)
+someParser _ TypeScript = Just (SomeParser typescriptParser)
 
 -- | Return a 'Language'-specific 'Parser', if one exists, falling back to the 'LineByLineParser'.
 syntaxParserForLanguage :: Language -> Maybe (Parser (Term Syntax (Record DefaultFields)))
