@@ -14,8 +14,8 @@
     { (Identifier)
     ->(Identifier) }
       (ScopeResolution
-      {+(Identifier)+}
-      {-(Identifier)-}
+      { (Identifier)
+      ->(Identifier) }
         (Identifier))
       (Empty))
   {-(ScopeResolution

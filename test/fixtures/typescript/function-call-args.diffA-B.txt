@@ -2,8 +2,8 @@
   (Call
     (Identifier)
     (Float)
-  {+(TextElement)+}
-  {-(TextElement)-}
+  { (TextElement)
+  ->(TextElement) }
     (Function
       (Empty)
       (Empty)
@@ -31,12 +31,12 @@
           (MemberAccess
             (Identifier)
             (Identifier))
-        {+(Identifier)+}
-        {-(Identifier)-}
+        { (Identifier)
+        ->(Identifier) }
           (Empty))
         (Return
         { (Identifier)
         ->(Identifier) })))
-  {+(Boolean)+}
-  {-(Boolean)-}
+  { (Boolean)
+  ->(Boolean) }
     (Empty)))

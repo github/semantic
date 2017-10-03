@@ -12,8 +12,8 @@
   {+(Identifier)+})+}
   (ForEach
     (
-    {+(Identifier)+}
-    {-(Identifier)-})
+    { (Identifier)
+    ->(Identifier) })
   { (Array
     {-(Integer)-}
     {-(Integer)-}

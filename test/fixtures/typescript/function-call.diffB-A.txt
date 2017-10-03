@@ -1,9 +1,9 @@
 (Program
   (Call
-  {+(TypeIdentifier)+}
-  {-(TypeIdentifier)-}
+  { (TypeIdentifier)
+  ->(TypeIdentifier) }
     (Identifier)
     (Identifier)
-  {+(TextElement)+}
-  {-(TextElement)-}
+  { (TextElement)
+  ->(TextElement) }
     (Empty)))
