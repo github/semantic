@@ -1,6 +1,8 @@
 {-# LANGUAGE DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Parser
 ( Parser(..)
+, SomeParser(..)
+, someParser
 -- Syntax parsers
 , syntaxParserForLanguage
 -- À la carte parsers
@@ -48,6 +50,19 @@ data Parser term where
   TreeSitterParser :: Ptr TS.Language -> Parser (Term Syntax (Record DefaultFields))
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
+
+data SomeParser where
+  SomeParser :: Parser (Term (Union fs) (Record Location)) -> SomeParser
+
+someParser :: Language -> Maybe SomeParser
+someParser Go         = Nothing
+someParser JavaScript = Just (SomeParser typescriptParser)
+someParser JSON       = Just (SomeParser jsonParser)
+someParser JSX        = Just (SomeParser typescriptParser)
+someParser Markdown   = Just (SomeParser markdownParser)
+someParser Python     = Just (SomeParser pythonParser)
+someParser Ruby       = Just (SomeParser rubyParser)
+someParser TypeScript = Just (SomeParser typescriptParser)
 
 -- | Return a 'Language'-specific 'Parser', if one exists, falling back to the 'LineByLineParser'.
 syntaxParserForLanguage :: Language -> Maybe (Parser (Term Syntax (Record DefaultFields)))
