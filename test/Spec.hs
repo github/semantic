@@ -2,6 +2,7 @@ module Main where
 
 import qualified AlignmentSpec
 import qualified CommandSpec
+import qualified Data.Functor.Classes.Ord.Generic.Spec
 import qualified Data.Mergeable.Spec
 import qualified Data.RandomWalkSimilarity.Spec
 import qualified Data.Syntax.Assignment.Spec
