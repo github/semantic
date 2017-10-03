@@ -53,7 +53,9 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (JSONTermRenderer, Just Language.TypeScript) -> parse typescriptParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
   (JSONTermRenderer, Just Language.Ruby) -> parse rubyParser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
   (JSONTermRenderer, _) | Just syntaxParser <- syntaxParser -> parse syntaxParser blob >>= decorate syntaxIdentifierAlgebra >>= render (renderJSONTerm blob)
-  (SExpressionTermRenderer, lang) | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Foldable, Functor]) -> render renderSExpressionTerm . fmap keepConstructorLabel <=< decorate constructorLabel <=< parse parser $ blob
+  (SExpressionTermRenderer, lang)
+    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Foldable, Functor]) ->
+      render renderSExpressionTerm . fmap keepConstructorLabel <=< decorate constructorLabel <=< parse parser $ blob
   (SExpressionTermRenderer, _) | Just syntaxParser <- syntaxParser -> parse syntaxParser blob >>= render renderSExpressionTerm . fmap keepCategory
   _ -> throwError (SomeException (NoParserForLanguage blobPath blobLanguage))
   where syntaxParser = blobLanguage >>= syntaxParserForLanguage
