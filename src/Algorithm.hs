@@ -163,6 +163,11 @@ class Diffable f where
                   -> g (f b)       -- ^ The resulting algorithm (or other 'Alternative' context), producing the traversed syntax.
   subalgorithmFor _ _ _ = empty
 
+  -- | Syntax having a human-provided identifier, such as function/method definitions, can use equivalence of identifiers as a proxy for their overall equivalence, improving the quality & efficiency of the diff as a whole.
+  --
+  --   This can also be used for annotation nodes to ensure that their subjects’ equivalence is weighed appropriately.
+  --
+  --   Other syntax should use the default definition, and thus have equivalence computed piece-wise.
   equivalentBySubterm :: f a -> Maybe a
   equivalentBySubterm _ = Nothing
 
