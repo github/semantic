@@ -199,6 +199,7 @@ instance Apply Diffable fs => Diffable (Union fs) where
 
   equivalentBySubterm = apply (Proxy :: Proxy Diffable) equivalentBySubterm
 
+  -- | Comparability on 'Union's is defined first by comparability of their contained functors (when they’re the same), falling back to using 'subalgorithmFor' to opt substructurally-diffable syntax into comparisons (e.g. to allow annotating nodes to be compared against the kind of nodes they annotate).
   comparableTo u1 u2 = fromMaybe False (apply2 proxy comparableTo u1 u2 <|> True <$ subalgorithmFor pure pure u1 <|> True <$ subalgorithmFor pure pure u2)
     where proxy = Proxy :: Proxy Diffable
 
