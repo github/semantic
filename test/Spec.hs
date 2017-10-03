@@ -22,6 +22,7 @@ main = hspec $ do
   parallel $ do
     describe "Alignment" AlignmentSpec.spec
     describe "Command" CommandSpec.spec
+    describe "Data.Functor.Classes.Ord.Generic" Data.Functor.Classes.Ord.Generic.Spec.spec
     describe "Data.Mergeable" Data.Mergeable.Spec.spec
     describe "Data.RandomWalkSimilarity" Data.RandomWalkSimilarity.Spec.spec
     describe "Data.Syntax.Assignment" Data.Syntax.Assignment.Spec.spec
