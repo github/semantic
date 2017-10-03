@@ -171,6 +171,9 @@ class Diffable f where
   equivalentBySubterm :: f a -> Maybe a
   equivalentBySubterm _ = Nothing
 
+  -- | A relation on syntax values indicating their  In general this should be true iff both values have the same constructor (this is the relation computed by the default, generic definition).
+  --
+  --   For syntax with constant fields which serve as a classifier, this method can be overloaded to consider equality on that classifier in addition to/instead of the constructors themselves, and thus limit the comparisons accordingly.
   comparableTo :: f term1 -> f term2 -> Bool
   default comparableTo :: (Generic1 f, GDiffable (Rep1 f)) => f term1 -> f term2 -> Bool
   comparableTo = genericComparableTo
