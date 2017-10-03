@@ -7,14 +7,17 @@ module Semantic
 , diffTermPair
 ) where
 
+import Algorithm (Diffable)
 import Control.Exception
 import Control.Monad ((<=<))
 import Control.Monad.Error.Class
+import Data.Align.Generic
 import Data.Bifunctor
 import Data.Blob
 import Data.ByteString (ByteString)
 import Data.Diff
 import Data.Functor.Both as Both
+import Data.Functor.Classes
 import Data.Output
 import Data.Record
 import Data.Syntax.Algebra
@@ -104,12 +107,9 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
     | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
       run (parse syntaxParser) diffSyntaxTerms (renderPatch blobs)
 
-  (SExpressionDiffRenderer, Just Language.JSON) -> run (decorate constructorLabel <=< parse jsonParser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
-  (SExpressionDiffRenderer, Just Language.Markdown) -> run (decorate constructorLabel <=< parse markdownParser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
-  (SExpressionDiffRenderer, Just Language.Python) -> run (decorate constructorLabel <=< parse pythonParser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
-  (SExpressionDiffRenderer, Just Language.Ruby) -> run (decorate constructorLabel <=< parse rubyParser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
-  (SExpressionDiffRenderer, Just Language.TypeScript) -> run (decorate constructorLabel <=< parse typescriptParser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
   (SExpressionDiffRenderer, lang)
+    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Diffable, Eq1, Foldable, Functor, GAlign, Show1, Traversable]) ->
+      run (decorate constructorLabel <=< parse parser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
     | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
       run (parse syntaxParser) diffSyntaxTerms (renderSExpressionDiff . bimap keepCategory keepCategory)
 
