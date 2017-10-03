@@ -8,10 +8,11 @@ import Data.Align.Generic
 import Data.ByteString (ByteString)
 import qualified Data.Error as Error
 import Data.Foldable (asum, toList)
-import Data.Function ((&))
+import Data.Function ((&), on)
 import Data.Ix
 import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
 import Data.Functor.Classes.Eq.Generic
+import Data.Functor.Classes.Ord.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Mergeable
 import Data.Record
@@ -53,7 +54,7 @@ handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pur
 
 -- | Catch parse errors into an error term.
 parseError :: (HasCallStack, Error :< fs, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
-parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (getCallStack (freezeCallStack callStack)) [] (Just "ParseError") [])
+parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (ErrorStack (getCallStack (freezeCallStack callStack))) [] (Just "ParseError") [])
 
 
 -- | Match context terms before a subject term, wrapping both up in a Context term if any context terms matched, or otherwise returning the subject term.
@@ -101,22 +102,25 @@ infixContext context left right operators = uncurry (&) <$> postContextualizeThr
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
 newtype Identifier a = Identifier ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Identifier where liftEq = genericLiftEq
+instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 newtype Program a = Program [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Program where liftEq = genericLiftEq
+instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 AccessibilityModifier where liftEq = genericLiftEq
+instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare
 instance Show1 AccessibilityModifier where liftShowsPrec = genericLiftShowsPrec
 
 
@@ -124,31 +128,48 @@ instance Show1 AccessibilityModifier where liftShowsPrec = genericLiftShowsPrec
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Empty where liftEq _ _ _ = True
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 
 -- | Syntax representing a parsing or assignment error.
-data Error a = Error { errorCallStack :: [([Char], SrcLoc)], errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
+data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Error where liftEq = genericLiftEq
+instance Ord1 Error where liftCompare = genericLiftCompare
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 
 errorSyntax :: Error.Error String -> [a] -> Error a
-errorSyntax Error.Error{..} = Error (getCallStack callStack) errorExpected errorActual
+errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorExpected errorActual
 
 unError :: Span -> Error a -> Error.Error String
-unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList errorCallStack)) (Error.Error span errorExpected errorActual)
+unError span Error{..} = Error.withCallStack (freezeCallStack (fromCallSiteList (unErrorStack errorCallStack))) (Error.Error span errorExpected errorActual)
+
+newtype ErrorStack = ErrorStack { unErrorStack :: [(String, SrcLoc)] }
+  deriving (Eq, Show)
+
+instance Ord ErrorStack where
+  compare = liftCompare (liftCompare compareSrcLoc) `on` unErrorStack
+    where compareSrcLoc s1 s2 = mconcat
+            [ (compare `on` srcLocPackage) s1 s2
+            , (compare `on` srcLocModule) s1 s2
+            , (compare `on` srcLocFile) s1 s2
+            , (compare `on` srcLocStartLine) s1 s2
+            , (compare `on` srcLocStartCol) s1 s2
+            , (compare `on` srcLocEndLine) s1 s2
+            , (compare `on` srcLocEndCol) s1 s2
+            ]
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Diffable Context where
   subalgorithmFor blur focus (Context n1 s1) = Context <$> traverse blur n1 <*> focus s1
 
 instance Eq1 Context where liftEq = genericLiftEq
+instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
