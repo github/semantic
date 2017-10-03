@@ -22,6 +22,7 @@ library
                      , Data.Error
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
+                     , Data.Functor.Classes.Ord.Generic
                      , Data.Functor.Classes.Show.Generic
                      , Data.JSON.Fields
                      , Data.Mergeable
@@ -143,6 +144,7 @@ test-suite test
   main-is:             Spec.hs
   other-modules:       AlignmentSpec
                      , CommandSpec
+                     , Data.Functor.Classes.Ord.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Mergeable.Spec
                      , Data.RandomWalkSimilarity.Spec
