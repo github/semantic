@@ -98,12 +98,9 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
     | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
       run (decorate syntaxIdentifierAlgebra <=< parse syntaxParser) diffSyntaxTerms (renderJSONDiff blobs)
 
-  (PatchDiffRenderer, Just Language.JSON) -> run (parse jsonParser) diffTerms (renderPatch blobs)
-  (PatchDiffRenderer, Just Language.Markdown) -> run (parse markdownParser) diffTerms (renderPatch blobs)
-  (PatchDiffRenderer, Just Language.Python) -> run (parse pythonParser) diffTerms (renderPatch blobs)
-  (PatchDiffRenderer, Just Language.Ruby) -> run (parse rubyParser) diffTerms (renderPatch blobs)
-  (PatchDiffRenderer, Just Language.TypeScript) -> run (parse typescriptParser) diffTerms (renderPatch blobs)
   (PatchDiffRenderer, lang)
+    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, Show1, Traversable]) ->
+      run (parse parser) diffTerms (renderPatch blobs)
     | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
       run (parse syntaxParser) diffSyntaxTerms (renderPatch blobs)
 
