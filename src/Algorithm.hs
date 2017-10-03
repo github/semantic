@@ -124,6 +124,7 @@ equivalentTerms term1@(Term (In _ syntax1)) term2@(Term (In _ syntax2))
   || runEquivalence (subalgorithmFor pure (Equivalence .      equivalentTerms term1) syntax2)
   || liftEq equivalentTerms syntax1 syntax2
 
+-- | A constant 'Alternative' functor used by 'equivalentTerms' to compute the substructural equivalence of syntax.
 newtype Equivalence a = Equivalence { runEquivalence :: Bool }
   deriving (Eq, Functor)
 
