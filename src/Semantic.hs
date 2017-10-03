@@ -50,7 +50,8 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (JSONTermRenderer, lang)
     | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Foldable, Functor]) ->
       parse parser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
-  (JSONTermRenderer, _) | Just syntaxParser <- syntaxParser -> parse syntaxParser blob >>= decorate syntaxIdentifierAlgebra >>= render (renderJSONTerm blob)
+    | Just syntaxParser <- syntaxParser ->
+      parse syntaxParser blob >>= decorate syntaxIdentifierAlgebra >>= render (renderJSONTerm blob)
   (SExpressionTermRenderer, lang)
     | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Foldable, Functor]) ->
       parse parser blob >>= decorate constructorLabel . (Nil <$) >>= render renderSExpressionTerm
