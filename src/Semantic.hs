@@ -60,7 +60,7 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (SExpressionTermRenderer, Just Language.Ruby) -> parse rubyParser blob >>= decorate constructorLabel >>= render renderSExpressionTerm . fmap keepConstructorLabel
   (SExpressionTermRenderer, _) | Just syntaxParser <- syntaxParser -> parse syntaxParser blob >>= render renderSExpressionTerm . fmap keepCategory
   _ -> throwError (SomeException (NoParserForLanguage blobPath blobLanguage))
-  where syntaxParser = blobLanguage >>= parserForLanguage
+  where syntaxParser = blobLanguage >>= syntaxParserForLanguage
 
 data NoParserForLanguage = NoParserForLanguage FilePath (Maybe Language.Language)
   deriving (Eq, Exception, Ord, Show, Typeable)
@@ -105,7 +105,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
           (Blob { blobLanguage = Just lang, blobPath = path }, _) -> (path, Just lang)
           (_, Blob { blobLanguage = Just lang, blobPath = path }) -> (path, Just lang)
           (Blob { blobPath = path }, _)                           -> (path, Nothing)
-        syntaxParser = effectiveLanguage >>= parserForLanguage
+        syntaxParser = effectiveLanguage >>= syntaxParserForLanguage
 
         run :: Functor syntax => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Diff syntax ann ann -> output) -> Task output
         run parse diff renderer = distributeFor blobs parse >>= runBothWith (diffTermPair blobs diff) >>= render renderer

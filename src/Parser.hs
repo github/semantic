@@ -2,7 +2,7 @@
 module Parser
 ( Parser(..)
 -- Syntax parsers
-, parserForLanguage
+, syntaxParserForLanguage
 -- À la carte parsers
 , jsonParser
 , markdownParser
@@ -50,8 +50,8 @@ data Parser term where
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
 
 -- | Return a 'Language'-specific 'Parser', if one exists, falling back to the 'LineByLineParser'.
-parserForLanguage :: Language -> Maybe (Parser (Term Syntax (Record DefaultFields)))
-parserForLanguage language = case language of
+syntaxParserForLanguage :: Language -> Maybe (Parser (Term Syntax (Record DefaultFields)))
+syntaxParserForLanguage language = case language of
   Go         -> Just (TreeSitterParser tree_sitter_go)
   JavaScript -> Just (TreeSitterParser tree_sitter_typescript)
   JSON       -> Just (TreeSitterParser tree_sitter_json)
