@@ -118,8 +118,8 @@ equivalentTerms :: (Diffable syntax, Eq1 syntax)
                 -> Bool
 equivalentTerms term1@(Term (In _ syntax1)) term2@(Term (In _ syntax2))
   =  fromMaybe False (equivalentTerms <$> equivalentBySubterm syntax1 <*> equivalentBySubterm syntax2)
-  || subequivalenceTo (flip equivalentTerms term2) syntax1
-  || subequivalenceTo (     equivalentTerms term1) syntax2
+  || runEquivalence (subalgorithmFor pure (Equivalence . flip equivalentTerms term2) syntax1)
+  || runEquivalence (subalgorithmFor pure (Equivalence .      equivalentTerms term1) syntax2)
   || liftEq equivalentTerms syntax1 syntax2
 
 newtype Equivalence a = Equivalence { runEquivalence :: Bool }
