@@ -111,7 +111,8 @@ equivalentTerms :: Diffable syntax
                 -> Term syntax ann2
                 -> Bool
 equivalentTerms term1@(Term (In _ syntax1)) term2@(Term (In _ syntax2))
-  =  subequivalenceTo (flip equivalentTerms term2) syntax1
+  =  fromMaybe False (equivalentTerms <$> equivalentBySubterm syntax1 <*> equivalentBySubterm syntax2)
+  || subequivalenceTo (flip equivalentTerms term2) syntax1
   || subequivalenceTo (     equivalentTerms term1) syntax2
 
 -- | A type class for determining what algorithm to use for diffing two terms.
