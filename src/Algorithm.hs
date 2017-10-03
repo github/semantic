@@ -170,6 +170,8 @@ instance Apply Diffable fs => Diffable (Union fs) where
 
   subequivalenceTo focus = apply (Proxy :: Proxy Diffable) (subequivalenceTo focus)
 
+  equivalentBySubterm = apply (Proxy :: Proxy Diffable) equivalentBySubterm
+
 -- | Diff two 'Maybe's.
 instance Diffable Maybe where
   algorithmFor = diffMaybe
