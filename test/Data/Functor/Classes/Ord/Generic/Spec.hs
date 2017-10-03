@@ -26,11 +26,13 @@ data Product a = Product a a a
 instance Listable a => Listable (Product a) where
   tiers = cons3 Product
 
+
 data Sum a = Sum1 a | Sum2 a | Sum3 a
   deriving (Eq, Generic1, Ord, Show)
 
 instance Listable a => Listable (Sum a) where
   tiers = cons1 Sum1 \/ cons1 Sum2 \/ cons1 Sum3
+
 
 data Tree a = Leaf a | Branch [Tree a]
   deriving (Eq, Generic1, Ord, Show)
