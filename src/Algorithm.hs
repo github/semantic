@@ -136,6 +136,9 @@ class Diffable f where
                   -> g (f b)       -- ^ The resulting algorithm (or other 'Alternative' context), producing the traversed syntax.
   subalgorithmFor _ _ _ = empty
 
+  subequivalenceTo :: (a -> Bool) -> f a -> Bool
+  subequivalenceTo _ _ = False
+
 genericAlgorithmFor :: (Generic1 f, GDiffable (Rep1 f))
                     => f term1
                     -> f term2
