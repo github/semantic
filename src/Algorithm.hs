@@ -106,6 +106,7 @@ algorithmForTerms t1@(Term (In ann1 f1)) t2@(Term (In ann2 f2))
   <|> insertF . In      ann2 <$> subalgorithmFor byInserting (     mergeFor t1) f2
   where mergeFor (Term (In ann1 f1)) (Term (In ann2 f2)) = merge (ann1, ann2) <$> algorithmFor f1 f2
 
+-- | An O(1) relation on terms indicating their non-recursive comparability (i.e. are they of the same “kind” in a way that warrants comparison), defined in terms of the comparability of their respective syntax.
 comparableTerms :: Diffable syntax
                 => TermF syntax ann1 term1
                 -> TermF syntax ann2 term2
