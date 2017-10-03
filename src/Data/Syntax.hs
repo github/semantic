@@ -170,8 +170,6 @@ data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
 instance Diffable Context where
   subalgorithmFor blur focus (Context n s) = Context <$> traverse blur n <*> focus s
 
-  subequivalenceTo focus = focus . contextSubject
-
   equivalentBySubterm = Just . contextSubject
 
 instance Eq1 Context where liftEq = genericLiftEq

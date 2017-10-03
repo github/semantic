@@ -163,9 +163,6 @@ class Diffable f where
                   -> g (f b)       -- ^ The resulting algorithm (or other 'Alternative' context), producing the traversed syntax.
   subalgorithmFor _ _ _ = empty
 
-  subequivalenceTo :: (a -> Bool) -> f a -> Bool
-  subequivalenceTo _ _ = False
-
   equivalentBySubterm :: f a -> Maybe a
   equivalentBySubterm _ = Nothing
 
@@ -191,8 +188,6 @@ instance Apply Diffable fs => Diffable (Union fs) where
   algorithmFor u1 u2 = fromMaybe empty (apply2' (Proxy :: Proxy Diffable) (\ inj f1 f2 -> inj <$> algorithmFor f1 f2) u1 u2)
 
   subalgorithmFor blur focus = apply' (Proxy :: Proxy Diffable) (\ inj f -> inj <$> subalgorithmFor blur focus f)
-
-  subequivalenceTo focus = apply (Proxy :: Proxy Diffable) (subequivalenceTo focus)
 
   equivalentBySubterm = apply (Proxy :: Proxy Diffable) equivalentBySubterm
 
