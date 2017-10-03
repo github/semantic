@@ -3,7 +3,6 @@ module Interpreter
 ( diffTerms
 , diffSyntaxTerms
 , comparableByConstructor
-, equivalentTerms
 ) where
 
 import Algorithm
