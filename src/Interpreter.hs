@@ -6,7 +6,7 @@ module Interpreter
 , equivalentTerms
 ) where
 
-import Algorithm hiding (equivalentTerms)
+import Algorithm
 import Control.Applicative (Alternative(..))
 import Control.Monad.Free.Freer
 import Data.Align.Generic
@@ -107,26 +107,3 @@ comparableByConstructor (In _ u1) (In _ u2)
   | Just Syntax.Context{} <- prj u1 = True
   | Just Syntax.Context{} <- prj u2 = True
   | otherwise = isJust (galign u1 u2)
-
--- | Equivalency relation for terms. Equivalence is determined by functions and
--- methods with equal identifiers/names and recursively by equivalent terms with
--- identical shapes.
-equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply Eq1 fs, Apply Foldable fs)
-                => Term (Union fs) ann1
-                -> Term (Union fs) ann2
-                -> Bool
-equivalentTerms t1@(Term (In _ u1)) t2@(Term (In _ u2))
-  | Just (Declaration.Method _ _ identifier1 _ _) <- prj u1
-  , Just (Declaration.Method _ _ identifier2 _ _) <- prj u2
-  = equivalentTerms identifier1 identifier2
-  | Just (Declaration.Function _ identifier1 _ _) <- prj u1
-  , Just (Declaration.Function _ identifier2 _ _) <- prj u2
-  = equivalentTerms identifier1 identifier2
-  | Just (Syntax.Context _ s1) <- prj u1
-  , Just (Syntax.Context _ s2) <- prj u2
-  = equivalentTerms s1 s2
-  | Just (Syntax.Context _ s1) <- prj u1
-  = equivalentTerms s1 t2
-  | Just (Syntax.Context _ s2) <- prj u2
-  = equivalentTerms t1 s2
-  | otherwise = liftEq equivalentTerms u1 u2
