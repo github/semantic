@@ -46,7 +46,9 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (ToCTermRenderer, Just Language.Python) -> parse pythonParser blob >>= decorate (declarationAlgebra blob) >>= render (renderToCTerm blob)
   (ToCTermRenderer, Just Language.TypeScript) -> parse typescriptParser blob >>= decorate (declarationAlgebra blob) >>= render (renderToCTerm blob)
   (ToCTermRenderer, Just Language.Ruby) -> parse rubyParser blob >>= decorate (declarationAlgebra blob) >>= render (renderToCTerm blob)
-  (ToCTermRenderer, _) | Just syntaxParser <- syntaxParser -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob) >>= render (renderToCTerm blob)
+  (ToCTermRenderer, _)
+    | Just syntaxParser <- syntaxParser ->
+      parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob) >>= render (renderToCTerm blob)
   (JSONTermRenderer, lang)
     | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Foldable, Functor]) ->
       parse parser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
