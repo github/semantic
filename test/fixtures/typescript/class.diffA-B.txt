@@ -7,8 +7,8 @@
   { (Identifier)
   ->(Identifier) }
     (ExtendsClause
-    {+(TypeIdentifier)+}
-    {-(TypeIdentifier)-})
+    { (TypeIdentifier)
+    ->(TypeIdentifier) })
   {+(Method
     {+(Empty)+}
     {+(Empty)+}

@@ -1,4 +1,4 @@
 (Program
-{+(Regex)+}
-{-(Regex)-}
+{ (Regex)
+->(Regex) }
 {-(Regex)-})

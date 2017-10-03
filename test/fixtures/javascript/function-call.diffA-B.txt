@@ -2,6 +2,6 @@
   (Call
     (Identifier)
     (Identifier)
-  {+(TextElement)+}
-  {-(TextElement)-}
+  { (TextElement)
+  ->(TextElement) }
     (Empty)))

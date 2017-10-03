@@ -2,8 +2,6 @@
 module Interpreter
 ( diffTerms
 , diffSyntaxTerms
-, comparableByConstructor
-, equivalentTerms
 ) where
 
 import Algorithm
@@ -13,15 +11,11 @@ import Data.Align.Generic
 import Data.Diff
 import Data.Functor.Classes
 import Data.Hashable (Hashable)
-import Data.Maybe (fromMaybe, isJust)
+import Data.Maybe (fromMaybe)
 import Data.Record
-import qualified Data.Syntax as Syntax
 import Data.Syntax.Algebra
-import qualified Data.Syntax.Declaration as Declaration
 import Data.Term
 import Data.Text (Text)
-import Data.These
-import Data.Union
 import Info hiding (Empty, Return)
 import RWS
 import Syntax (Syntax(Leaf))
@@ -35,11 +29,11 @@ diffSyntaxTerms :: (HasField fields1 Category, HasField fields2 Category)
 diffSyntaxTerms = decoratingWith comparableByCategory (equalTerms comparableByCategory) getLabel getLabel
 
 -- | Diff two à la carte terms recursively.
-diffTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply Diffable fs, Apply Foldable fs, Apply Functor fs, Apply GAlign fs, Apply Show1 fs, Apply Traversable fs)
-          => Term (Union fs) (Record fields1)
-          -> Term (Union fs) (Record fields2)
-          -> Diff (Union fs) (Record fields1) (Record fields2)
-diffTerms = decoratingWith comparableByConstructor equivalentTerms constructorNameAndConstantFields constructorNameAndConstantFields
+diffTerms :: (Diffable syntax, Eq1 syntax, Foldable syntax, Functor syntax, GAlign syntax, Show1 syntax, Traversable syntax)
+          => Term syntax (Record fields1)
+          -> Term syntax (Record fields2)
+          -> Diff syntax (Record fields1) (Record fields2)
+diffTerms = decoratingWith comparableTerms equivalentTerms constructorNameAndConstantFields constructorNameAndConstantFields
 
 -- | Diff two terms by decorating with feature vectors computed using the supplied labelling algebra, and stripping the feature vectors from the resulting diff.
 decoratingWith :: (Hashable label, Diffable syntax, GAlign syntax, Traversable syntax)
@@ -101,35 +95,3 @@ getLabel (In h t) = (Info.category h, case t of
 -- | Test whether two terms are comparable by their Category.
 comparableByCategory :: (HasField fields1 Category, HasField fields2 Category) => ComparabilityRelation syntax (Record fields1) (Record fields2)
 comparableByCategory (In a _) (In b _) = category a == category b
-
--- | Test whether two terms are comparable by their constructor.
-comparableByConstructor :: (Syntax.Context :< fs, Apply GAlign fs) => ComparabilityRelation (Union fs) ann1 ann2
-comparableByConstructor (In _ u1) (In _ u2)
-  | Just Syntax.Context{} <- prj u1 = True
-  | Just Syntax.Context{} <- prj u2 = True
-  | otherwise = isJust (galign u1 u2)
-
--- | Equivalency relation for terms. Equivalence is determined by functions and
--- methods with equal identifiers/names and recursively by equivalent terms with
--- identical shapes.
-equivalentTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Context :< fs, Apply Foldable fs, Apply GAlign fs)
-                => Term (Union fs) ann1
-                -> Term (Union fs) ann2
-                -> Bool
-equivalentTerms t1@(Term (In _ u1)) t2@(Term (In _ u2))
-  | Just (Declaration.Method _ _ identifier1 _ _) <- prj u1
-  , Just (Declaration.Method _ _ identifier2 _ _) <- prj u2
-  = equivalentTerms identifier1 identifier2
-  | Just (Declaration.Function _ identifier1 _ _) <- prj u1
-  , Just (Declaration.Function _ identifier2 _ _) <- prj u2
-  = equivalentTerms identifier1 identifier2
-  | Just (Syntax.Context _ s1) <- prj u1
-  , Just (Syntax.Context _ s2) <- prj u2
-  = equivalentTerms s1 s2
-  | Just (Syntax.Context _ s1) <- prj u1
-  = equivalentTerms s1 t2
-  | Just (Syntax.Context _ s2) <- prj u2
-  = equivalentTerms t1 s2
-  | Just aligned <- galignWith (Just . these (const False) (const False) equivalentTerms) u1 u2
-  = and aligned
-  | otherwise = False

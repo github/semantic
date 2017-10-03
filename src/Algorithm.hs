@@ -106,6 +106,36 @@ algorithmForTerms t1@(Term (In ann1 f1)) t2@(Term (In ann2 f2))
   <|> insertF . In      ann2 <$> subalgorithmFor byInserting (     mergeFor t1) f2
   where mergeFor (Term (In ann1 f1)) (Term (In ann2 f2)) = merge (ann1, ann2) <$> algorithmFor f1 f2
 
+-- | An O(1) relation on terms indicating their non-recursive comparability (i.e. are they of the same “kind” in a way that warrants comparison), defined in terms of the comparability of their respective syntax.
+comparableTerms :: Diffable syntax
+                => TermF syntax ann1 term1
+                -> TermF syntax ann2 term2
+                -> Bool
+comparableTerms (In _ syntax1) (In _ syntax2) = comparableTo syntax1 syntax2
+
+-- | An O(n) relation on terms indicating their recursive equivalence (i.e. are they _notionally_ “the same,” as distinct from literal equality), defined at each node in terms of the equivalence of their respective syntax, computed first on a nominated subterm (if any), falling back to substructural equivalence (e.g. equivalence of one term against the subject of the other, annotating term), and finally to equality.
+equivalentTerms :: (Diffable syntax, Eq1 syntax)
+                => Term syntax ann1
+                -> Term syntax ann2
+                -> Bool
+equivalentTerms term1@(Term (In _ syntax1)) term2@(Term (In _ syntax2))
+  =  fromMaybe False (equivalentTerms <$> equivalentBySubterm syntax1 <*> equivalentBySubterm syntax2)
+  || runEquivalence (subalgorithmFor pure (Equivalence . flip equivalentTerms term2) syntax1)
+  || runEquivalence (subalgorithmFor pure (Equivalence .      equivalentTerms term1) syntax2)
+  || liftEq equivalentTerms syntax1 syntax2
+
+-- | A constant 'Alternative' functor used by 'equivalentTerms' to compute the substructural equivalence of syntax.
+newtype Equivalence a = Equivalence { runEquivalence :: Bool }
+  deriving (Eq, Functor)
+
+instance Applicative Equivalence where
+  pure _ = Equivalence True
+  Equivalence a <*> Equivalence b = Equivalence (a && b)
+
+instance Alternative Equivalence where
+  empty = Equivalence False
+  Equivalence a <|> Equivalence b = Equivalence (a || b)
+
 -- | A type class for determining what algorithm to use for diffing two terms.
 class Diffable f where
   -- | Construct an algorithm to diff a pair of @f@s populated with disjoint terms.
@@ -136,21 +166,42 @@ class Diffable f where
                   -> g (f b)       -- ^ The resulting algorithm (or other 'Alternative' context), producing the traversed syntax.
   subalgorithmFor _ _ _ = empty
 
+  -- | Syntax having a human-provided identifier, such as function/method definitions, can use equivalence of identifiers as a proxy for their overall equivalence, improving the quality & efficiency of the diff as a whole.
+  --
+  --   This can also be used for annotation nodes to ensure that their subjects’ equivalence is weighed appropriately.
+  --
+  --   Other syntax should use the default definition, and thus have equivalence computed piece-wise.
+  equivalentBySubterm :: f a -> Maybe a
+  equivalentBySubterm _ = Nothing
+
+  -- | A relation on syntax values indicating their  In general this should be true iff both values have the same constructor (this is the relation computed by the default, generic definition).
+  --
+  --   For syntax with constant fields which serve as a classifier, this method can be overloaded to consider equality on that classifier in addition to/instead of the constructors themselves, and thus limit the comparisons accordingly.
+  comparableTo :: f term1 -> f term2 -> Bool
+  default comparableTo :: (Generic1 f, GDiffable (Rep1 f)) => f term1 -> f term2 -> Bool
+  comparableTo = genericComparableTo
+
 genericAlgorithmFor :: (Generic1 f, GDiffable (Rep1 f))
                     => f term1
                     -> f term2
                     -> Algorithm term1 term2 result (f result)
-genericAlgorithmFor a b = to1 <$> galgorithmFor (from1 a) (from1 b)
+genericAlgorithmFor a1 a2 = to1 <$> galgorithmFor (from1 a1) (from1 a2)
+
+genericComparableTo :: (Generic1 f, GDiffable (Rep1 f)) => f term1 -> f term2 -> Bool
+genericComparableTo a1 a2 = gcomparableTo (from1 a1) (from1 a2)
 
 
--- | Diff a Union of Syntax terms. Left is the "rest" of the Syntax terms in the Union,
--- Right is the "head" of the Union. 'weaken' relaxes the Union to allow the possible
--- diff terms from the "rest" of the Union, and 'inj' adds the diff terms into the Union.
--- NB: If Left or Right Syntax terms in our Union don't match, we fail fast by returning Nothing.
+-- | 'Diffable' for 'Union's of syntax functors is defined in general by straightforward lifting of each method into the functors in the 'Union'.
 instance Apply Diffable fs => Diffable (Union fs) where
   algorithmFor u1 u2 = fromMaybe empty (apply2' (Proxy :: Proxy Diffable) (\ inj f1 f2 -> inj <$> algorithmFor f1 f2) u1 u2)
 
   subalgorithmFor blur focus = apply' (Proxy :: Proxy Diffable) (\ inj f -> inj <$> subalgorithmFor blur focus f)
+
+  equivalentBySubterm = apply (Proxy :: Proxy Diffable) equivalentBySubterm
+
+  -- | Comparability on 'Union's is defined first by comparability of their contained functors (when they’re the same), falling back to using 'subalgorithmFor' to opt substructurally-diffable syntax into comparisons (e.g. to allow annotating nodes to be compared against the kind of nodes they annotate).
+  comparableTo u1 u2 = fromMaybe False (apply2 proxy comparableTo u1 u2 <|> True <$ subalgorithmFor pure pure u1 <|> True <$ subalgorithmFor pure pure u2)
+    where proxy = Proxy :: Proxy Diffable
 
 -- | Diff two 'Maybe's.
 instance Diffable Maybe where
@@ -168,9 +219,14 @@ instance Diffable NonEmpty where
 class GDiffable f where
   galgorithmFor :: f term1 -> f term2 -> Algorithm term1 term2 result (f result)
 
+  gcomparableTo :: f term1 -> f term2 -> Bool
+  gcomparableTo _ _ = True
+
 -- | Diff two constructors (M1 is the Generic1 newtype for meta-information (possibly related to type constructors, record selectors, and data types))
 instance GDiffable f => GDiffable (M1 i c f) where
   galgorithmFor (M1 a1) (M1 a2) = M1 <$> galgorithmFor a1 a2
+
+  gcomparableTo (M1 a1) (M1 a2) = gcomparableTo a1 a2
 
 -- | Diff the fields of a product type.
 -- i.e. data Foo a b = Foo a b (the 'Foo a b' is captured by 'a :*: b').
@@ -183,6 +239,10 @@ instance (GDiffable f, GDiffable g) => GDiffable (f :+: g) where
   galgorithmFor (L1 a1) (L1 a2) = L1 <$> galgorithmFor a1 a2
   galgorithmFor (R1 b1) (R1 b2) = R1 <$> galgorithmFor b1 b2
   galgorithmFor _ _ = empty
+
+  gcomparableTo (L1 _) (L1 _) = True
+  gcomparableTo (R1 _) (R1 _) = True
+  gcomparableTo _      _      = False
 
 -- | Diff two parameters (Par1 is the Generic1 newtype representing a type parameter).
 -- i.e. data Foo a = Foo a (the 'a' is captured by Par1).

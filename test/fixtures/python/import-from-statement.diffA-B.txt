@@ -17,6 +17,6 @@
     {+(Identifier)+})+})
   (Import
     (ScopeResolution
-    {+(Identifier)+}
-    {-(Identifier)-})
+    { (Identifier)
+    ->(Identifier) })
     (Identifier)))

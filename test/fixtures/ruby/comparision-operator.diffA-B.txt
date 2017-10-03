@@ -1,13 +1,13 @@
 (Program
-{+(LessThanEqual
+{ (LessThan
+  {-(Identifier)-}
+  {-(Identifier)-})
+->(LessThanEqual
   {+(Identifier)+}
-  {+(Identifier)+})+}
+  {+(Identifier)+}) }
 {+(GreaterThanEqual
   {+(Identifier)+}
   {+(Identifier)+})+}
-{-(LessThan
-  {-(Identifier)-}
-  {-(Identifier)-})-}
 {-(GreaterThan
   {-(Identifier)-}
   {-(Identifier)-})-})

@@ -6,7 +6,7 @@
     (Empty))
   (Call
     (Identifier)
+  { (Identifier)
+  ->(Identifier) }
   {+(Identifier)+}
-  {+(Identifier)+}
-  {-(Identifier)-}
     (Empty)))

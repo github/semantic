@@ -32,9 +32,12 @@
 {+(DividedBy
   {+(Identifier)+}
   {+(Identifier)+})+}
-{+(Modulo
+{ (DividedBy
+  {-(Identifier)-}
+  {-(Identifier)-})
+->(Modulo
   {+(Identifier)+}
-  {+(Identifier)+})+}
+  {+(Identifier)+}) }
 {+(DividedBy
   {+(Identifier)+}
   {+(Identifier)+})+}
@@ -47,9 +50,6 @@
 {+(Plus
   {+(Identifier)+}
   {+(Identifier)+})+}
-{-(DividedBy
-  {-(Identifier)-}
-  {-(Identifier)-})-}
 {-(Power
   {-(Identifier)-}
   {-(Identifier)-})-}

@@ -2,15 +2,15 @@
   (Import
     (ImportClause
       (Identifier))
-  {+(TextElement)+}
-  {-(TextElement)-})
+  { (TextElement)
+  ->(TextElement) })
   (Import
     (ImportClause
       (NamespaceImport
       { (Identifier)
       ->(Identifier) }))
-  {+(TextElement)+}
-  {-(TextElement)-})
+  { (TextElement)
+  ->(TextElement) })
   (Import
     (ImportClause
       (NamedImports
@@ -18,8 +18,8 @@
         { (Identifier)
         ->(Identifier) }
           (Empty))))
-  {+(TextElement)+}
-  {-(TextElement)-})
+  { (TextElement)
+  ->(TextElement) })
   (Import
     (ImportClause
       (NamedImports
@@ -31,8 +31,8 @@
         { (Identifier)
         ->(Identifier) }
           (Empty))))
-  {+(TextElement)+}
-  {-(TextElement)-})
+  { (TextElement)
+  ->(TextElement) })
   (Import
     (ImportClause
       (NamedImports
@@ -45,8 +45,8 @@
         ->(Identifier) }
         { (Identifier)
         ->(Identifier) })))
-  {+(TextElement)+}
-  {-(TextElement)-})
+  { (TextElement)
+  ->(TextElement) })
   (Import
     (ImportClause
       (Identifier)
@@ -60,16 +60,16 @@
         ->(Identifier) }
         { (Identifier)
         ->(Identifier) })))
-  {+(TextElement)+}
-  {-(TextElement)-})
+  { (TextElement)
+  ->(TextElement) })
   (Import
     (ImportClause
       (Identifier)
       (NamespaceImport
       { (Identifier)
       ->(Identifier) }))
-  {+(TextElement)+}
-  {-(TextElement)-})
+  { (TextElement)
+  ->(TextElement) })
   (Import
-  {+(TextElement)+}
-  {-(TextElement)-}))
+  { (TextElement)
+  ->(TextElement) }))
