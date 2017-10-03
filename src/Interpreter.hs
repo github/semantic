@@ -2,7 +2,6 @@
 module Interpreter
 ( diffTerms
 , diffSyntaxTerms
-, comparableByConstructor
 ) where
 
 import Algorithm
@@ -12,7 +11,7 @@ import Data.Align.Generic
 import Data.Diff
 import Data.Functor.Classes
 import Data.Hashable (Hashable)
-import Data.Maybe (fromMaybe, isJust)
+import Data.Maybe (fromMaybe)
 import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Algebra
@@ -37,7 +36,7 @@ diffTerms :: (Declaration.Method :< fs, Declaration.Function :< fs, Syntax.Conte
           => Term (Union fs) (Record fields1)
           -> Term (Union fs) (Record fields2)
           -> Diff (Union fs) (Record fields1) (Record fields2)
-diffTerms = decoratingWith comparableByConstructor equivalentTerms constructorNameAndConstantFields constructorNameAndConstantFields
+diffTerms = decoratingWith comparableTerms equivalentTerms constructorNameAndConstantFields constructorNameAndConstantFields
 
 -- | Diff two terms by decorating with feature vectors computed using the supplied labelling algebra, and stripping the feature vectors from the resulting diff.
 decoratingWith :: (Hashable label, Diffable syntax, GAlign syntax, Traversable syntax)
@@ -99,10 +98,3 @@ getLabel (In h t) = (Info.category h, case t of
 -- | Test whether two terms are comparable by their Category.
 comparableByCategory :: (HasField fields1 Category, HasField fields2 Category) => ComparabilityRelation syntax (Record fields1) (Record fields2)
 comparableByCategory (In a _) (In b _) = category a == category b
-
--- | Test whether two terms are comparable by their constructor.
-comparableByConstructor :: (Syntax.Context :< fs, Apply GAlign fs) => ComparabilityRelation (Union fs) ann1 ann2
-comparableByConstructor (In _ u1) (In _ u2)
-  | Just Syntax.Context{} <- prj u1 = True
-  | Just Syntax.Context{} <- prj u2 = True
-  | otherwise = isJust (galign u1 u2)
