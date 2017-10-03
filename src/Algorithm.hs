@@ -122,6 +122,17 @@ equivalentTerms term1@(Term (In _ syntax1)) term2@(Term (In _ syntax2))
   || subequivalenceTo (     equivalentTerms term1) syntax2
   || liftEq equivalentTerms syntax1 syntax2
 
+newtype Equivalence a = Equivalence { runEquivalence :: Bool }
+  deriving (Eq, Functor)
+
+instance Applicative Equivalence where
+  pure _ = Equivalence True
+  Equivalence a <*> Equivalence b = Equivalence (a && b)
+
+instance Alternative Equivalence where
+  empty = Equivalence False
+  Equivalence a <|> Equivalence b = Equivalence (a || b)
+
 -- | A type class for determining what algorithm to use for diffing two terms.
 class Diffable f where
   -- | Construct an algorithm to diff a pair of @f@s populated with disjoint terms.
