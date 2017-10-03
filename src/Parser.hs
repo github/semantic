@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Parser
 ( Parser(..)
 , SomeParser(..)
@@ -15,6 +15,7 @@ module Parser
 
 import qualified CMarkGFM
 import Data.Functor.Classes (Eq1)
+import Data.Kind
 import Data.Ix
 import Data.Record
 import qualified Data.Syntax as Syntax
@@ -51,10 +52,14 @@ data Parser term where
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
 
-data SomeParser typeclass where
-  SomeParser :: Apply typeclass fs => { unSomeParser :: Parser (Term (Union fs) (Record Location)) } -> SomeParser typeclass
+type family ApplyAll (typeclasses :: [(* -> *) -> Constraint]) (functors :: [* -> *]) :: Constraint where
+  ApplyAll (typeclass ': typeclasses) functors = (Apply typeclass functors, ApplyAll typeclasses functors)
+  ApplyAll '[] functors = ()
 
-someParser :: (Apply typeclass JSON.Syntax, Apply typeclass Markdown.Syntax, Apply typeclass Python.Syntax, Apply typeclass Ruby.Syntax, Apply typeclass TypeScript.Syntax) => proxy typeclass -> Language -> Maybe (SomeParser typeclass)
+data SomeParser typeclasses where
+  SomeParser :: ApplyAll typeclasses fs => { unSomeParser :: Parser (Term (Union fs) (Record Location)) } -> SomeParser typeclasses
+
+someParser :: (ApplyAll typeclasses JSON.Syntax, ApplyAll typeclasses Markdown.Syntax, ApplyAll typeclasses Python.Syntax, ApplyAll typeclasses Ruby.Syntax, ApplyAll typeclasses TypeScript.Syntax) => proxy typeclasses -> Language -> Maybe (SomeParser typeclasses)
 someParser _ Go         = Nothing
 someParser _ JavaScript = Just (SomeParser typescriptParser)
 someParser _ JSON       = Just (SomeParser jsonParser)
