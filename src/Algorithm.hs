@@ -113,6 +113,7 @@ comparableTerms :: Diffable syntax
                 -> Bool
 comparableTerms (In _ syntax1) (In _ syntax2) = comparableTo syntax1 syntax2
 
+-- | An O(n) relation on terms indicating their recursive equivalence (i.e. are they _notionally_ “the same,” as distinct from literal equality), defined at each node in terms of the equivalence of their respective syntax, computed first on a nominated subterm (if any), falling back to substructural equivalence (e.g. equivalence of one term against the subject of the other, annotating term), and finally to equality.
 equivalentTerms :: (Diffable syntax, Eq1 syntax)
                 => Term syntax ann1
                 -> Term syntax ann2
