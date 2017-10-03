@@ -106,6 +106,14 @@ algorithmForTerms t1@(Term (In ann1 f1)) t2@(Term (In ann2 f2))
   <|> insertF . In      ann2 <$> subalgorithmFor byInserting (     mergeFor t1) f2
   where mergeFor (Term (In ann1 f1)) (Term (In ann2 f2)) = merge (ann1, ann2) <$> algorithmFor f1 f2
 
+equivalentTerms :: Diffable syntax
+                => Term syntax ann1
+                -> Term syntax ann2
+                -> Bool
+equivalentTerms term1@(Term (In _ syntax1)) term2@(Term (In _ syntax2))
+  =  subequivalenceTo (flip equivalentTerms term2) syntax1
+  || subequivalenceTo (     equivalentTerms term1) syntax2
+
 -- | A type class for determining what algorithm to use for diffing two terms.
 class Diffable f where
   -- | Construct an algorithm to diff a pair of @f@s populated with disjoint terms.

@@ -6,7 +6,7 @@ module Interpreter
 , equivalentTerms
 ) where
 
-import Algorithm
+import Algorithm hiding (equivalentTerms)
 import Control.Applicative (Alternative(..))
 import Control.Monad.Free.Freer
 import Data.Align.Generic
