@@ -155,6 +155,8 @@ instance Apply Diffable fs => Diffable (Union fs) where
 
   subalgorithmFor blur focus = apply' (Proxy :: Proxy Diffable) (\ inj f -> inj <$> subalgorithmFor blur focus f)
 
+  subequivalenceTo focus = apply (Proxy :: Proxy Diffable) (subequivalenceTo focus)
+
 -- | Diff two 'Maybe's.
 instance Diffable Maybe where
   algorithmFor = diffMaybe
