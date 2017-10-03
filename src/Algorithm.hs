@@ -191,10 +191,7 @@ genericComparableTo :: (Generic1 f, GDiffable (Rep1 f)) => f term1 -> f term2 ->
 genericComparableTo a1 a2 = gcomparableTo (from1 a1) (from1 a2)
 
 
--- | Diff a Union of Syntax terms. Left is the "rest" of the Syntax terms in the Union,
--- Right is the "head" of the Union. 'weaken' relaxes the Union to allow the possible
--- diff terms from the "rest" of the Union, and 'inj' adds the diff terms into the Union.
--- NB: If Left or Right Syntax terms in our Union don't match, we fail fast by returning Nothing.
+-- | 'Diffable' for 'Union's of syntax functors is defined in general by straightforward lifting of each method into the functors in the 'Union'.
 instance Apply Diffable fs => Diffable (Union fs) where
   algorithmFor u1 u2 = fromMaybe empty (apply2' (Proxy :: Proxy Diffable) (\ inj f1 f2 -> inj <$> algorithmFor f1 f2) u1 u2)
 
