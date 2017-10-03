@@ -95,8 +95,7 @@ instance Alternative (Algorithm term1 term2 result) where
   a1               <|> a2               = Alt a1 a2 `Then` id
 
 
--- | Diff two terms based on their generic Diffable instances. If the terms are not diffable
--- (represented by a Nothing diff returned from algorithmFor) replace one term with another.
+-- | Diff two terms based on their 'Diffable' instances, performing substructural comparisons iff the initial comparison fails.
 algorithmForTerms :: Diffable syntax
                   => Term syntax ann1
                   -> Term syntax ann2
