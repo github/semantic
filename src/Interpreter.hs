@@ -16,7 +16,6 @@ import Data.Record
 import Data.Syntax.Algebra
 import Data.Term
 import Data.Text (Text)
-import Data.Union
 import Info hiding (Empty, Return)
 import RWS
 import Syntax (Syntax(Leaf))
@@ -30,10 +29,10 @@ diffSyntaxTerms :: (HasField fields1 Category, HasField fields2 Category)
 diffSyntaxTerms = decoratingWith comparableByCategory (equalTerms comparableByCategory) getLabel getLabel
 
 -- | Diff two à la carte terms recursively.
-diffTerms :: (Apply Diffable fs, Apply Eq1 fs, Apply Foldable fs, Apply Functor fs, Apply GAlign fs, Apply Show1 fs, Apply Traversable fs)
-          => Term (Union fs) (Record fields1)
-          -> Term (Union fs) (Record fields2)
-          -> Diff (Union fs) (Record fields1) (Record fields2)
+diffTerms :: (Diffable syntax, Eq1 syntax, Foldable syntax, Functor syntax, GAlign syntax, Show1 syntax, Traversable syntax)
+          => Term syntax (Record fields1)
+          -> Term syntax (Record fields2)
+          -> Diff syntax (Record fields1) (Record fields2)
 diffTerms = decoratingWith comparableTerms equivalentTerms constructorNameAndConstantFields constructorNameAndConstantFields
 
 -- | Diff two terms by decorating with feature vectors computed using the supplied labelling algebra, and stripping the feature vectors from the resulting diff.
