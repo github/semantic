@@ -172,6 +172,8 @@ instance Diffable Context where
 
   subequivalenceTo focus = focus . contextSubject
 
+  equivalentBySubterm = Just . contextSubject
+
 instance Eq1 Context where liftEq = genericLiftEq
 instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
