@@ -147,6 +147,9 @@ class Diffable f where
   subequivalenceTo :: (a -> Bool) -> f a -> Bool
   subequivalenceTo _ _ = False
 
+  equivalentBySubterm :: f a -> Maybe a
+  equivalentBySubterm _ = Nothing
+
 genericAlgorithmFor :: (Generic1 f, GDiffable (Rep1 f))
                     => f term1
                     -> f term2
