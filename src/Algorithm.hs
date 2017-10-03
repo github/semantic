@@ -152,11 +152,18 @@ class Diffable f where
   equivalentBySubterm :: f a -> Maybe a
   equivalentBySubterm _ = Nothing
 
+  comparableTo :: f term1 -> f term2 -> Bool
+  default comparableTo :: (Generic1 f, GDiffable (Rep1 f)) => f term1 -> f term2 -> Bool
+  comparableTo = genericComparableTo
+
 genericAlgorithmFor :: (Generic1 f, GDiffable (Rep1 f))
                     => f term1
                     -> f term2
                     -> Algorithm term1 term2 result (f result)
 genericAlgorithmFor a1 a2 = to1 <$> galgorithmFor (from1 a1) (from1 a2)
+
+genericComparableTo :: (Generic1 f, GDiffable (Rep1 f)) => f term1 -> f term2 -> Bool
+genericComparableTo a1 a2 = gcomparableTo (from1 a1) (from1 a2)
 
 
 -- | Diff a Union of Syntax terms. Left is the "rest" of the Syntax terms in the Union,
@@ -171,6 +178,9 @@ instance Apply Diffable fs => Diffable (Union fs) where
   subequivalenceTo focus = apply (Proxy :: Proxy Diffable) (subequivalenceTo focus)
 
   equivalentBySubterm = apply (Proxy :: Proxy Diffable) equivalentBySubterm
+
+  comparableTo u1 u2 = fromMaybe False (apply2 proxy comparableTo u1 u2 <|> True <$ subalgorithmFor pure pure u1 <|> True <$ subalgorithmFor pure pure u2)
+    where proxy = Proxy :: Proxy Diffable
 
 -- | Diff two 'Maybe's.
 instance Diffable Maybe where
@@ -188,9 +198,14 @@ instance Diffable NonEmpty where
 class GDiffable f where
   galgorithmFor :: f term1 -> f term2 -> Algorithm term1 term2 result (f result)
 
+  gcomparableTo :: f term1 -> f term2 -> Bool
+  gcomparableTo _ _ = True
+
 -- | Diff two constructors (M1 is the Generic1 newtype for meta-information (possibly related to type constructors, record selectors, and data types))
 instance GDiffable f => GDiffable (M1 i c f) where
   galgorithmFor (M1 a1) (M1 a2) = M1 <$> galgorithmFor a1 a2
+
+  gcomparableTo (M1 a1) (M1 a2) = gcomparableTo a1 a2
 
 -- | Diff the fields of a product type.
 -- i.e. data Foo a b = Foo a b (the 'Foo a b' is captured by 'a :*: b').
@@ -203,6 +218,10 @@ instance (GDiffable f, GDiffable g) => GDiffable (f :+: g) where
   galgorithmFor (L1 a1) (L1 a2) = L1 <$> galgorithmFor a1 a2
   galgorithmFor (R1 b1) (R1 b2) = R1 <$> galgorithmFor b1 b2
   galgorithmFor _ _ = empty
+
+  gcomparableTo (L1 _) (L1 _) = True
+  gcomparableTo (R1 _) (R1 _) = True
+  gcomparableTo _      _      = False
 
 -- | Diff two parameters (Par1 is the Generic1 newtype representing a type parameter).
 -- i.e. data Foo a = Foo a (the 'a' is captured by Par1).
