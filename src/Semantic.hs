@@ -55,7 +55,8 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (SExpressionTermRenderer, lang)
     | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Foldable, Functor]) ->
       parse parser blob >>= decorate constructorLabel . (Nil <$) >>= render renderSExpressionTerm
-  (SExpressionTermRenderer, _) | Just syntaxParser <- syntaxParser -> parse syntaxParser blob >>= render renderSExpressionTerm . fmap keepCategory
+    | Just syntaxParser <- syntaxParser ->
+      parse syntaxParser blob >>= render renderSExpressionTerm . fmap keepCategory
   _ -> throwError (SomeException (NoParserForLanguage blobPath blobLanguage))
   where syntaxParser = blobLanguage >>= syntaxParserForLanguage
 
