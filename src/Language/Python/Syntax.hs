@@ -10,9 +10,11 @@ import Algorithm
 import Data.Align.Generic
 import Data.Functor (void)
 import Data.Functor.Classes.Eq.Generic
+import Data.Functor.Classes.Ord.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.List.NonEmpty (some1)
 import Data.Maybe (fromMaybe)
+import Data.Mergeable
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm1, parseError, postContextualize)
 import qualified Data.Syntax as Syntax
@@ -37,7 +39,7 @@ type Syntax =
    , Declaration.Decorator
    , Declaration.Function
    , Declaration.Import
-   -- NB: Diffing requires Methods in the union.
+   -- NB: ToC rendering requires Methods in the union.
    , Declaration.Method
    , Declaration.Variable
    , Expression.Arithmetic
@@ -91,16 +93,18 @@ type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Ellipsis where liftEq = genericLiftEq
+instance Ord1 Ellipsis where liftCompare = genericLiftCompare
 instance Show1 Ellipsis where liftShowsPrec = genericLiftShowsPrec
 
 
 data Redirect a = Redirect !a !a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Redirect where liftEq = genericLiftEq
+instance Ord1 Redirect where liftCompare = genericLiftCompare
 instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
 
 -- | Assignment from AST in Python's grammar onto a program in Python's syntax.

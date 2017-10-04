@@ -5,10 +5,10 @@
     (
       (
         (
-        {+(Identifier)+}
-        {-(Identifier)-})
-      {+(Identifier)+}
-      {-(Identifier)-})
+        { (Identifier)
+        ->(Identifier) })
+      { (Identifier)
+      ->(Identifier) })
     {+(
       {+(Call
         {+(Identifier)+}
@@ -29,9 +29,9 @@
     (
       (
         (
-        {+(Identifier)+}
-        {-(Identifier)-})
-      {+(Identifier)+}
-      {-(Identifier)-})
+        { (Identifier)
+        ->(Identifier) })
+      { (Identifier)
+      ->(Identifier) })
     {-(
       {-(Identifier)-})-})))

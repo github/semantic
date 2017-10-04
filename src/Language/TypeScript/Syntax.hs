@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 {-# LANGUAGE DataKinds, DeriveAnyClass, RankNTypes, TypeOperators #-}
 
 module Language.TypeScript.Syntax
@@ -11,10 +10,12 @@ module Language.TypeScript.Syntax
 import Algorithm
 import GHC.Generics
 import Data.Functor.Classes.Eq.Generic
+import Data.Functor.Classes.Ord.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.ByteString (ByteString)
 import Data.Align.Generic
 import Data.Maybe (fromMaybe)
+import Data.Mergeable
 import Data.Record
 import Data.Maybe (catMaybes)
 import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm1, postContextualize)
@@ -41,20 +42,30 @@ type Syntax = '[
   , Declaration.Class
   , Declaration.Function
   , Declaration.Method
+  , Declaration.InterfaceDeclaration
+  , Declaration.PublicFieldDefinition
+  , Declaration.VariableDeclaration
+  , Declaration.TypeAliasDeclaration
+  , Declaration.Import
   , Declaration.Module
   , Expression.Arithmetic
   , Expression.Bitwise
   , Expression.Boolean
   , Expression.Call
+  , Expression.Cast
   , Expression.Comparison
   , Expression.Enumeration
   , Expression.MemberAccess
+  , Expression.NonNullExpression
   , Expression.ScopeResolution
+  , Expression.SequenceExpression
   , Expression.Subscript
   , Expression.Delete
   , Expression.Void
   , Expression.Typeof
   , Expression.InstanceOf
+  , Expression.New
+  , Expression.Await
   , Literal.Array
   , Literal.Boolean
   , Literal.Float
@@ -91,7 +102,6 @@ type Syntax = '[
   , Syntax.Identifier
   , Syntax.Program
   , Syntax.Context
-  , Type.Annotation
   , Type.Readonly
   , Type.TypeParameters
   , Language.TypeScript.Syntax.TypeParameter
@@ -104,7 +114,6 @@ type Syntax = '[
   , Language.TypeScript.Syntax.GenericType
   , Language.TypeScript.Syntax.TypeArguments
   , Language.TypeScript.Syntax.TypePredicate
-  , Language.TypeScript.Syntax.Annotation
   , Language.TypeScript.Syntax.CallSignature
   , Language.TypeScript.Syntax.ConstructSignature
   , Language.TypeScript.Syntax.ArrayType
@@ -123,9 +132,7 @@ type Syntax = '[
   , Language.TypeScript.Syntax.Tuple
   , Language.TypeScript.Syntax.Constructor
   , Language.TypeScript.Syntax.TypeAssertion
-  , Language.TypeScript.Syntax.Cast
   , Language.TypeScript.Syntax.ImportAlias
-  , Language.TypeScript.Syntax.NonNullExpression
   , Language.TypeScript.Syntax.Debugger
   , Language.TypeScript.Syntax.ShorthandPropertyIdentifier
   , Language.TypeScript.Syntax.InternalModule
@@ -142,7 +149,6 @@ type Syntax = '[
   , Language.TypeScript.Syntax.JsxClosingElement
   , Language.TypeScript.Syntax.JsxExpression
   , Language.TypeScript.Syntax.JsxAttribute
-  , Language.TypeScript.Syntax.SequenceExpression
   , Language.TypeScript.Syntax.OptionalParameter
   , Language.TypeScript.Syntax.RequiredParameter
   , Language.TypeScript.Syntax.RestParameter
@@ -151,9 +157,7 @@ type Syntax = '[
   , Language.TypeScript.Syntax.ExportClause
   , Language.TypeScript.Syntax.Export
   , Language.TypeScript.Syntax.AmbientDeclaration
-  , Language.TypeScript.Syntax.InterfaceDeclaration
   , Language.TypeScript.Syntax.EnumDeclaration
-  , Language.TypeScript.Syntax.TypeAliasDeclaration
   , Language.TypeScript.Syntax.ExtendsClause
   , Language.TypeScript.Syntax.AmbientFunction
   , Language.TypeScript.Syntax.ImportRequireClause
@@ -161,15 +165,11 @@ type Syntax = '[
   , Language.TypeScript.Syntax.LabeledStatement
   , Language.TypeScript.Syntax.NamedImports
   , Language.TypeScript.Syntax.NamespaceImport
-  , Language.TypeScript.Syntax.Import
+  , Language.TypeScript.Syntax.Annotation
   , Language.TypeScript.Syntax.With
   , Language.TypeScript.Syntax.ForOf
   , Language.TypeScript.Syntax.This
-  , Language.TypeScript.Syntax.New
   , Language.TypeScript.Syntax.Update
-  , Language.TypeScript.Syntax.Await
-  , Language.TypeScript.Syntax.PublicFieldDefinition
-  , Language.TypeScript.Syntax.VariableDeclaration
   , Language.TypeScript.Syntax.ComputedPropertyName
   , []
   ]
@@ -179,461 +179,467 @@ type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 -- | ShorthandPropertyIdentifier used in object patterns such as var baz = { foo } to mean var baz = { foo: foo }
 newtype ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ShorthandPropertyIdentifier where liftEq = genericLiftEq
+instance Ord1 ShorthandPropertyIdentifier where liftCompare = genericLiftCompare
 instance Show1 ShorthandPropertyIdentifier where liftShowsPrec = genericLiftShowsPrec
 
-data Union a = Union { unionLeft :: !a, unionRight :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data Union a = Union { _unionLeft :: !a, _unionRight :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Language.TypeScript.Syntax.Union where liftEq = genericLiftEq
+instance Ord1 Language.TypeScript.Syntax.Union where liftCompare = genericLiftCompare
 instance Show1 Language.TypeScript.Syntax.Union where liftShowsPrec = genericLiftShowsPrec
 
-data Intersection a = Intersection { intersectionLeft :: !a, intersectionRight :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data Intersection a = Intersection { _intersectionLeft :: !a, _intersectionRight :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Intersection where liftEq = genericLiftEq
+instance Ord1 Intersection where liftCompare = genericLiftCompare
 instance Show1 Intersection where liftShowsPrec = genericLiftShowsPrec
 
-data PublicFieldDefinition a = PublicFieldDefinition { publicFieldContext :: ![a], publicFieldPropertyName :: !a, publicFieldValue :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 PublicFieldDefinition where liftEq = genericLiftEq
-instance Show1 PublicFieldDefinition where liftShowsPrec = genericLiftShowsPrec
-
-data FunctionType a = FunctionType { functionTypeParameters :: !a, functionFormalParameters :: ![a], functionType :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data FunctionType a = FunctionType { _functionTypeParameters :: !a, _functionFormalParameters :: ![a], _functionType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 FunctionType where liftEq = genericLiftEq
+instance Ord1 FunctionType where liftCompare = genericLiftCompare
 instance Show1 FunctionType where liftShowsPrec = genericLiftShowsPrec
 
-data AmbientFunction a = AmbientFunction { ambientFunctionContext :: ![a], ambientFunctionIdentifier :: !a, ambientFunctionParameters :: ![a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data AmbientFunction a = AmbientFunction { _ambientFunctionContext :: ![a], _ambientFunctionIdentifier :: !a, _ambientFunctionParameters :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 AmbientFunction where liftEq = genericLiftEq
+instance Ord1 AmbientFunction where liftCompare = genericLiftCompare
 instance Show1 AmbientFunction where liftShowsPrec = genericLiftShowsPrec
 
-data ImportRequireClause a = ImportRequireClause { importRequireIdentifier :: !a, importRequireSubject :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data ImportRequireClause a = ImportRequireClause { _importRequireIdentifier :: !a, _importRequireSubject :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ImportRequireClause where liftEq = genericLiftEq
+instance Ord1 ImportRequireClause where liftCompare = genericLiftCompare
 instance Show1 ImportRequireClause where liftShowsPrec = genericLiftShowsPrec
 
-newtype ImportClause a = ImportClause { importClauseElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype ImportClause a = ImportClause { _importClauseElements :: [a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ImportClause where liftEq = genericLiftEq
+instance Ord1 ImportClause where liftCompare = genericLiftCompare
 instance Show1 ImportClause where liftShowsPrec = genericLiftShowsPrec
 
-newtype NamespaceImport a = NamespaceImport { namespaceImportSubject :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype NamespaceImport a = NamespaceImport { _namespaceImportSubject :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 NamespaceImport where liftEq = genericLiftEq
+instance Ord1 NamespaceImport where liftCompare = genericLiftCompare
 instance Show1 NamespaceImport where liftShowsPrec = genericLiftShowsPrec
 
-newtype Tuple a = Tuple { tupleElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype Tuple a = Tuple { _tupleElements :: [a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Tuple where liftEq = genericLiftEq
+instance Ord1 Tuple where liftCompare = genericLiftCompare
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
-data Constructor a = Constructor { constructorTypeParameters :: !a, constructorFormalParameters :: ![a], constructorType :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data Constructor a = Constructor { _constructorTypeParameters :: !a, _constructorFormalParameters :: ![a], _constructorType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Language.TypeScript.Syntax.Constructor where liftEq = genericLiftEq
+instance Ord1 Language.TypeScript.Syntax.Constructor where liftCompare = genericLiftCompare
 instance Show1 Language.TypeScript.Syntax.Constructor where liftShowsPrec = genericLiftShowsPrec
 
-data TypeParameter a = TypeParameter { typeParameter :: !a, typeParameterConstraint :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data TypeParameter a = TypeParameter { _typeParameter :: !a, _typeParameterConstraint :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 TypeParameter where liftEq = genericLiftEq
+instance Ord1 TypeParameter where liftCompare = genericLiftCompare
 instance Show1 TypeParameter where liftShowsPrec = genericLiftShowsPrec
 
-data TypeAssertion a = TypeAssertion { typeAssertionParameters :: !a, typeAssertionExpression :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data TypeAssertion a = TypeAssertion { _typeAssertionParameters :: !a, _typeAssertionExpression :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 TypeAssertion where liftEq = genericLiftEq
+instance Ord1 TypeAssertion where liftCompare = genericLiftCompare
 instance Show1 TypeAssertion where liftShowsPrec = genericLiftShowsPrec
 
-data Cast a =  Cast { castSubject :: !a, castType :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 Cast where liftEq = genericLiftEq
-instance Show1 Cast where liftShowsPrec = genericLiftShowsPrec
-
-newtype Annotation a = Annotation { annotationType :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype Annotation a = Annotation { _annotationType :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Annotation where liftEq = genericLiftEq
+instance Ord1 Annotation where liftCompare = genericLiftCompare
 instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
 
 newtype ComputedPropertyName a = ComputedPropertyName a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ComputedPropertyName where liftEq = genericLiftEq
+instance Ord1 ComputedPropertyName where liftCompare = genericLiftCompare
 instance Show1 ComputedPropertyName where liftShowsPrec = genericLiftShowsPrec
 
-newtype Constraint a = Constraint { constraintType :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype Constraint a = Constraint { _constraintType :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Constraint where liftEq = genericLiftEq
+instance Ord1 Constraint where liftCompare = genericLiftCompare
 instance Show1 Constraint where liftShowsPrec = genericLiftShowsPrec
 
-newtype ParenthesizedType a = ParenthesizedType { parenthesizedType :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype ParenthesizedType a = ParenthesizedType { _parenthesizedType :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ParenthesizedType where liftEq = genericLiftEq
+instance Ord1 ParenthesizedType where liftCompare = genericLiftCompare
 instance Show1 ParenthesizedType where liftShowsPrec = genericLiftShowsPrec
 
-newtype PredefinedType a = PredefinedType { predefinedType :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype PredefinedType a = PredefinedType { _predefinedType :: ByteString }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 PredefinedType where liftEq = genericLiftEq
+instance Ord1 PredefinedType where liftCompare = genericLiftCompare
 instance Show1 PredefinedType where liftShowsPrec = genericLiftShowsPrec
 
 newtype TypeIdentifier a = TypeIdentifier ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 TypeIdentifier where liftEq = genericLiftEq
+instance Ord1 TypeIdentifier where liftCompare = genericLiftCompare
 instance Show1 TypeIdentifier where liftShowsPrec = genericLiftShowsPrec
 
 data NestedIdentifier a = NestedIdentifier !a !a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 NestedIdentifier where liftEq = genericLiftEq
+instance Ord1 NestedIdentifier where liftCompare = genericLiftCompare
 instance Show1 NestedIdentifier where liftShowsPrec = genericLiftShowsPrec
 
 data NestedTypeIdentifier a = NestedTypeIdentifier !a !a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 NestedTypeIdentifier where liftEq = genericLiftEq
+instance Ord1 NestedTypeIdentifier where liftCompare = genericLiftCompare
 instance Show1 NestedTypeIdentifier where liftShowsPrec = genericLiftShowsPrec
 
-data GenericType a = GenericType { genericTypeIdentifier :: !a, genericTypeArguments :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data GenericType a = GenericType { _genericTypeIdentifier :: !a, _genericTypeArguments :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 GenericType where liftEq = genericLiftEq
+instance Ord1 GenericType where liftCompare = genericLiftCompare
 instance Show1 GenericType where liftShowsPrec = genericLiftShowsPrec
 
-data TypePredicate a = TypePredicate { typePredicateIdentifier :: !a, typePredicateType :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data TypePredicate a = TypePredicate { _typePredicateIdentifier :: !a, _typePredicateType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 TypePredicate where liftEq = genericLiftEq
+instance Ord1 TypePredicate where liftCompare = genericLiftCompare
 instance Show1 TypePredicate where liftShowsPrec = genericLiftShowsPrec
 
-newtype ObjectType a = ObjectType { objectTypeElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype ObjectType a = ObjectType { _objectTypeElements :: [a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ObjectType where liftEq = genericLiftEq
+instance Ord1 ObjectType where liftCompare = genericLiftCompare
 instance Show1 ObjectType where liftShowsPrec = genericLiftShowsPrec
 
-newtype Export a = Export { exportElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype Export a = Export { _exportElements :: [a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Export where liftEq = genericLiftEq
+instance Ord1 Export where liftCompare = genericLiftCompare
 instance Show1 Export where liftShowsPrec = genericLiftShowsPrec
 
-newtype ExportClause a = ExportClause { exportClauseElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype ExportClause a = ExportClause { _exportClauseElements :: [a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ExportClause where liftEq = genericLiftEq
+instance Ord1 ExportClause where liftCompare = genericLiftCompare
 instance Show1 ExportClause where liftShowsPrec = genericLiftShowsPrec
 
-data ImportExportSpecifier a = ImportExportSpecifier { specifierSubject :: !a, specifierAlias :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data ImportExportSpecifier a = ImportExportSpecifier { _specifierSubject :: !a, _specifierAlias :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ImportExportSpecifier where liftEq = genericLiftEq
+instance Ord1 ImportExportSpecifier where liftCompare = genericLiftCompare
 instance Show1 ImportExportSpecifier where liftShowsPrec = genericLiftShowsPrec
 
-newtype NamedImports a = NamedImports { namedImportElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype NamedImports a = NamedImports { _namedImportElements :: [a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 NamedImports where liftEq = genericLiftEq
+instance Ord1 NamedImports where liftCompare = genericLiftCompare
 instance Show1 NamedImports where liftShowsPrec = genericLiftShowsPrec
 
-data With a = With { withExpression :: !a, withBody :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data With a = With { _withExpression :: !a, _withBody :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 With where liftEq = genericLiftEq
+instance Ord1 With where liftCompare = genericLiftCompare
 instance Show1 With where liftShowsPrec = genericLiftShowsPrec
 
-newtype AmbientDeclaration a = AmbientDeclaration { ambientDeclarationBody :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype AmbientDeclaration a = AmbientDeclaration { _ambientDeclarationBody :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 AmbientDeclaration where liftEq = genericLiftEq
+instance Ord1 AmbientDeclaration where liftCompare = genericLiftCompare
 instance Show1 AmbientDeclaration where liftShowsPrec = genericLiftShowsPrec
 
-data InterfaceDeclaration a = InterfaceDeclaration { interfaceDeclarationContext :: ![a], interfaceDeclarationIdentifier :: !a, interfaceDeclarationBody :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 InterfaceDeclaration where liftEq = genericLiftEq
-instance Show1 InterfaceDeclaration where liftShowsPrec = genericLiftShowsPrec
-
-data EnumDeclaration a = EnumDeclaration { enumDeclarationIdentifier :: !a, enumDeclarationBody :: ![a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data EnumDeclaration a = EnumDeclaration { _enumDeclarationIdentifier :: !a, _enumDeclarationBody :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 EnumDeclaration where liftEq = genericLiftEq
+instance Ord1 EnumDeclaration where liftCompare = genericLiftCompare
 instance Show1 EnumDeclaration where liftShowsPrec = genericLiftShowsPrec
 
-data TypeAliasDeclaration a = TypeAliasDeclaration { typeAliasDeclarationContext :: ![a], typeAliasDeclarationIdentifier :: !a, typeAliasDeclarationType :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 TypeAliasDeclaration where liftEq = genericLiftEq
-instance Show1 TypeAliasDeclaration where liftShowsPrec = genericLiftShowsPrec
-
-newtype ExtendsClause a = ExtendsClause { extendsClauseTypes :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype ExtendsClause a = ExtendsClause { _extendsClauseTypes :: [a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ExtendsClause where liftEq = genericLiftEq
+instance Ord1 ExtendsClause where liftCompare = genericLiftCompare
 instance Show1 ExtendsClause where liftShowsPrec = genericLiftShowsPrec
 
-newtype Import a = Import { importElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 Import where liftEq = genericLiftEq
-instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
-
-newtype ArrayType a = ArrayType { arrayType :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype ArrayType a = ArrayType { _arrayType :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ArrayType where liftEq = genericLiftEq
+instance Ord1 ArrayType where liftCompare = genericLiftCompare
 instance Show1 ArrayType where liftShowsPrec = genericLiftShowsPrec
 
-newtype FlowMaybeType a = FlowMaybeType { flowMaybeType :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype FlowMaybeType a = FlowMaybeType { _flowMaybeType :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 FlowMaybeType where liftEq = genericLiftEq
+instance Ord1 FlowMaybeType where liftCompare = genericLiftCompare
 instance Show1 FlowMaybeType where liftShowsPrec = genericLiftShowsPrec
 
-newtype TypeQuery a = TypeQuery { typeQuerySubject :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype TypeQuery a = TypeQuery { _typeQuerySubject :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 TypeQuery where liftEq = genericLiftEq
+instance Ord1 TypeQuery where liftCompare = genericLiftCompare
 instance Show1 TypeQuery where liftShowsPrec = genericLiftShowsPrec
 
-newtype IndexTypeQuery a = IndexTypeQuery { indexTypeQuerySubject :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype IndexTypeQuery a = IndexTypeQuery { _indexTypeQuerySubject :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 IndexTypeQuery where liftEq = genericLiftEq
+instance Ord1 IndexTypeQuery where liftCompare = genericLiftCompare
 instance Show1 IndexTypeQuery where liftShowsPrec = genericLiftShowsPrec
 
-newtype TypeArguments a = TypeArguments { typeArguments :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype TypeArguments a = TypeArguments { _typeArguments :: [a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 TypeArguments where liftEq = genericLiftEq
+instance Ord1 TypeArguments where liftCompare = genericLiftCompare
 instance Show1 TypeArguments where liftShowsPrec = genericLiftShowsPrec
 
 newtype ThisType a = ThisType ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ThisType where liftEq = genericLiftEq
+instance Ord1 ThisType where liftCompare = genericLiftCompare
 instance Show1 ThisType where liftShowsPrec = genericLiftShowsPrec
 
 newtype ExistentialType a = ExistentialType ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ExistentialType where liftEq = genericLiftEq
+instance Ord1 ExistentialType where liftCompare = genericLiftCompare
 instance Show1 ExistentialType where liftShowsPrec = genericLiftShowsPrec
 
-newtype LiteralType a = LiteralType { literalTypeSubject :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype LiteralType a = LiteralType { _literalTypeSubject :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 LiteralType where liftEq = genericLiftEq
+instance Ord1 LiteralType where liftCompare = genericLiftCompare
 instance Show1 LiteralType where liftShowsPrec = genericLiftShowsPrec
 
-data PropertySignature a = PropertySignature { modifiers :: ![a], propertySignaturePropertyName :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data PropertySignature a = PropertySignature { _modifiers :: ![a], _propertySignaturePropertyName :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 PropertySignature where liftEq = genericLiftEq
+instance Ord1 PropertySignature where liftCompare = genericLiftCompare
 instance Show1 PropertySignature where liftShowsPrec = genericLiftShowsPrec
 
-data CallSignature a = CallSignature { callSignatureTypeParameters :: !a, callSignatureParameters :: ![a], callSignatureType :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data CallSignature a = CallSignature { _callSignatureTypeParameters :: !a, _callSignatureParameters :: ![a], _callSignatureType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 CallSignature where liftEq = genericLiftEq
+instance Ord1 CallSignature where liftCompare = genericLiftCompare
 instance Show1 CallSignature where liftShowsPrec = genericLiftShowsPrec
 
 -- | Todo: Move type params and type to context
-data ConstructSignature a = ConstructSignature { constructSignatureTypeParameters :: !a, constructSignatureParameters :: ![a], constructSignatureType :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data ConstructSignature a = ConstructSignature { _constructSignatureTypeParameters :: !a, _constructSignatureParameters :: ![a], _constructSignatureType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ConstructSignature where liftEq = genericLiftEq
+instance Ord1 ConstructSignature where liftCompare = genericLiftCompare
 instance Show1 ConstructSignature where liftShowsPrec = genericLiftShowsPrec
 
-newtype IndexSignature a = IndexSignature { indexSignatureSubject :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype IndexSignature a = IndexSignature { _indexSignatureSubject :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 IndexSignature where liftEq = genericLiftEq
+instance Ord1 IndexSignature where liftCompare = genericLiftCompare
 instance Show1 IndexSignature where liftShowsPrec = genericLiftShowsPrec
 
-data MethodSignature a = MethodSignature { methodSignatureContext :: ![a], methodSignatureName :: !a, methodSignatureParameters :: ![a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data MethodSignature a = MethodSignature { _methodSignatureContext :: ![a], _methodSignatureName :: !a, _methodSignatureParameters :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 MethodSignature where liftEq = genericLiftEq
+instance Ord1 MethodSignature where liftCompare = genericLiftCompare
 instance Show1 MethodSignature where liftShowsPrec = genericLiftShowsPrec
 
 data Debugger a = Debugger
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Debugger where liftEq = genericLiftEq
+instance Ord1 Debugger where liftCompare = genericLiftCompare
 instance Show1 Debugger where liftShowsPrec = genericLiftShowsPrec
 
-data ForOf a = ForOf { forOfBinding :: !a, forOfSubject :: !a, forOfBody :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data ForOf a = ForOf { _forOfBinding :: !a, _forOfSubject :: !a, _forOfBody :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ForOf where liftEq = genericLiftEq
+instance Ord1 ForOf where liftCompare = genericLiftCompare
 instance Show1 ForOf where liftShowsPrec = genericLiftShowsPrec
 
 data This a = This
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 This where liftEq = genericLiftEq
+instance Ord1 This where liftCompare = genericLiftCompare
 instance Show1 This where liftShowsPrec = genericLiftShowsPrec
 
-data LabeledStatement a = LabeledStatement { labeledStatementIdentifier :: !a, labeledStatementSubject :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data LabeledStatement a = LabeledStatement { _labeledStatementIdentifier :: !a, _labeledStatementSubject :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 LabeledStatement where liftEq = genericLiftEq
+instance Ord1 LabeledStatement where liftCompare = genericLiftCompare
 instance Show1 LabeledStatement where liftShowsPrec = genericLiftShowsPrec
 
-newtype NonNullExpression a = NonNullExpression { nonNullExpression :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 NonNullExpression where liftEq = genericLiftEq
-instance Show1 NonNullExpression where liftShowsPrec = genericLiftShowsPrec
-
-newtype Update a = Update { updateSubject :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype Update a = Update { _updateSubject :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Update where liftEq = genericLiftEq
+instance Ord1 Update where liftCompare = genericLiftCompare
 instance Show1 Update where liftShowsPrec = genericLiftShowsPrec
 
-newtype Await a = Await { awaitSubject :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 Await where liftEq = genericLiftEq
-instance Show1 Await where liftShowsPrec = genericLiftShowsPrec
-
-newtype New a = New { newSubject :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 New where liftEq = genericLiftEq
-instance Show1 New where liftShowsPrec = genericLiftShowsPrec
-
-data ImportAlias a = ImportAlias { importAliasSubject :: !a, importAlias :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data ImportAlias a = ImportAlias { _importAliasSubject :: !a, _importAlias :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ImportAlias where liftEq = genericLiftEq
+instance Ord1 ImportAlias where liftCompare = genericLiftCompare
 instance Show1 ImportAlias where liftShowsPrec = genericLiftShowsPrec
 
-data InternalModule a = InternalModule { internalModuleIdentifier :: !a, internalModuleStatements :: ![a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data InternalModule a = InternalModule { _internalModuleIdentifier :: !a, _internalModuleStatements :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 InternalModule where liftEq = genericLiftEq
+instance Ord1 InternalModule where liftCompare = genericLiftCompare
 instance Show1 InternalModule where liftShowsPrec = genericLiftShowsPrec
 
 data Super a = Super
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Super where liftEq = genericLiftEq
+instance Ord1 Super where liftCompare = genericLiftCompare
 instance Show1 Super where liftShowsPrec = genericLiftShowsPrec
 
 data Undefined a = Undefined
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Undefined where liftEq = genericLiftEq
+instance Ord1 Undefined where liftCompare = genericLiftCompare
 instance Show1 Undefined where liftShowsPrec = genericLiftShowsPrec
 
-data ClassHeritage a = ClassHeritage { classHeritageExtendsClause :: !a, implementsClause :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data ClassHeritage a = ClassHeritage { _classHeritageExtendsClause :: !a, _implementsClause :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ClassHeritage where liftEq = genericLiftEq
+instance Ord1 ClassHeritage where liftCompare = genericLiftCompare
 instance Show1 ClassHeritage where liftShowsPrec = genericLiftShowsPrec
 
-data AbstractClass a = AbstractClass { abstractClassIdentifier :: !a,  abstractClassTypeParameters :: !a, classHeritage :: ![a], classBody :: ![a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data AbstractClass a = AbstractClass { _abstractClassIdentifier :: !a,  _abstractClassTypeParameters :: !a, _classHeritage :: ![a], _classBody :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 AbstractClass where liftEq = genericLiftEq
+instance Ord1 AbstractClass where liftCompare = genericLiftCompare
 instance Show1 AbstractClass where liftShowsPrec = genericLiftShowsPrec
 
-data JsxElement a = JsxElement { jsxOpeningElement :: !a,  jsxElements :: ![a], jsxClosingElement :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data JsxElement a = JsxElement { _jsxOpeningElement :: !a,  _jsxElements :: ![a], _jsxClosingElement :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 JsxElement where liftEq = genericLiftEq
+instance Ord1 JsxElement where liftCompare = genericLiftCompare
 instance Show1 JsxElement where liftShowsPrec = genericLiftShowsPrec
 
 newtype JsxText a = JsxText ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 JsxText where liftEq = genericLiftEq
+instance Ord1 JsxText where liftCompare = genericLiftCompare
 instance Show1 JsxText where liftShowsPrec = genericLiftShowsPrec
 
-newtype JsxExpression a = JsxExpression { jsxExpression :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype JsxExpression a = JsxExpression { _jsxExpression :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 JsxExpression where liftEq = genericLiftEq
+instance Ord1 JsxExpression where liftCompare = genericLiftCompare
 instance Show1 JsxExpression where liftShowsPrec = genericLiftShowsPrec
 
-data JsxOpeningElement a = JsxOpeningElement { jsxOpeningElementIdentifier :: !a,  jsxAttributes :: ![a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data JsxOpeningElement a = JsxOpeningElement { _jsxOpeningElementIdentifier :: !a,  _jsxAttributes :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 JsxOpeningElement where liftEq = genericLiftEq
+instance Ord1 JsxOpeningElement where liftCompare = genericLiftCompare
 instance Show1 JsxOpeningElement where liftShowsPrec = genericLiftShowsPrec
 
-newtype JsxClosingElement a = JsxClosingElement { jsxClosingElementIdentifier :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype JsxClosingElement a = JsxClosingElement { _jsxClosingElementIdentifier :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 JsxClosingElement where liftEq = genericLiftEq
+instance Ord1 JsxClosingElement where liftCompare = genericLiftCompare
 instance Show1 JsxClosingElement where liftShowsPrec = genericLiftShowsPrec
 
-data JsxSelfClosingElement a = JsxSelfClosingElement { jsxSelfClosingElementIdentifier :: !a, jsxSelfClosingElementAttributes :: ![a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data JsxSelfClosingElement a = JsxSelfClosingElement { _jsxSelfClosingElementIdentifier :: !a, _jsxSelfClosingElementAttributes :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 JsxSelfClosingElement where liftEq = genericLiftEq
+instance Ord1 JsxSelfClosingElement where liftCompare = genericLiftCompare
 instance Show1 JsxSelfClosingElement where liftShowsPrec = genericLiftShowsPrec
 
-data JsxAttribute a = JsxAttribute { jsxAttributeTarget :: !a, jsxAttributeValue :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data JsxAttribute a = JsxAttribute { _jsxAttributeTarget :: !a, _jsxAttributeValue :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 JsxAttribute where liftEq = genericLiftEq
+instance Ord1 JsxAttribute where liftCompare = genericLiftCompare
 instance Show1 JsxAttribute where liftShowsPrec = genericLiftShowsPrec
 
-newtype ImplementsClause a = ImplementsClause { implementsClauseTypes :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+newtype ImplementsClause a = ImplementsClause { _implementsClauseTypes :: [a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ImplementsClause where liftEq = genericLiftEq
+instance Ord1 ImplementsClause where liftCompare = genericLiftCompare
 instance Show1 ImplementsClause where liftShowsPrec = genericLiftShowsPrec
 
-data SequenceExpression a = SequenceExpression { firstExpression :: !a, secondExpression :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 SequenceExpression where liftEq = genericLiftEq
-instance Show1 SequenceExpression where liftShowsPrec = genericLiftShowsPrec
-
-data OptionalParameter a = OptionalParameter { optionalParameterContext :: ![a], optionalParameterSubject :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data OptionalParameter a = OptionalParameter { _optionalParameterContext :: ![a], _optionalParameterSubject :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 OptionalParameter where liftEq = genericLiftEq
+instance Ord1 OptionalParameter where liftCompare = genericLiftCompare
 instance Show1 OptionalParameter where liftShowsPrec = genericLiftShowsPrec
 
-data RequiredParameter a = RequiredParameter { requiredParameterContext :: ![a], requiredParameterSubject :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data RequiredParameter a = RequiredParameter { _requiredParameterContext :: ![a], _requiredParameterSubject :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 RequiredParameter where liftEq = genericLiftEq
+instance Ord1 RequiredParameter where liftCompare = genericLiftCompare
 instance Show1 RequiredParameter where liftShowsPrec = genericLiftShowsPrec
 
-data RestParameter a = RestParameter { restParameterContext :: ![a], restParameterSubject :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+data RestParameter a = RestParameter { _restParameterContext :: ![a], _restParameterSubject :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 RestParameter where liftEq = genericLiftEq
+instance Ord1 RestParameter where liftCompare = genericLiftCompare
 instance Show1 RestParameter where liftShowsPrec = genericLiftShowsPrec
-
-newtype VariableDeclaration a = VariableDeclaration { variableDeclarations :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 VariableDeclaration where liftEq = genericLiftEq
-instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 -- | Assignment from AST in Ruby’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
@@ -708,7 +714,7 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
 
 
 awaitExpression :: Assignment
-awaitExpression = makeTerm <$> symbol Grammar.AwaitExpression <*> children (Language.TypeScript.Syntax.Await <$> expression)
+awaitExpression = makeTerm <$> symbol Grammar.AwaitExpression <*> children (Expression.Await <$> expression)
 
 unaryExpression :: Assignment
 unaryExpression = symbol Grammar.UnaryExpression >>= \ loc ->
@@ -725,7 +731,7 @@ memberExpression :: Assignment
 memberExpression = makeTerm <$> symbol Grammar.MemberExpression <*> children (Expression.MemberAccess <$> postContextualize comment expression <*> propertyIdentifier)
 
 newExpression :: Assignment
-newExpression = makeTerm <$> symbol Grammar.NewExpression <*> children (Language.TypeScript.Syntax.New <$> expression)
+newExpression = makeTerm <$> symbol Grammar.NewExpression <*> children (Expression.New <$> expression)
 
 updateExpression :: Assignment
 updateExpression = makeTerm <$> symbol Grammar.UpdateExpression <*> children (Language.TypeScript.Syntax.Update <$> expression)
@@ -764,7 +770,7 @@ typeAssertion :: Assignment
 typeAssertion = makeTerm <$> symbol Grammar.TypeAssertion <*> children (Language.TypeScript.Syntax.TypeAssertion <$> typeArguments' <*> expression)
 
 asExpression :: Assignment
-asExpression = makeTerm <$> symbol AsExpression <*> children (Language.TypeScript.Syntax.Cast <$> expression <*> (ty <|> templateString))
+asExpression = makeTerm <$> symbol AsExpression <*> children (Expression.Cast <$> expression <*> (ty <|> templateString))
 
 templateString :: Assignment
 templateString = makeTerm <$> symbol TemplateString <*> children (Literal.String <$> many (term templateSubstitution))
@@ -773,7 +779,7 @@ templateSubstitution :: Assignment
 templateSubstitution = symbol TemplateSubstitution *> children expression
 
 nonNullExpression' :: Assignment
-nonNullExpression' = makeTerm <$> symbol Grammar.NonNullExpression <*> children (Language.TypeScript.Syntax.NonNullExpression <$> expression)
+nonNullExpression' = makeTerm <$> symbol Grammar.NonNullExpression <*> children (Expression.NonNullExpression <$> expression)
 
 importAlias' :: Assignment
 importAlias' = makeTerm <$> symbol Grammar.ImportAlias <*> children (Language.TypeScript.Syntax.ImportAlias <$> identifier <*> (identifier <|> nestedIdentifier))
@@ -789,9 +795,6 @@ true = makeTerm <$> symbol Grammar.True <*> (Literal.true <$ source)
 
 false :: Assignment
 false = makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
-
-expressions :: Assignment
-expressions = makeTerm <$> location <*> many expression
 
 identifier :: Assignment
 identifier = (makeTerm <$> symbol Identifier' <*> (Syntax.Identifier <$> source)) <|> (makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source))
@@ -831,7 +834,7 @@ propertyIdentifier :: Assignment
 propertyIdentifier = makeTerm <$> symbol PropertyIdentifier <*> (Syntax.Identifier <$> source)
 
 sequenceExpression :: Assignment
-sequenceExpression = makeTerm <$> symbol Grammar.SequenceExpression <*> children (Language.TypeScript.Syntax.SequenceExpression <$> expression <*> (sequenceExpression <|> expression))
+sequenceExpression = makeTerm <$> symbol Grammar.SequenceExpression <*> children (Expression.SequenceExpression <$> expression <*> (sequenceExpression <|> expression))
 
 parameter :: Assignment
 parameter =
@@ -974,7 +977,7 @@ classBodyStatements = symbol ClassBody *> children (many (term (methodDefinition
 
 publicFieldDefinition :: Assignment
 publicFieldDefinition = makeField <$> symbol Grammar.PublicFieldDefinition <*> children ((,,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (readonly' <|> emptyTerm) <*> propertyName <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
-  where makeField loc (modifier, readonly, propertyName, annotation, expression) = makeTerm loc (Language.TypeScript.Syntax.PublicFieldDefinition [modifier, readonly, annotation] propertyName expression)
+  where makeField loc (modifier, readonly, propertyName, annotation, expression) = makeTerm loc (Declaration.PublicFieldDefinition [modifier, readonly, annotation] propertyName expression)
 
 
 statement :: Assignment
@@ -1031,7 +1034,7 @@ labeledStatement :: Assignment
 labeledStatement = makeTerm <$> symbol Grammar.LabeledStatement <*> children (Language.TypeScript.Syntax.LabeledStatement <$> (symbol StatementIdentifier *> children identifier) <*> statement)
 
 importStatement :: Assignment
-importStatement = makeTerm <$> symbol Grammar.ImportStatement <*> children (Language.TypeScript.Syntax.Import <$> (((\a b -> [a, b]) <$> importClause <*> fromClause) <|> (pure <$> (importRequireClause <|> string))))
+importStatement = makeTerm <$> symbol Grammar.ImportStatement <*> children (Declaration.Import <$> (((\a b -> [a, b]) <$> importClause <*> fromClause) <|> (pure <$> (importRequireClause <|> string))))
 
 importClause :: Assignment
 importClause = makeTerm <$> symbol Grammar.ImportClause <*> children (Language.TypeScript.Syntax.ImportClause <$> (((\a b -> [a, b]) <$> identifier <*> (namespaceImport <|> namedImports)) <|> (pure <$> (namespaceImport <|> namedImports <|> identifier))))
@@ -1071,7 +1074,7 @@ declaration = everything
 
 typeAliasDeclaration :: Assignment
 typeAliasDeclaration = makeTypeAliasDecl <$> symbol Grammar.TypeAliasDeclaration <*> children ((,,) <$> identifier <*> (typeParameters <|> emptyTerm) <*> ty)
-  where makeTypeAliasDecl loc (identifier, typeParams, body) = makeTerm loc (Language.TypeScript.Syntax.TypeAliasDeclaration [typeParams] identifier body)
+  where makeTypeAliasDecl loc (identifier, typeParams, body) = makeTerm loc (Declaration.TypeAliasDeclaration [typeParams] identifier body)
 
 enumDeclaration :: Assignment
 enumDeclaration = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Language.TypeScript.Syntax.EnumDeclaration <$> identifier <*> many (term (propertyName <|> enumAssignment)))
@@ -1081,7 +1084,7 @@ enumAssignment = makeTerm <$> symbol Grammar.EnumAssignment <*> children (Statem
 
 interfaceDeclaration :: Assignment
 interfaceDeclaration = makeInterfaceDecl <$> symbol Grammar.InterfaceDeclaration <*> children ((,,,) <$> identifier <*> (typeParameters <|> emptyTerm) <*> (extendsClause <|> emptyTerm) <*> objectType)
-  where makeInterfaceDecl loc (identifier, typeParams, clause, objectType) = makeTerm loc (Language.TypeScript.Syntax.InterfaceDeclaration [typeParams, clause] identifier objectType)
+  where makeInterfaceDecl loc (identifier, typeParams, clause, objectType) = makeTerm loc (Declaration.InterfaceDeclaration [typeParams, clause] identifier objectType)
 
 extendsClause :: Assignment
 extendsClause = makeTerm <$> symbol Grammar.ExtendsClause <*> children (Language.TypeScript.Syntax.ExtendsClause <$> many (term ty))
@@ -1156,7 +1159,7 @@ forStatement :: Assignment
 forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.For <$> (variableDeclaration <|> expressionStatement' <|> emptyStatement) <*> (expressionStatement' <|> emptyStatement) <*> (expression <|> emptyTerm) <*> statement)
 
 variableDeclaration :: Assignment
-variableDeclaration = (makeTerm <$> (symbol Grammar.VariableDeclaration <|> symbol Grammar.LexicalDeclaration) <*> children (Language.TypeScript.Syntax.VariableDeclaration <$> many (term variableDeclarator)))
+variableDeclaration = (makeTerm <$> (symbol Grammar.VariableDeclaration <|> symbol Grammar.LexicalDeclaration) <*> children (Declaration.VariableDeclaration <$> many (term variableDeclarator)))
 
 variableDeclarator :: Assignment
 variableDeclarator = makeVarDecl <$> symbol VariableDeclarator <*> children ((,,) <$> (identifier <|> destructuringPattern) <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
