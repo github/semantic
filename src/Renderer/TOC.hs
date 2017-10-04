@@ -51,6 +51,7 @@ import Data.Syntax.Algebra (RAlgebra)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Markup as Markup
+import Debug.Trace
 
 data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }
   deriving (Eq, Show)
@@ -86,6 +87,7 @@ isValidSummary _ = True
 -- | A declaration’s identifier and type.
 data Declaration
   = MethodDeclaration   { declarationIdentifier :: T.Text }
+  | ClassDeclaration    { declarationIdentifier :: T.Text }
   | FunctionDeclaration { declarationIdentifier :: T.Text }
   | SectionDeclaration  { declarationIdentifier :: T.Text, declarationLevel :: Int }
   | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationLanguage :: Maybe Language }
@@ -113,7 +115,7 @@ syntaxDeclarationAlgebra Blob{..} (In a r) = case r of
   where getSource = toText . flip Source.slice blobSource . byteRange . extract
 
 -- | Compute 'Declaration's for methods and functions.
-declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syntax.Empty :< fs, Syntax.Error :< fs, Apply Functor fs, HasField fields Range, HasField fields Span)
+declarationAlgebra :: (Declaration.Function :< fs, Declaration.Class :< fs, Declaration.Method :< fs, Syntax.Empty :< fs, Syntax.Error :< fs, Apply Functor fs, HasField fields Range, HasField fields Span)
                    => Blob
                    -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
 declarationAlgebra Blob{..} (In a r)
@@ -125,6 +127,10 @@ declarationAlgebra Blob{..} (In a r)
   -- Named functions
   | Just (Declaration.Function _ (identifier, _) _ _) <- prj r
   = Just $ FunctionDeclaration (getSource (extract identifier))
+
+  -- Classes
+  | Just (Declaration.Class _ (identifier, _) _ _) <- prj r
+  = Just $ ClassDeclaration (getSource (extract identifier))
 
   -- Methods without a receiver
   | Just (Declaration.Method _ (receiver, _) (identifier, _) _ _) <- prj r
@@ -256,6 +262,7 @@ termToC = mapMaybe (flip recordSummary "unchanged") . termTableOfContentsBy decl
 toCategoryName :: Declaration -> T.Text
 toCategoryName declaration = case declaration of
   FunctionDeclaration _ -> "Function"
+  ClassDeclaration _ -> "Class"
   MethodDeclaration _ -> "Method"
   SectionDeclaration _ l -> "Heading " <> T.pack (show l)
   ErrorDeclaration{} -> "ParseError"
