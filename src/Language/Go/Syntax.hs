@@ -41,6 +41,7 @@ type Syntax =
    , Literal.KeyValue
    , Literal.TextElement
    , Statement.Assignment
+   , Statement.Break
    , Syntax.Context
    , Syntax.Error
    , Syntax.Empty
@@ -71,7 +72,8 @@ expression = term (handleError (choice expressionChoices))
 
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
-  [ callExpression
+  [ breakStatement
+  , callExpression
   , channelType
   , comment
   , constVarDeclaration
@@ -281,6 +283,14 @@ packageClause = makeTerm <$> symbol PackageClause <*> children (Declaration.Modu
 parameterDeclaration :: Assignment
 parameterDeclaration = symbol ParameterDeclaration *> children expressions
 
+
+-- Statements
+
+breakStatement :: Assignment
+breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> labelName)
+
+labelName :: Assignment
+labelName = makeTerm <$> symbol LabelName <*> (Syntax.Identifier <$> source)
 
 -- Helpers
 
