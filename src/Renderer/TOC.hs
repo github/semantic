@@ -106,6 +106,9 @@ class HasDeclarationWithStrategy (strategy :: Strategy) f where
 instance HasDeclarationWithStrategy 'Default f where
   toDeclarationWithStrategy _ _ = Nothing
 
+instance HasDeclaration f => HasDeclarationWithStrategy 'Custom f where
+  toDeclarationWithStrategy _ = toDeclaration
+
 
 getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe Declaration
 getDeclaration = getField
