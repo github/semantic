@@ -93,7 +93,7 @@ data Declaration
 
 
 class HasDeclaration f where
-  toDeclaration :: Blob -> f a -> Maybe Declaration
+  toDeclaration :: Blob -> RAlgebra f t (Maybe Declaration)
 
 instance (DeclarationStrategy f ~ strategy, HasDeclarationWithStrategy strategy f) => HasDeclaration f where
   toDeclaration = toDeclarationWithStrategy (undefined :: proxy strategy)
@@ -102,7 +102,7 @@ instance (DeclarationStrategy f ~ strategy, HasDeclarationWithStrategy strategy 
 data Strategy = Default | Custom
 
 class HasDeclarationWithStrategy (strategy :: Strategy) f where
-  toDeclarationWithStrategy :: proxy strategy -> Blob -> f a -> Maybe Declaration
+  toDeclarationWithStrategy :: proxy strategy -> Blob -> RAlgebra f t (Maybe Declaration)
 
 
 type family DeclarationStrategy f where
