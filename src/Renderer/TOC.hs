@@ -92,17 +92,17 @@ data Declaration
   deriving (Eq, Generic, Show)
 
 
-class HasDeclaration f where
-  toDeclaration :: Blob -> RAlgebra f t (Maybe Declaration)
+class HasDeclaration term f where
+  toDeclaration :: Blob -> RAlgebra f term (Maybe Declaration)
 
-instance (DeclarationStrategy f ~ strategy, HasDeclarationWithStrategy strategy f) => HasDeclaration f where
+instance (DeclarationStrategy f ~ strategy, HasDeclarationWithStrategy strategy term f) => HasDeclaration term f where
   toDeclaration = toDeclarationWithStrategy (undefined :: proxy strategy)
 
 
 data Strategy = Default | Custom
 
-class HasDeclarationWithStrategy (strategy :: Strategy) f where
-  toDeclarationWithStrategy :: proxy strategy -> Blob -> RAlgebra f t (Maybe Declaration)
+class HasDeclarationWithStrategy (strategy :: Strategy) term f where
+  toDeclarationWithStrategy :: proxy strategy -> Blob -> RAlgebra f term (Maybe Declaration)
 
 
 type family DeclarationStrategy f where
@@ -114,10 +114,10 @@ type family DeclarationStrategy f where
   DeclarationStrategy a = 'Default
 
 
-instance HasDeclarationWithStrategy 'Default f where
+instance HasDeclarationWithStrategy 'Default term f where
   toDeclarationWithStrategy _ _ _ = Nothing
 
-instance HasDeclaration f => HasDeclarationWithStrategy 'Custom f where
+instance HasDeclaration term f => HasDeclarationWithStrategy 'Custom term f where
   toDeclarationWithStrategy _ = toDeclaration
 
 
