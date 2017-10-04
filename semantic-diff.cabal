@@ -76,6 +76,7 @@ library
                      , Semantic.Log
                      , Semantic.Stat
                      , Semantic.Task
+                     , Semantic.Queue
                      , Semantic.Util
                      , SemanticCmdLine
                      , SES
