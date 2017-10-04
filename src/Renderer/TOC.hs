@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, MultiParamTypeClasses, RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables #-}
+{-# LANGUAGE DataKinds, MultiParamTypeClasses, RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables, UndecidableInstances #-}
 module Renderer.TOC
 ( renderToCDiff
 , renderToCTerm
@@ -95,6 +95,8 @@ data Declaration
 class HasDeclaration f where
   toDeclaration :: f a -> Maybe Declaration
 
+instance (DeclarationStrategy f ~ strategy, HasDeclarationWithStrategy strategy f) => HasDeclaration f where
+  toDeclaration = toDeclarationWithStrategy (undefined :: proxy strategy)
 
 
 data Strategy = Default | Custom
