@@ -7,8 +7,8 @@
   (Subscript
   { (Identifier)
   ->(Identifier) }
-  {+(Symbol)+}
-  {-(Symbol)-})
+  { (Symbol)
+  ->(Symbol) })
 {+(Assignment
   {+(Subscript
     {+(Identifier)+}

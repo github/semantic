@@ -3,6 +3,6 @@
     (New
       (Call
         (Identifier)
-      {+(TextElement)+}
-      {-(TextElement)-}
+      { (TextElement)
+      ->(TextElement) }
         (Empty)))))

@@ -14,7 +14,6 @@ import Data.Syntax (makeTerm)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
-import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Markup as Markup
 import Data.Term as Term (Term(..), TermF(..), termIn, unwrap)
 import qualified Data.Text as Text
@@ -46,10 +45,6 @@ type Syntax =
    , Markup.Strong
    , Markup.Text
    , Markup.Strikethrough
-   -- NB: Diffing requires Methods, Functions, and Context in the union.
-   , Declaration.Method
-   , Declaration.Function
-   , Syntax.Context
    -- Assignment errors; cmark does not provide parse errors.
    , Syntax.Error
    , []

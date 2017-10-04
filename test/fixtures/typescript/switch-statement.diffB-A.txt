@@ -10,8 +10,8 @@
       (Pattern
         (Float)
         (
-        {+(Float)+}
-        {-(Float)-}))
+        { (Float)
+        ->(Float) }))
       (Pattern
         (Float)
         (

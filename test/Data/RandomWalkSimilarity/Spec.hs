@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 module Data.RandomWalkSimilarity.Spec where
 
+import Algorithm
 import Data.Array.IArray
 import Data.Bifunctor
 import Data.Diff
@@ -35,12 +36,12 @@ spec = parallel $ do
       \ (as, bs) -> let tas = decorate <$> (as :: [Term ListableSyntax (Record '[])])
                         tbs = decorate <$> (bs :: [Term ListableSyntax (Record '[])])
                         wrap = termIn Nil . inj
-                        diff = merge (Nil, Nil) (inj (stripDiff . diffThese <$> rws comparableByConstructor (equalTerms comparableByConstructor) tas tbs)) in
+                        diff = merge (Nil, Nil) (inj (stripDiff . diffThese <$> rws comparableTerms (equalTerms comparableTerms) tas tbs)) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (wrap (stripTerm <$> tas)), Just (wrap (stripTerm <$> tbs)))
 
     it "produces unbiased insertions within branches" $
       let (a, b) = (decorate (termIn Nil (inj [ termIn Nil (inj (Syntax.Identifier "a")) ])), decorate (termIn Nil (inj [ termIn Nil (inj (Syntax.Identifier "b")) ]))) in
-      fmap (bimap stripTerm stripTerm) (rws comparableByConstructor (equalTerms comparableByConstructor) [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ That a, These b b ]
+      fmap (bimap stripTerm stripTerm) (rws comparableTerms (equalTerms comparableTerms) [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ That a, These b b ]
 
   where decorate = defaultFeatureVectorDecorator constructorNameAndConstantFields
 
