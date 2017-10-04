@@ -11,8 +11,8 @@ data AsyncQ a b
   , extra :: b
   }
 
-newQueue :: b -> (b -> TMQueue a -> IO ()) -> IO (AsyncQ a b)
-newQueue b f = do
+newQueue :: (b -> TMQueue a -> IO ()) -> b-> IO (AsyncQ a b)
+newQueue f b = do
   q <- newTMQueueIO
   sink <- Async.async (f b q)
   pure (AsyncQ q sink b)

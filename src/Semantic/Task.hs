@@ -104,11 +104,11 @@ readBlobPairs from = ReadBlobPairs from `Then` return
 writeToOutput :: Either Handle FilePath -> B.ByteString -> Task ()
 writeToOutput path contents = WriteToOutput path contents `Then` return
 
-
 -- | A 'Task' which logs a message at a specific log level to stderr.
 writeLog :: Level -> String -> [(String, String)] -> Task ()
 writeLog level message pairs = WriteLog level message pairs `Then` return
 
+-- | A 'Task' which writes a stat.
 writeStat :: Stat -> Task ()
 writeStat stat = WriteStat stat `Then` return
 
@@ -160,18 +160,15 @@ runTask = runTaskWithOptions defaultOptions
 runTaskWithOptions :: Options -> Task a -> IO a
 runTaskWithOptions options task = do
   options <- configureOptionsForHandle stderr options
-  -- client <- dogStatsdClient "statsd://127.0.0.1:8125/semantic"
-  client <- statsClient "127.0.0.1" 8125
-  statter <- newQueue client statSink
-  logger <- newQueue options logSink
+  statter <- defaultStatsClient >>= newQueue statSink
+  logger <- newQueue logSink options
 
   result <- run options logger statter task
 
   closeQueue statter
   closeQueue logger
   either (die . displayException) pure result
-
-  where run :: Options -> AsyncQ Message Options -> AsyncQ Stat UdpClient -> Task a -> IO (Either SomeException a)
+  where run :: Options -> AsyncQ Message Options -> AsyncQ Stat StatClient -> Task a -> IO (Either SomeException a)
         run options logger statter = go
           where go :: Task a -> IO (Either SomeException a)
                 go = iterFreerA (\ task yield -> case task of

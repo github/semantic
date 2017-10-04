@@ -103,6 +103,7 @@ library
                      , MonadRandom
                      , mtl
                      , network
+                     , network-uri
                      , optparse-applicative
                      , parallel
                      , parsers
