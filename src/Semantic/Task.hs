@@ -62,6 +62,7 @@ import Semantic.Log
 import Semantic.Stat as Stat
 import Semantic.Queue
 
+
 data TaskF output where
   ReadBlobs :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
   ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [Both Blob]
@@ -159,15 +160,18 @@ runTask = runTaskWithOptions defaultOptions
 runTaskWithOptions :: Options -> Task a -> IO a
 runTaskWithOptions options task = do
   options <- configureOptionsForHandle stderr options
+  -- client <- dogStatsdClient "statsd://127.0.0.1:8125/semantic"
+  client <- statsClient "127.0.0.1" 8125
+  statter <- newQueue client statSink
   logger <- newQueue options logSink
-  statter <- newQueue () statSink
 
   result <- run options logger statter task
 
-  closeQueue logger
   closeQueue statter
+  closeQueue logger
   either (die . displayException) pure result
-  where run :: Options -> AsyncQ Message Options -> AsyncQ Stat () -> Task a -> IO (Either SomeException a)
+
+  where run :: Options -> AsyncQ Message Options -> AsyncQ Stat UdpClient -> Task a -> IO (Either SomeException a)
         run options logger statter = go
           where go :: Task a -> IO (Either SomeException a)
                 go = iterFreerA (\ task yield -> case task of
@@ -204,10 +208,11 @@ runParser Options{..} blob@Blob{..} = go
               liftIO ((Right <$> parseToAST language blob) `catchError` (pure . Left . toException)) >>= either throwError pure
           AssignmentParser parser assignment -> do
             ast <- go parser `catchError` \ err -> do
-              writeStat (Stat.increment "semantic.parse.errors" languageTag)
+              writeStat (Stat.increment "parse.errors" languageTag)
               writeLog Error "failed parsing" (("tag", "parse") : blobFields) >> throwError err
             logTiming "assign" $ case Assignment.assign blobSource assignment ast of
               Left err -> do
+                writeStat (Stat.increment "assign.errors" languageTag)
                 let formatted = Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err
                 writeLog Error formatted (("tag", "assign") : blobFields)
                 throwError (toException err)

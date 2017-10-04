@@ -102,6 +102,7 @@ library
                      , mersenne-random-pure64
                      , MonadRandom
                      , mtl
+                     , network
                      , optparse-applicative
                      , parallel
                      , parsers
