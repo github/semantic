@@ -92,10 +92,10 @@ data Declaration
   deriving (Eq, Generic, Show)
 
 
-class HasDeclaration term f where
-  toDeclaration :: Blob -> RAlgebra f term (Maybe Declaration)
+class HasDeclaration term syntax where
+  toDeclaration :: Blob -> RAlgebra syntax term (Maybe Declaration)
 
-instance (DeclarationStrategy f ~ strategy, HasDeclarationWithStrategy strategy term f) => HasDeclaration term f where
+instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy strategy term syntax) => HasDeclaration term syntax where
   toDeclaration = toDeclarationWithStrategy (undefined :: proxy strategy)
 
 instance (Apply Foldable fs, HasField fields Range) => HasDeclaration (Term (Union fs) (Record fields)) Markup.Section where
@@ -107,19 +107,19 @@ instance (Apply Foldable fs, HasField fields Range) => HasDeclaration (Term (Uni
 
 data Strategy = Default | Custom
 
-class HasDeclarationWithStrategy (strategy :: Strategy) term f where
-  toDeclarationWithStrategy :: proxy strategy -> Blob -> RAlgebra f term (Maybe Declaration)
+class HasDeclarationWithStrategy (strategy :: Strategy) term syntax where
+  toDeclarationWithStrategy :: proxy strategy -> Blob -> RAlgebra syntax term (Maybe Declaration)
 
 
-type family DeclarationStrategy f where
+type family DeclarationStrategy syntax where
   DeclarationStrategy Markup.Section = 'Custom
   DeclarationStrategy a = 'Default
 
 
-instance HasDeclarationWithStrategy 'Default term f where
+instance HasDeclarationWithStrategy 'Default term syntax where
   toDeclarationWithStrategy _ _ _ = Nothing
 
-instance HasDeclaration term f => HasDeclarationWithStrategy 'Custom term f where
+instance HasDeclaration term syntax => HasDeclarationWithStrategy 'Custom term syntax where
   toDeclarationWithStrategy _ = toDeclaration
 
 
