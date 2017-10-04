@@ -808,8 +808,8 @@ identifier :: Assignment
 identifier = (makeTerm <$> symbol Identifier' <*> (Syntax.Identifier <$> source)) <|> (makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source))
 
 class' :: Assignment
-class' = makeClass <$> symbol Class <*> children ((,,,) <$> identifier <*> ((symbol TypeParameters *> children (many (term typeParameter'))) <|> pure []) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
-  where makeClass loc (expression, typeParams, classHeritage, statements) = makeTerm loc (Declaration.Class typeParams expression classHeritage statements)
+class' = makeClass <$> symbol Class <*> children ((,,,,) <$> many (term decorator) <*> identifier <*> ((symbol TypeParameters *> children (many (term typeParameter'))) <|> pure []) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
+  where makeClass loc (decorators, expression, typeParams, classHeritage, statements) = makeTerm loc (Declaration.Class (decorators ++ typeParams) expression classHeritage statements)
 
 object :: Assignment
 object = (makeTerm <$> (symbol Object <|> symbol ObjectPattern) <*> children (Literal.Hash <$> many (term ((pair <|> spreadElement <|> methodDefinition <|> assignmentPattern <|> shorthandPropertyIdentifier)))))
@@ -886,7 +886,7 @@ methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> chi
   where makeMethodSignature loc (modifier, readonly, propertyName, (typeParams, params, annotation)) = makeTerm loc (Language.TypeScript.Syntax.MethodSignature [modifier, readonly, typeParams, annotation] propertyName params)
 
 formalParameters :: HasCallStack => Assignment.Assignment [] Grammar [Term]
-formalParameters = symbol FormalParameters *> children ((++) <$> many (term decorator) <*> many (term parameter))
+formalParameters = symbol FormalParameters *> children (concat <$> many ((\as b -> as ++ [b]) <$> many (term decorator) <*> term parameter))
 
 decorator :: Assignment
 decorator = makeTerm <$> symbol Grammar.Decorator <*> children (Language.TypeScript.Syntax.Decorator <$> (identifier <|> memberExpression <|> callExpression))
@@ -984,7 +984,7 @@ statementBlock :: Assignment
 statementBlock = makeTerm <$> symbol StatementBlock <*> children (many statement)
 
 classBodyStatements :: HasCallStack => Assignment.Assignment [] Grammar [Term]
-classBodyStatements = symbol ClassBody *> children (many (term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature)))
+classBodyStatements = symbol ClassBody *> children (concat <$> many ((\as b -> as ++ [b]) <$> many (term decorator) <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature)))
 
 publicFieldDefinition :: Assignment
 publicFieldDefinition = makeField <$> symbol Grammar.PublicFieldDefinition <*> children ((,,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (readonly' <|> emptyTerm) <*> propertyName <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
@@ -1104,7 +1104,7 @@ ambientDeclaration :: Assignment
 ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> children (Language.TypeScript.Syntax.AmbientDeclaration <$> choice [declaration, statementBlock])
 
 exportStatement :: Assignment
-exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (Language.TypeScript.Syntax.Export <$> (((\a b -> [a, b]) <$> exportClause <*> fromClause) <|> ((++) <$> many decorator <*> (pure <$> (fromClause <|> exportClause <|> declaration <|> expression <|> identifier <|> importAlias')))))
+exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (Language.TypeScript.Syntax.Export <$> (((\a b -> [a, b]) <$> exportClause <*> fromClause) <|> ((++) <$> many (term decorator) <*> (pure <$> (fromClause <|> exportClause <|> declaration <|> expression <|> identifier <|> importAlias')))))
 
 fromClause :: Assignment
 fromClause = string
