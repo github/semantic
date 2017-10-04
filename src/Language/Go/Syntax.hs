@@ -254,7 +254,7 @@ expressionList = symbol ExpressionList *> children expressions
 
 functionDeclaration :: Assignment
 functionDeclaration = mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> expression <*> parameters <*> (expression <|> emptyTerm) <*> block)
-  where mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Function [] name' params' block')) types')
+  where mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Declaration.Function [types'] name' params' block')
         parameters = symbol Parameters *> children (many expression)
 
 importDeclaration :: Assignment
@@ -264,10 +264,10 @@ importSpec :: Assignment
 importSpec = symbol ImportSpec *> children expressions
 
 methodDeclaration :: Assignment
-methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> children ((,,,,) <$> receiver <*> identifier <*> parameters <*> expression <*> block)
-  where parameters = symbol Parameters *> children (symbol ParameterDeclaration *> children (many typedIdentifier))
-        receiver = symbol Parameters *> children (symbol ParameterDeclaration *> children typedIdentifier)
-        mkTypedMethodDeclaration loc (receiver', name', parameters', type'', body') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Method [] receiver' name' parameters' body')) type'')
+methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> children ((,,,,) <$> receiver <*> fieldIdentifier <*> parameters <*> typeIdentifier <*> block)
+  where parameters = symbol Parameters *> children (symbol ParameterDeclaration *> children (many expression))
+        receiver = symbol Parameters *> children (symbol ParameterDeclaration *> children expressions)
+        mkTypedMethodDeclaration loc (receiver', name', parameters', type'', body') = makeTerm loc (Declaration.Method [type''] receiver' name' parameters' body')
 
 methodSpec :: Assignment
 methodSpec =  mkMethodSpec <$> symbol MethodSpec <*> children ((,,,,) <$> empty <*> identifier <*> parameters <*> (expression <|> parameters <|> emptyTerm) <*> empty)
