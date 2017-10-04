@@ -103,6 +103,10 @@ class HasDeclarationWithStrategy (strategy :: Strategy) f where
   toDeclarationWithStrategy :: proxy strategy -> f a -> Maybe Declaration
 
 
+instance HasDeclarationWithStrategy 'Default f where
+  toDeclarationWithStrategy _ _ = Nothing
+
+
 getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe Declaration
 getDeclaration = getField
 
