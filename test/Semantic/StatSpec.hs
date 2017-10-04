@@ -6,12 +6,6 @@ import Test.Hspec.Expectations.Pretty
 import System.Environment
 import Control.Exception
 
-setup :: String -> String -> IO ()
-setup = setEnv
-
-teardown :: String -> () -> IO ()
-teardown key _ = unsetEnv key
-
 withEnvironment :: String -> String -> (() -> IO ()) -> IO ()
 withEnvironment key value = bracket (setEnv key value) (const (unsetEnv key))
 
