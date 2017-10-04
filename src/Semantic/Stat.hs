@@ -32,7 +32,6 @@ import Network.URI
 import qualified Data.ByteString.Char8 as B
 import System.Environment
 import System.IO.Error
-import System.IO
 
 import Semantic.Queue
 
@@ -102,7 +101,6 @@ defaultStatsClient = do
   kubesHost <- lookupEnv "DOGSTATSD_HOST"
   let host = fromMaybe host' kubesHost
 
-  hPutStrLn stderr (host <> ":" <> port)
   statsClient host port "semantic"
   where
     defaultHostPort = ("127.0.0.1", "28125")
