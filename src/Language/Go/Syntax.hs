@@ -80,6 +80,7 @@ expressionChoices =
   , constVarSpecification
   , expressionList
   , fieldDeclaration
+  , fieldIdentifier
   , functionDeclaration
   , functionType
   , identifier
@@ -92,7 +93,9 @@ expressionChoices =
   , methodDeclaration
   , methodSpec
   , packageClause
+  , packageIdentifier
   , parameterDeclaration
+  , parenthesizedType
   , pointerType
   , rawStringLiteral
   , sliceType
@@ -124,21 +127,17 @@ rawStringLiteral = makeTerm <$> symbol RawStringLiteral <*> (Literal.TextElement
 typeIdentifier :: Assignment
 typeIdentifier = makeTerm <$> symbol TypeIdentifier <*> (Syntax.Identifier <$> source)
 
--- TODO: Combine with Type Literals
-typedIdentifier :: Assignment
-typedIdentifier =  mkTypedIdentifier <$> symbol Identifier <*> source <*> types <*> source
-  where
-    mkTypedIdentifier loc' identifier' loc'' identifier'' = makeTerm loc' (Type.Annotation (makeTerm loc' (Syntax.Identifier identifier')) (makeTerm loc'' (Syntax.Identifier identifier'')))
-    types = symbol ParenthesizedType
-         <|> symbol SliceType
-
 identifier :: Assignment
-identifier =
-      mk FieldIdentifier
-  <|> mk Identifier
-  <|> mk PackageIdentifier
-  <|> mk ParenthesizedType
-  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
+identifier =  makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
+
+fieldIdentifier :: Assignment
+fieldIdentifier = makeTerm <$> symbol FieldIdentifier <*> (Syntax.Identifier <$> source)
+
+packageIdentifier :: Assignment
+packageIdentifier = makeTerm <$> symbol PackageIdentifier <*> (Syntax.Identifier <$> source)
+
+parenthesizedType :: Assignment
+parenthesizedType = makeTerm <$> symbol ParenthesizedType <*> (Syntax.Identifier <$> source)
 
 interpretedStringLiteral :: Assignment
 interpretedStringLiteral = makeTerm <$> symbol InterpretedStringLiteral <*> (Literal.TextElement <$> source)
