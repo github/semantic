@@ -62,9 +62,9 @@ type family ApplyAll (typeclasses :: [(* -> *) -> Constraint]) (functors :: [* -
 data SomeParser typeclasses where
   SomeParser :: ApplyAll typeclasses fs => { unSomeParser :: Parser (Term (Union fs) (Record Location)) } -> SomeParser typeclasses
 
--- | Construct a 'SomeParser' given a proxy for a list of typeclasses, all of which must be satisfied by all of the types in the syntaxes of our supported languages.
+-- | Construct a 'SomeParser' given a proxy for a list of typeclasses and the 'Language' to be parsed, all of which must be satisfied by all of the types in the syntaxes of our supported languages.
 --
---   > case someParser (Proxy :: Proxy '[Show1]) of { Just parser -> runTask (parse parser blob) >>= putStrLn . show ; _ -> return () }
+--   > case someParser (Proxy :: Proxy '[Show1]) (blobLanguage language) of { Just parser -> runTask (parse parser blob) >>= putStrLn . show ; _ -> return () }
 someParser :: (ApplyAll typeclasses JSON.Syntax, ApplyAll typeclasses Markdown.Syntax, ApplyAll typeclasses Python.Syntax, ApplyAll typeclasses Ruby.Syntax, ApplyAll typeclasses TypeScript.Syntax) => proxy typeclasses -> Language -> Maybe (SomeParser typeclasses)
 someParser _ Go         = Nothing
 someParser _ JavaScript = Just (SomeParser typescriptParser)
