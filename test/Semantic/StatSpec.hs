@@ -46,9 +46,9 @@ spec = do
     describe "counters" $ do
       it "renders increment" $
         renderDatagram "" (increment key []) `shouldBe` "app.metric:1|c"
-      it "renders deccrement" $
+      it "renders decrement" $
         renderDatagram "" (decrement key []) `shouldBe` "app.metric:-1|c"
-      it "renders counter" $
+      it "renders count" $
         renderDatagram "" (count key 8 []) `shouldBe` "app.metric:8|c"
 
     it "renders namespace" $
