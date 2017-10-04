@@ -15,7 +15,10 @@ module Semantic.Stat
 
 -- Client
 , defaultStatsClient
-, StatClient
+, StatsClient(..)
+
+-- Internal
+, renderDatagram
 ) where
 
 
@@ -81,10 +84,12 @@ histogram n v = Stat n (Histogram v)
 set :: String -> Double -> Tags -> Stat
 set n v = Stat n (Set v)
 
-data StatClient
-  = StatClient
+data StatsClient
+  = StatsClient
   { udpSocket :: Socket
   , namespace :: String
+  , udpHost :: String
+  , udpPort :: String
   }
 
 -- Create a default stats client. This function consults two optional
@@ -92,10 +97,10 @@ data StatClient
 --   * STATS_ADDR     - String URI to send stats to in the form of `host:port`.
 --   * DOGSTATSD_HOST - String hostname which will override the above host.
 --                      Generally used on kubes pods.
-defaultStatsClient :: IO StatClient
+defaultStatsClient :: IO StatsClient
 defaultStatsClient = do
   addr <- lookupEnv "STATS_ADDR"
-  let (host', port) = maybe defaultHostPort parseAddr addr
+  let (host', port) = maybe defaultHostPort parseAddr (fmap ("statsd://" <>) addr)
 
   -- When running in Kubes, DOGSTATSD_HOST is set with the dogstatsd host.
   kubesHost <- lookupEnv "DOGSTATSD_HOST"
@@ -105,32 +110,28 @@ defaultStatsClient = do
   where
     defaultHostPort = ("127.0.0.1", "28125")
     parseAddr = maybe defaultHostPort parseAuthority . parseURI
-    parseAuthority = maybe defaultHostPort (uriRegName &&& uriPort) . uriAuthority
+    parseAuthority = maybe defaultHostPort (uriRegName &&& (drop 1 . uriPort)) . uriAuthority
 
 
 -- Create a StatsClient at the specified host and port with a namespace prefix.
-statsClient :: String -> String -> String -> IO StatClient
+statsClient :: String -> String -> String -> IO StatsClient
 statsClient host port namespace = do
   (addr:_) <- getAddrInfo Nothing (Just host) (Just port)
   sock <- socket (addrFamily addr) Datagram defaultProtocol
   connect sock (addrAddress addr)
-  pure (StatClient sock namespace)
+  pure (StatsClient sock namespace host port)
 
--- Send a stat over the StatClient's socket.
-sendStats :: StatClient -> Stat -> IO ()
-sendStats StatClient{..} = void . tryIOError . sendAll udpSocket . B.pack . datagram
-  where datagram stat = renderString prefix (renders stat "")
-        prefix | null namespace = ""
-               | otherwise = namespace <> "."
-
+-- Send a stat over the StatsClient's socket.
+sendStats :: StatsClient -> Stat -> IO ()
+sendStats StatsClient{..} = void . tryIOError . sendAll udpSocket . B.pack . renderDatagram namespace
 
 -- Queue a stat to be sent.
-queueStat :: AsyncQ Stat StatClient -> Stat -> IO ()
+queueStat :: AsyncQ Stat StatsClient -> Stat -> IO ()
 queueStat AsyncQ{..} = atomically . writeTMQueue queue
 
 -- Drains stat messages from the queue and sends those stats over the configured
 -- UDP socket. Intended to be run in a dedicated thread.
-statSink :: StatClient -> TMQueue Stat -> IO ()
+statSink :: StatsClient -> TMQueue Stat -> IO ()
 statSink client q = do
   stat <- atomically (readTMQueue q)
   maybe (pure ()) send stat
@@ -147,22 +148,27 @@ class Render a where
 renderString :: String -> RenderS
 renderString = (<>)
 
+-- Render a Stat (with namespace prefix) to a datagram String.
+renderDatagram :: String -> Stat -> String
+renderDatagram namespace stat = renderString prefix (renders stat "")
+  where prefix | null namespace = ""
+               | otherwise = namespace <> "."
 
 -- Instances
 
 instance Render Stat where
   renders Stat{..}
     = renderString name
-    . renderString "|"
+    . renderString ":"
     . renders value
     . renders tags
 
 instance Render Metric where
-  renders (Counter x)   = renderString "c|"  . renders x
-  renders (Gauge x)     = renderString "g|"  . renders x
-  renders (Histogram x) = renderString "h|"  . renders x
-  renders (Set x)       = renderString "s|"  . renders x
-  renders (Timer x)     = renderString "ms|" . renders x
+  renders (Counter x)   = renders x . renderString "|c"
+  renders (Gauge x)     = renders x . renderString "|g"
+  renders (Histogram x) = renders x . renderString "|h"
+  renders (Set x)       = renders x . renderString "|s"
+  renders (Timer x)     = renders x . renderString "|ms"
 
 instance Render Tags where
   renders [] = renderString ""

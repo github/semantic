@@ -165,7 +165,7 @@ runTaskWithOptions options task = do
   closeQueue statter
   closeQueue logger
   either (die . displayException) pure result
-  where run :: Options -> AsyncQ Message Options -> AsyncQ Stat StatClient -> Task a -> IO (Either SomeException a)
+  where run :: Options -> AsyncQ Message Options -> AsyncQ Stat StatsClient -> Task a -> IO (Either SomeException a)
         run options logger statter = go
           where go :: Task a -> IO (Either SomeException a)
                 go = iterFreerA (\ task yield -> case task of
