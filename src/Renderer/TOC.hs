@@ -99,8 +99,8 @@ instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy stra
   toDeclaration = toDeclarationWithStrategy (undefined :: proxy strategy)
 
 instance (Apply Foldable fs, HasField fields Range) => HasDeclaration (Term (Union fs) (Record fields)) Markup.Section where
-  toDeclaration Blob{..} (Markup.Section level (Term (In headingAnn headingF), _) _) =
-      Just $ SectionDeclaration (maybe (getSource (byteRange headingAnn)) (getSource . sconcat) (nonEmpty (byteRange . termAnnotation . unTerm <$> toList headingF))) level
+  toDeclaration Blob{..} (Markup.Section level (Term (In headingAnn headingF), _) _)
+    = Just $ SectionDeclaration (maybe (getSource (byteRange headingAnn)) (getSource . sconcat) (nonEmpty (byteRange . termAnnotation . unTerm <$> toList headingF))) level
     where getSource = firstLine . toText . flip Source.slice blobSource
           firstLine = T.takeWhile (/= '\n')
 
