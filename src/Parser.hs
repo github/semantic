@@ -56,6 +56,9 @@ type family ApplyAll (typeclasses :: [(* -> *) -> Constraint]) (functors :: [* -
   ApplyAll (typeclass ': typeclasses) functors = (Apply typeclass functors, ApplyAll typeclasses functors)
   ApplyAll '[] functors = ()
 
+-- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
+--
+--   This enables us to abstract over the details of the specific syntax types in cases where we can describe all the requirements on the syntax with a list of typeclasses.
 data SomeParser typeclasses where
   SomeParser :: ApplyAll typeclasses fs => { unSomeParser :: Parser (Term (Union fs) (Record Location)) } -> SomeParser typeclasses
 
