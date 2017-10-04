@@ -16,6 +16,7 @@ import System.Posix.Types
 import Text.Printf
 import GHC.Conc
 import System.IO
+import Semantic.Queue
 
 
 -- | A log message at a specific level.
@@ -30,9 +31,9 @@ data Level
   deriving (Eq, Ord, Show)
 
 
-queueLogMessage :: Options -> TMQueue Message -> Level -> String -> [(String, String)] -> IO ()
-queueLogMessage options q level message pairs
-  | Just logLevel <- optionsLevel options, level <= logLevel = Time.getCurrentTime >>= LocalTime.utcToLocalZonedTime >>= atomically . writeTMQueue q . Message level message pairs
+queueLogMessage :: AsyncQ Message Options -> Level -> String -> [(String, String)] -> IO ()
+queueLogMessage AsyncQ{..} level message pairs
+  | Just logLevel <- optionsLevel extra, level <= logLevel = Time.getCurrentTime >>= LocalTime.utcToLocalZonedTime >>= atomically . writeTMQueue queue . Message level message pairs
   | otherwise = pure ()
 
 logSink :: Options -> TMQueue Message -> IO ()

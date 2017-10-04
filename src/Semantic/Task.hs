@@ -159,28 +159,28 @@ runTask = runTaskWithOptions defaultOptions
 runTaskWithOptions :: Options -> Task a -> IO a
 runTaskWithOptions options task = do
   options <- configureOptionsForHandle stderr options
-  (logQ, logging) <- newQueue (logSink options)
-  (statQ, statting) <- newQueue statSink
+  logger <- newQueue options logSink
+  statter <- newQueue () statSink
 
-  result <- run options logQ statQ task
+  result <- run options logger statter task
 
-  closeQueue logQ logging
-  closeQueue statQ statting
+  closeQueue logger
+  closeQueue statter
   either (die . displayException) pure result
-  where run :: Options -> TMQueue Message -> TMQueue Stat -> Task a -> IO (Either SomeException a)
-        run options logQ statQ = go
+  where run :: Options -> AsyncQ Message Options -> AsyncQ Stat () -> Task a -> IO (Either SomeException a)
+        run options logger statter = go
           where go :: Task a -> IO (Either SomeException a)
                 go = iterFreerA (\ task yield -> case task of
                   ReadBlobs source -> (either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield) `catchError` (pure . Left . toException)
                   ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left . toException)
                   WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
-                  WriteLog level message pairs -> queueLogMessage options logQ level message pairs >>= yield
-                  WriteStat stat -> queueStat statQ stat >>= yield
+                  WriteLog level message pairs -> queueLogMessage logger level message pairs >>= yield
+                  WriteStat stat -> queueStat statter stat >>= yield
                   Time message pairs task -> do
                     start <- Time.getCurrentTime
                     !res <- go task
                     end <- Time.getCurrentTime
-                    queueLogMessage options logQ Info message (pairs <> [("duration", show (Time.diffUTCTime end start))])
+                    queueLogMessage logger Info message (pairs <> [("duration", show (Time.diffUTCTime end start))])
                     either (pure . Left) yield res
                   Parse parser blob -> go (runParser options blob parser) >>= either (pure . Left) yield
                   Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield

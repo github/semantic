@@ -1,17 +1,23 @@
 module Semantic.Queue where
 
 import Control.Concurrent.STM.TMQueue
-import qualified Control.Concurrent.Async as Async
+import Control.Concurrent.Async as Async
 import GHC.Conc
 
+data AsyncQ a b
+  = AsyncQ
+  { queue :: TMQueue a
+  , sink :: Async ()
+  , extra :: b
+  }
 
-newQueue :: (TMQueue a -> IO ()) -> IO (TMQueue a, Async.Async ())
-newQueue f = do
+newQueue :: b -> (b -> TMQueue a -> IO ()) -> IO (AsyncQ a b)
+newQueue b f = do
   q <- newTMQueueIO
-  sink <- Async.async (f q)
-  pure (q, sink)
+  sink <- Async.async (f b q)
+  pure (AsyncQ q sink b)
 
-closeQueue :: TMQueue a -> Async.Async () -> IO ()
-closeQueue q sink = do
-  atomically (closeTMQueue q)
+closeQueue :: AsyncQ a b -> IO ()
+closeQueue AsyncQ{..} = do
+  atomically (closeTMQueue queue)
   Async.wait sink
