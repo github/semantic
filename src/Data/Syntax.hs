@@ -168,7 +168,9 @@ data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Diffable Context where
-  subalgorithmFor blur focus (Context n1 s1) = Context <$> traverse blur n1 <*> focus s1
+  subalgorithmFor blur focus (Context n s) = Context <$> traverse blur n <*> focus s
+
+  equivalentBySubterm = Just . contextSubject
 
 instance Eq1 Context where liftEq = genericLiftEq
 instance Ord1 Context where liftCompare = genericLiftCompare

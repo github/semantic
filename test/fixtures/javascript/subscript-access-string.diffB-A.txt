@@ -1,5 +1,5 @@
 (Program
   (Subscript
     (Identifier)
-  {+(TextElement)+}
-  {-(TextElement)-}))
+  { (TextElement)
+  ->(TextElement) }))

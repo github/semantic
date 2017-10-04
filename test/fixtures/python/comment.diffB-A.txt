@@ -2,6 +2,6 @@
   (Context
   {-(Comment)-}
     (Comment)
-  {+(Comment)+}
-  {-(Comment)-}
+  { (Comment)
+  ->(Comment) }
     (Empty)))

@@ -4,8 +4,8 @@
     (
       (Pattern
         (
-        {+(Identifier)+}
-        {-(Identifier)-})
+        { (Identifier)
+        ->(Identifier) })
         (
         {+(Pattern
           {+(

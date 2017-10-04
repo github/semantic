@@ -83,8 +83,8 @@
       {+(Identifier)+}
       {+(Empty)+})+}))
   (Export
-  {+(Identifier)+}
-  {-(Identifier)-})
+  { (Identifier)
+  ->(Identifier) })
 {+(Export
   {+(Function
     {+(Empty)+}

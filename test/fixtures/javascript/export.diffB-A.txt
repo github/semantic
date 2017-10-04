@@ -81,8 +81,8 @@
       {-(Identifier)-}
       {-(Empty)-})-}))
   (Export
-  {+(Identifier)+}
-  {-(Identifier)-})
+  { (Identifier)
+  ->(Identifier) })
 {-(Export
   {-(Function
     {-(Empty)-}
@@ -111,8 +111,8 @@
       {+(Identifier)+}
       {+(Identifier)+})+})+})+}
   (Export
-  {+(TextElement)+}
-  {-(TextElement)-})
+  { (TextElement)
+  ->(TextElement) })
   (Export
     (ExportClause
       (ImportExportSpecifier
@@ -131,8 +131,8 @@
     {-(ImportExportSpecifier
       {-(Identifier)-}
       {-(Empty)-})-})
-  {+(TextElement)+}
-  {-(TextElement)-})
+  { (TextElement)
+  ->(TextElement) })
 {+(Export
   {+(ExportClause
     {+(ImportExportSpecifier

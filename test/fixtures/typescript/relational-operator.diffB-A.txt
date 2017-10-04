@@ -1,7 +1,7 @@
 (Program
-{+(LessThan
-  {+(Identifier)+}
-  {+(Identifier)+})+}
-{-(LessThanEqual
+{ (LessThanEqual
   {-(Identifier)-}
-  {-(Identifier)-})-})
+  {-(Identifier)-})
+->(LessThan
+  {+(Identifier)+}
+  {+(Identifier)+}) })
