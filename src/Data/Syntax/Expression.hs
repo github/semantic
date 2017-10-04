@@ -66,6 +66,14 @@ instance Eq1 Delete where liftEq = genericLiftEq
 instance Ord1 Delete where liftCompare = genericLiftCompare
 instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
 
+-- | A sequence expression such as Javascript or C's comma operator.
+data SequenceExpression a = SequenceExpression { _firstExpression :: !a, _secondExpression :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 SequenceExpression where liftEq = genericLiftEq
+instance Ord1 SequenceExpression where liftCompare = genericLiftCompare
+instance Show1 SequenceExpression where liftShowsPrec = genericLiftShowsPrec
+
 -- | Javascript void operator
 newtype Void a = Void a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -139,3 +147,35 @@ data ScopeResolution a
 instance Eq1 ScopeResolution where liftEq = genericLiftEq
 instance Ord1 ScopeResolution where liftCompare = genericLiftCompare
 instance Show1 ScopeResolution where liftShowsPrec = genericLiftShowsPrec
+
+-- | A non-null expression such as Typescript or Swift's ! expression.
+newtype NonNullExpression a = NonNullExpression { nonNullExpression :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 NonNullExpression where liftEq = genericLiftEq
+instance Ord1 NonNullExpression where liftCompare = genericLiftCompare
+instance Show1 NonNullExpression where liftShowsPrec = genericLiftShowsPrec
+
+-- | An await expression in Javascript or C#.
+newtype Await a = Await { awaitSubject :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Await where liftEq = genericLiftEq
+instance Ord1 Await where liftCompare = genericLiftCompare
+instance Show1 Await where liftShowsPrec = genericLiftShowsPrec
+
+-- | An object constructor call in Javascript, Java, etc.
+newtype New a = New { newSubject :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 New where liftEq = genericLiftEq
+instance Ord1 New where liftCompare = genericLiftCompare
+instance Show1 New where liftShowsPrec = genericLiftShowsPrec
+
+-- | A cast expression to a specified type.
+data Cast a =  Cast { castSubject :: !a, castType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Cast where liftEq = genericLiftEq
+instance Ord1 Cast where liftCompare = genericLiftCompare
+instance Show1 Cast where liftShowsPrec = genericLiftShowsPrec
