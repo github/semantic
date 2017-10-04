@@ -61,7 +61,6 @@ library
                      , Language.TypeScript
                      , Language.TypeScript.Grammar
                      , Language.TypeScript.Syntax
-                     , Language.Python
                      , Language.Python.Grammar
                      , Language.Python.Syntax
                      , Parser
