@@ -91,6 +91,11 @@ data Declaration
   | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationLanguage :: Maybe Language }
   deriving (Eq, Generic, Show)
 
+
+class HasDeclaration f where
+  toDeclaration :: f a -> Maybe Declaration
+
+
 getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe Declaration
 getDeclaration = getField
 
