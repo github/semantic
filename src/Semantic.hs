@@ -105,7 +105,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
 
   (SExpressionDiffRenderer, lang)
     | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Diffable, Eq1, Foldable, Functor, GAlign, Show1, Traversable]) ->
-      run (decorate constructorLabel <=< parse parser) diffTerms (renderSExpressionDiff . bimap keepConstructorLabel keepConstructorLabel)
+      run (decorate constructorLabel <=< parse parser) diffTerms (renderSExpressionDiff . bimap (const Nil) (const Nil))
     | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
       run (parse syntaxParser) diffSyntaxTerms (renderSExpressionDiff . bimap keepCategory keepCategory)
 
@@ -134,6 +134,3 @@ diffTermPair blobs differ t1 t2 = case runJoin (blobExists <$> blobs) of
 
 keepCategory :: HasField fields Category => Record fields -> Record '[Category]
 keepCategory = (:. Nil) . category
-
-keepConstructorLabel :: Record (ConstructorLabel ': fields) -> Record '[ConstructorLabel]
-keepConstructorLabel = (:. Nil) . rhead
