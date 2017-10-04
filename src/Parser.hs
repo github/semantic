@@ -64,6 +64,8 @@ data SomeParser typeclasses where
 
 -- | Construct a 'SomeParser' given a proxy for a list of typeclasses and the 'Language' to be parsed, all of which must be satisfied by all of the types in the syntaxes of our supported languages.
 --
+--   This can be used to perform operations uniformly over terms produced by blobs with different 'Language's, and which therefore have different types in general. For example, given some 'Blob', we can parse and 'show' the parsed & assigned 'Term' like so:
+--
 --   > case someParser (Proxy :: Proxy '[Show1]) (blobLanguage language) of { Just parser -> runTask (parse parser blob) >>= putStrLn . show ; _ -> return () }
 someParser :: (ApplyAll typeclasses JSON.Syntax, ApplyAll typeclasses Markdown.Syntax, ApplyAll typeclasses Python.Syntax, ApplyAll typeclasses Ruby.Syntax, ApplyAll typeclasses TypeScript.Syntax) => proxy typeclasses -> Language -> Maybe (SomeParser typeclasses)
 someParser _ Go         = Nothing
