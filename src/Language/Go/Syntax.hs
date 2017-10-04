@@ -42,6 +42,7 @@ type Syntax =
    , Literal.TextElement
    , Statement.Assignment
    , Statement.Break
+   , Statement.Return
    , Syntax.Context
    , Syntax.Error
    , Syntax.Empty
@@ -98,6 +99,7 @@ expressionChoices =
   , parenthesizedType
   , pointerType
   , rawStringLiteral
+  , returnStatement
   , sliceType
   , structType
   , typeDeclaration
@@ -288,6 +290,9 @@ breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Brea
 
 labelName :: Assignment
 labelName = makeTerm <$> symbol LabelName <*> (Syntax.Identifier <$> source)
+
+returnStatement :: Assignment
+returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (expression <|> emptyTerm))
 
 -- Helpers
 
