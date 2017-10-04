@@ -1,7 +1,7 @@
 module Semantic.Queue where
 
-import Control.Concurrent.STM.TMQueue
 import Control.Concurrent.Async as Async
+import Control.Concurrent.STM.TMQueue
 import GHC.Conc
 
 data AsyncQ a b

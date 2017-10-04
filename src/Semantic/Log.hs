@@ -6,16 +6,16 @@ import Data.Error (withSGRCode)
 import Data.Foldable (toList)
 import Data.List (intersperse)
 import Data.Semigroup ((<>))
-import qualified Data.Time.Format as Time
+import GHC.Conc
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
+import qualified Data.Time.Format as Time
 import qualified Data.Time.LocalTime as LocalTime
+import Semantic.Queue
 import System.Console.ANSI
+import System.IO
 import System.Posix.Process
 import System.Posix.Types
 import Text.Printf
-import GHC.Conc
-import System.IO
-import Semantic.Queue
 
 
 -- | A log message at a specific level.
