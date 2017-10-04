@@ -102,7 +102,6 @@ expressionChoices =
   , structType
   , typeDeclaration
   , typeIdentifier
-  , typedIdentifier
   ]
 
 identifiers :: Assignment
