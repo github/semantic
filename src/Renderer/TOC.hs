@@ -112,11 +112,7 @@ class HasDeclarationWithStrategy (strategy :: Strategy) term f where
 
 
 type family DeclarationStrategy f where
-  DeclarationStrategy Declaration.Function = 'Custom
-  DeclarationStrategy Declaration.Method = 'Custom
   DeclarationStrategy Markup.Section = 'Custom
-  DeclarationStrategy Syntax = 'Custom
-  DeclarationStrategy (Union fs) = 'Custom
   DeclarationStrategy a = 'Default
 
 
