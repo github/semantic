@@ -17,8 +17,9 @@ module Semantic.Stat
 , defaultStatsClient
 , StatsClient(..)
 
--- Internal
+-- Internal, exposed for testing
 , renderDatagram
+, sendStats
 ) where
 
 

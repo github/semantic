@@ -182,6 +182,7 @@ test-suite test
                      , HUnit
                      , leancheck
                      , mtl
+                     , network
                      , containers
                      , recursion-schemes >= 4.1
                      , semantic-diff

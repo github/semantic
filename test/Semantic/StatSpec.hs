@@ -5,6 +5,14 @@ import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
 import System.Environment
 import Control.Exception
+import Network.Socket hiding (recv)
+import Network.Socket.ByteString
+
+
+withSocketPair :: ((Socket, Socket) -> IO c) -> IO c
+withSocketPair = bracket create release
+  where create = socketPair AF_UNIX Datagram defaultProtocol
+        release (client, server) = close client >> close server
 
 withEnvironment :: String -> String -> (() -> IO ()) -> IO ()
 withEnvironment key value = bracket (setEnv key value) (const (unsetEnv key))
@@ -59,3 +67,11 @@ spec = do
       it "renders tags without value" $ do
         let inc = increment key [("key", "value"), ("a", "")]
         renderDatagram "" inc `shouldBe` "app.metric:1|c|#key:value,a"
+
+  describe "sendStats" $
+    it "delivers datagram" $ do
+      client@StatsClient{..} <- defaultStatsClient
+      withSocketPair $ \(clientSoc, serverSoc) -> do
+        sendStats client { udpSocket = clientSoc } (increment "app.metric" [])
+        info <- recv serverSoc 1024
+        info `shouldBe` "semantic.app.metric:1|c"
