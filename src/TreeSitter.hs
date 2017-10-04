@@ -21,7 +21,7 @@ import Data.Text (Text, pack)
 import Language
 import qualified Language.Go as Go
 import qualified Language.Ruby as Ruby
-import qualified Language.Ruby as TypeScript
+import qualified Language.TypeScript as TypeScript
 import Foreign
 import Foreign.C.String (peekCString)
 import Foreign.Marshal.Array (allocaArray)
@@ -194,6 +194,7 @@ categoryForLanguageProductionName = withDefaults . byLanguage
     byLanguage language = case languageForTSLanguage language of
       Just Ruby -> Ruby.categoryForRubyName
       Just Language.Go -> Go.categoryForGoName
+      Just Language.TypeScript -> TypeScript.categoryForTypeScriptName
       _ -> Other
 
 
