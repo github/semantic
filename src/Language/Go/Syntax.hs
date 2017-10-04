@@ -251,10 +251,9 @@ expressionList :: Assignment
 expressionList = symbol ExpressionList *> children expressions
 
 functionDeclaration :: Assignment
-functionDeclaration = mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> typedIdentifier <*> parameters <*> types <*> block)
-  where parameters = symbol Parameters *> children (many expression)
-        types = symbol Parameters *> children expressions <|> emptyTerm
-        mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Function [] name' params' block')) types')
+functionDeclaration = mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> expression <*> parameters <*> (expression <|> emptyTerm) <*> block)
+  where mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Type.Annotation (makeTerm loc (Declaration.Function [] name' params' block')) types')
+        parameters = symbol Parameters *> children (many expression)
 
 importDeclaration :: Assignment
 importDeclaration = makeTerm <$> symbol ImportDeclaration <*> children (Declaration.Import <$> many expression)
