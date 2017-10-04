@@ -14,9 +14,6 @@ error "Avoid return" =
     return ==> pure
     where note = "return is obsolete as of GHC 7.10"
 
-error "use pure" = free . Pure ==> pure
-error "use wrap" = free . Free ==> wrap
-
 error "use extract" = termAnnotation . unTerm ==> extract
 error "use unwrap" = termOut . unTerm ==> unwrap
 
