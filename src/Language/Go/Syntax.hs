@@ -61,39 +61,43 @@ type Syntax =
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
+-- | Assignment from AST in Go's grammar onto a program in Go's syntax.
 assignment :: Assignment
-assignment = makeTerm <$> symbol SourceFile <*> children (Syntax.Program <$> many expression)
+assignment = makeTerm <$> symbol SourceFile <*> children (Syntax.Program <$> many expression) <|> parseError
 
 expression :: Assignment
-expression =  choice
-          [ callExpression
-          , channelType
-          , comment
-          , constVarDeclaration
-          , constVarSpecification
-          , expressionList
-          , fieldDeclaration
-          , functionDeclaration
-          , functionType
-          , identifier
-          , importDeclaration
-          , importSpec
-          , interfaceType
-          , interpretedStringLiteral
-          , intLiteral
-          , mapType
-          , methodDeclaration
-          , methodSpec
-          , packageClause
-          , parameterDeclaration
-          , pointerType
-          , rawStringLiteral
-          , sliceType
-          , structType
-          , typeDeclaration
-          , typeIdentifier
-          , typedIdentifier
-          ]
+expression = term (handleError (choice expressionChoices))
+
+expressionChoices :: [Assignment.Assignment [] Grammar Term]
+expressionChoices =
+  [ callExpression
+  , channelType
+  , comment
+  , constVarDeclaration
+  , constVarSpecification
+  , expressionList
+  , fieldDeclaration
+  , functionDeclaration
+  , functionType
+  , identifier
+  , importDeclaration
+  , importSpec
+  , interfaceType
+  , interpretedStringLiteral
+  , intLiteral
+  , mapType
+  , methodDeclaration
+  , methodSpec
+  , packageClause
+  , parameterDeclaration
+  , pointerType
+  , rawStringLiteral
+  , sliceType
+  , structType
+  , typeDeclaration
+  , typeIdentifier
+  , typedIdentifier
+  ]
 
 identifiers :: Assignment
 identifiers = makeTerm <$> location <*> many identifier
