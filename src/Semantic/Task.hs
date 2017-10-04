@@ -25,7 +25,6 @@ module Semantic.Task
 , runTaskWithOptions
 ) where
 
-import Control.Concurrent.STM.TMQueue
 import Control.Exception
 import Control.Monad.Error.Class
 import Control.Monad.IO.Class
@@ -47,16 +46,14 @@ import qualified Data.Syntax.Assignment as Assignment
 import Data.Term
 import qualified Data.Time.Clock as Time
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
-import qualified Data.Time.LocalTime as LocalTime
 import Data.Union
 import Info hiding (Category(..))
 import qualified Files
-import GHC.Conc (atomically)
 import Language
 import Language.Markdown
 import Parser
 import System.Exit (die)
-import System.IO (Handle, hPutStr, stderr)
+import System.IO (Handle, stderr)
 import TreeSitter
 import Semantic.Log
 import Semantic.Stat as Stat
