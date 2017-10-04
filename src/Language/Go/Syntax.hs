@@ -100,10 +100,14 @@ expressionChoices =
   ]
 
 identifiers :: Assignment
-identifiers = makeTerm <$> location <*> many identifier
+identifiers = mk <$> location <*> many identifier
+  where mk _ [a] = a
+        mk loc children = makeTerm loc children
 
 expressions :: Assignment
-expressions = makeTerm <$> location <*> many expression
+expressions = mk <$> location <*> many expression
+  where mk _ [a] = a
+        mk loc children = makeTerm loc children
 
 
 -- Literals
