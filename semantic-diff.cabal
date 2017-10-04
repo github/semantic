@@ -74,6 +74,7 @@ library
                      , RWS
                      , Semantic
                      , Semantic.Log
+                     , Semantic.Stat
                      , Semantic.Task
                      , Semantic.Util
                      , SemanticCmdLine

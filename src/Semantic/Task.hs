@@ -8,6 +8,7 @@ module Semantic.Task
 , readBlobPairs
 , writeToOutput
 , writeLog
+, writeStat
 , time
 , parse
 , decorate
@@ -58,12 +59,15 @@ import System.Exit (die)
 import System.IO (Handle, hPutStr, stderr)
 import TreeSitter
 import Semantic.Log
+import Semantic.Stat as Stat
+import Semantic.Queue
 
 data TaskF output where
   ReadBlobs :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
   ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [Both Blob]
   WriteToOutput :: Either Handle FilePath -> B.ByteString -> TaskF ()
   WriteLog :: Level -> String -> [(String, String)] -> TaskF ()
+  WriteStat :: Stat -> TaskF ()
   Time :: String -> [(String, String)] -> Task output -> TaskF output
   Parse :: Parser term -> Blob -> TaskF term
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
@@ -103,6 +107,9 @@ writeToOutput path contents = WriteToOutput path contents `Then` return
 -- | A 'Task' which logs a message at a specific log level to stderr.
 writeLog :: Level -> String -> [(String, String)] -> Task ()
 writeLog level message pairs = WriteLog level message pairs `Then` return
+
+writeStat :: Stat -> Task ()
+writeStat stat = WriteStat stat `Then` return
 
 -- | A 'Task' which measures and logs the timing of another 'Task'.
 time :: String -> [(String, String)] -> Task output -> Task output
@@ -152,33 +159,28 @@ runTask = runTaskWithOptions defaultOptions
 runTaskWithOptions :: Options -> Task a -> IO a
 runTaskWithOptions options task = do
   options <- configureOptionsForHandle stderr options
-  logQueue <- newTMQueueIO
-  logging <- Async.async (logSink options logQueue)
+  (logQ, logging) <- newQueue (logSink options)
+  (statQ, statting) <- newQueue statSink
 
-  result <- run options logQueue task
-  atomically (closeTMQueue logQueue)
-  Async.wait logging
+  result <- run options logQ statQ task
+
+  closeQueue logQ logging
+  closeQueue statQ statting
   either (die . displayException) pure result
-  where logSink options@Options{..} queue = do
-          message <- atomically (readTMQueue queue)
-          case message of
-            Just message -> do
-              hPutStr stderr (optionsFormatter options message)
-              logSink options queue
-            _ -> pure ()
-        run :: Options -> TMQueue Message -> Task a -> IO (Either SomeException a)
-        run options logQueue = go
+  where run :: Options -> TMQueue Message -> TMQueue Stat -> Task a -> IO (Either SomeException a)
+        run options logQ statQ = go
           where go :: Task a -> IO (Either SomeException a)
                 go = iterFreerA (\ task yield -> case task of
                   ReadBlobs source -> (either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield) `catchError` (pure . Left . toException)
                   ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left . toException)
                   WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
-                  WriteLog level message pairs -> queueLogMessage level message pairs >>= yield
+                  WriteLog level message pairs -> queueLogMessage options logQ level message pairs >>= yield
+                  WriteStat stat -> queueStat statQ stat >>= yield
                   Time message pairs task -> do
                     start <- Time.getCurrentTime
                     !res <- go task
                     end <- Time.getCurrentTime
-                    queueLogMessage Info message (pairs <> [("duration", show (Time.diffUTCTime end start))])
+                    queueLogMessage options logQ Info message (pairs <> [("duration", show (Time.diffUTCTime end start))])
                     either (pure . Left) yield res
                   Parse parser blob -> go (runParser options blob parser) >>= either (pure . Left) yield
                   Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield
@@ -192,10 +194,6 @@ runTaskWithOptions options task = do
                     case result of
                       Left err -> go (handler err) >>= either (pure . Left) yield
                       Right a -> yield a) . fmap Right
-                queueLogMessage level message pairs
-                  | Just logLevel <- optionsLevel options, level <= logLevel = Time.getCurrentTime >>= LocalTime.utcToLocalZonedTime >>= atomically . writeTMQueue logQueue . Message level message pairs
-                  | otherwise = pure ()
-
 
 runParser :: Options -> Blob -> Parser term -> Task term
 runParser Options{..} blob@Blob{..} = go
@@ -205,7 +203,9 @@ runParser Options{..} blob@Blob{..} = go
             logTiming "ts ast parse" $
               liftIO ((Right <$> parseToAST language blob) `catchError` (pure . Left . toException)) >>= either throwError pure
           AssignmentParser parser assignment -> do
-            ast <- go parser `catchError` \ err -> writeLog Error "failed parsing" (("tag", "parse") : blobFields) >> throwError err
+            ast <- go parser `catchError` \ err -> do
+              writeStat (Stat.increment "semantic.parse.errors" languageTag)
+              writeLog Error "failed parsing" (("tag", "parse") : blobFields) >> throwError err
             logTiming "assign" $ case Assignment.assign blobSource assignment ast of
               Left err -> do
                 let formatted = Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err
@@ -217,7 +217,8 @@ runParser Options{..} blob@Blob{..} = go
                 pure term
           TreeSitterParser tslanguage -> logTiming "ts parse" $ liftIO (treeSitterParser tslanguage blob)
           MarkdownParser -> logTiming "cmark parse" $ pure (cmarkParser blobSource)
-        blobFields = ("path", blobPath) : maybe [] (pure . (,) "language" . show) blobLanguage
+        blobFields = ("path", blobPath) : languageTag
+        languageTag = maybe [] (pure . (,) "language" . show) blobLanguage
         errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
         errors = cata $ \ (In a syntax) -> case syntax of
           _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (sourceSpan a) err]

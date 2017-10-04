@@ -1,17 +1,22 @@
 module Semantic.Log where
 
+import Control.Concurrent.STM.TMQueue
 import Data.Bifunctor (second)
 import Data.Error (withSGRCode)
 import Data.Foldable (toList)
 import Data.List (intersperse)
 import Data.Semigroup ((<>))
 import qualified Data.Time.Format as Time
+import qualified Data.Time.Clock as Time
+import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.LocalTime as LocalTime
 import System.Console.ANSI
-import System.IO (Handle, hIsTerminalDevice)
 import System.Posix.Process
 import System.Posix.Types
 import Text.Printf
+import GHC.Conc
+import System.IO
+
 
 -- | A log message at a specific level.
 data Message = Message Level String [(String, String)] LocalTime.ZonedTime
@@ -23,6 +28,21 @@ data Level
   | Info
   | Debug
   deriving (Eq, Ord, Show)
+
+
+queueLogMessage :: Options -> TMQueue Message -> Level -> String -> [(String, String)] -> IO ()
+queueLogMessage options q level message pairs
+  | Just logLevel <- optionsLevel options, level <= logLevel = Time.getCurrentTime >>= LocalTime.utcToLocalZonedTime >>= atomically . writeTMQueue q . Message level message pairs
+  | otherwise = pure ()
+
+logSink :: Options -> TMQueue Message -> IO ()
+logSink options@Options{..} queue = do
+  message <- atomically (readTMQueue queue)
+  case message of
+    Just message -> do
+      hPutStr stderr (optionsFormatter options message)
+      logSink options queue
+    _ -> pure ()
 
 -- | Format log messaging using "logfmt".
 --
