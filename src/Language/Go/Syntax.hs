@@ -277,7 +277,7 @@ methodSpec =  mkMethodSpec <$> symbol MethodSpec <*> children ((,,,,) <$> empty 
         mkMethod loc empty' name' params empty'' = makeTerm loc $ Declaration.Method [] empty' name' (pure params) empty''
 
 packageClause :: Assignment
-packageClause = makeTerm <$> symbol PackageClause <*> children (Declaration.Module <$> identifier <*> pure [])
+packageClause = makeTerm <$> symbol PackageClause <*> children (Declaration.Module <$> expression <*> pure [])
 
 parameterDeclaration :: Assignment
 parameterDeclaration = symbol ParameterDeclaration *> children expressions
