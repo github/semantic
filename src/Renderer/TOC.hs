@@ -51,7 +51,6 @@ import Data.Syntax.Algebra (RAlgebra)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Markup as Markup
-import Debug.Trace
 
 data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }
   deriving (Eq, Show)
@@ -98,7 +97,7 @@ getDeclaration = getField
 
 -- | Produce the annotations of nodes representing declarations.
 declaration :: HasField fields (Maybe Declaration) => TermF f (Record fields) a -> Maybe (Record fields)
-declaration (In annotation _) = annotation <$ (getField annotation :: Maybe Declaration)
+declaration (In annotation _) = annotation <$ getDeclaration annotation
 
 
 -- | Compute 'Declaration's for methods and functions in 'Syntax'.
@@ -179,9 +178,9 @@ tableOfContentsBy :: (Foldable f, Functor f)
 tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
   Patch patch -> (pure . patchEntry <$> bicrosswalk selector selector patch) <> bifoldMap fold fold patch <> Just []
   Merge (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
-    (Just a, Nothing) -> Just [Unchanged a]
-    (Just a, Just []) -> Just [Changed a]
-    (_     , entries) -> entries)
+    (Just a, Nothing)      -> Just [Unchanged a]
+    (Just a, Just entries) -> Just (Changed a : entries)
+    (_     , entries)      -> entries)
 
   where patchEntry = patch Deleted Inserted (const Replaced)
 
