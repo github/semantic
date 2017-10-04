@@ -7,8 +7,9 @@ module Language.Go.Syntax
 ) where
 
 import Data.Functor (void)
+import Data.List.NonEmpty (some1)
 import Data.Record
-import Data.Syntax (emptyTerm, handleError, makeTerm)
+import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -282,6 +283,10 @@ parameterDeclaration = symbol ParameterDeclaration *> children expressions
 
 
 -- Helpers
+
+-- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
+term :: Assignment -> Assignment
+term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
 
 -- | Match a series of terms or comments until a delimiter is matched
 manyTermsTill :: Show b => Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
