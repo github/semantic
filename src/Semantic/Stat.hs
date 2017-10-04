@@ -52,9 +52,8 @@ data Metric
   | Set Double        -- Sets count the number of unique elements in a group
   | Timer Double      -- Timers measure the amount of time a section of code takes to execute.
 
-type Tag = (String, String)
-
-type Tags = [Tag]
+-- Tags are just key/value annotations. Values can blank.
+type Tags = [(String, String)]
 
 
 -- Increment a counter.
