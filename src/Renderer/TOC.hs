@@ -96,6 +96,10 @@ class HasDeclaration f where
   toDeclaration :: f a -> Maybe Declaration
 
 
+
+data Strategy = Default | Custom
+
+
 getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe Declaration
 getDeclaration = getField
 
