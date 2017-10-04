@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, KindSignatures, MultiParamTypeClasses, RankNTypes, TypeOperators, ScopedTypeVariables #-}
+{-# LANGUAGE DataKinds, MultiParamTypeClasses, RankNTypes, TypeFamilies, TypeOperators, ScopedTypeVariables #-}
 module Renderer.TOC
 ( renderToCDiff
 , renderToCTerm
@@ -101,6 +101,15 @@ data Strategy = Default | Custom
 
 class HasDeclarationWithStrategy (strategy :: Strategy) f where
   toDeclarationWithStrategy :: proxy strategy -> f a -> Maybe Declaration
+
+
+type family DeclarationStrategy f where
+  DeclarationStrategy Declaration.Function = 'Custom
+  DeclarationStrategy Declaration.Method = 'Custom
+  DeclarationStrategy Markup.Section = 'Custom
+  DeclarationStrategy Syntax = 'Custom
+  DeclarationStrategy (Union fs) = 'Custom
+  DeclarationStrategy a = 'Default
 
 
 instance HasDeclarationWithStrategy 'Default f where
