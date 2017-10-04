@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, RankNTypes, TypeOperators, ScopedTypeVariables #-}
+{-# LANGUAGE DataKinds, KindSignatures, MultiParamTypeClasses, RankNTypes, TypeOperators, ScopedTypeVariables #-}
 module Renderer.TOC
 ( renderToCDiff
 , renderToCTerm
@@ -98,6 +98,9 @@ class HasDeclaration f where
 
 
 data Strategy = Default | Custom
+
+class HasDeclarationWithStrategy (strategy :: Strategy) f where
+  toDeclarationWithStrategy :: proxy strategy -> f a -> Maybe Declaration
 
 
 getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe Declaration
