@@ -12,7 +12,6 @@ import Control.Exception
 import Control.Monad ((<=<))
 import Control.Monad.Error.Class
 import Data.Align.Generic
-import Data.Bifunctor
 import Data.Blob
 import Data.ByteString (ByteString)
 import Data.Diff
@@ -107,7 +106,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
     | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Diffable, Eq1, Foldable, Functor, GAlign, Show1, Traversable]) ->
       run (decorate constructorLabel . (Nil <$) <=< parse parser) diffTerms renderSExpressionDiff
     | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
-      run (parse syntaxParser) diffSyntaxTerms (renderSExpressionDiff . bimap keepCategory keepCategory)
+      run (fmap (fmap keepCategory) . parse syntaxParser) diffSyntaxTerms renderSExpressionDiff
 
   _ -> throwError (SomeException (NoParserForLanguage effectivePath effectiveLanguage))
   where (effectivePath, effectiveLanguage) = case runJoin blobs of
