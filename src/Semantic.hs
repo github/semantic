@@ -105,7 +105,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
 
   (SExpressionDiffRenderer, lang)
     | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Diffable, Eq1, Foldable, Functor, GAlign, Show1, Traversable]) ->
-      run (decorate constructorLabel <=< parse parser) diffTerms (renderSExpressionDiff . bimap (const Nil) (const Nil))
+      run (decorate constructorLabel . (Nil <$) <=< parse parser) diffTerms renderSExpressionDiff
     | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
       run (parse syntaxParser) diffSyntaxTerms (renderSExpressionDiff . bimap keepCategory keepCategory)
 
