@@ -97,6 +97,9 @@ data Declaration
 class HasDeclaration whole part where
   toDeclaration :: (HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra part (Term whole (Record fields)) (Maybe Declaration)
 
+class HasDeclaration' whole part where
+  toDeclaration' :: (HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra part (Term whole (Record fields)) (Maybe Declaration)
+
 toDeclarationAlgebra :: (HasField fields Range, HasField fields Span, HasDeclaration syntax syntax) => Blob -> RAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Maybe Declaration)
 toDeclarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
 
@@ -104,18 +107,18 @@ toDeclarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
 instance (DeclarationStrategy part ~ strategy, HasDeclarationWithStrategy strategy whole part) => HasDeclaration whole part where
   toDeclaration = toDeclarationWithStrategy (undefined :: proxy strategy)
 
-instance Apply Foldable fs => HasDeclaration (Union fs) Markup.Section where
-  toDeclaration Blob{..} _ (Markup.Section level (Term (In headingAnn headingF), _) _)
+instance Apply Foldable fs => HasDeclaration' (Union fs) Markup.Section where
+  toDeclaration' Blob{..} _ (Markup.Section level (Term (In headingAnn headingF), _) _)
     = Just $ SectionDeclaration (maybe (getSource (byteRange headingAnn)) (getSource . sconcat) (nonEmpty (byteRange . termAnnotation . unTerm <$> toList headingF))) level
     where getSource = firstLine . toText . flip Source.slice blobSource
           firstLine = T.takeWhile (/= '\n')
 
-instance HasDeclaration whole Syntax.Error where
-  toDeclaration Blob{..} ann err@Syntax.Error{}
+instance HasDeclaration' whole Syntax.Error where
+  toDeclaration' Blob{..} ann err@Syntax.Error{}
     = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan ann) err))) blobLanguage
 
-instance Apply (HasDeclaration (Union fs)) fs => HasDeclaration (Union fs) (Union fs) where
-  toDeclaration blob ann = apply (Proxy :: Proxy (HasDeclaration (Union fs))) (toDeclaration blob ann)
+instance Apply (HasDeclaration (Union fs)) fs => HasDeclaration' (Union fs) (Union fs) where
+  toDeclaration' blob ann = apply (Proxy :: Proxy (HasDeclaration (Union fs))) (toDeclaration blob ann)
 
 
 data Strategy = Default | Custom
@@ -132,8 +135,8 @@ type family DeclarationStrategy syntax where
 instance HasDeclarationWithStrategy 'Default term syntax where
   toDeclarationWithStrategy _ _ _ _ = Nothing
 
-instance HasDeclaration term syntax => HasDeclarationWithStrategy 'Custom term syntax where
-  toDeclarationWithStrategy _ = toDeclaration
+instance HasDeclaration' term syntax => HasDeclarationWithStrategy 'Custom term syntax where
+  toDeclarationWithStrategy _ = toDeclaration'
 
 
 getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe Declaration
