@@ -1,6 +1,7 @@
 {-# LANGUAGE TypeOperators, DataKinds #-}
 module Semantic.Util where
 
+import Control.Monad.IO.Class
 import Data.Blob
 import Language.Haskell.HsColour (hscolour, Output(TTY))
 import Language.Haskell.HsColour.Colourise (defaultColourPrefs)
@@ -28,7 +29,7 @@ import Data.Syntax
 pp :: Show a => a -> IO ()
 pp = putStrLn . hscolour TTY defaultColourPrefs False False "" False . ppShow
 
-file :: FilePath -> IO Blob
+file :: MonadIO m => FilePath -> m Blob
 file path = Files.readFile path (languageForFilePath path)
 
 diffWithParser :: (HasField fields Data.Span.Span,
