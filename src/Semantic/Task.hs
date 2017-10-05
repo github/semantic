@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, MultiParamTypeClasses, TypeOperators, BangPatterns #-}
+{-# LANGUAGE DataKinds, GADTs, MultiParamTypeClasses, TypeOperators #-}
 module Semantic.Task
 ( Task
 , Level(..)
@@ -43,8 +43,6 @@ import qualified Data.Syntax as Syntax
 import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import qualified Data.Syntax.Assignment as Assignment
 import Data.Term
-import qualified Data.Time.Clock as Time
-import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import Data.Union
 import Info hiding (Category(..))
 import qualified Files
@@ -152,6 +150,7 @@ distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 runTask :: Task a -> IO a
 runTask = runTaskWithOptions defaultOptions
 
+
 -- | Execute a 'Task' with the passed 'Options', yielding its result value in 'IO'.
 runTaskWithOptions :: Options -> Task a -> IO a
 runTaskWithOptions options task = do
@@ -159,7 +158,8 @@ runTaskWithOptions options task = do
   statter <- defaultStatsClient >>= newQueue sendStat
   logger <- newQueue logMessage options
 
-  result <- run options logger statter task
+  result <- withTiming (queue statter) "run" [] $
+    run options logger statter task
 
   closeQueue statter
   closeQueue logger
@@ -174,11 +174,7 @@ runTaskWithOptions options task = do
                   WriteLog level message pairs -> queueLogMessage logger level message pairs >>= yield
                   WriteStat stat -> queue statter stat >>= yield
                   Time statName tags task -> do
-                    start <- Time.getCurrentTime
-                    !res <- go task
-                    end <- Time.getCurrentTime
-                    let duration = realToFrac (Time.diffUTCTime end start * 1000)
-                    queue statter (timing statName duration tags)
+                    res <- withTiming (queue statter) statName tags $ go task
                     either (pure . Left) yield res
                   Parse parser blob -> go (runParser options blob parser) >>= either (pure . Left) yield
                   Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield

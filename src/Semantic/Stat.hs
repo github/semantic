@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 module Semantic.Stat
 (
 -- Primary API for creating stats.
@@ -6,6 +7,7 @@ module Semantic.Stat
 , count
 , gauge
 , timing
+, withTiming
 , histogram
 , set
 , Stat
@@ -32,6 +34,8 @@ import Numeric
 import qualified Data.ByteString.Char8 as B
 import System.Environment
 import System.IO.Error
+import qualified Data.Time.Clock as Time
+import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 
 -- | A named piece of data you wish to record a specific 'Metric' for.
 -- See https://docs.datadoghq.com/guides/dogstatsd/ for more details.
@@ -73,6 +77,16 @@ gauge n v = Stat n (Gauge v)
 -- | Timing in milliseconds.
 timing :: String -> Double -> Tags -> Stat
 timing n v = Stat n (Timer v)
+
+-- | Run an IO Action and record timing
+withTiming :: (Stat -> IO ()) -> String -> Tags -> IO a -> IO a
+withTiming statter name tags f = do
+  start <- Time.getCurrentTime
+  !result <- f
+  end <- Time.getCurrentTime
+  let duration = realToFrac (Time.diffUTCTime end start * 1000)
+  statter (timing name duration tags)
+  pure result
 
 -- | Histogram measurement.
 histogram :: String -> Double -> Tags -> Stat
