@@ -170,4 +170,4 @@ instance Render Int where
   renders = shows
 
 instance Render Double where
-  renders = shows
+  renders = showFFloat (Just 5)
