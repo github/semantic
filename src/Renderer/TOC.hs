@@ -35,6 +35,7 @@ import Data.List (sortOn)
 import Data.Maybe (fromMaybe, mapMaybe)
 import Data.Output
 import Data.Patch
+import Data.Proxy
 import Data.Record
 import Data.Semigroup ((<>), sconcat)
 import Data.Source as Source
@@ -112,6 +113,9 @@ instance Apply Foldable fs => HasDeclaration (Union fs) Markup.Section where
 instance HasDeclaration whole Syntax.Error where
   toDeclaration Blob{..} ann err@Syntax.Error{}
     = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan ann) err))) blobLanguage
+
+instance Apply (HasDeclaration (Union fs)) fs => HasDeclaration (Union fs) (Union fs) where
+  toDeclaration blob ann = apply (Proxy :: Proxy (HasDeclaration (Union fs))) (toDeclaration blob ann)
 
 
 data Strategy = Default | Custom
