@@ -1,12 +1,10 @@
 module Semantic.Log where
 
-import Control.Concurrent.STM.TMQueue
 import Data.Bifunctor (second)
 import Data.Error (withSGRCode)
 import Data.Foldable (toList)
 import Data.List (intersperse)
 import Data.Semigroup ((<>))
-import GHC.Conc
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.Format as Time
 import qualified Data.Time.LocalTime as LocalTime
@@ -30,19 +28,15 @@ data Level
   deriving (Eq, Ord, Show)
 
 
-queueLogMessage :: AsyncQ Message Options -> Level -> String -> [(String, String)] -> IO ()
-queueLogMessage AsyncQ{..} level message pairs
-  | Just logLevel <- optionsLevel extra, level <= logLevel = Time.getCurrentTime >>= LocalTime.utcToLocalZonedTime >>= atomically . writeTMQueue queue . Message level message pairs
+-- | Queue a message to be logged.
+queueLogMessage :: AsyncQueue Message Options -> Level -> String -> [(String, String)] -> IO ()
+queueLogMessage q@AsyncQueue{..} level message pairs
+  | Just logLevel <- optionsLevel asyncQueueExtra, level <= logLevel = Time.getCurrentTime >>= LocalTime.utcToLocalZonedTime >>= queue q . Message level message pairs
   | otherwise = pure ()
 
-logSink :: Options -> TMQueue Message -> IO ()
-logSink options@Options{..} queue = do
-  message <- atomically (readTMQueue queue)
-  case message of
-    Just message -> do
-      hPutStr stderr (optionsFormatter options message)
-      logSink options queue
-    _ -> pure ()
+-- | Log a message to stderr.
+logMessage :: Options -> Message -> IO ()
+logMessage options@Options{..} message = hPutStr stderr (optionsFormatter options message)
 
 -- | Format log messaging using "logfmt".
 --

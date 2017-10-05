@@ -157,15 +157,15 @@ runTask = runTaskWithOptions defaultOptions
 runTaskWithOptions :: Options -> Task a -> IO a
 runTaskWithOptions options task = do
   options <- configureOptionsForHandle stderr options
-  statter <- defaultStatsClient >>= newQueue statSink
-  logger <- newQueue logSink options
+  statter <- defaultStatsClient >>= newQueue sendStat
+  logger <- newQueue logMessage options
 
   result <- run options logger statter task
 
   closeQueue statter
   closeQueue logger
   either (die . displayException) pure result
-  where run :: Options -> AsyncQ Message Options -> AsyncQ Stat StatsClient -> Task a -> IO (Either SomeException a)
+  where run :: Options -> AsyncQueue Message Options -> AsyncQueue Stat StatsClient -> Task a -> IO (Either SomeException a)
         run options logger statter = go
           where go :: Task a -> IO (Either SomeException a)
                 go = iterFreerA (\ task yield -> case task of
@@ -173,7 +173,7 @@ runTaskWithOptions options task = do
                   ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left . toException)
                   WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
                   WriteLog level message pairs -> queueLogMessage logger level message pairs >>= yield
-                  WriteStat stat -> queueStat statter stat >>= yield
+                  WriteStat stat -> queue statter stat >>= yield
                   Time message pairs task -> do
                     start <- Time.getCurrentTime
                     !res <- go task
