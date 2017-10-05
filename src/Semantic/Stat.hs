@@ -107,11 +107,10 @@ defaultStatsClient = do
   where
     defaultHost = "127.0.0.1"
     defaultPort = "28125"
-    defaultHostPort = (defaultHost, defaultPort)
     parseAddr a | Just s <- a
                 , Just (Just (URIAuth _ host port)) <- uriAuthority <$> parseURI s
                 = (parseHost host, parsePort port)
-                | otherwise = defaultHostPort
+                | otherwise = (defaultHost, defaultPort)
     parseHost s = if null s then defaultHost else s
     parsePort s = if null s then defaultPort else dropWhile (':' ==) s
 
