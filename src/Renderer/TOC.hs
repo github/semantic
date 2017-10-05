@@ -135,7 +135,9 @@ class HasDeclarationWithStrategy (strategy :: Strategy) whole part where
 
 
 type family DeclarationStrategy syntax where
+  DeclarationStrategy Declaration.Function = 'Custom
   DeclarationStrategy Markup.Section = 'Custom
+  DeclarationStrategy Syntax.Empty = 'Custom
   DeclarationStrategy a = 'Default
 
 
