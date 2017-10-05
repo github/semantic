@@ -26,6 +26,7 @@
       (RequiredParameter
         (Empty)
         (Empty)
+        (Empty)
         (Assignment
           (Identifier)
           (Empty)))
@@ -43,6 +44,7 @@
       (RequiredParameter
         (Empty)
         (Empty)
+        (Empty)
         (Assignment
           (Identifier)
           (Empty)))
@@ -58,6 +60,7 @@
     { (Identifier)
     ->(Identifier) }
       (RequiredParameter
+        (Empty)
         (Empty)
         (Empty)
         (Assignment
