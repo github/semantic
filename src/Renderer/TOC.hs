@@ -92,14 +92,14 @@ data Declaration
   deriving (Eq, Generic, Show)
 
 
-class HasDeclaration term syntax where
-  toDeclaration :: Blob -> RAlgebra syntax term (Maybe Declaration)
+class HasDeclaration whole part where
+  toDeclaration :: (HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra part (Term whole (Record fields)) (Maybe Declaration)
 
-instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy strategy term syntax) => HasDeclaration term syntax where
+instance (DeclarationStrategy part ~ strategy, HasDeclarationWithStrategy strategy whole part) => HasDeclaration whole part where
   toDeclaration = toDeclarationWithStrategy (undefined :: proxy strategy)
 
-instance (Apply Foldable fs, HasField fields Range) => HasDeclaration (Term (Union fs) (Record fields)) Markup.Section where
-  toDeclaration Blob{..} (Markup.Section level (Term (In headingAnn headingF), _) _)
+instance Apply Foldable fs => HasDeclaration (Union fs) Markup.Section where
+  toDeclaration Blob{..} _ (Markup.Section level (Term (In headingAnn headingF), _) _)
     = Just $ SectionDeclaration (maybe (getSource (byteRange headingAnn)) (getSource . sconcat) (nonEmpty (byteRange . termAnnotation . unTerm <$> toList headingF))) level
     where getSource = firstLine . toText . flip Source.slice blobSource
           firstLine = T.takeWhile (/= '\n')
@@ -107,8 +107,8 @@ instance (Apply Foldable fs, HasField fields Range) => HasDeclaration (Term (Uni
 
 data Strategy = Default | Custom
 
-class HasDeclarationWithStrategy (strategy :: Strategy) term syntax where
-  toDeclarationWithStrategy :: proxy strategy -> Blob -> RAlgebra syntax term (Maybe Declaration)
+class HasDeclarationWithStrategy (strategy :: Strategy) whole part where
+  toDeclarationWithStrategy :: (HasField fields Range, HasField fields Span) => proxy strategy -> Blob -> Record fields -> RAlgebra part (Term whole (Record fields)) (Maybe Declaration)
 
 
 type family DeclarationStrategy syntax where
@@ -117,7 +117,7 @@ type family DeclarationStrategy syntax where
 
 
 instance HasDeclarationWithStrategy 'Default term syntax where
-  toDeclarationWithStrategy _ _ _ = Nothing
+  toDeclarationWithStrategy _ _ _ _ = Nothing
 
 instance HasDeclaration term syntax => HasDeclarationWithStrategy 'Custom term syntax where
   toDeclarationWithStrategy _ = toDeclaration
