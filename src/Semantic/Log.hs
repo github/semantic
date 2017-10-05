@@ -36,7 +36,7 @@ queueLogMessage q@AsyncQueue{..} level message pairs
 
 -- | Log a message to stderr.
 logMessage :: Options -> Message -> IO ()
-logMessage options@Options{..} message = hPutStr stderr (optionsFormatter options message)
+logMessage options@Options{..} = hPutStr stderr . optionsFormatter options
 
 -- | Format log messaging using "logfmt".
 --
