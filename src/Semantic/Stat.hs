@@ -1,4 +1,3 @@
-{-# LANGUAGE BangPatterns #-}
 module Semantic.Stat
 (
 -- Primary API for creating stats.
@@ -82,7 +81,7 @@ timing n v = Stat n (Timer v)
 withTiming :: (Stat -> IO ()) -> String -> Tags -> IO a -> IO a
 withTiming statter name tags f = do
   start <- Time.getCurrentTime
-  !result <- f
+  result <- f
   end <- Time.getCurrentTime
   let duration = realToFrac (Time.diffUTCTime end start * 1000)
   statter (timing name duration tags)
