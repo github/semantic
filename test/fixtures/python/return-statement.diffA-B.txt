@@ -6,8 +6,8 @@
       ->(Identifier) }
       { (Identifier)
       ->(Identifier) })
-    {+(Identifier)+}
-    {-(Identifier)-}))
+    { (Identifier)
+    ->(Identifier) }))
   (Return
     (Empty))
 {+(Return

@@ -1,9 +1,9 @@
 (Program
   (Call
     (Identifier)
-  {+(TextElement)+}
+  { (TextElement)
+  ->(TextElement) }
   {+(Identifier)+}
-  {-(TextElement)-}
     (Empty))
   (Call
     (Identifier)

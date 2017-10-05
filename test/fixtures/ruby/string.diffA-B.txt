@@ -1,5 +1,5 @@
 (Program
-{+(TextElement)+}
-{+(TextElement)+}
-{-(TextElement)-}
-{-(TextElement)-})
+{ (TextElement)
+->(TextElement) }
+{ (TextElement)
+->(TextElement) })

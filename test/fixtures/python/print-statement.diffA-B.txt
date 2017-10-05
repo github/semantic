@@ -1,14 +1,14 @@
 (Program
   (Call
     (Identifier)
-  {+(Identifier)+}
+  { (Identifier)
+  ->(Identifier) }
     (Identifier)
-  {-(Identifier)-}
     (Empty))
   (Call
     (Identifier)
-  {+(Identifier)+}
-  {-(Identifier)-}
+  { (Identifier)
+  ->(Identifier) }
     (Empty))
   (Call
     (Identifier)

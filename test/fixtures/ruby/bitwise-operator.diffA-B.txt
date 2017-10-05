@@ -1,16 +1,16 @@
 (Program
-{+(BAnd
-  {+(Identifier)+}
-  {+(Identifier)+})+}
-{+(LShift
-  {+(Identifier)+}
-  {+(Identifier)+})+}
-{-(BOr
+{ (BOr
   {-(Identifier)-}
-  {-(Identifier)-})-}
-{-(RShift
+  {-(Identifier)-})
+->(BAnd
+  {+(Identifier)+}
+  {+(Identifier)+}) }
+{ (RShift
   {-(Identifier)-}
-  {-(Identifier)-})-}
+  {-(Identifier)-})
+->(LShift
+  {+(Identifier)+}
+  {+(Identifier)+}) }
 {-(BXOr
   {-(Identifier)-}
   {-(Identifier)-})-})

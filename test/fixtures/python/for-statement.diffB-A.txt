@@ -27,8 +27,8 @@
       {+(Empty)+})+})+})+}
   (ForEach
     (
-    {+(Identifier)+}
-    {-(Identifier)-})
+    { (Identifier)
+    ->(Identifier) })
     (Array
       (Tuple
         (Integer))
@@ -37,8 +37,8 @@
       (Tuple
         (Integer)))
     (
-    {+(Identifier)+}
-    {-(Identifier)-}))
+    { (Identifier)
+    ->(Identifier) }))
 {-(Else
   {-(ForEach
     {-(
