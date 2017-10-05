@@ -117,6 +117,13 @@ instance HasDeclaration' whole Syntax.Error where
   toDeclaration' Blob{..} ann err@Syntax.Error{}
     = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan ann) err))) blobLanguage
 
+instance (Syntax.Empty :< fs) => HasDeclaration' (Union fs) Declaration.Function where
+  toDeclaration' Blob{..} _ (Declaration.Function _ (Term (In identifierAnn identifier), _) _ _)
+    -- Do not summarize anonymous functions
+    | Just Syntax.Empty <- prj identifier = Nothing
+    | otherwise                           = Just $ FunctionDeclaration (getSource identifierAnn)
+    where getSource = toText . flip Source.slice blobSource . byteRange
+
 instance Apply (HasDeclaration (Union fs)) fs => HasDeclaration' (Union fs) (Union fs) where
   toDeclaration' blob ann = apply (Proxy :: Proxy (HasDeclaration (Union fs))) (toDeclaration blob ann)
 
