@@ -82,6 +82,7 @@ histogram n v = Stat n (Histogram v)
 set :: String -> Double -> Tags -> Stat
 set n v = Stat n (Set v)
 
+-- | Client for sending stats on a UDP socket.
 data StatsClient
   = StatsClient
   { statsClientUDPSocket :: Socket
@@ -131,13 +132,22 @@ sendStat StatsClient{..} = void . tryIOError . sendAll statsClientUDPSocket . B.
 
 -- Datagram Rendering
 
-type RenderS = String -> String
-
+-- | Rendering of stats to their datagrams representations, which are packed and
+-- sent over a socket.
 class Render a where
   renders :: a -> RenderS
 
+-- | A Function that prepends the output 'String' to an existing 'String'.
+-- Analogous to 'ShowS'.
+type RenderS = String -> String
+
+-- | Utility function to prepend the string unchanged.
 renderString :: String -> RenderS
 renderString = (<>)
+
+-- | Internal: Clean a stat name of reserved chars `|, @, :`
+clean :: String -> String
+clean = intercalate "_" . splitOneOf "|@:"
 
 -- | Render a Stat (with namespace prefix) to a datagram String.
 renderDatagram :: String -> Stat -> String
@@ -145,9 +155,6 @@ renderDatagram namespace stat = renderString prefix (renders stat "")
   where prefix | null namespace = ""
                | otherwise = clean namespace <> "."
 
--- | Internal: Clean a stat name of reserved chars `|, @, :`
-clean :: String -> String
-clean = intercalate "_" . splitOneOf "|@:"
 
 -- Instances
 
