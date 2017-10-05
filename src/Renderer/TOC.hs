@@ -10,6 +10,7 @@ module Renderer.TOC
 , declaration
 , declarationAlgebra
 , markupSectionAlgebra
+, toDeclarationAlgebra
 , syntaxDeclarationAlgebra
 , Entry(..)
 , tableOfContentsBy
@@ -94,6 +95,10 @@ data Declaration
 
 class HasDeclaration whole part where
   toDeclaration :: (HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra part (Term whole (Record fields)) (Maybe Declaration)
+
+toDeclarationAlgebra :: (HasField fields Range, HasField fields Span, HasDeclaration syntax syntax) => Blob -> RAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Maybe Declaration)
+toDeclarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
+
 
 instance (DeclarationStrategy part ~ strategy, HasDeclarationWithStrategy strategy whole part) => HasDeclaration whole part where
   toDeclaration = toDeclarationWithStrategy (undefined :: proxy strategy)
