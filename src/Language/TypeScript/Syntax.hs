@@ -1132,16 +1132,16 @@ shorthandPropertyIdentifier :: Assignment
 shorthandPropertyIdentifier = makeTerm <$> symbol Grammar.ShorthandPropertyIdentifier <*> (Language.TypeScript.Syntax.ShorthandPropertyIdentifier <$> source)
 
 requiredParameter :: Assignment
-requiredParameter = makeRequiredParameter <$> symbol Grammar.RequiredParameter <*> children ((,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (identifier <|> destructuringPattern) <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
-  where makeRequiredParameter loc (modifier, identifier, annotation, initializer) = makeTerm loc (Language.TypeScript.Syntax.RequiredParameter [modifier, annotation] (makeTerm loc (Statement.Assignment [] identifier initializer)))
+requiredParameter = makeRequiredParameter <$> symbol Grammar.RequiredParameter <*> children ((,,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (readonly' <|> emptyTerm) <*> (identifier <|> destructuringPattern) <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
+  where makeRequiredParameter loc (modifier, readonly, identifier, annotation, initializer) = makeTerm loc (Language.TypeScript.Syntax.RequiredParameter [modifier, readonly, annotation] (makeTerm loc (Statement.Assignment [] identifier initializer)))
 
 restParameter :: Assignment
 restParameter = makeRestParameter <$> symbol Grammar.RestParameter <*> children ((,) <$> identifier <*> (typeAnnotation' <|> emptyTerm))
   where makeRestParameter loc (identifier, annotation) = makeTerm loc (Language.TypeScript.Syntax.RestParameter [annotation] identifier)
 
 optionalParameter :: Assignment
-optionalParameter = makeOptionalParam <$> symbol Grammar.OptionalParameter <*> children ((,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (identifier <|> destructuringPattern) <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
-  where makeOptionalParam loc (modifier, subject, annotation, initializer) = makeTerm loc (Language.TypeScript.Syntax.OptionalParameter [modifier, annotation] (makeTerm loc (Statement.Assignment [] subject initializer)))
+optionalParameter = makeOptionalParam <$> symbol Grammar.OptionalParameter <*> children ((,,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (readonly' <|> emptyTerm) <*> (identifier <|> destructuringPattern) <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
+  where makeOptionalParam loc (modifier, readonly, subject, annotation, initializer) = makeTerm loc (Language.TypeScript.Syntax.OptionalParameter [modifier, readonly, annotation] (makeTerm loc (Statement.Assignment [] subject initializer)))
 
 internalModule :: Assignment
 internalModule = makeTerm <$> symbol Grammar.InternalModule <*> children (Language.TypeScript.Syntax.InternalModule <$> (string <|> identifier <|> nestedIdentifier) <*> statements)
