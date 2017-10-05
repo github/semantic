@@ -108,7 +108,7 @@ writeLog level message pairs = WriteLog level message pairs `Then` return
 writeStat :: Stat -> Task ()
 writeStat stat = WriteStat stat `Then` return
 
--- | A 'Task' which measures and logs the timing of another 'Task'.
+-- | A 'Task' which measures and stats the timing of another 'Task'.
 time :: String -> [(String, String)] -> Task output -> Task output
 time statName tags task = Time statName tags task `Then` return
 
