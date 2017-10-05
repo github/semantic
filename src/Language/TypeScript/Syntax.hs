@@ -171,6 +171,7 @@ type Syntax = '[
   , Language.TypeScript.Syntax.This
   , Language.TypeScript.Syntax.Update
   , Language.TypeScript.Syntax.ComputedPropertyName
+  , Language.TypeScript.Syntax.Decorator
   , []
   ]
 
@@ -268,6 +269,13 @@ newtype Annotation a = Annotation { _annotationType :: a }
 instance Eq1 Annotation where liftEq = genericLiftEq
 instance Ord1 Annotation where liftCompare = genericLiftCompare
 instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
+
+newtype Decorator a = Decorator { _decoratorTerm :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Decorator where liftEq = genericLiftEq
+instance Ord1 Decorator where liftCompare = genericLiftCompare
+instance Show1 Decorator where liftShowsPrec = genericLiftShowsPrec
 
 newtype ComputedPropertyName a = ComputedPropertyName a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -728,7 +736,7 @@ ternaryExpression :: Assignment
 ternaryExpression = makeTerm <$> symbol Grammar.TernaryExpression <*> children (Statement.If <$> expression <*> expression <*> expression)
 
 memberExpression :: Assignment
-memberExpression = makeTerm <$> symbol Grammar.MemberExpression <*> children (Expression.MemberAccess <$> postContextualize comment expression <*> propertyIdentifier)
+memberExpression = makeTerm <$> (symbol Grammar.MemberExpression <|> symbol Grammar.MemberExpression') <*> children (Expression.MemberAccess <$> postContextualize comment expression <*> propertyIdentifier)
 
 newExpression :: Assignment
 newExpression = makeTerm <$> symbol Grammar.NewExpression <*> children (Expression.New <$> expression)
@@ -800,8 +808,8 @@ identifier :: Assignment
 identifier = (makeTerm <$> symbol Identifier' <*> (Syntax.Identifier <$> source)) <|> (makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source))
 
 class' :: Assignment
-class' = makeClass <$> symbol Class <*> children ((,,,) <$> identifier <*> ((symbol TypeParameters *> children (many (term typeParameter'))) <|> pure []) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
-  where makeClass loc (expression, typeParams, classHeritage, statements) = makeTerm loc (Declaration.Class typeParams expression classHeritage statements)
+class' = makeClass <$> symbol Class <*> children ((,,,,) <$> many (term decorator) <*> identifier <*> ((symbol TypeParameters *> children (many (term typeParameter'))) <|> pure []) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
+  where makeClass loc (decorators, expression, typeParams, classHeritage, statements) = makeTerm loc (Declaration.Class (decorators ++ typeParams) expression classHeritage statements)
 
 object :: Assignment
 object = (makeTerm <$> (symbol Object <|> symbol ObjectPattern) <*> children (Literal.Hash <$> many (term ((pair <|> spreadElement <|> methodDefinition <|> assignmentPattern <|> shorthandPropertyIdentifier)))))
@@ -878,7 +886,10 @@ methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> chi
   where makeMethodSignature loc (modifier, readonly, propertyName, (typeParams, params, annotation)) = makeTerm loc (Language.TypeScript.Syntax.MethodSignature [modifier, readonly, typeParams, annotation] propertyName params)
 
 formalParameters :: HasCallStack => Assignment.Assignment [] Grammar [Term]
-formalParameters = symbol FormalParameters *> children (many (term parameter))
+formalParameters = symbol FormalParameters *> children (concat <$> many ((\as b -> as ++ [b]) <$> many (term decorator) <*> term parameter))
+
+decorator :: Assignment
+decorator = makeTerm <$> symbol Grammar.Decorator <*> children (Language.TypeScript.Syntax.Decorator <$> (identifier <|> memberExpression <|> callExpression))
 
 typeParameters :: Assignment
 typeParameters = makeTerm <$> symbol TypeParameters <*> children (Type.TypeParameters <$> many (term typeParameter'))
@@ -973,7 +984,7 @@ statementBlock :: Assignment
 statementBlock = makeTerm <$> symbol StatementBlock <*> children (many statement)
 
 classBodyStatements :: HasCallStack => Assignment.Assignment [] Grammar [Term]
-classBodyStatements = symbol ClassBody *> children (many (term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature)))
+classBodyStatements = symbol ClassBody *> children (concat <$> many ((\as b -> as ++ [b]) <$> many (term decorator) <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature)))
 
 publicFieldDefinition :: Assignment
 publicFieldDefinition = makeField <$> symbol Grammar.PublicFieldDefinition <*> children ((,,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (readonly' <|> emptyTerm) <*> propertyName <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
@@ -1093,7 +1104,7 @@ ambientDeclaration :: Assignment
 ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> children (Language.TypeScript.Syntax.AmbientDeclaration <$> choice [declaration, statementBlock])
 
 exportStatement :: Assignment
-exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (Language.TypeScript.Syntax.Export <$> (((\a b -> [a, b]) <$> exportClause <*> fromClause) <|> (pure <$> (fromClause <|> exportClause <|> declaration <|> expression <|> identifier <|> importAlias'))))
+exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (Language.TypeScript.Syntax.Export <$> (((\a b -> [a, b]) <$> exportClause <*> fromClause) <|> ((++) <$> many (term decorator) <*> (pure <$> (fromClause <|> exportClause <|> declaration <|> expression <|> identifier <|> importAlias')))))
 
 fromClause :: Assignment
 fromClause = string
@@ -1181,7 +1192,7 @@ pair :: Assignment
 pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> propertyName <*> expression)
 
 callExpression :: Assignment
-callExpression = makeCall <$> symbol CallExpression <*> children ((,,,) <$> (expression <|> super <|> function) <*> (typeArguments <|> pure []) <*> (arguments <|> (pure <$> templateString)) <*> emptyTerm)
+callExpression = makeCall <$> (symbol CallExpression <|> symbol CallExpression') <*> children ((,,,) <$> (expression <|> super <|> function) <*> (typeArguments <|> pure []) <*> (arguments <|> (pure <$> templateString)) <*> emptyTerm)
   where makeCall loc (subject, typeArgs, args, body) = makeTerm loc (Expression.Call typeArgs subject args body)
         arguments = symbol Arguments *> children (many (term (expression <|> spreadElement)))
         typeArguments = symbol Grammar.TypeArguments *> children (some (term ty))
