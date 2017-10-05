@@ -116,8 +116,13 @@ diffTermPair :: Functor syntax => Both Blob -> Differ syntax ann1 ann2 -> Term s
 diffTermPair blobs differ t1 t2 = case runJoin (blobExists <$> blobs) of
   (True, False) -> pure (deleting t1)
   (False, True) -> pure (inserting t2)
-  _ -> time "diff" logInfo $ diff differ t1 t2
+  _ -> do
+    writeLog Info "diff" logInfo
+    time "diff" languageTag $ diff differ t1 t2
   where
+    showLanguage = pure . (,) "language" . show
+    languageTag = let (a, b) = runJoin blobs
+                  in maybe (maybe [] showLanguage (blobLanguage b)) showLanguage (blobLanguage a)
     logInfo = let (a, b) = runJoin blobs in
             [ ("before_path", blobPath a)
             , ("before_language", maybe "" show (blobLanguage a))
