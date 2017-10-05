@@ -104,6 +104,10 @@ instance Apply Foldable fs => HasDeclaration (Union fs) Markup.Section where
     where getSource = firstLine . toText . flip Source.slice blobSource
           firstLine = T.takeWhile (/= '\n')
 
+instance HasDeclaration whole Syntax.Error where
+  toDeclaration Blob{..} ann err@Syntax.Error{}
+    = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan ann) err))) blobLanguage
+
 
 data Strategy = Default | Custom
 
