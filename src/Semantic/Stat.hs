@@ -20,7 +20,6 @@ module Semantic.Stat
 ) where
 
 
-import Control.Arrow ((&&&))
 import Data.Functor
 import Data.List (intercalate)
 import Data.Maybe
@@ -28,6 +27,7 @@ import Data.Monoid
 import Network.Socket (Socket(..), SocketType(..), socket, connect, getAddrInfo, addrFamily, addrAddress, defaultProtocol)
 import Network.Socket.ByteString
 import Network.URI
+import Numeric
 import qualified Data.ByteString.Char8 as B
 import System.Environment
 import System.IO.Error
@@ -97,7 +97,7 @@ data StatsClient
 defaultStatsClient :: IO StatsClient
 defaultStatsClient = do
   addr <- lookupEnv "STATS_ADDR"
-  let (host', port) = maybe defaultHostPort parseAddr (fmap ("statsd://" <>) addr)
+  let (host', port) = parseAddr (fmap ("statsd://" <>) addr)
 
   -- When running in Kubes, DOGSTATSD_HOST is set with the dogstatsd host.
   kubesHost <- lookupEnv "DOGSTATSD_HOST"
@@ -108,10 +108,12 @@ defaultStatsClient = do
     defaultHost = "127.0.0.1"
     defaultPort = "28125"
     defaultHostPort = (defaultHost, defaultPort)
-    parseAddr = maybe defaultHostPort parseAuthority . parseURI
-    parseAuthority = maybe defaultHostPort (uriRegName &&& (parsePort . uriPort)) . uriAuthority
-    parsePort s | null s = defaultPort
-                | otherwise = dropWhile (':' ==) s
+    parseAddr a | Just s <- a
+                , Just (Just (URIAuth _ host port)) <- uriAuthority <$> parseURI s
+                = (parseHost host, parsePort port)
+                | otherwise = defaultHostPort
+    parseHost s = if null s then defaultHost else s
+    parsePort s = if null s then defaultPort else dropWhile (':' ==) s
 
 
 -- | Create a StatsClient at the specified host and port with a namespace prefix.
