@@ -22,6 +22,7 @@ module Semantic.Stat
 
 import Data.Functor
 import Data.List (intercalate)
+import Data.List.Split (splitOneOf)
 import Data.Maybe
 import Data.Monoid
 import Network.Socket (Socket(..), SocketType(..), socket, connect, getAddrInfo, addrFamily, addrAddress, defaultProtocol)
@@ -142,13 +143,17 @@ renderString = (<>)
 renderDatagram :: String -> Stat -> String
 renderDatagram namespace stat = renderString prefix (renders stat "")
   where prefix | null namespace = ""
-               | otherwise = namespace <> "."
+               | otherwise = clean namespace <> "."
+
+-- | Internal: Clean a stat name of reserved chars `|, @, :`
+clean :: String -> String
+clean = intercalate "_" . splitOneOf "|@:"
 
 -- Instances
 
 instance Render Stat where
   renders Stat{..}
-    = renderString statName
+    = renderString (clean statName)
     . renderString ":"
     . renders statValue
     . renders statTags
