@@ -35,7 +35,6 @@ file path = Files.readFile path (languageForFilePath path)
 diffWithParser :: (HasField fields Data.Span.Span,
                    HasField fields Range,
                    Error :< fs,
-                   Context :< fs,
                    Declaration.Method :< fs,
                    Declaration.Function :< fs,
                    Empty :< fs,
