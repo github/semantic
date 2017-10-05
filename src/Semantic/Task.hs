@@ -195,41 +195,44 @@ runTaskWithOptions options task = do
 
 runParser :: Options -> Blob -> Parser term -> Task term
 runParser Options{..} blob@Blob{..} = go
-  where go :: Parser term -> Task term
-        go parser = case parser of
-          ASTParser language -> logTiming "parse.tree_sitter_ast_parse" $
-            liftIO ((Right <$> parseToAST language blob) `catchError` (pure . Left . toException)) >>= either throwError pure
-          AssignmentParser parser assignment -> do
-            ast <- go parser `catchError` \ err -> do
-              writeStat (Stat.increment "parse.parse_failures" languageTag)
-              writeLog Error "failed parsing" (("tag", "parse") : blobFields) >> throwError err
-            logTiming "parse.assign" $ case Assignment.assign blobSource assignment ast of
-              Left err -> do
-                writeStat (Stat.increment "parse.assign_errors" languageTag)
-                let formatted = Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err
-                writeLog Error formatted (("tag", "assign") : blobFields)
-                throwError (toException err)
-              Right term -> do
-                for_ (errors term) $ \ err -> do
-                  writeStat (Stat.increment "parse.parse_errors" languageTag)
-                  writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("tag", "assign") : blobFields)
-                pure term
-          TreeSitterParser tslanguage ->
-            logTiming "parse.tree_sitter_parse" $
-              liftIO (treeSitterParser tslanguage blob)
-          MarkdownParser ->
-            logTiming "parse.cmark_parse" $
-              pure (cmarkParser blobSource)
-        blobFields = ("path", blobPath) : languageTag
-        languageTag = maybe [] (pure . (,) "language" . show) blobLanguage
-        errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
-        errors = cata $ \ (In a syntax) -> case syntax of
-          _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (sourceSpan a) err]
-          _ -> fold syntax
-        logTiming :: String -> Task a -> Task a
-        logTiming statName t = do
-          writeLog Info statName blobFields
-          time statName languageTag t
+  where
+    go :: Parser term -> Task term
+    go parser = case parser of
+      ASTParser language ->
+        logTiming "parse.tree_sitter_ast_parse" $
+          liftIO ((Right <$> parseToAST language blob) `catchError` (pure . Left . toException)) >>= either throwError pure
+      AssignmentParser parser assignment -> do
+        ast <- go parser `catchError` \ err -> do
+          writeStat (Stat.increment "parse.parse_failures" languageTag)
+          writeLog Error "failed parsing" (("tag", "parse") : blobFields) >> throwError err
+        logTiming "parse.assign" $
+          case Assignment.assign blobSource assignment ast of
+            Left err -> do
+              writeStat (Stat.increment "parse.assign_errors" languageTag)
+              let formatted = Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err
+              writeLog Error formatted (("tag", "assign") : blobFields)
+              throwError (toException err)
+            Right term -> do
+              for_ (errors term) $ \ err -> do
+                writeStat (Stat.increment "parse.parse_errors" languageTag)
+                writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("tag", "assign") : blobFields)
+              pure term
+      TreeSitterParser tslanguage ->
+        logTiming "parse.tree_sitter_parse" $
+          liftIO (treeSitterParser tslanguage blob)
+      MarkdownParser ->
+        logTiming "parse.cmark_parse" $
+          pure (cmarkParser blobSource)
+    blobFields = ("path", blobPath) : languageTag
+    languageTag = maybe [] (pure . (,) "language" . show) blobLanguage
+    errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
+    errors = cata $ \ (In a syntax) -> case syntax of
+      _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (sourceSpan a) err]
+      _ -> fold syntax
+    logTiming :: String -> Task a -> Task a
+    logTiming statName t = do
+      writeLog Info statName blobFields
+      time statName languageTag t
 
 instance MonadIO Task where
   liftIO action = LiftIO action `Then` return
