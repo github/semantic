@@ -11,7 +11,6 @@ module Renderer.TOC
 , HasDeclaration
 , declarationAlgebra
 , markupSectionAlgebra
-, toDeclarationAlgebra
 , syntaxDeclarationAlgebra
 , Entry(..)
 , tableOfContentsBy
@@ -101,8 +100,8 @@ class HasDeclaration whole part where
 class CustomHasDeclaration whole part where
   customToDeclaration :: (HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra part (Term whole (Record fields)) (Maybe Declaration)
 
-toDeclarationAlgebra :: (HasField fields Range, HasField fields Span, HasDeclaration syntax syntax) => Blob -> RAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Maybe Declaration)
-toDeclarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
+declarationAlgebra :: (HasField fields Range, HasField fields Span, HasDeclaration syntax syntax) => Blob -> RAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Maybe Declaration)
+declarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
 
 
 instance (DeclarationStrategy part ~ strategy, HasDeclarationWithStrategy strategy whole part) => HasDeclaration whole part where
@@ -180,35 +179,6 @@ syntaxDeclarationAlgebra Blob{..} (In a r) = case r of
   S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange a) blobSource)) blobLanguage
   _ -> Nothing
   where getSource = toText . flip Source.slice blobSource . byteRange . extract
-
--- | Compute 'Declaration's for methods and functions.
-declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syntax.Empty :< fs, Syntax.Error :< fs, Apply Functor fs, HasField fields Range, HasField fields Span)
-                   => Blob
-                   -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-declarationAlgebra Blob{..} (In a r)
-  -- Do not summarize anonymous functions
-  | Just (Declaration.Function _ (identifier, _) _ _) <- prj r
-  , Just Syntax.Empty <- prj (unwrap identifier)
-  = Nothing
-
-  -- Named functions
-  | Just (Declaration.Function _ (identifier, _) _ _) <- prj r
-  = Just $ FunctionDeclaration (getSource (extract identifier))
-
-  -- Methods without a receiver
-  | Just (Declaration.Method _ (receiver, _) (identifier, _) _ _) <- prj r
-  , Just Syntax.Empty <- prj (unwrap receiver)
-  = Just $ MethodDeclaration (getSource (extract identifier))
-
-  -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
-  | Just (Declaration.Method _ (receiver, _) (identifier, _) _ _) <- prj r
-  = Just $ MethodDeclaration (getSource (extract receiver) <> "." <> getSource (extract identifier))
-
-  | Just err@Syntax.Error{} <- prj r
-  = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan a) err))) blobLanguage
-  | otherwise = Nothing
-
-  where getSource = toText . flip Source.slice blobSource . byteRange
 
 -- | Compute 'Declaration's with the headings of 'Markup.Section's.
 markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error :< fs, HasField fields Range, HasField fields Span, Apply Functor fs, Apply Foldable fs)

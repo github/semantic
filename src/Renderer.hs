@@ -10,7 +10,6 @@ module Renderer
 , renderJSONTerm
 , renderToCDiff
 , renderToCTerm
-, toDeclarationAlgebra
 , declarationAlgebra
 , HasDeclaration
 , markupSectionAlgebra
