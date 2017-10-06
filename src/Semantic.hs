@@ -63,6 +63,7 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
       parse parser blob >>= decorate constructorLabel . (Nil <$) >>= render renderSExpressionTerm
     | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
       parse syntaxParser blob >>= render renderSExpressionTerm . fmap keepCategory
+
   _ -> throwError (SomeException (NoParserForLanguage blobPath blobLanguage))
 
 data NoParserForLanguage = NoParserForLanguage FilePath (Maybe Language.Language)
