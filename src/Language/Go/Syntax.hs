@@ -32,7 +32,11 @@ type Syntax =
    , Declaration.Interface
    , Declaration.Method
    , Declaration.Module
+   , Expression.Arithmetic
+   , Expression.Bitwise
+   , Expression.Boolean
    , Expression.Call
+   , Expression.Comparison
    , Expression.MemberAccess
    , Literal.Array
    , Literal.Channel
@@ -73,7 +77,8 @@ expression = term (handleError (choice expressionChoices))
 
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
-  [ breakStatement
+  [ binaryExpression
+  , breakStatement
   , callExpression
   , channelType
   , comment
@@ -230,6 +235,28 @@ typeDeclaration = handleError $ makeTerm <$> symbol TypeDeclaration <*> children
 
 -- Expressions
 
+binaryExpression :: Assignment
+binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression expression
+  [ (inj .) . Expression.Plus      <$ symbol AnonPlus
+  , (inj .) . Expression.Minus     <$ symbol AnonMinus
+  , (inj .) . Expression.Times     <$ symbol AnonStar
+  , (inj .) . Expression.DividedBy <$ symbol AnonSlash
+  , (inj .) . Expression.Modulo    <$ symbol AnonPercent
+  , (inj .) . Expression.BOr       <$ symbol AnonPipe
+  , (inj .) . Expression.BAnd      <$ symbol AnonAmpersand
+  , (inj .) . Expression.BAnd      <$ symbol AnonAmpersandCaret
+  , (inj .) . Expression.BXOr      <$ symbol AnonCaret
+  , (inj .) . Expression.LShift    <$ symbol AnonLAngleLAngle
+  , (inj .) . Expression.RShift    <$ symbol AnonRAngleRAngle
+  , (inj .) . Expression.LessThan  <$ symbol AnonLAngle
+  , (inj .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
+  , (inj .) . Expression.GreaterThan      <$ symbol AnonRAngle
+  , (inj .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
+  , (inj .) . Expression.Equal            <$ symbol AnonEqualEqual
+  , (inj .) . invert Expression.Equal     <$ symbol AnonBangEqual
+  ])
+  where invert cons a b = Expression.Not (makeTerm1 (cons a b))
+
 block :: Assignment
 block = symbol Block *> children expressions
 
@@ -295,6 +322,14 @@ returnStatement :: Assignment
 returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (expression <|> emptyTerm))
 
 -- Helpers
+
+-- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
+infixTerm :: HasCallStack
+          => Assignment
+          -> Assignment
+          -> [Assignment.Assignment [] Grammar (Term -> Term -> Union Syntax Term)]
+          -> Assignment.Assignment [] Grammar (Union Syntax Term)
+infixTerm = infixContext comment
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 term :: Assignment -> Assignment
