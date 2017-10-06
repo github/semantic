@@ -235,11 +235,10 @@ singletonMethod = makeTerm <$> symbol SingletonMethod <*> children (Declaration.
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
 
 lambda :: Assignment
-lambda = makeTerm <$> symbol Lambda <*> children (do
-  name <- emptyTerm
-  params <- (symbol BlockParameters <|> symbol LambdaParameters) *> children (many parameter) <|> pure []
-  body <- expressions
-  pure (Declaration.Function [] name params body))
+lambda = makeTerm <$> symbol Lambda <*> children (
+  Declaration.Function [] <$> emptyTerm
+                          <*> ((symbol BlockParameters <|> symbol LambdaParameters) *> children (many parameter) <|> pure [])
+                          <*> expressions)
 
 block :: Assignment
 block =  makeTerm <$> symbol DoBlock <*> children (Declaration.Function <$> pure [] <*> emptyTerm <*> params <*> expressions)
