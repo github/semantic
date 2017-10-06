@@ -169,8 +169,8 @@ instance Apply HasDeclaration fs => CustomHasDeclaration (Union fs) where
 data Strategy = Default | Custom
 
 -- | Produce a 'Declaration' for a syntax node using either the 'Default' or 'Custom' strategy.
-class HasDeclarationWithStrategy (strategy :: Strategy) part where
-  toDeclarationWithStrategy :: (Foldable whole, HasField fields Range, HasField fields Span) => proxy strategy -> Blob -> Record fields -> RAlgebra part (Term whole (Record fields)) (Maybe Declaration)
+class HasDeclarationWithStrategy (strategy :: Strategy) syntax where
+  toDeclarationWithStrategy :: (Foldable whole, HasField fields Range, HasField fields Span) => proxy strategy -> Blob -> Record fields -> RAlgebra syntax (Term whole (Record fields)) (Maybe Declaration)
 
 
 type family DeclarationStrategy syntax where
