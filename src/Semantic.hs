@@ -109,26 +109,28 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
         syntaxParser = effectiveLanguage >>= parserForLanguage
 
         run :: Functor syntax => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Diff syntax ann ann -> output) -> Task output
-        run parse diff renderer = distributeFor blobs parse >>= runBothWith (diffTermPair blobs diff) >>= render renderer
+        run parse diff renderer = do
+          terms <- distributeFor blobs parse
+          writeLog Info "diff" logInfo
+          time "diff" languageTag $ do
+            diff <- runBothWith (diffTermPair blobs diff) terms
+            render renderer diff
+          where
+            showLanguage = pure . (,) "language" . show
+            languageTag = let (a, b) = runJoin blobs
+                          in maybe (maybe [] showLanguage (blobLanguage b)) showLanguage (blobLanguage a)
+            logInfo = let (a, b) = runJoin blobs in
+                    [ ("before_path", blobPath a)
+                    , ("before_language", maybe "" show (blobLanguage a))
+                    , ("after_path", blobPath b)
+                    , ("after_language", maybe "" show (blobLanguage b)) ]
 
 -- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
 diffTermPair :: Functor syntax => Both Blob -> Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
 diffTermPair blobs differ t1 t2 = case runJoin (blobExists <$> blobs) of
   (True, False) -> pure (deleting t1)
   (False, True) -> pure (inserting t2)
-  _ -> do
-    writeLog Info "diff" logInfo
-    time "diff" languageTag $ diff differ t1 t2
-  where
-    showLanguage = pure . (,) "language" . show
-    languageTag = let (a, b) = runJoin blobs
-                  in maybe (maybe [] showLanguage (blobLanguage b)) showLanguage (blobLanguage a)
-    logInfo = let (a, b) = runJoin blobs in
-            [ ("before_path", blobPath a)
-            , ("before_language", maybe "" show (blobLanguage a))
-            , ("after_path", blobPath b)
-            , ("after_language", maybe "" show (blobLanguage b)) ]
-
+  _ -> diff differ t1 t2
 
 keepCategory :: HasField fields Category => Record fields -> Record '[Category]
 keepCategory = (:. Nil) . category
