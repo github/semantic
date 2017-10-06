@@ -160,6 +160,7 @@ type family DeclarationStrategy syntax where
   DeclarationStrategy Markup.Section = 'Custom
   DeclarationStrategy Syntax.Error = 'Custom
   DeclarationStrategy (Union fs) = 'Custom
+  DeclarationStrategy S.Syntax = 'Custom
   DeclarationStrategy a = 'Default
 
 
