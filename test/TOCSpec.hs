@@ -89,7 +89,7 @@ spec = parallel $ do
     it "summarizes Go methods with receivers with special formatting" $ do
       sourceBlobs <- blobsForPaths (both "go/method-with-receiver.A.go" "go/method-with-receiver.B.go")
       let Just goParser = syntaxParserForLanguage Go
-      diff <- runTask $ distributeFor sourceBlobs (\ blob -> parse goParser blob >>= decorate (syntaxDeclarationAlgebra blob)) >>= runBothWith (diffTermPair sourceBlobs diffSyntaxTerms)
+      diff <- runTask $ distributeFor sourceBlobs (\ blob -> parse goParser blob >>= decorate (declarationAlgebra blob)) >>= runBothWith (diffTermPair sourceBlobs diffSyntaxTerms)
       diffTOC diff `shouldBe`
         [ JSONSummary "Method" "(*apiClient) CheckAuth" (sourceSpanBetween (3,1) (3,101)) "added" ]
 
