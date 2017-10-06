@@ -135,6 +135,7 @@ instance CustomHasDeclaration Markup.Section where
     where getSource = firstLine . toText . flip Source.slice blobSource
           firstLine = T.takeWhile (/= '\n')
 
+-- | Produce an 'ErrorDeclaration' for 'Syntax.Error' nodes.
 instance CustomHasDeclaration Syntax.Error where
   customToDeclaration Blob{..} ann err@Syntax.Error{}
     = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan ann) err))) blobLanguage
