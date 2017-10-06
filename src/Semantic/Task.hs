@@ -216,6 +216,7 @@ runParser Options{..} blob@Blob{..} = go
               for_ (errors term) $ \ err -> do
                 writeStat (Stat.increment "parse.parse_errors" languageTag)
                 writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("tag", "assign") : blobFields)
+              writeStat (Stat.count "parse.nodes" (length term) languageTag)
               pure term
       TreeSitterParser tslanguage ->
         time "parse.tree_sitter_parse" languageTag $

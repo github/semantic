@@ -16,6 +16,7 @@ import Data.ByteString (ByteString)
 import Data.Diff
 import Data.Functor.Both as Both
 import Data.Output
+import Data.Bifoldable
 import Data.Record
 import Data.Syntax.Algebra
 import Data.Term
@@ -26,6 +27,7 @@ import qualified Language
 import Parser
 import Renderer
 import Semantic.Task as Task
+import Semantic.Stat as Stat
 
 -- This is the primary interface to the Semantic library which provides two
 -- major classes of functionality: semantic parsing and diffing of source code
@@ -108,11 +110,12 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
           (Blob { blobPath = path }, _)                           -> (path, Nothing)
         syntaxParser = effectiveLanguage >>= parserForLanguage
 
-        run :: Functor syntax => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Diff syntax ann ann -> output) -> Task output
+        run :: (Foldable syntax, Functor syntax) => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Diff syntax ann ann -> output) -> Task output
         run parse diff renderer = do
           terms <- distributeFor blobs parse
           time "diff" languageTag $ do
             diff <- runBothWith (diffTermPair blobs diff) terms
+            writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
             render renderer diff
           where
             showLanguage = pure . (,) "language" . show
