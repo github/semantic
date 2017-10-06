@@ -128,6 +128,7 @@ class CustomHasDeclaration syntax where
   customToDeclaration :: (Foldable whole, HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra syntax (Term whole (Record fields)) (Maybe Declaration)
 
 
+-- | Produce a 'Declaration' from the first line of the heading of a 'Markup.Section' node.
 instance CustomHasDeclaration Markup.Section where
   customToDeclaration Blob{..} _ (Markup.Section level (Term (In headingAnn headingF), _) _)
     = Just $ SectionDeclaration (maybe (getSource (byteRange headingAnn)) (getSource . sconcat) (nonEmpty (byteRange . termAnnotation . unTerm <$> toList headingF))) level
