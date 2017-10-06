@@ -125,6 +125,14 @@ instance (Syntax.Empty :< fs) => HasDeclaration' (Union fs) Declaration.Function
     | otherwise                           = Just $ FunctionDeclaration (getSource identifierAnn)
     where getSource = toText . flip Source.slice blobSource . byteRange
 
+instance (Syntax.Empty :< fs) => HasDeclaration' (Union fs) Declaration.Method where
+  toDeclaration' Blob{..} _ (Declaration.Method _ (Term (In receiverAnn receiver), _) (Term (In identifierAnn _), _) _ _)
+    -- Methods without a receiver
+    | Just Syntax.Empty <- prj receiver = Just $ MethodDeclaration (getSource identifierAnn)
+    -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
+    | otherwise                         = Just $ MethodDeclaration (getSource receiverAnn <> "." <> getSource identifierAnn)
+    where getSource = toText . flip Source.slice blobSource . byteRange
+
 instance Apply (HasDeclaration (Union fs)) fs => HasDeclaration' (Union fs) (Union fs) where
   toDeclaration' blob ann = apply (Proxy :: Proxy (HasDeclaration (Union fs))) (toDeclaration blob ann)
 
@@ -137,6 +145,7 @@ class HasDeclarationWithStrategy (strategy :: Strategy) whole part where
 
 type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Function = 'Custom
+  DeclarationStrategy Declaration.Method = 'Custom
   DeclarationStrategy Markup.Section = 'Custom
   DeclarationStrategy Syntax.Error = 'Custom
   DeclarationStrategy (Union fs) = 'Custom
