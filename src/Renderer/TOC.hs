@@ -139,6 +139,7 @@ instance Apply HasDeclaration fs => CustomHasDeclaration (Union fs) where
   customToDeclaration blob ann = apply (Proxy :: Proxy HasDeclaration) (toDeclaration blob ann)
 
 
+-- | A strategy for defining a 'HasDeclaration' instance. Intended to be promoted to the kind level using @-XDataKinds@.
 data Strategy = Default | Custom
 
 class HasDeclarationWithStrategy (strategy :: Strategy) part where
