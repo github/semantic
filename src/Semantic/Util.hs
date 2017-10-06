@@ -1,4 +1,5 @@
-{-# LANGUAGE TypeOperators, DataKinds #-}
+-- MonoLocalBinds is to silence a warning about a simplifiable constraint.
+{-# LANGUAGE DataKinds, MonoLocalBinds, TypeOperators #-}
 module Semantic.Util where
 
 import Control.Monad.IO.Class
