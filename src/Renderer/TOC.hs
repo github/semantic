@@ -124,6 +124,7 @@ instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy stra
 
 -- | Types for which we can produce a customized 'Declaration'. This returns in 'Maybe' so that some values can be opted out (e.g. anonymous functions).
 class CustomHasDeclaration syntax where
+  -- | Produce a customized 'Declaration' for a given syntax node.
   customToDeclaration :: (Foldable whole, HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra syntax (Term whole (Record fields)) (Maybe Declaration)
 
 
