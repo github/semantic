@@ -10,7 +10,6 @@ module Renderer.TOC
 , declaration
 , HasDeclaration
 , declarationAlgebra
-, markupSectionAlgebra
 , syntaxDeclarationAlgebra
 , Entry(..)
 , tableOfContentsBy
@@ -179,17 +178,6 @@ syntaxDeclarationAlgebra Blob{..} (In a r) = case r of
   S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange a) blobSource)) blobLanguage
   _ -> Nothing
   where getSource = toText . flip Source.slice blobSource . byteRange . extract
-
--- | Compute 'Declaration's with the headings of 'Markup.Section's.
-markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error :< fs, HasField fields Range, HasField fields Span, Apply Functor fs, Apply Foldable fs)
-                     => Blob
-                     -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-markupSectionAlgebra Blob{..} (In a r)
-  | Just (Markup.Section level (heading, _) _) <- prj r = Just $ SectionDeclaration (maybe (getSource (extract heading)) (firstLine . toText . flip Source.slice blobSource . sconcat) (nonEmpty (byteRange . extract <$> toList (unwrap heading)))) level
-  | Just err@Syntax.Error{} <- prj r = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan a) err))) blobLanguage
-  | otherwise = Nothing
-  where getSource = firstLine . toText . flip Source.slice blobSource . byteRange
-        firstLine = T.takeWhile (/= '\n')
 
 formatTOCError :: Error.Error String -> String
 formatTOCError e = showExpectation False (errorExpected e) (errorActual e) ""
