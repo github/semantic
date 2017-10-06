@@ -113,6 +113,11 @@ class HasDeclaration syntax where
   -- | Compute a 'Declaration' for a syntax type using its 'CustomHasDeclaration' instance, if any, or else falling back to the default definition (which simply returns 'Nothing').
   toDeclaration :: (Foldable whole, HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra syntax (Term whole (Record fields)) (Maybe Declaration)
 
+-- | Define 'toDeclaration' using the 'CustomHasDeclaration' instance for a type if there is one or else use the default definition.
+--
+--   This instance determines whether or not there is an instance for @syntax@ by looking it up in the 'DeclarationStrategy' type family. Thus producing a 'Declaration' for a node requires both defining a 'CustomHasDeclaration' instance _and_ adding a definition for the type to the 'DeclarationStrategy' type family to return 'Custom'.
+--
+--   Note that since 'DeclarationStrategy' has a fallback case for its final entry, this instance will hold for all types of kind @* -> *@. Thus, this must be the only instance of 'HasDeclaration', as any other instance would be indistinguishable.
 instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy strategy syntax) => HasDeclaration syntax where
   toDeclaration = toDeclarationWithStrategy (undefined :: proxy strategy)
 
