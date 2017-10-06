@@ -164,30 +164,34 @@ runTaskWithOptions options task = do
   closeQueue statter
   closeQueue logger
   either (die . displayException) pure result
-  where run :: Options -> AsyncQueue Message Options -> AsyncQueue Stat StatsClient -> Task a -> IO (Either SomeException a)
-        run options logger statter = go
-          where go :: Task a -> IO (Either SomeException a)
-                go = iterFreerA (\ task yield -> case task of
-                  ReadBlobs source -> (either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield) `catchError` (pure . Left . toException)
-                  ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left . toException)
-                  WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
-                  WriteLog level message pairs -> queueLogMessage logger level message pairs >>= yield
-                  WriteStat stat -> queue statter stat >>= yield
-                  Time statName tags task -> do
-                    res <- withTiming (queue statter) statName tags $ go task
-                    either (pure . Left) yield res
-                  Parse parser blob -> go (runParser options blob parser) >>= either (pure . Left) yield
-                  Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield
-                  Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2) >>= yield
-                  Render renderer input -> pure (renderer input) >>= yield
-                  Distribute tasks -> Async.mapConcurrently go tasks >>= either (pure . Left) yield . sequenceA . withStrategy (parTraversable (parTraversable rseq))
-                  LiftIO action -> action >>= yield
-                  Throw err -> pure (Left err)
-                  Catch during handler -> do
-                    result <- go during
-                    case result of
-                      Left err -> go (handler err) >>= either (pure . Left) yield
-                      Right a -> yield a) . fmap Right
+  where
+    run :: Options
+        -> AsyncQueue Message Options
+        -> AsyncQueue Stat StatsClient
+        -> Task a
+        -> IO (Either SomeException a)
+    run options logger statter = go
+      where
+        go :: Task a -> IO (Either SomeException a)
+        go = iterFreerA (\ task yield -> case task of
+          ReadBlobs source -> (either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield) `catchError` (pure . Left . toException)
+          ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left . toException)
+          WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
+          WriteLog level message pairs -> queueLogMessage logger level message pairs >>= yield
+          WriteStat stat -> queue statter stat >>= yield
+          Time statName tags task -> withTiming (queue statter) statName tags (go task) >>= either (pure . Left) yield
+          Parse parser blob -> go (runParser options blob parser) >>= either (pure . Left) yield
+          Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield
+          Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2) >>= yield
+          Render renderer input -> pure (renderer input) >>= yield
+          Distribute tasks -> Async.mapConcurrently go tasks >>= either (pure . Left) yield . sequenceA . withStrategy (parTraversable (parTraversable rseq))
+          LiftIO action -> action >>= yield
+          Throw err -> pure (Left err)
+          Catch during handler -> do
+            result <- go during
+            case result of
+              Left err -> go (handler err) >>= either (pure . Left) yield
+              Right a -> yield a) . fmap Right
 
 runParser :: Options -> Blob -> Parser term -> Task term
 runParser Options{..} blob@Blob{..} = go
