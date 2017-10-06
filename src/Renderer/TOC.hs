@@ -187,9 +187,11 @@ type family DeclarationStrategy syntax where
   DeclarationStrategy a = 'Default
 
 
+-- | The 'Default' strategy produces 'Nothing'.
 instance HasDeclarationWithStrategy 'Default syntax where
   toDeclarationWithStrategy _ _ _ _ = Nothing
 
+-- | The 'Custom' strategy delegates the selection of the strategy to the 'CustomHasDeclaration' instance for the type.
 instance CustomHasDeclaration syntax => HasDeclarationWithStrategy 'Custom syntax where
   toDeclarationWithStrategy _ = customToDeclaration
 
