@@ -10,7 +10,6 @@ module Renderer.TOC
 , declaration
 , HasDeclaration
 , declarationAlgebra
-, syntaxDeclarationAlgebra
 , Entry(..)
 , tableOfContentsBy
 , dedupe
@@ -178,19 +177,6 @@ getDeclaration = getField
 declaration :: HasField fields (Maybe Declaration) => TermF f (Record fields) a -> Maybe (Record fields)
 declaration (In annotation _) = annotation <$ (getField annotation :: Maybe Declaration)
 
-
--- | Compute 'Declaration's for methods and functions in 'Syntax'.
-syntaxDeclarationAlgebra :: HasField fields Range => Blob -> RAlgebra (TermF S.Syntax (Record fields)) (Term S.Syntax (Record fields)) (Maybe Declaration)
-syntaxDeclarationAlgebra Blob{..} (In a r) = case r of
-  S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier)
-  S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier)
-  S.Method _ (identifier, _) (Just (receiver, _)) _ _
-    | S.Indexed [receiverParams] <- unwrap receiver
-    , S.ParameterDecl (Just ty) _ <- unwrap receiverParams -> Just $ MethodDeclaration ("(" <> getSource ty <> ") " <> getSource identifier)
-    | otherwise -> Just $ MethodDeclaration (getSource receiver <> "." <> getSource identifier)
-  S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange a) blobSource)) blobLanguage
-  _ -> Nothing
-  where getSource = toText . flip Source.slice blobSource . byteRange . extract
 
 formatTOCError :: Error.Error String -> String
 formatTOCError e = showExpectation False (errorExpected e) (errorActual e) ""

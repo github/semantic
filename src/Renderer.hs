@@ -12,7 +12,6 @@ module Renderer
 , renderToCTerm
 , declarationAlgebra
 , HasDeclaration
-, syntaxDeclarationAlgebra
 , Summaries(..)
 , File(..)
 ) where
