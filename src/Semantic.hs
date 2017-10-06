@@ -111,7 +111,6 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
         run :: Functor syntax => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Diff syntax ann ann -> output) -> Task output
         run parse diff renderer = do
           terms <- distributeFor blobs parse
-          writeLog Info "diff" logInfo
           time "diff" languageTag $ do
             diff <- runBothWith (diffTermPair blobs diff) terms
             render renderer diff
@@ -119,11 +118,6 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
             showLanguage = pure . (,) "language" . show
             languageTag = let (a, b) = runJoin blobs
                           in maybe (maybe [] showLanguage (blobLanguage b)) showLanguage (blobLanguage a)
-            logInfo = let (a, b) = runJoin blobs in
-                    [ ("before_path", blobPath a)
-                    , ("before_language", maybe "" show (blobLanguage a))
-                    , ("after_path", blobPath b)
-                    , ("after_language", maybe "" show (blobLanguage b)) ]
 
 -- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
 diffTermPair :: Functor syntax => Both Blob -> Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
