@@ -8,12 +8,14 @@
     {-(Identifier)-}
     {-(RequiredParameter
       {-(Empty)-}
+      {-(Empty)-}
       {-(Annotation
         {-(PredefinedType)-})-}
       {-(Assignment
         {-(Identifier)-}
         {-(Empty)-})-})-}
     {-(RequiredParameter
+      {-(Empty)-}
       {-(Empty)-}
       {-(Annotation
         {-(PredefinedType)-})-}
