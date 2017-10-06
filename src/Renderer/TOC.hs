@@ -111,12 +111,13 @@ declarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
 class HasDeclaration syntax where
   toDeclaration :: (Foldable whole, HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra syntax (Term whole (Record fields)) (Maybe Declaration)
 
+instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy strategy syntax) => HasDeclaration syntax where
+  toDeclaration = toDeclarationWithStrategy (undefined :: proxy strategy)
+
+
 class CustomHasDeclaration syntax where
   customToDeclaration :: (Foldable whole, HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra syntax (Term whole (Record fields)) (Maybe Declaration)
 
-
-instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy strategy syntax) => HasDeclaration syntax where
-  toDeclaration = toDeclarationWithStrategy (undefined :: proxy strategy)
 
 instance CustomHasDeclaration Markup.Section where
   customToDeclaration Blob{..} _ (Markup.Section level (Term (In headingAnn headingF), _) _)
