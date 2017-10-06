@@ -35,7 +35,7 @@ diffWithParser :: (HasField fields Data.Span.Span,
                    Eq1 syntax, Show1 syntax,
                    Traversable syntax, Functor syntax,
                    Foldable syntax, Diffable syntax,
-                   GAlign syntax, HasDeclaration syntax syntax)
+                   GAlign syntax, HasDeclaration syntax)
                   =>
                   Parser (Term syntax (Record fields))
                   -> Both Blob

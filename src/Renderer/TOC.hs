@@ -94,30 +94,30 @@ data Declaration
   deriving (Eq, Generic, Show)
 
 
-class HasDeclaration whole part where
-  toDeclaration :: (HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra part (Term whole (Record fields)) (Maybe Declaration)
+class HasDeclaration syntax where
+  toDeclaration :: (Foldable whole, HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra syntax (Term whole (Record fields)) (Maybe Declaration)
 
-class CustomHasDeclaration whole part where
-  customToDeclaration :: (HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra part (Term whole (Record fields)) (Maybe Declaration)
+class CustomHasDeclaration syntax where
+  customToDeclaration :: (Foldable whole, HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra syntax (Term whole (Record fields)) (Maybe Declaration)
 
-declarationAlgebra :: (HasField fields Range, HasField fields Span, HasDeclaration syntax syntax) => Blob -> RAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Maybe Declaration)
+declarationAlgebra :: (HasField fields Range, HasField fields Span, Foldable syntax, HasDeclaration syntax) => Blob -> RAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Maybe Declaration)
 declarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
 
 
-instance (DeclarationStrategy part ~ strategy, HasDeclarationWithStrategy strategy whole part) => HasDeclaration whole part where
+instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy strategy syntax) => HasDeclaration syntax where
   toDeclaration = toDeclarationWithStrategy (undefined :: proxy strategy)
 
-instance Apply Foldable fs => CustomHasDeclaration (Union fs) Markup.Section where
+instance CustomHasDeclaration Markup.Section where
   customToDeclaration Blob{..} _ (Markup.Section level (Term (In headingAnn headingF), _) _)
     = Just $ SectionDeclaration (maybe (getSource (byteRange headingAnn)) (getSource . sconcat) (nonEmpty (byteRange . termAnnotation . unTerm <$> toList headingF))) level
     where getSource = firstLine . toText . flip Source.slice blobSource
           firstLine = T.takeWhile (/= '\n')
 
-instance CustomHasDeclaration whole Syntax.Error where
+instance CustomHasDeclaration Syntax.Error where
   customToDeclaration Blob{..} ann err@Syntax.Error{}
     = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan ann) err))) blobLanguage
 
-instance CustomHasDeclaration (Union fs) Declaration.Function where
+instance CustomHasDeclaration Declaration.Function where
   customToDeclaration Blob{..} _ (Declaration.Function _ (Term (In identifierAnn _), _) _ _)
     -- Do not summarize anonymous functions
     | isEmpty identifierAnn = Nothing
@@ -126,7 +126,7 @@ instance CustomHasDeclaration (Union fs) Declaration.Function where
     where getSource = toText . flip Source.slice blobSource . byteRange
           isEmpty = (== 0) . rangeLength . byteRange
 
-instance CustomHasDeclaration (Union fs) Declaration.Method where
+instance CustomHasDeclaration Declaration.Method where
   customToDeclaration Blob{..} _ (Declaration.Method _ (Term (In receiverAnn _), _) (Term (In identifierAnn _), _) _ _)
     -- Methods without a receiver
     | isEmpty receiverAnn = Just $ MethodDeclaration (getSource identifierAnn)
@@ -135,14 +135,14 @@ instance CustomHasDeclaration (Union fs) Declaration.Method where
     where getSource = toText . flip Source.slice blobSource . byteRange
           isEmpty = (== 0) . rangeLength . byteRange
 
-instance Apply (HasDeclaration (Union fs)) fs => CustomHasDeclaration (Union fs) (Union fs) where
-  customToDeclaration blob ann = apply (Proxy :: Proxy (HasDeclaration (Union fs))) (toDeclaration blob ann)
+instance Apply HasDeclaration fs => CustomHasDeclaration (Union fs) where
+  customToDeclaration blob ann = apply (Proxy :: Proxy HasDeclaration) (toDeclaration blob ann)
 
 
 data Strategy = Default | Custom
 
-class HasDeclarationWithStrategy (strategy :: Strategy) whole part where
-  toDeclarationWithStrategy :: (HasField fields Range, HasField fields Span) => proxy strategy -> Blob -> Record fields -> RAlgebra part (Term whole (Record fields)) (Maybe Declaration)
+class HasDeclarationWithStrategy (strategy :: Strategy) part where
+  toDeclarationWithStrategy :: (Foldable whole, HasField fields Range, HasField fields Span) => proxy strategy -> Blob -> Record fields -> RAlgebra part (Term whole (Record fields)) (Maybe Declaration)
 
 
 type family DeclarationStrategy syntax where
@@ -155,10 +155,10 @@ type family DeclarationStrategy syntax where
   DeclarationStrategy a = 'Default
 
 
-instance HasDeclarationWithStrategy 'Default term syntax where
+instance HasDeclarationWithStrategy 'Default syntax where
   toDeclarationWithStrategy _ _ _ _ = Nothing
 
-instance CustomHasDeclaration term syntax => HasDeclarationWithStrategy 'Custom term syntax where
+instance CustomHasDeclaration syntax => HasDeclarationWithStrategy 'Custom syntax where
   toDeclarationWithStrategy _ = customToDeclaration
 
 
