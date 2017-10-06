@@ -18,6 +18,7 @@ import Data.Diff
 import Data.Functor.Both as Both
 import Data.Functor.Classes
 import Data.Output
+import Data.Bifoldable
 import Data.Record
 import Data.Syntax.Algebra
 import Data.Term
@@ -28,6 +29,7 @@ import qualified Language
 import Parser
 import Renderer
 import Semantic.Task as Task
+import Semantic.Stat as Stat
 
 -- This is the primary interface to the Semantic library which provides two
 -- major classes of functionality: semantic parsing and diffing of source code
@@ -114,22 +116,24 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
           (_, Blob { blobLanguage = Just lang, blobPath = path }) -> (path, Just lang)
           (Blob { blobPath = path }, _)                           -> (path, Nothing)
 
-        run :: Functor syntax => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Diff syntax ann ann -> output) -> Task output
-        run parse diff renderer = distributeFor blobs parse >>= runBothWith (diffTermPair blobs diff) >>= render renderer
+        run :: (Foldable syntax, Functor syntax) => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Diff syntax ann ann -> output) -> Task output
+        run parse diff renderer = do
+          terms <- distributeFor blobs parse
+          time "diff" languageTag $ do
+            diff <- runBothWith (diffTermPair blobs diff) terms
+            writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
+            render renderer diff
+          where
+            showLanguage = pure . (,) "language" . show
+            languageTag = let (a, b) = runJoin blobs
+                          in maybe (maybe [] showLanguage (blobLanguage b)) showLanguage (blobLanguage a)
 
 -- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
 diffTermPair :: Functor syntax => Both Blob -> Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
 diffTermPair blobs differ t1 t2 = case runJoin (blobExists <$> blobs) of
   (True, False) -> pure (deleting t1)
   (False, True) -> pure (inserting t2)
-  _ -> time "diff" logInfo $ diff differ t1 t2
-  where
-    logInfo = let (a, b) = runJoin blobs in
-            [ ("before_path", blobPath a)
-            , ("before_language", maybe "" show (blobLanguage a))
-            , ("after_path", blobPath b)
-            , ("after_language", maybe "" show (blobLanguage b)) ]
-
+  _ -> diff differ t1 t2
 
 keepCategory :: HasField fields Category => Record fields -> Record '[Category]
 keepCategory = (:. Nil) . category
