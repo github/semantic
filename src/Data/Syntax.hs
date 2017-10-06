@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, TypeOperators #-}
+{-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators #-}
 module Data.Syntax where
 
 import Algorithm hiding (Empty)
@@ -15,6 +15,7 @@ import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Ord.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Mergeable
+import Data.Range
 import Data.Record
 import Data.Semigroup
 import Data.Span
@@ -46,7 +47,8 @@ makeTerm1' f = case toList f of
 
 -- | Construct an empty term at the current position.
 emptyTerm :: (HasCallStack, Empty :< fs, Apply Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
-emptyTerm = makeTerm <$> Assignment.location <*> pure Empty
+emptyTerm = makeTerm . startLocation <$> Assignment.location <*> pure Empty
+  where startLocation ann = Range (start (getField ann)) (start (getField ann)) :. Span (spanStart (getField ann)) (spanStart (getField ann)) :. Nil
 
 -- | Catch assignment errors into an error term.
 handleError :: (HasCallStack, Error :< fs, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
