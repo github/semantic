@@ -68,7 +68,15 @@ data SomeParser typeclasses where
 --   This can be used to perform operations uniformly over terms produced by blobs with different 'Language's, and which therefore have different types in general. For example, given some 'Blob', we can parse and 'show' the parsed & assigned 'Term' like so:
 --
 --   > case someParser (Proxy :: Proxy '[Show1]) (blobLanguage language) of { Just parser -> runTask (parse parser blob) >>= putStrLn . show ; _ -> return () }
-someParser :: (ApplyAll typeclasses JSON.Syntax, ApplyAll typeclasses Markdown.Syntax, ApplyAll typeclasses Python.Syntax, ApplyAll typeclasses Ruby.Syntax, ApplyAll typeclasses TypeScript.Syntax) => proxy typeclasses -> Language -> Maybe (SomeParser typeclasses)
+someParser :: ( ApplyAll typeclasses JSON.Syntax
+              , ApplyAll typeclasses Markdown.Syntax
+              , ApplyAll typeclasses Python.Syntax
+              , ApplyAll typeclasses Ruby.Syntax
+              , ApplyAll typeclasses TypeScript.Syntax
+              )
+           => proxy typeclasses
+           -> Language
+           -> Maybe (SomeParser typeclasses)
 someParser _ Go         = Nothing
 someParser _ JavaScript = Just (SomeParser typescriptParser)
 someParser _ JSON       = Just (SomeParser jsonParser)
