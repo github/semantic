@@ -34,6 +34,7 @@ import Data.Maybe (fromMaybe, mapMaybe)
 import Data.Output
 import Data.Patch
 import Data.Proxy
+import Data.Range
 import Data.Record
 import Data.Semigroup ((<>), sconcat)
 import Data.Source as Source
@@ -115,21 +116,23 @@ instance CustomHasDeclaration whole Syntax.Error where
   customToDeclaration Blob{..} ann err@Syntax.Error{}
     = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan ann) err))) blobLanguage
 
-instance (Syntax.Empty :< fs) => CustomHasDeclaration (Union fs) Declaration.Function where
-  customToDeclaration Blob{..} _ (Declaration.Function _ (Term (In identifierAnn identifier), _) _ _)
+instance CustomHasDeclaration (Union fs) Declaration.Function where
+  customToDeclaration Blob{..} _ (Declaration.Function _ (Term (In identifierAnn _), _) _ _)
     -- Do not summarize anonymous functions
-    | Just Syntax.Empty <- prj identifier = Nothing
+    | isEmpty identifierAnn = Nothing
     -- Named functions
-    | otherwise                           = Just $ FunctionDeclaration (getSource identifierAnn)
+    | otherwise             = Just $ FunctionDeclaration (getSource identifierAnn)
     where getSource = toText . flip Source.slice blobSource . byteRange
+          isEmpty = (== 0) . rangeLength . byteRange
 
-instance (Syntax.Empty :< fs) => CustomHasDeclaration (Union fs) Declaration.Method where
-  customToDeclaration Blob{..} _ (Declaration.Method _ (Term (In receiverAnn receiver), _) (Term (In identifierAnn _), _) _ _)
+instance CustomHasDeclaration (Union fs) Declaration.Method where
+  customToDeclaration Blob{..} _ (Declaration.Method _ (Term (In receiverAnn _), _) (Term (In identifierAnn _), _) _ _)
     -- Methods without a receiver
-    | Just Syntax.Empty <- prj receiver = Just $ MethodDeclaration (getSource identifierAnn)
+    | isEmpty receiverAnn = Just $ MethodDeclaration (getSource identifierAnn)
     -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
-    | otherwise                         = Just $ MethodDeclaration (getSource receiverAnn <> "." <> getSource identifierAnn)
+    | otherwise           = Just $ MethodDeclaration (getSource receiverAnn <> "." <> getSource identifierAnn)
     where getSource = toText . flip Source.slice blobSource . byteRange
+          isEmpty = (== 0) . rangeLength . byteRange
 
 instance Apply (HasDeclaration (Union fs)) fs => CustomHasDeclaration (Union fs) (Union fs) where
   customToDeclaration blob ann = apply (Proxy :: Proxy (HasDeclaration (Union fs))) (toDeclaration blob ann)
