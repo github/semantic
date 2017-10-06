@@ -168,6 +168,7 @@ instance Apply HasDeclaration fs => CustomHasDeclaration (Union fs) where
 -- | A strategy for defining a 'HasDeclaration' instance. Intended to be promoted to the kind level using @-XDataKinds@.
 data Strategy = Default | Custom
 
+-- | Produce a 'Declaration' for a syntax node using either the 'Default' or 'Custom' strategy.
 class HasDeclarationWithStrategy (strategy :: Strategy) part where
   toDeclarationWithStrategy :: (Foldable whole, HasField fields Range, HasField fields Span) => proxy strategy -> Blob -> Record fields -> RAlgebra part (Term whole (Record fields)) (Maybe Declaration)
 
