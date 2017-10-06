@@ -139,19 +139,6 @@ instance Apply (HasDeclaration (Union fs)) fs => CustomHasDeclaration (Union fs)
   customToDeclaration blob ann = apply (Proxy :: Proxy (HasDeclaration (Union fs))) (toDeclaration blob ann)
 
 
-instance CustomHasDeclaration S.Syntax S.Syntax where
-  customToDeclaration Blob{..} a r = case r of
-    S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier)
-    S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier)
-    S.Method _ (identifier, _) (Just (receiver, _)) _ _
-      | S.Indexed [receiverParams] <- unwrap receiver
-      , S.ParameterDecl (Just ty) _ <- unwrap receiverParams -> Just $ MethodDeclaration ("(" <> getSource ty <> ") " <> getSource identifier)
-      | otherwise -> Just $ MethodDeclaration (getSource receiver <> "." <> getSource identifier)
-    S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange a) blobSource)) blobLanguage
-    _ -> Nothing
-    where getSource = toText . flip Source.slice blobSource . byteRange . extract
-
-
 data Strategy = Default | Custom
 
 class HasDeclarationWithStrategy (strategy :: Strategy) whole part where
