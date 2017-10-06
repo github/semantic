@@ -108,6 +108,7 @@ declarationAlgebra :: (HasField fields Range, HasField fields Span, Foldable syn
 declarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
 
 
+-- | Types for which we can produce a 'Declaration' in 'Maybe'. There is exactly one instance of this typeclass; adding customized 'Declaration's for a new type is done by defining an instance of 'CustomHasDeclaration' instead.
 class HasDeclaration syntax where
   toDeclaration :: (Foldable whole, HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra syntax (Term whole (Record fields)) (Maybe Declaration)
 
