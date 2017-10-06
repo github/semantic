@@ -236,7 +236,7 @@ singletonMethod = makeTerm <$> symbol SingletonMethod <*> children (Declaration.
 
 lambda :: Assignment
 lambda = symbol Lambda >>= \ loc -> children $ do
-  name <- makeTerm loc <$> (Syntax.Empty <$ source)
+  name <- emptyTerm
   params <- (symbol BlockParameters <|> symbol LambdaParameters) *> children (many parameter) <|> pure []
   body <- expressions
   pure $ makeTerm loc (Declaration.Function [] name params body)
