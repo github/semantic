@@ -160,6 +160,7 @@ instance CustomHasDeclaration Declaration.Method where
     where getSource = toText . flip Source.slice blobSource . byteRange
           isEmpty = (== 0) . rangeLength . byteRange
 
+-- | Produce a 'Declaration' for 'Union's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
 instance Apply HasDeclaration fs => CustomHasDeclaration (Union fs) where
   customToDeclaration blob ann = apply (Proxy :: Proxy HasDeclaration) (toDeclaration blob ann)
 
