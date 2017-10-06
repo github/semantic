@@ -97,7 +97,7 @@ data Declaration
 class HasDeclaration whole part where
   toDeclaration :: (HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra part (Term whole (Record fields)) (Maybe Declaration)
 
-class HasDeclaration' whole part where
+class CustomHasDeclaration whole part where
   toDeclaration' :: (HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra part (Term whole (Record fields)) (Maybe Declaration)
 
 toDeclarationAlgebra :: (HasField fields Range, HasField fields Span, HasDeclaration syntax syntax) => Blob -> RAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Maybe Declaration)
@@ -107,17 +107,17 @@ toDeclarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
 instance (DeclarationStrategy part ~ strategy, HasDeclarationWithStrategy strategy whole part) => HasDeclaration whole part where
   toDeclaration = toDeclarationWithStrategy (undefined :: proxy strategy)
 
-instance Apply Foldable fs => HasDeclaration' (Union fs) Markup.Section where
+instance Apply Foldable fs => CustomHasDeclaration (Union fs) Markup.Section where
   toDeclaration' Blob{..} _ (Markup.Section level (Term (In headingAnn headingF), _) _)
     = Just $ SectionDeclaration (maybe (getSource (byteRange headingAnn)) (getSource . sconcat) (nonEmpty (byteRange . termAnnotation . unTerm <$> toList headingF))) level
     where getSource = firstLine . toText . flip Source.slice blobSource
           firstLine = T.takeWhile (/= '\n')
 
-instance HasDeclaration' whole Syntax.Error where
+instance CustomHasDeclaration whole Syntax.Error where
   toDeclaration' Blob{..} ann err@Syntax.Error{}
     = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan ann) err))) blobLanguage
 
-instance (Syntax.Empty :< fs) => HasDeclaration' (Union fs) Declaration.Function where
+instance (Syntax.Empty :< fs) => CustomHasDeclaration (Union fs) Declaration.Function where
   toDeclaration' Blob{..} _ (Declaration.Function _ (Term (In identifierAnn identifier), _) _ _)
     -- Do not summarize anonymous functions
     | Just Syntax.Empty <- prj identifier = Nothing
@@ -125,7 +125,7 @@ instance (Syntax.Empty :< fs) => HasDeclaration' (Union fs) Declaration.Function
     | otherwise                           = Just $ FunctionDeclaration (getSource identifierAnn)
     where getSource = toText . flip Source.slice blobSource . byteRange
 
-instance (Syntax.Empty :< fs) => HasDeclaration' (Union fs) Declaration.Method where
+instance (Syntax.Empty :< fs) => CustomHasDeclaration (Union fs) Declaration.Method where
   toDeclaration' Blob{..} _ (Declaration.Method _ (Term (In receiverAnn receiver), _) (Term (In identifierAnn _), _) _ _)
     -- Methods without a receiver
     | Just Syntax.Empty <- prj receiver = Just $ MethodDeclaration (getSource identifierAnn)
@@ -133,7 +133,7 @@ instance (Syntax.Empty :< fs) => HasDeclaration' (Union fs) Declaration.Method w
     | otherwise                         = Just $ MethodDeclaration (getSource receiverAnn <> "." <> getSource identifierAnn)
     where getSource = toText . flip Source.slice blobSource . byteRange
 
-instance Apply (HasDeclaration (Union fs)) fs => HasDeclaration' (Union fs) (Union fs) where
+instance Apply (HasDeclaration (Union fs)) fs => CustomHasDeclaration (Union fs) (Union fs) where
   toDeclaration' blob ann = apply (Proxy :: Proxy (HasDeclaration (Union fs))) (toDeclaration blob ann)
 
 
@@ -155,7 +155,7 @@ type family DeclarationStrategy syntax where
 instance HasDeclarationWithStrategy 'Default term syntax where
   toDeclarationWithStrategy _ _ _ _ = Nothing
 
-instance HasDeclaration' term syntax => HasDeclarationWithStrategy 'Custom term syntax where
+instance CustomHasDeclaration term syntax => HasDeclarationWithStrategy 'Custom term syntax where
   toDeclarationWithStrategy _ = toDeclaration'
 
 
