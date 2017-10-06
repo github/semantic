@@ -94,6 +94,16 @@ data Declaration
   deriving (Eq, Generic, Show)
 
 
+-- | An r-algebra producing 'Just' a 'Declaration' for syntax nodes corresponding to high-level declarations, or 'Nothing' otherwise.
+--
+--   Customizing this for a given syntax type involves two steps:
+--
+--   1. Defining a 'CustomHasDeclaration' instance for the type.
+--   2. Adding the type to the 'DeclarationStrategy' type family.
+--
+--   If you’re getting errors about missing a 'CustomHasDeclaration' instance for your syntax type, you probably forgot step 1.
+--
+--   If you’re getting 'Nothing' for your syntax node at runtime, you probably forgot step 2.
 declarationAlgebra :: (HasField fields Range, HasField fields Span, Foldable syntax, HasDeclaration syntax) => Blob -> RAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Maybe Declaration)
 declarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
 
