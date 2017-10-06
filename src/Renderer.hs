@@ -10,8 +10,8 @@ module Renderer
 , renderJSONTerm
 , renderToCDiff
 , renderToCTerm
-, declarationAlgebra
 , HasDeclaration
+, declarationAlgebra
 , Summaries(..)
 , File(..)
 ) where
