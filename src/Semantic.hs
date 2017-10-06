@@ -50,7 +50,7 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (ToCTermRenderer, Just Language.Ruby) -> parse rubyParser blob >>= decorate (declarationAlgebra blob) >>= render (renderToCTerm blob)
   (ToCTermRenderer, lang)
     | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
-      parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob) >>= render (renderToCTerm blob)
+      parse syntaxParser blob >>= decorate (declarationAlgebra blob) >>= render (renderToCTerm blob)
 
   (JSONTermRenderer, lang)
     | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Foldable, Functor]) ->
@@ -80,7 +80,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (OldToCDiffRenderer, Just Language.Ruby) -> run (\ blob -> parse rubyParser blob >>= decorate (declarationAlgebra blob)) diffTerms (renderToCDiff blobs)
   (OldToCDiffRenderer, lang)
     | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
-      run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms (renderToCDiff blobs)
+      run (\ blob -> parse syntaxParser blob >>= decorate (declarationAlgebra blob)) diffSyntaxTerms (renderToCDiff blobs)
 
   (ToCDiffRenderer, Just Language.Markdown) -> run (\ blob -> parse markdownParser blob >>= decorate (declarationAlgebra blob)) diffTerms (renderToCDiff blobs)
   (ToCDiffRenderer, Just Language.Python) -> run (\ blob -> parse pythonParser blob >>= decorate (declarationAlgebra blob)) diffTerms (renderToCDiff blobs)
@@ -88,7 +88,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (ToCDiffRenderer, Just Language.TypeScript) -> run (\ blob -> parse typescriptParser blob >>= decorate (declarationAlgebra blob)) diffTerms (renderToCDiff blobs)
   (ToCDiffRenderer, lang)
     | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
-      run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms (renderToCDiff blobs)
+      run (\ blob -> parse syntaxParser blob >>= decorate (declarationAlgebra blob)) diffSyntaxTerms (renderToCDiff blobs)
 
   (JSONDiffRenderer, lang)
     | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, Show1, Traversable]) ->
