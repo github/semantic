@@ -98,7 +98,7 @@ class HasDeclaration whole part where
   toDeclaration :: (HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra part (Term whole (Record fields)) (Maybe Declaration)
 
 class CustomHasDeclaration whole part where
-  toDeclaration' :: (HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra part (Term whole (Record fields)) (Maybe Declaration)
+  customToDeclaration :: (HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra part (Term whole (Record fields)) (Maybe Declaration)
 
 toDeclarationAlgebra :: (HasField fields Range, HasField fields Span, HasDeclaration syntax syntax) => Blob -> RAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Maybe Declaration)
 toDeclarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
@@ -108,17 +108,17 @@ instance (DeclarationStrategy part ~ strategy, HasDeclarationWithStrategy strate
   toDeclaration = toDeclarationWithStrategy (undefined :: proxy strategy)
 
 instance Apply Foldable fs => CustomHasDeclaration (Union fs) Markup.Section where
-  toDeclaration' Blob{..} _ (Markup.Section level (Term (In headingAnn headingF), _) _)
+  customToDeclaration Blob{..} _ (Markup.Section level (Term (In headingAnn headingF), _) _)
     = Just $ SectionDeclaration (maybe (getSource (byteRange headingAnn)) (getSource . sconcat) (nonEmpty (byteRange . termAnnotation . unTerm <$> toList headingF))) level
     where getSource = firstLine . toText . flip Source.slice blobSource
           firstLine = T.takeWhile (/= '\n')
 
 instance CustomHasDeclaration whole Syntax.Error where
-  toDeclaration' Blob{..} ann err@Syntax.Error{}
+  customToDeclaration Blob{..} ann err@Syntax.Error{}
     = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan ann) err))) blobLanguage
 
 instance (Syntax.Empty :< fs) => CustomHasDeclaration (Union fs) Declaration.Function where
-  toDeclaration' Blob{..} _ (Declaration.Function _ (Term (In identifierAnn identifier), _) _ _)
+  customToDeclaration Blob{..} _ (Declaration.Function _ (Term (In identifierAnn identifier), _) _ _)
     -- Do not summarize anonymous functions
     | Just Syntax.Empty <- prj identifier = Nothing
     -- Named functions
@@ -126,7 +126,7 @@ instance (Syntax.Empty :< fs) => CustomHasDeclaration (Union fs) Declaration.Fun
     where getSource = toText . flip Source.slice blobSource . byteRange
 
 instance (Syntax.Empty :< fs) => CustomHasDeclaration (Union fs) Declaration.Method where
-  toDeclaration' Blob{..} _ (Declaration.Method _ (Term (In receiverAnn receiver), _) (Term (In identifierAnn _), _) _ _)
+  customToDeclaration Blob{..} _ (Declaration.Method _ (Term (In receiverAnn receiver), _) (Term (In identifierAnn _), _) _ _)
     -- Methods without a receiver
     | Just Syntax.Empty <- prj receiver = Just $ MethodDeclaration (getSource identifierAnn)
     -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
@@ -134,7 +134,7 @@ instance (Syntax.Empty :< fs) => CustomHasDeclaration (Union fs) Declaration.Met
     where getSource = toText . flip Source.slice blobSource . byteRange
 
 instance Apply (HasDeclaration (Union fs)) fs => CustomHasDeclaration (Union fs) (Union fs) where
-  toDeclaration' blob ann = apply (Proxy :: Proxy (HasDeclaration (Union fs))) (toDeclaration blob ann)
+  customToDeclaration blob ann = apply (Proxy :: Proxy (HasDeclaration (Union fs))) (toDeclaration blob ann)
 
 
 data Strategy = Default | Custom
@@ -156,7 +156,7 @@ instance HasDeclarationWithStrategy 'Default term syntax where
   toDeclarationWithStrategy _ _ _ _ = Nothing
 
 instance CustomHasDeclaration term syntax => HasDeclarationWithStrategy 'Custom term syntax where
-  toDeclarationWithStrategy _ = toDeclaration'
+  toDeclarationWithStrategy _ = customToDeclaration
 
 
 getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe Declaration
