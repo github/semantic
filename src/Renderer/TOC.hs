@@ -121,6 +121,7 @@ instance (Syntax.Empty :< fs) => HasDeclaration' (Union fs) Declaration.Function
   toDeclaration' Blob{..} _ (Declaration.Function _ (Term (In identifierAnn identifier), _) _ _)
     -- Do not summarize anonymous functions
     | Just Syntax.Empty <- prj identifier = Nothing
+    -- Named functions
     | otherwise                           = Just $ FunctionDeclaration (getSource identifierAnn)
     where getSource = toText . flip Source.slice blobSource . byteRange
 
