@@ -121,7 +121,7 @@ class HasDeclaration syntax where
 --
 --   Note that since 'DeclarationStrategy' has a fallback case for its final entry, this instance will hold for all types of kind @* -> *@. Thus, this must be the only instance of 'HasDeclaration', as any other instance would be indistinguishable.
 instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy strategy syntax) => HasDeclaration syntax where
-  toDeclaration = toDeclarationWithStrategy (undefined :: proxy strategy)
+  toDeclaration = toDeclarationWithStrategy (Proxy :: Proxy strategy)
 
 
 -- | Types for which we can produce a customized 'Declaration'. This returns in 'Maybe' so that some values can be opted out (e.g. anonymous functions).
