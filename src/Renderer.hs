@@ -12,6 +12,7 @@ module Renderer
 , renderToCTerm
 , toDeclarationAlgebra
 , declarationAlgebra
+, HasDeclaration
 , markupSectionAlgebra
 , syntaxDeclarationAlgebra
 , Summaries(..)

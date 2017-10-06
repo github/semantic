@@ -8,6 +8,7 @@ module Renderer.TOC
 , isValidSummary
 , Declaration(..)
 , declaration
+, HasDeclaration
 , declarationAlgebra
 , markupSectionAlgebra
 , toDeclarationAlgebra
