@@ -74,9 +74,9 @@ someParser :: ( ApplyAll typeclasses JSON.Syntax
               , ApplyAll typeclasses Ruby.Syntax
               , ApplyAll typeclasses TypeScript.Syntax
               )
-           => proxy typeclasses
-           -> Language
-           -> Maybe (SomeParser typeclasses)
+           => proxy typeclasses              -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
+           -> Language                       -- ^ The 'Language' to select.
+           -> Maybe (SomeParser typeclasses) -- ^ 'Maybe' a 'SomeParser' abstracting the syntax type to be produced.
 someParser _ Go         = Nothing
 someParser _ JavaScript = Just (SomeParser typescriptParser)
 someParser _ JSON       = Just (SomeParser jsonParser)
