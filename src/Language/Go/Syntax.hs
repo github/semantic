@@ -49,6 +49,7 @@ type Syntax =
    , Literal.TextElement
    , Statement.Assignment
    , Statement.Break
+   , Statement.Goto
    , Statement.Return
    , Syntax.Context
    , Syntax.Error
@@ -96,6 +97,7 @@ expressionChoices =
   , fieldIdentifier
   , functionDeclaration
   , functionType
+  , gotoStatement
   , incStatement
   , identifier
   , implicitLengthArrayType
@@ -376,6 +378,9 @@ breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Brea
 
 decStatement :: Assignment
 decStatement = makeTerm <$> symbol DecStatement <*> children (Expression.Decrement <$> expression)
+
+gotoStatement :: Assignment
+gotoStatement = makeTerm <$> symbol GotoStatement <*> children (Statement.Goto <$> expression)
 
 incStatement :: Assignment
 incStatement = makeTerm <$> symbol IncStatement <*> children (Expression.Increment <$> expression)
