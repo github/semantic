@@ -97,6 +97,7 @@ expressionChoices =
   , interfaceType
   , interpretedStringLiteral
   , intLiteral
+  , literalValue
   , mapType
   , methodDeclaration
   , methodSpec
@@ -125,6 +126,9 @@ expressions = mk <$> location <*> many expression
 
 
 -- Literals
+
+literalValue :: Assignment
+literalValue = makeTerm <$> symbol LiteralValue <*> children (many expression)
 
 compositeLiteral :: Assignment
 compositeLiteral = makeTerm <$> symbol CompositeLiteral <*> children (Literal.Composite <$> expression <*> expression)
