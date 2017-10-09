@@ -158,7 +158,7 @@ instance Show1 Set where liftShowsPrec = genericLiftShowsPrec
 
 -- Misc
 
--- A channel type in Go
+-- A channel literal in Go
 newtype Channel a = Channel { channelContent :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
