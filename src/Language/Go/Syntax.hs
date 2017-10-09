@@ -269,18 +269,18 @@ binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm
   , (inj .) . Expression.Modulo           <$ symbol AnonPercent
   , (inj .) . Expression.Or               <$ symbol AnonPipePipe
   , (inj .) . Expression.And              <$ symbol AnonAmpersandAmpersand
+  , (inj .) . Expression.LessThan         <$ symbol AnonLAngle
+  , (inj .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
+  , (inj .) . Expression.GreaterThan      <$ symbol AnonRAngle
+  , (inj .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
+  , (inj .) . invert Expression.Equal     <$ symbol AnonBangEqual
+  , (inj .) . Expression.Equal            <$ symbol AnonEqualEqual
   , (inj .) . Expression.BOr              <$ symbol AnonPipe
   , (inj .) . Expression.BAnd             <$ symbol AnonAmpersand
   , (inj .) . Expression.BAnd             <$ symbol AnonAmpersandCaret
   , (inj .) . Expression.BXOr             <$ symbol AnonCaret
   , (inj .) . Expression.LShift           <$ symbol AnonLAngleLAngle
   , (inj .) . Expression.RShift           <$ symbol AnonRAngleRAngle
-  , (inj .) . Expression.LessThan         <$ symbol AnonLAngle
-  , (inj .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
-  , (inj .) . Expression.GreaterThan      <$ symbol AnonRAngle
-  , (inj .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
-  , (inj .) . Expression.Equal            <$ symbol AnonEqualEqual
-  , (inj .) . invert Expression.Equal     <$ symbol AnonBangEqual
   ])
   where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
