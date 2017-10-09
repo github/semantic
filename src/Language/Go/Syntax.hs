@@ -83,6 +83,7 @@ expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
   [ assignment'
   , binaryExpression
+  , block
   , breakStatement
   , callExpression
   , channelType
@@ -106,6 +107,7 @@ expressionChoices =
   , interfaceType
   , interpretedStringLiteral
   , intLiteral
+  , labelName
   , literalValue
   , mapType
   , methodDeclaration
