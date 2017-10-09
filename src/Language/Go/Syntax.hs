@@ -37,6 +37,7 @@ type Syntax =
    , Expression.Boolean
    , Expression.Call
    , Expression.Comparison
+   , Expression.Decrement
    , Expression.Increment
    , Expression.MemberAccess
    , Literal.Array
@@ -87,6 +88,7 @@ expressionChoices =
   , compositeLiteral
   , constVarDeclaration
   , constVarSpecification
+  , decStatement
   , element
   , expressionList
   , fieldDeclaration
@@ -345,6 +347,9 @@ parameterDeclaration = symbol ParameterDeclaration *> children expressions
 
 breakStatement :: Assignment
 breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> labelName)
+
+decStatement :: Assignment
+decStatement = makeTerm <$> symbol DecStatement <*> children (Expression.Decrement <$> expression)
 
 incStatement :: Assignment
 incStatement = makeTerm <$> symbol IncStatement <*> children (Expression.Increment <$> expression)
