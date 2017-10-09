@@ -106,6 +106,7 @@ expressionChoices =
   , packageClause
   , packageIdentifier
   , parameterDeclaration
+  , parenthesizedExpression
   , parenthesizedType
   , pointerType
   , rawStringLiteral
@@ -252,6 +253,8 @@ typeDeclaration = handleError $ makeTerm <$> symbol TypeDeclaration <*> children
 
 -- Expressions
 
+parenthesizedExpression :: Assignment
+parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 binaryExpression :: Assignment
 binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression expression
   [ (inj .) . Expression.Plus             <$ symbol AnonPlus
