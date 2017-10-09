@@ -40,6 +40,7 @@ type Syntax =
    , Expression.MemberAccess
    , Literal.Array
    , Literal.Channel
+   , Literal.Composite
    , Literal.Hash
    , Literal.Integer
    , Literal.KeyValue
@@ -82,6 +83,7 @@ expressionChoices =
   , callExpression
   , channelType
   , comment
+  , compositeLiteral
   , constVarDeclaration
   , constVarSpecification
   , expressionList
@@ -123,6 +125,9 @@ expressions = mk <$> location <*> many expression
 
 
 -- Literals
+
+compositeLiteral :: Assignment
+compositeLiteral = makeTerm <$> symbol CompositeLiteral <*> children (Literal.Composite <$> expression <*> expression)
 
 intLiteral :: Assignment
 intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> source)
