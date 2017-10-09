@@ -122,6 +122,7 @@ expressionChoices =
   , pointerType
   , rawStringLiteral
   , returnStatement
+  , shortVarDeclaration
   , sliceType
   , structType
   , typeDeclaration
@@ -376,6 +377,9 @@ assignment' =  makeTerm'  <$> symbol AssignmentStatement <*> children (infixTerm
     augmentedAssign c l r = assign l (makeTerm1 (c l r))
 
     invert cons a b = Expression.Not (makeTerm1 (cons a b))
+
+shortVarDeclaration :: Assignment
+shortVarDeclaration = makeTerm <$> symbol ShortVarDeclaration <*> children (Statement.Assignment <$> pure [] <*> expression <*> expression)
 
 breakStatement :: Assignment
 breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> labelName)
