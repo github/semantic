@@ -93,6 +93,7 @@ expressionChoices =
   , functionDeclaration
   , functionType
   , identifier
+  , implicitLengthArrayType
   , importDeclaration
   , importSpec
   , interfaceType
@@ -172,6 +173,9 @@ qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.Membe
 
 arrayType :: Assignment
 arrayType = makeTerm <$> symbol ArrayType <*> children (Type.Array . Just <$> expression <*> expression)
+
+implicitLengthArrayType :: Assignment
+implicitLengthArrayType = makeTerm <$> symbol ImplicitLengthArrayType <*> children (Type.Array Nothing <$> expression)
 
 functionType :: Assignment
 functionType = makeTerm <$> symbol FunctionType <*> children (Type.Function <$> parameters <*> returnType)
