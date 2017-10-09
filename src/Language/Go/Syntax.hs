@@ -258,8 +258,8 @@ parenthesizedExpression :: Assignment
 parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 
 unaryExpression :: Assignment
-unaryExpression = symbol UnaryExpression >>= \ location ->
-      makeTerm location . Expression.Not <$> children (symbol AnonBang *> expression)
+unaryExpression = symbol UnaryExpression >>= \ location -> (notExpression location) <|> children (symbol AnonPlus *> expression)
+  where notExpression location = makeTerm location . Expression.Not <$> children (symbol AnonBang *> expression)
 binaryExpression :: Assignment
 binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression expression
   [ (inj .) . Expression.Plus             <$ symbol AnonPlus
