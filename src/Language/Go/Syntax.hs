@@ -86,6 +86,7 @@ expressionChoices =
   , compositeLiteral
   , constVarDeclaration
   , constVarSpecification
+  , element
   , expressionList
   , fieldDeclaration
   , fieldIdentifier
@@ -126,6 +127,9 @@ expressions = mk <$> location <*> many expression
 
 
 -- Literals
+
+element :: Assignment
+element = symbol Element *> children expression
 
 literalValue :: Assignment
 literalValue = makeTerm <$> symbol LiteralValue <*> children (many expression)
