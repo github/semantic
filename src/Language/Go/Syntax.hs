@@ -37,6 +37,7 @@ type Syntax =
    , Expression.Boolean
    , Expression.Call
    , Expression.Comparison
+   , Expression.Increment
    , Expression.MemberAccess
    , Literal.Array
    , Literal.Channel
@@ -92,6 +93,7 @@ expressionChoices =
   , fieldIdentifier
   , functionDeclaration
   , functionType
+  , incStatement
   , identifier
   , implicitLengthArrayType
   , importDeclaration
@@ -343,6 +345,9 @@ parameterDeclaration = symbol ParameterDeclaration *> children expressions
 
 breakStatement :: Assignment
 breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> labelName)
+
+incStatement :: Assignment
+incStatement = makeTerm <$> symbol IncStatement <*> children (Expression.Increment <$> expression)
 
 labelName :: Assignment
 labelName = makeTerm <$> symbol LabelName <*> (Syntax.Identifier <$> source)
