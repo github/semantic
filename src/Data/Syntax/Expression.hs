@@ -186,3 +186,10 @@ newtype Increment a = Increment a
 
 instance Eq1 Increment where liftEq = genericLiftEq
 instance Show1 Increment where liftShowsPrec = genericLiftShowsPrec
+
+-- | Decrement (e.g. 1-- in C or Go).
+newtype Decrement a = Decrement a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
+
+instance Eq1 Decrement where liftEq = genericLiftEq
+instance Show1 Decrement where liftShowsPrec = genericLiftShowsPrec
