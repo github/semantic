@@ -50,6 +50,7 @@ type Syntax =
    , Statement.Assignment
    , Statement.Break
    , Statement.Goto
+   , Statement.If
    , Statement.Return
    , Syntax.Context
    , Syntax.Error
@@ -99,6 +100,7 @@ expressionChoices =
   , functionDeclaration
   , functionType
   , gotoStatement
+  , ifStatement
   , incStatement
   , identifier
   , implicitLengthArrayType
@@ -384,6 +386,8 @@ decStatement = makeTerm <$> symbol DecStatement <*> children (Expression.Decreme
 gotoStatement :: Assignment
 gotoStatement = makeTerm <$> symbol GotoStatement <*> children (Statement.Goto <$> expression)
 
+ifStatement :: Assignment
+ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> expression <*> (expression <|> emptyTerm))
 incStatement :: Assignment
 incStatement = makeTerm <$> symbol IncStatement <*> children (Expression.Increment <$> expression)
 
