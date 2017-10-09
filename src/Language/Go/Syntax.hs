@@ -254,18 +254,20 @@ typeDeclaration = handleError $ makeTerm <$> symbol TypeDeclaration <*> children
 
 binaryExpression :: Assignment
 binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression expression
-  [ (inj .) . Expression.Plus      <$ symbol AnonPlus
-  , (inj .) . Expression.Minus     <$ symbol AnonMinus
-  , (inj .) . Expression.Times     <$ symbol AnonStar
-  , (inj .) . Expression.DividedBy <$ symbol AnonSlash
-  , (inj .) . Expression.Modulo    <$ symbol AnonPercent
-  , (inj .) . Expression.BOr       <$ symbol AnonPipe
-  , (inj .) . Expression.BAnd      <$ symbol AnonAmpersand
-  , (inj .) . Expression.BAnd      <$ symbol AnonAmpersandCaret
-  , (inj .) . Expression.BXOr      <$ symbol AnonCaret
-  , (inj .) . Expression.LShift    <$ symbol AnonLAngleLAngle
-  , (inj .) . Expression.RShift    <$ symbol AnonRAngleRAngle
-  , (inj .) . Expression.LessThan  <$ symbol AnonLAngle
+  [ (inj .) . Expression.Plus             <$ symbol AnonPlus
+  , (inj .) . Expression.Minus            <$ symbol AnonMinus
+  , (inj .) . Expression.Times            <$ symbol AnonStar
+  , (inj .) . Expression.DividedBy        <$ symbol AnonSlash
+  , (inj .) . Expression.Modulo           <$ symbol AnonPercent
+  , (inj .) . Expression.Or               <$ symbol AnonPipePipe
+  , (inj .) . Expression.And              <$ symbol AnonAmpersandAmpersand
+  , (inj .) . Expression.BOr              <$ symbol AnonPipe
+  , (inj .) . Expression.BAnd             <$ symbol AnonAmpersand
+  , (inj .) . Expression.BAnd             <$ symbol AnonAmpersandCaret
+  , (inj .) . Expression.BXOr             <$ symbol AnonCaret
+  , (inj .) . Expression.LShift           <$ symbol AnonLAngleLAngle
+  , (inj .) . Expression.RShift           <$ symbol AnonRAngleRAngle
+  , (inj .) . Expression.LessThan         <$ symbol AnonLAngle
   , (inj .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
   , (inj .) . Expression.GreaterThan      <$ symbol AnonRAngle
   , (inj .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
