@@ -149,6 +149,8 @@ instance Eq1 Finally where liftEq = genericLiftEq
 instance Show1 Finally where liftShowsPrec = genericLiftShowsPrec
 
 
+-- Scoping
+
 -- | ScopeEntry (e.g. `BEGIN {}` block in Ruby or Perl).
 newtype ScopeEntry a = ScopeEntry [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
