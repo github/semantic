@@ -80,7 +80,8 @@ expression = term (handleError (choice expressionChoices))
 
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
-  [ binaryExpression
+  [ assignment'
+  , binaryExpression
   , breakStatement
   , callExpression
   , channelType
@@ -344,6 +345,24 @@ parameterDeclaration = symbol ParameterDeclaration *> children expressions
 
 
 -- Statements
+
+assignment' :: Assignment
+assignment' =  makeTerm'  <$> symbol AssignmentStatement <*> children (infixTerm expressionList expressionList
+                  [ assign Expression.Plus          <$ symbol AnonPlusEqual
+                  , assign Expression.Minus         <$ symbol AnonMinusEqual
+                  , assign Expression.Times         <$ symbol AnonStarEqual
+                  , assign Expression.DividedBy     <$ symbol AnonSlashEqual
+                  , assign Expression.BOr           <$ symbol AnonPipeEqual
+                  , assign Expression.BAnd          <$ symbol AnonAmpersandEqual
+                  , assign Expression.Modulo        <$ symbol AnonPercentEqual
+                  , assign Expression.RShift        <$ symbol AnonRAngleRAngleEqual
+                  , assign Expression.LShift        <$ symbol AnonLAngleLAngleEqual
+                  , assign Expression.BXOr          <$ symbol AnonCaretEqual
+                  , assign (invert Expression.BAnd) <$ symbol AnonAmpersandCaretEqual
+                  ])
+  where assign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
+        assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
+        invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
 breakStatement :: Assignment
 breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> labelName)
