@@ -348,21 +348,27 @@ parameterDeclaration = symbol ParameterDeclaration *> children expressions
 
 assignment' :: Assignment
 assignment' =  makeTerm'  <$> symbol AssignmentStatement <*> children (infixTerm expressionList expressionList
-                  [ assign Expression.Plus          <$ symbol AnonPlusEqual
-                  , assign Expression.Minus         <$ symbol AnonMinusEqual
-                  , assign Expression.Times         <$ symbol AnonStarEqual
-                  , assign Expression.DividedBy     <$ symbol AnonSlashEqual
-                  , assign Expression.BOr           <$ symbol AnonPipeEqual
-                  , assign Expression.BAnd          <$ symbol AnonAmpersandEqual
-                  , assign Expression.Modulo        <$ symbol AnonPercentEqual
-                  , assign Expression.RShift        <$ symbol AnonRAngleRAngleEqual
-                  , assign Expression.LShift        <$ symbol AnonLAngleLAngleEqual
-                  , assign Expression.BXOr          <$ symbol AnonCaretEqual
-                  , assign (invert Expression.BAnd) <$ symbol AnonAmpersandCaretEqual
+                  [ assign                                   <$ symbol AnonEqual
+                  , augmentedAssign Expression.Plus          <$ symbol AnonPlusEqual
+                  , augmentedAssign Expression.Minus         <$ symbol AnonMinusEqual
+                  , augmentedAssign Expression.Times         <$ symbol AnonStarEqual
+                  , augmentedAssign Expression.DividedBy     <$ symbol AnonSlashEqual
+                  , augmentedAssign Expression.BOr           <$ symbol AnonPipeEqual
+                  , augmentedAssign Expression.BAnd          <$ symbol AnonAmpersandEqual
+                  , augmentedAssign Expression.Modulo        <$ symbol AnonPercentEqual
+                  , augmentedAssign Expression.RShift        <$ symbol AnonRAngleRAngleEqual
+                  , augmentedAssign Expression.LShift        <$ symbol AnonLAngleLAngleEqual
+                  , augmentedAssign Expression.BXOr          <$ symbol AnonCaretEqual
+                  , augmentedAssign (invert Expression.BAnd) <$ symbol AnonAmpersandCaretEqual
                   ])
-  where assign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
-        assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
-        invert cons a b = Expression.Not (makeTerm1 (cons a b))
+  where
+    assign :: Term -> Term -> Union Syntax Term
+    assign l r = inj (Statement.Assignment [] l r)
+
+    augmentedAssign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
+    augmentedAssign c l r = assign l (makeTerm1 (c l r))
+
+    invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
 breakStatement :: Assignment
 breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> labelName)
