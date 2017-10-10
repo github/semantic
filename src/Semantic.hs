@@ -46,15 +46,15 @@ parseBlobs renderer = fmap toOutput . distributeFoldMap (parseBlob renderer) . f
 parseBlob :: TermRenderer output -> Blob -> Task output
 parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (ToCTermRenderer, lang)
-    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[HasDeclaration, Foldable, Functor]) ->
+    | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[HasDeclaration, Foldable, Functor]) <$> lang ->
       parse parser blob >>= decorate (declarationAlgebra blob) >>= render (renderToCTerm blob)
 
   (JSONTermRenderer, lang)
-    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Foldable, Functor]) ->
+    | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[ConstructorName, Foldable, Functor]) <$> lang ->
       parse parser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
 
   (SExpressionTermRenderer, lang)
-    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Foldable, Functor]) ->
+    | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[ConstructorName, Foldable, Functor]) <$> lang ->
       parse parser blob >>= decorate constructorLabel . (Nil <$) >>= render renderSExpressionTerm
 
   _ -> throwError (SomeException (NoParserForLanguage blobPath blobLanguage))
@@ -70,19 +70,19 @@ diffBlobPairs renderer = fmap toOutput . distributeFoldMap (diffBlobPair rendere
 diffBlobPair :: DiffRenderer output -> Both Blob -> Task output
 diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (ToCDiffRenderer, lang)
-    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, HasDeclaration, Show1, Traversable]) ->
+    | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, HasDeclaration, Show1, Traversable]) <$> lang ->
       run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob)) diffTerms (renderToCDiff blobs)
 
   (JSONDiffRenderer, lang)
-    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, Show1, Traversable]) ->
+    | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, Show1, Traversable]) <$> lang ->
       run (parse parser) diffTerms (renderJSONDiff blobs)
 
   (PatchDiffRenderer, lang)
-    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, Show1, Traversable]) ->
+    | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, Show1, Traversable]) <$> lang ->
       run (parse parser) diffTerms (renderPatch blobs)
 
   (SExpressionDiffRenderer, lang)
-    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Diffable, Eq1, Foldable, Functor, GAlign, Show1, Traversable]) ->
+    | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[ConstructorName, Diffable, Eq1, Foldable, Functor, GAlign, Show1, Traversable]) <$> lang ->
       run (decorate constructorLabel . (Nil <$) <=< parse parser) diffTerms renderSExpressionDiff
 
   _ -> throwError (SomeException (NoParserForLanguage effectivePath effectiveLanguage))

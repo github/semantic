@@ -70,17 +70,17 @@ someParser :: ( ApplyAll typeclasses Go.Syntax
               , ApplyAll typeclasses Ruby.Syntax
               , ApplyAll typeclasses TypeScript.Syntax
               )
-           => proxy typeclasses              -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
-           -> Language                       -- ^ The 'Language' to select.
-           -> Maybe (SomeParser typeclasses) -- ^ 'Maybe' a 'SomeParser' abstracting the syntax type to be produced.
-someParser _ Go         = Just (SomeParser goParser)
-someParser _ JavaScript = Just (SomeParser typescriptParser)
-someParser _ JSON       = Just (SomeParser jsonParser)
-someParser _ JSX        = Just (SomeParser typescriptParser)
-someParser _ Markdown   = Just (SomeParser markdownParser)
-someParser _ Python     = Just (SomeParser pythonParser)
-someParser _ Ruby       = Just (SomeParser rubyParser)
-someParser _ TypeScript = Just (SomeParser typescriptParser)
+           => proxy typeclasses      -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
+           -> Language               -- ^ The 'Language' to select.
+           -> SomeParser typeclasses -- ^ 'Maybe' a 'SomeParser' abstracting the syntax type to be produced.
+someParser _ Go         = SomeParser goParser
+someParser _ JavaScript = SomeParser typescriptParser
+someParser _ JSON       = SomeParser jsonParser
+someParser _ JSX        = SomeParser typescriptParser
+someParser _ Markdown   = SomeParser markdownParser
+someParser _ Python     = SomeParser pythonParser
+someParser _ Ruby       = SomeParser rubyParser
+someParser _ TypeScript = SomeParser typescriptParser
 
 
 goParser :: Parser Go.Term
