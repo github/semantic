@@ -180,14 +180,14 @@ programWithChange :: Term' -> Diff'
 programWithChange body = merge (programInfo, programInfo) (Indexed [ function' ])
   where
     function' = merge ((Just (FunctionDeclaration "foo") :. functionInfo, Just (FunctionDeclaration "foo") :. functionInfo)) (S.Function name' [] [ inserting body ])
-    name' = let info = Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil in merge (info, info) (Leaf "foo")
+    name' = let info = Nothing :. Range 0 0 :. sourceSpanBetween (0,0) (0,0) :. Nil in merge (info, info) (Leaf "foo")
 
 -- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
 programWithChangeOutsideFunction :: Term' -> Diff'
 programWithChangeOutsideFunction term = merge (programInfo, programInfo) (Indexed [ function', term' ])
   where
     function' = merge (Just (FunctionDeclaration "foo") :. functionInfo, Just (FunctionDeclaration "foo") :. functionInfo) (S.Function name' [] [])
-    name' = let info = Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil in  merge (info, info) (Leaf "foo")
+    name' = let info = Nothing :. Range 0 0 :. sourceSpanBetween (0,0) (0,0) :. Nil in  merge (info, info) (Leaf "foo")
     term' = inserting term
 
 programWithInsert :: Text -> Term' -> Diff'
@@ -205,22 +205,20 @@ programOf diff = merge (programInfo, programInfo) (Indexed [ diff ])
 functionOf :: Text -> Term' -> Term'
 functionOf name body = Term $ (Just (FunctionDeclaration name) :. functionInfo) `In` S.Function name' [] [body]
   where
-    name' = Term $ (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) `In` Leaf name
+    name' = Term $ (Nothing :. Range 0 0 :. sourceSpanBetween (0,0) (0,0) :. Nil) `In` Leaf name
 
-programInfo :: Record (Maybe Declaration ': DefaultFields)
-programInfo = Nothing :. Range 0 0 :. C.Program :. sourceSpanBetween (0,0) (0,0) :. Nil
+programInfo :: Record '[Maybe Declaration, Range, Span]
+programInfo = Nothing :. Range 0 0 :. sourceSpanBetween (0,0) (0,0) :. Nil
 
-functionInfo :: Record DefaultFields
-functionInfo = Range 0 0 :. C.Function :. sourceSpanBetween (0,0) (0,0) :. Nil
+functionInfo :: Record '[Range, Span]
+functionInfo = Range 0 0 :. sourceSpanBetween (0,0) (0,0) :. Nil
 
 -- Filter tiers for terms that we consider "meaniningful" in TOC summaries.
 isMeaningfulTerm :: Term Syntax a -> Bool
-isMeaningfulTerm a = case unTerm a of
-  (_ `In` S.Indexed _) -> False
-  (_ `In` S.Fixed _) -> False
-  (_ `In` S.Commented _ _) -> False
-  (_ `In` S.ParseError _) -> False
-  _ -> True
+isMeaningfulTerm a
+  | (_:_) <- prj (termOut (unTerm a)) = False
+  | [] <- prj (termOut (unTerm a)) = False
+  | otherwise = True
 
 -- Filter tiers for terms if the Syntax is a Method or a Function.
 isMethodOrFunction :: HasField fields Category => Term Syntax (Record fields) -> Bool
@@ -241,8 +239,8 @@ sourceSpanBetween (s1, e1) (s2, e2) = Span (Pos s1 e1) (Pos s2 e2)
 blankDiff :: Diff'
 blankDiff = merge (arrayInfo, arrayInfo) (Indexed [ inserting (Term $ literalInfo `In` Leaf "\"a\"") ])
   where
-    arrayInfo = Nothing :. Range 0 3 :. ArrayLiteral :. sourceSpanBetween (1, 1) (1, 5) :. Nil
-    literalInfo = Nothing :. Range 1 2 :. StringLiteral :. sourceSpanBetween (1, 2) (1, 4) :. Nil
+    arrayInfo = Nothing :. Range 0 3 :. sourceSpanBetween (1, 1) (1, 5) :. Nil
+    literalInfo = Nothing :. Range 1 2 :. sourceSpanBetween (1, 2) (1, 4) :. Nil
 
 blankDiffBlobs :: Both Blob
 blankDiffBlobs = both (Blob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob) (Just TypeScript)) (Blob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob) (Just TypeScript))
