@@ -12,7 +12,7 @@ import GHC.Generics
 
 -- | An unnested comment (line or block).
 newtype Comment a = Comment { commentContent :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Comment where liftEq = genericLiftEq
 instance Ord1 Comment where liftCompare = genericLiftCompare
