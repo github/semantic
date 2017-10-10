@@ -215,6 +215,9 @@ instance (Listable1 f, Listable1 (Union (g ': fs))) => Listable1 (Union (f ': g 
 instance Listable1 f => Listable1 (Union '[f]) where
   liftTiers tiers = inj `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)
 
+instance (Listable1 (Union fs), Listable a) => Listable (Union fs a) where
+  tiers = tiers1
+
 
 instance Listable1 Comment.Comment where
   liftTiers _ = cons1 Comment.Comment
