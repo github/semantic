@@ -69,7 +69,9 @@ library
                      , RWS
                      , Semantic
                      , Semantic.Log
+                     , Semantic.Stat
                      , Semantic.Task
+                     , Semantic.Queue
                      , Semantic.Util
                      , SemanticCmdLine
                      , SES
@@ -95,6 +97,8 @@ library
                      , mersenne-random-pure64
                      , MonadRandom
                      , mtl
+                     , network
+                     , network-uri
                      , optparse-applicative
                      , parallel
                      , parsers
@@ -145,6 +149,7 @@ test-suite test
                      , DiffSpec
                      , SemanticSpec
                      , SemanticCmdLineSpec
+                     , Semantic.StatSpec
                      , InterpreterSpec
                      , PatchOutputSpec
                      , SES.Spec
@@ -171,6 +176,7 @@ test-suite test
                      , HUnit
                      , leancheck
                      , mtl
+                     , network
                      , containers
                      , recursion-schemes >= 4.1
                      , semantic-diff
