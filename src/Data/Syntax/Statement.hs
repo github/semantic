@@ -171,3 +171,17 @@ newtype ScopeExit a = ScopeExit [a]
 
 instance Eq1 ScopeExit where liftEq = genericLiftEq
 instance Show1 ScopeExit where liftShowsPrec = genericLiftShowsPrec
+
+-- | Post increment operator (e.g. 1++ in Go, or i++ in C).
+newtype PostIncrement a = PostIncrement a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
+
+instance Eq1 PostIncrement where liftEq = genericLiftEq
+instance Show1 PostIncrement where liftShowsPrec = genericLiftShowsPrec
+
+-- | Post decrement operator (e.g. 1-- in Go, or i-- in C).
+newtype PostDecrement a = PostDecrement a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
+
+instance Eq1 PostDecrement where liftEq = genericLiftEq
+instance Show1 PostDecrement where liftShowsPrec = genericLiftShowsPrec

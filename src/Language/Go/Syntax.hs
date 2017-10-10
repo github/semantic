@@ -37,8 +37,8 @@ type Syntax =
    , Expression.Boolean
    , Expression.Call
    , Expression.Comparison
-   , Expression.Decrement
-   , Expression.Increment
+   , Statement.PostDecrement
+   , Statement.PostIncrement
    , Expression.MemberAccess
    , Literal.Array
    , Literal.Channel
@@ -385,7 +385,7 @@ breakStatement :: Assignment
 breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> labelName)
 
 decStatement :: Assignment
-decStatement = makeTerm <$> symbol DecStatement <*> children (Expression.Decrement <$> expression)
+decStatement = makeTerm <$> symbol DecStatement <*> children (Statement.PostDecrement <$> expression)
 
 gotoStatement :: Assignment
 gotoStatement = makeTerm <$> symbol GotoStatement <*> children (Statement.Goto <$> expression)
@@ -393,7 +393,7 @@ gotoStatement = makeTerm <$> symbol GotoStatement <*> children (Statement.Goto <
 ifStatement :: Assignment
 ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> expression <*> (expression <|> emptyTerm))
 incStatement :: Assignment
-incStatement = makeTerm <$> symbol IncStatement <*> children (Expression.Increment <$> expression)
+incStatement = makeTerm <$> symbol IncStatement <*> children (Statement.PostIncrement <$> expression)
 
 labelName :: Assignment
 labelName = makeTerm <$> symbol LabelName <*> (Syntax.Identifier <$> source)
