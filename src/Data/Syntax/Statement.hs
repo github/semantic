@@ -22,6 +22,12 @@ data Else a = Else { elseCondition :: !a, elseBody :: !a }
 instance Eq1 Else where liftEq = genericLiftEq
 instance Show1 Else where liftShowsPrec = genericLiftShowsPrec
 
+newtype Goto a = Goto { gotoLocation :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Show, Traversable)
+
+instance Eq1 Goto where liftEq = genericLiftEq
+instance Show1 Goto where liftShowsPrec = genericLiftShowsPrec
+
 -- TODO: Alternative definition would flatten if/else if/else chains: data If a = If ![(a, a)] !(Maybe a)
 
 -- | A pattern-matching or computed jump control-flow statement, like 'switch' in C or JavaScript, or 'case' in Ruby or Haskell.
@@ -148,6 +154,8 @@ newtype Finally a = Finally a
 instance Eq1 Finally where liftEq = genericLiftEq
 instance Show1 Finally where liftShowsPrec = genericLiftShowsPrec
 
+
+-- Scoping
 
 -- | ScopeEntry (e.g. `BEGIN {}` block in Ruby or Perl).
 newtype ScopeEntry a = ScopeEntry [a]

@@ -158,12 +158,19 @@ instance Show1 Set where liftShowsPrec = genericLiftShowsPrec
 
 -- Misc
 
--- A channel type in Go
+-- A channel literal in Go
 newtype Channel a = Channel { channelContent :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
 
 instance Eq1 Channel where liftEq = genericLiftEq
 instance Show1 Channel where liftShowsPrec = genericLiftShowsPrec
+
+-- A composite literal in Go
+data Composite a = Composite { compositeType :: !a, compositeElement :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
+
+instance Eq1 Composite where liftEq = genericLiftEq
+instance Show1 Composite where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Object literals as distinct from hash literals? Or coalesce object/hash literals into “key-value literals”?
 -- TODO: Function literals (lambdas, procs, anonymous functions, what have you).
