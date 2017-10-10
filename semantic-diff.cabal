@@ -58,6 +58,7 @@ library
                      , Language.Ruby.Grammar
                      , Language.Ruby.Assignment
                      , Language.TypeScript
+                     , Language.TypeScript.Assignment
                      , Language.TypeScript.Grammar
                      , Language.TypeScript.Syntax
                      , Language.Python.Assignment

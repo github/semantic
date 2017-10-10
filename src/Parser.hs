@@ -29,7 +29,7 @@ import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
-import qualified Language.TypeScript.Syntax as TypeScript
+import qualified Language.TypeScript.Assignment as TypeScript
 import Syntax hiding (Go)
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import TreeSitter.Go
