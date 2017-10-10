@@ -24,6 +24,7 @@
       (Identifier)
       (RequiredParameter
         (Empty)
+        (Empty)
         (Annotation
           (PredefinedType))
         (Assignment
@@ -38,6 +39,7 @@
           (PredefinedType))
         (Identifier)
         (RequiredParameter
+          (Empty)
           (Empty)
           (Annotation
             (PredefinedType))
@@ -94,6 +96,7 @@
         (Empty)
         (Identifier)
         (RequiredParameter
+          (Empty)
           (Empty)
           (Annotation
             (PredefinedType))

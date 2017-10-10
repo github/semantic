@@ -7,6 +7,7 @@ module Data.Syntax.Algebra
 , identifierAlgebra
 , syntaxIdentifierAlgebra
 , cyclomaticComplexityAlgebra
+, ConstructorName(..)
 , ConstructorLabel(..)
 , constructorNameAndConstantFields
 , constructorLabel
