@@ -39,8 +39,6 @@ type Syntax =
    , Declaration.Decorator
    , Declaration.Function
    , Declaration.Import
-   -- NB: ToC rendering requires Methods in the union.
-   , Declaration.Method
    , Declaration.Variable
    , Expression.Arithmetic
    , Expression.Boolean
