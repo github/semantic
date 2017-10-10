@@ -162,6 +162,7 @@ runTaskWithOptions options task = do
     run options logger statter task
 
   closeQueue statter
+  closeStatClient (asyncQueueExtra statter)
   closeQueue logger
   either (die . displayException) pure result
   where
