@@ -28,7 +28,7 @@ import Language
 import qualified Language.JSON.Syntax as JSON
 import qualified Language.Markdown.Syntax as Markdown
 import qualified Language.Python.Syntax as Python
-import qualified Language.Ruby.Syntax as Ruby
+import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Syntax as TypeScript
 import Syntax hiding (Go)
 import qualified TreeSitter.Language as TS (Language, Symbol)
