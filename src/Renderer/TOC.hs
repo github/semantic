@@ -242,9 +242,9 @@ tableOfContentsBy :: (Foldable f, Functor f)
 tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
   Patch patch -> (pure . patchEntry <$> bicrosswalk selector selector patch) <> bifoldMap fold fold patch <> Just []
   Merge (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
-    (Just a, Nothing) -> Just [Unchanged a]
-    (Just a, Just []) -> Just [Changed a]
-    (_     , entries) -> entries)
+    (Just a, Nothing)      -> Just [Unchanged a]
+    (Just a, Just entries) -> Just (Changed a : entries)
+    (_     , entries)      -> entries)
 
   where patchEntry = patch Deleted Inserted (const Replaced)
 
