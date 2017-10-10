@@ -52,7 +52,7 @@ import Syntax as S
 import Data.Syntax.Algebra (RAlgebra)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
-import qualified Data.Syntax.Markup as Markup
+import qualified Language.Markdown.Syntax as Markup
 
 data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }
   deriving (Eq, Show)

@@ -41,7 +41,6 @@ library
                      , Data.Syntax.Declaration
                      , Data.Syntax.Expression
                      , Data.Syntax.Literal
-                     , Data.Syntax.Markup
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
                      , Data.Term
@@ -50,6 +49,7 @@ library
                      , Interpreter
                      , Language
                      , Language.Markdown
+                     , Language.Markdown.Assignment
                      , Language.Markdown.Syntax
                      , Language.Go
                      , Language.Go.Syntax
