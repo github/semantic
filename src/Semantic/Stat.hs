@@ -14,6 +14,7 @@ module Semantic.Stat
 -- Client
 , defaultStatsClient
 , StatsClient(..)
+, closeStatClient
 
 -- Internal, exposed for testing
 , renderDatagram
@@ -26,7 +27,7 @@ import Data.List (intercalate)
 import Data.List.Split (splitOneOf)
 import Data.Maybe
 import Data.Monoid
-import Network.Socket (Socket(..), SocketType(..), socket, connect, getAddrInfo, addrFamily, addrAddress, defaultProtocol)
+import Network.Socket (Socket(..), SocketType(..), socket, connect, close, getAddrInfo, addrFamily, addrAddress, defaultProtocol)
 import Network.Socket.ByteString
 import Network.URI
 import Numeric
@@ -137,6 +138,10 @@ statsClient host port statsClientNamespace = do
   sock <- socket (addrFamily addr) Datagram defaultProtocol
   connect sock (addrAddress addr)
   pure (StatsClient sock statsClientNamespace host port)
+
+-- | Close the client's underlying socket.
+closeStatClient :: StatsClient -> IO ()
+closeStatClient StatsClient{..} = close statsClientUDPSocket
 
 -- | Send a stat over the StatsClient's socket.
 sendStat :: StatsClient -> Stat -> IO ()
