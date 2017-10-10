@@ -16,10 +16,12 @@ import qualified TOCSpec
 import qualified IntegrationSpec
 import qualified SemanticCmdLineSpec
 import qualified SemanticSpec
+import qualified Semantic.StatSpec
 import Test.Hspec
 
 main :: IO ()
 main = hspec $ do
+  describe "Semantic.Stat" Semantic.StatSpec.spec
   parallel $ do
     describe "Alignment" AlignmentSpec.spec
     describe "Command" CommandSpec.spec

@@ -20,8 +20,7 @@ import Data.Term
 import Data.Text (Text, pack)
 import Language
 import qualified Language.Go as Go
-import qualified Language.Ruby as Ruby
-import qualified Language.Ruby as TypeScript
+import qualified Language.TypeScript as TypeScript
 import Foreign
 import Foreign.C.String (peekCString)
 import Foreign.Marshal.Array (allocaArray)
@@ -30,7 +29,6 @@ import qualified TreeSitter.Document as TS
 import qualified TreeSitter.Node as TS
 import qualified TreeSitter.Language as TS
 import qualified TreeSitter.Go as TS
-import qualified TreeSitter.Ruby as TS
 import qualified TreeSitter.TypeScript as TS
 import Info
 
@@ -114,7 +112,6 @@ assignTerm language source annotation children allChildren =
   where assignTermByLanguage :: Source -> Category -> [ Term S.Syntax (Record DefaultFields) ] -> Maybe (S.Syntax (Term S.Syntax (Record DefaultFields)))
         assignTermByLanguage = case languageForTSLanguage language of
           Just Language.Go -> Go.termAssignment
-          Just Ruby -> Ruby.termAssignment
           Just TypeScript -> TypeScript.termAssignment
           _ -> \ _ _ _ -> Nothing
 
@@ -192,14 +189,13 @@ categoryForLanguageProductionName = withDefaults . byLanguage
       s -> productionMap s
 
     byLanguage language = case languageForTSLanguage language of
-      Just Ruby -> Ruby.categoryForRubyName
       Just Language.Go -> Go.categoryForGoName
+      Just Language.TypeScript -> TypeScript.categoryForTypeScriptName
       _ -> Other
 
 
 languageForTSLanguage :: Ptr TS.Language -> Maybe Language
 languageForTSLanguage = flip lookup
   [ (TS.tree_sitter_go, Language.Go)
-  , (TS.tree_sitter_ruby, Ruby)
   , (TS.tree_sitter_typescript, TypeScript)
   ]

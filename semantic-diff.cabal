@@ -55,13 +55,11 @@ library
                      , Language.Go.Syntax
                      , Language.JSON.Grammar
                      , Language.JSON.Syntax
-                     , Language.Ruby
                      , Language.Ruby.Grammar
                      , Language.Ruby.Syntax
                      , Language.TypeScript
                      , Language.TypeScript.Grammar
                      , Language.TypeScript.Syntax
-                     , Language.Python
                      , Language.Python.Grammar
                      , Language.Python.Syntax
                      , Parser
@@ -74,7 +72,9 @@ library
                      , RWS
                      , Semantic
                      , Semantic.Log
+                     , Semantic.Stat
                      , Semantic.Task
+                     , Semantic.Queue
                      , Semantic.Util
                      , SemanticCmdLine
                      , SES
@@ -101,6 +101,8 @@ library
                      , mersenne-random-pure64
                      , MonadRandom
                      , mtl
+                     , network
+                     , network-uri
                      , optparse-applicative
                      , parallel
                      , parsers
@@ -151,6 +153,7 @@ test-suite test
                      , DiffSpec
                      , SemanticSpec
                      , SemanticCmdLineSpec
+                     , Semantic.StatSpec
                      , InterpreterSpec
                      , PatchOutputSpec
                      , SES.Spec
@@ -177,6 +180,7 @@ test-suite test
                      , HUnit
                      , leancheck
                      , mtl
+                     , network
                      , containers
                      , recursion-schemes >= 4.1
                      , semantic-diff
