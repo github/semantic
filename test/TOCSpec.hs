@@ -2,7 +2,6 @@
 {-# LANGUAGE DataKinds, TypeOperators #-}
 module TOCSpec where
 
-import Category as C hiding (Go)
 import Data.Aeson
 import Data.Bifunctor
 import Data.Blob
@@ -14,13 +13,15 @@ import Data.Maybe (fromMaybe)
 import Data.Monoid (Last(..))
 import Data.Output
 import Data.Patch
+import Data.Range
 import Data.Record
 import Data.Semigroup ((<>))
 import Data.Source
+import Data.Span
+import Data.Syntax.Algebra (constructorNameAndConstantFields)
 import Data.Term
 import Data.Text (Text)
 import Data.These
-import Info hiding (Go)
 import Interpreter
 import Language
 import Prelude hiding (readFile)
@@ -31,7 +32,6 @@ import Semantic
 import Semantic.Task
 import Semantic.Util
 import SpecHelpers
-import Syntax as S hiding (Go)
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
@@ -42,23 +42,23 @@ spec :: Spec
 spec = parallel $ do
   describe "tableOfContentsBy" $ do
     prop "drops all nodes with the constant Nothing function" $
-      \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (diff :: Diff Syntax () ()) `shouldBe` []
+      \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (diff :: Diff ListableSyntax () ()) `shouldBe` []
 
     let diffSize = max 1 . length . diffPatches
     let lastValue a = fromMaybe (extract a) (getLast (foldMap (Last . Just) a))
     prop "includes all nodes with a constant Just function" $
-      \ diff -> let diff' = (diff :: Diff Syntax () ()) in entryPayload <$> tableOfContentsBy (const (Just ())) diff' `shouldBe` replicate (diffSize diff') ()
+      \ diff -> let diff' = (diff :: Diff ListableSyntax () ()) in entryPayload <$> tableOfContentsBy (const (Just ())) diff' `shouldBe` replicate (diffSize diff') ()
 
     prop "produces an unchanged entry for identity diffs" $
-      \ term -> tableOfContentsBy (Just . termAnnotation) (diffSyntaxTerms term term) `shouldBe` [Unchanged (lastValue (term :: Term Syntax (Record '[Category])))]
+      \ term -> tableOfContentsBy (Just . termAnnotation) (diffTerms term term) `shouldBe` [Unchanged (lastValue (term :: Term ListableSyntax (Record '[String])))]
 
     prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
       \ p -> tableOfContentsBy (Just . termAnnotation) (patch deleting inserting replacing p)
       `shouldBe`
-      patch (fmap Deleted) (fmap Inserted) (const (fmap Replaced)) (bimap (foldMap pure) (foldMap pure) (p :: Patch (Term Syntax Int) (Term Syntax Int)))
+      patch (fmap Deleted) (fmap Inserted) (const (fmap Replaced)) (bimap (foldMap pure) (foldMap pure) (p :: Patch (Term ListableSyntax Int) (Term ListableSyntax Int)))
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
-      \ diff -> let diff' = merge (0, 0) (Indexed [bimap (const 1) (const 1) (diff :: Diff Syntax Int Int)]) in
+      \ diff -> let diff' = merge (0, 0) (Indexed [bimap (const 1) (const 1) (diff :: Diff ListableSyntax Int Int)]) in
         tableOfContentsBy (\ (n `In` _) -> if n == (0 :: Int) then Just n else Nothing) diff' `shouldBe`
         if null (diffPatches diff') then [Unchanged 0]
                                     else replicate (length (diffPatches diff')) (Changed 0)
@@ -135,8 +135,8 @@ spec = parallel $ do
         in numTocSummaries diff `shouldBe` 0
 
     prop "equal terms produce identity diffs" $
-      \a -> let term = defaultFeatureVectorDecorator (Info.category . termAnnotation) (a :: Term') in
-        diffTOC (diffSyntaxTerms term term) `shouldBe` []
+      \a -> let term = defaultFeatureVectorDecorator constructorNameAndConstantFields (a :: Term') in
+        diffTOC (diffTerms term term) `shouldBe` []
 
   describe "JSONSummary" $ do
     it "encodes modified summaries to JSON" $ do
@@ -169,8 +169,8 @@ spec = parallel $ do
       toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/markdown/headings.A.md -> test/fixtures/toc/markdown/headings.B.md\":[{\"span\":{\"start\":[5,1],\"end\":[7,10]},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"added\"},{\"span\":{\"start\":[9,1],\"end\":[10,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
 
 
-type Diff' = Diff Syntax (Record (Maybe Declaration ': DefaultFields)) (Record (Maybe Declaration ': DefaultFields))
-type Term' = Term Syntax (Record (Maybe Declaration ': DefaultFields))
+type Diff' = Diff ListableSyntax (Record '[Maybe Declaration, Range, Span]) (Record '[Maybe Declaration, Range, Span])
+type Term' = Term ListableSyntax (Record '[Maybe Declaration, Range, Span])
 
 numTocSummaries :: Diff' -> Int
 numTocSummaries diff = length $ filter isValidSummary (diffTOC diff)
