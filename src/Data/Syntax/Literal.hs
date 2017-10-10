@@ -46,6 +46,7 @@ newtype Float a = Float { floatContent :: ByteString }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Data.Syntax.Literal.Float where liftEq = genericLiftEq
+instance Ord1 Data.Syntax.Literal.Float where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsPrec
 
 -- Rational literals e.g. `2/3r`
@@ -104,6 +105,7 @@ newtype Symbol a = Symbol { symbolContent :: ByteString }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Symbol where liftEq = genericLiftEq
+instance Ord1 Symbol where liftCompare = genericLiftCompare
 instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 
 newtype Regex a = Regex { regexContent :: ByteString }
@@ -138,6 +140,7 @@ data KeyValue a = KeyValue { key :: !a, value :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 KeyValue where liftEq = genericLiftEq
+instance Ord1 KeyValue where liftCompare = genericLiftCompare
 instance Show1 KeyValue where liftShowsPrec = genericLiftShowsPrec
 
 
