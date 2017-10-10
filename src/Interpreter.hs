@@ -9,7 +9,6 @@ import Control.Monad.Free.Freer
 import Data.Align.Generic
 import Data.Diff
 import Data.Functor.Classes
-import Data.Hashable (Hashable)
 import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Syntax.Algebra
@@ -21,18 +20,7 @@ diffTerms :: (Diffable syntax, Eq1 syntax, Foldable syntax, Functor syntax, GAli
           => Term syntax (Record fields1)
           -> Term syntax (Record fields2)
           -> Diff syntax (Record fields1) (Record fields2)
-diffTerms = decoratingWith comparableTerms equivalentTerms constructorNameAndConstantFields constructorNameAndConstantFields
-
--- | Diff two terms by decorating with feature vectors computed using the supplied labelling algebra, and stripping the feature vectors from the resulting diff.
-decoratingWith :: (Hashable label, Diffable syntax, GAlign syntax, Traversable syntax)
-               => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ A relation on terms used to determine comparability and equality.
-               -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool) -- ^ A relation used to determine term equivalence.
-               -> (forall a. TermF syntax (Record fields1) a -> label)
-               -> (forall a. TermF syntax (Record fields2) a -> label)
-               -> Term syntax (Record fields1)
-               -> Term syntax (Record fields2)
-               -> Diff syntax (Record fields1) (Record fields2)
-decoratingWith comparability equivalence getLabel1 getLabel2 t1 t2 = stripDiff (diffTermsWith comparability equivalence (defaultFeatureVectorDecorator getLabel1 t1) (defaultFeatureVectorDecorator getLabel2 t2))
+diffTerms t1 t2 = stripDiff (diffTermsWith comparableTerms equivalentTerms (defaultFeatureVectorDecorator constructorNameAndConstantFields t1) (defaultFeatureVectorDecorator constructorNameAndConstantFields t2))
 
 -- | Diff a pair of terms recurisvely, using the supplied continuation and 'ComparabilityRelation'.
 diffTermsWith :: forall syntax fields1 fields2
