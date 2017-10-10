@@ -45,13 +45,13 @@ spec = parallel $ do
     prop "drops all nodes with the constant Nothing function" $
       \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (diff :: Diff Syntax () ()) `shouldBe` []
 
-    let diffSize = cata $ \ diff -> 1 + sum diff
+    let diffSize = max 1 . length . diffPatches
     let lastValue a = fromMaybe (extract a) (getLast (foldMap (Last . Just) a))
     prop "includes all nodes with a constant Just function" $
       \ diff -> let diff' = (diff :: Diff Syntax () ()) in entryPayload <$> tableOfContentsBy (const (Just ())) diff' `shouldBe` replicate (diffSize diff') ()
 
-    prop "produces an unchanged entry for identity diffs" $ pending
-      -- \ term -> tableOfContentsBy (Just . termAnnotation) (diffSyntaxTerms term term) `shouldBe` [Unchanged (lastValue (term :: Term Syntax (Record '[Category])))]
+    prop "produces an unchanged entry for identity diffs" $
+      \ term -> tableOfContentsBy (Just . termAnnotation) (diffSyntaxTerms term term) `shouldBe` [Unchanged (lastValue (term :: Term Syntax (Record '[Category])))]
 
     prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
       \ p -> tableOfContentsBy (Just . termAnnotation) (patch deleting inserting replacing p)
@@ -165,10 +165,10 @@ spec = parallel $ do
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
       toOutput output `shouldBe` ("{\"changes\":{},\"errors\":{}}\n" :: ByteString)
 
-    it "summarizes Markdown headings" $ do pending
-      -- blobs <- blobsForPaths (both "markdown/headings.A.md" "markdown/headings.B.md")
-      -- output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      -- toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/markdown/headings.A.md -> test/fixtures/toc/markdown/headings.B.md\":[{\"span\":{\"start\":[5,1],\"end\":[7,10]},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"added\"},{\"span\":{\"start\":[9,1],\"end\":[10,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
+    it "summarizes Markdown headings" $ do
+      blobs <- blobsForPaths (both "markdown/headings.A.md" "markdown/headings.B.md")
+      output <- runTask (diffBlobPair ToCDiffRenderer blobs)
+      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/markdown/headings.A.md -> test/fixtures/toc/markdown/headings.B.md\":[{\"span\":{\"start\":[5,1],\"end\":[7,10]},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"added\"},{\"span\":{\"start\":[9,1],\"end\":[10,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
 
 
 type Diff' = Diff Syntax (Record (Maybe Declaration ': DefaultFields)) (Record (Maybe Declaration ': DefaultFields))
