@@ -243,10 +243,14 @@ tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
   Patch patch -> (pure . patchEntry <$> bicrosswalk selector selector patch) <> bifoldMap fold fold patch <> Just []
   Merge (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
     (Just a, Nothing)      -> Just [Unchanged a]
-    (Just a, Just entries) -> Just (Changed a : entries)
+    (Just a, Just entries)
+      | all (not.isChanged) entries -> Just (Unchanged a : entries)
+      | otherwise -> Just (Changed a : entries)
     (_     , entries)      -> entries)
 
   where patchEntry = patch Deleted Inserted (const Replaced)
+        isChanged (Unchanged _) = False
+        isChanged _             = True
 
 termTableOfContentsBy :: (Foldable f, Functor f)
                       => (forall b. TermF f annotation b -> Maybe a)

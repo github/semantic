@@ -10,6 +10,7 @@ import Data.ByteString (ByteString)
 import Data.Diff
 import Data.Functor.Both
 import Data.Functor.Listable
+import Data.Functor.Foldable (cata)
 import Data.Maybe (fromMaybe)
 import Data.Monoid (Last(..))
 import Data.Output
@@ -44,7 +45,7 @@ spec = parallel $ do
     prop "drops all nodes with the constant Nothing function" $
       \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (diff :: Diff Syntax () ()) `shouldBe` []
 
-    let diffSize = max 1 . length . diffPatches
+    let diffSize = cata $ \ diff -> 1 + sum diff
     let lastValue a = fromMaybe (extract a) (getLast (foldMap (Last . Just) a))
     prop "includes all nodes with a constant Just function" $
       \ diff -> let diff' = (diff :: Diff Syntax () ()) in entryPayload <$> tableOfContentsBy (const (Just ())) diff' `shouldBe` replicate (diffSize diff') ()
