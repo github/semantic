@@ -29,7 +29,6 @@ type Syntax =
    , Declaration.Constructor
    , Declaration.Function
    , Declaration.Import
-   , Declaration.Interface
    , Declaration.Method
    , Declaration.Module
    , Expression.Arithmetic
