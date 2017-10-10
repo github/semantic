@@ -222,8 +222,7 @@ runParser Options{..} blob@Blob{..} = go
         time "parse.tree_sitter_parse" languageTag $
           liftIO (treeSitterParser tslanguage blob)
       MarkdownParser ->
-        time "parse.cmark_parse" languageTag $
-          pure (cmarkParser blobSource)
+        pure (time "parse.cmark_parse" languageTag (cmarkParser blobSource))
     blobFields = ("path", blobPath) : languageTag
     languageTag = maybe [] (pure . (,) ("language" :: String) . show) blobLanguage
     errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
