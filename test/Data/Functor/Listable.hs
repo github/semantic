@@ -27,7 +27,6 @@ module Data.Functor.Listable
 , ListableSyntax
 ) where
 
-import qualified Category
 import Control.Monad.Free as Free
 import Control.Monad.Trans.Free as FreeF
 import Data.ByteString (ByteString)
@@ -52,7 +51,6 @@ import Data.These
 import Data.Union
 import Renderer.TOC
 import RWS
-import Syntax as S
 import Test.LeanCheck
 
 type Tier a = [a]
@@ -204,93 +202,11 @@ instance Listable (Record '[]) where
   tiers = cons0 Nil
 
 
-instance Listable Category.Category where
-  tiers = cons0 Category.Program
-       \/ cons0 Category.ParseError
-       \/ cons0 Category.Boolean
-       \/ cons0 Category.BooleanOperator
-       \/ cons0 Category.FunctionCall
-       \/ cons0 Category.Function
-       \/ cons0 Category.Identifier
-       \/ cons0 Category.MethodCall
-       \/ cons0 Category.StringLiteral
-       \/ cons0 Category.IntegerLiteral
-       \/ cons0 Category.NumberLiteral
-       \/ cons0 Category.Return
-       \/ cons0 Category.If
-       \/ cons0 Category.Class
-       \/ cons0 Category.Method
-       \/ cons0 Category.Binary
-       \/ cons0 Category.Unary
-       \/ cons0 Category.SingletonMethod
-
-
 instance Listable2 Patch where
   liftTiers2 t1 t2 = liftCons1 t2 Insert \/ liftCons1 t1 Delete \/ liftCons2 t1 t2 Replace
 
 instance (Listable a, Listable b) => Listable (Patch a b) where
   tiers = tiers2
-
-
-instance Listable1 Syntax where
-  liftTiers recur
-    =  liftCons1 (pack `mapT` tiers) Leaf
-    \/ liftCons1 (liftTiers recur) Indexed
-    \/ liftCons1 (liftTiers recur) Fixed
-    \/ liftCons3 recur (liftTiers recur) (liftTiers recur) FunctionCall
-    \/ liftCons2 recur (liftTiers recur) Ternary
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) AnonymousFunction
-    \/ liftCons3 recur (liftTiers recur) (liftTiers recur) Function
-    \/ liftCons2 recur recur Assignment
-    \/ liftCons2 recur recur OperatorAssignment
-    \/ liftCons2 recur recur MemberAccess
-    \/ liftCons4 recur recur (liftTiers recur) (liftTiers recur) MethodCall
-    \/ liftCons1 (liftTiers recur) Operator
-    \/ liftCons1 (liftTiers recur) VarDecl
-    \/ liftCons2 (liftTiers recur) recur VarAssignment
-    \/ liftCons2 recur recur SubscriptAccess
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) Switch
-    \/ liftCons2 recur (liftTiers recur) Case
-    \/ liftCons1 (liftTiers recur) Select
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) S.Object
-    \/ liftCons2 recur recur S.Pair
-    \/ liftCons1 (pack `mapT` tiers) Comment
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) Commented
-    \/ liftCons1 (liftTiers recur) S.ParseError
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) For
-    \/ liftCons2 recur recur DoWhile
-    \/ liftCons2 recur (liftTiers recur) While
-    \/ liftCons1 (liftTiers recur) Return
-    \/ liftCons1 recur Throw
-    \/ liftCons1 recur Constructor
-    \/ liftCons4 (liftTiers recur) (liftTiers recur) (liftTiers recur) (liftTiers recur) Try
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) S.Array
-    \/ liftCons3 recur (liftTiers recur) (liftTiers recur) Class
-    \/ liftCons5 (liftTiers recur) recur (liftTiers recur) (liftTiers recur) (liftTiers recur) Method
-    \/ liftCons2 recur (liftTiers recur) If
-    \/ liftCons2 recur (liftTiers recur) Module
-    \/ liftCons2 recur (liftTiers recur) Namespace
-    \/ liftCons2 recur (liftTiers recur) Import
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) Export
-    \/ liftCons1 (liftTiers recur) Yield
-    \/ liftCons1 recur Negate
-    \/ liftCons2 (liftTiers recur) (liftTiers recur) Rescue
-    \/ liftCons1 recur Go
-    \/ liftCons1 recur Defer
-    \/ liftCons2 recur recur TypeAssertion
-    \/ liftCons2 recur recur TypeConversion
-    \/ liftCons1 (liftTiers recur) Break
-    \/ liftCons1 (liftTiers recur) Continue
-    \/ liftCons1 (liftTiers recur) BlockStatement
-    \/ liftCons2 (liftTiers recur) recur ParameterDecl
-    \/ liftCons2 recur recur TypeDecl
-    \/ liftCons1 (liftTiers recur) FieldDecl
-    \/ liftCons1 (liftTiers recur) Ty
-    \/ liftCons2 recur recur Send
-    \/ liftCons1 (liftTiers recur) DefaultCase
-
-instance Listable recur => Listable (Syntax recur) where
-  tiers = tiers1
 
 
 instance (Listable1 f, Listable1 (Union (g ': fs))) => Listable1 (Union (f ': g ': fs)) where
