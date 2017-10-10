@@ -20,17 +20,9 @@ diffTerms :: (Diffable syntax, Eq1 syntax, Foldable syntax, Functor syntax, GAli
           => Term syntax (Record fields1)
           -> Term syntax (Record fields2)
           -> Diff syntax (Record fields1) (Record fields2)
-diffTerms t1 t2 = stripDiff (diffTermsWith comparableTerms equivalentTerms (defaultFeatureVectorDecorator constructorNameAndConstantFields t1) (defaultFeatureVectorDecorator constructorNameAndConstantFields t2))
-
--- | Diff a pair of terms recurisvely, using the supplied continuation and 'ComparabilityRelation'.
-diffTermsWith :: forall syntax fields1 fields2
-              .  (Diffable syntax, GAlign syntax, Traversable syntax)
-              => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ A relation on terms used to determine comparability and equality.
-              -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool) -- ^ A relation used to determine term equivalence.
-              -> Term syntax (Record (FeatureVector ': fields1)) -- ^ A term representing the old state.
-              -> Term syntax (Record (FeatureVector ': fields2)) -- ^ A term representing the new state.
-              -> Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)) -- ^ The resulting diff.
-diffTermsWith comparable eqTerms t1 t2 = fromMaybe (replacing t1 t2) (runAlgorithm comparable eqTerms (diff t1 t2))
+diffTerms t1 t2 = stripDiff (fromMaybe (replacing t1' t2') (runAlgorithm comparableTerms equivalentTerms (diff t1' t2')))
+  where (t1', t2') = ( defaultFeatureVectorDecorator constructorNameAndConstantFields t1
+                     , defaultFeatureVectorDecorator constructorNameAndConstantFields t2)
 
 -- | Run an 'Algorithm' to completion in an 'Alternative' context using the supplied comparability & equivalence relations.
 runAlgorithm :: forall syntax fields1 fields2 m result
