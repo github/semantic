@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, DeriveAnyClass, RankNTypes, TypeOperators #-}
-module Language.Go.Syntax
+module Language.Go.Assignment
 ( assignment
 , Syntax
 , Grammar
