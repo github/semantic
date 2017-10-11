@@ -1,5 +1,5 @@
-{-# LANGUAGE DataKinds, GADTs, RankNTypes, TypeOperators #-}
-module Language.JSON.Syntax
+{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+module Language.JSON.Assignment
 ( assignment
 , Syntax
 , Grammar

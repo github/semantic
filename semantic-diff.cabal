@@ -41,7 +41,6 @@ library
                      , Data.Syntax.Declaration
                      , Data.Syntax.Expression
                      , Data.Syntax.Literal
-                     , Data.Syntax.Markup
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
                      , Data.Term
@@ -50,17 +49,20 @@ library
                      , Interpreter
                      , Language
                      , Language.Markdown
+                     , Language.Markdown.Assignment
                      , Language.Markdown.Syntax
                      , Language.Go
                      , Language.Go.Grammar
                      , Language.Go.Syntax
                      , Language.JSON.Grammar
-                     , Language.JSON.Syntax
+                     , Language.JSON.Assignment
                      , Language.Ruby.Grammar
-                     , Language.Ruby.Syntax
+                     , Language.Ruby.Assignment
                      , Language.TypeScript
+                     , Language.TypeScript.Assignment
                      , Language.TypeScript.Grammar
                      , Language.TypeScript.Syntax
+                     , Language.Python.Assignment
                      , Language.Python.Grammar
                      , Language.Python.Syntax
                      , Parser

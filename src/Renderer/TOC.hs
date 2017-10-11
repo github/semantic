@@ -52,7 +52,7 @@ import Syntax as S
 import Data.Syntax.Algebra (RAlgebra)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
-import qualified Data.Syntax.Markup as Markup
+import qualified Language.Markdown.Syntax as Markdown
 
 data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }
   deriving (Eq, Show)
@@ -130,9 +130,9 @@ class CustomHasDeclaration syntax where
   customToDeclaration :: (Foldable whole, HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra syntax (Term whole (Record fields)) (Maybe Declaration)
 
 
--- | Produce a 'SectionDeclaration' from the first line of the heading of a 'Markup.Section' node.
-instance CustomHasDeclaration Markup.Section where
-  customToDeclaration Blob{..} _ (Markup.Section level (Term (In headingAnn headingF), _) _)
+-- | Produce a 'SectionDeclaration' from the first line of the heading of a 'Markdown.Section' node.
+instance CustomHasDeclaration Markdown.Section where
+  customToDeclaration Blob{..} _ (Markdown.Section level (Term (In headingAnn headingF), _) _)
     = Just $ SectionDeclaration (maybe (getSource (byteRange headingAnn)) (getSource . sconcat) (nonEmpty (byteRange . termAnnotation . unTerm <$> toList headingF))) level
     where getSource = firstLine . toText . flip Source.slice blobSource
           firstLine = T.takeWhile (/= '\n')
@@ -185,7 +185,7 @@ class HasDeclarationWithStrategy (strategy :: Strategy) syntax where
 type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Function = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
-  DeclarationStrategy Markup.Section = 'Custom
+  DeclarationStrategy Markdown.Section = 'Custom
   DeclarationStrategy Syntax.Error = 'Custom
   DeclarationStrategy (Union fs) = 'Custom
   DeclarationStrategy a = 'Default
