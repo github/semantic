@@ -244,8 +244,8 @@ tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
   Merge (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
     (Just a, Nothing)      -> Just [Unchanged a]
     (Just a, Just entries)
-      | all (not.isChanged) entries -> Just (Unchanged a : entries)
-      | otherwise -> Just (Changed a : entries)
+      | null entries || any isChanged entries -> Just (Changed a : entries)
+      | otherwise -> Just (Unchanged a : entries)
     (_     , entries)      -> entries)
 
   where patchEntry = patch Deleted Inserted (const Replaced)
