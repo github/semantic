@@ -47,10 +47,10 @@ parseBlobs renderer = fmap toOutput . distributeFoldMap (parseBlob renderer) . f
 parseBlob :: TermRenderer output -> Blob -> Task output
 parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
   (ToCTermRenderer, lang)
-    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[HasDeclaration, Foldable, Functor]) ->
-      parse parser blob >>= decorate (declarationAlgebra blob) >>= render (renderToCTerm blob)
+    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[HasCyclomaticComplexity, HasDeclaration, Foldable, Functor]) ->
+      parse parser blob >>= decorate (declarationAlgebra blob) >>= decorate (fToR cyclomaticComplexityAlgebra) >>= render (renderToCTerm blob)
     | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
-      parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob) >>= render (renderToCTerm blob)
+      parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob) >>= decorate (const (CyclomaticComplexity 0)) >>= render (renderToCTerm blob)
 
   (JSONTermRenderer, lang)
     | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Foldable, Functor]) ->
@@ -78,16 +78,16 @@ diffBlobPair :: DiffRenderer output -> Both Blob -> Task output
 diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (OldToCDiffRenderer, lang)
     | lang `elem` [ Just Language.Markdown, Just Language.Python, Just Language.Ruby ]
-    , Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, HasDeclaration, Show1, Traversable]) ->
-      run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob)) diffTerms (renderToCDiff blobs)
+    , Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, HasCyclomaticComplexity, HasDeclaration, Show1, Traversable]) ->
+      run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob) >>= decorate (fToR cyclomaticComplexityAlgebra)) diffTerms (renderToCDiff blobs)
     | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
-      run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms (renderToCDiff blobs)
+      run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob) >>= decorate (const (CyclomaticComplexity 0))) diffSyntaxTerms (renderToCDiff blobs)
 
   (ToCDiffRenderer, lang)
-    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, HasDeclaration, Show1, Traversable]) ->
-      run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob)) diffTerms (renderToCDiff blobs)
+    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, HasCyclomaticComplexity, HasDeclaration, Show1, Traversable]) ->
+      run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob) >>= decorate (fToR cyclomaticComplexityAlgebra)) diffTerms (renderToCDiff blobs)
     | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
-      run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms (renderToCDiff blobs)
+      run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob) >>= decorate (const (CyclomaticComplexity 0))) diffSyntaxTerms (renderToCDiff blobs)
 
   (JSONDiffRenderer, lang)
     | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, Show1, Traversable]) ->
