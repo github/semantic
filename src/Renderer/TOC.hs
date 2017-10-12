@@ -49,7 +49,7 @@ import Language
 import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
 import Syntax as S
-import Data.Syntax.Algebra (RAlgebra)
+import Data.Syntax.Algebra (CyclomaticComplexity(..), RAlgebra)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Language.Markdown.Syntax as Markdown
@@ -285,7 +285,7 @@ dedupe = let tuples = sortOn fst . Map.elems . snd . foldl' go (0, Map.empty) in
     exactMatch = (==) `on` (getDeclaration . entryPayload)
 
 -- | Construct a 'JSONSummary' from an 'Entry'. Returns 'Nothing' for 'Unchanged' patches.
-entrySummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Entry (Record fields) -> Maybe JSONSummary
+entrySummary :: (HasField fields (Maybe Declaration), HasField fields Span, HasField fields CyclomaticComplexity) => Entry (Record fields) -> Maybe JSONSummary
 entrySummary entry = case entry of
   Unchanged _ -> Nothing
   Changed a   -> recordSummary a "modified"
@@ -294,13 +294,13 @@ entrySummary entry = case entry of
   Replaced a  -> recordSummary a "modified"
 
 -- | Construct a 'JSONSummary' from a node annotation and a change type label.
-recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> T.Text -> Maybe JSONSummary
+recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span, HasField fields CyclomaticComplexity) => Record fields -> T.Text -> Maybe JSONSummary
 recordSummary record = case getDeclaration record of
   Just (ErrorDeclaration text language) -> Just . const (ErrorSummary text (sourceSpan record) language)
-  Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record)
+  Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration <> " " <> let CyclomaticComplexity n = getField record in T.pack (show n)) (sourceSpan record)
   Nothing -> const Nothing
 
-renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Both Blob -> Diff f (Record fields) (Record fields) -> Summaries
+renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, HasField fields CyclomaticComplexity, Foldable f, Functor f) => Both Blob -> Diff f (Record fields) (Record fields) -> Summaries
 renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
@@ -310,15 +310,15 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
                           | before == after -> after
                           | otherwise -> before <> " -> " <> after
 
-renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> Summaries
+renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, HasField fields CyclomaticComplexity, Foldable f, Functor f) => Blob -> Term f (Record fields) -> Summaries
 renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC
   where toMap [] = mempty
         toMap as = Map.singleton (T.pack blobPath) (toJSON <$> as)
 
-diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [JSONSummary]
+diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, HasField fields CyclomaticComplexity, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [JSONSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
 
-termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Term f (Record fields) -> [JSONSummary]
+termToC :: (HasField fields (Maybe Declaration), HasField fields Span, HasField fields CyclomaticComplexity, Foldable f, Functor f) => Term f (Record fields) -> [JSONSummary]
 termToC = mapMaybe (flip recordSummary "unchanged") . termTableOfContentsBy declaration
 
 -- The user-facing category name
