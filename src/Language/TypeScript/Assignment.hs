@@ -544,7 +544,7 @@ forInStatement :: Assignment
 forInStatement = makeTerm <$> symbol ForInStatement <*> children (Statement.ForEach <$> expression <*> expression <*> statement)
 
 doStatement :: Assignment
-doStatement = makeTerm <$> symbol DoStatement <*> children (flip Statement.DoWhile <$> statementBlock <*> parenthesizedExpression)
+doStatement = makeTerm <$> symbol DoStatement <*> children (flip Statement.DoWhile <$> statement <*> parenthesizedExpression)
 
 continueStatement :: Assignment
 continueStatement = makeTerm <$> symbol ContinueStatement <*> children (Statement.Continue <$> ((symbol StatementIdentifier *> identifier) <|> emptyTerm))
