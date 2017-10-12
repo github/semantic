@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, RankNTypes, TypeOperators, ScopedTypeVariables #-}
+{-# LANGUAGE DataKinds, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Renderer.TOC
 ( renderToCDiff
 , renderToCTerm
@@ -8,8 +8,8 @@ module Renderer.TOC
 , isValidSummary
 , Declaration(..)
 , declaration
+, HasDeclaration
 , declarationAlgebra
-, markupSectionAlgebra
 , syntaxDeclarationAlgebra
 , Entry(..)
 , tableOfContentsBy
@@ -34,6 +34,8 @@ import Data.List (sortOn)
 import Data.Maybe (fromMaybe, mapMaybe)
 import Data.Output
 import Data.Patch
+import Data.Proxy
+import Data.Range
 import Data.Record
 import Data.Semigroup ((<>), sconcat)
 import Data.Source as Source
@@ -50,7 +52,7 @@ import Syntax as S
 import Data.Syntax.Algebra (RAlgebra)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
-import qualified Data.Syntax.Markup as Markup
+import qualified Language.Markdown.Syntax as Markdown
 
 data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }
   deriving (Eq, Show)
@@ -91,6 +93,113 @@ data Declaration
   | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationLanguage :: Maybe Language }
   deriving (Eq, Generic, Show)
 
+
+-- | An r-algebra producing 'Just' a 'Declaration' for syntax nodes corresponding to high-level declarations, or 'Nothing' otherwise.
+--
+--   Customizing this for a given syntax type involves two steps:
+--
+--   1. Defining a 'CustomHasDeclaration' instance for the type.
+--   2. Adding the type to the 'DeclarationStrategy' type family.
+--
+--   If you’re getting errors about missing a 'CustomHasDeclaration' instance for your syntax type, you probably forgot step 1.
+--
+--   If you’re getting 'Nothing' for your syntax node at runtime, you probably forgot step 2.
+declarationAlgebra :: (HasField fields Range, HasField fields Span, Foldable syntax, HasDeclaration syntax) => Blob -> RAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Maybe Declaration)
+declarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
+
+
+-- | Types for which we can produce a 'Declaration' in 'Maybe'. There is exactly one instance of this typeclass; adding customized 'Declaration's for a new type is done by defining an instance of 'CustomHasDeclaration' instead.
+--
+--   This typeclass employs the Advanced Overlap techniques designed by Oleg Kiselyov & Simon Peyton Jones: https://wiki.haskell.org/GHC/AdvancedOverlap.
+class HasDeclaration syntax where
+  -- | Compute a 'Declaration' for a syntax type using its 'CustomHasDeclaration' instance, if any, or else falling back to the default definition (which simply returns 'Nothing').
+  toDeclaration :: (Foldable whole, HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra syntax (Term whole (Record fields)) (Maybe Declaration)
+
+-- | Define 'toDeclaration' using the 'CustomHasDeclaration' instance for a type if there is one or else use the default definition.
+--
+--   This instance determines whether or not there is an instance for @syntax@ by looking it up in the 'DeclarationStrategy' type family. Thus producing a 'Declaration' for a node requires both defining a 'CustomHasDeclaration' instance _and_ adding a definition for the type to the 'DeclarationStrategy' type family to return 'Custom'.
+--
+--   Note that since 'DeclarationStrategy' has a fallback case for its final entry, this instance will hold for all types of kind @* -> *@. Thus, this must be the only instance of 'HasDeclaration', as any other instance would be indistinguishable.
+instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy strategy syntax) => HasDeclaration syntax where
+  toDeclaration = toDeclarationWithStrategy (Proxy :: Proxy strategy)
+
+
+-- | Types for which we can produce a customized 'Declaration'. This returns in 'Maybe' so that some values can be opted out (e.g. anonymous functions).
+class CustomHasDeclaration syntax where
+  -- | Produce a customized 'Declaration' for a given syntax node.
+  customToDeclaration :: (Foldable whole, HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra syntax (Term whole (Record fields)) (Maybe Declaration)
+
+
+-- | Produce a 'SectionDeclaration' from the first line of the heading of a 'Markdown.Section' node.
+instance CustomHasDeclaration Markdown.Section where
+  customToDeclaration Blob{..} _ (Markdown.Section level (Term (In headingAnn headingF), _) _)
+    = Just $ SectionDeclaration (maybe (getSource (byteRange headingAnn)) (getSource . sconcat) (nonEmpty (byteRange . termAnnotation . unTerm <$> toList headingF))) level
+    where getSource = firstLine . toText . flip Source.slice blobSource
+          firstLine = T.takeWhile (/= '\n')
+
+-- | Produce an 'ErrorDeclaration' for 'Syntax.Error' nodes.
+instance CustomHasDeclaration Syntax.Error where
+  customToDeclaration Blob{..} ann err@Syntax.Error{}
+    = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan ann) err))) blobLanguage
+
+-- | Produce a 'FunctionDeclaration' for 'Declaration.Function' nodes so long as their identifier is non-empty (defined as having a non-empty 'byteRange').
+instance CustomHasDeclaration Declaration.Function where
+  customToDeclaration Blob{..} _ (Declaration.Function _ (Term (In identifierAnn _), _) _ _)
+    -- Do not summarize anonymous functions
+    | isEmpty identifierAnn = Nothing
+    -- Named functions
+    | otherwise             = Just $ FunctionDeclaration (getSource identifierAnn)
+    where getSource = toText . flip Source.slice blobSource . byteRange
+          isEmpty = (== 0) . rangeLength . byteRange
+
+-- | Produce a 'MethodDeclaration' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'byteRange'), the 'declarationIdentifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
+instance CustomHasDeclaration Declaration.Method where
+  customToDeclaration Blob{..} _ (Declaration.Method _ (Term (In receiverAnn _), _) (Term (In identifierAnn _), _) _ _)
+    -- Methods without a receiver
+    | isEmpty receiverAnn = Just $ MethodDeclaration (getSource identifierAnn)
+    -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
+    | otherwise           = Just $ MethodDeclaration (getSource receiverAnn <> "." <> getSource identifierAnn)
+    where getSource = toText . flip Source.slice blobSource . byteRange
+          isEmpty = (== 0) . rangeLength . byteRange
+
+-- | Produce a 'Declaration' for 'Union's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
+instance Apply HasDeclaration fs => CustomHasDeclaration (Union fs) where
+  customToDeclaration blob ann = apply (Proxy :: Proxy HasDeclaration) (toDeclaration blob ann)
+
+
+-- | A strategy for defining a 'HasDeclaration' instance. Intended to be promoted to the kind level using @-XDataKinds@.
+data Strategy = Default | Custom
+
+-- | Produce a 'Declaration' for a syntax node using either the 'Default' or 'Custom' strategy.
+--
+--   You should probably be using 'CustomHasDeclaration' instead of this class; and you should not define new instances of this class.
+class HasDeclarationWithStrategy (strategy :: Strategy) syntax where
+  toDeclarationWithStrategy :: (Foldable whole, HasField fields Range, HasField fields Span) => proxy strategy -> Blob -> Record fields -> RAlgebra syntax (Term whole (Record fields)) (Maybe Declaration)
+
+
+-- | A predicate on syntax types selecting either the 'Custom' or 'Default' strategy.
+--
+--   Only entries for which we want to use the 'Custom' strategy should be listed, with the exception of the final entry which maps all other types onto the 'Default' strategy.
+--
+--   If you’re seeing errors about missing a 'CustomHasDeclaration' instance for a given type, you’ve probably listed it in here but not defined a 'CustomHasDeclaration' instance for it, or else you’ve listed the wrong type in here. Conversely, if your 'customHasDeclaration' method is never being called, you may have forgotten to list the type in here.
+type family DeclarationStrategy syntax where
+  DeclarationStrategy Declaration.Function = 'Custom
+  DeclarationStrategy Declaration.Method = 'Custom
+  DeclarationStrategy Markdown.Section = 'Custom
+  DeclarationStrategy Syntax.Error = 'Custom
+  DeclarationStrategy (Union fs) = 'Custom
+  DeclarationStrategy a = 'Default
+
+
+-- | The 'Default' strategy produces 'Nothing'.
+instance HasDeclarationWithStrategy 'Default syntax where
+  toDeclarationWithStrategy _ _ _ _ = Nothing
+
+-- | The 'Custom' strategy delegates the selection of the strategy to the 'CustomHasDeclaration' instance for the type.
+instance CustomHasDeclaration syntax => HasDeclarationWithStrategy 'Custom syntax where
+  toDeclarationWithStrategy _ = customToDeclaration
+
+
 getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe Declaration
 getDeclaration = getField
 
@@ -111,46 +220,6 @@ syntaxDeclarationAlgebra Blob{..} (In a r) = case r of
   S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange a) blobSource)) blobLanguage
   _ -> Nothing
   where getSource = toText . flip Source.slice blobSource . byteRange . extract
-
--- | Compute 'Declaration's for methods and functions.
-declarationAlgebra :: (Declaration.Function :< fs, Declaration.Method :< fs, Syntax.Empty :< fs, Syntax.Error :< fs, Apply Functor fs, HasField fields Range, HasField fields Span)
-                   => Blob
-                   -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-declarationAlgebra Blob{..} (In a r)
-  -- Do not summarize anonymous functions
-  | Just (Declaration.Function _ (identifier, _) _ _) <- prj r
-  , Just Syntax.Empty <- prj (unwrap identifier)
-  = Nothing
-
-  -- Named functions
-  | Just (Declaration.Function _ (identifier, _) _ _) <- prj r
-  = Just $ FunctionDeclaration (getSource (extract identifier))
-
-  -- Methods without a receiver
-  | Just (Declaration.Method _ (receiver, _) (identifier, _) _ _) <- prj r
-  , Just Syntax.Empty <- prj (unwrap receiver)
-  = Just $ MethodDeclaration (getSource (extract identifier))
-
-  -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
-  | Just (Declaration.Method _ (receiver, _) (identifier, _) _ _) <- prj r
-  = Just $ MethodDeclaration (getSource (extract receiver) <> "." <> getSource (extract identifier))
-
-  | Just err@Syntax.Error{} <- prj r
-  = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan a) err))) blobLanguage
-  | otherwise = Nothing
-
-  where getSource = toText . flip Source.slice blobSource . byteRange
-
--- | Compute 'Declaration's with the headings of 'Markup.Section's.
-markupSectionAlgebra :: (Markup.Section :< fs, Syntax.Error :< fs, HasField fields Range, HasField fields Span, Apply Functor fs, Apply Foldable fs)
-                     => Blob
-                     -> RAlgebra (TermF (Union fs) (Record fields)) (Term (Union fs) (Record fields)) (Maybe Declaration)
-markupSectionAlgebra Blob{..} (In a r)
-  | Just (Markup.Section level (heading, _) _) <- prj r = Just $ SectionDeclaration (maybe (getSource (extract heading)) (firstLine . toText . flip Source.slice blobSource . sconcat) (nonEmpty (byteRange . extract <$> toList (unwrap heading)))) level
-  | Just err@Syntax.Error{} <- prj r = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan a) err))) blobLanguage
-  | otherwise = Nothing
-  where getSource = firstLine . toText . flip Source.slice blobSource . byteRange
-        firstLine = T.takeWhile (/= '\n')
 
 formatTOCError :: Error.Error String -> String
 formatTOCError e = showExpectation False (errorExpected e) (errorActual e) ""

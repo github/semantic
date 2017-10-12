@@ -41,7 +41,6 @@ library
                      , Data.Syntax.Declaration
                      , Data.Syntax.Expression
                      , Data.Syntax.Literal
-                     , Data.Syntax.Markup
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
                      , Data.Term
@@ -50,16 +49,19 @@ library
                      , Interpreter
                      , Language
                      , Language.Markdown
+                     , Language.Markdown.Assignment
                      , Language.Markdown.Syntax
                      , Language.Go
                      , Language.Go.Syntax
                      , Language.JSON.Grammar
-                     , Language.JSON.Syntax
+                     , Language.JSON.Assignment
                      , Language.Ruby.Grammar
-                     , Language.Ruby.Syntax
+                     , Language.Ruby.Assignment
                      , Language.TypeScript
+                     , Language.TypeScript.Assignment
                      , Language.TypeScript.Grammar
                      , Language.TypeScript.Syntax
+                     , Language.Python.Assignment
                      , Language.Python.Grammar
                      , Language.Python.Syntax
                      , Parser
@@ -72,7 +74,9 @@ library
                      , RWS
                      , Semantic
                      , Semantic.Log
+                     , Semantic.Stat
                      , Semantic.Task
+                     , Semantic.Queue
                      , Semantic.Util
                      , SemanticCmdLine
                      , SES
@@ -99,6 +103,8 @@ library
                      , mersenne-random-pure64
                      , MonadRandom
                      , mtl
+                     , network
+                     , network-uri
                      , optparse-applicative
                      , parallel
                      , parsers
@@ -149,6 +155,7 @@ test-suite test
                      , DiffSpec
                      , SemanticSpec
                      , SemanticCmdLineSpec
+                     , Semantic.StatSpec
                      , InterpreterSpec
                      , PatchOutputSpec
                      , SES.Spec
@@ -175,6 +182,7 @@ test-suite test
                      , HUnit
                      , leancheck
                      , mtl
+                     , network
                      , containers
                      , recursion-schemes >= 4.1
                      , semantic-diff

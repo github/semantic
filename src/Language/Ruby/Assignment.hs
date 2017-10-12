@@ -1,5 +1,5 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, RankNTypes, TypeOperators #-}
-module Language.Ruby.Syntax
+{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+module Language.Ruby.Assignment
 ( assignment
 , Syntax
 , Grammar
@@ -235,11 +235,10 @@ singletonMethod = makeTerm <$> symbol SingletonMethod <*> children (Declaration.
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
 
 lambda :: Assignment
-lambda = symbol Lambda >>= \ loc -> children $ do
-  name <- makeTerm loc <$> (Syntax.Empty <$ source)
-  params <- (symbol BlockParameters <|> symbol LambdaParameters) *> children (many parameter) <|> pure []
-  body <- expressions
-  pure $ makeTerm loc (Declaration.Function [] name params body)
+lambda = makeTerm <$> symbol Lambda <*> children (
+  Declaration.Function [] <$> emptyTerm
+                          <*> ((symbol BlockParameters <|> symbol LambdaParameters) *> children (many parameter) <|> pure [])
+                          <*> expressions)
 
 block :: Assignment
 block =  makeTerm <$> symbol DoBlock <*> children (Declaration.Function <$> pure [] <*> emptyTerm <*> params <*> expressions)
