@@ -5,6 +5,9 @@
 :undef pretty
 :def pretty \ _ -> return (unlines ["let colour = putStrLn . Language.Haskell.HsColour.hscolour Language.Haskell.HsColour.TTY Language.Haskell.HsColour.Colourise.defaultColourPrefs Prelude.False Prelude.False \"\" Prelude.False . Text.Show.Pretty.ppShow", ":set -interactive-print colour"])
 
+-- Enable pretty-printing by default.
+:pretty
+
 -- See docs/💡ProTip!.md
 :undef no-pretty
 :def no-pretty \_ -> return ":set -interactive-print System.IO.print"
