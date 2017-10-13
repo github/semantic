@@ -1,9 +1,8 @@
 {-# LANGUAGE TypeApplications, AllowAmbiguousTypes, DefaultSignatures, MultiParamTypeClasses, FlexibleInstances, FlexibleContexts, UndecidableInstances, ScopedTypeVariables #-}
 module Abstract.Eval where
 
-import Data.Term
 import Abstract.Store
-
+import Data.Term
 import Data.Proxy
 import Data.Union
 
