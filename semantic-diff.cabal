@@ -18,6 +18,7 @@ library
                      , Abstract.Eval
                      , Abstract.Set
                      , Abstract.Store
+                     , Control.Effect
                      , Category
                      , Data.Align.Generic
                      , Data.Blob
