@@ -10,6 +10,21 @@
 :undef re
 :def re \_ -> return ":reload\n:pretty\n"
 
+:{
+assignmentExample lang = case lang of
+  "Python" -> mk "py" "python"
+  "Go" -> mk "go" "go"
+  "Ruby" -> mk "rb" "ruby"
+  "JavaScript" -> mk "js" "typescript"
+  "TypeScript" -> mk "ts" "typescript"
+  "Haskell" -> mk "hs" "haskell"
+  "Markdown" -> mk "md" "markdown"
+  "JSON" -> mk "json" "json"
+  _ -> mk "" ""
+  where mk fileExtension parser = putStrLn ("example: fmap (() <$) . runTask . parse " ++ parser ++ "Parser =<< Semantic.Util.file \"example." ++ fileExtension ++ "\"") >> return ("import Parser\nimport Semantic.Task\nimport Semantic.Util")
+:}
+:def assignment assignmentExample
+
 :seti -fbreak-on-error
 
 :set -Wwarn
