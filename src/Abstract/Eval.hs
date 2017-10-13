@@ -19,13 +19,6 @@ instance ( Monad m
   evaluate ev = apply (Proxy :: Proxy (Eval v m s)) (evaluate ev)
 
 
-
-class Monad m => MonadGC l a m where
-  askRoots :: m (Set (Address l a))
-
-  extraRoots :: Set (Address l a) -> m b -> m b
-
-
 -- Collecting evaluator
 class Monad m => EvalCollect l v m syntax constr where
   evalCollect :: (Term syntax ann -> m v)
@@ -41,3 +34,9 @@ instance ( Monad m
          )
          => EvalCollect l v m s (Union fs) where
   evalCollect ev = apply (Proxy :: Proxy (EvalCollect l v m s)) (evalCollect @l ev)
+
+
+class Monad m => MonadGC l a m where
+  askRoots :: m (Set (Address l a))
+
+  extraRoots :: Set (Address l a) -> m b -> m b
