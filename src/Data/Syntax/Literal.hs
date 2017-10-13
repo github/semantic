@@ -1,6 +1,9 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses #-}
 module Data.Syntax.Literal where
 
+import Abstract.Eval
+import Abstract.Value
+import Abstract.Primitive
 import Algorithm
 import Data.Align.Generic
 import Data.ByteString (ByteString)
@@ -93,6 +96,8 @@ newtype TextElement a = TextElement { textElementContent :: ByteString }
 instance Eq1 TextElement where liftEq = genericLiftEq
 instance Ord1 TextElement where liftCompare = genericLiftCompare
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
+instance (Monad m) => Eval (Value s a l) m s a TextElement where
+  evaluate _ (TextElement x) = pure (I (PString x))
 
 data Null a = Null
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
