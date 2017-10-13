@@ -1,15 +1,20 @@
+-- :source is convenient for (re)loading commands from a file (for example, this one).
 :undef source
 :def source Prelude.readFile
 
+-- See docs/💡ProTip!.md
 :undef pretty
 :def pretty \_ -> return "import Text.Show.Pretty (pPrint, ppShow)\nimport Language.Haskell.HsColour\nimport Language.Haskell.HsColour.Colourise\nlet colour = putStrLn . hscolour TTY defaultColourPrefs Prelude.False Prelude.False \"\" Prelude.False . ppShow\n:set -interactive-print colour\n"
 
+-- See docs/💡ProTip!.md
 :undef no-pretty
 :def no-pretty \_ -> return ":set -interactive-print System.IO.print"
 
+-- See docs/💡ProTip!.md
 :undef re
 :def re \_ -> return ":reload\n:pretty\n"
 
+-- See docs/💡ProTip!.md for documentation & examples.
 :{
 assignmentExample lang = case lang of
   "Python" -> mk "py" "python"
@@ -25,8 +30,11 @@ assignmentExample lang = case lang of
 :}
 :def assignment assignmentExample
 
+-- Enable breaking on errors for code written in the repl.
 :seti -fbreak-on-error
 
+-- Continue loading after warnings when in the repl.
 :set -Wwarn
 
+-- Use a cyan lambda as the prompt.
 :set prompt "\ESC[1;36m\STXλ: \ESC[m\STX"
