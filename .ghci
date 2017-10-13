@@ -11,3 +11,5 @@
 :def re \_ -> return ":reload\n:pretty\n"
 
 :seti -fbreak-on-error
+
+:set -Wwarn
