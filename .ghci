@@ -38,4 +38,4 @@ assignmentExample lang = case lang of
 :set -Wwarn
 
 -- Use a cyan lambda as the prompt.
-:set prompt "\ESC[1;36m\STXλ: \ESC[m\STX"
+:set prompt "\ESC[1;36m\STXλ \ESC[m\STX"
