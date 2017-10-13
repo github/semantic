@@ -16,6 +16,7 @@ module Abstract.Store
 ) where
 
 import Abstract.Set
+import Abstract.FreeVariables
 import Data.Term
 import Control.Applicative
 import Control.Monad ((<=<))

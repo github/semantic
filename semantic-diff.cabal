@@ -16,6 +16,7 @@ library
   exposed-modules:     Algorithm
                      , Alignment
                      , Abstract.Eval
+                     , Abstract.FreeVariables
                      , Abstract.Set
                      , Abstract.Store
                      , Control.Effect
