@@ -13,8 +13,8 @@
 :def no-pretty \_ -> return ":set -interactive-print System.IO.print"
 
 -- See docs/💡ProTip!.md
-:undef re
-:def re \_ -> return ":reload\n:pretty\n"
+:undef r
+:def r \_ -> return (unlines [":reload", ":pretty"])
 
 -- See docs/💡ProTip!.md for documentation & examples.
 :{
