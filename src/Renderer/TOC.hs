@@ -296,8 +296,8 @@ dedupe = let tuples = sortOn fst . Map.elems . snd . foldl' go (0, Map.empty) in
 -- | Construct a 'JSONSummary' from an 'Entry'.
 entrySummary :: (HasField fields (Maybe Declaration), HasField fields Span, HasField fields CyclomaticComplexity) => Entry (Record fields) -> Maybe JSONSummary
 entrySummary entry = case entry of
-  Changed a   -> recordSummary a "modified" (Just (getField a))
-  Deleted a   -> recordSummary a "removed" (Just (getField a))
+  Changed a   -> recordSummary (mergeThese (flip const) a) "modified" (these (Just . negate . getCyclomaticComplexity) (Just . getCyclomaticComplexity) (\a1 a2 -> let cc = getCyclomaticComplexity a2 - getCyclomaticComplexity a1 in Just cc) a)
+  Deleted a   -> recordSummary a "removed" (Just (negate (getField a)))
   Inserted a  -> recordSummary a "added" (Just (getField a))
   Replaced a  -> recordSummary a "modified" (Just (getField a))
 
@@ -306,7 +306,7 @@ entrySummary entry = case entry of
 recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span, HasField fields CyclomaticComplexity) => Record fields -> T.Text -> Maybe CyclomaticComplexity -> Maybe JSONSummary
 recordSummary record entryText complexity = case getDeclaration record of
   Just (ErrorDeclaration text language) -> Just $ ErrorSummary text (sourceSpan record) language
-  Just declaration -> Just $ JSONSummary (toCategoryName declaration) (declarationIdentifier declaration <> " " <> (maybe T.empty (\n -> T.pack (show n)) complexity)) (sourceSpan record) entryText
+  Just declaration -> Just $ JSONSummary (toCategoryName declaration) (declarationIdentifier declaration <> " " <> (maybe T.empty (\(CyclomaticComplexity n) -> T.pack (show n)) complexity)) (sourceSpan record) entryText
   Nothing -> Nothing
 
 renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, HasField fields CyclomaticComplexity, Foldable f, Functor f) => Both Blob -> Diff f (Record fields) (Record fields) -> Summaries
