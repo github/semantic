@@ -204,6 +204,9 @@ instance CustomHasDeclaration syntax => HasDeclarationWithStrategy 'Custom synta
 getDeclaration :: HasField fields (Maybe Declaration) => Record fields -> Maybe Declaration
 getDeclaration = getField
 
+getCyclomaticComplexity :: HasField fields (CyclomaticComplexity) => Record fields -> CyclomaticComplexity
+getCyclomaticComplexity = getField
+
 -- | Produce the annotations of nodes representing declarations.
 declaration :: HasField fields (Maybe Declaration) => TermF f (Record fields) a -> Maybe (Record fields)
 declaration (In annotation _) = annotation <$ (getField annotation :: Maybe Declaration)
