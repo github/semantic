@@ -42,6 +42,7 @@ import Data.Source as Source
 import Data.Term
 import Data.Text (toLower)
 import qualified Data.Text as T
+import Data.These
 import Data.Union
 import GHC.Generics
 import Info
@@ -226,12 +227,19 @@ formatTOCError e = showExpectation False (errorExpected e) (errorActual e) ""
 
 -- | An entry in a table of contents.
 data Entry a
-  = Changed   { entryPayload :: a } -- ^ An entry for a node containing changes.
-  | Inserted  { entryPayload :: a } -- ^ An entry for a change occurring inside an 'Insert' 'Patch'.
-  | Deleted   { entryPayload :: a } -- ^ An entry for a change occurring inside a 'Delete' 'Patch'.
-  | Replaced  { entryPayload :: a } -- ^ An entry for a change occurring on the insertion side of a 'Replace' 'Patch'.
+  = Changed (These a a) -- ^ An entry for a node containing changes.
+  | Inserted a -- ^ An entry for a change occurring inside an 'Insert' 'Patch'.
+  | Deleted  a -- ^ An entry for a change occurring inside a 'Delete' 'Patch'.
+  | Replaced a -- ^ An entry for a change occurring on the insertion side of a 'Replace' 'Patch'.
   deriving (Eq, Show)
 
+entryPayload :: Entry a -> a
+entryPayload (Changed (These a1 a2)) = a2
+entryPayload (Changed (This a1)) = a1
+entryPayload (Changed (That a2)) = a2
+entryPayload (Inserted a2) = a2
+entryPayload (Deleted a1) = a1
+entryPayload (Replaced a2) = a2
 
 -- | Compute a table of contents for a diff characterized by a function mapping relevant nodes onto values in Maybe.
 tableOfContentsBy :: (Foldable f, Functor f)
