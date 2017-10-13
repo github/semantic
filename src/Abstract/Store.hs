@@ -17,7 +17,6 @@ module Abstract.Store
 
 import Abstract.Set
 import Abstract.FreeVariables
-import Data.Term
 import Control.Applicative
 import Control.Monad ((<=<))
 import Control.Monad.Effect

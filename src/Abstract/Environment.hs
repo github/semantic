@@ -3,7 +3,6 @@ module Abstract.Environment where
 
 import Abstract.Store
 import Abstract.FreeVariables
-import Data.Term
 import Control.Monad.Effect
 import Control.Monad.Effect.Reader
 import Data.Functor.Classes
