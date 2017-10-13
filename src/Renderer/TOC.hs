@@ -285,17 +285,18 @@ dedupe = let tuples = sortOn fst . Map.elems . snd . foldl' go (0, Map.empty) in
 -- | Construct a 'JSONSummary' from an 'Entry'.
 entrySummary :: (HasField fields (Maybe Declaration), HasField fields Span, HasField fields CyclomaticComplexity) => Entry (Record fields) -> Maybe JSONSummary
 entrySummary entry = case entry of
-  Changed a   -> recordSummary a "modified"
-  Deleted a   -> recordSummary a "removed"
-  Inserted a  -> recordSummary a "added"
-  Replaced a  -> recordSummary a "modified"
+  Changed a   -> recordSummary a "modified" (Just (getField a))
+  Deleted a   -> recordSummary a "removed" (Just (getField a))
+  Inserted a  -> recordSummary a "added" (Just (getField a))
+  Replaced a  -> recordSummary a "modified" (Just (getField a))
+
 
 -- | Construct a 'JSONSummary' from a node annotation and a change type label.
-recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span, HasField fields CyclomaticComplexity) => Record fields -> T.Text -> Maybe JSONSummary
-recordSummary record = case getDeclaration record of
-  Just (ErrorDeclaration text language) -> Just . const (ErrorSummary text (sourceSpan record) language)
-  Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration <> " " <> let CyclomaticComplexity n = getField record in T.pack (show n)) (sourceSpan record)
-  Nothing -> const Nothing
+recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span, HasField fields CyclomaticComplexity) => Record fields -> T.Text -> Maybe CyclomaticComplexity -> Maybe JSONSummary
+recordSummary record entryText complexity = case getDeclaration record of
+  Just (ErrorDeclaration text language) -> Just $ ErrorSummary text (sourceSpan record) language
+  Just declaration -> Just $ JSONSummary (toCategoryName declaration) (declarationIdentifier declaration <> " " <> (maybe T.empty (\n -> T.pack (show n)) complexity)) (sourceSpan record) entryText
+  Nothing -> Nothing
 
 renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, HasField fields CyclomaticComplexity, Foldable f, Functor f) => Both Blob -> Diff f (Record fields) (Record fields) -> Summaries
 renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
@@ -316,7 +317,7 @@ diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, HasField 
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
 
 termToC :: (HasField fields (Maybe Declaration), HasField fields Span, HasField fields CyclomaticComplexity, Foldable f, Functor f) => Term f (Record fields) -> [JSONSummary]
-termToC = mapMaybe (flip recordSummary "unchanged") . termTableOfContentsBy declaration
+termToC = mapMaybe (\a -> recordSummary a "unchanged" Nothing) . termTableOfContentsBy declaration
 
 -- The user-facing category name
 toCategoryName :: Declaration -> T.Text
