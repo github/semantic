@@ -4,9 +4,6 @@ module Semantic.Util where
 
 import Control.Monad.IO.Class
 import Data.Blob
-import Language.Haskell.HsColour (hscolour, Output(TTY))
-import Language.Haskell.HsColour.Colourise (defaultColourPrefs)
-import Text.Show.Pretty (ppShow)
 import Files
 import Data.Record
 import Data.Functor.Classes
@@ -22,10 +19,6 @@ import Semantic.Task
 import Renderer.TOC
 import Data.Range
 import Data.Span
-
--- Produces colorized pretty-printed output for the terminal / GHCi.
-pp :: Show a => a -> IO ()
-pp = putStrLn . hscolour TTY defaultColourPrefs False False "" False . ppShow
 
 file :: MonadIO m => FilePath -> m Blob
 file path = Files.readFile path (languageForFilePath path)
