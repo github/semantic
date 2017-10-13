@@ -28,6 +28,7 @@ assignmentExample lang = case lang of
   _ -> mk "" ""
   where mk fileExtension parser = putStrLn ("example: fmap (() <$) . runTask . parse " ++ parser ++ "Parser =<< Semantic.Util.file \"example." ++ fileExtension ++ "\"") >> return ("import Parser\nimport Semantic.Task\nimport Semantic.Util")
 :}
+:undef assignment
 :def assignment assignmentExample
 
 -- Enable breaking on errors for code written in the repl.
