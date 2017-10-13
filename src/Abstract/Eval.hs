@@ -8,32 +8,34 @@ import Data.Union
 
 
 -- Standard evaluator/interpreter
-class Monad m => Eval v m syntax constr where
+class Monad m => Eval v m syntax ann constr where
   evaluate :: (Term syntax ann -> m v) -> constr (Term syntax ann) -> m v
 
 
 instance ( Monad m
-         , Apply (Eval v m s) fs
+         , Apply (Eval v m s a) fs
          )
-         => Eval v m s (Union fs) where
-  evaluate ev = apply (Proxy :: Proxy (Eval v m s)) (evaluate ev)
+         => Eval v m s a (Union fs) where
+  evaluate ev = apply (Proxy :: Proxy (Eval v m s a)) (evaluate ev)
 
+instance (Monad m, Eval v m s a s) => Eval v m s a (TermF s a) where
+  evaluate ev In{..} = evaluate ev termOut
 
 -- Collecting evaluator
-class Monad m => EvalCollect l v m syntax constr where
+class Monad m => EvalCollect l v m syntax ann constr where
   evalCollect :: (Term syntax ann -> m v)
               -> constr (Term syntax ann)
               -> m v
-  default evalCollect :: (Eval v m syntax constr) => (Term syntax ann -> m v)
+  default evalCollect :: (Eval v m syntax ann constr) => (Term syntax ann -> m v)
                       -> constr (Term syntax ann)
                       -> m v
   evalCollect = evaluate
 
 instance ( Monad m
-         , Apply (EvalCollect l v m s) fs
+         , Apply (EvalCollect l v m s a) fs
          )
-         => EvalCollect l v m s (Union fs) where
-  evalCollect ev = apply (Proxy :: Proxy (EvalCollect l v m s)) (evalCollect @l ev)
+         => EvalCollect l v m s a (Union fs) where
+  evalCollect ev = apply (Proxy :: Proxy (EvalCollect l v m s a)) (evalCollect @l ev)
 
 
 class Monad m => MonadGC l a m where

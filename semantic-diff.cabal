@@ -16,6 +16,7 @@ library
   exposed-modules:     Algorithm
                      , Alignment
                      , Abstract.Environment
+                     , Abstract.Interpreter
                      , Abstract.Eval
                      , Abstract.FreeVariables
                      , Abstract.Primitive
