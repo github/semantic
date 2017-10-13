@@ -1,0 +1,40 @@
+-- Load the pretty-show & hscolour packages for use with :pretty.
+:set -package pretty-show -package hscolour
+
+-- See docs/💡ProTip!.md
+:undef pretty
+:def pretty \ _ -> return (unlines ["let colour = putStrLn . Language.Haskell.HsColour.hscolour Language.Haskell.HsColour.TTY Language.Haskell.HsColour.Colourise.defaultColourPrefs Prelude.False Prelude.False \"\" Prelude.False . Text.Show.Pretty.ppShow", ":set -interactive-print colour"])
+
+-- See docs/💡ProTip!.md
+:undef no-pretty
+:def no-pretty \_ -> return ":set -interactive-print System.IO.print"
+
+-- See docs/💡ProTip!.md
+:undef r
+:def r \_ -> return (unlines [":reload", ":pretty"])
+
+-- See docs/💡ProTip!.md for documentation & examples.
+:{
+assignmentExample lang = case lang of
+  "Python" -> mk "py" "python"
+  "Go" -> mk "go" "go"
+  "Ruby" -> mk "rb" "ruby"
+  "JavaScript" -> mk "js" "typescript"
+  "TypeScript" -> mk "ts" "typescript"
+  "Haskell" -> mk "hs" "haskell"
+  "Markdown" -> mk "md" "markdown"
+  "JSON" -> mk "json" "json"
+  _ -> mk "" ""
+  where mk fileExtension parser = putStrLn ("example: fmap (() <$) . runTask . parse " ++ parser ++ "Parser =<< Semantic.Util.file \"example." ++ fileExtension ++ "\"") >> return ("import Parser\nimport Semantic.Task\nimport Semantic.Util")
+:}
+:undef assignment
+:def assignment assignmentExample
+
+-- Enable breaking on errors for code written in the repl.
+:seti -fbreak-on-error
+
+-- Continue loading after warnings when in the repl.
+:set -Wwarn
+
+-- Use a cyan lambda as the prompt.
+:set prompt "\ESC[1;36m\STXλ \ESC[m\STX"
