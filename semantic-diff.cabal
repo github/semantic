@@ -15,10 +15,14 @@ library
   hs-source-dirs:      src
   exposed-modules:     Algorithm
                      , Alignment
+                     , Abstract.Environment
                      , Abstract.Eval
                      , Abstract.FreeVariables
+                     , Abstract.Primitive
                      , Abstract.Set
                      , Abstract.Store
+                     , Abstract.Type
+                     , Abstract.Value
                      , Control.Effect
                      , Category
                      , Data.Align.Generic
