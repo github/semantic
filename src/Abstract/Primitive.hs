@@ -6,6 +6,7 @@ import Control.Applicative
 import Control.Monad hiding (fail)
 import Control.Monad.Fail
 import Prelude hiding (fail)
+import Data.ByteString (ByteString)
 
 data Op1 = Negate | Abs | Signum | Not
   deriving (Eq, Ord, Show)
@@ -26,6 +27,7 @@ relationOperators = [Eq, Lt, LtE, Gt, GtE]
 data Prim
   = PInt  {-# UNPACK #-} !Int
   | PBool !Bool
+  | PString !ByteString
   deriving (Eq, Ord, Show)
 
 class Monad m => MonadPrim a m where
