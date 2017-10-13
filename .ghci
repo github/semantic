@@ -1,0 +1,2 @@
+:undef source
+:def source Prelude.readFile
