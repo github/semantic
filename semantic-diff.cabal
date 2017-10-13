@@ -15,6 +15,9 @@ library
   hs-source-dirs:      src
   exposed-modules:     Algorithm
                      , Alignment
+                     , Abstract.Eval
+                     , Abstract.Set
+                     , Abstract.Store
                      , Category
                      , Data.Align.Generic
                      , Data.Blob
@@ -108,6 +111,7 @@ library
                      , optparse-applicative
                      , parallel
                      , parsers
+                     , pointed
                      , recursion-schemes
                      , semigroups
                      , split
