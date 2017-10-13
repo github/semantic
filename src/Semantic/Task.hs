@@ -205,18 +205,18 @@ runParser Options{..} blob@Blob{..} = go
       AssignmentParser parser assignment -> do
         ast <- go parser `catchError` \ err -> do
           writeStat (Stat.increment "parse.parse_failures" languageTag)
-          writeLog Error "failed parsing" (("tag", "parse") : blobFields)
+          writeLog Error "failed parsing" (("task", "parse") : blobFields)
           throwError err
         time "parse.assign" languageTag $
           case Assignment.assign blobSource assignment ast of
             Left err -> do
               writeStat (Stat.increment "parse.assign_errors" languageTag)
-              writeLog Error (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("tag", "assign") : blobFields)
+              writeLog Error (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "assign") : blobFields)
               throwError (toException err)
             Right term -> do
               for_ (errors term) $ \ err -> do
                 writeStat (Stat.increment "parse.parse_errors" languageTag)
-                writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("tag", "assign") : blobFields)
+                writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "parse") : blobFields)
               writeStat (Stat.count "parse.nodes" (length term) languageTag)
               pure term
       TreeSitterParser tslanguage ->
