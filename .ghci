@@ -6,3 +6,6 @@
 
 :undef no-pretty
 :def no-pretty \_ -> return ":set -interactive-print System.IO.print"
+
+:undef re
+:def re \_ -> return ":reload\n:pretty\n"
