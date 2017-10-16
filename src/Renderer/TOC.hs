@@ -239,7 +239,7 @@ data Entry a
   deriving (Eq, Show)
 
 entryPayload :: Entry a -> a
-entryPayload (Changed (These a1 a2)) = a2
+entryPayload (Changed (These _ a2)) = a2
 entryPayload (Changed (This a1)) = a1
 entryPayload (Changed (That a2)) = a2
 entryPayload (Inserted a2) = a2
