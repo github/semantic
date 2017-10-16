@@ -1,5 +1,5 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, RankNTypes, TypeOperators #-}
-module Language.Ruby.Syntax
+{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+module Language.Ruby.Assignment
 ( assignment
 , Syntax
 , Grammar
@@ -10,7 +10,7 @@ import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Functor (void)
 import Data.List.NonEmpty (some1)
-import Data.Syntax (postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
+import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
@@ -235,11 +235,10 @@ singletonMethod = makeTerm <$> symbol SingletonMethod <*> children (Declaration.
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
 
 lambda :: Assignment
-lambda = symbol Lambda >>= \ loc -> children $ do
-  name <- makeTerm loc <$> (Syntax.Empty <$ source)
-  params <- (symbol BlockParameters <|> symbol LambdaParameters) *> children (many parameter) <|> pure []
-  body <- expressions
-  pure $ makeTerm loc (Declaration.Function [] name params body)
+lambda = makeTerm <$> symbol Lambda <*> children (
+  Declaration.Function [] <$> emptyTerm
+                          <*> ((symbol BlockParameters <|> symbol LambdaParameters) *> children (many parameter) <|> pure [])
+                          <*> expressions)
 
 block :: Assignment
 block =  makeTerm <$> symbol DoBlock <*> children (Declaration.Function <$> pure [] <*> emptyTerm <*> params <*> expressions)
@@ -401,7 +400,7 @@ invert term = makeTerm <$> location <*> fmap Expression.Not term
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 term :: Assignment -> Assignment
-term term = many comment *> term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
+term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
 
 -- | Match a series of terms or comments until a delimiter is matched.
 manyTermsTill :: Show b => Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]

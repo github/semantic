@@ -5,10 +5,10 @@
     (Catch
       (Empty)
       (
-      {+(Identifier)+}
-      {-(Identifier)-}))
+      { (Identifier)
+      ->(Identifier) }))
     (Finally
       (
-      {+(Identifier)+}
-      {-(Identifier)-})))
+      { (Identifier)
+      ->(Identifier) })))
   (Empty))

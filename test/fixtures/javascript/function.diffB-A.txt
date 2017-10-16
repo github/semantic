@@ -6,16 +6,18 @@
     (RequiredParameter
       (Empty)
       (Empty)
+      (Empty)
       (Assignment
         (Identifier)
         (Empty)))
     (RequiredParameter
       (Empty)
       (Empty)
+      (Empty)
       (Assignment
         (Identifier)
         (Empty)))
     (
-    {+(Identifier)+}
-    {-(Identifier)-}))
+    { (Identifier)
+    ->(Identifier) }))
   (Empty))

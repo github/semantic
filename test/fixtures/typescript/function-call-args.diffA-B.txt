@@ -2,13 +2,14 @@
   (Call
     (Identifier)
     (Float)
-  {+(TextElement)+}
-  {-(TextElement)-}
+  { (TextElement)
+  ->(TextElement) }
     (Function
       (Empty)
       (Empty)
       (Empty)
     {-(RequiredParameter
+      {-(Empty)-}
       {-(Empty)-}
       {-(Empty)-}
       {-(Assignment
@@ -17,10 +18,12 @@
       (RequiredParameter
         (Empty)
         (Empty)
+        (Empty)
         (Assignment
           (Identifier)
           (Empty)))
     {+(RequiredParameter
+      {+(Empty)+}
       {+(Empty)+}
       {+(Empty)+}
       {+(Assignment
@@ -31,12 +34,12 @@
           (MemberAccess
             (Identifier)
             (Identifier))
-        {+(Identifier)+}
-        {-(Identifier)-}
+        { (Identifier)
+        ->(Identifier) }
           (Empty))
         (Return
         { (Identifier)
         ->(Identifier) })))
-  {+(Boolean)+}
-  {-(Boolean)-}
+  { (Boolean)
+  ->(Boolean) }
     (Empty)))

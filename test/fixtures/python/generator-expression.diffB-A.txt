@@ -5,10 +5,10 @@
     (
       (
         (
-        {+(Identifier)+}
-        {-(Identifier)-})
-      {+(Identifier)+}
-      {-(Identifier)-})))
+        { (Identifier)
+        ->(Identifier) })
+      { (Identifier)
+      ->(Identifier) })))
   (Comprehension
   { (Plus
     {-(Identifier)-}
@@ -17,7 +17,7 @@
     (
       (
         (
-        {+(Identifier)+}
-        {-(Identifier)-})
-      {+(Identifier)+}
-      {-(Identifier)-}))))
+        { (Identifier)
+        ->(Identifier) })
+      { (Identifier)
+      ->(Identifier) }))))

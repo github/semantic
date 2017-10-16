@@ -22,6 +22,7 @@ library
                      , Data.Error
                      , Data.Functor.Both
                      , Data.Functor.Classes.Eq.Generic
+                     , Data.Functor.Classes.Ord.Generic
                      , Data.Functor.Classes.Show.Generic
                      , Data.JSON.Fields
                      , Data.Mergeable
@@ -40,7 +41,6 @@ library
                      , Data.Syntax.Declaration
                      , Data.Syntax.Expression
                      , Data.Syntax.Literal
-                     , Data.Syntax.Markup
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
                      , Data.Term
@@ -49,18 +49,19 @@ library
                      , Interpreter
                      , Language
                      , Language.Markdown
+                     , Language.Markdown.Assignment
                      , Language.Markdown.Syntax
                      , Language.Go
                      , Language.Go.Syntax
                      , Language.JSON.Grammar
-                     , Language.JSON.Syntax
-                     , Language.Ruby
+                     , Language.JSON.Assignment
                      , Language.Ruby.Grammar
-                     , Language.Ruby.Syntax
+                     , Language.Ruby.Assignment
                      , Language.TypeScript
+                     , Language.TypeScript.Assignment
                      , Language.TypeScript.Grammar
                      , Language.TypeScript.Syntax
-                     , Language.Python
+                     , Language.Python.Assignment
                      , Language.Python.Grammar
                      , Language.Python.Syntax
                      , Parser
@@ -73,7 +74,9 @@ library
                      , RWS
                      , Semantic
                      , Semantic.Log
+                     , Semantic.Stat
                      , Semantic.Task
+                     , Semantic.Queue
                      , Semantic.Util
                      , SemanticCmdLine
                      , SES
@@ -100,6 +103,8 @@ library
                      , mersenne-random-pure64
                      , MonadRandom
                      , mtl
+                     , network
+                     , network-uri
                      , optparse-applicative
                      , parallel
                      , parsers
@@ -118,8 +123,6 @@ library
                      , tree-sitter-python
                      , tree-sitter-ruby
                      , tree-sitter-typescript
-                     , pretty-show
-                     , hscolour
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards, StrictData
   ghc-options:         -Wall -fno-warn-name-shadowing -O -j
@@ -142,6 +145,7 @@ test-suite test
   main-is:             Spec.hs
   other-modules:       AlignmentSpec
                      , CommandSpec
+                     , Data.Functor.Classes.Ord.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Mergeable.Spec
                      , Data.RandomWalkSimilarity.Spec
@@ -149,6 +153,7 @@ test-suite test
                      , DiffSpec
                      , SemanticSpec
                      , SemanticCmdLineSpec
+                     , Semantic.StatSpec
                      , InterpreterSpec
                      , PatchOutputSpec
                      , SES.Spec
@@ -175,6 +180,7 @@ test-suite test
                      , HUnit
                      , leancheck
                      , mtl
+                     , network
                      , containers
                      , recursion-schemes >= 4.1
                      , semantic-diff

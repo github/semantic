@@ -6,10 +6,12 @@
     (RequiredParameter
       (Empty)
       (Empty)
+      (Empty)
       (Assignment
         (Identifier)
         (Empty)))
     (RequiredParameter
+      (Empty)
       (Empty)
       (Empty)
       (Assignment
@@ -23,10 +25,12 @@
         (RequiredParameter
           (Empty)
           (Empty)
+          (Empty)
           (Assignment
             (Identifier)
             (Empty)))
         (RequiredParameter
+          (Empty)
           (Empty)
           (Empty)
           (Assignment
@@ -37,13 +41,13 @@
             (MemberAccess
               (Identifier)
               (Identifier))
-          {+(Identifier)+}
-          {-(Identifier)-}
+          { (Identifier)
+          ->(Identifier) }
             (Empty))
           (Call
             (MemberAccess
               (Identifier)
               (Identifier))
-          {+(Identifier)+}
-          {-(Identifier)-}
+          { (Identifier)
+          ->(Identifier) }
             (Empty)))))))

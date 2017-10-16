@@ -1,8 +1,10 @@
-{-# LANGUAGE DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Parser
 ( Parser(..)
+, SomeParser(..)
+, someParser
 -- Syntax parsers
-, parserForLanguage
+, syntaxParserForLanguage
 -- À la carte parsers
 , jsonParser
 , markdownParser
@@ -13,6 +15,7 @@ module Parser
 
 import qualified CMarkGFM
 import Data.Functor.Classes (Eq1)
+import Data.Kind
 import Data.Ix
 import Data.Record
 import qualified Data.Syntax as Syntax
@@ -22,11 +25,11 @@ import Data.Union
 import Foreign.Ptr
 import Info hiding (Empty, Go)
 import Language
-import qualified Language.JSON.Syntax as JSON
-import qualified Language.Markdown.Syntax as Markdown
-import qualified Language.Python.Syntax as Python
-import qualified Language.Ruby.Syntax as Ruby
-import qualified Language.TypeScript.Syntax as TypeScript
+import qualified Language.JSON.Assignment as JSON
+import qualified Language.Markdown.Assignment as Markdown
+import qualified Language.Python.Assignment as Python
+import qualified Language.Ruby.Assignment as Ruby
+import qualified Language.TypeScript.Assignment as TypeScript
 import Syntax hiding (Go)
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import TreeSitter.Go
@@ -49,9 +52,43 @@ data Parser term where
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
 
+-- | Apply all of a list of typeclasses to all of a list of functors using 'Apply'. Used by 'someParser' to constrain all of the language-specific syntax types to the typeclasses in question.
+type family ApplyAll (typeclasses :: [(* -> *) -> Constraint]) (functors :: [* -> *]) :: Constraint where
+  ApplyAll (typeclass ': typeclasses) functors = (Apply typeclass functors, ApplyAll typeclasses functors)
+  ApplyAll '[] functors = ()
+
+-- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
+--
+--   This enables us to abstract over the details of the specific syntax types in cases where we can describe all the requirements on the syntax with a list of typeclasses.
+data SomeParser typeclasses where
+  SomeParser :: ApplyAll typeclasses fs => { unSomeParser :: Parser (Term (Union fs) (Record Location)) } -> SomeParser typeclasses
+
+-- | Construct a 'SomeParser' given a proxy for a list of typeclasses and the 'Language' to be parsed, all of which must be satisfied by all of the types in the syntaxes of our supported languages.
+--
+--   This can be used to perform operations uniformly over terms produced by blobs with different 'Language's, and which therefore have different types in general. For example, given some 'Blob', we can parse and 'show' the parsed & assigned 'Term' like so:
+--
+--   > case someParser (Proxy :: Proxy '[Show1]) (blobLanguage language) of { Just (SomeParser parser) -> runTask (parse parser blob) >>= putStrLn . show ; _ -> return () }
+someParser :: ( ApplyAll typeclasses JSON.Syntax
+              , ApplyAll typeclasses Markdown.Syntax
+              , ApplyAll typeclasses Python.Syntax
+              , ApplyAll typeclasses Ruby.Syntax
+              , ApplyAll typeclasses TypeScript.Syntax
+              )
+           => proxy typeclasses              -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
+           -> Language                       -- ^ The 'Language' to select.
+           -> Maybe (SomeParser typeclasses) -- ^ 'Maybe' a 'SomeParser' abstracting the syntax type to be produced.
+someParser _ Go         = Nothing
+someParser _ JavaScript = Just (SomeParser typescriptParser)
+someParser _ JSON       = Just (SomeParser jsonParser)
+someParser _ JSX        = Just (SomeParser typescriptParser)
+someParser _ Markdown   = Just (SomeParser markdownParser)
+someParser _ Python     = Just (SomeParser pythonParser)
+someParser _ Ruby       = Just (SomeParser rubyParser)
+someParser _ TypeScript = Just (SomeParser typescriptParser)
+
 -- | Return a 'Language'-specific 'Parser', if one exists, falling back to the 'LineByLineParser'.
-parserForLanguage :: Language -> Maybe (Parser (Term Syntax (Record DefaultFields)))
-parserForLanguage language = case language of
+syntaxParserForLanguage :: Language -> Maybe (Parser (Term Syntax (Record DefaultFields)))
+syntaxParserForLanguage language = case language of
   Go         -> Just (TreeSitterParser tree_sitter_go)
   JavaScript -> Just (TreeSitterParser tree_sitter_typescript)
   JSON       -> Just (TreeSitterParser tree_sitter_json)

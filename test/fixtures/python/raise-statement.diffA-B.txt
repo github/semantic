@@ -3,17 +3,17 @@
     (
       (Call
         (Identifier)
-      {+(TextElement)+}
-      {-(TextElement)-}
+      { (TextElement)
+      ->(TextElement) }
         (Empty))))
   (Throw
     (
       (Call
         (Identifier)
-      {+(TextElement)+}
-      {-(TextElement)-}
+      { (TextElement)
+      ->(TextElement) }
         (Empty))
-    {+(Identifier)+}
-    {-(Identifier)-}))
+    { (Identifier)
+    ->(Identifier) }))
   (Throw
     ([])))

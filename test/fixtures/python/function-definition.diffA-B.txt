@@ -15,13 +15,13 @@
   (Annotation
     (Function
       (Identifier)
-    {+(Identifier)+}
-    {+(Identifier)+}
-    {-(Identifier)-}
-    {-(Identifier)-}
+    { (Identifier)
+    ->(Identifier) }
+    { (Identifier)
+    ->(Identifier) }
       (
-      {+(Identifier)+}
-      {-(Identifier)-}))
+      { (Identifier)
+      ->(Identifier) }))
     (Empty))
 {+(Annotation
   {+(Function
@@ -55,8 +55,8 @@
         ->(Integer) })
       { (Identifier)
       ->(Identifier) })
-    {+(Identifier)+}
-    {-(Identifier)-}
+    { (Identifier)
+    ->(Identifier) }
       (
         (Identifier)))
     (Empty)))

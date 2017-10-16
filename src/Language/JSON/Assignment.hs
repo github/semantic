@@ -1,5 +1,5 @@
-{-# LANGUAGE DataKinds, GADTs, RankNTypes, TypeOperators #-}
-module Language.JSON.Syntax
+{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+module Language.JSON.Assignment
 ( assignment
 , Syntax
 , Grammar
@@ -11,7 +11,6 @@ import Data.Syntax (makeTerm, parseError)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
-import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
 import Data.Union
@@ -27,10 +26,6 @@ type Syntax =
   , Literal.Null
   , Literal.String
   , Literal.TextElement
-   -- NB: Diffing requires Methods, Functions, and Context in the union.
-  , Declaration.Method
-  , Declaration.Function
-  , Syntax.Context
   , Syntax.Error
   , []
   ]

@@ -5,13 +5,16 @@ import Data.Error (withSGRCode)
 import Data.Foldable (toList)
 import Data.List (intersperse)
 import Data.Semigroup ((<>))
+import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.Format as Time
 import qualified Data.Time.LocalTime as LocalTime
+import Semantic.Queue
 import System.Console.ANSI
-import System.IO (Handle, hIsTerminalDevice)
+import System.IO
 import System.Posix.Process
 import System.Posix.Types
 import Text.Printf
+
 
 -- | A log message at a specific level.
 data Message = Message Level String [(String, String)] LocalTime.ZonedTime
@@ -23,6 +26,17 @@ data Level
   | Info
   | Debug
   deriving (Eq, Ord, Show)
+
+
+-- | Queue a message to be logged.
+queueLogMessage :: AsyncQueue Message Options -> Level -> String -> [(String, String)] -> IO ()
+queueLogMessage q@AsyncQueue{..} level message pairs
+  | Just logLevel <- optionsLevel asyncQueueExtra, level <= logLevel = Time.getCurrentTime >>= LocalTime.utcToLocalZonedTime >>= queue q . Message level message pairs
+  | otherwise = pure ()
+
+-- | Log a message to stderr.
+logMessage :: Options -> Message -> IO ()
+logMessage options@Options{..} = hPutStr stderr . optionsFormatter options
 
 -- | Format log messaging using "logfmt".
 --

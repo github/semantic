@@ -15,8 +15,8 @@
     (ForEach
       (
         (Identifier)
-      {+(Identifier)+}
-      {-(Identifier)-})
+      { (Identifier)
+      ->(Identifier) })
       (Identifier)
       (
         (Call
@@ -26,8 +26,8 @@
         (ForEach
           (
             (Identifier)
-          {+(Identifier)+}
-          {-(Identifier)-})
+          { (Identifier)
+          ->(Identifier) })
           (Identifier)
           (
             (Call
@@ -37,8 +37,8 @@
     (
       (Call
         (Identifier)
-      {+(Identifier)+}
-      {-(Identifier)-}
+      { (Identifier)
+      ->(Identifier) }
         (Empty))))
 {-(ForEach
   {-(
