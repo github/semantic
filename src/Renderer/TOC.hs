@@ -74,12 +74,14 @@ data JSONSummary
     , summaryTermName :: T.Text
     , summarySpan :: Span
     , summaryChangeType :: T.Text
+    , summaryRelativeCyclomaticComplexity :: CyclomaticComplexity
+    , summaryAbsoluteCyclomaticComplexity :: CyclomaticComplexity
     }
   | ErrorSummary { error :: T.Text, errorSpan :: Span, errorLanguage :: Maybe Language }
   deriving (Generic, Eq, Show)
 
 instance ToJSON JSONSummary where
-  toJSON JSONSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= summaryCategoryName, "term" .= summaryTermName, "span" .= summarySpan ]
+  toJSON JSONSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= summaryCategoryName, "term" .= summaryTermName, "span" .= summarySpan, "relative_cyclomatic_complexity" .= summaryRelativeCyclomaticComplexity, "absolute_cyclomatic_complexity" .= summaryAbsoluteCyclomaticComplexity ]
   toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan, "language" .= errorLanguage ]
 
 isValidSummary :: JSONSummary -> Bool
@@ -304,9 +306,9 @@ entrySummary entry = case entry of
 
 -- | Construct a 'JSONSummary' from a node annotation and a change type label.
 recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span, HasField fields CyclomaticComplexity) => Record fields -> T.Text -> Maybe CyclomaticComplexity -> Maybe JSONSummary
-recordSummary record entryText complexity = case getDeclaration record of
+recordSummary record entryText relativeComplexity = case getDeclaration record of
   Just (ErrorDeclaration text language) -> Just $ ErrorSummary text (sourceSpan record) language
-  Just declaration -> Just $ JSONSummary (toCategoryName declaration) (declarationIdentifier declaration <> " " <> (maybe T.empty (\(CyclomaticComplexity n) -> T.pack (show n)) complexity)) (sourceSpan record) entryText
+  Just declaration -> Just $ JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record) entryText (maybe (CyclomaticComplexity 0) id relativeComplexity) (getCyclomaticComplexity record)
   Nothing -> Nothing
 
 renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, HasField fields CyclomaticComplexity, Foldable f, Functor f) => Both Blob -> Diff f (Record fields) (Record fields) -> Summaries
