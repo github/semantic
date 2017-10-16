@@ -18,6 +18,7 @@ import Data.Patch
 import Data.Record
 import Data.Semigroup ((<>))
 import Data.Source
+import Data.Syntax.Algebra (CyclomaticComplexity(..), fToR, cyclomaticComplexityAlgebra)
 import Data.Term
 import Data.Text (Text)
 import Data.These
@@ -56,7 +57,7 @@ spec = parallel $ do
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
       \ diff -> let diff' = merge (0, 0) (Indexed [bimap (const 1) (const 1) (diff :: Diff Syntax Int Int)]) in
         tableOfContentsBy (\ (n `In` _) -> if n == (0 :: Int) then Just n else Nothing) diff' `shouldBe`
-        replicate (length (diffPatches diff')) (Changed 0)
+        replicate (length (diffPatches diff')) (Changed (These 0 0))
 
   describe "diffTOC" $ do
     it "blank if there are no methods" $
@@ -66,39 +67,39 @@ spec = parallel $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ JSONSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "modified"
-        , JSONSummary "Method" "bar" (sourceSpanBetween (4, 1) (6, 4)) "modified" ]
+        [ JSONSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "modified" (CyclomaticComplexity 0) (CyclomaticComplexity 1)
+        , JSONSummary "Method" "bar" (sourceSpanBetween (4, 1) (6, 4)) "modified" (CyclomaticComplexity 0) (CyclomaticComplexity 1) ]
 
     it "dedupes changes in same parent method" $ do
       sourceBlobs <- blobsForPaths (both "javascript/duplicate-parent.A.js" "javascript/duplicate-parent.B.js")
       diff <- runTask $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ JSONSummary "Function" "myFunction" (sourceSpanBetween (1, 1) (6, 2)) "modified" ]
+        [ JSONSummary "Function" "myFunction" (sourceSpanBetween (1, 1) (6, 2)) "modified" (CyclomaticComplexity 0) (CyclomaticComplexity 2) ]
 
     it "dedupes similar methods" $ do
       sourceBlobs <- blobsForPaths (both "javascript/erroneous-duplicate-method.A.js" "javascript/erroneous-duplicate-method.B.js")
       diff <- runTask $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ JSONSummary "Function" "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" ]
+        [ JSONSummary "Function" "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" (CyclomaticComplexity 3) (CyclomaticComplexity 3) ]
 
     it "summarizes Go methods with receivers with special formatting" $ do
       sourceBlobs <- blobsForPaths (both "go/method-with-receiver.A.go" "go/method-with-receiver.B.go")
       let Just goParser = syntaxParserForLanguage Go
-      diff <- runTask $ distributeFor sourceBlobs (\ blob -> parse goParser blob >>= decorate (syntaxDeclarationAlgebra blob)) >>= runBothWith (diffTermPair sourceBlobs diffSyntaxTerms)
+      diff <- runTask $ distributeFor sourceBlobs (\ blob -> parse goParser blob >>= decorate (syntaxDeclarationAlgebra blob) >>= decorate (fToR cyclomaticComplexityAlgebra)) >>= runBothWith (diffTermPair sourceBlobs diffSyntaxTerms)
       diffTOC diff `shouldBe`
-        [ JSONSummary "Method" "(*apiClient) CheckAuth" (sourceSpanBetween (3,1) (3,101)) "added" ]
+        [ JSONSummary "Method" "(*apiClient) CheckAuth" (sourceSpanBetween (3,1) (3,101)) "added" (CyclomaticComplexity 0) (CyclomaticComplexity 0) ]
 
     it "summarizes Ruby methods that start with two identifiers" $ do
       sourceBlobs <- blobsForPaths (both "ruby/method-starts-with-two-identifiers.A.rb" "ruby/method-starts-with-two-identifiers.B.rb")
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ JSONSummary "Method" "foo" (sourceSpanBetween (1, 1) (4, 4)) "modified" ]
+        [ JSONSummary "Method" "foo" (sourceSpanBetween (1, 1) (4, 4)) "modified" (CyclomaticComplexity 0) (CyclomaticComplexity 1) ]
 
     it "handles unicode characters in file" $ do
       sourceBlobs <- blobsForPaths (both "ruby/unicode.A.rb" "ruby/unicode.B.rb")
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ JSONSummary "Method" "foo" (sourceSpanBetween (6, 1) (7, 4)) "added" ]
+        [ JSONSummary "Method" "foo" (sourceSpanBetween (6, 1) (7, 4)) "added" (CyclomaticComplexity 1) (CyclomaticComplexity 1) ]
 
     it "properly slices source blob that starts with a newline and has multi-byte chars" $ do
       sourceBlobs <- blobsForPaths (both "javascript/starts-with-newline.js" "javascript/starts-with-newline.js")
@@ -136,23 +137,23 @@ spec = parallel $ do
 
   describe "JSONSummary" $ do
     it "encodes modified summaries to JSON" $ do
-      let summary = JSONSummary "Method" "foo" (sourceSpanBetween (1, 1) (4, 4)) "modified"
-      encode summary `shouldBe` "{\"span\":{\"start\":[1,1],\"end\":[4,4]},\"category\":\"Method\",\"term\":\"foo\",\"changeType\":\"modified\"}"
+      let summary = JSONSummary "Method" "foo" (sourceSpanBetween (1, 1) (4, 4)) "modified" (CyclomaticComplexity 0) (CyclomaticComplexity 0)
+      encode summary `shouldBe` "{\"span\":{\"start\":[1,1],\"end\":[4,4]},\"category\":\"Method\",\"absolute_cyclomatic_complexity\":0,\"term\":\"foo\",\"relative_cyclomatic_complexity\":0,\"changeType\":\"modified\"}"
 
     it "encodes added summaries to JSON" $ do
-      let summary = JSONSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
-      encode summary `shouldBe` "{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"}"
+      let summary = JSONSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added" (CyclomaticComplexity 0) (CyclomaticComplexity 0)
+      encode summary `shouldBe` "{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"absolute_cyclomatic_complexity\":0,\"term\":\"self.foo\",\"relative_cyclomatic_complexity\":0,\"changeType\":\"added\"}"
 
   describe "diff with ToCDiffRenderer'" $ do
     it "produces JSON output" $ do
       blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"}]},\"errors\":{}}\n" :: ByteString)
+      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"absolute_cyclomatic_complexity\":1,\"term\":\"self.foo\",\"relative_cyclomatic_complexity\":0,\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"absolute_cyclomatic_complexity\":1,\"term\":\"bar\",\"relative_cyclomatic_complexity\":0,\"changeType\":\"modified\"}]},\"errors\":{}}\n" :: ByteString)
 
     it "produces JSON output if there are parse errors" $ do
       blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.X.rb")
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"removed\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"expected end of input nodes, but got ParseError\",\"language\":\"Ruby\"}]}}\n" :: ByteString)
+      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"absolute_cyclomatic_complexity\":1,\"term\":\"bar\",\"relative_cyclomatic_complexity\":-1,\"changeType\":\"removed\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"absolute_cyclomatic_complexity\":1,\"term\":\"baz\",\"relative_cyclomatic_complexity\":-1,\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"expected end of input nodes, but got ParseError\",\"language\":\"Ruby\"}]}}\n" :: ByteString)
 
     it "ignores anonymous functions" $ do
       blobs <- blobsForPaths (both "ruby/lambda.A.rb" "ruby/lambda.B.rb")
@@ -162,7 +163,7 @@ spec = parallel $ do
     it "summarizes Markdown headings" $ do
       blobs <- blobsForPaths (both "markdown/headings.A.md" "markdown/headings.B.md")
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/markdown/headings.A.md -> test/fixtures/toc/markdown/headings.B.md\":[{\"span\":{\"start\":[1,1],\"end\":[7,10]},\"category\":\"Heading 1\",\"term\":\"One\",\"changeType\":\"modified\"},{\"span\":{\"start\":[5,1],\"end\":[7,10]},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"added\"},{\"span\":{\"start\":[9,1],\"end\":[10,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
+      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/markdown/headings.A.md -> test/fixtures/toc/markdown/headings.B.md\":[{\"span\":{\"start\":[1,1],\"end\":[7,10]},\"category\":\"Heading 1\",\"absolute_cyclomatic_complexity\":0,\"term\":\"One\",\"relative_cyclomatic_complexity\":0,\"changeType\":\"modified\"},{\"span\":{\"start\":[5,1],\"end\":[7,10]},\"category\":\"Heading 2\",\"absolute_cyclomatic_complexity\":0,\"term\":\"Two\",\"relative_cyclomatic_complexity\":0,\"changeType\":\"added\"},{\"span\":{\"start\":[9,1],\"end\":[10,4]},\"category\":\"Heading 1\",\"absolute_cyclomatic_complexity\":0,\"term\":\"Final\",\"relative_cyclomatic_complexity\":0,\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
 
 
 type Diff' = Diff Syntax (Record (Maybe Declaration ': CyclomaticComplexity ': DefaultFields)) (Record (Maybe Declaration ': CyclomaticComplexity ': DefaultFields))
@@ -175,15 +176,15 @@ numTocSummaries diff = length $ filter isValidSummary (diffTOC diff)
 programWithChange :: Term' -> Diff'
 programWithChange body = merge (programInfo, programInfo) (Indexed [ function' ])
   where
-    function' = merge ((Just (FunctionDeclaration "foo") :. functionInfo, Just (FunctionDeclaration "foo") :. functionInfo)) (S.Function name' [] [ inserting body ])
-    name' = let info = Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil in merge (info, info) (Leaf "foo")
+    function' = merge ((Just (FunctionDeclaration "foo") :. (CyclomaticComplexity 1) :. functionInfo, Just (FunctionDeclaration "foo") :. (CyclomaticComplexity 1) :. functionInfo)) (S.Function name' [] [ inserting body ])
+    name' = let info = Nothing :. (CyclomaticComplexity 0) :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil in merge (info, info) (Leaf "foo")
 
 -- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
 programWithChangeOutsideFunction :: Term' -> Diff'
 programWithChangeOutsideFunction term = merge (programInfo, programInfo) (Indexed [ function', term' ])
   where
-    function' = merge (Just (FunctionDeclaration "foo") :. functionInfo, Just (FunctionDeclaration "foo") :. functionInfo) (S.Function name' [] [])
-    name' = let info = Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil in  merge (info, info) (Leaf "foo")
+    function' = merge (Just (FunctionDeclaration "foo") :. (CyclomaticComplexity 1) :. functionInfo, Just (FunctionDeclaration "foo") :. (CyclomaticComplexity 1) :. functionInfo) (S.Function name' [] [])
+    name' = let info = Nothing :. (CyclomaticComplexity 0) :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil in  merge (info, info) (Leaf "foo")
     term' = inserting term
 
 programWithInsert :: Text -> Term' -> Diff'
@@ -199,12 +200,12 @@ programOf :: Diff' -> Diff'
 programOf diff = merge (programInfo, programInfo) (Indexed [ diff ])
 
 functionOf :: Text -> Term' -> Term'
-functionOf name body = Term $ (Just (FunctionDeclaration name) :. functionInfo) `In` S.Function name' [] [body]
+functionOf name body = Term $ (Just (FunctionDeclaration name) :. (CyclomaticComplexity 1) :. functionInfo) `In` S.Function name' [] [body]
   where
-    name' = Term $ (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) `In` Leaf name
+    name' = Term $ (Nothing :. (CyclomaticComplexity 0) :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) `In` Leaf name
 
-programInfo :: Record (Maybe Declaration ': DefaultFields)
-programInfo = Nothing :. Range 0 0 :. C.Program :. sourceSpanBetween (0,0) (0,0) :. Nil
+programInfo :: Record (Maybe Declaration ': CyclomaticComplexity ': DefaultFields)
+programInfo = Nothing :. (CyclomaticComplexity 0) :. Range 0 0 :. C.Program :. sourceSpanBetween (0,0) (0,0) :. Nil
 
 functionInfo :: Record DefaultFields
 functionInfo = Range 0 0 :. C.Function :. sourceSpanBetween (0,0) (0,0) :. Nil
@@ -237,8 +238,8 @@ sourceSpanBetween (s1, e1) (s2, e2) = Span (Pos s1 e1) (Pos s2 e2)
 blankDiff :: Diff'
 blankDiff = merge (arrayInfo, arrayInfo) (Indexed [ inserting (Term $ literalInfo `In` Leaf "\"a\"") ])
   where
-    arrayInfo = Nothing :. Range 0 3 :. ArrayLiteral :. sourceSpanBetween (1, 1) (1, 5) :. Nil
-    literalInfo = Nothing :. Range 1 2 :. StringLiteral :. sourceSpanBetween (1, 2) (1, 4) :. Nil
+    arrayInfo = Nothing :. (CyclomaticComplexity 0) :. Range 0 3 :. ArrayLiteral :. sourceSpanBetween (1, 1) (1, 5) :. Nil
+    literalInfo = Nothing :. (CyclomaticComplexity 0) :. Range 1 2 :. StringLiteral :. sourceSpanBetween (1, 2) (1, 4) :. Nil
 
 blankDiffBlobs :: Both Blob
 blankDiffBlobs = both (Blob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob) (Just TypeScript)) (Blob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob) (Just TypeScript))
