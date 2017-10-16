@@ -331,7 +331,7 @@ class' = makeClass <$> symbol Class <*> children ((,,,,) <$> many (term decorato
   where makeClass loc (decorators, expression, typeParams, classHeritage, statements) = makeTerm loc (Declaration.Class (decorators ++ typeParams) expression classHeritage statements)
 
 object :: Assignment
-object = (makeTerm <$> (symbol Object <|> symbol ObjectPattern) <*> children (Literal.Hash <$> many (term ((pair <|> spreadElement <|> methodDefinition <|> assignmentPattern <|> shorthandPropertyIdentifier)))))
+object = makeTerm <$> (symbol Object <|> symbol ObjectPattern) <*> children (Literal.Hash <$> many (term ((pair <|> spreadElement <|> methodDefinition <|> assignmentPattern <|> shorthandPropertyIdentifier))))
 
 array :: Assignment
 array = makeTerm <$> (symbol Array <|> symbol ArrayPattern) <*> children (Literal.Array <$> many (term (expression <|> spreadElement)))
@@ -690,7 +690,7 @@ forStatement :: Assignment
 forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.For <$> (variableDeclaration <|> expressionStatement' <|> emptyStatement) <*> (expressionStatement' <|> emptyStatement) <*> (expression <|> emptyTerm) <*> statement)
 
 variableDeclaration :: Assignment
-variableDeclaration = (makeTerm <$> (symbol Grammar.VariableDeclaration <|> symbol Grammar.LexicalDeclaration) <*> children (Declaration.VariableDeclaration <$> many (term variableDeclarator)))
+variableDeclaration = makeTerm <$> (symbol Grammar.VariableDeclaration <|> symbol Grammar.LexicalDeclaration) <*> children (Declaration.VariableDeclaration <$> many (term variableDeclarator))
 
 variableDeclarator :: Assignment
 variableDeclarator = makeVarDecl <$> symbol VariableDeclarator <*> children ((,,) <$> (identifier <|> destructuringPattern) <*> (typeAnnotation' <|> emptyTerm) <*> (expression <|> emptyTerm))
