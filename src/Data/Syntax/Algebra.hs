@@ -88,7 +88,7 @@ syntaxIdentifierAlgebra (In _ syntax) = case syntax of
 
 -- | The cyclomatic complexity of a (sub)term.
 newtype CyclomaticComplexity = CyclomaticComplexity Int
-  deriving (Enum, Eq, Num, Ord, Show)
+  deriving (Enum, Eq, Num, Ord, Show, ToJSON)
 
 -- | Compute the cyclomatic complexity of a (sub)term, measured as the number places where control exits scope, e.g. returns and yields.
 --
