@@ -22,8 +22,8 @@ import Data.Foldable (asum)
 import Data.Functor.Classes (Show1 (liftShowsPrec))
 import Data.Functor.Foldable
 import Data.JSON.Fields
-import Data.Record
 import Data.Proxy
+import Data.Record
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
