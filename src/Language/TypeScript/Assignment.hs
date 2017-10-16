@@ -6,9 +6,8 @@ module Language.TypeScript.Assignment
 , Term
 ) where
 
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, catMaybes)
 import Data.Record
-import Data.Maybe (catMaybes)
 import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm1, postContextualize)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
