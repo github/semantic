@@ -6,6 +6,7 @@ import Control.Monad.IO.Class
 import Data.Blob
 import Files
 import Data.Record
+import Data.Syntax.Algebra (HasCyclomaticComplexity, CyclomaticComplexity(..), cyclomaticComplexityAlgebra, fToR)
 import Data.Functor.Classes
 import Algorithm
 import Data.Align.Generic
@@ -28,11 +29,11 @@ diffWithParser :: (HasField fields Data.Span.Span,
                    Eq1 syntax, Show1 syntax,
                    Traversable syntax, Functor syntax,
                    Foldable syntax, Diffable syntax,
-                   GAlign syntax, HasDeclaration syntax)
+                   GAlign syntax, HasDeclaration syntax, HasCyclomaticComplexity syntax)
                   =>
                   Parser (Term syntax (Record fields))
                   -> Both Blob
-                  -> Task (Diff syntax (Record (Maybe Declaration ': fields)) (Record (Maybe Declaration ': fields)))
-diffWithParser parser = run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))
+                  -> Task (Diff syntax (Record (CyclomaticComplexity ': Maybe Declaration ': fields)) (Record (CyclomaticComplexity ': Maybe Declaration ': fields)))
+diffWithParser parser = run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob) >>= decorate (fToR cyclomaticComplexityAlgebra))
   where
     run parse sourceBlobs = distributeFor sourceBlobs parse >>= runBothWith (diffTermPair sourceBlobs diffTerms)
