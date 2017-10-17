@@ -1,8 +1,9 @@
-{-# LANGUAGE OverloadedStrings, TypeSynonymInstances, DeriveAnyClass, DuplicateRecordFields, ScopedTypeVariables #-}
+{-# LANGUAGE OverloadedStrings, TypeSynonymInstances, DeriveAnyClass, DuplicateRecordFields, ScopedTypeVariables, TupleSections #-}
 module Files
 ( readFile
 , readBlobPairsFromHandle
 , readBlobsFromHandle
+, readBlobsFromDir
 , languageForFilePath
 ) where
 
@@ -25,6 +26,7 @@ import Prelude hiding (readFile)
 import System.Exit
 import System.FilePath
 import System.IO (Handle)
+import System.FilePath.Glob
 import Text.Read
 
 -- | Read a utf8-encoded file to a 'Blob'.
@@ -50,6 +52,12 @@ readBlobPairsFromHandle = fmap toBlobPairs . readFromHandle
 readBlobsFromHandle :: MonadIO m => Handle -> m [Blob.Blob]
 readBlobsFromHandle = fmap toBlobs . readFromHandle
   where toBlobs BlobParse{..} = fmap toBlob blobs
+
+readBlobsFromDir :: MonadIO m => FilePath -> m [Blob.Blob]
+readBlobsFromDir path = do
+  paths <- liftIO (glob (path </> "**/*.rb"))
+  let paths' = catMaybes $ fmap (\p -> (p,) . Just <$> languageForFilePath p) paths
+  traverse (uncurry readFile) paths'
 
 readFromHandle :: (FromJSON a, MonadIO m) => Handle -> m a
 readFromHandle h = do
