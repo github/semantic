@@ -45,7 +45,7 @@ parseBlobs :: Output output => TermRenderer output -> [Blob] -> Task ByteString
 parseBlobs renderer = fmap toOutput . distributeFoldMap (parseBlob renderer) . filter blobExists
 
 generateTags :: [Blob] -> Task ByteString
-generateTags _ = pure (toOutput ("" :: ByteString))
+generateTags = fmap toOutput . distributeFoldMap (parseBlob ToCTermRenderer) . filter blobExists
 
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
 parseBlob :: TermRenderer output -> Blob -> Task output

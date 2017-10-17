@@ -181,7 +181,7 @@ runTaskWithOptions options task = do
         go :: Task a -> IO (Either SomeException a)
         go = iterFreerA (\ task yield -> case task of
           ReadBlobs source -> (either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield) `catchError` (pure . Left . toException)
-          ReadProject dir -> undefined
+          ReadProject dir -> Files.readBlobsFromDir dir >>= yield 
           ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left . toException)
           WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
           WriteLog level message pairs -> queueLogMessage logger level message pairs >>= yield
