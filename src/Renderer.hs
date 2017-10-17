@@ -35,6 +35,7 @@ data DiffRenderer output where
   OldToCDiffRenderer :: DiffRenderer Summaries
   -- | Compute a table of contents for the diff & encode it as JSON (uses the new Assignment parse tree parser).
   ToCDiffRenderer :: DiffRenderer Summaries
+
   -- | Render to JSON with the format documented in docs/json-format.md
   JSONDiffRenderer :: DiffRenderer (Map.Map Text Value)
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
@@ -51,6 +52,8 @@ data TermRenderer output where
   JSONTermRenderer :: TermRenderer [Value]
   -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer ByteString
+  -- | Render to a list of tags.
+  TagsTermRenderer :: TermRenderer [ByteString]
 
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)

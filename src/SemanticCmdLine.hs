@@ -23,7 +23,7 @@ import qualified Paths_semantic_diff as Library (version)
 import qualified Semantic.Task as Task
 import qualified Semantic.Log as Log
 import System.IO (Handle, stdin, stdout)
-import qualified Semantic (parseBlobs, diffBlobPairs)
+import qualified Semantic (parseBlobs, generateTags, diffBlobPairs)
 import Text.Read
 
 main :: IO ()
@@ -34,6 +34,9 @@ runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Ta
 
 runParse :: SomeRenderer TermRenderer -> Either Handle [(FilePath, Maybe Language)] -> Task.Task ByteString
 runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
+
+runTags :: FilePath -> Task.Task ByteString
+runTags = Semantic.generateTags <=< Task.readProject
 
 -- | A parser for the application's command-line arguments.
 --
@@ -56,7 +59,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       <*> pure Log.logfmtFormatter -- Formatter
       <*> pure 0 -- ProcessID
     argumentsParser = (. Task.writeToOutput) . (>>=)
-      <$> hsubparser (diffCommand <> parseCommand)
+      <$> hsubparser (diffCommand <> parseCommand <> tagsCommand)
       <*> (   Right <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout")
           <|> pure (Left stdout) )
 
@@ -76,9 +79,13 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     parseArgumentsParser = runParse
       <$> (   flag  (SomeRenderer SExpressionTermRenderer) (SomeRenderer SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
           <|> flag'                                        (SomeRenderer JSONTermRenderer)        (long "json" <> help "Output JSON parse trees")
-          <|> flag'                                        (SomeRenderer ToCTermRenderer)         (long "toc" <> help "Output a table of contents for a file"))
+          <|> flag'                                        (SomeRenderer ToCTermRenderer)         (long "toc" <> help "Output a table of contents for a file")
+          <|> flag'                                        (SomeRenderer TagsTermRenderer)        (long "tags" <> help "Output a tags file for a project"))
       <*> (   Right <$> some (argument filePathReader (metavar "FILES..."))
           <|> pure (Left stdin) )
+
+    tagsCommand = command "tags" (info tagsArgumentsParser (progDesc "Print tags for project"))
+    tagsArgumentsParser = runTags <$> (argument str (metavar "PROJECT"))
 
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of

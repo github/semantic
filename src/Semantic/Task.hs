@@ -5,6 +5,7 @@ module Semantic.Task
 , RAlgebra
 , Differ
 , readBlobs
+, readProject
 , readBlobPairs
 , writeToOutput
 , writeLog
@@ -59,6 +60,7 @@ import Semantic.Queue
 
 data TaskF output where
   ReadBlobs :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
+  ReadProject :: FilePath -> TaskF [Blob]
   ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [Both Blob]
   WriteToOutput :: Either Handle FilePath -> B.ByteString -> TaskF ()
   WriteLog :: Level -> String -> [(String, String)] -> TaskF ()
@@ -89,6 +91,9 @@ type Renderer i o = i -> o
 -- | A 'Task' which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
 readBlobs :: Either Handle [(FilePath, Maybe Language)] -> Task [Blob]
 readBlobs from = ReadBlobs from `Then` return
+
+readProject :: FilePath -> Task [Blob]
+readProject dir = ReadProject dir `Then` return
 
 -- | A 'Task' which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
 readBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> Task [Both Blob]
@@ -176,6 +181,7 @@ runTaskWithOptions options task = do
         go :: Task a -> IO (Either SomeException a)
         go = iterFreerA (\ task yield -> case task of
           ReadBlobs source -> (either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield) `catchError` (pure . Left . toException)
+          ReadProject dir -> undefined
           ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left . toException)
           WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
           WriteLog level message pairs -> queueLogMessage logger level message pairs >>= yield
