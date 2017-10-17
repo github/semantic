@@ -45,7 +45,7 @@ parseBlobs :: Output output => TermRenderer output -> [Blob] -> Task ByteString
 parseBlobs renderer = fmap toOutput . distributeFoldMap (parseBlob renderer) . filter blobExists
 
 generateTags :: [Blob] -> Task ByteString
-generateTags = fmap toOutput . distributeFoldMap (parseBlob ToCTermRenderer) . filter blobExists
+generateTags = fmap toOutput . distributeFoldMap (parseBlob TagsTermRenderer) . filter blobExists
 
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
 parseBlob :: TermRenderer output -> Blob -> Task output
@@ -67,6 +67,10 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
       parse parser blob >>= decorate constructorLabel . (Nil <$) >>= render renderSExpressionTerm
     | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
       parse syntaxParser blob >>= render renderSExpressionTerm . fmap keepCategory
+  (TagsTermRenderer, lang)
+    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[HasDeclaration, Foldable, Functor]) ->
+      parse parser blob >>= decorate (declarationAlgebra blob) >>= render (renderToTags blob)
+
 
   _ -> throwError (SomeException (NoParserForLanguage blobPath blobLanguage))
 

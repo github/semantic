@@ -2,6 +2,7 @@
 module Renderer.TOC
 ( renderToCDiff
 , renderToCTerm
+, renderToTags
 , diffTOC
 , Summaries(..)
 , JSONSummary(..)
@@ -311,6 +312,14 @@ renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Fol
 renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC
   where toMap [] = mempty
         toMap as = Map.singleton (T.pack blobPath) (toJSON <$> as)
+
+renderToTags :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> [T.Text]
+renderToTags Blob{..} = toTagList . List.filter isValidSummary . termToC
+  where toTagList as = (summaryToTag blobPath <$> as)
+
+summaryToTag :: FilePath -> JSONSummary -> T.Text
+summaryToTag path JSONSummary{..} = summaryTermName <> "\t" <> T.pack path
+summaryToTag path ErrorSummary{..} = error <> "\t" <> T.pack path
 
 diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [JSONSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration

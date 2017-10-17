@@ -10,6 +10,7 @@ module Renderer
 , renderJSONTerm
 , renderToCDiff
 , renderToCTerm
+, renderToTags
 , HasDeclaration
 , declarationAlgebra
 , syntaxDeclarationAlgebra
@@ -53,7 +54,7 @@ data TermRenderer output where
   -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer ByteString
   -- | Render to a list of tags.
-  TagsTermRenderer :: TermRenderer [ByteString]
+  TagsTermRenderer :: TermRenderer [Text]
 
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)
