@@ -55,7 +55,7 @@ readBlobsFromHandle = fmap toBlobs . readFromHandle
 
 readBlobsFromDir :: MonadIO m => FilePath -> m [Blob.Blob]
 readBlobsFromDir path = do
-  paths <- liftIO (glob (path </> "**/*.rb"))
+  paths <- liftIO (globDir1 (compile "[^vendor]**/*[.rb|.js]") path)
   let paths' = catMaybes $ fmap (\p -> (p,) . Just <$> languageForFilePath p) paths
   traverse (uncurry readFile) paths'
 
