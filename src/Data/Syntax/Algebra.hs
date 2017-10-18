@@ -159,6 +159,9 @@ instance CustomHasCyclomaticComplexity Statement.If where
 instance CustomHasCyclomaticComplexity Statement.Return where
   customToCyclomaticComplexity = succ . sum
 
+instance CustomHasCyclomaticComplexity Statement.Throw where
+  customToCyclomaticComplexity = succ . sum
+
 instance CustomHasCyclomaticComplexity Statement.Yield where
   customToCyclomaticComplexity = succ . sum
 
@@ -192,6 +195,7 @@ type family CyclomaticComplexityStrategy syntax where
   CyclomaticComplexityStrategy Statement.Finally = 'Custom
   CyclomaticComplexityStrategy Statement.If = 'Custom
   CyclomaticComplexityStrategy Statement.Return = 'Custom
+  CyclomaticComplexityStrategy Statement.Throw = 'Custom
   CyclomaticComplexityStrategy Statement.Yield = 'Custom
   CyclomaticComplexityStrategy (Union fs) = 'Custom
   CyclomaticComplexityStrategy a = 'Default
