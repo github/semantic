@@ -144,6 +144,9 @@ instance CustomHasCyclomaticComplexity Expression.Call where
 instance CustomHasCyclomaticComplexity Statement.Break where
   customToCyclomaticComplexity = succ . sum
 
+instance CustomHasCyclomaticComplexity Statement.Catch where
+  customToCyclomaticComplexity = succ . sum
+
 instance CustomHasCyclomaticComplexity Statement.Return where
   customToCyclomaticComplexity = succ . sum
 
@@ -175,6 +178,7 @@ type family CyclomaticComplexityStrategy syntax where
   CyclomaticComplexityStrategy Declaration.Function = 'Custom
   CyclomaticComplexityStrategy Expression.Call = 'Custom
   CyclomaticComplexityStrategy Statement.Break = 'Custom
+  CyclomaticComplexityStrategy Statement.Catch = 'Custom
   CyclomaticComplexityStrategy Statement.Return = 'Custom
   CyclomaticComplexityStrategy Statement.Yield = 'Custom
   CyclomaticComplexityStrategy (Union fs) = 'Custom
