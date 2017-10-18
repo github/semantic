@@ -26,6 +26,7 @@ import Data.Proxy
 import Data.Record
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
+import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Statement as Statement
 import Data.Term
 import Data.Text.Encoding (decodeUtf8, encodeUtf8)
@@ -137,6 +138,9 @@ instance CustomHasCyclomaticComplexity Declaration.Method where
 instance CustomHasCyclomaticComplexity Declaration.Function where
   customToCyclomaticComplexity = succ . sum
 
+instance CustomHasCyclomaticComplexity Expression.Call where
+  customToCyclomaticComplexity = succ . sum
+
 instance CustomHasCyclomaticComplexity Statement.Return where
   customToCyclomaticComplexity = succ . sum
 
@@ -166,6 +170,7 @@ class HasCyclomaticComplexityWithStrategy (strategy :: Strategy) syntax where
 type family CyclomaticComplexityStrategy syntax where
   CyclomaticComplexityStrategy Declaration.Method = 'Custom
   CyclomaticComplexityStrategy Declaration.Function = 'Custom
+  CyclomaticComplexityStrategy Expression.Call = 'Custom
   CyclomaticComplexityStrategy Statement.Return = 'Custom
   CyclomaticComplexityStrategy Statement.Yield = 'Custom
   CyclomaticComplexityStrategy (Union fs) = 'Custom
