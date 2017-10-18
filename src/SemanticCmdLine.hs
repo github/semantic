@@ -35,8 +35,10 @@ runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Ta
 runParse :: SomeRenderer TermRenderer -> Either Handle [(FilePath, Maybe Language)] -> Task.Task ByteString
 runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
 
-runTags :: FilePath -> Task.Task ByteString
-runTags = Semantic.generateTags <=< Task.readProject
+runTags :: Either Handle FilePath -> Task.Task ByteString
+runTags handleOrPath = case handleOrPath of
+  (Left handle) -> (Semantic.generateTags <=< Task.readBlobs) (Left handle)
+  Right path -> (Semantic.generateTags <=< Task.readProject) path
 
 -- | A parser for the application's command-line arguments.
 --
@@ -85,7 +87,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
           <|> pure (Left stdin) )
 
     tagsCommand = command "tags" (info tagsArgumentsParser (progDesc "Print tags for project"))
-    tagsArgumentsParser = runTags <$> (argument str (metavar "PROJECT"))
+    tagsArgumentsParser = runTags <$> ( Right <$> argument str (metavar "PROJECT") <|> pure (Left stdin) )
 
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of
