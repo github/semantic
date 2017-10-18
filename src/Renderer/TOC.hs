@@ -68,6 +68,19 @@ instance Output Summaries where
 instance ToJSON Summaries where
   toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]
 
+data Tag
+  = Tag { tagSymbol :: T.Text
+        , tagPath :: T.Text
+        , tagLanguageId :: Maybe T.Text
+        , tagKind :: T.Text
+        , tagSpan :: Span
+      }
+  deriving (Generic, Eq, Show)
+
+instance ToJSON Tag where
+  toJSON Tag{..} = object [ "symbol" .= tagSymbol, "path" .= tagPath, "language_id" .= tagLanguageId, "kind" .= tagKind, "span" .= tagSpan ]
+
+
 data JSONSummary
   = JSONSummary
     { summaryCategoryName :: T.Text
@@ -313,13 +326,13 @@ renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition 
   where toMap [] = mempty
         toMap as = Map.singleton (T.pack blobPath) (toJSON <$> as)
 
-renderToTags :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> [T.Text]
-renderToTags Blob{..} = toTagList . List.filter isValidSummary . termToC
-  where toTagList as = (summaryToTag blobPath <$> as)
+renderToTags :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> [Value]
+renderToTags Blob{..} = fmap toJSON . toTagList . List.filter isValidSummary . termToC
+  where toTagList as = (summaryToTag blobLanguage blobPath <$> as)
 
-summaryToTag :: FilePath -> JSONSummary -> T.Text
-summaryToTag path JSONSummary{..} = summaryTermName <> "\t" <> T.pack path
-summaryToTag path ErrorSummary{..} = error <> "\t" <> T.pack path
+summaryToTag :: Maybe Language -> FilePath -> JSONSummary -> Tag
+summaryToTag lang path JSONSummary{..} = Tag summaryTermName (T.pack path) (T.pack . show <$> lang) summaryCategoryName summarySpan
+summaryToTag _ _ err@ErrorSummary{} = Prelude.error ("Unexpected ErrorSummary" <> show err)
 
 diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [JSONSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
