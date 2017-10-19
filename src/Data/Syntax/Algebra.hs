@@ -155,9 +155,6 @@ instance CustomHasCyclomaticComplexity Statement.ForEach where
 instance CustomHasCyclomaticComplexity Statement.If where
   customToCyclomaticComplexity = succ . sum
 
-instance CustomHasCyclomaticComplexity Statement.Match where
-  customToCyclomaticComplexity = succ . sum
-
 instance CustomHasCyclomaticComplexity Statement.Pattern where
   customToCyclomaticComplexity = succ . sum
 
@@ -194,7 +191,6 @@ type family CyclomaticComplexityStrategy syntax where
   CyclomaticComplexityStrategy Statement.For = 'Custom
   CyclomaticComplexityStrategy Statement.ForEach = 'Custom
   CyclomaticComplexityStrategy Statement.If = 'Custom
-  CyclomaticComplexityStrategy Statement.Match = 'Custom
   CyclomaticComplexityStrategy Statement.Pattern = 'Custom
   CyclomaticComplexityStrategy Statement.While = 'Custom
   CyclomaticComplexityStrategy (Union fs) = 'Custom
