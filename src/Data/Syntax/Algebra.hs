@@ -26,7 +26,6 @@ import Data.Proxy
 import Data.Record
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
-import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Statement as Statement
 import Data.Term
 import Data.Text.Encoding (decodeUtf8, encodeUtf8)
@@ -132,25 +131,25 @@ class CustomHasCyclomaticComplexity syntax where
   -- | Produce a customized 'CyclomaticComplexity' for a given syntax node.
   customToCyclomaticComplexity :: FAlgebra syntax CyclomaticComplexity
 
-instance CustomHasCyclomaticComplexity Declaration.Method where
-  customToCyclomaticComplexity = succ . sum
-
 instance CustomHasCyclomaticComplexity Declaration.Function where
   customToCyclomaticComplexity = succ . sum
 
-instance CustomHasCyclomaticComplexity Expression.Call where
-  customToCyclomaticComplexity = succ . sum
-
-instance CustomHasCyclomaticComplexity Statement.Break where
+instance CustomHasCyclomaticComplexity Declaration.Method where
   customToCyclomaticComplexity = succ . sum
 
 instance CustomHasCyclomaticComplexity Statement.Catch where
   customToCyclomaticComplexity = succ . sum
 
+instance CustomHasCyclomaticComplexity Statement.DoWhile where
+  customToCyclomaticComplexity = succ . sum
+
 instance CustomHasCyclomaticComplexity Statement.Else where
   customToCyclomaticComplexity = succ . sum
 
-instance CustomHasCyclomaticComplexity Statement.Finally where
+instance CustomHasCyclomaticComplexity Statement.For where
+  customToCyclomaticComplexity = succ . sum
+
+instance CustomHasCyclomaticComplexity Statement.ForEach where
   customToCyclomaticComplexity = succ . sum
 
 instance CustomHasCyclomaticComplexity Statement.If where
@@ -162,14 +161,9 @@ instance CustomHasCyclomaticComplexity Statement.Match where
 instance CustomHasCyclomaticComplexity Statement.Pattern where
   customToCyclomaticComplexity = succ . sum
 
-instance CustomHasCyclomaticComplexity Statement.Return where
+instance CustomHasCyclomaticComplexity Statement.While where
   customToCyclomaticComplexity = succ . sum
 
-instance CustomHasCyclomaticComplexity Statement.Throw where
-  customToCyclomaticComplexity = succ . sum
-
-instance CustomHasCyclomaticComplexity Statement.Yield where
-  customToCyclomaticComplexity = succ . sum
 
 -- | Produce a 'CyclomaticComplexity' for 'Union's using the 'HasCyclomaticComplexity' instance & therefore using a 'CustomHasCyclomaticComplexity' instance when one exists & the type is listed in 'CyclomaticComplexityStrategy'.
 instance Apply HasCyclomaticComplexity fs => CustomHasCyclomaticComplexity (Union fs) where
@@ -192,19 +186,17 @@ class HasCyclomaticComplexityWithStrategy (strategy :: Strategy) syntax where
 --
 --   If you’re seeing errors about missing a 'CustomHasCyclomaticComplexity' instance for a given type, you’ve probably listed it in here but not defined a 'CustomHasCyclomaticComplexity' instance for it, or else you’ve listed the wrong type in here. Conversely, if your 'customHasCyclomaticComplexity' method is never being called, you may have forgotten to list the type in here.
 type family CyclomaticComplexityStrategy syntax where
-  CyclomaticComplexityStrategy Declaration.Method = 'Custom
   CyclomaticComplexityStrategy Declaration.Function = 'Custom
-  CyclomaticComplexityStrategy Expression.Call = 'Custom
-  CyclomaticComplexityStrategy Statement.Break = 'Custom
+  CyclomaticComplexityStrategy Declaration.Method = 'Custom
   CyclomaticComplexityStrategy Statement.Catch = 'Custom
+  CyclomaticComplexityStrategy Statement.DoWhile = 'Custom
   CyclomaticComplexityStrategy Statement.Else = 'Custom
-  CyclomaticComplexityStrategy Statement.Finally = 'Custom
+  CyclomaticComplexityStrategy Statement.For = 'Custom
+  CyclomaticComplexityStrategy Statement.ForEach = 'Custom
   CyclomaticComplexityStrategy Statement.If = 'Custom
   CyclomaticComplexityStrategy Statement.Match = 'Custom
   CyclomaticComplexityStrategy Statement.Pattern = 'Custom
-  CyclomaticComplexityStrategy Statement.Return = 'Custom
-  CyclomaticComplexityStrategy Statement.Throw = 'Custom
-  CyclomaticComplexityStrategy Statement.Yield = 'Custom
+  CyclomaticComplexityStrategy Statement.While = 'Custom
   CyclomaticComplexityStrategy (Union fs) = 'Custom
   CyclomaticComplexityStrategy a = 'Default
 

@@ -68,19 +68,19 @@ spec = parallel $ do
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
         [ JSONSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "modified" (CyclomaticComplexity 0) (CyclomaticComplexity 1)
-        , JSONSummary "Method" "bar" (sourceSpanBetween (4, 1) (6, 4)) "modified" (CyclomaticComplexity 1) (CyclomaticComplexity 2) ]
+        , JSONSummary "Method" "bar" (sourceSpanBetween (4, 1) (6, 4)) "modified" (CyclomaticComplexity 0) (CyclomaticComplexity 1) ]
 
     it "dedupes changes in same parent method" $ do
       sourceBlobs <- blobsForPaths (both "javascript/duplicate-parent.A.js" "javascript/duplicate-parent.B.js")
       diff <- runTask $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ JSONSummary "Function" "myFunction" (sourceSpanBetween (1, 1) (6, 2)) "modified" (CyclomaticComplexity 2) (CyclomaticComplexity 4) ]
+        [ JSONSummary "Function" "myFunction" (sourceSpanBetween (1, 1) (6, 2)) "modified" (CyclomaticComplexity 1) (CyclomaticComplexity 2) ]
 
     it "dedupes similar methods" $ do
       sourceBlobs <- blobsForPaths (both "javascript/erroneous-duplicate-method.A.js" "javascript/erroneous-duplicate-method.B.js")
       diff <- runTask $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ JSONSummary "Function" "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" (CyclomaticComplexity 20) (CyclomaticComplexity 20) ]
+        [ JSONSummary "Function" "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" (CyclomaticComplexity 2) (CyclomaticComplexity 2) ]
 
     it "summarizes Go methods with receivers with special formatting" $ do
       sourceBlobs <- blobsForPaths (both "go/method-with-receiver.A.go" "go/method-with-receiver.B.go")
@@ -148,7 +148,7 @@ spec = parallel $ do
     it "produces JSON output" $ do
       blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"absolute_cyclomatic_complexity\":1,\"term\":\"self.foo\",\"relative_cyclomatic_complexity\":0,\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"absolute_cyclomatic_complexity\":2,\"term\":\"bar\",\"relative_cyclomatic_complexity\":1,\"changeType\":\"modified\"}]},\"errors\":{}}\n" :: ByteString)
+      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"absolute_cyclomatic_complexity\":1,\"term\":\"self.foo\",\"relative_cyclomatic_complexity\":0,\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"absolute_cyclomatic_complexity\":1,\"term\":\"bar\",\"relative_cyclomatic_complexity\":0,\"changeType\":\"modified\"}]},\"errors\":{}}\n" :: ByteString)
 
     it "produces JSON output if there are parse errors" $ do
       blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.X.rb")
