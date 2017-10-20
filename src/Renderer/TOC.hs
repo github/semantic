@@ -73,18 +73,20 @@ data Tag
         , tagPath :: T.Text
         , tagLanguageId :: Maybe T.Text
         , tagKind :: T.Text
+        , tagLine :: T.Text
         , tagSpan :: Span
       }
   deriving (Generic, Eq, Show)
 
 instance ToJSON Tag where
-  toJSON Tag{..} = object [ "symbol" .= tagSymbol, "path" .= tagPath, "language_id" .= tagLanguageId, "kind" .= tagKind, "span" .= tagSpan ]
+  toJSON Tag{..} = object [ "symbol" .= tagSymbol, "path" .= tagPath, "language_id" .= tagLanguageId, "kind" .= tagKind, "line" .= tagLine, "span" .= tagSpan ]
 
 
 data JSONSummary
   = JSONSummary
     { summaryCategoryName :: T.Text
     , summaryTermName :: T.Text
+    , summaryTermText :: T.Text
     , summarySpan :: Span
     , summaryChangeType :: T.Text
     }
@@ -101,10 +103,10 @@ isValidSummary _ = True
 
 -- | A declaration’s identifier and type.
 data Declaration
-  = MethodDeclaration   { declarationIdentifier :: T.Text }
-  | FunctionDeclaration { declarationIdentifier :: T.Text }
-  | SectionDeclaration  { declarationIdentifier :: T.Text, declarationLevel :: Int }
-  | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationLanguage :: Maybe Language }
+  = MethodDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text }
+  | FunctionDeclaration { declarationIdentifier :: T.Text, declarationText :: T.Text }
+  | SectionDeclaration  { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLevel :: Int }
+  | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   deriving (Eq, Generic, Show)
 
 
@@ -147,32 +149,32 @@ class CustomHasDeclaration syntax where
 -- | Produce a 'SectionDeclaration' from the first line of the heading of a 'Markdown.Section' node.
 instance CustomHasDeclaration Markdown.Section where
   customToDeclaration Blob{..} _ (Markdown.Section level (Term (In headingAnn headingF), _) _)
-    = Just $ SectionDeclaration (maybe (getSource (byteRange headingAnn)) (getSource . sconcat) (nonEmpty (byteRange . termAnnotation . unTerm <$> toList headingF))) level
+    = Just $ SectionDeclaration (maybe (getSource (byteRange headingAnn)) (getSource . sconcat) (nonEmpty (byteRange . termAnnotation . unTerm <$> toList headingF))) mempty level
     where getSource = firstLine . toText . flip Source.slice blobSource
           firstLine = T.takeWhile (/= '\n')
 
 -- | Produce an 'ErrorDeclaration' for 'Syntax.Error' nodes.
 instance CustomHasDeclaration Syntax.Error where
   customToDeclaration Blob{..} ann err@Syntax.Error{}
-    = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan ann) err))) blobLanguage
+    = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan ann) err))) mempty blobLanguage
 
 -- | Produce a 'FunctionDeclaration' for 'Declaration.Function' nodes so long as their identifier is non-empty (defined as having a non-empty 'byteRange').
 instance CustomHasDeclaration Declaration.Function where
-  customToDeclaration Blob{..} _ (Declaration.Function _ (Term (In identifierAnn _), _) _ _)
+  customToDeclaration blob@Blob{..} ann decl@(Declaration.Function _ (Term (In identifierAnn _), _) _ _)
     -- Do not summarize anonymous functions
     | isEmpty identifierAnn = Nothing
     -- Named functions
-    | otherwise             = Just $ FunctionDeclaration (getSource identifierAnn)
+    | otherwise             = Just $ FunctionDeclaration (getSource identifierAnn) (getFunctionSource blob (In ann decl))
     where getSource = toText . flip Source.slice blobSource . byteRange
           isEmpty = (== 0) . rangeLength . byteRange
 
 -- | Produce a 'MethodDeclaration' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'byteRange'), the 'declarationIdentifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
 instance CustomHasDeclaration Declaration.Method where
-  customToDeclaration Blob{..} _ (Declaration.Method _ (Term (In receiverAnn _), _) (Term (In identifierAnn _), _) _ _)
+  customToDeclaration blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn _), _) (Term (In identifierAnn _), _) _ _)
     -- Methods without a receiver
-    | isEmpty receiverAnn = Just $ MethodDeclaration (getSource identifierAnn)
+    | isEmpty receiverAnn = Just $ MethodDeclaration (getSource identifierAnn) (getMethodSource blob (In ann decl))
     -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
-    | otherwise           = Just $ MethodDeclaration (getSource receiverAnn <> "." <> getSource identifierAnn)
+    | otherwise           = Just $ MethodDeclaration (getSource receiverAnn <> "." <> getSource identifierAnn) (getMethodSource blob (In ann decl))
     where getSource = toText . flip Source.slice blobSource . byteRange
           isEmpty = (== 0) . rangeLength . byteRange
 
@@ -224,16 +226,37 @@ declaration (In annotation _) = annotation <$ (getField annotation :: Maybe Decl
 
 -- | Compute 'Declaration's for methods and functions in 'Syntax'.
 syntaxDeclarationAlgebra :: HasField fields Range => Blob -> RAlgebra (TermF S.Syntax (Record fields)) (Term S.Syntax (Record fields)) (Maybe Declaration)
-syntaxDeclarationAlgebra Blob{..} (In a r) = case r of
-  S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier)
-  S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier)
+syntaxDeclarationAlgebra blob@Blob{..} decl@(In a r) = case r of
+  S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl)
+  S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl)
   S.Method _ (identifier, _) (Just (receiver, _)) _ _
     | S.Indexed [receiverParams] <- unwrap receiver
-    , S.ParameterDecl (Just ty) _ <- unwrap receiverParams -> Just $ MethodDeclaration ("(" <> getSource ty <> ") " <> getSource identifier)
-    | otherwise -> Just $ MethodDeclaration (getSource receiver <> "." <> getSource identifier)
-  S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange a) blobSource)) blobLanguage
+    , S.ParameterDecl (Just ty) _ <- unwrap receiverParams -> Just $ MethodDeclaration ("(" <> getSource ty <> ") " <> getSource identifier) (getSyntaxDeclarationSource blob decl)
+    | otherwise -> Just $ MethodDeclaration (getSource receiver <> "." <> getSource identifier) (getSyntaxDeclarationSource blob decl)
+  S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange a) blobSource)) mempty blobLanguage
   _ -> Nothing
-  where getSource = toText . flip Source.slice blobSource . byteRange . extract
+  where
+    getSource = toText . flip Source.slice blobSource . byteRange . extract
+
+getMethodSource Blob{..} (In a r)
+  = let declRange = byteRange a
+        bodyRange = byteRange <$> case r of
+          Declaration.Method _ _ _ _ ((Term (In a' _)), _) -> Just a'
+    in maybe mempty (toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
+
+getFunctionSource Blob{..} (In a r)
+  = let declRange = byteRange a
+        bodyRange = byteRange <$> case r of
+          Declaration.Function _ _ _ ((Term (In a' _)), _) -> Just a'
+    in maybe mempty (toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
+
+getSyntaxDeclarationSource Blob{..} (In a r)
+  = let declRange = byteRange a
+        bodyRange = byteRange <$> case r of
+          S.Function _ _ (((Term (In a' _)), _) : _) -> Just a'
+          S.Method _ _ _ _ (((Term (In a' _)), _) : _) -> Just a'
+          _ -> Nothing
+    in maybe mempty (toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
 
 formatTOCError :: Error.Error String -> String
 formatTOCError e = showExpectation False (errorExpected e) (errorActual e) ""
@@ -307,8 +330,8 @@ entrySummary entry = case entry of
 -- | Construct a 'JSONSummary' from a node annotation and a change type label.
 recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> T.Text -> Maybe JSONSummary
 recordSummary record = case getDeclaration record of
-  Just (ErrorDeclaration text language) -> Just . const (ErrorSummary text (sourceSpan record) language)
-  Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record)
+  Just (ErrorDeclaration text _ language) -> Just . const (ErrorSummary text (sourceSpan record) language)
+  Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (declarationText declaration) (sourceSpan record)
   Nothing -> const Nothing
 
 renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Both Blob -> Diff f (Record fields) (Record fields) -> Summaries
@@ -331,7 +354,7 @@ renderToTags Blob{..} = fmap toJSON . toTagList . List.filter isValidSummary . t
   where toTagList as = (summaryToTag blobLanguage blobPath <$> as)
 
 summaryToTag :: Maybe Language -> FilePath -> JSONSummary -> Tag
-summaryToTag lang path JSONSummary{..} = Tag summaryTermName (T.pack path) (T.pack . show <$> lang) summaryCategoryName summarySpan
+summaryToTag lang path JSONSummary{..} = Tag summaryTermName (T.pack path) (T.pack . show <$> lang) summaryCategoryName summaryTermText summarySpan
 summaryToTag _ _ err@ErrorSummary{} = Prelude.error ("Unexpected ErrorSummary" <> show err)
 
 diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [JSONSummary]
@@ -343,7 +366,7 @@ termToC = mapMaybe (flip recordSummary "unchanged") . termTableOfContentsBy decl
 -- The user-facing category name
 toCategoryName :: Declaration -> T.Text
 toCategoryName declaration = case declaration of
-  FunctionDeclaration _ -> "Function"
-  MethodDeclaration _ -> "Method"
-  SectionDeclaration _ l -> "Heading " <> T.pack (show l)
+  FunctionDeclaration _ _ -> "Function"
+  MethodDeclaration _ _ -> "Method"
+  SectionDeclaration _ _ l -> "Heading " <> T.pack (show l)
   ErrorDeclaration{} -> "ParseError"
