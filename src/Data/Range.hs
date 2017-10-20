@@ -4,6 +4,7 @@ module Data.Range
 , rangeLength
 , offsetRange
 , intersectsRange
+, subtractRange
 ) where
 
 import Data.Aeson
@@ -26,6 +27,9 @@ offsetRange a b = Range (start a + b) (end a + b)
 -- | Test two ranges for intersection.
 intersectsRange :: Range -> Range -> Bool
 intersectsRange range1 range2 = start range1 < end range2 && start range2 < end range1
+
+subtractRange :: Range -> Range -> Range
+subtractRange range1 range2 = Range (start range1) (end range1 - rangeLength range2)
 
 
 -- Instances
