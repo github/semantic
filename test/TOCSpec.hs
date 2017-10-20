@@ -66,39 +66,39 @@ spec = parallel $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ JSONSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "modified"
-        , JSONSummary "Method" "bar" (sourceSpanBetween (4, 1) (6, 4)) "modified" ]
+        [ JSONSummary "Method" "self.foo" "def self.foo(a, *)" (sourceSpanBetween (1, 1) (2, 4)) "modified"
+        , JSONSummary "Method" "bar" "def bar" (sourceSpanBetween (4, 1) (6, 4)) "modified" ]
 
     it "dedupes changes in same parent method" $ do
       sourceBlobs <- blobsForPaths (both "javascript/duplicate-parent.A.js" "javascript/duplicate-parent.B.js")
       diff <- runTask $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ JSONSummary "Function" "myFunction" (sourceSpanBetween (1, 1) (6, 2)) "modified" ]
+        [ JSONSummary "Function" "myFunction" "function myFunction()" (sourceSpanBetween (1, 1) (6, 2)) "modified" ]
 
     it "dedupes similar methods" $ do
       sourceBlobs <- blobsForPaths (both "javascript/erroneous-duplicate-method.A.js" "javascript/erroneous-duplicate-method.B.js")
       diff <- runTask $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ JSONSummary "Function" "performHealthCheck" (sourceSpanBetween (8, 1) (29, 2)) "modified" ]
+        [ JSONSummary "Function" "performHealthCheck" "function performHealthCheck(container, repoName)" (sourceSpanBetween (8, 1) (29, 2)) "modified" ]
 
     it "summarizes Go methods with receivers with special formatting" $ do
       sourceBlobs <- blobsForPaths (both "go/method-with-receiver.A.go" "go/method-with-receiver.B.go")
       let Just goParser = syntaxParserForLanguage Go
       diff <- runTask $ distributeFor sourceBlobs (\ blob -> parse goParser blob >>= decorate (syntaxDeclarationAlgebra blob)) >>= runBothWith (diffTermPair sourceBlobs diffSyntaxTerms)
       diffTOC diff `shouldBe`
-        [ JSONSummary "Method" "(*apiClient) CheckAuth" (sourceSpanBetween (3,1) (3,101)) "added" ]
+        [ JSONSummary "Method" "(*apiClient) CheckAuth" mempty (sourceSpanBetween (3,1) (3,101)) "added" ]
 
     it "summarizes Ruby methods that start with two identifiers" $ do
       sourceBlobs <- blobsForPaths (both "ruby/method-starts-with-two-identifiers.A.rb" "ruby/method-starts-with-two-identifiers.B.rb")
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ JSONSummary "Method" "foo" (sourceSpanBetween (1, 1) (4, 4)) "modified" ]
+        [ JSONSummary "Method" "foo" "def foo" (sourceSpanBetween (1, 1) (4, 4)) "modified" ]
 
     it "handles unicode characters in file" $ do
       sourceBlobs <- blobsForPaths (both "ruby/unicode.A.rb" "ruby/unicode.B.rb")
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ JSONSummary "Method" "foo" (sourceSpanBetween (6, 1) (7, 4)) "added" ]
+        [ JSONSummary "Method" "foo" "def foo(a, b, c)" (sourceSpanBetween (6, 1) (7, 4)) "added" ]
 
     it "properly slices source blob that starts with a newline and has multi-byte chars" $ do
       sourceBlobs <- blobsForPaths (both "javascript/starts-with-newline.js" "javascript/starts-with-newline.js")
@@ -136,11 +136,11 @@ spec = parallel $ do
 
   describe "JSONSummary" $ do
     it "encodes modified summaries to JSON" $ do
-      let summary = JSONSummary "Method" "foo" (sourceSpanBetween (1, 1) (4, 4)) "modified"
+      let summary = JSONSummary "Method" "foo" mempty (sourceSpanBetween (1, 1) (4, 4)) "modified"
       encode summary `shouldBe` "{\"span\":{\"start\":[1,1],\"end\":[4,4]},\"category\":\"Method\",\"term\":\"foo\",\"changeType\":\"modified\"}"
 
     it "encodes added summaries to JSON" $ do
-      let summary = JSONSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
+      let summary = JSONSummary "Method" "self.foo" mempty (sourceSpanBetween (1, 1) (2, 4)) "added"
       encode summary `shouldBe` "{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"}"
 
   describe "diff with ToCDiffRenderer'" $ do
@@ -175,14 +175,14 @@ numTocSummaries diff = length $ filter isValidSummary (diffTOC diff)
 programWithChange :: Term' -> Diff'
 programWithChange body = merge (programInfo, programInfo) (Indexed [ function' ])
   where
-    function' = merge ((Just (FunctionDeclaration "foo") :. functionInfo, Just (FunctionDeclaration "foo") :. functionInfo)) (S.Function name' [] [ inserting body ])
+    function' = merge ((Just (FunctionDeclaration "foo" mempty) :. functionInfo, Just (FunctionDeclaration "foo" mempty) :. functionInfo)) (S.Function name' [] [ inserting body ])
     name' = let info = Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil in merge (info, info) (Leaf "foo")
 
 -- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
 programWithChangeOutsideFunction :: Term' -> Diff'
 programWithChangeOutsideFunction term = merge (programInfo, programInfo) (Indexed [ function', term' ])
   where
-    function' = merge (Just (FunctionDeclaration "foo") :. functionInfo, Just (FunctionDeclaration "foo") :. functionInfo) (S.Function name' [] [])
+    function' = merge (Just (FunctionDeclaration "foo" mempty) :. functionInfo, Just (FunctionDeclaration "foo" mempty) :. functionInfo) (S.Function name' [] [])
     name' = let info = Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil in  merge (info, info) (Leaf "foo")
     term' = inserting term
 
@@ -199,7 +199,7 @@ programOf :: Diff' -> Diff'
 programOf diff = merge (programInfo, programInfo) (Indexed [ diff ])
 
 functionOf :: Text -> Term' -> Term'
-functionOf name body = Term $ (Just (FunctionDeclaration name) :. functionInfo) `In` S.Function name' [] [body]
+functionOf name body = Term $ (Just (FunctionDeclaration name mempty) :. functionInfo) `In` S.Function name' [] [body]
   where
     name' = Term $ (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) `In` Leaf name
 

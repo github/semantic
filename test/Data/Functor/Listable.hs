@@ -348,9 +348,9 @@ instance Listable Text where
 
 instance Listable Declaration where
   tiers
-    =  cons1 (MethodDeclaration)
-    \/ cons1 (FunctionDeclaration)
-    \/ cons1 (flip ErrorDeclaration Nothing)
+    =  cons2 (MethodDeclaration)
+    \/ cons2 (FunctionDeclaration)
+    \/ cons2 (\ a b -> ErrorDeclaration a b Nothing)
 
 
 instance Listable Range where
