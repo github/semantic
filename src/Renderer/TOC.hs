@@ -41,7 +41,7 @@ import Data.Record
 import Data.Semigroup ((<>), sconcat)
 import Data.Source as Source
 import Data.Term
-import Data.Text (toLower)
+import Data.Text (toLower, stripEnd)
 import qualified Data.Text as T
 import Data.Union
 import GHC.Generics
@@ -242,13 +242,13 @@ getMethodSource Blob{..} (In a r)
   = let declRange = byteRange a
         bodyRange = byteRange <$> case r of
           Declaration.Method _ _ _ _ ((Term (In a' _)), _) -> Just a'
-    in maybe mempty (toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
+    in maybe mempty (stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
 
 getFunctionSource Blob{..} (In a r)
   = let declRange = byteRange a
         bodyRange = byteRange <$> case r of
           Declaration.Function _ _ _ ((Term (In a' _)), _) -> Just a'
-    in maybe mempty (toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
+    in maybe mempty (stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
 
 getSyntaxDeclarationSource Blob{..} (In a r)
   = let declRange = byteRange a
@@ -256,7 +256,7 @@ getSyntaxDeclarationSource Blob{..} (In a r)
           S.Function _ _ (((Term (In a' _)), _) : _) -> Just a'
           S.Method _ _ _ _ (((Term (In a' _)), _) : _) -> Just a'
           _ -> Nothing
-    in maybe mempty (toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
+    in maybe mempty (stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
 
 formatTOCError :: Error.Error String -> String
 formatTOCError e = showExpectation False (errorExpected e) (errorActual e) ""
