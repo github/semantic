@@ -236,15 +236,15 @@ mapContiguous :: Functor syntax
               => ComparabilityRelation syntax ann1 ann2
               -> RWSEditScript syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
               -> [MappedDiff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))]
-mapContiguous canCompare = go 0 0 []
-  where go _ _ chunk [] = mapChunk chunk []
-        go i j chunk (first : rest) = case first of
-          This  a   -> go (succ i)       j  (Left  (i, a) : chunk) rest
-          That    b -> go       i  (succ j) (Right (j, b) : chunk) rest
-          These a b -> mapChunk chunk (These (i, a) (j, b) : go (succ i) (succ j) [] rest)
-        mapChunk []     rest = rest
-        mapChunk [only] rest = either This That only : rest
-        mapChunk more   rest = (either This That <$> reverse more) <> rest
+mapContiguous canCompare = go 0 0 [] []
+  where go _ _ ls rs [] = mapChunk ls rs
+        go i j ls rs (first : rest) = case first of
+          This  a   -> go (succ i)       j  ((i, a) : ls)          rs  rest
+          That    b -> go       i  (succ j)           ls ((j, b) : rs) rest
+          These a b -> mapChunk ls rs <> (These (i, a) (j, b) : go (succ i) (succ j) [] [] rest)
+        mapChunk ls [] = This <$> reverse ls
+        mapChunk [] rs = That <$> reverse rs
+        mapChunk ls rs = (This <$> reverse ls) <> (That <$> reverse rs)
 
 
 genFeaturizedTermsAndDiffs :: Functor syntax
