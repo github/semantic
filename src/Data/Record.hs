@@ -53,7 +53,7 @@ instance (Show h, Show (Record t)) => Show (Record (h ': t)) where
   showsPrec n (h :. t) = showParen (n > 0) $ showsPrec 1 h . (" :. " <>) . shows t
 
 instance Show (Record '[]) where
-  showsPrec n Nil = showParen (n > 0) ("Nil" <>)
+  showsPrec _ Nil = showString "Nil"
 
 instance (Eq h, Eq (Record t)) => Eq (Record (h ': t)) where
   (h1 :. t1) == (h2 :. t2) = h1 == h2 && t1 == t2
