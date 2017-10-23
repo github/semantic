@@ -26,7 +26,7 @@ spec = parallel $ do
       \ a b -> let diff = diffTerms a b :: Diff ListableSyntax (Record '[]) (Record '[]) in
                    (beforeTerm diff, afterTerm diff) `shouldBe` (Just a, Just b)
 
-    prop "constructs zero-cost diffs of equal terms" $
+    prop "produces identity diffs for equal terms " $
       \ a -> let diff = diffTerms a a :: Diff ListableSyntax (Record '[]) (Record '[]) in
                  length (diffPatches diff) `shouldBe` 0
 
