@@ -9,7 +9,7 @@ import Data.Foldable (toList)
 import Data.Functor.Classes
 import Data.Functor.Foldable hiding (fold)
 import Data.JSON.Fields
-import Data.Mergeable
+import Data.Mergeable (Mergeable(sequenceAlt))
 import Data.Patch
 import Data.Record
 import Data.Term
