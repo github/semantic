@@ -184,7 +184,7 @@ nearestUnmapped :: (Foldable syntax, Functor syntax, GAlign syntax)
                 -> Maybe (UnmappedTerm syntax ann1) -- ^ The most similar unmapped term, if any.
 nearestUnmapped unmapped tree key = listToMaybe (sortOn approximateEditDistance candidates)
   where candidates = toList (IntMap.intersection unmapped (toMap (fmap snd (kNearest tree defaultL (feature key)))))
-        approximateEditDistance = editDistanceUpTo defaultM . These (term key) . term
+        approximateEditDistance = editDistanceUpTo defaultM (term key) . term
 
 defaultD, defaultL, defaultP, defaultQ, defaultMoveBound :: Int
 defaultD = 15
@@ -320,8 +320,8 @@ defaultM = 10
 
 -- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
-editDistanceUpTo :: (GAlign syntax, Foldable syntax, Functor syntax) => Integer -> Edit syntax ann1 ann2 -> Int
-editDistanceUpTo m = these termSize termSize (\ a b -> diffCost m (approximateDiff a b))
+editDistanceUpTo :: (GAlign syntax, Foldable syntax, Functor syntax) => Integer -> Term syntax ann1 -> Term syntax ann2 -> Int
+editDistanceUpTo m a b = diffCost m (approximateDiff a b)
   where diffCost = flip . cata $ \ diff m -> case diff of
           _ | m <= 0 -> 0
           Merge body -> sum (fmap ($ pred m) body)
