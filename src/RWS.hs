@@ -161,9 +161,9 @@ findNearestNeighbourTo canCompare kdTreeA kdTreeB term@(UnmappedTerm j _ b) = do
   fromMaybe (insertion previous unmappedA unmappedB term) $ do
     guard (not (null unmappedA))
     -- Look up the nearest unmapped term in `unmappedA`.
-    foundA@(UnmappedTerm i _ a) <- nearestUnmapped (isNearAndComparableTo canCompare previous b) kdTreeA term
+    foundA@(UnmappedTerm i _ a) <- nearestUnmapped (\ a -> isNearAndComparableTo canCompare previous b a && termIndex a >= fst (IntMap.findMin unmappedA)) kdTreeA term
     -- Look up the nearest `foundA` in `unmappedB`
-    UnmappedTerm j' _ _ <- nearestUnmapped (isNearAndComparableTo (flip canCompare) (pred j) a) kdTreeB foundA
+    UnmappedTerm j' _ _ <- nearestUnmapped (\ b -> isNearAndComparableTo (flip canCompare) (pred j) a b && termIndex b >= j) kdTreeB foundA
     -- Return Nothing if their indices don't match
     guard (j == j')
     pure $! do
