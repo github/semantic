@@ -26,7 +26,7 @@ import Data.Functor.Classes
 import Data.Functor.Foldable
 import Data.Hashable
 import qualified Data.IntMap as IntMap
-import Data.KdMap.Static hiding (elems, empty, inRange)
+import Data.KdMap.Static hiding (elems, empty, inRange, null)
 import Data.List (sortOn)
 import Data.Maybe
 import Data.Record
@@ -159,6 +159,7 @@ findNearestNeighbourTo :: (Foldable syntax, Functor syntax, GAlign syntax)
 findNearestNeighbourTo canCompare kdTreeA kdTreeB term@(UnmappedTerm j _ b) = do
   (previous, unmappedA, unmappedB) <- get
   fromMaybe (insertion previous unmappedA unmappedB term) $ do
+    guard (not (null unmappedA))
     -- Look up the nearest unmapped term in `unmappedA`.
     foundA@(UnmappedTerm i _ a) <- nearestUnmapped (isNearAndComparableTo canCompare previous b) kdTreeA term
     -- Look up the nearest `foundA` in `unmappedB`
