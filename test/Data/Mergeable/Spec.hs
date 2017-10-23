@@ -23,12 +23,6 @@ spec = parallel $ do
   describe "Identity" $ do
     withAlternativeInstances sequenceAltLaws (Identity `mapT` tiers :: [Tier (Identity Char)])
     withAlternativeInstances mergeLaws (Identity `mapT` tiers :: [Tier (Identity Char)])
-  describe "Context" $ do
-    withAlternativeInstances sequenceAltLaws (tiers :: [Tier (Context Char)])
-    withAlternativeInstances mergeLaws (tiers :: [Tier (Context Char)])
-  describe "Empty" $ do
-    withAlternativeInstances sequenceAltLaws (tiers :: [Tier (Empty Char)])
-    withAlternativeInstances mergeLaws (tiers :: [Tier (Empty Char)])
   describe "Union" $ do
     withAlternativeInstances sequenceAltLaws (tiers :: [Tier (ListableSyntax Char)])
     withAlternativeInstances mergeLaws (tiers :: [Tier (ListableSyntax Char)])
