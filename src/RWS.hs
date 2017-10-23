@@ -25,7 +25,7 @@ import Data.Functor.Classes
 import Data.Functor.Foldable
 import Data.Hashable
 import qualified Data.IntMap as IntMap
-import Data.KdMap.Static hiding (elems, empty)
+import Data.KdMap.Static hiding (elems, empty, inRange)
 import Data.List (sortOn)
 import Data.Maybe
 import Data.Record
@@ -169,10 +169,7 @@ findNearestNeighbourTo canCompare kdTreeA kdTreeB term@(UnmappedTerm j _ b) = do
       pure (These i j, These a b)
 
 nearAndComparableTo :: ComparabilityRelation syntax ann1 ann2 -> Int -> Term syntax ann2 -> UnmappedTerms syntax ann1 -> UnmappedTerms syntax ann1
-nearAndComparableTo canCompare index term = IntMap.filterWithKey (\ k (UnmappedTerm _ _ term') -> isInMoveBounds index k && canCompareTerms canCompare term' term)
-
-isInMoveBounds :: Int -> Int -> Bool
-isInMoveBounds previous i = previous < i && i < previous + defaultMoveBound
+nearAndComparableTo canCompare index term = IntMap.filterWithKey (\ k (UnmappedTerm _ _ term') -> k == succ index && canCompareTerms canCompare term' term)
 
 -- | Finds the most-similar unmapped term to the passed-in term, if any.
 --
@@ -188,12 +185,11 @@ nearestUnmapped unmapped tree key = listToMaybe (sortOn approximateEditDistance 
   where candidates = toList (IntMap.intersection unmapped (toMap (fmap snd (kNearest tree defaultL (feature key)))))
         approximateEditDistance = editDistanceUpTo defaultM . These (term key) . term
 
-defaultD, defaultL, defaultP, defaultQ, defaultMoveBound :: Int
+defaultD, defaultL, defaultP, defaultQ :: Int
 defaultD = 15
 defaultL = 2
 defaultP = 2
 defaultQ = 3
-defaultMoveBound = 2
 
 
 -- Returns a state (insertion index, old unmapped terms, new unmapped terms), and value of (index, inserted diff),
