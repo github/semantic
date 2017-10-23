@@ -95,8 +95,7 @@ deleteRemaining :: Traversable t
                 => [MappedDiff syntax ann1 ann2]
                 -> t (UnmappedTerm syntax ann1)
                 -> [MappedDiff syntax ann1 ann2]
-deleteRemaining diffs unmappedAs =
-  foldl' (flip insertDiff) diffs (This . (termIndex &&& term) <$> unmappedAs)
+deleteRemaining diffs remaining = insertMapped (This . (termIndex &&& term) <$> remaining) diffs
 
 -- | Inserts an index and diff pair into a list of indices and diffs.
 insertDiff :: MappedDiff syntax ann1 ann2
