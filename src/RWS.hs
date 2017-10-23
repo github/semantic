@@ -160,9 +160,9 @@ findNearestNeighbourTo canCompare kdTreeA kdTreeB term@(UnmappedTerm j _ b) = do
   (previous, unmappedA, unmappedB) <- get
   fromMaybe (insertion previous unmappedA unmappedB term) $ do
     -- Look up the nearest unmapped term in `unmappedA`.
-    foundA@(UnmappedTerm i _ a) <- nearestUnmapped (IntMap.filter (isNearAndComparableTo canCompare previous b) unmappedA) kdTreeA term
+    foundA@(UnmappedTerm i _ a) <- nearestUnmapped (isNearAndComparableTo canCompare previous b) kdTreeA term
     -- Look up the nearest `foundA` in `unmappedB`
-    UnmappedTerm j' _ _ <- nearestUnmapped (IntMap.filter (isNearAndComparableTo (flip canCompare) (pred j) a) unmappedB) kdTreeB foundA
+    UnmappedTerm j' _ _ <- nearestUnmapped (isNearAndComparableTo (flip canCompare) (pred j) a) kdTreeB foundA
     -- Return Nothing if their indices don't match
     guard (j == j')
     pure $! do
@@ -184,9 +184,9 @@ findNearestNeighbourTo' canCompare kdTreeA kdTreeB = go
         go previous unmappedA (termB@(UnmappedTerm j _ b) : restUnmappedB) =
           fromMaybe (That (j, b) : go previous unmappedA restUnmappedB) $ do
             -- Look up the nearest unmapped term in `unmappedA`.
-            foundA@(UnmappedTerm i _ a) <- nearestUnmapped' (isNearAndComparableTo canCompare previous b) kdTreeA termB
+            foundA@(UnmappedTerm i _ a) <- nearestUnmapped (isNearAndComparableTo canCompare previous b) kdTreeA termB
             -- Look up the nearest `foundA` in `unmappedB`
-            UnmappedTerm j' _ _ <- nearestUnmapped' (isNearAndComparableTo (flip canCompare) (pred j) a) kdTreeB foundA
+            UnmappedTerm j' _ _ <- nearestUnmapped (isNearAndComparableTo (flip canCompare) (pred j) a) kdTreeB foundA
             -- Return Nothing if their indices don't match
             guard (j == j')
             pure $!
@@ -202,25 +202,11 @@ isNearAndComparableTo canCompare index term (UnmappedTerm k _ term') = inRange (
 --
 -- cf §4.2 of RWS-Diff
 nearestUnmapped :: (Foldable syntax, Functor syntax, GAlign syntax)
-                => UnmappedTerms syntax ann1 -- ^ A set of terms eligible for matching against.
+                => (UnmappedTerm syntax ann1 -> Bool) -- ^ A predicate selecting terms eligible for matching against.
                 -> KdMap Double FeatureVector (UnmappedTerm syntax ann1) -- ^ The k-d tree to look up nearest neighbours within.
                 -> UnmappedTerm syntax ann2 -- ^ The term to find the nearest neighbour to.
                 -> Maybe (UnmappedTerm syntax ann1) -- ^ The most similar unmapped term, if any.
-nearestUnmapped unmapped tree key = listToMaybe (sortOn approximateEditDistance candidates)
-  where candidates = toList (IntMap.intersection unmapped (toMap (fmap snd (kNearest tree defaultL (feature key)))))
-        approximateEditDistance = editDistanceUpTo defaultM (term key) . term
-
--- | Finds the most-similar unmapped term to the passed-in term, if any.
---
--- RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which have already been mapped, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
---
--- cf §4.2 of RWS-Diff
-nearestUnmapped' :: (Foldable syntax, Functor syntax, GAlign syntax)
-                 => (UnmappedTerm syntax ann1 -> Bool) -- ^ A predicate selecting terms eligible for matching against.
-                 -> KdMap Double FeatureVector (UnmappedTerm syntax ann1) -- ^ The k-d tree to look up nearest neighbours within.
-                 -> UnmappedTerm syntax ann2 -- ^ The term to find the nearest neighbour to.
-                 -> Maybe (UnmappedTerm syntax ann1) -- ^ The most similar unmapped term, if any.
-nearestUnmapped' isEligible tree key = listToMaybe (sortOn approximateEditDistance candidates)
+nearestUnmapped isEligible tree key = listToMaybe (sortOn approximateEditDistance candidates)
   where candidates = filter isEligible (snd <$> kNearest tree defaultL (feature key))
         approximateEditDistance = editDistanceUpTo defaultM (term key) . term
 
