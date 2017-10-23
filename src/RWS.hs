@@ -159,9 +159,9 @@ findNearestNeighbourTo canCompare kdTreeA kdTreeB term@(UnmappedTerm j _ b) = do
   (previous, unmappedA, unmappedB) <- get
   fromMaybe (insertion previous unmappedA unmappedB term) $ do
     -- Look up the nearest unmapped term in `unmappedA`.
-    foundA@(UnmappedTerm i _ a) <- nearestUnmapped canCompare (IntMap.filterWithKey (\ k (UnmappedTerm _ _ a) -> isInMoveBounds previous k && canCompareTerms canCompare a b) unmappedA) kdTreeA term
+    foundA@(UnmappedTerm i _ a) <- nearestUnmapped (IntMap.filterWithKey (\ k (UnmappedTerm _ _ a) -> isInMoveBounds previous k && canCompareTerms canCompare a b) unmappedA) kdTreeA term
     -- Look up the nearest `foundA` in `unmappedB`
-    UnmappedTerm j' _ _ <- nearestUnmapped (flip canCompare) (IntMap.filterWithKey (\ k (UnmappedTerm _ _ b) -> isInMoveBounds (pred j) k && canCompareTerms canCompare a b) unmappedB) kdTreeB foundA
+    UnmappedTerm j' _ _ <- nearestUnmapped (IntMap.filterWithKey (\ k (UnmappedTerm _ _ b) -> isInMoveBounds (pred j) k && canCompareTerms canCompare a b) unmappedB) kdTreeB foundA
     -- Return Nothing if their indices don't match
     guard (j == j')
     pure $! do
@@ -177,12 +177,11 @@ isInMoveBounds previous i = previous < i && i < previous + defaultMoveBound
 --
 -- cf §4.2 of RWS-Diff
 nearestUnmapped :: (Foldable syntax, Functor syntax, GAlign syntax)
-                => ComparabilityRelation syntax ann1 ann2 -- ^ A relation determining whether two terms can be compared.
-                -> UnmappedTerms syntax ann1 -- ^ A set of terms eligible for matching against.
+                => UnmappedTerms syntax ann1 -- ^ A set of terms eligible for matching against.
                 -> KdMap Double FeatureVector (UnmappedTerm syntax ann1) -- ^ The k-d tree to look up nearest neighbours within.
                 -> UnmappedTerm syntax ann2 -- ^ The term to find the nearest neighbour to.
                 -> Maybe (UnmappedTerm syntax ann1) -- ^ The most similar unmapped term, if any.
-nearestUnmapped canCompare unmapped tree key = listToMaybe (sortOn approximateEditDistance candidates)
+nearestUnmapped unmapped tree key = listToMaybe (sortOn approximateEditDistance candidates)
   where candidates = toList (IntMap.intersection unmapped (toMap (fmap snd (kNearest tree defaultL (feature key)))))
         approximateEditDistance = editDistanceUpTo defaultM . These (term key) . term
 
