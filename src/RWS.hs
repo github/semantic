@@ -164,7 +164,6 @@ findNearestNeighbourTo canCompare kdTreeA kdTreeB term@(UnmappedTerm j _ b) = do
     UnmappedTerm j' _ _ <- nearestUnmapped (flip canCompare) (IntMap.filterWithKey (\ k (UnmappedTerm _ _ b) -> isInMoveBounds (pred j) k && canCompareTerms canCompare a b) unmappedB) kdTreeB foundA
     -- Return Nothing if their indices don't match
     guard (j == j')
-    guard (canCompareTerms canCompare a b)
     pure $! do
       put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
       pure (These i j, These a b)
