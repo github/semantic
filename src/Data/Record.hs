@@ -50,7 +50,7 @@ instance {-# OVERLAPPABLE #-} HasField (field ': fields) field where
 
 
 instance (Show h, Show (Record t)) => Show (Record (h ': t)) where
-  showsPrec n (h :. t) = showParen (n > 0) $ showsPrec 1 h . (" :. " <>) . shows t
+  showsPrec n (h :. t) = showParen (n > 0) $ showsPrec 1 h . showString " :. " . showsPrec 0 t
 
 instance Show (Record '[]) where
   showsPrec _ Nil = showString "Nil"
