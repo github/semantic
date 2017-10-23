@@ -93,12 +93,14 @@ expressionChoices =
   , constVarSpecification
   , decStatement
   , element
+  , elseClause
   , expressionList
   , fieldDeclaration
   , fieldIdentifier
   , functionDeclaration
   , functionType
   , gotoStatement
+  , ifInitializer
   , ifStatement
   , incStatement
   , identifier
@@ -390,7 +392,14 @@ gotoStatement :: Assignment
 gotoStatement = makeTerm <$> symbol GotoStatement <*> children (Statement.Goto <$> expression)
 
 ifStatement :: Assignment
-ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> expression <*> (expression <|> emptyTerm))
+ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> (makeTerm <$> location <*> manyTermsTill expression (void (symbol Block))) <*> expression <*> (expression <|> emptyTerm))
+
+ifInitializer :: Assignment
+ifInitializer = symbol IfInitializer *> children expression
+
+elseClause :: Assignment
+elseClause = symbol ElseClause *> children expression
+
 incStatement :: Assignment
 incStatement = makeTerm <$> symbol IncStatement <*> children (Statement.PostIncrement <$> expression)
 
