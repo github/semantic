@@ -184,7 +184,7 @@ nearestUnmapped :: (Foldable syntax, Functor syntax, GAlign syntax)
                 -> Maybe (UnmappedTerm syntax ann1) -- ^ The most similar unmapped term, if any.
 nearestUnmapped canCompare unmapped tree key = listToMaybe (sortOn approximateEditDistance candidates)
   where candidates = toList (IntMap.intersection unmapped (toMap (fmap snd (kNearest tree defaultL (feature key)))))
-        approximateEditDistance = editDistanceIfComparable (flip canCompare) (term key) . term
+        approximateEditDistance = editDistanceUpTo defaultM . These (term key) . term
 
 editDistanceIfComparable :: (Foldable syntax, Functor syntax, GAlign syntax)
                          => ComparabilityRelation syntax ann1 ann2
