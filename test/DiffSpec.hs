@@ -21,16 +21,6 @@ spec = parallel $ do
   prop "equal terms produce identity diffs" $
     \ term -> length (diffPatches (diffTerms term (term :: Term ListableSyntax (Record '[])))) `shouldBe` 0
 
-  describe "beforeTerm" $ do
-    prop "recovers the before term" $
-      \ a b -> let diff = diffTerms a b :: Diff ListableSyntax (Record '[]) (Record '[]) in
-        beforeTerm diff `shouldBe` Just a
-
-  describe "afterTerm" $ do
-    prop "recovers the after term" $
-      \ a b -> let diff = diffTerms a b :: Diff ListableSyntax (Record '[]) (Record '[]) in
-        afterTerm diff `shouldBe` Just b
-
   prop "forward permutations are changes" $
     \ a -> let wrap = termIn Nil . inj
                b = wrap [a]
