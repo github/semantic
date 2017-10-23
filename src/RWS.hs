@@ -183,7 +183,7 @@ findNearestNeighbourTo' canCompare kdTreeA kdTreeB = go
   where go _ [] [] = []
         go _ as [] = This . (termIndex &&& term) <$> as
         go _ [] bs = That . (termIndex &&& term) <$> bs
-        go previous unmappedA (termB@(UnmappedTerm j _ b) : restUnmappedB) =
+        go previous unmappedA@(_ : restUnmappedA) (termB@(UnmappedTerm j _ b) : restUnmappedB) =
           fromMaybe (That (j, b) : go previous unmappedA restUnmappedB) $ do
             -- Look up the nearest unmapped term in `unmappedA`.
             foundA@(UnmappedTerm i _ a) <- nearestUnmapped (isNearAndComparableTo canCompare previous b) kdTreeA termB
@@ -193,7 +193,7 @@ findNearestNeighbourTo' canCompare kdTreeA kdTreeB = go
             guard (j == j')
             pure $!
               -- put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
-              These (i, a) (j, b) : go i (tail unmappedA) restUnmappedB
+              These (i, a) (j, b) : go i restUnmappedA restUnmappedB
 
 isNearAndComparableTo :: ComparabilityRelation syntax ann1 ann2 -> Int -> Term syntax ann2 -> UnmappedTerm syntax ann1 -> Bool
 isNearAndComparableTo canCompare index term (UnmappedTerm k _ term') = inRange (succ index, index + defaultMoveBound) k && canCompareTerms canCompare term' term
