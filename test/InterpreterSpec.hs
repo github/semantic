@@ -28,7 +28,7 @@ spec = parallel $ do
 
     prop "constructs zero-cost diffs of equal terms" $
       \ a -> let diff = diffTerms a a :: Diff ListableSyntax (Record '[]) (Record '[]) in
-                 diffCost diff `shouldBe` 0
+                 length (diffPatches diff) `shouldBe` 0
 
     it "produces unbiased insertions within branches" $
       let term s = termIn Nil (inj [ termIn Nil (inj (Syntax.Identifier s)) ]) :: Term ListableSyntax (Record '[])

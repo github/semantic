@@ -19,7 +19,7 @@ spec = parallel $ do
     \ diff -> diff `shouldBe` (diff :: Diff ListableSyntax (Record '[]) (Record '[]))
 
   prop "equal terms produce identity diffs" $
-    \ term -> diffCost (diffTerms term (term :: Term ListableSyntax (Record '[]))) `shouldBe` 0
+    \ term -> length (diffPatches (diffTerms term (term :: Term ListableSyntax (Record '[])))) `shouldBe` 0
 
   describe "beforeTerm" $ do
     prop "recovers the before term" $
