@@ -18,6 +18,7 @@ import Control.Monad.Random
 import Control.Monad.State.Strict
 import Data.Align.Generic
 import Data.Array.Unboxed
+import Data.Bifunctor (bimap)
 import Data.Diff (DiffF(..), deleting, inserting, merge, replacing)
 import Data.Foldable
 import Data.Function ((&))
@@ -71,7 +72,7 @@ rws canCompare equivalent as bs =
       (diffs, remaining) = findNearestNeighboursToDiff canCompare allDiffs featureAs featureBs
       diffs' = deleteRemaining diffs remaining
       rwsDiffs = insertMapped mappedDiffs diffs'
-  in fmap snd rwsDiffs
+  in bimap snd snd <$> rwsDiffs
 
 -- | An IntMap of unmapped terms keyed by their position in a list of terms.
 type UnmappedTerms syntax ann = IntMap.IntMap (UnmappedTerm syntax ann)
@@ -79,7 +80,7 @@ type UnmappedTerms syntax ann = IntMap.IntMap (UnmappedTerm syntax ann)
 type Edit syntax ann1 ann2 = These (Term syntax ann1) (Term syntax ann2)
 
 -- A Diff paired with both its indices
-type MappedDiff syntax ann1 ann2 = (These Int Int, Edit syntax ann1 ann2)
+type MappedDiff syntax ann1 ann2 = These (Int, Term syntax ann1) (Int, Term syntax ann2)
 
 type RWSEditScript syntax ann1 ann2 = [Edit syntax ann1 ann2]
 
@@ -94,14 +95,14 @@ deleteRemaining :: Traversable t
                 -> t (UnmappedTerm syntax ann1)
                 -> [MappedDiff syntax ann1 ann2]
 deleteRemaining diffs unmappedAs =
-  foldl' (flip insertDiff) diffs ((This . termIndex &&& This . term) <$> unmappedAs)
+  foldl' (flip insertDiff) diffs (This . (termIndex &&& term) <$> unmappedAs)
 
 -- | Inserts an index and diff pair into a list of indices and diffs.
 insertDiff :: MappedDiff syntax ann1 ann2
            -> [MappedDiff syntax ann1 ann2]
            -> [MappedDiff syntax ann1 ann2]
 insertDiff inserted [] = [ inserted ]
-insertDiff a@(ij1, _) (b@(ij2, _):rest) = case (ij1, ij2) of
+insertDiff a (b:rest) = case (bimap fst fst a, bimap fst fst b) of
   (These i1 i2, These j1 j2) -> if i1 <= j1 && i2 <= j2 then a : b : rest else b : insertDiff a rest
   (This i, This j) -> if i <= j then a : b : rest else b : insertDiff a rest
   (That i, That j) -> if i <= j then a : b : rest else b : insertDiff a rest
@@ -111,13 +112,13 @@ insertDiff a@(ij1, _) (b@(ij2, _):rest) = case (ij1, ij2) of
   (This _, That _) -> b : insertDiff a rest
   (That _, This _) -> b : insertDiff a rest
 
-  (These i1 i2, _) -> case break (isThese . fst) rest of
+  (These i1 i2, _) -> case break isThese rest of
     (rest, tail) -> let (before, after) = foldr' (combine i1 i2) ([], []) (b : rest) in
        case after of
          [] -> before <> insertDiff a tail
          _ -> before <> (a : after) <> tail
   where
-    combine i1 i2 each (before, after) = case fst each of
+    combine i1 i2 each (before, after) = case bimap fst fst each of
       This j1 -> if i1 <= j1 then (before, each : after) else (each : before, after)
       That j2 -> if i2 <= j2 then (before, each : after) else (each : before, after)
       These _ _ -> (before, after)
@@ -166,7 +167,7 @@ findNearestNeighbourTo canCompare kdTreeA kdTreeB term@(UnmappedTerm j _ b) = do
     guard (j == j')
     pure $! do
       put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
-      pure (These i j, These a b)
+      pure (These (i, a) (j, b))
 
 nearAndComparableTo :: ComparabilityRelation syntax ann1 ann2 -> Int -> Term syntax ann2 -> UnmappedTerms syntax ann1 -> UnmappedTerms syntax ann1
 nearAndComparableTo canCompare index term = IntMap.filterWithKey (\ k (UnmappedTerm _ _ term') -> inRange (succ index, index + defaultMoveBound) k && canCompareTerms canCompare term' term)
@@ -203,7 +204,7 @@ insertion :: Int
                    (MappedDiff syntax ann1 ann2)
 insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
   put (previous, unmappedA, IntMap.delete j unmappedB)
-  pure (That j, That b)
+  pure (That (j, b))
 
 genFeaturizedTermsAndDiffs :: Functor syntax
                            => RWSEditScript syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
@@ -216,7 +217,7 @@ genFeaturizedTermsAndDiffs sesDiffs = let Mapping _ _ a b c d = foldl' combine (
   where combine (Mapping counterA counterB as bs mappedDiffs allDiffs) diff = case diff of
           This term -> Mapping (succ counterA) counterB (featurize counterA term : as) bs mappedDiffs (None : allDiffs)
           That term -> Mapping counterA (succ counterB) as (featurize counterB term : bs) mappedDiffs (RWS.Term (featurize counterB term) : allDiffs)
-          These a b -> Mapping (succ counterA) (succ counterB) as bs ((These counterA counterB, These a b) : mappedDiffs) (Index counterA : allDiffs)
+          These a b -> Mapping (succ counterA) (succ counterB) as bs ((These (counterA, a) (counterB, b)) : mappedDiffs) (Index counterA : allDiffs)
 
 data Mapping syntax ann1 ann2
   = Mapping
