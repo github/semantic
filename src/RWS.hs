@@ -170,7 +170,7 @@ findNearestNeighbourTo canCompare kdTreeA kdTreeB term@(UnmappedTerm j _ b) = do
       pure (These (i, a) (j, b))
 
 nearAndComparableTo :: ComparabilityRelation syntax ann1 ann2 -> Int -> Term syntax ann2 -> UnmappedTerms syntax ann1 -> UnmappedTerms syntax ann1
-nearAndComparableTo canCompare index term = IntMap.filterWithKey (\ k (UnmappedTerm _ _ term') -> inRange (succ index, index + defaultMoveBound) k && canCompareTerms canCompare term' term)
+nearAndComparableTo canCompare index term = IntMap.filter (\ (UnmappedTerm k _ term') -> inRange (succ index, index + defaultMoveBound) k && canCompareTerms canCompare term' term)
 
 -- | Finds the most-similar unmapped term to the passed-in term, if any.
 --
