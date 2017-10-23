@@ -134,7 +134,7 @@ findNearestNeighboursToDiff canCompare allDiffs featureAs featureBs = (diffs, re
     (diffs, (_, remaining, _)) =
       traverse (findNearestNeighbourToDiff' canCompare (toKdMap featureAs) (toKdMap featureBs)) allDiffs &
       fmap catMaybes &
-      (`runState` (minimumTermIndex featureAs, toMap featureAs, toMap featureBs))
+      (`runState` (pred (maybe 0 termIndex (listToMaybe featureAs)), toMap featureAs, toMap featureBs))
 
 findNearestNeighbourToDiff' :: (Foldable syntax, Functor syntax, GAlign syntax)
                             => ComparabilityRelation syntax ann1 ann2 -- ^ A relation determining whether two terms can be compared.
@@ -239,9 +239,6 @@ nullFeatureVector = FV $ listArray (0, 0) [0]
 
 setFeatureVector :: Record (FeatureVector ': fields) -> FeatureVector -> Record (FeatureVector ': fields)
 setFeatureVector = setField
-
-minimumTermIndex :: [UnmappedTerm syntax ann] -> Int
-minimumTermIndex = pred . fromMaybe 0 . foldr (min . Just . termIndex) Nothing
 
 toMap :: [UnmappedTerm syntax ann] -> IntMap.IntMap (UnmappedTerm syntax ann)
 toMap = IntMap.fromList . fmap (termIndex &&& id)
