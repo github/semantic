@@ -169,6 +169,30 @@ findNearestNeighbourTo canCompare kdTreeA kdTreeB term@(UnmappedTerm j _ b) = do
       put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
       pure (These (i, a) (j, b))
 
+findNearestNeighbourTo' :: (Foldable syntax, Functor syntax, GAlign syntax)
+                        => ComparabilityRelation syntax ann1 ann2 -- ^ A relation determining whether two terms can be compared.
+                        -> KdMap Double FeatureVector (UnmappedTerm syntax ann1)
+                        -> KdMap Double FeatureVector (UnmappedTerm syntax ann2)
+                        -> Int
+                        -> [UnmappedTerm syntax ann1]
+                        -> [UnmappedTerm syntax ann2]
+                        -> [MappedDiff syntax ann1 ann2]
+findNearestNeighbourTo' canCompare kdTreeA kdTreeB = go
+  where go _ [] [] = []
+        go _ as [] = This . (termIndex &&& term) <$> as
+        go _ [] bs = That . (termIndex &&& term) <$> bs
+        go previous unmappedA unmappedB@(termB@(UnmappedTerm j _ b) : restUnmappedB) =
+          fromMaybe (That (j, b) : go previous unmappedA restUnmappedB) $ do
+            -- Look up the nearest unmapped term in `unmappedA`.
+            foundA@(UnmappedTerm i _ a) <- nearestUnmapped' (filter (canCompareTerms (flip canCompare) b . term) (takeWhile (inRange (succ previous, previous + defaultMoveBound) . termIndex) unmappedA)) kdTreeA termB
+            -- Look up the nearest `foundA` in `unmappedB`
+            UnmappedTerm j' _ _ <- nearestUnmapped' (filter (canCompareTerms canCompare a . term) (takeWhile (inRange (j, pred j + defaultMoveBound) . termIndex) unmappedB)) kdTreeB foundA
+            -- Return Nothing if their indices don't match
+            guard (j == j')
+            pure $!
+              -- put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
+              These (i, a) (j, b) : go i (tail unmappedA) restUnmappedB
+
 isNearAndComparableTo :: ComparabilityRelation syntax ann1 ann2 -> Int -> Term syntax ann2 -> UnmappedTerm syntax ann1 -> Bool
 isNearAndComparableTo canCompare index term (UnmappedTerm k _ term') = inRange (succ index, index + defaultMoveBound) k && canCompareTerms canCompare term' term
 
