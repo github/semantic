@@ -186,15 +186,6 @@ nearestUnmapped canCompare unmapped tree key = listToMaybe (sortOn approximateEd
   where candidates = toList (IntMap.intersection unmapped (toMap (fmap snd (kNearest tree defaultL (feature key)))))
         approximateEditDistance = editDistanceUpTo defaultM . These (term key) . term
 
-editDistanceIfComparable :: (Foldable syntax, Functor syntax, GAlign syntax)
-                         => ComparabilityRelation syntax ann1 ann2
-                         -> Term syntax ann1
-                         -> Term syntax ann2
-                         -> Int
-editDistanceIfComparable canCompare a b = if canCompareTerms canCompare a b
-  then editDistanceUpTo defaultM (These a b)
-  else maxBound
-
 defaultD, defaultL, defaultP, defaultQ, defaultMoveBound :: Int
 defaultD = 15
 defaultL = 2
