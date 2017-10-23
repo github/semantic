@@ -6,6 +6,7 @@ import Data.Functor.Identity
 import Data.Functor.Listable
 import Data.Maybe (catMaybes)
 import Data.Mergeable
+import Data.Syntax
 import Syntax
 import Test.Hspec
 import Test.Hspec.LeanCheck
@@ -22,6 +23,12 @@ spec = parallel $ do
   describe "Identity" $ do
     withAlternativeInstances sequenceAltLaws (Identity `mapT` tiers :: [Tier (Identity Char)])
     withAlternativeInstances mergeLaws (Identity `mapT` tiers :: [Tier (Identity Char)])
+  describe "Context" $ do
+    withAlternativeInstances sequenceAltLaws (tiers :: [Tier (Context Char)])
+    withAlternativeInstances mergeLaws (tiers :: [Tier (Context Char)])
+  describe "Empty" $ do
+    withAlternativeInstances sequenceAltLaws (tiers :: [Tier (Empty Char)])
+    withAlternativeInstances mergeLaws (tiers :: [Tier (Empty Char)])
   describe "Syntax" $ do
     withAlternativeInstances sequenceAltLaws (tiers :: [Tier (Syntax Char)])
     withAlternativeInstances mergeLaws (tiers :: [Tier (Syntax Char)])
