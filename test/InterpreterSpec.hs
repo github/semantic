@@ -37,3 +37,15 @@ spec = parallel $ do
 
     prop "compares nodes against context" $
       \ a b -> diffTerms a (termIn Nil (inj (Syntax.Context (pure b) a))) `shouldBe` insertF (In Nil (inj (Syntax.Context (pure (inserting b)) (merging (a :: Term ListableSyntax (Record '[]))))))
+
+    prop "diffs forward permutations as changes" $
+      \ a -> let wrap = termIn Nil . inj
+                 b = wrap [a]
+                 c = wrap [a, b] in
+        diffTerms (wrap [a, b, c]) (wrap [c, a, b :: Term ListableSyntax (Record '[])]) `shouldBe` merge (Nil, Nil) (inj [ inserting c, merging a, merging b, deleting c ])
+
+    prop "diffs backward permutations as changes" $
+      \ a -> let wrap = termIn Nil . inj
+                 b = wrap [a]
+                 c = wrap [a, b] in
+        diffTerms (wrap [a, b, c]) (wrap [b, c, a :: Term ListableSyntax (Record '[])]) `shouldBe` merge (Nil, Nil) (inj [ deleting a, merging b, merging c, inserting a ])
