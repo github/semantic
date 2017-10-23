@@ -233,9 +233,10 @@ insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
   pure (That (j, b))
 
 mapContiguous :: Functor syntax
-              => RWSEditScript syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
+              => ComparabilityRelation syntax ann1 ann2
+              -> RWSEditScript syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
               -> [MappedDiff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))]
-mapContiguous = go 0 0 []
+mapContiguous canCompare = go 0 0 []
   where go _ _ chunk [] = mapChunk chunk []
         go i j chunk (first : rest) = case first of
           This  a   -> go (succ i)       j  (Left  (i, a) : chunk) rest
