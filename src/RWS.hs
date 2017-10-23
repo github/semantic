@@ -66,13 +66,14 @@ rws :: (Foldable syntax, Functor syntax, GAlign syntax)
 rws _          _          as [] = This <$> as
 rws _          _          [] bs = That <$> bs
 rws canCompare _          [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
-rws canCompare equivalent as bs =
-  let sesDiffs = ses equivalent as bs
-      (featureAs, featureBs, mappedDiffs, allDiffs) = genFeaturizedTermsAndDiffs sesDiffs
-      (diffs, remaining) = findNearestNeighboursToDiff canCompare allDiffs featureAs featureBs
-      diffs' = deleteRemaining diffs remaining
-      rwsDiffs = insertMapped mappedDiffs diffs'
-  in bimap snd snd <$> rwsDiffs
+rws canCompare equivalent as bs
+  = ses equivalent as bs
+  & genFeaturizedTermsAndDiffs
+  & \ (featureAs, featureBs, mappedDiffs, allDiffs) ->
+      findNearestNeighboursToDiff canCompare allDiffs featureAs featureBs
+    & uncurry deleteRemaining
+    & insertMapped mappedDiffs
+    & fmap (bimap snd snd)
 
 -- | An IntMap of unmapped terms keyed by their position in a list of terms.
 type UnmappedTerms syntax ann = IntMap.IntMap (UnmappedTerm syntax ann)
