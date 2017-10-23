@@ -21,13 +21,13 @@ import Data.Array.Unboxed
 import Data.Bifunctor (bimap)
 import Data.Diff (DiffF(..), deleting, inserting, merge, replacing)
 import Data.Foldable
-import Data.Function ((&))
+import Data.Function ((&), on)
 import Data.Functor.Classes
 import Data.Functor.Foldable
 import Data.Hashable
 import qualified Data.IntMap as IntMap
 import Data.KdMap.Static hiding (elems, empty, inRange)
-import Data.List (sortOn)
+import Data.List (intersectBy, sortOn)
 import Data.Maybe
 import Data.Record
 import Data.Semigroup hiding (First(..))
@@ -184,6 +184,20 @@ nearestUnmapped :: (Foldable syntax, Functor syntax, GAlign syntax)
                 -> Maybe (UnmappedTerm syntax ann1) -- ^ The most similar unmapped term, if any.
 nearestUnmapped unmapped tree key = listToMaybe (sortOn approximateEditDistance candidates)
   where candidates = toList (IntMap.intersection unmapped (toMap (fmap snd (kNearest tree defaultL (feature key)))))
+        approximateEditDistance = editDistanceUpTo defaultM (term key) . term
+
+-- | Finds the most-similar unmapped term to the passed-in term, if any.
+--
+-- RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which have already been mapped, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
+--
+-- cf §4.2 of RWS-Diff
+nearestUnmapped' :: (Foldable syntax, Functor syntax, GAlign syntax)
+                 => [UnmappedTerm syntax ann1] -- ^ A set of terms eligible for matching against.
+                 -> KdMap Double FeatureVector (UnmappedTerm syntax ann1) -- ^ The k-d tree to look up nearest neighbours within.
+                 -> UnmappedTerm syntax ann2 -- ^ The term to find the nearest neighbour to.
+                 -> Maybe (UnmappedTerm syntax ann1) -- ^ The most similar unmapped term, if any.
+nearestUnmapped' unmapped tree key = listToMaybe (sortOn approximateEditDistance candidates)
+  where candidates = intersectBy ((==) `on` termIndex) unmapped (fmap snd (kNearest tree defaultL (feature key)))
         approximateEditDistance = editDistanceUpTo defaultM (term key) . term
 
 defaultD, defaultL, defaultP, defaultQ, defaultMoveBound :: Int
