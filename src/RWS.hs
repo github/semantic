@@ -160,17 +160,17 @@ findNearestNeighbourTo canCompare kdTreeA kdTreeB term@(UnmappedTerm j _ b) = do
   (previous, unmappedA, unmappedB) <- get
   fromMaybe (insertion previous unmappedA unmappedB term) $ do
     -- Look up the nearest unmapped term in `unmappedA`.
-    foundA@(UnmappedTerm i _ a) <- nearestUnmapped (nearAndComparableTo canCompare previous b unmappedA) kdTreeA term
+    foundA@(UnmappedTerm i _ a) <- nearestUnmapped (IntMap.filter (isNearAndComparableTo canCompare previous b) unmappedA) kdTreeA term
     -- Look up the nearest `foundA` in `unmappedB`
-    UnmappedTerm j' _ _ <- nearestUnmapped (nearAndComparableTo (flip canCompare) (pred j) a unmappedB) kdTreeB foundA
+    UnmappedTerm j' _ _ <- nearestUnmapped (IntMap.filter (isNearAndComparableTo (flip canCompare) (pred j) a) unmappedB) kdTreeB foundA
     -- Return Nothing if their indices don't match
     guard (j == j')
     pure $! do
       put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
       pure (These (i, a) (j, b))
 
-nearAndComparableTo :: ComparabilityRelation syntax ann1 ann2 -> Int -> Term syntax ann2 -> UnmappedTerms syntax ann1 -> UnmappedTerms syntax ann1
-nearAndComparableTo canCompare index term = IntMap.filter (\ (UnmappedTerm k _ term') -> inRange (succ index, index + defaultMoveBound) k && canCompareTerms canCompare term' term)
+isNearAndComparableTo :: ComparabilityRelation syntax ann1 ann2 -> Int -> Term syntax ann2 -> UnmappedTerm syntax ann1 -> Bool
+isNearAndComparableTo canCompare index term (UnmappedTerm k _ term') = inRange (succ index, index + defaultMoveBound) k && canCompareTerms canCompare term' term
 
 -- | Finds the most-similar unmapped term to the passed-in term, if any.
 --
