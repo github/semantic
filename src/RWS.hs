@@ -232,6 +232,20 @@ insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
   put (previous, unmappedA, IntMap.delete j unmappedB)
   pure (That (j, b))
 
+mapContiguous :: Functor syntax
+              => RWSEditScript syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
+              -> [MappedDiff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))]
+mapContiguous = go 0 0 []
+  where go _ _ chunk [] = mapChunk chunk []
+        go i j chunk (first : rest) = case first of
+          This  a   -> go (succ i)       j  (Left  (i, a) : chunk) rest
+          That    b -> go       i  (succ j) (Right (j, b) : chunk) rest
+          These a b -> mapChunk chunk (These (i, a) (j, b) : go (succ i) (succ j) [] rest)
+        mapChunk []     rest = rest
+        mapChunk [only] rest = either This That only : rest
+        mapChunk more   rest = (either This That <$> reverse more) <> rest
+
+
 genFeaturizedTermsAndDiffs :: Functor syntax
                            => RWSEditScript syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
                            -> ( [UnmappedTerm syntax (Record (FeatureVector ': fields1))]
