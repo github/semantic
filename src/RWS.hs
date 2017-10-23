@@ -221,7 +221,7 @@ nearestUnmapped' :: (Foldable syntax, Functor syntax, GAlign syntax)
                  -> UnmappedTerm syntax ann2 -- ^ The term to find the nearest neighbour to.
                  -> Maybe (UnmappedTerm syntax ann1) -- ^ The most similar unmapped term, if any.
 nearestUnmapped' isEligible tree key = listToMaybe (sortOn approximateEditDistance candidates)
-  where candidates = filter isEligible (fmap snd (kNearest tree defaultL (feature key)))
+  where candidates = filter isEligible (snd <$> kNearest tree defaultL (feature key))
         approximateEditDistance = editDistanceUpTo defaultM (term key) . term
 
 defaultD, defaultL, defaultP, defaultQ, defaultMoveBound :: Int
