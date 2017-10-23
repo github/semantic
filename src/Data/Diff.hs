@@ -61,12 +61,6 @@ merging :: Functor syntax => Term syntax ann -> Diff syntax ann ann
 merging = cata (\ (In ann syntax) -> mergeF (In (ann, ann) syntax))
 
 
-diffSum :: (Foldable syntax, Functor syntax) => (forall a b. Patch a b -> Int) -> Diff syntax ann1 ann2 -> Int
-diffSum patchCost = cata $ \ diff -> case diff of
-  Patch patch -> patchCost patch + sum (sum <$> patch)
-  Merge merge -> sum merge
-
-
 diffPatch :: Diff syntax ann1 ann2 -> Maybe (Patch (TermF syntax ann1 (Diff syntax ann1 ann2)) (TermF syntax ann2 (Diff syntax ann1 ann2)))
 diffPatch diff = case unDiff diff of
   Patch patch -> Just patch
