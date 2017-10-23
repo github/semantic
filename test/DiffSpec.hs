@@ -18,9 +18,6 @@ spec = parallel $ do
   prop "equality is reflexive" $
     \ diff -> diff `shouldBe` (diff :: Diff ListableSyntax (Record '[]) (Record '[]))
 
-  prop "equal terms produce identity diffs" $
-    \ term -> length (diffPatches (diffTerms term (term :: Term ListableSyntax (Record '[])))) `shouldBe` 0
-
   prop "forward permutations are changes" $
     \ a -> let wrap = termIn Nil . inj
                b = wrap [a]
