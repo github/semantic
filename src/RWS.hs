@@ -241,7 +241,7 @@ setFeatureVector :: Record (FeatureVector ': fields) -> FeatureVector -> Record 
 setFeatureVector = setField
 
 minimumTermIndex :: [UnmappedTerm syntax ann] -> Int
-minimumTermIndex = pred . maybe 0 getMin . getOption . foldMap (Option . Just . Min . termIndex)
+minimumTermIndex = pred . fromMaybe 0 . foldr (min . Just . termIndex) Nothing
 
 toMap :: [UnmappedTerm syntax ann] -> IntMap.IntMap (UnmappedTerm syntax ann)
 toMap = IntMap.fromList . fmap (termIndex &&& id)
