@@ -66,10 +66,6 @@ diffSum patchCost = cata $ \ diff -> case diff of
   Patch patch -> patchCost patch + sum (sum <$> patch)
   Merge merge -> sum merge
 
--- | The sum of the node count of the diff’s patches.
-diffCost :: (Foldable syntax, Functor syntax) => Diff syntax ann1 ann2 -> Int
-diffCost = diffSum (const 1)
-
 
 diffPatch :: Diff syntax ann1 ann2 -> Maybe (Patch (TermF syntax ann1 (Diff syntax ann1 ann2)) (TermF syntax ann2 (Diff syntax ann1 ann2)))
 diffPatch diff = case unDiff diff of
