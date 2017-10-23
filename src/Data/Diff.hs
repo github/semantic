@@ -11,7 +11,6 @@ module Data.Diff
 , mergeF
 , merging
 , diffPatches
-, mergeMaybe
 , beforeTerm
 , afterTerm
 , stripDiff
@@ -88,19 +87,15 @@ diffPatches = para $ \ diff -> case diff of
   Merge merge ->                                                foldMap (toList . diffPatch . fst)  merge
 
 
--- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
-mergeMaybe :: (Mergeable syntax, Traversable syntax) => (DiffF syntax ann1 ann2 (Maybe (Term syntax combined)) -> Maybe (Term syntax combined)) -> Diff syntax ann1 ann2 -> Maybe (Term syntax combined)
-mergeMaybe = cata
-
 -- | Recover the before state of a diff.
 beforeTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann1 ann2 -> Maybe (Term syntax ann1)
-beforeTerm = mergeMaybe $ \ diff -> case diff of
+beforeTerm = cata $ \ diff -> case diff of
   Patch patch -> before patch >>= \ (In a l) -> termIn a <$> sequenceAlt l
   Merge  (In (a, _) l) -> termIn a <$> sequenceAlt l
 
 -- | Recover the after state of a diff.
 afterTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann1 ann2 -> Maybe (Term syntax ann2)
-afterTerm = mergeMaybe $ \ diff -> case diff of
+afterTerm = cata $ \ diff -> case diff of
   Patch patch -> after patch >>= \ (In b r) -> termIn b <$> sequenceAlt r
   Merge  (In (_, b) r) -> termIn b <$> sequenceAlt r
 
