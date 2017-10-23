@@ -29,6 +29,9 @@ spec = parallel $ do
   describe "Empty" $ do
     withAlternativeInstances sequenceAltLaws (tiers :: [Tier (Empty Char)])
     withAlternativeInstances mergeLaws (tiers :: [Tier (Empty Char)])
+  describe "Union" $ do
+    withAlternativeInstances sequenceAltLaws (tiers :: [Tier (ListableSyntax Char)])
+    withAlternativeInstances mergeLaws (tiers :: [Tier (ListableSyntax Char)])
   describe "Syntax" $ do
     withAlternativeInstances sequenceAltLaws (tiers :: [Tier (Syntax Char)])
     withAlternativeInstances mergeLaws (tiers :: [Tier (Syntax Char)])
