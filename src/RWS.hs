@@ -192,7 +192,6 @@ findNearestNeighbourTo' canCompare kdTreeA kdTreeB = go
             -- Return Nothing if their indices don't match
             guard (j == j')
             pure $!
-              -- put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
               These (i, a) (j, b) : go i restUnmappedA restUnmappedB
 
 isNearAndComparableTo :: ComparabilityRelation syntax ann1 ann2 -> Int -> Term syntax ann2 -> UnmappedTerm syntax ann1 -> Bool
