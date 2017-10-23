@@ -318,8 +318,14 @@ instance Listable1 Statement.Return where
 instance Listable1 Syntax.Context where
   liftTiers tiers = liftCons2 (liftTiers tiers) tiers Syntax.Context
 
+instance Listable a => Listable (Syntax.Context a) where
+  tiers = tiers1
+
 instance Listable1 Syntax.Empty where
   liftTiers _ = cons0 Syntax.Empty
+
+instance Listable a => Listable (Syntax.Empty a) where
+  tiers = tiers1
 
 instance Listable1 Syntax.Identifier where
   liftTiers _ = cons1 Syntax.Identifier
