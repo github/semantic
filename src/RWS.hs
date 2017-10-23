@@ -159,14 +159,17 @@ findNearestNeighbourTo canCompare kdTreeA kdTreeB term@(UnmappedTerm j _ b) = do
   (previous, unmappedA, unmappedB) <- get
   fromMaybe (insertion previous unmappedA unmappedB term) $ do
     -- Look up the nearest unmapped term in `unmappedA`.
-    foundA@(UnmappedTerm i _ a) <- nearestUnmapped (IntMap.filterWithKey (\ k (UnmappedTerm _ _ a) -> isInMoveBounds previous k && canCompareTerms canCompare a b) unmappedA) kdTreeA term
+    foundA@(UnmappedTerm i _ a) <- nearestUnmapped (nearAndComparableTo canCompare previous b unmappedA) kdTreeA term
     -- Look up the nearest `foundA` in `unmappedB`
-    UnmappedTerm j' _ _ <- nearestUnmapped (IntMap.filterWithKey (\ k (UnmappedTerm _ _ b) -> isInMoveBounds (pred j) k && canCompareTerms canCompare a b) unmappedB) kdTreeB foundA
+    UnmappedTerm j' _ _ <- nearestUnmapped ((nearAndComparableTo (flip canCompare) (pred j) a) unmappedB) kdTreeB foundA
     -- Return Nothing if their indices don't match
     guard (j == j')
     pure $! do
       put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
       pure (These i j, These a b)
+
+nearAndComparableTo :: ComparabilityRelation syntax ann1 ann2 -> Int -> Term syntax ann2 -> UnmappedTerms syntax ann1 -> UnmappedTerms syntax ann1
+nearAndComparableTo canCompare index term = IntMap.filterWithKey (\ k (UnmappedTerm _ _ term') -> isInMoveBounds index k && canCompareTerms canCompare term' term)
 
 isInMoveBounds :: Int -> Int -> Bool
 isInMoveBounds previous i = previous < i && i < previous + defaultMoveBound
