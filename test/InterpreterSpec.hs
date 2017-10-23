@@ -16,7 +16,7 @@ import Test.Hspec.LeanCheck
 
 spec :: Spec
 spec = parallel $ do
-  describe "interpret" $ do
+  describe "diffTerms" $ do
     it "returns a replacement when comparing two unicode equivalent terms" $
       let termA = termIn Nil (inj (Syntax.Identifier "t\776"))
           termB = termIn Nil (inj (Syntax.Identifier "\7831")) in
