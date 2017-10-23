@@ -16,11 +16,12 @@ module Data.Diff
 , stripDiff
 ) where
 
+import Control.Applicative ((<|>))
 import Data.Aeson
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
-import Data.Foldable (toList)
+import Data.Foldable (asum, toList)
 import Data.Functor.Classes
 import Data.Functor.Foldable hiding (fold)
 import Data.JSON.Fields
@@ -90,14 +91,14 @@ diffPatches = para $ \ diff -> case diff of
 -- | Recover the before state of a diff.
 beforeTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann1 ann2 -> Maybe (Term syntax ann1)
 beforeTerm = cata $ \ diff -> case diff of
-  Patch patch -> before patch >>= \ (In  a     l) -> termIn a <$> sequenceAlt l
-  Merge                             (In (a, _) l) -> termIn a <$> sequenceAlt l
+  Patch patch -> (before patch >>= \ (In  a     l) -> termIn a <$> sequenceAlt l) <|> (after patch >>= asum)
+  Merge                              (In (a, _) l) -> termIn a <$> sequenceAlt l
 
 -- | Recover the after state of a diff.
 afterTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann1 ann2 -> Maybe (Term syntax ann2)
 afterTerm = cata $ \ diff -> case diff of
-  Patch patch -> after patch >>= \ (In     b  r) -> termIn b <$> sequenceAlt r
-  Merge                            (In (_, b) r) -> termIn b <$> sequenceAlt r
+  Patch patch -> (after patch >>= \ (In     b  r) -> termIn b <$> sequenceAlt r) <|> (before patch >>= asum)
+  Merge                             (In (_, b) r) -> termIn b <$> sequenceAlt r
 
 
 -- | Strips the head annotation off a diff annotated with non-empty records.
