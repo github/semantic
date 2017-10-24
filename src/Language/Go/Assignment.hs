@@ -110,6 +110,7 @@ expressionChoices =
   , interfaceType
   , interpretedStringLiteral
   , intLiteral
+  , keyedElement
   , labelName
   , literalValue
   , mapType
@@ -403,6 +404,9 @@ elseClause = symbol ElseClause *> children expression
 
 incStatement :: Assignment
 incStatement = makeTerm <$> symbol IncStatement <*> children (Statement.PostIncrement <$> expression)
+
+keyedElement :: Assignment
+keyedElement = makeTerm <$> symbol KeyedElement <*> children (Literal.KeyValue <$> expression <*> expression)
 
 labelName :: Assignment
 labelName = makeTerm <$> symbol LabelName <*> (Syntax.Identifier <$> source)
