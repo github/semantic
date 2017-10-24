@@ -14,6 +14,7 @@ module RWS
 
 import Control.Applicative (empty)
 import Control.Arrow ((&&&))
+import Control.Monad (replicateM)
 import Control.Monad.Random
 import Control.Monad.State.Strict
 import Data.Align.Generic
@@ -210,7 +211,7 @@ unitVector :: Int -> Int -> FeatureVector
 unitVector d hash = FV $ listArray (0, d - 1) ((* invMagnitude) <$> components)
   where
     invMagnitude = 1 / sqrt (sum (fmap (** 2) components))
-    components = evalRand (sequenceA (replicate d (liftRand randomDouble))) (pureMT (fromIntegral hash))
+    components = evalRand (replicateM d (liftRand randomDouble)) (pureMT (fromIntegral hash))
 
 -- | Test the comparability of two root 'Term's in O(1).
 canCompareTerms :: ComparabilityRelation syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Bool
