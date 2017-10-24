@@ -68,6 +68,10 @@ rws _          _          [] bs = That <$> bs
 rws canCompare _          [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
 rws canCompare equivalent as bs
   = ses equivalent as bs
+  & mapContiguous canCompare
+  & fmap (bimap snd snd)
+rws canCompare equivalent as bs
+  = ses equivalent as bs
   & genFeaturizedTermsAndDiffs
   & \ (featureAs, featureBs, mappedDiffs, allDiffs) ->
       findNearestNeighboursToDiff canCompare allDiffs featureAs featureBs
