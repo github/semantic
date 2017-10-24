@@ -15,7 +15,7 @@ module RWS
 import Control.Applicative (empty)
 import Control.Arrow ((&&&))
 import Control.Monad (replicateM)
-import Control.Monad.Random
+import Control.Monad.Random.Strict
 import Control.Monad.State.Strict
 import Data.Align.Generic
 import Data.Array.Unboxed
