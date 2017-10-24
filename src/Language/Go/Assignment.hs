@@ -89,8 +89,8 @@ expressionChoices =
   , channelType
   , comment
   , compositeLiteral
-  , constVarDeclaration
-  , constVarSpecification
+  , varDeclaration
+  , varSpecification
   , decStatement
   , element
   , elseClause
@@ -306,14 +306,14 @@ block = symbol Block *> children expressions
 callExpression :: Assignment
 callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Call <$> pure [] <*> identifier <*> pure [] <*> emptyTerm)
 
-constVarDeclaration :: Assignment
-constVarDeclaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
+varDeclaration :: Assignment
+varDeclaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
 
-constVarSpecification :: Assignment
-constVarSpecification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> children (Statement.Assignment
-                                                                           <$> pure []
-                                                                           <*> (annotatedLHS <|> identifiers)
-                                                                           <*> expressions)
+varSpecification :: Assignment
+varSpecification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> children (Statement.Assignment
+                                                                      <$> pure []
+                                                                      <*> (annotatedLHS <|> identifiers)
+                                                                      <*> expressions)
     where
       annotatedLHS = makeTerm <$> location <*> (Type.Annotation
                                               <$> (makeTerm <$> location <*> (manyTermsTill identifier (void (symbol TypeIdentifier))))
