@@ -87,6 +87,14 @@ rws canCompare equivalent as bs
                 (as, bs) = (zip [0..] as', zip [0..] bs')
                 (kdMapA, kdMapB) = (toKdMap as, toKdMap bs)
 
+        -- Find the most similar term matching a predicate, if any.
+        --
+        -- RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which don’t match the predicate, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
+        --
+        -- cf §4.2 of RWS-Diff
+        mostSimilarMatching isEligible tree term = listToMaybe (sortOn (editDistanceUpTo defaultM term . snd) candidates)
+          where candidates = filter (uncurry isEligible) (snd <$> KdMap.kNearest tree defaultL (rhead (extract term)))
+
 data Options = Options
   { optionsLookaheadPlaces :: {-# UNPACK #-} !Int -- ^ How many places ahead should we look for similar terms?
   }
@@ -95,19 +103,6 @@ defaultOptions :: Options
 defaultOptions = Options
   { optionsLookaheadPlaces = 0
   }
-
--- | Finds the most-similar term to the passed-in term, if any.
---
---   RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which don’t match the predicate, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
---
---   cf §4.2 of RWS-Diff
-mostSimilarMatching :: (Foldable syntax, Functor syntax, GAlign syntax)
-                    => (Int -> Term syntax ann1 -> Bool)                        -- ^ A predicate selecting terms eligible for matching against.
-                    -> KdMap.KdMap Double FeatureVector (Int, Term syntax ann1) -- ^ The k-d map to look up nearest neighbours within.
-                    -> Term syntax (Record (FeatureVector ': fields2))          -- ^ The term to find the nearest neighbour to.
-                    -> Maybe (Int, Term syntax ann1)                            -- ^ The most similar term matched by the predicate, if any.
-mostSimilarMatching isEligible tree term = listToMaybe (sortOn (editDistanceUpTo defaultM term . snd) candidates)
-  where candidates = filter (uncurry isEligible) (snd <$> KdMap.kNearest tree defaultL (rhead (extract term)))
 
 defaultD, defaultL, defaultM, defaultP, defaultQ :: Int
 defaultD = 15
