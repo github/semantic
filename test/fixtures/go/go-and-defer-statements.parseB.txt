@@ -1,16 +1,4 @@
 (Program
   (Module
     (Identifier))
-  (Function
-    (Identifier)
-    (Args)
-    (Defer
-      (FunctionCall
-        (SubscriptAccess
-          (Identifier)
-          (Identifier))))
-    (Go
-      (FunctionCall
-        (SubscriptAccess
-          (Identifier)
-          (Identifier))))))
+  (Error))

@@ -1,28 +1,22 @@
 (Program
   (Module
     (Identifier))
-  (Other "const_declaration"
-    (VarAssignment
+  (
+    (Assignment
       (Identifier)
-      (Other "expression_list"
-        (RuneLiteral)))
-    (VarAssignment
+      (Error))
+    (Assignment
       (Identifier)
-      (Other "expression_list"
-        (RuneLiteral)))
-    (VarAssignment
+      (Error))
+    (Assignment
       (Identifier)
-      (Other "expression_list"
-        (RuneLiteral)))
-    (VarAssignment
+      (Error))
+    (Assignment
       (Identifier)
-      (Other "expression_list"
-        (RuneLiteral)))
-    (VarAssignment
+      (Error))
+    (Assignment
       (Identifier)
-      (Other "expression_list"
-        (RuneLiteral)))
-    (VarAssignment
+      (Error))
+    (Assignment
       (Identifier)
-      (Other "expression_list"
-        (RuneLiteral)))))
+      (Error))))

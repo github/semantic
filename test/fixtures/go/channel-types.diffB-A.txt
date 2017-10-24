@@ -2,26 +2,16 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Other "type_declaration"
-      (TypeDecl
+    (
+      (Annotation
       { (Identifier)
       ->(Identifier) }
-        (ChannelTy
-          (ChannelTy
-          { (Identifier)
-          ->(Identifier) })))
-      (TypeDecl
-      { (Identifier)
-      ->(Identifier) }
-        (ChannelTy
-          (ChannelTy
-            (StructTy))))
-      (TypeDecl
-      { (Identifier)
-      ->(Identifier) }
-        (ChannelTy
-          (ChannelTy
-          { (Identifier)
-          ->(Identifier) }))))))
+        (Error))
+      (Annotation
+        (Identifier)
+        (Error))
+      (Annotation
+        (Identifier)
+        (Error)))))

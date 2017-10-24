@@ -2,12 +2,12 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (VarDecl
-      (Other "expression_list"
+    (Assignment
+      (
         (Identifier)
         (Identifier))
-      (Other "expression_list"
-        (NumberLiteral)
-        (NumberLiteral)))))
+      (
+        (Integer)
+        (Integer)))))

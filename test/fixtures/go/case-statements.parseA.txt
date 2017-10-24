@@ -1,7 +1,4 @@
 (Program
   (Module
     (Identifier))
-  (Function
-    (Identifier)
-    (Args)
-    (Switch)))
+  (Error))

@@ -2,46 +2,52 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Assignment
-      (Other "expression_list"
-      { (Identifier)
-      ->(Identifier) })
-      (Other "expression_list"
-        (NumberLiteral)))
-    (Assignment
-      (Other "expression_list"
+    (
+      (Assignment
       { (Identifier)
       ->(Identifier) }
-        (Identifier))
-      (Other "expression_list"
-        (NumberLiteral)
-        (NumberLiteral)))
-    (Assignment
-      (Other "expression_list"
-      { (Identifier)
-      ->(Identifier) })
-      (Other "expression_list"
-        (NumberLiteral)))
-    (Assignment
-      (Other "expression_list"
-      { (Identifier)
-      ->(Identifier) })
-      (Other "expression_list"
-        (NumberLiteral)))
-    (Other "var_declaration"
-      (VarAssignment
-        (Identifier)
-        (PointerTy
+        (Integer))
+      (Assignment
+        (
         { (Identifier)
-        ->(Identifier) })
-        (Other "expression_list"
-          (Operator
-            (Other "composite_literal"
+        ->(Identifier) }
+          (Identifier))
+        (Plus
+          (
+          { (Identifier)
+          ->(Identifier) }
+            (Identifier))
+          (
+            (Integer)
+            (Integer))))
+      (Assignment
+      { (Identifier)
+      ->(Identifier) }
+        (Times
+        { (Identifier)
+        ->(Identifier) }
+          (Integer)))
+      (Assignment
+      { (Identifier)
+      ->(Identifier) }
+        (Plus
+        { (Identifier)
+        ->(Identifier) }
+          (Integer)))
+      (Assignment
+        (Identifier)
+        (
+          (Pointer
+          { (Identifier)
+          ->(Identifier) })
+          (Reference
+            (Composite
             { (Identifier)
             ->(Identifier) }
-              (Pair
-              { (Identifier)
-              ->(Identifier) }
-                (NumberLiteral)))))))))
+              (
+                (KeyValue
+                { (Identifier)
+                ->(Identifier) }
+                  (Integer))))))))))

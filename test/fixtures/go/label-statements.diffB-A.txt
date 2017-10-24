@@ -2,9 +2,6 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (ExpressionStatements
-      (Other "label_statement"
-      { (Identifier)
-      ->(Identifier) }))))
+    (Error)))

@@ -2,9 +2,11 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Other "type_declaration"
-      (TypeDecl
+    (
+      (Annotation
         (Identifier)
-        (QualifiedType)))))
+        (MemberAccess
+          (Identifier)
+          (Identifier))))))

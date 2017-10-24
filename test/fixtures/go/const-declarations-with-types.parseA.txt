@@ -2,11 +2,11 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Other "const_declaration"
-      (VarAssignment
-        (Identifier)
-        (Identifier)
-        (Other "expression_list"
-          (NumberLiteral))))))
+    (Assignment
+      (Annotation
+        (
+          (Identifier))
+        (Identifier))
+      (Integer))))

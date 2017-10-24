@@ -2,17 +2,9 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (FunctionCall
-      (Identifier)
-      (Identifier)
-      (Identifier))
-    (FunctionCall
-      (Identifier)
-      (Identifier)
-      (Identifier))
-    (FunctionCall
-      (Identifier)
-      (Identifier)
-      (Identifier))))
+    (
+      (Error)
+      (Error)
+      (Error))))

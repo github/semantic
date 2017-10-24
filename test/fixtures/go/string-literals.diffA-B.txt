@@ -2,16 +2,14 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Other "const_declaration"
-      (VarAssignment
+    (
+      (Assignment
         (Identifier)
-        (Other "expression_list"
-        { (StringLiteral)
-        ->(StringLiteral) }))
-      (VarAssignment
+      { (TextElement)
+      ->(TextElement) })
+      (Assignment
         (Identifier)
-        (Other "expression_list"
-        { (StringLiteral)
-        ->(StringLiteral) })))))
+      { (TextElement)
+      ->(TextElement) }))))

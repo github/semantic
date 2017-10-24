@@ -1,34 +1,4 @@
 (Program
   (Module
     (Identifier))
-  (Function
-    (Identifier)
-    (Args)
-    (Switch
-      (Case
-        (Case
-          (Other "expression_list"
-            (RelationalOperator
-              (Identifier)
-              (Other "<")
-              (Identifier))))
-        (FunctionCall
-          (Identifier)))
-      (Case
-        (Case
-          (Other "expression_list"
-            (RelationalOperator
-              (Identifier)
-              (Other "<")
-              (Identifier))))
-        (FunctionCall
-          (Identifier)))
-      (Case
-        (Case
-          (Other "expression_list"
-            (RelationalOperator
-              (Identifier)
-              (Other "==")
-              (NumberLiteral))))
-        (FunctionCall
-          (Identifier))))))
+  (Error))

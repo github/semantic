@@ -1,11 +1,4 @@
 (Program
   (Module
     (Identifier))
-  (Function
-    (Identifier)
-    (Args)
-    (Send
-    { (Identifier)
-    ->(Identifier) }
-    { (NumberLiteral)
-    ->(NumberLiteral) })))
+  (Error))

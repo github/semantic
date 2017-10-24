@@ -2,35 +2,10 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (FunctionCall
-      (Identifier)
-      (ChannelTy
-      { (Identifier)
-      ->(Identifier) }))
-    (FunctionCall
-      (Identifier)
-      (ChannelTy
-      { (Identifier)
-      ->(Identifier) })
-      (RelationalOperator
-        (Identifier)
-        (Other "-")
-        (Identifier)))
-    (FunctionCall
-      (Identifier)
-      (ChannelTy
-      { (Identifier)
-      ->(Identifier) })
-    { (NumberLiteral)
-    ->(NumberLiteral) }
-    { (NumberLiteral)
-    ->(NumberLiteral) })
-    (FunctionCall
-      (Identifier)
-      (DictionaryTy
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->(Identifier) }))))
+    (
+      (Error)
+      (Error)
+      (Error)
+      (Error))))

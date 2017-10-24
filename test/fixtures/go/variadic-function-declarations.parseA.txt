@@ -2,23 +2,25 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args))
+    ([]))
   (Function
+    (Empty)
     (Identifier)
-    (Args
-      (ParameterDecl
-        (PointerTy
-          (Identifier))
-        (Identifier))))
-  (Function
-    (Identifier)
-    (Args
-      (ParameterDecl
-        (Identifier))))
-  (Function
-    (Identifier)
-    (Args
+    (
       (Identifier)
-      (ParameterDecl
-        (Identifier)))))
+      (Pointer
+        (Identifier)))
+    ([]))
+  (Function
+    (Empty)
+    (Identifier)
+    (Identifier)
+    ([]))
+  (Function
+    (Empty)
+    (Identifier)
+    (Identifier)
+    (Identifier)
+    ([])))

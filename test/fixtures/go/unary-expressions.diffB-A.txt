@@ -2,13 +2,9 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Operator
-      (Operator
-      { (Identifier)
-      ->(Identifier) }))
-    (Operator
-      (FunctionCall
-      { (Identifier)
-      ->(Identifier) }))))
+    (
+      (Not
+        (Error))
+      (Error))))

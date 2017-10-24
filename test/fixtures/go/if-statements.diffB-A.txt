@@ -2,68 +2,68 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (If
-      (FunctionCall
-      { (Identifier)
-      ->(Identifier) })
-      (ExpressionStatements
-        (FunctionCall
-          (Identifier))))
-    (If
-      (Other "if_initializer"
-        (VarDecl
-          (Other "expression_list"
+    (
+      (If
+        (
+          (Call
           { (Identifier)
-          ->(Identifier) })
-          (Other "expression_list"
-            (FunctionCall
-              (Identifier)))))
-      (Identifier)
-      (ExpressionStatements
-        (FunctionCall
-          (Identifier))))
-    (If
-      (FunctionCall
-      { (Identifier)
-      ->(Identifier) })
-      (ExpressionStatements
-        (FunctionCall
-          (Identifier)))
-      (Other "else_clause"
-        (ExpressionStatements
-          (FunctionCall
-            (Identifier)))))
-    (If
-      (Other "if_initializer"
-        (VarDecl
-          (Other "expression_list"
-            (Identifier))
-          (Other "expression_list"
-          { (NumberLiteral)
-          ->(NumberLiteral) })))
-      (RelationalOperator
-        (Identifier)
-        (Other "<")
-        (NumberLiteral))
-      (ExpressionStatements
-        (FunctionCall
-        { (Identifier)
-        ->(Identifier) }))
-      (Other "else_clause"
-        (If
-          (RelationalOperator
+          ->(Identifier) }
+            (Empty)))
+        (Call
+          (Identifier)
+          (Empty))
+        (Empty))
+      (If
+        (
+          (Assignment
+          { (Identifier)
+          ->(Identifier) }
+            (Call
+              (Identifier)
+              (Empty)))
+          (Identifier))
+        (Call
+          (Identifier)
+          (Empty))
+        (Empty))
+      (If
+        (
+          (Call
+          { (Identifier)
+          ->(Identifier) }
+            (Empty)))
+        (Call
+          (Identifier)
+          (Empty))
+        (Call
+          (Identifier)
+          (Empty)))
+      (If
+        (
+          (Assignment
             (Identifier)
-            (Other "<")
-          { (NumberLiteral)
-          ->(NumberLiteral) })
-          (ExpressionStatements
-            (FunctionCall
-            { (Identifier)
-            ->(Identifier) }))
-          (Other "else_clause"
-            (ExpressionStatements
-              (FunctionCall
-              { (Identifier)
-              ->(Identifier) }))))))))
+          { (Integer)
+          ->(Integer) })
+          (LessThan
+            (Identifier)
+            (Integer)))
+        (Call
+        { (Identifier)
+        ->(Identifier) }
+          (Empty))
+        (If
+          (
+            (LessThan
+              (Identifier)
+            { (Integer)
+            ->(Integer) }))
+          (Call
+          { (Identifier)
+          ->(Identifier) }
+            (Empty))
+          (Call
+          { (Identifier)
+          ->(Identifier) }
+            (Empty)))))))

@@ -2,40 +2,38 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Other "const_declaration"
-      (VarAssignment
+    (
+      (Assignment
         (Identifier)
-        (Other "expression_list"
-          (Other "composite_literal"
-          { (Identifier)
-          ->(Identifier) }
-            (Pair
+        (Composite
+        { (Identifier)
+        ->(Identifier) }
+          (
+            (KeyValue
               (Identifier)
-              (StringLiteral))
-            (Pair
+              (TextElement))
+            (KeyValue
               (Identifier)
-              (StringLiteral))))))
-    (Other "const_declaration"
-      (VarAssignment
+              (TextElement)))))
+      (Assignment
         (Identifier)
-        (Other "expression_list"
-          (Other "composite_literal"
-            (StructTy
-              (FieldDecl
-                (Identifier)
-              { (Identifier)
-              ->(Identifier) }))
-            (Pair
+        (Composite
+          (Constructor
+            (Empty)
+            (Annotation
+              (Annotation
+                ([])
+                (Identifier))
+            { (Identifier)
+            ->(Identifier) }))
+          (
+            (KeyValue
             { (Identifier)
             ->(Identifier) }
-            { (NumberLiteral)
-            ->(NumberLiteral) })))))
-    (Other "const_declaration"
-      (VarAssignment
+            { (Integer)
+            ->(Integer) }))))
+      (Assignment
         (Identifier)
-        (Other "expression_list"
-          (Other "composite_literal"
-          { (QualifiedType)
-          ->(QualifiedType) }))))))
+        (Error)))))

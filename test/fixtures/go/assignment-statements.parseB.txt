@@ -2,39 +2,42 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Assignment
-      (Other "expression_list"
-        (Identifier))
-      (Other "expression_list"
-        (NumberLiteral)))
-    (Assignment
-      (Other "expression_list"
+    (
+      (Assignment
         (Identifier)
-        (Identifier))
-      (Other "expression_list"
-        (NumberLiteral)
-        (NumberLiteral)))
-    (Assignment
-      (Other "expression_list"
-        (Identifier))
-      (Other "expression_list"
-        (NumberLiteral)))
-    (Assignment
-      (Other "expression_list"
-        (Identifier))
-      (Other "expression_list"
-        (NumberLiteral)))
-    (Other "var_declaration"
-      (VarAssignment
-        (Identifier)
-        (PointerTy
+        (Integer))
+      (Assignment
+        (
+          (Identifier)
           (Identifier))
-        (Other "expression_list"
-          (Operator
-            (Other "composite_literal"
+        (Plus
+          (
+            (Identifier)
+            (Identifier))
+          (
+            (Integer)
+            (Integer))))
+      (Assignment
+        (Identifier)
+        (Times
+          (Identifier)
+          (Integer)))
+      (Assignment
+        (Identifier)
+        (Plus
+          (Identifier)
+          (Integer)))
+      (Assignment
+        (Identifier)
+        (
+          (Pointer
+            (Identifier))
+          (Reference
+            (Composite
               (Identifier)
-              (Pair
-                (Identifier)
-                (NumberLiteral)))))))))
+              (
+                (KeyValue
+                  (Identifier)
+                  (Integer))))))))))

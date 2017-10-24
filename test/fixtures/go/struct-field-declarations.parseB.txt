@@ -2,13 +2,11 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Other "type_declaration"
-      (TypeDecl
+    (
+      (Annotation
         (Identifier)
-        (StructTy
-          (FieldDecl
-            (Identifier)
-            (Identifier)
-            (Identifier)))))))
+        (Constructor
+          (Empty)
+          (Error))))))
