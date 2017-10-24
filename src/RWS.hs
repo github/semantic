@@ -179,13 +179,12 @@ findNearestNeighbourTo' :: (Foldable syntax, Functor syntax, GAlign syntax)
                         => ComparabilityRelation syntax ann1 ann2 -- ^ A relation determining whether two terms can be compared.
                         -> KdMap Double FeatureVector (UnmappedTerm syntax ann1)
                         -> KdMap Double FeatureVector (UnmappedTerm syntax ann2)
-                        -> Int
                         -> [UnmappedTerm syntax ann1]
                         -> [UnmappedTerm syntax ann2]
                         -> [MappedDiff syntax ann1 ann2]
-findNearestNeighbourTo' _          _       _       _ as [] = This . (termIndex &&& term) <$> as
-findNearestNeighbourTo' _          _       _       _ [] bs = That . (termIndex &&& term) <$> bs
-findNearestNeighbourTo' canCompare kdTreeA kdTreeB i as bs = go i as bs
+findNearestNeighbourTo' _          _       _       as [] = This . (termIndex &&& term) <$> as
+findNearestNeighbourTo' _          _       _       [] bs = That . (termIndex &&& term) <$> bs
+findNearestNeighbourTo' canCompare kdTreeA kdTreeB as bs = go (termIndex (head as)) as bs
   where go _ as [] = This . (termIndex &&& term) <$> as
         go _ [] bs = That . (termIndex &&& term) <$> bs
         go previous unmappedA@(UnmappedTerm minA _ _ : _) (termB@(UnmappedTerm j _ b) : restUnmappedB) =
@@ -249,7 +248,7 @@ mapContiguous canCompare = go 0 0 id id
           These a b -> mapChunk (ls []) (rs []) <> (These (i, a) (j, b) : go (succ i) (succ j) id id rest)
         mapChunk ls [] = This . (termIndex &&& term) <$> ls
         mapChunk [] rs = That . (termIndex &&& term) <$> rs
-        mapChunk ls rs = findNearestNeighbourTo' canCompare (toKdMap ls) (toKdMap rs) (termIndex (head ls)) ls rs
+        mapChunk ls rs = findNearestNeighbourTo' canCompare (toKdMap ls) (toKdMap rs) ls rs
 
 
 genFeaturizedTermsAndDiffs :: Functor syntax
