@@ -58,7 +58,9 @@ rws canCompare _          [a] [b] = if canCompareTerms canCompare a b then [Thes
 rws canCompare equivalent as bs
   = ses equivalent as bs
   & mapContiguous [] []
-  where -- Map contiguous sequences of unmapped terms separated by SES-mapped equivalencies.
+  where Options{..} = defaultOptions
+
+        -- Map contiguous sequences of unmapped terms separated by SES-mapped equivalencies.
         mapContiguous as bs [] = mapSimilar (reverse as) (reverse bs)
         mapContiguous as bs (first : rest) = case first of
           This  a   -> mapContiguous (a : as)      bs  rest
@@ -74,9 +76,9 @@ rws canCompare equivalent as bs
                 go as@((i, _) : _) ((j, b) : restB) =
                   fromMaybe (That b : go as restB) $ do
                     -- Look up the most similar term to b near i.
-                    (i', a) <- mostSimilarMatching (\ i' a -> inRange (i, i + lookaheadPlaces) i' && canCompareTerms canCompare a b) kdMapA b
+                    (i', a) <- mostSimilarMatching (\ i' a -> inRange (i, i + optionsLookaheadPlaces) i' && canCompareTerms canCompare a b) kdMapA b
                     -- Look up the most similar term to a near j.
-                    (j', _) <- mostSimilarMatching (\ j' b -> inRange (j, j + lookaheadPlaces) j' && canCompareTerms canCompare a b) kdMapB a
+                    (j', _) <- mostSimilarMatching (\ j' b -> inRange (j, j + optionsLookaheadPlaces) j' && canCompareTerms canCompare a b) kdMapB a
                     -- Fail out if there’s a better match for a nearby.
                     guard (j == j')
                     pure $!
@@ -115,9 +117,6 @@ defaultM = 10
 defaultP = 2
 defaultQ = 3
 
--- | How many places ahead should we look for similar terms?
-lookaheadPlaces :: Int
-lookaheadPlaces = 0
 
 toKdMap :: Functor syntax => [(Int, Term syntax (Record (FeatureVector ': fields)))] -> KdMap.KdMap Double FeatureVector (Int, Term syntax (Record (FeatureVector ': fields)))
 toKdMap = KdMap.build (elems . unFV) . fmap (rhead . extract . snd &&& id)
