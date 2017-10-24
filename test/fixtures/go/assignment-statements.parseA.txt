@@ -25,4 +25,16 @@
       (Other "expression_list"
         (Identifier))
       (Other "expression_list"
-        (NumberLiteral)))))
+        (NumberLiteral)))
+      (Other "var_declaration"
+        (VarAssignment
+          (Identifier)
+          (PointerTy
+            (Identifier))
+          (Other "expression_list"
+            (Operator
+              (Other "composite_literal"
+                (Identifier)
+                (Pair
+                  (Identifier)
+                  (NumberLiteral)))))))))
