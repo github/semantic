@@ -74,9 +74,9 @@ rws canCompare equivalent as bs
                 go as@((i, _) : _) ((j, b) : restB) =
                   fromMaybe (That b : go as restB) $ do
                     -- Look up the nearest unmapped term in `unmappedA`.
-                    (i', a) <- nearestUnmapped (isNearAndComparableTo canCompare i b) kdMapA b
+                    (i', a) <- mostSimilarMatching (isNearAndComparableTo canCompare i b) kdMapA b
                     -- Look up the nearest `foundA` in `unmappedB`
-                    (j', _) <- nearestUnmapped (isNearAndComparableTo (flip canCompare) j a) kdMapB a
+                    (j', _) <- mostSimilarMatching (isNearAndComparableTo (flip canCompare) j a) kdMapB a
                     -- Return Nothing if their indices don't match
                     guard (j == j')
                     pure $!
@@ -88,17 +88,17 @@ rws canCompare equivalent as bs
 isNearAndComparableTo :: ComparabilityRelation syntax ann1 ann2 -> Int -> Term syntax ann2 -> Int -> Term syntax ann1 -> Bool
 isNearAndComparableTo canCompare index term k term' = inRange (index, index + defaultMoveBound) k && canCompareTerms canCompare term' term
 
--- | Finds the most-similar unmapped term to the passed-in term, if any.
+-- | Finds the most-similar term to the passed-in term, if any.
 --
--- RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which have already been mapped, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
+--   RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which don’t match the predicate, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
 --
--- cf §4.2 of RWS-Diff
-nearestUnmapped :: (Foldable syntax, Functor syntax, GAlign syntax)
-                => (Int -> Term syntax ann1 -> Bool)                        -- ^ A predicate selecting terms eligible for matching against.
-                -> KdMap.KdMap Double FeatureVector (Int, Term syntax ann1) -- ^ The k-d map to look up nearest neighbours within.
-                -> Term syntax (Record (FeatureVector ': fields2))          -- ^ The term to find the nearest neighbour to.
-                -> Maybe (Int, Term syntax ann1)                            -- ^ The most similar unmapped term matched by the predicate, if any.
-nearestUnmapped isEligible tree key = listToMaybe (sortOn approximateEditDistance candidates)
+--   cf §4.2 of RWS-Diff
+mostSimilarMatching :: (Foldable syntax, Functor syntax, GAlign syntax)
+                    => (Int -> Term syntax ann1 -> Bool)                        -- ^ A predicate selecting terms eligible for matching against.
+                    -> KdMap.KdMap Double FeatureVector (Int, Term syntax ann1) -- ^ The k-d map to look up nearest neighbours within.
+                    -> Term syntax (Record (FeatureVector ': fields2))          -- ^ The term to find the nearest neighbour to.
+                    -> Maybe (Int, Term syntax ann1)                            -- ^ The most similar term matched by the predicate, if any.
+mostSimilarMatching isEligible tree key = listToMaybe (sortOn approximateEditDistance candidates)
   where candidates = filter (uncurry isEligible) (snd <$> KdMap.kNearest tree defaultL (rhead (extract key)))
         approximateEditDistance = editDistanceUpTo defaultM key . snd
 
