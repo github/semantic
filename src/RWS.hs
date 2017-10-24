@@ -102,14 +102,16 @@ mostSimilarMatching isEligible tree key = listToMaybe (sortOn approximateEditDis
   where candidates = filter (uncurry isEligible) (snd <$> KdMap.kNearest tree defaultL (rhead (extract key)))
         approximateEditDistance = editDistanceUpTo defaultM key . snd
 
-defaultD, defaultL, defaultM, defaultP, defaultQ, lookaheadPlaces :: Int
+defaultD, defaultL, defaultM, defaultP, defaultQ :: Int
 defaultD = 15
 defaultL = 2
 defaultM = 10
 defaultP = 2
 defaultQ = 3
-lookaheadPlaces = 0
 
+-- | How many places ahead should we look for similar terms?
+lookaheadPlaces :: Int
+lookaheadPlaces = 0
 
 toKdMap :: Functor syntax => [(Int, Term syntax (Record (FeatureVector ': fields)))] -> KdMap.KdMap Double FeatureVector (Int, Term syntax (Record (FeatureVector ': fields)))
 toKdMap = KdMap.build (elems . unFV) . fmap (rhead . extract . snd &&& id)
