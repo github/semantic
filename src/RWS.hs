@@ -240,14 +240,14 @@ mapContiguous :: (Foldable syntax, Functor syntax, GAlign syntax)
               -> RWSEditScript syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
               -> [MappedDiff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))]
 mapContiguous canCompare = go 0 0 [] []
-  where go _ _ ls rs [] = mapChunk ls rs
-        go i j ls rs (first : rest) = case first of
-          This  a   -> go (succ i)       j  (featurize i a : ls)                  rs  rest
-          That    b -> go       i  (succ j)                  ls  (featurize j b : rs) rest
-          These a b -> mapChunk ls rs <> (These (i, a) (j, b) : go (succ i) (succ j) [] [] rest)
-        mapChunk ls [] = This . (termIndex &&& term) <$> reverse ls
-        mapChunk [] rs = That . (termIndex &&& term) <$> reverse rs
-        mapChunk ls rs = findNearestNeighbourTo' canCompare (reverse ls) (reverse rs)
+  where go _ _ as bs [] = mapChunk as bs
+        go i j as bs (first : rest) = case first of
+          This  a   -> go (succ i)       j  (featurize i a : as)                  bs  rest
+          That    b -> go       i  (succ j)                  as  (featurize j b : bs) rest
+          These a b -> mapChunk as bs <> (These (i, a) (j, b) : go (succ i) (succ j) [] [] rest)
+        mapChunk as [] = This . (termIndex &&& term) <$> reverse as
+        mapChunk [] bs = That . (termIndex &&& term) <$> reverse bs
+        mapChunk as bs = findNearestNeighbourTo' canCompare (reverse as) (reverse bs)
 
 
 genFeaturizedTermsAndDiffs :: Functor syntax
