@@ -59,7 +59,7 @@ rws :: (Foldable syntax, Functor syntax, GAlign syntax)
     -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool)
     -> [Term syntax (Record (FeatureVector ': fields1))]
     -> [Term syntax (Record (FeatureVector ': fields2))]
-    -> [These (Term syntax (Record (FeatureVector ': fields1))) (Term syntax (Record (FeatureVector ': fields2)))]
+    -> EditScript (Term syntax (Record (FeatureVector ': fields1))) (Term syntax (Record (FeatureVector ': fields2)))
 rws _          _          as [] = This <$> as
 rws _          _          [] bs = That <$> bs
 rws canCompare _          [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
@@ -78,7 +78,7 @@ findNearestNeighbourTo :: (Foldable syntax, Functor syntax, GAlign syntax)
                        => ComparabilityRelation syntax ann1 ann2 -- ^ A relation determining whether two terms can be compared.
                        -> [UnmappedTerm syntax ann1]
                        -> [UnmappedTerm syntax ann2]
-                       -> [These (UnmappedTerm syntax ann1) (UnmappedTerm syntax ann2)]
+                       -> EditScript (UnmappedTerm syntax ann1) (UnmappedTerm syntax ann2)
 findNearestNeighbourTo canCompare as bs = go as bs
   where go as [] = This <$> as
         go [] bs = That <$> bs
