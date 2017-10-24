@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs, DataKinds, RankNTypes, TypeOperators #-}
 module RWS
 ( rws
+, Options(..)
 , ComparabilityRelation
 , FeatureVector(..)
 , defaultFeatureVectorDecorator
