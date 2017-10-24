@@ -65,12 +65,12 @@ rws canCompare _          [a] [b] = if canCompareTerms canCompare a b then [Thes
 rws canCompare equivalent as bs
   = ses (\ a b -> equivalent (term a) (term b)) (zipWith featurize [0..] as) (zipWith featurize [0..] bs)
   & mapContiguous canCompare
-  & fmap (bimap snd snd)
+  & fmap (bimap term term)
 
 type Edit syntax ann1 ann2 = These (Term syntax ann1) (Term syntax ann2)
 
 -- A Diff paired with both its indices
-type MappedDiff syntax ann1 ann2 = These (Int, Term syntax ann1) (Int, Term syntax ann2)
+type MappedDiff syntax ann1 ann2 = These (UnmappedTerm syntax ann1) (UnmappedTerm syntax ann2)
 
 type RWSEditScript syntax ann1 ann2 = [Edit syntax ann1 ann2]
 
@@ -81,12 +81,12 @@ findNearestNeighbourTo :: (Foldable syntax, Functor syntax, GAlign syntax)
                        -> [UnmappedTerm syntax ann2]
                        -> [MappedDiff syntax ann1 ann2]
 findNearestNeighbourTo canCompare as bs = go as bs
-  where go as [] = This . (termIndex &&& term) <$> as
-        go [] bs = That . (termIndex &&& term) <$> bs
-        go [a] [b] | canCompareTerms canCompare (term a) (term b) = [These (termIndex a, term a) (termIndex b, term b)]
-                   | otherwise = [That (termIndex b, term b), This (termIndex a, term a)]
-        go unmappedA@(UnmappedTerm minA _ _ : _) (termB@(UnmappedTerm j _ b) : restUnmappedB) =
-          fromMaybe (That (j, b) : go unmappedA restUnmappedB) $ do
+  where go as [] = This <$> as
+        go [] bs = That <$> bs
+        go [a] [b] | canCompareTerms canCompare (term a) (term b) = [These a b]
+                   | otherwise = [That b, This a]
+        go unmappedA@(termA@(UnmappedTerm minA _ _) : _) (termB@(UnmappedTerm j _ b) : restUnmappedB) =
+          fromMaybe (That termB : go unmappedA restUnmappedB) $ do
             -- Look up the nearest unmapped term in `unmappedA`.
             foundA@(UnmappedTerm i _ a) <- nearestUnmapped (isNearAndComparableTo canCompare minA b) kdTreeA termB
             -- Look up the nearest `foundA` in `unmappedB`
@@ -95,7 +95,7 @@ findNearestNeighbourTo canCompare as bs = go as bs
             guard (j == j')
             pure $!
               let (deleted, _ : restUnmappedA) = span ((< i) . termIndex) unmappedA in
-              (This . (termIndex &&& term) <$> deleted) <> (These (i, a) (j, b) : go restUnmappedA restUnmappedB)
+              (This <$> deleted) <> (These termA termB : go restUnmappedA restUnmappedB)
         (kdTreeA, kdTreeB) = (toKdMap as, toKdMap bs)
 
 isNearAndComparableTo :: ComparabilityRelation syntax ann1 ann2 -> Int -> Term syntax ann2 -> UnmappedTerm syntax ann1 -> Bool
@@ -132,9 +132,9 @@ mapContiguous canCompare = go [] []
         go as bs (first : rest) = case first of
           This  a   -> go (a : as)      bs  rest
           That    b -> go      as  (b : bs) rest
-          These _ _ -> mapChunk as bs <> (bimap (termIndex &&& term) (termIndex &&& term) first : go [] [] rest)
-        mapChunk as [] = This . (termIndex &&& term) <$> reverse as
-        mapChunk [] bs = That . (termIndex &&& term) <$> reverse bs
+          These _ _ -> mapChunk as bs <> (first : go [] [] rest)
+        mapChunk as [] = This <$> reverse as
+        mapChunk [] bs = That <$> reverse bs
         mapChunk as bs = findNearestNeighbourTo canCompare (reverse as) (reverse bs)
 
 
