@@ -134,8 +134,6 @@ mapContiguous canCompare = go [] []
           This  a   -> go (a : as)      bs  rest
           That    b -> go      as  (b : bs) rest
           These _ _ -> mapChunk as bs <> (first : go [] [] rest)
-        mapChunk as [] = This <$> reverse as
-        mapChunk [] bs = That <$> reverse bs
         mapChunk as bs = findNearestNeighbourTo canCompare (reverse as) (reverse bs)
 
 
