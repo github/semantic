@@ -59,7 +59,7 @@ rws :: (Foldable syntax, Functor syntax, GAlign syntax)
     -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool)
     -> [Term syntax (Record (FeatureVector ': fields1))]
     -> [Term syntax (Record (FeatureVector ': fields2))]
-    -> RWSEditScript syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
+    -> [These (Term syntax (Record (FeatureVector ': fields1))) (Term syntax (Record (FeatureVector ': fields2)))]
 rws _          _          as [] = This <$> as
 rws _          _          [] bs = That <$> bs
 rws canCompare _          [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
@@ -75,8 +75,6 @@ rws canCompare equivalent as bs
 
 -- A Diff paired with both its indices
 type MappedDiff syntax ann1 ann2 = These (UnmappedTerm syntax ann1) (UnmappedTerm syntax ann2)
-
-type RWSEditScript syntax ann1 ann2 = [These (Term syntax ann1) (Term syntax ann2)]
 
 -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
 findNearestNeighbourTo :: (Foldable syntax, Functor syntax, GAlign syntax)
