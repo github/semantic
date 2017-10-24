@@ -83,6 +83,8 @@ findNearestNeighbourTo :: (Foldable syntax, Functor syntax, GAlign syntax)
 findNearestNeighbourTo canCompare as bs = go as bs
   where go as [] = This . (termIndex &&& term) <$> as
         go [] bs = That . (termIndex &&& term) <$> bs
+        go [a] [b] | canCompareTerms canCompare (term a) (term b) = [These (termIndex a, term a) (termIndex b, term b)]
+                   | otherwise = [That (termIndex b, term b), This (termIndex a, term a)]
         go unmappedA@(UnmappedTerm minA _ _ : _) (termB@(UnmappedTerm j _ b) : restUnmappedB) =
           fromMaybe (That (j, b) : go unmappedA restUnmappedB) $ do
             -- Look up the nearest unmapped term in `unmappedA`.
