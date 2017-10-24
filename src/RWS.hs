@@ -124,9 +124,9 @@ defaultMoveBound = 0
 
 
 mapContiguous :: (Foldable syntax, Functor syntax, GAlign syntax)
-              => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
-              -> [These (UnmappedTerm syntax (Record (FeatureVector ': fields1))) (UnmappedTerm syntax (Record (FeatureVector ': fields2)))]
-              -> [MappedDiff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))]
+              => ComparabilityRelation syntax ann1 ann2
+              -> [These (UnmappedTerm syntax ann1) (UnmappedTerm syntax ann2)]
+              -> [MappedDiff syntax ann1 ann2]
 mapContiguous canCompare = go [] []
   where go as bs [] = mapChunk as bs
         go as bs (first : rest) = case first of
