@@ -67,13 +67,13 @@ rws canCompare equivalent as bs
   = ses (\ a b -> equivalent (term a) (term b)) (zipWith featurize [0..] as) (zipWith featurize [0..] bs)
   & mapContiguous [] []
   & fmap (bimap term term)
-  where mapContiguous as bs [] = findNearestNeighbourTo (reverse as) (reverse bs)
+  where mapContiguous as bs [] = mapSimilar (reverse as) (reverse bs)
         mapContiguous as bs (first : rest) = case first of
           This  a   -> mapContiguous (a : as)      bs  rest
           That    b -> mapContiguous      as  (b : bs) rest
-          These _ _ -> findNearestNeighbourTo (reverse as) (reverse bs) <> (first : mapContiguous [] [] rest)
+          These _ _ -> mapSimilar (reverse as) (reverse bs) <> (first : mapContiguous [] [] rest)
 
-        findNearestNeighbourTo as bs = go as bs
+        mapSimilar as bs = go as bs
           where go as [] = This <$> as
                 go [] bs = That <$> bs
                 go [a] [b] | canCompareTerms canCompare (term a) (term b) = [These a b]
