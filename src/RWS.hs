@@ -103,7 +103,7 @@ data Options = Options
 
 defaultOptions :: Options
 defaultOptions = Options
-  { optionsLookaheadPlaces = 0
+  { optionsLookaheadPlaces = 1
   , optionsMaxSimilarTerms = 2
   , optionsNodeComparisons = 10
   }
