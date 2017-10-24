@@ -71,8 +71,8 @@ rws canCompare equivalent as bs
                 go [] bs = That . snd <$> bs
                 go [a] [b] | canCompareTerms canCompare (snd a) (snd b) = [These (snd a) (snd b)]
                            | otherwise = [That (snd b), This (snd a)]
-                go unmappedA@((i, _) : _) ((j, b) : restUnmappedB) =
-                  fromMaybe (That b : go unmappedA restUnmappedB) $ do
+                go as@((i, _) : _) ((j, b) : restB) =
+                  fromMaybe (That b : go as restB) $ do
                     -- Look up the nearest unmapped term in `unmappedA`.
                     (i', a) <- nearestUnmapped (isNearAndComparableTo canCompare i b) kdMapA b
                     -- Look up the nearest `foundA` in `unmappedB`
@@ -80,8 +80,8 @@ rws canCompare equivalent as bs
                     -- Return Nothing if their indices don't match
                     guard (j == j')
                     pure $!
-                      let (deleted, _ : restUnmappedA) = span ((< i') . fst) unmappedA in
-                      (This . snd <$> deleted) <> (These a b : go restUnmappedA restUnmappedB)
+                      let (deleted, _ : restA) = span ((< i') . fst) as in
+                      (This . snd <$> deleted) <> (These a b : go restA restB)
                 (as, bs) = (zip [0..] as', zip [0..] bs')
                 (kdMapA, kdMapB) = (toKdMap as, toKdMap bs)
 
