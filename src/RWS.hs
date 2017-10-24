@@ -75,15 +75,15 @@ rws canCompare equivalent as bs
                 go unmappedA@(termA@(i, _) : _) (termB@(j, b) : restUnmappedB) =
                   fromMaybe (That termB : go unmappedA restUnmappedB) $ do
                     -- Look up the nearest unmapped term in `unmappedA`.
-                    (i', a) <- nearestUnmapped (isNearAndComparableTo canCompare i b) kdTreeA b
+                    (i', a) <- nearestUnmapped (isNearAndComparableTo canCompare i b) kdMapA b
                     -- Look up the nearest `foundA` in `unmappedB`
-                    (j', _) <- nearestUnmapped (isNearAndComparableTo (flip canCompare) j a) kdTreeB a
+                    (j', _) <- nearestUnmapped (isNearAndComparableTo (flip canCompare) j a) kdMapB a
                     -- Return Nothing if their indices don't match
                     guard (j == j')
                     pure $!
                       let (deleted, _ : restUnmappedA) = span ((< i') . fst) unmappedA in
                       (This <$> deleted) <> (These termA termB : go restUnmappedA restUnmappedB)
-                (kdTreeA, kdTreeB) = (toKdMap as, toKdMap bs)
+                (kdMapA, kdMapB) = (toKdMap as, toKdMap bs)
 
 isNearAndComparableTo :: ComparabilityRelation syntax ann1 ann2 -> Int -> Term syntax ann2 -> Int -> Term syntax ann1 -> Bool
 isNearAndComparableTo canCompare index term k term' = inRange (index, index + defaultMoveBound) k && canCompareTerms canCompare term' term
