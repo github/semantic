@@ -21,6 +21,7 @@ instance ( Monad m
 instance (Monad m, Eval v m s a s) => Eval v m s a (TermF s a) where
   evaluate ev In{..} = evaluate ev termOut
 
+
 -- Collecting evaluator
 class Monad m => EvalCollect l v m syntax ann constr where
   evalCollect :: (Term syntax ann -> m v)
