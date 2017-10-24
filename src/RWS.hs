@@ -19,7 +19,6 @@ import Control.Monad.Random.Strict
 import Control.Monad.State.Strict
 import Data.Align.Generic
 import Data.Array.Unboxed
-import Data.Bifunctor (bimap)
 import Data.Diff (DiffF(..), deleting, inserting, merge, replacing)
 import Data.Foldable
 import Data.Function ((&))
@@ -57,9 +56,8 @@ rws _          _          as [] = This <$> as
 rws _          _          [] bs = That <$> bs
 rws canCompare _          [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
 rws canCompare equivalent as bs
-  = ses (\ a b -> equivalent (snd a) (snd b)) (zip [0..] as) (zip [0..] bs)
+  = ses equivalent as bs
   & mapContiguous [] []
-  & fmap (bimap snd snd)
   where -- Map contiguous sequences of unmapped terms separated by SES-mapped equivalencies.
         mapContiguous as bs [] = mapSimilar (reverse as) (reverse bs)
         mapContiguous as bs (first : rest) = case first of
@@ -68,13 +66,13 @@ rws canCompare equivalent as bs
           These _ _ -> mapSimilar (reverse as) (reverse bs) <> (first : mapContiguous [] [] rest)
 
         -- Map comparable, mutually similar terms, inserting & deleting surrounding terms.
-        mapSimilar as bs = go as bs
-          where go as [] = This <$> as
-                go [] bs = That <$> bs
-                go [a] [b] | canCompareTerms canCompare (snd a) (snd b) = [These a b]
-                           | otherwise = [That b, This a]
-                go unmappedA@(termA@(i, _) : _) (termB@(j, b) : restUnmappedB) =
-                  fromMaybe (That termB : go unmappedA restUnmappedB) $ do
+        mapSimilar as' bs' = go as bs
+          where go as [] = This . snd <$> as
+                go [] bs = That . snd <$> bs
+                go [a] [b] | canCompareTerms canCompare (snd a) (snd b) = [These (snd a) (snd b)]
+                           | otherwise = [That (snd b), This (snd a)]
+                go unmappedA@((i, _) : _) ((j, b) : restUnmappedB) =
+                  fromMaybe (That b : go unmappedA restUnmappedB) $ do
                     -- Look up the nearest unmapped term in `unmappedA`.
                     (i', a) <- nearestUnmapped (isNearAndComparableTo canCompare i b) kdMapA b
                     -- Look up the nearest `foundA` in `unmappedB`
@@ -83,7 +81,8 @@ rws canCompare equivalent as bs
                     guard (j == j')
                     pure $!
                       let (deleted, _ : restUnmappedA) = span ((< i') . fst) unmappedA in
-                      (This <$> deleted) <> (These termA termB : go restUnmappedA restUnmappedB)
+                      (This . snd <$> deleted) <> (These a b : go restUnmappedA restUnmappedB)
+                (as, bs) = (zip [0..] as', zip [0..] bs')
                 (kdMapA, kdMapB) = (toKdMap as, toKdMap bs)
 
 isNearAndComparableTo :: ComparabilityRelation syntax ann1 ann2 -> Int -> Term syntax ann2 -> Int -> Term syntax ann1 -> Bool
