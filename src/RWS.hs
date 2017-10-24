@@ -67,7 +67,8 @@ rws canCompare equivalent as bs
   = ses (\ a b -> equivalent (term a) (term b)) (zipWith featurize [0..] as) (zipWith featurize [0..] bs)
   & mapContiguous [] []
   & fmap (bimap term term)
-  where mapContiguous as bs [] = mapSimilar (reverse as) (reverse bs)
+  where -- Map contiguous sequences of unmapped terms separated by SES-mapped equivalencies.
+        mapContiguous as bs [] = mapSimilar (reverse as) (reverse bs)
         mapContiguous as bs (first : rest) = case first of
           This  a   -> mapContiguous (a : as)      bs  rest
           That    b -> mapContiguous      as  (b : bs) rest
