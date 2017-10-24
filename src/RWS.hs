@@ -26,7 +26,7 @@ import Data.Function ((&))
 import Data.Functor.Classes
 import Data.Functor.Foldable
 import Data.Hashable
-import Data.KdMap.Static hiding (elems, empty, inRange, null)
+import qualified Data.KdMap.Static as KdMap
 import Data.List (sortOn)
 import Data.Maybe
 import Data.Record
@@ -107,11 +107,11 @@ isNearAndComparableTo canCompare index term (UnmappedTerm k _ term') = inRange (
 -- cf §4.2 of RWS-Diff
 nearestUnmapped :: (Foldable syntax, Functor syntax, GAlign syntax)
                 => (UnmappedTerm syntax ann1 -> Bool)                    -- ^ A predicate selecting terms eligible for matching against.
-                -> KdMap Double FeatureVector (UnmappedTerm syntax ann1) -- ^ The k-d map to look up nearest neighbours within.
+                -> KdMap.KdMap Double FeatureVector (UnmappedTerm syntax ann1) -- ^ The k-d map to look up nearest neighbours within.
                 -> UnmappedTerm syntax ann2                              -- ^ The term to find the nearest neighbour to.
                 -> Maybe (UnmappedTerm syntax ann1)                      -- ^ The most similar unmapped term matched by the predicate, if any.
 nearestUnmapped isEligible tree key = listToMaybe (sortOn approximateEditDistance candidates)
-  where candidates = filter isEligible (snd <$> kNearest tree defaultL (feature key))
+  where candidates = filter isEligible (snd <$> KdMap.kNearest tree defaultL (feature key))
         approximateEditDistance = editDistanceUpTo defaultM (term key) . term
 
 defaultD, defaultL, defaultP, defaultQ, defaultMoveBound :: Int
@@ -135,8 +135,8 @@ setFeatureVector :: Record (FeatureVector ': fields) -> FeatureVector -> Record 
 setFeatureVector = setField
 
 
-toKdMap :: [UnmappedTerm syntax ann] -> KdMap Double FeatureVector (UnmappedTerm syntax ann)
-toKdMap = build (elems . unFV) . fmap (feature &&& id)
+toKdMap :: [UnmappedTerm syntax ann] -> KdMap.KdMap Double FeatureVector (UnmappedTerm syntax ann)
+toKdMap = KdMap.build (elems . unFV) . fmap (feature &&& id)
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
