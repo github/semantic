@@ -106,9 +106,9 @@ mostSimilarMatching :: (Foldable syntax, Functor syntax, GAlign syntax)
                     -> KdMap.KdMap Double FeatureVector (Int, Term syntax ann1) -- ^ The k-d map to look up nearest neighbours within.
                     -> Term syntax (Record (FeatureVector ': fields2))          -- ^ The term to find the nearest neighbour to.
                     -> Maybe (Int, Term syntax ann1)                            -- ^ The most similar term matched by the predicate, if any.
-mostSimilarMatching isEligible tree key = listToMaybe (sortOn approximateEditDistance candidates)
-  where candidates = filter (uncurry isEligible) (snd <$> KdMap.kNearest tree defaultL (rhead (extract key)))
-        approximateEditDistance = editDistanceUpTo defaultM key . snd
+mostSimilarMatching isEligible tree term = listToMaybe (sortOn approximateEditDistance candidates)
+  where candidates = filter (uncurry isEligible) (snd <$> KdMap.kNearest tree defaultL (rhead (extract term)))
+        approximateEditDistance = editDistanceUpTo defaultM term . snd
 
 defaultD, defaultL, defaultM, defaultP, defaultQ :: Int
 defaultD = 15
