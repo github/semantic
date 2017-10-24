@@ -129,12 +129,11 @@ mapContiguous :: (Foldable syntax, Functor syntax, GAlign syntax)
               -> [These (UnmappedTerm syntax ann1) (UnmappedTerm syntax ann2)]
               -> [MappedDiff syntax ann1 ann2]
 mapContiguous canCompare = go [] []
-  where go as bs [] = mapChunk as bs
+  where go as bs [] = findNearestNeighbourTo canCompare (reverse as) (reverse bs)
         go as bs (first : rest) = case first of
           This  a   -> go (a : as)      bs  rest
           That    b -> go      as  (b : bs) rest
-          These _ _ -> mapChunk as bs <> (first : go [] [] rest)
-        mapChunk as bs = findNearestNeighbourTo canCompare (reverse as) (reverse bs)
+          These _ _ -> findNearestNeighbourTo canCompare (reverse as) (reverse bs) <> (first : go [] [] rest)
 
 
 featurize :: Functor syntax => Int -> Term syntax (Record (FeatureVector ': fields)) -> UnmappedTerm syntax (Record (FeatureVector ': fields))
