@@ -233,7 +233,7 @@ insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
   pure (That (j, b))
 
 mapContiguous :: Functor syntax
-              => ComparabilityRelation syntax ann1 ann2
+              => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
               -> RWSEditScript syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
               -> [MappedDiff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))]
 mapContiguous canCompare = go 0 0 [] []
