@@ -92,23 +92,24 @@ rws canCompare equivalent as bs
         -- RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which don’t match the predicate, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
         --
         -- cf §4.2 of RWS-Diff
-        mostSimilarMatching isEligible tree term = listToMaybe (sortOn (editDistanceUpTo defaultM term . snd) candidates)
+        mostSimilarMatching isEligible tree term = listToMaybe (sortOn (editDistanceUpTo optionsNodeComparisons term . snd) candidates)
           where candidates = filter (uncurry isEligible) (snd <$> KdMap.kNearest tree optionsMaxSimilarTerms (rhead (extract term)))
 
 data Options = Options
   { optionsLookaheadPlaces :: {-# UNPACK #-} !Int -- ^ How many places ahead should we look for similar terms?
   , optionsMaxSimilarTerms :: {-# UNPACK #-} !Int -- ^ The maximum number of similar terms to consider.
+  , optionsNodeComparisons :: {-# UNPACK #-} !Int -- ^ The number of nodes to compare when selecting the most similar term.
   }
 
 defaultOptions :: Options
 defaultOptions = Options
   { optionsLookaheadPlaces = 0
   , optionsMaxSimilarTerms = 2
+  , optionsNodeComparisons = 10
   }
 
-defaultD, defaultM, defaultP, defaultQ :: Int
+defaultD, defaultP, defaultQ :: Int
 defaultD = 15
-defaultM = 10
 defaultP = 2
 defaultQ = 3
 
