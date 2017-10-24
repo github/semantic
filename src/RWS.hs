@@ -180,8 +180,6 @@ findNearestNeighbourTo' :: (Foldable syntax, Functor syntax, GAlign syntax)
                         -> [UnmappedTerm syntax ann1]
                         -> [UnmappedTerm syntax ann2]
                         -> [MappedDiff syntax ann1 ann2]
-findNearestNeighbourTo' _          as [] = This . (termIndex &&& term) <$> as
-findNearestNeighbourTo' _          [] bs = That . (termIndex &&& term) <$> bs
 findNearestNeighbourTo' canCompare as bs = go (pred (termIndex (head as))) as bs
   where go _ as [] = This . (termIndex &&& term) <$> as
         go _ [] bs = That . (termIndex &&& term) <$> bs
