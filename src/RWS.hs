@@ -207,10 +207,10 @@ isNearAndComparableTo canCompare index term (UnmappedTerm k _ term') = inRange (
 --
 -- cf §4.2 of RWS-Diff
 nearestUnmapped :: (Foldable syntax, Functor syntax, GAlign syntax)
-                => (UnmappedTerm syntax ann1 -> Bool) -- ^ A predicate selecting terms eligible for matching against.
-                -> KdMap Double FeatureVector (UnmappedTerm syntax ann1) -- ^ The k-d tree to look up nearest neighbours within.
-                -> UnmappedTerm syntax ann2 -- ^ The term to find the nearest neighbour to.
-                -> Maybe (UnmappedTerm syntax ann1) -- ^ The most similar unmapped term, if any.
+                => (UnmappedTerm syntax ann1 -> Bool)                    -- ^ A predicate selecting terms eligible for matching against.
+                -> KdMap Double FeatureVector (UnmappedTerm syntax ann1) -- ^ The k-d map to look up nearest neighbours within.
+                -> UnmappedTerm syntax ann2                              -- ^ The term to find the nearest neighbour to.
+                -> Maybe (UnmappedTerm syntax ann1)                      -- ^ The most similar unmapped term matched by the predicate, if any.
 nearestUnmapped isEligible tree key = listToMaybe (sortOn approximateEditDistance candidates)
   where candidates = filter isEligible (snd <$> kNearest tree defaultL (feature key))
         approximateEditDistance = editDistanceUpTo defaultM (term key) . term
