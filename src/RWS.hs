@@ -2,6 +2,7 @@
 module RWS
 ( rws
 , Options(..)
+, defaultOptions
 , ComparabilityRelation
 , FeatureVector(..)
 , defaultFeatureVectorDecorator
