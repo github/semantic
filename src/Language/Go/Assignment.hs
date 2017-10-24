@@ -50,6 +50,8 @@ type Syntax =
    , Statement.Break
    , Statement.Goto
    , Statement.If
+   , Statement.Pointer
+   , Statement.Reference
    , Statement.Return
    , Syntax.Context
    , Syntax.Error
