@@ -34,4 +34,36 @@
       (Other "else_clause"
         (ExpressionStatements
           (FunctionCall
-            (Identifier)))))))
+            (Identifier)))))
+    (If
+      (Other "if_initializer"
+        (VarDecl
+          (Other "expression_list"
+            (Identifier))
+          (Other "expression_list"
+          { (NumberLiteral)
+          ->(NumberLiteral) })))
+      (RelationalOperator
+        (Identifier)
+        (Other "<")
+        (NumberLiteral))
+      (ExpressionStatements
+        (FunctionCall
+        { (Identifier)
+        ->(Identifier) }))
+      (Other "else_clause"
+        (If
+          (RelationalOperator
+            (Identifier)
+            (Other "<")
+          { (NumberLiteral)
+          ->(NumberLiteral) })
+          (ExpressionStatements
+            (FunctionCall
+            { (Identifier)
+            ->(Identifier) }))
+          (Other "else_clause"
+            (ExpressionStatements
+              (FunctionCall
+              { (Identifier)
+              ->(Identifier) }))))))))

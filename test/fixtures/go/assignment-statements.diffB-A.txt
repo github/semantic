@@ -30,18 +30,18 @@
       ->(Identifier) })
       (Other "expression_list"
         (NumberLiteral)))
-      (Other "var_declaration"
-        (VarAssignment
-          (Identifier)
-          (PointerTy
-          { (Identifier)
-          ->(Identifier) })
-          (Other "expression_list"
-            (Operator
-              (Other "composite_literal"
-              { (Identifier)
-              ->(Identifier) }
+    (Other "var_declaration"
+      (VarAssignment
+        (Identifier)
+        (PointerTy
+        { (Identifier)
+        ->(Identifier) })
+        (Other "expression_list"
+          (Operator
+            (Other "composite_literal"
+            { (Identifier)
+            ->(Identifier) }
               (Pair
               { (Identifier)
               ->(Identifier) }
-              (NumberLiteral)))))))))
+                (NumberLiteral)))))))))

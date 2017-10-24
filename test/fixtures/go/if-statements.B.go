@@ -12,11 +12,11 @@ b()
 } else {
 c()
 }
-}
 if num := 10; num < 0 {
 f()
 } else if num < 100 {
 g()
 } else {
 h()
+}
 }
