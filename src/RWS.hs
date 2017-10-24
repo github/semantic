@@ -67,6 +67,7 @@ rws canCompare equivalent as bs
           That    b -> mapContiguous      as  (b : bs) rest
           These _ _ -> mapSimilar (reverse as) (reverse bs) <> (first : mapContiguous [] [] rest)
 
+        -- Map comparable, mutually similar terms, inserting & deleting surrounding terms.
         mapSimilar as bs = go as bs
           where go as [] = This <$> as
                 go [] bs = That <$> bs
