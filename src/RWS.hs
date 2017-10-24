@@ -184,8 +184,7 @@ findNearestNeighbourTo' :: (Foldable syntax, Functor syntax, GAlign syntax)
                         -> [UnmappedTerm syntax ann2]
                         -> [MappedDiff syntax ann1 ann2]
 findNearestNeighbourTo' canCompare kdTreeA kdTreeB = go
-  where go _ [] [] = []
-        go _ as [] = This . (termIndex &&& term) <$> as
+  where go _ as [] = This . (termIndex &&& term) <$> as
         go _ [] bs = That . (termIndex &&& term) <$> bs
         go previous unmappedA@(UnmappedTerm minA _ _ : _) (termB@(UnmappedTerm j _ b) : restUnmappedB) =
           fromMaybe (That (j, b) : go previous unmappedA restUnmappedB) $ do
