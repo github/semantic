@@ -93,20 +93,21 @@ rws canCompare equivalent as bs
         --
         -- cf §4.2 of RWS-Diff
         mostSimilarMatching isEligible tree term = listToMaybe (sortOn (editDistanceUpTo defaultM term . snd) candidates)
-          where candidates = filter (uncurry isEligible) (snd <$> KdMap.kNearest tree defaultL (rhead (extract term)))
+          where candidates = filter (uncurry isEligible) (snd <$> KdMap.kNearest tree optionsMaxSimilarTerms (rhead (extract term)))
 
 data Options = Options
   { optionsLookaheadPlaces :: {-# UNPACK #-} !Int -- ^ How many places ahead should we look for similar terms?
+  , optionsMaxSimilarTerms :: {-# UNPACK #-} !Int -- ^ The maximum number of similar terms to consider.
   }
 
 defaultOptions :: Options
 defaultOptions = Options
   { optionsLookaheadPlaces = 0
+  , optionsMaxSimilarTerms = 2
   }
 
-defaultD, defaultL, defaultM, defaultP, defaultQ :: Int
+defaultD, defaultM, defaultP, defaultQ :: Int
 defaultD = 15
-defaultL = 2
 defaultM = 10
 defaultP = 2
 defaultQ = 3
