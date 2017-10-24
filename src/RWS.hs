@@ -86,7 +86,7 @@ rws canCompare equivalent as bs
                 (kdMapA, kdMapB) = (toKdMap as, toKdMap bs)
 
 isNearAndComparableTo :: ComparabilityRelation syntax ann1 ann2 -> Int -> Term syntax ann2 -> Int -> Term syntax ann1 -> Bool
-isNearAndComparableTo canCompare index term k term' = inRange (index, index + defaultMoveBound) k && canCompareTerms canCompare term' term
+isNearAndComparableTo canCompare index term k term' = inRange (index, index + lookaheadPlaces) k && canCompareTerms canCompare term' term
 
 -- | Finds the most-similar term to the passed-in term, if any.
 --
@@ -102,13 +102,13 @@ mostSimilarMatching isEligible tree key = listToMaybe (sortOn approximateEditDis
   where candidates = filter (uncurry isEligible) (snd <$> KdMap.kNearest tree defaultL (rhead (extract key)))
         approximateEditDistance = editDistanceUpTo defaultM key . snd
 
-defaultD, defaultL, defaultM, defaultP, defaultQ, defaultMoveBound :: Int
+defaultD, defaultL, defaultM, defaultP, defaultQ, lookaheadPlaces :: Int
 defaultD = 15
 defaultL = 2
 defaultM = 10
 defaultP = 2
 defaultQ = 3
-defaultMoveBound = 0
+lookaheadPlaces = 0
 
 
 toKdMap :: Functor syntax => [(Int, Term syntax (Record (FeatureVector ': fields)))] -> KdMap.KdMap Double FeatureVector (Int, Term syntax (Record (FeatureVector ': fields)))
