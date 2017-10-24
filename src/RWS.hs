@@ -81,9 +81,9 @@ rws canCompare equivalent as bs
                     (j', _) <- mostSimilarMatching (\ j' b -> inRange (j, j + optionsLookaheadPlaces) j' && canCompareTerms canCompare a b) kdMapB a
                     -- Fail out if there’s a better match for a nearby.
                     guard (j == j')
-                    pure $!
-                      let (deleted, _ : restA) = span ((< i') . fst) as in
-                      (This . snd <$> deleted) <> (These a b : go restA restB)
+                    -- Delete any elements of as before the selected element.
+                    let (deleted, _ : restA) = span ((< i') . fst) as
+                    pure $! (This . snd <$> deleted) <> (These a b : go restA restB)
                 (as, bs) = (zip [0..] as', zip [0..] bs')
                 (kdMapA, kdMapB) = (toKdMap as, toKdMap bs)
 
