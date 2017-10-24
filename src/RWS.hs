@@ -248,7 +248,7 @@ mapContiguous canCompare = go 0 0 id id
           These a b -> mapChunk (ls []) (rs []) <> (These (i, a) (j, b) : go (succ i) (succ j) id id rest)
         mapChunk ls [] = This . (termIndex &&& term) <$> ls
         mapChunk [] rs = That . (termIndex &&& term) <$> rs
-        mapChunk ls rs = findNearestNeighbourTo' canCompare (toKdMap ls) (toKdMap rs) (termIndex (last ls)) ls rs
+        mapChunk ls rs = findNearestNeighbourTo' canCompare (toKdMap ls) (toKdMap rs) (termIndex (head ls)) ls rs
 
 
 genFeaturizedTermsAndDiffs :: Functor syntax
