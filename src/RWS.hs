@@ -74,9 +74,9 @@ rws canCompare equivalent as bs
                 go as@((i, _) : _) ((j, b) : restB) =
                   fromMaybe (That b : go as restB) $ do
                     -- Look up the most similar term to b near i.
-                    (i', a) <- mostSimilarMatching (isNearAndComparableTo canCompare i b) kdMapA b
+                    (i', a) <- mostSimilarMatching (\ i' a -> inRange (i, i + lookaheadPlaces) i' && canCompareTerms canCompare a b) kdMapA b
                     -- Look up the most similar term to a near j.
-                    (j', _) <- mostSimilarMatching (isNearAndComparableTo (flip canCompare) j a) kdMapB a
+                    (j', _) <- mostSimilarMatching (\ j' b -> inRange (j, j + lookaheadPlaces) j' && canCompareTerms canCompare a b) kdMapB a
                     -- Fail out if there’s a better match for a nearby.
                     guard (j == j')
                     pure $!
@@ -84,9 +84,6 @@ rws canCompare equivalent as bs
                       (This . snd <$> deleted) <> (These a b : go restA restB)
                 (as, bs) = (zip [0..] as', zip [0..] bs')
                 (kdMapA, kdMapB) = (toKdMap as, toKdMap bs)
-
-isNearAndComparableTo :: ComparabilityRelation syntax ann1 ann2 -> Int -> Term syntax ann2 -> Int -> Term syntax ann1 -> Bool
-isNearAndComparableTo canCompare index term k term' = inRange (index, index + lookaheadPlaces) k && canCompareTerms canCompare term' term
 
 -- | Finds the most-similar term to the passed-in term, if any.
 --
