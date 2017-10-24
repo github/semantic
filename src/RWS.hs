@@ -102,9 +102,10 @@ mostSimilarMatching isEligible tree key = listToMaybe (sortOn approximateEditDis
   where candidates = filter (uncurry isEligible) (snd <$> KdMap.kNearest tree defaultL (rhead (extract key)))
         approximateEditDistance = editDistanceUpTo defaultM key . snd
 
-defaultD, defaultL, defaultP, defaultQ, defaultMoveBound :: Int
+defaultD, defaultL, defaultM, defaultP, defaultQ, defaultMoveBound :: Int
 defaultD = 15
 defaultL = 2
+defaultM = 10
 defaultP = 2
 defaultQ = 3
 defaultMoveBound = 0
@@ -181,13 +182,9 @@ equalTerms canCompare = go
   where go a b = canCompareTerms canCompare a b && liftEq go (termOut (unTerm a)) (termOut (unTerm b))
 
 
--- | How many nodes to consider for our constant-time approximation to tree edit distance.
-defaultM :: Integer
-defaultM = 10
-
 -- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
-editDistanceUpTo :: (GAlign syntax, Foldable syntax, Functor syntax) => Integer -> Term syntax ann1 -> Term syntax ann2 -> Int
+editDistanceUpTo :: (GAlign syntax, Foldable syntax, Functor syntax) => Int -> Term syntax ann1 -> Term syntax ann2 -> Int
 editDistanceUpTo m a b = diffCost m (approximateDiff a b)
   where diffCost = flip . cata $ \ diff m -> case diff of
           _ | m <= 0 -> 0
