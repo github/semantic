@@ -73,15 +73,12 @@ rws canCompare equivalent as bs
           That    b -> mapContiguous      as  (b : bs) rest
           These _ _ -> findNearestNeighbourTo canCompare (reverse as) (reverse bs) <> (first : mapContiguous [] [] rest)
 
--- A Diff paired with both its indices
-type MappedDiff syntax ann1 ann2 = These (UnmappedTerm syntax ann1) (UnmappedTerm syntax ann2)
-
 -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
 findNearestNeighbourTo :: (Foldable syntax, Functor syntax, GAlign syntax)
                        => ComparabilityRelation syntax ann1 ann2 -- ^ A relation determining whether two terms can be compared.
                        -> [UnmappedTerm syntax ann1]
                        -> [UnmappedTerm syntax ann2]
-                       -> [MappedDiff syntax ann1 ann2]
+                       -> [These (UnmappedTerm syntax ann1) (UnmappedTerm syntax ann2)]
 findNearestNeighbourTo canCompare as bs = go as bs
   where go as [] = This <$> as
         go [] bs = That <$> bs
