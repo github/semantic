@@ -6,8 +6,9 @@ import Data.Term
 import Data.Proxy
 import Data.Union
 import Data.Functor.Foldable
+import Data.ByteString (ByteString)
 
-type Name = String
+type Name = ByteString
 
 class FreeVariables1 syntax where
   liftFreeVariables :: (a -> Set Name) -> syntax a -> Set Name
