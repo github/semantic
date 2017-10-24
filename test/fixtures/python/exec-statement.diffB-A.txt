@@ -12,13 +12,10 @@
   {-(Identifier)-}
   {-(Identifier)-}
     (Empty))
-{+(Call
+  (Call
+    (Identifier)
+  { (TextElement)
+  ->(TextElement) }
   {+(Identifier)+}
-  {+(TextElement)+}
   {+(Identifier)+}
-  {+(Identifier)+}
-  {+(Empty)+})+}
-{-(Call
-  {-(Identifier)-}
-  {-(TextElement)-}
-  {-(Empty)-})-})
+    (Empty)))
