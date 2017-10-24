@@ -80,24 +80,24 @@ findNearestNeighbourTo :: (Foldable syntax, Functor syntax, GAlign syntax)
                        -> [UnmappedTerm syntax ann1]
                        -> [UnmappedTerm syntax ann2]
                        -> [MappedDiff syntax ann1 ann2]
-findNearestNeighbourTo canCompare as bs = go (pred (termIndex (head as))) as bs
-  where go _ as [] = This . (termIndex &&& term) <$> as
-        go _ [] bs = That . (termIndex &&& term) <$> bs
-        go previous unmappedA@(UnmappedTerm minA _ _ : _) (termB@(UnmappedTerm j _ b) : restUnmappedB) =
-          fromMaybe (That (j, b) : go previous unmappedA restUnmappedB) $ do
+findNearestNeighbourTo canCompare as bs = go as bs
+  where go as [] = This . (termIndex &&& term) <$> as
+        go [] bs = That . (termIndex &&& term) <$> bs
+        go unmappedA@(UnmappedTerm minA _ _ : _) (termB@(UnmappedTerm j _ b) : restUnmappedB) =
+          fromMaybe (That (j, b) : go unmappedA restUnmappedB) $ do
             -- Look up the nearest unmapped term in `unmappedA`.
-            foundA@(UnmappedTerm i _ a) <- nearestUnmapped (\ a -> isNearAndComparableTo canCompare previous b a && termIndex a >= minA) kdTreeA termB
+            foundA@(UnmappedTerm i _ a) <- nearestUnmapped (isNearAndComparableTo canCompare minA b) kdTreeA termB
             -- Look up the nearest `foundA` in `unmappedB`
-            UnmappedTerm j' _ _ <- nearestUnmapped (\ b -> isNearAndComparableTo (flip canCompare) (pred j) a b && termIndex b >= j) kdTreeB foundA
+            UnmappedTerm j' _ _ <- nearestUnmapped (isNearAndComparableTo (flip canCompare) j a) kdTreeB foundA
             -- Return Nothing if their indices don't match
             guard (j == j')
             pure $!
               let (deleted, _ : restUnmappedA) = span ((< i) . termIndex) unmappedA in
-              (This . (termIndex &&& term) <$> deleted) <> (These (i, a) (j, b) : go i restUnmappedA restUnmappedB)
+              (This . (termIndex &&& term) <$> deleted) <> (These (i, a) (j, b) : go restUnmappedA restUnmappedB)
         (kdTreeA, kdTreeB) = (toKdMap as, toKdMap bs)
 
 isNearAndComparableTo :: ComparabilityRelation syntax ann1 ann2 -> Int -> Term syntax ann2 -> UnmappedTerm syntax ann1 -> Bool
-isNearAndComparableTo canCompare index term (UnmappedTerm k _ term') = inRange (succ index, index + defaultMoveBound) k && canCompareTerms canCompare term' term
+isNearAndComparableTo canCompare index term (UnmappedTerm k _ term') = inRange (index, index + defaultMoveBound) k && canCompareTerms canCompare term' term
 
 -- | Finds the most-similar unmapped term to the passed-in term, if any.
 --
@@ -118,7 +118,7 @@ defaultD = 15
 defaultL = 2
 defaultP = 2
 defaultQ = 3
-defaultMoveBound = 1
+defaultMoveBound = 0
 
 
 mapContiguous :: (Foldable syntax, Functor syntax, GAlign syntax)
