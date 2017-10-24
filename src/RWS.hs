@@ -232,19 +232,19 @@ insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
   put (previous, unmappedA, IntMap.delete j unmappedB)
   pure (That (j, b))
 
-mapContiguous :: Functor syntax
+mapContiguous :: (Foldable syntax, Functor syntax, GAlign syntax)
               => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
               -> RWSEditScript syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
               -> [MappedDiff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))]
 mapContiguous canCompare = go 0 0 [] []
   where go _ _ ls rs [] = mapChunk ls rs
         go i j ls rs (first : rest) = case first of
-          This  a   -> go (succ i)       j  ((i, a) : ls)          rs  rest
-          That    b -> go       i  (succ j)           ls ((j, b) : rs) rest
+          This  a   -> go (succ i)       j  (featurize i a : ls)                 rs  rest
+          That    b -> go       i  (succ j)                  ls (featurize j b : rs) rest
           These a b -> mapChunk ls rs <> (These (i, a) (j, b) : go (succ i) (succ j) [] [] rest)
-        mapChunk ls [] = This <$> reverse ls
-        mapChunk [] rs = That <$> reverse rs
-        mapChunk ls rs = (This <$> reverse ls) <> (That <$> reverse rs)
+        mapChunk ls [] = This . (termIndex &&& term) <$> reverse ls
+        mapChunk [] rs = That . (termIndex &&& term) <$> reverse rs
+        mapChunk ls rs = findNearestNeighbourTo' canCompare (toKdMap ls) (toKdMap rs) (termIndex (last ls)) ls rs
 
 
 genFeaturizedTermsAndDiffs :: Functor syntax
