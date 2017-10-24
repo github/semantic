@@ -63,7 +63,7 @@ rws _          _          as [] = This <$> as
 rws _          _          [] bs = That <$> bs
 rws canCompare _          [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
 rws canCompare equivalent as bs
-  = ses equivalent as bs
+  = ses (\ a b -> equivalent (snd a) (snd b)) (zip [0..] as) (zip [0..] bs)
   & mapContiguous canCompare
   & fmap (bimap snd snd)
 
@@ -123,14 +123,14 @@ defaultMoveBound = 1
 
 mapContiguous :: (Foldable syntax, Functor syntax, GAlign syntax)
               => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
-              -> RWSEditScript syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
+              -> [These (Int, Term syntax (Record (FeatureVector ': fields1))) (Int, Term syntax (Record (FeatureVector ': fields2)))]
               -> [MappedDiff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))]
-mapContiguous canCompare = go 0 0 [] []
-  where go _ _ as bs [] = mapChunk as bs
-        go i j as bs (first : rest) = case first of
-          This  a   -> go (succ i)       j  (featurize i a : as)                  bs  rest
-          That    b -> go       i  (succ j)                  as  (featurize j b : bs) rest
-          These a b -> mapChunk as bs <> (These (i, a) (j, b) : go (succ i) (succ j) [] [] rest)
+mapContiguous canCompare = go [] []
+  where go as bs [] = mapChunk as bs
+        go as bs (first : rest) = case first of
+          This  (i, a)        -> go (featurize i a : as)                  bs  rest
+          That         (j, b) -> go                  as  (featurize j b : bs) rest
+          These _      _      -> mapChunk as bs <> (first : go [] [] rest)
         mapChunk as [] = This . (termIndex &&& term) <$> reverse as
         mapChunk [] bs = That . (termIndex &&& term) <$> reverse bs
         mapChunk as bs = findNearestNeighbourTo canCompare (reverse as) (reverse bs)
