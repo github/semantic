@@ -47,13 +47,6 @@ type ComparabilityRelation syntax ann1 ann2 = forall a b. TermF syntax ann1 a ->
 newtype FeatureVector = FV { unFV :: UArray Int Double }
   deriving (Eq, Ord, Show)
 
--- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
-data UnmappedTerm syntax ann = UnmappedTerm
-  { termIndex :: {-# UNPACK #-} !Int -- ^ The index of the term within its root term.
-  , feature   :: {-# UNPACK #-} !FeatureVector -- ^ Feature vector
-  , term      :: Term syntax ann -- ^ The unmapped term
-  }
-
 rws :: (Foldable syntax, Functor syntax, GAlign syntax)
     => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
     -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool)
@@ -64,9 +57,9 @@ rws _          _          as [] = This <$> as
 rws _          _          [] bs = That <$> bs
 rws canCompare _          [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
 rws canCompare equivalent as bs
-  = ses (\ a b -> equivalent (term a) (term b)) (zipWith featurize [0..] as) (zipWith featurize [0..] bs)
+  = ses (\ a b -> equivalent (snd a) (snd b)) (zip [0..] as) (zip [0..] bs)
   & mapContiguous [] []
-  & fmap (bimap term term)
+  & fmap (bimap snd snd)
   where -- Map contiguous sequences of unmapped terms separated by SES-mapped equivalencies.
         mapContiguous as bs [] = mapSimilar (reverse as) (reverse bs)
         mapContiguous as bs (first : rest) = case first of
@@ -77,23 +70,23 @@ rws canCompare equivalent as bs
         mapSimilar as bs = go as bs
           where go as [] = This <$> as
                 go [] bs = That <$> bs
-                go [a] [b] | canCompareTerms canCompare (term a) (term b) = [These a b]
+                go [a] [b] | canCompareTerms canCompare (snd a) (snd b) = [These a b]
                            | otherwise = [That b, This a]
-                go unmappedA@(termA@(UnmappedTerm i _ _) : _) (termB@(UnmappedTerm j _ b) : restUnmappedB) =
+                go unmappedA@(termA@(i, _) : _) (termB@(j, b) : restUnmappedB) =
                   fromMaybe (That termB : go unmappedA restUnmappedB) $ do
                     -- Look up the nearest unmapped term in `unmappedA`.
-                    foundA@(UnmappedTerm i' _ a) <- nearestUnmapped (isNearAndComparableTo canCompare i b) kdTreeA termB
+                    (i', a) <- nearestUnmapped (isNearAndComparableTo canCompare i b) kdTreeA b
                     -- Look up the nearest `foundA` in `unmappedB`
-                    UnmappedTerm j' _ _ <- nearestUnmapped (isNearAndComparableTo (flip canCompare) j a) kdTreeB foundA
+                    (j', _) <- nearestUnmapped (isNearAndComparableTo (flip canCompare) j a) kdTreeB a
                     -- Return Nothing if their indices don't match
                     guard (j == j')
                     pure $!
-                      let (deleted, _ : restUnmappedA) = span ((< i') . termIndex) unmappedA in
+                      let (deleted, _ : restUnmappedA) = span ((< i') . fst) unmappedA in
                       (This <$> deleted) <> (These termA termB : go restUnmappedA restUnmappedB)
                 (kdTreeA, kdTreeB) = (toKdMap as, toKdMap bs)
 
-isNearAndComparableTo :: ComparabilityRelation syntax ann1 ann2 -> Int -> Term syntax ann2 -> UnmappedTerm syntax ann1 -> Bool
-isNearAndComparableTo canCompare index term (UnmappedTerm k _ term') = inRange (index, index + defaultMoveBound) k && canCompareTerms canCompare term' term
+isNearAndComparableTo :: ComparabilityRelation syntax ann1 ann2 -> Int -> Term syntax ann2 -> Int -> Term syntax ann1 -> Bool
+isNearAndComparableTo canCompare index term k term' = inRange (index, index + defaultMoveBound) k && canCompareTerms canCompare term' term
 
 -- | Finds the most-similar unmapped term to the passed-in term, if any.
 --
@@ -101,13 +94,13 @@ isNearAndComparableTo canCompare index term (UnmappedTerm k _ term') = inRange (
 --
 -- cf §4.2 of RWS-Diff
 nearestUnmapped :: (Foldable syntax, Functor syntax, GAlign syntax)
-                => (UnmappedTerm syntax ann1 -> Bool)                    -- ^ A predicate selecting terms eligible for matching against.
-                -> KdMap.KdMap Double FeatureVector (UnmappedTerm syntax ann1) -- ^ The k-d map to look up nearest neighbours within.
-                -> UnmappedTerm syntax ann2                              -- ^ The term to find the nearest neighbour to.
-                -> Maybe (UnmappedTerm syntax ann1)                      -- ^ The most similar unmapped term matched by the predicate, if any.
+                => (Int -> Term syntax ann1 -> Bool)                           -- ^ A predicate selecting terms eligible for matching against.
+                -> KdMap.KdMap Double FeatureVector (Int, Term syntax ann1) -- ^ The k-d map to look up nearest neighbours within.
+                -> Term syntax (Record (FeatureVector ': fields2))                                            -- ^ The term to find the nearest neighbour to.
+                -> Maybe (Int, Term syntax ann1)                            -- ^ The most similar unmapped term matched by the predicate, if any.
 nearestUnmapped isEligible tree key = listToMaybe (sortOn approximateEditDistance candidates)
-  where candidates = filter isEligible (snd <$> KdMap.kNearest tree defaultL (feature key))
-        approximateEditDistance = editDistanceUpTo defaultM (term key) . term
+  where candidates = filter (uncurry isEligible) (snd <$> KdMap.kNearest tree defaultL (rhead (extract key)))
+        approximateEditDistance = editDistanceUpTo defaultM key . snd
 
 defaultD, defaultL, defaultP, defaultQ, defaultMoveBound :: Int
 defaultD = 15
@@ -117,21 +110,8 @@ defaultQ = 3
 defaultMoveBound = 0
 
 
-featurize :: Functor syntax => Int -> Term syntax (Record (FeatureVector ': fields)) -> UnmappedTerm syntax (Record (FeatureVector ': fields))
-featurize index term = UnmappedTerm index (rhead (extract term)) (eraseFeatureVector term)
-
-eraseFeatureVector :: Functor syntax => Term syntax (Record (FeatureVector ': fields)) -> Term syntax (Record (FeatureVector ': fields))
-eraseFeatureVector (Term.Term (In record functor)) = termIn (setFeatureVector record nullFeatureVector) functor
-
-nullFeatureVector :: FeatureVector
-nullFeatureVector = FV $ listArray (0, 0) [0]
-
-setFeatureVector :: Record (FeatureVector ': fields) -> FeatureVector -> Record (FeatureVector ': fields)
-setFeatureVector = setField
-
-
-toKdMap :: [UnmappedTerm syntax ann] -> KdMap.KdMap Double FeatureVector (UnmappedTerm syntax ann)
-toKdMap = KdMap.build (elems . unFV) . fmap (feature &&& id)
+toKdMap :: Functor syntax => [(Int, Term syntax (Record (FeatureVector ': fields)))] -> KdMap.KdMap Double FeatureVector (Int, Term syntax (Record (FeatureVector ': fields)))
+toKdMap = KdMap.build (elems . unFV) . fmap (rhead . extract . snd &&& id)
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
