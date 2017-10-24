@@ -65,8 +65,13 @@ rws _          _          [] bs = That <$> bs
 rws canCompare _          [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
 rws canCompare equivalent as bs
   = ses (\ a b -> equivalent (term a) (term b)) (zipWith featurize [0..] as) (zipWith featurize [0..] bs)
-  & mapContiguous canCompare
+  & mapContiguous [] []
   & fmap (bimap term term)
+  where mapContiguous as bs [] = findNearestNeighbourTo canCompare (reverse as) (reverse bs)
+        mapContiguous as bs (first : rest) = case first of
+          This  a   -> mapContiguous (a : as)      bs  rest
+          That    b -> mapContiguous      as  (b : bs) rest
+          These _ _ -> findNearestNeighbourTo canCompare (reverse as) (reverse bs) <> (first : mapContiguous [] [] rest)
 
 type Edit syntax ann1 ann2 = These (Term syntax ann1) (Term syntax ann2)
 
@@ -122,18 +127,6 @@ defaultL = 2
 defaultP = 2
 defaultQ = 3
 defaultMoveBound = 0
-
-
-mapContiguous :: (Foldable syntax, Functor syntax, GAlign syntax)
-              => ComparabilityRelation syntax ann1 ann2
-              -> [These (UnmappedTerm syntax ann1) (UnmappedTerm syntax ann2)]
-              -> [MappedDiff syntax ann1 ann2]
-mapContiguous canCompare = go [] []
-  where go as bs [] = findNearestNeighbourTo canCompare (reverse as) (reverse bs)
-        go as bs (first : rest) = case first of
-          This  a   -> go (a : as)      bs  rest
-          That    b -> go      as  (b : bs) rest
-          These _ _ -> findNearestNeighbourTo canCompare (reverse as) (reverse bs) <> (first : go [] [] rest)
 
 
 featurize :: Functor syntax => Int -> Term syntax (Record (FeatureVector ': fields)) -> UnmappedTerm syntax (Record (FeatureVector ': fields))
