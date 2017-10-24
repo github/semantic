@@ -177,14 +177,12 @@ findNearestNeighbourTo canCompare kdTreeA kdTreeB term@(UnmappedTerm j _ b) = do
 
 findNearestNeighbourTo' :: (Foldable syntax, Functor syntax, GAlign syntax)
                         => ComparabilityRelation syntax ann1 ann2 -- ^ A relation determining whether two terms can be compared.
-                        -> KdMap Double FeatureVector (UnmappedTerm syntax ann1)
-                        -> KdMap Double FeatureVector (UnmappedTerm syntax ann2)
                         -> [UnmappedTerm syntax ann1]
                         -> [UnmappedTerm syntax ann2]
                         -> [MappedDiff syntax ann1 ann2]
-findNearestNeighbourTo' _          _       _       as [] = This . (termIndex &&& term) <$> as
-findNearestNeighbourTo' _          _       _       [] bs = That . (termIndex &&& term) <$> bs
-findNearestNeighbourTo' canCompare kdTreeA kdTreeB as bs = go (termIndex (head as)) as bs
+findNearestNeighbourTo' _          as [] = This . (termIndex &&& term) <$> as
+findNearestNeighbourTo' _          [] bs = That . (termIndex &&& term) <$> bs
+findNearestNeighbourTo' canCompare as bs = go (termIndex (head as)) as bs
   where go _ as [] = This . (termIndex &&& term) <$> as
         go _ [] bs = That . (termIndex &&& term) <$> bs
         go previous unmappedA@(UnmappedTerm minA _ _ : _) (termB@(UnmappedTerm j _ b) : restUnmappedB) =
@@ -198,6 +196,7 @@ findNearestNeighbourTo' canCompare kdTreeA kdTreeB as bs = go (termIndex (head a
             pure $!
               let (deleted, _ : restUnmappedA) = span ((< i) . termIndex) unmappedA in
               (This . (termIndex &&& term) <$> deleted) <> (These (i, a) (j, b) : go i restUnmappedA restUnmappedB)
+        (kdTreeA, kdTreeB) = (toKdMap as, toKdMap bs)
 
 isNearAndComparableTo :: ComparabilityRelation syntax ann1 ann2 -> Int -> Term syntax ann2 -> UnmappedTerm syntax ann1 -> Bool
 isNearAndComparableTo canCompare index term (UnmappedTerm k _ term') = inRange (succ index, index + defaultMoveBound) k && canCompareTerms canCompare term' term
@@ -248,7 +247,7 @@ mapContiguous canCompare = go 0 0 id id
           These a b -> mapChunk (ls []) (rs []) <> (These (i, a) (j, b) : go (succ i) (succ j) id id rest)
         mapChunk ls [] = This . (termIndex &&& term) <$> ls
         mapChunk [] rs = That . (termIndex &&& term) <$> rs
-        mapChunk ls rs = findNearestNeighbourTo' canCompare (toKdMap ls) (toKdMap rs) ls rs
+        mapChunk ls rs = findNearestNeighbourTo' canCompare ls rs
 
 
 genFeaturizedTermsAndDiffs :: Functor syntax
