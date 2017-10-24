@@ -85,6 +85,10 @@ rws canCompare equivalent as bs
                 (as, bs) = (zip [0..] as', zip [0..] bs')
                 (kdMapA, kdMapB) = (toKdMap as, toKdMap bs)
 
+data Options = Options
+  { optionsLookaheadPlaces :: {-# UNPACK #-} !Int -- ^ How many places ahead should we look for similar terms?
+  }
+
 -- | Finds the most-similar term to the passed-in term, if any.
 --
 --   RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which don’t match the predicate, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
