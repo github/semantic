@@ -73,11 +73,11 @@ rws canCompare equivalent as bs
                            | otherwise = [That (snd b), This (snd a)]
                 go as@((i, _) : _) ((j, b) : restB) =
                   fromMaybe (That b : go as restB) $ do
-                    -- Look up the nearest unmapped term in `unmappedA`.
+                    -- Look up the most similar term to b near i.
                     (i', a) <- mostSimilarMatching (isNearAndComparableTo canCompare i b) kdMapA b
-                    -- Look up the nearest `foundA` in `unmappedB`
+                    -- Look up the most similar term to a near j.
                     (j', _) <- mostSimilarMatching (isNearAndComparableTo (flip canCompare) j a) kdMapB a
-                    -- Return Nothing if their indices don't match
+                    -- Fail out if there’s a better match for a nearby.
                     guard (j == j')
                     pure $!
                       let (deleted, _ : restA) = span ((< i') . fst) as in
