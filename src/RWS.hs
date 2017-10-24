@@ -140,7 +140,7 @@ mapContiguous canCompare = go [] []
 
 
 featurize :: Functor syntax => Int -> Term syntax (Record (FeatureVector ': fields)) -> UnmappedTerm syntax (Record (FeatureVector ': fields))
-featurize index term = UnmappedTerm index (getField (extract term)) (eraseFeatureVector term)
+featurize index term = UnmappedTerm index (rhead (extract term)) (eraseFeatureVector term)
 
 eraseFeatureVector :: Functor syntax => Term syntax (Record (FeatureVector ': fields)) -> Term syntax (Record (FeatureVector ': fields))
 eraseFeatureVector (Term.Term (In record functor)) = termIn (setFeatureVector record nullFeatureVector) functor
