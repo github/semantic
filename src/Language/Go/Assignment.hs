@@ -135,6 +135,7 @@ expressionChoices =
   , typeDeclaration
   , typeIdentifier
   , unaryExpression
+  , variadicParameterDeclaration
   ]
 
 identifiers :: Assignment
@@ -337,6 +338,12 @@ functionDeclaration :: Assignment
 functionDeclaration = mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> expression <*> parameters <*> (expression <|> emptyTerm) <*> block)
   where mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Declaration.Function [types'] name' params' block')
         parameters = symbol Parameters *> children (many expression)
+
+variadicParameterDeclaration :: Assignment
+variadicParameterDeclaration =  mkVariadic <$> symbol VariadicParameterDeclaration <*> children ((,) <$> emptyTerm  <*> expression)
+                            <|> mkVariadic <$> symbol VariadicParameterDeclaration <*> children ((,) <$> expression <*> expression)
+  where
+    mkVariadic loc (identifier', typeIdentifier') = makeTerm loc (Go.Syntax.Variadic [typeIdentifier'] identifier')
 
 importDeclaration :: Assignment
 importDeclaration = makeTerm <$> symbol ImportDeclaration <*> children (Declaration.Import <$> many expression)
