@@ -86,7 +86,6 @@ expression = term (handleError (choice expressionChoices))
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
   [ assignment'
-  , variadicArgument
   , binaryExpression
   , block
   , breakStatement
@@ -135,6 +134,7 @@ expressionChoices =
   , typeDeclaration
   , typeIdentifier
   , unaryExpression
+  , variadicArgument
   , variadicParameterDeclaration
   ]
 
@@ -170,8 +170,7 @@ typeIdentifier :: Assignment
 typeIdentifier = makeTerm <$> symbol TypeIdentifier <*> (Syntax.Identifier <$> source)
 
 identifier :: Assignment
-identifier =  symbol Identifier >>= \ loc -> (source >> symbol AnonDotDotDot *> (makeTerm loc <$> (Go.Syntax.Variadic <$> (makeTerm loc <$> (Syntax.Identifier <$> source)))))
-                                            <|> (makeTerm loc <$> (Syntax.Identifier <$> source))
+identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
 
 fieldIdentifier :: Assignment
 fieldIdentifier = makeTerm <$> symbol FieldIdentifier <*> (Syntax.Identifier <$> source)
@@ -313,7 +312,7 @@ block :: Assignment
 block = symbol Block *> children expressions
 
 variadicArgument :: Assignment
-variadicArgument = symbol Identifier >>= \ loc -> children (symbol AnonDotDotDot *> (makeTerm loc <$> (Go.Syntax.Variadic <$> (makeTerm loc <$> (Syntax.Identifier <$> source)))))
+variadicArgument = makeTerm <$> symbol VariadicArgument <*> children (Go.Syntax.Variadic <$> pure [] <*> expression)
 
 callExpression :: Assignment
 callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Call <$> pure [] <*> identifier <*> many expression <*> emptyTerm)
