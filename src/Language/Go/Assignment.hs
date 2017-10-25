@@ -23,6 +23,7 @@ import qualified Data.Term as Term
 import Data.Union
 import GHC.Stack
 import Language.Go.Grammar as Grammar
+import Language.Go.Syntax as Go.Syntax
 
 type Syntax =
   '[ Comment.Comment
@@ -39,6 +40,7 @@ type Syntax =
    , Statement.PostDecrement
    , Statement.PostIncrement
    , Expression.MemberAccess
+   , Go.Syntax.Variadic
    , Literal.Array
    , Literal.Channel
    , Literal.Composite
@@ -84,6 +86,7 @@ expression = term (handleError (choice expressionChoices))
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
   [ assignment'
+  , variadicArgument
   , binaryExpression
   , block
   , breakStatement
@@ -166,7 +169,8 @@ typeIdentifier :: Assignment
 typeIdentifier = makeTerm <$> symbol TypeIdentifier <*> (Syntax.Identifier <$> source)
 
 identifier :: Assignment
-identifier =  makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source)
+identifier =  symbol Identifier >>= \ loc -> (source >> symbol AnonDotDotDot *> (makeTerm loc <$> (Go.Syntax.Variadic <$> (makeTerm loc <$> (Syntax.Identifier <$> source)))))
+                                            <|> (makeTerm loc <$> (Syntax.Identifier <$> source))
 
 fieldIdentifier :: Assignment
 fieldIdentifier = makeTerm <$> symbol FieldIdentifier <*> (Syntax.Identifier <$> source)
@@ -306,6 +310,9 @@ binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm
 
 block :: Assignment
 block = symbol Block *> children expressions
+
+variadicArgument :: Assignment
+variadicArgument = symbol Identifier >>= \ loc -> children (symbol AnonDotDotDot *> (makeTerm loc <$> (Go.Syntax.Variadic <$> (makeTerm loc <$> (Syntax.Identifier <$> source)))))
 
 callExpression :: Assignment
 callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Call <$> pure [] <*> identifier <*> many expression <*> emptyTerm)
