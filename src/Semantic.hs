@@ -67,10 +67,12 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
       parse parser blob >>= decorate constructorLabel . (Nil <$) >>= render renderSExpressionTerm
     | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
       parse syntaxParser blob >>= render renderSExpressionTerm . fmap keepCategory
+
   (TagsTermRenderer, lang)
     | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[HasDeclaration, Foldable, Functor]) ->
       parse parser blob >>= decorate (declarationAlgebra blob) >>= render (renderToTags blob)
-
+    | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
+      parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob) >>= render (renderToTags blob)
 
   _ -> throwError (SomeException (NoParserForLanguage blobPath blobLanguage))
 
