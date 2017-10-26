@@ -238,23 +238,26 @@ syntaxDeclarationAlgebra blob@Blob{..} decl@(In a r) = case r of
   where
     getSource = toText . flip Source.slice blobSource . byteRange . extract
 
+getMethodSource :: HasField fields Range => Blob -> TermF Declaration.Method (Record fields) (Term syntax (Record fields), a) -> T.Text
 getMethodSource Blob{..} (In a r)
   = let declRange = byteRange a
         bodyRange = byteRange <$> case r of
-          Declaration.Method _ _ _ _ ((Term (In a' _)), _) -> Just a'
+          Declaration.Method _ _ _ _ (Term (In a' _), _) -> Just a'
     in maybe mempty (stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
 
+getFunctionSource :: HasField fields Range => Blob -> TermF Declaration.Function (Record fields) (Term syntax (Record fields), a) -> T.Text
 getFunctionSource Blob{..} (In a r)
   = let declRange = byteRange a
         bodyRange = byteRange <$> case r of
-          Declaration.Function _ _ _ ((Term (In a' _)), _) -> Just a'
+          Declaration.Function _ _ _ (Term (In a' _), _) -> Just a'
     in maybe mempty (stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
 
+getSyntaxDeclarationSource :: HasField fields Range => Blob -> TermF Syntax (Record fields) (Term syntax (Record fields), a) -> T.Text
 getSyntaxDeclarationSource Blob{..} (In a r)
   = let declRange = byteRange a
         bodyRange = byteRange <$> case r of
-          S.Function _ _ (((Term (In a' _)), _) : _) -> Just a'
-          S.Method _ _ _ _ (((Term (In a' _)), _) : _) -> Just a'
+          S.Function _ _ ((Term (In a' _), _) : _) -> Just a'
+          S.Method _ _ _ _ ((Term (In a' _), _) : _) -> Just a'
           _ -> Nothing
     in maybe mempty (stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
 
@@ -351,7 +354,7 @@ renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition 
 
 renderToTags :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> [Value]
 renderToTags Blob{..} = fmap toJSON . toTagList . List.filter isValidSummary . termToC
-  where toTagList as = (summaryToTag blobLanguage blobPath <$> as)
+  where toTagList as = summaryToTag blobLanguage blobPath <$> as
 
 summaryToTag :: Maybe Language -> FilePath -> JSONSummary -> Tag
 summaryToTag lang path JSONSummary{..} = Tag summaryTermName (T.pack path) (T.pack . show <$> lang) summaryCategoryName summaryTermText summarySpan
