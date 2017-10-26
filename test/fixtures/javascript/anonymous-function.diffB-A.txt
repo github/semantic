@@ -3,14 +3,13 @@
     (Empty)
     (Empty)
     (Empty)
-    (RequiredParameter
-      (Empty)
-      (Empty)
-      (Empty)
-      (Assignment
-      { (Identifier)
-      ->(Identifier) }
-        (Empty)))
+  {+(RequiredParameter
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Empty)+}
+    {+(Assignment
+      {+(Identifier)+}
+      {+(Empty)+})+})+}
     (RequiredParameter
       (Empty)
       (Empty)
@@ -18,6 +17,13 @@
       (Assignment
         (Identifier)
         (Empty)))
+  {-(RequiredParameter
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Assignment
+      {-(Identifier)-}
+      {-(Empty)-})-})-}
     (
       (Return
       { (Times

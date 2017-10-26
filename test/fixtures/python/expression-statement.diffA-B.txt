@@ -9,9 +9,10 @@
     (Integer))
 {+(Identifier)+}
   (
+  {+(Integer)+}
     (Integer)
     (Integer)
-    (Integer))
+  {-(Integer)-})
 {+(Plus
   {+(Identifier)+}
   {+(Identifier)+})+})

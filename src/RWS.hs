@@ -1,6 +1,8 @@
 {-# LANGUAGE GADTs, DataKinds, RankNTypes, TypeOperators #-}
 module RWS
 ( rws
+, Options(..)
+, defaultOptions
 , ComparabilityRelation
 , FeatureVector(..)
 , defaultFeatureVectorDecorator
@@ -14,7 +16,8 @@ module RWS
 
 import Control.Applicative (empty)
 import Control.Arrow ((&&&))
-import Control.Monad.Random
+import Control.Monad (replicateM)
+import Control.Monad.Random.Strict
 import Control.Monad.State.Strict
 import Data.Align.Generic
 import Data.Array.Unboxed
@@ -24,8 +27,7 @@ import Data.Function ((&))
 import Data.Functor.Classes
 import Data.Functor.Foldable
 import Data.Hashable
-import qualified Data.IntMap as IntMap
-import Data.KdMap.Static hiding (elems, empty)
+import qualified Data.KdMap.Static as KdMap
 import Data.List (sortOn)
 import Data.Maybe
 import Data.Record
@@ -46,219 +48,76 @@ type ComparabilityRelation syntax ann1 ann2 = forall a b. TermF syntax ann1 a ->
 newtype FeatureVector = FV { unFV :: UArray Int Double }
   deriving (Eq, Ord, Show)
 
--- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
-data UnmappedTerm syntax ann = UnmappedTerm
-  { termIndex :: {-# UNPACK #-} !Int -- ^ The index of the term within its root term.
-  , feature   :: {-# UNPACK #-} !FeatureVector -- ^ Feature vector
-  , term      :: Term syntax ann -- ^ The unmapped term
-  }
-
--- | Either a `term`, an index of a matched term, or nil.
-data TermOrIndexOrNone term = Term term | Index {-# UNPACK #-} !Int | None
-
 rws :: (Foldable syntax, Functor syntax, GAlign syntax)
     => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
     -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool)
     -> [Term syntax (Record (FeatureVector ': fields1))]
     -> [Term syntax (Record (FeatureVector ': fields2))]
-    -> RWSEditScript syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
+    -> EditScript (Term syntax (Record (FeatureVector ': fields1))) (Term syntax (Record (FeatureVector ': fields2)))
 rws _          _          as [] = This <$> as
 rws _          _          [] bs = That <$> bs
 rws canCompare _          [a] [b] = if canCompareTerms canCompare a b then [These a b] else [That b, This a]
-rws canCompare equivalent as bs =
-  let sesDiffs = ses equivalent as bs
-      (featureAs, featureBs, mappedDiffs, allDiffs) = genFeaturizedTermsAndDiffs sesDiffs
-      (diffs, remaining) = findNearestNeighboursToDiff canCompare allDiffs featureAs featureBs
-      diffs' = deleteRemaining diffs remaining
-      rwsDiffs = insertMapped mappedDiffs diffs'
-  in fmap snd rwsDiffs
+rws canCompare equivalent as bs
+  = ses equivalent as bs
+  & mapContiguous [] []
+  where Options{..} = defaultOptions
 
--- | An IntMap of unmapped terms keyed by their position in a list of terms.
-type UnmappedTerms syntax ann = IntMap.IntMap (UnmappedTerm syntax ann)
+        -- Map contiguous sequences of unmapped terms separated by SES-mapped equivalencies.
+        mapContiguous as bs [] = mapSimilar (reverse as) (reverse bs)
+        mapContiguous as bs (first : rest) = case first of
+          This  a   -> mapContiguous (a : as)      bs  rest
+          That    b -> mapContiguous      as  (b : bs) rest
+          These _ _ -> mapSimilar (reverse as) (reverse bs) <> (first : mapContiguous [] [] rest)
 
-type Edit syntax ann1 ann2 = These (Term syntax ann1) (Term syntax ann2)
+        -- Map comparable, mutually similar terms, inserting & deleting surrounding terms.
+        mapSimilar as' bs' = go as bs
+          where go as [] = This . snd <$> as
+                go [] bs = That . snd <$> bs
+                go [a] [b] | canCompareTerms canCompare (snd a) (snd b) = [These (snd a) (snd b)]
+                           | otherwise = [That (snd b), This (snd a)]
+                go as@((i, _) : _) ((j, b) : restB) =
+                  fromMaybe (That b : go as restB) $ do
+                    -- Look up the most similar term to b near i.
+                    (i', a) <- mostSimilarMatching (\ i' a -> inRange (i, i + optionsLookaheadPlaces) i' && canCompareTerms canCompare a b) kdMapA b
+                    -- Look up the most similar term to a near j.
+                    (j', _) <- mostSimilarMatching (\ j' b -> inRange (j, j + optionsLookaheadPlaces) j' && canCompareTerms canCompare a b) kdMapB a
+                    -- Fail out if there’s a better match for a nearby.
+                    guard (j == j')
+                    -- Delete any elements of as before the selected element.
+                    let (deleted, _ : restA) = span ((< i') . fst) as
+                    pure $! (This . snd <$> deleted) <> (These a b : go restA restB)
+                (as, bs) = (zip [0..] as', zip [0..] bs')
+                (kdMapA, kdMapB) = (toKdMap as, toKdMap bs)
 
--- A Diff paired with both its indices
-type MappedDiff syntax ann1 ann2 = (These Int Int, Edit syntax ann1 ann2)
+        -- Find the most similar term matching a predicate, if any.
+        --
+        -- RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which don’t match the predicate, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
+        --
+        -- cf §4.2 of RWS-Diff
+        mostSimilarMatching isEligible tree term = listToMaybe (sortOn (editDistanceUpTo optionsNodeComparisons term . snd) candidates)
+          where candidates = filter (uncurry isEligible) (snd <$> KdMap.kNearest tree optionsMaxSimilarTerms (rhead (extract term)))
 
-type RWSEditScript syntax ann1 ann2 = [Edit syntax ann1 ann2]
+data Options = Options
+  { optionsLookaheadPlaces :: {-# UNPACK #-} !Int -- ^ How many places ahead should we look for similar terms?
+  , optionsMaxSimilarTerms :: {-# UNPACK #-} !Int -- ^ The maximum number of similar terms to consider.
+  , optionsNodeComparisons :: {-# UNPACK #-} !Int -- ^ The number of nodes to compare when selecting the most similar term.
+  }
 
-insertMapped :: Foldable t
-             => t (MappedDiff syntax ann1 ann2)
-             -> [MappedDiff syntax ann1 ann2]
-             -> [MappedDiff syntax ann1 ann2]
-insertMapped diffs into = foldl' (flip insertDiff) into diffs
+defaultOptions :: Options
+defaultOptions = Options
+  { optionsLookaheadPlaces = 0
+  , optionsMaxSimilarTerms = 2
+  , optionsNodeComparisons = 10
+  }
 
-deleteRemaining :: Traversable t
-                => [MappedDiff syntax ann1 ann2]
-                -> t (UnmappedTerm syntax ann1)
-                -> [MappedDiff syntax ann1 ann2]
-deleteRemaining diffs unmappedAs =
-  foldl' (flip insertDiff) diffs ((This . termIndex &&& This . term) <$> unmappedAs)
-
--- | Inserts an index and diff pair into a list of indices and diffs.
-insertDiff :: MappedDiff syntax ann1 ann2
-           -> [MappedDiff syntax ann1 ann2]
-           -> [MappedDiff syntax ann1 ann2]
-insertDiff inserted [] = [ inserted ]
-insertDiff a@(ij1, _) (b@(ij2, _):rest) = case (ij1, ij2) of
-  (These i1 i2, These j1 j2) -> if i1 <= j1 && i2 <= j2 then a : b : rest else b : insertDiff a rest
-  (This i, This j) -> if i <= j then a : b : rest else b : insertDiff a rest
-  (That i, That j) -> if i <= j then a : b : rest else b : insertDiff a rest
-  (This i, These j _) -> if i <= j then a : b : rest else b : insertDiff a rest
-  (That i, These _ j) -> if i <= j then a : b : rest else b : insertDiff a rest
-
-  (This _, That _) -> b : insertDiff a rest
-  (That _, This _) -> b : insertDiff a rest
-
-  (These i1 i2, _) -> case break (isThese . fst) rest of
-    (rest, tail) -> let (before, after) = foldr' (combine i1 i2) ([], []) (b : rest) in
-       case after of
-         [] -> before <> insertDiff a tail
-         _ -> before <> (a : after) <> tail
-  where
-    combine i1 i2 each (before, after) = case fst each of
-      This j1 -> if i1 <= j1 then (before, each : after) else (each : before, after)
-      That j2 -> if i2 <= j2 then (before, each : after) else (each : before, after)
-      These _ _ -> (before, after)
-
-findNearestNeighboursToDiff :: (Foldable syntax, Functor syntax, GAlign syntax)
-                            => ComparabilityRelation syntax ann1 ann2 -- ^ A relation determining whether two terms can be compared.
-                            -> [TermOrIndexOrNone (UnmappedTerm syntax ann2)]
-                            -> [UnmappedTerm syntax ann1]
-                            -> [UnmappedTerm syntax ann2]
-                            -> ([MappedDiff syntax ann1 ann2], UnmappedTerms syntax ann1)
-findNearestNeighboursToDiff canCompare allDiffs featureAs featureBs = (diffs, remaining)
-  where
-    (diffs, (_, remaining, _)) =
-      traverse (findNearestNeighbourToDiff' canCompare (toKdMap featureAs) (toKdMap featureBs)) allDiffs &
-      fmap catMaybes &
-      (`runState` (minimumTermIndex featureAs, toMap featureAs, toMap featureBs))
-
-findNearestNeighbourToDiff' :: (Foldable syntax, Functor syntax, GAlign syntax)
-                            => ComparabilityRelation syntax ann1 ann2 -- ^ A relation determining whether two terms can be compared.
-                            -> KdMap Double FeatureVector (UnmappedTerm syntax ann1)
-                            -> KdMap Double FeatureVector (UnmappedTerm syntax ann2)
-                            -> TermOrIndexOrNone (UnmappedTerm syntax ann2)
-                            -> State (Int, UnmappedTerms syntax ann1, UnmappedTerms syntax ann2)
-                                     (Maybe (MappedDiff syntax ann1 ann2))
-findNearestNeighbourToDiff' canCompare kdTreeA kdTreeB termThing = case termThing of
-  None -> pure Nothing
-  RWS.Term term -> Just <$> findNearestNeighbourTo canCompare kdTreeA kdTreeB term
-  Index i -> modify' (\ (_, unA, unB) -> (i, unA, unB)) >> pure Nothing
-
--- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
-findNearestNeighbourTo :: (Foldable syntax, Functor syntax, GAlign syntax)
-                       => ComparabilityRelation syntax ann1 ann2 -- ^ A relation determining whether two terms can be compared.
-                       -> KdMap Double FeatureVector (UnmappedTerm syntax ann1)
-                       -> KdMap Double FeatureVector (UnmappedTerm syntax ann2)
-                       -> UnmappedTerm syntax ann2
-                       -> State (Int, UnmappedTerms syntax ann1, UnmappedTerms syntax ann2)
-                                (MappedDiff syntax ann1 ann2)
-findNearestNeighbourTo canCompare kdTreeA kdTreeB term@(UnmappedTerm j _ b) = do
-  (previous, unmappedA, unmappedB) <- get
-  fromMaybe (insertion previous unmappedA unmappedB term) $ do
-    -- Look up the nearest unmapped term in `unmappedA`.
-    foundA@(UnmappedTerm i _ a) <- nearestUnmapped canCompare (termsWithinMoveBoundsFrom previous unmappedA) kdTreeA term
-    -- Look up the nearest `foundA` in `unmappedB`
-    UnmappedTerm j' _ _ <- nearestUnmapped (flip canCompare) (termsWithinMoveBoundsFrom (pred j) unmappedB) kdTreeB foundA
-    -- Return Nothing if their indices don't match
-    guard (j == j')
-    guard (canCompareTerms canCompare a b)
-    pure $! do
-      put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
-      pure (These i j, These a b)
-    where termsWithinMoveBoundsFrom bound = IntMap.filterWithKey (\ k _ -> isInMoveBounds bound k)
-
-isInMoveBounds :: Int -> Int -> Bool
-isInMoveBounds previous i = previous < i && i < previous + defaultMoveBound
-
--- | Finds the most-similar unmapped term to the passed-in term, if any.
---
--- RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which have already been mapped, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
---
--- cf §4.2 of RWS-Diff
-nearestUnmapped :: (Foldable syntax, Functor syntax, GAlign syntax)
-                => ComparabilityRelation syntax ann1 ann2 -- ^ A relation determining whether two terms can be compared.
-                -> UnmappedTerms syntax ann1 -- ^ A set of terms eligible for matching against.
-                -> KdMap Double FeatureVector (UnmappedTerm syntax ann1) -- ^ The k-d tree to look up nearest neighbours within.
-                -> UnmappedTerm syntax ann2 -- ^ The term to find the nearest neighbour to.
-                -> Maybe (UnmappedTerm syntax ann1) -- ^ The most similar unmapped term, if any.
-nearestUnmapped canCompare unmapped tree key = listToMaybe (sortOn approximateEditDistance candidates)
-  where candidates = toList (IntMap.intersection unmapped (toMap (fmap snd (kNearest tree defaultL (feature key)))))
-        approximateEditDistance = editDistanceIfComparable (flip canCompare) (term key) . term
-
-editDistanceIfComparable :: (Foldable syntax, Functor syntax, GAlign syntax)
-                         => ComparabilityRelation syntax ann1 ann2
-                         -> Term syntax ann1
-                         -> Term syntax ann2
-                         -> Int
-editDistanceIfComparable canCompare a b = if canCompareTerms canCompare a b
-  then editDistanceUpTo defaultM (These a b)
-  else maxBound
-
-defaultD, defaultL, defaultP, defaultQ, defaultMoveBound :: Int
+defaultD, defaultP, defaultQ :: Int
 defaultD = 15
-defaultL = 2
 defaultP = 2
 defaultQ = 3
-defaultMoveBound = 2
 
 
--- Returns a state (insertion index, old unmapped terms, new unmapped terms), and value of (index, inserted diff),
--- given a previous index, two sets of umapped terms, and an unmapped term to insert.
-insertion :: Int
-          -> UnmappedTerms syntax ann1
-          -> UnmappedTerms syntax ann2
-          -> UnmappedTerm syntax ann2
-          -> State (Int, UnmappedTerms syntax ann1, UnmappedTerms syntax ann2)
-                   (MappedDiff syntax ann1 ann2)
-insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
-  put (previous, unmappedA, IntMap.delete j unmappedB)
-  pure (That j, That b)
-
-genFeaturizedTermsAndDiffs :: Functor syntax
-                           => RWSEditScript syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
-                           -> ( [UnmappedTerm syntax (Record (FeatureVector ': fields1))]
-                              , [UnmappedTerm syntax (Record (FeatureVector ': fields2))]
-                              , [MappedDiff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))]
-                              , [TermOrIndexOrNone (UnmappedTerm syntax (Record (FeatureVector ': fields2)))]
-                              )
-genFeaturizedTermsAndDiffs sesDiffs = let Mapping _ _ a b c d = foldl' combine (Mapping 0 0 [] [] [] []) sesDiffs in (reverse a, reverse b, reverse c, reverse d)
-  where combine (Mapping counterA counterB as bs mappedDiffs allDiffs) diff = case diff of
-          This term -> Mapping (succ counterA) counterB (featurize counterA term : as) bs mappedDiffs (None : allDiffs)
-          That term -> Mapping counterA (succ counterB) as (featurize counterB term : bs) mappedDiffs (RWS.Term (featurize counterB term) : allDiffs)
-          These a b -> Mapping (succ counterA) (succ counterB) as bs ((These counterA counterB, These a b) : mappedDiffs) (Index counterA : allDiffs)
-
-data Mapping syntax ann1 ann2
-  = Mapping
-    {-# UNPACK #-} !Int
-    {-# UNPACK #-} !Int
-    ![UnmappedTerm syntax ann1]
-    ![UnmappedTerm syntax ann2]
-    ![MappedDiff syntax ann1 ann2]
-    ![TermOrIndexOrNone (UnmappedTerm syntax ann2)]
-
-featurize :: Functor syntax => Int -> Term syntax (Record (FeatureVector ': fields)) -> UnmappedTerm syntax (Record (FeatureVector ': fields))
-featurize index term = UnmappedTerm index (getField (extract term)) (eraseFeatureVector term)
-
-eraseFeatureVector :: Functor syntax => Term syntax (Record (FeatureVector ': fields)) -> Term syntax (Record (FeatureVector ': fields))
-eraseFeatureVector (Term.Term (In record functor)) = termIn (setFeatureVector record nullFeatureVector) functor
-
-nullFeatureVector :: FeatureVector
-nullFeatureVector = FV $ listArray (0, 0) [0]
-
-setFeatureVector :: Record (FeatureVector ': fields) -> FeatureVector -> Record (FeatureVector ': fields)
-setFeatureVector = setField
-
-minimumTermIndex :: [UnmappedTerm syntax ann] -> Int
-minimumTermIndex = pred . maybe 0 getMin . getOption . foldMap (Option . Just . Min . termIndex)
-
-toMap :: [UnmappedTerm syntax ann] -> IntMap.IntMap (UnmappedTerm syntax ann)
-toMap = IntMap.fromList . fmap (termIndex &&& id)
-
-toKdMap :: [UnmappedTerm syntax ann] -> KdMap Double FeatureVector (UnmappedTerm syntax ann)
-toKdMap = build (elems . unFV) . fmap (feature &&& id)
+toKdMap :: Functor syntax => [(Int, Term syntax (Record (FeatureVector ': fields)))] -> KdMap.KdMap Double FeatureVector (Int, Term syntax (Record (FeatureVector ': fields)))
+toKdMap = KdMap.build (elems . unFV) . fmap (rhead . extract . snd &&& id)
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
@@ -316,7 +175,7 @@ unitVector :: Int -> Int -> FeatureVector
 unitVector d hash = FV $ listArray (0, d - 1) ((* invMagnitude) <$> components)
   where
     invMagnitude = 1 / sqrt (sum (fmap (** 2) components))
-    components = evalRand (sequenceA (replicate d (liftRand randomDouble))) (pureMT (fromIntegral hash))
+    components = evalRand (replicateM d (liftRand randomDouble)) (pureMT (fromIntegral hash))
 
 -- | Test the comparability of two root 'Term's in O(1).
 canCompareTerms :: ComparabilityRelation syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Bool
@@ -328,14 +187,11 @@ equalTerms canCompare = go
   where go a b = canCompareTerms canCompare a b && liftEq go (termOut (unTerm a)) (termOut (unTerm b))
 
 
--- | How many nodes to consider for our constant-time approximation to tree edit distance.
-defaultM :: Integer
-defaultM = 10
-
--- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
--- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
-editDistanceUpTo :: (GAlign syntax, Foldable syntax, Functor syntax) => Integer -> Edit syntax ann1 ann2 -> Int
-editDistanceUpTo m = these termSize termSize (\ a b -> diffCost m (approximateDiff a b))
+-- | Return an edit distance between two terms, up to a certain depth.
+--
+--   Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
+editDistanceUpTo :: (GAlign syntax, Foldable syntax, Functor syntax) => Int -> Term syntax ann1 -> Term syntax ann2 -> Int
+editDistanceUpTo m a b = diffCost m (approximateDiff a b)
   where diffCost = flip . cata $ \ diff m -> case diff of
           _ | m <= 0 -> 0
           Merge body -> sum (fmap ($ pred m) body)
