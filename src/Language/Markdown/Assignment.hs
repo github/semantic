@@ -18,6 +18,7 @@ import Data.Term as Term (Term(..), TermF(..), termIn, unwrap)
 import qualified Data.Text as Text
 import Data.Text.Encoding (encodeUtf8)
 import Data.Union
+import GHC.Stack
 import Language.Markdown as Grammar (Grammar(..))
 import qualified Language.Markdown.Syntax as Markup
 
@@ -50,7 +51,7 @@ type Syntax =
    ]
 
 type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = Assignment.Assignment (TermF [] CMarkGFM.NodeType) Grammar Language.Markdown.Assignment.Term
+type Assignment = HasCallStack => Assignment.Assignment (TermF [] CMarkGFM.NodeType) Grammar Language.Markdown.Assignment.Term
 
 
 assignment :: Assignment

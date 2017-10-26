@@ -20,6 +20,7 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import Data.Union
+import GHC.Stack
 import Language.TypeScript.Grammar as Grammar
 import qualified Language.TypeScript.Syntax as TypeScript.Syntax
 import qualified Data.Term as Term
@@ -281,7 +282,7 @@ anonymousClass = makeTerm <$> symbol Grammar.AnonymousClass <*> children (Declar
 abstractClass :: Assignment
 abstractClass = makeTerm <$> symbol Grammar.AbstractClass <*> (TypeScript.Syntax.AbstractClass <$> identifier <*> (typeParameters <|> emptyTerm) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
 
-classHeritage' :: Assignment.Assignment [] Grammar [Term]
+classHeritage' :: HasCallStack => Assignment.Assignment [] Grammar [Term]
 classHeritage' = symbol Grammar.ClassHeritage *> children (((++) `on` toList) <$> optional extendsClause' <*> optional implementsClause')
 
 extendsClause' :: Assignment
@@ -388,7 +389,7 @@ methodDefinition = makeMethod <$>
   where
     makeMethod loc (modifier, readonly, receiver, propertyName', (typeParameters', params, ty'), statements) = makeTerm loc (Declaration.Method [modifier, readonly, typeParameters', ty'] receiver propertyName' params statements)
 
-callSignatureParts :: Assignment.Assignment [] Grammar (Term, [Term], Term)
+callSignatureParts :: HasCallStack => Assignment.Assignment [] Grammar (Term, [Term], Term)
 callSignatureParts =  symbol Grammar.CallSignature *> children ((,,) <$> (fromMaybe <$> emptyTerm <*> optional typeParameters) <*> formalParameters <*> (fromMaybe <$> emptyTerm <*> optional typeAnnotation'))
 
 callSignature :: Assignment
@@ -404,7 +405,7 @@ methodSignature :: Assignment
 methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> children ((,,,) <$> (accessibilityModifier' <|> emptyTerm) <*> (readonly' <|> emptyTerm) <*> propertyName <*> callSignatureParts)
   where makeMethodSignature loc (modifier, readonly, propertyName, (typeParams, params, annotation)) = makeTerm loc (TypeScript.Syntax.MethodSignature [modifier, readonly, typeParams, annotation] propertyName params)
 
-formalParameters :: Assignment.Assignment [] Grammar [Term]
+formalParameters :: HasCallStack => Assignment.Assignment [] Grammar [Term]
 formalParameters = symbol FormalParameters *> children (concat <$> many ((\as b -> as ++ [b]) <$> many (term decorator) <*> term parameter))
 
 decorator :: Assignment
@@ -502,7 +503,7 @@ constructorTy = makeTerm <$> symbol ConstructorType <*> children (TypeScript.Syn
 statementBlock :: Assignment
 statementBlock = makeTerm <$> symbol StatementBlock <*> children (many statement)
 
-classBodyStatements :: Assignment.Assignment [] Grammar [Term]
+classBodyStatements :: HasCallStack => Assignment.Assignment [] Grammar [Term]
 classBodyStatements = symbol ClassBody *> children (concat <$> many ((\as b -> as ++ [b]) <$> many (term decorator) <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature)))
 
 publicFieldDefinition :: Assignment
@@ -670,7 +671,7 @@ module' :: Assignment
 module' = makeTerm <$> symbol Module <*> children (Declaration.Module <$> (string <|> identifier <|> nestedIdentifier) <*> ((symbol StatementBlock *> children (many statement)) <|> pure []))
 
 
-statements :: Assignment.Assignment [] Grammar [Term]
+statements :: HasCallStack => Assignment.Assignment [] Grammar [Term]
 statements = symbol StatementBlock *> children (many statement)
 
 arrowFunction :: Assignment
@@ -753,7 +754,8 @@ emptyStatement :: Assignment
 emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ source <|> pure Syntax.Empty)
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
-infixTerm :: Assignment
+infixTerm :: HasCallStack
+          => Assignment
           -> Assignment
           -> [Assignment.Assignment [] Grammar (Term -> Term -> Data.Union.Union Syntax Term)]
           -> Assignment.Assignment [] Grammar (Data.Union.Union Syntax Term)
