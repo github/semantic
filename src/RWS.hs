@@ -176,28 +176,25 @@ pqGramDecorator getLabel p q = cata algebra
 
 -- | Computes a unit vector of the specified dimension from a hash.
 unitVector :: Int -> Int -> FeatureVector
-unitVector _ !hash = FV (invMagnitude *## d00) (invMagnitude *## d01) (invMagnitude *## d02) (invMagnitude *## d03) (invMagnitude *## d04) (invMagnitude *## d05) (invMagnitude *## d06) (invMagnitude *## d07) (invMagnitude *## d08) (invMagnitude *## d09) (invMagnitude *## d10) (invMagnitude *## d11) (invMagnitude *## d12) (invMagnitude *## d13) (invMagnitude *## d14)
-  where
-    !(D# zero) = 0
-    !(D# one) = 1
-    r = pureMT (fromIntegral hash)
-    !(# d00, s00, r00 #) = component r zero
-    !(# d01, s01, r01 #) = component r00 s00
-    !(# d02, s02, r02 #) = component r01 s01
-    !(# d03, s03, r03 #) = component r02 s02
-    !(# d04, s04, r04 #) = component r03 s03
-    !(# d05, s05, r05 #) = component r04 s04
-    !(# d06, s06, r06 #) = component r05 s05
-    !(# d07, s07, r07 #) = component r06 s06
-    !(# d08, s08, r08 #) = component r07 s07
-    !(# d09, s09, r09 #) = component r08 s08
-    !(# d10, s10, r10 #) = component r09 s09
-    !(# d11, s11, r11 #) = component r10 s10
-    !(# d12, s12, r12 #) = component r11 s11
-    !(# d13, s13, r13 #) = component r12 s12
-    !(# d14, s14, _   #) = component r13 s13
-    !invMagnitude = one /## sqrtDouble# s14
-    component !rng !sum = let !(!(D# v), !rng') = randomDouble rng in (# v, sum +## v *## v, rng' #)
+unitVector _ !hash =
+  let !(D# d00, r00) = randomDouble (pureMT (fromIntegral hash))
+      !(D# d01, r01) = randomDouble r00
+      !(D# d02, r02) = randomDouble r01
+      !(D# d03, r03) = randomDouble r02
+      !(D# d04, r04) = randomDouble r03
+      !(D# d05, r05) = randomDouble r04
+      !(D# d06, r06) = randomDouble r05
+      !(D# d07, r07) = randomDouble r06
+      !(D# d08, r08) = randomDouble r07
+      !(D# d09, r09) = randomDouble r08
+      !(D# d10, r10) = randomDouble r09
+      !(D# d11, r11) = randomDouble r10
+      !(D# d12, r12) = randomDouble r11
+      !(D# d13, r13) = randomDouble r12
+      !(D# d14, _) = randomDouble r13
+      !(D# one) = 1
+      !invMagnitude = one /## sqrtDouble# (d00 *## d00 +## d01 *## d01 +## d02 *## d02 +## d03 *## d03 +## d04 *## d04 +## d05 *## d05 +## d06 *## d06 +## d07 *## d07 +## d08 *## d08 +## d09 *## d09 +## d10 *## d10 +## d11 *## d11 +## d12 *## d12 +## d13 *## d13 +## d14 *## d14)
+  in FV (invMagnitude *## d00) (invMagnitude *## d01) (invMagnitude *## d02) (invMagnitude *## d03) (invMagnitude *## d04) (invMagnitude *## d05) (invMagnitude *## d06) (invMagnitude *## d07) (invMagnitude *## d08) (invMagnitude *## d09) (invMagnitude *## d10) (invMagnitude *## d11) (invMagnitude *## d12) (invMagnitude *## d13) (invMagnitude *## d14)
 
 -- | Test the comparability of two root 'Term's in O(1).
 canCompareTerms :: ComparabilityRelation syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Bool
