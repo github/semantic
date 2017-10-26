@@ -313,7 +313,7 @@ instance Eq1 ConstructSignature where liftEq = genericLiftEq
 instance Ord1 ConstructSignature where liftCompare = genericLiftCompare
 instance Show1 ConstructSignature where liftShowsPrec = genericLiftShowsPrec
 
-newtype IndexSignature a = IndexSignature { _indexSignatureSubject :: a }
+data IndexSignature a = IndexSignature { _indexSignatureSubject :: a, _indexSignatureType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 IndexSignature where liftEq = genericLiftEq
