@@ -101,7 +101,6 @@ library
                      , hashable
                      , kdt
                      , mersenne-random-pure64
-                     , MonadRandom
                      , mtl
                      , network
                      , network-uri

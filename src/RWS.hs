@@ -16,8 +16,6 @@ module RWS
 
 import Control.Applicative (empty)
 import Control.Arrow ((&&&))
-import Control.Monad (replicateM)
-import Control.Monad.Random.Strict
 import Control.Monad.State.Strict
 import Data.Align.Generic
 import Data.Array.Unboxed
@@ -174,8 +172,10 @@ pqGramDecorator getLabel p q = cata algebra
 unitVector :: Int -> Int -> FeatureVector
 unitVector d hash = FV $ listArray (0, d - 1) ((* invMagnitude) <$> components)
   where
-    invMagnitude = 1 / sqrt (sum (fmap (** 2) components))
-    components = evalRand (replicateM d (liftRand randomDouble)) (pureMT (fromIntegral hash))
+    invMagnitude = 1 / sqrt (foldr (\ x y -> x * x + y) 0 components)
+    components = go d (pureMT (fromIntegral hash)) []
+    go n rng vs | n < 0 = vs
+                | otherwise = let (v, rng') = randomDouble rng in go (pred n) rng' (v : vs)
 
 -- | Test the comparability of two root 'Term's in O(1).
 canCompareTerms :: ComparabilityRelation syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Bool
