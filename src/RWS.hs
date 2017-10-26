@@ -170,14 +170,14 @@ pqGramDecorator getLabel p q = cata algebra
 
 -- | Computes a unit vector of the specified dimension from a hash.
 unitVector :: Int -> Int -> FeatureVector
-unitVector d hash = FV $ listArray (0, d - 1) (map (* invMagnitude) components)
+unitVector d hash = FV $ listArray (0, d - 1) components
   where
     invMagnitude = 1 / sqrt sum
     (components, !sum) = go d (pureMT (fromIntegral hash)) [] 0
     go !n !rng !vs !sum
       | n < 0     = (vs, sum)
       | otherwise = let (!v, !rng') = randomDouble rng in
-        go (pred n) rng' (v : vs) (sum + v * v)
+        go (pred n) rng' (invMagnitude * v : vs) (sum + v * v)
 
 -- | Test the comparability of two root 'Term's in O(1).
 canCompareTerms :: ComparabilityRelation syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Bool
