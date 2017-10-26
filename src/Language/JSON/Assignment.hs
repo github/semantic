@@ -14,7 +14,6 @@ import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
 import Data.Union
-import GHC.Stack
 import Language.JSON.Grammar as Grammar
 
 type Syntax =
@@ -31,7 +30,7 @@ type Syntax =
   ]
 
 type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
+type Assignment = Assignment.Assignment [] Grammar Term
 
 
 assignment :: Assignment

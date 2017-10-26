@@ -21,7 +21,6 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Term as Term
 import Data.Union
-import GHC.Stack
 import Language.Ruby.Grammar as Grammar
 
 -- | The type of Ruby syntax.
@@ -79,7 +78,7 @@ type Syntax = '[
   ]
 
 type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
+type Assignment = Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
@@ -407,8 +406,7 @@ manyTermsTill :: Show b => Assignment.Assignment [] Grammar Term -> Assignment.A
 manyTermsTill step end = manyTill (step <|> comment) end
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
-infixTerm :: HasCallStack
-          => Assignment
+infixTerm :: Assignment
           -> Assignment
           -> [Assignment.Assignment [] Grammar (Term -> Term -> Union Syntax Term)]
           -> Assignment.Assignment [] Grammar (Union Syntax Term)
