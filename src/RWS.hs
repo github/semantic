@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, DataKinds, RankNTypes, TypeOperators #-}
+{-# LANGUAGE BangPatterns, GADTs, DataKinds, RankNTypes, TypeOperators #-}
 module RWS
 ( rws
 , Options(..)
@@ -170,12 +170,14 @@ pqGramDecorator getLabel p q = cata algebra
 
 -- | Computes a unit vector of the specified dimension from a hash.
 unitVector :: Int -> Int -> FeatureVector
-unitVector d hash = FV $ listArray (0, d - 1) ((* invMagnitude) <$> components)
+unitVector d hash = FV $ listArray (0, d - 1) (map (* invMagnitude) components)
   where
-    invMagnitude = 1 / sqrt (foldr (\ x y -> x * x + y) 0 components)
-    components = go d (pureMT (fromIntegral hash)) []
-    go n rng vs | n < 0 = vs
-                | otherwise = let (v, rng') = randomDouble rng in go (pred n) rng' (v : vs)
+    invMagnitude = 1 / sqrt sum
+    (components, !sum) = go d (pureMT (fromIntegral hash)) [] 0
+    go !n !rng !vs !sum
+      | n < 0     = (vs, sum)
+      | otherwise = let (!v, !rng') = randomDouble rng in
+        go (pred n) rng' (v : vs) (sum + v * v)
 
 -- | Test the comparability of two root 'Term's in O(1).
 canCompareTerms :: ComparabilityRelation syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Bool
