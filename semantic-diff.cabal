@@ -97,6 +97,7 @@ library
                      , filepath
                      , free
                      , freer-cofreer
+                     , ghc-prim
                      , gitrev
                      , hashable
                      , kdt

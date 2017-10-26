@@ -1,4 +1,4 @@
-{-# LANGUAGE BangPatterns, GADTs, DataKinds, RankNTypes, TypeOperators #-}
+{-# LANGUAGE BangPatterns, GADTs, DataKinds, MagicHash, RankNTypes, TypeOperators, UnboxedTuples #-}
 module RWS
 ( rws
 , Options(..)
@@ -18,13 +18,13 @@ import Control.Applicative (empty)
 import Control.Arrow ((&&&))
 import Control.Monad.State.Strict
 import Data.Align.Generic
-import Data.Array.Unboxed
 import Data.Diff (DiffF(..), deleting, inserting, merge, replacing)
 import Data.Foldable
 import Data.Function ((&))
 import Data.Functor.Classes
 import Data.Functor.Foldable
 import Data.Hashable
+import Data.Ix
 import qualified Data.KdMap.Static as KdMap
 import Data.List (sortOn)
 import Data.Maybe
@@ -33,6 +33,8 @@ import Data.Semigroup hiding (First(..))
 import Data.Term as Term
 import Data.These
 import Data.Traversable
+import GHC.Prim
+import GHC.Types
 import SES
 import System.Random.Mersenne.Pure64
 
@@ -43,8 +45,12 @@ type Label f fields label = forall b. TermF f (Record fields) b -> label
 --   This is used both to determine whether two root terms can be compared in O(1), and, recursively, to determine whether two nodes are equal in O(n); thus, comparability is defined s.t. two terms are equal if they are recursively comparable subterm-wise.
 type ComparabilityRelation syntax ann1 ann2 = forall a b. TermF syntax ann1 a -> TermF syntax ann2 b -> Bool
 
-newtype FeatureVector = FV { unFV :: UArray Int Double }
-  deriving (Eq, Ord, Show)
+data FeatureVector = FV !Double# !Double# !Double# !Double# !Double# !Double# !Double# !Double# !Double# !Double# !Double# !Double# !Double# !Double# !Double#
+
+unFV :: FeatureVector -> [Double]
+unFV !(FV d00 d01 d02 d03 d04 d05 d06 d07 d08 d09 d10 d11 d12 d13 d14)
+  = [ D# d00, D# d01, D# d02, D# d03, D# d04, D# d05, D# d06, D# d07, D# d08, D# d09, D# d10, D# d11, D# d12, D# d13, D# d14 ]
+
 
 rws :: (Foldable syntax, Functor syntax, GAlign syntax)
     => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
@@ -115,7 +121,7 @@ defaultQ = 3
 
 
 toKdMap :: Functor syntax => [(Int, Term syntax (Record (FeatureVector ': fields)))] -> KdMap.KdMap Double FeatureVector (Int, Term syntax (Record (FeatureVector ': fields)))
-toKdMap = KdMap.build (elems . unFV) . fmap (rhead . extract . snd &&& id)
+toKdMap = KdMap.build unFV . fmap (rhead . extract . snd &&& id)
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
@@ -139,7 +145,7 @@ featureVectorDecorator getLabel p q d
        addSubtermVector v term = addVectors v (rhead (extract term))
 
        addVectors :: FeatureVector -> FeatureVector -> FeatureVector
-       addVectors (FV as) (FV bs) = FV $ listArray (0, pred d) (map (\ i -> as ! i + bs ! i) [0..pred d])
+       addVectors !(FV a0 a1 a2 a3 a4 a5 a6 a7 a8 a9 a10 a11 a12 a13 a14) !(FV b0 b1 b2 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 b13 b14) = FV (a0 +## b0) (a1 +## b1) (a2 +## b2) (a3 +## b3) (a4 +## b4) (a5 +## b5) (a6 +## b6) (a7 +## b7) (a8 +## b8) (a9 +## b9) (a10 +## b10) (a11 +## b11) (a12 +## b12) (a13 +## b13) (a14 +## b14)
 
 -- | Annotates a term with the corresponding p,q-gram at each node.
 pqGramDecorator
@@ -170,13 +176,28 @@ pqGramDecorator getLabel p q = cata algebra
 
 -- | Computes a unit vector of the specified dimension from a hash.
 unitVector :: Int -> Int -> FeatureVector
-unitVector !d !hash = FV $ listArray (0, pred d) components
+unitVector _ !hash = FV (invMagnitude *## d00) (invMagnitude *## d01) (invMagnitude *## d02) (invMagnitude *## d03) (invMagnitude *## d04) (invMagnitude *## d05) (invMagnitude *## d06) (invMagnitude *## d07) (invMagnitude *## d08) (invMagnitude *## d09) (invMagnitude *## d10) (invMagnitude *## d11) (invMagnitude *## d12) (invMagnitude *## d13) (invMagnitude *## d14)
   where
-    invMagnitude = 1 / sqrt sum
-    (components, !sum) = go d (pureMT (fromIntegral hash)) [] 0
-    go 0 _ !vs !sum = (vs, sum)
-    go !n !rng !vs !sum = let (!v, !rng') = randomDouble rng in
-      go (pred n) rng' (invMagnitude * v : vs) (sum + v * v)
+    !(D# zero) = 0
+    !(D# one) = 1
+    r = pureMT (fromIntegral hash)
+    !(# d00, s00, r00 #) = component r zero
+    !(# d01, s01, r01 #) = component r00 s00
+    !(# d02, s02, r02 #) = component r01 s01
+    !(# d03, s03, r03 #) = component r02 s02
+    !(# d04, s04, r04 #) = component r03 s03
+    !(# d05, s05, r05 #) = component r04 s04
+    !(# d06, s06, r06 #) = component r05 s05
+    !(# d07, s07, r07 #) = component r06 s06
+    !(# d08, s08, r08 #) = component r07 s07
+    !(# d09, s09, r09 #) = component r08 s08
+    !(# d10, s10, r10 #) = component r09 s09
+    !(# d11, s11, r11 #) = component r10 s10
+    !(# d12, s12, r12 #) = component r11 s11
+    !(# d13, s13, r13 #) = component r12 s12
+    !(# d14, s14, _   #) = component r13 s13
+    !invMagnitude = one /## sqrtDouble# s14
+    component !rng !sum = let !(!(D# v), !rng') = randomDouble rng in (# v, sum +## v *## v, rng' #)
 
 -- | Test the comparability of two root 'Term's in O(1).
 canCompareTerms :: ComparabilityRelation syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Bool
