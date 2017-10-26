@@ -9,7 +9,6 @@ module RWS
 , featureVectorDecorator
 , pqGramDecorator
 , Gram(..)
-, defaultD
 , canCompareTerms
 , equalTerms
 ) where
@@ -114,8 +113,7 @@ defaultOptions = Options
   , optionsNodeComparisons = 10
   }
 
-defaultD, defaultP, defaultQ :: Int
-defaultD = 15
+defaultP, defaultQ :: Int
 defaultP = 2
 defaultQ = 3
 
@@ -133,14 +131,14 @@ defaultFeatureVectorDecorator
  => Label f fields label
  -> Term f (Record fields)
  -> Term f (Record (FeatureVector ': fields))
-defaultFeatureVectorDecorator getLabel = featureVectorDecorator getLabel defaultP defaultQ defaultD
+defaultFeatureVectorDecorator getLabel = featureVectorDecorator getLabel defaultP defaultQ
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
-featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (FeatureVector ': fields))
-featureVectorDecorator getLabel p q d
+featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Term f (Record fields) -> Term f (Record (FeatureVector ': fields))
+featureVectorDecorator getLabel p q
  = cata collect
  . pqGramDecorator getLabel p q
- where collect (In (gram :. rest) functor) = termIn (foldl' addSubtermVector (unitVector d (hash gram)) functor :. rest) functor
+ where collect (In (gram :. rest) functor) = termIn (foldl' addSubtermVector (unitVector (hash gram)) functor :. rest) functor
        addSubtermVector :: Functor f => FeatureVector -> Term f (Record (FeatureVector ': fields)) -> FeatureVector
        addSubtermVector v term = addVectors v (rhead (extract term))
 
@@ -175,8 +173,8 @@ pqGramDecorator getLabel p q = cata algebra
     padToSize n list = take n (list <> repeat empty)
 
 -- | Computes a unit vector of the specified dimension from a hash.
-unitVector :: Int -> Int -> FeatureVector
-unitVector _ !hash =
+unitVector :: Int -> FeatureVector
+unitVector !hash =
   let !(D# d00, r00) = randomDouble (pureMT (fromIntegral hash))
       !(D# d01, r01) = randomDouble r00
       !(D# d02, r02) = randomDouble r01
