@@ -175,7 +175,7 @@ unitVector !d !hash = FV $ listArray (0, pred d) components
     invMagnitude = 1 / sqrt sum
     (components, !sum) = go d (pureMT (fromIntegral hash)) [] 0
     go !n !rng !vs !sum
-      | n < 0     = (vs, sum)
+      | n <= 0    = (vs, sum)
       | otherwise = let (!v, !rng') = randomDouble rng in
         go (pred n) rng' (invMagnitude * v : vs) (sum + v * v)
 
