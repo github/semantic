@@ -71,7 +71,7 @@ instance ToJSON Summaries where
 data Tag
   = Tag { tagSymbol :: T.Text
         , tagPath :: T.Text
-        , tagLanguageId :: Maybe T.Text
+        , tagLanguage :: Maybe T.Text
         , tagKind :: T.Text
         , tagLine :: T.Text
         , tagSpan :: Span
@@ -79,7 +79,7 @@ data Tag
   deriving (Generic, Eq, Show)
 
 instance ToJSON Tag where
-  toJSON Tag{..} = object [ "symbol" .= tagSymbol, "path" .= tagPath, "language_id" .= tagLanguageId, "kind" .= tagKind, "line" .= tagLine, "span" .= tagSpan ]
+  toJSON Tag{..} = object [ "symbol" .= tagSymbol, "path" .= tagPath, "language" .= tagLanguage, "kind" .= tagKind, "line" .= tagLine, "span" .= tagSpan ]
 
 
 data JSONSummary
