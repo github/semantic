@@ -1,15 +1,31 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeFamilies, TypeOperators #-}
-module Data.Diff where
+module Data.Diff
+( Diff(..)
+, DiffF(..)
+, replacing
+, inserting
+, insertF
+, deleting
+, deleteF
+, merge
+, mergeF
+, merging
+, diffPatches
+, beforeTerm
+, afterTerm
+, stripDiff
+) where
 
+import Control.Applicative ((<|>))
 import Data.Aeson
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
-import Data.Foldable (toList)
+import Data.Foldable (asum, toList)
 import Data.Functor.Classes
 import Data.Functor.Foldable hiding (fold)
 import Data.JSON.Fields
-import Data.Mergeable
+import Data.Mergeable (Mergeable(sequenceAlt))
 import Data.Patch
 import Data.Record
 import Data.Term
@@ -61,16 +77,6 @@ merging :: Functor syntax => Term syntax ann -> Diff syntax ann ann
 merging = cata (\ (In ann syntax) -> mergeF (In (ann, ann) syntax))
 
 
-diffSum :: (Foldable syntax, Functor syntax) => (forall a b. Patch a b -> Int) -> Diff syntax ann1 ann2 -> Int
-diffSum patchCost = cata $ \ diff -> case diff of
-  Patch patch -> patchCost patch + sum (sum <$> patch)
-  Merge merge -> sum merge
-
--- | The sum of the node count of the diff’s patches.
-diffCost :: (Foldable syntax, Functor syntax) => Diff syntax ann1 ann2 -> Int
-diffCost = diffSum (const 1)
-
-
 diffPatch :: Diff syntax ann1 ann2 -> Maybe (Patch (TermF syntax ann1 (Diff syntax ann1 ann2)) (TermF syntax ann2 (Diff syntax ann1 ann2)))
 diffPatch diff = case unDiff diff of
   Patch patch -> Just patch
@@ -82,21 +88,17 @@ diffPatches = para $ \ diff -> case diff of
   Merge merge ->                                                foldMap (toList . diffPatch . fst)  merge
 
 
--- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
-mergeMaybe :: (Mergeable syntax, Traversable syntax) => (DiffF syntax ann1 ann2 (Maybe (Term syntax combined)) -> Maybe (Term syntax combined)) -> Diff syntax ann1 ann2 -> Maybe (Term syntax combined)
-mergeMaybe = cata
-
 -- | Recover the before state of a diff.
 beforeTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann1 ann2 -> Maybe (Term syntax ann1)
-beforeTerm = mergeMaybe $ \ diff -> case diff of
-  Patch patch -> before patch >>= \ (In a l) -> termIn a <$> sequenceAlt l
-  Merge  (In (a, _) l) -> termIn a <$> sequenceAlt l
+beforeTerm = cata $ \ diff -> case diff of
+  Patch patch -> (before patch >>= \ (In  a     l) -> termIn a <$> sequenceAlt l) <|> (after patch >>= asum)
+  Merge                              (In (a, _) l) -> termIn a <$> sequenceAlt l
 
 -- | Recover the after state of a diff.
 afterTerm :: (Mergeable syntax, Traversable syntax) => Diff syntax ann1 ann2 -> Maybe (Term syntax ann2)
-afterTerm = mergeMaybe $ \ diff -> case diff of
-  Patch patch -> after patch >>= \ (In b r) -> termIn b <$> sequenceAlt r
-  Merge  (In (_, b) r) -> termIn b <$> sequenceAlt r
+afterTerm = cata $ \ diff -> case diff of
+  Patch patch -> (after patch >>= \ (In     b  r) -> termIn b <$> sequenceAlt r) <|> (before patch >>= asum)
+  Merge                             (In (_, b) r) -> termIn b <$> sequenceAlt r
 
 
 -- | Strips the head annotation off a diff annotated with non-empty records.

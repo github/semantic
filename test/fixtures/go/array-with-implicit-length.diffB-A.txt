@@ -15,5 +15,5 @@
           ->(NumberLiteral) }
           { (NumberLiteral)
           ->(NumberLiteral) }
-          {+(NumberLiteral)+}
-          {-(NumberLiteral)-}))))))
+          { (NumberLiteral)
+          ->(NumberLiteral) }))))))
