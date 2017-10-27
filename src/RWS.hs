@@ -4,7 +4,7 @@ module RWS
 , Options(..)
 , defaultOptions
 , ComparabilityRelation
-, FeatureVector(..)
+, FeatureVector
 , defaultFeatureVectorDecorator
 , featureVectorDecorator
 , pqGramDecorator
