@@ -86,7 +86,6 @@ data TOCSummary
   = TOCSummary
     { summaryCategoryName :: T.Text
     , summaryTermName :: T.Text
-    , summaryTermText :: T.Text
     , summarySpan :: Span
     , summaryChangeType :: T.Text
     }
@@ -334,7 +333,7 @@ entrySummary entry = case entry of
 recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => T.Text -> Record fields -> Maybe TOCSummary
 recordSummary changeText record = case getDeclaration record of
   Just (ErrorDeclaration text _ language) -> Just $ ErrorSummary text (sourceSpan record) language
-  Just declaration -> Just $ TOCSummary (toCategoryName declaration) (formatIdentifier declaration) (declarationText declaration) (sourceSpan record) changeText
+  Just declaration -> Just $ TOCSummary (toCategoryName declaration) (formatIdentifier declaration) (sourceSpan record) changeText
   Nothing -> Nothing
   where
     formatIdentifier (MethodDeclaration identifier _ (Just Language.Go) (Just receiver)) = "(" <> receiver <> ") " <> identifier
