@@ -33,7 +33,7 @@ unitVector !hash =
       !(D# d11, r11) = randomDouble r10
       !(D# d12, r12) = randomDouble r11
       !(D# d13, r13) = randomDouble r12
-      !(D# d14, _) = randomDouble r13
+      !(D# d14, _)   = randomDouble r13
       !(D# one) = 1
       !invMagnitude = one /## sqrtDouble# (d00 *## d00 +## d01 *## d01 +## d02 *## d02 +## d03 *## d03 +## d04 *## d04 +## d05 *## d05 +## d06 *## d06 +## d07 *## d07 +## d08 *## d08 +## d09 *## d09 +## d10 *## d10 +## d11 *## d11 +## d12 *## d12 +## d13 *## d13 +## d14 *## d14)
   in FV (invMagnitude *## d00) (invMagnitude *## d01) (invMagnitude *## d02) (invMagnitude *## d03) (invMagnitude *## d04) (invMagnitude *## d05) (invMagnitude *## d06) (invMagnitude *## d07) (invMagnitude *## d08) (invMagnitude *## d09) (invMagnitude *## d10) (invMagnitude *## d11) (invMagnitude *## d12) (invMagnitude *## d13) (invMagnitude *## d14)
