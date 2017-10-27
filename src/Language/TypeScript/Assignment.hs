@@ -585,7 +585,7 @@ debuggerStatement :: Assignment
 debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> (TypeScript.Syntax.Debugger <$ source)
 
 expressionStatement' :: Assignment
-expressionStatement' = symbol ExpressionStatement *> children (term expression <|> term sequenceExpression)
+expressionStatement' = symbol ExpressionStatement *> children (term (expression <|> sequenceExpression))
 
 declaration :: Assignment
 declaration = everything
