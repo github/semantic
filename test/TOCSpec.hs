@@ -175,14 +175,14 @@ numTocSummaries diff = length $ filter isValidSummary (diffTOC diff)
 programWithChange :: Term' -> Diff'
 programWithChange body = merge (programInfo, programInfo) (Indexed [ function' ])
   where
-    function' = merge ((Just (FunctionDeclaration "foo" mempty) :. functionInfo, Just (FunctionDeclaration "foo" mempty) :. functionInfo)) (S.Function name' [] [ inserting body ])
+    function' = merge ((Just (FunctionDeclaration "foo" mempty Nothing) :. functionInfo, Just (FunctionDeclaration "foo" mempty Nothing) :. functionInfo)) (S.Function name' [] [ inserting body ])
     name' = let info = Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil in merge (info, info) (Leaf "foo")
 
 -- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
 programWithChangeOutsideFunction :: Term' -> Diff'
 programWithChangeOutsideFunction term = merge (programInfo, programInfo) (Indexed [ function', term' ])
   where
-    function' = merge (Just (FunctionDeclaration "foo" mempty) :. functionInfo, Just (FunctionDeclaration "foo" mempty) :. functionInfo) (S.Function name' [] [])
+    function' = merge (Just (FunctionDeclaration "foo" mempty Nothing) :. functionInfo, Just (FunctionDeclaration "foo" mempty Nothing) :. functionInfo) (S.Function name' [] [])
     name' = let info = Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil in  merge (info, info) (Leaf "foo")
     term' = inserting term
 
@@ -199,7 +199,7 @@ programOf :: Diff' -> Diff'
 programOf diff = merge (programInfo, programInfo) (Indexed [ diff ])
 
 functionOf :: Text -> Term' -> Term'
-functionOf name body = Term $ (Just (FunctionDeclaration name mempty) :. functionInfo) `In` S.Function name' [] [body]
+functionOf name body = Term $ (Just (FunctionDeclaration name mempty Nothing) :. functionInfo) `In` S.Function name' [] [body]
   where
     name' = Term $ (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) `In` Leaf name
 

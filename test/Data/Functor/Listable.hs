@@ -54,6 +54,7 @@ import Renderer.TOC
 import RWS
 import Syntax as S
 import Test.LeanCheck
+import qualified Language
 
 type Tier a = [a]
 
@@ -348,10 +349,17 @@ instance Listable Text where
 
 instance Listable Declaration where
   tiers
-    =  cons3 (MethodDeclaration)
-    \/ cons2 (FunctionDeclaration)
+    =  cons4 MethodDeclaration
+    \/ cons3 FunctionDeclaration
     \/ cons2 (\ a b -> ErrorDeclaration a b Nothing)
 
+instance Listable Language.Language where
+  tiers
+    =  cons0 Language.Go
+    \/ cons0 Language.JavaScript
+    \/ cons0 Language.Python
+    \/ cons0 Language.Ruby
+    \/ cons0 Language.TypeScript
 
 instance Listable Range where
   tiers = cons2 Range
