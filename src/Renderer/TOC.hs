@@ -5,7 +5,7 @@ module Renderer.TOC
 , renderToTags
 , diffTOC
 , Summaries(..)
-, JSONSummary(..)
+, TOCSummary(..)
 , isValidSummary
 , Declaration(..)
 , declaration
@@ -82,8 +82,8 @@ instance ToJSON Tag where
   toJSON Tag{..} = object [ "symbol" .= tagSymbol, "path" .= tagPath, "language" .= tagLanguage, "kind" .= tagKind, "line" .= tagLine, "span" .= tagSpan ]
 
 
-data JSONSummary
-  = JSONSummary
+data TOCSummary
+  = TOCSummary
     { summaryCategoryName :: T.Text
     , summaryTermName :: T.Text
     , summaryTermText :: T.Text
@@ -93,11 +93,11 @@ data JSONSummary
   | ErrorSummary { error :: T.Text, errorSpan :: Span, errorLanguage :: Maybe Language }
   deriving (Generic, Eq, Show)
 
-instance ToJSON JSONSummary where
-  toJSON JSONSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= summaryCategoryName, "term" .= summaryTermName, "span" .= summarySpan ]
+instance ToJSON TOCSummary where
+  toJSON TOCSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= summaryCategoryName, "term" .= summaryTermName, "span" .= summarySpan ]
   toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan, "language" .= errorLanguage ]
 
-isValidSummary :: JSONSummary -> Bool
+isValidSummary :: TOCSummary -> Bool
 isValidSummary ErrorSummary{} = False
 isValidSummary _ = True
 
@@ -322,20 +322,25 @@ dedupe = let tuples = sortOn fst . Map.elems . snd . foldl' go (0, Map.empty) in
     dedupeKey entry = DedupeKey ((fmap toCategoryName . getDeclaration . entryPayload) entry, (fmap (toLower . declarationIdentifier) . getDeclaration . entryPayload) entry)
     exactMatch = (==) `on` (getDeclaration . entryPayload)
 
--- | Construct a 'JSONSummary' from an 'Entry'.
-entrySummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Entry (Record fields) -> Maybe JSONSummary
+-- | Construct a 'TOCSummary' from an 'Entry'.
+entrySummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Entry (Record fields) -> Maybe TOCSummary
 entrySummary entry = case entry of
   Changed a   -> recordSummary a "modified"
   Deleted a   -> recordSummary a "removed"
   Inserted a  -> recordSummary a "added"
   Replaced a  -> recordSummary a "modified"
 
--- | Construct a 'JSONSummary' from a node annotation and a change type label.
-recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> T.Text -> Maybe JSONSummary
-recordSummary record = case getDeclaration record of
-  Just (ErrorDeclaration text _ language) -> Just . const (ErrorSummary text (sourceSpan record) language)
-  Just declaration -> Just . JSONSummary (toCategoryName declaration) (formatIdentifier declaration) (declarationText declaration) (sourceSpan record)
-  Nothing -> const Nothing
+  Changed  a -> recordSummary "modified" a
+  Deleted  a -> recordSummary "removed" a
+  Inserted a -> recordSummary "added" a
+  Replaced a -> recordSummary "modified" a
+
+-- | Construct a 'TOCSummary' from a node annotation and a change type label.
+recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => T.Text -> Record fields -> Maybe TOCSummary
+recordSummary changeText record = case getDeclaration record of
+  Just (ErrorDeclaration text _ language) -> Just $ ErrorSummary text (sourceSpan record) language
+  Just declaration -> Just $ TOCSummary (toCategoryName declaration) (formatIdentifier declaration) (declarationText declaration) (sourceSpan record) changeText
+  Nothing -> Nothing
   where
     formatIdentifier (MethodDeclaration identifier _ (Just receiver)) = receiver <> "." <> identifier
     formatIdentifier declaration = declarationIdentifier declaration
@@ -365,11 +370,11 @@ renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition 
 renderToTags :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> [Value]
 renderToTags Blob{..} = fmap toJSON . termToC' blobLanguage blobPath
 
-diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [JSONSummary]
+diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [TOCSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
 
-termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Term f (Record fields) -> [JSONSummary]
 termToC = mapMaybe (`recordSummary` "unchanged") . termTableOfContentsBy declaration
+termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Term f (Record fields) -> [TOCSummary]
 
 termToC' :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Maybe Language -> FilePath -> Term f (Record fields) -> [Tag]
 termToC' lang path = mapMaybe (\r -> tagSummary r lang path "unchanged") . termTableOfContentsBy declaration
