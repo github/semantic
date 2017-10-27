@@ -72,6 +72,7 @@ library
                      , Renderer.SExpression
                      , Renderer.TOC
                      , RWS
+                     , RWS.FeatureVector
                      , Semantic
                      , Semantic.Log
                      , Semantic.Stat
