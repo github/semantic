@@ -138,7 +138,8 @@ featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields labe
 featureVectorDecorator getLabel p q
  = cata collect
  . pqGramDecorator getLabel p q
- where collect (In (gram :. rest) functor) = termIn (foldl' addSubtermVector (unitVector (hash gram)) functor :. rest) functor
+ where collect :: (Hashable label, Traversable f) => TermF f (Record (Gram label ': fields)) (Term f (Record (FeatureVector ': fields))) -> Term f (Record (FeatureVector ': fields))
+       collect (In (gram :. rest) functor) = termIn (foldl' addSubtermVector (unitVector (hash gram)) functor :. rest) functor
        addSubtermVector :: Functor f => FeatureVector -> Term f (Record (FeatureVector ': fields)) -> FeatureVector
        addSubtermVector v term = addVectors v (rhead (extract term))
 
