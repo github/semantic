@@ -122,14 +122,12 @@ defaultFeatureVectorDecorator
  => Label f fields label
  -> Term f (Record fields)
  -> Term f (Record (FeatureVector ': fields))
-defaultFeatureVectorDecorator getLabel = featureVectorDecorator getLabel defaultP defaultQ
+defaultFeatureVectorDecorator getLabel = featureVectorDecorator . pqGramDecorator getLabel defaultP defaultQ
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
-featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Term f (Record fields) -> Term f (Record (FeatureVector ': fields))
-featureVectorDecorator getLabel p q
- = cata collect
- . pqGramDecorator getLabel p q
- where collect :: (Hashable label, Traversable f) => TermF f (Record (Gram label ': fields)) (Term f (Record (FeatureVector ': fields))) -> Term f (Record (FeatureVector ': fields))
+featureVectorDecorator :: (Foldable f, Functor f, Hashable label) => Term f (Record (Gram label ': fields)) -> Term f (Record (FeatureVector ': fields))
+featureVectorDecorator = cata collect
+ where collect :: (Foldable f, Functor f, Hashable label) => TermF f (Record (Gram label ': fields)) (Term f (Record (FeatureVector ': fields))) -> Term f (Record (FeatureVector ': fields))
        collect (In (gram :. rest) functor) = termIn (foldl' addSubtermVector (unitVector (hash gram)) functor :. rest) functor
        addSubtermVector :: Functor f => FeatureVector -> Term f (Record (FeatureVector ': fields)) -> FeatureVector
        addSubtermVector v term = addVectors v (rhead (extract term))
