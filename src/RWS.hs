@@ -4,29 +4,26 @@ module RWS
 , Options(..)
 , defaultOptions
 , ComparabilityRelation
-, FeatureVector(..)
+, FeatureVector
 , defaultFeatureVectorDecorator
 , featureVectorDecorator
 , pqGramDecorator
 , Gram(..)
-, defaultD
 , canCompareTerms
 , equalTerms
 ) where
 
 import Control.Applicative (empty)
 import Control.Arrow ((&&&))
-import Control.Monad (replicateM)
-import Control.Monad.Random.Strict
 import Control.Monad.State.Strict
 import Data.Align.Generic
-import Data.Array.Unboxed
 import Data.Diff (DiffF(..), deleting, inserting, merge, replacing)
 import Data.Foldable
 import Data.Function ((&))
 import Data.Functor.Classes
 import Data.Functor.Foldable
 import Data.Hashable
+import Data.Ix
 import qualified Data.KdMap.Static as KdMap
 import Data.List (sortOn)
 import Data.Maybe
@@ -35,8 +32,8 @@ import Data.Semigroup hiding (First(..))
 import Data.Term as Term
 import Data.These
 import Data.Traversable
+import RWS.FeatureVector
 import SES
-import System.Random.Mersenne.Pure64
 
 type Label f fields label = forall b. TermF f (Record fields) b -> label
 
@@ -44,9 +41,6 @@ type Label f fields label = forall b. TermF f (Record fields) b -> label
 --
 --   This is used both to determine whether two root terms can be compared in O(1), and, recursively, to determine whether two nodes are equal in O(n); thus, comparability is defined s.t. two terms are equal if they are recursively comparable subterm-wise.
 type ComparabilityRelation syntax ann1 ann2 = forall a b. TermF syntax ann1 a -> TermF syntax ann2 b -> Bool
-
-newtype FeatureVector = FV { unFV :: UArray Int Double }
-  deriving (Eq, Ord, Show)
 
 rws :: (Foldable syntax, Functor syntax, GAlign syntax)
     => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
@@ -110,14 +104,13 @@ defaultOptions = Options
   , optionsNodeComparisons = 10
   }
 
-defaultD, defaultP, defaultQ :: Int
-defaultD = 15
+defaultP, defaultQ :: Int
 defaultP = 2
 defaultQ = 3
 
 
 toKdMap :: Functor syntax => [(Int, Term syntax (Record (FeatureVector ': fields)))] -> KdMap.KdMap Double FeatureVector (Int, Term syntax (Record (FeatureVector ': fields)))
-toKdMap = KdMap.build (elems . unFV) . fmap (rhead . extract . snd &&& id)
+toKdMap = KdMap.build unFV . fmap (rhead . extract . snd &&& id)
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
@@ -129,19 +122,13 @@ defaultFeatureVectorDecorator
  => Label f fields label
  -> Term f (Record fields)
  -> Term f (Record (FeatureVector ': fields))
-defaultFeatureVectorDecorator getLabel = featureVectorDecorator getLabel defaultP defaultQ defaultD
+defaultFeatureVectorDecorator getLabel = featureVectorDecorator . pqGramDecorator getLabel defaultP defaultQ
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
-featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (FeatureVector ': fields))
-featureVectorDecorator getLabel p q d
- = cata collect
- . pqGramDecorator getLabel p q
- where collect (In (gram :. rest) functor) = termIn (foldl' addSubtermVector (unitVector d (hash gram)) functor :. rest) functor
-       addSubtermVector :: Functor f => FeatureVector -> Term f (Record (FeatureVector ': fields)) -> FeatureVector
-       addSubtermVector v term = addVectors v (rhead (extract term))
-
-       addVectors :: FeatureVector -> FeatureVector -> FeatureVector
-       addVectors (FV as) (FV bs) = FV $ listArray (0, d - 1) (fmap (\ i -> as ! i + bs ! i) [0..(d - 1)])
+featureVectorDecorator :: (Foldable f, Functor f, Hashable label) => Term f (Record (Gram label ': fields)) -> Term f (Record (FeatureVector ': fields))
+featureVectorDecorator = cata (\ (In (gram :. rest) functor) ->
+  termIn (foldl' addSubtermVector (unitVector (hash gram)) functor :. rest) functor)
+  where addSubtermVector v term = addVectors v (rhead (extract term))
 
 -- | Annotates a term with the corresponding p,q-gram at each node.
 pqGramDecorator
@@ -169,13 +156,6 @@ pqGramDecorator getLabel p q = cata algebra
     siblingLabels :: Traversable f => f (Term f (Record (Gram label ': fields))) -> [Maybe label]
     siblingLabels = foldMap (base . rhead . extract)
     padToSize n list = take n (list <> repeat empty)
-
--- | Computes a unit vector of the specified dimension from a hash.
-unitVector :: Int -> Int -> FeatureVector
-unitVector d hash = FV $ listArray (0, d - 1) ((* invMagnitude) <$> components)
-  where
-    invMagnitude = 1 / sqrt (sum (fmap (** 2) components))
-    components = evalRand (replicateM d (liftRand randomDouble)) (pureMT (fromIntegral hash))
 
 -- | Test the comparability of two root 'Term's in O(1).
 canCompareTerms :: ComparabilityRelation syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Bool
