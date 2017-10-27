@@ -10,6 +10,9 @@ import GHC.Prim
 import GHC.Types
 import System.Random.Mersenne.Pure64
 
+-- | A 15-dimensional feature vector represented with machine doubles.
+--
+--   15 dimensions ought to be enough for anyone. cf §5.2 of RWS-Diff: “We obtained best results with 10 ≤ d ≤ 20.”
 data FeatureVector = FV !Double# !Double# !Double# !Double# !Double#
                         !Double# !Double# !Double# !Double# !Double#
                         !Double# !Double# !Double# !Double# !Double#
