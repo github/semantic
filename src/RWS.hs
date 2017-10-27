@@ -126,10 +126,9 @@ defaultFeatureVectorDecorator getLabel = featureVectorDecorator . pqGramDecorato
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
 featureVectorDecorator :: (Foldable f, Functor f, Hashable label) => Term f (Record (Gram label ': fields)) -> Term f (Record (FeatureVector ': fields))
-featureVectorDecorator = cata collect
-  where collect :: (Foldable f, Functor f, Hashable label) => TermF f (Record (Gram label ': fields)) (Term f (Record (FeatureVector ': fields))) -> Term f (Record (FeatureVector ': fields))
-        collect (In (gram :. rest) functor) = termIn (foldl' addSubtermVector (unitVector (hash gram)) functor :. rest) functor
-        addSubtermVector :: Functor f => FeatureVector -> Term f (Record (FeatureVector ': fields)) -> FeatureVector
+featureVectorDecorator = cata (\ (In (gram :. rest) functor) ->
+  termIn (foldl' addSubtermVector (unitVector (hash gram)) functor :. rest) functor)
+  where addSubtermVector :: Functor f => FeatureVector -> Term f (Record (FeatureVector ': fields)) -> FeatureVector
         addSubtermVector v term = addVectors v (rhead (extract term))
 
 -- | Annotates a term with the corresponding p,q-gram at each node.
