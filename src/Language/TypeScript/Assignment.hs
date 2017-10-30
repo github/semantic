@@ -306,7 +306,7 @@ templateString :: Assignment
 templateString = makeTerm <$> symbol TemplateString <*> children (Literal.String <$> manyTerm templateSubstitution)
 
 templateSubstitution :: Assignment
-templateSubstitution = symbol TemplateSubstitution *> children (term expression)
+templateSubstitution = symbol TemplateSubstitution *> children (term expressions)
 
 nonNullExpression' :: Assignment
 nonNullExpression' = makeTerm <$> symbol Grammar.NonNullExpression <*> children (Expression.NonNullExpression <$> term expression)
@@ -349,7 +349,7 @@ jsxOpeningElement' :: Assignment
 jsxOpeningElement' = makeTerm <$> symbol Grammar.JsxOpeningElement <*> children (TypeScript.Syntax.JsxOpeningElement <$> term identifier <*> manyTerm (jsxAttribute <|> jsxExpression'))
 
 jsxExpression' :: Assignment
-jsxExpression' = makeTerm <$> symbol Grammar.JsxExpression <*> children (TypeScript.Syntax.JsxExpression <$> term (expression <|> sequenceExpression <|> spreadElement))
+jsxExpression' = makeTerm <$> symbol Grammar.JsxExpression <*> children (TypeScript.Syntax.JsxExpression <$> term (expressions <|> spreadElement))
 
 jsxText :: Assignment
 jsxText = makeTerm <$> symbol Grammar.JsxText <*> (TypeScript.Syntax.JsxText <$> source)
@@ -364,7 +364,10 @@ propertyIdentifier :: Assignment
 propertyIdentifier = makeTerm <$> symbol PropertyIdentifier <*> (Syntax.Identifier <$> source)
 
 sequenceExpression :: Assignment
-sequenceExpression = makeTerm <$> symbol Grammar.SequenceExpression <*> children (Expression.SequenceExpression <$> term expression <*> term (sequenceExpression <|> expression))
+sequenceExpression = makeTerm <$> symbol Grammar.SequenceExpression <*> children (Expression.SequenceExpression <$> term expression <*> term expressions)
+
+expressions :: Assignment
+expressions = expression <|> sequenceExpression
 
 parameter :: Assignment
 parameter =
@@ -540,7 +543,7 @@ statement = handleError everything
       , labeledStatement ]
 
 forOfStatement :: Assignment
-forOfStatement = makeTerm <$> symbol ForOfStatement <*> children (TypeScript.Syntax.ForOf <$> term expression <*> term expression <*> term statement)
+forOfStatement = makeTerm <$> symbol ForOfStatement <*> children (TypeScript.Syntax.ForOf <$> term expression <*> term expressions <*> term statement)
 
 forInStatement :: Assignment
 forInStatement = makeTerm <$> symbol ForInStatement <*> children (Statement.ForEach <$> term expression <*> term expression <*> term statement)
@@ -558,10 +561,10 @@ withStatement :: Assignment
 withStatement = makeTerm <$> symbol WithStatement <*> children (TypeScript.Syntax.With <$> term parenthesizedExpression <*> term statement)
 
 returnStatement :: Assignment
-returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (term expression <|> term sequenceExpression <|> emptyTerm))
+returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (term expressions <|> emptyTerm))
 
 throwStatement :: Assignment
-throwStatement = makeTerm <$> symbol Grammar.ThrowStatement <*> children (Statement.Throw <$> (term expression <|> term sequenceExpression))
+throwStatement = makeTerm <$> symbol Grammar.ThrowStatement <*> children (Statement.Throw <$> term expressions)
 
 labeledStatement :: Assignment
 labeledStatement = makeTerm <$> symbol Grammar.LabeledStatement <*> children (TypeScript.Syntax.LabeledStatement <$> term (symbol StatementIdentifier *> children (term identifier)) <*> term statement)
@@ -585,7 +588,7 @@ debuggerStatement :: Assignment
 debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> (TypeScript.Syntax.Debugger <$ source)
 
 expressionStatement' :: Assignment
-expressionStatement' = symbol ExpressionStatement *> children (term (expression <|> sequenceExpression))
+expressionStatement' = symbol ExpressionStatement *> children (term expressions)
 
 declaration :: Assignment
 declaration = everything
@@ -687,7 +690,7 @@ whileStatement :: Assignment
 whileStatement = makeTerm <$> symbol WhileStatement <*> children (Statement.While <$> term expression <*> term statement)
 
 forStatement :: Assignment
-forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.For <$> term (variableDeclaration <|> expressionStatement' <|> emptyStatement) <*> term (expressionStatement' <|> emptyStatement) <*> (term expression <|> emptyTerm) <*> term statement)
+forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.For <$> term (variableDeclaration <|> expressionStatement' <|> emptyStatement) <*> term (expressionStatement' <|> emptyStatement) <*> term (expressions <|> emptyTerm) <*> term statement)
 
 variableDeclaration :: Assignment
 variableDeclaration = makeTerm <$> (symbol Grammar.VariableDeclaration <|> symbol Grammar.LexicalDeclaration) <*> children (Declaration.VariableDeclaration <$> manyTerm variableDeclarator)
@@ -697,16 +700,16 @@ variableDeclarator = makeVarDecl <$> symbol VariableDeclarator <*> children ((,,
   where makeVarDecl loc (subject, annotations, value) = makeTerm loc (Statement.Assignment [annotations] subject value)
 
 parenthesizedExpression :: Assignment
-parenthesizedExpression = symbol ParenthesizedExpression *> children (term (expression <|> sequenceExpression))
+parenthesizedExpression = symbol ParenthesizedExpression *> children (term expressions)
 
 switchStatement :: Assignment
 switchStatement = makeTerm <$> symbol SwitchStatement <*> children (Statement.Match <$> term parenthesizedExpression <*> term switchBody)
   where
     switchBody =  symbol SwitchBody *> children (makeTerm <$> location <*> manyTerm switchCase)
-    switchCase = makeTerm <$> (symbol SwitchCase <|> symbol SwitchDefault) <*> children (Statement.Pattern <$> (term expression <|> emptyTerm) <*> (makeTerm <$> location <*> manyTerm statement))
+    switchCase = makeTerm <$> (symbol SwitchCase <|> symbol SwitchDefault) <*> children (Statement.Pattern <$> (term expressions <|> emptyTerm) <*> (makeTerm <$> location <*> manyTerm statement))
 
 subscriptExpression :: Assignment
-subscriptExpression = makeTerm <$> symbol SubscriptExpression <*> children (Expression.Subscript <$> term expression <*> (pure <$> term expression))
+subscriptExpression = makeTerm <$> symbol SubscriptExpression <*> children (Expression.Subscript <$> term expression <*> (pure <$> term expressions))
 
 pair :: Assignment
 pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> term propertyName <*> term expression)
