@@ -5,7 +5,8 @@
       (Empty))
     (Identifier)
     (ExtendsClause
-      (TypeIdentifier))
+      (TypeIdentifier)
+      (Empty))
     (Method
       (Empty)
       (Empty)
