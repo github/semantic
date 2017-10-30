@@ -488,7 +488,7 @@ literalType :: Assignment
 literalType = makeTerm <$> symbol Grammar.LiteralType <*> children (TypeScript.Syntax.LiteralType <$> term (number <|> string <|> true <|> false))
 
 unionType :: Assignment
-unionType = makeTerm <$> symbol UnionType <*> children (TypeScript.Syntax.Union <$> term ty <*> term ty)
+unionType = makeTerm <$> symbol UnionType <*> children (TypeScript.Syntax.Union <$> (term ty <|> emptyTerm) <*> term ty)
 
 intersectionType :: Assignment
 intersectionType = makeTerm <$> symbol IntersectionType <*> children (TypeScript.Syntax.Intersection <$> term ty <*> term ty)
