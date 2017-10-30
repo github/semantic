@@ -25,17 +25,17 @@
       {-(Empty)-})-}))
   (Export
     (ExportClause
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+      (ImportExportSpecifier
+        (Identifier)
+        (Identifier))
       (ImportExportSpecifier
       { (Identifier)
       ->(Identifier) }
       { (Identifier)
-      ->(Identifier) })
-      (ImportExportSpecifier
-        (Identifier)
-        (Identifier))
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Empty)+})+}
+      ->(Empty) })
     {-(ImportExportSpecifier
       {-(Identifier)-}
       {-(Empty)-})-}))
@@ -105,14 +105,14 @@
     {-(ImportExportSpecifier
       {-(Identifier)-}
       {-(Identifier)-})-})-})
-{+(Export
+  (Export
   {+(ExportClause
     {+(ImportExportSpecifier
       {+(Identifier)+}
-      {+(Identifier)+})+})+})+}
-  (Export
-  { (TextElement)
-  ->(TextElement) })
+      {+(Identifier)+})+})+}
+  {-(TextElement)-})
+{+(Export
+  {+(TextElement)+})+}
   (Export
     (ExportClause
       (ImportExportSpecifier
@@ -133,27 +133,21 @@
       {-(Empty)-})-})
   { (TextElement)
   ->(TextElement) })
-{+(Export
-  {+(ExportClause
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Identifier)+})+}
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Identifier)+})+}
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Empty)+})+})+}
-  {+(TextElement)+})+}
-{-(Export
-  {-(ExportClause
-    {-(ImportExportSpecifier
-      {-(Identifier)-}
-      {-(Identifier)-})-}
-    {-(ImportExportSpecifier
-      {-(Identifier)-}
-      {-(Identifier)-})-}
-    {-(ImportExportSpecifier
-      {-(Identifier)-}
-      {-(Empty)-})-})-}
-  {-(TextElement)-})-})
+  (Export
+    (ExportClause
+      (ImportExportSpecifier
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) })
+      (ImportExportSpecifier
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) })
+      (ImportExportSpecifier
+      { (Identifier)
+      ->(Identifier) }
+        (Empty)))
+  { (TextElement)
+  ->(TextElement) }))

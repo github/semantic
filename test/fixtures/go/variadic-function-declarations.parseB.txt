@@ -8,19 +8,23 @@
   (Function
     (Empty)
     (Identifier)
-    (
-      (Identifier)
+    (Variadic
       (Pointer
-        (Identifier)))
+        (Identifier))
+      (Identifier))
+    ([]))
+  (Function
+    (Empty)
+    (Identifier)
+    (Variadic
+      (Identifier)
+      (Empty))
     ([]))
   (Function
     (Empty)
     (Identifier)
     (Identifier)
-    ([]))
-  (Function
-    (Empty)
-    (Identifier)
-    (Identifier)
-    (Identifier)
+    (Variadic
+      (Identifier)
+      (Empty))
     ([])))

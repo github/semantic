@@ -37,7 +37,8 @@ instance Mergeable [] where
   merge _ [] = pure []
 
 instance Mergeable NonEmpty where
-  merge f (x:|xs) = (:|) <$> f x <*> merge f xs
+  merge f (x:|[]) = (:|) <$> f x <*> pure []
+  merge f (x1:|x2:xs) = (:|) <$> f x1 <*> merge f (x2 : xs) <|> merge f (x2:|xs)
 
 instance Mergeable Maybe where
   merge f (Just a) = Just <$> f a

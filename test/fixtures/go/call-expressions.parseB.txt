@@ -5,6 +5,20 @@
     (Empty)
     (Identifier)
     (
-      (Error)
-      (Error)
-      (Error))))
+      (Call
+        (Identifier)
+        (Identifier)
+        (Variadic
+          (Identifier))
+        (Empty))
+      (Call
+        (Identifier)
+        (Identifier)
+        (Identifier)
+        (Empty))
+      (Call
+        (Identifier)
+        (Identifier)
+        (Variadic
+          (Identifier))
+        (Empty)))))

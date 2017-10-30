@@ -89,7 +89,7 @@ someParser _ Python     = Just (SomeParser pythonParser)
 someParser _ Ruby       = Just (SomeParser rubyParser)
 someParser _ TypeScript = Just (SomeParser typescriptParser)
 
--- | Return a 'Language'-specific 'Parser', if one exists, falling back to the 'LineByLineParser'.
+-- | Return a 'Language'-specific 'Parser', if one exists.
 syntaxParserForLanguage :: Language -> Maybe (Parser (Term Syntax (Record DefaultFields)))
 syntaxParserForLanguage language = case language of
   Go         -> Just (TreeSitterParser tree_sitter_go)
