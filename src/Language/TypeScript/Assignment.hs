@@ -282,7 +282,7 @@ anonymousClass :: Assignment
 anonymousClass = makeTerm <$> symbol Grammar.AnonymousClass <*> children (Declaration.Class <$> pure [] <*> emptyTerm <*> (classHeritage' <|> pure []) <*> classBodyStatements)
 
 abstractClass :: Assignment
-abstractClass = makeTerm <$> symbol Grammar.AbstractClass <*> (TypeScript.Syntax.AbstractClass <$> term identifier <*> (term typeParameters <|> emptyTerm) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
+abstractClass = makeTerm <$> symbol Grammar.AbstractClass <*> children (TypeScript.Syntax.AbstractClass <$> term identifier <*> (term typeParameters <|> emptyTerm) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
 
 classHeritage' :: HasCallStack => Assignment.Assignment [] Grammar [Term]
 classHeritage' = symbol Grammar.ClassHeritage *> children (((++) `on` toList) <$> optional (term extendsClause) <*> optional (term implementsClause'))
