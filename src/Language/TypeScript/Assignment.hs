@@ -285,10 +285,10 @@ abstractClass :: Assignment
 abstractClass = makeTerm <$> symbol Grammar.AbstractClass <*> (TypeScript.Syntax.AbstractClass <$> term identifier <*> (term typeParameters <|> emptyTerm) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
 
 classHeritage' :: HasCallStack => Assignment.Assignment [] Grammar [Term]
-classHeritage' = symbol Grammar.ClassHeritage *> children (((++) `on` toList) <$> optional (term extendsClause') <*> optional (term implementsClause'))
+classHeritage' = symbol Grammar.ClassHeritage *> children (((++) `on` toList) <$> optional (term extendsClause) <*> optional (term implementsClause'))
 
-extendsClause' :: Assignment
-extendsClause' = makeTerm <$> symbol Grammar.ExtendsClause <*> children (TypeScript.Syntax.ExtendsClause <$> manyTerm ty)
+extendsClause :: Assignment
+extendsClause = makeTerm <$> symbol Grammar.ExtendsClause <*> children (TypeScript.Syntax.ExtendsClause <$> term (expression <|> typeIdentifier) <*> (term typeArguments' <|> emptyTerm))
 
 implementsClause' :: Assignment
 implementsClause' = makeTerm <$> symbol Grammar.ImplementsClause <*> children (TypeScript.Syntax.ImplementsClause <$> manyTerm ty)
@@ -619,9 +619,6 @@ enumAssignment = makeTerm <$> symbol Grammar.EnumAssignment <*> children (Statem
 interfaceDeclaration :: Assignment
 interfaceDeclaration = makeInterfaceDecl <$> symbol Grammar.InterfaceDeclaration <*> children ((,,,) <$> term identifier <*> (term typeParameters <|> emptyTerm) <*> (term extendsClause <|> emptyTerm) <*> term objectType)
   where makeInterfaceDecl loc (identifier, typeParams, clause, objectType) = makeTerm loc (Declaration.InterfaceDeclaration [typeParams, clause] identifier objectType)
-
-extendsClause :: Assignment
-extendsClause = makeTerm <$> symbol Grammar.ExtendsClause <*> children (TypeScript.Syntax.ExtendsClause <$> manyTerm ty)
 
 ambientDeclaration :: Assignment
 ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> children (TypeScript.Syntax.AmbientDeclaration <$> term (choice [declaration, statementBlock]))
