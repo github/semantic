@@ -327,6 +327,13 @@ instance Eq1 MethodSignature where liftEq = genericLiftEq
 instance Ord1 MethodSignature where liftCompare = genericLiftCompare
 instance Show1 MethodSignature where liftShowsPrec = genericLiftShowsPrec
 
+data AbstractMethodSignature a = AbstractMethodSignature { _abstractMethodSignatureContext :: ![a], _abstractMethodSignatureName :: !a, _abstractMethodSignatureParameters :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 AbstractMethodSignature where liftEq = genericLiftEq
+instance Ord1 AbstractMethodSignature where liftCompare = genericLiftCompare
+instance Show1 AbstractMethodSignature where liftShowsPrec = genericLiftShowsPrec
+
 data Debugger a = Debugger
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 

@@ -114,6 +114,7 @@ type Syntax = '[
   , TypeScript.Syntax.ThisType
   , TypeScript.Syntax.ExistentialType
   , TypeScript.Syntax.MethodSignature
+  , TypeScript.Syntax.AbstractMethodSignature
   , TypeScript.Syntax.IndexSignature
   , TypeScript.Syntax.ObjectType
   , TypeScript.Syntax.LiteralType
@@ -283,6 +284,10 @@ anonymousClass = makeTerm <$> symbol Grammar.AnonymousClass <*> children (Declar
 
 abstractClass :: Assignment
 abstractClass = makeTerm <$> symbol Grammar.AbstractClass <*> children (TypeScript.Syntax.AbstractClass <$> term identifier <*> (term typeParameters <|> emptyTerm) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
+
+abstractMethodSignature :: Assignment
+abstractMethodSignature = makeSignature <$> symbol Grammar.AbstractMethodSignature <*> children ((,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> term propertyName <*> callSignatureParts)
+  where makeSignature loc (modifier, propertyName, (typeParams, params, annotation)) = makeTerm loc (TypeScript.Syntax.AbstractMethodSignature [modifier, typeParams, annotation] propertyName params)
 
 classHeritage' :: HasCallStack => Assignment.Assignment [] Grammar [Term]
 classHeritage' = symbol Grammar.ClassHeritage *> children (((++) `on` toList) <$> optional (term extendsClause) <*> optional (term implementsClause'))
@@ -512,7 +517,7 @@ statementBlock :: Assignment
 statementBlock = makeTerm <$> symbol StatementBlock <*> children (manyTerm statement)
 
 classBodyStatements :: HasCallStack => Assignment.Assignment [] Grammar [Term]
-classBodyStatements = symbol ClassBody *> children (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature)))
+classBodyStatements = symbol ClassBody *> children (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature <|> abstractMethodSignature)))
 
 publicFieldDefinition :: Assignment
 publicFieldDefinition = makeField <$> symbol Grammar.PublicFieldDefinition <*> children ((,,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
