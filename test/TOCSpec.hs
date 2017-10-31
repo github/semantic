@@ -72,6 +72,15 @@ spec = parallel $ do
         , JSONSummary "Method" "baz" (sourceSpanBetween (4, 1) (5, 4)) "removed"
         ]
 
+    it "summarizes changed classes" $ do
+      sourceBlobs <- blobsForPaths (both "ruby/classes.A.rb" "ruby/classes.B.rb")
+      diff <- runTask $ diffWithParser rubyParser sourceBlobs
+      diffTOC diff `shouldBe`
+        [ JSONSummary "Class" "Baz" (sourceSpanBetween (7, 1) (9, 4)) "added"
+        , JSONSummary "Class" "Foo" (sourceSpanBetween (2, 1) (4, 4)) "modified"
+        , JSONSummary "Class" "Bar" (sourceSpanBetween (10, 1) (12, 4)) "removed"
+        ]
+
     it "dedupes changes in same parent method" $ do
       sourceBlobs <- blobsForPaths (both "javascript/duplicate-parent.A.js" "javascript/duplicate-parent.B.js")
       diff <- runTask $ diffWithParser typescriptParser sourceBlobs
