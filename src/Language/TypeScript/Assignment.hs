@@ -625,7 +625,7 @@ declaration = everything
       ]
 
 typeAliasDeclaration :: Assignment
-typeAliasDeclaration = makeTypeAliasDecl <$> symbol Grammar.TypeAliasDeclaration <*> children ((,,) <$> identifier <*> (typeParameters) <*> ty)
+typeAliasDeclaration = makeTypeAliasDecl <$> symbol Grammar.TypeAliasDeclaration <*> children ((,,) <$> term identifier <*> (term typeParameters <|> emptyTerm) <*> term ty)
   where makeTypeAliasDecl loc (identifier, typeParams, body) = makeTerm loc (Declaration.TypeAliasDeclaration [typeParams] identifier body)
 
 enumDeclaration :: Assignment
