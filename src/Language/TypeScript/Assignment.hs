@@ -213,7 +213,7 @@ expression = handleError everything
       parenthesizedExpression,
       subscriptExpression,
       yieldExpression,
-      thisExpression,
+      this,
       number,
       string,
       templateString,
@@ -271,8 +271,8 @@ updateExpression = makeTerm <$> symbol Grammar.UpdateExpression <*> children (Ty
 yieldExpression :: Assignment
 yieldExpression = makeTerm <$> symbol Grammar.YieldExpression <*> children (Statement.Yield <$> term (expression <|> emptyTerm))
 
-thisExpression :: Assignment
-thisExpression = makeTerm <$> symbol Grammar.ThisExpression <*> (TypeScript.Syntax.This <$ source)
+this :: Assignment
+this = makeTerm <$> symbol Grammar.This <*> (TypeScript.Syntax.This <$ source)
 
 regex :: Assignment
 regex = makeTerm <$> symbol Grammar.Regex <*> (Literal.Regex <$> source)
@@ -670,7 +670,7 @@ shorthandPropertyIdentifier :: Assignment
 shorthandPropertyIdentifier = makeTerm <$> symbol Grammar.ShorthandPropertyIdentifier <*> (TypeScript.Syntax.ShorthandPropertyIdentifier <$> source)
 
 requiredParameter :: Assignment
-requiredParameter = makeRequiredParameter <$> symbol Grammar.RequiredParameter <*> children ((,,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term (identifier <|> destructuringPattern) <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
+requiredParameter = makeRequiredParameter <$> symbol Grammar.RequiredParameter <*> children ((,,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term (identifier <|> destructuringPattern <|> this) <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
   where makeRequiredParameter loc (modifier, readonly, identifier, annotation, initializer) = makeTerm loc (TypeScript.Syntax.RequiredParameter [modifier, readonly, annotation] (makeTerm loc (Statement.Assignment [] identifier initializer)))
 
 restParameter :: Assignment
