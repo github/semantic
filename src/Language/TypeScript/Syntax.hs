@@ -81,7 +81,7 @@ instance Eq1 Language.TypeScript.Syntax.Constructor where liftEq = genericLiftEq
 instance Ord1 Language.TypeScript.Syntax.Constructor where liftCompare = genericLiftCompare
 instance Show1 Language.TypeScript.Syntax.Constructor where liftShowsPrec = genericLiftShowsPrec
 
-data TypeParameter a = TypeParameter { _typeParameter :: !a, _typeParameterConstraint :: !a }
+data TypeParameter a = TypeParameter { _typeParameter :: !a, _typeParameterConstraint :: !a, _typeParameterDefaultType :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 TypeParameter where liftEq = genericLiftEq
@@ -122,6 +122,13 @@ newtype Constraint a = Constraint { _constraintType :: a }
 instance Eq1 Constraint where liftEq = genericLiftEq
 instance Ord1 Constraint where liftCompare = genericLiftCompare
 instance Show1 Constraint where liftShowsPrec = genericLiftShowsPrec
+
+newtype DefaultType a = DefaultType { _defaultType :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 DefaultType where liftEq = genericLiftEq
+instance Ord1 DefaultType where liftCompare = genericLiftCompare
+instance Show1 DefaultType where liftShowsPrec = genericLiftShowsPrec
 
 newtype ParenthesizedType a = ParenthesizedType { _parenthesizedType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

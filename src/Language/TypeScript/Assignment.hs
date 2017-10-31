@@ -98,6 +98,7 @@ type Syntax = '[
   , TypeScript.Syntax.TypeParameter
   , TypeScript.Syntax.Constraint
   , TypeScript.Syntax.ParenthesizedType
+  , TypeScript.Syntax.DefaultType
   , TypeScript.Syntax.PredefinedType
   , TypeScript.Syntax.TypeIdentifier
   , TypeScript.Syntax.NestedIdentifier
@@ -431,7 +432,10 @@ typeAnnotation' :: Assignment
 typeAnnotation' = makeTerm <$> symbol TypeAnnotation <*> children (TypeScript.Syntax.Annotation <$> term ty)
 
 typeParameter' :: Assignment
-typeParameter' = makeTerm <$> symbol Grammar.TypeParameter <*> children (TypeScript.Syntax.TypeParameter <$> term identifier <*> term (constraint <|> emptyTerm))
+typeParameter' = makeTerm <$> symbol Grammar.TypeParameter <*> children (TypeScript.Syntax.TypeParameter <$> term identifier <*> term (constraint <|> emptyTerm) <*> term (defaultType <|> emptyTerm))
+
+defaultType :: Assignment
+defaultType = makeTerm <$> symbol Grammar.DefaultType <*> children (TypeScript.Syntax.DefaultType <$> term ty)
 
 constraint :: Assignment
 constraint = makeTerm <$> symbol Grammar.Constraint <*> children (TypeScript.Syntax.Constraint <$> term ty)
@@ -618,7 +622,7 @@ declaration = everything
       ]
 
 typeAliasDeclaration :: Assignment
-typeAliasDeclaration = makeTypeAliasDecl <$> symbol Grammar.TypeAliasDeclaration <*> children ((,,) <$> term identifier <*> (term typeParameters <|> emptyTerm) <*> term ty)
+typeAliasDeclaration = makeTypeAliasDecl <$> symbol Grammar.TypeAliasDeclaration <*> children ((,,) <$> identifier <*> (typeParameters) <*> ty)
   where makeTypeAliasDecl loc (identifier, typeParams, body) = makeTerm loc (Declaration.TypeAliasDeclaration [typeParams] identifier body)
 
 enumDeclaration :: Assignment
