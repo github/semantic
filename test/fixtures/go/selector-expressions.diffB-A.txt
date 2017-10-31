@@ -4,4 +4,13 @@
   (Function
     (Empty)
     (Identifier)
-    (Error)))
+    (Call
+      (MemberAccess
+        (MemberAccess
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) })
+      { (Identifier)
+      ->(Identifier) })
+      (Empty))))
