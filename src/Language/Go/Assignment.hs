@@ -45,6 +45,7 @@ type Syntax =
    , Literal.Array
    , Literal.Channel
    , Literal.Composite
+   , Literal.Float
    , Literal.Hash
    , Literal.Integer
    , Literal.KeyValue
@@ -107,6 +108,7 @@ expressionChoices =
   , fallThroughStatement
   , fieldDeclaration
   , fieldIdentifier
+  , floatLiteral
   , functionDeclaration
   , functionType
   , gotoStatement
@@ -168,6 +170,9 @@ compositeLiteral = makeTerm <$> symbol CompositeLiteral <*> children (Literal.Co
 
 intLiteral :: Assignment
 intLiteral = makeTerm <$> symbol IntLiteral <*> (Literal.Integer <$> source)
+
+floatLiteral :: Assignment
+floatLiteral = makeTerm <$> symbol FloatLiteral <*> (Literal.Float <$> source)
 
 rawStringLiteral :: Assignment
 rawStringLiteral = makeTerm <$> symbol RawStringLiteral <*> (Literal.TextElement <$> source)
