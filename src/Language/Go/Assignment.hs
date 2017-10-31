@@ -104,6 +104,7 @@ expressionChoices =
   , expressionCaseClause
   , expressionList
   , expressionSwitchStatement
+  , fallThroughStatement
   , fieldDeclaration
   , fieldIdentifier
   , functionDeclaration
@@ -329,6 +330,9 @@ expressionSwitchStatement :: Assignment
 expressionSwitchStatement = makeTerm <$> symbol ExpressionSwitchStatement <*> children (Statement.Match <$> (expression <|> emptyTerm) <*> (expressionCaseClauses <|> emptyTerm))
   where
     expressionCaseClauses = makeTerm <$> location <*> many expressionCaseClause
+
+fallThroughStatement :: Assignment
+fallThroughStatement = makeTerm <$> symbol FallthroughStatement <*> (Statement.Pattern <$> (makeTerm <$> location <*> (Syntax.Identifier <$> source)) <*> emptyTerm)
 
 variadicArgument :: Assignment
 variadicArgument = makeTerm <$> symbol VariadicArgument <*> children (Go.Syntax.Variadic <$> pure [] <*> expression)
