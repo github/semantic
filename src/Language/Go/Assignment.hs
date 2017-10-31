@@ -52,6 +52,7 @@ type Syntax =
    , Literal.TextElement
    , Statement.Assignment
    , Statement.Break
+   , Statement.Continue
    , Statement.Goto
    , Statement.If
    , Statement.Match
@@ -97,6 +98,7 @@ expressionChoices =
   , channelType
   , comment
   , compositeLiteral
+  , continueStatement
   , varDeclaration
   , varSpecification
   , decStatement
@@ -429,6 +431,9 @@ shortVarDeclaration = makeTerm <$> symbol ShortVarDeclaration <*> children (Stat
 
 breakStatement :: Assignment
 breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> (labelName <|> emptyTerm))
+
+continueStatement :: Assignment
+continueStatement = makeTerm <$> symbol ContinueStatement <*> children (Statement.Continue <$> (labelName <|> emptyTerm))
 
 decStatement :: Assignment
 decStatement = makeTerm <$> symbol DecStatement <*> children (Statement.PostDecrement <$> expression)
