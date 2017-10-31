@@ -5,8 +5,7 @@
       (Empty))
     (Identifier)
     (ExtendsClause
-      (TypeIdentifier)
-      (Empty))
+      (TypeIdentifier))
     (PublicFieldDefinition
       (Empty)
       (Empty)

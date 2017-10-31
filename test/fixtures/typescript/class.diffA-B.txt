@@ -8,8 +8,7 @@
   ->(Identifier) }
     (ExtendsClause
     { (TypeIdentifier)
-    ->(TypeIdentifier) }
-      (Empty))
+    ->(TypeIdentifier) })
   {+(Method
     {+(Empty)+}
     {+(Empty)+}
