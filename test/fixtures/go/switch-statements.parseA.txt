@@ -1,4 +1,29 @@
 (Program
   (Module
     (Identifier))
-  (Error))
+  (Function
+    (Empty)
+    (Identifier)
+    (Match
+      (Pattern
+        (LessThan
+          (Identifier)
+          (Identifier))
+        (Call
+          (Identifier)
+          (Empty)))
+      (
+        (Pattern
+          (LessThan
+            (Identifier)
+            (Identifier))
+          (Call
+            (Identifier)
+            (Empty)))
+        (Pattern
+          (Equal
+            (Identifier)
+            (Integer))
+          (Call
+            (Identifier)
+            (Empty)))))))
