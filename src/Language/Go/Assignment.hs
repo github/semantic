@@ -41,6 +41,7 @@ type Syntax =
    , Statement.PostIncrement
    , Expression.MemberAccess
    , Go.Syntax.DefaultPattern
+   , Go.Syntax.RuneLiteral
    , Go.Syntax.Variadic
    , Literal.Array
    , Literal.Channel
@@ -141,6 +142,7 @@ expressionChoices =
   , pointerType
   , rawStringLiteral
   , returnStatement
+  , runeLiteral
   , shortVarDeclaration
   , sliceType
   , structType
@@ -202,6 +204,9 @@ interpretedStringLiteral = makeTerm <$> symbol InterpretedStringLiteral <*> (Lit
 
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
+
+runeLiteral :: Assignment
+runeLiteral = makeTerm <$> symbol Grammar.RuneLiteral <*> (Go.Syntax.RuneLiteral <$> source)
 
 
 -- Primitive Types
