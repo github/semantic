@@ -11,6 +11,7 @@ import Data.Diff
 import Data.Functor.Both
 import Data.Functor.Foldable (cata)
 import Data.Functor.Listable
+import Data.Functor.Foldable (cata)
 import Data.Maybe (fromMaybe)
 import Data.Monoid (Last(..))
 import Data.Output
@@ -45,13 +46,8 @@ spec = parallel $ do
     prop "drops all nodes with the constant Nothing function" $
       \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (diff :: Diff Syntax () ()) `shouldBe` []
 
-    let diffSize = max 1 . length . diffPatches
-    let lastValue a = fromMaybe (extract a) (getLast (foldMap (Last . Just) a))
-    prop "includes all nodes with a constant Just function" $
-      \ diff -> let diff' = (diff :: Diff Syntax () ()) in entryPayload <$> tableOfContentsBy (const (Just ())) diff' `shouldBe` replicate (diffSize diff') ()
-
-    prop "produces an unchanged entry for identity diffs" $
-      \ term -> tableOfContentsBy (Just . termAnnotation) (diffSyntaxTerms term term) `shouldBe` [Unchanged (lastValue (term :: Term Syntax (Record '[Category])))]
+    prop "produces no entries for identity diffs" $
+      \ term -> tableOfContentsBy (Just . termAnnotation) (diffSyntaxTerms term (term :: Term Syntax (Record '[Category]))) `shouldBe` []
 
     prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
       \ p -> tableOfContentsBy (Just . termAnnotation) (patch deleting inserting replacing p)
@@ -61,8 +57,7 @@ spec = parallel $ do
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
       \ diff -> let diff' = merge (0, 0) (Indexed [bimap (const 1) (const 1) (diff :: Diff Syntax Int Int)]) in
         tableOfContentsBy (\ (n `In` _) -> if n == (0 :: Int) then Just n else Nothing) diff' `shouldBe`
-        if null (diffPatches diff') then [Unchanged 0]
-                                    else replicate (length (diffPatches diff')) (Changed 0)
+        replicate (length (diffPatches diff')) (Changed 0)
 
   describe "diffTOC" $ do
     it "blank if there are no methods" $
@@ -72,8 +67,10 @@ spec = parallel $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ JSONSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "modified"
-        , JSONSummary "Method" "bar" (sourceSpanBetween (4, 1) (6, 4)) "modified" ]
+        [ JSONSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
+        , JSONSummary "Method" "bar" (sourceSpanBetween (4, 1) (6, 4)) "modified"
+        , JSONSummary "Method" "baz" (sourceSpanBetween (4, 1) (5, 4)) "removed"
+        ]
 
     it "dedupes changes in same parent method" $ do
       sourceBlobs <- blobsForPaths (both "javascript/duplicate-parent.A.js" "javascript/duplicate-parent.B.js")
@@ -153,7 +150,7 @@ spec = parallel $ do
     it "produces JSON output" $ do
       blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"}]},\"errors\":{}}\n" :: ByteString)
+      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}\n" :: ByteString)
 
     it "produces JSON output if there are parse errors" $ do
       blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.X.rb")
@@ -168,7 +165,7 @@ spec = parallel $ do
     it "summarizes Markdown headings" $ do
       blobs <- blobsForPaths (both "markdown/headings.A.md" "markdown/headings.B.md")
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/markdown/headings.A.md -> test/fixtures/toc/markdown/headings.B.md\":[{\"span\":{\"start\":[5,1],\"end\":[7,10]},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"added\"},{\"span\":{\"start\":[9,1],\"end\":[10,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
+      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/markdown/headings.A.md -> test/fixtures/toc/markdown/headings.B.md\":[{\"span\":{\"start\":[1,1],\"end\":[7,10]},\"category\":\"Heading 1\",\"term\":\"One\",\"changeType\":\"modified\"},{\"span\":{\"start\":[5,1],\"end\":[7,10]},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"added\"},{\"span\":{\"start\":[9,1],\"end\":[10,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
 
 
 type Diff' = Diff Syntax (Record (Maybe Declaration ': DefaultFields)) (Record (Maybe Declaration ': DefaultFields))

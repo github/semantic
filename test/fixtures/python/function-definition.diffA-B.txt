@@ -23,28 +23,24 @@
       { (Identifier)
       ->(Identifier) }))
     (Empty))
-{+(Annotation
-  {+(Function
-    {+(Identifier)+}
-    {+(
-      {+(Identifier)+})+})+}
-  {+(Empty)+})+}
-{+(Annotation
-  {+(Function
-    {+(Identifier)+}
-    {+(Identifier)+}
-    {+(
-      {+(Identifier)+})+})+}
-  {+(Empty)+})+}
-{-(Annotation
-  {-(Function
-    {-(Identifier)-}
+  (Annotation
+    (Function
+    { (Identifier)
+    ->(Identifier) }
     {-(Assignment
       {-(Identifier)-}
       {-(Identifier)-})-}
-    {-(
-      {-(Identifier)-})-})-}
-  {-(Empty)-})-}
+      (
+      { (Identifier)
+      ->(Identifier) }))
+    (Empty))
+{+(Annotation
+  {+(Function
+    {+(Identifier)+}
+    {+(Identifier)+}
+    {+(
+      {+(Identifier)+})+})+}
+  {+(Empty)+})+}
   (Annotation
     (Function
       (Identifier)

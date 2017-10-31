@@ -25,11 +25,11 @@ import Data.Union
 import Foreign.Ptr
 import Info hiding (Empty, Go)
 import Language
-import qualified Language.JSON.Syntax as JSON
-import qualified Language.Markdown.Syntax as Markdown
-import qualified Language.Python.Syntax as Python
-import qualified Language.Ruby.Syntax as Ruby
-import qualified Language.TypeScript.Syntax as TypeScript
+import qualified Language.JSON.Assignment as JSON
+import qualified Language.Markdown.Assignment as Markdown
+import qualified Language.Python.Assignment as Python
+import qualified Language.Ruby.Assignment as Ruby
+import qualified Language.TypeScript.Assignment as TypeScript
 import Syntax hiding (Go)
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import TreeSitter.Go
@@ -86,7 +86,7 @@ someParser _ Python     = Just (SomeParser pythonParser)
 someParser _ Ruby       = Just (SomeParser rubyParser)
 someParser _ TypeScript = Just (SomeParser typescriptParser)
 
--- | Return a 'Language'-specific 'Parser', if one exists, falling back to the 'LineByLineParser'.
+-- | Return a 'Language'-specific 'Parser', if one exists.
 syntaxParserForLanguage :: Language -> Maybe (Parser (Term Syntax (Record DefaultFields)))
 syntaxParserForLanguage language = case language of
   Go         -> Just (TreeSitterParser tree_sitter_go)

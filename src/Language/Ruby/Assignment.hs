@@ -1,5 +1,5 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, RankNTypes, TypeOperators #-}
-module Language.Ruby.Syntax
+{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+module Language.Ruby.Assignment
 ( assignment
 , Syntax
 , Grammar
