@@ -18,7 +18,7 @@ instance Ord1 Variadic where liftCompare = genericLiftCompare
 instance Show1 Variadic where liftShowsPrec = genericLiftShowsPrec
 
 -- | A pattern in a pattern-matching or computed jump control-flow statement, like 'case' in C or JavaScript, 'when' in Ruby, or the left-hand side of '->' in the body of Haskell 'case' expressions.
-newtype DefaultPattern a = DefaultPattern { patternBody :: a }
+newtype DefaultPattern a = DefaultPattern { defaultPatternBody :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 DefaultPattern where liftEq = genericLiftEq
