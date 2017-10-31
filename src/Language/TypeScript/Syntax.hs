@@ -228,7 +228,7 @@ instance Eq1 EnumDeclaration where liftEq = genericLiftEq
 instance Ord1 EnumDeclaration where liftCompare = genericLiftCompare
 instance Show1 EnumDeclaration where liftShowsPrec = genericLiftShowsPrec
 
-data ExtendsClause a = ExtendsClause { _extendsSubject :: a, _extendsTypeArguments :: a }
+data ExtendsClause a = ExtendsClause { _extendsClauses :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ExtendsClause where liftEq = genericLiftEq

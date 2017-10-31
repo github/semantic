@@ -288,7 +288,10 @@ classHeritage' :: HasCallStack => Assignment.Assignment [] Grammar [Term]
 classHeritage' = symbol Grammar.ClassHeritage *> children (((++) `on` toList) <$> optional (term extendsClause) <*> optional (term implementsClause'))
 
 extendsClause :: Assignment
-extendsClause = makeTerm <$> symbol Grammar.ExtendsClause <*> children (TypeScript.Syntax.ExtendsClause <$> term (expression <|> typeIdentifier) <*> (term typeArguments' <|> emptyTerm))
+extendsClause = makeTerm <$> symbol Grammar.ExtendsClause <*> children (TypeScript.Syntax.ExtendsClause <$> manyTerm (typeReference <|> expression))
+
+typeReference :: Assignment
+typeReference = typeIdentifier <|> nestedTypeIdentifier <|> genericType
 
 implementsClause' :: Assignment
 implementsClause' = makeTerm <$> symbol Grammar.ImplementsClause <*> children (TypeScript.Syntax.ImplementsClause <$> manyTerm ty)
