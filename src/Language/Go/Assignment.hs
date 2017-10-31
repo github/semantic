@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, RankNTypes, TypeOperators #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, RankNTypes, TupleSections, TypeOperators #-}
 module Language.Go.Assignment
 ( assignment
 , Syntax
@@ -53,6 +53,8 @@ type Syntax =
    , Statement.Assignment
    , Statement.Break
    , Statement.Continue
+   , Statement.For
+   , Statement.ForEach
    , Statement.Goto
    , Statement.If
    , Statement.Match
@@ -111,6 +113,7 @@ expressionChoices =
   , fieldDeclaration
   , fieldIdentifier
   , floatLiteral
+  , forStatement
   , functionDeclaration
   , functionType
   , gotoStatement
@@ -449,6 +452,20 @@ ifInitializer = symbol IfInitializer *> children expression
 
 elseClause :: Assignment
 elseClause = symbol ElseClause *> children expression
+
+forStatement :: Assignment
+forStatement = mkForStatement <$> symbol ForStatement <*> children ((,) <$> (forClause <|> rangeClause <|> emptyClause) <*> expression)
+  where
+    mkForStatement loc ((constructor, a, b, c), block') = case (constructor :: [Char]) of
+                                                            "forEach" -> makeTerm loc $ (Statement.ForEach a b block')
+                                                            _ -> makeTerm loc $ (Statement.For a b c block')
+    emptyClause = children (("for",,,) <$> emptyTerm <*> emptyTerm <*> emptyTerm)
+    rangeClause = symbol RangeClause *> children ( (("forEach",,,) <$> expression <*> expression <*> emptyTerm)
+                                                <|> (("forEach",,,) <$> emptyTerm <*> expression <*> emptyTerm))
+    forClause = symbol ForClause *> children (  (("for",,,) <$> expression <*> expression <*> expression)
+                                            <|> (("for",,,) <$> expression <*> expression <*> emptyTerm)
+                                            <|> (("for",,,) <$> expression <*> emptyTerm <*> emptyTerm)
+                                            <|> (("for",,,) <$> emptyTerm <*> emptyTerm <*> emptyTerm))
 
 incStatement :: Assignment
 incStatement = makeTerm <$> symbol IncStatement <*> children (Statement.PostIncrement <$> expression)
