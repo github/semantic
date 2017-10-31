@@ -40,6 +40,7 @@ type Syntax =
    , Statement.PostDecrement
    , Statement.PostIncrement
    , Expression.MemberAccess
+   , Go.Syntax.DefaultPattern
    , Go.Syntax.Variadic
    , Literal.Array
    , Literal.Channel
@@ -52,6 +53,8 @@ type Syntax =
    , Statement.Break
    , Statement.Goto
    , Statement.If
+   , Statement.Match
+   , Statement.Pattern
    , Statement.Pointer
    , Statement.Reference
    , Statement.Return
@@ -98,7 +101,9 @@ expressionChoices =
   , decStatement
   , element
   , elseClause
+  , expressionCaseClause
   , expressionList
+  , expressionSwitchStatement
   , fieldDeclaration
   , fieldIdentifier
   , functionDeclaration
@@ -310,6 +315,20 @@ binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm
 
 block :: Assignment
 block = symbol Block *> children expressions
+
+expressionCase :: Assignment
+expressionCase = makeTerm <$> symbol ExpressionCase <*> (Statement.Pattern <$> children expressions <*> expressions)
+
+defaultExpressionCase :: Assignment
+defaultExpressionCase = makeTerm <$> symbol DefaultExpressionCase <* source <*> (Go.Syntax.DefaultPattern <$> expressions)
+
+expressionCaseClause :: Assignment
+expressionCaseClause = symbol ExpressionCaseClause *> children (expressionCase <|> defaultExpressionCase)
+
+expressionSwitchStatement :: Assignment
+expressionSwitchStatement = makeTerm <$> symbol ExpressionSwitchStatement <*> children (Statement.Match <$> (expression <|> emptyTerm) <*> (expressionCaseClauses <|> emptyTerm))
+  where
+    expressionCaseClauses = makeTerm <$> location <*> many expressionCaseClause
 
 variadicArgument :: Assignment
 variadicArgument = makeTerm <$> symbol VariadicArgument <*> children (Go.Syntax.Variadic <$> pure [] <*> expression)
