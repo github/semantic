@@ -5,8 +5,18 @@
     (Empty)
     (Identifier)
     (
-      (Error)
-      (Error)
-      (Error)
-      (Error)
-      (Error))))
+      (Assignment
+        (Identifier)
+        (Float))
+      (Assignment
+        (Identifier)
+        (Float))
+      (Assignment
+        (Identifier)
+        (Float))
+      (Assignment
+        (Identifier)
+        (Float))
+      (Assignment
+        (Identifier)
+        (Float)))))
