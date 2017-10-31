@@ -5,7 +5,36 @@
     (Empty)
     (Identifier)
     (
-      (Error)
-      (Error)
-      (Error)
-      (Error))))
+      (Call
+        (Identifier)
+        (BiDirectionalChannel
+        { (Identifier)
+        ->(Identifier) })
+        (Empty))
+      (Call
+        (Identifier)
+        (BiDirectionalChannel
+        { (Identifier)
+        ->(Identifier) })
+        (Minus
+          (Identifier)
+          (Identifier))
+        (Empty))
+      (Call
+        (Identifier)
+        (BiDirectionalChannel
+        { (Identifier)
+        ->(Identifier) })
+      { (Integer)
+      ->(Integer) }
+      { (Integer)
+      ->(Integer) }
+        (Empty))
+      (Call
+        (Identifier)
+        (Map
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) })
+        (Empty)))))

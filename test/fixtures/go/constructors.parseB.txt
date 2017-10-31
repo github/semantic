@@ -5,7 +5,29 @@
     (Empty)
     (Identifier)
     (
-      (Error)
-      (Error)
-      (Error)
-      (Error))))
+      (Call
+        (Identifier)
+        (BiDirectionalChannel
+          (Identifier))
+        (Empty))
+      (Call
+        (Identifier)
+        (BiDirectionalChannel
+          (Identifier))
+        (Minus
+          (Identifier)
+          (Identifier))
+        (Empty))
+      (Call
+        (Identifier)
+        (BiDirectionalChannel
+          (Identifier))
+        (Integer)
+        (Integer)
+        (Empty))
+      (Call
+        (Identifier)
+        (Map
+          (Identifier)
+          (Identifier))
+        (Empty)))))
