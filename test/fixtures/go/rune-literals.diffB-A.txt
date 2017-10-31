@@ -4,19 +4,25 @@
   (
     (Assignment
       (Identifier)
-      (Error))
+    { (RuneLiteral)
+    ->(RuneLiteral) })
     (Assignment
       (Identifier)
-      (Error))
+    { (RuneLiteral)
+    ->(RuneLiteral) })
     (Assignment
       (Identifier)
-      (Error))
+    { (RuneLiteral)
+    ->(RuneLiteral) })
     (Assignment
       (Identifier)
-      (Error))
+    { (RuneLiteral)
+    ->(RuneLiteral) })
     (Assignment
       (Identifier)
-      (Error))
+    { (RuneLiteral)
+    ->(RuneLiteral) })
     (Assignment
       (Identifier)
-      (Error))))
+    { (RuneLiteral)
+    ->(RuneLiteral) })))
