@@ -143,6 +143,7 @@ expressionChoices =
   , rawStringLiteral
   , returnStatement
   , runeLiteral
+  , selectorExpression
   , shortVarDeclaration
   , sliceType
   , structType
@@ -298,6 +299,9 @@ typeDeclaration = handleError $ makeTerm <$> symbol TypeDeclaration <*> children
 parenthesizedExpression :: Assignment
 parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 
+selectorExpression :: Assignment
+selectorExpression = makeTerm <$> symbol SelectorExpression <*> children (Expression.MemberAccess <$> expression <*> expression)
+
 unaryExpression :: Assignment
 unaryExpression = symbol UnaryExpression >>= \ location -> (notExpression location) <|> (unaryMinus location) <|> unaryPlus <|> unaryAmpersand
   where notExpression location = makeTerm location . Expression.Not <$> children (symbol AnonBang *> expression)
@@ -353,7 +357,7 @@ variadicArgument :: Assignment
 variadicArgument = makeTerm <$> symbol VariadicArgument <*> children (Go.Syntax.Variadic <$> pure [] <*> expression)
 
 callExpression :: Assignment
-callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Call <$> pure [] <*> identifier <*> many expression <*> emptyTerm)
+callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Call <$> pure [] <*> expression <*> many expression <*> emptyTerm)
 
 varDeclaration :: Assignment
 varDeclaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
