@@ -5,15 +5,24 @@
     (Empty)
     (Identifier)
     (
-    {-(Annotation
-      {-(Identifier)-}
-      {-(Error)-})-}
       (Annotation
-        (Identifier)
-        (Error))
+      { (Identifier)
+      ->(Identifier) }
+        (SendChannel
+          (BiDirectionalChannel
+          { (Identifier)
+          ->(Identifier) })))
       (Annotation
-        (Identifier)
-        (Error))
-    {+(Annotation
-      {+(Identifier)+}
-      {+(Error)+})+})))
+      { (Identifier)
+      ->(Identifier) }
+        (SendChannel
+          (BiDirectionalChannel
+            (Constructor
+              (Empty)))))
+      (Annotation
+      { (Identifier)
+      ->(Identifier) }
+        (SendChannel
+          (ReceiveChannel
+          { (Identifier)
+          ->(Identifier) }))))))

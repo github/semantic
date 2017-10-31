@@ -7,10 +7,17 @@
     (
       (Annotation
         (Identifier)
-        (Error))
+        (SendChannel
+          (BiDirectionalChannel
+            (Identifier))))
       (Annotation
         (Identifier)
-        (Error))
+        (SendChannel
+          (BiDirectionalChannel
+            (Constructor
+              (Empty)))))
       (Annotation
         (Identifier)
-        (Error)))))
+        (SendChannel
+          (ReceiveChannel
+            (Identifier)))))))
