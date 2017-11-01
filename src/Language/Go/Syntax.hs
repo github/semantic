@@ -57,3 +57,11 @@ newtype Defer a = Defer { deferBody :: a }
 instance Eq1 Defer where liftEq = genericLiftEq
 instance Ord1 Defer where liftCompare = genericLiftCompare
 instance Show1 Defer where liftShowsPrec = genericLiftShowsPrec
+
+-- | A go statement (i.e. go routine) in Go (e.g. go x())
+newtype Go a = Go { goBody :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Go where liftEq = genericLiftEq
+instance Ord1 Go where liftCompare = genericLiftCompare
+instance Show1 Go where liftShowsPrec = genericLiftShowsPrec
