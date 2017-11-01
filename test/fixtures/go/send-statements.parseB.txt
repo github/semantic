@@ -1,4 +1,9 @@
 (Program
   (Module
     (Identifier))
-  (Error))
+  (Function
+    (Empty)
+    (Identifier)
+    (Send
+      (Identifier)
+      (Integer))))
