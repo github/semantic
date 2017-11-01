@@ -23,5 +23,21 @@
       (Identifier)
       (Identifier))
     ([]))
-  (Error)
-  (Error))
+  (Function
+    (
+      (Identifier)
+      (Identifier))
+  { (Identifier)
+  ->(Identifier) }
+    ([]))
+  (Function
+    (
+      (
+        (Identifier)
+        (Identifier))
+      (
+        (Identifier)
+        (Identifier)))
+  { (Identifier)
+  ->(Identifier) }
+    ([])))
