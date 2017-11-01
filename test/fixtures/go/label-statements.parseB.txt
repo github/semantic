@@ -4,4 +4,6 @@
   (Function
     (Empty)
     (Identifier)
-    (Error)))
+    (Label
+      (Identifier)
+      (Empty))))
