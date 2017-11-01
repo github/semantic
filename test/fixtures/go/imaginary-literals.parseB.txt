@@ -7,7 +7,7 @@
     (
       (Assignment
         (Identifier)
-        (Error))
+        (Complex))
       (Assignment
         (Identifier)
-        (Error)))))
+        (Complex)))))
