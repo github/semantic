@@ -46,6 +46,7 @@ type Syntax =
    , Go.Syntax.Variadic
    , Literal.Array
    , Literal.Channel
+   , Literal.Complex
    , Literal.Composite
    , Literal.Float
    , Literal.Hash
@@ -121,6 +122,7 @@ expressionChoices =
   , gotoStatement
   , ifInitializer
   , ifStatement
+  , imaginaryLiteral
   , incStatement
   , identifier
   , implicitLengthArrayType
@@ -171,6 +173,9 @@ expressions = mk <$> location <*> many expression
 
 element :: Assignment
 element = symbol Element *> children expression
+
+imaginaryLiteral :: Assignment
+imaginaryLiteral = makeTerm <$> symbol ImaginaryLiteral <*> (Literal.Complex <$> source)
 
 literalValue :: Assignment
 literalValue = makeTerm <$> symbol LiteralValue <*> children (many expression)
