@@ -41,12 +41,14 @@ type Syntax =
    , Statement.PostDecrement
    , Statement.PostIncrement
    , Expression.MemberAccess
+   , Go.Syntax.Communication
    , Go.Syntax.DefaultPattern
    , Go.Syntax.Defer
    , Go.Syntax.Go
    , Go.Syntax.Label
    , Go.Syntax.Receive
    , Go.Syntax.RuneLiteral
+   , Go.Syntax.Select
    , Go.Syntax.Send
    , Go.Syntax.Slice
    , Go.Syntax.Variadic
@@ -108,6 +110,7 @@ expressionChoices =
   , callExpression
   , channelType
   , comment
+  , communicationClause
   , compositeLiteral
   , continueStatement
   , varDeclaration
@@ -158,6 +161,7 @@ expressionChoices =
   , receiveStatement
   , returnStatement
   , runeLiteral
+  , selectStatement
   , selectorExpression
   , sendStatement
   , shortVarDeclaration
@@ -537,6 +541,14 @@ returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Re
 receiveStatement :: Assignment
 receiveStatement = makeTerm <$> symbol ReceiveStatement <*> children (  (Go.Syntax.Receive <$> expression <*> expression)
                                                                     <|> (Go.Syntax.Receive <$> emptyTerm <*> expression))
+
+selectStatement :: Assignment
+selectStatement = makeTerm <$> symbol SelectStatement <*> children (Go.Syntax.Select <$> expressions)
+
+communicationClause :: Assignment
+communicationClause = makeTerm <$> symbol CommunicationClause <*> children (Go.Syntax.Communication <$> communicationCase <*> expression)
+  where
+    communicationCase = symbol CommunicationCase *> children expression
 
 -- Helpers
 
