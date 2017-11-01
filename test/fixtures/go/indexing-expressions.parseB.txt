@@ -1,4 +1,37 @@
 (Program
   (Module
     (Identifier))
-  (Error))
+  (Function
+    (Empty)
+    (Identifier)
+    (
+      (Slice
+        (Identifier)
+        (Integer)
+        (Empty)
+        (Empty))
+      (Slice
+        (Identifier)
+        (Integer)
+        (Empty)
+        (Empty))
+      (Slice
+        (Identifier)
+        (Integer)
+        (Empty)
+        (Empty))
+      (Slice
+        (Identifier)
+        (Integer)
+        (Integer)
+        (Empty))
+      (Slice
+        (Identifier)
+        (Integer)
+        (Integer)
+        (Empty))
+      (Slice
+        (Identifier)
+        (Integer)
+        (Integer)
+        (Integer)))))
