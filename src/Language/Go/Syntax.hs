@@ -41,3 +41,11 @@ data Label a = Label { labelName :: a, labelStatement :: a }
 instance Eq1 Label where liftEq = genericLiftEq
 instance Ord1 Label where liftCompare = genericLiftCompare
 instance Show1 Label where liftShowsPrec = genericLiftShowsPrec
+
+-- | A send statement in Go (e.g. chan <- value)
+data Send a = Send { sendReceiver :: a, sendValue :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Send where liftEq = genericLiftEq
+instance Ord1 Send where liftCompare = genericLiftCompare
+instance Show1 Send where liftShowsPrec = genericLiftShowsPrec
