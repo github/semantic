@@ -13,5 +13,10 @@
             (KeyValue
             { (Identifier)
             ->(Identifier) }
-            { (Error)
+            { (Call
+              {-(Identifier)-}
+              {-(MemberAccess
+                {-(Identifier)-}
+                {-(Identifier)-})-}
+              {-(Empty)-})
             ->(Identifier) })))))))
