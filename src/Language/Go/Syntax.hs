@@ -73,3 +73,11 @@ data Slice a = Slice { sliceName :: !a, sliceLow :: !a, sliceHigh :: !a, sliceCa
 instance Eq1 Slice where liftEq = genericLiftEq
 instance Ord1 Slice where liftCompare = genericLiftCompare
 instance Show1 Slice where liftShowsPrec = genericLiftShowsPrec
+
+-- | A select statement in Go (e.g. `select { case x := <-c: x() }` where each case is a send or receive operation on channels).
+data Select a = Select { selectCases :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Select where liftEq = genericLiftEq
+instance Ord1 Select where liftCompare = genericLiftCompare
+instance Show1 Select where liftShowsPrec = genericLiftShowsPrec
