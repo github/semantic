@@ -45,6 +45,7 @@ type Syntax =
    , Go.Syntax.Defer
    , Go.Syntax.Go
    , Go.Syntax.Label
+   , Go.Syntax.Receive
    , Go.Syntax.RuneLiteral
    , Go.Syntax.Send
    , Go.Syntax.Slice
@@ -154,6 +155,7 @@ expressionChoices =
   , pointerType
   , qualifiedType
   , rawStringLiteral
+  , receiveStatement
   , returnStatement
   , runeLiteral
   , selectorExpression
@@ -332,11 +334,12 @@ selectorExpression :: Assignment
 selectorExpression = makeTerm <$> symbol SelectorExpression <*> children (Expression.MemberAccess <$> expression <*> expression)
 
 unaryExpression :: Assignment
-unaryExpression = symbol UnaryExpression >>= \ location -> (notExpression location) <|> (unaryMinus location) <|> unaryPlus <|> unaryAmpersand
+unaryExpression = symbol UnaryExpression >>= \ location -> (notExpression location) <|> (unaryMinus location) <|> unaryPlus <|> unaryAmpersand <|> unaryReceive
   where notExpression location = makeTerm location . Expression.Not <$> children (symbol AnonBang *> expression)
         unaryMinus location    = makeTerm location . Expression.Negate <$> children (symbol AnonMinus *> expression)
         unaryPlus = children (symbol AnonPlus *> expression)
         unaryAmpersand = children (makeTerm <$> symbol AnonAmpersand <*> (Statement.Reference <$> expression))
+        unaryReceive = children (symbol AnonLAngleMinus *> expression)
 
 binaryExpression :: Assignment
 binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression expression
@@ -530,6 +533,10 @@ labelStatement' = makeTerm <$> symbol LabelStatement <*> children (Go.Syntax.Lab
 
 returnStatement :: Assignment
 returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (expression <|> emptyTerm))
+
+receiveStatement :: Assignment
+receiveStatement = makeTerm <$> symbol ReceiveStatement <*> children (  (Go.Syntax.Receive <$> expression <*> expression)
+                                                                    <|> (Go.Syntax.Receive <$> emptyTerm <*> expression))
 
 -- Helpers
 
