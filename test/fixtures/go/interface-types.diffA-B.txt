@@ -14,9 +14,26 @@
         (Annotation
         { (Identifier)
         ->(Identifier) }
-          (Error)))
+          (Interface
+            (MemberAccess
+              (Identifier)
+              (Identifier)))))
       (
         (Annotation
         { (Identifier)
         ->(Identifier) }
-          (Error))))))
+          (Interface
+            (Identifier)
+            (MemberAccess
+              (Identifier)
+              (Identifier))
+            (Annotation
+              (Method
+                (Empty)
+                (Identifier)
+                (
+                  (
+                    (Identifier)
+                    (Identifier)))
+                (Empty))
+              (Identifier))))))))
