@@ -32,4 +32,8 @@
               (Integer)))))
       (Assignment
         (Identifier)
-        (Error)))))
+        (Composite
+          (MemberAccess
+            (Identifier)
+            (Identifier))
+          ([]))))))

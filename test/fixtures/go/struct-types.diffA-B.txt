@@ -33,5 +33,9 @@
         ->(Identifier) }
           (Constructor
             (Empty)
-            (Error)
+            (Annotation
+              ([])
+              (MemberAccess
+                (Identifier)
+                (Identifier)))
             (Error)))))))
