@@ -37,6 +37,7 @@ type Syntax =
    , Expression.Boolean
    , Expression.Call
    , Expression.Comparison
+   , Expression.Subscript
    , Statement.PostDecrement
    , Statement.PostIncrement
    , Expression.MemberAccess
@@ -134,6 +135,7 @@ expressionChoices =
   , implicitLengthArrayType
   , importDeclaration
   , importSpec
+  , indexExpression
   , interfaceType
   , interpretedStringLiteral
   , intLiteral
@@ -310,6 +312,9 @@ typeDeclaration = handleError $ makeTerm <$> symbol TypeDeclaration <*> children
 
 
 -- Expressions
+
+indexExpression :: Assignment
+indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> many expression)
 
 sliceExpression :: Assignment
 sliceExpression = makeTerm <$> symbol SliceExpression <*> children (  (Go.Syntax.Slice <$> expression <*> expression <*> expression <*> expression)
