@@ -41,6 +41,7 @@ type Syntax =
    , Statement.PostIncrement
    , Expression.MemberAccess
    , Go.Syntax.DefaultPattern
+   , Go.Syntax.Defer
    , Go.Syntax.Label
    , Go.Syntax.RuneLiteral
    , Go.Syntax.Send
@@ -108,6 +109,7 @@ expressionChoices =
   , varDeclaration
   , varSpecification
   , decStatement
+  , deferStatement
   , element
   , elseClause
   , expressionCaseClause
@@ -463,6 +465,9 @@ continueStatement = makeTerm <$> symbol ContinueStatement <*> children (Statemen
 
 decStatement :: Assignment
 decStatement = makeTerm <$> symbol DecStatement <*> children (Statement.PostDecrement <$> expression)
+
+deferStatement :: Assignment
+deferStatement = makeTerm <$> symbol DeferStatement <*> children (Go.Syntax.Defer <$> expression)
 
 gotoStatement :: Assignment
 gotoStatement = makeTerm <$> symbol GotoStatement <*> children (Statement.Goto <$> expression)
