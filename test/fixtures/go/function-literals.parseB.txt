@@ -6,4 +6,15 @@
     (Identifier)
     (Assignment
       (Identifier)
-      (Error))))
+      (Function
+        (
+          (Identifier)
+          (Identifier))
+        (Empty)
+        (
+          (Identifier)
+          (Identifier))
+        (Return
+          (
+            (Integer)
+            (Integer)))))))
