@@ -41,6 +41,7 @@ type Syntax =
    , Statement.PostIncrement
    , Expression.MemberAccess
    , Go.Syntax.DefaultPattern
+   , Go.Syntax.Label
    , Go.Syntax.RuneLiteral
    , Go.Syntax.Variadic
    , Literal.Array
@@ -129,7 +130,8 @@ expressionChoices =
   , interpretedStringLiteral
   , intLiteral
   , keyedElement
-  , labelName
+  , labelName'
+  , labelStatement'
   , literalValue
   , mapType
   , methodDeclaration
@@ -442,10 +444,10 @@ shortVarDeclaration :: Assignment
 shortVarDeclaration = makeTerm <$> symbol ShortVarDeclaration <*> children (Statement.Assignment <$> pure [] <*> expression <*> expression)
 
 breakStatement :: Assignment
-breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> (labelName <|> emptyTerm))
+breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> (labelName' <|> emptyTerm))
 
 continueStatement :: Assignment
-continueStatement = makeTerm <$> symbol ContinueStatement <*> children (Statement.Continue <$> (labelName <|> emptyTerm))
+continueStatement = makeTerm <$> symbol ContinueStatement <*> children (Statement.Continue <$> (labelName' <|> emptyTerm))
 
 decStatement :: Assignment
 decStatement = makeTerm <$> symbol DecStatement <*> children (Statement.PostDecrement <$> expression)
@@ -482,8 +484,11 @@ incStatement = makeTerm <$> symbol IncStatement <*> children (Statement.PostIncr
 keyedElement :: Assignment
 keyedElement = makeTerm <$> symbol KeyedElement <*> children (Literal.KeyValue <$> expression <*> expression)
 
-labelName :: Assignment
-labelName = makeTerm <$> symbol LabelName <*> (Syntax.Identifier <$> source)
+labelName' :: Assignment
+labelName' = makeTerm <$> symbol LabelName <*> (Syntax.Identifier <$> source)
+
+labelStatement' :: Assignment
+labelStatement' = makeTerm <$> symbol LabelStatement <*> children (Go.Syntax.Label <$> expression <*> (expression <|> emptyTerm))
 
 returnStatement :: Assignment
 returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (expression <|> emptyTerm))
