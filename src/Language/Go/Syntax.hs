@@ -33,3 +33,11 @@ newtype RuneLiteral a = RuneLiteral { runeLiteralContent :: ByteString }
 instance Eq1 RuneLiteral where liftEq = genericLiftEq
 instance Ord1 RuneLiteral where liftCompare = genericLiftCompare
 instance Show1 RuneLiteral where liftShowsPrec = genericLiftShowsPrec
+
+-- | A labeled statement in Go (e.g. a:continue)
+data Label a = Label { labelName :: a, labelStatement :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Label where liftEq = genericLiftEq
+instance Ord1 Label where liftCompare = genericLiftCompare
+instance Show1 Label where liftShowsPrec = genericLiftShowsPrec
