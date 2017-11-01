@@ -90,3 +90,10 @@ instance Eq1 Communication where liftEq = genericLiftEq
 instance Ord1 Communication where liftCompare = genericLiftCompare
 instance Show1 Communication where liftShowsPrec = genericLiftShowsPrec
 
+-- | A receive statement in Go (e.g. `value = <-channel` )
+data Receive a = Receive { receiveSubject :: !a, receiveExpression :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Receive where liftEq = genericLiftEq
+instance Ord1 Receive where liftCompare = genericLiftCompare
+instance Show1 Receive where liftShowsPrec = genericLiftShowsPrec
