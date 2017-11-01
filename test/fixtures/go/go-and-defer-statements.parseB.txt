@@ -1,4 +1,19 @@
 (Program
   (Module
     (Identifier))
-  (Error))
+  (Function
+    (Empty)
+    (Identifier)
+    (
+      (Defer
+        (Call
+          (MemberAccess
+            (Identifier)
+            (Identifier))
+          (Empty)))
+      (Go
+        (Call
+          (MemberAccess
+            (Identifier)
+            (Identifier))
+          (Empty))))))
