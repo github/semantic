@@ -67,7 +67,7 @@ instance Ord1 Go where liftCompare = genericLiftCompare
 instance Show1 Go where liftShowsPrec = genericLiftShowsPrec
 
 -- | A slice expression in Go (e.g. a[1:4:3] where a is a list, 1 is the low bound, 4 is the high bound, and 3 is the max capacity).
-data Slice a = Slice { sliceName :: !a, sliceBody :: ![a] }
+data Slice a = Slice { sliceName :: !a, sliceLow :: !a, sliceHigh :: !a, sliceCapacity :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Slice where liftEq = genericLiftEq
