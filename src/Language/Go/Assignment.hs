@@ -385,10 +385,10 @@ expressionList :: Assignment
 expressionList = symbol ExpressionList *> children expressions
 
 functionDeclaration :: Assignment
-functionDeclaration = mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> expression <*> parameters <*> (expression <|> parameters' <|> emptyTerm) <*> block)
+functionDeclaration = mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> expression <*> parameters <*> (expression <|> returnParameters <|> emptyTerm) <*> block)
   where mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Declaration.Function [types'] name' params' block')
         parameters = symbol Parameters *> children (many expression)
-        parameters' = makeTerm <$> symbol Parameters <*> children (many expression)
+        returnParameters = makeTerm <$> symbol Parameters <*> children (many expression)
 
 variadicParameterDeclaration :: Assignment
 variadicParameterDeclaration =  mkVariadic <$> symbol VariadicParameterDeclaration <*> children ((,) <$> emptyTerm  <*> expression)
