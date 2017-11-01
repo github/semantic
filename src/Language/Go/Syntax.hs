@@ -81,3 +81,12 @@ data Select a = Select { selectCases :: !a }
 instance Eq1 Select where liftEq = genericLiftEq
 instance Ord1 Select where liftCompare = genericLiftCompare
 instance Show1 Select where liftShowsPrec = genericLiftShowsPrec
+
+-- | A communication clause in a Go select statement (e.g. `select { case x := <-c: x() }` where `case x:= <-c:` is the communication subject and `x()` is the communication body).
+data Communication a = Communication { communicationSubject :: !a, communicationBody :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Communication where liftEq = genericLiftEq
+instance Ord1 Communication where liftCompare = genericLiftCompare
+instance Show1 Communication where liftShowsPrec = genericLiftShowsPrec
+
