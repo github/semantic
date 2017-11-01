@@ -35,7 +35,7 @@ instance Ord1 RuneLiteral where liftCompare = genericLiftCompare
 instance Show1 RuneLiteral where liftShowsPrec = genericLiftShowsPrec
 
 -- | A labeled statement in Go (e.g. label:continue)
-data Label a = Label { labelName :: a, labelStatement :: a }
+data Label a = Label { labelName :: !a, labelStatement :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Label where liftEq = genericLiftEq
@@ -43,7 +43,7 @@ instance Ord1 Label where liftCompare = genericLiftCompare
 instance Show1 Label where liftShowsPrec = genericLiftShowsPrec
 
 -- | A send statement in Go (e.g. channel <- value).
-data Send a = Send { sendReceiver :: a, sendValue :: a }
+data Send a = Send { sendReceiver :: !a, sendValue :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Send where liftEq = genericLiftEq
