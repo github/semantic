@@ -42,6 +42,7 @@ type Syntax =
    , Expression.MemberAccess
    , Go.Syntax.DefaultPattern
    , Go.Syntax.Defer
+   , Go.Syntax.Go
    , Go.Syntax.Label
    , Go.Syntax.RuneLiteral
    , Go.Syntax.Send
@@ -122,6 +123,7 @@ expressionChoices =
   , forStatement
   , functionDeclaration
   , functionType
+  , goStatement
   , gotoStatement
   , ifInitializer
   , ifStatement
@@ -468,6 +470,9 @@ decStatement = makeTerm <$> symbol DecStatement <*> children (Statement.PostDecr
 
 deferStatement :: Assignment
 deferStatement = makeTerm <$> symbol DeferStatement <*> children (Go.Syntax.Defer <$> expression)
+
+goStatement :: Assignment
+goStatement = makeTerm <$> symbol GoStatement <*> children (Go.Syntax.Go <$> expression)
 
 gotoStatement :: Assignment
 gotoStatement = makeTerm <$> symbol GotoStatement <*> children (Statement.Goto <$> expression)
