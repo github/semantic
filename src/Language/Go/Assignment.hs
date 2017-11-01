@@ -46,6 +46,7 @@ type Syntax =
    , Go.Syntax.Label
    , Go.Syntax.RuneLiteral
    , Go.Syntax.Send
+   , Go.Syntax.Slice
    , Go.Syntax.Variadic
    , Literal.Array
    , Literal.Channel
@@ -155,6 +156,7 @@ expressionChoices =
   , selectorExpression
   , sendStatement
   , shortVarDeclaration
+  , sliceExpression
   , sliceType
   , structType
   , typeDeclaration
@@ -308,6 +310,14 @@ typeDeclaration = handleError $ makeTerm <$> symbol TypeDeclaration <*> children
 
 
 -- Expressions
+
+sliceExpression :: Assignment
+sliceExpression = makeTerm <$> symbol SliceExpression <*> children (  (Go.Syntax.Slice <$> expression <*> expression <*> expression <*> expression)
+                                                                  <|> (Go.Syntax.Slice <$> expression <*> emptyTerm <* symbol AnonColon <*> expression <* symbol AnonColon <*> expression)
+                                                                  <|> (Go.Syntax.Slice <$> expression <*> emptyTerm <* symbol AnonColon <*> expression <*> emptyTerm)
+                                                                  <|> (Go.Syntax.Slice <$> expression <*> expression <*> expression <*> emptyTerm)
+                                                                  <|> (Go.Syntax.Slice <$> expression <*> expression <*> emptyTerm <*> emptyTerm)
+                                                                  <|> (Go.Syntax.Slice <$> expression <*> emptyTerm <*> emptyTerm <*> emptyTerm))
 
 parenthesizedExpression :: Assignment
 parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
