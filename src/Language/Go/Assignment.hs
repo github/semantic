@@ -43,6 +43,7 @@ type Syntax =
    , Go.Syntax.DefaultPattern
    , Go.Syntax.Label
    , Go.Syntax.RuneLiteral
+   , Go.Syntax.Send
    , Go.Syntax.Variadic
    , Literal.Array
    , Literal.Channel
@@ -148,6 +149,7 @@ expressionChoices =
   , returnStatement
   , runeLiteral
   , selectorExpression
+  , sendStatement
   , shortVarDeclaration
   , sliceType
   , structType
@@ -447,6 +449,9 @@ assignment' =  makeTerm'  <$> symbol AssignmentStatement <*> children (infixTerm
 
 shortVarDeclaration :: Assignment
 shortVarDeclaration = makeTerm <$> symbol ShortVarDeclaration <*> children (Statement.Assignment <$> pure [] <*> expression <*> expression)
+
+sendStatement :: Assignment
+sendStatement = makeTerm <$> symbol SendStatement <*> children (Go.Syntax.Send <$> expression <*> expression)
 
 breakStatement :: Assignment
 breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> (labelName' <|> emptyTerm))
