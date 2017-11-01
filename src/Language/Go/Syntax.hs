@@ -26,7 +26,7 @@ instance Eq1 DefaultPattern where liftEq = genericLiftEq
 instance Ord1 DefaultPattern where liftCompare = genericLiftCompare
 instance Show1 DefaultPattern where liftShowsPrec = genericLiftShowsPrec
 
--- | A rune literal in Go (e.g. '⌘')
+-- | A rune literal in Go (e.g. '⌘').
 newtype RuneLiteral a = RuneLiteral { runeLiteralContent :: ByteString }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
@@ -34,7 +34,7 @@ instance Eq1 RuneLiteral where liftEq = genericLiftEq
 instance Ord1 RuneLiteral where liftCompare = genericLiftCompare
 instance Show1 RuneLiteral where liftShowsPrec = genericLiftShowsPrec
 
--- | A labeled statement in Go (e.g. label:continue)
+-- | A labeled statement in Go (e.g. label:continue).
 data Label a = Label { labelName :: !a, labelStatement :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
@@ -50,7 +50,7 @@ instance Eq1 Send where liftEq = genericLiftEq
 instance Ord1 Send where liftCompare = genericLiftCompare
 instance Show1 Send where liftShowsPrec = genericLiftShowsPrec
 
--- | A defer statement in Go (e.g. defer x())
+-- | A defer statement in Go (e.g. defer x()).
 newtype Defer a = Defer { deferBody :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
@@ -58,7 +58,7 @@ instance Eq1 Defer where liftEq = genericLiftEq
 instance Ord1 Defer where liftCompare = genericLiftCompare
 instance Show1 Defer where liftShowsPrec = genericLiftShowsPrec
 
--- | A go statement (i.e. go routine) in Go (e.g. go x())
+-- | A go statement (i.e. go routine) in Go (e.g. go x()).
 newtype Go a = Go { goBody :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
