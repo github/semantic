@@ -113,3 +113,11 @@ data Field a = Field { fieldContext :: ![a], fieldName :: !a }
 instance Eq1 Field where liftEq = genericLiftEq
 instance Ord1 Field where liftCompare = genericLiftCompare
 instance Show1 Field where liftShowsPrec = genericLiftShowsPrec
+
+-- | A type assertion in Go (e.g. x.(T) where the value of x is not nil and is of type T).
+data TypeAssertion a = TypeAssertion { typeAssertionSubject :: !a, typeAssertionType :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 TypeAssertion where liftEq = genericLiftEq
+instance Ord1 TypeAssertion where liftCompare = genericLiftCompare
+instance Show1 TypeAssertion where liftShowsPrec = genericLiftShowsPrec
