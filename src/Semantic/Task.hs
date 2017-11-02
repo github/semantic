@@ -214,9 +214,13 @@ runParser Options{..} blob@Blob{..} = go
               writeLog Error (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "assign") : blobFields)
               throwError (toException err)
             Right term -> do
-              for_ (errors term) $ \ err -> do
-                writeStat (Stat.increment "parse.parse_errors" languageTag)
-                writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "parse") : blobFields)
+              for_ (errors term) $ \ err -> case Error.errorActual err of
+                  (Just "ParseError") -> do
+                    writeStat (Stat.increment "parse.parse_errors" languageTag)
+                    writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "parse") : blobFields)
+                  _ -> do
+                    writeStat (Stat.increment "parse.assign_warnings" languageTag)
+                    writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "assign") : blobFields)
               writeStat (Stat.count "parse.nodes" (length term) languageTag)
               pure term
       TreeSitterParser tslanguage ->
