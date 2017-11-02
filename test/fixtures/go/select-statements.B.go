@@ -8,5 +8,7 @@ select {
     println(5)
   case <-time.After(2):
     println(6)
+  default:
+    return
 }
 }

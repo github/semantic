@@ -34,4 +34,8 @@
           (Call
             (Identifier)
             (Integer)
+            (Empty)))
+        (Communication
+          (DefaultCommunication)
+          (Return
             (Empty)))))))
