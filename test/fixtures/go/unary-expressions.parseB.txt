@@ -6,5 +6,5 @@
     (Identifier)
     (
       (Not
-        (Error))
+        (Identifier))
       (Error))))
