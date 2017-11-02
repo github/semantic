@@ -121,3 +121,10 @@ data TypeAssertion a = TypeAssertion { typeAssertionSubject :: !a, typeAssertion
 instance Eq1 TypeAssertion where liftEq = genericLiftEq
 instance Ord1 TypeAssertion where liftCompare = genericLiftCompare
 instance Show1 TypeAssertion where liftShowsPrec = genericLiftShowsPrec
+
+data TypeConversion a = TypeConversion { typeConversionType :: !a, typeConversionSubject :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 TypeConversion where liftEq = genericLiftEq
+instance Ord1 TypeConversion where liftCompare = genericLiftCompare
+instance Show1 TypeConversion where liftShowsPrec = genericLiftShowsPrec
