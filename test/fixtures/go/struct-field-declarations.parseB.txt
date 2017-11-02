@@ -9,8 +9,8 @@
         (Identifier)
         (Constructor
           (Empty)
-          (Annotation
+          (Field
+            (Identifier)
             (
               (Identifier)
-              (Identifier))
-            (Identifier)))))))
+              (Identifier))))))))
