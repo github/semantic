@@ -1,4 +1,40 @@
 (Program
   (Module
     (Identifier))
-  (Error))
+  (Function
+    (Empty)
+    (Identifier)
+    (Select
+      (
+        (Communication
+          (Receive
+          { (Identifier)
+          ->(Identifier) }
+            (Identifier))
+          (Call
+            (Identifier)
+            (Identifier)
+            (Empty)))
+        (Communication
+          (Send
+          { (Identifier)
+          ->(Identifier) }
+            (Identifier))
+          (Call
+            (Identifier)
+            (Integer)
+            (Empty)))
+        (Communication
+          (Receive
+            (Empty)
+            (Call
+              (MemberAccess
+                (Identifier)
+                (Identifier))
+            { (Integer)
+            ->(Integer) }
+              (Empty)))
+          (Call
+            (Identifier)
+            (Integer)
+            (Empty)))))))
