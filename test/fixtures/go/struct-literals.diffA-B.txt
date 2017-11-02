@@ -23,8 +23,7 @@
           (Constructor
             (Empty)
             (Annotation
-              (Annotation
-                ([])
+              (
                 (Identifier))
             { (Identifier)
             ->(Identifier) }))
