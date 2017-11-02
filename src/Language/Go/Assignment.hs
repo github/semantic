@@ -42,6 +42,7 @@ type Syntax =
    , Statement.PostIncrement
    , Expression.MemberAccess
    , Go.Syntax.Communication
+   , Go.Syntax.DefaultCommunication
    , Go.Syntax.DefaultPattern
    , Go.Syntax.Defer
    , Go.Syntax.Go
@@ -546,9 +547,10 @@ selectStatement :: Assignment
 selectStatement = makeTerm <$> symbol SelectStatement <*> children (Go.Syntax.Select <$> expressions)
 
 communicationClause :: Assignment
-communicationClause = makeTerm <$> symbol CommunicationClause <*> children (Go.Syntax.Communication <$> communicationCase <*> expression)
+communicationClause = makeTerm <$> symbol CommunicationClause <*> children (Go.Syntax.Communication <$> (communicationCase <|> defaultCommunicationCase) <*> expression)
   where
     communicationCase = symbol CommunicationCase *> children expression
+    defaultCommunicationCase = makeTerm <$> symbol DefaultCommunicationCase <*> (Go.Syntax.DefaultCommunication <$ source)
 
 -- Helpers
 
