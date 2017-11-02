@@ -9,4 +9,8 @@
         (Identifier)
         (Constructor
           (Empty)
-          (Error))))))
+          (Annotation
+            (
+              (Identifier)
+              (Identifier))
+            (Identifier)))))))

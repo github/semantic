@@ -9,9 +9,9 @@
         (Identifier)
         (Constructor
           (Empty)
-        {+(Error)+}
-        {-(Annotation
-          {-(Annotation
-            {-([])-}
-            {-(Identifier)-})-}
-          {-(Identifier)-})-})))))
+          (Annotation
+            (
+            { (Identifier)
+            ->(Identifier) }
+            {+(Identifier)+})
+            (Identifier)))))))
