@@ -54,6 +54,7 @@ type Syntax =
    , Go.Syntax.Send
    , Go.Syntax.Slice
    , Go.Syntax.TypeAssertion
+   , Go.Syntax.TypeConversion
    , Go.Syntax.Variadic
    , Literal.Array
    , Literal.Channel
@@ -172,6 +173,7 @@ expressionChoices =
   , sliceType
   , structType
   , typeAssertion
+  , typeConversion
   , typeDeclaration
   , typeIdentifier
   , unaryExpression
@@ -346,6 +348,9 @@ selectorExpression = makeTerm <$> symbol SelectorExpression <*> children (Expres
 
 typeAssertion :: Assignment
 typeAssertion = makeTerm <$> symbol TypeAssertionExpression <*> children (Go.Syntax.TypeAssertion <$> expression <*> expression)
+
+typeConversion :: Assignment
+typeConversion = makeTerm <$> symbol TypeConversionExpression <*> children (Go.Syntax.TypeConversion <$> expression <*> expression)
 
 unaryExpression :: Assignment
 unaryExpression = symbol UnaryExpression >>= \ location -> (notExpression location) <|> (unaryMinus location) <|> unaryPlus <|> unaryAmpersand <|> unaryReceive
