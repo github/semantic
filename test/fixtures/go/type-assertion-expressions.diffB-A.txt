@@ -1,4 +1,14 @@
 (Program
   (Module
     (Identifier))
-  (Error))
+  (Function
+    (Empty)
+    (Identifier)
+    (TypeAssertion
+    { (Identifier)
+    ->(Identifier) }
+      (MemberAccess
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) }))))
