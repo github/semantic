@@ -762,7 +762,7 @@ tryStatement = makeTry <$> symbol TryStatement <*> children ((,,) <$> term state
     finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> statementBlock)
 
 binaryExpression  :: Assignment
-binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression expression
+binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression (term expression)
   [ (inj .) . Expression.Plus             <$ symbol AnonPlus
   , (inj .) . Expression.Minus            <$ symbol AnonMinus
   , (inj .) . Expression.Times            <$ symbol AnonStar
