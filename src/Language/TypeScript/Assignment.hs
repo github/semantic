@@ -429,7 +429,15 @@ methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> chi
   where makeMethodSignature loc (modifier, readonly, propertyName, (typeParams, params, annotation)) = makeTerm loc (TypeScript.Syntax.MethodSignature [modifier, readonly, typeParams, annotation] propertyName params)
 
 formalParameters :: HasCallStack => Assignment.Assignment [] Grammar [Term]
-formalParameters = symbol FormalParameters *> children (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term parameter))
+formalParameters = symbol FormalParameters *> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term parameter)) <*> many comment))
+  where
+    contextualize' (cs, formalParams) = case nonEmpty cs of
+      Just cs -> toList cs ++ formalParams
+      Nothing -> formalParams
+    postContextualize' formalParams cs = case nonEmpty cs of
+      Just cs -> formalParams ++ toList cs
+      Nothing -> formalParams
+
 
 decorator :: Assignment
 decorator = makeTerm <$> symbol Grammar.Decorator <*> children (TypeScript.Syntax.Decorator <$> term (identifier <|> memberExpression <|> callExpression))
