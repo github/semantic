@@ -241,6 +241,8 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
   , assign Expression.Modulo <$ symbol AnonPercentEqual
   , assign Expression.BXOr <$ symbol AnonCaretEqual
   , assign Expression.BAnd <$ symbol AnonAmpersandEqual
+  , assign Expression.RShift <$ symbol AnonRAngleRAngleEqual
+  , assign Expression.UnsignedRShift <$ symbol AnonRAngleRAngleRAngleEqual
   , assign Expression.BOr <$ symbol AnonPipeEqual ])
   where assign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Data.Union.Union Syntax Term
         assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
