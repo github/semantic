@@ -45,6 +45,7 @@ type Syntax =
    , Go.Syntax.DefaultCommunication
    , Go.Syntax.DefaultPattern
    , Go.Syntax.Defer
+   , Go.Syntax.Field
    , Go.Syntax.Go
    , Go.Syntax.Label
    , Go.Syntax.Receive
@@ -273,10 +274,13 @@ pointerType :: Assignment
 pointerType = handleError $ makeTerm <$> symbol PointerType <*> children (Type.Pointer <$> expression)
 
 fieldDeclaration :: Assignment
-fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> manyTermsTill expression (void (symbol TypeIdentifier)) <*> expression <*> optional expression)
+fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> (manyTermsTill expression (void (symbol TypeIdentifier)) <|> (many expression)) <*> optional expression <*> optional expression)
   where
-    mkFieldDeclarationWithTag loc (fields, type', (Just tag)) = makeTerm loc $ Type.Annotation (makeTerm loc (Type.Annotation (makeTerm loc fields) type')) tag
-    mkFieldDeclarationWithTag loc (fields, type', Nothing) = makeTerm loc $ Type.Annotation (makeTerm loc fields) type'
+    mkFieldDeclarationWithTag loc (fields, (Just type'), (Just tag)) = makeTerm loc $ Go.Syntax.Field [type', tag] (makeTerm loc fields) --Type.Annotation (makeTerm loc (Type.Annotation (makeTerm loc fields) type')) tag
+    mkFieldDeclarationWithTag loc (fields, (Just type'), Nothing) = makeTerm loc $ Go.Syntax.Field [type'] (makeTerm loc fields)
+    mkFieldDeclarationWithTag loc (fields, Nothing, (Just tag)) = makeTerm loc $ Go.Syntax.Field [tag] (makeTerm loc fields)
+    mkFieldDeclarationWithTag loc (fields, Nothing, Nothing) = makeTerm loc $ Go.Syntax.Field [] (makeTerm loc fields)
+
 
 -- Type Declarations
 
