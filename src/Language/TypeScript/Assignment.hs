@@ -769,6 +769,7 @@ binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm
   , (inj .) . invert Expression.Equal     <$ (symbol AnonBangEqual <|> symbol AnonBangEqualEqual)
   , (inj .) . Expression.LShift           <$ symbol AnonLAngleLAngle
   , (inj .) . Expression.RShift           <$ symbol AnonRAngleRAngle
+  , (inj .) . Expression.UnsignedRShift   <$ symbol AnonRAngleRAngleRAngle
   , (inj .) . Expression.LessThan         <$ symbol AnonLAngle
   , (inj .) . Expression.GreaterThan      <$ symbol AnonRAngle
   , (inj .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
