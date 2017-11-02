@@ -19,27 +19,23 @@
       (Empty)
       (Identifier)
       (Empty))
-  {+(PublicFieldDefinition
-    {+(Identifier)+}
-    {+(Readonly)+}
-    {+(Empty)+}
-    {+(Identifier)+}
-    {+(Float)+})+}
     (PublicFieldDefinition
       (Identifier)
       (Readonly)
-      (Annotation
-        (TypeIdentifier))
-    { (Identifier)
-    ->(Identifier) }
-      (Float))
-  {-(PublicFieldDefinition
-    {-(Identifier)-}
-    {-(Empty)-}
+    {+(Empty)+}
     {-(Annotation
       {-(TypeIdentifier)-})-}
-    {-(Identifier)-}
-    {-(Float)-})-}
+      (Identifier)
+      (Float))
+    (PublicFieldDefinition
+    { (Identifier)
+    ->(Identifier) }
+    {+(Readonly)+}
+    {-(Empty)-}
+      (Annotation
+        (TypeIdentifier))
+      (Identifier)
+      (Float))
     (PublicFieldDefinition
       (Empty)
       (Empty)

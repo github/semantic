@@ -1,18 +1,20 @@
 (Program
-  (Return
-    (
-      (Plus
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->(Identifier) })
-    { (Identifier)
-    ->(Identifier) }))
+{+(Return
+  {+(
+    {+(Plus
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(Identifier)+})+})+}
   (Return
     (Empty))
-{+(Return
-  {+(Not
-    {+(Identifier)+})+})+}
+  (Return
+  { (
+    {-(Plus
+      {-(Identifier)-}
+      {-(Identifier)-})-}
+    {-(Identifier)-})
+  ->(Not
+    {+(Identifier)+}) })
 {-(Return
   {-(Not
     {-(Identifier)-})-})-})

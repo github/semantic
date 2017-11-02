@@ -27,10 +27,6 @@ spec = parallel $ do
     prop "produces grams with bases of the specified width" $
       \ (term, p, q) -> pqGramDecorator constructorNameAndConstantFields (positively p) (positively q) (term :: Term ListableSyntax (Record '[])) `shouldSatisfy` all ((== positively q) . length . base . rhead)
 
-  describe "featureVectorDecorator" $ do
-    prop "produces a vector of the specified dimension" $
-      \ term p q d -> featureVectorDecorator constructorNameAndConstantFields (positively p) (positively q) (positively d) (term :: Term ListableSyntax (Record '[])) `shouldSatisfy` all ((== (0, abs d)) . bounds . unFV . rhead)
-
   describe "rws" $ do
     prop "produces correct diffs" $
       \ (as, bs) -> let tas = decorate <$> (as :: [Term ListableSyntax (Record '[])])

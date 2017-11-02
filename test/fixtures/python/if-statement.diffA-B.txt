@@ -3,9 +3,9 @@
   { (Identifier)
   ->(Identifier) }
     (
-    { (Identifier)
-    ->(Identifier) }
-      (Identifier))
+    {+(Identifier)+}
+      (Identifier)
+    {-(Identifier)-})
   { (If
     {-(Identifier)-}
     {-(

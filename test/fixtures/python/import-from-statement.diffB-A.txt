@@ -7,12 +7,14 @@
   {+(ScopeResolution
     {+(Identifier)+})+})
   (Import
+  {+(ScopeResolution
+    {+(Identifier)+})+}
     (ScopeResolution
       (Identifier))
     (ScopeResolution
       (Identifier))
-    (ScopeResolution
-      (Identifier)))
+  {-(ScopeResolution
+    {-(Identifier)-})-})
   (Import
     (ScopeResolution
     { (Identifier)
