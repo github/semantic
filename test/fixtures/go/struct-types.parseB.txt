@@ -15,23 +15,31 @@
           (Identifier)
           (Constructor
             (Empty)
-            (Annotation
-              ([])
-              (Identifier)))))
+            (Field
+              (Identifier)
+              ([])))))
       (
         (Annotation
           (Identifier)
           (Constructor
             (Empty)
-            (Error))))
-      (
-        (Annotation
-          (Identifier)
-          (Constructor
-            (Empty)
-            (Annotation
-              ([])
-              (MemberAccess
+            (Field
+              (Identifier)
+              (
                 (Identifier)
-                (Identifier)))
-            (Error)))))))
+                (Identifier))))))
+      (
+        (Annotation
+          (Identifier)
+          (Constructor
+            (Empty)
+            (Field
+              (
+                (MemberAccess
+                  (Identifier)
+                  (Identifier))))
+            (Field
+              (Identifier)
+              (TextElement)
+              (
+                (Identifier)))))))))
