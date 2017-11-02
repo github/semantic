@@ -273,10 +273,10 @@ pointerType :: Assignment
 pointerType = handleError $ makeTerm <$> symbol PointerType <*> children (Type.Pointer <$> expression)
 
 fieldDeclaration :: Assignment
-fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> many identifier <*> expression <*> optional expression)
+fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> manyTermsTill expression (void (symbol TypeIdentifier)) <*> expression <*> optional expression)
   where
-        mkFieldDeclarationWithTag loc (fields, type', (Just tag)) = makeTerm loc $ Type.Annotation (makeTerm loc (Type.Annotation (makeTerm loc fields) type')) tag
-        mkFieldDeclarationWithTag loc (fields, type', Nothing) = makeTerm loc $ Type.Annotation (makeTerm loc fields) type'
+    mkFieldDeclarationWithTag loc (fields, type', (Just tag)) = makeTerm loc $ Type.Annotation (makeTerm loc (Type.Annotation (makeTerm loc fields) type')) tag
+    mkFieldDeclarationWithTag loc (fields, type', Nothing) = makeTerm loc $ Type.Annotation (makeTerm loc fields) type'
 
 -- Type Declarations
 
