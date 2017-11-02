@@ -21,10 +21,10 @@
         (Composite
           (Constructor
             (Empty)
-            (Annotation
+            (Field
+              (Identifier)
               (
-                (Identifier))
-              (Identifier)))
+                (Identifier))))
           (
             (KeyValue
               (Identifier)

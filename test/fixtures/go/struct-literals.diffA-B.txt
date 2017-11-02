@@ -22,11 +22,11 @@
         (Composite
           (Constructor
             (Empty)
-            (Annotation
-              (
-                (Identifier))
+            (Field
             { (Identifier)
-            ->(Identifier) }))
+            ->(Identifier) }
+              (
+                (Identifier))))
           (
             (KeyValue
             { (Identifier)
