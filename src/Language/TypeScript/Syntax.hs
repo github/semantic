@@ -10,6 +10,14 @@ import Data.Functor.Classes.Show.Generic
 import Data.Mergeable
 import GHC.Generics
 
+-- | Lookup type for a type-level key in a typescript map.
+data LookupType a = LookupType { lookupTypeIdentifier :: a, lookupTypeKey :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 LookupType where liftEq = genericLiftEq
+instance Ord1 LookupType where liftCompare = genericLiftCompare
+instance Show1 LookupType where liftShowsPrec = genericLiftShowsPrec
+
 -- | ShorthandPropertyIdentifier used in object patterns such as var baz = { foo } to mean var baz = { foo: foo }
 newtype ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier ByteString
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

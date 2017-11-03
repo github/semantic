@@ -110,6 +110,7 @@ type Syntax = '[
   , TypeScript.Syntax.CallSignature
   , TypeScript.Syntax.ConstructSignature
   , TypeScript.Syntax.ArrayType
+  , TypeScript.Syntax.LookupType
   , TypeScript.Syntax.FlowMaybeType
   , TypeScript.Syntax.TypeQuery
   , TypeScript.Syntax.IndexTypeQuery
@@ -471,7 +472,7 @@ ty :: Assignment
 ty = primaryType <|> unionType <|> intersectionType <|> functionTy <|> constructorTy
 
 primaryType :: Assignment
-primaryType = parenthesizedTy <|> predefinedTy <|> typeIdentifier <|> nestedTypeIdentifier <|> genericType <|> typePredicate <|> objectType <|> arrayTy <|> tupleType <|> flowMaybeTy <|> typeQuery <|> indexTypeQuery <|> thisType <|> existentialType <|> literalType
+primaryType = parenthesizedTy <|> predefinedTy <|> typeIdentifier <|> nestedTypeIdentifier <|> genericType <|> typePredicate <|> objectType <|> arrayTy <|> tupleType <|> flowMaybeTy <|> typeQuery <|> indexTypeQuery <|> thisType <|> existentialType <|> literalType <|> lookupType
 
 parenthesizedTy :: Assignment
 parenthesizedTy = makeTerm <$> symbol Grammar.ParenthesizedType <*> children (TypeScript.Syntax.ParenthesizedType <$> term ty)
@@ -502,6 +503,9 @@ objectType = makeTerm <$> symbol Grammar.ObjectType <*> children (TypeScript.Syn
 
 arrayTy :: Assignment
 arrayTy = makeTerm <$> symbol Grammar.ArrayType <*> children (TypeScript.Syntax.ArrayType <$> term ty)
+
+lookupType :: Assignment
+lookupType = makeTerm <$> symbol Grammar.LookupType <*> children (TypeScript.Syntax.LookupType <$> term (identifier <|> nestedTypeIdentifier) <*> term ty)
 
 flowMaybeTy :: Assignment
 flowMaybeTy = makeTerm <$> symbol Grammar.FlowMaybeType <*> children (TypeScript.Syntax.FlowMaybeType <$> term primaryType)
