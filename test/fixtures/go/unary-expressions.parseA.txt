@@ -7,4 +7,7 @@
     (
       (Not
         (Identifier))
-      (Error))))
+      (Pointer
+        (Call
+          (Identifier)
+          (Empty))))))

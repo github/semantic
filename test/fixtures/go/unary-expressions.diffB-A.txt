@@ -8,4 +8,8 @@
       (Not
       { (Identifier)
       ->(Identifier) })
-      (Error))))
+      (Pointer
+        (Call
+        { (Identifier)
+        ->(Identifier) }
+          (Empty))))))
