@@ -315,8 +315,11 @@ sliceTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotatio
 pointerTypeDeclaration :: Assignment
 pointerTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> pointerType)
 
+typeIdentifierDeclaration :: Assignment
+typeIdentifierDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> expression)
+
 typeDeclaration :: Assignment
-typeDeclaration = handleError $ makeTerm <$> symbol TypeDeclaration <*> children (many ( arrayTypeDeclaration
+typeDeclaration = handleError $ makeTerm <$> symbol TypeDeclaration <*> children (many (  arrayTypeDeclaration
                                                                                       <|> channelTypeDeclaration
                                                                                       <|> functionTypeDeclaration
                                                                                       <|> interfaceTypeDeclaration
@@ -324,7 +327,8 @@ typeDeclaration = handleError $ makeTerm <$> symbol TypeDeclaration <*> children
                                                                                       <|> pointerTypeDeclaration
                                                                                       <|> sliceTypeDeclaration
                                                                                       <|> structTypeDeclaration
-                                                                                      <|> mapTypeDeclaration ))
+                                                                                      <|> mapTypeDeclaration
+                                                                                      <|> typeIdentifierDeclaration ))
 
 
 -- Expressions
