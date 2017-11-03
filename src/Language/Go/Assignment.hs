@@ -64,6 +64,8 @@ type Syntax =
    , Literal.Hash
    , Literal.Integer
    , Literal.KeyValue
+   , Literal.Pointer
+   , Literal.Reference
    , Literal.TextElement
    , Statement.Assignment
    , Statement.Break
@@ -74,8 +76,6 @@ type Syntax =
    , Statement.If
    , Statement.Match
    , Statement.Pattern
-   , Statement.Pointer
-   , Statement.Reference
    , Statement.Return
    , Syntax.Context
    , Syntax.Error
@@ -353,12 +353,13 @@ typeConversion :: Assignment
 typeConversion = makeTerm <$> symbol TypeConversionExpression <*> children (Go.Syntax.TypeConversion <$> expression <*> expression)
 
 unaryExpression :: Assignment
-unaryExpression = symbol UnaryExpression >>= \ location -> (notExpression location) <|> (unaryMinus location) <|> unaryPlus <|> unaryAmpersand <|> unaryReceive
+unaryExpression = symbol UnaryExpression >>= \ location -> (notExpression location) <|> (unaryMinus location) <|> unaryPlus <|> unaryAmpersand <|> unaryReceive <|> unaryPointer
   where notExpression location = makeTerm location . Expression.Not <$> children (symbol AnonBang *> expression)
         unaryMinus location    = makeTerm location . Expression.Negate <$> children (symbol AnonMinus *> expression)
         unaryPlus = children (symbol AnonPlus *> expression)
-        unaryAmpersand = children (makeTerm <$> symbol AnonAmpersand <*> (Statement.Reference <$> expression))
+        unaryAmpersand = children (makeTerm <$> symbol AnonAmpersand <*> (Literal.Reference <$> expression))
         unaryReceive = children (symbol AnonLAngleMinus *> expression)
+        unaryPointer = children (makeTerm <$> symbol AnonStar <*> (Literal.Pointer <$> expression))
 
 binaryExpression :: Assignment
 binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression expression
