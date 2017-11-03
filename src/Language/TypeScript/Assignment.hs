@@ -171,7 +171,7 @@ type Syntax = '[
   ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
+type Assignment = Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in Ruby’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
@@ -294,7 +294,7 @@ abstractMethodSignature :: Assignment
 abstractMethodSignature = makeSignature <$> symbol Grammar.AbstractMethodSignature <*> children ((,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> term propertyName <*> callSignatureParts)
   where makeSignature loc (modifier, propertyName, (typeParams, params, annotation)) = makeTerm loc (TypeScript.Syntax.AbstractMethodSignature [modifier, typeParams, annotation] propertyName params)
 
-classHeritage' :: HasCallStack => Assignment.Assignment [] Grammar [Term]
+classHeritage' :: Assignment.Assignment [] Grammar [Term]
 classHeritage' = symbol Grammar.ClassHeritage *> children (((++) `on` toList) <$> optional (term extendsClause) <*> optional (term implementsClause'))
 
 extendsClause :: Assignment
@@ -407,7 +407,7 @@ methodDefinition = makeMethod <$>
   where
     makeMethod loc (modifier, readonly, receiver, propertyName', (typeParameters', params, ty'), statements) = makeTerm loc (Declaration.Method [modifier, readonly, typeParameters', ty'] receiver propertyName' params statements)
 
-callSignatureParts :: HasCallStack => Assignment.Assignment [] Grammar (Term, [Term], Term)
+callSignatureParts :: Assignment.Assignment [] Grammar (Term, [Term], Term)
 callSignatureParts = contextualize' <$> Assignment.manyThrough comment (postContextualize'
  <$> (symbol Grammar.CallSignature *> children ((,,) <$> (fromMaybe <$> emptyTerm <*> optional (term typeParameters)) <*> formalParameters <*> (fromMaybe <$> emptyTerm <*> optional (term typeAnnotation')))) <*> many comment)
   where
@@ -431,7 +431,7 @@ methodSignature :: Assignment
 methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> children ((,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> callSignatureParts)
   where makeMethodSignature loc (modifier, readonly, propertyName, (typeParams, params, annotation)) = makeTerm loc (TypeScript.Syntax.MethodSignature [modifier, readonly, typeParams, annotation] propertyName params)
 
-formalParameters :: HasCallStack => Assignment.Assignment [] Grammar [Term]
+formalParameters :: Assignment.Assignment [] Grammar [Term]
 formalParameters = symbol FormalParameters *> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term parameter)) <*> many comment))
   where
     contextualize' (cs, formalParams) = case nonEmpty cs of
@@ -543,7 +543,7 @@ constructorTy = makeTerm <$> symbol ConstructorType <*> children (TypeScript.Syn
 statementBlock :: Assignment
 statementBlock = makeTerm <$> symbol StatementBlock <*> children (manyTerm statement)
 
-classBodyStatements :: HasCallStack => Assignment.Assignment [] Grammar [Term]
+classBodyStatements :: Assignment.Assignment [] Grammar [Term]
 classBodyStatements = symbol ClassBody *> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature <|> abstractMethodSignature))) <*> many comment))
   where
     contextualize' (cs, formalParams) = case nonEmpty cs of
@@ -718,7 +718,7 @@ module' :: Assignment
 module' = makeTerm <$> symbol Module <*> children (Declaration.Module <$> term (string <|> identifier <|> nestedIdentifier) <*> (statements <|> pure []))
 
 
-statements :: HasCallStack => Assignment.Assignment [] Grammar [Term]
+statements :: Assignment.Assignment [] Grammar [Term]
 statements = symbol StatementBlock *> children (manyTerm statement)
 
 arrowFunction :: Assignment
@@ -802,8 +802,7 @@ emptyStatement :: Assignment
 emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ source <|> pure Syntax.Empty)
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
-infixTerm :: HasCallStack
-          => Assignment
+infixTerm :: Assignment
           -> Assignment
           -> [Assignment.Assignment [] Grammar (Term -> Term -> Data.Union.Union Syntax Term)]
           -> Assignment.Assignment [] Grammar (Data.Union.Union Syntax Term)
