@@ -431,7 +431,15 @@ methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> chi
   where makeMethodSignature loc (modifier, readonly, propertyName, (typeParams, params, annotation)) = makeTerm loc (TypeScript.Syntax.MethodSignature [modifier, readonly, typeParams, annotation] propertyName params)
 
 formalParameters :: HasCallStack => Assignment.Assignment [] Grammar [Term]
-formalParameters = symbol FormalParameters *> children (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term (parameter <|> emptyTerm)))
+formalParameters = symbol FormalParameters *> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term parameter)) <*> many comment))
+  where
+    contextualize' (cs, formalParams) = case nonEmpty cs of
+      Just cs -> toList cs ++ formalParams
+      Nothing -> formalParams
+    postContextualize' formalParams cs = case nonEmpty cs of
+      Just cs -> formalParams ++ toList cs
+      Nothing -> formalParams
+
 
 decorator :: Assignment
 decorator = makeTerm <$> symbol Grammar.Decorator <*> children (TypeScript.Syntax.Decorator <$> term (identifier <|> memberExpression <|> callExpression))
@@ -532,7 +540,7 @@ statementBlock :: Assignment
 statementBlock = makeTerm <$> symbol StatementBlock <*> children (manyTerm statement)
 
 classBodyStatements :: HasCallStack => Assignment.Assignment [] Grammar [Term]
-classBodyStatements = (symbol ClassBody *> children (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature <|> abstractMethodSignature <|> emptyTerm))))
+classBodyStatements = symbol ClassBody *> children (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature <|> abstractMethodSignature)))
 
 publicFieldDefinition :: Assignment
 publicFieldDefinition = makeField <$> symbol Grammar.PublicFieldDefinition <*> children ((,,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
