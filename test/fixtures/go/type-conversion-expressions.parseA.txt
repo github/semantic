@@ -1,4 +1,32 @@
 (Program
   (Module
     (Identifier))
-  (Error))
+  (Function
+    (Empty)
+    (Identifier)
+    (
+      (TypeConversion
+        (Slice
+          (MemberAccess
+            (Identifier)
+            (Identifier)))
+        (MemberAccess
+          (Identifier)
+          (Identifier)))
+      (TypeConversion
+        (Identifier)
+        (MemberAccess
+          (Identifier)
+          (Identifier)))
+      (Call
+        (MemberAccess
+          (Identifier)
+          (Identifier))
+        (Identifier)
+        (Empty))
+      (Call
+        (MemberAccess
+          (Identifier)
+          (Identifier))
+        (Identifier)
+        (Empty)))))
