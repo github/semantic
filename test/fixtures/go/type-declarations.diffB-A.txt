@@ -5,5 +5,20 @@
     (Empty)
     (Identifier)
     (
-      (Error)
-      (Error))))
+      (
+        (Annotation
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) }))
+      (
+        (Annotation
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) })
+        (Annotation
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) })))))

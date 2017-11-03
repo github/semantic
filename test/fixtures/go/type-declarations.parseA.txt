@@ -5,5 +5,14 @@
     (Empty)
     (Identifier)
     (
-      (Error)
-      (Error))))
+      (
+        (Annotation
+          (Identifier)
+          (Identifier)))
+      (
+        (Annotation
+          (Identifier)
+          (Identifier))
+        (Annotation
+          (Identifier)
+          (Identifier))))))
