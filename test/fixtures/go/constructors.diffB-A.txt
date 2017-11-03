@@ -16,6 +16,7 @@
       ->(Identifier) })
       (RelationalOperator
         (Identifier)
+        (Other "-")
         (Identifier)))
     (FunctionCall
       (Identifier)
