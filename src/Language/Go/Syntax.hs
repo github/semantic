@@ -90,14 +90,6 @@ instance Eq1 Communication where liftEq = genericLiftEq
 instance Ord1 Communication where liftCompare = genericLiftCompare
 instance Show1 Communication where liftShowsPrec = genericLiftShowsPrec
 
--- | A default communication case in a Go select statement.
-data DefaultCommunication a = DefaultCommunication
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
-
-instance Eq1 DefaultCommunication where liftEq = genericLiftEq
-instance Ord1 DefaultCommunication where liftCompare = genericLiftCompare
-instance Show1 DefaultCommunication where liftShowsPrec = genericLiftShowsPrec
-
 -- | A receive statement in Go (e.g. `value = <-channel` )
 data Receive a = Receive { receiveSubject :: !a, receiveExpression :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
