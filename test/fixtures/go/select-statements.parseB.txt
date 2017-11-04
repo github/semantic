@@ -36,6 +36,7 @@
             (Integer)
             (Empty)))
         (Communication
-          (DefaultCommunication)
+          (DefaultPattern
+            ([]))
           (Return
             (Empty)))))))
