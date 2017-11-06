@@ -35,7 +35,7 @@ type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 
 assignment :: Assignment
-assignment = object <|> array <|> parseError
+assignment = handleError $ object <|> array <|> parseError
 
 value :: Assignment
 value = object <|> array <|> number <|> string <|> boolean <|> none <|> parseError
