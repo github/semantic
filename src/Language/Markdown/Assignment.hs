@@ -55,7 +55,7 @@ type Assignment = HasCallStack => Assignment.Assignment (TermF [] CMarkGFM.NodeT
 
 
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Document <*> children (Markup.Document <$> many blockElement)
+assignment = Syntax.handleError $ makeTerm <$> symbol Document <*> children (Markup.Document <$> many blockElement)
 
 
 -- Block elements
