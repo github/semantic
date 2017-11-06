@@ -1,18 +1,14 @@
 (Program
-{+(Annotation
-  {+(Function
-    {+(Identifier)+}
-    {+(
-      {+(Identifier)+})+})+}
-  {+(Empty)+})+}
-{-(Annotation
-  {-(Function
+  (Annotation
+    (Function
+    { (Identifier)
+    ->(Identifier) }
     {-(Identifier)-}
     {-(Identifier)-}
-    {-(Identifier)-}
-    {-(
-      {-(Identifier)-})-})-}
-  {-(Empty)-})-}
+      (
+      { (Identifier)
+      ->(Identifier) }))
+    (Empty))
   (Annotation
     (Function
       (Identifier)

@@ -4,24 +4,20 @@
   (Function
     (Identifier)
     (Args)
-  {+(FunctionCall
-    {+(Identifier)+}
-    {+(Identifier)+}
-    {+(Identifier)+})+}
-  {+(FunctionCall
-    {+(Identifier)+}
-    {+(Identifier)+}
-    {+(Identifier)+})+}
+    (FunctionCall
+    { (Identifier)
+    ->(Identifier) }
+      (Identifier)
+      (Other "variadic_argument"
+        (Identifier)))
     (FunctionCall
     { (Identifier)
     ->(Identifier) }
       (Identifier)
       (Identifier))
-  {-(FunctionCall
-    {-(Identifier)-}
-    {-(Identifier)-}
-    {-(Identifier)-})-}
-  {-(FunctionCall
-    {-(Identifier)-}
-    {-(Identifier)-}
-    {-(Identifier)-})-}))
+    (FunctionCall
+    { (Identifier)
+    ->(Identifier) }
+      (Identifier)
+      (Other "variadic_argument"
+        (Identifier)))))
