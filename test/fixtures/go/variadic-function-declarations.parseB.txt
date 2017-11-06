@@ -7,18 +7,18 @@
   (Function
     (Identifier)
     (Args
-      (ParameterDecl
+      (Other "variadic_parameter_declaration"
+        (Identifier)
         (PointerTy
-          (Identifier))
-        (Identifier))))
+          (Identifier)))))
   (Function
     (Identifier)
     (Args
-      (ParameterDecl
+      (Other "variadic_parameter_declaration"
         (Identifier))))
   (Function
     (Identifier)
     (Args
       (Identifier)
-      (ParameterDecl
+      (Other "variadic_parameter_declaration"
         (Identifier)))))

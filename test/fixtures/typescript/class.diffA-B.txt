@@ -3,6 +3,7 @@
     (TypeParameter
     { (Identifier)
     ->(Identifier) }
+      (Empty)
       (Empty))
   { (Identifier)
   ->(Identifier) }
