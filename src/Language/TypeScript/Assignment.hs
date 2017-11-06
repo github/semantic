@@ -173,7 +173,7 @@ type Syntax = '[
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar Term
 
--- | Assignment from AST in Ruby’s grammar onto a program in TypeScript’s syntax.
+-- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
 assignment = makeTerm <$> symbol Program <*> children (Syntax.Program <$> manyTerm statement) <|> parseError
 
