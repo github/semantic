@@ -120,6 +120,7 @@ expressionChoices =
   , varDeclaration
   , varSpecification
   , decStatement
+  , defaultCase
   , deferStatement
   , element
   , elseClause
