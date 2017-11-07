@@ -54,6 +54,7 @@ type Syntax =
    , Go.Syntax.Slice
    , Go.Syntax.TypeAssertion
    , Go.Syntax.TypeConversion
+   , Go.Syntax.TypeSwitch
    , Go.Syntax.TypeSwitchGuard
    , Go.Syntax.Variadic
    , Literal.Array
