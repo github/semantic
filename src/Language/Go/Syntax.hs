@@ -95,6 +95,14 @@ instance Eq1 TypeSwitch where liftEq = genericLiftEq
 instance Ord1 TypeSwitch where liftCompare = genericLiftCompare
 instance Show1 TypeSwitch where liftShowsPrec = genericLiftShowsPrec
 
+-- | A type switch guard statement in a Go type switch statement (e.g. `switch i := x.(type) { // cases}`).
+newtype TypeSwitchGuard a = TypeSwitchGuard { typeSwitchGuardSubject :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 TypeSwitchGuard where liftEq = genericLiftEq
+instance Ord1 TypeSwitchGuard where liftCompare = genericLiftCompare
+instance Show1 TypeSwitchGuard where liftShowsPrec = genericLiftShowsPrec
+
 -- | A receive statement in Go (e.g. `value = <-channel` )
 data Receive a = Receive { receiveSubject :: !a, receiveExpression :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
