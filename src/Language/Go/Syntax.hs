@@ -128,3 +128,10 @@ data TypeConversion a = TypeConversion { typeConversionType :: !a, typeConversio
 instance Eq1 TypeConversion where liftEq = genericLiftEq
 instance Ord1 TypeConversion where liftCompare = genericLiftCompare
 instance Show1 TypeConversion where liftShowsPrec = genericLiftShowsPrec
+
+newtype ParenthesizedType a = ParenthesizedType a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 ParenthesizedType where liftEq = genericLiftEq
+instance Ord1 ParenthesizedType where liftCompare = genericLiftCompare
+instance Show1 ParenthesizedType where liftShowsPrec = genericLiftShowsPrec
