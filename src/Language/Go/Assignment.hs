@@ -75,6 +75,7 @@ type Syntax =
    , Statement.Goto
    , Statement.If
    , Statement.Match
+   , Statement.NoOp
    , Statement.Pattern
    , Statement.Return
    , Syntax.Context
@@ -124,6 +125,7 @@ expressionChoices =
   , deferStatement
   , element
   , elseClause
+  , emptyStatement
   , expressionCaseClause
   , expressionList
   , expressionSwitchStatement
@@ -517,6 +519,9 @@ assignment' =  makeTerm'  <$> symbol AssignmentStatement <*> children (infixTerm
     augmentedAssign c l r = assign l (makeTerm1 (c l r))
 
     invert cons a b = Expression.Not (makeTerm1 (cons a b))
+
+emptyStatement :: Assignment
+emptyStatement = makeTerm <$> token EmptyStatement <*> (Statement.NoOp <$> emptyTerm)
 
 shortVarDeclaration :: Assignment
 shortVarDeclaration = makeTerm <$> symbol ShortVarDeclaration <*> children (Statement.Assignment <$> pure [] <*> expression <*> expression)
