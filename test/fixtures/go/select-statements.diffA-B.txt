@@ -6,7 +6,7 @@
     (Identifier)
     (Select
       (
-        (Communication
+        (Pattern
           (Receive
           { (Identifier)
           ->(Identifier) }
@@ -15,7 +15,7 @@
             (Identifier)
             (Identifier)
             (Empty)))
-        (Communication
+        (Pattern
           (Send
           { (Identifier)
           ->(Identifier) }
@@ -24,7 +24,7 @@
             (Identifier)
             (Integer)
             (Empty)))
-        (Communication
+        (Pattern
           (Receive
             (Empty)
             (Call
@@ -38,7 +38,7 @@
             (Identifier)
             (Integer)
             (Empty)))
-        (Communication
+        (Pattern
           (DefaultPattern
             ([]))
           (Return
