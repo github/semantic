@@ -12,13 +12,14 @@
         (FunctionCall
           (Identifier))))
     (If
-      (VarDecl
-        (Other "expression_list"
-        { (Identifier)
-        ->(Identifier) })
-        (Other "expression_list"
-          (FunctionCall
-            (Identifier))))
+      (Other "if_initializer"
+        (VarDecl
+          (Other "expression_list"
+          { (Identifier)
+          ->(Identifier) })
+          (Other "expression_list"
+            (FunctionCall
+              (Identifier)))))
       (Identifier)
       (ExpressionStatements
         (FunctionCall
@@ -30,6 +31,7 @@
       (ExpressionStatements
         (FunctionCall
           (Identifier)))
-      (ExpressionStatements
-        (FunctionCall
-          (Identifier))))))
+      (Other "else_clause"
+        (ExpressionStatements
+          (FunctionCall
+            (Identifier)))))))

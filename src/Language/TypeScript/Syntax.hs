@@ -10,6 +10,14 @@ import Data.Functor.Classes.Show.Generic
 import Data.Mergeable
 import GHC.Generics
 
+-- | Lookup type for a type-level key in a typescript map.
+data LookupType a = LookupType { lookupTypeIdentifier :: a, lookupTypeKey :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 LookupType where liftEq = genericLiftEq
+instance Ord1 LookupType where liftCompare = genericLiftCompare
+instance Show1 LookupType where liftShowsPrec = genericLiftShowsPrec
+
 -- | ShorthandPropertyIdentifier used in object patterns such as var baz = { foo } to mean var baz = { foo: foo }
 newtype ShorthandPropertyIdentifier a = ShorthandPropertyIdentifier ByteString
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -81,7 +89,7 @@ instance Eq1 Language.TypeScript.Syntax.Constructor where liftEq = genericLiftEq
 instance Ord1 Language.TypeScript.Syntax.Constructor where liftCompare = genericLiftCompare
 instance Show1 Language.TypeScript.Syntax.Constructor where liftShowsPrec = genericLiftShowsPrec
 
-data TypeParameter a = TypeParameter { _typeParameter :: !a, _typeParameterConstraint :: !a }
+data TypeParameter a = TypeParameter { _typeParameter :: !a, _typeParameterConstraint :: !a, _typeParameterDefaultType :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 TypeParameter where liftEq = genericLiftEq
@@ -122,6 +130,13 @@ newtype Constraint a = Constraint { _constraintType :: a }
 instance Eq1 Constraint where liftEq = genericLiftEq
 instance Ord1 Constraint where liftCompare = genericLiftCompare
 instance Show1 Constraint where liftShowsPrec = genericLiftShowsPrec
+
+newtype DefaultType a = DefaultType { _defaultType :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 DefaultType where liftEq = genericLiftEq
+instance Ord1 DefaultType where liftCompare = genericLiftCompare
+instance Show1 DefaultType where liftShowsPrec = genericLiftShowsPrec
 
 newtype ParenthesizedType a = ParenthesizedType { _parenthesizedType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -228,7 +243,7 @@ instance Eq1 EnumDeclaration where liftEq = genericLiftEq
 instance Ord1 EnumDeclaration where liftCompare = genericLiftCompare
 instance Show1 EnumDeclaration where liftShowsPrec = genericLiftShowsPrec
 
-newtype ExtendsClause a = ExtendsClause { _extendsClauseTypes :: [a] }
+newtype ExtendsClause a = ExtendsClause { _extendsClauses :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ExtendsClause where liftEq = genericLiftEq
@@ -313,7 +328,7 @@ instance Eq1 ConstructSignature where liftEq = genericLiftEq
 instance Ord1 ConstructSignature where liftCompare = genericLiftCompare
 instance Show1 ConstructSignature where liftShowsPrec = genericLiftShowsPrec
 
-newtype IndexSignature a = IndexSignature { _indexSignatureSubject :: a }
+data IndexSignature a = IndexSignature { _indexSignatureSubject :: a, _indexSignatureType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 IndexSignature where liftEq = genericLiftEq
@@ -326,6 +341,13 @@ data MethodSignature a = MethodSignature { _methodSignatureContext :: ![a], _met
 instance Eq1 MethodSignature where liftEq = genericLiftEq
 instance Ord1 MethodSignature where liftCompare = genericLiftCompare
 instance Show1 MethodSignature where liftShowsPrec = genericLiftShowsPrec
+
+data AbstractMethodSignature a = AbstractMethodSignature { _abstractMethodSignatureContext :: ![a], _abstractMethodSignatureName :: !a, _abstractMethodSignatureParameters :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 AbstractMethodSignature where liftEq = genericLiftEq
+instance Ord1 AbstractMethodSignature where liftCompare = genericLiftCompare
+instance Show1 AbstractMethodSignature where liftShowsPrec = genericLiftShowsPrec
 
 data Debugger a = Debugger
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

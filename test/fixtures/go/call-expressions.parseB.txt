@@ -7,7 +7,8 @@
     (FunctionCall
       (Identifier)
       (Identifier)
-      (Identifier))
+      (Other "variadic_argument"
+        (Identifier)))
     (FunctionCall
       (Identifier)
       (Identifier)
@@ -15,4 +16,5 @@
     (FunctionCall
       (Identifier)
       (Identifier)
-      (Identifier))))
+      (Other "variadic_argument"
+        (Identifier)))))
