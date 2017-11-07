@@ -54,6 +54,7 @@ type Syntax =
    , Go.Syntax.Slice
    , Go.Syntax.TypeAssertion
    , Go.Syntax.TypeConversion
+   , Go.Syntax.TypeSwitchGuard
    , Go.Syntax.Variadic
    , Literal.Array
    , Literal.Channel
@@ -175,6 +176,7 @@ expressionChoices =
   , typeConversion
   , typeDeclaration
   , typeIdentifier
+  , typeSwitchGuard
   , unaryExpression
   , variadicArgument
   , variadicParameterDeclaration
@@ -408,6 +410,8 @@ expressionSwitchStatement = makeTerm <$> symbol ExpressionSwitchStatement <*> ch
   where
     expressionCaseClauses = makeTerm <$> location <*> many expressionCaseClause
 
+typeSwitchGuard :: Assignment
+typeSwitchGuard = makeTerm <$> symbol Grammar.TypeSwitchGuard <*> children (Go.Syntax.TypeSwitchGuard <$> expression)
 fallThroughStatement :: Assignment
 fallThroughStatement = makeTerm <$> symbol FallthroughStatement <*> (Statement.Pattern <$> (makeTerm <$> location <*> (Syntax.Identifier <$> source)) <*> emptyTerm)
 
