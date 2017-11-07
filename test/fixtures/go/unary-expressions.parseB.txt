@@ -6,7 +6,9 @@
     (Identifier)
     (
       (Not
-        (Identifier))
+        (Receive
+          (Empty)
+          (Identifier)))
       (Pointer
         (Call
           (Identifier)

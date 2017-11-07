@@ -6,8 +6,10 @@
     (Identifier)
     (
       (Not
-      { (Identifier)
-      ->(Identifier) })
+        (Receive
+          (Empty)
+        { (Identifier)
+        ->(Identifier) }))
       (Pointer
         (Call
         { (Identifier)
