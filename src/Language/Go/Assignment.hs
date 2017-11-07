@@ -46,6 +46,7 @@ type Syntax =
    , Go.Syntax.Field
    , Go.Syntax.Go
    , Go.Syntax.Label
+   , Go.Syntax.ParenthesizedType
    , Go.Syntax.Receive
    , Go.Syntax.RuneLiteral
    , Go.Syntax.Select
@@ -235,7 +236,7 @@ packageIdentifier :: Assignment
 packageIdentifier = makeTerm <$> symbol PackageIdentifier <*> (Syntax.Identifier <$> source)
 
 parenthesizedType :: Assignment
-parenthesizedType = makeTerm <$> symbol ParenthesizedType <*> (Syntax.Identifier <$> source)
+parenthesizedType = makeTerm <$> symbol Grammar.ParenthesizedType <*> children (Go.Syntax.ParenthesizedType <$> expression)
 
 interpretedStringLiteral :: Assignment
 interpretedStringLiteral = makeTerm <$> symbol InterpretedStringLiteral <*> (Literal.TextElement <$> source)
