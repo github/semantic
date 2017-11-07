@@ -1,7 +1,7 @@
 package main
 
 func main() {
-switch e.(type) {
+switch c := d; f.(type) {
   case []Person:
     a()
   case *Dog:

@@ -1,4 +1,33 @@
 (Program
   (Module
     (Identifier))
-  (Error))
+  (Function
+    (Empty)
+    (Identifier)
+    (TypeSwitch
+      (
+        (Assignment
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) })
+        (TypeSwitchGuard
+        { (Identifier)
+        ->(Identifier) }))
+      (
+        (Pattern
+          (Slice
+            (Identifier))
+          (Call
+            (Identifier)
+            (Empty)))
+        (Pattern
+          (Pointer
+            (Identifier))
+          (Break
+            (Empty)))
+      {-(Pattern
+        {-(DefaultPattern
+          {-([])-})-}
+        {-(Break
+          {-(Empty)-})-})-}))))

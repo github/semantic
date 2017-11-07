@@ -1,10 +1,12 @@
 package main
 
 func main() {
-switch b.(type) {
+switch a := b; e.(type) {
   case []Person:
     a()
   case *Dog:
+    break
+  default:
     break
 }
 }
