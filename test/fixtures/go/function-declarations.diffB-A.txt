@@ -40,4 +40,9 @@
         (Identifier)))
   { (Identifier)
   ->(Identifier) }
-    ([])))
+    ([]))
+{-(Function
+  {-([])-}
+  {-(Identifier)-}
+  {-(NoOp
+    {-(Empty)-})-})-})
