@@ -84,6 +84,7 @@ type Syntax =
    , Syntax.Empty
    , Syntax.Identifier
    , Syntax.Program
+   , Type.Alias
    , Type.Annotation
    , Type.Array
    , Type.BiDirectionalChannel
@@ -323,6 +324,9 @@ sliceTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotatio
 pointerTypeDeclaration :: Assignment
 pointerTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> pointerType)
 
+typeAlias :: Assignment
+typeAlias = makeTerm <$> symbol TypeAlias <*> children (Type.Alias <$> expression <*> expression)
+
 typeIdentifierDeclaration :: Assignment
 typeIdentifierDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> expression)
 
@@ -336,6 +340,7 @@ typeDeclaration = handleError $ makeTerm <$> symbol TypeDeclaration <*> children
                                                                                       <|> sliceTypeDeclaration
                                                                                       <|> structTypeDeclaration
                                                                                       <|> mapTypeDeclaration
+                                                                                      <|> typeAlias
                                                                                       <|> typeIdentifierDeclaration ))
 
 
