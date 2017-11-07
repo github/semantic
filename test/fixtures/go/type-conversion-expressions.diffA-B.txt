@@ -18,8 +18,13 @@
         { (Identifier)
         ->(Identifier) }))
       (TypeConversion
-      { (Identifier)
-      ->(Identifier) }
+        (ParenthesizedType
+          (Slice
+            (MemberAccess
+            { (Identifier)
+            ->(Identifier) }
+            { (Identifier)
+            ->(Identifier) })))
         (MemberAccess
         { (Identifier)
         ->(Identifier) }

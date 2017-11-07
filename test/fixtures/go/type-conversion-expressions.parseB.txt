@@ -14,7 +14,11 @@
           (Identifier)
           (Identifier)))
       (TypeConversion
-        (Identifier)
+        (ParenthesizedType
+          (Slice
+            (MemberAccess
+              (Identifier)
+              (Identifier))))
         (MemberAccess
           (Identifier)
           (Identifier)))
