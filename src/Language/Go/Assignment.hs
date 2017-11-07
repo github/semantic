@@ -176,6 +176,7 @@ expressionChoices =
   , typeConversion
   , typeDeclaration
   , typeIdentifier
+  , typeSwitchStatement
   , typeSwitchGuard
   , typeCase
   , typeCaseClause
@@ -411,6 +412,11 @@ expressionSwitchStatement :: Assignment
 expressionSwitchStatement = makeTerm <$> symbol ExpressionSwitchStatement <*> children (Statement.Match <$> (expression <|> emptyTerm) <*> (expressionCaseClauses <|> emptyTerm))
   where
     expressionCaseClauses = makeTerm <$> location <*> many expressionCaseClause
+
+typeSwitchStatement :: Assignment
+typeSwitchStatement = makeTerm <$> symbol TypeSwitchStatement <*> children (Go.Syntax.TypeSwitch <$> _typeSwitchSubject <*> expressions)
+  where
+    _typeSwitchSubject = makeTerm <$> location <*> manyTermsTill expression (void (symbol TypeCaseClause))
 
 typeSwitchGuard :: Assignment
 typeSwitchGuard = makeTerm <$> symbol Grammar.TypeSwitchGuard <*> children (Go.Syntax.TypeSwitchGuard <$> expression)
