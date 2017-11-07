@@ -10,7 +10,9 @@
           (Receive
           { (Identifier)
           ->(Identifier) }
-            (Identifier))
+            (Receive
+              (Empty)
+              (Identifier)))
           (Call
             (Identifier)
             (Identifier)
@@ -27,13 +29,15 @@
         (Pattern
           (Receive
             (Empty)
-            (Call
-              (MemberAccess
-                (Identifier)
-                (Identifier))
-            { (Integer)
-            ->(Integer) }
-              (Empty)))
+            (Receive
+              (Empty)
+              (Call
+                (MemberAccess
+                  (Identifier)
+                  (Identifier))
+              { (Integer)
+              ->(Integer) }
+                (Empty))))
           (Call
             (Identifier)
             (Integer)
