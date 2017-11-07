@@ -178,6 +178,7 @@ expressionChoices =
   , typeIdentifier
   , typeSwitchGuard
   , typeCase
+  , typeCaseClause
   , unaryExpression
   , variadicArgument
   , variadicParameterDeclaration
@@ -413,6 +414,10 @@ expressionSwitchStatement = makeTerm <$> symbol ExpressionSwitchStatement <*> ch
 
 typeSwitchGuard :: Assignment
 typeSwitchGuard = makeTerm <$> symbol Grammar.TypeSwitchGuard <*> children (Go.Syntax.TypeSwitchGuard <$> expression)
+
+typeCaseClause :: Assignment
+typeCaseClause = makeTerm <$> symbol TypeCaseClause <*> children (Statement.Pattern <$> expression <*> expressions)
+
 typeCase :: Assignment
 typeCase = symbol TypeCase *> children expression
 
