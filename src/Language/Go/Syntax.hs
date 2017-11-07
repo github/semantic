@@ -34,7 +34,7 @@ instance Eq1 RuneLiteral where liftEq = genericLiftEq
 instance Ord1 RuneLiteral where liftCompare = genericLiftCompare
 instance Show1 RuneLiteral where liftShowsPrec = genericLiftShowsPrec
 
--- | A labeled statement in Go (e.g. `label:continue`).
+-- | A label statement in Go (e.g. `label:continue`).
 data Label a = Label { labelName :: !a, labelStatement :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
