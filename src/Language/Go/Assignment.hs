@@ -592,6 +592,7 @@ communicationClause = makeTerm <$> symbol CommunicationClause <*> children (Stat
   where
     communicationCase = symbol CommunicationCase *> children expression
 
+
 -- Helpers
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
