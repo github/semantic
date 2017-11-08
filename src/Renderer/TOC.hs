@@ -180,9 +180,9 @@ instance CustomHasDeclaration Declaration.Method where
 
 -- | Produce a 'ClassDeclaration' for 'Declaration.Class' nodes.
 instance CustomHasDeclaration Declaration.Class where
-  customToDeclaration Blob{..} _ (Declaration.Class _ (Term (In identifierAnn _), _) _ _)
+  customToDeclaration blob@Blob{..} ann decl@(Declaration.Class _ (Term (In identifierAnn _), _) _ _)
     -- Classes
-    = Just $ ClassDeclaration (getSource identifierAnn)
+    = Just $ ClassDeclaration (getSource identifierAnn) (getClassSource blob (In ann decl)) blobLanguage
     where getSource = toText . flip Source.slice blobSource . byteRange
 
 -- | Produce a 'Declaration' for 'Union's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
@@ -258,6 +258,13 @@ getFunctionSource Blob{..} (In a r)
   = let declRange = byteRange a
         bodyRange = byteRange <$> case r of
           Declaration.Function _ _ _ (Term (In a' _), _) -> Just a'
+    in maybe mempty (stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
+
+getClassSource :: (HasField fields Range) => Blob -> TermF Declaration.Class (Record fields) (Term syntax (Record fields), a) -> T.Text
+getClassSource Blob{..} (In a r)
+  = let declRange = byteRange a
+        bodyRange = byteRange <$> case r of
+          Declaration.Class _ _ _ (Term (In a' _), _) -> Just a'
     in maybe mempty (stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
 
 getSyntaxDeclarationSource :: HasField fields Range => Blob -> TermF Syntax (Record fields) (Term syntax (Record fields), a) -> T.Text
