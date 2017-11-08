@@ -20,4 +20,15 @@
         (Identifier)
         (SendChannel
           (ReceiveChannel
-            (Identifier)))))))
+            (Identifier))))
+      (Annotation
+        (Identifier)
+        (ReceiveChannel
+          (ReceiveChannel
+            (Identifier))))
+      (Annotation
+        (Identifier)
+        (BiDirectionalChannel
+          (ParenthesizedType
+            (ReceiveChannel
+              (Identifier))))))))
