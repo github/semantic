@@ -269,8 +269,7 @@ sliceType :: Assignment
 sliceType = makeTerm <$> symbol SliceType <*> children (Type.Slice <$> expression)
 
 channelType :: Assignment
-channelType = handleError
-            $  (makeTerm <$> symbol ChannelType <*> (children (token AnonChan *> token AnonLAngleMinus *> (Type.SendChannel <$> expression))))
+channelType =  (makeTerm <$> symbol ChannelType <*> (children (token AnonChan *> token AnonLAngleMinus *> (Type.SendChannel <$> expression))))
            <|> (makeTerm <$> symbol ChannelType <*> (children (token AnonLAngleMinus *> token AnonChan *> (Type.ReceiveChannel <$> expression))))
            <|> (makeTerm <$> symbol ChannelType <*> (children (token AnonChan *>                          (Type.BiDirectionalChannel <$> expression))))
 
