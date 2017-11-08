@@ -1,0 +1,18 @@
+(Program
+  (Module
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    (
+      (Alias
+      { (Identifier)
+      ->(Identifier) }
+        (Slice
+          (Pointer
+            (Identifier))))
+      (Alias
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) }))))
