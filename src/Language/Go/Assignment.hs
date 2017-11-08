@@ -481,8 +481,9 @@ importSpec :: Assignment
 importSpec = symbol ImportSpec *> children expressions
 
 methodDeclaration :: Assignment
-methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> children ((,,,,) <$> receiver <*> fieldIdentifier <*> parameters <*> typeIdentifier <*> block)
-  where parameters = symbol Parameters *> children (symbol ParameterDeclaration *> children (many expression))
+methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> children ((,,,,) <$> receiver <*> fieldIdentifier <*> parameters <*> (typeIdentifier <|> emptyTerm) <*> block)
+  where parameters = symbol Parameters *> children ((symbol ParameterDeclaration *> children (many expression))
+                                                  <|> many emptyTerm)
         receiver = symbol Parameters *> children (symbol ParameterDeclaration *> children expressions)
         mkTypedMethodDeclaration loc (receiver', name', parameters', type'', body') = makeTerm loc (Declaration.Method [type''] receiver' name' parameters' body')
 
