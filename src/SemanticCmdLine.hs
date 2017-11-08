@@ -23,7 +23,7 @@ import qualified Paths_semantic_diff as Library (version)
 import qualified Semantic.Task as Task
 import qualified Semantic.Log as Log
 import System.IO (Handle, stdin, stdout)
-import qualified Semantic (parseBlobs, generateTags, diffBlobPairs)
+import qualified Semantic (parseBlobs, diffBlobPairs)
 import Text.Read
 
 main :: IO ()
@@ -34,11 +34,6 @@ runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Ta
 
 runParse :: SomeRenderer TermRenderer -> Either Handle [(FilePath, Maybe Language)] -> Task.Task ByteString
 runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
-
-runTags :: Either Handle FilePath -> Task.Task ByteString
-runTags handleOrPath = case handleOrPath of
-  (Left handle) -> (Semantic.generateTags <=< Task.readBlobs) (Left handle)
-  Right path -> (Semantic.generateTags <=< Task.readProject) path
 
 -- | A parser for the application's command-line arguments.
 --
@@ -61,7 +56,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       <*> pure Log.logfmtFormatter -- Formatter
       <*> pure 0 -- ProcessID
     argumentsParser = (. Task.writeToOutput) . (>>=)
-      <$> hsubparser (diffCommand <> parseCommand <> tagsCommand)
+      <$> hsubparser (diffCommand <> parseCommand)
       <*> (   Right <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout")
           <|> pure (Left stdout) )
 
@@ -85,9 +80,6 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
           <|> flag'                                        (SomeRenderer TagsTermRenderer)        (long "tags" <> help "Output a tags file for a project"))
       <*> (   Right <$> some (argument filePathReader (metavar "FILES..."))
           <|> pure (Left stdin) )
-
-    tagsCommand = command "tags" (info tagsArgumentsParser (progDesc "Print tags for project"))
-    tagsArgumentsParser = runTags <$> ( Right <$> argument str (metavar "PROJECT") <|> pure (Left stdin) )
 
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of

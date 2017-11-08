@@ -2,7 +2,6 @@
 module Semantic
 ( parseBlobs
 , parseBlob
-, generateTags
 , diffBlobPairs
 , diffBlobPair
 , diffTermPair
@@ -43,9 +42,6 @@ import Semantic.Stat as Stat
 
 parseBlobs :: Output output => TermRenderer output -> [Blob] -> Task ByteString
 parseBlobs renderer = fmap toOutput . distributeFoldMap (parseBlob renderer) . filter blobExists
-
-generateTags :: [Blob] -> Task ByteString
-generateTags = fmap toOutput . distributeFoldMap (parseBlob TagsTermRenderer) . filter blobExists
 
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
 parseBlob :: TermRenderer output -> Blob -> Task output
