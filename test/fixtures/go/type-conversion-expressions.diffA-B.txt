@@ -6,6 +6,52 @@
     (Identifier)
     (
       (TypeConversion
+        (Pointer
+          (Identifier))
+      { (Identifier)
+      ->(Identifier) })
+      (Call
+        (Pointer
+          (Identifier))
+      { (Identifier)
+      ->(Identifier) }
+        (Empty))
+      (Receive
+        (Empty)
+        (TypeConversion
+          (BiDirectionalChannel
+            (Identifier))
+        { (Identifier)
+        ->(Identifier) }))
+      (TypeConversion
+        (ParenthesizedType
+          (ReceiveChannel
+            (Identifier)))
+      { (Identifier)
+      ->(Identifier) })
+      (TypeConversion
+        (Function
+          (Empty))
+      { (Identifier)
+      ->(Identifier) })
+      (TypeConversion
+        (ParenthesizedType
+          (Function
+            (Empty)))
+      { (Identifier)
+      ->(Identifier) })
+      (TypeConversion
+        (ParenthesizedType
+          (Function
+            (Identifier)))
+      { (Identifier)
+      ->(Identifier) })
+      (TypeConversion
+        (Function
+          (Identifier))
+      { (Identifier)
+      ->(Identifier) })
+      (TypeConversion
         (Slice
           (MemberAccess
           { (Identifier)
