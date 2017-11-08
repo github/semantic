@@ -245,7 +245,7 @@ async' :: Assignment
 async' = makeTerm <$> symbol AnonAsync <*> (Syntax.Identifier <$> source)
 
 classDefinition :: Assignment
-classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.Class <$> pure [] <*> expression <*> argumentList <*> many expression)
+classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.Class <$> pure [] <*> expression <*> argumentList <*> expressions)
   where argumentList = symbol ArgumentList *> children (many expression)
                     <|> pure []
 

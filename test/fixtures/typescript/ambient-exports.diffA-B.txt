@@ -26,4 +26,5 @@
           {+(ShorthandPropertyIdentifier)+}
           {+(ShorthandPropertyIdentifier)+})+})+})+})+}
   {-(Class
-    {-(Identifier)-})-}))
+    {-(Identifier)-}
+    {-([])-})-}))
