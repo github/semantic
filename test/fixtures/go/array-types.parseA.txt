@@ -10,5 +10,6 @@
         (ArrayTy
           (RelationalOperator
             (NumberLiteral)
+            (Other "+")
             (NumberLiteral))
           (Identifier))))))

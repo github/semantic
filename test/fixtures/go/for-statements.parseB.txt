@@ -25,6 +25,7 @@
     (For
       (RelationalOperator
         (Identifier)
+        (Other "<")
         (NumberLiteral))
       (IncrementStatement)
       (FunctionCall

@@ -9,6 +9,7 @@ import Data.Blob
 import Data.ByteString (ByteString)
 import Data.Diff
 import Data.Functor.Both
+import Data.Functor.Foldable (cata)
 import Data.Functor.Listable
 import Data.Functor.Foldable (cata)
 import Data.Maybe (fromMaybe)
@@ -33,7 +34,7 @@ import Semantic.Task
 import Semantic.Util
 import SpecHelpers
 import Syntax as S hiding (Go)
-import Test.Hspec (Spec, describe, it, parallel)
+import Test.Hspec (Spec, describe, it, parallel, pending)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
 import Test.LeanCheck
@@ -69,6 +70,15 @@ spec = parallel $ do
         [ TOCSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
         , TOCSummary "Method" "bar" (sourceSpanBetween (4, 1) (6, 4)) "modified"
         , TOCSummary "Method" "baz" (sourceSpanBetween (4, 1) (5, 4)) "removed"
+        ]
+
+    it "summarizes changed classes" $ do
+      sourceBlobs <- blobsForPaths (both "ruby/classes.A.rb" "ruby/classes.B.rb")
+      diff <- runTask $ diffWithParser rubyParser sourceBlobs
+      diffTOC diff `shouldBe`
+        [ JSONSummary "Class" "Baz" (sourceSpanBetween (1, 1) (2, 4)) "removed"
+        , JSONSummary "Class" "Foo" (sourceSpanBetween (1, 1) (3, 4)) "modified"
+        , JSONSummary "Class" "Bar" (sourceSpanBetween (5, 1) (6, 4)) "added"
         ]
 
     it "dedupes changes in same parent method" $ do

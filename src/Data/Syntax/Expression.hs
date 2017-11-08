@@ -97,6 +97,7 @@ data Bitwise a
   | BXOr !a !a
   | LShift !a !a
   | RShift !a !a
+  | UnsignedRShift !a !a
   | Complement a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 

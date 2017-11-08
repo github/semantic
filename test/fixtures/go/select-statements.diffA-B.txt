@@ -35,5 +35,5 @@
       (FunctionCall
         (Identifier)
         (NumberLiteral))
-      (Case)
+      (Other "default_communication_case")
       (Return))))

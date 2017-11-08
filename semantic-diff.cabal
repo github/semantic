@@ -72,6 +72,7 @@ library
                      , Renderer.SExpression
                      , Renderer.TOC
                      , RWS
+                     , RWS.FeatureVector
                      , Semantic
                      , Semantic.Log
                      , Semantic.Stat
@@ -97,12 +98,12 @@ library
                      , filepath
                      , free
                      , freer-cofreer
+                     , ghc-prim
                      , gitrev
                      , Glob
                      , hashable
                      , kdt
                      , mersenne-random-pure64
-                     , MonadRandom
                      , mtl
                      , network
                      , network-uri
