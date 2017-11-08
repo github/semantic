@@ -15,4 +15,90 @@
     (Identifier)
   { (Identifier)
   ->(Identifier) }
-    ([])))
+    ([]))
+  (Method
+    (Identifier)
+    (
+      (Identifier)
+      (Pointer
+        (Identifier)))
+  { (Identifier)
+  ->(Identifier) }
+    (Empty)
+    (Return
+      (Call
+        (MemberAccess
+          (Identifier)
+          (Identifier))
+        (Plus
+        { (Times
+          {-(MemberAccess
+            {-(Identifier)-}
+            {-(Identifier)-})-}
+          {-(MemberAccess
+            {-(Identifier)-}
+            {-(Identifier)-})-})
+        ->(Plus
+          {+(Plus
+            {+(Call
+              {+(MemberAccess
+                {+(Identifier)+}
+                {+(Identifier)+})+}
+              {+(MemberAccess
+                {+(Identifier)+}
+                {+(Identifier)+})+}
+              {+(Integer)+}
+              {+(Empty)+})+}
+            {+(MemberAccess
+              {+(Identifier)+}
+              {+(Identifier)+})+})+}
+          {+(Call
+            {+(MemberAccess
+              {+(Identifier)+}
+              {+(Identifier)+})+}
+            {+(MemberAccess
+              {+(Identifier)+}
+              {+(Identifier)+})+}
+            {+(Integer)+}
+            {+(Empty)+})+}) }
+        { (Times
+          {-(MemberAccess
+            {-(Identifier)-}
+            {-(Identifier)-})-}
+          {-(MemberAccess
+            {-(Identifier)-}
+            {-(Identifier)-})-})
+        ->(MemberAccess
+          {+(Identifier)+}
+          {+(Identifier)+}) })
+        (Empty))))
+  (Method
+    (Empty)
+    (
+    { (Identifier)
+    ->(Identifier) }
+      (Pointer
+        (Identifier)))
+    (Identifier)
+    (Identifier)
+  { (Identifier)
+  ->(Identifier) }
+    (
+      (Assignment
+        (MemberAccess
+          (Identifier)
+          (Identifier))
+        (Times
+          (MemberAccess
+            (Identifier)
+            (Identifier))
+          (Identifier)))
+      (Assignment
+        (MemberAccess
+          (Identifier)
+          (Identifier))
+        (Times
+          (MemberAccess
+            (Identifier)
+            (Identifier))
+          (Identifier))))))
