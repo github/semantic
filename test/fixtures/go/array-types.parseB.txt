@@ -5,10 +5,29 @@
     (Empty)
     (Identifier)
     (
-      (Annotation
-        (Identifier)
-        (Array
-          (Plus
+      (
+        (Annotation
+          (Identifier)
+          (Array
+            (Plus
+              (Integer)
+              (Integer))
+            (Identifier))))
+      (
+        (Annotation
+          (Identifier)
+          (Array
             (Integer)
-            (Integer))
-          (Identifier))))))
+            (Array
+              (Integer)
+              (Identifier)))))
+      (
+        (Annotation
+          (Identifier)
+          (Array
+            (Integer)
+            (Array
+              (Integer)
+              (Array
+                (Integer)
+                (Identifier)))))))))
