@@ -299,7 +299,7 @@ unaryOperator = symbol UnaryOperator >>= \ location -> arithmetic location <|> b
     bitwise location    = makeTerm location . Expression.Complement <$> children ( symbol AnonTilde *> term expression )
 
 binaryOperator :: Assignment
-binaryOperator = makeTerm' <$> symbol BinaryOperator <*> children (infixTerm expression expression
+binaryOperator = makeTerm' <$> symbol BinaryOperator <*> children (infixTerm expression (term expression)
   [ (inj .) . Expression.Plus      <$ symbol AnonPlus
   , (inj .) . Expression.Minus     <$ symbol AnonMinus
   , (inj .) . Expression.Times     <$ symbol AnonStar
@@ -315,14 +315,14 @@ binaryOperator = makeTerm' <$> symbol BinaryOperator <*> children (infixTerm exp
   ])
 
 booleanOperator :: Assignment
-booleanOperator = makeTerm' <$> symbol BooleanOperator <*> children (infixTerm expression expression
+booleanOperator = makeTerm' <$> symbol BooleanOperator <*> children (infixTerm expression (term expression)
   [ (inj .) . Expression.And <$ symbol AnonAnd
   , (inj .) . Expression.Or  <$ symbol AnonOr
   ])
 
 assignment' :: Assignment
 assignment' =  makeTerm  <$> symbol Assignment <*> children (Statement.Assignment [] <$> term expressionList <*> term rvalue)
-           <|> makeTerm' <$> symbol AugmentedAssignment <*> children (infixTerm expressionList rvalue
+           <|> makeTerm' <$> symbol AugmentedAssignment <*> children (infixTerm expressionList (term rvalue)
                   [ assign Expression.Plus      <$ symbol AnonPlusEqual
                   , assign Expression.Minus     <$ symbol AnonMinusEqual
                   , assign Expression.Times     <$ symbol AnonStarEqual
@@ -353,7 +353,7 @@ dictionary :: Assignment
 dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> manyTerm expression)
 
 pair :: Assignment
-pair = makeTerm' <$> symbol Pair <*> children (infixTerm expression expression [ (inj .) . Literal.KeyValue <$ symbol AnonColon ])
+pair = makeTerm' <$> symbol Pair <*> children (infixTerm expression (term expression) [ (inj .) . Literal.KeyValue <$ symbol AnonColon ])
 
 list' :: Assignment
 list' = makeTerm <$> symbol List <*> children (Literal.Array <$> manyTerm expression)
