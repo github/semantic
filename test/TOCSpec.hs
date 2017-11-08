@@ -76,9 +76,9 @@ spec = parallel $ do
       sourceBlobs <- blobsForPaths (both "ruby/classes.A.rb" "ruby/classes.B.rb")
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ JSONSummary "Class" "Baz" (sourceSpanBetween (1, 1) (2, 4)) "removed"
-        , JSONSummary "Class" "Foo" (sourceSpanBetween (1, 1) (3, 4)) "modified"
-        , JSONSummary "Class" "Bar" (sourceSpanBetween (5, 1) (6, 4)) "added"
+        [ TOCSummary "Class" "Baz" (sourceSpanBetween (1, 1) (2, 4)) "removed"
+        , TOCSummary "Class" "Foo" (sourceSpanBetween (1, 1) (3, 4)) "modified"
+        , TOCSummary "Class" "Bar" (sourceSpanBetween (5, 1) (6, 4)) "added"
         ]
 
     it "dedupes changes in same parent method" $ do
