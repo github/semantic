@@ -69,7 +69,6 @@
         {+(Identifier)+}
         {+(Identifier)+})+}
       {+(Identifier)+}
-<<<<<<< HEAD
       {+(Call
         {+(Identifier)+}
         {+(Identifier)+}
@@ -135,55 +134,6 @@
         {-(Empty)-})-})-}
     {-(ForEach
       {-(
-=======
-      {+(Other "<")+}
-      {+(NumberLiteral)+})+}
-    {+(IncrementStatement)+}
-    {+(FunctionCall
-      {+(Identifier)+})+}
-    {+(Break
-      {+(Identifier)+})+})+}
-  {+(For
-    {+(RelationalOperator
-      {+(Identifier)+}
-      {+(Other "<")+}
-      {+(NumberLiteral)+})+}
-    {+(IncrementStatement)+}
-    {+(FunctionCall
-      {+(Identifier)+})+}
-    {+(Continue
-      {+(Identifier)+})+})+}
-  {+(For
-    {+(FunctionCall
-      {+(Identifier)+})+}
-    {+(Continue)+})+}
-    (For
-      (Other "expression_list"
-        (Identifier))
-      (Identifier)
-      (FunctionCall
-        (Identifier)
-      {+(Identifier)+})
-      (Break
-      {-(Identifier)-}))
-  {-(For
-    {-(FunctionCall
-      {-(Identifier)-})-}
-    {-(Continue
-      {-(Identifier)-})-})-}
-  {-(For
-    {-(RelationalOperator
-      {-(Identifier)-}
-      {-(Other "<")-}
-      {-(NumberLiteral)-})-}
-    {-(IncrementStatement)-}
-    {-(FunctionCall
-      {-(Identifier)-})-}
-    {-(Continue)-})-}
-  {-(For
-    {-(ExpressionStatements
-      {-(FunctionCall
->>>>>>> master
         {-(Identifier)-}
         {-(Identifier)-})-}
       {-(Identifier)-}

@@ -4,7 +4,6 @@
   (Function
     (Empty)
     (Identifier)
-<<<<<<< HEAD
     (
       (
         (Annotation
@@ -32,15 +31,3 @@
               (Array
                 (Integer)
                 (Identifier)))))))))
-=======
-    (Args)
-    (Other "type_declaration"
-      (TypeDecl
-        (Identifier)
-        (ArrayTy
-          (RelationalOperator
-            (NumberLiteral)
-            (Other "+")
-            (NumberLiteral))
-          (Identifier))))))
->>>>>>> master

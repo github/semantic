@@ -4,7 +4,6 @@
   (Function
     (Empty)
     (Identifier)
-<<<<<<< HEAD
     (Match
       (Pattern
         (LessThan
@@ -34,49 +33,3 @@
           { (Identifier)
           ->(Identifier) }
             (Empty)))))))
-=======
-    (Args)
-    (Switch
-      (Case
-        (Case
-          (Other "expression_list"
-            (RelationalOperator
-            { (Identifier)
-            ->(Identifier) }
-              (Other "<")
-            { (Identifier)
-            ->(Identifier) })))
-        (FunctionCall
-          (Identifier)))
-    {+(Case
-      {+(Case
-        {+(Other "expression_list"
-          {+(RelationalOperator
-            {+(Identifier)+}
-            {+(Other "<")+}
-            {+(Identifier)+})+})+})+}
-      {+(FunctionCall
-        {+(Identifier)+})+})+}
-      (Case
-        (Case
-          (Other "expression_list"
-            (RelationalOperator
-            { (Identifier)
-            ->(Identifier) }
-            { (Other "<")
-            ->(Other "==") }
-            { (Identifier)
-            ->(NumberLiteral) })))
-        (FunctionCall
-        { (Identifier)
-        ->(Identifier) }))
-    {-(Case
-      {-(Case
-        {-(Other "expression_list"
-          {-(RelationalOperator
-            {-(Identifier)-}
-            {-(Other "==")-}
-            {-(NumberLiteral)-})-})-})-}
-      {-(FunctionCall
-        {-(Identifier)-})-})-})))
->>>>>>> master

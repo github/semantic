@@ -4,7 +4,6 @@
   (Function
     (Empty)
     (Identifier)
-<<<<<<< HEAD
     (
       (Call
         (Identifier)
@@ -23,20 +22,3 @@
         (Variadic
           (Identifier))
         (Empty)))))
-=======
-    (Args)
-    (FunctionCall
-      (Identifier)
-      (Identifier)
-      (Other "variadic_argument"
-        (Identifier)))
-    (FunctionCall
-      (Identifier)
-      (Identifier)
-      (Identifier))
-    (FunctionCall
-      (Identifier)
-      (Identifier)
-      (Other "variadic_argument"
-        (Identifier)))))
->>>>>>> master

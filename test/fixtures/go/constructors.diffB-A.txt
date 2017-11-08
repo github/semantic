@@ -7,7 +7,6 @@
     (
       (Call
         (Identifier)
-<<<<<<< HEAD
         (BiDirectionalChannel
         { (Identifier)
         ->(Identifier) })
@@ -39,23 +38,3 @@
         { (Identifier)
         ->(Identifier) })
         (Empty)))))
-=======
-        (Other "-")
-        (Identifier)))
-    (FunctionCall
-      (Identifier)
-      (ChannelTy
-      { (Identifier)
-      ->(Identifier) })
-    { (NumberLiteral)
-    ->(NumberLiteral) }
-    { (NumberLiteral)
-    ->(NumberLiteral) })
-    (FunctionCall
-      (Identifier)
-      (DictionaryTy
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->(Identifier) }))))
->>>>>>> master

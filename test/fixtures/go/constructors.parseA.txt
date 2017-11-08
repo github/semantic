@@ -7,24 +7,10 @@
     (
       (Call
         (Identifier)
-<<<<<<< HEAD
         (BiDirectionalChannel
           (Identifier))
         (Empty))
       (Call
-=======
-        (Other "-")
-        (Identifier)))
-    (FunctionCall
-      (Identifier)
-      (ChannelTy
-        (Identifier))
-      (NumberLiteral)
-      (NumberLiteral))
-    (FunctionCall
-      (Identifier)
-      (DictionaryTy
->>>>>>> master
         (Identifier)
         (BiDirectionalChannel
           (Identifier))
