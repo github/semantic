@@ -4,6 +4,7 @@
   (Function
     (Empty)
     (Identifier)
+<<<<<<< HEAD
     (
       (If
         (
@@ -67,3 +68,37 @@
           { (Identifier)
           ->(Identifier) }
             (Empty)))))))
+=======
+    (Args)
+    (If
+      (FunctionCall
+      { (Identifier)
+      ->(Identifier) })
+      (ExpressionStatements
+        (FunctionCall
+          (Identifier))))
+    (If
+      (Other "if_initializer"
+        (VarDecl
+          (Other "expression_list"
+          { (Identifier)
+          ->(Identifier) })
+          (Other "expression_list"
+            (FunctionCall
+              (Identifier)))))
+      (Identifier)
+      (ExpressionStatements
+        (FunctionCall
+          (Identifier))))
+    (If
+      (FunctionCall
+      { (Identifier)
+      ->(Identifier) })
+      (ExpressionStatements
+        (FunctionCall
+          (Identifier)))
+      (Other "else_clause"
+        (ExpressionStatements
+          (FunctionCall
+            (Identifier)))))))
+>>>>>>> master

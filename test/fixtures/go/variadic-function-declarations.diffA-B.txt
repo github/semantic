@@ -9,19 +9,33 @@
     (Empty)
   { (Identifier)
   ->(Identifier) }
+<<<<<<< HEAD
     (Variadic
       (Pointer
         (Identifier))
       (Identifier))
     ([]))
+=======
+    (Args
+      (Other "variadic_parameter_declaration"
+        (Identifier)
+        (PointerTy
+          (Identifier)))))
+>>>>>>> master
   (Function
     (Empty)
   { (Identifier)
   ->(Identifier) }
+<<<<<<< HEAD
     (Variadic
       (Identifier)
       (Empty))
     ([]))
+=======
+    (Args
+      (Other "variadic_parameter_declaration"
+        (Identifier))))
+>>>>>>> master
   (Function
     (Empty)
   { (Identifier)
@@ -29,5 +43,10 @@
     (Identifier)
     (Variadic
       (Identifier)
+<<<<<<< HEAD
       (Empty))
     ([])))
+=======
+      (Other "variadic_parameter_declaration"
+        (Identifier)))))
+>>>>>>> master

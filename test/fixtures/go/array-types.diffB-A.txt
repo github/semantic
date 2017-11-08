@@ -4,6 +4,7 @@
   (Function
     (Empty)
     (Identifier)
+<<<<<<< HEAD
     (
       (
         (Annotation
@@ -18,6 +19,19 @@
           ->(Identifier) })))
       (
         (Annotation
+=======
+    (Args)
+    (Other "type_declaration"
+      (TypeDecl
+        (Identifier)
+        (ArrayTy
+          (RelationalOperator
+          { (NumberLiteral)
+          ->(NumberLiteral) }
+            (Other "+")
+          { (NumberLiteral)
+          ->(NumberLiteral) })
+>>>>>>> master
         { (Identifier)
         ->(Identifier) }
           (Array

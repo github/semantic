@@ -20,6 +20,7 @@
           (Send
             (Identifier)
             (Identifier))
+<<<<<<< HEAD
           (Call
             (Identifier)
             (Integer)
@@ -44,3 +45,30 @@
             ([]))
           (Return
             (Empty)))))))
+=======
+          (Operator
+            (Identifier))))
+      (FunctionCall
+        (Identifier)
+        (Identifier))
+      (Case
+        (Send
+          (Identifier)
+          (Identifier)))
+      (FunctionCall
+        (Identifier)
+        (NumberLiteral))
+      (Case
+        (Other "receive_statement"
+          (Operator
+            (FunctionCall
+              (SubscriptAccess
+                (Identifier)
+                (Identifier))
+              (NumberLiteral)))))
+      (FunctionCall
+        (Identifier)
+        (NumberLiteral))
+      (Other "default_communication_case")
+      (Return))))
+>>>>>>> master

@@ -55,6 +55,7 @@
             (Empty))))
       (ForEach
         (Identifier)
+<<<<<<< HEAD
         (Identifier)
         (
           (Call
@@ -85,5 +86,33 @@
           (Empty)))
       (ForEach
         (Empty)
+=======
+        (Other "<")
+        (NumberLiteral))
+      (IncrementStatement)
+      (FunctionCall
+        (Identifier))
+      (Break
+        (Identifier)))
+    (For
+      (RelationalOperator
+        (Identifier)
+        (Other "<")
+        (NumberLiteral))
+      (IncrementStatement)
+      (FunctionCall
+        (Identifier))
+      (Continue
+        (Identifier)))
+    (For
+      (FunctionCall
+        (Identifier))
+      (Continue))
+    (For
+      (Other "expression_list"
+        (Identifier))
+      (Identifier)
+      (FunctionCall
+>>>>>>> master
         (Identifier)
         ([])))))

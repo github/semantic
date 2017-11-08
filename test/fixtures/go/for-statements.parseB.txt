@@ -17,6 +17,7 @@
             (Identifier))))
       (ForEach
         (Identifier)
+<<<<<<< HEAD
         (Identifier)
         (
           (Call
@@ -70,6 +71,17 @@
           (Empty)))
       (ForEach
         (
+=======
+        (Other "<")
+        (NumberLiteral))
+      (IncrementStatement)
+      (FunctionCall
+        (Identifier))
+      (Continue))
+    (For
+      (ExpressionStatements
+        (FunctionCall
+>>>>>>> master
           (Identifier)
           (Identifier))
         (Identifier)
