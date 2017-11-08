@@ -255,7 +255,7 @@ qualifiedType :: Assignment
 qualifiedType = makeTerm <$> symbol QualifiedType <*> children (Expression.MemberAccess <$> expression <*> expression)
 
 arrayType :: Assignment
-arrayType = makeTerm <$> symbol ArrayType <*> children (Type.Array . Just <$> expression <*> expression)
+arrayType = makeTerm <$> symbol ArrayType <*> children (Type.Array . Just <$> expression <*> (expression <|> arrayType))
 
 implicitLengthArrayType :: Assignment
 implicitLengthArrayType = makeTerm <$> symbol ImplicitLengthArrayType <*> children (Type.Array Nothing <$> expression)
