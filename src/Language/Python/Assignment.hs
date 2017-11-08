@@ -91,6 +91,9 @@ assignment = handleError $ makeTerm <$> symbol Module <*> children (Syntax.Progr
 manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
 manyTerm term = many (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
 
+someTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
+someTerm term = some (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
+
 term :: Assignment -> Assignment
 term term = contextualize comment (postContextualize comment term)
 
@@ -169,12 +172,12 @@ expressions :: Assignment
 expressions = makeTerm <$> location <*> manyTerm expression
 
 expressionStatement :: Assignment
-expressionStatement = mk <$> symbol ExpressionStatement <*> children (some expression)
+expressionStatement = mk <$> symbol ExpressionStatement <*> children (someTerm expression)
   where mk _ [child] = child
         mk location children = makeTerm location children
 
 expressionList :: Assignment
-expressionList = mk <$> symbol ExpressionList <*> children (some expression)
+expressionList = mk <$> symbol ExpressionList <*> children (someTerm expression)
   where mk _ [child] = child
         mk location children = makeTerm location children
 
@@ -207,7 +210,7 @@ argumentList :: Assignment
 argumentList = symbol ArgumentList *> children expressions
 
 withStatement :: Assignment
-withStatement = mk <$> symbol WithStatement <*> children (some with)
+withStatement = mk <$> symbol WithStatement <*> children (someTerm with)
   where
     mk _ [child] = child
     mk l children = makeTerm l children
@@ -440,7 +443,7 @@ slice = makeTerm <$> symbol Slice <*> children
 
 call :: Assignment
 call = makeTerm <$> symbol Call <*> children (Expression.Call <$> pure [] <*> term expression <*> (symbol ArgumentList *> children (manyTerm expression)
-                                                                                <|> some comprehension) <*> emptyTerm)
+                                                                                <|> someTerm comprehension) <*> emptyTerm)
 
 boolean :: Assignment
 boolean =  makeTerm <$> token Grammar.True <*> pure Literal.true
