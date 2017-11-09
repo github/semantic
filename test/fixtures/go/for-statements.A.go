@@ -27,5 +27,8 @@ for i, s := range a {
 for key, val = range m {
 	h(key, val)
 }
+for 1 < 2 {
+  i()
+}
 for range ch {}
 }

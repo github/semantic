@@ -88,6 +88,15 @@
         {+(Identifier)+}
         {+(Identifier)+}
         {+(Empty)+})+})+}
+    {+(For
+      {+(Empty)+}
+      {+(LessThan
+        {+(Integer)+}
+        {+(Integer)+})+}
+      {+(Empty)+}
+      {+(Call
+        {+(Identifier)+}
+        {+(Empty)+})+})+}
     {+(ForEach
       {+(Empty)+}
       {+(Identifier)+}
@@ -143,6 +152,15 @@
       {-(Call
         {-(Identifier)-}
         {-(Identifier)-}
+        {-(Identifier)-}
+        {-(Empty)-})-})-}
+    {-(For
+      {-(Empty)-}
+      {-(LessThan
+        {-(Integer)-}
+        {-(Integer)-})-}
+      {-(Empty)-}
+      {-(Call
         {-(Identifier)-}
         {-(Empty)-})-})-}
     {-(ForEach
