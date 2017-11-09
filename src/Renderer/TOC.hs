@@ -2,20 +2,22 @@
 module Renderer.TOC
 ( renderToCDiff
 , renderToCTerm
-, renderToTags
 , diffTOC
 , Summaries(..)
 , TOCSummary(..)
 , isValidSummary
 , Declaration(..)
+, getDeclaration
 , declaration
 , HasDeclaration
 , declarationAlgebra
 , syntaxDeclarationAlgebra
 , Entry(..)
 , tableOfContentsBy
+, termTableOfContentsBy
 , dedupe
 , entrySummary
+, toCategoryName
 ) where
 
 import Data.Aeson
@@ -67,19 +69,6 @@ instance Output Summaries where
 
 instance ToJSON Summaries where
   toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]
-
-data Tag
-  = Tag { tagSymbol :: T.Text
-        , tagPath :: T.Text
-        , tagLanguage :: Maybe T.Text
-        , tagKind :: T.Text
-        , tagLine :: T.Text
-        , tagSpan :: Span
-      }
-  deriving (Generic, Eq, Show)
-
-instance ToJSON Tag where
-  toJSON Tag{..} = object [ "symbol" .= tagSymbol, "path" .= tagPath, "language" .= tagLanguage, "kind" .= tagKind, "line" .= tagLine, "span" .= tagSpan ]
 
 
 data TOCSummary
@@ -276,7 +265,6 @@ getSyntaxDeclarationSource Blob{..} (In a r)
           _ -> Nothing
     in maybe mempty (stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
 
-
 formatTOCError :: Error.Error String -> String
 formatTOCError e = showExpectation False (errorExpected e) (errorActual e) ""
 
@@ -357,13 +345,6 @@ recordSummary changeText record = case getDeclaration record of
     formatIdentifier (MethodDeclaration identifier _ _                  (Just receiver)) = receiver <> "." <> identifier
     formatIdentifier declaration = declarationIdentifier declaration
 
--- | Construct a 'Tag' from a node annotation and a change type label.
-tagSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => FilePath -> T.Text -> Record fields -> Maybe Tag
-tagSummary path _ record = case getDeclaration record of
-  Just ErrorDeclaration{} -> Nothing
-  Just declaration -> Just $ Tag (declarationIdentifier declaration) (T.pack path) (T.pack . show <$> declarationLanguage declaration) (toCategoryName declaration) (declarationText declaration) (sourceSpan record)
-  _ -> Nothing
-
 renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Both Blob -> Diff f (Record fields) (Record fields) -> Summaries
 renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
@@ -374,22 +355,17 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
                           | before == after -> after
                           | otherwise -> before <> " -> " <> after
 
-renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> Summaries
-renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC
-  where toMap [] = mempty
-        toMap as = Map.singleton (T.pack blobPath) (toJSON <$> as)
-
-renderToTags :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> [Value]
-renderToTags Blob{..} = fmap toJSON . termToC' blobPath
-
 diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [TOCSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
 
-termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Term f (Record fields) -> [TOCSummary]
-termToC = mapMaybe (recordSummary "unchanged") . termTableOfContentsBy declaration
+renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> Summaries
+renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC
+  where
+    toMap [] = mempty
+    toMap as = Map.singleton (T.pack blobPath) (toJSON <$> as)
 
-termToC' :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => FilePath -> Term f (Record fields) -> [Tag]
-termToC' path = mapMaybe (tagSummary path "unchanged") . termTableOfContentsBy declaration
+    termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Term f (Record fields) -> [TOCSummary]
+    termToC = mapMaybe (recordSummary "unchanged") . termTableOfContentsBy declaration
 
 -- The user-facing category name
 toCategoryName :: Declaration -> T.Text

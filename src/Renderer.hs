@@ -26,6 +26,7 @@ import Data.Text (Text)
 import Renderer.JSON as R
 import Renderer.Patch as R
 import Renderer.SExpression as R
+import Renderer.Tag as R
 import Renderer.TOC as R
 
 -- | Specification of renderers for diffs, producing output in the parameter type.
