@@ -111,6 +111,7 @@ expression = term (handleError (choice expressionChoices))
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
   [ assignment'
+  , arrayType
   , binaryExpression
   , block
   , breakStatement
