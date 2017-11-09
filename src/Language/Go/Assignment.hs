@@ -566,7 +566,7 @@ elseClause :: Assignment
 elseClause = symbol ElseClause *> children expression
 
 forStatement :: Assignment
-forStatement = mkForStatement <$> symbol ForStatement <*> children ((,) <$> (forClause <|> rangeClause <|> emptyClause) <*> expression)
+forStatement = mkForStatement <$> symbol ForStatement <*> children ((,) <$> (forClause <|> rangeClause <|> for <|> emptyClause) <*> expression)
   where
     mkForStatement loc ((constructor, a, b, c), block') = case (constructor :: [Char]) of
                                                             "forEach" -> makeTerm loc $ (Statement.ForEach a b block')
@@ -578,6 +578,7 @@ forStatement = mkForStatement <$> symbol ForStatement <*> children ((,) <$> (for
                                             <|> (("for",,,) <$> expression <*> expression <*> emptyTerm)
                                             <|> (("for",,,) <$> expression <*> emptyTerm <*> emptyTerm)
                                             <|> (("for",,,) <$> emptyTerm <*> emptyTerm <*> emptyTerm))
+    for = ("for",,,) <$> emptyTerm <*> expression <*> emptyTerm
 
 incStatement :: Assignment
 incStatement = makeTerm <$> symbol IncStatement <*> children (Statement.PostIncrement <$> expression)
