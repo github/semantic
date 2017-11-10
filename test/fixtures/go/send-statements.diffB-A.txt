@@ -4,6 +4,7 @@
   (Function
     (Empty)
     (Identifier)
+    ([])
     (Send
     { (Identifier)
     ->(Identifier) }

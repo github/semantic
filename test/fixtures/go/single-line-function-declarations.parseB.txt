@@ -4,16 +4,19 @@
   (Function
     (Empty)
     (Identifier)
+    ([])
     ([]))
   (Function
     (Empty)
     (Identifier)
+    ([])
     (Call
       (Identifier)
       (Empty)))
   (Function
     (Empty)
     (Identifier)
+    ([])
     (
       (Call
         (Identifier)
@@ -24,6 +27,7 @@
   (Function
     (Empty)
     (Identifier)
+    ([])
     (
       (Call
         (Identifier)

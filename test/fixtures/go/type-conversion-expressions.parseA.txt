@@ -4,6 +4,7 @@
   (Function
     (Empty)
     (Identifier)
+    ([])
     (
       (TypeConversion
         (Pointer
@@ -14,12 +15,10 @@
           (Identifier))
         (Identifier)
         (Empty))
-      (Receive
-        (Empty)
-        (TypeConversion
-          (BiDirectionalChannel
-            (Identifier))
-          (Identifier)))
+      (TypeConversion
+        (ReceiveChannel
+          (Identifier))
+        (Identifier))
       (TypeConversion
         (ParenthesizedType
           (ReceiveChannel
@@ -27,20 +26,24 @@
         (Identifier))
       (TypeConversion
         (Function
+          ([])
           (Empty))
         (Identifier))
       (TypeConversion
         (ParenthesizedType
           (Function
+            ([])
             (Empty)))
         (Identifier))
       (TypeConversion
         (ParenthesizedType
           (Function
+            ([])
             (Identifier)))
         (Identifier))
       (TypeConversion
         (Function
+          ([])
           (Identifier))
         (Identifier))
       (TypeConversion

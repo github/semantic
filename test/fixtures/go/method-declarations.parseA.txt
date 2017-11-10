@@ -4,6 +4,7 @@
   (Function
     (Empty)
     (Identifier)
+    ([])
     ([]))
   (Method
     (Identifier)
@@ -11,8 +12,10 @@
       (Identifier)
       (Identifier))
     (Identifier)
-    (Identifier)
-    (Identifier)
+    (
+      (
+        (Identifier)
+        (Identifier)))
     ([]))
   (Method
     (Identifier)
@@ -21,6 +24,7 @@
       (Pointer
         (Identifier)))
     (Identifier)
+    ([])
     (Return
       (Call
         (MemberAccess
@@ -49,8 +53,10 @@
       (Pointer
         (Identifier)))
     (Identifier)
-    (Identifier)
-    (Identifier)
+    (
+      (
+        (Identifier)
+        (Identifier)))
     (
       (Assignment
         (MemberAccess
@@ -77,8 +83,9 @@
       (Pointer
         (Identifier)))
     (Identifier)
-    (Identifier)
     (
       (Identifier)
-      (Identifier))
+      (
+        (Identifier)
+        (Identifier)))
     ([])))

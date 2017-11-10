@@ -4,11 +4,13 @@
   (Function
     (Empty)
     (Identifier)
+    ([])
     ([]))
   (Function
     (Empty)
   { (Identifier)
   ->(Identifier) }
+    ([])
     (Call
       (Identifier)
       (Empty)))
@@ -16,6 +18,7 @@
     (Empty)
   { (Identifier)
   ->(Identifier) }
+    ([])
     (
       (Call
         (Identifier)
@@ -27,6 +30,7 @@
     (Empty)
   { (Identifier)
   ->(Identifier) }
+    ([])
     (
       (Call
         (Identifier)

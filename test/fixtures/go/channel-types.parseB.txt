@@ -4,11 +4,12 @@
   (Function
     (Empty)
     (Identifier)
+    ([])
     (
       (Annotation
         (Identifier)
-        (SendChannel
-          (BiDirectionalChannel
+        (BiDirectionalChannel
+          (ReceiveChannel
             (Identifier))))
       (Annotation
         (Identifier)

@@ -4,6 +4,7 @@
   (Function
     (Empty)
     (Identifier)
+    ([])
     (
       (For
         (Empty)

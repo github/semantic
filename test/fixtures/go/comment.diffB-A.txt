@@ -4,5 +4,6 @@
   (Function
     (Empty)
     (Identifier)
+    ([])
   { (Comment)
   ->(Comment) }))

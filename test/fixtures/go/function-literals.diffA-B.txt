@@ -4,15 +4,18 @@
   (Function
     (Empty)
     (Identifier)
+    ([])
     (Assignment
       (Identifier)
       (Function
-        (
-        { (Identifier)
-        ->(Identifier) }
-        { (Identifier)
-        ->(Identifier) })
         (Empty)
+        (Empty)
+        (
+          (
+          { (Identifier)
+          ->(Identifier) }
+          { (Identifier)
+          ->(Identifier) }))
         (
         { (Identifier)
         ->(Identifier) }

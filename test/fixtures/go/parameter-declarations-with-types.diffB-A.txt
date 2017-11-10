@@ -4,18 +4,20 @@
   (Function
     (Empty)
     (Identifier)
+    ([])
     ([]))
   (Function
     (Empty)
     (Identifier)
     (
-    { (Identifier)
-    ->(Identifier) }
-    { (Identifier)
-    ->(Identifier) })
-    (
-    { (Identifier)
-    ->(Identifier) }
-    { (Identifier)
-    ->(Identifier) })
+      (
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) })
+      (
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) }))
     ([])))

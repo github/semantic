@@ -4,6 +4,7 @@
   (Function
     (Empty)
     (Identifier)
+    ([])
     (Assignment
       (Annotation
         (

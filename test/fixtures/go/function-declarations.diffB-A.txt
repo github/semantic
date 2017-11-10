@@ -4,33 +4,42 @@
   (Function
     (Empty)
     (Identifier)
+    ([])
     ([]))
   (Function
     (Empty)
   { (Identifier)
   ->(Identifier) }
+    ([])
     ([]))
   (Function
     (Identifier)
   { (Identifier)
   ->(Identifier) }
     (
+      (
+        (Identifier)
+        (Identifier))
       (Identifier)
-      (Identifier))
-    (Identifier)
-    (Identifier)
-    (
       (Identifier)
-      (Identifier))
+      (
+        (Identifier)
+        (Identifier)))
     ([]))
   (Function
-    (
-      (Identifier)
-      (Identifier))
+    (Empty)
   { (Identifier)
   ->(Identifier) }
+    ([])
+    (
+      (Identifier)
+      (Identifier))
     ([]))
   (Function
+    (Empty)
+  { (Identifier)
+  ->(Identifier) }
+    ([])
     (
       (
         (Identifier)
@@ -38,11 +47,11 @@
       (
         (Identifier)
         (Identifier)))
-  { (Identifier)
-  ->(Identifier) }
     ([]))
 {-(Function
-  {-([])-}
+  {-(Empty)-}
   {-(Identifier)-}
+  {-([])-}
+  {-([])-}
   {-(NoOp
     {-(Empty)-})-})-})

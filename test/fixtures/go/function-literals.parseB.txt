@@ -4,13 +4,16 @@
   (Function
     (Empty)
     (Identifier)
+    ([])
     (Assignment
       (Identifier)
       (Function
-        (
-          (Identifier)
-          (Identifier))
         (Empty)
+        (Empty)
+        (
+          (
+            (Identifier)
+            (Identifier)))
         (
           (Identifier)
           (Identifier))

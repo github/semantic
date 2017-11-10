@@ -4,24 +4,29 @@
   (Function
     (Empty)
     (Identifier)
+    ([])
     (
       (Annotation
       { (Identifier)
       ->(Identifier) }
         (Function
-        { (Identifier)
-        ->(Identifier) }
+          (
+          { (Identifier)
+          ->(Identifier) })
         { (Identifier)
         ->(Identifier) }))
       (Annotation
       { (Identifier)
       ->(Identifier) }
         (Function
-        {-(Identifier)-}
-          (Identifier)
-        {+(Identifier)+}
           (
-          {+(BiDirectionalChannel
-            {+(Identifier)+})+}
           {-(Identifier)-}
-            (Identifier)))))))
+            (Identifier)
+          {+(Identifier)+})
+          (
+          {+(
+            {+(BiDirectionalChannel
+              {+(Identifier)+})+})+}
+          {-(Identifier)-}
+            (Identifier))
+          (Empty))))))
