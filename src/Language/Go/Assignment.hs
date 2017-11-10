@@ -163,6 +163,7 @@ expressionChoices =
   , packageClause
   , packageIdentifier
   , parameterDeclaration
+  , parameters
   , parenthesizedExpression
   , parenthesizedType
   , pointerType
@@ -264,9 +265,8 @@ implicitLengthArrayType :: Assignment
 implicitLengthArrayType = makeTerm <$> symbol ImplicitLengthArrayType <*> children (Type.Array Nothing <$> expression)
 
 functionType :: Assignment
-functionType = makeTerm <$> symbol FunctionType <*> children (Type.Function <$> parameters <*> returnType)
+functionType = makeTerm <$> symbol FunctionType <*> children (Type.Function <$> many parameters <*> returnType)
   where
-    parameters = symbol Parameters *> children (many expression)
     returnType = symbol Parameters *> children expressions <|> expression <|> emptyTerm
 
 sliceType :: Assignment
@@ -462,11 +462,10 @@ expressionList :: Assignment
 expressionList = symbol ExpressionList *> children expressions
 
 functionDeclaration :: Assignment
-functionDeclaration =  mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> expression <*> parameters <*> (expression <|> returnParameters <|> emptyTerm) <*> block)
-                   <|> mkTypedFunctionDeclaration <$> symbol FuncLiteral         <*> children ((,,,) <$> emptyTerm  <*> parameters <*> (expression <|> returnParameters <|> emptyTerm) <*> block)
+functionDeclaration =  mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> expression <*> many parameters <*> (expression <|> returnParameters <|> emptyTerm) <*> block)
+                   <|> mkTypedFunctionDeclaration <$> symbol FuncLiteral         <*> children ((,,,) <$> emptyTerm  <*> many parameters <*> (expression <|> returnParameters <|> emptyTerm) <*> block)
   where
     mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Declaration.Function [types'] name' params' block')
-    parameters = symbol Parameters *> children (many expression)
     returnParameters = makeTerm <$> symbol Parameters <*> children (many expression)
 
 variadicParameterDeclaration :: Assignment
@@ -481,27 +480,27 @@ importDeclaration = makeTerm <$> symbol ImportDeclaration <*> children (Declarat
 importSpec :: Assignment
 importSpec = symbol ImportSpec *> children expressions
 
+parameters :: Assignment
+parameters = makeTerm <$> symbol Parameters <*> children (many expression)
+
+parameterDeclaration :: Assignment
+parameterDeclaration = makeTerm <$> symbol ParameterDeclaration <*> children (many expression)
+
 methodDeclaration :: Assignment
-methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> children ((,,,,) <$> receiver <*> fieldIdentifier <*> parameters <*> (expression <|> emptyTerm) <*> block)
+methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> children ((,,,,) <$> receiver <*> fieldIdentifier <*> many parameters <*> (expression <|> emptyTerm) <*> block)
   where
-    parameterDeclaration =  symbol ParameterDeclaration *> (children (many expression) <|> many emptyTerm)
-    parameters = symbol Parameters *> children (parameterDeclaration <|> many expression)
     receiver = symbol Parameters *> children ((symbol ParameterDeclaration *> children expressions) <|> expressions)
     mkTypedMethodDeclaration loc (receiver', name', parameters', type'', body') = makeTerm loc (Declaration.Method [type''] receiver' name' parameters' body')
 
 methodSpec :: Assignment
 methodSpec =  mkMethodSpec <$> symbol MethodSpec <*> children ((,,,,) <$> empty <*> expression <*> parameters <*> (expression <|> parameters <|> emptyTerm) <*> empty)
   where
-    parameters = makeTerm <$> symbol Parameters <*> children (many expression)
     empty = makeTerm <$> location <*> pure Syntax.Empty
     mkMethodSpec loc (receiver', name', params, optionaltypeLiteral, body') = makeTerm loc $ Type.Annotation (mkMethod loc receiver' name' params body') optionaltypeLiteral
     mkMethod loc empty' name' params empty'' = makeTerm loc $ Declaration.Method [] empty' name' (pure params) empty''
 
 packageClause :: Assignment
 packageClause = makeTerm <$> symbol PackageClause <*> children (Declaration.Module <$> expression <*> pure [])
-
-parameterDeclaration :: Assignment
-parameterDeclaration = symbol ParameterDeclaration *> children expressions
 
 
 -- Statements
