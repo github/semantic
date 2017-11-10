@@ -21,7 +21,6 @@
       (Pointer
         (Identifier)))
     (Identifier)
-    (Empty)
     (Return
       (Call
         (MemberAccess
@@ -70,4 +69,16 @@
           (MemberAccess
             (Identifier)
             (Identifier))
-          (Identifier))))))
+          (Identifier)))))
+  (Method
+    (Identifier)
+    (
+      (Identifier)
+      (Pointer
+        (Identifier)))
+    (Identifier)
+    (Identifier)
+    (
+      (Identifier)
+      (Identifier))
+    ([])))

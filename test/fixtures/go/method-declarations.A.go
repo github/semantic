@@ -12,3 +12,5 @@ func (p *Point) Scale(factor float64) {
 	p.x *= factor
 	p.y *= factor
 }
+
+func (f *Field) Alive(x, y int) bool { }

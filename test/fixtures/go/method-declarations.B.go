@@ -12,3 +12,5 @@ func (q *Point) Scale(factor int) {
 	p.x *= factor
 	p.y *= factor
 }
+
+func (f *Field) Alive(z, h int) bool { }
