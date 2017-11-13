@@ -88,6 +88,7 @@ isValidSummary _ = True
 -- | A declaration’s identifier and type.
 data Declaration
   = MethodDeclaration   { declarationIdentifier :: T.Text }
+  | ClassDeclaration    { declarationIdentifier :: T.Text }
   | FunctionDeclaration { declarationIdentifier :: T.Text }
   | SectionDeclaration  { declarationIdentifier :: T.Text, declarationLevel :: Int }
   | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationLanguage :: Maybe Language }
@@ -162,6 +163,13 @@ instance CustomHasDeclaration Declaration.Method where
     where getSource = toText . flip Source.slice blobSource . byteRange
           isEmpty = (== 0) . rangeLength . byteRange
 
+-- | Produce a 'ClassDeclaration' for 'Declaration.Class' nodes.
+instance CustomHasDeclaration Declaration.Class where
+  customToDeclaration Blob{..} _ (Declaration.Class _ (Term (In identifierAnn _), _) _ _)
+    -- Classes
+    = Just $ ClassDeclaration (getSource identifierAnn)
+    where getSource = toText . flip Source.slice blobSource . byteRange
+
 -- | Produce a 'Declaration' for 'Union's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
 instance Apply HasDeclaration fs => CustomHasDeclaration (Union fs) where
   customToDeclaration blob ann = apply (Proxy :: Proxy HasDeclaration) (toDeclaration blob ann)
@@ -183,6 +191,7 @@ class HasDeclarationWithStrategy (strategy :: Strategy) syntax where
 --
 --   If you’re seeing errors about missing a 'CustomHasDeclaration' instance for a given type, you’ve probably listed it in here but not defined a 'CustomHasDeclaration' instance for it, or else you’ve listed the wrong type in here. Conversely, if your 'customHasDeclaration' method is never being called, you may have forgotten to list the type in here.
 type family DeclarationStrategy syntax where
+  DeclarationStrategy Declaration.Class = 'Custom
   DeclarationStrategy Declaration.Function = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
   DeclarationStrategy Markdown.Section = 'Custom
@@ -205,7 +214,7 @@ getDeclaration = getField
 
 -- | Produce the annotations of nodes representing declarations.
 declaration :: HasField fields (Maybe Declaration) => TermF f (Record fields) a -> Maybe (Record fields)
-declaration (In annotation _) = annotation <$ (getField annotation :: Maybe Declaration)
+declaration (In annotation _) = annotation <$ getDeclaration annotation
 
 
 -- | Compute 'Declaration's for methods and functions in 'Syntax'.
@@ -220,6 +229,7 @@ syntaxDeclarationAlgebra Blob{..} (In a r) = case r of
   S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange a) blobSource)) blobLanguage
   _ -> Nothing
   where getSource = toText . flip Source.slice blobSource . byteRange . extract
+
 
 formatTOCError :: Error.Error String -> String
 formatTOCError e = showExpectation False (errorExpected e) (errorActual e) ""
@@ -322,6 +332,7 @@ termToC = mapMaybe (flip recordSummary "unchanged") . termTableOfContentsBy decl
 toCategoryName :: Declaration -> T.Text
 toCategoryName declaration = case declaration of
   FunctionDeclaration _ -> "Function"
+  ClassDeclaration _ -> "Class"
   MethodDeclaration _ -> "Method"
   SectionDeclaration _ l -> "Heading " <> T.pack (show l)
   ErrorDeclaration{} -> "ParseError"
