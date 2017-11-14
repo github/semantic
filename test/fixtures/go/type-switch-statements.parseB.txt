@@ -5,7 +5,8 @@
     (Identifier)
     (Args)
     (Switch
-      (Identifier)
+      (Other "type_switch_guard"
+        (Identifier))
       (Case
         (Other "type_case"
           (SliceTy
