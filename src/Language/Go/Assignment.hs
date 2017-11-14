@@ -373,7 +373,7 @@ typeConversion :: Assignment
 typeConversion = makeTerm <$> symbol TypeConversionExpression <*> children (Go.Syntax.TypeConversion <$> expression <*> expression)
 
 unaryExpression :: Assignment
-unaryExpression = symbol UnaryExpression >>= \ location -> (notExpression location) <|> (unaryMinus location) <|> unaryPlus <|> unaryAmpersand <|> unaryReceive <|> unaryPointer
+unaryExpression = symbol UnaryExpression >>= \ location -> (notExpression location) <|> (unaryMinus location) <|> unaryPlus <|> unaryAmpersand <|> unaryReceive <|> unaryPointer <|> unaryComplement
   where
     notExpression location = makeTerm location . Expression.Not <$> children (symbol AnonBang *> expression)
     unaryMinus location    = makeTerm location . Expression.Negate <$> children (symbol AnonMinus *> expression)
@@ -381,6 +381,7 @@ unaryExpression = symbol UnaryExpression >>= \ location -> (notExpression locati
     unaryAmpersand = children (makeTerm <$> symbol AnonAmpersand <*> (Literal.Reference <$> expression))
     unaryReceive = children (makeTerm <$> symbol AnonLAngleMinus <*> (Go.Syntax.Receive <$> emptyTerm <*> expression))
     unaryPointer = children (makeTerm <$> symbol AnonStar <*> (Literal.Pointer <$> expression))
+    unaryComplement = children (makeTerm <$> symbol AnonCaret <*> (Expression.Complement <$> expression))
 
 binaryExpression :: Assignment
 binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression expression
