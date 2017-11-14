@@ -5,46 +5,68 @@
     (Empty)
     (Identifier)
     ([])
-    (Select
-      (
-        (Pattern
-          (Receive
-          { (Identifier)
-          ->(Identifier) }
+    (
+      (Select
+        (
+          (Pattern
+            (Receive
+            { (Identifier)
+            ->(Identifier) }
+              (Receive
+                (Empty)
+                (Identifier)))
+            (Call
+              (Identifier)
+              (Identifier)
+              (Empty)))
+          (Pattern
+            (Send
+            { (Identifier)
+            ->(Identifier) }
+              (Identifier))
+            (Call
+              (Identifier)
+              (Integer)
+              (Empty)))
+          (Pattern
             (Receive
               (Empty)
-              (Identifier)))
-          (Call
-            (Identifier)
-            (Identifier)
-            (Empty)))
-        (Pattern
-          (Send
-          { (Identifier)
-          ->(Identifier) }
-            (Identifier))
-          (Call
-            (Identifier)
-            (Integer)
-            (Empty)))
-        (Pattern
-          (Receive
-            (Empty)
+              (Receive
+                (Empty)
+                (Call
+                  (MemberAccess
+                    (Identifier)
+                    (Identifier))
+                { (Integer)
+                ->(Integer) }
+                  (Empty))))
+            (Call
+              (Identifier)
+              (Integer)
+              (Empty)))
+          (Pattern
+            (DefaultPattern
+              ([]))
+            (Return
+              (Empty)))))
+      (Select
+        (
+          (Pattern
             (Receive
               (Empty)
-              (Call
-                (MemberAccess
-                  (Identifier)
-                  (Identifier))
-              { (Integer)
-              ->(Integer) }
-                (Empty))))
-          (Call
-            (Identifier)
-            (Integer)
-            (Empty)))
-        (Pattern
-          (DefaultPattern
-            ([]))
-          (Return
-            (Empty)))))))
+              (Receive
+                (Empty)
+              { (Identifier)
+              ->(Identifier) }))
+            (Empty))
+          (Pattern
+            (Receive
+              (Empty)
+              (Receive
+                (Empty)
+                (Identifier)))
+            (Empty))
+        {+(Pattern
+          {+(DefaultPattern
+            {+([])+})+}
+          {+(Empty)+})+})))))

@@ -11,4 +11,8 @@ select {
   default:
     return
 }
+select {
+case <-channel:
+case <-timeout:
+}
 }

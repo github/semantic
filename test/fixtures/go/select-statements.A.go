@@ -11,4 +11,9 @@ select {
   default:
     return
 }
+select {
+case <-ch:
+case <-timeout:
+default:
+}
 }
