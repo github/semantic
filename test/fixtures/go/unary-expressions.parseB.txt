@@ -13,4 +13,6 @@
       (Pointer
         (Call
           (Identifier)
-          (Empty))))))
+          (Empty)))
+      (Complement
+        (Identifier)))))
