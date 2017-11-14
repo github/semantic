@@ -204,6 +204,26 @@ expressions = mk <$> location <*> many expression
     mk _ [a] = a
     mk loc children = makeTerm loc children
 
+types :: Assignment
+types =  arrayType
+     <|> channelType
+     <|> functionType
+     <|> implicitLengthArrayType
+     <|> interfaceType
+     <|> mapType
+     <|> parenthesizedType
+     <|> pointerType
+     <|> qualifiedType
+     <|> sliceType
+     <|> structType
+     <|> typeAssertion
+     <|> typeConversion
+     <|> typeDeclaration
+     <|> typeIdentifier
+     <|> typeCase
+     <|> typeCaseClause
+     <|> typeSwitchGuard
+     <|> typeSwitchStatement
 
 -- Literals
 
