@@ -103,7 +103,29 @@ sourceLineRanges source = sourceLineRangesWithin (totalRange source) source
 
 -- | Compute the 'Range's of each line in a 'Range' of a 'Source'.
 sourceLineRangesWithin :: Range -> Source -> [Range]
-sourceLineRangesWithin range = uncurry (zipWith Range) . ((start range:) &&& (<> [ end range ])) . fmap (+ succ (start range)) . B.elemIndices (toEnum (ord '\n')) . sourceBytes . slice range
+sourceLineRangesWithin range = uncurry (zipWith Range)
+                             . ((start range:) &&& (<> [ end range ]))
+                             . fmap (+ succ (start range))
+                             . newlineIndices
+                             . sourceBytes
+                             . slice range
+
+-- | Return all indices of newlines ('\n', '\r', '\r\n') in the 'ByteString'.
+newlineIndices :: B.ByteString -> [Int]
+newlineIndices = loop 0
+  where
+    loop i bytes = case B.uncons bytes of
+      Nothing -> []
+      Just (b, bs) | isLF b -> i : loop (succ i) bs
+                   | isCR b -> case B.uncons bs of
+                     Nothing -> loop (succ i) bs
+                     Just (b', bs') | isLF b' -> succ i : loop (succ (succ i)) bs'
+                                    | otherwise -> i : loop (succ i) bs
+                   | otherwise -> loop (succ i) bs
+    isLF = (== toEnum (ord '\n'))
+    isCR = (== toEnum (ord '\r'))
+
+{-# INLINE newlineIndices #-}
 
 
 -- Conversion
