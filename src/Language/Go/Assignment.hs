@@ -484,9 +484,10 @@ expressionList = symbol ExpressionList *> children expressions
 
 functionDeclaration :: Assignment
 functionDeclaration =  mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> expression <*> many parameters <*> optional (types <|> identifier <|> returnParameters) <*> optional block)
-                   <|> mkTypedFunctionDeclaration <$> symbol FuncLiteral         <*> children ((,,,) <$> emptyTerm  <*> many parameters <*> optional (types <|> identifier <|> returnParameters) <*> optional block)
+                   <|> mkTypedFunctionLiteral     <$> symbol FuncLiteral         <*> children ((,,,) <$> emptyTerm  <*> many parameters <*> optional (types <|> identifier <|> returnParameters) <*> block)
   where
     mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Declaration.Function [(maybe (makeTerm loc Syntax.Empty) id types')] name' params' (maybe (makeTerm loc Syntax.Empty) id block'))
+    mkTypedFunctionLiteral     loc (name', params', types', block') = makeTerm loc (Declaration.Function [(maybe (makeTerm loc Syntax.Empty) id types')] name' params' block')
     returnParameters = makeTerm <$> symbol Parameters <*> children (many expression)
 
 variadicParameterDeclaration :: Assignment
