@@ -433,7 +433,7 @@ typeSwitchStatement = makeTerm <$> symbol TypeSwitchStatement <*> children (Go.S
     _typeSwitchSubject = makeTerm <$> location <*> manyTermsTill expression (void (symbol TypeCaseClause))
 
 typeSwitchGuard :: Assignment
-typeSwitchGuard = makeTerm <$> symbol Grammar.TypeSwitchGuard <*> children (Go.Syntax.TypeSwitchGuard <$> expression)
+typeSwitchGuard = makeTerm <$> symbol Grammar.TypeSwitchGuard <*> children (Go.Syntax.TypeSwitchGuard <$> expressions)
 
 typeCaseClause :: Assignment
 typeCaseClause = makeTerm <$> symbol TypeCaseClause <*> children (Statement.Pattern <$> expression <*> expressions)
