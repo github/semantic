@@ -463,7 +463,7 @@ expressionList :: Assignment
 expressionList = symbol ExpressionList *> children expressions
 
 functionDeclaration :: Assignment
-functionDeclaration =  mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> expression <*> many parameters <*> (expression <|> returnParameters <|> emptyTerm) <*> block)
+functionDeclaration =  mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> expression <*> many parameters <*> (expression <|> returnParameters <|> emptyTerm) <*> (block <|> emptyTerm))
                    <|> mkTypedFunctionDeclaration <$> symbol FuncLiteral         <*> children ((,,,) <$> emptyTerm  <*> many parameters <*> (expression <|> returnParameters <|> emptyTerm) <*> block)
   where
     mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Declaration.Function [types'] name' params' block')
