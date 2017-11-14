@@ -48,10 +48,20 @@
         (Identifier)
         (Identifier)))
     ([]))
+{+(Function
+  {+(Identifier)+}
+  {+(Identifier)+}
+  {+([])+}
+  {+(Empty)+})+}
 {-(Function
   {-(Empty)-}
   {-(Identifier)-}
   {-([])-}
   {-([])-}
   {-(NoOp
-    {-(Empty)-})-})-})
+    {-(Empty)-})-})-}
+{-(Function
+  {-(Identifier)-}
+  {-(Identifier)-}
+  {-([])-}
+  {-(Empty)-})-})

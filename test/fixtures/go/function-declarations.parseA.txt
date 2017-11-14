@@ -43,4 +43,9 @@
       (
         (Identifier)
         (Identifier)))
-    ([])))
+    ([]))
+  (Function
+    (Identifier)
+    (Identifier)
+    ([])
+    (Empty)))

@@ -50,4 +50,9 @@
     ([])
     ([])
     (NoOp
-      (Empty))))
+      (Empty)))
+  (Function
+    (Identifier)
+    (Identifier)
+    ([])
+    (Empty)))
