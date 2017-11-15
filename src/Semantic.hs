@@ -77,7 +77,15 @@ diffBlobPairs renderer = fmap toOutput . distributeFoldMap (diffBlobPair rendere
 diffBlobPair :: DiffRenderer output -> Both Blob -> Task output
 diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (OldToCDiffRenderer, lang)
-    | lang `elem` [ Just Language.Go, Just Language.Markdown, Just Language.Python, Just Language.Ruby ]
+    | elem lang $ fmap Just [
+        Language.Go,
+        Language.JSX,
+        Language.JavaScript,
+        Language.Markdown,
+        Language.Python,
+        Language.Ruby,
+        Language.TypeScript
+      ]
     , Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, HasDeclaration, Show1, Traversable]) ->
       run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob)) diffTerms (renderToCDiff blobs)
     | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
