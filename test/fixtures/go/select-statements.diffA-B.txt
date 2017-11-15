@@ -40,10 +40,43 @@
                 { (Integer)
                 ->(Integer) }
                   (Empty))))
-            (Call
-              (Identifier)
-              (Integer)
-              (Empty)))
+            (
+              (Call
+                (Identifier)
+                (Integer)
+                (Empty))
+            {+(PostIncrement
+              {+(Identifier)+})+}
+            {+(If
+              {+(
+                {+(Identifier)+})+}
+              {+(
+                {+(Send
+                  {+(Identifier)+}
+                  {+(Composite
+                    {+(Identifier)+}
+                    {+(
+                      {+(Identifier)+}
+                      {+(Identifier)+})+})+})+}
+                {+(Return
+                  {+(Empty)+})+})+}
+              {+(Empty)+})+}
+            {-(PostDecrement
+              {-(Identifier)-})-}
+            {-(If
+              {-(
+                {-(Identifier)-})-}
+              {-(
+                {-(Send
+                  {-(Identifier)-}
+                  {-(Composite
+                    {-(Identifier)-}
+                    {-(
+                      {-(Identifier)-}
+                      {-(Identifier)-})-})-})-}
+                {-(Return
+                  {-(Empty)-})-})-}
+              {-(Empty)-})-}))
           (Pattern
             (DefaultPattern
               ([]))
@@ -58,15 +91,15 @@
                 (Empty)
               { (Identifier)
               ->(Identifier) }))
-            (Empty))
+            ([]))
           (Pattern
             (Receive
               (Empty)
               (Receive
                 (Empty)
                 (Identifier)))
-            (Empty))
+            ([]))
         {-(Pattern
           {-(DefaultPattern
             {-([])-})-}
-          {-(Empty)-})-})))))
+          {-([])-})-})))))
