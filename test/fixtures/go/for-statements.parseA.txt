@@ -18,6 +18,7 @@
           (NumberLiteral)))
       (RelationalOperator
         (Identifier)
+        (Other "<")
         (NumberLiteral))
       (IncrementStatement)
       (FunctionCall
@@ -27,6 +28,7 @@
     (For
       (RelationalOperator
         (Identifier)
+        (Other "<")
         (NumberLiteral))
       (IncrementStatement)
       (FunctionCall

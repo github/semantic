@@ -1,6 +1,5 @@
 (Program
-{ (Identifier)
-->(Identifier) }
+{+(Identifier)+}
 {+(Plus
   {+(Identifier)+}
   {+(Identifier)+})+}
@@ -12,6 +11,7 @@
   {+(Integer)+}
   {+(Integer)+}
   {+(Integer)+})+}
+{-(Identifier)-}
 {-(
   {-(Integer)-}
   {-(Integer)-}

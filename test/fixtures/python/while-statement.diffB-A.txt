@@ -3,15 +3,11 @@
   { (Identifier)
   ->(Identifier) }
     (
-    { (Break
-      {-(Empty)-})
-    ->(NoOp
-      {+(Empty)+}) }
-    { (Continue
-      {-(Empty)-})
-    ->(Break
-      {+(Empty)+}) }
-    { (NoOp
-      {-(Empty)-})
-    ->(Continue
-      {+(Empty)+}) })))
+    {+(NoOp
+      {+(Empty)+})+}
+      (Break
+        (Empty))
+      (Continue
+        (Empty))
+    {-(NoOp
+      {-(Empty)-})-})))

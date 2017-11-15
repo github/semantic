@@ -35,5 +35,5 @@
       (FunctionCall
         (Identifier)
         (NumberLiteral))
-      (Case)
+      (Other "default_case")
       (Return))))

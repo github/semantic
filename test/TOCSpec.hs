@@ -9,6 +9,7 @@ import Data.Blob
 import Data.ByteString (ByteString)
 import Data.Diff
 import Data.Functor.Both
+import Data.Functor.Foldable (cata)
 import Data.Functor.Listable
 import Data.Functor.Foldable (cata)
 import Data.Maybe (fromMaybe)
@@ -33,7 +34,7 @@ import Semantic.Task
 import Semantic.Util
 import SpecHelpers
 import Syntax as S hiding (Go)
-import Test.Hspec (Spec, describe, it, parallel)
+import Test.Hspec (Spec, describe, it, parallel, pending)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
 import Test.LeanCheck
@@ -66,8 +67,19 @@ spec = parallel $ do
       sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ JSONSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "modified"
-        , JSONSummary "Method" "bar" (sourceSpanBetween (4, 1) (6, 4)) "modified" ]
+        [ JSONSummary "Method" "self.foo" (sourceSpanBetween (1, 1) (2, 4)) "added"
+        , JSONSummary "Method" "bar" (sourceSpanBetween (4, 1) (6, 4)) "modified"
+        , JSONSummary "Method" "baz" (sourceSpanBetween (4, 1) (5, 4)) "removed"
+        ]
+
+    it "summarizes changed classes" $ do
+      sourceBlobs <- blobsForPaths (both "ruby/classes.A.rb" "ruby/classes.B.rb")
+      diff <- runTask $ diffWithParser rubyParser sourceBlobs
+      diffTOC diff `shouldBe`
+        [ JSONSummary "Class" "Baz" (sourceSpanBetween (1, 1) (2, 4)) "removed"
+        , JSONSummary "Class" "Foo" (sourceSpanBetween (1, 1) (3, 4)) "modified"
+        , JSONSummary "Class" "Bar" (sourceSpanBetween (5, 1) (6, 4)) "added"
+        ]
 
     it "dedupes changes in same parent method" $ do
       sourceBlobs <- blobsForPaths (both "javascript/duplicate-parent.A.js" "javascript/duplicate-parent.B.js")
@@ -147,7 +159,7 @@ spec = parallel $ do
     it "produces JSON output" $ do
       blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"}]},\"errors\":{}}\n" :: ByteString)
+      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}\n" :: ByteString)
 
     it "produces JSON output if there are parse errors" $ do
       blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.X.rb")
