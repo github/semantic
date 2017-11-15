@@ -444,9 +444,7 @@ expressionCaseClause :: Assignment
 expressionCaseClause = symbol ExpressionCaseClause *> children (expressionCase <|> defaultExpressionCase)
 
 expressionSwitchStatement :: Assignment
-expressionSwitchStatement = makeTerm <$> symbol ExpressionSwitchStatement <*> children (Statement.Match <$> (expression <|> emptyTerm) <*> (expressionCaseClauses <|> emptyTerm))
-  where
-    expressionCaseClauses = makeTerm <$> location <*> many expressionCaseClause
+expressionSwitchStatement = makeTerm <$> symbol ExpressionSwitchStatement <*> children (Statement.Match <$> (makeTerm <$> location <*> manyTermsTill expression (void (symbol ExpressionCaseClause)) <|> emptyTerm) <*> expressions)
 
 typeSwitchStatement :: Assignment
 typeSwitchStatement = makeTerm <$> symbol TypeSwitchStatement <*> children (Go.Syntax.TypeSwitch <$> _typeSwitchSubject <*> expressions)
