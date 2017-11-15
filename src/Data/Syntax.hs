@@ -1,6 +1,14 @@
-{-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators #-}
+{-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances #-}
 module Data.Syntax where
 
+import Abstract.Eval
+import Abstract.Value
+import Abstract.Primitive
+import Abstract.Environment
+import Abstract.Store
+import Control.Monad hiding (fail)
+import Control.Monad.Effect
+import Control.Monad.Fail
 import Algorithm hiding (Empty)
 import Control.Applicative
 import Control.Monad.Error.Class hiding (Error)
@@ -24,6 +32,7 @@ import Data.Term
 import Data.Union
 import GHC.Generics
 import GHC.Stack
+import Data.ByteString.Char8 (unpack)
 
 -- Combinators
 
@@ -144,6 +153,7 @@ data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
+instance (Monad m) => Eval (Value s a l) m s a Error
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorExpected errorActual
@@ -178,3 +188,5 @@ instance Diffable Context where
 instance Eq1 Context where liftEq = genericLiftEq
 instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
+instance (Monad m) => Eval (Value s a l) m s a Context where
+  evaluate ev Context{..} = ev contextSubject
