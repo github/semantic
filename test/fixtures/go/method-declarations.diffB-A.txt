@@ -7,7 +7,15 @@
     ([])
     ([]))
   (Method
+    (Empty)
     (Identifier)
+  { (Identifier)
+  ->(Identifier) }
+    ([])
+    (Empty))
+  (Method
+    (
+      (Identifier))
     (
       (Identifier)
     { (Identifier)
@@ -20,7 +28,8 @@
       ->(Identifier) }))
     ([]))
   (Method
-    (Identifier)
+    (
+      (Identifier))
     (
       (Identifier)
       (Pointer
@@ -76,7 +85,7 @@
             {+(Identifier)+})+}) })
         (Empty))))
   (Method
-    (Empty)
+    ([])
     (
     { (Identifier)
     ->(Identifier) }
@@ -108,7 +117,8 @@
             (Identifier))
           (Identifier)))))
   (Method
-    (Identifier)
+    (
+      (Identifier))
     (
       (Identifier)
       (Pointer
