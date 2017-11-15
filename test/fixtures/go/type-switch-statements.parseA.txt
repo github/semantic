@@ -15,6 +15,15 @@
             (Identifier)))
         (
           (Pattern
+            (
+              (Identifier)
+              (Pointer
+                (MemberAccess
+                  (Identifier)
+                  (Identifier))))
+            ([]))
+          (Comment)
+          (Pattern
             (Slice
               (Identifier))
             (Call

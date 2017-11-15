@@ -2,6 +2,8 @@ package main
 
 func main() {
 switch a := b; e.(type) {
+	case nil, *obj.LSym:
+		// ok, but no node
   case []Person:
     a()
   case *Dog:
