@@ -2,8 +2,9 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
+    ([])
     (Send
       (Identifier)
-      (NumberLiteral))))
+      (Integer))))

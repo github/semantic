@@ -2,11 +2,17 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Operator
-      (Operator
-        (Identifier)))
-    (Operator
-      (FunctionCall
+    ([])
+    (
+      (Not
+        (Receive
+          (Empty)
+          (Identifier)))
+      (Pointer
+        (Call
+          (Identifier)
+          (Empty)))
+      (Complement
         (Identifier)))))

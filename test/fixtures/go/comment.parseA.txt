@@ -2,6 +2,7 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
+    ([])
     (Comment)))

@@ -2,34 +2,60 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-  {+(IndexExpression
-    {+(Identifier)+}
-    {+(NumberLiteral)+})+}
-  {+(Slice
-    {+(Identifier)+})+}
-    (Slice
-    { (Identifier)
-    ->(Identifier) }
-    { (NumberLiteral)
-    ->(NumberLiteral) })
-  {-(Slice
-    {-(Identifier)-}
-    {-(NumberLiteral)-})-}
-  {-(Slice
-    {-(Identifier)-}
-    {-(NumberLiteral)-})-}
-    (Slice
-      (Identifier)
-      (NumberLiteral)
-      (NumberLiteral))
-    (Slice
-      (Identifier)
-      (NumberLiteral)
-      (NumberLiteral))
-    (Slice
-      (Identifier)
-      (NumberLiteral)
-      (NumberLiteral)
-      (NumberLiteral))))
+    ([])
+    (
+    {+(Subscript
+      {+(Identifier)+}
+      {+(Integer)+})+}
+    {+(Slice
+      {+(Identifier)+}
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Empty)+})+}
+    {+(Slice
+      {+(Identifier)+}
+      {+(Integer)+}
+      {+(Empty)+}
+      {+(Empty)+})+}
+    {+(Slice
+      {+(Identifier)+}
+      {+(Integer)+}
+      {+(Integer)+}
+      {+(Empty)+})+}
+      (Slice
+      { (Identifier)
+      ->(Identifier) }
+        (Integer)
+      { (Empty)
+      ->(Integer) }
+        (Empty))
+      (Slice
+      { (Identifier)
+      ->(Identifier) }
+        (Integer)
+      { (Empty)
+      ->(Integer) }
+      { (Empty)
+      ->(Integer) })
+    {-(Slice
+      {-(Identifier)-}
+      {-(Integer)-}
+      {-(Empty)-}
+      {-(Empty)-})-}
+    {-(Slice
+      {-(Identifier)-}
+      {-(Integer)-}
+      {-(Integer)-}
+      {-(Empty)-})-}
+    {-(Slice
+      {-(Identifier)-}
+      {-(Integer)-}
+      {-(Integer)-}
+      {-(Empty)-})-}
+    {-(Slice
+      {-(Identifier)-}
+      {-(Integer)-}
+      {-(Integer)-}
+      {-(Integer)-})-})))

@@ -22,7 +22,7 @@ import Data.Term
 import Data.Union
 import Foreign.Ptr
 import Language
-import qualified Language.Go.Syntax as Go
+import qualified Language.Go.Assignment as Go
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.Python.Assignment as Python

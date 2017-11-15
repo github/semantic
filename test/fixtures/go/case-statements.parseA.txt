@@ -2,6 +2,9 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Switch)))
+    ([])
+    (Match
+      (Empty)
+      ([]))))

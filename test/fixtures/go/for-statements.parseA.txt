@@ -2,48 +2,98 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (For
-      (ExpressionStatements
-        (FunctionCall
+    ([])
+    (
+      (For
+        (Empty)
+        (Empty)
+        (Empty)
+        (
+          (Call
+            (Identifier)
+            (Empty))
+          (Goto
+            (Identifier))))
+      (For
+        (Assignment
+          (Identifier)
+          (Integer))
+        (LessThan
+          (Identifier)
+          (Integer))
+        (PostIncrement
           (Identifier))
-        (Other "goto_statement"
-          (Identifier))))
-    (For
-      (VarDecl
-        (Other "expression_list"
+        (
+          (Call
+            (Identifier)
+            (Empty))
+          (Break
+            (Identifier))))
+      (For
+        (LessThan
+          (Identifier)
+          (Integer))
+        (PostIncrement
           (Identifier))
-        (Other "expression_list"
-          (NumberLiteral)))
-      (RelationalOperator
+        (Empty)
+        (
+          (Call
+            (Identifier)
+            (Empty))
+          (Continue
+            (Identifier))))
+      (For
+        (Empty)
+        (Empty)
+        (Empty)
+        (
+          (Call
+            (Identifier)
+            (Empty))
+          (Continue
+            (Empty))))
+      (ForEach
         (Identifier)
-        (Other "<")
-        (NumberLiteral))
-      (IncrementStatement)
-      (FunctionCall
-        (Identifier))
-      (Break
-        (Identifier)))
-    (For
-      (RelationalOperator
         (Identifier)
-        (Other "<")
-        (NumberLiteral))
-      (IncrementStatement)
-      (FunctionCall
-        (Identifier))
-      (Continue
-        (Identifier)))
-    (For
-      (FunctionCall
-        (Identifier))
-      (Continue))
-    (For
-      (Other "expression_list"
-        (Identifier))
-      (Identifier)
-      (FunctionCall
+        (
+          (Call
+            (Identifier)
+            (Identifier)
+            (Empty))
+          (Break
+            (Empty))))
+      (ForEach
+        (
+          (Identifier)
+          (Identifier))
         (Identifier)
-        (Identifier))
-      (Break))))
+        (Call
+          (Identifier)
+          (Identifier)
+          (Identifier)
+          (Empty)))
+      (ForEach
+        (
+          (Identifier)
+          (Identifier))
+        (Identifier)
+        (Call
+          (Identifier)
+          (Identifier)
+          (Identifier)
+          (Empty)))
+      (For
+        (Empty)
+        (LessThan
+          (Integer)
+          (Integer))
+        (Empty)
+        (Call
+          (Identifier)
+          (Empty)))
+      (ForEach
+        (Empty)
+        (Identifier)
+        ([])))))

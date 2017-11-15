@@ -2,16 +2,15 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Other "const_declaration"
-      (VarAssignment
+    ([])
+    (
+      (Assignment
         (Identifier)
-        (Other "expression_list"
-        { (Other "imaginary_literal")
-        ->(Other "imaginary_literal") }))
-      (VarAssignment
+      { (Complex)
+      ->(Complex) })
+      (Assignment
         (Identifier)
-        (Other "expression_list"
-        { (Other "imaginary_literal")
-        ->(Other "imaginary_literal") })))))
+      { (Complex)
+      ->(Complex) }))))

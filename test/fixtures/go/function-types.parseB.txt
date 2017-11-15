@@ -2,23 +2,25 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Other "type_declaration"
-      (TypeDecl
+    ([])
+    (
+      (Annotation
         (Identifier)
-        (FunctionTy
-          (Args
+        (Function
+          (
             (Identifier))
           (Identifier)))
-      (TypeDecl
+      (Annotation
         (Identifier)
-        (FunctionTy
-          (Args
+        (Function
+          (
             (Identifier)
             (Identifier))
-          (Args
-            (ParameterDecl
-              (ChannelTy
+          (
+            (
+              (BiDirectionalChannel
                 (Identifier)))
-            (Identifier)))))))
+            (Identifier))
+          (Empty))))))

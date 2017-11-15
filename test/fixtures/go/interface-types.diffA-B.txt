@@ -2,30 +2,39 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Other "type_declaration"
-      (TypeDecl
-      { (Identifier)
-      ->(Identifier) }
-        (Other "interface_type")))
-    (Other "type_declaration"
-      (TypeDecl
-      { (Identifier)
-      ->(Identifier) }
-        (Other "interface_type"
-          (QualifiedType))))
-    (Other "type_declaration"
-      (TypeDecl
-      { (Identifier)
-      ->(Identifier) }
-        (Other "interface_type"
-          (Identifier)
-          (QualifiedType)
-          (Other "method_spec"
+    ([])
+    (
+      (
+        (Annotation
+        { (Identifier)
+        ->(Identifier) }
+          (Interface)))
+      (
+        (Annotation
+        { (Identifier)
+        ->(Identifier) }
+          (Interface
+            (MemberAccess
+              (Identifier)
+              (Identifier)))))
+      (
+        (Annotation
+        { (Identifier)
+        ->(Identifier) }
+          (Interface
             (Identifier)
-            (Args
-              (ParameterDecl
+            (MemberAccess
+              (Identifier)
+              (Identifier))
+            (Annotation
+              (Method
+                (Empty)
                 (Identifier)
-                (Identifier)))
-            (Identifier)))))))
+                (
+                  (
+                    (Identifier)
+                    (Identifier)))
+                (Empty))
+              (Identifier))))))))

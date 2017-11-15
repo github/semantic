@@ -2,17 +2,20 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (VarDecl
-      (Other "expression_list"
-        (Identifier))
-      (Other "expression_list"
-        (Operator
-          (Other "composite_literal"
-            (Identifier)
-            (Pair
+    ([])
+    (Assignment
+      (Identifier)
+      (Reference
+        (Composite
+          (Identifier)
+          (
+            (KeyValue
               (Identifier)
-              (FunctionCall
+              (Call
                 (Identifier)
-                (QualifiedType)))))))))
+                (MemberAccess
+                  (Identifier)
+                  (Identifier))
+                (Empty)))))))))

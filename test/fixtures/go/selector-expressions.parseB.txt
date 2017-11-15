@@ -2,11 +2,13 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (FunctionCall
-      (SubscriptAccess
-        (SubscriptAccess
+    ([])
+    (Call
+      (MemberAccess
+        (MemberAccess
           (Identifier)
           (Identifier))
-        (Identifier)))))
+        (Identifier))
+      (Empty))))

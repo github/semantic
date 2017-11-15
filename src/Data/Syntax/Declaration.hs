@@ -99,12 +99,6 @@ instance Eq1 Module where liftEq = genericLiftEq
 instance Ord1 Module where liftCompare = genericLiftCompare
 instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
-data Interface a = Interface { interfaceIdentifier :: !a, interfaceBody :: ![a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Show, Traversable)
-
-instance Eq1 Interface where liftEq = genericLiftEq
-instance Show1 Interface where liftShowsPrec = genericLiftShowsPrec
-
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

@@ -2,12 +2,13 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Other "type_declaration"
-      (TypeDecl
+    ([])
+    (
+      (Annotation
         (Identifier)
-        (DictionaryTy
+        (Map
         { (Identifier)
         ->(Identifier) }
           (Identifier))))))

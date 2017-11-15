@@ -2,16 +2,18 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Other "type_declaration"
-      (TypeDecl
-        (Identifier)
-        (SliceTy
-          (Identifier))))
-    (Other "type_declaration"
-      (TypeDecl
-        (Identifier)
-        (SliceTy
-          (SliceTy
-            (Identifier)))))))
+    ([])
+    (
+      (
+        (Annotation
+          (Identifier)
+          (Slice
+            (Identifier))))
+      (
+        (Annotation
+          (Identifier)
+          (Slice
+            (Slice
+              (Identifier))))))))

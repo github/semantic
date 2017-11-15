@@ -2,21 +2,34 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Other "type_declaration"
-      (TypeDecl
+    ([])
+    (
+      (Annotation
         (Identifier)
-        (ChannelTy
-          (ChannelTy
+        (BiDirectionalChannel
+          (ReceiveChannel
             (Identifier))))
-      (TypeDecl
+      (Annotation
         (Identifier)
-        (ChannelTy
-          (ChannelTy
-            (StructTy))))
-      (TypeDecl
+        (SendChannel
+          (BiDirectionalChannel
+            (Constructor
+              (Empty)))))
+      (Annotation
         (Identifier)
-        (ChannelTy
-          (ChannelTy
-            (Identifier)))))))
+        (SendChannel
+          (ReceiveChannel
+            (Identifier))))
+      (Annotation
+        (Identifier)
+        (ReceiveChannel
+          (ReceiveChannel
+            (Identifier))))
+      (Annotation
+        (Identifier)
+        (BiDirectionalChannel
+          (ParenthesizedType
+            (ReceiveChannel
+              (Identifier))))))))

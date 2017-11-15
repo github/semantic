@@ -2,26 +2,53 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Other "type_declaration"
-      (TypeDecl
+    ([])
+    (
+      (Annotation
       { (Identifier)
       ->(Identifier) }
-        (ChannelTy
-          (ChannelTy
+        (BiDirectionalChannel
+          (ReceiveChannel
           { (Identifier)
           ->(Identifier) })))
-      (TypeDecl
+      (Annotation
       { (Identifier)
       ->(Identifier) }
-        (ChannelTy
-          (ChannelTy
-            (StructTy))))
-      (TypeDecl
-      { (Identifier)
-      ->(Identifier) }
-        (ChannelTy
-          (ChannelTy
-          { (Identifier)
-          ->(Identifier) }))))))
+        (SendChannel
+          (BiDirectionalChannel
+            (Constructor
+              (Empty)))))
+    {+(Annotation
+      {+(Identifier)+}
+      {+(SendChannel
+        {+(ReceiveChannel
+          {+(Identifier)+})+})+})+}
+    {+(Annotation
+      {+(Identifier)+}
+      {+(ReceiveChannel
+        {+(ReceiveChannel
+          {+(Identifier)+})+})+})+}
+    {+(Annotation
+      {+(Identifier)+}
+      {+(BiDirectionalChannel
+        {+(ParenthesizedType
+          {+(ReceiveChannel
+            {+(Identifier)+})+})+})+})+}
+    {-(Annotation
+      {-(Identifier)-}
+      {-(SendChannel
+        {-(ReceiveChannel
+          {-(Identifier)-})-})-})-}
+    {-(Annotation
+      {-(Identifier)-}
+      {-(ReceiveChannel
+        {-(ReceiveChannel
+          {-(Identifier)-})-})-})-}
+    {-(Annotation
+      {-(Identifier)-}
+      {-(BiDirectionalChannel
+        {-(ParenthesizedType
+          {-(ReceiveChannel
+            {-(Identifier)-})-})-})-})-})))

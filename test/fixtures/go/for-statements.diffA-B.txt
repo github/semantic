@@ -2,81 +2,169 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-  { (For
-    {-(ExpressionStatements
-      {-(FunctionCall
-        {-(Identifier)-})-}
-      {-(Other "goto_statement"
-        {-(Identifier)-})-})-})
-  ->(For
-    {+(FunctionCall
-      {+(Identifier)+})+}
-    {+(Other "goto_statement"
-      {+(Identifier)+})+}) }
-  {+(For
-    {+(Other "expression_list"
-      {+(Identifier)+})+}
-    {+(Identifier)+}
-    {+(FunctionCall
-      {+(Identifier)+})+}
-    {+(Break
-      {+(Identifier)+})+})+}
-  {+(For
-    {+(FunctionCall
-      {+(Identifier)+})+}
-    {+(Continue
-      {+(Identifier)+})+})+}
-  {+(For
-    {+(RelationalOperator
+    ([])
+    (
+      (For
+        (Empty)
+        (Empty)
+        (Empty)
+        (
+          (Call
+            (Identifier)
+            (Empty))
+          (Goto
+            (Identifier))))
+    {+(ForEach
       {+(Identifier)+}
-      {+(Other "<")+}
-      {+(NumberLiteral)+})+}
-    {+(IncrementStatement)+}
-    {+(FunctionCall
-      {+(Identifier)+})+}
-    {+(Continue)+})+}
-  {+(For
-    {+(ExpressionStatements
-      {+(FunctionCall
+      {+(Identifier)+}
+      {+(
+        {+(Call
+          {+(Identifier)+}
+          {+(Empty)+})+}
+        {+(Break
+          {+(Identifier)+})+})+})+}
+    {+(For
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(
+        {+(Call
+          {+(Identifier)+}
+          {+(Empty)+})+}
+        {+(Continue
+          {+(Identifier)+})+})+})+}
+      (For
+      { (Assignment
+        {-(Identifier)-}
+        {-(Integer)-})
+      ->(LessThan
+        {+(Identifier)+}
+        {+(Integer)+}) }
+      { (LessThan
+        {-(Identifier)-}
+        {-(Integer)-})
+      ->(PostIncrement
+        {+(Identifier)+}) }
+      { (PostIncrement
+        {-(Identifier)-})
+      ->(Empty) }
+        (
+          (Call
+            (Identifier)
+            (Empty))
+        {+(Continue
+          {+(Empty)+})+}
+        {-(Break
+          {-(Identifier)-})-}))
+    {+(For
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(
+        {+(Call
+          {+(Identifier)+}
+          {+(Identifier)+}
+          {+(Empty)+})+}
+        {+(Break
+          {+(Empty)+})+})+})+}
+    {+(ForEach
+      {+(
         {+(Identifier)+}
         {+(Identifier)+})+}
-      {+(Break)+})+})+}
-  {-(For
-    {-(VarDecl
-      {-(Other "expression_list"
+      {+(Identifier)+}
+      {+(Call
+        {+(Identifier)+}
+        {+(Identifier)+}
+        {+(Identifier)+}
+        {+(Empty)+})+})+}
+    {+(ForEach
+      {+(
+        {+(Identifier)+}
+        {+(Identifier)+})+}
+      {+(Identifier)+}
+      {+(Call
+        {+(Identifier)+}
+        {+(Identifier)+}
+        {+(Identifier)+}
+        {+(Empty)+})+})+}
+    {+(For
+      {+(Empty)+}
+      {+(LessThan
+        {+(Integer)+}
+        {+(Integer)+})+}
+      {+(Empty)+}
+      {+(Call
+        {+(Identifier)+}
+        {+(Empty)+})+})+}
+    {+(ForEach
+      {+(Empty)+}
+      {+(Identifier)+}
+      {+([])+})+}
+    {-(For
+      {-(LessThan
+        {-(Identifier)-}
+        {-(Integer)-})-}
+      {-(PostIncrement
         {-(Identifier)-})-}
-      {-(Other "expression_list"
-        {-(NumberLiteral)-})-})-}
-    {-(RelationalOperator
+      {-(Empty)-}
+      {-(
+        {-(Call
+          {-(Identifier)-}
+          {-(Empty)-})-}
+        {-(Continue
+          {-(Identifier)-})-})-})-}
+    {-(For
+      {-(Empty)-}
+      {-(Empty)-}
+      {-(Empty)-}
+      {-(
+        {-(Call
+          {-(Identifier)-}
+          {-(Empty)-})-}
+        {-(Continue
+          {-(Empty)-})-})-})-}
+    {-(ForEach
       {-(Identifier)-}
-      {-(Other "<")-}
-      {-(NumberLiteral)-})-}
-    {-(IncrementStatement)-}
-    {-(FunctionCall
-      {-(Identifier)-})-}
-    {-(Break
-      {-(Identifier)-})-})-}
-  {-(For
-    {-(RelationalOperator
       {-(Identifier)-}
-      {-(Other "<")-}
-      {-(NumberLiteral)-})-}
-    {-(IncrementStatement)-}
-    {-(FunctionCall
-      {-(Identifier)-})-}
-    {-(Continue
-      {-(Identifier)-})-})-}
-  {-(For
-    {-(FunctionCall
-      {-(Identifier)-})-}
-    {-(Continue)-})-}
-  {-(For
-    {-(Other "expression_list"
-      {-(Identifier)-})-}
-    {-(Identifier)-}
-    {-(FunctionCall
+      {-(
+        {-(Call
+          {-(Identifier)-}
+          {-(Identifier)-}
+          {-(Empty)-})-}
+        {-(Break
+          {-(Empty)-})-})-})-}
+    {-(ForEach
+      {-(
+        {-(Identifier)-}
+        {-(Identifier)-})-}
       {-(Identifier)-}
-      {-(Identifier)-})-}
-    {-(Break)-})-}))
+      {-(Call
+        {-(Identifier)-}
+        {-(Identifier)-}
+        {-(Identifier)-}
+        {-(Empty)-})-})-}
+    {-(ForEach
+      {-(
+        {-(Identifier)-}
+        {-(Identifier)-})-}
+      {-(Identifier)-}
+      {-(Call
+        {-(Identifier)-}
+        {-(Identifier)-}
+        {-(Identifier)-}
+        {-(Empty)-})-})-}
+    {-(For
+      {-(Empty)-}
+      {-(LessThan
+        {-(Integer)-}
+        {-(Integer)-})-}
+      {-(Empty)-}
+      {-(Call
+        {-(Identifier)-}
+        {-(Empty)-})-})-}
+    {-(ForEach
+      {-(Empty)-}
+      {-(Identifier)-}
+      {-([])-})-})))

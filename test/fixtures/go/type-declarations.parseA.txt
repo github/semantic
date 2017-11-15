@@ -2,16 +2,18 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Other "type_declaration"
-      (TypeDecl
-        (Identifier)
-        (Identifier)))
-    (Other "type_declaration"
-      (TypeDecl
-        (Identifier)
-        (Identifier))
-      (TypeDecl
-        (Identifier)
-        (Identifier)))))
+    ([])
+    (
+      (
+        (Annotation
+          (Identifier)
+          (Identifier)))
+      (
+        (Annotation
+          (Identifier)
+          (Identifier))
+        (Annotation
+          (Identifier)
+          (Identifier))))))

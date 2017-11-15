@@ -1,7 +1,7 @@
 package main
 
 func main() {
-a[1]
+ a[1]
  b[:]
  c[1:]
  d[1:2]

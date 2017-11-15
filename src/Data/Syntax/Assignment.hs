@@ -152,7 +152,7 @@ tracing f = case getCallStack callStack of
 
 -- | Zero-width production of the current location.
 --
---   If assigning at the end of input or at the end of a list of children, the loccation will be returned as an empty Range and Span at the current offset. Otherwise, it will be the Range and Span of the current node.
+--   If assigning at the end of input or at the end of a list of children, the location will be returned as an empty Range and Span at the current offset. Otherwise, it will be the Range and Span of the current node.
 location :: HasCallStack => Assignment ast grammar (Record Location)
 location = tracing Location `Then` return
 
