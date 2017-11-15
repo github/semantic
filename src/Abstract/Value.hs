@@ -76,5 +76,6 @@ instance (FreeVariables1 (TermF syntax ann), Functor syntax, Ord l) => AbstractV
 instance AbstractValue Monovariant Type where
   valueRoots _ = mempty
 
-  literal (PInt _)  = Int
-  literal (PBool _) = Bool
+  literal (PInt _)    = Int
+  literal (PBool _)   = Bool
+  literal (PString _) = String
