@@ -9,6 +9,7 @@ module Parser
 , jsonParser
 , markdownParser
 , pythonParser
+, pythonParser2
 , rubyParser
 , typescriptParser
 ) where
@@ -28,6 +29,7 @@ import Language
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.Python.Assignment as Python
+import qualified Language.Python.Assignment2 as Python2
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 import Syntax hiding (Go)
@@ -102,6 +104,9 @@ rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 
 pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
+
+pythonParser2 :: Parser Python2.Term
+pythonParser2 = AssignmentParser (ASTParser tree_sitter_python) Python2.assignment
 
 jsonParser :: Parser JSON.Term
 jsonParser = AssignmentParser (ASTParser tree_sitter_json) JSON.assignment
