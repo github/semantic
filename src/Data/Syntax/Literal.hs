@@ -28,6 +28,8 @@ false = Boolean False
 instance Eq1 Boolean where liftEq = genericLiftEq
 instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
+instance (Monad m) => Eval (Value s a l) m s a Boolean where
+  evaluate _ (Boolean x) = pure (I (PBool x))
 
 
 -- Numeric
@@ -39,6 +41,7 @@ newtype Integer a = Integer { integerContent :: ByteString }
 instance Eq1 Data.Syntax.Literal.Integer where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Integer where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShowsPrec
+instance (Monad m) => Eval (Value s a l) m s a Data.Syntax.Literal.Integer
 
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
 -- TODO: Do we care about differentiating between hex/octal/decimal/binary integer literals?

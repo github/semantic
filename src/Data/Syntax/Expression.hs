@@ -1,6 +1,8 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses #-}
 module Data.Syntax.Expression where
 
+import Abstract.Eval
+import Abstract.Value
 import Algorithm
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
@@ -16,6 +18,7 @@ data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a]
 instance Eq1 Call where liftEq = genericLiftEq
 instance Ord1 Call where liftCompare = genericLiftCompare
 instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
+instance (Monad m) => Eval (Value s a l) m s a Call
 
 
 data Comparison a
