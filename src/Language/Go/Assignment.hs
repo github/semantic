@@ -625,7 +625,7 @@ selectStatement :: Assignment
 selectStatement = makeTerm <$> symbol SelectStatement <*> children (Go.Syntax.Select <$> expressions)
 
 communicationClause :: Assignment
-communicationClause = makeTerm <$> symbol CommunicationClause <*> children (Statement.Pattern <$> (communicationCase <|> defaultCase) <*> (expressions <|> emptyTerm))
+communicationClause = makeTerm <$> symbol CommunicationClause <*> children (Statement.Pattern <$> (communicationCase <|> defaultCase) <*> expressions)
   where
     communicationCase = symbol CommunicationCase *> children expression
 
