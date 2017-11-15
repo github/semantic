@@ -28,6 +28,7 @@ data Prim
   = PInt  {-# UNPACK #-} !Int
   | PBool !Bool
   | PString !ByteString
+  | Noop
   deriving (Eq, Ord, Show)
 
 class Monad m => MonadPrim a m where

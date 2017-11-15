@@ -125,6 +125,8 @@ newtype Program a = Program [a]
 instance Eq1 Program where liftEq = genericLiftEq
 instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
+instance (Monad m) => Eval (Value s a l) m s a Program where
+  evaluate ev (Program xs) = foldl (\_ a -> ev a) (pure (I Noop)) xs
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
@@ -144,6 +146,8 @@ data Empty a = Empty
 instance Eq1 Empty where liftEq _ _ _ = True
 instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
+instance (Monad m) => Eval (Value s a l) m s a Empty where
+  evaluate _ _ = pure (I Noop)
 
 
 -- | Syntax representing a parsing or assignment error.
@@ -190,3 +194,7 @@ instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 instance (Monad m) => Eval (Value s a l) m s a Context where
   evaluate ev Context{..} = ev contextSubject
+
+-- TODO: Find a better place for this
+instance Monad m => Eval (Value s a l) m s a [] where
+  evaluate _ _ = pure (I Noop)
