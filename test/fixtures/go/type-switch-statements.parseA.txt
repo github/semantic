@@ -14,15 +14,16 @@
           (TypeSwitchGuard
             (Identifier)))
         (
-          (Pattern
-            (
-              (Identifier)
-              (Pointer
-                (MemberAccess
-                  (Identifier)
-                  (Identifier))))
-            ([]))
-          (Comment)
+          (Context
+            (Comment)
+            (Pattern
+              (
+                (Identifier)
+                (Pointer
+                  (MemberAccess
+                    (Identifier)
+                    (Identifier))))
+              ([])))
           (Pattern
             (Slice
               (Identifier))

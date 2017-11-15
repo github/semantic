@@ -31,16 +31,17 @@
         {+(Call
           {+(Identifier)+}
           {+(Empty)+})+})+}
-      {-(Pattern
-        {-(LessThan
-          {-(Identifier)-}
-          {-(Identifier)-})-}
-        {-(
-          {-(Comment)-}
-          {-(Call
+      {-(Context
+        {-(Comment)-}
+        {-(Pattern
+          {-(LessThan
             {-(Identifier)-}
-            {-(Empty)-})-})-})-}
-      {-(Comment)-}
+            {-(Identifier)-})-}
+          {-(
+            {-(Comment)-}
+            {-(Call
+              {-(Identifier)-}
+              {-(Empty)-})-})-})-})-}
       {-(Pattern
         {-(Equal
           {-(Identifier)-}
