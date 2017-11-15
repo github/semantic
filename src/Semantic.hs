@@ -77,7 +77,7 @@ diffBlobPairs renderer = fmap toOutput . distributeFoldMap (diffBlobPair rendere
 diffBlobPair :: DiffRenderer output -> Both Blob -> Task output
 diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (OldToCDiffRenderer, lang)
-    | (elem lang) $ fmap Just [
+    | elem lang $ fmap Just [
         Language.JSX,
         Language.JavaScript,
         Language.Markdown,
