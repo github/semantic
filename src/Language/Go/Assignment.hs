@@ -460,7 +460,7 @@ typeCaseClause :: Assignment
 typeCaseClause = makeTerm <$> symbol TypeCaseClause <*> children (Statement.Pattern <$> expression <*> expressions)
 
 typeCase :: Assignment
-typeCase = symbol TypeCase *> children expression
+typeCase = symbol TypeCase *> children expressions
 
 fallThroughStatement :: Assignment
 fallThroughStatement = makeTerm <$> symbol FallthroughStatement <*> (Statement.Pattern <$> (makeTerm <$> location <*> (Syntax.Identifier <$> source)) <*> emptyTerm)
