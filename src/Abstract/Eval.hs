@@ -11,6 +11,9 @@ import Data.Union
 class Monad m => Eval v m syntax ann constr where
   evaluate :: (Term syntax ann -> m v) -> constr (Term syntax ann) -> m v
 
+  default evaluate :: (Term syntax ann -> m v) -> constr (Term syntax ann) -> m v
+  evaluate = fail "default evalute"
+
 
 instance ( Monad m
          , Apply (Eval v m s a) fs
