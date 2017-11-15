@@ -6,14 +6,15 @@
     (Identifier)
     ([])
     (Match
-      (Pattern
-        (LessThan
-          (Identifier)
-          (Identifier))
-        (Call
-          (Identifier)
-          (Empty)))
+      ([])
       (
+        (Pattern
+          (LessThan
+            (Identifier)
+            (Identifier))
+          (Call
+            (Identifier)
+            (Empty)))
         (Pattern
           (LessThan
             (Identifier)

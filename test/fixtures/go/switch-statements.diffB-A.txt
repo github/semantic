@@ -6,15 +6,7 @@
     (Identifier)
     ([])
     (Match
-      (Pattern
-        (LessThan
-        { (Identifier)
-        ->(Identifier) }
-        { (Identifier)
-        ->(Identifier) })
-        (Call
-          (Identifier)
-          (Empty)))
+      ([])
       (
         (Pattern
           (LessThan
@@ -25,12 +17,31 @@
           (Call
             (Identifier)
             (Empty)))
+      {+(Pattern
+        {+(LessThan
+          {+(Identifier)+}
+          {+(Identifier)+})+}
+        {+(
+          {+(Comment)+}
+          {+(Call
+            {+(Identifier)+}
+            {+(Empty)+})+})+})+}
+      {+(Comment)+}
         (Pattern
-          (Equal
-          { (Identifier)
-          ->(Identifier) }
-            (Integer))
+        { (LessThan
+          {-(Identifier)-}
+          {-(Identifier)-})
+        ->(Equal
+          {+(Identifier)+}
+          {+(Integer)+}) }
           (Call
           { (Identifier)
           ->(Identifier) }
-            (Empty)))))))
+            (Empty)))
+      {-(Pattern
+        {-(Equal
+          {-(Identifier)-}
+          {-(Integer)-})-}
+        {-(Call
+          {-(Identifier)-}
+          {-(Empty)-})-})-}))))
