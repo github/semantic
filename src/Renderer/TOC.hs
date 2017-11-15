@@ -166,7 +166,7 @@ instance CustomHasDeclaration Declaration.Class where
   customToDeclaration Blob{..} _ (Declaration.Class _ (Term (In identifierAnn _), _) _ _)
     -- Classes
     = Just $ ClassDeclaration (getSource identifierAnn)
-    where getSource = toText . flip Source.slice blobSource . byteRange
+    where getSource = toText . flip Source.slice blobSource . getField
 
 -- | Produce a 'Declaration' for 'Union's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
 instance Apply HasDeclaration fs => CustomHasDeclaration (Union fs) where
