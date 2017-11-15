@@ -3,6 +3,7 @@
   {+(TypeParameters
     {+(TypeParameter
       {+(Identifier)+}
+      {+(Empty)+}
       {+(Empty)+})+})+}
   {+(Annotation
     {+(PredefinedType)+})+}

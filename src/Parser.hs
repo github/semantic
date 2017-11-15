@@ -22,12 +22,12 @@ import Data.Term
 import Data.Union
 import Foreign.Ptr
 import Language
-import qualified Language.Go.Syntax as Go
-import qualified Language.JSON.Syntax as JSON
-import qualified Language.Markdown.Syntax as Markdown
-import qualified Language.Python.Syntax as Python
-import qualified Language.Ruby.Syntax as Ruby
-import qualified Language.TypeScript.Syntax as TypeScript
+import qualified Language.Go.Assignment as Go
+import qualified Language.JSON.Assignment as JSON
+import qualified Language.Markdown.Assignment as Markdown
+import qualified Language.Python.Assignment as Python
+import qualified Language.Ruby.Assignment as Ruby
+import qualified Language.TypeScript.Assignment as TypeScript
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import TreeSitter.Go
 import TreeSitter.JSON

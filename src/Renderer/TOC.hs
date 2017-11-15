@@ -50,7 +50,7 @@ import qualified Data.Map as Map hiding (null)
 import Data.Syntax.Algebra (RAlgebra)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
-import qualified Data.Syntax.Markup as Markup
+import qualified Language.Markdown.Syntax as Markdown
 
 data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }
   deriving (Eq, Show)
@@ -86,6 +86,7 @@ isValidSummary _ = True
 -- | A declaration’s identifier and type.
 data Declaration
   = MethodDeclaration   { declarationIdentifier :: T.Text }
+  | ClassDeclaration    { declarationIdentifier :: T.Text }
   | FunctionDeclaration { declarationIdentifier :: T.Text }
   | SectionDeclaration  { declarationIdentifier :: T.Text, declarationLevel :: Int }
   | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationLanguage :: Maybe Language }
@@ -128,9 +129,9 @@ class CustomHasDeclaration syntax where
   customToDeclaration :: (Foldable whole, HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra syntax (Term whole (Record fields)) (Maybe Declaration)
 
 
--- | Produce a 'SectionDeclaration' from the first line of the heading of a 'Markup.Section' node.
-instance CustomHasDeclaration Markup.Section where
-  customToDeclaration Blob{..} _ (Markup.Section level (Term (In headingAnn headingF), _) _)
+-- | Produce a 'SectionDeclaration' from the first line of the heading of a 'Markdown.Section' node.
+instance CustomHasDeclaration Markdown.Section where
+  customToDeclaration Blob{..} _ (Markdown.Section level (Term (In headingAnn headingF), _) _)
     = Just $ SectionDeclaration (maybe (getSource (getField headingAnn)) (getSource . sconcat) (nonEmpty (getField . termAnnotation . unTerm <$> toList headingF))) level
     where getSource = firstLine . toText . flip Source.slice blobSource
           firstLine = T.takeWhile (/= '\n')
@@ -160,6 +161,13 @@ instance CustomHasDeclaration Declaration.Method where
     where getSource = toText . flip Source.slice blobSource . getField
           isEmpty = (== 0) . rangeLength . getField
 
+-- | Produce a 'ClassDeclaration' for 'Declaration.Class' nodes.
+instance CustomHasDeclaration Declaration.Class where
+  customToDeclaration Blob{..} _ (Declaration.Class _ (Term (In identifierAnn _), _) _ _)
+    -- Classes
+    = Just $ ClassDeclaration (getSource identifierAnn)
+    where getSource = toText . flip Source.slice blobSource . byteRange
+
 -- | Produce a 'Declaration' for 'Union's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
 instance Apply HasDeclaration fs => CustomHasDeclaration (Union fs) where
   customToDeclaration blob ann = apply (Proxy :: Proxy HasDeclaration) (toDeclaration blob ann)
@@ -181,9 +189,10 @@ class HasDeclarationWithStrategy (strategy :: Strategy) syntax where
 --
 --   If you’re seeing errors about missing a 'CustomHasDeclaration' instance for a given type, you’ve probably listed it in here but not defined a 'CustomHasDeclaration' instance for it, or else you’ve listed the wrong type in here. Conversely, if your 'customHasDeclaration' method is never being called, you may have forgotten to list the type in here.
 type family DeclarationStrategy syntax where
+  DeclarationStrategy Declaration.Class = 'Custom
   DeclarationStrategy Declaration.Function = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
-  DeclarationStrategy Markup.Section = 'Custom
+  DeclarationStrategy Markdown.Section = 'Custom
   DeclarationStrategy Syntax.Error = 'Custom
   DeclarationStrategy (Union fs) = 'Custom
   DeclarationStrategy a = 'Default
@@ -203,7 +212,7 @@ getDeclaration = getField
 
 -- | Produce the annotations of nodes representing declarations.
 declaration :: HasField fields (Maybe Declaration) => TermF f (Record fields) a -> Maybe (Record fields)
-declaration (In annotation _) = annotation <$ (getField annotation :: Maybe Declaration)
+declaration (In annotation _) = annotation <$ getDeclaration annotation
 
 
 formatTOCError :: Error.Error String -> String
@@ -211,8 +220,7 @@ formatTOCError e = showExpectation False (errorExpected e) (errorActual e) ""
 
 -- | An entry in a table of contents.
 data Entry a
-  = Unchanged { entryPayload :: a } -- ^ An entry for an unchanged portion of a diff (i.e. a diff node not containing any patches).
-  | Changed   { entryPayload :: a } -- ^ An entry for a node containing changes.
+  = Changed   { entryPayload :: a } -- ^ An entry for a node containing changes.
   | Inserted  { entryPayload :: a } -- ^ An entry for a change occurring inside an 'Insert' 'Patch'.
   | Deleted   { entryPayload :: a } -- ^ An entry for a change occurring inside a 'Delete' 'Patch'.
   | Replaced  { entryPayload :: a } -- ^ An entry for a change occurring on the insertion side of a 'Replace' 'Patch'.
@@ -223,13 +231,12 @@ data Entry a
 tableOfContentsBy :: (Foldable f, Functor f)
                   => (forall b. TermF f ann b -> Maybe a) -- ^ A function mapping relevant nodes onto values in Maybe.
                   -> Diff f ann ann                       -- ^ The diff to compute the table of contents for.
-                  -> [Entry a]                            -- ^ A list of entries for relevant changed and unchanged nodes in the diff.
+                  -> [Entry a]                            -- ^ A list of entries for relevant changed nodes in the diff.
 tableOfContentsBy selector = fromMaybe [] . cata (\ r -> case r of
   Patch patch -> (pure . patchEntry <$> bicrosswalk selector selector patch) <> bifoldMap fold fold patch <> Just []
   Merge (In (_, ann2) r) -> case (selector (In ann2 r), fold r) of
-    (Just a, Nothing) -> Just [Unchanged a]
-    (Just a, Just []) -> Just [Changed a]
-    (_     , entries) -> entries)
+    (Just a, Just entries) -> Just (Changed a : entries)
+    (_     , entries)      -> entries)
 
   where patchEntry = patch Deleted Inserted (const Replaced)
 
@@ -269,10 +276,9 @@ dedupe = let tuples = sortOn fst . Map.elems . snd . foldl' go (0, Map.empty) in
     dedupeKey entry = DedupeKey ((fmap toCategoryName . getDeclaration . entryPayload) entry, (fmap (toLower . declarationIdentifier) . getDeclaration . entryPayload) entry)
     exactMatch = (==) `on` (getDeclaration . entryPayload)
 
--- | Construct a 'JSONSummary' from an 'Entry'. Returns 'Nothing' for 'Unchanged' patches.
+-- | Construct a 'JSONSummary' from an 'Entry'.
 entrySummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Entry (Record fields) -> Maybe JSONSummary
 entrySummary entry = case entry of
-  Unchanged _ -> Nothing
   Changed a   -> recordSummary a "modified"
   Deleted a   -> recordSummary a "removed"
   Inserted a  -> recordSummary a "added"
@@ -310,6 +316,7 @@ termToC = mapMaybe (flip recordSummary "unchanged") . termTableOfContentsBy decl
 toCategoryName :: Declaration -> T.Text
 toCategoryName declaration = case declaration of
   FunctionDeclaration _ -> "Function"
+  ClassDeclaration _ -> "Class"
   MethodDeclaration _ -> "Method"
   SectionDeclaration _ l -> "Heading " <> T.pack (show l)
   ErrorDeclaration{} -> "ParseError"

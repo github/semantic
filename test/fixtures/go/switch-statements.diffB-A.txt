@@ -11,6 +11,7 @@
             (RelationalOperator
             { (Identifier)
             ->(Identifier) }
+              (Other "<")
             { (Identifier)
             ->(Identifier) })))
         (FunctionCall
@@ -20,6 +21,7 @@
         {+(Other "expression_list"
           {+(RelationalOperator
             {+(Identifier)+}
+            {+(Other "<")+}
             {+(Identifier)+})+})+})+}
       {+(FunctionCall
         {+(Identifier)+})+})+}
@@ -28,6 +30,7 @@
         {+(Other "expression_list"
           {+(RelationalOperator
             {+(Identifier)+}
+            {+(Other "==")+}
             {+(NumberLiteral)+})+})+})+}
       {+(FunctionCall
         {+(Identifier)+})+})+}
@@ -36,6 +39,7 @@
         {-(Other "expression_list"
           {-(RelationalOperator
             {-(Identifier)-}
+            {-(Other "<")-}
             {-(Identifier)-})-})-})-}
       {-(FunctionCall
         {-(Identifier)-})-})-}
@@ -44,6 +48,7 @@
         {-(Other "expression_list"
           {-(RelationalOperator
             {-(Identifier)-}
+            {-(Other "==")-}
             {-(NumberLiteral)-})-})-})-}
       {-(FunctionCall
         {-(Identifier)-})-})-})))

@@ -2,6 +2,7 @@
   (Class
     (TypeParameter
       (Identifier)
+      (Empty)
       (Empty))
     (Identifier)
     (ExtendsClause

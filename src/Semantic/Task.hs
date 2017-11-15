@@ -161,6 +161,7 @@ runTaskWithOptions options task = do
     run options logger statter task
 
   closeQueue statter
+  closeStatClient (asyncQueueExtra statter)
   closeQueue logger
   either (die . displayException) pure result
   where
@@ -203,23 +204,28 @@ runParser Options{..} blob@Blob{..} = go
       AssignmentParser parser assignment -> do
         ast <- go parser `catchError` \ err -> do
           writeStat (Stat.increment "parse.parse_failures" languageTag)
-          writeLog Error "failed parsing" (("tag", "parse") : blobFields)
+          writeLog Error "failed parsing" (("task", "parse") : blobFields)
           throwError err
         time "parse.assign" languageTag $
           case Assignment.assign blobSource assignment ast of
             Left err -> do
               writeStat (Stat.increment "parse.assign_errors" languageTag)
-              writeLog Error (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("tag", "assign") : blobFields)
+              writeLog Error (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "assign") : blobFields)
               throwError (toException err)
             Right term -> do
-              for_ (errors term) $ \ err -> do
-                writeStat (Stat.increment "parse.parse_errors" languageTag)
-                writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("tag", "assign") : blobFields)
+              for_ (errors term) $ \ err -> case Error.errorActual err of
+                  (Just "ParseError") -> do
+                    writeStat (Stat.increment "parse.parse_errors" languageTag)
+                    writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "parse") : blobFields)
+                  _ -> do
+                    writeStat (Stat.increment "parse.assign_warnings" languageTag)
+                    writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "assign") : blobFields)
               writeStat (Stat.count "parse.nodes" (length term) languageTag)
               pure term
       MarkdownParser ->
         time "parse.cmark_parse" languageTag $
-          pure (cmarkParser blobSource)
+          let term = cmarkParser blobSource
+          in length term `seq` pure term
     blobFields = ("path", blobPath) : languageTag
     languageTag = maybe [] (pure . (,) ("language" :: String) . show) blobLanguage
     errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]

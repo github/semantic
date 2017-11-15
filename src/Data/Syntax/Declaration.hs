@@ -82,7 +82,10 @@ instance Show1 Variable where liftShowsPrec = genericLiftShowsPrec
 
 
 data Class a = Class { classContext :: ![a], classIdentifier :: !a, classSuperclasses :: ![a], classBody :: ![a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Diffable Class where
+  equivalentBySubterm = Just . classIdentifier
 
 instance Eq1 Class where liftEq = genericLiftEq
 instance Ord1 Class where liftCompare = genericLiftCompare
