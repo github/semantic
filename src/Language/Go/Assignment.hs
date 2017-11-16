@@ -139,7 +139,6 @@ expressionChoices =
   , breakStatement
   , callExpression
   , channelType
-  , comment
   , communicationClause
   , compositeLiteral
   , continueStatement
