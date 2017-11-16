@@ -5,5 +5,7 @@
     (Empty)
     (Identifier)
     ([])
-  { (Comment)
-  ->(Comment) }))
+    (Context
+    { (Comment)
+    ->(Comment) }
+      (Empty))))
