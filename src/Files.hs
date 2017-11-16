@@ -71,9 +71,9 @@ readBlobsFromDir path = do
 readFromHandle :: (FromJSON a, MonadIO m) => Handle -> m a
 readFromHandle h = do
   input <- liftIO $ BL.hGetContents h
-  case decode input of
-    Just d -> pure d
-    Nothing -> liftIO $ die ("invalid input on " <> show h <> ", expecting JSON")
+  case eitherDecode input of
+    Left e -> liftIO (die (e <> ". Invalid input on " <> show h <> ", expecting JSON"))
+    Right d -> pure d
 
 toBlob :: Blob -> Blob.Blob
 toBlob Blob{..} = Blob.sourceBlob path language' (fromText content)
