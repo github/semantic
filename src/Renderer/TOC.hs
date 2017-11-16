@@ -295,7 +295,7 @@ termTableOfContentsBy :: (Foldable f, Functor f)
                       -> Term f annotation
                       -> [a]
 termTableOfContentsBy selector = cata termAlgebra
-  where termAlgebra r | Just a <- selector r = [a]
+  where termAlgebra r | Just a <- selector r = a : fold r
                       | otherwise = fold r
 
 
