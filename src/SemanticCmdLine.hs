@@ -62,11 +62,11 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
 
     diffCommand = command "diff" (info diffArgumentsParser (progDesc "Show changes between commits or paths"))
     diffArgumentsParser = runDiff
-      <$> (   flag  (SomeRenderer PatchDiffRenderer) (SomeRenderer PatchDiffRenderer)       (long "patch" <> help "Output a patch(1)-compatible diff (default)")
-          <|> flag'                                  (SomeRenderer JSONDiffRenderer)        (long "json" <> help "Output a json diff")
-          <|> flag'                                  (SomeRenderer SExpressionDiffRenderer) (long "sexpression" <> help "Output an s-expression diff tree")
-          <|> flag'                                  (SomeRenderer OldToCDiffRenderer)      (long "toc" <> help "Output a table of contents for a diff")
-          <|> flag'                                  (SomeRenderer ToCDiffRenderer)         (long "toc-assignment" <> help "Output a table of contents for a diff using the assignment parser") )
+      <$> (   flag  (SomeRenderer PatchDiffRenderer) (SomeRenderer PatchDiffRenderer)       (long "patch" <> help "Output patch(1)-compatible diff (default)")
+          <|> flag'                                  (SomeRenderer JSONDiffRenderer)        (long "json" <> help "Output JSON diff trees")
+          <|> flag'                                  (SomeRenderer SExpressionDiffRenderer) (long "sexpression" <> help "Output s-expression diff tree")
+          <|> flag'                                  (SomeRenderer OldToCDiffRenderer)      (long "toc" <> help "Output JSON table of contents diff summary")
+          <|> flag'                                  (SomeRenderer ToCDiffRenderer)         (long "toc-assignment" <> help "Output JSON table of contents diff summary using the assignment parser") )
       <*> (   Right <$> some (both
           <$> argument filePathReader (metavar "FILE_A")
           <*> argument filePathReader (metavar "FILE_B"))
@@ -76,8 +76,8 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     parseArgumentsParser = runParse
       <$> (   flag  (SomeRenderer SExpressionTermRenderer) (SomeRenderer SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
           <|> flag'                                        (SomeRenderer JSONTermRenderer)        (long "json" <> help "Output JSON parse trees")
-          <|> flag'                                        (SomeRenderer ToCTermRenderer)         (long "toc" <> help "Output a table of contents for a file")
-          <|> flag'                                        (SomeRenderer TagsTermRenderer)        (long "tags" <> help "Output a tags file for a project"))
+          <|> flag'                                        (SomeRenderer ToCTermRenderer)         (long "toc" <> help "Output JSON table of contents summary")
+          <|> flag'                                        (SomeRenderer TagsTermRenderer)        (long "tags" <> help "Output JSON tags/symbols"))
       <*> (   Right <$> some (argument filePathReader (metavar "FILES..."))
           <|> pure (Left stdin) )
 
