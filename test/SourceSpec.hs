@@ -49,6 +49,20 @@ spec = parallel $ do
     prop "covers multiple lines" $
       \ n -> totalSpan (fromText (Text.intersperse '\n' (Text.replicate n "*"))) `shouldBe` Span (Pos 1 1) (Pos (max 1 n) (if n > 0 then 2 else 1))
 
+  describe "newlineIndices" $ do
+    it "finds \\n" $
+      let source = "a\nb" in
+      newlineIndices source `shouldBe` [1]
+    it "finds \\r" $
+      let source = "a\rb" in
+      newlineIndices source `shouldBe` [1]
+    it "finds \\r\\n" $
+      let source = "a\r\nb" in
+      newlineIndices source `shouldBe` [2]
+    it "finds intermixed line endings" $
+      let source = "hi\r}\r}\n xxx \r a" in
+      newlineIndices source `shouldBe` [2, 4, 6, 12]
+
   prop "preserves characters" . forAll (toTiers (list +| [chr 0xa0..chr 0x24f])) $
     \ c -> Text.unpack (toText (fromText (Text.singleton c))) `shouldBe` [c]
 

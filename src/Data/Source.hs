@@ -23,6 +23,7 @@ module Data.Source
 , spanToRangeInLineRanges
 , sourceLineRangesByLineNumber
 , rangeToSpan
+, newlineIndices
 ) where
 
 import Control.Arrow ((&&&))
