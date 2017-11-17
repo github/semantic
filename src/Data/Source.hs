@@ -110,20 +110,20 @@ sourceLineRangesWithin range = uncurry (zipWith Range)
                              . sourceBytes
                              . slice range
 
--- | Return all indices of newlines ('\n', '\r', '\r\n') in the 'ByteString'.
+-- | Return all indices of newlines ('\n', '\r', and '\r\n') in the 'ByteString'.
 newlineIndices :: B.ByteString -> [Int]
-newlineIndices = loop 0
-  where
-    loop i bytes = case B.uncons bytes of
-      Nothing -> []
-      Just (b, bs) | isLF b -> i : loop (succ i) bs
-                   | isCR b -> case B.uncons bs of
-                     Nothing -> loop (succ i) bs
-                     Just (b', bs') | isLF b' -> succ i : loop (succ (succ i)) bs'
-                                    | otherwise -> i : loop (succ i) bs
-                   | otherwise -> loop (succ i) bs
-    isLF = (== toEnum (ord '\n'))
-    isCR = (== toEnum (ord '\r'))
+newlineIndices = go 0
+  where go n bs | B.null bs = []
+                | otherwise = case (searchCR bs, searchLF bs) of
+                    (Nothing, Nothing)  -> []
+                    (Just i, Nothing)   -> recur n i bs
+                    (Nothing, Just i)   -> recur n i bs
+                    (Just crI, Just lfI)
+                      | succ crI == lfI -> recur n lfI bs
+                      | otherwise       -> recur n (min crI lfI) bs
+        recur n i bs = let j = n + i in j : go (succ j) (B.drop (succ i) bs)
+        searchLF = B.elemIndex (toEnum (ord '\n'))
+        searchCR = B.elemIndex (toEnum (ord '\r'))
 
 {-# INLINE newlineIndices #-}
 
