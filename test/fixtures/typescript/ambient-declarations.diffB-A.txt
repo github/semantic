@@ -1,8 +1,6 @@
 (Program
-  (AmbientDeclaration
-  { (InternalModule
-    {-(Identifier)-})
-  ->(Class
+{+(AmbientDeclaration
+  {+(Class
     {+(Identifier)+}
     {+(PublicFieldDefinition
       {+(Empty)+}
@@ -10,16 +8,14 @@
       {+(Annotation
         {+(TypeIdentifier)+})+}
       {+(Identifier)+}
-      {+(Empty)+})+}) })
-  (AmbientDeclaration
-  { (Class
-    {-(Identifier)-})
-  ->(VariableDeclaration
+      {+(Empty)+})+})+})+}
+{+(AmbientDeclaration
+  {+(VariableDeclaration
     {+(Assignment
       {+(Annotation
         {+(PredefinedType)+})+}
       {+(Identifier)+}
-      {+(Empty)+})+}) })
+      {+(Empty)+})+})+})+}
 {+(AmbientDeclaration
   {+(AmbientFunction
     {+(Empty)+}
@@ -34,13 +30,8 @@
       {+(Assignment
         {+(Identifier)+}
         {+(Empty)+})+})+})+})+}
-  (AmbientDeclaration
-  { (InterfaceDeclaration
-    {-(Empty)-}
-    {-(Empty)-}
-    {-(Identifier)-}
-    {-(ObjectType)-})
-  ->(InternalModule
+{+(AmbientDeclaration
+  {+(InternalModule
     {+(Identifier)+}
     {+(AmbientFunction
       {+(Empty)+}
@@ -94,38 +85,52 @@
           {+(Empty)+}
           {+(Annotation
             {+(PredefinedType)+})+}
-          {+(Identifier)+})+})+})+}) })
+          {+(Identifier)+})+})+})+})+})+}
+{-(AmbientDeclaration
+  {-(InternalModule
+    {-(Identifier)-})-})-}
+{-(AmbientDeclaration
+  {-(Class
+    {-(Identifier)-}
+    {-([])-})-})-}
+{-(AmbientDeclaration
+  {-(InterfaceDeclaration
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Identifier)-}
+    {-(ObjectType)-})-})-}
   (AmbientDeclaration
     (Class
       (Identifier)
-      (MethodSignature
-        (Empty)
-        (Empty)
-        (Empty)
-        (Empty)
-        (Identifier)
-        (RequiredParameter
+      (
+        (MethodSignature
+          (Empty)
+          (Empty)
+          (Empty)
+          (Empty)
+          (Identifier)
+          (RequiredParameter
+            (Empty)
+            (Empty)
+            (Annotation
+              (PredefinedType))
+            (Assignment
+              (Identifier)
+              (Empty))))
+        (PublicFieldDefinition
           (Empty)
           (Empty)
           (Annotation
             (PredefinedType))
-          (Assignment
-            (Identifier)
-            (Empty))))
-      (PublicFieldDefinition
-        (Empty)
-        (Empty)
-        (Annotation
-          (PredefinedType))
-        (Identifier)
-        (Empty))
-      (MethodSignature
-        (Empty)
-        (Empty)
-        (Empty)
-        (Annotation
-          (PredefinedType))
-        (Identifier))))
+          (Identifier)
+          (Empty))
+        (MethodSignature
+          (Empty)
+          (Empty)
+          (Empty)
+          (Annotation
+            (PredefinedType))
+          (Identifier)))))
 {-(AmbientDeclaration
   {-(AmbientFunction
     {-(Empty)-}

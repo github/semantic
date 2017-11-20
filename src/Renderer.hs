@@ -10,6 +10,7 @@ module Renderer
 , renderJSONTerm
 , renderToCDiff
 , renderToCTerm
+, renderToTags
 , HasDeclaration
 , declarationAlgebra
 , syntaxDeclarationAlgebra
@@ -25,6 +26,7 @@ import Data.Text (Text)
 import Renderer.JSON as R
 import Renderer.Patch as R
 import Renderer.SExpression as R
+import Renderer.Tag as R
 import Renderer.TOC as R
 
 -- | Specification of renderers for diffs, producing output in the parameter type.
@@ -35,6 +37,7 @@ data DiffRenderer output where
   OldToCDiffRenderer :: DiffRenderer Summaries
   -- | Compute a table of contents for the diff & encode it as JSON (uses the new Assignment parse tree parser).
   ToCDiffRenderer :: DiffRenderer Summaries
+
   -- | Render to JSON with the format documented in docs/json-format.md
   JSONDiffRenderer :: DiffRenderer (Map.Map Text Value)
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
@@ -51,6 +54,8 @@ data TermRenderer output where
   JSONTermRenderer :: TermRenderer [Value]
   -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer ByteString
+  -- | Render to a list of tags.
+  TagsTermRenderer :: TermRenderer [Value]
 
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)

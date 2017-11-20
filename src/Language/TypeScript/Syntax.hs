@@ -419,7 +419,7 @@ instance Eq1 ClassHeritage where liftEq = genericLiftEq
 instance Ord1 ClassHeritage where liftCompare = genericLiftCompare
 instance Show1 ClassHeritage where liftShowsPrec = genericLiftShowsPrec
 
-data AbstractClass a = AbstractClass { _abstractClassIdentifier :: !a,  _abstractClassTypeParameters :: !a, _classHeritage :: ![a], _classBody :: ![a] }
+data AbstractClass a = AbstractClass { _abstractClassIdentifier :: !a,  _abstractClassTypeParameters :: !a, _classHeritage :: ![a], _classBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 AbstractClass where liftEq = genericLiftEq
