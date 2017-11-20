@@ -1,8 +1,11 @@
-{-# LANGUAGE OverloadedStrings, TypeSynonymInstances, DeriveAnyClass, DuplicateRecordFields, ScopedTypeVariables #-}
+{-# LANGUAGE OverloadedStrings, TypeSynonymInstances, DeriveAnyClass, DuplicateRecordFields, ScopedTypeVariables, TupleSections #-}
 module Files
 ( readFile
+, isDirectory
 , readBlobPairsFromHandle
 , readBlobsFromHandle
+, readBlobsFromPaths
+, readBlobsFromDir
 , languageForFilePath
 ) where
 
@@ -25,6 +28,8 @@ import Prelude hiding (readFile)
 import System.Exit
 import System.FilePath
 import System.IO (Handle)
+import System.FilePath.Glob
+import System.Directory (doesDirectoryExist)
 import Text.Read
 
 -- | Read a utf8-encoded file to a 'Blob'.
@@ -33,6 +38,9 @@ readFile path@"/dev/null" _ = pure (Blob.emptyBlob path)
 readFile path language = do
   raw <- liftIO $ (Just <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe B.ByteString))
   pure $ fromMaybe (Blob.emptyBlob path) (Blob.sourceBlob path language . fromBytes <$> raw)
+
+isDirectory :: MonadIO m => FilePath -> m Bool
+isDirectory path = liftIO (doesDirectoryExist path) >>= pure
 
 -- | Return a language based on a FilePath's extension, or Nothing if extension is not found or not supported.
 languageForFilePath :: FilePath -> Maybe Language
@@ -50,6 +58,15 @@ readBlobPairsFromHandle = fmap toBlobPairs . readFromHandle
 readBlobsFromHandle :: MonadIO m => Handle -> m [Blob.Blob]
 readBlobsFromHandle = fmap toBlobs . readFromHandle
   where toBlobs BlobParse{..} = fmap toBlob blobs
+
+readBlobsFromPaths :: MonadIO m => [(FilePath, Maybe Language)] -> m [Blob.Blob]
+readBlobsFromPaths = traverse (uncurry Files.readFile)
+
+readBlobsFromDir :: MonadIO m => FilePath -> m [Blob.Blob]
+readBlobsFromDir path = do
+  paths <- liftIO (globDir1 (compile "[^vendor]**/*[.rb|.js|.tsx|.go|.py]") path)
+  let paths' = catMaybes $ fmap (\p -> (p,) . Just <$> languageForFilePath p) paths
+  traverse (uncurry readFile) paths'
 
 readFromHandle :: (FromJSON a, MonadIO m) => Handle -> m a
 readFromHandle h = do

@@ -4,17 +4,20 @@ module Renderer.TOC
 , renderToCTerm
 , diffTOC
 , Summaries(..)
-, JSONSummary(..)
+, TOCSummary(..)
 , isValidSummary
 , Declaration(..)
+, getDeclaration
 , declaration
 , HasDeclaration
 , declarationAlgebra
 , syntaxDeclarationAlgebra
 , Entry(..)
 , tableOfContentsBy
+, termTableOfContentsBy
 , dedupe
 , entrySummary
+, toCategoryName
 ) where
 
 import Data.Aeson
@@ -40,7 +43,7 @@ import Data.Record
 import Data.Semigroup ((<>), sconcat)
 import Data.Source as Source
 import Data.Term
-import Data.Text (toLower)
+import Data.Text (toLower, stripEnd)
 import qualified Data.Text as T
 import Data.Union
 import GHC.Generics
@@ -67,8 +70,9 @@ instance Output Summaries where
 instance ToJSON Summaries where
   toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]
 
-data JSONSummary
-  = JSONSummary
+
+data TOCSummary
+  = TOCSummary
     { summaryCategoryName :: T.Text
     , summaryTermName :: T.Text
     , summarySpan :: Span
@@ -77,21 +81,21 @@ data JSONSummary
   | ErrorSummary { error :: T.Text, errorSpan :: Span, errorLanguage :: Maybe Language }
   deriving (Generic, Eq, Show)
 
-instance ToJSON JSONSummary where
-  toJSON JSONSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= summaryCategoryName, "term" .= summaryTermName, "span" .= summarySpan ]
+instance ToJSON TOCSummary where
+  toJSON TOCSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= summaryCategoryName, "term" .= summaryTermName, "span" .= summarySpan ]
   toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan, "language" .= errorLanguage ]
 
-isValidSummary :: JSONSummary -> Bool
+isValidSummary :: TOCSummary -> Bool
 isValidSummary ErrorSummary{} = False
 isValidSummary _ = True
 
 -- | A declaration’s identifier and type.
 data Declaration
-  = MethodDeclaration   { declarationIdentifier :: T.Text }
-  | ClassDeclaration    { declarationIdentifier :: T.Text }
-  | FunctionDeclaration { declarationIdentifier :: T.Text }
-  | HeadingDeclaration  { declarationIdentifier :: T.Text, declarationLevel :: Int }
-  | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationLanguage :: Maybe Language }
+  = MethodDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationReceiver :: Maybe T.Text }
+  | ClassDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
+  | FunctionDeclaration { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
+  | HeadingDeclaration  { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationLevel :: Int }
+  | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   deriving (Eq, Generic, Show)
 
 
@@ -134,7 +138,7 @@ class CustomHasDeclaration syntax where
 -- | Produce a 'HeadingDeclaration' from the first line of the heading of a 'Markdown.Heading' node.
 instance CustomHasDeclaration Markdown.Heading where
   customToDeclaration Blob{..} ann (Markdown.Heading level terms _)
-    = Just $ HeadingDeclaration (headingText terms) level
+    = Just $ HeadingDeclaration (headingText terms) mempty blobLanguage level
     where headingText terms = getSource $ maybe (byteRange ann) sconcat (nonEmpty (headingByteRange <$> toList terms))
           headingByteRange (Term (In ann _), _) = byteRange ann
           getSource = firstLine . toText . flip Source.slice blobSource
@@ -143,33 +147,33 @@ instance CustomHasDeclaration Markdown.Heading where
 -- | Produce an 'ErrorDeclaration' for 'Syntax.Error' nodes.
 instance CustomHasDeclaration Syntax.Error where
   customToDeclaration Blob{..} ann err@Syntax.Error{}
-    = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan ann) err))) blobLanguage
+    = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan ann) err))) mempty blobLanguage
 
 -- | Produce a 'FunctionDeclaration' for 'Declaration.Function' nodes so long as their identifier is non-empty (defined as having a non-empty 'byteRange').
 instance CustomHasDeclaration Declaration.Function where
-  customToDeclaration Blob{..} _ (Declaration.Function _ (Term (In identifierAnn _), _) _ _)
+  customToDeclaration blob@Blob{..} ann decl@(Declaration.Function _ (Term (In identifierAnn _), _) _ _)
     -- Do not summarize anonymous functions
     | isEmpty identifierAnn = Nothing
     -- Named functions
-    | otherwise             = Just $ FunctionDeclaration (getSource identifierAnn)
+    | otherwise             = Just $ FunctionDeclaration (getSource identifierAnn) (getFunctionSource blob (In ann decl)) blobLanguage
     where getSource = toText . flip Source.slice blobSource . byteRange
           isEmpty = (== 0) . rangeLength . byteRange
 
 -- | Produce a 'MethodDeclaration' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'byteRange'), the 'declarationIdentifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
 instance CustomHasDeclaration Declaration.Method where
-  customToDeclaration Blob{..} _ (Declaration.Method _ (Term (In receiverAnn _), _) (Term (In identifierAnn _), _) _ _)
+  customToDeclaration blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn _), _) (Term (In identifierAnn _), _) _ _)
     -- Methods without a receiver
-    | isEmpty receiverAnn = Just $ MethodDeclaration (getSource identifierAnn)
+    | isEmpty receiverAnn = Just $ MethodDeclaration (getSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage Nothing
     -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
-    | otherwise           = Just $ MethodDeclaration (getSource receiverAnn <> "." <> getSource identifierAnn)
+    | otherwise           = Just $ MethodDeclaration (getSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage (Just (getSource receiverAnn))
     where getSource = toText . flip Source.slice blobSource . byteRange
           isEmpty = (== 0) . rangeLength . byteRange
 
 -- | Produce a 'ClassDeclaration' for 'Declaration.Class' nodes.
 instance CustomHasDeclaration Declaration.Class where
-  customToDeclaration Blob{..} _ (Declaration.Class _ (Term (In identifierAnn _), _) _ _)
+  customToDeclaration blob@Blob{..} ann decl@(Declaration.Class _ (Term (In identifierAnn _), _) _ _)
     -- Classes
-    = Just $ ClassDeclaration (getSource identifierAnn)
+    = Just $ ClassDeclaration (getSource identifierAnn) (getClassSource blob (In ann decl)) blobLanguage
     where getSource = toText . flip Source.slice blobSource . byteRange
 
 -- | Produce a 'Declaration' for 'Union's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
@@ -221,17 +225,47 @@ declaration (In annotation _) = annotation <$ getDeclaration annotation
 
 -- | Compute 'Declaration's for methods and functions in 'Syntax'.
 syntaxDeclarationAlgebra :: HasField fields Range => Blob -> RAlgebra (TermF S.Syntax (Record fields)) (Term S.Syntax (Record fields)) (Maybe Declaration)
-syntaxDeclarationAlgebra Blob{..} (In a r) = case r of
-  S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier)
-  S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier)
+syntaxDeclarationAlgebra blob@Blob{..} decl@(In a r) = case r of
+  S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage
+  S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage Nothing
   S.Method _ (identifier, _) (Just (receiver, _)) _ _
     | S.Indexed [receiverParams] <- unwrap receiver
-    , S.ParameterDecl (Just ty) _ <- unwrap receiverParams -> Just $ MethodDeclaration ("(" <> getSource ty <> ") " <> getSource identifier)
-    | otherwise -> Just $ MethodDeclaration (getSource receiver <> "." <> getSource identifier)
-  S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange a) blobSource)) blobLanguage
+    , S.ParameterDecl (Just ty) _ <- unwrap receiverParams -> Just $ MethodDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage (Just (getSource ty))
+    | otherwise -> Just $ MethodDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage (Just (getSource receiver))
+  S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange a) blobSource)) mempty blobLanguage
   _ -> Nothing
-  where getSource = toText . flip Source.slice blobSource . byteRange . extract
+  where
+    getSource = toText . flip Source.slice blobSource . byteRange . extract
 
+getMethodSource :: HasField fields Range => Blob -> TermF Declaration.Method (Record fields) (Term syntax (Record fields), a) -> T.Text
+getMethodSource Blob{..} (In a r)
+  = let declRange = byteRange a
+        bodyRange = byteRange <$> case r of
+          Declaration.Method _ _ _ _ (Term (In a' _), _) -> Just a'
+    in maybe mempty (stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
+
+getFunctionSource :: HasField fields Range => Blob -> TermF Declaration.Function (Record fields) (Term syntax (Record fields), a) -> T.Text
+getFunctionSource Blob{..} (In a r)
+  = let declRange = byteRange a
+        bodyRange = byteRange <$> case r of
+          Declaration.Function _ _ _ (Term (In a' _), _) -> Just a'
+    in maybe mempty (stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
+
+getClassSource :: (HasField fields Range) => Blob -> TermF Declaration.Class (Record fields) (Term syntax (Record fields), a) -> T.Text
+getClassSource Blob{..} (In a r)
+  = let declRange = byteRange a
+        bodyRange = byteRange <$> case r of
+          Declaration.Class _ _ _ (Term (In a' _), _) -> Just a'
+    in maybe mempty (stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
+
+getSyntaxDeclarationSource :: HasField fields Range => Blob -> TermF Syntax (Record fields) (Term syntax (Record fields), a) -> T.Text
+getSyntaxDeclarationSource Blob{..} (In a r)
+  = let declRange = byteRange a
+        bodyRange = byteRange <$> case r of
+          S.Function _ _ ((Term (In a' _), _) : _) -> Just a'
+          S.Method _ _ _ _ ((Term (In a' _), _) : _) -> Just a'
+          _ -> Nothing
+    in maybe mempty (stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
 
 formatTOCError :: Error.Error String -> String
 formatTOCError e = showExpectation False (errorExpected e) (errorActual e) ""
@@ -263,7 +297,7 @@ termTableOfContentsBy :: (Foldable f, Functor f)
                       -> Term f annotation
                       -> [a]
 termTableOfContentsBy selector = cata termAlgebra
-  where termAlgebra r | Just a <- selector r = [a]
+  where termAlgebra r | Just a <- selector r = a : fold r
                       | otherwise = fold r
 
 
@@ -294,20 +328,24 @@ dedupe = let tuples = sortOn fst . Map.elems . snd . foldl' go (0, Map.empty) in
     dedupeKey entry = DedupeKey ((fmap toCategoryName . getDeclaration . entryPayload) entry, (fmap (toLower . declarationIdentifier) . getDeclaration . entryPayload) entry)
     exactMatch = (==) `on` (getDeclaration . entryPayload)
 
--- | Construct a 'JSONSummary' from an 'Entry'.
-entrySummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Entry (Record fields) -> Maybe JSONSummary
+-- | Construct a 'TOCSummary' from an 'Entry'.
+entrySummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Entry (Record fields) -> Maybe TOCSummary
 entrySummary entry = case entry of
-  Changed a   -> recordSummary a "modified"
-  Deleted a   -> recordSummary a "removed"
-  Inserted a  -> recordSummary a "added"
-  Replaced a  -> recordSummary a "modified"
+  Changed  a -> recordSummary "modified" a
+  Deleted  a -> recordSummary "removed" a
+  Inserted a -> recordSummary "added" a
+  Replaced a -> recordSummary "modified" a
 
--- | Construct a 'JSONSummary' from a node annotation and a change type label.
-recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> T.Text -> Maybe JSONSummary
-recordSummary record = case getDeclaration record of
-  Just (ErrorDeclaration text language) -> Just . const (ErrorSummary text (sourceSpan record) language)
-  Just declaration -> Just . JSONSummary (toCategoryName declaration) (declarationIdentifier declaration) (sourceSpan record)
-  Nothing -> const Nothing
+-- | Construct a 'TOCSummary' from a node annotation and a change type label.
+recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => T.Text -> Record fields -> Maybe TOCSummary
+recordSummary changeText record = case getDeclaration record of
+  Just (ErrorDeclaration text _ language) -> Just $ ErrorSummary text (sourceSpan record) language
+  Just declaration -> Just $ TOCSummary (toCategoryName declaration) (formatIdentifier declaration) (sourceSpan record) changeText
+  Nothing -> Nothing
+  where
+    formatIdentifier (MethodDeclaration identifier _ (Just Language.Go) (Just receiver)) = "(" <> receiver <> ") " <> identifier
+    formatIdentifier (MethodDeclaration identifier _ _                  (Just receiver)) = receiver <> "." <> identifier
+    formatIdentifier declaration = declarationIdentifier declaration
 
 renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Both Blob -> Diff f (Record fields) (Record fields) -> Summaries
 renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
@@ -319,22 +357,23 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
                           | before == after -> after
                           | otherwise -> before <> " -> " <> after
 
-renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> Summaries
-renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC
-  where toMap [] = mempty
-        toMap as = Map.singleton (T.pack blobPath) (toJSON <$> as)
-
-diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [JSONSummary]
+diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [TOCSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
 
-termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Term f (Record fields) -> [JSONSummary]
-termToC = mapMaybe (flip recordSummary "unchanged") . termTableOfContentsBy declaration
+renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> Summaries
+renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . termToC
+  where
+    toMap [] = mempty
+    toMap as = Map.singleton (T.pack blobPath) (toJSON <$> as)
+
+    termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Term f (Record fields) -> [TOCSummary]
+    termToC = mapMaybe (recordSummary "unchanged") . termTableOfContentsBy declaration
 
 -- The user-facing category name
 toCategoryName :: Declaration -> T.Text
 toCategoryName declaration = case declaration of
-  FunctionDeclaration _ -> "Function"
-  ClassDeclaration _ -> "Class"
-  MethodDeclaration _ -> "Method"
-  HeadingDeclaration _ l -> "Heading " <> T.pack (show l)
+  ClassDeclaration{} -> "Class"
+  FunctionDeclaration{} -> "Function"
+  MethodDeclaration{} -> "Method"
+  HeadingDeclaration _ _ _ l -> "Heading " <> T.pack (show l)
   ErrorDeclaration{} -> "ParseError"

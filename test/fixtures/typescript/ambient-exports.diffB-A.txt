@@ -1,7 +1,8 @@
 (Program
   (Export
   {+(Class
-    {+(Identifier)+})+}
+    {+(Identifier)+}
+    {+([])+})+}
   {-(Function
     {-(Empty)-}
     {-(Empty)-}

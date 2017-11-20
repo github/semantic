@@ -32,6 +32,7 @@ import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
 import Data.Blob
+import Data.Bool
 import qualified Data.ByteString as B
 import Data.Diff
 import qualified Data.Error as Error
@@ -175,7 +176,9 @@ runTaskWithOptions options task = do
       where
         go :: Task a -> IO (Either SomeException a)
         go = iterFreerA (\ task yield -> case task of
-          ReadBlobs source -> (either Files.readBlobsFromHandle (traverse (uncurry Files.readFile)) source >>= yield) `catchError` (pure . Left . toException)
+          ReadBlobs (Left handle) -> (Files.readBlobsFromHandle handle >>= yield) `catchError` (pure . Left . toException)
+          ReadBlobs (Right paths@[(path, Nothing)]) -> (Files.isDirectory path >>= bool (Files.readBlobsFromPaths paths) (Files.readBlobsFromDir path) >>= yield) `catchError` (pure . Left . toException)
+          ReadBlobs (Right paths) -> (Files.readBlobsFromPaths paths >>= yield) `catchError` (pure . Left . toException)
           ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left . toException)
           WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
           WriteLog level message pairs -> queueLogMessage logger level message pairs >>= yield
