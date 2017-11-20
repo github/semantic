@@ -133,7 +133,7 @@ class CustomHasDeclaration syntax where
 
 -- | Produce a 'HeadingDeclaration' from the first line of the heading of a 'Markdown.Heading' node.
 instance CustomHasDeclaration Markdown.Heading where
-  customToDeclaration Blob{..} ann (Markdown.Heading level terms)
+  customToDeclaration Blob{..} ann (Markdown.Heading level terms _)
     = Just $ HeadingDeclaration (headingText terms) level
     where headingText terms = getSource $ maybe (byteRange ann) sconcat (nonEmpty (fmap (\ (Term (In ann _), _) -> (byteRange ann)) (toList terms)))
           getSource = firstLine . toText . flip Source.slice blobSource

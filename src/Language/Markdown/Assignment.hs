@@ -8,13 +8,13 @@ module Language.Markdown.Assignment
 
 import qualified CMarkGFM
 import Data.ByteString (ByteString)
-import Data.Function (on)
+import Data.Functor (void)
 import Data.Record
 import Data.Syntax (makeTerm)
 import qualified Data.Syntax as Syntax
 import Data.Syntax.Assignment hiding (Assignment, Error)
 import qualified Data.Syntax.Assignment as Assignment
-import Data.Term as Term (Term(..), TermF(..), termIn, unwrap)
+import Data.Term as Term (Term(..), TermF(..), termIn)
 import qualified Data.Text as Text
 import Data.Text.Encoding (encodeUtf8)
 import Data.Union
@@ -30,7 +30,6 @@ type Syntax =
    , Markup.HTMLBlock
    , Markup.OrderedList
    , Markup.Paragraph
-   , Markup.Section
    , Markup.ThematicBreak
    , Markup.UnorderedList
    , Markup.Table
@@ -68,7 +67,7 @@ blockElement = choice
   , codeBlock
   , thematicBreak
   , htmlBlock
-  , section
+  , heading
   , table
   ]
 
@@ -83,8 +82,8 @@ list = termIn <$> symbol List <*> ((\ (CMarkGFM.LIST CMarkGFM.ListAttributes{..}
 item :: Assignment
 item = makeTerm <$> symbol Item <*> children (many blockElement)
 
-section :: Assignment
-section = makeTerm <$> symbol Heading <*> ((\ (CMarkGFM.HEADING level) -> Markup.Heading level) . termAnnotation . termOut <$> currentNode <*> children (many inlineElement))
+heading :: Assignment
+heading = makeTerm <$> symbol Heading <*> ((\ (CMarkGFM.HEADING level) -> Markup.Heading level) . termAnnotation . termOut <$> currentNode <*> children (many inlineElement) <*> manyTill blockElement (void (symbol Heading) <|> eof))
 
 blockQuote :: Assignment
 blockQuote = makeTerm <$> symbol BlockQuote <*> children (Markup.BlockQuote <$> many blockElement)

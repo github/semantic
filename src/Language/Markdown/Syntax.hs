@@ -28,14 +28,7 @@ instance Eq1 Paragraph where liftEq = genericLiftEq
 instance Ord1 Paragraph where liftCompare = genericLiftCompare
 instance Show1 Paragraph where liftShowsPrec = genericLiftShowsPrec
 
-data Section a = Section { sectionLevel :: Int, sectionHeading :: a, sectionContent :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
-
-instance Eq1 Section where liftEq = genericLiftEq
-instance Ord1 Section where liftCompare = genericLiftCompare
-instance Show1 Section where liftShowsPrec = genericLiftShowsPrec
-
-data Heading a = Heading { headingLevel :: Int, headingContent :: [a] }
+data Heading a = Heading { headingLevel :: Int, headingContent :: [a], sectionContent :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Heading where liftEq = genericLiftEq
