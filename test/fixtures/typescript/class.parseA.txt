@@ -7,60 +7,61 @@
     (Identifier)
     (ExtendsClause
       (TypeIdentifier))
-    (PublicFieldDefinition
-      (Empty)
-      (Empty)
-      (Empty)
-      (Identifier)
-      (Float))
-    (Method
-      (Empty)
-      (Empty)
-      (Empty)
-      (Empty)
-      (Empty)
-      (Identifier)
-      (RequiredParameter
+    (
+      (PublicFieldDefinition
         (Empty)
         (Empty)
         (Empty)
-        (Assignment
-          (Identifier)
-          (Empty)))
-      (
-        (Return
-          (Identifier))))
-    (Method
-      (Empty)
-      (Empty)
-      (Empty)
-      (Empty)
-      (Empty)
-      (Identifier)
-      (RequiredParameter
+        (Identifier)
+        (Float))
+      (Method
         (Empty)
         (Empty)
         (Empty)
-        (Assignment
-          (Identifier)
-          (Empty)))
-      (
-        (Return
-          (Identifier))))
-    (Method
-      (Empty)
-      (Empty)
-      (Empty)
-      (Empty)
-      (Empty)
-      (Identifier)
-      (RequiredParameter
+        (Empty)
+        (Empty)
+        (Identifier)
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Empty)
+          (Assignment
+            (Identifier)
+            (Empty)))
+        (
+          (Return
+            (Identifier))))
+      (Method
         (Empty)
         (Empty)
         (Empty)
-        (Assignment
-          (Identifier)
-          (Empty)))
-      (
-        (Return
-          (Identifier))))))
+        (Empty)
+        (Empty)
+        (Identifier)
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Empty)
+          (Assignment
+            (Identifier)
+            (Empty)))
+        (
+          (Return
+            (Identifier))))
+      (Method
+        (Empty)
+        (Empty)
+        (Empty)
+        (Empty)
+        (Empty)
+        (Identifier)
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Empty)
+          (Assignment
+            (Identifier)
+            (Empty)))
+        (
+          (Return
+            (Identifier)))))))
