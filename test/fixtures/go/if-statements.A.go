@@ -16,7 +16,8 @@ if num := 9; num < 0 {
 d()
 } else if num < 10 {
 e()
-} else {
-f()
+} else // comment
+if f() {
+  g()
 }
 }
