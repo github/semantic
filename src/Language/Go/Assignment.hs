@@ -402,7 +402,7 @@ sliceExpression = makeTerm <$> symbol SliceExpression <*> children (  (Go.Syntax
                                                                   <|> (Go.Syntax.Slice <$> term expression <*> emptyTerm <*> emptyTerm <*> emptyTerm))
 
 parenthesizedExpression :: Assignment
-parenthesizedExpression = symbol ParenthesizedExpression *> children (term expressions)
+parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 
 selectorExpression :: Assignment
 selectorExpression = makeTerm <$> symbol SelectorExpression <*> children (Expression.MemberAccess <$> term expression <*> term expression)
@@ -453,30 +453,30 @@ block :: Assignment
 block = symbol Block *> children expressions
 
 expressionCase :: Assignment
-expressionCase = makeTerm <$> symbol ExpressionCase <*> (Statement.Pattern <$> children (term expressions) <*> term expressions)
+expressionCase = makeTerm <$> symbol ExpressionCase <*> (Statement.Pattern <$> children expressions <*> expressions)
 
 defaultCase :: Assignment
-defaultCase = makeTerm <$> symbol DefaultCase <*> children (Go.Syntax.DefaultPattern <$> (term expressions <|> emptyTerm))
+defaultCase = makeTerm <$> symbol DefaultCase <*> children (Go.Syntax.DefaultPattern <$> (expressions <|> emptyTerm))
 
 defaultExpressionCase :: Assignment
-defaultExpressionCase = makeTerm <$> symbol DefaultCase <*> (Go.Syntax.DefaultPattern <$ source <*> (term expressions <|> emptyTerm))
+defaultExpressionCase = makeTerm <$> symbol DefaultCase <*> (Go.Syntax.DefaultPattern <$ source <*> (expressions <|> emptyTerm))
 
 expressionCaseClause :: Assignment
-expressionCaseClause = symbol ExpressionCaseClause *> children (term expressionCase <|> term defaultExpressionCase)
+expressionCaseClause = symbol ExpressionCaseClause *> children (term (expressionCase <|> defaultExpressionCase))
 
 expressionSwitchStatement :: Assignment
-expressionSwitchStatement = makeTerm <$> symbol ExpressionSwitchStatement <*> children (Statement.Match <$> (makeTerm <$> location <*> manyTermsTill expression (void (symbol ExpressionCaseClause)) <|> emptyTerm) <*> term expressions)
+expressionSwitchStatement = makeTerm <$> symbol ExpressionSwitchStatement <*> children (Statement.Match <$> (makeTerm <$> location <*> manyTermsTill expression (void (symbol ExpressionCaseClause)) <|> emptyTerm) <*> expressions)
 
 typeSwitchStatement :: Assignment
-typeSwitchStatement = makeTerm <$> symbol TypeSwitchStatement <*> children (Go.Syntax.TypeSwitch <$> term _typeSwitchSubject <*> term expressions)
+typeSwitchStatement = makeTerm <$> symbol TypeSwitchStatement <*> children (Go.Syntax.TypeSwitch <$> term _typeSwitchSubject <*> expressions)
   where
     _typeSwitchSubject = makeTerm <$> location <*> manyTermsTill expression (void (symbol TypeCaseClause))
 
 typeSwitchGuard :: Assignment
-typeSwitchGuard = makeTerm <$> symbol Grammar.TypeSwitchGuard <*> children (Go.Syntax.TypeSwitchGuard <$> term expressions)
+typeSwitchGuard = makeTerm <$> symbol Grammar.TypeSwitchGuard <*> children (Go.Syntax.TypeSwitchGuard <$> expressions)
 
 typeCaseClause :: Assignment
-typeCaseClause = makeTerm <$> symbol TypeCaseClause <*> children (Statement.Pattern <$> term expression <*> term expressions)
+typeCaseClause = makeTerm <$> symbol TypeCaseClause <*> children (Statement.Pattern <$> term expression <*> expressions)
 
 typeCase :: Assignment
 typeCase = symbol TypeCase *> children expressions
@@ -494,12 +494,12 @@ varDeclaration :: Assignment
 varDeclaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
 
 varSpecification :: Assignment
-varSpecification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> children (Statement.Assignment <$> pure [] <*> (annotatedLHS <|> identifiers) <*> term expressions)
+varSpecification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> children (Statement.Assignment <$> pure [] <*> (annotatedLHS <|> identifiers) <*> expressions)
     where
       annotatedLHS = makeTerm <$> location <*> (Type.Annotation <$> (makeTerm <$> location <*> (manyTermsTill identifier (void (symbol TypeIdentifier)))) <*> term expression)
 
 expressionList :: Assignment
-expressionList = symbol ExpressionList *> children (term expressions)
+expressionList = symbol ExpressionList *> children expressions
 
 functionDeclaration :: Assignment
 functionDeclaration =  mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> term expression <*> manyTerm parameters <*> optional (term types <|> term identifier <|> term returnParameters) <*> optional (term block))
@@ -530,7 +530,7 @@ parameterDeclaration = makeTerm <$> symbol ParameterDeclaration <*> children (ma
 methodDeclaration :: Assignment
 methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> children ((,,,,) <$> term receiver <*> term fieldIdentifier <*> manyTerm parameters <*> term ((makeTerm <$> location <*> (manyTermsTill expression (void (symbol Block)))) <|> emptyTerm) <*> term (block <|> emptyTerm))
   where
-    receiver = symbol Parameters *> children ((symbol ParameterDeclaration *> children (term expressions)) <|> term expressions)
+    receiver = symbol Parameters *> children ((symbol ParameterDeclaration *> children expressions) <|> expressions)
     mkTypedMethodDeclaration loc (receiver', name', parameters', type'', body') = makeTerm loc (Declaration.Method [type''] receiver' name' parameters' body')
 
 methodSpec :: Assignment
@@ -641,9 +641,9 @@ receiveStatement = makeTerm <$> symbol ReceiveStatement <*> children (  (Go.Synt
                                                                     <|> (Go.Syntax.Receive <$> emptyTerm <*> term expression))
 
 selectStatement :: Assignment
-selectStatement = makeTerm <$> symbol SelectStatement <*> children (Go.Syntax.Select <$> term expressions)
+selectStatement = makeTerm <$> symbol SelectStatement <*> children (Go.Syntax.Select <$> expressions)
 
 communicationClause :: Assignment
-communicationClause = makeTerm <$> symbol CommunicationClause <*> children (Statement.Pattern <$> (term communicationCase <|> term defaultCase) <*> term expressions)
+communicationClause = makeTerm <$> symbol CommunicationClause <*> children (Statement.Pattern <$> (term communicationCase <|> term defaultCase) <*> expressions)
   where
     communicationCase = symbol CommunicationCase *> children expression
