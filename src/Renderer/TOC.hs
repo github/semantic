@@ -135,7 +135,8 @@ class CustomHasDeclaration syntax where
 instance CustomHasDeclaration Markdown.Heading where
   customToDeclaration Blob{..} ann (Markdown.Heading level terms _)
     = Just $ HeadingDeclaration (headingText terms) level
-    where headingText terms = getSource $ maybe (byteRange ann) sconcat (nonEmpty (fmap (\ (Term (In ann _), _) -> (byteRange ann)) (toList terms)))
+    where headingText terms = getSource $ maybe (byteRange ann) sconcat (nonEmpty (headingByteRange <$> toList terms))
+          headingByteRange (Term (In ann _), _) = byteRange ann
           getSource = firstLine . toText . flip Source.slice blobSource
           firstLine = T.takeWhile (/= '\n')
 
