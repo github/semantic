@@ -425,7 +425,7 @@ unaryExpression = symbol UnaryExpression >>= \ location -> (notExpression locati
     unaryComplement = children (makeTerm <$> symbol AnonCaret <*> (Expression.Complement <$> term expression))
 
 binaryExpression :: Assignment
-binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression (term expression)
+binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression (contextualize comment expression)
   [ (inj .) . Expression.Plus             <$ symbol AnonPlus
   , (inj .) . Expression.Minus            <$ symbol AnonMinus
   , (inj .) . Expression.Times            <$ symbol AnonStar
