@@ -90,7 +90,7 @@ data Declaration
   = MethodDeclaration   { declarationIdentifier :: T.Text }
   | ClassDeclaration    { declarationIdentifier :: T.Text }
   | FunctionDeclaration { declarationIdentifier :: T.Text }
-  | SectionDeclaration  { declarationIdentifier :: T.Text, declarationLevel :: Int }
+  | HeadingDeclaration  { declarationIdentifier :: T.Text, declarationLevel :: Int }
   | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationLanguage :: Maybe Language }
   deriving (Eq, Generic, Show)
 
@@ -131,11 +131,12 @@ class CustomHasDeclaration syntax where
   customToDeclaration :: (Foldable whole, HasField fields Range, HasField fields Span) => Blob -> Record fields -> RAlgebra syntax (Term whole (Record fields)) (Maybe Declaration)
 
 
--- | Produce a 'SectionDeclaration' from the first line of the heading of a 'Markdown.Section' node.
-instance CustomHasDeclaration Markdown.Section where
-  customToDeclaration Blob{..} _ (Markdown.Section level (Term (In headingAnn headingF), _) _)
-    = Just $ SectionDeclaration (maybe (getSource (byteRange headingAnn)) (getSource . sconcat) (nonEmpty (byteRange . termAnnotation . unTerm <$> toList headingF))) level
-    where getSource = firstLine . toText . flip Source.slice blobSource
+-- | Produce a 'HeadingDeclaration' from the first line of the heading of a 'Markdown.Heading' node.
+instance CustomHasDeclaration Markdown.Heading where
+  customToDeclaration Blob{..} ann (Markdown.Heading level terms)
+    = Just $ HeadingDeclaration (headingText terms) level
+    where headingText terms = getSource $ maybe (byteRange ann) sconcat (nonEmpty (fmap (\ (Term (In ann _), _) -> (byteRange ann)) (toList terms)))
+          getSource = firstLine . toText . flip Source.slice blobSource
           firstLine = T.takeWhile (/= '\n')
 
 -- | Produce an 'ErrorDeclaration' for 'Syntax.Error' nodes.
@@ -194,7 +195,7 @@ type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Class = 'Custom
   DeclarationStrategy Declaration.Function = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
-  DeclarationStrategy Markdown.Section = 'Custom
+  DeclarationStrategy Markdown.Heading = 'Custom
   DeclarationStrategy Syntax.Error = 'Custom
   DeclarationStrategy (Union fs) = 'Custom
   DeclarationStrategy a = 'Default
@@ -334,5 +335,5 @@ toCategoryName declaration = case declaration of
   FunctionDeclaration _ -> "Function"
   ClassDeclaration _ -> "Class"
   MethodDeclaration _ -> "Method"
-  SectionDeclaration _ l -> "Heading " <> T.pack (show l)
+  HeadingDeclaration _ l -> "Heading " <> T.pack (show l)
   ErrorDeclaration{} -> "ParseError"

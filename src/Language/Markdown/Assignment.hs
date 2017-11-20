@@ -84,12 +84,7 @@ item :: Assignment
 item = makeTerm <$> symbol Item <*> children (many blockElement)
 
 section :: Assignment
-section = makeTerm <$> symbol Heading <*> (heading >>= \ headingTerm -> Markup.Section (level headingTerm) headingTerm <$> while (((<) `on` level) headingTerm) blockElement)
-  where heading = makeTerm <$> symbol Heading <*> ((\ (CMarkGFM.HEADING level) -> Markup.Heading level) . termAnnotation . termOut <$> currentNode <*> children (many inlineElement))
-        level term = case term of
-          _ | Just section <- prj (unwrap term) -> level (Markup.sectionHeading section)
-          _ | Just heading <- prj (unwrap term) -> Markup.headingLevel heading
-          _ -> maxBound
+section = makeTerm <$> symbol Heading <*> ((\ (CMarkGFM.HEADING level) -> Markup.Heading level) . termAnnotation . termOut <$> currentNode <*> children (many inlineElement))
 
 blockQuote :: Assignment
 blockQuote = makeTerm <$> symbol BlockQuote <*> children (Markup.BlockQuote <$> many blockElement)
