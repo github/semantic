@@ -15,21 +15,21 @@
           (Call
             (Identifier)
             (Empty)))
+        (Pattern
+          (LessThan
+            (Identifier)
+            (Identifier))
+          (Context
+            (Comment)
+            (Call
+              (Identifier)
+              (Empty))))
         (Context
           (Comment)
           (Pattern
-            (LessThan
+            (Equal
               (Identifier)
-              (Identifier))
-            (Context
-              (Comment)
-              (Call
-                (Identifier)
-                (Empty)))))
-        (Pattern
-          (Equal
-            (Identifier)
-            (Integer))
-          (Call
-            (Identifier)
-            (Empty)))))))
+              (Integer))
+            (Call
+              (Identifier)
+              (Empty))))))))

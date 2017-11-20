@@ -1,7 +1,11 @@
 package main
 
 func main() {
-!<-b
++b
+-c
+!<-d
 *bar()
-^g
+^i
+&foo
+<-e
 }

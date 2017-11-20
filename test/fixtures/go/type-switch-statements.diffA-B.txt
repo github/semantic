@@ -17,22 +17,22 @@
           { (Identifier)
           ->(Identifier) }))
         (
+          (Pattern
+            (
+              (Identifier)
+              (Pointer
+                (MemberAccess
+                  (Identifier)
+                  (Identifier))))
+            ([]))
           (Context
             (Comment)
             (Pattern
-              (
+              (Slice
+                (Identifier))
+              (Call
                 (Identifier)
-                (Pointer
-                  (MemberAccess
-                    (Identifier)
-                    (Identifier))))
-              ([])))
-          (Pattern
-            (Slice
-              (Identifier))
-            (Call
-              (Identifier)
-              (Empty)))
+                (Empty))))
           (Pattern
             (Pointer
               (Identifier))
