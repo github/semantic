@@ -601,10 +601,10 @@ ifStatement :: Assignment
 ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> (makeTerm <$> location <*> manyTermsTill expression (void (symbol Block))) <*> term expression <*> (term expression <|> term emptyTerm))
 
 ifInitializer :: Assignment
-ifInitializer = symbol IfInitializer *> children expression
+ifInitializer = symbol IfInitializer *> children (term expression)
 
 elseClause :: Assignment
-elseClause = symbol ElseClause *> children expression
+elseClause = symbol ElseClause *> children (term expression)
 
 forStatement :: Assignment
 forStatement = mkForStatement <$> symbol ForStatement <*> children ((,) <$> (forClause <|> rangeClause <|> for <|> emptyClause) <*> term expression)
