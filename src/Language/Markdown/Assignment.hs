@@ -61,7 +61,16 @@ assignment = Syntax.handleError $ makeTerm <$> symbol Document <*> children (Mar
 -- Block elements
 
 blockElement :: Assignment
-blockElement = paragraph <|> list <|> blockQuote <|> codeBlock <|> thematicBreak <|> htmlBlock <|> section <|> table
+blockElement = choice
+  [ paragraph
+  , list
+  , blockQuote
+  , codeBlock
+  , thematicBreak
+  , htmlBlock
+  , section
+  , table
+  ]
 
 paragraph :: Assignment
 paragraph = makeTerm <$> symbol Paragraph <*> children (Markup.Paragraph <$> many inlineElement)
@@ -106,7 +115,18 @@ tableCell = makeTerm <$> symbol TableCell <*> children (Markup.TableCell <$> man
 -- Inline elements
 
 inlineElement :: Assignment
-inlineElement = strong <|> emphasis <|> strikethrough <|> text <|> link <|> htmlInline <|> image <|> code <|> lineBreak <|> softBreak
+inlineElement = choice
+  [ strong
+  , emphasis
+  , strikethrough
+  , text
+  , link
+  , htmlInline
+  , image
+  , code
+  , lineBreak
+  , softBreak
+  ]
 
 strong :: Assignment
 strong = makeTerm <$> symbol Strong <*> children (Markup.Strong <$> many inlineElement)
