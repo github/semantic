@@ -64,7 +64,7 @@ readBlobsFromPaths = traverse (uncurry Files.readFile)
 
 readBlobsFromDir :: MonadIO m => FilePath -> m [Blob.Blob]
 readBlobsFromDir path = do
-  paths <- liftIO (globDir1 (compile "[^vendor]**/*[.rb|.js|.go|.py]") path)
+  paths <- liftIO (globDir1 (compile "[^vendor]**/*[.rb|.js|.tsx|.go|.py]") path)
   let paths' = catMaybes $ fmap (\p -> (p,) . Just <$> languageForFilePath p) paths
   traverse (uncurry readFile) paths'
 
