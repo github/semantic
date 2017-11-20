@@ -128,7 +128,7 @@ assignment :: Assignment
 assignment = handleError $ makeTerm <$> symbol SourceFile <*> children (Syntax.Program <$> manyTerm expression) <|> parseError
 
 expression :: Assignment
-expression = term (handleError (choice expressionChoices))
+expression = handleError (choice expressionChoices)
 
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
