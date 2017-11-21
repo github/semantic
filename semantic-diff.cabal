@@ -68,6 +68,7 @@ library
                      , Renderer.JSON
                      , Renderer.Patch
                      , Renderer.SExpression
+                     , Renderer.Tag
                      , Renderer.TOC
                      , RWS
                      , RWS.FeatureVector
@@ -97,6 +98,7 @@ library
                      , freer-cofreer
                      , ghc-prim
                      , gitrev
+                     , Glob
                      , hashable
                      , kdt
                      , mersenne-random-pure64

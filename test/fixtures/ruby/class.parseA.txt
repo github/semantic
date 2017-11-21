@@ -9,4 +9,5 @@
   (Class
     (ScopeResolution
       (Identifier)
-      (Identifier))))
+      (Identifier))
+    ([])))
