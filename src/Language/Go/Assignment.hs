@@ -116,7 +116,7 @@ manyTermsTill step end = manyTill (step <|> comment) end
 
 -- | Match a term and contextualize any comments preceeding or proceeding the term.
 term :: Assignment -> Assignment
-term term = contextualize comment (postContextualize comment term)
+term term' = contextualize comment term' <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
 
 
 -- | Assignment from AST in Go's grammar onto a program in Go's syntax.
