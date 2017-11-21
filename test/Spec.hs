@@ -8,7 +8,6 @@ import qualified Data.RandomWalkSimilarity.Spec
 import qualified Data.Syntax.Assignment.Spec
 import qualified DiffSpec
 import qualified InterpreterSpec
-import qualified PatchOutputSpec
 import qualified SES.Spec
 import qualified SourceSpec
 import qualified TermSpec
@@ -31,7 +30,6 @@ main = hspec $ do
     describe "Data.Syntax.Assignment" Data.Syntax.Assignment.Spec.spec
     describe "Diff" DiffSpec.spec
     describe "Interpreter" InterpreterSpec.spec
-    describe "PatchOutput" PatchOutputSpec.spec
     describe "SES" SES.Spec.spec
     describe "Source" SourceSpec.spec
     describe "Term" TermSpec.spec

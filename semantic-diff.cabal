@@ -157,7 +157,6 @@ test-suite test
                      , SemanticCmdLineSpec
                      , Semantic.StatSpec
                      , InterpreterSpec
-                     , PatchOutputSpec
                      , SES.Spec
                      , SourceSpec
                      , SpecHelpers
