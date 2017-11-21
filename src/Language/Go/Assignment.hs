@@ -359,17 +359,17 @@ typeIdentifierDeclaration :: Assignment
 typeIdentifierDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> expression)
 
 typeDeclaration :: Assignment
-typeDeclaration = makeTerm <$> symbol TypeDeclaration <*> children (many (  arrayTypeDeclaration
-                                                                        <|> channelTypeDeclaration
-                                                                        <|> functionTypeDeclaration
-                                                                        <|> interfaceTypeDeclaration
-                                                                        <|> qualifiedTypeDeclaration
-                                                                        <|> pointerTypeDeclaration
-                                                                        <|> sliceTypeDeclaration
-                                                                        <|> structTypeDeclaration
-                                                                        <|> mapTypeDeclaration
-                                                                        <|> typeAlias
-                                                                        <|> typeIdentifierDeclaration ))
+typeDeclaration = makeTerm <$> symbol TypeDeclaration <*> children (manyTerm (  arrayTypeDeclaration
+                                                                            <|> channelTypeDeclaration
+                                                                            <|> functionTypeDeclaration
+                                                                            <|> interfaceTypeDeclaration
+                                                                            <|> qualifiedTypeDeclaration
+                                                                            <|> pointerTypeDeclaration
+                                                                            <|> sliceTypeDeclaration
+                                                                            <|> structTypeDeclaration
+                                                                            <|> mapTypeDeclaration
+                                                                            <|> typeAlias
+                                                                            <|> typeIdentifierDeclaration ))
 
 
 -- Expressions
