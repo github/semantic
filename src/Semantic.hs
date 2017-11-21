@@ -84,7 +84,6 @@ diffBlobPair :: DiffRenderer output -> Both Blob -> Task output
 diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
   (OldToCDiffRenderer, lang)
     | elem lang $ fmap Just [
-        Language.Go,
         Language.JSX,
         Language.JavaScript,
         Language.Markdown,
