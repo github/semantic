@@ -2,6 +2,8 @@ package main
 
 func main() {
 switch a := b; e.(type) {
+	case nil, *obj.LSym:
+		// ok, but no node
   case []Person:
     a()
   case *Dog:
@@ -18,5 +20,7 @@ case string:
 	l := len(x) / 2
 	fmt.Println("i swapped by halves is", x[l:]+x[:l])
 default:
+}
+switch _ := s.(type) { // comment 
 }
 }

@@ -37,10 +37,27 @@
                     (Identifier))
                   (Integer)
                   (Empty))))
-            (Call
-              (Identifier)
-              (Integer)
-              (Empty)))
+            (
+              (Call
+                (Identifier)
+                (Integer)
+                (Empty))
+              (PostDecrement
+                (Identifier))
+              (If
+                (
+                  (Identifier))
+                (
+                  (Send
+                    (Identifier)
+                    (Composite
+                      (Identifier)
+                      (
+                        (Identifier)
+                        (Identifier))))
+                  (Return
+                    (Empty)))
+                (Empty))))
           (Pattern
             (DefaultPattern
               ([]))
@@ -54,15 +71,15 @@
               (Receive
                 (Empty)
                 (Identifier)))
-            (Empty))
+            ([]))
           (Pattern
             (Receive
               (Empty)
               (Receive
                 (Empty)
                 (Identifier)))
-            (Empty))
+            ([]))
           (Pattern
             (DefaultPattern
               ([]))
-            (Empty)))))))
+            ([])))))))

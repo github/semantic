@@ -7,20 +7,28 @@
     ([])
     ([]))
   (Method
+    (Empty)
     (Identifier)
+  { (Identifier)
+  ->(Identifier) }
+    ([])
+    (Empty))
+  (Method
+    (
+      (Identifier))
     (
       (Identifier)
     { (Identifier)
     ->(Identifier) })
     (Identifier)
     (
-      (
-        (Identifier)
-      { (Identifier)
-      ->(Identifier) }))
+      (Identifier)
+    { (Identifier)
+    ->(Identifier) })
     ([]))
   (Method
-    (Identifier)
+    (
+      (Identifier))
     (
       (Identifier)
       (Pointer
@@ -76,7 +84,7 @@
             {+(Identifier)+})+}) })
         (Empty))))
   (Method
-    (Empty)
+    ([])
     (
     { (Identifier)
     ->(Identifier) }
@@ -84,10 +92,9 @@
         (Identifier)))
     (Identifier)
     (
-      (
-        (Identifier)
-      { (Identifier)
-      ->(Identifier) }))
+      (Identifier)
+    { (Identifier)
+    ->(Identifier) })
     (
       (Assignment
         (MemberAccess
@@ -108,7 +115,8 @@
             (Identifier))
           (Identifier)))))
   (Method
-    (Identifier)
+    (
+      (Identifier))
     (
       (Identifier)
       (Pointer

@@ -55,4 +55,15 @@
     (Identifier)
     (Identifier)
     ([])
-    (Empty)))
+    (Empty))
+  (Function
+    (Empty)
+    (Identifier)
+    (
+      (Identifier)
+      (Pointer
+        (Identifier)))
+    (Context
+      (Comment)
+      (Empty))
+    ([])))

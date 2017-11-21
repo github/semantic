@@ -49,14 +49,16 @@
         (Call
           (Identifier)
           (Empty))
-        (If
-          (
-            (LessThan
+        (Context
+          (Comment)
+          (If
+            (
+              (LessThan
+                (Identifier)
+                (Integer)))
+            (Call
               (Identifier)
-              (Integer)))
-          (Call
-            (Identifier)
-            (Empty))
-          (Call
-            (Identifier)
-            (Empty)))))))
+              (Empty))
+            (Call
+              (Identifier)
+              (Empty))))))))

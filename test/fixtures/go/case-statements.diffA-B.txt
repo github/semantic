@@ -10,14 +10,15 @@
     {-([])-})
   ->(
     {+(Match
+      {+([])+}
       {+(Pattern
         {+(Identifier)+}
         {+(Call
           {+(Identifier)+}
-          {+(Empty)+})+})+}
-      {+([])+})+}
+          {+(Empty)+})+})+})+}
     {+(Match
-      {+(Identifier)+}
+      {+(
+        {+(Identifier)+})+}
       {+(
         {+(Pattern
           {+(

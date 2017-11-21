@@ -6,6 +6,9 @@
     (Identifier)
     ([])
     (
+      (Identifier)
+      (Negate
+        (Identifier))
       (Not
         (Receive
           (Empty)
@@ -15,4 +18,9 @@
           (Identifier)
           (Empty)))
       (Complement
+        (Identifier))
+      (Reference
+        (Identifier))
+      (Receive
+        (Empty)
         (Identifier)))))

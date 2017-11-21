@@ -2,6 +2,8 @@ package main
 
 func main() {}
 
+func (s) Method()
+
 func (self Person) Equals(other Person) bool {}
 
 func (p *Point) Length() float64 {

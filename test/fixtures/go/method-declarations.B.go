@@ -2,6 +2,8 @@ package main
 
 func main() {}
 
+func (s) Methods()
+
 func (self Num) Equals(other Num) bool {}
 
 func (p *Point) OtherLength() float64 {

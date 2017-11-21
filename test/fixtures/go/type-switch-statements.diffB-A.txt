@@ -18,11 +18,21 @@
           ->(Identifier) }))
         (
           (Pattern
-            (Slice
-              (Identifier))
-            (Call
+            (
               (Identifier)
-              (Empty)))
+              (Pointer
+                (MemberAccess
+                  (Identifier)
+                  (Identifier))))
+            ([]))
+          (Context
+            (Comment)
+            (Pattern
+              (Slice
+                (Identifier))
+              (Call
+                (Identifier)
+                (Empty))))
           (Pattern
             (Pointer
               (Identifier))
@@ -111,4 +121,16 @@
           (Pattern
             (DefaultPattern
               ([]))
-            ([])))))))
+            ([]))))
+      (TypeSwitch
+        (Empty)
+        (
+          (TypeSwitchGuard
+            (
+              (Identifier)
+            { (Identifier)
+            ->(Identifier) }))
+          (Context
+          { (Comment)
+          ->(Comment) }
+            (Empty)))))))

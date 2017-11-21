@@ -6,6 +6,11 @@
     (Identifier)
     ([])
     (
+    { (Identifier)
+    ->(Identifier) }
+      (Negate
+      { (Identifier)
+      ->(Identifier) })
       (Not
         (Receive
           (Empty)
@@ -17,5 +22,12 @@
         ->(Identifier) }
           (Empty)))
       (Complement
+      { (Identifier)
+      ->(Identifier) })
+      (Reference
+      { (Identifier)
+      ->(Identifier) })
+      (Receive
+        (Empty)
       { (Identifier)
       ->(Identifier) }))))

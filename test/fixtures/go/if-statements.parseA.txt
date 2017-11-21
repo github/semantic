@@ -57,6 +57,14 @@
           (Call
             (Identifier)
             (Empty))
-          (Call
-            (Identifier)
-            (Empty)))))))
+          (Context
+            (Comment)
+            (If
+              (
+                (Call
+                  (Identifier)
+                  (Empty)))
+              (Call
+                (Identifier)
+                (Empty))
+              (Empty))))))))
