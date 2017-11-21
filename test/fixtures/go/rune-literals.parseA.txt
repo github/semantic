@@ -4,19 +4,19 @@
   (
     (Assignment
       (Identifier)
-      (RuneLiteral))
+      (Rune))
     (Assignment
       (Identifier)
-      (RuneLiteral))
+      (Rune))
     (Assignment
       (Identifier)
-      (RuneLiteral))
+      (Rune))
     (Assignment
       (Identifier)
-      (RuneLiteral))
+      (Rune))
     (Assignment
       (Identifier)
-      (RuneLiteral))
+      (Rune))
     (Assignment
       (Identifier)
-      (RuneLiteral))))
+      (Rune))))

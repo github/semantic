@@ -30,6 +30,6 @@
       (Annotation
         (Identifier)
         (BiDirectionalChannel
-          (ParenthesizedType
+          (Parenthesized
             (ReceiveChannel
               (Identifier))))))))

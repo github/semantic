@@ -37,7 +37,7 @@
     {+(Annotation
       {+(Identifier)+}
       {+(BiDirectionalChannel
-        {+(ParenthesizedType
+        {+(Parenthesized
           {+(ReceiveChannel
             {+(Identifier)+})+})+})+})+}
     {-(Annotation
@@ -48,6 +48,6 @@
     {-(Annotation
       {-(Identifier)-}
       {-(BiDirectionalChannel
-        {-(ParenthesizedType
+        {-(Parenthesized
           {-(ReceiveChannel
             {-(Identifier)-})-})-})-})-})))
