@@ -58,10 +58,8 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
       parse parser blob >>= decorate constructorLabel . (Nil <$) >>= render renderSExpressionTerm
 
   (TagsTermRenderer, lang)
-    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[HasDeclaration, Foldable, Functor]) ->
+    | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[HasDeclaration, Foldable, Functor]) <$> lang ->
       parse parser blob >>= decorate (declarationAlgebra blob) >>= render (renderToTags blob)
-    | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
-      parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob) >>= render (renderToTags blob)
 
   _ -> throwError (SomeException (NoParserForLanguage blobPath blobLanguage))
 
