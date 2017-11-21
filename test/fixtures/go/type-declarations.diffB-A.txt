@@ -22,4 +22,31 @@
         { (Identifier)
         ->(Identifier) }
         { (Identifier)
-        ->(Identifier) })))))
+        ->(Identifier) }))
+      (
+        (Context
+          (Comment)
+          (Annotation
+          { (Identifier)
+          ->(Identifier) }
+            (Constructor
+              (Empty)
+              (Field
+                (Identifier)
+                (
+                  (Identifier)))
+              (Field
+                (Identifier)
+                (
+                  (Identifier)))
+              (Field
+                (Identifier)
+                (
+                  (Identifier))))))
+        (Annotation
+        { (Identifier)
+        ->(Identifier) }
+          (Interface))
+        (Context
+          (Comment)
+          (Empty))))))
