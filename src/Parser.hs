@@ -61,8 +61,8 @@ type family ApplyAll (typeclasses :: [(* -> *) -> Constraint]) (syntax :: * -> *
 -- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
 --
 --   This enables us to abstract over the details of the specific syntax types in cases where we can describe all the requirements on the syntax with a list of typeclasses.
-data SomeParser typeclasses where
-  SomeParser :: ApplyAll typeclasses syntax => Parser (Term syntax (Record Location)) -> SomeParser typeclasses
+data SomeParser typeclasses ann where
+  SomeParser :: ApplyAll typeclasses syntax => Parser (Term syntax ann) -> SomeParser typeclasses ann
 
 -- | Construct a 'SomeParser' given a proxy for a list of typeclasses and the 'Language' to be parsed, all of which must be satisfied by all of the types in the syntaxes of our supported languages.
 --
@@ -75,9 +75,9 @@ someParser :: ( ApplyAll typeclasses (Union JSON.Syntax)
               , ApplyAll typeclasses (Union Ruby.Syntax)
               , ApplyAll typeclasses (Union TypeScript.Syntax)
               )
-           => proxy typeclasses              -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
-           -> Language                       -- ^ The 'Language' to select.
-           -> Maybe (SomeParser typeclasses) -- ^ 'Maybe' a 'SomeParser' abstracting the syntax type to be produced.
+           => proxy typeclasses                                -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
+           -> Language                                         -- ^ The 'Language' to select.
+           -> Maybe (SomeParser typeclasses (Record Location)) -- ^ 'Maybe' a 'SomeParser' abstracting the syntax type to be produced.
 someParser _ Go         = Nothing
 someParser _ JavaScript = Just (SomeParser typescriptParser)
 someParser _ JSON       = Just (SomeParser jsonParser)
