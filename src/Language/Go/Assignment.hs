@@ -502,7 +502,7 @@ importSpec :: Assignment
 importSpec = symbol ImportSpec *> children expressions
 
 parameters :: Assignment
-parameters = makeTerm <$> symbol Parameters <*> children (manyTerm expression)
+parameters = symbol Parameters *> children expressions
 
 parameterDeclaration :: Assignment
 parameterDeclaration = makeTerm <$> symbol ParameterDeclaration <*> children (many expression)
