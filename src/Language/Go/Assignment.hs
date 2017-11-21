@@ -564,13 +564,13 @@ forStatement = mkForStatement <$> symbol ForStatement <*> children ((,) <$> (for
                                                             "forEach" -> makeTerm loc $ (Statement.ForEach a b block')
                                                             _ -> makeTerm loc $ (Statement.For a b c block')
     emptyClause = children (("for",,,) <$> emptyTerm <*> emptyTerm <*> emptyTerm)
+    for = ("for",,,) <$> emptyTerm <*> expression <*> emptyTerm
     rangeClause = symbol RangeClause *> children (  (("forEach",,,) <$> expression <*> expression <*> emptyTerm)
                                                 <|> (("forEach",,,) <$> emptyTerm <*> expression <*> emptyTerm))
     forClause = symbol ForClause *> children (  (("for",,,) <$> expression <*> expression <*> expression)
                                             <|> (("for",,,) <$> expression <*> expression <*> emptyTerm)
                                             <|> (("for",,,) <$> expression <*> emptyTerm <*> emptyTerm)
                                             <|> (("for",,,) <$> emptyTerm <*> emptyTerm <*> emptyTerm))
-    for = ("for",,,) <$> emptyTerm <*> expression <*> emptyTerm
 
 goStatement :: Assignment
 goStatement = makeTerm <$> symbol GoStatement <*> children (Go.Syntax.Go <$> expression)
