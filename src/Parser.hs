@@ -53,26 +53,26 @@ data Parser term where
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
 
 -- | Apply all of a list of typeclasses to all of a list of functors using 'Apply'. Used by 'someParser' to constrain all of the language-specific syntax types to the typeclasses in question.
-type family ApplyAll (typeclasses :: [(* -> *) -> Constraint]) (functors :: [* -> *]) :: Constraint where
-  ApplyAll (typeclass ': typeclasses) functors = (Apply typeclass functors, ApplyAll typeclasses functors)
-  ApplyAll '[] functors = ()
+type family ApplyAll (typeclasses :: [(* -> *) -> Constraint]) (syntax :: * -> *) :: Constraint where
+  ApplyAll (typeclass ': typeclasses) syntax = (typeclass syntax, ApplyAll typeclasses syntax)
+  ApplyAll '[] syntax = ()
 
 -- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
 --
 --   This enables us to abstract over the details of the specific syntax types in cases where we can describe all the requirements on the syntax with a list of typeclasses.
 data SomeParser typeclasses where
-  SomeParser :: ApplyAll typeclasses fs => { unSomeParser :: Parser (Term (Union fs) (Record Location)) } -> SomeParser typeclasses
+  SomeParser :: ApplyAll typeclasses syntax => { unSomeParser :: Parser (Term syntax (Record Location)) } -> SomeParser typeclasses
 
 -- | Construct a 'SomeParser' given a proxy for a list of typeclasses and the 'Language' to be parsed, all of which must be satisfied by all of the types in the syntaxes of our supported languages.
 --
 --   This can be used to perform operations uniformly over terms produced by blobs with different 'Language's, and which therefore have different types in general. For example, given some 'Blob', we can parse and 'show' the parsed & assigned 'Term' like so:
 --
 --   > case someParser (Proxy :: Proxy '[Show1]) (blobLanguage language) of { Just (SomeParser parser) -> runTask (parse parser blob) >>= putStrLn . show ; _ -> return () }
-someParser :: ( ApplyAll typeclasses JSON.Syntax
-              , ApplyAll typeclasses Markdown.Syntax
-              , ApplyAll typeclasses Python.Syntax
-              , ApplyAll typeclasses Ruby.Syntax
-              , ApplyAll typeclasses TypeScript.Syntax
+someParser :: ( ApplyAll typeclasses (Union JSON.Syntax)
+              , ApplyAll typeclasses (Union Markdown.Syntax)
+              , ApplyAll typeclasses (Union Python.Syntax)
+              , ApplyAll typeclasses (Union Ruby.Syntax)
+              , ApplyAll typeclasses (Union TypeScript.Syntax)
               )
            => proxy typeclasses              -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
            -> Language                       -- ^ The 'Language' to select.

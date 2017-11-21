@@ -17,6 +17,7 @@ import Data.ByteString (ByteString)
 import Data.Diff
 import Data.Functor.Both as Both
 import Data.Functor.Classes
+import Data.JSON.Fields
 import Data.Output
 import Data.Bifoldable
 import Data.Record
@@ -53,7 +54,7 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
       parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob) >>= render (renderToCTerm blob)
 
   (JSONTermRenderer, lang)
-    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Foldable, Functor]) ->
+    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Functor, ToJSONFields1]) ->
       parse parser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
     | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
       parse syntaxParser blob >>= decorate syntaxIdentifierAlgebra >>= render (renderJSONTerm blob)
@@ -103,7 +104,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
       run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms (renderToCDiff blobs)
 
   (JSONDiffRenderer, lang)
-    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, Show1, Traversable]) ->
+    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, Show1, ToJSONFields1, Traversable]) ->
       run (parse parser) diffTerms (renderJSONDiff blobs)
     | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
       run (decorate syntaxIdentifierAlgebra <=< parse syntaxParser) diffSyntaxTerms (renderJSONDiff blobs)
