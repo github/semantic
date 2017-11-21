@@ -41,6 +41,7 @@ type Syntax =
    , Statement.PostDecrement
    , Statement.PostIncrement
    , Expression.MemberAccess
+   , Go.Syntax.Composite
    , Go.Syntax.DefaultPattern
    , Go.Syntax.Defer
    , Go.Syntax.Field
@@ -59,7 +60,6 @@ type Syntax =
    , Literal.Array
    , Literal.Channel
    , Literal.Complex
-   , Literal.Composite
    , Literal.Float
    , Literal.Hash
    , Literal.Integer
@@ -217,7 +217,7 @@ comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 compositeLiteral :: Assignment
-compositeLiteral = makeTerm <$> symbol CompositeLiteral <*> children (Literal.Composite <$> expression <*> expression)
+compositeLiteral = makeTerm <$> symbol CompositeLiteral <*> children (Go.Syntax.Composite <$> expression <*> expression)
 
 element :: Assignment
 element = symbol Element *> children expression

@@ -10,6 +10,15 @@ import Data.Functor.Classes.Show.Generic
 import Data.Mergeable
 import GHC.Generics
 
+
+-- A composite literal in Go
+data Composite a = Composite { compositeType :: !a, compositeElement :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Composite where liftEq = genericLiftEq
+instance Ord1 Composite where liftCompare = genericLiftCompare
+instance Show1 Composite where liftShowsPrec = genericLiftShowsPrec
+
 -- | A default pattern in a Go select or switch statement (e.g. `switch { default: s() }`).
 newtype DefaultPattern a = DefaultPattern { defaultPatternBody :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
