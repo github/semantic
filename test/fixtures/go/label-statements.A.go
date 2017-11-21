@@ -8,4 +8,7 @@ L1: { // L1 labels block => L1 does not apply to for loop
 		break L1;  // comment
 	}
 }
+{
+  insert:
+}
 }

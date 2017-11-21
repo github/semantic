@@ -157,9 +157,12 @@ instance CustomHasDeclaration Declaration.Function where
 
 -- | Produce a 'MethodDeclaration' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'Range'), the 'declarationIdentifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
 instance CustomHasDeclaration Declaration.Method where
-  customToDeclaration blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn _), _) (Term (In identifierAnn _), _) _ _)
+  customToDeclaration blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _)
     -- Methods without a receiver
     | isEmpty receiverAnn = Just $ MethodDeclaration (getSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage Nothing
+    -- Methods with a receiver type and an identifier (e.g. (a *Type) in Go).
+    | blobLanguage == Just Language.Go
+    , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ MethodDeclaration (getSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage (Just (getSource receiverType))
     -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
     | otherwise           = Just $ MethodDeclaration (getSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage (Just (getSource receiverAnn))
     where getSource = toText . flip Source.slice blobSource . getField
@@ -316,7 +319,7 @@ recordSummary changeText record = case getDeclaration record of
   Just declaration -> Just $ TOCSummary (toCategoryName declaration) (formatIdentifier declaration) (getField record) changeText
   Nothing -> Nothing
   where
-    formatIdentifier (MethodDeclaration identifier _ (Just Language.Go) (Just receiver)) = "(" <> receiver <> ") " <> identifier
+    formatIdentifier (MethodDeclaration identifier _ (Just Language.Go) (Just receiverTy)) = "(" <> receiverTy <> ") " <> identifier
     formatIdentifier (MethodDeclaration identifier _ _                  (Just receiver)) = receiver <> "." <> identifier
     formatIdentifier declaration = declarationIdentifier declaration
 

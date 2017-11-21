@@ -23,7 +23,7 @@
       { (Identifier)
       ->(Identifier) })
       (TypeConversion
-        (ParenthesizedType
+        (Parenthesized
           (ReceiveChannel
             (Identifier)))
       { (Identifier)
@@ -35,14 +35,14 @@
       { (Identifier)
       ->(Identifier) })
       (TypeConversion
-        (ParenthesizedType
+        (Parenthesized
           (Function
             ([])
             (Empty)))
       { (Identifier)
       ->(Identifier) })
       (TypeConversion
-        (ParenthesizedType
+        (Parenthesized
           (Function
             ([])
             (Identifier)))
@@ -67,7 +67,7 @@
         { (Identifier)
         ->(Identifier) }))
       (TypeConversion
-        (ParenthesizedType
+        (Parenthesized
           (Slice
             (MemberAccess
             { (Identifier)

@@ -39,4 +39,8 @@
                 ->(Identifier) })
                 (Context
                   (Comment)
-                  (Empty))))))))))
+                  (Empty)))))))
+      (Label
+      { (Identifier)
+      ->(Identifier) }
+        (Empty)))))

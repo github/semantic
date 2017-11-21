@@ -25,6 +25,7 @@ instance Eq1 Else where liftEq = genericLiftEq
 instance Ord1 Else where liftCompare = genericLiftCompare
 instance Show1 Else where liftShowsPrec = genericLiftShowsPrec
 
+-- | Goto statement (e.g. `goto a` in Go).
 newtype Goto a = Goto { gotoLocation :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
@@ -68,6 +69,22 @@ data Assignment a = Assignment { assignmentContext :: ![a], assignmentTarget :: 
 instance Eq1 Assignment where liftEq = genericLiftEq
 instance Ord1 Assignment where liftCompare = genericLiftCompare
 instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
+
+-- | Post increment operator (e.g. 1++ in Go, or i++ in C).
+newtype PostIncrement a = PostIncrement a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 PostIncrement where liftEq = genericLiftEq
+instance Ord1 PostIncrement where liftCompare = genericLiftCompare
+instance Show1 PostIncrement where liftShowsPrec = genericLiftShowsPrec
+
+-- | Post decrement operator (e.g. 1-- in Go, or i-- in C).
+newtype PostDecrement a = PostDecrement a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 PostDecrement where liftEq = genericLiftEq
+instance Ord1 PostDecrement where liftCompare = genericLiftCompare
+instance Show1 PostDecrement where liftShowsPrec = genericLiftShowsPrec
 
 
 -- Returns
@@ -187,7 +204,6 @@ instance Eq1 ScopeEntry where liftEq = genericLiftEq
 instance Ord1 ScopeEntry where liftCompare = genericLiftCompare
 instance Show1 ScopeEntry where liftShowsPrec = genericLiftShowsPrec
 
-
 -- | ScopeExit (e.g. `END {}` block in Ruby or Perl).
 newtype ScopeExit a = ScopeExit [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -195,19 +211,3 @@ newtype ScopeExit a = ScopeExit [a]
 instance Eq1 ScopeExit where liftEq = genericLiftEq
 instance Ord1 ScopeExit where liftCompare = genericLiftCompare
 instance Show1 ScopeExit where liftShowsPrec = genericLiftShowsPrec
-
--- | Post increment operator (e.g. 1++ in Go, or i++ in C).
-newtype PostIncrement a = PostIncrement a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
-
-instance Eq1 PostIncrement where liftEq = genericLiftEq
-instance Ord1 PostIncrement where liftCompare = genericLiftCompare
-instance Show1 PostIncrement where liftShowsPrec = genericLiftShowsPrec
-
--- | Post decrement operator (e.g. 1-- in Go, or i-- in C).
-newtype PostDecrement a = PostDecrement a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
-
-instance Eq1 PostDecrement where liftEq = genericLiftEq
-instance Ord1 PostDecrement where liftCompare = genericLiftCompare
-instance Show1 PostDecrement where liftShowsPrec = genericLiftShowsPrec

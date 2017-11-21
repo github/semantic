@@ -8,4 +8,7 @@ M1: { // M1 labels block => M1 does not apply to for loop
 		break M1;  // comment
 	}
 }
+{
+  replacement:
+}
 }

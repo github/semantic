@@ -34,4 +34,7 @@
                   (Identifier))
                 (Context
                   (Comment)
-                  (Empty))))))))))
+                  (Empty)))))))
+      (Label
+        (Identifier)
+        (Empty)))))
