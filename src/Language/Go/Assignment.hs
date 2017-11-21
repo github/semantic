@@ -133,12 +133,10 @@ expression = handleError (choice expressionChoices)
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
   [ assignment'
-  , arrayType
   , binaryExpression
   , block
   , breakStatement
   , callExpression
-  , channelType
   , communicationClause
   , compositeLiteral
   , continueStatement
@@ -159,7 +157,6 @@ expressionChoices =
   , floatLiteral
   , forStatement
   , functionDeclaration
-  , functionType
   , goStatement
   , gotoStatement
   , ifInitializer
@@ -167,18 +164,15 @@ expressionChoices =
   , imaginaryLiteral
   , incStatement
   , identifier
-  , implicitLengthArrayType
   , importDeclaration
   , importSpec
   , indexExpression
-  , interfaceType
   , interpretedStringLiteral
   , intLiteral
   , keyedElement
   , labelName'
   , labelStatement'
   , literalValue
-  , mapType
   , methodDeclaration
   , methodSpec
   , packageClause
@@ -186,9 +180,6 @@ expressionChoices =
   , parameterDeclaration
   , parameters
   , parenthesizedExpression
-  , parenthesizedType
-  , pointerType
-  , qualifiedType
   , rawStringLiteral
   , receiveStatement
   , returnStatement
@@ -198,19 +189,10 @@ expressionChoices =
   , sendStatement
   , shortVarDeclaration
   , sliceExpression
-  , sliceType
-  , structType
-  , typeAssertion
-  , typeConversion
-  , typeDeclaration
-  , typeIdentifier
-  , typeSwitchStatement
-  , typeSwitchGuard
-  , typeCase
-  , typeCaseClause
   , unaryExpression
   , variadicArgument
   , variadicParameterDeclaration
+  , types
   ]
 
 identifiers :: Assignment
