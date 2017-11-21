@@ -61,9 +61,9 @@ parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
     | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[HasDeclaration, Foldable, Functor]) <$> lang ->
       parse parser blob >>= decorate (declarationAlgebra blob) >>= render (renderToTags blob)
 
-  _ -> throwError (SomeException (NoParserForLanguage blobPath blobLanguage))
+  _ -> throwError (SomeException (NoLanguageForBlob blobPath blobLanguage))
 
-data NoParserForLanguage = NoParserForLanguage FilePath (Maybe Language.Language)
+data NoLanguageForBlob = NoLanguageForBlob FilePath (Maybe Language.Language)
   deriving (Eq, Exception, Ord, Show, Typeable)
 
 
@@ -89,7 +89,7 @@ diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
     | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[ConstructorName, Diffable, Eq1, Foldable, Functor, GAlign, Show1, Traversable]) <$> lang ->
       run (decorate constructorLabel . (Nil <$) <=< parse parser) diffTerms renderSExpressionDiff
 
-  _ -> throwError (SomeException (NoParserForLanguage effectivePath effectiveLanguage))
+  _ -> throwError (SomeException (NoLanguageForBlob effectivePath effectiveLanguage))
   where (effectivePath, effectiveLanguage) = case runJoin blobs of
           (Blob { blobLanguage = Just lang, blobPath = path }, _) -> (path, Just lang)
           (_, Blob { blobLanguage = Just lang, blobPath = path }) -> (path, Just lang)
