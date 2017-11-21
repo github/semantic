@@ -170,8 +170,6 @@ expressionChoices =
   , interpretedStringLiteral
   , intLiteral
   , keyedElement
-  , labelName'
-  , labelStatement'
   , literalValue
   , methodDeclaration
   , methodSpec
@@ -193,6 +191,8 @@ expressionChoices =
   , variadicArgument
   , variadicParameterDeclaration
   , types
+  , labelName'
+  , labeledStatement'
   ]
 
 identifiers :: Assignment
@@ -614,8 +614,8 @@ keyedElement = makeTerm <$> symbol KeyedElement <*> children (Literal.KeyValue <
 labelName' :: Assignment
 labelName' = makeTerm <$> symbol LabelName <*> (Syntax.Identifier <$> source)
 
-labelStatement' :: Assignment
-labelStatement' = makeTerm <$> symbol LabelStatement <*> children (Go.Syntax.Label <$> expression <*> (expression <|> emptyTerm))
+labeledStatement' :: Assignment
+labeledStatement' = makeTerm <$> symbol LabeledStatement <*> children (Go.Syntax.Label <$> expression <*> (expression <|> (symbol AnonColon *> source *> emptyTerm)))
 
 returnStatement :: Assignment
 returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (expression <|> emptyTerm))
