@@ -61,7 +61,7 @@ type family ApplyAll (typeclasses :: [(* -> *) -> Constraint]) (syntax :: * -> *
 --
 --   This enables us to abstract over the details of the specific syntax types in cases where we can describe all the requirements on the syntax with a list of typeclasses.
 data SomeParser typeclasses where
-  SomeParser :: ApplyAll typeclasses syntax => { unSomeParser :: Parser (Term syntax (Record Location)) } -> SomeParser typeclasses
+  SomeParser :: ApplyAll typeclasses syntax => Parser (Term syntax (Record Location)) -> SomeParser typeclasses
 
 -- | Construct a 'SomeParser' given a proxy for a list of typeclasses and the 'Language' to be parsed, all of which must be satisfied by all of the types in the syntaxes of our supported languages.
 --
