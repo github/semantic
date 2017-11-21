@@ -80,10 +80,6 @@ diffBlobPair renderer blobs@(Join (Blob { blobLanguage = Just lang }, Blob { blo
     | SomeParser parser <- someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, Show1, Traversable]) lang ->
       run (parse parser) diffTerms (renderJSONDiff blobs)
 
-  PatchDiffRenderer
-    | SomeParser parser <- someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, Show1, Traversable]) lang ->
-      run (parse parser) diffTerms (renderPatch blobs)
-
   SExpressionDiffRenderer
     | SomeParser parser <- someParser (Proxy :: Proxy '[ConstructorName, Diffable, Eq1, Foldable, Functor, GAlign, Show1, Traversable]) lang ->
       run (decorate constructorLabel . (Nil <$) <=< parse parser) diffTerms renderSExpressionDiff
