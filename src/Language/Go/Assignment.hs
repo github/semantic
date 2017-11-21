@@ -24,6 +24,7 @@ import Data.Union
 import GHC.Stack
 import Language.Go.Grammar as Grammar
 import Language.Go.Syntax as Go.Syntax
+import Language.Go.Type as Go.Type
 
 type Syntax =
   '[ Comment.Comment
@@ -57,6 +58,9 @@ type Syntax =
    , Go.Syntax.TypeSwitch
    , Go.Syntax.TypeSwitchGuard
    , Go.Syntax.Variadic
+   , Go.Type.BiDirectionalChannel
+   , Go.Type.ReceiveChannel
+   , Go.Type.SendChannel
    , Literal.Array
    , Literal.Complex
    , Literal.Float
@@ -85,14 +89,11 @@ type Syntax =
    , Type.Alias
    , Type.Annotation
    , Type.Array
-   , Type.BiDirectionalChannel
    , Type.Function
    , Type.Interface
    , Type.Map
    , Type.Parenthesized
    , Type.Pointer
-   , Type.ReceiveChannel
-   , Type.SendChannel
    , Type.Slice
    , []
    ]
@@ -265,9 +266,9 @@ arrayType :: Assignment
 arrayType = makeTerm <$> symbol ArrayType <*> children (Type.Array . Just <$> expression <*> (expression <|> arrayType))
 
 channelType :: Assignment
-channelType =  (makeTerm <$> symbol ChannelType <*> children (token AnonLAngleMinus *> token AnonChan *> (Type.ReceiveChannel <$> expression)))
-           <|> (makeTerm <$> symbol ChannelType <*> children (token AnonChan *> token AnonLAngleMinus *> (Type.SendChannel <$> expression)))
-           <|> (makeTerm <$> symbol ChannelType <*> children (token AnonChan *> (Type.BiDirectionalChannel <$> expression)))
+channelType =  (makeTerm <$> symbol ChannelType <*> children (token AnonLAngleMinus *> token AnonChan *> (Go.Type.ReceiveChannel <$> expression)))
+           <|> (makeTerm <$> symbol ChannelType <*> children (token AnonChan *> token AnonLAngleMinus *> (Go.Type.SendChannel <$> expression)))
+           <|> (makeTerm <$> symbol ChannelType <*> children (token AnonChan *> (Go.Type.BiDirectionalChannel <$> expression)))
 
 fieldDeclaration :: Assignment
 fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> (manyTermsTill expression (void (symbol TypeIdentifier)) <|> (manyTerm expression)) <*> optional expression <*> optional expression)
