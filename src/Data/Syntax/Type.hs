@@ -65,6 +65,13 @@ instance Eq1 Map where liftEq = genericLiftEq
 instance Ord1 Map where liftCompare = genericLiftCompare
 instance Show1 Map where liftShowsPrec = genericLiftShowsPrec
 
+newtype Parenthesized a = Parenthesized { parenthesizedType :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Parenthesized where liftEq = genericLiftEq
+instance Ord1 Parenthesized where liftCompare = genericLiftCompare
+instance Show1 Parenthesized where liftShowsPrec = genericLiftShowsPrec
+
 newtype Pointer a = Pointer { pointerType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 

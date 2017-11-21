@@ -46,9 +46,8 @@ type Syntax =
    , Go.Syntax.Field
    , Go.Syntax.Go
    , Go.Syntax.Label
-   , Go.Syntax.ParenthesizedType
    , Go.Syntax.Receive
-   , Go.Syntax.RuneLiteral
+   , Go.Syntax.Rune
    , Go.Syntax.Select
    , Go.Syntax.Send
    , Go.Syntax.Slice
@@ -91,6 +90,7 @@ type Syntax =
    , Type.Function
    , Type.Interface
    , Type.Map
+   , Type.Parenthesized
    , Type.Pointer
    , Type.ReceiveChannel
    , Type.SendChannel
@@ -152,8 +152,8 @@ expressionChoices =
   , interpretedStringLiteral
   , intLiteral
   , keyedElement
-  , labelName'
-  , labeledStatement'
+  , labelName
+  , labeledStatement
   , literalValue
   , methodDeclaration
   , methodSpec
@@ -248,13 +248,13 @@ packageIdentifier :: Assignment
 packageIdentifier = makeTerm <$> symbol PackageIdentifier <*> (Syntax.Identifier <$> source)
 
 parenthesizedType :: Assignment
-parenthesizedType = makeTerm <$> symbol Grammar.ParenthesizedType <*> children (Go.Syntax.ParenthesizedType <$> expression)
+parenthesizedType = makeTerm <$> symbol Grammar.ParenthesizedType <*> children (Type.Parenthesized <$> expression)
 
 rawStringLiteral :: Assignment
 rawStringLiteral = makeTerm <$> symbol RawStringLiteral <*> (Literal.TextElement <$> source)
 
 runeLiteral :: Assignment
-runeLiteral = makeTerm <$> symbol Grammar.RuneLiteral <*> (Go.Syntax.RuneLiteral <$> source)
+runeLiteral = makeTerm <$> symbol Grammar.RuneLiteral <*> (Go.Syntax.Rune <$> source)
 
 typeIdentifier :: Assignment
 typeIdentifier = makeTerm <$> symbol TypeIdentifier <*> (Syntax.Identifier <$> source)
@@ -535,7 +535,7 @@ assignment' =  makeTerm'  <$> symbol AssignmentStatement <*> children (infixTerm
     invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
 breakStatement :: Assignment
-breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> (labelName' <|> emptyTerm))
+breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> (labelName <|> emptyTerm))
 
 communicationClause :: Assignment
 communicationClause = makeTerm <$> symbol CommunicationClause <*> children (Statement.Pattern <$> (communicationCase <|> defaultCase) <*> expressions)
@@ -543,7 +543,7 @@ communicationClause = makeTerm <$> symbol CommunicationClause <*> children (Stat
     communicationCase = symbol CommunicationCase *> children expression
 
 continueStatement :: Assignment
-continueStatement = makeTerm <$> symbol ContinueStatement <*> children (Statement.Continue <$> (labelName' <|> emptyTerm))
+continueStatement = makeTerm <$> symbol ContinueStatement <*> children (Statement.Continue <$> (labelName <|> emptyTerm))
 
 decStatement :: Assignment
 decStatement = makeTerm <$> symbol DecStatement <*> children (Statement.PostDecrement <$> expression)
@@ -590,11 +590,11 @@ incStatement = makeTerm <$> symbol IncStatement <*> children (Statement.PostIncr
 keyedElement :: Assignment
 keyedElement = makeTerm <$> symbol KeyedElement <*> children (Literal.KeyValue <$> expression <*> expression)
 
-labelName' :: Assignment
-labelName' = makeTerm <$> symbol LabelName <*> (Syntax.Identifier <$> source)
+labelName :: Assignment
+labelName = makeTerm <$> symbol LabelName <*> (Syntax.Identifier <$> source)
 
-labeledStatement' :: Assignment
-labeledStatement' = makeTerm <$> (symbol LabeledStatement <|> symbol LabeledStatement') <*> children (Go.Syntax.Label <$> expression <*> (expression <|> emptyTerm))
+labeledStatement :: Assignment
+labeledStatement = makeTerm <$> (symbol LabeledStatement <|> symbol LabeledStatement') <*> children (Go.Syntax.Label <$> expression <*> (expression <|> emptyTerm))
 
 returnStatement :: Assignment
 returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (expression <|> emptyTerm))
