@@ -89,31 +89,32 @@
   (AmbientDeclaration
     (Class
       (Identifier)
-      (MethodSignature
-        (Empty)
-        (Empty)
-        (Empty)
-        (Empty)
-        (Identifier)
-        (RequiredParameter
+      (
+        (MethodSignature
+          (Empty)
+          (Empty)
+          (Empty)
+          (Empty)
+          (Identifier)
+          (RequiredParameter
+            (Empty)
+            (Empty)
+            (Annotation
+              (PredefinedType))
+            (Assignment
+              (Identifier)
+              (Empty))))
+        (PublicFieldDefinition
           (Empty)
           (Empty)
           (Annotation
             (PredefinedType))
-          (Assignment
-            (Identifier)
-            (Empty))))
-      (PublicFieldDefinition
-        (Empty)
-        (Empty)
-        (Annotation
-          (PredefinedType))
-        (Identifier)
-        (Empty))
-      (MethodSignature
-        (Empty)
-        (Empty)
-        (Empty)
-        (Annotation
-          (PredefinedType))
-        (Identifier)))))
+          (Identifier)
+          (Empty))
+        (MethodSignature
+          (Empty)
+          (Empty)
+          (Empty)
+          (Annotation
+            (PredefinedType))
+          (Identifier))))))

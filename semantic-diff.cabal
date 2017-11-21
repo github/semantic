@@ -59,7 +59,6 @@ library
                      , Language.JSON.Assignment
                      , Language.Ruby.Grammar
                      , Language.Ruby.Assignment
-                     , Language.TypeScript
                      , Language.TypeScript.Assignment
                      , Language.TypeScript.Grammar
                      , Language.TypeScript.Syntax
@@ -72,6 +71,7 @@ library
                      , Renderer.JSON
                      , Renderer.Patch
                      , Renderer.SExpression
+                     , Renderer.Tag
                      , Renderer.TOC
                      , RWS
                      , RWS.FeatureVector
@@ -102,6 +102,7 @@ library
                      , freer-cofreer
                      , ghc-prim
                      , gitrev
+                     , Glob
                      , hashable
                      , kdt
                      , mersenne-random-pure64

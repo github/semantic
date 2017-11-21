@@ -23,6 +23,7 @@ module Data.Source
 , spanToRangeInLineRanges
 , sourceLineRangesByLineNumber
 , rangeToSpan
+, newlineIndices
 ) where
 
 import Control.Arrow ((&&&))
@@ -103,7 +104,29 @@ sourceLineRanges source = sourceLineRangesWithin (totalRange source) source
 
 -- | Compute the 'Range's of each line in a 'Range' of a 'Source'.
 sourceLineRangesWithin :: Range -> Source -> [Range]
-sourceLineRangesWithin range = uncurry (zipWith Range) . ((start range:) &&& (<> [ end range ])) . fmap (+ succ (start range)) . B.elemIndices (toEnum (ord '\n')) . sourceBytes . slice range
+sourceLineRangesWithin range = uncurry (zipWith Range)
+                             . ((start range:) &&& (<> [ end range ]))
+                             . fmap (+ succ (start range))
+                             . newlineIndices
+                             . sourceBytes
+                             . slice range
+
+-- | Return all indices of newlines ('\n', '\r', and '\r\n') in the 'ByteString'.
+newlineIndices :: B.ByteString -> [Int]
+newlineIndices = go 0
+  where go n bs | B.null bs = []
+                | otherwise = case (searchCR bs, searchLF bs) of
+                    (Nothing, Nothing)  -> []
+                    (Just i, Nothing)   -> recur n i bs
+                    (Nothing, Just i)   -> recur n i bs
+                    (Just crI, Just lfI)
+                      | succ crI == lfI -> recur n lfI bs
+                      | otherwise       -> recur n (min crI lfI) bs
+        recur n i bs = let j = n + i in j : go (succ j) (B.drop (succ i) bs)
+        searchLF = B.elemIndex (toEnum (ord '\n'))
+        searchCR = B.elemIndex (toEnum (ord '\r'))
+
+{-# INLINE newlineIndices #-}
 
 
 -- Conversion

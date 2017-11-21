@@ -542,9 +542,11 @@ constructorTy = makeTerm <$> symbol ConstructorType <*> children (TypeScript.Syn
 statementBlock :: Assignment
 statementBlock = makeTerm <$> symbol StatementBlock <*> children (manyTerm statement)
 
-classBodyStatements :: Assignment.Assignment [] Grammar [Term]
-classBodyStatements = symbol ClassBody *> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature <|> abstractMethodSignature))) <*> many comment))
+classBodyStatements :: Assignment
+classBodyStatements = mk <$> symbol ClassBody <*> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature <|> abstractMethodSignature))) <*> many comment))
   where
+    mk _ [a] = a
+    mk loc children = makeTerm loc children
     contextualize' (cs, formalParams) = case nonEmpty cs of
       Just cs -> toList cs ++ formalParams
       Nothing -> formalParams
