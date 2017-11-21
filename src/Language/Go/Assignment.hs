@@ -58,7 +58,6 @@ type Syntax =
    , Go.Syntax.TypeSwitchGuard
    , Go.Syntax.Variadic
    , Literal.Array
-   , Literal.Channel
    , Literal.Complex
    , Literal.Float
    , Literal.Hash
