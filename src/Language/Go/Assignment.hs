@@ -124,7 +124,7 @@ assignment :: Assignment
 assignment = handleError program <|> parseError
 
 expression :: Assignment
-expression = handleError (choice expressionChoices)
+expression = term (handleError (choice expressionChoices))
 
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
