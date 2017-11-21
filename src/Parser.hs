@@ -3,6 +3,7 @@ module Parser
 ( Parser(..)
 , SomeParser(..)
 , someParser
+, withParser
 , ApplyAll
 -- Syntax parsers
 , syntaxParserForLanguage
@@ -86,6 +87,9 @@ someParser _ Markdown   = Just (SomeParser markdownParser)
 someParser _ Python     = Just (SomeParser pythonParser)
 someParser _ Ruby       = Just (SomeParser rubyParser)
 someParser _ TypeScript = Just (SomeParser typescriptParser)
+
+withParser :: SomeParser typeclasses ann -> (forall syntax . ApplyAll typeclasses syntax => Parser (Term syntax ann) -> a) -> a
+withParser (SomeParser parser) with = with parser
 
 -- | Return a 'Language'-specific 'Parser', if one exists.
 syntaxParserForLanguage :: Language -> Maybe (Parser (Term Syntax (Record DefaultFields)))
