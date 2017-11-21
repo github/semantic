@@ -121,7 +121,7 @@ term term' = contextualize comment term' <|> makeTerm1 <$> (Syntax.Context <$> s
 
 -- | Assignment from AST in Go's grammar onto a program in Go's syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol SourceFile <*> children (Syntax.Program <$> manyTerm expression) <|> parseError
+assignment = handleError program <|> parseError
 
 expression :: Assignment
 expression = handleError (choice expressionChoices)
