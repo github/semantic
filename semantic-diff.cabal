@@ -55,6 +55,7 @@ library
                      , Language.Go.Grammar
                      , Language.Go.Assignment
                      , Language.Go.Syntax
+                     , Language.Go.Type
                      , Language.JSON.Grammar
                      , Language.JSON.Assignment
                      , Language.Ruby.Grammar
