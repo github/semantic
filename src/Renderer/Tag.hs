@@ -7,9 +7,9 @@ import Data.Aeson
 import Data.Blob
 import Data.Maybe (mapMaybe)
 import Data.Record
+import Data.Span
 import Data.Term
 import GHC.Generics
-import Info
 import qualified Data.Text as T
 import Renderer.TOC
 
@@ -24,7 +24,7 @@ renderToTags Blob{..} = fmap toJSON . termToC blobPath
 tagSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => FilePath -> T.Text -> Record fields -> Maybe Tag
 tagSummary path _ record = case getDeclaration record of
   Just ErrorDeclaration{} -> Nothing
-  Just declaration -> Just $ Tag (declarationIdentifier declaration) (T.pack path) (T.pack . show <$> declarationLanguage declaration) (toCategoryName declaration) (declarationText declaration) (sourceSpan record)
+  Just declaration -> Just $ Tag (declarationIdentifier declaration) (T.pack path) (T.pack . show <$> declarationLanguage declaration) (toCategoryName declaration) (declarationText declaration) (getField record)
   _ -> Nothing
 
 data Tag
