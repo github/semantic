@@ -9,6 +9,13 @@ import Data.Functor.Classes.Show.Generic
 import Data.Mergeable
 import GHC.Generics
 
+data Array a = Array { arraySize :: Maybe a, arrayElementType :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Array where liftEq = genericLiftEq
+instance Ord1 Array where liftCompare = genericLiftCompare
+instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
+
 data Annotation a = Annotation { annotationSubject :: !a, annotationType :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
@@ -29,20 +36,6 @@ data Function a = Function { functionParameters :: [a], functionReturn :: a }
 instance Eq1 Function where liftEq = genericLiftEq
 instance Ord1 Function where liftCompare = genericLiftCompare
 instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
-
-newtype Product a = Product { productElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
-
-instance Eq1 Product where liftEq = genericLiftEq
-instance Ord1 Product where liftCompare = genericLiftCompare
-instance Show1 Product where liftShowsPrec = genericLiftShowsPrec
-
-data Array a = Array { arraySize :: Maybe a, arrayElementType :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
-
-instance Eq1 Array where liftEq = genericLiftEq
-instance Ord1 Array where liftCompare = genericLiftCompare
-instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 
 newtype Interface a = Interface { interfaceElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -72,11 +65,19 @@ instance Eq1 Pointer where liftEq = genericLiftEq
 instance Ord1 Pointer where liftCompare = genericLiftCompare
 instance Show1 Pointer where liftShowsPrec = genericLiftShowsPrec
 
+newtype Product a = Product { productElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
+instance Eq1 Product where liftEq = genericLiftEq
+instance Ord1 Product where liftCompare = genericLiftCompare
+instance Show1 Product where liftShowsPrec = genericLiftShowsPrec
 
+data Readonly a = Readonly
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
+instance Eq1 Readonly where liftEq = genericLiftEq
+instance Ord1 Readonly where liftCompare = genericLiftCompare
+instance Show1 Readonly where liftShowsPrec = genericLiftShowsPrec
 
 newtype Slice a = Slice { sliceElementType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -91,10 +92,3 @@ data TypeParameters a = TypeParameters { typeParameters :: ![a] }
 instance Eq1 TypeParameters where liftEq = genericLiftEq
 instance Ord1 TypeParameters where liftCompare = genericLiftCompare
 instance Show1 TypeParameters where liftShowsPrec = genericLiftShowsPrec
-
-data Readonly a = Readonly
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
-
-instance Eq1 Readonly where liftEq = genericLiftEq
-instance Ord1 Readonly where liftCompare = genericLiftCompare
-instance Show1 Readonly where liftShowsPrec = genericLiftShowsPrec
