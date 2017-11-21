@@ -21,9 +21,13 @@ import Data.Semigroup ((<>))
 import Data.Source
 import Data.Span
 import Data.Syntax.Algebra (constructorNameAndConstantFields)
+import qualified Data.Syntax as Syntax
+import qualified Data.Syntax.Declaration as Declaration
 import Data.Term
 import Data.Text (Text)
+import Data.Text.Encoding (encodeUtf8)
 import Data.These
+import Data.Union
 import Interpreter
 import Language
 import Prelude hiding (readFile)
@@ -47,7 +51,7 @@ spec = parallel $ do
       \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (diff :: Diff ListableSyntax () ()) `shouldBe` []
 
     prop "produces no entries for identity diffs" $
-      \ term -> tableOfContentsBy (Just . termAnnotation) (diffSyntaxTerms term (term :: Term ListableSyntax (Record '[Category]))) `shouldBe` []
+      \ term -> tableOfContentsBy (Just . termAnnotation) (diffTerms term (term :: Term ListableSyntax (Record '[Range, Span]))) `shouldBe` []
 
     prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
       \ p -> tableOfContentsBy (Just . termAnnotation) (patch deleting inserting replacing p)
@@ -55,7 +59,7 @@ spec = parallel $ do
       patch (fmap Deleted) (fmap Inserted) (const (fmap Replaced)) (bimap (foldMap pure) (foldMap pure) (p :: Patch (Term ListableSyntax Int) (Term ListableSyntax Int)))
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
-      \ diff -> let diff' = merge (0, 0) (Indexed [bimap (const 1) (const 1) (diff :: Diff ListableSyntax Int Int)]) in
+      \ diff -> let diff' = merge (0, 0) (inj [bimap (const 1) (const 1) (diff :: Diff ListableSyntax Int Int)]) in
         tableOfContentsBy (\ (n `In` _) -> if n == (0 :: Int) then Just n else Nothing) diff' `shouldBe`
         replicate (length (diffPatches diff')) (Changed 0)
 
@@ -184,17 +188,17 @@ numTocSummaries diff = length $ filter isValidSummary (diffTOC diff)
 
 -- Return a diff where body is inserted in the expressions of a function. The function is present in both sides of the diff.
 programWithChange :: Term' -> Diff'
-programWithChange body = merge (programInfo, programInfo) (Indexed [ function' ])
+programWithChange body = merge (programInfo, programInfo) (inj [ function' ])
   where
-    function' = merge ((Just (FunctionDeclaration "foo" mempty Nothing) :. functionInfo, Just (FunctionDeclaration "foo" mempty Nothing) :. functionInfo)) (S.Function name' [] [ inserting body ])
-    name' = let info = Nothing :. Range 0 0 :. sourceSpanBetween (0,0) (0,0) :. Nil in merge (info, info) (Leaf "foo")
+    function' = merge (Just (FunctionDeclaration "foo" mempty Nothing) :. functionInfo, Just (FunctionDeclaration "foo" mempty Nothing) :. functionInfo) (inj (Declaration.Function [] name' [] (merge (Nothing :. functionInfo, Nothing :. functionInfo) (inj [ inserting body ]))))
+    name' = let info = Nothing :. Range 0 0 :. sourceSpanBetween (0,0) (0,0) :. Nil in merge (info, info) (inj (Syntax.Identifier "foo"))
 
 -- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
 programWithChangeOutsideFunction :: Term' -> Diff'
-programWithChangeOutsideFunction term = merge (programInfo, programInfo) (Indexed [ function', term' ])
+programWithChangeOutsideFunction term = merge (programInfo, programInfo) (inj [ function', term' ])
   where
-    function' = merge (Just (FunctionDeclaration "foo" mempty Nothing) :. functionInfo, Just (FunctionDeclaration "foo" mempty Nothing) :. functionInfo) (S.Function name' [] [])
-    name' = let info = Nothing :. Range 0 0 :. sourceSpanBetween (0,0) (0,0) :. Nil in  merge (info, info) (Leaf "foo")
+    function' = merge (Just (FunctionDeclaration "foo" mempty Nothing) :. functionInfo, Just (FunctionDeclaration "foo" mempty Nothing) :. functionInfo) (inj (Declaration.Function [] name' [] (merge (Nothing :. functionInfo, Nothing :. functionInfo) (inj []))))
+    name' = let info = Nothing :. Range 0 0 :. sourceSpanBetween (0,0) (0,0) :. Nil in  merge (info, info) (inj (Syntax.Identifier "foo"))
     term' = inserting term
 
 programWithInsert :: Text -> Term' -> Diff'
@@ -207,12 +211,12 @@ programWithReplace :: Text -> Term' -> Diff'
 programWithReplace name body = programOf $ replacing (functionOf name body) (functionOf (name <> "2") body)
 
 programOf :: Diff' -> Diff'
-programOf diff = merge (programInfo, programInfo) (Indexed [ diff ])
+programOf diff = merge (programInfo, programInfo) (inj [ diff ])
 
 functionOf :: Text -> Term' -> Term'
-functionOf name body = Term $ (Just (FunctionDeclaration name mempty Nothing) :. functionInfo) `In` S.Function name' [] [body]
+functionOf name body = termIn (Just (FunctionDeclaration name mempty Nothing) :. functionInfo) (inj (Declaration.Function [] name' [] (termIn (Nothing :. functionInfo) (inj [body]))))
   where
-    name' = Term $ (Nothing :. Range 0 0 :. sourceSpanBetween (0,0) (0,0) :. Nil) `In` Leaf name
+    name' = termIn (Nothing :. Range 0 0 :. sourceSpanBetween (0,0) (0,0) :. Nil) (inj (Syntax.Identifier (encodeUtf8 name)))
 
 programInfo :: Record '[Maybe Declaration, Range, Span]
 programInfo = Nothing :. Range 0 0 :. sourceSpanBetween (0,0) (0,0) :. Nil
@@ -221,21 +225,18 @@ functionInfo :: Record '[Range, Span]
 functionInfo = Range 0 0 :. sourceSpanBetween (0,0) (0,0) :. Nil
 
 -- Filter tiers for terms that we consider "meaniningful" in TOC summaries.
-isMeaningfulTerm :: Term Syntax a -> Bool
+isMeaningfulTerm :: Term ListableSyntax a -> Bool
 isMeaningfulTerm a
-  | (_:_) <- prj (termOut (unTerm a)) = False
-  | [] <- prj (termOut (unTerm a)) = False
+  | Just (_:_) <- prj (termOut (unTerm a)) = False
+  | Just []    <- prj (termOut (unTerm a)) = False
   | otherwise = True
 
 -- Filter tiers for terms if the Syntax is a Method or a Function.
-isMethodOrFunction :: HasField fields Category => Term Syntax (Record fields) -> Bool
-isMethodOrFunction a = case unTerm a of
-  (_ `In` S.Method{}) -> True
-  (_ `In` S.Function{}) -> True
-  (a `In` _) | getField a == C.Function -> True
-  (a `In` _) | getField a == C.Method -> True
-  (a `In` _) | getField a == C.SingletonMethod -> True
-  _ -> False
+isMethodOrFunction :: Term ListableSyntax ann -> Bool
+isMethodOrFunction a
+  | Just Declaration.Method{}   <- prj (termOut (unTerm a)) = True
+  | Just Declaration.Function{} <- prj (termOut (unTerm a)) = True
+  | otherwise                                     = False
 
 blobsForPaths :: Both FilePath -> IO (Both Blob)
 blobsForPaths = traverse (readFile . ("test/fixtures/toc/" <>))
@@ -244,7 +245,7 @@ sourceSpanBetween :: (Int, Int) -> (Int, Int) -> Span
 sourceSpanBetween (s1, e1) (s2, e2) = Span (Pos s1 e1) (Pos s2 e2)
 
 blankDiff :: Diff'
-blankDiff = merge (arrayInfo, arrayInfo) (Indexed [ inserting (Term $ literalInfo `In` Leaf "\"a\"") ])
+blankDiff = merge (arrayInfo, arrayInfo) (inj [ inserting (termIn literalInfo (inj (Syntax.Identifier "\"a\""))) ])
   where
     arrayInfo = Nothing :. Range 0 3 :. sourceSpanBetween (1, 1) (1, 5) :. Nil
     literalInfo = Nothing :. Range 1 2 :. sourceSpanBetween (1, 2) (1, 4) :. Nil
