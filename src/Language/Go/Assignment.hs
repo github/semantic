@@ -196,13 +196,13 @@ expressionChoices =
   ]
 
 identifiers :: Assignment
-identifiers = mk <$> location <*> many identifier
+identifiers = mk <$> location <*> manyTerm identifier
   where
     mk _ [a] = a
     mk loc children = makeTerm loc children
 
 expressions :: Assignment
-expressions = mk <$> location <*> many expression
+expressions = mk <$> location <*> manyTerm expression
   where
     mk _ [a] = a
     mk loc children = makeTerm loc children
@@ -229,7 +229,7 @@ types =  arrayType
      <|> typeSwitchStatement
 
 program :: Assignment
-program = makeTerm <$> symbol SourceFile <*> children (Syntax.Program <$> many expression)
+program = makeTerm <$> symbol SourceFile <*> children (Syntax.Program <$> manyTerm expression)
 
 -- Literals
 
@@ -240,7 +240,7 @@ imaginaryLiteral :: Assignment
 imaginaryLiteral = makeTerm <$> symbol ImaginaryLiteral <*> (Literal.Complex <$> source)
 
 literalValue :: Assignment
-literalValue = makeTerm <$> symbol LiteralValue <*> children (many expression)
+literalValue = makeTerm <$> symbol LiteralValue <*> children (manyTerm expression)
 
 compositeLiteral :: Assignment
 compositeLiteral = makeTerm <$> symbol CompositeLiteral <*> children (Literal.Composite <$> expression <*> expression)
@@ -292,7 +292,7 @@ implicitLengthArrayType :: Assignment
 implicitLengthArrayType = makeTerm <$> symbol ImplicitLengthArrayType <*> children (Type.Array Nothing <$> expression)
 
 functionType :: Assignment
-functionType = makeTerm <$> symbol FunctionType <*> children (Type.Function <$> many parameters <*> (expression <|> emptyTerm))
+functionType = makeTerm <$> symbol FunctionType <*> children (Type.Function <$> manyTerm parameters <*> (expression <|> emptyTerm))
 
 sliceType :: Assignment
 sliceType = makeTerm <$> symbol SliceType <*> children (Type.Slice <$> expression)
@@ -303,10 +303,10 @@ channelType =  (makeTerm <$> symbol ChannelType <*> children (token AnonLAngleMi
            <|> (makeTerm <$> symbol ChannelType <*> children (token AnonChan *> (Type.BiDirectionalChannel <$> expression)))
 
 structType :: Assignment
-structType = makeTerm <$> symbol StructType <*> children (Declaration.Constructor <$> emptyTerm <*> many expression)
+structType = makeTerm <$> symbol StructType <*> children (Declaration.Constructor <$> emptyTerm <*> manyTerm expression)
 
 interfaceType :: Assignment
-interfaceType = makeTerm <$> symbol InterfaceType <*> children (Type.Interface <$> many expression)
+interfaceType = makeTerm <$> symbol InterfaceType <*> children (Type.Interface <$> manyTerm expression)
 
 mapType :: Assignment
 mapType = makeTerm <$> symbol MapType <*> children (Type.Map <$> expression <*> expression)
@@ -315,7 +315,7 @@ pointerType :: Assignment
 pointerType = makeTerm <$> symbol PointerType <*> children (Type.Pointer <$> expression)
 
 fieldDeclaration :: Assignment
-fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> (manyTermsTill expression (void (symbol TypeIdentifier)) <|> (many expression)) <*> optional expression <*> optional expression)
+fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> (manyTermsTill expression (void (symbol TypeIdentifier)) <|> (manyTerm expression)) <*> optional expression <*> optional expression)
   where
     mkFieldDeclarationWithTag loc (fields, (Just type'), (Just tag)) = makeTerm loc $ Go.Syntax.Field [type', tag] (makeTerm loc fields) --Type.Annotation (makeTerm loc (Type.Annotation (makeTerm loc fields) type')) tag
     mkFieldDeclarationWithTag loc (fields, (Just type'), Nothing) = makeTerm loc $ Go.Syntax.Field [type'] (makeTerm loc fields)
@@ -375,7 +375,7 @@ typeDeclaration = makeTerm <$> symbol TypeDeclaration <*> children (manyTerm (  
 -- Expressions
 
 indexExpression :: Assignment
-indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> many expression)
+indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)
 
 sliceExpression :: Assignment
 sliceExpression = makeTerm <$> symbol SliceExpression <*> children (  (Go.Syntax.Slice <$> expression <*> expression <*> expression <*> expression)
@@ -472,7 +472,7 @@ variadicArgument :: Assignment
 variadicArgument = makeTerm <$> symbol VariadicArgument <*> children (Go.Syntax.Variadic <$> pure [] <*> expression)
 
 callExpression :: Assignment
-callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Call <$> pure [] <*> expression <*> many expression <*> emptyTerm)
+callExpression = makeTerm <$> symbol CallExpression <*> children (Expression.Call <$> pure [] <*> expression <*> manyTerm expression <*> emptyTerm)
 
 varDeclaration :: Assignment
 varDeclaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
@@ -486,12 +486,12 @@ expressionList :: Assignment
 expressionList = symbol ExpressionList *> children expressions
 
 functionDeclaration :: Assignment
-functionDeclaration =  mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> expression <*> many parameters <*> optional (types <|> identifier <|> returnParameters) <*> optional block)
-                   <|> mkTypedFunctionLiteral     <$> symbol FuncLiteral         <*> children ((,,,) <$> emptyTerm  <*> many parameters <*> optional (types <|> identifier <|> returnParameters) <*> block)
+functionDeclaration =  mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> expression <*> manyTerm parameters <*> optional (types <|> identifier <|> returnParameters) <*> optional block)
+                   <|> mkTypedFunctionLiteral     <$> symbol FuncLiteral         <*> children ((,,,) <$> emptyTerm  <*> manyTerm parameters <*> optional (types <|> identifier <|> returnParameters) <*> block)
   where
     mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Declaration.Function [(maybe (makeTerm loc Syntax.Empty) id types')] name' params' (maybe (makeTerm loc Syntax.Empty) id block'))
     mkTypedFunctionLiteral     loc (name', params', types', block') = makeTerm loc (Declaration.Function [(maybe (makeTerm loc Syntax.Empty) id types')] name' params' block')
-    returnParameters = makeTerm <$> symbol Parameters <*> children (many expression)
+    returnParameters = makeTerm <$> symbol Parameters <*> children (manyTerm expression)
 
 variadicParameterDeclaration :: Assignment
 variadicParameterDeclaration =  mkVariadic <$> symbol VariadicParameterDeclaration <*> children ((,) <$> emptyTerm  <*> expression)
@@ -500,7 +500,7 @@ variadicParameterDeclaration =  mkVariadic <$> symbol VariadicParameterDeclarati
     mkVariadic loc (identifier', typeIdentifier') = makeTerm loc (Go.Syntax.Variadic [typeIdentifier'] identifier')
 
 importDeclaration :: Assignment
-importDeclaration = makeTerm <$> symbol ImportDeclaration <*> children (Declaration.Import <$> many expression)
+importDeclaration = makeTerm <$> symbol ImportDeclaration <*> children (Declaration.Import <$> manyTerm expression)
 
 importSpec :: Assignment
 importSpec = symbol ImportSpec *> children expressions
@@ -509,10 +509,10 @@ parameters :: Assignment
 parameters = symbol Parameters *> children expressions
 
 parameterDeclaration :: Assignment
-parameterDeclaration = makeTerm <$> symbol ParameterDeclaration <*> children (many expression)
+parameterDeclaration = makeTerm <$> symbol ParameterDeclaration <*> children (manyTerm expression)
 
 methodDeclaration :: Assignment
-methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> children ((,,,,) <$> receiver <*> fieldIdentifier <*> many parameters <*> ((makeTerm <$> location <*> (manyTermsTill expression (void (symbol Block)))) <|> emptyTerm) <*> (block <|> emptyTerm))
+methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> children ((,,,,) <$> receiver <*> fieldIdentifier <*> manyTerm parameters <*> ((makeTerm <$> location <*> (manyTermsTill expression (void (symbol Block)))) <|> emptyTerm) <*> (block <|> emptyTerm))
   where
     receiver = symbol Parameters *> children ((symbol ParameterDeclaration *> children expressions) <|> expressions)
     mkTypedMethodDeclaration loc (receiver', name', parameters', type'', body') = makeTerm loc (Declaration.Method [type''] receiver' name' parameters' body')
