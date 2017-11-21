@@ -21,4 +21,6 @@ case string:
 	fmt.Println("i swapped by halves is", x[l:]+x[:l])
 default:
 }
+switch _ := s.(type) { // comment 
+}
 }

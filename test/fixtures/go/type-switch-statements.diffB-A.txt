@@ -121,4 +121,16 @@
           (Pattern
             (DefaultPattern
               ([]))
-            ([])))))))
+            ([]))))
+      (TypeSwitch
+        (Empty)
+        (
+          (TypeSwitchGuard
+            (
+              (Identifier)
+            { (Identifier)
+            ->(Identifier) }))
+          (Context
+          { (Comment)
+          ->(Comment) }
+            (Empty)))))))

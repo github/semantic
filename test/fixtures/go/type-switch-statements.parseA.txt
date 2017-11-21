@@ -95,4 +95,14 @@
           (Pattern
             (DefaultPattern
               ([]))
-            ([])))))))
+            ([]))))
+      (TypeSwitch
+        (Empty)
+        (
+          (TypeSwitchGuard
+            (
+              (Identifier)
+              (Identifier)))
+          (Context
+            (Comment)
+            (Empty)))))))
