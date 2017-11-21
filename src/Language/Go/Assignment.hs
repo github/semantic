@@ -454,7 +454,7 @@ expressionSwitchStatement = makeTerm <$> symbol ExpressionSwitchStatement <*> ch
 typeSwitchStatement :: Assignment
 typeSwitchStatement = makeTerm <$> symbol TypeSwitchStatement <*> children (Go.Syntax.TypeSwitch <$> _typeSwitchSubject <*> expressions)
   where
-    _typeSwitchSubject = makeTerm <$> location <*> manyTermsTill expression (void (symbol TypeCaseClause))
+    _typeSwitchSubject = makeTerm <$> location <*> manyTermsTill expression (void (symbol TypeCaseClause)) <|> emptyTerm
 
 typeSwitchGuard :: Assignment
 typeSwitchGuard = makeTerm <$> symbol Grammar.TypeSwitchGuard <*> children (Go.Syntax.TypeSwitchGuard <$> expressions)
