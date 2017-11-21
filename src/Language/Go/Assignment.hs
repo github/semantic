@@ -246,6 +246,9 @@ types =  arrayType
      <|> typeSwitchGuard
      <|> typeSwitchStatement
 
+program :: Assignment
+program = makeTerm <$> symbol SourceFile <*> children (Syntax.Program <$> many expression)
+
 -- Literals
 
 element :: Assignment
