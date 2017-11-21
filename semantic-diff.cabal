@@ -14,7 +14,6 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Algorithm
-                     , Alignment
                      , Category
                      , Data.Align.Generic
                      , Data.Blob
