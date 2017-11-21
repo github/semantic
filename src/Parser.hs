@@ -3,6 +3,7 @@ module Parser
 ( Parser(..)
 , SomeParser(..)
 , someParser
+, ApplyAll
 -- Syntax parsers
 , syntaxParserForLanguage
 -- À la carte parsers
