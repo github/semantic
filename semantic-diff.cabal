@@ -67,7 +67,6 @@ library
                      , Paths_semantic_diff
                      , Renderer
                      , Renderer.JSON
-                     , Renderer.Patch
                      , Renderer.SExpression
                      , Renderer.Tag
                      , Renderer.TOC
