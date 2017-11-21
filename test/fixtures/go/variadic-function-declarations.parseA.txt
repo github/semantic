@@ -9,19 +9,17 @@
   (Function
     (Empty)
     (Identifier)
-    (
-      (Variadic
-        (Pointer
-          (Identifier))
-        (Identifier)))
+    (Variadic
+      (Pointer
+        (Identifier))
+      (Identifier))
     ([]))
   (Function
     (Empty)
     (Identifier)
-    (
-      (Variadic
-        (Identifier)
-        (Empty)))
+    (Variadic
+      (Identifier)
+      (Empty))
     ([]))
   (Function
     (Empty)

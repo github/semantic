@@ -9,8 +9,7 @@
       (Annotation
         (Identifier)
         (Function
-          (
-            (Identifier))
+          (Identifier)
           (Identifier)))
       (Annotation
         (Identifier)

@@ -20,9 +20,8 @@
       (Identifier))
     (Identifier)
     (
-      (
-        (Identifier)
-        (Identifier)))
+      (Identifier)
+      (Identifier))
     ([]))
   (Method
     (
@@ -74,9 +73,8 @@
         (Identifier)))
     (Identifier)
     (
-      (
-        (Identifier)
-        (Identifier)))
+      (Identifier)
+      (Identifier))
     (
       (Assignment
         (MemberAccess

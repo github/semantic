@@ -11,11 +11,10 @@
         (Empty)
         (Empty)
         (
-          (
-          { (Identifier)
-          ->(Identifier) }
-          { (Identifier)
-          ->(Identifier) }))
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) })
         (
         { (Identifier)
         ->(Identifier) }
