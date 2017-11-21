@@ -564,7 +564,7 @@ forStatement = mkForStatement <$> symbol ForStatement <*> children ((,) <$> (for
                                                             "forEach" -> makeTerm loc $ (Statement.ForEach a b block')
                                                             _ -> makeTerm loc $ (Statement.For a b c block')
     emptyClause = children (("for",,,) <$> emptyTerm <*> emptyTerm <*> emptyTerm)
-    rangeClause = symbol RangeClause *> children ( (("forEach",,,) <$> expression <*> expression <*> emptyTerm)
+    rangeClause = symbol RangeClause *> children (  (("forEach",,,) <$> expression <*> expression <*> emptyTerm)
                                                 <|> (("forEach",,,) <$> emptyTerm <*> expression <*> emptyTerm))
     forClause = symbol ForClause *> children (  (("for",,,) <$> expression <*> expression <*> expression)
                                             <|> (("for",,,) <$> expression <*> expression <*> emptyTerm)
