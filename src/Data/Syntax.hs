@@ -3,6 +3,7 @@ module Data.Syntax where
 
 import Abstract.Eval
 import Abstract.Value
+import Abstract.Type
 import Abstract.Primitive
 import Abstract.Environment
 import Abstract.Store
@@ -120,7 +121,9 @@ instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Identifier
 instance (Monad m) => EvalCollect l (Value s a l) m s a Identifier
+instance (Monad m) => EvalCollect l Type m s a Identifier
 instance (Monad m) => Eval (Value s a l) m s a Identifier
+instance (Monad m) => Eval Type m s a Identifier
 
 newtype Program a = Program [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -130,8 +133,11 @@ instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Program
 instance (Monad m) => EvalCollect l (Value s a l) m s a Program
+instance (Monad m) => EvalCollect l Type m s a Program
 instance (Monad m) => Eval (Value s a l) m s a Program where
   eval ev (Program xs) = foldl (\_ a -> ev a) (pure (I PUnit)) xs
+instance (Monad m) => Eval Type m s a Program where
+  eval ev (Program xs) = foldl (\_ a -> ev a) (pure Unit) xs
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
@@ -153,8 +159,11 @@ instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 -- TODO: Define Value semantics for Empty
 instance (Monad m) => EvalCollect l (Value s a l) m s a Empty
+instance (Monad m) => EvalCollect l Type m s a Empty
 instance (Monad m) => Eval (Value s a l) m s a Empty where
   eval _ _ = pure (I PUnit)
+instance (Monad m) => Eval Type m s a Empty where
+  eval _ _ = pure Unit
 
 
 -- | Syntax representing a parsing or assignment error.
@@ -166,7 +175,9 @@ instance Ord1 Error where liftCompare = genericLiftCompare
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Define Value semantics for Error
 instance (Monad m) => EvalCollect l (Value s a l) m s a Error
+instance (Monad m) => EvalCollect l Type m s a Error
 instance (Monad m) => Eval (Value s a l) m s a Error
+instance (Monad m) => Eval Type m s a Error
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorExpected errorActual
@@ -202,11 +213,17 @@ instance Eq1 Context where liftEq = genericLiftEq
 instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 instance (Monad m) => EvalCollect l (Value s a l) m s a Context
+instance (Monad m) => EvalCollect l Type m s a Context
 instance (Monad m) => Eval (Value s a l) m s a Context where
+  eval ev Context{..} = ev contextSubject
+instance (Monad m) => Eval Type m s a Context where
   eval ev Context{..} = ev contextSubject
 
 -- TODO: Find a better place for this
 -- TODO: Define Value semantics for []
 instance Monad m => EvalCollect l (Value s a l) m s a []
+instance Monad m => EvalCollect l Type m s a []
 instance Monad m => Eval (Value s a l) m s a [] where
   eval _ _ = pure (I PUnit)
+instance Monad m => Eval Type m s a [] where
+  eval _ _ = pure Unit
