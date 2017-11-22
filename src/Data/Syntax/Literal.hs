@@ -29,11 +29,9 @@ false = Boolean False
 instance Eq1 Boolean where liftEq = genericLiftEq
 instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
-instance (Monad m) => EvalCollect l (Value s a l) m s a Boolean
-instance (Monad m) => EvalCollect l Type m s a Boolean
-instance (Monad m) => Eval (Value s a l) m s a Boolean where
+instance (Monad m) => Eval l (Value s a l) m s a Boolean where
   eval _ (Boolean x) = pure (I (PBool x))
-instance (Monad m) => Eval Type m s a Boolean where
+instance (Monad m) => Eval l Type m s a Boolean where
   eval _ (Boolean _) = pure Bool
 
 
@@ -46,10 +44,8 @@ newtype Integer a = Integer { integerContent :: ByteString }
 instance Eq1 Data.Syntax.Literal.Integer where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Integer where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShowsPrec
-instance (Monad m) => EvalCollect l (Value s a l) m s a Data.Syntax.Literal.Integer
-instance (Monad m) => EvalCollect l Type m s a Data.Syntax.Literal.Integer
-instance (Monad m) => Eval (Value s a l) m s a Data.Syntax.Literal.Integer
-instance (Monad m) => Eval Type m s a Data.Syntax.Literal.Integer
+instance (Monad m) => Eval l (Value s a l) m s a Data.Syntax.Literal.Integer
+instance (Monad m) => Eval l Type m s a Data.Syntax.Literal.Integer
 
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
 -- TODO: Do we care about differentiating between hex/octal/decimal/binary integer literals?
@@ -107,11 +103,9 @@ newtype TextElement a = TextElement { textElementContent :: ByteString }
 instance Eq1 TextElement where liftEq = genericLiftEq
 instance Ord1 TextElement where liftCompare = genericLiftCompare
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
-instance (Monad m) => EvalCollect l (Value s a l) m s a TextElement
-instance (Monad m) => EvalCollect l Type m s a TextElement
-instance (Monad m) => Eval (Value s a l) m s a TextElement where
+instance (Monad m) => Eval l (Value s a l) m s a TextElement where
   eval _ (TextElement x) = pure (I (PString x))
-instance (Monad m) => Eval Type m s a TextElement where
+instance (Monad m) => Eval l Type m s a TextElement where
   eval _ (TextElement _) = pure Abstract.Type.String
 
 data Null a = Null

@@ -83,9 +83,8 @@ instance (NonDetEff :< fs) => MonadNonDet (Eff fs) where
 -- Coinductively-cached evaluation
 --
 -- Examples:
---    evalCache @Monovariant @Type @Syntax (makeLam "x" (var "x") # true)
---    evalCache @Precise @(Value Syntax Precise) @Syntax (makeLam "x" (var "x") # true)
-
+--    Files.readFile "test.py" (Just Python) >>= runTask . parse pythonParser2 >>= pure . evalCache @Monovariant @Type
+--    Files.readFile "test.py" (Just Python) >>= runTask . parse pythonParser2 >>= pure . evalCache @Precise @(Value (Data.Union.Union Language.Python.Assignment2.Syntax) (Record Location) Precise)
 evalCache :: forall l v syntax ann
           . ( Ord v
             , Ord l
@@ -97,7 +96,7 @@ evalCache :: forall l v syntax ann
             , MonadPrim v (Eff (CachingInterpreter l (Term syntax ann) v))
             , Semigroup (Cell l v)
             , AbstractValue l v
-            , EvalCollect l v (Eff (CachingInterpreter l (Term syntax ann) v)) syntax ann (TermF syntax ann)
+            , Eval l v (Eff (CachingInterpreter l (Term syntax ann) v)) syntax ann (TermF syntax ann)
             )
           => Term syntax ann
           -> CachingResult l (Term syntax ann) v
@@ -144,7 +143,7 @@ fixCache :: forall l t v m
            )
          => Eval' t (m v)
          -> Eval' t (m v)
-fixCache eval e = do
+fixCache ev e = do
   env <- askEnv
   store <- getStore
   roots <- askRoots
@@ -153,7 +152,7 @@ fixCache eval e = do
     putCache (mempty :: Cache l t v)
     putStore store
     reset 0
-    _ <- localCache (const dollar) (collect point (eval e) :: m (Set v))
+    _ <- localCache (const dollar) (collect point (ev e) :: m (Set v))
     getCache)
   asum . flip map (maybe [] toList (cacheLookup c pairs)) $ \ (value, store') -> do
     putStore store'

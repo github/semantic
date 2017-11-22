@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances, MonoLocalBinds #-}
 module Abstract.Interpreter.Collecting where
 
 import Abstract.Environment
@@ -54,8 +54,8 @@ evRoots :: forall l v m syntax ann
            , MonadGC l v m
            , MonadPrim v m
            , AbstractValue l v
-           , EvalCollect l v m syntax ann (TermF syntax ann)
+           , Eval l v m syntax ann (TermF syntax ann)
            )
         => Eval' (Term syntax ann) (m v)
         -> Eval' (Term syntax ann) (m v)
-evRoots ev = evalCollect @l ev . unTerm
+evRoots ev = eval @l ev . unTerm

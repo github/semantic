@@ -35,11 +35,6 @@ class Monad m => MonadTrace l t v g m where
 instance (Writer (g (Configuration l t v)) :< fs) => MonadTrace l t v g (Eff fs) where
   trace = tell
 
--- instance (Ord l, Reader (Set (Address l a)) :< fs) => MonadGC l a (Eff fs) where
---   askRoots = ask :: Eff fs (Set (Address l a))
---
---   extraRoots roots' = local (<> roots')
-
 -- Tracing and reachable state analyses
 --
 -- Examples
@@ -52,10 +47,10 @@ evalTrace :: forall l v syntax ann
             , MonadPrim v (Eff (TraceInterpreter l (Term syntax ann) v))
             , MonadGC l v (Eff (TraceInterpreter l (Term syntax ann) v))
             , Semigroup (Cell l v)
-            , Eval v (Eff (TraceInterpreter l (Term syntax ann) v)) syntax ann syntax
+            , Eval l v (Eff (TraceInterpreter l (Term syntax ann) v)) syntax ann syntax
             )
           => Eval' (Term syntax ann) (TraceResult l (Term syntax ann) v [])
-evalTrace = run @(TraceInterpreter l (Term syntax ann) v) . fix (evTell @l @(Term syntax ann) @v @[] ev)
+evalTrace = run @(TraceInterpreter l (Term syntax ann) v) . fix (evTell @l @(Term syntax ann) @v @[] (ev @l))
 
 evalReach :: forall l v syntax ann
           . ( Ord v, Ord ann, Ord l, Ord1 (Cell l), Ord1 syntax
@@ -63,10 +58,10 @@ evalReach :: forall l v syntax ann
             , MonadPrim v (Eff (ReachableStateInterpreter l (Term syntax ann) v))
             , MonadGC l v (Eff (ReachableStateInterpreter l (Term syntax ann) v))
             , Semigroup (Cell l v)
-            , Eval v (Eff (ReachableStateInterpreter l (Term syntax ann) v)) syntax ann syntax
+            , Eval l v (Eff (ReachableStateInterpreter l (Term syntax ann) v)) syntax ann syntax
             )
           => Eval' (Term syntax ann) (TraceResult l (Term syntax ann) v Set.Set)
-evalReach = run @(ReachableStateInterpreter l (Term syntax ann) v) . fix (evTell @l @(Term syntax ann) @v @Set.Set ev)
+evalReach = run @(ReachableStateInterpreter l (Term syntax ann) v) . fix (evTell @l @(Term syntax ann) @v @Set.Set (ev @l))
 
 
 evTell :: forall l t v g m
