@@ -47,7 +47,6 @@ library
                      , Info
                      , Interpreter
                      , Language
-                     , Language.Markdown
                      , Language.Markdown.Assignment
                      , Language.Markdown.Syntax
                      , Language.Go
@@ -63,6 +62,7 @@ library
                      , Language.Python.Grammar
                      , Language.Python.Syntax
                      , Parser
+                     , Parser.CMark
                      , Parser.TreeSitter
                      , Paths_semantic_diff
                      , Renderer

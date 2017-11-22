@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, TypeOperators #-}
-module Language.Markdown
+module Parser.CMark
 ( Grammar(..)
 , cmarkParser
 , toGrammar

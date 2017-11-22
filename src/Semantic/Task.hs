@@ -48,8 +48,8 @@ import Decorator (RAlgebra, decoratorWithAlgebra)
 import Info hiding (Category(..))
 import qualified Files
 import Language
-import Language.Markdown
 import Parser
+import Parser.CMark
 import Parser.TreeSitter
 import System.Exit (die)
 import System.IO (Handle, stderr)

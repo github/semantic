@@ -19,7 +19,7 @@ import qualified Data.Text as Text
 import Data.Text.Encoding (encodeUtf8)
 import Data.Union
 import GHC.Stack
-import Language.Markdown as Grammar (Grammar(..))
+import Parser.CMark as Grammar (Grammar(..))
 import qualified Language.Markdown.Syntax as Markup
 
 type Syntax =
