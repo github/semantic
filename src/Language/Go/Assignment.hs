@@ -443,12 +443,13 @@ unaryExpression :: Assignment
 unaryExpression = symbol UnaryExpression >>= \ location -> (notExpression location) <|> (unaryMinus location) <|> unaryPlus <|> unaryAmpersand <|> unaryReceive <|> unaryPointer <|> unaryComplement
   where
     notExpression location = makeTerm location . Expression.Not <$> children (symbol AnonBang *> expression)
-    unaryMinus location    = makeTerm location . Expression.Negate <$> children (symbol AnonMinus *> expression)
-    unaryPlus = children (symbol AnonPlus *> expression)
+    unaryMinus location = makeTerm location . Expression.Negate <$> children (symbol AnonMinus *> expression)
+
     unaryAmpersand = children (makeTerm <$> symbol AnonAmpersand <*> (Literal.Reference <$> expression))
-    unaryReceive = children (symbol AnonLAngleMinus *> expression)
-    unaryPointer = children (makeTerm <$> symbol AnonStar <*> (Literal.Pointer <$> expression))
     unaryComplement = children (makeTerm <$> symbol AnonCaret <*> (Expression.Complement <$> expression))
+    unaryPlus = children (symbol AnonPlus *> expression)
+    unaryPointer = children (makeTerm <$> symbol AnonStar <*> (Literal.Pointer <$> expression))
+    unaryReceive = children (symbol AnonLAngleMinus *> expression)
 
 varDeclaration :: Assignment
 varDeclaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
