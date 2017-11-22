@@ -9,20 +9,20 @@ import Data.Union
 
 -- Standard evaluator/interpreter
 class Monad m => Eval v m syntax ann constr where
-  evaluate :: (Term syntax ann -> m v) -> constr (Term syntax ann) -> m v
+  eval :: (Term syntax ann -> m v) -> constr (Term syntax ann) -> m v
 
-  default evaluate :: (Term syntax ann -> m v) -> constr (Term syntax ann) -> m v
-  evaluate = fail "default evalute"
+  default eval :: (Term syntax ann -> m v) -> constr (Term syntax ann) -> m v
+  eval = fail "default evalute"
 
 
 instance ( Monad m
          , Apply (Eval v m s a) fs
          )
          => Eval v m s a (Union fs) where
-  evaluate ev = apply (Proxy :: Proxy (Eval v m s a)) (evaluate ev)
+  eval ev = apply (Proxy :: Proxy (Eval v m s a)) (eval ev)
 
 instance (Monad m, Eval v m s a s) => Eval v m s a (TermF s a) where
-  evaluate ev In{..} = evaluate ev termOut
+  eval ev In{..} = eval ev termOut
 
 
 -- Collecting evaluator
@@ -33,7 +33,7 @@ class Monad m => EvalCollect l v m syntax ann constr where
   default evalCollect :: (Eval v m syntax ann constr) => (Term syntax ann -> m v)
                       -> constr (Term syntax ann)
                       -> m v
-  evalCollect = evaluate
+  evalCollect = eval
 
 instance ( Monad m
          , Apply (EvalCollect l v m s a) fs

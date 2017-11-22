@@ -29,7 +29,7 @@ instance Eq1 Boolean where liftEq = genericLiftEq
 instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 instance (Monad m) => Eval (Value s a l) m s a Boolean where
-  evaluate _ (Boolean x) = pure (I (PBool x))
+  eval _ (Boolean x) = pure (I (PBool x))
 
 
 -- Numeric
@@ -100,7 +100,7 @@ instance Eq1 TextElement where liftEq = genericLiftEq
 instance Ord1 TextElement where liftCompare = genericLiftCompare
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 instance (Monad m) => Eval (Value s a l) m s a TextElement where
-  evaluate _ (TextElement x) = pure (I (PString x))
+  eval _ (TextElement x) = pure (I (PString x))
 
 data Null a = Null
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

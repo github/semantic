@@ -29,19 +29,19 @@ type Eval' t m = t -> m
 
 -- Evaluate an expression.
 -- Example:
---    eval @Precise @(Value Syntax Precise) @Syntax (makeLam "x" (var "x") # true)
---    Files.readFile "test.py" (Just Python) >>= runTask . parse pythonParser2 >>= pure . eval @Precise @(Value (Data.Union.Union Language.Python.Assignment2.Syntax) (Record Location) Precise) @(Data.Union.Union Language.Python.Assignment2.Syntax) @(Record Location)
-eval :: forall l v syntax ann
-     . ( Ord v
-       , Eval v (Eff (Interpreter l v)) syntax ann syntax
-       , MonadAddress l (Eff (Interpreter l v))
-       , MonadPrim v (Eff (Interpreter l v))
-       , Semigroup (Cell l v))
-     => Term syntax ann
-     -> EvalResult l v
-eval = run @(Interpreter l v) . fix ev
+--    evaluate @Precise @(Value Syntax Precise) @Syntax (makeLam "x" (var "x") # true)
+--    Files.readFile "test.py" (Just Python) >>= runTask . parse pythonParser2 >>= pure . evaluate @Precise @(Value (Data.Union.Union Language.Python.Assignment2.Syntax) (Record Location) Precise) @(Data.Union.Union Language.Python.Assignment2.Syntax) @(Record Location)
+evaluate :: forall l v syntax ann
+         . ( Ord v
+           , Eval v (Eff (Interpreter l v)) syntax ann syntax
+           , MonadAddress l (Eff (Interpreter l v))
+           , MonadPrim v (Eff (Interpreter l v))
+           , Semigroup (Cell l v))
+         => Term syntax ann
+         -> EvalResult l v
+evaluate = run @(Interpreter l v) . fix ev
 
 ev :: (Eval v m syntax ann syntax)
    => (Term syntax ann -> m v)
    -> Term syntax ann -> m v
-ev ev = evaluate ev . unTerm
+ev ev' = eval ev' . unTerm

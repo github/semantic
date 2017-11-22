@@ -129,7 +129,7 @@ instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Program
 instance (Monad m) => Eval (Value s a l) m s a Program where
-  evaluate ev (Program xs) = foldl (\_ a -> ev a) (pure (I PNoOp)) xs
+  eval ev (Program xs) = foldl (\_ a -> ev a) (pure (I PNoOp)) xs
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
@@ -151,7 +151,7 @@ instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 -- TODO: Define Value semantics for Empty
 instance (Monad m) => Eval (Value s a l) m s a Empty where
-  evaluate _ _ = pure (I PNoOp)
+  eval _ _ = pure (I PNoOp)
 
 
 -- | Syntax representing a parsing or assignment error.
@@ -198,9 +198,9 @@ instance Eq1 Context where liftEq = genericLiftEq
 instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 instance (Monad m) => Eval (Value s a l) m s a Context where
-  evaluate ev Context{..} = ev contextSubject
+  eval ev Context{..} = ev contextSubject
 
 -- TODO: Find a better place for this
 -- TODO: Define Value semantics for []
 instance Monad m => Eval (Value s a l) m s a [] where
-  evaluate _ _ = pure (I PNoOp)
+  eval _ _ = pure (I PNoOp)
