@@ -119,22 +119,22 @@ spec = parallel $ do
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe` []
 
-    prop "inserts of methods and functions are summarized" $
-      \name body ->
+    prop "inserts of methods and functions are summarized" . forAll ((not . isMethodOrFunction . Prelude.snd) `filterT` tiers) $
+      \(name, body) ->
         let diff = programWithInsert name body
         in numTocSummaries diff `shouldBe` 1
 
-    prop "deletes of methods and functions are summarized" $
-      \name body ->
+    prop "deletes of methods and functions are summarized" . forAll ((not . isMethodOrFunction . Prelude.snd) `filterT` tiers) $
+      \(name, body) ->
         let diff = programWithDelete name body
         in numTocSummaries diff `shouldBe` 1
 
-    prop "replacements of methods and functions are summarized" $
-      \name body ->
+    prop "replacements of methods and functions are summarized" . forAll ((not . isMethodOrFunction . Prelude.snd) `filterT` tiers) $
+      \(name, body) ->
         let diff = programWithReplace name body
         in numTocSummaries diff `shouldBe` 1
 
-    prop "changes inside methods and functions are summarizied" . forAll (isMeaningfulTerm `filterT` tiers) $
+    prop "changes inside methods and functions are summarizied" . forAll (((&&) <$> not . isMethodOrFunction <*> isMeaningfulTerm) `filterT` tiers) $
       \body ->
         let diff = programWithChange body
         in numTocSummaries diff `shouldBe` 1
