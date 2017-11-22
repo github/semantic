@@ -136,11 +136,15 @@ class CustomConstructorName syntax where
 instance Apply ConstructorName fs => CustomConstructorName (Union fs) where
   customConstructorName = apply (Proxy :: Proxy ConstructorName) constructorName
 
+instance CustomConstructorName [] where
+  customConstructorName _ = ""
+
 data Strategy = Default | Custom
 
 type family ConstructorNameStrategy syntax where
   ConstructorNameStrategy (Union _) = 'Custom
-  ConstructorNameStrategy syntax = 'Default
+  ConstructorNameStrategy []        = 'Custom
+  ConstructorNameStrategy syntax    = 'Default
 
 class ConstructorNameWithStrategy (strategy :: Strategy) syntax where
   constructorNameWithStrategy :: proxy strategy -> syntax a -> String
@@ -163,6 +167,4 @@ instance (GConstructorName f, GConstructorName g) => GConstructorName (f :+: g) 
   gconstructorName (R1 r) = gconstructorName r
 
 instance Constructor c => GConstructorName (M1 C c f) where
-  gconstructorName x = case conName x of
-                        ":" -> ""
-                        n -> n
+  gconstructorName = conName
