@@ -10,7 +10,6 @@ import Data.Diff
 import Data.Functor.Both
 import Data.Functor.Foldable (cata)
 import Data.Functor.Listable
-import Data.Functor.Foldable (cata)
 import Data.Maybe (fromMaybe)
 import Data.Monoid (Last(..))
 import Data.Output
