@@ -560,8 +560,7 @@ returnStatement :: Assignment
 returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (expression <|> emptyTerm))
 
 receiveStatement :: Assignment
-receiveStatement = makeTerm <$> symbol ReceiveStatement <*> children (  (Go.Syntax.Receive <$> expression <*> expression)
-                                                                    <|> (Go.Syntax.Receive <$> emptyTerm <*> expression))
+receiveStatement = makeTerm <$> symbol ReceiveStatement <*> children (Go.Syntax.Receive <$> (expression <|> emptyTerm) <*> expression)
 
 shortVarDeclaration :: Assignment
 shortVarDeclaration = makeTerm <$> symbol ShortVarDeclaration <*> children (Statement.Assignment <$> pure [] <*> expression <*> expression)
