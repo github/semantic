@@ -23,13 +23,6 @@ instance Eq1 Annotation where liftEq = genericLiftEq
 instance Ord1 Annotation where liftCompare = genericLiftCompare
 instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
 
-data Alias a = Alias { aliasSubject :: !a, aliasType :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
-
-instance Eq1 Alias where liftEq = genericLiftEq
-instance Ord1 Alias where liftCompare = genericLiftCompare
-instance Show1 Alias where liftShowsPrec = genericLiftShowsPrec
-
 data Function a = Function { functionParameters :: [a], functionReturn :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
