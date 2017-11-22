@@ -62,11 +62,10 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
 
     diffCommand = command "diff" (info diffArgumentsParser (progDesc "Show changes between commits or paths"))
     diffArgumentsParser = runDiff
-      <$> (   flag  (SomeRenderer PatchDiffRenderer) (SomeRenderer PatchDiffRenderer)       (long "patch" <> help "Output patch(1)-compatible diff (default)")
-          <|> flag'                                  (SomeRenderer JSONDiffRenderer)        (long "json" <> help "Output JSON diff trees")
-          <|> flag'                                  (SomeRenderer SExpressionDiffRenderer) (long "sexpression" <> help "Output s-expression diff tree")
-          <|> flag'                                  (SomeRenderer OldToCDiffRenderer)      (long "toc" <> help "Output JSON table of contents diff summary")
-          <|> flag'                                  (SomeRenderer ToCDiffRenderer)         (long "toc-assignment" <> help "Output JSON table of contents diff summary using the assignment parser") )
+      <$> (   flag  (SomeRenderer SExpressionDiffRenderer) (SomeRenderer SExpressionDiffRenderer) (long "sexpression" <> help "Output s-expression diff tree")
+          <|> flag'                                        (SomeRenderer JSONDiffRenderer)        (long "json" <> help "Output JSON diff trees")
+          <|> flag'                                        (SomeRenderer OldToCDiffRenderer)      (long "toc" <> help "Output JSON table of contents diff summary")
+          <|> flag'                                        (SomeRenderer ToCDiffRenderer)         (long "toc-assignment" <> help "Output JSON table of contents diff summary using the assignment parser") )
       <*> (   Right <$> some (both
           <$> argument filePathReader (metavar "FILE_A")
           <*> argument filePathReader (metavar "FILE_B"))
