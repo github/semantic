@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, FunctionalDependencies, AllowAmbiguousTypes, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, FunctionalDependencies, AllowAmbiguousTypes, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeOperators, UndecidableInstances, MonoLocalBinds #-}
 module Abstract.Value where
 
 import Abstract.Environment
@@ -6,6 +6,7 @@ import Abstract.Primitive
 import Abstract.Set
 import Abstract.Store
 import Abstract.Type
+import Abstract.Eval
 import Abstract.FreeVariables
 import Data.Term
 import Control.Monad hiding (fail)
@@ -80,3 +81,8 @@ instance AbstractValue Monovariant Type where
   literal (PBool _)   = Bool
   literal (PString _) = String
   literal PUnit       = Unit
+
+
+-- Eval instances
+instance Monad m => Eval l (Value s a l) m s a [] where
+  eval _ _ = pure (I PUnit)

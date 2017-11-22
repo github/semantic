@@ -5,11 +5,7 @@ import Abstract.Eval
 import Abstract.Value
 import Abstract.Type
 import Abstract.Primitive
-import Abstract.Environment
-import Abstract.Store
-import Control.Monad hiding (fail)
 import Control.Monad.Effect
-import Control.Monad.Fail
 import Algorithm hiding (Empty)
 import Control.Applicative
 import Control.Monad.Error.Class hiding (Error)
@@ -33,7 +29,6 @@ import Data.Term
 import Data.Union
 import GHC.Generics
 import GHC.Stack
-import Data.ByteString.Char8 (unpack)
 
 -- Combinators
 
@@ -208,10 +203,3 @@ instance (Monad m) => Eval l (Value s a l) m s a Context where
   eval ev Context{..} = ev contextSubject
 instance (Monad m) => Eval l Type m s a Context where
   eval ev Context{..} = ev contextSubject
-
--- TODO: Find a better place for this
--- TODO: Define Value semantics for []
-instance Monad m => Eval l (Value s a l) m s a [] where
-  eval _ _ = pure (I PUnit)
-instance Monad m => Eval l Type m s a [] where
-  eval _ _ = pure Unit
