@@ -9,7 +9,7 @@ module Semantic
 
 import Algorithm (Diffable)
 import Control.Exception
-import Control.Monad ((<=<))
+import Control.Monad ((<=<), (>=>))
 import Control.Monad.Error.Class
 import Data.Align.Generic
 import Data.Bifoldable
@@ -46,32 +46,22 @@ parseBlobs renderer = fmap toOutput . distributeFoldMap (parseBlob renderer) . f
 
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
 parseBlob :: TermRenderer output -> Blob -> Task output
-parseBlob renderer blob@Blob{..} = case (renderer, blobLanguage) of
-  (ToCTermRenderer, lang)
-    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[HasDeclaration, Foldable, Functor]) ->
-      parse parser blob >>= decorate (declarationAlgebra blob) >>= render (renderToCTerm blob)
-    | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
-      parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob) >>= render (renderToCTerm blob)
+parseBlob renderer blob@Blob{..}
+  | Just (SomeParser parser) <- blobLanguage >>= someParser (Proxy :: Proxy '[ConstructorName, HasDeclaration, Foldable, Functor, ToJSONFields1])
+  = parse parser blob >>= case renderer of
+    ToCTermRenderer         -> decorate (declarationAlgebra blob)   >=> render (renderToCTerm  blob)
+    JSONTermRenderer        -> decorate constructorLabel            >=> render (renderJSONTerm blob)
+    SExpressionTermRenderer -> decorate constructorLabel . (Nil <$) >=> render renderSExpressionTerm
+    TagsTermRenderer        -> decorate (declarationAlgebra blob)   >=> render (renderToTags blob)
 
-  (JSONTermRenderer, lang)
-    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Functor, ToJSONFields1]) ->
-      parse parser blob >>= decorate constructorLabel >>= render (renderJSONTerm blob)
-    | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
-      parse syntaxParser blob >>= decorate syntaxIdentifierAlgebra >>= render (renderJSONTerm blob)
+  | Just parser <- blobLanguage >>= syntaxParserForLanguage
+  = parse parser blob >>= case renderer of
+    ToCTermRenderer         -> decorate (syntaxDeclarationAlgebra blob) >=> render (renderToCTerm blob)
+    JSONTermRenderer        -> decorate syntaxIdentifierAlgebra         >=> render (renderJSONTerm blob)
+    SExpressionTermRenderer ->                                              render renderSExpressionTerm . fmap keepCategory
+    TagsTermRenderer        -> decorate (syntaxDeclarationAlgebra blob) >=> render (renderToTags blob)
 
-  (SExpressionTermRenderer, lang)
-    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Foldable, Functor]) ->
-      parse parser blob >>= decorate constructorLabel . (Nil <$) >>= render renderSExpressionTerm
-    | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
-      parse syntaxParser blob >>= render renderSExpressionTerm . fmap keepCategory
-
-  (TagsTermRenderer, lang)
-    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[HasDeclaration, Foldable, Functor]) ->
-      parse parser blob >>= decorate (declarationAlgebra blob) >>= render (renderToTags blob)
-    | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
-      parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob) >>= render (renderToTags blob)
-
-  _ -> throwError (SomeException (NoParserForLanguage blobPath blobLanguage))
+  | otherwise = throwError (SomeException (NoParserForLanguage blobPath blobLanguage))
 
 data NoParserForLanguage = NoParserForLanguage FilePath (Maybe Language.Language)
   deriving (Eq, Exception, Ord, Show, Typeable)
