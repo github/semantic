@@ -21,9 +21,7 @@ library
                      , Abstract.FreeVariables
                      , Abstract.Interpreter
                      , Abstract.Interpreter.Caching
-                     , Abstract.Interpreter.Collecting
                      , Abstract.Interpreter.Dead
-                     -- , Abstract.Interpreter.Symbolic
                      , Abstract.Interpreter.Tracing
                      , Abstract.Primitive
                      , Abstract.Set

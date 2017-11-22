@@ -1,11 +1,13 @@
-{-# LANGUAGE UndecidableInstances, AllowAmbiguousTypes, ConstraintKinds, DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeOperators #-}
+{-# LANGUAGE UndecidableInstances, AllowAmbiguousTypes, ConstraintKinds, DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeOperators, MonoLocalBinds #-}
 module Abstract.Interpreter where
 
 import Abstract.Environment
+import Abstract.Eval
 import Abstract.Primitive
+import Abstract.Set
 import Abstract.Store
 import Abstract.Type
-import Abstract.Eval
+import Abstract.Value
 import Data.Term
 
 import Control.Effect
@@ -40,8 +42,48 @@ evaluate :: forall l v syntax ann
          -> EvalResult l v
 evaluate = run @(Interpreter l v) . fix (ev @l)
 
+
 ev :: forall l v m syntax ann
    . (Eval l v m syntax ann syntax)
    => (Term syntax ann -> m v)
    -> Term syntax ann -> m v
 ev ev' = eval @l ev' . unTerm
+
+gc :: (Ord l, Foldable (Cell l), AbstractValue l a) => Set (Address l a) -> Store l a -> Store l a
+gc roots store = storeRestrict store (reachable roots store)
+
+reachable :: (Ord l, Foldable (Cell l), AbstractValue l a) => Set (Address l a) -> Store l a -> Set (Address l a)
+reachable roots store = go roots mempty
+  where go set seen = case split set of
+          Nothing -> seen
+          Just (a, as)
+            | Just values <- storeLookupAll a store -> go (difference (foldr ((<>) . valueRoots) mempty values <> as) seen) (insert a seen)
+            | otherwise -> go seen (insert a seen)
+
+evCollect :: forall l t v m
+          .  ( Ord l
+             , Foldable (Cell l)
+             , MonadStore l v m
+             , MonadGC l v m
+             , AbstractValue l v
+             )
+          => (Eval' t (m v) -> Eval' t (m v))
+          -> Eval' t (m v)
+          -> Eval' t (m v)
+evCollect ev0 ev e = do
+  roots <- askRoots :: m (Set (Address l v))
+  v <- ev0 ev e
+  modifyStore (gc (roots <> valueRoots v))
+  return v
+
+evRoots :: forall l v m syntax ann
+        .  ( Ord l
+           , MonadEnv l v m
+           , MonadGC l v m
+           , MonadPrim v m
+           , AbstractValue l v
+           , Eval l v m syntax ann (TermF syntax ann)
+           )
+        => Eval' (Term syntax ann) (m v)
+        -> Eval' (Term syntax ann) (m v)
+evRoots ev = eval @l ev . unTerm

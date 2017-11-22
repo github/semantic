@@ -5,7 +5,6 @@ import Abstract.Configuration
 import Abstract.Environment
 import Abstract.Eval
 import Abstract.Interpreter
-import Abstract.Interpreter.Collecting()
 import Abstract.Primitive
 import Abstract.Set
 import Abstract.Store
