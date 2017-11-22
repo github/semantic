@@ -79,3 +79,4 @@ instance AbstractValue Monovariant Type where
   literal (PInt _)    = Int
   literal (PBool _)   = Bool
   literal (PString _) = String
+  literal PNoOp       = NoOp

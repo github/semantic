@@ -118,6 +118,8 @@ newtype Identifier a = Identifier ByteString
 instance Eq1 Identifier where liftEq = genericLiftEq
 instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
+-- TODO: Implement Eval instance for Identifier
+instance (Monad m) => Eval (Value s a l) m s a Identifier
 
 newtype Program a = Program [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -125,8 +127,9 @@ newtype Program a = Program [a]
 instance Eq1 Program where liftEq = genericLiftEq
 instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
+-- TODO: Implement Eval instance for Program
 instance (Monad m) => Eval (Value s a l) m s a Program where
-  evaluate ev (Program xs) = foldl (\_ a -> ev a) (pure (I Noop)) xs
+  evaluate ev (Program xs) = foldl (\_ a -> ev a) (pure (I PNoOp)) xs
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
@@ -146,8 +149,9 @@ data Empty a = Empty
 instance Eq1 Empty where liftEq _ _ _ = True
 instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
+-- TODO: Define Value semantics for Empty
 instance (Monad m) => Eval (Value s a l) m s a Empty where
-  evaluate _ _ = pure (I Noop)
+  evaluate _ _ = pure (I PNoOp)
 
 
 -- | Syntax representing a parsing or assignment error.
@@ -157,6 +161,7 @@ data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
+-- TODO: Define Value semantics for Error
 instance (Monad m) => Eval (Value s a l) m s a Error
 
 errorSyntax :: Error.Error String -> [a] -> Error a
@@ -196,5 +201,6 @@ instance (Monad m) => Eval (Value s a l) m s a Context where
   evaluate ev Context{..} = ev contextSubject
 
 -- TODO: Find a better place for this
+-- TODO: Define Value semantics for []
 instance Monad m => Eval (Value s a l) m s a [] where
-  evaluate _ _ = pure (I Noop)
+  evaluate _ _ = pure (I PNoOp)
