@@ -9,7 +9,7 @@ module Semantic
 
 import Algorithm (Diffable)
 import Control.Exception
-import Control.Monad ((<=<), (>=>))
+import Control.Monad ((>=>))
 import Control.Monad.Error.Class
 import Data.Align.Generic
 import Data.Bifoldable
@@ -72,52 +72,47 @@ diffBlobPairs renderer = fmap toOutput . distributeFoldMap (diffBlobPair rendere
 
 -- | A task to parse a pair of 'Blob's, diff them, and render the 'Diff'.
 diffBlobPair :: DiffRenderer output -> Both Blob -> Task output
-diffBlobPair renderer blobs = case (renderer, effectiveLanguage) of
-  (OldToCDiffRenderer, lang)
-    | elem lang $ fmap Just [
-        Language.JSX,
-        Language.JavaScript,
-        Language.Markdown,
-        Language.Python,
-        Language.Ruby,
-        Language.TypeScript
-      ]
-    , Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, HasDeclaration, Show1, Traversable]) ->
-      run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob)) diffTerms (renderToCDiff blobs)
-    | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
-      run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms (renderToCDiff blobs)
+diffBlobPair renderer blobs
+  | Just (SomeParser parser) <- effectiveLanguage >>= qualify >>= someParser (Proxy :: Proxy '[ConstructorName, Diffable, Eq1, GAlign, HasDeclaration, Show1, ToJSONFields1, Traversable])
+  = case renderer of
+    OldToCDiffRenderer      -> run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))   diffTerms renderToCDiff
+    ToCDiffRenderer         -> run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))   diffTerms renderToCDiff
+    JSONDiffRenderer        -> run (          parse parser)                                               diffTerms renderJSONDiff
+    SExpressionDiffRenderer -> run (          parse parser      >=> decorate constructorLabel . (Nil <$)) diffTerms (const renderSExpressionDiff)
 
-  (ToCDiffRenderer, lang)
-    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, HasDeclaration, Show1, Traversable]) ->
-      run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob)) diffTerms (renderToCDiff blobs)
-    | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
-      run (\ blob -> parse syntaxParser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms (renderToCDiff blobs)
+  | Just parser <- effectiveLanguage >>= syntaxParserForLanguage
+  = case renderer of
+    OldToCDiffRenderer      -> run (\ blob -> parse parser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms renderToCDiff
+    ToCDiffRenderer         -> run (\ blob -> parse parser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms renderToCDiff
+    JSONDiffRenderer        -> run (          parse parser      >=> decorate syntaxIdentifierAlgebra)         diffSyntaxTerms renderJSONDiff
+    SExpressionDiffRenderer -> run (          parse parser      >=> pure . fmap keepCategory)                 diffSyntaxTerms (const renderSExpressionDiff)
 
-  (JSONDiffRenderer, lang)
-    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[Diffable, Eq1, Foldable, Functor, GAlign, Show1, ToJSONFields1, Traversable]) ->
-      run (parse parser) diffTerms (renderJSONDiff blobs)
-    | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
-      run (decorate syntaxIdentifierAlgebra <=< parse syntaxParser) diffSyntaxTerms (renderJSONDiff blobs)
-
-  (SExpressionDiffRenderer, lang)
-    | Just (SomeParser parser) <- lang >>= someParser (Proxy :: Proxy '[ConstructorName, Diffable, Eq1, Foldable, Functor, GAlign, Show1, Traversable]) ->
-      run (decorate constructorLabel . (Nil <$) <=< parse parser) diffTerms renderSExpressionDiff
-    | Just syntaxParser <- lang >>= syntaxParserForLanguage ->
-      run (fmap (fmap keepCategory) . parse syntaxParser) diffSyntaxTerms renderSExpressionDiff
-
-  _ -> throwError (SomeException (NoParserForLanguage effectivePath effectiveLanguage))
+  | otherwise = throwError (SomeException (NoParserForLanguage effectivePath effectiveLanguage))
   where (effectivePath, effectiveLanguage) = case runJoin blobs of
           (Blob { blobLanguage = Just lang, blobPath = path }, _) -> (path, Just lang)
           (_, Blob { blobLanguage = Just lang, blobPath = path }) -> (path, Just lang)
           (Blob { blobPath = path }, _)                           -> (path, Nothing)
 
-        run :: (Foldable syntax, Functor syntax) => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Diff syntax ann ann -> output) -> Task output
+        qualify language
+          | OldToCDiffRenderer <- renderer
+          , language `notElem`
+            [ Language.JSX
+            , Language.JavaScript
+            , Language.Markdown
+            , Language.Python
+            , Language.Ruby
+            , Language.TypeScript
+            ]
+          = Nothing
+          | otherwise = Just language
+
+        run :: (Foldable syntax, Functor syntax) => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Both Blob -> Diff syntax ann ann -> output) -> Task output
         run parse diff renderer = do
           terms <- distributeFor blobs parse
           time "diff" languageTag $ do
             diff <- runBothWith (diffTermPair blobs diff) terms
             writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
-            render renderer diff
+            render (renderer blobs) diff
           where
             showLanguage = pure . (,) "language" . show
             languageTag = let (a, b) = runJoin blobs
