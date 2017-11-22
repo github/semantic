@@ -10,7 +10,7 @@ import Data.Diff
 import Data.Functor.Both
 import Data.Functor.Foldable (cata)
 import Data.Functor.Listable
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, isJust)
 import Data.Monoid (Last(..))
 import Data.Output
 import Data.Patch
@@ -231,10 +231,11 @@ isMeaningfulTerm a
   | otherwise                              = True
 
 -- Filter tiers for terms if the Syntax is a Method or a Function.
-isMethodOrFunction :: Term ListableSyntax ann -> Bool
+isMethodOrFunction :: Term' -> Bool
 isMethodOrFunction a
   | Just Declaration.Method{}   <- prj (termOut (unTerm a)) = True
   | Just Declaration.Function{} <- prj (termOut (unTerm a)) = True
+  | any isJust (foldMap ((:[]) . rhead) a)                  = True
   | otherwise                                               = False
 
 blobsForPaths :: Both FilePath -> IO (Both Blob)
