@@ -32,7 +32,6 @@ import Language
 import Prelude hiding (readFile)
 import Renderer
 import Renderer.TOC
-import RWS
 import Semantic
 import Semantic.Task
 import Semantic.Util
@@ -144,9 +143,8 @@ spec = parallel $ do
         let diff = programWithChangeOutsideFunction body
         in numTocSummaries diff `shouldBe` 0
 
-    prop "equal terms produce identity diffs" $
-      \a -> let term = defaultFeatureVectorDecorator constructorNameAndConstantFields (a :: Term') in
-        diffTOC (diffTerms term term) `shouldBe` []
+    prop "unchanged diffs aren’t summarized" $
+      \term -> diffTOC (diffTerms term (term :: Term')) `shouldBe` []
 
   describe "TOCSummary" $ do
     it "encodes modified summaries to JSON" $ do
