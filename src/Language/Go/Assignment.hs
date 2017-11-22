@@ -303,54 +303,13 @@ sliceType = makeTerm <$> symbol SliceType <*> children (Type.Slice <$> expressio
 structType :: Assignment
 structType = makeTerm <$> symbol StructType <*> children (Declaration.Constructor <$> emptyTerm <*> manyTerm expression)
 
-
--- Type Declarations
-
-arrayTypeDeclaration :: Assignment
-arrayTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> arrayType)
-
-channelTypeDeclaration :: Assignment
-channelTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> channelType)
-
-functionTypeDeclaration :: Assignment
-functionTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> functionType)
-
-interfaceTypeDeclaration :: Assignment
-interfaceTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> interfaceType)
-
-mapTypeDeclaration :: Assignment
-mapTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> mapType)
-
-pointerTypeDeclaration :: Assignment
-pointerTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> pointerType)
-
-qualifiedTypeDeclaration :: Assignment
-qualifiedTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> qualifiedType)
-
-sliceTypeDeclaration :: Assignment
-sliceTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> sliceType)
-
-structTypeDeclaration :: Assignment
-structTypeDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> structType)
-
 typeAlias :: Assignment
-typeAlias = makeTerm <$> symbol TypeAlias <*> children (Type.Alias <$> expression <*> expression)
-
-typeIdentifierDeclaration :: Assignment
-typeIdentifierDeclaration = makeTerm <$> symbol TypeSpec <*> children (Type.Annotation <$> typeIdentifier <*> expression)
+typeAlias = makeTerm <$> symbol TypeAlias <*> children (Declaration.TypeAlias [] <$> expression <*> expression)
 
 typeDeclaration :: Assignment
-typeDeclaration = makeTerm <$> symbol TypeDeclaration <*> children (manyTerm (  arrayTypeDeclaration
-                                                                            <|> channelTypeDeclaration
-                                                                            <|> functionTypeDeclaration
-                                                                            <|> interfaceTypeDeclaration
-                                                                            <|> qualifiedTypeDeclaration
-                                                                            <|> pointerTypeDeclaration
-                                                                            <|> sliceTypeDeclaration
-                                                                            <|> structTypeDeclaration
-                                                                            <|> mapTypeDeclaration
-                                                                            <|> typeAlias
-                                                                            <|> typeIdentifierDeclaration ))
+typeDeclaration = makeTerm <$> symbol TypeDeclaration <*> children (manyTerm ( (makeTerm <$> symbol TypeSpec <*> children (Declaration.Type <$> typeIdentifier <*> expression))
+                                                                            <|> typeAlias ))
+
 
 
 -- Expressions
