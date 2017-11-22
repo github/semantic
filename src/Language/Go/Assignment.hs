@@ -60,7 +60,7 @@ type Syntax =
    , Go.Syntax.TypeSwitch
    , Go.Syntax.TypeSwitchGuard
    , Go.Syntax.Variadic
-   , Go.Type.BiDirectionalChannel
+   , Go.Type.BidirectionalChannel
    , Go.Type.ReceiveChannel
    , Go.Type.SendChannel
    , Literal.Array
@@ -269,7 +269,7 @@ arrayType = makeTerm <$> symbol ArrayType <*> children (Type.Array . Just <$> ex
 channelType :: Assignment
 channelType =  (makeTerm <$> symbol ChannelType <*> children (token AnonLAngleMinus *> token AnonChan *> (Go.Type.ReceiveChannel <$> expression)))
            <|> (makeTerm <$> symbol ChannelType <*> children (token AnonChan *> token AnonLAngleMinus *> (Go.Type.SendChannel <$> expression)))
-           <|> (makeTerm <$> symbol ChannelType <*> children (token AnonChan *> (Go.Type.BiDirectionalChannel <$> expression)))
+           <|> (makeTerm <$> symbol ChannelType <*> children (token AnonChan *> (Go.Type.BidirectionalChannel <$> expression)))
 
 fieldDeclaration :: Assignment
 fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> (manyTermsTill expression (void (symbol TypeIdentifier)) <|> (manyTerm expression)) <*> optional expression <*> optional expression)
