@@ -29,8 +29,7 @@ type Eval' t m = t -> m
 
 -- Evaluate an expression.
 -- Example:
---    evaluate @Precise @(Value Syntax Precise) @Syntax (makeLam "x" (var "x") # true)
---    Files.readFile "test.py" (Just Python) >>= runTask . parse pythonParser2 >>= pure . evaluate @Precise @(Value (Data.Union.Union Language.Python.Assignment2.Syntax) (Record Location) Precise) @(Data.Union.Union Language.Python.Assignment2.Syntax) @(Record Location)
+--    Files.readFile "test.py" (Just Python) >>= runTask . parse pythonParser2 >>= pure . evaluate @Precise @(Value (Data.Union.Union Language.Python.Assignment2.Syntax) (Record Location) Precise)
 evaluate :: forall l v syntax ann
          . ( Ord v
            , Eval v (Eff (Interpreter l v)) syntax ann syntax
