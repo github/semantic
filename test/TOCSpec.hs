@@ -229,14 +229,14 @@ isMeaningfulTerm :: Term ListableSyntax a -> Bool
 isMeaningfulTerm a
   | Just (_:_) <- prj (termOut (unTerm a)) = False
   | Just []    <- prj (termOut (unTerm a)) = False
-  | otherwise = True
+  | otherwise                              = True
 
 -- Filter tiers for terms if the Syntax is a Method or a Function.
 isMethodOrFunction :: Term ListableSyntax ann -> Bool
 isMethodOrFunction a
   | Just Declaration.Method{}   <- prj (termOut (unTerm a)) = True
   | Just Declaration.Function{} <- prj (termOut (unTerm a)) = True
-  | otherwise                                     = False
+  | otherwise                                               = False
 
 blobsForPaths :: Both FilePath -> IO (Both Blob)
 blobsForPaths = traverse (readFile . ("test/fixtures/toc/" <>))
