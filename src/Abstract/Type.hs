@@ -8,7 +8,7 @@ import Prelude hiding (fail)
 
 type TName = Int
 
-data Type = Int | Bool | String | NoOp | Type :-> Type | Type :* Type | TVar TName
+data Type = Int | Bool | String | Unit | Type :-> Type | Type :* Type | TVar TName
   deriving (Eq, Ord, Show)
 
 
