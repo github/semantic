@@ -446,7 +446,7 @@ unaryExpression = symbol UnaryExpression >>= \ location -> (notExpression locati
     unaryMinus location    = makeTerm location . Expression.Negate <$> children (symbol AnonMinus *> expression)
     unaryPlus = children (symbol AnonPlus *> expression)
     unaryAmpersand = children (makeTerm <$> symbol AnonAmpersand <*> (Literal.Reference <$> expression))
-    unaryReceive = children (makeTerm <$> symbol AnonLAngleMinus <*> (Go.Syntax.Receive <$> emptyTerm <*> expression))
+    unaryReceive = children (symbol AnonLAngleMinus *> expression)
     unaryPointer = children (makeTerm <$> symbol AnonStar <*> (Literal.Pointer <$> expression))
     unaryComplement = children (makeTerm <$> symbol AnonCaret <*> (Expression.Complement <$> expression))
 
