@@ -12,10 +12,8 @@
       { (Identifier)
       ->(Identifier) })
       (Not
-        (Receive
-          (Empty)
-        { (Identifier)
-        ->(Identifier) }))
+      { (Identifier)
+      ->(Identifier) })
       (Pointer
         (Call
         { (Identifier)
@@ -27,7 +25,5 @@
       (Reference
       { (Identifier)
       ->(Identifier) })
-      (Receive
-        (Empty)
-      { (Identifier)
-      ->(Identifier) }))))
+    { (Identifier)
+    ->(Identifier) })))

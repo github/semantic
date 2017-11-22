@@ -12,9 +12,7 @@
             (Receive
             { (Identifier)
             ->(Identifier) }
-              (Receive
-                (Empty)
-                (Identifier)))
+              (Identifier))
             (Call
               (Identifier)
               (Identifier)
@@ -31,15 +29,13 @@
           (Pattern
             (Receive
               (Empty)
-              (Receive
-                (Empty)
-                (Call
-                  (MemberAccess
-                    (Identifier)
-                    (Identifier))
-                { (Integer)
-                ->(Integer) }
-                  (Empty))))
+              (Call
+                (MemberAccess
+                  (Identifier)
+                  (Identifier))
+              { (Integer)
+              ->(Integer) }
+                (Empty)))
             (
               (Call
                 (Identifier)
@@ -87,17 +83,13 @@
           (Pattern
             (Receive
               (Empty)
-              (Receive
-                (Empty)
-              { (Identifier)
-              ->(Identifier) }))
+            { (Identifier)
+            ->(Identifier) })
             ([]))
           (Pattern
             (Receive
               (Empty)
-              (Receive
-                (Empty)
-                (Identifier)))
+              (Identifier))
             ([]))
         {-(Pattern
           {-(DefaultPattern

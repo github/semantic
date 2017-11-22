@@ -6,7 +6,7 @@
     (Identifier)
     ([])
     (
-      (Annotation
+      (Type
       { (Identifier)
       ->(Identifier) }
         (Function
@@ -14,7 +14,7 @@
         ->(Identifier) }
         { (Identifier)
         ->(Identifier) }))
-      (Annotation
+      (Type
       { (Identifier)
       ->(Identifier) }
         (Function
@@ -25,7 +25,7 @@
           (
           {+(Identifier)+}
           {-(
-            {-(BiDirectionalChannel
+            {-(BidirectionalChannel
               {-(Identifier)-})-})-}
             (Identifier))
           (Empty))))))

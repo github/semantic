@@ -6,13 +6,13 @@
     (Identifier)
     ([])
     (
-      (Alias
+      (TypeAlias
       { (Identifier)
       ->(Identifier) }
         (Slice
           (Pointer
             (Identifier))))
-      (Alias
+      (TypeAlias
       { (Identifier)
       ->(Identifier) }
       { (Identifier)

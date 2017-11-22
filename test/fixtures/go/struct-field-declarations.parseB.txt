@@ -6,7 +6,7 @@
     (Identifier)
     ([])
     (
-      (Annotation
+      (Type
         (Identifier)
         (Constructor
           (Empty)

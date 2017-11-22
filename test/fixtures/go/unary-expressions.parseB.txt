@@ -10,9 +10,7 @@
       (Negate
         (Identifier))
       (Not
-        (Receive
-          (Empty)
-          (Identifier)))
+        (Identifier))
       (Pointer
         (Call
           (Identifier)
@@ -21,6 +19,4 @@
         (Identifier))
       (Reference
         (Identifier))
-      (Receive
-        (Empty)
-        (Identifier)))))
+      (Identifier))))

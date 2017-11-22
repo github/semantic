@@ -8,13 +8,13 @@
     (
       (Call
         (Identifier)
-        (BiDirectionalChannel
+        (BidirectionalChannel
         { (Identifier)
         ->(Identifier) })
         (Empty))
       (Call
         (Identifier)
-        (BiDirectionalChannel
+        (BidirectionalChannel
         { (Identifier)
         ->(Identifier) })
         (Minus
@@ -23,7 +23,7 @@
         (Empty))
       (Call
         (Identifier)
-        (BiDirectionalChannel
+        (BidirectionalChannel
         { (Identifier)
         ->(Identifier) })
       { (Integer)

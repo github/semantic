@@ -6,11 +6,11 @@
     (Identifier)
     ([])
     (
-      (Annotation
+      (Type
         (Identifier)
         (Pointer
           (Identifier)))
-      (Annotation
+      (Type
         (Identifier)
         (Pointer
           (Pointer

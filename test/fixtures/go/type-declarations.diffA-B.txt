@@ -7,18 +7,18 @@
     ([])
     (
       (
-        (Annotation
+        (Type
         { (Identifier)
         ->(Identifier) }
         { (Identifier)
         ->(Identifier) }))
       (
-        (Annotation
+        (Type
         { (Identifier)
         ->(Identifier) }
         { (Identifier)
         ->(Identifier) })
-        (Annotation
+        (Type
         { (Identifier)
         ->(Identifier) }
         { (Identifier)
@@ -26,7 +26,7 @@
       (
         (Context
           (Comment)
-          (Annotation
+          (Type
           { (Identifier)
           ->(Identifier) }
             (Constructor
@@ -43,7 +43,7 @@
                 (Identifier)
                 (
                   (Identifier))))))
-        (Annotation
+        (Type
         { (Identifier)
         ->(Identifier) }
           (Interface))

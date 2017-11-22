@@ -11,9 +11,7 @@
           (Pattern
             (Receive
               (Identifier)
-              (Receive
-                (Empty)
-                (Identifier)))
+              (Identifier))
             (Call
               (Identifier)
               (Identifier)
@@ -29,14 +27,12 @@
           (Pattern
             (Receive
               (Empty)
-              (Receive
-                (Empty)
-                (Call
-                  (MemberAccess
-                    (Identifier)
-                    (Identifier))
-                  (Integer)
-                  (Empty))))
+              (Call
+                (MemberAccess
+                  (Identifier)
+                  (Identifier))
+                (Integer)
+                (Empty)))
             (
               (Call
                 (Identifier)
@@ -68,16 +64,12 @@
           (Pattern
             (Receive
               (Empty)
-              (Receive
-                (Empty)
-                (Identifier)))
+              (Identifier))
             ([]))
           (Pattern
             (Receive
               (Empty)
-              (Receive
-                (Empty)
-                (Identifier)))
+              (Identifier))
             ([]))
           (Pattern
             (DefaultPattern

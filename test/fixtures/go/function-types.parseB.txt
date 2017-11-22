@@ -6,12 +6,12 @@
     (Identifier)
     ([])
     (
-      (Annotation
+      (Type
         (Identifier)
         (Function
           (Identifier)
           (Identifier)))
-      (Annotation
+      (Type
         (Identifier)
         (Function
           (
@@ -19,7 +19,7 @@
             (Identifier))
           (
             (
-              (BiDirectionalChannel
+              (BidirectionalChannel
                 (Identifier)))
             (Identifier))
           (Empty))))))

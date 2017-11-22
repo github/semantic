@@ -7,12 +7,12 @@
     ([])
     (
       (
-        (Annotation
+        (Type
         { (Identifier)
         ->(Identifier) }
           (Interface)))
       (
-        (Annotation
+        (Type
         { (Identifier)
         ->(Identifier) }
           (Interface
@@ -20,7 +20,7 @@
               (Identifier)
               (Identifier)))))
       (
-        (Annotation
+        (Type
         { (Identifier)
         ->(Identifier) }
           (Interface

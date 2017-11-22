@@ -7,14 +7,14 @@
     ([])
     (
       (
-        (Annotation
+        (Type
           (Identifier)
           (Slice
           { (Identifier)
           ->(Slice
             {+(Identifier)+}) })))
       (
-        (Annotation
+        (Type
           (Identifier)
           (Slice
           { (Slice

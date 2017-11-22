@@ -7,13 +7,13 @@
     ([])
     (
       (
-        (Annotation
+        (Type
         { (Identifier)
         ->(Identifier) }
           (Constructor
             (Empty))))
       (
-        (Annotation
+        (Type
         { (Identifier)
         ->(Identifier) }
           (Constructor
@@ -22,7 +22,7 @@
               (Identifier)
               ([])))))
       (
-        (Annotation
+        (Type
         { (Identifier)
         ->(Identifier) }
           (Constructor
@@ -33,7 +33,7 @@
                 (Identifier)
                 (Identifier))))))
       (
-        (Annotation
+        (Type
         { (Identifier)
         ->(Identifier) }
           (Constructor
