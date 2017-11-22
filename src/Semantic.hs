@@ -12,6 +12,7 @@ import Control.Exception
 import Control.Monad ((<=<))
 import Control.Monad.Error.Class
 import Data.Align.Generic
+import Data.Bifoldable
 import Data.Blob
 import Data.ByteString (ByteString)
 import Data.Diff
@@ -19,7 +20,6 @@ import Data.Functor.Both as Both
 import Data.Functor.Classes
 import Data.JSON.Fields
 import Data.Output
-import Data.Bifoldable
 import Data.Record
 import Data.Syntax.Algebra
 import Data.Term
