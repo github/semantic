@@ -137,7 +137,8 @@ instance Apply ConstructorName fs => CustomConstructorName (Union fs) where
   customConstructorName = apply (Proxy :: Proxy ConstructorName) constructorName
 
 instance CustomConstructorName [] where
-  customConstructorName _ = ""
+  customConstructorName [] = "[]"
+  customConstructorName _  = ""
 
 data Strategy = Default | Custom
 
