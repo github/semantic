@@ -28,6 +28,7 @@ false = Boolean False
 instance Eq1 Boolean where liftEq = genericLiftEq
 instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
+instance (Monad m) => EvalCollect l (Value s a l) m s a Boolean
 instance (Monad m) => Eval (Value s a l) m s a Boolean where
   eval _ (Boolean x) = pure (I (PBool x))
 
@@ -41,6 +42,7 @@ newtype Integer a = Integer { integerContent :: ByteString }
 instance Eq1 Data.Syntax.Literal.Integer where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Integer where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShowsPrec
+instance (Monad m) => EvalCollect l (Value s a l) m s a Data.Syntax.Literal.Integer
 instance (Monad m) => Eval (Value s a l) m s a Data.Syntax.Literal.Integer
 
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
@@ -99,6 +101,7 @@ newtype TextElement a = TextElement { textElementContent :: ByteString }
 instance Eq1 TextElement where liftEq = genericLiftEq
 instance Ord1 TextElement where liftCompare = genericLiftCompare
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
+instance (Monad m) => EvalCollect l (Value s a l) m s a TextElement
 instance (Monad m) => Eval (Value s a l) m s a TextElement where
   eval _ (TextElement x) = pure (I (PString x))
 

@@ -20,6 +20,7 @@ instance Eq1 Comment where liftEq = genericLiftEq
 instance Ord1 Comment where liftCompare = genericLiftCompare
 instance Show1 Comment where liftShowsPrec = genericLiftShowsPrec
 
+instance (Monad m) => EvalCollect l (Value s a l) m s a Comment
 instance (Monad m) => Eval (Value s a l) m s a Comment
 
 -- TODO: nested comment types

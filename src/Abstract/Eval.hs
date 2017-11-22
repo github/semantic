@@ -41,6 +41,11 @@ instance ( Monad m
          => EvalCollect l v m s a (Union fs) where
   evalCollect ev = apply (Proxy :: Proxy (EvalCollect l v m s a)) (evalCollect @l ev)
 
+instance ( Monad m
+         , EvalCollect l v m s a s
+         )
+         => EvalCollect l v m s a (TermF s a) where
+  evalCollect ev In{..} = evalCollect @l ev termOut
 
 class Monad m => MonadGC l a m where
   askRoots :: m (Set (Address l a))
