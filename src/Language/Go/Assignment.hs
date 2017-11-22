@@ -33,6 +33,8 @@ type Syntax =
    , Declaration.Import
    , Declaration.Method
    , Declaration.Module
+   , Declaration.Type
+   , Declaration.TypeAlias
    , Expression.Arithmetic
    , Expression.Bitwise
    , Expression.Boolean
@@ -86,7 +88,6 @@ type Syntax =
    , Syntax.Empty
    , Syntax.Identifier
    , Syntax.Program
-   , Type.Alias
    , Type.Annotation
    , Type.Array
    , Type.Function

@@ -36,7 +36,7 @@ type Syntax = '[
   , Declaration.InterfaceDeclaration
   , Declaration.PublicFieldDefinition
   , Declaration.VariableDeclaration
-  , Declaration.TypeAliasDeclaration
+  , Declaration.TypeAlias
   , Declaration.Import
   , Declaration.Module
   , Expression.Arithmetic
@@ -657,7 +657,7 @@ declaration = everything
 
 typeAliasDeclaration :: Assignment
 typeAliasDeclaration = makeTypeAliasDecl <$> symbol Grammar.TypeAliasDeclaration <*> children ((,,) <$> term identifier <*> (term typeParameters <|> emptyTerm) <*> term ty)
-  where makeTypeAliasDecl loc (identifier, typeParams, body) = makeTerm loc (Declaration.TypeAliasDeclaration [typeParams] identifier body)
+  where makeTypeAliasDecl loc (identifier, typeParams, body) = makeTerm loc (Declaration.TypeAlias [typeParams] identifier body)
 
 enumDeclaration :: Assignment
 enumDeclaration = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (TypeScript.Syntax.EnumDeclaration <$> term identifier <*> (symbol EnumBody *> children (manyTerm (propertyName <|> enumAssignment))))
