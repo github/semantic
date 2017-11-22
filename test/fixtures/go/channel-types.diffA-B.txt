@@ -9,23 +9,22 @@
       (Annotation
       { (Identifier)
       ->(Identifier) }
-        (BiDirectionalChannel
+        (BidirectionalChannel
           (ReceiveChannel
           { (Identifier)
           ->(Identifier) })))
-      (Annotation
       { (Identifier)
       ->(Identifier) }
         (SendChannel
           (BiDirectionalChannel
             (Constructor
               (Empty)))))
-    {+(Annotation
+    {+(Type
       {+(Identifier)+}
       {+(SendChannel
         {+(ReceiveChannel
           {+(Identifier)+})+})+})+}
-      (Annotation
+      (Type
       { (Identifier)
       ->(Identifier) }
       { (SendChannel
@@ -45,9 +44,9 @@
       {-(ReceiveChannel
         {-(ReceiveChannel
           {-(Identifier)-})-})-})-}
-    {-(Annotation
+    {-(Type
       {-(Identifier)-}
-      {-(BiDirectionalChannel
+      {-(BidirectionalChannel
         {-(Parenthesized
           {-(ReceiveChannel
             {-(Identifier)-})-})-})-})-})))

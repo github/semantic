@@ -41,14 +41,14 @@
       {-(SendChannel
         {-(ReceiveChannel
           {-(Identifier)-})-})-})-}
-    {-(Annotation
+    {-(Type
       {-(Identifier)-}
       {-(ReceiveChannel
         {-(ReceiveChannel
           {-(Identifier)-})-})-})-}
-    {-(Annotation
+    {-(Type
       {-(Identifier)-}
-      {-(BiDirectionalChannel
+      {-(BidirectionalChannel
         {-(Parenthesized
           {-(ReceiveChannel
             {-(Identifier)-})-})-})-})-})))
