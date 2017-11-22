@@ -13,9 +13,9 @@ import Data.Functor.Classes
 import Data.Hashable (Hashable)
 import Data.Maybe (fromMaybe)
 import Data.Record
-import Data.Syntax.Algebra
 import Data.Term
 import Data.Text (Text)
+import Decorator
 import Info hiding (Empty, Return)
 import RWS
 import Syntax (Syntax(Leaf))

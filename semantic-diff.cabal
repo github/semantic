@@ -33,7 +33,6 @@ library
                      , Data.Span
                      , Data.SplitDiff
                      , Data.Syntax
-                     , Data.Syntax.Algebra
                      , Data.Syntax.Assignment
                      , Data.Syntax.Assignment.Table
                      , Data.Syntax.Comment
@@ -43,6 +42,7 @@ library
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
                      , Data.Term
+                     , Decorator
                      , Files
                      , Info
                      , Interpreter

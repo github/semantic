@@ -41,10 +41,10 @@ import Data.Functor.Both as Both hiding (snd)
 import Data.Functor.Foldable (cata)
 import Data.Record
 import qualified Data.Syntax as Syntax
-import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
 import qualified Data.Syntax.Assignment as Assignment
 import Data.Term
 import Data.Union
+import Decorator (RAlgebra, decoratorWithAlgebra)
 import Info hiding (Category(..))
 import qualified Files
 import Language

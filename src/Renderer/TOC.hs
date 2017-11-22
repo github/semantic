@@ -52,9 +52,9 @@ import Language
 import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
 import Syntax as S
-import Data.Syntax.Algebra (RAlgebra)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
+import Decorator (RAlgebra)
 import qualified Language.Markdown.Syntax as Markdown
 
 data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }

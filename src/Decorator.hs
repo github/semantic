@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Data.Syntax.Algebra
+module Decorator
 ( FAlgebra
 , RAlgebra
 , fToR

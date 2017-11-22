@@ -21,9 +21,9 @@ import Data.Functor.Classes
 import Data.JSON.Fields
 import Data.Output
 import Data.Record
-import Data.Syntax.Algebra
 import Data.Term
 import Data.Typeable
+import Decorator
 import Info
 import Interpreter
 import qualified Language
