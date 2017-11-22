@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Decorator
 ( FAlgebra
 , RAlgebra
@@ -32,13 +32,13 @@ import GHC.Generics
 import qualified Syntax as S
 
 -- | An F-algebra on some carrier functor 'f'.
-type FAlgebra f a = f a -> a
+type FAlgebra t a = Base t a -> a
 
 -- | An R-algebra on some carrier functor 'f' of its fixpoint type 't'.
 type RAlgebra f t a = f (t, a) -> a
 
 -- | Promote an FAlgebra into an RAlgebra (by dropping the original parameter).
-fToR :: Functor (Base t) => FAlgebra (Base t) a -> RAlgebra (Base t) t a
+fToR :: Functor (Base t) => FAlgebra t a -> RAlgebra (Base t) t a
 fToR f = f . fmap snd
 
 -- | Lift an algebra into a decorator for terms annotated with records.
@@ -58,7 +58,7 @@ instance ToJSONFields Identifier where
 -- | Produce the identifier for a given term, if any.
 --
 --   Identifier syntax is labelled, as well as declaration syntax identified by these, but other uses of these identifiers are not, e.g. the declaration of a class or method or binding of a variable will be labelled, but a function call will not.
-identifierAlgebra :: (Syntax.Identifier :< fs, Declaration.Method :< fs, Declaration.Class :< fs, Apply Foldable fs, Apply Functor fs) => FAlgebra (Base (Term (Union fs) a)) (Maybe Identifier)
+identifierAlgebra :: (Syntax.Identifier :< fs, Declaration.Method :< fs, Declaration.Class :< fs, Apply Foldable fs, Apply Functor fs) => FAlgebra (Term (Union fs) a) (Maybe Identifier)
 identifierAlgebra (In _ union) = case union of
   _ | Just (Syntax.Identifier s) <- prj union -> Just (Identifier s)
   _ | Just Declaration.Class{..} <- prj union -> classIdentifier
@@ -93,7 +93,7 @@ newtype CyclomaticComplexity = CyclomaticComplexity Int
 --   TODO: Explicit returns at the end of methods should only count once.
 --   TODO: Anonymous functions should not increase parent scope’s complexity.
 --   TODO: Inner functions should not increase parent scope’s complexity.
-cyclomaticComplexityAlgebra :: (Declaration.Method :< fs, Statement.Return :< fs, Statement.Yield :< fs, Apply Foldable fs, Apply Functor fs) => FAlgebra (Base (Term (Union fs) a)) CyclomaticComplexity
+cyclomaticComplexityAlgebra :: (Declaration.Method :< fs, Statement.Return :< fs, Statement.Yield :< fs, Apply Foldable fs, Apply Functor fs) => FAlgebra (Term (Union fs) a) CyclomaticComplexity
 cyclomaticComplexityAlgebra (In _ union) = case union of
   _ | Just Declaration.Method{} <- prj union -> succ (sum union)
   _ | Just Statement.Return{} <- prj union -> succ (sum union)
