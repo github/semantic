@@ -50,9 +50,9 @@ import qualified Files
 import Language
 import Language.Markdown
 import Parser
+import Parser.TreeSitter
 import System.Exit (die)
 import System.IO (Handle, stderr)
-import TreeSitter
 import Semantic.Log
 import Semantic.Stat as Stat
 import Semantic.Queue

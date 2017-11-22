@@ -63,6 +63,7 @@ library
                      , Language.Python.Grammar
                      , Language.Python.Syntax
                      , Parser
+                     , Parser.TreeSitter
                      , Paths_semantic_diff
                      , Renderer
                      , Renderer.JSON
@@ -80,7 +81,6 @@ library
                      , SemanticCmdLine
                      , SES
                      , Syntax
-                     , TreeSitter
   build-depends:       base >= 4.8 && < 5
                      , aeson
                      , ansi-terminal
