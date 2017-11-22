@@ -9,7 +9,7 @@ module Semantic
 
 import Algorithm (Diffable)
 import Control.Exception
-import Control.Monad ((>=>))
+import Control.Monad ((>=>), guard)
 import Control.Monad.Error.Class
 import Data.Align.Generic
 import Data.Bifoldable
@@ -93,18 +93,16 @@ diffBlobPair renderer blobs
           (_, Blob { blobLanguage = Just lang, blobPath = path }) -> (path, Just lang)
           (Blob { blobPath = path }, _)                           -> (path, Nothing)
 
-        qualify language
-          | OldToCDiffRenderer <- renderer
-          , language `notElem`
-            [ Language.JSX
+        qualify language | OldToCDiffRenderer <- renderer = guard (language `elem` aLaCarteLanguages) *> Just language
+                         | otherwise                      =                                              Just language
+        aLaCarteLanguages
+          = [ Language.JSX
             , Language.JavaScript
             , Language.Markdown
             , Language.Python
             , Language.Ruby
             , Language.TypeScript
             ]
-          = Nothing
-          | otherwise = Just language
 
         run :: (Foldable syntax, Functor syntax) => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Both Blob -> Diff syntax ann ann -> output) -> Task output
         run parse diff renderer = do
