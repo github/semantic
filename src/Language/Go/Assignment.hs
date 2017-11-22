@@ -273,7 +273,7 @@ channelType =  (makeTerm <$> symbol ChannelType <*> children (token AnonLAngleMi
 fieldDeclaration :: Assignment
 fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> (manyTermsTill expression (void (symbol TypeIdentifier)) <|> (manyTerm expression)) <*> optional expression <*> optional expression)
   where
-    mkFieldDeclarationWithTag loc (fields, (Just type'), (Just tag)) = makeTerm loc $ Go.Syntax.Field [type', tag] (makeTerm loc fields) --Type.Annotation (makeTerm loc (Type.Annotation (makeTerm loc fields) type')) tag
+    mkFieldDeclarationWithTag loc (fields, (Just type'), (Just tag)) = makeTerm loc $ Go.Syntax.Field [type', tag] (makeTerm loc fields)
     mkFieldDeclarationWithTag loc (fields, (Just type'), Nothing) = makeTerm loc $ Go.Syntax.Field [type'] (makeTerm loc fields)
     mkFieldDeclarationWithTag loc (fields, Nothing, (Just tag)) = makeTerm loc $ Go.Syntax.Field [tag] (makeTerm loc fields)
     mkFieldDeclarationWithTag loc (fields, Nothing, Nothing) = makeTerm loc $ Go.Syntax.Field [] (makeTerm loc fields)
