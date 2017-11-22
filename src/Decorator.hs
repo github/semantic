@@ -35,15 +35,15 @@ import qualified Syntax as S
 type FAlgebra t a = Base t a -> a
 
 -- | An R-algebra on some carrier functor 'f' of its fixpoint type 't'.
-type RAlgebra f t a = f (t, a) -> a
+type RAlgebra t a = Base t (t, a) -> a
 
 -- | Promote an FAlgebra into an RAlgebra (by dropping the original parameter).
-fToR :: Functor (Base t) => FAlgebra t a -> RAlgebra (Base t) t a
+fToR :: Functor (Base t) => FAlgebra t a -> RAlgebra t a
 fToR f = f . fmap snd
 
 -- | Lift an algebra into a decorator for terms annotated with records.
 decoratorWithAlgebra :: Functor f
-                     => RAlgebra (Base (Term f (Record fs))) (Term f (Record fs)) a -- ^ An R-algebra on terms.
+                     => RAlgebra (Term f (Record fs)) a -- ^ An R-algebra on terms.
                      -> Term f (Record fs) -- ^ A term to decorate with values produced by the R-algebra.
                      -> Term f (Record (a ': fs)) -- ^ A term decorated with values produced by the R-algebra.
 decoratorWithAlgebra alg = para $ \ c@(In a f) -> termIn (alg (fmap (second (rhead . extract)) c) :. a) (fmap snd f)
@@ -65,7 +65,7 @@ identifierAlgebra (In _ union) = case union of
   _ | Just Declaration.Method{..} <- prj union -> methodName
   _ -> Nothing
 
-syntaxIdentifierAlgebra :: RAlgebra (TermF S.Syntax a) (Term S.Syntax a) (Maybe Identifier)
+syntaxIdentifierAlgebra :: RAlgebra (Term S.Syntax a) (Maybe Identifier)
 syntaxIdentifierAlgebra (In _ syntax) = case syntax of
   S.Assignment f _ -> identifier f
   S.Class f _ _ -> identifier f
