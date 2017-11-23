@@ -2,9 +2,9 @@
 module Data.Term
 ( Term(..)
 , termIn
+, termAnnotation
+, termOut
 , TermF(..)
-, termFAnnotation
-, termFOut
 , termSize
 , extract
 , unwrap
@@ -29,15 +29,15 @@ import Text.Show
 -- | A Term with an abstract syntax tree and an annotation.
 newtype Term syntax ann = Term { unTerm :: TermF syntax ann (Term syntax ann) }
 
-data TermF syntax ann recur = In { termAnnotation :: ann, termOut :: syntax recur }
+termAnnotation :: Term syntax ann -> ann
+termAnnotation = termFAnnotation . unTerm
+
+termOut :: Term syntax ann -> syntax (Term syntax ann)
+termOut = termFOut . unTerm
+
+
+data TermF syntax ann recur = In { termFAnnotation :: ann, termFOut :: syntax recur }
   deriving (Eq, Foldable, Functor, Show, Traversable)
-
-
-termFAnnotation :: TermF syntax ann recur -> ann
-termFAnnotation (In ann _) = ann
-
-termFOut :: TermF syntax ann recur -> syntax recur
-termFOut (In _ out) = out
 
 
 -- | Return the node count of a term.
@@ -67,7 +67,7 @@ instance Functor f => Recursive (Term f a) where project = unTerm
 instance Functor f => Corecursive (Term f a) where embed = Term
 
 instance Functor f => Comonad (Term f) where
-  extract = termAnnotation . unTerm
+  extract = termAnnotation
   duplicate w = termIn w (fmap duplicate (unwrap w))
   extend f = go where go w = termIn (f w) (fmap go (unwrap w))
 
@@ -81,7 +81,7 @@ instance Traversable f => Traversable (Term f) where
   traverse f = go where go = fmap Term . bitraverse f go . unTerm
 
 instance Functor f => ComonadCofree f (Term f) where
-  unwrap = termOut . unTerm
+  unwrap = termOut
   {-# INLINE unwrap #-}
 
 instance Eq1 f => Eq1 (Term f) where

@@ -47,10 +47,10 @@ spec = parallel $ do
       \ diff -> tableOfContentsBy (const Nothing :: a -> Maybe ()) (diff :: Diff Syntax () ()) `shouldBe` []
 
     prop "produces no entries for identity diffs" $
-      \ term -> tableOfContentsBy (Just . termAnnotation) (diffSyntaxTerms term (term :: Term Syntax (Record '[Category]))) `shouldBe` []
+      \ term -> tableOfContentsBy (Just . termFAnnotation) (diffSyntaxTerms term (term :: Term Syntax (Record '[Category]))) `shouldBe` []
 
     prop "produces inserted/deleted/replaced entries for relevant nodes within patches" $
-      \ p -> tableOfContentsBy (Just . termAnnotation) (patch deleting inserting replacing p)
+      \ p -> tableOfContentsBy (Just . termFAnnotation) (patch deleting inserting replacing p)
       `shouldBe`
       patch (fmap Deleted) (fmap Inserted) (const (fmap Replaced)) (bimap (foldMap pure) (foldMap pure) (p :: Patch (Term Syntax Int) (Term Syntax Int)))
 
@@ -143,7 +143,7 @@ spec = parallel $ do
         in numTocSummaries diff `shouldBe` 0
 
     prop "equal terms produce identity diffs" $
-      \a -> let term = defaultFeatureVectorDecorator (Info.category . termAnnotation) (a :: Term') in
+      \a -> let term = defaultFeatureVectorDecorator (Info.category . termFAnnotation) (a :: Term') in
         diffTOC (diffSyntaxTerms term term) `shouldBe` []
 
   describe "TOCSummary" $ do
