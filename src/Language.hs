@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, DeriveGeneric, DeriveAnyClass #-}
 module Language where
 
-import Control.Comonad.Trans.Cofree
 import Data.Aeson
 import Data.Foldable
 import Data.Record
@@ -37,30 +36,30 @@ languageForType mediaType = case mediaType of
     _ -> Nothing
 
 toVarDeclOrAssignment :: HasField fields Category => Term S.Syntax (Record fields) -> Term S.Syntax (Record fields)
-toVarDeclOrAssignment child = case unwrap child of
-  S.Indexed [child', assignment] -> termIn (setCategory (extract child) VarAssignment) (S.VarAssignment [child'] assignment)
-  S.Indexed [child'] -> termIn (setCategory (extract child) VarDecl) (S.VarDecl [child'])
-  S.VarDecl _ -> termIn (setCategory (extract child) VarDecl) (unwrap child)
+toVarDeclOrAssignment child = case termOut child of
+  S.Indexed [child', assignment] -> termIn (setCategory (termAnnotation child) VarAssignment) (S.VarAssignment [child'] assignment)
+  S.Indexed [child'] -> termIn (setCategory (termAnnotation child) VarDecl) (S.VarDecl [child'])
+  S.VarDecl _ -> termIn (setCategory (termAnnotation child) VarDecl) (termOut child)
   S.VarAssignment _ _ -> child
   _ -> toVarDecl child
 
 toVarDecl :: HasField fields Category => Term S.Syntax (Record fields) -> Term S.Syntax (Record fields)
-toVarDecl child = termIn (setCategory (extract child) VarDecl) (S.VarDecl [child])
+toVarDecl child = termIn (setCategory (termAnnotation child) VarDecl) (S.VarDecl [child])
 
 toTuple :: Term S.Syntax (Record fields) -> [Term S.Syntax (Record fields)]
-toTuple child | S.Indexed [key,value] <- unwrap child = [termIn (extract child) (S.Pair key value)]
-toTuple child | S.Fixed [key,value] <- unwrap child = [termIn (extract child) (S.Pair key value)]
-toTuple child | S.Leaf c <- unwrap child = [termIn (extract child) (S.Comment c)]
+toTuple child | S.Indexed [key,value] <- termOut child = [termIn (termAnnotation child) (S.Pair key value)]
+toTuple child | S.Fixed [key,value] <- termOut child = [termIn (termAnnotation child) (S.Pair key value)]
+toTuple child | S.Leaf c <- termOut child = [termIn (termAnnotation child) (S.Comment c)]
 toTuple child = pure child
 
 toPublicFieldDefinition :: HasField fields Category => [Term S.Syntax (Record fields)] -> Maybe (S.Syntax (Term S.Syntax (Record fields)))
-toPublicFieldDefinition children = case break (\x -> category (extract x) == Identifier) children of
+toPublicFieldDefinition children = case break (\x -> category (termAnnotation x) == Identifier) children of
   (prev, [identifier, assignment]) -> Just $ S.VarAssignment (prev ++ [identifier]) assignment
   (_, [_]) -> Just $ S.VarDecl children
   _ -> Nothing
 
 toInterface :: HasField fields Category => [Term S.Syntax (Record fields)] -> Maybe (S.Syntax (Term S.Syntax (Record fields)))
-toInterface (id : rest) = case break (\x -> category (extract x) == Other "object_type") rest of
-  (clauses, [body]) -> Just $ S.Interface id clauses (toList (unwrap body))
+toInterface (id : rest) = case break (\x -> category (termAnnotation x) == Other "object_type") rest of
+  (clauses, [body]) -> Just $ S.Interface id clauses (toList (termOut body))
   _ -> Nothing
 toInterface _ = Nothing

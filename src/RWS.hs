@@ -89,7 +89,7 @@ rws canCompare equivalent as bs
         --
         -- cf §4.2 of RWS-Diff
         mostSimilarMatching isEligible tree term = listToMaybe (sortOn (editDistanceUpTo optionsNodeComparisons term . snd) candidates)
-          where candidates = filter (uncurry isEligible) (snd <$> KdMap.kNearest tree optionsMaxSimilarTerms (rhead (extract term)))
+          where candidates = filter (uncurry isEligible) (snd <$> KdMap.kNearest tree optionsMaxSimilarTerms (rhead (termAnnotation term)))
 
 data Options = Options
   { optionsLookaheadPlaces :: {-# UNPACK #-} !Int -- ^ How many places ahead should we look for similar terms?
@@ -110,7 +110,7 @@ defaultQ = 3
 
 
 toKdMap :: Functor syntax => [(Int, Term syntax (Record (FeatureVector ': fields)))] -> KdMap.KdMap Double FeatureVector (Int, Term syntax (Record (FeatureVector ': fields)))
-toKdMap = KdMap.build unFV . fmap (rhead . extract . snd &&& id)
+toKdMap = KdMap.build unFV . fmap (rhead . termAnnotation . snd &&& id)
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
@@ -128,7 +128,7 @@ defaultFeatureVectorDecorator getLabel = featureVectorDecorator . pqGramDecorato
 featureVectorDecorator :: (Foldable f, Functor f, Hashable label) => Term f (Record (Gram label ': fields)) -> Term f (Record (FeatureVector ': fields))
 featureVectorDecorator = cata (\ (In (gram :. rest) functor) ->
   termIn (foldl' addSubtermVector (unitVector (hash gram)) functor :. rest) functor)
-  where addSubtermVector v term = addVectors v (rhead (extract term))
+  where addSubtermVector v term = addVectors v (rhead (termAnnotation term))
 
 -- | Annotates a term with the corresponding p,q-gram at each node.
 pqGramDecorator
@@ -154,7 +154,7 @@ pqGramDecorator getLabel p q = cata algebra
       put (drop 1 labels)
       pure $! termIn (gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } :. rest) functor
     siblingLabels :: Traversable f => f (Term f (Record (Gram label ': fields))) -> [Maybe label]
-    siblingLabels = foldMap (base . rhead . extract)
+    siblingLabels = foldMap (base . rhead . termAnnotation)
     padToSize n list = take n (list <> repeat empty)
 
 -- | Test the comparability of two root 'Term's in O(1).
@@ -176,7 +176,7 @@ editDistanceUpTo m a b = diffCost m (approximateDiff a b)
           _ | m <= 0 -> 0
           Merge body -> sum (fmap ($ pred m) body)
           body -> succ (sum (fmap ($ pred m) body))
-        approximateDiff a b = maybe (replacing a b) (merge (extract a, extract b)) (galignWith (Just . these deleting inserting approximateDiff) (unwrap a) (unwrap b))
+        approximateDiff a b = maybe (replacing a b) (merge (termAnnotation a, termAnnotation b)) (galignWith (Just . these deleting inserting approximateDiff) (termOut a) (termOut b))
 
 
 -- Instances

@@ -6,15 +6,11 @@ module Data.Term
 , termOut
 , TermF(..)
 , termSize
-, extract
-, unwrap
 , hoistTerm
 , hoistTermF
 , stripTerm
 ) where
 
-import Control.Comonad
-import Control.Comonad.Cofree.Class
 import Data.Aeson
 import Data.Bifoldable
 import Data.Bifunctor
@@ -66,11 +62,6 @@ type instance Base (Term f a) = TermF f a
 instance Functor f => Recursive (Term f a) where project = unTerm
 instance Functor f => Corecursive (Term f a) where embed = Term
 
-instance Functor f => Comonad (Term f) where
-  extract = termAnnotation
-  duplicate w = termIn w (fmap duplicate (unwrap w))
-  extend f = go where go w = termIn (f w) (fmap go (unwrap w))
-
 instance Functor f => Functor (Term f) where
   fmap f = go where go = Term . bimap f go . unTerm
 
@@ -79,10 +70,6 @@ instance Foldable f => Foldable (Term f) where
 
 instance Traversable f => Traversable (Term f) where
   traverse f = go where go = fmap Term . bitraverse f go . unTerm
-
-instance Functor f => ComonadCofree f (Term f) where
-  unwrap = termOut
-  {-# INLINE unwrap #-}
 
 instance Eq1 f => Eq1 (Term f) where
   liftEq eqA = go where go t1 t2 = liftEq2 eqA go (unTerm t1) (unTerm t2)

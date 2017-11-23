@@ -229,13 +229,13 @@ syntaxDeclarationAlgebra blob@Blob{..} decl@(In a r) = case r of
   S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage
   S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage Nothing
   S.Method _ (identifier, _) (Just (receiver, _)) _ _
-    | S.Indexed [receiverParams] <- unwrap receiver
-    , S.ParameterDecl (Just ty) _ <- unwrap receiverParams -> Just $ MethodDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage (Just (getSource ty))
+    | S.Indexed [receiverParams] <- termOut receiver
+    , S.ParameterDecl (Just ty) _ <- termOut receiverParams -> Just $ MethodDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage (Just (getSource ty))
     | otherwise -> Just $ MethodDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage (Just (getSource receiver))
   S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange a) blobSource)) mempty blobLanguage
   _ -> Nothing
   where
-    getSource = toText . flip Source.slice blobSource . byteRange . extract
+    getSource = toText . flip Source.slice blobSource . byteRange . termAnnotation
 
 getMethodSource :: HasField fields Range => Blob -> TermF Declaration.Method (Record fields) (Term syntax (Record fields), a) -> T.Text
 getMethodSource Blob{..} (In a r)

@@ -93,7 +93,7 @@ documentToTerm language document Blob{..} = do
         copyAll = TS.ts_node_copy_child_nodes document
 
 isNonEmpty :: HasField fields Category => Term S.Syntax (Record fields) -> Bool
-isNonEmpty = (/= Empty) . category . extract
+isNonEmpty = (/= Empty) . category . termAnnotation
 
 nodeRange :: TS.Node -> Range
 nodeRange TS.Node{..} = Range (fromIntegral nodeStartByte) (fromIntegral nodeEndByte)
@@ -124,7 +124,7 @@ defaultTermAssignment source annotation children allChildren
 
     -- Control flow statements
     (If, condition : body) -> toTerm $ S.If condition body
-    (Switch, _) -> let (subject, body) = break ((== Other "switch_body") . Info.category . extract) children in toTerm $ S.Switch subject (body >>= toList . unwrap)
+    (Switch, _) -> let (subject, body) = break ((== Other "switch_body") . Info.category . termAnnotation) children in toTerm $ S.Switch subject (body >>= toList . termOut)
     (Case, expr : body) -> toTerm $ S.Case expr body
     (While, expr : rest) -> toTerm $ S.While expr rest
 
@@ -141,7 +141,7 @@ defaultTermAssignment source annotation children allChildren
 
     (Other "unary_expression", _) -> do
       cs <- allChildren
-      let c = case category . extract <$> cs of
+      let c = case category . termAnnotation <$> cs of
                 [Other s, _]
                   | s `elem` ["-", "+", "++", "--"] -> MathOperator
                   | s == "~" -> BitwiseOperator
@@ -153,7 +153,7 @@ defaultTermAssignment source annotation children allChildren
 
     (Other "binary_expression", _) -> do
       cs <- allChildren
-      let c = case category . extract <$> cs of
+      let c = case category . termAnnotation <$> cs of
                 [_, Other s, _]
                   | s `elem` ["<=", "<", ">=", ">", "==", "===", "!=", "!=="] -> RelationalOperator
                   | s `elem` ["*", "+", "-", "/", "%"] -> MathOperator

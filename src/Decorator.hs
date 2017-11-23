@@ -46,7 +46,7 @@ decoratorWithAlgebra :: Functor f
                      => RAlgebra (Term f (Record fs)) a -- ^ An R-algebra on terms.
                      -> Term f (Record fs) -- ^ A term to decorate with values produced by the R-algebra.
                      -> Term f (Record (a ': fs)) -- ^ A term decorated with values produced by the R-algebra.
-decoratorWithAlgebra alg = para $ \ c@(In a f) -> termIn (alg (fmap (second (rhead . extract)) c) :. a) (fmap snd f)
+decoratorWithAlgebra alg = para $ \ c@(In a f) -> termIn (alg (fmap (second (rhead . termAnnotation)) c) :. a) (fmap snd f)
 
 
 newtype Identifier = Identifier ByteString
@@ -81,7 +81,7 @@ syntaxIdentifierAlgebra (In _ syntax) = case syntax of
   S.TypeDecl f _ -> identifier f
   S.VarAssignment f _ -> asum $ identifier <$> f
   _ -> Nothing
-  where identifier = fmap (Identifier . encodeUtf8) . S.extractLeafValue . unwrap . fst
+  where identifier = fmap (Identifier . encodeUtf8) . S.extractLeafValue . termOut . fst
 
 
 -- | The cyclomatic complexity of a (sub)term.
