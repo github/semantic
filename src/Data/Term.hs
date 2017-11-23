@@ -3,6 +3,8 @@ module Data.Term
 ( Term(..)
 , termIn
 , TermF(..)
+, termFAnnotation
+, termFOut
 , termSize
 , extract
 , unwrap
@@ -29,6 +31,13 @@ newtype Term syntax ann = Term { unTerm :: TermF syntax ann (Term syntax ann) }
 
 data TermF syntax ann recur = In { termAnnotation :: ann, termOut :: syntax recur }
   deriving (Eq, Foldable, Functor, Show, Traversable)
+
+
+termFAnnotation :: TermF syntax ann recur -> ann
+termFAnnotation (In ann _) = ann
+
+termFOut :: TermF syntax ann recur -> syntax recur
+termFOut (In _ out) = out
 
 
 -- | Return the node count of a term.
