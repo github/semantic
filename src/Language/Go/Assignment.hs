@@ -516,19 +516,13 @@ emptyStatement :: Assignment
 emptyStatement = makeTerm <$> token EmptyStatement <*> (Statement.NoOp <$> emptyTerm)
 
 forStatement :: Assignment
-forStatement = mkForStatement <$> symbol ForStatement <*> children ((,) <$> (forClause <|> rangeClause <|> for <|> emptyClause) <*> expression)
+forStatement =  (makeTerm <$> symbol ForStatement <*> children ((forClause <|> for <|> emptyClause) <*> expression))
+            <|> (makeTerm <$> symbol ForStatement <*> children (rangeClause <*> expression))
   where
-    mkForStatement loc ((constructor, a, b, c), block') = case (constructor :: [Char]) of
-                                                            "forEach" -> makeTerm loc $ (Statement.ForEach a b block')
-                                                            _ -> makeTerm loc $ (Statement.For a b c block')
-    emptyClause = children (("for",,,) <$> emptyTerm <*> emptyTerm <*> emptyTerm)
-    for = ("for",,,) <$> emptyTerm <*> expression <*> emptyTerm
-    rangeClause = symbol RangeClause *> children (  (("forEach",,,) <$> expression <*> expression <*> emptyTerm)
-                                                <|> (("forEach",,,) <$> emptyTerm <*> expression <*> emptyTerm))
-    forClause = symbol ForClause *> children (  (("for",,,) <$> expression <*> expression <*> expression)
-                                            <|> (("for",,,) <$> expression <*> expression <*> emptyTerm)
-                                            <|> (("for",,,) <$> expression <*> emptyTerm <*> emptyTerm)
-                                            <|> (("for",,,) <$> emptyTerm <*> emptyTerm <*> emptyTerm))
+    emptyClause = children (Statement.For <$> emptyTerm <*> emptyTerm <*> emptyTerm)
+    for = Statement.For <$> emptyTerm <*> expression <*> emptyTerm
+    rangeClause = symbol RangeClause *> children (Statement.ForEach <$> (expression <|> emptyTerm) <*> expression)
+    forClause = symbol ForClause *> children (Statement.For <$> (expression <|> emptyTerm) <*> (expression <|> emptyTerm) <*> (expression <|> emptyTerm))
 
 goStatement :: Assignment
 goStatement = makeTerm <$> symbol GoStatement <*> children (Go.Syntax.Go <$> expression)
