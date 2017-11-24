@@ -9,7 +9,6 @@ module Decorator
 , rToOpenR
 , openFToOpenR
 , decoratorWithAlgebra
-, identifierAlgebra
 , syntaxIdentifierAlgebra
 , cyclomaticComplexityAlgebra
 , ConstructorName(..)
@@ -27,7 +26,6 @@ import Data.Functor.Foldable
 import Data.JSON.Fields
 import Data.Record
 import Data.Proxy
-import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
 import Data.Term
@@ -77,16 +75,6 @@ newtype Identifier = Identifier ByteString
 
 instance ToJSONFields Identifier where
   toJSONFields (Identifier i) = [ "identifier" .= decodeUtf8 i ]
-
--- | Produce the identifier for a given term, if any.
---
---   Identifier syntax is labelled, as well as declaration syntax identified by these, but other uses of these identifiers are not, e.g. the declaration of a class or method or binding of a variable will be labelled, but a function call will not.
-identifierAlgebra :: (Syntax.Identifier :< fs, Declaration.Method :< fs, Declaration.Class :< fs, Apply Foldable fs, Apply Functor fs) => FAlgebra (Term (Union fs) a) (Maybe Identifier)
-identifierAlgebra (In _ union) = case union of
-  _ | Just (Syntax.Identifier s) <- prj union -> Just (Identifier s)
-  _ | Just Declaration.Class{..} <- prj union -> classIdentifier
-  _ | Just Declaration.Method{..} <- prj union -> methodName
-  _ -> Nothing
 
 syntaxIdentifierAlgebra :: RAlgebra (Term S.Syntax a) (Maybe Identifier)
 syntaxIdentifierAlgebra (In _ syntax) = case syntax of
