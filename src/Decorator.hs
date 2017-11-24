@@ -5,6 +5,9 @@ module Decorator
 , OpenFAlgebra
 , OpenRAlgebra
 , fToR
+, fToOpenR
+, rToOpenR
+, openFToOpenR
 , decoratorWithAlgebra
 , identifierAlgebra
 , syntaxIdentifierAlgebra
@@ -48,6 +51,18 @@ type OpenRAlgebra t a = forall b . (b -> (t, a)) -> Base t b -> a
 -- | Promote an 'FAlgebra' into an 'RAlgebra' (by dropping the original parameter).
 fToR :: Functor (Base t) => FAlgebra t a -> RAlgebra t a
 fToR f = f . fmap snd
+
+-- | Promote an 'FAlgebra' into an 'OpenRAlgebra' (by 'fmap'ing the action over the structure and dropping the original parameter).
+fToOpenR :: Functor (Base t) => FAlgebra t a -> OpenRAlgebra t a
+fToOpenR alg f = alg . fmap (snd . f)
+
+-- | Promote an 'RAlgebra' into an 'OpenRAlgebra' (by 'fmap'ing the action over the structure).
+rToOpenR :: Functor (Base t) => RAlgebra t a -> OpenRAlgebra t a
+rToOpenR alg f = alg . fmap f
+
+-- | Promote an 'OpenFAlgebra' into an 'OpenRAlgebra' (by dropping the original parameter).
+openFToOpenR :: OpenFAlgebra t a -> OpenRAlgebra t a
+openFToOpenR alg = alg . fmap snd
 
 -- | Lift an algebra into a decorator for terms annotated with records.
 decoratorWithAlgebra :: Functor f
