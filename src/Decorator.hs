@@ -45,7 +45,7 @@ type OpenFAlgebra t a = forall b . (b -> a) -> Base t b -> a
 -- | An open-recursive R-algebra on some 'Recursive' type @t@.
 type OpenRAlgebra t a = forall b . (b -> (t, a)) -> Base t b -> a
 
--- | Promote an FAlgebra into an RAlgebra (by dropping the original parameter).
+-- | Promote an 'FAlgebra' into an 'RAlgebra' (by dropping the original parameter).
 fToR :: Functor (Base t) => FAlgebra t a -> RAlgebra t a
 fToR f = f . fmap snd
 
