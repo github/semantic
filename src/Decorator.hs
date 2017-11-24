@@ -67,8 +67,8 @@ openFToOpenR alg = alg . fmap snd
 -- | Lift an algebra into a decorator for terms annotated with records.
 decoratorWithAlgebra :: Functor syntax
                      => RAlgebra (Term syntax (Record fs)) a -- ^ An R-algebra on terms.
-                     -> Term syntax (Record fs) -- ^ A term to decorate with values produced by the R-algebra.
-                     -> Term syntax (Record (a ': fs)) -- ^ A term decorated with values produced by the R-algebra.
+                     -> Term syntax (Record fs)              -- ^ A term to decorate with values produced by the R-algebra.
+                     -> Term syntax (Record (a ': fs))       -- ^ A term decorated with values produced by the R-algebra.
 decoratorWithAlgebra alg = para $ \ c@(In a f) -> termIn (alg (fmap (second (rhead . termAnnotation)) c) :. a) (fmap snd f)
 
 
