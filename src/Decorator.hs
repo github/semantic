@@ -31,10 +31,10 @@ import Data.Union
 import GHC.Generics
 import qualified Syntax as S
 
--- | An F-algebra on some carrier functor 'f'.
+-- | An F-algebra on some 'Recursive' type @t@.
 type FAlgebra t a = Base t a -> a
 
--- | An R-algebra on some carrier functor 'f' of its fixpoint type 't'.
+-- | An R-algebra on some 'Recursive' type @t@.
 type RAlgebra t a = Base t (t, a) -> a
 
 -- | Promote an FAlgebra into an RAlgebra (by dropping the original parameter).
