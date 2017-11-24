@@ -1,7 +1,9 @@
-{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Decorator
 ( FAlgebra
 , RAlgebra
+, OpenFAlgebra
+, OpenRAlgebra
 , fToR
 , decoratorWithAlgebra
 , identifierAlgebra
@@ -36,6 +38,12 @@ type FAlgebra t a = Base t a -> a
 
 -- | An R-algebra on some 'Recursive' type @t@.
 type RAlgebra t a = Base t (t, a) -> a
+
+-- | An open-recursive F-algebra on some 'Recursive' type @t@.
+type OpenFAlgebra t a = forall b . (b -> a) -> Base t b -> a
+
+-- | An open-recursive R-algebra on some 'Recursive' type @t@.
+type OpenRAlgebra t a = forall b . (b -> (t, a)) -> Base t b -> a
 
 -- | Promote an FAlgebra into an RAlgebra (by dropping the original parameter).
 fToR :: Functor (Base t) => FAlgebra t a -> RAlgebra t a
