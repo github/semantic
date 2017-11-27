@@ -36,7 +36,7 @@ instance Ord1 Match where liftCompare = genericLiftCompare
 instance Show1 Match where liftShowsPrec = genericLiftShowsPrec
 
 -- | A pattern in a pattern-matching or computed jump control-flow statement, like 'case' in C or JavaScript, 'when' in Ruby, or the left-hand side of '->' in the body of Haskell 'case' expressions.
-data Pattern a = Pattern { pattern :: !a, patternBody :: !a }
+data Pattern a = Pattern { _pattern :: !a, patternBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Pattern where liftEq = genericLiftEq
