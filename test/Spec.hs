@@ -4,11 +4,11 @@ import qualified Assigning.Assignment.Spec
 import qualified CommandSpec
 import qualified Data.Functor.Classes.Ord.Generic.Spec
 import qualified Data.Mergeable.Spec
+import qualified Data.Source.Spec
 import qualified Diffing.Algorithm.RWS.Spec
 import qualified DiffSpec
 import qualified InterpreterSpec
 import qualified SES.Spec
-import qualified SourceSpec
 import qualified TermSpec
 import qualified TOCSpec
 import qualified IntegrationSpec
@@ -25,11 +25,11 @@ main = hspec $ do
     describe "Command" CommandSpec.spec
     describe "Data.Functor.Classes.Ord.Generic" Data.Functor.Classes.Ord.Generic.Spec.spec
     describe "Data.Mergeable" Data.Mergeable.Spec.spec
+    describe "Data.Source" Data.Source.Spec.spec
     describe "Diff" DiffSpec.spec
     describe "Diffing.Algorithm.RWS" Diffing.Algorithm.RWS.Spec.spec
     describe "Interpreter" InterpreterSpec.spec
     describe "SES" SES.Spec.spec
-    describe "Source" SourceSpec.spec
     describe "Term" TermSpec.spec
     describe "Semantic" SemanticSpec.spec
     describe "SemanticCmdLine" SemanticCmdLineSpec.spec

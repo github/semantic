@@ -149,6 +149,7 @@ test-suite test
                      , Data.Functor.Classes.Ord.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Mergeable.Spec
+                     , Data.Source.Spec
                      , Diffing.Algorithm.RWS.Spec
                      , DiffSpec
                      , SemanticSpec
@@ -156,7 +157,6 @@ test-suite test
                      , Semantic.StatSpec
                      , InterpreterSpec
                      , SES.Spec
-                     , SourceSpec
                      , SpecHelpers
                      , TermSpec
                      , TOCSpec
