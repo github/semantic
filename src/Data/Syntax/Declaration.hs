@@ -4,6 +4,7 @@ module Data.Syntax.Declaration where
 import Abstract.Eval
 import Abstract.Value
 import Abstract.Type
+import Abstract.FreeVariables
 import Algorithm
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
@@ -13,7 +14,7 @@ import Data.Mergeable
 import GHC.Generics
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Diffable Function where
   equivalentBySubterm = Just . functionName

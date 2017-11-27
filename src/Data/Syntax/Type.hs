@@ -4,6 +4,7 @@ module Data.Syntax.Type where
 import Abstract.Eval
 import Abstract.Value
 import Abstract.Type
+import Abstract.FreeVariables
 import Algorithm
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
@@ -12,8 +13,9 @@ import Data.Functor.Classes.Show.Generic
 import Data.Mergeable
 import GHC.Generics
 
+-- TODO: What about type variables? re: FreeVariables1
 data Annotation a = Annotation { annotationSubject :: !a, annotationType :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Annotation where liftEq = genericLiftEq
 instance Ord1 Annotation where liftCompare = genericLiftCompare

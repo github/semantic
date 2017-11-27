@@ -5,6 +5,7 @@ import Abstract.Eval
 import Abstract.Value
 import Abstract.Type
 import Abstract.Primitive
+import Abstract.FreeVariables
 import Control.Monad.Effect
 import Algorithm hiding (Empty)
 import Control.Applicative
@@ -22,6 +23,7 @@ import Data.Functor.Classes.Show.Generic
 import Data.Mergeable
 import Data.Range
 import Data.Record
+import Data.Pointed
 import Data.Semigroup
 import Data.Span
 import qualified Data.Syntax.Assignment as Assignment
@@ -118,8 +120,11 @@ instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 instance (Monad m) => Eval l (Value s a l) m s a Identifier
 instance (Monad m) => Eval l Type m s a Identifier
 
+instance FreeVariables1 Identifier where
+  liftFreeVariables _ (Identifier x) = point x
+
 newtype Program a = Program [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Program where liftEq = genericLiftEq
 instance Ord1 Program where liftCompare = genericLiftCompare
@@ -145,7 +150,7 @@ instance Show1 AccessibilityModifier where liftShowsPrec = genericLiftShowsPrec
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Empty where liftEq _ _ _ = True
 instance Ord1 Empty where liftCompare _ _ _ = EQ
@@ -159,7 +164,7 @@ instance (Monad m) => Eval l Type m s a Empty where
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
@@ -191,7 +196,7 @@ instance Ord ErrorStack where
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Diffable Context where
   subalgorithmFor blur focus (Context n s) = Context <$> traverse blur n <*> focus s

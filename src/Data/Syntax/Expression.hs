@@ -4,6 +4,7 @@ module Data.Syntax.Expression where
 import Abstract.Eval
 import Abstract.Value
 import Abstract.Type
+import Abstract.FreeVariables
 import Algorithm
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
@@ -14,7 +15,7 @@ import GHC.Generics
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Call where liftEq = genericLiftEq
 instance Ord1 Call where liftCompare = genericLiftCompare

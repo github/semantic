@@ -5,6 +5,7 @@ import Abstract.Eval
 import Abstract.Value
 import Abstract.Primitive
 import Abstract.Type
+import Abstract.FreeVariables
 import Algorithm
 import Data.Align.Generic
 import Data.ByteString (ByteString)
@@ -16,7 +17,7 @@ import GHC.Generics
 
 -- | An unnested comment (line or block).
 newtype Comment a = Comment { commentContent :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Comment where liftEq = genericLiftEq
 instance Ord1 Comment where liftCompare = genericLiftCompare

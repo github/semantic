@@ -5,6 +5,7 @@ import Abstract.Eval
 import Abstract.Value
 import Abstract.Type
 import Abstract.Primitive
+import Abstract.FreeVariables
 import Algorithm
 import Data.Align.Generic
 import Data.Maybe
@@ -20,7 +21,7 @@ import Prelude
 -- Boolean
 
 newtype Boolean a = Boolean Bool
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 true :: Boolean a
 true = Boolean True
@@ -43,7 +44,7 @@ instance (Monad m) => Eval l Type m s a Boolean where
 
 -- | A literal integer of unspecified width. No particular base is implied.
 newtype Integer a = Integer { integerContent :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Data.Syntax.Literal.Integer where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Integer where liftCompare = genericLiftCompare
@@ -107,7 +108,7 @@ instance Show1 InterpolationElement where liftShowsPrec = genericLiftShowsPrec
 
 -- | A sequence of textual contents within a string literal.
 newtype TextElement a = TextElement { textElementContent :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 TextElement where liftEq = genericLiftEq
 instance Ord1 TextElement where liftCompare = genericLiftCompare
