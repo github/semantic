@@ -7,7 +7,7 @@ import Data.Functor.Both as Both
 import Data.Patch
 import Data.Term
 import Language
-import Renderer
+import Rendering.Renderer
 import Semantic
 import Semantic.Task
 import Syntax

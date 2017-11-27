@@ -7,7 +7,7 @@ import Data.Foldable (for_)
 import Data.Functor.Both
 import Data.Semigroup ((<>))
 import Language
-import Renderer
+import Rendering.Renderer
 import Semantic.CLI
 import Semantic.Task
 import System.IO (Handle)

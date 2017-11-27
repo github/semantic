@@ -15,7 +15,7 @@ import Data.Term
 import Diffing.Algorithm
 import Diffing.Interpreter
 import Parsing.Parser
-import Renderer.TOC
+import Rendering.TOC
 import Semantic
 import Semantic.IO as IO
 import Semantic.Task

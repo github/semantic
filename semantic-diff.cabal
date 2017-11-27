@@ -67,11 +67,11 @@ library
                      , Parsing.CMark
                      , Parsing.TreeSitter
                      , Paths_semantic_diff
-                     , Renderer
-                     , Renderer.JSON
-                     , Renderer.SExpression
-                     , Renderer.Tag
-                     , Renderer.TOC
+                     , Rendering.JSON
+                     , Rendering.Renderer
+                     , Rendering.SExpression
+                     , Rendering.Tag
+                     , Rendering.TOC
                      , Semantic
                      , Semantic.CLI
                      , Semantic.IO

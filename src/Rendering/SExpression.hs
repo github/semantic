@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables #-}
-module Renderer.SExpression
+module Rendering.SExpression
 ( renderSExpressionDiff
 , renderSExpressionTerm
 ) where

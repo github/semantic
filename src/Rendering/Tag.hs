@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Renderer.Tag
+module Rendering.Tag
 ( renderToTags
 ) where
 
@@ -11,7 +11,7 @@ import Data.Term
 import GHC.Generics
 import Info
 import qualified Data.Text as T
-import Renderer.TOC
+import Rendering.TOC
 
 -- | Render a 'Term' to a ctags like output (See 'Tag').
 renderToTags :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> [Value]

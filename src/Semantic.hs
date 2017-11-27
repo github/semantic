@@ -28,7 +28,7 @@ import Info
 import Diffing.Interpreter
 import qualified Language
 import Parsing.Parser
-import Renderer
+import Rendering.Renderer
 import Semantic.Task as Task
 import Semantic.Stat as Stat
 

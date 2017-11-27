@@ -28,8 +28,8 @@ import Diffing.Interpreter
 import Language
 import Parsing.Parser
 import Prelude hiding (readFile)
-import Renderer
-import Renderer.TOC
+import Rendering.Renderer
+import Rendering.TOC
 import Semantic
 import Semantic.Task
 import Semantic.Util

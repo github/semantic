@@ -1,4 +1,4 @@
-module Renderer.JSON
+module Rendering.JSON
 ( renderJSONDiff
 , renderJSONTerm
 ) where

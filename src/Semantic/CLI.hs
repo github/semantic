@@ -17,7 +17,7 @@ import Data.Version (showVersion)
 import Development.GitRev
 import Language
 import Options.Applicative hiding (action)
-import Renderer
+import Rendering.Renderer
 import qualified Paths_semantic_diff as Library (version)
 import Semantic.IO (languageForFilePath)
 import qualified Semantic.Log as Log

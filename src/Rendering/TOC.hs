@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Renderer.TOC
+module Rendering.TOC
 ( renderToCDiff
 , renderToCTerm
 , diffTOC

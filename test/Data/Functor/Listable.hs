@@ -51,7 +51,7 @@ import qualified Data.Text.Encoding as T
 import Data.These
 import Data.Union
 import Diffing.Algorithm.RWS
-import Renderer.TOC
+import Rendering.TOC
 import Syntax as S
 import Test.LeanCheck
 import qualified Language

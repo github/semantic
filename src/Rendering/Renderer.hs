@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, TypeOperators #-}
-module Renderer
+module Rendering.Renderer
 ( DiffRenderer(..)
 , TermRenderer(..)
 , SomeRenderer(..)
@@ -21,10 +21,10 @@ import Data.ByteString (ByteString)
 import qualified Data.Map as Map
 import Data.Output
 import Data.Text (Text)
-import Renderer.JSON as R
-import Renderer.SExpression as R
-import Renderer.Tag as R
-import Renderer.TOC as R
+import Rendering.JSON as R
+import Rendering.SExpression as R
+import Rendering.Tag as R
+import Rendering.TOC as R
 
 -- | Specification of renderers for diffs, producing output in the parameter type.
 data DiffRenderer output where
