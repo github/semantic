@@ -151,12 +151,12 @@ test-suite test
                      , Data.Mergeable.Spec
                      , Data.Source.Spec
                      , Diffing.Algorithm.RWS.Spec
+                     , Diffing.Algorithm.SES.Spec
                      , DiffSpec
                      , SemanticSpec
                      , SemanticCmdLineSpec
                      , Semantic.StatSpec
                      , InterpreterSpec
-                     , SES.Spec
                      , SpecHelpers
                      , TermSpec
                      , TOCSpec

@@ -6,9 +6,9 @@ import qualified Data.Functor.Classes.Ord.Generic.Spec
 import qualified Data.Mergeable.Spec
 import qualified Data.Source.Spec
 import qualified Diffing.Algorithm.RWS.Spec
+import qualified Diffing.Algorithm.SES.Spec
 import qualified DiffSpec
 import qualified InterpreterSpec
-import qualified SES.Spec
 import qualified TermSpec
 import qualified TOCSpec
 import qualified IntegrationSpec
@@ -28,8 +28,8 @@ main = hspec $ do
     describe "Data.Source" Data.Source.Spec.spec
     describe "Diff" DiffSpec.spec
     describe "Diffing.Algorithm.RWS" Diffing.Algorithm.RWS.Spec.spec
+    describe "Diffing.Algorithm.SES" Diffing.Algorithm.SES.Spec.spec
     describe "Interpreter" InterpreterSpec.spec
-    describe "SES" SES.Spec.spec
     describe "Term" TermSpec.spec
     describe "Semantic" SemanticSpec.spec
     describe "SemanticCmdLine" SemanticCmdLineSpec.spec

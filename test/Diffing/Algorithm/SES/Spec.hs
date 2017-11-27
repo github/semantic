@@ -1,4 +1,4 @@
-module SES.Spec where
+module Diffing.Algorithm.SES.Spec where
 
 import Data.These
 import Diffing.Algorithm.SES
