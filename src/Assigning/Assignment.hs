@@ -63,9 +63,6 @@ module Assigning.Assignment
 -- Types
 ( Assignment
 , Location
-, AST
-, Node(..)
-, nodeLocation
 -- Combinators
 , Alternative(..)
 , MonadError(..)
@@ -101,6 +98,7 @@ import Control.Monad ((<=<), guard)
 import Control.Monad.Error.Class hiding (Error)
 import Control.Monad.Fail
 import Control.Monad.Free.Freer
+import Data.AST
 import Data.Bifunctor
 import Data.ByteString (ByteString)
 import Data.Error
@@ -214,22 +212,6 @@ manyThrough :: (Alternative m, HasCallStack) => m a -> m b -> m ([a], b)
 manyThrough step stop = go
   where go = (,) [] <$> stop <|> first . (:) <$> step <*> go
 
-
--- | A location specified as possibly-empty intervals of bytes and line/column positions.
-type Location = '[Info.Range, Info.Span]
-
--- | An AST node labelled with symbols and source location.
-type AST f grammar = Term f (Node grammar)
-
-data Node grammar = Node
-  { nodeSymbol :: !grammar
-  , nodeByteRange :: {-# UNPACK #-} !Info.Range
-  , nodeSpan :: {-# UNPACK #-} !Info.Span
-  }
-  deriving (Eq, Show)
-
-nodeLocation :: Node grammar -> Record Location
-nodeLocation Node{..} = nodeByteRange :. nodeSpan :. Nil
 
 nodeError :: HasCallStack => [Either String grammar] -> Node grammar -> Error (Either String grammar)
 nodeError expected Node{..} = Error nodeSpan expected (Just (Right nodeSymbol))

@@ -14,13 +14,14 @@ module Parsing.Parser
 , typescriptParser
 ) where
 
+import Assigning.Assignment
 import qualified CMarkGFM
+import Data.AST
 import Data.Functor.Classes (Eq1)
 import Data.Kind
 import Data.Ix
 import Data.Record
 import qualified Data.Syntax as Syntax
-import Assigning.Assignment
 import Data.Term
 import Data.Union
 import Foreign.Ptr

@@ -2,6 +2,7 @@
 module Data.Syntax.Assignment.Spec where
 
 import Assigning.Assignment
+import Data.AST
 import Data.Bifunctor (first)
 import Data.ByteString.Char8 as B (ByteString, length, words)
 import Data.Ix

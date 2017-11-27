@@ -6,10 +6,10 @@ module Parsing.CMark
 ) where
 
 import CMarkGFM
+import qualified Data.AST as A
 import Data.Ix
 import Data.Source
 import Data.Term
-import qualified Assigning.Assignment as A (AST, Node(..))
 import Info
 import TreeSitter.Language (Symbol(..), SymbolType(..))
 

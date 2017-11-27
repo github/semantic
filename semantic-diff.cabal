@@ -17,6 +17,7 @@ library
                      , Assigning.Assignment.Table
                      , Category
                      , Data.Align.Generic
+                     , Data.AST
                      , Data.Blob
                      , Data.Diff
                      , Data.Error
