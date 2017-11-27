@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances, DeriveAnyClass, DuplicateRecordFields, ScopedTypeVariables, TupleSections #-}
-module Files
+module Semantic.IO
 ( readFile
 , isDirectory
 , readBlobPairsFromHandle
@@ -60,7 +60,7 @@ readBlobsFromHandle = fmap toBlobs . readFromHandle
   where toBlobs BlobParse{..} = fmap toBlob blobs
 
 readBlobsFromPaths :: MonadIO m => [(FilePath, Maybe Language)] -> m [Blob.Blob]
-readBlobsFromPaths = traverse (uncurry Files.readFile)
+readBlobsFromPaths = traverse (uncurry Semantic.IO.readFile)
 
 readBlobsFromDir :: MonadIO m => FilePath -> m [Blob.Blob]
 readBlobsFromDir path = do

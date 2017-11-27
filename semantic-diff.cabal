@@ -47,7 +47,6 @@ library
                      , Diffing.Algorithm.RWS.FeatureVector
                      , Diffing.Algorithm.SES
                      , Diffing.Interpreter
-                     , Files
                      , Info
                      , Language
                      , Language.Markdown.Assignment
@@ -75,6 +74,7 @@ library
                      , Renderer.TOC
                      , Semantic
                      , Semantic.CLI
+                     , Semantic.IO
                      , Semantic.Log
                      , Semantic.Stat
                      , Semantic.Task

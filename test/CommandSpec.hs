@@ -1,12 +1,12 @@
 module CommandSpec where
 
-import Files
 import Data.Blob
 import Data.Functor.Both as Both
 import Data.Maybe
 import Data.String
 import Language
 import Prelude hiding (readFile)
+import Semantic.IO
 import System.Exit (ExitCode(..))
 import System.IO (IOMode(..), openFile)
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)

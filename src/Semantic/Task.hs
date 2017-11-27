@@ -46,13 +46,13 @@ import Data.Term
 import Data.Union
 import Decorator (RAlgebra, decoratorWithAlgebra)
 import Info hiding (Category(..))
-import qualified Files
 import Language
 import Parser
 import Parser.CMark
 import Parser.TreeSitter
 import System.Exit (die)
 import System.IO (Handle, stderr)
+import qualified Semantic.IO as IO
 import Semantic.Log
 import Semantic.Stat as Stat
 import Semantic.Queue
@@ -176,10 +176,10 @@ runTaskWithOptions options task = do
       where
         go :: Task a -> IO (Either SomeException a)
         go = iterFreerA (\ task yield -> case task of
-          ReadBlobs (Left handle) -> (Files.readBlobsFromHandle handle >>= yield) `catchError` (pure . Left . toException)
-          ReadBlobs (Right paths@[(path, Nothing)]) -> (Files.isDirectory path >>= bool (Files.readBlobsFromPaths paths) (Files.readBlobsFromDir path) >>= yield) `catchError` (pure . Left . toException)
-          ReadBlobs (Right paths) -> (Files.readBlobsFromPaths paths >>= yield) `catchError` (pure . Left . toException)
-          ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left . toException)
+          ReadBlobs (Left handle) -> (IO.readBlobsFromHandle handle >>= yield) `catchError` (pure . Left . toException)
+          ReadBlobs (Right paths@[(path, Nothing)]) -> (IO.isDirectory path >>= bool (IO.readBlobsFromPaths paths) (IO.readBlobsFromDir path) >>= yield) `catchError` (pure . Left . toException)
+          ReadBlobs (Right paths) -> (IO.readBlobsFromPaths paths >>= yield) `catchError` (pure . Left . toException)
+          ReadBlobPairs source -> (either IO.readBlobPairsFromHandle (traverse (traverse (uncurry IO.readFile))) source >>= yield) `catchError` (pure . Left . toException)
           WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
           WriteLog level message pairs -> queueLogMessage logger level message pairs >>= yield
           WriteStat stat -> queue statter stat >>= yield

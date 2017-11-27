@@ -7,7 +7,6 @@ module Semantic.CLI
 ) where
 
 import Control.Monad ((<=<))
-import Files (languageForFilePath)
 import Data.ByteString (ByteString)
 import Data.Foldable (find)
 import Data.Functor.Both hiding (fst, snd)
@@ -20,8 +19,9 @@ import Language
 import Options.Applicative hiding (action)
 import Renderer
 import qualified Paths_semantic_diff as Library (version)
-import qualified Semantic.Task as Task
+import Semantic.IO (languageForFilePath)
 import qualified Semantic.Log as Log
+import qualified Semantic.Task as Task
 import System.IO (Handle, stdin, stdout)
 import qualified Semantic (parseBlobs, diffBlobPairs)
 import Text.Read
