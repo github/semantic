@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators #-}
 module Data.Syntax where
 
-import Algorithm hiding (Empty)
+import Diffing.Algorithm hiding (Empty)
 import Control.Applicative
 import Control.Monad.Error.Class hiding (Error)
 import Data.Align.Generic

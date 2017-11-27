@@ -7,7 +7,7 @@ module Semantic
 , diffTermPair
 ) where
 
-import Algorithm (Diffable)
+import Diffing.Algorithm (Diffable)
 import Control.Exception
 import Control.Monad ((>=>), guard)
 import Control.Monad.Error.Class

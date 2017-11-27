@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, DefaultSignatures, GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
-module Algorithm where
+module Diffing.Algorithm where
 
 import Control.Applicative (Alternative(..))
 import Control.Monad (guard)
@@ -41,7 +41,7 @@ type Algorithm term1 term2 result = Freer (AlgorithmF term1 term2 result)
 
 -- | Diff two terms without specifying the algorithm to be used.
 diff :: term1 -> term2 -> Algorithm term1 term2 result result
-diff a1 a2 = Algorithm.Diff a1 a2 `Then` return
+diff a1 a2 = Diffing.Algorithm.Diff a1 a2 `Then` return
 
 -- | Diff a These of terms without specifying the algorithm to be used.
 diffThese :: These term1 term2 -> Algorithm term1 term2 result result
@@ -77,7 +77,7 @@ byReplacing a1 a2 = Replace a1 a2 `Then` return
 
 instance (Show term1, Show term2) => Show1 (AlgorithmF term1 term2 result) where
   liftShowsPrec sp _ d algorithm = case algorithm of
-    Algorithm.Diff t1 t2 -> showsBinaryWith showsPrec showsPrec "Diff" d t1 t2
+    Diffing.Algorithm.Diff t1 t2 -> showsBinaryWith showsPrec showsPrec "Diff" d t1 t2
     Linear t1 t2 -> showsBinaryWith showsPrec showsPrec "Linear" d t1 t2
     RWS as bs -> showsBinaryWith (liftShowsPrec showsPrec showList) (liftShowsPrec showsPrec showList) "RWS" d as bs
     Delete t1 -> showsUnaryWith showsPrec "Delete" d t1

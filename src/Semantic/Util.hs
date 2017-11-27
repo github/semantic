@@ -7,7 +7,7 @@ import Data.Blob
 import Files
 import Data.Record
 import Data.Functor.Classes
-import Algorithm
+import Diffing.Algorithm
 import Data.Align.Generic
 import Interpreter
 import Parser

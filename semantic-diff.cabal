@@ -13,8 +13,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Algorithm
-                     , Category
+  exposed-modules:     Category
                      , Data.Align.Generic
                      , Data.Blob
                      , Data.Diff
@@ -43,6 +42,7 @@ library
                      , Data.Syntax.Type
                      , Data.Term
                      , Decorator
+                     , Diffing.Algorithm
                      , Files
                      , Info
                      , Interpreter
