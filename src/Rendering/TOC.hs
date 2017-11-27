@@ -20,8 +20,8 @@ module Rendering.TOC
 , toCategoryName
 ) where
 
-import Analysis.Decorator (RAlgebra)
 import Data.Aeson
+import Data.Algebra (RAlgebra)
 import Data.Align (bicrosswalk)
 import Data.Bifoldable (bifoldMap)
 import Data.Bifunctor (bimap)

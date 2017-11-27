@@ -21,6 +21,7 @@ library
                      , Assigning.Assignment.Table
                      , Category
                      -- General datatype definitions & generic algorithms
+                     , Data.Algebra
                      , Data.Align.Generic
                      , Data.AST
                      , Data.Blob

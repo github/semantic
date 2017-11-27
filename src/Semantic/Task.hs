@@ -25,7 +25,7 @@ module Semantic.Task
 , runTaskWithOptions
 ) where
 
-import Analysis.Decorator (RAlgebra, decoratorWithAlgebra)
+import Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
 import Control.Exception
 import Control.Monad.Error.Class
@@ -33,6 +33,7 @@ import Control.Monad.IO.Class
 import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
+import Data.Algebra (RAlgebra)
 import Data.Blob
 import Data.Bool
 import qualified Data.ByteString as B
