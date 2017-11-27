@@ -15,7 +15,7 @@ import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Term
 import Data.Text (Text)
-import Decorator
+import Decorating.Decorator
 import Diffing.Algorithm.RWS
 import Info hiding (Empty, Return)
 import Syntax (Syntax(Leaf))

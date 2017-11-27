@@ -44,7 +44,7 @@ import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Term
 import Data.Union
-import Decorator (RAlgebra, decoratorWithAlgebra)
+import Decorating.Decorator (RAlgebra, decoratorWithAlgebra)
 import Info hiding (Category(..))
 import Language
 import Parsing.Parser

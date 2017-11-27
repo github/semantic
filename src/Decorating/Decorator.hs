@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Decorator
+module Decorating.Decorator
 ( FAlgebra
 , RAlgebra
 , OpenFAlgebra

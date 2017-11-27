@@ -46,6 +46,7 @@ import Data.Term
 import Data.Text (toLower, stripEnd)
 import qualified Data.Text as T
 import Data.Union
+import Decorating.Decorator (RAlgebra)
 import GHC.Generics
 import Info
 import Language
@@ -54,7 +55,6 @@ import qualified Data.Map as Map hiding (null)
 import Syntax as S
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
-import Decorator (RAlgebra)
 import qualified Language.Markdown.Syntax as Markdown
 
 data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }

@@ -23,7 +23,7 @@ import Data.Output
 import Data.Record
 import Data.Term
 import Data.Typeable
-import Decorator
+import Decorating.Decorator
 import Info
 import Diffing.Interpreter
 import qualified Language

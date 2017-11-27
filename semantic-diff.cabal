@@ -41,7 +41,7 @@ library
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
                      , Data.Term
-                     , Decorator
+                     , Decorating.Decorator
                      , Diffing.Algorithm
                      , Diffing.Algorithm.RWS
                      , Diffing.Algorithm.RWS.FeatureVector
