@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, ScopedTypeVariables, TypeOperators #-}
-module Parser.TreeSitter
+module Parsing.TreeSitter
 ( treeSitterParser
 , parseToAST
 ) where

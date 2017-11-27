@@ -63,9 +63,9 @@ library
                      , Language.Python.Assignment
                      , Language.Python.Grammar
                      , Language.Python.Syntax
-                     , Parser
-                     , Parser.CMark
-                     , Parser.TreeSitter
+                     , Parsing.Parser
+                     , Parsing.CMark
+                     , Parsing.TreeSitter
                      , Paths_semantic_diff
                      , Renderer
                      , Renderer.JSON

@@ -1,5 +1,5 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
-module Parser
+module Parsing.Parser
 ( Parser(..)
 , SomeParser(..)
 , someParser

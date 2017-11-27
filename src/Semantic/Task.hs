@@ -47,9 +47,9 @@ import Data.Union
 import Decorator (RAlgebra, decoratorWithAlgebra)
 import Info hiding (Category(..))
 import Language
-import Parser
-import Parser.CMark
-import Parser.TreeSitter
+import Parsing.Parser
+import Parsing.CMark
+import Parsing.TreeSitter
 import System.Exit (die)
 import System.IO (Handle, stderr)
 import qualified Semantic.IO as IO

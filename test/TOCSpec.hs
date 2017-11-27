@@ -26,6 +26,7 @@ import Info hiding (Go)
 import Diffing.Algorithm.RWS
 import Diffing.Interpreter
 import Language
+import Parsing.Parser
 import Prelude hiding (readFile)
 import Renderer
 import Renderer.TOC
@@ -38,7 +39,6 @@ import Test.Hspec (Spec, describe, it, parallel, pending)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
 import Test.LeanCheck
-import Parser
 
 spec :: Spec
 spec = parallel $ do
