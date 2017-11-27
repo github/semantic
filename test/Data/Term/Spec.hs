@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-module TermSpec where
+module Data.Term.Spec where
 
 import Category
 import Data.Functor.Listable
