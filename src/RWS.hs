@@ -32,8 +32,8 @@ import Data.Semigroup hiding (First(..))
 import Data.Term as Term
 import Data.These
 import Data.Traversable
+import Diffing.Algorithm.SES
 import RWS.FeatureVector
-import SES
 
 type Label f fields label = forall b. TermF f (Record fields) b -> label
 

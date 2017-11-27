@@ -43,6 +43,7 @@ library
                      , Data.Term
                      , Decorator
                      , Diffing.Algorithm
+                     , Diffing.Algorithm.SES
                      , Diffing.Interpreter
                      , Files
                      , Info
@@ -79,7 +80,6 @@ library
                      , Semantic.Queue
                      , Semantic.Util
                      , SemanticCmdLine
-                     , SES
                      , Syntax
   build-depends:       base >= 4.8 && < 5
                      , aeson

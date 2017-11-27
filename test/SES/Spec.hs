@@ -1,7 +1,7 @@
 module SES.Spec where
 
 import Data.These
-import SES
+import Diffing.Algorithm.SES
 import Test.Hspec
 import Test.Hspec.LeanCheck
 

@@ -1,5 +1,5 @@
 {-# LANGUAGE BangPatterns, GADTs, ImplicitParams, MultiParamTypeClasses, ScopedTypeVariables #-}
-module SES
+module Diffing.Algorithm.SES
 ( EditScript
 , ses
 ) where
