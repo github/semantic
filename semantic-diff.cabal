@@ -154,8 +154,8 @@ test-suite test
                      , DiffSpec
                      , Semantic.CLI.Spec
                      , Semantic.IO.Spec
+                     , Semantic.Stat.Spec
                      , SemanticSpec
-                     , Semantic.StatSpec
                      , InterpreterSpec
                      , SpecHelpers
                      , TermSpec

@@ -13,13 +13,13 @@ import qualified TOCSpec
 import qualified IntegrationSpec
 import qualified Semantic.CLI.Spec
 import qualified Semantic.IO.Spec
+import qualified Semantic.Stat.Spec
 import qualified SemanticSpec
-import qualified Semantic.StatSpec
 import Test.Hspec
 
 main :: IO ()
 main = hspec $ do
-  describe "Semantic.Stat" Semantic.StatSpec.spec
+  describe "Semantic.Stat" Semantic.Stat.Spec.spec
   parallel $ do
     describe "Assigning.Assignment" Assigning.Assignment.Spec.spec
     describe "Data.Functor.Classes.Ord.Generic" Data.Functor.Classes.Ord.Generic.Spec.spec
