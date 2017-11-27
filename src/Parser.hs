@@ -20,7 +20,7 @@ import Data.Kind
 import Data.Ix
 import Data.Record
 import qualified Data.Syntax as Syntax
-import Data.Syntax.Assignment
+import Assigning.Assignment
 import Data.Term
 import Data.Union
 import Foreign.Ptr

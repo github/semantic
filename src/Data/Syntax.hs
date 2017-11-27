@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators #-}
 module Data.Syntax where
 
+import qualified Assigning.Assignment as Assignment
 import Diffing.Algorithm hiding (Empty)
 import Control.Applicative
 import Control.Monad.Error.Class hiding (Error)
@@ -19,7 +20,6 @@ import Data.Range
 import Data.Record
 import Data.Semigroup
 import Data.Span
-import qualified Data.Syntax.Assignment as Assignment
 import Data.Term
 import Data.Union
 import GHC.Generics

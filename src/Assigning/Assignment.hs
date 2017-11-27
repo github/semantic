@@ -59,7 +59,7 @@
 --   AST symbols are classified by their 'symbolType' as either 'Regular', 'Anonymous', or 'Auxiliary'. 'Auxiliary' never appears in ASTs; 'Regular' is for the symbols of explicitly named productions in the grammar, and 'Anonymous' is for unnamed productions of content such as tokens. Most of the time, assignments are only concerned with the named productions, and thus will be using 'Regular' symbols. Therefore, when matching a committed choice of all-'Regular' symbols, nodes with 'Anonymous' symbols will be skipped. However, in some cases grammars don’t provide a named symbol for e.g. every kind of infix operator, and thus the only way to differentiate between them is by means of a 'symbol' rule for an 'Anonymous' token. In these cases, and before every other kind of assignment, the 'Anonymous' nodes will not be skipped so that matching can succeed.
 --
 --   Therefore, in addition to the rule of thumb for committed choices (see above), try to match 'Regular' symbols up front, and only match 'Anonymous' ones in the middle of a chain. That will ensure that you don’t have to make redundant effort to explicitly skip 'Anonymous' nodes ahead of multiple alternatives, and can instead rely on them being automatically skipped except when explicitly required.
-module Data.Syntax.Assignment
+module Assigning.Assignment
 -- Types
 ( Assignment
 , Location
@@ -95,6 +95,7 @@ module Data.Syntax.Assignment
 , module Parsers
 ) where
 
+import qualified Assigning.Assignment.Table as Table
 import Control.Applicative
 import Control.Monad ((<=<), guard)
 import Control.Monad.Error.Class hiding (Error)
@@ -112,7 +113,6 @@ import Data.Maybe
 import Data.Record
 import Data.Semigroup
 import qualified Data.Source as Source (Source, slice, sourceBytes)
-import qualified Data.Syntax.Assignment.Table as Table
 import Data.Term
 import GHC.Stack
 import qualified Info

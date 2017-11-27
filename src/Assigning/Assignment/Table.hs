@@ -1,4 +1,4 @@
-module Data.Syntax.Assignment.Table
+module Assigning.Assignment.Table
 ( Table(tableAddresses)
 , singleton
 , fromListWith

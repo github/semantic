@@ -4,6 +4,7 @@ module Parser.TreeSitter
 , parseToAST
 ) where
 
+import qualified Assigning.Assignment as A
 import Category
 import Control.Exception
 import Control.Monad ((<=<))
@@ -15,7 +16,6 @@ import Data.Range
 import Data.Record
 import Data.Source
 import Data.Span
-import qualified Data.Syntax.Assignment as A
 import Data.Term
 import Data.Text (Text, pack)
 import Language

@@ -25,6 +25,7 @@ module Semantic.Task
 , runTaskWithOptions
 ) where
 
+import qualified Assigning.Assignment as Assignment
 import Control.Exception
 import Control.Monad.Error.Class
 import Control.Monad.IO.Class
@@ -41,7 +42,6 @@ import Data.Functor.Both as Both hiding (snd)
 import Data.Functor.Foldable (cata)
 import Data.Record
 import qualified Data.Syntax as Syntax
-import qualified Data.Syntax.Assignment as Assignment
 import Data.Term
 import Data.Union
 import Decorator (RAlgebra, decoratorWithAlgebra)

@@ -9,7 +9,7 @@ import CMarkGFM
 import Data.Ix
 import Data.Source
 import Data.Term
-import qualified Data.Syntax.Assignment as A (AST, Node(..))
+import qualified Assigning.Assignment as A (AST, Node(..))
 import Info
 import TreeSitter.Language (Symbol(..), SymbolType(..))
 

@@ -13,7 +13,9 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Category
+  exposed-modules:     Assigning.Assignment
+                     , Assigning.Assignment.Table
+                     , Category
                      , Data.Align.Generic
                      , Data.Blob
                      , Data.Diff
@@ -32,8 +34,6 @@ library
                      , Data.Span
                      , Data.SplitDiff
                      , Data.Syntax
-                     , Data.Syntax.Assignment
-                     , Data.Syntax.Assignment.Table
                      , Data.Syntax.Comment
                      , Data.Syntax.Declaration
                      , Data.Syntax.Expression

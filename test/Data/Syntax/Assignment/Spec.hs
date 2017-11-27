@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 module Data.Syntax.Assignment.Spec where
 
+import Assigning.Assignment
 import Data.Bifunctor (first)
 import Data.ByteString.Char8 as B (ByteString, length, words)
 import Data.Ix
@@ -8,7 +9,6 @@ import Data.Range
 import Data.Semigroup ((<>))
 import Data.Source
 import Data.Span
-import Data.Syntax.Assignment
 import Data.Term
 import GHC.Stack (getCallStack)
 import Prelude hiding (words)
