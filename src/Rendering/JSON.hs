@@ -8,11 +8,11 @@ import Data.Aeson as A hiding (json)
 import Data.Blob
 import Data.Foldable (toList)
 import Data.Functor.Both (Both)
+import Data.Language
 import qualified Data.Map as Map
 import Data.Text (Text)
 import Data.Text.Encoding (decodeUtf8)
 import GHC.Generics
-import Language
 
 --
 -- Diffs

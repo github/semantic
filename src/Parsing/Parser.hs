@@ -18,15 +18,15 @@ import Assigning.Assignment
 import qualified CMarkGFM
 import Data.AST
 import Data.Functor.Classes (Eq1)
-import Data.Kind
 import Data.Ix
+import Data.Kind
+import Data.Language
 import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Term
 import Data.Union
 import Foreign.Ptr
 import Info hiding (Empty, Go)
-import Language
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.Python.Assignment as Python

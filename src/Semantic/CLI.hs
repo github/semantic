@@ -10,12 +10,12 @@ import Control.Monad ((<=<))
 import Data.ByteString (ByteString)
 import Data.Foldable (find)
 import Data.Functor.Both hiding (fst, snd)
+import Data.Language
 import Data.List (intercalate)
 import Data.List.Split (splitWhen)
 import Data.Semigroup ((<>))
 import Data.Version (showVersion)
 import Development.GitRev
-import Language
 import Options.Applicative hiding (action)
 import Rendering.Renderer
 import qualified Paths_semantic_diff as Library (version)

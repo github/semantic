@@ -12,13 +12,13 @@ import Data.Blob
 import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
 import Data.Foldable (toList)
 import Data.Functor.Foldable hiding (Nil)
+import Data.Language as Language
 import Data.Range
 import Data.Record
 import Data.Source
 import Data.Span
 import Data.Term
 import Data.Text (Text, pack)
-import Language
 import qualified Language.Go as Go
 import Foreign
 import Foreign.C.String (peekCString)

@@ -26,7 +26,7 @@ import Data.Typeable
 import Decorating.Decorator
 import Info
 import Diffing.Interpreter
-import qualified Language
+import qualified Data.Language as Language
 import Parsing.Parser
 import Rendering.Renderer
 import Semantic.Task as Task

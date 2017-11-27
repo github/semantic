@@ -26,6 +26,7 @@ library
                      , Data.Functor.Classes.Ord.Generic
                      , Data.Functor.Classes.Show.Generic
                      , Data.JSON.Fields
+                     , Data.Language
                      , Data.Mergeable
                      , Data.Output
                      , Data.Patch
@@ -49,7 +50,6 @@ library
                      , Diffing.Algorithm.SES
                      , Diffing.Interpreter
                      , Info
-                     , Language
                      , Language.Markdown.Assignment
                      , Language.Markdown.Syntax
                      , Language.Go

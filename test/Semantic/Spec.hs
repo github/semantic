@@ -4,9 +4,9 @@ import Data.Blob
 import Data.Diff
 import Data.Functor (void)
 import Data.Functor.Both as Both
+import Data.Language
 import Data.Patch
 import Data.Term
-import Language
 import Rendering.Renderer
 import Semantic
 import Semantic.Task

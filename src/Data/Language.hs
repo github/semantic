@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
-module Language where
+module Data.Language where
 
 import Data.Aeson
 import GHC.Generics
@@ -22,7 +22,7 @@ languageForType mediaType = case mediaType of
     ".json" -> Just JSON
     ".md" -> Just Markdown
     ".rb" -> Just Ruby
-    ".go" -> Just Language.Go
+    ".go" -> Just Go
     ".js" -> Just TypeScript
     ".ts" -> Just TypeScript
     ".tsx" -> Just TypeScript

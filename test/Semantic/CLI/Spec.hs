@@ -5,8 +5,8 @@ import Control.Monad (when)
 import Data.ByteString (ByteString)
 import Data.Foldable (for_)
 import Data.Functor.Both
+import Data.Language
 import Data.Semigroup ((<>))
-import Language
 import Rendering.Renderer
 import Semantic.CLI
 import Semantic.Task

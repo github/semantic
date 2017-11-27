@@ -34,6 +34,7 @@ import Data.ByteString (ByteString)
 import Data.Char (chr)
 import Data.Diff
 import Data.Functor.Both
+import qualified Data.Language as Language
 import Data.List.NonEmpty
 import Data.Patch
 import Data.Range
@@ -54,7 +55,6 @@ import Diffing.Algorithm.RWS
 import Rendering.TOC
 import Syntax as S
 import Test.LeanCheck
-import qualified Language
 
 type Tier a = [a]
 

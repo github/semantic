@@ -32,6 +32,7 @@ import Data.Foldable (fold, foldl', toList)
 import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Foldable (cata)
 import Data.Function (on)
+import Data.Language as Language
 import Data.List.NonEmpty (nonEmpty)
 import Data.List (sortOn)
 import Data.Maybe (fromMaybe, mapMaybe)
@@ -49,7 +50,6 @@ import Data.Union
 import Decorating.Decorator (RAlgebra)
 import GHC.Generics
 import Info
-import Language
 import qualified Data.List as List
 import qualified Data.Map as Map hiding (null)
 import Syntax as S

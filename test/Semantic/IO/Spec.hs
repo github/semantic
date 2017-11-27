@@ -2,9 +2,9 @@ module Semantic.IO.Spec where
 
 import Data.Blob
 import Data.Functor.Both as Both
+import Data.Language
 import Data.Maybe
 import Data.String
-import Language
 import Prelude hiding (readFile)
 import Semantic.IO
 import System.Exit (ExitCode(..))

@@ -40,13 +40,13 @@ import qualified Data.Error as Error
 import Data.Foldable (fold, for_)
 import Data.Functor.Both as Both hiding (snd)
 import Data.Functor.Foldable (cata)
+import Data.Language
 import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Term
 import Data.Union
 import Decorating.Decorator (RAlgebra, decoratorWithAlgebra)
 import Info hiding (Category(..))
-import Language
 import Parsing.Parser
 import Parsing.CMark
 import Parsing.TreeSitter

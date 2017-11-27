@@ -10,9 +10,9 @@ import Control.Exception
 import Data.Blob
 import qualified Data.ByteString as B
 import Data.Functor.Both
+import Data.Language
 import Data.Maybe (fromMaybe)
 import Data.Source
-import Language
 import Prelude hiding (readFile)
 import Rendering.Renderer
 import Semantic

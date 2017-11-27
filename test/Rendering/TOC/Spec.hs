@@ -12,6 +12,7 @@ import Data.Functor.Both
 import Data.Functor.Foldable (cata)
 import Data.Functor.Listable
 import Data.Functor.Foldable (cata)
+import Data.Language
 import Data.Maybe (fromMaybe)
 import Data.Monoid (Last(..))
 import Data.Output
@@ -22,10 +23,9 @@ import Data.Source
 import Data.Term
 import Data.Text (Text)
 import Data.These
-import Info hiding (Go)
 import Diffing.Algorithm.RWS
 import Diffing.Interpreter
-import Language
+import Info hiding (Go)
 import Parsing.Parser
 import Prelude hiding (readFile)
 import Rendering.Renderer
