@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, TypeOperators #-}
 module Analysis.Decorator
 ( decoratorWithAlgebra
 , syntaxIdentifierAlgebra
