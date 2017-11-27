@@ -23,12 +23,12 @@ import Data.Term
 import Data.Text (Text)
 import Data.These
 import Info hiding (Go)
+import Diffing.Algorithm.RWS
 import Diffing.Interpreter
 import Language
 import Prelude hiding (readFile)
 import Renderer
 import Renderer.TOC
-import RWS
 import Semantic
 import Semantic.Task
 import Semantic.Util

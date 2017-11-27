@@ -43,6 +43,8 @@ library
                      , Data.Term
                      , Decorator
                      , Diffing.Algorithm
+                     , Diffing.Algorithm.RWS
+                     , Diffing.Algorithm.RWS.FeatureVector
                      , Diffing.Algorithm.SES
                      , Diffing.Interpreter
                      , Files
@@ -71,8 +73,6 @@ library
                      , Renderer.SExpression
                      , Renderer.Tag
                      , Renderer.TOC
-                     , RWS
-                     , RWS.FeatureVector
                      , Semantic
                      , Semantic.Log
                      , Semantic.Stat

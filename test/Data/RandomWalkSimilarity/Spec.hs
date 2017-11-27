@@ -12,8 +12,8 @@ import Data.Term
 import Data.These
 import Data.Union
 import Decorator
+import Diffing.Algorithm.RWS
 import Diffing.Interpreter
-import RWS
 import Test.Hspec
 import Test.Hspec.LeanCheck
 

@@ -16,8 +16,8 @@ import Data.Record
 import Data.Term
 import Data.Text (Text)
 import Decorator
+import Diffing.Algorithm.RWS
 import Info hiding (Empty, Return)
-import RWS
 import Syntax (Syntax(Leaf))
 
 

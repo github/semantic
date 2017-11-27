@@ -1,5 +1,5 @@
 {-# LANGUAGE BangPatterns, MagicHash #-}
-module RWS.FeatureVector
+module Diffing.Algorithm.RWS.FeatureVector
 ( FeatureVector
 , unFV
 , unitVector

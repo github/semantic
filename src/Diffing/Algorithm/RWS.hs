@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, DataKinds, RankNTypes, TypeOperators #-}
-module RWS
+module Diffing.Algorithm.RWS
 ( rws
 , Options(..)
 , defaultOptions
@@ -32,8 +32,8 @@ import Data.Semigroup hiding (First(..))
 import Data.Term as Term
 import Data.These
 import Data.Traversable
+import Diffing.Algorithm.RWS.FeatureVector
 import Diffing.Algorithm.SES
-import RWS.FeatureVector
 
 type Label f fields label = forall b. TermF f (Record fields) b -> label
 

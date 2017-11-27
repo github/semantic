@@ -50,8 +50,8 @@ import Data.Text as T (Text, pack)
 import qualified Data.Text.Encoding as T
 import Data.These
 import Data.Union
+import Diffing.Algorithm.RWS
 import Renderer.TOC
-import RWS
 import Syntax as S
 import Test.LeanCheck
 import qualified Language
