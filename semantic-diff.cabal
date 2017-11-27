@@ -149,7 +149,7 @@ test-suite test
                      , Data.Functor.Classes.Ord.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Mergeable.Spec
-                     , Data.RandomWalkSimilarity.Spec
+                     , Diffing.Algorithm.RWS.Spec
                      , DiffSpec
                      , SemanticSpec
                      , SemanticCmdLineSpec

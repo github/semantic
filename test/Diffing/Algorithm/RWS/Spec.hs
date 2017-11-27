@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-module Data.RandomWalkSimilarity.Spec where
+module Diffing.Algorithm.RWS.Spec where
 
 import Data.Array.IArray
 import Data.Bifunctor
