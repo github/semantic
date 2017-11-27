@@ -152,9 +152,9 @@ test-suite test
                      , Diffing.Algorithm.RWS.Spec
                      , Diffing.Algorithm.SES.Spec
                      , DiffSpec
+                     , Semantic.CLI.Spec
                      , Semantic.IO.Spec
                      , SemanticSpec
-                     , SemanticCmdLineSpec
                      , Semantic.StatSpec
                      , InterpreterSpec
                      , SpecHelpers

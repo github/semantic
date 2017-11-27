@@ -11,8 +11,8 @@ import qualified InterpreterSpec
 import qualified TermSpec
 import qualified TOCSpec
 import qualified IntegrationSpec
+import qualified Semantic.CLI.Spec
 import qualified Semantic.IO.Spec
-import qualified SemanticCmdLineSpec
 import qualified SemanticSpec
 import qualified Semantic.StatSpec
 import Test.Hspec
@@ -31,7 +31,7 @@ main = hspec $ do
     describe "Interpreter" InterpreterSpec.spec
     describe "Term" TermSpec.spec
     describe "Semantic" SemanticSpec.spec
-    describe "Semantic.IO" Semantic.IO.spec
-    describe "SemanticCmdLine" SemanticCmdLineSpec.spec
+    describe "Semantic.CLI" Semantic.CLI.Spec.spec
+    describe "Semantic.IO" Semantic.IO.Spec.spec
     describe "TOC" TOCSpec.spec
     describe "Integration" IntegrationSpec.spec
