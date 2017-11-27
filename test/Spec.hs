@@ -1,7 +1,6 @@
 module Main where
 
 import qualified Assigning.Assignment.Spec
-import qualified CommandSpec
 import qualified Data.Functor.Classes.Ord.Generic.Spec
 import qualified Data.Mergeable.Spec
 import qualified Data.Source.Spec
@@ -12,6 +11,7 @@ import qualified InterpreterSpec
 import qualified TermSpec
 import qualified TOCSpec
 import qualified IntegrationSpec
+import qualified Semantic.IO.Spec
 import qualified SemanticCmdLineSpec
 import qualified SemanticSpec
 import qualified Semantic.StatSpec
@@ -22,7 +22,6 @@ main = hspec $ do
   describe "Semantic.Stat" Semantic.StatSpec.spec
   parallel $ do
     describe "Assigning.Assignment" Assigning.Assignment.Spec.spec
-    describe "Command" CommandSpec.spec
     describe "Data.Functor.Classes.Ord.Generic" Data.Functor.Classes.Ord.Generic.Spec.spec
     describe "Data.Mergeable" Data.Mergeable.Spec.spec
     describe "Data.Source" Data.Source.Spec.spec
@@ -32,6 +31,7 @@ main = hspec $ do
     describe "Interpreter" InterpreterSpec.spec
     describe "Term" TermSpec.spec
     describe "Semantic" SemanticSpec.spec
+    describe "Semantic.IO" Semantic.IO.spec
     describe "SemanticCmdLine" SemanticCmdLineSpec.spec
     describe "TOC" TOCSpec.spec
     describe "Integration" IntegrationSpec.spec

@@ -1,4 +1,4 @@
-module CommandSpec where
+module Semantic.IO.Spec where
 
 import Data.Blob
 import Data.Functor.Both as Both

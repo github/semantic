@@ -145,7 +145,6 @@ test-suite test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       Assigning.Assignment.Spec
-                     , CommandSpec
                      , Data.Functor.Classes.Ord.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Mergeable.Spec
@@ -153,6 +152,7 @@ test-suite test
                      , Diffing.Algorithm.RWS.Spec
                      , Diffing.Algorithm.SES.Spec
                      , DiffSpec
+                     , Semantic.IO.Spec
                      , SemanticSpec
                      , SemanticCmdLineSpec
                      , Semantic.StatSpec
