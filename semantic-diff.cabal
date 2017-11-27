@@ -154,12 +154,12 @@ test-suite test
                      , Diffing.Algorithm.RWS.Spec
                      , Diffing.Algorithm.SES.Spec
                      , Diffing.Interpreter.Spec
+                     , Rendering.TOC.Spec
                      , Semantic.Spec
                      , Semantic.CLI.Spec
                      , Semantic.IO.Spec
                      , Semantic.Stat.Spec
                      , SpecHelpers
-                     , TOCSpec
                      , IntegrationSpec
                      , Test.Hspec.LeanCheck
   build-depends:       aeson

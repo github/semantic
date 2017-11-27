@@ -1,6 +1,6 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# LANGUAGE DataKinds, TypeOperators #-}
-module TOCSpec where
+module Rendering.TOC.Spec where
 
 import Category as C hiding (Go)
 import Data.Aeson
