@@ -124,11 +124,13 @@ newtype Program a = Program [a]
 instance Eq1 Program where liftEq = genericLiftEq
 instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
+
 -- TODO: Implement Eval instance for Program
 instance (Monad m) => Eval l (Value s a l) m s a Program where
-  eval ev (Program xs) = foldl (\_ a -> ev a) (pure (I PUnit)) xs
+  eval ev (Program xs) = foldl (\prev a -> prev *> ev a) (pure (I PUnit)) xs
+
 instance (Monad m) => Eval l Type m s a Program where
-  eval ev (Program xs) = foldl (\_ a -> ev a) (pure Unit) xs
+  eval ev (Program xs) = foldl (\prev a -> prev *> ev a) (pure Unit) xs
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
