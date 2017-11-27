@@ -17,6 +17,7 @@ import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
+import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import Data.Union
@@ -30,6 +31,7 @@ type Syntax =
    , Literal.Boolean
    , Literal.Integer
    , Literal.TextElement
+   , Statement.Assignment
    , Syntax.Context
    , Syntax.Empty
    , Syntax.Error
@@ -67,7 +69,8 @@ expressionStatement = mk <$> symbol ExpressionStatement <*> children (someTerm e
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
   -- Long-term, can we de/serialize assignments and avoid paying the cost of construction altogether?
-  [ boolean
+  [ assignment'
+  , boolean
   , call
   , expressionStatement
   , functionDefinition
@@ -78,6 +81,11 @@ expressionChoices =
 
 expressions :: Assignment
 expressions = makeTerm <$> location <*> manyTerm expression
+
+expressionList :: Assignment
+expressionList = mk <$> symbol ExpressionList <*> children (someTerm expression)
+  where mk _ [child] = child
+        mk location children = makeTerm location children
 
 boolean :: Assignment
 boolean =  makeTerm <$> token Grammar.True <*> pure Literal.true
@@ -108,3 +116,7 @@ functionDefinition
   <|> makeFunctionDeclaration <$> (symbol Lambda' <|> symbol Lambda) <*> children ((,,,) <$ token AnonLambda <*> emptyTerm <*> (symbol LambdaParameters *> children (manyTerm expression) <|> pure []) <*> optional (symbol Type *> children (term expression)) <*> expressions)
   where
     makeFunctionDeclaration loc (functionName', functionParameters, ty, functionBody) = makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function [] functionName' functionParameters functionBody) (fromMaybe (makeTerm loc Syntax.Empty) ty)
+
+assignment' :: Assignment
+assignment' =  makeTerm  <$> symbol Assignment <*> children (Statement.Assignment [] <$> term expressionList <*> term rvalue)
+  where rvalue = expressionList <|> assignment'

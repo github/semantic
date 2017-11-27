@@ -1,7 +1,13 @@
-{-# LANGUAGE DeriveAnyClass, StandaloneDeriving #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, TypeApplications, ScopedTypeVariables #-}
 module Data.Syntax.Statement where
 
+import Abstract.Eval
+import Abstract.Value
+import Abstract.FreeVariables
+import Abstract.Store
 import Algorithm
+import Data.Foldable
+import Data.Semigroup
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Ord.Generic
@@ -56,12 +62,25 @@ instance Show1 Let where liftShowsPrec = genericLiftShowsPrec
 
 -- | Assignment to a variable or other lvalue.
 data Assignment a = Assignment { assignmentContext :: ![a], assignmentTarget :: !a, assignmentValue :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Assignment where liftEq = genericLiftEq
 instance Ord1 Assignment where liftCompare = genericLiftCompare
 instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
+instance ( Monad m
+         , Functor s
+         , Foldable s
+         , Semigroup (Cell l (Value s a l))
+         , MonadAddress l m
+         , MonadStore l (Value s a l) m
+         , FreeVariables1 s) => Eval l (Value s a l) m s a Assignment where
+  eval ev Assignment{..} = do
+    let [var] = toList (freeVariables assignmentTarget)
+    v <- ev assignmentValue
+    a <- alloc @l var
+    assign a v
+    pure v
 
 -- Returns
 
