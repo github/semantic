@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, FlexibleContexts, DefaultSignatures, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances, MonoLocalBinds #-}
+{-# LANGUAGE AllowAmbiguousTypes, FlexibleContexts, DefaultSignatures, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Abstract.Eval where
 
 import Abstract.Store
