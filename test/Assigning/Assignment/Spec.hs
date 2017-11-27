@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-module Data.Syntax.Assignment.Spec where
+module Assigning.Assignment.Spec where
 
 import Assigning.Assignment
 import Data.AST
