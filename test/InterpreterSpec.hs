@@ -9,7 +9,7 @@ import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Term
 import Data.Union
-import Interpreter
+import Diffing.Interpreter
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck

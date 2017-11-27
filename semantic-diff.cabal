@@ -43,9 +43,9 @@ library
                      , Data.Term
                      , Decorator
                      , Diffing.Algorithm
+                     , Diffing.Interpreter
                      , Files
                      , Info
-                     , Interpreter
                      , Language
                      , Language.Markdown.Assignment
                      , Language.Markdown.Syntax

@@ -23,7 +23,7 @@ import Data.Term
 import Data.Text (Text)
 import Data.These
 import Info hiding (Go)
-import Interpreter
+import Diffing.Interpreter
 import Language
 import Prelude hiding (readFile)
 import Renderer

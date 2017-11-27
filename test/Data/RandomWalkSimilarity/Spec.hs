@@ -12,7 +12,7 @@ import Data.Term
 import Data.These
 import Data.Union
 import Decorator
-import Interpreter
+import Diffing.Interpreter
 import RWS
 import Test.Hspec
 import Test.Hspec.LeanCheck

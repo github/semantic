@@ -9,7 +9,7 @@ import Data.Record
 import Data.Functor.Classes
 import Diffing.Algorithm
 import Data.Align.Generic
-import Interpreter
+import Diffing.Interpreter
 import Parser
 import Data.Functor.Both
 import Data.Term

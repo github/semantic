@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
-module Interpreter
+module Diffing.Interpreter
 ( diffTerms
 , diffSyntaxTerms
 ) where

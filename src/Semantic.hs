@@ -25,7 +25,7 @@ import Data.Term
 import Data.Typeable
 import Decorator
 import Info
-import Interpreter
+import Diffing.Interpreter
 import qualified Language
 import Parser
 import Renderer
