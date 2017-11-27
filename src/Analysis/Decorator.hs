@@ -2,26 +2,20 @@
 module Analysis.Decorator
 ( decoratorWithAlgebra
 , syntaxIdentifierAlgebra
-, cyclomaticComplexityAlgebra
 , constructorNameAndConstantFields
 ) where
 
 import Data.Aeson
 import Data.Algebra
 import Data.Bifunctor (second)
-import Data.ByteString.Char8 (ByteString, pack, unpack)
+import Data.ByteString.Char8 (ByteString, pack)
 import Data.Foldable (asum)
 import Data.Functor.Classes (Show1 (liftShowsPrec))
 import Data.Functor.Foldable
 import Data.JSON.Fields
 import Data.Record
-import Data.Proxy
-import qualified Data.Syntax.Declaration as Declaration
-import qualified Data.Syntax.Statement as Statement
 import Data.Term
 import Data.Text.Encoding (decodeUtf8, encodeUtf8)
-import Data.Union
-import GHC.Generics
 import qualified Syntax as S
 
 -- | Lift an algebra into a decorator for terms annotated with records.
@@ -55,23 +49,6 @@ syntaxIdentifierAlgebra (In _ syntax) = case syntax of
   S.VarAssignment f _ -> asum $ identifier <$> f
   _ -> Nothing
   where identifier = fmap (Identifier . encodeUtf8) . S.extractLeafValue . termOut . fst
-
-
--- | The cyclomatic complexity of a (sub)term.
-newtype CyclomaticComplexity = CyclomaticComplexity Int
-  deriving (Enum, Eq, Num, Ord, Show)
-
--- | Compute the cyclomatic complexity of a (sub)term, measured as the number places where control exits scope, e.g. returns and yields.
---
---   TODO: Explicit returns at the end of methods should only count once.
---   TODO: Anonymous functions should not increase parent scope’s complexity.
---   TODO: Inner functions should not increase parent scope’s complexity.
-cyclomaticComplexityAlgebra :: (Declaration.Method :< fs, Statement.Return :< fs, Statement.Yield :< fs, Apply Foldable fs, Apply Functor fs) => FAlgebra (Term (Union fs) a) CyclomaticComplexity
-cyclomaticComplexityAlgebra (In _ union) = case union of
-  _ | Just Declaration.Method{} <- prj union -> succ (sum union)
-  _ | Just Statement.Return{} <- prj union -> succ (sum union)
-  _ | Just Statement.Yield{} <- prj union -> succ (sum union)
-  _ -> sum union
 
 -- | Compute a 'ByteString' label for a 'Show1'able 'Term'.
 --

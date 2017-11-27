@@ -16,6 +16,7 @@ library
   exposed-modules:
                      -- Analyses & term annotations
                        Analysis.ConstructorName
+                     , Analysis.CyclomaticComplexity
                      , Analysis.Decorator
                      -- Semantic assignment
                      , Assigning.Assignment
