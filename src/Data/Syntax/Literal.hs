@@ -7,7 +7,9 @@ import Abstract.Type
 import Abstract.Primitive
 import Algorithm
 import Data.Align.Generic
+import Data.Maybe
 import Data.ByteString (ByteString)
+import Data.ByteString.Char8 (readInt)
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Ord.Generic
 import Data.Functor.Classes.Show.Generic
@@ -29,10 +31,12 @@ false = Boolean False
 instance Eq1 Boolean where liftEq = genericLiftEq
 instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
+
 instance (Monad m) => Eval l (Value s a l) m s a Boolean where
   eval _ (Boolean x) = pure (I (PBool x))
+
 instance (Monad m) => Eval l Type m s a Boolean where
-  eval _ (Boolean _) = pure Bool
+  eval _ _ = pure Bool
 
 
 -- Numeric
@@ -44,8 +48,13 @@ newtype Integer a = Integer { integerContent :: ByteString }
 instance Eq1 Data.Syntax.Literal.Integer where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Integer where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShowsPrec
-instance (Monad m) => Eval l (Value s a l) m s a Data.Syntax.Literal.Integer
-instance (Monad m) => Eval l Type m s a Data.Syntax.Literal.Integer
+
+instance (Monad m) => Eval l (Value s a l) m s a Data.Syntax.Literal.Integer where
+  eval _ (Data.Syntax.Literal.Integer x) = pure (I (PInt (maybe 0 fst (readInt x))))
+
+instance (Monad m) => Eval l Type m s a Data.Syntax.Literal.Integer where
+  eval _ _ = pure Int
+
 
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
 -- TODO: Do we care about differentiating between hex/octal/decimal/binary integer literals?
