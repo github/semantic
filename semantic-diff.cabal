@@ -145,13 +145,13 @@ test-suite test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       Assigning.Assignment.Spec
+                     , Data.Diff.Spec
                      , Data.Functor.Classes.Ord.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Mergeable.Spec
                      , Data.Source.Spec
                      , Diffing.Algorithm.RWS.Spec
                      , Diffing.Algorithm.SES.Spec
-                     , DiffSpec
                      , Semantic.CLI.Spec
                      , Semantic.IO.Spec
                      , Semantic.Stat.Spec
