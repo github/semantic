@@ -26,3 +26,5 @@ instance (FreeVariables1 syntax) => FreeVariables1 (TermF syntax ann) where
 
 instance (Apply FreeVariables1 fs) => FreeVariables1 (Union fs) where
   liftFreeVariables f = apply (Proxy :: Proxy FreeVariables1) (liftFreeVariables f)
+
+instance FreeVariables1 []
