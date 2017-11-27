@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures, UndecidableInstances, MonoLocalBinds #-}
+{-# LANGUAGE DefaultSignatures, UndecidableInstances #-}
 module Abstract.FreeVariables where
 
 import Abstract.Set
@@ -18,10 +18,11 @@ class FreeVariables1 syntax where
 class FreeVariables term where
   freeVariables :: term -> Set Name
 
-instance (FreeVariables1 (TermF syntax ann), Functor syntax) => FreeVariables (Term syntax ann) where
+instance (FreeVariables1 syntax, Functor syntax) => FreeVariables (Term syntax ann) where
   freeVariables = cata (liftFreeVariables id)
 
-instance (Foldable syntax) => FreeVariables1 (TermF syntax ann)
+instance (FreeVariables1 syntax) => FreeVariables1 (TermF syntax ann) where
+  liftFreeVariables f (In _ s) = liftFreeVariables f s
 
 instance (Apply FreeVariables1 fs) => FreeVariables1 (Union fs) where
   liftFreeVariables f = apply (Proxy :: Proxy FreeVariables1) (liftFreeVariables f)
