@@ -3,6 +3,7 @@ module Data.Syntax.Comment where
 
 import Abstract.Eval
 import Abstract.Value
+import Abstract.Primitive
 import Abstract.Type
 import Algorithm
 import Data.Align.Generic
@@ -21,8 +22,11 @@ instance Eq1 Comment where liftEq = genericLiftEq
 instance Ord1 Comment where liftCompare = genericLiftCompare
 instance Show1 Comment where liftShowsPrec = genericLiftShowsPrec
 
-instance (Monad m) => Eval l (Value s a l) m s a Comment
-instance (Monad m) => Eval l Type m s a Comment
+instance (Monad m) => Eval l (Value s a l) m s a Comment where
+  eval _ _ = pure (I PUnit)
+
+instance (Monad m) => Eval l Type m s a Comment where
+  eval _ _ = pure Unit
 
 -- TODO: nested comment types
 -- TODO: documentation comment types
