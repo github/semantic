@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, FunctionalDependencies, AllowAmbiguousTypes, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeOperators, UndecidableInstances, MonoLocalBinds #-}
+{-# LANGUAGE ConstraintKinds, FunctionalDependencies, AllowAmbiguousTypes, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Abstract.Value where
 
 import Abstract.Environment
@@ -68,7 +68,7 @@ class AbstractValue l v | v -> l where
   literal :: Prim -> v
   valueRoots :: v -> Set (Address l v)
 
-instance (FreeVariables1 (TermF syntax ann), Functor syntax, Ord l) => AbstractValue l (Value syntax ann l) where
+instance (FreeVariables1 syntax, Functor syntax, Ord l) => AbstractValue l (Value syntax ann l) where
   valueRoots (I _) = mempty
   valueRoots (Closure name body env) = envRoots env (delete name (freeVariables body))
 
