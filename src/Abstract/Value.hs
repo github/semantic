@@ -84,5 +84,5 @@ instance AbstractValue Monovariant Type where
 
 
 -- Eval instances
-instance Monad m => Eval l (Value s a l) m s a [] where
-  eval _ _ = pure (I PUnit)
+instance (Monad m) => Eval l (Value s a l) m s a [] where
+  eval ev = foldl (\prev x -> prev *> ev x) (pure (I PUnit))
