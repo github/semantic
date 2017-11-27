@@ -9,8 +9,8 @@ import qualified Data.Term.Spec
 import qualified Diffing.Algorithm.RWS.Spec
 import qualified Diffing.Algorithm.SES.Spec
 import qualified Diffing.Interpreter.Spec
+import qualified Integration.Spec
 import qualified Rendering.TOC.Spec
-import qualified IntegrationSpec
 import qualified Semantic.Spec
 import qualified Semantic.CLI.Spec
 import qualified Semantic.IO.Spec
@@ -34,4 +34,4 @@ main = hspec $ do
     describe "Semantic" Semantic.Spec.spec
     describe "Semantic.CLI" Semantic.CLI.Spec.spec
     describe "Semantic.IO" Semantic.IO.Spec.spec
-    describe "Integration" IntegrationSpec.spec
+    describe "Integration" Integration.Spec.spec
