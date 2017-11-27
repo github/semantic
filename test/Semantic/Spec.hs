@@ -1,4 +1,4 @@
-module SemanticSpec where
+module Semantic.Spec where
 
 import Data.Blob
 import Data.Diff

@@ -11,10 +11,10 @@ import qualified InterpreterSpec
 import qualified TermSpec
 import qualified TOCSpec
 import qualified IntegrationSpec
+import qualified Semantic.Spec
 import qualified Semantic.CLI.Spec
 import qualified Semantic.IO.Spec
 import qualified Semantic.Stat.Spec
-import qualified SemanticSpec
 import Test.Hspec
 
 main :: IO ()
@@ -30,7 +30,7 @@ main = hspec $ do
     describe "Diffing.Algorithm.SES" Diffing.Algorithm.SES.Spec.spec
     describe "Interpreter" InterpreterSpec.spec
     describe "Term" TermSpec.spec
-    describe "Semantic" SemanticSpec.spec
+    describe "Semantic" Semantic.Spec.spec
     describe "Semantic.CLI" Semantic.CLI.Spec.spec
     describe "Semantic.IO" Semantic.IO.Spec.spec
     describe "TOC" TOCSpec.spec
