@@ -74,12 +74,12 @@ library
                      , Renderer.Tag
                      , Renderer.TOC
                      , Semantic
+                     , Semantic.CLI
                      , Semantic.Log
                      , Semantic.Stat
                      , Semantic.Task
                      , Semantic.Queue
                      , Semantic.Util
-                     , SemanticCmdLine
                      , Syntax
   build-depends:       base >= 4.8 && < 5
                      , aeson

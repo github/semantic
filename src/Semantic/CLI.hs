@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
-module SemanticCmdLine
+module Semantic.CLI
 ( main
 -- Testing
 , runDiff

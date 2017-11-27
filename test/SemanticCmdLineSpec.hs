@@ -8,8 +8,8 @@ import Data.Functor.Both
 import Data.Semigroup ((<>))
 import Language
 import Renderer
+import Semantic.CLI
 import Semantic.Task
-import SemanticCmdLine
 import System.IO (Handle)
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
