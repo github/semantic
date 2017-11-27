@@ -13,9 +13,12 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Assigning.Assignment
+  exposed-modules:
+                     -- Semantic assignment
+                       Assigning.Assignment
                      , Assigning.Assignment.Table
                      , Category
+                     -- General datatype definitions & generic algorithms
                      , Data.Align.Generic
                      , Data.AST
                      , Data.Blob
@@ -35,6 +38,7 @@ library
                      , Data.Source
                      , Data.Span
                      , Data.SplitDiff
+                     -- À la carte syntax types
                      , Data.Syntax
                      , Data.Syntax.Comment
                      , Data.Syntax.Declaration
@@ -43,13 +47,16 @@ library
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
                      , Data.Term
+                     -- Analyses & term annotations
                      , Decorating.Decorator
+                     -- Diffing algorithms & interpretation thereof
                      , Diffing.Algorithm
                      , Diffing.Algorithm.RWS
                      , Diffing.Algorithm.RWS.FeatureVector
                      , Diffing.Algorithm.SES
                      , Diffing.Interpreter
                      , Info
+                     -- Language-specific grammar/syntax types, & assignments
                      , Language.Markdown.Assignment
                      , Language.Markdown.Syntax
                      , Language.Go
@@ -64,15 +71,18 @@ library
                      , Language.Python.Assignment
                      , Language.Python.Grammar
                      , Language.Python.Syntax
-                     , Parsing.Parser
+                     -- Parser glue
                      , Parsing.CMark
+                     , Parsing.Parser
                      , Parsing.TreeSitter
                      , Paths_semantic_diff
+                     -- Rendering formats
                      , Rendering.JSON
                      , Rendering.Renderer
                      , Rendering.SExpression
                      , Rendering.Tag
                      , Rendering.TOC
+                     -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic
                      , Semantic.CLI
                      , Semantic.IO
