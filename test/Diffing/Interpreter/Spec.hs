@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-module InterpreterSpec where
+module Diffing.Interpreter.Spec where
 
 import Data.Diff
 import Data.Functor.Both

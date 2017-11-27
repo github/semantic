@@ -8,7 +8,7 @@ import qualified Data.Source.Spec
 import qualified Data.Term.Spec
 import qualified Diffing.Algorithm.RWS.Spec
 import qualified Diffing.Algorithm.SES.Spec
-import qualified InterpreterSpec
+import qualified Diffing.Interpreter.Spec
 import qualified TOCSpec
 import qualified IntegrationSpec
 import qualified Semantic.Spec
@@ -29,7 +29,7 @@ main = hspec $ do
     describe "Data.Term" Data.Term.Spec.spec
     describe "Diffing.Algorithm.RWS" Diffing.Algorithm.RWS.Spec.spec
     describe "Diffing.Algorithm.SES" Diffing.Algorithm.SES.Spec.spec
-    describe "Interpreter" InterpreterSpec.spec
+    describe "Diffing.Interpreter" Diffing.Interpreter.Spec.spec
     describe "Semantic" Semantic.Spec.spec
     describe "Semantic.CLI" Semantic.CLI.Spec.spec
     describe "Semantic.IO" Semantic.IO.Spec.spec
