@@ -20,6 +20,7 @@ module Rendering.TOC
 , toCategoryName
 ) where
 
+import Analysis.Decorator (RAlgebra)
 import Data.Aeson
 import Data.Align (bicrosswalk)
 import Data.Bifoldable (bifoldMap)
@@ -47,7 +48,6 @@ import Data.Term
 import Data.Text (toLower, stripEnd)
 import qualified Data.Text as T
 import Data.Union
-import Decorating.Decorator (RAlgebra)
 import GHC.Generics
 import Info
 import qualified Data.List as List

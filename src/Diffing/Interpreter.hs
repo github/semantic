@@ -4,7 +4,7 @@ module Diffing.Interpreter
 , diffSyntaxTerms
 ) where
 
-import Diffing.Algorithm
+import Analysis.Decorator
 import Control.Applicative (Alternative(..))
 import Control.Monad.Free.Freer
 import Data.Align.Generic
@@ -15,7 +15,7 @@ import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Term
 import Data.Text (Text)
-import Decorating.Decorator
+import Diffing.Algorithm
 import Diffing.Algorithm.RWS
 import Info hiding (Empty, Return)
 import Syntax (Syntax(Leaf))

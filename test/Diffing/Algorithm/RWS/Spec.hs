@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 module Diffing.Algorithm.RWS.Spec where
 
+import Analysis.Decorator
 import Data.Array.IArray
 import Data.Bifunctor
 import Data.Diff
@@ -10,7 +11,6 @@ import qualified Data.Syntax as Syntax
 import Data.Term
 import Data.These
 import Data.Union
-import Decorating.Decorator
 import Diffing.Algorithm
 import Diffing.Algorithm.RWS
 import Diffing.Interpreter

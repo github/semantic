@@ -25,6 +25,7 @@ module Semantic.Task
 , runTaskWithOptions
 ) where
 
+import Analysis.Decorator (RAlgebra, decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
 import Control.Exception
 import Control.Monad.Error.Class
@@ -45,7 +46,6 @@ import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Term
 import Data.Union
-import Decorating.Decorator (RAlgebra, decoratorWithAlgebra)
 import Info hiding (Category(..))
 import Parsing.Parser
 import Parsing.CMark

@@ -14,8 +14,10 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:
+                     -- Analyses & term annotations
+                       Analysis.Decorator
                      -- Semantic assignment
-                       Assigning.Assignment
+                     , Assigning.Assignment
                      , Assigning.Assignment.Table
                      , Category
                      -- General datatype definitions & generic algorithms
@@ -47,8 +49,6 @@ library
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
                      , Data.Term
-                     -- Analyses & term annotations
-                     , Decorating.Decorator
                      -- Diffing algorithms & interpretation thereof
                      , Diffing.Algorithm
                      , Diffing.Algorithm.RWS
