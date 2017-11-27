@@ -15,7 +15,8 @@ library
   hs-source-dirs:      src
   exposed-modules:
                      -- Analyses & term annotations
-                       Analysis.Decorator
+                       Analysis.ConstructorName
+                     , Analysis.Decorator
                      -- Semantic assignment
                      , Assigning.Assignment
                      , Assigning.Assignment.Table

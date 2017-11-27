@@ -7,7 +7,8 @@ module Semantic
 , diffTermPair
 ) where
 
-import Analysis.Decorator
+import Analysis.ConstructorName (ConstructorName, constructorLabel)
+import Analysis.Decorator (syntaxIdentifierAlgebra)
 import Control.Exception
 import Control.Monad ((>=>), guard)
 import Control.Monad.Error.Class
