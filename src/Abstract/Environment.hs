@@ -22,7 +22,7 @@ envLookup = (. unEnvironment) . Map.lookup
 envInsert :: Name -> Address l a -> Environment l a -> Environment l a
 envInsert name value (Environment m) = Environment (Map.insert name value m)
 
-envRoots :: (Foldable t, Ord l) => Environment l a -> t Name -> Set (Address l a)
+envRoots :: (Ord l, Foldable t) => Environment l a -> t Name -> Set (Address l a)
 envRoots env = foldr ((<>) . maybe mempty point . flip envLookup env) mempty
 
 
