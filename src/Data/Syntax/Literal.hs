@@ -34,10 +34,10 @@ instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
 instance (Monad m) => Eval l (Value s a l) m s a Boolean where
-  eval _ (Boolean x) = pure (I (PBool x))
+  eval _ yield (Boolean x) = yield (I (PBool x))
 
 instance (Monad m) => Eval l Type m s a Boolean where
-  eval _ _ = pure Bool
+  eval _ yield _ = yield Bool
 
 
 -- Numeric
@@ -51,10 +51,10 @@ instance Ord1 Data.Syntax.Literal.Integer where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShowsPrec
 
 instance (Monad m) => Eval l (Value s a l) m s a Data.Syntax.Literal.Integer where
-  eval _ (Data.Syntax.Literal.Integer x) = pure (I (PInt (maybe 0 fst (readInt x))))
+  eval _ yield (Data.Syntax.Literal.Integer x) = yield (I (PInt (maybe 0 fst (readInt x))))
 
 instance (Monad m) => Eval l Type m s a Data.Syntax.Literal.Integer where
-  eval _ _ = pure Int
+  eval _ yield _ = yield Int
 
 
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
@@ -113,10 +113,12 @@ newtype TextElement a = TextElement { textElementContent :: ByteString }
 instance Eq1 TextElement where liftEq = genericLiftEq
 instance Ord1 TextElement where liftCompare = genericLiftCompare
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
+
 instance (Monad m) => Eval l (Value s a l) m s a TextElement where
-  eval _ (TextElement x) = pure (I (PString x))
+  eval _ yield (TextElement x) = yield (I (PString x))
+
 instance (Monad m) => Eval l Type m s a TextElement where
-  eval _ (TextElement _) = pure Abstract.Type.String
+  eval _ yield (TextElement _) = yield Abstract.Type.String
 
 data Null a = Null
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
