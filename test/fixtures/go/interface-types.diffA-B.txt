@@ -28,12 +28,9 @@
             (MemberAccess
               (Identifier)
               (Identifier))
-            (Annotation
-              (Method
-                (Empty)
+            (MethodSignature
+              (Identifier)
+              (Identifier)
+              (
                 (Identifier)
-                (
-                  (Identifier)
-                  (Identifier))
-                (Empty))
-              (Identifier))))))))
+                (Identifier)))))))))
