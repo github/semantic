@@ -275,10 +275,10 @@ channelType =  makeTerm' <$> symbol ChannelType <*> children (mkChannelType <$> 
 fieldDeclaration :: Assignment
 fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> (manyTermsTill expression (void (symbol TypeIdentifier)) <|> (manyTerm expression)) <*> optional expression <*> optional expression)
   where
-    mkFieldDeclarationWithTag loc (fields, (Just type'), (Just tag)) = makeTerm loc $ Go.Syntax.Field [type', tag] (makeTerm loc fields)
-    mkFieldDeclarationWithTag loc (fields, (Just type'), Nothing) = makeTerm loc $ Go.Syntax.Field [type'] (makeTerm loc fields)
-    mkFieldDeclarationWithTag loc (fields, Nothing, (Just tag)) = makeTerm loc $ Go.Syntax.Field [tag] (makeTerm loc fields)
-    mkFieldDeclarationWithTag loc (fields, Nothing, Nothing) = makeTerm loc $ Go.Syntax.Field [] (makeTerm loc fields)
+    mkFieldDeclarationWithTag loc (fields, type', tag) | Just ty <- type', Just tag' <- tag = makeTerm loc (Go.Syntax.Field [ty, tag'] (makeTerm loc fields))
+                                                       | Just ty <- type'                   = makeTerm loc (Go.Syntax.Field [ty] (makeTerm loc fields))
+                                                       | Just tag' <- tag                   = makeTerm loc (Go.Syntax.Field [tag'] (makeTerm loc fields))
+                                                       | otherwise                          = makeTerm loc (Go.Syntax.Field [] (makeTerm loc fields))
 
 functionType :: Assignment
 functionType = makeTerm <$> symbol FunctionType <*> children (Type.Function <$> manyTerm parameters <*> (expression <|> emptyTerm))
