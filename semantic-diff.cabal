@@ -14,7 +14,6 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Algorithm
-                     , Alignment
                      , Abstract.Configuration
                      , Abstract.Environment
                      , Abstract.Eval
@@ -70,7 +69,6 @@ library
                      , Language.JSON.Assignment
                      , Language.Ruby.Grammar
                      , Language.Ruby.Assignment
-                     , Language.TypeScript
                      , Language.TypeScript.Assignment
                      , Language.TypeScript.Grammar
                      , Language.TypeScript.Syntax
@@ -82,8 +80,8 @@ library
                      , Paths_semantic_diff
                      , Renderer
                      , Renderer.JSON
-                     , Renderer.Patch
                      , Renderer.SExpression
+                     , Renderer.Tag
                      , Renderer.TOC
                      , RWS
                      , RWS.FeatureVector
@@ -114,6 +112,7 @@ library
                      , freer-cofreer
                      , ghc-prim
                      , gitrev
+                     , Glob
                      , hashable
                      , kdt
                      , mersenne-random-pure64
@@ -159,8 +158,7 @@ test-suite test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       AlignmentSpec
-                     , CommandSpec
+  other-modules:       CommandSpec
                      , Data.Functor.Classes.Ord.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Mergeable.Spec
@@ -171,7 +169,6 @@ test-suite test
                      , SemanticCmdLineSpec
                      , Semantic.StatSpec
                      , InterpreterSpec
-                     , PatchOutputSpec
                      , SES.Spec
                      , SourceSpec
                      , SpecHelpers

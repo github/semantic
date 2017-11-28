@@ -87,7 +87,7 @@ instance Ord1 Variable where liftCompare = genericLiftCompare
 instance Show1 Variable where liftShowsPrec = genericLiftShowsPrec
 
 
-data Class a = Class { classContext :: ![a], classIdentifier :: !a, classSuperclasses :: ![a], classBody :: ![a] }
+data Class a = Class { classContext :: ![a], classIdentifier :: !a, classSuperclasses :: ![a], classBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Diffable Class where

@@ -1,16 +1,19 @@
 (Program
+{+(AmbientDeclaration
+  {+(InternalModule
+    {+(Identifier)+})+})+}
   (AmbientDeclaration
-  { (Class
-    {-(Identifier)-}
-    {-(PublicFieldDefinition
+    (Class
+    { (Identifier)
+    ->(Identifier) }
+    { (PublicFieldDefinition
       {-(Empty)-}
       {-(Empty)-}
       {-(Annotation
         {-(TypeIdentifier)-})-}
       {-(Identifier)-}
-      {-(Empty)-})-})
-  ->(InternalModule
-    {+(Identifier)+}) })
+      {-(Empty)-})
+    ->([]) }))
   (AmbientDeclaration
   { (VariableDeclaration
     {-(Assignment
@@ -18,14 +21,11 @@
         {-(PredefinedType)-})-}
       {-(Identifier)-}
       {-(Empty)-})-})
-  ->(Class
-    {+(Identifier)+}) })
-{+(AmbientDeclaration
-  {+(InterfaceDeclaration
+  ->(InterfaceDeclaration
     {+(Empty)+}
     {+(Empty)+}
     {+(Identifier)+}
-    {+(ObjectType)+})+})+}
+    {+(ObjectType)+}) })
 {-(AmbientDeclaration
   {-(AmbientFunction
     {-(Empty)-}
@@ -99,34 +99,35 @@
   (AmbientDeclaration
     (Class
       (Identifier)
-      (MethodSignature
-        (Empty)
-        (Empty)
-        (Empty)
-        (Empty)
-        (Identifier)
-        (RequiredParameter
+      (
+        (MethodSignature
+          (Empty)
+          (Empty)
+          (Empty)
+          (Empty)
+          (Identifier)
+          (RequiredParameter
+            (Empty)
+            (Empty)
+            (Annotation
+              (PredefinedType))
+            (Assignment
+              (Identifier)
+              (Empty))))
+        (PublicFieldDefinition
           (Empty)
           (Empty)
           (Annotation
             (PredefinedType))
-          (Assignment
-            (Identifier)
-            (Empty))))
-      (PublicFieldDefinition
-        (Empty)
-        (Empty)
-        (Annotation
-          (PredefinedType))
-        (Identifier)
-        (Empty))
-      (MethodSignature
-        (Empty)
-        (Empty)
-        (Empty)
-        (Annotation
-          (PredefinedType))
-        (Identifier))))
+          (Identifier)
+          (Empty))
+        (MethodSignature
+          (Empty)
+          (Empty)
+          (Empty)
+          (Annotation
+            (PredefinedType))
+          (Identifier)))))
 {+(AmbientDeclaration
   {+(AmbientFunction
     {+(Empty)+}

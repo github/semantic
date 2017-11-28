@@ -7,54 +7,55 @@
     (Identifier)
     (ExtendsClause
       (TypeIdentifier))
-    (Method
-      (Empty)
-      (Empty)
-      (Empty)
-      (Empty)
-      (Empty)
-      (Identifier)
-      (RequiredParameter
+    (
+      (Method
         (Empty)
         (Empty)
         (Empty)
-        (Assignment
-          (Identifier)
-          (Empty)))
-      (
-        (Return
-          (Identifier))))
-    (Method
-      (Empty)
-      (Empty)
-      (Empty)
-      (Empty)
-      (Empty)
-      (Identifier)
-      (RequiredParameter
+        (Empty)
+        (Empty)
+        (Identifier)
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Empty)
+          (Assignment
+            (Identifier)
+            (Empty)))
+        (
+          (Return
+            (Identifier))))
+      (Method
         (Empty)
         (Empty)
         (Empty)
-        (Assignment
-          (Identifier)
-          (Empty)))
-      (
-        (Return
-          (Identifier))))
-    (Method
-      (Empty)
-      (Empty)
-      (Empty)
-      (Empty)
-      (Empty)
-      (Identifier)
-      (RequiredParameter
+        (Empty)
+        (Empty)
+        (Identifier)
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Empty)
+          (Assignment
+            (Identifier)
+            (Empty)))
+        (
+          (Return
+            (Identifier))))
+      (Method
         (Empty)
         (Empty)
         (Empty)
-        (Assignment
-          (Identifier)
-          (Empty)))
-      (
-        (Return
-          (Identifier))))))
+        (Empty)
+        (Empty)
+        (Identifier)
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Empty)
+          (Assignment
+            (Identifier)
+            (Empty)))
+        (
+          (Return
+            (Identifier)))))))

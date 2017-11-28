@@ -1,4 +1,5 @@
 (Program
   (Export
     (Class
-      (Identifier))))
+      (Identifier)
+      ([]))))

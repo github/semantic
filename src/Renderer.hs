@@ -3,18 +3,17 @@ module Renderer
 ( DiffRenderer(..)
 , TermRenderer(..)
 , SomeRenderer(..)
-, renderPatch
 , renderSExpressionDiff
 , renderSExpressionTerm
 , renderJSONDiff
 , renderJSONTerm
 , renderToCDiff
 , renderToCTerm
+, renderToTags
 , HasDeclaration
 , declarationAlgebra
 , syntaxDeclarationAlgebra
 , Summaries(..)
-, File(..)
 ) where
 
 import Data.Aeson (Value)
@@ -23,14 +22,12 @@ import qualified Data.Map as Map
 import Data.Output
 import Data.Text (Text)
 import Renderer.JSON as R
-import Renderer.Patch as R
 import Renderer.SExpression as R
+import Renderer.Tag as R
 import Renderer.TOC as R
 
 -- | Specification of renderers for diffs, producing output in the parameter type.
 data DiffRenderer output where
-  -- | Render to git-diff-compatible textual output.
-  PatchDiffRenderer :: DiffRenderer File
   -- | Compute a table of contents for the diff & encode it as JSON.
   OldToCDiffRenderer :: DiffRenderer Summaries
   -- | Compute a table of contents for the diff & encode it as JSON (uses the new Assignment parse tree parser).
@@ -51,6 +48,8 @@ data TermRenderer output where
   JSONTermRenderer :: TermRenderer [Value]
   -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer ByteString
+  -- | Render to a list of tags.
+  TagsTermRenderer :: TermRenderer [Value]
 
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)
