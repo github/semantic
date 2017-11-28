@@ -49,7 +49,7 @@ evalDead :: forall l v syntax ann
            , Ord1 syntax
            , Recursive (Term syntax ann)
            , Foldable (Base (Term syntax ann))
-           , Eval l v (Eff (DeadCodeInterpreter l (Term syntax ann) v)) syntax ann syntax
+           , Eval l v (Eff (DeadCodeInterpreter l (Term syntax ann) v)) (Term syntax ann) syntax
            , MonadAddress l (Eff (DeadCodeInterpreter l (Term syntax ann) v))
            , MonadPrim v (Eff (DeadCodeInterpreter l (Term syntax ann) v))
            , Semigroup (Cell l v)
@@ -64,6 +64,6 @@ evDead :: (Ord t, MonadDead t m)
        => (Eval' t m v -> Eval' t m v)
        -> Eval' t m v
        -> Eval' t m v
-evDead ev0 ev yield e = do
+evDead ev0 ev' yield e = do
   revive e
-  ev0 ev yield e
+  ev0 ev' yield e

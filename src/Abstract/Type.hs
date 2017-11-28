@@ -42,5 +42,7 @@ instance RunEffect Fresh a where
     Reset s' -> k s' ())
 
 -- Eval instances
-instance (Monad m) => Eval l Type m s a [] where
-  eval ev = foldl (\prev x -> prev *> ev x) (pure Unit)
+instance (Monad m) => Eval l Type m t [] where
+  eval _  yield []     = yield Unit
+  eval ev yield [a]    = ev pure a >>= yield
+  eval ev yield (a:as) = ev (const (eval ev pure as)) a >>= yield

@@ -95,7 +95,7 @@ evalCache :: forall l v syntax ann
             , MonadPrim v (Eff (CachingInterpreter l (Term syntax ann) v))
             , Semigroup (Cell l v)
             , AbstractValue l v
-            , Eval l v (Eff (CachingInterpreter l (Term syntax ann) v)) syntax ann (TermF syntax ann)
+            , Eval l v (Eff (CachingInterpreter l (Term syntax ann) v)) (Term syntax ann) (TermF syntax ann)
             )
           => Term syntax ann
           -> CachingResult l (Term syntax ann) v
@@ -112,7 +112,7 @@ evCache :: forall l t v m
         => (Eval' t m v -> Eval' t m v)
         -> Eval' t m v
         -> Eval' t m v
-evCache ev0 ev yield e = do
+evCache ev0 ev' yield e = do
   env <- askEnv
   store <- getStore
   roots <- askRoots
@@ -126,7 +126,7 @@ evCache ev0 ev yield e = do
       in' <- askCache
       let pairs = fromMaybe mempty (cacheLookup c in')
       putCache (cacheSet c pairs out)
-      v <- ev0 ev yield e
+      v <- ev0 ev' yield e
       store' <- getStore
       modifyCache (cacheInsert c (v, store'))
       return v
@@ -142,7 +142,7 @@ fixCache :: forall l t v m
            )
          => Eval' t m v
          -> Eval' t m v
-fixCache ev yield e = do
+fixCache ev' yield e = do
   env <- askEnv
   store <- getStore
   roots <- askRoots
@@ -151,7 +151,7 @@ fixCache ev yield e = do
     putCache (mempty :: Cache l t v)
     putStore store
     reset 0
-    _ <- localCache (const dollar) (collect point (ev yield e) :: m (Set v))
+    _ <- localCache (const dollar) (collect point (ev' yield e) :: m (Set v))
     getCache)
   asum . flip map (maybe [] toList (cacheLookup c pairs)) $ \ (value, store') -> do
     putStore store'

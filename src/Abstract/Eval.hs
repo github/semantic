@@ -12,14 +12,14 @@ import Data.Semigroup
 
 
 -- Collecting evaluator
-class Monad m => Eval l v m syntax ann constr where
-  eval :: ((v -> m v) -> Term syntax ann -> m v) ->  (v -> m w) -> constr (Term syntax ann) -> m w
+class Monad m => Eval l v m term constr where
+  eval :: ((v -> m v) -> term -> m v) ->  (v -> m w) -> constr term -> m w
   eval = fail "default eval"
 
-instance (Monad m, Apply (Eval l v m s a) fs) => Eval l v m s a (Union fs) where
-  eval ev yield = apply (Proxy :: Proxy (Eval l v m s a)) (eval @l ev yield)
+instance (Monad m, Apply (Eval l v m t) fs) => Eval l v m t (Union fs) where
+  eval ev yield = apply (Proxy :: Proxy (Eval l v m t)) (eval @l ev yield)
 
-instance (Monad m, Eval l v m s a s) => Eval l v m s a (TermF s a) where
+instance (Monad m, Eval l v m t s) => Eval l v m t (TermF s a) where
   eval ev yield In{..} = eval @l ev yield termOut
 
 

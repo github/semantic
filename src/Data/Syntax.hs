@@ -118,8 +118,8 @@ instance Eq1 Identifier where liftEq = genericLiftEq
 instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Identifier
-instance (Monad m) => Eval l (Value s a l) m s a Identifier
-instance (Monad m) => Eval l Type m s a Identifier
+instance (Monad m) => Eval l (Value s a l) m t Identifier
+instance (Monad m) => Eval l Type m t Identifier
 
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = point x
@@ -136,14 +136,17 @@ instance ( Monad m
          , Functor s
          , MonadGC l (Value s a l) m
          , MonadEnv l (Value s a l) m
+         , FreeVariables t
          , FreeVariables1 s)
-        => Eval l (Value s a l) m s a Program where
+        => Eval l (Value s a l) m t Program where
   eval _  yield (Program [])     = yield (I PUnit)
   eval ev yield (Program [a])    = ev pure a >>= yield
   eval ev yield (Program (a:as)) = do
     env <- askEnv @l @(Value s a l)
     extraRoots (envRoots @l env (freeVariables1 as)) (ev (const (eval @l ev pure (Program as))) a) >>= yield
 
+-- instance (Monad m) => Eval l Type m s a Program where
+--   eval ev (Program xs) = foldl (\prev a -> prev *> ev a) (pure Unit) xs
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
@@ -164,7 +167,7 @@ instance Eq1 Empty where liftEq _ _ _ = True
 instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 -- TODO: Define Value semantics for Empty
-instance (Monad m) => Eval l (Value s a l) m s a Empty where
+instance (Monad m) => Eval l (Value s a l) m t Empty where
   eval _ yield _ = yield (I PUnit)
 -- instance (Monad m) => Eval l Type m s a Empty where
 --   eval _ _ = pure Unit
@@ -178,8 +181,8 @@ instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Define Value semantics for Error
-instance (Monad m) => Eval l (Value s a l) m s a Error
-instance (Monad m) => Eval l Type m s a Error
+instance (Monad m) => Eval l (Value s a l) m t Error
+instance (Monad m) => Eval l Type m t Error
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorExpected errorActual
@@ -215,8 +218,8 @@ instance Eq1 Context where liftEq = genericLiftEq
 instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
-instance (Monad m) => Eval l (Value s a l) m s a Context where
+instance (Monad m) => Eval l (Value s a l) m t Context where
   eval ev yield Context{..} = ev pure contextSubject >>= yield
 
-instance (Monad m) => Eval l Type m s a Context where
+instance (Monad m) => Eval l Type m t Context where
   eval ev yield Context{..} = ev pure contextSubject >>= yield

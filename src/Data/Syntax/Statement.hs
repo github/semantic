@@ -76,8 +76,9 @@ instance ( Monad m
          , MonadAddress l m
          , MonadStore l (Value s a l) m
          , MonadEnv l (Value s a l) m
+         , FreeVariables t
          , FreeVariables1 s)
-         => Eval l (Value s a l) m s a Assignment where
+         => Eval l (Value s a l) m t Assignment where
   eval ev yield Assignment{..} = do
     let [var] = toList (freeVariables assignmentTarget)
     v <- ev pure assignmentValue
