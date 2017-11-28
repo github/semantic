@@ -5,11 +5,9 @@ import Abstract.Environment
 import Abstract.Eval
 import Abstract.FreeVariables
 import Abstract.Primitive
-import Abstract.Set
 import Abstract.Store
 import Abstract.Type
 import Abstract.Value
-import Data.Term
 
 import Control.Effect
 import Control.Monad.Effect hiding (run)
@@ -19,6 +17,8 @@ import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Function (fix)
 import Data.Semigroup
+import qualified Data.Set as Set
+import Data.Term
 import Prelude hiding (fail)
 
 
@@ -53,16 +53,16 @@ ev :: forall v w m syntax ann
    -> (v -> m w) -> Term syntax ann -> m w
 ev ev' yield = eval ev' yield . unTerm
 
-gc :: (Ord l, Foldable (Cell l), AbstractValue l a) => Set (Address l a) -> Store l a -> Store l a
+gc :: (Ord l, Foldable (Cell l), AbstractValue l a) => Set.Set (Address l a) -> Store l a -> Store l a
 gc roots store = storeRestrict store (reachable roots store)
 
-reachable :: (Ord l, Foldable (Cell l), AbstractValue l a) => Set (Address l a) -> Store l a -> Set (Address l a)
+reachable :: (Ord l, Foldable (Cell l), AbstractValue l a) => Set.Set (Address l a) -> Store l a -> Set.Set (Address l a)
 reachable roots store = go roots mempty
-  where go set seen = case split set of
+  where go set seen = case Set.minView set of
           Nothing -> seen
           Just (a, as)
-            | Just values <- storeLookupAll a store -> go (difference (foldr ((<>) . valueRoots) mempty values <> as) seen) (insert a seen)
-            | otherwise -> go seen (insert a seen)
+            | Just values <- storeLookupAll a store -> go (Set.difference (foldr ((<>) . valueRoots) mempty values <> as) seen) (Set.insert a seen)
+            | otherwise -> go seen (Set.insert a seen)
 
 evCollect :: forall l t v m
           .  ( Ord l
@@ -75,7 +75,7 @@ evCollect :: forall l t v m
           -> Eval' t m v
           -> Eval' t m v
 evCollect ev0 ev' yield e = do
-  roots <- askRoots :: m (Set (Address l v))
+  roots <- askRoots :: m (Set.Set (Address l v))
   v <- ev0 ev' yield e
   modifyStore (gc (roots <> valueRoots v))
   return v

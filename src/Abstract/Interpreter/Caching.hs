@@ -7,11 +7,9 @@ import Abstract.Eval
 import Abstract.FreeVariables
 import Abstract.Interpreter
 import Abstract.Primitive
-import Abstract.Set
 import Abstract.Store
 import Abstract.Type
 import Abstract.Value
-import Data.Term
 
 import Control.Applicative
 import Control.Effect
@@ -26,23 +24,25 @@ import Data.Functor.Classes
 import Data.Maybe
 import Data.Pointed
 import Data.Semigroup
+import qualified Data.Set as Set
 import qualified Data.Map as Map
+import Data.Term
 
-newtype Cache l t v = Cache { unCache :: Map.Map (Configuration l t v) (Set (v, Store l v)) }
+newtype Cache l t v = Cache { unCache :: Map.Map (Configuration l t v) (Set.Set (v, Store l v)) }
 
 deriving instance (Ord l, Ord t, Ord v, Ord1 (Cell l)) => Monoid (Cache l t v)
 
-cacheLookup :: (Ord l, Ord t, Ord v, Ord1 (Cell l)) => Configuration l t v -> Cache l t v -> Maybe (Set (v, Store l v))
+cacheLookup :: (Ord l, Ord t, Ord v, Ord1 (Cell l)) => Configuration l t v -> Cache l t v -> Maybe (Set.Set (v, Store l v))
 cacheLookup key = Map.lookup key . unCache
 
-cacheSet :: (Ord l, Ord t, Ord v, Ord1 (Cell l)) => Configuration l t v -> Set (v, Store l v) -> Cache l t v -> Cache l t v
+cacheSet :: (Ord l, Ord t, Ord v, Ord1 (Cell l)) => Configuration l t v -> Set.Set (v, Store l v) -> Cache l t v -> Cache l t v
 cacheSet = (((Cache .) . (. unCache)) .) . Map.insert
 
 cacheInsert :: (Ord l, Ord t, Ord v, Ord1 (Cell l)) => Configuration l t v -> (v, Store l v) -> Cache l t v -> Cache l t v
 cacheInsert = (((Cache .) . (. unCache)) .) . (. point) . Map.insertWith (<>)
 
 
-type CachingInterpreter l t v = '[Fresh, Reader (Set (Address l v)), Reader (Environment l v), Fail, NonDetEff, State (Store l v), Reader (Cache l t v), State (Cache l t v)]
+type CachingInterpreter l t v = '[Fresh, Reader (Set.Set (Address l v)), Reader (Environment l v), Fail, NonDetEff, State (Store l v), Reader (Cache l t v), State (Cache l t v)]
 
 type CachingResult l t v = Final (CachingInterpreter l t v) v
 
@@ -154,7 +154,7 @@ fixCache ev' yield e = do
     putCache (mempty :: Cache l t v)
     putStore store
     reset 0
-    _ <- localCache (const dollar) (collect point (ev' yield e) :: m (Set v))
+    _ <- localCache (const dollar) (collect point (ev' yield e) :: m (Set.Set v))
     getCache)
   asum . flip map (maybe [] toList (cacheLookup c pairs)) $ \ (value, store') -> do
     putStore store'

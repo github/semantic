@@ -3,13 +3,14 @@ module Abstract.Eval where
 
 import Abstract.FreeVariables
 import Abstract.Store
-import Data.Proxy
-import Data.Term
-import Data.Union
 
 import Control.Monad.Effect
 import Control.Monad.Effect.Reader
+import Data.Proxy
 import Data.Semigroup
+import qualified Data.Set as Set
+import Data.Term
+import Data.Union
 
 
 -- Collecting evaluator
@@ -25,11 +26,11 @@ instance (Monad m, Eval v m s) => Eval v m (TermF s a) where
 
 
 class Monad m => MonadGC l a m where
-  askRoots :: m (Set (Address l a))
+  askRoots :: m (Set.Set (Address l a))
 
-  extraRoots :: Set (Address l a) -> m b -> m b
+  extraRoots :: Set.Set (Address l a) -> m b -> m b
 
-instance (Ord l, Reader (Set (Address l a)) :< fs) => MonadGC l a (Eff fs) where
-  askRoots = ask :: Eff fs (Set (Address l a))
+instance (Ord l, Reader (Set.Set (Address l a)) :< fs) => MonadGC l a (Eff fs) where
+  askRoots = ask :: Eff fs (Set.Set (Address l a))
 
   extraRoots roots' = local (<> roots')

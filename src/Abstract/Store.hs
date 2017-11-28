@@ -8,14 +8,12 @@ module Abstract.Store
 , storeLookupAll
 , storeRestrict
 , Address(..)
-, Set(..)
 , deref
 , assign
 , MonadStore(..)
 , modifyStore
 ) where
 
-import Abstract.Set
 import Abstract.FreeVariables
 import Control.Applicative
 import Control.Monad ((<=<))
@@ -27,6 +25,7 @@ import Data.Functor.Classes
 import qualified Data.Map as Map
 import Data.Pointed
 import Data.Semigroup
+import qualified Data.Set as Set
 import Prelude hiding (fail)
 
 newtype Store l a = Store { unStore :: Map.Map (Address l a) (Cell l a) }
@@ -47,8 +46,8 @@ storeInsert = (((Store .) . (. unStore)) .) . (. point) . Map.insertWith (<>)
 storeSize :: Store l a -> Int
 storeSize = Map.size . unStore
 
-storeRestrict :: Ord l => Store l a -> Set (Address l a) -> Store l a
-storeRestrict (Store m) roots = Store (Map.filterWithKey (\ address _ -> address `member` roots) m)
+storeRestrict :: Ord l => Store l a -> Set.Set (Address l a) -> Store l a
+storeRestrict (Store m) roots = Store (Map.filterWithKey (\ address _ -> address `Set.member` roots) m)
 
 
 assign :: (Ord l, Semigroup (Cell l a), Pointed (Cell l), MonadStore l a m) => Address l a -> a -> m ()
@@ -96,7 +95,7 @@ newtype Monovariant = Monovariant { unMonovariant :: Name }
   deriving (Eq, Ord, Show)
 
 instance (Alternative m, Monad m) => MonadAddress Monovariant m where
-  type Cell Monovariant = Set
+  type Cell Monovariant = Set.Set
 
   deref = asum . maybe [] (map pure . toList) <=< flip fmap getStore . storeLookup
 

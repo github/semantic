@@ -7,9 +7,7 @@ import Abstract.Eval
 import Abstract.FreeVariables
 import Abstract.Interpreter
 import Abstract.Primitive
-import Abstract.Set
 import Abstract.Store
-import Data.Term
 
 import Control.Effect
 import Control.Monad.Effect hiding (run)
@@ -18,10 +16,11 @@ import Control.Monad.Effect.Writer
 import Data.Function (fix)
 import Data.Functor.Classes (Ord1)
 import Data.Semigroup
-import GHC.Exts (IsList(..))
 import qualified Data.Set as Set
+import Data.Term
+import GHC.Exts (IsList(..))
 
-type TracingInterpreter l t v g = Reader (Set (Address l v)) ': Writer (g (Configuration l t v)) ': Interpreter l v
+type TracingInterpreter l t v g = Reader (Set.Set (Address l v)) ': Writer (g (Configuration l t v)) ': Interpreter l v
 
 type TraceInterpreter l t v = TracingInterpreter l t v []
 type ReachableStateInterpreter l t v = TracingInterpreter l t v Set.Set

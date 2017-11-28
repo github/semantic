@@ -3,7 +3,6 @@ module Abstract.Value where
 
 import Abstract.Environment
 import Abstract.Primitive
-import Abstract.Set
 import Abstract.Store
 import Abstract.Type
 import Abstract.Eval
@@ -13,6 +12,7 @@ import Control.Monad hiding (fail)
 import Control.Monad.Fail
 import Data.Functor.Classes
 import Data.Semigroup
+import Data.Set
 import Prelude hiding (fail)
 
 

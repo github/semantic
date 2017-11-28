@@ -4,7 +4,6 @@ module Abstract.Interpreter.Symbolic where
 import Abstract.Environment
 import Abstract.Interpreter
 import Abstract.Primitive
-import Abstract.Set
 import Abstract.Store
 import Data.Term
 

@@ -7,10 +7,11 @@ import Control.Monad.Effect
 import Control.Monad.Effect.Reader
 import Data.Functor.Classes
 import Data.Functor.Classes.Show.Generic
+import qualified Data.Map as Map
 import Data.Pointed
 import Data.Semigroup
+import qualified Data.Set as Set
 import GHC.Generics
-import qualified Data.Map as Map
 
 
 newtype Environment l a = Environment { unEnvironment :: Map.Map Name (Address l a) }
@@ -22,7 +23,7 @@ envLookup = (. unEnvironment) . Map.lookup
 envInsert :: Name -> Address l a -> Environment l a -> Environment l a
 envInsert name value (Environment m) = Environment (Map.insert name value m)
 
-envRoots :: (Ord l, Foldable t) => Environment l a -> t Name -> Set (Address l a)
+envRoots :: (Ord l, Foldable t) => Environment l a -> t Name -> Set.Set (Address l a)
 envRoots env = foldr ((<>) . maybe mempty point . flip envLookup env) mempty
 
 

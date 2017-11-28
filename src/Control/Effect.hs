@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Effect where
 
-import Abstract.Set
 import qualified Control.Monad.Effect as Effect
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Internal hiding (run)
@@ -10,6 +9,7 @@ import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Writer
 import Data.Pointed
+import Data.Set
 
 run :: RunEffects fs a => Eff fs a -> Final fs a
 run = Effect.run . runEffects

@@ -24,7 +24,6 @@ library
                      , Abstract.Interpreter.Dead
                      , Abstract.Interpreter.Tracing
                      , Abstract.Primitive
-                     , Abstract.Set
                      , Abstract.Store
                      , Abstract.Type
                      , Abstract.Value

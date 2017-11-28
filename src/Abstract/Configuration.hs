@@ -1,18 +1,18 @@
-{-# LANGUAGE DeriveFoldable, FlexibleContexts, StandaloneDeriving, UndecidableInstances #-}
+{-# LANGUAGE DeriveFoldable, DeriveGeneric, FlexibleContexts, StandaloneDeriving, UndecidableInstances #-}
 module Abstract.Configuration where
 
-import Abstract.Set
 import Abstract.Store
 import Abstract.Environment
 
 import Data.List (intersperse)
 import Data.Functor.Classes
 import Data.Monoid
+import qualified Data.Set as Set
 
 data Configuration l t v
   = Configuration
     { configurationTerm :: t
-    , configurationRoots :: Set (Address l v)
+    , configurationRoots :: Set.Set (Address l v)
     , configurationEnvironment :: Environment l v
     , configurationStore :: Store l v
     }

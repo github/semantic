@@ -5,9 +5,7 @@ import Abstract.Eval
 import Abstract.FreeVariables
 import Abstract.Interpreter
 import Abstract.Primitive
-import Abstract.Set
 import Abstract.Store
-import Data.Term
 
 import Control.Effect
 import Control.Monad.Effect hiding (run)
@@ -17,6 +15,8 @@ import Data.Functor.Foldable
 import Data.Functor.Classes
 import Data.Pointed
 import Data.Semigroup
+import Data.Set
+import Data.Term
 
 
 type DeadCodeInterpreter l t v = State (Dead t) ': Interpreter l v

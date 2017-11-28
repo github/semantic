@@ -1,12 +1,12 @@
 {-# LANGUAGE DefaultSignatures, UndecidableInstances #-}
 module Abstract.FreeVariables where
 
-import Abstract.Set
-import Data.Term
-import Data.Proxy
-import Data.Union
-import Data.Functor.Foldable
 import Data.ByteString (ByteString)
+import Data.Functor.Foldable
+import Data.Proxy
+import Data.Set
+import Data.Term
+import Data.Union
 
 type Name = ByteString
 
