@@ -47,17 +47,6 @@ evaluate :: forall v syntax ann
          -> EvalResult (LocationFor v) v
 evaluate = run @(Interpreter (LocationFor v) v) . fix ev pure
 
-
-gc :: (Ord l, Foldable (Cell l), AbstractValue l a) => Set.Set (Address l a) -> Store l a -> Store l a
-gc roots store = storeRestrict store (reachable roots store)
-
-reachable :: (Ord l, Foldable (Cell l), AbstractValue l a) => Set.Set (Address l a) -> Store l a -> Set.Set (Address l a)
-reachable roots store = go roots mempty
-  where go set seen = case Set.minView set of
-          Nothing -> seen
-          Just (a, as)
-            | Just values <- storeLookupAll a store -> go (Set.difference (foldr ((<>) . valueRoots) mempty values <> as) seen) (Set.insert a seen)
-            | otherwise -> go seen (Set.insert a seen)
 ev ::
      ( Functor syntax
      , FreeVariables1 syntax
@@ -95,3 +84,14 @@ evRoots :: forall l v m syntax ann
         => Eval' (Term syntax ann) m v
         -> Eval' (Term syntax ann) m v
 evRoots ev' yield = eval ev' yield . unTerm
+
+gc :: (Ord l, Foldable (Cell l), AbstractValue l a) => Set.Set (Address l a) -> Store l a -> Store l a
+gc roots store = storeRestrict store (reachable roots store)
+
+reachable :: (Ord l, Foldable (Cell l), AbstractValue l a) => Set.Set (Address l a) -> Store l a -> Set.Set (Address l a)
+reachable roots store = go roots mempty
+  where go set seen = case Set.minView set of
+          Nothing -> seen
+          Just (a, as)
+            | Just values <- storeLookupAll a store -> go (Set.difference (foldr ((<>) . valueRoots) mempty values <> as) seen) (Set.insert a seen)
+            | otherwise -> go seen (Set.insert a seen)
