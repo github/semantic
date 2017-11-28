@@ -32,26 +32,23 @@ type Eval' t m v = (v -> m v) -> t -> m v
 
 -- Evaluate an expression.
 -- Example:
---    Files.readFile "test.py" (Just Python) >>= runTask . parse pythonParser2 >>= pure . evaluate @Precise @(Value (Data.Union.Union Language.Python.Assignment2.Syntax) (Record Location) Precise)
-evaluate :: forall l v syntax ann
+--    evaluate @Type <term>
+--    evaluate @(Value (Data.Union.Union Language.Python.Assignment2.Syntax) (Record Location) Precise) <term>
+evaluate :: forall v syntax ann
          . ( Ord v
            , Eval v (Eff (Interpreter l v)) syntax
            , FreeVariables1 syntax
            , Functor syntax
-           , MonadAddress l (Eff (Interpreter l v))
-           , MonadPrim v (Eff (Interpreter l v))
-           , Semigroup (Cell l v)
+           , Semigroup (Cell (LocationFor v) v)
+           , FreeVariables1 syntax
+           , MonadAddress (LocationFor v) (Eff (Interpreter (LocationFor v) v))
+           , MonadPrim v (Eff (Interpreter (LocationFor v) v))
+           , Eval v (Eff (Interpreter (LocationFor v) v)) syntax
            )
          => Term syntax ann
-         -> EvalResult l v
-evaluate = run @(Interpreter l v) . fix ev pure
+         -> EvalResult (LocationFor v) v
+evaluate = run @(Interpreter (LocationFor v) v) . fix ev pure
 
-
-ev :: forall v w m syntax ann
-   .  (FreeVariables1 syntax, Functor syntax, Eval v m syntax)
-   => ((v -> m v) -> Term syntax ann -> m v)
-   -> (v -> m w) -> Term syntax ann -> m w
-ev ev' yield = eval ev' yield . unTerm
 
 gc :: (Ord l, Foldable (Cell l), AbstractValue l a) => Set.Set (Address l a) -> Store l a -> Store l a
 gc roots store = storeRestrict store (reachable roots store)
@@ -63,6 +60,13 @@ reachable roots store = go roots mempty
           Just (a, as)
             | Just values <- storeLookupAll a store -> go (Set.difference (foldr ((<>) . valueRoots) mempty values <> as) seen) (Set.insert a seen)
             | otherwise -> go seen (Set.insert a seen)
+ev ::
+     ( Functor syntax
+     , FreeVariables1 syntax
+     , Eval v m syntax
+     )
+     => Eval' (Term syntax ann) m v -> Eval' (Term syntax ann) m v
+ev recur yield = eval recur yield . unTerm
 
 evCollect :: forall l t v m
           .  ( Ord l
