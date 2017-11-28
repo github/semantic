@@ -118,8 +118,8 @@ instance Eq1 Identifier where liftEq = genericLiftEq
 instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Identifier
-instance (Monad m) => Eval (Value s a l) m t Identifier
-instance (Monad m) => Eval Type m t Identifier
+instance (Monad m) => Eval (Value s a l) m Identifier
+instance (Monad m) => Eval Type m Identifier
 
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = point x
@@ -136,9 +136,8 @@ instance ( Monad m
          , Functor s
          , MonadGC l (Value s a l) m
          , MonadEnv l (Value s a l) m
-         , FreeVariables t
          , FreeVariables1 s)
-        => Eval (Value s a l) m t Program where
+        => Eval (Value s a l) m Program where
   eval _  yield (Program [])     = yield (I PUnit)
   eval ev yield (Program [a])    = ev pure a >>= yield
   eval ev yield (Program (a:as)) = do
@@ -167,9 +166,9 @@ instance Eq1 Empty where liftEq _ _ _ = True
 instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 -- TODO: Define Value semantics for Empty
-instance (Monad m) => Eval (Value s a l) m t Empty where
+instance (Monad m) => Eval (Value s a l) m Empty where
   eval _ yield _ = yield (I PUnit)
-instance (Monad m) => Eval Type m t Empty where
+instance (Monad m) => Eval Type m Empty where
   eval _ yield _ = yield Unit
 
 
@@ -181,8 +180,8 @@ instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Define Value semantics for Error
-instance (Monad m) => Eval (Value s a l) m t Error
-instance (Monad m) => Eval Type m t Error
+instance (Monad m) => Eval (Value s a l) m Error
+instance (Monad m) => Eval Type m Error
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorExpected errorActual
@@ -218,8 +217,8 @@ instance Eq1 Context where liftEq = genericLiftEq
 instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
-instance (Monad m) => Eval (Value s a l) m t Context where
+instance (Monad m) => Eval (Value s a l) m Context where
   eval ev yield Context{..} = ev pure contextSubject >>= yield
 
-instance (Monad m) => Eval Type m t Context where
+instance (Monad m) => Eval Type m Context where
   eval ev yield Context{..} = ev pure contextSubject >>= yield

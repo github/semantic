@@ -2,6 +2,7 @@
 module Abstract.Interpreter.Dead where
 
 import Abstract.Eval
+import Abstract.FreeVariables
 import Abstract.Interpreter
 import Abstract.Primitive
 import Abstract.Set
@@ -48,8 +49,10 @@ evalDead :: forall l v syntax ann
            , Ord ann
            , Ord1 syntax
            , Recursive (Term syntax ann)
-           , Foldable (Base (Term syntax ann))
-           , Eval v (Eff (DeadCodeInterpreter l (Term syntax ann) v)) (Term syntax ann) syntax
+           , Foldable syntax
+           , FreeVariables1 syntax
+           , Functor syntax
+           , Eval v (Eff (DeadCodeInterpreter l (Term syntax ann) v)) syntax
            , MonadAddress l (Eff (DeadCodeInterpreter l (Term syntax ann) v))
            , MonadPrim v (Eff (DeadCodeInterpreter l (Term syntax ann) v))
            , Semigroup (Cell l v)

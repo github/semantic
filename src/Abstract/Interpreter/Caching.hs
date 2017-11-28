@@ -4,6 +4,7 @@ module Abstract.Interpreter.Caching where
 import Abstract.Configuration
 import Abstract.Environment
 import Abstract.Eval
+import Abstract.FreeVariables
 import Abstract.Interpreter
 import Abstract.Primitive
 import Abstract.Set
@@ -91,11 +92,13 @@ evalCache :: forall l v syntax ann
             , Ord1 (Cell l)
             , Ord1 syntax
             , Foldable (Cell l)
+            , FreeVariables1 syntax
+            , Functor syntax
             , MonadAddress l (Eff (CachingInterpreter l (Term syntax ann) v))
             , MonadPrim v (Eff (CachingInterpreter l (Term syntax ann) v))
             , Semigroup (Cell l v)
             , AbstractValue l v
-            , Eval v (Eff (CachingInterpreter l (Term syntax ann) v)) (Term syntax ann) (TermF syntax ann)
+            , Eval v (Eff (CachingInterpreter l (Term syntax ann) v)) (TermF syntax ann)
             )
           => Term syntax ann
           -> CachingResult l (Term syntax ann) v

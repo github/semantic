@@ -4,6 +4,7 @@ module Abstract.Interpreter.Tracing where
 import Abstract.Configuration
 import Abstract.Environment
 import Abstract.Eval
+import Abstract.FreeVariables
 import Abstract.Interpreter
 import Abstract.Primitive
 import Abstract.Set
@@ -40,22 +41,26 @@ instance (Writer (g (Configuration l t v)) :< fs) => MonadTrace l t v g (Eff fs)
 
 evalTrace :: forall l v syntax ann
           . ( Ord v, Ord ann, Ord1 syntax, Ord1 (Cell l)
+            , FreeVariables1 syntax
+            , Functor syntax
             , MonadAddress l (Eff (TraceInterpreter l (Term syntax ann) v))
             , MonadPrim v (Eff (TraceInterpreter l (Term syntax ann) v))
             , MonadGC l v (Eff (TraceInterpreter l (Term syntax ann) v))
             , Semigroup (Cell l v)
-            , Eval v (Eff (TraceInterpreter l (Term syntax ann) v)) (Term syntax ann) syntax
+            , Eval v (Eff (TraceInterpreter l (Term syntax ann) v)) syntax
             )
           => Term syntax ann -> Final (TracingInterpreter l (Term syntax ann) v []) v
 evalTrace = run @(TraceInterpreter l (Term syntax ann) v) . fix (evTell @l @(Term syntax ann) @v @[] (ev @l)) pure
 
 evalReach :: forall l v syntax ann
           . ( Ord v, Ord ann, Ord l, Ord1 (Cell l), Ord1 syntax
+            , FreeVariables1 syntax
+            , Functor syntax
             , MonadAddress l (Eff (ReachableStateInterpreter l (Term syntax ann) v))
             , MonadPrim v (Eff (ReachableStateInterpreter l (Term syntax ann) v))
             , MonadGC l v (Eff (ReachableStateInterpreter l (Term syntax ann) v))
             , Semigroup (Cell l v)
-            , Eval v (Eff (ReachableStateInterpreter l (Term syntax ann) v)) (Term syntax ann) syntax
+            , Eval v (Eff (ReachableStateInterpreter l (Term syntax ann) v)) syntax
             )
           => Term syntax ann -> Final (TracingInterpreter l (Term syntax ann) v Set.Set) v
 evalReach = run @(ReachableStateInterpreter l (Term syntax ann) v) . fix (evTell @l @(Term syntax ann) @v @Set.Set (ev @l)) pure

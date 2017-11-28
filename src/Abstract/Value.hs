@@ -90,9 +90,8 @@ instance ( Monad m
          , Functor s
          , MonadGC l (Value s a l) m
          , MonadEnv l (Value s a l) m
-         , FreeVariables t
          , FreeVariables1 s)
-         => Eval (Value s a l) m t [] where
+         => Eval (Value s a l) m [] where
   eval _  yield []     = yield (I PUnit)
   eval ev yield [a]    = ev pure a >>= yield
   eval ev yield (a:as) = do

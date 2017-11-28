@@ -3,6 +3,7 @@ module Abstract.Interpreter where
 
 import Abstract.Environment
 import Abstract.Eval
+import Abstract.FreeVariables
 import Abstract.Primitive
 import Abstract.Set
 import Abstract.Store
@@ -34,17 +35,20 @@ type Eval' t m v = (v -> m v) -> t -> m v
 --    Files.readFile "test.py" (Just Python) >>= runTask . parse pythonParser2 >>= pure . evaluate @Precise @(Value (Data.Union.Union Language.Python.Assignment2.Syntax) (Record Location) Precise)
 evaluate :: forall l v syntax ann
          . ( Ord v
-           , Eval v (Eff (Interpreter l v)) (Term syntax ann) syntax
+           , Eval v (Eff (Interpreter l v)) syntax
+           , FreeVariables1 syntax
+           , Functor syntax
            , MonadAddress l (Eff (Interpreter l v))
            , MonadPrim v (Eff (Interpreter l v))
-           , Semigroup (Cell l v))
+           , Semigroup (Cell l v)
+           )
          => Term syntax ann
          -> EvalResult l v
 evaluate = run @(Interpreter l v) . fix (ev @l) pure
 
 
 ev :: forall l v w m syntax ann
-   . (Eval v m (Term syntax ann) syntax)
+   .  (FreeVariables1 syntax, Functor syntax, Eval v m syntax)
    => ((v -> m v) -> Term syntax ann -> m v)
    -> (v -> m w) -> Term syntax ann -> m w
 ev ev' yield = eval ev' yield . unTerm
@@ -82,7 +86,9 @@ evRoots :: forall l v m syntax ann
            , MonadGC l v m
            , MonadPrim v m
            , AbstractValue l v
-           , Eval v m (Term syntax ann) (TermF syntax ann)
+           , Eval v m (TermF syntax ann)
+           , FreeVariables1 syntax
+           , Functor syntax
            )
         => Eval' (Term syntax ann) m v
         -> Eval' (Term syntax ann) m v
