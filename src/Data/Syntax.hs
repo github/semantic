@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, TypeApplications #-}
 module Data.Syntax where
 
 import Abstract.Eval
@@ -6,6 +6,7 @@ import Abstract.Value
 import Abstract.Type
 import Abstract.Primitive
 import Abstract.FreeVariables
+import Abstract.Environment
 import Control.Monad.Effect
 import Algorithm hiding (Empty)
 import Control.Applicative
@@ -130,12 +131,19 @@ instance Eq1 Program where liftEq = genericLiftEq
 instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Program
-instance (Monad m) => Eval l (Value s a l) m s a Program where
-  eval ev (Program xs) = foldl (\prev a -> prev *> ev a) (pure (I PUnit)) xs
+instance ( Monad m
+         , Ord l
+         , Functor s
+         , MonadGC l (Value s a l) m
+         , MonadEnv l (Value s a l) m
+         , FreeVariables1 s)
+        => Eval l (Value s a l) m s a Program where
+  eval _  yield (Program [])     = yield (I PUnit)
+  eval ev yield (Program [a])    = ev pure a >>= yield
+  eval ev yield (Program (a:as)) = do
+    env <- askEnv @l @(Value s a l)
+    extraRoots (envRoots @l env (freeVariables1 as)) (ev (const (eval @l ev pure (Program as))) a) >>= yield
 
-instance (Monad m) => Eval l Type m s a Program where
-  eval ev (Program xs) = foldl (\prev a -> prev *> ev a) (pure Unit) xs
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
