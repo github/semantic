@@ -98,7 +98,7 @@ evalCache :: forall l v syntax ann
             , MonadPrim v (Eff (CachingInterpreter l (Term syntax ann) v))
             , Semigroup (Cell l v)
             , AbstractValue l v
-            , Eval v (Eff (CachingInterpreter l (Term syntax ann) v)) (TermF syntax ann)
+            , Eval v (Eff (CachingInterpreter l (Term syntax ann) v)) syntax
             )
           => Term syntax ann
           -> CachingResult l (Term syntax ann) v
