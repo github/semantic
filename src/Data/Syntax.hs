@@ -165,9 +165,9 @@ instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 -- TODO: Define Value semantics for Empty
 instance (Monad m) => Eval l (Value s a l) m s a Empty where
-  eval _ _ = pure (I PUnit)
-instance (Monad m) => Eval l Type m s a Empty where
-  eval _ _ = pure Unit
+  eval _ yield _ = yield (I PUnit)
+-- instance (Monad m) => Eval l Type m s a Empty where
+--   eval _ _ = pure Unit
 
 
 -- | Syntax representing a parsing or assignment error.
