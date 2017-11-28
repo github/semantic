@@ -31,6 +31,14 @@ instance Eq1 Method where liftEq = genericLiftEq
 instance Ord1 Method where liftCompare = genericLiftCompare
 instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 
+-- | A method signature in TypeScript or a method spec in Go.
+data MethodSignature a = MethodSignature { _methodSignatureContext :: ![a], _methodSignatureName :: !a, _methodSignatureParameters :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 MethodSignature where liftEq = genericLiftEq
+instance Ord1 MethodSignature where liftCompare = genericLiftCompare
+instance Show1 MethodSignature where liftShowsPrec = genericLiftShowsPrec
+
 data RequiredParameter a = RequiredParameter { requiredParameter :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
