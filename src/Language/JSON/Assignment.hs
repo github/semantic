@@ -6,11 +6,11 @@ module Language.JSON.Assignment
 , Term)
 where
 
+import Assigning.Assignment hiding (Assignment, Error)
+import qualified Assigning.Assignment as Assignment
 import Data.Record
 import Data.Syntax (makeTerm, parseError)
 import qualified Data.Syntax as Syntax
-import Data.Syntax.Assignment hiding (Assignment, Error)
-import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
 import Data.Union

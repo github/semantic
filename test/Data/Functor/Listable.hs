@@ -27,12 +27,14 @@ module Data.Functor.Listable
 , ListableSyntax
 ) where
 
+import Analysis.Declaration
 import Control.Monad.Free as Free
 import Control.Monad.Trans.Free as FreeF
 import Data.ByteString (ByteString)
 import Data.Char (chr)
 import Data.Diff
 import Data.Functor.Both
+import qualified Data.Language as Language
 import Data.List.NonEmpty
 import Data.Patch
 import Data.Range
@@ -49,10 +51,8 @@ import Data.Text as T (Text, pack)
 import qualified Data.Text.Encoding as T
 import Data.These
 import Data.Union
-import Renderer.TOC
-import RWS
+import Diffing.Algorithm.RWS
 import Test.LeanCheck
-import qualified Language
 
 type Tier a = [a]
 

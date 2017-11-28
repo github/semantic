@@ -6,14 +6,14 @@ module Language.Ruby.Assignment
 , Term
 ) where
 
+import Assigning.Assignment hiding (Assignment, Error)
+import qualified Assigning.Assignment as Assignment
 import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Functor (void)
 import Data.List.NonEmpty (some1)
 import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
 import qualified Data.Syntax as Syntax
-import Data.Syntax.Assignment hiding (Assignment, Error)
-import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression

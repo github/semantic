@@ -25,12 +25,15 @@ module Semantic.Task
 , runTaskWithOptions
 ) where
 
+import Analysis.Decorator (decoratorWithAlgebra)
+import qualified Assigning.Assignment as Assignment
 import Control.Exception
 import Control.Monad.Error.Class
 import Control.Monad.IO.Class
 import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
+import Data.Algebra (RAlgebra)
 import Data.Blob
 import Data.Bool
 import qualified Data.ByteString as B
@@ -39,19 +42,17 @@ import qualified Data.Error as Error
 import Data.Foldable (fold, for_)
 import Data.Functor.Both as Both hiding (snd)
 import Data.Functor.Foldable (cata)
+import Data.Language
 import Data.Record
 import qualified Data.Syntax as Syntax
-import Data.Syntax.Algebra (RAlgebra, decoratorWithAlgebra)
-import qualified Data.Syntax.Assignment as Assignment
 import Data.Term
 import Data.Union
-import qualified Files
-import Language
-import Language.Markdown
-import Parser
+import Parsing.Parser
+import Parsing.CMark
+import Parsing.TreeSitter
 import System.Exit (die)
 import System.IO (Handle, stderr)
-import TreeSitter
+import qualified Semantic.IO as IO
 import Semantic.Log
 import Semantic.Stat as Stat
 import Semantic.Queue
@@ -65,7 +66,7 @@ data TaskF output where
   WriteStat :: Stat -> TaskF ()
   Time :: String -> [(String, String)] -> Task output -> TaskF output
   Parse :: Parser term -> Blob -> TaskF term
-  Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
+  Decorate :: Functor f => RAlgebra (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
   Render :: Renderer input output -> input -> TaskF output
   Distribute :: Traversable t => t (Task output) -> TaskF (t output)
@@ -115,7 +116,7 @@ parse :: Parser term -> Blob -> Task term
 parse parser blob = Parse parser blob `Then` return
 
 -- | A 'Task' which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
-decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
+decorate :: Functor f => RAlgebra (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
 decorate algebra term = Decorate algebra term `Then` return
 
 -- | A 'Task' which diffs a pair of terms using the supplied 'Differ' function.
@@ -175,10 +176,10 @@ runTaskWithOptions options task = do
       where
         go :: Task a -> IO (Either SomeException a)
         go = iterFreerA (\ task yield -> case task of
-          ReadBlobs (Left handle) -> (Files.readBlobsFromHandle handle >>= yield) `catchError` (pure . Left . toException)
-          ReadBlobs (Right paths@[(path, Nothing)]) -> (Files.isDirectory path >>= bool (Files.readBlobsFromPaths paths) (Files.readBlobsFromDir path) >>= yield) `catchError` (pure . Left . toException)
-          ReadBlobs (Right paths) -> (Files.readBlobsFromPaths paths >>= yield) `catchError` (pure . Left . toException)
-          ReadBlobPairs source -> (either Files.readBlobPairsFromHandle (traverse (traverse (uncurry Files.readFile))) source >>= yield) `catchError` (pure . Left . toException)
+          ReadBlobs (Left handle) -> (IO.readBlobsFromHandle handle >>= yield) `catchError` (pure . Left . toException)
+          ReadBlobs (Right paths@[(path, Nothing)]) -> (IO.isDirectory path >>= bool (IO.readBlobsFromPaths paths) (IO.readBlobsFromDir path) >>= yield) `catchError` (pure . Left . toException)
+          ReadBlobs (Right paths) -> (IO.readBlobsFromPaths paths >>= yield) `catchError` (pure . Left . toException)
+          ReadBlobPairs source -> (either IO.readBlobPairsFromHandle (traverse (traverse (uncurry IO.readFile))) source >>= yield) `catchError` (pure . Left . toException)
           WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
           WriteLog level message pairs -> queueLogMessage logger level message pairs >>= yield
           WriteStat stat -> queue statter stat >>= yield
