@@ -36,8 +36,6 @@ type Eval' t m v = (v -> m v) -> t -> m v
 --    evaluate @(Value (Data.Union.Union Language.Python.Assignment2.Syntax) (Record Location) Precise) <term>
 evaluate :: forall v syntax ann
          . ( Ord v
-           , Eval v (Eff (Interpreter l v)) syntax
-           , FreeVariables1 syntax
            , Functor syntax
            , Semigroup (Cell (LocationFor v) v)
            , FreeVariables1 syntax
