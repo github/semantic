@@ -119,7 +119,7 @@ evCache ev0 ev' yield e = do
   env <- askEnv
   store <- getStore
   roots <- askRoots
-  let c = Configuration e roots env store :: Configuration l t v
+  let c = Configuration e (Set.toList roots) env store :: Configuration l t v
   out <- getCache
   case cacheLookup c out of
     Just pairs -> asum . flip map (toList pairs) $ \ (value, store') -> do
@@ -149,7 +149,7 @@ fixCache ev' yield e = do
   env <- askEnv
   store <- getStore
   roots <- askRoots
-  let c = Configuration e roots env store :: Configuration l t v
+  let c = Configuration e (Set.toList roots) env store :: Configuration l t v
   pairs <- mlfp mempty (\ dollar -> do
     putCache (mempty :: Cache l t v)
     putStore store

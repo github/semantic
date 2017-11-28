@@ -81,5 +81,5 @@ evTell ev0 ev' yield e = do
   env <- askEnv
   store <- getStore
   roots <- askRoots
-  trace (fromList [Configuration e roots env store] :: g (Configuration l t v))
+  trace (fromList [Configuration e (Set.toList roots) env store] :: g (Configuration l t v))
   ev0 ev' yield e

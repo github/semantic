@@ -7,12 +7,11 @@ import Abstract.Environment
 import Data.List (intersperse)
 import Data.Functor.Classes
 import Data.Monoid
-import qualified Data.Set as Set
 
 data Configuration l t v
   = Configuration
     { configurationTerm :: t
-    , configurationRoots :: Set.Set (Address l v)
+    , configurationRoots :: [Address l v]
     , configurationEnvironment :: Environment l v
     , configurationStore :: Store l v
     }
