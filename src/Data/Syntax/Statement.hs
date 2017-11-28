@@ -2,10 +2,10 @@
 module Data.Syntax.Statement where
 
 import Abstract.Eval
-import Abstract.Value
 import Abstract.FreeVariables
 import Abstract.Environment
 import Abstract.Store
+import Abstract.Value
 import Algorithm
 import Data.Foldable
 import Data.Semigroup
@@ -70,19 +70,17 @@ instance Ord1 Assignment where liftCompare = genericLiftCompare
 instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
 instance ( Monad m
-         , Functor s
-         , Foldable s
-         , Semigroup (Cell l (Value s a l))
-         , MonadAddress l m
-         , MonadStore l (Value s a l) m
-         , MonadEnv l (Value s a l) m
-         , FreeVariables1 s)
-         => Eval (Value s a l) m Assignment where
+         , Semigroup (Cell (LocationFor v) v)
+         , MonadAddress (LocationFor v) m
+         , MonadStore (LocationFor v) v m
+         , MonadEnv (LocationFor v) v m
+         )
+         => Eval v m Assignment where
   eval ev yield Assignment{..} = do
     let [var] = toList (freeVariables assignmentTarget)
     v <- ev pure assignmentValue
-    env <- askEnv @l @(Value s a l)
-    a <- maybe (alloc @l var) pure (envLookup var env)
+    env <- askEnv @(LocationFor v) @v
+    a <- maybe (alloc @(LocationFor v) var) pure (envLookup var env)
     assign a v
     localEnv (envInsert var a) (yield v)
 
