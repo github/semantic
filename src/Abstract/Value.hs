@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, FunctionalDependencies, AllowAmbiguousTypes, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeOperators, UndecidableInstances, TypeApplications #-}
+{-# LANGUAGE ConstraintKinds, FunctionalDependencies, AllowAmbiguousTypes, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances, TypeApplications #-}
 module Abstract.Value where
 
 import Abstract.Environment
@@ -20,6 +20,10 @@ data Value syntax ann l
   = I Prim
   | Closure Name (Term syntax ann) (Environment l (Value syntax ann l))
   deriving (Eq, Ord, Show)
+
+type family LocationFor value :: * where
+  LocationFor (Value syntax a location) = location
+  LocationFor Type = Monovariant
 
 
 -- Instances
