@@ -51,50 +51,6 @@ data Declaration
 declarationAlgebra :: (HasField fields Range, HasField fields Span, Foldable syntax, HasDeclaration syntax) => Blob -> RAlgebra (Term syntax (Record fields)) (Maybe Declaration)
 declarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
 
--- | Compute 'Declaration's for methods and functions in 'Syntax'.
-syntaxDeclarationAlgebra :: HasField fields Range => Blob -> RAlgebra (Term S.Syntax (Record fields)) (Maybe Declaration)
-syntaxDeclarationAlgebra blob@Blob{..} decl@(In a r) = case r of
-  S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage
-  S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage Nothing
-  S.Method _ (identifier, _) (Just (receiver, _)) _ _
-    | S.Indexed [receiverParams] <- termOut receiver
-    , S.ParameterDecl (Just ty) _ <- termOut receiverParams -> Just $ MethodDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage (Just (getSource ty))
-    | otherwise -> Just $ MethodDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage (Just (getSource receiver))
-  S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange a) blobSource)) mempty blobLanguage
-  _ -> Nothing
-  where
-    getSource = toText . flip Source.slice blobSource . byteRange . termAnnotation
-
-getMethodSource :: HasField fields Range => Blob -> TermF Declaration.Method (Record fields) (Term syntax (Record fields), a) -> T.Text
-getMethodSource Blob{..} (In a r)
-  = let declRange = byteRange a
-        bodyRange = byteRange <$> case r of
-          Declaration.Method _ _ _ _ (Term (In a' _), _) -> Just a'
-    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
-
-getFunctionSource :: HasField fields Range => Blob -> TermF Declaration.Function (Record fields) (Term syntax (Record fields), a) -> T.Text
-getFunctionSource Blob{..} (In a r)
-  = let declRange = byteRange a
-        bodyRange = byteRange <$> case r of
-          Declaration.Function _ _ _ (Term (In a' _), _) -> Just a'
-    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
-
-getClassSource :: (HasField fields Range) => Blob -> TermF Declaration.Class (Record fields) (Term syntax (Record fields), a) -> T.Text
-getClassSource Blob{..} (In a r)
-  = let declRange = byteRange a
-        bodyRange = byteRange <$> case r of
-          Declaration.Class _ _ _ (Term (In a' _), _) -> Just a'
-    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
-
-getSyntaxDeclarationSource :: HasField fields Range => Blob -> TermF S.Syntax (Record fields) (Term syntax (Record fields), a) -> T.Text
-getSyntaxDeclarationSource Blob{..} (In a r)
-  = let declRange = byteRange a
-        bodyRange = byteRange <$> case r of
-          S.Function _ _ ((Term (In a' _), _) : _) -> Just a'
-          S.Method _ _ _ _ ((Term (In a' _), _) : _) -> Just a'
-          _ -> Nothing
-    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
-
 
 -- | Types for which we can produce a 'Declaration' in 'Maybe'. There is exactly one instance of this typeclass; adding customized 'Declaration's for a new type is done by defining an instance of 'CustomHasDeclaration' instead.
 --
@@ -197,3 +153,48 @@ instance HasDeclarationWithStrategy 'Default syntax where
 -- | The 'Custom' strategy delegates the selection of the strategy to the 'CustomHasDeclaration' instance for the type.
 instance CustomHasDeclaration syntax => HasDeclarationWithStrategy 'Custom syntax where
   toDeclarationWithStrategy _ = customToDeclaration
+
+
+-- | Compute 'Declaration's for methods and functions in 'Syntax'.
+syntaxDeclarationAlgebra :: HasField fields Range => Blob -> RAlgebra (Term S.Syntax (Record fields)) (Maybe Declaration)
+syntaxDeclarationAlgebra blob@Blob{..} decl@(In a r) = case r of
+  S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage
+  S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage Nothing
+  S.Method _ (identifier, _) (Just (receiver, _)) _ _
+    | S.Indexed [receiverParams] <- termOut receiver
+    , S.ParameterDecl (Just ty) _ <- termOut receiverParams -> Just $ MethodDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage (Just (getSource ty))
+    | otherwise -> Just $ MethodDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage (Just (getSource receiver))
+  S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange a) blobSource)) mempty blobLanguage
+  _ -> Nothing
+  where
+    getSource = toText . flip Source.slice blobSource . byteRange . termAnnotation
+
+getMethodSource :: HasField fields Range => Blob -> TermF Declaration.Method (Record fields) (Term syntax (Record fields), a) -> T.Text
+getMethodSource Blob{..} (In a r)
+  = let declRange = byteRange a
+        bodyRange = byteRange <$> case r of
+          Declaration.Method _ _ _ _ (Term (In a' _), _) -> Just a'
+    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
+
+getFunctionSource :: HasField fields Range => Blob -> TermF Declaration.Function (Record fields) (Term syntax (Record fields), a) -> T.Text
+getFunctionSource Blob{..} (In a r)
+  = let declRange = byteRange a
+        bodyRange = byteRange <$> case r of
+          Declaration.Function _ _ _ (Term (In a' _), _) -> Just a'
+    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
+
+getClassSource :: (HasField fields Range) => Blob -> TermF Declaration.Class (Record fields) (Term syntax (Record fields), a) -> T.Text
+getClassSource Blob{..} (In a r)
+  = let declRange = byteRange a
+        bodyRange = byteRange <$> case r of
+          Declaration.Class _ _ _ (Term (In a' _), _) -> Just a'
+    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
+
+getSyntaxDeclarationSource :: HasField fields Range => Blob -> TermF S.Syntax (Record fields) (Term syntax (Record fields), a) -> T.Text
+getSyntaxDeclarationSource Blob{..} (In a r)
+  = let declRange = byteRange a
+        bodyRange = byteRange <$> case r of
+          S.Function _ _ ((Term (In a' _), _) : _) -> Just a'
+          S.Method _ _ _ _ ((Term (In a' _), _) : _) -> Just a'
+          _ -> Nothing
+    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
