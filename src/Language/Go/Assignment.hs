@@ -413,12 +413,7 @@ selectorExpression :: Assignment
 selectorExpression = makeTerm <$> symbol SelectorExpression <*> children (Expression.MemberAccess <$> expression <*> expression)
 
 sliceExpression :: Assignment
-sliceExpression = makeTerm <$> symbol SliceExpression <*> children (  (Go.Syntax.Slice <$> expression <*> expression <*> expression <*> expression)
-                                                                  <|> (Go.Syntax.Slice <$> expression <*> emptyTerm <* symbol AnonColon <*> expression <* symbol AnonColon <*> expression)
-                                                                  <|> (Go.Syntax.Slice <$> expression <*> emptyTerm <* symbol AnonColon <*> expression <*> emptyTerm)
-                                                                  <|> (Go.Syntax.Slice <$> expression <*> expression <*> expression <*> emptyTerm)
-                                                                  <|> (Go.Syntax.Slice <$> expression <*> expression <*> emptyTerm <*> emptyTerm)
-                                                                  <|> (Go.Syntax.Slice <$> expression <*> emptyTerm <*> emptyTerm <*> emptyTerm))
+sliceExpression = makeTerm <$> symbol SliceExpression <*> children (Go.Syntax.Slice <$> expression <* token AnonLBracket <*> (expression <|> emptyTerm) <* symbol AnonColon <*> (expression <|> emptyTerm) <* optional (symbol AnonColon) <*> (expression <|> emptyTerm))
 
 typeAssertion :: Assignment
 typeAssertion = makeTerm <$> symbol TypeAssertionExpression <*> children (Go.Syntax.TypeAssertion <$> expression <*> expression)
