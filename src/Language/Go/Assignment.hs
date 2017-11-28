@@ -465,7 +465,7 @@ varSpecification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> childr
 -- Statements
 
 assignment' :: Assignment
-assignment' =  makeTerm'  <$> symbol AssignmentStatement <*> children (infixTerm expressionList expressionList
+assignment' =  makeTerm' <$> symbol AssignmentStatement <*> children (infixTerm expressionList expressionList
                   [ assign                                   <$ symbol AnonEqual
                   , augmentedAssign Expression.Plus          <$ symbol AnonPlusEqual
                   , augmentedAssign Expression.Minus         <$ symbol AnonMinusEqual
