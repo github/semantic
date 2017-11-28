@@ -33,6 +33,7 @@ type Syntax = '[
   , Declaration.Class
   , Declaration.Function
   , Declaration.Method
+  , Declaration.MethodSignature
   , Declaration.InterfaceDeclaration
   , Declaration.PublicFieldDefinition
   , Declaration.VariableDeclaration
@@ -115,7 +116,6 @@ type Syntax = '[
   , TypeScript.Syntax.IndexTypeQuery
   , TypeScript.Syntax.ThisType
   , TypeScript.Syntax.ExistentialType
-  , TypeScript.Syntax.MethodSignature
   , TypeScript.Syntax.AbstractMethodSignature
   , TypeScript.Syntax.IndexSignature
   , TypeScript.Syntax.ObjectType
@@ -428,7 +428,7 @@ indexSignature = makeTerm <$> symbol Grammar.IndexSignature <*> children (TypeSc
 
 methodSignature :: Assignment
 methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> children ((,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> callSignatureParts)
-  where makeMethodSignature loc (modifier, readonly, propertyName, (typeParams, params, annotation)) = makeTerm loc (TypeScript.Syntax.MethodSignature [modifier, readonly, typeParams, annotation] propertyName params)
+  where makeMethodSignature loc (modifier, readonly, propertyName, (typeParams, params, annotation)) = makeTerm loc (Declaration.MethodSignature [modifier, readonly, typeParams, annotation] propertyName params)
 
 formalParameters :: Assignment.Assignment [] Grammar [Term]
 formalParameters = symbol FormalParameters *> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term parameter)) <*> many comment))

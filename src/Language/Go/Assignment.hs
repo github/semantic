@@ -32,6 +32,7 @@ type Syntax =
    , Declaration.Function
    , Declaration.Import
    , Declaration.Method
+   , Declaration.MethodSignature
    , Declaration.Module
    , Declaration.Type
    , Declaration.TypeAlias
@@ -392,11 +393,9 @@ methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> ch
 
 -- TODO: Refactor using makeTerm' and inj (and :fire: the use of Annotation here, the type should be part of the Method's context field).
 methodSpec :: Assignment
-methodSpec =  mkMethodSpec <$> symbol MethodSpec <*> children ((,,,,) <$> empty <*> expression <*> parameters <*> (expression <|> parameters <|> emptyTerm) <*> empty)
+methodSpec =  makeTerm <$> symbol MethodSpec <*> children (mkMethodSpec <$> expression <*> parameters <*> expression)
   where
-    empty = makeTerm <$> location <*> pure Syntax.Empty
-    mkMethodSpec loc (receiver', name', params, optionaltypeLiteral, body') = makeTerm loc $ Type.Annotation (mkMethod loc receiver' name' params body') optionaltypeLiteral
-    mkMethod loc empty' name' params empty'' = makeTerm loc $ Declaration.Method [] empty' name' (pure params) empty''
+    mkMethodSpec name' params optionalTypeLiteral = Declaration.MethodSignature [optionalTypeLiteral] name' [params]
 
 packageClause :: Assignment
 packageClause = makeTerm <$> symbol PackageClause <*> children (Declaration.Module <$> expression <*> pure [])
