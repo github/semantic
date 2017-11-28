@@ -8,21 +8,16 @@
     (
       (Slice
         (Identifier)
-        (Empty)
-        (Integer)
-        (Empty))
-      (Slice
-        (Identifier)
-        (Empty)
-        (Integer)
-        (Empty))
-      (Slice
-        (Identifier)
         (Integer)
         (Empty)
         (Empty))
       (Slice
         (Identifier)
+        (Empty)
+        (Integer)
+        (Empty))
+      (Slice
+        (Identifier)
         (Integer)
         (Integer)
         (Empty))
@@ -30,9 +25,9 @@
         (Identifier)
         (Integer)
         (Integer)
-        (Empty))
+        (Integer))
       (Slice
         (Identifier)
         (Integer)
         (Integer)
-        (Integer)))))
+        (Empty)))))

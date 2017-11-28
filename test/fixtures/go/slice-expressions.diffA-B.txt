@@ -6,31 +6,36 @@
     (Identifier)
     ([])
     (
-      (Subscript
-        (Identifier)
-        (Integer))
       (Slice
         (Identifier)
-        (Empty)
+      { (Integer)
+      ->(Integer) }
         (Empty)
         (Empty))
       (Slice
         (Identifier)
-        (Integer)
         (Empty)
+      { (Integer)
+      ->(Integer) }
         (Empty))
       (Slice
         (Identifier)
-        (Integer)
-        (Integer)
+      { (Empty)
+      ->(Integer) }
+      { (Empty)
+      ->(Integer) }
         (Empty))
       (Slice
         (Identifier)
-        (Integer)
-        (Integer)
-        (Empty))
+      { (Integer)
+      ->(Integer) }
+      { (Integer)
+      ->(Integer) }
+      { (Integer)
+      ->(Integer) })
       (Slice
-        (Identifier)
+      { (Identifier)
+      ->(Identifier) }
         (Integer)
         (Integer)
-        (Integer)))))
+        (Empty)))))
