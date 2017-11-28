@@ -4,6 +4,7 @@ module Data.Syntax.Statement where
 import Abstract.Eval
 import Abstract.Value
 import Abstract.FreeVariables
+import Abstract.Environment
 import Abstract.Store
 import Algorithm
 import Data.Foldable
@@ -74,13 +75,16 @@ instance ( Monad m
          , Semigroup (Cell l (Value s a l))
          , MonadAddress l m
          , MonadStore l (Value s a l) m
-         , FreeVariables1 s) => Eval l (Value s a l) m s a Assignment where
-  eval ev Assignment{..} = do
+         , MonadEnv l (Value s a l) m
+         , FreeVariables1 s)
+         => Eval l (Value s a l) m s a Assignment where
+  eval ev yield Assignment{..} = do
     let [var] = toList (freeVariables assignmentTarget)
-    v <- ev assignmentValue
-    a <- alloc @l var
+    v <- ev pure assignmentValue
+    env <- askEnv @l @(Value s a l)
+    a <- maybe (alloc @l var) pure (envLookup var env)
     assign a v
-    pure v
+    localEnv (envInsert var a) (yield v)
 
 -- Returns
 
