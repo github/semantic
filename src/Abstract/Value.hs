@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, FunctionalDependencies, AllowAmbiguousTypes, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, FunctionalDependencies, AllowAmbiguousTypes, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeOperators, UndecidableInstances, TypeApplications #-}
 module Abstract.Value where
 
 import Abstract.Environment
@@ -83,6 +83,17 @@ instance AbstractValue Monovariant Type where
   literal PUnit       = Unit
 
 
--- Eval instances
-instance (Monad m) => Eval l (Value s a l) m s a [] where
-  eval ev = foldl (\prev x -> prev *> ev x) (pure (I PUnit))
+-- Eval instance
+
+instance ( Monad m
+         , Ord l
+         , Functor s
+         , MonadGC l (Value s a l) m
+         , MonadEnv l (Value s a l) m
+         , FreeVariables1 s)
+         => Eval l (Value s a l) m s a [] where
+  eval _  yield []     = yield (I PUnit)
+  eval ev yield [a]    = ev pure a >>= yield
+  eval ev yield (a:as) = do
+    env <- askEnv @l @(Value s a l)
+    extraRoots (envRoots @l env (freeVariables1 as)) (ev (const (eval @l ev pure as)) a) >>= yield
