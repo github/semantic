@@ -15,6 +15,9 @@ class FreeVariables1 syntax where
   default liftFreeVariables :: (Foldable syntax) => (a -> Set Name) -> syntax a -> Set Name
   liftFreeVariables = foldMap
 
+freeVariables1 :: (FreeVariables1 t, FreeVariables a) => t a -> Set Name
+freeVariables1 = liftFreeVariables freeVariables
+
 class FreeVariables term where
   freeVariables :: term -> Set Name
 
