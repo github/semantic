@@ -14,7 +14,6 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Algorithm
-                     , Alignment
                      , Category
                      , Data.Align.Generic
                      , Data.Blob
@@ -70,7 +69,6 @@ library
                      , Paths_semantic_diff
                      , Renderer
                      , Renderer.JSON
-                     , Renderer.Patch
                      , Renderer.SExpression
                      , Renderer.Tag
                      , Renderer.TOC
@@ -148,8 +146,7 @@ test-suite test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       AlignmentSpec
-                     , CommandSpec
+  other-modules:       CommandSpec
                      , Data.Functor.Classes.Ord.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Mergeable.Spec
@@ -160,7 +157,6 @@ test-suite test
                      , SemanticCmdLineSpec
                      , Semantic.StatSpec
                      , InterpreterSpec
-                     , PatchOutputSpec
                      , SES.Spec
                      , SourceSpec
                      , SpecHelpers

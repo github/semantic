@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Syntax.Algebra
 ( FAlgebra
 , RAlgebra
@@ -108,8 +108,8 @@ constructorNameAndConstantFields :: Show1 f => TermF f a b -> ByteString
 constructorNameAndConstantFields (In _ f) = pack (liftShowsPrec (const (const id)) (const id) 0 f "")
 
 -- | Compute a 'ConstructorLabel' label for a 'Union' of syntax 'Term's.
-constructorLabel :: Apply ConstructorName fs => TermF (Union fs) a b -> ConstructorLabel
-constructorLabel (In _ u) = ConstructorLabel $ pack (apply (Proxy :: Proxy ConstructorName) constructorName u)
+constructorLabel :: ConstructorName syntax => TermF syntax a b -> ConstructorLabel
+constructorLabel (In _ s) = ConstructorLabel $ pack (constructorName s)
 
 
 newtype ConstructorLabel = ConstructorLabel ByteString
@@ -121,11 +121,40 @@ instance ToJSONFields ConstructorLabel where
   toJSONFields (ConstructorLabel s) = [ "category" .= decodeUtf8 s ]
 
 
-class ConstructorName f where
-  constructorName :: f a -> String
+-- | A typeclass to retrieve the name of the data constructor for a value.
+--
+--   This typeclass employs the Advanced Overlap techniques designed by Oleg Kiselyov & Simon Peyton Jones: https://wiki.haskell.org/GHC/AdvancedOverlap; see also src/Renderer/TOC.hs for discussion of the details of the mechanism.
+class ConstructorName syntax where
+  constructorName :: syntax a -> String
 
-instance (Generic1 f, GConstructorName (Rep1 f)) => ConstructorName f where
-  constructorName = gconstructorName . from1
+instance (ConstructorNameStrategy syntax ~ strategy, ConstructorNameWithStrategy strategy syntax) => ConstructorName syntax where
+  constructorName = constructorNameWithStrategy (Proxy :: Proxy strategy)
+
+class CustomConstructorName syntax where
+  customConstructorName :: syntax a -> String
+
+instance Apply ConstructorName fs => CustomConstructorName (Union fs) where
+  customConstructorName = apply (Proxy :: Proxy ConstructorName) constructorName
+
+instance CustomConstructorName [] where
+  customConstructorName [] = "[]"
+  customConstructorName _  = ""
+
+data Strategy = Default | Custom
+
+type family ConstructorNameStrategy syntax where
+  ConstructorNameStrategy (Union _) = 'Custom
+  ConstructorNameStrategy []        = 'Custom
+  ConstructorNameStrategy syntax    = 'Default
+
+class ConstructorNameWithStrategy (strategy :: Strategy) syntax where
+  constructorNameWithStrategy :: proxy strategy -> syntax a -> String
+
+instance (Generic1 syntax, GConstructorName (Rep1 syntax)) => ConstructorNameWithStrategy 'Default syntax where
+  constructorNameWithStrategy _ = gconstructorName . from1
+
+instance CustomConstructorName syntax => ConstructorNameWithStrategy 'Custom syntax where
+  constructorNameWithStrategy _ = customConstructorName
 
 
 class GConstructorName f where
@@ -139,6 +168,4 @@ instance (GConstructorName f, GConstructorName g) => GConstructorName (f :+: g) 
   gconstructorName (R1 r) = gconstructorName r
 
 instance Constructor c => GConstructorName (M1 C c f) where
-  gconstructorName x = case conName x of
-                        ":" -> ""
-                        n -> n
+  gconstructorName = conName
