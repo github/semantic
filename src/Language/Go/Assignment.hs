@@ -415,7 +415,7 @@ selectorExpression = makeTerm <$> symbol SelectorExpression <*> children (Expres
 
 -- TODO: Refactor to parse a[:2:3] correctly.
 sliceExpression :: Assignment
-sliceExpression = makeTerm <$> symbol SliceExpression <*> children (Go.Syntax.Slice <$> expression <* token AnonLBracket <*> (expression <|> emptyTerm) <* symbol AnonColon <*> (expression <|> emptyTerm) <* optional (symbol AnonColon) <*> (expression <|> emptyTerm))
+sliceExpression = makeTerm <$> symbol SliceExpression <*> children (Go.Syntax.Slice <$> expression <* token AnonLBracket <*> (emptyTerm <|> expression) <* token AnonColon <*> (expression <|> emptyTerm) <* optional (token AnonColon) <*> (expression <|> emptyTerm))
 
 typeAssertion :: Assignment
 typeAssertion = makeTerm <$> symbol TypeAssertionExpression <*> children (Go.Syntax.TypeAssertion <$> expression <*> expression)
