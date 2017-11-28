@@ -22,7 +22,7 @@ import Data.Term
 import Prelude hiding (fail)
 
 
-type Interpreter l v = '[Fresh, Fail, NonDetEff, State (Store l v), Reader (Environment l v)]
+type Interpreter l v = '[Fresh, Fail, NonDetEff, State (Store l v), Reader (Set.Set (Address l v)), Reader (Environment l v)]
 
 type MonadInterpreter l v m = (MonadEnv l v m, MonadStore l v m, MonadFail m)
 
