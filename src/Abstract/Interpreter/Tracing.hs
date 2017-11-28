@@ -8,6 +8,7 @@ import Abstract.FreeVariables
 import Abstract.Interpreter
 import Abstract.Primitive
 import Abstract.Store
+import Abstract.Value
 
 import Control.Effect
 import Control.Monad.Effect hiding (run)
@@ -35,44 +36,43 @@ instance (Writer (g (Configuration l t v)) :< fs) => MonadTrace l t v g (Eff fs)
 -- Tracing and reachable state analyses
 --
 -- Examples
---    evalTrace @Precise @(Value Syntax Precise) @Syntax (makeLam "x" (var "x") # true)
---    evalReach @Precise @(Value Syntax Precise) @Syntax (makeLam "x" (var "x") # true)
+--    evalTrace @(Value Syntax Precise) <term>
+--    evalReach @(Value Syntax Precise) <term>
 
-evalTrace :: forall l v syntax ann
-          . ( Ord v, Ord ann, Ord1 syntax, Ord1 (Cell l)
+evalTrace :: forall v syntax ann
+          . ( Ord v, Ord ann, Ord1 syntax, Ord1 (Cell (LocationFor v))
             , FreeVariables1 syntax
             , Functor syntax
-            , MonadAddress l (Eff (TraceInterpreter l (Term syntax ann) v))
-            , MonadPrim v (Eff (TraceInterpreter l (Term syntax ann) v))
-            , MonadGC l v (Eff (TraceInterpreter l (Term syntax ann) v))
-            , Semigroup (Cell l v)
-            , Eval v (Eff (TraceInterpreter l (Term syntax ann) v)) syntax
+            , MonadAddress (LocationFor v) (Eff (TraceInterpreter (LocationFor v) (Term syntax ann) v))
+            , MonadPrim v (Eff (TraceInterpreter (LocationFor v) (Term syntax ann) v))
+            , MonadGC (LocationFor v) v (Eff (TraceInterpreter (LocationFor v) (Term syntax ann) v))
+            , Semigroup (Cell (LocationFor v) v)
+            , Eval v (Eff (TraceInterpreter (LocationFor v) (Term syntax ann) v)) syntax
             )
-          => Term syntax ann -> Final (TracingInterpreter l (Term syntax ann) v []) v
-evalTrace = run @(TraceInterpreter l (Term syntax ann) v) . fix (evTell @l @(Term syntax ann) @v @[] ev) pure
+          => Term syntax ann -> Final (TracingInterpreter (LocationFor v) (Term syntax ann) v []) v
+evalTrace = run @(TraceInterpreter (LocationFor v) (Term syntax ann) v) . fix (evTell @[] ev) pure
 
-evalReach :: forall l v syntax ann
-          . ( Ord v, Ord ann, Ord l, Ord1 (Cell l), Ord1 syntax
+evalReach :: forall v syntax ann
+          . ( Ord v, Ord ann, Ord (LocationFor v), Ord1 (Cell (LocationFor v)), Ord1 syntax
             , FreeVariables1 syntax
             , Functor syntax
-            , MonadAddress l (Eff (ReachableStateInterpreter l (Term syntax ann) v))
-            , MonadPrim v (Eff (ReachableStateInterpreter l (Term syntax ann) v))
-            , MonadGC l v (Eff (ReachableStateInterpreter l (Term syntax ann) v))
-            , Semigroup (Cell l v)
-            , Eval v (Eff (ReachableStateInterpreter l (Term syntax ann) v)) syntax
+            , MonadAddress (LocationFor v) (Eff (ReachableStateInterpreter (LocationFor v) (Term syntax ann) v))
+            , MonadPrim v (Eff (ReachableStateInterpreter (LocationFor v) (Term syntax ann) v))
+            , MonadGC (LocationFor v) v (Eff (ReachableStateInterpreter (LocationFor v) (Term syntax ann) v))
+            , Semigroup (Cell (LocationFor v) v)
+            , Eval v (Eff (ReachableStateInterpreter (LocationFor v) (Term syntax ann) v)) syntax
             )
-          => Term syntax ann -> Final (TracingInterpreter l (Term syntax ann) v Set.Set) v
-evalReach = run @(ReachableStateInterpreter l (Term syntax ann) v) . fix (evTell @l @(Term syntax ann) @v @Set.Set ev) pure
+          => Term syntax ann -> Final (TracingInterpreter (LocationFor v) (Term syntax ann) v Set.Set) v
+evalReach = run @(ReachableStateInterpreter (LocationFor v) (Term syntax ann) v) . fix (evTell @Set.Set ev) pure
 
 
-evTell :: forall l t v g m
-       . ( Ord l
-         , IsList (g (Configuration l t v))
-         , Item (g (Configuration l t v)) ~ Configuration l t v
-         , MonadTrace l t v g m
-         , MonadEnv l v m
-         , MonadStore l v m
-         , MonadGC l v m
+evTell :: forall g t m v
+       . ( IsList (g (Configuration (LocationFor v) t v))
+         , Item (g (Configuration (LocationFor v) t v)) ~ Configuration (LocationFor v) t v
+         , MonadTrace (LocationFor v) t v g m
+         , MonadEnv (LocationFor v) v m
+         , MonadStore (LocationFor v) v m
+         , MonadGC (LocationFor v) v m
          )
        => (Eval' t m v -> Eval' t m v)
        -> Eval' t m v
@@ -81,5 +81,5 @@ evTell ev0 ev' yield e = do
   env <- askEnv
   store <- getStore
   roots <- askRoots
-  trace (fromList [Configuration e (Set.toList roots) env store] :: g (Configuration l t v))
+  trace (fromList [Configuration e (Set.toList roots) env store] :: g (Configuration (LocationFor v) t v))
   ev0 ev' yield e

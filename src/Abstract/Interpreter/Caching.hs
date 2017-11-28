@@ -83,26 +83,26 @@ instance (NonDetEff :< fs) => MonadNonDet (Eff fs) where
 -- Coinductively-cached evaluation
 --
 -- Examples:
---    Files.readFile "test.py" (Just Python) >>= runTask . parse pythonParser2 >>= pure . evalCache @Monovariant @Type
---    Files.readFile "test.py" (Just Python) >>= runTask . parse pythonParser2 >>= pure . evalCache @Precise @(Value (Data.Union.Union Language.Python.Assignment2.Syntax) (Record Location) Precise)
-evalCache :: forall l v syntax ann
+--    evalCache @Type <term>
+--    evalCache @(Value (Data.Union.Union Language.Python.Assignment2.Syntax) (Record Location) Precise) <term>
+evalCache :: forall v syntax ann
           . ( Ord v
-            , Ord l
+            , Ord (LocationFor v)
             , Ord ann
-            , Ord1 (Cell l)
+            , Ord1 (Cell (LocationFor v))
             , Ord1 syntax
-            , Foldable (Cell l)
+            , Foldable (Cell (LocationFor v))
             , FreeVariables1 syntax
             , Functor syntax
-            , MonadAddress l (Eff (CachingInterpreter l (Term syntax ann) v))
-            , MonadPrim v (Eff (CachingInterpreter l (Term syntax ann) v))
-            , Semigroup (Cell l v)
-            , AbstractValue l v
-            , Eval v (Eff (CachingInterpreter l (Term syntax ann) v)) syntax
+            , MonadAddress (LocationFor v) (Eff (CachingInterpreter (LocationFor v) (Term syntax ann) v))
+            , MonadPrim v (Eff (CachingInterpreter (LocationFor v) (Term syntax ann) v))
+            , Semigroup (Cell (LocationFor v) v)
+            , AbstractValue (LocationFor v) v
+            , Eval v (Eff (CachingInterpreter (LocationFor v) (Term syntax ann) v)) syntax
             )
           => Term syntax ann
-          -> CachingResult l (Term syntax ann) v
-evalCache e = run @(CachingInterpreter l (Term syntax ann) v) (fixCache @l (fix (evCache @l (evCollect @l (evRoots @l)))) pure e)
+          -> CachingResult (LocationFor v) (Term syntax ann) v
+evalCache e = run @(CachingInterpreter (LocationFor v) (Term syntax ann) v) (fixCache @(LocationFor v) (fix (evCache @(LocationFor v) (evCollect @(LocationFor v) (evRoots @(LocationFor v))))) pure e)
 
 
 evCache :: forall l t v m

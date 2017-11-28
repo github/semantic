@@ -6,6 +6,7 @@ import Abstract.FreeVariables
 import Abstract.Interpreter
 import Abstract.Primitive
 import Abstract.Store
+import Abstract.Value
 
 import Control.Effect
 import Control.Monad.Effect hiding (run)
@@ -42,9 +43,11 @@ subterms term = para (foldMap (uncurry ((<>) . point))) term <> point term
 
 
 -- Dead code analysis
+--
 -- Example:
---    evalDead @Precise @(Value Syntax Precise) @Syntax (if' true (Abstract.Syntax.int 1) (Abstract.Syntax.int 2))
-evalDead :: forall l v syntax ann
+--    evalDead @(Value Syntax Precise) <term>
+
+evalDead :: forall v syntax ann
          . ( Ord v
            , Ord ann
            , Ord1 syntax
@@ -52,14 +55,14 @@ evalDead :: forall l v syntax ann
            , Foldable syntax
            , FreeVariables1 syntax
            , Functor syntax
-           , Eval v (Eff (DeadCodeInterpreter l (Term syntax ann) v)) syntax
-           , MonadAddress l (Eff (DeadCodeInterpreter l (Term syntax ann) v))
-           , MonadPrim v (Eff (DeadCodeInterpreter l (Term syntax ann) v))
-           , Semigroup (Cell l v)
+           , Eval v (Eff (DeadCodeInterpreter (LocationFor v) (Term syntax ann) v)) syntax
+           , MonadAddress (LocationFor v) (Eff (DeadCodeInterpreter (LocationFor v) (Term syntax ann) v))
+           , MonadPrim v (Eff (DeadCodeInterpreter (LocationFor v) (Term syntax ann) v))
+           , Semigroup (Cell (LocationFor v) v)
            )
          => Term syntax ann
-         -> DeadCodeResult l (Term syntax ann) v
-evalDead e0 = run @(DeadCodeInterpreter l (Term syntax ann) v) $ do
+         -> DeadCodeResult (LocationFor v) (Term syntax ann) v
+evalDead e0 = run @(DeadCodeInterpreter (LocationFor v) (Term syntax ann) v) $ do
   killAll (Dead (subterms e0))
   fix (evDead ev) pure e0
 
