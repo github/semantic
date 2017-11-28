@@ -206,7 +206,9 @@ instance Diffable Context where
 instance Eq1 Context where liftEq = genericLiftEq
 instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
+
 instance (Monad m) => Eval l (Value s a l) m s a Context where
-  eval ev Context{..} = ev contextSubject
+  eval ev yield Context{..} = ev pure contextSubject >>= yield
+
 instance (Monad m) => Eval l Type m s a Context where
-  eval ev Context{..} = ev contextSubject
+  eval ev yield Context{..} = ev pure contextSubject >>= yield
