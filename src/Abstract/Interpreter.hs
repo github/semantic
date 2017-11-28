@@ -44,10 +44,10 @@ evaluate :: forall l v syntax ann
            )
          => Term syntax ann
          -> EvalResult l v
-evaluate = run @(Interpreter l v) . fix (ev @l) pure
+evaluate = run @(Interpreter l v) . fix ev pure
 
 
-ev :: forall l v w m syntax ann
+ev :: forall v w m syntax ann
    .  (FreeVariables1 syntax, Functor syntax, Eval v m syntax)
    => ((v -> m v) -> Term syntax ann -> m v)
    -> (v -> m w) -> Term syntax ann -> m w

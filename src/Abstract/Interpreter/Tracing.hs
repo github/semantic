@@ -50,7 +50,7 @@ evalTrace :: forall l v syntax ann
             , Eval v (Eff (TraceInterpreter l (Term syntax ann) v)) syntax
             )
           => Term syntax ann -> Final (TracingInterpreter l (Term syntax ann) v []) v
-evalTrace = run @(TraceInterpreter l (Term syntax ann) v) . fix (evTell @l @(Term syntax ann) @v @[] (ev @l)) pure
+evalTrace = run @(TraceInterpreter l (Term syntax ann) v) . fix (evTell @l @(Term syntax ann) @v @[] ev) pure
 
 evalReach :: forall l v syntax ann
           . ( Ord v, Ord ann, Ord l, Ord1 (Cell l), Ord1 syntax
@@ -63,7 +63,7 @@ evalReach :: forall l v syntax ann
             , Eval v (Eff (ReachableStateInterpreter l (Term syntax ann) v)) syntax
             )
           => Term syntax ann -> Final (TracingInterpreter l (Term syntax ann) v Set.Set) v
-evalReach = run @(ReachableStateInterpreter l (Term syntax ann) v) . fix (evTell @l @(Term syntax ann) @v @Set.Set (ev @l)) pure
+evalReach = run @(ReachableStateInterpreter l (Term syntax ann) v) . fix (evTell @l @(Term syntax ann) @v @Set.Set ev) pure
 
 
 evTell :: forall l t v g m
