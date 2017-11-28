@@ -27,7 +27,7 @@ type MonadInterpreter l v m = (MonadEnv l v m, MonadStore l v m, MonadFail m)
 
 type EvalResult l v = Final (Interpreter l v) v
 
-type Eval' t m = t -> m
+type Eval' t m v = (v -> m v) -> t -> m v
 
 -- Evaluate an expression.
 -- Example:
@@ -40,14 +40,14 @@ evaluate :: forall l v syntax ann
            , Semigroup (Cell l v))
          => Term syntax ann
          -> EvalResult l v
-evaluate = run @(Interpreter l v) . fix (ev @l)
+evaluate = run @(Interpreter l v) . fix (ev @l) pure
 
 
-ev :: forall l v m syntax ann
+ev :: forall l v w m syntax ann
    . (Eval l v m syntax ann syntax)
-   => (Term syntax ann -> m v)
-   -> Term syntax ann -> m v
-ev ev' = eval @l ev' . unTerm
+   => ((v -> m v) -> Term syntax ann -> m v)
+   -> (v -> m w) -> Term syntax ann -> m w
+ev ev' yield = eval @l ev' yield . unTerm
 
 gc :: (Ord l, Foldable (Cell l), AbstractValue l a) => Set (Address l a) -> Store l a -> Store l a
 gc roots store = storeRestrict store (reachable roots store)
@@ -67,12 +67,12 @@ evCollect :: forall l t v m
              , MonadGC l v m
              , AbstractValue l v
              )
-          => (Eval' t (m v) -> Eval' t (m v))
-          -> Eval' t (m v)
-          -> Eval' t (m v)
-evCollect ev0 ev e = do
+          => (Eval' t m v -> Eval' t m v)
+          -> Eval' t m v
+          -> Eval' t m v
+evCollect ev0 ev yield e = do
   roots <- askRoots :: m (Set (Address l v))
-  v <- ev0 ev e
+  v <- ev0 ev yield e
   modifyStore (gc (roots <> valueRoots v))
   return v
 
@@ -84,6 +84,6 @@ evRoots :: forall l v m syntax ann
            , AbstractValue l v
            , Eval l v m syntax ann (TermF syntax ann)
            )
-        => Eval' (Term syntax ann) (m v)
-        -> Eval' (Term syntax ann) (m v)
-evRoots ev = eval @l ev . unTerm
+        => Eval' (Term syntax ann) m v
+        -> Eval' (Term syntax ann) m v
+evRoots ev yield = eval @l ev yield . unTerm

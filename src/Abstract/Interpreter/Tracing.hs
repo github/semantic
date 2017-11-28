@@ -25,8 +25,6 @@ type TracingInterpreter l t v g = Reader (Set (Address l v)) ': Writer (g (Confi
 type TraceInterpreter l t v = TracingInterpreter l t v []
 type ReachableStateInterpreter l t v = TracingInterpreter l t v Set.Set
 
-type TraceResult l t v f = Final (TracingInterpreter l t v f) v
-
 
 class Monad m => MonadTrace l t v g m where
   trace :: g (Configuration l t v) -> m ()
@@ -48,8 +46,8 @@ evalTrace :: forall l v syntax ann
             , Semigroup (Cell l v)
             , Eval l v (Eff (TraceInterpreter l (Term syntax ann) v)) syntax ann syntax
             )
-          => Eval' (Term syntax ann) (TraceResult l (Term syntax ann) v [])
-evalTrace = run @(TraceInterpreter l (Term syntax ann) v) . fix (evTell @l @(Term syntax ann) @v @[] (ev @l))
+          => Term syntax ann -> Final (TracingInterpreter l (Term syntax ann) v []) v
+evalTrace = run @(TraceInterpreter l (Term syntax ann) v) . fix (evTell @l @(Term syntax ann) @v @[] (ev @l)) pure
 
 evalReach :: forall l v syntax ann
           . ( Ord v, Ord ann, Ord l, Ord1 (Cell l), Ord1 syntax
@@ -59,8 +57,8 @@ evalReach :: forall l v syntax ann
             , Semigroup (Cell l v)
             , Eval l v (Eff (ReachableStateInterpreter l (Term syntax ann) v)) syntax ann syntax
             )
-          => Eval' (Term syntax ann) (TraceResult l (Term syntax ann) v Set.Set)
-evalReach = run @(ReachableStateInterpreter l (Term syntax ann) v) . fix (evTell @l @(Term syntax ann) @v @Set.Set (ev @l))
+          => Term syntax ann -> Final (TracingInterpreter l (Term syntax ann) v Set.Set) v
+evalReach = run @(ReachableStateInterpreter l (Term syntax ann) v) . fix (evTell @l @(Term syntax ann) @v @Set.Set (ev @l)) pure
 
 
 evTell :: forall l t v g m
@@ -72,12 +70,12 @@ evTell :: forall l t v g m
          , MonadStore l v m
          , MonadGC l v m
          )
-       => (Eval' t (m v) -> Eval' t (m v))
-       -> Eval' t (m v)
-       -> Eval' t (m v)
-evTell ev0 ev e = do
+       => (Eval' t m v -> Eval' t m v)
+       -> Eval' t m v
+       -> Eval' t m v
+evTell ev0 ev yield e = do
   env <- askEnv
   store <- getStore
   roots <- askRoots
   trace (fromList [Configuration e roots env store] :: g (Configuration l t v))
-  ev0 ev e
+  ev0 ev yield e

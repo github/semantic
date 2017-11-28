@@ -58,12 +58,12 @@ evalDead :: forall l v syntax ann
          -> DeadCodeResult l (Term syntax ann) v
 evalDead e0 = run @(DeadCodeInterpreter l (Term syntax ann) v) $ do
   killAll (Dead (subterms e0))
-  fix (evDead (ev @l)) e0
+  fix (evDead (ev @l)) pure e0
 
 evDead :: (Ord t, MonadDead t m)
-       => (Eval' t (m v) -> Eval' t (m v))
-       -> Eval' t (m v)
-       -> Eval' t (m v)
-evDead ev0 ev e = do
+       => (Eval' t m v -> Eval' t m v)
+       -> Eval' t m v
+       -> Eval' t m v
+evDead ev0 ev yield e = do
   revive e
-  ev0 ev e
+  ev0 ev yield e
