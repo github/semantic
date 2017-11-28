@@ -7,12 +7,15 @@ import Abstract.Type
 import Abstract.Primitive
 import Abstract.FreeVariables
 import Abstract.Environment
+import Abstract.Store
 import Control.Monad.Effect
+import Control.Monad.Fail
 import Algorithm hiding (Empty)
 import Control.Applicative
 import Control.Monad.Error.Class hiding (Error)
 import Data.Align.Generic
 import Data.ByteString (ByteString)
+import Data.ByteString.Char8 (unpack)
 import qualified Data.Error as Error
 import Data.Foldable (asum, toList)
 import Data.Function ((&), on)
@@ -32,6 +35,7 @@ import Data.Term
 import Data.Union
 import GHC.Generics
 import GHC.Stack
+import Prelude hiding (fail)
 
 -- Combinators
 
@@ -117,9 +121,16 @@ newtype Identifier a = Identifier ByteString
 instance Eq1 Identifier where liftEq = genericLiftEq
 instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
--- TODO: Implement Eval instance for Identifier
-instance (Monad m) => Eval (Value s a l) m Identifier
-instance (Monad m) => Eval Type m Identifier
+
+instance ( MonadAddress (LocationFor v) m
+         , MonadEnv (LocationFor v) v m
+         , MonadFail m
+         , MonadStore (LocationFor v) v m
+         ) => Eval v m Identifier where
+  eval _ yield (Identifier name) = do
+    env <- askEnv @(LocationFor v) @v
+    maybe (fail ("free variable: " <> unpack name)) deref (envLookup name env) >>= yield
+
 
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = point x
