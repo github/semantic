@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilyDependencies, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Abstract.Store
 ( Precise(..)
 , Monovariant(..)
@@ -67,7 +67,7 @@ modifyStore f = getStore >>= putStore . f
 
 
 class (Ord l, Pointed (Cell l), Monad m) => MonadAddress l m where
-  type Cell l :: * -> *
+  type Cell (l :: *) = (res :: * -> *) | res -> l
 
   deref :: (MonadStore l a m, MonadFail m) => Address l a -> m a
 
