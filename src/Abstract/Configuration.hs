@@ -7,6 +7,7 @@ import Abstract.Environment
 import Data.List (intersperse)
 import Data.Functor.Classes
 import Data.Monoid
+import GHC.Generics
 
 data Configuration l t v
   = Configuration
@@ -15,6 +16,7 @@ data Configuration l t v
     , configurationEnvironment :: Environment l v
     , configurationStore :: Store l v
     }
+    deriving (Generic1)
 
 deriving instance (Eq l, Eq t, Eq v, Eq1 (Cell l)) => Eq (Configuration l t v)
 deriving instance (Ord l, Ord t, Ord v, Ord1 (Cell l)) => Ord (Configuration l t v)
