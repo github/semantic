@@ -170,7 +170,7 @@ instance Ord1 KeyValue where liftCompare = genericLiftCompare
 instance Show1 KeyValue where liftShowsPrec = genericLiftShowsPrec
 
 
-newtype Tuple a = Tuple { tupleContents :: [a]}
+newtype Tuple a = Tuple { tupleContents :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Tuple where liftEq = genericLiftEq
