@@ -144,8 +144,16 @@ instance ( Monad m
     env <- askEnv @l @(Value s a l)
     extraRoots (envRoots @l env (freeVariables1 as)) (ev (const (eval ev pure (Program as))) a) >>= yield
 
--- instance (Monad m) => Eval l Type m s a Program where
---   eval ev (Program xs) = foldl (\prev a -> prev *> ev a) (pure Unit) xs
+instance ( Monad m
+         , MonadGC (LocationFor Type) Type m
+         , MonadEnv (LocationFor Type) Type m
+         )
+        => Eval Type m Program where
+  eval _  yield (Program [])     = yield Unit
+  eval ev yield (Program [a])    = ev pure a >>= yield
+  eval ev yield (Program (a:as)) = do
+    env <- askEnv @(LocationFor Type) @Type
+    extraRoots (envRoots @(LocationFor Type) env (freeVariables1 as)) (ev (const (eval ev pure (Program as))) a) >>= yield
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
