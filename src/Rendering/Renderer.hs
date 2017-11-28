@@ -10,9 +10,6 @@ module Rendering.Renderer
 , renderToCDiff
 , renderToCTerm
 , renderToTags
-, HasDeclaration
-, declarationAlgebra
-, syntaxDeclarationAlgebra
 , Summaries(..)
 ) where
 

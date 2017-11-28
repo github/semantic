@@ -30,7 +30,7 @@ instance ToJSONFields ConstructorLabel where
 
 -- | A typeclass to retrieve the name of the data constructor for a value.
 --
---   This typeclass employs the Advanced Overlap techniques designed by Oleg Kiselyov & Simon Peyton Jones: https://wiki.haskell.org/GHC/AdvancedOverlap; see also src/Rendering/TOC.hs for discussion of the details of the mechanism.
+--   This typeclass employs the Advanced Overlap techniques designed by Oleg Kiselyov & Simon Peyton Jones: https://wiki.haskell.org/GHC/AdvancedOverlap; see also src/Analysis/Declaration.hs for discussion of the details of the mechanism.
 class ConstructorName syntax where
   constructorName :: syntax a -> String
 

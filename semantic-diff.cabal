@@ -18,6 +18,7 @@ library
                        Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
                      , Analysis.Decorator
+                     , Analysis.Declaration
                      -- Semantic assignment
                      , Assigning.Assignment
                      , Assigning.Assignment.Table

@@ -2,6 +2,7 @@
 {-# LANGUAGE DataKinds, TypeOperators #-}
 module Rendering.TOC.Spec where
 
+import Analysis.Declaration
 import Category as C hiding (Go)
 import Data.Aeson
 import Data.Bifunctor

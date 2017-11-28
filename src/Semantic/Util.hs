@@ -2,6 +2,7 @@
 {-# LANGUAGE DataKinds, MonoLocalBinds, TypeOperators #-}
 module Semantic.Util where
 
+import Analysis.Declaration
 import Control.Monad.IO.Class
 import Data.Align.Generic
 import Data.Blob
@@ -15,7 +16,6 @@ import Data.Term
 import Diffing.Algorithm
 import Diffing.Interpreter
 import Parsing.Parser
-import Rendering.TOC
 import Semantic
 import Semantic.IO as IO
 import Semantic.Task

@@ -3,6 +3,7 @@ module Rendering.Tag
 ( renderToTags
 ) where
 
+import Analysis.Declaration
 import Data.Aeson
 import Data.Blob
 import Data.Maybe (mapMaybe)

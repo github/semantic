@@ -8,6 +8,7 @@ module Semantic
 ) where
 
 import Analysis.ConstructorName (ConstructorName, constructorLabel)
+import Analysis.Declaration (HasDeclaration, declarationAlgebra, syntaxDeclarationAlgebra)
 import Analysis.Decorator (syntaxIdentifierAlgebra)
 import Control.Exception
 import Control.Monad ((>=>), guard)

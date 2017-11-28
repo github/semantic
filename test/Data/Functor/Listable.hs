@@ -27,6 +27,7 @@ module Data.Functor.Listable
 , ListableSyntax
 ) where
 
+import Analysis.Declaration
 import qualified Category
 import Control.Monad.Free as Free
 import Control.Monad.Trans.Free as FreeF
@@ -52,7 +53,6 @@ import qualified Data.Text.Encoding as T
 import Data.These
 import Data.Union
 import Diffing.Algorithm.RWS
-import Rendering.TOC
 import Syntax as S
 import Test.LeanCheck
 
