@@ -88,8 +88,8 @@
                     (Empty))
                   (Slice
                     (Identifier)
-                    (Identifier)
                     (Empty)
+                    (Identifier)
                     (Empty)))
                 (Empty))))
           (Pattern

@@ -9,28 +9,31 @@
     {+(Subscript
       {+(Identifier)+}
       {+(Integer)+})+}
-    {+(Slice
-      {+(Identifier)+}
-      {+(Empty)+}
-      {+(Empty)+}
-      {+(Empty)+})+}
-    {+(Slice
-      {+(Identifier)+}
-      {+(Integer)+}
-      {+(Empty)+}
-      {+(Empty)+})+}
-    {+(Slice
-      {+(Identifier)+}
-      {+(Integer)+}
-      {+(Integer)+}
-      {+(Empty)+})+}
       (Slice
       { (Identifier)
       ->(Identifier) }
-        (Integer)
+        (Empty)
+      { (Integer)
+      ->(Empty) }
+        (Empty))
+      (Slice
+      { (Identifier)
+      ->(Identifier) }
       { (Empty)
       ->(Integer) }
+      { (Integer)
+      ->(Empty) }
         (Empty))
+    {+(Slice
+      {+(Identifier)+}
+      {+(Integer)+}
+      {+(Integer)+}
+      {+(Empty)+})+}
+    {+(Slice
+      {+(Identifier)+}
+      {+(Integer)+}
+      {+(Integer)+}
+      {+(Empty)+})+}
       (Slice
       { (Identifier)
       ->(Identifier) }
@@ -39,11 +42,6 @@
       ->(Integer) }
       { (Empty)
       ->(Integer) })
-    {-(Slice
-      {-(Identifier)-}
-      {-(Integer)-}
-      {-(Empty)-}
-      {-(Empty)-})-}
     {-(Slice
       {-(Identifier)-}
       {-(Integer)-}

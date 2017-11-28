@@ -8,12 +8,12 @@
     (
       (Call
         (Identifier)
-        (BidirectionalChannel
+        (SendChannel
           (Identifier))
         (Empty))
       (Call
         (Identifier)
-        (BidirectionalChannel
+        (SendChannel
           (Identifier))
         (Minus
           (Identifier)
@@ -21,7 +21,7 @@
         (Empty))
       (Call
         (Identifier)
-        (BidirectionalChannel
+        (SendChannel
           (Identifier))
         (Integer)
         (Integer)

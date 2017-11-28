@@ -6,47 +6,37 @@
     (Identifier)
     ([])
     (
-      (Annotation
+      (Type
       { (Identifier)
       ->(Identifier) }
         (BidirectionalChannel
           (ReceiveChannel
           { (Identifier)
           ->(Identifier) })))
-      { (Identifier)
-      ->(Identifier) }
-        (SendChannel
-          (BiDirectionalChannel
-            (Constructor
-              (Empty)))))
-    {+(Type
-      {+(Identifier)+}
-      {+(SendChannel
-        {+(ReceiveChannel
-          {+(Identifier)+})+})+})+}
       (Type
       { (Identifier)
       ->(Identifier) }
-      { (SendChannel
-        {-(ReceiveChannel
-          {-(Identifier)-})-})
-      ->(ReceiveChannel
-        {+(ReceiveChannel
-          {+(Identifier)+})+}) })
-    {+(Annotation
-      {+(Identifier)+}
-      {+(BiDirectionalChannel
-        {+(Parenthesized
-          {+(ReceiveChannel
-            {+(Identifier)+})+})+})+})+}
-    {-(Annotation
-      {-(Identifier)-}
-      {-(ReceiveChannel
-        {-(ReceiveChannel
-          {-(Identifier)-})-})-})-}
-    {-(Type
-      {-(Identifier)-}
-      {-(BidirectionalChannel
-        {-(Parenthesized
-          {-(ReceiveChannel
-            {-(Identifier)-})-})-})-})-})))
+        (SendChannel
+          (SendChannel
+            (Constructor
+              (Empty)))))
+      (Type
+      { (Identifier)
+      ->(Identifier) }
+        (SendChannel
+          (ReceiveChannel
+          { (Identifier)
+          ->(Identifier) })))
+      (Type
+        (Identifier)
+        (ReceiveChannel
+          (ReceiveChannel
+          { (Identifier)
+          ->(Identifier) })))
+      (Type
+        (Identifier)
+        (BidirectionalChannel
+          (Parenthesized
+            (ReceiveChannel
+            { (Identifier)
+            ->(Identifier) })))))))

@@ -8,13 +8,13 @@
     (
       (Slice
         (Identifier)
-        (Integer)
         (Empty)
+        (Integer)
         (Empty))
       (Slice
         (Identifier)
-        (Integer)
         (Empty)
+        (Integer)
         (Empty))
       (Slice
         (Identifier)

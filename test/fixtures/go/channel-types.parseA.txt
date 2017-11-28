@@ -14,7 +14,7 @@
       (Type
         (Identifier)
         (SendChannel
-          (BidirectionalChannel
+          (SendChannel
             (Constructor
               (Empty)))))
       (Type
