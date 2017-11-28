@@ -92,9 +92,9 @@ instance ( Monad m
          , MonadEnv l (Value s a l) m
          , FreeVariables t
          , FreeVariables1 s)
-         => Eval l (Value s a l) m t [] where
+         => Eval (Value s a l) m t [] where
   eval _  yield []     = yield (I PUnit)
   eval ev yield [a]    = ev pure a >>= yield
   eval ev yield (a:as) = do
     env <- askEnv @l @(Value s a l)
-    extraRoots (envRoots @l env (freeVariables1 as)) (ev (const (eval @l ev pure as)) a) >>= yield
+    extraRoots (envRoots @l env (freeVariables1 as)) (ev (const (eval ev pure as)) a) >>= yield

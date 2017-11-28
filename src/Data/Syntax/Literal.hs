@@ -33,10 +33,10 @@ instance Eq1 Boolean where liftEq = genericLiftEq
 instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
-instance (Monad m) => Eval l (Value s a l) m t Boolean where
+instance (Monad m) => Eval (Value s a l) m t Boolean where
   eval _ yield (Boolean x) = yield (I (PBool x))
 
-instance (Monad m) => Eval l Type m t Boolean where
+instance (Monad m) => Eval Type m t Boolean where
   eval _ yield _ = yield Bool
 
 
@@ -50,10 +50,10 @@ instance Eq1 Data.Syntax.Literal.Integer where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Integer where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShowsPrec
 
-instance (Monad m) => Eval l (Value s a l) m t Data.Syntax.Literal.Integer where
+instance (Monad m) => Eval (Value s a l) m t Data.Syntax.Literal.Integer where
   eval _ yield (Data.Syntax.Literal.Integer x) = yield (I (PInt (maybe 0 fst (readInt x))))
 
-instance (Monad m) => Eval l Type m t Data.Syntax.Literal.Integer where
+instance (Monad m) => Eval Type m t Data.Syntax.Literal.Integer where
   eval _ yield _ = yield Int
 
 
@@ -114,10 +114,10 @@ instance Eq1 TextElement where liftEq = genericLiftEq
 instance Ord1 TextElement where liftCompare = genericLiftCompare
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 
-instance (Monad m) => Eval l (Value s a l) m t TextElement where
+instance (Monad m) => Eval (Value s a l) m t TextElement where
   eval _ yield (TextElement x) = yield (I (PString x))
 
-instance (Monad m) => Eval l Type m t TextElement where
+instance (Monad m) => Eval Type m t TextElement where
   eval _ yield (TextElement _) = yield Abstract.Type.String
 
 data Null a = Null

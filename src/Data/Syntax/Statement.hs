@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, TypeApplications, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, TypeApplications, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Syntax.Statement where
 
 import Abstract.Eval
@@ -78,7 +78,7 @@ instance ( Monad m
          , MonadEnv l (Value s a l) m
          , FreeVariables t
          , FreeVariables1 s)
-         => Eval l (Value s a l) m t Assignment where
+         => Eval (Value s a l) m t Assignment where
   eval ev yield Assignment{..} = do
     let [var] = toList (freeVariables assignmentTarget)
     v <- ev pure assignmentValue

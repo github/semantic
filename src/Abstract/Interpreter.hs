@@ -34,7 +34,7 @@ type Eval' t m v = (v -> m v) -> t -> m v
 --    Files.readFile "test.py" (Just Python) >>= runTask . parse pythonParser2 >>= pure . evaluate @Precise @(Value (Data.Union.Union Language.Python.Assignment2.Syntax) (Record Location) Precise)
 evaluate :: forall l v syntax ann
          . ( Ord v
-           , Eval l v (Eff (Interpreter l v)) (Term syntax ann) syntax
+           , Eval v (Eff (Interpreter l v)) (Term syntax ann) syntax
            , MonadAddress l (Eff (Interpreter l v))
            , MonadPrim v (Eff (Interpreter l v))
            , Semigroup (Cell l v))
@@ -44,10 +44,10 @@ evaluate = run @(Interpreter l v) . fix (ev @l) pure
 
 
 ev :: forall l v w m syntax ann
-   . (Eval l v m (Term syntax ann) syntax)
+   . (Eval v m (Term syntax ann) syntax)
    => ((v -> m v) -> Term syntax ann -> m v)
    -> (v -> m w) -> Term syntax ann -> m w
-ev ev' yield = eval @l ev' yield . unTerm
+ev ev' yield = eval ev' yield . unTerm
 
 gc :: (Ord l, Foldable (Cell l), AbstractValue l a) => Set (Address l a) -> Store l a -> Store l a
 gc roots store = storeRestrict store (reachable roots store)
@@ -82,8 +82,8 @@ evRoots :: forall l v m syntax ann
            , MonadGC l v m
            , MonadPrim v m
            , AbstractValue l v
-           , Eval l v m (Term syntax ann) (TermF syntax ann)
+           , Eval v m (Term syntax ann) (TermF syntax ann)
            )
         => Eval' (Term syntax ann) m v
         -> Eval' (Term syntax ann) m v
-evRoots ev' yield = eval @l ev' yield . unTerm
+evRoots ev' yield = eval ev' yield . unTerm

@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Abstract.Eval where
 
 import Abstract.Store
@@ -12,15 +12,15 @@ import Data.Semigroup
 
 
 -- Collecting evaluator
-class Monad m => Eval l v m term constr where
+class Monad m => Eval v m term constr where
   eval :: ((v -> m v) -> term -> m v) ->  (v -> m w) -> constr term -> m w
   eval = fail "default eval"
 
-instance (Monad m, Apply (Eval l v m t) fs) => Eval l v m t (Union fs) where
-  eval ev yield = apply (Proxy :: Proxy (Eval l v m t)) (eval @l ev yield)
+instance (Monad m, Apply (Eval v m t) fs) => Eval v m t (Union fs) where
+  eval ev yield = apply (Proxy :: Proxy (Eval v m t)) (eval ev yield)
 
-instance (Monad m, Eval l v m t s) => Eval l v m t (TermF s a) where
-  eval ev yield In{..} = eval @l ev yield termOut
+instance (Monad m, Eval v m t s) => Eval v m t (TermF s a) where
+  eval ev yield In{..} = eval ev yield termOut
 
 
 class Monad m => MonadGC l a m where

@@ -22,8 +22,8 @@ instance Diffable Function where
 instance Eq1 Function where liftEq = genericLiftEq
 instance Ord1 Function where liftCompare = genericLiftCompare
 instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
-instance (Monad m) => Eval l (Value s a l) m t Function
-instance (Monad m) => Eval l Type m t Function
+instance (Monad m) => Eval (Value s a l) m t Function
+instance (Monad m) => Eval Type m t Function
 
 -- TODO: How should we represent function types, where applicable?
 

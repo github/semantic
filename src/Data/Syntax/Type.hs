@@ -20,8 +20,8 @@ data Annotation a = Annotation { annotationSubject :: !a, annotationType :: !a }
 instance Eq1 Annotation where liftEq = genericLiftEq
 instance Ord1 Annotation where liftCompare = genericLiftCompare
 instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
-instance (Monad m) => Eval l (Value s a l) m t Annotation
-instance (Monad m) => Eval l Type m t Annotation
+instance (Monad m) => Eval (Value s a l) m t Annotation
+instance (Monad m) => Eval Type m t Annotation
 
 newtype Product a = Product { productElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

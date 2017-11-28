@@ -44,7 +44,7 @@ evalTrace :: forall l v syntax ann
             , MonadPrim v (Eff (TraceInterpreter l (Term syntax ann) v))
             , MonadGC l v (Eff (TraceInterpreter l (Term syntax ann) v))
             , Semigroup (Cell l v)
-            , Eval l v (Eff (TraceInterpreter l (Term syntax ann) v)) (Term syntax ann) syntax
+            , Eval v (Eff (TraceInterpreter l (Term syntax ann) v)) (Term syntax ann) syntax
             )
           => Term syntax ann -> Final (TracingInterpreter l (Term syntax ann) v []) v
 evalTrace = run @(TraceInterpreter l (Term syntax ann) v) . fix (evTell @l @(Term syntax ann) @v @[] (ev @l)) pure
@@ -55,7 +55,7 @@ evalReach :: forall l v syntax ann
             , MonadPrim v (Eff (ReachableStateInterpreter l (Term syntax ann) v))
             , MonadGC l v (Eff (ReachableStateInterpreter l (Term syntax ann) v))
             , Semigroup (Cell l v)
-            , Eval l v (Eff (ReachableStateInterpreter l (Term syntax ann) v)) (Term syntax ann) syntax
+            , Eval v (Eff (ReachableStateInterpreter l (Term syntax ann) v)) (Term syntax ann) syntax
             )
           => Term syntax ann -> Final (TracingInterpreter l (Term syntax ann) v Set.Set) v
 evalReach = run @(ReachableStateInterpreter l (Term syntax ann) v) . fix (evTell @l @(Term syntax ann) @v @Set.Set (ev @l)) pure

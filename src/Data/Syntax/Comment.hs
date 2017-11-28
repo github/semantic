@@ -23,10 +23,10 @@ instance Eq1 Comment where liftEq = genericLiftEq
 instance Ord1 Comment where liftCompare = genericLiftCompare
 instance Show1 Comment where liftShowsPrec = genericLiftShowsPrec
 
-instance (Monad m) => Eval l (Value s a l) m t Comment where
+instance (Monad m) => Eval (Value s a l) m t Comment where
   eval _ yield _ = yield (I PUnit)
 
-instance (Monad m) => Eval l Type m t Comment where
+instance (Monad m) => Eval Type m t Comment where
   eval _ yield _ = yield Unit
 
 -- TODO: nested comment types
