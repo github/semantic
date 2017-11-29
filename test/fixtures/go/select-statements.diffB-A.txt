@@ -12,7 +12,8 @@
             (Receive
             { (Identifier)
             ->(Identifier) }
-              (Identifier))
+              (ReceiveOperator
+                (Identifier)))
             (Call
               (Identifier)
               (Identifier)
@@ -29,13 +30,14 @@
           (Pattern
             (Receive
               (Empty)
-              (Call
-                (MemberAccess
-                  (Identifier)
-                  (Identifier))
-              { (Integer)
-              ->(Integer) }
-                (Empty)))
+              (ReceiveOperator
+                (Call
+                  (MemberAccess
+                    (Identifier)
+                    (Identifier))
+                { (Integer)
+                ->(Integer) }
+                  (Empty))))
             (
               (Call
                 (Identifier)
@@ -83,13 +85,15 @@
           (Pattern
             (Receive
               (Empty)
-            { (Identifier)
-            ->(Identifier) })
+              (ReceiveOperator
+              { (Identifier)
+              ->(Identifier) }))
             ([]))
           (Pattern
             (Receive
               (Empty)
-              (Identifier))
+              (ReceiveOperator
+                (Identifier)))
             ([]))
         {+(Pattern
           {+(DefaultPattern

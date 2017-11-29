@@ -12,8 +12,9 @@
       { (Identifier)
       ->(Identifier) })
       (Not
-      { (Identifier)
-      ->(Identifier) })
+        (ReceiveOperator
+        { (Identifier)
+        ->(Identifier) }))
       (Pointer
         (Call
         { (Identifier)
@@ -25,5 +26,6 @@
       (Reference
       { (Identifier)
       ->(Identifier) })
-    { (Identifier)
-    ->(Identifier) })))
+      (ReceiveOperator
+      { (Identifier)
+      ->(Identifier) }))))

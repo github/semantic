@@ -10,7 +10,8 @@
       (Negate
         (Identifier))
       (Not
-        (Identifier))
+        (ReceiveOperator
+          (Identifier)))
       (Pointer
         (Call
           (Identifier)
@@ -19,4 +20,5 @@
         (Identifier))
       (Reference
         (Identifier))
-      (Identifier))))
+      (ReceiveOperator
+        (Identifier)))))
