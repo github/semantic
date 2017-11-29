@@ -3,6 +3,7 @@ module Data.Syntax.Declaration where
 
 import Abstract.Environment
 import Abstract.Eval
+import Abstract.Store
 import Abstract.FreeVariables
 import Abstract.Type as Type
 import Abstract.Value
@@ -13,6 +14,7 @@ import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Ord.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Mergeable
+import Data.Semigroup
 import Data.Union
 import GHC.Generics
 
@@ -26,17 +28,25 @@ instance Eq1 Function where liftEq = genericLiftEq
 instance Ord1 Function where liftCompare = genericLiftCompare
 instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Extend the environment/store with the function.
 -- TODO: Do we need some distinct notion of a global environment?
 -- TODO: Implement evaluation under the binder for the typechecking evaluator.
 instance ( Monad m
-         , MonadEnv location (Value location term) m
-         , FreeVariables term
-         ) => Eval term (Value location term) m Function where
+         , Ord l
+         , Semigroup (Cell l (Value l t))
+         , MonadEnv l (Value l t) m
+         , MonadStore l (Value l t) m
+         , MonadAddress l m
+         , FreeVariables t
+         ) => Eval t (Value l t) m Function where
   eval _ yield Function{..} = do
-    env <- askEnv @location @(Value location term)
+    env <- askEnv @l @(Value l t)
     let params = toList (foldMap freeVariables functionParameters)
-    yield (inj (Closure params functionBody env))
+
+    let [name] = toList (freeVariables functionName)
+    let v = inj (Closure params functionBody env)
+    a <- maybe (alloc name) pure (envLookup name env)
+    assign a v
+    localEnv (envInsert name a) (yield v)
 
 instance (MonadFail m) => Eval term Type m Function
 
