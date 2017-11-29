@@ -26,6 +26,9 @@ instance Eq1 Function where liftEq = genericLiftEq
 instance Ord1 Function where liftCompare = genericLiftCompare
 instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Extend the environment/store with the function.
+-- TODO: Do we need some distinct notion of a global environment?
+-- TODO: Implement evaluation under the binder for the typechecking evaluator.
 instance ( Monad m
          , MonadEnv location (Value location term) m
          , FreeVariables term
