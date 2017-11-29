@@ -391,7 +391,6 @@ methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> ch
     receiver = symbol Parameters *> children ((symbol ParameterDeclaration *> children expressions) <|> expressions)
     mkTypedMethodDeclaration loc (receiver', name', parameters', type'', body') = makeTerm loc (Declaration.Method [type''] receiver' name' parameters' body')
 
--- TODO: Refactor using makeTerm' and inj (and :fire: the use of Annotation here, the type should be part of the Method's context field).
 methodSpec :: Assignment
 methodSpec =  makeTerm <$> symbol MethodSpec <*> children (mkMethodSpec <$> expression <*> parameters <*> expression)
   where
@@ -412,7 +411,6 @@ parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 selectorExpression :: Assignment
 selectorExpression = makeTerm <$> symbol SelectorExpression <*> children (Expression.MemberAccess <$> expression <*> expression)
 
--- TODO: Refactor to parse a[:2:3] correctly.
 sliceExpression :: Assignment
 sliceExpression = makeTerm <$> symbol SliceExpression <*> children (Go.Syntax.Slice <$> expression <* token AnonLBracket <*> (emptyTerm <|> expression) <* token AnonColon <*> (expression <|> emptyTerm) <* optional (token AnonColon) <*> (expression <|> emptyTerm))
 
@@ -436,7 +434,6 @@ typeSwitchStatement = makeTerm <$> symbol TypeSwitchStatement <*> children (Go.S
   where
     typeSwitchSubject = makeTerm <$> location <*> manyTermsTill expression (void (symbol TypeCaseClause)) <|> emptyTerm
 
--- TODO: Refactor and introduce a unaryContext combinator for handling multiple unary constructors rather than alternating on different functors.
 unaryExpression :: Assignment
 unaryExpression = symbol UnaryExpression >>= \ location -> (notExpression location) <|> (unaryMinus location) <|> unaryPlus <|> unaryAmpersand <|> unaryReceive <|> unaryPointer <|> unaryComplement
   where
