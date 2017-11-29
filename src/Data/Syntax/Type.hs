@@ -18,7 +18,11 @@ data Annotation a = Annotation { annotationSubject :: !a, annotationType :: !a }
 instance Eq1 Annotation where liftEq = genericLiftEq
 instance Ord1 Annotation where liftCompare = genericLiftCompare
 instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
-instance (MonadFail m) => Eval v m Annotation
+
+-- TODO: Specialize Eval for Type to unify the inferred type of the subject with the specified type
+instance (Monad m) => Eval v m Annotation where
+  eval recur yield Annotation{..} = recur pure annotationSubject >>= yield
+
 
 newtype Product a = Product { productElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
