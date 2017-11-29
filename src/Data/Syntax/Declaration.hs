@@ -1,14 +1,19 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, UndecidableInstances #-}
 module Data.Syntax.Declaration where
 
+import Abstract.Environment
 import Abstract.Eval
 import Abstract.FreeVariables
+import Abstract.Type as Type
+import Abstract.Value
 import Algorithm
 import Data.Align.Generic
+import Data.Foldable (toList)
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Ord.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Mergeable
+import Data.Union
 import GHC.Generics
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
@@ -20,7 +25,17 @@ instance Diffable Function where
 instance Eq1 Function where liftEq = genericLiftEq
 instance Ord1 Function where liftCompare = genericLiftCompare
 instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
-instance (MonadFail m) => Eval v m Function
+
+instance ( Monad m
+         , MonadEnv location (Value location term) m
+         , FreeVariables term
+         ) => Eval term (Value location term) m Function where
+  eval _ yield Function{..} = do
+    env <- askEnv @location @(Value location term)
+    let params = toList (foldMap freeVariables functionParameters)
+    yield (inj (Closure params functionBody env))
+
+instance (MonadFail m) => Eval term Type m Function
 
 -- TODO: How should we represent function types, where applicable?
 
