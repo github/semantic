@@ -23,8 +23,8 @@ import Prelude hiding (fail)
 
 -- Collecting evaluator
 class Monad m => Eval term v m constr where
-  eval :: ((v -> m v) -> term -> m v) -> (v -> m w) -> constr term -> m w
-  default eval :: (MonadFail m, Show1 constr) => ((v -> m v) -> term -> m v) ->  (v -> m w) -> constr term -> m w
+  eval :: ((v -> m v) -> term -> m v) -> ((v -> m v) -> constr term -> m v)
+  default eval :: (MonadFail m, Show1 constr) => ((v -> m v) -> term -> m v) -> ((v -> m v) -> constr term -> m v)
   eval _ _ expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
 instance (Monad m, Apply (Eval t v m) fs) => Eval t v m (Union fs) where
