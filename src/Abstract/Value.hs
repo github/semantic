@@ -6,13 +6,13 @@ import Abstract.Store
 import qualified Abstract.Type as Type
 import Abstract.FreeVariables
 import Control.Monad hiding (fail)
-import Data.ByteString
+import Data.ByteString (ByteString)
 import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Ord.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Semigroup
-import Data.Set
+import qualified Data.Set as Set
 import Data.Term
 import Data.Union
 import GHC.Generics
@@ -28,7 +28,7 @@ type ValueConstructors syntax ann
 
 type Value syntax ann = Union (ValueConstructors syntax ann)
 
-data Closure syntax ann location = Closure Name (Term syntax ann) (Environment location (Value syntax ann location))
+data Closure syntax ann location = Closure [Name] (Term syntax ann) (Environment location (Value syntax ann location))
   deriving (Eq, Ord, Show)
 
 instance (Eq1 syntax, Eq ann) => Eq1 (Closure syntax ann) where
@@ -80,7 +80,7 @@ type family LocationFor value :: * where
 -- Instances
 
 class ValueRoots l v | v -> l where
-  valueRoots :: v -> Set (Address l v)
+  valueRoots :: v -> Set.Set (Address l v)
 
 class AbstractValue v where
   unit :: v
@@ -90,8 +90,8 @@ class AbstractValue v where
 
 instance (FreeVariables1 syntax, Functor syntax, Ord l) => ValueRoots l (Value syntax ann l) where
   valueRoots v
-    | Just (Closure name body env) <- prj v = envRoots env (delete name (freeVariables body))
-    | otherwise                             = mempty
+    | Just (Closure names body env) <- prj v = envRoots env (foldr Set.delete (freeVariables body) names)
+    | otherwise                              = mempty
 
 instance AbstractValue (Value syntax ann l) where
   unit = inj Unit
