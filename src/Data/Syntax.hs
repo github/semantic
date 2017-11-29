@@ -7,7 +7,6 @@ import Abstract.FreeVariables
 import Abstract.Environment
 import Abstract.Store
 import Control.Monad.Effect
-import Control.Monad.Fail
 import Algorithm hiding (Empty)
 import Control.Applicative
 import Control.Monad.Error.Class hiding (Error)
@@ -183,8 +182,9 @@ data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
+
 -- TODO: Define Value semantics for Error
-instance (Monad m) => Eval v m Error
+instance (MonadFail m) => Eval v m Error
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorExpected errorActual

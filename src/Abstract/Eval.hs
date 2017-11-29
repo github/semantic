@@ -1,5 +1,9 @@
-{-# LANGUAGE AllowAmbiguousTypes, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances #-}
-module Abstract.Eval where
+{-# LANGUAGE AllowAmbiguousTypes, DefaultSignatures, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances #-}
+module Abstract.Eval
+( Eval(..)
+, MonadGC(..)
+, MonadFail(..)
+) where
 
 import Abstract.Environment
 import Abstract.FreeVariables
@@ -7,17 +11,20 @@ import Abstract.Store
 import Abstract.Value
 import Control.Monad.Effect
 import Control.Monad.Effect.Reader
+import Control.Monad.Fail
 import Data.Proxy
 import Data.Semigroup
 import qualified Data.Set as Set
 import Data.Term
 import Data.Union
+import Prelude hiding (fail)
 
 
 -- Collecting evaluator
 class Monad m => Eval v m constr where
   eval :: FreeVariables term => ((v -> m v) -> term -> m v) ->  (v -> m w) -> constr term -> m w
-  eval = fail "default eval"
+  default eval :: (FreeVariables term, MonadFail m) => ((v -> m v) -> term -> m v) ->  (v -> m w) -> constr term -> m w
+  eval _ _ _ = fail "default eval"
 
 instance (Monad m, Apply (Eval v m) fs) => Eval v m (Union fs) where
   eval ev yield = apply (Proxy :: Proxy (Eval v m)) (eval ev yield)
