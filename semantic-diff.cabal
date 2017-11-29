@@ -22,7 +22,6 @@ library
                      , Abstract.Interpreter.Caching
                      , Abstract.Interpreter.Dead
                      , Abstract.Interpreter.Tracing
-                     , Abstract.Primitive
                      , Abstract.Store
                      , Abstract.Type
                      , Abstract.Value

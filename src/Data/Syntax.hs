@@ -2,9 +2,9 @@
 module Data.Syntax where
 
 import Abstract.Eval
-import Abstract.Value
-import Abstract.Type
-import Abstract.Primitive
+import Abstract.Value (Value, LocationFor, literal)
+import qualified Abstract.Value as Value
+import Abstract.Type as Type
 import Abstract.FreeVariables
 import Abstract.Environment
 import Abstract.Store
@@ -149,7 +149,7 @@ instance ( Monad m
          , MonadEnv l (Value s a l) m
          , FreeVariables1 s)
         => Eval (Value s a l) m Program where
-  eval _  yield (Program [])     = yield (literal PUnit)
+  eval _  yield (Program [])     = yield (literal Value.Unit)
   eval ev yield (Program [a])    = ev pure a >>= yield
   eval ev yield (Program (a:as)) = do
     env <- askEnv @l @(Value s a l)
@@ -160,7 +160,7 @@ instance ( Monad m
          , MonadEnv (LocationFor Type) Type m
          )
         => Eval Type m Program where
-  eval _  yield (Program [])     = yield Unit
+  eval _  yield (Program [])     = yield Type.Unit
   eval ev yield (Program [a])    = ev pure a >>= yield
   eval ev yield (Program (a:as)) = do
     env <- askEnv @(LocationFor Type) @Type
@@ -186,9 +186,9 @@ instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 -- TODO: Define Value semantics for Empty
 instance (Monad m) => Eval (Value s a l) m Empty where
-  eval _ yield _ = yield (literal PUnit)
+  eval _ yield _ = yield (literal Value.Unit)
 instance (Monad m) => Eval Type m Empty where
-  eval _ yield _ = yield Unit
+  eval _ yield _ = yield Type.Unit
 
 
 -- | Syntax representing a parsing or assignment error.

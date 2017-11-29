@@ -2,12 +2,12 @@
 module Abstract.Value where
 
 import Abstract.Environment
-import Abstract.Primitive
 import Abstract.Store
 import Abstract.Type
 import Abstract.Eval
 import Abstract.FreeVariables
 import Control.Monad hiding (fail)
+import Data.ByteString
 import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Ord.Generic
@@ -19,7 +19,15 @@ import Data.Union
 import GHC.Generics
 import Prelude hiding (fail)
 
-type Value syntax ann = Union '[Closure syntax ann, Primitive]
+type ValueConstructors syntax ann
+  = '[Closure syntax ann
+    , Abstract.Value.Unit
+    , Abstract.Value.Boolean
+    , Abstract.Value.Integer
+    , Abstract.Value.String
+    ]
+
+type Value syntax ann = Union (ValueConstructors syntax ann)
 
 data Closure syntax ann location = Closure Name (Term syntax ann) (Environment location (Value syntax ann location))
   deriving (Eq, Ord, Show)
@@ -36,12 +44,33 @@ instance (Show1 syntax, Show ann) => Show1 (Closure syntax ann) where
     . showChar ' ' . showsPrec 11 t
     . showChar ' ' . liftShowsPrec2 sp sl (liftShowsPrec sp sl) (liftShowList sp sl) 11 e
 
-data Primitive location = I Prim
+data Unit location = Unit
   deriving (Eq, Generic1, Ord, Show)
 
-instance Eq1 Primitive where liftEq = genericLiftEq
-instance Ord1 Primitive where liftCompare = genericLiftCompare
-instance Show1 Primitive where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 Unit where liftEq = genericLiftEq
+instance Ord1 Unit where liftCompare = genericLiftCompare
+instance Show1 Unit where liftShowsPrec = genericLiftShowsPrec
+
+data Boolean location = Boolean Prelude.Bool
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Boolean where liftEq = genericLiftEq
+instance Ord1 Boolean where liftCompare = genericLiftCompare
+instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
+
+data Integer location = Integer Prelude.Integer
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Abstract.Value.Integer where liftEq = genericLiftEq
+instance Ord1 Abstract.Value.Integer where liftCompare = genericLiftCompare
+instance Show1 Abstract.Value.Integer where liftShowsPrec = genericLiftShowsPrec
+
+data String location = String ByteString
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Abstract.Value.String where liftEq = genericLiftEq
+instance Ord1 Abstract.Value.String where liftCompare = genericLiftCompare
+instance Show1 Abstract.Value.String where liftShowsPrec = genericLiftShowsPrec
 
 
 type family LocationFor value :: * where
@@ -49,8 +78,8 @@ type family LocationFor value :: * where
   LocationFor Type = Monovariant
 
 
-literal :: Prim -> Value syntax ann location
-literal = inj . I
+literal :: (f :< ValueConstructors syntax ann) => f location -> Value syntax ann location
+literal = inj
 
 
 -- Instances
@@ -60,9 +89,8 @@ class AbstractValue l v | v -> l where
 
 instance (FreeVariables1 syntax, Functor syntax, Ord l) => AbstractValue l (Value syntax ann l) where
   valueRoots v
-    | Just (I _) <- prj v                   = mempty
     | Just (Closure name body env) <- prj v = envRoots env (delete name (freeVariables body))
-    | otherwise                             = error "valueRoots: unhandled constructor"
+    | otherwise                             = mempty
 
 instance AbstractValue Monovariant Type where
   valueRoots _ = mempty
@@ -77,7 +105,7 @@ instance ( Monad m
          , MonadEnv l (Value s a l) m
          , FreeVariables1 s)
          => Eval (Value s a l) m [] where
-  eval _  yield []     = yield (literal PUnit)
+  eval _  yield []     = yield (literal Abstract.Value.Unit)
   eval ev yield [a]    = ev pure a >>= yield
   eval ev yield (a:as) = do
     env <- askEnv @l @(Value s a l)

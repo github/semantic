@@ -2,7 +2,7 @@
 module Data.Syntax.Expression where
 
 import Abstract.Eval
-import Abstract.Value
+import Abstract.Value (Value)
 import Abstract.Type
 import Abstract.FreeVariables
 import Algorithm
