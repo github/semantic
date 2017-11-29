@@ -50,5 +50,8 @@ instance Ord2 Environment where
 instance Ord l => Ord1 (Environment l) where
   liftCompare = liftCompare2 compare
 
+instance Show2 Environment where
+  liftShowsPrec2 spL slL spA slA d (Environment map) = showParen (d > 10) $ showString "Environment" . showChar ' ' . liftShowsPrec (liftShowsPrec2 spL slL spA slA) (liftShowList2 spL slL spA slA) 11 map
+
 instance Show l => Show1 (Environment l) where
   liftShowsPrec = genericLiftShowsPrec
