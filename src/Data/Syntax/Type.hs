@@ -2,8 +2,6 @@
 module Data.Syntax.Type where
 
 import Abstract.Eval
-import Abstract.Value
-import Abstract.Type
 import Abstract.FreeVariables
 import Algorithm
 import Data.Align.Generic
@@ -20,8 +18,7 @@ data Annotation a = Annotation { annotationSubject :: !a, annotationType :: !a }
 instance Eq1 Annotation where liftEq = genericLiftEq
 instance Ord1 Annotation where liftCompare = genericLiftCompare
 instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
-instance (Monad m) => Eval (Value s a l) m Annotation
-instance (Monad m) => Eval Type m Annotation
+instance (Monad m) => Eval v m Annotation
 
 newtype Product a = Product { productElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

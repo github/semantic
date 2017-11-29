@@ -2,8 +2,6 @@
 module Data.Syntax.Declaration where
 
 import Abstract.Eval
-import Abstract.Value
-import Abstract.Type
 import Abstract.FreeVariables
 import Algorithm
 import Data.Align.Generic
@@ -22,8 +20,7 @@ instance Diffable Function where
 instance Eq1 Function where liftEq = genericLiftEq
 instance Ord1 Function where liftCompare = genericLiftCompare
 instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
-instance (Monad m) => Eval (Value s a l) m Function
-instance (Monad m) => Eval Type m Function
+instance (Monad m) => Eval v m Function
 
 -- TODO: How should we represent function types, where applicable?
 

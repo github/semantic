@@ -2,9 +2,7 @@
 module Data.Syntax.Literal where
 
 import Abstract.Eval
-import Abstract.Value (Value, literal)
-import qualified Abstract.Value as Value
-import Abstract.Type as Type
+import Abstract.Value (AbstractValue(..))
 import Abstract.FreeVariables
 import Algorithm
 import Data.Align.Generic
@@ -33,11 +31,8 @@ instance Eq1 Boolean where liftEq = genericLiftEq
 instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
-instance (Monad m) => Eval (Value s a l) m Boolean where
-  eval _ yield (Boolean x) = yield (literal (Value.Boolean x))
-
-instance (Monad m) => Eval Type m Boolean where
-  eval _ yield _ = yield Type.Bool
+instance (Monad m, AbstractValue v) => Eval v m Boolean where
+  eval _ yield (Boolean x) = yield (boolean x)
 
 
 -- Numeric
@@ -50,11 +45,8 @@ instance Eq1 Data.Syntax.Literal.Integer where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Integer where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShowsPrec
 
-instance (Monad m) => Eval (Value s a l) m Data.Syntax.Literal.Integer where
-  eval _ yield (Data.Syntax.Literal.Integer x) = yield (literal (Value.Integer (maybe 0 fst (readInteger x))))
-
-instance (Monad m) => Eval Type m Data.Syntax.Literal.Integer where
-  eval _ yield _ = yield Type.Int
+instance (Monad m, AbstractValue v) => Eval v m Data.Syntax.Literal.Integer where
+  eval _ yield (Data.Syntax.Literal.Integer x) = yield (integer (maybe 0 fst (readInteger x)))
 
 
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
@@ -114,11 +106,8 @@ instance Eq1 TextElement where liftEq = genericLiftEq
 instance Ord1 TextElement where liftCompare = genericLiftCompare
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 
-instance (Monad m) => Eval (Value s a l) m TextElement where
-  eval _ yield (TextElement x) = yield (literal (Value.String x))
-
-instance (Monad m) => Eval Type m TextElement where
-  eval _ yield (TextElement _) = yield Type.String
+instance (Monad m, AbstractValue v) => Eval v m TextElement where
+  eval _ yield (TextElement x) = yield (string x)
 
 data Null a = Null
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

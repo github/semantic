@@ -1,7 +1,6 @@
 {-# LANGUAGE FlexibleContexts, FlexibleInstances, GADTs, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
 module Abstract.Type where
 
-import Abstract.Eval
 import Control.Effect
 import Control.Monad.Effect.Internal
 import Control.Monad.Fail
@@ -40,9 +39,3 @@ instance RunEffect Fresh a where
   runEffect = relayState (0 :: TName) (const pure) (\ s action k -> case action of
     Fresh -> k (succ s) s
     Reset s' -> k s' ())
-
--- Eval instances
-instance (Monad m) => Eval Type m [] where
-  eval _  yield []     = yield Unit
-  eval ev yield [a]    = ev pure a >>= yield
-  eval ev yield (a:as) = ev (const (eval ev pure as)) a >>= yield

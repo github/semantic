@@ -3,8 +3,7 @@ module Abstract.Value where
 
 import Abstract.Environment
 import Abstract.Store
-import Abstract.Type
-import Abstract.Eval
+import qualified Abstract.Type as Type
 import Abstract.FreeVariables
 import Control.Monad hiding (fail)
 import Data.ByteString
@@ -75,11 +74,7 @@ instance Show1 Abstract.Value.String where liftShowsPrec = genericLiftShowsPrec
 
 type family LocationFor value :: * where
   LocationFor (Value syntax ann location) = location
-  LocationFor Type = Monovariant
-
-
-literal :: (f :< ValueConstructors syntax ann) => f location -> Value syntax ann location
-literal = inj
+  LocationFor Type.Type = Monovariant
 
 
 -- Instances
@@ -87,26 +82,28 @@ literal = inj
 class ValueRoots l v | v -> l where
   valueRoots :: v -> Set (Address l v)
 
+class AbstractValue v where
+  unit :: v
+  integer :: Prelude.Integer -> v
+  boolean :: Bool -> v
+  string :: ByteString -> v
+
 instance (FreeVariables1 syntax, Functor syntax, Ord l) => ValueRoots l (Value syntax ann l) where
   valueRoots v
     | Just (Closure name body env) <- prj v = envRoots env (delete name (freeVariables body))
     | otherwise                             = mempty
 
-instance ValueRoots Monovariant Type where
+instance AbstractValue (Value syntax ann l) where
+  unit = inj Unit
+  integer = inj . Abstract.Value.Integer
+  boolean = inj . Boolean
+  string = inj . Abstract.Value.String
+
+instance ValueRoots Monovariant Type.Type where
   valueRoots _ = mempty
 
-
--- Eval instance
-
-instance ( Monad m
-         , Ord l
-         , Functor s
-         , MonadGC l (Value s a l) m
-         , MonadEnv l (Value s a l) m
-         , FreeVariables1 s)
-         => Eval (Value s a l) m [] where
-  eval _  yield []     = yield (literal Abstract.Value.Unit)
-  eval ev yield [a]    = ev pure a >>= yield
-  eval ev yield (a:as) = do
-    env <- askEnv @l @(Value s a l)
-    extraRoots (envRoots @l env (freeVariables1 as)) (ev (const (eval ev pure as)) a) >>= yield
+instance AbstractValue Type.Type where
+  unit = Type.Unit
+  integer _ = Type.Int
+  boolean _ = Type.Bool
+  string _ = Type.String

@@ -2,9 +2,7 @@
 module Data.Syntax where
 
 import Abstract.Eval
-import Abstract.Value (Value, LocationFor, literal)
-import qualified Abstract.Value as Value
-import Abstract.Type as Type
+import Abstract.Value (LocationFor, AbstractValue(..))
 import Abstract.FreeVariables
 import Abstract.Environment
 import Abstract.Store
@@ -143,28 +141,17 @@ instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 
 instance ( Monad m
-         , Ord l
-         , Functor s
-         , MonadGC l (Value s a l) m
-         , MonadEnv l (Value s a l) m
-         , FreeVariables1 s)
-        => Eval (Value s a l) m Program where
-  eval _  yield (Program [])     = yield (literal Value.Unit)
-  eval ev yield (Program [a])    = ev pure a >>= yield
-  eval ev yield (Program (a:as)) = do
-    env <- askEnv @l @(Value s a l)
-    extraRoots (envRoots @l env (freeVariables1 as)) (ev (const (eval ev pure (Program as))) a) >>= yield
-
-instance ( Monad m
-         , MonadGC (LocationFor Type) Type m
-         , MonadEnv (LocationFor Type) Type m
+         , Ord (LocationFor v)
+         , MonadGC (LocationFor v) v m
+         , MonadEnv (LocationFor v) v m
+         , AbstractValue v
          )
-        => Eval Type m Program where
-  eval _  yield (Program [])     = yield Type.Unit
+        => Eval v m Program where
+  eval _  yield (Program [])     = yield unit
   eval ev yield (Program [a])    = ev pure a >>= yield
   eval ev yield (Program (a:as)) = do
-    env <- askEnv @(LocationFor Type) @Type
-    extraRoots (envRoots @(LocationFor Type) env (freeVariables1 as)) (ev (const (eval ev pure (Program as))) a) >>= yield
+    env <- askEnv @(LocationFor v) @v
+    extraRoots (envRoots @(LocationFor v) env (freeVariables1 as)) (ev (const (eval ev pure (Program as))) a) >>= yield
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
@@ -184,11 +171,9 @@ data Empty a = Empty
 instance Eq1 Empty where liftEq _ _ _ = True
 instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
--- TODO: Define Value semantics for Empty
-instance (Monad m) => Eval (Value s a l) m Empty where
-  eval _ yield _ = yield (literal Value.Unit)
-instance (Monad m) => Eval Type m Empty where
-  eval _ yield _ = yield Type.Unit
+
+instance (Monad m, AbstractValue v) => Eval v m Empty where
+  eval _ yield _ = yield unit
 
 
 -- | Syntax representing a parsing or assignment error.
@@ -199,8 +184,7 @@ instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Define Value semantics for Error
-instance (Monad m) => Eval (Value s a l) m Error
-instance (Monad m) => Eval Type m Error
+instance (Monad m) => Eval v m Error
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorExpected errorActual
@@ -236,8 +220,5 @@ instance Eq1 Context where liftEq = genericLiftEq
 instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
-instance (Monad m) => Eval (Value s a l) m Context where
-  eval ev yield Context{..} = ev pure contextSubject >>= yield
-
-instance (Monad m) => Eval Type m Context where
+instance (Monad m) => Eval v m Context where
   eval ev yield Context{..} = ev pure contextSubject >>= yield

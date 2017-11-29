@@ -1,9 +1,10 @@
-{-# LANGUAGE AllowAmbiguousTypes, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Abstract.Eval where
 
+import Abstract.Environment
 import Abstract.FreeVariables
 import Abstract.Store
-
+import Abstract.Value
 import Control.Monad.Effect
 import Control.Monad.Effect.Reader
 import Data.Proxy
@@ -34,3 +35,17 @@ instance (Ord l, Reader (Set.Set (Address l a)) :< fs) => MonadGC l a (Eff fs) w
   askRoots = ask :: Eff fs (Set.Set (Address l a))
 
   extraRoots roots' = local (<> roots')
+
+
+instance ( Monad m
+         , Ord (LocationFor v)
+         , MonadGC (LocationFor v) v m
+         , MonadEnv (LocationFor v) v m
+         , AbstractValue v
+         )
+         => Eval v m [] where
+  eval _  yield []     = yield unit
+  eval ev yield [a]    = ev pure a >>= yield
+  eval ev yield (a:as) = do
+    env <- askEnv @(LocationFor v) @v
+    extraRoots (envRoots @(LocationFor v) env (freeVariables1 as)) (ev (const (eval ev pure as)) a) >>= yield

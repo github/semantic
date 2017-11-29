@@ -2,8 +2,6 @@
 module Data.Syntax.Expression where
 
 import Abstract.Eval
-import Abstract.Value (Value)
-import Abstract.Type
 import Abstract.FreeVariables
 import Algorithm
 import Data.Align.Generic
@@ -20,8 +18,7 @@ data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a]
 instance Eq1 Call where liftEq = genericLiftEq
 instance Ord1 Call where liftCompare = genericLiftCompare
 instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
-instance (Monad m) => Eval (Value s a l) m Call
-instance (Monad m) => Eval Type m Call
+instance (Monad m) => Eval v m Call
 
 
 data Comparison a
