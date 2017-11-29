@@ -149,7 +149,7 @@ instance ( Monad m
          , MonadEnv l (Value s a l) m
          , FreeVariables1 s)
         => Eval (Value s a l) m Program where
-  eval _  yield (Program [])     = yield (I PUnit)
+  eval _  yield (Program [])     = yield (literal PUnit)
   eval ev yield (Program [a])    = ev pure a >>= yield
   eval ev yield (Program (a:as)) = do
     env <- askEnv @l @(Value s a l)
@@ -186,7 +186,7 @@ instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 -- TODO: Define Value semantics for Empty
 instance (Monad m) => Eval (Value s a l) m Empty where
-  eval _ yield _ = yield (I PUnit)
+  eval _ yield _ = yield (literal PUnit)
 instance (Monad m) => Eval Type m Empty where
   eval _ yield _ = yield Unit
 

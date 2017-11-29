@@ -24,7 +24,7 @@ instance Ord1 Comment where liftCompare = genericLiftCompare
 instance Show1 Comment where liftShowsPrec = genericLiftShowsPrec
 
 instance (Monad m) => Eval (Value s a l) m Comment where
-  eval _ yield _ = yield (I PUnit)
+  eval _ yield _ = yield (literal PUnit)
 
 instance (Monad m) => Eval Type m Comment where
   eval _ yield _ = yield Unit
