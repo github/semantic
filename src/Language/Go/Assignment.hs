@@ -512,12 +512,11 @@ emptyStatement :: Assignment
 emptyStatement = makeTerm <$> token EmptyStatement <*> (Statement.NoOp <$> emptyTerm)
 
 forStatement :: Assignment
-forStatement =  (makeTerm <$> symbol ForStatement <*> children ((forClause <|> forSimpleClause) <*> expression))
-            <|> (makeTerm <$> symbol ForStatement <*> children (rangeClause <*> expression))
+forStatement =  makeTerm' <$> symbol ForStatement <*> children (forClause <|> forSimpleClause <|> rangeClause)
   where
-    forClause = symbol ForClause *> children (Statement.For <$> (expression <|> emptyTerm) <*> (expression <|> emptyTerm) <*> (expression <|> emptyTerm))
-    forSimpleClause = Statement.For <$> emptyTerm <*> (expression <|> emptyTerm) <*> emptyTerm
-    rangeClause = symbol RangeClause *> children (Statement.ForEach <$> (expression <|> emptyTerm) <*> expression)
+    forClause = inj <$> (symbol ForClause *> children (Statement.For <$> (expression <|> emptyTerm) <*> (expression <|> emptyTerm) <*> (expression <|> emptyTerm)) <*> expression)
+    forSimpleClause = inj <$> (Statement.For <$> emptyTerm <*> (expression <|> emptyTerm) <*> emptyTerm <*> expression)
+    rangeClause = inj <$> (symbol RangeClause *> children (Statement.ForEach <$> (expression <|> emptyTerm) <*> expression) <*> expression)
 
 goStatement :: Assignment
 goStatement = makeTerm <$> symbol GoStatement <*> children (Go.Syntax.Go <$> expression)
