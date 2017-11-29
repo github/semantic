@@ -21,7 +21,7 @@ instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Specialize Eval for Type to unify the inferred type of the subject with the specified type
 instance (Monad m) => Eval t v m Annotation where
-  eval recur yield Annotation{..} = recur pure annotationSubject >>= yield
+  eval recur yield Annotation{..} = recur yield annotationSubject 
 
 
 newtype Product a = Product { productElements :: [a] }

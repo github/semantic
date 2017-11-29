@@ -221,4 +221,4 @@ instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
 instance (Monad m) => Eval t v m Context where
-  eval ev yield Context{..} = ev pure contextSubject >>= yield
+  eval ev yield Context{..} = ev yield contextSubject
