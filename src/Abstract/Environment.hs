@@ -27,11 +27,11 @@ envRoots :: (Ord l, Foldable t) => Environment l a -> t Name -> Set.Set (Address
 envRoots env = foldr ((<>) . maybe mempty point . flip envLookup env) mempty
 
 
-class Monad m => MonadEnv l a m where
-  askEnv :: m (Environment l a)
-  localEnv :: (Environment l a -> Environment l a) -> m b -> m b
+class Monad m => MonadEnv l value m where
+  askEnv :: m (Environment l value)
+  localEnv :: (Environment l value -> Environment l value) -> m b -> m b
 
-instance (Reader (Environment l a) :< fs) => MonadEnv l a (Eff fs) where
+instance (Reader (Environment l value) :< fs) => MonadEnv l value (Eff fs) where
   askEnv = ask
   localEnv = local
 
