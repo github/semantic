@@ -18,7 +18,7 @@ data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a]
 instance Eq1 Call where liftEq = genericLiftEq
 instance Ord1 Call where liftCompare = genericLiftCompare
 instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
-instance (MonadFail m) => Eval v m Call
+instance (MonadFail m) => Eval t v m Call
 
 
 data Comparison a

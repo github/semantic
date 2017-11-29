@@ -22,15 +22,15 @@ import Prelude hiding (fail)
 
 
 -- Collecting evaluator
-class Monad m => Eval v m constr where
-  eval :: FreeVariables term => ((v -> m v) -> term -> m v) ->  (v -> m w) -> constr term -> m w
-  default eval :: (FreeVariables term, MonadFail m, Show1 constr) => ((v -> m v) -> term -> m v) ->  (v -> m w) -> constr term -> m w
+class Monad m => Eval term v m constr where
+  eval :: ((v -> m v) -> term -> m v) -> (v -> m w) -> constr term -> m w
+  default eval :: (MonadFail m, Show1 constr) => ((v -> m v) -> term -> m v) ->  (v -> m w) -> constr term -> m w
   eval _ _ expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
-instance (Monad m, Apply (Eval v m) fs) => Eval v m (Union fs) where
-  eval ev yield = apply (Proxy :: Proxy (Eval v m)) (eval ev yield)
+instance (Monad m, Apply (Eval t v m) fs) => Eval t v m (Union fs) where
+  eval ev yield = apply (Proxy :: Proxy (Eval t v m)) (eval ev yield)
 
-instance (Monad m, Eval v m s) => Eval v m (TermF s a) where
+instance (Monad m, Eval t v m s) => Eval t v m (TermF s a) where
   eval ev yield In{..} = eval ev yield termOut
 
 
@@ -50,8 +50,9 @@ instance ( Monad m
          , MonadGC (LocationFor v) v m
          , MonadEnv (LocationFor v) v m
          , AbstractValue v
+         , FreeVariables t
          )
-         => Eval v m [] where
+         => Eval t v m [] where
   eval _  yield []     = yield unit
   eval ev yield [a]    = ev pure a >>= yield
   eval ev yield (a:as) = do

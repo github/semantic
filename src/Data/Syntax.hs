@@ -123,7 +123,7 @@ instance ( MonadAddress (LocationFor v) m
          , MonadEnv (LocationFor v) v m
          , MonadFail m
          , MonadStore (LocationFor v) v m
-         ) => Eval v m Identifier where
+         ) => Eval t v m Identifier where
   eval _ yield (Identifier name) = do
     env <- askEnv @(LocationFor v) @v
     maybe (fail ("free variable: " <> unpack name)) deref (envLookup name env) >>= yield
@@ -144,8 +144,9 @@ instance ( Monad m
          , MonadGC (LocationFor v) v m
          , MonadEnv (LocationFor v) v m
          , AbstractValue v
+         , FreeVariables t
          )
-        => Eval v m Program where
+        => Eval t v m Program where
   eval _  yield (Program [])     = yield unit
   eval ev yield (Program [a])    = ev pure a >>= yield
   eval ev yield (Program (a:as)) = do
@@ -171,7 +172,7 @@ instance Eq1 Empty where liftEq _ _ _ = True
 instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
-instance (Monad m, AbstractValue v) => Eval v m Empty where
+instance (Monad m, AbstractValue v) => Eval t v m Empty where
   eval _ yield _ = yield unit
 
 
@@ -183,7 +184,7 @@ instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 
-instance (MonadFail m) => Eval v m Error
+instance (MonadFail m) => Eval t v m Error
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorExpected errorActual
@@ -219,5 +220,5 @@ instance Eq1 Context where liftEq = genericLiftEq
 instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
-instance (Monad m) => Eval v m Context where
+instance (Monad m) => Eval t v m Context where
   eval ev yield Context{..} = ev pure contextSubject >>= yield

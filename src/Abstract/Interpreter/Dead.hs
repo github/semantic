@@ -54,7 +54,7 @@ evalDead :: forall v syntax ann
            , Foldable syntax
            , FreeVariables1 syntax
            , Functor syntax
-           , Eval v (Eff (DeadCodeInterpreter (LocationFor v) (Term syntax ann) v)) syntax
+           , Eval (Term syntax ann) v (Eff (DeadCodeInterpreter (LocationFor v) (Term syntax ann) v)) syntax
            , MonadAddress (LocationFor v) (Eff (DeadCodeInterpreter (LocationFor v) (Term syntax ann) v))
            , Semigroup (Cell (LocationFor v) v)
            )

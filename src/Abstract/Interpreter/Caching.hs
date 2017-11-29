@@ -96,7 +96,7 @@ evalCache :: forall v syntax ann
             , MonadAddress (LocationFor v) (Eff (CachingInterpreter (LocationFor v) (Term syntax ann) v))
             , Semigroup (Cell (LocationFor v) v)
             , ValueRoots (LocationFor v) v
-            , Eval v (Eff (CachingInterpreter (LocationFor v) (Term syntax ann) v)) syntax
+            , Eval (Term syntax ann) v (Eff (CachingInterpreter (LocationFor v) (Term syntax ann) v)) syntax
             )
           => Term syntax ann
           -> CachingResult (LocationFor v) (Term syntax ann) v

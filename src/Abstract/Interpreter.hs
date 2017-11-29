@@ -39,7 +39,7 @@ evaluate :: forall v syntax ann
            , Semigroup (Cell (LocationFor v) v)
            , FreeVariables1 syntax
            , MonadAddress (LocationFor v) (Eff (Interpreter (LocationFor v) v))
-           , Eval v (Eff (Interpreter (LocationFor v) v)) syntax
+           , Eval (Term syntax ann) v (Eff (Interpreter (LocationFor v) v)) syntax
            )
          => Term syntax ann
          -> EvalResult (LocationFor v) v
@@ -48,7 +48,7 @@ evaluate = run @(Interpreter (LocationFor v) v) . fix ev pure
 ev ::
      ( Functor syntax
      , FreeVariables1 syntax
-     , Eval v m syntax
+     , Eval (Term syntax ann) v m syntax
      )
      => Eval' (Term syntax ann) m v -> Eval' (Term syntax ann) m v
 ev recur yield = eval recur yield . unTerm
@@ -74,7 +74,7 @@ evRoots :: forall l v m syntax ann
            , MonadEnv l v m
            , MonadGC l v m
            , ValueRoots l v
-           , Eval v m (TermF syntax ann)
+           , Eval (Term syntax ann) v m (TermF syntax ann)
            , FreeVariables1 syntax
            , Functor syntax
            )

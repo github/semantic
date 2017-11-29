@@ -5,7 +5,6 @@ import Abstract.Environment
 import Abstract.Store
 import qualified Abstract.Type as Type
 import Abstract.FreeVariables
-import Control.Monad hiding (fail)
 import Data.ByteString (ByteString)
 import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic
@@ -13,58 +12,57 @@ import Data.Functor.Classes.Ord.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Semigroup
 import qualified Data.Set as Set
-import Data.Term
 import Data.Union
 import GHC.Generics
 import Prelude hiding (fail)
 
-type ValueConstructors syntax ann
-  = '[Closure syntax ann
+type ValueConstructors location
+  = '[Closure location
     , Abstract.Value.Unit
     , Abstract.Value.Boolean
     , Abstract.Value.Integer
     , Abstract.Value.String
     ]
 
-type Value syntax ann = Union (ValueConstructors syntax ann)
+type Value location = Union (ValueConstructors location)
 
-data Closure syntax ann location = Closure [Name] (Term syntax ann) (Environment location (Value syntax ann location))
+data Closure location term = Closure [Name] term (Environment location (Value location term))
   deriving (Eq, Ord, Show)
 
-instance (Eq1 syntax, Eq ann) => Eq1 (Closure syntax ann) where
-  liftEq eqL (Closure s1 t1 e1) (Closure s2 t2 e2) = s1 == s2 && t1 == t2 && liftEq2 eqL (liftEq eqL) e1 e2
+instance (Eq location) => Eq1 (Closure location) where
+  liftEq eqT (Closure s1 t1 e1) (Closure s2 t2 e2) = s1 == s2 && t1 `eqT` t2 && liftEq (liftEq eqT) e1 e2
 
-instance (Ord1 syntax, Ord ann) => Ord1 (Closure syntax ann) where
-  liftCompare compareL (Closure s1 t1 e1) (Closure s2 t2 e2) = compare s1 s2 <> compare t1 t2 <> liftCompare2 compareL (liftCompare compareL) e1 e2
+instance (Ord location) => Ord1 (Closure location) where
+  liftCompare compareT (Closure s1 t1 e1) (Closure s2 t2 e2) = compare s1 s2 <> compareT t1 t2 <> liftCompare (liftCompare compareT) e1 e2
 
-instance (Show1 syntax, Show ann) => Show1 (Closure syntax ann) where
-  liftShowsPrec sp sl d (Closure s t e) = showParen (d > 10) $ showString "Closure"
+instance (Show location) => Show1 (Closure location) where
+  liftShowsPrec spT slT d (Closure s t e) = showParen (d > 10) $ showString "Closure"
     . showChar ' ' . showsPrec 11 s
-    . showChar ' ' . showsPrec 11 t
-    . showChar ' ' . liftShowsPrec2 sp sl (liftShowsPrec sp sl) (liftShowList sp sl) 11 e
+    . showChar ' ' . spT 11 t
+    . showChar ' ' . liftShowsPrec (liftShowsPrec spT slT) (liftShowList spT slT) 11 e
 
-data Unit location = Unit
+data Unit term = Unit
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 Unit where liftEq = genericLiftEq
 instance Ord1 Unit where liftCompare = genericLiftCompare
 instance Show1 Unit where liftShowsPrec = genericLiftShowsPrec
 
-data Boolean location = Boolean Prelude.Bool
+data Boolean term = Boolean Prelude.Bool
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 Boolean where liftEq = genericLiftEq
 instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
-data Integer location = Integer Prelude.Integer
+data Integer term = Integer Prelude.Integer
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 Abstract.Value.Integer where liftEq = genericLiftEq
 instance Ord1 Abstract.Value.Integer where liftCompare = genericLiftCompare
 instance Show1 Abstract.Value.Integer where liftShowsPrec = genericLiftShowsPrec
 
-data String location = String ByteString
+data String term = String ByteString
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 Abstract.Value.String where liftEq = genericLiftEq
@@ -73,7 +71,7 @@ instance Show1 Abstract.Value.String where liftShowsPrec = genericLiftShowsPrec
 
 
 type family LocationFor value :: * where
-  LocationFor (Value syntax ann location) = location
+  LocationFor (Value location term) = location
   LocationFor Type.Type = Monovariant
 
 
@@ -88,12 +86,12 @@ class AbstractValue v where
   boolean :: Bool -> v
   string :: ByteString -> v
 
-instance (FreeVariables1 syntax, Functor syntax, Ord l) => ValueRoots l (Value syntax ann l) where
+instance (FreeVariables term, Ord location) => ValueRoots location (Value location term) where
   valueRoots v
     | Just (Closure names body env) <- prj v = envRoots env (foldr Set.delete (freeVariables body) names)
     | otherwise                              = mempty
 
-instance AbstractValue (Value syntax ann l) where
+instance AbstractValue (Value location term) where
   unit = inj Unit
   integer = inj . Abstract.Value.Integer
   boolean = inj . Boolean

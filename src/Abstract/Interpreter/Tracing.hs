@@ -45,7 +45,7 @@ evalTrace :: forall v syntax ann
             , MonadAddress (LocationFor v) (Eff (TraceInterpreter (LocationFor v) (Term syntax ann) v))
             , MonadGC (LocationFor v) v (Eff (TraceInterpreter (LocationFor v) (Term syntax ann) v))
             , Semigroup (Cell (LocationFor v) v)
-            , Eval v (Eff (TraceInterpreter (LocationFor v) (Term syntax ann) v)) syntax
+            , Eval (Term syntax ann) v (Eff (TraceInterpreter (LocationFor v) (Term syntax ann) v)) syntax
             )
           => Term syntax ann -> Final (TracingInterpreter (LocationFor v) (Term syntax ann) v []) v
 evalTrace = run @(TraceInterpreter (LocationFor v) (Term syntax ann) v) . fix (evTell @[] ev) pure
@@ -57,7 +57,7 @@ evalReach :: forall v syntax ann
             , MonadAddress (LocationFor v) (Eff (ReachableStateInterpreter (LocationFor v) (Term syntax ann) v))
             , MonadGC (LocationFor v) v (Eff (ReachableStateInterpreter (LocationFor v) (Term syntax ann) v))
             , Semigroup (Cell (LocationFor v) v)
-            , Eval v (Eff (ReachableStateInterpreter (LocationFor v) (Term syntax ann) v)) syntax
+            , Eval (Term syntax ann) v (Eff (ReachableStateInterpreter (LocationFor v) (Term syntax ann) v)) syntax
             )
           => Term syntax ann -> Final (TracingInterpreter (LocationFor v) (Term syntax ann) v Set.Set) v
 evalReach = run @(ReachableStateInterpreter (LocationFor v) (Term syntax ann) v) . fix (evTell @Set.Set ev) pure
