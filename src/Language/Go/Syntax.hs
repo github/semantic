@@ -99,7 +99,7 @@ instance Eq1 TypeSwitchGuard where liftEq = genericLiftEq
 instance Ord1 TypeSwitchGuard where liftCompare = genericLiftCompare
 instance Show1 TypeSwitchGuard where liftShowsPrec = genericLiftShowsPrec
 
--- | A receive statement in Go (e.g. `value = <-channel` )
+-- | A receive statement in a Go select statement (e.g. `case value := <-channel` )
 data Receive a = Receive { receiveSubject :: !a, receiveExpression :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
