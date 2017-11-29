@@ -58,7 +58,7 @@ evCollect :: forall l t v m
              , Foldable (Cell l)
              , MonadStore l v m
              , MonadGC l v m
-             , AbstractValue l v
+             , ValueRoots l v
              )
           => (Eval' t m v -> Eval' t m v)
           -> Eval' t m v
@@ -73,7 +73,7 @@ evRoots :: forall l v m syntax ann
         .  ( Ord l
            , MonadEnv l v m
            , MonadGC l v m
-           , AbstractValue l v
+           , ValueRoots l v
            , Eval v m (TermF syntax ann)
            , FreeVariables1 syntax
            , Functor syntax
@@ -82,10 +82,10 @@ evRoots :: forall l v m syntax ann
         -> Eval' (Term syntax ann) m v
 evRoots ev' yield = eval ev' yield . unTerm
 
-gc :: (Ord l, Foldable (Cell l), AbstractValue l a) => Set.Set (Address l a) -> Store l a -> Store l a
+gc :: (Ord l, Foldable (Cell l), ValueRoots l a) => Set.Set (Address l a) -> Store l a -> Store l a
 gc roots store = storeRestrict store (reachable roots store)
 
-reachable :: (Ord l, Foldable (Cell l), AbstractValue l a) => Set.Set (Address l a) -> Store l a -> Set.Set (Address l a)
+reachable :: (Ord l, Foldable (Cell l), ValueRoots l a) => Set.Set (Address l a) -> Store l a -> Set.Set (Address l a)
 reachable roots store = go roots mempty
   where go set seen = case Set.minView set of
           Nothing -> seen

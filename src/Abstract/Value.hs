@@ -84,15 +84,15 @@ literal = inj
 
 -- Instances
 
-class AbstractValue l v | v -> l where
+class ValueRoots l v | v -> l where
   valueRoots :: v -> Set (Address l v)
 
-instance (FreeVariables1 syntax, Functor syntax, Ord l) => AbstractValue l (Value syntax ann l) where
+instance (FreeVariables1 syntax, Functor syntax, Ord l) => ValueRoots l (Value syntax ann l) where
   valueRoots v
     | Just (Closure name body env) <- prj v = envRoots env (delete name (freeVariables body))
     | otherwise                             = mempty
 
-instance AbstractValue Monovariant Type where
+instance ValueRoots Monovariant Type where
   valueRoots _ = mempty
 
 
