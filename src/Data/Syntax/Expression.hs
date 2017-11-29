@@ -144,8 +144,7 @@ instance Ord1 InstanceOf where liftCompare = genericLiftCompare
 instance Show1 InstanceOf where liftShowsPrec = genericLiftShowsPrec
 
 -- | ScopeResolution (e.g. import a.b in Python or a::b in C++)
-data ScopeResolution a
-  = ScopeResolution ![a]
+newtype ScopeResolution a = ScopeResolution [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ScopeResolution where liftEq = genericLiftEq
