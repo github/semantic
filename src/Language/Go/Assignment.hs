@@ -52,6 +52,7 @@ type Syntax =
    , Go.Syntax.Go
    , Go.Syntax.Label
    , Go.Syntax.Receive
+   , Go.Syntax.ReceiveOperator
    , Go.Syntax.Rune
    , Go.Syntax.Select
    , Go.Syntax.Send
@@ -444,7 +445,7 @@ unaryExpression = symbol UnaryExpression >>= \ location -> (notExpression locati
     unaryComplement = children (makeTerm <$> symbol AnonCaret <*> (Expression.Complement <$> expression))
     unaryPlus = children (symbol AnonPlus *> expression)
     unaryPointer = children (makeTerm <$> symbol AnonStar <*> (Literal.Pointer <$> expression))
-    unaryReceive = children (symbol AnonLAngleMinus *> expression)
+    unaryReceive = children (makeTerm <$> symbol AnonLAngleMinus <*> (Go.Syntax.ReceiveOperator <$> expression))
 
 varDeclaration :: Assignment
 varDeclaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
