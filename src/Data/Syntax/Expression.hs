@@ -1,15 +1,24 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Syntax.Expression where
 
 import Abstract.Eval
+import Abstract.Store
+import Abstract.Environment
+import Abstract.Value (Value, Closure(..))
+import Abstract.Type as Type
 import Abstract.FreeVariables
 import Algorithm
+import Data.Maybe
+import Data.Union
+import Data.Semigroup
+import Data.Traversable
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Ord.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Mergeable
 import GHC.Generics
+import Prelude hiding (fail)
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
@@ -18,8 +27,26 @@ data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a]
 instance Eq1 Call where liftEq = genericLiftEq
 instance Ord1 Call where liftCompare = genericLiftCompare
 instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
-instance (MonadFail m) => Eval t v m Call
 
+instance ( Ord l
+         , Semigroup (Cell l (Value l t))
+         , MonadFail m
+         , MonadEnv l (Value l t) m
+         , MonadStore l (Value l t) m
+         , MonadAddress l m
+         )
+         => Eval t (Value l t) m Call where
+  eval recur yield Call{..} = do
+    closure <- recur pure callFunction
+    Closure names body env <- maybe (fail "expected a closure") pure (prj closure :: Maybe (Closure l t))
+    bindings <- for (zip names callParams) $ \ (name, param) -> do
+      v <- recur pure param
+      a <- alloc name
+      assign a v
+      pure (name, a)
+    localEnv (const (foldr (uncurry envInsert) env bindings)) (recur pure body) >>= yield
+
+instance (MonadFail m) => Eval t Type m Call
 
 data Comparison a
   = LessThan !a !a
