@@ -6,7 +6,6 @@ import Abstract.Environment
 import Abstract.Eval
 import Abstract.FreeVariables
 import Abstract.Interpreter
-import Abstract.Primitive
 import Abstract.Store
 import Abstract.Type
 import Abstract.Value
@@ -95,7 +94,6 @@ evalCache :: forall v syntax ann
             , FreeVariables1 syntax
             , Functor syntax
             , MonadAddress (LocationFor v) (Eff (CachingInterpreter (LocationFor v) (Term syntax ann) v))
-            , MonadPrim v (Eff (CachingInterpreter (LocationFor v) (Term syntax ann) v))
             , Semigroup (Cell (LocationFor v) v)
             , AbstractValue (LocationFor v) v
             , Eval v (Eff (CachingInterpreter (LocationFor v) (Term syntax ann) v)) syntax

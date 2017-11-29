@@ -4,7 +4,6 @@ module Abstract.Interpreter where
 import Abstract.Environment
 import Abstract.Eval
 import Abstract.FreeVariables
-import Abstract.Primitive
 import Abstract.Store
 import Abstract.Type
 import Abstract.Value
@@ -40,7 +39,6 @@ evaluate :: forall v syntax ann
            , Semigroup (Cell (LocationFor v) v)
            , FreeVariables1 syntax
            , MonadAddress (LocationFor v) (Eff (Interpreter (LocationFor v) v))
-           , MonadPrim v (Eff (Interpreter (LocationFor v) v))
            , Eval v (Eff (Interpreter (LocationFor v) v)) syntax
            )
          => Term syntax ann
@@ -75,7 +73,6 @@ evRoots :: forall l v m syntax ann
         .  ( Ord l
            , MonadEnv l v m
            , MonadGC l v m
-           , MonadPrim v m
            , AbstractValue l v
            , Eval v m (TermF syntax ann)
            , FreeVariables1 syntax

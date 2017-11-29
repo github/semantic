@@ -6,7 +6,6 @@ import Abstract.Environment
 import Abstract.Eval
 import Abstract.FreeVariables
 import Abstract.Interpreter
-import Abstract.Primitive
 import Abstract.Store
 import Abstract.Value
 
@@ -44,7 +43,6 @@ evalTrace :: forall v syntax ann
             , FreeVariables1 syntax
             , Functor syntax
             , MonadAddress (LocationFor v) (Eff (TraceInterpreter (LocationFor v) (Term syntax ann) v))
-            , MonadPrim v (Eff (TraceInterpreter (LocationFor v) (Term syntax ann) v))
             , MonadGC (LocationFor v) v (Eff (TraceInterpreter (LocationFor v) (Term syntax ann) v))
             , Semigroup (Cell (LocationFor v) v)
             , Eval v (Eff (TraceInterpreter (LocationFor v) (Term syntax ann) v)) syntax
@@ -57,7 +55,6 @@ evalReach :: forall v syntax ann
             , FreeVariables1 syntax
             , Functor syntax
             , MonadAddress (LocationFor v) (Eff (ReachableStateInterpreter (LocationFor v) (Term syntax ann) v))
-            , MonadPrim v (Eff (ReachableStateInterpreter (LocationFor v) (Term syntax ann) v))
             , MonadGC (LocationFor v) v (Eff (ReachableStateInterpreter (LocationFor v) (Term syntax ann) v))
             , Semigroup (Cell (LocationFor v) v)
             , Eval v (Eff (ReachableStateInterpreter (LocationFor v) (Term syntax ann) v)) syntax

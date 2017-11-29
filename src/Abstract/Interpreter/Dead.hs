@@ -4,7 +4,6 @@ module Abstract.Interpreter.Dead where
 import Abstract.Eval
 import Abstract.FreeVariables
 import Abstract.Interpreter
-import Abstract.Primitive
 import Abstract.Store
 import Abstract.Value
 
@@ -57,7 +56,6 @@ evalDead :: forall v syntax ann
            , Functor syntax
            , Eval v (Eff (DeadCodeInterpreter (LocationFor v) (Term syntax ann) v)) syntax
            , MonadAddress (LocationFor v) (Eff (DeadCodeInterpreter (LocationFor v) (Term syntax ann) v))
-           , MonadPrim v (Eff (DeadCodeInterpreter (LocationFor v) (Term syntax ann) v))
            , Semigroup (Cell (LocationFor v) v)
            )
          => Term syntax ann
