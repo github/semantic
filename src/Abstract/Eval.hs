@@ -12,6 +12,7 @@ import Abstract.Value
 import Control.Monad.Effect
 import Control.Monad.Effect.Reader
 import Control.Monad.Fail
+import Data.Functor.Classes
 import Data.Proxy
 import Data.Semigroup
 import qualified Data.Set as Set
@@ -23,8 +24,8 @@ import Prelude hiding (fail)
 -- Collecting evaluator
 class Monad m => Eval v m constr where
   eval :: FreeVariables term => ((v -> m v) -> term -> m v) ->  (v -> m w) -> constr term -> m w
-  default eval :: (FreeVariables term, MonadFail m) => ((v -> m v) -> term -> m v) ->  (v -> m w) -> constr term -> m w
-  eval _ _ _ = fail "default eval"
+  default eval :: (FreeVariables term, MonadFail m, Show1 constr) => ((v -> m v) -> term -> m v) ->  (v -> m w) -> constr term -> m w
+  eval _ _ expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
 instance (Monad m, Apply (Eval v m) fs) => Eval v m (Union fs) where
   eval ev yield = apply (Proxy :: Proxy (Eval v m)) (eval ev yield)

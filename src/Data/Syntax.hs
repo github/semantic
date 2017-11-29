@@ -183,7 +183,6 @@ instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Define Value semantics for Error
 instance (MonadFail m) => Eval v m Error
 
 errorSyntax :: Error.Error String -> [a] -> Error a
