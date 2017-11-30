@@ -1,7 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Abstract.Environment where
 
-import Abstract.Address
+import Data.Abstract.Address
 import Data.Abstract.FreeVariables
 import Data.Functor.Classes
 import Data.Functor.Classes.Show.Generic

@@ -1,8 +1,8 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, FunctionalDependencies, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Abstract.Value where
 
-import Abstract.Address
 import qualified Abstract.Type as Type
+import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.ByteString (ByteString)

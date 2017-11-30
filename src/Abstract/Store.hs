@@ -17,13 +17,13 @@ module Abstract.Store
 , modifyStore
 ) where
 
-import Abstract.Address
 import Abstract.Value
 import Control.Applicative
 import Control.Monad ((<=<))
 import Control.Monad.Effect
 import Control.Monad.Effect.State
 import Control.Monad.Fail
+import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Foldable (asum, toList)

@@ -1,10 +1,10 @@
 {-# LANGUAGE MultiParamTypeClasses, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Control.Monad.Effect.GC where
 
-import Abstract.Address
 import Abstract.Value
 import Control.Monad.Effect
 import Control.Monad.Effect.Reader
+import Data.Abstract.Address
 import Data.Semigroup ((<>))
 import Data.Set (Set)
 

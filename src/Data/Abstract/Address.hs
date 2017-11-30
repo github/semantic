@@ -1,5 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeFamilyDependencies #-}
-module Abstract.Address where
+module Data.Abstract.Address where
 
 import Data.Abstract.FreeVariables
 import Data.Functor.Classes

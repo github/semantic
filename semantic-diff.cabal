@@ -15,8 +15,7 @@ library
   hs-source-dirs:      src
   exposed-modules:
                      -- Analyses & term annotations
-                       Abstract.Address
-                     , Abstract.Interpreter
+                       Abstract.Interpreter
                      , Abstract.Interpreter.Caching
                      , Abstract.Interpreter.Dead
                      , Abstract.Interpreter.Tracing
@@ -38,6 +37,7 @@ library
                      , Control.Monad.Effect.Fresh
                      , Control.Monad.Effect.GC
                      -- General datatype definitions & generic algorithms
+                     , Data.Abstract.Address
                      , Data.Abstract.Configuration
                      , Data.Abstract.Environment
                      , Data.Abstract.FreeVariables
