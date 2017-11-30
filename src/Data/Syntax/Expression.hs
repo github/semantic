@@ -8,7 +8,6 @@ import Abstract.Monad.Env
 import Abstract.Value (Value, Closure(..))
 import Abstract.Type as Type
 import Abstract.FreeVariables
-import Algorithm
 import Data.Maybe
 import Data.Union
 import Data.Semigroup
@@ -18,6 +17,7 @@ import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Ord.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Mergeable
+import Diffing.Algorithm
 import GHC.Generics
 import Prelude hiding (fail)
 

@@ -4,13 +4,13 @@ module Data.Syntax.Comment where
 import Abstract.Eval
 import Abstract.Value as Value
 import Abstract.FreeVariables
-import Algorithm
 import Data.Align.Generic
 import Data.ByteString (ByteString)
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Ord.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Mergeable
+import Diffing.Algorithm
 import GHC.Generics
 
 -- | An unnested comment (line or block).

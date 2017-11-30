@@ -9,7 +9,6 @@ import Abstract.FreeVariables
 import Abstract.Type hiding (Type)
 import qualified Abstract.Type as Type
 import Abstract.Value
-import Algorithm
 import Control.Applicative
 import Data.Align.Generic
 import Data.Foldable (toList)
@@ -20,6 +19,7 @@ import Data.Mergeable
 import Data.Traversable
 import Data.Semigroup
 import Data.Union
+import Diffing.Algorithm
 import GHC.Generics
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }

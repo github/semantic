@@ -7,13 +7,13 @@ import Abstract.FreeVariables
 import Abstract.Monad.Env
 import Abstract.Store
 import Abstract.Value
-import Algorithm
 import Data.Semigroup
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Ord.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Mergeable
+import Diffing.Algorithm
 import GHC.Generics
 
 -- | Conditional. This must have an else block, which can be filled with some default value when omitted in the source, e.g. 'pure ()' for C-style if-without-else or 'pure Nothing' for Ruby-style, in both cases assuming some appropriate Applicative context into which the If will be lifted.

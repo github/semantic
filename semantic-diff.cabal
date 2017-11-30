@@ -13,8 +13,9 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Algorithm
-                     , Abstract.Address
+  exposed-modules:
+                     -- Analyses & term annotations
+                       Abstract.Address
                      , Abstract.Configuration
                      , Abstract.Environment
                      , Abstract.Eval
@@ -27,9 +28,20 @@ library
                      , Abstract.Store
                      , Abstract.Type
                      , Abstract.Value
-                     , Control.Effect
+                     , Analysis.ConstructorName
+                     , Analysis.CyclomaticComplexity
+                     , Analysis.Decorator
+                     , Analysis.Declaration
+                     -- Semantic assignment
+                     , Assigning.Assignment
+                     , Assigning.Assignment.Table
                      , Category
+                     -- Control flow
+                     , Control.Effect
+                     -- General datatype definitions & generic algorithms
+                     , Data.Algebra
                      , Data.Align.Generic
+                     , Data.AST
                      , Data.Blob
                      , Data.Diff
                      , Data.Error
@@ -38,6 +50,7 @@ library
                      , Data.Functor.Classes.Ord.Generic
                      , Data.Functor.Classes.Show.Generic
                      , Data.JSON.Fields
+                     , Data.Language
                      , Data.Mergeable
                      , Data.Output
                      , Data.Patch
@@ -46,10 +59,8 @@ library
                      , Data.Source
                      , Data.Span
                      , Data.SplitDiff
+                     -- À la carte syntax types
                      , Data.Syntax
-                     , Data.Syntax.Algebra
-                     , Data.Syntax.Assignment
-                     , Data.Syntax.Assignment.Table
                      , Data.Syntax.Comment
                      , Data.Syntax.Declaration
                      , Data.Syntax.Expression
@@ -57,11 +68,14 @@ library
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
                      , Data.Term
-                     , Files
+                     -- Diffing algorithms & interpretation thereof
+                     , Diffing.Algorithm
+                     , Diffing.Algorithm.RWS
+                     , Diffing.Algorithm.RWS.FeatureVector
+                     , Diffing.Algorithm.SES
+                     , Diffing.Interpreter
                      , Info
-                     , Interpreter
-                     , Language
-                     , Language.Markdown
+                     -- Language-specific grammar/syntax types, & assignments
                      , Language.Markdown.Assignment
                      , Language.Markdown.Syntax
                      , Language.Go
@@ -80,25 +94,27 @@ library
                      , Language.Python.Assignment2
                      , Language.Python.Grammar
                      , Language.Python.Syntax
-                     , Parser
+                     -- Parser glue
+                     , Parsing.CMark
+                     , Parsing.Parser
+                     , Parsing.TreeSitter
                      , Paths_semantic_diff
-                     , Renderer
-                     , Renderer.JSON
-                     , Renderer.SExpression
-                     , Renderer.Tag
-                     , Renderer.TOC
-                     , RWS
-                     , RWS.FeatureVector
+                     -- Rendering formats
+                     , Rendering.JSON
+                     , Rendering.Renderer
+                     , Rendering.SExpression
+                     , Rendering.Tag
+                     , Rendering.TOC
+                     -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic
+                     , Semantic.CLI
+                     , Semantic.IO
                      , Semantic.Log
                      , Semantic.Stat
                      , Semantic.Task
                      , Semantic.Queue
                      , Semantic.Util
-                     , SemanticCmdLine
-                     , SES
                      , Syntax
-                     , TreeSitter
   build-depends:       base >= 4.8 && < 5
                      , aeson
                      , ansi-terminal
@@ -162,23 +178,23 @@ test-suite test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       CommandSpec
+  other-modules:       Assigning.Assignment.Spec
+                     , Data.Diff.Spec
                      , Data.Functor.Classes.Ord.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Mergeable.Spec
-                     , Data.RandomWalkSimilarity.Spec
-                     , Data.Syntax.Assignment.Spec
-                     , DiffSpec
-                     , SemanticSpec
-                     , SemanticCmdLineSpec
-                     , Semantic.StatSpec
-                     , InterpreterSpec
-                     , SES.Spec
-                     , SourceSpec
+                     , Data.Source.Spec
+                     , Data.Term.Spec
+                     , Diffing.Algorithm.RWS.Spec
+                     , Diffing.Algorithm.SES.Spec
+                     , Diffing.Interpreter.Spec
+                     , Integration.Spec
+                     , Rendering.TOC.Spec
+                     , Semantic.Spec
+                     , Semantic.CLI.Spec
+                     , Semantic.IO.Spec
+                     , Semantic.Stat.Spec
                      , SpecHelpers
-                     , TermSpec
-                     , TOCSpec
-                     , IntegrationSpec
                      , Test.Hspec.LeanCheck
   build-depends:       aeson
                      , array

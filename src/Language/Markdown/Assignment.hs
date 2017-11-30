@@ -6,20 +6,20 @@ module Language.Markdown.Assignment
 , Language.Markdown.Assignment.Term
 ) where
 
+import Assigning.Assignment hiding (Assignment, Error)
+import qualified Assigning.Assignment as Assignment
 import qualified CMarkGFM
 import Data.ByteString (ByteString)
 import Data.Functor (void)
 import Data.Record
 import Data.Syntax (makeTerm)
 import qualified Data.Syntax as Syntax
-import Data.Syntax.Assignment hiding (Assignment, Error)
-import qualified Data.Syntax.Assignment as Assignment
-import Data.Term as Term (Term(..), TermF(..), termIn)
+import Data.Term as Term (Term(..), TermF(..), termFAnnotation, termFOut, termIn)
 import qualified Data.Text as Text
 import Data.Text.Encoding (encodeUtf8)
 import Data.Union
 import GHC.Stack
-import Language.Markdown as Grammar (Grammar(..))
+import Parsing.CMark as Grammar (Grammar(..))
 import qualified Language.Markdown.Syntax as Markup
 
 type Syntax =
@@ -77,19 +77,19 @@ paragraph = makeTerm <$> symbol Paragraph <*> children (Markup.Paragraph <$> man
 list :: Assignment
 list = termIn <$> symbol List <*> ((\ (CMarkGFM.LIST CMarkGFM.ListAttributes{..}) -> case listType of
   CMarkGFM.BULLET_LIST -> inj . Markup.UnorderedList
-  CMarkGFM.ORDERED_LIST -> inj . Markup.OrderedList) . termAnnotation . termOut <$> currentNode <*> children (many item))
+  CMarkGFM.ORDERED_LIST -> inj . Markup.OrderedList) . termFAnnotation . termFOut <$> currentNode <*> children (many item))
 
 item :: Assignment
 item = makeTerm <$> symbol Item <*> children (many blockElement)
 
 heading :: Assignment
-heading = makeTerm <$> symbol Heading <*> ((\ (CMarkGFM.HEADING level) -> Markup.Heading level) . termAnnotation . termOut <$> currentNode <*> children (many inlineElement) <*> manyTill blockElement (void (symbol Heading) <|> eof))
+heading = makeTerm <$> symbol Heading <*> ((\ (CMarkGFM.HEADING level) -> Markup.Heading level) . termFAnnotation . termFOut <$> currentNode <*> children (many inlineElement) <*> manyTill blockElement (void (symbol Heading) <|> eof))
 
 blockQuote :: Assignment
 blockQuote = makeTerm <$> symbol BlockQuote <*> children (Markup.BlockQuote <$> many blockElement)
 
 codeBlock :: Assignment
-codeBlock = makeTerm <$> symbol CodeBlock <*> ((\ (CMarkGFM.CODE_BLOCK language _) -> Markup.Code (nullText language)) . termAnnotation . termOut <$> currentNode <*> source)
+codeBlock = makeTerm <$> symbol CodeBlock <*> ((\ (CMarkGFM.CODE_BLOCK language _) -> Markup.Code (nullText language)) . termFAnnotation . termFOut <$> currentNode <*> source)
 
 thematicBreak :: Assignment
 thematicBreak = makeTerm <$> token ThematicBreak <*> pure Markup.ThematicBreak
@@ -138,10 +138,10 @@ htmlInline :: Assignment
 htmlInline = makeTerm <$> symbol HTMLInline <*> (Markup.HTMLBlock <$> source)
 
 link :: Assignment
-link = makeTerm <$> symbol Link <*> ((\ (CMarkGFM.LINK url title) -> Markup.Link (encodeUtf8 url) (nullText title)) . termAnnotation . termOut <$> currentNode) <* advance
+link = makeTerm <$> symbol Link <*> ((\ (CMarkGFM.LINK url title) -> Markup.Link (encodeUtf8 url) (nullText title)) . termFAnnotation . termFOut <$> currentNode) <* advance
 
 image :: Assignment
-image = makeTerm <$> symbol Image <*> ((\ (CMarkGFM.IMAGE url title) -> Markup.Image (encodeUtf8 url) (nullText title)) . termAnnotation . termOut <$> currentNode) <* advance
+image = makeTerm <$> symbol Image <*> ((\ (CMarkGFM.IMAGE url title) -> Markup.Image (encodeUtf8 url) (nullText title)) . termFAnnotation . termFOut <$> currentNode) <* advance
 
 code :: Assignment
 code = makeTerm <$> symbol Code <*> (Markup.Code Nothing <$> source)

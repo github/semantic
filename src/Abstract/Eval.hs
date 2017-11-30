@@ -32,7 +32,7 @@ instance (Monad m, Apply (Eval t v m) fs) => Eval t v m (Union fs) where
   eval ev yield = apply (Proxy :: Proxy (Eval t v m)) (eval ev yield)
 
 instance (Monad m, Eval t v m s) => Eval t v m (TermF s a) where
-  eval ev yield In{..} = eval ev yield termOut
+  eval ev yield In{..} = eval ev yield termFOut
 
 
 class Monad m => MonadGC a m where

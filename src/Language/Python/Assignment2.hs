@@ -6,13 +6,13 @@ module Language.Python.Assignment2
 , Term
 ) where
 
+import Assigning.Assignment hiding (Assignment, Error)
+import qualified Assigning.Assignment as Assignment
 import Data.List.NonEmpty (some1)
 import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, handleError, makeTerm, makeTerm1, parseError, postContextualize)
 import qualified Data.Syntax as Syntax
-import Data.Syntax.Assignment hiding (Assignment, Error)
-import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
