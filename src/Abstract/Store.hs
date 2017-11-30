@@ -14,6 +14,7 @@ module Abstract.Store
 , modifyStore
 ) where
 
+import Abstract.Address
 import Abstract.FreeVariables
 import Control.Applicative
 import Control.Monad ((<=<))
@@ -34,9 +35,6 @@ import Prelude hiding (fail)
 
 newtype Store l a = Store { unStore :: Map.Map (Address l a) (Cell l a) }
   deriving (Semigroup, Monoid)
-
-newtype Address l a = Address { unAddress :: l }
-  deriving (Eq, Ord, Show)
 
 storeLookup :: Ord l => Address l a -> Store l a -> Maybe (Cell l a)
 storeLookup = (. unStore) . Map.lookup
@@ -129,15 +127,6 @@ instance Eq1 I where liftEq = genericLiftEq
 instance Ord1 I where liftCompare = genericLiftCompare
 instance Show1 I where liftShowsPrec = genericLiftShowsPrec
 
-instance Foldable (Address l) where
-  foldMap _ = mempty
-
-instance Functor (Address l) where
-  fmap _ = Address . unAddress
-
-instance Traversable (Address l) where
-  traverse _ = fmap Address . pure . unAddress
-
 
 instance Foldable (Cell l) => Foldable (Store l) where
   foldMap = (. unStore) . foldMap . foldMap
@@ -155,32 +144,14 @@ instance (Eq l, Eq1 (Cell l)) => Eq1 (Store l) where
 instance (Eq a, Eq l, Eq1 (Cell l)) => Eq (Store l a) where
   (==) = eq1
 
-instance Eq2 Address where
-  liftEq2 eqL _ (Address a) (Address b) = eqL a b
-
-instance Eq l => Eq1 (Address l) where
-  liftEq = liftEq2 (==)
-
 instance (Ord l, Ord1 (Cell l)) => Ord1 (Store l) where
   liftCompare compareA (Store m1) (Store m2) = liftCompare2 (liftCompare compareA) (liftCompare compareA) m1 m2
 
 instance (Ord a, Ord l, Ord1 (Cell l)) => Ord (Store l a) where
   compare = compare1
 
-instance Ord2 Address where
-  liftCompare2 compareL _ (Address a) (Address b) = compareL a b
-
-instance Ord l => Ord1 (Address l) where
-  liftCompare = liftCompare2 compare
-
 instance (Show l, Show1 (Cell l)) => Show1 (Store l) where
   liftShowsPrec sp sl d (Store m) = showsUnaryWith (liftShowsPrec (liftShowsPrec sp sl) (liftShowList sp sl)) "Store" d m
 
 instance (Show a, Show l, Show1 (Cell l)) => Show (Store l a) where
   showsPrec = showsPrec1
-
-instance Show2 Address where
-  liftShowsPrec2 spL _ _ _ d = showsUnaryWith spL "Address" d . unAddress
-
-instance Show l => Show1 (Address l) where
-  liftShowsPrec = liftShowsPrec2 showsPrec showList
