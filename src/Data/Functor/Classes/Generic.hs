@@ -6,6 +6,7 @@ module Data.Functor.Classes.Generic
 , genericLiftCompare
 , Show1(..)
 , GShow1Options(..)
+, defaultGShow1Options
 , genericLiftShowsPrec
 , genericLiftShowsPrecWithOptions
 ) where
