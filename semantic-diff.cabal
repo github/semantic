@@ -30,6 +30,7 @@ library
                      , Category
                      -- Control flow
                      , Control.Effect
+                     , Control.Monad.Effect.Dead
                      , Control.Monad.Effect.Env
                      , Control.Monad.Effect.Fresh
                      , Control.Monad.Effect.GC

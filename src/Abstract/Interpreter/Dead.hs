@@ -1,10 +1,11 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, DeriveFoldable, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, ScopedTypeVariables, TypeApplications, TypeOperators #-}
 module Abstract.Interpreter.Dead where
 
 import Abstract.Interpreter
 import Analysis.Abstract.Eval
 import Control.Effect
 import Control.Monad.Effect hiding (run)
+import Control.Monad.Effect.Dead
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Store
 import Data.Abstract.FreeVariables
@@ -23,19 +24,6 @@ type DeadCodeInterpreter t v = State (Dead t) ': Interpreter v
 type DeadCodeResult t v = Final (DeadCodeInterpreter t v) v
 
 
-newtype Dead a = Dead { unDead :: Set a }
-  deriving (Eq, Foldable, Semigroup, Monoid, Ord, Show)
-
-
-class Monad m => MonadDead t m where
-  killAll :: Dead t -> m ()
-  revive :: Ord t => t -> m ()
-
-instance (State (Dead t) :< fs) => MonadDead t (Eff fs) where
-  killAll = put
-  revive = modify . (Dead .) . (. unDead) . delete
-
-
 subterms :: (Ord a, Recursive a, Foldable (Base a)) => a -> Set a
 subterms term = para (foldMap (uncurry ((<>) . point))) term <> point term
 
@@ -49,7 +37,6 @@ evalDead :: forall v syntax ann
          . ( Ord v
            , Ord ann
            , Ord1 syntax
-           , Recursive (Term syntax ann)
            , Foldable syntax
            , FreeVariables1 syntax
            , Functor syntax
