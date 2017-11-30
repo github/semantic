@@ -39,6 +39,7 @@ library
                      , Control.Effect
                      , Control.Monad.Effect.Env
                      , Control.Monad.Effect.Fresh
+                     , Control.Monad.Effect.GC
                      -- General datatype definitions & generic algorithms
                      , Data.Algebra
                      , Data.Align.Generic

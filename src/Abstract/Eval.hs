@@ -7,16 +7,12 @@ module Abstract.Eval
 
 import Abstract.Environment
 import Abstract.FreeVariables
-import Abstract.Store
 import Abstract.Value
-import Control.Monad.Effect
 import Control.Monad.Effect.Env
-import Control.Monad.Effect.Reader
+import Control.Monad.Effect.GC
 import Control.Monad.Fail
 import Data.Functor.Classes
 import Data.Proxy
-import Data.Semigroup
-import qualified Data.Set as Set
 import Data.Term
 import Data.Union
 import Prelude hiding (fail)
@@ -33,17 +29,6 @@ instance (Monad m, Apply (Eval t v m) fs) => Eval t v m (Union fs) where
 
 instance (Monad m, Eval t v m s) => Eval t v m (TermF s a) where
   eval ev yield In{..} = eval ev yield termFOut
-
-
-class Monad m => MonadGC a m where
-  askRoots :: m (Set.Set (Address (LocationFor a) a))
-
-  extraRoots :: Set.Set (Address (LocationFor a) a) -> m b -> m b
-
-instance (Ord (LocationFor a), Reader (Set.Set (Address (LocationFor a) a)) :< fs) => MonadGC a (Eff fs) where
-  askRoots = ask :: Eff fs (Set.Set (Address (LocationFor a) a))
-
-  extraRoots roots' = local (<> roots')
 
 
 instance ( Monad m
