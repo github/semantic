@@ -8,6 +8,17 @@ import Test.Hspec.LeanCheck
 
 spec :: Spec
 spec = parallel $ do
+  describe "Eq1" $ do
+    describe "genericLiftEq" $ do
+      prop "equivalent to derived (==) for product types" $
+        \ a b -> genericLiftEq (==) a b `shouldBe` a == (b :: Product Int)
+
+      prop "equivalent to derived (==) for sum types" $
+        \ a b -> genericLiftEq (==) a b `shouldBe` a == (b :: Sum Int)
+
+      prop "equivalent to derived (==) for recursive types" $
+        \ a b -> genericLiftEq (==) a b `shouldBe` a == (b :: Tree Int)
+
   describe "Ord1" $ do
     describe "genericLiftCompare" $ do
       prop "equivalent to derived compare for product types" $
