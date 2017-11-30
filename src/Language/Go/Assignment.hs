@@ -272,6 +272,7 @@ arrayType = makeTerm <$> symbol ArrayType <*> children (Type.Array . Just <$> ex
 channelType :: Assignment
 channelType =  makeTerm' <$> symbol ChannelType <*> children (mkChannelType <$> optional (token AnonLAngleMinus) <* token AnonChan <*> optional (token AnonLAngleMinus) <*> expression)
   where
+    mkChannelType :: Maybe a -> Maybe a -> b -> Union Syntax b
     mkChannelType receive send | Just _ <- receive = inj . Go.Type.ReceiveChannel
                                | Just _ <- send    = inj . Go.Type.SendChannel
                                | otherwise         = inj . Go.Type.BidirectionalChannel
