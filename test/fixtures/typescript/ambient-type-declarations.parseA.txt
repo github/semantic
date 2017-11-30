@@ -1,6 +1,6 @@
 (Program
   (AmbientDeclaration
-    (TypeAliasDeclaration
+    (TypeAlias
       (Empty)
       (Identifier)
       (Union

@@ -2,15 +2,18 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (Other "type_declaration"
-      (TypeDecl
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (
+      (Type
         (Identifier)
-        (StructTy
-          (FieldDecl
-          { (Identifier)
-          ->(Identifier) }
-          { (Identifier)
-          ->(Identifier) }
-          {-(Identifier)-}))))))
+        (Constructor
+          (Empty)
+          (Field
+            (Identifier)
+            (
+            { (Identifier)
+            ->(Identifier) }
+            {-(Identifier)-})))))))

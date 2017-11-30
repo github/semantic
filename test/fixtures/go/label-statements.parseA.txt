@@ -2,8 +2,40 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (ExpressionStatements
-      (Other "label_statement"
-        (Identifier)))))
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (
+      (Label
+        (Identifier)
+        (NoOp
+          (Empty)))
+      (Context
+        (Comment)
+        (Label
+          (Identifier)
+          (Context
+            (Comment)
+            (For
+              (Assignment
+                (Identifier)
+                (Integer))
+              (LessThan
+                (Identifier)
+                (Integer))
+              (PostIncrement
+                (Identifier))
+              (
+                (Call
+                  (Identifier)
+                  (Identifier)
+                  (Empty))
+                (Break
+                  (Identifier))
+                (Context
+                  (Comment)
+                  (Empty)))))))
+      (Label
+        (Identifier)
+        (Empty)))))

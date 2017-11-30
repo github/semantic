@@ -2,17 +2,24 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (Other "var_declaration"
-      (VarAssignment
-      { (Identifier)
-      ->(Identifier) }
-        (Identifier)))
-    (Other "var_declaration"
-      (VarAssignment
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->(Identifier) }
-        (Identifier)))))
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (
+      (Assignment
+        (Annotation
+          (
+          { (Identifier)
+          ->(Identifier) })
+          (Identifier))
+        ([]))
+      (Assignment
+        (Annotation
+          (
+          { (Identifier)
+          ->(Identifier) }
+          { (Identifier)
+          ->(Identifier) })
+          (Identifier))
+        ([])))))

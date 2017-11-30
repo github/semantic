@@ -2,40 +2,99 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (TypeConversion
-      (SliceTy
-      { (QualifiedType)
-      ->(QualifiedType) })
-      (SubscriptAccess
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->(Identifier) }))
-    (TypeConversion
-      (ParenthesizedType
-        (SliceTy
-        { (QualifiedType)
-        ->(QualifiedType) }))
-      (SubscriptAccess
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->(Identifier) }))
-    (FunctionCall
-      (SubscriptAccess
-      { (Identifier)
-      ->(Identifier) }
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (
+      (TypeConversion
+        (Pointer
+          (Identifier))
       { (Identifier)
       ->(Identifier) })
-    { (Identifier)
-    ->(Identifier) })
-    (FunctionCall
-      (SubscriptAccess
+      (Call
+        (Pointer
+          (Identifier))
       { (Identifier)
       ->(Identifier) }
+        (Empty))
+      (TypeConversion
+        (ReceiveChannel
+          (Identifier))
       { (Identifier)
       ->(Identifier) })
-    { (Identifier)
-    ->(Identifier) })))
+      (TypeConversion
+        (Parenthesized
+          (ReceiveChannel
+            (Identifier)))
+      { (Identifier)
+      ->(Identifier) })
+      (TypeConversion
+        (Function
+          ([])
+          (Empty))
+      { (Identifier)
+      ->(Identifier) })
+      (TypeConversion
+        (Parenthesized
+          (Function
+            ([])
+            (Empty)))
+      { (Identifier)
+      ->(Identifier) })
+      (TypeConversion
+        (Parenthesized
+          (Function
+            ([])
+            (Identifier)))
+      { (Identifier)
+      ->(Identifier) })
+      (TypeConversion
+        (Function
+          ([])
+          (Identifier))
+      { (Identifier)
+      ->(Identifier) })
+      (TypeConversion
+        (Slice
+          (MemberAccess
+          { (Identifier)
+          ->(Identifier) }
+          { (Identifier)
+          ->(Identifier) }))
+        (MemberAccess
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) }))
+      (TypeConversion
+        (Parenthesized
+          (Slice
+            (MemberAccess
+            { (Identifier)
+            ->(Identifier) }
+            { (Identifier)
+            ->(Identifier) })))
+        (MemberAccess
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) }))
+      (Call
+        (MemberAccess
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) })
+      { (Identifier)
+      ->(Identifier) }
+        (Empty))
+      (Call
+        (MemberAccess
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) })
+      { (Identifier)
+      ->(Identifier) }
+        (Empty)))))

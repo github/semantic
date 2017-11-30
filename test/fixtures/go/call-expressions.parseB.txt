@@ -2,19 +2,25 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (FunctionCall
-      (Identifier)
-      (Identifier)
-      (Other "variadic_argument"
-        (Identifier)))
-    (FunctionCall
-      (Identifier)
-      (Identifier)
+    (Empty)
+    (
       (Identifier))
-    (FunctionCall
-      (Identifier)
-      (Identifier)
-      (Other "variadic_argument"
-        (Identifier)))))
+    ([])
+    (
+      (Call
+        (Identifier)
+        (Identifier)
+        (Variadic
+          (Identifier))
+        (Empty))
+      (Call
+        (Identifier)
+        (Identifier)
+        (Identifier)
+        (Empty))
+      (Call
+        (Identifier)
+        (Identifier)
+        (Variadic
+          (Identifier))
+        (Empty)))))

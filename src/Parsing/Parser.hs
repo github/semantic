@@ -7,6 +7,7 @@ module Parsing.Parser
 -- Syntax parsers
 , syntaxParserForLanguage
 -- À la carte parsers
+, goParser
 , jsonParser
 , markdownParser
 , pythonParser
@@ -27,6 +28,7 @@ import Data.Term
 import Data.Union
 import Foreign.Ptr
 import Info hiding (Empty, Go)
+import qualified Language.Go.Assignment as Go
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.Python.Assignment as Python
@@ -70,7 +72,8 @@ data SomeParser typeclasses ann where
 --   This can be used to perform operations uniformly over terms produced by blobs with different 'Language's, and which therefore have different types in general. For example, given some 'Blob', we can parse and 'show' the parsed & assigned 'Term' like so:
 --
 --   > case someParser (Proxy :: Proxy '[Show1]) (blobLanguage language) of { Just (SomeParser parser) -> runTask (parse parser blob) >>= putStrLn . show ; _ -> return () }
-someParser :: ( ApplyAll typeclasses (Union JSON.Syntax)
+someParser :: ( ApplyAll typeclasses (Union Go.Syntax)
+              , ApplyAll typeclasses (Union JSON.Syntax)
               , ApplyAll typeclasses (Union Markdown.Syntax)
               , ApplyAll typeclasses (Union Python.Syntax)
               , ApplyAll typeclasses (Union Ruby.Syntax)
@@ -79,7 +82,7 @@ someParser :: ( ApplyAll typeclasses (Union JSON.Syntax)
            => proxy typeclasses                                -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
            -> Language                                         -- ^ The 'Language' to select.
            -> Maybe (SomeParser typeclasses (Record Location)) -- ^ 'Maybe' a 'SomeParser' abstracting the syntax type to be produced.
-someParser _ Go         = Nothing
+someParser _ Go         = Just (SomeParser goParser)
 someParser _ JavaScript = Just (SomeParser typescriptParser)
 someParser _ JSON       = Just (SomeParser jsonParser)
 someParser _ JSX        = Just (SomeParser typescriptParser)
@@ -98,6 +101,9 @@ syntaxParserForLanguage language = case language of
   Ruby       -> Just (TreeSitterParser tree_sitter_ruby)
   TypeScript -> Just (TreeSitterParser tree_sitter_typescript)
   _ -> Nothing
+
+goParser :: Parser Go.Term
+goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
 
 rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment

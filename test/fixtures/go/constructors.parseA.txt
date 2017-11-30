@@ -2,28 +2,34 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (FunctionCall
-      (Identifier)
-      (ChannelTy
-        (Identifier)))
-    (FunctionCall
-      (Identifier)
-      (ChannelTy
-        (Identifier))
-      (RelationalOperator
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (
+      (Call
         (Identifier)
-        (Other "-")
-        (Identifier)))
-    (FunctionCall
-      (Identifier)
-      (ChannelTy
-        (Identifier))
-      (NumberLiteral)
-      (NumberLiteral))
-    (FunctionCall
-      (Identifier)
-      (DictionaryTy
+        (SendChannel
+          (Identifier))
+        (Empty))
+      (Call
         (Identifier)
-        (Identifier)))))
+        (SendChannel
+          (Identifier))
+        (Minus
+          (Identifier)
+          (Identifier))
+        (Empty))
+      (Call
+        (Identifier)
+        (SendChannel
+          (Identifier))
+        (Integer)
+        (Integer)
+        (Empty))
+      (Call
+        (Identifier)
+        (Map
+          (Identifier)
+          (Identifier))
+        (Empty)))))

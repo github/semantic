@@ -2,15 +2,16 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (Other "const_declaration"
-      (VarAssignment
-        (Identifier)
-        (Other "expression_list"
-          (Other "composite_literal"
-            (ArrayTy
-              (Identifier))
-            (NumberLiteral)
-            (NumberLiteral)
-            (NumberLiteral)))))))
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (Assignment
+      (Identifier)
+      (Composite
+        (Array
+          (Identifier))
+        (
+          (Integer)
+          (Integer)
+          (Integer))))))

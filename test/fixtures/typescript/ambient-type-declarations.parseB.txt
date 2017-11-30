@@ -1,5 +1,5 @@
 (Program
-  (TypeAliasDeclaration
+  (TypeAlias
     (Empty)
     (Identifier)
     (Union

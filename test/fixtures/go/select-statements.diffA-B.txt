@@ -2,38 +2,101 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (Select
-      (Case
-        (Other "receive_statement"
-          (Other "expression_list"
-          { (Identifier)
-          ->(Identifier) })
-          (Operator
-            (Identifier))))
-      (FunctionCall
-        (Identifier)
-        (Identifier))
-      (Case
-        (Send
-        { (Identifier)
-        ->(Identifier) }
-          (Identifier)))
-      (FunctionCall
-        (Identifier)
-        (NumberLiteral))
-      (Case
-        (Other "receive_statement"
-          (Operator
-            (FunctionCall
-              (SubscriptAccess
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (
+      (Select
+        (
+          (Pattern
+            (Receive
+            { (Identifier)
+            ->(Identifier) }
+              (ReceiveOperator
+                (Identifier)))
+            (Call
+              (Identifier)
+              (Identifier)
+              (Empty)))
+          (Pattern
+            (Send
+            { (Identifier)
+            ->(Identifier) }
+              (Identifier))
+            (Call
+              (Identifier)
+              (Integer)
+              (Empty)))
+          (Pattern
+            (Receive
+              (Empty)
+              (ReceiveOperator
+                (Call
+                  (MemberAccess
+                    (Identifier)
+                    (Identifier))
+                { (Integer)
+                ->(Integer) }
+                  (Empty))))
+            (
+              (Call
                 (Identifier)
-                (Identifier))
-            { (NumberLiteral)
-            ->(NumberLiteral) }))))
-      (FunctionCall
-        (Identifier)
-        (NumberLiteral))
-      (Other "default_case")
-      (Return))))
+                (Integer)
+                (Empty))
+            {+(PostIncrement
+              {+(Identifier)+})+}
+            {+(If
+              {+(
+                {+(Identifier)+})+}
+              {+(
+                {+(Send
+                  {+(Identifier)+}
+                  {+(Composite
+                    {+(Identifier)+}
+                    {+(
+                      {+(Identifier)+}
+                      {+(Identifier)+})+})+})+}
+                {+(Return
+                  {+(Empty)+})+})+}
+              {+(Empty)+})+}
+            {-(PostDecrement
+              {-(Identifier)-})-}
+            {-(If
+              {-(
+                {-(Identifier)-})-}
+              {-(
+                {-(Send
+                  {-(Identifier)-}
+                  {-(Composite
+                    {-(Identifier)-}
+                    {-(
+                      {-(Identifier)-}
+                      {-(Identifier)-})-})-})-}
+                {-(Return
+                  {-(Empty)-})-})-}
+              {-(Empty)-})-}))
+          (Pattern
+            (DefaultPattern
+              ([]))
+            (Return
+              (Empty)))))
+      (Select
+        (
+          (Pattern
+            (Receive
+              (Empty)
+              (ReceiveOperator
+              { (Identifier)
+              ->(Identifier) }))
+            ([]))
+          (Pattern
+            (Receive
+              (Empty)
+              (ReceiveOperator
+                (Identifier)))
+            ([]))
+        {-(Pattern
+          {-(DefaultPattern
+            {-([])-})-}
+          {-([])-})-})))))

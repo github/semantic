@@ -2,36 +2,68 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args))
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    ([]))
+  (Function
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    ([]))
   (Function
     (Identifier)
-    (Args))
-  (Function
-    (Identifier)
-    (Args
-      (ParameterDecl
+    (
+      (Identifier))
+    (
+      (
         (Identifier)
         (Identifier))
       (Identifier)
       (Identifier)
-      (ParameterDecl
+      (
         (Identifier)
         (Identifier)))
-    (Identifier))
+    ([]))
   (Function
-    (Identifier)
-    (Args)
-    (Args
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (
       (Identifier)
-      (Identifier)))
+      (Identifier))
+    ([]))
   (Function
-    (Identifier)
-    (Args)
-    (Args
-      (ParameterDecl
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (
+      (
         (Identifier)
         (Identifier))
-      (ParameterDecl
+      (
         (Identifier)
-        (Identifier)))))
+        (Identifier)))
+    ([]))
+  (Function
+    (Identifier)
+    (
+      (Identifier))
+    ([])
+    (Empty))
+  (Function
+    (Empty)
+    (
+      (Identifier))
+    (
+      (Identifier)
+      (Pointer
+        (Identifier)))
+    (Context
+      (Comment)
+      (Empty))
+    ([])))

@@ -2,10 +2,12 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
+    (Empty)
+    (
+      (Identifier))
+    ([])
     (Send
     { (Identifier)
     ->(Identifier) }
-    { (NumberLiteral)
-    ->(NumberLiteral) })))
+    { (Integer)
+    ->(Integer) })))

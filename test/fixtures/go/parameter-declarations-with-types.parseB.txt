@@ -2,14 +2,20 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args))
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    ([]))
   (Function
-    (Identifier)
-    (Args
-      (ParameterDecl
+    (Empty)
+    (
+      (Identifier))
+    (
+      (
         (Identifier)
         (Identifier))
-      (ParameterDecl
+      (
         (Identifier)
-        (Identifier)))))
+        (Identifier)))
+    ([])))
