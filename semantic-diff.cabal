@@ -16,7 +16,6 @@ library
   exposed-modules:
                      -- Analyses & term annotations
                        Abstract.Address
-                     , Abstract.Configuration
                      , Abstract.FreeVariables
                      , Abstract.Interpreter
                      , Abstract.Interpreter.Caching
@@ -40,6 +39,7 @@ library
                      , Control.Monad.Effect.Fresh
                      , Control.Monad.Effect.GC
                      -- General datatype definitions & generic algorithms
+                     , Data.Abstract.Configuration
                      , Data.Abstract.Environment
                      , Data.Algebra
                      , Data.Align.Generic

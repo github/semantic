@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveFoldable, DeriveGeneric, FlexibleContexts, StandaloneDeriving, UndecidableInstances #-}
-module Abstract.Configuration where
+module Data.Abstract.Configuration where
 
 import Abstract.Store
 import Data.Abstract.Environment
