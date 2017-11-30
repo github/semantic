@@ -5,7 +5,9 @@ module Data.Functor.Classes.Generic
 , Ord1(..)
 , genericLiftCompare
 , Show1(..)
+, GShow1Options(..)
 , genericLiftShowsPrec
+, genericLiftShowsPrecWithOptions
 ) where
 
 import Data.Functor.Classes
@@ -62,6 +64,10 @@ gliftShowList opts sp sl = showListWith (gliftShowsPrec opts sp sl 0)
 -- | A suitable implementation of Show1’s liftShowsPrec for Generic1 types.
 genericLiftShowsPrec :: (Generic1 f, GShow1 (Rep1 f)) => (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> f a -> ShowS
 genericLiftShowsPrec sp sl d = gliftShowsPrec defaultGShow1Options sp sl d . from1
+
+-- | A suitable implementation of Show1’s liftShowsPrec for Generic1 types.
+genericLiftShowsPrecWithOptions :: (Generic1 f, GShow1 (Rep1 f)) => GShow1Options -> (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> f a -> ShowS
+genericLiftShowsPrecWithOptions options sp sl d = gliftShowsPrec options sp sl d . from1
 
 
 -- Generics
