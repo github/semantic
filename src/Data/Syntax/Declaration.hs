@@ -37,7 +37,7 @@ instance ( Monad m
          , Ord l
          , Semigroup (Cell l (Value l t))
          , MonadEnv l (Value l t) m
-         , MonadStore l (Value l t) m
+         , MonadStore (Value l t) m
          , MonadAddress l m
          , FreeVariables t
          ) => Eval t (Value l t) m Function where
@@ -54,7 +54,7 @@ instance ( Alternative m
          , Monad m
          , Type.MonadFresh m
          , MonadEnv Monovariant Type.Type m
-         , MonadStore Monovariant Type.Type m
+         , MonadStore Type.Type m
          , FreeVariables t
          )
          => Eval t Type.Type m Function where

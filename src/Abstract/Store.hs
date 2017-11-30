@@ -20,6 +20,7 @@ module Abstract.Store
 import Abstract.Address
 import Abstract.Environment
 import Abstract.FreeVariables
+import Abstract.Value
 import Control.Applicative
 import Control.Monad ((<=<))
 import Control.Monad.Effect
@@ -67,46 +68,46 @@ storeRestrict (Store m) roots = Store (Map.filterWithKey (\ address _ -> Address
 
 envLookupOrAlloc' ::
                  ( FreeVariables t
-                 , Semigroup (Cell l a)
-                 , MonadStore l a m
-                 , MonadAddress l m
+                 , Semigroup (Cell (LocationFor a) a)
+                 , MonadStore a m
+                 , MonadAddress (LocationFor a) m
                  )
-                 => t -> Environment l a -> a -> m (Name, Address l a)
+                 => t -> Environment (LocationFor a) a -> a -> m (Name, Address (LocationFor a) a)
 envLookupOrAlloc' term = let [name] = toList (freeVariables term) in
                          envLookupOrAlloc name
 
 envLookupOrAlloc ::
-                 ( Semigroup (Cell l a)
-                 , MonadStore l a m
-                 , MonadAddress l m
+                 ( Semigroup (Cell (LocationFor a) a)
+                 , MonadStore a m
+                 , MonadAddress (LocationFor a) m
                  )
-                 => Name -> Environment l a -> a -> m (Name, Address l a)
+                 => Name -> Environment (LocationFor a) a -> a -> m (Name, Address (LocationFor a) a)
 envLookupOrAlloc name env v = do
   a <- maybe (alloc name) pure (envLookup name env)
   assign a v
   pure (name, a)
 
 
-assign :: (Ord l, Semigroup (Cell l a), Pointed (Cell l), MonadStore l a m) => Address l a -> a -> m ()
+assign :: (Ord (LocationFor a), Semigroup (Cell (LocationFor a) a), Pointed (Cell (LocationFor a)), MonadStore a m) => Address (LocationFor a) a -> a -> m ()
 assign = (modifyStore .) . storeInsert
 
 
-class Monad m => MonadStore l a m where
-  getStore :: m (Store l a)
-  putStore :: Store l a -> m ()
+class Monad m => MonadStore a m where
+  getStore :: m (Store (LocationFor a) a)
+  putStore :: Store (LocationFor a) a -> m ()
 
-instance (State (Store l a) :< fs) => MonadStore l a (Eff fs) where
+instance (State (Store (LocationFor a) a) :< fs) => MonadStore a (Eff fs) where
   getStore = get
   putStore = put
 
-modifyStore :: MonadStore l a m => (Store l a -> Store l a) -> m ()
+modifyStore :: MonadStore a m => (Store (LocationFor a) a -> Store (LocationFor a) a) -> m ()
 modifyStore f = getStore >>= putStore . f
 
 
 class (Ord l, Pointed (Cell l), Monad m) => MonadAddress l m where
-  deref :: (MonadStore l a m, MonadFail m) => Address l a -> m a
+  deref :: (MonadStore a m, MonadFail m, l ~ LocationFor a) => Address l a -> m a
 
-  alloc :: MonadStore l a m => Name -> m (Address l a)
+  alloc :: (MonadStore a m, l ~ LocationFor a) => Name -> m (Address l a)
 
 
 allocPrecise :: Store Precise a -> Address Precise a

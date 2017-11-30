@@ -79,7 +79,7 @@ instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 instance ( Monad m
          , Semigroup (Cell (LocationFor v) v)
          , MonadAddress (LocationFor v) m
-         , MonadStore (LocationFor v) v m
+         , MonadStore v m
          , MonadEnv (LocationFor v) v m
          , FreeVariables t
          )

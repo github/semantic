@@ -23,7 +23,7 @@ import Prelude hiding (fail)
 
 type Interpreter l v = '[Fresh, Fail, NonDetEff, State (Store l v), Reader (Set.Set (Address l v)), Reader (Environment l v)]
 
-type MonadInterpreter l v m = (MonadEnv l v m, MonadStore l v m, MonadFail m)
+type MonadInterpreter l v m = (MonadEnv l v m, MonadStore v m, MonadFail m)
 
 type EvalResult l v = Final (Interpreter l v) v
 
@@ -53,18 +53,18 @@ ev ::
      => Eval' (Term syntax ann) m v -> Eval' (Term syntax ann) m v
 ev recur yield = eval recur yield . unTerm
 
-evCollect :: forall l t v m
-          .  ( Ord l
-             , Foldable (Cell l)
-             , MonadStore l v m
-             , MonadGC l v m
-             , ValueRoots l v
+evCollect :: forall t v m
+          .  ( Ord (LocationFor v)
+             , Foldable (Cell (LocationFor v))
+             , MonadStore v m
+             , MonadGC (LocationFor v) v m
+             , ValueRoots (LocationFor v) v
              )
           => (Eval' t m v -> Eval' t m v)
           -> Eval' t m v
           -> Eval' t m v
 evCollect ev0 ev' yield e = do
-  roots <- askRoots :: m (Set.Set (Address l v))
+  roots <- askRoots :: m (Set.Set (Address (LocationFor v) v))
   v <- ev0 ev' yield e
   modifyStore (gc (roots <> valueRoots v))
   return v

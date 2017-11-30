@@ -122,7 +122,7 @@ instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 instance ( MonadAddress (LocationFor v) m
          , MonadEnv (LocationFor v) v m
          , MonadFail m
-         , MonadStore (LocationFor v) v m
+         , MonadStore v m
          ) => Eval t v m Identifier where
   eval _ yield (Identifier name) = do
     env <- askEnv @(LocationFor v) @v

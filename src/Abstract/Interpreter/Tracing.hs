@@ -68,7 +68,7 @@ evTell :: forall g t m v
          , Item (g (Configuration (LocationFor v) t v)) ~ Configuration (LocationFor v) t v
          , MonadTrace (LocationFor v) t v g m
          , MonadEnv (LocationFor v) v m
-         , MonadStore (LocationFor v) v m
+         , MonadStore v m
          , MonadGC (LocationFor v) v m
          )
        => (Eval' t m v -> Eval' t m v)

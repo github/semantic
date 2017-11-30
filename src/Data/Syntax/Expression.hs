@@ -32,7 +32,7 @@ instance ( Ord l
          , MonadFail m
          , Semigroup (Cell l (Value l t))
          , MonadEnv l (Value l t) m
-         , MonadStore l (Value l t) m
+         , MonadStore (Value l t) m
          , MonadAddress l m
          )
          => Eval t (Value l t) m Call where

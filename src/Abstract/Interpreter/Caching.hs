@@ -44,11 +44,11 @@ cacheInsert :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> (
 cacheInsert = (((Cache .) . (. unCache)) .) . (. point) . Map.insertWith (<>)
 
 
-type CachingInterpreter l t v = '[Fresh, Reader (Set.Set (Address l v)), Reader (Environment l v), Fail, NonDetEff, State (Store l v), Reader (Cache l t v), State (Cache l t v)]
+type CachingInterpreter t v = '[Fresh, Reader (Set.Set (Address (LocationFor v) v)), Reader (Environment (LocationFor v) v), Fail, NonDetEff, State (Store (LocationFor v) v), Reader (Cache (LocationFor v) t v), State (Cache (LocationFor v) t v)]
 
-type CachingResult l t v = Final (CachingInterpreter l t v) v
+type CachingResult t v = Final (CachingInterpreter t v) v
 
-type MonadCachingInterpreter l t v m = (MonadEnv l v m, MonadStore l v m, MonadCacheIn l t v m, MonadCacheOut l t v m, MonadGC l v m, Alternative m)
+type MonadCachingInterpreter t v m = (MonadEnv (LocationFor v) v m, MonadStore v m, MonadCacheIn (LocationFor v) t v m, MonadCacheOut (LocationFor v) t v m, MonadGC (LocationFor v) v m, Alternative m)
 
 
 
@@ -96,22 +96,22 @@ evalCache :: forall v syntax ann
             , Foldable (Cell (LocationFor v))
             , FreeVariables1 syntax
             , Functor syntax
-            , MonadAddress (LocationFor v) (Eff (CachingInterpreter (LocationFor v) (Term syntax ann) v))
+            , MonadAddress (LocationFor v) (Eff (CachingInterpreter (Term syntax ann) v))
             , Semigroup (Cell (LocationFor v) v)
             , ValueRoots (LocationFor v) v
-            , Eval (Term syntax ann) v (Eff (CachingInterpreter (LocationFor v) (Term syntax ann) v)) syntax
+            , Eval (Term syntax ann) v (Eff (CachingInterpreter (Term syntax ann) v)) syntax
             )
           => Term syntax ann
-          -> CachingResult (LocationFor v) (Term syntax ann) v
-evalCache e = run @(CachingInterpreter (LocationFor v) (Term syntax ann) v) (fixCache @(LocationFor v) (fix (evCache @(LocationFor v) (evCollect @(LocationFor v) (evRoots @(LocationFor v))))) pure e)
+          -> CachingResult (Term syntax ann) v
+evalCache e = run @(CachingInterpreter (Term syntax ann) v) (fixCache (fix (evCache (evCollect (evRoots)))) pure e)
 
 
-evCache :: forall l t v m
-        . ( Ord l
+evCache :: forall t v m
+        . ( Ord (LocationFor v)
           , Ord t
           , Ord v
-          , Ord (Cell l v)
-          , MonadCachingInterpreter l t v m
+          , Ord (Cell (LocationFor v) v)
+          , MonadCachingInterpreter t v m
           )
         => (Eval' t m v -> Eval' t m v)
         -> Eval' t m v
@@ -120,7 +120,7 @@ evCache ev0 ev' yield e = do
   env <- askEnv
   store <- getStore
   roots <- askRoots
-  let c = Configuration e (Set.toList roots) env store :: Configuration l t v
+  let c = Configuration e (Set.toList roots) env store :: Configuration (LocationFor v) t v
   out <- getCache
   case cacheLookup c out of
     Just pairs -> asum . flip map (toList pairs) $ \ (value, store') -> do
@@ -135,12 +135,12 @@ evCache ev0 ev' yield e = do
       modifyCache (cacheInsert c (v, store'))
       return v
 
-fixCache :: forall l t v m
-         . ( Ord l
+fixCache :: forall t v m
+         . ( Ord (LocationFor v)
            , Ord t
            , Ord v
-           , Ord (Cell l v)
-           , MonadCachingInterpreter l t v m
+           , Ord (Cell (LocationFor v) v)
+           , MonadCachingInterpreter t v m
            , MonadNonDet m
            , MonadFresh m
            )
@@ -150,9 +150,9 @@ fixCache ev' yield e = do
   env <- askEnv
   store <- getStore
   roots <- askRoots
-  let c = Configuration e (Set.toList roots) env store :: Configuration l t v
+  let c = Configuration e (Set.toList roots) env store :: Configuration (LocationFor v) t v
   pairs <- mlfp mempty (\ dollar -> do
-    putCache (mempty :: Cache l t v)
+    putCache (mempty :: Cache (LocationFor v) t v)
     putStore store
     reset 0
     _ <- localCache (const dollar) (collect point (ev' yield e) :: m (Set.Set v))
