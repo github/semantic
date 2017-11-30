@@ -6,6 +6,7 @@ import Abstract.Environment
 import Abstract.Eval
 import Abstract.FreeVariables
 import Abstract.Interpreter
+import Abstract.Monad.Env
 import Abstract.Store
 import Abstract.Type
 import Abstract.Value

@@ -2,10 +2,11 @@
 module Data.Syntax where
 
 import Abstract.Eval
-import Abstract.Value (LocationFor, AbstractValue(..))
 import Abstract.FreeVariables
+import Abstract.Monad.Env
 import Abstract.Environment
 import Abstract.Store
+import Abstract.Value (LocationFor, AbstractValue(..))
 import Control.Monad.Effect
 import Algorithm hiding (Empty)
 import Control.Applicative

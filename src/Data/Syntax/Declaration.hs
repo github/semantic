@@ -3,6 +3,7 @@ module Data.Syntax.Declaration where
 
 import Abstract.Environment
 import Abstract.Eval
+import Abstract.Monad.Env
 import Abstract.Store
 import Abstract.FreeVariables
 import Abstract.Type hiding (Type)

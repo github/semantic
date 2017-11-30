@@ -1,9 +1,10 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Syntax.Expression where
 
+import Abstract.Environment
 import Abstract.Eval
 import Abstract.Store
-import Abstract.Environment
+import Abstract.Monad.Env
 import Abstract.Value (Value, Closure(..))
 import Abstract.Type as Type
 import Abstract.FreeVariables

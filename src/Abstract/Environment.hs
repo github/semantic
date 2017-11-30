@@ -3,8 +3,6 @@ module Abstract.Environment where
 
 import Abstract.Address
 import Abstract.FreeVariables
-import Control.Monad.Effect
-import Control.Monad.Effect.Reader
 import Data.Functor.Classes
 import Data.Functor.Classes.Show.Generic
 import qualified Data.Map as Map
@@ -25,15 +23,6 @@ envInsert name value (Environment m) = Environment (Map.insert name value m)
 
 envRoots :: (Ord l, Foldable t) => Environment l a -> t Name -> Set.Set (Address l a)
 envRoots env = foldr ((<>) . maybe mempty point . flip envLookup env) mempty
-
-
-class Monad m => MonadEnv l value m where
-  askEnv :: m (Environment l value)
-  localEnv :: (Environment l value -> Environment l value) -> m b -> m b
-
-instance (Reader (Environment l value) :< fs) => MonadEnv l value (Eff fs) where
-  askEnv = ask
-  localEnv = local
 
 
 -- Instances

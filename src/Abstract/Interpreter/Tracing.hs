@@ -2,8 +2,8 @@
 module Abstract.Interpreter.Tracing where
 
 import Abstract.Configuration
-import Abstract.Environment
 import Abstract.Eval
+import Abstract.Monad.Env
 import Abstract.FreeVariables
 import Abstract.Interpreter
 import Abstract.Store

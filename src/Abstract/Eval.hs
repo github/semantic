@@ -7,6 +7,7 @@ module Abstract.Eval
 
 import Abstract.Environment
 import Abstract.FreeVariables
+import Abstract.Monad.Env
 import Abstract.Store
 import Abstract.Value
 import Control.Monad.Effect
