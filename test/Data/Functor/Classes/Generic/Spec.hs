@@ -41,7 +41,7 @@ spec = parallel $ do
       prop "equivalent to derived showsPrec for recursive types" $
         \ a -> genericLiftShowsPrec showsPrec showList 0 a "" `shouldBe` showsPrec 0 (a :: Tree Int) ""
 
-      prop "equivalent to derived showsPrec for record types" $
+      prop "equivalent to derived showsPrec for record selectors" $
         \ a -> genericLiftShowsPrec showsPrec showList 0 a "" `shouldBe` showsPrec 0 (a :: Record Int) ""
 
 
