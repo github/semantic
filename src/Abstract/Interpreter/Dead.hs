@@ -19,9 +19,9 @@ import Data.Set
 import Data.Term
 
 
-type DeadCodeInterpreter l t v = State (Dead t) ': Interpreter l v
+type DeadCodeInterpreter t v = State (Dead t) ': Interpreter v
 
-type DeadCodeResult l t v = Final (DeadCodeInterpreter l t v) v
+type DeadCodeResult t v = Final (DeadCodeInterpreter t v) v
 
 
 newtype Dead a = Dead { unDead :: Set a }
@@ -54,13 +54,13 @@ evalDead :: forall v syntax ann
            , Foldable syntax
            , FreeVariables1 syntax
            , Functor syntax
-           , Eval (Term syntax ann) v (Eff (DeadCodeInterpreter (LocationFor v) (Term syntax ann) v)) syntax
-           , MonadAddress (LocationFor v) (Eff (DeadCodeInterpreter (LocationFor v) (Term syntax ann) v))
+           , Eval (Term syntax ann) v (Eff (DeadCodeInterpreter (Term syntax ann) v)) syntax
+           , MonadAddress (LocationFor v) (Eff (DeadCodeInterpreter (Term syntax ann) v))
            , Semigroup (Cell (LocationFor v) v)
            )
          => Term syntax ann
-         -> DeadCodeResult (LocationFor v) (Term syntax ann) v
-evalDead e0 = run @(DeadCodeInterpreter (LocationFor v) (Term syntax ann) v) $ do
+         -> DeadCodeResult (Term syntax ann) v
+evalDead e0 = run @(DeadCodeInterpreter (Term syntax ann) v) $ do
   killAll (Dead (subterms e0))
   fix (evDead ev) pure e0
 

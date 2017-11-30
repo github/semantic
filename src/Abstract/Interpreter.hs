@@ -22,11 +22,11 @@ import Data.Term
 import Prelude hiding (fail)
 
 
-type Interpreter l v = '[Fresh, Fail, NonDetEff, State (Store l v), Reader (Set.Set (Address l v)), Reader (Environment l v)]
+type Interpreter v = '[Fresh, Fail, NonDetEff, State (Store (LocationFor v) v), Reader (Set.Set (Address (LocationFor v) v)), Reader (Environment (LocationFor v) v)]
 
 type MonadInterpreter v m = (MonadEnv v m, MonadStore v m, MonadFail m)
 
-type EvalResult l v = Final (Interpreter l v) v
+type EvalResult v = Final (Interpreter v) v
 
 type Eval' t m v = (v -> m v) -> t -> m v
 
@@ -39,12 +39,12 @@ evaluate :: forall v syntax ann
            , Functor syntax
            , Semigroup (Cell (LocationFor v) v)
            , FreeVariables1 syntax
-           , MonadAddress (LocationFor v) (Eff (Interpreter (LocationFor v) v))
-           , Eval (Term syntax ann) v (Eff (Interpreter (LocationFor v) v)) syntax
+           , MonadAddress (LocationFor v) (Eff (Interpreter v))
+           , Eval (Term syntax ann) v (Eff (Interpreter v)) syntax
            )
          => Term syntax ann
-         -> EvalResult (LocationFor v) v
-evaluate = run @(Interpreter (LocationFor v) v) . fix ev pure
+         -> EvalResult v
+evaluate = run @(Interpreter v) . fix ev pure
 
 ev ::
      ( Functor syntax
@@ -58,7 +58,7 @@ evCollect :: forall t v m
           .  ( Ord (LocationFor v)
              , Foldable (Cell (LocationFor v))
              , MonadStore v m
-             , MonadGC (LocationFor v) v m
+             , MonadGC v m
              , ValueRoots (LocationFor v) v
              )
           => (Eval' t m v -> Eval' t m v)
@@ -70,11 +70,11 @@ evCollect ev0 ev' yield e = do
   modifyStore (gc (roots <> valueRoots v))
   return v
 
-evRoots :: forall l v m syntax ann
-        .  ( Ord l
+evRoots :: forall v m syntax ann
+        .  ( Ord (LocationFor v)
            , MonadEnv v m
-           , MonadGC l v m
-           , ValueRoots l v
+           , MonadGC v m
+           , ValueRoots (LocationFor v) v
            , Eval (Term syntax ann) v m (TermF syntax ann)
            , FreeVariables1 syntax
            , Functor syntax
@@ -83,10 +83,10 @@ evRoots :: forall l v m syntax ann
         -> Eval' (Term syntax ann) m v
 evRoots ev' yield = eval ev' yield . unTerm
 
-gc :: (Ord l, Foldable (Cell l), ValueRoots l a) => Set.Set (Address l a) -> Store l a -> Store l a
+gc :: (Ord (LocationFor a), Foldable (Cell (LocationFor a)), ValueRoots (LocationFor a) a) => Set.Set (Address (LocationFor a) a) -> Store (LocationFor a) a -> Store (LocationFor a) a
 gc roots store = storeRestrict store (reachable roots store)
 
-reachable :: (Ord l, Foldable (Cell l), ValueRoots l a) => Set.Set (Address l a) -> Store l a -> Set.Set (Address l a)
+reachable :: (Ord (LocationFor a), Foldable (Cell (LocationFor a)), ValueRoots (LocationFor a) a) => Set.Set (Address (LocationFor a) a) -> Store (LocationFor a) a -> Set.Set (Address (LocationFor a) a)
 reachable roots store = go roots mempty
   where go set seen = case Set.minView set of
           Nothing -> seen

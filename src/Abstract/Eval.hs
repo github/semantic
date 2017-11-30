@@ -35,20 +35,20 @@ instance (Monad m, Eval t v m s) => Eval t v m (TermF s a) where
   eval ev yield In{..} = eval ev yield termOut
 
 
-class Monad m => MonadGC l a m where
-  askRoots :: m (Set.Set (Address l a))
+class Monad m => MonadGC a m where
+  askRoots :: m (Set.Set (Address (LocationFor a) a))
 
-  extraRoots :: Set.Set (Address l a) -> m b -> m b
+  extraRoots :: Set.Set (Address (LocationFor a) a) -> m b -> m b
 
-instance (Ord l, Reader (Set.Set (Address l a)) :< fs) => MonadGC l a (Eff fs) where
-  askRoots = ask :: Eff fs (Set.Set (Address l a))
+instance (Ord (LocationFor a), Reader (Set.Set (Address (LocationFor a) a)) :< fs) => MonadGC a (Eff fs) where
+  askRoots = ask :: Eff fs (Set.Set (Address (LocationFor a) a))
 
   extraRoots roots' = local (<> roots')
 
 
 instance ( Monad m
          , Ord (LocationFor v)
-         , MonadGC (LocationFor v) v m
+         , MonadGC v m
          , MonadEnv v m
          , AbstractValue v
          , FreeVariables t

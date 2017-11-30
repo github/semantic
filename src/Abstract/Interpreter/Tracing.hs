@@ -20,16 +20,16 @@ import qualified Data.Set as Set
 import Data.Term
 import GHC.Exts (IsList(..))
 
-type TracingInterpreter l t v g = Reader (Set.Set (Address l v)) ': Writer (g (Configuration l t v)) ': Interpreter l v
+type TracingInterpreter t v g = Reader (Set.Set (Address (LocationFor v) v)) ': Writer (g (Configuration (LocationFor v) t v)) ': Interpreter v
 
-type TraceInterpreter l t v = TracingInterpreter l t v []
-type ReachableStateInterpreter l t v = TracingInterpreter l t v Set.Set
+type TraceInterpreter t v = TracingInterpreter t v []
+type ReachableStateInterpreter t v = TracingInterpreter t v Set.Set
 
 
-class Monad m => MonadTrace l t v g m where
-  trace :: g (Configuration l t v) -> m ()
+class Monad m => MonadTrace t v g m where
+  trace :: g (Configuration (LocationFor v) t v) -> m ()
 
-instance (Writer (g (Configuration l t v)) :< fs) => MonadTrace l t v g (Eff fs) where
+instance (Writer (g (Configuration (LocationFor v) t v)) :< fs) => MonadTrace t v g (Eff fs) where
   trace = tell
 
 -- Tracing and reachable state analyses
@@ -42,34 +42,34 @@ evalTrace :: forall v syntax ann
           . ( Ord v, Ord ann, Ord1 syntax, Ord (Cell (LocationFor v) v)
             , FreeVariables1 syntax
             , Functor syntax
-            , MonadAddress (LocationFor v) (Eff (TraceInterpreter (LocationFor v) (Term syntax ann) v))
-            , MonadGC (LocationFor v) v (Eff (TraceInterpreter (LocationFor v) (Term syntax ann) v))
+            , MonadAddress (LocationFor v) (Eff (TraceInterpreter (Term syntax ann) v))
+            , MonadGC v (Eff (TraceInterpreter (Term syntax ann) v))
             , Semigroup (Cell (LocationFor v) v)
-            , Eval (Term syntax ann) v (Eff (TraceInterpreter (LocationFor v) (Term syntax ann) v)) syntax
+            , Eval (Term syntax ann) v (Eff (TraceInterpreter (Term syntax ann) v)) syntax
             )
-          => Term syntax ann -> Final (TracingInterpreter (LocationFor v) (Term syntax ann) v []) v
-evalTrace = run @(TraceInterpreter (LocationFor v) (Term syntax ann) v) . fix (evTell @[] ev) pure
+          => Term syntax ann -> Final (TracingInterpreter (Term syntax ann) v []) v
+evalTrace = run @(TraceInterpreter (Term syntax ann) v) . fix (evTell @[] ev) pure
 
 evalReach :: forall v syntax ann
           . ( Ord v, Ord ann, Ord (LocationFor v), Ord (Cell (LocationFor v) v), Ord1 syntax
             , FreeVariables1 syntax
             , Functor syntax
-            , MonadAddress (LocationFor v) (Eff (ReachableStateInterpreter (LocationFor v) (Term syntax ann) v))
-            , MonadGC (LocationFor v) v (Eff (ReachableStateInterpreter (LocationFor v) (Term syntax ann) v))
+            , MonadAddress (LocationFor v) (Eff (ReachableStateInterpreter (Term syntax ann) v))
+            , MonadGC v (Eff (ReachableStateInterpreter (Term syntax ann) v))
             , Semigroup (Cell (LocationFor v) v)
-            , Eval (Term syntax ann) v (Eff (ReachableStateInterpreter (LocationFor v) (Term syntax ann) v)) syntax
+            , Eval (Term syntax ann) v (Eff (ReachableStateInterpreter (Term syntax ann) v)) syntax
             )
-          => Term syntax ann -> Final (TracingInterpreter (LocationFor v) (Term syntax ann) v Set.Set) v
-evalReach = run @(ReachableStateInterpreter (LocationFor v) (Term syntax ann) v) . fix (evTell @Set.Set ev) pure
+          => Term syntax ann -> Final (TracingInterpreter (Term syntax ann) v Set.Set) v
+evalReach = run @(ReachableStateInterpreter (Term syntax ann) v) . fix (evTell @Set.Set ev) pure
 
 
 evTell :: forall g t m v
        . ( IsList (g (Configuration (LocationFor v) t v))
          , Item (g (Configuration (LocationFor v) t v)) ~ Configuration (LocationFor v) t v
-         , MonadTrace (LocationFor v) t v g m
+         , MonadTrace t v g m
          , MonadEnv v m
          , MonadStore v m
-         , MonadGC (LocationFor v) v m
+         , MonadGC v m
          )
        => (Eval' t m v -> Eval' t m v)
        -> Eval' t m v

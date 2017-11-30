@@ -49,7 +49,7 @@ type CachingInterpreter t v = '[Fresh, Reader (Set.Set (Address (LocationFor v) 
 
 type CachingResult t v = Final (CachingInterpreter t v) v
 
-type MonadCachingInterpreter t v m = (MonadEnv v m, MonadStore v m, MonadCacheIn (LocationFor v) t v m, MonadCacheOut (LocationFor v) t v m, MonadGC (LocationFor v) v m, Alternative m)
+type MonadCachingInterpreter t v m = (MonadEnv v m, MonadStore v m, MonadCacheIn (LocationFor v) t v m, MonadCacheOut (LocationFor v) t v m, MonadGC v m, Alternative m)
 
 
 

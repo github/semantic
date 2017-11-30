@@ -142,7 +142,7 @@ instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 
 instance ( Monad m
          , Ord (LocationFor v)
-         , MonadGC (LocationFor v) v m
+         , MonadGC v m
          , MonadEnv v m
          , AbstractValue v
          , FreeVariables t

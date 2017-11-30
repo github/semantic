@@ -50,7 +50,7 @@ instance ( Ord l
 -- TODO: extraRoots for evalCollect
 instance ( MonadFail m
          , MonadFresh m
-         , MonadGC Monovariant Type m
+         , MonadGC Type m
          , MonadEnv Type m
          , FreeVariables t
          )
