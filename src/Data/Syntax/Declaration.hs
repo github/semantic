@@ -55,7 +55,6 @@ instance ( Alternative m
          , MonadFresh m
          , MonadEnv Monovariant Type m
          , MonadStore Monovariant Type m
-         -- , MonadAddress Monovariant m
          , FreeVariables t
          )
          => Eval t Type m Function where
@@ -69,7 +68,7 @@ instance ( Alternative m
       pure (name, a, tvar)
 
     outTy <- localEnv (const (foldr (\ (n, a, _) -> envInsert n a) env tvars)) (recur pure functionBody)
-    let tvars' = fmap (\(_, _, t) -> t) tvars
+    let tvars' = fmap (\(_, _, t) -> TVar t) tvars
     let v = TArr tvars' :-> outTy
 
     let [name] = toList (freeVariables functionName)
