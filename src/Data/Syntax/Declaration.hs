@@ -2,7 +2,6 @@
 module Data.Syntax.Declaration where
 
 import Abstract.Store
-import Abstract.Value
 import Analysis.Abstract.Eval
 import Control.Applicative
 import Control.Monad.Effect.Env
@@ -11,6 +10,7 @@ import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type hiding (Type)
 import qualified Data.Abstract.Type as Type
+import Data.Abstract.Value
 import Data.Align.Generic
 import Data.Foldable (toList)
 import Data.Functor.Classes.Eq.Generic

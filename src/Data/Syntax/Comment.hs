@@ -1,9 +1,9 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses #-}
 module Data.Syntax.Comment where
 
-import Abstract.Value as Value
 import Analysis.Abstract.Eval
 import Data.Abstract.FreeVariables
+import Data.Abstract.Value as Value
 import Data.Align.Generic
 import Data.ByteString (ByteString)
 import Data.Functor.Classes.Eq.Generic

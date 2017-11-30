@@ -1,5 +1,5 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, FunctionalDependencies, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
-module Abstract.Value where
+module Data.Abstract.Value where
 
 import Data.Abstract.Address
 import Data.Abstract.Environment
@@ -14,14 +14,15 @@ import Data.Semigroup
 import qualified Data.Set as Set
 import Data.Union
 import GHC.Generics
-import Prelude hiding (fail)
+import Prelude hiding (Integer, String, fail)
+import qualified Prelude
 
 type ValueConstructors location
   = '[Closure location
-    , Abstract.Value.Unit
-    , Abstract.Value.Boolean
-    , Abstract.Value.Integer
-    , Abstract.Value.String
+    , Unit
+    , Boolean
+    , Integer
+    , String
     ]
 
 type Value location = Union (ValueConstructors location)
@@ -50,16 +51,16 @@ instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 data Integer term = Integer Prelude.Integer
   deriving (Eq, Generic1, Ord, Show)
 
-instance Eq1 Abstract.Value.Integer where liftEq = genericLiftEq
-instance Ord1 Abstract.Value.Integer where liftCompare = genericLiftCompare
-instance Show1 Abstract.Value.Integer where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 Integer where liftEq = genericLiftEq
+instance Ord1 Integer where liftCompare = genericLiftCompare
+instance Show1 Integer where liftShowsPrec = genericLiftShowsPrec
 
 data String term = String ByteString
   deriving (Eq, Generic1, Ord, Show)
 
-instance Eq1 Abstract.Value.String where liftEq = genericLiftEq
-instance Ord1 Abstract.Value.String where liftCompare = genericLiftCompare
-instance Show1 Abstract.Value.String where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 String where liftEq = genericLiftEq
+instance Ord1 String where liftCompare = genericLiftCompare
+instance Show1 String where liftShowsPrec = genericLiftShowsPrec
 
 
 type family LocationFor value :: * where
@@ -85,9 +86,9 @@ instance (FreeVariables term, Ord location) => ValueRoots location (Value locati
 
 instance AbstractValue (Value location term) where
   unit = inj Unit
-  integer = inj . Abstract.Value.Integer
+  integer = inj . Integer
   boolean = inj . Boolean
-  string = inj . Abstract.Value.String
+  string = inj . String
 
 instance ValueRoots Monovariant Type.Type where
   valueRoots _ = mempty

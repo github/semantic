@@ -2,13 +2,13 @@
 module Data.Syntax.Expression where
 
 import Abstract.Store
-import Abstract.Value (Value, Closure(..))
 import Analysis.Abstract.Eval
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fresh
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type as Type
+import Data.Abstract.Value (Value, Closure(..))
 import Data.Maybe
 import Data.Union
 import Data.Semigroup

@@ -3,7 +3,6 @@ module Abstract.Interpreter.Caching where
 
 import Abstract.Interpreter
 import Abstract.Store
-import Abstract.Value
 import Analysis.Abstract.Eval
 import Control.Applicative
 import Control.Effect
@@ -17,6 +16,7 @@ import Control.Monad.Effect.State
 import Data.Abstract.Configuration
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
+import Data.Abstract.Value
 import Data.Foldable
 import Data.Function (fix)
 import Data.Functor.Classes

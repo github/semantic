@@ -17,7 +17,6 @@ module Abstract.Store
 , modifyStore
 ) where
 
-import Abstract.Value
 import Control.Applicative
 import Control.Monad ((<=<))
 import Control.Monad.Effect
@@ -26,6 +25,7 @@ import Control.Monad.Fail
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
+import Data.Abstract.Value
 import Data.Foldable (asum, toList)
 import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic

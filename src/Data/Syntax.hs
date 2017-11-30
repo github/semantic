@@ -2,7 +2,6 @@
 module Data.Syntax where
 
 import Abstract.Store
-import Abstract.Value (LocationFor, AbstractValue(..))
 import Analysis.Abstract.Eval
 import qualified Assigning.Assignment as Assignment
 import Control.Monad.Effect
@@ -11,6 +10,7 @@ import Control.Applicative
 import Control.Monad.Error.Class hiding (Error)
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
+import Data.Abstract.Value (LocationFor, AbstractValue(..))
 import Data.Align.Generic
 import Data.AST
 import Data.ByteString (ByteString)

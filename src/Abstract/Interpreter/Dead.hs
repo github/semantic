@@ -3,12 +3,12 @@ module Abstract.Interpreter.Dead where
 
 import Abstract.Interpreter
 import Abstract.Store
-import Abstract.Value
 import Analysis.Abstract.Eval
 import Control.Effect
 import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.State
 import Data.Abstract.FreeVariables
+import Data.Abstract.Value
 import Data.Function (fix)
 import Data.Functor.Foldable
 import Data.Functor.Classes

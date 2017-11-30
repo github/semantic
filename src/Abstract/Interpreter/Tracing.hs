@@ -3,7 +3,6 @@ module Abstract.Interpreter.Tracing where
 
 import Abstract.Interpreter
 import Abstract.Store
-import Abstract.Value
 import Analysis.Abstract.Eval
 import Control.Effect
 import Control.Monad.Effect hiding (run)
@@ -12,6 +11,7 @@ import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Writer
 import Data.Abstract.Configuration
 import Data.Abstract.FreeVariables
+import Data.Abstract.Value
 import Data.Function (fix)
 import Data.Functor.Classes (Ord1)
 import Data.Semigroup
