@@ -1,6 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Abstract.Address where
 
+import Abstract.FreeVariables
 import Data.Functor.Classes
 
 newtype Address l a = Address { unAddress :: l }
@@ -33,3 +34,10 @@ instance Show2 Address where
 
 instance Show l => Show1 (Address l) where
   liftShowsPrec = liftShowsPrec2 showsPrec showList
+
+
+newtype Precise = Precise { unPrecise :: Int }
+  deriving (Eq, Ord, Show)
+
+newtype Monovariant = Monovariant { unMonovariant :: Name }
+  deriving (Eq, Ord, Show)

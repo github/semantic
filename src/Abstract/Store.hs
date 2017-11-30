@@ -76,9 +76,6 @@ class (Ord l, Pointed (Cell l), Monad m) => MonadAddress l m where
   alloc :: MonadStore l a m => Name -> m (Address l a)
 
 
-newtype Precise = Precise { unPrecise :: Int }
-  deriving (Eq, Ord, Show)
-
 allocPrecise :: Store Precise a -> Address Precise a
 allocPrecise = Address . Precise . storeSize
 
@@ -92,9 +89,6 @@ instance Monad m => MonadAddress Precise m where
 
   alloc _ = fmap allocPrecise getStore
 
-
-newtype Monovariant = Monovariant { unMonovariant :: Name }
-  deriving (Eq, Ord, Show)
 
 instance (Alternative m, Monad m) => MonadAddress Monovariant m where
   type Cell Monovariant = Set.Set
