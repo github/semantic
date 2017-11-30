@@ -373,11 +373,11 @@ fallThroughStatement :: Assignment
 fallThroughStatement = makeTerm <$> symbol FallthroughStatement <*> (Statement.Pattern <$> (makeTerm <$> location <*> (Syntax.Identifier <$> source)) <*> emptyTerm)
 
 functionDeclaration :: Assignment
-functionDeclaration =  mkTypedFunctionDeclaration <$> symbol FunctionDeclaration <*> children ((,,,) <$> expression <*> manyTerm parameters <*> optional (types <|> identifier <|> returnParameters) <*> optional block)
-                   <|> mkTypedFunctionLiteral     <$> symbol FuncLiteral         <*> children ((,,,) <$> emptyTerm  <*> manyTerm parameters <*> optional (types <|> identifier <|> returnParameters) <*> block)
+functionDeclaration =  makeTerm <$> symbol FunctionDeclaration <*> children (mkTypedFunctionDeclaration <$> location <*> expression <*> manyTerm parameters <*> optional (types <|> identifier <|> returnParameters) <*> optional block)
+                   <|> makeTerm <$> symbol FuncLiteral         <*> children (mkTypedFunctionLiteral     <$> location <*> emptyTerm  <*> manyTerm parameters <*> optional (types <|> identifier <|> returnParameters) <*> block)
   where
-    mkTypedFunctionDeclaration loc (name', params', types', block') = makeTerm loc (Declaration.Function [(maybe (makeTerm loc Syntax.Empty) id types')] name' params' (maybe (makeTerm loc Syntax.Empty) id block'))
-    mkTypedFunctionLiteral     loc (name', params', types', block') = makeTerm loc (Declaration.Function [(maybe (makeTerm loc Syntax.Empty) id types')] name' params' block')
+    mkTypedFunctionDeclaration loc name' params' types' block' = Declaration.Function [(maybe (makeTerm loc Syntax.Empty) id types')] name' params' (maybe (makeTerm loc Syntax.Empty) id block')
+    mkTypedFunctionLiteral     loc name' params' types' block' = Declaration.Function [(maybe (makeTerm loc Syntax.Empty) id types')] name' params' block'
     returnParameters = makeTerm <$> symbol Parameters <*> children (manyTerm expression)
 
 importDeclaration :: Assignment
@@ -390,10 +390,10 @@ indexExpression :: Assignment
 indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)
 
 methodDeclaration :: Assignment
-methodDeclaration = mkTypedMethodDeclaration <$> symbol MethodDeclaration <*> children ((,,,,) <$> receiver <*> fieldIdentifier <*> manyTerm parameters <*> ((makeTerm <$> location <*> (manyTermsTill expression (void (symbol Block)))) <|> emptyTerm) <*> (block <|> emptyTerm))
+methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> fieldIdentifier <*> manyTerm parameters <*> ((makeTerm <$> location <*> (manyTermsTill expression (void (symbol Block)))) <|> emptyTerm) <*> (block <|> emptyTerm))
   where
     receiver = symbol Parameters *> children ((symbol ParameterDeclaration *> children expressions) <|> expressions)
-    mkTypedMethodDeclaration loc (receiver', name', parameters', type'', body') = makeTerm loc (Declaration.Method [type''] receiver' name' parameters' body')
+    mkTypedMethodDeclaration receiver' name' parameters' type'' body' = Declaration.Method [type''] receiver' name' parameters' body'
 
 methodSpec :: Assignment
 methodSpec =  makeTerm <$> symbol MethodSpec <*> children (mkMethodSpec <$> expression <*> parameters <*> expression)
