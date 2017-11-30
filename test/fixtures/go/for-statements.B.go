@@ -21,4 +21,14 @@ for  {
 a(x)
 break
 }
+for s, i := range b {
+	g(i, s)
+}
+for k, v = range m {
+	h(k, v)
+}
+for 2 < 1 {
+  j()
+}
+for range b {}
 }

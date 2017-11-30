@@ -33,10 +33,11 @@ type Syntax = '[
   , Declaration.Class
   , Declaration.Function
   , Declaration.Method
+  , Declaration.MethodSignature
   , Declaration.InterfaceDeclaration
   , Declaration.PublicFieldDefinition
   , Declaration.VariableDeclaration
-  , Declaration.TypeAliasDeclaration
+  , Declaration.TypeAlias
   , Declaration.Import
   , Declaration.Module
   , Expression.Arithmetic
@@ -115,7 +116,6 @@ type Syntax = '[
   , TypeScript.Syntax.IndexTypeQuery
   , TypeScript.Syntax.ThisType
   , TypeScript.Syntax.ExistentialType
-  , TypeScript.Syntax.MethodSignature
   , TypeScript.Syntax.AbstractMethodSignature
   , TypeScript.Syntax.IndexSignature
   , TypeScript.Syntax.ObjectType
@@ -428,7 +428,7 @@ indexSignature = makeTerm <$> symbol Grammar.IndexSignature <*> children (TypeSc
 
 methodSignature :: Assignment
 methodSignature = makeMethodSignature <$> symbol Grammar.MethodSignature <*> children ((,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> callSignatureParts)
-  where makeMethodSignature loc (modifier, readonly, propertyName, (typeParams, params, annotation)) = makeTerm loc (TypeScript.Syntax.MethodSignature [modifier, readonly, typeParams, annotation] propertyName params)
+  where makeMethodSignature loc (modifier, readonly, propertyName, (typeParams, params, annotation)) = makeTerm loc (Declaration.MethodSignature [modifier, readonly, typeParams, annotation] propertyName params)
 
 formalParameters :: Assignment.Assignment [] Grammar [Term]
 formalParameters = symbol FormalParameters *> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term parameter)) <*> many comment))
@@ -657,7 +657,7 @@ declaration = everything
 
 typeAliasDeclaration :: Assignment
 typeAliasDeclaration = makeTypeAliasDecl <$> symbol Grammar.TypeAliasDeclaration <*> children ((,,) <$> term identifier <*> (term typeParameters <|> emptyTerm) <*> term ty)
-  where makeTypeAliasDecl loc (identifier, typeParams, body) = makeTerm loc (Declaration.TypeAliasDeclaration [typeParams] identifier body)
+  where makeTypeAliasDecl loc (identifier, typeParams, body) = makeTerm loc (Declaration.TypeAlias [typeParams] identifier body)
 
 enumDeclaration :: Assignment
 enumDeclaration = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (TypeScript.Syntax.EnumDeclaration <$> term identifier <*> (symbol EnumBody *> children (manyTerm (propertyName <|> enumAssignment))))

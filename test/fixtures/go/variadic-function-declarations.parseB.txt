@@ -2,23 +2,35 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args))
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    ([]))
   (Function
-    (Identifier)
-    (Args
-      (Other "variadic_parameter_declaration"
-        (Identifier)
-        (PointerTy
-          (Identifier)))))
+    (Empty)
+    (
+      (Identifier))
+    (Variadic
+      (Pointer
+        (Identifier))
+      (Identifier))
+    ([]))
   (Function
-    (Identifier)
-    (Args
-      (Other "variadic_parameter_declaration"
-        (Identifier))))
-  (Function
-    (Identifier)
-    (Args
+    (Empty)
+    (
+      (Identifier))
+    (Variadic
       (Identifier)
-      (Other "variadic_parameter_declaration"
-        (Identifier)))))
+      (Empty))
+    ([]))
+  (Function
+    (Empty)
+    (
+      (Identifier))
+    (
+      (Identifier)
+      (Variadic
+        (Identifier)
+        (Empty)))
+    ([])))

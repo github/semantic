@@ -2,7 +2,12 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (IncrementStatement)
-    (DecrementStatement)))
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (
+      (PostIncrement
+        (Identifier))
+      (PostDecrement
+        (Identifier)))))

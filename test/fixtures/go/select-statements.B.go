@@ -8,7 +8,16 @@ select {
     println(5)
   case <-time.After(2):
     println(6)
+  	n++
+  	if v {
+  		waitDone <- result{n, v}
+  		return
+  	}
   default:
     return
+}
+select {
+case <-channel:
+case <-timeout:
 }
 }

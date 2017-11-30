@@ -2,15 +2,17 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (Other "type_declaration"
-      (TypeDecl
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (
+      (Type
         (Identifier)
-        (PointerTy
+        (Pointer
           (Identifier)))
-      (TypeDecl
+      (Type
         (Identifier)
-        (PointerTy
-          (PointerTy
+        (Pointer
+          (Pointer
             (Identifier)))))))

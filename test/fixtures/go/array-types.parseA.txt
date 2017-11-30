@@ -2,14 +2,34 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (Other "type_declaration"
-      (TypeDecl
-        (Identifier)
-        (ArrayTy
-          (RelationalOperator
-            (NumberLiteral)
-            (Other "+")
-            (NumberLiteral))
-          (Identifier))))))
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (
+      (
+        (Type
+          (Identifier)
+          (Array
+            (Plus
+              (Integer)
+              (Integer))
+            (Identifier))))
+      (
+        (Type
+          (Identifier)
+          (Array
+            (Integer)
+            (Array
+              (Integer)
+              (Identifier)))))
+      (
+        (Type
+          (Identifier)
+          (Array
+            (Integer)
+            (Array
+              (Integer)
+              (Array
+                (Integer)
+                (Identifier)))))))))

@@ -2,19 +2,23 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (VarDecl
-      (Other "expression_list"
-        (Identifier))
-      (Other "expression_list"
-        (Operator
-          (Other "composite_literal"
-            (Identifier)
-            (Pair
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (Assignment
+      (Identifier)
+      (Reference
+        (Composite
+          (Identifier)
+          (
+            (KeyValue
             { (Identifier)
             ->(Identifier) }
-            { (FunctionCall
+            { (Call
               {-(Identifier)-}
-              {-(QualifiedType)-})
+              {-(MemberAccess
+                {-(Identifier)-}
+                {-(Identifier)-})-}
+              {-(Empty)-})
             ->(Identifier) })))))))

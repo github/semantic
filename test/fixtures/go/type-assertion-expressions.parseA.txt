@@ -2,8 +2,12 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
+    (Empty)
+    (
+      (Identifier))
+    ([])
     (TypeAssertion
       (Identifier)
-      (QualifiedType))))
+      (MemberAccess
+        (Identifier)
+        (Identifier)))))

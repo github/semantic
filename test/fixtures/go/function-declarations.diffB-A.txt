@@ -2,40 +2,98 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    ([]))
+  (Function
+    (Empty)
+    (
+    { (Identifier)
+    ->(Identifier) })
+    ([])
+    ([]))
+  (Function
     (Identifier)
-    (Args))
-  (Function
-  { (Identifier)
-  ->(Identifier) }
-    (Args))
-  (Function
-  { (Identifier)
-  ->(Identifier) }
-    (Args
-      (ParameterDecl
+    (
+    { (Identifier)
+    ->(Identifier) })
+    (
+      (
         (Identifier)
         (Identifier))
       (Identifier)
       (Identifier)
-      (ParameterDecl
+      (
         (Identifier)
         (Identifier)))
-    (Identifier))
+    ([]))
   (Function
-  { (Identifier)
-  ->(Identifier) }
-    (Args)
-    (Args
+    (Empty)
+    (
+    { (Identifier)
+    ->(Identifier) })
+    ([])
+    (
       (Identifier)
-      (Identifier)))
+      (Identifier))
+    ([]))
   (Function
-  { (Identifier)
-  ->(Identifier) }
-    (Args)
-    (Args
-      (ParameterDecl
+    (Empty)
+    (
+    { (Identifier)
+    ->(Identifier) })
+    ([])
+    (
+      (
         (Identifier)
         (Identifier))
-      (ParameterDecl
+      (
         (Identifier)
-        (Identifier)))))
+        (Identifier)))
+    ([]))
+{+(Function
+  {+(Identifier)+}
+  {+(
+    {+(Identifier)+})+}
+  {+([])+}
+  {+(Empty)+})+}
+{+(Function
+  {+(Empty)+}
+  {+(
+    {+(Identifier)+})+}
+  {+(
+    {+(Identifier)+}
+    {+(Pointer
+      {+(Identifier)+})+})+}
+  {+(Context
+    {+(Comment)+}
+    {+(Empty)+})+}
+  {+([])+})+}
+{-(Function
+  {-(Empty)-}
+  {-(
+    {-(Identifier)-})-}
+  {-([])-}
+  {-([])-}
+  {-(NoOp
+    {-(Empty)-})-})-}
+{-(Function
+  {-(Identifier)-}
+  {-(
+    {-(Identifier)-})-}
+  {-([])-}
+  {-(Empty)-})-}
+{-(Function
+  {-(Empty)-}
+  {-(
+    {-(Identifier)-})-}
+  {-(
+    {-(Identifier)-}
+    {-(Pointer
+      {-(Identifier)-})-})-}
+  {-(Context
+    {-(Comment)-}
+    {-(Empty)-})-}
+  {-([])-})-})

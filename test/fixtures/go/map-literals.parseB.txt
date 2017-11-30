@@ -2,19 +2,20 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (Other "const_declaration"
-      (VarAssignment
-        (Identifier)
-        (Other "expression_list"
-          (Other "composite_literal"
-            (DictionaryTy
-              (Identifier)
-              (Identifier))
-            (Pair
-              (StringLiteral)
-              (StringLiteral))
-            (Pair
-              (StringLiteral)
-              (StringLiteral))))))))
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (Assignment
+      (Identifier)
+      (Composite
+        (Map
+          (Identifier)
+          (Identifier))
+        (
+          (KeyValue
+            (TextElement)
+            (TextElement))
+          (KeyValue
+            (TextElement)
+            (TextElement)))))))
