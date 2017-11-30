@@ -3,13 +3,15 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     ([]))
   (Function
     (Empty)
-  { (Identifier)
-  ->(Identifier) }
+    (
+    { (Identifier)
+    ->(Identifier) })
     (Variadic
       (Pointer
         (Identifier))
@@ -17,16 +19,18 @@
     ([]))
   (Function
     (Empty)
-  { (Identifier)
-  ->(Identifier) }
+    (
+    { (Identifier)
+    ->(Identifier) })
     (Variadic
       (Identifier)
       (Empty))
     ([]))
   (Function
     (Empty)
-  { (Identifier)
-  ->(Identifier) }
+    (
+    { (Identifier)
+    ->(Identifier) })
     (
       (Identifier)
       (Variadic

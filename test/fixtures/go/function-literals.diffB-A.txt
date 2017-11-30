@@ -3,13 +3,14 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     (Assignment
       (Identifier)
       (Function
         (Empty)
-        (Empty)
+        ([])
         (
         { (Identifier)
         ->(Identifier) }

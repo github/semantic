@@ -11,6 +11,7 @@
       (TextElement)))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     ([])))
