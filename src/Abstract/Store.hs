@@ -28,10 +28,11 @@ import qualified Data.Map as Map
 import Data.Pointed
 import Data.Semigroup
 import qualified Data.Set as Set
+import GHC.Generics
 import Prelude hiding (fail)
 
 newtype Store l a = Store { unStore :: Map.Map l (Cell l a) }
-  deriving (Semigroup, Monoid)
+  deriving (Generic1, Monoid, Semigroup)
 
 storeLookup :: Ord l => Address l a -> Store l a -> Maybe (Cell l a)
 storeLookup = (. unStore) . Map.lookup . unAddress
