@@ -2,26 +2,26 @@
 {-# LANGUAGE DataKinds, MonoLocalBinds, TypeOperators #-}
 module Semantic.Util where
 
+import Analysis.Declaration
 import Control.Monad.IO.Class
-import Data.Blob
-import Files
-import Data.Record
-import Data.Functor.Classes
-import Algorithm
 import Data.Align.Generic
-import Interpreter
-import Parser
-import Data.Functor.Both
-import Data.Term
+import Data.Blob
 import Data.Diff
-import Semantic
-import Semantic.Task
-import Renderer.TOC
+import Data.Functor.Both
+import Data.Functor.Classes
 import Data.Range
+import Data.Record
 import Data.Span
+import Data.Term
+import Diffing.Algorithm
+import Diffing.Interpreter
+import Parsing.Parser
+import Semantic
+import Semantic.IO as IO
+import Semantic.Task
 
 file :: MonadIO m => FilePath -> m Blob
-file path = Files.readFile path (languageForFilePath path)
+file path = IO.readFile path (languageForFilePath path)
 
 diffWithParser :: (HasField fields Data.Span.Span,
                    HasField fields Range,

@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric #-}
 module Data.Syntax.Literal where
 
-import Algorithm
+import Diffing.Algorithm
 import Data.Align.Generic
 import Data.ByteString (ByteString)
 import Data.Functor.Classes.Eq.Generic
