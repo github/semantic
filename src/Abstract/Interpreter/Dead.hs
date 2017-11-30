@@ -8,15 +8,12 @@ import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.Dead
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Store
-import Data.Abstract.FreeVariables
 import Data.Abstract.Value
 import Data.Function (fix)
 import Data.Functor.Foldable
-import Data.Functor.Classes
 import Data.Pointed
 import Data.Semigroup
 import Data.Set
-import Data.Term
 
 
 type DeadCodeInterpreter t v = State (Dead t) ': Interpreter v
@@ -33,22 +30,20 @@ subterms term = para (foldMap (uncurry ((<>) . point))) term <> point term
 -- Example:
 --    evalDead @(Value Syntax Precise) <term>
 
-evalDead :: forall v syntax ann
+evalDead :: forall v term
          . ( Ord v
-           , Ord ann
-           , Ord1 syntax
-           , Foldable syntax
-           , FreeVariables1 syntax
-           , Functor syntax
-           , Eval (Term syntax ann) v (Eff (DeadCodeInterpreter (Term syntax ann) v)) syntax
-           , MonadAddress (LocationFor v) (Eff (DeadCodeInterpreter (Term syntax ann) v))
+           , Ord term
+           , Foldable (Base term)
+           , Recursive term
+           , Eval term v (Eff (DeadCodeInterpreter term v)) (Base term)
+           , MonadAddress (LocationFor v) (Eff (DeadCodeInterpreter term v))
            , Semigroup (Cell (LocationFor v) v)
            )
-         => Term syntax ann
-         -> DeadCodeResult (Term syntax ann) v
-evalDead e0 = run @(DeadCodeInterpreter (Term syntax ann) v) $ do
+         => term
+         -> DeadCodeResult term v
+evalDead e0 = run @(DeadCodeInterpreter term v) $ do
   killAll (Dead (subterms e0))
-  fix (evDead ev) pure e0
+  fix (evDead (\ recur yield -> eval recur yield . project)) pure e0
 
 evDead :: (Ord t, MonadDead t m)
        => (Eval' t m v -> Eval' t m v)
