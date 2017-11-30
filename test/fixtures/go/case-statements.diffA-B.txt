@@ -2,12 +2,43 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (Switch
-    {+(Case
-      {+(Case
-        {+(Other "expression_list"
-          {+(Identifier)+})+})+}
-      {+(FunctionCall
-        {+(Identifier)+})+})+})))
+    (Empty)
+    (
+      (Identifier))
+    ([])
+  { (Match
+    {-(Empty)-}
+    {-([])-})
+  ->(
+    {+(Match
+      {+([])+}
+      {+(Pattern
+        {+(Identifier)+}
+        {+(Call
+          {+(Identifier)+}
+          {+(Empty)+})+})+})+}
+    {+(Match
+      {+(
+        {+(Identifier)+})+}
+      {+(
+        {+(Pattern
+          {+(
+            {+(Integer)+}
+            {+(Integer)+})+}
+          {+(
+            {+(Call
+              {+(Identifier)+}
+              {+(Empty)+})+}
+            {+(Call
+              {+(Identifier)+}
+              {+(Empty)+})+}
+            {+(Pattern
+              {+(Identifier)+}
+              {+(Empty)+})+})+})+}
+        {+(DefaultPattern
+          {+(
+            {+(Call
+              {+(Identifier)+}
+              {+(Empty)+})+}
+            {+(Break
+              {+(Empty)+})+})+})+})+})+}) }))

@@ -2,16 +2,44 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (Other "type_declaration"
-      (TypeDecl
-        (Identifier)
-        (Identifier)))
-    (Other "type_declaration"
-      (TypeDecl
-        (Identifier)
-        (Identifier))
-      (TypeDecl
-        (Identifier)
-        (Identifier)))))
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (
+      (
+        (Type
+          (Identifier)
+          (Identifier)))
+      (
+        (Type
+          (Identifier)
+          (Identifier))
+        (Type
+          (Identifier)
+          (Identifier)))
+      (
+        (Context
+          (Comment)
+          (Type
+            (Identifier)
+            (Constructor
+              (Empty)
+              (Field
+                (Identifier)
+                (
+                  (Identifier)))
+              (Field
+                (Identifier)
+                (
+                  (Identifier)))
+              (Field
+                (Identifier)
+                (
+                  (Identifier))))))
+        (Type
+          (Identifier)
+          (Interface))
+        (Context
+          (Comment)
+          (Empty))))))

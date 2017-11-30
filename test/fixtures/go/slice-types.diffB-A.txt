@@ -2,19 +2,22 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (Other "type_declaration"
-      (TypeDecl
-        (Identifier)
-        (SliceTy
-        {+(Identifier)+}
-        {-(SliceTy
-          {-(Identifier)-})-})))
-    (Other "type_declaration"
-      (TypeDecl
-        (Identifier)
-        (SliceTy
-        {+(SliceTy
-          {+(Identifier)+})+}
-        {-(Identifier)-})))))
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (
+      (
+        (Type
+          (Identifier)
+          (Slice
+          { (Slice
+            {-(Identifier)-})
+          ->(Identifier) })))
+      (
+        (Type
+          (Identifier)
+          (Slice
+          { (Identifier)
+          ->(Slice
+            {+(Identifier)+}) }))))))

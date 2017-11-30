@@ -2,19 +2,24 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (Defer
-      (FunctionCall
-        (SubscriptAccess
-        { (Identifier)
-        ->(Identifier) }
-        { (Identifier)
-        ->(Identifier) })))
-    (Go
-      (FunctionCall
-        (SubscriptAccess
-        { (Identifier)
-        ->(Identifier) }
-        { (Identifier)
-        ->(Identifier) })))))
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (
+      (Defer
+        (Call
+          (MemberAccess
+          { (Identifier)
+          ->(Identifier) }
+          { (Identifier)
+          ->(Identifier) })
+          (Empty)))
+      (Go
+        (Call
+          (MemberAccess
+          { (Identifier)
+          ->(Identifier) }
+          { (Identifier)
+          ->(Identifier) })
+          (Empty))))))

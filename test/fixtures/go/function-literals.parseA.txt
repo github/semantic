@@ -2,16 +2,22 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (Other "const_declaration"
-      (VarAssignment
-        (Identifier)
-        (Other "expression_list"
-          (AnonymousFunction
-            (Identifier)
-            (Identifier)
-            (Return
-              (Other "expression_list"
-                (NumberLiteral)
-                (NumberLiteral)))))))))
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (Assignment
+      (Identifier)
+      (Function
+        (Empty)
+        ([])
+        (
+          (Identifier)
+          (Identifier))
+        (
+          (Identifier)
+          (Identifier))
+        (Return
+          (
+            (Integer)
+            (Integer)))))))

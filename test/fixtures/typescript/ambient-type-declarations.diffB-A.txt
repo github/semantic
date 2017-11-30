@@ -1,6 +1,6 @@
 (Program
 {+(AmbientDeclaration
-  {+(TypeAliasDeclaration
+  {+(TypeAlias
     {+(Empty)+}
     {+(Identifier)+}
     {+(Union
@@ -17,7 +17,7 @@
               {+(PredefinedType)+}
               {+(PredefinedType)+})+}
             {+(TypeIdentifier)+})+})+})+})+})+})+}
-{-(TypeAliasDeclaration
+{-(TypeAlias
   {-(Empty)-}
   {-(Identifier)-}
   {-(Union

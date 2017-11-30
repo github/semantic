@@ -2,33 +2,30 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (Other "const_declaration"
-      (VarAssignment
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (
+      (Assignment
         (Identifier)
-        (Other "expression_list"
-          (Other "composite_literal"
-            (SliceTy
-              (Identifier))
-            (Literal
-              (StringLiteral))))))
-    (Other "const_declaration"
-      (VarAssignment
+        (Composite
+          (Slice
+            (Identifier))
+          (
+            (TextElement))))
+      (Assignment
         (Identifier)
-        (Other "expression_list"
-          (Other "composite_literal"
-            (SliceTy
-              (Identifier))
-            (Literal
-              (StringLiteral))))))
-    (Other "const_declaration"
-      (VarAssignment
+        (Composite
+          (Slice
+            (Identifier))
+          (
+            (TextElement))))
+      (Assignment
         (Identifier)
-        (Other "expression_list"
-          (Other "composite_literal"
-            (SliceTy
-              (Identifier))
-            (Literal
-              (StringLiteral)
-              (StringLiteral))))))))
+        (Composite
+          (Slice
+            (Identifier))
+          (
+            (TextElement)
+            (TextElement)))))))

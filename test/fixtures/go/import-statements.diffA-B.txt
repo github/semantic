@@ -1,0 +1,18 @@
+(Program
+  (Module
+    (Identifier))
+  (Import
+    (Context
+      (Comment)
+      (Comment)
+    { (TextElement)
+    ->(TextElement) })
+    (Context
+      (Comment)
+      (Empty)))
+  (Function
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    ([])))

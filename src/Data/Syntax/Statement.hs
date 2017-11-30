@@ -25,6 +25,14 @@ instance Eq1 Else where liftEq = genericLiftEq
 instance Ord1 Else where liftCompare = genericLiftCompare
 instance Show1 Else where liftShowsPrec = genericLiftShowsPrec
 
+-- | Goto statement (e.g. `goto a` in Go).
+newtype Goto a = Goto { gotoLocation :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Goto where liftEq = genericLiftEq
+instance Ord1 Goto where liftCompare = genericLiftCompare
+instance Show1 Goto where liftShowsPrec = genericLiftShowsPrec
+
 -- TODO: Alternative definition would flatten if/else if/else chains: data If a = If ![(a, a)] !(Maybe a)
 
 -- | A pattern-matching or computed jump control-flow statement, like 'switch' in C or JavaScript, or 'case' in Ruby or Haskell.
@@ -61,6 +69,22 @@ data Assignment a = Assignment { assignmentContext :: ![a], assignmentTarget :: 
 instance Eq1 Assignment where liftEq = genericLiftEq
 instance Ord1 Assignment where liftCompare = genericLiftCompare
 instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
+
+-- | Post increment operator (e.g. 1++ in Go, or i++ in C).
+newtype PostIncrement a = PostIncrement a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 PostIncrement where liftEq = genericLiftEq
+instance Ord1 PostIncrement where liftCompare = genericLiftCompare
+instance Show1 PostIncrement where liftShowsPrec = genericLiftShowsPrec
+
+-- | Post decrement operator (e.g. 1-- in Go, or i-- in C).
+newtype PostDecrement a = PostDecrement a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 PostDecrement where liftEq = genericLiftEq
+instance Ord1 PostDecrement where liftCompare = genericLiftCompare
+instance Show1 PostDecrement where liftShowsPrec = genericLiftShowsPrec
 
 
 -- Returns
@@ -170,6 +194,8 @@ instance Ord1 Finally where liftCompare = genericLiftCompare
 instance Show1 Finally where liftShowsPrec = genericLiftShowsPrec
 
 
+-- Scoping
+
 -- | ScopeEntry (e.g. `BEGIN {}` block in Ruby or Perl).
 newtype ScopeEntry a = ScopeEntry [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -177,7 +203,6 @@ newtype ScopeEntry a = ScopeEntry [a]
 instance Eq1 ScopeEntry where liftEq = genericLiftEq
 instance Ord1 ScopeEntry where liftCompare = genericLiftCompare
 instance Show1 ScopeEntry where liftShowsPrec = genericLiftShowsPrec
-
 
 -- | ScopeExit (e.g. `END {}` block in Ruby or Perl).
 newtype ScopeExit a = ScopeExit [a]

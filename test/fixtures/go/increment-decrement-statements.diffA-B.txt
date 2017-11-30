@@ -2,9 +2,15 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-  { (IncrementStatement)
-  ->(IncrementStatement) }
-  {+(IncrementStatement)+}
-  {-(DecrementStatement)-}))
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (
+      (PostIncrement
+      { (Identifier)
+      ->(Identifier) })
+    {+(PostIncrement
+      {+(Identifier)+})+}
+    {-(PostDecrement
+      {-(Identifier)-})-})))

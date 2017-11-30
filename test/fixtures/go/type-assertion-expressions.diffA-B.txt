@@ -2,10 +2,15 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
+    (Empty)
+    (
+      (Identifier))
+    ([])
     (TypeAssertion
     { (Identifier)
     ->(Identifier) }
-    { (QualifiedType)
-    ->(QualifiedType) })))
+      (MemberAccess
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) }))))

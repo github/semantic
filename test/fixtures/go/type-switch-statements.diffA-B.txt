@@ -2,20 +2,136 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args)
-    (Switch
-      (Other "type_switch_guard"
-      { (Identifier)
-      ->(Identifier) })
-      (Case
-        (Other "type_case"
-          (SliceTy
-            (Identifier)))
-        (FunctionCall
-          (Identifier)))
-      (Case
-        (Other "type_case"
-          (PointerTy
-            (Identifier)))
-        (Break)))))
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    (
+      (TypeSwitch
+        (
+          (Assignment
+          { (Identifier)
+          ->(Identifier) }
+          { (Identifier)
+          ->(Identifier) })
+          (TypeSwitchGuard
+          { (Identifier)
+          ->(Identifier) }))
+        (
+          (Pattern
+            (
+              (Identifier)
+              (Pointer
+                (MemberAccess
+                  (Identifier)
+                  (Identifier))))
+            ([]))
+          (Context
+            (Comment)
+            (Pattern
+              (Slice
+                (Identifier))
+              (Call
+                (Identifier)
+                (Empty))))
+          (Pattern
+            (Pointer
+              (Identifier))
+            (Break
+              (Empty)))
+        {+(Pattern
+          {+(DefaultPattern
+            {+([])+})+}
+          {+(Break
+            {+(Empty)+})+})+}))
+      (TypeSwitch
+        (
+          (TypeSwitchGuard
+            (
+            { (Identifier)
+            ->(Identifier) }
+            { (Identifier)
+            ->(Identifier) })))
+        (
+          (Pattern
+          { (Identifier)
+          ->(Identifier) }
+            (Call
+              (MemberAccess
+                (Identifier)
+                (Identifier))
+            { (TextElement)
+            ->(TextElement) }
+            {+(DividedBy
+              {+(Integer)+}
+              {+(Identifier)+})+}
+            {-(Times
+              {-(Identifier)-}
+              {-(Integer)-})-}
+              (Empty)))
+          (Pattern
+          { (Identifier)
+          ->(Identifier) }
+            (Call
+              (MemberAccess
+                (Identifier)
+                (Identifier))
+            { (TextElement)
+            ->(TextElement) }
+            {+(Times
+              {+(Identifier)+}
+              {+(Integer)+})+}
+            {-(DividedBy
+              {-(Integer)-}
+              {-(Identifier)-})-}
+              (Empty)))
+          (Pattern
+            (Identifier)
+            (
+              (Assignment
+              { (Identifier)
+              ->(Identifier) }
+                (DividedBy
+                  (Call
+                    (Identifier)
+                  { (Identifier)
+                  ->(Identifier) }
+                    (Empty))
+                  (Integer)))
+              (Call
+                (MemberAccess
+                  (Identifier)
+                  (Identifier))
+                (TextElement)
+                (Plus
+                  (Slice
+                  { (Identifier)
+                  ->(Identifier) }
+                  { (Identifier)
+                  ->(Identifier) }
+                    (Empty)
+                    (Empty))
+                  (Slice
+                  { (Identifier)
+                  ->(Identifier) }
+                    (Empty)
+                  { (Identifier)
+                  ->(Identifier) }
+                    (Empty)))
+                (Empty))))
+          (Pattern
+            (DefaultPattern
+              ([]))
+            ([]))))
+      (TypeSwitch
+        (Empty)
+        (
+          (TypeSwitchGuard
+            (
+              (Identifier)
+            { (Identifier)
+            ->(Identifier) }))
+          (Context
+          { (Comment)
+          ->(Comment) }
+            (Empty)))))))

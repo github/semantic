@@ -2,18 +2,132 @@
   (Module
     (Identifier))
   (Function
-    (Identifier)
-    (Args))
+    (Empty)
+    (
+      (Identifier))
+    ([])
+    ([]))
   (Method
+    (Empty)
     (Identifier)
-    (Args
-      (ParameterDecl
+  { (Identifier)
+  ->(Identifier) }
+    ([])
+    (Empty))
+  (Method
+    (
+      (Identifier))
+    (
+      (Identifier)
+    { (Identifier)
+    ->(Identifier) })
+    (Identifier)
+    (
+      (Identifier)
+    { (Identifier)
+    ->(Identifier) })
+    ([]))
+  (Method
+    (
+      (Identifier))
+    (
+      (Identifier)
+      (Pointer
+        (Identifier)))
+  { (Identifier)
+  ->(Identifier) }
+    ([])
+    (Return
+      (Call
+        (MemberAccess
+          (Identifier)
+          (Identifier))
+        (Plus
+        { (Plus
+          {-(Plus
+            {-(Call
+              {-(MemberAccess
+                {-(Identifier)-}
+                {-(Identifier)-})-}
+              {-(MemberAccess
+                {-(Identifier)-}
+                {-(Identifier)-})-}
+              {-(Integer)-}
+              {-(Empty)-})-}
+            {-(MemberAccess
+              {-(Identifier)-}
+              {-(Identifier)-})-})-}
+          {-(Call
+            {-(MemberAccess
+              {-(Identifier)-}
+              {-(Identifier)-})-}
+            {-(MemberAccess
+              {-(Identifier)-}
+              {-(Identifier)-})-}
+            {-(Integer)-}
+            {-(Empty)-})-})
+        ->(Times
+          {+(MemberAccess
+            {+(Identifier)+}
+            {+(Identifier)+})+}
+          {+(MemberAccess
+            {+(Identifier)+}
+            {+(Identifier)+})+}) }
+        { (MemberAccess
+          {-(Identifier)-}
+          {-(Identifier)-})
+        ->(Times
+          {+(MemberAccess
+            {+(Identifier)+}
+            {+(Identifier)+})+}
+          {+(MemberAccess
+            {+(Identifier)+}
+            {+(Identifier)+})+}) })
+        (Empty))))
+  (Method
+    ([])
+    (
+    { (Identifier)
+    ->(Identifier) }
+      (Pointer
+        (Identifier)))
+    (Identifier)
+    (
+      (Identifier)
+    { (Identifier)
+    ->(Identifier) })
+    (
+      (Assignment
+        (MemberAccess
+          (Identifier)
+          (Identifier))
+        (Times
+          (MemberAccess
+            (Identifier)
+            (Identifier))
+          (Identifier)))
+      (Assignment
+        (MemberAccess
+          (Identifier)
+          (Identifier))
+        (Times
+          (MemberAccess
+            (Identifier)
+            (Identifier))
+          (Identifier)))))
+  (Method
+    (
+      (Identifier))
+    (
+      (Identifier)
+      (Pointer
+        (Identifier)))
+    (Identifier)
+    (
+    { (Identifier)
+    ->(Identifier) }
+      (
       { (Identifier)
       ->(Identifier) }
         (Identifier)))
-    (Args
-      (ParameterDecl
-      { (Identifier)
-      ->(Identifier) }
-        (Identifier)))
-    (Identifier)))
+    ([])))
