@@ -85,7 +85,7 @@ instance ( Monad m
          )
          => Eval t v m Assignment where
   eval ev yield Assignment{..} = do
-    env <- askEnv @(LocationFor v) @v
+    env <- askEnv
     v <- ev pure assignmentValue
 
     (var, a) <- envLookupOrAlloc' assignmentTarget env v

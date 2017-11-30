@@ -57,4 +57,4 @@ instance ( Monad m
   eval ev yield [a]    = ev pure a >>= yield
   eval ev yield (a:as) = do
     env <- askEnv @(LocationFor v) @v
-    extraRoots (envRoots @(LocationFor v) env (freeVariables1 as)) (ev (const (eval ev pure as)) a) >>= yield
+    extraRoots (envRoots env (freeVariables1 as)) (ev (const (eval ev pure as)) a) >>= yield

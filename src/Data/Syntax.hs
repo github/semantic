@@ -125,7 +125,7 @@ instance ( MonadAddress (LocationFor v) m
          , MonadStore v m
          ) => Eval t v m Identifier where
   eval _ yield (Identifier name) = do
-    env <- askEnv @(LocationFor v) @v
+    env <- askEnv
     maybe (fail ("free variable: " <> unpack name)) deref (envLookup name env) >>= yield
 
 
@@ -151,7 +151,7 @@ instance ( Monad m
   eval ev yield (Program [a])    = ev pure a >>= yield
   eval ev yield (Program (a:as)) = do
     env <- askEnv @(LocationFor v) @v
-    extraRoots (envRoots @(LocationFor v) env (freeVariables1 as)) (ev (const (eval ev pure (Program as))) a) >>= yield
+    extraRoots (envRoots env (freeVariables1 as)) (ev (const (eval ev pure (Program as))) a) >>= yield
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
