@@ -32,9 +32,6 @@ library
                      , Data.Error
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
-                     , Data.Functor.Classes.Eq.Generic
-                     , Data.Functor.Classes.Ord.Generic
-                     , Data.Functor.Classes.Show.Generic
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Mergeable
@@ -164,7 +161,7 @@ test-suite test
   main-is:             Spec.hs
   other-modules:       Assigning.Assignment.Spec
                      , Data.Diff.Spec
-                     , Data.Functor.Classes.Ord.Generic.Spec
+                     , Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Mergeable.Spec
                      , Data.Source.Spec

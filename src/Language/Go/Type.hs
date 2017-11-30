@@ -2,9 +2,7 @@
 module Language.Go.Type where
 
 import Data.Align.Generic
-import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Ord.Generic
-import Data.Functor.Classes.Show.Generic
+import Data.Functor.Classes.Generic
 import Data.Mergeable
 import Diffing.Algorithm
 import GHC.Generics

@@ -1,7 +1,6 @@
-module Data.Functor.Classes.Ord.Generic.Spec where
+module Data.Functor.Classes.Generic.Spec where
 
-import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Ord.Generic
+import Data.Functor.Classes.Generic
 import Data.Functor.Listable
 import GHC.Generics
 import Test.Hspec
@@ -9,15 +8,16 @@ import Test.Hspec.LeanCheck
 
 spec :: Spec
 spec = parallel $ do
-  describe "genericLiftCompare" $ do
-    prop "equivalent to derived compare for product types" $
-      \ a b -> genericLiftCompare compare a b `shouldBe` compare a (b :: Product Int)
+  describe "Ord1" $ do
+    describe "genericLiftCompare" $ do
+      prop "equivalent to derived compare for product types" $
+        \ a b -> genericLiftCompare compare a b `shouldBe` compare a (b :: Product Int)
 
-    prop "equivalent to derived compare for sum types" $
-      \ a b -> genericLiftCompare compare a b `shouldBe` compare a (b :: Sum Int)
+      prop "equivalent to derived compare for sum types" $
+        \ a b -> genericLiftCompare compare a b `shouldBe` compare a (b :: Sum Int)
 
-    prop "equivalent to derived compare for recursive types" $
-      \ a b -> genericLiftCompare compare a b `shouldBe` compare a (b :: Tree Int)
+      prop "equivalent to derived compare for recursive types" $
+        \ a b -> genericLiftCompare compare a b `shouldBe` compare a (b :: Tree Int)
 
 
 data Product a = Product a a a
