@@ -49,7 +49,7 @@ instance (Ord l, Reader (Set.Set (Address l a)) :< fs) => MonadGC l a (Eff fs) w
 instance ( Monad m
          , Ord (LocationFor v)
          , MonadGC (LocationFor v) v m
-         , MonadEnv (LocationFor v) v m
+         , MonadEnv v m
          , AbstractValue v
          , FreeVariables t
          )
@@ -57,5 +57,5 @@ instance ( Monad m
   eval _  yield []     = yield unit
   eval ev yield [a]    = ev pure a >>= yield
   eval ev yield (a:as) = do
-    env <- askEnv @(LocationFor v) @v
+    env <- askEnv @v
     extraRoots (envRoots env (freeVariables1 as)) (ev (const (eval ev pure as)) a) >>= yield

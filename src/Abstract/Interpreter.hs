@@ -24,7 +24,7 @@ import Prelude hiding (fail)
 
 type Interpreter l v = '[Fresh, Fail, NonDetEff, State (Store l v), Reader (Set.Set (Address l v)), Reader (Environment l v)]
 
-type MonadInterpreter l v m = (MonadEnv l v m, MonadStore v m, MonadFail m)
+type MonadInterpreter v m = (MonadEnv v m, MonadStore v m, MonadFail m)
 
 type EvalResult l v = Final (Interpreter l v) v
 
@@ -72,7 +72,7 @@ evCollect ev0 ev' yield e = do
 
 evRoots :: forall l v m syntax ann
         .  ( Ord l
-           , MonadEnv l v m
+           , MonadEnv v m
            , MonadGC l v m
            , ValueRoots l v
            , Eval (Term syntax ann) v m (TermF syntax ann)

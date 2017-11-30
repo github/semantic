@@ -81,7 +81,7 @@ instance ( Monad m
          , Semigroup (Cell (LocationFor v) v)
          , MonadAddress (LocationFor v) m
          , MonadStore v m
-         , MonadEnv (LocationFor v) v m
+         , MonadEnv v m
          , FreeVariables t
          )
          => Eval t v m Assignment where

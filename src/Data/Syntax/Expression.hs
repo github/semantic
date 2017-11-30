@@ -32,7 +32,7 @@ instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 instance ( Ord l
          , MonadFail m
          , Semigroup (Cell l (Value l t))
-         , MonadEnv l (Value l t) m
+         , MonadEnv (Value l t) m
          , MonadStore (Value l t) m
          , MonadAddress l m
          )
@@ -51,7 +51,7 @@ instance ( Ord l
 instance ( MonadFail m
          , MonadFresh m
          , MonadGC Monovariant Type m
-         , MonadEnv Monovariant Type m
+         , MonadEnv Type m
          , FreeVariables t
          )
          => Eval t Type m Call where

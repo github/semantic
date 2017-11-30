@@ -37,13 +37,13 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 instance ( Monad m
          , Ord l
          , Semigroup (Cell l (Value l t))
-         , MonadEnv l (Value l t) m
+         , MonadEnv (Value l t) m
          , MonadStore (Value l t) m
          , MonadAddress l m
          , FreeVariables t
          ) => Eval t (Value l t) m Function where
   eval _ yield Function{..} = do
-    env <- askEnv @l @(Value l t)
+    env <- askEnv @(Value l t)
     let params = toList (foldMap freeVariables functionParameters)
     let v = inj (Closure params functionBody env)
 
@@ -54,13 +54,13 @@ instance ( Monad m
 instance ( Alternative m
          , Monad m
          , Type.MonadFresh m
-         , MonadEnv Monovariant Type.Type m
+         , MonadEnv Type.Type m
          , MonadStore Type.Type m
          , FreeVariables t
          )
          => Eval t Type.Type m Function where
   eval recur yield Function{..} = do
-    env <- askEnv @Monovariant @Type.Type
+    env <- askEnv @Type.Type
     let params = toList (foldMap freeVariables functionParameters)
     tvars <- for params $ \name -> do
       a <- alloc name

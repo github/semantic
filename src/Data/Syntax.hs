@@ -121,7 +121,7 @@ instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 instance ( MonadAddress (LocationFor v) m
-         , MonadEnv (LocationFor v) v m
+         , MonadEnv v m
          , MonadFail m
          , MonadStore v m
          ) => Eval t v m Identifier where
@@ -143,7 +143,7 @@ instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 instance ( Monad m
          , Ord (LocationFor v)
          , MonadGC (LocationFor v) v m
-         , MonadEnv (LocationFor v) v m
+         , MonadEnv v m
          , AbstractValue v
          , FreeVariables t
          )
@@ -151,7 +151,7 @@ instance ( Monad m
   eval _  yield (Program [])     = yield unit
   eval ev yield (Program [a])    = ev pure a >>= yield
   eval ev yield (Program (a:as)) = do
-    env <- askEnv @(LocationFor v) @v
+    env <- askEnv @v
     extraRoots (envRoots env (freeVariables1 as)) (ev (const (eval ev pure (Program as))) a) >>= yield
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.

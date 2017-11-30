@@ -67,7 +67,7 @@ evTell :: forall g t m v
        . ( IsList (g (Configuration (LocationFor v) t v))
          , Item (g (Configuration (LocationFor v) t v)) ~ Configuration (LocationFor v) t v
          , MonadTrace (LocationFor v) t v g m
-         , MonadEnv (LocationFor v) v m
+         , MonadEnv v m
          , MonadStore v m
          , MonadGC (LocationFor v) v m
          )
