@@ -267,7 +267,7 @@ typeIdentifier = makeTerm <$> symbol TypeIdentifier <*> (Syntax.Identifier <$> s
 -- Primitive Types
 
 arrayType :: Assignment
-arrayType = makeTerm <$> symbol ArrayType <*> children (Type.Array . Just <$> expression <*> (expression <|> arrayType))
+arrayType = makeTerm <$> symbol ArrayType <*> children (Type.Array . Just <$> expression <*> expression)
 
 channelType :: Assignment
 channelType =  makeTerm' <$> symbol ChannelType <*> children (mkChannelType <$> optional (token AnonLAngleMinus) <* token AnonChan <*> optional (token AnonLAngleMinus) <*> expression)
