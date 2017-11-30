@@ -17,8 +17,8 @@ library
                      -- Analyses & term annotations
                        Abstract.Interpreter
                      , Abstract.Interpreter.Caching
-                     , Abstract.Interpreter.Dead
                      , Abstract.Interpreter.Tracing
+                     , Analysis.Abstract.Dead
                      , Analysis.Abstract.Eval
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity

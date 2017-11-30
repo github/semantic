@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, ScopedTypeVariables, TypeApplications, TypeOperators #-}
-module Abstract.Interpreter.Dead where
+module Analysis.Abstract.Dead where
 
 import Abstract.Interpreter
 import Analysis.Abstract.Eval
