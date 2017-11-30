@@ -41,6 +41,9 @@ spec = parallel $ do
       prop "equivalent to derived showsPrec for recursive types" $
         \ a -> genericLiftShowsPrec showsPrec showList 0 a "" `shouldBe` showsPrec 0 (a :: Tree Int) ""
 
+      prop "equivalent to derived showsPrec for record types" $
+        \ a -> genericLiftShowsPrec showsPrec showList 0 a "" `shouldBe` showsPrec 0 (a :: Record Int) ""
+
 
 data Product a = Product a a a
   deriving (Eq, Generic1, Ord, Show)
@@ -65,3 +68,10 @@ instance Listable a => Listable (Tree a) where
 instance Eq1 Tree where liftEq = genericLiftEq
 instance Ord1 Tree where liftCompare = genericLiftCompare
 instance Show1 Tree where liftShowsPrec = genericLiftShowsPrec
+
+
+data Record a = Record { recordSelector1 :: a, recordSelector2 :: a, recordSelector3 :: a }
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Listable a => Listable (Record a) where
+  tiers = cons3 Record
