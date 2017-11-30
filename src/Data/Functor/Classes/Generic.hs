@@ -46,10 +46,10 @@ class GShow1 f where
   -- | showsPrec function for an application of the type constructor based on showsPrec and showList functions for the argument type.
   gliftShowsPrec :: GShow1Options -> (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> f a -> ShowS
 
-data GShow1Options = GShow1Options { optionsIncludeSelectors :: Bool }
+data GShow1Options = GShow1Options { optionsUseRecordSyntax :: Bool }
 
 defaultGShow1Options :: GShow1Options
-defaultGShow1Options = GShow1Options { optionsIncludeSelectors = False }
+defaultGShow1Options = GShow1Options { optionsUseRecordSyntax = False }
 
 class GShow1 f => GShow1Body f where
   -- | showsPrec function for the body of an application of the type constructor based on showsPrec and showList functions for the argument type.
@@ -146,7 +146,7 @@ instance GShow1 f => GShow1 (M1 D c f) where
   gliftShowsPrec opts sp sl d (M1 a) = gliftShowsPrec opts sp sl d a
 
 instance (Constructor c, GShow1Body f) => GShow1 (M1 C c f) where
-  gliftShowsPrec opts sp sl d m = gliftShowsPrecBody opts (conFixity m) (conIsRecord m && optionsIncludeSelectors opts) (conName m) sp sl d (unM1 m)
+  gliftShowsPrec opts sp sl d m = gliftShowsPrecBody opts (conFixity m) (conIsRecord m && optionsUseRecordSyntax opts) (conName m) sp sl d (unM1 m)
 
 instance GShow1Body U1 where
   gliftShowsPrecBody _ _ _ conName _ _ _ _ = showString conName
