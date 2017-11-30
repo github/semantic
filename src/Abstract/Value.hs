@@ -27,19 +27,11 @@ type ValueConstructors location
 type Value location = Union (ValueConstructors location)
 
 data Closure location term = Closure [Name] term (Environment location (Value location term))
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Generic1, Ord, Show)
 
-instance (Eq location) => Eq1 (Closure location) where
-  liftEq eqT (Closure s1 t1 e1) (Closure s2 t2 e2) = s1 == s2 && t1 `eqT` t2 && liftEq (liftEq eqT) e1 e2
-
-instance (Ord location) => Ord1 (Closure location) where
-  liftCompare compareT (Closure s1 t1 e1) (Closure s2 t2 e2) = compare s1 s2 <> compareT t1 t2 <> liftCompare (liftCompare compareT) e1 e2
-
-instance (Show location) => Show1 (Closure location) where
-  liftShowsPrec spT slT d (Closure s t e) = showParen (d > 10) $ showString "Closure"
-    . showChar ' ' . showsPrec 11 s
-    . showChar ' ' . spT 11 t
-    . showChar ' ' . liftShowsPrec (liftShowsPrec spT slT) (liftShowList spT slT) 11 e
+instance (Eq location) => Eq1 (Closure location) where liftEq = genericLiftEq
+instance (Ord location) => Ord1 (Closure location) where liftCompare = genericLiftCompare
+instance (Show location) => Show1 (Closure location) where liftShowsPrec = genericLiftShowsPrec
 
 data Unit term = Unit
   deriving (Eq, Generic1, Ord, Show)
