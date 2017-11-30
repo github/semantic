@@ -145,15 +145,15 @@ instance GShow1 f => GShow1 (M1 D c f) where
   gliftShowsPrec opts sp sl d (M1 a) = gliftShowsPrec opts sp sl d a
 
 instance (Constructor c, GShow1Body f) => GShow1 (M1 C c f) where
-  gliftShowsPrec opts sp sl d m = gliftShowsPrecBody opts (conFixity m) (conIsRecord m) (conName m) sp sl d (unM1 m)
+  gliftShowsPrec opts sp sl d m = gliftShowsPrecBody opts (conFixity m) (conIsRecord m && optionsIncludeSelectors opts) (conName m) sp sl d (unM1 m)
 
 instance GShow1Body U1 where
   gliftShowsPrecBody _ _ _ conName _ _ _ _ = showString conName
 
 instance (Selector s, GShow1 f) => GShow1Body (M1 S s f) where
-  gliftShowsPrecBody opts _ conIsRecord conName sp sl d m = showParen (d > 10) $ showString conName . showChar ' ' . showBraces (conIsRecord && optionsIncludeSelectors opts) (foldr (.) id (gliftShowsPrecAll opts conIsRecord sp sl 11 m))
+  gliftShowsPrecBody opts _ conIsRecord conName sp sl d m = showParen (d > 10) $ showString conName . showChar ' ' . showBraces conIsRecord (foldr (.) id (gliftShowsPrecAll opts conIsRecord sp sl 11 m))
 
-  gliftShowsPrecAll opts conIsRecord sp sl d m = [ (if conIsRecord && optionsIncludeSelectors opts && not (null (selName m)) then showString (selName m) . showString " = " else id) . gliftShowsPrec opts sp sl (if conIsRecord && optionsIncludeSelectors opts then 0 else d) (unM1 m) ]
+  gliftShowsPrecAll opts conIsRecord sp sl d m = [ (if conIsRecord && not (null (selName m)) then showString (selName m) . showString " = " else id) . gliftShowsPrec opts sp sl (if conIsRecord then 0 else d) (unM1 m) ]
 
 instance (GShow1Body f, GShow1Body g) => GShow1Body (f :*: g) where
   gliftShowsPrecBody opts conFixity conIsRecord conName sp sl d (a :*: b) = case conFixity of
