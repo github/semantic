@@ -8,6 +8,8 @@ module Abstract.Store
 , storeLookup
 , storeLookupAll
 , storeRestrict
+, envLookupOrAlloc'
+, envLookupOrAlloc
 , Address(..)
 , deref
 , assign
@@ -16,6 +18,7 @@ module Abstract.Store
 ) where
 
 import Abstract.Address
+import Abstract.Environment
 import Abstract.FreeVariables
 import Control.Applicative
 import Control.Monad ((<=<))
@@ -61,6 +64,27 @@ storeSize = Map.size . unStore
 
 storeRestrict :: Ord l => Store l a -> Set.Set (Address l a) -> Store l a
 storeRestrict (Store m) roots = Store (Map.filterWithKey (\ address _ -> Address address `Set.member` roots) m)
+
+envLookupOrAlloc' ::
+                 ( FreeVariables t
+                 , Semigroup (Cell l a)
+                 , MonadStore l a m
+                 , MonadAddress l m
+                 )
+                 => t -> Environment l a -> a -> m (Name, Address l a)
+envLookupOrAlloc' term = let [name] = toList (freeVariables term) in
+                         envLookupOrAlloc name
+
+envLookupOrAlloc ::
+                 ( Semigroup (Cell l a)
+                 , MonadStore l a m
+                 , MonadAddress l m
+                 )
+                 => Name -> Environment l a -> a -> m (Name, Address l a)
+envLookupOrAlloc name env v = do
+  a <- maybe (alloc name) pure (envLookup name env)
+  assign a v
+  pure (name, a)
 
 
 assign :: (Ord l, Semigroup (Cell l a), Pointed (Cell l), MonadStore l a m) => Address l a -> a -> m ()
