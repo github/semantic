@@ -29,8 +29,8 @@ instance Ord1 Call where liftCompare = genericLiftCompare
 instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 
 instance ( Ord l
-         , Semigroup (Cell l (Value l t))
          , MonadFail m
+         , Semigroup (Cell l (Value l t))
          , MonadEnv l (Value l t) m
          , MonadStore l (Value l t) m
          , MonadAddress l m
@@ -39,7 +39,7 @@ instance ( Ord l
   eval recur yield Call{..} = do
     closure <- recur pure callFunction
     Closure names body env <- maybe (fail "expected a closure") pure (prj closure :: Maybe (Closure l t))
-    bindings <- for (zip names callParams) $ \ (name, param) -> do
+    bindings <- for (zip names callParams) $ \(name, param) -> do
       v <- recur pure param
       a <- alloc name
       assign a v
