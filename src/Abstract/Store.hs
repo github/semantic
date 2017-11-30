@@ -30,23 +30,23 @@ import Data.Semigroup
 import qualified Data.Set as Set
 import Prelude hiding (fail)
 
-newtype Store l a = Store { unStore :: Map.Map (Address l a) (Cell l a) }
+newtype Store l a = Store { unStore :: Map.Map l (Cell l a) }
   deriving (Semigroup, Monoid)
 
 storeLookup :: Ord l => Address l a -> Store l a -> Maybe (Cell l a)
-storeLookup = (. unStore) . Map.lookup
+storeLookup = (. unStore) . Map.lookup . unAddress
 
 storeLookupAll :: (Ord l, Foldable (Cell l)) => Address l a -> Store l a -> Maybe [a]
 storeLookupAll address = fmap toList . storeLookup address
 
 storeInsert :: (Ord l, Semigroup (Cell l a), Pointed (Cell l)) => Address l a -> a -> Store l a -> Store l a
-storeInsert = (((Store .) . (. unStore)) .) . (. point) . Map.insertWith (<>)
+storeInsert = (((Store .) . (. unStore)) .) . (. point) . Map.insertWith (<>) . unAddress
 
 storeSize :: Store l a -> Int
 storeSize = Map.size . unStore
 
 storeRestrict :: Ord l => Store l a -> Set.Set (Address l a) -> Store l a
-storeRestrict (Store m) roots = Store (Map.filterWithKey (\ address _ -> address `Set.member` roots) m)
+storeRestrict (Store m) roots = Store (Map.filterWithKey (\ address _ -> Address address `Set.member` roots) m)
 
 
 assign :: (Ord l, Semigroup (Cell l a), Pointed (Cell l), MonadStore l a m) => Address l a -> a -> m ()
@@ -94,20 +94,20 @@ instance Foldable (Cell l) => Foldable (Store l) where
   foldMap = (. unStore) . foldMap . foldMap
 
 instance (Ord l, Functor (Cell l)) => Functor (Store l) where
-  fmap f = Store . Map.mapKeys (Address . unAddress) . fmap (fmap f) . unStore
+  fmap f = Store . fmap (fmap f) . unStore
 
 instance (Ord l, Traversable (Cell l)) => Traversable (Store l) where
-  traverse f = fmap (Store . Map.mapKeys (Address . unAddress)) . traverse (traverse f) . unStore
+  traverse f = fmap Store . traverse (traverse f) . unStore
 
 
 instance (Eq l, Eq1 (Cell l)) => Eq1 (Store l) where
-  liftEq eq (Store m1) (Store m2) = liftEq2 (liftEq eq) (liftEq eq) m1 m2
+  liftEq eq (Store m1) (Store m2) = liftEq (liftEq eq) m1 m2
 
 instance (Eq a, Eq l, Eq1 (Cell l)) => Eq (Store l a) where
   (==) = eq1
 
 instance (Ord l, Ord1 (Cell l)) => Ord1 (Store l) where
-  liftCompare compareA (Store m1) (Store m2) = liftCompare2 (liftCompare compareA) (liftCompare compareA) m1 m2
+  liftCompare compareA (Store m1) (Store m2) = liftCompare (liftCompare compareA) m1 m2
 
 instance (Ord a, Ord l, Ord1 (Cell l)) => Ord (Store l a) where
   compare = compare1
