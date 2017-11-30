@@ -23,14 +23,10 @@ import Control.Monad.Effect.State
 import Control.Monad.Fail
 import Data.Foldable (asum, toList)
 import Data.Functor.Classes
-import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Ord.Generic
-import Data.Functor.Classes.Show.Generic
 import qualified Data.Map as Map
 import Data.Pointed
 import Data.Semigroup
 import qualified Data.Set as Set
-import GHC.Generics
 import Prelude hiding (fail)
 
 newtype Store l a = Store { unStore :: Map.Map (Address l a) (Cell l a) }
@@ -79,9 +75,6 @@ class (Ord l, Pointed (Cell l), Monad m) => MonadAddress l m where
 allocPrecise :: Store Precise a -> Address Precise a
 allocPrecise = Address . Precise . storeSize
 
-newtype I a = I { unI :: a }
-  deriving (Eq, Generic1, Ord, Show)
-
 instance Monad m => MonadAddress Precise m where
   type Cell Precise = I
 
@@ -100,26 +93,6 @@ instance (Alternative m, Monad m) => MonadAddress Monovariant m where
 
 uninitializedAddress :: MonadFail m => m a
 uninitializedAddress = fail "uninitialized address"
-
-
-instance Semigroup (I a) where
-  (<>) = const
-
-instance Foldable I where
-  foldMap f = f . unI
-
-instance Functor I where
-  fmap f = I . f . unI
-
-instance Traversable I where
-  traverse f = fmap I . f . unI
-
-instance Pointed I where
-  point = I
-
-instance Eq1 I where liftEq = genericLiftEq
-instance Ord1 I where liftCompare = genericLiftCompare
-instance Show1 I where liftShowsPrec = genericLiftShowsPrec
 
 
 instance Foldable (Cell l) => Foldable (Store l) where

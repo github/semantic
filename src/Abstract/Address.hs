@@ -1,8 +1,14 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeFamilyDependencies #-}
 module Abstract.Address where
 
 import Abstract.FreeVariables
 import Data.Functor.Classes
+import Data.Functor.Classes.Eq.Generic
+import Data.Functor.Classes.Ord.Generic
+import Data.Functor.Classes.Show.Generic
+import Data.Pointed
+import Data.Semigroup
+import GHC.Generics
 
 newtype Address l a = Address { unAddress :: l }
   deriving (Eq, Ord, Show)
@@ -41,3 +47,26 @@ newtype Precise = Precise { unPrecise :: Int }
 
 newtype Monovariant = Monovariant { unMonovariant :: Name }
   deriving (Eq, Ord, Show)
+
+
+newtype I a = I { unI :: a }
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Semigroup (I a) where
+  (<>) = const
+
+instance Foldable I where
+  foldMap f = f . unI
+
+instance Functor I where
+  fmap f = I . f . unI
+
+instance Traversable I where
+  traverse f = fmap I . f . unI
+
+instance Pointed I where
+  point = I
+
+instance Eq1 I where liftEq = genericLiftEq
+instance Ord1 I where liftCompare = genericLiftCompare
+instance Show1 I where liftShowsPrec = genericLiftShowsPrec
