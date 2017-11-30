@@ -1,10 +1,10 @@
 {-# LANGUAGE MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
 module Control.Monad.Effect.Env where
 
-import Abstract.Environment
 import Abstract.Value
 import Control.Monad.Effect
 import Control.Monad.Effect.Reader
+import Data.Abstract.Environment
 
 class Monad m => MonadEnv value m where
   askEnv :: m (Environment (LocationFor value) value)

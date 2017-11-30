@@ -17,7 +17,6 @@ library
                      -- Analyses & term annotations
                        Abstract.Address
                      , Abstract.Configuration
-                     , Abstract.Environment
                      , Abstract.FreeVariables
                      , Abstract.Interpreter
                      , Abstract.Interpreter.Caching
@@ -41,6 +40,7 @@ library
                      , Control.Monad.Effect.Fresh
                      , Control.Monad.Effect.GC
                      -- General datatype definitions & generic algorithms
+                     , Data.Abstract.Environment
                      , Data.Algebra
                      , Data.Align.Generic
                      , Data.AST

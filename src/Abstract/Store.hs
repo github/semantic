@@ -18,7 +18,6 @@ module Abstract.Store
 ) where
 
 import Abstract.Address
-import Abstract.Environment
 import Abstract.FreeVariables
 import Abstract.Value
 import Control.Applicative
@@ -26,6 +25,7 @@ import Control.Monad ((<=<))
 import Control.Monad.Effect
 import Control.Monad.Effect.State
 import Control.Monad.Fail
+import Data.Abstract.Environment
 import Data.Foldable (asum, toList)
 import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic

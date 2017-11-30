@@ -1,5 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module Abstract.Environment where
+module Data.Abstract.Environment where
 
 import Abstract.Address
 import Abstract.FreeVariables

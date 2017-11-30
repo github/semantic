@@ -2,9 +2,9 @@
 module Abstract.Value where
 
 import Abstract.Address
-import Abstract.Environment
-import qualified Abstract.Type as Type
 import Abstract.FreeVariables
+import qualified Abstract.Type as Type
+import Data.Abstract.Environment
 import Data.ByteString (ByteString)
 import Data.Functor.Classes
 import Data.Functor.Classes.Eq.Generic

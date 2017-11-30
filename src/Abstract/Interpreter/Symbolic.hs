@@ -1,19 +1,18 @@
 {-# LANGUAGE FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Abstract.Interpreter.Symbolic where
 
-import Abstract.Environment
 import Abstract.Interpreter
 import Abstract.Primitive
 import Abstract.Store
-import Data.Term
-
 import Control.Applicative
 import Control.Monad
 import Control.Monad.Effect
 import Control.Monad.Effect.State
 import Control.Monad.Fail
+import Data.Abstract.Environment
 import Data.Functor.Classes
 import qualified Data.Set as Set
+import Data.Term
 import Data.Union
 
 data Sym t a = Sym t | V a

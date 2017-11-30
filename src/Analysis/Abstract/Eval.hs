@@ -5,12 +5,12 @@ module Analysis.Abstract.Eval
 , MonadFail(..)
 ) where
 
-import Abstract.Environment
 import Abstract.FreeVariables
 import Abstract.Value
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.GC
 import Control.Monad.Fail
+import Data.Abstract.Environment
 import Data.Functor.Classes
 import Data.Proxy
 import Data.Term

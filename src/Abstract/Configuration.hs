@@ -2,8 +2,7 @@
 module Abstract.Configuration where
 
 import Abstract.Store
-import Abstract.Environment
-
+import Data.Abstract.Environment
 import Data.List (intersperse)
 import Data.Functor.Classes
 import Data.Monoid
