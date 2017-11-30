@@ -31,6 +31,7 @@ library
                      , Data.Diff
                      , Data.Error
                      , Data.Functor.Both
+                     , Data.Functor.Classes.Generic
                      , Data.Functor.Classes.Eq.Generic
                      , Data.Functor.Classes.Ord.Generic
                      , Data.Functor.Classes.Show.Generic
