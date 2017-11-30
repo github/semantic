@@ -9,7 +9,7 @@ import Data.Algebra
 import Data.Blob
 import Data.Error (Error(..), showExpectation)
 import Data.Foldable (toList)
-import Data.Language
+import Data.Language as Language
 import Data.List.NonEmpty (nonEmpty)
 import Data.Proxy (Proxy(..))
 import Data.Range

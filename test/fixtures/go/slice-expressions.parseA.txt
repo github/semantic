@@ -3,7 +3,8 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     (
       (Slice
@@ -13,26 +14,21 @@
         (Empty))
       (Slice
         (Identifier)
+        (Empty)
         (Integer)
+        (Empty))
+      (Slice
+        (Identifier)
+        (Empty)
         (Empty)
         (Empty))
       (Slice
         (Identifier)
         (Integer)
-        (Empty)
-        (Empty))
+        (Integer)
+        (Integer))
       (Slice
         (Identifier)
         (Integer)
         (Integer)
-        (Empty))
-      (Slice
-        (Identifier)
-        (Integer)
-        (Integer)
-        (Empty))
-      (Slice
-        (Identifier)
-        (Integer)
-        (Integer)
-        (Integer)))))
+        (Empty)))))

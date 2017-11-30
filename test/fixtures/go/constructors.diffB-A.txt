@@ -3,18 +3,19 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     (
       (Call
         (Identifier)
-        (BiDirectionalChannel
+        (SendChannel
         { (Identifier)
         ->(Identifier) })
         (Empty))
       (Call
         (Identifier)
-        (BiDirectionalChannel
+        (SendChannel
         { (Identifier)
         ->(Identifier) })
         (Minus
@@ -23,7 +24,7 @@
         (Empty))
       (Call
         (Identifier)
-        (BiDirectionalChannel
+        (SendChannel
         { (Identifier)
         ->(Identifier) })
       { (Integer)

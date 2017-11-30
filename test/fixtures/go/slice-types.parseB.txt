@@ -3,17 +3,18 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     (
       (
-        (Annotation
+        (Type
           (Identifier)
           (Slice
             (Slice
               (Identifier)))))
       (
-        (Annotation
+        (Type
           (Identifier)
           (Slice
             (Identifier)))))))

@@ -3,17 +3,18 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     (
       (Call
         (Identifier)
-        (BiDirectionalChannel
+        (SendChannel
           (Identifier))
         (Empty))
       (Call
         (Identifier)
-        (BiDirectionalChannel
+        (SendChannel
           (Identifier))
         (Minus
           (Identifier)
@@ -21,7 +22,7 @@
         (Empty))
       (Call
         (Identifier)
-        (BiDirectionalChannel
+        (SendChannel
           (Identifier))
         (Integer)
         (Integer)

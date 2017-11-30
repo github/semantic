@@ -3,24 +3,25 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     (
       (
-        (Annotation
+        (Type
           (Identifier)
           (Identifier)))
       (
-        (Annotation
+        (Type
           (Identifier)
           (Identifier))
-        (Annotation
+        (Type
           (Identifier)
           (Identifier)))
       (
         (Context
           (Comment)
-          (Annotation
+          (Type
             (Identifier)
             (Constructor
               (Empty)
@@ -36,7 +37,7 @@
                 (Identifier)
                 (
                   (Identifier))))))
-        (Annotation
+        (Type
           (Identifier)
           (Interface))
         (Context

@@ -3,7 +3,8 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     (
     { (Identifier)
@@ -12,8 +13,7 @@
       { (Identifier)
       ->(Identifier) })
       (Not
-        (Receive
-          (Empty)
+        (ReceiveOperator
         { (Identifier)
         ->(Identifier) }))
       (Pointer
@@ -27,7 +27,6 @@
       (Reference
       { (Identifier)
       ->(Identifier) })
-      (Receive
-        (Empty)
+      (ReceiveOperator
       { (Identifier)
       ->(Identifier) }))))

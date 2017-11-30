@@ -3,16 +3,17 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     (
       (
-        (Annotation
+        (Type
           (Identifier)
           (Constructor
             (Empty))))
       (
-        (Annotation
+        (Type
           (Identifier)
           (Constructor
             (Empty)
@@ -20,7 +21,7 @@
               (Identifier)
               ([])))))
       (
-        (Annotation
+        (Type
           (Identifier)
           (Constructor
             (Empty)
@@ -30,7 +31,7 @@
                 (Identifier)
                 (Identifier))))))
       (
-        (Annotation
+        (Type
           (Identifier)
           (Constructor
             (Empty)

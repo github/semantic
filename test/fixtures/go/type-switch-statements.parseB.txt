@@ -3,7 +3,8 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     (
       (TypeSwitch
@@ -93,8 +94,8 @@
                     (Empty))
                   (Slice
                     (Identifier)
-                    (Identifier)
                     (Empty)
+                    (Identifier)
                     (Empty)))
                 (Empty))))
           (Pattern

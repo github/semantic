@@ -3,33 +3,34 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     (
-      (Annotation
+      (Type
         (Identifier)
-        (BiDirectionalChannel
+        (BidirectionalChannel
           (ReceiveChannel
             (Identifier))))
-      (Annotation
+      (Type
         (Identifier)
         (SendChannel
-          (BiDirectionalChannel
+          (SendChannel
             (Constructor
               (Empty)))))
-      (Annotation
+      (Type
         (Identifier)
         (SendChannel
           (ReceiveChannel
             (Identifier))))
-      (Annotation
+      (Type
         (Identifier)
         (ReceiveChannel
           (ReceiveChannel
             (Identifier))))
-      (Annotation
+      (Type
         (Identifier)
-        (BiDirectionalChannel
+        (BidirectionalChannel
           (Parenthesized
             (ReceiveChannel
               (Identifier))))))))

@@ -3,10 +3,11 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     (
-      (Annotation
+      (Type
         (Identifier)
         (Map
         { (Identifier)

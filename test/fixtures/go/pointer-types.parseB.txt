@@ -3,14 +3,15 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     (
-      (Annotation
+      (Type
         (Identifier)
         (Pointer
           (Identifier)))
-      (Annotation
+      (Type
         (Identifier)
         (Pointer
           (Pointer

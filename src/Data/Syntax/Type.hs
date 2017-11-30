@@ -23,13 +23,6 @@ instance Eq1 Annotation where liftEq = genericLiftEq
 instance Ord1 Annotation where liftCompare = genericLiftCompare
 instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
 
-data Alias a = Alias { aliasSubject :: !a, aliasType :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
-
-instance Eq1 Alias where liftEq = genericLiftEq
-instance Ord1 Alias where liftCompare = genericLiftCompare
-instance Show1 Alias where liftShowsPrec = genericLiftShowsPrec
-
 data Function a = Function { functionParameters :: [a], functionReturn :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
@@ -37,7 +30,7 @@ instance Eq1 Function where liftEq = genericLiftEq
 instance Ord1 Function where liftCompare = genericLiftCompare
 instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
-newtype Interface a = Interface { interfaceElements :: [a] }
+newtype Interface a = Interface [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Interface where liftEq = genericLiftEq
@@ -51,21 +44,21 @@ instance Eq1 Map where liftEq = genericLiftEq
 instance Ord1 Map where liftCompare = genericLiftCompare
 instance Show1 Map where liftShowsPrec = genericLiftShowsPrec
 
-newtype Parenthesized a = Parenthesized { parenthesizedType :: a }
+newtype Parenthesized a = Parenthesized a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Parenthesized where liftEq = genericLiftEq
 instance Ord1 Parenthesized where liftCompare = genericLiftCompare
 instance Show1 Parenthesized where liftShowsPrec = genericLiftShowsPrec
 
-newtype Pointer a = Pointer { pointerType :: a }
+newtype Pointer a = Pointer a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Pointer where liftEq = genericLiftEq
 instance Ord1 Pointer where liftCompare = genericLiftCompare
 instance Show1 Pointer where liftShowsPrec = genericLiftShowsPrec
 
-newtype Product a = Product { productElements :: [a] }
+newtype Product a = Product [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Product where liftEq = genericLiftEq
@@ -79,14 +72,14 @@ instance Eq1 Readonly where liftEq = genericLiftEq
 instance Ord1 Readonly where liftCompare = genericLiftCompare
 instance Show1 Readonly where liftShowsPrec = genericLiftShowsPrec
 
-newtype Slice a = Slice { sliceElementType :: a }
+newtype Slice a = Slice a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Slice where liftEq = genericLiftEq
 instance Ord1 Slice where liftCompare = genericLiftCompare
 instance Show1 Slice where liftShowsPrec = genericLiftShowsPrec
 
-data TypeParameters a = TypeParameters { typeParameters :: ![a] }
+data TypeParameters a = TypeParameters [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 TypeParameters where liftEq = genericLiftEq

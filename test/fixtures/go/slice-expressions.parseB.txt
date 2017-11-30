@@ -3,34 +3,32 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     (
-      (Subscript
+      (Slice
         (Identifier)
+        (Integer)
+        (Empty)
+        (Empty))
+      (Slice
+        (Identifier)
+        (Empty)
+        (Integer)
+        (Empty))
+      (Slice
+        (Identifier)
+        (Integer)
+        (Integer)
+        (Empty))
+      (Slice
+        (Identifier)
+        (Integer)
+        (Integer)
         (Integer))
       (Slice
         (Identifier)
-        (Empty)
-        (Empty)
-        (Empty))
-      (Slice
-        (Identifier)
-        (Integer)
-        (Empty)
-        (Empty))
-      (Slice
-        (Identifier)
         (Integer)
         (Integer)
-        (Empty))
-      (Slice
-        (Identifier)
-        (Integer)
-        (Integer)
-        (Empty))
-      (Slice
-        (Identifier)
-        (Integer)
-        (Integer)
-        (Integer)))))
+        (Empty)))))

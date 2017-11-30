@@ -3,15 +3,15 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     (
       (Identifier)
       (Negate
         (Identifier))
       (Not
-        (Receive
-          (Empty)
+        (ReceiveOperator
           (Identifier)))
       (Pointer
         (Call
@@ -21,6 +21,5 @@
         (Identifier))
       (Reference
         (Identifier))
-      (Receive
-        (Empty)
+      (ReceiveOperator
         (Identifier)))))

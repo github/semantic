@@ -3,34 +3,32 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     (
       (
-        (Annotation
+        (Type
           (Identifier)
           (Interface)))
       (
-        (Annotation
+        (Type
           (Identifier)
           (Interface
             (MemberAccess
               (Identifier)
               (Identifier)))))
       (
-        (Annotation
+        (Type
           (Identifier)
           (Interface
             (Identifier)
             (MemberAccess
               (Identifier)
               (Identifier))
-            (Annotation
-              (Method
-                (Empty)
+            (MethodSignature
+              (Identifier)
+              (Identifier)
+              (
                 (Identifier)
-                (
-                  (Identifier)
-                  (Identifier))
-                (Empty))
-              (Identifier))))))))
+                (Identifier)))))))))

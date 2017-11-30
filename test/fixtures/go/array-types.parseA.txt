@@ -3,11 +3,12 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     (
       (
-        (Annotation
+        (Type
           (Identifier)
           (Array
             (Plus
@@ -15,7 +16,7 @@
               (Integer))
             (Identifier))))
       (
-        (Annotation
+        (Type
           (Identifier)
           (Array
             (Integer)
@@ -23,7 +24,7 @@
               (Integer)
               (Identifier)))))
       (
-        (Annotation
+        (Type
           (Identifier)
           (Array
             (Integer)

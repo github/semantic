@@ -3,7 +3,8 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     (
       (Select
@@ -12,8 +13,7 @@
             (Receive
             { (Identifier)
             ->(Identifier) }
-              (Receive
-                (Empty)
+              (ReceiveOperator
                 (Identifier)))
             (Call
               (Identifier)
@@ -31,8 +31,7 @@
           (Pattern
             (Receive
               (Empty)
-              (Receive
-                (Empty)
+              (ReceiveOperator
                 (Call
                   (MemberAccess
                     (Identifier)
@@ -87,16 +86,14 @@
           (Pattern
             (Receive
               (Empty)
-              (Receive
-                (Empty)
+              (ReceiveOperator
               { (Identifier)
               ->(Identifier) }))
             ([]))
           (Pattern
             (Receive
               (Empty)
-              (Receive
-                (Empty)
+              (ReceiveOperator
                 (Identifier)))
             ([]))
         {+(Pattern

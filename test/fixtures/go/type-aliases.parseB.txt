@@ -3,14 +3,15 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     (
-      (Alias
+      (TypeAlias
         (Identifier)
         (Slice
           (Pointer
             (Identifier))))
-      (Alias
+      (TypeAlias
         (Identifier)
         (Identifier)))))

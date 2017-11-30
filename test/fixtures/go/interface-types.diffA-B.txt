@@ -3,16 +3,17 @@
     (Identifier))
   (Function
     (Empty)
-    (Identifier)
+    (
+      (Identifier))
     ([])
     (
       (
-        (Annotation
+        (Type
         { (Identifier)
         ->(Identifier) }
           (Interface)))
       (
-        (Annotation
+        (Type
         { (Identifier)
         ->(Identifier) }
           (Interface
@@ -20,7 +21,7 @@
               (Identifier)
               (Identifier)))))
       (
-        (Annotation
+        (Type
         { (Identifier)
         ->(Identifier) }
           (Interface
@@ -28,12 +29,9 @@
             (MemberAccess
               (Identifier)
               (Identifier))
-            (Annotation
-              (Method
-                (Empty)
+            (MethodSignature
+              (Identifier)
+              (Identifier)
+              (
                 (Identifier)
-                (
-                  (Identifier)
-                  (Identifier))
-                (Empty))
-              (Identifier))))))))
+                (Identifier)))))))))
