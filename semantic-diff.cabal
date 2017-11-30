@@ -14,7 +14,7 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Algorithm
-                     , Abstract.Abstract
+                     , Abstract.Address
                      , Abstract.Configuration
                      , Abstract.Environment
                      , Abstract.Eval
