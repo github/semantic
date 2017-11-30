@@ -6,12 +6,11 @@ import Abstract.Eval
 import Abstract.FreeVariables
 import Abstract.Monad.Env
 import Abstract.Store
-import Abstract.Type
 import Abstract.Value
-
 import Control.Effect
 import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.Fail
+import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State

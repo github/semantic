@@ -38,6 +38,7 @@ library
                      , Category
                      -- Control flow
                      , Control.Effect
+                     , Control.Monad.Effect.Fresh
                      -- General datatype definitions & generic algorithms
                      , Data.Algebra
                      , Data.Align.Generic

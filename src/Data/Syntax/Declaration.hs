@@ -10,6 +10,7 @@ import Abstract.Type hiding (Type)
 import qualified Abstract.Type as Type
 import Abstract.Value
 import Control.Applicative
+import Control.Monad.Effect.Fresh
 import Data.Align.Generic
 import Data.Foldable (toList)
 import Data.Functor.Classes.Eq.Generic
@@ -53,7 +54,7 @@ instance ( Monad m
 
 instance ( Alternative m
          , Monad m
-         , Type.MonadFresh m
+         , MonadFresh m
          , MonadEnv Type.Type m
          , MonadStore Type.Type m
          , FreeVariables t

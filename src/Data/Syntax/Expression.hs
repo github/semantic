@@ -8,6 +8,7 @@ import Abstract.Monad.Env
 import Abstract.Value (Value, Closure(..))
 import Abstract.Type as Type
 import Abstract.FreeVariables
+import Control.Monad.Effect.Fresh
 import Data.Maybe
 import Data.Union
 import Data.Semigroup
