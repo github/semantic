@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Syntax.Expression where
 
 import Abstract.Eval
@@ -56,7 +56,10 @@ instance ( MonadFail m
          => Eval t Type m Call where
   eval recur yield Call{..} = do
     opTy <- recur pure callFunction
-    yield opTy
+    tvar <- fresh
+    inTys <- traverse (recur pure) callParams
+    _ :-> outTy <- opTy `unify` (TArr inTys :-> TVar tvar)
+    yield outTy
 
 data Comparison a
   = LessThan !a !a
