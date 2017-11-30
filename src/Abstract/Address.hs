@@ -8,6 +8,7 @@ import Data.Functor.Classes.Ord.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Pointed
 import Data.Semigroup
+import Data.Set
 import GHC.Generics
 
 newtype Address l a = Address { unAddress :: l }
@@ -38,6 +39,11 @@ newtype Precise = Precise { unPrecise :: Int }
 
 newtype Monovariant = Monovariant { unMonovariant :: Name }
   deriving (Eq, Ord, Show)
+
+
+type family Cell l = res | res -> l where
+  Cell Precise = Latest
+  Cell Monovariant = Set
 
 
 newtype Latest a = Latest { unLatest :: a }
