@@ -7,6 +7,7 @@ import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Store
+import Control.Monad.Effect.Trace
 import Control.Monad.Effect.Writer
 import Data.Abstract.Configuration
 import Data.Abstract.Eval
@@ -24,12 +25,6 @@ type TracingInterpreter t v g = Reader (Set.Set (Address (LocationFor v) v)) ': 
 type TraceInterpreter t v = TracingInterpreter t v []
 type ReachableStateInterpreter t v = TracingInterpreter t v Set.Set
 
-
-class Monad m => MonadTrace t v g m where
-  trace :: g (Configuration (LocationFor v) t v) -> m ()
-
-instance (Writer (g (Configuration (LocationFor v) t v)) :< fs) => MonadTrace t v g (Eff fs) where
-  trace = tell
 
 -- Tracing and reachable state analyses
 --
