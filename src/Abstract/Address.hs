@@ -49,24 +49,24 @@ newtype Monovariant = Monovariant { unMonovariant :: Name }
   deriving (Eq, Ord, Show)
 
 
-newtype I a = I { unI :: a }
+newtype Latest a = Latest { unLatest :: a }
   deriving (Eq, Generic1, Ord, Show)
 
-instance Semigroup (I a) where
+instance Semigroup (Latest a) where
   (<>) = flip const
 
-instance Foldable I where
-  foldMap f = f . unI
+instance Foldable Latest where
+  foldMap f = f . unLatest
 
-instance Functor I where
-  fmap f = I . f . unI
+instance Functor Latest where
+  fmap f = Latest . f . unLatest
 
-instance Traversable I where
-  traverse f = fmap I . f . unI
+instance Traversable Latest where
+  traverse f = fmap Latest . f . unLatest
 
-instance Pointed I where
-  point = I
+instance Pointed Latest where
+  point = Latest
 
-instance Eq1 I where liftEq = genericLiftEq
-instance Ord1 I where liftCompare = genericLiftCompare
-instance Show1 I where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 Latest where liftEq = genericLiftEq
+instance Ord1 Latest where liftCompare = genericLiftCompare
+instance Show1 Latest where liftShowsPrec = genericLiftShowsPrec

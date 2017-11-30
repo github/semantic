@@ -76,9 +76,9 @@ allocPrecise :: Store Precise a -> Address Precise a
 allocPrecise = Address . Precise . storeSize
 
 instance Monad m => MonadAddress Precise m where
-  type Cell Precise = I
+  type Cell Precise = Latest
 
-  deref = maybe uninitializedAddress (pure . unI) <=< flip fmap getStore . storeLookup
+  deref = maybe uninitializedAddress (pure . unLatest) <=< flip fmap getStore . storeLookup
 
   alloc _ = fmap allocPrecise getStore
 
