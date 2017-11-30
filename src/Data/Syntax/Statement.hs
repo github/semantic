@@ -78,11 +78,11 @@ instance ( Monad m
          )
          => Eval t v m Assignment where
   eval ev yield Assignment{..} = do
-    let [var] = toList (freeVariables assignmentTarget)
-    v <- ev pure assignmentValue
     env <- askEnv @(LocationFor v) @v
-    a <- maybe (alloc @(LocationFor v) var) pure (envLookup var env)
-    assign a v
+    v <- ev pure assignmentValue
+
+    (var, a) <- envLookupOrAlloc' assignmentTarget env v
+
     localEnv (envInsert var a) (yield v)
 
 -- Returns

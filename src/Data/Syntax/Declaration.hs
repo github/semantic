@@ -45,9 +45,8 @@ instance ( Monad m
     let params = toList (foldMap freeVariables functionParameters)
     let v = inj (Closure params functionBody env)
 
-    let [name] = toList (freeVariables functionName)
-    a <- maybe (alloc name) pure (envLookup name env)
-    assign a v
+    (name, a) <- envLookupOrAlloc' functionName env v
+
     localEnv (envInsert name a) (yield v)
 
 instance ( Alternative m
@@ -61,19 +60,17 @@ instance ( Alternative m
   eval recur yield Function{..} = do
     env <- askEnv @Monovariant @Type
     let params = toList (foldMap freeVariables functionParameters)
-    tvars <- for params $ \ name -> do
+    tvars <- for params $ \name -> do
       a <- alloc name
-      tvar <- fresh
-      assign a (TVar tvar)
+      tvar <- TVar <$> fresh
+      assign a tvar
       pure (name, a, tvar)
 
     outTy <- localEnv (const (foldr (\ (n, a, _) -> envInsert n a) env tvars)) (recur pure functionBody)
-    let tvars' = fmap (\(_, _, t) -> TVar t) tvars
+    let tvars' = fmap (\(_, _, t) -> t) tvars
     let v = TArr tvars' :-> outTy
 
-    let [name] = toList (freeVariables functionName)
-    a <- maybe (alloc name) pure (envLookup name env)
-    assign a v
+    (name, a) <- envLookupOrAlloc' functionName env v
 
     localEnv (envInsert name a) (yield v)
 

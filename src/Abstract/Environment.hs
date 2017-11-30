@@ -9,6 +9,7 @@ import Data.Functor.Classes
 import Data.Functor.Classes.Show.Generic
 import qualified Data.Map as Map
 import Data.Pointed
+import Data.Foldable (toList)
 import Data.Semigroup
 import qualified Data.Set as Set
 import GHC.Generics
@@ -19,6 +20,27 @@ newtype Environment l a = Environment { unEnvironment :: Map.Map Name (Address l
 
 envLookup :: Name -> Environment l a -> Maybe (Address l a)
 envLookup = (. unEnvironment) . Map.lookup
+
+envLookupOrAlloc' ::
+                 ( FreeVariables t
+                 , Semigroup (Cell l a)
+                 , MonadStore l a m
+                 , MonadAddress l m
+                 )
+                 => t -> Environment l a -> a -> m (Name, Address l a)
+envLookupOrAlloc' term = let [name] = toList (freeVariables term) in
+                         envLookupOrAlloc name
+
+envLookupOrAlloc ::
+                 ( Semigroup (Cell l a)
+                 , MonadStore l a m
+                 , MonadAddress l m
+                 )
+                 => Name -> Environment l a -> a -> m (Name, Address l a)
+envLookupOrAlloc name env v = do
+  a <- maybe (alloc name) pure (envLookup name env)
+  assign a v
+  pure (name, a)
 
 envInsert :: Name -> Address l a -> Environment l a -> Environment l a
 envInsert name value (Environment m) = Environment (Map.insert name value m)
