@@ -8,12 +8,14 @@ import Abstract.FreeVariables
 import Abstract.Type as Type
 import Abstract.Value
 import Algorithm
+import Control.Applicative
 import Data.Align.Generic
 import Data.Foldable (toList)
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Ord.Generic
 import Data.Functor.Classes.Show.Generic
 import Data.Mergeable
+import Data.Traversable
 import Data.Semigroup
 import Data.Union
 import GHC.Generics
@@ -41,14 +43,40 @@ instance ( Monad m
   eval _ yield Function{..} = do
     env <- askEnv @l @(Value l t)
     let params = toList (foldMap freeVariables functionParameters)
+    let v = inj (Closure params functionBody env)
 
     let [name] = toList (freeVariables functionName)
-    let v = inj (Closure params functionBody env)
     a <- maybe (alloc name) pure (envLookup name env)
     assign a v
     localEnv (envInsert name a) (yield v)
 
-instance (MonadFail m) => Eval term Type m Function
+instance ( Alternative m
+         , Monad m
+         , MonadFresh m
+         , MonadEnv Monovariant Type m
+         , MonadStore Monovariant Type m
+         -- , MonadAddress Monovariant m
+         , FreeVariables t
+         )
+         => Eval t Type m Function where
+  eval recur yield Function{..} = do
+    env <- askEnv @Monovariant @Type
+    let params = toList (foldMap freeVariables functionParameters)
+    tvars <- for params $ \ name -> do
+      a <- alloc name
+      tvar <- fresh
+      assign a (TVar tvar)
+      pure (name, a, tvar)
+
+    outTy <- localEnv (const (foldr (\ (n, a, _) -> envInsert n a) env tvars)) (recur pure functionBody)
+    let tvars' = fmap (\(_, _, t) -> t) tvars
+    let v = TArr tvars' :-> outTy
+
+    let [name] = toList (freeVariables functionName)
+    a <- maybe (alloc name) pure (envLookup name env)
+    assign a v
+
+    localEnv (envInsert name a) (yield v)
 
 -- TODO: How should we represent function types, where applicable?
 
