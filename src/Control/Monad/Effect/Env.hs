@@ -1,5 +1,5 @@
 {-# LANGUAGE MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
-module Abstract.Monad.Env where
+module Control.Monad.Effect.Env where
 
 import Abstract.Environment
 import Abstract.Value

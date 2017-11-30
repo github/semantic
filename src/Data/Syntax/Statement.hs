@@ -4,9 +4,9 @@ module Data.Syntax.Statement where
 import Abstract.Environment
 import Abstract.Eval
 import Abstract.FreeVariables
-import Abstract.Monad.Env
 import Abstract.Store
 import Abstract.Value
+import Control.Monad.Effect.Env
 import Data.Semigroup
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic

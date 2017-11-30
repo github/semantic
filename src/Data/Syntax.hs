@@ -3,12 +3,12 @@ module Data.Syntax where
 
 import Abstract.Eval
 import Abstract.FreeVariables
-import Abstract.Monad.Env
 import Abstract.Environment
 import Abstract.Store
 import Abstract.Value (LocationFor, AbstractValue(..))
 import qualified Assigning.Assignment as Assignment
 import Control.Monad.Effect
+import Control.Monad.Effect.Env
 import Control.Applicative
 import Control.Monad.Error.Class hiding (Error)
 import Data.Align.Generic

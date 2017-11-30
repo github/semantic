@@ -24,7 +24,6 @@ library
                      , Abstract.Interpreter.Caching
                      , Abstract.Interpreter.Dead
                      , Abstract.Interpreter.Tracing
-                     , Abstract.Monad.Env
                      , Abstract.Store
                      , Abstract.Type
                      , Abstract.Value
@@ -38,6 +37,7 @@ library
                      , Category
                      -- Control flow
                      , Control.Effect
+                     , Control.Monad.Effect.Env
                      , Control.Monad.Effect.Fresh
                      -- General datatype definitions & generic algorithms
                      , Data.Algebra

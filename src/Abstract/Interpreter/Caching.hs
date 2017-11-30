@@ -6,11 +6,11 @@ import Abstract.Environment
 import Abstract.Eval
 import Abstract.FreeVariables
 import Abstract.Interpreter
-import Abstract.Monad.Env
 import Abstract.Store
 import Abstract.Value
 import Control.Applicative
 import Control.Effect
+import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.Internal hiding (run)

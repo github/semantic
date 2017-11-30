@@ -4,10 +4,10 @@ module Data.Syntax.Expression where
 import Abstract.Environment
 import Abstract.Eval
 import Abstract.Store
-import Abstract.Monad.Env
 import Abstract.Value (Value, Closure(..))
 import Abstract.Type as Type
 import Abstract.FreeVariables
+import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fresh
 import Data.Maybe
 import Data.Union

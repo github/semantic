@@ -7,10 +7,10 @@ module Abstract.Eval
 
 import Abstract.Environment
 import Abstract.FreeVariables
-import Abstract.Monad.Env
 import Abstract.Store
 import Abstract.Value
 import Control.Monad.Effect
+import Control.Monad.Effect.Env
 import Control.Monad.Effect.Reader
 import Control.Monad.Fail
 import Data.Functor.Classes

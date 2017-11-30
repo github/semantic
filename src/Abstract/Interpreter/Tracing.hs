@@ -3,14 +3,13 @@ module Abstract.Interpreter.Tracing where
 
 import Abstract.Configuration
 import Abstract.Eval
-import Abstract.Monad.Env
 import Abstract.FreeVariables
 import Abstract.Interpreter
 import Abstract.Store
 import Abstract.Value
-
 import Control.Effect
 import Control.Monad.Effect hiding (run)
+import Control.Monad.Effect.Env
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Writer
 import Data.Function (fix)
