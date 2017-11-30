@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeOperators, MultiParamTypeClasses, FlexibleInstances, FlexibleContexts, UndecidableInstances, DeriveFoldable, DeriveFunctor, DeriveTraversable, DeriveGeneric, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Abstract.Environment where
 
 import Abstract.Address
@@ -13,7 +13,7 @@ import GHC.Generics
 
 
 newtype Environment l a = Environment { unEnvironment :: Map.Map Name (Address l a) }
-  deriving (Eq, Foldable, Functor, Monoid, Ord, Semigroup, Show, Traversable, Generic1)
+  deriving (Eq, Foldable, Functor, Generic1, Monoid, Ord, Semigroup, Show, Traversable)
 
 envLookup :: Name -> Environment l a -> Maybe (Address l a)
 envLookup = (. unEnvironment) . Map.lookup
