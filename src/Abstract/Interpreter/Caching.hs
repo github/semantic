@@ -49,28 +49,28 @@ type CachingInterpreter t v = '[Fresh, Reader (Set.Set (Address (LocationFor v) 
 
 type CachingResult t v = Final (CachingInterpreter t v) v
 
-type MonadCachingInterpreter t v m = (MonadEnv v m, MonadStore v m, MonadCacheIn (LocationFor v) t v m, MonadCacheOut (LocationFor v) t v m, MonadGC v m, Alternative m)
+type MonadCachingInterpreter t v m = (MonadEnv v m, MonadStore v m, MonadCacheIn t v m, MonadCacheOut t v m, MonadGC v m, Alternative m)
 
 
 
-class Monad m => MonadCacheIn l t v m where
-  askCache :: m (Cache l t v)
-  localCache :: (Cache l t v -> Cache l t v) -> m a -> m a
+class Monad m => MonadCacheIn t v m where
+  askCache :: m (Cache (LocationFor v) t v)
+  localCache :: (Cache (LocationFor v) t v -> Cache (LocationFor v) t v) -> m a -> m a
 
-instance (Reader (Cache l t v) :< fs) => MonadCacheIn l t v (Eff fs) where
+instance (Reader (Cache (LocationFor v) t v) :< fs) => MonadCacheIn t v (Eff fs) where
   askCache = ask
   localCache = local
 
 
-class Monad m => MonadCacheOut l t v m where
-  getCache :: m (Cache l t v)
-  putCache :: Cache l t v -> m ()
+class Monad m => MonadCacheOut t v m where
+  getCache :: m (Cache (LocationFor v) t v)
+  putCache :: Cache (LocationFor v) t v -> m ()
 
-instance (State (Cache l t v) :< fs) => MonadCacheOut l t v (Eff fs) where
+instance (State (Cache (LocationFor v) t v) :< fs) => MonadCacheOut t v (Eff fs) where
   getCache = get
   putCache = put
 
-modifyCache :: MonadCacheOut l t v m => (Cache l t v -> Cache l t v) -> m ()
+modifyCache :: MonadCacheOut t v m => (Cache (LocationFor v) t v -> Cache (LocationFor v) t v) -> m ()
 modifyCache f = fmap f getCache >>= putCache
 
 
