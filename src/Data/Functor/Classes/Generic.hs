@@ -49,7 +49,7 @@ class GShow1 f where
 data GShow1Options = GShow1Options { optionsIncludeSelectors :: Bool }
 
 defaultGShow1Options :: GShow1Options
-defaultGShow1Options = GShow1Options { optionsIncludeSelectors = True }
+defaultGShow1Options = GShow1Options { optionsIncludeSelectors = False }
 
 class GShow1 f => GShow1Body f where
   -- | showsPrec function for the body of an application of the type constructor based on showsPrec and showList functions for the argument type.
