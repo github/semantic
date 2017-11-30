@@ -4,11 +4,12 @@ module Abstract.Type where
 import Control.Effect
 import Control.Monad.Effect.Internal
 import Control.Monad.Fail
+import Data.Traversable
 import Prelude hiding (fail)
 
 type TName = Int
 
-data Type = Int | Bool | String | Unit | Type :-> Type | Type :* Type | TVar TName | TArr [TName]
+data Type = Int | Bool | String | Unit | Type :-> Type | Type :* Type | TVar TName | TArr [Type]
   deriving (Eq, Ord, Show)
 
 
@@ -19,6 +20,7 @@ unify (a1 :-> b1) (a2 :-> b2) = (:->) <$> unify a1 a2 <*> unify b1 b2
 unify (a1 :* b1)  (a2 :* b2)  = (:*)  <$> unify a1 a2 <*> unify b1 b2
 unify (TVar _) b = pure b
 unify a (TVar _) = pure a
+unify (TArr as) (TArr bs) = TArr <$> for (zip as bs) (uncurry unify)
 unify t1 t2 = fail ("cannot unify " ++ show t1 ++ " with " ++ show t2)
 
 
