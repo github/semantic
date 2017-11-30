@@ -11,16 +11,7 @@ import Data.Semigroup
 import GHC.Generics
 
 newtype Address l a = Address { unAddress :: l }
-  deriving (Eq, Ord, Show)
-
-instance Foldable (Address l) where
-  foldMap _ = mempty
-
-instance Functor (Address l) where
-  fmap _ = Address . unAddress
-
-instance Traversable (Address l) where
-  traverse _ = fmap Address . pure . unAddress
+  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
 
 instance Eq2 Address where
