@@ -30,6 +30,17 @@ spec = parallel $ do
       prop "equivalent to derived compare for recursive types" $
         \ a b -> genericLiftCompare compare a b `shouldBe` compare a (b :: Tree Int)
 
+  describe "Show1" $ do
+    describe "genericLiftShowsPrec" $ do
+      prop "equivalent to derived showsPrec for product types" $
+        \ a -> genericLiftShowsPrec showsPrec showList 0 a "" `shouldBe` showsPrec 0 (a :: Product Int) ""
+
+      prop "equivalent to derived showsPrec for sum types" $
+        \ a -> genericLiftShowsPrec showsPrec showList 0 a "" `shouldBe` showsPrec 0 (a :: Sum Int) ""
+
+      prop "equivalent to derived showsPrec for recursive types" $
+        \ a -> genericLiftShowsPrec showsPrec showList 0 a "" `shouldBe` showsPrec 0 (a :: Tree Int) ""
+
 
 data Product a = Product a a a
   deriving (Eq, Generic1, Ord, Show)
@@ -53,3 +64,4 @@ instance Listable a => Listable (Tree a) where
 
 instance Eq1 Tree where liftEq = genericLiftEq
 instance Ord1 Tree where liftCompare = genericLiftCompare
+instance Show1 Tree where liftShowsPrec = genericLiftShowsPrec
