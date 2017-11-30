@@ -1,7 +1,6 @@
 {-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, DataKinds, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Abstract.Interpreter.Caching where
 
-import Abstract.FreeVariables
 import Abstract.Interpreter
 import Abstract.Store
 import Abstract.Value
@@ -17,6 +16,7 @@ import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Configuration
 import Data.Abstract.Environment
+import Data.Abstract.FreeVariables
 import Data.Foldable
 import Data.Function (fix)
 import Data.Functor.Classes

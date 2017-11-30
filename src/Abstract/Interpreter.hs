@@ -1,7 +1,6 @@
 {-# LANGUAGE UndecidableInstances, AllowAmbiguousTypes, ConstraintKinds, DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeOperators, MonoLocalBinds #-}
 module Abstract.Interpreter where
 
-import Abstract.FreeVariables
 import Abstract.Store
 import Abstract.Value
 import Analysis.Abstract.Eval
@@ -14,6 +13,7 @@ import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Environment
+import Data.Abstract.FreeVariables
 import Data.Function (fix)
 import Data.Semigroup
 import qualified Data.Set as Set

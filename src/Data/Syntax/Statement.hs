@@ -1,12 +1,12 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, TypeApplications, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Syntax.Statement where
 
-import Abstract.FreeVariables
 import Abstract.Store
 import Abstract.Value
 import Analysis.Abstract.Eval
 import Control.Monad.Effect.Env
 import Data.Abstract.Environment
+import Data.Abstract.FreeVariables
 import Data.Semigroup
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic

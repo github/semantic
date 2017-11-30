@@ -1,7 +1,6 @@
 {-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Abstract.Interpreter.Tracing where
 
-import Abstract.FreeVariables
 import Abstract.Interpreter
 import Abstract.Store
 import Abstract.Value
@@ -12,6 +11,7 @@ import Control.Monad.Effect.Env
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Writer
 import Data.Abstract.Configuration
+import Data.Abstract.FreeVariables
 import Data.Function (fix)
 import Data.Functor.Classes (Ord1)
 import Data.Semigroup

@@ -1,5 +1,5 @@
 {-# LANGUAGE DefaultSignatures, UndecidableInstances #-}
-module Abstract.FreeVariables where
+module Data.Abstract.FreeVariables where
 
 import Data.ByteString (ByteString)
 import Data.Functor.Foldable

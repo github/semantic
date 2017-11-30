@@ -2,8 +2,8 @@
 module Data.Syntax.Literal where
 
 import Abstract.Value (AbstractValue(..))
-import Abstract.FreeVariables
 import Analysis.Abstract.Eval
+import Data.Abstract.FreeVariables
 import Data.Align.Generic
 import Data.Maybe
 import Data.ByteString (ByteString)

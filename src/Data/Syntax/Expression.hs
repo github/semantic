@@ -4,11 +4,11 @@ module Data.Syntax.Expression where
 import Abstract.Store
 import Abstract.Value (Value, Closure(..))
 import Abstract.Type as Type
-import Abstract.FreeVariables
 import Analysis.Abstract.Eval
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fresh
 import Data.Abstract.Environment
+import Data.Abstract.FreeVariables
 import Data.Maybe
 import Data.Union
 import Data.Semigroup

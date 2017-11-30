@@ -2,7 +2,7 @@
 module Data.Abstract.Environment where
 
 import Abstract.Address
-import Abstract.FreeVariables
+import Data.Abstract.FreeVariables
 import Data.Functor.Classes
 import Data.Functor.Classes.Show.Generic
 import qualified Data.Map as Map
