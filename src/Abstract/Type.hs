@@ -25,8 +25,8 @@ unify t1 t2 = fail ("cannot unify " ++ show t1 ++ " with " ++ show t2)
 
 
 data Fresh a where
-  Reset :: Int -> Fresh ()
-  Fresh :: Fresh Int
+  Reset :: TName -> Fresh ()
+  Fresh :: Fresh TName
 
 class Monad m => MonadFresh m where
   fresh :: m TName
