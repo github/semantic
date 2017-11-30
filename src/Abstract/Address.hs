@@ -53,7 +53,7 @@ newtype I a = I { unI :: a }
   deriving (Eq, Generic1, Ord, Show)
 
 instance Semigroup (I a) where
-  (<>) = const
+  (<>) = flip const
 
 instance Foldable I where
   foldMap f = f . unI
