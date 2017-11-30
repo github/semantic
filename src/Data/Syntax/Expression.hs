@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, UndecidableInstances #-}
 module Data.Syntax.Expression where
 
 import Abstract.Eval
@@ -46,7 +46,17 @@ instance ( Ord l
       pure (name, a)
     localEnv (const (foldr (uncurry envInsert) env bindings)) (recur pure body) >>= yield
 
-instance (MonadFail m) => Eval t Type m Call
+-- TODO: extraRoots for evalCollect
+instance ( MonadFail m
+         , MonadFresh m
+         , MonadGC Monovariant Type m
+         , MonadEnv Monovariant Type m
+         , FreeVariables t
+         )
+         => Eval t Type m Call where
+  eval recur yield Call{..} = do
+    opTy <- recur pure callFunction
+    yield opTy
 
 data Comparison a
   = LessThan !a !a
