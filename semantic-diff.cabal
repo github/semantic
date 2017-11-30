@@ -19,7 +19,6 @@ library
                      , Abstract.Interpreter.Caching
                      , Abstract.Interpreter.Tracing
                      , Analysis.Abstract.Dead
-                     , Analysis.Abstract.Eval
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
                      , Analysis.Decorator
@@ -39,6 +38,7 @@ library
                      , Data.Abstract.Address
                      , Data.Abstract.Configuration
                      , Data.Abstract.Environment
+                     , Data.Abstract.Eval
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Store
                      , Data.Abstract.Type

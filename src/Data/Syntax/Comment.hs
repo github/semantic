@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses #-}
 module Data.Syntax.Comment where
 
-import Analysis.Abstract.Eval
+import Data.Abstract.Eval
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value as Value
 import Data.Align.Generic

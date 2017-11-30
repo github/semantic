@@ -1,11 +1,11 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Syntax.Expression where
 
-import Analysis.Abstract.Eval
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.Store
 import Data.Abstract.Environment
+import Data.Abstract.Eval
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type as Type
 import Data.Abstract.Value (Value, Closure(..))

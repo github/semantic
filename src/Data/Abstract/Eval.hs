@@ -1,5 +1,5 @@
 {-# LANGUAGE DefaultSignatures, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
-module Analysis.Abstract.Eval
+module Data.Abstract.Eval
 ( Eval(..)
 , MonadGC(..)
 , MonadFail(..)

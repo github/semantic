@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses #-}
 module Data.Syntax.Type where
 
-import Analysis.Abstract.Eval
+import Data.Abstract.Eval
 import Data.Abstract.FreeVariables
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
