@@ -44,6 +44,9 @@ spec = parallel $ do
       prop "equivalent to derived showsPrec for record selectors" $
         \ a -> genericLiftShowsPrec showsPrec showList 0 a "" `shouldBe` showsPrec 0 (a :: Record Int) ""
 
+      prop "equivalent to derived showsPrec for infix constructors" $
+        \ a -> genericLiftShowsPrec showsPrec showList 0 a "" `shouldBe` showsPrec 0 (a :: Infix Int) ""
+
 
 data Product a = Product a a a
   deriving (Eq, Generic1, Ord, Show)
@@ -75,3 +78,10 @@ data Record a = Record { recordSelector1 :: a, recordSelector2 :: a, recordSelec
 
 instance Listable a => Listable (Record a) where
   tiers = cons3 Record
+
+
+data Infix a = a :<>: a
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Listable a => Listable (Infix a) where
+  tiers = cons2 (:<>:)
