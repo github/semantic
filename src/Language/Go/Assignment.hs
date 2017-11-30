@@ -181,25 +181,27 @@ expressionChoices =
   ]
 
 types :: Assignment
-types =  arrayType
-     <|> channelType
-     <|> functionType
-     <|> implicitLengthArrayType
-     <|> interfaceType
-     <|> mapType
-     <|> parenthesizedType
-     <|> pointerType
-     <|> qualifiedType
-     <|> sliceType
-     <|> structType
-     <|> typeAssertion
-     <|> typeConversion
-     <|> typeDeclaration
-     <|> typeIdentifier
-     <|> typeCase
-     <|> typeCaseClause
-     <|> typeSwitchGuard
-     <|> typeSwitchStatement
+types =
+  choice [ arrayType
+         , channelType
+         , functionType
+         , implicitLengthArrayType
+         , interfaceType
+         , mapType
+         , parenthesizedType
+         , pointerType
+         , qualifiedType
+         , sliceType
+         , structType
+         , typeAssertion
+         , typeConversion
+         , typeDeclaration
+         , typeIdentifier
+         , typeCase
+         , typeCaseClause
+         , typeSwitchGuard
+         , typeSwitchStatement
+         ]
 
 identifiers :: Assignment
 identifiers = mk <$> location <*> manyTerm identifier
