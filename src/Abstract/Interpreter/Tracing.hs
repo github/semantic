@@ -39,7 +39,7 @@ instance (Writer (g (Configuration l t v)) :< fs) => MonadTrace l t v g (Eff fs)
 --    evalReach @(Value Syntax Precise) <term>
 
 evalTrace :: forall v syntax ann
-          . ( Ord v, Ord ann, Ord1 syntax, Ord1 (Cell (LocationFor v))
+          . ( Ord v, Ord ann, Ord1 syntax, Ord (Cell (LocationFor v) v)
             , FreeVariables1 syntax
             , Functor syntax
             , MonadAddress (LocationFor v) (Eff (TraceInterpreter (LocationFor v) (Term syntax ann) v))
@@ -51,7 +51,7 @@ evalTrace :: forall v syntax ann
 evalTrace = run @(TraceInterpreter (LocationFor v) (Term syntax ann) v) . fix (evTell @[] ev) pure
 
 evalReach :: forall v syntax ann
-          . ( Ord v, Ord ann, Ord (LocationFor v), Ord1 (Cell (LocationFor v)), Ord1 syntax
+          . ( Ord v, Ord ann, Ord (LocationFor v), Ord (Cell (LocationFor v) v), Ord1 syntax
             , FreeVariables1 syntax
             , Functor syntax
             , MonadAddress (LocationFor v) (Eff (ReachableStateInterpreter (LocationFor v) (Term syntax ann) v))

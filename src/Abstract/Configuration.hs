@@ -18,9 +18,9 @@ data Configuration l t v
     }
     deriving (Generic1)
 
-deriving instance (Eq l, Eq t, Eq v, Eq1 (Cell l)) => Eq (Configuration l t v)
-deriving instance (Ord l, Ord t, Ord v, Ord1 (Cell l)) => Ord (Configuration l t v)
-deriving instance (Show l, Show t, Show v, Show1 (Cell l)) => Show (Configuration l t v)
+deriving instance (Eq l, Eq t, Eq v, Eq (Cell l v)) => Eq (Configuration l t v)
+deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Ord (Configuration l t v)
+deriving instance (Show l, Show t, Show v, Show (Cell l v)) => Show (Configuration l t v)
 deriving instance (Ord l, Foldable (Cell l)) => Foldable (Configuration l t)
 
 

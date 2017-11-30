@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilyDependencies, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeFamilyDependencies, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Abstract.Store
 ( Precise(..)
 , Monovariant(..)
@@ -33,6 +33,10 @@ import Prelude hiding (fail)
 
 newtype Store l a = Store { unStore :: Map.Map l (Cell l a) }
   deriving (Generic1, Monoid, Semigroup)
+
+deriving instance (Eq l, Eq (Cell l a)) => Eq (Store l a)
+deriving instance (Ord l, Ord (Cell l a)) => Ord (Store l a)
+deriving instance (Show l, Show (Cell l a)) => Show (Store l a)
 
 storeLookup :: Ord l => Address l a -> Store l a -> Maybe (Cell l a)
 storeLookup = (. unStore) . Map.lookup . unAddress
@@ -104,17 +108,8 @@ instance (Ord l, Traversable (Cell l)) => Traversable (Store l) where
 instance (Eq l, Eq1 (Cell l)) => Eq1 (Store l) where
   liftEq eq (Store m1) (Store m2) = liftEq (liftEq eq) m1 m2
 
-instance (Eq a, Eq l, Eq1 (Cell l)) => Eq (Store l a) where
-  (==) = eq1
-
 instance (Ord l, Ord1 (Cell l)) => Ord1 (Store l) where
   liftCompare compareA (Store m1) (Store m2) = liftCompare (liftCompare compareA) m1 m2
 
-instance (Ord a, Ord l, Ord1 (Cell l)) => Ord (Store l a) where
-  compare = compare1
-
 instance (Show l, Show1 (Cell l)) => Show1 (Store l) where
   liftShowsPrec sp sl d (Store m) = showsUnaryWith (liftShowsPrec (liftShowsPrec sp sl) (liftShowList sp sl)) "Store" d m
-
-instance (Show a, Show l, Show1 (Cell l)) => Show (Store l a) where
-  showsPrec = showsPrec1
