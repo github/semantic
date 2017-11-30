@@ -7,7 +7,6 @@ import Abstract.Environment
 import Abstract.Store
 import Abstract.Value
 import Algorithm
-import Data.Foldable
 import Data.Semigroup
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
