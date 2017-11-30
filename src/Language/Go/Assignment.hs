@@ -272,9 +272,9 @@ arrayType = makeTerm <$> symbol ArrayType <*> children (Type.Array . Just <$> ex
 channelType :: Assignment
 channelType =  makeTerm' <$> symbol ChannelType <*> children (mkChannelType <$> optional (token AnonLAngleMinus) <* token AnonChan <*> optional (token AnonLAngleMinus) <*> expression)
   where
-    mkChannelType receive send expression' | Just _ <- receive = inj (Go.Type.ReceiveChannel expression')
-                                           | Just _ <- send    = inj (Go.Type.SendChannel expression')
-                                           | otherwise         = inj (Go.Type.BidirectionalChannel expression')
+    mkChannelType receive send | Just _ <- receive = inj . Go.Type.ReceiveChannel
+                               | Just _ <- send    = inj . Go.Type.SendChannel
+                               | otherwise         = inj . Go.Type.BidirectionalChannel
 
 fieldDeclaration :: Assignment
 fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> (manyTermsTill expression (void (symbol TypeIdentifier)) <|> (manyTerm expression)) <*> optional expression <*> optional expression)
