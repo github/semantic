@@ -436,16 +436,21 @@ typeSwitchStatement = makeTerm <$> symbol TypeSwitchStatement <*> children (Go.S
     typeSwitchSubject = makeTerm <$> location <*> manyTermsTill expression (void (symbol TypeCaseClause)) <|> emptyTerm
 
 unaryExpression :: Assignment
-unaryExpression = symbol UnaryExpression >>= \ location -> (notExpression location) <|> (unaryMinus location) <|> unaryPlus <|> unaryAmpersand <|> unaryReceive <|> unaryPointer <|> unaryComplement
+unaryExpression = makeTerm' <$> symbol UnaryExpression <*> (  notExpression
+                                                          <|> unaryMinus
+                                                          <|> unaryAmpersand
+                                                          <|> unaryReceive
+                                                          <|> unaryPointer
+                                                          <|> unaryComplement
+                                                          <|> unaryPlus )
   where
-    notExpression location = makeTerm location . Expression.Not <$> children (symbol AnonBang *> expression)
-    unaryMinus location = makeTerm location . Expression.Negate <$> children (symbol AnonMinus *> expression)
-
-    unaryAmpersand = children (makeTerm <$> symbol AnonAmpersand <*> (Literal.Reference <$> expression))
-    unaryComplement = children (makeTerm <$> symbol AnonCaret <*> (Expression.Complement <$> expression))
-    unaryPlus = children (symbol AnonPlus *> expression)
-    unaryPointer = children (makeTerm <$> symbol AnonStar <*> (Literal.Pointer <$> expression))
-    unaryReceive = children (makeTerm <$> symbol AnonLAngleMinus <*> (Go.Syntax.ReceiveOperator <$> expression))
+    notExpression   = inj <$> (children (Expression.Not <$ symbol AnonBang <*> expression))
+    unaryAmpersand  = inj <$> (children (Literal.Reference <$ symbol AnonAmpersand <*> expression))
+    unaryComplement = inj <$> (children (Expression.Complement <$ symbol AnonCaret <*> expression))
+    unaryMinus      = inj <$> (children (Expression.Negate <$ symbol AnonMinus <*> expression))
+    unaryPlus       =          children (symbol AnonPlus *> (Term.unwrap <$> expression))
+    unaryPointer    = inj <$> (children (Literal.Pointer <$ symbol AnonStar <*> expression))
+    unaryReceive    = inj <$> (children (Go.Syntax.ReceiveOperator <$ symbol AnonLAngleMinus <*> expression))
 
 varDeclaration :: Assignment
 varDeclaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
