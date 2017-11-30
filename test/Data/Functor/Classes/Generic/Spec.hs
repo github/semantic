@@ -42,7 +42,7 @@ spec = parallel $ do
         \ a -> genericLiftShowsPrec showsPrec showList 0 a "" `shouldBe` showsPrec 0 (a :: Tree Int) ""
 
       prop "equivalent to derived showsPrec for record selectors" $
-        \ a -> genericLiftShowsPrec showsPrec showList 0 a "" `shouldBe` showsPrec 0 (a :: Record Int) ""
+        \ a -> genericLiftShowsPrecWithOptions defaultGShow1Options { optionsUseRecordSyntax = True } showsPrec showList 0 a "" `shouldBe` showsPrec 0 (a :: Record Int) ""
 
       prop "equivalent to derived showsPrec for infix constructors" $
         \ a -> genericLiftShowsPrec showsPrec showList 0 a "" `shouldBe` showsPrec 0 (a :: Infix Int) ""
