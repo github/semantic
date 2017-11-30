@@ -373,12 +373,11 @@ fallThroughStatement :: Assignment
 fallThroughStatement = makeTerm <$> symbol FallthroughStatement <*> (Statement.Pattern <$> (makeTerm <$> location <*> (Syntax.Identifier <$> source)) <*> emptyTerm)
 
 functionDeclaration :: Assignment
-functionDeclaration =  makeTerm <$> symbol FunctionDeclaration <*> children (mkTypedFunctionDeclaration <$> location <*> expression <*> manyTerm parameters <*> optional (types <|> identifier <|> returnParameters) <*> optional block)
-                   <|> makeTerm <$> symbol FuncLiteral         <*> children (mkTypedFunctionLiteral     <$> location <*> emptyTerm  <*> manyTerm parameters <*> optional (types <|> identifier <|> returnParameters) <*> block)
+functionDeclaration =  makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncLiteral) <*> children (mkFunctionDeclaration <$> name <*> manyTerm parameters <*> (types <|> identifier <|> returnParameters <|> emptyTerm) <*> (block <|> emptyTerm))
   where
-    mkTypedFunctionDeclaration loc name' params' types' block' = Declaration.Function [(maybe (makeTerm loc Syntax.Empty) id types')] name' params' (maybe (makeTerm loc Syntax.Empty) id block')
-    mkTypedFunctionLiteral     loc name' params' types' block' = Declaration.Function [(maybe (makeTerm loc Syntax.Empty) id types')] name' params' block'
+    mkFunctionDeclaration name' params' types' block' = Declaration.Function [types'] name' params' block'
     returnParameters = makeTerm <$> symbol Parameters <*> children (manyTerm expression)
+    name = makeTerm <$> location <*> manyTermsTill expression (void (symbol Parameters))
 
 importDeclaration :: Assignment
 importDeclaration = makeTerm <$> symbol ImportDeclaration <*> children (Declaration.Import <$> manyTerm expression)
