@@ -1,4 +1,4 @@
-module Abstract.Type where
+module Data.Abstract.Type where
 
 import Control.Monad.Fail
 import Data.Traversable

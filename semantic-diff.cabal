@@ -20,7 +20,6 @@ library
                      , Abstract.Interpreter.Dead
                      , Abstract.Interpreter.Tracing
                      , Abstract.Store
-                     , Abstract.Type
                      , Abstract.Value
                      , Analysis.Abstract.Eval
                      , Analysis.ConstructorName
@@ -41,6 +40,7 @@ library
                      , Data.Abstract.Configuration
                      , Data.Abstract.Environment
                      , Data.Abstract.FreeVariables
+                     , Data.Abstract.Type
                      , Data.Algebra
                      , Data.Align.Generic
                      , Data.AST
