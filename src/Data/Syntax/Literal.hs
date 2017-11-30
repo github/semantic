@@ -1,9 +1,9 @@
 {-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses #-}
 module Data.Syntax.Literal where
 
-import Abstract.Eval
 import Abstract.Value (AbstractValue(..))
 import Abstract.FreeVariables
+import Analysis.Abstract.Eval
 import Data.Align.Generic
 import Data.Maybe
 import Data.ByteString (ByteString)

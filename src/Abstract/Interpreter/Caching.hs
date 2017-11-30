@@ -3,11 +3,11 @@ module Abstract.Interpreter.Caching where
 
 import Abstract.Configuration
 import Abstract.Environment
-import Abstract.Eval
 import Abstract.FreeVariables
 import Abstract.Interpreter
 import Abstract.Store
 import Abstract.Value
+import Analysis.Abstract.Eval
 import Control.Applicative
 import Control.Effect
 import Control.Monad.Effect.Env

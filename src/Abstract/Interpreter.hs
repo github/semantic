@@ -2,10 +2,10 @@
 module Abstract.Interpreter where
 
 import Abstract.Environment
-import Abstract.Eval
 import Abstract.FreeVariables
 import Abstract.Store
 import Abstract.Value
+import Analysis.Abstract.Eval
 import Control.Effect
 import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.Env

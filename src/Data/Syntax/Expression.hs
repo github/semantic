@@ -2,11 +2,11 @@
 module Data.Syntax.Expression where
 
 import Abstract.Environment
-import Abstract.Eval
 import Abstract.Store
 import Abstract.Value (Value, Closure(..))
 import Abstract.Type as Type
 import Abstract.FreeVariables
+import Analysis.Abstract.Eval
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fresh
 import Data.Maybe

@@ -1,12 +1,11 @@
 {-# LANGUAGE AllowAmbiguousTypes, DataKinds, DeriveFoldable, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Abstract.Interpreter.Dead where
 
-import Abstract.Eval
 import Abstract.FreeVariables
 import Abstract.Interpreter
 import Abstract.Store
 import Abstract.Value
-
+import Analysis.Abstract.Eval
 import Control.Effect
 import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.State

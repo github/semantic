@@ -2,10 +2,10 @@
 module Data.Syntax.Statement where
 
 import Abstract.Environment
-import Abstract.Eval
 import Abstract.FreeVariables
 import Abstract.Store
 import Abstract.Value
+import Analysis.Abstract.Eval
 import Control.Monad.Effect.Env
 import Data.Semigroup
 import Data.Align.Generic

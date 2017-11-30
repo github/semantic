@@ -2,11 +2,11 @@
 module Abstract.Interpreter.Tracing where
 
 import Abstract.Configuration
-import Abstract.Eval
 import Abstract.FreeVariables
 import Abstract.Interpreter
 import Abstract.Store
 import Abstract.Value
+import Analysis.Abstract.Eval
 import Control.Effect
 import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.Env
