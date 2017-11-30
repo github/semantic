@@ -1,4 +1,4 @@
-{-# LANGUAGE AllowAmbiguousTypes, DefaultSignatures, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Abstract.Eval
 ( Eval(..)
 , MonadGC(..)
@@ -57,5 +57,5 @@ instance ( Monad m
   eval _  yield []     = yield unit
   eval ev yield [a]    = ev pure a >>= yield
   eval ev yield (a:as) = do
-    env <- askEnv @v
+    env <- askEnv :: m (Environment (LocationFor v) v)
     extraRoots (envRoots env (freeVariables1 as)) (ev (const (eval ev pure as)) a) >>= yield
