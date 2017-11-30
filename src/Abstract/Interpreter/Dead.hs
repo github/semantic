@@ -2,11 +2,11 @@
 module Abstract.Interpreter.Dead where
 
 import Abstract.Interpreter
-import Abstract.Store
 import Analysis.Abstract.Eval
 import Control.Effect
 import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.State
+import Control.Monad.Effect.Store
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value
 import Data.Function (fix)

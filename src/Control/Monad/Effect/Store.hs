@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeFamilyDependencies, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Abstract.Store
+module Control.Monad.Effect.Store
 ( Precise(..)
 , Monovariant(..)
 , MonadAddress(alloc)

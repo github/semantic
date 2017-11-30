@@ -3,11 +3,11 @@ module Abstract.Interpreter.Symbolic where
 
 import Abstract.Interpreter
 import Abstract.Primitive
-import Abstract.Store
 import Control.Applicative
 import Control.Monad
 import Control.Monad.Effect
 import Control.Monad.Effect.State
+import Control.Monad.Effect.Store
 import Control.Monad.Fail
 import Data.Abstract.Environment
 import Data.Functor.Classes

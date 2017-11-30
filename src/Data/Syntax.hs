@@ -1,12 +1,12 @@
 {-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, TypeApplications #-}
 module Data.Syntax where
 
-import Abstract.Store
 import Analysis.Abstract.Eval
 import qualified Assigning.Assignment as Assignment
+import Control.Applicative
 import Control.Monad.Effect
 import Control.Monad.Effect.Env
-import Control.Applicative
+import Control.Monad.Effect.Store
 import Control.Monad.Error.Class hiding (Error)
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables

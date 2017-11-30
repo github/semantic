@@ -1,8 +1,9 @@
 {-# LANGUAGE DeriveFoldable, DeriveGeneric, FlexibleContexts, StandaloneDeriving, UndecidableInstances #-}
 module Data.Abstract.Configuration where
 
-import Abstract.Store
+import Data.Abstract.Address
 import Data.Abstract.Environment
+import Data.Abstract.Store
 import Data.List (intersperse)
 import Data.Functor.Classes
 import Data.Monoid

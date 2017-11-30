@@ -2,7 +2,6 @@
 module Abstract.Interpreter.Caching where
 
 import Abstract.Interpreter
-import Abstract.Store
 import Analysis.Abstract.Eval
 import Control.Applicative
 import Control.Effect
@@ -13,6 +12,7 @@ import Control.Monad.Effect.Internal hiding (run)
 import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
+import Control.Monad.Effect.Store
 import Data.Abstract.Configuration
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables

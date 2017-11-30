@@ -19,7 +19,6 @@ library
                      , Abstract.Interpreter.Caching
                      , Abstract.Interpreter.Dead
                      , Abstract.Interpreter.Tracing
-                     , Abstract.Store
                      , Analysis.Abstract.Eval
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
@@ -34,6 +33,7 @@ library
                      , Control.Monad.Effect.Env
                      , Control.Monad.Effect.Fresh
                      , Control.Monad.Effect.GC
+                     , Control.Monad.Effect.Store
                      -- General datatype definitions & generic algorithms
                      , Data.Abstract.Address
                      , Data.Abstract.Configuration

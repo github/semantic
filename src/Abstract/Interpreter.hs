@@ -1,7 +1,6 @@
 {-# LANGUAGE UndecidableInstances, AllowAmbiguousTypes, ConstraintKinds, DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeOperators, MonoLocalBinds #-}
 module Abstract.Interpreter where
 
-import Abstract.Store
 import Analysis.Abstract.Eval
 import Control.Effect
 import Control.Monad.Effect hiding (run)
@@ -11,6 +10,7 @@ import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
+import Control.Monad.Effect.Store
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value
