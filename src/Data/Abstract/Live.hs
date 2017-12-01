@@ -27,7 +27,6 @@ instance Generic1 (Live l) where
   to1 = unsafeCoerce
   from1 = unsafeCoerce
 
-
 instance Ord l => Functor (Live l) where
   fmap _ = unsafeCoerce
 
