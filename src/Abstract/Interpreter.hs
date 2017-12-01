@@ -1,4 +1,4 @@
-{-# LANGUAGE UndecidableInstances, AllowAmbiguousTypes, ConstraintKinds, DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeOperators, MonoLocalBinds #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, ScopedTypeVariables, TypeApplications #-}
 module Abstract.Interpreter where
 
 import Control.Effect
@@ -20,8 +20,6 @@ import Data.Function (fix)
 import Data.Functor.Foldable (Base, Recursive(..))
 import Data.Semigroup
 import Data.Set hiding (foldr)
-import Prelude hiding (fail)
-
 
 type Interpreter v = '[Fresh, Fail, NonDetEff, State (Store (LocationFor v) v), Reader (Set (Address (LocationFor v) v)), Reader (Environment (LocationFor v) v)]
 
