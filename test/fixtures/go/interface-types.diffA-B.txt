@@ -33,4 +33,16 @@
               (Identifier)
               (
                 (Identifier)
-                (Identifier)))))))))
+                (Identifier))))))
+      (Context
+        (Comment)
+        (
+          (Type
+          { (Identifier)
+          ->(Identifier) }
+            (Interface
+              (MethodSignature
+                (Empty)
+              { (Identifier)
+              ->(Identifier) }
+                ([])))))))))
