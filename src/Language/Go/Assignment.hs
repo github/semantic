@@ -6,13 +6,13 @@ module Language.Go.Assignment
 , Term
 ) where
 
+import Assigning.Assignment hiding (Assignment, Error)
+import qualified Assigning.Assignment as Assignment
 import Data.Functor (void)
 import Data.List.NonEmpty (some1)
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
 import qualified Data.Syntax as Syntax
-import Data.Syntax.Assignment hiding (Assignment, Error)
-import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
@@ -449,7 +449,7 @@ unaryExpression = makeTerm' <$> symbol UnaryExpression <*> (  notExpression
     unaryAmpersand  = inj <$> (children (Literal.Reference <$ symbol AnonAmpersand <*> expression))
     unaryComplement = inj <$> (children (Expression.Complement <$ symbol AnonCaret <*> expression))
     unaryMinus      = inj <$> (children (Expression.Negate <$ symbol AnonMinus <*> expression))
-    unaryPlus       =          children (symbol AnonPlus *> (Term.unwrap <$> expression))
+    unaryPlus       =          children (symbol AnonPlus *> (Term.termOut <$> expression))
     unaryPointer    = inj <$> (children (Literal.Pointer <$ symbol AnonStar <*> expression))
     unaryReceive    = inj <$> (children (Go.Syntax.ReceiveOperator <$ symbol AnonLAngleMinus <*> expression))
 

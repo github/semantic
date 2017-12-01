@@ -11,10 +11,10 @@ module Data.Blob
 ) where
 
 import Data.ByteString.Char8 (ByteString, pack)
+import Data.Language
 import Data.Maybe (isJust)
 import Data.Source as Source
 import Data.Word
-import Language
 import Numeric
 
 -- | The source, oid, path, and Maybe BlobKind of a blob.

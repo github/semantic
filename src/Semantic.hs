@@ -7,7 +7,9 @@ module Semantic
 , diffTermPair
 ) where
 
-import Algorithm (Diffable)
+import Analysis.ConstructorName (ConstructorName, constructorLabel)
+import Analysis.Declaration (HasDeclaration, declarationAlgebra, syntaxDeclarationAlgebra)
+import Analysis.Decorator (syntaxIdentifierAlgebra)
 import Control.Exception
 import Control.Monad ((>=>), guard)
 import Control.Monad.Error.Class
@@ -19,18 +21,18 @@ import Data.Diff
 import Data.Functor.Both as Both
 import Data.Functor.Classes
 import Data.JSON.Fields
+import qualified Data.Language as Language
 import Data.Output
 import Data.Record
-import Data.Syntax.Algebra
 import Data.Term
 import Data.Typeable
+import Diffing.Algorithm (Diffable)
+import Diffing.Interpreter
 import Info
-import Interpreter
-import qualified Language
-import Parser
-import Renderer
-import Semantic.Task as Task
+import Parsing.Parser
+import Rendering.Renderer
 import Semantic.Stat as Stat
+import Semantic.Task as Task
 
 -- This is the primary interface to the Semantic library which provides two
 -- major classes of functionality: semantic parsing and diffing of source code
