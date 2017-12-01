@@ -18,6 +18,7 @@ import Data.Abstract.FreeVariables
 import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Function (fix)
+import Data.Functor.Foldable (Base, Recursive(..))
 import Data.Semigroup
 import Data.Set hiding (foldr)
 import Data.Term
@@ -48,10 +49,9 @@ evaluate :: forall v syntax ann
          -> EvalResult v
 evaluate = run @(Interpreter v) . fix ev pure
 
-ev ::
-     ( Functor syntax
-     , FreeVariables1 syntax
-     , Eval (Term syntax ann) v m syntax
-     )
-     => Eval' (Term syntax ann) m v -> Eval' (Term syntax ann) m v
-ev recur yield = eval recur yield . unTerm
+ev :: ( Functor (Base term)
+      , Recursive term
+      , Eval term v m (Base term)
+      )
+      => Eval' term m v -> Eval' term m v
+ev recur yield = eval recur yield . project
