@@ -3,22 +3,19 @@
     (Identifier))
   (Function
     (Empty)
-    (
-      (Identifier))
+    (Identifier)
     ([])
     ([]))
   (Function
     (Empty)
-    (
-    { (Identifier)
-    ->(Identifier) })
+  { (Identifier)
+  ->(Identifier) }
     ([])
     ([]))
   (Function
     (Identifier)
-    (
-    { (Identifier)
-    ->(Identifier) })
+  { (Identifier)
+  ->(Identifier) }
     (
       (
         (Identifier)
@@ -31,9 +28,8 @@
     ([]))
   (Function
     (Empty)
-    (
-    { (Identifier)
-    ->(Identifier) })
+  { (Identifier)
+  ->(Identifier) }
     ([])
     (
       (Identifier)
@@ -41,9 +37,8 @@
     ([]))
   (Function
     (Empty)
-    (
-    { (Identifier)
-    ->(Identifier) })
+  { (Identifier)
+  ->(Identifier) }
     ([])
     (
       (
@@ -55,8 +50,7 @@
     ([]))
 {+(Function
   {+(Empty)+}
-  {+(
-    {+(Identifier)+})+}
+  {+(Identifier)+}
   {+([])+}
   {+([])+}
   {+(NoOp
@@ -64,16 +58,14 @@
   (Function
   { (Identifier)
   ->(Identifier) }
-    (
-    { (Identifier)
-    ->(Identifier) })
+  { (Identifier)
+  ->(Identifier) }
     ([])
     (Empty))
   (Function
     (Empty)
-    (
-    { (Identifier)
-    ->(Identifier) })
+  { (Identifier)
+  ->(Identifier) }
     (
       (Identifier)
       (Pointer
