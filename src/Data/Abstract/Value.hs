@@ -6,10 +6,7 @@ import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import qualified Data.Abstract.Type as Type
 import Data.ByteString (ByteString)
-import Data.Functor.Classes
-import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Ord.Generic
-import Data.Functor.Classes.Show.Generic
+import Data.Functor.Classes.Generic
 import Data.Semigroup
 import qualified Data.Set as Set
 import Data.Union

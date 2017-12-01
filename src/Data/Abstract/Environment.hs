@@ -3,9 +3,7 @@ module Data.Abstract.Environment where
 
 import Data.Abstract.Address
 import Data.Abstract.FreeVariables
-import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Ord.Generic
-import Data.Functor.Classes.Show.Generic
+import Data.Functor.Classes.Generic
 import qualified Data.Map as Map
 import Data.Pointed
 import Data.Semigroup

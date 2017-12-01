@@ -2,10 +2,7 @@
 module Data.Abstract.Address where
 
 import Data.Abstract.FreeVariables
-import Data.Functor.Classes
-import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Ord.Generic
-import Data.Functor.Classes.Show.Generic
+import Data.Functor.Classes.Generic
 import Data.Pointed
 import Data.Semigroup
 import Data.Set

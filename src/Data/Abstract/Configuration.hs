@@ -4,9 +4,7 @@ module Data.Abstract.Configuration where
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Store
-import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Ord.Generic
-import Data.Functor.Classes.Show.Generic
+import Data.Functor.Classes.Generic
 import GHC.Generics
 
 data Configuration l t v
