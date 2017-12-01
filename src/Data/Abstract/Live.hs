@@ -11,6 +11,10 @@ import Unsafe.Coerce
 newtype Live l v = Live { unLive :: Set (Address l v) }
   deriving (Eq, Foldable, Monoid, Ord, Semigroup, Show)
 
+delete :: Ord l => Address l v -> Live l v -> Live l v
+delete addr (Live s) = Live (Set.delete addr s)
+
+
 instance Generic1 (Live l) where
   type Rep1 (Live l)
     = D1
