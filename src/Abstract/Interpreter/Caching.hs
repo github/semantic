@@ -5,6 +5,7 @@ import Abstract.Interpreter
 import Control.Applicative
 import Control.Effect
 import Control.Monad.Effect.Address
+import Control.Monad.Effect.Cache
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
@@ -35,28 +36,6 @@ type CachingInterpreter t v = '[Fresh, Reader (Set.Set (Address (LocationFor v) 
 type CachingResult t v = Final (CachingInterpreter t v) v
 
 type MonadCachingInterpreter t v m = (MonadEnv v m, MonadStore v m, MonadCacheIn t v m, MonadCacheOut t v m, MonadGC v m, Alternative m)
-
-
-
-class Monad m => MonadCacheIn t v m where
-  askCache :: m (Cache (LocationFor v) t v)
-  localCache :: (Cache (LocationFor v) t v -> Cache (LocationFor v) t v) -> m a -> m a
-
-instance (Reader (Cache (LocationFor v) t v) :< fs) => MonadCacheIn t v (Eff fs) where
-  askCache = ask
-  localCache = local
-
-
-class Monad m => MonadCacheOut t v m where
-  getCache :: m (Cache (LocationFor v) t v)
-  putCache :: Cache (LocationFor v) t v -> m ()
-
-instance (State (Cache (LocationFor v) t v) :< fs) => MonadCacheOut t v (Eff fs) where
-  getCache = get
-  putCache = put
-
-modifyCache :: MonadCacheOut t v m => (Cache (LocationFor v) t v -> Cache (LocationFor v) t v) -> m ()
-modifyCache f = fmap f getCache >>= putCache
 
 
 class (Alternative m, Monad m) => MonadNonDet m where
