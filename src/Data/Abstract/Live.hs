@@ -3,12 +3,13 @@ module Data.Abstract.Live where
 
 import Data.Abstract.Address
 import Data.Functor.Classes.Generic
+import Data.Semigroup
 import Data.Set as Set
 import GHC.Generics
 import Unsafe.Coerce
 
 newtype Live l v = Live { unLive :: Set (Address l v) }
-  deriving (Eq, Foldable, Ord, Show)
+  deriving (Eq, Foldable, Monoid, Ord, Semigroup, Show)
 
 instance Generic1 (Live l) where
   type Rep1 (Live l)
