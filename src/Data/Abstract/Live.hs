@@ -45,11 +45,11 @@ instance Generic1 (Live l) where
                  'NoSourceStrictness
                  'DecidedLazy)
               (Set :.: Rec1 (Address l))))
-  to1 = unsafeCoerce
-  from1 = unsafeCoerce
+  to1 = Live . unsafeCoerce . unComp1 . unM1 . unM1 . unM1
+  from1 = M1 . M1 . M1 . Comp1 . unsafeCoerce . unLive
 
 instance Ord l => Functor (Live l) where
-  fmap _ = unsafeCoerce
+  fmap _ = Live . unsafeCoerce . unLive
 
 instance Eq l => Eq1 (Live l) where liftEq = genericLiftEq
 instance Ord l => Ord1 (Live l) where liftCompare = genericLiftCompare
