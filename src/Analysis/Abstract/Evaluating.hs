@@ -6,8 +6,6 @@ import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Fresh
-import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Store
@@ -21,7 +19,7 @@ import Data.Functor.Foldable (Base, Recursive(..))
 import Data.Semigroup
 import Data.Set hiding (foldr)
 
-type Interpreter v = '[Fresh, Fail, NonDetEff, State (Store (LocationFor v) v), Reader (Set (Address (LocationFor v) v)), Reader (Environment (LocationFor v) v)]
+type Interpreter v = '[Fail, State (Store (LocationFor v) v), Reader (Set (Address (LocationFor v) v)), Reader (Environment (LocationFor v) v)]
 
 type MonadInterpreter v m = (MonadEnv v m, MonadStore v m, MonadFail m)
 
