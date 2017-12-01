@@ -46,6 +46,7 @@ library
                      , Data.Abstract.Environment
                      , Data.Abstract.Eval
                      , Data.Abstract.FreeVariables
+                     , Data.Abstract.Live
                      , Data.Abstract.Store
                      , Data.Abstract.Type
                      , Data.Abstract.Value
