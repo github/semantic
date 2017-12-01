@@ -3,8 +3,7 @@
     (Identifier))
   (Function
     (Empty)
-    (
-      (Identifier))
+    (Identifier)
     ([])
     (Assignment
       (Identifier)

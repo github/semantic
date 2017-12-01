@@ -373,11 +373,10 @@ fallThroughStatement :: Assignment
 fallThroughStatement = makeTerm <$> symbol FallthroughStatement <*> (Statement.Pattern <$> (makeTerm <$> location <*> (Syntax.Identifier <$> source)) <*> emptyTerm)
 
 functionDeclaration :: Assignment
-functionDeclaration =  makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncLiteral) <*> children (mkFunctionDeclaration <$> name <*> manyTerm parameters <*> (types <|> identifier <|> returnParameters <|> emptyTerm) <*> (block <|> emptyTerm))
+functionDeclaration =  makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncLiteral) <*> children (mkFunctionDeclaration <$> (identifier <|> emptyTerm) <*> manyTerm parameters <*> (types <|> identifier <|> returnParameters <|> emptyTerm) <*> (block <|> emptyTerm))
   where
     mkFunctionDeclaration name' params' types' block' = Declaration.Function [types'] name' params' block'
     returnParameters = makeTerm <$> symbol Parameters <*> children (manyTerm expression)
-    name = makeTerm <$> location <*> manyTermsTill expression (void (symbol Parameters))
 
 importDeclaration :: Assignment
 importDeclaration = makeTerm <$> symbol ImportDeclaration <*> children (Declaration.Import <$> manyTerm expression)
@@ -395,7 +394,7 @@ methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedM
     mkTypedMethodDeclaration receiver' name' parameters' type'' body' = Declaration.Method [type''] receiver' name' parameters' body'
 
 methodSpec :: Assignment
-methodSpec =  makeTerm <$> symbol MethodSpec <*> children (mkMethodSpec <$> expression <*> parameters <*> expression)
+methodSpec =  makeTerm <$> symbol MethodSpec <*> children (mkMethodSpec <$> expression <*> parameters <*> (expression <|> emptyTerm))
   where
     mkMethodSpec name' params optionalTypeLiteral = Declaration.MethodSignature [optionalTypeLiteral] name' [params]
 
