@@ -6,8 +6,6 @@ import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Fresh
-import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Store
@@ -21,16 +19,13 @@ import Data.Functor.Foldable (Base, Recursive(..))
 import Data.Semigroup
 import Data.Set
 
-type Interpreter v = '[Fail, State (Store (LocationFor v) v), Reader (Set (Address (LocationFor v) v)), NonDetEff, Fresh, Reader (Environment (LocationFor v) v)]
+type Interpreter v = '[Fail, State (Store (LocationFor v) v), Reader (Set (Address (LocationFor v) v)), Reader (Environment (LocationFor v) v)]
 
 type MonadInterpreter v m = (MonadEnv v m, MonadStore v m, MonadFail m)
 
 type EvalResult v = Final (Interpreter v) v
 
--- Evaluate an expression.
--- Example:
---    evaluate @Type <term>
---    evaluate @(Value (Data.Union.Union Language.Python.Assignment2.Syntax) (Record Location) Precise) <term>
+-- | Evaluate a term to a value.
 evaluate :: forall v term
          . ( Ord v
            , Ord (Cell (LocationFor v) v)
