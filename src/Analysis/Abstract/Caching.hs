@@ -19,6 +19,7 @@ import Data.Abstract.Cache
 import Data.Abstract.Configuration
 import Data.Abstract.Environment
 import Data.Abstract.Eval
+import Data.Abstract.Live
 import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Foldable
@@ -29,7 +30,7 @@ import Data.Pointed
 import Data.Semigroup
 import qualified Data.Set as Set
 
-type CachingInterpreter t v = '[Fresh, Reader (Set.Set (Address (LocationFor v) v)), Reader (Environment (LocationFor v) v), Fail, NonDetEff, State (Store (LocationFor v) v), Reader (Cache (LocationFor v) t v), State (Cache (LocationFor v) t v)]
+type CachingInterpreter t v = '[Fresh, Reader (Live (LocationFor v) v), Reader (Environment (LocationFor v) v), Fail, NonDetEff, State (Store (LocationFor v) v), Reader (Cache (LocationFor v) t v), State (Cache (LocationFor v) t v)]
 
 type CachingResult t v = Final (CachingInterpreter t v) v
 
@@ -73,7 +74,7 @@ evCache ev0 ev' yield e = do
   env <- askEnv
   store <- getStore
   roots <- askRoots
-  let c = Configuration e (Set.toList roots) env store :: Configuration (LocationFor v) t v
+  let c = Configuration e roots env store :: Configuration (LocationFor v) t v
   out <- getCache
   case cacheLookup c out of
     Just pairs -> asum . flip map (toList pairs) $ \ (value, store') -> do
@@ -103,7 +104,7 @@ fixCache ev' yield e = do
   env <- askEnv
   store <- getStore
   roots <- askRoots
-  let c = Configuration e (Set.toList roots) env store :: Configuration (LocationFor v) t v
+  let c = Configuration e roots env store :: Configuration (LocationFor v) t v
   pairs <- mlfp mempty (\ dollar -> do
     putCache (mempty :: Cache (LocationFor v) t v)
     putStore store

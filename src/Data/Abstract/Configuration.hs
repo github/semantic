@@ -3,6 +3,7 @@ module Data.Abstract.Configuration where
 
 import Data.Abstract.Address
 import Data.Abstract.Environment
+import Data.Abstract.Live
 import Data.Abstract.Store
 import Data.Functor.Classes.Generic
 import GHC.Generics
@@ -10,7 +11,7 @@ import GHC.Generics
 data Configuration l t v
   = Configuration
     { configurationTerm :: t
-    , configurationRoots :: [Address l v]
+    , configurationRoots :: Live l v
     , configurationEnvironment :: Environment l v
     , configurationStore :: Store l v
     }

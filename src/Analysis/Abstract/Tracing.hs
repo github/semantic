@@ -75,5 +75,5 @@ evTell ev0 ev' yield e = do
   env <- askEnv
   store <- getStore
   roots <- askRoots
-  trace (point (Configuration e (toList roots) env store) :: g (Configuration (LocationFor v) t v))
+  trace (point (Configuration e roots env store) :: g (Configuration (LocationFor v) t v))
   ev0 ev' yield e

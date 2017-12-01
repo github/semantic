@@ -2,12 +2,12 @@
 module Data.Abstract.Store where
 
 import Data.Abstract.Address
+import Data.Abstract.Live
 import Data.Foldable (toList)
 import Data.Functor.Classes.Generic
 import qualified Data.Map as Map
 import Data.Pointed
 import Data.Semigroup
-import qualified Data.Set as Set
 import GHC.Generics
 
 newtype Store l a = Store { unStore :: Map.Map l (Cell l a) }
@@ -35,5 +35,5 @@ storeInsert = (((Store .) . (. unStore)) .) . (. point) . Map.insertWith (<>) . 
 storeSize :: Store l a -> Int
 storeSize = Map.size . unStore
 
-storeRestrict :: Ord l => Store l a -> Set.Set (Address l a) -> Store l a
-storeRestrict (Store m) roots = Store (Map.filterWithKey (\ address _ -> Address address `Set.member` roots) m)
+storeRestrict :: Ord l => Store l a -> Live l a -> Store l a
+storeRestrict (Store m) roots = Store (Map.filterWithKey (\ address _ -> Address address `member` roots) m)

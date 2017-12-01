@@ -4,6 +4,7 @@ module Data.Abstract.Value where
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
+import Data.Abstract.Live
 import qualified Data.Abstract.Type as Type
 import Data.ByteString (ByteString)
 import Data.Functor.Classes.Generic
@@ -68,7 +69,7 @@ type family LocationFor value :: * where
 -- Instances
 
 class ValueRoots l v | v -> l where
-  valueRoots :: v -> Set.Set (Address l v)
+  valueRoots :: v -> Live l v
 
 class AbstractValue v where
   unit :: v

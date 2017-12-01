@@ -3,17 +3,16 @@ module Control.Monad.Effect.GC where
 
 import Control.Monad.Effect
 import Control.Monad.Effect.Reader
-import Data.Abstract.Address
+import Data.Abstract.Live
 import Data.Abstract.Value
 import Data.Semigroup ((<>))
-import Data.Set (Set)
 
 class Monad m => MonadGC a m where
-  askRoots :: m (Set (Address (LocationFor a) a))
+  askRoots :: m (Live (LocationFor a) a)
 
-  extraRoots :: Set (Address (LocationFor a) a) -> m b -> m b
+  extraRoots :: Live (LocationFor a) a -> m b -> m b
 
-instance (Ord (LocationFor a), Reader (Set (Address (LocationFor a) a)) :< fs) => MonadGC a (Eff fs) where
-  askRoots = ask :: Eff fs (Set (Address (LocationFor a) a))
+instance (Ord (LocationFor a), Reader (Live (LocationFor a) a) :< fs) => MonadGC a (Eff fs) where
+  askRoots = ask :: Eff fs (Live (LocationFor a) a)
 
   extraRoots roots' = local (<> roots')
