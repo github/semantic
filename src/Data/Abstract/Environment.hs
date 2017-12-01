@@ -3,7 +3,8 @@ module Data.Abstract.Environment where
 
 import Data.Abstract.Address
 import Data.Abstract.FreeVariables
-import Data.Functor.Classes
+import Data.Functor.Classes.Eq.Generic
+import Data.Functor.Classes.Ord.Generic
 import Data.Functor.Classes.Show.Generic
 import qualified Data.Map as Map
 import Data.Pointed
@@ -27,20 +28,6 @@ envRoots env = foldr ((<>) . maybe mempty point . flip envLookup env) mempty
 
 -- Instances
 
-instance Eq2 Environment where
-  liftEq2 eqL eqA (Environment m1) (Environment m2) = liftEq (liftEq2 eqL eqA) m1 m2
-
-instance Eq l => Eq1 (Environment l) where
-  liftEq = liftEq2 (==)
-
-instance Ord2 Environment where
-  liftCompare2 compareL compareA (Environment m1) (Environment m2) = liftCompare (liftCompare2 compareL compareA) m1 m2
-
-instance Ord l => Ord1 (Environment l) where
-  liftCompare = liftCompare2 compare
-
-instance Show2 Environment where
-  liftShowsPrec2 spL slL spA slA d (Environment map) = showParen (d > 10) $ showString "Environment" . showChar ' ' . liftShowsPrec (liftShowsPrec2 spL slL spA slA) (liftShowList2 spL slL spA slA) 11 map
-
-instance Show l => Show1 (Environment l) where
-  liftShowsPrec = genericLiftShowsPrec
+instance Eq l => Eq1 (Environment l) where liftEq = genericLiftEq
+instance Ord l => Ord1 (Environment l) where liftCompare = genericLiftCompare
+instance Show l => Show1 (Environment l) where liftShowsPrec = genericLiftShowsPrec
