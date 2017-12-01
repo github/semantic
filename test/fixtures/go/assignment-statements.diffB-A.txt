@@ -25,19 +25,18 @@
           (
             (Integer)
             (Integer))))
+      (Assignment
+      { (Identifier)
+      ->(Identifier) }
+        (Times
+        { (Identifier)
+        ->(Identifier) }
+          (Integer)))
     {+(Assignment
       {+(Identifier)+}
-      {+(Times
+      {+(Plus
         {+(Identifier)+}
         {+(Integer)+})+})+}
-      (Assignment
-        (Identifier)
-      { (Times
-        {-(Identifier)-}
-        {-(Integer)-})
-      ->(Plus
-        {+(Identifier)+}
-        {+(Integer)+}) })
     {+(Assignment
       {+(Identifier)+}
       {+(LShift
