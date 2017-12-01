@@ -6,7 +6,6 @@ module Analysis.CyclomaticComplexity
 ) where
 
 import Data.Aeson
-import Data.Algebra
 import Data.Proxy
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
@@ -33,7 +32,7 @@ newtype CyclomaticComplexity = CyclomaticComplexity Int
 --   If you’re getting errors about missing a 'CustomHasCyclomaticComplexity' instance for your syntax type, you probably forgot step 1.
 --
 --   If you’re getting 'Nothing' for your syntax node at runtime, you probably forgot step 2.
-cyclomaticComplexityAlgebra :: (Foldable syntax, HasCyclomaticComplexity syntax) => FAlgebra (TermF syntax ann) CyclomaticComplexity
+cyclomaticComplexityAlgebra :: (Foldable syntax, HasCyclomaticComplexity syntax) => TermF syntax ann CyclomaticComplexity -> CyclomaticComplexity
 cyclomaticComplexityAlgebra (In _ syntax) = toCyclomaticComplexity syntax
 
 
@@ -42,7 +41,7 @@ cyclomaticComplexityAlgebra (In _ syntax) = toCyclomaticComplexity syntax
 --   This typeclass employs the Advanced Overlap techniques designed by Oleg Kiselyov & Simon Peyton Jones: https://wiki.haskell.org/GHC/AdvancedOverlap.
 class HasCyclomaticComplexity syntax where
   -- | Compute a 'CyclomaticComplexity' for a syntax type using its 'CustomHasCyclomaticComplexity' instance, if any, or else falling back to the default definition (which simply returns the sum of any contained cyclomatic complexities).
-  toCyclomaticComplexity :: FAlgebra syntax CyclomaticComplexity
+  toCyclomaticComplexity :: syntax CyclomaticComplexity -> CyclomaticComplexity
 
 -- | Define 'toCyclomaticComplexity' using the 'CustomHasCyclomaticComplexity' instance for a type if there is one or else use the default definition.
 --
@@ -56,7 +55,7 @@ instance (CyclomaticComplexityStrategy syntax ~ strategy, HasCyclomaticComplexit
 -- | Types for which we can produce a customized 'CyclomaticComplexity'.
 class CustomHasCyclomaticComplexity syntax where
   -- | Produce a customized 'CyclomaticComplexity' for a given syntax node.
-  customToCyclomaticComplexity :: FAlgebra syntax CyclomaticComplexity
+  customToCyclomaticComplexity :: syntax CyclomaticComplexity -> CyclomaticComplexity
 
 instance CustomHasCyclomaticComplexity Declaration.Function where
   customToCyclomaticComplexity = succ . sum
@@ -101,7 +100,7 @@ data Strategy = Default | Custom
 --
 --   You should probably be using 'CustomHasCyclomaticComplexity' instead of this class; and you should not define new instances of this class.
 class HasCyclomaticComplexityWithStrategy (strategy :: Strategy) syntax where
-  toCyclomaticComplexityWithStrategy :: proxy strategy -> FAlgebra syntax CyclomaticComplexity
+  toCyclomaticComplexityWithStrategy :: proxy strategy -> syntax CyclomaticComplexity -> CyclomaticComplexity
 
 
 -- | A predicate on syntax types selecting either the 'Custom' or 'Default' strategy.
