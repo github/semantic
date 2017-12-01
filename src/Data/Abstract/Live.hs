@@ -2,6 +2,7 @@
 module Data.Abstract.Live where
 
 import Data.Abstract.Address
+import Data.Functor.Classes.Generic
 import Data.Set as Set
 import GHC.Generics
 
@@ -26,3 +27,7 @@ instance Ord l => Generic1 (Live l) where
 
 instance Ord l => Functor (Live l) where
   fmap f (Live as) = Live (Set.map (fmap f) as)
+
+instance Ord l => Eq1 (Live l) where liftEq = genericLiftEq
+instance Ord l => Ord1 (Live l) where liftCompare = genericLiftCompare
+instance (Ord l, Show l) => Show1 (Live l) where liftShowsPrec = genericLiftShowsPrec
