@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, ScopedTypeVariables, TypeApplications, TypeOperators #-}
+{-# LANGUAGE DataKinds, ScopedTypeVariables, TypeApplications #-}
 module Analysis.Abstract.Dead where
 
 import Control.Effect
