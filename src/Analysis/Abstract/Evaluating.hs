@@ -25,8 +25,6 @@ type MonadInterpreter v m = (MonadEnv v m, MonadStore v m, MonadFail m)
 
 type EvalResult v = Final (Interpreter v) v
 
-type Eval' t m v = (v -> m v) -> t -> m v
-
 -- Evaluate an expression.
 -- Example:
 --    evaluate @Type <term>
@@ -41,11 +39,4 @@ evaluate :: forall v term
            )
          => term
          -> EvalResult v
-evaluate = run @(Interpreter v) . fix ev pure
-
-ev :: ( Functor (Base term)
-      , Recursive term
-      , Eval term v m (Base term)
-      )
-      => Eval' term m v -> Eval' term m v
-ev recur yield = eval recur yield . project
+evaluate = run @(Interpreter v) . fix (\ recur yield -> eval recur yield . project) pure
