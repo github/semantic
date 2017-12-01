@@ -17,6 +17,9 @@ singleton = Live . Set.singleton
 delete :: Ord l => Address l v -> Live l v -> Live l v
 delete addr (Live s) = Live (Set.delete addr s)
 
+member :: Ord l => Address l v -> Live l v -> Bool
+member addr = Set.member addr . unLive
+
 
 instance Generic1 (Live l) where
   type Rep1 (Live l)
