@@ -100,7 +100,6 @@ library
                      , Language.TypeScript.Grammar
                      , Language.TypeScript.Syntax
                      , Language.Python.Assignment
-                     , Language.Python.Assignment2
                      , Language.Python.Grammar
                      , Language.Python.Syntax
                      -- Parser glue
