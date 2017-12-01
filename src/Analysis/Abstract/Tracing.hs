@@ -1,18 +1,21 @@
 {-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Tracing where
 
-import Analysis.Abstract.Evaluating
 import Control.Effect
 import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
+import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Store
+import Control.Monad.Effect.State
 import Control.Monad.Effect.Trace
 import Control.Monad.Effect.Writer
 import Data.Abstract.Address
 import Data.Abstract.Configuration
+import Data.Abstract.Environment
 import Data.Abstract.Eval
+import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Function (fix)
 import Data.Functor.Foldable (Base, Recursive(..))
@@ -20,7 +23,7 @@ import Data.Semigroup
 import Data.Set hiding (fromList)
 import GHC.Exts (IsList(Item, fromList))
 
-type TracingInterpreter t v g = Reader (Set (Address (LocationFor v) v)) ': Writer (g (Configuration (LocationFor v) t v)) ': Interpreter v
+type TracingInterpreter t v g = '[Reader (Set (Address (LocationFor v) v)), Writer (g (Configuration (LocationFor v) t v)), Fail, State (Store (LocationFor v) v), Reader (Set (Address (LocationFor v) v)), Reader (Environment (LocationFor v) v)]
 
 type TraceInterpreter t v = TracingInterpreter t v []
 type ReachableStateInterpreter t v = TracingInterpreter t v Set
@@ -42,7 +45,7 @@ evalTrace :: forall v term
             , Eval term v (Eff (TraceInterpreter term v)) (Base term)
             )
           => term -> Final (TracingInterpreter term v []) v
-evalTrace = run @(TraceInterpreter term v) . fix (evTell @[] ev) pure
+evalTrace = run @(TraceInterpreter term v) . fix (evTell @[] (\ recur yield -> eval recur yield . project)) pure
 
 evalReach :: forall v term
           . ( Ord v, Ord term, Ord (LocationFor v), Ord (Cell (LocationFor v) v)
@@ -54,7 +57,7 @@ evalReach :: forall v term
             , Eval term v (Eff (ReachableStateInterpreter term v)) (Base term)
             )
           => term -> Final (TracingInterpreter term v Set) v
-evalReach = run @(ReachableStateInterpreter term v) . fix (evTell @Set ev) pure
+evalReach = run @(ReachableStateInterpreter term v) . fix (evTell @Set (\ recur yield -> eval recur yield . project)) pure
 
 
 evTell :: forall g t m v
@@ -65,9 +68,9 @@ evTell :: forall g t m v
          , MonadStore v m
          , MonadGC v m
          )
-       => (Eval' t m v -> Eval' t m v)
-       -> Eval' t m v
-       -> Eval' t m v
+       => (((v -> m v) -> t -> m v) -> (v -> m v) -> t -> m v)
+       -> ((v -> m v) -> t -> m v)
+       -> (v -> m v) -> t -> m v
 evTell ev0 ev' yield e = do
   env <- askEnv
   store <- getStore
