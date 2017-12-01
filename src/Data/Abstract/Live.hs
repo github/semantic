@@ -2,6 +2,7 @@
 module Data.Abstract.Live where
 
 import Data.Abstract.Address
+import Data.Bifunctor (second)
 import Data.Functor.Classes.Generic
 import Data.Semigroup
 import Data.Set as Set
@@ -19,6 +20,9 @@ delete addr (Live s) = Live (Set.delete addr s)
 
 member :: Ord l => Address l v -> Live l v -> Bool
 member addr = Set.member addr . unLive
+
+split :: Ord l => Live l v -> Maybe (Address l v, Live l v)
+split = fmap (second Live) . Set.minView . unLive
 
 
 instance Generic1 (Live l) where
