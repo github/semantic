@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, ScopedTypeVariables, TypeApplications, TypeOperators #-}
 module Analysis.Abstract.Dead where
 
-import Abstract.Interpreter
+import Analysis.Abstract.Evaluating
 import Control.Effect
 import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.Address

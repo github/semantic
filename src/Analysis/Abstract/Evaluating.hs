@@ -1,5 +1,5 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, ScopedTypeVariables, TypeApplications #-}
-module Abstract.Interpreter where
+module Analysis.Abstract.Evaluating where
 
 import Control.Effect
 import Control.Monad.Effect hiding (run)

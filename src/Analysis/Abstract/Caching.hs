@@ -1,8 +1,8 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, ScopedTypeVariables, TypeApplications #-}
 module Analysis.Abstract.Caching where
 
-import Abstract.Interpreter
 import Analysis.Abstract.Collecting
+import Analysis.Abstract.Evaluating
 import Control.Applicative
 import Control.Effect
 import Control.Monad.Effect.Address

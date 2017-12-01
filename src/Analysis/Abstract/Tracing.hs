@@ -1,7 +1,7 @@
 {-# LANGUAGE AllowAmbiguousTypes, DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Tracing where
 
-import Abstract.Interpreter
+import Analysis.Abstract.Evaluating
 import Control.Effect
 import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.Address
