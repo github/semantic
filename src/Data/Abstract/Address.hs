@@ -13,26 +13,11 @@ import GHC.Generics
 
 -- | An abstract address with a location of @l@ pointing to a variable of type @a@.
 newtype Address l a = Address { unAddress :: l }
-  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
 
-
-instance Eq2 Address where
-  liftEq2 eqL _ (Address a) (Address b) = eqL a b
-
-instance Eq l => Eq1 (Address l) where
-  liftEq = liftEq2 (==)
-
-instance Ord2 Address where
-  liftCompare2 compareL _ (Address a) (Address b) = compareL a b
-
-instance Ord l => Ord1 (Address l) where
-  liftCompare = liftCompare2 compare
-
-instance Show2 Address where
-  liftShowsPrec2 spL _ _ _ d = showsUnaryWith spL "Address" d . unAddress
-
-instance Show l => Show1 (Address l) where
-  liftShowsPrec = liftShowsPrec2 showsPrec showList
+instance Eq l => Eq1 (Address l) where liftEq = genericLiftEq
+instance Ord l => Ord1 (Address l) where liftCompare = genericLiftCompare
+instance Show l => Show1 (Address l) where liftShowsPrec = genericLiftShowsPrec
 
 
 -- | 'Precise' models precise store semantics where only the 'Latest' value is taken.
