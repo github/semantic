@@ -20,17 +20,15 @@ import Data.Abstract.Cache
 import Data.Abstract.Configuration
 import Data.Abstract.Environment
 import Data.Abstract.Eval
-import Data.Abstract.FreeVariables
 import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Foldable
 import Data.Function (fix)
-import Data.Functor.Classes
+import Data.Functor.Foldable (Base, Recursive(..))
 import Data.Maybe
 import Data.Pointed
 import Data.Semigroup
 import qualified Data.Set as Set
-import Data.Term
 
 type CachingInterpreter t v = '[Fresh, Reader (Set.Set (Address (LocationFor v) v)), Reader (Environment (LocationFor v) v), Fail, NonDetEff, State (Store (LocationFor v) v), Reader (Cache (LocationFor v) t v), State (Cache (LocationFor v) t v)]
 
@@ -44,23 +42,22 @@ type MonadCachingInterpreter t v m = (MonadEnv v m, MonadStore v m, MonadCacheIn
 -- Examples:
 --    evalCache @Type <term>
 --    evalCache @(Value (Data.Union.Union Language.Python.Assignment2.Syntax) (Record Location) Precise) <term>
-evalCache :: forall v syntax ann
+evalCache :: forall v term
           . ( Ord v
+            , Ord term
             , Ord (LocationFor v)
-            , Ord ann
             , Ord (Cell (LocationFor v) v)
-            , Ord1 syntax
             , Foldable (Cell (LocationFor v))
-            , FreeVariables1 syntax
-            , Functor syntax
-            , MonadAddress (LocationFor v) (Eff (CachingInterpreter (Term syntax ann) v))
+            , Functor (Base term)
+            , Recursive term
+            , MonadAddress (LocationFor v) (Eff (CachingInterpreter term v))
             , Semigroup (Cell (LocationFor v) v)
             , ValueRoots (LocationFor v) v
-            , Eval (Term syntax ann) v (Eff (CachingInterpreter (Term syntax ann) v)) syntax
+            , Eval term v (Eff (CachingInterpreter term v)) (Base term)
             )
-          => Term syntax ann
-          -> CachingResult (Term syntax ann) v
-evalCache e = run @(CachingInterpreter (Term syntax ann) v) (fixCache (fix (evCache (evCollect ev))) pure e)
+          => term
+          -> CachingResult term v
+evalCache e = run @(CachingInterpreter term v) (fixCache (fix (evCache (evCollect ev))) pure e)
 
 
 evCache :: forall t v m
