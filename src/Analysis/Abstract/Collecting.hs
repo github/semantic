@@ -30,8 +30,8 @@ gc roots store = storeRestrict store (reachable roots store)
 
 reachable :: (Ord (LocationFor a), Foldable (Cell (LocationFor a)), ValueRoots (LocationFor a) a) => Live (LocationFor a) a -> Store (LocationFor a) a -> Live (LocationFor a) a
 reachable roots store = go roots mempty
-  where go set seen = case split set of
+  where go set seen = case liveSplit set of
           Nothing -> seen
           Just (a, as)
-            | Just values <- storeLookupAll a store -> go (difference (foldr ((<>) . valueRoots) mempty values <> as) seen) (insert a seen)
-            | otherwise -> go seen (insert a seen)
+            | Just values <- storeLookupAll a store -> go (liveDifference (foldr ((<>) . valueRoots) mempty values <> as) seen) (liveInsert a seen)
+            | otherwise -> go seen (liveInsert a seen)

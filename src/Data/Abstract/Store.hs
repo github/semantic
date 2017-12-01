@@ -36,4 +36,4 @@ storeSize :: Store l a -> Int
 storeSize = Map.size . unStore
 
 storeRestrict :: Ord l => Store l a -> Live l a -> Store l a
-storeRestrict (Store m) roots = Store (Map.filterWithKey (\ address _ -> Address address `member` roots) m)
+storeRestrict (Store m) roots = Store (Map.filterWithKey (\ address _ -> Address address `liveMember` roots) m)

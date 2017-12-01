@@ -13,23 +13,23 @@ import Unsafe.Coerce
 newtype Live l v = Live { unLive :: Set (Address l v) }
   deriving (Eq, Foldable, Monoid, Ord, Semigroup, Show)
 
-singleton :: Address l v -> Live l v
-singleton = Live . Set.singleton
+liveSingleton :: Address l v -> Live l v
+liveSingleton = Live . Set.singleton
 
-insert :: Ord l => Address l v -> Live l v -> Live l v
-insert addr = Live . Set.insert addr . unLive
+liveInsert :: Ord l => Address l v -> Live l v -> Live l v
+liveInsert addr = Live . Set.insert addr . unLive
 
-delete :: Ord l => Address l v -> Live l v -> Live l v
-delete addr = Live . Set.delete addr . unLive
+liveDelete :: Ord l => Address l v -> Live l v -> Live l v
+liveDelete addr = Live . Set.delete addr . unLive
 
-difference :: Ord l => Live l v -> Live l v -> Live l v
-difference = fmap Live . (Set.difference `on` unLive)
+liveDifference :: Ord l => Live l v -> Live l v -> Live l v
+liveDifference = fmap Live . (Set.difference `on` unLive)
 
-member :: Ord l => Address l v -> Live l v -> Bool
-member addr = Set.member addr . unLive
+liveMember :: Ord l => Address l v -> Live l v -> Bool
+liveMember addr = Set.member addr . unLive
 
-split :: Ord l => Live l v -> Maybe (Address l v, Live l v)
-split = fmap (second Live) . Set.minView . unLive
+liveSplit :: Ord l => Live l v -> Maybe (Address l v, Live l v)
+liveSplit = fmap (second Live) . Set.minView . unLive
 
 
 instance Generic1 (Live l) where

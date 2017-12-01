@@ -20,7 +20,7 @@ envInsert :: Name -> Address l a -> Environment l a -> Environment l a
 envInsert name value (Environment m) = Environment (Map.insert name value m)
 
 envRoots :: (Ord l, Foldable t) => Environment l a -> t Name -> Live l a
-envRoots env = foldr ((<>) . maybe mempty singleton . flip envLookup env) mempty
+envRoots env = foldr ((<>) . maybe mempty liveSingleton . flip envLookup env) mempty
 
 
 -- Instances
