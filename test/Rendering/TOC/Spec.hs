@@ -21,7 +21,6 @@ import Data.Patch
 import Data.Record
 import Data.Semigroup ((<>))
 import Data.Source
-import Data.Syntax.Algebra (CyclomaticComplexity(..), fToR, cyclomaticComplexityAlgebra)
 import Data.Term
 import Data.Text (Text)
 import Data.These
@@ -59,7 +58,7 @@ spec = parallel $ do
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
       \ diff -> let diff' = merge (0, 0) (Indexed [bimap (const 1) (const 1) (diff :: Diff Syntax Int Int)]) in
         tableOfContentsBy (\ (n `In` _) -> if n == (0 :: Int) then Just n else Nothing) diff' `shouldBe`
-        replicate (length (diffPatches diff')) (Changed (These 0 0))
+        replicate (length (diffPatches diff')) (Changed 0)
 
   describe "diffTOC" $ do
     it "blank if there are no methods" $
@@ -165,7 +164,7 @@ spec = parallel $ do
     it "produces JSON output if there are parse errors" $ do
       blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.X.rb")
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"absolute_cyclomatic_complexity\":1,\"term\":\"bar\",\"relative_cyclomatic_complexity\":-1,\"changeType\":\"removed\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"absolute_cyclomatic_complexity\":1,\"term\":\"baz\",\"relative_cyclomatic_complexity\":-1,\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"expected end of input nodes, but got ParseError\",\"language\":\"Ruby\"}]}}\n" :: ByteString)
+      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"removed\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"expected end of input nodes, but got ParseError\",\"language\":\"Ruby\"}]}}\n" :: ByteString)
 
     it "ignores anonymous functions" $ do
       blobs <- blobsForPaths (both "ruby/lambda.A.rb" "ruby/lambda.B.rb")
@@ -178,8 +177,8 @@ spec = parallel $ do
       toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/markdown/headings.A.md -> test/fixtures/toc/markdown/headings.B.md\":[{\"span\":{\"start\":[1,1],\"end\":[3,16]},\"category\":\"Heading 1\",\"term\":\"Introduction\",\"changeType\":\"removed\"},{\"span\":{\"start\":[5,1],\"end\":[7,4]},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"modified\"},{\"span\":{\"start\":[9,1],\"end\":[11,10]},\"category\":\"Heading 3\",\"term\":\"This heading is new\",\"changeType\":\"added\"},{\"span\":{\"start\":[13,1],\"end\":[14,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
 
 
-type Diff' = Diff Syntax (Record (Maybe Declaration ': CyclomaticComplexity ': DefaultFields)) (Record (Maybe Declaration ': CyclomaticComplexity ': DefaultFields))
-type Term' = Term Syntax (Record (Maybe Declaration ': CyclomaticComplexity ': DefaultFields))
+type Diff' = Diff Syntax (Record (Maybe Declaration ': DefaultFields)) (Record (Maybe Declaration ': DefaultFields))
+type Term' = Term Syntax (Record (Maybe Declaration ': DefaultFields))
 
 numTocSummaries :: Diff' -> Int
 numTocSummaries diff = length $ filter isValidSummary (diffTOC diff)
@@ -214,10 +213,10 @@ programOf diff = merge (programInfo, programInfo) (Indexed [ diff ])
 functionOf :: Text -> Term' -> Term'
 functionOf name body = Term $ (Just (FunctionDeclaration name mempty Nothing) :. functionInfo) `In` S.Function name' [] [body]
   where
-    name' = Term $ (Nothing :. (CyclomaticComplexity 0) :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) `In` Leaf name
+    name' = Term $ (Nothing :. Range 0 0 :. C.Identifier :. sourceSpanBetween (0,0) (0,0) :. Nil) `In` Leaf name
 
-programInfo :: Record (Maybe Declaration ': CyclomaticComplexity ': DefaultFields)
-programInfo = Nothing :. (CyclomaticComplexity 0) :. Range 0 0 :. C.Program :. sourceSpanBetween (0,0) (0,0) :. Nil
+programInfo :: Record (Maybe Declaration ': DefaultFields)
+programInfo = Nothing :. Range 0 0 :. C.Program :. sourceSpanBetween (0,0) (0,0) :. Nil
 
 functionInfo :: Record DefaultFields
 functionInfo = Range 0 0 :. C.Function :. sourceSpanBetween (0,0) (0,0) :. Nil
@@ -250,8 +249,8 @@ sourceSpanBetween (s1, e1) (s2, e2) = Span (Pos s1 e1) (Pos s2 e2)
 blankDiff :: Diff'
 blankDiff = merge (arrayInfo, arrayInfo) (Indexed [ inserting (Term $ literalInfo `In` Leaf "\"a\"") ])
   where
-    arrayInfo = Nothing :. (CyclomaticComplexity 0) :. Range 0 3 :. ArrayLiteral :. sourceSpanBetween (1, 1) (1, 5) :. Nil
-    literalInfo = Nothing :. (CyclomaticComplexity 0) :. Range 1 2 :. StringLiteral :. sourceSpanBetween (1, 2) (1, 4) :. Nil
+    arrayInfo = Nothing :. Range 0 3 :. ArrayLiteral :. sourceSpanBetween (1, 1) (1, 5) :. Nil
+    literalInfo = Nothing :. Range 1 2 :. StringLiteral :. sourceSpanBetween (1, 2) (1, 4) :. Nil
 
 blankDiffBlobs :: Both Blob
 blankDiffBlobs = both (Blob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob) (Just TypeScript)) (Blob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob) (Just TypeScript))

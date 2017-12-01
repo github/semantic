@@ -45,7 +45,6 @@ import Data.Semigroup
 import Data.Source
 import Data.Span
 import qualified Data.Syntax as Syntax
-import qualified Data.Syntax.Algebra as Algebra
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
@@ -358,8 +357,8 @@ instance Listable Declaration where
     \/ cons3 FunctionDeclaration
     \/ cons2 (\ a b -> ErrorDeclaration a b Nothing)
 
-instance Listable Analysis.CyclomaticComplexity where
-  tiers = cons1 (Analysis.CyclomaticComplexity)
+instance Listable CyclomaticComplexity where
+  tiers = cons1 CyclomaticComplexity
 
 instance Listable Language.Language where
   tiers
