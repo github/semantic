@@ -17,6 +17,7 @@ library
                      -- Analyses & term annotations
                        Abstract.Interpreter
                      , Analysis.Abstract.Caching
+                     , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
