@@ -5,10 +5,12 @@ import Data.Abstract.Address
 import Data.Functor.Classes.Generic
 import Data.Set as Set
 import GHC.Generics
+import Unsafe.Coerce
 
 newtype Live l v = Live { unLive :: Set (Address l v) }
+  deriving (Eq, Foldable, Ord, Show)
 
-instance Ord l => Generic1 (Live l) where
+instance Generic1 (Live l) where
   type Rep1 (Live l)
     = D1
         ('MetaData "Live" "Data.Abstract.Live" "main" 'Prelude.True)
@@ -21,13 +23,13 @@ instance Ord l => Generic1 (Live l) where
                  'NoSourceStrictness
                  'DecidedLazy)
               (Set :.: Rec1 (Address l))))
-  to1 = Live . Set.map unRec1 . unComp1 . unM1 . unM1 . unM1
-  from1 = M1 . M1 . M1 . Comp1 . Set.map Rec1 . unLive
+  to1 = unsafeCoerce
+  from1 = unsafeCoerce
 
 
 instance Ord l => Functor (Live l) where
-  fmap f (Live as) = Live (Set.map (fmap f) as)
+  fmap _ = unsafeCoerce
 
-instance Ord l => Eq1 (Live l) where liftEq = genericLiftEq
+instance Eq l => Eq1 (Live l) where liftEq = genericLiftEq
 instance Ord l => Ord1 (Live l) where liftCompare = genericLiftCompare
-instance (Ord l, Show l) => Show1 (Live l) where liftShowsPrec = genericLiftShowsPrec
+instance Show l => Show1 (Live l) where liftShowsPrec = genericLiftShowsPrec
