@@ -44,7 +44,7 @@ evalDead :: forall v term
          -> DeadCodeResult term v
 evalDead e0 = run @(DeadCodeInterpreter term v) $ do
   killAll (Dead (subterms e0))
-  fix (evDead (\ recur yield -> eval recur yield . project)) pure e0
+  fix (evDead ev) pure e0
 
 evDead :: (Ord t, MonadDead t m)
        => (Eval' t m v -> Eval' t m v)
