@@ -14,14 +14,12 @@ import Control.Monad.Effect.Store
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Eval
-import Data.Abstract.FreeVariables
 import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Function (fix)
 import Data.Functor.Foldable (Base, Recursive(..))
 import Data.Semigroup
 import Data.Set hiding (foldr)
-import Data.Term
 import Prelude hiding (fail)
 
 
@@ -37,15 +35,15 @@ type Eval' t m v = (v -> m v) -> t -> m v
 -- Example:
 --    evaluate @Type <term>
 --    evaluate @(Value (Data.Union.Union Language.Python.Assignment2.Syntax) (Record Location) Precise) <term>
-evaluate :: forall v syntax ann
+evaluate :: forall v term
          . ( Ord v
-           , Functor syntax
            , Semigroup (Cell (LocationFor v) v)
-           , FreeVariables1 syntax
+           , Functor (Base term)
+           , Recursive term
            , MonadAddress (LocationFor v) (Eff (Interpreter v))
-           , Eval (Term syntax ann) v (Eff (Interpreter v)) syntax
+           , Eval term v (Eff (Interpreter v)) (Base term)
            )
-         => Term syntax ann
+         => term
          -> EvalResult v
 evaluate = run @(Interpreter v) . fix ev pure
 
