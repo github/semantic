@@ -1,5 +1,5 @@
 {-# LANGUAGE FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, RankNTypes, TypeOperators, UndecidableInstances #-}
-module Abstract.Interpreter.Symbolic where
+module Analysis.Abstract.Symbolic where
 
 import Abstract.Interpreter
 import Abstract.Primitive
