@@ -16,7 +16,7 @@ library
   exposed-modules:
                      -- Analyses & term annotations
                        Abstract.Interpreter
-                     , Abstract.Interpreter.Caching
+                     , Analysis.Abstract.Caching
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName

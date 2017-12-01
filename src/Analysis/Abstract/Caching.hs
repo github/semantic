@@ -1,5 +1,5 @@
-{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, DataKinds, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Abstract.Interpreter.Caching where
+{-# LANGUAGE ConstraintKinds, DataKinds, ScopedTypeVariables, TypeApplications #-}
+module Analysis.Abstract.Caching where
 
 import Abstract.Interpreter
 import Control.Applicative
@@ -59,7 +59,7 @@ evalCache :: forall v syntax ann
             )
           => Term syntax ann
           -> CachingResult (Term syntax ann) v
-evalCache e = run @(CachingInterpreter (Term syntax ann) v) (fixCache (fix (evCache (evCollect (evRoots)))) pure e)
+evalCache e = run @(CachingInterpreter (Term syntax ann) v) (fixCache (fix (evCache (evCollect evRoots))) pure e)
 
 
 evCache :: forall t v m
