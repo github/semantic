@@ -12,6 +12,7 @@ import Control.Monad.Effect.Store
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Eval
+import Data.Abstract.Live
 import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Function (fix)
@@ -19,7 +20,7 @@ import Data.Functor.Foldable (Base, Recursive(..))
 import Data.Semigroup
 import Data.Set
 
-type Interpreter v = '[Fail, State (Store (LocationFor v) v), Reader (Set (Address (LocationFor v) v)), Reader (Environment (LocationFor v) v)]
+type Interpreter v = '[Fail, Reader (Live (LocationFor v) v), State (Store (LocationFor v) v), Reader (Set (Address (LocationFor v) v)), Reader (Environment (LocationFor v) v)]
 
 type MonadInterpreter v m = (MonadEnv v m, MonadStore v m, MonadFail m)
 
