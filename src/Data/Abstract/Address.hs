@@ -11,6 +11,7 @@ import Data.Semigroup
 import Data.Set
 import GHC.Generics
 
+-- | An abstract address with a location of @l@ pointing to a variable of type @a@.
 newtype Address l a = Address { unAddress :: l }
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
@@ -34,6 +35,7 @@ instance Show l => Show1 (Address l) where
   liftShowsPrec = liftShowsPrec2 showsPrec showList
 
 
+-- | 'Precise' models precise store semantics where only the 'Latest' value is taken.
 newtype Precise = Precise { unPrecise :: Int }
   deriving (Eq, Ord, Show)
 
