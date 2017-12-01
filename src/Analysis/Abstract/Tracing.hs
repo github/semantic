@@ -19,9 +19,9 @@ import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Function (fix)
 import Data.Functor.Foldable (Base, Recursive(..))
+import Data.Pointed
 import Data.Semigroup
-import Data.Set hiding (fromList)
-import GHC.Exts (IsList(Item, fromList))
+import Data.Set
 
 type TracingInterpreter t v g = '[Reader (Set (Address (LocationFor v) v)), Writer (g (Configuration (LocationFor v) t v)), Fail, State (Store (LocationFor v) v), Reader (Set (Address (LocationFor v) v)), Reader (Environment (LocationFor v) v)]
 
@@ -61,8 +61,8 @@ evalReach = run @(ReachableStateInterpreter term v) . fix (evTell @Set (\ recur 
 
 
 evTell :: forall g t m v
-       . ( IsList (g (Configuration (LocationFor v) t v))
-         , Item (g (Configuration (LocationFor v) t v)) ~ Configuration (LocationFor v) t v
+       . ( Monoid (g (Configuration (LocationFor v) t v))
+         , Pointed g
          , MonadTrace t v g m
          , MonadEnv v m
          , MonadStore v m
@@ -75,5 +75,5 @@ evTell ev0 ev' yield e = do
   env <- askEnv
   store <- getStore
   roots <- askRoots
-  trace (fromList [Configuration e (toList roots) env store] :: g (Configuration (LocationFor v) t v))
+  trace (point (Configuration e (toList roots) env store) :: g (Configuration (LocationFor v) t v))
   ev0 ev' yield e
