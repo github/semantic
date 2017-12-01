@@ -16,6 +16,9 @@ newtype Live l v = Live { unLive :: Set (Address l v) }
 singleton :: Address l v -> Live l v
 singleton = Live . Set.singleton
 
+insert :: Ord l => Address l v -> Live l v -> Live l v
+insert addr = Live . Set.insert addr . unLive
+
 delete :: Ord l => Address l v -> Live l v -> Live l v
 delete addr = Live . Set.delete addr . unLive
 
