@@ -28,28 +28,17 @@ cacheInsert :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> (
 cacheInsert = (((Cache .) . (. unCache)) .) . (. point) . Map.insertWith (<>)
 
 
-instance (Eq l, Eq1 (Cell l)) => Eq2 (Cache l) where
-  liftEq2 eqT eqV (Cache a) (Cache b) = liftEq2 (liftEq2 eqT eqV) (liftEq (liftEq2 eqV (liftEq eqV))) a b
-
 instance (Eq l, Eq t, Eq1 (Cell l)) => Eq1 (Cache l t) where
-  liftEq = liftEq2 (==)
-
-
-instance (Ord l, Ord1 (Cell l)) => Ord2 (Cache l) where
-  liftCompare2 compareT compareV (Cache a) (Cache b) = liftCompare2 (liftCompare2 compareT compareV) (liftCompare (liftCompare2 compareV (liftCompare compareV))) a b
+  liftEq eqV (Cache c1) (Cache c2) = liftEq2 (liftEq eqV) (liftEq (liftEq2 eqV (liftEq eqV))) c1 c2
 
 instance (Ord l, Ord t, Ord1 (Cell l)) => Ord1 (Cache l t) where
-  liftCompare = liftCompare2 compare
-
-
-instance (Show l, Show1 (Cell l)) => Show2 (Cache l) where
-  liftShowsPrec2 spT slT spV slV d = showsUnaryWith (liftShowsPrec2 spKey slKey (liftShowsPrec spPair slPair) (liftShowList spPair slPair)) "Cache" d . unCache
-    where spKey = liftShowsPrec2 spT slT spV slV
-          slKey = liftShowList2 spT slT spV slV
-          spPair = liftShowsPrec2 spV slV spStore slStore
-          slPair = liftShowList2 spV slV spStore slStore
-          spStore = liftShowsPrec spV slV
-          slStore = liftShowList  spV slV
+  liftCompare compareV (Cache c1) (Cache c2) = liftCompare2 (liftCompare compareV) (liftCompare (liftCompare2 compareV (liftCompare compareV))) c1 c2
 
 instance (Show l, Show t, Show1 (Cell l)) => Show1 (Cache l t) where
-  liftShowsPrec = liftShowsPrec2 showsPrec showList
+  liftShowsPrec spV slV d = showsUnaryWith (liftShowsPrec2 spKey slKey (liftShowsPrec spPair slPair) (liftShowList spPair slPair)) "Cache" d . unCache
+      where spKey = liftShowsPrec spV slV
+            slKey = liftShowList spV slV
+            spPair = liftShowsPrec2 spV slV spStore slStore
+            slPair = liftShowList2 spV slV spStore slStore
+            spStore = liftShowsPrec spV slV
+            slStore = liftShowList  spV slV
