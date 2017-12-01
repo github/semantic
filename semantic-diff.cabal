@@ -38,6 +38,7 @@ library
                      , Control.Monad.Effect.Trace
                      -- General datatype definitions & generic algorithms
                      , Data.Abstract.Address
+                     , Data.Abstract.Cache
                      , Data.Abstract.Configuration
                      , Data.Abstract.Environment
                      , Data.Abstract.Eval

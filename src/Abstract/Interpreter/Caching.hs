@@ -14,9 +14,10 @@ import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Store
 import Data.Abstract.Address
-import Data.Abstract.Eval
+import Data.Abstract.Cache
 import Data.Abstract.Configuration
 import Data.Abstract.Environment
+import Data.Abstract.Eval
 import Data.Abstract.FreeVariables
 import Data.Abstract.Store
 import Data.Abstract.Value
@@ -27,25 +28,7 @@ import Data.Maybe
 import Data.Pointed
 import Data.Semigroup
 import qualified Data.Set as Set
-import qualified Data.Map as Map
 import Data.Term
-
-newtype Cache l t v = Cache { unCache :: Map.Map (Configuration l t v) (Set.Set (v, Store l v)) }
-
-deriving instance (Eq l, Eq t, Eq v, Eq (Cell l v)) => Eq (Cache l t v)
-deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Ord (Cache l t v)
-deriving instance (Show l, Show t, Show v, Show (Cell l v)) => Show (Cache l t v)
-deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Monoid (Cache l t v)
-
-cacheLookup :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> Cache l t v -> Maybe (Set.Set (v, Store l v))
-cacheLookup key = Map.lookup key . unCache
-
-cacheSet :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> Set.Set (v, Store l v) -> Cache l t v -> Cache l t v
-cacheSet = (((Cache .) . (. unCache)) .) . Map.insert
-
-cacheInsert :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> (v, Store l v) -> Cache l t v -> Cache l t v
-cacheInsert = (((Cache .) . (. unCache)) .) . (. point) . Map.insertWith (<>)
-
 
 type CachingInterpreter t v = '[Fresh, Reader (Set.Set (Address (LocationFor v) v)), Reader (Environment (LocationFor v) v), Fail, NonDetEff, State (Store (LocationFor v) v), Reader (Cache (LocationFor v) t v), State (Cache (LocationFor v) t v)]
 
@@ -173,30 +156,3 @@ mlfp a f = loop a
             return x
           else
             loop x'
-
-
-instance (Eq l, Eq1 (Cell l)) => Eq2 (Cache l) where
-  liftEq2 eqT eqV (Cache a) (Cache b) = liftEq2 (liftEq2 eqT eqV) (liftEq (liftEq2 eqV (liftEq eqV))) a b
-
-instance (Eq l, Eq t, Eq1 (Cell l)) => Eq1 (Cache l t) where
-  liftEq = liftEq2 (==)
-
-
-instance (Ord l, Ord1 (Cell l)) => Ord2 (Cache l) where
-  liftCompare2 compareT compareV (Cache a) (Cache b) = liftCompare2 (liftCompare2 compareT compareV) (liftCompare (liftCompare2 compareV (liftCompare compareV))) a b
-
-instance (Ord l, Ord t, Ord1 (Cell l)) => Ord1 (Cache l t) where
-  liftCompare = liftCompare2 compare
-
-
-instance (Show l, Show1 (Cell l)) => Show2 (Cache l) where
-  liftShowsPrec2 spT slT spV slV d = showsUnaryWith (liftShowsPrec2 spKey slKey (liftShowsPrec spPair slPair) (liftShowList spPair slPair)) "Cache" d . unCache
-    where spKey = liftShowsPrec2 spT slT spV slV
-          slKey = liftShowList2 spT slT spV slV
-          spPair = liftShowsPrec2 spV slV spStore slStore
-          slPair = liftShowList2 spV slV spStore slStore
-          spStore = liftShowsPrec spV slV
-          slStore = liftShowList  spV slV
-
-instance (Show l, Show t, Show1 (Cell l)) => Show1 (Cache l t) where
-  liftShowsPrec = liftShowsPrec2 showsPrec showList
