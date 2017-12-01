@@ -3,22 +3,19 @@
     (Identifier))
   (Function
     (Empty)
-    (
-      (Identifier))
+    (Identifier)
     ([])
     ([]))
   (Function
     (Empty)
-    (
-      (Identifier))
+    (Identifier)
     ([])
     (Call
       (Identifier)
       (Empty)))
   (Function
     (Empty)
-    (
-      (Identifier))
+    (Identifier)
     ([])
     (
       (Call
@@ -29,8 +26,7 @@
         (Empty))))
   (Function
     (Empty)
-    (
-      (Identifier))
+    (Identifier)
     ([])
     (
       (Call
