@@ -12,7 +12,7 @@ import Data.Semigroup
 import qualified Data.Set as Set
 import Data.Union
 import GHC.Generics
-import Prelude hiding (Integer, String, fail)
+import Prelude hiding (Integer, String)
 import qualified Prelude
 
 type ValueConstructors location
