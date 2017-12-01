@@ -35,6 +35,7 @@ library
                      , Control.Monad.Effect.Env
                      , Control.Monad.Effect.Fresh
                      , Control.Monad.Effect.GC
+                     , Control.Monad.Effect.NonDet
                      , Control.Monad.Effect.Store
                      , Control.Monad.Effect.Trace
                      -- General datatype definitions & generic algorithms

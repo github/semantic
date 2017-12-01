@@ -10,7 +10,7 @@ import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.Internal hiding (run)
-import Control.Monad.Effect.NonDetEff
+import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Store
@@ -36,15 +36,6 @@ type CachingInterpreter t v = '[Fresh, Reader (Set.Set (Address (LocationFor v) 
 type CachingResult t v = Final (CachingInterpreter t v) v
 
 type MonadCachingInterpreter t v m = (MonadEnv v m, MonadStore v m, MonadCacheIn t v m, MonadCacheOut t v m, MonadGC v m, Alternative m)
-
-
-class (Alternative m, Monad m) => MonadNonDet m where
-  collect :: Monoid b => (a -> b) -> m a -> m b
-
-instance (NonDetEff :< fs) => MonadNonDet (Eff fs) where
-  collect f = interpose (pure . f) (\ m k -> case m of
-    MZero -> pure mempty
-    MPlus -> mappend <$> k True <*> k False)
 
 
 -- Coinductively-cached evaluation
