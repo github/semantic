@@ -45,6 +45,7 @@ instance Generic1 (Live l) where
                  'NoSourceStrictness
                  'DecidedLazy)
               (Set :.: Rec1 (Address l))))
+  -- NB: The value type @v@ in @'Address' l v@ is phantom; 'compare'ing 'Address'es is based solely on the location type @l@. Thus, we can safely coerce the values in the 'Set' without worrying about changing its shape. However, 'Set.map' would require that we add an extra 'Ord' constraint since it needs to account for the possibility of changing the shape of the set; so we use 'unsafeCoerce' to circumvent that possibility.
   to1 = Live . unsafeCoerce . unComp1 . unM1 . unM1 . unM1
   from1 = M1 . M1 . M1 . Comp1 . unsafeCoerce . unLive
 
