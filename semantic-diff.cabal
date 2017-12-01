@@ -29,6 +29,7 @@ library
                      , Category
                      -- Control flow
                      , Control.Effect
+                     , Control.Monad.Effect.Address
                      , Control.Monad.Effect.Dead
                      , Control.Monad.Effect.Env
                      , Control.Monad.Effect.Fresh

@@ -4,6 +4,7 @@ module Data.Syntax where
 import qualified Assigning.Assignment as Assignment
 import Control.Applicative
 import Control.Monad.Effect
+import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Store
 import Control.Monad.Error.Class hiding (Error)

@@ -4,9 +4,10 @@ module Analysis.Abstract.Dead where
 import Abstract.Interpreter
 import Control.Effect
 import Control.Monad.Effect hiding (run)
+import Control.Monad.Effect.Address
 import Control.Monad.Effect.Dead
 import Control.Monad.Effect.State
-import Control.Monad.Effect.Store
+import Data.Abstract.Address
 import Data.Abstract.Eval
 import Data.Abstract.Value
 import Data.Function (fix)

@@ -1,8 +1,10 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, TypeApplications, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Syntax.Statement where
 
+import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Store
+import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Eval
 import Data.Abstract.FreeVariables

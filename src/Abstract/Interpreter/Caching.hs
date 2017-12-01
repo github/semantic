@@ -4,6 +4,7 @@ module Abstract.Interpreter.Caching where
 import Abstract.Interpreter
 import Control.Applicative
 import Control.Effect
+import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
@@ -12,10 +13,12 @@ import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Store
+import Data.Abstract.Address
 import Data.Abstract.Eval
 import Data.Abstract.Configuration
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
+import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Foldable
 import Data.Function (fix)

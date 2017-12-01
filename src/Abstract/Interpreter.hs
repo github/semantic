@@ -3,6 +3,7 @@ module Abstract.Interpreter where
 
 import Control.Effect
 import Control.Monad.Effect hiding (run)
+import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
@@ -10,18 +11,20 @@ import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Store
+import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Eval
 import Data.Abstract.FreeVariables
+import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Function (fix)
 import Data.Semigroup
-import qualified Data.Set as Set
+import Data.Set hiding (foldr)
 import Data.Term
 import Prelude hiding (fail)
 
 
-type Interpreter v = '[Fresh, Fail, NonDetEff, State (Store (LocationFor v) v), Reader (Set.Set (Address (LocationFor v) v)), Reader (Environment (LocationFor v) v)]
+type Interpreter v = '[Fresh, Fail, NonDetEff, State (Store (LocationFor v) v), Reader (Set (Address (LocationFor v) v)), Reader (Environment (LocationFor v) v)]
 
 type MonadInterpreter v m = (MonadEnv v m, MonadStore v m, MonadFail m)
 
@@ -64,7 +67,7 @@ evCollect :: forall t v m
           -> Eval' t m v
           -> Eval' t m v
 evCollect ev0 ev' yield e = do
-  roots <- askRoots :: m (Set.Set (Address (LocationFor v) v))
+  roots <- askRoots :: m (Set (Address (LocationFor v) v))
   v <- ev0 ev' yield e
   modifyStore (gc (roots <> valueRoots v))
   return v
@@ -82,13 +85,13 @@ evRoots :: forall v m syntax ann
         -> Eval' (Term syntax ann) m v
 evRoots ev' yield = eval ev' yield . unTerm
 
-gc :: (Ord (LocationFor a), Foldable (Cell (LocationFor a)), ValueRoots (LocationFor a) a) => Set.Set (Address (LocationFor a) a) -> Store (LocationFor a) a -> Store (LocationFor a) a
+gc :: (Ord (LocationFor a), Foldable (Cell (LocationFor a)), ValueRoots (LocationFor a) a) => Set (Address (LocationFor a) a) -> Store (LocationFor a) a -> Store (LocationFor a) a
 gc roots store = storeRestrict store (reachable roots store)
 
-reachable :: (Ord (LocationFor a), Foldable (Cell (LocationFor a)), ValueRoots (LocationFor a) a) => Set.Set (Address (LocationFor a) a) -> Store (LocationFor a) a -> Set.Set (Address (LocationFor a) a)
+reachable :: (Ord (LocationFor a), Foldable (Cell (LocationFor a)), ValueRoots (LocationFor a) a) => Set (Address (LocationFor a) a) -> Store (LocationFor a) a -> Set (Address (LocationFor a) a)
 reachable roots store = go roots mempty
-  where go set seen = case Set.minView set of
+  where go set seen = case minView set of
           Nothing -> seen
           Just (a, as)
-            | Just values <- storeLookupAll a store -> go (Set.difference (foldr ((<>) . valueRoots) mempty values <> as) seen) (Set.insert a seen)
-            | otherwise -> go seen (Set.insert a seen)
+            | Just values <- storeLookupAll a store -> go (difference (foldr ((<>) . valueRoots) mempty values <> as) seen) (insert a seen)
+            | otherwise -> go seen (insert a seen)
