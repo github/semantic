@@ -35,9 +35,9 @@ liveSplit = fmap (second Live) . Set.minView . unLive
 instance Generic1 (Live l) where
   type Rep1 (Live l)
     = D1
-        ('MetaData "Live" "Data.Abstract.Live" "main" 'Prelude.True)
+        ('MetaData "Live" "Data.Abstract.Live" "main" 'True)
         (C1
-           ('MetaCons "Live" 'PrefixI 'Prelude.True)
+           ('MetaCons "Live" 'PrefixI 'True)
            (S1
               ('MetaSel
                  ('Just "unLive")
