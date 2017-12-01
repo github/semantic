@@ -60,7 +60,7 @@ evalCache :: forall v syntax ann
             )
           => Term syntax ann
           -> CachingResult (Term syntax ann) v
-evalCache e = run @(CachingInterpreter (Term syntax ann) v) (fixCache (fix (evCache (evCollect evRoots))) pure e)
+evalCache e = run @(CachingInterpreter (Term syntax ann) v) (fixCache (fix (evCache (evCollect ev))) pure e)
 
 
 evCache :: forall t v m
