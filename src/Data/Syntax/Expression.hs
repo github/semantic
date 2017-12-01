@@ -63,6 +63,7 @@ instance ( MonadFail m
     _ :-> outTy <- opTy `unify` (TArr inTys :-> TVar tvar)
     yield outTy
 
+
 data Comparison a
   = LessThan !a !a
   | LessThanEqual !a !a
@@ -70,11 +71,14 @@ data Comparison a
   | GreaterThanEqual !a !a
   | Equal !a !a
   | Comparison !a !a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Comparison where liftEq = genericLiftEq
 instance Ord1 Comparison where liftCompare = genericLiftCompare
 instance Show1 Comparison where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for Comparison
+instance (MonadFail m) => Eval t v m Comparison
 
 
 -- | Binary arithmetic operators.
@@ -86,54 +90,78 @@ data Arithmetic a
   | Modulo !a !a
   | Power !a !a
   | Negate !a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Arithmetic where liftEq = genericLiftEq
 instance Ord1 Arithmetic where liftCompare = genericLiftCompare
 instance Show1 Arithmetic where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for Arithmetic
+instance (MonadFail m) => Eval t v m Arithmetic
+
 
 -- | Boolean operators.
 data Boolean a
   = Or !a !a
   | And !a !a
   | Not !a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Boolean where liftEq = genericLiftEq
 instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Implement Eval instance for Boolean
+instance (MonadFail m) => Eval t v m Boolean
+
+
 -- | Javascript delete operator
 newtype Delete a = Delete a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Delete where liftEq = genericLiftEq
 instance Ord1 Delete where liftCompare = genericLiftCompare
 instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Implement Eval instance for Delete
+instance (MonadFail m) => Eval t v m Delete
+
+
 -- | A sequence expression such as Javascript or C's comma operator.
 data SequenceExpression a = SequenceExpression { _firstExpression :: !a, _secondExpression :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 SequenceExpression where liftEq = genericLiftEq
 instance Ord1 SequenceExpression where liftCompare = genericLiftCompare
 instance Show1 SequenceExpression where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Implement Eval instance for SequenceExpression
+instance (MonadFail m) => Eval t v m SequenceExpression
+
+
 -- | Javascript void operator
 newtype Void a = Void a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Void where liftEq = genericLiftEq
 instance Ord1 Void where liftCompare = genericLiftCompare
 instance Show1 Void where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Implement Eval instance for Void
+instance (MonadFail m) => Eval t v m Void
+
+
 -- | Javascript typeof operator
 newtype Typeof a = Typeof a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Typeof where liftEq = genericLiftEq
 instance Ord1 Typeof where liftCompare = genericLiftCompare
 instance Show1 Typeof where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for Typeof
+instance (MonadFail m) => Eval t v m Typeof
+
 
 -- | Bitwise operators.
 data Bitwise a
@@ -144,83 +172,122 @@ data Bitwise a
   | RShift !a !a
   | UnsignedRShift !a !a
   | Complement a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Bitwise where liftEq = genericLiftEq
 instance Ord1 Bitwise where liftCompare = genericLiftCompare
 instance Show1 Bitwise where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Implement Eval instance for Bitwise
+instance (MonadFail m) => Eval t v m Bitwise
+
+
 -- | Member Access (e.g. a.b)
 data MemberAccess a
   = MemberAccess !a !a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 MemberAccess where liftEq = genericLiftEq
 instance Ord1 MemberAccess where liftCompare = genericLiftCompare
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Implement Eval instance for MemberAccess
+instance (MonadFail m) => Eval t v m MemberAccess
+
+
 -- | Subscript (e.g a[1])
 data Subscript a
   = Subscript !a ![a]
   | Member !a !a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Subscript where liftEq = genericLiftEq
 instance Ord1 Subscript where liftCompare = genericLiftCompare
 instance Show1 Subscript where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Implement Eval instance for Subscript
+instance (MonadFail m) => Eval t v m Subscript
+
+
 -- | Enumeration (e.g. a[1:10:1] in Python (start at index 1, stop at index 10, step 1 element from start to stop))
 data Enumeration a = Enumeration { enumerationStart :: !a, enumerationEnd :: !a, enumerationStep :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Enumeration where liftEq = genericLiftEq
 instance Ord1 Enumeration where liftCompare = genericLiftCompare
 instance Show1 Enumeration where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Implement Eval instance for Enumeration
+instance (MonadFail m) => Eval t v m Enumeration
+
+
 -- | InstanceOf (e.g. a instanceof b in JavaScript
 data InstanceOf a = InstanceOf { instanceOfSubject :: !a, instanceOfObject :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 InstanceOf where liftEq = genericLiftEq
 instance Ord1 InstanceOf where liftCompare = genericLiftCompare
 instance Show1 InstanceOf where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Implement Eval instance for InstanceOf
+instance (MonadFail m) => Eval t v m InstanceOf
+
+
 -- | ScopeResolution (e.g. import a.b in Python or a::b in C++)
 newtype ScopeResolution a = ScopeResolution [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 ScopeResolution where liftEq = genericLiftEq
 instance Ord1 ScopeResolution where liftCompare = genericLiftCompare
 instance Show1 ScopeResolution where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Implement Eval instance for ScopeResolution
+instance (MonadFail m) => Eval t v m ScopeResolution
+
+
 -- | A non-null expression such as Typescript or Swift's ! expression.
 newtype NonNullExpression a = NonNullExpression { nonNullExpression :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 NonNullExpression where liftEq = genericLiftEq
 instance Ord1 NonNullExpression where liftCompare = genericLiftCompare
 instance Show1 NonNullExpression where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Implement Eval instance for NonNullExpression
+instance (MonadFail m) => Eval t v m NonNullExpression
+
+
 -- | An await expression in Javascript or C#.
 newtype Await a = Await { awaitSubject :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Await where liftEq = genericLiftEq
 instance Ord1 Await where liftCompare = genericLiftCompare
 instance Show1 Await where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Implement Eval instance for Await
+instance (MonadFail m) => Eval t v m Await
+
+
 -- | An object constructor call in Javascript, Java, etc.
 newtype New a = New { newSubject :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 New where liftEq = genericLiftEq
 instance Ord1 New where liftCompare = genericLiftCompare
 instance Show1 New where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Implement Eval instance for New
+instance (MonadFail m) => Eval t v m New
+
+
 -- | A cast expression to a specified type.
 data Cast a =  Cast { castSubject :: !a, castType :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Cast where liftEq = genericLiftEq
 instance Ord1 Cast where liftCompare = genericLiftCompare
 instance Show1 Cast where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for Cast
+instance (MonadFail m) => Eval t v m Cast

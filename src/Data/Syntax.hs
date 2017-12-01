@@ -162,6 +162,8 @@ instance Eq1 AccessibilityModifier where liftEq = genericLiftEq
 instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare
 instance Show1 AccessibilityModifier where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Implement Eval instance for AccessibilityModifier
+instance (MonadFail m) => Eval t v m AccessibilityModifier
 
 -- | Empty syntax, with essentially no-op semantics.
 --
