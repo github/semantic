@@ -2,7 +2,6 @@
 module Analysis.Abstract.Caching where
 
 import Analysis.Abstract.Collecting
-import Analysis.Abstract.Evaluating
 import Control.Applicative
 import Control.Effect
 import Control.Monad.Effect.Address
@@ -57,7 +56,7 @@ evalCache :: forall v term
             )
           => term
           -> CachingResult term v
-evalCache e = run @(CachingInterpreter term v) (fixCache (fix (evCache (evCollect ev))) pure e)
+evalCache e = run @(CachingInterpreter term v) (fixCache (fix (evCache (evCollect (\ recur yield -> eval recur yield . project)))) pure e)
 
 
 evCache :: forall t v m
@@ -67,9 +66,9 @@ evCache :: forall t v m
           , Ord (Cell (LocationFor v) v)
           , MonadCachingInterpreter t v m
           )
-        => (Eval' t m v -> Eval' t m v)
-        -> Eval' t m v
-        -> Eval' t m v
+        => (((v -> m v) -> t -> m v) -> (v -> m v) -> t -> m v)
+        -> ((v -> m v) -> t -> m v)
+        -> (v -> m v) -> t -> m v
 evCache ev0 ev' yield e = do
   env <- askEnv
   store <- getStore
@@ -98,8 +97,8 @@ fixCache :: forall t v m
            , MonadNonDet m
            , MonadFresh m
            )
-         => Eval' t m v
-         -> Eval' t m v
+         => ((v -> m v) -> t -> m v)
+         -> (v -> m v) -> t -> m v
 fixCache ev' yield e = do
   env <- askEnv
   store <- getStore
