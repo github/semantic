@@ -1,8 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 module Language.Go where
 
-import Control.Comonad
-import Control.Comonad.Cofree
 import Data.Foldable (toList)
 import Data.Maybe
 import Data.Record
@@ -20,17 +18,17 @@ termAssignment
 termAssignment source category children = case (category, children) of
   (Module, [moduleName]) -> Just $ S.Module moduleName []
   (Import, [importName]) -> Just $ S.Import importName []
-  (Function, [id, params, block]) -> Just $ S.Function id [params] (toList (unwrap block))
-  (Function, [id, params, ty, block]) -> Just $ S.Function id [params, ty] (toList (unwrap block))
-  (For, [body]) | Other "block" <- Info.category (extract body) -> Just $ S.For [] (toList (unwrap body))
-  (For, [forClause, body]) | Other "for_clause" <- Info.category (extract forClause) -> Just $ S.For (toList (unwrap forClause)) (toList (unwrap body))
-  (For, [rangeClause, body]) | Other "range_clause" <- Info.category (extract rangeClause) -> Just $ S.For (toList (unwrap rangeClause)) (toList (unwrap body))
+  (Function, [id, params, block]) -> Just $ S.Function id [params] (toList (termOut block))
+  (Function, [id, params, ty, block]) -> Just $ S.Function id [params, ty] (toList (termOut block))
+  (For, [body]) | Other "block" <- Info.category (termAnnotation body) -> Just $ S.For [] (toList (termOut body))
+  (For, [forClause, body]) | Other "for_clause" <- Info.category (termAnnotation forClause) -> Just $ S.For (toList (termOut forClause)) (toList (termOut body))
+  (For, [rangeClause, body]) | Other "range_clause" <- Info.category (termAnnotation rangeClause) -> Just $ S.For (toList (termOut rangeClause)) (toList (termOut body))
   (TypeDecl, [identifier, ty]) -> Just $ S.TypeDecl identifier ty
   (StructTy, _) -> Just (S.Ty children)
   (FieldDecl, _) -> Just (S.FieldDecl children)
   (ParameterDecl, param : ty) -> Just $ S.ParameterDecl (listToMaybe ty) param
   (Assignment, [identifier, expression]) -> Just $ S.VarAssignment [identifier] expression
-  (Select, _) -> Just $ S.Select (children >>= toList . unwrap)
+  (Select, _) -> Just $ S.Select (children >>= toList . termOut)
   (Go, [expr]) -> Just $ S.Go expr
   (Defer, [expr]) -> Just $ S.Defer expr
   (SubscriptAccess, [a, b]) -> Just $ S.SubscriptAccess a b
@@ -38,15 +36,15 @@ termAssignment source category children = case (category, children) of
   (Slice, [a, rest]) -> Just $ S.SubscriptAccess a rest
   (Literal, children) -> Just . S.Indexed $ unpackElement <$> children
   (Other "composite_literal", [ty, values])
-    | ArrayTy <- Info.category (extract ty)
-    -> Just $ S.Array (Just ty) (toList (unwrap values))
-    | DictionaryTy <- Info.category (extract ty)
-    -> Just $ S.Object (Just ty) (toList (unwrap values))
-    | SliceTy <- Info.category (extract ty)
+    | ArrayTy <- Info.category (termAnnotation ty)
+    -> Just $ S.Array (Just ty) (toList (termOut values))
+    | DictionaryTy <- Info.category (termAnnotation ty)
+    -> Just $ S.Object (Just ty) (toList (termOut values))
+    | SliceTy <- Info.category (termAnnotation ty)
     -> Just $ S.SubscriptAccess ty values
   (Other "composite_literal", []) -> Just $ S.Struct Nothing []
   (Other "composite_literal", [ty]) -> Just $ S.Struct (Just ty) []
-  (Other "composite_literal", [ty, values]) -> Just $ S.Struct (Just ty) (toList (unwrap values))
+  (Other "composite_literal", [ty, values]) -> Just $ S.Struct (Just ty) (toList (termOut values))
   (TypeAssertion, [a, b]) -> Just $ S.TypeAssertion a b
   (TypeConversion, [a, b]) -> Just $ S.TypeConversion a b
   -- TODO: Handle multiple var specs
@@ -54,8 +52,8 @@ termAssignment source category children = case (category, children) of
   (VarDecl, children) -> Just $ S.VarDecl children
   (FunctionCall, id : rest) -> Just $ S.FunctionCall id [] rest
   (AnonymousFunction, [params, _, body])
-    | [params'] <- toList (unwrap params)
-    -> Just $ S.AnonymousFunction (toList (unwrap params')) (toList (unwrap body))
+    | [params'] <- toList (termOut params)
+    -> Just $ S.AnonymousFunction (toList (termOut params')) (toList (termOut body))
   (PointerTy, _) -> Just $ S.Ty children
   (ChannelTy, _) -> Just $ S.Ty children
   (Send, [channel, expr]) -> Just $ S.Send channel expr
@@ -64,15 +62,15 @@ termAssignment source category children = case (category, children) of
   (IncrementStatement, _) -> Just $ S.Leaf (toText source)
   (DecrementStatement, _) -> Just $ S.Leaf (toText source)
   (QualifiedType, _) -> Just $ S.Leaf (toText source)
-  (Method, [receiverParams, name, body]) -> Just (S.Method [] name (Just receiverParams) [] (toList (unwrap body)))
+  (Method, [receiverParams, name, body]) -> Just (S.Method [] name (Just receiverParams) [] (toList (termOut body)))
   (Method, [receiverParams, name, params, body])
-    -> Just (S.Method [] name (Just receiverParams) [params] (toList (unwrap body)))
+    -> Just (S.Method [] name (Just receiverParams) [params] (toList (termOut body)))
   (Method, [receiverParams, name, params, ty, body])
-    -> Just (S.Method [] name (Just receiverParams) [params, ty] (toList (unwrap body)))
+    -> Just (S.Method [] name (Just receiverParams) [params, ty] (toList (termOut body)))
   _ -> Nothing
   where unpackElement element
-          | Element <- Info.category (extract element)
-          , S.Indexed [ child ] <- unwrap element = child
+          | Element <- Info.category (termAnnotation element)
+          , S.Indexed [ child ] <- termOut element = child
           | otherwise                             = element
 
 categoryForGoName :: Text -> Category

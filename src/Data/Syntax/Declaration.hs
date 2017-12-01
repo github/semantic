@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Data.Syntax.Declaration where
 
-import Algorithm
+import Diffing.Algorithm
 import Data.Align.Generic
 import Data.Functor.Classes.Eq.Generic
 import Data.Functor.Classes.Ord.Generic

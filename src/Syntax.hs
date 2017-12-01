@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Syntax where
 
-import Algorithm
+import Diffing.Algorithm
 import Data.Aeson (ToJSON, (.=))
 import Data.Align.Generic
 import Data.Foldable (toList)
