@@ -17,7 +17,7 @@ singleton :: Address l v -> Live l v
 singleton = Live . Set.singleton
 
 delete :: Ord l => Address l v -> Live l v -> Live l v
-delete addr (Live s) = Live (Set.delete addr s)
+delete addr = Live . Set.delete addr . unLive
 
 difference :: Ord l => Live l v -> Live l v -> Live l v
 difference = fmap Live . (Set.difference `on` unLive)
