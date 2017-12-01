@@ -21,4 +21,14 @@ for x := range y {
 a(x)
 break
 }
+for i, s := range a {
+	g(i, s)
+}
+for key, val = range m {
+	h(key, val)
+}
+for 1 < 2 {
+  i()
+}
+for range ch {}
 }

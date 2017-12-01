@@ -3,69 +3,71 @@
     (TypeParameter
     { (Identifier)
     ->(Identifier) }
+      (Empty)
       (Empty))
   { (Identifier)
   ->(Identifier) }
     (ExtendsClause
     { (TypeIdentifier)
     ->(TypeIdentifier) })
-  {+(PublicFieldDefinition
-    {+(Empty)+}
-    {+(Empty)+}
-    {+(Empty)+}
-    {+(Identifier)+}
-    {+(Float)+})+}
-    (Method
-      (Empty)
-      (Empty)
-      (Empty)
-      (Empty)
-      (Empty)
-    { (Identifier)
-    ->(Identifier) }
-      (RequiredParameter
+    (
+    {+(PublicFieldDefinition
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Empty)+}
+      {+(Identifier)+}
+      {+(Float)+})+}
+      (Method
         (Empty)
         (Empty)
         (Empty)
-        (Assignment
-          (Identifier)
-          (Empty)))
-      (
-        (Return
-          (Identifier))))
-    (Method
-      (Empty)
-      (Empty)
-      (Empty)
-      (Empty)
-      (Empty)
-    { (Identifier)
-    ->(Identifier) }
-      (RequiredParameter
+        (Empty)
+        (Empty)
+      { (Identifier)
+      ->(Identifier) }
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Empty)
+          (Assignment
+            (Identifier)
+            (Empty)))
+        (
+          (Return
+            (Identifier))))
+      (Method
         (Empty)
         (Empty)
         (Empty)
-        (Assignment
-          (Identifier)
-          (Empty)))
-      (
-        (Return
-          (Identifier))))
-    (Method
-      (Empty)
-      (Empty)
-      (Empty)
-      (Empty)
-      (Empty)
-    { (Identifier)
-    ->(Identifier) }
-      (RequiredParameter
+        (Empty)
+        (Empty)
+      { (Identifier)
+      ->(Identifier) }
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Empty)
+          (Assignment
+            (Identifier)
+            (Empty)))
+        (
+          (Return
+            (Identifier))))
+      (Method
         (Empty)
         (Empty)
         (Empty)
-        (Assignment
-          (Identifier)
-          (Empty)))
-      (
-        (Return
-          (Identifier))))))
+        (Empty)
+        (Empty)
+      { (Identifier)
+      ->(Identifier) }
+        (RequiredParameter
+          (Empty)
+          (Empty)
+          (Empty)
+          (Assignment
+            (Identifier)
+            (Empty)))
+        (
+          (Return
+            (Identifier)))))))

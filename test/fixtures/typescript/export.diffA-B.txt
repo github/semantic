@@ -107,37 +107,36 @@
     {-(Empty)-}
     {-(Identifier)-}
     {-([])-})-})
-{+(Export
-  {+(TextElement)+})+}
-{+(Export
-  {+(ExportClause
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Empty)+})+}
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Empty)+})+}
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Empty)+})+})+}
-  {+(TextElement)+})+}
-{+(Export
-  {+(ExportClause
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Identifier)+})+}
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Identifier)+})+}
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Empty)+})+})+}
-  {+(TextElement)+})+}
-{-(Export
+  (Export
+  {+(TextElement)+}
   {-(ExportClause
     {-(ImportExportSpecifier
       {-(Identifier)-}
-      {-(Identifier)-})-})-})-}
+      {-(Identifier)-})-})-})
+{+(Export
+  {+(ExportClause
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Empty)+})+}
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Empty)+})+}
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Empty)+})+})+}
+  {+(TextElement)+})+}
+{+(Export
+  {+(ExportClause
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Empty)+})+})+}
+  {+(TextElement)+})+}
 {-(Export
   {-(TextElement)-})-}
 {-(Export

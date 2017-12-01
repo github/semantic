@@ -1,3 +1,2 @@
-module Main (main)
-where
-import SemanticCmdLine (main)
+module Main (main) where
+import Semantic.CLI (main)

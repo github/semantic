@@ -1,17 +1,17 @@
 (Program
   (Module
     (Identifier))
-  (Other "import_declaration"
-    (Import
-    { (StringLiteral)
-    ->(StringLiteral) })
-    (Import
-    { (StringLiteral)
-    ->(StringLiteral) })
-    (Import
+  (Import
+  { (TextElement)
+  ->(TextElement) }
+  { (TextElement)
+  ->(TextElement) }
+    (
       (Identifier)
-    { (StringLiteral)
-    ->(StringLiteral) }))
+    { (TextElement)
+    ->(TextElement) }))
   (Function
+    (Empty)
     (Identifier)
-    (Args)))
+    ([])
+    ([])))

@@ -27,6 +27,8 @@ module Data.Functor.Listable
 , ListableSyntax
 ) where
 
+import Analysis.CyclomaticComplexity
+import Analysis.Declaration
 import qualified Category
 import Control.Monad.Free as Free
 import Control.Monad.Trans.Free as FreeF
@@ -34,6 +36,7 @@ import Data.ByteString (ByteString)
 import Data.Char (chr)
 import Data.Diff
 import Data.Functor.Both
+import qualified Data.Language as Language
 import Data.List.NonEmpty
 import Data.Patch
 import Data.Range
@@ -51,8 +54,7 @@ import Data.Text as T (Text, pack)
 import qualified Data.Text.Encoding as T
 import Data.These
 import Data.Union
-import Renderer.TOC
-import RWS
+import Diffing.Algorithm.RWS
 import Syntax as S
 import Test.LeanCheck
 
@@ -300,6 +302,9 @@ instance (Listable1 f, Listable1 (Union (g ': fs))) => Listable1 (Union (f ': g 
 instance Listable1 f => Listable1 (Union '[f]) where
   liftTiers tiers = inj `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)
 
+instance (Listable1 (Union fs), Listable a) => Listable (Union fs a) where
+  tiers = tiers1
+
 
 instance Listable1 Comment.Comment where
   liftTiers _ = cons1 Comment.Comment
@@ -349,12 +354,20 @@ instance Listable Text where
 
 instance Listable Declaration where
   tiers
-    =  cons1 (MethodDeclaration)
-    \/ cons1 (FunctionDeclaration)
-    \/ cons1 (flip ErrorDeclaration Nothing)
+    =  cons4 MethodDeclaration
+    \/ cons3 FunctionDeclaration
+    \/ cons2 (\ a b -> ErrorDeclaration a b Nothing)
 
-instance Listable Algebra.CyclomaticComplexity where
-  tiers = cons1 (Algebra.CyclomaticComplexity)
+instance Listable Analysis.CyclomaticComplexity where
+  tiers = cons1 (Analysis.CyclomaticComplexity)
+
+instance Listable Language.Language where
+  tiers
+    =  cons0 Language.Go
+    \/ cons0 Language.JavaScript
+    \/ cons0 Language.Python
+    \/ cons0 Language.Ruby
+    \/ cons0 Language.TypeScript
 
 instance Listable Range where
   tiers = cons2 Range

@@ -1,12 +1,10 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.Markdown.Syntax where
 
-import Algorithm
+import Diffing.Algorithm
 import Data.Align.Generic
 import Data.ByteString (ByteString)
-import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Ord.Generic
-import Data.Functor.Classes.Show.Generic
+import Data.Functor.Classes.Generic
 import Data.Mergeable
 import GHC.Generics
 
@@ -28,14 +26,7 @@ instance Eq1 Paragraph where liftEq = genericLiftEq
 instance Ord1 Paragraph where liftCompare = genericLiftCompare
 instance Show1 Paragraph where liftShowsPrec = genericLiftShowsPrec
 
-data Section a = Section { sectionLevel :: Int, sectionHeading :: a, sectionContent :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
-
-instance Eq1 Section where liftEq = genericLiftEq
-instance Ord1 Section where liftCompare = genericLiftCompare
-instance Show1 Section where liftShowsPrec = genericLiftShowsPrec
-
-data Heading a = Heading { headingLevel :: Int, headingContent :: [a] }
+data Heading a = Heading { headingLevel :: Int, headingContent :: [a], sectionContent :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Heading where liftEq = genericLiftEq

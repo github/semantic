@@ -6,14 +6,14 @@ module Language.Ruby.Assignment
 , Term
 ) where
 
+import Assigning.Assignment hiding (Assignment, Error)
+import qualified Assigning.Assignment as Assignment
 import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Functor (void)
 import Data.List.NonEmpty (some1)
 import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
 import qualified Data.Syntax as Syntax
-import Data.Syntax.Assignment hiding (Assignment, Error)
-import qualified Data.Syntax.Assignment as Assignment
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
@@ -83,7 +83,7 @@ type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
-assignment = makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression) <|> parseError
 
 expression :: Assignment
 expression = term (handleError (choice expressionChoices))
@@ -202,11 +202,11 @@ endBlock :: Assignment
 endBlock = makeTerm <$> symbol EndBlock <*> children (Statement.ScopeExit <$> many expression)
 
 class' :: Assignment
-class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> pure [] <*> expression <*> (superclass <|> pure []) <*> many expression)
+class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> pure [] <*> expression <*> (superclass <|> pure []) <*> expressions)
   where superclass = pure <$ symbol Superclass <*> children expression
 
 singletonClass :: Assignment
-singletonClass = makeTerm <$> symbol SingletonClass <*> children (Declaration.Class <$> pure [] <*> expression <*> pure [] <*> many expression)
+singletonClass = makeTerm <$> symbol SingletonClass <*> children (Declaration.Class <$> pure [] <*> expression <*> pure [] <*> expressions)
 
 module' :: Assignment
 module' = makeTerm <$> symbol Module <*> children (Declaration.Module <$> expression <*> many expression)

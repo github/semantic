@@ -2,30 +2,34 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Switch
-      (Case
-        (Case
-          (Other "expression_list"
-            (RelationalOperator
+    ([])
+    (Match
+      ([])
+      (
+        (Pattern
+          (LessThan
+            (Identifier)
+            (Identifier))
+          (Call
+            (Identifier)
+            (Empty)))
+        (Pattern
+          (LessThan
+            (Identifier)
+            (Identifier))
+          (Context
+            (Comment)
+            (Call
               (Identifier)
-              (Identifier))))
-        (FunctionCall
-          (Identifier)))
-      (Case
-        (Case
-          (Other "expression_list"
-            (RelationalOperator
+              (Empty))))
+        (Context
+          (Comment)
+          (Pattern
+            (Equal
               (Identifier)
-              (Identifier))))
-        (FunctionCall
-          (Identifier)))
-      (Case
-        (Case
-          (Other "expression_list"
-            (RelationalOperator
+              (Integer))
+            (Call
               (Identifier)
-              (NumberLiteral))))
-        (FunctionCall
-          (Identifier))))))
+              (Empty))))))))

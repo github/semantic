@@ -2,27 +2,39 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args))
+    ([])
+    ([]))
   (Function
+    (Empty)
   { (Identifier)
   ->(Identifier) }
-    (Args)
-    (FunctionCall
-      (Identifier)))
+    ([])
+    (Call
+      (Identifier)
+      (Empty)))
   (Function
+    (Empty)
   { (Identifier)
   ->(Identifier) }
-    (Args)
-    (FunctionCall
-      (Identifier))
-    (FunctionCall
-      (Identifier)))
+    ([])
+    (
+      (Call
+        (Identifier)
+        (Empty))
+      (Call
+        (Identifier)
+        (Empty))))
   (Function
+    (Empty)
   { (Identifier)
   ->(Identifier) }
-    (Args)
-    (FunctionCall
-      (Identifier))
-    (FunctionCall
-      (Identifier))))
+    ([])
+    (
+      (Call
+        (Identifier)
+        (Empty))
+      (Call
+        (Identifier)
+        (Empty)))))

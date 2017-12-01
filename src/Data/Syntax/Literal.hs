@@ -1,12 +1,10 @@
 {-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric #-}
 module Data.Syntax.Literal where
 
-import Algorithm
+import Diffing.Algorithm
 import Data.Align.Generic
 import Data.ByteString (ByteString)
-import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Ord.Generic
-import Data.Functor.Classes.Show.Generic
+import Data.Functor.Classes.Generic
 import Data.Mergeable
 import GHC.Generics
 import Prelude
@@ -158,6 +156,25 @@ newtype Set a = Set { setElements :: [a] }
 instance Eq1 Set where liftEq = genericLiftEq
 instance Ord1 Set where liftCompare = genericLiftCompare
 instance Show1 Set where liftShowsPrec = genericLiftShowsPrec
+
+
+-- Pointers
+
+-- | A declared pointer (e.g. var pointer *int in Go)
+newtype Pointer a = Pointer a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Pointer where liftEq = genericLiftEq
+instance Ord1 Pointer where liftCompare = genericLiftCompare
+instance Show1 Pointer where liftShowsPrec = genericLiftShowsPrec
+
+-- | A reference to a pointer's address (e.g. &pointer in Go)
+newtype Reference a = Reference a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Reference where liftEq = genericLiftEq
+instance Ord1 Reference where liftCompare = genericLiftCompare
+instance Show1 Reference where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Object literals as distinct from hash literals? Or coalesce object/hash literals into “key-value literals”?
 -- TODO: Function literals (lambdas, procs, anonymous functions, what have you).

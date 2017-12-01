@@ -1,27 +1,26 @@
 {-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators #-}
 module Data.Syntax where
 
-import Algorithm hiding (Empty)
+import qualified Assigning.Assignment as Assignment
 import Control.Applicative
 import Control.Monad.Error.Class hiding (Error)
 import Data.Align.Generic
+import Data.AST
 import Data.ByteString (ByteString)
 import qualified Data.Error as Error
 import Data.Foldable (asum, toList)
 import Data.Function ((&), on)
 import Data.Ix
 import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
-import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Ord.Generic
-import Data.Functor.Classes.Show.Generic
+import Data.Functor.Classes.Generic
 import Data.Mergeable
 import Data.Range
 import Data.Record
 import Data.Semigroup
 import Data.Span
-import qualified Data.Syntax.Assignment as Assignment
 import Data.Term
 import Data.Union
+import Diffing.Algorithm hiding (Empty)
 import GHC.Generics
 import GHC.Stack
 
@@ -33,7 +32,7 @@ makeTerm a = makeTerm' a . inj
 
 -- | Lift a union and an annotation into a term, ensuring the annotation encompasses all children.
 makeTerm' :: (HasCallStack, Semigroup a, Foldable f) => a -> f (Term f a) -> Term f a
-makeTerm' a f = termIn (sconcat (a :| (termAnnotation . unTerm <$> toList f))) f
+makeTerm' a f = termIn (sconcat (a :| (termAnnotation <$> toList f))) f
 
 -- | Lift non-empty syntax into a term, injecting the syntax into a union & appending all subterms’.annotations to make the new term’s annotation.
 makeTerm1 :: (HasCallStack, f :< fs, Semigroup a, Apply Foldable fs) => f (Term (Union fs) a) -> Term (Union fs) a
@@ -42,20 +41,20 @@ makeTerm1 = makeTerm1' . inj
 -- | Lift a non-empty union into a term, appending all subterms’.annotations to make the new term’s annotation.
 makeTerm1' :: (HasCallStack, Semigroup a, Foldable f) => f (Term f a) -> Term f a
 makeTerm1' f = case toList f of
-  a : _ -> makeTerm' (termAnnotation (unTerm a)) f
+  a : _ -> makeTerm' (termAnnotation a) f
   _ -> error "makeTerm1': empty structure"
 
 -- | Construct an empty term at the current position.
-emptyTerm :: (HasCallStack, Empty :< fs, Apply Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
+emptyTerm :: (HasCallStack, Empty :< fs, Apply Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Location))
 emptyTerm = makeTerm . startLocation <$> Assignment.location <*> pure Empty
   where startLocation ann = Range (start (getField ann)) (start (getField ann)) :. Span (spanStart (getField ann)) (spanStart (getField ann)) :. Nil
 
 -- | Catch assignment errors into an error term.
-handleError :: (HasCallStack, Error :< fs, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
+handleError :: (HasCallStack, Error :< fs, Enum grammar, Eq1 ast, Ix grammar, Show grammar, Apply Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Location)) -> Assignment.Assignment ast grammar (Term (Union fs) (Record Location))
 handleError = flip catchError (\ err -> makeTerm <$> Assignment.location <*> pure (errorSyntax (either id show <$> err) []) <* Assignment.source)
 
 -- | Catch parse errors into an error term.
-parseError :: (HasCallStack, Error :< fs, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Assignment.Location))
+parseError :: (HasCallStack, Error :< fs, Bounded grammar, Enum grammar, Ix grammar, Apply Foldable fs) => Assignment.Assignment ast grammar (Term (Union fs) (Record Location))
 parseError = makeTerm <$> Assignment.token maxBound <*> pure (Error (ErrorStack (getCallStack (freezeCallStack callStack))) [] (Just "ParseError") [])
 
 

@@ -2,37 +2,49 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Other "type_declaration"
-      (TypeDecl
-      { (Identifier)
-      ->(Identifier) }
-        (StructTy)))
-    (Other "type_declaration"
-      (TypeDecl
-      { (Identifier)
-      ->(Identifier) }
-        (StructTy
-          (FieldDecl
-            (Identifier)))))
-    (Other "type_declaration"
-      (TypeDecl
-      { (Identifier)
-      ->(Identifier) }
-        (StructTy
-          (FieldDecl
-            (Identifier)
-            (Identifier)
-            (Identifier)))))
-    (Other "type_declaration"
-      (TypeDecl
-      { (Identifier)
-      ->(Identifier) }
-        (StructTy
-          (FieldDecl
-            (QualifiedType))
-          (FieldDecl
-            (Identifier)
-            (Identifier)
-            (StringLiteral)))))))
+    ([])
+    (
+      (
+        (Type
+        { (Identifier)
+        ->(Identifier) }
+          (Constructor
+            (Empty))))
+      (
+        (Type
+        { (Identifier)
+        ->(Identifier) }
+          (Constructor
+            (Empty)
+            (Field
+              (Identifier)
+              ([])))))
+      (
+        (Type
+        { (Identifier)
+        ->(Identifier) }
+          (Constructor
+            (Empty)
+            (Field
+              (Identifier)
+              (
+                (Identifier)
+                (Identifier))))))
+      (
+        (Type
+        { (Identifier)
+        ->(Identifier) }
+          (Constructor
+            (Empty)
+            (Field
+              (
+                (MemberAccess
+                  (Identifier)
+                  (Identifier))))
+            (Field
+              (Identifier)
+              (TextElement)
+              (
+                (Identifier)))))))))

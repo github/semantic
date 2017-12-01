@@ -2,43 +2,40 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Switch
-      (Case
-        (Case
-          (Other "expression_list"
-            (RelationalOperator
+    ([])
+    (Match
+      ([])
+      (
+        (Pattern
+          (LessThan
+          { (Identifier)
+          ->(Identifier) }
+          { (Identifier)
+          ->(Identifier) })
+          (Call
+            (Identifier)
+            (Empty)))
+        (Pattern
+          (LessThan
+          { (Identifier)
+          ->(Identifier) }
+          { (Identifier)
+          ->(Identifier) })
+        {-(Context
+          {-(Comment)-}
+            (Call
+              (Identifier)
+              (Empty)))-})
+      {-(Context
+        {-(Comment)-}
+          (Pattern
+            (Equal
             { (Identifier)
             ->(Identifier) }
-            { (Identifier)
-            ->(Identifier) })))
-        (FunctionCall
-          (Identifier)))
-    {+(Case
-      {+(Case
-        {+(Other "expression_list"
-          {+(RelationalOperator
-            {+(Identifier)+}
-            {+(Identifier)+})+})+})+}
-      {+(FunctionCall
-        {+(Identifier)+})+})+}
-      (Case
-        (Case
-          (Other "expression_list"
-            (RelationalOperator
+              (Integer))
+            (Call
             { (Identifier)
             ->(Identifier) }
-            { (Identifier)
-            ->(NumberLiteral) })))
-        (FunctionCall
-        { (Identifier)
-        ->(Identifier) }))
-    {-(Case
-      {-(Case
-        {-(Other "expression_list"
-          {-(RelationalOperator
-            {-(Identifier)-}
-            {-(NumberLiteral)-})-})-})-}
-      {-(FunctionCall
-        {-(Identifier)-})-})-})))
+              (Empty))))-}))))

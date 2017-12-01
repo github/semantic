@@ -1,12 +1,10 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Data.Syntax.Comment where
 
-import Algorithm
+import Diffing.Algorithm
 import Data.Align.Generic
 import Data.ByteString (ByteString)
-import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Ord.Generic
-import Data.Functor.Classes.Show.Generic
+import Data.Functor.Classes.Generic
 import Data.Mergeable
 import GHC.Generics
 

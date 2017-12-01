@@ -1,11 +1,9 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Data.Syntax.Declaration where
 
-import Algorithm
+import Diffing.Algorithm
 import Data.Align.Generic
-import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Ord.Generic
-import Data.Functor.Classes.Show.Generic
+import Data.Functor.Classes.Generic
 import Data.Mergeable
 import GHC.Generics
 
@@ -30,6 +28,14 @@ instance Diffable Method where
 instance Eq1 Method where liftEq = genericLiftEq
 instance Ord1 Method where liftCompare = genericLiftCompare
 instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
+
+-- | A method signature in TypeScript or a method spec in Go.
+data MethodSignature a = MethodSignature { _methodSignatureContext :: ![a], _methodSignatureName :: !a, _methodSignatureParameters :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 MethodSignature where liftEq = genericLiftEq
+instance Ord1 MethodSignature where liftCompare = genericLiftCompare
+instance Show1 MethodSignature where liftShowsPrec = genericLiftShowsPrec
 
 data RequiredParameter a = RequiredParameter { requiredParameter :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -81,8 +87,11 @@ instance Ord1 Variable where liftCompare = genericLiftCompare
 instance Show1 Variable where liftShowsPrec = genericLiftShowsPrec
 
 
-data Class a = Class { classContext :: ![a], classIdentifier :: !a, classSuperclasses :: ![a], classBody :: ![a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+data Class a = Class { classContext :: ![a], classIdentifier :: !a, classSuperclasses :: ![a], classBody :: !a }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Diffable Class where
+  equivalentBySubterm = Just . classIdentifier
 
 instance Eq1 Class where liftEq = genericLiftEq
 instance Ord1 Class where liftCompare = genericLiftCompare
@@ -95,7 +104,6 @@ data Module a = Module { moduleIdentifier :: !a, moduleScope :: ![a] }
 instance Eq1 Module where liftEq = genericLiftEq
 instance Ord1 Module where liftCompare = genericLiftCompare
 instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
-
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
@@ -141,10 +149,18 @@ instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
--- | Type alias declarations in Javascript/Haskell, etc.
-data TypeAliasDeclaration a = TypeAliasDeclaration { typeAliasDeclarationContext :: ![a], typeAliasDeclarationIdentifier :: !a, typeAliasDeclarationType :: !a }
+-- | A declared type (e.g. `a []int` in Go).
+data Type a = Type { typeName :: !a, typeKind :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
-instance Eq1 TypeAliasDeclaration where liftEq = genericLiftEq
-instance Ord1 TypeAliasDeclaration where liftCompare = genericLiftCompare
-instance Show1 TypeAliasDeclaration where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 Type where liftEq = genericLiftEq
+instance Ord1 Type where liftCompare = genericLiftCompare
+instance Show1 Type where liftShowsPrec = genericLiftShowsPrec
+
+-- | Type alias declarations in Javascript/Haskell, etc.
+data TypeAlias a = TypeAlias { typeAliasContext :: ![a], typeAliasIdentifier :: !a, typeAliasKind :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 TypeAlias where liftEq = genericLiftEq
+instance Ord1 TypeAlias where liftCompare = genericLiftCompare
+instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec

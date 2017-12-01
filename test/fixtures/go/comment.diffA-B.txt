@@ -2,7 +2,10 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-  { (Comment)
-  ->(Comment) }))
+    ([])
+    (Context
+    { (Comment)
+    ->(Comment) }
+      (Empty))))

@@ -2,11 +2,15 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Other "type_declaration"
-      (TypeDecl
+    ([])
+    (
+      (Type
       { (Identifier)
       ->(Identifier) }
-      { (QualifiedType)
-      ->(QualifiedType) }))))
+        (MemberAccess
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) })))))

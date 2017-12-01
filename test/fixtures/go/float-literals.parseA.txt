@@ -2,30 +2,22 @@
   (Module
     (Identifier))
   (Function
+    (Empty)
     (Identifier)
-    (Args)
-    (Assignment
-      (Other "expression_list"
-        (Identifier))
-      (Other "expression_list"
-        (FloatLiteral)))
-    (Assignment
-      (Other "expression_list"
-        (Identifier))
-      (Other "expression_list"
-        (FloatLiteral)))
-    (Assignment
-      (Other "expression_list"
-        (Identifier))
-      (Other "expression_list"
-        (FloatLiteral)))
-    (Assignment
-      (Other "expression_list"
-        (Identifier))
-      (Other "expression_list"
-        (FloatLiteral)))
-    (Assignment
-      (Other "expression_list"
-        (Identifier))
-      (Other "expression_list"
-        (FloatLiteral)))))
+    ([])
+    (
+      (Assignment
+        (Identifier)
+        (Float))
+      (Assignment
+        (Identifier)
+        (Float))
+      (Assignment
+        (Identifier)
+        (Float))
+      (Assignment
+        (Identifier)
+        (Float))
+      (Assignment
+        (Identifier)
+        (Float)))))
