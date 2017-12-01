@@ -105,7 +105,7 @@ defaultOptions = Options
   }
 
 defaultP, defaultQ :: Int
-defaultP = 2
+defaultP = 0
 defaultQ = 3
 
 
