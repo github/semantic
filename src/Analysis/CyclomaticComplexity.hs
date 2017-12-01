@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeOperators #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.CyclomaticComplexity
 ( CyclomaticComplexity(..)
 , HasCyclomaticComplexity
@@ -6,7 +6,7 @@ module Analysis.CyclomaticComplexity
 ) where
 
 import Data.Aeson
-import Data.Algebra (FAlgebra)
+import Data.Algebra
 import Data.Proxy
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
