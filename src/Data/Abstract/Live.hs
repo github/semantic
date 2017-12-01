@@ -11,6 +11,9 @@ import Unsafe.Coerce
 newtype Live l v = Live { unLive :: Set (Address l v) }
   deriving (Eq, Foldable, Monoid, Ord, Semigroup, Show)
 
+singleton :: Address l v -> Live l v
+singleton = Live . Set.singleton
+
 delete :: Ord l => Address l v -> Live l v -> Live l v
 delete addr (Live s) = Live (Set.delete addr s)
 
