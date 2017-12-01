@@ -11,9 +11,7 @@ import Data.Abstract.FreeVariables
 import Data.Abstract.Value
 import Data.Semigroup
 import Data.Align.Generic
-import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Ord.Generic
-import Data.Functor.Classes.Show.Generic
+import Data.Functor.Classes.Generic
 import Data.Mergeable
 import Diffing.Algorithm
 import GHC.Generics

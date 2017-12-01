@@ -15,9 +15,7 @@ import qualified Data.Abstract.Type as Type
 import Data.Abstract.Value
 import Data.Align.Generic
 import Data.Foldable (toList)
-import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Ord.Generic
-import Data.Functor.Classes.Show.Generic
+import Data.Functor.Classes.Generic
 import Data.Mergeable
 import Data.Traversable
 import Data.Semigroup

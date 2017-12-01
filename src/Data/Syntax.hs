@@ -21,9 +21,7 @@ import Data.Foldable (asum, toList)
 import Data.Function ((&), on)
 import Data.Ix
 import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
-import Data.Functor.Classes.Eq.Generic
-import Data.Functor.Classes.Ord.Generic
-import Data.Functor.Classes.Show.Generic
+import Data.Functor.Classes.Generic
 import Data.Mergeable
 import Data.Range
 import Data.Record

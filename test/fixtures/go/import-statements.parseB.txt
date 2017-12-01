@@ -11,7 +11,6 @@
       (Empty)))
   (Function
     (Empty)
-    (
-      (Identifier))
+    (Identifier)
     ([])
     ([])))
