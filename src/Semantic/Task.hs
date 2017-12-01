@@ -193,7 +193,7 @@ runTaskWithOptions options task = do
     run options logger statter = go
       where
         go :: Task a -> IO (Either SomeException a)
-        go = iterFreerA (\ task yield -> case task of
+        go = iterFreerA (\ yield task -> case task of
           ReadBlobs (Left handle) -> (IO.readBlobsFromHandle handle >>= yield) `catchError` (pure . Left . toException)
           ReadBlobs (Right paths@[(path, Nothing)]) -> (IO.isDirectory path >>= bool (IO.readBlobsFromPaths paths) (IO.readBlobsFromDir path) >>= yield) `catchError` (pure . Left . toException)
           ReadBlobs (Right paths) -> (IO.readBlobsFromPaths paths >>= yield) `catchError` (pure . Left . toException)
