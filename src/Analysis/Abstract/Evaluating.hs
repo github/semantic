@@ -20,7 +20,13 @@ import Data.Functor.Foldable (Base, Recursive(..))
 import Data.Semigroup
 import Data.Set
 
-type Interpreter v = '[Fail, Reader (Live (LocationFor v) v), State (Store (LocationFor v) v), Reader (Set (Address (LocationFor v) v)), Reader (Environment (LocationFor v) v)]
+type Interpreter v
+  = '[ Fail
+     , Reader (Live (LocationFor v) v)
+     , State (Store (LocationFor v) v)
+     , Reader (Set (Address (LocationFor v) v))
+     , Reader (Environment (LocationFor v) v)
+     ]
 
 type MonadInterpreter v m = (MonadEnv v m, MonadStore v m, MonadFail m)
 

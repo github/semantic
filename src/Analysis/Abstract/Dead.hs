@@ -20,20 +20,18 @@ import Data.Semigroup
 import Data.Set
 
 
-type DeadCodeInterpreter t v = '[State (Dead t), Fail, State (Store (LocationFor v) v), Reader (Set (Address (LocationFor v) v)), Reader (Environment (LocationFor v) v)]
+type DeadCodeInterpreter t v
+  = '[ State (Dead t)
+     , Fail
+     , State (Store (LocationFor v) v)
+     , Reader (Set (Address (LocationFor v) v))
+     , Reader (Environment (LocationFor v) v)
+     ]
 
 type DeadCodeResult t v = Final (DeadCodeInterpreter t v) v
 
 
-subterms :: (Ord a, Recursive a, Foldable (Base a)) => a -> Set a
-subterms term = para (foldMap (uncurry ((<>) . point))) term <> point term
-
-
--- Dead code analysis
---
--- Example:
---    evalDead @(Value Syntax Precise) <term>
-
+-- | Dead code analysis
 evalDead :: forall v term
          . ( Ord v
            , Ord term
@@ -48,6 +46,9 @@ evalDead :: forall v term
 evalDead e0 = run @(DeadCodeInterpreter term v) $ do
   killAll (Dead (subterms e0))
   fix (evDead (\ recur yield -> eval recur yield . project)) pure e0
+  where
+    subterms :: (Ord a, Recursive a, Foldable (Base a)) => a -> Set a
+    subterms term = para (foldMap (uncurry ((<>) . point))) term <> point term
 
 evDead :: (Ord t, MonadDead t m)
        => (((v -> m v) -> t -> m v) -> (v -> m v) -> t -> m v)

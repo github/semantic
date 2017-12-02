@@ -23,18 +23,20 @@ import Data.Pointed
 import Data.Semigroup
 import Data.Set
 
-type TracingInterpreter t v g = '[Reader (Set (Address (LocationFor v) v)), Writer (g (Configuration (LocationFor v) t v)), Fail, State (Store (LocationFor v) v), Reader (Set (Address (LocationFor v) v)), Reader (Environment (LocationFor v) v)]
+type TracingInterpreter t v g
+  = '[ Reader (Set (Address (LocationFor v) v))
+     , Writer (g (Configuration (LocationFor v) t v))
+     , Fail
+     , State (Store (LocationFor v) v)
+     , Reader (Set (Address (LocationFor v) v))
+     , Reader (Environment (LocationFor v) v)
+     ]
 
 type TraceInterpreter t v = TracingInterpreter t v []
 type ReachableStateInterpreter t v = TracingInterpreter t v Set
 
 
--- Tracing and reachable state analyses
---
--- Examples
---    evalTrace @(Value Syntax Precise) <term>
---    evalReach @(Value Syntax Precise) <term>
-
+-- | Tracing state analyses
 evalTrace :: forall v term
           . ( Ord v, Ord term, Ord (Cell (LocationFor v) v)
             , Functor (Base term)
@@ -47,6 +49,7 @@ evalTrace :: forall v term
           => term -> Final (TracingInterpreter term v []) v
 evalTrace = run @(TraceInterpreter term v) . fix (evTell @[] (\ recur yield -> eval recur yield . project)) pure
 
+-- | Reach state analyses
 evalReach :: forall v term
           . ( Ord v, Ord term, Ord (LocationFor v), Ord (Cell (LocationFor v) v)
             , Functor (Base term)

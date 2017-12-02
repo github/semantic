@@ -20,12 +20,12 @@ class (Ord l, Pointed (Cell l), Monad m) => MonadAddress l m where
   alloc :: (MonadStore a m, l ~ LocationFor a) => Name -> m (Address l a)
 
 envLookupOrAlloc' ::
-                 ( FreeVariables t
-                 , Semigroup (Cell (LocationFor a) a)
-                 , MonadStore a m
-                 , MonadAddress (LocationFor a) m
-                 )
-                 => t -> Environment (LocationFor a) a -> a -> m (Name, Address (LocationFor a) a)
+                  ( FreeVariables t
+                  , Semigroup (Cell (LocationFor a) a)
+                  , MonadStore a m
+                  , MonadAddress (LocationFor a) m
+                  )
+                  => t -> Environment (LocationFor a) a -> a -> m (Name, Address (LocationFor a) a)
 envLookupOrAlloc' term = let [name] = toList (freeVariables term) in
                          envLookupOrAlloc name
 
@@ -39,7 +39,6 @@ envLookupOrAlloc name env v = do
   a <- maybe (alloc name) pure (envLookup name env)
   assign a v
   pure (name, a)
-
 
 
 instance Monad m => MonadAddress Precise m where

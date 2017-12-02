@@ -23,7 +23,7 @@ evCollect ev0 ev' yield e = do
   roots <- askRoots :: m (Live (LocationFor v) v)
   v <- ev0 ev' yield e
   modifyStore (gc (roots <> valueRoots v))
-  return v
+  pure v
 
 gc :: (Ord (LocationFor a), Foldable (Cell (LocationFor a)), ValueRoots (LocationFor a) a) => Live (LocationFor a) a -> Store (LocationFor a) a -> Store (LocationFor a) a
 gc roots store = storeRestrict store (reachable roots store)

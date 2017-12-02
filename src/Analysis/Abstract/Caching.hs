@@ -30,18 +30,30 @@ import Data.Pointed
 import Data.Semigroup
 import qualified Data.Set as Set
 
-type CachingInterpreter t v = '[Fresh, Reader (Live (LocationFor v) v), Reader (Environment (LocationFor v) v), Fail, NonDetEff, State (Store (LocationFor v) v), Reader (Cache (LocationFor v) t v), State (Cache (LocationFor v) t v)]
+type CachingInterpreter t v
+  = '[ Fresh
+     , Reader (Live (LocationFor v) v)
+     , Reader (Environment (LocationFor v) v)
+     , Fail
+     , NonDetEff
+     , State (Store (LocationFor v) v)
+     , Reader (Cache (LocationFor v) t v)
+     , State (Cache (LocationFor v) t v)
+     ]
 
 type CachingResult t v = Final (CachingInterpreter t v) v
 
-type MonadCachingInterpreter t v m = (MonadEnv v m, MonadStore v m, MonadCacheIn t v m, MonadCacheOut t v m, MonadGC v m, Alternative m)
+type MonadCachingInterpreter t v m
+  = ( MonadEnv v m
+    , MonadStore v m
+    , MonadCacheIn t v m
+    , MonadCacheOut t v m
+    , MonadGC v m
+    , Alternative m
+    )
 
 
--- Coinductively-cached evaluation
---
--- Examples:
---    evalCache @Type <term>
---    evalCache @(Value (Data.Union.Union Language.Python.Assignment2.Syntax) (Record Location) Precise) <term>
+-- | Coinductively-cached evaluation.
 evalCache :: forall v term
           . ( Ord v
             , Ord term
@@ -79,7 +91,7 @@ evCache ev0 ev' yield e = do
   case cacheLookup c out of
     Just pairs -> asum . flip map (toList pairs) $ \ (value, store') -> do
       putStore store'
-      return value
+      pure value
     Nothing -> do
       in' <- askCache
       let pairs = fromMaybe mempty (cacheLookup c in')
@@ -87,7 +99,7 @@ evCache ev0 ev' yield e = do
       v <- ev0 ev' yield e
       store' <- getStore
       modifyCache (cacheInsert c (v, store'))
-      return v
+      pure v
 
 fixCache :: forall t v m
          . ( Ord (LocationFor v)
@@ -113,7 +125,7 @@ fixCache ev' yield e = do
     getCache)
   asum . flip map (maybe [] toList (cacheLookup c pairs)) $ \ (value, store') -> do
     putStore store'
-    return value
+    pure value
 
 
 mlfp :: (Eq a, Monad m) => a -> (a -> m a) -> m a
@@ -121,6 +133,6 @@ mlfp a f = loop a
   where loop x = do
           x' <- f x
           if x' == x then
-            return x
+            pure x
           else
             loop x'
