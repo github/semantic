@@ -82,6 +82,7 @@ library
                      , Parsing.TreeSitter
                      , Paths_semantic_diff
                      -- Rendering formats
+                     , Rendering.DOT
                      , Rendering.JSON
                      , Rendering.Renderer
                      , Rendering.SExpression
