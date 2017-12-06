@@ -35,7 +35,7 @@ renderGraph Graph{..} = "digraph " <> maybe "" quote graphName <> " {" <> foldr 
   where quote a = "\"" <> a <> "\""
 
 renderNode :: Node -> B.ByteString
-renderNode Node{..} = B.pack (show nodeID) <> " [ label = " <> nodeLabel <> " ];"
+renderNode Node{..} = B.pack (show nodeID) <> " [ label = \"" <> nodeLabel <> "\" ];"
 
 renderEdge :: Edge -> B.ByteString
 renderEdge Edge{..} = B.pack (show edgeFrom) <> " -> " <> B.pack (show edgeTo) <> ";"
