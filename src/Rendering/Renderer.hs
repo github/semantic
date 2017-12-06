@@ -10,6 +10,8 @@ module Rendering.Renderer
 , renderToCDiff
 , renderToCTerm
 , renderToTags
+, renderDOTDiff
+, renderDOTTerm
 , Summaries(..)
 ) where
 
@@ -18,6 +20,7 @@ import Data.ByteString (ByteString)
 import qualified Data.Map as Map
 import Data.Output
 import Data.Text (Text)
+import Rendering.DOT as R
 import Rendering.JSON as R
 import Rendering.SExpression as R
 import Rendering.Tag as R
