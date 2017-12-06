@@ -24,9 +24,10 @@ renderDOTTerm Blob{..} term = renderGraph (snd (cata graphAlgebra term 0)) { gra
 graphAlgebra :: (ConstructorName syntax, Foldable syntax) => TermF syntax ann (Int -> (Int, Graph)) -> Int -> (Int, Graph)
 graphAlgebra t i = (succ i, Graph
   Nothing
-  (Node (succ i) (unConstructorLabel (constructorLabel t)) : (g >>= graphNodes . snd))
-  (map (Edge (succ i) . fst) g <> (g >>= graphEdges . snd)))
-  where g = map ($ succ i) (toList t)
+  (Node (succ i) (unConstructorLabel (constructorLabel t)) : graphNodes g)
+  (map (Edge (succ i)) is <> graphEdges g))
+  where (_, is, g) = foldr combine (succ i, [], mempty) (toList t)
+        combine f (i, is, gs) = let (i', g) = f i in (maximum (i : map nodeID (graphNodes g)), i' : is, g <> gs)
 
 
 renderGraph :: Graph -> B.ByteString
