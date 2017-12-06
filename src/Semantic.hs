@@ -55,6 +55,7 @@ parseBlob renderer blob@Blob{..}
     JSONTermRenderer        -> decorate constructorLabel            >=> render (renderJSONTerm blob)
     SExpressionTermRenderer -> decorate constructorLabel . (Nil <$) >=> render renderSExpressionTerm
     TagsTermRenderer        -> decorate (declarationAlgebra blob)   >=> render (renderToTags blob)
+    DOTTermRenderer         ->                                          render renderDOTTerm
 
   | Just parser <- blobLanguage >>= syntaxParserForLanguage
   = parse parser blob >>= case renderer of
@@ -62,6 +63,7 @@ parseBlob renderer blob@Blob{..}
     JSONTermRenderer        -> decorate syntaxIdentifierAlgebra         >=> render (renderJSONTerm blob)
     SExpressionTermRenderer ->                                              render renderSExpressionTerm . fmap keepCategory
     TagsTermRenderer        -> decorate (syntaxDeclarationAlgebra blob) >=> render (renderToTags blob)
+    DOTTermRenderer         ->                                              render renderDOTTerm
 
   | otherwise = throwError (SomeException (NoParserForLanguage blobPath blobLanguage))
 
@@ -81,6 +83,7 @@ diffBlobPair renderer blobs
     ToCDiffRenderer         -> run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))   diffTerms renderToCDiff
     JSONDiffRenderer        -> run (          parse parser)                                               diffTerms renderJSONDiff
     SExpressionDiffRenderer -> run (          parse parser      >=> decorate constructorLabel . (Nil <$)) diffTerms (const renderSExpressionDiff)
+    DOTDiffRenderer         -> run (          parse parser)                                               diffTerms (const renderDOTDiff)
 
   | Just parser <- effectiveLanguage >>= syntaxParserForLanguage
   = case renderer of
@@ -88,6 +91,7 @@ diffBlobPair renderer blobs
     ToCDiffRenderer         -> run (\ blob -> parse parser blob >>= decorate (syntaxDeclarationAlgebra blob)) diffSyntaxTerms renderToCDiff
     JSONDiffRenderer        -> run (          parse parser      >=> decorate syntaxIdentifierAlgebra)         diffSyntaxTerms renderJSONDiff
     SExpressionDiffRenderer -> run (          parse parser      >=> pure . fmap keepCategory)                 diffSyntaxTerms (const renderSExpressionDiff)
+    DOTDiffRenderer         -> run (          parse parser)                                                   diffSyntaxTerms (const renderDOTDiff)
 
   | otherwise = throwError (SomeException (NoParserForLanguage effectivePath effectiveLanguage))
   where (effectivePath, effectiveLanguage) = case runJoin blobs of

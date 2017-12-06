@@ -36,6 +36,8 @@ data DiffRenderer output where
   JSONDiffRenderer :: DiffRenderer (Map.Map Text Value)
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
   SExpressionDiffRenderer :: DiffRenderer ByteString
+  -- | Render to a 'ByteString' formatted as a DOT description of the diff.
+  DOTDiffRenderer :: DiffRenderer ByteString
 
 deriving instance Eq (DiffRenderer output)
 deriving instance Show (DiffRenderer output)
@@ -50,6 +52,8 @@ data TermRenderer output where
   SExpressionTermRenderer :: TermRenderer ByteString
   -- | Render to a list of tags.
   TagsTermRenderer :: TermRenderer [Value]
+  -- | Render to a 'ByteString' formatted as a DOT description of the term.
+  DOTTermRenderer :: TermRenderer ByteString
 
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)
