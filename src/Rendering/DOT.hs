@@ -25,3 +25,7 @@ data Edge = Edge { edgeFrom :: Int, edgeTo :: Int }
 
 instance Semigroup Graph where
   Graph n1 ns1 es1 <> Graph n2 ns2 es2 = Graph (n1 <|> n2) (ns1 <> ns2) (es1 <> es2)
+
+instance Monoid Graph where
+  mempty = Graph Nothing [] []
+  mappend = (<>)
