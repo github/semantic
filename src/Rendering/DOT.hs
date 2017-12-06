@@ -1,4 +1,7 @@
-module Rendering.DOT where
+module Rendering.DOT
+( renderDOTDiff
+, renderDOTTerm
+) where
 
 import Analysis.ConstructorName
 import Control.Applicative
