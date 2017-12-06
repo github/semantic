@@ -18,16 +18,15 @@ renderDOTDiff :: Both Blob -> Diff syntax ann1 ann2 -> B.ByteString
 renderDOTDiff _ _ = ""
 
 renderDOTTerm :: (ConstructorName syntax, Foldable syntax, Functor syntax) => Blob -> Term syntax ann -> B.ByteString
-renderDOTTerm Blob{..} term = renderGraph (snd (cata graphAlgebra term)) { graphName = Just (B.pack blobPath) }
+renderDOTTerm Blob{..} term = renderGraph (snd (cata graphAlgebra term 0)) { graphName = Just (B.pack blobPath) }
 
 
-graphAlgebra :: (ConstructorName syntax, Foldable syntax) => TermF syntax ann (Int, Graph) -> (Int, Graph)
-graphAlgebra t = (i, Graph
+graphAlgebra :: (ConstructorName syntax, Foldable syntax) => TermF syntax ann (Int -> (Int, Graph)) -> Int -> (Int, Graph)
+graphAlgebra t i = (succ i, Graph
   Nothing
-  (Node i (unConstructorLabel (constructorLabel t)) : (g >>= graphNodes . snd))
-  (map (Edge i . fst) g <> (g >>= graphEdges . snd)))
-  where g = toList t
-        i = 0
+  (Node (succ i) (unConstructorLabel (constructorLabel t)) : (g >>= graphNodes . snd))
+  (map (Edge (succ i) . fst) g <> (g >>= graphEdges . snd)))
+  where g = map ($ succ i) (toList t)
 
 
 renderGraph :: Graph -> B.ByteString
