@@ -2,7 +2,7 @@ module Rendering.DOT where
 
 import Control.Applicative
 import Data.Blob
-import qualified Data.ByteString as B
+import qualified Data.ByteString.Char8 as B
 import Data.Diff
 import Data.Functor.Both
 import Data.Semigroup
@@ -13,6 +13,17 @@ renderDOTDiff _ _ = ""
 
 renderDOTTerm :: Blob -> Term syntax ann -> B.ByteString
 renderDOTTerm _ _ = ""
+
+
+renderGraph :: Graph -> B.ByteString
+renderGraph Graph{..} = "digraph " <> maybe "" quote graphName <> " {" <> foldr ((<>) . renderNode) "" graphNodes <> foldr ((<>) . renderEdge) "" graphEdges <> "}"
+  where quote a = "\"" <> a <> "\""
+
+renderNode :: Node -> B.ByteString
+renderNode Node{..} = B.pack (show nodeID) <> " [ label = " <> nodeLabel <> " ]"
+
+renderEdge :: Edge -> B.ByteString
+renderEdge Edge{..} = B.pack (show edgeFrom) <> " -> " <> B.pack (show edgeTo) <> ";"
 
 data Graph = Graph { graphName :: Maybe B.ByteString, graphNodes :: [Node], graphEdges :: [Edge] }
   deriving (Eq, Ord, Show)
