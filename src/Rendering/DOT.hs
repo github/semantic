@@ -1,9 +1,11 @@
 module Rendering.DOT where
 
+import Control.Applicative
 import Data.Blob
 import qualified Data.ByteString as B
 import Data.Diff
 import Data.Functor.Both
+import Data.Semigroup
 import Data.Term
 
 renderDOTDiff :: Both Blob -> Diff syntax ann1 ann2 -> B.ByteString
@@ -20,3 +22,6 @@ data Node = Node { nodeID :: Int, nodeLabel :: B.ByteString }
 
 data Edge = Edge { edgeFrom :: Int, edgeTo :: Int }
   deriving (Eq, Ord, Show)
+
+instance Semigroup Graph where
+  Graph n1 ns1 es1 <> Graph n2 ns2 es2 = Graph (n1 <|> n2) (ns1 <> ns2) (es1 <> es2)
