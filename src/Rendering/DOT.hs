@@ -1,3 +1,4 @@
+{-# LANGUAGE MonoLocalBinds #-}
 module Rendering.DOT
 ( renderDOTDiff
 , renderDOTTerm
