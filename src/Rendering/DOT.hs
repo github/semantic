@@ -1,18 +1,30 @@
 module Rendering.DOT where
 
+import Analysis.ConstructorName
 import Control.Applicative
 import Data.Blob
 import qualified Data.ByteString.Char8 as B
 import Data.Diff
-import Data.Functor.Both
+import Data.Foldable
+import Data.Functor.Both (Both)
+import Data.Functor.Foldable hiding (fold)
 import Data.Semigroup
 import Data.Term
 
 renderDOTDiff :: Both Blob -> Diff syntax ann1 ann2 -> B.ByteString
 renderDOTDiff _ _ = ""
 
-renderDOTTerm :: Blob -> Term syntax ann -> B.ByteString
-renderDOTTerm _ _ = ""
+renderDOTTerm :: (ConstructorName syntax, Foldable syntax, Functor syntax) => Blob -> Term syntax ann -> B.ByteString
+renderDOTTerm Blob{..} term = renderGraph (snd (cata graphAlgebra term)) { graphName = Just (B.pack blobPath) }
+
+
+graphAlgebra :: (ConstructorName syntax, Foldable syntax) => TermF syntax ann (Int, Graph) -> (Int, Graph)
+graphAlgebra t = (i, Graph
+  Nothing
+  (Node i (unConstructorLabel (constructorLabel t)) : (g >>= graphNodes . snd))
+  (map (Edge i . fst) g <> (g >>= graphEdges . snd)))
+  where g = toList t
+        i = 0
 
 
 renderGraph :: Graph -> B.ByteString
