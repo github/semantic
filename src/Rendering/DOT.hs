@@ -25,23 +25,22 @@ renderDOTDiff blobs diff = renderGraph (snd (cata diffAlgebra diff 0)) { graphNa
 renderDOTTerm :: (ConstructorName syntax, Foldable syntax, Functor syntax) => Blob -> Term syntax ann -> B.ByteString
 renderDOTTerm Blob{..} term = renderGraph (snd (cata termAlgebra term 0)) { graphName = Just (B.pack blobPath) }
 
-diffAlgebra :: (ConstructorName syntax, Foldable syntax) => DiffF syntax ann1 ann2 (Int -> (Int, Graph)) -> Int -> (Int, Graph)
+diffAlgebra :: (ConstructorName syntax, Foldable syntax) => DiffF syntax ann1 ann2 (Int -> ([Int], Graph)) -> Int -> ([Int], Graph)
 diffAlgebra d i = case d of
   Merge t               -> termAlgebra t i
   Patch (Delete  t1)    -> termAlgebra t1 i `modifyHeadNode` setColour "red"
   Patch (Insert     t2) -> termAlgebra t2 i `modifyHeadNode` setColour "green"
-  Patch (Replace t1 t2) -> let (_, g1) = termAlgebra t1 i `modifyHeadNode` setColour "red"
-                               (_, g2) = termAlgebra t2 i `modifyHeadNode` setColour "green"
-                           in  (succ i, g1 <> g2)
+  Patch (Replace t1 t2) -> (termAlgebra t1 i `modifyHeadNode` setColour "red")
+                        <> (termAlgebra t2 i `modifyHeadNode` setColour "green")
   where modifyHeadNode (i, g) f | n:ns <- graphNodes g = (i, g { graphNodes = f n : ns })
                                 | otherwise            = (i, g)
         setColour c n = n { nodeAttributes = Map.insert "color" c (nodeAttributes n) }
 
-termAlgebra :: (ConstructorName syntax, Foldable syntax) => TermF syntax ann (Int -> (Int, Graph)) -> Int -> (Int, Graph)
-termAlgebra t i = (succ i, Graph
+termAlgebra :: (ConstructorName syntax, Foldable syntax) => TermF syntax ann (Int -> ([Int], Graph)) -> Int -> ([Int], Graph)
+termAlgebra t i = ([succ i], Graph
   Nothing
   (Node (succ i) (Map.singleton "label" (unConstructorLabel (constructorLabel t))) : graphNodes g)
-  (map (Edge (succ i)) is <> graphEdges g))
+  (concatMap (map (Edge (succ i))) is <> graphEdges g))
   where (_, is, g) = foldr combine (succ i, [], mempty) (toList t)
         combine f (i, is, gs) = let (i', g) = f i in (maximum (i : map nodeID (graphNodes g)), i' : is, g <> gs)
 
