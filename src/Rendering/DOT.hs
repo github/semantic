@@ -31,6 +31,16 @@ graphAlgebra t i = (succ i, Graph
         combine f (i, is, gs) = let (i', g) = f i in (maximum (i : map nodeID (graphNodes g)), i' : is, g <> gs)
 
 
+data Graph = Graph { graphName :: Maybe B.ByteString, graphNodes :: [Node], graphEdges :: [Edge] }
+  deriving (Eq, Ord, Show)
+
+data Node = Node { nodeID :: Int, nodeLabel :: B.ByteString }
+  deriving (Eq, Ord, Show)
+
+data Edge = Edge { edgeFrom :: Int, edgeTo :: Int }
+  deriving (Eq, Ord, Show)
+
+
 renderGraph :: Graph -> B.ByteString
 renderGraph Graph{..} = "digraph " <> maybe "" quote graphName <> " {" <> foldr ((<>) . renderNode) "" graphNodes <> foldr ((<>) . renderEdge) "" graphEdges <> "}"
   where quote a = "\"" <> a <> "\""
@@ -41,14 +51,6 @@ renderNode Node{..} = B.pack (show nodeID) <> " [ label = \"" <> nodeLabel <> "\
 renderEdge :: Edge -> B.ByteString
 renderEdge Edge{..} = B.pack (show edgeFrom) <> " -> " <> B.pack (show edgeTo) <> ";"
 
-data Graph = Graph { graphName :: Maybe B.ByteString, graphNodes :: [Node], graphEdges :: [Edge] }
-  deriving (Eq, Ord, Show)
-
-data Node = Node { nodeID :: Int, nodeLabel :: B.ByteString }
-  deriving (Eq, Ord, Show)
-
-data Edge = Edge { edgeFrom :: Int, edgeTo :: Int }
-  deriving (Eq, Ord, Show)
 
 instance Semigroup Graph where
   Graph n1 ns1 es1 <> Graph n2 ns2 es2 = Graph (n1 <|> n2) (ns1 <> ns2) (es1 <> es2)
