@@ -23,22 +23,22 @@ renderDOTDiff blobs diff = renderGraph (snd (cata diffAlgebra diff 0)) { graphNa
   where join = (++) . (" -> " ++)
 
 renderDOTTerm :: (ConstructorName syntax, Foldable syntax, Functor syntax) => Blob -> Term syntax ann -> B.ByteString
-renderDOTTerm Blob{..} term = renderGraph (snd (cata graphAlgebra term 0)) { graphName = Just (B.pack blobPath) }
+renderDOTTerm Blob{..} term = renderGraph (snd (cata termAlgebra term 0)) { graphName = Just (B.pack blobPath) }
 
 diffAlgebra :: (ConstructorName syntax, Foldable syntax) => DiffF syntax ann1 ann2 (Int -> (Int, Graph)) -> Int -> (Int, Graph)
 diffAlgebra d i = case d of
-  Merge t               -> graphAlgebra t i
-  Patch (Delete  t1)    -> graphAlgebra t1 i `modifyHeadNode` setColour "red"
-  Patch (Insert     t2) -> graphAlgebra t2 i `modifyHeadNode` setColour "green"
-  Patch (Replace t1 t2) -> let (_, g1) = graphAlgebra t1 i `modifyHeadNode` setColour "red"
-                               (_, g2) = graphAlgebra t2 i `modifyHeadNode` setColour "green"
+  Merge t               -> termAlgebra t i
+  Patch (Delete  t1)    -> termAlgebra t1 i `modifyHeadNode` setColour "red"
+  Patch (Insert     t2) -> termAlgebra t2 i `modifyHeadNode` setColour "green"
+  Patch (Replace t1 t2) -> let (_, g1) = termAlgebra t1 i `modifyHeadNode` setColour "red"
+                               (_, g2) = termAlgebra t2 i `modifyHeadNode` setColour "green"
                            in  (succ i, g1 <> g2)
   where modifyHeadNode (i, g) f | n:ns <- graphNodes g = (i, g { graphNodes = f n : ns })
                                 | otherwise            = (i, g)
         setColour c n = n { nodeAttributes = Map.insert "color" c (nodeAttributes n) }
 
-graphAlgebra :: (ConstructorName syntax, Foldable syntax) => TermF syntax ann (Int -> (Int, Graph)) -> Int -> (Int, Graph)
-graphAlgebra t i = (succ i, Graph
+termAlgebra :: (ConstructorName syntax, Foldable syntax) => TermF syntax ann (Int -> (Int, Graph)) -> Int -> (Int, Graph)
+termAlgebra t i = (succ i, Graph
   Nothing
   (Node (succ i) (Map.singleton "label" (unConstructorLabel (constructorLabel t))) : graphNodes g)
   (map (Edge (succ i)) is <> graphEdges g))
