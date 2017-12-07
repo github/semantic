@@ -26,12 +26,16 @@ renderDOTTerm :: (ConstructorName syntax, Foldable syntax, Functor syntax) => Bl
 renderDOTTerm Blob{..} term = renderGraph (snd (cata graphAlgebra term 0)) { graphName = Just (B.pack blobPath) }
 
 diffAlgebra :: (ConstructorName syntax, Foldable syntax) => DiffF syntax ann1 ann2 (Int -> (Int, Graph)) -> Int -> (Int, Graph)
-diffAlgebra (Merge t) i = graphAlgebra t i
-diffAlgebra (Patch (Delete t1)) i = graphAlgebra t1 i
-diffAlgebra (Patch (Insert t2)) i = graphAlgebra t2 i
-diffAlgebra (Patch (Replace t1 t2)) i = let (_, g1) = graphAlgebra t1 i
-                                            (_, g2) = graphAlgebra t2 i
-                                        in  (succ i, g1 <> g2)
+diffAlgebra d i = case d of
+  Merge t               -> graphAlgebra t i
+  Patch (Delete  t1)    -> graphAlgebra t1 i `modifyHeadNode` setColour "red"
+  Patch (Insert     t2) -> graphAlgebra t2 i `modifyHeadNode` setColour "green"
+  Patch (Replace t1 t2) -> let (_, g1) = graphAlgebra t1 i `modifyHeadNode` setColour "red"
+                               (_, g2) = graphAlgebra t2 i `modifyHeadNode` setColour "green"
+                           in  (succ i, g1 <> g2)
+  where modifyHeadNode (i, g) f | n:ns <- graphNodes g = (i, g { graphNodes = f n : ns })
+                                | otherwise            = (i, g)
+        setColour c n = n { nodeAttributes = Map.insert "color" c (nodeAttributes n) }
 
 graphAlgebra :: (ConstructorName syntax, Foldable syntax) => TermF syntax ann (Int -> (Int, Graph)) -> Int -> (Int, Graph)
 graphAlgebra t i = (succ i, Graph
