@@ -14,16 +14,24 @@ import Data.Function (on)
 import Data.Functor.Both (Both, runBothWith)
 import Data.Functor.Foldable hiding (fold)
 import qualified Data.Map as Map
+import Data.Patch
 import Data.Semigroup
 import Data.Term
 
-renderDOTDiff :: Both Blob -> Diff syntax ann1 ann2 -> B.ByteString
-renderDOTDiff blobs _ = renderGraph mempty { graphName = Just (runBothWith (fmap B.pack . (join `on` blobPath)) blobs) }
+renderDOTDiff :: (ConstructorName syntax, Foldable syntax, Functor syntax) => Both Blob -> Diff syntax ann1 ann2 -> B.ByteString
+renderDOTDiff blobs diff = renderGraph (snd (cata diffAlgebra diff 0)) { graphName = Just (runBothWith (fmap B.pack . (join `on` blobPath)) blobs) }
   where join = (++) . (" -> " ++)
 
 renderDOTTerm :: (ConstructorName syntax, Foldable syntax, Functor syntax) => Blob -> Term syntax ann -> B.ByteString
 renderDOTTerm Blob{..} term = renderGraph (snd (cata graphAlgebra term 0)) { graphName = Just (B.pack blobPath) }
 
+diffAlgebra :: (ConstructorName syntax, Foldable syntax) => DiffF syntax ann1 ann2 (Int -> (Int, Graph)) -> Int -> (Int, Graph)
+diffAlgebra (Merge t) i = graphAlgebra t i
+diffAlgebra (Patch (Delete t1)) i = graphAlgebra t1 i
+diffAlgebra (Patch (Insert t2)) i = graphAlgebra t2 i
+diffAlgebra (Patch (Replace t1 t2)) i = let (_, g1) = graphAlgebra t1 i
+                                            (_, g2) = graphAlgebra t2 i
+                                        in  (succ i, g1 <> g2)
 
 graphAlgebra :: (ConstructorName syntax, Foldable syntax) => TermF syntax ann (Int -> (Int, Graph)) -> Int -> (Int, Graph)
 graphAlgebra t i = (succ i, Graph
