@@ -13,6 +13,7 @@ import Data.Foldable
 import Data.Function (on)
 import Data.Functor.Both (Both, runBothWith)
 import Data.Functor.Foldable hiding (fold)
+import qualified Data.Map as Map
 import Data.Semigroup
 import Data.Term
 
@@ -27,7 +28,7 @@ renderDOTTerm Blob{..} term = renderGraph (snd (cata graphAlgebra term 0)) { gra
 graphAlgebra :: (ConstructorName syntax, Foldable syntax) => TermF syntax ann (Int -> (Int, Graph)) -> Int -> (Int, Graph)
 graphAlgebra t i = (succ i, Graph
   Nothing
-  (Node (succ i) (unConstructorLabel (constructorLabel t)) : graphNodes g)
+  (Node (succ i) (Map.singleton "label" (unConstructorLabel (constructorLabel t))) : graphNodes g)
   (map (Edge (succ i)) is <> graphEdges g))
   where (_, is, g) = foldr combine (succ i, [], mempty) (toList t)
         combine f (i, is, gs) = let (i', g) = f i in (maximum (i : map nodeID (graphNodes g)), i' : is, g <> gs)
@@ -36,7 +37,7 @@ graphAlgebra t i = (succ i, Graph
 data Graph = Graph { graphName :: Maybe B.ByteString, graphNodes :: [Node], graphEdges :: [Edge] }
   deriving (Eq, Ord, Show)
 
-data Node = Node { nodeID :: Int, nodeLabel :: B.ByteString }
+data Node = Node { nodeID :: Int, nodeAttributes :: Map.Map B.ByteString B.ByteString }
   deriving (Eq, Ord, Show)
 
 data Edge = Edge { edgeFrom :: Int, edgeTo :: Int }
@@ -48,7 +49,7 @@ renderGraph Graph{..} = "digraph " <> maybe "" quote graphName <> " {" <> foldr 
   where quote a = "\"" <> a <> "\""
 
 renderNode :: Node -> B.ByteString
-renderNode Node{..} = B.pack (show nodeID) <> " [ label = \"" <> nodeLabel <> "\" ];"
+renderNode Node{..} = B.pack (show nodeID) <> " [ " <> foldr (\ (key, value) rest -> key <> " = \"" <> value <> "\" " <> rest) "" (Map.toList nodeAttributes) <> "];"
 
 renderEdge :: Edge -> B.ByteString
 renderEdge Edge{..} = B.pack (show edgeFrom) <> " -> " <> B.pack (show edgeTo) <> ";"
