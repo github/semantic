@@ -10,13 +10,15 @@ import Data.Blob
 import qualified Data.ByteString.Char8 as B
 import Data.Diff
 import Data.Foldable
-import Data.Functor.Both (Both)
+import Data.Function (on)
+import Data.Functor.Both (Both, runBothWith)
 import Data.Functor.Foldable hiding (fold)
 import Data.Semigroup
 import Data.Term
 
 renderDOTDiff :: Both Blob -> Diff syntax ann1 ann2 -> B.ByteString
-renderDOTDiff _ _ = ""
+renderDOTDiff blobs _ = renderGraph mempty { graphName = Just (runBothWith (fmap B.pack . (join `on` blobPath)) blobs) }
+  where join = (++) . (" -> " ++)
 
 renderDOTTerm :: (ConstructorName syntax, Foldable syntax, Functor syntax) => Blob -> Term syntax ann -> B.ByteString
 renderDOTTerm Blob{..} term = renderGraph (snd (cata graphAlgebra term 0)) { graphName = Just (B.pack blobPath) }
