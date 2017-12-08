@@ -108,9 +108,9 @@ diffBlobPair renderer blobs
 
         run :: (Foldable syntax, Functor syntax) => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Both Blob -> Diff syntax ann ann -> output) -> Task output
         run parse diff renderer = do
-          terms <- distributeFor blobs parse
+          terms <- distributeFor blobs (\b -> if blobExists b then Just <$> parse b else pure Nothing)
           time "diff" languageTag $ do
-            diff <- runBothWith (diffTermPair blobs diff) terms
+            diff <- runBothWith (diffTermPair diff) terms
             writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
             render (renderer blobs) diff
           where
@@ -119,11 +119,10 @@ diffBlobPair renderer blobs
                           in maybe (maybe [] showLanguage (blobLanguage b)) showLanguage (blobLanguage a)
 
 -- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
-diffTermPair :: Functor syntax => Both Blob -> Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
-diffTermPair blobs differ t1 t2 = case runJoin (blobExists <$> blobs) of
-  (True, False) -> pure (deleting t1)
-  (False, True) -> pure (inserting t2)
-  _ -> diff differ t1 t2
+diffTermPair :: Functor syntax => Differ syntax ann1 ann2 -> Maybe (Term syntax ann1) -> Maybe (Term syntax ann2) -> Task (Diff syntax ann1 ann2)
+diffTermPair _      (Just t1) Nothing   = pure (deleting t1)
+diffTermPair _      Nothing   (Just t2) = pure (inserting t2)
+diffTermPair differ (Just t1) (Just t2) = diff differ t1 t2
 
 keepCategory :: HasField fields Category => Record fields -> Record '[Category]
 keepCategory = (:. Nil) . category

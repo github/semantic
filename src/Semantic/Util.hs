@@ -35,4 +35,4 @@ diffWithParser :: (HasField fields Data.Span.Span,
                   -> Task (Diff syntax (Record (Maybe Declaration ': fields)) (Record (Maybe Declaration ': fields)))
 diffWithParser parser = run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))
   where
-    run parse sourceBlobs = distributeFor sourceBlobs parse >>= runBothWith (diffTermPair sourceBlobs diffTerms)
+    run parse sourceBlobs = distributeFor sourceBlobs (\b -> if blobExists b then Just <$> parse b else pure Nothing) >>= runBothWith (diffTermPair diffTerms)
