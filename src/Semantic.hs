@@ -95,7 +95,7 @@ diffBlobPair renderer blobs
   where (effectivePath, effectiveLanguage) = case blobs of
           This Blob { blobLanguage = Just lang, blobPath = path } -> (path, Just lang)
           That Blob { blobLanguage = Just lang, blobPath = path } -> (path, Just lang)
-          These Blob { blobPath = path } _                        -> (path, Nothing)
+          These _ Blob { blobLanguage = lang, blobPath = path }   -> (path, lang)
 
         qualify language | OldToCDiffRenderer <- renderer = guard (language `elem` aLaCarteLanguages) *> Just language
                          | otherwise                      =                                              Just language
