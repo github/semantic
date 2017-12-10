@@ -12,6 +12,7 @@ module Data.Blob
 , BlobPair
 , languageForBlobPair
 , languageTagForBlobPair
+, pathForBlobPair
 ) where
 
 import Data.ByteString.Char8 (ByteString, pack)
@@ -29,6 +30,11 @@ languageForBlobPair :: BlobPair -> Maybe Language
 languageForBlobPair (This Blob{..}) = blobLanguage
 languageForBlobPair (That Blob{..}) = blobLanguage
 languageForBlobPair (These _ Blob{..}) = blobLanguage
+
+pathForBlobPair :: BlobPair -> FilePath
+pathForBlobPair (This Blob{..}) = blobPath
+pathForBlobPair (That Blob{..}) = blobPath
+pathForBlobPair (These _ Blob{..}) = blobPath
 
 languageTagForBlobPair :: BlobPair -> [(String, String)]
 languageTagForBlobPair pair = maybe [] showLanguage (languageForBlobPair pair)
