@@ -65,7 +65,8 @@ readBlobPairsFromHandle :: MonadIO m => Handle -> m [Blob.BlobPair]
 readBlobPairsFromHandle = fmap toBlobPairs . readFromHandle
   where
     toBlobPairs :: BlobDiff -> [Blob.BlobPair]
-    toBlobPairs = undefined
+    toBlobPairs BlobDiff{..} = toBlobPair <$> blobs
+    toBlobPair blobs = runJoin (toBlob <$> blobs)
 
 -- | Read JSON encoded blobs from a handle.
 readBlobsFromHandle :: MonadIO m => Handle -> m [Blob.Blob]
