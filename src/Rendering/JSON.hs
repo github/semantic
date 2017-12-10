@@ -19,7 +19,7 @@ import GHC.Generics
 --
 
 -- | Render a diff to a string representing its JSON.
-renderJSONDiff :: ToJSON a => Both Blob -> a -> Map.Map Text Value
+renderJSONDiff :: ToJSON a => BlobPair -> a -> Map.Map Text Value
 renderJSONDiff blobs diff = Map.fromList
   [ ("diff", toJSON diff)
   , ("oids", toJSON (decodeUtf8 . blobOid <$> toList blobs))

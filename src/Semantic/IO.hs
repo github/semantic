@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances, DeriveAnyClass, DuplicateRecordFields, ScopedTypeVariables, TupleSections #-}
 module Semantic.IO
 ( readFile
+, readFiles
 , isDirectory
 , readBlobPairsFromHandle
 , readBlobsFromHandle
@@ -21,6 +22,7 @@ import Data.Source
 import Data.String
 import Data.Text
 import Data.These
+import Data.Traversable
 import GHC.Generics
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
@@ -39,6 +41,18 @@ readFile path language = do
   raw <- liftIO $ (Just <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe B.ByteString))
   pure $ fromMaybe (Blob.emptyBlob path) (Blob.sourceBlob path language . fromBytes <$> raw)
 
+readFiles :: forall m. MonadIO m => [Both (FilePath, Maybe Language)] -> m [Blob.BlobPair]
+readFiles files = for files (runBothWith readFilesToBlobPair)
+  where
+    readFilesToBlobPair :: (FilePath, Maybe Language) -> (FilePath, Maybe Language) -> m Blob.BlobPair
+    readFilesToBlobPair a b = do
+      before <- uncurry readFile a
+      after <- uncurry readFile b
+      case (Blob.blobExists before, Blob.blobExists after) of
+        (True, False) -> pure (This before)
+        (False, True) -> pure (That after)
+        _ -> pure (These before after)
+
 isDirectory :: MonadIO m => FilePath -> m Bool
 isDirectory path = liftIO (doesDirectoryExist path) >>= pure
 
@@ -47,12 +61,11 @@ languageForFilePath :: FilePath -> Maybe Language
 languageForFilePath = languageForType . takeExtension
 
 -- | Read JSON encoded blob pairs from a handle.
-readBlobPairsFromHandle :: MonadIO m => Handle -> m [Both Blob.Blob]
+readBlobPairsFromHandle :: MonadIO m => Handle -> m [Blob.BlobPair]
 readBlobPairsFromHandle = fmap toBlobPairs . readFromHandle
   where
-    toBlobPairs BlobDiff{..} = toBlobPair <$> blobs
-    toBlobPair blobs = Join (fromThese empty empty (runJoin (toBlob <$> blobs)))
-      where empty = Blob.emptyBlob (mergeThese const (runJoin (path <$> blobs)))
+    toBlobPairs :: BlobDiff -> [Blob.BlobPair]
+    toBlobPairs = undefined
 
 -- | Read JSON encoded blobs from a handle.
 readBlobsFromHandle :: MonadIO m => Handle -> m [Blob.Blob]

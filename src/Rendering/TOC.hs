@@ -160,15 +160,15 @@ recordSummary changeText record = case getDeclaration record of
     formatIdentifier (MethodDeclaration identifier _ _                  (Just receiver)) = receiver <> "." <> identifier
     formatIdentifier declaration = declarationIdentifier declaration
 
-renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Both Blob -> Diff f (Record fields) (Record fields) -> Summaries
+renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => BlobPair -> Diff f (Record fields) (Record fields) -> Summaries
 renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
-        summaryKey = T.pack $ case runJoin (blobPath <$> blobs) of
-          (before, after) | null before -> after
-                          | null after -> before
-                          | before == after -> after
-                          | otherwise -> before <> " -> " <> after
+        summaryKey = T.pack $ case bimap blobPath blobPath blobs of
+           This before -> before
+           That after -> after
+           These before after | before == after -> after
+                              | otherwise -> before <> " -> " <> after
 
 diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [TOCSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration

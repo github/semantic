@@ -1,6 +1,7 @@
 module Data.Blob
 ( Blob(..)
 , BlobKind(..)
+, These(..)
 , modeToDigits
 , defaultPlainBlob
 , emptyBlob
@@ -8,14 +9,31 @@ module Data.Blob
 , blobExists
 , sourceBlob
 , nullOid
+, BlobPair
+, languageForBlobPair
+, languageTagForBlobPair
 ) where
 
 import Data.ByteString.Char8 (ByteString, pack)
 import Data.Language
+import Data.These
 import Data.Maybe (isJust)
 import Data.Source as Source
 import Data.Word
 import Numeric
+
+
+type BlobPair = These Blob Blob
+
+languageForBlobPair :: BlobPair -> Maybe Language
+languageForBlobPair (This Blob{..}) = blobLanguage
+languageForBlobPair (That Blob{..}) = blobLanguage
+languageForBlobPair (These _ Blob{..}) = blobLanguage
+
+languageTagForBlobPair :: BlobPair -> [(String, String)]
+languageTagForBlobPair pair = maybe [] showLanguage (languageForBlobPair pair)
+  where showLanguage = pure . (,) "language" . show
+
 
 -- | The source, oid, path, and Maybe BlobKind of a blob.
 data Blob = Blob

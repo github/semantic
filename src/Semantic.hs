@@ -18,6 +18,7 @@ import Data.Bifoldable
 import Data.Blob
 import Data.ByteString (ByteString)
 import Data.Diff
+import Data.Foldable (toList)
 import Data.Functor.Both as Both
 import Data.Functor.Classes
 import Data.JSON.Fields
@@ -25,6 +26,7 @@ import qualified Data.Language as Language
 import Data.Output
 import Data.Record
 import Data.Term
+import Data.These
 import Data.Typeable
 import Diffing.Algorithm (Diffable)
 import Diffing.Interpreter
@@ -69,11 +71,11 @@ data NoParserForLanguage = NoParserForLanguage FilePath (Maybe Language.Language
   deriving (Eq, Exception, Ord, Show, Typeable)
 
 
-diffBlobPairs :: Output output => DiffRenderer output -> [Both Blob] -> Task ByteString
-diffBlobPairs renderer = fmap toOutput . distributeFoldMap (diffBlobPair renderer) . filter (any blobExists)
+diffBlobPairs :: Output output => DiffRenderer output -> [BlobPair] -> Task ByteString
+diffBlobPairs renderer = fmap toOutput . distributeFoldMap (diffBlobPair renderer)
 
 -- | A task to parse a pair of 'Blob's, diff them, and render the 'Diff'.
-diffBlobPair :: DiffRenderer output -> Both Blob -> Task output
+diffBlobPair :: DiffRenderer output -> BlobPair -> Task output
 diffBlobPair renderer blobs
   | Just (SomeParser parser) <- effectiveLanguage >>= qualify >>= someParser (Proxy :: Proxy '[ConstructorName, Diffable, Eq1, GAlign, HasDeclaration, Show1, ToJSONFields1, Traversable])
   = case renderer of
@@ -90,10 +92,10 @@ diffBlobPair renderer blobs
     SExpressionDiffRenderer -> run (          parse parser      >=> pure . fmap keepCategory)                 diffSyntaxTerms (const renderSExpressionDiff)
 
   | otherwise = throwError (SomeException (NoParserForLanguage effectivePath effectiveLanguage))
-  where (effectivePath, effectiveLanguage) = case runJoin blobs of
-          (Blob { blobLanguage = Just lang, blobPath = path }, _) -> (path, Just lang)
-          (_, Blob { blobLanguage = Just lang, blobPath = path }) -> (path, Just lang)
-          (Blob { blobPath = path }, _)                           -> (path, Nothing)
+  where (effectivePath, effectiveLanguage) = case blobs of
+          This Blob { blobLanguage = Just lang, blobPath = path } -> (path, Just lang)
+          That Blob { blobLanguage = Just lang, blobPath = path } -> (path, Just lang)
+          These Blob { blobPath = path } _                        -> (path, Nothing)
 
         qualify language | OldToCDiffRenderer <- renderer = guard (language `elem` aLaCarteLanguages) *> Just language
                          | otherwise                      =                                              Just language
@@ -106,23 +108,21 @@ diffBlobPair renderer blobs
             , Language.TypeScript
             ]
 
-        run :: (Foldable syntax, Functor syntax) => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Both Blob -> Diff syntax ann ann -> output) -> Task output
+        run :: (Foldable syntax, Functor syntax) => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (These Blob Blob -> Diff syntax ann ann -> output) -> Task output
         run parse diff renderer = do
-          terms <- distributeFor blobs (\b -> if blobExists b then Just <$> parse b else pure Nothing)
+          terms <- bidistributeFor blobs parse parse
           time "diff" languageTag $ do
-            diff <- runBothWith (diffTermPair diff) terms
+            diff <- diffTermPair diff terms
             writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
             render (renderer blobs) diff
           where
-            showLanguage = pure . (,) "language" . show
-            languageTag = let (a, b) = runJoin blobs
-                          in maybe (maybe [] showLanguage (blobLanguage b)) showLanguage (blobLanguage a)
+            languageTag = languageTagForBlobPair blobs
 
 -- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
-diffTermPair :: Functor syntax => Differ syntax ann1 ann2 -> Maybe (Term syntax ann1) -> Maybe (Term syntax ann2) -> Task (Diff syntax ann1 ann2)
-diffTermPair _      (Just t1) Nothing   = pure (deleting t1)
-diffTermPair _      Nothing   (Just t2) = pure (inserting t2)
-diffTermPair differ (Just t1) (Just t2) = diff differ t1 t2
+diffTermPair :: Functor syntax => Differ syntax ann1 ann2 -> These (Term syntax ann1) (Term syntax ann2) -> Task (Diff syntax ann1 ann2)
+diffTermPair _      (This t1)     = pure (deleting t1)
+diffTermPair _      (That t2)     = pure (inserting t2)
+diffTermPair differ (These t1 t2) = diff differ t1 t2
 
 keepCategory :: HasField fields Category => Record fields -> Record '[Category]
 keepCategory = (:. Nil) . category
