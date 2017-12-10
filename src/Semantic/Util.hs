@@ -7,7 +7,6 @@ import Control.Monad.IO.Class
 import Data.Align.Generic
 import Data.Blob
 import Data.Diff
-import Data.Functor.Both
 import Data.Functor.Classes
 import Data.Range
 import Data.Record
@@ -31,8 +30,8 @@ diffWithParser :: (HasField fields Data.Span.Span,
                    GAlign syntax, HasDeclaration syntax)
                   =>
                   Parser (Term syntax (Record fields))
-                  -> Both Blob
+                  -> BlobPair
                   -> Task (Diff syntax (Record (Maybe Declaration ': fields)) (Record (Maybe Declaration ': fields)))
 diffWithParser parser = run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))
   where
-    run parse sourceBlobs = distributeFor sourceBlobs (\b -> if blobExists b then Just <$> parse b else pure Nothing) >>= runBothWith (diffTermPair diffTerms)
+    run parse blobs = bidistributeFor blobs parse parse >>= diffTermPair diffTerms
