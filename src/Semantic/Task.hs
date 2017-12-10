@@ -192,7 +192,6 @@ runTaskWithOptions options task = do
           ReadBlobs (Right paths@[(path, Nothing)]) -> (IO.isDirectory path >>= bool (IO.readBlobsFromPaths paths) (IO.readBlobsFromDir path) >>= yield) `catchError` (pure . Left . toException)
           ReadBlobs (Right paths) -> (IO.readBlobsFromPaths paths >>= yield) `catchError` (pure . Left . toException)
           ReadBlobPairs source -> (either IO.readBlobPairsFromHandle IO.readFiles source >>= yield) `catchError` (pure . Left . toException)
-          -- ReadBlobPairs source -> (either IO.readBlobPairsFromHandle (traverse (traverse (uncurry IO.readFile))) source >>= yield) `catchError` (pure . Left . toException)
           WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
           WriteLog level message pairs -> queueLogMessage logger level message pairs >>= yield
           WriteStat stat -> queue statter stat >>= yield
@@ -202,7 +201,7 @@ runTaskWithOptions options task = do
           Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2) >>= yield
           Render renderer input -> pure (renderer input) >>= yield
           Distribute tasks -> Async.mapConcurrently go tasks >>= either (pure . Left) yield . sequenceA . withStrategy (parTraversable (parTraversable rseq))
-          Bidistribute tasks -> Async.runConcurrently (bitraverse (Async.Concurrently . go) (Async.Concurrently . go) tasks) >>= either (pure . Left) yield . bisequenceA
+          Bidistribute tasks -> Async.runConcurrently (bitraverse (Async.Concurrently . go) (Async.Concurrently . go) tasks) >>= either (pure . Left) yield . bisequenceA . withStrategy (parBitraversable (parTraversable rseq) (parTraversable rseq))
           LiftIO action -> action >>= yield
           Throw err -> pure (Left err)
           Catch during handler -> do
@@ -210,6 +209,9 @@ runTaskWithOptions options task = do
             case result of
               Left err -> go (handler err) >>= either (pure . Left) yield
               Right a -> yield a) . fmap Right
+
+        parBitraversable :: Bitraversable t => Strategy a -> Strategy b -> Strategy (t a b)
+        parBitraversable strat1 strat2 = bitraverse (rparWith strat1) (rparWith strat2)
 
 runParser :: Options -> Blob -> Parser term -> Task term
 runParser Options{..} blob@Blob{..} = go
