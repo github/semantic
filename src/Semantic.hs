@@ -18,15 +18,12 @@ import Data.Bifoldable
 import Data.Blob
 import Data.ByteString (ByteString)
 import Data.Diff
-import Data.Foldable (toList)
-import Data.Functor.Both as Both
 import Data.Functor.Classes
 import Data.JSON.Fields
 import qualified Data.Language as Language
 import Data.Output
 import Data.Record
 import Data.Term
-import Data.These
 import Data.Typeable
 import Diffing.Algorithm (Diffable)
 import Diffing.Interpreter

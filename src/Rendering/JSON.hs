@@ -4,10 +4,9 @@ module Rendering.JSON
 ) where
 
 import Data.Aeson (ToJSON, toJSON, object, (.=))
-import Data.Aeson as A hiding (json)
+import Data.Aeson as A
 import Data.Blob
 import Data.Foldable (toList)
-import Data.Functor.Both (Both)
 import Data.Language
 import qualified Data.Map as Map
 import Data.Text (Text)

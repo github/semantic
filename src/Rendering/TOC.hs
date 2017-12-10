@@ -25,13 +25,12 @@ import Data.Blob
 import Data.ByteString.Lazy (toStrict)
 import Data.Diff
 import Data.Foldable (fold, foldl')
-import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Foldable (cata)
 import Data.Function (on)
 import Data.Language as Language
 import Data.List (sortOn)
 import qualified Data.List as List
-import qualified Data.Map as Map hiding (null)
+import qualified Data.Map as Map
 import Data.Maybe (fromMaybe, mapMaybe)
 import Data.Output
 import Data.Patch
