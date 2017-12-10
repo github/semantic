@@ -89,10 +89,8 @@ diffBlobPair renderer blobs
     SExpressionDiffRenderer -> run (          parse parser      >=> pure . fmap keepCategory)                 diffSyntaxTerms (const renderSExpressionDiff)
 
   | otherwise = throwError (SomeException (NoParserForLanguage effectivePath effectiveLanguage))
-  where (effectivePath, effectiveLanguage) = case blobs of
-          This Blob { blobLanguage = Just lang, blobPath = path } -> (path, Just lang)
-          That Blob { blobLanguage = Just lang, blobPath = path } -> (path, Just lang)
-          These _ Blob { blobLanguage = lang, blobPath = path }   -> (path, lang)
+  where effectiveLanguage = languageForBlobPair blobs
+        effectivePath = pathForBlobPair blobs
 
         qualify language | OldToCDiffRenderer <- renderer = guard (language `elem` aLaCarteLanguages) *> Just language
                          | otherwise                      =                                              Just language
