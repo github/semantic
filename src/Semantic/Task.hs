@@ -191,7 +191,7 @@ runTaskWithOptions options task = do
           ReadBlobs (Left handle) -> (IO.readBlobsFromHandle handle >>= yield) `catchError` (pure . Left . toException)
           ReadBlobs (Right paths@[(path, Nothing)]) -> (IO.isDirectory path >>= bool (IO.readBlobsFromPaths paths) (IO.readBlobsFromDir path) >>= yield) `catchError` (pure . Left . toException)
           ReadBlobs (Right paths) -> (IO.readBlobsFromPaths paths >>= yield) `catchError` (pure . Left . toException)
-          ReadBlobPairs source -> (either IO.readBlobPairsFromHandle IO.readFiles source >>= yield) `catchError` (pure . Left . toException)
+          ReadBlobPairs source -> (either IO.readBlobPairsFromHandle (traverse (runBothWith IO.readFilePair)) source >>= yield) `catchError` (pure . Left . toException)
           WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
           WriteLog level message pairs -> queueLogMessage logger level message pairs >>= yield
           WriteStat stat -> queue statter stat >>= yield

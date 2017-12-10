@@ -6,7 +6,7 @@ module Rendering.JSON
 import Data.Aeson (ToJSON, toJSON, object, (.=))
 import Data.Aeson as A
 import Data.Blob
-import Data.Foldable (toList)
+import Data.Bifoldable (biList)
 import Data.Language
 import qualified Data.Map as Map
 import Data.Text (Text)
@@ -21,8 +21,8 @@ import GHC.Generics
 renderJSONDiff :: ToJSON a => BlobPair -> a -> Map.Map Text Value
 renderJSONDiff blobs diff = Map.fromList
   [ ("diff", toJSON diff)
-  , ("oids", toJSON (decodeUtf8 . blobOid <$> toList blobs))
-  , ("paths", toJSON (blobPath <$> toList blobs))
+  , ("oids", toJSON (decodeUtf8 . blobOid <$> biList blobs))
+  , ("paths", toJSON (blobPath <$> biList blobs))
   ]
 
 data File a = File { filePath :: FilePath, fileLanguage :: Maybe Language, fileContent :: a }

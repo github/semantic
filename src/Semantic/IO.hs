@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings, TypeSynonymInstances, DeriveAnyClass, DuplicateRecordFields, ScopedTypeVariables, TupleSections #-}
 module Semantic.IO
 ( readFile
-, readFiles
+, readFilePair
 , isDirectory
 , readBlobPairsFromHandle
 , readBlobsFromHandle
@@ -41,17 +41,14 @@ readFile path language = do
   raw <- liftIO $ (Just <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe B.ByteString))
   pure $ fromMaybe (Blob.emptyBlob path) (Blob.sourceBlob path language . fromBytes <$> raw)
 
-readFiles :: forall m. MonadIO m => [Both (FilePath, Maybe Language)] -> m [Blob.BlobPair]
-readFiles files = for files (runBothWith readFilesToBlobPair)
-  where
-    readFilesToBlobPair :: (FilePath, Maybe Language) -> (FilePath, Maybe Language) -> m Blob.BlobPair
-    readFilesToBlobPair a b = do
-      before <- uncurry readFile a
-      after <- uncurry readFile b
-      case (Blob.blobExists before, Blob.blobExists after) of
-        (True, False) -> pure (This before)
-        (False, True) -> pure (That after)
-        _ -> pure (These before after)
+readFilePair :: forall m. MonadIO m => (FilePath, Maybe Language) -> (FilePath, Maybe Language) -> m Blob.BlobPair
+readFilePair a b = do
+  before <- uncurry readFile a
+  after <- uncurry readFile b
+  case (Blob.blobExists before, Blob.blobExists after) of
+    (True, False) -> pure (This before)
+    (False, True) -> pure (That after)
+    _ -> pure (These before after)
 
 isDirectory :: MonadIO m => FilePath -> m Bool
 isDirectory path = liftIO (doesDirectoryExist path) >>= pure
