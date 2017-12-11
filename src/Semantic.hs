@@ -113,7 +113,7 @@ diffBlobPair renderer blobs
           where
             languageTag = languageTagForBlobPair blobs
 
--- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
+-- | A task to diff 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
 diffTermPair :: Functor syntax => Differ syntax ann1 ann2 -> These (Term syntax ann1) (Term syntax ann2) -> Task (Diff syntax ann1 ann2)
 diffTermPair _      (This t1)     = pure (deleting t1)
 diffTermPair _      (That t2)     = pure (inserting t2)
