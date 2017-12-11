@@ -10,7 +10,6 @@ module Semantic.IO
 , languageForFilePath
 ) where
 
-import Control.Exception (catch, IOException)
 import Control.Monad.IO.Class
 import Data.Aeson
 import qualified Data.Blob as Blob
@@ -35,20 +34,21 @@ import System.Directory (doesDirectoryExist)
 import Text.Read
 
 -- | Read a utf8-encoded file to a 'Blob'.
-readFile :: forall m. MonadIO m => FilePath -> Maybe Language -> m Blob.Blob
-readFile path@"/dev/null" _ = pure (Blob.emptyBlob path)
+readFile :: forall m. MonadIO m => FilePath -> Maybe Language -> m (Maybe Blob.Blob)
+readFile "/dev/null" _ = pure Nothing
 readFile path language = do
-  raw <- liftIO $ (Just <$> B.readFile path) `catch` (const (pure Nothing) :: IOException -> IO (Maybe B.ByteString))
-  pure $ fromMaybe (Blob.emptyBlob path) (Blob.sourceBlob path language . fromBytes <$> raw)
+  raw <- liftIO $ (Just <$> B.readFile path)
+  pure $ Blob.sourceBlob path language . fromBytes <$> raw
 
 readFilePair :: forall m. MonadIO m => (FilePath, Maybe Language) -> (FilePath, Maybe Language) -> m Blob.BlobPair
 readFilePair a b = do
   before <- uncurry readFile a
   after <- uncurry readFile b
-  case (Blob.blobExists before, Blob.blobExists after) of
-    (True, False) -> pure (Join (This before))
-    (False, True) -> pure (Join (That after))
-    _ -> pure (Join (These before after))
+  case (before, after) of
+    (Just a, Nothing) -> pure (Join (This a))
+    (Nothing, Just b) -> pure (Join (That b))
+    (Just a, Just b) -> pure (Join (These a b))
+    _ -> fail "expected file pair with content on at least one side"
 
 isDirectory :: MonadIO m => FilePath -> m Bool
 isDirectory path = liftIO (doesDirectoryExist path) >>= pure
@@ -71,13 +71,14 @@ readBlobsFromHandle = fmap toBlobs . readFromHandle
   where toBlobs BlobParse{..} = fmap toBlob blobs
 
 readBlobsFromPaths :: MonadIO m => [(FilePath, Maybe Language)] -> m [Blob.Blob]
-readBlobsFromPaths = traverse (uncurry Semantic.IO.readFile)
+readBlobsFromPaths files = traverse (uncurry Semantic.IO.readFile) files >>= pure . catMaybes
 
 readBlobsFromDir :: MonadIO m => FilePath -> m [Blob.Blob]
 readBlobsFromDir path = do
   paths <- liftIO (globDir1 (compile "[^vendor]**/*[.rb|.js|.tsx|.go|.py]") path)
   let paths' = catMaybes $ fmap (\p -> (p,) . Just <$> languageForFilePath p) paths
-  traverse (uncurry readFile) paths'
+  blobs <- traverse (uncurry readFile) paths'
+  pure (catMaybes blobs)
 
 readFromHandle :: (FromJSON a, MonadIO m) => Handle -> m a
 readFromHandle h = do

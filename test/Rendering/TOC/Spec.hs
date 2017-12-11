@@ -253,4 +253,4 @@ blankDiff = merge (arrayInfo, arrayInfo) (Indexed [ inserting (Term $ literalInf
     literalInfo = Nothing :. Range 1 2 :. StringLiteral :. sourceSpanBetween (1, 2) (1, 4) :. Nil
 
 blankDiffBlobs :: Both Blob
-blankDiffBlobs = both (Blob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob) (Just TypeScript)) (Blob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob) (Just TypeScript))
+blankDiffBlobs = both (Blob (fromText "[]") nullOid "a.js" defaultPlainBlob (Just TypeScript)) (Blob (fromText "[a]") nullOid "b.js" defaultPlainBlob (Just TypeScript))

@@ -44,7 +44,7 @@ import Semantic.Task as Task
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
 parseBlobs :: Output output => TermRenderer output -> [Blob] -> Task ByteString
-parseBlobs renderer = fmap toOutput . distributeFoldMap (parseBlob renderer) . filter blobExists
+parseBlobs renderer = fmap toOutput . distributeFoldMap (parseBlob renderer)
 
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
 parseBlob :: TermRenderer output -> Blob -> Task output

@@ -9,19 +9,18 @@ import Prelude hiding (readFile)
 import Semantic.IO
 import System.Exit (ExitCode(..))
 import System.IO (IOMode(..), openFile)
-import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
+import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall, anyIOException)
 import Test.Hspec.Expectations.Pretty
 
 spec :: Spec
 spec = parallel $ do
   describe "readFile" $ do
     it "returns a blob for extant files" $ do
-      blob <- readFile "semantic-diff.cabal" Nothing
+      Just blob <- readFile "semantic-diff.cabal" Nothing
       blobPath blob `shouldBe` "semantic-diff.cabal"
 
-    it "returns a nullBlob for absent files" $ do
-      blob <- readFile "this file should not exist" Nothing
-      nullBlob blob `shouldBe` True
+    it "throws for absent files" $ do
+      readFile "this file should not exist" Nothing `shouldThrow` anyIOException
 
   describe "readBlobPairsFromHandle" $ do
     let a = sourceBlob "method.rb" (Just Ruby) "def foo; end"

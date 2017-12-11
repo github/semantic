@@ -38,7 +38,6 @@ parseFixtures =
   , (SomeRenderer JSONTermRenderer, pathMode, jsonParseTreeOutput)
   , (SomeRenderer JSONTermRenderer, pathMode', jsonParseTreeOutput')
   , (SomeRenderer JSONTermRenderer, Right [], emptyJsonParseTreeOutput)
-  , (SomeRenderer JSONTermRenderer, Right [("not-a-file.rb", Just Ruby)], emptyJsonParseTreeOutput)
   , (SomeRenderer ToCTermRenderer, Right [("test/fixtures/ruby/method-declaration.A.rb", Just Ruby)], tocOutput)
   ]
   where pathMode = Right [("test/fixtures/ruby/and-or.A.rb", Just Ruby)]

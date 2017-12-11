@@ -12,7 +12,7 @@ import Data.Blob
 import qualified Data.ByteString as B
 import Data.Functor.Both
 import Data.Language
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, fromJust)
 import Data.Source
 import Rendering.Renderer
 import Semantic
@@ -26,7 +26,7 @@ diffFilePaths paths = readFilePair paths >>= runTask . diffBlobPair SExpressionD
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFilePath :: FilePath -> IO B.ByteString
-parseFilePath path = IO.readFile path (languageForFilePath path) >>= runTask . parseBlob SExpressionTermRenderer
+parseFilePath path = IO.readFile path (languageForFilePath path) >>= pure . fromJust >>= runTask . parseBlob SExpressionTermRenderer
 
 -- | Read two files to a BlobPair.
 readFilePair :: Both FilePath -> IO BlobPair

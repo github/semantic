@@ -5,6 +5,7 @@ module Semantic.Util where
 import Analysis.Declaration
 import Control.Monad.IO.Class
 import Data.Align.Generic
+import Data.Maybe
 import Data.Blob
 import Data.Diff
 import Data.Functor.Classes
@@ -21,7 +22,7 @@ import Semantic.IO as IO
 import Semantic.Task
 
 file :: MonadIO m => FilePath -> m Blob
-file path = IO.readFile path (languageForFilePath path)
+file path = IO.readFile path (languageForFilePath path) >>= pure . fromJust
 
 diffWithParser :: (HasField fields Data.Span.Span,
                    HasField fields Range,
