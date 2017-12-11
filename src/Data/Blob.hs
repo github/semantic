@@ -3,7 +3,6 @@ module Data.Blob
 , BlobKind(..)
 , These(..)
 , modeToDigits
-, defaultPlainBlob
 , nullBlob
 , sourceBlob
 , nullOid
@@ -59,7 +58,6 @@ data Blob = Blob
   { blobSource :: Source -- ^ The UTF-8 encoded source text of the blob.
   , blobOid :: ByteString -- ^ The Git object ID (SHA-1) of the blob.
   , blobPath :: FilePath -- ^ The file path to the blob.
-  , blobKind :: BlobKind -- ^ The kind of blob.
   , blobLanguage :: Maybe Language -- ^ The language of this blob. Nothing denotes a langauge we don't support yet.
   }
   deriving (Show, Eq)
@@ -73,15 +71,11 @@ modeToDigits (PlainBlob mode) = pack $ showOct mode ""
 modeToDigits (ExecutableBlob mode) = pack $ showOct mode ""
 modeToDigits (SymlinkBlob mode) = pack $ showOct mode ""
 
--- | The default plain blob mode
-defaultPlainBlob :: BlobKind
-defaultPlainBlob = PlainBlob 0o100644
-
 nullBlob :: Blob -> Bool
 nullBlob Blob{..} = blobOid == nullOid || nullSource blobSource
 
 sourceBlob :: FilePath -> Maybe Language -> Source -> Blob
-sourceBlob filepath language source = Blob source nullOid filepath defaultPlainBlob language
+sourceBlob filepath language source = Blob source nullOid filepath language
 
 nullOid :: ByteString
 nullOid = "0000000000000000000000000000000000000000"
