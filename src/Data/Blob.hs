@@ -10,12 +10,16 @@ module Data.Blob
 , sourceBlob
 , nullOid
 , BlobPair
+, blobPairDiffing
+, blobPairInserting
+, blobPairDeleting
 , languageForBlobPair
 , languageTagForBlobPair
 , pathForBlobPair
 ) where
 
 import Data.ByteString.Char8 (ByteString, pack)
+import Data.Bifunctor.Join
 import Data.Language
 import Data.These
 import Data.Maybe (isJust)
@@ -24,17 +28,29 @@ import Data.Word
 import Numeric
 
 
-type BlobPair = These Blob Blob
+-- | Represents a blobs suitable for diffing which can be either a blob to
+-- delete, a blob to insert, or a pair of blobs to diff.
+type BlobPair = Join These Blob
+
+
+blobPairDiffing :: Blob -> Blob -> BlobPair
+blobPairDiffing a b = Join (These a b)
+
+blobPairInserting :: Blob -> BlobPair
+blobPairInserting = Join . That
+
+blobPairDeleting :: Blob -> BlobPair
+blobPairDeleting = Join . This
 
 languageForBlobPair :: BlobPair -> Maybe Language
-languageForBlobPair (This Blob{..}) = blobLanguage
-languageForBlobPair (That Blob{..}) = blobLanguage
-languageForBlobPair (These _ Blob{..}) = blobLanguage
+languageForBlobPair (Join (This Blob{..})) = blobLanguage
+languageForBlobPair (Join (That Blob{..})) = blobLanguage
+languageForBlobPair (Join (These _ Blob{..})) = blobLanguage
 
 pathForBlobPair :: BlobPair -> FilePath
-pathForBlobPair (This Blob{..}) = blobPath
-pathForBlobPair (That Blob{..}) = blobPath
-pathForBlobPair (These _ Blob{..}) = blobPath
+pathForBlobPair (Join (This Blob{..})) = blobPath
+pathForBlobPair (Join (That Blob{..})) = blobPath
+pathForBlobPair (Join (These _ Blob{..})) = blobPath
 
 languageTagForBlobPair :: BlobPair -> [(String, String)]
 languageTagForBlobPair pair = maybe [] showLanguage (languageForBlobPair pair)

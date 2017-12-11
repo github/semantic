@@ -28,34 +28,34 @@ spec = parallel $ do
     let b = sourceBlob "method.rb" (Just Ruby) "def bar(x); end"
     it "returns blobs for valid JSON encoded diff input" $ do
       blobs <- blobsFromFilePath "test/fixtures/input/diff.json"
-      blobs `shouldBe` [These a b]
+      blobs `shouldBe` [blobPairDiffing a b]
 
     it "returns blobs when there's no before" $ do
       blobs <- blobsFromFilePath "test/fixtures/input/diff-no-before.json"
-      blobs `shouldBe` [That b]
+      blobs `shouldBe` [blobPairInserting b]
 
     it "returns blobs when there's null before" $ do
       blobs <- blobsFromFilePath "test/fixtures/input/diff-null-before.json"
-      blobs `shouldBe` [That b]
+      blobs `shouldBe` [blobPairInserting b]
 
     it "returns blobs when there's no after" $ do
       blobs <- blobsFromFilePath "test/fixtures/input/diff-no-after.json"
-      blobs `shouldBe` [This a]
+      blobs `shouldBe` [blobPairDeleting a]
 
     it "returns blobs when there's null after" $ do
       blobs <- blobsFromFilePath "test/fixtures/input/diff-null-after.json"
-      blobs `shouldBe` [This a]
+      blobs `shouldBe` [blobPairDeleting a]
 
 
     it "returns blobs for unsupported language" $ do
       h <- openFile "test/fixtures/input/diff-unsupported-language.json" ReadMode
       blobs <- readBlobPairsFromHandle h
       let b' = sourceBlob "test.kt" Nothing "fun main(args: Array<String>) {\nprintln(\"hi\")\n}\n"
-      blobs `shouldBe` [That b']
+      blobs `shouldBe` [blobPairInserting b']
 
     it "detects language based on filepath for empty language" $ do
       blobs <- blobsFromFilePath "test/fixtures/input/diff-empty-language.json"
-      blobs `shouldBe` [These a b]
+      blobs `shouldBe` [blobPairDiffing a b]
 
     it "throws on blank input" $ do
       h <- openFile "test/fixtures/input/blank.json" ReadMode

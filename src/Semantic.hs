@@ -15,6 +15,7 @@ import Control.Monad ((>=>), guard)
 import Control.Monad.Error.Class
 import Data.Align.Generic
 import Data.Bifoldable
+import Data.Bifunctor.Join
 import Data.Blob
 import Data.ByteString (ByteString)
 import Data.Diff
@@ -103,9 +104,9 @@ diffBlobPair renderer blobs
             , Language.TypeScript
             ]
 
-        run :: (Foldable syntax, Functor syntax) => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (These Blob Blob -> Diff syntax ann ann -> output) -> Task output
+        run :: (Foldable syntax, Functor syntax) => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Join These Blob -> Diff syntax ann ann -> output) -> Task output
         run parse diff renderer = do
-          terms <- bidistributeFor blobs parse parse
+          terms <- bidistributeFor (runJoin blobs) parse parse
           time "diff" languageTag $ do
             diff <- diffTermPair diff terms
             writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)

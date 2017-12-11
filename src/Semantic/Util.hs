@@ -8,6 +8,7 @@ import Data.Align.Generic
 import Data.Blob
 import Data.Diff
 import Data.Functor.Classes
+import Data.Bifunctor.Join
 import Data.Range
 import Data.Record
 import Data.Span
@@ -34,4 +35,4 @@ diffWithParser :: (HasField fields Data.Span.Span,
                   -> Task (Diff syntax (Record (Maybe Declaration ': fields)) (Record (Maybe Declaration ': fields)))
 diffWithParser parser = run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))
   where
-    run parse blobs = bidistributeFor blobs parse parse >>= diffTermPair diffTerms
+    run parse blobs = bidistributeFor (runJoin blobs) parse parse >>= diffTermPair diffTerms

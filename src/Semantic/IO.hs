@@ -46,9 +46,9 @@ readFilePair a b = do
   before <- uncurry readFile a
   after <- uncurry readFile b
   case (Blob.blobExists before, Blob.blobExists after) of
-    (True, False) -> pure (This before)
-    (False, True) -> pure (That after)
-    _ -> pure (These before after)
+    (True, False) -> pure (Join (This before))
+    (False, True) -> pure (Join (That after))
+    _ -> pure (Join (These before after))
 
 isDirectory :: MonadIO m => FilePath -> m Bool
 isDirectory path = liftIO (doesDirectoryExist path) >>= pure
@@ -63,7 +63,7 @@ readBlobPairsFromHandle = fmap toBlobPairs . readFromHandle
   where
     toBlobPairs :: BlobDiff -> [Blob.BlobPair]
     toBlobPairs BlobDiff{..} = toBlobPair <$> blobs
-    toBlobPair blobs = runJoin (toBlob <$> blobs)
+    toBlobPair blobs = toBlob <$> blobs
 
 -- | Read JSON encoded blobs from a handle.
 readBlobsFromHandle :: MonadIO m => Handle -> m [Blob.Blob]
