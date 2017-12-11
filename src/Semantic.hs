@@ -116,8 +116,8 @@ diffBlobPair renderer blobs
 
 -- | A task to diff 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
 diffTermPair :: Functor syntax => Differ syntax ann1 ann2 -> These (Term syntax ann1) (Term syntax ann2) -> Task (Diff syntax ann1 ann2)
-diffTermPair _      (This t1)     = pure (deleting t1)
-diffTermPair _      (That t2)     = pure (inserting t2)
+diffTermPair _      (This  t1   ) = pure (deleting t1)
+diffTermPair _      (That     t2) = pure (inserting t2)
 diffTermPair differ (These t1 t2) = diff differ t1 t2
 
 keepCategory :: HasField fields Category => Record fields -> Record '[Category]
