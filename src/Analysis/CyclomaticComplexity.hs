@@ -123,7 +123,7 @@ type family CyclomaticComplexityStrategy syntax where
   CyclomaticComplexityStrategy a = 'Default
 
 
--- | The 'Default' strategy produces 'Nothing'.
+-- | The 'Default' strategy takes the sum without incrementing.
 instance Foldable syntax => HasCyclomaticComplexityWithStrategy 'Default syntax where
   toCyclomaticComplexityWithStrategy _ = sum
 
