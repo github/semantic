@@ -64,6 +64,10 @@ spec = parallel $ do
       h <- openFile "test/fixtures/input/diff-no-language.json" ReadMode
       readBlobsFromHandle h `shouldThrow` (== ExitFailure 1)
 
+    it "throws if null on before and after" $ do
+      h <- openFile "test/fixtures/input/diff-null-both-sides.json" ReadMode
+      readBlobPairsFromHandle h `shouldThrow` (== ExitFailure 1)
+
   describe "readBlobsFromHandle" $ do
     it "returns blobs for valid JSON encoded parse input" $ do
       h <- openFile "test/fixtures/input/parse.json" ReadMode
