@@ -18,7 +18,7 @@ import Data.These
 import Data.Source as Source
 
 
--- | The source, oid, path, kind and language of a blob.
+-- | The source, path, and language of a blob.
 data Blob = Blob
   { blobSource :: Source -- ^ The UTF-8 encoded source text of the blob.
   , blobPath :: FilePath -- ^ The file path to the blob.
