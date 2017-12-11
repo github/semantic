@@ -139,6 +139,9 @@ render renderer input = Render renderer input `Then` return
 distribute :: Traversable t => t (Task output) -> Task (t output)
 distribute tasks = Distribute tasks `Then` return
 
+-- | Distribute a 'Bitraversable' container of 'Task's over the available cores (i.e. execute them concurrently), collecting their results.
+--
+--   This is a concurrent analogue of 'bisequenceA'.
 bidistribute :: Bitraversable t => t (Task output1) (Task output2) -> Task (t output1 output2)
 bidistribute tasks = Bidistribute tasks `Then` return
 
@@ -148,6 +151,9 @@ bidistribute tasks = Bidistribute tasks `Then` return
 distributeFor :: Traversable t => t a -> (a -> Task output) -> Task (t output)
 distributeFor inputs toTask = distribute (fmap toTask inputs)
 
+-- | Distribute the application of a function to each element of a 'Bitraversable' container of inputs over the available cores (i.e. perform the functions concurrently for each element), collecting the results.
+--
+--   This is a concurrent analogue of 'bifor' or 'bitraverse' (with the arguments flipped).
 bidistributeFor :: Bitraversable t => t a b -> (a -> Task output1) -> (b -> Task output2) -> Task (t output1 output2)
 bidistributeFor inputs toTask1 toTask2 = bidistribute (bimap toTask1 toTask2 inputs)
 
