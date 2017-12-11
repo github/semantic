@@ -11,14 +11,12 @@ import Data.Bifunctor.Join
 import Data.Language
 import qualified Data.Map as Map
 import Data.Text (Text)
-import Data.Text.Encoding (decodeUtf8)
 import GHC.Generics
 
 -- | Render a diff to a string representing its JSON.
 renderJSONDiff :: ToJSON a => BlobPair -> a -> Map.Map Text Value
 renderJSONDiff blobs diff = Map.fromList
   [ ("diff", toJSON diff)
-  , ("oids", toJSON (decodeUtf8 . blobOid <$> (biList . runJoin) blobs))
   , ("paths", toJSON (blobPath <$> (biList . runJoin) blobs))
   ]
 

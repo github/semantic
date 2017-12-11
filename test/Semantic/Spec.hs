@@ -37,4 +37,4 @@ spec = parallel $ do
       result `shouldBe` (Diff (Patch (Delete (In () []))) :: Diff [] () ())
 
   where
-    methodsBlob = Blob "def foo\nend\n" "ff7bbbe9495f61d9e1e58c597502d152bab1761e" "methods.rb" (Just Ruby)
+    methodsBlob = Blob "def foo\nend\n" "methods.rb" (Just Ruby)
