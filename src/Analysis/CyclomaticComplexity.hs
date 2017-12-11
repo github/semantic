@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, DefaultSignatures, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
 module Analysis.CyclomaticComplexity
 ( CyclomaticComplexity(..)
 , HasCyclomaticComplexity
@@ -57,36 +57,20 @@ class CustomHasCyclomaticComplexity syntax where
   -- | Produce a customized 'CyclomaticComplexity' for a given syntax node.
   customToCyclomaticComplexity :: syntax CyclomaticComplexity -> CyclomaticComplexity
 
-instance CustomHasCyclomaticComplexity Declaration.Function where
+  -- | Because we perform the same operation wherever we use the custom strategy, we can define the default method for all instances.
+  default customToCyclomaticComplexity :: Foldable syntax => syntax CyclomaticComplexity -> CyclomaticComplexity
   customToCyclomaticComplexity = succ . sum
 
-instance CustomHasCyclomaticComplexity Declaration.Method where
-  customToCyclomaticComplexity = succ . sum
-
-instance CustomHasCyclomaticComplexity Statement.Catch where
-  customToCyclomaticComplexity = succ . sum
-
-instance CustomHasCyclomaticComplexity Statement.DoWhile where
-  customToCyclomaticComplexity = succ . sum
-
-instance CustomHasCyclomaticComplexity Statement.Else where
-  customToCyclomaticComplexity = succ . sum
-
-instance CustomHasCyclomaticComplexity Statement.For where
-  customToCyclomaticComplexity = succ . sum
-
-instance CustomHasCyclomaticComplexity Statement.ForEach where
-  customToCyclomaticComplexity = succ . sum
-
-instance CustomHasCyclomaticComplexity Statement.If where
-  customToCyclomaticComplexity = succ . sum
-
-instance CustomHasCyclomaticComplexity Statement.Pattern where
-  customToCyclomaticComplexity = succ . sum
-
-instance CustomHasCyclomaticComplexity Statement.While where
-  customToCyclomaticComplexity = succ . sum
-
+instance CustomHasCyclomaticComplexity Declaration.Function
+instance CustomHasCyclomaticComplexity Declaration.Method
+instance CustomHasCyclomaticComplexity Statement.Catch
+instance CustomHasCyclomaticComplexity Statement.DoWhile
+instance CustomHasCyclomaticComplexity Statement.Else
+instance CustomHasCyclomaticComplexity Statement.For
+instance CustomHasCyclomaticComplexity Statement.ForEach
+instance CustomHasCyclomaticComplexity Statement.If
+instance CustomHasCyclomaticComplexity Statement.Pattern
+instance CustomHasCyclomaticComplexity Statement.While
 
 -- | Produce a 'CyclomaticComplexity' for 'Union's using the 'HasCyclomaticComplexity' instance & therefore using a 'CustomHasCyclomaticComplexity' instance when one exists & the type is listed in 'CyclomaticComplexityStrategy'.
 instance Apply HasCyclomaticComplexity fs => CustomHasCyclomaticComplexity (Union fs) where
