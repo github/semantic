@@ -241,7 +241,7 @@ isMethodOrFunction a = case unTerm a of
   _ -> False
 
 blobsForPaths :: Both FilePath -> IO BlobPair
-blobsForPaths = readFilePair . (fmap ("test/fixtures/toc/" <>))
+blobsForPaths = readFilePair . fmap ("test/fixtures/toc/" <>)
 
 sourceSpanBetween :: (Int, Int) -> (Int, Int) -> Span
 sourceSpanBetween (s1, e1) (s2, e2) = Span (Pos s1 e1) (Pos s2 e2)
