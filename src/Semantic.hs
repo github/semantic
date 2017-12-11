@@ -98,7 +98,8 @@ diffBlobPair renderer blobs
         qualify language | OldToCDiffRenderer <- renderer = guard (language `elem` aLaCarteLanguages) *> Just language
                          | otherwise                      =                                              Just language
         aLaCarteLanguages
-          = [ Language.JSX
+          = [ Language.Go
+            , Language.JSX
             , Language.JavaScript
             , Language.Markdown
             , Language.Python
