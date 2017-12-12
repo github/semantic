@@ -26,18 +26,21 @@
   (Modulo
     (Identifier)
     (Identifier))
-{+(Power
-  {+(Identifier)+}
-  {+(Identifier)+})+}
-{+(DividedBy
-  {+(Identifier)+}
-  {+(Identifier)+})+}
 { (DividedBy
   {-(Identifier)-}
   {-(Identifier)-})
-->(Modulo
+->(Power
   {+(Identifier)+}
   {+(Identifier)+}) }
+{ (Power
+  {-(Identifier)-}
+  {-(Identifier)-})
+->(DividedBy
+  {+(Identifier)+}
+  {+(Identifier)+}) }
+{+(Modulo
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {+(DividedBy
   {+(Identifier)+}
   {+(Identifier)+})+}
@@ -50,9 +53,6 @@
 {+(Plus
   {+(Identifier)+}
   {+(Identifier)+})+}
-{-(Power
-  {-(Identifier)-}
-  {-(Identifier)-})-}
 {-(BOr
   {-(Identifier)-}
   {-(Identifier)-})-}
