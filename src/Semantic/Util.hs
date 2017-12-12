@@ -29,10 +29,22 @@ diffWithParser :: (HasField fields Data.Span.Span,
                    Traversable syntax, Functor syntax,
                    Foldable syntax, Diffable syntax,
                    GAlign syntax, HasDeclaration syntax)
-                  =>
-                  Parser (Term syntax (Record fields))
+                  => Parser (Term syntax (Record fields))
                   -> Both Blob
                   -> Task (Diff syntax (Record (Maybe Declaration ': fields)) (Record (Maybe Declaration ': fields)))
 diffWithParser parser = run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))
   where
     run parse sourceBlobs = distributeFor sourceBlobs parse >>= runBothWith (diffTermPair sourceBlobs diffTerms)
+
+diffBlobWithParser :: (HasField fields Data.Span.Span,
+                   HasField fields Range,
+                   Eq1 syntax, Show1 syntax,
+                   Traversable syntax, Functor syntax,
+                   Foldable syntax, Diffable syntax,
+                   GAlign syntax, HasDeclaration syntax)
+                  => Parser (Term syntax (Record fields))
+                  -> Blob
+                  -> Task (Term syntax (Record (Maybe Declaration : fields)))
+diffBlobWithParser parser = run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))
+  where
+    run parse sourceBlob = parse sourceBlob
