@@ -9,6 +9,7 @@ module Semantic.Task
 , writeToOutput
 , writeLog
 , writeStat
+, askOptions
 , time
 , parse
 , decorate
@@ -69,6 +70,7 @@ data TaskF output where
   WriteToOutput :: Either Handle FilePath -> B.ByteString -> TaskF ()
   WriteLog :: Level -> String -> [(String, String)] -> TaskF ()
   WriteStat :: Stat -> TaskF ()
+  AskOptions :: TaskF Options
   Time :: String -> [(String, String)] -> Task output -> TaskF output
   Parse :: Parser term -> Blob -> TaskF term
   Decorate :: Functor f => RAlgebra (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
@@ -112,6 +114,9 @@ writeLog level message pairs = WriteLog level message pairs `Then` return
 -- | A 'Task' which writes a stat.
 writeStat :: Stat -> Task ()
 writeStat stat = WriteStat stat `Then` return
+
+askOptions :: Task Options
+askOptions = AskOptions `Then` return
 
 -- | A 'Task' which measures and stats the timing of another 'Task'.
 time :: String -> [(String, String)] -> Task output -> Task output
@@ -201,6 +206,7 @@ runTaskWithOptions options task = do
           WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
           WriteLog level message pairs -> queueLogMessage logger level message pairs >>= yield
           WriteStat stat -> queue statter stat >>= yield
+          AskOptions -> pure options >>= yield
           Time statName tags task -> withTiming (queue statter) statName tags (go task) >>= either (pure . Left) yield
           Parse parser blob -> go (runParser options blob parser) >>= either (pure . Left) yield
           Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield

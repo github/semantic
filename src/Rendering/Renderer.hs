@@ -7,6 +7,7 @@ module Rendering.Renderer
 , renderSExpressionTerm
 , renderJSONDiff
 , renderJSONTerm
+, renderJSONMetadata
 , renderToCDiff
 , renderToCTerm
 , renderToTags
@@ -42,7 +43,7 @@ data TermRenderer output where
   -- | Compute a table of contents for the term & encode it as JSON.
   ToCTermRenderer :: TermRenderer Summaries
   -- | Render to JSON with the format documented in docs/json-format.md under “Term.”
-  JSONTermRenderer :: TermRenderer [Value]
+  JSONTermRenderer :: TermRenderer (Map.Map Text Value)
   -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer ByteString
   -- | Render to a list of tags.

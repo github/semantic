@@ -91,6 +91,8 @@ data Options = Options
   , optionsPrintSource :: Bool -- ^ Whether to print the source reference when logging errors (set automatically at runtime).
   , optionsFormatter :: Options -> Message -> String -- ^ Log formatter to use (set automaticaly at runtime).
   , optionsProcessID :: CPid -- ^ ProcessID (set automaticaly at runtime).
+  , optionsLibraryVersion :: String -- ^ Version of the library
+  , optionsGitHash :: String -- ^ Git Hash of the library
   }
 
 defaultOptions :: Options
@@ -102,6 +104,8 @@ defaultOptions = Options
   , optionsPrintSource = False
   , optionsFormatter = logfmtFormatter
   , optionsProcessID = 0
+  , optionsLibraryVersion = ""
+  , optionsGitHash = ""
   }
 
 configureOptionsForHandle :: Handle -> Options -> IO Options

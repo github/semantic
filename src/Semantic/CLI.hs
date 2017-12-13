@@ -55,6 +55,8 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       <*> pure False -- PrintSource
       <*> pure Log.logfmtFormatter -- Formatter
       <*> pure 0 -- ProcessID
+      <*> pure (showVersion Library.version)
+      <*> pure $(gitHash)
     argumentsParser = (. Task.writeToOutput) . (>>=)
       <$> hsubparser (diffCommand <> parseCommand)
       <*> (   Right <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout")
