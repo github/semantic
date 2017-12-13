@@ -25,6 +25,7 @@ data File a = File { filePath :: FilePath, fileLanguage :: Maybe Language, fileC
   deriving (Generic, Show)
 
 instance ToJSON a => ToJSON (File a) where
+  -- TODO: make this "path" .= filePath to be consistent with other JSON responses.
   toJSON File{..} = object [ "filePath" .= filePath, "language" .= fileLanguage, "programNode" .= fileContent ]
 
 -- | Render a term to a string representing its JSON.
