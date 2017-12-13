@@ -218,7 +218,7 @@ nodeError expected Node{..} = Error nodeSpan expected (Just (Right nodeSymbol))
 
 
 firstSet :: (Enum grammar, Ix grammar) => Assignment ast grammar a -> [grammar]
-firstSet = iterFreer (\ (Tracing _ assignment) _ -> case assignment of
+firstSet = iterFreer (\ _ (Tracing _ assignment) -> case assignment of
   Choose table _ _ -> Table.tableAddresses table
   Label child _ -> firstSet child
   _ -> []) . ([] <$)
@@ -245,11 +245,11 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
         go assignment = iterFreer run ((pure .) . (,) <$> assignment)
         {-# INLINE go #-}
 
-        run :: Tracing (AssignmentF ast grammar) x
-            -> (x -> State ast grammar -> Either (Error (Either String grammar)) (result, State ast grammar))
+        run :: (x -> State ast grammar -> Either (Error (Either String grammar)) (result, State ast grammar))
+            -> Tracing (AssignmentF ast grammar) x
             -> State ast grammar
             -> Either (Error (Either String grammar)) (result, State ast grammar)
-        run t yield initialState = state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
+        run yield t initialState = state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
           where atNode (Term (In node f)) = case runTracing t of
                   Location -> yield (nodeLocation node) state
                   CurrentNode -> yield (In node (() <$ f)) state
@@ -367,7 +367,7 @@ instance (Enum grammar, Eq1 ast, Ix grammar, Show grammar) => MonadError (Error 
   throwError err = fail (show err)
 
   catchError :: HasCallStack => Assignment ast grammar a -> (Error (Either String grammar) -> Assignment ast grammar a) -> Assignment ast grammar a
-  catchError rule handler = iterFreer (\ (Tracing cs assignment) continue -> case assignment of
+  catchError rule handler = iterFreer (\ continue (Tracing cs assignment) -> case assignment of
     Choose choices atEnd Nothing -> Tracing cs (Choose (fmap (>>= continue) choices) (fmap (>>= continue) atEnd) (Just handler)) `Then` return
     Choose choices atEnd (Just onError) -> Tracing cs (Choose (fmap (>>= continue) choices) (fmap (>>= continue) atEnd) (Just (\ err -> (onError err >>= continue) <|> handler err))) `Then` return
     _ -> Tracing cs assignment `Then` ((`catchError` handler) . continue)) (fmap pure rule)
