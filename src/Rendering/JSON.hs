@@ -35,7 +35,7 @@ renderJSONTerm blob content = pure $ toJSON (object ("programNode" .= content : 
 renderJSONTerms :: Options -> [Value] -> Map.Map Text Value
 renderJSONTerms options = Map.union (renderJSONMetadata options) . Map.singleton "trees" . toJSON
 
--- | Render program options/metadata to a value representing its JSON.
+-- | Render program options/metadata to a map representing its JSON.
 renderJSONMetadata :: Options -> Map.Map Text Value
 renderJSONMetadata Options{..} = Map.singleton "_metadata" $
   toJSON (object [ "version" .= optionsLibraryVersion
