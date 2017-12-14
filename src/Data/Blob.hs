@@ -74,4 +74,6 @@ pathKeyForBlobPair blobs = case bimap blobPath blobPath (runJoin blobs) of
                       | otherwise -> before <> " -> " <> after
 
 instance ToJSONFields Blob where
-  toJSONFields Blob{..} = [ "path" .= blobPath, "language" .= blobLanguage ]
+  toJSONFields Blob{..} = [ "path" .= blobPath
+                          , "filePath" .= blobPath
+                          , "language" .= blobLanguage ]
