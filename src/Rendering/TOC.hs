@@ -21,7 +21,6 @@ import Data.Aeson
 import Data.Align (bicrosswalk)
 import Data.Bifoldable (bifoldMap)
 import Data.Bifunctor (bimap)
-import Data.Bifunctor.Join
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
 import Data.Diff
@@ -164,11 +163,7 @@ renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Fol
 renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
-        summaryKey = T.pack $ case bimap blobPath blobPath (runJoin blobs) of
-           This before -> before
-           That after -> after
-           These before after | before == after -> after
-                              | otherwise -> before <> " -> " <> after
+        summaryKey = T.pack $ pathKeyForBlobPair blobs
 
 diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [TOCSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration
