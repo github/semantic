@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, MultiParamTypeClasses, StandaloneDeriving, TypeOperators #-}
 module Rendering.Renderer
 ( DiffRenderer(..)
 , TermRenderer(..)
@@ -18,9 +18,7 @@ module Rendering.Renderer
 
 import Data.Aeson (Value)
 import Data.ByteString (ByteString)
-import qualified Data.Map as Map
 import Data.Output
-import Data.Text (Text)
 import Rendering.JSON as R
 import Rendering.SExpression as R
 import Rendering.Tag as R
