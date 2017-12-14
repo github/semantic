@@ -26,7 +26,6 @@ import qualified Data.Language as Language
 import Data.Output
 import Data.Record
 import Data.Term
-import qualified Data.Map as Map
 import Data.Typeable
 import Diffing.Algorithm (Diffable)
 import Diffing.Interpreter
