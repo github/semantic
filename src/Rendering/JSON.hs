@@ -1,34 +1,41 @@
 module Rendering.JSON
 ( renderJSONDiff
+, renderJSONDiffs
 , renderJSONTerm
+, renderJSONTerms
 , renderJSONMetadata
 ) where
 
 import Data.Aeson (ToJSON, toJSON, object, (.=))
 import Data.Aeson as A
+import Data.JSON.Fields
 import Data.Blob
-import Data.Bifunctor
-import Data.Bifoldable
 import Data.Bifunctor.Join
 import qualified Data.Map as Map
 import Data.Text (Text)
 import Semantic.Log
+import Data.Patch
+import Data.These
 
--- | Render a diff to a Map representing its JSON.
-renderJSONDiff :: ToJSON a => BlobPair -> a -> Map.Map Text Value
-renderJSONDiff blobs diff = Map.fromList $ ("diff", toJSON diff) : renderJSONBlobPair
-  where
-    renderJSONBlobPair = biList (bimap (render "before") (render "after") (runJoin blobs))
-    render key Blob{..} = (key, toJSON (object [ "path" .= blobPath, "language" .= blobLanguage ]))
 
--- | Render a term to a Map representing its JSON.
-renderJSONTerm :: ToJSON a => Blob -> a -> Map.Map Text Value
-renderJSONTerm Blob{..} content = Map.singleton "trees" $
-  toJSON (object [ "path" .= blobPath
-                 , "language" .= blobLanguage
-                 , "programNode" .= content
-                 ])
+-- | Render a diff to a value representing its JSON.
+renderJSONDiff :: ToJSON a => BlobPair -> a -> [Value]
+renderJSONDiff blobs diff = pure $
+  toJSON (object [ "diff" .= diff, "stat" .= object (toJSONFields statPatch) ])
+  where statPatch = these Delete Insert Replace (runJoin blobs)
 
+renderJSONDiffs :: Options -> [Value] -> Map.Map Text Value
+renderJSONDiffs options = Map.union (renderJSONMetadata options) . Map.singleton "diffs" . toJSON
+
+
+-- | Render a term to a value representing its JSON.
+renderJSONTerm :: ToJSON a => Blob -> a -> [Value]
+renderJSONTerm blob content = pure $ toJSON (object ("programNode" .= content : toJSONFields blob))
+
+renderJSONTerms :: Options -> [Value] -> Map.Map Text Value
+renderJSONTerms options = Map.union (renderJSONMetadata options) . Map.singleton "trees" . toJSON
+
+-- | Render program options/metadata to a value representing its JSON.
 renderJSONMetadata :: Options -> Map.Map Text Value
 renderJSONMetadata Options{..} = Map.singleton "_metadata" $
   toJSON (object [ "version" .= optionsLibraryVersion

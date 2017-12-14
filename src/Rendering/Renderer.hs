@@ -6,7 +6,9 @@ module Rendering.Renderer
 , renderSExpressionDiff
 , renderSExpressionTerm
 , renderJSONDiff
+, renderJSONDiffs
 , renderJSONTerm
+, renderJSONTerms
 , renderJSONMetadata
 , renderToCDiff
 , renderToCTerm
@@ -31,7 +33,7 @@ data DiffRenderer output where
   -- | Compute a table of contents for the diff & encode it as JSON (uses the new Assignment parse tree parser).
   ToCDiffRenderer :: DiffRenderer Summaries
   -- | Render to JSON with the format documented in docs/json-format.md
-  JSONDiffRenderer :: DiffRenderer (Map.Map Text Value)
+  JSONDiffRenderer :: DiffRenderer [Value]
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
   SExpressionDiffRenderer :: DiffRenderer ByteString
 
@@ -43,7 +45,7 @@ data TermRenderer output where
   -- | Compute a table of contents for the term & encode it as JSON.
   ToCTermRenderer :: TermRenderer Summaries
   -- | Render to JSON with the format documented in docs/json-format.md under “Term.”
-  JSONTermRenderer :: TermRenderer (Map.Map Text Value)
+  JSONTermRenderer :: TermRenderer [Value]
   -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer ByteString
   -- | Render to a list of tags.

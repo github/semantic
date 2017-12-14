@@ -46,17 +46,20 @@ import Semantic.Task as Task
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
 parseBlobs :: Output output => TermRenderer output -> [Blob] -> Task ByteString
-parseBlobs renderer = fmap toOutput . distributeFoldMap (parseBlob renderer)
+parseBlobs renderer blobs = do
+  opts <- askOptions
+  toOutputWithMetadata opts <$> distributeFoldMap (parseBlob renderer) blobs
+  where toOutputWithMetadata opts = case renderer of
+          JSONTermRenderer -> toOutput . renderJSONTerms opts
+          _ -> toOutput
 
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
 parseBlob :: TermRenderer output -> Blob -> Task output
 parseBlob renderer blob@Blob{..}
   | Just (SomeParser parser) <- blobLanguage >>= someParser (Proxy :: Proxy '[ConstructorName, IdentifierName, HasDeclaration, Foldable, Functor, ToJSONFields1])
-  = do
-    opts <- askOptions
-    parse parser blob >>= case renderer of
+  = parse parser blob >>= case renderer of
       ToCTermRenderer         -> decorate (declarationAlgebra blob)   >=> render (renderToCTerm blob)
-      JSONTermRenderer        -> decorate constructorLabel >=> decorate identifierLabel >=> render (Map.union (renderJSONMetadata opts) . renderJSONTerm blob)
+      JSONTermRenderer        -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)
       SExpressionTermRenderer -> decorate constructorLabel . (Nil <$) >=> render renderSExpressionTerm
       TagsTermRenderer        -> decorate (declarationAlgebra blob)   >=> render (renderToTags blob)
 
@@ -74,18 +77,21 @@ data NoParserForLanguage = NoParserForLanguage FilePath (Maybe Language.Language
 
 
 diffBlobPairs :: Output output => DiffRenderer output -> [BlobPair] -> Task ByteString
-diffBlobPairs renderer = fmap toOutput . distributeFoldMap (diffBlobPair renderer)
+diffBlobPairs renderer blobs = do
+  opts <- askOptions
+  toOutputWithMetadata opts <$> distributeFoldMap (diffBlobPair renderer) blobs
+  where toOutputWithMetadata opts = case renderer of
+          JSONDiffRenderer -> toOutput . renderJSONDiffs opts
+          _ -> toOutput
 
 -- | A task to parse a pair of 'Blob's, diff them, and render the 'Diff'.
 diffBlobPair :: DiffRenderer output -> BlobPair -> Task output
 diffBlobPair renderer blobs
   | Just (SomeParser parser) <- effectiveLanguage >>= qualify >>= someParser (Proxy :: Proxy '[ConstructorName, IdentifierName, Diffable, Eq1, GAlign, HasDeclaration, Show1, ToJSONFields1, Traversable])
-  = do
-    opts <- askOptions
-    case renderer of
+  = case renderer of
       OldToCDiffRenderer      -> run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))   diffTerms renderToCDiff
       ToCDiffRenderer         -> run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))   diffTerms renderToCDiff
-      JSONDiffRenderer        -> run (          parse parser      >=> decorate constructorLabel >=> decorate identifierLabel) diffTerms (\b d -> Map.union (renderJSONMetadata opts) (renderJSONDiff b d))
+      JSONDiffRenderer        -> run (          parse parser      >=> decorate constructorLabel >=> decorate identifierLabel) diffTerms renderJSONDiff
       SExpressionDiffRenderer -> run (          parse parser      >=> decorate constructorLabel . (Nil <$)) diffTerms (const renderSExpressionDiff)
 
   | Just parser <- effectiveLanguage >>= syntaxParserForLanguage
