@@ -11,6 +11,7 @@ import Data.Record
 import qualified Data.Term as Term
 import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm1, contextualize, postContextualize)
 import qualified Data.Syntax as Syntax
+import qualified Language.PHP.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
@@ -29,6 +30,7 @@ type Syntax = '[
   , Syntax.Error
   , Syntax.Context
   , Syntax.Program
+  , Syntax.Text
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -36,11 +38,15 @@ type Assignment = Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> manyTerm statement) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> ((\a b c -> a : b ++ [c]) <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
 manyTerm term = many (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
+
+
+text :: Assignment
+text = makeTerm <$> symbol Text <*> (Syntax.Text <$> source)
 
 statement :: Assignment
 statement = handleError everything
