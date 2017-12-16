@@ -35,6 +35,7 @@ type Syntax = '[
   , Declaration.VariableDeclaration
   , Syntax.Identifier
   , Syntax.VariableName
+  , Syntax.RequireOnce
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -84,10 +85,12 @@ expression = choice [
   -- includeExpression,
   -- includeOnceExpression,
   -- requireExpression,
-  -- requireOnceExpression
+  requireOnceExpression
   ]
 
--- TODO: Does this keep the range of VariableName?
+requireOnceExpression :: Assignment
+requireOnceExpression = makeTerm <$> symbol RequireOnceExpression <*> children (Syntax.RequireOnce <$> expression)
+
 variableName :: Assignment
 variableName = makeTerm <$> symbol VariableName <*> children (Syntax.VariableName <$> name)
 
