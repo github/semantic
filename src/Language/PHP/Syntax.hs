@@ -15,3 +15,11 @@ newtype Text a = Text ByteString
 instance Eq1 Text where liftEq = genericLiftEq
 instance Ord1 Text where liftCompare = genericLiftCompare
 instance Show1 Text where liftShowsPrec = genericLiftShowsPrec
+
+-- | Lookup type for a type-level key in a typescript map.
+data VariableName a = VariableName a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 VariableName where liftEq = genericLiftEq
+instance Ord1 VariableName where liftCompare = genericLiftCompare
+instance Show1 VariableName where liftShowsPrec = genericLiftShowsPrec

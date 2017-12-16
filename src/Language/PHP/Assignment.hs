@@ -31,6 +31,10 @@ type Syntax = '[
   , Syntax.Context
   , Syntax.Program
   , Syntax.Text
+  , Statement.Assignment
+  , Declaration.VariableDeclaration
+  , Syntax.Identifier
+  , Syntax.VariableName
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -50,7 +54,51 @@ text = makeTerm <$> symbol Text <*> (Syntax.Text <$> source)
 
 statement :: Assignment
 statement = handleError everything
-  where everything = choice [ string ]
+  where
+    everything = choice [
+  --   compoundStatement
+  -- , namedLabelStatement
+  -- , expressionStatement
+  -- , selectionStatement
+  -- , jumpStatement
+  -- , tryStatement
+  -- , declareStatement
+  -- , echoStatement
+  -- , constDeclaration
+  -- , functionDefinition
+  -- , classDeclaration
+  -- , interfaceDeclaration
+  -- , traitDeclaration
+  -- , namespaceDefinition
+  -- , namespaceUseDeclaration
+  -- , globalDeclaration
+      functionStaticDeclaration
+      ]
+
+expression :: Assignment
+expression = choice [
+  -- assignmentExpression,
+  -- yieldExpression,
+  -- unaryExpression,
+  -- binaryExpression,
+  -- includeExpression,
+  -- includeOnceExpression,
+  -- requireExpression,
+  -- requireOnceExpression
+  ]
+
+-- TODO: Does this keep the range of VariableName?
+variableName :: Assignment
+variableName = makeTerm <$> symbol VariableName <*> children (Syntax.VariableName <$> name)
+
+name :: Assignment
+name = makeTerm <$> symbol Name <*> (Syntax.Identifier <$> source)
+
+functionStaticDeclaration :: Assignment
+functionStaticDeclaration = makeTerm <$> symbol FunctionStaticDeclaration <*> children (Declaration.VariableDeclaration . pure <$> staticVariableDeclaration)
+
+staticVariableDeclaration :: Assignment
+staticVariableDeclaration = makeTerm <$> symbol StaticVariableDeclaration <*> children (Statement.Assignment <$> pure [] <*> variableName <*> (expression <|> emptyTerm))
 
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
