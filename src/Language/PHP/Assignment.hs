@@ -36,6 +36,7 @@ type Syntax = '[
   , Syntax.Identifier
   , Syntax.VariableName
   , Syntax.RequireOnce
+  , Syntax.Require
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -84,9 +85,13 @@ expression = choice [
   -- binaryExpression,
   -- includeExpression,
   -- includeOnceExpression,
-  -- requireExpression,
+  requireExpression,
   requireOnceExpression
   ]
+
+requireExpression :: Assignment
+requireExpression = makeTerm <$> symbol RequireExpression <*> children (Syntax.Require <$> expression)
+
 
 requireOnceExpression :: Assignment
 requireOnceExpression = makeTerm <$> symbol RequireOnceExpression <*> children (Syntax.RequireOnce <$> expression)

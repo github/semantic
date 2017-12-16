@@ -28,3 +28,10 @@ newtype RequireOnce a = RequireOnce a
 instance Eq1 RequireOnce where liftEq = genericLiftEq
 instance Ord1 RequireOnce where liftCompare = genericLiftCompare
 instance Show1 RequireOnce where liftShowsPrec = genericLiftShowsPrec
+
+newtype Require a = Require a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Require where liftEq          = genericLiftEq
+instance Ord1 Require where liftCompare    = genericLiftCompare
+instance Show1 Require where liftShowsPrec = genericLiftShowsPrec
