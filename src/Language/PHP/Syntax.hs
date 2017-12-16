@@ -35,3 +35,17 @@ newtype Require a = Require a
 instance Eq1 Require where liftEq          = genericLiftEq
 instance Ord1 Require where liftCompare    = genericLiftCompare
 instance Show1 Require where liftShowsPrec = genericLiftShowsPrec
+
+newtype Include a = Include a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Include where liftEq          = genericLiftEq
+instance Ord1 Include where liftCompare    = genericLiftCompare
+instance Show1 Include where liftShowsPrec = genericLiftShowsPrec
+
+newtype IncludeOnce a = IncludeOnce a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 IncludeOnce where liftEq          = genericLiftEq
+instance Ord1 IncludeOnce where liftCompare    = genericLiftCompare
+instance Show1 IncludeOnce where liftShowsPrec = genericLiftShowsPrec

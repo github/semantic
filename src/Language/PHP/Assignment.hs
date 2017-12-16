@@ -35,6 +35,8 @@ type Syntax = '[
   , Declaration.VariableDeclaration
   , Syntax.Identifier
   , Syntax.VariableName
+  , Syntax.IncludeOnce
+  , Syntax.Include
   , Syntax.RequireOnce
   , Syntax.Require
   , [] ]
@@ -83,11 +85,18 @@ expression = choice [
   -- yieldExpression,
   -- unaryExpression,
   -- binaryExpression,
-  -- includeExpression,
-  -- includeOnceExpression,
+  includeExpression,
+  includeOnceExpression,
   requireExpression,
   requireOnceExpression
   ]
+
+includeExpression :: Assignment
+includeExpression = makeTerm <$> symbol IncludeExpression <*> children (Syntax.Include <$> expression)
+
+
+includeOnceExpression :: Assignment
+includeOnceExpression = makeTerm <$> symbol IncludeOnceExpression <*> children (Syntax.IncludeOnce <$> expression)
 
 requireExpression :: Assignment
 requireExpression = makeTerm <$> symbol RequireExpression <*> children (Syntax.Require <$> expression)
