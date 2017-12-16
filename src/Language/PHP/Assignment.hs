@@ -39,6 +39,8 @@ type Syntax = '[
   , Syntax.Include
   , Syntax.RequireOnce
   , Syntax.Require
+  , Statement.Yield
+  , Syntax.ArrayElement
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -82,7 +84,7 @@ statement = handleError everything
 expression :: Assignment
 expression = choice [
   -- assignmentExpression,
-  -- yieldExpression,
+  yieldExpression,
   -- unaryExpression,
   -- binaryExpression,
   includeExpression,
@@ -90,6 +92,14 @@ expression = choice [
   requireExpression,
   requireOnceExpression
   ]
+
+yieldExpression :: Assignment
+yieldExpression = makeTerm <$> symbol YieldExpression <*> children (Statement.Yield <$> (arrayElementInitializer <|> expression))
+
+arrayElementInitializer :: Assignment
+arrayElementInitializer = makeTerm <$> symbol ArrayElementInitializer <*> children (Syntax.ArrayElement <$> (expression
+  -- <|> KeyValue <$> expression <*> expression
+  ))
 
 includeExpression :: Assignment
 includeExpression = makeTerm <$> symbol IncludeExpression <*> children (Syntax.Include <$> expression)

@@ -49,3 +49,10 @@ newtype IncludeOnce a = IncludeOnce a
 instance Eq1 IncludeOnce where liftEq          = genericLiftEq
 instance Ord1 IncludeOnce where liftCompare    = genericLiftCompare
 instance Show1 IncludeOnce where liftShowsPrec = genericLiftShowsPrec
+
+newtype ArrayElement a = ArrayElement a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 ArrayElement where liftEq          = genericLiftEq
+instance Ord1 ArrayElement where liftCompare    = genericLiftCompare
+instance Show1 ArrayElement where liftShowsPrec = genericLiftShowsPrec
