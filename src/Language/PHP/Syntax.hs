@@ -56,3 +56,17 @@ newtype ArrayElement a = ArrayElement a
 instance Eq1 ArrayElement where liftEq          = genericLiftEq
 instance Ord1 ArrayElement where liftCompare    = genericLiftCompare
 instance Show1 ArrayElement where liftShowsPrec = genericLiftShowsPrec
+
+newtype GlobalDeclaration a = GlobalDeclaration [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 GlobalDeclaration where liftEq          = genericLiftEq
+instance Ord1 GlobalDeclaration where liftCompare    = genericLiftCompare
+instance Show1 GlobalDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+newtype SimpleVariable a = SimpleVariable a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 SimpleVariable where liftEq          = genericLiftEq
+instance Ord1 SimpleVariable where liftCompare    = genericLiftCompare
+instance Show1 SimpleVariable where liftShowsPrec = genericLiftShowsPrec

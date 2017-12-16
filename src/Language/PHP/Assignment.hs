@@ -40,6 +40,8 @@ type Syntax = '[
   , Syntax.RequireOnce
   , Syntax.Require
   , Statement.Yield
+  , Syntax.SimpleVariable
+  , Syntax.GlobalDeclaration
   , Syntax.ArrayElement
   , [] ]
 
@@ -77,8 +79,8 @@ statement = handleError everything
   -- , traitDeclaration
   -- , namespaceDefinition
   -- , namespaceUseDeclaration
-  -- , globalDeclaration
-      functionStaticDeclaration
+        globalDeclaration
+      , functionStaticDeclaration
       ]
 
 expression :: Assignment
@@ -92,6 +94,13 @@ expression = choice [
   requireExpression,
   requireOnceExpression
   ]
+
+globalDeclaration :: Assignment
+globalDeclaration = makeTerm <$> symbol GlobalDeclaration <*> children (Syntax.GlobalDeclaration <$> manyTerm simpleVariable)
+
+simpleVariable :: Assignment
+simpleVariable = makeTerm <$> symbol SimpleVariable <*> children (Syntax.SimpleVariable <$> (variableName <|> simpleVariable <|> expression))
+
 
 yieldExpression :: Assignment
 yieldExpression = makeTerm <$> symbol YieldExpression <*> children (Statement.Yield <$> (arrayElementInitializer <|> expression))
