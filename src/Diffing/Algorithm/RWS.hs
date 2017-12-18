@@ -105,7 +105,7 @@ defaultOptions = Options
   }
 
 defaultP, defaultQ :: Int
-defaultP = 2
+defaultP = 0
 defaultQ = 3
 
 
@@ -125,9 +125,9 @@ defaultFeatureVectorDecorator
 defaultFeatureVectorDecorator getLabel = featureVectorDecorator . pqGramDecorator getLabel defaultP defaultQ
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
-featureVectorDecorator :: (Foldable f, Functor f, Hashable label) => Term f (Record (Gram label ': fields)) -> Term f (Record (FeatureVector ': fields))
-featureVectorDecorator = cata (\ (In (gram :. rest) functor) ->
-  termIn (foldl' addSubtermVector (unitVector (hash gram)) functor :. rest) functor)
+featureVectorDecorator :: (Foldable f, Functor f, Hashable label) => Term f (Record (label ': fields)) -> Term f (Record (FeatureVector ': fields))
+featureVectorDecorator = cata (\ (In (label :. rest) functor) ->
+  termIn (foldl' addSubtermVector (unitVector (hash label)) functor :. rest) functor)
   where addSubtermVector v term = addVectors v (rhead (termAnnotation term))
 
 -- | Annotates a term with the corresponding p,q-gram at each node.

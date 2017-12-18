@@ -240,8 +240,8 @@ isMethodOrFunction a = case unTerm a of
   (a `In` _) | getField a == C.SingletonMethod -> True
   _ -> False
 
-blobsForPaths :: Both FilePath -> IO (Both Blob)
-blobsForPaths = traverse (readFile . ("test/fixtures/toc/" <>))
+blobsForPaths :: Both FilePath -> IO BlobPair
+blobsForPaths = readFilePair . fmap ("test/fixtures/toc/" <>)
 
 sourceSpanBetween :: (Int, Int) -> (Int, Int) -> Span
 sourceSpanBetween (s1, e1) (s2, e2) = Span (Pos s1 e1) (Pos s2 e2)
@@ -253,4 +253,4 @@ blankDiff = merge (arrayInfo, arrayInfo) (Indexed [ inserting (Term $ literalInf
     literalInfo = Nothing :. Range 1 2 :. StringLiteral :. sourceSpanBetween (1, 2) (1, 4) :. Nil
 
 blankDiffBlobs :: Both Blob
-blankDiffBlobs = both (Blob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob) (Just TypeScript)) (Blob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob) (Just TypeScript))
+blankDiffBlobs = both (Blob (fromText "[]") "a.js" (Just TypeScript)) (Blob (fromText "[a]") "b.js" (Just TypeScript))

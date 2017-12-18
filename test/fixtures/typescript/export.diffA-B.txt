@@ -1,30 +1,22 @@
 (Program
   (Export
     (ExportClause
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Empty)+})+}
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Empty)+})+}
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Empty)+})+}
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Empty)+})+}
-    {-(ImportExportSpecifier
-      {-(Identifier)-}
-      {-(Empty)-})-}
-    {-(ImportExportSpecifier
-      {-(Identifier)-}
-      {-(Empty)-})-}
-    {-(ImportExportSpecifier
-      {-(Identifier)-}
-      {-(Empty)-})-}
-    {-(ImportExportSpecifier
-      {-(Identifier)-}
-      {-(Empty)-})-}))
+      (ImportExportSpecifier
+      { (Identifier)
+      ->(Identifier) }
+        (Empty))
+      (ImportExportSpecifier
+      { (Identifier)
+      ->(Identifier) }
+        (Empty))
+      (ImportExportSpecifier
+      { (Identifier)
+      ->(Identifier) }
+        (Empty))
+      (ImportExportSpecifier
+      { (Identifier)
+      ->(Identifier) }
+        (Empty))))
   (Export
     (ExportClause
     {-(ImportExportSpecifier
@@ -73,15 +65,15 @@
         (Identifier)
       { (Empty)
       ->(Identifier) })
+    {+(Assignment
+      {+(Empty)+}
+      {+(Identifier)+}
+      {+(Empty)+})+}
       (Assignment
         (Empty)
       { (Identifier)
       ->(Identifier) }
-        (Empty))
-    {+(Assignment
-      {+(Empty)+}
-      {+(Identifier)+}
-      {+(Empty)+})+}))
+        (Empty))))
   (Export
   { (Identifier)
   ->(Identifier) })

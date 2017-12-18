@@ -39,7 +39,7 @@ type Colourize = Bool
 formatError :: IncludeSource -> Colourize -> Blob -> Error String -> String
 formatError includeSource colourize Blob{..} Error{..}
   = ($ "")
-  $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showSpan (maybe Nothing (const (Just blobPath)) blobKind) errorSpan . showString ": ")
+  $ withSGRCode colourize [SetConsoleIntensity BoldIntensity] (showSpan (Just blobPath) errorSpan . showString ": ")
   . withSGRCode colourize [SetColor Foreground Vivid Red] (showString "error") . showString ": " . showExpectation colourize errorExpected errorActual . showChar '\n'
   . (if includeSource
     then showString (unpack context) . (if "\n" `isSuffixOf` context then id else showChar '\n')
