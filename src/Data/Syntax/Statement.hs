@@ -149,7 +149,8 @@ instance Ord1 Return where liftCompare = genericLiftCompare
 instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Return
-instance (MonadFail m) => Eval t v m Return
+instance (MonadFail m) => Eval t v m Return where
+  eval ev yield (Return a) = ev yield a
 
 
 newtype Yield a = Yield a
