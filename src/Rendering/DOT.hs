@@ -56,14 +56,14 @@ data Edge = Edge { edgeFrom :: Int, edgeTo :: Int }
 
 
 renderGraph :: Graph -> B.ByteString
-renderGraph Graph{..} = "digraph " <> maybe "" quote graphName <> " {" <> foldr ((<>) . renderNode) "" graphNodes <> foldr ((<>) . renderEdge) "" graphEdges <> "}"
+renderGraph Graph{..} = "digraph " <> maybe "" quote graphName <> " {\n" <> foldr ((<>) . renderNode) "" graphNodes <> foldr ((<>) . renderEdge) "" graphEdges <> "}"
   where quote a = "\"" <> a <> "\""
 
 renderNode :: Node -> B.ByteString
-renderNode Node{..} = B.pack (show nodeID) <> " [ " <> foldr (\ (key, value) rest -> key <> " = \"" <> value <> "\" " <> rest) "" (Map.toList nodeAttributes) <> "];"
+renderNode Node{..} = "\t" <> B.pack (show nodeID) <> " [ " <> foldr (\ (key, value) rest -> key <> " = \"" <> value <> "\" " <> rest) "" (Map.toList nodeAttributes) <> "];\n"
 
 renderEdge :: Edge -> B.ByteString
-renderEdge Edge{..} = B.pack (show edgeFrom) <> " -> " <> B.pack (show edgeTo) <> ";"
+renderEdge Edge{..} = "\t" <> B.pack (show edgeFrom) <> " -> " <> B.pack (show edgeTo) <> ";\n"
 
 
 instance Semigroup Graph where
