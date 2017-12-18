@@ -4,26 +4,20 @@ module Rendering.JSON
 ) where
 
 import Data.Aeson (ToJSON, toJSON, object, (.=))
-import Data.Aeson as A hiding (json)
+import Data.Aeson as A
 import Data.Blob
-import Data.Foldable (toList)
-import Data.Functor.Both (Both)
+import Data.Bifoldable (biList)
+import Data.Bifunctor.Join
 import Data.Language
 import qualified Data.Map as Map
 import Data.Text (Text)
-import Data.Text.Encoding (decodeUtf8)
 import GHC.Generics
 
---
--- Diffs
---
-
 -- | Render a diff to a string representing its JSON.
-renderJSONDiff :: ToJSON a => Both Blob -> a -> Map.Map Text Value
+renderJSONDiff :: ToJSON a => BlobPair -> a -> Map.Map Text Value
 renderJSONDiff blobs diff = Map.fromList
   [ ("diff", toJSON diff)
-  , ("oids", toJSON (decodeUtf8 . blobOid <$> toList blobs))
-  , ("paths", toJSON (blobPath <$> toList blobs))
+  , ("paths", toJSON (blobPath <$> (biList . runJoin) blobs))
   ]
 
 data File a = File { filePath :: FilePath, fileLanguage :: Maybe Language, fileContent :: a }
@@ -32,5 +26,6 @@ data File a = File { filePath :: FilePath, fileLanguage :: Maybe Language, fileC
 instance ToJSON a => ToJSON (File a) where
   toJSON File{..} = object [ "filePath" .= filePath, "language" .= fileLanguage, "programNode" .= fileContent ]
 
+-- | Render a term to a string representing its JSON.
 renderJSONTerm :: ToJSON a => Blob -> a -> [Value]
 renderJSONTerm Blob{..} = pure . toJSON . File blobPath blobLanguage

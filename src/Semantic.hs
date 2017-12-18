@@ -8,6 +8,7 @@ module Semantic
 ) where
 
 import Analysis.ConstructorName (ConstructorName, constructorLabel)
+import Analysis.IdentifierName (IdentifierName, identifierLabel)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra, syntaxDeclarationAlgebra)
 import Analysis.Decorator (syntaxIdentifierAlgebra)
 import Control.Exception
@@ -15,10 +16,10 @@ import Control.Monad ((>=>), guard)
 import Control.Monad.Error.Class
 import Data.Align.Generic
 import Data.Bifoldable
+import Data.Bifunctor.Join
 import Data.Blob
 import Data.ByteString (ByteString)
 import Data.Diff
-import Data.Functor.Both as Both
 import Data.Functor.Classes
 import Data.JSON.Fields
 import qualified Data.Language as Language
@@ -44,15 +45,15 @@ import Semantic.Task as Task
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
 parseBlobs :: Output output => TermRenderer output -> [Blob] -> Task ByteString
-parseBlobs renderer = fmap toOutput . distributeFoldMap (parseBlob renderer) . filter blobExists
+parseBlobs renderer = fmap toOutput . distributeFoldMap (parseBlob renderer)
 
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
 parseBlob :: TermRenderer output -> Blob -> Task output
 parseBlob renderer blob@Blob{..}
-  | Just (SomeParser parser) <- blobLanguage >>= someParser (Proxy :: Proxy '[ConstructorName, HasDeclaration, Foldable, Functor, ToJSONFields1])
+  | Just (SomeParser parser) <- blobLanguage >>= someParser (Proxy :: Proxy '[ConstructorName, IdentifierName, HasDeclaration, Foldable, Functor, ToJSONFields1])
   = parse parser blob >>= case renderer of
     ToCTermRenderer         -> decorate (declarationAlgebra blob)   >=> render (renderToCTerm  blob)
-    JSONTermRenderer        -> decorate constructorLabel            >=> render (renderJSONTerm blob)
+    JSONTermRenderer        -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)
     SExpressionTermRenderer -> decorate constructorLabel . (Nil <$) >=> render renderSExpressionTerm
     TagsTermRenderer        -> decorate (declarationAlgebra blob)   >=> render (renderToTags blob)
     DOTTermRenderer         ->                                          render (renderDOTTerm blob)
@@ -71,17 +72,17 @@ data NoParserForLanguage = NoParserForLanguage FilePath (Maybe Language.Language
   deriving (Eq, Exception, Ord, Show, Typeable)
 
 
-diffBlobPairs :: Output output => DiffRenderer output -> [Both Blob] -> Task ByteString
-diffBlobPairs renderer = fmap toOutput . distributeFoldMap (diffBlobPair renderer) . filter (any blobExists)
+diffBlobPairs :: Output output => DiffRenderer output -> [BlobPair] -> Task ByteString
+diffBlobPairs renderer = fmap toOutput . distributeFoldMap (diffBlobPair renderer)
 
 -- | A task to parse a pair of 'Blob's, diff them, and render the 'Diff'.
-diffBlobPair :: DiffRenderer output -> Both Blob -> Task output
+diffBlobPair :: DiffRenderer output -> BlobPair -> Task output
 diffBlobPair renderer blobs
-  | Just (SomeParser parser) <- effectiveLanguage >>= qualify >>= someParser (Proxy :: Proxy '[ConstructorName, Diffable, Eq1, GAlign, HasDeclaration, Show1, ToJSONFields1, Traversable])
+  | Just (SomeParser parser) <- effectiveLanguage >>= qualify >>= someParser (Proxy :: Proxy '[ConstructorName, IdentifierName, Diffable, Eq1, GAlign, HasDeclaration, Show1, ToJSONFields1, Traversable])
   = case renderer of
     OldToCDiffRenderer      -> run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))   diffTerms renderToCDiff
     ToCDiffRenderer         -> run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))   diffTerms renderToCDiff
-    JSONDiffRenderer        -> run (          parse parser)                                               diffTerms renderJSONDiff
+    JSONDiffRenderer        -> run (          parse parser      >=> decorate constructorLabel >=> decorate identifierLabel) diffTerms renderJSONDiff
     SExpressionDiffRenderer -> run (          parse parser      >=> decorate constructorLabel . (Nil <$)) diffTerms (const renderSExpressionDiff)
     DOTDiffRenderer         -> run (          parse parser)                                               diffTerms renderDOTDiff
 
@@ -94,10 +95,8 @@ diffBlobPair renderer blobs
     DOTDiffRenderer         -> run (          parse parser)                                                   diffSyntaxTerms renderDOTDiff
 
   | otherwise = throwError (SomeException (NoParserForLanguage effectivePath effectiveLanguage))
-  where (effectivePath, effectiveLanguage) = case runJoin blobs of
-          (Blob { blobLanguage = Just lang, blobPath = path }, _) -> (path, Just lang)
-          (_, Blob { blobLanguage = Just lang, blobPath = path }) -> (path, Just lang)
-          (Blob { blobPath = path }, _)                           -> (path, Nothing)
+  where effectiveLanguage = languageForBlobPair blobs
+        effectivePath = pathForBlobPair blobs
 
         qualify language | OldToCDiffRenderer <- renderer = guard (language `elem` aLaCarteLanguages) *> Just language
                          | otherwise                      =                                              Just language
@@ -111,24 +110,21 @@ diffBlobPair renderer blobs
             , Language.TypeScript
             ]
 
-        run :: (Foldable syntax, Functor syntax) => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Both Blob -> Diff syntax ann ann -> output) -> Task output
+        run :: (Foldable syntax, Functor syntax) => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (Join These Blob -> Diff syntax ann ann -> output) -> Task output
         run parse diff renderer = do
-          terms <- distributeFor blobs parse
+          terms <- bidistributeFor (runJoin blobs) parse parse
           time "diff" languageTag $ do
-            diff <- runBothWith (diffTermPair blobs diff) terms
+            diff <- diffTermPair diff terms
             writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
             render (renderer blobs) diff
           where
-            showLanguage = pure . (,) "language" . show
-            languageTag = let (a, b) = runJoin blobs
-                          in maybe (maybe [] showLanguage (blobLanguage b)) showLanguage (blobLanguage a)
+            languageTag = languageTagForBlobPair blobs
 
--- | A task to diff a pair of 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
-diffTermPair :: Functor syntax => Both Blob -> Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
-diffTermPair blobs differ t1 t2 = case runJoin (blobExists <$> blobs) of
-  (True, False) -> pure (deleting t1)
-  (False, True) -> pure (inserting t2)
-  _ -> diff differ t1 t2
+-- | A task to diff 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
+diffTermPair :: Functor syntax => Differ syntax ann1 ann2 -> These (Term syntax ann1) (Term syntax ann2) -> Task (Diff syntax ann1 ann2)
+diffTermPair _      (This  t1   ) = pure (deleting t1)
+diffTermPair _      (That     t2) = pure (inserting t2)
+diffTermPair differ (These t1 t2) = diff differ t1 t2
 
 keepCategory :: HasField fields Category => Record fields -> Record '[Category]
 keepCategory = (:. Nil) . category
