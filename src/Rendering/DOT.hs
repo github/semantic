@@ -29,8 +29,8 @@ diffAlgebra d i = case d of
   Merge t               -> termAlgebra t i
   Patch (Delete  t1)    -> termAlgebra t1 i `modifyHeadNode` setColour "red"
   Patch (Insert     t2) -> termAlgebra t2 i `modifyHeadNode` setColour "green"
-  Patch (Replace t1 t2) -> let (i', g1) =   termAlgebra t1 i                         `modifyHeadNode` setColour "red"
-                           in  (i', g1) <> (termAlgebra t2 (succ (maximum (i : i'))) `modifyHeadNode` setColour "green")
+  Patch (Replace t1 t2) -> let (i', g1) =  termAlgebra t1 i                         `modifyHeadNode` setColour "red"
+                           in  (i', g1) <> termAlgebra t2 (succ (maximum (i : i'))) `modifyHeadNode` setColour "green"
   where modifyHeadNode (i, g) f | n:ns <- graphNodes g = (i, g { graphNodes = f n : ns })
                                 | otherwise            = (i, g)
         setColour c n = n { nodeAttributes = Map.insert "color" c (nodeAttributes n) }
