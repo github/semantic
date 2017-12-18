@@ -15,14 +15,16 @@ import qualified Data.Map as Map
 import Data.Text (Text)
 import Semantic.Log
 import Data.Patch
+import Data.Monoid
 import Data.These
 
 
 -- | Render a diff to a value representing its JSON.
 renderJSONDiff :: ToJSON a => BlobPair -> a -> [Value]
 renderJSONDiff blobs diff = pure $
-  toJSON (object [ "diff" .= diff, "stat" .= object (toJSONFields statPatch) ])
+  toJSON (object [ "diff" .= diff, "stat" .= object (pathKey <> toJSONFields statPatch) ])
   where statPatch = these Delete Insert Replace (runJoin blobs)
+        pathKey = [ "path" .= pathKeyForBlobPair blobs ]
 
 renderJSONDiffs :: Options -> [Value] -> Map.Map Text Value
 renderJSONDiffs options = Map.union (renderJSONMetadata options) . Map.singleton "diffs" . toJSON
