@@ -19,7 +19,8 @@ import Data.Term
 import Data.These (These, mergeThese)
 
 renderDOTDiff :: (ConstructorName syntax, Foldable syntax, Functor syntax) => Join These Blob -> Diff syntax ann1 ann2 -> B.ByteString
-renderDOTDiff blobs diff = renderGraph (snd (cata diffAlgebra diff 0)) { graphName = Just (mergeThese ((<>) . (" -> " <>)) (runJoin (fmap (B.pack . blobPath) blobs))) }
+renderDOTDiff blobs diff = renderGraph (snd (cata diffAlgebra diff 0)) { graphName = Just (B.pack (mergeThese combine (runJoin (blobPath <$> blobs)))) }
+  where combine p1 p2 = p1 <> " -> " <> p2
 
 renderDOTTerm :: (ConstructorName syntax, Foldable syntax, Functor syntax) => Blob -> Term syntax ann -> B.ByteString
 renderDOTTerm Blob{..} term = renderGraph (snd (cata termAlgebra term 0)) { graphName = Just (B.pack blobPath) }
