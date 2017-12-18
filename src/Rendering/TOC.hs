@@ -21,17 +21,17 @@ import Data.Aeson
 import Data.Align (bicrosswalk)
 import Data.Bifoldable (bifoldMap)
 import Data.Bifunctor (bimap)
+import Data.Bifunctor.Join
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
 import Data.Diff
 import Data.Foldable (fold, foldl')
-import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Foldable (cata)
 import Data.Function (on)
 import Data.Language as Language
 import Data.List (sortOn)
 import qualified Data.List as List
-import qualified Data.Map as Map hiding (null)
+import qualified Data.Map as Map
 import Data.Maybe (fromMaybe, mapMaybe)
 import Data.Output
 import Data.Patch
@@ -160,15 +160,15 @@ recordSummary changeText record = case getDeclaration record of
     formatIdentifier (MethodDeclaration identifier _ _                  (Just receiver)) = receiver <> "." <> identifier
     formatIdentifier declaration = declarationIdentifier declaration
 
-renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Both Blob -> Diff f (Record fields) (Record fields) -> Summaries
+renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => BlobPair -> Diff f (Record fields) (Record fields) -> Summaries
 renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
-        summaryKey = T.pack $ case runJoin (blobPath <$> blobs) of
-          (before, after) | null before -> after
-                          | null after -> before
-                          | before == after -> after
-                          | otherwise -> before <> " -> " <> after
+        summaryKey = T.pack $ case bimap blobPath blobPath (runJoin blobs) of
+           This before -> before
+           That after -> after
+           These before after | before == after -> after
+                              | otherwise -> before <> " -> " <> after
 
 diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [TOCSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration

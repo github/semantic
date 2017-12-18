@@ -236,8 +236,8 @@ isMethodOrFunction a
   | any isJust (foldMap ((:[]) . rhead) a)         = True
   | otherwise                                      = False
 
-blobsForPaths :: Both FilePath -> IO (Both Blob)
-blobsForPaths = traverse (readFile . ("test/fixtures/toc/" <>))
+blobsForPaths :: Both FilePath -> IO BlobPair
+blobsForPaths = readFilePair . fmap ("test/fixtures/toc/" <>)
 
 blankDiff :: Diff'
 blankDiff = merge (arrayInfo, arrayInfo) (inj [ inserting (termIn literalInfo (inj (Syntax.Identifier "\"a\""))) ])
@@ -246,4 +246,4 @@ blankDiff = merge (arrayInfo, arrayInfo) (inj [ inserting (termIn literalInfo (i
     literalInfo = Nothing :. Range 1 2 :. Span (Pos 1 2) (Pos 1 4) :. Nil
 
 blankDiffBlobs :: Both Blob
-blankDiffBlobs = both (Blob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob) (Just TypeScript)) (Blob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob) (Just TypeScript))
+blankDiffBlobs = both (Blob (fromText "[]") "a.js" (Just TypeScript)) (Blob (fromText "[a]") "b.js" (Just TypeScript))

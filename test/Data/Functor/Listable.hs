@@ -27,6 +27,7 @@ module Data.Functor.Listable
 , ListableSyntax
 ) where
 
+import Analysis.CyclomaticComplexity
 import Analysis.Declaration
 import Control.Monad.Free as Free
 import Control.Monad.Trans.Free as FreeF
@@ -271,6 +272,9 @@ instance Listable Declaration where
     =  cons4 MethodDeclaration
     \/ cons3 FunctionDeclaration
     \/ cons2 (\ a b -> ErrorDeclaration a b Nothing)
+
+instance Listable CyclomaticComplexity where
+  tiers = cons1 CyclomaticComplexity
 
 instance Listable Language.Language where
   tiers

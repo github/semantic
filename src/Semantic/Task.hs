@@ -17,6 +17,8 @@ module Semantic.Task
 , distribute
 , distributeFor
 , distributeFoldMap
+, bidistribute
+, bidistributeFor
 , defaultOptions
 , configureOptionsForHandle
 , terminalFormatter
@@ -41,6 +43,8 @@ import Data.Diff
 import qualified Data.Error as Error
 import Data.Foldable (fold, for_)
 import Data.Functor.Both as Both hiding (snd)
+import Data.Bitraversable
+import Data.Bifunctor
 import Data.Functor.Foldable (cata)
 import Data.Language
 import Data.Record
@@ -60,7 +64,7 @@ import Semantic.Queue
 
 data TaskF output where
   ReadBlobs :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
-  ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [Both Blob]
+  ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [BlobPair]
   WriteToOutput :: Either Handle FilePath -> B.ByteString -> TaskF ()
   WriteLog :: Level -> String -> [(String, String)] -> TaskF ()
   WriteStat :: Stat -> TaskF ()
@@ -70,6 +74,7 @@ data TaskF output where
   Diff :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
   Render :: Renderer input output -> input -> TaskF output
   Distribute :: Traversable t => t (Task output) -> TaskF (t output)
+  Bidistribute :: Bitraversable t => t (Task output1) (Task output2) -> TaskF (t output1 output2)
 
   -- | For MonadIO.
   LiftIO :: IO a -> TaskF a
@@ -92,7 +97,7 @@ readBlobs :: Either Handle [(FilePath, Maybe Language)] -> Task [Blob]
 readBlobs from = ReadBlobs from `Then` return
 
 -- | A 'Task' which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
-readBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> Task [Both Blob]
+readBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> Task [BlobPair]
 readBlobPairs from = ReadBlobPairs from `Then` return
 
 -- | A 'Task' which writes a 'B.ByteString' to a 'Handle' or a 'FilePath'.
@@ -133,11 +138,23 @@ render renderer input = Render renderer input `Then` return
 distribute :: Traversable t => t (Task output) -> Task (t output)
 distribute tasks = Distribute tasks `Then` return
 
+-- | Distribute a 'Bitraversable' container of 'Task's over the available cores (i.e. execute them concurrently), collecting their results.
+--
+--   This is a concurrent analogue of 'bisequenceA'.
+bidistribute :: Bitraversable t => t (Task output1) (Task output2) -> Task (t output1 output2)
+bidistribute tasks = Bidistribute tasks `Then` return
+
 -- | Distribute the application of a function to each element of a 'Traversable' container of inputs over the available cores (i.e. perform the function concurrently for each element), collecting the results.
 --
 --   This is a concurrent analogue of 'for' or 'traverse' (with the arguments flipped).
 distributeFor :: Traversable t => t a -> (a -> Task output) -> Task (t output)
 distributeFor inputs toTask = distribute (fmap toTask inputs)
+
+-- | Distribute the application of a function to each element of a 'Bitraversable' container of inputs over the available cores (i.e. perform the functions concurrently for each element), collecting the results.
+--
+--   This is a concurrent analogue of 'bifor' or 'bitraverse' (with the arguments flipped).
+bidistributeFor :: Bitraversable t => t a b -> (a -> Task output1) -> (b -> Task output2) -> Task (t output1 output2)
+bidistributeFor inputs toTask1 toTask2 = bidistribute (bimap toTask1 toTask2 inputs)
 
 -- | Distribute the application of a function to each element of a 'Traversable' container of inputs over the available cores (i.e. perform the function concurrently for each element), combining the results 'Monoid'ally into a final value.
 --
@@ -175,11 +192,11 @@ runTaskWithOptions options task = do
     run options logger statter = go
       where
         go :: Task a -> IO (Either SomeException a)
-        go = iterFreerA (\ task yield -> case task of
+        go = iterFreerA (\ yield task -> case task of
           ReadBlobs (Left handle) -> (IO.readBlobsFromHandle handle >>= yield) `catchError` (pure . Left . toException)
           ReadBlobs (Right paths@[(path, Nothing)]) -> (IO.isDirectory path >>= bool (IO.readBlobsFromPaths paths) (IO.readBlobsFromDir path) >>= yield) `catchError` (pure . Left . toException)
           ReadBlobs (Right paths) -> (IO.readBlobsFromPaths paths >>= yield) `catchError` (pure . Left . toException)
-          ReadBlobPairs source -> (either IO.readBlobPairsFromHandle (traverse (traverse (uncurry IO.readFile))) source >>= yield) `catchError` (pure . Left . toException)
+          ReadBlobPairs source -> (either IO.readBlobPairsFromHandle (traverse (runBothWith IO.readFilePair)) source >>= yield) `catchError` (pure . Left . toException)
           WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
           WriteLog level message pairs -> queueLogMessage logger level message pairs >>= yield
           WriteStat stat -> queue statter stat >>= yield
@@ -189,6 +206,7 @@ runTaskWithOptions options task = do
           Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2) >>= yield
           Render renderer input -> pure (renderer input) >>= yield
           Distribute tasks -> Async.mapConcurrently go tasks >>= either (pure . Left) yield . sequenceA . withStrategy (parTraversable (parTraversable rseq))
+          Bidistribute tasks -> Async.runConcurrently (bitraverse (Async.Concurrently . go) (Async.Concurrently . go) tasks) >>= either (pure . Left) yield . bisequenceA . withStrategy (parBitraversable (parTraversable rseq) (parTraversable rseq))
           LiftIO action -> action >>= yield
           Throw err -> pure (Left err)
           Catch during handler -> do
@@ -196,6 +214,9 @@ runTaskWithOptions options task = do
             case result of
               Left err -> go (handler err) >>= either (pure . Left) yield
               Right a -> yield a) . fmap Right
+
+        parBitraversable :: Bitraversable t => Strategy a -> Strategy b -> Strategy (t a b)
+        parBitraversable strat1 strat2 = bitraverse (rparWith strat1) (rparWith strat2)
 
 runParser :: Options -> Blob -> Parser term -> Task term
 runParser Options{..} blob@Blob{..} = go

@@ -33,7 +33,7 @@ runAlgorithm :: forall syntax fields1 fields2 m result
                (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
                result
              -> m result
-runAlgorithm = iterFreerA (\ step yield -> case step of
+runAlgorithm = iterFreerA (\ yield step -> case step of
   Diffing.Algorithm.Diff t1 t2 -> runAlgorithm (algorithmForTerms t1 t2) <|> pure (replacing t1 t2) >>= yield
   Linear (Term (In ann1 f1)) (Term (In ann2 f2)) -> merge (ann1, ann2) <$> galignWith (runAlgorithm . diffThese) f1 f2 >>= yield
   RWS as bs -> traverse (runAlgorithm . diffThese) (rws comparableTerms equivalentTerms as bs) >>= yield

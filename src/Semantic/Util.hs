@@ -5,10 +5,11 @@ module Semantic.Util where
 import Analysis.Declaration
 import Control.Monad.IO.Class
 import Data.Align.Generic
+import Data.Maybe
 import Data.Blob
 import Data.Diff
-import Data.Functor.Both
 import Data.Functor.Classes
+import Data.Bifunctor.Join
 import Data.Range
 import Data.Record
 import Data.Span
@@ -21,7 +22,7 @@ import Semantic.IO as IO
 import Semantic.Task
 
 file :: MonadIO m => FilePath -> m Blob
-file path = IO.readFile path (languageForFilePath path)
+file path = IO.readFile path (languageForFilePath path) >>= pure . fromJust
 
 diffWithParser :: (HasField fields Data.Span.Span,
                    HasField fields Range,
@@ -31,8 +32,21 @@ diffWithParser :: (HasField fields Data.Span.Span,
                    GAlign syntax, HasDeclaration syntax)
                   =>
                   Parser (Term syntax (Record fields))
-                  -> Both Blob
+                  -> BlobPair
                   -> Task (Diff syntax (Record (Maybe Declaration ': fields)) (Record (Maybe Declaration ': fields)))
 diffWithParser parser = run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))
   where
-    run parse sourceBlobs = distributeFor sourceBlobs parse >>= runBothWith (diffTermPair sourceBlobs diffTerms)
+    run parse blobs = bidistributeFor (runJoin blobs) parse parse >>= diffTermPair diffTerms
+
+diffBlobWithParser :: (HasField fields Data.Span.Span,
+                   HasField fields Range,
+                   Eq1 syntax, Show1 syntax,
+                   Traversable syntax, Functor syntax,
+                   Foldable syntax, Diffable syntax,
+                   GAlign syntax, HasDeclaration syntax)
+                  => Parser (Term syntax (Record fields))
+                  -> Blob
+                  -> Task (Term syntax (Record (Maybe Declaration : fields)))
+diffBlobWithParser parser = run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))
+  where
+    run parse sourceBlob = parse sourceBlob

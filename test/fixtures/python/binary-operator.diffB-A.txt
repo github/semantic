@@ -26,12 +26,18 @@
   (Modulo
     (Identifier)
     (Identifier))
-{+(DividedBy
+{ (Power
+  {-(Identifier)-}
+  {-(Identifier)-})
+->(DividedBy
   {+(Identifier)+}
-  {+(Identifier)+})+}
-{+(Power
+  {+(Identifier)+}) }
+{ (DividedBy
+  {-(Identifier)-}
+  {-(Identifier)-})
+->(Power
   {+(Identifier)+}
-  {+(Identifier)+})+}
+  {+(Identifier)+}) }
 {+(BOr
   {+(Identifier)+}
   {+(Identifier)+})+}
@@ -47,12 +53,6 @@
 {+(RShift
   {+(Identifier)+}
   {+(Identifier)+})+}
-{-(Power
-  {-(Identifier)-}
-  {-(Identifier)-})-}
-{-(DividedBy
-  {-(Identifier)-}
-  {-(Identifier)-})-}
 {-(Modulo
   {-(Identifier)-}
   {-(Identifier)-})-}
