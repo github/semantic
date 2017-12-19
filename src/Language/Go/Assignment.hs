@@ -153,6 +153,7 @@ expressionChoices =
   , identifier
   , importDeclaration
   , importSpec
+  , importSpecList
   , indexExpression
   , interpretedStringLiteral
   , intLiteral
@@ -391,6 +392,9 @@ importDeclaration = makeTerm <$> symbol ImportDeclaration <*> children (Declarat
 
 importSpec :: Assignment
 importSpec = symbol ImportSpec *> children expressions
+
+importSpecList :: Assignment
+importSpecList = symbol ImportSpecList *> children expressions
 
 indexExpression :: Assignment
 indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)
