@@ -4,8 +4,6 @@ module Parsing.Parser
 , SomeParser(..)
 , someParser
 , ApplyAll
--- Syntax parsers
-, syntaxParserForLanguage
 -- À la carte parsers
 , goParser
 , jsonParser
@@ -27,20 +25,18 @@ import qualified Data.Syntax as Syntax
 import Data.Term
 import Data.Union
 import Foreign.Ptr
-import Info hiding (Empty, Go)
 import qualified Language.Go.Assignment as Go
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
-import Syntax hiding (Go)
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import TreeSitter.Go
+import TreeSitter.JSON
 import TreeSitter.Python
 import TreeSitter.Ruby
 import TreeSitter.TypeScript
-import TreeSitter.JSON
 
 -- | A parser from 'Source' onto some term type.
 data Parser term where
@@ -51,8 +47,6 @@ data Parser term where
                    => Parser (Term ast (Node grammar))                           -- ^ A parser producing AST.
                    -> Assignment ast grammar (Term (Union fs) (Record Location)) -- ^ An assignment from AST onto 'Term's.
                    -> Parser (Term (Union fs) (Record Location))                 -- ^ A parser producing 'Term's.
-  -- | A tree-sitter parser.
-  TreeSitterParser :: Ptr TS.Language -> Parser (Term Syntax (Record DefaultFields))
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
 
@@ -71,7 +65,7 @@ data SomeParser typeclasses ann where
 --
 --   This can be used to perform operations uniformly over terms produced by blobs with different 'Language's, and which therefore have different types in general. For example, given some 'Blob', we can parse and 'show' the parsed & assigned 'Term' like so:
 --
---   > case someParser (Proxy :: Proxy '[Show1]) (blobLanguage language) of { Just (SomeParser parser) -> runTask (parse parser blob) >>= putStrLn . show ; _ -> return () }
+--   > case someParser (Proxy :: Proxy '[Show1]) <$> blobLanguage language of { Just (SomeParser parser) -> runTask (parse parser blob) >>= putStrLn . show ; _ -> return () }
 someParser :: ( ApplyAll typeclasses (Union Go.Syntax)
               , ApplyAll typeclasses (Union JSON.Syntax)
               , ApplyAll typeclasses (Union Markdown.Syntax)
@@ -79,28 +73,18 @@ someParser :: ( ApplyAll typeclasses (Union Go.Syntax)
               , ApplyAll typeclasses (Union Ruby.Syntax)
               , ApplyAll typeclasses (Union TypeScript.Syntax)
               )
-           => proxy typeclasses                                -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
-           -> Language                                         -- ^ The 'Language' to select.
-           -> Maybe (SomeParser typeclasses (Record Location)) -- ^ 'Maybe' a 'SomeParser' abstracting the syntax type to be produced.
-someParser _ Go         = Just (SomeParser goParser)
-someParser _ JavaScript = Just (SomeParser typescriptParser)
-someParser _ JSON       = Just (SomeParser jsonParser)
-someParser _ JSX        = Just (SomeParser typescriptParser)
-someParser _ Markdown   = Just (SomeParser markdownParser)
-someParser _ Python     = Just (SomeParser pythonParser)
-someParser _ Ruby       = Just (SomeParser rubyParser)
-someParser _ TypeScript = Just (SomeParser typescriptParser)
+           => proxy typeclasses                        -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
+           -> Language                                 -- ^ The 'Language' to select.
+           -> SomeParser typeclasses (Record Location) -- ^ A 'SomeParser' abstracting the syntax type to be produced.
+someParser _ Go         = SomeParser goParser
+someParser _ JavaScript = SomeParser typescriptParser
+someParser _ JSON       = SomeParser jsonParser
+someParser _ JSX        = SomeParser typescriptParser
+someParser _ Markdown   = SomeParser markdownParser
+someParser _ Python     = SomeParser pythonParser
+someParser _ Ruby       = SomeParser rubyParser
+someParser _ TypeScript = SomeParser typescriptParser
 
--- | Return a 'Language'-specific 'Parser', if one exists.
-syntaxParserForLanguage :: Language -> Maybe (Parser (Term Syntax (Record DefaultFields)))
-syntaxParserForLanguage language = case language of
-  Go         -> Just (TreeSitterParser tree_sitter_go)
-  JavaScript -> Just (TreeSitterParser tree_sitter_typescript)
-  JSON       -> Just (TreeSitterParser tree_sitter_json)
-  JSX        -> Just (TreeSitterParser tree_sitter_typescript)
-  Ruby       -> Just (TreeSitterParser tree_sitter_ruby)
-  TypeScript -> Just (TreeSitterParser tree_sitter_typescript)
-  _ -> Nothing
 
 goParser :: Parser Go.Term
 goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment

@@ -66,8 +66,9 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     diffArgumentsParser = runDiff
       <$> (   flag  (SomeRenderer SExpressionDiffRenderer) (SomeRenderer SExpressionDiffRenderer) (long "sexpression" <> help "Output s-expression diff tree")
           <|> flag'                                        (SomeRenderer JSONDiffRenderer)        (long "json" <> help "Output JSON diff trees")
-          <|> flag'                                        (SomeRenderer OldToCDiffRenderer)      (long "toc" <> help "Output JSON table of contents diff summary")
-          <|> flag'                                        (SomeRenderer ToCDiffRenderer)         (long "toc-assignment" <> help "Output JSON table of contents diff summary using the assignment parser") )
+          <|> flag'                                        (SomeRenderer ToCDiffRenderer)         (long "toc" <> help "Output JSON table of contents diff summary")
+          <|> flag'                                        (SomeRenderer ToCDiffRenderer)         (long "toc-assignment" <> help "Output JSON table of contents diff summary using the assignment parser")
+          <|> flag'                                        (SomeRenderer DOTDiffRenderer)         (long "dot" <> help "Output the diff as a DOT graph"))
       <*> (   Right <$> some (both
           <$> argument filePathReader (metavar "FILE_A")
           <*> argument filePathReader (metavar "FILE_B"))
@@ -78,7 +79,8 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       <$> (   flag  (SomeRenderer SExpressionTermRenderer) (SomeRenderer SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
           <|> flag'                                        (SomeRenderer JSONTermRenderer)        (long "json" <> help "Output JSON parse trees")
           <|> flag'                                        (SomeRenderer ToCTermRenderer)         (long "toc" <> help "Output JSON table of contents summary")
-          <|> flag'                                        (SomeRenderer TagsTermRenderer)        (long "tags" <> help "Output JSON tags/symbols"))
+          <|> flag'                                        (SomeRenderer TagsTermRenderer)        (long "tags" <> help "Output JSON tags/symbols")
+          <|> flag'                                        (SomeRenderer DOTTermRenderer)         (long "dot" <> help "Output the term as a DOT graph"))
       <*> (   Right <$> some (argument filePathReader (metavar "FILES..."))
           <|> pure (Left stdin) )
 

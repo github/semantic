@@ -13,12 +13,15 @@ module Rendering.Renderer
 , renderToCDiff
 , renderToCTerm
 , renderToTags
+, renderDOTDiff
+, renderDOTTerm
 , Summaries(..)
 ) where
 
 import Data.Aeson (Value)
 import Data.ByteString (ByteString)
 import Data.Output
+import Rendering.DOT as R
 import Rendering.JSON as R
 import Rendering.SExpression as R
 import Rendering.Tag as R
@@ -27,13 +30,13 @@ import Rendering.TOC as R
 -- | Specification of renderers for diffs, producing output in the parameter type.
 data DiffRenderer output where
   -- | Compute a table of contents for the diff & encode it as JSON.
-  OldToCDiffRenderer :: DiffRenderer Summaries
-  -- | Compute a table of contents for the diff & encode it as JSON (uses the new Assignment parse tree parser).
   ToCDiffRenderer :: DiffRenderer Summaries
   -- | Render to JSON with the format documented in docs/json-format.md
   JSONDiffRenderer :: DiffRenderer [Value]
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
   SExpressionDiffRenderer :: DiffRenderer ByteString
+  -- | Render to a 'ByteString' formatted as a DOT description of the diff.
+  DOTDiffRenderer :: DiffRenderer ByteString
 
 deriving instance Eq (DiffRenderer output)
 deriving instance Show (DiffRenderer output)
@@ -48,6 +51,8 @@ data TermRenderer output where
   SExpressionTermRenderer :: TermRenderer ByteString
   -- | Render to a list of tags.
   TagsTermRenderer :: TermRenderer [Value]
+  -- | Render to a 'ByteString' formatted as a DOT description of the term.
+  DOTTermRenderer :: TermRenderer ByteString
 
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)

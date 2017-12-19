@@ -54,7 +54,7 @@ diffFixtures :: [(SomeRenderer DiffRenderer, Either Handle [Both (FilePath, Mayb
 diffFixtures =
   [ (SomeRenderer JSONDiffRenderer, pathMode, jsonOutput)
   , (SomeRenderer SExpressionDiffRenderer, pathMode, sExpressionOutput)
-  , (SomeRenderer OldToCDiffRenderer, pathMode, tocOutput)
+  , (SomeRenderer ToCDiffRenderer, pathMode, tocOutput)
   ]
   where pathMode = Right [both ("test/fixtures/ruby/method-declaration.A.rb", Just Ruby) ("test/fixtures/ruby/method-declaration.B.rb", Just Ruby)]
 

@@ -6,8 +6,6 @@ import Data.Functor.Identity
 import Data.Functor.Listable
 import Data.Maybe (catMaybes)
 import Data.Mergeable
-import Data.Syntax
-import Syntax
 import Test.Hspec
 import Test.Hspec.LeanCheck
 import Test.LeanCheck
@@ -23,12 +21,9 @@ spec = parallel $ do
   describe "Identity" $ do
     withAlternativeInstances sequenceAltLaws (Identity `mapT` tiers :: [Tier (Identity Char)])
     withAlternativeInstances mergeLaws (Identity `mapT` tiers :: [Tier (Identity Char)])
-  describe "Union" $ do
+  describe "ListableSyntax" $ do
     withAlternativeInstances sequenceAltLaws (tiers :: [Tier (ListableSyntax Char)])
     withAlternativeInstances mergeLaws (tiers :: [Tier (ListableSyntax Char)])
-  describe "Syntax" $ do
-    withAlternativeInstances sequenceAltLaws (tiers :: [Tier (Syntax Char)])
-    withAlternativeInstances mergeLaws (tiers :: [Tier (Syntax Char)])
 
   prop "subsumes catMaybes/Just" $
     \ a -> sequenceAlt a `shouldBe` pure (catMaybes (a :: [Maybe Char]))

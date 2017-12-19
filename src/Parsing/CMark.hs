@@ -8,9 +8,10 @@ module Parsing.CMark
 import CMarkGFM
 import qualified Data.AST as A
 import Data.Ix
+import Data.Range
+import Data.Span
 import Data.Source
 import Data.Term
-import Info
 import TreeSitter.Language (Symbol(..), SymbolType(..))
 
 data Grammar

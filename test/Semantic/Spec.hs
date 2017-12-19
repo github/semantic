@@ -10,7 +10,6 @@ import Data.Term
 import Rendering.Renderer
 import Semantic
 import Semantic.Task
-import Syntax
 import System.Exit
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty

@@ -36,10 +36,10 @@ import Data.Output
 import Data.Patch
 import Data.Record
 import Data.Semigroup ((<>))
+import Data.Span
 import Data.Term
 import qualified Data.Text as T
 import GHC.Generics
-import Info
 
 data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }
   deriving (Eq, Show)
@@ -151,8 +151,8 @@ entrySummary entry = case entry of
 -- | Construct a 'TOCSummary' from a node annotation and a change type label.
 recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => T.Text -> Record fields -> Maybe TOCSummary
 recordSummary changeText record = case getDeclaration record of
-  Just (ErrorDeclaration text _ language) -> Just $ ErrorSummary text (sourceSpan record) language
-  Just declaration -> Just $ TOCSummary (toCategoryName declaration) (formatIdentifier declaration) (sourceSpan record) changeText
+  Just (ErrorDeclaration text _ language) -> Just $ ErrorSummary text (getField record) language
+  Just declaration -> Just $ TOCSummary (toCategoryName declaration) (formatIdentifier declaration) (getField record) changeText
   Nothing -> Nothing
   where
     formatIdentifier (MethodDeclaration identifier _ (Just Language.Go) (Just receiver)) = "(" <> receiver <> ") " <> identifier

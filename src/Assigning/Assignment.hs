@@ -108,12 +108,13 @@ import Data.Functor.Classes
 import Data.Ix (Ix(..))
 import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
 import Data.Maybe
+import Data.Range
 import Data.Record
 import Data.Semigroup
 import qualified Data.Source as Source (Source, slice, sourceBytes)
+import Data.Span
 import Data.Term
 import GHC.Stack
-import qualified Info
 import Prelude hiding (fail, until)
 import Text.Parser.Combinators as Parsers hiding (choice)
 import TreeSitter.Language
@@ -262,7 +263,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
 
                 anywhere node = case runTracing t of
                   End -> requireExhaustive (tracingCallSite t) ((), state) >>= uncurry yield
-                  Location -> yield (Info.Range stateOffset stateOffset :. Info.Span statePos statePos :. Nil) state
+                  Location -> yield (Range stateOffset stateOffset :. Span statePos statePos :. Nil) state
                   Many rule -> fix (\ recur state -> (go rule state >>= \ (a, state') -> first (a:) <$> if state == state' then pure ([], state') else recur state') `catchError` const (pure ([], state))) state >>= uncurry yield
                   Alt (a:as) -> sconcat (flip yield state <$> a:|as)
                   Label child label -> go child state `catchError` (\ err -> throwError err { errorExpected = [Left label] }) >>= uncurry yield
@@ -274,7 +275,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   (Choose table _ _, State { stateNodes = Term (In node _) : _ }) | symbolType (nodeSymbol node) /= Regular, symbols@(_:_) <- Table.tableAddresses table, all ((== Regular) . symbolType) symbols -> skipTokens initialState
                   _ -> initialState
                 expectedSymbols = firstSet (t `Then` return)
-                makeError = withStateCallStack (tracingCallSite t) state $ maybe (Error (Info.Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
+                makeError = withStateCallStack (tracingCallSite t) state $ maybe (Error (Span statePos statePos) (fmap Right expectedSymbols) Nothing) (nodeError (fmap Right expectedSymbols))
 
 requireExhaustive :: Symbol grammar => Maybe (String, SrcLoc) -> (result, State ast grammar) -> Either (Error (Either String grammar)) (result, State ast grammar)
 requireExhaustive callSite (a, state) = let state' = skipTokens state in case stateNodes state' of
@@ -290,13 +291,13 @@ skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . n
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
 advanceState :: State ast grammar -> State ast grammar
 advanceState state@State{..}
-  | Term (In Node{..} _) : rest <- stateNodes = State (Info.end nodeByteRange) (Info.spanEnd nodeSpan) stateCallSites rest
+  | Term (In Node{..} _) : rest <- stateNodes = State (end nodeByteRange) (spanEnd nodeSpan) stateCallSites rest
   | otherwise = state
 
 -- | State kept while running 'Assignment's.
 data State ast grammar = State
   { stateOffset :: {-# UNPACK #-} !Int    -- ^ The offset into the Source thus far reached, measured in bytes.
-  , statePos :: {-# UNPACK #-} !Info.Pos  -- ^ The (1-indexed) line/column position in the Source thus far reached.
+  , statePos :: {-# UNPACK #-} !Pos  -- ^ The (1-indexed) line/column position in the Source thus far reached.
   , stateCallSites :: ![(String, SrcLoc)] -- ^ The symbols & source locations of the calls thus far.
   , stateNodes :: ![AST ast grammar]      -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
   }
@@ -305,7 +306,7 @@ deriving instance (Eq grammar, Eq1 ast) => Eq (State ast grammar)
 deriving instance (Show grammar, Show1 ast) => Show (State ast grammar)
 
 makeState :: [AST ast grammar] -> State ast grammar
-makeState = State 0 (Info.Pos 1 1) []
+makeState = State 0 (Pos 1 1) []
 
 
 -- Instances
@@ -378,7 +379,7 @@ instance Show1 f => Show1 (Tracing f) where
 instance (Enum grammar, Ix grammar, Show grammar, Show1 ast) => Show1 (AssignmentF ast grammar) where
   liftShowsPrec sp sl d a = case a of
     End -> showString "End" . showChar ' ' . sp d ()
-    Location -> showString "Location" . sp d (Info.Range 0 0 :. Info.Span (Info.Pos 1 1) (Info.Pos 1 1) :. Nil)
+    Location -> showString "Location" . sp d (Range 0 0 :. Span (Pos 1 1) (Pos 1 1) :. Nil)
     CurrentNode -> showString "CurrentNode"
     Source -> showString "Source" . showChar ' ' . sp d ""
     Children a -> showsUnaryWith showChild "Children" d a

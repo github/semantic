@@ -1,11 +1,8 @@
 {-# LANGUAGE DataKinds #-}
 module Data.Term.Spec where
 
-import Category
 import Data.Functor.Listable
-import Data.Record
 import Data.Term
-import Syntax
 import Test.Hspec (Spec, describe, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
@@ -14,4 +11,4 @@ spec :: Spec
 spec = parallel $ do
   describe "Term" $ do
     prop "equality is reflexive" $
-      \ a -> unListableF a `shouldBe` (unListableF a :: Term Syntax (Record '[Category]))
+      \ a -> a `shouldBe` (a :: Term ListableSyntax ())
