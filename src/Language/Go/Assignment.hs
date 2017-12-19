@@ -163,6 +163,7 @@ expressionChoices =
   , literalValue
   , methodDeclaration
   , methodSpec
+  , methodSpecList
   , packageClause
   , packageIdentifier
   , parameterDeclaration
@@ -409,6 +410,9 @@ methodSpec :: Assignment
 methodSpec =  makeTerm <$> symbol MethodSpec <*> children (mkMethodSpec <$> expression <*> parameters <*> (expression <|> emptyTerm))
   where
     mkMethodSpec name' params optionalTypeLiteral = Declaration.MethodSignature [optionalTypeLiteral] name' [params]
+
+methodSpecList :: Assignment
+methodSpecList = symbol MethodSpecList *> children expressions
 
 packageClause :: Assignment
 packageClause = makeTerm <$> symbol PackageClause <*> children (Declaration.Module <$> expression <*> pure [])
