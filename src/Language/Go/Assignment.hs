@@ -117,7 +117,8 @@ expression = term (handleError (choice expressionChoices))
 
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
-  [ assignment'
+  [ argumentList
+  , assignment'
   , binaryExpression
   , block
   , breakStatement
@@ -319,6 +320,9 @@ typeDeclaration = makeTerm <$> symbol TypeDeclaration <*> children (manyTerm ( (
 
 
 -- Expressions
+
+argumentList :: Assignment
+argumentList = symbol ArgumentList *> children expressions
 
 binaryExpression :: Assignment
 binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression expression
