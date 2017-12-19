@@ -15,6 +15,7 @@
       (Pointer
         (Call
           (Identifier)
+          ([])
           (Empty)))
       (Complement
         (Identifier))

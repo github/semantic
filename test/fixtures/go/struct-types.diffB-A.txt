@@ -11,7 +11,8 @@
         { (Identifier)
         ->(Identifier) }
           (Constructor
-            (Empty))))
+            (Empty)
+            ([]))))
       (
         (Type
         { (Identifier)
@@ -38,13 +39,14 @@
         ->(Identifier) }
           (Constructor
             (Empty)
-            (Field
-              (
-                (MemberAccess
-                  (Identifier)
-                  (Identifier))))
-            (Field
-              (Identifier)
-              (TextElement)
-              (
-                (Identifier)))))))))
+            (
+              (Field
+                (
+                  (MemberAccess
+                    (Identifier)
+                    (Identifier))))
+              (Field
+                (Identifier)
+                (TextElement)
+                (
+                  (Identifier))))))))))

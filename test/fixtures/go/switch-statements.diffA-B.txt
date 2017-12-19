@@ -16,6 +16,7 @@
           ->(Identifier) })
           (Call
             (Identifier)
+            ([])
             (Empty)))
         (Pattern
           (LessThan
@@ -27,6 +28,7 @@
           {-(Comment)-}
             (Call
               (Identifier)
+              ([])
               (Empty)))-})
       {-(Context
         {-(Comment)-}
@@ -38,4 +40,5 @@
             (Call
             { (Identifier)
             ->(Identifier) }
+              ([])
               (Empty))))-}))))

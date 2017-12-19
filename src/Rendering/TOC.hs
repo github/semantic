@@ -21,26 +21,26 @@ import Data.Aeson
 import Data.Align (bicrosswalk)
 import Data.Bifoldable (bifoldMap)
 import Data.Bifunctor (bimap)
+import Data.Bifunctor.Join
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
 import Data.Diff
 import Data.Foldable (fold, foldl')
-import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Foldable (cata)
 import Data.Function (on)
 import Data.Language as Language
 import Data.List (sortOn)
 import qualified Data.List as List
-import qualified Data.Map as Map hiding (null)
+import qualified Data.Map as Map
 import Data.Maybe (fromMaybe, mapMaybe)
 import Data.Output
 import Data.Patch
 import Data.Record
 import Data.Semigroup ((<>))
+import Data.Span
 import Data.Term
 import qualified Data.Text as T
 import GHC.Generics
-import Info
 
 data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }
   deriving (Eq, Show)
@@ -152,23 +152,23 @@ entrySummary entry = case entry of
 -- | Construct a 'TOCSummary' from a node annotation and a change type label.
 recordSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => T.Text -> Record fields -> Maybe TOCSummary
 recordSummary changeText record = case getDeclaration record of
-  Just (ErrorDeclaration text _ language) -> Just $ ErrorSummary text (sourceSpan record) language
-  Just declaration -> Just $ TOCSummary (toCategoryName declaration) (formatIdentifier declaration) (sourceSpan record) changeText
+  Just (ErrorDeclaration text _ language) -> Just $ ErrorSummary text (getField record) language
+  Just declaration -> Just $ TOCSummary (toCategoryName declaration) (formatIdentifier declaration) (getField record) changeText
   Nothing -> Nothing
   where
     formatIdentifier (MethodDeclaration identifier _ (Just Language.Go) (Just receiver)) = "(" <> receiver <> ") " <> identifier
     formatIdentifier (MethodDeclaration identifier _ _                  (Just receiver)) = receiver <> "." <> identifier
     formatIdentifier declaration = declarationIdentifier declaration
 
-renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Both Blob -> Diff f (Record fields) (Record fields) -> Summaries
+renderToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => BlobPair -> Diff f (Record fields) (Record fields) -> Summaries
 renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isValidSummary . diffTOC
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
-        summaryKey = T.pack $ case runJoin (blobPath <$> blobs) of
-          (before, after) | null before -> after
-                          | null after -> before
-                          | before == after -> after
-                          | otherwise -> before <> " -> " <> after
+        summaryKey = T.pack $ case bimap blobPath blobPath (runJoin blobs) of
+           This before -> before
+           That after -> after
+           These before after | before == after -> after
+                              | otherwise -> before <> " -> " <> after
 
 diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [TOCSummary]
 diffTOC = mapMaybe entrySummary . dedupe . tableOfContentsBy declaration

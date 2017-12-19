@@ -10,7 +10,6 @@ import Data.Term
 import Rendering.Renderer
 import Semantic
 import Semantic.Task
-import Syntax
 import System.Exit
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
 import Test.Hspec.Expectations.Pretty
@@ -28,13 +27,13 @@ spec = parallel $ do
       output `shouldBe` "(Program\n  (Method\n    (Empty)\n    (Identifier)\n    ([])))\n"
 
   describe "diffTermPair" $ do
-    it "produces an Insert when the first blob is missing" $ do
-      result <- runTask (diffTermPair (both (emptyBlob "/foo") (sourceBlob "/foo" Nothing "")) replacing (termIn () []) (termIn () []))
-      result `shouldBe` Diff (Patch (Insert (In () [])))
+    it "produces an Insert when the first term is missing" $ do
+      result <- runTask (diffTermPair replacing (That (termIn () [])))
+      result `shouldBe` (Diff (Patch (Insert (In () []))) :: Diff [] () ())
 
-    it "produces a Delete when the second blob is missing" $ do
-      result <- runTask (diffTermPair (both (sourceBlob "/foo" Nothing "") (emptyBlob "/foo")) replacing (termIn () []) (termIn () []))
-      result `shouldBe` Diff (Patch (Delete (In () [])))
+    it "produces a Delete when the second term is missing" $ do
+      result <- runTask (diffTermPair replacing (This (termIn () [])))
+      result `shouldBe` (Diff (Patch (Delete (In () []))) :: Diff [] () ())
 
   where
-    methodsBlob = Blob "def foo\nend\n" "ff7bbbe9495f61d9e1e58c597502d152bab1761e" "methods.rb" (Just defaultPlainBlob) (Just Ruby)
+    methodsBlob = Blob "def foo\nend\n" "methods.rb" (Just Ruby)

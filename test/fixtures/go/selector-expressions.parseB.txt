@@ -11,4 +11,5 @@
           (Identifier)
           (Identifier))
         (Identifier))
+      ([])
       (Empty))))

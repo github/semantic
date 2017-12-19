@@ -13,6 +13,7 @@
         (
           (Call
             (Identifier)
+            ([])
             (Empty))
           (Goto
             (Identifier))))
@@ -28,6 +29,7 @@
       {+(
         {+(Call
           {+(Identifier)+}
+          {+([])+}
           {+(Empty)+})+}
         {+(Break
           {+(Identifier)+})+})+})+}
@@ -41,6 +43,7 @@
       {+(
         {+(Call
           {+(Identifier)+}
+          {+([])+}
           {+(Empty)+})+}
         {+(Continue
           {+(Identifier)+})+})+})+}
@@ -51,6 +54,7 @@
       {+(
         {+(Call
           {+(Identifier)+}
+          {+([])+}
           {+(Empty)+})+}
         {+(Continue
           {+(Empty)+})+})+})+}
@@ -61,6 +65,7 @@
           (Call
             (Identifier)
           {+(Identifier)+}
+          {-([])-}
             (Empty))
           (Break
           { (Identifier)
@@ -72,8 +77,9 @@
       {+(Identifier)+}
       {+(Call
         {+(Identifier)+}
-        {+(Identifier)+}
-        {+(Identifier)+}
+        {+(
+          {+(Identifier)+}
+          {+(Identifier)+})+}
         {+(Empty)+})+})+}
     {+(ForEach
       {+(
@@ -82,8 +88,9 @@
       {+(Identifier)+}
       {+(Call
         {+(Identifier)+}
-        {+(Identifier)+}
-        {+(Identifier)+}
+        {+(
+          {+(Identifier)+}
+          {+(Identifier)+})+}
         {+(Empty)+})+})+}
     {+(For
       {+(Empty)+}
@@ -93,6 +100,7 @@
       {+(Empty)+}
       {+(Call
         {+(Identifier)+}
+        {+([])+}
         {+(Empty)+})+})+}
     {+(ForEach
       {+(Empty)+}
@@ -105,6 +113,7 @@
       {-(
         {-(Call
           {-(Identifier)-}
+          {-([])-}
           {-(Empty)-})-}
         {-(Continue
           {-(Identifier)-})-})-})-}
@@ -118,6 +127,7 @@
       {-(
         {-(Call
           {-(Identifier)-}
+          {-([])-}
           {-(Empty)-})-}
         {-(Continue
           {-(Empty)-})-})-})-}
@@ -139,8 +149,9 @@
       {-(Identifier)-}
       {-(Call
         {-(Identifier)-}
-        {-(Identifier)-}
-        {-(Identifier)-}
+        {-(
+          {-(Identifier)-}
+          {-(Identifier)-})-}
         {-(Empty)-})-})-}
     {-(ForEach
       {-(
@@ -149,8 +160,9 @@
       {-(Identifier)-}
       {-(Call
         {-(Identifier)-}
-        {-(Identifier)-}
-        {-(Identifier)-}
+        {-(
+          {-(Identifier)-}
+          {-(Identifier)-})-}
         {-(Empty)-})-})-}
     {-(For
       {-(Empty)-}
@@ -160,6 +172,7 @@
       {-(Empty)-}
       {-(Call
         {-(Identifier)-}
+        {-([])-}
         {-(Empty)-})-})-}
     {-(ForEach
       {-(Empty)-}
