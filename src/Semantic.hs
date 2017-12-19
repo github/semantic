@@ -53,7 +53,7 @@ parseBlob renderer blob@Blob{..}
     JSONTermRenderer        -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)
     SExpressionTermRenderer -> decorate constructorLabel . (Nil <$)                   >=> render renderSExpressionTerm
     TagsTermRenderer        -> decorate (declarationAlgebra blob)                     >=> render (renderToTags blob)
-
+    DOTTermRenderer         ->                                          render (renderDOTTerm blob)
   | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
 
 data NoLanguageForBlob = NoLanguageForBlob FilePath
@@ -71,7 +71,7 @@ diffBlobPair renderer blobs
     ToCDiffRenderer         -> run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))                     diffTerms renderToCDiff
     JSONDiffRenderer        -> run (          parse parser      >=> decorate constructorLabel >=> decorate identifierLabel) diffTerms renderJSONDiff
     SExpressionDiffRenderer -> run (          parse parser      >=> decorate constructorLabel . (Nil <$))                   diffTerms (const renderSExpressionDiff)
-
+    DOTDiffRenderer         -> run (          parse parser)                                                                 diffTerms renderDOTDiff
   | otherwise = throwError (SomeException (NoLanguageForBlob effectivePath))
   where effectivePath = pathForBlobPair blobs
         effectiveLanguage = languageForBlobPair blobs

@@ -19,7 +19,7 @@ constructorLabel :: ConstructorName syntax => TermF syntax a b -> ConstructorLab
 constructorLabel (In _ s) = ConstructorLabel $ pack (constructorName s)
 
 
-newtype ConstructorLabel = ConstructorLabel ByteString
+newtype ConstructorLabel = ConstructorLabel { unConstructorLabel :: ByteString }
 
 instance Show ConstructorLabel where
   showsPrec _ (ConstructorLabel s) = showString (unpack s)
