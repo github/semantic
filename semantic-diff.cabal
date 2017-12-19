@@ -23,7 +23,6 @@ library
                      -- Semantic assignment
                      , Assigning.Assignment
                      , Assigning.Assignment.Table
-                     , Category
                      -- General datatype definitions & generic algorithms
                      , Data.Algebra
                      , Data.Align.Generic
@@ -58,11 +57,9 @@ library
                      , Diffing.Algorithm.RWS.FeatureVector
                      , Diffing.Algorithm.SES
                      , Diffing.Interpreter
-                     , Info
                      -- Language-specific grammar/syntax types, & assignments
                      , Language.Markdown.Assignment
                      , Language.Markdown.Syntax
-                     , Language.Go
                      , Language.Go.Grammar
                      , Language.Go.Assignment
                      , Language.Go.Syntax
@@ -98,7 +95,6 @@ library
                      , Semantic.Task
                      , Semantic.Queue
                      , Semantic.Util
-                     , Syntax
   build-depends:       base >= 4.8 && < 5
                      , aeson
                      , ansi-terminal
