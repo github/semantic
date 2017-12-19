@@ -117,7 +117,8 @@ expression = term (handleError (choice expressionChoices))
 
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
-  [ assignment'
+  [ argumentList
+  , assignment'
   , binaryExpression
   , block
   , breakStatement
@@ -138,6 +139,7 @@ expressionChoices =
   , expressionSwitchStatement
   , fallThroughStatement
   , fieldDeclaration
+  , fieldDeclarationList
   , fieldIdentifier
   , floatLiteral
   , forStatement
@@ -151,6 +153,7 @@ expressionChoices =
   , identifier
   , importDeclaration
   , importSpec
+  , importSpecList
   , indexExpression
   , interpretedStringLiteral
   , intLiteral
@@ -160,6 +163,7 @@ expressionChoices =
   , literalValue
   , methodDeclaration
   , methodSpec
+  , methodSpecList
   , packageClause
   , packageIdentifier
   , parameterDeclaration
@@ -285,6 +289,9 @@ fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> ch
                                                        | Just tag' <- tag                   = makeTerm loc (Go.Syntax.Field [tag'] (makeTerm loc fields))
                                                        | otherwise                          = makeTerm loc (Go.Syntax.Field [] (makeTerm loc fields))
 
+fieldDeclarationList :: Assignment
+fieldDeclarationList = symbol FieldDeclarationList *> children expressions
+
 functionType :: Assignment
 functionType = makeTerm <$> symbol FunctionType <*> children (Type.Function <$> manyTerm parameters <*> (expression <|> emptyTerm))
 
@@ -319,6 +326,9 @@ typeDeclaration = makeTerm <$> symbol TypeDeclaration <*> children (manyTerm ( (
 
 
 -- Expressions
+
+argumentList :: Assignment
+argumentList = (symbol ArgumentList <|> symbol ArgumentList') *> children expressions
 
 binaryExpression :: Assignment
 binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression expression
@@ -376,7 +386,7 @@ functionDeclaration :: Assignment
 functionDeclaration =  makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncLiteral) <*> children (mkFunctionDeclaration <$> (term identifier <|> emptyTerm) <*> manyTerm parameters <*> (term types <|> term identifier <|> term returnParameters <|> emptyTerm) <*> (term block <|> emptyTerm))
   where
     mkFunctionDeclaration name' params' types' block' = Declaration.Function [types'] name' params' block'
-    returnParameters = makeTerm <$> symbol Parameters <*> children (manyTerm expression)
+    returnParameters = makeTerm <$> symbol ParameterList <*> children (manyTerm expression)
 
 importDeclaration :: Assignment
 importDeclaration = makeTerm <$> symbol ImportDeclaration <*> children (Declaration.Import <$> manyTerm expression)
@@ -384,13 +394,16 @@ importDeclaration = makeTerm <$> symbol ImportDeclaration <*> children (Declarat
 importSpec :: Assignment
 importSpec = symbol ImportSpec *> children expressions
 
+importSpecList :: Assignment
+importSpecList = symbol ImportSpecList *> children expressions
+
 indexExpression :: Assignment
 indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)
 
 methodDeclaration :: Assignment
 methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> term fieldIdentifier <*> manyTerm parameters <*> ((makeTerm <$> location <*> (manyTermsTill expression (void (symbol Block)))) <|> emptyTerm) <*> (term block <|> emptyTerm))
   where
-    receiver = symbol Parameters *> children ((symbol ParameterDeclaration *> children expressions) <|> expressions)
+    receiver = symbol ParameterList *> children ((symbol ParameterDeclaration *> children expressions) <|> expressions)
     mkTypedMethodDeclaration receiver' name' parameters' type'' body' = Declaration.Method [type''] receiver' name' parameters' body'
 
 methodSpec :: Assignment
@@ -398,11 +411,14 @@ methodSpec =  makeTerm <$> symbol MethodSpec <*> children (mkMethodSpec <$> expr
   where
     mkMethodSpec name' params optionalTypeLiteral = Declaration.MethodSignature [optionalTypeLiteral] name' [params]
 
+methodSpecList :: Assignment
+methodSpecList = symbol MethodSpecList *> children expressions
+
 packageClause :: Assignment
 packageClause = makeTerm <$> symbol PackageClause <*> children (Declaration.Module <$> expression <*> pure [])
 
 parameters :: Assignment
-parameters = symbol Parameters *> children expressions
+parameters = symbol ParameterList *> children expressions
 
 parameterDeclaration :: Assignment
 parameterDeclaration = makeTerm <$> symbol ParameterDeclaration <*> children (manyTerm expression)

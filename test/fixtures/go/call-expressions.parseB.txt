@@ -8,18 +8,21 @@
     (
       (Call
         (Identifier)
+        (
+          (Identifier)
+          (Variadic
+            (Identifier)))
+        (Empty))
+      (Call
         (Identifier)
-        (Variadic
+        (
+          (Identifier)
           (Identifier))
         (Empty))
       (Call
         (Identifier)
-        (Identifier)
-        (Identifier)
-        (Empty))
-      (Call
-        (Identifier)
-        (Identifier)
-        (Variadic
-          (Identifier))
+        (
+          (Identifier)
+          (Variadic
+            (Identifier)))
         (Empty)))))

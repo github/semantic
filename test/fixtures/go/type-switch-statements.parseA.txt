@@ -29,6 +29,7 @@
                 (Identifier))
               (Call
                 (Identifier)
+                ([])
                 (Empty))))
           (Pattern
             (Pointer
@@ -48,10 +49,11 @@
               (MemberAccess
                 (Identifier)
                 (Identifier))
-              (TextElement)
-              (Times
-                (Identifier)
-                (Integer))
+              (
+                (TextElement)
+                (Times
+                  (Identifier)
+                  (Integer)))
               (Empty)))
           (Pattern
             (Identifier)
@@ -59,10 +61,11 @@
               (MemberAccess
                 (Identifier)
                 (Identifier))
-              (TextElement)
-              (DividedBy
-                (Integer)
-                (Identifier))
+              (
+                (TextElement)
+                (DividedBy
+                  (Integer)
+                  (Identifier)))
               (Empty)))
           (Pattern
             (Identifier)
@@ -79,18 +82,19 @@
                 (MemberAccess
                   (Identifier)
                   (Identifier))
-                (TextElement)
-                (Plus
-                  (Slice
-                    (Identifier)
-                    (Identifier)
-                    (Empty)
-                    (Empty))
-                  (Slice
-                    (Identifier)
-                    (Empty)
-                    (Identifier)
-                    (Empty)))
+                (
+                  (TextElement)
+                  (Plus
+                    (Slice
+                      (Identifier)
+                      (Identifier)
+                      (Empty)
+                      (Empty))
+                    (Slice
+                      (Identifier)
+                      (Empty)
+                      (Identifier)
+                      (Empty))))
                 (Empty))))
           (Pattern
             (DefaultPattern

@@ -11,10 +11,12 @@
           (MemberAccess
             (Identifier)
             (Identifier))
+          ([])
           (Empty)))
       (Go
         (Call
           (MemberAccess
             (Identifier)
             (Identifier))
+          ([])
           (Empty))))))

@@ -2,14 +2,15 @@
   (Module
     (Identifier))
   (Import
-  { (TextElement)
-  ->(TextElement) }
-  { (TextElement)
-  ->(TextElement) }
     (
-      (Identifier)
     { (TextElement)
-    ->(TextElement) }))
+    ->(TextElement) }
+    { (TextElement)
+    ->(TextElement) }
+      (
+        (Identifier)
+      { (TextElement)
+      ->(TextElement) })))
   (Function
     (Empty)
     (Identifier)

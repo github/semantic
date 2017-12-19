@@ -24,21 +24,23 @@
             (Identifier)
             (Constructor
               (Empty)
-              (Field
-                (Identifier)
-                (
-                  (Identifier)))
-              (Field
-                (Identifier)
-                (
-                  (Identifier)))
-              (Field
-                (Identifier)
-                (
-                  (Identifier))))))
+              (
+                (Field
+                  (Identifier)
+                  (
+                    (Identifier)))
+                (Field
+                  (Identifier)
+                  (
+                    (Identifier)))
+                (Field
+                  (Identifier)
+                  (
+                    (Identifier)))))))
         (Type
           (Identifier)
-          (Interface))
+          (Interface
+            ([])))
         (Context
           (Comment)
           (Empty))))))
