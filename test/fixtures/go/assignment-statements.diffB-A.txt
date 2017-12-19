@@ -37,21 +37,29 @@
       {+(Plus
         {+(Identifier)+}
         {+(Integer)+})+})+}
-    {+(Assignment
-      {+(Identifier)+}
-      {+(LShift
+      (Assignment
+      { (Identifier)
+      ->(Identifier) }
+      { (Plus
+        {-(Identifier)-}
+        {-(Integer)-})
+      ->(LShift
         {+(Identifier)+}
-        {+(Integer)+})+})+}
+        {+(Integer)+}) })
     {+(Assignment
       {+(Identifier)+}
       {+(RShift
         {+(Identifier)+}
         {+(Integer)+})+})+}
-    {+(Assignment
-      {+(Identifier)+}
-      {+(DividedBy
+      (Assignment
+      { (Identifier)
+      ->(Identifier) }
+      { (LShift
+        {-(Identifier)-}
+        {-(Integer)-})
+      ->(DividedBy
         {+(Identifier)+}
-        {+(Integer)+})+})+}
+        {+(Integer)+}) })
     {+(Assignment
       {+(Identifier)+}
       {+(BXOr
@@ -80,16 +88,6 @@
               {+(KeyValue
                 {+(Identifier)+}
                 {+(Integer)+})+})+})+})+})+})+}
-    {-(Assignment
-      {-(Identifier)-}
-      {-(Plus
-        {-(Identifier)-}
-        {-(Integer)-})-})-}
-    {-(Assignment
-      {-(Identifier)-}
-      {-(LShift
-        {-(Identifier)-}
-        {-(Integer)-})-})-}
     {-(Assignment
       {-(Identifier)-}
       {-(RShift
