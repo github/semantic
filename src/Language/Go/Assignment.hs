@@ -327,7 +327,7 @@ typeDeclaration = makeTerm <$> symbol TypeDeclaration <*> children (manyTerm ( (
 -- Expressions
 
 argumentList :: Assignment
-argumentList = symbol ArgumentList *> children expressions
+argumentList = (symbol ArgumentList <|> symbol ArgumentList') *> children expressions
 
 binaryExpression :: Assignment
 binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression expression
