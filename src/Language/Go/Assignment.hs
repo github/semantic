@@ -139,6 +139,7 @@ expressionChoices =
   , expressionSwitchStatement
   , fallThroughStatement
   , fieldDeclaration
+  , fieldDeclarationList
   , fieldIdentifier
   , floatLiteral
   , forStatement
@@ -285,6 +286,9 @@ fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> ch
                                                        | Just ty <- type'                   = makeTerm loc (Go.Syntax.Field [ty] (makeTerm loc fields))
                                                        | Just tag' <- tag                   = makeTerm loc (Go.Syntax.Field [tag'] (makeTerm loc fields))
                                                        | otherwise                          = makeTerm loc (Go.Syntax.Field [] (makeTerm loc fields))
+
+fieldDeclarationList :: Assignment
+fieldDeclarationList = symbol FieldDeclarationList *> children expressions
 
 functionType :: Assignment
 functionType = makeTerm <$> symbol FunctionType <*> children (Type.Function <$> manyTerm parameters <*> (expression <|> emptyTerm))
