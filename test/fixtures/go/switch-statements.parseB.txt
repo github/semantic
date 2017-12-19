@@ -14,6 +14,7 @@
             (Identifier))
           (Call
             (Identifier)
+            ([])
             (Empty)))
         (Pattern
           (LessThan
@@ -21,6 +22,7 @@
             (Identifier))
           (Call
             (Identifier)
+            ([])
             (Empty)))
         (Pattern
           (Equal
@@ -28,4 +30,5 @@
             (Integer))
           (Call
             (Identifier)
+            ([])
             (Empty)))))))

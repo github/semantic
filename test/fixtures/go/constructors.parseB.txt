@@ -13,18 +13,20 @@
         (Empty))
       (Call
         (Identifier)
-        (SendChannel
-          (Identifier))
-        (Minus
-          (Identifier)
-          (Identifier))
+        (
+          (SendChannel
+            (Identifier))
+          (Minus
+            (Identifier)
+            (Identifier)))
         (Empty))
       (Call
         (Identifier)
-        (SendChannel
-          (Identifier))
-        (Integer)
-        (Integer)
+        (
+          (SendChannel
+            (Identifier))
+          (Integer)
+          (Integer))
         (Empty))
       (Call
         (Identifier)

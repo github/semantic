@@ -44,10 +44,11 @@
                 (MemberAccess
                   (Identifier)
                   (Identifier))
-                (MemberAccess
-                  (Identifier)
-                  (Identifier))
-                (Integer)
+                (
+                  (MemberAccess
+                    (Identifier)
+                    (Identifier))
+                  (Integer))
                 (Empty))
               (MemberAccess
                 (Identifier)
@@ -56,10 +57,11 @@
               (MemberAccess
                 (Identifier)
                 (Identifier))
-              (MemberAccess
-                (Identifier)
-                (Identifier))
-              (Integer)
+              (
+                (MemberAccess
+                  (Identifier)
+                  (Identifier))
+                (Integer))
               (Empty)))
           (MemberAccess
             (Identifier)
