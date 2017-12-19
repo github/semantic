@@ -376,7 +376,7 @@ functionDeclaration :: Assignment
 functionDeclaration =  makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncLiteral) <*> children (mkFunctionDeclaration <$> (term identifier <|> emptyTerm) <*> manyTerm parameters <*> (term types <|> term identifier <|> term returnParameters <|> emptyTerm) <*> (term block <|> emptyTerm))
   where
     mkFunctionDeclaration name' params' types' block' = Declaration.Function [types'] name' params' block'
-    returnParameters = makeTerm <$> symbol Parameters <*> children (manyTerm expression)
+    returnParameters = makeTerm <$> symbol ParameterList <*> children (manyTerm expression)
 
 importDeclaration :: Assignment
 importDeclaration = makeTerm <$> symbol ImportDeclaration <*> children (Declaration.Import <$> manyTerm expression)
@@ -390,7 +390,7 @@ indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.S
 methodDeclaration :: Assignment
 methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> term fieldIdentifier <*> manyTerm parameters <*> ((makeTerm <$> location <*> (manyTermsTill expression (void (symbol Block)))) <|> emptyTerm) <*> (term block <|> emptyTerm))
   where
-    receiver = symbol Parameters *> children ((symbol ParameterDeclaration *> children expressions) <|> expressions)
+    receiver = symbol ParameterList *> children ((symbol ParameterDeclaration *> children expressions) <|> expressions)
     mkTypedMethodDeclaration receiver' name' parameters' type'' body' = Declaration.Method [type''] receiver' name' parameters' body'
 
 methodSpec :: Assignment
@@ -402,7 +402,7 @@ packageClause :: Assignment
 packageClause = makeTerm <$> symbol PackageClause <*> children (Declaration.Module <$> expression <*> pure [])
 
 parameters :: Assignment
-parameters = symbol Parameters *> children expressions
+parameters = symbol ParameterList *> children expressions
 
 parameterDeclaration :: Assignment
 parameterDeclaration = makeTerm <$> symbol ParameterDeclaration <*> children (manyTerm expression)
