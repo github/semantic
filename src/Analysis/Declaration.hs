@@ -3,7 +3,6 @@ module Analysis.Declaration
 ( Declaration(..)
 , HasDeclaration
 , declarationAlgebra
-, syntaxDeclarationAlgebra
 ) where
 
 import Data.Algebra
@@ -24,9 +23,7 @@ import Data.Term
 import qualified Data.Text as T
 import Data.Union
 import GHC.Generics
-import Info (byteRange, sourceSpan)
 import qualified Language.Markdown.Syntax as Markdown
-import qualified Syntax as S
 
 -- | A declaration’s identifier and type.
 data Declaration
@@ -78,46 +75,46 @@ class CustomHasDeclaration syntax where
 instance CustomHasDeclaration Markdown.Heading where
   customToDeclaration Blob{..} ann (Markdown.Heading level terms _)
     = Just $ HeadingDeclaration (headingText terms) mempty blobLanguage level
-    where headingText terms = getSource $ maybe (byteRange ann) sconcat (nonEmpty (headingByteRange <$> toList terms))
-          headingByteRange (Term (In ann _), _) = byteRange ann
+    where headingText terms = getSource $ maybe (getField ann) sconcat (nonEmpty (headingByteRange <$> toList terms))
+          headingByteRange (Term (In ann _), _) = getField ann
           getSource = firstLine . toText . flip Source.slice blobSource
           firstLine = T.takeWhile (/= '\n')
 
 -- | Produce an 'ErrorDeclaration' for 'Syntax.Error' nodes.
 instance CustomHasDeclaration Syntax.Error where
   customToDeclaration Blob{..} ann err@Syntax.Error{}
-    = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (sourceSpan ann) err))) mempty blobLanguage
+    = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (getField ann) err))) mempty blobLanguage
     where formatTOCError e = showExpectation False (errorExpected e) (errorActual e) ""
 
--- | Produce a 'FunctionDeclaration' for 'Declaration.Function' nodes so long as their identifier is non-empty (defined as having a non-empty 'byteRange').
+-- | Produce a 'FunctionDeclaration' for 'Declaration.Function' nodes so long as their identifier is non-empty (defined as having a non-empty 'Range').
 instance CustomHasDeclaration Declaration.Function where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Function _ (Term (In identifierAnn _), _) _ _)
     -- Do not summarize anonymous functions
     | isEmpty identifierAnn = Nothing
     -- Named functions
     | otherwise             = Just $ FunctionDeclaration (getSource identifierAnn) (getFunctionSource blob (In ann decl)) blobLanguage
-    where getSource = toText . flip Source.slice blobSource . byteRange
-          isEmpty = (== 0) . rangeLength . byteRange
+    where getSource = toText . flip Source.slice blobSource . getField
+          isEmpty = (== 0) . rangeLength . getField
 
--- | Produce a 'MethodDeclaration' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'byteRange'), the 'declarationIdentifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
+-- | Produce a 'MethodDeclaration' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'Range'), the 'declarationIdentifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
 instance CustomHasDeclaration Declaration.Method where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _)
     -- Methods without a receiver
     | isEmpty receiverAnn = Just $ MethodDeclaration (getSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage Nothing
     -- Methods with a receiver type and an identifier (e.g. (a *Type) in Go).
-    | blobLanguage == Just Language.Go
+    | blobLanguage == Just Go
     , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ MethodDeclaration (getSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage (Just (getSource receiverType))
     -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
     | otherwise           = Just $ MethodDeclaration (getSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage (Just (getSource receiverAnn))
-    where getSource = toText . flip Source.slice blobSource . byteRange
-          isEmpty = (== 0) . rangeLength . byteRange
+    where getSource = toText . flip Source.slice blobSource . getField
+          isEmpty = (== 0) . rangeLength . getField
 
 -- | Produce a 'ClassDeclaration' for 'Declaration.Class' nodes.
 instance CustomHasDeclaration Declaration.Class where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Class _ (Term (In identifierAnn _), _) _ _)
     -- Classes
     = Just $ ClassDeclaration (getSource identifierAnn) (getClassSource blob (In ann decl)) blobLanguage
-    where getSource = toText . flip Source.slice blobSource . byteRange
+    where getSource = toText . flip Source.slice blobSource . getField
 
 -- | Produce a 'Declaration' for 'Union's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
 instance Apply HasDeclaration fs => CustomHasDeclaration (Union fs) where
@@ -158,46 +155,23 @@ instance CustomHasDeclaration syntax => HasDeclarationWithStrategy 'Custom synta
   toDeclarationWithStrategy _ = customToDeclaration
 
 
--- | Compute 'Declaration's for methods and functions in 'Syntax'.
-syntaxDeclarationAlgebra :: HasField fields Range => Blob -> RAlgebra (Term S.Syntax (Record fields)) (Maybe Declaration)
-syntaxDeclarationAlgebra blob@Blob{..} decl@(In a r) = case r of
-  S.Function (identifier, _) _ _ -> Just $ FunctionDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage
-  S.Method _ (identifier, _) Nothing _ _ -> Just $ MethodDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage Nothing
-  S.Method _ (identifier, _) (Just (receiver, _)) _ _
-    | S.Indexed [receiverParams] <- termOut receiver
-    , S.ParameterDecl (Just ty) _ <- termOut receiverParams -> Just $ MethodDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage (Just (getSource ty))
-    | otherwise -> Just $ MethodDeclaration (getSource identifier) (getSyntaxDeclarationSource blob decl) blobLanguage (Just (getSource receiver))
-  S.ParseError{} -> Just $ ErrorDeclaration (toText (Source.slice (byteRange a) blobSource)) mempty blobLanguage
-  _ -> Nothing
-  where
-    getSource = toText . flip Source.slice blobSource . byteRange . termAnnotation
-
 getMethodSource :: HasField fields Range => Blob -> TermF Declaration.Method (Record fields) (Term syntax (Record fields), a) -> T.Text
 getMethodSource Blob{..} (In a r)
-  = let declRange = byteRange a
-        bodyRange = byteRange <$> case r of
+  = let declRange = getField a
+        bodyRange = getField <$> case r of
           Declaration.Method _ _ _ _ (Term (In a' _), _) -> Just a'
     in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
 
 getFunctionSource :: HasField fields Range => Blob -> TermF Declaration.Function (Record fields) (Term syntax (Record fields), a) -> T.Text
 getFunctionSource Blob{..} (In a r)
-  = let declRange = byteRange a
-        bodyRange = byteRange <$> case r of
+  = let declRange = getField a
+        bodyRange = getField <$> case r of
           Declaration.Function _ _ _ (Term (In a' _), _) -> Just a'
     in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
 
 getClassSource :: (HasField fields Range) => Blob -> TermF Declaration.Class (Record fields) (Term syntax (Record fields), a) -> T.Text
 getClassSource Blob{..} (In a r)
-  = let declRange = byteRange a
-        bodyRange = byteRange <$> case r of
+  = let declRange = getField a
+        bodyRange = getField <$> case r of
           Declaration.Class _ _ _ (Term (In a' _), _) -> Just a'
-    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
-
-getSyntaxDeclarationSource :: HasField fields Range => Blob -> TermF S.Syntax (Record fields) (Term syntax (Record fields), a) -> T.Text
-getSyntaxDeclarationSource Blob{..} (In a r)
-  = let declRange = byteRange a
-        bodyRange = byteRange <$> case r of
-          S.Function _ _ ((Term (In a' _), _) : _) -> Just a'
-          S.Method _ _ _ _ ((Term (In a' _), _) : _) -> Just a'
-          _ -> Nothing
     in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
