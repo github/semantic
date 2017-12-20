@@ -8,6 +8,7 @@ import Data.Abstract.Store
 import Data.Functor.Classes.Generic
 import GHC.Generics
 
+-- | A single point in a program’s execution.
 data Configuration l t v
   = Configuration
     { configurationTerm :: t
