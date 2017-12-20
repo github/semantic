@@ -29,6 +29,7 @@ class FreeVariables1 syntax where
 freeVariables1 :: (FreeVariables1 t, FreeVariables a) => t a -> Set Name
 freeVariables1 = liftFreeVariables freeVariables
 
+
 instance (FreeVariables1 syntax, Functor syntax) => FreeVariables (Term syntax ann) where
   freeVariables = cata (liftFreeVariables id)
 
