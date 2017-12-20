@@ -18,6 +18,7 @@ class FreeVariables term where
   freeVariables :: term -> Set Name
 
 
+-- | A lifting of 'FreeVariables' to type constructors of kind @* -> *@.
 class FreeVariables1 syntax where
   liftFreeVariables :: (a -> Set Name) -> syntax a -> Set Name
   default liftFreeVariables :: (Foldable syntax) => (a -> Set Name) -> syntax a -> Set Name
