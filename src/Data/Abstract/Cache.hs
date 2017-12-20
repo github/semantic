@@ -22,6 +22,7 @@ deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Monoid (Cache l t v)
 cacheLookup :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> Cache l t v -> Maybe (Set (v, Store l v))
 cacheLookup key = Map.lookup key . unCache
 
+-- | Set the resulting value & 'Store' for a given 'Configuration', overwriting any previous entry.
 cacheSet :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> Set (v, Store l v) -> Cache l t v -> Cache l t v
 cacheSet key value = Cache . Map.insert key value . unCache
 
