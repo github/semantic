@@ -43,6 +43,8 @@ type Syntax = '[
   , Syntax.SimpleVariable
   , Syntax.GlobalDeclaration
   , Syntax.ArrayElement
+  , Syntax.CastType
+  , Expression.Cast
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -87,13 +89,31 @@ expression :: Assignment
 expression = choice [
   -- assignmentExpression,
   yieldExpression,
-  -- unaryExpression,
+  unaryExpression,
   -- binaryExpression,
   includeExpression,
   includeOnceExpression,
   requireExpression,
   requireOnceExpression
   ]
+
+unaryExpression :: Assignment
+unaryExpression = choice [
+  -- cloneExpression,
+  -- primaryExpression,
+  -- exponentiationExpression,
+  -- unaryOpExpression,
+  castExpression
+  ]
+
+-- unaryOpExpression :: Assignment
+-- unaryOpExpression =
+
+castExpression :: Assignment
+castExpression = makeTerm <$> symbol CastExpression <*> children (flip Expression.Cast <$> castType <*> unaryExpression)
+
+castType :: Assignment
+castType = makeTerm <$> symbol CastType <*> (Syntax.CastType <$> source)
 
 globalDeclaration :: Assignment
 globalDeclaration = makeTerm <$> symbol GlobalDeclaration <*> children (Syntax.GlobalDeclaration <$> manyTerm simpleVariable)
