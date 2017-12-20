@@ -20,6 +20,7 @@ data Type
   deriving (Eq, Ord, Show)
 
 -- TODO: Do we need both TArr and :->?
+-- TODO: À la carte representation of types.
 
 
 -- | Unify two 'Type's.
