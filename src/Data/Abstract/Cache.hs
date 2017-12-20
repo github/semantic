@@ -26,6 +26,7 @@ cacheLookup key = Map.lookup key . unCache
 cacheSet :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> Set (v, Store l v) -> Cache l t v -> Cache l t v
 cacheSet key value = Cache . Map.insert key value . unCache
 
+-- | Insert the resulting value & 'Store' for a given 'Configuration', appending onto any previous entry.
 cacheInsert :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> (v, Store l v) -> Cache l t v -> Cache l t v
 cacheInsert key value = Cache . Map.insertWith (<>) key (point value) . unCache
 
