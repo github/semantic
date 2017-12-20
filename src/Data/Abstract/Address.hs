@@ -32,6 +32,7 @@ type family Cell l = res | res -> l where
   Cell Monovariant = Set
 
 
+-- | A cell holding a single value. Writes will replace any prior value.
 newtype Latest a = Latest { unLatest :: a }
   deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
 
