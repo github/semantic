@@ -108,12 +108,10 @@ unaryExpression = choice [
   -- cloneExpression,
   -- primaryExpression,
   -- exponentiationExpression,
-  -- unaryOpExpression,
+  unaryOpExpression,
   castExpression
   ]
 
--- unaryOpExpression :: Assignment
--- unaryOpExpression =
 unaryOpExpression :: Assignment
 unaryOpExpression = symbol UnaryOpExpression >>= \ loc ->
   makeTerm loc . Expression.Not <$> children ((symbol AnonTilde <|> symbol AnonBang) *> term expression)
