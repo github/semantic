@@ -52,6 +52,7 @@ type Syntax = '[
   , Literal.Integer
   , Literal.Float
   , Syntax.ShellCommand
+  , Syntax.Update
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -132,13 +133,13 @@ primaryExpression = choice [
   -- intrinsic,
   -- anonymousFunctionCreationExpression,
   -- objectCreationExpression,
-  -- postfixIncrementExpression,
-  -- postfixDecrementExpression,
-  -- prefixIncrementExpression,
-  -- prefixDecrementExpression,
+  updateExpression,
   shellCommandExpression,
   expression
   ]
+
+updateExpression :: Assignment
+updateExpression = makeTerm <$> symbol UpdateExpression <*> children (Syntax.Update <$> term expression)
 
 shellCommandExpression :: Assignment
 shellCommandExpression = makeTerm <$> symbol ShellCommandExpression <*> children (Syntax.ShellCommand <$> source)

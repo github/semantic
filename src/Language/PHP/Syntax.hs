@@ -100,3 +100,11 @@ newtype ShellCommand a = ShellCommand ByteString
 instance Eq1 ShellCommand where liftEq = genericLiftEq
 instance Ord1 ShellCommand where liftCompare = genericLiftCompare
 instance Show1 ShellCommand where liftShowsPrec = genericLiftShowsPrec
+
+-- | TODO: Combine with TypeScript update expression.
+newtype Update a = Update { _updateSubject :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Update where liftEq = genericLiftEq
+instance Ord1 Update where liftCompare = genericLiftCompare
+instance Show1 Update where liftShowsPrec = genericLiftShowsPrec
