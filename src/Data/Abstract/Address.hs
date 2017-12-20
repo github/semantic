@@ -17,10 +17,11 @@ instance Ord l => Ord1 (Address l) where liftCompare = genericLiftCompare
 instance Show l => Show1 (Address l) where liftShowsPrec = genericLiftShowsPrec
 
 
--- | 'Precise' models precise store semantics where only the 'Latest' value is taken.
+-- | 'Precise' models precise store semantics where only the 'Latest' value is taken. Everything gets it's own address (always makes a new allocation) which makes for a larger store.
 newtype Precise = Precise { unPrecise :: Int }
   deriving (Eq, Ord, Show)
 
+-- | 'Monovariant' models using one address for a particular name. It trackes the set of values that a particular address takes and uses it's name to lookup in the store and only allocation if new.
 newtype Monovariant = Monovariant { unMonovariant :: Name }
   deriving (Eq, Ord, Show)
 
