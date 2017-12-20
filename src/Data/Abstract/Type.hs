@@ -19,6 +19,8 @@ data Type
   | TArr [Type]   -- ^ N-ary function types?
   deriving (Eq, Ord, Show)
 
+-- TODO: Do we need both TArr and :->?
+
 
 -- | Unify two 'Type's.
 unify :: MonadFail m => Type -> Type -> m Type
