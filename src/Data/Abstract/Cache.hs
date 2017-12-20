@@ -18,6 +18,7 @@ deriving instance (Show l, Show t, Show v, Show (Cell l v)) => Show (Cache l t v
 deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Semigroup (Cache l t v)
 deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Monoid (Cache l t v)
 
+-- | Look up the resulting value & 'Store' for a given 'Configuration'.
 cacheLookup :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> Cache l t v -> Maybe (Set (v, Store l v))
 cacheLookup key = Map.lookup key . unCache
 
