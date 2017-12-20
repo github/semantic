@@ -24,6 +24,7 @@ deriving instance Foldable (Cell l) => Foldable (Store l)
 deriving instance Functor (Cell l) => Functor (Store l)
 deriving instance Traversable (Cell l) => Traversable (Store l)
 
+-- | Look up the cell of values for an 'Address' in a 'Store', if any.
 storeLookup :: Ord l => Address l a -> Store l a -> Maybe (Cell l a)
 storeLookup (Address address) = Map.lookup address . unStore
 
