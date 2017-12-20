@@ -164,7 +164,7 @@ instance Ord1 Await where liftCompare = genericLiftCompare
 instance Show1 Await where liftShowsPrec = genericLiftShowsPrec
 
 -- | An object constructor call in Javascript, Java, etc.
-newtype New a = New { newSubject :: a }
+newtype New a = New { newSubject :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 New where liftEq = genericLiftEq

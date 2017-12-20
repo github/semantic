@@ -53,6 +53,11 @@ type Syntax = '[
   , Literal.Float
   , Syntax.ShellCommand
   , Syntax.Update
+  , Syntax.NamespaceName
+  , Syntax.QualifiedName
+  , Syntax.RelativeScope
+  , Syntax.NewVariable
+  , Expression.New
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -69,6 +74,8 @@ term term = contextualize comment (postContextualize comment term)
 manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
 manyTerm term = many (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
 
+someTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
+someTerm term = some (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
 
 text :: Assignment
 text = makeTerm <$> symbol Text <*> (Syntax.Text <$> source)
@@ -132,11 +139,44 @@ primaryExpression = choice [
   -- arrayCreationExpression,
   -- intrinsic,
   -- anonymousFunctionCreationExpression,
-  -- objectCreationExpression,
+  objectCreationExpression,
   updateExpression,
   shellCommandExpression,
   expression
   ]
+
+objectCreationExpression :: Assignment
+objectCreationExpression = makeTerm <$> symbol ObjectCreationExpression <*> children (fmap Expression.New . (:) <$> classTypeDesignator <*> (arguments <|> pure []))
+
+arguments :: Assignment.Assignment [] Grammar [Term]
+arguments = symbol Arguments *> children (manyTerm (variadicUnpacking <|> expression))
+
+variadicUnpacking :: Assignment
+variadicUnpacking = symbol VariadicUnpacking *> children (term expression)
+
+classTypeDesignator :: Assignment
+classTypeDesignator = qualifiedName <|> newVariable
+
+newVariable :: Assignment
+newVariable = makeTerm <$> symbol NewVariable <*> children (Syntax.NewVariable <$> ((pure <$> simpleVariable) <|> ((\a b -> [a, b]) <$> (newVariable <|> qualifiedName <|> relativeScope) <*> (expression <|> memberName <|> emptyTerm))))
+
+memberName :: Assignment
+memberName = name <|> simpleVariable <|> expression
+
+relativeScope :: Assignment
+relativeScope = makeTerm <$> symbol RelativeScope <*> (Syntax.RelativeScope <$> source)
+
+qualifiedName :: Assignment
+qualifiedName = makeTerm <$> symbol QualifiedName <*> children (Syntax.QualifiedName <$> (namespaceNameAsPrefix <|> emptyTerm) <*> name)
+
+namespaceNameAsPrefix :: Assignment
+namespaceNameAsPrefix = symbol NamespaceNameAsPrefix *> children (namespaceName <|> emptyTerm)
+
+namespaceName :: Assignment
+namespaceName = makeTerm <$> symbol NamespaceName <*> children (Syntax.NamespaceName <$> someTerm name)
+
+-- anonymousClass :: Assignment
+-- anonymousClass = makeTerm <$> symbol Grammar.AnonymousClass <*> children (Declaration.Class <$> pure [] <*> emptyTerm <*> (classHeritage' <|> pure []) <*> classBodyStatements)
 
 updateExpression :: Assignment
 updateExpression = makeTerm <$> symbol UpdateExpression <*> children (Syntax.Update <$> term expression)

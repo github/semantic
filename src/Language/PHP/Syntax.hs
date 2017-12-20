@@ -108,3 +108,31 @@ newtype Update a = Update { _updateSubject :: a }
 instance Eq1 Update where liftEq = genericLiftEq
 instance Ord1 Update where liftCompare = genericLiftCompare
 instance Show1 Update where liftShowsPrec = genericLiftShowsPrec
+
+newtype NewVariable a = NewVariable [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 NewVariable where liftEq = genericLiftEq
+instance Ord1 NewVariable where liftCompare = genericLiftCompare
+instance Show1 NewVariable where liftShowsPrec = genericLiftShowsPrec
+
+newtype RelativeScope a = RelativeScope ByteString
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 RelativeScope where liftEq = genericLiftEq
+instance Ord1 RelativeScope where liftCompare = genericLiftCompare
+instance Show1 RelativeScope where liftShowsPrec = genericLiftShowsPrec
+
+data QualifiedName a = QualifiedName a a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 QualifiedName where liftEq = genericLiftEq
+instance Ord1 QualifiedName where liftCompare = genericLiftCompare
+instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
+
+data NamespaceName a = NamespaceName [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 NamespaceName where liftEq = genericLiftEq
+instance Ord1 NamespaceName where liftCompare = genericLiftCompare
+instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
