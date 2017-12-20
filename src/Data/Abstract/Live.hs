@@ -18,6 +18,7 @@ newtype Live l v = Live { unLive :: Set (Address l v) }
 liveSingleton :: Address l v -> Live l v
 liveSingleton = Live . Set.singleton
 
+-- | Insert an address into a 'Live' set.
 liveInsert :: Ord l => Address l v -> Live l v -> Live l v
 liveInsert addr = Live . Set.insert addr . unLive
 
