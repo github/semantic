@@ -12,6 +12,7 @@ import Data.Union
 type Name = ByteString
 
 
+-- | Types which can contain unbound variables.
 class FreeVariables term where
   freeVariables :: term -> Set Name
 
