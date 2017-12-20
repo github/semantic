@@ -40,5 +40,6 @@ storeInsert (Address address) value = Store . Map.insertWith (<>) address (point
 storeSize :: Store l a -> Int
 storeSize = Map.size . unStore
 
+-- | Restrict a 'Store' to only those 'Address'es in the given 'Live' set (in essence garbage collecting the rest).
 storeRestrict :: Ord l => Store l a -> Live l a -> Store l a
 storeRestrict (Store m) roots = Store (Map.filterWithKey (\ address _ -> Address address `liveMember` roots) m)
