@@ -22,6 +22,7 @@ liveSingleton = Live . Set.singleton
 liveInsert :: Ord l => Address l v -> Live l v -> Live l v
 liveInsert addr = Live . Set.insert addr . unLive
 
+-- | Delete an address from a 'Live' set, if present.
 liveDelete :: Ord l => Address l v -> Live l v -> Live l v
 liveDelete addr = Live . Set.delete addr . unLive
 
