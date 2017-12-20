@@ -23,6 +23,7 @@ type ValueConstructors location
     , String
     ]
 
+-- | Open union of primitive values that terms can be evaluated to.
 type Value location = Union (ValueConstructors location)
 
 data Closure location term = Closure [Name] term (Environment location (Value location term))

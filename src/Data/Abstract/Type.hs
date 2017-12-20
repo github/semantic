@@ -9,7 +9,7 @@ type TName = Int
 data Type = Int | Bool | String | Unit | Type :-> Type | Type :* Type | TVar TName | TArr [Type]
   deriving (Eq, Ord, Show)
 
-
+-- | Unify two 'Type's.
 unify :: MonadFail m => Type -> Type -> m Type
 unify Int  Int  = pure Int
 unify Bool Bool = pure Bool
