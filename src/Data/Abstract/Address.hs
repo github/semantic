@@ -26,6 +26,7 @@ newtype Monovariant = Monovariant { unMonovariant :: Name }
   deriving (Eq, Ord, Show)
 
 
+-- | The type into which stored values will be written for a given location type.
 type family Cell l = res | res -> l where
   Cell Precise = Latest
   Cell Monovariant = Set
