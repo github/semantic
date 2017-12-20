@@ -36,6 +36,7 @@ storeLookupAll address = fmap toList . storeLookup address
 storeInsert :: (Ord l, Semigroup (Cell l a), Pointed (Cell l)) => Address l a -> a -> Store l a -> Store l a
 storeInsert (Address address) value = Store . Map.insertWith (<>) address (point value) . unStore
 
+-- | The number of addresses extant in a 'Store'.
 storeSize :: Store l a -> Int
 storeSize = Map.size . unStore
 
