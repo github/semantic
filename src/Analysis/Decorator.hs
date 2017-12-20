@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, TypeOperators #-}
 module Analysis.Decorator
 ( decoratorWithAlgebra
-, syntaxIdentifierAlgebra
 , constructorNameAndConstantFields
 ) where
 
@@ -9,14 +8,12 @@ import Data.Aeson
 import Data.Algebra
 import Data.Bifunctor (second)
 import Data.ByteString.Char8 (ByteString, pack)
-import Data.Foldable (asum)
 import Data.Functor.Classes (Show1 (liftShowsPrec))
 import Data.Functor.Foldable
 import Data.JSON.Fields
 import Data.Record
 import Data.Term
-import Data.Text.Encoding (decodeUtf8, encodeUtf8)
-import qualified Syntax as S
+import Data.Text.Encoding (decodeUtf8)
 
 -- | Lift an algebra into a decorator for terms annotated with records.
 decoratorWithAlgebra :: Functor syntax
@@ -31,24 +28,6 @@ newtype Identifier = Identifier ByteString
 
 instance ToJSONFields Identifier where
   toJSONFields (Identifier i) = [ "identifier" .= decodeUtf8 i ]
-
-syntaxIdentifierAlgebra :: RAlgebra (Term S.Syntax a) (Maybe Identifier)
-syntaxIdentifierAlgebra (In _ syntax) = case syntax of
-  S.Assignment f _ -> identifier f
-  S.Class f _ _ -> identifier f
-  S.Export f _ -> f >>= identifier
-  S.Function f _ _ -> identifier f
-  S.FunctionCall f _ _ -> identifier f
-  S.Import f _ -> identifier f
-  S.Method _ f _ _ _ -> identifier f
-  S.MethodCall _ f _ _ -> identifier f
-  S.Module f _ -> identifier f
-  S.OperatorAssignment f _ -> identifier f
-  S.SubscriptAccess f _  -> identifier f
-  S.TypeDecl f _ -> identifier f
-  S.VarAssignment f _ -> asum $ identifier <$> f
-  _ -> Nothing
-  where identifier = fmap (Identifier . encodeUtf8) . S.extractLeafValue . termOut . fst
 
 -- | Compute a 'ByteString' label for a 'Show1'able 'Term'.
 --

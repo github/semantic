@@ -12,6 +12,7 @@
         {-(Identifier)-}
         {-(Call
           {-(Identifier)-}
+          {-([])-}
           {-(Empty)-})-})-})-}
     {-(Match
       {-(
@@ -24,9 +25,11 @@
           {-(
             {-(Call
               {-(Identifier)-}
+              {-([])-}
               {-(Empty)-})-}
             {-(Call
               {-(Identifier)-}
+              {-([])-}
               {-(Empty)-})-}
             {-(Pattern
               {-(Identifier)-}
@@ -35,6 +38,7 @@
           {-(
             {-(Call
               {-(Identifier)-}
+              {-([])-}
               {-(Empty)-})-}
             {-(Break
               {-(Empty)-})-})-})-})-})-})

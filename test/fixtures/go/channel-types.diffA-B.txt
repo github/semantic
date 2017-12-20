@@ -19,7 +19,8 @@
         (SendChannel
           (SendChannel
             (Constructor
-              (Empty)))))
+              (Empty)
+              ([])))))
       (Type
       { (Identifier)
       ->(Identifier) }

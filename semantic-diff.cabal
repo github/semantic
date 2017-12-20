@@ -28,7 +28,6 @@ library
                      -- Semantic assignment
                      , Assigning.Assignment
                      , Assigning.Assignment.Table
-                     , Category
                      -- Control flow
                      , Control.Effect
                      , Control.Monad.Effect.Address
@@ -84,11 +83,9 @@ library
                      , Diffing.Algorithm.RWS.FeatureVector
                      , Diffing.Algorithm.SES
                      , Diffing.Interpreter
-                     , Info
                      -- Language-specific grammar/syntax types, & assignments
                      , Language.Markdown.Assignment
                      , Language.Markdown.Syntax
-                     , Language.Go
                      , Language.Go.Grammar
                      , Language.Go.Assignment
                      , Language.Go.Syntax
@@ -109,6 +106,7 @@ library
                      , Parsing.TreeSitter
                      , Paths_semantic_diff
                      -- Rendering formats
+                     , Rendering.DOT
                      , Rendering.JSON
                      , Rendering.Renderer
                      , Rendering.SExpression
@@ -123,7 +121,6 @@ library
                      , Semantic.Task
                      , Semantic.Queue
                      , Semantic.Util
-                     , Syntax
   build-depends:       base >= 4.8 && < 5
                      , aeson
                      , ansi-terminal

@@ -13,6 +13,7 @@
           ->(Identifier) }
           { (Identifier)
           ->(Identifier) })
+          ([])
           (Empty)))
       (Go
         (Call
@@ -21,4 +22,5 @@
           ->(Identifier) }
           { (Identifier)
           ->(Identifier) })
+          ([])
           (Empty))))))

@@ -25,13 +25,11 @@
           (
             (Integer)
             (Integer))))
-      (Assignment
-      { (Identifier)
-      ->(Identifier) }
-        (Times
-        { (Identifier)
-        ->(Identifier) }
-          (Integer)))
+    {+(Assignment
+      {+(Identifier)+}
+      {+(Times
+        {+(Identifier)+}
+        {+(Integer)+})+})+}
     {+(Assignment
       {+(Identifier)+}
       {+(Plus
@@ -57,11 +55,15 @@
       {+(BXOr
         {+(Identifier)+}
         {+(Integer)+})+})+}
-    {+(Assignment
-      {+(Identifier)+}
-      {+(Modulo
+      (Assignment
+      { (Identifier)
+      ->(Identifier) }
+      { (Times
+        {-(Identifier)-}
+        {-(Integer)-})
+      ->(Modulo
         {+(Identifier)+}
-        {+(Integer)+})+})+}
+        {+(Integer)+}) })
     {+(Assignment
       {+(Identifier)+}
       {+(Not

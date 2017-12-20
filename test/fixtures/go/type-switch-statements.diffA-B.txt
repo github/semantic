@@ -32,6 +32,7 @@
                 (Identifier))
               (Call
                 (Identifier)
+                ([])
                 (Empty))))
           (Pattern
             (Pointer
@@ -59,14 +60,15 @@
               (MemberAccess
                 (Identifier)
                 (Identifier))
-            { (TextElement)
-            ->(TextElement) }
-            {+(DividedBy
-              {+(Integer)+}
-              {+(Identifier)+})+}
-            {-(Times
-              {-(Identifier)-}
-              {-(Integer)-})-}
+              (
+              { (TextElement)
+              ->(TextElement) }
+              {+(DividedBy
+                {+(Integer)+}
+                {+(Identifier)+})+}
+              {-(Times
+                {-(Identifier)-}
+                {-(Integer)-})-})
               (Empty)))
           (Pattern
           { (Identifier)
@@ -75,14 +77,15 @@
               (MemberAccess
                 (Identifier)
                 (Identifier))
-            { (TextElement)
-            ->(TextElement) }
-            {+(Times
-              {+(Identifier)+}
-              {+(Integer)+})+}
-            {-(DividedBy
-              {-(Integer)-}
-              {-(Identifier)-})-}
+              (
+              { (TextElement)
+              ->(TextElement) }
+              {+(Times
+                {+(Identifier)+}
+                {+(Integer)+})+}
+              {-(DividedBy
+                {-(Integer)-}
+                {-(Identifier)-})-})
               (Empty)))
           (Pattern
             (Identifier)
@@ -101,22 +104,23 @@
                 (MemberAccess
                   (Identifier)
                   (Identifier))
-                (TextElement)
-                (Plus
-                  (Slice
-                  { (Identifier)
-                  ->(Identifier) }
-                  { (Identifier)
-                  ->(Identifier) }
-                    (Empty)
-                    (Empty))
-                  (Slice
-                  { (Identifier)
-                  ->(Identifier) }
-                    (Empty)
-                  { (Identifier)
-                  ->(Identifier) }
-                    (Empty)))
+                (
+                  (TextElement)
+                  (Plus
+                    (Slice
+                    { (Identifier)
+                    ->(Identifier) }
+                    { (Identifier)
+                    ->(Identifier) }
+                      (Empty)
+                      (Empty))
+                    (Slice
+                    { (Identifier)
+                    ->(Identifier) }
+                      (Empty)
+                    { (Identifier)
+                    ->(Identifier) }
+                      (Empty))))
                 (Empty))))
           (Pattern
             (DefaultPattern

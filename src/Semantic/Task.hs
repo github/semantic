@@ -51,7 +51,6 @@ import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Term
 import Data.Union
-import Info hiding (Category(..))
 import Parsing.Parser
 import Parsing.CMark
 import Parsing.TreeSitter
@@ -248,9 +247,6 @@ runParser Options{..} blob@Blob{..} = go
                     writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "assign") : blobFields)
               writeStat (Stat.count "parse.nodes" (length term) languageTag)
               pure term
-      TreeSitterParser tslanguage ->
-        time "parse.tree_sitter_parse" languageTag $
-          liftIO (treeSitterParser tslanguage blob)
       MarkdownParser ->
         time "parse.cmark_parse" languageTag $
           let term = cmarkParser blobSource
@@ -259,7 +255,7 @@ runParser Options{..} blob@Blob{..} = go
     languageTag = maybe [] (pure . (,) ("language" :: String) . show) blobLanguage
     errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
     errors = cata $ \ (In a syntax) -> case syntax of
-      _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (sourceSpan a) err]
+      _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (getField a) err]
       _ -> fold syntax
 
 instance MonadIO Task where
