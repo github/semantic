@@ -19,6 +19,7 @@ data Type
   | TArr [Type]   -- ^ N-ary function types?
   deriving (Eq, Ord, Show)
 
+
 -- | Unify two 'Type's.
 unify :: MonadFail m => Type -> Type -> m Type
 unify Int  Int  = pure Int
