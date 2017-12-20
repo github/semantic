@@ -4,6 +4,7 @@ import Control.Monad.Fail
 import Data.Traversable
 import Prelude hiding (fail)
 
+-- | The type of type variable names.
 type TName = Int
 
 data Type
