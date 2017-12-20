@@ -7,6 +7,7 @@ import Prelude hiding (fail)
 -- | The type of type variable names.
 type TName = Int
 
+-- | A datatype representing primitive types and combinations thereof.
 data Type
   = Int
   | Bool
