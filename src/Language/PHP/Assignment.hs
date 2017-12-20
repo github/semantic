@@ -51,6 +51,7 @@ type Syntax = '[
   , Syntax.Clone
   , Literal.Integer
   , Literal.Float
+  , Syntax.ShellCommand
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -135,10 +136,12 @@ primaryExpression = choice [
   -- postfixDecrementExpression,
   -- prefixIncrementExpression,
   -- prefixDecrementExpression,
-  -- shellCommandExpression,
+  shellCommandExpression,
   expression
-
   ]
+
+shellCommandExpression :: Assignment
+shellCommandExpression = makeTerm <$> symbol ShellCommandExpression <*> children (Syntax.ShellCommand <$> source)
 
 literal :: Assignment
 literal = integer <|> float <|> string

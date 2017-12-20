@@ -93,3 +93,10 @@ newtype Clone a = Clone a
 instance Eq1 Clone where liftEq = genericLiftEq
 instance Ord1 Clone where liftCompare = genericLiftCompare
 instance Show1 Clone where liftShowsPrec = genericLiftShowsPrec
+
+newtype ShellCommand a = ShellCommand ByteString
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 ShellCommand where liftEq = genericLiftEq
+instance Ord1 ShellCommand where liftCompare = genericLiftCompare
+instance Show1 ShellCommand where liftShowsPrec = genericLiftShowsPrec
