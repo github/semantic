@@ -45,6 +45,9 @@ type Syntax = '[
   , Syntax.ArrayElement
   , Syntax.CastType
   , Expression.Cast
+  , Syntax.ErrorControl
+  , Expression.Arithmetic
+  , Expression.Boolean
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -111,6 +114,11 @@ unaryExpression = choice [
 
 -- unaryOpExpression :: Assignment
 -- unaryOpExpression =
+unaryOpExpression :: Assignment
+unaryOpExpression = symbol UnaryOpExpression >>= \ loc ->
+  makeTerm loc . Expression.Not <$> children ((symbol AnonTilde <|> symbol AnonBang) *> term expression)
+  <|> makeTerm loc . Expression.Negate <$> children ((symbol AnonMinus <|> symbol AnonPlus) *> term expression)
+  <|> makeTerm loc . Syntax.ErrorControl <$> children (symbol AnonAt *> term expression)
 
 castExpression :: Assignment
 castExpression = makeTerm <$> symbol CastExpression <*> children (flip Expression.Cast <$> castType <*> unaryExpression)
