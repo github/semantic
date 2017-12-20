@@ -9,14 +9,14 @@ type TName = Int
 
 -- | A datatype representing primitive types and combinations thereof.
 data Type
-  = Int
-  | Bool
-  | String
-  | Unit
-  | Type :-> Type
-  | Type :* Type
-  | TVar TName
-  | TArr [Type]
+  = Int           -- ^ Primitive int type.
+  | Bool          -- ^ Primitive boolean type.
+  | String        -- ^ Primitive string type.
+  | Unit          -- ^ The unit type.
+  | Type :-> Type -- ^ Binary function types.
+  | Type :* Type  -- ^ Binary products.
+  | TVar TName    -- ^ A type variable.
+  | TArr [Type]   -- ^ N-ary function types?
   deriving (Eq, Ord, Show)
 
 -- | Unify two 'Type's.
