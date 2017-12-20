@@ -10,6 +10,7 @@ import Data.Set as Set
 import GHC.Generics
 import Unsafe.Coerce
 
+-- | A set of live addresses (whether roots or reachable).
 newtype Live l v = Live { unLive :: Set (Address l v) }
   deriving (Eq, Foldable, Monoid, Ord, Semigroup, Show)
 
