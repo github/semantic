@@ -86,3 +86,10 @@ newtype ErrorControl a = ErrorControl a
 instance Eq1 ErrorControl where liftEq = genericLiftEq
 instance Ord1 ErrorControl where liftCompare = genericLiftCompare
 instance Show1 ErrorControl where liftShowsPrec = genericLiftShowsPrec
+
+newtype Clone a = Clone a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Clone where liftEq = genericLiftEq
+instance Ord1 Clone where liftCompare = genericLiftCompare
+instance Show1 Clone where liftShowsPrec = genericLiftShowsPrec
