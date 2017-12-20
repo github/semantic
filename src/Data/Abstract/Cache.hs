@@ -26,7 +26,7 @@ cacheSet :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> Set 
 cacheSet key value = Cache . Map.insert key value . unCache
 
 cacheInsert :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> (v, Store l v) -> Cache l t v -> Cache l t v
-cacheInsert = (((Cache .) . (. unCache)) .) . (. point) . Map.insertWith (<>)
+cacheInsert key value = Cache . Map.insertWith (<>) key (point value) . unCache
 
 
 instance (Eq l, Eq t, Eq1 (Cell l)) => Eq1 (Cache l t) where
