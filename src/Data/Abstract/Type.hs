@@ -30,5 +30,6 @@ unify (a1 :-> b1) (a2 :-> b2) = (:->) <$> unify a1 a2 <*> unify b1 b2
 unify (a1 :* b1)  (a2 :* b2)  = (:*)  <$> unify a1 a2 <*> unify b1 b2
 unify (TVar _) b = pure b
 unify a (TVar _) = pure a
+-- FIXME: this can succeed incorrectly for lists of inequal length.
 unify (TArr as) (TArr bs) = TArr <$> for (zip as bs) (uncurry unify)
 unify t1 t2 = fail ("cannot unify " ++ show t1 ++ " with " ++ show t2)
