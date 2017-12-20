@@ -26,6 +26,7 @@ liveInsert addr = Live . Set.insert addr . unLive
 liveDelete :: Ord l => Address l v -> Live l v -> Live l v
 liveDelete addr = Live . Set.delete addr . unLive
 
+-- | Compute the (asymmetric) difference of two 'Live' sets, i.e. delete every element of the second set from the first set.
 liveDifference :: Ord l => Live l v -> Live l v -> Live l v
 liveDifference = fmap Live . (Set.difference `on` unLive)
 
