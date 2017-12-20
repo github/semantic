@@ -11,6 +11,11 @@ import Data.Union
 -- | The type of variable names.
 type Name = ByteString
 
+
+class FreeVariables term where
+  freeVariables :: term -> Set Name
+
+
 class FreeVariables1 syntax where
   liftFreeVariables :: (a -> Set Name) -> syntax a -> Set Name
   default liftFreeVariables :: (Foldable syntax) => (a -> Set Name) -> syntax a -> Set Name
@@ -18,9 +23,6 @@ class FreeVariables1 syntax where
 
 freeVariables1 :: (FreeVariables1 t, FreeVariables a) => t a -> Set Name
 freeVariables1 = liftFreeVariables freeVariables
-
-class FreeVariables term where
-  freeVariables :: term -> Set Name
 
 instance (FreeVariables1 syntax, Functor syntax) => FreeVariables (Term syntax ann) where
   freeVariables = cata (liftFreeVariables id)
