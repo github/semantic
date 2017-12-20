@@ -32,6 +32,7 @@ storeLookup (Address address) = Map.lookup address . unStore
 storeLookupAll :: (Ord l, Foldable (Cell l)) => Address l a -> Store l a -> Maybe [a]
 storeLookupAll address = fmap toList . storeLookup address
 
+-- | Append a value onto the cell for a given address, inserting a new cell if none existed.
 storeInsert :: (Ord l, Semigroup (Cell l a), Pointed (Cell l)) => Address l a -> a -> Store l a -> Store l a
 storeInsert (Address address) value = Store . Map.insertWith (<>) address (point value) . unStore
 
