@@ -25,7 +25,7 @@ deriving instance Functor (Cell l) => Functor (Store l)
 deriving instance Traversable (Cell l) => Traversable (Store l)
 
 storeLookup :: Ord l => Address l a -> Store l a -> Maybe (Cell l a)
-storeLookup = (. unStore) . Map.lookup . unAddress
+storeLookup (Address address) = Map.lookup address . unStore
 
 storeLookupAll :: (Ord l, Foldable (Cell l)) => Address l a -> Store l a -> Maybe [a]
 storeLookupAll address = fmap toList . storeLookup address
