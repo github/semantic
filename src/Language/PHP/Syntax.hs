@@ -79,3 +79,10 @@ newtype CastType a = CastType { _castType :: ByteString }
 instance Eq1 CastType where liftEq = genericLiftEq
 instance Ord1 CastType where liftCompare = genericLiftCompare
 instance Show1 CastType where liftShowsPrec = genericLiftShowsPrec
+
+newtype ErrorControl a = ErrorControl a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 ErrorControl where liftEq = genericLiftEq
+instance Ord1 ErrorControl where liftCompare = genericLiftCompare
+instance Show1 ErrorControl where liftShowsPrec = genericLiftShowsPrec
