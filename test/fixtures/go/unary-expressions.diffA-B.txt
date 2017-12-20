@@ -16,6 +16,7 @@
     {+(Pointer
       {+(Call
         {+(Identifier)+}
+        {+([])+}
         {+(Empty)+})+})+}
     {+(Complement
       {+(Identifier)+})+}
@@ -31,6 +32,7 @@
     {-(Pointer
       {-(Call
         {-(Identifier)-}
+        {-([])-}
         {-(Empty)-})-})-}
     {-(Complement
       {-(Identifier)-})-}

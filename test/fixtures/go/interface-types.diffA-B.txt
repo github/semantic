@@ -10,7 +10,8 @@
         (Type
         { (Identifier)
         ->(Identifier) }
-          (Interface)))
+          (Interface
+            ([]))))
       (
         (Type
         { (Identifier)
@@ -24,16 +25,17 @@
         { (Identifier)
         ->(Identifier) }
           (Interface
-            (Identifier)
-            (MemberAccess
+            (
               (Identifier)
-              (Identifier))
-            (MethodSignature
-              (Identifier)
-              (Identifier)
-              (
+              (MemberAccess
                 (Identifier)
-                (Identifier))))))
+                (Identifier))
+              (MethodSignature
+                (Identifier)
+                (Identifier)
+                (
+                  (Identifier)
+                  (Identifier)))))))
       (Context
         (Comment)
         (

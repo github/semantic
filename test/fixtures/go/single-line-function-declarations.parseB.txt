@@ -12,6 +12,7 @@
     ([])
     (Call
       (Identifier)
+      ([])
       (Empty)))
   (Function
     (Empty)
@@ -20,9 +21,11 @@
     (
       (Call
         (Identifier)
+        ([])
         (Empty))
       (Call
         (Identifier)
+        ([])
         (Empty))))
   (Function
     (Empty)
@@ -31,7 +34,9 @@
     (
       (Call
         (Identifier)
+        ([])
         (Empty))
       (Call
         (Identifier)
+        ([])
         (Empty)))))

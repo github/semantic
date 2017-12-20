@@ -15,7 +15,12 @@ library
   hs-source-dirs:      src
   exposed-modules:
                      -- Analyses & term annotations
-                       Analysis.ConstructorName
+                       Analysis.Abstract.Caching
+                     , Analysis.Abstract.Collecting
+                     , Analysis.Abstract.Dead
+                     , Analysis.Abstract.Evaluating
+                     , Analysis.Abstract.Tracing
+                     , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
                      , Analysis.Decorator
                      , Analysis.Declaration
@@ -23,7 +28,28 @@ library
                      -- Semantic assignment
                      , Assigning.Assignment
                      , Assigning.Assignment.Table
+                     -- Control flow
+                     , Control.Effect
+                     , Control.Monad.Effect.Address
+                     , Control.Monad.Effect.Cache
+                     , Control.Monad.Effect.Dead
+                     , Control.Monad.Effect.Env
+                     , Control.Monad.Effect.Fresh
+                     , Control.Monad.Effect.GC
+                     , Control.Monad.Effect.NonDet
+                     , Control.Monad.Effect.Store
+                     , Control.Monad.Effect.Trace
                      -- General datatype definitions & generic algorithms
+                     , Data.Abstract.Address
+                     , Data.Abstract.Cache
+                     , Data.Abstract.Configuration
+                     , Data.Abstract.Environment
+                     , Data.Abstract.Eval
+                     , Data.Abstract.FreeVariables
+                     , Data.Abstract.Live
+                     , Data.Abstract.Store
+                     , Data.Abstract.Type
+                     , Data.Abstract.Value
                      , Data.Algebra
                      , Data.Align.Generic
                      , Data.AST
@@ -122,6 +148,7 @@ library
                      , optparse-applicative
                      , parallel
                      , parsers
+                     , pointed
                      , recursion-schemes
                      , semigroups
                      , split
