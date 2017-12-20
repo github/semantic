@@ -23,7 +23,7 @@ cacheLookup :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> C
 cacheLookup key = Map.lookup key . unCache
 
 cacheSet :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> Set (v, Store l v) -> Cache l t v -> Cache l t v
-cacheSet = (((Cache .) . (. unCache)) .) . Map.insert
+cacheSet key value = Cache . Map.insert key value . unCache
 
 cacheInsert :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> (v, Store l v) -> Cache l t v -> Cache l t v
 cacheInsert = (((Cache .) . (. unCache)) .) . (. point) . Map.insertWith (<>)
