@@ -14,6 +14,7 @@ import Unsafe.Coerce
 newtype Live l v = Live { unLive :: Set (Address l v) }
   deriving (Eq, Foldable, Monoid, Ord, Semigroup, Show)
 
+-- | Construct a 'Live' set containing only the given address.
 liveSingleton :: Address l v -> Live l v
 liveSingleton = Live . Set.singleton
 
