@@ -8,6 +8,7 @@ import Data.Set
 import Data.Term
 import Data.Union
 
+-- | The type of variable names.
 type Name = ByteString
 
 class FreeVariables1 syntax where
