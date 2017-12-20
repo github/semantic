@@ -10,6 +10,7 @@ import Data.Semigroup
 import Data.Set
 import Data.Map as Map
 
+-- | A map of 'Configuration's to 'Set's of resulting values & 'Store's.
 newtype Cache l t v = Cache { unCache :: Map.Map (Configuration l t v) (Set (v, Store l v)) }
 
 deriving instance (Eq l, Eq t, Eq v, Eq (Cell l v)) => Eq (Cache l t v)
