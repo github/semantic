@@ -20,6 +20,7 @@ class FreeVariables term where
 
 -- | A lifting of 'FreeVariables' to type constructors of kind @* -> *@.
 class FreeVariables1 syntax where
+  -- | Lift a function mapping each element to its set of free variables through a containing structure, collecting the results into a single set.
   liftFreeVariables :: (a -> Set Name) -> syntax a -> Set Name
   default liftFreeVariables :: (Foldable syntax) => (a -> Set Name) -> syntax a -> Set Name
   liftFreeVariables = foldMap
