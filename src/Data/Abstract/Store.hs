@@ -10,6 +10,7 @@ import Data.Pointed
 import Data.Semigroup
 import GHC.Generics
 
+-- | A map of addresses onto cells holding their values.
 newtype Store l a = Store { unStore :: Map.Map l (Cell l a) }
   deriving (Generic1, Monoid, Semigroup)
 
