@@ -34,6 +34,7 @@ liveDifference = fmap Live . (Set.difference `on` unLive)
 liveMember :: Ord l => Address l v -> Live l v -> Bool
 liveMember addr = Set.member addr . unLive
 
+-- | Decompose a 'Live' set into a pair of one member address and the remaining set, or 'Nothing' if empty.
 liveSplit :: Ord l => Live l v -> Maybe (Address l v, Live l v)
 liveSplit = fmap (second Live) . Set.minView . unLive
 
