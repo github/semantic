@@ -48,6 +48,9 @@ type Syntax = '[
   , Syntax.ErrorControl
   , Expression.Arithmetic
   , Expression.Boolean
+  , Syntax.Clone
+  , Literal.Integer
+  , Literal.Float
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -107,10 +110,44 @@ unaryExpression :: Assignment
 unaryExpression = choice [
   -- cloneExpression,
   -- primaryExpression,
-  -- exponentiationExpression,
+  exponentiationExpression,
   unaryOpExpression,
   castExpression
   ]
+
+exponentiationExpression :: Assignment
+exponentiationExpression = makeTerm <$> symbol ExponentiationExpression <*> children (Expression.Power <$> (cloneExpression <|> primaryExpression) <*> (primaryExpression <|> cloneExpression <|> exponentiationExpression))
+
+cloneExpression :: Assignment
+cloneExpression = makeTerm <$> symbol CloneExpression <*> children (Syntax.Clone <$> primaryExpression)
+
+primaryExpression :: Assignment
+primaryExpression = choice [
+  -- variable,
+  -- classConstantAccessExpression,
+  -- qualifiedName,
+  literal,
+  -- arrayCreationExpression,
+  -- intrinsic,
+  -- anonymousFunctionCreationExpression,
+  -- objectCreationExpression,
+  -- postfixIncrementExpression,
+  -- postfixDecrementExpression,
+  -- prefixIncrementExpression,
+  -- prefixDecrementExpression,
+  -- shellCommandExpression,
+  expression
+
+  ]
+
+literal :: Assignment
+literal = integer <|> float <|> string
+
+float :: Assignment
+float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
+
+integer :: Assignment
+integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
 
 unaryOpExpression :: Assignment
 unaryOpExpression = symbol UnaryOpExpression >>= \ loc ->
