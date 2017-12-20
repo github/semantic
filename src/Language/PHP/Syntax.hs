@@ -70,3 +70,12 @@ newtype SimpleVariable a = SimpleVariable a
 instance Eq1 SimpleVariable where liftEq          = genericLiftEq
 instance Ord1 SimpleVariable where liftCompare    = genericLiftCompare
 instance Show1 SimpleVariable where liftShowsPrec = genericLiftShowsPrec
+
+
+-- | TODO: Unify with TypeScript's PredefinedType
+newtype CastType a = CastType { _castType :: ByteString }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 CastType where liftEq = genericLiftEq
+instance Ord1 CastType where liftCompare = genericLiftCompare
+instance Show1 CastType where liftShowsPrec = genericLiftShowsPrec
