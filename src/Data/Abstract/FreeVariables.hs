@@ -14,6 +14,7 @@ type Name = ByteString
 
 -- | Types which can contain unbound variables.
 class FreeVariables term where
+  -- | The set of free variables in the given value.
   freeVariables :: term -> Set Name
 
 
