@@ -28,6 +28,7 @@ deriving instance Traversable (Cell l) => Traversable (Store l)
 storeLookup :: Ord l => Address l a -> Store l a -> Maybe (Cell l a)
 storeLookup (Address address) = Map.lookup address . unStore
 
+-- | Look up the list of values stored for a given address, if any.
 storeLookupAll :: (Ord l, Foldable (Cell l)) => Address l a -> Store l a -> Maybe [a]
 storeLookupAll address = fmap toList . storeLookup address
 
