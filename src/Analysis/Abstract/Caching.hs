@@ -133,6 +133,8 @@ fixCache ev' yield e = do
 
 -- | Compute the Kleene fixed-point theorem in a monadic context.
 --
+--   Repeatedly runs a monadic action starting from some initial seed and coinductively recurring until the action’s results converge.
+--
 --   cf https://en.wikipedia.org/wiki/Kleene_fixed-point_theorem
 mlfp :: (Eq a, Monad m) => a -> (a -> m a) -> m a
 mlfp a f = loop a
