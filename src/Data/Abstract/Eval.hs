@@ -33,6 +33,7 @@ class Monad m => Eval term v m constr where
 instance (Monad m, Apply (Eval t v m) fs) => Eval t v m (Union fs) where
   eval ev yield = apply (Proxy :: Proxy (Eval t v m)) (eval ev yield)
 
+-- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
 instance (Monad m, Eval t v m s) => Eval t v m (TermF s a) where
   eval ev yield In{..} = eval ev yield termFOut
 
