@@ -33,6 +33,8 @@ type TracingInterpreter t v g
 
 -- | The effects necessary for a linear trace analysis.
 type TraceInterpreter t v = TracingInterpreter t v []
+
+-- | The effects necessary for a reachable state analysis.
 type ReachableStateInterpreter t v = TracingInterpreter t v Set
 
 
