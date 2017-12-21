@@ -6,6 +6,7 @@ import Control.Monad.Effect.Reader
 import Data.Abstract.Environment
 import Data.Abstract.Value
 
+-- | 'Monad's offering a local environment binding variable names to addresses.
 class Monad m => MonadEnv value m where
   askEnv :: m (Environment (LocationFor value) value)
   localEnv :: (Environment (LocationFor value) value -> Environment (LocationFor value) value) -> m b -> m b
