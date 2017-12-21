@@ -37,7 +37,13 @@ instance (Monad m, Apply (Eval t v m) fs) => Eval t v m (Union fs) where
 instance (Monad m, Eval t v m s) => Eval t v m (TermF s a) where
   eval ev yield In{..} = eval ev yield termFOut
 
-
+-- | '[]' is treated as an imperative sequence of statements/declarations s.t.:
+--
+--   1. Each statement’s effects on the store are accumulated;
+--   2. Each statement can affect the environment of later statements (e.g. by yielding under 'localEnv'); and
+--   3. Only the last statement’s return value is returned.
+--
+--   This also allows e.g. early returns to be implemented in the middle of a list, by means of a statement returning instead of yielding. Therefore, care must be taken by 'Eval' instances in general to yield and not simply return, or else they will unintentionally short-circuit control and skip the rest of the scope.
 instance ( Monad m
          , Ord (LocationFor v)
          , MonadGC v m
