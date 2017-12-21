@@ -8,6 +8,7 @@ import Data.Abstract.Value
 
 -- | 'Monad's offering a local environment binding variable names to addresses.
 class Monad m => MonadEnv value m where
+  -- | Retrieve the local environment.
   askEnv :: m (Environment (LocationFor value) value)
   localEnv :: (Environment (LocationFor value) value -> Environment (LocationFor value) value) -> m b -> m b
 
