@@ -29,6 +29,7 @@ type Value location = Union (ValueConstructors location)
 -- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
 -- TODO: Wrap the Value union in a newtype to differentiate from (eventual) à la carte Types.
 
+-- | A function value consisting of a list of parameters, the body of the function, and an environment of bindings captured by the body.
 data Closure location term = Closure [Name] term (Environment location (Value location term))
   deriving (Eq, Generic1, Ord, Show)
 
