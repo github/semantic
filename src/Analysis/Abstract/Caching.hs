@@ -30,6 +30,7 @@ import Data.Pointed
 import Data.Semigroup
 import qualified Data.Set as Set
 
+-- | The effects necessary for caching analyses.
 type CachingInterpreter t v
   = '[ Fresh
      , Reader (Live (LocationFor v) v)
