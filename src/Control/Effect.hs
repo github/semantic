@@ -17,6 +17,7 @@ run = Effect.run . runEffects
 
 -- | A typeclass to run a computation to completion, interpreting each effect with some sensible defaults.
 class RunEffects fs a where
+  -- | The final result type of the computation, factoring in the results of any effects, e.g. pairing 'State' results with the final state, wrapping 'Fail' results in 'Either', etc.
   type Final fs a
   runEffects :: Eff fs a -> Eff '[] (Final fs a)
 
