@@ -9,7 +9,7 @@ import Data.Abstract.Value
 
 -- | 'Monad's offering a readable 'Cache' of values & stores for each configuration in a program.
 --
---   This cache is used as an oracle for the results of recursive computations, allowing us to finitize potentially nonterminating control flow by repeatedly computing the results until analysis converges on a stable value. Each iteration of this process must consult this cache only _after_ evaluating the configuration itself in order to ensure soundness (since it could otherwise produce stale results for some configurations).
+--   This (in-)cache is used as an oracle for the results of recursive computations, allowing us to finitize potentially nonterminating control flow by repeatedly computing the results until analysis converges on a stable value. Each iteration of this process must consult this cache only _after_ evaluating the configuration itself in order to ensure soundness (since it could otherwise produce stale results for some configurations).
 --
 --   Since finitization crucially depends on convergence, this cache should only be used with value abstractions that will converge for multiple disjoint assignments of a given variable, e.g. its type, and not with precisely-modelled values. To illustrate why, consider a simple incrementing recursive function:
 --
@@ -26,6 +26,16 @@ instance (Reader (Cache (LocationFor v) t v) :< fs) => MonadCacheIn t v (Eff fs)
   localCache = local
 
 
+-- | 'Monad's offering a readable & writable 'Cache' of values & stores for each configuration in a program.
+--
+--   This (out-)cache is used to store the results of recursive computations, allowing us to finitize each iteration of an analysis by first looking up the current configuration in the cache and only evaluating:
+--
+--   1. If the configuration has not been visited before, and
+--   2. _after_ copying the previous iteration’s results (from the in-cache, and defaulting to a 'mempty' set of results) into the out-cache.
+--
+--   Thus, visiting the same configuration twice recursively will terminate, since we’ll have consulted the in-cache as an oracle before evaluating, and after evaluating, the resulting value and store should be appended into the out-cache. Then, once the current iteration of the analysis has completed, the updated out-cache will be used as the oracle for the next iteration, until such time as the cache converges.
+--
+--   See also 'MonadCacheIn' for discussion of the conditions of finitization.
 class Monad m => MonadCacheOut t v m where
   getCache :: m (Cache (LocationFor v) t v)
   putCache :: Cache (LocationFor v) t v -> m ()
