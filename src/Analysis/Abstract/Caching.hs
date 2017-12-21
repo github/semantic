@@ -30,7 +30,7 @@ import Data.Semigroup
 import qualified Data.Set as Set
 
 -- | The effects necessary for caching analyses.
-type CachingInterpreter t v
+type Caching t v
   = '[ Fresh                                  -- For 'MonadFresh'.
      , Reader (Live (LocationFor v) v)        -- For 'MonadGC'.
      , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
@@ -41,11 +41,11 @@ type CachingInterpreter t v
      , State (Cache (LocationFor v) t v)      -- For 'MonadCacheOut'.
      ]
 
--- | A synonym for the result of a 'CachingInterpreter'.
-type CachingResult t v = Final (CachingInterpreter t v) v
+-- | A synonym for the result of a 'Caching' evaluation to @v@.
+type CachingResult t v = Final (Caching t v) v
 
 -- | A constraint synonym for the interfaces necessary for caching interpretation.
-type MonadCachingInterpreter t v m
+type MonadCaching t v m
   = ( MonadEnv v m
     , MonadStore v m
     , MonadCacheIn t v m
@@ -64,14 +64,14 @@ evalCache :: forall v term
             , Foldable (Cell (LocationFor v))
             , Functor (Base term)
             , Recursive term
-            , MonadAddress (LocationFor v) (Eff (CachingInterpreter term v))
+            , MonadAddress (LocationFor v) (Eff (Caching term v))
             , Semigroup (Cell (LocationFor v) v)
             , ValueRoots (LocationFor v) v
-            , Eval term v (Eff (CachingInterpreter term v)) (Base term)
+            , Eval term v (Eff (Caching term v)) (Base term)
             )
           => term
           -> CachingResult term v
-evalCache e = run @(CachingInterpreter term v) (fixCache (fix (evCache (evCollect (\ recur yield -> eval recur yield . project)))) pure e)
+evalCache e = run @(Caching term v) (fixCache (fix (evCache (evCollect (\ recur yield -> eval recur yield . project)))) pure e)
 
 
 -- | Evaluation of a single iteration of an analysis, given a 'MonadCacheIn' instance as an oracle for results and a 'MonadCacheOut' instance to record computed results in.
@@ -80,7 +80,7 @@ evCache :: forall t v m
           , Ord t
           , Ord v
           , Ord (Cell (LocationFor v) v)
-          , MonadCachingInterpreter t v m
+          , MonadCaching t v m
           )
         => (((v -> m v) -> t -> m v) -> (v -> m v) -> t -> m v)
         -> ((v -> m v) -> t -> m v)
@@ -104,7 +104,7 @@ fixCache :: forall t v m
            , Ord t
            , Ord v
            , Ord (Cell (LocationFor v) v)
-           , MonadCachingInterpreter t v m
+           , MonadCaching t v m
            , MonadNonDet m
            , MonadFresh m
            )
