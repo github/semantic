@@ -32,14 +32,14 @@ import qualified Data.Set as Set
 
 -- | The effects necessary for caching analyses.
 type CachingInterpreter t v
-  = '[ Fresh
-     , Reader (Live (LocationFor v) v)
-     , Reader (Environment (LocationFor v) v)
-     , Fail
-     , NonDetEff
-     , State (Store (LocationFor v) v)
-     , Reader (Cache (LocationFor v) t v)
-     , State (Cache (LocationFor v) t v)
+  = '[ Fresh                                  -- For 'MonadFresh'.
+     , Reader (Live (LocationFor v) v)        -- For 'MonadGC'.
+     , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
+     , Fail                                   -- For 'MonadFail'.
+     , NonDetEff                              -- For 'Alternative' & 'MonadNonDet'.
+     , State (Store (LocationFor v) v)        -- For 'MonadStore'.
+     , Reader (Cache (LocationFor v) t v)     -- For 'MonadCacheIn'.
+     , State (Cache (LocationFor v) t v)      -- For 'MonadCacheOut'.
      ]
 
 type CachingResult t v = Final (CachingInterpreter t v) v
