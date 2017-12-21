@@ -8,6 +8,7 @@ import Data.Abstract.Value
 
 -- | 'Monad's offering a writable trace of configurations.
 class Monad m => MonadTrace t v g m where
+  -- | Log the given collection of configurations.
   trace :: g (Configuration (LocationFor v) t v) -> m ()
 
 instance (Writer (g (Configuration (LocationFor v) t v)) :< fs) => MonadTrace t v g (Eff fs) where
