@@ -70,6 +70,7 @@ instance Ord1 String where liftCompare = genericLiftCompare
 instance Show1 String where liftShowsPrec = genericLiftShowsPrec
 
 
+-- | The location type (the body of 'Address'es) which should be used for an abstract value type.
 type family LocationFor value :: * where
   LocationFor (Value location term) = location
   LocationFor Type.Type = Monovariant
