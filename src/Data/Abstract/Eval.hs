@@ -21,7 +21,7 @@ import Prelude hiding (fail)
 -- | The 'Eval' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Monad m => Eval term v m constr where
   -- | Evaluate a term using an open-recursive evaluator for any child terms.
-  eval :: ((v -> m v) -> term -> m v) -- ^ An open-recursive evaluator for child terms.
+  eval :: ((v -> m v) -> term -> m v) -- ^ An open-recursive evaluator for child terms, taking a continuation representing the remainder of the child’s scope. Syntax representing imperative sequences of statements should pass in a continuation evaluating the remaining statements. Syntax which introduces a lexical scope for variable bindings should pass 'pure'. Syntax which does not delimit variable bindings should pass the continuation that it itself was passed by its parent.
        -> (v -> m v)                  -- ^ A continuation representing the remainder of the current (imperative) scope. This allows each statement in an imperative sequence to affect the environment of later statements in the same scope, but without allowing such effects to escape their scope. For example, @do { x <- getX ; f x }@ binds @x@ in the local environment in the first statement s.t. the second can use it, but remains unbound outside of the @do@-block.
        -> constr term                 -- ^ The current instruction in a program.
        -> m v                         -- ^ A monadic computation producing the (abstract) evaluation of the current instruction.
