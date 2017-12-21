@@ -6,6 +6,7 @@ import Control.Monad.Effect.Internal
 
 type TName = Int
 
+-- | An effect offering a (resettable) sequence of always-incrementing, and therefore “fresh,” type variables.
 data Fresh a where
   Reset :: TName -> Fresh ()
   Fresh :: Fresh TName
