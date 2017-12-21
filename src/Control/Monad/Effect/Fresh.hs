@@ -13,6 +13,7 @@ data Fresh a where
 
 -- | 'Monad's offering a (resettable) sequence of guaranteed-fresh type variables.
 class Monad m => MonadFresh m where
+  -- | Get a fresh variable name, guaranteed unused (since the last 'reset').
   fresh :: m TName
   reset :: TName -> m ()
 
