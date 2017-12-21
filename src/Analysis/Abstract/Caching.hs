@@ -105,6 +105,7 @@ evCache ev0 ev' yield e = do
       modifyCache (cacheInsert c (v, store'))
       pure v
 
+-- | Coinductively iterate the analysis of a term until the results converge.
 fixCache :: forall t v m
          . ( Ord (LocationFor v)
            , Ord t
