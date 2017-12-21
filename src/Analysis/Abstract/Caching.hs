@@ -128,6 +128,10 @@ fixCache ev' yield e = do
     getCache) mempty
   maybe empty scatter (cacheLookup c cache)
 
+-- | Get the current 'Configuration' with a passed-in term.
+getConfiguration :: (MonadEnv v m, MonadGC v m, MonadStore v m) => t -> m (Configuration (LocationFor v) t v)
+getConfiguration term = Configuration term <$> askRoots <*> askEnv <*> getStore
+
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
 scatter :: (Alternative m, Foldable t, MonadStore a m) => t (a, Store (LocationFor a) a) -> m a
