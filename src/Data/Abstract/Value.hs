@@ -76,6 +76,7 @@ type family LocationFor value :: * where
   LocationFor Type.Type = Monovariant
 
 
+-- | Value types, e.g. closures, which can root a set of addresses.
 class ValueRoots l v | v -> l where
   valueRoots :: v -> Live l v
 
