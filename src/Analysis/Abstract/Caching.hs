@@ -139,9 +139,9 @@ fixCache ev' yield e = do
 mlfp :: ( Eq a
         , Monad m
         )
-     => (a -> m a)
-     -> a
-     -> m a
+     => (a -> m a) -- ^ A monadic action to perform at each iteration, starting from the result of the previous iteration or from the seed value for the first iteration.
+     -> a          -- ^ An initial seed value to iterate from.
+     -> m a        -- ^ A computation producing the least fixed point (the first value at which the actions converge).
 mlfp f = loop
   where loop x = do
           x' <- f x
