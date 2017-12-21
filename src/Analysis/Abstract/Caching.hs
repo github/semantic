@@ -94,9 +94,9 @@ evCache ev0 ev' yield e = do
   let c = Configuration e roots env store :: Configuration (LocationFor v) t v
   out <- getCache
   case cacheLookup c out of
-    Just pairs -> asum . flip map (toList pairs) $ \ (value, store') -> do
+    Just pairs -> foldMapA (\ (value, store') -> do
       putStore store'
-      pure value
+      pure value) (toList pairs)
     Nothing -> do
       in' <- askCache
       let pairs = fromMaybe mempty (cacheLookup c in')
@@ -129,9 +129,9 @@ fixCache ev' yield e = do
     reset 0
     _ <- localCache (const dollar) (collect point (ev' yield e) :: m (Set.Set v))
     getCache) mempty
-  asum . flip map (maybe [] toList (cacheLookup c cache)) $ \ (value, store') -> do
+  maybe empty (foldMapA (\ (value, store') -> do
     putStore store'
-    pure value
+    pure value) . toList) (cacheLookup c cache)
 
 
 -- | Compute the Kleene fixed-point theorem in a monadic context.
