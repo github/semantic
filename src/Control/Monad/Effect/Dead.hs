@@ -6,6 +6,7 @@ import Control.Monad.Effect.State
 import Data.Semigroup
 import Data.Set
 
+-- | A set of “dead” (unreachable) terms.
 newtype Dead a = Dead { unDead :: Set a }
   deriving (Eq, Foldable, Semigroup, Monoid, Ord, Show)
 
