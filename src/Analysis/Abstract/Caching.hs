@@ -131,6 +131,9 @@ fixCache ev' yield e = do
     pure value
 
 
+-- | Compute the Kleene fixed-point theorem in a monadic context.
+--
+--   cf https://en.wikipedia.org/wiki/Kleene_fixed-point_theorem
 mlfp :: (Eq a, Monad m) => a -> (a -> m a) -> m a
 mlfp a f = loop a
   where loop x = do
