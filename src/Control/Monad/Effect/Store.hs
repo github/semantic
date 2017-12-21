@@ -19,6 +19,7 @@ assign = (modifyStore .) . storeInsert
 
 -- | 'Monad's offering a readable & writable 'Store' of values for specific 'Address'es.
 class Monad m => MonadStore a m where
+  -- | Get the current store.
   getStore :: m (Store (LocationFor a) a)
   putStore :: Store (LocationFor a) a -> m ()
 
