@@ -45,6 +45,7 @@ type CachingInterpreter t v
 -- | A synonym for the result of a 'CachingInterpreter'.
 type CachingResult t v = Final (CachingInterpreter t v) v
 
+-- | A constraint synonym for the interfaces necessary for caching interpretation.
 type MonadCachingInterpreter t v m
   = ( MonadEnv v m
     , MonadStore v m
