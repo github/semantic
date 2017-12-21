@@ -37,7 +37,13 @@ gc :: ( Ord (LocationFor a)
 gc roots store = storeRestrict store (reachable roots store)
 
 -- | Compute the set of addresses reachable from a given root set in a given store.
-reachable :: (Ord (LocationFor a), Foldable (Cell (LocationFor a)), ValueRoots (LocationFor a) a) => Live (LocationFor a) a -> Store (LocationFor a) a -> Live (LocationFor a) a
+reachable :: ( Ord (LocationFor a)
+             , Foldable (Cell (LocationFor a))
+             , ValueRoots (LocationFor a) a
+             )
+          => Live (LocationFor a) a
+          -> Store (LocationFor a) a
+          -> Live (LocationFor a) a
 reachable roots store = go roots mempty
   where go set seen = case liveSplit set of
           Nothing -> seen
