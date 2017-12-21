@@ -6,6 +6,7 @@ import Control.Monad.Effect.Writer
 import Data.Abstract.Configuration
 import Data.Abstract.Value
 
+-- | 'Monad's offering a writable trace of configurations.
 class Monad m => MonadTrace t v g m where
   trace :: g (Configuration (LocationFor v) t v) -> m ()
 
