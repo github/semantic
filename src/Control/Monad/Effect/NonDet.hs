@@ -8,6 +8,7 @@ import Control.Applicative
 import Control.Monad.Effect.Internal
 import Control.Monad.Effect.NonDetEff
 
+-- | 'Monad's offering local isolation of nondeterminism effects.
 class (Alternative m, Monad m) => MonadNonDet m where
   collect :: Monoid b => (a -> b) -> m a -> m b
 
