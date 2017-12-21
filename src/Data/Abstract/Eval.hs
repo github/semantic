@@ -21,7 +21,10 @@ import Prelude hiding (fail)
 -- | The 'Eval' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Monad m => Eval term v m constr where
   -- | Evaluate a term using an open-recursive evaluator for any child terms.
-  eval :: ((v -> m v) -> term -> m v) -> ((v -> m v) -> constr term -> m v)
+  eval :: ((v -> m v) -> term -> m v)
+       -> (v -> m v)
+       -> constr term
+       -> m v
 
   default eval :: (MonadFail m, Show1 constr) => ((v -> m v) -> term -> m v) -> ((v -> m v) -> constr term -> m v)
   eval _ _ expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
