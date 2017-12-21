@@ -39,21 +39,26 @@ class RunEffect f a where
   -- | Interpret the topmost effect in a computation with some sensible defaults (defined per-effect), and return the incremental 'Result'.
   runEffect :: Eff (f ': fs) a -> Eff fs (Result f a)
 
+-- | 'State' effects with 'Monoid'al states are interpreted starting from the 'mempty' state value into a pair of result value and final state.
 instance Monoid b => RunEffect (State b) a where
   type Result (State b) a = (a, b)
   runEffect = flip runState mempty
 
+-- | 'Reader' effects with 'Monoid'al environments are interpreted starting from the 'mempty' environment value.
 instance Monoid b => RunEffect (Reader b) a where
   runEffect = flip runReader mempty
 
+-- | 'Fail' effects are interpreted into 'Either' s.t. failures are in 'Left' and successful results are in 'Right'.
 instance RunEffect Fail a where
   type Result Fail a = Either String a
   runEffect = runFail
 
+-- | 'Writer' effects are interpreted into a pair of result value and final log.
 instance Monoid w => RunEffect (Writer w) a where
   type Result (Writer w) a = (a, w)
   runEffect = runWriter
 
+-- | 'NonDetEff' effects are interpreted into a nondeterministic set of result values.
 instance Ord a => RunEffect NonDetEff a where
   type Result NonDetEff a = Set a
   runEffect = relay (pure . point) (\ m k -> case m of
