@@ -103,6 +103,7 @@ instance (FreeVariables term, Ord location) => ValueRoots location (Value locati
     | Just (Closure names body env) <- prj v = envRoots env (foldr Set.delete (freeVariables body) names)
     | otherwise                              = mempty
 
+-- | Construct a 'Value' wrapping the value arguments (if any).
 instance AbstractValue (Value location term) where
   unit = inj Unit
   integer = inj . Integer
@@ -112,6 +113,7 @@ instance AbstractValue (Value location term) where
 instance ValueRoots Monovariant Type.Type where
   valueRoots _ = mempty
 
+-- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
 instance AbstractValue Type.Type where
   unit = Type.Unit
   integer _ = Type.Int
