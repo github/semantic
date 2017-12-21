@@ -78,6 +78,7 @@ type family LocationFor value :: * where
 
 -- | Value types, e.g. closures, which can root a set of addresses.
 class ValueRoots l v | v -> l where
+  -- | Compute the set of addresses rooted by a given value.
   valueRoots :: v -> Live l v
 
 class AbstractValue v where
