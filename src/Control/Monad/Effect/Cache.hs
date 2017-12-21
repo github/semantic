@@ -40,6 +40,7 @@ instance (Reader (Cache (LocationFor v) t v) :< fs) => MonadCacheIn t v (Eff fs)
 --
 --   See also 'MonadCacheIn' for discussion of the conditions of finitization.
 class Monad m => MonadCacheOut t v m where
+  -- | Retrieve the current out-cache.
   getCache :: m (Cache (LocationFor v) t v)
   putCache :: Cache (LocationFor v) t v -> m ()
 
