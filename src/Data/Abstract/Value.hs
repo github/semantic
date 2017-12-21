@@ -61,6 +61,7 @@ instance Eq1 Integer where liftEq = genericLiftEq
 instance Ord1 Integer where liftCompare = genericLiftCompare
 instance Show1 Integer where liftShowsPrec = genericLiftShowsPrec
 
+-- | String values.
 newtype String term = String ByteString
   deriving (Eq, Generic1, Ord, Show)
 
