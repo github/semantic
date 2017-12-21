@@ -20,15 +20,15 @@ import Data.Semigroup
 import Data.Set
 
 -- | The effects necessary for dead code analysis.
-type DeadCodeInterpreter t v
+type DeadCodeEvaluating t v
   = '[ State (Dead t)                         -- For 'MonadDead'.
      , Fail                                   -- For 'MonadFail'.
      , State (Store (LocationFor v) v)        -- For 'MonadStore'.
      , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
      ]
 
--- | A synonym for the result of a 'DeadCodeInterpreter'.
-type DeadCodeResult t v = Final (DeadCodeInterpreter t v) v
+-- | A synonym for the result of 'DeadCodeEvaluating' to @v@.
+type DeadCodeResult t v = Final (DeadCodeEvaluating t v) v
 
 
 -- | Dead code analysis
@@ -37,13 +37,13 @@ evalDead :: forall v term
            , Ord term
            , Foldable (Base term)
            , Recursive term
-           , Eval term v (Eff (DeadCodeInterpreter term v)) (Base term)
-           , MonadAddress (LocationFor v) (Eff (DeadCodeInterpreter term v))
+           , Eval term v (Eff (DeadCodeEvaluating term v)) (Base term)
+           , MonadAddress (LocationFor v) (Eff (DeadCodeEvaluating term v))
            , Semigroup (Cell (LocationFor v) v)
            )
          => term
          -> DeadCodeResult term v
-evalDead e0 = run @(DeadCodeInterpreter term v) $ do
+evalDead e0 = run @(DeadCodeEvaluating term v) $ do
   killAll (Dead (subterms e0))
   fix (evDead (\ recur yield -> eval recur yield . project)) pure e0
   where
