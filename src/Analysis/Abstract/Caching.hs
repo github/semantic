@@ -42,6 +42,7 @@ type CachingInterpreter t v
      , State (Cache (LocationFor v) t v)      -- For 'MonadCacheOut'.
      ]
 
+-- | A synonym for the result of a 'CachingInterpreter'.
 type CachingResult t v = Final (CachingInterpreter t v) v
 
 type MonadCachingInterpreter t v m
