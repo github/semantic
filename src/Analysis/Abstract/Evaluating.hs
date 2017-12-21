@@ -30,6 +30,7 @@ type Interpreter v
 -- | A constraint synonym for the interfaces necessary for concrete interpretation.
 type MonadInterpreter v m = (MonadEnv v m, MonadStore v m, MonadFail m)
 
+-- | A synonym for the result of an 'Interpreter' of @v@.
 type EvalResult v = Final (Interpreter v) v
 
 -- | Evaluate a term to a value.
