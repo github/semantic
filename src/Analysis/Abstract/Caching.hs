@@ -26,6 +26,7 @@ import Data.Foldable
 import Data.Function (fix)
 import Data.Functor.Foldable (Base, Recursive(..))
 import Data.Maybe
+import Data.Monoid (Alt(..))
 import Data.Pointed
 import Data.Semigroup
 import qualified Data.Set as Set
@@ -151,3 +152,7 @@ mlfp f = loop
             pure x
           else
             loop x'
+
+-- | Generalization of 'foldMap' to an 'Alternative' functor.
+foldMapA :: (Alternative f, Foldable t) => (a -> f b) -> t a -> f b
+foldMapA f = getAlt . foldMap (Alt . f)
