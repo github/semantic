@@ -45,6 +45,7 @@ instance Eq1 Unit where liftEq = genericLiftEq
 instance Ord1 Unit where liftCompare = genericLiftCompare
 instance Show1 Unit where liftShowsPrec = genericLiftShowsPrec
 
+-- | Boolean values.
 newtype Boolean term = Boolean Prelude.Bool
   deriving (Eq, Generic1, Ord, Show)
 
