@@ -76,8 +76,6 @@ type family LocationFor value :: * where
   LocationFor Type.Type = Monovariant
 
 
--- Instances
-
 class ValueRoots l v | v -> l where
   valueRoots :: v -> Live l v
 
@@ -86,6 +84,9 @@ class AbstractValue v where
   integer :: Prelude.Integer -> v
   boolean :: Bool -> v
   string :: ByteString -> v
+
+
+-- Instances
 
 instance (FreeVariables term, Ord location) => ValueRoots location (Value location term) where
   valueRoots v
