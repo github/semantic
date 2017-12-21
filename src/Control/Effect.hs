@@ -30,6 +30,7 @@ instance RunEffect f a => RunEffects '[f] a where
   runEffects = runEffect
 
 
+-- | A typeclass to interpret a single effect with some sensible defaults (defined per-effect).
 class RunEffect f a where
   type Result f a
   type instance Result f a = a
