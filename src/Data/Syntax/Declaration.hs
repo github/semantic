@@ -35,6 +35,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Do we need some distinct notion of a global environment?
 -- TODO: Implement evaluation under the binder for the typechecking evaluator.
+-- TODO: Filter the closed-over environment by the free variables in the term.
 instance ( Monad m
          , Ord l
          , Semigroup (Cell l (Value l t))
