@@ -26,6 +26,9 @@ type ValueConstructors location
 -- | Open union of primitive values that terms can be evaluated to.
 type Value location = Union (ValueConstructors location)
 
+-- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
+-- TODO: Wrap the Value union in a newtype to differentiate from (eventual) à la carte Types.
+
 data Closure location term = Closure [Name] term (Environment location (Value location term))
   deriving (Eq, Generic1, Ord, Show)
 
