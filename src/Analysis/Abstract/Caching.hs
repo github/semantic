@@ -124,7 +124,7 @@ fixCache ev' yield e = do
     putCache (mempty :: Cache (LocationFor v) t v)
     putStore store
     reset 0
-    _ <- localCache (const dollar) (collect point (ev' yield e) :: m (Set.Set v))
+    _ <- localCache (const dollar) (gather point (ev' yield e) :: m (Set.Set v))
     getCache) mempty
   maybe empty scatter (cacheLookup c cache)
 
