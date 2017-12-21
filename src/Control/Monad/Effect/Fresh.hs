@@ -24,6 +24,7 @@ instance (Fresh :< fs) => MonadFresh (Eff fs) where
   reset = send . Reset
 
 
+-- | 'Fresh' effects are interpreted starting from 0, incrementing the current name with each request for a fresh name, and overwriting the counter on reset.
 instance RunEffect Fresh a where
   runEffect = relayState (0 :: TName) (const pure) (\ s action k -> case action of
     Fresh -> k (succ s) s
