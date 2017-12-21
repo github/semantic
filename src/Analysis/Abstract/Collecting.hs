@@ -41,9 +41,9 @@ reachable :: ( Ord (LocationFor a)
              , Foldable (Cell (LocationFor a))
              , ValueRoots (LocationFor a) a
              )
-          => Live (LocationFor a) a
-          -> Store (LocationFor a) a
-          -> Live (LocationFor a) a
+          => Live (LocationFor a) a  -- ^ The set of root addresses.
+          -> Store (LocationFor a) a -- ^ The store to trace addresses through.
+          -> Live (LocationFor a) a  -- ^ The set of addresses reachable from the root set.
 reachable roots store = go roots mempty
   where go set seen = case liveSplit set of
           Nothing -> seen
