@@ -14,7 +14,7 @@ import Data.Pointed
 import Data.Semigroup
 
 assign :: (Ord (LocationFor a), Semigroup (Cell (LocationFor a) a), Pointed (Cell (LocationFor a)), MonadStore a m) => Address (LocationFor a) a -> a -> m ()
-assign = (modifyStore .) . storeInsert
+assign address = modifyStore . storeInsert address
 
 
 -- | 'Monad's offering a readable & writable 'Store' of values for specific 'Address'es.
