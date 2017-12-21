@@ -9,6 +9,7 @@ import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Semigroup
 
+-- | Small-step evaluation which garbage-collects any non-rooted addresses after evaluating each term.
 evCollect :: forall t v m
           .  ( Ord (LocationFor v)
              , Foldable (Cell (LocationFor v))
