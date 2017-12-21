@@ -20,6 +20,7 @@ import Data.Functor.Foldable (Base, Recursive(..))
 import Data.Semigroup
 import Data.Set
 
+-- | The effects necessary for concrete interpretation.
 type Interpreter v
   = '[ Fail
      , Reader (Live (LocationFor v) v)
