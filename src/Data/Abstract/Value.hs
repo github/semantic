@@ -81,6 +81,7 @@ class ValueRoots l v | v -> l where
   -- | Compute the set of addresses rooted by a given value.
   valueRoots :: v -> Live l v
 
+-- | An interface for constructing abstract values.
 class AbstractValue v where
   unit :: v
   integer :: Prelude.Integer -> v
