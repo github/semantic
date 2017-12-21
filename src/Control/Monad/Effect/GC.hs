@@ -7,6 +7,7 @@ import Data.Abstract.Live
 import Data.Abstract.Value
 import Data.Semigroup ((<>))
 
+-- | 'Monad's offering a local set of 'Live' (rooted/reachable) addresses.
 class Monad m => MonadGC a m where
   askRoots :: m (Live (LocationFor a) a)
 
