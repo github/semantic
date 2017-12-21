@@ -75,6 +75,7 @@ evalCache :: forall v term
 evalCache e = run @(CachingInterpreter term v) (fixCache (fix (evCache (evCollect (\ recur yield -> eval recur yield . project)))) pure e)
 
 
+-- | Evaluation of a single iteration of an analysis, given a 'MonadCacheIn' instance as an oracle for results and a 'MonadCacheOut' instance to record computed results in.
 evCache :: forall t v m
         . ( Ord (LocationFor v)
           , Ord t
