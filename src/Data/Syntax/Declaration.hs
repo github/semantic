@@ -72,7 +72,7 @@ instance ( Alternative m
 
     outTy <- localEnv (const (foldr (\ (n, a, _) -> envInsert n a) env tvars)) (recur pure functionBody)
     let tvars' = fmap (\(_, _, t) -> t) tvars
-    let v = TArr tvars' :-> outTy
+    let v = Type.Product tvars' :-> outTy
 
     (name, a) <- envLookupOrAlloc' functionName env v
 
