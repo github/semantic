@@ -21,10 +21,10 @@ import Data.Set
 
 -- | The effects necessary for dead code analysis.
 type DeadCodeInterpreter t v
-  = '[ State (Dead t)
-     , Fail
-     , State (Store (LocationFor v) v)
-     , Reader (Environment (LocationFor v) v)
+  = '[ State (Dead t)                         -- For 'MonadDead'.
+     , Fail                                   -- For 'MonadFail'.
+     , State (Store (LocationFor v) v)        -- For 'MonadStore'.
+     , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
      ]
 
 type DeadCodeResult t v = Final (DeadCodeInterpreter t v) v
