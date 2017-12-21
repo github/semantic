@@ -46,6 +46,7 @@ envLookupOrAlloc name env v = do
   pure (name, a)
 
 
+-- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
 instance Monad m => MonadAddress Precise m where
   deref = maybe uninitializedAddress (pure . unLatest) <=< flip fmap getStore . storeLookup
 
@@ -54,6 +55,7 @@ instance Monad m => MonadAddress Precise m where
           allocPrecise = Address . Precise . storeSize
 
 
+-- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
 instance (Alternative m, Monad m) => MonadAddress Monovariant m where
   deref = asum . maybe [] (map pure . toList) <=< flip fmap getStore . storeLookup
 
