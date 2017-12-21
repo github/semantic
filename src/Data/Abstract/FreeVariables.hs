@@ -19,6 +19,8 @@ class FreeVariables term where
 
 
 -- | A lifting of 'FreeVariables' to type constructors of kind @* -> *@.
+--
+--   'Foldable' types requiring no additional semantics to the set of free variables (e.g. types which do not bind any variables) can use (and even derive, with @-XDeriveAnyClass@) the default implementation.
 class FreeVariables1 syntax where
   -- | Lift a function mapping each element to its set of free variables through a containing structure, collecting the results into a single set.
   liftFreeVariables :: (a -> Set Name) -> syntax a -> Set Name
