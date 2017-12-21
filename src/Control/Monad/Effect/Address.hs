@@ -4,7 +4,7 @@ module Control.Monad.Effect.Address where
 import Control.Applicative
 import Control.Monad ((<=<))
 import Control.Monad.Effect.Store
-import Control.Monad.Fail
+import Control.Monad.Fail as Fail
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
@@ -64,4 +64,4 @@ instance (Alternative m, Monad m) => MonadAddress Monovariant m where
 
 -- | Fail with a message denoting an uninitialized address (i.e. one which was 'alloc'ated, but never 'assign'ed a value before being 'deref'erenced).
 uninitializedAddress :: MonadFail m => m a
-uninitializedAddress = Control.Monad.Fail.fail "uninitialized address"
+uninitializedAddress = Fail.fail "uninitialized address"
