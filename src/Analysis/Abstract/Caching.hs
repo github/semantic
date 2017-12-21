@@ -93,9 +93,7 @@ evCache ev0 ev' yield e = do
   let c = Configuration e roots env store :: Configuration (LocationFor v) t v
   out <- getCache
   case cacheLookup c out of
-    Just pairs -> foldMapA (\ (value, store') -> do
-      putStore store'
-      pure value) pairs
+    Just pairs -> scatter pairs
     Nothing -> do
       in' <- askCache
       let pairs = fromMaybe mempty (cacheLookup c in')
@@ -128,10 +126,12 @@ fixCache ev' yield e = do
     reset 0
     _ <- localCache (const dollar) (collect point (ev' yield e) :: m (Set.Set v))
     getCache) mempty
-  maybe empty (foldMapA (\ (value, store') -> do
-    putStore store'
-    pure value)) (cacheLookup c cache)
+  maybe empty scatter (cacheLookup c cache)
 
+
+-- | Nondeterministically write each of a collection of stores & return their associated results.
+scatter :: (Alternative m, Foldable t, MonadStore a m) => t (a, Store (LocationFor a) a) -> m a
+scatter = foldMapA (\ (value, store') -> putStore store' *> pure value)
 
 -- | Compute the Kleene fixed-point theorem in a monadic context.
 --
