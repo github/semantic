@@ -21,6 +21,8 @@ assign = (modifyStore .) . storeInsert
 class Monad m => MonadStore a m where
   -- | Get the current store.
   getStore :: m (Store (LocationFor a) a)
+
+  -- | Update the current store.
   putStore :: Store (LocationFor a) a -> m ()
 
 instance (State (Store (LocationFor a) a) :< fs) => MonadStore a (Eff fs) where
