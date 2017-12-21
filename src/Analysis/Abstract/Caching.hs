@@ -88,13 +88,13 @@ evCache :: forall t v m
         -> (v -> m v) -> t -> m v
 evCache ev0 ev' yield e = do
   c <- getConfiguration e
-  out <- getCache
-  case cacheLookup c out of
+  cached <- getsCache (cacheLookup c)
+  case cached of
     Just pairs -> scatter pairs
     Nothing -> do
       in' <- askCache
       let pairs = fromMaybe mempty (cacheLookup c in')
-      putCache (cacheSet c pairs out)
+      modifyCache (cacheSet c pairs)
       v <- ev0 ev' yield e
       store' <- getStore
       modifyCache (cacheInsert c (v, store'))
