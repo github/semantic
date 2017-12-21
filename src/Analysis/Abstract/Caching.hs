@@ -41,7 +41,7 @@ type Caching t v
      , State (Cache (LocationFor v) t v)      -- For 'MonadCacheOut'.
      ]
 
--- | A constraint synonym for the interfaces necessary for caching interpretation.
+-- | A constraint synonym for the interfaces necessary for caching analyses.
 type MonadCaching t v m
   = ( MonadEnv v m
     , MonadStore v m
