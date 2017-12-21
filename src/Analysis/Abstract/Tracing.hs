@@ -31,6 +31,7 @@ type TracingInterpreter t v g
      , Reader (Environment (LocationFor v) v)         -- For 'MonadEnv'.
      ]
 
+-- | The effects necessary for a linear trace analysis.
 type TraceInterpreter t v = TracingInterpreter t v []
 type ReachableStateInterpreter t v = TracingInterpreter t v Set
 
