@@ -113,11 +113,11 @@ fixCache :: forall t v m
          -> (v -> m v) -> t -> m v
 fixCache ev' yield e = do
   c <- getConfiguration e
-  cache <- mlfp (\ dollar -> do
+  cache <- mlfp (\ prevCache -> do
     putCache (mempty :: Cache (LocationFor v) t v)
     putStore (configurationStore c)
     reset 0
-    _ <- localCache (const dollar) (gather Set.singleton (ev' yield e))
+    _ <- localCache (const prevCache) (gather Set.singleton (ev' yield e))
     getCache) mempty
   maybe empty scatter (cacheLookup c cache)
 
