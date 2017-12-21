@@ -136,7 +136,12 @@ fixCache ev' yield e = do
 --   Repeatedly runs a monadic action starting from some initial seed and coinductively recurring until the action’s results converge.
 --
 --   cf https://en.wikipedia.org/wiki/Kleene_fixed-point_theorem
-mlfp :: (Eq a, Monad m) => a -> (a -> m a) -> m a
+mlfp :: ( Eq a
+        , Monad m
+        )
+     => a
+     -> (a -> m a)
+     -> m a
 mlfp a f = loop a
   where loop x = do
           x' <- f x
