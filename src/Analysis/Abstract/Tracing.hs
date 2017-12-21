@@ -65,6 +65,7 @@ evalReach :: forall v term
 evalReach = run @(ReachableStateInterpreter term v) . fix (evTell @Set (\ recur yield -> eval recur yield . project)) pure
 
 
+-- | Small-step evaluation which records every visited configuration.
 evTell :: forall g t m v
        . ( Monoid (g (Configuration (LocationFor v) t v))
          , Pointed g
