@@ -19,7 +19,7 @@ import Data.Functor.Foldable (Base, Recursive(..))
 import Data.Semigroup
 
 -- | The effects necessary for concrete interpretation.
-type Interpreter v
+type Evaluating v
   = '[ Fail                                   -- For 'MonadFail'.
      , State (Store (LocationFor v) v)        -- For 'MonadStore'.
      , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
@@ -28,8 +28,8 @@ type Interpreter v
 -- | A constraint synonym for the interfaces necessary for concrete interpretation.
 type MonadInterpreter v m = (MonadEnv v m, MonadStore v m, MonadFail m)
 
--- | A synonym for the result of an 'Interpreter' of @v@.
-type EvalResult v = Final (Interpreter v) v
+-- | A synonym for the result of 'Evaluating' to @v@.
+type EvalResult v = Final (Evaluating v) v
 
 -- | Evaluate a term to a value.
 evaluate :: forall v term
@@ -38,9 +38,9 @@ evaluate :: forall v term
            , Semigroup (Cell (LocationFor v) v)
            , Functor (Base term)
            , Recursive term
-           , MonadAddress (LocationFor v) (Eff (Interpreter v))
-           , Eval term v (Eff (Interpreter v)) (Base term)
+           , MonadAddress (LocationFor v) (Eff (Evaluating v))
+           , Eval term v (Eff (Evaluating v)) (Base term)
            )
          => term
          -> EvalResult v
-evaluate = run @(Interpreter v) . fix (\ recur yield -> eval recur yield . project) pure
+evaluate = run @(Evaluating v) . fix (\ recur yield -> eval recur yield . project) pure
