@@ -32,6 +32,7 @@ instance RunEffect f a => RunEffects '[f] a where
 
 -- | A typeclass to interpret a single effect with some sensible defaults (defined per-effect).
 class RunEffect f a where
+  -- | The incremental result of an effect w.r.t. the parameter value, factoring in the interpretation of the effect.
   type Result f a
   type instance Result f a = a
   runEffect :: Eff (f ': fs) a -> Eff fs (Result f a)
