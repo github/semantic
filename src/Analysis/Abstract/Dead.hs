@@ -27,9 +27,6 @@ type DeadCodeEvaluating t v
      , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
      ]
 
--- | A synonym for the result of 'DeadCodeEvaluating' to @v@.
-type DeadCodeResult t v = Final (DeadCodeEvaluating t v) v
-
 
 -- | Dead code analysis
 evalDead :: forall v term
@@ -42,7 +39,7 @@ evalDead :: forall v term
            , Semigroup (Cell (LocationFor v) v)
            )
          => term
-         -> DeadCodeResult term v
+         -> Final (DeadCodeEvaluating term v) v
 evalDead e0 = run @(DeadCodeEvaluating term v) $ do
   killAll (Dead (subterms e0))
   fix (evDead (\ recur yield -> eval recur yield . project)) pure e0
