@@ -27,6 +27,7 @@ type Interpreter v
      , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
      ]
 
+-- | A constraint synonym for the interfaces necessary for concrete interpretation.
 type MonadInterpreter v m = (MonadEnv v m, MonadStore v m, MonadFail m)
 
 type EvalResult v = Final (Interpreter v) v
