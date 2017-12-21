@@ -126,11 +126,9 @@ getConfiguration term = Configuration term <$> askRoots <*> askEnv <*> getStore
 scatter :: (Alternative m, Foldable t, MonadStore a m) => t (a, Store (LocationFor a) a) -> m a
 scatter = getAlt . foldMap (\ (value, store') -> Alt (putStore store' *> pure value))
 
--- | Compute the Kleene fixed-point theorem in a monadic context.
+-- | Iterate a monadic action starting from some initial seed until the results converge.
 --
---   Repeatedly runs a monadic action starting from some initial seed and coinductively recurring until the action’s results converge.
---
---   cf https://en.wikipedia.org/wiki/Kleene_fixed-point_theorem
+--   This applies the Kleene fixed-point theorem to finitize a monotone action. cf https://en.wikipedia.org/wiki/Kleene_fixed-point_theorem
 converge :: (Eq a, Monad m)
          => (a -> m a) -- ^ A monadic action to perform at each iteration, starting from the result of the previous iteration or from the seed value for the first iteration.
          -> a          -- ^ An initial seed value to iterate from.
