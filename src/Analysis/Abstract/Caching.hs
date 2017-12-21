@@ -120,12 +120,12 @@ fixCache ev' yield e = do
   store <- getStore
   roots <- askRoots
   let c = Configuration e roots env store :: Configuration (LocationFor v) t v
-  pairs <- mlfp mempty (\ dollar -> do
+  pairs <- mlfp (\ dollar -> do
     putCache (mempty :: Cache (LocationFor v) t v)
     putStore store
     reset 0
     _ <- localCache (const dollar) (collect point (ev' yield e) :: m (Set.Set v))
-    getCache)
+    getCache) mempty
   asum . flip map (maybe [] toList (cacheLookup c pairs)) $ \ (value, store') -> do
     putStore store'
     pure value
@@ -139,10 +139,10 @@ fixCache ev' yield e = do
 mlfp :: ( Eq a
         , Monad m
         )
-     => a
-     -> (a -> m a)
+     => (a -> m a)
+     -> a
      -> m a
-mlfp a f = loop a
+mlfp f = loop
   where loop x = do
           x' <- f x
           if x' == x then
