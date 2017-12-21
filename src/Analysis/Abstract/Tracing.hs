@@ -23,6 +23,7 @@ import Data.Pointed
 import Data.Semigroup
 import Data.Set
 
+-- | The effects necessary for tracing analyses.
 type TracingInterpreter t v g
   = '[ Reader (Set (Address (LocationFor v) v))
      , Writer (g (Configuration (LocationFor v) t v))
