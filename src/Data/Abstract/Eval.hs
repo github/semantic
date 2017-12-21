@@ -18,7 +18,7 @@ import Data.Union
 import Prelude hiding (fail)
 
 
--- | The 'Eval' class defines the necessary interface for a term to be evaluated. Instances must impement `eval`
+-- | The 'Eval' class defines the necessary interface for a term to be evaluated. Instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Monad m => Eval term v m constr where
   -- | Evaluate a term.
   eval :: ((v -> m v) -> term -> m v) -> ((v -> m v) -> constr term -> m v)
