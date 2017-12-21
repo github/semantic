@@ -35,6 +35,8 @@ class RunEffect f a where
   -- | The incremental result of an effect w.r.t. the parameter value, factoring in the interpretation of the effect.
   type Result f a
   type instance Result f a = a
+
+  -- | Interpret the topmost effect in a computation with some sensible defaults (defined per-effect), and return the incremental 'Result'.
   runEffect :: Eff (f ': fs) a -> Eff fs (Result f a)
 
 instance Monoid b => RunEffect (State b) a where
