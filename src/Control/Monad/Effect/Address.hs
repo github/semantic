@@ -14,6 +14,7 @@ import Data.Foldable (asum, toList)
 import Data.Pointed
 import Data.Semigroup
 
+-- | 'Monad's offering 'alloc'ation and 'deref'erencing of 'Address'es.
 class (Ord l, Pointed (Cell l), Monad m) => MonadAddress l m where
   deref :: (MonadStore a m, MonadFail m, l ~ LocationFor a) => Address l a -> m a
 
