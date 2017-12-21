@@ -87,10 +87,7 @@ evCache :: forall t v m
         -> ((v -> m v) -> t -> m v)
         -> (v -> m v) -> t -> m v
 evCache ev0 ev' yield e = do
-  env <- askEnv
-  store <- getStore
-  roots <- askRoots
-  let c = Configuration e roots env store :: Configuration (LocationFor v) t v
+  c <- getConfiguration e
   out <- getCache
   case cacheLookup c out of
     Just pairs -> scatter pairs
@@ -116,13 +113,10 @@ fixCache :: forall t v m
          => ((v -> m v) -> t -> m v)
          -> (v -> m v) -> t -> m v
 fixCache ev' yield e = do
-  env <- askEnv
-  store <- getStore
-  roots <- askRoots
-  let c = Configuration e roots env store :: Configuration (LocationFor v) t v
+  c <- getConfiguration e
   cache <- mlfp (\ dollar -> do
     putCache (mempty :: Cache (LocationFor v) t v)
-    putStore store
+    putStore (configurationStore c)
     reset 0
     _ <- localCache (const dollar) (gather point (ev' yield e) :: m (Set.Set v))
     getCache) mempty
