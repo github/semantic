@@ -12,6 +12,7 @@ newtype Dead a = Dead { unDead :: Set a }
 
 -- | 'Monad's offering a readable & writable set of 'Dead' terms.
 class Monad m => MonadDead t m where
+  -- | Update the current 'Dead' set.
   killAll :: Dead t -> m ()
   revive :: Ord t => t -> m ()
 
