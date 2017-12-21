@@ -131,7 +131,7 @@ fixCache ev' yield e = do
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
 scatter :: (Alternative m, Foldable t, MonadStore a m) => t (a, Store (LocationFor a) a) -> m a
-scatter = foldMapA (\ (value, store') -> putStore store' *> pure value)
+scatter = getAlt . foldMap (\ (value, store') -> Alt (putStore store' *> pure value))
 
 -- | Compute the Kleene fixed-point theorem in a monadic context.
 --
@@ -151,7 +151,3 @@ mlfp f = loop
             pure x
           else
             loop x'
-
--- | Generalization of 'foldMap' to an 'Alternative' functor.
-foldMapA :: (Alternative f, Foldable t) => (a -> f b) -> t a -> f b
-foldMapA f = getAlt . foldMap (Alt . f)
