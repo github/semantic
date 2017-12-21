@@ -30,6 +30,7 @@ envLookupOrAlloc' ::
 envLookupOrAlloc' term = let [name] = toList (freeVariables term) in
                          envLookupOrAlloc name
 
+-- | Look up or allocate an address for a 'Name' & assign it a given value, returning the 'Name' paired with the address.
 envLookupOrAlloc ::
                  ( Semigroup (Cell (LocationFor a) a)
                  , MonadStore a m
