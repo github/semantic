@@ -50,6 +50,7 @@ evalDead e0 = run @(DeadCodeInterpreter term v) $ do
     subterms :: (Ord a, Recursive a, Foldable (Base a)) => a -> Set a
     subterms term = para (foldMap (uncurry ((<>) . point))) term <> point term
 
+-- | Evaluation which 'revive's each visited term.
 evDead :: (Ord t, MonadDead t m)
        => (((v -> m v) -> t -> m v) -> (v -> m v) -> t -> m v)
        -> ((v -> m v) -> t -> m v)
