@@ -41,9 +41,6 @@ type Caching t v
      , State (Cache (LocationFor v) t v)      -- For 'MonadCacheOut'.
      ]
 
--- | A synonym for the result of a 'Caching' evaluation to @v@.
-type CachingResult t v = Final (Caching t v) v
-
 -- | A constraint synonym for the interfaces necessary for caching interpretation.
 type MonadCaching t v m
   = ( MonadEnv v m
@@ -70,7 +67,7 @@ evalCache :: forall v term
             , Eval term v (Eff (Caching term v)) (Base term)
             )
           => term
-          -> CachingResult term v
+          -> Final (Caching term v) v
 evalCache e = run @(Caching term v) (fixCache (fix (evCache (evCollect (\ recur yield -> eval recur yield . project)))) pure e)
 
 
