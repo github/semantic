@@ -21,10 +21,10 @@ import Data.Semigroup
 
 -- | The effects necessary for concrete interpretation.
 type Interpreter v
-  = '[ Fail
-     , Reader (Live (LocationFor v) v)
-     , State (Store (LocationFor v) v)
-     , Reader (Environment (LocationFor v) v)
+  = '[ Fail                                   -- For 'MonadFail'.
+     , Reader (Live (LocationFor v) v)        -- For 'MonadGC'.
+     , State (Store (LocationFor v) v)        -- For 'MonadStore'.
+     , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
      ]
 
 type MonadInterpreter v m = (MonadEnv v m, MonadStore v m, MonadFail m)
