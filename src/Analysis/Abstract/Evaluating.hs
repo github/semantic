@@ -12,7 +12,6 @@ import Control.Monad.Effect.Store
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Eval
-import Data.Abstract.Live
 import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Function (fix)
@@ -22,7 +21,6 @@ import Data.Semigroup
 -- | The effects necessary for concrete interpretation.
 type Interpreter v
   = '[ Fail                                   -- For 'MonadFail'.
-     , Reader (Live (LocationFor v) v)        -- For 'MonadGC'.
      , State (Store (LocationFor v) v)        -- For 'MonadStore'.
      , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
      ]
