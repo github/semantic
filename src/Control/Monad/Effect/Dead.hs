@@ -14,6 +14,8 @@ newtype Dead a = Dead { unDead :: Set a }
 class Monad m => MonadDead t m where
   -- | Update the current 'Dead' set.
   killAll :: Dead t -> m ()
+
+  -- | Revive a single term, removing it from the current 'Dead' set.
   revive :: Ord t => t -> m ()
 
 instance (State (Dead t) :< fs) => MonadDead t (Eff fs) where
