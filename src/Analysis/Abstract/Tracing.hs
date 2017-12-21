@@ -38,7 +38,7 @@ type TraceInterpreter t v = TracingInterpreter t v []
 type ReachableStateInterpreter t v = TracingInterpreter t v Set
 
 
--- | Tracing state analyses
+-- | Linear trace analysis.
 evalTrace :: forall v term
           . ( Ord v, Ord term, Ord (Cell (LocationFor v) v)
             , Functor (Base term)
@@ -51,7 +51,7 @@ evalTrace :: forall v term
           => term -> Final (TracingInterpreter term v []) v
 evalTrace = run @(TraceInterpreter term v) . fix (evTell @[] (\ recur yield -> eval recur yield . project)) pure
 
--- | Reach state analyses
+-- | Reachable configuration analysis.
 evalReach :: forall v term
           . ( Ord v, Ord term, Ord (LocationFor v), Ord (Cell (LocationFor v) v)
             , Functor (Base term)
