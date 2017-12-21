@@ -62,5 +62,6 @@ instance (Alternative m, Monad m) => MonadAddress Monovariant m where
   alloc = pure . Address . Monovariant
 
 
+-- | Fail with a message denoting an uninitialized address (i.e. one which was 'alloc'ated, but never 'assign'ed a value before being 'deref'erenced).
 uninitializedAddress :: MonadFail m => m a
 uninitializedAddress = Control.Monad.Fail.fail "uninitialized address"
