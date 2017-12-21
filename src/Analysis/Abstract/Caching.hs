@@ -26,7 +26,6 @@ import Data.Function (fix)
 import Data.Functor.Foldable (Base, Recursive(..))
 import Data.Maybe
 import Data.Monoid (Alt(..))
-import Data.Pointed
 import Data.Semigroup
 import qualified Data.Set as Set
 
@@ -118,7 +117,7 @@ fixCache ev' yield e = do
     putCache (mempty :: Cache (LocationFor v) t v)
     putStore (configurationStore c)
     reset 0
-    _ <- localCache (const dollar) (gather point (ev' yield e) :: m (Set.Set v))
+    _ <- localCache (const dollar) (gather Set.singleton (ev' yield e))
     getCache) mempty
   maybe empty scatter (cacheLookup c cache)
 
