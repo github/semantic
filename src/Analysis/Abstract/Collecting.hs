@@ -47,6 +47,6 @@ reachable :: ( Ord (LocationFor a)
 reachable roots store = go mempty roots
   where go seen set = case liveSplit set of
           Nothing -> seen
-          Just (a, as)
-            | Just values <- storeLookupAll a store -> go (liveInsert a seen) (liveDifference (foldr ((<>) . valueRoots) mempty values <> as) seen)
-            | otherwise -> go (liveInsert a seen) seen
+          Just (a, as) -> go (liveInsert a seen) (case storeLookupAll a store of
+            Just values -> liveDifference (foldr ((<>) . valueRoots) mempty values <> as) seen
+            _           -> seen)
