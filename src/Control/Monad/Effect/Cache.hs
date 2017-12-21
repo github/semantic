@@ -18,6 +18,7 @@ import Data.Abstract.Value
 --
 --   @n@ differs at every iteration, and thus a precise modelling of the integral value will not converge in the store: each iteration will allocate a new address & write a distinct value into it. Modelling values with their types _will_ converge, however, as the type at each iteration is the same.
 class Monad m => MonadCacheIn t v m where
+  -- | Retrieve the local in-cache.
   askCache :: m (Cache (LocationFor v) t v)
   localCache :: (Cache (LocationFor v) t v -> Cache (LocationFor v) t v) -> m a -> m a
 
