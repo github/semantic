@@ -50,5 +50,6 @@ instance (State (Cache (LocationFor v) t v) :< fs) => MonadCacheOut t v (Eff fs)
   getCache = get
   putCache = put
 
+-- | Modify the current out-cache using a given function.
 modifyCache :: MonadCacheOut t v m => (Cache (LocationFor v) t v -> Cache (LocationFor v) t v) -> m ()
 modifyCache f = fmap f getCache >>= putCache
