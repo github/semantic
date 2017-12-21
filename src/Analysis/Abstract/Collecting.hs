@@ -31,9 +31,9 @@ gc :: ( Ord (LocationFor a)
       , Foldable (Cell (LocationFor a))
       , ValueRoots (LocationFor a) a
       )
-   => Live (LocationFor a) a
-   -> Store (LocationFor a) a
-   -> Store (LocationFor a) a
+   => Live (LocationFor a) a  -- ^ The set of addresses to consider rooted.
+   -> Store (LocationFor a) a -- ^ A store to collect unreachable addresses within.
+   -> Store (LocationFor a) a -- ^ A garbage-collected store.
 gc roots store = storeRestrict store (reachable roots store)
 
 reachable :: (Ord (LocationFor a), Foldable (Cell (LocationFor a)), ValueRoots (LocationFor a) a) => Live (LocationFor a) a -> Store (LocationFor a) a -> Live (LocationFor a) a
