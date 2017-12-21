@@ -10,6 +10,8 @@ import Data.Abstract.Value
 class Monad m => MonadEnv value m where
   -- | Retrieve the local environment.
   askEnv :: m (Environment (LocationFor value) value)
+
+  -- | Run a computation with a locally-modified environment.
   localEnv :: (Environment (LocationFor value) value -> Environment (LocationFor value) value) -> m b -> m b
 
 instance (Reader (Environment (LocationFor value) value) :< fs) => MonadEnv value (Eff fs) where
