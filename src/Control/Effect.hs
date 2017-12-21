@@ -11,6 +11,7 @@ import Control.Monad.Effect.Writer
 import Data.Pointed
 import Data.Set
 
+-- | Run a computation in 'Eff' to completion, interpreting each effect with some sensible defaults, and return the 'Final' result.
 run :: RunEffects fs a => Eff fs a -> Final fs a
 run = Effect.run . runEffects
 
