@@ -109,7 +109,7 @@ fixCache :: forall t v m
          -> (v -> m v) -> t -> m v
 fixCache ev' yield e = do
   c <- getConfiguration e
-  cache <- mlfp (\ prevCache -> do
+  cache <- converge (\ prevCache -> do
     putCache (mempty :: Cache (LocationFor v) t v)
     putStore (configurationStore c)
     reset 0
@@ -131,13 +131,11 @@ scatter = getAlt . foldMap (\ (value, store') -> Alt (putStore store' *> pure va
 --   Repeatedly runs a monadic action starting from some initial seed and coinductively recurring until the action’s results converge.
 --
 --   cf https://en.wikipedia.org/wiki/Kleene_fixed-point_theorem
-mlfp :: ( Eq a
-        , Monad m
-        )
-     => (a -> m a) -- ^ A monadic action to perform at each iteration, starting from the result of the previous iteration or from the seed value for the first iteration.
-     -> a          -- ^ An initial seed value to iterate from.
-     -> m a        -- ^ A computation producing the least fixed point (the first value at which the actions converge).
-mlfp f = loop
+converge :: (Eq a, Monad m)
+         => (a -> m a) -- ^ A monadic action to perform at each iteration, starting from the result of the previous iteration or from the seed value for the first iteration.
+         -> a          -- ^ An initial seed value to iterate from.
+         -> m a        -- ^ A computation producing the least fixed point (the first value at which the actions converge).
+converge f = loop
   where loop x = do
           x' <- f x
           if x' == x then
