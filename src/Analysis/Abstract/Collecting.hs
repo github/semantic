@@ -44,9 +44,9 @@ reachable :: ( Ord (LocationFor a)
           => Live (LocationFor a) a  -- ^ The set of root addresses.
           -> Store (LocationFor a) a -- ^ The store to trace addresses through.
           -> Live (LocationFor a) a  -- ^ The set of addresses reachable from the root set.
-reachable roots store = go roots mempty
-  where go set seen = case liveSplit set of
+reachable roots store = go mempty roots
+  where go seen set = case liveSplit set of
           Nothing -> seen
           Just (a, as)
-            | Just values <- storeLookupAll a store -> go (liveDifference (foldr ((<>) . valueRoots) mempty values <> as) seen) (liveInsert a seen)
-            | otherwise -> go seen (liveInsert a seen)
+            | Just values <- storeLookupAll a store -> go (liveInsert a seen) (liveDifference (foldr ((<>) . valueRoots) mempty values <> as) seen)
+            | otherwise -> go (liveInsert a seen) seen
