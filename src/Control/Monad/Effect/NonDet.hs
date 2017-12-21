@@ -16,6 +16,7 @@ class (Alternative m, Monad m) => MonadNonDet m where
           -> m a      -- ^ The computation to run locally-nondeterministically.
           -> m b      -- ^ A _deterministic_ computation producing the 'Monoid'al accumulation of the _locally-nondeterministic_ result values.
 
+-- | Effect stacks containing 'NonDetEff' offer a 'MonadNonDet' instance which implements 'collect' by interpreting the requests for nondeterminism locally, without removing 'NonDetEff' from the stack—i.e. the _capacity_ for nondeterminism is still present in the effect stack, but any local nondeterminism has been applied.
 instance (NonDetEff :< fs) => MonadNonDet (Eff fs) where
   collect f = interpose (pure . f) (\ m k -> case m of
     MZero -> pure mempty
