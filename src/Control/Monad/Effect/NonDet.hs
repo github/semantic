@@ -12,9 +12,9 @@ import Control.Monad.Effect.NonDetEff
 class (Alternative m, Monad m) => MonadNonDet m where
   -- | Run a computation, collecting any local nondeterminism into a 'Monoid'al value.
   collect :: Monoid b
-          => (a -> b)
-          -> m a
-          -> m b
+          => (a -> b) -- ^ A function constructing a 'Monoid'al value from a single computed result. This might typically be @point@ (for @Pointed@ functors), 'pure' (for 'Applicative's), or some similar singleton constructor.
+          -> m a      -- ^ The computation to run locally-nondeterministically.
+          -> m b      -- ^ A _deterministic_ computation producing the 'Monoid'al accumulation of the _locally-nondeterministic_ result values.
 
 instance (NonDetEff :< fs) => MonadNonDet (Eff fs) where
   collect f = interpose (pure . f) (\ m k -> case m of
