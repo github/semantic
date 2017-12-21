@@ -37,6 +37,7 @@ instance (Eq location) => Eq1 (Closure location) where liftEq = genericLiftEq
 instance (Ord location) => Ord1 (Closure location) where liftCompare = genericLiftCompare
 instance (Show location) => Show1 (Closure location) where liftShowsPrec = genericLiftShowsPrec
 
+-- | The unit value. Typically used to represent the result of imperative statements.
 data Unit term = Unit
   deriving (Eq, Generic1, Ord, Show)
 
