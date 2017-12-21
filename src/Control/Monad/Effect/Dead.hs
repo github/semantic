@@ -20,4 +20,4 @@ class Monad m => MonadDead t m where
 
 instance (State (Dead t) :< fs) => MonadDead t (Eff fs) where
   killAll = put
-  revive = modify . (Dead .) . (. unDead) . delete
+  revive t = modify (Dead . delete t . unDead)
