@@ -1,7 +1,8 @@
 module Data.Abstract.Type where
 
 import Control.Monad.Fail
-import Data.Traversable
+import Data.Align (alignWith)
+import Data.These (these)
 import Prelude hiding (fail)
 
 -- | The type of type variable names.
@@ -29,6 +30,5 @@ unify (a1 :-> b1) (a2 :-> b2) = (:->) <$> unify a1 a2 <*> unify b1 b2
 -- FIXME: this should be constructing a substitution.
 unify (Var _) b = pure b
 unify a (Var _) = pure a
--- FIXME: this can succeed incorrectly for lists of inequal length.
-unify (Product as) (Product bs) = Product <$> for (zip as bs) (uncurry unify)
+unify (Product as) (Product bs) = Product <$> sequenceA (alignWith (these pure pure unify) as bs)
 unify t1 t2 = fail ("cannot unify " ++ show t1 ++ " with " ++ show t2)
