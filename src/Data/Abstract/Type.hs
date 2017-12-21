@@ -14,12 +14,10 @@ data Type
   | String         -- ^ Primitive string type.
   | Unit           -- ^ The unit type.
   | Type :-> Type  -- ^ Binary function types.
-  | Type :* Type   -- ^ Binary products.
   | TVar TName     -- ^ A type variable.
   | Product [Type] -- ^ N-ary products.
   deriving (Eq, Ord, Show)
 
--- TODO: Do we need both Product and :*?
 -- TODO: À la carte representation of types.
 
 
@@ -28,7 +26,6 @@ unify :: MonadFail m => Type -> Type -> m Type
 unify Int  Int  = pure Int
 unify Bool Bool = pure Bool
 unify (a1 :-> b1) (a2 :-> b2) = (:->) <$> unify a1 a2 <*> unify b1 b2
-unify (a1 :* b1)  (a2 :* b2)  = (:*)  <$> unify a1 a2 <*> unify b1 b2
 unify (TVar _) b = pure b
 unify a (TVar _) = pure a
 -- FIXME: this can succeed incorrectly for lists of inequal length.
