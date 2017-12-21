@@ -14,6 +14,7 @@ import Data.Set
 run :: RunEffects fs a => Eff fs a -> Final fs a
 run = Effect.run . runEffects
 
+-- | A typeclass to run a computation to completion, interpreting each effect with some sensible defaults.
 class RunEffects fs a where
   type Final fs a
   runEffects :: Eff fs a -> Eff '[] (Final fs a)
