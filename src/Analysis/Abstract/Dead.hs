@@ -27,6 +27,7 @@ type DeadCodeInterpreter t v
      , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
      ]
 
+-- | A synonym for the result of a 'DeadCodeInterpreter'.
 type DeadCodeResult t v = Final (DeadCodeInterpreter t v) v
 
 
