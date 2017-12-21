@@ -53,6 +53,7 @@ instance Eq1 Boolean where liftEq = genericLiftEq
 instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
+-- | Arbitrary-width integral values.
 newtype Integer term = Integer Prelude.Integer
   deriving (Eq, Generic1, Ord, Show)
 
