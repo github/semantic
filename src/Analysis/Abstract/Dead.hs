@@ -19,7 +19,7 @@ import Data.Pointed
 import Data.Semigroup
 import Data.Set
 
-
+-- | The effects necessary for dead code analysis.
 type DeadCodeInterpreter t v
   = '[ State (Dead t)
      , Fail
