@@ -26,6 +26,7 @@ evCollect ev0 ev' yield e = do
   modifyStore (gc (roots <> valueRoots v))
   pure v
 
+-- | Collect any addresses in the store not rooted in the given 'Live' set.
 gc :: (Ord (LocationFor a), Foldable (Cell (LocationFor a)), ValueRoots (LocationFor a) a) => Live (LocationFor a) a -> Store (LocationFor a) a -> Store (LocationFor a) a
 gc roots store = storeRestrict store (reachable roots store)
 
