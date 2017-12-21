@@ -20,6 +20,8 @@ import Data.Abstract.Value
 class Monad m => MonadCacheIn t v m where
   -- | Retrieve the local in-cache.
   askCache :: m (Cache (LocationFor v) t v)
+
+  -- | Run a computation with a locally-modified in-cache.
   localCache :: (Cache (LocationFor v) t v -> Cache (LocationFor v) t v) -> m a -> m a
 
 instance (Reader (Cache (LocationFor v) t v) :< fs) => MonadCacheIn t v (Eff fs) where
