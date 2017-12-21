@@ -21,6 +21,8 @@ class (Ord l, Pointed (Cell l), Monad m) => MonadAddress l m where
   alloc :: (MonadStore a m, l ~ LocationFor a) => Name -> m (Address l a)
 
 -- | Look up or allocate an address for a 'Name' free in a given term & assign it a given value, returning the 'Name' paired with the address.
+--
+--   The term is expected to contain one and only one free 'Name', meaning that care should be taken to apply this only to e.g. identifiers.
 envLookupOrAlloc' ::
                   ( FreeVariables t
                   , Semigroup (Cell (LocationFor a) a)
