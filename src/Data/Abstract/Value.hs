@@ -83,9 +83,16 @@ class ValueRoots l v | v -> l where
 
 -- | An interface for constructing abstract values.
 class AbstractValue v where
+  -- | Construct an abstract unit value.
   unit :: v
+
+  -- | Construct an abstract integral value.
   integer :: Prelude.Integer -> v
+
+  -- | Construct an abstract boolean value.
   boolean :: Bool -> v
+
+  -- | Construct an abstract string value.
   string :: ByteString -> v
 
 
