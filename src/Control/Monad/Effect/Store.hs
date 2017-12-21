@@ -29,5 +29,6 @@ instance (State (Store (LocationFor a) a) :< fs) => MonadStore a (Eff fs) where
   getStore = get
   putStore = put
 
+-- | Modify the current store using a given function.
 modifyStore :: MonadStore a m => (Store (LocationFor a) a -> Store (LocationFor a) a) -> m ()
 modifyStore f = getStore >>= putStore . f
