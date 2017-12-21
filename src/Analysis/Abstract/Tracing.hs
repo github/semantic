@@ -25,10 +25,10 @@ import Data.Set
 
 -- | The effects necessary for tracing analyses.
 type TracingInterpreter t v g
-  = '[ Writer (g (Configuration (LocationFor v) t v))
-     , Fail
-     , State (Store (LocationFor v) v)
-     , Reader (Environment (LocationFor v) v)
+  = '[ Writer (g (Configuration (LocationFor v) t v)) -- For 'MonadTrace'.
+     , Fail                                           -- For 'MonadFail'.
+     , State (Store (LocationFor v) v)                -- For 'MonadStore'.
+     , Reader (Environment (LocationFor v) v)         -- For 'MonadEnv'.
      ]
 
 type TraceInterpreter t v = TracingInterpreter t v []
