@@ -18,14 +18,12 @@ import Data.Abstract.Value
 import Data.Function (fix)
 import Data.Functor.Foldable (Base, Recursive(..))
 import Data.Semigroup
-import Data.Set
 
 -- | The effects necessary for concrete interpretation.
 type Interpreter v
   = '[ Fail
      , Reader (Live (LocationFor v) v)
      , State (Store (LocationFor v) v)
-     , Reader (Set (Address (LocationFor v) v))
      , Reader (Environment (LocationFor v) v)
      ]
 
