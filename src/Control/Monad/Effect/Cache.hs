@@ -42,6 +42,8 @@ instance (Reader (Cache (LocationFor v) t v) :< fs) => MonadCacheIn t v (Eff fs)
 class Monad m => MonadCacheOut t v m where
   -- | Retrieve the current out-cache.
   getCache :: m (Cache (LocationFor v) t v)
+
+  -- | Update the current out-cache.
   putCache :: Cache (LocationFor v) t v -> m ()
 
 instance (State (Cache (LocationFor v) t v) :< fs) => MonadCacheOut t v (Eff fs) where
