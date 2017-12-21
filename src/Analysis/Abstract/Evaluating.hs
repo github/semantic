@@ -23,9 +23,6 @@ type Evaluating v
      , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
      ]
 
--- | A synonym for the result of 'Evaluating' to @v@.
-type EvalResult v = Final (Evaluating v) v
-
 -- | Evaluate a term to a value.
 evaluate :: forall v term
          . ( Ord v
@@ -37,5 +34,5 @@ evaluate :: forall v term
            , Eval term v (Eff (Evaluating v)) (Base term)
            )
          => term
-         -> EvalResult v
+         -> Final (Evaluating v) v
 evaluate = run @(Evaluating v) . fix (\ recur yield -> eval recur yield . project) pure
