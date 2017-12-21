@@ -25,11 +25,9 @@ import Data.Set
 
 -- | The effects necessary for tracing analyses.
 type TracingInterpreter t v g
-  = '[ Reader (Set (Address (LocationFor v) v))
-     , Writer (g (Configuration (LocationFor v) t v))
+  = '[ Writer (g (Configuration (LocationFor v) t v))
      , Fail
      , State (Store (LocationFor v) v)
-     , Reader (Set (Address (LocationFor v) v))
      , Reader (Environment (LocationFor v) v)
      ]
 
