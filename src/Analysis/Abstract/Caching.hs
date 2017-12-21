@@ -22,7 +22,6 @@ import Data.Abstract.Eval
 import Data.Abstract.Live
 import Data.Abstract.Store
 import Data.Abstract.Value
-import Data.Foldable
 import Data.Function (fix)
 import Data.Functor.Foldable (Base, Recursive(..))
 import Data.Maybe
@@ -96,7 +95,7 @@ evCache ev0 ev' yield e = do
   case cacheLookup c out of
     Just pairs -> foldMapA (\ (value, store') -> do
       putStore store'
-      pure value) (toList pairs)
+      pure value) pairs
     Nothing -> do
       in' <- askCache
       let pairs = fromMaybe mempty (cacheLookup c in')
@@ -131,7 +130,7 @@ fixCache ev' yield e = do
     getCache) mempty
   maybe empty (foldMapA (\ (value, store') -> do
     putStore store'
-    pure value) . toList) (cacheLookup c cache)
+    pure value)) (cacheLookup c cache)
 
 
 -- | Compute the Kleene fixed-point theorem in a monadic context.
