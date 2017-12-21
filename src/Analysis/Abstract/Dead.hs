@@ -24,7 +24,6 @@ type DeadCodeInterpreter t v
   = '[ State (Dead t)
      , Fail
      , State (Store (LocationFor v) v)
-     , Reader (Set (Address (LocationFor v) v))
      , Reader (Environment (LocationFor v) v)
      ]
 
