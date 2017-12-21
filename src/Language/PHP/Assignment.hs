@@ -57,6 +57,10 @@ type Syntax = '[
   , Syntax.QualifiedName
   , Syntax.RelativeScope
   , Syntax.NewVariable
+  , Syntax.ClassConstDeclaration
+  , Syntax.ClassInterfaceClause
+  , Declaration.Class
+  , Syntax.ClassBaseClause
   , Expression.New
   , [] ]
 
@@ -146,7 +150,35 @@ primaryExpression = choice [
   ]
 
 objectCreationExpression :: Assignment
-objectCreationExpression = makeTerm <$> symbol ObjectCreationExpression <*> children (fmap Expression.New . (:) <$> classTypeDesignator <*> (arguments <|> pure []))
+objectCreationExpression = (makeTerm <$> symbol ObjectCreationExpression <*> children (fmap Expression.New $ ((:) <$> classTypeDesignator <*> (arguments <|> pure []))))
+
+  <|> (makeTerm <$> symbol ObjectCreationExpression <*> children (makeAnonClass <$ token AnonNew <* token AnonClass <*> emptyTerm <*> (arguments <|> pure []) <*> (classBaseClause <|> emptyTerm) <*> (classInterfaceClause <|> emptyTerm) <*> (makeTerm <$> location <*> manyTerm classMemberDeclaration)))
+  where makeAnonClass identifier args baseClause interfaceClause declarations = (Declaration.Class [] identifier (args ++ [baseClause, interfaceClause]) declarations)
+
+classMemberDeclaration :: Assignment
+classMemberDeclaration = choice [
+  classConstDeclaration
+  -- propertyDeclaration,
+  -- methodDeclaration,
+  -- constructorDeclaration,
+  -- destructorDeclaration,
+  -- traitUseClause
+  ]
+
+classBaseClause :: Assignment
+classBaseClause = makeTerm <$> symbol ClassBaseClause <*> (Syntax.ClassBaseClause <$> qualifiedName)
+
+classInterfaceClause :: Assignment
+classInterfaceClause = makeTerm <$> symbol ClassInterfaceClause <*> (Syntax.ClassInterfaceClause <$> someTerm qualifiedName)
+
+classConstDeclaration :: Assignment
+classConstDeclaration = makeTerm <$> symbol ClassConstDeclaration <*> (Syntax.ClassConstDeclaration <$> (visibilityModifier <|> emptyTerm) <*> manyTerm constElement)
+
+visibilityModifier :: Assignment
+visibilityModifier = makeTerm <$> symbol VisibilityModifier <*> (Syntax.Identifier <$> source)
+
+constElement :: Assignment
+constElement = makeTerm <$> symbol ConstElement <*> (Statement.Assignment [] <$> name <*> expression)
 
 arguments :: Assignment.Assignment [] Grammar [Term]
 arguments = symbol Arguments *> children (manyTerm (variadicUnpacking <|> expression))

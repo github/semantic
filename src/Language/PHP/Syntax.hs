@@ -136,3 +136,31 @@ data NamespaceName a = NamespaceName [a]
 instance Eq1 NamespaceName where liftEq = genericLiftEq
 instance Ord1 NamespaceName where liftCompare = genericLiftCompare
 instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
+
+data ConstDeclaration a = ConstDeclaration [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 ConstDeclaration where liftEq = genericLiftEq
+instance Ord1 ConstDeclaration where liftCompare = genericLiftCompare
+instance Show1 ConstDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+data ClassConstDeclaration a = ClassConstDeclaration a [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 ClassConstDeclaration where liftEq = genericLiftEq
+instance Ord1 ClassConstDeclaration where liftCompare = genericLiftCompare
+instance Show1 ClassConstDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+data ClassInterfaceClause a = ClassInterfaceClause [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 ClassInterfaceClause where liftEq = genericLiftEq
+instance Ord1 ClassInterfaceClause where liftCompare = genericLiftCompare
+instance Show1 ClassInterfaceClause where liftShowsPrec = genericLiftShowsPrec
+
+data ClassBaseClause a = ClassBaseClause a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 ClassBaseClause where liftEq = genericLiftEq
+instance Ord1 ClassBaseClause where liftCompare = genericLiftCompare
+instance Show1 ClassBaseClause where liftShowsPrec = genericLiftShowsPrec
