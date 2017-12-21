@@ -14,7 +14,7 @@ data Type
   | String         -- ^ Primitive string type.
   | Unit           -- ^ The unit type.
   | Type :-> Type  -- ^ Binary function types.
-  | TVar TName     -- ^ A type variable.
+  | Var TName      -- ^ A type variable.
   | Product [Type] -- ^ N-ary products.
   deriving (Eq, Ord, Show)
 
@@ -26,8 +26,9 @@ unify :: MonadFail m => Type -> Type -> m Type
 unify Int  Int  = pure Int
 unify Bool Bool = pure Bool
 unify (a1 :-> b1) (a2 :-> b2) = (:->) <$> unify a1 a2 <*> unify b1 b2
-unify (TVar _) b = pure b
-unify a (TVar _) = pure a
+-- FIXME: this should be constructing a substitution.
+unify (Var _) b = pure b
+unify a (Var _) = pure a
 -- FIXME: this can succeed incorrectly for lists of inequal length.
 unify (Product as) (Product bs) = Product <$> for (zip as bs) (uncurry unify)
 unify t1 t2 = fail ("cannot unify " ++ show t1 ++ " with " ++ show t2)

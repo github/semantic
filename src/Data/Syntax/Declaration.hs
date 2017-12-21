@@ -66,7 +66,7 @@ instance ( Alternative m
     let params = toList (foldMap freeVariables functionParameters)
     tvars <- for params $ \name -> do
       a <- alloc name
-      tvar <- TVar <$> fresh
+      tvar <- Var <$> fresh
       assign a tvar
       pure (name, a, tvar)
 
