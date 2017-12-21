@@ -10,6 +10,7 @@ import Data.Set
 newtype Dead a = Dead { unDead :: Set a }
   deriving (Eq, Foldable, Semigroup, Monoid, Ord, Show)
 
+-- | 'Monad's offering a readable & writable set of 'Dead' terms.
 class Monad m => MonadDead t m where
   killAll :: Dead t -> m ()
   revive :: Ord t => t -> m ()
