@@ -28,6 +28,10 @@ instance (Reader (Cache (LocationFor v) t v) :< fs) => MonadCacheIn t v (Eff fs)
   askCache = ask
   localCache = local
 
+-- | Project a value out of the in-cache.
+asksCache :: MonadCacheIn t v m => (Cache (LocationFor v) t v -> a) -> m a
+asksCache f = f <$> askCache
+
 
 -- | 'Monad's offering a readable & writable 'Cache' of values & stores for each configuration in a program.
 --
