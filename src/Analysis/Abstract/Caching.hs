@@ -91,8 +91,7 @@ evCache ev0 ev' yield e = do
   case cached of
     Just pairs -> scatter pairs
     Nothing -> do
-      in' <- askCache
-      let pairs = fromMaybe mempty (cacheLookup c in')
+      pairs <- asksCache (fromMaybe mempty . cacheLookup c)
       modifyCache (cacheSet c pairs)
       v <- ev0 ev' yield e
       store' <- getStore
