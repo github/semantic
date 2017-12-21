@@ -50,7 +50,7 @@ instance (State (Cache (LocationFor v) t v) :< fs) => MonadCacheOut t v (Eff fs)
   getCache = get
   putCache = put
 
--- | Project a value out of the cache.
+-- | Project a value out of the out-cache.
 getsCache :: MonadCacheOut t v m => (Cache (LocationFor v) t v -> a) -> m a
 getsCache f = f <$> getCache
 
