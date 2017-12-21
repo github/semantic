@@ -9,6 +9,7 @@ import Data.Semigroup ((<>))
 
 -- | 'Monad's offering a local set of 'Live' (rooted/reachable) addresses.
 class Monad m => MonadGC a m where
+  -- | Retrieve the local 'Live' set.
   askRoots :: m (Live (LocationFor a) a)
 
   extraRoots :: Live (LocationFor a) a -> m b -> m b
