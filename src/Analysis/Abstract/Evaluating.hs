@@ -4,11 +4,9 @@ module Analysis.Abstract.Evaluating where
 import Control.Effect
 import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.Address
-import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
-import Control.Monad.Effect.Store
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Eval
@@ -24,9 +22,6 @@ type Evaluating v
      , State (Store (LocationFor v) v)        -- For 'MonadStore'.
      , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
      ]
-
--- | A constraint synonym for the interfaces necessary for concrete interpretation.
-type MonadInterpreter v m = (MonadEnv v m, MonadStore v m, MonadFail m)
 
 -- | A synonym for the result of 'Evaluating' to @v@.
 type EvalResult v = Final (Evaluating v) v
