@@ -74,6 +74,7 @@ type Syntax = '[
   , Type.Annotation
   , Declaration.Function
   , Expression.New
+  , Literal.Array
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -152,7 +153,7 @@ primaryExpression = choice [
   -- classConstantAccessExpression,
   -- qualifiedName,
   literal,
-  -- arrayCreationExpression,
+  arrayCreationExpression,
   intrinsic,
   anonymousFunctionCreationExpression,
   objectCreationExpression,
@@ -160,6 +161,9 @@ primaryExpression = choice [
   shellCommandExpression,
   expression
   ]
+
+arrayCreationExpression :: Assignment
+arrayCreationExpression = makeTerm <$> symbol ArrayCreationExpression <*> children (Literal.Array <$> manyTerm arrayElementInitializer)
 
 intrinsic :: Assignment
 intrinsic = choice [
