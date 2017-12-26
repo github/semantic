@@ -66,6 +66,11 @@ type Syntax = '[
   , Syntax.TypeDeclaration
   , Syntax.ReturnType
   , Syntax.UseClause
+  , Syntax.PrintIntrinsic
+  , Syntax.IssetIntrinsic
+  , Syntax.EvalIntrinsic
+  , Syntax.EmptyIntrinsic
+  , Syntax.ExitIntrinsic
   , Type.Annotation
   , Declaration.Function
   , Expression.New
@@ -148,13 +153,37 @@ primaryExpression = choice [
   -- qualifiedName,
   literal,
   -- arrayCreationExpression,
-  -- intrinsic,
+  intrinsic,
   anonymousFunctionCreationExpression,
   objectCreationExpression,
   updateExpression,
   shellCommandExpression,
   expression
   ]
+
+intrinsic :: Assignment
+intrinsic = choice [
+  emptyIntrinsic,
+  evalIntrinsic,
+  exitIntrinsic,
+  issetIntrinsic,
+  printIntrinsic
+  ]
+
+emptyIntrinsic :: Assignment
+emptyIntrinsic = makeTerm <$> symbol EmptyIntrinsic <*> children (Syntax.EmptyIntrinsic <$> expression)
+
+evalIntrinsic :: Assignment
+evalIntrinsic = makeTerm <$> symbol EvalIntrinsic <*> children (Syntax.EvalIntrinsic <$> expression)
+
+exitIntrinsic :: Assignment
+exitIntrinsic = makeTerm <$> symbol ExitIntrinsic <*> children (Syntax.ExitIntrinsic <$> expression)
+
+issetIntrinsic :: Assignment
+issetIntrinsic = makeTerm <$> symbol IssetIntrinsic <*> children (Syntax.IssetIntrinsic <$> expression)
+
+printIntrinsic :: Assignment
+printIntrinsic = makeTerm <$> symbol PrintIntrinsic <*> children (Syntax.PrintIntrinsic <$> expression)
 
 anonymousFunctionCreationExpression :: Assignment
 anonymousFunctionCreationExpression = makeTerm <$> symbol AnonymousFunctionCreationExpression <*> children (makeFunction <$> emptyTerm <*> parameters <*> functionUseClause <*> returnType <*> compoundStatement)

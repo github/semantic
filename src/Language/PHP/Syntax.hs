@@ -200,3 +200,38 @@ data ScalarType a = ScalarType ByteString
 instance Eq1 ScalarType where liftEq = genericLiftEq
 instance Ord1 ScalarType where liftCompare = genericLiftCompare
 instance Show1 ScalarType where liftShowsPrec = genericLiftShowsPrec
+
+data EmptyIntrinsic a = EmptyIntrinsic a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 EmptyIntrinsic where liftEq = genericLiftEq
+instance Ord1 EmptyIntrinsic where liftCompare = genericLiftCompare
+instance Show1 EmptyIntrinsic where liftShowsPrec = genericLiftShowsPrec
+
+data ExitIntrinsic a = ExitIntrinsic a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 ExitIntrinsic where liftEq = genericLiftEq
+instance Ord1 ExitIntrinsic where liftCompare = genericLiftCompare
+instance Show1 ExitIntrinsic where liftShowsPrec = genericLiftShowsPrec
+
+data IssetIntrinsic a = IssetIntrinsic a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 IssetIntrinsic where liftEq = genericLiftEq
+instance Ord1 IssetIntrinsic where liftCompare = genericLiftCompare
+instance Show1 IssetIntrinsic where liftShowsPrec = genericLiftShowsPrec
+
+data EvalIntrinsic a = EvalIntrinsic a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 EvalIntrinsic where liftEq = genericLiftEq
+instance Ord1 EvalIntrinsic where liftCompare = genericLiftCompare
+instance Show1 EvalIntrinsic where liftShowsPrec = genericLiftShowsPrec
+
+data PrintIntrinsic a = PrintIntrinsic a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 PrintIntrinsic where liftEq = genericLiftEq
+instance Ord1 PrintIntrinsic where liftCompare = genericLiftCompare
+instance Show1 PrintIntrinsic where liftShowsPrec = genericLiftShowsPrec
