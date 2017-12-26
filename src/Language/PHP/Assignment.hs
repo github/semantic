@@ -61,6 +61,13 @@ type Syntax = '[
   , Syntax.ClassInterfaceClause
   , Declaration.Class
   , Syntax.ClassBaseClause
+  , Syntax.ScalarType
+  , Syntax.BaseTypeDeclaration
+  , Syntax.TypeDeclaration
+  , Syntax.ReturnType
+  , Syntax.UseClause
+  , Type.Annotation
+  , Declaration.Function
   , Expression.New
   , [] ]
 
@@ -142,12 +149,51 @@ primaryExpression = choice [
   literal,
   -- arrayCreationExpression,
   -- intrinsic,
-  -- anonymousFunctionCreationExpression,
+  anonymousFunctionCreationExpression,
   objectCreationExpression,
   updateExpression,
   shellCommandExpression,
   expression
   ]
+
+anonymousFunctionCreationExpression :: Assignment
+anonymousFunctionCreationExpression = makeTerm <$> symbol AnonymousFunctionCreationExpression <*> children (makeFunction <$> emptyTerm <*> parameters <*> functionUseClause <*> returnType <*> compoundStatement)
+  where makeFunction identifier parameters functionUseClause returnType statement = Declaration.Function [functionUseClause, returnType] identifier parameters statement
+
+parameters :: Assignment.Assignment [] Grammar [Term]
+parameters = manyTerm (simpleParameter <|> variadicParameter)
+
+simpleParameter :: Assignment
+simpleParameter = makeTerm <$> symbol SimpleParameter <*> children (makeAnnotation <$> (typeDeclaration <|> emptyTerm) <*> (makeAssignment <$> location <*> variableName <*> (defaultArgumentSpecifier <|> emptyTerm)))
+  where
+    makeAnnotation typeDecl assignment = Type.Annotation assignment typeDecl
+    makeAssignment loc name argument = makeTerm loc (Statement.Assignment [] name argument)
+
+defaultArgumentSpecifier :: Assignment
+defaultArgumentSpecifier = symbol DefaultArgumentSpecifier *> children expression
+
+
+variadicParameter :: Assignment
+variadicParameter = makeTerm <$> symbol VariadicParameter <*> children (makeTypeAnnotation <$> (typeDeclaration <|> emptyTerm) <*> variableName)
+  where makeTypeAnnotation ty variableName = (Type.Annotation variableName ty)
+
+functionUseClause :: Assignment
+functionUseClause = makeTerm <$> symbol AnonymousFunctionUseClause <*> children (Syntax.UseClause <$> someTerm variableName)
+
+returnType :: Assignment
+returnType = makeTerm <$> symbol ReturnType <*> children (Syntax.ReturnType <$> (typeDeclaration <|> emptyTerm))
+
+typeDeclaration :: Assignment
+typeDeclaration = makeTerm <$> symbol TypeDeclaration <*> children (Syntax.TypeDeclaration <$> baseTypeDeclaration)
+
+baseTypeDeclaration :: Assignment
+baseTypeDeclaration = makeTerm <$> symbol BaseTypeDeclaration <*> children (Syntax.BaseTypeDeclaration <$> (scalarType <|> qualifiedName <|> emptyTerm))
+
+scalarType :: Assignment
+scalarType = makeTerm <$> symbol ScalarType <*> (Syntax.ScalarType <$> source)
+
+compoundStatement :: Assignment
+compoundStatement = makeTerm <$> symbol CompoundStatement <*> children (manyTerm statement)
 
 objectCreationExpression :: Assignment
 objectCreationExpression = (makeTerm <$> symbol ObjectCreationExpression <*> children (fmap Expression.New $ ((:) <$> classTypeDesignator <*> (arguments <|> pure []))))

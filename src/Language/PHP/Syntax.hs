@@ -164,3 +164,39 @@ data ClassBaseClause a = ClassBaseClause a
 instance Eq1 ClassBaseClause where liftEq = genericLiftEq
 instance Ord1 ClassBaseClause where liftCompare = genericLiftCompare
 instance Show1 ClassBaseClause where liftShowsPrec = genericLiftShowsPrec
+
+
+data UseClause a = UseClause [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 UseClause where liftEq = genericLiftEq
+instance Ord1 UseClause where liftCompare = genericLiftCompare
+instance Show1 UseClause where liftShowsPrec = genericLiftShowsPrec
+
+data ReturnType a = ReturnType a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 ReturnType where liftEq = genericLiftEq
+instance Ord1 ReturnType where liftCompare = genericLiftCompare
+instance Show1 ReturnType where liftShowsPrec = genericLiftShowsPrec
+
+data TypeDeclaration a = TypeDeclaration a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 TypeDeclaration where liftEq = genericLiftEq
+instance Ord1 TypeDeclaration where liftCompare = genericLiftCompare
+instance Show1 TypeDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+data BaseTypeDeclaration a = BaseTypeDeclaration a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 BaseTypeDeclaration where liftEq = genericLiftEq
+instance Ord1 BaseTypeDeclaration where liftCompare = genericLiftCompare
+instance Show1 BaseTypeDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+data ScalarType a = ScalarType ByteString
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 ScalarType where liftEq = genericLiftEq
+instance Ord1 ScalarType where liftCompare = genericLiftCompare
+instance Show1 ScalarType where liftShowsPrec = genericLiftShowsPrec
