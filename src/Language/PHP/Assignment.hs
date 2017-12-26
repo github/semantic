@@ -75,6 +75,7 @@ type Syntax = '[
   , Declaration.Function
   , Expression.New
   , Literal.Array
+  , Expression.MemberAccess
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -149,7 +150,7 @@ cloneExpression = makeTerm <$> symbol CloneExpression <*> children (Syntax.Clone
 
 primaryExpression :: Assignment
 primaryExpression = choice [
-  -- variable,
+  variable,
   -- classConstantAccessExpression,
   qualifiedName,
   literal,
@@ -160,6 +161,32 @@ primaryExpression = choice [
   updateExpression,
   shellCommandExpression,
   expression
+  ]
+
+variable :: Assignment
+variable = callableVariable <|> scopedPropertyAccessExpression <|> memberAccessExpression
+
+callableVariable :: Assignment
+callableVariable = simpleVariable
+  -- subscriptExpression,
+  -- memberCallExpression,
+  -- scopedCallExpression,
+  -- functionCallExpression
+
+memberAccessExpression :: Assignment
+memberAccessExpression = makeTerm <$> symbol MemberAccessExpression <*> children (Expression.MemberAccess <$> dereferencableExpression <*> memberName)
+
+dereferencableExpression :: Assignment
+dereferencableExpression = symbol DereferencableExpression *> children (variable <|> expression <|> arrayCreationExpression <|> string)
+
+scopedPropertyAccessExpression :: Assignment
+scopedPropertyAccessExpression = makeTerm <$> symbol ScopedPropertyAccessExpression <*> children (Expression.MemberAccess <$> scopeResolutionQualifier <*> simpleVariable)
+
+scopeResolutionQualifier :: Assignment
+scopeResolutionQualifier = choice [
+  relativeScope,
+  qualifiedName,
+  dereferencableExpression
   ]
 
 arrayCreationExpression :: Assignment
