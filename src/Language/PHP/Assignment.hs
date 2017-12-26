@@ -134,8 +134,8 @@ expression = choice [
 
 unaryExpression :: Assignment
 unaryExpression = choice [
-  -- cloneExpression,
-  -- primaryExpression,
+  cloneExpression,
+  primaryExpression,
   exponentiationExpression,
   unaryOpExpression,
   castExpression
