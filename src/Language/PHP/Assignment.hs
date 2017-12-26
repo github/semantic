@@ -76,6 +76,7 @@ type Syntax = '[
   , Expression.New
   , Literal.Array
   , Expression.MemberAccess
+  , Expression.Subscript
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -167,11 +168,16 @@ variable :: Assignment
 variable = callableVariable <|> scopedPropertyAccessExpression <|> memberAccessExpression
 
 callableVariable :: Assignment
-callableVariable = simpleVariable
-  -- subscriptExpression,
+callableVariable = choice [
+  simpleVariable,
+  subscriptExpression
+  ]
   -- memberCallExpression,
   -- scopedCallExpression,
   -- functionCallExpression
+
+subscriptExpression :: Assignment
+subscriptExpression = makeTerm <$> symbol SubscriptExpression <*> children (Expression.Subscript <$> dereferencableExpression <*> (pure <$> (expression <|> emptyTerm)))
 
 memberAccessExpression :: Assignment
 memberAccessExpression = makeTerm <$> symbol MemberAccessExpression <*> children (Expression.MemberAccess <$> dereferencableExpression <*> memberName)
