@@ -172,14 +172,29 @@ callableVariable :: Assignment
 callableVariable = choice [
   simpleVariable,
   subscriptExpression,
-  memberCallExpression
-  -- scopedCallExpression,
-  -- functionCallExpression
+  memberCallExpression,
+  scopedCallExpression,
+  functionCallExpression
   ]
 
 memberCallExpression :: Assignment
 memberCallExpression = makeTerm <$> symbol MemberCallExpression <*> children (Expression.Call [] <$> (makeMemberAccess <$> location <*> dereferencableExpression <*> memberName) <*> arguments <*> emptyTerm)
   where makeMemberAccess loc expr memberName = makeTerm loc (Expression.MemberAccess expr memberName)
+
+scopedCallExpression :: Assignment
+scopedCallExpression = makeTerm <$> symbol ScopedCallExpression <*> children (Expression.Call [] <$> (makeMemberAccess <$> location <*> dereferencableExpression <*> memberName) <*> arguments <*> emptyTerm)
+  where makeMemberAccess loc expr memberName = makeTerm loc (Expression.MemberAccess expr memberName)
+
+functionCallExpression :: Assignment
+functionCallExpression = makeTerm <$> symbol FunctionCallExpression <*> children (Expression.Call [] <$> (qualifiedName <|> callableExpression) <*> arguments <*> emptyTerm)
+
+callableExpression :: Assignment
+callableExpression = choice [
+  callableVariable,
+  expression,
+  arrayCreationExpression,
+  string
+  ]
 
 subscriptExpression :: Assignment
 subscriptExpression = makeTerm <$> symbol SubscriptExpression <*> children (Expression.Subscript <$> dereferencableExpression <*> (pure <$> (expression <|> emptyTerm)))
