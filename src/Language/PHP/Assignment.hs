@@ -151,7 +151,7 @@ primaryExpression :: Assignment
 primaryExpression = choice [
   -- variable,
   -- classConstantAccessExpression,
-  -- qualifiedName,
+  qualifiedName,
   literal,
   arrayCreationExpression,
   intrinsic,
