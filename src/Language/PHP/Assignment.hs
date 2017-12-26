@@ -153,7 +153,7 @@ cloneExpression = makeTerm <$> symbol CloneExpression <*> children (Syntax.Clone
 primaryExpression :: Assignment
 primaryExpression = choice [
   variable,
-  -- classConstantAccessExpression,
+  classConstantAccessExpression,
   qualifiedName,
   literal,
   arrayCreationExpression,
@@ -164,6 +164,9 @@ primaryExpression = choice [
   shellCommandExpression,
   expression
   ]
+
+classConstantAccessExpression :: Assignment
+classConstantAccessExpression = makeTerm <$> symbol ClassConstantAccessExpression <*> children (Expression.MemberAccess <$> scopeResolutionQualifier <*> name)
 
 variable :: Assignment
 variable = callableVariable <|> scopedPropertyAccessExpression <|> memberAccessExpression
