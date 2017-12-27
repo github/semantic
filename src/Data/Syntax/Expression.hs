@@ -49,6 +49,7 @@ instance Show1 Arithmetic where liftShowsPrec = genericLiftShowsPrec
 data Boolean a
   = Or !a !a
   | And !a !a
+  | XOr !a !a
   | Not !a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
