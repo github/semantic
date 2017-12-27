@@ -1,11 +1,12 @@
 (Program
-{+(Or
+{ (And
+  {-(Identifier)-}
+  {-(Identifier)-})
+->(Or
   {+(Identifier)+}
-  {+(Identifier)+})+}
-  (And
-  { (Identifier)
-  ->(Or
+  {+(Identifier)+}) }
+{+(And
+  {+(Or
     {+(Identifier)+}
-    {+(Identifier)+}) }
-  { (Identifier)
-  ->(Identifier) }))
+    {+(Identifier)+})+}
+  {+(Identifier)+})+})
