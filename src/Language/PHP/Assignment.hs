@@ -108,7 +108,7 @@ statement :: Assignment
 statement = handleError everything
   where
     everything = choice [
-    compoundStatement
+      compoundStatement
   -- , namedLabelStatement
   -- , expressionStatement
   -- , selectionStatement
