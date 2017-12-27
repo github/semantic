@@ -125,7 +125,7 @@ statement = handleError everything
 
 expression :: Assignment
 expression = choice [
-  -- assignmentExpression,
+  assignmentExpression,
   yieldExpression,
   unaryExpression,
   -- binaryExpression,
@@ -143,6 +143,31 @@ unaryExpression = choice [
   unaryOpExpression,
   castExpression
   ]
+
+assignmentExpression :: Assignment
+assignmentExpression = (makeTerm <$> symbol AssignmentExpression <*> children (Statement.Assignment [] <$> ((variable <|> list) <*> expression) <|> (variable <*> variable))) <|> (symbol AssignmentExpression *> children (conditionalExpression <|> augmentedAssignmentExpression))
+
+augmentedAssignmentExpression :: Assignment
+augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpression <*> children (infixTerm variable expression [
+  assign Expression.Power <$ symbol AnonStarStarEqual
+  assign Expression.Times <$ symbol AnonStarEqual
+  , assign Expression.DividedBy <$ symbol AnonSlashEqual
+  , assign Expression.Plus <$ symbol AnonPlusEqual
+  , assign Expression.Times <$ symbol AnonDotEqual
+  , assign Expression.LShift <$ symbol AnonLAngleLAngleEqual
+  , assign Expression.RShift <$ symbol AnonRAngleRAngleEqual
+  , assign Expression.BAnd <$ symbol AnonAmpersandEqual
+  , assign Expression.BXOr <$ symbol AnonCaretEqual
+  , assign Expression.BOr <$ symbol AnonPipeEqual ])
+  where assign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Data.Union.Union Syntax Term
+        assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
+
+
+conditionalExpression :: Assignment
+conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (Statement.If <$> (binaryExpression <|> unaryExpression) <*> (expression <|> emptyTerm) <*> expression)
+
+list :: Assignment
+list = makeTerm <$> symbol ListLiteral <*> children (Literal.Array <$> manyTerm (list <|> variable))
 
 exponentiationExpression :: Assignment
 exponentiationExpression = makeTerm <$> symbol ExponentiationExpression <*> children (Expression.Power <$> (cloneExpression <|> primaryExpression) <*> (primaryExpression <|> cloneExpression <|> exponentiationExpression))
