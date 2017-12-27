@@ -78,6 +78,9 @@ type Syntax = '[
   , Expression.MemberAccess
   , Expression.Subscript
   , Expression.Call
+  , Expression.InstanceOf
+  , Expression.Comparison
+  , Expression.Bitwise
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -126,9 +129,11 @@ statement = handleError everything
 expression :: Assignment
 expression = choice [
   assignmentExpression,
+  augmentedAssignmentExpression,
+  conditionalExpression,
   yieldExpression,
   unaryExpression,
-  -- binaryExpression,
+  binaryExpression,
   includeExpression,
   includeOnceExpression,
   requireExpression,
@@ -145,12 +150,12 @@ unaryExpression = choice [
   ]
 
 assignmentExpression :: Assignment
-assignmentExpression = (makeTerm <$> symbol AssignmentExpression <*> children (Statement.Assignment [] <$> ((variable <|> list) <*> expression) <|> (variable <*> variable))) <|> (symbol AssignmentExpression *> children (conditionalExpression <|> augmentedAssignmentExpression))
+assignmentExpression = makeTerm <$> symbol AssignmentExpression <*> children (Statement.Assignment [] <$> (variable <|> list) <*> (expression <|> variable))
 
 augmentedAssignmentExpression :: Assignment
 augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpression <*> children (infixTerm variable expression [
   assign Expression.Power <$ symbol AnonStarStarEqual
-  assign Expression.Times <$ symbol AnonStarEqual
+  , assign Expression.Times <$ symbol AnonStarEqual
   , assign Expression.DividedBy <$ symbol AnonSlashEqual
   , assign Expression.Plus <$ symbol AnonPlusEqual
   , assign Expression.Times <$ symbol AnonDotEqual
@@ -162,6 +167,33 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
   where assign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Data.Union.Union Syntax Term
         assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
 
+binaryExpression  :: Assignment
+binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm (expression <|> unaryExpression) (term (expression <|> classTypeDesignator))
+  [ (inj .) . Expression.And              <$ symbol AnonAnd
+  , (inj .) . Expression.Or               <$ symbol AnonOr
+  , (inj .) . Expression.XOr              <$ symbol AnonXor
+  , (inj .) . Expression.Or               <$ symbol AnonPipePipe
+  , (inj .) . Expression.And              <$ symbol AnonAmpersandAmpersand
+  , (inj .) . Expression.BOr              <$ symbol AnonPipe
+  , (inj .) . Expression.BXOr             <$ symbol AnonCaret
+  , (inj .) . Expression.BAnd             <$ symbol AnonAmpersand
+  , (inj .) . Expression.Or               <$ symbol AnonQuestionQuestion -- Not sure if this is right.
+  , (inj .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual)
+  , (inj .) . invert Expression.Equal     <$ (symbol AnonBangEqual <|> symbol AnonLAngleRAngle <|> symbol AnonBangEqualEqual)
+  , (inj .) . Expression.LessThan         <$ symbol AnonLAngle
+  , (inj .) . Expression.GreaterThan      <$ symbol AnonRAngle
+  , (inj .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
+  , (inj .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
+  , (inj .) . Expression.Comparison       <$ symbol AnonLAngleEqualRAngle
+  , (inj .) . Expression.LShift           <$ symbol AnonLAngleLAngle
+  , (inj .) . Expression.RShift           <$ symbol AnonRAngleRAngle
+  , (inj .) . Expression.Plus             <$ symbol AnonPlus
+  , (inj .) . Expression.Minus            <$ symbol AnonMinus
+  , (inj .) . Expression.Times            <$ (symbol AnonStar <|> symbol AnonDot)
+  , (inj .) . Expression.DividedBy        <$ symbol AnonSlash
+  , (inj .) . Expression.Modulo           <$ symbol AnonPercent
+  , (inj .) . Expression.InstanceOf       <$ symbol AnonInstanceof
+  ]) where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
 conditionalExpression :: Assignment
 conditionalExpression = makeTerm <$> symbol ConditionalExpression <*> children (Statement.If <$> (binaryExpression <|> unaryExpression) <*> (expression <|> emptyTerm) <*> expression)
@@ -443,3 +475,10 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 string :: Assignment
 string = makeTerm <$> symbol Grammar.String <*> (Literal.TextElement <$> source)
+
+-- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
+infixTerm :: Assignment
+          -> Assignment
+          -> [Assignment.Assignment [] Grammar (Term -> Term -> Data.Union.Union Syntax Term)]
+          -> Assignment.Assignment [] Grammar (Data.Union.Union Syntax Term)
+infixTerm = infixContext comment
