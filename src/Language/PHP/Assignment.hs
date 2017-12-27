@@ -78,6 +78,7 @@ type Syntax = '[
   , Expression.MemberAccess
   , Expression.Subscript
   , Expression.Call
+  , Statement.If
   , Expression.InstanceOf
   , Expression.Comparison
   , Expression.Bitwise
