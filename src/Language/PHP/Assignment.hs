@@ -86,6 +86,7 @@ type Syntax = '[
   , Syntax.NamespaceUseGroupClause
   , Syntax.NamespaceUseClause
   , Syntax.NamespaceUseDeclaration
+  , Syntax.Namespace
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -125,7 +126,7 @@ statement = handleError everything
   -- , classDeclaration
   -- , interfaceDeclaration
   -- , traitDeclaration
-  -- , namespaceDefinition
+      , namespaceDefinition
       , namespaceUseDeclaration
       , globalDeclaration
       , functionStaticDeclaration
@@ -435,6 +436,9 @@ castExpression = makeTerm <$> symbol CastExpression <*> children (flip Expressio
 
 castType :: Assignment
 castType = makeTerm <$> symbol CastType <*> (Syntax.CastType <$> source)
+
+namespaceDefinition :: Assignment
+namespaceDefinition = makeTerm <$> symbol NamespaceDefinition <*> children (Syntax.Namespace <$> (name <|> emptyTerm) <*> (compoundStatement <|> emptyTerm))
 
 namespaceUseDeclaration :: Assignment
 namespaceUseDeclaration = makeTerm <$> symbol NamespaceUseDeclaration <*> children (Syntax.NamespaceUseDeclaration <$>

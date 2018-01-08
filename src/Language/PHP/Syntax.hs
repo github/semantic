@@ -263,3 +263,10 @@ newtype NamespaceUseGroupClause a = NamespaceUseGroupClause [a]
 instance Eq1 NamespaceUseGroupClause where liftEq = genericLiftEq
 instance Ord1 NamespaceUseGroupClause where liftCompare = genericLiftCompare
 instance Show1 NamespaceUseGroupClause where liftShowsPrec = genericLiftShowsPrec
+
+data Namespace a = Namespace { namespaceName :: a, namespaceBody :: a}
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Namespace where liftEq = genericLiftEq
+instance Ord1 Namespace where liftCompare = genericLiftCompare
+instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
