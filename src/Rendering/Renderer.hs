@@ -9,7 +9,6 @@ module Rendering.Renderer
 , renderJSONDiffs
 , renderJSONTerm
 , renderJSONTerms
-, renderJSONMetadata
 , renderToCDiff
 , renderToCTerm
 , renderToTags
