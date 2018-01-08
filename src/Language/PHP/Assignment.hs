@@ -82,6 +82,10 @@ type Syntax = '[
   , Expression.InstanceOf
   , Expression.Comparison
   , Expression.Bitwise
+  , Syntax.NamespaceAliasingClause
+  , Syntax.NamespaceUseGroupClause
+  , Syntax.NamespaceUseClause
+  , Syntax.NamespaceUseDeclaration
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -122,10 +126,12 @@ statement = handleError everything
   -- , interfaceDeclaration
   -- , traitDeclaration
   -- , namespaceDefinition
-  -- , namespaceUseDeclaration
+      , namespaceUseDeclaration
       , globalDeclaration
       , functionStaticDeclaration
       ]
+
+
 
 expression :: Assignment
 expression = choice [
@@ -429,6 +435,26 @@ castExpression = makeTerm <$> symbol CastExpression <*> children (flip Expressio
 
 castType :: Assignment
 castType = makeTerm <$> symbol CastType <*> (Syntax.CastType <$> source)
+
+namespaceUseDeclaration :: Assignment
+namespaceUseDeclaration = makeTerm <$> symbol NamespaceUseDeclaration <*> children (Syntax.NamespaceUseDeclaration <$>
+  (((++) <$> (pure <$> (namespaceFunctionOrConst <|> emptyTerm)) <*> someTerm namespaceUseClause) <|> ((\a b cs -> a : b : cs) <$> namespaceFunctionOrConst <*> namespaceName <*> someTerm namespaceUseGroupClause1) <|> ((\a b -> a : b) <$> namespaceName <*> someTerm namespaceUseGroupClause2)))
+
+namespaceUseClause :: Assignment
+namespaceUseClause = makeTerm <$> symbol NamespaceUseClause <*> children (fmap Syntax.NamespaceUseClause $ (\a b -> [a, b]) <$> namespaceName <*> (namespaceAliasingClause <|> emptyTerm))
+
+namespaceUseGroupClause1 :: Assignment
+namespaceUseGroupClause1 = makeTerm <$> symbol NamespaceUseGroupClause_1 <*> children (fmap Syntax.NamespaceUseGroupClause $ (\a b -> [a, b]) <$> namespaceName <*> (namespaceAliasingClause <|> emptyTerm))
+
+namespaceUseGroupClause2 :: Assignment
+namespaceUseGroupClause2 = makeTerm <$> symbol NamespaceUseGroupClause_2 <*> children (fmap Syntax.NamespaceUseGroupClause $ (\a b c -> [a, b, c]) <$> (namespaceFunctionOrConst <|> emptyTerm) <*> namespaceName <*> (namespaceAliasingClause <|> emptyTerm))
+
+namespaceAliasingClause :: Assignment
+namespaceAliasingClause = makeTerm <$> symbol NamespaceAliasingClause <*> children (Syntax.NamespaceAliasingClause <$> name)
+
+-- | TODO Do something better than Identifier
+namespaceFunctionOrConst :: Assignment
+namespaceFunctionOrConst = makeTerm <$> symbol NamespaceFunctionOrConst <*> (Syntax.Identifier <$> source)
 
 globalDeclaration :: Assignment
 globalDeclaration = makeTerm <$> symbol GlobalDeclaration <*> children (Syntax.GlobalDeclaration <$> manyTerm simpleVariable)

@@ -235,3 +235,31 @@ data PrintIntrinsic a = PrintIntrinsic a
 instance Eq1 PrintIntrinsic where liftEq = genericLiftEq
 instance Ord1 PrintIntrinsic where liftCompare = genericLiftCompare
 instance Show1 PrintIntrinsic where liftShowsPrec = genericLiftShowsPrec
+
+data NamespaceAliasingClause a = NamespaceAliasingClause a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 NamespaceAliasingClause where liftEq = genericLiftEq
+instance Ord1 NamespaceAliasingClause where liftCompare = genericLiftCompare
+instance Show1 NamespaceAliasingClause where liftShowsPrec = genericLiftShowsPrec
+
+newtype NamespaceUseDeclaration a = NamespaceUseDeclaration [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 NamespaceUseDeclaration where liftEq = genericLiftEq
+instance Ord1 NamespaceUseDeclaration where liftCompare = genericLiftCompare
+instance Show1 NamespaceUseDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+newtype NamespaceUseClause a = NamespaceUseClause [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 NamespaceUseClause where liftEq = genericLiftEq
+instance Ord1 NamespaceUseClause where liftCompare = genericLiftCompare
+instance Show1 NamespaceUseClause where liftShowsPrec = genericLiftShowsPrec
+
+newtype NamespaceUseGroupClause a = NamespaceUseGroupClause [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 NamespaceUseGroupClause where liftEq = genericLiftEq
+instance Ord1 NamespaceUseGroupClause where liftCompare = genericLiftCompare
+instance Show1 NamespaceUseGroupClause where liftShowsPrec = genericLiftShowsPrec
