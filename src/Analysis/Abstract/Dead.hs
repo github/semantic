@@ -19,16 +19,13 @@ import Data.Pointed
 import Data.Semigroup
 import Data.Set
 
-
-type DeadCodeInterpreter t v
-  = '[ State (Dead t)
-     , Fail
-     , State (Store (LocationFor v) v)
-     , Reader (Set (Address (LocationFor v) v))
-     , Reader (Environment (LocationFor v) v)
+-- | The effects necessary for dead code analysis.
+type DeadCodeEvaluating t v
+  = '[ State (Dead t)                         -- For 'MonadDead'.
+     , Fail                                   -- For 'MonadFail'.
+     , State (Store (LocationFor v) v)        -- For 'MonadStore'.
+     , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
      ]
-
-type DeadCodeResult t v = Final (DeadCodeInterpreter t v) v
 
 
 -- | Dead code analysis
@@ -37,19 +34,20 @@ evalDead :: forall v term
            , Ord term
            , Foldable (Base term)
            , Recursive term
-           , Eval term v (Eff (DeadCodeInterpreter term v)) (Base term)
-           , MonadAddress (LocationFor v) (Eff (DeadCodeInterpreter term v))
+           , Eval term v (Eff (DeadCodeEvaluating term v)) (Base term)
+           , MonadAddress (LocationFor v) (Eff (DeadCodeEvaluating term v))
            , Semigroup (Cell (LocationFor v) v)
            )
          => term
-         -> DeadCodeResult term v
-evalDead e0 = run @(DeadCodeInterpreter term v) $ do
+         -> Final (DeadCodeEvaluating term v) v
+evalDead e0 = run @(DeadCodeEvaluating term v) $ do
   killAll (Dead (subterms e0))
   fix (evDead (\ recur yield -> eval recur yield . project)) pure e0
   where
     subterms :: (Ord a, Recursive a, Foldable (Base a)) => a -> Set a
     subterms term = para (foldMap (uncurry ((<>) . point))) term <> point term
 
+-- | Evaluation which 'revive's each visited term.
 evDead :: (Ord t, MonadDead t m)
        => (((v -> m v) -> t -> m v) -> (v -> m v) -> t -> m v)
        -> ((v -> m v) -> t -> m v)

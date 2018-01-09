@@ -60,7 +60,7 @@ instance ( MonadFail m
     opTy <- recur pure callFunction
     tvar <- fresh
     inTys <- traverse (recur pure) callParams
-    _ :-> outTy <- opTy `unify` (TArr inTys :-> TVar tvar)
+    _ :-> outTy <- opTy `unify` (Type.Product inTys :-> Var tvar)
     yield outTy
 
 

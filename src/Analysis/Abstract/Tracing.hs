@@ -23,46 +23,42 @@ import Data.Pointed
 import Data.Semigroup
 import Data.Set
 
-type TracingInterpreter t v g
-  = '[ Reader (Set (Address (LocationFor v) v))
-     , Writer (g (Configuration (LocationFor v) t v))
-     , Fail
-     , State (Store (LocationFor v) v)
-     , Reader (Set (Address (LocationFor v) v))
-     , Reader (Environment (LocationFor v) v)
+-- | The effects necessary for tracing analyses.
+type Tracing g t v
+  = '[ Writer (g (Configuration (LocationFor v) t v)) -- For 'MonadTrace'.
+     , Fail                                           -- For 'MonadFail'.
+     , State (Store (LocationFor v) v)                -- For 'MonadStore'.
+     , Reader (Environment (LocationFor v) v)         -- For 'MonadEnv'.
      ]
 
-type TraceInterpreter t v = TracingInterpreter t v []
-type ReachableStateInterpreter t v = TracingInterpreter t v Set
-
-
--- | Tracing state analyses
+-- | Linear trace analysis.
 evalTrace :: forall v term
           . ( Ord v, Ord term, Ord (Cell (LocationFor v) v)
             , Functor (Base term)
             , Recursive term
-            , MonadAddress (LocationFor v) (Eff (TraceInterpreter term v))
-            , MonadGC v (Eff (TraceInterpreter term v))
+            , MonadAddress (LocationFor v) (Eff (Tracing [] term v))
+            , MonadGC v (Eff (Tracing [] term v))
             , Semigroup (Cell (LocationFor v) v)
-            , Eval term v (Eff (TraceInterpreter term v)) (Base term)
+            , Eval term v (Eff (Tracing [] term v)) (Base term)
             )
-          => term -> Final (TracingInterpreter term v []) v
-evalTrace = run @(TraceInterpreter term v) . fix (evTell @[] (\ recur yield -> eval recur yield . project)) pure
+          => term -> Final (Tracing [] term v) v
+evalTrace = run @(Tracing [] term v) . fix (evTell @[] (\ recur yield -> eval recur yield . project)) pure
 
--- | Reach state analyses
+-- | Reachable configuration analysis.
 evalReach :: forall v term
           . ( Ord v, Ord term, Ord (LocationFor v), Ord (Cell (LocationFor v) v)
             , Functor (Base term)
             , Recursive term
-            , MonadAddress (LocationFor v) (Eff (ReachableStateInterpreter term v))
-            , MonadGC v (Eff (ReachableStateInterpreter term v))
+            , MonadAddress (LocationFor v) (Eff (Tracing Set term v))
+            , MonadGC v (Eff (Tracing Set term v))
             , Semigroup (Cell (LocationFor v) v)
-            , Eval term v (Eff (ReachableStateInterpreter term v)) (Base term)
+            , Eval term v (Eff (Tracing Set term v)) (Base term)
             )
-          => term -> Final (TracingInterpreter term v Set) v
-evalReach = run @(ReachableStateInterpreter term v) . fix (evTell @Set (\ recur yield -> eval recur yield . project)) pure
+          => term -> Final (Tracing Set term v) v
+evalReach = run @(Tracing Set term v) . fix (evTell @Set (\ recur yield -> eval recur yield . project)) pure
 
 
+-- | Small-step evaluation which records every visited configuration.
 evTell :: forall g t m v
        . ( Monoid (g (Configuration (LocationFor v) t v))
          , Pointed g
