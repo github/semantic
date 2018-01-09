@@ -10,24 +10,31 @@ import Data.Set as Set
 import GHC.Generics
 import Unsafe.Coerce
 
+-- | A set of live addresses (whether roots or reachable).
 newtype Live l v = Live { unLive :: Set (Address l v) }
   deriving (Eq, Foldable, Monoid, Ord, Semigroup, Show)
 
+-- | Construct a 'Live' set containing only the given address.
 liveSingleton :: Address l v -> Live l v
 liveSingleton = Live . Set.singleton
 
+-- | Insert an address into a 'Live' set.
 liveInsert :: Ord l => Address l v -> Live l v -> Live l v
 liveInsert addr = Live . Set.insert addr . unLive
 
+-- | Delete an address from a 'Live' set, if present.
 liveDelete :: Ord l => Address l v -> Live l v -> Live l v
 liveDelete addr = Live . Set.delete addr . unLive
 
+-- | Compute the (asymmetric) difference of two 'Live' sets, i.e. delete every element of the second set from the first set.
 liveDifference :: Ord l => Live l v -> Live l v -> Live l v
 liveDifference = fmap Live . (Set.difference `on` unLive)
 
+-- | Test whether an 'Address' is in a 'Live' set.
 liveMember :: Ord l => Address l v -> Live l v -> Bool
 liveMember addr = Set.member addr . unLive
 
+-- | Decompose a 'Live' set into a pair of one member address and the remaining set, or 'Nothing' if empty.
 liveSplit :: Ord l => Live l v -> Maybe (Address l v, Live l v)
 liveSplit = fmap (second Live) . Set.minView . unLive
 

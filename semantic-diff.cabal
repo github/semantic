@@ -30,6 +30,7 @@ library
                      , Assigning.Assignment.Table
                      -- Control flow
                      , Control.Effect
+                     -- Effects used in abstract interpretation
                      , Control.Monad.Effect.Address
                      , Control.Monad.Effect.Cache
                      , Control.Monad.Effect.Dead

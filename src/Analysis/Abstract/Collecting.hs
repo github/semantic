@@ -9,6 +9,7 @@ import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Semigroup
 
+-- | Small-step evaluation which garbage-collects any non-rooted addresses after evaluating each term.
 evCollect :: forall t v m
           .  ( Ord (LocationFor v)
              , Foldable (Cell (LocationFor v))
@@ -25,13 +26,27 @@ evCollect ev0 ev' yield e = do
   modifyStore (gc (roots <> valueRoots v))
   pure v
 
-gc :: (Ord (LocationFor a), Foldable (Cell (LocationFor a)), ValueRoots (LocationFor a) a) => Live (LocationFor a) a -> Store (LocationFor a) a -> Store (LocationFor a) a
+-- | Collect any addresses in the store not rooted in or reachable from the given 'Live' set.
+gc :: ( Ord (LocationFor a)
+      , Foldable (Cell (LocationFor a))
+      , ValueRoots (LocationFor a) a
+      )
+   => Live (LocationFor a) a  -- ^ The set of addresses to consider rooted.
+   -> Store (LocationFor a) a -- ^ A store to collect unreachable addresses within.
+   -> Store (LocationFor a) a -- ^ A garbage-collected store.
 gc roots store = storeRestrict store (reachable roots store)
 
-reachable :: (Ord (LocationFor a), Foldable (Cell (LocationFor a)), ValueRoots (LocationFor a) a) => Live (LocationFor a) a -> Store (LocationFor a) a -> Live (LocationFor a) a
-reachable roots store = go roots mempty
-  where go set seen = case liveSplit set of
+-- | Compute the set of addresses reachable from a given root set in a given store.
+reachable :: ( Ord (LocationFor a)
+             , Foldable (Cell (LocationFor a))
+             , ValueRoots (LocationFor a) a
+             )
+          => Live (LocationFor a) a  -- ^ The set of root addresses.
+          -> Store (LocationFor a) a -- ^ The store to trace addresses through.
+          -> Live (LocationFor a) a  -- ^ The set of addresses reachable from the root set.
+reachable roots store = go mempty roots
+  where go seen set = case liveSplit set of
           Nothing -> seen
-          Just (a, as)
-            | Just values <- storeLookupAll a store -> go (liveDifference (foldr ((<>) . valueRoots) mempty values <> as) seen) (liveInsert a seen)
-            | otherwise -> go seen (liveInsert a seen)
+          Just (a, as) -> go (liveInsert a seen) (case storeLookupAll a store of
+            Just values -> liveDifference (foldr ((<>) . valueRoots) mempty values <> as) seen
+            _           -> seen)

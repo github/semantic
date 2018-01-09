@@ -23,6 +23,9 @@ envInsert :: Name -> Address l a -> Environment l a -> Environment l a
 envInsert name value (Environment m) = Environment (Map.insert name value m)
 
 
+-- | Retrieve the 'Live' set of addresses to which the given free variable names are bound.
+--
+--   Unbound names are silently dropped.
 envRoots :: (Ord l, Foldable t) => Environment l a -> t Name -> Live l a
 envRoots env = foldr ((<>) . maybe mempty liveSingleton . flip envLookup env) mempty
 

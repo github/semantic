@@ -35,6 +35,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Do we need some distinct notion of a global environment?
 -- TODO: Implement evaluation under the binder for the typechecking evaluator.
+-- TODO: Filter the closed-over environment by the free variables in the term.
 instance ( Monad m
          , Ord l
          , Semigroup (Cell l (Value l t))
@@ -65,13 +66,13 @@ instance ( Alternative m
     let params = toList (foldMap freeVariables functionParameters)
     tvars <- for params $ \name -> do
       a <- alloc name
-      tvar <- TVar <$> fresh
+      tvar <- Var <$> fresh
       assign a tvar
       pure (name, a, tvar)
 
     outTy <- localEnv (const (foldr (\ (n, a, _) -> envInsert n a) env tvars)) (recur pure functionBody)
     let tvars' = fmap (\(_, _, t) -> t) tvars
-    let v = TArr tvars' :-> outTy
+    let v = Type.Product tvars' :-> outTy
 
     (name, a) <- envLookupOrAlloc' functionName env v
 
