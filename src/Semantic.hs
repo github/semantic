@@ -42,7 +42,10 @@ import Semantic.Task as Task
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
 parseBlobs :: Output output => TermRenderer output -> [Blob] -> Task ByteString
-parseBlobs renderer = fmap toOutput . distributeFoldMap (parseBlob renderer)
+parseBlobs renderer blobs = toOutput' <$> distributeFoldMap (parseBlob renderer) blobs
+  where toOutput' = case renderer of
+          JSONTermRenderer -> toOutput . renderJSONTerms
+          _ -> toOutput
 
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
 parseBlob :: TermRenderer output -> Blob -> Task output
@@ -53,15 +56,18 @@ parseBlob renderer blob@Blob{..}
     JSONTermRenderer        -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)
     SExpressionTermRenderer -> decorate constructorLabel . (Nil <$)                   >=> render renderSExpressionTerm
     TagsTermRenderer        -> decorate (declarationAlgebra blob)                     >=> render (renderToTags blob)
-    DOTTermRenderer         ->                                          render (renderDOTTerm blob)
+    DOTTermRenderer         ->                                                            render (renderDOTTerm blob)
   | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
 
-data NoLanguageForBlob = NoLanguageForBlob FilePath
+newtype NoLanguageForBlob = NoLanguageForBlob FilePath
   deriving (Eq, Exception, Ord, Show, Typeable)
 
 
 diffBlobPairs :: Output output => DiffRenderer output -> [BlobPair] -> Task ByteString
-diffBlobPairs renderer = fmap toOutput . distributeFoldMap (diffBlobPair renderer)
+diffBlobPairs renderer blobs = toOutput' <$> distributeFoldMap (diffBlobPair renderer) blobs
+  where toOutput' = case renderer of
+          JSONDiffRenderer -> toOutput . renderJSONDiffs
+          _ -> toOutput
 
 -- | A task to parse a pair of 'Blob's, diff them, and render the 'Diff'.
 diffBlobPair :: DiffRenderer output -> BlobPair -> Task output

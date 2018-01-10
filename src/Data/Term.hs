@@ -33,7 +33,7 @@ termOut = termFOut . unTerm
 
 
 data TermF syntax ann recur = In { termFAnnotation :: ann, termFOut :: syntax recur }
-  deriving (Eq, Foldable, Functor, Show, Traversable)
+  deriving (Eq, Ord, Foldable, Functor, Show, Traversable)
 
 
 -- | Return the node count of a term.
@@ -83,6 +83,13 @@ instance Show1 f => Show1 (Term f) where
 instance (Show1 f, Show a) => Show (Term f a) where
   showsPrec = showsPrec1
 
+instance Ord1 f => Ord1 (Term f) where
+  liftCompare comp = go where go t1 t2 = liftCompare2 comp go (unTerm t1) (unTerm t2)
+
+instance (Ord1 f, Ord a) => Ord (Term f a) where
+  compare = compare1
+
+
 instance Functor f => Bifunctor (TermF f) where
   bimap f g (In a r) = In (f a) (fmap g r)
 
@@ -105,6 +112,11 @@ instance Show1 f => Show2 (TermF f) where
 instance (Show1 f, Show a) => Show1 (TermF f a) where
   liftShowsPrec = liftShowsPrec2 showsPrec showList
 
+instance Ord1 f => Ord2 (TermF f) where
+  liftCompare2 compA compB (In a1 f1) (In a2 f2) = compA a1 a2 <> liftCompare compB f1 f2
+
+instance (Ord1 f, Ord a) => Ord1 (TermF f a) where
+  liftCompare = liftCompare2 compare
 
 instance (ToJSONFields a, ToJSONFields1 f) => ToJSON (Term f a) where
   toJSON = object . toJSONFields
