@@ -65,7 +65,6 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       <$> (   flag  (SomeRenderer SExpressionDiffRenderer) (SomeRenderer SExpressionDiffRenderer) (long "sexpression" <> help "Output s-expression diff tree")
           <|> flag'                                        (SomeRenderer JSONDiffRenderer)        (long "json" <> help "Output JSON diff trees")
           <|> flag'                                        (SomeRenderer ToCDiffRenderer)         (long "toc" <> help "Output JSON table of contents diff summary")
-          <|> flag'                                        (SomeRenderer ToCDiffRenderer)         (long "toc-assignment" <> help "Output JSON table of contents diff summary using the assignment parser")
           <|> flag'                                        (SomeRenderer DOTDiffRenderer)         (long "dot" <> help "Output the diff as a DOT graph"))
       <*> (   Right <$> some (both
           <$> argument filePathReader (metavar "FILE_A")
