@@ -96,6 +96,7 @@ type Syntax = '[
   , Syntax.DestructorDeclaration
   , Syntax.ConstructorDeclaration
   , Syntax.TraitDeclaration
+  , Declaration.Method
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -369,26 +370,32 @@ classMemberDeclaration :: Assignment
 classMemberDeclaration = choice [
   classConstDeclaration,
   -- propertyDeclaration,
-  -- methodDeclaration,
+  methodDeclaration,
   constructorDeclaration,
   destructorDeclaration,
   traitUseClause
   ]
 
+methodDeclaration :: Assignment
+methodDeclaration =  makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> manyTerm methodModifier <*> emptyTerm <*> functionDefinitionParts)
+  where
+    functionDefinitionParts = symbol FunctionDefinition *> children ((,,,) <$> name <*> parameters <*> (returnType <|> emptyTerm) <*> (compoundStatement <|> emptyTerm))
+    makeMethod modifiers receiver (name, params, returnType, compoundStatement) = Declaration.Method (modifiers ++ [returnType]) receiver name params compoundStatement
+
 classBaseClause :: Assignment
-classBaseClause = makeTerm <$> symbol ClassBaseClause <*> (Syntax.ClassBaseClause <$> qualifiedName)
+classBaseClause = makeTerm <$> symbol ClassBaseClause <*> children (Syntax.ClassBaseClause <$> qualifiedName)
 
 classInterfaceClause :: Assignment
-classInterfaceClause = makeTerm <$> symbol ClassInterfaceClause <*> (Syntax.ClassInterfaceClause <$> someTerm qualifiedName)
+classInterfaceClause = makeTerm <$> symbol ClassInterfaceClause <*> children (Syntax.ClassInterfaceClause <$> someTerm qualifiedName)
 
 classConstDeclaration :: Assignment
-classConstDeclaration = makeTerm <$> symbol ClassConstDeclaration <*> (Syntax.ClassConstDeclaration <$> (visibilityModifier <|> emptyTerm) <*> manyTerm constElement)
+classConstDeclaration = makeTerm <$> symbol ClassConstDeclaration <*> children (Syntax.ClassConstDeclaration <$> (visibilityModifier <|> emptyTerm) <*> manyTerm constElement)
 
 visibilityModifier :: Assignment
 visibilityModifier = makeTerm <$> symbol VisibilityModifier <*> (Syntax.Identifier <$> source)
 
 constElement :: Assignment
-constElement = makeTerm <$> symbol ConstElement <*> (Statement.Assignment [] <$> name <*> expression)
+constElement = makeTerm <$> symbol ConstElement <*> children (Statement.Assignment [] <$> name <*> expression)
 
 arguments :: Assignment.Assignment [] Grammar [Term]
 arguments = symbol Arguments *> children (manyTerm (variadicUnpacking <|> expression))
