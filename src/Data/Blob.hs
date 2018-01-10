@@ -10,11 +10,16 @@ module Data.Blob
 , languageForBlobPair
 , languageTagForBlobPair
 , pathForBlobPair
+, pathKeyForBlobPair
 ) where
 
+import Data.Aeson
+import Data.JSON.Fields
 import Data.Bifunctor.Join
+import Data.Bifunctor
 import Data.Language
 import Data.These
+import Data.Monoid
 import Data.Source as Source
 
 
@@ -60,3 +65,13 @@ pathForBlobPair (Join (These _ Blob{..})) = blobPath
 languageTagForBlobPair :: BlobPair -> [(String, String)]
 languageTagForBlobPair pair = maybe [] showLanguage (languageForBlobPair pair)
   where showLanguage = pure . (,) "language" . show
+
+pathKeyForBlobPair :: BlobPair -> FilePath
+pathKeyForBlobPair blobs = case bimap blobPath blobPath (runJoin blobs) of
+   This before -> before
+   That after -> after
+   These before after | before == after -> after
+                      | otherwise -> before <> " -> " <> after
+
+instance ToJSONFields Blob where
+  toJSONFields Blob{..} = [ "path" .= blobPath, "language" .= blobLanguage ]
