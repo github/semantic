@@ -270,3 +270,38 @@ data Namespace a = Namespace { namespaceName :: a, namespaceBody :: a}
 instance Eq1 Namespace where liftEq = genericLiftEq
 instance Ord1 Namespace where liftCompare = genericLiftCompare
 instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
+
+data TraitDeclaration a = TraitDeclaration { traitName :: a, traitStatements :: [a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 TraitDeclaration where liftEq = genericLiftEq
+instance Ord1 TraitDeclaration where liftCompare = genericLiftCompare
+instance Show1 TraitDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+data AliasAs a = AliasAs { aliasAsName  :: a, aliasAsModifier :: a, aliasAsClause :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 AliasAs where liftEq = genericLiftEq
+instance Ord1 AliasAs where liftCompare = genericLiftCompare
+instance Show1 AliasAs where liftShowsPrec = genericLiftShowsPrec
+
+data InsteadOf a = InsteadOf a a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 InsteadOf where liftEq = genericLiftEq
+instance Ord1 InsteadOf where liftCompare = genericLiftCompare
+instance Show1 InsteadOf where liftShowsPrec = genericLiftShowsPrec
+
+newtype TraitUseSpecification a = TraitUseSpecification [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 TraitUseSpecification where liftEq = genericLiftEq
+instance Ord1 TraitUseSpecification where liftCompare = genericLiftCompare
+instance Show1 TraitUseSpecification where liftShowsPrec = genericLiftShowsPrec
+
+data TraitUseClause a = TraitUseClause [a] a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 TraitUseClause where liftEq = genericLiftEq
+instance Ord1 TraitUseClause where liftCompare = genericLiftCompare
+instance Show1 TraitUseClause where liftShowsPrec = genericLiftShowsPrec

@@ -125,7 +125,7 @@ statement = handleError everything
   -- , functionDefinition
   -- , classDeclaration
   -- , interfaceDeclaration
-  -- , traitDeclaration
+      , traitDeclaration
       , namespaceDefinition
       , namespaceUseDeclaration
       , globalDeclaration
@@ -436,6 +436,33 @@ castExpression = makeTerm <$> symbol CastExpression <*> children (flip Expressio
 
 castType :: Assignment
 castType = makeTerm <$> symbol CastType <*> (Syntax.CastType <$> source)
+
+traitDeclaration :: Assignment
+traitDeclaration = makeTerm <$> symbol TraitDeclaration <*> children (Syntax.TraitDeclaration <$> name <*> manyTerm traitMemberDeclaration)
+
+traitMemberDeclaration :: Assignment
+traitMemberDeclaration = choice [
+  propertyDeclaration,
+  methodDeclaration,
+  constructorDeclaration,
+  destructorDeclaration,
+  (makeTerm <$> location <*> someTerm traitUseClause)
+  ]
+
+traitUseClause :: Assignment
+traitUseClause = makeTerm <$> symbol TraitUseClause <*> children (Syntax.TraitUseClause <$> someTerm qualifiedName <*> traitUseSpecification)
+
+traitUseSpecification :: Assignment
+traitUseSpecification = makeTerm <$> symbol TraitUseSpecification <*> children (Syntax.TraitUseSpecification <$> manyTerm traitSelectAndAliasClause)
+
+traitSelectAndAliasClause :: Assignment
+traitSelectAndAliasClause = traitSelectInsteadOfClause <|> traitAliasAsClause
+
+traitSelectInsteadOfClause :: Assignment
+traitSelectInsteadOfClause = makeTerm <$> symbol TraitSelectInsteadOfClause <*> children (Syntax.InsteadOf <$> name <*> name)
+
+traitAliasAsClause :: Assignment
+traitAliasAsClause = makeTerm <$> symbol TraitAliasAsClause <*> children (Syntax.AliasAs <$> name <*> (visibilityModifier <|> emptyTerm) <*> (name <|> emptyTerm))
 
 namespaceDefinition :: Assignment
 namespaceDefinition = makeTerm <$> symbol NamespaceDefinition <*> children (Syntax.Namespace <$> (name <|> emptyTerm) <*> (compoundStatement <|> emptyTerm))
