@@ -87,6 +87,15 @@ type Syntax = '[
   , Syntax.NamespaceUseClause
   , Syntax.NamespaceUseDeclaration
   , Syntax.Namespace
+  , Syntax.AliasAs
+  , Syntax.InsteadOf
+  , Syntax.TraitUseSpecification
+  , Syntax.TraitUseClause
+  , Syntax.ClassModifier
+  , Syntax.Static
+  , Syntax.DestructorDeclaration
+  , Syntax.ConstructorDeclaration
+  , Syntax.TraitDeclaration
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -172,8 +181,8 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
   , assign Expression.BAnd <$ symbol AnonAmpersandEqual
   , assign Expression.BXOr <$ symbol AnonCaretEqual
   , assign Expression.BOr <$ symbol AnonPipeEqual ])
-  where assign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Data.Union.Union Syntax Term
-        assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
+  where
+    assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
 
 binaryExpression  :: Assignment
 binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm (expression <|> unaryExpression) (term (expression <|> classTypeDesignator))
@@ -312,7 +321,8 @@ printIntrinsic = makeTerm <$> symbol PrintIntrinsic <*> children (Syntax.PrintIn
 
 anonymousFunctionCreationExpression :: Assignment
 anonymousFunctionCreationExpression = makeTerm <$> symbol AnonymousFunctionCreationExpression <*> children (makeFunction <$> emptyTerm <*> parameters <*> functionUseClause <*> returnType <*> compoundStatement)
-  where makeFunction identifier parameters functionUseClause returnType statement = Declaration.Function [functionUseClause, returnType] identifier parameters statement
+  where
+    makeFunction identifier parameters functionUseClause returnType statement = Declaration.Function [functionUseClause, returnType] identifier parameters statement
 
 parameters :: Assignment.Assignment [] Grammar [Term]
 parameters = manyTerm (simpleParameter <|> variadicParameter)
@@ -357,12 +367,12 @@ objectCreationExpression = (makeTerm <$> symbol ObjectCreationExpression <*> chi
 
 classMemberDeclaration :: Assignment
 classMemberDeclaration = choice [
-  classConstDeclaration
+  classConstDeclaration,
   -- propertyDeclaration,
   -- methodDeclaration,
-  -- constructorDeclaration,
-  -- destructorDeclaration,
-  -- traitUseClause
+  constructorDeclaration,
+  destructorDeclaration,
+  traitUseClause
   ]
 
 classBaseClause :: Assignment
@@ -442,12 +452,31 @@ traitDeclaration = makeTerm <$> symbol TraitDeclaration <*> children (Syntax.Tra
 
 traitMemberDeclaration :: Assignment
 traitMemberDeclaration = choice [
-  propertyDeclaration,
-  methodDeclaration,
+  -- propertyDeclaration,
+  -- methodDeclaration,
   constructorDeclaration,
   destructorDeclaration,
-  (makeTerm <$> location <*> someTerm traitUseClause)
+  makeTerm <$> location <*> someTerm traitUseClause
   ]
+
+constructorDeclaration :: Assignment
+constructorDeclaration = makeTerm <$> symbol ConstructorDeclaration <*> children (Syntax.ConstructorDeclaration <$> someTerm methodModifier <*> parameters <*> compoundStatement)
+
+destructorDeclaration :: Assignment
+destructorDeclaration = makeTerm <$> symbol DestructorDeclaration <*> children (Syntax.DestructorDeclaration <$> someTerm methodModifier <*> compoundStatement)
+
+methodModifier :: Assignment
+methodModifier = choice [
+  visibilityModifier,
+  classModifier,
+  staticModifier
+  ]
+
+staticModifier :: Assignment
+staticModifier = makeTerm <$> symbol StaticModifier <*> (Syntax.Static <$> source)
+
+classModifier :: Assignment
+classModifier = makeTerm <$> symbol ClassModifier <*> (Syntax.ClassModifier <$> source)
 
 traitUseClause :: Assignment
 traitUseClause = makeTerm <$> symbol TraitUseClause <*> children (Syntax.TraitUseClause <$> someTerm qualifiedName <*> traitUseSpecification)
@@ -469,7 +498,7 @@ namespaceDefinition = makeTerm <$> symbol NamespaceDefinition <*> children (Synt
 
 namespaceUseDeclaration :: Assignment
 namespaceUseDeclaration = makeTerm <$> symbol NamespaceUseDeclaration <*> children (Syntax.NamespaceUseDeclaration <$>
-  (((++) <$> (pure <$> (namespaceFunctionOrConst <|> emptyTerm)) <*> someTerm namespaceUseClause) <|> ((\a b cs -> a : b : cs) <$> namespaceFunctionOrConst <*> namespaceName <*> someTerm namespaceUseGroupClause1) <|> ((\a b -> a : b) <$> namespaceName <*> someTerm namespaceUseGroupClause2)))
+  (((++) <$> (pure <$> (namespaceFunctionOrConst <|> emptyTerm)) <*> someTerm namespaceUseClause) <|> ((\a b cs -> a : b : cs) <$> namespaceFunctionOrConst <*> namespaceName <*> someTerm namespaceUseGroupClause1) <|> ((:) <$> namespaceName <*> someTerm namespaceUseGroupClause2)))
 
 namespaceUseClause :: Assignment
 namespaceUseClause = makeTerm <$> symbol NamespaceUseClause <*> children (fmap Syntax.NamespaceUseClause $ (\a b -> [a, b]) <$> namespaceName <*> (namespaceAliasingClause <|> emptyTerm))

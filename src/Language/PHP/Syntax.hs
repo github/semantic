@@ -305,3 +305,31 @@ data TraitUseClause a = TraitUseClause [a] a
 instance Eq1 TraitUseClause where liftEq = genericLiftEq
 instance Ord1 TraitUseClause where liftCompare = genericLiftCompare
 instance Show1 TraitUseClause where liftShowsPrec = genericLiftShowsPrec
+
+data DestructorDeclaration a = DestructorDeclaration [a] a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 DestructorDeclaration where liftEq = genericLiftEq
+instance Ord1 DestructorDeclaration where liftCompare = genericLiftCompare
+instance Show1 DestructorDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+newtype Static a = Static ByteString
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Static where liftEq = genericLiftEq
+instance Ord1 Static where liftCompare = genericLiftCompare
+instance Show1 Static where liftShowsPrec = genericLiftShowsPrec
+
+newtype ClassModifier a = ClassModifier ByteString
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 ClassModifier where liftEq = genericLiftEq
+instance Ord1 ClassModifier where liftCompare = genericLiftCompare
+instance Show1 ClassModifier where liftShowsPrec = genericLiftShowsPrec
+
+data ConstructorDeclaration a = ConstructorDeclaration [a] [a] a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 ConstructorDeclaration where liftEq = genericLiftEq
+instance Ord1 ConstructorDeclaration where liftCompare = genericLiftCompare
+instance Show1 ConstructorDeclaration where liftShowsPrec = genericLiftShowsPrec
