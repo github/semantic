@@ -460,7 +460,7 @@ traitDeclaration = makeTerm <$> symbol TraitDeclaration <*> children (Syntax.Tra
 traitMemberDeclaration :: Assignment
 traitMemberDeclaration = choice [
   -- propertyDeclaration,
-  -- methodDeclaration,
+  methodDeclaration,
   constructorDeclaration,
   destructorDeclaration,
   makeTerm <$> location <*> someTerm traitUseClause
