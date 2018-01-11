@@ -58,6 +58,7 @@ type Syntax = '[
   , Syntax.RelativeScope
   , Syntax.NewVariable
   , Syntax.ClassConstDeclaration
+  , Syntax.ConstDeclaration
   , Syntax.ClassInterfaceClause
   , Declaration.Class
   , Syntax.ClassBaseClause
@@ -135,7 +136,7 @@ statement = handleError everything
   -- , tryStatement
   -- , declareStatement
   -- , echoStatement
-  -- , constDeclaration
+      , constDeclaration
       , functionDefinition
       , classDeclaration
       , interfaceDeclaration
@@ -457,6 +458,9 @@ castExpression = makeTerm <$> symbol CastExpression <*> children (flip Expressio
 
 castType :: Assignment
 castType = makeTerm <$> symbol CastType <*> (Syntax.CastType <$> source)
+
+constDeclaration :: Assignment
+constDeclaration = makeTerm <$> symbol ConstDeclaration <*> children (Syntax.ConstDeclaration <$> someTerm constElement)
 
 functionDefinition :: Assignment
 functionDefinition = makeTerm <$> symbol FunctionDefinition <*> children (makeFunction <$> name <*> parameters <*> (returnType <|> emptyTerm) <*> compoundStatement)
