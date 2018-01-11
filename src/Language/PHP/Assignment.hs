@@ -110,6 +110,9 @@ type Syntax = '[
   , Statement.Try
   , Statement.Throw
   , Statement.Return
+  , Statement.Break
+  , Statement.Continue
+  , Statement.Goto
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -139,7 +142,7 @@ statement = handleError everything
       compoundStatement
   -- , namedLabelStatement
   -- , expressionStatement
-  -- , selectionStatement
+      , selectionStatement
       , jumpStatement
       , tryStatement
       , declareStatement
@@ -469,12 +472,24 @@ castType = makeTerm <$> symbol CastType <*> (Syntax.CastType <$> source)
 
 jumpStatement :: Assignment
 jumpStatement = choice [
-  -- gotoStatement,
-  -- continueStatement,
-  -- breakStatement,
+  gotoStatement,
+  continueStatement,
+  breakStatement,
   returnStatement,
   throwStatement
   ]
+
+gotoStatement :: Assignment
+gotoStatement = makeTerm <$> symbol GotoStatement <*> children (Statement.Goto <$> name)
+
+continueStatement :: Assignment
+continueStatement = makeTerm <$> symbol ContinueStatement <*> children (Statement.Continue <$> (breakoutLevel <|> emptyTerm))
+
+breakoutLevel :: Assignment
+breakoutLevel = integer
+
+breakStatement :: Assignment
+breakStatement = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> (breakoutLevel <|> emptyTerm))
 
 returnStatement :: Assignment
 returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (expression <|> emptyTerm))
