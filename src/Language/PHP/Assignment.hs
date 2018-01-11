@@ -137,7 +137,7 @@ statement = handleError everything
   -- , echoStatement
   -- , constDeclaration
   -- , functionDefinition
-  -- , classDeclaration
+      , classDeclaration
       , interfaceDeclaration
       , traitDeclaration
       , namespaceDefinition
@@ -457,6 +457,11 @@ castExpression = makeTerm <$> symbol CastExpression <*> children (flip Expressio
 
 castType :: Assignment
 castType = makeTerm <$> symbol CastType <*> (Syntax.CastType <$> source)
+
+classDeclaration :: Assignment
+classDeclaration = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> (classModifier <|> emptyTerm) <*> name <*> (classBaseClause <|> emptyTerm) <*> (classInterfaceClause <|> emptyTerm) <*> (makeTerm <$> location <*> manyTerm classMemberDeclaration))
+  where
+    makeClass modifier name baseClause interfaceClause declarations = Declaration.Class [modifier] name [baseClause, interfaceClause] declarations
 
 interfaceDeclaration :: Assignment
 interfaceDeclaration = makeTerm <$> symbol InterfaceDeclaration <*> children (Syntax.InterfaceDeclaration <$> name <*> (interfaceBaseClause <|> emptyTerm) <*> manyTerm interfaceMemberDeclaration)
