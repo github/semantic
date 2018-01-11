@@ -113,6 +113,10 @@ type Syntax = '[
   , Statement.Break
   , Statement.Continue
   , Statement.Goto
+  , Statement.If
+  , Statement.Else
+  , Statement.Pattern
+  , Statement.Match
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -469,6 +473,28 @@ castExpression = makeTerm <$> symbol CastExpression <*> children (flip Expressio
 
 castType :: Assignment
 castType = makeTerm <$> symbol CastType <*> (Syntax.CastType <$> source)
+
+
+selectionStatement :: Assignment
+selectionStatement = ifStatement <|> switchStatement
+
+ifStatement :: Assignment
+ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> (makeTerm <$> location <*> someTerm statement) <*> (makeTerm <$> location <*> ((\as b -> as ++ [b]) <$> manyTerm elseIfClause <*> (elseClause <|> emptyTerm))))
+
+switchStatement :: Assignment
+switchStatement = makeTerm <$> symbol SwitchStatement <*> children (Statement.Match <$> expression <*> (makeTerm <$> location <*> manyTerm (caseStatement <|> defaultStatement)))
+
+caseStatement :: Assignment
+caseStatement = makeTerm <$> symbol CaseStatement <*> children (Statement.Pattern <$> expression <*> statement)
+
+defaultStatement :: Assignment
+defaultStatement = makeTerm <$> symbol DefaultStatement <*> children (Statement.Pattern <$> emptyTerm <*> (makeTerm <$> location <*> manyTerm statement))
+
+elseIfClause :: Assignment
+elseIfClause = makeTerm <$> symbol ElseIfClause <*> children (Statement.Else <$> expression <*> statement)
+
+elseClause :: Assignment
+elseClause = makeTerm <$> symbol ElseClause <*> children (Statement.Else <$> emptyTerm <*> statement)
 
 jumpStatement :: Assignment
 jumpStatement = choice [
