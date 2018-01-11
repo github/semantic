@@ -1,12 +1,21 @@
-{-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators #-}
+{-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, TypeApplications #-}
 module Data.Syntax where
 
 import qualified Assigning.Assignment as Assignment
 import Control.Applicative
+import Control.Monad.Effect
+import Control.Monad.Effect.Address
+import Control.Monad.Effect.Env
+import Control.Monad.Effect.Store
 import Control.Monad.Error.Class hiding (Error)
+import Data.Abstract.Environment
+import Data.Abstract.Eval
+import Data.Abstract.FreeVariables
+import Data.Abstract.Value (LocationFor, AbstractValue(..))
 import Data.Align.Generic
 import Data.AST
 import Data.ByteString (ByteString)
+import Data.ByteString.Char8 (unpack)
 import qualified Data.Error as Error
 import Data.Foldable (asum, toList)
 import Data.Function ((&), on)
@@ -16,6 +25,7 @@ import Data.Functor.Classes.Generic
 import Data.Mergeable
 import Data.Range
 import Data.Record
+import Data.Pointed
 import Data.Semigroup
 import Data.Span
 import Data.Term
@@ -23,6 +33,7 @@ import Data.Union
 import Diffing.Algorithm hiding (Empty)
 import GHC.Generics
 import GHC.Stack
+import Prelude hiding (fail)
 
 -- Combinators
 
@@ -109,12 +120,39 @@ instance Eq1 Identifier where liftEq = genericLiftEq
 instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
+instance ( MonadAddress (LocationFor v) m
+         , MonadEnv v m
+         , MonadFail m
+         , MonadStore v m
+         ) => Eval t v m Identifier where
+  eval _ yield (Identifier name) = do
+    env <- askEnv
+    maybe (fail ("free variable: " <> unpack name)) deref (envLookup name env) >>= yield
+
+
+instance FreeVariables1 Identifier where
+  liftFreeVariables _ (Identifier x) = point x
+
 newtype Program a = Program [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Program where liftEq = genericLiftEq
 instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
+
+instance ( Monad m
+         , Ord (LocationFor v)
+         , MonadGC v m
+         , MonadEnv v m
+         , AbstractValue v
+         , FreeVariables t
+         )
+        => Eval t v m Program where
+  eval _  yield (Program [])     = yield unit
+  eval ev yield (Program [a])    = ev pure a >>= yield
+  eval ev yield (Program (a:as)) = do
+    env <- askEnv @v
+    extraRoots (envRoots env (freeVariables1 as)) (ev (const (eval ev pure (Program as))) a) >>= yield
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
@@ -124,24 +162,32 @@ instance Eq1 AccessibilityModifier where liftEq = genericLiftEq
 instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare
 instance Show1 AccessibilityModifier where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Implement Eval instance for AccessibilityModifier
+instance (MonadFail m) => Eval t v m AccessibilityModifier
 
 -- | Empty syntax, with essentially no-op semantics.
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Empty where liftEq _ _ _ = True
+instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
+
+instance (Monad m, AbstractValue v) => Eval t v m Empty where
+  eval _ yield _ = yield unit
 
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
+
+instance (MonadFail m) => Eval t v m Error
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorExpected errorActual
@@ -166,7 +212,7 @@ instance Ord ErrorStack where
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Diffable Context where
   subalgorithmFor blur focus (Context n s) = Context <$> traverse blur n <*> focus s
@@ -176,3 +222,6 @@ instance Diffable Context where
 instance Eq1 Context where liftEq = genericLiftEq
 instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
+
+instance (Monad m) => Eval t v m Context where
+  eval ev yield Context{..} = ev yield contextSubject

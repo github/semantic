@@ -1,31 +1,36 @@
 module Rendering.JSON
 ( renderJSONDiff
+, renderJSONDiffs
 , renderJSONTerm
+, renderJSONTerms
 ) where
 
 import Data.Aeson (ToJSON, toJSON, object, (.=))
 import Data.Aeson as A
+import Data.JSON.Fields
 import Data.Blob
-import Data.Bifoldable (biList)
 import Data.Bifunctor.Join
-import Data.Language
 import qualified Data.Map as Map
 import Data.Text (Text)
-import GHC.Generics
+import Data.Patch
+import Data.Monoid
+import Data.These
 
--- | Render a diff to a string representing its JSON.
-renderJSONDiff :: ToJSON a => BlobPair -> a -> Map.Map Text Value
-renderJSONDiff blobs diff = Map.fromList
-  [ ("diff", toJSON diff)
-  , ("paths", toJSON (blobPath <$> (biList . runJoin) blobs))
-  ]
 
-data File a = File { filePath :: FilePath, fileLanguage :: Maybe Language, fileContent :: a }
-  deriving (Generic, Show)
+-- | Render a diff to a value representing its JSON.
+renderJSONDiff :: ToJSON a => BlobPair -> a -> [Value]
+renderJSONDiff blobs diff = pure $
+  toJSON (object [ "diff" .= diff, "stat" .= object (pathKey <> toJSONFields statPatch) ])
+  where statPatch = these Delete Insert Replace (runJoin blobs)
+        pathKey = [ "path" .= pathKeyForBlobPair blobs ]
 
-instance ToJSON a => ToJSON (File a) where
-  toJSON File{..} = object [ "filePath" .= filePath, "language" .= fileLanguage, "programNode" .= fileContent ]
+renderJSONDiffs :: [Value] -> Map.Map Text Value
+renderJSONDiffs = Map.singleton "diffs" . toJSON
 
--- | Render a term to a string representing its JSON.
+
+-- | Render a term to a value representing its JSON.
 renderJSONTerm :: ToJSON a => Blob -> a -> [Value]
-renderJSONTerm Blob{..} = pure . toJSON . File blobPath blobLanguage
+renderJSONTerm blob content = pure $ toJSON (object ("programNode" .= content : toJSONFields blob))
+
+renderJSONTerms :: [Value] -> Map.Map Text Value
+renderJSONTerms = Map.singleton "trees" . toJSON

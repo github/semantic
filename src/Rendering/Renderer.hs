@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, MultiParamTypeClasses, StandaloneDeriving, TypeOperators #-}
 module Rendering.Renderer
 ( DiffRenderer(..)
 , TermRenderer(..)
@@ -6,7 +6,9 @@ module Rendering.Renderer
 , renderSExpressionDiff
 , renderSExpressionTerm
 , renderJSONDiff
+, renderJSONDiffs
 , renderJSONTerm
+, renderJSONTerms
 , renderToCDiff
 , renderToCTerm
 , renderToTags
@@ -17,9 +19,7 @@ module Rendering.Renderer
 
 import Data.Aeson (Value)
 import Data.ByteString (ByteString)
-import qualified Data.Map as Map
 import Data.Output
-import Data.Text (Text)
 import Rendering.DOT as R
 import Rendering.JSON as R
 import Rendering.SExpression as R
@@ -31,7 +31,7 @@ data DiffRenderer output where
   -- | Compute a table of contents for the diff & encode it as JSON.
   ToCDiffRenderer :: DiffRenderer Summaries
   -- | Render to JSON with the format documented in docs/json-format.md
-  JSONDiffRenderer :: DiffRenderer (Map.Map Text Value)
+  JSONDiffRenderer :: DiffRenderer [Value]
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
   SExpressionDiffRenderer :: DiffRenderer ByteString
   -- | Render to a 'ByteString' formatted as a DOT description of the diff.
