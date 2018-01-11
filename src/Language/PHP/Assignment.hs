@@ -109,6 +109,7 @@ type Syntax = '[
   , Statement.Catch
   , Statement.Try
   , Statement.Throw
+  , Statement.Return
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -471,9 +472,12 @@ jumpStatement = choice [
   -- gotoStatement,
   -- continueStatement,
   -- breakStatement,
-  -- returnStatement,
+  returnStatement,
   throwStatement
   ]
+
+returnStatement :: Assignment
+returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (expression <|> emptyTerm))
 
 throwStatement :: Assignment
 throwStatement = makeTerm <$> symbol ThrowStatement <*> children (Statement.Throw <$> expression)
