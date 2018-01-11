@@ -102,6 +102,8 @@ type Syntax = '[
   , Syntax.PropertyDeclaration
   , Syntax.InterfaceBaseClause
   , Syntax.InterfaceDeclaration
+  , Expression.SequenceExpression
+  , Syntax.Echo
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -135,7 +137,7 @@ statement = handleError everything
   -- , jumpStatement
   -- , tryStatement
   -- , declareStatement
-  -- , echoStatement
+      , echoStatement
       , constDeclaration
       , functionDefinition
       , classDeclaration
@@ -458,6 +460,15 @@ castExpression = makeTerm <$> symbol CastExpression <*> children (flip Expressio
 
 castType :: Assignment
 castType = makeTerm <$> symbol CastType <*> (Syntax.CastType <$> source)
+
+echoStatement :: Assignment
+echoStatement = makeTerm <$> symbol ConstDeclaration <*> children (Syntax.Echo <$> expressions)
+
+expressions :: Assignment
+expressions = expression <|> sequenceExpression
+
+sequenceExpression :: Assignment
+sequenceExpression = makeTerm <$> symbol SequenceExpression <*> children (Expression.SequenceExpression <$> term expression <*> term expressions)
 
 constDeclaration :: Assignment
 constDeclaration = makeTerm <$> symbol ConstDeclaration <*> children (Syntax.ConstDeclaration <$> someTerm constElement)

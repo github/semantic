@@ -361,3 +361,10 @@ newtype InterfaceBaseClause a = InterfaceBaseClause [a]
 instance Eq1 InterfaceBaseClause where liftEq = genericLiftEq
 instance Ord1 InterfaceBaseClause where liftCompare = genericLiftCompare
 instance Show1 InterfaceBaseClause where liftShowsPrec = genericLiftShowsPrec
+
+newtype Echo a = Echo a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Echo where liftEq = genericLiftEq
+instance Ord1 Echo where liftCompare = genericLiftCompare
+instance Show1 Echo where liftShowsPrec = genericLiftShowsPrec
