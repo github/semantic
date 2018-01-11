@@ -97,6 +97,8 @@ type Syntax = '[
   , Syntax.ConstructorDeclaration
   , Syntax.TraitDeclaration
   , Declaration.Method
+  , Syntax.PropertyModifier
+  , Syntax.PropertyDeclaration
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -369,7 +371,7 @@ objectCreationExpression = (makeTerm <$> symbol ObjectCreationExpression <*> chi
 classMemberDeclaration :: Assignment
 classMemberDeclaration = choice [
   classConstDeclaration,
-  -- propertyDeclaration,
+  propertyDeclaration,
   methodDeclaration,
   constructorDeclaration,
   destructorDeclaration,
@@ -459,12 +461,22 @@ traitDeclaration = makeTerm <$> symbol TraitDeclaration <*> children (Syntax.Tra
 
 traitMemberDeclaration :: Assignment
 traitMemberDeclaration = choice [
-  -- propertyDeclaration,
+  propertyDeclaration,
   methodDeclaration,
   constructorDeclaration,
   destructorDeclaration,
   makeTerm <$> location <*> someTerm traitUseClause
   ]
+
+propertyDeclaration :: Assignment
+propertyDeclaration = makeTerm <$> symbol PropertyDeclaration <*> children (Syntax.PropertyDeclaration <$> propertyModifier <*> someTerm propertyElement)
+
+propertyModifier :: Assignment
+propertyModifier = (makeTerm <$> symbol PropertyModifier <*> children (Syntax.PropertyModifier <$> (visibilityModifier <|> emptyTerm) <*> (staticModifier <|> emptyTerm))) <|> (makeTerm <$> symbol PropertyModifier <*> (Syntax.Identifier <$> source))
+
+propertyElement :: Assignment
+propertyElement = makeTerm <$> symbol PropertyElement <*> children (Statement.Assignment [] <$> variableName <*> propertyInitializer) <|> (symbol PropertyElement *> children variableName)
+  where propertyInitializer = symbol PropertyInitializer *> children expression
 
 constructorDeclaration :: Assignment
 constructorDeclaration = makeTerm <$> symbol ConstructorDeclaration <*> children (Syntax.ConstructorDeclaration <$> someTerm methodModifier <*> parameters <*> compoundStatement)

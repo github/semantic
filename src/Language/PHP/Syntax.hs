@@ -333,3 +333,17 @@ data ConstructorDeclaration a = ConstructorDeclaration [a] [a] a
 instance Eq1 ConstructorDeclaration where liftEq = genericLiftEq
 instance Ord1 ConstructorDeclaration where liftCompare = genericLiftCompare
 instance Show1 ConstructorDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+data PropertyDeclaration a = PropertyDeclaration a [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 PropertyDeclaration where liftEq = genericLiftEq
+instance Ord1 PropertyDeclaration where liftCompare = genericLiftCompare
+instance Show1 PropertyDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+data PropertyModifier a = PropertyModifier a a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 PropertyModifier where liftEq = genericLiftEq
+instance Ord1 PropertyModifier where liftCompare = genericLiftCompare
+instance Show1 PropertyModifier where liftShowsPrec = genericLiftShowsPrec
