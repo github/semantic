@@ -117,6 +117,7 @@ type Syntax = '[
   , Statement.Else
   , Statement.Pattern
   , Statement.Match
+  , Syntax.LabeledStatement
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -144,8 +145,8 @@ statement = handleError everything
   where
     everything = choice [
       compoundStatement
-  -- , namedLabelStatement
-  -- , expressionStatement
+      , namedLabelStatement
+      , expressionStatement
       , selectionStatement
       , jumpStatement
       , tryStatement
@@ -474,6 +475,11 @@ castExpression = makeTerm <$> symbol CastExpression <*> children (flip Expressio
 castType :: Assignment
 castType = makeTerm <$> symbol CastType <*> (Syntax.CastType <$> source)
 
+expressionStatement :: Assignment
+expressionStatement = symbol ExpressionStatement *> children (term expression)
+
+namedLabelStatement :: Assignment
+namedLabelStatement = makeTerm <$> symbol NamedLabelStatement <*> children (Syntax.LabeledStatement <$> name)
 
 selectionStatement :: Assignment
 selectionStatement = ifStatement <|> switchStatement

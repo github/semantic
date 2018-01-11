@@ -375,3 +375,10 @@ newtype Declare a = Declare a
 instance Eq1 Declare where liftEq = genericLiftEq
 instance Ord1 Declare where liftCompare = genericLiftCompare
 instance Show1 Declare where liftShowsPrec = genericLiftShowsPrec
+
+data LabeledStatement a = LabeledStatement { _labeledStatementIdentifier :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 LabeledStatement where liftEq = genericLiftEq
+instance Ord1 LabeledStatement where liftCompare = genericLiftCompare
+instance Show1 LabeledStatement where liftShowsPrec = genericLiftShowsPrec
