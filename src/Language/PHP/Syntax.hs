@@ -347,3 +347,17 @@ data PropertyModifier a = PropertyModifier a a
 instance Eq1 PropertyModifier where liftEq = genericLiftEq
 instance Ord1 PropertyModifier where liftCompare = genericLiftCompare
 instance Show1 PropertyModifier where liftShowsPrec = genericLiftShowsPrec
+
+data InterfaceDeclaration a = InterfaceDeclaration a a [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 InterfaceDeclaration where liftEq = genericLiftEq
+instance Ord1 InterfaceDeclaration where liftCompare = genericLiftCompare
+instance Show1 InterfaceDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+newtype InterfaceBaseClause a = InterfaceBaseClause [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 InterfaceBaseClause where liftEq = genericLiftEq
+instance Ord1 InterfaceBaseClause where liftCompare = genericLiftCompare
+instance Show1 InterfaceBaseClause where liftShowsPrec = genericLiftShowsPrec

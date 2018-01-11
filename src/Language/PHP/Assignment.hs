@@ -99,6 +99,8 @@ type Syntax = '[
   , Declaration.Method
   , Syntax.PropertyModifier
   , Syntax.PropertyDeclaration
+  , Syntax.InterfaceBaseClause
+  , Syntax.InterfaceDeclaration
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -136,7 +138,7 @@ statement = handleError everything
   -- , constDeclaration
   -- , functionDefinition
   -- , classDeclaration
-  -- , interfaceDeclaration
+      , interfaceDeclaration
       , traitDeclaration
       , namespaceDefinition
       , namespaceUseDeclaration
@@ -455,6 +457,15 @@ castExpression = makeTerm <$> symbol CastExpression <*> children (flip Expressio
 
 castType :: Assignment
 castType = makeTerm <$> symbol CastType <*> (Syntax.CastType <$> source)
+
+interfaceDeclaration :: Assignment
+interfaceDeclaration = makeTerm <$> symbol InterfaceDeclaration <*> children (Syntax.InterfaceDeclaration <$> name <*> (interfaceBaseClause <|> emptyTerm) <*> manyTerm interfaceMemberDeclaration)
+
+interfaceBaseClause :: Assignment
+interfaceBaseClause = makeTerm <$> symbol InterfaceBaseClause <*> children (Syntax.InterfaceBaseClause <$> someTerm qualifiedName)
+
+interfaceMemberDeclaration :: Assignment
+interfaceMemberDeclaration = classConstDeclaration <|> methodDeclaration
 
 traitDeclaration :: Assignment
 traitDeclaration = makeTerm <$> symbol TraitDeclaration <*> children (Syntax.TraitDeclaration <$> name <*> manyTerm traitMemberDeclaration)
