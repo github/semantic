@@ -368,3 +368,10 @@ newtype Echo a = Echo a
 instance Eq1 Echo where liftEq = genericLiftEq
 instance Ord1 Echo where liftCompare = genericLiftCompare
 instance Show1 Echo where liftShowsPrec = genericLiftShowsPrec
+
+newtype Declare a = Declare a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Declare where liftEq = genericLiftEq
+instance Ord1 Declare where liftCompare = genericLiftCompare
+instance Show1 Declare where liftShowsPrec = genericLiftShowsPrec

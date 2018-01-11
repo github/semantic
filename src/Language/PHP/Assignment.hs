@@ -104,6 +104,11 @@ type Syntax = '[
   , Syntax.InterfaceDeclaration
   , Expression.SequenceExpression
   , Syntax.Echo
+  , Syntax.Declare
+  , Statement.Finally
+  , Statement.Catch
+  , Statement.Try
+  , Statement.Throw
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -134,9 +139,9 @@ statement = handleError everything
   -- , namedLabelStatement
   -- , expressionStatement
   -- , selectionStatement
-  -- , jumpStatement
-  -- , tryStatement
-  -- , declareStatement
+      , jumpStatement
+      , tryStatement
+      , declareStatement
       , echoStatement
       , constDeclaration
       , functionDefinition
@@ -461,8 +466,38 @@ castExpression = makeTerm <$> symbol CastExpression <*> children (flip Expressio
 castType :: Assignment
 castType = makeTerm <$> symbol CastType <*> (Syntax.CastType <$> source)
 
+jumpStatement :: Assignment
+jumpStatement = choice [
+  -- gotoStatement,
+  -- continueStatement,
+  -- breakStatement,
+  -- returnStatement,
+  throwStatement
+  ]
+
+throwStatement :: Assignment
+throwStatement = makeTerm <$> symbol ThrowStatement <*> children (Statement.Throw <$> expression)
+
+
+tryStatement :: Assignment
+tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> compoundStatement <*> (((\as b -> as ++ [b]) <$> someTerm catchClause <*> finallyClause) <|>  someTerm catchClause <|> someTerm finallyClause))
+
+catchClause :: Assignment
+catchClause = makeTerm <$> symbol CatchClause <*> children (Statement.Catch <$> (qualifiedName <|> variableName) <*> compoundStatement)
+
+finallyClause :: Assignment
+finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> compoundStatement)
+
+declareStatement :: Assignment
+declareStatement = makeTerm <$> symbol DeclareStatement <*> children (Syntax.Declare <$> (declareDirective <|> statement <|> (makeTerm <$> location <*> manyTerm statement) <|> emptyTerm))
+
+-- | TODO: Figure out how to parse assignment token
+declareDirective :: Assignment
+declareDirective = emptyTerm
+
+
 echoStatement :: Assignment
-echoStatement = makeTerm <$> symbol ConstDeclaration <*> children (Syntax.Echo <$> expressions)
+echoStatement = makeTerm <$> symbol EchoStatement <*> children (Syntax.Echo <$> expressions)
 
 expressions :: Assignment
 expressions = expression <|> sequenceExpression
