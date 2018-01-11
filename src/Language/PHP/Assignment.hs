@@ -136,7 +136,7 @@ statement = handleError everything
   -- , declareStatement
   -- , echoStatement
   -- , constDeclaration
-  -- , functionDefinition
+      , functionDefinition
       , classDeclaration
       , interfaceDeclaration
       , traitDeclaration
@@ -457,6 +457,11 @@ castExpression = makeTerm <$> symbol CastExpression <*> children (flip Expressio
 
 castType :: Assignment
 castType = makeTerm <$> symbol CastType <*> (Syntax.CastType <$> source)
+
+functionDefinition :: Assignment
+functionDefinition = makeTerm <$> symbol FunctionDefinition <*> children (makeFunction <$> name <*> parameters <*> (returnType <|> emptyTerm) <*> compoundStatement)
+  where
+    makeFunction identifier parameters returnType statement = Declaration.Function [returnType] identifier parameters statement
 
 classDeclaration :: Assignment
 classDeclaration = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> (classModifier <|> emptyTerm) <*> name <*> (classBaseClause <|> emptyTerm) <*> (classInterfaceClause <|> emptyTerm) <*> (makeTerm <$> location <*> manyTerm classMemberDeclaration))
