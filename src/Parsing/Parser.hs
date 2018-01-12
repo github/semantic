@@ -31,9 +31,11 @@ import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
+import qualified Language.PHP.Assignment as PHP
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import TreeSitter.Go
 import TreeSitter.JSON
+import TreeSitter.PHP
 import TreeSitter.Python
 import TreeSitter.Ruby
 import TreeSitter.TypeScript
@@ -72,6 +74,7 @@ someParser :: ( ApplyAll typeclasses (Union Go.Syntax)
               , ApplyAll typeclasses (Union Python.Syntax)
               , ApplyAll typeclasses (Union Ruby.Syntax)
               , ApplyAll typeclasses (Union TypeScript.Syntax)
+              , ApplyAll typeclasses (Union PHP.Syntax)
               )
            => proxy typeclasses                        -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
            -> Language                                 -- ^ The 'Language' to select.
@@ -84,6 +87,7 @@ someParser _ Markdown   = SomeParser markdownParser
 someParser _ Python     = SomeParser pythonParser
 someParser _ Ruby       = SomeParser rubyParser
 someParser _ TypeScript = SomeParser typescriptParser
+someParser _ PHP        = SomeParser phpParser
 
 
 goParser :: Parser Go.Term
@@ -91,6 +95,9 @@ goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
 
 rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
+
+phpParser :: Parser PHP.Term
+phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
 
 pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
