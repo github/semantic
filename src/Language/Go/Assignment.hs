@@ -152,8 +152,6 @@ expressionChoices =
   , incStatement
   , identifier
   , importDeclaration
-  , importSpec
-  , importSpecList
   , indexExpression
   , interpretedStringLiteral
   , intLiteral
@@ -389,13 +387,14 @@ functionDeclaration =  makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncL
     returnParameters = makeTerm <$> symbol ParameterList <*> children (manyTerm expression)
 
 importDeclaration :: Assignment
-importDeclaration = makeTerm <$> symbol ImportDeclaration <*> children (Declaration.Import <$> manyTerm expression)
-
-importSpec :: Assignment
-importSpec = symbol ImportSpec *> children expressions
-
-importSpecList :: Assignment
-importSpecList = symbol ImportSpecList *> children expressions
+importDeclaration = mk <$> symbol ImportDeclaration <*> children (manyTerm (importSpec <|> importSpecList))
+  where
+    importSpec = makeTerm <$> symbol ImportSpec <*> children (namedImport <|> plainImport)
+    namedImport = flip Declaration.Import <$> expression <*> expression <*> emptyTerm
+    plainImport = Declaration.Import <$> expression <*> emptyTerm <*> emptyTerm
+    importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyTerm (importSpec <|> comment))
+    mk _ [child] = child
+    mk location children = makeTerm location children
 
 indexExpression :: Assignment
 indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)
