@@ -251,7 +251,7 @@ instance Show1 Comprehension where liftShowsPrec = genericLiftShowsPrec
 instance (MonadFail m) => Eval t v m Comprehension
 
 -- | Import declarations.
-data Import a = Import { importFrom :: !a, importSymbols :: !a, importAlias :: !a }
+data Import a = Import { importFrom :: !a, importAlias :: !a, importSymbols :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Import where liftEq = genericLiftEq
