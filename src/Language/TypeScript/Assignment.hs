@@ -616,19 +616,22 @@ statementIdentifier :: Assignment
 statementIdentifier = makeTerm <$> symbol StatementIdentifier <*> (Syntax.Identifier <$> source)
 
 importStatement :: Assignment
-importStatement = makeTerm <$> symbol Grammar.ImportStatement <*> children (Declaration.Import <$> (((\a b -> [a, b]) <$> term importClause <*> term fromClause) <|> (pure <$> term (importRequireClause <|> string))))
+importStatement =  mkImport <$> symbol Grammar.ImportStatement <*> children ((,) <$> importClause <*> expression)
+               <|> mkImport' <$> symbol Grammar.ImportStatement <*> children ((,) <$> stringClause <*> emptyTerm)
+               <|> mkImport' <$> symbol Grammar.ImportStatement <*> children ((,) <$> importRequireClause <*> emptyTerm)
+  where
+    stringClause = (,) <$> emptyTerm <*> string
+    importClause = symbol Grammar.ImportClause *> children (namespace <|> named <|> plain)
+    importRequireClause = symbol Grammar.ImportRequireClause *> children require
+    plain = (,) <$> expressions <*> emptyTerm
+    namespace = (,) <$> emptyTerm <*> namespaceImport
+    named = (,) <$> namedImports <*> emptyTerm
+    namedImports = makeTerm <$> symbol Grammar.NamedImports <*> children (TypeScript.Syntax.NamedImports <$> manyTerm importExportSpecifier)
+    namespaceImport = makeTerm <$> symbol Grammar.NamespaceImport <*> children (TypeScript.Syntax.NamespaceImport <$> term identifier)
+    mkImport loc ((symbols, alias), from) = makeTerm loc (Declaration.Import from alias symbols)
 
-importClause :: Assignment
-importClause = makeTerm <$> symbol Grammar.ImportClause <*> children (TypeScript.Syntax.ImportClause <$> (((\a b -> [a, b]) <$> term identifier <*> term (namespaceImport <|> namedImports)) <|> (pure <$> term (namespaceImport <|> namedImports <|> identifier))))
-
-namedImports :: Assignment
-namedImports = makeTerm <$> symbol Grammar.NamedImports <*> children (TypeScript.Syntax.NamedImports <$> manyTerm importExportSpecifier)
-
-namespaceImport :: Assignment
-namespaceImport = makeTerm <$> symbol Grammar.NamespaceImport <*> children (TypeScript.Syntax.NamespaceImport <$> term identifier)
-
-importRequireClause :: Assignment
-importRequireClause = makeTerm <$> symbol Grammar.ImportRequireClause <*> children (TypeScript.Syntax.ImportRequireClause <$> term identifier <*> term string)
+    require = (,) <$> term identifier <*> term string
+    mkImport' loc ((alias, from), symbols) = makeTerm loc (Declaration.Import from alias symbols)
 
 debuggerStatement :: Assignment
 debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> (TypeScript.Syntax.Debugger <$ source)
