@@ -1,16 +1,22 @@
 (Program
   (Module
     (Identifier))
-  (Import
-    (
+  (
+    (Import
     { (TextElement)
     ->(TextElement) }
+      (Empty)
+      (Empty))
+    (Import
     { (TextElement)
     ->(TextElement) }
-      (
-        (Identifier)
-      { (TextElement)
-      ->(TextElement) })))
+      (Empty)
+      (Empty))
+    (Import
+    { (TextElement)
+    ->(TextElement) }
+      (Identifier)
+      (Empty)))
   (Function
     (Empty)
     (Identifier)

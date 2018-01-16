@@ -3,15 +3,19 @@
     (Identifier))
   (Import
   { (TextElement)
-  ->(TextElement) })
+  ->(TextElement) }
+    (Empty)
+    (Empty))
   (Import
   { (TextElement)
-  ->(TextElement) })
+  ->(TextElement) }
+    (Empty)
+    (Empty))
   (Import
-    (
-      (Identifier)
-    { (TextElement)
-    ->(TextElement) }))
+  { (TextElement)
+  ->(TextElement) }
+    (Identifier)
+    (Empty))
   (Function
     (Empty)
     (Identifier)
