@@ -181,6 +181,7 @@ renderToCTerm Blob{..} = uncurry Summaries . bimap toMap toMap . List.partition 
 toCategoryName :: Declaration -> T.Text
 toCategoryName declaration = case declaration of
   ClassDeclaration{} -> "Class"
+  ImportDeclaration{} -> "Import"
   FunctionDeclaration{} -> "Function"
   MethodDeclaration{} -> "Method"
   HeadingDeclaration _ _ _ l -> "Heading " <> T.pack (show l)
