@@ -93,7 +93,11 @@ spec = parallel $ do
       sourceBlobs <- blobsForPaths (both "javascript/erroneous-duplicate-method.A.js" "javascript/erroneous-duplicate-method.B.js")
       diff <- runTask $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe`
-        [ TOCSummary "Function" "performHealthCheck" (Span (Pos 8 1) (Pos 29 2)) "modified" ]
+        [ TOCSummary "Import" "'../jquery'" (Span (Pos 3 1) (Pos 3 26)) "removed"
+        , TOCSummary "Import" "'../form'" (Span (Pos 4 1) (Pos 4 36)) "added"
+        , TOCSummary "Import" "'../fetch'" (Span (Pos 5 1) (Pos 5 51)) "modified"
+        , TOCSummary "Import" "'../observe'" (Span (Pos 6 1) (Pos 6 35)) "modified"
+        , TOCSummary "Function" "performHealthCheck" (Span (Pos 8 1) (Pos 29 2)) "modified" ]
 
     it "summarizes Go methods with receivers with special formatting" $ do
       sourceBlobs <- blobsForPaths (both "go/method-with-receiver.A.go" "go/method-with-receiver.B.go")
