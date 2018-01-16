@@ -51,7 +51,7 @@ data TermRenderer output where
   -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer ByteString
   -- | Render to a list of tags.
-  TagsTermRenderer :: TermRenderer [Value]
+  TagsTermRenderer :: TagFields -> TermRenderer [Value]
   -- | Render to a 'ByteString' formatted as a DOT description of the term.
   DOTTermRenderer :: TermRenderer ByteString
 

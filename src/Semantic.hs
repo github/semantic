@@ -41,21 +41,21 @@ import Semantic.Task as Task
 --   - Built in concurrency where appropriate.
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
-parseBlobs :: Output output => TagFields -> TermRenderer output -> [Blob] -> Task ByteString
-parseBlobs fields renderer blobs = toOutput' <$> distributeFoldMap (parseBlob fields renderer) blobs
+parseBlobs :: Output output => TermRenderer output -> [Blob] -> Task ByteString
+parseBlobs renderer blobs = toOutput' <$> distributeFoldMap (parseBlob renderer) blobs
   where toOutput' = case renderer of
           JSONTermRenderer -> toOutput . renderJSONTerms
           _ -> toOutput
 
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
-parseBlob :: TagFields -> TermRenderer output -> Blob -> Task output
-parseBlob fields renderer blob@Blob{..}
+parseBlob :: TermRenderer output -> Blob -> Task output
+parseBlob renderer blob@Blob{..}
   | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[ConstructorName, HasDeclaration, IdentifierName, Foldable, Functor, ToJSONFields1]) <$> blobLanguage
   = parse parser blob >>= case renderer of
     ToCTermRenderer         -> decorate (declarationAlgebra blob)                     >=> render (renderToCTerm  blob)
     JSONTermRenderer        -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)
     SExpressionTermRenderer -> decorate constructorLabel . (Nil <$)                   >=> render renderSExpressionTerm
-    TagsTermRenderer        -> decorate (declarationAlgebra blob)                     >=> render (renderToTags fields blob)
+    TagsTermRenderer fields -> decorate (declarationAlgebra blob)                     >=> render (renderToTags fields blob)
     DOTTermRenderer         ->                                                            render (renderDOTTerm blob)
   | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
 

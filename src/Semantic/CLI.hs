@@ -33,8 +33,8 @@ main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTa
 runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both (FilePath, Maybe Language)] -> Task.Task ByteString
 runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Task.readBlobPairs
 
-runParse :: SomeRenderer TermRenderer -> TagFields -> Either Handle [(FilePath, Maybe Language)] -> Task.Task ByteString
-runParse (SomeRenderer parseTreeRenderer) fields = Semantic.parseBlobs fields parseTreeRenderer <=< Task.readBlobs
+runParse :: SomeRenderer TermRenderer -> Either Handle [(FilePath, Maybe Language)] -> Task.Task ByteString
+runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
 
 -- | A parser for the application's command-line arguments.
 --
@@ -77,9 +77,8 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       <$> (   flag  (SomeRenderer SExpressionTermRenderer) (SomeRenderer SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
           <|> flag'                                        (SomeRenderer JSONTermRenderer)        (long "json" <> help "Output JSON parse trees")
           <|> flag'                                        (SomeRenderer ToCTermRenderer)         (long "toc" <> help "Output JSON table of contents summary")
-          <|> flag'                                        (SomeRenderer TagsTermRenderer)        (long "tags" <> help "Output JSON tags/symbols")
+          <|> flag'                                        (SomeRenderer . TagsTermRenderer)      (long "tags" <> help "Output JSON tags/symbols") <*> (option tagFieldsReader (long "fields" <> help "Comma delimited list of specific fields to return (tags output only)." <> metavar "FIELDS") <|> pure defaultTagFields)
           <|> flag'                                        (SomeRenderer DOTTermRenderer)         (long "dot" <> help "Output the term as a DOT graph"))
-      <*> (option fieldsReader (long "fields" <> help "Comma delimited list of specific fields to return (tags output only)." <> metavar "FIELDS") <|> pure defaultTagFields)
       <*> (   Right <$> some (argument filePathReader (metavar "FILES..."))
           <|> pure (Left stdin) )
 
@@ -94,9 +93,9 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options) <> metavar (intercalate "|" (fmap fst options)))
     findOption options value = maybe "" fst (find ((== value) . snd) options)
 
-    -- Example: --fields=symbol,path,language,kind,line,span
-    fieldsReader = eitherReader parseFields
-    parseFields arg = let fields = splitWhen (== ',') arg in
+    -- Example: semantic parse --tags --fields=symbol,path,language,kind,line,span
+    tagFieldsReader = eitherReader parseTagFields
+    parseTagFields arg = let fields = splitWhen (== ',') arg in
                       Right $ TagFields
                         { tagFieldsShowSymbol = (elem "symbol" fields)
                         , tagFieldsShowPath = (elem "path" fields)
