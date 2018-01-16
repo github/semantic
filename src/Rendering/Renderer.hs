@@ -15,6 +15,8 @@ module Rendering.Renderer
 , renderDOTDiff
 , renderDOTTerm
 , Summaries(..)
+, TagFields(..)
+, defaultTagFields
 ) where
 
 import Data.Aeson (Value)

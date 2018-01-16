@@ -26,14 +26,15 @@ import System.IO (Handle, stdin, stdout)
 import qualified Semantic (parseBlobs, diffBlobPairs)
 import Text.Read
 
+
 main :: IO ()
 main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskWithOptions
 
 runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both (FilePath, Maybe Language)] -> Task.Task ByteString
 runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Task.readBlobPairs
 
-runParse :: SomeRenderer TermRenderer -> Either Handle [(FilePath, Maybe Language)] -> Task.Task ByteString
-runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
+runParse :: SomeRenderer TermRenderer -> TagFields -> Either Handle [(FilePath, Maybe Language)] -> Task.Task ByteString
+runParse (SomeRenderer parseTreeRenderer) fields = Semantic.parseBlobs fields parseTreeRenderer <=< Task.readBlobs
 
 -- | A parser for the application's command-line arguments.
 --
@@ -78,6 +79,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
           <|> flag'                                        (SomeRenderer ToCTermRenderer)         (long "toc" <> help "Output JSON table of contents summary")
           <|> flag'                                        (SomeRenderer TagsTermRenderer)        (long "tags" <> help "Output JSON tags/symbols")
           <|> flag'                                        (SomeRenderer DOTTermRenderer)         (long "dot" <> help "Output the term as a DOT graph"))
+      <*> (option fieldsReader (long "fields" <> help "Comma delimited list of specific fields to return (tags output only)." <> metavar "FIELDS") <|> pure defaultTagFields)
       <*> (   Right <$> some (argument filePathReader (metavar "FILES..."))
           <|> pure (Left stdin) )
 
@@ -91,3 +93,15 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     optionsReader options = eitherReader $ \ str -> maybe (Left ("expected one of: " <> intercalate ", " (fmap fst options))) (Right . snd) (find ((== str) . fst) options)
     options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options) <> metavar (intercalate "|" (fmap fst options)))
     findOption options value = maybe "" fst (find ((== value) . snd) options)
+
+    -- Example: --fields=symbol,path,language,kind,line,span
+    fieldsReader = eitherReader parseFields
+    parseFields arg = let fields = splitWhen (== ',') arg in
+                      Right $ TagFields
+                        { tagFieldsShowSymbol = (elem "symbol" fields)
+                        , tagFieldsShowPath = (elem "path" fields)
+                        , tagFieldsShowLanguage = (elem "language" fields)
+                        , tagFieldsShowKind = (elem "kind" fields)
+                        , tagFieldsShowLine = (elem "line" fields)
+                        , tagFieldsShowSpan = (elem "span" fields)
+                        }
