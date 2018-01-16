@@ -188,5 +188,5 @@ getImportSource :: (HasField fields Range) => Blob -> TermF Declaration.Import (
 getImportSource Blob{..} (In a r)
   = let declRange = getField a
         bodyRange = getField <$> case r of
-          Declaration.Import _ _ (Term (In a' _), _) -> Just a'
+          Declaration.Import (Term (In a' _), _) _ _ -> Just a'
     in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
