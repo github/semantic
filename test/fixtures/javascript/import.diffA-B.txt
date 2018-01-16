@@ -1,75 +1,87 @@
 (Program
   (Import
-    (ImportClause
+  { (TextElement)
+  ->(TextElement) }
+    (Empty)
+    (Identifier))
+  (Import
+  { (TextElement)
+  ->(TextElement) }
+    (NamespaceImport
+    { (Identifier)
+    ->(Identifier) })
+    (Empty))
+  (Import
+  { (TextElement)
+  ->(TextElement) }
+    (Empty)
+    (NamedImports
+      (ImportExportSpecifier
+      { (Identifier)
+      ->(Identifier) }
+        (Empty))))
+  (Import
+  { (TextElement)
+  ->(TextElement) }
+    (Empty)
+    (NamedImports
+      (ImportExportSpecifier
+      { (Identifier)
+      ->(Identifier) }
+        (Empty))
+      (ImportExportSpecifier
+      { (Identifier)
+      ->(Identifier) }
+        (Empty))))
+  (Import
+  { (TextElement)
+  ->(TextElement) }
+    (Empty)
+    (NamedImports
+      (ImportExportSpecifier
+      { (Identifier)
+      ->(Identifier) }
+        (Empty))
+      (ImportExportSpecifier
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) })))
+  (
+    (Import
+    { (TextElement)
+    ->(TextElement) }
+      (Empty)
       (Identifier))
-  { (TextElement)
-  ->(TextElement) })
-  (Import
-    (ImportClause
+    (Import
+    { (TextElement)
+    ->(TextElement) }
+      (Empty)
+      (NamedImports
+        (ImportExportSpecifier
+        { (Identifier)
+        ->(Identifier) }
+          (Empty))
+        (ImportExportSpecifier
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) }))))
+  (
+    (Import
+    { (TextElement)
+    ->(TextElement) }
+      (Empty)
+      (Identifier))
+    (Import
+    { (TextElement)
+    ->(TextElement) }
       (NamespaceImport
       { (Identifier)
-      ->(Identifier) }))
-  { (TextElement)
-  ->(TextElement) })
-  (Import
-    (ImportClause
-      (NamedImports
-        (ImportExportSpecifier
-        { (Identifier)
-        ->(Identifier) }
-          (Empty))))
-  { (TextElement)
-  ->(TextElement) })
-  (Import
-    (ImportClause
-      (NamedImports
-        (ImportExportSpecifier
-        { (Identifier)
-        ->(Identifier) }
-          (Empty))
-        (ImportExportSpecifier
-        { (Identifier)
-        ->(Identifier) }
-          (Empty))))
-  { (TextElement)
-  ->(TextElement) })
-  (Import
-    (ImportClause
-      (NamedImports
-        (ImportExportSpecifier
-        { (Identifier)
-        ->(Identifier) }
-          (Empty))
-        (ImportExportSpecifier
-        { (Identifier)
-        ->(Identifier) }
-        { (Identifier)
-        ->(Identifier) })))
-  { (TextElement)
-  ->(TextElement) })
-  (Import
-    (ImportClause
-      (Identifier)
-      (NamedImports
-        (ImportExportSpecifier
-        { (Identifier)
-        ->(Identifier) }
-          (Empty))
-        (ImportExportSpecifier
-        { (Identifier)
-        ->(Identifier) }
-        { (Identifier)
-        ->(Identifier) })))
-  { (TextElement)
-  ->(TextElement) })
-  (Import
-    (ImportClause
-      (Identifier)
-      (NamespaceImport
-      { (Identifier)
-      ->(Identifier) }))
-  { (TextElement)
-  ->(TextElement) })
+      ->(Identifier) })
+      (Empty)))
   (Import
   { (TextElement)
-  ->(TextElement) }))
+  ->(TextElement) }
+    (Empty)
+    (Empty)))
