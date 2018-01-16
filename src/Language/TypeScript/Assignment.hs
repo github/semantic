@@ -166,6 +166,7 @@ type Syntax = '[
   , TypeScript.Syntax.Update
   , TypeScript.Syntax.ComputedPropertyName
   , TypeScript.Syntax.Decorator
+  , Declaration.ImportSymbol
   , []
   ]
 

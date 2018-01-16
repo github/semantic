@@ -377,10 +377,10 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 import' :: Assignment
 import' =  mk <$> symbol ImportStatement <*> children (manyTerm (aliasedImport <|> plainImport))
-       <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> expression <*> emptyTerm <*> (wildCard <|> expressions))
+       <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> expression <*> emptyTerm <*> (pure <$> (wildCard <|> expressions)))
   where
-    aliasedImport = makeTerm <$> symbol AliasedImport <*> children (Declaration.Import <$> expression <*> expression <*> emptyTerm)
-    plainImport = makeTerm <$> symbol DottedName <*> children (Declaration.Import <$> expression <*> emptyTerm <*> emptyTerm)
+    aliasedImport = makeTerm <$> symbol AliasedImport <*> children (Declaration.Import <$> expression <*> expression <*> pure [])
+    plainImport = makeTerm <$> symbol DottedName <*> children (Declaration.Import <$> expression <*> emptyTerm <*> pure [])
     wildCard = makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
     mk _ [child] = child
     mk location children = makeTerm location children

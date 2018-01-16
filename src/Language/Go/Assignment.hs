@@ -390,8 +390,8 @@ importDeclaration :: Assignment
 importDeclaration = mk <$> symbol ImportDeclaration <*> children (manyTerm (importSpec <|> importSpecList))
   where
     importSpec = makeTerm <$> symbol ImportSpec <*> children (namedImport <|> plainImport)
-    namedImport = flip Declaration.Import <$> expression <*> expression <*> emptyTerm
-    plainImport = Declaration.Import <$> expression <*> emptyTerm <*> emptyTerm
+    namedImport = flip Declaration.Import <$> expression <*> expression <*> pure []
+    plainImport = Declaration.Import <$> expression <*> emptyTerm <*> pure []
     importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyTerm (importSpec <|> comment))
     mk _ [child] = child
     mk location children = makeTerm location children
