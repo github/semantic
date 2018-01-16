@@ -5,34 +5,37 @@
     (Identifier))
   (Import
     (TextElement)
-    (NamespaceImport
-      (Identifier))
-    (Empty))
+    (Identifier))
   (Import
     (TextElement)
     (Empty)
-    (NamedImports
-      (ImportExportSpecifier
+    (ImportSymbol
+      (Identifier)
+      (Empty)))
+  (
+    (Import
+      (TextElement)
+      (Empty)
+      (ImportSymbol
+        (Identifier)
+        (Empty)))
+    (Import
+      (TextElement)
+      (Empty)
+      (ImportSymbol
         (Identifier)
         (Empty))))
-  (Import
-    (TextElement)
-    (Empty)
-    (NamedImports
-      (ImportExportSpecifier
+  (
+    (Import
+      (TextElement)
+      (Empty)
+      (ImportSymbol
         (Identifier)
-        (Empty))
-      (ImportExportSpecifier
-        (Identifier)
-        (Empty))))
-  (Import
-    (TextElement)
-    (Empty)
-    (NamedImports
-      (ImportExportSpecifier
-        (Identifier)
-        (Empty))
-      (ImportExportSpecifier
+        (Empty)))
+    (Import
+      (TextElement)
+      (Empty)
+      (ImportSymbol
         (Identifier)
         (Identifier))))
   (
@@ -43,13 +46,15 @@
     (Import
       (TextElement)
       (Empty)
-      (NamedImports
-        (ImportExportSpecifier
-          (Identifier)
-          (Empty))
-        (ImportExportSpecifier
-          (Identifier)
-          (Identifier)))))
+      (ImportSymbol
+        (Identifier)
+        (Empty)))
+    (Import
+      (TextElement)
+      (Empty)
+      (ImportSymbol
+        (Identifier)
+        (Identifier))))
   (
     (Import
       (TextElement)
@@ -57,10 +62,7 @@
       (Identifier))
     (Import
       (TextElement)
-      (NamespaceImport
-        (Identifier))
-      (Empty)))
+      (Identifier)))
   (Import
     (TextElement)
-    (Empty)
     (Empty)))

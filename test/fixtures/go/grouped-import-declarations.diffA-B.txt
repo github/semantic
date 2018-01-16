@@ -5,18 +5,15 @@
     (Import
     { (TextElement)
     ->(TextElement) }
-      (Empty)
       (Empty))
     (Import
     { (TextElement)
     ->(TextElement) }
-      (Empty)
       (Empty))
     (Import
     { (TextElement)
     ->(TextElement) }
-      (Identifier)
-      (Empty)))
+      (Identifier)))
   (Function
     (Empty)
     (Identifier)

@@ -3,16 +3,13 @@
     (Identifier))
   (Import
     (TextElement)
-    (Empty)
     (Empty))
   (Import
     (TextElement)
-    (Empty)
     (Empty))
   (Import
     (TextElement)
-    (Identifier)
-    (Empty))
+    (Identifier))
   (Function
     (Empty)
     (Identifier)

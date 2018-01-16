@@ -7,42 +7,47 @@
   (Import
   { (TextElement)
   ->(TextElement) }
-    (NamespaceImport
+  { (Identifier)
+  ->(Identifier) })
+  (Import
+  { (TextElement)
+  ->(TextElement) }
+    (Empty)
+    (ImportSymbol
     { (Identifier)
-    ->(Identifier) })
-    (Empty))
-  (Import
-  { (TextElement)
-  ->(TextElement) }
-    (Empty)
-    (NamedImports
-      (ImportExportSpecifier
+    ->(Identifier) }
+      (Empty)))
+  (
+    (Import
+    { (TextElement)
+    ->(TextElement) }
+      (Empty)
+      (ImportSymbol
+      { (Identifier)
+      ->(Identifier) }
+        (Empty)))
+    (Import
+    { (TextElement)
+    ->(TextElement) }
+      (Empty)
+      (ImportSymbol
       { (Identifier)
       ->(Identifier) }
         (Empty))))
-  (Import
-  { (TextElement)
-  ->(TextElement) }
-    (Empty)
-    (NamedImports
-      (ImportExportSpecifier
+  (
+    (Import
+    { (TextElement)
+    ->(TextElement) }
+      (Empty)
+      (ImportSymbol
       { (Identifier)
       ->(Identifier) }
-        (Empty))
-      (ImportExportSpecifier
-      { (Identifier)
-      ->(Identifier) }
-        (Empty))))
-  (Import
-  { (TextElement)
-  ->(TextElement) }
-    (Empty)
-    (NamedImports
-      (ImportExportSpecifier
-      { (Identifier)
-      ->(Identifier) }
-        (Empty))
-      (ImportExportSpecifier
+        (Empty)))
+    (Import
+    { (TextElement)
+    ->(TextElement) }
+      (Empty)
+      (ImportSymbol
       { (Identifier)
       ->(Identifier) }
       { (Identifier)
@@ -57,16 +62,19 @@
     { (TextElement)
     ->(TextElement) }
       (Empty)
-      (NamedImports
-        (ImportExportSpecifier
-        { (Identifier)
-        ->(Identifier) }
-          (Empty))
-        (ImportExportSpecifier
-        { (Identifier)
-        ->(Identifier) }
-        { (Identifier)
-        ->(Identifier) }))))
+      (ImportSymbol
+      { (Identifier)
+      ->(Identifier) }
+        (Empty)))
+    (Import
+    { (TextElement)
+    ->(TextElement) }
+      (Empty)
+      (ImportSymbol
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) })))
   (
     (Import
     { (TextElement)
@@ -76,12 +84,9 @@
     (Import
     { (TextElement)
     ->(TextElement) }
-      (NamespaceImport
-      { (Identifier)
-      ->(Identifier) })
-      (Empty)))
+    { (Identifier)
+    ->(Identifier) }))
   (Import
   { (TextElement)
   ->(TextElement) }
-    (Empty)
     (Empty)))

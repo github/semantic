@@ -7,7 +7,6 @@
     (Import
     { (TextElement)
     ->(TextElement) }
-      (Empty)
       (Empty))
     (Comment))
   (Function

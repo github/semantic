@@ -6,7 +6,6 @@
     (Comment)
     (Import
       (TextElement)
-      (Empty)
       (Empty))
     (Comment))
   (Function
