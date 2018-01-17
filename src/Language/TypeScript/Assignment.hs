@@ -615,24 +615,24 @@ statementIdentifier :: Assignment
 statementIdentifier = makeTerm <$> symbol StatementIdentifier <*> (Syntax.Identifier <$> source)
 
 importStatement :: Assignment
-importStatement =  makeImport <$> symbol Grammar.ImportStatement <*> children ((,) <$> importClause <*> term string)
-               <|> makeTerm <$> symbol Grammar.ImportStatement <*> children (term requireClause)
+importStatement =  makeImport <$> symbol Grammar.ImportStatement <*> children ((,) <$> importClause' <*> term string)
+               <|> makeTerm <$> symbol Grammar.ImportStatement <*> children requireClause'
                <|> makeTerm <$> symbol Grammar.ImportStatement <*> children (declarationImport <$> emptyTerm <*> pure [] <*> term string)
   where
     makeImport loc ([clause], from) = makeTerm loc (clause from)
     makeImport loc (clauses, from) = makeTerm loc $ fmap (\c -> makeTerm loc (c from)) clauses
-    importClause = symbol Grammar.ImportClause *> children (choice [
-      namedImports,
-      (pure <$> term namespace'),
-      ((\a b -> [a, b]) <$> term identifier' <*> term namespace'),
-      ((:) <$> term identifier' <*> namedImports),
-      (pure <$> term identifier')
+    importClause' = symbol Grammar.ImportClause *> children (choice [
+      namedImports',
+      (pure <$> namespace'),
+      ((\a b -> [a, b]) <$> identifier' <*> namespace'),
+      ((:) <$> identifier' <*> namedImports'),
+      (pure <$> identifier')
       ])
-    requireClause = symbol Grammar.ImportRequireClause *> children (declarationImport <$> term identifier <*> pure [] <*> term string)
+    requireClause' = symbol Grammar.ImportRequireClause *> children (declarationImport <$> term identifier <*> pure [] <*> term string)
     identifier' = (declarationImport <$> emptyTerm <*> (pure <$> term identifier))
     namespace' = (declarationImport <$> term namespaceImport <*> pure [])
 
-    namedImports = symbol Grammar.NamedImports *> children (many (declarationImport <$> emptyTerm <*> (pure <$> term importSymbol)))
+    namedImports' = symbol Grammar.NamedImports *> children (many (declarationImport <$> emptyTerm <*> (pure <$> term importSymbol)))
     importSymbol = makeTerm <$> symbol Grammar.ImportSpecifier <*> children (Declaration.ImportSymbol <$> term identifier <*> (term identifier <|> emptyTerm))
     namespaceImport = symbol Grammar.NamespaceImport *> children (term identifier)
 
