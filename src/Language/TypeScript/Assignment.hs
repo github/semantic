@@ -615,7 +615,7 @@ statementIdentifier :: Assignment
 statementIdentifier = makeTerm <$> symbol StatementIdentifier <*> (Syntax.Identifier <$> source)
 
 importStatement :: Assignment
-importStatement =  makeImport <$> symbol Grammar.ImportStatement <*> children ((,) <$> term importClause <*> term string)
+importStatement =  makeImport <$> symbol Grammar.ImportStatement <*> children ((,) <$> importClause <*> term string)
                <|> makeTerm <$> symbol Grammar.ImportStatement <*> children (term requireClause)
                <|> makeTerm <$> symbol Grammar.ImportStatement <*> children (declarationImport <$> emptyTerm <*> pure [] <*> term string)
   where
