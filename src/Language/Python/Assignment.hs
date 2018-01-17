@@ -170,8 +170,6 @@ expressionChoices =
 
 expressions :: Assignment
 expressions = makeTerm <$> location <*> manyTerm expression
-  -- where mk _ [child] = child
-        -- mk location children = makeTerm location children
 
 expressionStatement :: Assignment
 expressionStatement = mk <$> symbol ExpressionStatement <*> children (someTerm expression)
