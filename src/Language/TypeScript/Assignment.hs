@@ -10,7 +10,7 @@ import Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import Data.Maybe (fromMaybe, catMaybes)
 import Data.Record
-import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm1, contextualize, postContextualize)
+import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, contextualize, postContextualize)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -544,10 +544,8 @@ statementBlock :: Assignment
 statementBlock = makeTerm <$> symbol StatementBlock <*> children (manyTerm statement)
 
 classBodyStatements :: Assignment
-classBodyStatements = mk <$> symbol ClassBody <*> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature <|> abstractMethodSignature))) <*> many comment))
+classBodyStatements = makeTerm'' <$> symbol ClassBody <*> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature <|> abstractMethodSignature))) <*> many comment))
   where
-    mk _ [a] = a
-    mk loc children = makeTerm loc children
     contextualize' (cs, formalParams) = case nonEmpty cs of
       Just cs -> toList cs ++ formalParams
       Nothing -> formalParams
