@@ -632,7 +632,7 @@ importStatement =  makeImport <$> symbol Grammar.ImportStatement <*> children ((
     identifier' = (declarationImport <$> emptyTerm <*> (pure <$> term identifier))
     namespace' = (declarationImport <$> term namespaceImport <*> pure [])
 
-    namedImports = symbol Grammar.NamedImports *> children (manyTerm (declarationImport <$> emptyTerm <*> (pure <$> importSymbol)))
+    namedImports = symbol Grammar.NamedImports *> children (many (declarationImport <$> emptyTerm <*> (pure <$> term importSymbol)))
     importSymbol = makeTerm <$> symbol Grammar.ImportSpecifier <*> children (Declaration.ImportSymbol <$> term identifier <*> (term identifier <|> emptyTerm))
     namespaceImport = symbol Grammar.NamespaceImport *> children (term identifier)
 
