@@ -12,7 +12,7 @@ import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Functor (void)
 import Data.List.NonEmpty (some1)
-import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
+import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -136,14 +136,10 @@ expressionChoices =
     mk s construct = makeTerm <$> symbol s <*> children ((construct .) . fromMaybe <$> emptyTerm <*> optional (symbol ArgumentList *> children expressions))
 
 expressions :: Assignment
-expressions = mk <$> location <*> many expression
-  where mk _ [a] = a
-        mk loc children = makeTerm loc children
+expressions = makeTerm'' <$> location <*> many expression
 
 parenthesized_expressions :: Assignment
-parenthesized_expressions = mk <$> symbol ParenthesizedStatements <*> children (many expression)
-  where mk _ [a] = a
-        mk loc children = makeTerm loc children
+parenthesized_expressions = makeTerm'' <$> symbol ParenthesizedStatements <*> children (many expression)
 
 identifier :: Assignment
 identifier =
