@@ -171,21 +171,21 @@ expression = choice [
   augmentedAssignmentExpression,
   conditionalExpression,
   yieldExpression,
-  unaryExpression,
-  binaryExpression,
   includeExpression,
   includeOnceExpression,
   requireExpression,
-  requireOnceExpression
+  requireOnceExpression,
+  binaryExpression,
+  unaryExpression
   ]
 
 unaryExpression :: Assignment
 unaryExpression = choice [
   cloneExpression,
-  primaryExpression,
   exponentiationExpression,
   unaryOpExpression,
-  castExpression
+  castExpression,
+  primaryExpression
   ]
 
 assignmentExpression :: Assignment
@@ -257,8 +257,10 @@ primaryExpression = choice [
   anonymousFunctionCreationExpression,
   objectCreationExpression,
   updateExpression,
-  shellCommandExpression,
-  expression
+  shellCommandExpression
+  -- | TODO Add expression back so we can parse '(', expression, ')' as a primary expression.
+  -- | Leaving this in here causes assignment to infinite loop.
+  -- expression
   ]
 
 classConstantAccessExpression :: Assignment
