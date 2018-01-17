@@ -258,6 +258,10 @@ instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO: Implement Eval instance for Import
+instance (MonadFail m) => Eval t v m Import
+
+-- | An imported symbol
 data ImportSymbol a = ImportSymbol { importSymbolName :: !a, importSymbolAlias :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
@@ -265,8 +269,8 @@ instance Eq1 ImportSymbol where liftEq = genericLiftEq
 instance Ord1 ImportSymbol where liftCompare = genericLiftCompare
 instance Show1 ImportSymbol where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Import
-instance (MonadFail m) => Eval t v m Import
+-- TODO: Implement Eval instance for ImportSymbol
+instance (MonadFail m) => Eval t v m ImportSymbol
 
 
 -- | A declared type (e.g. `a []int` in Go).
