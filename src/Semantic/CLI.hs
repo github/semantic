@@ -77,7 +77,11 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       <$> (   flag  (SomeRenderer SExpressionTermRenderer) (SomeRenderer SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
           <|> flag'                                        (SomeRenderer JSONTermRenderer)        (long "json" <> help "Output JSON parse trees")
           <|> flag'                                        (SomeRenderer ToCTermRenderer)         (long "toc" <> help "Output JSON table of contents summary")
-          <|> flag'                                        (SomeRenderer . TagsTermRenderer)      (long "tags" <> help "Output JSON tags/symbols") <*> (option tagFieldsReader (long "fields" <> help "Comma delimited list of specific fields to return (tags output only)." <> metavar "FIELDS") <|> pure defaultTagFields)
+          <|> flag'                                        (SomeRenderer . TagsTermRenderer)      (long "tags" <> help "Output JSON tags/symbols")
+              <*> (   option tagFieldsReader (  long "fields"
+                                             <> help "Comma delimited list of specific fields to return (tags output only)."
+                                             <> metavar "FIELDS")
+                  <|> pure defaultTagFields)
           <|> flag'                                        (SomeRenderer DOTTermRenderer)         (long "dot" <> help "Output the term as a DOT graph"))
       <*> (   Right <$> some (argument filePathReader (metavar "FILES..."))
           <|> pure (Left stdin) )
