@@ -39,6 +39,7 @@ parseFixtures =
   , (SomeRenderer JSONTermRenderer, pathMode', jsonParseTreeOutput')
   , (SomeRenderer JSONTermRenderer, Right [], emptyJsonParseTreeOutput)
   , (SomeRenderer (SymbolsTermRenderer defaultSymbolFields), Right [("test/fixtures/ruby/method-declaration.A.rb", Just Ruby)], symbolsOutput)
+  , (SomeRenderer TagsTermRenderer, Right [("test/fixtures/ruby/method-declaration.A.rb", Just Ruby)], tagsOutput)
   ]
   where pathMode = Right [("test/fixtures/ruby/and-or.A.rb", Just Ruby)]
         pathMode' = Right [("test/fixtures/ruby/and-or.A.rb", Just Ruby), ("test/fixtures/ruby/and-or.B.rb", Just Ruby)]
@@ -48,6 +49,7 @@ parseFixtures =
         jsonParseTreeOutput' = "{\"trees\":[{\"path\":\"test/fixtures/ruby/and-or.A.rb\",\"programNode\":{\"category\":\"Program\",\"children\":[{\"category\":\"And\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"name\":\"foo\",\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}},{\"category\":\"Identifier\",\"children\":[],\"name\":\"bar\",\"sourceRange\":[8,11],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,12]}}],\"sourceRange\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,12]}}],\"sourceRange\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,1]}},\"language\":\"Ruby\"},{\"path\":\"test/fixtures/ruby/and-or.B.rb\",\"programNode\":{\"category\":\"Program\",\"children\":[{\"category\":\"Or\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"name\":\"foo\",\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}},{\"category\":\"Identifier\",\"children\":[],\"name\":\"bar\",\"sourceRange\":[7,10],\"sourceSpan\":{\"start\":[1,8],\"end\":[1,11]}}],\"sourceRange\":[0,10],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,11]}},{\"category\":\"And\",\"children\":[{\"category\":\"Or\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"name\":\"a\",\"sourceRange\":[11,12],\"sourceSpan\":{\"start\":[2,1],\"end\":[2,2]}},{\"category\":\"Identifier\",\"children\":[],\"name\":\"b\",\"sourceRange\":[16,17],\"sourceSpan\":{\"start\":[2,6],\"end\":[2,7]}}],\"sourceRange\":[11,17],\"sourceSpan\":{\"start\":[2,1],\"end\":[2,7]}},{\"category\":\"Identifier\",\"children\":[],\"name\":\"c\",\"sourceRange\":[22,23],\"sourceSpan\":{\"start\":[2,12],\"end\":[2,13]}}],\"sourceRange\":[11,23],\"sourceSpan\":{\"start\":[2,1],\"end\":[2,13]}}],\"sourceRange\":[0,24],\"sourceSpan\":{\"start\":[1,1],\"end\":[3,1]}},\"language\":\"Ruby\"}]}\n"
         emptyJsonParseTreeOutput = "{\"trees\":[]}\n"
         symbolsOutput = "{\"files\":[{\"path\":\"test/fixtures/ruby/method-declaration.A.rb\",\"symbols\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"kind\":\"Method\",\"symbol\":\"foo\"}],\"language\":\"Ruby\"}]}\n"
+        tagsOutput = "[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"path\":\"test/fixtures/ruby/method-declaration.A.rb\",\"kind\":\"Method\",\"symbol\":\"foo\",\"line\":\"def foo\",\"language\":\"Ruby\"}]\n"
 
 
 diffFixtures :: [(SomeRenderer DiffRenderer, Either Handle [Both (FilePath, Maybe Language)], ByteString)]
