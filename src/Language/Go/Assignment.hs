@@ -11,7 +11,7 @@ import qualified Assigning.Assignment as Assignment
 import Data.Functor (void)
 import Data.List.NonEmpty (some1)
 import Data.Record
-import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm1)
+import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -206,16 +206,10 @@ types =
          ]
 
 identifiers :: Assignment
-identifiers = mk <$> location <*> manyTerm identifier
-  where
-    mk _ [a] = a
-    mk loc children = makeTerm loc children
+identifiers = makeTerm'' <$> location <*> manyTerm identifier
 
 expressions :: Assignment
-expressions = mk <$> location <*> manyTerm expression
-  where
-    mk _ [a] = a
-    mk loc children = makeTerm loc children
+expressions = makeTerm'' <$> location <*> manyTerm expression
 
 
 -- Literals
@@ -387,14 +381,12 @@ functionDeclaration =  makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncL
     returnParameters = makeTerm <$> symbol ParameterList <*> children (manyTerm expression)
 
 importDeclaration :: Assignment
-importDeclaration = mk <$> symbol ImportDeclaration <*> children (manyTerm (importSpec <|> importSpecList))
+importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTerm (importSpec <|> importSpecList))
   where
     importSpec = makeTerm <$> symbol ImportSpec <*> children (namedImport <|> plainImport)
     namedImport = flip Declaration.Import <$> expression <*> expression <*> pure []
     plainImport = Declaration.Import <$> expression <*> emptyTerm <*> pure []
     importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyTerm (importSpec <|> comment))
-    mk _ [child] = child
-    mk location children = makeTerm location children
 
 indexExpression :: Assignment
 indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)
