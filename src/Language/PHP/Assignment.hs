@@ -642,7 +642,7 @@ namespaceUseDeclaration = makeTerm <$> symbol NamespaceUseDeclaration <*> childr
   (((++) <$> (pure <$> (namespaceFunctionOrConst <|> emptyTerm)) <*> someTerm namespaceUseClause) <|> ((\a b cs -> a : b : cs) <$> namespaceFunctionOrConst <*> namespaceName <*> someTerm namespaceUseGroupClause1) <|> ((:) <$> namespaceName <*> someTerm namespaceUseGroupClause2)))
 
 namespaceUseClause :: Assignment
-namespaceUseClause = makeTerm <$> symbol NamespaceUseClause <*> children (fmap Syntax.NamespaceUseClause $ (\a b -> [a, b]) <$> namespaceName <*> (namespaceAliasingClause <|> emptyTerm))
+namespaceUseClause = makeTerm <$> symbol NamespaceUseClause <*> children (fmap Syntax.NamespaceUseClause $ (\a b -> [a, b]) <$> qualifiedName <*> (namespaceAliasingClause <|> emptyTerm))
 
 namespaceUseGroupClause1 :: Assignment
 namespaceUseGroupClause1 = makeTerm <$> symbol NamespaceUseGroupClause_1 <*> children (fmap Syntax.NamespaceUseGroupClause $ (\a b -> [a, b]) <$> namespaceName <*> (namespaceAliasingClause <|> emptyTerm))
