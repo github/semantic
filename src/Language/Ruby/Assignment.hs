@@ -9,9 +9,11 @@ module Language.Ruby.Assignment
 import Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import Data.Maybe (fromMaybe)
+import Control.Monad (guard)
 import Data.Record
 import Data.Functor (void)
 import Data.List.NonEmpty (some1)
+import Data.List (elem)
 import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
@@ -29,6 +31,7 @@ type Syntax = '[
     Comment.Comment
   , Declaration.Class
   , Declaration.Function
+  , Declaration.Import
   , Declaration.Method
   , Declaration.Module
   , Expression.Arithmetic
@@ -296,9 +299,15 @@ pair :: Assignment
 pair =   makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> (expression <|> emptyTerm))
 
 methodCall :: Assignment
-methodCall = makeTerm <$> symbol MethodCall <*> children (Expression.Call <$> pure [] <*> expression <*> args <*> (block <|> emptyTerm))
+methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> regularCall)
   where
+    regularCall = inj <$> (Expression.Call <$> pure [] <*> expression <*> args <*> (block <|> emptyTerm))
+    require = inj <$> (symbol Identifier *> do
+      s <- source
+      guard (elem s ["autoload", "load", "require", "require_relative"])
+      Declaration.Import <$> args' <*> emptyTerm <*> pure [])
     args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> pure []
+    args' = makeTerm'' <$> (symbol ArgumentList <|> symbol ArgumentListWithParens) <*> children (many expression) <|> emptyTerm
 
 call :: Assignment
 call = makeTerm <$> symbol Call <*> children (Expression.MemberAccess <$> expression <*> (expression <|> args))
