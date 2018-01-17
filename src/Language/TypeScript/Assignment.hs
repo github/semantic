@@ -622,10 +622,10 @@ importStatement =  makeImport <$> symbol Grammar.ImportStatement <*> children ((
     makeImport loc ([clause], from) = makeTerm loc (clause from)
     makeImport loc (clauses, from) = makeTerm loc $ fmap (\c -> makeTerm loc (c from)) clauses
     importClause = symbol Grammar.ImportClause *> children (choice [
-      term namedImports,
+      namedImports,
       (pure <$> term namespace'),
       ((\a b -> [a, b]) <$> term identifier' <*> term namespace'),
-      ((:) <$> term identifier' <*> term namedImports),
+      ((:) <$> term identifier' <*> namedImports),
       (pure <$> term identifier')
       ])
     requireClause = symbol Grammar.ImportRequireClause *> children (declarationImport <$> term identifier <*> pure [] <*> term string)
