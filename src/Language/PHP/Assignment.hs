@@ -119,6 +119,10 @@ type Syntax = '[
   , Statement.Match
   , Syntax.LabeledStatement
   , Literal.KeyValue
+  , Statement.ForEach
+  , Statement.For
+  , Statement.DoWhile
+  , Statement.While
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -149,6 +153,7 @@ statement = handleError everything
       , namedLabelStatement
       , expressionStatement
       , selectionStatement
+      , iterationStatement
       , jumpStatement
       , tryStatement
       , declareStatement
@@ -504,6 +509,30 @@ elseIfClause = makeTerm <$> symbol ElseIfClause <*> children (Statement.Else <$>
 
 elseClause :: Assignment
 elseClause = makeTerm <$> symbol ElseClause <*> children (Statement.Else <$> emptyTerm <*> statement)
+
+iterationStatement :: Assignment
+iterationStatement = choice [
+  whileStatement,
+  doStatement,
+  forStatement,
+  foreachStatement
+  ]
+
+whileStatement :: Assignment
+whileStatement = makeTerm <$> symbol WhileStatement <*> children (Statement.While <$> expression <*> (statement <|> (makeTerm <$> location <*> manyTerm statement) <|> emptyTerm))
+
+doStatement :: Assignment
+doStatement = makeTerm <$> symbol DoStatement <*> children (Statement.DoWhile <$> expression <*> expression)
+
+forStatement :: Assignment
+forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.For <$> (expressions <|> emptyTerm) <*> (expressions <|> emptyTerm) <*> (expressions <|> emptyTerm) <*> (statement <|> (makeTerm <$> location <*> manyTerm statement)))
+
+foreachStatement :: Assignment
+foreachStatement = makeTerm <$> symbol ForeachStatement <*> children (forEachStatement' <$> expression <*> (pair <|> expression) <*> (statement <|> (makeTerm <$> location <*> someTerm statement <|> emptyTerm)))
+  where forEachStatement' array value body = Statement.ForEach value array body
+
+pair :: Assignment
+pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression)
 
 jumpStatement :: Assignment
 jumpStatement = choice [
