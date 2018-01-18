@@ -45,6 +45,12 @@ makeTerm a = makeTerm' a . inj
 makeTerm' :: (HasCallStack, Semigroup a, Foldable f) => a -> f (Term f a) -> Term f a
 makeTerm' a f = termIn (sconcat (a :| (termAnnotation <$> toList f))) f
 
+-- | Lift syntax and an annotation into a term, injecting the syntax into a union & ensuring the annotation encompasses all children. Removes extra structure if term is a list of a single item.
+makeTerm'' :: (HasCallStack, f :< fs, Semigroup a, Apply Foldable fs, Foldable f) => a -> f (Term (Union fs) a) -> Term (Union fs) a
+makeTerm'' a children = case toList children of
+  [x] -> x
+  _ -> makeTerm' a (inj children)
+
 -- | Lift non-empty syntax into a term, injecting the syntax into a union & appending all subterms’.annotations to make the new term’s annotation.
 makeTerm1 :: (HasCallStack, f :< fs, Semigroup a, Apply Foldable fs) => f (Term (Union fs) a) -> Term (Union fs) a
 makeTerm1 = makeTerm1' . inj

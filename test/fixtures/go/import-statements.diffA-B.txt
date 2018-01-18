@@ -1,16 +1,14 @@
 (Program
   (Module
     (Identifier))
-  (Import
-    (
-      (Context
-        (Comment)
-        (Comment)
-      { (TextElement)
-      ->(TextElement) })
-      (Context
-        (Comment)
-        (Empty))))
+  (
+    (Comment)
+    (Comment)
+    (Import
+    { (TextElement)
+    ->(TextElement) }
+      (Empty))
+    (Comment))
   (Function
     (Empty)
     (Identifier)

@@ -26,6 +26,7 @@ import System.IO (Handle, stdin, stdout)
 import qualified Semantic (parseBlobs, diffBlobPairs)
 import Text.Read
 
+
 main :: IO ()
 main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskWithOptions
 
@@ -76,7 +77,11 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       <$> (   flag  (SomeRenderer SExpressionTermRenderer) (SomeRenderer SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
           <|> flag'                                        (SomeRenderer JSONTermRenderer)        (long "json" <> help "Output JSON parse trees")
           <|> flag'                                        (SomeRenderer ToCTermRenderer)         (long "toc" <> help "Output JSON table of contents summary")
-          <|> flag'                                        (SomeRenderer TagsTermRenderer)        (long "tags" <> help "Output JSON tags/symbols")
+          <|> flag'                                        (SomeRenderer . TagsTermRenderer)      (long "tags" <> help "Output JSON tags/symbols")
+              <*> (   option tagFieldsReader (  long "fields"
+                                             <> help "Comma delimited list of specific fields to return (tags output only)."
+                                             <> metavar "FIELDS")
+                  <|> pure defaultTagFields)
           <|> flag'                                        (SomeRenderer DOTTermRenderer)         (long "dot" <> help "Output the term as a DOT graph"))
       <*> (   Right <$> some (argument filePathReader (metavar "FILES..."))
           <|> pure (Left stdin) )
@@ -91,3 +96,15 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     optionsReader options = eitherReader $ \ str -> maybe (Left ("expected one of: " <> intercalate ", " (fmap fst options))) (Right . snd) (find ((== str) . fst) options)
     options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options) <> metavar (intercalate "|" (fmap fst options)))
     findOption options value = maybe "" fst (find ((== value) . snd) options)
+
+    -- Example: semantic parse --tags --fields=symbol,path,language,kind,line,span
+    tagFieldsReader = eitherReader parseTagFields
+    parseTagFields arg = let fields = splitWhen (== ',') arg in
+                      Right $ TagFields
+                        { tagFieldsShowSymbol = (elem "symbol" fields)
+                        , tagFieldsShowPath = (elem "path" fields)
+                        , tagFieldsShowLanguage = (elem "language" fields)
+                        , tagFieldsShowKind = (elem "kind" fields)
+                        , tagFieldsShowLine = (elem "line" fields)
+                        , tagFieldsShowSpan = (elem "span" fields)
+                        }

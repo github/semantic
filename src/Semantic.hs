@@ -55,7 +55,7 @@ parseBlob renderer blob@Blob{..}
     ToCTermRenderer         -> decorate (declarationAlgebra blob)                     >=> render (renderToCTerm  blob)
     JSONTermRenderer        -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)
     SExpressionTermRenderer -> decorate constructorLabel . (Nil <$)                   >=> render renderSExpressionTerm
-    TagsTermRenderer        -> decorate (declarationAlgebra blob)                     >=> render (renderToTags blob)
+    TagsTermRenderer fields -> decorate (declarationAlgebra blob)                     >=> render (renderToTags fields blob)
     DOTTermRenderer         ->                                                            render (renderDOTTerm blob)
   | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
 

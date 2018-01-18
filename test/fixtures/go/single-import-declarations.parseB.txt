@@ -2,13 +2,14 @@
   (Module
     (Identifier))
   (Import
-    (TextElement))
+    (TextElement)
+    (Empty))
   (Import
-    (TextElement))
+    (TextElement)
+    (Empty))
   (Import
-    (
-      (Identifier)
-      (TextElement)))
+    (TextElement)
+    (Identifier))
   (Function
     (Empty)
     (Identifier)
