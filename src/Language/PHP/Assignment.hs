@@ -287,7 +287,7 @@ scopedCallExpression = makeTerm <$> symbol ScopedCallExpression <*> children (Ex
   where makeMemberAccess loc expr memberName = makeTerm loc (Expression.MemberAccess expr memberName)
 
 functionCallExpression :: Assignment
-functionCallExpression = makeTerm <$> symbol FunctionCallExpression <*> children (Expression.Call [] <$> (qualifiedName <|> callableExpression) <*> arguments <*> emptyTerm)
+functionCallExpression = makeTerm <$> symbol FunctionCallExpression <*> children (Expression.Call [] <$> (term (qualifiedName <|> callableExpression)) <*> arguments <*> emptyTerm)
 
 callableExpression :: Assignment
 callableExpression = choice [
