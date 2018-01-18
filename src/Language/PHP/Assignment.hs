@@ -118,6 +118,7 @@ type Syntax = '[
   , Statement.Pattern
   , Statement.Match
   , Syntax.LabeledStatement
+  , Literal.KeyValue
   , [] ]
 
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
@@ -670,9 +671,7 @@ yieldExpression :: Assignment
 yieldExpression = makeTerm <$> symbol YieldExpression <*> children (Statement.Yield <$> (arrayElementInitializer <|> expression))
 
 arrayElementInitializer :: Assignment
-arrayElementInitializer = makeTerm <$> symbol ArrayElementInitializer <*> children (Syntax.ArrayElement <$> (expression
-  -- <|> KeyValue <$> expression <*> expression
-  ))
+arrayElementInitializer = makeTerm <$> symbol ArrayElementInitializer <*> children (Literal.KeyValue <$> expression <*> expression) <|> (symbol ArrayElementInitializer *> children expression)
 
 includeExpression :: Assignment
 includeExpression = makeTerm <$> symbol IncludeExpression <*> children (Syntax.Include <$> expression)
