@@ -283,7 +283,7 @@ memberCallExpression = makeTerm <$> symbol MemberCallExpression <*> children (Ex
   where makeMemberAccess loc expr memberName = makeTerm loc (Expression.MemberAccess expr memberName)
 
 scopedCallExpression :: Assignment
-scopedCallExpression = makeTerm <$> symbol ScopedCallExpression <*> children (Expression.Call [] <$> (makeMemberAccess <$> location <*> dereferencableExpression <*> memberName) <*> arguments <*> emptyTerm)
+scopedCallExpression = makeTerm <$> symbol ScopedCallExpression <*> children (Expression.Call [] <$> (makeMemberAccess <$> location <*> scopeResolutionQualifier <*> memberName) <*> arguments <*> emptyTerm)
   where makeMemberAccess loc expr memberName = makeTerm loc (Expression.MemberAccess expr memberName)
 
 functionCallExpression :: Assignment
