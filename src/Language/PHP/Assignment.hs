@@ -567,7 +567,7 @@ tryStatement :: Assignment
 tryStatement = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> compoundStatement <*> (((\as b -> as ++ [b]) <$> someTerm catchClause <*> finallyClause) <|>  someTerm catchClause <|> someTerm finallyClause))
 
 catchClause :: Assignment
-catchClause = makeTerm <$> symbol CatchClause <*> children (Statement.Catch <$> (qualifiedName <|> variableName) <*> compoundStatement)
+catchClause = makeTerm <$> symbol CatchClause <*> children (Statement.Catch <$> (makeTerm <$> location <*> ((\a b -> [a, b]) <$> qualifiedName <*> variableName)) <*> compoundStatement)
 
 finallyClause :: Assignment
 finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> compoundStatement)
