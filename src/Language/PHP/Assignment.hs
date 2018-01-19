@@ -720,7 +720,7 @@ variableName :: Assignment
 variableName = makeTerm <$> symbol VariableName <*> children (Syntax.VariableName <$> name)
 
 name :: Assignment
-name = makeTerm <$> symbol Name <*> (Syntax.Identifier <$> source)
+name = makeTerm <$> (symbol Name <|> symbol Name') <*> (Syntax.Identifier <$> source)
 
 functionStaticDeclaration :: Assignment
 functionStaticDeclaration = makeTerm <$> symbol FunctionStaticDeclaration <*> children (Declaration.VariableDeclaration . pure <$> staticVariableDeclaration)
