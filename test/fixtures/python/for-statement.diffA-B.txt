@@ -1,7 +1,6 @@
 (Program
 {+(ForEach
-  {+(
-    {+(Identifier)+})+}
+  {+(Identifier)+}
   {+(Array
     {+(Tuple
       {+(Integer)+})+}
@@ -34,15 +33,13 @@
               (Identifier)
               (Identifier)
               (Empty))))))
-    (
-      (Call
-        (Identifier)
-      { (Identifier)
-      ->(Identifier) }
-        (Empty))))
+    (Call
+      (Identifier)
+    { (Identifier)
+    ->(Identifier) }
+      (Empty)))
 {-(ForEach
-  {-(
-    {-(Identifier)-})-}
+  {-(Identifier)-}
   {-(Array
     {-(Tuple
       {-(Integer)-})-}

@@ -2,16 +2,12 @@
   (Comprehension
     (Identifier)
     (
-      (
-        (
-          (Identifier))
-        (Identifier))))
+      (Identifier)
+      (Identifier)))
   (Comprehension
     (Plus
       (Identifier)
       (Integer))
     (
-      (
-        (
-          (Identifier))
-        (Identifier)))))
+      (Identifier)
+      (Identifier))))

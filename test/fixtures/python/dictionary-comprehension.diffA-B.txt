@@ -6,14 +6,12 @@
     { (Identifier)
     ->(Identifier) })
     (
-      (
-        (
-        { (Identifier)
-        ->(Identifier) })
-      { (Identifier)
-      ->(Identifier) })
     {+(
-      {+(Identifier)+})+}))
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    { (Identifier)
+    ->(Identifier) }
+    {-(Identifier)-}))
   (Comprehension
     (KeyValue
     { (Identifier)
@@ -21,11 +19,9 @@
     { (Identifier)
     ->(Integer) })
     (
-      (
-        (
-        { (Identifier)
-        ->(Identifier) })
-      { (Identifier)
-      ->(Identifier) })
+    {+(Identifier)+}
+    {+(Identifier)+}
     {-(
-      {-(Identifier)-})-})))
+      {-(Identifier)-}
+      {-(Identifier)-})-}
+    {-(Identifier)-})))

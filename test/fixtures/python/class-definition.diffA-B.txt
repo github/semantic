@@ -3,33 +3,28 @@
   { (Identifier)
   ->(Identifier) }
   {+(Identifier)+}
-    (
-      (Annotation
-        (Function
+    (Annotation
+      (Function
+      { (Identifier)
+      ->(Identifier) }
+        (Identifier)
+        (Return
         { (Identifier)
-        ->(Identifier) }
-          (Identifier)
-          (
-            (Return
-            { (Identifier)
-            ->(Empty) })))
-        (Empty))))
+        ->(Empty) }))
+      (Empty)))
 {-(Class
   {-(Identifier)-}
-  {-(
-    {-(NoOp
-      {-(Empty)-})-})-})-}
+  {-(NoOp
+    {-(Empty)-})-})-}
   (Class
     (Identifier)
   {-(Identifier)-}
-    (
-      (Annotation
-        (Function
-        { (Identifier)
-        ->(Identifier) }
-          (Identifier)
-          (
-            (Return
-            { (Empty)
-            ->(Identifier) })))
-        (Empty)))))
+    (Annotation
+      (Function
+      { (Identifier)
+      ->(Identifier) }
+        (Identifier)
+        (Return
+        { (Empty)
+        ->(Identifier) }))
+      (Empty))))

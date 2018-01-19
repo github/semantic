@@ -3,8 +3,7 @@
     (Function
       (Empty)
       (Identifier)
-      (
-        (Plus
-          (Identifier)
-          (Integer))))
+      (Plus
+        (Identifier)
+        (Integer)))
     (Empty)))

@@ -3,9 +3,8 @@
     (Function
       (Empty)
     {-(Identifier)-}
-      (
-        (Plus
-        { (Identifier)
-        ->(Integer) }
-          (Integer))))
+      (Plus
+      { (Identifier)
+      ->(Integer) }
+        (Integer)))
     (Empty)))

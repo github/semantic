@@ -3,27 +3,21 @@
     (Identifier)
     (
       (
-        (
-          (Identifier))
+        (Identifier)
         (Identifier))
+      (Call
+        (Identifier)
+        (Empty))
       (
-        (Call
-          (Identifier)
-          (Empty)))
-      (
-        (
-          (Identifier))
+        (Identifier)
         (Identifier))
-      (
-        (Call
-          (Identifier)
-          (Empty)))))
+      (Call
+        (Identifier)
+        (Empty))))
   (Comprehension
     (Plus
       (Identifier)
       (Integer))
     (
-      (
-        (
-          (Identifier))
-        (Identifier)))))
+      (Identifier)
+      (Identifier))))

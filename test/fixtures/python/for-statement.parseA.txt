@@ -20,14 +20,12 @@
               (Identifier)
               (Identifier)
               (Empty))))))
-    (
-      (Call
-        (Identifier)
-        (Identifier)
-        (Empty))))
+    (Call
+      (Identifier)
+      (Identifier)
+      (Empty)))
   (ForEach
-    (
-      (Identifier))
+    (Identifier)
     (Array
       (Tuple
         (Integer))

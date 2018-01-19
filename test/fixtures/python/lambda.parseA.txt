@@ -2,8 +2,7 @@
   (Annotation
     (Function
       (Empty)
-      (
-        (Plus
-          (Integer)
-          (Integer))))
+      (Plus
+        (Integer)
+        (Integer)))
     (Empty)))
