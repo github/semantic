@@ -500,7 +500,7 @@ switchStatement :: Assignment
 switchStatement = makeTerm <$> symbol SwitchStatement <*> children (Statement.Match <$> expression <*> (makeTerm <$> location <*> manyTerm (caseStatement <|> defaultStatement)))
 
 caseStatement :: Assignment
-caseStatement = makeTerm <$> symbol CaseStatement <*> children (Statement.Pattern <$> expression <*> statement)
+caseStatement = makeTerm <$> symbol CaseStatement <*> children (Statement.Pattern <$> expression <*> (makeTerm <$> location <*> manyTerm statement))
 
 defaultStatement :: Assignment
 defaultStatement = makeTerm <$> symbol DefaultStatement <*> children (Statement.Pattern <$> emptyTerm <*> (makeTerm <$> location <*> manyTerm statement))
