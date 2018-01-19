@@ -406,10 +406,11 @@ classMemberDeclaration = choice [
   ]
 
 methodDeclaration :: Assignment
-methodDeclaration =  makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> manyTerm methodModifier <*> emptyTerm <*> functionDefinitionParts)
+methodDeclaration =  (makeTerm <$> symbol MethodDeclaration <*> children (makeMethod1 <$> manyTerm methodModifier <*> emptyTerm <*> functionDefinitionParts)) <|> makeTerm <$> symbol MethodDeclaration <*> children (makeMethod2 <$> someTerm methodModifier <*> emptyTerm <*> term name <*> parameters <*> term (returnType <|> emptyTerm) <*> emptyTerm)
   where
-    functionDefinitionParts = symbol FunctionDefinition *> children ((,,,) <$> name <*> parameters <*> (returnType <|> emptyTerm) <*> (compoundStatement <|> emptyTerm))
-    makeMethod modifiers receiver (name, params, returnType, compoundStatement) = Declaration.Method (modifiers ++ [returnType]) receiver name params compoundStatement
+    functionDefinitionParts = symbol FunctionDefinition *> children ((,,,) <$> term name <*> parameters <*> term (returnType <|> emptyTerm) <*> (term compoundStatement <|> emptyTerm))
+    makeMethod1 modifiers receiver (name, params, returnType, compoundStatement) = Declaration.Method (modifiers ++ [returnType]) receiver name params compoundStatement
+    makeMethod2 modifiers receiver name params returnType compoundStatement = Declaration.Method (modifiers ++ [returnType]) receiver name params compoundStatement
 
 classBaseClause :: Assignment
 classBaseClause = makeTerm <$> symbol ClassBaseClause <*> children (Syntax.ClassBaseClause <$> qualifiedName)
@@ -602,13 +603,13 @@ classDeclaration = makeTerm <$> symbol ClassDeclaration <*> children (makeClass 
     makeClass modifier name baseClause interfaceClause declarations = Declaration.Class [modifier] name [baseClause, interfaceClause] declarations
 
 interfaceDeclaration :: Assignment
-interfaceDeclaration = makeTerm <$> symbol InterfaceDeclaration <*> children (Syntax.InterfaceDeclaration <$> name <*> (interfaceBaseClause <|> emptyTerm) <*> manyTerm interfaceMemberDeclaration)
+interfaceDeclaration = makeTerm <$> symbol InterfaceDeclaration <*> children (Syntax.InterfaceDeclaration <$> term name <*> (term interfaceBaseClause <|> emptyTerm) <*> manyTerm interfaceMemberDeclaration)
 
 interfaceBaseClause :: Assignment
 interfaceBaseClause = makeTerm <$> symbol InterfaceBaseClause <*> children (Syntax.InterfaceBaseClause <$> someTerm qualifiedName)
 
 interfaceMemberDeclaration :: Assignment
-interfaceMemberDeclaration = classConstDeclaration <|> methodDeclaration
+interfaceMemberDeclaration = methodDeclaration <|> classConstDeclaration
 
 traitDeclaration :: Assignment
 traitDeclaration = makeTerm <$> symbol TraitDeclaration <*> children (Syntax.TraitDeclaration <$> name <*> manyTerm traitMemberDeclaration)
