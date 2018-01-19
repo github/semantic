@@ -369,6 +369,13 @@ instance Eq1 Echo where liftEq = genericLiftEq
 instance Ord1 Echo where liftCompare = genericLiftCompare
 instance Show1 Echo where liftShowsPrec = genericLiftShowsPrec
 
+newtype Unset a = Unset a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Unset where liftEq = genericLiftEq
+instance Ord1 Unset where liftCompare = genericLiftCompare
+instance Show1 Unset where liftShowsPrec = genericLiftShowsPrec
+
 newtype Declare a = Declare a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 

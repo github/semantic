@@ -104,6 +104,7 @@ type Syntax = '[
   , Syntax.InterfaceDeclaration
   , Expression.SequenceExpression
   , Syntax.Echo
+  , Syntax.Unset
   , Syntax.Declare
   , Statement.Finally
   , Statement.Catch
@@ -158,6 +159,7 @@ statement = handleError everything
       , tryStatement
       , declareStatement
       , echoStatement
+      , unsetStatement
       , constDeclaration
       , functionDefinition
       , classDeclaration
@@ -582,6 +584,9 @@ declareDirective = emptyTerm
 
 echoStatement :: Assignment
 echoStatement = makeTerm <$> symbol EchoStatement <*> children (Syntax.Echo <$> expressions)
+
+unsetStatement :: Assignment
+unsetStatement = makeTerm <$> symbol UnsetStatement <*> children (Syntax.Unset <$> expressions)
 
 expressions :: Assignment
 expressions = expression <|> sequenceExpression
