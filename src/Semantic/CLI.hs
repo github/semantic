@@ -16,7 +16,7 @@ import Data.List.Split (splitWhen)
 import Data.Semigroup ((<>))
 import Data.Version (showVersion)
 import Development.GitRev
-import Options.Applicative hiding (action)
+import Options.Applicative
 import Rendering.Renderer
 import qualified Paths_semantic_diff as Library (version)
 import Semantic.IO (languageForFilePath)
