@@ -14,6 +14,7 @@ import Data.Maybe (mapMaybe)
 import Data.Record
 import Data.Span
 import Data.Term
+import Control.Monad (join)
 import GHC.Generics
 import qualified Data.Text as T
 import qualified Data.Map as Map
@@ -47,13 +48,13 @@ renderToSymbols fields Blob{..} term = [toJSON (termToC fields blobPath term)]
 symbolSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => SymbolFields -> FilePath -> T.Text -> Record fields -> Maybe Symbol
 symbolSummary SymbolFields{..} path _ record = case getDeclaration record of
   Just ErrorDeclaration{} -> Nothing
-  Just declaration -> Just $ Symbol
-    { symbolName = when symbolFieldsShowName (declarationIdentifier declaration)
-    , symbolPath = when symbolFieldsShowPath (T.pack path)
-    , symbolLang = if symbolFieldsShowLang then (T.pack . show <$> declarationLanguage declaration) else Nothing
-    , symbolKind = when symbolFieldsShowKind (toCategoryName declaration)
-    , symbolLine = when symbolFieldsShowLine (declarationText declaration)
-    , symbolSpan = when symbolFieldsShowSpan (getField record)
+  Just declaration -> Just Symbol
+    { symbolName = when symbolFieldsName (declarationIdentifier declaration)
+    , symbolPath = when symbolFieldsPath (T.pack path)
+    , symbolLang = join (when symbolFieldsLang (T.pack . show <$> declarationLanguage declaration))
+    , symbolKind = when symbolFieldsKind (toCategoryName declaration)
+    , symbolLine = when symbolFieldsLine (declarationText declaration)
+    , symbolSpan = when symbolFieldsSpan (getField record)
     }
   _ -> Nothing
 
@@ -92,12 +93,12 @@ when True a = Just a
 when False _ = Nothing
 
 data SymbolFields = SymbolFields
-  { symbolFieldsShowName :: Bool
-  , symbolFieldsShowPath :: Bool
-  , symbolFieldsShowLang :: Bool
-  , symbolFieldsShowKind :: Bool
-  , symbolFieldsShowLine :: Bool
-  , symbolFieldsShowSpan :: Bool
+  { symbolFieldsName :: Bool
+  , symbolFieldsPath :: Bool
+  , symbolFieldsLang :: Bool
+  , symbolFieldsKind :: Bool
+  , symbolFieldsLine :: Bool
+  , symbolFieldsSpan :: Bool
   }
   deriving (Eq, Show)
 
