@@ -78,12 +78,13 @@ data Symbol = Symbol
   } deriving (Generic, Eq, Show)
 
 instance ToJSON Symbol where
-  toJSON Symbol{..} = objectWithoutNulls [ "symbol" .= symbolName
-                          , "path" .= symbolPath
-                          , "language" .= symbolLang
-                          , "kind" .= symbolKind
-                          , "line" .= symbolLine
-                          , "span" .= symbolSpan ]
+  toJSON Symbol{..} = objectWithoutNulls
+    [ "symbol" .= symbolName
+    , "path" .= symbolPath
+    , "language" .= symbolLang
+    , "kind" .= symbolKind
+    , "line" .= symbolLine
+    , "span" .= symbolSpan ]
     where objectWithoutNulls = object . filter (\(_, v) -> v /= Null)
 
 when :: Bool -> a -> Maybe a
