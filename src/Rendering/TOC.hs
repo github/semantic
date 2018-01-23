@@ -170,7 +170,7 @@ diffTOC = mapMaybe entrySummary . dedupe . filter removeImports . tableOfContent
   where
     removeImports :: HasField fields (Maybe Declaration) => Entry (Record fields) -> Bool
     removeImports entry = case getDeclaration (entryPayload entry) of
-      Just (ImportDeclaration{..}) -> False
+      Just ImportDeclaration{..} -> False
       _ -> True
 
 renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> Summaries
