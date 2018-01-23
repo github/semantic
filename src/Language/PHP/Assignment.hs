@@ -279,7 +279,7 @@ variable = callableVariable <|> scopedPropertyAccessExpression <|> memberAccessE
 
 callableVariable :: Assignment
 callableVariable = choice [
-  simpleVariable,
+  simpleVariable',
   subscriptExpression,
   memberCallExpression,
   scopedCallExpression,
@@ -315,7 +315,7 @@ dereferencableExpression :: Assignment
 dereferencableExpression = symbol DereferencableExpression *> children (variable <|> expression <|> arrayCreationExpression <|> string)
 
 scopedPropertyAccessExpression :: Assignment
-scopedPropertyAccessExpression = makeTerm <$> symbol ScopedPropertyAccessExpression <*> children (Expression.MemberAccess <$> scopeResolutionQualifier <*> simpleVariable)
+scopedPropertyAccessExpression = makeTerm <$> symbol ScopedPropertyAccessExpression <*> children (Expression.MemberAccess <$> scopeResolutionQualifier <*> simpleVariable')
 
 scopeResolutionQualifier :: Assignment
 scopeResolutionQualifier = choice [
@@ -439,10 +439,10 @@ classTypeDesignator :: Assignment
 classTypeDesignator = qualifiedName <|> newVariable
 
 newVariable :: Assignment
-newVariable = makeTerm <$> symbol NewVariable <*> children (Syntax.NewVariable <$> ((pure <$> simpleVariable) <|> ((\a b -> [a, b]) <$> (newVariable <|> qualifiedName <|> relativeScope) <*> (expression <|> memberName <|> emptyTerm))))
+newVariable = makeTerm <$> symbol NewVariable <*> children (Syntax.NewVariable <$> ((pure <$> simpleVariable') <|> ((\a b -> [a, b]) <$> (newVariable <|> qualifiedName <|> relativeScope) <*> (expression <|> memberName <|> emptyTerm))))
 
 memberName :: Assignment
-memberName = name <|> simpleVariable <|> expression
+memberName = name <|> simpleVariable' <|> expression
 
 relativeScope :: Assignment
 relativeScope = makeTerm <$> symbol RelativeScope <*> (Syntax.RelativeScope <$> source)
@@ -696,10 +696,13 @@ namespaceFunctionOrConst :: Assignment
 namespaceFunctionOrConst = makeTerm <$> symbol NamespaceFunctionOrConst <*> (Syntax.Identifier <$> source)
 
 globalDeclaration :: Assignment
-globalDeclaration = makeTerm <$> symbol GlobalDeclaration <*> children (Syntax.GlobalDeclaration <$> manyTerm simpleVariable)
+globalDeclaration = makeTerm <$> symbol GlobalDeclaration <*> children (Syntax.GlobalDeclaration <$> manyTerm simpleVariable')
 
 simpleVariable :: Assignment
-simpleVariable = makeTerm <$> symbol SimpleVariable <*> children (Syntax.SimpleVariable <$> (variableName <|> simpleVariable <|> expression))
+simpleVariable = makeTerm <$> symbol SimpleVariable <*> children (Syntax.SimpleVariable <$> (simpleVariable' <|> expression))
+
+simpleVariable' :: Assignment
+simpleVariable' = simpleVariable <|> variableName
 
 
 yieldExpression :: Assignment
