@@ -11,6 +11,7 @@ module Parsing.Parser
 , pythonParser
 , rubyParser
 , typescriptParser
+, phpParser
 ) where
 
 import Assigning.Assignment
