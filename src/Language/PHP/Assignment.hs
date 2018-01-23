@@ -265,11 +265,12 @@ primaryExpression = choice [
   anonymousFunctionCreationExpression,
   objectCreationExpression,
   updateExpression,
-  shellCommandExpression
-  -- | TODO Add expression back so we can parse '(', expression, ')' as a primary expression.
-  -- | Leaving this in here causes assignment to infinite loop.
-  -- expression
+  shellCommandExpression,
+  parenthesizedExpression
   ]
+
+parenthesizedExpression :: Assignment
+parenthesizedExpression = symbol ParenthesizedExpression *> children expression
 
 classConstantAccessExpression :: Assignment
 classConstantAccessExpression = makeTerm <$> symbol ClassConstantAccessExpression <*> children (Expression.MemberAccess <$> scopeResolutionQualifier <*> name)
