@@ -45,6 +45,7 @@ parseBlobs :: Output output => TermRenderer output -> [Blob] -> Task ByteString
 parseBlobs renderer blobs = toOutput' <$> distributeFoldMap (parseBlob renderer) blobs
   where toOutput' = case renderer of
           JSONTermRenderer -> toOutput . renderJSONTerms
+          ImportsTermRenderer -> toOutput . renderModuleTerms
           SymbolsTermRenderer _ -> toOutput . renderSymbolTerms
           _ -> toOutput
 
@@ -56,6 +57,7 @@ parseBlob renderer blob@Blob{..}
     JSONTermRenderer           -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)
     SExpressionTermRenderer    -> decorate constructorLabel . (Nil <$)                   >=> render renderSExpressionTerm
     TagsTermRenderer           -> decorate (declarationAlgebra blob)                     >=> render (renderToTags blob)
+    ImportsTermRenderer        -> decorate (declarationAlgebra blob)                     >=> render (renderToImports blob)
     SymbolsTermRenderer fields -> decorate (declarationAlgebra blob)                     >=> render (renderToSymbols fields blob)
     DOTTermRenderer            ->                                                            render (renderDOTTerm blob)
   | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))

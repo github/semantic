@@ -13,6 +13,8 @@ module Rendering.Renderer
 , renderToCTerm
 , renderSymbolTerms
 , renderToSymbols
+, renderModuleTerms
+, renderToImports
 , renderToTags
 , renderDOTDiff
 , renderDOTTerm
@@ -28,6 +30,7 @@ import Rendering.DOT as R
 import Rendering.JSON as R
 import Rendering.SExpression as R
 import Rendering.Symbol as R
+import Rendering.Imports as R
 import Rendering.TOC as R
 
 -- | Specification of renderers for diffs, producing output in the parameter type.
@@ -54,6 +57,8 @@ data TermRenderer output where
   TagsTermRenderer :: TermRenderer [Value]
   -- | Render to a list of symbols.
   SymbolsTermRenderer :: SymbolFields -> TermRenderer [Value]
+  -- | Render to a list of modules that represent the import graph.
+  ImportsTermRenderer :: TermRenderer [Value]
   -- | Render to a 'ByteString' formatted as a DOT description of the term.
   DOTTermRenderer :: TermRenderer ByteString
 
