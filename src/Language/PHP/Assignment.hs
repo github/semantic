@@ -587,7 +587,7 @@ echoStatement :: Assignment
 echoStatement = makeTerm <$> symbol EchoStatement <*> children (Syntax.Echo <$> expressions)
 
 unsetStatement :: Assignment
-unsetStatement = makeTerm <$> symbol UnsetStatement <*> children (Syntax.Unset <$> expressions)
+unsetStatement = makeTerm <$> symbol UnsetStatement <*> children (Syntax.Unset <$> (makeTerm <$> location <*> someTerm variable))
 
 expressions :: Assignment
 expressions = expression <|> sequenceExpression
