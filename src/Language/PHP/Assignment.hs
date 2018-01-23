@@ -215,7 +215,7 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
     assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
 
 binaryExpression  :: Assignment
-binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm (expression <|> unaryExpression) (term (expression <|> classTypeDesignator))
+binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression (expression <|> classTypeDesignator)
   [ (inj .) . Expression.And              <$ symbol AnonAnd
   , (inj .) . Expression.Or               <$ symbol AnonOr
   , (inj .) . Expression.XOr              <$ symbol AnonXor
