@@ -126,7 +126,7 @@ instance CustomHasDeclaration Declaration.Import where
     where getSource = toText . flip Source.slice blobSource . getField
 
 instance CustomHasDeclaration Expression.Call where
-  customToDeclaration blob@Blob{..} ann decl@(Expression.Call _ (Term (In fromAnn _), _) _ _)
+  customToDeclaration Blob{..} _ (Expression.Call _ (Term (In fromAnn _), _) _ _)
     = Just $ CallReference (getSource fromAnn)
     where getSource = toText . flip Source.slice blobSource . getField
 
