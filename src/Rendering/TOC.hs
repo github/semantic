@@ -189,5 +189,6 @@ toCategoryName declaration = case declaration of
   ImportDeclaration{} -> "Import"
   FunctionDeclaration{} -> "Function"
   MethodDeclaration{} -> "Method"
+  CallReference{} -> "Call"
   HeadingDeclaration _ _ _ l -> "Heading " <> T.pack (show l)
   ErrorDeclaration{} -> "ParseError"

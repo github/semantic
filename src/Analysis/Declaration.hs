@@ -19,6 +19,7 @@ import Data.Semigroup (sconcat)
 import Data.Span
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
+import qualified Data.Syntax.Expression as Expression
 import Data.Term
 import qualified Data.Text as T
 import Data.Union
@@ -31,6 +32,7 @@ data Declaration
   | ClassDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   | ImportDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   | FunctionDeclaration { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
+  | CallReference       { declarationIdentifier :: T.Text }
   | HeadingDeclaration  { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationLevel :: Int }
   | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   deriving (Eq, Generic, Show)
@@ -123,6 +125,11 @@ instance CustomHasDeclaration Declaration.Import where
     = Just $ ImportDeclaration (getSource fromAnn) (getImportSource blob (In ann decl)) blobLanguage
     where getSource = toText . flip Source.slice blobSource . getField
 
+instance CustomHasDeclaration Expression.Call where
+  customToDeclaration blob@Blob{..} ann decl@(Expression.Call _ (Term (In fromAnn _), _) _ _)
+    = Just $ CallReference (getSource fromAnn)
+    where getSource = toText . flip Source.slice blobSource . getField
+
 -- | Produce a 'Declaration' for 'Union's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
 instance Apply HasDeclaration fs => CustomHasDeclaration (Union fs) where
   customToDeclaration blob ann = apply (Proxy :: Proxy HasDeclaration) (toDeclaration blob ann)
@@ -148,6 +155,7 @@ type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Function = 'Custom
   DeclarationStrategy Declaration.Import = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
+  DeclarationStrategy Expression.Call = 'Custom
   DeclarationStrategy Markdown.Heading = 'Custom
   DeclarationStrategy Syntax.Error = 'Custom
   DeclarationStrategy (Union fs) = 'Custom
