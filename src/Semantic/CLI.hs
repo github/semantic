@@ -16,7 +16,7 @@ import Data.List.Split (splitWhen)
 import Data.Semigroup ((<>))
 import Data.Version (showVersion)
 import Development.GitRev
-import Options.Applicative hiding (action)
+import Options.Applicative
 import Rendering.Renderer
 import qualified Paths_semantic_diff as Library (version)
 import Semantic.IO (languageForFilePath)
@@ -76,13 +76,13 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     parseArgumentsParser = runParse
       <$> (   flag  (SomeRenderer SExpressionTermRenderer) (SomeRenderer SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
           <|> flag'                                        (SomeRenderer JSONTermRenderer)        (long "json" <> help "Output JSON parse trees")
-          <|> flag'                                        (SomeRenderer ToCTermRenderer)         (long "toc" <> help "Output JSON table of contents summary")
-          <|> flag'                                        (SomeRenderer . TagsTermRenderer)      (long "tags" <> help "Output JSON tags/symbols")
-              <*> (   option tagFieldsReader (  long "fields"
-                                             <> help "Comma delimited list of specific fields to return (tags output only)."
+          <|> flag'                                        (SomeRenderer TagsTermRenderer)        (long "tags" <> help "Output JSON tags")
+          <|> flag'                                        (SomeRenderer . SymbolsTermRenderer)   (long "symbols" <> help "Output JSON symbol list")
+              <*> (   option symbolFieldsReader (  long "fields"
+                                             <> help "Comma delimited list of specific fields to return (symbols output only)."
                                              <> metavar "FIELDS")
-                  <|> pure defaultTagFields)
-          <|> flag'                                        (SomeRenderer DOTTermRenderer)         (long "dot" <> help "Output the term as a DOT graph"))
+                  <|> pure defaultSymbolFields)
+          <|> flag'                                        (SomeRenderer DOTTermRenderer)         (long "dot" <> help "Output DOT graph parse trees"))
       <*> (   Right <$> some (argument filePathReader (metavar "FILES..."))
           <|> pure (Left stdin) )
 
@@ -97,14 +97,14 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options) <> metavar (intercalate "|" (fmap fst options)))
     findOption options value = maybe "" fst (find ((== value) . snd) options)
 
-    -- Example: semantic parse --tags --fields=symbol,path,language,kind,line,span
-    tagFieldsReader = eitherReader parseTagFields
-    parseTagFields arg = let fields = splitWhen (== ',') arg in
-                      Right $ TagFields
-                        { tagFieldsShowSymbol = (elem "symbol" fields)
-                        , tagFieldsShowPath = (elem "path" fields)
-                        , tagFieldsShowLanguage = (elem "language" fields)
-                        , tagFieldsShowKind = (elem "kind" fields)
-                        , tagFieldsShowLine = (elem "line" fields)
-                        , tagFieldsShowSpan = (elem "span" fields)
+    -- Example: semantic parse --symbols --fields=symbol,path,language,kind,line,span
+    symbolFieldsReader = eitherReader parseSymbolFields
+    parseSymbolFields arg = let fields = splitWhen (== ',') arg in
+                      Right SymbolFields
+                        { symbolFieldsName = "symbol" `elem` fields
+                        , symbolFieldsPath = "path" `elem` fields
+                        , symbolFieldsLang = "language" `elem` fields
+                        , symbolFieldsKind = "kind" `elem` fields
+                        , symbolFieldsLine = "line" `elem` fields
+                        , symbolFieldsSpan = "span" `elem` fields
                         }
