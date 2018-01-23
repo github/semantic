@@ -526,7 +526,7 @@ whileStatement :: Assignment
 whileStatement = makeTerm <$> symbol WhileStatement <*> children (Statement.While <$> expression <*> (statement <|> (makeTerm <$> location <*> manyTerm statement) <|> emptyTerm))
 
 doStatement :: Assignment
-doStatement = makeTerm <$> symbol DoStatement <*> children (Statement.DoWhile <$> expression <*> expression)
+doStatement = makeTerm <$> symbol DoStatement <*> children (Statement.DoWhile <$> statement <*> expression)
 
 forStatement :: Assignment
 forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.For <$> (expressions <|> emptyTerm) <*> (expressions <|> emptyTerm) <*> (expressions <|> emptyTerm) <*> (statement <|> (makeTerm <$> location <*> manyTerm statement)))
