@@ -27,16 +27,30 @@ renderToImports :: (HasField fields (Maybe Declaration), HasField fields Span, F
 renderToImports Blob{..} term = [toJSON (termToC blobPath term)]
   where
     termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => FilePath -> Term f (Record fields) -> Module
-    termToC path = Module (T.pack (takeBaseName path)) (T.pack path) (T.pack . show <$> blobLanguage) . mapMaybe declarationSummary . termTableOfContentsBy declaration
+    termToC path term = let toc = termTableOfContentsBy declaration term in Module
+      { moduleName = T.pack (takeBaseName path)
+      , modulePath = T.pack path
+      , moduleLanguage = T.pack . show <$> blobLanguage
+      , moduleImports = mapMaybe importSummary toc
+      , moduleDeclarations = mapMaybe declarationSummary toc
+      }
 
--- | Construct a 'Symbol' from a node annotation and a change type label.
 declarationSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Maybe SymbolDeclaration
 declarationSummary record = case getDeclaration record of
-  Just ErrorDeclaration{} -> Nothing
-  Just declaration -> Just SymbolDeclaration
-    { declarationName = declarationIdentifier declaration
-    , declarationKind = toCategoryName declaration
-    , declarationSpan = getField record
+  Just declaration | FunctionDeclaration{} <- declaration -> Just (makeSymbolDeclaration declaration)
+                   | MethodDeclaration{} <- declaration -> Just (makeSymbolDeclaration declaration)
+  _ -> Nothing
+  where makeSymbolDeclaration declaration = SymbolDeclaration
+          { declarationName = declarationIdentifier declaration
+          , declarationKind = toCategoryName declaration
+          , declarationSpan = getField record
+          }
+
+importSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Maybe SymbolImport
+importSummary record = case getDeclaration record of
+  Just ImportDeclaration{..} -> Just SymbolImport
+    { symbolName = declarationIdentifier
+    , symbolSpan = getField record
     }
   _ -> Nothing
 
@@ -44,7 +58,7 @@ data Module = Module
   { moduleName :: T.Text
   , modulePath :: T.Text
   , moduleLanguage :: Maybe T.Text
-  -- , moduleImports :: [SymbolImports]
+  , moduleImports :: [SymbolImport]
   , moduleDeclarations :: [SymbolDeclaration]
   -- , moduleReferences :: [SymbolReferences]
   } deriving (Generic, Eq, Show)
@@ -53,6 +67,7 @@ instance ToJSON Module where
   toJSON Module{..} = object [ "name" .= moduleName
                              , "path" .= modulePath
                              , "langauge" .= moduleLanguage
+                             , "imports" .= moduleImports
                              , "declarations" .= moduleDeclarations
                              ]
 
@@ -67,3 +82,12 @@ instance ToJSON SymbolDeclaration where
                                         , "kind" .= declarationKind
                                         , "span" .= declarationSpan
                                         ]
+
+data SymbolImport = SymbolImport
+  { symbolName :: T.Text
+  , symbolSpan :: Span
+  } deriving (Generic, Eq, Show)
+
+instance ToJSON SymbolImport where
+  toJSON SymbolImport{..} = object [ "name" .= symbolName
+                                   , "span" .= symbolSpan ]
