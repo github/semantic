@@ -37,7 +37,7 @@ import Semantic
 import Semantic.Task
 import Semantic.Util
 import SpecHelpers
-import Test.Hspec (Spec, describe, it, parallel)
+import Test.Hspec (Spec, describe, it, parallel, pendingWith)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
 import Test.LeanCheck
@@ -164,7 +164,8 @@ spec = parallel $ do
     it "produces JSON output if there are parse errors" $ do
       blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.X.rb")
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"removed\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"expected end of input nodes, but got ParseError\",\"language\":\"Ruby\"}]}}\n" :: ByteString)
+      pendingWith "https://github.com/tree-sitter/tree-sitter-ruby/issues/63"
+      -- toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"removed\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"expected end of input nodes, but got ParseError\",\"language\":\"Ruby\"}]}}\n" :: ByteString)
 
     it "ignores anonymous functions" $ do
       blobs <- blobsForPaths (both "ruby/lambda.A.rb" "ruby/lambda.B.rb")
