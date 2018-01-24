@@ -24,19 +24,23 @@ renderModuleTerms = Map.singleton "modules" . toJSON
 
 -- | Render a 'Term' to a list of symbols (See 'Symbol').
 renderToImports :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> [Value]
-renderToImports Blob{..} term = [toJSON (termToC blobPath term)]
+renderToImports blob term = toJSON <$> (termToModules blob term)
   where
-    termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => FilePath -> Term f (Record fields) -> Module
-    termToC path term = Module
-      { moduleName = T.pack (takeBaseName path)
-      , modulePath = T.pack path
-      , moduleLanguage = T.pack . show <$> blobLanguage
-      , moduleImports = mapMaybe importSummary declarations
-      , moduleDeclarations = mapMaybe declarationSummary declarations
-      , moduleReferences = mapMaybe referenceSummary declarations
-      }
+    termToModules :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> [Module]
+    termToModules blob@Blob{..} term = case mapMaybe (moduleSummary blob declarations) declarations of
+        [] -> [makeModule defaultModuleName blob declarations]
+        modules -> modules
       where
         declarations = termTableOfContentsBy declaration term
+        defaultModuleName = T.pack (takeBaseName blobPath)
+
+makeModule :: (HasField fields Span, HasField fields (Maybe Declaration)) => T.Text -> Blob -> [Record fields] -> Module
+makeModule name Blob{..} ds = Module name (T.pack blobPath) (T.pack . show <$> blobLanguage) (mapMaybe importSummary ds) (mapMaybe declarationSummary ds) (mapMaybe referenceSummary ds)
+
+moduleSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Blob -> [Record fields] -> Record fields -> Maybe Module
+moduleSummary blob declarations record = case getDeclaration record of
+  Just ModuleDeclaration{..} -> Just $ makeModule declarationIdentifier blob declarations
+  _ -> Nothing
 
 declarationSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Maybe SymbolDeclaration
 declarationSummary record = case getDeclaration record of

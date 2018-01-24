@@ -32,8 +32,9 @@ data Declaration
   | ClassDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   | ImportDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   | FunctionDeclaration { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
-  | CallReference       { declarationIdentifier :: T.Text }
   | HeadingDeclaration  { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationLevel :: Int }
+  | CallReference       { declarationIdentifier :: T.Text }
+  | ModuleDeclaration   { declarationIdentifier :: T.Text }
   | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   deriving (Eq, Generic, Show)
 
@@ -130,6 +131,11 @@ instance CustomHasDeclaration Expression.Call where
     = Just $ CallReference (getSource fromAnn)
     where getSource = toText . flip Source.slice blobSource . getField
 
+instance CustomHasDeclaration Declaration.Module where
+  customToDeclaration Blob{..} _ (Declaration.Module (Term (In fromAnn _), _) _)
+    = Just $ ModuleDeclaration (getSource fromAnn)
+    where getSource = toText . flip Source.slice blobSource . getField
+
 -- | Produce a 'Declaration' for 'Union's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
 instance Apply HasDeclaration fs => CustomHasDeclaration (Union fs) where
   customToDeclaration blob ann = apply (Proxy :: Proxy HasDeclaration) (toDeclaration blob ann)
@@ -155,8 +161,9 @@ type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Function = 'Custom
   DeclarationStrategy Declaration.Import = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
-  DeclarationStrategy Expression.Call = 'Custom
   DeclarationStrategy Markdown.Heading = 'Custom
+  DeclarationStrategy Expression.Call = 'Custom
+  DeclarationStrategy Declaration.Module = 'Custom
   DeclarationStrategy Syntax.Error = 'Custom
   DeclarationStrategy (Union fs) = 'Custom
   DeclarationStrategy a = 'Default
