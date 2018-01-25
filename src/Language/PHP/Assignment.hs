@@ -201,11 +201,12 @@ assignmentExpression :: Assignment
 assignmentExpression = makeTerm <$> symbol AssignmentExpression <*> children (Statement.Assignment [] <$> (variable <|> list) <*> (expression <|> variable))
 
 augmentedAssignmentExpression :: Assignment
-augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpression <*> children (infixTerm variable expression [
+augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpression <*> children (infixTerm variable (term expression) [
   assign Expression.Power <$ symbol AnonStarStarEqual
   , assign Expression.Times <$ symbol AnonStarEqual
   , assign Expression.DividedBy <$ symbol AnonSlashEqual
   , assign Expression.Plus <$ symbol AnonPlusEqual
+  , assign Expression.Minus <$ symbol AnonMinusEqual
   , assign Expression.Times <$ symbol AnonDotEqual
   , assign Expression.LShift <$ symbol AnonLAngleLAngleEqual
   , assign Expression.RShift <$ symbol AnonRAngleRAngleEqual
