@@ -37,7 +37,7 @@ import Semantic
 import Semantic.Task
 import Semantic.Util
 import SpecHelpers
-import Test.Hspec (Spec, describe, it, parallel)
+import Test.Hspec (Spec, describe, it, parallel, pendingWith)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
 import Test.LeanCheck
