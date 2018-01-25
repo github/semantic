@@ -7,6 +7,7 @@ module Analysis.Declaration
 
 import Data.Algebra
 import Data.Blob
+import Data.Monoid
 import Data.Error (Error(..), showExpectation)
 import Data.Foldable (toList)
 import Data.Language as Language
@@ -33,7 +34,7 @@ data Declaration
   | ImportDeclaration   { declarationIdentifier :: T.Text, declarationAlias :: T.Text,  declarationText :: T.Text, declarationLanguage :: Maybe Language }
   | FunctionDeclaration { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   | HeadingDeclaration  { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationLevel :: Int }
-  | CallReference       { declarationIdentifier :: T.Text, declarationImportIdentifier :: Maybe T.Text }
+  | CallReference       { declarationIdentifier :: T.Text, declarationImportIdentifier :: [T.Text] }
   | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   deriving (Eq, Generic, Show)
 
@@ -130,9 +131,14 @@ instance CustomHasDeclaration Declaration.Import where
 
 instance CustomHasDeclaration Expression.Call where
   customToDeclaration Blob{..} _ (Expression.Call _ (Term (In fromAnn fromF), _) _ _)
-    | [Term (In modAnn _), Term (In idenAnn _)] <- toList fromF = Just $ CallReference (getSource idenAnn) (Just (getSource modAnn))
-    | otherwise = Just $ CallReference (getSource fromAnn) Nothing
-    where getSource = toText . flip Source.slice blobSource . getField
+    | [Term (In _ modF), Term (In idenAnn _)] <- toList fromF = Just $ CallReference (getSource idenAnn) (memberAccess modF)
+    | otherwise = Just $ CallReference (getSource fromAnn) []
+    where
+      memberAccess termFOut = case toList termFOut of
+        [Term (In idenA f), Term (In idenB _)] | null f -> [getSource idenA, getSource idenB]
+                                               | otherwise -> memberAccess f <> [getSource idenB]
+        _ -> []
+      getSource = toText . flip Source.slice blobSource . getField
 
 -- | Produce a 'Declaration' for 'Union's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
 instance Apply HasDeclaration fs => CustomHasDeclaration (Union fs) where

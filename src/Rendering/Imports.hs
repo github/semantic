@@ -131,7 +131,7 @@ instance ToJSON ImportStatement where
 
 data CallExpression = CallExpression
   { referenceName :: T.Text
-  , referenceTarget :: Maybe T.Text
+  , referenceTarget :: [T.Text]
   , referenceKind :: T.Text
   , referenceSpan :: Span
   } deriving (Generic, Eq, Show)
@@ -139,7 +139,7 @@ data CallExpression = CallExpression
 instance ToJSON CallExpression where
   toJSON CallExpression{..} = objectWithoutNulls
     [ "name" .= referenceName
-    , "target" .= referenceTarget
+    , "targets" .= referenceTarget
     , "kind" .= referenceKind
     -- , "span" .= referenceSpan
     ]
