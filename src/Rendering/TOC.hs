@@ -171,7 +171,6 @@ diffTOC = mapMaybe entrySummary . dedupe . filter extraDeclarations . tableOfCon
     extraDeclarations :: HasField fields (Maybe Declaration) => Entry (Record fields) -> Bool
     extraDeclarations entry = case getDeclaration (entryPayload entry) of
       Just ImportDeclaration{..} -> False
-      Just ModuleDeclaration{..} -> False
       Just CallReference{..} -> False
       _ -> True
 
@@ -192,6 +191,5 @@ toCategoryName declaration = case declaration of
   FunctionDeclaration{} -> "Function"
   MethodDeclaration{} -> "Method"
   CallReference{} -> "Call"
-  ModuleDeclaration{} -> "Module"
   HeadingDeclaration _ _ _ l -> "Heading " <> T.pack (show l)
   ErrorDeclaration{} -> "ParseError"
