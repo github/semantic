@@ -131,7 +131,7 @@ type Assignment = Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> ((\a b c -> a : b ++ [c]) <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> ((\a b c -> a : b ++ [c]) <$> (text <|> emptyTerm) <*> manyTerm (statement <|> text) <*> (text <|> emptyTerm))) <|> parseError
 
 term :: Assignment -> Assignment
 term term = contextualize comment (postContextualize comment term)
@@ -144,7 +144,8 @@ someTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
 someTerm term = some (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
 
 text :: Assignment
-text = makeTerm <$> symbol Text <*> (Syntax.Text <$> source)
+text = makeTerm <$> (symbol Text <|> symbol TextInterpolation) <*> (Syntax.Text <$> source)
+
 
 statement :: Assignment
 statement = handleError everything
