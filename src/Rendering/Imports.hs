@@ -70,23 +70,23 @@ declarationSummary record = case getDeclaration record of
           , declarationSpan = getField record
           }
 
-importSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Maybe SymbolImport
+importSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Maybe ImportStatement
 importSummary record = case getDeclaration record of
-  Just ImportDeclaration{..} -> Just $ SymbolImport declarationIdentifier declarationAlias (getField record)
+  Just ImportDeclaration{..} -> Just $ ImportStatement declarationIdentifier declarationAlias (getField record)
   _ -> Nothing
 
-referenceSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Maybe SymbolReference
+referenceSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Maybe CallExpression
 referenceSummary record = case getDeclaration record of
-  Just decl@CallReference{..} -> Just  $ SymbolReference declarationIdentifier declarationImportIdentifier (toCategoryName decl) (getField record)
+  Just decl@CallReference{..} -> Just  $ CallExpression declarationIdentifier declarationImportIdentifier (toCategoryName decl) (getField record)
   _ -> Nothing
 
 data Module = Module
   { moduleName :: T.Text
   , modulePaths :: [T.Text]
   , moduleLanguage :: Maybe T.Text
-  , moduleImports :: [SymbolImport]
+  , moduleImports :: [ImportStatement]
   , moduleDeclarations :: [SymbolDeclaration]
-  , moduleReferences :: [SymbolReference]
+  , moduleCalls :: [CallExpression]
   } deriving (Generic, Eq, Show)
 
 instance Monoid Module where
@@ -94,13 +94,14 @@ instance Monoid Module where
   mappend (Module n1 p1 l1 i1 d1 r1) (Module _ p2 _ i2 d2 r2) = Module n1 (p1 <> p2) l1 (i1 <> i2) (d1 <> d2) (r1 <> r2)
 
 instance ToJSON Module where
-  toJSON Module{..} = object [ "name" .= moduleName
-                             , "paths" .= modulePaths
-                             , "langauge" .= moduleLanguage
-                             , "imports" .= moduleImports
-                             , "declarations" .= moduleDeclarations
-                             , "references" .= moduleReferences
-                             ]
+  toJSON Module{..} = object
+    [ "name" .= moduleName
+    , "paths" .= modulePaths
+    , "langauge" .= moduleLanguage
+    , "imports" .= moduleImports
+    , "declarations" .= moduleDeclarations
+    , "calls" .= moduleCalls
+    ]
 
 data SymbolDeclaration = SymbolDeclaration
   { declarationName :: T.Text
@@ -109,33 +110,39 @@ data SymbolDeclaration = SymbolDeclaration
   } deriving (Generic, Eq, Show)
 
 instance ToJSON SymbolDeclaration where
-  toJSON SymbolDeclaration{..} = object [ "name" .= declarationName
-                                        , "kind" .= declarationKind
-                                        -- , "span" .= declarationSpan
-                                        ]
+  toJSON SymbolDeclaration{..} = object
+    [ "name" .= declarationName
+    , "kind" .= declarationKind
+    -- , "span" .= declarationSpan
+    ]
 
-data SymbolImport = SymbolImport
+data ImportStatement = ImportStatement
   { importName :: T.Text
   , importAlias :: T.Text
   , importSpan :: Span
   } deriving (Generic, Eq, Show)
 
-instance ToJSON SymbolImport where
-  toJSON SymbolImport{..} = object [ "name" .= importName
-                                   , "alias" .= importAlias
-                                   -- , "span" .= importSpan
-                                   ]
+instance ToJSON ImportStatement where
+  toJSON ImportStatement{..} = object
+    [ "name" .= importName
+    , "alias" .= importAlias
+    -- , "span" .= importSpan
+    ]
 
-data SymbolReference = SymbolReference
+data CallExpression = CallExpression
   { referenceName :: T.Text
-  , referenceImport :: Maybe T.Text
+  , referenceTarget :: Maybe T.Text
   , referenceKind :: T.Text
   , referenceSpan :: Span
   } deriving (Generic, Eq, Show)
 
-instance ToJSON SymbolReference where
-  toJSON SymbolReference{..} = object [ "name" .= referenceName
-                                      , "import" .= referenceImport
-                                      , "kind" .= referenceKind
-                                      -- , "span" .= referenceSpan
-                                      ]
+instance ToJSON CallExpression where
+  toJSON CallExpression{..} = objectWithoutNulls
+    [ "name" .= referenceName
+    , "target" .= referenceTarget
+    , "kind" .= referenceKind
+    -- , "span" .= referenceSpan
+    ]
+
+objectWithoutNulls :: [(T.Text, Value)] -> Value
+objectWithoutNulls = object . filter (\(_, v) -> v /= Null)
