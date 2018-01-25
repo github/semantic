@@ -11,10 +11,14 @@ module Rendering.Renderer
 , renderJSONTerms
 , renderToCDiff
 , renderToCTerm
+, renderSymbolTerms
+, renderToSymbols
 , renderToTags
 , renderDOTDiff
 , renderDOTTerm
 , Summaries(..)
+, SymbolFields(..)
+, defaultSymbolFields
 ) where
 
 import Data.Aeson (Value)
@@ -23,7 +27,7 @@ import Data.Output
 import Rendering.DOT as R
 import Rendering.JSON as R
 import Rendering.SExpression as R
-import Rendering.Tag as R
+import Rendering.Symbol as R
 import Rendering.TOC as R
 
 -- | Specification of renderers for diffs, producing output in the parameter type.
@@ -42,14 +46,14 @@ deriving instance Show (DiffRenderer output)
 
 -- | Specification of renderers for terms, producing output in the parameter type.
 data TermRenderer output where
-  -- | Compute a table of contents for the term & encode it as JSON.
-  ToCTermRenderer :: TermRenderer Summaries
   -- | Render to JSON with the format documented in docs/json-format.md under “Term.”
   JSONTermRenderer :: TermRenderer [Value]
   -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer ByteString
-  -- | Render to a list of tags.
+  -- | Render to a list of tags (deprecated).
   TagsTermRenderer :: TermRenderer [Value]
+  -- | Render to a list of symbols.
+  SymbolsTermRenderer :: SymbolFields -> TermRenderer [Value]
   -- | Render to a 'ByteString' formatted as a DOT description of the term.
   DOTTermRenderer :: TermRenderer ByteString
 

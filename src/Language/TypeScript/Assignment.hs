@@ -10,7 +10,7 @@ import Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import Data.Maybe (fromMaybe, catMaybes)
 import Data.Record
-import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm1, contextualize, postContextualize)
+import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, contextualize, postContextualize)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -166,6 +166,7 @@ type Syntax = '[
   , TypeScript.Syntax.Update
   , TypeScript.Syntax.ComputedPropertyName
   , TypeScript.Syntax.Decorator
+  , Declaration.ImportSymbol
   , []
   ]
 
@@ -543,10 +544,8 @@ statementBlock :: Assignment
 statementBlock = makeTerm <$> symbol StatementBlock <*> children (manyTerm statement)
 
 classBodyStatements :: Assignment
-classBodyStatements = mk <$> symbol ClassBody <*> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature <|> abstractMethodSignature))) <*> many comment))
+classBodyStatements = makeTerm'' <$> symbol ClassBody <*> children (contextualize' <$> Assignment.manyThrough comment (postContextualize' <$> (concat <$> many ((\as b -> as ++ [b]) <$> manyTerm decorator <*> term (methodDefinition <|> publicFieldDefinition <|> methodSignature <|> indexSignature <|> abstractMethodSignature))) <*> many comment))
   where
-    mk _ [a] = a
-    mk loc children = makeTerm loc children
     contextualize' (cs, formalParams) = case nonEmpty cs of
       Just cs -> toList cs ++ formalParams
       Nothing -> formalParams
@@ -616,19 +615,29 @@ statementIdentifier :: Assignment
 statementIdentifier = makeTerm <$> symbol StatementIdentifier <*> (Syntax.Identifier <$> source)
 
 importStatement :: Assignment
-importStatement = makeTerm <$> symbol Grammar.ImportStatement <*> children (Declaration.Import <$> (((\a b -> [a, b]) <$> term importClause <*> term fromClause) <|> (pure <$> term (importRequireClause <|> string))))
+importStatement =  makeImport <$> symbol Grammar.ImportStatement <*> children ((,) <$> importClause' <*> term string)
+               <|> makeTerm <$> symbol Grammar.ImportStatement <*> children requireClause'
+               <|> makeTerm <$> symbol Grammar.ImportStatement <*> children (declarationImport <$> emptyTerm <*> pure [] <*> term string)
+  where
+    makeImport loc ([clause], from) = makeTerm loc (clause from)
+    makeImport loc (clauses, from) = makeTerm loc $ fmap (\c -> makeTerm loc (c from)) clauses
+    importClause' = symbol Grammar.ImportClause *> children (
+      namedImports'
+      <|> (pure <$> namespace')
+      <|> ((\a b -> [a, b]) <$> identifier' <*> namespace')
+      <|> ((:) <$> identifier' <*> namedImports')
+      <|> (pure <$> identifier')
+      )
+    requireClause' = symbol Grammar.ImportRequireClause *> children (declarationImport <$> term identifier <*> pure [] <*> term string)
+    identifier' = (declarationImport <$> emptyTerm <*> (pure <$> term identifier))
+    namespace' = (declarationImport <$> term namespaceImport <*> pure [])
 
-importClause :: Assignment
-importClause = makeTerm <$> symbol Grammar.ImportClause <*> children (TypeScript.Syntax.ImportClause <$> (((\a b -> [a, b]) <$> term identifier <*> term (namespaceImport <|> namedImports)) <|> (pure <$> term (namespaceImport <|> namedImports <|> identifier))))
+    namedImports' = symbol Grammar.NamedImports *> children (many (declarationImport <$> emptyTerm <*> (pure <$> term importSymbol)))
+    importSymbol = makeTerm <$> symbol Grammar.ImportSpecifier <*> children (Declaration.ImportSymbol <$> term identifier <*> (term identifier <|> emptyTerm))
+    namespaceImport = symbol Grammar.NamespaceImport *> children (term identifier)
 
-namedImports :: Assignment
-namedImports = makeTerm <$> symbol Grammar.NamedImports <*> children (TypeScript.Syntax.NamedImports <$> manyTerm importExportSpecifier)
 
-namespaceImport :: Assignment
-namespaceImport = makeTerm <$> symbol Grammar.NamespaceImport <*> children (TypeScript.Syntax.NamespaceImport <$> term identifier)
-
-importRequireClause :: Assignment
-importRequireClause = makeTerm <$> symbol Grammar.ImportRequireClause <*> children (TypeScript.Syntax.ImportRequireClause <$> term identifier <*> term string)
+    declarationImport alias symbols from = Declaration.Import from alias symbols
 
 debuggerStatement :: Assignment
 debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> (TypeScript.Syntax.Debugger <$ source)

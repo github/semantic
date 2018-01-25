@@ -1,22 +1,26 @@
 (Program
-  (Import
-  {+(ScopeResolution
-    {+(Identifier)+})+}
-    (ScopeResolution
-      (Identifier))
-  {-(Let
-    {-(Identifier)-}
+  (
+  {+(Import
+    {+(Identifier)+}
+    {+(Empty)+})+}
+    (Import
+      (Identifier)
+      (Empty))
+  {-(Import
     {-(ScopeResolution
       {-(Identifier)-})-}
-    {-(Empty)-})-})
-  (Import
-    (Let
-    { (Identifier)
-    ->(Identifier) }
-      (ScopeResolution
-      { (Identifier)
-      ->(Identifier) }
-        (Identifier))
-      (Empty))
-  {-(ScopeResolution
-    {-(Identifier)-})-}))
+    {-(Identifier)-})-})
+{+(Import
+  {+(ScopeResolution
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(Identifier)+})+}
+{-(
+  {-(Import
+    {-(ScopeResolution
+      {-(Identifier)-}
+      {-(Identifier)-})-}
+    {-(Identifier)-})-}
+  {-(Import
+    {-(Identifier)-}
+    {-(Empty)-})-})-})

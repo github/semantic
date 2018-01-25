@@ -29,6 +29,7 @@ import qualified Language.Markdown.Syntax as Markdown
 data Declaration
   = MethodDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationReceiver :: Maybe T.Text }
   | ClassDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
+  | ImportDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   | FunctionDeclaration { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   | HeadingDeclaration  { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationLevel :: Int }
   | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
@@ -116,6 +117,12 @@ instance CustomHasDeclaration Declaration.Class where
     = Just $ ClassDeclaration (getSource identifierAnn) (getClassSource blob (In ann decl)) blobLanguage
     where getSource = toText . flip Source.slice blobSource . getField
 
+instance CustomHasDeclaration Declaration.Import where
+  customToDeclaration blob@Blob{..} ann decl@(Declaration.Import (Term (In fromAnn _), _) _ _)
+    -- Imports
+    = Just $ ImportDeclaration (getSource fromAnn) (getImportSource blob (In ann decl)) blobLanguage
+    where getSource = toText . flip Source.slice blobSource . getField
+
 -- | Produce a 'Declaration' for 'Union's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
 instance Apply HasDeclaration fs => CustomHasDeclaration (Union fs) where
   customToDeclaration blob ann = apply (Proxy :: Proxy HasDeclaration) (toDeclaration blob ann)
@@ -139,6 +146,7 @@ class HasDeclarationWithStrategy (strategy :: Strategy) syntax where
 type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Class = 'Custom
   DeclarationStrategy Declaration.Function = 'Custom
+  DeclarationStrategy Declaration.Import = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
   DeclarationStrategy Markdown.Heading = 'Custom
   DeclarationStrategy Syntax.Error = 'Custom
@@ -174,4 +182,11 @@ getClassSource Blob{..} (In a r)
   = let declRange = getField a
         bodyRange = getField <$> case r of
           Declaration.Class _ _ _ (Term (In a' _), _) -> Just a'
+    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
+
+getImportSource :: (HasField fields Range) => Blob -> TermF Declaration.Import (Record fields) (Term syntax (Record fields), a) -> T.Text
+getImportSource Blob{..} (In a r)
+  = let declRange = getField a
+        bodyRange = getField <$> case r of
+          Declaration.Import (Term (In a' _), _) _ _ -> Just a'
     in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange

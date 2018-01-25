@@ -2,16 +2,21 @@
   (Import
     (ScopeResolution
       (Identifier))
-    (ScopeResolution
-      (Identifier)))
+    (Empty)
+    (
+      (ScopeResolution
+        (Identifier))))
   (Import
     (ScopeResolution
       (Identifier))
-    (ScopeResolution
-      (Identifier))
-    (ScopeResolution
-      (Identifier)))
+    (Empty)
+    (
+      (ScopeResolution
+        (Identifier))
+      (ScopeResolution
+        (Identifier))))
   (Import
     (ScopeResolution
       (Identifier))
+    (Empty)
     (Identifier)))

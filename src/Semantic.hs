@@ -45,6 +45,7 @@ parseBlobs :: Output output => TermRenderer output -> [Blob] -> Task ByteString
 parseBlobs renderer blobs = toOutput' <$> distributeFoldMap (parseBlob renderer) blobs
   where toOutput' = case renderer of
           JSONTermRenderer -> toOutput . renderJSONTerms
+          SymbolsTermRenderer _ -> toOutput . renderSymbolTerms
           _ -> toOutput
 
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
@@ -52,11 +53,11 @@ parseBlob :: TermRenderer output -> Blob -> Task output
 parseBlob renderer blob@Blob{..}
   | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[ConstructorName, HasDeclaration, IdentifierName, Foldable, Functor, ToJSONFields1]) <$> blobLanguage
   = parse parser blob >>= case renderer of
-    ToCTermRenderer         -> decorate (declarationAlgebra blob)                     >=> render (renderToCTerm  blob)
-    JSONTermRenderer        -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)
-    SExpressionTermRenderer -> decorate constructorLabel . (Nil <$)                   >=> render renderSExpressionTerm
-    TagsTermRenderer        -> decorate (declarationAlgebra blob)                     >=> render (renderToTags blob)
-    DOTTermRenderer         ->                                                            render (renderDOTTerm blob)
+    JSONTermRenderer           -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)
+    SExpressionTermRenderer    -> decorate constructorLabel . (Nil <$)                   >=> render renderSExpressionTerm
+    TagsTermRenderer           -> decorate (declarationAlgebra blob)                     >=> render (renderToTags blob)
+    SymbolsTermRenderer fields -> decorate (declarationAlgebra blob)                     >=> render (renderToSymbols fields blob)
+    DOTTermRenderer            ->                                                            render (renderDOTTerm blob)
   | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
 
 newtype NoLanguageForBlob = NoLanguageForBlob FilePath

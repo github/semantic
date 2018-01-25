@@ -114,7 +114,7 @@ library
                      , Rendering.JSON
                      , Rendering.Renderer
                      , Rendering.SExpression
-                     , Rendering.Tag
+                     , Rendering.Symbol
                      , Rendering.TOC
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic

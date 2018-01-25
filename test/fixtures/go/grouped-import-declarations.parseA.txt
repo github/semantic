@@ -1,13 +1,16 @@
 (Program
   (Module
     (Identifier))
-  (Import
-    (
+  (
+    (Import
       (TextElement)
+      (Empty))
+    (Import
       (TextElement)
-      (
-        (Identifier)
-        (TextElement))))
+      (Empty))
+    (Import
+      (TextElement)
+      (Identifier)))
   (Function
     (Empty)
     (Identifier)

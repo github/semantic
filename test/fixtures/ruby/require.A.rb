@@ -1,0 +1,3 @@
+require "json"
+
+foo(a)

@@ -1,0 +1,14 @@
+(Program
+  (Import
+  { (TextElement)
+  ->(TextElement) }
+    (Empty))
+{+(Import
+  {+(
+    {+(Symbol)+}
+    {+(TextElement)+})+}
+  {+(Empty)+})+}
+{-(Call
+  {-(Identifier)-}
+  {-(Identifier)-}
+  {-(Empty)-})-})
