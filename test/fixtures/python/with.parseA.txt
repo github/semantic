@@ -11,8 +11,7 @@
         (Identifier)
         (Boolean))
       (ForEach
-        (
-          (Identifier))
+        (Identifier)
         (Identifier)
         (
           (Assignment

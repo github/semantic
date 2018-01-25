@@ -2,8 +2,7 @@
   (Try
     (Identifier)
     (Finally
-      (
-        (Identifier))))
+      (Identifier)))
   (Try
     (Identifier)
     (Catch
@@ -16,8 +15,7 @@
         (Identifier)
         (Identifier)
         (Empty))
-      (
-        (Identifier)))
+      (Identifier))
     (Catch
       (
         (Identifier)
@@ -25,6 +23,5 @@
         (Identifier))
       ([]))
     (Catch
-      (
-        (Identifier))
+      (Identifier)
       ([]))))

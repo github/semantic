@@ -4,23 +4,20 @@
   {+(If
     {+(Identifier)+}
     {+(Identifier)+}
-    {+(
-      {+(Identifier)+})+})+})+}
+    {+(Identifier)+})+})+}
   (If
   { (Identifier)
   ->(Identifier) }
     (Call
       (Identifier)
       (Empty))
-    (
-    {+(Call
-      {+(Identifier)+}
-      {+(Empty)+})+}
-    {-(Identifier)-}))
+  { (Identifier)
+  ->(Call
+    {+(Identifier)+}
+    {+(Empty)+}) })
 {-(Assignment
   {-(Identifier)-}
   {-(If
     {-(Identifier)-}
     {-(Identifier)-}
-    {-(
-      {-(Identifier)-})-})-})-})
+    {-(Identifier)-})-})-})

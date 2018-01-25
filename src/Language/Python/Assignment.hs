@@ -169,17 +169,13 @@ expressionChoices =
   ]
 
 expressions :: Assignment
-expressions = makeTerm <$> location <*> manyTerm expression
+expressions = makeTerm'' <$> location <*> manyTerm expression
 
 expressionStatement :: Assignment
-expressionStatement = mk <$> symbol ExpressionStatement <*> children (someTerm expression)
-  where mk _ [child] = child
-        mk location children = makeTerm location children
+expressionStatement = makeTerm'' <$> symbol ExpressionStatement <*> children (someTerm expression)
 
 expressionList :: Assignment
-expressionList = mk <$> symbol ExpressionList <*> children (someTerm expression)
-  where mk _ [child] = child
-        mk location children = makeTerm location children
+expressionList = makeTerm'' <$> symbol ExpressionList <*> children (someTerm expression)
 
 listSplat :: Assignment
 listSplat = makeTerm <$> symbol ListSplat <*> (Syntax.Identifier <$> source)

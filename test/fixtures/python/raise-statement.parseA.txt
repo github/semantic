@@ -2,11 +2,10 @@
   (Throw
     ([]))
   (Throw
-    (
-      (Call
-        (Identifier)
-        (TextElement)
-        (Empty))))
+    (Call
+      (Identifier)
+      (TextElement)
+      (Empty)))
   (Throw
     (
       (Call

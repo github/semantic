@@ -6,66 +6,62 @@
     (Class
     { (Identifier)
     ->(Identifier) }
-      (
+      (Decorator
+        (ScopeResolution
+          (Identifier))
+        ([])
         (Decorator
           (ScopeResolution
-            (Identifier))
-          ([])
+          { (Identifier)
+          ->(Identifier) })
+        {+(Identifier)+}
+        {-(Integer)-}
           (Decorator
             (ScopeResolution
             { (Identifier)
             ->(Identifier) })
-            (
-            {+(Identifier)+}
-            {-(Integer)-})
+          {+(Identifier)+}
+          {-(
+            {-(Integer)-}
+            {-(Integer)-})-}
             (Decorator
               (ScopeResolution
-              { (Identifier)
-              ->(Identifier) })
-              (
-              {+(Identifier)+}
-              {-(Integer)-}
-              {-(Integer)-})
-              (Decorator
-                (ScopeResolution
-                  (Identifier))
-                (
-                {+(Integer)+}
-                  (Assignment
-                  { (Identifier)
-                  ->(Identifier) }
-                    (Boolean))
+                (Identifier))
+            {+(
+              {+(Integer)+}
+              {+(Assignment
                 {+(Identifier)+}
-                {+(Identifier)+})
-              { (Decorator
+                {+(Boolean)+})+}
+              {+(Identifier)+}
+              {+(Identifier)+})+}
+            {-(Assignment
+              {-(Identifier)-}
+              {-(Boolean)-})-}
+            { (Decorator
+              {-(ScopeResolution
+                {-(Identifier)-})-}
+              {-(Identifier)-}
+              {-(Decorator
                 {-(ScopeResolution
                   {-(Identifier)-})-}
-                {-(
-                  {-(Identifier)-})-}
+                {-(Identifier)-}
                 {-(Decorator
                   {-(ScopeResolution
                     {-(Identifier)-})-}
                   {-(
+                    {-(Integer)-}
+                    {-(Assignment
+                      {-(Identifier)-}
+                      {-(Boolean)-})-}
+                    {-(Identifier)-}
                     {-(Identifier)-})-}
-                  {-(Decorator
-                    {-(ScopeResolution
-                      {-(Identifier)-})-}
-                    {-(
-                      {-(Integer)-}
-                      {-(Assignment
-                        {-(Identifier)-}
-                        {-(Boolean)-})-}
+                  {-(Annotation
+                    {-(Function
                       {-(Identifier)-}
                       {-(Identifier)-})-}
-                    {-(Annotation
-                      {-(Function
-                        {-(Identifier)-}
-                        {-(
-                          {-(Identifier)-})-})-}
-                      {-(Empty)-})-})-})-})
-              ->(Annotation
-                {+(Function
-                  {+(Identifier)+}
-                  {+(
-                    {+(Identifier)+})+})+}
-                {+(Empty)+}) }))))))))
+                    {-(Empty)-})-})-})-})
+            ->(Annotation
+              {+(Function
+                {+(Identifier)+}
+                {+(Identifier)+})+}
+              {+(Empty)+}) })))))))

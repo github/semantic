@@ -4,10 +4,9 @@
     { (Identifier)
     ->(Identifier) })
     (Empty)
-    (
-      (ScopeResolution
-      { (Identifier)
-      ->(Identifier) })))
+    (ScopeResolution
+    { (Identifier)
+    ->(Identifier) }))
   (Import
     (ScopeResolution
     { (Identifier)
