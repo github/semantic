@@ -33,7 +33,7 @@ data Declaration
   | ImportDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   | FunctionDeclaration { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   | HeadingDeclaration  { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationLevel :: Int }
-  | CallReference       { declarationIdentifier :: T.Text }
+  | CallReference       { declarationIdentifier :: T.Text, declarationImportIdentifier :: Maybe T.Text }
   | ModuleDeclaration   { declarationIdentifier :: T.Text }
   | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   deriving (Eq, Generic, Show)
@@ -127,8 +127,9 @@ instance CustomHasDeclaration Declaration.Import where
     where getSource = toText . flip Source.slice blobSource . getField
 
 instance CustomHasDeclaration Expression.Call where
-  customToDeclaration Blob{..} _ (Expression.Call _ (Term (In fromAnn _), _) _ _)
-    = Just $ CallReference (getSource fromAnn)
+  customToDeclaration Blob{..} _ (Expression.Call _ (Term (In fromAnn fromF), _) _ _)
+    | [Term (In modAnn _), Term (In idenAnn _)] <- toList fromF = Just $ CallReference (getSource idenAnn) (Just (getSource modAnn))
+    | otherwise = Just $ CallReference (getSource fromAnn) Nothing
     where getSource = toText . flip Source.slice blobSource . getField
 
 instance CustomHasDeclaration Declaration.Module where

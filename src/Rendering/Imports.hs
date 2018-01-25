@@ -60,7 +60,7 @@ importSummary record = case getDeclaration record of
 
 referenceSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Maybe SymbolReference
 referenceSummary record = case getDeclaration record of
-  Just decl@CallReference{..} -> Just  $ SymbolReference declarationIdentifier (toCategoryName decl) (getField record)
+  Just decl@CallReference{..} -> Just  $ SymbolReference declarationIdentifier declarationImportIdentifier (toCategoryName decl) (getField record)
   _ -> Nothing
 
 data Module = Module
@@ -104,11 +104,14 @@ instance ToJSON SymbolImport where
 
 data SymbolReference = SymbolReference
   { referenceName :: T.Text
+  , referenceImport :: Maybe T.Text
   , referenceKind :: T.Text
   , referenceSpan :: Span
   } deriving (Generic, Eq, Show)
 
 instance ToJSON SymbolReference where
   toJSON SymbolReference{..} = object [ "name" .= referenceName
-                                      , "kinds" .= referenceKind
-                                      , "span" .= referenceSpan ]
+                                      , "import" .= referenceImport
+                                      , "kind" .= referenceKind
+                                      -- , "span" .= referenceSpan
+                                      ]
