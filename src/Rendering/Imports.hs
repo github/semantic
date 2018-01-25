@@ -55,7 +55,7 @@ declarationSummary record = case getDeclaration record of
 
 importSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Maybe SymbolImport
 importSummary record = case getDeclaration record of
-  Just ImportDeclaration{..} -> Just $ SymbolImport declarationIdentifier (getField record)
+  Just ImportDeclaration{..} -> Just $ SymbolImport declarationIdentifier declarationAlias (getField record)
   _ -> Nothing
 
 referenceSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Maybe SymbolReference
@@ -95,12 +95,15 @@ instance ToJSON SymbolDeclaration where
 
 data SymbolImport = SymbolImport
   { importName :: T.Text
+  , importAlias :: T.Text
   , importSpan :: Span
   } deriving (Generic, Eq, Show)
 
 instance ToJSON SymbolImport where
   toJSON SymbolImport{..} = object [ "name" .= importName
-                                   , "span" .= importSpan ]
+                                   , "alias" .= importAlias
+                                   -- , "span" .= importSpan
+                                   ]
 
 data SymbolReference = SymbolReference
   { referenceName :: T.Text

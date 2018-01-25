@@ -30,7 +30,7 @@ import qualified Language.Markdown.Syntax as Markdown
 data Declaration
   = MethodDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationReceiver :: Maybe T.Text }
   | ClassDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
-  | ImportDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
+  | ImportDeclaration   { declarationIdentifier :: T.Text, declarationAlias :: T.Text,  declarationText :: T.Text, declarationLanguage :: Maybe Language }
   | FunctionDeclaration { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   | HeadingDeclaration  { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationLevel :: Int }
   | CallReference       { declarationIdentifier :: T.Text, declarationImportIdentifier :: Maybe T.Text }
@@ -121,9 +121,8 @@ instance CustomHasDeclaration Declaration.Class where
     where getSource = toText . flip Source.slice blobSource . getField
 
 instance CustomHasDeclaration Declaration.Import where
-  customToDeclaration blob@Blob{..} ann decl@(Declaration.Import (Term (In fromAnn _), _) _ _)
-    -- Imports
-    = Just $ ImportDeclaration (getSource fromAnn) (getImportSource blob (In ann decl)) blobLanguage
+  customToDeclaration blob@Blob{..} ann decl@(Declaration.Import (Term (In fromAnn _), _) (Term (In aliasAnn _), _) _)
+    = Just $ ImportDeclaration (getSource fromAnn) (getSource aliasAnn) (getImportSource blob (In ann decl)) blobLanguage
     where getSource = toText . flip Source.slice blobSource . getField
 
 instance CustomHasDeclaration Expression.Call where
