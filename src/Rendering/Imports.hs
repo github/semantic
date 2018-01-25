@@ -5,6 +5,7 @@ module Rendering.Imports
 ) where
 
 import Analysis.Declaration
+import Analysis.ModuleDef
 import Data.Aeson
 import Data.Aeson.Encode.Pretty
 import Data.Blob
@@ -34,26 +35,29 @@ instance Output ModuleSummary where
 instance ToJSON ModuleSummary where
   toJSON (ModuleSummary m) = object [ "modules" .= m ]
 
-renderToImports :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> ModuleSummary
-renderToImports blob term = ModuleSummary $ toMap (termToModules blob term)
+renderToImports :: (HasField fields (Maybe ModuleDef), HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> ModuleSummary
+renderToImports blob term = ModuleSummary $ toMap (termToModule blob term)
   where
-    toMap xs = Map.fromList (moduleToTuple <$> xs)
-    moduleToTuple m@Module{..} = (moduleName, m)
-    termToModules :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> [Module]
-    termToModules blob@Blob{..} term = case mapMaybe (moduleSummary blob declarations) declarations of
-        [] -> [makeModule defaultModuleName blob declarations]
-        xs -> xs
+    toMap m@Module{..} = Map.singleton moduleName m
+    termToModule :: (HasField fields (Maybe ModuleDef), HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> Module
+    termToModule blob@Blob{..} term = makeModule detectModuleName blob declarations
       where
         declarations = termTableOfContentsBy declaration term
         defaultModuleName = T.pack (takeBaseName blobPath)
+        detectModuleName = case termTableOfContentsBy moduleDef term of
+          x:_ | Just ModuleDef{..} <- getModuleDef x -> moduleDefIdentifier
+          _ -> defaultModuleName
 
 makeModule :: (HasField fields Span, HasField fields (Maybe Declaration)) => T.Text -> Blob -> [Record fields] -> Module
-makeModule name Blob{..} ds = Module name [(T.pack blobPath)] (T.pack . show <$> blobLanguage) (mapMaybe importSummary ds) (mapMaybe declarationSummary ds) (mapMaybe referenceSummary ds)
+makeModule name Blob{..} ds = Module name [T.pack blobPath] (T.pack . show <$> blobLanguage) (mapMaybe importSummary ds) (mapMaybe declarationSummary ds) (mapMaybe referenceSummary ds)
 
-moduleSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Blob -> [Record fields] -> Record fields -> Maybe Module
-moduleSummary blob declarations record = case getDeclaration record of
-  Just ModuleDeclaration{..} -> Just $ makeModule declarationIdentifier blob declarations
-  _ -> Nothing
+
+getModuleDef :: HasField fields (Maybe ModuleDef) => Record fields -> Maybe ModuleDef
+getModuleDef = getField
+
+-- | Produce the annotations of nodes representing moduleDefs.
+moduleDef :: HasField fields (Maybe ModuleDef) => TermF f (Record fields) a -> Maybe (Record fields)
+moduleDef (In annotation _) = annotation <$ getModuleDef annotation
 
 declarationSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Maybe SymbolDeclaration
 declarationSummary record = case getDeclaration record of
