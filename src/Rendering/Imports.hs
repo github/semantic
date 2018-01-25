@@ -1,14 +1,18 @@
 {-# LANGUAGE DataKinds, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Rendering.Imports
-( renderModuleTerms
-, renderToImports
+( renderToImports
+, ModuleSummary(..)
 ) where
 
 import Analysis.Declaration
 import Data.Aeson
+import Data.Aeson.Encode.Pretty
 import Data.Blob
+import Data.ByteString.Lazy (toStrict)
+import Data.Monoid
 import Data.Maybe (mapMaybe)
 import Data.Record
+import Data.Output
 import Data.Span
 import Data.Term
 import GHC.Generics
@@ -18,24 +22,33 @@ import qualified Data.Map as Map
 import Rendering.TOC (termTableOfContentsBy, declaration, getDeclaration, toCategoryName)
 
 
--- | Render terms to final JSON structure.
-renderModuleTerms :: [Value] -> Map.Map T.Text Value
-renderModuleTerms = Map.singleton "modules" . toJSON
+newtype ModuleSummary = ModuleSummary (Map.Map T.Text Module) deriving (Eq, Show)
 
--- | Render a 'Term' to a list of symbols (See 'Symbol').
-renderToImports :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> [Value]
-renderToImports blob term = toJSON <$> (termToModules blob term)
+instance Monoid ModuleSummary where
+  mempty = ModuleSummary mempty
+  mappend (ModuleSummary m1) (ModuleSummary m2) = ModuleSummary (Map.unionWith (<>) m1 m2)
+
+instance Output ModuleSummary where
+  toOutput = toStrict . (<> "\n") . encodePretty' defConfig { confCompare = compare, confIndent = Spaces 2 }
+
+instance ToJSON ModuleSummary where
+  toJSON (ModuleSummary m) = object [ "modules" .= m ]
+
+renderToImports :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> ModuleSummary
+renderToImports blob term = ModuleSummary $ toMap (termToModules blob term)
   where
+    toMap xs = Map.fromList (moduleToTuple <$> xs)
+    moduleToTuple m@Module{..} = (moduleName, m)
     termToModules :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> [Module]
     termToModules blob@Blob{..} term = case mapMaybe (moduleSummary blob declarations) declarations of
         [] -> [makeModule defaultModuleName blob declarations]
-        modules -> modules
+        xs -> xs
       where
         declarations = termTableOfContentsBy declaration term
         defaultModuleName = T.pack (takeBaseName blobPath)
 
 makeModule :: (HasField fields Span, HasField fields (Maybe Declaration)) => T.Text -> Blob -> [Record fields] -> Module
-makeModule name Blob{..} ds = Module name (T.pack blobPath) (T.pack . show <$> blobLanguage) (mapMaybe importSummary ds) (mapMaybe declarationSummary ds) (mapMaybe referenceSummary ds)
+makeModule name Blob{..} ds = Module name [(T.pack blobPath)] (T.pack . show <$> blobLanguage) (mapMaybe importSummary ds) (mapMaybe declarationSummary ds) (mapMaybe referenceSummary ds)
 
 moduleSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Blob -> [Record fields] -> Record fields -> Maybe Module
 moduleSummary blob declarations record = case getDeclaration record of
@@ -65,16 +78,20 @@ referenceSummary record = case getDeclaration record of
 
 data Module = Module
   { moduleName :: T.Text
-  , modulePath :: T.Text
+  , modulePaths :: [T.Text]
   , moduleLanguage :: Maybe T.Text
   , moduleImports :: [SymbolImport]
   , moduleDeclarations :: [SymbolDeclaration]
   , moduleReferences :: [SymbolReference]
   } deriving (Generic, Eq, Show)
 
+instance Monoid Module where
+  mempty = mempty
+  mappend (Module n1 p1 l1 i1 d1 r1) (Module _ p2 _ i2 d2 r2) = Module n1 (p1 <> p2) l1 (i1 <> i2) (d1 <> d2) (r1 <> r2)
+
 instance ToJSON Module where
   toJSON Module{..} = object [ "name" .= moduleName
-                             , "path" .= modulePath
+                             , "paths" .= modulePaths
                              , "langauge" .= moduleLanguage
                              , "imports" .= moduleImports
                              , "declarations" .= moduleDeclarations
@@ -90,7 +107,7 @@ data SymbolDeclaration = SymbolDeclaration
 instance ToJSON SymbolDeclaration where
   toJSON SymbolDeclaration{..} = object [ "name" .= declarationName
                                         , "kind" .= declarationKind
-                                        , "span" .= declarationSpan
+                                        -- , "span" .= declarationSpan
                                         ]
 
 data SymbolImport = SymbolImport

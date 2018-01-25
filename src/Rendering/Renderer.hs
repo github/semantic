@@ -13,7 +13,7 @@ module Rendering.Renderer
 , renderToCTerm
 , renderSymbolTerms
 , renderToSymbols
-, renderModuleTerms
+, ModuleSummary(..)
 , renderToImports
 , renderToTags
 , renderDOTDiff
@@ -58,7 +58,7 @@ data TermRenderer output where
   -- | Render to a list of symbols.
   SymbolsTermRenderer :: SymbolFields -> TermRenderer [Value]
   -- | Render to a list of modules that represent the import graph.
-  ImportsTermRenderer :: TermRenderer [Value]
+  ImportsTermRenderer :: TermRenderer ModuleSummary
   -- | Render to a 'ByteString' formatted as a DOT description of the term.
   DOTTermRenderer :: TermRenderer ByteString
 

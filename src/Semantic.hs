@@ -45,7 +45,6 @@ parseBlobs :: Output output => TermRenderer output -> [Blob] -> Task ByteString
 parseBlobs renderer blobs = toOutput' <$> distributeFoldMap (parseBlob renderer) blobs
   where toOutput' = case renderer of
           JSONTermRenderer -> toOutput . renderJSONTerms
-          ImportsTermRenderer -> toOutput . renderModuleTerms
           SymbolsTermRenderer _ -> toOutput . renderSymbolTerms
           _ -> toOutput
 
