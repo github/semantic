@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Rendering.Imports
 ( renderToImports
-, ModuleSummary(..)
+, ImportSummary(..)
 ) where
 
 import Analysis.Declaration
@@ -23,20 +23,20 @@ import qualified Data.Map as Map
 import Rendering.TOC (termTableOfContentsBy, declaration, getDeclaration, toCategoryName)
 
 
-newtype ModuleSummary = ModuleSummary (Map.Map T.Text Module) deriving (Eq, Show)
+newtype ImportSummary = ImportSummary (Map.Map T.Text Module) deriving (Eq, Show)
 
-instance Monoid ModuleSummary where
-  mempty = ModuleSummary mempty
-  mappend (ModuleSummary m1) (ModuleSummary m2) = ModuleSummary (Map.unionWith (<>) m1 m2)
+instance Monoid ImportSummary where
+  mempty = ImportSummary mempty
+  mappend (ImportSummary m1) (ImportSummary m2) = ImportSummary (Map.unionWith (<>) m1 m2)
 
-instance Output ModuleSummary where
+instance Output ImportSummary where
   toOutput = toStrict . (<> "\n") . encodePretty' defConfig { confCompare = compare, confIndent = Spaces 2 }
 
-instance ToJSON ModuleSummary where
-  toJSON (ModuleSummary m) = object [ "modules" .= m ]
+instance ToJSON ImportSummary where
+  toJSON (ImportSummary m) = object [ "modules" .= m ]
 
-renderToImports :: (HasField fields (Maybe ModuleDef), HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> ModuleSummary
-renderToImports blob term = ModuleSummary $ toMap (termToModule blob term)
+renderToImports :: (HasField fields (Maybe ModuleDef), HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> ImportSummary
+renderToImports blob term = ImportSummary $ toMap (termToModule blob term)
   where
     toMap m@Module{..} = Map.singleton moduleName m
     termToModule :: (HasField fields (Maybe ModuleDef), HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> Module
