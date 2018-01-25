@@ -121,8 +121,12 @@ instance CustomHasDeclaration Declaration.Class where
 
 instance CustomHasDeclaration Declaration.Import where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Import (Term (In fromAnn _), _) (Term (In aliasAnn _), _) _)
-    = Just $ ImportDeclaration (getSource fromAnn) (getSource aliasAnn) (getImportSource blob (In ann decl)) blobLanguage
-    where getSource = toText . flip Source.slice blobSource . getField
+    | blobLanguage == Just Go
+    , getSource aliasAnn == "" = let i = getSource fromAnn in Just $ ImportDeclaration i (goLangDefaultAlias i) (getImportSource blob (In ann decl)) blobLanguage
+    | otherwise = Just $ ImportDeclaration (getSource fromAnn) (getSource aliasAnn) (getImportSource blob (In ann decl)) blobLanguage
+    where
+      goLangDefaultAlias = last . T.splitOn "/"
+      getSource = T.dropAround (== '"') . toText . flip Source.slice blobSource . getField
 
 instance CustomHasDeclaration Expression.Call where
   customToDeclaration Blob{..} _ (Expression.Call _ (Term (In fromAnn fromF), _) _ _)
