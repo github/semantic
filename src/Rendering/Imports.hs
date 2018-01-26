@@ -12,6 +12,7 @@ import Data.Blob
 import Data.ByteString.Lazy (toStrict)
 import Data.Monoid
 import Data.Maybe (mapMaybe)
+import Data.Language as Language
 import Data.Record
 import Data.Output
 import Data.Span
@@ -72,8 +73,12 @@ declarationSummary record = case getDeclaration record of
 
 importSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Maybe ImportStatement
 importSummary record = case getDeclaration record of
+  Just ImportDeclaration{..} | Just Language.Go <- declarationLanguage
+                             , T.null declarationAlias -> Just $ ImportStatement declarationIdentifier (goLangDefaultAlias declarationIdentifier) (getField record)
   Just ImportDeclaration{..} -> Just $ ImportStatement declarationIdentifier declarationAlias (getField record)
   _ -> Nothing
+  where
+      goLangDefaultAlias = last . T.splitOn "/"
 
 referenceSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Maybe CallExpression
 referenceSummary record = case getDeclaration record of
