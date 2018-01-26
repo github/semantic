@@ -130,11 +130,12 @@ instance CustomHasDeclaration whole Declaration.Class where
 
 instance (Declaration.ImportSymbol :< fs) => CustomHasDeclaration (Union fs) Declaration.Import where
   customToDeclaration Blob{..} _ (Declaration.Import (Term (In fromAnn _), _) (Term (In aliasAnn _), _) symbols)
-    = Just $ ImportDeclaration name (getAlias (getSource aliasAnn)) (mapMaybe getSymbol symbols) blobLanguage
+    = Just $ ImportDeclaration name (getAlias blobLanguage (getSource aliasAnn)) (mapMaybe getSymbol symbols) blobLanguage
     where
       name = getSource fromAnn
-      getAlias alias | T.null alias = basename name
-                     | otherwise = alias
+      getAlias lang alias | Just Ruby <- lang, T.null alias = alias
+                          | T.null alias = basename name
+                          | otherwise = alias
       basename = last . T.splitOn "/"
       getSource = T.dropAround (`elem` ['"', '\'']) . toText . flip Source.slice blobSource . getField
       getSymbol (Term (In _ f), _) | Just (Declaration.ImportSymbol (Term (In nameAnn _)) (Term (In aliasAnn _))) <- prj f
