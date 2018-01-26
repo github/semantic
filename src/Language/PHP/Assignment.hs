@@ -538,7 +538,7 @@ foreachStatement = makeTerm <$> symbol ForeachStatement <*> children (forEachSta
   where forEachStatement' array value body = Statement.ForEach value array body
 
 pair :: Assignment
-pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> expression)
+pair = makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> (expression <|> list))
 
 jumpStatement :: Assignment
 jumpStatement = choice [
