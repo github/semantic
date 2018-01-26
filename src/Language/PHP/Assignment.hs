@@ -628,7 +628,7 @@ traitMemberDeclaration = choice [
   methodDeclaration,
   constructorDeclaration,
   destructorDeclaration,
-  makeTerm <$> location <*> someTerm traitUseClause
+  traitUseClause
   ]
 
 propertyDeclaration :: Assignment
@@ -661,7 +661,7 @@ classModifier :: Assignment
 classModifier = makeTerm <$> symbol ClassModifier <*> (Syntax.ClassModifier <$> source)
 
 traitUseClause :: Assignment
-traitUseClause = makeTerm <$> symbol TraitUseClause <*> children (Syntax.TraitUseClause <$> someTerm qualifiedName <*> traitUseSpecification)
+traitUseClause = makeTerm <$> symbol TraitUseClause <*> children (Syntax.TraitUseClause <$> someTerm qualifiedName <*> (traitUseSpecification <|> emptyTerm))
 
 traitUseSpecification :: Assignment
 traitUseSpecification = makeTerm <$> symbol TraitUseSpecification <*> children (Syntax.TraitUseSpecification <$> manyTerm traitSelectAndAliasClause)
