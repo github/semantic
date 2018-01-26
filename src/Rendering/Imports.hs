@@ -97,7 +97,7 @@ instance ToJSON Module where
   toJSON Module{..} = object
     [ "name" .= moduleName
     , "paths" .= modulePaths
-    , "langauge" .= moduleLanguage
+    , "language" .= moduleLanguage
     , "imports" .= moduleImports
     , "declarations" .= moduleDeclarations
     , "calls" .= moduleCalls
