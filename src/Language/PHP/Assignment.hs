@@ -344,7 +344,7 @@ evalIntrinsic :: Assignment
 evalIntrinsic = makeTerm <$> symbol EvalIntrinsic <*> children (Syntax.EvalIntrinsic <$> term expression)
 
 exitIntrinsic :: Assignment
-exitIntrinsic = makeTerm <$> symbol ExitIntrinsic <*> children (Syntax.ExitIntrinsic <$> term expression)
+exitIntrinsic = makeTerm <$> symbol ExitIntrinsic <*> children (Syntax.ExitIntrinsic <$> (term expression <|> emptyTerm))
 
 issetIntrinsic :: Assignment
 issetIntrinsic = makeTerm <$> symbol IssetIntrinsic <*> children (Syntax.IssetIntrinsic <$> (makeTerm <$> location <*> someTerm variable))
