@@ -74,8 +74,8 @@ declarationSummary record = case getDeclaration record of
 importSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Maybe ImportStatement
 importSummary record = case getDeclaration record of
   Just ImportDeclaration{..} | Just Language.Go <- declarationLanguage
-                             , T.null declarationAlias -> Just $ ImportStatement declarationIdentifier (goLangDefaultAlias declarationIdentifier) (getField record)
-  Just ImportDeclaration{..} -> Just $ ImportStatement declarationIdentifier declarationAlias (getField record)
+                             , T.null declarationAlias -> Just $ ImportStatement declarationIdentifier (goLangDefaultAlias declarationIdentifier) (uncurry ImportSymbol <$> declarationSymbols) (getField record)
+  Just ImportDeclaration{..} -> Just $ ImportStatement declarationIdentifier declarationAlias (uncurry ImportSymbol <$> declarationSymbols) (getField record)
   _ -> Nothing
   where
       goLangDefaultAlias = last . T.splitOn "/"
@@ -124,6 +124,7 @@ instance ToJSON SymbolDeclaration where
 data ImportStatement = ImportStatement
   { importName :: T.Text
   , importAlias :: T.Text
+  , importSymbols :: [ImportSymbol]
   , importSpan :: Span
   } deriving (Generic, Eq, Show)
 
@@ -131,7 +132,19 @@ instance ToJSON ImportStatement where
   toJSON ImportStatement{..} = object
     [ "name" .= importName
     , "alias" .= importAlias
+    , "symbols" .= importSymbols
     -- , "span" .= importSpan
+    ]
+
+data ImportSymbol = ImportSymbol
+  { importSymbolName :: T.Text
+  , importSymbolAlias :: T.Text
+  } deriving (Generic, Eq, Show)
+
+instance ToJSON ImportSymbol where
+  toJSON ImportSymbol{..} = object
+    [ "name" .= importSymbolName
+    , "alias" .= importSymbolAlias
     ]
 
 data CallExpression = CallExpression

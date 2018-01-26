@@ -14,6 +14,7 @@ import Data.Language as Language
 import Data.List.NonEmpty (nonEmpty)
 import Data.Proxy (Proxy(..))
 import Data.Range
+import Data.Maybe (mapMaybe)
 import Data.Record
 import Data.Source as Source
 import Data.Semigroup (sconcat)
@@ -31,7 +32,7 @@ import qualified Language.Markdown.Syntax as Markdown
 data Declaration
   = MethodDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationReceiver :: Maybe T.Text }
   | ClassDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
-  | ImportDeclaration   { declarationIdentifier :: T.Text, declarationAlias :: T.Text,  declarationText :: T.Text, declarationLanguage :: Maybe Language }
+  | ImportDeclaration   { declarationIdentifier :: T.Text, declarationAlias :: T.Text, declarationSymbols :: [(T.Text, T.Text)], declarationLanguage :: Maybe Language }
   | FunctionDeclaration { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   | HeadingDeclaration  { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationLevel :: Int }
   | CallReference       { declarationIdentifier :: T.Text, declarationImportIdentifier :: [T.Text] }
@@ -127,10 +128,13 @@ instance CustomHasDeclaration whole Declaration.Class where
     = Just $ ClassDeclaration (getSource identifierAnn) (getClassSource blob (In ann decl)) blobLanguage
     where getSource = toText . flip Source.slice blobSource . getField
 
-instance CustomHasDeclaration whole Declaration.Import where
-  customToDeclaration blob@Blob{..} ann decl@(Declaration.Import (Term (In fromAnn _), _) (Term (In aliasAnn _), _) _)
-    = Just $ ImportDeclaration (getSource fromAnn) (getSource aliasAnn) (getImportSource blob (In ann decl)) blobLanguage
+instance (Declaration.ImportSymbol :< fs) => CustomHasDeclaration (Union fs) Declaration.Import where
+  customToDeclaration Blob{..} _ (Declaration.Import (Term (In fromAnn _), _) (Term (In aliasAnn _), _) symbols)
+    = Just $ ImportDeclaration (getSource fromAnn) (getSource aliasAnn) (mapMaybe getSymbol symbols) blobLanguage
     where
+      getSymbol (Term (In _ f), _) | Just (Declaration.ImportSymbol (Term (In nameAnn _)) (Term (In aliasAnn _))) <- prj f
+                                   = Just (getSource nameAnn, getSource aliasAnn)
+                                   | otherwise = Nothing
       getSource = T.dropAround (== '"') . toText . flip Source.slice blobSource . getField
 
 instance (Expression.MemberAccess :< fs) => CustomHasDeclaration (Union fs) Expression.Call where
@@ -204,11 +208,4 @@ getClassSource Blob{..} (In a r)
   = let declRange = getField a
         bodyRange = getField <$> case r of
           Declaration.Class _ _ _ (Term (In a' _), _) -> Just a'
-    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
-
-getImportSource :: (HasField fields Range) => Blob -> TermF Declaration.Import (Record fields) (Term syntax (Record fields), a) -> T.Text
-getImportSource Blob{..} (In a r)
-  = let declRange = getField a
-        bodyRange = getField <$> case r of
-          Declaration.Import (Term (In a' _), _) _ _ -> Just a'
     in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange

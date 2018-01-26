@@ -31,6 +31,7 @@ type Syntax =
    , Declaration.Constructor
    , Declaration.Function
    , Declaration.Import
+   , Declaration.ImportSymbol
    , Declaration.Method
    , Declaration.MethodSignature
    , Declaration.Module

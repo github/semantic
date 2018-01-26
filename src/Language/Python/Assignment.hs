@@ -33,6 +33,7 @@ type Syntax =
    , Declaration.Decorator
    , Declaration.Function
    , Declaration.Import
+   , Declaration.ImportSymbol
    , Declaration.Variable
    , Expression.Arithmetic
    , Expression.Boolean

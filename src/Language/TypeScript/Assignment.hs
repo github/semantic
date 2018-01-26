@@ -39,6 +39,7 @@ type Syntax = '[
   , Declaration.VariableDeclaration
   , Declaration.TypeAlias
   , Declaration.Import
+  , Declaration.ImportSymbol
   , Declaration.Module
   , Expression.Arithmetic
   , Expression.Bitwise
