@@ -131,17 +131,17 @@ type Assignment = Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> ((\a b c -> a : b ++ [c]) <$> (text <|> emptyTerm) <*> manyTerm (statement <|> text) <*> (text <|> emptyTerm))) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> ((\a b c -> a : b ++ [c]) <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
 
 term :: Assignment -> Assignment
-term term = contextualize comment (postContextualize comment term)
+term term = contextualize (comment <|> text) (postContextualize (comment <|> text) term)
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
-manyTerm term = many (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
+manyTerm term = many (contextualize (comment <|> text) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> text) <*> emptyTerm))
 
 someTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
-someTerm term = some (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
+someTerm term = some (contextualize (comment <|> text) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> text) <*> emptyTerm))
 
 text :: Assignment
 text = makeTerm <$> (symbol Text <|> symbol TextInterpolation) <*> (Syntax.Text <$> source)
@@ -746,4 +746,4 @@ infixTerm :: Assignment
           -> Assignment
           -> [Assignment.Assignment [] Grammar (Term -> Term -> Data.Union.Union Syntax Term)]
           -> Assignment.Assignment [] Grammar (Data.Union.Union Syntax Term)
-infixTerm = infixContext comment
+infixTerm = infixContext (comment <|> text)
