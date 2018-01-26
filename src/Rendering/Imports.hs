@@ -117,7 +117,7 @@ instance ToJSON SymbolDeclaration where
     ]
 
 data ImportStatement = ImportStatement
-  { importName :: T.Text
+  { importPath :: T.Text
   , importAlias :: T.Text
   , importSymbols :: [ImportSymbol]
   , importSpan :: Span
@@ -125,7 +125,7 @@ data ImportStatement = ImportStatement
 
 instance ToJSON ImportStatement where
   toJSON ImportStatement{..} = object
-    [ "name" .= importName
+    [ "path" .= importPath
     , "alias" .= importAlias
     , "symbols" .= importSymbols
     -- , "span" .= importSpan

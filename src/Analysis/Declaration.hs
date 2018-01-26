@@ -130,12 +130,13 @@ instance CustomHasDeclaration whole Declaration.Class where
 
 instance (Declaration.ImportSymbol :< fs) => CustomHasDeclaration (Union fs) Declaration.Import where
   customToDeclaration Blob{..} _ (Declaration.Import (Term (In fromAnn _), _) (Term (In aliasAnn _), _) symbols)
-    | blobLanguage == Just Go
-    , T.null (getSource aliasAnn) = let i = getSource fromAnn in Just $ ImportDeclaration i (goLangDefaultAlias i) [] blobLanguage
-    | otherwise = Just $ ImportDeclaration (getSource fromAnn) (getSource aliasAnn) (mapMaybe getSymbol symbols) blobLanguage
+    = Just $ ImportDeclaration name (getAlias (getSource aliasAnn)) (mapMaybe getSymbol symbols) blobLanguage
     where
-      goLangDefaultAlias = last . T.splitOn "/"
-      getSource = T.dropAround (== '"') . toText . flip Source.slice blobSource . getField
+      name = getSource fromAnn
+      getAlias alias | T.null alias = basename name
+                     | otherwise = alias
+      basename = last . T.splitOn "/"
+      getSource = T.dropAround (`elem` ['"', '\'']) . toText . flip Source.slice blobSource . getField
       getSymbol (Term (In _ f), _) | Just (Declaration.ImportSymbol (Term (In nameAnn _)) (Term (In aliasAnn _))) <- prj f
                                    = Just (getSource nameAnn, getSource aliasAnn)
                                    | otherwise = Nothing
