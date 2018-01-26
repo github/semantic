@@ -146,7 +146,6 @@ someTerm term = some (contextualize (comment <|> text) term <|> makeTerm1 <$> (S
 text :: Assignment
 text = makeTerm <$> (symbol Text <|> symbol TextInterpolation) <*> (Syntax.Text <$> source)
 
-
 statement :: Assignment
 statement = handleError everything
   where
@@ -739,7 +738,7 @@ comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 string :: Assignment
-string = makeTerm <$> symbol Grammar.String <*> (Literal.TextElement <$> source)
+string = makeTerm <$> (symbol Grammar.String <|> symbol Heredoc) <*> (Literal.TextElement <$> source)
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: Assignment
