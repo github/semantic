@@ -30,8 +30,7 @@
       {+(Identifier)+})+}
     {+([])+})+}
   {-(Finally
-    {-(
-      {-(Identifier)-})-})-})
+    {-(Identifier)-})-})
   (Try
   { (Identifier)
   ->(Identifier) }
@@ -50,8 +49,7 @@
       {-(Identifier)-}
       {-(Identifier)-}
       {-(Empty)-})-}
-    {-(
-      {-(Identifier)-})-})-}
+    {-(Identifier)-})-}
   {-(Catch
     {-(
       {-(Identifier)-}
@@ -59,6 +57,5 @@
       {-(Identifier)-})-}
     {-([])-})-}
   {-(Catch
-    {-(
-      {-(Identifier)-})-}
+    {-(Identifier)-}
     {-([])-})-}))

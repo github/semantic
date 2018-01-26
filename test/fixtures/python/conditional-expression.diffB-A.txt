@@ -4,8 +4,7 @@
   {+(Call
     {+(Identifier)+}
     {+(Empty)+})+}
-  {+(
-    {+(Identifier)+})+})+}
+  {+(Identifier)+})+}
   (Assignment
   { (Identifier)
   ->(Identifier) }
@@ -14,15 +13,13 @@
     ->(Identifier) }
     { (Identifier)
     ->(Identifier) }
-      (
-      { (Identifier)
-      ->(Identifier) })))
+    { (Identifier)
+    ->(Identifier) }))
 {-(If
   {-(Identifier)-}
   {-(Call
     {-(Identifier)-}
     {-(Empty)-})-}
-  {-(
-    {-(Call
-      {-(Identifier)-}
-      {-(Empty)-})-})-})-})
+  {-(Call
+    {-(Identifier)-}
+    {-(Empty)-})-})-})

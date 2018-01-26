@@ -2,14 +2,10 @@
   (Comprehension
     (Identifier)
     (
-      (
-        (
-          (Identifier))
-        (Identifier))))
+      (Identifier)
+      (Identifier)))
   (Comprehension
     (Identifier)
     (
-      (
-        (
-          (Identifier))
-        (Identifier)))))
+      (Identifier)
+      (Identifier))))

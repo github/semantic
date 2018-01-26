@@ -5,17 +5,13 @@
       (Identifier))
     (
       (
-        (
-          (Identifier))
+        (Identifier)
         (Identifier))
-      (
-        (Identifier))))
+      (Identifier)))
   (Comprehension
     (KeyValue
       (Identifier)
       (Integer))
     (
-      (
-        (
-          (Identifier))
-        (Identifier)))))
+      (Identifier)
+      (Identifier))))
