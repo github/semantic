@@ -77,7 +77,7 @@ importSummary record = case getDeclaration record of
 
 referenceSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Maybe CallExpression
 referenceSummary record = case getDeclaration record of
-  Just decl@CallReference{..} -> Just  $ CallExpression declarationIdentifier declarationImportIdentifier (toCategoryName decl) (getField record)
+  Just CallReference{..} -> Just  $ CallExpression declarationIdentifier declarationImportIdentifier (getField record)
   _ -> Nothing
 
 data Module = Module
@@ -143,18 +143,16 @@ instance ToJSON ImportSymbol where
     ]
 
 data CallExpression = CallExpression
-  { referenceName :: T.Text
-  , referenceTarget :: [T.Text]
-  , referenceKind :: T.Text
-  , referenceSpan :: Span
+  { callSymbol :: T.Text
+  , callTargets :: [T.Text]
+  , callSpan :: Span
   } deriving (Generic, Eq, Show)
 
 instance ToJSON CallExpression where
   toJSON CallExpression{..} = objectWithoutNulls
-    [ "name" .= referenceName
-    , "targets" .= referenceTarget
-    , "kind" .= referenceKind
-    -- , "span" .= referenceSpan
+    [ "symbol" .= callSymbol
+    , "targets" .= callTargets
+    -- , "span" .= callSpan
     ]
 
 objectWithoutNulls :: [(T.Text, Value)] -> Value
