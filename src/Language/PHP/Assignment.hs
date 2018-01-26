@@ -494,7 +494,7 @@ selectionStatement :: Assignment
 selectionStatement = ifStatement <|> switchStatement
 
 ifStatement :: Assignment
-ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> expression <*> (makeTerm <$> location <*> someTerm statement) <*> (makeTerm <$> location <*> ((\as b -> as ++ [b]) <$> manyTerm elseIfClause <*> (term elseClause <|> emptyTerm))))
+ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> term expression <*> (makeTerm <$> location <*> someTerm statement) <*> (makeTerm <$> location <*> ((\as b -> as ++ [b]) <$> manyTerm elseIfClause <*> (term elseClause <|> emptyTerm))))
 
 switchStatement :: Assignment
 switchStatement = makeTerm <$> symbol SwitchStatement <*> children (Statement.Match <$> term expression <*> (makeTerm <$> location <*> manyTerm (caseStatement <|> defaultStatement)))
