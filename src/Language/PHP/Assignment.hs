@@ -275,7 +275,7 @@ classConstantAccessExpression :: Assignment
 classConstantAccessExpression = makeTerm <$> symbol ClassConstantAccessExpression <*> children (Expression.MemberAccess <$> term scopeResolutionQualifier <*> term name)
 
 variable :: Assignment
-variable = callableVariable <|> scopedPropertyAccessExpression <|> memberAccessExpression
+variable = callableVariable <|> scopedPropertyAccessExpression <|> memberAccessExpression <|> castExpression
 
 callableVariable :: Assignment
 callableVariable = choice [
@@ -478,7 +478,7 @@ unaryOpExpression = symbol UnaryOpExpression >>= \ loc ->
   <|> makeTerm loc . Syntax.ErrorControl <$> children (symbol AnonAt *> term expression)
 
 castExpression :: Assignment
-castExpression = makeTerm <$> symbol CastExpression <*> children (flip Expression.Cast <$> term castType <*> term unaryExpression)
+castExpression = makeTerm <$> (symbol CastExpression <|> symbol CastExpression') <*> children (flip Expression.Cast <$> term castType <*> term unaryExpression)
 
 castType :: Assignment
 castType = makeTerm <$> symbol CastType <*> (Syntax.CastType <$> source)
