@@ -133,8 +133,8 @@ instance (Declaration.ImportSymbol :< fs) => CustomHasDeclaration (Union fs) Dec
     = Just $ ImportDeclaration name (getAlias blobLanguage (getSource aliasAnn)) (mapMaybe getSymbol symbols) blobLanguage
     where
       name = getSource fromAnn
-      getAlias lang alias | Just Ruby <- lang, T.null alias = alias
-                          | T.null alias = basename name
+      getAlias lang alias | Just TypeScript <- lang, T.null alias = basename name
+                          | Just Go <- lang, T.null alias = basename name
                           | otherwise = alias
       basename = last . T.splitOn "/"
       getSource = T.dropAround (`elem` ['"', '\'']) . toText . flip Source.slice blobSource . getField
