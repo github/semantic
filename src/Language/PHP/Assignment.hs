@@ -664,10 +664,10 @@ traitSelectAndAliasClause :: Assignment
 traitSelectAndAliasClause = traitSelectInsteadOfClause <|> traitAliasAsClause
 
 traitSelectInsteadOfClause :: Assignment
-traitSelectInsteadOfClause = makeTerm <$> symbol TraitSelectInsteadOfClause <*> children (Syntax.InsteadOf <$> term name <*> term name)
+traitSelectInsteadOfClause = makeTerm <$> symbol TraitSelectInsteadOfClause <*> children (Syntax.InsteadOf <$> term (classConstantAccessExpression <|> name) <*> term name)
 
 traitAliasAsClause :: Assignment
-traitAliasAsClause = makeTerm <$> symbol TraitAliasAsClause <*> children (Syntax.AliasAs <$> term name <*> (term visibilityModifier <|> emptyTerm) <*> (term name <|> emptyTerm))
+traitAliasAsClause = makeTerm <$> symbol TraitAliasAsClause <*> children (Syntax.AliasAs <$> term (classConstantAccessExpression <|> name) <*> (term visibilityModifier <|> emptyTerm) <*> (term name <|> emptyTerm))
 
 namespaceDefinition :: Assignment
 namespaceDefinition = makeTerm <$> symbol NamespaceDefinition <*> children (Syntax.Namespace <$> (term name <|> emptyTerm) <*> (term compoundStatement <|> emptyTerm))
