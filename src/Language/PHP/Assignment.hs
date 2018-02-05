@@ -144,7 +144,7 @@ someTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
 someTerm term = some (contextualize (comment <|> text) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> text) <*> emptyTerm))
 
 text :: Assignment
-text = makeTerm <$> (symbol Text <|> symbol TextInterpolation) <*> (Syntax.Text <$> source)
+text = makeTerm <$> (symbol TextInterpolation <|> symbol Text) <*> (Syntax.Text <$> source)
 
 statement :: Assignment
 statement = handleError everything
@@ -493,7 +493,7 @@ selectionStatement :: Assignment
 selectionStatement = ifStatement <|> switchStatement
 
 ifStatement :: Assignment
-ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> term expression <*> (makeTerm <$> location <*> someTerm statement) <*> (makeTerm <$> location <*> ((\as b -> as ++ [b]) <$> manyTerm elseIfClause <*> (term elseClause <|> emptyTerm))))
+ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> term expression <*> (makeTerm <$> location <*> manyTerm statement) <*> (makeTerm <$> location <*> ((\as b -> as ++ [b]) <$> manyTerm elseIfClause <*> (term elseClause <|> emptyTerm))))
 
 switchStatement :: Assignment
 switchStatement = makeTerm <$> symbol SwitchStatement <*> children (Statement.Match <$> term expression <*> (makeTerm <$> location <*> manyTerm (caseStatement <|> defaultStatement)))
@@ -699,7 +699,7 @@ simpleVariable :: Assignment
 simpleVariable = makeTerm <$> symbol SimpleVariable <*> children (Syntax.SimpleVariable <$> term (simpleVariable' <|> expression))
 
 simpleVariable' :: Assignment
-simpleVariable' = simpleVariable <|> variableName
+simpleVariable' = choice [simpleVariable, variableName]
 
 
 yieldExpression :: Assignment
