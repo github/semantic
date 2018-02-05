@@ -532,7 +532,7 @@ forStatement :: Assignment
 forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.For <$> (term expressions <|> emptyTerm) <*> (term expressions <|> emptyTerm) <*> (term expressions <|> emptyTerm) <*> (statement <|> (makeTerm <$> location <*> manyTerm statement)))
 
 foreachStatement :: Assignment
-foreachStatement = makeTerm <$> symbol ForeachStatement <*> children (forEachStatement' <$> term expression <*> term (pair <|> expression <|> list) <*> (makeTerm <$> location <*> someTerm statement))
+foreachStatement = makeTerm <$> symbol ForeachStatement <*> children (forEachStatement' <$> term expression <*> term (pair <|> expression <|> list) <*> (makeTerm <$> location <*> manyTerm statement))
   where forEachStatement' array value body = Statement.ForEach value array body
 
 pair :: Assignment
