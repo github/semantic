@@ -106,6 +106,7 @@ type Syntax = '[
   , Syntax.Echo
   , Syntax.Unset
   , Syntax.Declare
+  , Syntax.DeclareDirective
   , Statement.Finally
   , Statement.Catch
   , Statement.Try
@@ -576,11 +577,12 @@ finallyClause :: Assignment
 finallyClause = makeTerm <$> symbol FinallyClause <*> children (Statement.Finally <$> term compoundStatement)
 
 declareStatement :: Assignment
-declareStatement = makeTerm <$> symbol DeclareStatement <*> children (Syntax.Declare <$> (term (declareDirective <|> statement <|> (makeTerm <$> location <*> manyTerm statement)) <|> emptyTerm))
+declareStatement = makeTerm <$> symbol DeclareStatement <*> children (Syntax.Declare <$> term declareDirective <*> (makeTerm <$> location <*> manyTerm statement))
+
 
 -- | TODO: Figure out how to parse assignment token
 declareDirective :: Assignment
-declareDirective = emptyTerm
+declareDirective = makeTerm <$> symbol DeclareDirective <*> children (Syntax.DeclareDirective <$> literal)
 
 
 echoStatement :: Assignment

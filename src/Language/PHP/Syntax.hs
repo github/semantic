@@ -376,12 +376,19 @@ instance Eq1 Unset where liftEq = genericLiftEq
 instance Ord1 Unset where liftCompare = genericLiftCompare
 instance Show1 Unset where liftShowsPrec = genericLiftShowsPrec
 
-newtype Declare a = Declare a
+data Declare a = Declare a a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Declare where liftEq = genericLiftEq
 instance Ord1 Declare where liftCompare = genericLiftCompare
 instance Show1 Declare where liftShowsPrec = genericLiftShowsPrec
+
+data DeclareDirective a = DeclareDirective a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 DeclareDirective where liftEq = genericLiftEq
+instance Ord1 DeclareDirective where liftCompare = genericLiftCompare
+instance Show1 DeclareDirective where liftShowsPrec = genericLiftShowsPrec
 
 data LabeledStatement a = LabeledStatement { _labeledStatementIdentifier :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
