@@ -4,14 +4,12 @@
     (If
       (Identifier)
       (Identifier)
-      (
-        (Identifier))))
+      (Identifier)))
   (If
     (Identifier)
     (Call
       (Identifier)
       (Empty))
-    (
-      (Call
-        (Identifier)
-        (Empty)))))
+    (Call
+      (Identifier)
+      (Empty))))

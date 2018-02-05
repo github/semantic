@@ -20,15 +20,13 @@
             {+(Identifier)+}
             {+(Identifier)+}
             {+(Empty)+})+})+})+})+})+}
-  {+(
-    {+(Call
-      {+(Identifier)+}
-      {+(Identifier)+}
-      {+(Empty)+})+})+})+}
+  {+(Call
+    {+(Identifier)+}
+    {+(Identifier)+}
+    {+(Empty)+})+})+}
   (ForEach
-    (
-    { (Identifier)
-    ->(Identifier) })
+  { (Identifier)
+  ->(Identifier) }
     (Array
       (Tuple
         (Integer))
@@ -60,8 +58,7 @@
             {-(Identifier)-}
             {-(Identifier)-}
             {-(Empty)-})-})-})-})-})-}
-  {-(
-    {-(Call
-      {-(Identifier)-}
-      {-(Identifier)-}
-      {-(Empty)-})-})-})-})
+  {-(Call
+    {-(Identifier)-}
+    {-(Identifier)-}
+    {-(Empty)-})-})-})

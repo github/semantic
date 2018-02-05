@@ -3,8 +3,7 @@
     (Annotation
       (Function
         (Identifier)
-        (
-          (Identifier)))
+        (Identifier))
       (Empty))
     (Identifier))
   (Annotation
@@ -13,8 +12,7 @@
         (Identifier)
         (Identifier)
         (Identifier)
-        (
-          (Identifier)))
+        (Identifier))
       (Empty))
     (Identifier))
   (Annotation
@@ -22,7 +20,6 @@
       (Function
         (Identifier)
         (Identifier)
-        (
-          (Identifier)))
+        (Identifier))
       (Empty))
     (Identifier)))

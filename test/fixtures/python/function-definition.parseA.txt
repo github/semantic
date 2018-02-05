@@ -2,23 +2,20 @@
   (Annotation
     (Function
       (Identifier)
-      (
-        (Identifier)))
+      (Identifier))
     (Empty))
   (Annotation
     (Function
       (Identifier)
       (Identifier)
-      (
-        (Identifier)))
+      (Identifier))
     (Empty))
   (Annotation
     (Function
       (Identifier)
       (Identifier)
       (Identifier)
-      (
-        (Identifier)))
+      (Identifier))
     (Empty))
   (Annotation
     (Function
@@ -26,8 +23,7 @@
       (Assignment
         (Identifier)
         (Identifier))
-      (
-        (Identifier)))
+      (Identifier))
     (Empty))
   (Annotation
     (Function
@@ -38,6 +34,5 @@
           (TextElement))
         (Identifier))
       (Identifier)
-      (
-        (Identifier)))
+      (Identifier))
     (Empty)))

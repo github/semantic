@@ -3,21 +3,17 @@
   { (Identifier)
   ->(Identifier) }
     (
-      (
-        (
-        { (Identifier)
-        ->(Identifier) })
-      { (Identifier)
-      ->(Identifier) })))
+    { (Identifier)
+    ->(Identifier) }
+    { (Identifier)
+    ->(Identifier) }))
   (Comprehension
   { (Identifier)
   ->(Plus
     {+(Identifier)+}
     {+(Integer)+}) }
     (
-      (
-        (
-        { (Identifier)
-        ->(Identifier) })
-      { (Identifier)
-      ->(Identifier) }))))
+    { (Identifier)
+    ->(Identifier) }
+    { (Identifier)
+    ->(Identifier) })))
