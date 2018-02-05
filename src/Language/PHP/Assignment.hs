@@ -729,7 +729,7 @@ name :: Assignment
 name = makeTerm <$> (symbol Name <|> symbol Name') <*> (Syntax.Identifier <$> source)
 
 functionStaticDeclaration :: Assignment
-functionStaticDeclaration = makeTerm <$> symbol FunctionStaticDeclaration <*> children (Declaration.VariableDeclaration . pure <$> term staticVariableDeclaration)
+functionStaticDeclaration = makeTerm <$> symbol FunctionStaticDeclaration <*> children (Declaration.VariableDeclaration <$> manyTerm staticVariableDeclaration)
 
 staticVariableDeclaration :: Assignment
 staticVariableDeclaration = makeTerm <$> symbol StaticVariableDeclaration <*> children (Statement.Assignment <$> pure [] <*> term variableName <*> (term expression <|> emptyTerm))
