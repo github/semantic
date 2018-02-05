@@ -204,6 +204,7 @@ augmentedAssignmentExpression :: Assignment
 augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpression <*> children (infixTerm variable (term expression) [
   assign Expression.Power <$ symbol AnonStarStarEqual
   , assign Expression.Times <$ symbol AnonStarEqual
+  , assign Expression.Modulo <$ symbol AnonPercentEqual
   , assign Expression.DividedBy <$ symbol AnonSlashEqual
   , assign Expression.Plus <$ symbol AnonPlusEqual
   , assign Expression.Minus <$ symbol AnonMinusEqual
