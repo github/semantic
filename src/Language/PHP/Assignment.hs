@@ -508,7 +508,7 @@ elseIfClause :: Assignment
 elseIfClause = makeTerm <$> symbol ElseIfClause <*> children (Statement.Else <$> term expression <*> term statement)
 
 elseClause :: Assignment
-elseClause = makeTerm <$> symbol ElseClause <*> children (Statement.Else <$> emptyTerm <*> term statement)
+elseClause = makeTerm <$> symbol ElseClause <*> children (Statement.Else <$> emptyTerm <*> (makeTerm <$> location <*> manyTerm statement))
 
 iterationStatement :: Assignment
 iterationStatement = choice [
