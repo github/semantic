@@ -134,17 +134,20 @@ assignment :: Assignment
 assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> ((\a b c -> a : b ++ [c]) <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
 
 term :: Assignment -> Assignment
-term term = contextualize (comment <|> text) (postContextualize (comment <|> text) term)
+term term = contextualize (comment <|> textInterpolation) (postContextualize (comment <|> textInterpolation) term)
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
-manyTerm term = many (contextualize (comment <|> text) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> text) <*> emptyTerm))
+manyTerm term = many (contextualize (comment <|> textInterpolation) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> textInterpolation) <*> emptyTerm))
 
 someTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
-someTerm term = some (contextualize (comment <|> text) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> text) <*> emptyTerm))
+someTerm term = some (contextualize (comment <|> textInterpolation) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> textInterpolation) <*> emptyTerm))
 
 text :: Assignment
-text = makeTerm <$> (symbol TextInterpolation <|> symbol Text) <*> (Syntax.Text <$> source)
+text = makeTerm <$> symbol Text <*> (Syntax.Text <$> source)
+
+textInterpolation :: Assignment
+textInterpolation = makeTerm <$> symbol TextInterpolation <*> (Syntax.Text <$> source)
 
 statement :: Assignment
 statement = handleError everything
@@ -528,7 +531,7 @@ forStatement :: Assignment
 forStatement = makeTerm <$> symbol ForStatement <*> children (Statement.For <$> (term expressions <|> emptyTerm) <*> (term expressions <|> emptyTerm) <*> (term expressions <|> emptyTerm) <*> (statement <|> (makeTerm <$> location <*> manyTerm statement)))
 
 foreachStatement :: Assignment
-foreachStatement = makeTerm <$> symbol ForeachStatement <*> children (forEachStatement' <$> term expression <*> term (pair <|> expression <|> list) <*> (term (statement <|> (makeTerm <$> location <*> someTerm statement)) <|> emptyTerm))
+foreachStatement = makeTerm <$> symbol ForeachStatement <*> children (forEachStatement' <$> term expression <*> term (pair <|> expression <|> list) <*> (makeTerm <$> location <*> someTerm statement))
   where forEachStatement' array value body = Statement.ForEach value array body
 
 pair :: Assignment
@@ -745,4 +748,4 @@ infixTerm :: Assignment
           -> Assignment
           -> [Assignment.Assignment [] Grammar (Term -> Term -> Data.Union.Union Syntax Term)]
           -> Assignment.Assignment [] Grammar (Data.Union.Union Syntax Term)
-infixTerm = infixContext (comment <|> text)
+infixTerm = infixContext (comment <|> textInterpolation)
