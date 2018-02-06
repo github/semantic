@@ -130,7 +130,7 @@ type Syntax = '[
 type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar Term
 
--- | Assignment from AST in TypeScript’s grammar onto a program in TypeScript’s syntax.
+-- | Assignment from AST in PHP's grammar onto a program in PHP's syntax.
 assignment :: Assignment
 assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> ((\a b c -> a : b ++ [c]) <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
 
