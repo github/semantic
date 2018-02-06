@@ -465,7 +465,7 @@ updateExpression :: Assignment
 updateExpression = makeTerm <$> symbol UpdateExpression <*> children (Syntax.Update <$> term expression)
 
 shellCommandExpression :: Assignment
-shellCommandExpression = makeTerm <$> symbol ShellCommandExpression <*> children (Syntax.ShellCommand <$> source)
+shellCommandExpression = makeTerm <$> symbol ShellCommandExpression <*> (Syntax.ShellCommand <$> source)
 
 literal :: Assignment
 literal = integer <|> float <|> string
