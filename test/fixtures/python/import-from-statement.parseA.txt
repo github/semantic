@@ -3,22 +3,16 @@
     (ScopeResolution
       (Identifier))
     (Empty)
-    (ImportSymbol
-      (ScopeResolution
-        (Identifier))
-      (Empty)))
+    (ScopeResolution
+      (Identifier)))
   (Import
     (ScopeResolution
       (Identifier))
     (Empty)
-    (ImportSymbol
-      (ScopeResolution
-        (Identifier))
-      (Empty))
-    (ImportSymbol
-      (ScopeResolution
-        (Identifier))
-      (Empty)))
+    (ScopeResolution
+      (Identifier))
+    (ScopeResolution
+      (Identifier)))
   (Import
     (ScopeResolution
       (Identifier))

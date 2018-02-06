@@ -372,15 +372,14 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 import' :: Assignment
 import' =  makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliasedImport <|> plainImport))
-       -- <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> expression <*> emptyTerm <*> (pure <$> (wildCard <|> expressions)))
-       <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> expression <*> emptyTerm <*> ((pure <$> wildCard <|> importSymbols)))
+       <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> expression <*> emptyTerm <*> someTerm (wildCard <|> dottedName <|> aliasedSymbol <|> importSymbol))
   where
-    importSymbols = many (makeTerm <$> location <*> (Declaration.ImportSymbol <$> expression <*> emptyTerm))
-    -- importSymbols = makeTerm'' <$> location <*> fmap (\e -> Declaration.ImportSymbol e emptyTerm) (manyTerm expression)
-    -- expressions = makeTerm'' <$> location <*> manyTerm expression
+    importSymbol = makeTerm <$> location <*> (Declaration.ImportSymbol <$> expression <*> emptyTerm)
+    aliasedSymbol = makeTerm <$> symbol AliasedImport <*> children (Declaration.ImportSymbol <$> expression <*> expression)
+    wildCard = makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
+
     aliasedImport = makeTerm <$> symbol AliasedImport <*> children (Declaration.Import <$> expression <*> expression <*> pure [])
     plainImport = makeTerm <$> symbol DottedName <*> children (Declaration.Import <$> expression <*> emptyTerm <*> pure [])
-    wildCard = makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
 
 assertStatement :: Assignment
 assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> manyTerm expression <*> emptyTerm)
