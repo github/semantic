@@ -199,7 +199,7 @@ unaryExpression = choice [
   ]
 
 assignmentExpression :: Assignment
-assignmentExpression = makeTerm <$> symbol AssignmentExpression <*> children (Statement.Assignment [] <$> term (variable <|> list) <*> term (expression <|> variable))
+assignmentExpression = makeTerm <$> symbol AssignmentExpression <*> children (Statement.Assignment [] <$> term (variable <|> list <|> arrayCreationExpression) <*> term (expression <|> variable))
 
 augmentedAssignmentExpression :: Assignment
 augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpression <*> children (infixTerm variable (term expression) [
