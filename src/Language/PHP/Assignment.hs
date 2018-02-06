@@ -676,7 +676,7 @@ traitAliasAsClause :: Assignment
 traitAliasAsClause = makeTerm <$> symbol TraitAliasAsClause <*> children (Syntax.AliasAs <$> term (classConstantAccessExpression <|> name) <*> (term visibilityModifier <|> emptyTerm) <*> (term name <|> emptyTerm))
 
 namespaceDefinition :: Assignment
-namespaceDefinition = makeTerm <$> symbol NamespaceDefinition <*> children (Syntax.Namespace <$> (term name <|> emptyTerm) <*> (term compoundStatement <|> emptyTerm))
+namespaceDefinition = makeTerm <$> symbol NamespaceDefinition <*> children (Syntax.Namespace <$> (term namespaceName <|> emptyTerm) <*> (term compoundStatement <|> emptyTerm))
 
 namespaceUseDeclaration :: Assignment
 namespaceUseDeclaration = makeTerm <$> symbol NamespaceUseDeclaration <*> children (Syntax.NamespaceUseDeclaration <$>
