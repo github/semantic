@@ -7,7 +7,6 @@ module Rendering.Imports
 import Analysis.Declaration
 import Analysis.ModuleDef
 import Data.Aeson
-import Data.Aeson.Encode.Pretty
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
 import Data.Monoid
@@ -30,7 +29,7 @@ instance Monoid ImportSummary where
   mappend (ImportSummary m1) (ImportSummary m2) = ImportSummary (Map.unionWith (<>) m1 m2)
 
 instance Output ImportSummary where
-  toOutput = toStrict . (<> "\n") . encodePretty' defConfig { confCompare = compare, confIndent = Spaces 2 }
+  toOutput = toStrict . (<> "\n") . encode
 
 instance ToJSON ImportSummary where
   toJSON (ImportSummary m) = object [ "modules" .= m ]
@@ -113,7 +112,7 @@ instance ToJSON SymbolDeclaration where
   toJSON SymbolDeclaration{..} = object
     [ "name" .= declarationName
     , "kind" .= declarationKind
-    -- , "span" .= declarationSpan
+    , "span" .= declarationSpan
     ]
 
 data ImportStatement = ImportStatement
@@ -128,7 +127,7 @@ instance ToJSON ImportStatement where
     [ "path" .= importPath
     , "alias" .= importAlias
     , "symbols" .= importSymbols
-    -- , "span" .= importSpan
+    , "span" .= importSpan
     ]
 
 data ImportSymbol = ImportSymbol
@@ -152,7 +151,7 @@ instance ToJSON CallExpression where
   toJSON CallExpression{..} = objectWithoutNulls
     [ "symbol" .= callSymbol
     , "targets" .= callTargets
-    -- , "span" .= callSpan
+    , "span" .= callSpan
     ]
 
 objectWithoutNulls :: [(T.Text, Value)] -> Value
