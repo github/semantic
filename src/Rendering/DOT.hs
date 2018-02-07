@@ -6,7 +6,6 @@ module Rendering.DOT
 
 import Analysis.ConstructorName
 import Control.Applicative
-import Data.Bifunctor.Join (Join(..))
 import Data.Blob
 import qualified Data.ByteString.Char8 as B
 import Data.Diff
@@ -16,9 +15,8 @@ import qualified Data.Map as Map
 import Data.Patch
 import Data.Semigroup
 import Data.Term
-import Data.These (These)
 
-renderDOTDiff :: (ConstructorName syntax, Foldable syntax, Functor syntax) => Join These Blob -> Diff syntax ann1 ann2 -> B.ByteString
+renderDOTDiff :: (ConstructorName syntax, Foldable syntax, Functor syntax) => BlobPair -> Diff syntax ann1 ann2 -> B.ByteString
 renderDOTDiff blobs diff = renderGraph (snd (cata diffAlgebra diff 0)) { graphName = Just (B.pack (pathKeyForBlobPair blobs)) }
 
 renderDOTTerm :: (ConstructorName syntax, Foldable syntax, Functor syntax) => Blob -> Term syntax ann -> B.ByteString
