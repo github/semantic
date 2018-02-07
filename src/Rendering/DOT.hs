@@ -33,7 +33,10 @@ diffAlgebra d i as = case d of
                            in  r1 <> termAlgebra t2 (succ (maximum (i : toList (stateGraph r1)))) ("color" := "green" : as)
 
 termAlgebra :: (ConstructorName syntax, Foldable syntax) => TermF syntax ann (Int -> [Attribute B.ByteString] -> State) -> Int -> [Attribute B.ByteString] -> State
-termAlgebra t i defaultAttrs = State root (root `connect` stateRoots combined `overlay` (stateGraph combined)) (IntMap.insert (succ i) ("label" := unConstructorLabel (constructorLabel t) : defaultAttrs) (stateVertexAttributes combined))
+termAlgebra t i defaultAttrs = State
+  root
+  (root `connect` stateRoots combined `overlay` (stateGraph combined))
+  (IntMap.insert (succ i) ("label" := unConstructorLabel (constructorLabel t) : defaultAttrs) (stateVertexAttributes combined))
   where root = vertex (succ i)
         combined = foldr combine (State empty root mempty) t
         combine makeSubgraph rest = makeSubgraph (maximum (stateGraph rest)) defaultAttrs <> rest
