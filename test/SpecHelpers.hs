@@ -52,10 +52,6 @@ newtype Verbatim = Verbatim B.ByteString
 instance Show Verbatim where
   show (Verbatim x) = show x
 
--- instance Show Verbatim where
-  -- showsPrec _ (Verbatim byteString) = ('\n':) . (T.unpack (decodeUtf8 byteString) ++)
-  -- showsPrec _ (Verbatim byteString) = (T.unpack (decodeUtf8 byteString) ++)
-
 verbatim :: B.ByteString -> Verbatim
 verbatim = Verbatim . stripWhitespace
   where
