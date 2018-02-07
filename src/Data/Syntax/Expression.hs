@@ -105,6 +105,7 @@ data Boolean a
   = Or !a !a
   | And !a !a
   | Not !a
+  | XOr !a !a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Boolean where liftEq = genericLiftEq
@@ -270,7 +271,7 @@ instance (MonadFail m) => Eval t v m Await
 
 
 -- | An object constructor call in Javascript, Java, etc.
-newtype New a = New { newSubject :: a }
+newtype New a = New { newSubject :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 New where liftEq = genericLiftEq
