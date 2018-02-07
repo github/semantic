@@ -44,7 +44,7 @@ languageForFilePath = languageForType . takeExtension
 
 
 readFileVerbatim :: FilePath -> IO Verbatim
-readFileVerbatim path = verbatim <$> B.readFile "test/fixtures/ruby/import-graph/app.json"
+readFileVerbatim = fmap verbatim . B.readFile
 
 newtype Verbatim = Verbatim B.ByteString
   deriving (Eq)
