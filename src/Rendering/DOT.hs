@@ -38,8 +38,8 @@ termAlgebra t i defaultAttrs = State
   (root `connect` stateRoots combined `overlay` (stateGraph combined))
   (IntMap.insert (succ i) ("label" := unConstructorLabel (constructorLabel t) : defaultAttrs) (stateVertexAttributes combined))
   where root = vertex (succ i)
-        combined = foldr combine (State empty root mempty) t
-        combine makeSubgraph rest = makeSubgraph (maximum (stateGraph rest)) defaultAttrs <> rest
+        combined = foldl' combine (State empty root mempty) t
+        combine prev makeSubgraph = prev <> makeSubgraph (maximum (stateGraph prev)) defaultAttrs
 
 
 data State = State { stateRoots :: Graph Int, stateGraph :: Graph Int, stateVertexAttributes :: IntMap.IntMap [Attribute B.ByteString] }
