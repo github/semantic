@@ -29,8 +29,8 @@ diffAlgebra d i as = case d of
   Merge t               -> termAlgebra t  i as
   Patch (Delete  t1)    -> termAlgebra t1 i ("color" := "red"   : as)
   Patch (Insert     t2) -> termAlgebra t2 i ("color" := "green" : as)
-  Patch (Replace t1 t2) -> let r1 =  termAlgebra t1 i                                             ("color" := "red"   : as)
-                           in  r1 <> termAlgebra t2 (succ (maximum (i : toList (stateGraph r1)))) ("color" := "green" : as)
+  Patch (Replace t1 t2) -> let r1 =  termAlgebra t1 i                         ("color" := "red"   : as)
+                           in  r1 <> termAlgebra t2 (maximum (stateGraph r1)) ("color" := "green" : as)
 
 termAlgebra :: (ConstructorName syntax, Foldable syntax) => TermF syntax ann (Int -> [Attribute B.ByteString] -> State) -> Int -> [Attribute B.ByteString] -> State
 termAlgebra t i defaultAttrs = State
