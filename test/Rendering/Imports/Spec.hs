@@ -1,8 +1,6 @@
 module Rendering.Imports.Spec where
 
-import Analysis.ConstructorName (ConstructorName, constructorLabel)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
-import Analysis.IdentifierName (IdentifierName, identifierLabel)
 import Analysis.ModuleDef (HasModuleDef, moduleDefAlgebra)
 import Data.Output
 import Parsing.Parser
