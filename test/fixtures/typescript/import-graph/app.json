@@ -1,0 +1,290 @@
+{
+  "modules": {
+    "app": {
+      "imports": [
+        {
+          "span": {
+            "start": [
+              1,
+              1
+            ],
+            "end": [
+              1,
+              33
+            ]
+          },
+          "path": "foo",
+          "symbols": [],
+          "alias": "foo"
+        },
+        {
+          "span": {
+            "start": [
+              2,
+              1
+            ],
+            "end": [
+              2,
+              34
+            ]
+          },
+          "path": "aardvark",
+          "symbols": [],
+          "alias": "name"
+        },
+        {
+          "span": {
+            "start": [
+              3,
+              1
+            ],
+            "end": [
+              3,
+              30
+            ]
+          },
+          "path": "ant",
+          "symbols": [
+            {
+              "alias": "",
+              "name": "member"
+            }
+          ],
+          "alias": "ant"
+        },
+        {
+          "span": {
+            "start": [
+              4,
+              1
+            ],
+            "end": [
+              4,
+              46
+            ]
+          },
+          "path": "antelope",
+          "symbols": [
+            {
+              "alias": "",
+              "name": "member1"
+            }
+          ],
+          "alias": "antelope"
+        },
+        {
+          "span": {
+            "start": [
+              4,
+              1
+            ],
+            "end": [
+              4,
+              46
+            ]
+          },
+          "path": "antelope",
+          "symbols": [
+            {
+              "alias": "",
+              "name": "member2"
+            }
+          ],
+          "alias": "antelope"
+        },
+        {
+          "span": {
+            "start": [
+              5,
+              1
+            ],
+            "end": [
+              5,
+              57
+            ]
+          },
+          "path": "ant-eater",
+          "symbols": [
+            {
+              "alias": "",
+              "name": "member1"
+            }
+          ],
+          "alias": "ant-eater"
+        },
+        {
+          "span": {
+            "start": [
+              5,
+              1
+            ],
+            "end": [
+              5,
+              57
+            ]
+          },
+          "path": "ant-eater",
+          "symbols": [
+            {
+              "alias": "alias2",
+              "name": "member2"
+            }
+          ],
+          "alias": "ant-eater"
+        },
+        {
+          "span": {
+            "start": [
+              6,
+              1
+            ],
+            "end": [
+              6,
+              70
+            ]
+          },
+          "path": "anaconda",
+          "symbols": [],
+          "alias": "anaconda"
+        },
+        {
+          "span": {
+            "start": [
+              6,
+              1
+            ],
+            "end": [
+              6,
+              70
+            ]
+          },
+          "path": "anaconda",
+          "symbols": [
+            {
+              "alias": "",
+              "name": "member1"
+            }
+          ],
+          "alias": "anaconda"
+        },
+        {
+          "span": {
+            "start": [
+              6,
+              1
+            ],
+            "end": [
+              6,
+              70
+            ]
+          },
+          "path": "anaconda",
+          "symbols": [
+            {
+              "alias": "alias2",
+              "name": "member2"
+            }
+          ],
+          "alias": "anaconda"
+        },
+        {
+          "span": {
+            "start": [
+              7,
+              1
+            ],
+            "end": [
+              7,
+              50
+            ]
+          },
+          "path": "alligator",
+          "symbols": [],
+          "alias": "alligator"
+        },
+        {
+          "span": {
+            "start": [
+              7,
+              1
+            ],
+            "end": [
+              7,
+              50
+            ]
+          },
+          "path": "alligator",
+          "symbols": [],
+          "alias": "name"
+        },
+        {
+          "span": {
+            "start": [
+              8,
+              1
+            ],
+            "end": [
+              8,
+              22
+            ]
+          },
+          "path": "arctic-tern",
+          "symbols": [],
+          "alias": "arctic-tern"
+        },
+        {
+          "span": {
+            "start": [
+              9,
+              1
+            ],
+            "end": [
+              9,
+              32
+            ]
+          },
+          "path": "../zip",
+          "symbols": [],
+          "alias": "zip"
+        }
+      ],
+      "name": "app",
+      "language": "TypeScript",
+      "declarations": [
+        {
+          "span": {
+            "start": [
+              11,
+              1
+            ],
+            "end": [
+              11,
+              52
+            ]
+          },
+          "kind": "Function",
+          "name": "someFunction"
+        }
+      ],
+      "paths": [
+        "test/fixtures/typescript/import-graph/app.ts"
+      ],
+      "calls": [
+        {
+          "span": {
+            "start": [
+              13,
+              1
+            ],
+            "end": [
+              13,
+              27
+            ]
+          },
+          "symbol": "someFunction",
+          "targets": []
+        }
+      ]
+    }
+  }
+}

@@ -198,6 +198,7 @@ test-suite test
                      , Diffing.Algorithm.SES.Spec
                      , Diffing.Interpreter.Spec
                      , Integration.Spec
+                     , Rendering.Imports.Spec
                      , Rendering.TOC.Spec
                      , Semantic.Spec
                      , Semantic.CLI.Spec
