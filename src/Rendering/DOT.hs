@@ -22,7 +22,8 @@ renderDOTDiff blobs diff = renderGraph (defaultStyleViaShow { graphName = B.pack
   where quote a = "\"" <> a <> "\""
 
 renderDOTTerm :: (ConstructorName syntax, Foldable syntax, Functor syntax) => Blob -> Term syntax ann -> B.ByteString
-renderDOTTerm Blob{..} term = renderGraph (defaultStyleViaShow { graphName = B.pack blobPath }) (cata termAlgebra term 0 [])
+renderDOTTerm Blob{..} term = renderGraph (defaultStyleViaShow { graphName = B.pack (quote blobPath) }) (cata termAlgebra term 0 [])
+  where quote a = "\"" <> a <> "\""
 
 diffAlgebra :: (ConstructorName syntax, Foldable syntax) => DiffF syntax ann1 ann2 (Int -> [Attribute B.ByteString] -> State) -> Int -> [Attribute B.ByteString] -> State
 diffAlgebra d i as = case d of
