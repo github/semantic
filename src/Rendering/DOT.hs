@@ -43,6 +43,10 @@ data State = State { stateRoots :: [Int], stateGraph :: Graph Int, stateVertexAt
 instance Semigroup State where
   State r1 g1 v1 <> State r2 g2 v2 = State (r1 <> r2) (g1 `overlay` g2) (v1 <> v2)
 
+instance Monoid State where
+  mempty = State mempty empty mempty
+  mappend = (<>)
+
 
 renderGraph :: Style Int B.ByteString -> State -> B.ByteString
 renderGraph style State{..} = export (style { vertexAttributes = flip (IntMap.findWithDefault []) stateVertexAttributes }) stateGraph
