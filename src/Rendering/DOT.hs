@@ -33,18 +33,19 @@ diffAlgebra d i as = case d of
                            in  r1 <> termAlgebra t2 (succ (maximum (i : toList (stateGraph r1)))) ("color" := "green" : as)
 
 termAlgebra :: (ConstructorName syntax, Foldable syntax) => TermF syntax ann (Int -> [Attribute B.ByteString] -> State) -> Int -> [Attribute B.ByteString] -> State
-termAlgebra t i as = State [succ i] g vattrs
-  where (_, g, vattrs) = foldr combine (succ i, vertex (succ i), IntMap.singleton (succ i) ("label" := unConstructorLabel (constructorLabel t) : as)) (toList t)
-        combine f (prev, g, attrs) = let State roots g' attrs' = f prev as in (maximum (prev : toList g'), foldr (overlay . connect (vertex (succ i)) . vertex) g' roots `overlay` g, attrs <> attrs')
+termAlgebra t i defaultAttrs = State root (root `connect` stateRoots combined `overlay` (stateGraph combined)) (IntMap.insert (succ i) ("label" := unConstructorLabel (constructorLabel t) : defaultAttrs) (stateVertexAttributes combined))
+  where root = vertex (succ i)
+        combined = foldr combine (State empty root mempty) t
+        combine makeSubgraph rest = makeSubgraph (maximum (stateGraph rest)) defaultAttrs <> rest
 
 
-data State = State { stateRoots :: [Int], stateGraph :: Graph Int, stateVertexAttributes :: IntMap.IntMap [Attribute B.ByteString] }
+data State = State { stateRoots :: Graph Int, stateGraph :: Graph Int, stateVertexAttributes :: IntMap.IntMap [Attribute B.ByteString] }
 
 instance Semigroup State where
-  State r1 g1 v1 <> State r2 g2 v2 = State (r1 <> r2) (g1 `overlay` g2) (v1 <> v2)
+  State r1 g1 v1 <> State r2 g2 v2 = State (r1 `overlay` r2) (g1 `overlay` g2) (v1 <> v2)
 
 instance Monoid State where
-  mempty = State mempty empty mempty
+  mempty = State empty empty mempty
   mappend = (<>)
 
 
