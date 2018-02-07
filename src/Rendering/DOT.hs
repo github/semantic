@@ -26,7 +26,7 @@ renderDOTTerm Blob{..} term = renderGraph (defaultStyleViaShow { graphName = B.p
 
 diffAlgebra :: (ConstructorName syntax, Foldable syntax) => DiffF syntax ann1 ann2 (Int -> [Attribute B.ByteString] -> State) -> Int -> [Attribute B.ByteString] -> State
 diffAlgebra d i as = case d of
-  Merge t               -> termAlgebra t i as
+  Merge t               -> termAlgebra t  i as
   Patch (Delete  t1)    -> termAlgebra t1 i ("color" := "red"   : as)
   Patch (Insert     t2) -> termAlgebra t2 i ("color" := "green" : as)
   Patch (Replace t1 t2) -> let r1 =  termAlgebra t1 i                                             ("color" := "red"   : as)
