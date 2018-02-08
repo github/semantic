@@ -127,6 +127,7 @@ library
                      , Semantic.Util
   build-depends:       base >= 4.8 && < 5
                      , aeson
+                     , algebraic-graphs
                      , ansi-terminal
                      , array
                      , async
