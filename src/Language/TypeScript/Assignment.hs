@@ -267,7 +267,7 @@ memberExpression :: Assignment
 memberExpression = makeTerm <$> (symbol Grammar.MemberExpression <|> symbol Grammar.MemberExpression') <*> children (Expression.MemberAccess <$> term expression <*> term propertyIdentifier)
 
 newExpression :: Assignment
-newExpression = makeTerm <$> symbol Grammar.NewExpression <*> children (Expression.New <$> term expression)
+newExpression = makeTerm <$> symbol Grammar.NewExpression <*> children (Expression.New . pure <$> term expression)
 
 updateExpression :: Assignment
 updateExpression = makeTerm <$> symbol Grammar.UpdateExpression <*> children (TypeScript.Syntax.Update <$> term expression)

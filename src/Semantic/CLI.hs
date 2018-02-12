@@ -79,8 +79,8 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
           <|> flag'                                        (SomeRenderer TagsTermRenderer)        (long "tags" <> help "Output JSON tags")
           <|> flag'                                        (SomeRenderer . SymbolsTermRenderer)   (long "symbols" <> help "Output JSON symbol list")
               <*> (   option symbolFieldsReader (  long "fields"
-                                             <> help "Comma delimited list of specific fields to return (symbols output only)."
-                                             <> metavar "FIELDS")
+                                                <> help "Comma delimited list of specific fields to return (symbols output only)."
+                                                <> metavar "FIELDS")
                   <|> pure defaultSymbolFields)
           <|> flag'                                        (SomeRenderer ImportsTermRenderer)     (long "import-graph" <> help "Output JSON import graph")
           <|> flag'                                        (SomeRenderer DOTTermRenderer)         (long "dot" <> help "Output DOT graph parse trees"))

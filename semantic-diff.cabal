@@ -99,6 +99,9 @@ library
                      , Language.TypeScript.Assignment
                      , Language.TypeScript.Grammar
                      , Language.TypeScript.Syntax
+                     , Language.PHP.Assignment
+                     , Language.PHP.Grammar
+                     , Language.PHP.Syntax
                      , Language.Python.Assignment
                      , Language.Python.Grammar
                      , Language.Python.Syntax
@@ -126,6 +129,7 @@ library
                      , Semantic.Util
   build-depends:       base >= 4.8 && < 5
                      , aeson
+                     , algebraic-graphs
                      , ansi-terminal
                      , array
                      , async
@@ -164,6 +168,7 @@ library
                      , haskell-tree-sitter
                      , tree-sitter-go
                      , tree-sitter-json
+                     , tree-sitter-php
                      , tree-sitter-python
                      , tree-sitter-ruby
                      , tree-sitter-typescript

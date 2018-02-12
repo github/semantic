@@ -14,6 +14,7 @@ data Language
     | Python
     | Ruby
     | TypeScript
+    | PHP
     deriving (Eq, Generic, Ord, Read, Show, ToJSON)
 
 -- | Returns a Language based on the file extension (including the ".").
@@ -28,4 +29,6 @@ languageForType mediaType = case mediaType of
     ".tsx" -> Just TypeScript
     ".jsx" -> Just JSX
     ".py" -> Just Python
+    ".php" -> Just PHP
+    ".phpt" -> Just PHP
     _ -> Nothing
