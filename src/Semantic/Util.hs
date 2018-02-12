@@ -21,8 +21,23 @@ import Semantic
 import Semantic.IO as IO
 import Semantic.Task
 
+import Data.AST
+import Data.Union
+import Data.Abstract.Value
+import Data.Abstract.Address
+import qualified Language.Python.Assignment as Python
+
+type PythonValue = Value Precise (Term (Union Python.Syntax) (Record Location))
+
 file :: MonadIO m => FilePath -> m Blob
-file path = IO.readFile path (languageForFilePath path) >>= pure . fromJust
+file path = fromJust <$> IO.readFile path (languageForFilePath path)
+
+files :: MonadIO m => [FilePath] -> m [Blob]
+files = traverse file
+
+parsePythonFiles :: [FilePath] -> IO [Python.Term]
+parsePythonFiles paths = files paths
+  >>= runTask . traverse (parse pythonParser)
 
 diffWithParser :: (HasField fields Data.Span.Span,
                    HasField fields Range,
@@ -49,4 +64,4 @@ diffBlobWithParser :: (HasField fields Data.Span.Span,
                   -> Task (Term syntax (Record (Maybe Declaration : fields)))
 diffBlobWithParser parser = run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))
   where
-    run parse sourceBlob = parse sourceBlob
+    run parse = parse
