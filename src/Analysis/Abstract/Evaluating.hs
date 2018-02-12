@@ -36,4 +36,5 @@ evaluate :: forall v term
            )
          => term
          -> Final (Evaluating v) v
-evaluate = run @(Evaluating v) . fix (\ recur yield -> eval recur yield . project) pure
+evaluate = run @(Evaluating v) . fix go pure
+  where go recur yield = eval recur yield . project
