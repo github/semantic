@@ -9,6 +9,8 @@ import qualified Data.Map as Map
 import Data.Semigroup
 import GHC.Generics
 
+import Debug.Trace
+
 
 -- | A map of names to addresses that represents the evaluation environment.
 newtype Environment l a = Environment { unEnvironment :: Map.Map Name (Address l a) }
@@ -16,7 +18,7 @@ newtype Environment l a = Environment { unEnvironment :: Map.Map Name (Address l
 
 -- | Lookup a 'Name' in the environment.
 envLookup :: Name -> Environment l a -> Maybe (Address l a)
-envLookup = (. unEnvironment) . Map.lookup
+envLookup k = trace ("envLookup" <> show k) . Map.lookup k . unEnvironment
 
 -- | Insert a 'Name' in the environment.
 envInsert :: Name -> Address l a -> Environment l a -> Environment l a
