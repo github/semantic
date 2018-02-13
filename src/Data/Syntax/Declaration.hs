@@ -264,19 +264,25 @@ instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Import
-instance ( MonadFail m
+instance ( Monad m
+         , Show v
+         , MonadFail m
          , MonadLinker v m
+         , MonadEnv v m
          , AbstractValue v
          , FreeVariables t
-         , Show v
          )
          => Eval t v m Import where
   eval recur yield (Import from alias _) = do
     let [name] = toList (freeVariables from)
 
     linker <- askLinker @v
-    let v = linkerLookup (BC.unpack name <> ".py") linker
-    trace ("name: " <> show name <> " v: " <> show v) $ yield unit
+    let v = linkerLookup (BC.unpack name) linker
+    -- TODO: If we find the import, update this enviornment with symbols defined in the import
+    --       If we don't find the import, try and parse/eval the file.
+    -- TODO: how do we register
+    trace ("[Import] " <> show name <> ": " <> show v) $
+      maybe (yield unit) yield v
 
 -- | An imported symbol
 data ImportSymbol a = ImportSymbol { importSymbolName :: !a, importSymbolAlias :: !a }

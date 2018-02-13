@@ -32,11 +32,11 @@ type PythonValue = Value Precise (Term (Union Python.Syntax) (Record Location))
 file :: MonadIO m => FilePath -> m Blob
 file path = fromJust <$> IO.readFile path (languageForFilePath path)
 
-parsePythonFiles :: [FilePath] -> IO [(FilePath, Python.Term)]
+parsePythonFiles :: [FilePath] -> IO [(Blob, Python.Term)]
 parsePythonFiles paths = do
-  xs <- traverse file paths
-  ts <- runTask $ traverse (parse pythonParser) xs
-  pure (zip paths ts)
+  blobs <- traverse file paths
+  terms <- runTask $ traverse (parse pythonParser) blobs
+  pure (zip blobs terms)
 
 diffWithParser :: (HasField fields Data.Span.Span,
                    HasField fields Range,

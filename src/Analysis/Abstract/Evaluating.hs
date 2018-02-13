@@ -21,6 +21,9 @@ import Data.Function (fix)
 import Data.Functor.Foldable (Base, Recursive(..), ListF(..))
 import Data.Semigroup
 
+import Data.Blob
+import System.FilePath.Posix
+
 import Debug.Trace
 
 -- | The effects necessary for concrete interpretation.
@@ -61,30 +64,14 @@ evaluates :: forall v term
             , FreeVariables term
             , Eval term v (Eff (Evaluating v)) (Base term)
             )
-          => [(FilePath, term)]
+          => [(Blob, term)]
           -> Final (Evaluating v) v
 evaluates = run @(Evaluating v) . fix go pure
   where
-    go _     yield [] = yield unit
-    go recur yield [(f, a)] = trace (show f) $ eval (\ev term -> recur ev [(f, term)]) yield (project a)
-    go recur yield ((f, a):as) = do
-      env <- askEnv :: (Eff (Evaluating v)) (Environment (LocationFor v) v)
-      v <- trace (show f) $ eval (\ev term -> recur ev [(f, term)]) pure (project a)
-      extraRoots (envRoots env (freeVariables a)) $
-        localLinker (linkerInsert f v) (go recur yield as)
-
-    -- go recur yield [(f, a)] = trace ("[] " <> show f) $ eval (\ev term -> recur ev [(f, term)]) pure (project a) >>= yield
-    -- go recur yield [(f, a)] = trace ("[]:" <> show f) $ eval (\_ term -> recur pure [(f, term)]) yield (project a)
-    -- go recur yield [(f, a)] = do
-    --   x <- trace (show f) $ eval (\ev term -> recur ev [(f, term)]) pure (project a)
-    --   localLinker (linkerInsert f x) (yield x)
-    -- go recur yield ((f, a):as) = do
-    --   trace ("[a:as] " <> show f) $
-    --     eval (const (const (go recur pure as))) yield (project a)
-
-      -- linker <- askLinker :: (Eff (Evaluating v)) (Linker v)
-      -- todo: local linker and linkerInsert
-    -- go recur yield ((f, a):as) = do
-    --   x <- trace ("[a:as] " <> show f) $
-    --     eval (const (const (go recur pure as))) pure (project a)
-    --   localLinker (linkerInsert f x) (yield x)
+    go _ yield [] = yield unit
+    go recur yield [x] = go1 recur yield x
+    go recur yield (x@(Blob{..}, _):xs) = do
+      v <- go1 recur yield x
+      localLinker (linkerInsert (dropExtensions blobPath) v) (go recur yield xs)
+    go1 recur yield (b@Blob{..}, t) = trace (show blobPath) $
+      eval (\ev term -> recur ev [(b, term)]) yield (project t)
