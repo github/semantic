@@ -154,11 +154,7 @@ instance ( Monad m
          , FreeVariables t
          )
         => Eval t v m Program where
-  eval _  yield (Program [])     = yield unit
-  eval ev yield (Program [a])    = ev pure a >>= yield
-  eval ev yield (Program (a:as)) = do
-    env <- askEnv @v
-    extraRoots (envRoots env (freeVariables1 as)) (ev (const (eval ev pure (Program as))) a) >>= yield
+  eval ev yield (Program xs) = eval ev yield xs
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
