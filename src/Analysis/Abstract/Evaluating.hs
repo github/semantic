@@ -19,13 +19,15 @@ import Data.Function (fix)
 import Data.Functor.Foldable (Base, Recursive(..), ListF(..))
 import Data.Semigroup
 
+import Debug.Trace
+
 -- | The effects necessary for concrete interpretation.
 type Evaluating v
   = '[ Fail                                   -- For 'MonadFail'.
-     , State (Store (LocationFor v) v)        -- For 'MonadStore'.
+     , State  (Store (LocationFor v) v)       -- For 'MonadStore'.
      , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
-     , Reader (Linker v)                      -- For 'MonadLinker'.
      , Reader (Live (LocationFor v) v)        -- For 'MonadGC'.
+     , Reader (Linker v)                      -- For 'MonadLinker'.
      ]
 
 -- | Evaluate a term to a value.
@@ -52,15 +54,16 @@ evaluates :: forall v term
             , Recursive term
             , AbstractValue v
             , MonadAddress (LocationFor v) (Eff (Evaluating v))
-            , MonadLinker v (Eff (Evaluating v))
+            -- , MonadLinker v (Eff (Evaluating v))
             , Eval term v (Eff (Evaluating v)) (Base term)
             )
-          => [term]
+          => [(FilePath, term)]
           -> Final (Evaluating v) v
 evaluates = run @(Evaluating v) . fix go pure
   where
-    go recur yield [] = yield unit
-    go recur yield [a] = eval (\x y -> recur x [y]) pure (project a) >>= yield
-    go recur yield (a:as) = do
-      linker <- askLinker :: (Eff (Evaluating v)) (Linker v)
-      eval (const (const (go recur pure as))) pure (project a) >>= yield
+    go _     yield [] = yield unit
+    go recur yield [(f, a)] = trace ("[]:" <> show f) $ eval (\_ term -> recur pure [(f, term)]) yield (project a)
+    go recur yield ((f, a):as) = do
+      x <- trace ("[a:as] " <> show f) $
+        eval (const (const (go recur pure as))) pure (project a)
+      localLinker (linkerInsert f x) (yield x)

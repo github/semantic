@@ -3,11 +3,13 @@ module Data.Syntax.Declaration where
 
 import Control.Applicative
 import Control.Monad.Effect.Address
+import Control.Monad.Effect.Linker
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.Store
 import Data.Abstract.Address
 import Data.Abstract.Environment
+import Data.Abstract.Linker
 import Data.Abstract.Eval
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type hiding (Type)
@@ -22,6 +24,9 @@ import Data.Semigroup
 import Data.Union
 import Diffing.Algorithm
 import GHC.Generics
+
+import qualified Data.ByteString.Char8 as BC
+import Debug.Trace
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -259,7 +264,19 @@ instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Import
-instance (MonadFail m) => Eval t v m Import
+instance ( MonadFail m
+         , MonadLinker v m
+         , AbstractValue v
+         , FreeVariables t
+         , Show v
+         )
+         => Eval t v m Import where
+  eval recur yield (Import from alias _) = do
+    let [name] = toList (freeVariables from)
+
+    linker <- askLinker @v
+    let v = linkerLookup (BC.unpack name <> ".py") linker
+    trace ("name: " <> show name <> " v: " <> show v) $ yield unit
 
 -- | An imported symbol
 data ImportSymbol a = ImportSymbol { importSymbolName :: !a, importSymbolAlias :: !a }
