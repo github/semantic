@@ -12,16 +12,27 @@
     { (Identifier)
     ->(Identifier) })
     (Empty)
-    (
-    {+(ScopeResolution
-      {+(Identifier)+})+}
-      (ScopeResolution
-        (Identifier))
-    {-(ScopeResolution
-      {-(Identifier)-})-}))
+  {+(ScopeResolution
+    {+(Identifier)+})+}
+    (ScopeResolution
+      (Identifier))
+  {-(ScopeResolution
+    {-(Identifier)-})-})
   (Import
     (ScopeResolution
     { (Identifier)
     ->(Identifier) })
     (Empty)
-    (Identifier)))
+    (Identifier))
+{-(Import
+  {-(ScopeResolution
+    {-(Identifier)-})-}
+  {-(Empty)-}
+  {-(ImportSymbol
+    {-(ScopeResolution
+      {-(Identifier)-})-}
+    {-(Identifier)-})-}
+  {-(ImportSymbol
+    {-(ScopeResolution
+      {-(Identifier)-})-}
+    {-(Identifier)-})-})-})

@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, MultiParamTypeClasses, TypeOperators, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
 module Analysis.Declaration
 ( Declaration(..)
 , HasDeclaration
@@ -7,18 +7,21 @@ module Analysis.Declaration
 
 import Data.Algebra
 import Data.Blob
+import Data.Monoid
 import Data.Error (Error(..), showExpectation)
 import Data.Foldable (toList)
 import Data.Language as Language
 import Data.List.NonEmpty (nonEmpty)
 import Data.Proxy (Proxy(..))
 import Data.Range
+import Data.Maybe (mapMaybe)
 import Data.Record
 import Data.Source as Source
 import Data.Semigroup (sconcat)
 import Data.Span
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
+import qualified Data.Syntax.Expression as Expression
 import Data.Term
 import qualified Data.Text as T
 import Data.Union
@@ -29,9 +32,10 @@ import qualified Language.Markdown.Syntax as Markdown
 data Declaration
   = MethodDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationReceiver :: Maybe T.Text }
   | ClassDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
-  | ImportDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
+  | ImportDeclaration   { declarationIdentifier :: T.Text, declarationAlias :: T.Text, declarationSymbols :: [(T.Text, T.Text)], declarationLanguage :: Maybe Language }
   | FunctionDeclaration { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   | HeadingDeclaration  { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationLevel :: Int }
+  | CallReference       { declarationIdentifier :: T.Text, declarationImportIdentifier :: [T.Text] }
   | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   deriving (Eq, Generic, Show)
 
@@ -46,34 +50,41 @@ data Declaration
 --   If you’re getting errors about missing a 'CustomHasDeclaration' instance for your syntax type, you probably forgot step 1.
 --
 --   If you’re getting 'Nothing' for your syntax node at runtime, you probably forgot step 2.
-declarationAlgebra :: (HasField fields Range, HasField fields Span, Foldable syntax, HasDeclaration syntax) => Blob -> RAlgebra (Term syntax (Record fields)) (Maybe Declaration)
+declarationAlgebra :: (HasField fields Range, HasField fields Span, Foldable syntax, HasDeclaration syntax)
+                   => Blob -> RAlgebra (Term syntax (Record fields)) (Maybe Declaration)
 declarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
 
+-- | Types for which we can produce a 'Declaration' in 'Maybe'. There is exactly one instance of this typeclass
+class HasDeclaration syntax where
+  toDeclaration :: (Foldable syntax, HasField fields Range, HasField fields Span) => Blob -> Record fields -> syntax (Term syntax (Record fields), Maybe Declaration) -> Maybe Declaration
+
+instance (HasDeclaration' syntax syntax) => HasDeclaration syntax where
+  toDeclaration = toDeclaration'
 
 -- | Types for which we can produce a 'Declaration' in 'Maybe'. There is exactly one instance of this typeclass; adding customized 'Declaration's for a new type is done by defining an instance of 'CustomHasDeclaration' instead.
 --
 --   This typeclass employs the Advanced Overlap techniques designed by Oleg Kiselyov & Simon Peyton Jones: https://wiki.haskell.org/GHC/AdvancedOverlap.
-class HasDeclaration syntax where
+class HasDeclaration' whole syntax where
   -- | Compute a 'Declaration' for a syntax type using its 'CustomHasDeclaration' instance, if any, or else falling back to the default definition (which simply returns 'Nothing').
-  toDeclaration :: (Foldable whole, HasField fields Range, HasField fields Span) => Blob -> Record fields -> syntax (Term whole (Record fields), Maybe Declaration) -> Maybe Declaration
+  toDeclaration' :: (Foldable whole, HasField fields Range, HasField fields Span) => Blob -> Record fields -> syntax (Term whole (Record fields), Maybe Declaration) -> Maybe Declaration
 
 -- | Define 'toDeclaration' using the 'CustomHasDeclaration' instance for a type if there is one or else use the default definition.
 --
 --   This instance determines whether or not there is an instance for @syntax@ by looking it up in the 'DeclarationStrategy' type family. Thus producing a 'Declaration' for a node requires both defining a 'CustomHasDeclaration' instance _and_ adding a definition for the type to the 'DeclarationStrategy' type family to return 'Custom'.
 --
 --   Note that since 'DeclarationStrategy' has a fallback case for its final entry, this instance will hold for all types of kind @* -> *@. Thus, this must be the only instance of 'HasDeclaration', as any other instance would be indistinguishable.
-instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy strategy syntax) => HasDeclaration syntax where
-  toDeclaration = toDeclarationWithStrategy (Proxy :: Proxy strategy)
+instance (DeclarationStrategy syntax ~ strategy, HasDeclarationWithStrategy strategy whole syntax) => HasDeclaration' whole syntax where
+  toDeclaration' = toDeclarationWithStrategy (Proxy :: Proxy strategy)
 
 
 -- | Types for which we can produce a customized 'Declaration'. This returns in 'Maybe' so that some values can be opted out (e.g. anonymous functions).
-class CustomHasDeclaration syntax where
+class CustomHasDeclaration whole syntax where
   -- | Produce a customized 'Declaration' for a given syntax node.
   customToDeclaration :: (Foldable whole, HasField fields Range, HasField fields Span) => Blob -> Record fields -> syntax (Term whole (Record fields), Maybe Declaration) -> Maybe Declaration
 
 
 -- | Produce a 'HeadingDeclaration' from the first line of the heading of a 'Markdown.Heading' node.
-instance CustomHasDeclaration Markdown.Heading where
+instance CustomHasDeclaration whole Markdown.Heading where
   customToDeclaration Blob{..} ann (Markdown.Heading level terms _)
     = Just $ HeadingDeclaration (headingText terms) mempty blobLanguage level
     where headingText terms = getSource $ maybe (getField ann) sconcat (nonEmpty (headingByteRange <$> toList terms))
@@ -82,13 +93,13 @@ instance CustomHasDeclaration Markdown.Heading where
           firstLine = T.takeWhile (/= '\n')
 
 -- | Produce an 'ErrorDeclaration' for 'Syntax.Error' nodes.
-instance CustomHasDeclaration Syntax.Error where
+instance CustomHasDeclaration whole Syntax.Error where
   customToDeclaration Blob{..} ann err@Syntax.Error{}
     = Just $ ErrorDeclaration (T.pack (formatTOCError (Syntax.unError (getField ann) err))) mempty blobLanguage
     where formatTOCError e = showExpectation False (errorExpected e) (errorActual e) ""
 
 -- | Produce a 'FunctionDeclaration' for 'Declaration.Function' nodes so long as their identifier is non-empty (defined as having a non-empty 'Range').
-instance CustomHasDeclaration Declaration.Function where
+instance CustomHasDeclaration whole Declaration.Function where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Function _ (Term (In identifierAnn _), _) _ _)
     -- Do not summarize anonymous functions
     | isEmpty identifierAnn = Nothing
@@ -98,7 +109,7 @@ instance CustomHasDeclaration Declaration.Function where
           isEmpty = (== 0) . rangeLength . getField
 
 -- | Produce a 'MethodDeclaration' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'Range'), the 'declarationIdentifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
-instance CustomHasDeclaration Declaration.Method where
+instance CustomHasDeclaration whole Declaration.Method where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _)
     -- Methods without a receiver
     | isEmpty receiverAnn = Just $ MethodDeclaration (getSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage Nothing
@@ -111,21 +122,40 @@ instance CustomHasDeclaration Declaration.Method where
           isEmpty = (== 0) . rangeLength . getField
 
 -- | Produce a 'ClassDeclaration' for 'Declaration.Class' nodes.
-instance CustomHasDeclaration Declaration.Class where
+instance CustomHasDeclaration whole Declaration.Class where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Class _ (Term (In identifierAnn _), _) _ _)
     -- Classes
     = Just $ ClassDeclaration (getSource identifierAnn) (getClassSource blob (In ann decl)) blobLanguage
     where getSource = toText . flip Source.slice blobSource . getField
 
-instance CustomHasDeclaration Declaration.Import where
-  customToDeclaration blob@Blob{..} ann decl@(Declaration.Import (Term (In fromAnn _), _) _ _)
-    -- Imports
-    = Just $ ImportDeclaration (getSource fromAnn) (getImportSource blob (In ann decl)) blobLanguage
-    where getSource = toText . flip Source.slice blobSource . getField
+instance (Declaration.ImportSymbol :< fs) => CustomHasDeclaration (Union fs) Declaration.Import where
+  customToDeclaration Blob{..} _ (Declaration.Import (Term (In fromAnn _), _) (Term (In aliasAnn _), _) symbols)
+    = Just $ ImportDeclaration name (getAlias blobLanguage (getSource aliasAnn)) (mapMaybe getSymbol symbols) blobLanguage
+    where
+      name = getSource fromAnn
+      getAlias lang alias | Just TypeScript <- lang, T.null alias = basename name
+                          | Just Go <- lang, T.null alias = basename name
+                          | otherwise = alias
+      basename = last . T.splitOn "/"
+      getSource = T.dropAround (`elem` ['"', '\'']) . toText . flip Source.slice blobSource . getField
+      getSymbol (Term (In _ f), _) | Just (Declaration.ImportSymbol (Term (In nameAnn _)) (Term (In aliasAnn _))) <- prj f
+                                   = Just (getSource nameAnn, getSource aliasAnn)
+                                   | otherwise = Nothing
+
+instance (Expression.MemberAccess :< fs) => CustomHasDeclaration (Union fs) Expression.Call where
+  customToDeclaration Blob{..} _ (Expression.Call _ (Term (In fromAnn fromF), _) _ _)
+    | Just (Expression.MemberAccess (Term (In leftAnn leftF)) (Term (In idenAnn _))) <- prj fromF = Just $ CallReference (getSource idenAnn) (memberAccess leftAnn leftF)
+    | otherwise = Just $ CallReference (getSource fromAnn) []
+    where
+      memberAccess modAnn termFOut
+        | Just (Expression.MemberAccess (Term (In leftAnn leftF)) (Term (In rightAnn rightF))) <- prj termFOut
+        = memberAccess leftAnn leftF <> memberAccess rightAnn rightF
+        | otherwise = [getSource modAnn]
+      getSource = toText . flip Source.slice blobSource . getField
 
 -- | Produce a 'Declaration' for 'Union's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
-instance Apply HasDeclaration fs => CustomHasDeclaration (Union fs) where
-  customToDeclaration blob ann = apply (Proxy :: Proxy HasDeclaration) (toDeclaration blob ann)
+instance Apply (HasDeclaration' whole) fs => CustomHasDeclaration whole (Union fs) where
+  customToDeclaration blob ann = apply (Proxy :: Proxy (HasDeclaration' whole)) (toDeclaration' blob ann)
 
 
 -- | A strategy for defining a 'HasDeclaration' instance. Intended to be promoted to the kind level using @-XDataKinds@.
@@ -134,7 +164,7 @@ data Strategy = Default | Custom
 -- | Produce a 'Declaration' for a syntax node using either the 'Default' or 'Custom' strategy.
 --
 --   You should probably be using 'CustomHasDeclaration' instead of this class; and you should not define new instances of this class.
-class HasDeclarationWithStrategy (strategy :: Strategy) syntax where
+class HasDeclarationWithStrategy (strategy :: Strategy) whole syntax where
   toDeclarationWithStrategy :: (Foldable whole, HasField fields Range, HasField fields Span) => proxy strategy -> Blob -> Record fields -> syntax (Term whole (Record fields), Maybe Declaration) -> Maybe Declaration
 
 
@@ -149,17 +179,18 @@ type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Import = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
   DeclarationStrategy Markdown.Heading = 'Custom
+  DeclarationStrategy Expression.Call = 'Custom
   DeclarationStrategy Syntax.Error = 'Custom
   DeclarationStrategy (Union fs) = 'Custom
   DeclarationStrategy a = 'Default
 
 
 -- | The 'Default' strategy produces 'Nothing'.
-instance HasDeclarationWithStrategy 'Default syntax where
+instance HasDeclarationWithStrategy 'Default whole syntax where
   toDeclarationWithStrategy _ _ _ _ = Nothing
 
 -- | The 'Custom' strategy delegates the selection of the strategy to the 'CustomHasDeclaration' instance for the type.
-instance CustomHasDeclaration syntax => HasDeclarationWithStrategy 'Custom syntax where
+instance CustomHasDeclaration whole syntax => HasDeclarationWithStrategy 'Custom whole syntax where
   toDeclarationWithStrategy _ = customToDeclaration
 
 
@@ -182,11 +213,4 @@ getClassSource Blob{..} (In a r)
   = let declRange = getField a
         bodyRange = getField <$> case r of
           Declaration.Class _ _ _ (Term (In a' _), _) -> Just a'
-    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
-
-getImportSource :: (HasField fields Range) => Blob -> TermF Declaration.Import (Record fields) (Term syntax (Record fields), a) -> T.Text
-getImportSource Blob{..} (In a r)
-  = let declRange = getField a
-        bodyRange = getField <$> case r of
-          Declaration.Import (Term (In a' _), _) _ _ -> Just a'
     in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange

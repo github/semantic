@@ -25,6 +25,7 @@ library
                      , Analysis.Decorator
                      , Analysis.Declaration
                      , Analysis.IdentifierName
+                     , Analysis.ModuleDef
                      -- Semantic assignment
                      , Assigning.Assignment
                      , Assigning.Assignment.Table
@@ -111,6 +112,7 @@ library
                      , Paths_semantic_diff
                      -- Rendering formats
                      , Rendering.DOT
+                     , Rendering.Imports
                      , Rendering.JSON
                      , Rendering.Renderer
                      , Rendering.SExpression
@@ -201,6 +203,7 @@ test-suite test
                      , Diffing.Algorithm.SES.Spec
                      , Diffing.Interpreter.Spec
                      , Integration.Spec
+                     , Rendering.Imports.Spec
                      , Rendering.TOC.Spec
                      , Semantic.Spec
                      , Semantic.CLI.Spec

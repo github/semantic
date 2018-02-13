@@ -4,6 +4,9 @@ module SpecHelpers
 , parseFilePath
 , readFilePair
 , languageForFilePath
+, Verbatim(..)
+, verbatim
+, readFileVerbatim
 ) where
 
 import Control.Monad ((<=<))
@@ -19,6 +22,8 @@ import Semantic
 import Semantic.Task
 import qualified Semantic.IO as IO
 import System.FilePath
+import qualified Data.Text as T
+import Data.Text.Encoding (decodeUtf8)
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO B.ByteString
@@ -36,3 +41,21 @@ readFilePair paths = let paths' = fmap (\p -> (p, languageForFilePath p)) paths 
 -- | Returns a Maybe Language based on the FilePath's extension.
 languageForFilePath :: FilePath -> Maybe Language
 languageForFilePath = languageForType . takeExtension
+
+
+readFileVerbatim :: FilePath -> IO Verbatim
+readFileVerbatim = fmap verbatim . B.readFile
+
+newtype Verbatim = Verbatim B.ByteString
+  deriving (Eq)
+
+instance Show Verbatim where
+  show (Verbatim x) = show x
+
+verbatim :: B.ByteString -> Verbatim
+verbatim = Verbatim . stripWhitespace
+  where
+    stripWhitespace :: B.ByteString -> B.ByteString
+    stripWhitespace = B.foldl' go B.empty
+      where go acc x | x `B.elem` " \t\n" = acc
+                     | otherwise = B.snoc acc x

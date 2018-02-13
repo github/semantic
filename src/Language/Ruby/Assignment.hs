@@ -32,6 +32,7 @@ type Syntax = '[
   , Declaration.Class
   , Declaration.Function
   , Declaration.Import
+  , Declaration.ImportSymbol
   , Declaration.Method
   , Declaration.Module
   , Expression.Arithmetic

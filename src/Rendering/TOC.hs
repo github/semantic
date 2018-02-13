@@ -166,11 +166,12 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
         summaryKey = T.pack $ pathKeyForBlobPair blobs
 
 diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [TOCSummary]
-diffTOC = mapMaybe entrySummary . dedupe . filter removeImports . tableOfContentsBy declaration
+diffTOC = mapMaybe entrySummary . dedupe . filter extraDeclarations . tableOfContentsBy declaration
   where
-    removeImports :: HasField fields (Maybe Declaration) => Entry (Record fields) -> Bool
-    removeImports entry = case getDeclaration (entryPayload entry) of
-      Just (ImportDeclaration{..}) -> False
+    extraDeclarations :: HasField fields (Maybe Declaration) => Entry (Record fields) -> Bool
+    extraDeclarations entry = case getDeclaration (entryPayload entry) of
+      Just ImportDeclaration{..} -> False
+      Just CallReference{..} -> False
       _ -> True
 
 renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> Summaries
@@ -189,5 +190,6 @@ toCategoryName declaration = case declaration of
   ImportDeclaration{} -> "Import"
   FunctionDeclaration{} -> "Function"
   MethodDeclaration{} -> "Method"
+  CallReference{} -> "Call"
   HeadingDeclaration _ _ _ l -> "Heading " <> T.pack (show l)
   ErrorDeclaration{} -> "ParseError"

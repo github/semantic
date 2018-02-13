@@ -39,6 +39,7 @@ type Syntax = '[
   , Declaration.VariableDeclaration
   , Declaration.TypeAlias
   , Declaration.Import
+  , Declaration.ImportSymbol
   , Declaration.Module
   , Expression.Arithmetic
   , Expression.Bitwise
@@ -166,7 +167,6 @@ type Syntax = '[
   , TypeScript.Syntax.Update
   , TypeScript.Syntax.ComputedPropertyName
   , TypeScript.Syntax.Decorator
-  , Declaration.ImportSymbol
   , []
   ]
 
