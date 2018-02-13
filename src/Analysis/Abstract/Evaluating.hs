@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, ScopedTypeVariables, TypeApplications, TypeFamilies #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, MultiParamTypeClasses #-}
 module Analysis.Abstract.Evaluating where
 
 import Control.Effect
@@ -19,12 +19,23 @@ import Data.Abstract.Value
 import Data.Abstract.Live
 import Data.Function (fix)
 import Data.Functor.Foldable (Base, Recursive(..), ListF(..))
+import qualified Data.Map as Map
 import Data.Semigroup
+import Control.Monad.Fail
+import Prelude hiding (fail)
 
 import Data.Blob
 import System.FilePath.Posix
 
 import Debug.Trace
+
+class Monad m => MonadLinker v m where
+  require :: FilePath -> m v
+
+instance (b ~ Eff (Evaluating v)) => MonadLinker v b where
+  require name = do
+    linker <- ask
+    maybe (fail ("cannot find " <> show name)) runEvaluator (linkerLookup name linker)
 
 -- | The effects necessary for concrete interpretation.
 type Evaluating v
@@ -32,7 +43,7 @@ type Evaluating v
      , State  (Store (LocationFor v) v)       -- For 'MonadStore'.
      , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
      , Reader (Live (LocationFor v) v)        -- For 'MonadGC'.
-     , Reader (Linker v)                      -- For 'MonadLinker'.
+     , Reader (Linker (Evaluator v))          -- For 'MonadLinker'
      ]
 
 -- | Evaluate a term to a value.
@@ -43,13 +54,14 @@ evaluate :: forall v term
            , Functor (Base term)
            , Recursive term
            , MonadAddress (LocationFor v) (Eff (Evaluating v))
-           -- , MonadLinker v (Eff (Evaluating v))
            , Eval term v (Eff (Evaluating v)) (Base term)
            )
          => term
          -> Final (Evaluating v) v
 evaluate = run @(Evaluating v) . fix go pure
   where go recur yield = eval recur yield . project
+
+newtype Evaluator v = Evaluator { runEvaluator :: Eff (Evaluating v) v }
 
 evaluates :: forall v term
           . ( Ord v
@@ -59,19 +71,22 @@ evaluates :: forall v term
             , Recursive term
             , AbstractValue v
             , MonadAddress (LocationFor v) (Eff (Evaluating v))
-            -- , MonadLinker v (Eff (Evaluating v))
-            -- , MonadEnv v (Eff (Evaluating v))
             , FreeVariables term
             , Eval term v (Eff (Evaluating v)) (Base term)
             )
-          => [(Blob, term)]
+          => [(Blob, term)] -- List of blob, term pairs that make up the program to be evaluated
+          -> (Blob, term)   -- Entrypoint
           -> Final (Evaluating v) v
-evaluates = run @(Evaluating v) . fix go pure
+evaluates pairs = run @(Evaluating v) . fix go1 pure
   where
-    go _ yield [] = yield unit
-    go recur yield [x] = go1 recur yield x
-    go recur yield (x@(Blob{..}, _):xs) = do
-      v <- go1 recur yield x
-      localLinker (linkerInsert (dropExtensions blobPath) v) (go recur yield xs)
     go1 recur yield (b@Blob{..}, t) = trace (show blobPath) $
-      eval (\ev term -> recur ev [(b, term)]) yield (project t)
+      local (const (Linker (Map.fromList (map (toPathActionPair recur yield) pairs)))) $
+        eval (\ev term -> recur ev (b, term)) yield (project t)
+    toPathActionPair recur yield (b@Blob{..}, t) = (dropExtensions blobPath, Evaluator (go1 recur yield (b, t)))
+
+
+-- TODO: Register actions in the module table instead of the values
+--
+-- TODO: Some concept of an "entry point".
+--       - a program will have a 'main'
+--       - a library? can just lazy eval in parallel

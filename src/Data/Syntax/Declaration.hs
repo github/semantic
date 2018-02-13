@@ -10,6 +10,7 @@ import Control.Monad.Effect.Store
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Linker
+import Analysis.Abstract.Evaluating
 import Data.Abstract.Eval
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type hiding (Type)
@@ -273,16 +274,11 @@ instance ( Monad m
          , FreeVariables t
          )
          => Eval t v m Import where
-  eval recur yield (Import from alias _) = do
+  eval _ yield (Import from _ _) = do
     let [name] = toList (freeVariables from)
 
-    linker <- askLinker @v
-    let v = linkerLookup (BC.unpack name) linker
-    -- TODO: If we find the import, update this enviornment with symbols defined in the import
-    --       If we don't find the import, try and parse/eval the file.
-    -- TODO: how do we register
-    trace ("[Import] " <> show name <> ": " <> show v) $
-      maybe (yield unit) yield v
+    v <- require (BC.unpack name)
+    trace ("[Import] " <> show name <> ": " <> show v) $ yield v
 
 -- | An imported symbol
 data ImportSymbol a = ImportSymbol { importSymbolName :: !a, importSymbolAlias :: !a }

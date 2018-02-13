@@ -1,8 +1,9 @@
 -- MonoLocalBinds is to silence a warning about a simplifiable constraint.
-{-# LANGUAGE DataKinds, MonoLocalBinds, TypeOperators #-}
+{-# LANGUAGE DataKinds, MonoLocalBinds, TypeOperators, TypeApplications #-}
 module Semantic.Util where
 
 import Analysis.Declaration
+import Analysis.Abstract.Evaluating
 import Control.Monad.IO.Class
 import Data.Align.Generic
 import Data.Maybe
@@ -32,11 +33,18 @@ type PythonValue = Value Precise (Term (Union Python.Syntax) (Record Location))
 file :: MonadIO m => FilePath -> m Blob
 file path = fromJust <$> IO.readFile path (languageForFilePath path)
 
-parsePythonFiles :: [FilePath] -> IO [(Blob, Python.Term)]
-parsePythonFiles paths = do
+parsePythonFiles :: [FilePath] -> FilePath -> IO ([(Blob, Python.Term)], (Blob, Python.Term))
+parsePythonFiles paths entryPath = do
   blobs <- traverse file paths
   terms <- runTask $ traverse (parse pythonParser) blobs
-  pure (zip blobs terms)
+  entryBlob <- file entryPath
+  entryTerm <- runTask (parse pythonParser entryBlob)
+  pure ((zip blobs terms), (entryBlob, entryTerm))
+
+evaluatePythonFiles paths = do
+  blobs@(b:bs) <- traverse file paths
+  (t:ts) <- runTask $ traverse (parse pythonParser) blobs
+  pure $ evaluates @PythonValue (zip bs ts) (b, t)
 
 diffWithParser :: (HasField fields Data.Span.Span,
                    HasField fields Range,
