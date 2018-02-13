@@ -22,7 +22,7 @@ envLookup k = trace ("envLookup" <> show k) . Map.lookup k . unEnvironment
 
 -- | Insert a 'Name' in the environment.
 envInsert :: Name -> Address l a -> Environment l a -> Environment l a
-envInsert name value (Environment m) = Environment (Map.insert name value m)
+envInsert name value (Environment m) = trace ("envInsert" <> show name) $ Environment (Map.insert name value m)
 
 
 -- | Retrieve the 'Live' set of addresses to which the given free variable names are bound.
