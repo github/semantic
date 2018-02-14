@@ -35,4 +35,15 @@
   {+(ImportSymbol
     {+(ScopeResolution
       {+(Identifier)+})+}
-    {+(Identifier)+})+})+})
+    {+(Identifier)+})+})+}
+  (Import
+    (ScopeResolution
+      {-(Identifier)-}
+      (Identifier)
+      {+(Identifier)+})
+    (Empty)
+    (ScopeResolution{(Identifier)->(Identifier)}))
+  (Import
+    (Empty)
+    (Empty)
+    (ScopeResolution{(Identifier)->(Identifier)})))

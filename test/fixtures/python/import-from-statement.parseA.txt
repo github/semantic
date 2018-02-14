@@ -17,4 +17,14 @@
     (ScopeResolution
       (Identifier))
     (Empty)
-    (Identifier)))
+    (Identifier))
+  (Import
+    (ScopeResolution
+      (Identifier)
+      (Identifier))
+    (Empty)
+    (ScopeResolution(Identifier)))
+  (Import
+    (Empty)
+    (Empty)
+    (ScopeResolution(Identifier))))

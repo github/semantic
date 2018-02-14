@@ -10,4 +10,7 @@
     (ScopeResolution
       (Identifier)
       (Identifier))
-    (Identifier)))
+    (Identifier))
+  (Import
+    ((Identifier) (Identifier) (Identifier))
+    (Empty)))

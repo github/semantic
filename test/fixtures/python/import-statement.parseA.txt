@@ -15,4 +15,5 @@
       (Identifier))
     (Import
       (Identifier)
-      (Empty))))
+      (Empty)))
+  (Import((Identifier)(Identifier)(Identifier))(Empty)))
