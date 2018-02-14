@@ -44,6 +44,9 @@ type Evaluating v
      , Reader (Linker (Evaluator v))          -- For 'MonadLinker'
      ]
 
+newtype Evaluator v = Evaluator { runEvaluator :: Eff (Evaluating v) v }
+
+
 -- | Evaluate a term to a value.
 evaluate :: forall v term
          . ( Ord v
@@ -58,8 +61,6 @@ evaluate :: forall v term
          -> Final (Evaluating v) v
 evaluate = run @(Evaluating v) . fix go pure
   where go recur yield = eval recur yield . project
-
-newtype Evaluator v = Evaluator { runEvaluator :: Eff (Evaluating v) v }
 
 evaluates :: forall v term
           . ( Ord v
