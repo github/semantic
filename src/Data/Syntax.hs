@@ -8,10 +8,13 @@ import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Store
 import Control.Monad.Error.Class hiding (Error)
+import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Eval
 import Data.Abstract.FreeVariables
-import Data.Abstract.Value (LocationFor, AbstractValue(..))
+import Data.Abstract.Value (LocationFor, AbstractValue(..), Value(..))
+import qualified Data.Abstract.Value as Value
+import qualified Data.Abstract.Type as Type
 import Data.Align.Generic
 import Data.AST
 import Data.ByteString (ByteString)
@@ -34,6 +37,8 @@ import Diffing.Algorithm hiding (Empty)
 import GHC.Generics
 import GHC.Stack
 import Prelude hiding (fail)
+
+import Debug.Trace
 
 -- Combinators
 
@@ -146,15 +151,42 @@ instance Eq1 Program where liftEq = genericLiftEq
 instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 
+-- instance ( Monad m
+--          , Ord (LocationFor v)
+--          , MonadGC v m
+--          , MonadEnv v m
+--          , AbstractValue v
+--          , FreeVariables t
+--          )
+--         => Eval t v m Program where
+--   eval ev yield term@(Program xs) = do
+--     env <- askEnv :: m (Environment (LocationFor v) v)
+--     let v = inj (Value.Program term env)
+--     extraRoots (envRoots env (freeVariables v)) (eval ev yield xs)
 instance ( Monad m
-         , Ord (LocationFor v)
-         , MonadGC v m
-         , MonadEnv v m
-         , AbstractValue v
+         , Ord l
+         , Show l
+         , Show t
+         , Semigroup (Cell l (Value l t))
+         , MonadEnv (Value l t) m
+         , MonadStore (Value l t) m
+         , MonadGC (Value l t) m
+         , MonadAddress l m
          , FreeVariables t
          )
-        => Eval t v m Program where
-  eval ev yield (Program xs) = eval ev yield xs
+        => Eval t (Value l t) m Program where
+  eval ev yield (Program xs) = eval' ev yield xs
+    where
+      eval' _  _ []     = do
+        env <- askEnv @(Value l t)
+        let v = trace ("env: " <> show env) $ inj (Value.Program env)
+        yield v
+      eval' ev _ (a:as) = do
+        env <- askEnv @(Value l t)
+        extraRoots (envAll env) (ev (const (eval' ev pure as)) a) >>= yield
+
+
+instance MonadFail m => Eval t Type.Type m Program
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
