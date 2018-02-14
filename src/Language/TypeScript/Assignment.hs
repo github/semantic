@@ -356,10 +356,10 @@ jsxElement :: Assignment
 jsxElement = makeTerm <$> symbol Grammar.JsxElement <*> children (TypeScript.Syntax.JsxElement <$> term jsxOpeningElement' <*> manyTerm (jsxElement <|> jsxSelfClosingElement <|> jsxExpression' <|> jsxText) <*> term jsxClosingElement')
 
 jsxSelfClosingElement :: Assignment
-jsxSelfClosingElement = makeTerm <$> symbol Grammar.JsxSelfClosingElement <*> children (TypeScript.Syntax.JsxSelfClosingElement <$> term identifier <*> manyTerm (jsxAttribute <|> jsxExpression'))
+jsxSelfClosingElement = makeTerm <$> symbol Grammar.JsxSelfClosingElement <*> children (TypeScript.Syntax.JsxSelfClosingElement <$> term (identifier <|> nestedIdentifier) <*> manyTerm (jsxAttribute <|> jsxExpression'))
 
 jsxOpeningElement' :: Assignment
-jsxOpeningElement' = makeTerm <$> symbol Grammar.JsxOpeningElement <*> children (TypeScript.Syntax.JsxOpeningElement <$> term identifier <*> manyTerm (jsxAttribute <|> jsxExpression'))
+jsxOpeningElement' = makeTerm <$> symbol Grammar.JsxOpeningElement <*> children (TypeScript.Syntax.JsxOpeningElement <$> term (identifier <|> nestedIdentifier) <*> manyTerm (jsxAttribute <|> jsxExpression'))
 
 jsxExpression' :: Assignment
 jsxExpression' = makeTerm <$> symbol Grammar.JsxExpression <*> children (TypeScript.Syntax.JsxExpression <$> term (expressions <|> spreadElement))
@@ -368,10 +368,10 @@ jsxText :: Assignment
 jsxText = makeTerm <$> symbol Grammar.JsxText <*> (TypeScript.Syntax.JsxText <$> source)
 
 jsxClosingElement' :: Assignment
-jsxClosingElement' = makeTerm <$> symbol Grammar.JsxClosingElement <*> children (TypeScript.Syntax.JsxClosingElement <$> term identifier)
+jsxClosingElement' = makeTerm <$> symbol Grammar.JsxClosingElement <*> children (TypeScript.Syntax.JsxClosingElement <$> term (identifier <|> nestedIdentifier))
 
 jsxAttribute :: Assignment
-jsxAttribute = makeTerm <$> symbol Grammar.JsxAttribute <*> children (TypeScript.Syntax.JsxAttribute <$> term propertyIdentifier <*> term (number <|> string <|> jsxExpression'))
+jsxAttribute = makeTerm <$> symbol Grammar.JsxAttribute <*> children (TypeScript.Syntax.JsxAttribute <$> term propertyIdentifier <*> (term (number <|> string <|> jsxExpression') <|> emptyTerm))
 
 propertyIdentifier :: Assignment
 propertyIdentifier = makeTerm <$> symbol PropertyIdentifier <*> (Syntax.Identifier <$> source)
