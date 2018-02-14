@@ -23,7 +23,6 @@ import qualified Data.Map as Map
 import Data.Semigroup
 import Control.Monad.Fail
 import Prelude hiding (fail)
-
 import Data.Blob
 import System.FilePath.Posix
 
@@ -80,7 +79,7 @@ evaluates :: forall v term
 evaluates pairs = run @(Evaluating v) . fix go1 pure
   where
     go1 recur yield (b@Blob{..}, t) = trace (show blobPath) $
-      local (const (Linker (Map.fromList (map (toPathActionPair recur yield) pairs)))) $
+      local (const (Linker (Map.fromList (map (toPathActionPair recur pure) pairs)))) $
         eval (\ev term -> recur ev (b, term)) yield (project t)
     toPathActionPair recur yield (b@Blob{..}, t) = (dropExtensions blobPath, Evaluator (go1 recur yield (b, t)))
 
