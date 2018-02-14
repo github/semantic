@@ -6,6 +6,7 @@ import Data.Abstract.FreeVariables
 import Data.Abstract.Live
 import Data.Functor.Classes.Generic
 import qualified Data.Map as Map
+import qualified Data.Set as Set
 import Data.Semigroup
 import GHC.Generics
 
@@ -24,6 +25,8 @@ envLookup k = trace ("envLookup" <> show k) . Map.lookup k . unEnvironment
 envInsert :: Name -> Address l a -> Environment l a -> Environment l a
 envInsert name value (Environment m) = trace ("envInsert" <> show name) $ Environment (Map.insert name value m)
 
+envUnion :: Environment l a -> Environment l a -> Environment l a
+envUnion (Environment e1) (Environment e2) = Environment $ Map.union e1 e2 
 
 -- | Retrieve the 'Live' set of addresses to which the given free variable names are bound.
 --
@@ -31,6 +34,8 @@ envInsert name value (Environment m) = trace ("envInsert" <> show name) $ Enviro
 envRoots :: (Ord l, Foldable t) => Environment l a -> t Name -> Live l a
 envRoots env = foldr ((<>) . maybe mempty liveSingleton . flip envLookup env) mempty
 
+envAll :: (Ord l) => Environment l a -> Live l a
+envAll (Environment env) = Live $ Set.fromList (Map.elems env)
 
 -- Instances
 
