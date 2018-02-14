@@ -17,6 +17,7 @@ import qualified Prelude
 
 type ValueConstructors location
   = '[Closure location
+    , Program location
     , Unit
     , Boolean
     , Integer
@@ -36,6 +37,14 @@ data Closure location term = Closure [Name] term (Environment location (Value lo
 instance (Eq location) => Eq1 (Closure location) where liftEq = genericLiftEq
 instance (Ord location) => Ord1 (Closure location) where liftCompare = genericLiftCompare
 instance (Show location) => Show1 (Closure location) where liftShowsPrec = genericLiftShowsPrec
+
+-- | A function value consisting of a list of parameters, the body of the function, and an environment of bindings captured by the body.
+data Program location term = Program (Environment location (Value location term))
+  deriving (Eq, Generic1, Ord, Show)
+
+instance (Eq location) => Eq1 (Program location) where liftEq = genericLiftEq
+instance (Ord location) => Ord1 (Program location) where liftCompare = genericLiftCompare
+instance (Show location) => Show1 (Program location) where liftShowsPrec = genericLiftShowsPrec
 
 -- | The unit value. Typically used to represent the result of imperative statements.
 data Unit term = Unit
@@ -101,6 +110,7 @@ class AbstractValue v where
 instance (FreeVariables term, Ord location) => ValueRoots location (Value location term) where
   valueRoots v
     | Just (Closure names body env) <- prj v = envRoots env (foldr Set.delete (freeVariables body) names)
+    | Just (Program env) <- prj v            = envAll env
     | otherwise                              = mempty
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
