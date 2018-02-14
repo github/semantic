@@ -379,7 +379,7 @@ import' =  makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliased
     wildCard = makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
 
     aliasedImport = makeTerm <$> symbol AliasedImport <*> children (Declaration.Import <$> expression <*> expression <*> pure [])
-    plainImport = makeTerm <$> symbol DottedName <*> children (Declaration.Import <$> (makeTerm <$> location <*> manyTerm expression) <*> emptyTerm <*> pure [])
+    plainImport = makeTerm <$> symbol DottedName <*> children (Declaration.Import <$> expressions <*> emptyTerm <*> pure [])
 
 assertStatement :: Assignment
 assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> manyTerm expression <*> emptyTerm)

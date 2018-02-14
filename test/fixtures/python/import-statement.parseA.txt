@@ -1,7 +1,7 @@
 (Program
   (
     (Import
-      ((Identifier))
+      (Identifier)
       (Empty))
     (Import
       (ScopeResolution
@@ -14,6 +14,6 @@
         (Identifier))
       (Identifier))
     (Import
-      ((Identifier))
+      (Identifier)
       (Empty)))
   (Import((Identifier)(Identifier)(Identifier))(Empty)))
