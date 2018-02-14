@@ -3,7 +3,6 @@ module Analysis.Abstract.Evaluating where
 
 import Control.Effect
 import Control.Monad.Effect hiding (run)
-import Control.Monad.Effect.Env
 import Control.Monad.Effect.Address
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
@@ -17,10 +16,9 @@ import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Abstract.Live
 import Data.Function (fix)
-import Data.Functor.Foldable (Base, Recursive(..), ListF(..))
+import Data.Functor.Foldable (Base, Recursive(..))
 import qualified Data.Map as Map
 import Data.Semigroup
-import Control.Monad.Fail
 import Prelude hiding (fail)
 import Data.Blob
 import System.FilePath.Posix

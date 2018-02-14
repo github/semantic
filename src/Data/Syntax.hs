@@ -151,18 +151,6 @@ instance Eq1 Program where liftEq = genericLiftEq
 instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 
--- instance ( Monad m
---          , Ord (LocationFor v)
---          , MonadGC v m
---          , MonadEnv v m
---          , AbstractValue v
---          , FreeVariables t
---          )
---         => Eval t v m Program where
---   eval ev yield term@(Program xs) = do
---     env <- askEnv :: m (Environment (LocationFor v) v)
---     let v = inj (Value.Program term env)
---     extraRoots (envRoots env (freeVariables v)) (eval ev yield xs)
 instance ( Monad m
          , Ord l
          , Show l
@@ -185,8 +173,14 @@ instance ( Monad m
         env <- askEnv @(Value l t)
         extraRoots (envAll env) (ev (const (eval' ev pure as)) a) >>= yield
 
-
-instance MonadFail m => Eval t Type.Type m Program
+instance ( Monad m
+         , Ord Type.Type
+         , MonadGC Type.Type m
+         , MonadEnv Type.Type m
+         , AbstractValue Type.Type
+         , FreeVariables t
+         ) => Eval t Type.Type m Program where
+  eval ev yield (Program xs) = eval ev yield xs
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString

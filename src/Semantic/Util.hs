@@ -39,7 +39,7 @@ parsePythonFiles paths entryPath = do
   terms <- runTask $ traverse (parse pythonParser) blobs
   entryBlob <- file entryPath
   entryTerm <- runTask (parse pythonParser entryBlob)
-  pure ((zip blobs terms), (entryBlob, entryTerm))
+  pure (zip blobs terms, (entryBlob, entryTerm))
 
 evaluatePythonFiles paths = do
   blobs@(b:bs) <- traverse file paths

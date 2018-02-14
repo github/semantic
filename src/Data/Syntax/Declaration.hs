@@ -8,7 +8,6 @@ import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.Store
 import Data.Abstract.Address
 import Data.Abstract.Environment
-import Data.Abstract.Linker
 import Analysis.Abstract.Evaluating
 import Data.Abstract.Eval
 import Data.Abstract.FreeVariables
@@ -272,7 +271,6 @@ instance ( Monad m
          , MonadFail m
          , MonadLinker (Value l t) m
          , MonadEnv (Value l t) m
-         , AbstractValue (Value l t)
          , FreeVariables t
          )
          => Eval t (Value l t) m Import where
