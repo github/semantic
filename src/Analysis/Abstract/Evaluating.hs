@@ -72,7 +72,7 @@ evaluates :: forall v term
             , FreeVariables term
             , Eval term v (Eff (Evaluating v)) (Base term)
             )
-          => [(Blob, term)] -- List of blob, term pairs that make up the program to be evaluated
+          => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
           -> Final (Evaluating v) v
 evaluates pairs = run @(Evaluating v) . fix go1 pure
@@ -81,10 +81,3 @@ evaluates pairs = run @(Evaluating v) . fix go1 pure
       local (const (Linker (Map.fromList (map (toPathActionPair recur pure) pairs)))) $
         eval (\ev term -> recur ev (b, term)) yield (project t)
     toPathActionPair recur yield (b@Blob{..}, t) = (dropExtensions blobPath, Evaluator (go1 recur yield (b, t)))
-
-
--- TODO: Register actions in the module table instead of the values
---
--- TODO: Some concept of an "entry point".
---       - a program will have a 'main'
---       - a library? can just lazy eval in parallel
