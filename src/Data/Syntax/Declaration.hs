@@ -3,7 +3,6 @@ module Data.Syntax.Declaration where
 
 import Control.Applicative
 import Control.Monad.Effect.Address
-import Control.Monad.Effect.Linker
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.Store

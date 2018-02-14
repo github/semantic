@@ -36,7 +36,6 @@ library
                      , Control.Monad.Effect.Cache
                      , Control.Monad.Effect.Dead
                      , Control.Monad.Effect.Env
-                     , Control.Monad.Effect.Link
                      , Control.Monad.Effect.Fresh
                      , Control.Monad.Effect.GC
                      , Control.Monad.Effect.NonDet

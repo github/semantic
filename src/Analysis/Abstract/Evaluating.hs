@@ -5,7 +5,6 @@ import Control.Effect
 import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Address
-import Control.Monad.Effect.Linker
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
