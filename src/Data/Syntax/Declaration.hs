@@ -14,6 +14,7 @@ import Analysis.Abstract.Evaluating
 import Data.Abstract.Eval
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type hiding (Type)
+import qualified Data.Abstract.Value as Value
 import qualified Data.Abstract.Type as Type
 import Data.Abstract.Value
 import Data.Align.Generic
@@ -25,6 +26,7 @@ import Data.Semigroup
 import Data.Union
 import Diffing.Algorithm
 import GHC.Generics
+import Prelude hiding (fail)
 
 import qualified Data.ByteString.Char8 as BC
 import Debug.Trace
@@ -266,19 +268,25 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Import
 instance ( Monad m
-         , Show v
+         , Show l
+         , Show t
          , MonadFail m
-         , MonadLinker v m
-         , MonadEnv v m
-         , AbstractValue v
+         , MonadLinker (Value l t) m
+         , MonadEnv (Value l t) m
+         , AbstractValue (Value l t)
          , FreeVariables t
          )
-         => Eval t v m Import where
+         => Eval t (Value l t) m Import where
   eval _ yield (Import from _ _) = do
     let [name] = toList (freeVariables from)
 
-    v <- require (BC.unpack name)
-    trace ("[Import] " <> show name <> ": " <> show v) $ yield v
+    require <- require (BC.unpack name)
+    Value.Program env <- maybe (fail "expected a program") pure (prj require :: Maybe (Value.Program l t))
+
+    trace ("[Import] " <> show name <> ": " <> show require) $
+      localEnv (envUnion env) (yield require)
+
+instance MonadFail m => Eval t Type.Type m Import
 
 -- | An imported symbol
 data ImportSymbol a = ImportSymbol { importSymbolName :: !a, importSymbolAlias :: !a }
