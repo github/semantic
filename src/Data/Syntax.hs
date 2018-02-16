@@ -165,9 +165,9 @@ instance ( Monad m
         => Eval t (Value l t) m Program where
   eval ev yield (Program xs) = eval' ev yield xs
     where
-      eval' _  _ []     = do
+      eval' ev _ [] = do
         env <- askEnv @(Value l t)
-        let v = trace ("env: " <> show env) $ inj (Value.Program env)
+        let v = trace ("env: " <> show env) $ inj (Value.Interface env) :: Value l t
         yield v
       eval' ev _ (a:as) = do
         env <- askEnv @(Value l t)

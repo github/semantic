@@ -278,7 +278,7 @@ instance ( Monad m
     let [name] = toList (freeVariables from)
 
     require <- require (BC.unpack name)
-    Value.Program env <- maybe (fail "expected a program") pure (prj require :: Maybe (Value.Program l t))
+    Value.Interface env <- maybe (fail ("expected a program, but got: " <> show require)) pure (prj require :: Maybe (Value.Interface l t))
 
     trace ("[Import] " <> show name <> ": " <> show require) $
       localEnv (envUnion env) (yield require)
