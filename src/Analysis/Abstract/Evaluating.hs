@@ -23,8 +23,6 @@ import Prelude hiding (fail)
 import Data.Blob
 import System.FilePath.Posix
 
-import Debug.Trace
-
 class Monad m => MonadLinker v m where
   require :: FilePath -> m v
 
@@ -74,9 +72,8 @@ evaluates :: forall v term
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
           -> Final (Evaluating v) v
-evaluates pairs = run @(Evaluating v) . fix go1 pure
+evaluates pairs = run @(Evaluating v) . fix go pure
   where
-    go1 recur yield (b@Blob{..}, t) = trace (show blobPath) $
-      local (const (Linker (Map.fromList (map (toPathActionPair recur pure) pairs)))) $
+    go recur yield (b@Blob{..}, t) = local (const (Linker (Map.fromList (map (toPathActionPair recur pure) pairs)))) $
         eval (\ev term -> recur ev (b, term)) yield (project t)
-    toPathActionPair recur yield (b@Blob{..}, t) = (dropExtensions blobPath, Evaluator (go1 recur yield (b, t)))
+    toPathActionPair recur yield (b@Blob{..}, t) = (dropExtensions blobPath, Evaluator (go recur yield (b, t)))
