@@ -507,10 +507,3 @@ data JsxNamespaceName a = JsxNamespaceName a a
 instance Eq1 JsxNamespaceName where liftEq = genericLiftEq
 instance Ord1 JsxNamespaceName where liftCompare = genericLiftCompare
 instance Show1 JsxNamespaceName where liftShowsPrec = genericLiftShowsPrec
-
-data JsxMemberExpression a = JsxMemberExpression [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
-
-instance Eq1 JsxMemberExpression where liftEq = genericLiftEq
-instance Ord1 JsxMemberExpression where liftCompare = genericLiftCompare
-instance Show1 JsxMemberExpression where liftShowsPrec = genericLiftShowsPrec

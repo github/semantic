@@ -144,7 +144,6 @@ type Syntax = '[
   , TypeScript.Syntax.JsxClosingElement
   , TypeScript.Syntax.JsxExpression
   , TypeScript.Syntax.JsxAttribute
-  , TypeScript.Syntax.JsxMemberExpression
   , TypeScript.Syntax.JsxFragment
   , TypeScript.Syntax.JsxNamespaceName
   , TypeScript.Syntax.OptionalParameter
@@ -376,13 +375,10 @@ jsxOpeningElement' :: Assignment
 jsxOpeningElement' = makeTerm <$> symbol Grammar.JsxOpeningElement <*> children (TypeScript.Syntax.JsxOpeningElement <$> term jsxElementName <*> manyTerm jsxAttribute')
 
 jsxElementName :: Assignment
-jsxElementName = choice [ identifier, jsxMemberExpression, jsxNamespaceName ]
+jsxElementName = choice [ identifier, nestedIdentifier, jsxNamespaceName ]
 
 jsxNamespaceName :: Assignment
 jsxNamespaceName = makeTerm <$> symbol Grammar.JsxNamespaceName <*> children (TypeScript.Syntax.JsxNamespaceName <$> identifier <*> identifier)
-
-jsxMemberExpression :: Assignment
-jsxMemberExpression = makeTerm <$> symbol Grammar.JsxMemberExpression <*> children (TypeScript.Syntax.JsxMemberExpression <$> manyTerm identifier)
 
 jsxExpression' :: Assignment
 jsxExpression' = makeTerm <$> symbol Grammar.JsxExpression <*> children (TypeScript.Syntax.JsxExpression <$> term (expressions <|> spreadElement <|> emptyTerm))
