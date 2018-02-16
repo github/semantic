@@ -493,3 +493,17 @@ data RestParameter a = RestParameter { _restParameterContext :: ![a], _restParam
 instance Eq1 RestParameter where liftEq = genericLiftEq
 instance Ord1 RestParameter where liftCompare = genericLiftCompare
 instance Show1 RestParameter where liftShowsPrec = genericLiftShowsPrec
+
+data JsxFragment a = JsxFragment [a]
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 JsxFragment where liftEq = genericLiftEq
+instance Ord1 JsxFragment where liftCompare = genericLiftCompare
+instance Show1 JsxFragment where liftShowsPrec = genericLiftShowsPrec
+
+data JsxNamespaceName a = JsxNamespaceName a a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 JsxNamespaceName where liftEq = genericLiftEq
+instance Ord1 JsxNamespaceName where liftCompare = genericLiftCompare
+instance Show1 JsxNamespaceName where liftShowsPrec = genericLiftShowsPrec

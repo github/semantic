@@ -22,4 +22,16 @@
         (JsxExpression
           (Identifier))
         (JsxClosingElement
-          (Identifier))))))
+          (Identifier)))))
+  {-(VariableDeclaration
+    {-(Assignment
+      {-(Empty)-}
+      {-(Identifier)-}
+      {-(JsxElement{-(JsxOpeningElement{-(NestedIdentifier{-(Identifier)-}{-(Identifier)-})-})-}{-(JsxClosingElement{-(NestedIdentifier{-(Identifier)-}{-(Identifier)-})-})-})-})
+    -})-}
+  {-(VariableDeclaration
+    {-(Assignment
+      {-(Empty)-}
+      {-(Identifier)-}
+      {-(JsxSelfClosingElement{-(NestedIdentifier{-(Identifier)-}{-(Identifier)-})-}{-(JsxAttribute{-(Identifier)-}{-(Empty)-})-}{-(JsxAttribute{-(Identifier)-}{-(TextElement)-})-})-}
+    )-})-})
