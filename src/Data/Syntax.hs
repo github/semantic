@@ -163,18 +163,16 @@ instance ( Monad m
         => Eval t (Value l t) m Program where
   eval ev yield (Program xs) = eval' ev yield xs
     where
-      eval' _  yield []  = do
-        env <- askEnv @(Value l t)
-        let v = inj (Value.Interface (unit :: Value l t) env) :: Value l t
-        yield v
-      eval' ev yield [a] = do
-        env <- askEnv @(Value l t)
-        v1 <- ev pure a
-        let v = inj (Value.Interface (v1 :: Value l t) env) :: Value l t
-        yield v
+      eval' _  _ []  = injectAndYield unit
+      eval' ev _ [a] = ev pure a >>= injectAndYield
       eval' ev yield (a:as) = do
         env <- askEnv @(Value l t)
         extraRoots (envAll env) (ev (const (eval' ev pure as)) a) >>= yield
+
+      injectAndYield :: Value l t -> m (Value l t)
+      injectAndYield val = do
+        env <- askEnv @(Value l t)
+        yield $ inj (Value.Interface val env)
 
 instance ( Monad m
          , Ord Type.Type
