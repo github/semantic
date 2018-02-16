@@ -144,6 +144,8 @@ type Syntax = '[
   , TypeScript.Syntax.JsxClosingElement
   , TypeScript.Syntax.JsxExpression
   , TypeScript.Syntax.JsxAttribute
+  , TypeScript.Syntax.JsxFragment
+  , TypeScript.Syntax.JsxNamespaceName
   , TypeScript.Syntax.OptionalParameter
   , TypeScript.Syntax.RequiredParameter
   , TypeScript.Syntax.RestParameter
@@ -196,8 +198,8 @@ expression = handleError everything
       super,
       object,
       array,
-      jsxElement,
-      jsxSelfClosingElement,
+      jsxElement',
+      jsxFragment,
       class',
       anonymousClass,
       function,
@@ -352,26 +354,44 @@ object = makeTerm <$> (symbol Object <|> symbol ObjectPattern) <*> children (Lit
 array :: Assignment
 array = makeTerm <$> (symbol Array <|> symbol ArrayPattern) <*> children (Literal.Array <$> manyTerm (expression <|> spreadElement))
 
+jsxElement' :: Assignment
+jsxElement' = choice [ jsxElement, jsxSelfClosingElement ]
+
 jsxElement :: Assignment
-jsxElement = makeTerm <$> symbol Grammar.JsxElement <*> children (TypeScript.Syntax.JsxElement <$> term jsxOpeningElement' <*> manyTerm (jsxElement <|> jsxSelfClosingElement <|> jsxExpression' <|> jsxText) <*> term jsxClosingElement')
+jsxElement = makeTerm <$> symbol Grammar.JsxElement <*> children (TypeScript.Syntax.JsxElement <$> term jsxOpeningElement' <*> manyTerm jsxChild <*> term jsxClosingElement')
+
+jsxFragment :: Assignment
+jsxFragment = makeTerm <$> symbol Grammar.JsxFragment <*> children (TypeScript.Syntax.JsxFragment <$> manyTerm jsxChild)
+
+jsxChild :: Assignment
+jsxChild = choice [ jsxElement', jsxExpression', jsxText ]
 
 jsxSelfClosingElement :: Assignment
-jsxSelfClosingElement = makeTerm <$> symbol Grammar.JsxSelfClosingElement <*> children (TypeScript.Syntax.JsxSelfClosingElement <$> term identifier <*> manyTerm (jsxAttribute <|> jsxExpression'))
+jsxSelfClosingElement = makeTerm <$> symbol Grammar.JsxSelfClosingElement <*> children (TypeScript.Syntax.JsxSelfClosingElement <$> term jsxElementName <*> manyTerm jsxAttribute')
+
+jsxAttribute' = jsxAttribute <|> jsxExpression'
 
 jsxOpeningElement' :: Assignment
-jsxOpeningElement' = makeTerm <$> symbol Grammar.JsxOpeningElement <*> children (TypeScript.Syntax.JsxOpeningElement <$> term identifier <*> manyTerm (jsxAttribute <|> jsxExpression'))
+jsxOpeningElement' = makeTerm <$> symbol Grammar.JsxOpeningElement <*> children (TypeScript.Syntax.JsxOpeningElement <$> term jsxElementName <*> manyTerm jsxAttribute')
+
+jsxElementName :: Assignment
+jsxElementName = choice [ identifier, nestedIdentifier, jsxNamespaceName ]
+
+jsxNamespaceName :: Assignment
+jsxNamespaceName = makeTerm <$> symbol Grammar.JsxNamespaceName <*> children (TypeScript.Syntax.JsxNamespaceName <$> identifier <*> identifier)
 
 jsxExpression' :: Assignment
-jsxExpression' = makeTerm <$> symbol Grammar.JsxExpression <*> children (TypeScript.Syntax.JsxExpression <$> term (expressions <|> spreadElement))
+jsxExpression' = makeTerm <$> symbol Grammar.JsxExpression <*> children (TypeScript.Syntax.JsxExpression <$> term (expressions <|> spreadElement <|> emptyTerm))
 
 jsxText :: Assignment
 jsxText = makeTerm <$> symbol Grammar.JsxText <*> (TypeScript.Syntax.JsxText <$> source)
 
 jsxClosingElement' :: Assignment
-jsxClosingElement' = makeTerm <$> symbol Grammar.JsxClosingElement <*> children (TypeScript.Syntax.JsxClosingElement <$> term identifier)
+jsxClosingElement' = makeTerm <$> symbol Grammar.JsxClosingElement <*> children (TypeScript.Syntax.JsxClosingElement <$> term jsxElementName)
 
 jsxAttribute :: Assignment
-jsxAttribute = makeTerm <$> symbol Grammar.JsxAttribute <*> children (TypeScript.Syntax.JsxAttribute <$> term propertyIdentifier <*> term (number <|> string <|> jsxExpression'))
+jsxAttribute = makeTerm <$> symbol Grammar.JsxAttribute <*> children (TypeScript.Syntax.JsxAttribute <$> term (propertyIdentifier <|> jsxNamespaceName) <*> (term jsxAttributeValue <|> emptyTerm))
+  where jsxAttributeValue = choice [ string, jsxExpression', jsxElement', jsxFragment ]
 
 propertyIdentifier :: Assignment
 propertyIdentifier = makeTerm <$> symbol PropertyIdentifier <*> (Syntax.Identifier <$> source)
