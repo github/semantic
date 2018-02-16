@@ -38,7 +38,7 @@ instance (Eq location) => Eq1 (Closure location) where liftEq = genericLiftEq
 instance (Ord location) => Ord1 (Closure location) where liftCompare = genericLiftCompare
 instance (Show location) => Show1 (Closure location) where liftShowsPrec = genericLiftShowsPrec
 
--- | A function value consisting of a list of parameters, the body of the function, and an environment of bindings captured by the body.
+-- | A program value consisting of the value of the program and it's enviornment of bindings.
 data Interface location term = Interface (Value location term) (Environment location (Value location term))
   deriving (Eq, Generic1, Ord, Show)
 
