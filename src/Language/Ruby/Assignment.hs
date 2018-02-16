@@ -1,9 +1,12 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
 module Language.Ruby.Assignment
 ( assignment
+, assignment2
 , Syntax
+, Syntax2
 , Grammar
 , Term
+, Term2
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
@@ -25,6 +28,13 @@ import qualified Data.Term as Term
 import Data.Union
 import GHC.Stack
 import Language.Ruby.Grammar as Grammar
+
+type Syntax2 = '[
+    Literal.Integer
+  , Syntax.Error
+  , Syntax.Program
+  , []
+  ]
 
 -- | The type of Ruby syntax.
 type Syntax = '[
@@ -81,6 +91,13 @@ type Syntax = '[
   , Syntax.Program
   , []
   ]
+
+type Term2 = Term.Term (Union Syntax2) (Record Location)
+type Assignment2 = HasCallStack => Assignment.Assignment [] Grammar Term2
+
+assignment2 :: Assignment2
+assignment2 = makeTerm <$> symbol Program <*> children (Syntax.Program <$> many number)
+  where number = makeTerm <$> symbol Grammar.Integer  <*> (Literal.Integer <$> source)
 
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term

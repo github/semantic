@@ -10,6 +10,7 @@ module Parsing.Parser
 , markdownParser
 , pythonParser
 , rubyParser
+, rubyParser2
 , typescriptParser
 , phpParser
 ) where
@@ -93,6 +94,9 @@ someParser _ PHP        = SomeParser phpParser
 
 goParser :: Parser Go.Term
 goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
+
+rubyParser2 :: Parser Ruby.Term2
+rubyParser2 = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment2
 
 rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
