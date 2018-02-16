@@ -14,6 +14,7 @@ import Data.Abstract.FreeVariables
 import Data.Abstract.Type hiding (Type)
 import qualified Data.Abstract.Value as Value
 import qualified Data.Abstract.Type as Type
+import qualified Data.ByteString.Char8 as BC
 import Data.Abstract.Value
 import Data.Align.Generic
 import Data.Foldable (toList)
@@ -25,9 +26,6 @@ import Data.Union
 import Diffing.Algorithm
 import GHC.Generics
 import Prelude hiding (fail)
-
-import qualified Data.ByteString.Char8 as BC
-import Debug.Trace
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -264,7 +262,6 @@ instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Import
 instance ( Monad m
          , Show l
          , Show t
@@ -277,11 +274,13 @@ instance ( Monad m
   eval _ yield (Import from _ _) = do
     let [name] = toList (freeVariables from)
 
-    require <- require (BC.unpack name)
-    Value.Interface env <- maybe (fail ("expected a program, but got: " <> show require)) pure (prj require :: Maybe (Value.Interface l t))
+    interface <- require (BC.unpack name)
+    Interface _ env <- maybe
+                           (fail ("expected an interface, but got: " <> show interface))
+                           pure
+                           (prj interface :: Maybe (Value.Interface l t))
 
-    trace ("[Import] " <> show name <> ": " <> show require) $
-      localEnv (envUnion env) (yield require)
+    localEnv (envUnion env) (yield interface)
 
 instance MonadFail m => Eval t Type.Type m Import
 

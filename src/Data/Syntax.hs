@@ -12,7 +12,7 @@ import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Eval
 import Data.Abstract.FreeVariables
-import Data.Abstract.Value (LocationFor, AbstractValue(..), Value(..))
+import Data.Abstract.Value (LocationFor, AbstractValue(..), Value)
 import qualified Data.Abstract.Value as Value
 import qualified Data.Abstract.Type as Type
 import Data.Align.Generic
@@ -37,8 +37,6 @@ import Diffing.Algorithm hiding (Empty)
 import GHC.Generics
 import GHC.Stack
 import Prelude hiding (fail)
-
-import Debug.Trace
 
 -- Combinators
 
@@ -165,11 +163,16 @@ instance ( Monad m
         => Eval t (Value l t) m Program where
   eval ev yield (Program xs) = eval' ev yield xs
     where
-      eval' ev _ [] = do
+      eval' _  yield []  = do
         env <- askEnv @(Value l t)
-        let v = trace ("env: " <> show env) $ inj (Value.Interface env) :: Value l t
+        let v = inj (Value.Interface (unit :: Value l t) env) :: Value l t
         yield v
-      eval' ev _ (a:as) = do
+      eval' ev yield [a] = do
+        env <- askEnv @(Value l t)
+        v1 <- ev pure a
+        let v = inj (Value.Interface (v1 :: Value l t) env) :: Value l t
+        yield v
+      eval' ev yield (a:as) = do
         env <- askEnv @(Value l t)
         extraRoots (envAll env) (ev (const (eval' ev pure as)) a) >>= yield
 
@@ -177,7 +180,6 @@ instance ( Monad m
          , Ord Type.Type
          , MonadGC Type.Type m
          , MonadEnv Type.Type m
-         , AbstractValue Type.Type
          , FreeVariables t
          ) => Eval t Type.Type m Program where
   eval ev yield (Program xs) = eval ev yield xs
