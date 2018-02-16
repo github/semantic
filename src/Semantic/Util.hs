@@ -25,6 +25,7 @@ import Semantic.Task
 import Data.AST
 import Data.Union
 import Data.Abstract.Value
+import Data.Abstract.Store
 import Data.Abstract.Address
 import qualified Language.Python.Assignment as Python
 
@@ -41,6 +42,14 @@ parsePythonFiles paths entryPath = do
   entryTerm <- runTask (parse pythonParser entryBlob)
   pure (zip blobs terms, (entryBlob, entryTerm))
 
+evaluatePythonFiles :: [FilePath]
+                    -> IO
+                        (Either
+                           Prelude.String
+                           (Union
+                              (ValueConstructors Precise)
+                              (Term (Union Python.Syntax) (Record Location))),
+                           Store Precise PythonValue)
 evaluatePythonFiles paths = do
   blobs@(b:bs) <- traverse file paths
   (t:ts) <- runTask $ traverse (parse pythonParser) blobs
