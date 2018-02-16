@@ -48,7 +48,7 @@ instance (Monad m, AbstractValue v) => Eval t v m Data.Syntax.Literal.Integer wh
   eval _ yield (Data.Syntax.Literal.Integer x) = yield (integer (maybe 0 fst (readInteger x)))
 
 instance (Monad m, AbstractValue v) => E2.Eval t v m Data.Syntax.Literal.Integer where
-  eval (Data.Syntax.Literal.Integer x) = undefined -- yield (integer (maybe 0 fst (readInteger x)))
+  eval (Data.Syntax.Literal.Integer x) = pure (integer (maybe 0 fst (readInteger x)))
 
 
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
