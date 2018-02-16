@@ -11,6 +11,7 @@ import Control.Monad.Error.Class hiding (Error)
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Eval
+import qualified Data.Abstract.Eval2 as E2
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value (LocationFor, AbstractValue(..), Value)
 import qualified Data.Abstract.Value as Value
@@ -182,6 +183,15 @@ instance ( Monad m
          ) => Eval t Type.Type m Program where
   eval ev yield (Program xs) = eval ev yield xs
 
+instance ( MonadFail m
+         , Ord (LocationFor v)
+         , AbstractValue v
+         , E2.Recursive t
+         , E2.Eval t v m (E2.Base t)
+         )
+         => E2.Eval t v m Program where
+  eval (Program xs) = E2.eval xs
+
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -216,6 +226,7 @@ instance Ord1 Error where liftCompare = genericLiftCompare
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 
 instance (MonadFail m) => Eval t v m Error
+instance (MonadFail m) => E2.Eval t v m Error
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorExpected errorActual

@@ -2,6 +2,7 @@
 module Data.Syntax.Literal where
 
 import Data.Abstract.Eval
+import qualified Data.Abstract.Eval2 as E2
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value (AbstractValue(..))
 import Data.Align.Generic
@@ -45,6 +46,9 @@ instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShow
 
 instance (Monad m, AbstractValue v) => Eval t v m Data.Syntax.Literal.Integer where
   eval _ yield (Data.Syntax.Literal.Integer x) = yield (integer (maybe 0 fst (readInteger x)))
+
+instance (Monad m, AbstractValue v) => E2.Eval t v m Data.Syntax.Literal.Integer where
+  eval (Data.Syntax.Literal.Integer x) = undefined -- yield (integer (maybe 0 fst (readInteger x)))
 
 
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
