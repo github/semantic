@@ -1,10 +1,12 @@
 {-# LANGUAGE DefaultSignatures, MultiParamTypeClasses, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE TypeApplications #-}
 module Data.Abstract.Eval2
 ( Eval(..)
 , MonadGC(..)
 , MonadFail(..)
 , Recursive(..)
 , Base
+, Recur(..)
 ) where
 
 import Control.Monad.Effect.Env
@@ -19,6 +21,17 @@ import Data.Term
 import Data.Union
 import Data.Functor.Foldable (Base, Recursive(..), project)
 import Prelude hiding (fail)
+import Control.Monad.Effect hiding (run)
+
+
+class Recur term v m where
+  recur :: term -> m v
+
+instance ( Eval term v (Eff fs) (Base term)
+         , Recursive term )
+         => Recur term v (Eff fs) where
+  recur = eval . project
+
 
 -- | The 'Eval' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Monad m => Eval term v m constr where
@@ -49,15 +62,19 @@ instance ( Monad m
          , AbstractValue v
          , Recursive t
          -- , FreeVariables t
+         , Recur t v m
          , Eval t v m (Base t)
          )
          => Eval t v m [] where
-  eval []  = pure unit
-  eval [x] = eval (project x)
+  eval []     = pure unit
+  eval [x]    = recur x
+  eval (x:xs) = recur @t @v x >> eval xs
+
+  -- eval (x:xs) = eval (project x) >>= \_ -> eval xs
   -- eval ev yield [a]    = ev pure a >>= yield
   -- eval ev yield (a:as) = do
   --   env <- askEnv :: m (Environment (LocationFor v) v)
   --   extraRoots (envRoots env (freeVariables1 as)) (ev (const (eval ev pure as)) a) >>= yield
 
--- Default should be to yield
+-- Default should be to affect the environment.
 -- Allow "return" to short circuit the rest of the imperative scope

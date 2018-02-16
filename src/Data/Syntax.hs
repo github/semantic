@@ -188,6 +188,7 @@ instance ( MonadFail m
          , AbstractValue v
          , E2.Recursive t
          , E2.Eval t v m (E2.Base t)
+         , E2.Recur t v m
          )
          => E2.Eval t v m Program where
   eval (Program xs) = E2.eval xs
