@@ -28,6 +28,7 @@ type Evaluating v
   = '[ Fail                                   -- For 'MonadFail'.
      , State  (Store (LocationFor v) v)       -- For 'MonadStore'.
      -- , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
+     , State  (Environment (LocationFor v) v)
      -- , Reader (Live (LocationFor v) v)        -- For 'MonadGC'.
      ]
 

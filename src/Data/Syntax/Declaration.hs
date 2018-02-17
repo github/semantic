@@ -10,6 +10,7 @@ import Data.Abstract.Address
 import Data.Abstract.Environment
 import Analysis.Abstract.Evaluating
 import Data.Abstract.Eval
+import qualified Data.Abstract.Eval2 as E2
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type hiding (Type)
 import qualified Data.Abstract.Value as Value
@@ -97,6 +98,26 @@ instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Method
 instance (MonadFail m) => Eval t v m Method
 
+-- Evaluating a Function creates a closure and makes that value available in the
+-- local environment.
+instance ( Monad m
+         -- , MonadEnv (Value l t) m         -- 'askEnv'
+         , FreeVariables t                -- To get free variables from the function's parameters
+         , Semigroup (Cell l (Value l t)) -- envLookupOrAlloc'
+         , MonadStore (Value l t) m       -- envLookupOrAlloc'
+         , MonadAddress l m               -- envLookupOrAlloc'
+         , E2.Yield (Value l t) m         -- 'yield'
+         ) => E2.Eval t (Value l t) m Method where
+  eval Method{..} = do
+    env <- E2.getEnv @(Value l t)
+    let params = toList (foldMap freeVariables methodParameters)
+    let v = inj (Closure params methodBody env) :: Value l t
+    (name, addr) <- envLookupOrAlloc' methodName env v
+    E2.yield (envInsert name addr) v
+    -- localEnv (envInsert name a) (yield v)
+
+instance ( MonadFail m
+         ) => E2.Eval t Type.Type m Method
 
 -- | A method signature in TypeScript or a method spec in Go.
 data MethodSignature a = MethodSignature { _methodSignatureContext :: ![a], _methodSignatureName :: !a, _methodSignatureParameters :: ![a] }
@@ -283,6 +304,8 @@ instance ( Monad m
     localEnv (envUnion env) (yield interface)
 
 instance MonadFail m => Eval t Type.Type m Import
+
+instance (MonadFail m) => E2.Eval t v m Import
 
 -- | An imported symbol
 data ImportSymbol a = ImportSymbol { importSymbolName :: !a, importSymbolAlias :: !a }
