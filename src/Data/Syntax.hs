@@ -217,6 +217,9 @@ instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 instance (Monad m, AbstractValue v) => Eval t v m Empty where
   eval _ yield _ = yield unit
 
+instance (Monad m, AbstractValue v) => E2.Eval t v m Empty where
+  eval _ = pure unit
+
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
