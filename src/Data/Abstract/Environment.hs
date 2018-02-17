@@ -22,7 +22,7 @@ envLookup k = Map.lookup k . unEnvironment
 
 -- | Insert a 'Name' in the environment.
 envInsert :: Name -> Address l a -> Environment l a -> Environment l a
-envInsert name value (Environment m) = Environment (Map.insert name value m)
+envInsert name value (Environment m) = trace ("envInsert: " <> show name) $ Environment (Map.insert name value m)
 
 envUnion :: Environment l a -> Environment l a -> Environment l a
 envUnion (Environment e1) (Environment e2) = Environment $ Map.union e1 e2
