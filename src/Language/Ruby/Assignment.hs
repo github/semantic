@@ -31,8 +31,13 @@ import Language.Ruby.Grammar as Grammar
 
 type Syntax2 = '[
     Literal.Integer
+  , Declaration.Import
+  , Declaration.Method
+  , Expression.Call
   , Syntax.Error
+  , Syntax.Empty
   , Syntax.Program
+  , Syntax.Identifier
   , []
   ]
 
@@ -96,8 +101,62 @@ type Term2 = Term.Term (Union Syntax2) (Record Location)
 type Assignment2 = HasCallStack => Assignment.Assignment [] Grammar Term2
 
 assignment2 :: Assignment2
-assignment2 = makeTerm <$> symbol Program <*> children (Syntax.Program <$> many number)
-  where number = makeTerm <$> symbol Grammar.Integer  <*> (Literal.Integer <$> source)
+assignment2 = makeTerm <$> symbol Program <*> children (Syntax.Program <$> many expression)
+  where
+    number = makeTerm <$> symbol Grammar.Integer  <*> (Literal.Integer <$> source)
+
+    expression :: Assignment2
+    expression = handleError $
+      choice [ number
+             , identifier
+             , method
+             , methodCall ]
+
+    method :: Assignment2
+    method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> pure [] <*> emptyTerm <*> expression <*> params <*> expressions')
+      where params = symbol MethodParameters *> children (many parameter) <|> pure []
+            expressions' = makeTerm <$> location <*> many expression
+
+    methodCall :: Assignment2
+    methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> regularCall)
+      where
+        regularCall = inj <$> (Expression.Call <$> pure [] <*> expression <*> args <*> ({-block <|>-} emptyTerm))
+        require = inj <$> (symbol Identifier *> do
+          s <- source
+          guard (elem s ["autoload", "load", "require", "require_relative"])
+          Declaration.Import <$> args' <*> emptyTerm <*> pure [])
+        args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> pure []
+        args' = makeTerm'' <$> (symbol ArgumentList <|> symbol ArgumentListWithParens) <*> children (many expression) <|> emptyTerm
+
+    parameter :: Assignment2
+    parameter =
+          mk SplatParameter
+      <|> mk HashSplatParameter
+      <|> mk BlockParameter
+      <|> mk KeywordParameter
+      <|> mk OptionalParameter
+      <|> makeTerm <$> symbol DestructuredParameter <*> children (many parameter)
+      <|> expression
+      where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
+
+    identifier :: Assignment2
+    identifier =
+          mk Identifier
+      <|> mk Identifier'
+      <|> mk Constant
+      <|> mk InstanceVariable
+      <|> mk ClassVariable
+      <|> mk GlobalVariable
+      <|> mk Operator
+      <|> mk Self
+      <|> mk Super
+      <|> mk Setter
+      <|> mk SplatArgument
+      <|> mk HashSplatArgument
+      <|> mk BlockArgument
+      <|> mk ReservedIdentifier
+      <|> mk Uninterpreted
+      where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
