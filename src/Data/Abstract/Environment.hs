@@ -10,6 +10,7 @@ import qualified Data.Set as Set
 import Data.Semigroup
 import GHC.Generics
 
+import Debug.Trace
 
 -- | A map of names to addresses that represents the evaluation environment.
 newtype Environment l a = Environment { unEnvironment :: Map.Map Name (Address l a) }
@@ -25,6 +26,11 @@ envInsert name value (Environment m) = Environment (Map.insert name value m)
 
 envUnion :: Environment l a -> Environment l a -> Environment l a
 envUnion (Environment e1) (Environment e2) = Environment $ Map.union e1 e2
+
+bindEnv :: (Show l, Show (t Name), Ord l, Foldable t) => t Name -> Environment l a -> Environment l a
+bindEnv names env = trace ("bindEnv: " <> show env <> " : " <> show names) $ Environment (Map.fromList pairs)
+  where
+    pairs = foldr (\name b -> maybe b (\v -> (name, v) : b) (envLookup name env)) mempty names
 
 -- | Retrieve the 'Live' set of addresses to which the given free variable names are bound.
 --
