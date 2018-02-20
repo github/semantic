@@ -27,7 +27,6 @@ import System.FilePath.Posix
 type Evaluating v
   = '[ Fail                                   -- For 'MonadFail'.
      , State  (Store (LocationFor v) v)       -- For 'MonadStore'.
-
      , Reader (Environment (LocationFor v) v) -- Local environment
      , State  (Environment (LocationFor v) v) -- Global environment
      ]
@@ -41,8 +40,4 @@ evaluate :: forall v term
            )
          => term
          -> Final (Evaluating v) v
-evaluate = run @(Evaluating v) . fix go
-  where
-    go :: (Recursive term, Eval term v m (Base term)) =>
-            (term -> m v) -> term -> m v
-    go _ = eval . project
+evaluate = run @(Evaluating v) . fix (const step)
