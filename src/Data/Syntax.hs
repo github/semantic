@@ -143,7 +143,7 @@ instance ( MonadAddress (LocationFor v) m
          -- , MonadEnv v m
          , MonadFail m
          , MonadStore v m
-         , E2.Yield v m
+         , E2.EvalEnv v m
          ) => E2.Eval t v m Identifier where
   eval (Identifier name) = do
     env <- E2.askEnv
@@ -198,7 +198,7 @@ instance ( MonadFail m
          , E2.Recursive t
          , E2.Eval t v m (E2.Base t)
          , FreeVariables t
-         , E2.Yield v m
+         , E2.EvalEnv v m
          , Show (LocationFor v)
          )
          => E2.Eval t v m Program where

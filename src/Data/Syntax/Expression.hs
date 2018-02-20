@@ -70,7 +70,7 @@ instance ( Ord l
          , Semigroup (Cell l (Value l t)) -- 'assign'
          , MonadStore (Value l t) m       -- 'alloc'
          , MonadAddress l m               -- 'alloc'
-         , E2.Yield (Value l t) m         -- 'yield'
+         , E2.EvalEnv (Value l t) m       -- 'yield'
          , E2.Recursive t
          , E2.Eval t (Value l t) m (E2.Base t)
          )
@@ -84,7 +84,7 @@ instance ( Ord l
       assign a v
       pure (name, a)
 
-    E2.withEnv (const (foldr (uncurry envInsert) env bindings)) (E2.step body)
+    E2.localEnv (const (foldr (uncurry envInsert) env bindings)) (E2.step body)
 
 
 data Comparison a

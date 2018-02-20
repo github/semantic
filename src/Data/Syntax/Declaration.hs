@@ -105,7 +105,7 @@ instance ( Monad m
          , Semigroup (Cell l (Value l t)) -- envLookupOrAlloc'
          , MonadStore (Value l t) m       -- envLookupOrAlloc'
          , MonadAddress l m               -- envLookupOrAlloc'
-         , E2.Yield (Value l t) m         -- 'yield'
+         , E2.EvalEnv (Value l t) m         -- 'yield'
          ) => E2.Eval t (Value l t) m Method where
   eval Method{..} = do
     env <- E2.askEnv @(Value l t)
@@ -113,7 +113,8 @@ instance ( Monad m
     let v = inj (Closure params methodBody env) :: Value l t
 
     (name, addr) <- envLookupOrAlloc' methodName env v
-    E2.yield (envInsert name addr) v
+    E2.modifyEnv (envInsert name addr)
+    pure v
 
 instance ( MonadFail m
          ) => E2.Eval t Type.Type m Method

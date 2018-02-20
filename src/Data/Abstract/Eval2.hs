@@ -6,13 +6,11 @@ module Data.Abstract.Eval2
 , MonadFail(..)
 , Recursive(..)
 , Base
--- , Recur(..)
-, Yield(..)
+, EvalEnv(..)
 ) where
 
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
-import Control.Monad.Effect.Env
 import Control.Monad.Effect.GC
 import Control.Monad.Fail
 import Data.Abstract.Environment
@@ -21,37 +19,34 @@ import Data.Abstract.Value
 import Data.Functor.Classes
 import Data.Proxy
 import Data.Term
-import Data.Monoid
 import Data.Union
 import Data.Functor.Foldable (Base, Recursive(..), project)
 import Prelude hiding (fail)
 import Control.Monad.Effect hiding (run)
 
 
-import Debug.Trace
-
-
--- Yield with a modified environment
-class Yield v m where
+-- a local and global environment binding variable names to addresses.
+class EvalEnv v m where
   askEnv :: m (Environment (LocationFor v) v)
-  withEnv :: (Environment (LocationFor v) v -> Environment (LocationFor v) v) -> m v -> m v
+  localEnv :: (Environment (LocationFor v) v -> Environment (LocationFor v) v) -> m v -> m v
 
-  yield :: (Environment (LocationFor v) v -> Environment (LocationFor v) v) -> v -> m v
-  askGEnv :: m (Environment (LocationFor v) v)
+  modifyEnv :: (Environment (LocationFor v) v -> Environment (LocationFor v) v) -> m ()
+  getEnv :: m (Environment (LocationFor v) v)
 
   step :: forall term. (Eval term v m (Base term), Recursive term) => term -> m v
 
 instance ( Reader (Environment (LocationFor v) v) :< fs
          , State (Environment (LocationFor v) v) :< fs
          )
-         => Yield v (Eff fs) where
+         => EvalEnv v (Eff fs) where
   askEnv = ask
-  withEnv = local
+  localEnv = local
 
-  yield f v = get >>= put . f >> pure v
-  askGEnv = get
+  modifyEnv f = get >>= put . f
+  getEnv = get
 
   step = eval . project
+
 
 -- | The 'Eval' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Monad m => Eval term v m constr where
@@ -80,20 +75,21 @@ instance ( Monad m
          , AbstractValue v
          , Recursive t
          , FreeVariables t
-         , Yield v m
+         , EvalEnv v m
          , Eval t v m (Base t)
 
          , Show (LocationFor v)
          )
          => Eval t v m [] where
-  eval []     = pure unit --
-  eval [x]    = step x   -- Return the value for the last item
+  eval []     = pure unit -- Return unit value if this is an empty list of terms
+  eval [x]    = step x    -- Return the value for the last term
   eval (x:xs) = do
-    _ <- step @v x -- Evaluate the head term
-    env <- askGEnv @v  -- Get the global environment after evaluation since it might have been updated but the 'step' app above ^.
-    withEnv (const (bindEnv (freeVariables1 xs) env)) (eval xs) -- Evaluate the rest of the terms, but do so within an environment where the free variables in those terms are bound to the global environment.
-  -- eval (x:xs) = eval (project x) >>= \_ -> eval xs
-  -- eval ev yield [a]    = ev pure a >>= yield
-  -- eval ev yield (a:as) = do
-  --   env <- askEnv :: m (Environment (LocationFor v) v)
-  --   extraRoots (envRoots env (freeVariables1 as)) (ev (const (eval ev pure as)) a) >>= yield
+    _ <- step @v x         -- Evaluate the head term
+    env <- getEnv @v       -- Get the global environment after evaluation since
+                           -- it might have been modified by the 'step'
+                           -- evaluation above ^.
+
+    -- Finally, evaluate the rest of the terms, but do so by calculating a new
+    -- environment each time where the free variables in those terms are bound
+    -- to the global environment.
+    localEnv (const (bindEnv (freeVariables1 xs) env)) (eval xs)
