@@ -101,7 +101,6 @@ instance (MonadFail m) => Eval t v m Method
 -- Evaluating a Function creates a closure and makes that value available in the
 -- local environment.
 instance ( Monad m
-         -- , MonadEnv (Value l t) m         -- 'askEnv'
          , FreeVariables t                -- To get free variables from the function's parameters
          , Semigroup (Cell l (Value l t)) -- envLookupOrAlloc'
          , MonadStore (Value l t) m       -- envLookupOrAlloc'
@@ -109,12 +108,12 @@ instance ( Monad m
          , E2.Yield (Value l t) m         -- 'yield'
          ) => E2.Eval t (Value l t) m Method where
   eval Method{..} = do
-    env <- E2.getEnv @(Value l t)
-    let params = toList (foldMap freeVariables methodParameters)
+    env <- E2.askEnv @(Value l t)
+    let params = toList (freeVariables1 methodParameters)
     let v = inj (Closure params methodBody env) :: Value l t
+
     (name, addr) <- envLookupOrAlloc' methodName env v
     E2.yield (envInsert name addr) v
-    -- localEnv (envInsert name a) (yield v)
 
 instance ( MonadFail m
          ) => E2.Eval t Type.Type m Method

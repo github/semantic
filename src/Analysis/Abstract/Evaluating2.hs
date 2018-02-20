@@ -27,20 +27,16 @@ import System.FilePath.Posix
 type Evaluating v
   = '[ Fail                                   -- For 'MonadFail'.
      , State  (Store (LocationFor v) v)       -- For 'MonadStore'.
-     -- , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
-     , State  (Environment (LocationFor v) v)
-     -- , Reader (Live (LocationFor v) v)        -- For 'MonadGC'.
+
+     , Reader (Environment (LocationFor v) v) -- Local environment
+     , State  (Environment (LocationFor v) v) -- Global environment
      ]
 
 -- | Evaluate a term to a value.
 evaluate :: forall v term
          . ( Ord v
            , Ord (LocationFor v) -- For 'MonadStore'
-           -- , Ord (Cell (LocationFor v) v)
-           -- , Semigroup (Cell (LocationFor v) v)
-           -- , Functor (Base term)
            , Recursive term
-           -- , MonadAddress (LocationFor v) (Eff (Evaluating v))
            , Eval term v (Eff (Evaluating v)) (Base term)
            )
          => term

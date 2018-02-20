@@ -6,7 +6,7 @@ module Data.Abstract.Eval2
 , MonadFail(..)
 , Recursive(..)
 , Base
-, Recur(..)
+-- , Recur(..)
 , Yield(..)
 ) where
 
@@ -33,30 +33,25 @@ import Debug.Trace
 
 -- Yield with a modified environment
 class Yield v m where
-  getEnv :: m (Environment (LocationFor v) v)
+  askEnv :: m (Environment (LocationFor v) v)
+  withEnv :: (Environment (LocationFor v) v -> Environment (LocationFor v) v) -> m v -> m v
+
   yield :: (Environment (LocationFor v) v -> Environment (LocationFor v) v) -> v -> m v
-  yield' :: (Environment (LocationFor v) v -> Environment (LocationFor v) v) -> m v -> m v
+  askGEnv :: m (Environment (LocationFor v) v)
 
-instance (State (Environment (LocationFor v) v) :< fs)
-         => Yield v (Eff fs) where
-  getEnv = get
-  -- yield f v = local f (pure v)
-  -- yield' f v = local f v
-  yield f v = get >>= put . f >> pure v
-  yield' f v = get >>= put . f >> v
+  step :: forall term. (Eval term v m (Base term), Recursive term) => term -> m v
 
--- | Recurse and evaluate a term
-class Recur term v m where
-  recur :: term -> m v
-  recur' :: (Environment (LocationFor v) v -> Environment (LocationFor v) v) -> term -> m v
-
-instance ( Eval term v (Eff fs) (Base term)
+instance ( Reader (Environment (LocationFor v) v) :< fs
          , State (Environment (LocationFor v) v) :< fs
-         , Recursive term )
-         => Recur term v (Eff fs) where
-  recur = eval . project
-  recur' f term = get >>= put . f >> recur term
+         )
+         => Yield v (Eff fs) where
+  askEnv = ask
+  withEnv = local
 
+  yield f v = get >>= put . f >> pure v
+  askGEnv = get
+
+  step = eval . project
 
 -- | The 'Eval' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Monad m => Eval term v m constr where
@@ -82,38 +77,23 @@ instance (Monad m, Eval t v m s) => Eval t v m (TermF s a) where
 --   This also allows e.g. early returns to be implemented in the middle of a list, by means of a statement returning instead of yielding. Therefore, care must be taken by 'Eval' instances in general to yield and not simply return, or else they will unintentionally short-circuit control and skip the rest of the scope.
 instance ( Monad m
          , Ord (LocationFor v)
-         -- , MonadGC v m
-         -- , MonadEnv v m
          , AbstractValue v
          , Recursive t
          , FreeVariables t
-         , Recur t v m
          , Yield v m
          , Eval t v m (Base t)
 
          , Show (LocationFor v)
          )
          => Eval t v m [] where
-  eval []     = pure unit
-  eval [x]    = recur x
-  eval (x:xs) = recur' @t @v ((bindEnv (freeVariables1 xs))) x >> eval xs
-  
-  -- eval (x:xs) = do
-    -- env <- askEnv :: m (Environment (LocationFor v) v)
-    -- recur' @t @v (bindEnv (freeVariables1 xs)) x >> eval xs
-  -- eval [x]    = recur' id x
-  -- eval (x:xs) = recur @t @v x >> eval xs
-  -- eval (x:xs) = do
-  --   recur' @t @v ((bindEnv (freeVariables1 xs))) x >> eval xs
-    -- yield' (bindEnv (freeVariables1 xs)) (recur @t @v x >> eval xs)
-    -- recur @t @v x >> yield' (bindEnv (freeVariables1 xs)) (eval xs)
-
-
+  eval []     = pure unit --
+  eval [x]    = step x   -- Return the value for the last item
+  eval (x:xs) = do
+    _ <- step @v x -- Evaluate the head term
+    env <- askGEnv @v  -- Get the global environment after evaluation since it might have been updated but the 'step' app above ^.
+    withEnv (const (bindEnv (freeVariables1 xs) env)) (eval xs) -- Evaluate the rest of the terms, but do so within an environment where the free variables in those terms are bound to the global environment.
   -- eval (x:xs) = eval (project x) >>= \_ -> eval xs
   -- eval ev yield [a]    = ev pure a >>= yield
   -- eval ev yield (a:as) = do
   --   env <- askEnv :: m (Environment (LocationFor v) v)
   --   extraRoots (envRoots env (freeVariables1 as)) (ev (const (eval ev pure as)) a) >>= yield
-
--- Default should be to affect the environment.
--- Allow "return" to short circuit the rest of the imperative scope

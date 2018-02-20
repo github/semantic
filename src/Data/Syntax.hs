@@ -146,7 +146,7 @@ instance ( MonadAddress (LocationFor v) m
          , E2.Yield v m
          ) => E2.Eval t v m Identifier where
   eval (Identifier name) = do
-    env <- E2.getEnv
+    env <- E2.askEnv
     maybe (fail ("free variable: " <> unpack name)) deref (envLookup name env)
 
 instance FreeVariables1 Identifier where
@@ -193,16 +193,12 @@ instance ( Monad m
   eval ev yield (Program xs) = eval ev yield xs
 
 instance ( MonadFail m
-         -- , MonadEnv v m
          , Ord (LocationFor v)
          , AbstractValue v
          , E2.Recursive t
          , E2.Eval t v m (E2.Base t)
-          -- for [] instance of Eval
-         , E2.Recur t v m
          , FreeVariables t
          , E2.Yield v m
-
          , Show (LocationFor v)
          )
          => E2.Eval t v m Program where

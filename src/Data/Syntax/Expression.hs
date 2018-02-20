@@ -67,28 +67,24 @@ instance ( MonadFail m
 
 instance ( Ord l
          , MonadFail m
-         , E2.Recur t (Value l t) m
          , Semigroup (Cell l (Value l t)) -- 'assign'
-         -- , MonadEnv (Value l t) m
          , MonadStore (Value l t) m       -- 'alloc'
          , MonadAddress l m               -- 'alloc'
          , E2.Yield (Value l t) m         -- 'yield'
-         , E2.Recur t (Value l t) m       -- 'recur'
+         , E2.Recursive t
+         , E2.Eval t (Value l t) m (E2.Base t)
          )
          => E2.Eval t (Value l t) m Call where
   eval Call{..} = do
-    closure <- E2.recur @t @(Value l t) callFunction
+    closure <- E2.step @(Value l t) callFunction
     Closure names body env <- maybe (fail "expected a closure") pure (prj closure :: Maybe (Closure l t))
     bindings <- for (zip names callParams) $ \(name, param) -> do
-      v <- E2.recur @ t @(Value l t) param
+      v <- E2.step @(Value l t) param
       a <- alloc name
       assign a v
       pure (name, a)
 
-    let newEnv = \_ -> foldr (uncurry envInsert) env bindings
-    v <- E2.recur body
-    E2.yield newEnv v
-    -- localEnv (const (foldr (uncurry envInsert) env bindings)) (recur pure body) >>= yield
+    E2.withEnv (const (foldr (uncurry envInsert) env bindings)) (E2.step body)
 
 
 data Comparison a

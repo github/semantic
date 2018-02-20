@@ -18,7 +18,7 @@ newtype Environment l a = Environment { unEnvironment :: Map.Map Name (Address l
 
 -- | Lookup a 'Name' in the environment.
 envLookup :: Name -> Environment l a -> Maybe (Address l a)
-envLookup k = Map.lookup k . unEnvironment
+envLookup k = trace ("envLookup: " <> show k) $ Map.lookup k . unEnvironment
 
 -- | Insert a 'Name' in the environment.
 envInsert :: Name -> Address l a -> Environment l a -> Environment l a
