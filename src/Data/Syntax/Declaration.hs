@@ -2,15 +2,20 @@
 module Data.Syntax.Declaration where
 
 import Control.Applicative
+import Control.Monad.Effect.State
 import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.Store
+import Control.Monad.Effect.Store2 (Store2)
+import Control.Monad.Effect (Eff)
+import Control.Monad.Effect.Fail
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Analysis.Abstract.Evaluating
 import Data.Abstract.Eval
 import qualified Data.Abstract.Eval2 as E2
+import qualified Data.Abstract.Eval3 as E3
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type hiding (Type)
 import qualified Data.Abstract.Value as Value
@@ -118,6 +123,23 @@ instance ( Monad m
 
 instance ( MonadFail m
          ) => E2.Eval t Type.Type m Method
+
+instance ( FreeVariables t                -- To get free variables from the function's parameters
+         , Semigroup (Cell l (Value l t)) -- envLookupOrAlloc'
+         , MonadStore (Value l t) (Eff es)       -- envLookupOrAlloc'
+         , MonadAddress l (Eff es)               -- envLookupOrAlloc'
+         , Member (State (E3.Env' (Value l t))) es
+         ) => E3.Evaluatable es t (Value l t) Method where
+  eval Method{..} = do
+    env <- get
+    let params = toList (freeVariables1 methodParameters)
+    let v = inj (Closure params methodBody env) :: Value l t
+
+    (name, addr) <- envLookupOrAlloc' methodName env v
+    modify (envInsert name addr)
+    pure v
+
+instance ( Member Fail es ) => E3.Evaluatable es t Type.Type Method
 
 -- | A method signature in TypeScript or a method spec in Go.
 data MethodSignature a = MethodSignature { _methodSignatureContext :: ![a], _methodSignatureName :: !a, _methodSignatureParameters :: ![a] }
