@@ -7,11 +7,13 @@ import Control.Monad.Effect
 import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Store
+import Control.Monad.Effect.State
 import Control.Monad.Error.Class hiding (Error)
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Eval
 import qualified Data.Abstract.Eval2 as E2
+import qualified Data.Abstract.Eval3 as E3
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value (LocationFor, AbstractValue(..), Value)
 import qualified Data.Abstract.Value as Value
@@ -147,6 +149,15 @@ instance ( MonadAddress (LocationFor v) m
          ) => E2.Eval t v m Identifier where
   eval (Identifier name) = do
     env <- E2.askEnv
+    maybe (fail ("free variable: " <> unpack name)) deref (envLookup name env)
+
+instance ( MonadAddress (LocationFor v) (Eff es)
+         , MonadFail (Eff es)
+         , MonadStore v (Eff es)
+         , (State (E3.Env' v) :< es)
+         ) => E3.Evaluatable es t v Identifier where
+  eval (Identifier name) = do
+    env <- get
     maybe (fail ("free variable: " <> unpack name)) deref (envLookup name env)
 
 instance FreeVariables1 Identifier where
