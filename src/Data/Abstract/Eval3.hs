@@ -4,7 +4,7 @@ module Data.Abstract.Eval3
 ( Eval
 , Evaluatable(..)
 , runEval
-, runEvalEnv
+, Env'
 -- , step
 , MonadGC(..)
 , MonadFail(..)
@@ -27,6 +27,8 @@ import Data.Term
 import Data.Functor.Foldable (Base, Recursive(..), project)
 import Prelude hiding (fail)
 import Control.Monad.Effect hiding (run)
+import Data.Union (Apply)
+import qualified Data.Union as U
 
 
 -- a local and global environment binding variable names to addresses.
@@ -62,35 +64,43 @@ type Env' v = Environment (LocationFor v) v
 
   -- Step :: (forall term. (Recursive term) => term) -> EvalEnv v
 
-step :: forall term es v. (Evaluatable es (Base term) term v, Eval (Base term) term :< es, Recursive term) => term -> Eff es v
+step :: forall term es v. (Evaluatable es term v (Base term), Eval (Base term) term :< es, Recursive term) => term -> Eff es v
 step = eval . project
-
-runEvalEnv :: Eff (State (Env' v) ': es) v -> Eff es v
-runEvalEnv = undefined
 
 data Eval constr term v where
   Eval :: constr term -> Eval constr term v
 
-runEval :: Evaluatable es constr term a => Eff (Eval constr term ': es) a -> Eff es a
+runEval :: Evaluatable es term a constr => Eff (Eval constr term ': es) a -> Eff es a
 runEval (Val a) = pure a
 runEval (E u q) = case decompose u of
   Right (Eval term)      -> eval term
   Left  u'       -> E u' $ tsingleton (runEval . apply q)
 
-class Evaluatable es constr term v where
+class Evaluatable es term v constr where
   eval :: constr term -> Eff es v
   default eval :: (Exc Prelude.String :< es, Show1 constr) => (constr term -> Eff es v)
   eval expr = throwError $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
+-- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
+instance (Apply (Evaluatable es t v) fs) => Evaluatable es t v (Union fs) where
+  eval = U.apply (Proxy :: Proxy (Evaluatable es t v)) eval
+
+-- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
+instance (Evaluatable es t v s) => Evaluatable es t v (TermF s a) where
+  eval In{..} = eval termFOut
+
 instance (Recursive t
+        , FreeVariables t
+        , AbstractValue v
+
         , (Show (LocationFor v))
         , (Ord (LocationFor v))
+
         , (Eval (Base t) t :< es)
         , (State (Env' v) :< es)
-        , Evaluatable es (Base t) t v
-        , AbstractValue v
-        , FreeVariables t)
-       => Evaluatable es [] t v where
+        , Evaluatable es t v (Base t)
+        )
+       => Evaluatable es t v [] where
   eval []     = pure unit -- Return unit value if this is an empty list of terms
   eval [x]    = step @t x    -- Return the value for the last term
   eval (x:xs) = do
