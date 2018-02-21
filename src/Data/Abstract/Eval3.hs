@@ -1,8 +1,7 @@
-{-# LANGUAGE MultiParamTypeClasses, Rank2Types, GADTs, TypeOperators, DefaultSignatures, UndecidableInstances #-}
+{-# LANGUAGE MultiParamTypeClasses, Rank2Types, GADTs, TypeOperators, DefaultSignatures, UndecidableInstances, ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 module Data.Abstract.Eval3
 ( Eval
-, EvalEnv
 , Evaluatable(..)
 , runEval
 , runEvalEnv
@@ -52,37 +51,61 @@ import Control.Monad.Effect hiding (run)
 --
 --   step = eval . project
 
-data EvalEnv v where
-  AskEnv :: EvalEnv (Environment (LocationFor v) v)
-  LocalEnv :: (Environment (LocationFor v) v -> Environment (LocationFor v) v) -> EvalEnv v -> EvalEnv v
+-- data EvalEnv v where
+--   AskEnv :: EvalEnv (Environment (LocationFor v) v)
+--   LocalEnv :: (Environment (LocationFor v) v -> Environment (LocationFor v) v) -> EvalEnv v -> EvalEnv v
+--
+--   ModifyEnv :: (Environment (LocationFor v) v -> Environment (LocationFor v) v) -> EvalEnv ()
+--   GetEnv :: EvalEnv (Environment (LocationFor v) v)
 
-  ModifyEnv :: (Environment (LocationFor v) v -> Environment (LocationFor v) v) -> EvalEnv ()
-  GetEnv :: EvalEnv (Environment (LocationFor v) v)
+type Env' v = Environment (LocationFor v) v
 
   -- Step :: (forall term. (Recursive term) => term) -> EvalEnv v
 
--- step :: forall term es v. (EvalEnv :< es, Eval (Base term) term :< es, Recursive term) => term -> Eff es v
--- step = eval . project
+step :: forall term es v. (Evaluatable es (Base term) term v, Eval (Base term) term :< es, Recursive term) => term -> Eff es v
+step = eval . project
 
-runEvalEnv :: Eff (EvalEnv ': es) v -> Eff es v
+runEvalEnv :: Eff (State (Env' v) ': es) v -> Eff es v
 runEvalEnv = undefined
 
 data Eval constr term v where
   Eval :: constr term -> Eval constr term v
 
-runEval :: Evaluatable constr term a => Eff (Eval constr term ': es) a -> Eff es a
+runEval :: Evaluatable es constr term a => Eff (Eval constr term ': es) a -> Eff es a
 runEval (Val a) = pure a
 runEval (E u q) = case decompose u of
   Right (Eval term)      -> eval term
   Left  u'       -> E u' $ tsingleton (runEval . apply q)
 
-class Evaluatable constr term v where
+class Evaluatable es constr term v where
   eval :: constr term -> Eff es v
   default eval :: (Exc Prelude.String :< es, Show1 constr) => (constr term -> Eff es v)
   eval expr = throwError $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
-instance (Recursive t, Evaluatable (Base t) t v) => Evaluatable [] t v where
-  eval = undefined
+instance (Recursive t
+        , (Show (LocationFor v))
+        , (Ord (LocationFor v))
+        , (Eval (Base t) t :< es)
+        , (State (Env' v) :< es)
+        , Evaluatable es (Base t) t v
+        , AbstractValue v
+        , FreeVariables t)
+       => Evaluatable es [] t v where
+  eval []     = pure unit -- Return unit value if this is an empty list of terms
+  eval [x]    = step @t x    -- Return the value for the last term
+  eval (x:xs) = do
+    _ <- step @t @es @v x         -- Evaluate the head term
+    env <- get @(Environment (LocationFor v) v)       -- Get the global environment after evaluation since
+                           -- it might have been modified by the 'step'
+                           -- evaluation above ^.
+
+    -- Finally, evaluate the rest of the terms, but do so by calculating a new
+    -- environment each time where the free variables in those terms are bound
+    -- to the global environment.
+    put @(Environment (LocationFor v) v) (bindEnv (freeVariables1 xs) env)
+    -- TODO: This might not be right
+    transactionState (Proxy :: Proxy (Environment (LocationFor v) v)) (eval xs)
+    -- transactionState (const (bindEnv (freeVariables1 xs) env)) (eval xs)
 
 -- | The 'Eval' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 -- class Monad m => Eval term v m constr where
