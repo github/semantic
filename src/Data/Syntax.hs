@@ -8,6 +8,7 @@ import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Store
 import Control.Monad.Effect.State
+import Control.Monad.Effect.Fail
 import Control.Monad.Error.Class hiding (Error)
 import Data.Abstract.Address
 import Data.Abstract.Environment
@@ -152,9 +153,9 @@ instance ( MonadAddress (LocationFor v) m
     maybe (fail ("free variable: " <> unpack name)) deref (envLookup name env)
 
 instance ( MonadAddress (LocationFor v) (Eff es)
-         , MonadFail (Eff es)
          , MonadStore v (Eff es)
          , (State (E3.Env' v) :< es)
+         , (Fail :< es)
          ) => E3.Evaluatable es t v Identifier where
   eval (Identifier name) = do
     env <- get
