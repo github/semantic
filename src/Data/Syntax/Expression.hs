@@ -86,7 +86,6 @@ instance ( Ord l
 
     E2.localEnv (const (foldr (uncurry envInsert) env bindings)) (E2.step body)
 
-
 data Comparison a
   = LessThan !a !a
   | LessThanEqual !a !a
