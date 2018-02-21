@@ -3,6 +3,7 @@ module Data.Syntax.Literal where
 
 import Data.Abstract.Eval
 import qualified Data.Abstract.Eval2 as E2
+import qualified Data.Abstract.Eval3 as E3
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value (AbstractValue(..))
 import Data.Align.Generic
@@ -51,6 +52,11 @@ instance ( Monad m
          , AbstractValue v
          )
          => E2.Eval t v m Data.Syntax.Literal.Integer where
+  eval (Data.Syntax.Literal.Integer x) = pure (integer (maybe 0 fst (readInteger x)))
+
+instance (AbstractValue v) =>
+  E3.Evaluatable es t v Data.Syntax.Literal.Integer where
+  -- TODO: This instance probably shouldn't have readInteger?
   eval (Data.Syntax.Literal.Integer x) = pure (integer (maybe 0 fst (readInteger x)))
 
 
