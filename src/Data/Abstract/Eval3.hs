@@ -17,7 +17,7 @@ import Control.Monad.Effect.State
 import Control.Monad.Effect.GC
 import Control.Monad.Effect.Exception
 import Control.Monad.Effect.Internal
-import Control.Monad.Fail
+import Control.Monad.Effect.Fail
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value
@@ -78,8 +78,8 @@ runEval (E u q) = case decompose u of
 
 class Evaluatable es term v constr where
   eval :: constr term -> Eff es v
-  default eval :: (Exc Prelude.String :< es, Show1 constr) => (constr term -> Eff es v)
-  eval expr = throwError $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
+  default eval :: (Fail :< es, Show1 constr) => (constr term -> Eff es v)
+  eval expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
 -- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
 instance (Apply (Evaluatable es t v) fs) => Evaluatable es t v (Union fs) where
