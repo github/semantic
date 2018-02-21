@@ -328,6 +328,7 @@ instance ( Monad m
 instance MonadFail m => Eval t Type.Type m Import
 
 instance (MonadFail m) => E2.Eval t v m Import
+instance Member Fail es => E3.Evaluatable es t v Import
 
 -- | An imported symbol
 data ImportSymbol a = ImportSymbol { importSymbolName :: !a, importSymbolAlias :: !a }
