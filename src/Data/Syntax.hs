@@ -216,6 +216,19 @@ instance ( MonadFail m
          => E2.Eval t v m Program where
   eval (Program xs) = E2.eval xs
 
+instance ( Member Fail es
+         , Ord (LocationFor v)
+         , Show (LocationFor v)
+         , AbstractValue v
+         , E2.Recursive t
+         , E3.Evaluatable es t v (E3.Base t)
+         , FreeVariables t
+         , Member (E3.Eval (E2.Base t) t) es
+         , Member (State (E3.Env' v)) es
+         )
+         => E3.Evaluatable es t v Program where
+  eval (Program xs) = E3.eval xs
+
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
