@@ -64,7 +64,7 @@ type Env' v = Environment (LocationFor v) v
 
   -- Step :: (forall term. (Recursive term) => term) -> EvalEnv v
 
-step :: forall term es v. (Evaluatable es term v (Base term), Eval (Base term) term :< es, Recursive term) => term -> Eff es v
+step :: forall v term es. (Evaluatable es term v (Base term), Eval (Base term) term :< es, Recursive term) => term -> Eff es v
 step = eval . project
 
 data Eval constr term v where
@@ -102,9 +102,9 @@ instance (Recursive t
         )
        => Evaluatable es t v [] where
   eval []     = pure unit -- Return unit value if this is an empty list of terms
-  eval [x]    = step @t x    -- Return the value for the last term
+  eval [x]    = step x    -- Return the value for the last term
   eval (x:xs) = do
-    _ <- step @t @es @v x         -- Evaluate the head term
+    _ <- step @v x         -- Evaluate the head term
     env <- get @(Environment (LocationFor v) v)       -- Get the global environment after evaluation since
                            -- it might have been modified by the 'step'
                            -- evaluation above ^.
