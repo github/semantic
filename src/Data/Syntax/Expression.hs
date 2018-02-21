@@ -2,14 +2,19 @@
 {-# LANGUAGE TypeApplications #-}
 module Data.Syntax.Expression where
 
+import Data.Proxy
+import Control.Monad.Effect
+import Control.Monad.Effect.State
 import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.Store
+import Control.Monad.Effect.Fail
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Eval
 import qualified Data.Abstract.Eval2 as E2
+import qualified Data.Abstract.Eval3 as E3
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type as Type
 import Data.Abstract.Value (Value, Closure(..))
@@ -85,6 +90,31 @@ instance ( Ord l
       pure (name, a)
 
     E2.localEnv (const (foldr (uncurry envInsert) env bindings)) (E2.step body)
+
+instance ( Ord l
+         , Semigroup (Cell l (Value l t)) -- 'assign'
+         , MonadStore (Value l t) (Eff es)       -- 'alloc'
+         , Member (State (E3.Env' (Value l t))) es -- State Env
+         , MonadAddress l (Eff es)               -- 'alloc'
+
+         , Member (E3.Eval (E3.Base t) t) es
+         , Member (E3.Eval (E3.Base t) (Value l t)) es
+
+         , Member Fail es
+         , E2.Recursive t
+         , E3.Evaluatable es t (Value l t) (E3.Base t)
+         ) => E3.Evaluatable es t (Value l t) Call where
+  eval Call{..} = do
+    closure <- E3.step @(Value l t) callFunction
+    Closure names body env <- maybe (fail "expected a closure") pure (prj closure :: Maybe (Closure l t))
+    bindings <- for (zip names callParams) $ \(name, param) -> do
+      v <- E3.step param
+      a <- alloc name
+      assign a v
+      pure (name, a)
+
+    put (foldr (uncurry envInsert) env bindings)
+    transactionState (Proxy :: Proxy (Environment l (Value l t)))  (E3.step body)
 
 data Comparison a
   = LessThan !a !a
