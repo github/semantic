@@ -4,6 +4,7 @@ module Semantic.Util where
 
 
 import Analysis.Abstract.Evaluating2
+import qualified Analysis.Abstract.Evaluating3 as Evaluating3
 import Analysis.Declaration
 import Control.Monad.IO.Class
 import Data.Abstract.Address
@@ -39,6 +40,10 @@ file path = fromJust <$> IO.readFile path (languageForFilePath path)
 evaluateRubyFile path = file path
   >>= runTask . parse rubyParser2
   >>= pure . Prelude.fst . evaluate @RubyValue
+
+evaluateRubyFile2 path = file path
+  >>= runTask . parse rubyParser2
+  >>= pure  . Evaluating3.evaluate @RubyValue
 
 -- parsePythonFiles :: [FilePath] -> FilePath -> IO ([(Blob, Python.Term)], (Blob, Python.Term))
 -- parsePythonFiles paths entryPath = do
