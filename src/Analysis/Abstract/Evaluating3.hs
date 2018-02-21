@@ -30,14 +30,6 @@ type Evaluating term v
      , Eval (Base term) term
      ]
 
-type Evaluating' term v
-  = '[ Fail                                   -- For 'MonadFail'.
-     , Store2 v       -- For 'MonadStore'.
-     , Reader (Environment (LocationFor v) v) -- Local environment
-     , State  (Environment (LocationFor v) v) -- Global environment
-     ]
-
-
 -- | Evaluate a term to a value.
 evaluate :: forall term v. ( Ord v
            , Ord (LocationFor v) -- For 'MonadStore'
