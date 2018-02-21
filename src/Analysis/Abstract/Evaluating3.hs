@@ -1,7 +1,8 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, MultiParamTypeClasses #-}
 module Analysis.Abstract.Evaluating3 where
 
-import Control.Monad.Effect
+import Control.Effect
+import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Store2
@@ -27,23 +28,17 @@ type Evaluating term v
   = '[ Fail                                  -- For 'MonadFail'.
      , Store2 v                              -- For 'MonadStore'.
      , State (Environment (LocationFor v) v) -- Environment State
-     , Eval (Base term) term
+     -- , Eval (Base term) term
      ]
 
 -- | Evaluate a term to a value.
-evaluate :: forall term v. ( Ord v
-           , Ord (LocationFor v) -- For 'MonadStore'
-           , Recursive term
-           , Evaluatable '[] (Base term) term (Either Prelude.String v)
-           , Evaluatable (Evaluating term v) (Base term) term v
-           )
+evaluate :: forall v term.
+          ( Ord v
+          , Ord (LocationFor v) -- For 'MonadStore'
+          , Recursive term
+          , Evaluatable (Evaluating term v) term v (Base term)
+          )
          => term
-         -> Either Prelude.String v
-evaluate = run
-  . runEval
-  . fmap fst
-  . flip runState mempty
-  . fmap fst
-  . flip runState mempty
-  . runFail
-  . (fix (const (eval . project :: term -> Eff (Evaluating term v) v)))
+         -> Final (Evaluating term v) v
+evaluate = run @(Evaluating term v)
+  . (fix (const (eval . project)))
