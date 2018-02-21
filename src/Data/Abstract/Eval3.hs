@@ -5,7 +5,7 @@ module Data.Abstract.Eval3
 , Evaluatable(..)
 , runEval
 , Env'
--- , step
+, step
 , MonadGC(..)
 , MonadFail(..)
 , Recursive(..)
