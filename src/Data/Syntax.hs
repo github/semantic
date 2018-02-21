@@ -256,6 +256,9 @@ instance (Monad m, AbstractValue v) => Eval t v m Empty where
 instance (Monad m, AbstractValue v) => E2.Eval t v m Empty where
   eval _ = pure unit
 
+instance (AbstractValue v) => E3.Evaluatable es t v Empty where
+  eval _ = pure unit
+
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
@@ -267,6 +270,7 @@ instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 
 instance (MonadFail m) => Eval t v m Error
 instance (MonadFail m) => E2.Eval t v m Error
+instance Member Fail es => E3.Evaluatable es t v Error
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorExpected errorActual
