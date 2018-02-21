@@ -52,6 +52,7 @@ library
                      , Data.Abstract.Linker
                      , Data.Abstract.Eval
                      , Data.Abstract.Eval2
+                     , Data.Abstract.Eval3
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Live
                      , Data.Abstract.Store

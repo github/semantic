@@ -4,6 +4,7 @@ module Control.Monad.Effect.Store2
 , modify
 , get
 , put
+, Store2
 ) where
 
 import Control.Monad.Effect
