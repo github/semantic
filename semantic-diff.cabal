@@ -20,6 +20,7 @@ library
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Evaluating
                      , Analysis.Abstract.Evaluating2
+                     , Analysis.Abstract.Evaluating3
                      , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
@@ -41,6 +42,7 @@ library
                      , Control.Monad.Effect.GC
                      , Control.Monad.Effect.NonDet
                      , Control.Monad.Effect.Store
+                     , Control.Monad.Effect.Store2
                      , Control.Monad.Effect.Trace
                      -- General datatype definitions & generic algorithms
                      , Data.Abstract.Address
