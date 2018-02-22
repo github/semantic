@@ -4,7 +4,6 @@ module Data.Abstract.Eval3
 ( Evaluatable(..)
 , EnvironmentFor
 , step
-, require
 , Linker
 , MonadGC(..)
 , MonadFail(..)
@@ -32,11 +31,6 @@ import Control.Monad.Effect hiding (run)
 import Data.Union (Apply)
 import qualified Data.Union as U
 
-
-require :: Members '[Fail, Reader (Linker v)] es => FilePath -> Eff es v
-require name = do
-  linker <- ask
-  maybe (fail ("cannot find " <> show name)) pure (linkerLookup name linker)
 
 -- a local and global environment binding variable names to addresses.
 -- class EvalEnv v m where

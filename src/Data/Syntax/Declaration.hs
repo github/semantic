@@ -3,6 +3,7 @@ module Data.Syntax.Declaration where
 
 import Control.Applicative
 import Control.Monad.Effect.Reader
+import Control.Monad.Effect.Embedded
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
@@ -14,6 +15,7 @@ import Control.Monad.Effect.Fail
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Analysis.Abstract.Evaluating
+import qualified Analysis.Abstract.Evaluating as E3
 import Data.Abstract.Eval
 import qualified Data.Abstract.Eval2 as E2
 import qualified Data.Abstract.Eval3 as E3
@@ -334,18 +336,15 @@ instance (MonadFail m) => E2.Eval t v m Import
 
 instance ( Show l
          , Show t
-         , Members '[
-             Fail
-           , State (E3.EnvironmentFor (Value l t))
-           , Reader (E3.EnvironmentFor (Value l t))
-           , Reader (E3.Linker (Value l t)) ] es
+         , Members (Evaluating (Value l t)) es
+         , Member (State (E3.EnvironmentFor (Value l t))) es
          , FreeVariables t
          )
          => E3.Evaluatable es t (Value l t) Import where
   eval (Import from _ _) = do
     let [name] = toList (freeVariables from)
 
-    interface <- E3.require (BC.unpack name)
+    interface <- raiseEmbedded (E3.require (BC.unpack name))
     -- TODO: Consider returning the value instead of the interface.
     Interface _ env <- maybe
                            (fail ("expected an interface, but got: " <> show interface))

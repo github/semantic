@@ -217,17 +217,29 @@ instance ( MonadFail m
          => E2.Eval t v m Program where
   eval (Program xs) = E2.eval xs
 
-instance ( Member Fail es
-         , Ord (LocationFor v)
-         , Show (LocationFor v)
-         , AbstractValue v
+instance ( Ord (LocationFor (Value l t))
+         , Show (LocationFor (Value l t))
          , E2.Recursive t
-         , E3.Evaluatable es t v (E3.Base t)
+         , E3.Evaluatable es t (Value l t) (E3.Base t)
          , FreeVariables t
-         , Members '[ State (E3.EnvironmentFor v), Reader (E3.EnvironmentFor v) ] es
+         , Members '[
+            Fail,
+            State (E3.EnvironmentFor (Value l t)),
+            Reader (E3.EnvironmentFor (Value l t)) ] es
          )
-         => E3.Evaluatable es t v Program where
-  eval (Program xs) = E3.eval xs
+         => E3.Evaluatable es t (Value l t) Program where
+  eval (Program xs) = eval' xs
+    where
+      interface val = ask @(E3.EnvironmentFor (Value l t)) >>= pure . inj . Value.Interface val
+
+      eval' [] = interface unit
+      eval' [x] = E3.step x >>= interface
+      eval' (x:xs) = do
+        _ <- E3.step @(Value l t) x
+        env <- get @(E3.EnvironmentFor (Value l t))
+        local (envUnion env) (eval' xs)
+
+instance Member Fail es => E3.Evaluatable es t Type.Type Program where
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
