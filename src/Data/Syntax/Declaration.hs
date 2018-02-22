@@ -330,7 +330,33 @@ instance ( Monad m
 instance MonadFail m => Eval t Type.Type m Import
 
 instance (MonadFail m) => E2.Eval t v m Import
-instance Member Fail es => E3.Evaluatable es t v Import
+
+
+instance ( Show l
+         , Show t
+         , Members '[
+             Fail
+           , State (E3.EnvironmentFor (Value l t))
+           , Reader (E3.EnvironmentFor (Value l t))
+           , Reader (E3.Linker (Value l t)) ] es
+         , FreeVariables t
+         )
+         => E3.Evaluatable es t (Value l t) Import where
+  eval (Import from _ _) = do
+    let [name] = toList (freeVariables from)
+
+    interface <- E3.require (BC.unpack name)
+    -- TODO: Consider returning the value instead of the interface.
+    Interface _ env <- maybe
+                           (fail ("expected an interface, but got: " <> show interface))
+                           pure
+                           (prj interface :: Maybe (Value.Interface l t))
+
+    modify (envUnion env)
+    pure interface
+
+instance Member Fail es => E3.Evaluatable es Type.Type v Import
+
 
 -- | An imported symbol
 data ImportSymbol a = ImportSymbol { importSymbolName :: !a, importSymbolAlias :: !a }
