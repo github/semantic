@@ -6,6 +6,7 @@ import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Store2
 import Control.Monad.Effect.State
+import Control.Monad.Effect.Reader
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Linker
@@ -26,7 +27,8 @@ import System.FilePath.Posix
 type Evaluating term v
   = '[ Fail                                -- For 'MonadFail'.
      , State (Store (LocationFor v) v)                              -- For 'MonadStore'.
-     , State (Environment (LocationFor v) v) -- Environment State
+     , State (Env v) -- Environment State
+     , Reader (LocalEnv v) -- Environment State
      ]
 
 -- | Evaluate a term to a value.

@@ -5,6 +5,7 @@ module Data.Syntax.Expression where
 import Data.Proxy
 import Control.Monad.Effect
 import Control.Monad.Effect.State
+import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fresh
@@ -94,10 +95,12 @@ instance ( Ord l
 instance ( Ord l
          , Semigroup (Cell l (Value l t)) -- 'assign'
          , MonadStore (Value l t) (Eff es)       -- 'alloc'
-         , Member (State (E3.Env' (Value l t))) es -- State Env
-         , MonadAddress l (Eff es)               -- 'alloc'
-
-         , Member Fail es
+         , MonadAddress l (Eff es)        -- 'alloc'
+         , Members '[
+             State  (E3.Env (Value l t))
+           , Reader (E3.LocalEnv (Value l t))
+           , Fail
+           ] es -- Env and LocalEnv
          , E2.Recursive t
          , E3.Evaluatable es t (Value l t) (E3.Base t)
          ) => E3.Evaluatable es t (Value l t) Call where
@@ -110,7 +113,7 @@ instance ( Ord l
       assign a v
       pure (name, a)
 
-    localState (Proxy :: Proxy (E3.Env' (Value l t))) (foldr (uncurry envInsert) env bindings) (E3.step body)
+    local (const (E3.LocalEnv $ foldr (uncurry envInsert) env bindings)) (E3.step body)
 
 data Comparison a
   = LessThan !a !a

@@ -1,8 +1,9 @@
-{-# LANGUAGE MultiParamTypeClasses, Rank2Types, GADTs, TypeOperators, DefaultSignatures, UndecidableInstances, ScopedTypeVariables #-}
+{-# LANGUAGE MultiParamTypeClasses, Rank2Types, GADTs, TypeOperators, DefaultSignatures, UndecidableInstances, ScopedTypeVariables, GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TypeApplications #-}
 module Data.Abstract.Eval3
 ( Evaluatable(..)
-, Env'
+, Env(..)
+, LocalEnv(..)
 , step
 , MonadGC(..)
 , MonadFail(..)
@@ -58,7 +59,10 @@ import qualified Data.Union as U
 --   ModifyEnv :: (Environment (LocationFor v) v -> Environment (LocationFor v) v) -> EvalEnv ()
 --   GetEnv :: EvalEnv (Environment (LocationFor v) v)
 
-type Env' v = Environment (LocationFor v) v
+newtype Env v = Env { unEnv :: Environment (LocationFor v) v }
+  deriving (Monoid)
+newtype LocalEnv v = LocalEnv { unLocalEnv :: Environment (LocationFor v) v }
+  deriving (Monoid)
 
   -- Step :: (forall term. (Recursive term) => term) -> EvalEnv v
 
@@ -94,7 +98,8 @@ instance (Recursive t
         , (Show (LocationFor v))
         , (Ord (LocationFor v))
 
-        , (State (Env' v) :< es)
+        , (State (Env v) :< es)
+        , (Reader (LocalEnv v) :< es)
         , Evaluatable es t v (Base t)
         )
        => Evaluatable es t v [] where
@@ -102,14 +107,14 @@ instance (Recursive t
   eval [x]    = step x    -- Return the value for the last term
   eval (x:xs) = do
     _ <- step @v x         -- Evaluate the head term
-    env <- get @(Env' v)       -- Get the global environment after evaluation since
+    env <- get @(Env v)       -- Get the global environment after evaluation since
                            -- it might have been modified by the 'step'
                            -- evaluation above ^.
 
     -- Finally, evaluate the rest of the terms, but do so by calculating a new
     -- environment each time where the free variables in those terms are bound
     -- to the global environment.
-    localState (Proxy :: Proxy (Env' v)) (bindEnv (freeVariables1 xs) env) (eval xs)
+    local (const (LocalEnv $ bindEnv (freeVariables1 xs) (unEnv env))) (eval xs)
 
 -- | The 'Eval' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 -- class Monad m => Eval term v m constr where

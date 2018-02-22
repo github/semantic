@@ -8,6 +8,7 @@ import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Store
 import Control.Monad.Effect.State
+import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Fail
 import Control.Monad.Error.Class hiding (Error)
 import Data.Abstract.Address
@@ -154,12 +155,12 @@ instance ( MonadAddress (LocationFor v) m
 
 instance ( MonadAddress (LocationFor v) (Eff es)
          , MonadStore v (Eff es)
-         , (State (E3.Env' v) :< es)
+         , (Reader (E3.LocalEnv v) :< es)
          , (Fail :< es)
          ) => E3.Evaluatable es t v Identifier where
   eval (Identifier name) = do
-    env <- get
-    maybe (fail ("free variable: " <> unpack name)) deref (envLookup name env)
+    env <- ask
+    maybe (fail ("free variable: " <> unpack name)) deref (envLookup name (E3.unLocalEnv env))
 
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = point x
@@ -223,7 +224,7 @@ instance ( Member Fail es
          , E2.Recursive t
          , E3.Evaluatable es t v (E3.Base t)
          , FreeVariables t
-         , Member (State (E3.Env' v)) es
+         , Members '[ State (E3.Env v), Reader (E3.LocalEnv v) ] es
          )
          => E3.Evaluatable es t v Program where
   eval (Program xs) = E3.eval xs
