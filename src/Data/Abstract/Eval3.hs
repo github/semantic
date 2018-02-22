@@ -1,9 +1,7 @@
 {-# LANGUAGE MultiParamTypeClasses, Rank2Types, GADTs, TypeOperators, DefaultSignatures, UndecidableInstances, ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 module Data.Abstract.Eval3
-( Eval
-, Evaluatable(..)
-, runEval
+( Evaluatable(..)
 , Env'
 , step
 , MonadGC(..)
@@ -64,17 +62,17 @@ type Env' v = Environment (LocationFor v) v
 
   -- Step :: (forall term. (Recursive term) => term) -> EvalEnv v
 
-step :: forall v term es. (Evaluatable es term v (Base term), Eval (Base term) term :< es, Recursive term) => term -> Eff es v
+step :: forall v term es. (Evaluatable es term v (Base term), Recursive term) => term -> Eff es v
 step = eval . project
 
-data Eval constr term v where
-  Eval :: constr term -> Eval constr term v
-
-runEval :: Evaluatable es term a constr => Eff (Eval constr term ': es) a -> Eff es a
-runEval (Val a) = pure a
-runEval (E u q) = case decompose u of
-  Right (Eval term)      -> eval term
-  Left  u'       -> E u' $ tsingleton (runEval . apply q)
+-- data Eval constr term v where
+--   Eval :: constr term -> Eval constr term v
+--
+-- runEval :: Evaluatable es term v constr => Eff (Eval constr term ': es) v -> Eff es v
+-- runEval (Val v) = pure v
+-- runEval (E u q) = case decompose u of
+--   Right (Eval term) -> eval term
+--   Left  u'          -> E u' $ tsingleton (runEval . apply q)
 
 class Evaluatable es term v constr where
   eval :: constr term -> Eff es v
@@ -96,7 +94,6 @@ instance (Recursive t
         , (Show (LocationFor v))
         , (Ord (LocationFor v))
 
-        , (Eval (Base t) t :< es)
         , (State (Env' v) :< es)
         , Evaluatable es t v (Base t)
         )

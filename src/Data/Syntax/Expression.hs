@@ -97,9 +97,6 @@ instance ( Ord l
          , Member (State (E3.Env' (Value l t))) es -- State Env
          , MonadAddress l (Eff es)               -- 'alloc'
 
-         , Member (E3.Eval (E3.Base t) t) es
-         , Member (E3.Eval (E3.Base t) (Value l t)) es
-
          , Member Fail es
          , E2.Recursive t
          , E3.Evaluatable es t (Value l t) (E3.Base t)

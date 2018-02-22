@@ -8,7 +8,6 @@ import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Writer
-import Data.Abstract.Eval3 (Eval, runEval, Evaluatable)
 import Data.Pointed
 import Data.Set
 

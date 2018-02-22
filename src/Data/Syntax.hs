@@ -223,7 +223,6 @@ instance ( Member Fail es
          , E2.Recursive t
          , E3.Evaluatable es t v (E3.Base t)
          , FreeVariables t
-         , Member (E3.Eval (E2.Base t) t) es
          , Member (State (E3.Env' v)) es
          )
          => E3.Evaluatable es t v Program where

@@ -2,7 +2,6 @@
 module Analysis.Abstract.Evaluating3 where
 
 import Control.Effect
-import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Store2
@@ -28,7 +27,6 @@ type Evaluating term v
   = '[ Fail                                -- For 'MonadFail'.
      , State (Store (LocationFor v) v)                              -- For 'MonadStore'.
      , State (Environment (LocationFor v) v) -- Environment State
-     , Eval (Base term) term
      ]
 
 -- | Evaluate a term to a value.
@@ -40,5 +38,4 @@ evaluate :: forall v term.
           )
          => term
          -> Final (Evaluating term v) v
-evaluate = run @(Evaluating term v)
-  . (fix (const (eval . project)))
+evaluate = run @(Evaluating term v) . fix (const step)
