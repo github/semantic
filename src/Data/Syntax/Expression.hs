@@ -110,8 +110,7 @@ instance ( Ord l
       assign a v
       pure (name, a)
 
-    put (foldr (uncurry envInsert) env bindings)
-    transactionState (Proxy :: Proxy (Environment l (Value l t)))  (E3.step body)
+    localState (Proxy :: Proxy (E3.Env' (Value l t))) (foldr (uncurry envInsert) env bindings) (E3.step body)
 
 data Comparison a
   = LessThan !a !a

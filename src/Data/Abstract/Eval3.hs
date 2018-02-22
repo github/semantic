@@ -102,17 +102,14 @@ instance (Recursive t
   eval [x]    = step x    -- Return the value for the last term
   eval (x:xs) = do
     _ <- step @v x         -- Evaluate the head term
-    env <- get @(Environment (LocationFor v) v)       -- Get the global environment after evaluation since
+    env <- get @(Env' v)       -- Get the global environment after evaluation since
                            -- it might have been modified by the 'step'
                            -- evaluation above ^.
 
     -- Finally, evaluate the rest of the terms, but do so by calculating a new
     -- environment each time where the free variables in those terms are bound
     -- to the global environment.
-    put @(Environment (LocationFor v) v) (bindEnv (freeVariables1 xs) env)
-    -- TODO: This might not be right
-    transactionState (Proxy :: Proxy (Environment (LocationFor v) v)) (eval xs)
-    -- transactionState (const (bindEnv (freeVariables1 xs) env)) (eval xs)
+    localState (Proxy :: Proxy (Env' v)) (bindEnv (freeVariables1 xs) env) (eval xs)
 
 -- | The 'Eval' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 -- class Monad m => Eval term v m constr where
