@@ -27,8 +27,8 @@ import System.FilePath.Posix
 type Evaluating term v
   = '[ Fail                                -- For 'MonadFail'.
      , State (Store (LocationFor v) v)                              -- For 'MonadStore'.
-     , State (Env v) -- Environment State
-     , Reader (LocalEnv v) -- Environment State
+     , State (EnvironmentFor v) -- Environment State
+     , Reader (EnvironmentFor v) -- Environment State
      ]
 
 -- | Evaluate a term to a value.

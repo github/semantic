@@ -97,10 +97,10 @@ instance ( Ord l
          , MonadStore (Value l t) (Eff es)       -- 'alloc'
          , MonadAddress l (Eff es)        -- 'alloc'
          , Members '[
-             State  (E3.Env (Value l t))
-           , Reader (E3.LocalEnv (Value l t))
+             State  (E3.EnvironmentFor (Value l t))
+           , Reader (E3.EnvironmentFor (Value l t))
            , Fail
-           ] es -- Env and LocalEnv
+           ] es -- Env and EnvironmentFor
          , E2.Recursive t
          , E3.Evaluatable es t (Value l t) (E3.Base t)
          ) => E3.Evaluatable es t (Value l t) Call where
@@ -113,7 +113,7 @@ instance ( Ord l
       assign a v
       pure (name, a)
 
-    local (const (E3.LocalEnv $ foldr (uncurry envInsert) env bindings)) (E3.step body)
+    local (const (foldr (uncurry envInsert) env bindings)) (E3.step body)
 
 data Comparison a
   = LessThan !a !a

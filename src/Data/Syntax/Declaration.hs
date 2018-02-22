@@ -129,16 +129,16 @@ instance ( FreeVariables t                -- To get free variables from the func
          , Semigroup (Cell l (Value l t)) -- envLookupOrAlloc'
          , MonadStore (Value l t) (Eff es)       -- envLookupOrAlloc'
          , MonadAddress l (Eff es)               -- envLookupOrAlloc'
-         , Member (State (E3.Env (Value l t))) es
-         , Member (Reader (E3.LocalEnv (Value l t))) es
+         , Member (State (E3.EnvironmentFor (Value l t))) es
+         , Member (Reader (E3.EnvironmentFor (Value l t))) es
          ) => E3.Evaluatable es t (Value l t) Method where
   eval Method{..} = do
-    env <- ask @(E3.LocalEnv (Value l t))
+    env <- ask @(E3.EnvironmentFor (Value l t))
     let params = toList (freeVariables1 methodParameters)
-    let v = inj (Closure params methodBody (E3.unLocalEnv env)) :: Value l t
+    let v = inj (Closure params methodBody env) :: Value l t
 
-    (name, addr) <- envLookupOrAlloc' methodName (E3.unLocalEnv env) v
-    modify (E3.Env . (envInsert name addr) . E3.unEnv)
+    (name, addr) <- envLookupOrAlloc' methodName env v
+    modify (envInsert name addr)
     pure v
 
 instance ( Member Fail es ) => E3.Evaluatable es t Type.Type Method

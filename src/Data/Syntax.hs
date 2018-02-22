@@ -155,12 +155,12 @@ instance ( MonadAddress (LocationFor v) m
 
 instance ( MonadAddress (LocationFor v) (Eff es)
          , MonadStore v (Eff es)
-         , (Reader (E3.LocalEnv v) :< es)
+         , (Reader (E3.EnvironmentFor v) :< es)
          , (Fail :< es)
          ) => E3.Evaluatable es t v Identifier where
   eval (Identifier name) = do
     env <- ask
-    maybe (fail ("free variable: " <> unpack name)) deref (envLookup name (E3.unLocalEnv env))
+    maybe (fail ("free variable: " <> unpack name)) deref (envLookup name env)
 
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = point x
@@ -224,7 +224,7 @@ instance ( Member Fail es
          , E2.Recursive t
          , E3.Evaluatable es t v (E3.Base t)
          , FreeVariables t
-         , Members '[ State (E3.Env v), Reader (E3.LocalEnv v) ] es
+         , Members '[ State (E3.EnvironmentFor v), Reader (E3.EnvironmentFor v) ] es
          )
          => E3.Evaluatable es t v Program where
   eval (Program xs) = E3.eval xs
