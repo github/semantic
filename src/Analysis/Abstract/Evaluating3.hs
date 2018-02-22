@@ -25,10 +25,10 @@ import System.FilePath.Posix
 
 -- | The effects necessary for concrete interpretation.
 type Evaluating term v
-  = '[ Fail                                -- For 'MonadFail'.
-     , State (Store (LocationFor v) v)                              -- For 'MonadStore'.
-     , State (EnvironmentFor v) -- Environment State
-     , Reader (EnvironmentFor v) -- Environment State
+  = '[ Fail
+     , State (Store (LocationFor v) v)
+     , State (EnvironmentFor v)
+     , Reader (EnvironmentFor v)
      ]
 
 -- | Evaluate a term to a value.
