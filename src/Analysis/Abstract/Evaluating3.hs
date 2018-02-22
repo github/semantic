@@ -2,6 +2,7 @@
 module Analysis.Abstract.Evaluating3 where
 
 import Control.Effect
+import Control.Monad.Effect (Eff, Members)
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Store2
@@ -21,7 +22,9 @@ import qualified Data.Map as Map
 import Data.Semigroup
 import Prelude hiding (fail)
 import Data.Blob
+import Data.Maybe (fromMaybe)
 import System.FilePath.Posix
+
 
 -- | The effects necessary for concrete interpretation.
 type Evaluating term v
@@ -29,6 +32,7 @@ type Evaluating term v
      , State (Store (LocationFor v) v)
      , State (EnvironmentFor v)
      , Reader (EnvironmentFor v)
+     , Reader (Linker v)
      ]
 
 -- | Evaluate a term to a value.
