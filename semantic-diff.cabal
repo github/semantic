@@ -15,13 +15,11 @@ library
   hs-source-dirs:      src
   exposed-modules:
                      -- Analyses & term annotations
-                       Analysis.Abstract.Caching
-                     , Analysis.Abstract.Collecting
-                     , Analysis.Abstract.Dead
-                     , Analysis.Abstract.Evaluating
-                     , Analysis.Abstract.Evaluating2
-                     , Analysis.Abstract.Evaluating3
-                     , Analysis.Abstract.Tracing
+                       -- Analysis.Abstract.Caching
+                     -- , Analysis.Abstract.Collecting
+                     -- , Analysis.Abstract.Dead
+                       Analysis.Abstract.Evaluating
+                     -- , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
                      , Analysis.Decorator
@@ -49,9 +47,7 @@ library
                      , Data.Abstract.Configuration
                      , Data.Abstract.Environment
                      , Data.Abstract.Linker
-                     , Data.Abstract.Eval
-                     , Data.Abstract.Eval2
-                     , Data.Abstract.Eval3
+                     , Data.Abstract.Evaluatable
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Live
                      , Data.Abstract.Store

@@ -1,8 +1,7 @@
-{-# LANGUAGE MultiParamTypeClasses, Rank2Types, GADTs, TypeOperators, DefaultSignatures, UndecidableInstances, ScopedTypeVariables, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE MultiParamTypeClasses, Rank2Types, GADTs, TypeOperators, DefaultSignatures, UndecidableInstances, ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
-module Data.Abstract.Eval3
+module Data.Abstract.Evaluatable
 ( Evaluatable(..)
-, EnvironmentFor
 , step
 , Linker
 , MonadGC(..)
@@ -28,7 +27,6 @@ import Prelude hiding (fail)
 import Data.Union (Apply)
 import qualified Data.Union as U
 
-type EnvironmentFor v = Environment (LocationFor v) v
 
 step :: forall v term es. (Evaluatable es term v (Base term), Recursive term) => term -> Eff es v
 step = eval . project

@@ -1,39 +1,30 @@
-{-# LANGUAGE DeriveAnyClass, GADTs, DataKinds, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, TypeApplications #-}
+{-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, TypeApplications #-}
 module Data.Syntax where
 
-import qualified Assigning.Assignment as Assignment
 import Control.Applicative
 import Control.Monad.Effect
 import Control.Monad.Effect.Address
-import Control.Monad.Effect.Env
-import Control.Monad.Effect.Store
-import Control.Monad.Effect.State
-import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Fail
+import Control.Monad.Effect.Reader
+import Control.Monad.Effect.State
 import Control.Monad.Error.Class hiding (Error)
-import Data.Abstract.Address
 import Data.Abstract.Environment
-import Data.Abstract.Eval
-import qualified Data.Abstract.Eval2 as E2
-import qualified Data.Abstract.Eval3 as E3
+import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables
-import Data.Abstract.Value (LocationFor, AbstractValue(..), Value)
-import qualified Data.Abstract.Value as Value
-import qualified Data.Abstract.Type as Type
+import Data.Abstract.Value (LocationFor, EnvironmentFor, StoreFor, AbstractValue(..), Value)
 import Data.Align.Generic
 import Data.AST
 import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (unpack)
-import qualified Data.Error as Error
 import Data.Foldable (asum, toList)
 import Data.Function ((&), on)
+import Data.Functor.Classes.Generic
 import Data.Ix
 import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
-import Data.Functor.Classes.Generic
 import Data.Mergeable
+import Data.Pointed
 import Data.Range
 import Data.Record
-import Data.Pointed
 import Data.Semigroup
 import Data.Span
 import Data.Term
@@ -42,6 +33,10 @@ import Diffing.Algorithm hiding (Empty)
 import GHC.Generics
 import GHC.Stack
 import Prelude hiding (fail)
+import qualified Assigning.Assignment as Assignment
+import qualified Data.Abstract.Type as Type
+import qualified Data.Abstract.Value as Value
+import qualified Data.Error as Error
 
 -- Combinators
 
@@ -134,30 +129,11 @@ instance Eq1 Identifier where liftEq = genericLiftEq
 instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
-instance ( MonadAddress (LocationFor v) m
-         , MonadEnv v m
-         , MonadFail m
-         , MonadStore v m
-         ) => Eval t v m Identifier where
-  eval _ yield (Identifier name) = do
-    env <- askEnv
-    maybe (fail ("free variable: " <> unpack name)) deref (envLookup name env) >>= yield
-
-instance ( MonadAddress (LocationFor v) m
-         -- , MonadEnv v m
-         , MonadFail m
-         , MonadStore v m
-         , E2.EvalEnv v m
-         ) => E2.Eval t v m Identifier where
-  eval (Identifier name) = do
-    env <- E2.askEnv
-    maybe (fail ("free variable: " <> unpack name)) deref (envLookup name env)
-
-instance ( MonadAddress (LocationFor v) (Eff es)
-         , MonadStore v (Eff es)
-         , (Reader (E3.EnvironmentFor v) :< es)
-         , (Fail :< es)
-         ) => E3.Evaluatable es t v Identifier where
+instance ( MonadAddress (LocationFor v) es
+         , Member Fail es
+         , Member (Reader (EnvironmentFor v)) es
+         , Member (State (StoreFor v)) es
+         ) => Evaluatable es t v Identifier where
   eval (Identifier name) = do
     env <- ask
     maybe (fail ("free variable: " <> unpack name)) deref (envLookup name env)
@@ -172,74 +148,28 @@ instance Eq1 Program where liftEq = genericLiftEq
 instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 
-instance ( Monad m
-         , Ord l
-         , Show l
-         , Show t
-         , Semigroup (Cell l (Value l t))
-         , MonadEnv (Value l t) m
-         , MonadStore (Value l t) m
-         , MonadGC (Value l t) m
-         , MonadAddress l m
-         , FreeVariables t
-         )
-        => Eval t (Value l t) m Program where
-  eval ev yield (Program xs) = eval' ev yield xs
-    where
-      eval' _  _ []  = injectAndYield unit
-      eval' ev _ [a] = ev pure a >>= injectAndYield
-      eval' ev yield (a:as) = do
-        env <- askEnv @(Value l t)
-        extraRoots (envAll env) (ev (const (eval' ev pure as)) a) >>= yield
-
-      injectAndYield :: Value l t -> m (Value l t)
-      injectAndYield val = do
-        env <- askEnv @(Value l t)
-        yield $ inj (Value.Interface val env)
-
-instance ( Monad m
-         , Ord Type.Type
-         , MonadGC Type.Type m
-         , MonadEnv Type.Type m
-         , FreeVariables t
-         ) => Eval t Type.Type m Program where
-  eval ev yield (Program xs) = eval ev yield xs
-
-instance ( MonadFail m
-         , Ord (LocationFor v)
-         , AbstractValue v
-         , E2.Recursive t
-         , E2.Eval t v m (E2.Base t)
-         , FreeVariables t
-         , E2.EvalEnv v m
-         , Show (LocationFor v)
-         )
-         => E2.Eval t v m Program where
-  eval (Program xs) = E2.eval xs
-
 instance ( Ord (LocationFor (Value l t))
          , Show (LocationFor (Value l t))
-         , E2.Recursive t
-         , E3.Evaluatable es t (Value l t) (E3.Base t)
+         , Recursive t
+         , Evaluatable es t (Value l t) (Base t)
          , FreeVariables t
-         , Members '[
-            Fail,
-            State (E3.EnvironmentFor (Value l t)),
-            Reader (E3.EnvironmentFor (Value l t)) ] es
+         , Member Fail es
+         , Member (State (EnvironmentFor (Value l t))) es
+         , Member (Reader (EnvironmentFor (Value l t))) es
          )
-         => E3.Evaluatable es t (Value l t) Program where
+         => Evaluatable es t (Value l t) Program where
   eval (Program xs) = eval' xs
     where
-      interface val = ask @(E3.EnvironmentFor (Value l t)) >>= pure . inj . Value.Interface val
+      interface val = inj . Value.Interface val <$> ask @(EnvironmentFor (Value l t))
 
       eval' [] = interface unit
-      eval' [x] = E3.step x >>= interface
+      eval' [x] = step x >>= interface
       eval' (x:xs) = do
-        _ <- E3.step @(Value l t) x
-        env <- get @(E3.EnvironmentFor (Value l t))
+        _ <- step @(Value l t) x
+        env <- get @(EnvironmentFor (Value l t))
         local (envUnion env) (eval' xs)
 
-instance Member Fail es => E3.Evaluatable es t Type.Type Program where
+instance Member Fail es => Evaluatable es t Type.Type Program where
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
@@ -250,7 +180,7 @@ instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare
 instance Show1 AccessibilityModifier where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for AccessibilityModifier
-instance (MonadFail m) => Eval t v m AccessibilityModifier
+instance Member Fail es => Evaluatable es t v AccessibilityModifier
 
 -- | Empty syntax, with essentially no-op semantics.
 --
@@ -262,13 +192,7 @@ instance Eq1 Empty where liftEq _ _ _ = True
 instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
-instance (Monad m, AbstractValue v) => Eval t v m Empty where
-  eval _ yield _ = yield unit
-
-instance (Monad m, AbstractValue v) => E2.Eval t v m Empty where
-  eval _ = pure unit
-
-instance (AbstractValue v) => E3.Evaluatable es t v Empty where
+instance (AbstractValue v) => Evaluatable es t v Empty where
   eval _ = pure unit
 
 
@@ -280,9 +204,7 @@ instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 
-instance (MonadFail m) => Eval t v m Error
-instance (MonadFail m) => E2.Eval t v m Error
-instance Member Fail es => E3.Evaluatable es t v Error
+instance Member Fail es => Evaluatable es t v Error
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorExpected errorActual
@@ -318,5 +240,6 @@ instance Eq1 Context where liftEq = genericLiftEq
 instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
-instance (Monad m) => Eval t v m Context where
-  eval ev yield Context{..} = ev yield contextSubject
+instance (Evaluatable es t v (Base t), Recursive t)
+         => Evaluatable es t v Context where
+  eval Context{..} = step contextSubject
