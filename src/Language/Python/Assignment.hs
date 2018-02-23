@@ -32,6 +32,7 @@ import Language.Python.Grammar as Grammar
 type Syntax2 =
   '[ Declaration.Function
    , Declaration.Import
+   , Declaration.ImportSymbol
    , Expression.Call
    , Literal.Integer
    , Statement.Return
@@ -140,14 +141,18 @@ assignment2 = handleError $ makeTerm <$> symbol Module <*> children (Syntax.Prog
 
     import' :: Assignment2
     import' =  makeTerm'' <$> symbol ImportStatement <*> children (many (aliasedImport <|> plainImport))
-           -- <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> (dottedName <|> emptyTerm) <*> emptyTerm <*> someTerm (wildCard <|> dottedName <|> aliasedSymbol <|> importSymbol))
+           <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> (dottedName <|> emptyTerm) <*> emptyTerm <*> some (wildCard <|> dottedName <|> aliasedSymbol <|> importSymbol))
       where
-        -- importSymbol = makeTerm <$> location <*> (Declaration.ImportSymbol <$> expression <*> emptyTerm)
-        -- aliasedSymbol = makeTerm <$> symbol AliasedImport <*> children (Declaration.ImportSymbol <$> expression <*> expression)
-        -- wildCard = makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
+        importSymbol = makeTerm <$> location <*> (Declaration.ImportSymbol <$> expression <*> emptyTerm)
+        aliasedSymbol = makeTerm <$> symbol AliasedImport <*> children (Declaration.ImportSymbol <$> expression <*> expression)
+        wildCard = makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
 
         aliasedImport = makeTerm <$> symbol AliasedImport <*> children (Declaration.Import <$> expression <*> expression <*> pure [])
         plainImport = makeTerm <$> symbol DottedName <*> children (Declaration.Import <$> expressions <*> emptyTerm <*> pure [])
+
+    dottedName :: Assignment2
+    dottedName = makeTerm <$> symbol DottedName <*> children (Syntax.Identifier <$> source)
+    -- dottedName = makeTerm <$> symbol DottedName <*> children (Expression.ScopeResolution <$> many expression)
 
     returnStatement :: Assignment2
     returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (expressionList <|> emptyTerm))
