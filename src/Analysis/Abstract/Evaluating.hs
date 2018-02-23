@@ -143,7 +143,7 @@ evaluates' pairs = run @(Evaluating' v) . fix go
 
 -- | The effects necessary for concrete interpretation.
 --
--- NOTE: Uses a lazy, non-memoized linker strategy.
+-- NOTE: Uses a lazy, non-memoized linker strategy where Effects are stored in the linker and run each time they are needed.
 type Evaluating'' v
   = '[ Fail
      , State (Store (LocationFor v) v)
@@ -191,3 +191,50 @@ evaluates'' pairs = run @(Evaluating'' v) . fix go
   where
     go _ (Blob{..}, t) = local (const (Linker' (Map.fromList (map toPathActionPair pairs)))) (trace ("step: " <> show blobPath) (step @v t))
     toPathActionPair (Blob{..}, t) = (dropExtensions blobPath, Evaluator (step @v t))
+
+
+-- | The effects necessary for concrete interpretation.
+--
+-- NOTE: Allows for both the concepts of requiring and loading.
+--   * require - evaluates the specified term and memoizes the resulting value (and environment), future calls to require the same file do not re-evaluate.
+--   * load    - always evaluates the specified term.
+type Evaluating''' v
+  = '[ Fail
+     , State (Store (LocationFor v) v)
+     , State (EnvironmentFor v)  -- Global (imperative) environment
+     , Reader (EnvironmentFor v) -- Local environment (e.g. binding over a closure)
+     , State (Module (Evaluator' v) v)
+     ]
+
+newtype Evaluator' v = Evaluator' { unEvaluator' :: Eff (Evaluating''' v) v }
+
+-- | Load another file and return an Effect.
+load :: forall v term es.
+        ( Members (Evaluating''' v) es
+        , FreeVariables term
+        )
+        => term -> Eff es v
+load term = do
+  let name = moduleName term
+  module' <- get @(Module (Evaluator' v) v)
+  maybe (fail ("cannot find " <> show name)) (raiseEmbedded . unEvaluator' . Prelude.fst) (moduleLookup name module')
+
+-- | Require/import another file and return an Effect.
+require''' :: forall v term es.
+        ( Members (Evaluating''' v) es
+        , FreeVariables term
+        )
+        => term -> Eff es v
+require''' term = do
+  let name = moduleName term
+  module' <- get @(Module (Evaluator' v) v)
+  case moduleLookup name module' of
+    Just (m, Nothing) -> do
+      v <- raiseEmbedded (unEvaluator' m)
+      modify @(Module (Evaluator' v) v) (moduleInsert name v)
+      pure v
+    Just (_, Just v) -> pure v
+    _ -> fail ("cannot find " <> show name)
+
+moduleName :: FreeVariables term => term -> Prelude.String
+moduleName term = let [name'] = toList (freeVariables term) in BC.unpack name'

@@ -5,6 +5,16 @@ import Data.Semigroup
 import GHC.Generics
 import qualified Data.Map as Map
 
+
+newtype Module e v = Module { unModule :: Map.Map FilePath (e, Maybe v) }
+
+moduleLookup :: FilePath -> Module e v -> Maybe (e, Maybe v)
+moduleLookup k = Map.lookup k . unModule
+
+moduleInsert :: FilePath -> v -> Module e v -> Module e v
+moduleInsert k v Module{..} = Module $ Map.update (\(x, _) -> Just (x, Just v)) k unModule
+
+
 data Linker t a = Linker { linkerValues :: Map.Map FilePath a, linkerTerms :: Map.Map FilePath t }
   deriving (Eq, Foldable, Functor, Generic1, Ord, Semigroup, Show, Traversable)
 
