@@ -3,7 +3,7 @@ module Analysis.Abstract.Tracing where
 
 import Control.Effect
 import Control.Monad.Effect hiding (run)
-import Control.Monad.Effect.Address
+import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
@@ -35,7 +35,7 @@ evalTrace :: forall v term
           . ( Ord v, Ord term, Ord (Cell (LocationFor v) v)
             , Functor (Base term)
             , Recursive term
-            , MonadAddress (LocationFor v) (Eff (Tracing [] term v))
+            , Addressable (LocationFor v) (Eff (Tracing [] term v))
             , MonadGC v (Eff (Tracing [] term v))
             , Semigroup (Cell (LocationFor v) v)
             , Eval term v (Eff (Tracing [] term v)) (Base term)
@@ -48,7 +48,7 @@ evalReach :: forall v term
           . ( Ord v, Ord term, Ord (LocationFor v), Ord (Cell (LocationFor v) v)
             , Functor (Base term)
             , Recursive term
-            , MonadAddress (LocationFor v) (Eff (Tracing Set term v))
+            , Addressable (LocationFor v) (Eff (Tracing Set term v))
             , MonadGC v (Eff (Tracing Set term v))
             , Semigroup (Cell (LocationFor v) v)
             , Eval term v (Eff (Tracing Set term v)) (Base term)

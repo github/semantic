@@ -1,8 +1,7 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Syntax.Statement where
 
-import Control.Monad.Effect (Eff)
-import Control.Monad.Effect.Address
+import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
@@ -104,7 +103,7 @@ instance Ord1 Assignment where liftCompare = genericLiftCompare
 instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
 instance ( Semigroup (Cell (LocationFor v) v)
-         , MonadAddress (LocationFor v) es
+         , Addressable (LocationFor v) es
          , FreeVariables t
          , Member (Reader (EnvironmentFor v)) es
          , Member (State (EnvironmentFor v)) es

@@ -4,32 +4,26 @@ module Data.Abstract.Evaluatable
 ( Evaluatable(..)
 , step
 , Linker
-, MonadGC(..)
-, MonadFail(..)
 , Recursive(..)
 , Base
 ) where
 
+import Control.Monad.Effect.Fail
+import Control.Monad.Effect.Internal
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
-import Control.Monad.Effect.GC
-import Control.Monad.Effect.Internal
-import Control.Monad.Effect.Fail
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
-import Data.Abstract.Value
 import Data.Abstract.Linker
+import Data.Abstract.Value
 import Data.Functor.Classes
+import Data.Functor.Foldable (Base, Recursive(..), project)
 import Data.Proxy
 import Data.Term
-import Data.Functor.Foldable (Base, Recursive(..), project)
-import Prelude hiding (fail)
 import Data.Union (Apply)
+import Prelude hiding (fail)
 import qualified Data.Union as U
 
-
-step :: forall v term es. (Evaluatable es term v (Base term), Recursive term) => term -> Eff es v
-step = eval . project
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable es term v constr where
@@ -44,6 +38,13 @@ instance (Apply (Evaluatable es t v) fs) => Evaluatable es t v (Union fs) where
 -- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
 instance (Evaluatable es t v s) => Evaluatable es t v (TermF s a) where
   eval In{..} = eval termFOut
+
+-- | Evaluate by first projecting a term to recurse one level.
+step :: forall v term es. (Evaluatable es term v (Base term), Recursive term) => term -> Eff es v
+step = eval . project
+
+
+-- Instances
 
 -- | '[]' is treated as an imperative sequence of statements/declarations s.t.:
 --

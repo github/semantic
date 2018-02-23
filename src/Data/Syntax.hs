@@ -3,7 +3,7 @@ module Data.Syntax where
 
 import Control.Applicative
 import Control.Monad.Effect
-import Control.Monad.Effect.Address
+import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
@@ -129,7 +129,7 @@ instance Eq1 Identifier where liftEq = genericLiftEq
 instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
-instance ( MonadAddress (LocationFor v) es
+instance ( Addressable (LocationFor v) es
          , Member Fail es
          , Member (Reader (EnvironmentFor v)) es
          , Member (State (StoreFor v)) es

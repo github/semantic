@@ -2,7 +2,7 @@
 module Data.Syntax.Expression where
 
 import Control.Monad.Effect
-import Control.Monad.Effect.Address
+import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
@@ -34,7 +34,7 @@ instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 
 instance ( Ord l
          , Semigroup (Cell l (Value l t))  -- 'assign'
-         , MonadAddress l es         -- 'alloc'
+         , Addressable l es         -- 'alloc'
          , Member Fail es
          , Member (State (EnvironmentFor (Value l t))) es
          , Member (Reader (EnvironmentFor (Value l t))) es

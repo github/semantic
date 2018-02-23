@@ -3,8 +3,7 @@ module Data.Syntax.Declaration where
 
 import Analysis.Abstract.Evaluating
 import Control.Applicative
-import Control.Monad.Effect (Eff)
-import Control.Monad.Effect.Address
+import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
@@ -43,7 +42,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
 instance ( FreeVariables t
          , Semigroup (Cell l (Value l t))
-         , MonadAddress l es
+         , Addressable l es
          , Member (State (EnvironmentFor (Value l t))) es
          , Member (Reader (EnvironmentFor (Value l t))) es
          , Member (State (StoreFor (Value l t))) es
@@ -99,7 +98,7 @@ instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 -- local environment.
 instance ( FreeVariables t                -- To get free variables from the function's parameters
          , Semigroup (Cell l (Value l t)) -- envLookupOrAlloc
-         , MonadAddress l es              -- envLookupOrAlloc
+         , Addressable l es              -- envLookupOrAlloc
          , Member (State (EnvironmentFor (Value l t))) es
          , Member (Reader (EnvironmentFor (Value l t))) es
          , Member (State (StoreFor (Value l t))) es

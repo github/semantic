@@ -4,7 +4,7 @@ module Analysis.Abstract.Caching where
 import Analysis.Abstract.Collecting
 import Control.Applicative
 import Control.Effect
-import Control.Monad.Effect.Address
+import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Cache
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fail
@@ -60,7 +60,7 @@ evalCache :: forall v term
             , Foldable (Cell (LocationFor v))
             , Functor (Base term)
             , Recursive term
-            , MonadAddress (LocationFor v) (Eff (Caching term v))
+            , Addressable (LocationFor v) (Eff (Caching term v))
             , Semigroup (Cell (LocationFor v) v)
             , ValueRoots (LocationFor v) v
             , Eval term v (Eff (Caching term v)) (Base term)
