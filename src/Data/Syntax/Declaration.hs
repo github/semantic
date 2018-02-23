@@ -352,8 +352,8 @@ instance ( Show l
 
     modify (envUnion env)
     pure interface
-
-instance Member Fail es => E3.Evaluatable es Type.Type v Import
+--
+instance Member Fail es => E3.Evaluatable es t Type.Type Import
 
 
 -- | An imported symbol
