@@ -57,7 +57,7 @@ evaluatePythonFiles paths = do
   pure $ evaluates @PythonValue (zip bs ts) (b, t)
 
 
--- Diff helpers  
+-- Diff helpers
 diffWithParser :: (HasField fields Data.Span.Span,
                    HasField fields Range,
                    Eq1 syntax, Show1 syntax,
