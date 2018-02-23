@@ -35,7 +35,6 @@ library
                      , Control.Monad.Effect.Addressable
                      , Control.Monad.Effect.Cache
                      , Control.Monad.Effect.Dead
-                     , Control.Monad.Effect.Env
                      , Control.Monad.Effect.Evaluatable
                      , Control.Monad.Effect.Fresh
                      , Control.Monad.Effect.GC
