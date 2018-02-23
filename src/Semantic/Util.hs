@@ -30,17 +30,15 @@ import Semantic.IO as IO
 import Semantic.Task
 
 import qualified Language.Ruby.Assignment as Ruby
+import qualified Language.Python.Assignment as Python
 
 type RubyValue = Value Precise (Term (Union Ruby.Syntax2) (Record Location))
+type PythonValue = Value Precise (Term (Union Python.Syntax2) (Record Location))
 
 file :: MonadIO m => FilePath -> m Blob
 file path = fromJust <$> IO.readFile path (languageForFilePath path)
 
--- evaluatePythonFile :: FilePath -> _
--- evaluateRubyFile path = file path
---   >>= runTask . parse rubyParser2
---   >>= pure . Prelude.fst . evaluate @RubyValue
-
+-- Ruby
 evaluateRubyFile path = file path
   >>= runTask . parse rubyParser2
   >>= pure  . E3.evaluate @RubyValue
@@ -49,6 +47,17 @@ evaluateRubyFiles paths = do
   blobs@(b:bs) <- traverse file paths
   (t:ts) <- runTask $ traverse (parse rubyParser2) blobs
   pure $ E3.evaluates @RubyValue (zip bs ts) (b, t)
+
+
+-- Python
+evaluatePythonFile path = file path
+  >>= runTask . parse pythonParser2
+  >>= pure  . E3.evaluate @PythonValue
+
+evaluatePythonFiles paths = do
+  blobs@(b:bs) <- traverse file paths
+  (t:ts) <- runTask $ traverse (parse pythonParser2) blobs
+  pure $ E3.evaluates @PythonValue (zip bs ts) (b, t)
 
 -- parsePythonFiles :: [FilePath] -> FilePath -> IO ([(Blob, Python.Term)], (Blob, Python.Term))
 -- parsePythonFiles paths entryPath = do

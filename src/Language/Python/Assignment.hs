@@ -1,9 +1,12 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
 module Language.Python.Assignment
 ( assignment
+, assignment2
 , Syntax
+, Syntax2
 , Grammar
 , Term
+, Term2
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
@@ -25,6 +28,20 @@ import Data.Union
 import GHC.Stack
 import Language.Python.Syntax as Python.Syntax
 import Language.Python.Grammar as Grammar
+
+type Syntax2 =
+  '[ Declaration.Function
+   , Declaration.Import
+   , Expression.Call
+   , Literal.Integer
+   , Statement.Return
+   , Syntax.Empty
+   , Syntax.Error
+   , Syntax.Identifier
+   , Syntax.Program
+   , Type.Annotation
+   , []
+   ]
 
 type Syntax =
   '[ Comment.Comment
@@ -80,6 +97,66 @@ type Syntax =
    , Type.Annotation
    , []
    ]
+
+type Term2 = Term.Term (Union Syntax2) (Record Location)
+type Assignment2 = HasCallStack => Assignment.Assignment [] Grammar Term2
+
+assignment2 :: Assignment2
+assignment2 = handleError $ makeTerm <$> symbol Module <*> children (Syntax.Program <$> many expression) <|> parseError
+  where
+    expression :: Assignment2
+    expression = handleError $
+      choice [ call
+             , expressionStatement
+             , functionDefinition
+             , integer
+             , identifier
+             , expressionList
+             , expressionStatement
+             , import'
+             , returnStatement
+             ]
+
+    expressions :: Assignment2
+    expressions = makeTerm'' <$> location <*> many expression
+
+    expressionList :: Assignment2
+    expressionList = makeTerm'' <$> symbol ExpressionList <*> children (some expression)
+
+    expressionStatement :: Assignment2
+    expressionStatement = makeTerm'' <$> symbol ExpressionStatement <*> children (some expression)
+
+    call :: Assignment2
+    call = makeTerm <$> symbol Call <*> children (Expression.Call <$> pure [] <*> expression <*> (symbol ArgumentList *> children (many expression) {- <|> some comprehension -}) <*> emptyTerm)
+
+    functionDefinition :: Assignment2
+    functionDefinition
+      =   makeFunctionDeclaration <$> symbol FunctionDefinition <*> children ((,,,) <$> expression <* symbol Parameters <*> children (many expression) <*> optional (symbol Type *> children (expression)) <*> expressions)
+      -- <|> makeAsyncFunctionDeclaration <$> symbol AsyncFunctionDefinition <*> children ((,,,,) <$> async' <*> expression <* symbol Parameters <*> children (many expression) <*> optional (symbol Type *> children (expression)) <*> expressions)
+      -- <|> makeFunctionDeclaration <$> (symbol Lambda' <|> symbol Lambda) <*> children ((,,,) <$ token AnonLambda <*> emptyTerm <*> (symbol LambdaParameters *> children (many expression) <|> pure []) <*> optional (symbol Type *> children (expression)) <*> expressions)
+      where
+        makeFunctionDeclaration loc (functionName', functionParameters, ty, functionBody) = makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function [] functionName' functionParameters functionBody) (fromMaybe (makeTerm loc Syntax.Empty) ty)
+        -- makeAsyncFunctionDeclaration loc (async', functionName', functionParameters, ty, functionBody) = makeTerm loc $ Type.Annotation (makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function [] functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) id ty)) async'
+
+    import' :: Assignment2
+    import' =  makeTerm'' <$> symbol ImportStatement <*> children (many (aliasedImport <|> plainImport))
+           -- <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> (dottedName <|> emptyTerm) <*> emptyTerm <*> someTerm (wildCard <|> dottedName <|> aliasedSymbol <|> importSymbol))
+      where
+        -- importSymbol = makeTerm <$> location <*> (Declaration.ImportSymbol <$> expression <*> emptyTerm)
+        -- aliasedSymbol = makeTerm <$> symbol AliasedImport <*> children (Declaration.ImportSymbol <$> expression <*> expression)
+        -- wildCard = makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
+
+        aliasedImport = makeTerm <$> symbol AliasedImport <*> children (Declaration.Import <$> expression <*> expression <*> pure [])
+        plainImport = makeTerm <$> symbol DottedName <*> children (Declaration.Import <$> expressions <*> emptyTerm <*> pure [])
+
+    returnStatement :: Assignment2
+    returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> (expressionList <|> emptyTerm))
+
+    integer :: Assignment2
+    integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
+
+    identifier :: Assignment2
+    identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax.Identifier <$> source)
 
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
