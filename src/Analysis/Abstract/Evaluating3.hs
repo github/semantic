@@ -45,7 +45,7 @@ newtype Evaluator v = Evaluator { runEvaluator :: Eff (Evaluating v) v }
 -- | Evaluate a term to a value.
 evaluate :: forall v term.
           ( Ord v
-          , Ord (LocationFor v) -- For 'MonadStore'
+          , Ord (LocationFor v)
           , Recursive term
           , Evaluatable (Evaluating v) term v (Base term)
           )
@@ -53,29 +53,17 @@ evaluate :: forall v term.
          -> Final (Evaluating v) v
 evaluate = run @(Evaluating v) . fix (const step)
 
--- evaluates :: forall v term
---           . ( Ord v
---             , Ord (LocationFor v) -- For 'MonadStore'
---             , Recursive term
---             , Evaluatable (Evaluating term v) term v (Base term)
---             -- , Ord (Cell (LocationFor v) v)
---             -- , Semigroup (Cell (LocationFor v) v)
---             -- , Functor (Base term)
---             -- , Recursive term
---             -- , AbstractValue v
---             -- , MonadAddress (LocationFor v) (Eff (Evaluating v))
---             -- , FreeVariables term
---             -- , Eval term v (Eff (Evaluating v)) (Base term)
---             )
---           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
---           -> (Blob, term)   -- Entrypoint
---           -> Final (Evaluating term v) v
--- evaluates pairs = run @(Evaluating term v) . fix go
---   where
---     go :: ((Blob, term) -> Eff (Evaluating term v) (Final (Evaluating term v) v)) -> (Blob, term) -> Eff (Evaluating term v) (Final (Evaluating term v) v)
---     go recur (b@Blob{..}, t) = do
---       local (const (Linker (Map.fromList (map (toPathActionPair recur) pairs)))) (step t)
---
---     toPathActionPair recur p@(Blob{..}, t) = do
---       v <- run @(Evaluating term v) (fix (const (step t)))
---       pure (dropExtensions blobPath, fst v)
+evaluates :: forall v term.
+          ( Ord v
+          , Ord (LocationFor v)
+          , Recursive term
+          , Evaluatable (Evaluating v) term v (Base term)
+          )
+          => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
+          -> (Blob, term)   -- Entrypoint
+          -> Final (Evaluating v) v
+evaluates pairs = run @(Evaluating v) . fix go
+  where
+    go _ (Blob{..}, t) = do
+      local (const (Linker (Map.fromList (map toPathActionPair pairs)))) (step @v t)
+    toPathActionPair (Blob{..}, t) = (dropExtensions blobPath, Evaluator (step @v t))
