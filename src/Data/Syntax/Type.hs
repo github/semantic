@@ -1,7 +1,8 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses, UndecidableInstances #-}
 module Data.Syntax.Type where
 
 import Data.Abstract.Eval
+import qualified Data.Abstract.Eval3 as E3
 import Data.Abstract.FreeVariables
 import Data.Align.Generic
 import Data.Functor.Classes.Generic
@@ -31,6 +32,12 @@ instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Specialize Eval for Type to unify the inferred type of the subject with the specified type
 instance (Monad m) => Eval t v m Annotation where
   eval recur yield Annotation{..} = recur yield annotationSubject
+
+instance ( E3.Evaluatable es t v (E3.Base t)
+         , E3.Recursive t
+         )
+         => E3.Evaluatable es t v Annotation where
+  eval Annotation{..} = E3.step annotationSubject
 
 
 data Function a = Function { functionParameters :: [a], functionReturn :: a }
