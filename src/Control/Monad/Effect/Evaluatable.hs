@@ -3,7 +3,6 @@
 module Control.Monad.Effect.Evaluatable
 ( Evaluatable(..)
 , step
-, Linker
 , Recursive(..)
 , Base
 ) where
@@ -14,7 +13,6 @@ import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
-import Data.Abstract.Linker
 import Data.Abstract.Value
 import Data.Functor.Classes
 import Data.Functor.Foldable (Base, Recursive(..), project)
@@ -40,7 +38,8 @@ instance (Evaluatable es t v s) => Evaluatable es t v (TermF s a) where
   eval In{..} = eval termFOut
 
 -- | Evaluate by first projecting a term to recurse one level.
-step :: forall v term es. (Evaluatable es term v (Base term), Recursive term) => term -> Eff es v
+step :: forall v term es. (Evaluatable es term v (Base term), Recursive term)
+     => term -> Eff es v
 step = eval . project
 
 
