@@ -53,7 +53,7 @@ instance ( FreeVariables t
     let params = toList (freeVariables1 functionParameters)
     let v = inj (Closure params functionBody env) :: Value l t
 
-    (name, addr) <- envLookupOrAlloc' functionName env v
+    (name, addr) <- envLookupOrAlloc functionName env v
     modify (envInsert name addr)
     pure v
 
@@ -80,7 +80,7 @@ instance Member Fail es => Evaluatable es t Type.Type Function
 --     let tvars' = fmap (\(_, _, t) -> t) tvars
 --     let v = Type.Product tvars' :-> outTy
 --
---     (name, a) <- envLookupOrAlloc' functionName env v
+--     (name, a) <- envLookupOrAlloc functionName env v
 --
 --     localEnv (envInsert name a) (yield v)
 
@@ -98,8 +98,8 @@ instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 -- Evaluating a Method creates a closure and makes that value available in the
 -- local environment.
 instance ( FreeVariables t                -- To get free variables from the function's parameters
-         , Semigroup (Cell l (Value l t)) -- envLookupOrAlloc'
-         , MonadAddress l es              -- envLookupOrAlloc'
+         , Semigroup (Cell l (Value l t)) -- envLookupOrAlloc
+         , MonadAddress l es              -- envLookupOrAlloc
          , Member (State (EnvironmentFor (Value l t))) es
          , Member (Reader (EnvironmentFor (Value l t))) es
          , Member (State (StoreFor (Value l t))) es
@@ -109,7 +109,7 @@ instance ( FreeVariables t                -- To get free variables from the func
     let params = toList (freeVariables1 methodParameters)
     let v = inj (Closure params methodBody env) :: Value l t
 
-    (name, addr) <- envLookupOrAlloc' methodName env v
+    (name, addr) <- envLookupOrAlloc methodName env v
     modify (envInsert name addr)
     pure v
 

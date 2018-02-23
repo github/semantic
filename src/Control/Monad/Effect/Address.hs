@@ -28,7 +28,7 @@ class (Ord l, Pointed (Cell l)) => MonadAddress l es where
 -- | Look up or allocate an address for a 'Name' free in a given term & assign it a given value, returning the 'Name' paired with the address.
 --
 --   The term is expected to contain one and only one free 'Name', meaning that care should be taken to apply this only to e.g. identifiers.
-envLookupOrAlloc' :: ( FreeVariables t
+envLookupOrAlloc :: ( FreeVariables t
                      , Semigroup (Cell (LocationFor a) a)
                      , Member (State (StoreFor a)) es
                      , MonadAddress (LocationFor a) es
@@ -37,22 +37,22 @@ envLookupOrAlloc' :: ( FreeVariables t
                   -> Environment (LocationFor a) a
                   -> a
                   -> Eff es (Name, Address (LocationFor a) a)
-envLookupOrAlloc' term = let [name] = toList (freeVariables term) in
-                         envLookupOrAlloc name
-
--- | Look up or allocate an address for a 'Name' & assign it a given value, returning the 'Name' paired with the address.
-envLookupOrAlloc :: ( Semigroup (Cell (LocationFor a) a)
-                    , Member (State (StoreFor a)) es
-                    , MonadAddress (LocationFor a) es
-                    )
-                 => Name
-                 -> Environment (LocationFor a) a
-                 -> a
-                 -> Eff es (Name, Address (LocationFor a) a)
-envLookupOrAlloc name env v = do
-  a <- maybe (alloc name) pure (envLookup name env)
-  assign a v
-  pure (name, a)
+envLookupOrAlloc term = let [name] = toList (freeVariables term) in
+                         envLookupOrAlloc' name
+  where
+    -- | Look up or allocate an address for a 'Name' & assign it a given value, returning the 'Name' paired with the address.
+    envLookupOrAlloc' :: ( Semigroup (Cell (LocationFor a) a)
+                        , Member (State (StoreFor a)) es
+                        , MonadAddress (LocationFor a) es
+                        )
+                     => Name
+                     -> Environment (LocationFor a) a
+                     -> a
+                     -> Eff es (Name, Address (LocationFor a) a)
+    envLookupOrAlloc' name env v = do
+      a <- maybe (alloc name) pure (envLookup name env)
+      assign a v
+      pure (name, a)
 
 -- | Write a value to the given 'Address' in the 'Store'.
 assign :: ( Ord (LocationFor a)

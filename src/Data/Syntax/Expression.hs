@@ -11,7 +11,7 @@ import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type as Type
-import Data.Abstract.Value (Value, Closure(..), LocationFor, EnvironmentFor, StoreFor)
+import Data.Abstract.Value (Value, Closure(..), EnvironmentFor, StoreFor)
 import Data.Align.Generic
 import Data.Functor.Classes.Generic
 import Data.Maybe

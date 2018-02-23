@@ -116,7 +116,7 @@ instance ( Semigroup (Cell (LocationFor v) v)
   eval Assignment{..} = do
     env <- ask
     v <- step assignmentValue
-    (var, a) <- envLookupOrAlloc' assignmentTarget env v
+    (var, a) <- envLookupOrAlloc assignmentTarget env v
 
     modify (envInsert var a)
     pure v
