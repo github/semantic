@@ -2,7 +2,7 @@
 module Data.Syntax.Literal where
 
 import Control.Monad.Effect.Fail
-import Data.Abstract.Evaluatable
+import Control.Monad.Effect.Evaluatable
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value (AbstractValue(..))
 import Data.Align.Generic

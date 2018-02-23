@@ -8,7 +8,7 @@ import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Address
 import Data.Abstract.Environment
-import Data.Abstract.Evaluatable
+import Control.Monad.Effect.Evaluatable
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type as Type
 import Data.Abstract.Value (Value, Closure(..), EnvironmentFor, StoreFor)

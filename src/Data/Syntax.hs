@@ -9,7 +9,7 @@ import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Control.Monad.Error.Class hiding (Error)
 import Data.Abstract.Environment
-import Data.Abstract.Evaluatable
+import Control.Monad.Effect.Evaluatable
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value (LocationFor, EnvironmentFor, StoreFor, AbstractValue(..), Value)
 import Data.Align.Generic

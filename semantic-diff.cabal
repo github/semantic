@@ -36,6 +36,7 @@ library
                      , Control.Monad.Effect.Cache
                      , Control.Monad.Effect.Dead
                      , Control.Monad.Effect.Env
+                     , Control.Monad.Effect.Evaluatable
                      , Control.Monad.Effect.Fresh
                      , Control.Monad.Effect.GC
                      , Control.Monad.Effect.NonDet
@@ -46,7 +47,6 @@ library
                      , Data.Abstract.Configuration
                      , Data.Abstract.Environment
                      , Data.Abstract.Linker
-                     , Data.Abstract.Evaluatable
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Live
                      , Data.Abstract.Store

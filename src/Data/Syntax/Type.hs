@@ -2,7 +2,7 @@
 module Data.Syntax.Type where
 
 import Control.Monad.Effect.Fail
-import Data.Abstract.Evaluatable
+import Control.Monad.Effect.Evaluatable
 import Data.Abstract.FreeVariables
 import Data.Align.Generic
 import Data.Functor.Classes.Generic

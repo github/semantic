@@ -1,6 +1,6 @@
 {-# LANGUAGE MultiParamTypeClasses, Rank2Types, GADTs, TypeOperators, DefaultSignatures, UndecidableInstances, ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
-module Data.Abstract.Evaluatable
+module Control.Monad.Effect.Evaluatable
 ( Evaluatable(..)
 , step
 , Linker

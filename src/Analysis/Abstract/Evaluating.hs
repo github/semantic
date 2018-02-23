@@ -7,7 +7,7 @@ import Control.Monad.Effect.Fail
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Reader
 import Data.Abstract.Linker
-import Data.Abstract.Evaluatable
+import Control.Monad.Effect.Evaluatable
 import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Function (fix)
