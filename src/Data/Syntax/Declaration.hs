@@ -124,8 +124,7 @@ instance ( Monad m
     E2.modifyEnv (envInsert name addr)
     pure v
 
-instance ( MonadFail m
-         ) => E2.Eval t Type.Type m Method
+instance MonadFail m => E2.Eval t Type.Type m Method
 
 instance ( FreeVariables t                -- To get free variables from the function's parameters
          , Semigroup (Cell l (Value l t)) -- envLookupOrAlloc'
