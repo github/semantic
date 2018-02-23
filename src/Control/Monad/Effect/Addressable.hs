@@ -28,30 +28,30 @@ class (Ord l, Pointed (Cell l)) => Addressable l es where
 -- | Look up or allocate an address for a 'Name' free in a given term & assign it a given value, returning the 'Name' paired with the address.
 --
 --   The term is expected to contain one and only one free 'Name', meaning that care should be taken to apply this only to e.g. identifiers.
-envLookupOrAlloc ::
+lookupOrAlloc ::
                  ( FreeVariables t
                  , Semigroup (Cell (LocationFor a) a)
                  , Member (State (StoreFor a)) es
                  , Addressable (LocationFor a) es
                  )
                  => t
-                 -> Environment (LocationFor a) a
                  -> a
+                 -> Environment (LocationFor a) a
                  -> Eff es (Name, Address (LocationFor a) a)
-envLookupOrAlloc term = let [name] = toList (freeVariables term) in
-                         envLookupOrAlloc' name
+lookupOrAlloc term = let [name] = toList (freeVariables term) in
+                         lookupOrAlloc' name
   where
     -- | Look up or allocate an address for a 'Name' & assign it a given value, returning the 'Name' paired with the address.
-    envLookupOrAlloc' ::
+    lookupOrAlloc' ::
                       ( Semigroup (Cell (LocationFor a) a)
                       , Member (State (StoreFor a)) es
                       , Addressable (LocationFor a) es
                       )
                       => Name
-                      -> Environment (LocationFor a) a
                       -> a
+                      -> Environment (LocationFor a) a
                       -> Eff es (Name, Address (LocationFor a) a)
-    envLookupOrAlloc' name env v = do
+    lookupOrAlloc' name v env = do
       a <- maybe (alloc name) pure (envLookup name env)
       assign a v
       pure (name, a)
