@@ -91,6 +91,24 @@ instance ( Alternative m
 
     localEnv (envInsert name a) (yield v)
 
+instance ( FreeVariables t
+         , Semigroup (Cell l (Value l t))
+         , MonadStore (Value l t) (Eff es)
+         , MonadAddress l (Eff es)
+         , Member (State (E3.EnvironmentFor (Value l t))) es
+         , Member (Reader (E3.EnvironmentFor (Value l t))) es
+         ) => E3.Evaluatable es t (Value l t) Function where
+  eval Function{..} = do
+    env <- ask @(E3.EnvironmentFor (Value l t))
+    let params = toList (freeVariables1 functionParameters)
+    let v = inj (Closure params functionBody env) :: Value l t
+
+    (name, addr) <- envLookupOrAlloc' functionName env v
+    modify (envInsert name addr)
+    pure v
+
+instance ( Member Fail es ) => E3.Evaluatable es t Type.Type Function
+
 -- TODO: How should we represent function types, where applicable?
 
 data Method a = Method { methodContext :: ![a], methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
