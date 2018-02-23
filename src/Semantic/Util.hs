@@ -3,8 +3,8 @@
 module Semantic.Util where
 
 
-import Analysis.Abstract.Evaluating2
-import qualified Analysis.Abstract.Evaluating3 as Evaluating3
+import qualified Analysis.Abstract.Evaluating2 as E2
+import qualified Analysis.Abstract.Evaluating3 as E3
 import Analysis.Declaration
 import Control.Monad.IO.Class
 import Data.Abstract.Address
@@ -37,13 +37,18 @@ file :: MonadIO m => FilePath -> m Blob
 file path = fromJust <$> IO.readFile path (languageForFilePath path)
 
 -- evaluatePythonFile :: FilePath -> _
+-- evaluateRubyFile path = file path
+--   >>= runTask . parse rubyParser2
+--   >>= pure . Prelude.fst . evaluate @RubyValue
+
 evaluateRubyFile path = file path
   >>= runTask . parse rubyParser2
-  >>= pure . Prelude.fst . evaluate @RubyValue
+  >>= pure  . E3.evaluate @RubyValue
 
-evaluateRubyFile2 path = file path
-  >>= runTask . parse rubyParser2
-  >>= pure  . Evaluating3.evaluate @RubyValue
+evaluateRubyFiles paths = do
+  blobs@(b:bs) <- traverse file paths
+  (t:ts) <- runTask $ traverse (parse rubyParser2) blobs
+  pure $ E3.evaluates @RubyValue (zip bs ts) (b, t)
 
 -- parsePythonFiles :: [FilePath] -> FilePath -> IO ([(Blob, Python.Term)], (Blob, Python.Term))
 -- parsePythonFiles paths entryPath = do
