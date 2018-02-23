@@ -15,7 +15,7 @@ import Control.Monad.Effect.Fail
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Analysis.Abstract.Evaluating
-import qualified Analysis.Abstract.Evaluating as E3
+import qualified Analysis.Abstract.Evaluating3 as E3
 import Data.Abstract.Eval
 import qualified Data.Abstract.Eval2 as E2
 import qualified Data.Abstract.Eval3 as E3
@@ -336,15 +336,14 @@ instance (MonadFail m) => E2.Eval t v m Import
 
 instance ( Show l
          , Show t
-         , Members (Evaluating (Value l t)) es
-         , Member (State (E3.EnvironmentFor (Value l t))) es
+         , Members (E3.Evaluating (Value l t)) es
          , FreeVariables t
          )
          => E3.Evaluatable es t (Value l t) Import where
   eval (Import from _ _) = do
     let [name] = toList (freeVariables from)
 
-    interface <- raiseEmbedded (E3.require (BC.unpack name))
+    interface <- E3.require (BC.unpack name)
     -- TODO: Consider returning the value instead of the interface.
     Interface _ env <- maybe
                            (fail ("expected an interface, but got: " <> show interface))
