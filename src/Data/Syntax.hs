@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, TypeApplications #-}
+{-# LANGUAGE DeriveAnyClass, GADTs, DataKinds, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, TypeApplications #-}
 module Data.Syntax where
 
 import qualified Assigning.Assignment as Assignment
