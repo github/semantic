@@ -3,13 +3,11 @@ module Data.Syntax.Declaration where
 
 import Control.Applicative
 import Control.Monad.Effect.Reader
-import Control.Monad.Effect.Embedded
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.Store
-import Control.Monad.Effect.Store2 (Store2)
 import Control.Monad.Effect (Eff)
 import Control.Monad.Effect.Fail
 import Data.Abstract.Address
