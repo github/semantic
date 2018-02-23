@@ -33,13 +33,13 @@ library
                      , Control.Effect
                      -- Effects used in abstract interpretation
                      , Control.Monad.Effect.Addressable
-                     , Control.Monad.Effect.Cache
-                     , Control.Monad.Effect.Dead
+                     -- , Control.Monad.Effect.Cache
+                     -- , Control.Monad.Effect.Dead
                      , Control.Monad.Effect.Evaluatable
-                     , Control.Monad.Effect.Fresh
-                     , Control.Monad.Effect.GC
-                     , Control.Monad.Effect.NonDet
-                     , Control.Monad.Effect.Trace
+                     -- , Control.Monad.Effect.Fresh
+                     -- , Control.Monad.Effect.GC
+                     -- , Control.Monad.Effect.NonDet
+                     -- , Control.Monad.Effect.Trace
                      -- General datatype definitions & generic algorithms
                      , Data.Abstract.Address
                      , Data.Abstract.Cache
