@@ -13,7 +13,6 @@ import Control.Monad.Effect.Internal hiding (run)
 import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
-import Control.Monad.Effect.Store
 import Data.Abstract.Address
 import Data.Abstract.Cache
 import Data.Abstract.Configuration

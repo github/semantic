@@ -7,7 +7,6 @@ import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
-import Control.Monad.Effect.Store
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Trace
 import Control.Monad.Effect.Writer
