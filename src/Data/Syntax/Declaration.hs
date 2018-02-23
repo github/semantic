@@ -24,7 +24,6 @@ import GHC.Generics
 import Prelude hiding (fail)
 import qualified Data.Abstract.Type as Type
 import qualified Data.Abstract.Value as Value
-import qualified Data.ByteString.Char8 as BC
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -281,14 +280,14 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance ( Show l
          , Show t
-         , Members (Evaluating (Value l t)) es
+         , Members (Evaluating t (Value l t)) es
+         , Evaluatable es t (Value l t) (Base t)
+         , Recursive t
          , FreeVariables t
          )
          => Evaluatable es t (Value l t) Import where
   eval (Import from _ _) = do
-    let [name] = toList (freeVariables from)
-
-    interface <- require (BC.unpack name)
+    interface <- require @(Value l t) @t from
     -- TODO: Consider returning the value instead of the interface.
     Interface _ env <- maybe
                            (fail ("expected an interface, but got: " <> show interface))
