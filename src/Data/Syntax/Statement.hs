@@ -4,9 +4,11 @@ module Data.Syntax.Statement where
 import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Store
+import Control.Monad.Effect.Fail
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Eval
+import qualified Data.Abstract.Eval3 as E3
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value
 import Data.Semigroup
@@ -15,6 +17,7 @@ import Data.Functor.Classes.Generic
 import Data.Mergeable
 import Diffing.Algorithm
 import GHC.Generics
+import Data.Union
 
 -- | Conditional. This must have an else block, which can be filled with some default value when omitted in the source, e.g. 'pure ()' for C-style if-without-else or 'pure Nothing' for Ruby-style, in both cases assuming some appropriate Applicative context into which the If will be lifted.
 data If a = If { ifCondition :: !a, ifThenBody :: !a, ifElseBody :: !a }
@@ -152,6 +155,11 @@ instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 instance (MonadFail m) => Eval t v m Return where
   eval ev yield (Return a) = ev yield a
 
+instance ( E3.Evaluatable es t v (E3.Base t)
+         , E3.Recursive t
+         )
+         => E3.Evaluatable es t v Return where
+  eval (Return x) = E3.step x
 
 newtype Yield a = Yield a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
