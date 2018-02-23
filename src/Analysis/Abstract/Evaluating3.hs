@@ -5,7 +5,6 @@ import Control.Effect
 import Control.Monad.Effect (Eff, Members)
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
-import Control.Monad.Effect.Store2
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Reader
 import Data.Abstract.Address
