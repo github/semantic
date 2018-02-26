@@ -54,8 +54,9 @@ load :: forall v term es.
         , FreeVariables term
         )
         => term -> Eff es v
-load term = ask @(Linker (Evaluator v)) >>= maybe (fail ("cannot find " <> show name)) evalAndCache . linkerLookup name
+load term = ask @(Linker (Evaluator v)) >>= maybe notFound evalAndCache . linkerLookup name
   where name = moduleName term
+        notFound = fail ("cannot find " <> show name)
         evalAndCache e = do
           v <- raiseEmbedded (runEvaluator e)
           modify @(Linker v) (linkerInsert name v)
