@@ -51,6 +51,7 @@ instance ( Ord l
       assign a v
       pure (name, a)
 
+    -- FIXME: `para eval` precludes custom evaluation à la dead code evaluation, gc, etc.
     local (const (foldr (uncurry envInsert) env bindings)) (para eval body)
 
 -- TODO: Implement type checking for Call
