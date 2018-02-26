@@ -288,11 +288,10 @@ instance ( Show l
          => Evaluatable es t (Value l t) Import where
   eval (Import from _ _) = do
     interface <- require @(Value l t) @t from
-    -- TODO: Consider returning the value instead of the interface.
-    Interface _ env <- maybe
-                           (fail ("expected an interface, but got: " <> show interface))
-                           pure
-                           (prj interface :: Maybe (Value.Interface l t))
+    Interface env <- maybe
+                      (fail ("expected an interface, but got: " <> show interface))
+                      pure
+                      (prj interface :: Maybe (Value.Interface l t))
 
     modify (envUnion env)
     pure interface

@@ -40,7 +40,7 @@ instance (Ord location) => Ord1 (Closure location) where liftCompare = genericLi
 instance (Show location) => Show1 (Closure location) where liftShowsPrec = genericLiftShowsPrec
 
 -- | A program value consisting of the value of the program and it's enviornment of bindings.
-data Interface location term = Interface (Value location term) (Environment location (Value location term))
+newtype Interface location term = Interface (Environment location (Value location term))
   deriving (Eq, Generic1, Ord, Show)
 
 instance (Eq location) => Eq1 (Interface location) where liftEq = genericLiftEq
@@ -116,7 +116,7 @@ class AbstractValue v where
 instance (FreeVariables term, Ord location) => ValueRoots location (Value location term) where
   valueRoots v
     | Just (Closure names body env) <- prj v = envRoots env (foldr Set.delete (freeVariables body) names)
-    | Just (Interface _ env) <- prj v        = envAll env
+    | Just (Interface env) <- prj v          = envAll env
     | otherwise                              = mempty
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
