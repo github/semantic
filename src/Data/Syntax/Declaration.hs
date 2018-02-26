@@ -280,7 +280,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance ( Show l
          , Show t
-         , Members (Evaluating t (Value l t)) es
+         , Members (Evaluating (Value l t)) es
          , Evaluatable es t (Value l t) (Base t)
          , Recursive t
          , FreeVariables t
