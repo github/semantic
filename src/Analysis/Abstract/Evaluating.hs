@@ -27,10 +27,10 @@ import qualified Data.ByteString.Char8 as BC
 type Evaluating v
   = '[ Fail
      , State (Store (LocationFor v) v)
-     , State (EnvironmentFor v)  -- Global (imperative) environment
-     , Reader (EnvironmentFor v) -- Local environment (e.g. binding over a closure)
-     , Reader (Linker (Evaluator v))
-     , State (Linker v)
+     , State (EnvironmentFor v)      -- Global (imperative) environment
+     , Reader (EnvironmentFor v)     -- Local environment (e.g. binding over a closure)
+     , Reader (Linker (Evaluator v)) -- Linker effects
+     , State (Linker v)              -- Cache of evaluated modules
      ]
 
 newtype Evaluator v = Evaluator { runEvaluator :: Eff (Evaluating v) v }
