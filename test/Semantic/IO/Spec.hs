@@ -16,8 +16,8 @@ spec :: Spec
 spec = parallel $ do
   describe "readFile" $ do
     it "returns a blob for extant files" $ do
-      Just blob <- readFile "semantic-diff.cabal" Nothing
-      blobPath blob `shouldBe` "semantic-diff.cabal"
+      Just blob <- readFile "semantic.cabal" Nothing
+      blobPath blob `shouldBe` "semantic.cabal"
 
     it "throws for absent files" $ do
       readFile "this file should not exist" Nothing `shouldThrow` anyIOException

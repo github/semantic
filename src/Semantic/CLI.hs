@@ -18,7 +18,7 @@ import Data.Version (showVersion)
 import Development.GitRev
 import Options.Applicative
 import Rendering.Renderer
-import qualified Paths_semantic_diff as Library (version)
+import qualified Paths_semantic as Library (version)
 import Semantic.IO (languageForFilePath)
 import qualified Semantic.Log as Log
 import qualified Semantic.Task as Task
