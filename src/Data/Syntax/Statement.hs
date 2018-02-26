@@ -114,7 +114,7 @@ instance ( Semigroup (Cell (LocationFor v) v)
          => Evaluatable es t v Assignment where
   eval Assignment{..} = do
     v <- step assignmentValue
-    (var, a) <- ask >>= lookupOrAlloc assignmentTarget v
+    (var, a) <- ask >>= lookupOrAlloc (fst assignmentTarget) v
 
     modify (envInsert var a)
     pure v

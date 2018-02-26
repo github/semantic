@@ -14,7 +14,6 @@ import Data.Abstract.Value
 import Data.Abstract.FreeVariables
 import Data.Blob
 import Data.Traversable
-import Data.Function (fix)
 import Data.Functor.Foldable (Base, Recursive(..))
 import Data.Foldable (toList)
 import Data.Semigroup
@@ -53,7 +52,7 @@ require term = do
   where
     evalModule linker name = case linkerLookupTerm name linker of
       Just m -> do
-        v <- step @v m
+        v <- para eval m
         modify @(Linker term v) (linkerInsert name v)
         trace ("require[eval]:" <> name) (pure v)
       _ -> fail ("cannot find " <> show name)
@@ -67,7 +66,7 @@ evaluate :: forall v term.
          )
          => term
          -> Final (Evaluating term v) v
-evaluate = run @(Evaluating term v) . fix (const step)
+evaluate = run @(Evaluating term v) . para eval
 
 -- | Evaluate terms and an entry point to a value.
 evaluates :: forall v term.
@@ -79,11 +78,10 @@ evaluates :: forall v term.
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
           -> Final (Evaluating term v) v
-evaluates pairs = run @(Evaluating term v) . fix go
+evaluates pairs (Blob{..}, t) = run @(Evaluating term v) $ do
+  put (Linker @term @v Map.empty (Map.fromList (fmap toPathActionPair pairs)))
+  trace ("step[entryPoint]: " <> show blobPath) (para eval t)
   where
-    go _ (Blob{..}, t) = do
-      put (Linker @term @v Map.empty (Map.fromList (fmap toPathActionPair pairs)))
-      trace ("step[entryPoint]: " <> show blobPath) (step @v t)
     toPathActionPair (Blob{..}, t) = (dropExtensions blobPath, t)
 
 
@@ -120,7 +118,7 @@ evaluate' :: forall v term.
         )
         => term
         -> Final (Evaluating' v) v
-evaluate' = run @(Evaluating' v) . fix (const step)
+evaluate' = run @(Evaluating' v) . para eval
 
 -- | Evaluate terms and an entry point to a value.
 evaluates' :: forall v term.
@@ -132,14 +130,11 @@ evaluates' :: forall v term.
          => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
          -> (Blob, term)   -- Entrypoint
          -> Final (Evaluating' v) v
-evaluates' pairs = run @(Evaluating' v) . fix go
- where
-   go _ (Blob{..}, t) = do
-     modules <- for pairs $ \(Blob{..}, t) -> do
-       v <- trace ("step: " <> show blobPath) $ step @v t
-       pure (dropExtensions blobPath, v)
-     local (const (Linker' (Map.fromList modules))) (trace ("step: " <> show blobPath) (step @v t))
-
+evaluates' pairs (Blob{..}, t) = run @(Evaluating' v) $ do
+  modules <- for pairs $ \(Blob{..}, t) -> do
+    v <- trace ("step: " <> show blobPath) $ para eval t
+    pure (dropExtensions blobPath, v :: v)
+  local (const (Linker' (Map.fromList modules))) (trace ("step: " <> show blobPath) (para eval t))
 
 -- | The effects necessary for concrete interpretation.
 --
@@ -175,7 +170,7 @@ evaluate'' :: forall v term.
          )
          => term
          -> Final (Evaluating'' v) v
-evaluate'' = run @(Evaluating'' v) . fix (const step)
+evaluate'' = run @(Evaluating'' v) . para eval
 
 -- | Evaluate terms and an entry point to a value.
 evaluates'' :: forall v term.
@@ -187,10 +182,9 @@ evaluates'' :: forall v term.
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
           -> Final (Evaluating'' v) v
-evaluates'' pairs = run @(Evaluating'' v) . fix go
+evaluates'' pairs (Blob{..}, t) = run @(Evaluating'' v) $ local @(Linker' (Evaluator v)) (const (Linker' (Map.fromList (map toPathActionPair pairs)))) (trace ("step: " <> show blobPath) (para eval t))
   where
-    go _ (Blob{..}, t) = local (const (Linker' (Map.fromList (map toPathActionPair pairs)))) (trace ("step: " <> show blobPath) (step @v t))
-    toPathActionPair (Blob{..}, t) = (dropExtensions blobPath, Evaluator (step @v t))
+    toPathActionPair (Blob{..}, t) = (dropExtensions blobPath, Evaluator (para eval t))
 
 
 -- | The effects necessary for concrete interpretation.

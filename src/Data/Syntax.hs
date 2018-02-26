@@ -163,9 +163,9 @@ instance ( Ord (LocationFor (Value l t))
       interface val = inj . Value.Interface val <$> ask @(EnvironmentFor (Value l t))
 
       eval' [] = interface unit
-      eval' [x] = step x >>= interface
-      eval' (x:xs) = do
-        _ <- step @(Value l t) x
+      eval' [(_, x)] = x >>= interface
+      eval' ((_, x):xs) = do
+        _ <- x
         env <- get @(EnvironmentFor (Value l t))
         local (envUnion env) (eval' xs)
 

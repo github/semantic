@@ -43,7 +43,7 @@ instance ( Ord l
          , Recursive t
          ) => Evaluatable es t (Value l t) Call where
   eval Call{..} = do
-    closure <- step @(Value l t) callFunction
+    closure <- step callFunction
     Closure names body env <- maybe (fail "expected a closure") pure (prj closure :: Maybe (Closure l t))
     bindings <- for (zip names callParams) $ \(name, param) -> do
       v <- step param
@@ -51,7 +51,7 @@ instance ( Ord l
       assign a v
       pure (name, a)
 
-    local (const (foldr (uncurry envInsert) env bindings)) (step body)
+    local (const (foldr (uncurry envInsert) env bindings)) (para eval body)
 
 -- TODO: Implement type checking for Call
 instance Member Fail es => Evaluatable es t Type.Type Call

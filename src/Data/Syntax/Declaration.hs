@@ -48,10 +48,10 @@ instance ( FreeVariables t
          ) => Evaluatable es t (Value l t) Function where
   eval Function{..} = do
     env <- ask
-    let params = toList (freeVariables1 functionParameters)
-    let v = inj (Closure params functionBody env) :: Value l t
+    let params = toList (liftFreeVariables (freeVariables . fst) functionParameters)
+    let v = inj (Closure params (fst functionBody) env) :: Value l t
 
-    (name, addr) <- lookupOrAlloc functionName v env
+    (name, addr) <- lookupOrAlloc (fst functionName) v env
     modify (envInsert name addr)
     pure v
 
@@ -104,10 +104,10 @@ instance ( FreeVariables t                -- To get free variables from the func
          ) => Evaluatable es t (Value l t) Method where
   eval Method{..} = do
     env <- ask
-    let params = toList (freeVariables1 methodParameters)
-    let v = inj (Closure params methodBody env) :: Value l t
+    let params = toList (liftFreeVariables (freeVariables . fst) methodParameters)
+    let v = inj (Closure params (fst methodBody) env) :: Value l t
 
-    (name, addr) <- lookupOrAlloc methodName v env
+    (name, addr) <- lookupOrAlloc (fst methodName) v env
     modify (envInsert name addr)
     pure v
 
@@ -286,7 +286,7 @@ instance ( Show l
          , FreeVariables t
          )
          => Evaluatable es t (Value l t) Import where
-  eval (Import from _ _) = do
+  eval (Import (from, _) _ _) = do
     interface <- require @(Value l t) @t from
     -- TODO: Consider returning the value instead of the interface.
     Interface _ env <- maybe
