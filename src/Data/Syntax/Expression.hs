@@ -2,24 +2,13 @@
 module Data.Syntax.Expression where
 
 import Control.Monad.Effect
-import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Evaluatable
 import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.State
-import Data.Algebra
-import Data.Abstract.Address
-import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
-import Data.Abstract.Type as Type
-import Data.Abstract.Value (Value, Closure(..), EnvironmentFor, StoreFor)
 import Data.Align.Generic
 import Data.Functor.Classes.Generic
-import Data.Maybe
 import Data.Mergeable
-import Data.Semigroup
 import Data.Traversable
-import Data.Union
 import Diffing.Algorithm
 import GHC.Generics
 import Prelude hiding (fail)
@@ -32,44 +21,10 @@ instance Eq1 Call where liftEq = genericLiftEq
 instance Ord1 Call where liftCompare = genericLiftCompare
 instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 
-
-instance ( Ord l
-         , Semigroup (Cell l (Value l t))  -- 'assign'
-         , Addressable l es         -- 'alloc'
-         , Member Fail es
-         , Member (State (EnvironmentFor (Value l t))) es
-         , Member (Reader (EnvironmentFor (Value l t))) es
-         , Member (State (StoreFor (Value l t))) es
-         , Evaluatable es t (Value l t) (Base t)
-         , Recursive t
-         ) => Evaluatable es t (Value l t) Call where
+instance Evaluatable es t v Call where
   eval Call{..} = do
-    closure <- subtermValue callFunction
-    Closure names body env <- maybe (fail "expected a closure") pure (prj closure :: Maybe (Closure l t))
-    bindings <- for (zip names callParams) $ \(name, param) -> do
-      v <- subtermValue param
-      a <- alloc name
-      assign a v
-      pure (name, a)
-
-    -- FIXME: `para eval` precludes custom evaluation à la dead code evaluation, gc, etc.
-    local (const (foldr (uncurry envInsert) env bindings)) (foldSubterms eval body)
-
--- TODO: Implement type checking for Call
-instance Member Fail es => Evaluatable es t (Type.Type t) Call
--- TODO: extraRoots for evalCollect
--- instance ( MonadFail m
---          , MonadFresh m
---          , MonadGC Type m
---          , MonadEnv Type m
---          )
---          => Eval t Type m Call where
---   eval recur yield Call{..} = do
---     opTy <- recur pure callFunction
---     tvar <- fresh
---     inTys <- traverse (recur pure) callParams
---     _ :-> outTy <- opTy `unify` (Type.Product inTys :-> Var tvar)
---     yield outTy
+    op <- subtermValue callFunction
+    apply op callParams
 
 data Comparison a
   = LessThan !a !a
