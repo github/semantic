@@ -26,7 +26,7 @@ import qualified Data.Union as U
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable effects term value constr where
-  eval :: (FreeVariables term) => SubtermAlgebra constr term (Eff effects value)
+  eval :: (AbstractValue term value, FreeVariables term) => SubtermAlgebra constr term (Eff effects value)
   default eval :: (Fail :< effects, FreeVariables term, Show1 constr) => SubtermAlgebra constr term (Eff effects value)
   eval expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
@@ -50,7 +50,6 @@ instance ( Ord (LocationFor v)
          , Show (LocationFor v)
          , (State (EnvironmentFor v) :< es)
          , (Reader (EnvironmentFor v) :< es)
-         , AbstractValue t v
          , FreeVariables t
          , Evaluatable es t v (Base t)
          , Recursive t

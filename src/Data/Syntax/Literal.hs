@@ -31,7 +31,7 @@ instance Eq1 Boolean where liftEq = genericLiftEq
 instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
-instance AbstractValue t v => Evaluatable es t v Boolean where
+instance Evaluatable es t v Boolean where
   eval (Boolean x) = pure (boolean x)
 
 
@@ -45,7 +45,7 @@ instance Eq1 Data.Syntax.Literal.Integer where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Integer where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShowsPrec
 
-instance AbstractValue t v => Evaluatable es t v Data.Syntax.Literal.Integer where
+instance Evaluatable es t v Data.Syntax.Literal.Integer where
   -- TODO: This instance probably shouldn't have readInteger?
   eval (Data.Syntax.Literal.Integer x) = pure (integer (maybe 0 fst (readInteger x)))
 
@@ -124,7 +124,7 @@ instance Eq1 TextElement where liftEq = genericLiftEq
 instance Ord1 TextElement where liftCompare = genericLiftCompare
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 
-instance AbstractValue t v => Evaluatable es t v TextElement where
+instance Evaluatable es t v TextElement where
   eval (TextElement x) = pure (string x)
 
 data Null a = Null

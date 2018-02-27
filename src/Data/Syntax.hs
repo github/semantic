@@ -191,7 +191,7 @@ instance Eq1 Empty where liftEq _ _ _ = True
 instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
-instance AbstractValue t v => Evaluatable es t v Empty where
+instance Evaluatable es t v Empty where
   eval _ = pure unit
 
 
