@@ -40,6 +40,7 @@ type OpenRAlgebra f t a = forall b . (b -> (t, a)) -> f b -> a
 
 data Subterm t a = Subterm { subterm :: !t, subtermValue :: !a }
 
+-- | Like an R-algebra, but using 'Subterm' to label the fields instead of an anonymous pair.
 type SubtermAlgebra f t a = f (Subterm t a) -> a
 
 -- | Promote an 'FAlgebra' into an 'RAlgebra' (by dropping the original parameter).
