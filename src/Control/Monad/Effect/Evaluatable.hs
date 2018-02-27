@@ -57,9 +57,6 @@ instance ( Ord (LocationFor v)
          , Show (LocationFor v)
          , (State (EnvironmentFor v) :< es)
          , (Reader (EnvironmentFor v) :< es)
-         , FreeVariables t
-         , Evaluatable es t v (Base t)
-         , Recursive t
          )
          => Evaluatable es t v [] where
   eval []     = pure unit          -- Return unit value if this is an empty list of terms
