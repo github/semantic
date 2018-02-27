@@ -110,6 +110,8 @@ class AbstractValue t v | v -> t where
   -- | Construct an abstract string value.
   string :: ByteString -> v
 
+  -- abstract :: Monad m => [Name] -> (t, m v) -> m v
+
 
 -- Instances
 
@@ -125,6 +127,7 @@ instance AbstractValue term (Value location term) where
   integer = inj . Integer
   boolean = inj . Boolean
   string = inj . String
+  -- abstract names (term, _) = inj . Closure names term <$> ask
 
 instance ValueRoots Monovariant (Type.Type term) where
   valueRoots _ = mempty
