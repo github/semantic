@@ -50,7 +50,7 @@ instance ( Ord (LocationFor v)
          , Show (LocationFor v)
          , (State (EnvironmentFor v) :< es)
          , (Reader (EnvironmentFor v) :< es)
-         , AbstractValue v
+         , AbstractValue t v
          , FreeVariables t
          , Evaluatable es t v (Base t)
          , Recursive t

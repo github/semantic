@@ -97,7 +97,7 @@ class ValueRoots l v | v -> l where
   valueRoots :: v -> Live l v
 
 -- | An interface for constructing abstract values.
-class AbstractValue v where
+class AbstractValue t v | v -> t where
   -- | Construct an abstract unit value.
   unit :: v
 
@@ -120,7 +120,7 @@ instance (FreeVariables term, Ord location) => ValueRoots location (Value locati
     | otherwise                              = mempty
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance AbstractValue (Value location term) where
+instance AbstractValue term (Value location term) where
   unit = inj Unit
   integer = inj . Integer
   boolean = inj . Boolean
@@ -130,7 +130,7 @@ instance ValueRoots Monovariant (Type.Type term) where
   valueRoots _ = mempty
 
 -- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
-instance AbstractValue (Type.Type term) where
+instance AbstractValue term (Type.Type term) where
   unit = Type.Unit
   integer _ = Type.Int
   boolean _ = Type.Bool
