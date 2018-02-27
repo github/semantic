@@ -15,6 +15,7 @@ import Control.Monad.Effect.Internal
 import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
+import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type as Type
@@ -23,6 +24,7 @@ import Data.Algebra
 import Data.Functor.Classes
 import Data.Functor.Foldable (Base, Recursive(..), project)
 import Data.Proxy
+import Data.Semigroup
 import Data.Term
 import Data.Union (Apply)
 import Prelude hiding (fail)
@@ -75,12 +77,22 @@ instance ( Ord (LocationFor v)
 
 class AbstractValue v => AbstractFunction effects t v | v -> t where
   abstract :: [Name] -> Subterm t (Eff effects v) -> Eff effects v
+  apply :: v -> [Subterm t (Eff effects v)] -> Eff effects v
 
-instance Reader (EnvironmentFor (Value location t)) :< effects => AbstractFunction effects t (Value location t) where
-  -- FIXME: Can we store the action evaluating the body in the Value instead of the body term itself?
+instance (Addressable location effects, Semigroup (Cell location (Value location t)), Members '[Fail, Reader (EnvironmentFor (Value location t)), State (StoreFor (Value location t))] effects, Recursive t, Evaluatable effects t (Value location t) (Base t), FreeVariables t) => AbstractFunction effects t (Value location t) where
+  -- FIXME: Can we store the action evaluating the body in the Value instead of the body term itself
   abstract names (Subterm body _) = inj . Closure names body <$> ask @(EnvironmentFor (Value location t))
 
-instance Members '[Fresh, NonDetEff, Reader (EnvironmentFor (Type t)), State (StoreFor (Type t))] effects => AbstractFunction effects t (Type t) where
+  apply op params = do
+    Closure names body env <- maybe (fail "expected a closure") pure (prj op :: Maybe (Closure location t))
+    bindings <- foldr (\ (name, param) rest -> do
+      v <- subtermValue param
+      a <- alloc name
+      assign a v
+      envInsert name a <$> rest) (pure env) (zip names params)
+    local (mappend bindings) (foldSubterms eval body)
+
+instance Members '[Fail, Fresh, NonDetEff, Reader (EnvironmentFor (Type t)), State (StoreFor (Type t))] effects => AbstractFunction effects t (Type t) where
   abstract names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
@@ -90,3 +102,9 @@ instance Members '[Fresh, NonDetEff, Reader (EnvironmentFor (Type t)), State (St
       pure (envInsert name a env, tvar : tvars)) (pure mempty) names
     ret <- local (mappend env) body
     pure (Type.Product tvars :-> ret)
+
+  apply op params = do
+    tvar <- fresh
+    paramTypes <- traverse subtermValue params
+    _ :-> ret <- op `unify` (Type.Product paramTypes :-> Var tvar)
+    pure ret
