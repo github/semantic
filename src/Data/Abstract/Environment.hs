@@ -1,13 +1,11 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Abstract.Environment where
 
+import Prologue
 import Data.Abstract.Address
 import Data.Abstract.FreeVariables
 import Data.Abstract.Live
-import Data.Functor.Classes.Generic
 import qualified Data.Map as Map
-import Data.Semigroup
-import GHC.Generics
 
 
 -- | A map of names to addresses that represents the evaluation environment.

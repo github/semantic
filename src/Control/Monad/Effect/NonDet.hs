@@ -4,7 +4,7 @@ module Control.Monad.Effect.NonDet
 , NonDetEff
 ) where
 
-import Control.Applicative
+import Prologue
 import Control.Monad.Effect.Internal
 import Control.Monad.Effect.NonDetEff
 

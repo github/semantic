@@ -11,15 +11,8 @@ import Data.Abstract.Eval
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type as Type
 import Data.Abstract.Value (Value, Closure(..))
-import Data.Maybe
-import Data.Union
-import Data.Semigroup
-import Data.Traversable
-import Data.Align.Generic
-import Data.Functor.Classes.Generic
-import Data.Mergeable
 import Diffing.Algorithm
-import GHC.Generics
+import Prologue
 import Prelude hiding (fail)
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.

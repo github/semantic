@@ -5,13 +5,12 @@ module Control.Monad.Effect.Store
 , modifyStore
 ) where
 
+import Prologue
 import Control.Monad.Effect
 import Control.Monad.Effect.State
 import Data.Abstract.Address
 import Data.Abstract.Store
 import Data.Abstract.Value
-import Data.Pointed
-import Data.Semigroup
 
 -- | Write a value to the given 'Address' in the 'Store'.
 assign :: (Ord (LocationFor a), Semigroup (Cell (LocationFor a) a), Pointed (Cell (LocationFor a)), MonadStore a m) => Address (LocationFor a) a -> a -> m ()

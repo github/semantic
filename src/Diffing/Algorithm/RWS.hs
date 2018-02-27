@@ -13,25 +13,14 @@ module Diffing.Algorithm.RWS
 , equalTerms
 ) where
 
-import Control.Applicative (empty)
-import Control.Arrow ((&&&))
+import Prologue
+import Data.Align.Generic (galignWith)
 import Control.Monad.State.Strict
-import Data.Align.Generic
 import Data.Diff (DiffF(..), deleting, inserting, merge, replacing)
-import Data.Foldable
-import Data.Function ((&))
-import Data.Functor.Classes
-import Data.Functor.Foldable
-import Data.Hashable
-import Data.Ix
 import qualified Data.KdMap.Static as KdMap
 import Data.List (sortOn)
-import Data.Maybe
 import Data.Record
-import Data.Semigroup hiding (First(..))
 import Data.Term as Term
-import Data.These
-import Data.Traversable
 import Diffing.Algorithm.RWS.FeatureVector
 import Diffing.Algorithm.SES
 

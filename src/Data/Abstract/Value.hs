@@ -6,12 +6,8 @@ import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Live
 import qualified Data.Abstract.Type as Type
-import Data.ByteString (ByteString)
-import Data.Functor.Classes.Generic
-import Data.Semigroup
 import qualified Data.Set as Set
-import Data.Union
-import GHC.Generics
+import Prologue
 import Prelude hiding (Integer, String)
 import qualified Prelude
 

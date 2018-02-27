@@ -1,18 +1,14 @@
 {-# LANGUAGE MultiParamTypeClasses, TypeFamilies #-}
 module Control.Monad.Effect.Address where
 
-import Control.Applicative
-import Control.Monad ((<=<))
+import Prologue
+import Prelude hiding (fail)
 import Control.Monad.Effect.Store
-import Control.Monad.Fail as Fail
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Store
 import Data.Abstract.Value
-import Data.Foldable (asum, toList)
-import Data.Pointed
-import Data.Semigroup
 
 -- | 'Monad's offering 'alloc'ation and 'deref'erencing of 'Address'es.
 class (Ord l, Pointed (Cell l), Monad m) => MonadAddress l m where
@@ -64,4 +60,4 @@ instance (Alternative m, Monad m) => MonadAddress Monovariant m where
 
 -- | Fail with a message denoting an uninitialized address (i.e. one which was 'alloc'ated, but never 'assign'ed a value before being 'deref'erenced).
 uninitializedAddress :: MonadFail m => m a
-uninitializedAddress = Fail.fail "uninitialized address"
+uninitializedAddress = fail "uninitialized address"

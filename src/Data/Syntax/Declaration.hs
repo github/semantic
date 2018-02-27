@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, UndecidableInstances #-}
 module Data.Syntax.Declaration where
 
-import Control.Applicative
+import Prologue
 import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.Fresh
@@ -13,15 +13,7 @@ import Data.Abstract.FreeVariables
 import Data.Abstract.Type hiding (Type)
 import qualified Data.Abstract.Type as Type
 import Data.Abstract.Value
-import Data.Align.Generic
-import Data.Foldable (toList)
-import Data.Functor.Classes.Generic
-import Data.Mergeable
-import Data.Traversable
-import Data.Semigroup
-import Data.Union
 import Diffing.Algorithm
-import GHC.Generics
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)

@@ -93,19 +93,16 @@ module Assigning.Assignment
 ) where
 
 import Prologue hiding (Alt)
+import Prelude hiding (fail, until)
 import qualified Assigning.Assignment.Table as Table
-import Control.Monad.Error.Class hiding (Error)
 import Control.Monad.Free.Freer
 import Data.AST
 import Data.Error
-import Data.Ix (Ix(..))
 import Data.Range
 import Data.Record
 import qualified Data.Source as Source (Source, slice, sourceBytes)
 import Data.Span
 import Data.Term
-import GHC.Stack
-import Prelude hiding (fail, until)
 import Text.Parser.Combinators as Parsers hiding (choice)
 import TreeSitter.Language
 

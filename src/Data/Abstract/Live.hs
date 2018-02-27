@@ -1,13 +1,9 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators #-}
 module Data.Abstract.Live where
 
+import Prologue
 import Data.Abstract.Address
-import Data.Bifunctor (second)
-import Data.Function (on)
-import Data.Functor.Classes.Generic
-import Data.Semigroup
 import Data.Set as Set
-import GHC.Generics
 import Unsafe.Coerce
 
 -- | A set of live addresses (whether roots or reachable).

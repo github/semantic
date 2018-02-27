@@ -8,10 +8,8 @@ module Analysis.IdentifierName
 import Prologue
 import Data.Aeson
 import Data.JSON.Fields
-import Data.Proxy
 import Data.Term
 import Data.Text.Encoding (decodeUtf8)
-import Data.Union
 import qualified Data.Syntax
 
 -- | Compute a 'IdentifierLabel' label for a 'Term'.

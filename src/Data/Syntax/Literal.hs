@@ -4,15 +4,9 @@ module Data.Syntax.Literal where
 import Data.Abstract.Eval
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value (AbstractValue(..))
-import Data.Align.Generic
-import Data.Maybe
-import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (readInteger)
-import Data.Functor.Classes.Generic
-import Data.Mergeable
 import Diffing.Algorithm
-import GHC.Generics
-import Prelude
+import Prologue hiding (Set)
 
 -- Boolean
 

@@ -5,16 +5,13 @@ module Data.Abstract.Eval
 , MonadFail(..)
 ) where
 
+import Prologue
 import Control.Monad.Effect.Env
 import Control.Monad.Effect.GC
-import Control.Monad.Fail
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value
-import Data.Functor.Classes
-import Data.Proxy
 import Data.Term
-import Data.Union
 import Prelude hiding (fail)
 
 
