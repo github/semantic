@@ -2,7 +2,6 @@
 {-# LANGUAGE TypeApplications #-}
 module Control.Monad.Effect.Evaluatable
 ( Evaluatable(..)
-, step
 , Recursive(..)
 , Base
 ) where
@@ -37,11 +36,6 @@ instance (Apply (Evaluatable es t v) fs) => Evaluatable es t v (Union fs) where
 -- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
 instance (Evaluatable es t v s) => Evaluatable es t v (TermF s a) where
   eval In{..} = eval termFOut
-
--- | Evaluate by first projecting a term to recurse one level.
-step :: Recursive term
-     => (term, Eff es v) -> Eff es v
-step = snd
 
 
 -- Instances

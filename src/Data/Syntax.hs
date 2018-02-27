@@ -242,4 +242,4 @@ instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
 instance (Evaluatable es t v (Base t), Recursive t)
          => Evaluatable es t v Context where
-  eval Context{..} = step contextSubject
+  eval Context{contextSubject = (_, contextSubject)} = contextSubject

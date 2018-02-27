@@ -42,11 +42,11 @@ instance ( Ord l
          , Evaluatable es t (Value l t) (Base t)
          , Recursive t
          ) => Evaluatable es t (Value l t) Call where
-  eval Call{..} = do
-    closure <- step callFunction
+  eval Call{callFunction = (_, callFunction), callParams = callParams} = do
+    closure <- callFunction
     Closure names body env <- maybe (fail "expected a closure") pure (prj closure :: Maybe (Closure l t))
-    bindings <- for (zip names callParams) $ \(name, param) -> do
-      v <- step param
+    bindings <- for (zip names callParams) $ \(name, (_, param)) -> do
+      v <- param
       a <- alloc name
       assign a v
       pure (name, a)
