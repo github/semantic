@@ -70,7 +70,7 @@ data TaskF output where
   WriteStat :: Stat -> TaskF ()
   Time :: String -> [(String, String)] -> Task output -> TaskF output
   Parse :: Parser term -> Blob -> TaskF term
-  Decorate :: Functor f => RAlgebra (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
+  Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
   Render :: Renderer input output -> input -> TaskF output
   Distribute :: Traversable t => t (Task output) -> TaskF (t output)
@@ -121,7 +121,7 @@ parse :: Parser term -> Blob -> Task term
 parse parser blob = Parse parser blob `Then` return
 
 -- | A 'Task' which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
-decorate :: Functor f => RAlgebra (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
+decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
 decorate algebra term = Decorate algebra term `Then` return
 
 -- | A 'Task' which diffs a pair of terms using the supplied 'Differ' function.

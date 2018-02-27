@@ -51,7 +51,7 @@ data Declaration
 --
 --   If you’re getting 'Nothing' for your syntax node at runtime, you probably forgot step 2.
 declarationAlgebra :: (HasField fields Range, HasField fields Span, Foldable syntax, HasDeclaration syntax)
-                   => Blob -> RAlgebra (Term syntax (Record fields)) (Maybe Declaration)
+                   => Blob -> RAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Maybe Declaration)
 declarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
 
 -- | Types for which we can produce a 'Declaration' in 'Maybe'. There is exactly one instance of this typeclass
