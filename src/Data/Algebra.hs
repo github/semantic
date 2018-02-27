@@ -45,6 +45,8 @@ data Subterm t a = Subterm { subterm :: !t, subtermValue :: !a }
 -- | Like an R-algebra, but using 'Subterm' to label the fields instead of an anonymous pair.
 type SubtermAlgebra f t a = f (Subterm t a) -> a
 
+
+-- | Fold a 'Recursive' structure using a 'SubtermAlgebra'. Like 'para', but with named fields for subterms and values.
 foldSubterms :: Recursive t => SubtermAlgebra (Base t) t a -> t -> a
 foldSubterms algebra = go where go = algebra . fmap (Subterm <*> go) . project
 
