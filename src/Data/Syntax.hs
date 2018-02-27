@@ -168,7 +168,7 @@ instance ( Ord (LocationFor (Value l t))
         env <- get @(EnvironmentFor (Value l t))
         local (envUnion env) (eval' xs)
 
-instance Member Fail es => Evaluatable es t Type.Type Program where
+instance Member Fail es => Evaluatable es t (Type.Type t) Program where
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString

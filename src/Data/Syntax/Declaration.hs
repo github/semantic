@@ -56,7 +56,7 @@ instance ( Semigroup (Cell l (Value l t))
     pure v
 
 -- TODO: Re-implement type checking with 'Evaluatable' approach.
-instance Member Fail es => Evaluatable es t Type.Type Function
+instance Member Fail es => Evaluatable es t (Type.Type t) Function
 -- instance ( Alternative m
 --          , Monad m
 --          , MonadFresh m
@@ -111,7 +111,7 @@ instance ( Semigroup (Cell l (Value l t)) -- lookupOrAlloc
     pure v
 
 -- TODO: Implement Evaluatable instance for type checking
-instance Member Fail es => Evaluatable es t Type.Type Method
+instance Member Fail es => Evaluatable es t (Type.Type t) Method
 
 -- | A method signature in TypeScript or a method spec in Go.
 data MethodSignature a = MethodSignature { _methodSignatureContext :: ![a], _methodSignatureName :: !a, _methodSignatureParameters :: ![a] }
@@ -296,7 +296,7 @@ instance ( Show l
     modify (envUnion env)
     pure interface
 --
-instance Member Fail es => Evaluatable es t Type.Type Import
+instance Member Fail es => Evaluatable es t (Type.Type t) Import
 
 
 -- | An imported symbol

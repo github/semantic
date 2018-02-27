@@ -56,7 +56,7 @@ instance ( Ord l
     local (const (foldr (uncurry envInsert) env bindings)) (foldSubterms eval body)
 
 -- TODO: Implement type checking for Call
-instance Member Fail es => Evaluatable es t Type.Type Call
+instance Member Fail es => Evaluatable es t (Type.Type t) Call
 -- TODO: extraRoots for evalCollect
 -- instance ( MonadFail m
 --          , MonadFresh m

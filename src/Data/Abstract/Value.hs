@@ -88,7 +88,7 @@ type StoreFor v = Store (LocationFor v) v
 -- | The location type (the body of 'Address'es) which should be used for an abstract value type.
 type family LocationFor value :: * where
   LocationFor (Value location term) = location
-  LocationFor Type.Type = Monovariant
+  LocationFor (Type.Type term) = Monovariant
 
 
 -- | Value types, e.g. closures, which can root a set of addresses.
@@ -126,11 +126,11 @@ instance AbstractValue (Value location term) where
   boolean = inj . Boolean
   string = inj . String
 
-instance ValueRoots Monovariant Type.Type where
+instance ValueRoots Monovariant (Type.Type term) where
   valueRoots _ = mempty
 
 -- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
-instance AbstractValue Type.Type where
+instance AbstractValue (Type.Type term) where
   unit = Type.Unit
   integer _ = Type.Int
   boolean _ = Type.Bool
