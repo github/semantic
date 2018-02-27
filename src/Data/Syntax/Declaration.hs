@@ -39,8 +39,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Filter the closed-over environment by the free variables in the term.
 -- TODO: How should we represent function types, where applicable?
 
-instance ( FreeVariables t
-         , Semigroup (Cell l (Value l t))
+instance ( Semigroup (Cell l (Value l t))
          , Addressable l es
          , Member (State (EnvironmentFor (Value l t))) es
          , Member (Reader (EnvironmentFor (Value l t))) es
@@ -63,7 +62,6 @@ instance Member Fail es => Evaluatable es t Type.Type Function
 --          , MonadFresh m
 --          , MonadEnv Type.Type m
 --          , MonadStore Type.Type m
---          , FreeVariables t
 --          )
 --          => Eval t Type.Type m Function where
 --   eval recur yield Function{..} = do
@@ -96,8 +94,7 @@ instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 
 -- Evaluating a Method creates a closure and makes that value available in the
 -- local environment.
-instance ( FreeVariables t                -- To get free variables from the function's parameters
-         , Semigroup (Cell l (Value l t)) -- lookupOrAlloc
+instance ( Semigroup (Cell l (Value l t)) -- lookupOrAlloc
          , Addressable l es              -- lookupOrAlloc
          , Member (State (EnvironmentFor (Value l t))) es
          , Member (Reader (EnvironmentFor (Value l t))) es

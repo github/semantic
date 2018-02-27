@@ -152,7 +152,6 @@ instance ( Ord (LocationFor (Value l t))
          , Show (LocationFor (Value l t))
          , Recursive t
          , Evaluatable es t (Value l t) (Base t)
-         , FreeVariables t
          , Member Fail es
          , Member (State (EnvironmentFor (Value l t))) es
          , Member (Reader (EnvironmentFor (Value l t))) es

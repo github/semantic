@@ -62,7 +62,6 @@ instance Member Fail es => Evaluatable es t Type.Type Call
 --          , MonadFresh m
 --          , MonadGC Type m
 --          , MonadEnv Type m
---          , FreeVariables t
 --          )
 --          => Eval t Type m Call where
 --   eval recur yield Call{..} = do

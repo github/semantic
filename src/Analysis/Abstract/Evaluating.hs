@@ -72,6 +72,7 @@ evaluate :: forall v term.
          ( Ord v
          , Ord (LocationFor v)
          , Evaluatable (Evaluating v) term v (Base term)
+         , FreeVariables term
          , Recursive term
          )
          => term
@@ -82,6 +83,7 @@ evaluate = run @(Evaluating v) . foldSubterms eval
 evaluates :: forall v term.
           ( Ord v
           , Ord (LocationFor v)
+          , FreeVariables term
           , Evaluatable (Evaluating v) term v (Base term)
           , Recursive term
           )
