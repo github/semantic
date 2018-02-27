@@ -4,12 +4,9 @@ module Analysis.Decorator
 , constructorNameAndConstantFields
 ) where
 
+import Prologue
 import Data.Aeson
-import Data.Algebra
-import Data.Bifunctor (second)
 import Data.ByteString.Char8 (ByteString, pack)
-import Data.Functor.Classes (Show1 (liftShowsPrec))
-import Data.Functor.Foldable
 import Data.JSON.Fields
 import Data.Record
 import Data.Term

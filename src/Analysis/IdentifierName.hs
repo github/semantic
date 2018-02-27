@@ -5,8 +5,8 @@ module Analysis.IdentifierName
 , identifierLabel
 ) where
 
+import Prologue
 import Data.Aeson
-import Data.ByteString
 import Data.JSON.Fields
 import Data.Proxy
 import Data.Term

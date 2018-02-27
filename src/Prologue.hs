@@ -5,6 +5,7 @@ module Prologue (
 import Data.Union as X
 import Data.Function as X (fix, on, (&))
 import Data.Functor.Foldable as X (Base, Recursive(..))
+import Data.Functor.Classes as X
 import Data.Semigroup as X
 import Control.Applicative as X
 import Data.Maybe as X
@@ -27,6 +28,11 @@ import Data.List.NonEmpty as X (
     NonEmpty(..)
   , nonEmpty
   )
+
+import Data.Algebra as X
+import Data.Bifunctor as X (Bifunctor(..))
+
+import Data.ByteString as X (ByteString)
 
 -- Generics
 import GHC.Generics as X (

@@ -6,7 +6,6 @@ module Analysis.Declaration
 ) where
 
 import Prologue
-import Data.Algebra
 import Data.Blob
 import Data.Error (Error(..), showExpectation)
 import Data.Language as Language
