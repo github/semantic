@@ -48,9 +48,7 @@ instance ( Semigroup (Cell l (Value l t))
   eval Function{..} = do
     env <- ask
     let params = toList (liftFreeVariables (freeVariables . subterm) functionParameters)
-    -- FIXME: Can we store the action evaluating the body in the Value instead of the body term itself?
-    let v = inj (Closure params (subterm functionBody) env) :: Value l t
-
+    v <- abstract params functionBody
     (name, addr) <- lookupOrAlloc (subterm functionName) v env
     modify (envInsert name addr)
     pure v
