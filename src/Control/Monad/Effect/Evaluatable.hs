@@ -14,6 +14,7 @@ import Control.Monad.Effect.State
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value
+import Data.Algebra
 import Data.Functor.Classes
 import Data.Functor.Foldable (Base, Recursive(..), project)
 import Data.Proxy
@@ -25,8 +26,8 @@ import qualified Data.Union as U
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable es term v constr where
-  eval :: constr (term, Eff es v) -> Eff es v
-  default eval :: (Fail :< es, Show1 constr) => (constr (term, Eff es v) -> Eff es v)
+  eval :: RAlgebra constr term (Eff es v)
+  default eval :: (Fail :< es, Show1 constr) => RAlgebra constr term (Eff es v)
   eval expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
 -- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
