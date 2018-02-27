@@ -6,13 +6,14 @@ module Data.Algebra
 , OpenRAlgebra
 , Subterm(..)
 , SubtermAlgebra
+, foldSubterms
 , fToR
 , fToOpenR
 , rToOpenR
 , openFToOpenR
 ) where
 
-import Data.Functor.Foldable (Base)
+import Data.Functor.Foldable (Base, Recursive(project))
 
 -- | An F-algebra on some 'Recursive' type @t@.
 --
@@ -43,6 +44,10 @@ data Subterm t a = Subterm { subterm :: !t, subtermValue :: !a }
 
 -- | Like an R-algebra, but using 'Subterm' to label the fields instead of an anonymous pair.
 type SubtermAlgebra f t a = f (Subterm t a) -> a
+
+foldSubterms :: Recursive t => SubtermAlgebra (Base t) t a -> t -> a
+foldSubterms algebra = go where go = algebra . fmap (Subterm <*> go) . project
+
 
 -- | Promote an 'FAlgebra' into an 'RAlgebra' (by dropping the original parameter).
 fToR :: Functor (Base t) => FAlgebra (Base t) a -> RAlgebra (Base t) t a
