@@ -38,6 +38,7 @@ type OpenFAlgebra f a = forall b . (b -> a) -> f b -> a
 --   See also 'RAlgebra' & 'OpenFAlgebra'.
 type OpenRAlgebra f t a = forall b . (b -> (t, a)) -> f b -> a
 
+-- | A subterm and its computed value, used in 'SubtermAlgebra'.
 data Subterm t a = Subterm { subterm :: !t, subtermValue :: !a }
 
 -- | Like an R-algebra, but using 'Subterm' to label the fields instead of an anonymous pair.
