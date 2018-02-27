@@ -158,12 +158,16 @@ instance ( Ord (LocationFor (Value l t))
          , Member (Reader (EnvironmentFor (Value l t))) es
          )
          => Evaluatable es t (Value l t) Program where
-  eval (Program xs) = foldr evalEach interface xs
+  eval (Program xs) = eval' xs
     where
-      interface = inj . Value.Interface <$> ask @(EnvironmentFor (Value l t))
-      evalEach each rest = subtermValue each >> do
+      interface val = inj . Value.Interface val <$> ask @(EnvironmentFor (Value l t))
+
+      eval' [] = interface unit
+      eval' [x] = subtermValue x >>= interface
+      eval' (x:xs) = do
+        _ <- subtermValue x
         env <- get @(EnvironmentFor (Value l t))
-        local (envUnion env) rest
+        local (envUnion env) (eval' xs)
 
 instance Member Fail es => Evaluatable es t Type.Type Program where
 
