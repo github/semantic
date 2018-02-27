@@ -6,15 +6,25 @@ import Data.Union as X
 import Data.Function as X (fix, on, (&))
 import Data.Functor.Foldable as X (Base, Recursive(..), Corecursive(..))
 import Data.Functor.Classes as X
-import Data.Semigroup as X
+import Data.Semigroup as X (Semigroup(..))
 import Control.Applicative as X
 import Data.Maybe as X
-import Data.Monoid as X (Alt(..))
+import Data.Monoid as X (Monoid(..), First(..), Last(..))
 import Data.Pointed as X
 
 import Control.Monad as X hiding (fail, return)
 import Control.Monad.Fail as X (MonadFail(..))
 import Control.Monad.Except as X (MonadError(..))
+
+import Control.Exception as X hiding (
+    throw
+  , throwIO
+  , throwTo
+  , assert
+  , Handler(..)
+  )
+
+import Data.Typeable as X (Typeable)
 
 import GHC.Stack as X
 

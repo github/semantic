@@ -1,18 +1,10 @@
 {-# LANGUAGE DataKinds, DefaultSignatures, GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Diffing.Algorithm where
 
-import Control.Applicative (Alternative(..))
-import Control.Monad (guard)
+import Prologue hiding (Alt)
 import Control.Monad.Free.Freer
 import Data.Diff
-import Data.Functor.Classes
-import Data.List.NonEmpty (NonEmpty(..))
-import Data.Maybe
-import Data.Proxy
 import Data.Term
-import Data.These
-import Data.Union
-import GHC.Generics
 
 -- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
 data AlgorithmF term1 term2 result partial where

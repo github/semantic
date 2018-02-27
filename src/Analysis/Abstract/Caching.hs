@@ -2,6 +2,7 @@
 module Analysis.Abstract.Caching where
 
 import Prologue
+import Data.Monoid (Alt(..))
 import Analysis.Abstract.Collecting
 import Control.Effect
 import Control.Monad.Effect.Address

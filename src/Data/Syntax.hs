@@ -2,7 +2,6 @@
 module Data.Syntax where
 
 import qualified Assigning.Assignment as Assignment
-import Control.Applicative
 import Control.Monad.Effect
 import Control.Monad.Effect.Address
 import Control.Monad.Effect.Env
@@ -12,27 +11,15 @@ import Data.Abstract.Environment
 import Data.Abstract.Eval
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value (LocationFor, AbstractValue(..))
-import Data.Align.Generic
 import Data.AST
-import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (unpack)
 import qualified Data.Error as Error
-import Data.Foldable (asum, toList)
-import Data.Function ((&), on)
-import Data.Ix
-import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
-import Data.Functor.Classes.Generic
-import Data.Mergeable
 import Data.Range
 import Data.Record
-import Data.Pointed
-import Data.Semigroup
 import Data.Span
 import Data.Term
-import Data.Union
 import Diffing.Algorithm hiding (Empty)
-import GHC.Generics
-import GHC.Stack
+import Prologue
 import Prelude hiding (fail)
 
 -- Combinators

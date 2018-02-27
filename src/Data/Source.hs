@@ -26,14 +26,12 @@ module Data.Source
 , newlineIndices
 ) where
 
-import Control.Arrow ((&&&))
+import Prologue
 import Data.Array
 import qualified Data.ByteString as B
 import Data.Char (ord)
 import Data.List (span)
-import Data.Monoid (First(..), Last(..))
 import Data.Range
-import Data.Semigroup hiding (First(..), Last(..))
 import Data.Span
 import Data.String (IsString(..))
 import qualified Data.Text as T
