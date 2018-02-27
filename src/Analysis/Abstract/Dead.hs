@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds, ScopedTypeVariables, TypeApplications #-}
 module Analysis.Abstract.Dead where
 
+import Prologue
 import Control.Effect
 import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.Address
@@ -13,11 +14,6 @@ import Data.Abstract.Environment
 import Data.Abstract.Eval
 import Data.Abstract.Store
 import Data.Abstract.Value
-import Data.Function (fix)
-import Data.Functor.Foldable
-import Data.Pointed
-import Data.Semigroup
-import Data.Set
 
 -- | The effects necessary for dead code analysis.
 type DeadCodeEvaluating t v

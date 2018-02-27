@@ -105,6 +105,8 @@ library
                      , Language.Python.Assignment
                      , Language.Python.Grammar
                      , Language.Python.Syntax
+                     -- Custom Prelude
+                     , Prologue
                      -- Parser glue
                      , Parsing.CMark
                      , Parsing.Parser
@@ -173,7 +175,15 @@ library
                      , tree-sitter-ruby
                      , tree-sitter-typescript
   default-language:    Haskell2010
-  default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards, StrictData
+  default-extensions: DeriveFoldable
+                    , DeriveFunctor
+                    , DeriveGeneric
+                    , DeriveTraversable
+                    , FlexibleContexts
+                    , FlexibleInstances
+                    , OverloadedStrings
+                    , RecordWildCards
+                    , StrictData
   ghc-options:         -Wall -fno-warn-name-shadowing -O -j
   ghc-prof-options:    -fprof-auto
 
