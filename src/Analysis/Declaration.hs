@@ -5,27 +5,20 @@ module Analysis.Declaration
 , declarationAlgebra
 ) where
 
+import Prologue
 import Data.Algebra
 import Data.Blob
-import Data.Monoid
 import Data.Error (Error(..), showExpectation)
-import Data.Foldable (toList)
 import Data.Language as Language
-import Data.List.NonEmpty (nonEmpty)
-import Data.Proxy (Proxy(..))
 import Data.Range
-import Data.Maybe (mapMaybe)
 import Data.Record
 import Data.Source as Source
-import Data.Semigroup (sconcat)
 import Data.Span
+import Data.Term
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
-import Data.Term
 import qualified Data.Text as T
-import Data.Union
-import GHC.Generics
 import qualified Language.Markdown.Syntax as Markdown
 
 -- | A declaration’s identifier and type.

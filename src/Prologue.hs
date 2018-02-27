@@ -21,6 +21,13 @@ import Data.IntSet as X (IntSet)
 
 import Data.Proxy as X ( Proxy(..) )
 
+import Data.Foldable as X hiding (product , sum)
+
+import Data.List.NonEmpty as X (
+    NonEmpty(..)
+  , nonEmpty
+  )
+
 -- Generics
 import GHC.Generics as X (
     Generic(..)
