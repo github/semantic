@@ -12,6 +12,9 @@ import Data.Maybe as X
 import Data.Monoid as X (Alt(..))
 import Data.Pointed as X
 
+import Control.Monad as X hiding (fail, return)
+import Control.Monad.Fail as X (MonadFail(..))
+
 -- Data Types
 import Data.Map as X (Map)
 import Data.Set as X (Set)

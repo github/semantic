@@ -92,25 +92,15 @@ module Assigning.Assignment
 , module Parsers
 ) where
 
+import Prologue hiding (Alt)
 import qualified Assigning.Assignment.Table as Table
-import Control.Applicative
-import Control.Monad ((<=<), guard)
 import Control.Monad.Error.Class hiding (Error)
-import Control.Monad.Fail
 import Control.Monad.Free.Freer
 import Data.AST
-import Data.Bifunctor
-import Data.ByteString (ByteString)
 import Data.Error
-import Data.Foldable
-import Data.Function
-import Data.Functor.Classes
 import Data.Ix (Ix(..))
-import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
-import Data.Maybe
 import Data.Range
 import Data.Record
-import Data.Semigroup
 import qualified Data.Source as Source (Source, slice, sourceBytes)
 import Data.Span
 import Data.Term
