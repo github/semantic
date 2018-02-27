@@ -39,12 +39,12 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Filter the closed-over environment by the free variables in the term.
 -- TODO: How should we represent function types, where applicable?
 
-instance ( Semigroup (Cell l (Value l t))
-         , Addressable l es
-         , Member (State (EnvironmentFor (Value l t))) es
-         , Member (Reader (EnvironmentFor (Value l t))) es
-         , Member (State (StoreFor (Value l t))) es
-         ) => Evaluatable es t (Value l t) Function where
+instance ( Semigroup (Cell (LocationFor v) v)
+         , Addressable (LocationFor v) es
+         , Member (State (EnvironmentFor v)) es
+         , Member (Reader (EnvironmentFor v)) es
+         , Member (State (StoreFor v)) es
+         ) => Evaluatable es t v Function where
   eval Function{..} = do
     env <- ask
     let params = toList (liftFreeVariables (freeVariables . subterm) functionParameters)
@@ -52,32 +52,6 @@ instance ( Semigroup (Cell l (Value l t))
     (name, addr) <- lookupOrAlloc (subterm functionName) v env
     modify (envInsert name addr)
     pure v
-
--- TODO: Re-implement type checking with 'Evaluatable' approach.
-instance Member Fail es => Evaluatable es t (Type.Type t) Function
--- instance ( Alternative m
---          , Monad m
---          , MonadFresh m
---          , MonadEnv Type.Type m
---          , MonadStore Type.Type m
---          )
---          => Eval t Type.Type m Function where
---   eval recur yield Function{..} = do
---     env <- askEnv @Type.Type
---     let params = toList (foldMap freeVariables functionParameters)
---     tvars <- for params $ \name -> do
---       a <- alloc name
---       tvar <- Var <$> fresh
---       assign a tvar
---       pure (name, a, tvar)
---
---     outTy <- localEnv (const (foldr (\ (n, a, _) -> envInsert n a) env tvars)) (recur pure functionBody)
---     let tvars' = fmap (\(_, _, t) -> t) tvars
---     let v = Type.Product tvars' :-> outTy
---
---     (name, a) <- lookupOrAlloc functionName env v
---
---     localEnv (envInsert name a) (yield v)
 
 
 data Method a = Method { methodContext :: ![a], methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
