@@ -66,24 +66,20 @@ instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 
 -- Evaluating a Method creates a closure and makes that value available in the
 -- local environment.
-instance ( Semigroup (Cell l (Value l t)) -- lookupOrAlloc
-         , Addressable l es              -- lookupOrAlloc
-         , Member (State (EnvironmentFor (Value l t))) es
-         , Member (Reader (EnvironmentFor (Value l t))) es
-         , Member (State (StoreFor (Value l t))) es
-         ) => Evaluatable es t (Value l t) Method where
+instance ( Semigroup (Cell (LocationFor v) v)
+         , Addressable (LocationFor v) es
+         , Member (State (EnvironmentFor v)) es
+         , Member (Reader (EnvironmentFor v)) es
+         , Member (State (StoreFor v)) es
+         ) => Evaluatable es t v Method where
   eval Method{..} = do
     env <- ask
     let params = toList (liftFreeVariables (freeVariables . subterm) methodParameters)
-    -- FIXME: Can we store the action evaluating the body in the Value instead of the body term itself?
-    let v = inj (Closure params (subterm methodBody) env) :: Value l t
+    v <- abstract params methodBody
 
     (name, addr) <- lookupOrAlloc (subterm methodName) v env
     modify (envInsert name addr)
     pure v
-
--- TODO: Implement Evaluatable instance for type checking
-instance Member Fail es => Evaluatable es t (Type.Type t) Method
 
 -- | A method signature in TypeScript or a method spec in Go.
 data MethodSignature a = MethodSignature { _methodSignatureContext :: ![a], _methodSignatureName :: !a, _methodSignatureParameters :: ![a] }
