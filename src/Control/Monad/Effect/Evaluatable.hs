@@ -56,13 +56,13 @@ instance ( Ord (LocationFor v)
          , Recursive t
          )
          => Evaluatable es t v [] where
-  eval []       = pure unit -- Return unit value if this is an empty list of terms
-  eval [Subterm _ x] = x         -- Return the value for the last term
-  eval (Subterm _ x:xs) = do
-    _ <- x                         -- Evaluate the head term
+  eval []     = pure unit          -- Return unit value if this is an empty list of terms
+  eval [x]    = subtermValue x     -- Return the value for the last term
+  eval (x:xs) = do
+    _ <- subtermValue x            -- Evaluate the head term
     env <- get @(EnvironmentFor v) -- Get the global environment after evaluation
                                    -- since it might have been modified by the
-                                   -- 'step' evaluation above ^.
+                                   -- evaluation above ^.
 
     -- Finally, evaluate the rest of the terms, but do so by calculating a new
     -- environment each time where the free variables in those terms are bound
