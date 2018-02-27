@@ -9,9 +9,7 @@ module Parsing.Parser
 , jsonParser
 , markdownParser
 , pythonParser
-, pythonParser2
 , rubyParser
-, rubyParser2
 , typescriptParser
 , phpParser
 ) where
@@ -99,17 +97,11 @@ goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
 rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
 
-rubyParser2 :: Parser Ruby.Term2
-rubyParser2 = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment2
-
 phpParser :: Parser PHP.Term
 phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
 
 pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
-
-pythonParser2 :: Parser Python.Term2
-pythonParser2 = AssignmentParser (ASTParser tree_sitter_python) Python.assignment2
 
 jsonParser :: Parser JSON.Term
 jsonParser = AssignmentParser (ASTParser tree_sitter_json) JSON.assignment
