@@ -1,15 +1,17 @@
 {-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses #-}
 module Data.Syntax.Literal where
 
-import Data.Abstract.Eval
+import Control.Monad.Effect.Fail
+import Control.Monad.Effect.Evaluatable
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value (AbstractValue(..))
 import Data.Align.Generic
-import Data.Maybe
 import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (readInteger)
 import Data.Functor.Classes.Generic
+import Data.Maybe
 import Data.Mergeable
+import Data.Union
 import Diffing.Algorithm
 import GHC.Generics
 import Prelude
@@ -29,8 +31,8 @@ instance Eq1 Boolean where liftEq = genericLiftEq
 instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
-instance (Monad m, AbstractValue v) => Eval t v m Boolean where
-  eval _ yield (Boolean x) = yield (boolean x)
+instance AbstractValue v => Evaluatable es t v Boolean where
+  eval (Boolean x) = pure (boolean x)
 
 
 -- Numeric
@@ -43,8 +45,9 @@ instance Eq1 Data.Syntax.Literal.Integer where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Integer where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShowsPrec
 
-instance (Monad m, AbstractValue v) => Eval t v m Data.Syntax.Literal.Integer where
-  eval _ yield (Data.Syntax.Literal.Integer x) = yield (integer (maybe 0 fst (readInteger x)))
+instance AbstractValue v => Evaluatable es t v Data.Syntax.Literal.Integer where
+  -- TODO: This instance probably shouldn't have readInteger?
+  eval (Data.Syntax.Literal.Integer x) = pure (integer (maybe 0 fst (readInteger x)))
 
 
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
@@ -60,7 +63,7 @@ instance Ord1 Data.Syntax.Literal.Float where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Float
-instance (MonadFail m) => Eval t v m Data.Syntax.Literal.Float
+instance Member Fail es => Evaluatable es t v Data.Syntax.Literal.Float
 
 
 -- Rational literals e.g. `2/3r`
@@ -72,7 +75,7 @@ instance Ord1 Data.Syntax.Literal.Rational where liftCompare = genericLiftCompar
 instance Show1 Data.Syntax.Literal.Rational where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Rational
-instance (MonadFail m) => Eval t v m Data.Syntax.Literal.Rational
+instance Member Fail es => Evaluatable es t v Data.Syntax.Literal.Rational
 
 
 -- Complex literals e.g. `3 + 2i`
@@ -84,7 +87,7 @@ instance Ord1 Data.Syntax.Literal.Complex where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Complex where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Complex
-instance (MonadFail m) => Eval t v m Complex
+instance Member Fail es => Evaluatable es t v Complex
 
 -- Strings, symbols
 
@@ -98,7 +101,7 @@ instance Show1 Data.Syntax.Literal.String where liftShowsPrec = genericLiftShows
 -- TODO: Should string literal bodies include escapes too?
 
 -- TODO: Implement Eval instance for String
-instance (MonadFail m) => Eval t v m Data.Syntax.Literal.String
+instance Member Fail es => Evaluatable es t v Data.Syntax.Literal.String
 
 
 -- | An interpolation element within a string literal.
@@ -110,7 +113,7 @@ instance Ord1 InterpolationElement where liftCompare = genericLiftCompare
 instance Show1 InterpolationElement where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for InterpolationElement
-instance (MonadFail m) => Eval t v m InterpolationElement
+instance Member Fail es => Evaluatable es t v InterpolationElement
 
 
 -- | A sequence of textual contents within a string literal.
@@ -121,8 +124,8 @@ instance Eq1 TextElement where liftEq = genericLiftEq
 instance Ord1 TextElement where liftCompare = genericLiftCompare
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 
-instance (Monad m, AbstractValue v) => Eval t v m TextElement where
-  eval _ yield (TextElement x) = yield (string x)
+instance AbstractValue v => Evaluatable es t v TextElement where
+  eval (TextElement x) = pure (string x)
 
 data Null a = Null
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -132,7 +135,7 @@ instance Ord1 Null where liftCompare = genericLiftCompare
 instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Null
-instance (MonadFail m) => Eval t v m Null
+instance Member Fail es => Evaluatable es t v Null
 
 
 newtype Symbol a = Symbol { symbolContent :: ByteString }
@@ -143,7 +146,7 @@ instance Ord1 Symbol where liftCompare = genericLiftCompare
 instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Symbol
-instance (MonadFail m) => Eval t v m Symbol
+instance Member Fail es => Evaluatable es t v Symbol
 
 
 newtype Regex a = Regex { regexContent :: ByteString }
@@ -157,7 +160,7 @@ instance Show1 Regex where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Character literals.
 
 -- TODO: Implement Eval instance for Regex
-instance (MonadFail m) => Eval t v m Regex
+instance Member Fail es => Evaluatable es t v Regex
 
 
 -- Collections
@@ -170,7 +173,7 @@ instance Ord1 Array where liftCompare = genericLiftCompare
 instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Array
-instance (MonadFail m) => Eval t v m Array
+instance Member Fail es => Evaluatable es t v Array
 
 
 newtype Hash a = Hash { hashElements :: [a] }
@@ -181,7 +184,7 @@ instance Ord1 Hash where liftCompare = genericLiftCompare
 instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Hash
-instance (MonadFail m) => Eval t v m Hash
+instance Member Fail es => Evaluatable es t v Hash
 
 
 data KeyValue a = KeyValue { key :: !a, value :: !a }
@@ -192,7 +195,7 @@ instance Ord1 KeyValue where liftCompare = genericLiftCompare
 instance Show1 KeyValue where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for KeyValue
-instance (MonadFail m) => Eval t v m KeyValue
+instance Member Fail es => Evaluatable es t v KeyValue
 
 
 newtype Tuple a = Tuple { tupleContents :: [a] }
@@ -203,7 +206,7 @@ instance Ord1 Tuple where liftCompare = genericLiftCompare
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Tuple
-instance (MonadFail m) => Eval t v m Tuple
+instance Member Fail es => Evaluatable es t v Tuple
 
 
 newtype Set a = Set { setElements :: [a] }
@@ -214,7 +217,7 @@ instance Ord1 Set where liftCompare = genericLiftCompare
 instance Show1 Set where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Set
-instance (MonadFail m) => Eval t v m Set
+instance Member Fail es => Evaluatable es t v Set
 
 
 -- Pointers
@@ -228,7 +231,7 @@ instance Ord1 Pointer where liftCompare = genericLiftCompare
 instance Show1 Pointer where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Pointer
-instance (MonadFail m) => Eval t v m Pointer
+instance Member Fail es => Evaluatable es t v Pointer
 
 
 -- | A reference to a pointer's address (e.g. &pointer in Go)
@@ -240,7 +243,7 @@ instance Ord1 Reference where liftCompare = genericLiftCompare
 instance Show1 Reference where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Reference
-instance (MonadFail m) => Eval t v m Reference
+instance Member Fail es => Evaluatable es t v Reference
 
 -- TODO: Object literals as distinct from hash literals? Or coalesce object/hash literals into “key-value literals”?
 -- TODO: Function literals (lambdas, procs, anonymous functions, what have you).

@@ -2,7 +2,6 @@
 module Analysis.Abstract.Collecting where
 
 import Control.Monad.Effect.GC
-import Control.Monad.Effect.Store
 import Data.Abstract.Address
 import Data.Abstract.Live
 import Data.Abstract.Store
