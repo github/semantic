@@ -160,10 +160,10 @@ instance ( Ord (LocationFor (Value l t))
          => Evaluatable es t (Value l t) Program where
   eval (Program xs) = eval' xs
     where
-      interface val = inj . Value.Interface val <$> ask @(EnvironmentFor (Value l t))
+      interface = inj . Value.Interface <$> ask @(EnvironmentFor (Value l t))
 
-      eval' [] = interface unit
-      eval' [(_, x)] = x >>= interface
+      eval' [] = interface
+      eval' [(_, x)] = x >> interface
       eval' ((_, x):xs) = do
         _ <- x
         env <- get @(EnvironmentFor (Value l t))
