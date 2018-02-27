@@ -48,11 +48,11 @@ instance ( FreeVariables t
          ) => Evaluatable es t (Value l t) Function where
   eval Function{..} = do
     env <- ask
-    let params = toList (liftFreeVariables (freeVariables . fst) functionParameters)
+    let params = toList (liftFreeVariables (freeVariables . subterm) functionParameters)
     -- FIXME: Can we store the action evaluating the body in the Value instead of the body term itself?
-    let v = inj (Closure params (fst functionBody) env) :: Value l t
+    let v = inj (Closure params (subterm functionBody) env) :: Value l t
 
-    (name, addr) <- lookupOrAlloc (fst functionName) v env
+    (name, addr) <- lookupOrAlloc (subterm functionName) v env
     modify (envInsert name addr)
     pure v
 
@@ -105,11 +105,11 @@ instance ( FreeVariables t                -- To get free variables from the func
          ) => Evaluatable es t (Value l t) Method where
   eval Method{..} = do
     env <- ask
-    let params = toList (liftFreeVariables (freeVariables . fst) methodParameters)
+    let params = toList (liftFreeVariables (freeVariables . subterm) methodParameters)
     -- FIXME: Can we store the action evaluating the body in the Value instead of the body term itself?
-    let v = inj (Closure params (fst methodBody) env) :: Value l t
+    let v = inj (Closure params (subterm methodBody) env) :: Value l t
 
-    (name, addr) <- lookupOrAlloc (fst methodName) v env
+    (name, addr) <- lookupOrAlloc (subterm methodName) v env
     modify (envInsert name addr)
     pure v
 
@@ -288,8 +288,8 @@ instance ( Show l
          , FreeVariables t
          )
          => Evaluatable es t (Value l t) Import where
-  eval (Import (from, _) _ _) = do
-    interface <- require @(Value l t) @t from
+  eval (Import from _ _) = do
+    interface <- require @(Value l t) @t (subterm from)
     Interface env <- maybe
                       (fail ("expected an interface, but got: " <> show interface))
                       pure

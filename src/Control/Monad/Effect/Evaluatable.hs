@@ -4,6 +4,7 @@ module Control.Monad.Effect.Evaluatable
 ( Evaluatable(..)
 , Recursive(..)
 , Base
+, Subterm(..)
 ) where
 
 import Control.Monad.Effect.Fail
@@ -25,8 +26,8 @@ import qualified Data.Union as U
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable es term v constr where
-  eval :: RAlgebra constr term (Eff es v)
-  default eval :: (Fail :< es, Show1 constr) => RAlgebra constr term (Eff es v)
+  eval :: SubtermAlgebra constr term (Eff es v)
+  default eval :: (Fail :< es, Show1 constr) => SubtermAlgebra constr term (Eff es v)
   eval expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
 -- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
@@ -56,8 +57,8 @@ instance ( Ord (LocationFor v)
          )
          => Evaluatable es t v [] where
   eval []       = pure unit -- Return unit value if this is an empty list of terms
-  eval [(_, x)] = x         -- Return the value for the last term
-  eval ((_, x):xs) = do
+  eval [Subterm _ x] = x         -- Return the value for the last term
+  eval (Subterm _ x:xs) = do
     _ <- x                         -- Evaluate the head term
     env <- get @(EnvironmentFor v) -- Get the global environment after evaluation
                                    -- since it might have been modified by the
@@ -66,4 +67,4 @@ instance ( Ord (LocationFor v)
     -- Finally, evaluate the rest of the terms, but do so by calculating a new
     -- environment each time where the free variables in those terms are bound
     -- to the global environment.
-    local (const (bindEnv (liftFreeVariables (freeVariables . fst) xs) env)) (eval xs)
+    local (const (bindEnv (liftFreeVariables (freeVariables . subterm) xs) env)) (eval xs)

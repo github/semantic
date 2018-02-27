@@ -161,7 +161,7 @@ instance ( Ord (LocationFor (Value l t))
   eval (Program xs) = foldr evalEach interface xs
     where
       interface = inj . Value.Interface <$> ask @(EnvironmentFor (Value l t))
-      evalEach (_, each) rest = each >> do
+      evalEach each rest = subtermValue each >> do
         env <- get @(EnvironmentFor (Value l t))
         local (envUnion env) rest
 
@@ -238,4 +238,4 @@ instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
 instance (Evaluatable es t v (Base t), Recursive t)
          => Evaluatable es t v Context where
-  eval Context{contextSubject = (_, contextSubject)} = contextSubject
+  eval Context{..} = subtermValue contextSubject

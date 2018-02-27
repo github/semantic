@@ -112,9 +112,9 @@ instance ( Semigroup (Cell (LocationFor v) v)
          , Recursive t
          )
          => Evaluatable es t v Assignment where
-  eval Assignment{assignmentTarget = (assignmentTarget, _), assignmentValue = (_, assignmentValue)} = do
-    v <- assignmentValue
-    (var, a) <- ask >>= lookupOrAlloc assignmentTarget v
+  eval Assignment{..} = do
+    v <- subtermValue assignmentValue
+    (var, a) <- ask >>= lookupOrAlloc (subterm assignmentTarget) v
 
     modify (envInsert var a)
     pure v
@@ -154,7 +154,7 @@ instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 
 instance (Evaluatable es t v (Base t), Recursive t)
          => Evaluatable es t v Return where
-  eval (Return (_, x)) = x
+  eval (Return x) = subtermValue x
 
 newtype Yield a = Yield a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
