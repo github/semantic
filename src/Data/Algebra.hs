@@ -4,6 +4,7 @@ module Data.Algebra
 , RAlgebra
 , OpenFAlgebra
 , OpenRAlgebra
+, Subterm(..)
 , fToR
 , fToOpenR
 , rToOpenR
@@ -35,6 +36,8 @@ type OpenFAlgebra f a = forall b . (b -> a) -> f b -> a
 --
 --   See also 'RAlgebra' & 'OpenFAlgebra'.
 type OpenRAlgebra f t a = forall b . (b -> (t, a)) -> f b -> a
+
+data Subterm t a = Subterm { subterm :: !t, subtermValue :: !a }
 
 -- | Promote an 'FAlgebra' into an 'RAlgebra' (by dropping the original parameter).
 fToR :: Functor (Base t) => FAlgebra (Base t) a -> RAlgebra (Base t) t a
