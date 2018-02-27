@@ -77,6 +77,7 @@ class AbstractValue v => AbstractFunction effects t v | v -> t where
   abstract :: [Name] -> Subterm t (Eff effects v) -> Eff effects v
 
 instance Reader (EnvironmentFor (Value location t)) :< effects => AbstractFunction effects t (Value location t) where
+  -- FIXME: Can we store the action evaluating the body in the Value instead of the body term itself?
   abstract names (Subterm body _) = inj . Closure names body <$> ask @(EnvironmentFor (Value location t))
 
 instance Members '[Fresh, NonDetEff, Reader (EnvironmentFor (Type t)), State (StoreFor (Type t))] effects => AbstractFunction effects t (Type t) where
