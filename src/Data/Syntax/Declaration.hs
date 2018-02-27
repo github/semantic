@@ -49,6 +49,7 @@ instance ( FreeVariables t
   eval Function{..} = do
     env <- ask
     let params = toList (liftFreeVariables (freeVariables . fst) functionParameters)
+    -- FIXME: Can we store the action evaluating the body in the Value instead of the body term itself?
     let v = inj (Closure params (fst functionBody) env) :: Value l t
 
     (name, addr) <- lookupOrAlloc (fst functionName) v env
@@ -105,6 +106,7 @@ instance ( FreeVariables t                -- To get free variables from the func
   eval Method{..} = do
     env <- ask
     let params = toList (liftFreeVariables (freeVariables . fst) methodParameters)
+    -- FIXME: Can we store the action evaluating the body in the Value instead of the body term itself?
     let v = inj (Closure params (fst methodBody) env) :: Value l t
 
     (name, addr) <- lookupOrAlloc (fst methodName) v env
