@@ -71,7 +71,7 @@ moduleName term = let [n] = toList (freeVariables term) in BC.unpack n
 evaluate :: forall v term.
          ( Ord v
          , Ord (LocationFor v)
-         , AbstractValue term v
+         , AbstractFunction (Evaluating v) term v
          , Evaluatable (Evaluating v) term v (Base term)
          , FreeVariables term
          , Recursive term
@@ -84,7 +84,7 @@ evaluate = run @(Evaluating v) . foldSubterms eval
 evaluates :: forall v term.
           ( Ord v
           , Ord (LocationFor v)
-          , AbstractValue term v
+          , AbstractFunction (Evaluating v) term v
           , FreeVariables term
           , Evaluatable (Evaluating v) term v (Base term)
           , Recursive term

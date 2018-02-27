@@ -1,18 +1,23 @@
-{-# LANGUAGE MultiParamTypeClasses, Rank2Types, GADTs, TypeOperators, DefaultSignatures, UndecidableInstances, ScopedTypeVariables #-}
+{-# LANGUAGE DataKinds, FunctionalDependencies, MultiParamTypeClasses, Rank2Types, GADTs, TypeOperators, DefaultSignatures, UndecidableInstances, ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 module Control.Monad.Effect.Evaluatable
 ( Evaluatable(..)
 , Recursive(..)
 , Base
 , Subterm(..)
+, AbstractFunction(..)
 ) where
 
+import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Fail
+import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.Internal
+import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
+import Data.Abstract.Type as Type
 import Data.Abstract.Value
 import Data.Algebra
 import Data.Functor.Classes
@@ -26,7 +31,7 @@ import qualified Data.Union as U
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable effects term value constr where
-  eval :: (AbstractValue term value, FreeVariables term) => SubtermAlgebra constr term (Eff effects value)
+  eval :: (AbstractFunction effects term value, FreeVariables term) => SubtermAlgebra constr term (Eff effects value)
   default eval :: (Fail :< effects, FreeVariables term, Show1 constr) => SubtermAlgebra constr term (Eff effects value)
   eval expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
@@ -67,3 +72,20 @@ instance ( Ord (LocationFor v)
     -- environment each time where the free variables in those terms are bound
     -- to the global environment.
     local (const (bindEnv (liftFreeVariables (freeVariables . subterm) xs) env)) (eval xs)
+
+class AbstractValue v => AbstractFunction effects t v | v -> t where
+  abstract :: [Name] -> (t, Eff effects v) -> Eff effects v
+
+instance Reader (EnvironmentFor (Value location t)) :< effects => AbstractFunction effects t (Value location t) where
+  abstract names (body, _) = inj . Closure names body <$> ask @(EnvironmentFor (Value location t))
+
+instance Members '[Fresh, NonDetEff, Reader (EnvironmentFor (Type t)), State (StoreFor (Type t))] effects => AbstractFunction effects t (Type t) where
+  abstract names (_, body) = do
+    (env, tvars) <- foldr (\ name rest -> do
+      a <- alloc name
+      tvar <- Var <$> fresh
+      assign a tvar
+      (env, tvars) <- rest
+      pure (envInsert name a env, tvar : tvars)) (pure mempty) names
+    ret <- local (mappend env) body
+    pure (Type.Product tvars :-> ret)
