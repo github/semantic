@@ -74,13 +74,13 @@ instance ( Ord (LocationFor v)
     local (const (bindEnv (liftFreeVariables (freeVariables . subterm) xs) env)) (eval xs)
 
 class AbstractValue v => AbstractFunction effects t v | v -> t where
-  abstract :: [Name] -> (t, Eff effects v) -> Eff effects v
+  abstract :: [Name] -> Subterm t (Eff effects v) -> Eff effects v
 
 instance Reader (EnvironmentFor (Value location t)) :< effects => AbstractFunction effects t (Value location t) where
-  abstract names (body, _) = inj . Closure names body <$> ask @(EnvironmentFor (Value location t))
+  abstract names (Subterm body _) = inj . Closure names body <$> ask @(EnvironmentFor (Value location t))
 
 instance Members '[Fresh, NonDetEff, Reader (EnvironmentFor (Type t)), State (StoreFor (Type t))] effects => AbstractFunction effects t (Type t) where
-  abstract names (_, body) = do
+  abstract names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
       tvar <- Var <$> fresh
