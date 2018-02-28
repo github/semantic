@@ -11,6 +11,10 @@ import Control.Monad.Effect.State
 import Data.Abstract.Value
 import Prelude hiding (fail)
 
+getGlobalEnv :: Evaluator effects value (EnvironmentFor value)
+getGlobalEnv = Evaluator get
+
+
 data Evaluator effects value a
   = Evaluator
     { runEvaluator :: Members '[ Fail
