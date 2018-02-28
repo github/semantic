@@ -4,17 +4,15 @@ module Rendering.DOT
 , renderDOTTerm
 ) where
 
+import Prologue hiding (empty)
 import Algebra.Graph
 import Algebra.Graph.Export.Dot
 import Analysis.ConstructorName
 import Data.Blob
 import qualified Data.ByteString.Char8 as B
-import Data.Diff
-import Data.Foldable
-import Data.Functor.Foldable hiding (fold)
 import qualified Data.IntMap as IntMap
+import Data.Diff
 import Data.Patch
-import Data.Semigroup
 import Data.Term
 
 renderDOTDiff :: (ConstructorName syntax, Foldable syntax, Functor syntax) => BlobPair -> Diff syntax ann1 ann2 -> B.ByteString

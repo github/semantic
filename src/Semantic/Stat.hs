@@ -22,11 +22,9 @@ module Semantic.Stat
 ) where
 
 
-import Data.Functor
+import Prologue
 import Data.List (intercalate)
 import Data.List.Split (splitOneOf)
-import Data.Maybe
-import Data.Monoid
 import Network.Socket (Socket(..), SocketType(..), socket, connect, close, getAddrInfo, addrFamily, addrAddress, defaultProtocol)
 import Network.Socket.ByteString
 import Network.URI

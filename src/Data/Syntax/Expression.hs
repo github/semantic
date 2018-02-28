@@ -13,15 +13,8 @@ import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type as Type
 import Data.Abstract.Value (Value, Closure(..), EnvironmentFor, StoreFor)
-import Data.Align.Generic
-import Data.Functor.Classes.Generic
-import Data.Maybe
-import Data.Mergeable
-import Data.Semigroup
-import Data.Traversable
-import Data.Union
 import Diffing.Algorithm
-import GHC.Generics
+import Prologue
 import Prelude hiding (fail)
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.

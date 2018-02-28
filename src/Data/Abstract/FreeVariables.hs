@@ -1,12 +1,8 @@
 {-# LANGUAGE DefaultSignatures, UndecidableInstances #-}
 module Data.Abstract.FreeVariables where
 
-import Data.ByteString (ByteString)
-import Data.Functor.Foldable
-import Data.Proxy
-import Data.Set
+import Prologue
 import Data.Term
-import Data.Union
 
 -- | The type of variable names.
 type Name = ByteString

@@ -5,16 +5,9 @@ import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Evaluatable
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value (AbstractValue(..))
-import Data.Align.Generic
-import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (readInteger)
-import Data.Functor.Classes.Generic
-import Data.Maybe
-import Data.Mergeable
-import Data.Union
 import Diffing.Algorithm
-import GHC.Generics
-import Prelude
+import Prologue hiding (Set)
 
 -- Boolean
 

@@ -1,6 +1,7 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, MultiParamTypeClasses #-}
 module Analysis.Abstract.Evaluating where
 
+import Prologue
 import Control.Effect
 import Control.Monad.Effect (Eff, Members)
 import Control.Monad.Effect.Embedded
@@ -14,9 +15,6 @@ import Data.Abstract.Value
 import Data.Abstract.FreeVariables
 import Data.Algebra
 import Data.Blob
-import Data.Functor.Foldable (Base, Recursive(..))
-import Data.Foldable (toList)
-import Data.Semigroup
 import Prelude hiding (fail)
 import qualified Data.Map as Map
 import System.FilePath.Posix

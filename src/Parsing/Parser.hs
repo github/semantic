@@ -14,17 +14,15 @@ module Parsing.Parser
 , phpParser
 ) where
 
+import Prologue
 import Assigning.Assignment
 import qualified CMarkGFM
 import Data.AST
-import Data.Functor.Classes (Eq1)
-import Data.Ix
 import Data.Kind
 import Data.Language
 import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Term
-import Data.Union
 import Foreign.Ptr
 import qualified Language.Go.Assignment as Go
 import qualified Language.JSON.Assignment as JSON

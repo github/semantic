@@ -1,8 +1,7 @@
 module Data.Abstract.Type where
 
-import Control.Monad.Fail
+import Prologue
 import Data.Align (alignWith)
-import Data.These (these)
 import Prelude hiding (fail)
 
 -- | The type of type variable names.

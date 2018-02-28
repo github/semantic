@@ -1,37 +1,22 @@
 {-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, TypeApplications #-}
 module Data.Syntax where
 
-import Control.Applicative
-import Control.Monad.Effect
+import Prologue
 import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
-import Control.Monad.Error.Class hiding (Error)
 import Data.Abstract.Environment
 import Control.Monad.Effect.Evaluatable
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value (LocationFor, EnvironmentFor, StoreFor, AbstractValue(..), Value)
-import Data.Align.Generic
 import Data.AST
-import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (unpack)
-import Data.Foldable (asum, toList)
-import Data.Function ((&), on)
-import Data.Functor.Classes.Generic
-import Data.Ix
-import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
-import Data.Mergeable
-import Data.Pointed
 import Data.Range
 import Data.Record
-import Data.Semigroup
 import Data.Span
 import Data.Term
-import Data.Union
 import Diffing.Algorithm hiding (Empty)
-import GHC.Generics
-import GHC.Stack
 import Prelude hiding (fail)
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Abstract.Type as Type

@@ -2,25 +2,20 @@
 {-# LANGUAGE DataKinds, MonoLocalBinds, TypeOperators, TypeApplications #-}
 module Semantic.Util where
 
-
+import Prologue
 import Analysis.Abstract.Evaluating
 import Analysis.Declaration
 import Control.Monad.IO.Class
 import Data.Abstract.Address
 import Data.Abstract.Store
 import Data.Abstract.Value
-import Data.Align.Generic
 import Data.AST
-import Data.Bifunctor.Join
 import Data.Blob
 import Data.Diff
-import Data.Functor.Classes
-import Data.Maybe
 import Data.Range
 import Data.Record
 import Data.Span
 import Data.Term
-import Data.Union
 import Diffing.Algorithm
 import Diffing.Interpreter
 import Parsing.Parser
