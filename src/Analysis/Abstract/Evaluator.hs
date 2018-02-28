@@ -47,7 +47,7 @@ localModuleTable :: (Linker term -> Linker term) -> Evaluator effects term value
 localModuleTable f a = Evaluator (local f (runEvaluator a))
 
 
-data Evaluator effects term value a
+newtype Evaluator effects term value a
   = Evaluator
     { runEvaluator :: Members '[ Fail
                                , Reader (EnvironmentFor value)
