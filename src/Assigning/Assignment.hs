@@ -170,7 +170,7 @@ choice alternatives
   where (choices, atEnd, handlers) = foldMap toChoices alternatives
         toChoices :: (Enum grammar, Ix grammar) => Assignment ast grammar a -> ([(grammar, Assignment ast grammar a)], [Assignment ast grammar a], [Error (Either String grammar) -> Assignment ast grammar a])
         toChoices rule = case rule of
-          Tracing _ (Choose t a h) `Then` continue -> (Table.toList (fmap (>>= continue) t), toList ((>>= continue) <$> a), toList ((continue <=<) <$> h))
+          Tracing _ (Choose t a h) `Then` continue -> (Table.toPairs (fmap (>>= continue) t), toList ((>>= continue) <$> a), toList ((continue <=<) <$> h))
           Tracing _ (Many  child)   `Then` _ -> let (c, _, _) = toChoices child in (fmap (rule <$) c, [rule], [])
           Tracing _ (Label child _) `Then` _ -> let (c, _, _) = toChoices child in (fmap (rule <$) c, [rule], [])
           Tracing _ (Alt as) `Then` continue -> foldMap (toChoices . continue) as
