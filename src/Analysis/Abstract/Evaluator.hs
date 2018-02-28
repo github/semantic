@@ -18,6 +18,10 @@ modifyGlobalEnv :: (EnvironmentFor value -> EnvironmentFor value) -> Evaluator e
 modifyGlobalEnv f = Evaluator (modify f)
 
 
+askLocalEnv :: Evaluator effects value (EnvironmentFor value)
+askLocalEnv = Evaluator ask
+
+
 data Evaluator effects value a
   = Evaluator
     { runEvaluator :: Members '[ Fail
