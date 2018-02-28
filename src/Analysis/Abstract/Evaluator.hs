@@ -16,3 +16,7 @@ data Evaluator effects value a
                                ] effects
                    => Eff effects a
     }
+
+
+instance Functor (Evaluator effects value) where
+  fmap f (Evaluator run) = Evaluator (fmap f run)
