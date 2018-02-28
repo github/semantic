@@ -32,3 +32,8 @@ instance Member NonDetEff effects => Alternative (Evaluator effects value) where
   empty = Evaluator empty
 
   Evaluator runA <|> Evaluator runB = Evaluator (runA <|> runB)
+
+instance Monad (Evaluator effects value) where
+  return = pure
+
+  Evaluator runA >>= f = Evaluator (runA >>= runEvaluator . f)
