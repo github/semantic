@@ -8,6 +8,7 @@ import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
+import Data.Abstract.Linker
 import Data.Abstract.Value
 import Prelude hiding (fail)
 
@@ -38,6 +39,8 @@ data Evaluator effects value a
                                , Reader (EnvironmentFor value)
                                , State  (EnvironmentFor value)
                                , State  (StoreFor value)
+                               , Reader (Linker (Evaluator effects value value))
+                               , State  (Linker value)
                                ] effects
                    => Eff effects a
     }
