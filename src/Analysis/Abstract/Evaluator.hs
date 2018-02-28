@@ -43,6 +43,9 @@ modifyModuleTable f = Evaluator (modify f)
 askModuleEvaluatorTable :: Evaluator effects value (Linker (Evaluator effects value value))
 askModuleEvaluatorTable = Evaluator ask
 
+localModuleEvaluatorTable :: (Linker (Evaluator effects value value) -> Linker (Evaluator effects value value)) -> Evaluator effects value a -> Evaluator effects value a
+localModuleEvaluatorTable f a = Evaluator (local f (runEvaluator a))
+
 
 data Evaluator effects value a
   = Evaluator
