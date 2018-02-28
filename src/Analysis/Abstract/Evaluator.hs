@@ -21,6 +21,9 @@ modifyGlobalEnv f = Evaluator (modify f)
 askLocalEnv :: Evaluator effects value (EnvironmentFor value)
 askLocalEnv = Evaluator ask
 
+localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> Evaluator effects value a -> Evaluator effects value a
+localEnv f a = Evaluator (local f (runEvaluator a))
+
 
 data Evaluator effects value a
   = Evaluator
