@@ -24,7 +24,8 @@ import Data.List.NonEmpty as X (
   )
 
 import Control.Exception as X hiding (
-    throw
+    evaluate
+  , throw
   , throwIO
   , throwTo
   , assert
@@ -43,6 +44,7 @@ import Data.Bifoldable as X
 import Data.Bifunctor as X (Bifunctor(..))
 import Data.Bitraversable as X
 import Data.Foldable as X hiding (product , sum)
+import Data.Functor as X (void)
 import Data.Function as X (fix, on, (&))
 import Data.Functor.Classes as X
 import Data.Functor.Classes.Generic as X
@@ -62,5 +64,5 @@ import Data.Hashable as X (
   )
 
 -- Generics
-import GHC.Generics as X
+import GHC.Generics as X hiding (moduleName)
 import GHC.Stack as X

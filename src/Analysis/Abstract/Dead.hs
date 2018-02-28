@@ -4,7 +4,7 @@ module Analysis.Abstract.Dead where
 import Prologue
 import Control.Effect
 import Control.Monad.Effect hiding (run)
-import Control.Monad.Effect.Address
+import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Dead
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
@@ -31,7 +31,7 @@ evalDead :: forall v term
            , Foldable (Base term)
            , Recursive term
            , Eval term v (Eff (DeadCodeEvaluating term v)) (Base term)
-           , MonadAddress (LocationFor v) (Eff (DeadCodeEvaluating term v))
+           , Addressable (LocationFor v) (Eff (DeadCodeEvaluating term v))
            , Semigroup (Cell (LocationFor v) v)
            )
          => term

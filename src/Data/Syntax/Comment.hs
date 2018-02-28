@@ -2,7 +2,7 @@
 module Data.Syntax.Comment where
 
 import Prologue
-import Data.Abstract.Eval
+import Control.Monad.Effect.Evaluatable
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value as Value
 import Diffing.Algorithm
@@ -15,8 +15,8 @@ instance Eq1 Comment where liftEq = genericLiftEq
 instance Ord1 Comment where liftCompare = genericLiftCompare
 instance Show1 Comment where liftShowsPrec = genericLiftShowsPrec
 
-instance (Monad m, AbstractValue v) => Eval t v m Comment where
-  eval _ yield _ = yield unit
+instance (AbstractValue v) => Evaluatable es t v Comment where
+  eval _ = pure unit
 
 -- TODO: nested comment types
 -- TODO: documentation comment types

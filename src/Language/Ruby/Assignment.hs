@@ -8,10 +8,10 @@ module Language.Ruby.Assignment
 
 import Prologue hiding (for)
 import Assigning.Assignment hiding (Assignment, Error)
-import qualified Assigning.Assignment as Assignment
 import Data.Record
 import Data.List (elem)
 import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
+import qualified Assigning.Assignment as Assignment
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration

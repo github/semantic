@@ -15,11 +15,11 @@ library
   hs-source-dirs:      src
   exposed-modules:
                      -- Analyses & term annotations
-                       Analysis.Abstract.Caching
-                     , Analysis.Abstract.Collecting
-                     , Analysis.Abstract.Dead
-                     , Analysis.Abstract.Evaluating
-                     , Analysis.Abstract.Tracing
+                       -- Analysis.Abstract.Caching
+                     -- , Analysis.Abstract.Collecting
+                     -- , Analysis.Abstract.Dead
+                       Analysis.Abstract.Evaluating
+                     -- , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
                      , Analysis.Decorator
@@ -32,21 +32,20 @@ library
                      -- Control flow
                      , Control.Effect
                      -- Effects used in abstract interpretation
-                     , Control.Monad.Effect.Address
-                     , Control.Monad.Effect.Cache
-                     , Control.Monad.Effect.Dead
-                     , Control.Monad.Effect.Env
-                     , Control.Monad.Effect.Fresh
-                     , Control.Monad.Effect.GC
-                     , Control.Monad.Effect.NonDet
-                     , Control.Monad.Effect.Store
-                     , Control.Monad.Effect.Trace
+                     , Control.Monad.Effect.Addressable
+                     -- , Control.Monad.Effect.Cache
+                     -- , Control.Monad.Effect.Dead
+                     , Control.Monad.Effect.Evaluatable
+                     -- , Control.Monad.Effect.Fresh
+                     -- , Control.Monad.Effect.GC
+                     -- , Control.Monad.Effect.NonDet
+                     -- , Control.Monad.Effect.Trace
                      -- General datatype definitions & generic algorithms
                      , Data.Abstract.Address
                      , Data.Abstract.Cache
                      , Data.Abstract.Configuration
                      , Data.Abstract.Environment
-                     , Data.Abstract.Eval
+                     , Data.Abstract.Linker
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Live
                      , Data.Abstract.Store

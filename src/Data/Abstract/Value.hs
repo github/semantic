@@ -3,6 +3,7 @@ module Data.Abstract.Value where
 
 import Data.Abstract.Address
 import Data.Abstract.Environment
+import Data.Abstract.Store
 import Data.Abstract.FreeVariables
 import Data.Abstract.Live
 import qualified Data.Abstract.Type as Type
@@ -13,6 +14,7 @@ import qualified Prelude
 
 type ValueConstructors location
   = '[Closure location
+    , Interface location
     , Unit
     , Boolean
     , Integer
@@ -32,6 +34,14 @@ data Closure location term = Closure [Name] term (Environment location (Value lo
 instance (Eq location) => Eq1 (Closure location) where liftEq = genericLiftEq
 instance (Ord location) => Ord1 (Closure location) where liftCompare = genericLiftCompare
 instance (Show location) => Show1 (Closure location) where liftShowsPrec = genericLiftShowsPrec
+
+-- | A program value consisting of the value of the program and it's enviornment of bindings.
+data Interface location term = Interface (Value location term) (Environment location (Value location term))
+  deriving (Eq, Generic1, Ord, Show)
+
+instance (Eq location) => Eq1 (Interface location) where liftEq = genericLiftEq
+instance (Ord location) => Ord1 (Interface location) where liftCompare = genericLiftCompare
+instance (Show location) => Show1 (Interface location) where liftShowsPrec = genericLiftShowsPrec
 
 -- | The unit value. Typically used to represent the result of imperative statements.
 data Unit term = Unit
@@ -65,6 +75,11 @@ instance Eq1 String where liftEq = genericLiftEq
 instance Ord1 String where liftCompare = genericLiftCompare
 instance Show1 String where liftShowsPrec = genericLiftShowsPrec
 
+-- | The environment for an abstract value type.
+type EnvironmentFor v = Environment (LocationFor v) v
+
+-- | The store for an abstract value type.
+type StoreFor v = Store (LocationFor v) v
 
 -- | The location type (the body of 'Address'es) which should be used for an abstract value type.
 type family LocationFor value :: * where
@@ -97,6 +112,7 @@ class AbstractValue v where
 instance (FreeVariables term, Ord location) => ValueRoots location (Value location term) where
   valueRoots v
     | Just (Closure names body env) <- prj v = envRoots env (foldr Set.delete (freeVariables body) names)
+    | Just (Interface _ env) <- prj v        = envAll env
     | otherwise                              = mempty
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
