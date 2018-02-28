@@ -14,6 +14,9 @@ import Prelude hiding (fail)
 getGlobalEnv :: Evaluator effects value (EnvironmentFor value)
 getGlobalEnv = Evaluator get
 
+modifyGlobalEnv :: (EnvironmentFor value -> EnvironmentFor value) -> Evaluator effects value ()
+modifyGlobalEnv f = Evaluator (modify f)
+
 
 data Evaluator effects value a
   = Evaluator
