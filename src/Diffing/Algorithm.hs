@@ -160,8 +160,8 @@ class Diffable f where
   --
   --   By default, 'subalgorithmFor' produces 'empty', rejecting substructural comparisons. This is important for performance, as alternations with 'empty' are eliminated at construction time.
   -- ^ The 'Alternative' instance will in general be 'Algorithm', but left opaque to make it harder to shoot oneself in the foot.
-  subalgorithmFor :: Alternative g =>
-                  (a -> g b)       -- ^ A “blur” function to traverse positions which should not be diffed against.
+  subalgorithmFor :: Alternative g
+                  => (a -> g b)    -- ^ A “blur” function to traverse positions which should not be diffed against.
                   -> (a -> g b)    -- ^ A “focus” function to traverse positions which should be diffed against.
                   -> f a           -- ^ The syntax to diff inside of.
                   -> g (f b)       -- ^ The resulting algorithm (or other 'Alternative' context), producing the traversed syntax.
