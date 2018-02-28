@@ -1,8 +1,10 @@
 {-# LANGUAGE DataKinds, RankNTypes, UndecidableInstances #-}
 module Analysis.Abstract.Evaluator where
 
+import Control.Applicative
 import Control.Monad.Effect
 import Control.Monad.Effect.Fail
+import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Value
@@ -25,3 +27,8 @@ instance Applicative (Evaluator effects value) where
   pure = Evaluator . pure
 
   Evaluator runF <*> Evaluator runA = Evaluator (runF <*> runA)
+
+instance Member NonDetEff effects => Alternative (Evaluator effects value) where
+  empty = Evaluator empty
+
+  Evaluator runA <|> Evaluator runB = Evaluator (runA <|> runB)
