@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses #-}
 module Data.Syntax.Literal where
 
-import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Evaluatable
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value (AbstractValue(..))
@@ -11,7 +10,6 @@ import Data.ByteString.Char8 (readInteger)
 import Data.Functor.Classes.Generic
 import Data.Maybe
 import Data.Mergeable
-import Data.Union
 import Diffing.Algorithm
 import GHC.Generics
 import Prelude
@@ -31,7 +29,7 @@ instance Eq1 Boolean where liftEq = genericLiftEq
 instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable es t v Boolean where
+instance Evaluatable es Boolean where
   eval (Boolean x) = pure (boolean x)
 
 
@@ -45,7 +43,7 @@ instance Eq1 Data.Syntax.Literal.Integer where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Integer where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable es t v Data.Syntax.Literal.Integer where
+instance Evaluatable es Data.Syntax.Literal.Integer where
   -- TODO: This instance probably shouldn't have readInteger?
   eval (Data.Syntax.Literal.Integer x) = pure (integer (maybe 0 fst (readInteger x)))
 
@@ -63,7 +61,7 @@ instance Ord1 Data.Syntax.Literal.Float where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Float
-instance Member Fail es => Evaluatable es t v Data.Syntax.Literal.Float
+instance Evaluatable es Data.Syntax.Literal.Float
 
 
 -- Rational literals e.g. `2/3r`
@@ -75,7 +73,7 @@ instance Ord1 Data.Syntax.Literal.Rational where liftCompare = genericLiftCompar
 instance Show1 Data.Syntax.Literal.Rational where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Rational
-instance Member Fail es => Evaluatable es t v Data.Syntax.Literal.Rational
+instance Evaluatable es Data.Syntax.Literal.Rational
 
 
 -- Complex literals e.g. `3 + 2i`
@@ -87,7 +85,7 @@ instance Ord1 Data.Syntax.Literal.Complex where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Complex where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Complex
-instance Member Fail es => Evaluatable es t v Complex
+instance Evaluatable es Complex
 
 -- Strings, symbols
 
@@ -101,7 +99,7 @@ instance Show1 Data.Syntax.Literal.String where liftShowsPrec = genericLiftShows
 -- TODO: Should string literal bodies include escapes too?
 
 -- TODO: Implement Eval instance for String
-instance Member Fail es => Evaluatable es t v Data.Syntax.Literal.String
+instance Evaluatable es Data.Syntax.Literal.String
 
 
 -- | An interpolation element within a string literal.
@@ -113,7 +111,7 @@ instance Ord1 InterpolationElement where liftCompare = genericLiftCompare
 instance Show1 InterpolationElement where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for InterpolationElement
-instance Member Fail es => Evaluatable es t v InterpolationElement
+instance Evaluatable es InterpolationElement
 
 
 -- | A sequence of textual contents within a string literal.
@@ -124,7 +122,7 @@ instance Eq1 TextElement where liftEq = genericLiftEq
 instance Ord1 TextElement where liftCompare = genericLiftCompare
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable es t v TextElement where
+instance Evaluatable es TextElement where
   eval (TextElement x) = pure (string x)
 
 data Null a = Null
@@ -135,7 +133,7 @@ instance Ord1 Null where liftCompare = genericLiftCompare
 instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Null
-instance Member Fail es => Evaluatable es t v Null
+instance Evaluatable es Null
 
 
 newtype Symbol a = Symbol { symbolContent :: ByteString }
@@ -146,7 +144,7 @@ instance Ord1 Symbol where liftCompare = genericLiftCompare
 instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Symbol
-instance Member Fail es => Evaluatable es t v Symbol
+instance Evaluatable es Symbol
 
 
 newtype Regex a = Regex { regexContent :: ByteString }
@@ -160,7 +158,7 @@ instance Show1 Regex where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Character literals.
 
 -- TODO: Implement Eval instance for Regex
-instance Member Fail es => Evaluatable es t v Regex
+instance Evaluatable es Regex
 
 
 -- Collections
@@ -173,7 +171,7 @@ instance Ord1 Array where liftCompare = genericLiftCompare
 instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Array
-instance Member Fail es => Evaluatable es t v Array
+instance Evaluatable es Array
 
 
 newtype Hash a = Hash { hashElements :: [a] }
@@ -184,7 +182,7 @@ instance Ord1 Hash where liftCompare = genericLiftCompare
 instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Hash
-instance Member Fail es => Evaluatable es t v Hash
+instance Evaluatable es Hash
 
 
 data KeyValue a = KeyValue { key :: !a, value :: !a }
@@ -195,7 +193,7 @@ instance Ord1 KeyValue where liftCompare = genericLiftCompare
 instance Show1 KeyValue where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for KeyValue
-instance Member Fail es => Evaluatable es t v KeyValue
+instance Evaluatable es KeyValue
 
 
 newtype Tuple a = Tuple { tupleContents :: [a] }
@@ -206,7 +204,7 @@ instance Ord1 Tuple where liftCompare = genericLiftCompare
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Tuple
-instance Member Fail es => Evaluatable es t v Tuple
+instance Evaluatable es Tuple
 
 
 newtype Set a = Set { setElements :: [a] }
@@ -217,7 +215,7 @@ instance Ord1 Set where liftCompare = genericLiftCompare
 instance Show1 Set where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Set
-instance Member Fail es => Evaluatable es t v Set
+instance Evaluatable es Set
 
 
 -- Pointers
@@ -231,7 +229,7 @@ instance Ord1 Pointer where liftCompare = genericLiftCompare
 instance Show1 Pointer where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Pointer
-instance Member Fail es => Evaluatable es t v Pointer
+instance Evaluatable es Pointer
 
 
 -- | A reference to a pointer's address (e.g. &pointer in Go)
@@ -243,7 +241,7 @@ instance Ord1 Reference where liftCompare = genericLiftCompare
 instance Show1 Reference where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Reference
-instance Member Fail es => Evaluatable es t v Reference
+instance Evaluatable es Reference
 
 -- TODO: Object literals as distinct from hash literals? Or coalesce object/hash literals into “key-value literals”?
 -- TODO: Function literals (lambdas, procs, anonymous functions, what have you).

@@ -19,7 +19,7 @@ instance Eq1 Comment where liftEq = genericLiftEq
 instance Ord1 Comment where liftCompare = genericLiftCompare
 instance Show1 Comment where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable es t v Comment where
+instance Evaluatable es Comment where
   eval _ = pure unit
 
 -- TODO: nested comment types

@@ -2,19 +2,19 @@
 {-# LANGUAGE TypeApplications #-}
 module Control.Monad.Effect.Evaluatable
 ( Evaluatable(..)
+, module Evaluator
 , Recursive(..)
 , Base
 , Subterm(..)
 , AbstractFunction(..)
 ) where
 
+import Analysis.Abstract.Evaluator as Evaluator
 import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.Internal
 import Control.Monad.Effect.NonDetEff
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.State
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
@@ -32,17 +32,23 @@ import qualified Data.Union as U
 
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
-class Evaluatable effects term value constr where
-  eval :: (AbstractFunction effects term value, FreeVariables term) => SubtermAlgebra constr term (Eff effects value)
-  default eval :: (Fail :< effects, FreeVariables term, Show1 constr) => SubtermAlgebra constr term (Eff effects value)
+class Evaluatable effects constr where
+  eval :: ( AbstractFunction effects term value
+          , Addressable (LocationFor value) effects
+          , FreeVariables term
+          , Ord (LocationFor value)
+          , Semigroup (Cell (LocationFor value) value)
+          )
+          => SubtermAlgebra constr term (Evaluator effects term value value)
+  default eval :: (AbstractFunction effects term value, FreeVariables term, Show1 constr) => SubtermAlgebra constr term (Evaluator effects term value value)
   eval expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
 -- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
-instance (Apply (Evaluatable es t v) fs) => Evaluatable es t v (Union fs) where
-  eval = U.apply (Proxy :: Proxy (Evaluatable es t v)) eval
+instance (Apply (Evaluatable es) fs) => Evaluatable es (Union fs) where
+  eval = U.apply (Proxy :: Proxy (Evaluatable es)) eval
 
 -- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
-instance (Evaluatable es t v s) => Evaluatable es t v (TermF s a) where
+instance (Evaluatable es s) => Evaluatable es (TermF s a) where
   eval In{..} = eval termFOut
 
 
@@ -53,32 +59,27 @@ instance (Evaluatable es t v s) => Evaluatable es t v (TermF s a) where
 --   1. Each statement’s effects on the store are accumulated;
 --   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
 --   3. Only the last statement’s return value is returned.
-instance ( Ord (LocationFor v)
-         , Show (LocationFor v)
-         , (State (EnvironmentFor v) :< es)
-         , (Reader (EnvironmentFor v) :< es)
-         )
-         => Evaluatable es t v [] where
-  eval []     = pure unit          -- Return unit value if this is an empty list of terms
-  eval [x]    = subtermValue x     -- Return the value for the last term
+instance Evaluatable effects [] where
+  eval []     = pure unit      -- Return unit value if this is an empty list of terms
+  eval [x]    = subtermValue x -- Return the value for the last term
   eval (x:xs) = do
-    _ <- subtermValue x            -- Evaluate the head term
-    env <- get @(EnvironmentFor v) -- Get the global environment after evaluation
-                                   -- since it might have been modified by the
-                                   -- evaluation above ^.
+    _ <- subtermValue x        -- Evaluate the head term
+    env <- getGlobalEnv                 -- Get the global environment after evaluation
+                               -- since it might have been modified by the
+                               -- evaluation above ^.
 
     -- Finally, evaluate the rest of the terms, but do so by calculating a new
     -- environment each time where the free variables in those terms are bound
     -- to the global environment.
-    local (const (bindEnv (liftFreeVariables (freeVariables . subterm) xs) env)) (eval xs)
+    localEnv (const (bindEnv (liftFreeVariables (freeVariables . subterm) xs) env)) (eval xs)
 
 class AbstractValue v => AbstractFunction effects t v | v -> t where
-  abstract :: [Name] -> Subterm t (Eff effects v) -> Eff effects v
-  apply :: v -> [Subterm t (Eff effects v)] -> Eff effects v
+  abstract :: [Name] -> Subterm t (Evaluator effects t v v) -> Evaluator effects t v v
+  apply :: v -> [Subterm t (Evaluator effects t v v)] -> Evaluator effects t v v
 
-instance (Addressable location effects, Semigroup (Cell location (Value location t)), Members '[Fail, Reader (EnvironmentFor (Value location t)), State (StoreFor (Value location t))] effects, Recursive t, Evaluatable effects t (Value location t) (Base t), FreeVariables t) => AbstractFunction effects t (Value location t) where
+instance (Addressable location effects, Semigroup (Cell location (Value location t)), Recursive t, Evaluatable effects (Base t), FreeVariables t) => AbstractFunction effects t (Value location t) where
   -- FIXME: Can we store the action evaluating the body in the Value instead of the body term itself
-  abstract names (Subterm body _) = inj . Closure names body <$> ask @(EnvironmentFor (Value location t))
+  abstract names (Subterm body _) = inj . Closure names body <$> askLocalEnv
 
   apply op params = do
     Closure names body env <- maybe (fail "expected a closure") pure (prj op :: Maybe (Closure location t))
@@ -87,9 +88,9 @@ instance (Addressable location effects, Semigroup (Cell location (Value location
       a <- alloc name
       assign a v
       envInsert name a <$> rest) (pure env) (zip names params)
-    local (mappend bindings) (foldSubterms eval body)
+    localEnv (mappend bindings) (foldSubterms eval body)
 
-instance Members '[Fail, Fresh, NonDetEff, Reader (EnvironmentFor (Type t)), State (StoreFor (Type t))] effects => AbstractFunction effects t (Type t) where
+instance Members '[Fresh, NonDetEff] effects => AbstractFunction effects t (Type t) where
   abstract names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
@@ -97,7 +98,7 @@ instance Members '[Fail, Fresh, NonDetEff, Reader (EnvironmentFor (Type t)), Sta
       assign a tvar
       (env, tvars) <- rest
       pure (envInsert name a env, tvar : tvars)) (pure mempty) names
-    ret <- local (mappend env) body
+    ret <- localEnv (mappend env) body
     pure (Type.Product tvars :-> ret)
 
   apply op params = do

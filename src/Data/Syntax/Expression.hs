@@ -1,9 +1,7 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, TypeApplications #-}
 module Data.Syntax.Expression where
 
-import Control.Monad.Effect
 import Control.Monad.Effect.Evaluatable
-import Control.Monad.Effect.Fail
 import Data.Abstract.FreeVariables
 import Data.Align.Generic
 import Data.Functor.Classes.Generic
@@ -21,7 +19,7 @@ instance Eq1 Call where liftEq = genericLiftEq
 instance Ord1 Call where liftCompare = genericLiftCompare
 instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable es t v Call where
+instance Evaluatable es Call where
   eval Call{..} = do
     op <- subtermValue callFunction
     apply op callParams
@@ -40,7 +38,7 @@ instance Ord1 Comparison where liftCompare = genericLiftCompare
 instance Show1 Comparison where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Comparison
-instance Member Fail es => Evaluatable es t v Comparison
+instance Evaluatable es Comparison
 
 
 -- | Binary arithmetic operators.
@@ -59,7 +57,7 @@ instance Ord1 Arithmetic where liftCompare = genericLiftCompare
 instance Show1 Arithmetic where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Arithmetic
-instance Member Fail es => Evaluatable es t v Arithmetic
+instance Evaluatable es Arithmetic
 
 
 -- | Boolean operators.
@@ -75,7 +73,7 @@ instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Boolean
-instance Member Fail es => Evaluatable es t v Boolean
+instance Evaluatable es Boolean
 
 
 -- | Javascript delete operator
@@ -87,7 +85,7 @@ instance Ord1 Delete where liftCompare = genericLiftCompare
 instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Delete
-instance Member Fail es => Evaluatable es t v Delete
+instance Evaluatable es Delete
 
 
 -- | A sequence expression such as Javascript or C's comma operator.
@@ -99,7 +97,7 @@ instance Ord1 SequenceExpression where liftCompare = genericLiftCompare
 instance Show1 SequenceExpression where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for SequenceExpression
-instance Member Fail es => Evaluatable es t v SequenceExpression
+instance Evaluatable es SequenceExpression
 
 
 -- | Javascript void operator
@@ -111,7 +109,7 @@ instance Ord1 Void where liftCompare = genericLiftCompare
 instance Show1 Void where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Void
-instance Member Fail es => Evaluatable es t v Void
+instance Evaluatable es Void
 
 
 -- | Javascript typeof operator
@@ -123,7 +121,7 @@ instance Ord1 Typeof where liftCompare = genericLiftCompare
 instance Show1 Typeof where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Typeof
-instance Member Fail es => Evaluatable es t v Typeof
+instance Evaluatable es Typeof
 
 
 -- | Bitwise operators.
@@ -142,7 +140,7 @@ instance Ord1 Bitwise where liftCompare = genericLiftCompare
 instance Show1 Bitwise where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Bitwise
-instance Member Fail es => Evaluatable es t v Bitwise
+instance Evaluatable es Bitwise
 
 
 -- | Member Access (e.g. a.b)
@@ -155,7 +153,7 @@ instance Ord1 MemberAccess where liftCompare = genericLiftCompare
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for MemberAccess
-instance Member Fail es => Evaluatable es t v MemberAccess
+instance Evaluatable es MemberAccess
 
 
 -- | Subscript (e.g a[1])
@@ -169,7 +167,7 @@ instance Ord1 Subscript where liftCompare = genericLiftCompare
 instance Show1 Subscript where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Subscript
-instance Member Fail es => Evaluatable es t v Subscript
+instance Evaluatable es Subscript
 
 
 -- | Enumeration (e.g. a[1:10:1] in Python (start at index 1, stop at index 10, step 1 element from start to stop))
@@ -181,7 +179,7 @@ instance Ord1 Enumeration where liftCompare = genericLiftCompare
 instance Show1 Enumeration where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Enumeration
-instance Member Fail es => Evaluatable es t v Enumeration
+instance Evaluatable es Enumeration
 
 
 -- | InstanceOf (e.g. a instanceof b in JavaScript
@@ -193,7 +191,7 @@ instance Ord1 InstanceOf where liftCompare = genericLiftCompare
 instance Show1 InstanceOf where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for InstanceOf
-instance Member Fail es => Evaluatable es t v InstanceOf
+instance Evaluatable es InstanceOf
 
 
 -- | ScopeResolution (e.g. import a.b in Python or a::b in C++)
@@ -205,7 +203,7 @@ instance Ord1 ScopeResolution where liftCompare = genericLiftCompare
 instance Show1 ScopeResolution where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for ScopeResolution
-instance Member Fail es => Evaluatable es t v ScopeResolution
+instance Evaluatable es ScopeResolution
 
 
 -- | A non-null expression such as Typescript or Swift's ! expression.
@@ -217,7 +215,7 @@ instance Ord1 NonNullExpression where liftCompare = genericLiftCompare
 instance Show1 NonNullExpression where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for NonNullExpression
-instance Member Fail es => Evaluatable es t v NonNullExpression
+instance Evaluatable es NonNullExpression
 
 
 -- | An await expression in Javascript or C#.
@@ -229,7 +227,7 @@ instance Ord1 Await where liftCompare = genericLiftCompare
 instance Show1 Await where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Await
-instance Member Fail es => Evaluatable es t v Await
+instance Evaluatable es Await
 
 
 -- | An object constructor call in Javascript, Java, etc.
@@ -241,7 +239,7 @@ instance Ord1 New where liftCompare = genericLiftCompare
 instance Show1 New where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for New
-instance Member Fail es => Evaluatable es t v New
+instance Evaluatable es New
 
 
 -- | A cast expression to a specified type.
@@ -253,4 +251,4 @@ instance Ord1 Cast where liftCompare = genericLiftCompare
 instance Show1 Cast where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Cast
-instance Member Fail es => Evaluatable es t v Cast
+instance Evaluatable es Cast
