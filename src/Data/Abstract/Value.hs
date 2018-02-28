@@ -1,5 +1,14 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, FunctionalDependencies, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
-module Data.Abstract.Value where
+module Data.Abstract.Value
+( Value
+, Closure(..)
+, Interface(..)
+, EnvironmentFor
+, StoreFor
+, LocationFor
+, ValueRoots(..)
+, AbstractValue(..)
+) where
 
 import Data.Abstract.Address
 import Data.Abstract.Environment
