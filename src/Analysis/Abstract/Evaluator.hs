@@ -28,6 +28,9 @@ localEnv f a = Evaluator (local f (runEvaluator a))
 getStore :: Evaluator effects value (StoreFor value)
 getStore = Evaluator get
 
+modifyStore :: (StoreFor value -> StoreFor value) -> Evaluator effects value ()
+modifyStore f = Evaluator (modify f)
+
 
 data Evaluator effects value a
   = Evaluator
