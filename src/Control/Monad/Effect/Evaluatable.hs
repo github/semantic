@@ -40,7 +40,7 @@ class Evaluatable constr where
           , Semigroup (Cell (LocationFor value) value)
           )
           => SubtermAlgebra constr term (Evaluator effects term value value)
-  default eval :: (AbstractFunction effects term value, FreeVariables term, Show1 constr) => SubtermAlgebra constr term (Evaluator effects term value value)
+  default eval :: (FreeVariables term, Show1 constr) => SubtermAlgebra constr term (Evaluator effects term value value)
   eval expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
 -- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
