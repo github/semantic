@@ -20,3 +20,8 @@ data Evaluator effects value a
 
 instance Functor (Evaluator effects value) where
   fmap f (Evaluator run) = Evaluator (fmap f run)
+
+instance Applicative (Evaluator effects value) where
+  pure = Evaluator . pure
+
+  Evaluator runF <*> Evaluator runA = Evaluator (runF <*> runA)
