@@ -34,7 +34,7 @@ import Control.Exception as X hiding (
 -- Typeclasses
 import Control.Applicative as X
 import Control.Arrow as X ((&&&), (***))
-import Control.Monad as X hiding (fail, return)
+import Control.Monad as X hiding (fail, return, unless, when)
 import Control.Monad.Except as X (MonadError(..))
 import Control.Monad.Fail as X (MonadFail(..))
 import Data.Algebra as X

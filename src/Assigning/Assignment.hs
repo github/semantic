@@ -92,7 +92,7 @@ module Assigning.Assignment
 , module Parsers
 ) where
 
-import Prologue hiding (Alt)
+import Prologue
 import Prelude hiding (fail, until)
 import qualified Assigning.Assignment.Table as Table
 import Control.Monad.Free.Freer

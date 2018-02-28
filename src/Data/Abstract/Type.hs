@@ -1,6 +1,6 @@
 module Data.Abstract.Type where
 
-import Prologue hiding (Product)
+import Prologue
 import Data.Align (alignWith)
 import Prelude hiding (fail)
 

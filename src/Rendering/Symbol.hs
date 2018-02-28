@@ -7,7 +7,7 @@ module Rendering.Symbol
 , defaultSymbolFields
 ) where
 
-import Prologue hiding (when)
+import Prologue
 import Analysis.Declaration
 import Data.Aeson
 import Data.Blob
