@@ -36,6 +36,9 @@ modifyStore f = Evaluator (modify f)
 getModuleTable :: Evaluator effects value (Linker value)
 getModuleTable = Evaluator get
 
+modifyModuleTable :: (Linker value -> Linker value) -> Evaluator effects value ()
+modifyModuleTable f = Evaluator (modify f)
+
 
 data Evaluator effects value a
   = Evaluator
