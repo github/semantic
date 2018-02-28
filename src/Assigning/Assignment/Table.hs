@@ -21,13 +21,13 @@ singleton i a = Table [i] (IntMap.singleton (fromEnum i) a)
 fromListWith :: (Enum i, Ord i) => (a -> a -> a) -> [(i, a)] -> Table i a
 fromListWith with assocs = Table (toEnum <$> IntSet.toList (IntSet.fromList (fromEnum . fst <$> assocs))) (IntMap.fromListWith with (first fromEnum <$> assocs))
 
--- TODO: This is more like toPairs than toList?
 toPairs :: Enum i => Table i a -> [(i, a)]
 toPairs Table{..} = first toEnum <$> IntMap.toList tableBranches
 
 
 lookup :: Enum i => i -> Table i a -> Maybe a
 lookup i = IntMap.lookup (fromEnum i) . tableBranches
+
 
 instance (Enum i, Monoid a) => Monoid (Table i a) where
   mempty = Table mempty mempty
