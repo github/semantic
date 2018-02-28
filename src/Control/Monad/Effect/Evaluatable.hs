@@ -32,7 +32,7 @@ import qualified Data.Union as U
 
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
-class Evaluatable effects constr where
+class Evaluatable constr where
   eval :: ( AbstractFunction effects term value
           , Addressable (LocationFor value) effects
           , FreeVariables term
@@ -44,11 +44,11 @@ class Evaluatable effects constr where
   eval expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
 -- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
-instance (Apply (Evaluatable es) fs) => Evaluatable es (Union fs) where
-  eval = U.apply (Proxy :: Proxy (Evaluatable es)) eval
+instance Apply Evaluatable fs => Evaluatable (Union fs) where
+  eval = U.apply (Proxy :: Proxy Evaluatable) eval
 
 -- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
-instance (Evaluatable es s) => Evaluatable es (TermF s a) where
+instance Evaluatable s => Evaluatable (TermF s a) where
   eval In{..} = eval termFOut
 
 
@@ -59,7 +59,7 @@ instance (Evaluatable es s) => Evaluatable es (TermF s a) where
 --   1. Each statement’s effects on the store are accumulated;
 --   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
 --   3. Only the last statement’s return value is returned.
-instance Evaluatable effects [] where
+instance Evaluatable [] where
   eval []     = pure unit      -- Return unit value if this is an empty list of terms
   eval [x]    = subtermValue x -- Return the value for the last term
   eval (x:xs) = do
@@ -77,7 +77,7 @@ class AbstractValue v => AbstractFunction effects t v | v -> t where
   abstract :: [Name] -> Subterm t (Evaluator effects t v v) -> Evaluator effects t v v
   apply :: v -> [Subterm t (Evaluator effects t v v)] -> Evaluator effects t v v
 
-instance (Addressable location effects, Semigroup (Cell location (Value location t)), Recursive t, Evaluatable effects (Base t), FreeVariables t) => AbstractFunction effects t (Value location t) where
+instance (Addressable location effects, Semigroup (Cell location (Value location t)), Recursive t, Evaluatable (Base t), FreeVariables t) => AbstractFunction effects t (Value location t) where
   -- FIXME: Can we store the action evaluating the body in the Value instead of the body term itself
   abstract names (Subterm body _) = inj . Closure names body <$> askLocalEnv
 

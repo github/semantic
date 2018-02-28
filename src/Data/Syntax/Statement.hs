@@ -20,7 +20,7 @@ instance Ord1 If where liftCompare = genericLiftCompare
 instance Show1 If where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for If
-instance Evaluatable es If
+instance Evaluatable If
 
 
 -- | Else statement. The else condition is any term, that upon successful completion, continues evaluation to the elseBody, e.g. `for ... else` in Python.
@@ -32,7 +32,7 @@ instance Ord1 Else where liftCompare = genericLiftCompare
 instance Show1 Else where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Else
-instance Evaluatable es Else
+instance Evaluatable Else
 
 -- TODO: Alternative definition would flatten if/else if/else chains: data If a = If ![(a, a)] !(Maybe a)
 
@@ -45,7 +45,7 @@ instance Ord1 Goto where liftCompare = genericLiftCompare
 instance Show1 Goto where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Goto
-instance Evaluatable es Goto
+instance Evaluatable Goto
 
 
 -- | A pattern-matching or computed jump control-flow statement, like 'switch' in C or JavaScript, or 'case' in Ruby or Haskell.
@@ -57,7 +57,7 @@ instance Ord1 Match where liftCompare = genericLiftCompare
 instance Show1 Match where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Match
-instance Evaluatable es Match
+instance Evaluatable Match
 
 
 -- | A pattern in a pattern-matching or computed jump control-flow statement, like 'case' in C or JavaScript, 'when' in Ruby, or the left-hand side of '->' in the body of Haskell 'case' expressions.
@@ -69,7 +69,7 @@ instance Ord1 Pattern where liftCompare = genericLiftCompare
 instance Show1 Pattern where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Pattern
-instance Evaluatable es Pattern
+instance Evaluatable Pattern
 
 
 -- | A let statement or local binding, like 'a as b' or 'let a = b'.
@@ -81,7 +81,7 @@ instance Ord1 Let where liftCompare = genericLiftCompare
 instance Show1 Let where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Let
-instance Evaluatable es Let
+instance Evaluatable Let
 
 
 -- Assignment
@@ -94,7 +94,7 @@ instance Eq1 Assignment where liftEq = genericLiftEq
 instance Ord1 Assignment where liftCompare = genericLiftCompare
 instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable es Assignment where
+instance Evaluatable Assignment where
   eval Assignment{..} = do
     v <- subtermValue assignmentValue
     (var, a) <- askLocalEnv >>= lookupOrAlloc (subterm assignmentTarget) v
@@ -111,7 +111,7 @@ instance Ord1 PostIncrement where liftCompare = genericLiftCompare
 instance Show1 PostIncrement where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for PostIncrement
-instance Evaluatable es PostIncrement
+instance Evaluatable PostIncrement
 
 
 -- | Post decrement operator (e.g. 1-- in Go, or i-- in C).
@@ -123,7 +123,7 @@ instance Ord1 PostDecrement where liftCompare = genericLiftCompare
 instance Show1 PostDecrement where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for PostDecrement
-instance Evaluatable es PostDecrement
+instance Evaluatable PostDecrement
 
 
 -- Returns
@@ -135,7 +135,7 @@ instance Eq1 Return where liftEq = genericLiftEq
 instance Ord1 Return where liftCompare = genericLiftCompare
 instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable es Return where
+instance Evaluatable Return where
   eval (Return x) = subtermValue x
 
 newtype Yield a = Yield a
@@ -146,7 +146,7 @@ instance Ord1 Yield where liftCompare = genericLiftCompare
 instance Show1 Yield where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Yield
-instance Evaluatable es Yield
+instance Evaluatable Yield
 
 
 newtype Break a = Break a
@@ -157,7 +157,7 @@ instance Ord1 Break where liftCompare = genericLiftCompare
 instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Break
-instance Evaluatable es Break
+instance Evaluatable Break
 
 
 newtype Continue a = Continue a
@@ -168,7 +168,7 @@ instance Ord1 Continue where liftCompare = genericLiftCompare
 instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Continue
-instance Evaluatable es Continue
+instance Evaluatable Continue
 
 
 newtype Retry a = Retry a
@@ -179,7 +179,7 @@ instance Ord1 Retry where liftCompare = genericLiftCompare
 instance Show1 Retry where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Retry
-instance Evaluatable es Retry
+instance Evaluatable Retry
 
 
 newtype NoOp a = NoOp a
@@ -190,7 +190,7 @@ instance Ord1 NoOp where liftCompare = genericLiftCompare
 instance Show1 NoOp where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for NoOp
-instance Evaluatable es NoOp
+instance Evaluatable NoOp
 
 
 -- Loops
@@ -203,7 +203,7 @@ instance Ord1 For where liftCompare = genericLiftCompare
 instance Show1 For where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for For
-instance Evaluatable es For
+instance Evaluatable For
 
 
 data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }
@@ -214,7 +214,7 @@ instance Ord1 ForEach where liftCompare = genericLiftCompare
 instance Show1 ForEach where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for ForEach
-instance Evaluatable es ForEach
+instance Evaluatable ForEach
 
 
 data While a = While { whileCondition :: !a, whileBody :: !a }
@@ -225,7 +225,7 @@ instance Ord1 While where liftCompare = genericLiftCompare
 instance Show1 While where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for While
-instance Evaluatable es While
+instance Evaluatable While
 
 
 data DoWhile a = DoWhile { doWhileCondition :: !a, doWhileBody :: !a }
@@ -236,7 +236,7 @@ instance Ord1 DoWhile where liftCompare = genericLiftCompare
 instance Show1 DoWhile where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for DoWhile
-instance Evaluatable es DoWhile
+instance Evaluatable DoWhile
 
 
 -- Exception handling
@@ -249,7 +249,7 @@ instance Ord1 Throw where liftCompare = genericLiftCompare
 instance Show1 Throw where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Throw
-instance Evaluatable es Throw
+instance Evaluatable Throw
 
 
 data Try a = Try { tryBody :: !a, tryCatch :: ![a] }
@@ -260,7 +260,7 @@ instance Ord1 Try where liftCompare = genericLiftCompare
 instance Show1 Try where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Try
-instance Evaluatable es Try
+instance Evaluatable Try
 
 
 data Catch a = Catch { catchException :: !a, catchBody :: !a }
@@ -271,7 +271,7 @@ instance Ord1 Catch where liftCompare = genericLiftCompare
 instance Show1 Catch where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Catch
-instance Evaluatable es Catch
+instance Evaluatable Catch
 
 
 newtype Finally a = Finally a
@@ -282,7 +282,7 @@ instance Ord1 Finally where liftCompare = genericLiftCompare
 instance Show1 Finally where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Finally
-instance Evaluatable es Finally
+instance Evaluatable Finally
 
 
 -- Scoping
@@ -296,7 +296,7 @@ instance Ord1 ScopeEntry where liftCompare = genericLiftCompare
 instance Show1 ScopeEntry where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for ScopeEntry
-instance Evaluatable es ScopeEntry
+instance Evaluatable ScopeEntry
 
 
 -- | ScopeExit (e.g. `END {}` block in Ruby or Perl).
@@ -308,4 +308,4 @@ instance Ord1 ScopeExit where liftCompare = genericLiftCompare
 instance Show1 ScopeExit where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for ScopeExit
-instance Evaluatable es ScopeExit
+instance Evaluatable ScopeExit

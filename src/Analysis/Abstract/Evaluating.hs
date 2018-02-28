@@ -39,7 +39,7 @@ type Evaluating t v
 -- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
 require :: ( AbstractFunction effects term v
            , Addressable (LocationFor v) effects
-           , Evaluatable effects (Base term)
+           , Evaluatable (Base term)
            , FreeVariables term
            , Recursive term
            , Semigroup (Cell (LocationFor v) v)
@@ -54,7 +54,7 @@ require term = getModuleTable >>= maybe (load term) pure . linkerLookup name
 -- Always loads/evaluates.
 load :: ( AbstractFunction effects term v
         , Addressable (LocationFor v) effects
-        , Evaluatable effects (Base term)
+        , Evaluatable (Base term)
         , FreeVariables term
         , Recursive term
         , Semigroup (Cell (LocationFor v) v)
@@ -80,7 +80,7 @@ evaluate :: forall v term.
          , Ord (LocationFor v)
          , AbstractFunction (Evaluating term v) term v
          , Addressable (LocationFor v) (Evaluating term v)
-         , Evaluatable (Evaluating term v) (Base term)
+         , Evaluatable (Base term)
          , FreeVariables term
          , Recursive term
          , Semigroup (Cell (LocationFor v) v)
@@ -95,7 +95,7 @@ evaluates :: forall v term.
           , Ord (LocationFor v)
           , AbstractFunction (Evaluating term v) term v
           , Addressable (LocationFor v) (Evaluating term v)
-          , Evaluatable (Evaluating term v) (Base term)
+          , Evaluatable (Base term)
           , FreeVariables term
           , Recursive term
           , Semigroup (Cell (LocationFor v) v)

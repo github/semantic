@@ -125,7 +125,7 @@ instance Eq1 Identifier where liftEq = genericLiftEq
 instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable es Identifier where
+instance Evaluatable Identifier where
   eval (Identifier name) = do
     env <- askLocalEnv
     maybe (fail ("free variable: " <> unpack name)) deref (envLookup name env)
@@ -140,7 +140,7 @@ instance Eq1 Program where liftEq = genericLiftEq
 instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable es Program where
+instance Evaluatable Program where
   -- eval (Program xs) = eval' xs
   --   where
   --     interface val = inj . Value.Interface val <$> askLocalEnv
@@ -161,7 +161,7 @@ instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare
 instance Show1 AccessibilityModifier where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for AccessibilityModifier
-instance Evaluatable es AccessibilityModifier
+instance Evaluatable AccessibilityModifier
 
 -- | Empty syntax, with essentially no-op semantics.
 --
@@ -173,7 +173,7 @@ instance Eq1 Empty where liftEq _ _ _ = True
 instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
-instance Evaluatable es Empty where
+instance Evaluatable Empty where
   eval _ = pure unit
 
 
@@ -185,7 +185,7 @@ instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
 instance Show1 Error where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable es Error
+instance Evaluatable Error
 
 errorSyntax :: Error.Error String -> [a] -> Error a
 errorSyntax Error.Error{..} = Error (ErrorStack (getCallStack callStack)) errorExpected errorActual
@@ -221,5 +221,5 @@ instance Eq1 Context where liftEq = genericLiftEq
 instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable es Context where
+instance Evaluatable Context where
   eval Context{..} = subtermValue contextSubject

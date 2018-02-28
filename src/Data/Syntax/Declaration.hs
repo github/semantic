@@ -29,7 +29,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Filter the closed-over environment by the free variables in the term.
 -- TODO: How should we represent function types, where applicable?
 
-instance Evaluatable es Function where
+instance Evaluatable Function where
   eval Function{..} = do
     env <- askLocalEnv
     let params = toList (liftFreeVariables (freeVariables . subterm) functionParameters)
@@ -51,7 +51,7 @@ instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 
 -- Evaluating a Method creates a closure and makes that value available in the
 -- local environment.
-instance Evaluatable es Method where
+instance Evaluatable Method where
   eval Method{..} = do
     env <- askLocalEnv
     let params = toList (liftFreeVariables (freeVariables . subterm) methodParameters)
@@ -70,7 +70,7 @@ instance Ord1 MethodSignature where liftCompare = genericLiftCompare
 instance Show1 MethodSignature where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for MethodSignature
-instance Evaluatable es MethodSignature
+instance Evaluatable MethodSignature
 
 
 newtype RequiredParameter a = RequiredParameter { requiredParameter :: a }
@@ -81,7 +81,7 @@ instance Ord1 RequiredParameter where liftCompare = genericLiftCompare
 instance Show1 RequiredParameter where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for RequiredParameter
-instance Evaluatable es RequiredParameter
+instance Evaluatable RequiredParameter
 
 
 newtype OptionalParameter a = OptionalParameter { optionalParameter :: a }
@@ -92,7 +92,7 @@ instance Ord1 OptionalParameter where liftCompare = genericLiftCompare
 instance Show1 OptionalParameter where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for OptionalParameter
-instance Evaluatable es OptionalParameter
+instance Evaluatable OptionalParameter
 
 
 -- TODO: Should we replace this with Function and differentiate by context?
@@ -107,7 +107,7 @@ instance Ord1 VariableDeclaration where liftCompare = genericLiftCompare
 instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for VariableDeclaration
-instance Evaluatable es VariableDeclaration
+instance Evaluatable VariableDeclaration
 
 
 -- | A TypeScript/Java style interface declaration to implement.
@@ -119,7 +119,7 @@ instance Ord1 InterfaceDeclaration where liftCompare = genericLiftCompare
 instance Show1 InterfaceDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for InterfaceDeclaration
-instance Evaluatable es InterfaceDeclaration
+instance Evaluatable InterfaceDeclaration
 
 
 -- | A public field definition such as a field definition in a JavaScript class.
@@ -131,7 +131,7 @@ instance Ord1 PublicFieldDefinition where liftCompare = genericLiftCompare
 instance Show1 PublicFieldDefinition where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for PublicFieldDefinition
-instance Evaluatable es PublicFieldDefinition
+instance Evaluatable PublicFieldDefinition
 
 
 data Variable a = Variable { variableName :: !a, variableType :: !a, variableValue :: !a }
@@ -142,7 +142,7 @@ instance Ord1 Variable where liftCompare = genericLiftCompare
 instance Show1 Variable where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Variable
-instance Evaluatable es Variable
+instance Evaluatable Variable
 
 data Class a = Class { classContext :: ![a], classIdentifier :: !a, classSuperclasses :: ![a], classBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -155,7 +155,7 @@ instance Ord1 Class where liftCompare = genericLiftCompare
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Class
-instance Evaluatable es Class
+instance Evaluatable Class
 
 
 data Module a = Module { moduleIdentifier :: !a, moduleScope :: ![a] }
@@ -166,7 +166,7 @@ instance Ord1 Module where liftCompare = genericLiftCompare
 instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Module
-instance Evaluatable es Module
+instance Evaluatable Module
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
@@ -177,7 +177,7 @@ instance Ord1 Decorator where liftCompare = genericLiftCompare
 instance Show1 Decorator where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Decorator
-instance Evaluatable es Decorator
+instance Evaluatable Decorator
 
 -- TODO: Generics, constraints.
 
@@ -191,7 +191,7 @@ instance Ord1 Data.Syntax.Declaration.Datatype where liftCompare = genericLiftCo
 instance Show1 Data.Syntax.Declaration.Datatype where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Datatype
-instance Evaluatable es Data.Syntax.Declaration.Datatype
+instance Evaluatable Data.Syntax.Declaration.Datatype
 
 
 -- | A single constructor in a datatype, or equally a 'struct' in C, Rust, or Swift.
@@ -203,7 +203,7 @@ instance Ord1 Data.Syntax.Declaration.Constructor where liftCompare = genericLif
 instance Show1 Data.Syntax.Declaration.Constructor where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Constructor
-instance Evaluatable es Data.Syntax.Declaration.Constructor
+instance Evaluatable Data.Syntax.Declaration.Constructor
 
 
 -- | Comprehension (e.g. ((a for b in c if a()) in Python)
@@ -215,7 +215,7 @@ instance Ord1 Comprehension where liftCompare = genericLiftCompare
 instance Show1 Comprehension where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Comprehension
-instance Evaluatable es Comprehension
+instance Evaluatable Comprehension
 
 -- | Import declarations.
 data Import a = Import { importFrom :: !a, importAlias :: !a, importSymbols :: ![a] }
@@ -228,11 +228,11 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 -- instance ( Show l
 --          , Show t
 --          , Members (Evaluating (Value l t)) es
---          , Evaluatable es t (Value l t) (Base t)
+--          , Evaluatable t (Value l t) (Base t)
 --          , Recursive t
 --          , FreeVariables t
 --          )
---          => Evaluatable es t (Value l t) Import where
+--          => Evaluatable t (Value l t) Import where
 --   eval (Import from _ _) = do
 --     interface <- require @(Value l t) @t (subterm from)
 --     -- TODO: Consider returning the value instead of the interface.
@@ -244,7 +244,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 --     modify (envUnion env)
 --     pure interface
 --
-instance Evaluatable es Import
+instance Evaluatable Import
 
 
 -- | An imported symbol
@@ -256,7 +256,7 @@ instance Ord1 ImportSymbol where liftCompare = genericLiftCompare
 instance Show1 ImportSymbol where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for ImportSymbol
-instance Evaluatable es ImportSymbol
+instance Evaluatable ImportSymbol
 
 
 -- | A declared type (e.g. `a []int` in Go).
@@ -268,7 +268,7 @@ instance Ord1 Type where liftCompare = genericLiftCompare
 instance Show1 Type where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Type
-instance Evaluatable es Type
+instance Evaluatable Type
 
 
 -- | Type alias declarations in Javascript/Haskell, etc.
@@ -280,4 +280,4 @@ instance Ord1 TypeAlias where liftCompare = genericLiftCompare
 instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for TypeAlias
-instance Evaluatable es TypeAlias
+instance Evaluatable TypeAlias

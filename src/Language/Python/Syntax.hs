@@ -18,7 +18,7 @@ instance Ord1 Ellipsis where liftCompare = genericLiftCompare
 instance Show1 Ellipsis where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Ellipsis
-instance Evaluatable es Ellipsis
+instance Evaluatable Ellipsis
 
 
 data Redirect a = Redirect !a !a
@@ -29,4 +29,4 @@ instance Ord1 Redirect where liftCompare = genericLiftCompare
 instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Redirect
-instance Evaluatable es Redirect
+instance Evaluatable Redirect
