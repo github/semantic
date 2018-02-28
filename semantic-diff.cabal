@@ -19,6 +19,7 @@ library
                      -- , Analysis.Abstract.Collecting
                      -- , Analysis.Abstract.Dead
                        Analysis.Abstract.Evaluating
+                     , Analysis.Abstract.Evaluator
                      -- , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
