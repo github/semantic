@@ -40,6 +40,10 @@ modifyModuleTable :: (Linker value -> Linker value) -> Evaluator effects value (
 modifyModuleTable f = Evaluator (modify f)
 
 
+askModuleEvaluatorTable :: Evaluator effects value (Linker (Evaluator effects value value))
+askModuleEvaluatorTable = Evaluator ask
+
+
 data Evaluator effects value a
   = Evaluator
     { runEvaluator :: Members '[ Fail
