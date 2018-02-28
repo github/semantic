@@ -25,7 +25,7 @@ envInsert name value (Environment m) = Environment (Map.insert name value m)
 envUnion :: Environment l a -> Environment l a -> Environment l a
 envUnion (Environment e1) (Environment e2) = Environment $ Map.union e1 e2
 
-bindEnv :: (Show l, Show (t Name), Ord l, Foldable t) => t Name -> Environment l a -> Environment l a
+bindEnv :: (Ord l, Foldable t) => t Name -> Environment l a -> Environment l a
 bindEnv names env = Environment (Map.fromList pairs)
   where pairs = foldr (\name b -> maybe b (\v -> (name, v) : b) (envLookup name env)) mempty names
 
