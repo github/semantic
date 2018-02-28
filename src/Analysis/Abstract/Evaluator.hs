@@ -33,6 +33,10 @@ modifyStore :: (StoreFor value -> StoreFor value) -> Evaluator effects value ()
 modifyStore f = Evaluator (modify f)
 
 
+getModuleTable :: Evaluator effects value (Linker value)
+getModuleTable = Evaluator get
+
+
 data Evaluator effects value a
   = Evaluator
     { runEvaluator :: Members '[ Fail
