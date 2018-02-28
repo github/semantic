@@ -31,7 +31,7 @@ newtype ModuleDef = ModuleDef { moduleDefIdentifier :: T.Text }
 --   If you’re getting errors about missing a 'CustomHasModuleDef' instance for your syntax type, you probably forgot step 1.
 --
 --   If you’re getting 'Nothing' for your syntax node at runtime, you probably forgot step 2.
-moduleDefAlgebra :: (HasField fields Range, HasField fields Span, Foldable syntax, HasModuleDef syntax) => Blob -> RAlgebra (Term syntax (Record fields)) (Maybe ModuleDef)
+moduleDefAlgebra :: (HasField fields Range, HasField fields Span, Foldable syntax, HasModuleDef syntax) => Blob -> RAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Maybe ModuleDef)
 moduleDefAlgebra blob (In ann syntax) = toModuleDef blob ann syntax
 
 

@@ -163,9 +163,9 @@ instance ( Ord (LocationFor (Value l t))
       interface val = inj . Value.Interface val <$> ask @(EnvironmentFor (Value l t))
 
       eval' [] = interface unit
-      eval' [x] = step x >>= interface
+      eval' [x] = subtermValue x >>= interface
       eval' (x:xs) = do
-        _ <- step @(Value l t) x
+        _ <- subtermValue x
         env <- get @(EnvironmentFor (Value l t))
         local (envUnion env) (eval' xs)
 
@@ -242,4 +242,4 @@ instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
 instance (Evaluatable es t v (Base t), Recursive t)
          => Evaluatable es t v Context where
-  eval Context{..} = step contextSubject
+  eval Context{..} = subtermValue contextSubject
