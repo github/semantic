@@ -25,6 +25,10 @@ localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> Evaluator effects 
 localEnv f a = Evaluator (local f (runEvaluator a))
 
 
+getStore :: Evaluator effects value (StoreFor value)
+getStore = Evaluator get
+
+
 data Evaluator effects value a
   = Evaluator
     { runEvaluator :: Members '[ Fail
