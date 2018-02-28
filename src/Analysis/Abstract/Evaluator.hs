@@ -4,6 +4,7 @@ module Analysis.Abstract.Evaluator where
 import Control.Applicative
 import Control.Monad.Effect
 import Control.Monad.Effect.Fail
+import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
@@ -41,3 +42,8 @@ instance Monad (Evaluator effects value) where
 
 instance MonadFail (Evaluator effects value) where
   fail s = Evaluator (fail s)
+
+instance Member Fresh effects => MonadFresh (Evaluator effects value) where
+  fresh = Evaluator fresh
+
+  reset t = Evaluator (reset t)
