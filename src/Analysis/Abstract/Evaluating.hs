@@ -76,8 +76,7 @@ moduleName term = let [n] = toList (freeVariables term) in BC.unpack n
 
 -- | Evaluate a term to a value.
 evaluate :: forall v term.
-         ( Ord v
-         , Ord (LocationFor v)
+         ( Ord (LocationFor v)
          , AbstractFunction (Evaluating term v) term v
          , Addressable (LocationFor v) (Evaluating term v)
          , Evaluatable (Base term)
@@ -91,8 +90,7 @@ evaluate = run @(Evaluating term v) . runEvaluator . foldSubterms eval
 
 -- | Evaluate terms and an entry point to a value.
 evaluates :: forall v term.
-          ( Ord v
-          , Ord (LocationFor v)
+          ( Ord (LocationFor v)
           , AbstractFunction (Evaluating term v) term v
           , Addressable (LocationFor v) (Evaluating term v)
           , Evaluatable (Base term)
