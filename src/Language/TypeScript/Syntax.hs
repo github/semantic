@@ -1,12 +1,8 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.TypeScript.Syntax where
 
+import Prologue
 import Diffing.Algorithm
-import Data.Align.Generic
-import Data.ByteString (ByteString)
-import Data.Functor.Classes.Generic
-import Data.Mergeable
-import GHC.Generics
 
 -- | Lookup type for a type-level key in a typescript map.
 data LookupType a = LookupType { lookupTypeIdentifier :: a, lookupTypeKey :: a }

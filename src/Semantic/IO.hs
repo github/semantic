@@ -10,19 +10,12 @@ module Semantic.IO
 , languageForFilePath
 ) where
 
+import Prologue hiding (fail)
 import Control.Monad.IO.Class
 import Data.Aeson
 import qualified Data.Blob as Blob
-import Data.Functor.Both
 import Data.Language
-import Data.Maybe
-import Data.Semigroup
 import Data.Source
-import Data.String
-import Data.Text
-import Data.These
-import Data.Traversable
-import GHC.Generics
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import Prelude hiding (readFile)

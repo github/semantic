@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, DefaultSignatures, GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Diffing.Algorithm where
 
-import Prologue hiding (Alt)
+import Prologue
 import Control.Monad.Free.Freer
 import Data.Diff
 import Data.Term

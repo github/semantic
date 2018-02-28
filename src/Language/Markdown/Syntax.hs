@@ -1,13 +1,8 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.Markdown.Syntax where
 
+import Prologue hiding (Text)
 import Diffing.Algorithm
-import Data.Align.Generic
-import Data.ByteString (ByteString)
-import Data.Functor.Classes.Generic
-import Data.Mergeable
-import GHC.Generics
-
 
 newtype Document a = Document [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

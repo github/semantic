@@ -17,10 +17,16 @@ module Data.Diff
 , stripDiff
 ) where
 
-import Prologue
-import Data.Mergeable (sequenceAlt)
+import Control.Applicative ((<|>))
 import Data.Aeson
+import Data.Bifoldable
+import Data.Bifunctor
+import Data.Bitraversable
+import Data.Foldable (asum, toList)
+import Data.Functor.Classes
+import Data.Functor.Foldable hiding (fold)
 import Data.JSON.Fields
+import Data.Mergeable (Mergeable(sequenceAlt))
 import Data.Patch
 import Data.Record
 import Data.Term

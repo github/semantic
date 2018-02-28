@@ -9,8 +9,6 @@ module Language.Go.Assignment
 import Prologue
 import Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
-import Data.Functor (void)
-import Data.List.NonEmpty (some1)
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
 import qualified Data.Syntax as Syntax

@@ -1,3 +1,4 @@
+{-# LANGUAGE UndecidableInstances #-}
 module Prologue (
   module X
 , ) where
@@ -11,6 +12,7 @@ import Control.Applicative as X
 import Data.Maybe as X
 import Data.Monoid as X (Monoid(..), First(..), Last(..))
 import Data.Pointed as X
+import Data.Functor.Both as X (Both, runBothWith, both)
 
 import Control.Monad as X hiding (fail, return)
 import Control.Monad.Fail as X (MonadFail(..))
@@ -59,6 +61,7 @@ import Data.Functor.Both (Both)
 import Data.List.NonEmpty as X (
     NonEmpty(..)
   , nonEmpty
+  , some1
   )
 
 import Data.Algebra as X
@@ -66,6 +69,7 @@ import Data.Bifunctor as X (Bifunctor(..))
 import Data.Bifunctor.Join as X
 
 import Data.ByteString as X (ByteString)
+import Data.Text as X (Text)
 
 import Data.Align.Generic as X (GAlign)
 import Data.Mergeable as X (Mergeable)

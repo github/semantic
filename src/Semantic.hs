@@ -7,25 +7,19 @@ module Semantic
 , diffTermPair
 ) where
 
+import Prologue
 import Analysis.ConstructorName (ConstructorName, constructorLabel)
 import Analysis.IdentifierName (IdentifierName, identifierLabel)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
 import Analysis.ModuleDef (HasModuleDef, moduleDefAlgebra)
-import Control.Exception
-import Control.Monad ((>=>))
 import Control.Monad.Error.Class
 import Data.Align.Generic
-import Data.Bifoldable
-import Data.Bifunctor.Join
 import Data.Blob
-import Data.ByteString (ByteString)
 import Data.Diff
-import Data.Functor.Classes
 import Data.JSON.Fields
 import Data.Output
 import Data.Record
 import Data.Term
-import Data.Typeable
 import Diffing.Algorithm (Diffable)
 import Diffing.Interpreter
 import Parsing.Parser

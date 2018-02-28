@@ -27,30 +27,22 @@ module Semantic.Task
 , runTaskWithOptions
 ) where
 
+import Prologue
 import Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
-import Control.Exception
-import Control.Monad.Error.Class
 import Control.Monad.IO.Class
 import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
-import Data.Algebra (RAlgebra)
 import Data.Blob
 import Data.Bool
 import qualified Data.ByteString as B
 import Data.Diff
 import qualified Data.Error as Error
-import Data.Foldable (fold, for_)
-import Data.Functor.Both as Both hiding (snd)
-import Data.Bitraversable
-import Data.Bifunctor
-import Data.Functor.Foldable (cata)
 import Data.Language
 import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Term
-import Data.Union
 import Parsing.Parser
 import Parsing.CMark
 import Parsing.TreeSitter

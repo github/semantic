@@ -23,8 +23,8 @@ module Rendering.Renderer
 , defaultSymbolFields
 ) where
 
+import Prologue
 import Data.Aeson (Value)
-import Data.ByteString (ByteString)
 import Data.Output
 import Rendering.DOT as R
 import Rendering.JSON as R
