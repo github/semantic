@@ -8,6 +8,7 @@ import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Value
+import Prelude hiding (fail)
 
 data Evaluator effects value a
   = Evaluator
@@ -37,3 +38,6 @@ instance Monad (Evaluator effects value) where
   return = pure
 
   Evaluator runA >>= f = Evaluator (runA >>= runEvaluator . f)
+
+instance MonadFail (Evaluator effects value) where
+  fail s = Evaluator (fail s)
