@@ -13,6 +13,7 @@ import Data.Abstract.Linker
 import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Abstract.FreeVariables
+import Data.Algebra
 import Data.Blob
 import Prelude hiding (fail)
 import qualified Data.Map as Map
@@ -73,7 +74,7 @@ evaluate :: forall v term.
          )
          => term
          -> Final (Evaluating v) v
-evaluate = run @(Evaluating v) . fix (const step)
+evaluate = run @(Evaluating v) . foldSubterms eval
 
 -- | Evaluate terms and an entry point to a value.
 evaluates :: forall v term.
@@ -85,7 +86,6 @@ evaluates :: forall v term.
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
           -> Final (Evaluating v) v
-evaluates pairs = run @(Evaluating v) . fix go
+evaluates pairs (Blob{..}, t) = run @(Evaluating v) (local @(Linker (Evaluator v)) (const (Linker (Map.fromList (map toPathActionPair pairs)))) (foldSubterms eval t))
   where
-    go _ (Blob{..}, t) = local (const (Linker (Map.fromList (map toPathActionPair pairs)))) (step @v t)
-    toPathActionPair (Blob{..}, t) = (dropExtensions blobPath, Evaluator (step @v t))
+    toPathActionPair (Blob{..}, t) = (dropExtensions blobPath, Evaluator (foldSubterms eval t))

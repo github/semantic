@@ -40,10 +40,11 @@ instance ( FreeVariables t
          ) => Evaluatable es t (Value l t) Function where
   eval Function{..} = do
     env <- ask
-    let params = toList (freeVariables1 functionParameters)
-    let v = inj (Closure params functionBody env) :: Value l t
+    let params = toList (liftFreeVariables (freeVariables . subterm) functionParameters)
+    -- FIXME: Can we store the action evaluating the body in the Value instead of the body term itself?
+    let v = inj (Closure params (subterm functionBody) env) :: Value l t
 
-    (name, addr) <- lookupOrAlloc functionName v env
+    (name, addr) <- lookupOrAlloc (subterm functionName) v env
     modify (envInsert name addr)
     pure v
 
@@ -96,10 +97,11 @@ instance ( FreeVariables t                -- To get free variables from the func
          ) => Evaluatable es t (Value l t) Method where
   eval Method{..} = do
     env <- ask
-    let params = toList (freeVariables1 methodParameters)
-    let v = inj (Closure params methodBody env) :: Value l t
+    let params = toList (liftFreeVariables (freeVariables . subterm) methodParameters)
+    -- FIXME: Can we store the action evaluating the body in the Value instead of the body term itself?
+    let v = inj (Closure params (subterm methodBody) env) :: Value l t
 
-    (name, addr) <- lookupOrAlloc methodName v env
+    (name, addr) <- lookupOrAlloc (subterm methodName) v env
     modify (envInsert name addr)
     pure v
 
@@ -279,7 +281,7 @@ instance ( Show l
          )
          => Evaluatable es t (Value l t) Import where
   eval (Import from _ _) = do
-    interface <- require @(Value l t) @t from
+    interface <- require @(Value l t) @t (subterm from)
     -- TODO: Consider returning the value instead of the interface.
     Interface _ env <- maybe
                            (fail ("expected an interface, but got: " <> show interface))

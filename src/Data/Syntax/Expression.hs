@@ -3,12 +3,13 @@ module Data.Syntax.Expression where
 
 import Control.Monad.Effect
 import Control.Monad.Effect.Addressable
+import Control.Monad.Effect.Evaluatable
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
+import Data.Algebra
 import Data.Abstract.Address
 import Data.Abstract.Environment
-import Control.Monad.Effect.Evaluatable
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type as Type
 import Data.Abstract.Value (Value, Closure(..), EnvironmentFor, StoreFor)
@@ -36,15 +37,16 @@ instance ( Ord l
          , Recursive t
          ) => Evaluatable es t (Value l t) Call where
   eval Call{..} = do
-    closure <- step @(Value l t) callFunction
+    closure <- subtermValue callFunction
     Closure names body env <- maybe (fail "expected a closure") pure (prj closure :: Maybe (Closure l t))
     bindings <- for (zip names callParams) $ \(name, param) -> do
-      v <- step param
+      v <- subtermValue param
       a <- alloc name
       assign a v
       pure (name, a)
 
-    local (const (foldr (uncurry envInsert) env bindings)) (step body)
+    -- FIXME: `para eval` precludes custom evaluation à la dead code evaluation, gc, etc.
+    local (const (foldr (uncurry envInsert) env bindings)) (foldSubterms eval body)
 
 -- TODO: Implement type checking for Call
 instance Member Fail es => Evaluatable es t Type.Type Call

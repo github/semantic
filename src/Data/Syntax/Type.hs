@@ -29,7 +29,7 @@ instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Specialize Evaluatable for Type to unify the inferred type of the subject with the specified type
 instance (Evaluatable es t v (Base t), Recursive t)
          => Evaluatable es t v Annotation where
-  eval Annotation{..} = step annotationSubject
+  eval Annotation{annotationSubject = Subterm _ action} = action
 
 
 data Function a = Function { functionParameters :: [a], functionReturn :: a }
