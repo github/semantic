@@ -123,16 +123,16 @@ instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Program where
-  -- eval (Program xs) = eval' xs
-  --   where
-  --     interface val = inj . Value.Interface val <$> askLocalEnv
-  --
-  --     eval' [] = interface unit
-  --     eval' [x] = subtermValue x >>= interface
-  --     eval' (x:xs) = do
-  --       _ <- subtermValue x
-  --       env <- getGlobalEnv
-  --       localEnv (envUnion env) (eval' xs)
+  eval (Program xs) = eval' xs
+    where
+      interface val = pure val -- inj . Value.Interface val <$> askLocalEnv
+
+      eval' [] = interface unit
+      eval' [x] = subtermValue x >>= interface
+      eval' (x:xs) = do
+        _ <- subtermValue x
+        env <- getGlobalEnv
+        localEnv (envUnion env) (eval' xs)
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
