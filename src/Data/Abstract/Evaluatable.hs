@@ -5,14 +5,14 @@ module Data.Abstract.Evaluatable
 , module Addressable
 , module Analysis
 , module FreeVariables
+, module Function
 , MonadEvaluator(..)
-, MonadFunction(..)
 ) where
 
 import Control.Abstract.Addressable as Addressable
 import Control.Abstract.Analysis as Analysis
 import Control.Abstract.Evaluator
-import Control.Abstract.Function
+import Control.Abstract.Function as Function
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Internal
 import Data.Abstract.Address
