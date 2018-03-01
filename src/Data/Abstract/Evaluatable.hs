@@ -6,7 +6,7 @@ module Data.Abstract.Evaluatable
 , module Addressable
 , module FreeVariables
 , MonadEvaluator(..)
-, MonadFunctionAbstraction(..)
+, MonadFunction(..)
 ) where
 
 import Control.Abstract.Addressable as Addressable
@@ -37,7 +37,7 @@ class Evaluatable constr where
           , FreeVariables term
           , MonadAddressable (LocationFor value) value m
           , MonadEvaluator term value m
-          , MonadFunctionAbstraction term value m
+          , MonadFunction term value m
           , Ord (LocationFor value)
           , Semigroup (Cell (LocationFor value) value)
           )
@@ -75,7 +75,7 @@ instance Evaluatable [] where
     -- to the global environment.
     localEnv (const (bindEnv (liftFreeVariables (freeVariables . subterm) xs) env)) (eval xs)
 
-class MonadEvaluator t v m => MonadFunctionAbstraction t v m where
+class MonadEvaluator t v m => MonadFunction t v m where
   abstract :: [Name] -> Subterm t (m v) -> m v
   apply :: v -> [Subterm t (m v)] -> m v
 
@@ -86,7 +86,7 @@ instance ( Evaluatable (Base t)
          , Recursive t
          , Semigroup (Cell location (Value location t))
          )
-         => MonadFunctionAbstraction t (Value location t) m where
+         => MonadFunction t (Value location t) m where
   -- FIXME: Can we store the action evaluating the body in the Value instead of the body term itself
   abstract names (Subterm body _) = inj . Closure names body <$> askLocalEnv
 
@@ -99,7 +99,7 @@ instance ( Evaluatable (Base t)
       envInsert name a <$> rest) (pure env) (zip names params)
     localEnv (mappend bindings) (foldSubterms eval body)
 
-instance (Alternative m, MonadEvaluator t (Type.Type t) m, MonadFresh m) => MonadFunctionAbstraction t (Type t) m where
+instance (Alternative m, MonadEvaluator t (Type.Type t) m, MonadFresh m) => MonadFunction t (Type t) m where
   abstract names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name

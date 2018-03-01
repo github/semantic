@@ -37,7 +37,7 @@ require :: ( AbstractValue v
            , FreeVariables term
            , MonadAddressable (LocationFor v) v m
            , MonadEvaluator term v m
-           , MonadFunctionAbstraction term v m
+           , MonadFunction term v m
            , Recursive term
            , Semigroup (Cell (LocationFor v) v)
            )
@@ -53,7 +53,7 @@ load :: ( AbstractValue v
         , Evaluatable (Base term)
         , FreeVariables term
         , MonadAddressable (LocationFor v) v m
-        , MonadFunctionAbstraction term v m
+        , MonadFunction term v m
         , MonadEvaluator term v m
         , Recursive term
         , Semigroup (Cell (LocationFor v) v)
@@ -80,7 +80,7 @@ evaluate :: forall v term.
          , Evaluatable (Base term)
          , FreeVariables term
          , MonadAddressable (LocationFor v) v (Evaluator (Evaluating term v) term v)
-         , MonadFunctionAbstraction term v (Evaluator (Evaluating term v) term v)
+         , MonadFunction term v (Evaluator (Evaluating term v) term v)
          , Recursive term
          , Semigroup (Cell (LocationFor v) v)
          )
@@ -95,7 +95,7 @@ evaluates :: forall v term.
           , Evaluatable (Base term)
           , FreeVariables term
           , MonadAddressable (LocationFor v) v (Evaluator (Evaluating term v) term v)
-          , MonadFunctionAbstraction term v (Evaluator (Evaluating term v) term v)
+          , MonadFunction term v (Evaluator (Evaluating term v) term v)
           , Recursive term
           , Semigroup (Cell (LocationFor v) v)
           )
