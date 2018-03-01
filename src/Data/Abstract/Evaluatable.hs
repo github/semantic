@@ -9,6 +9,7 @@ module Data.Abstract.Evaluatable
 ) where
 
 import Control.Abstract.Addressable as Addressable
+import Control.Abstract.Analysis
 import Control.Abstract.Evaluator
 import Control.Applicative (Alternative(..))
 import Control.Monad.Effect.Fail
@@ -73,16 +74,6 @@ instance Evaluatable [] where
     -- environment each time where the free variables in those terms are bound
     -- to the global environment.
     localEnv (const (bindEnv (liftFreeVariables (freeVariables . subterm) xs) env)) (eval xs)
-
-class Monad m => MonadAnalysis term value m where
-  evaluateTerm :: ( AbstractValue value
-                  , FreeVariables term
-                  , MonadAddressable (LocationFor value) value m
-                  , Ord (LocationFor value)
-                  , Semigroup (Cell (LocationFor value) value)
-                  )
-               => term
-               -> m value
 
 instance (Recursive t, Evaluatable (Base t), MonadFunction t v (Evaluator es t v)) => MonadAnalysis t v (Evaluator es t v) where
   evaluateTerm = foldSubterms eval
