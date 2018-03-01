@@ -167,7 +167,7 @@ instance ( Ord (LocationFor (Value l t))
       eval' (x:xs) = do
         _ <- subtermValue x
         env <- get @(EnvironmentFor (Value l t))
-        local (envUnion env) (eval' xs)
+        local (const env) (eval' xs)
 
 instance Member Fail es => Evaluatable es t Type.Type Program where
 
