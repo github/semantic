@@ -1,11 +1,8 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.Go.Type where
 
-import Data.Align.Generic
-import Data.Functor.Classes.Generic
-import Data.Mergeable
+import Prologue
 import Diffing.Algorithm
-import GHC.Generics
 
 -- | A Bidirectional channel in Go (e.g. `chan`).
 newtype BidirectionalChannel a = BidirectionalChannel a

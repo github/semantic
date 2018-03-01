@@ -1,8 +1,8 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, UndecidableInstances #-}
 module Data.Syntax.Declaration where
 
+import Prologue
 import Analysis.Abstract.Evaluating
-import Control.Applicative
 import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
@@ -12,15 +12,7 @@ import Data.Abstract.Environment
 import Control.Monad.Effect.Evaluatable
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value
-import Data.Align.Generic
-import Data.Foldable (toList)
-import Data.Functor.Classes.Generic
-import Data.Mergeable
-import Data.Semigroup
-import Data.Traversable
-import Data.Union
 import Diffing.Algorithm
-import GHC.Generics
 import Prelude hiding (fail)
 import qualified Data.Abstract.Type as Type
 import qualified Data.Abstract.Value as Value

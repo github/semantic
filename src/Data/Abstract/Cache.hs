@@ -1,13 +1,10 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, StandaloneDeriving, UndecidableInstances #-}
 module Data.Abstract.Cache where
 
+import Prologue
 import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.Store
-import Data.Functor.Classes
-import Data.Pointed
-import Data.Semigroup
-import Data.Set
 import Data.Map as Map
 
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Store's.

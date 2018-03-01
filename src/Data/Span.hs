@@ -9,12 +9,10 @@ module Data.Span
 , emptySpan
 ) where
 
+import Prologue
 import Data.Aeson ((.=), (.:))
 import qualified Data.Aeson as A
 import Data.JSON.Fields
-import Data.Hashable (Hashable)
-import Data.Semigroup
-import GHC.Generics
 
 -- | Source position information
 data Pos = Pos

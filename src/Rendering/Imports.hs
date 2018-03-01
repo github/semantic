@@ -4,18 +4,16 @@ module Rendering.Imports
 , ImportSummary(..)
 ) where
 
+import Prologue
 import Analysis.Declaration
 import Analysis.ModuleDef
 import Data.Aeson
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
-import Data.Monoid
-import Data.Maybe (mapMaybe)
 import Data.Record
 import Data.Output
 import Data.Span
 import Data.Term
-import GHC.Generics
 import System.FilePath.Posix (takeBaseName)
 import qualified Data.Text as T
 import qualified Data.Map as Map
@@ -26,7 +24,7 @@ newtype ImportSummary = ImportSummary (Map.Map T.Text Module) deriving (Eq, Show
 
 instance Monoid ImportSummary where
   mempty = ImportSummary mempty
-  mappend (ImportSummary m1) (ImportSummary m2) = ImportSummary (Map.unionWith (<>) m1 m2)
+  mappend (ImportSummary m1) (ImportSummary m2) = ImportSummary (Map.unionWith mappend m1 m2)
 
 instance Output ImportSummary where
   toOutput = toStrict . (<> "\n") . encode

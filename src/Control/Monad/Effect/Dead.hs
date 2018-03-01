@@ -1,10 +1,10 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
 module Control.Monad.Effect.Dead where
 
+import Prologue
+import Data.Set (delete)
 import Control.Monad.Effect
 import Control.Monad.Effect.State
-import Data.Semigroup
-import Data.Set
 
 -- | A set of “dead” (unreachable) terms.
 newtype Dead a = Dead { unDead :: Set a }

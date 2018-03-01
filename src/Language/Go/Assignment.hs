@@ -6,10 +6,9 @@ module Language.Go.Assignment
 , Term
 ) where
 
+import Prologue
 import Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
-import Data.Functor (void)
-import Data.List.NonEmpty (some1)
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
 import qualified Data.Syntax as Syntax
@@ -20,8 +19,6 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
-import Data.Union
-import GHC.Stack
 import Language.Go.Grammar as Grammar
 import Language.Go.Syntax as Go.Syntax
 import Language.Go.Type as Go.Type

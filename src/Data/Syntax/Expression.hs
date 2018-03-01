@@ -7,23 +7,16 @@ import Control.Monad.Effect.Evaluatable
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
-import Data.Algebra
 import Data.Abstract.Address
-import Data.Abstract.Store
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
+import Data.Abstract.Store
 import Data.Abstract.Type as Type
 import Data.Abstract.Value (CellValue(..), Value, Interface(..), Closure(..), EnvironmentFor, StoreFor)
-import Data.Align.Generic
-import Data.Functor.Classes.Generic
-import Data.Maybe
-import Data.Mergeable
-import Data.Semigroup
-import Data.Traversable
-import Data.Union
+import Data.Algebra
 import Diffing.Algorithm
-import GHC.Generics
 import Prelude hiding (fail)
+import Prologue
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }

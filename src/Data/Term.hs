@@ -11,15 +11,10 @@ module Data.Term
 , stripTerm
 ) where
 
+import Prologue
 import Data.Aeson
-import Data.Bifoldable
-import Data.Bifunctor
-import Data.Bitraversable
-import Data.Functor.Classes
-import Data.Functor.Foldable
 import Data.JSON.Fields
 import Data.Record
-import Data.Semigroup ((<>))
 import Text.Show
 
 -- | A Term with an abstract syntax tree and an annotation.

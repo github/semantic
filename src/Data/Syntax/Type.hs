@@ -4,12 +4,8 @@ module Data.Syntax.Type where
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Evaluatable
 import Data.Abstract.FreeVariables
-import Data.Align.Generic
-import Data.Functor.Classes.Generic
-import Data.Mergeable
-import Data.Union
 import Diffing.Algorithm
-import GHC.Generics
+import Prologue hiding (Map)
 
 data Array a = Array { arraySize :: Maybe a, arrayElementType :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)

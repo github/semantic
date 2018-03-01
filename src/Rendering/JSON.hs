@@ -5,16 +5,13 @@ module Rendering.JSON
 , renderJSONTerms
 ) where
 
+import Prologue
 import Data.Aeson (ToJSON, toJSON, object, (.=))
 import Data.Aeson as A
 import Data.JSON.Fields
 import Data.Blob
-import Data.Bifunctor.Join
 import qualified Data.Map as Map
-import Data.Text (Text)
 import Data.Patch
-import Data.Monoid
-import Data.These
 
 
 -- | Render a diff to a value representing its JSON.

@@ -13,13 +13,11 @@ import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Algebra
 import Data.Blob
-import Data.Functor.Foldable (Base, Recursive(..))
-import Data.Semigroup
 import Prelude hiding (fail)
+import Prologue
+import qualified Data.ByteString.Char8 as BC
 import qualified Data.Map as Map
 import System.FilePath.Posix
-
-import qualified Data.ByteString.Char8 as BC
 
 -- | The effects necessary for concrete interpretation.
 type Evaluating v

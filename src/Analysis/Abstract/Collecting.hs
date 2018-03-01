@@ -1,12 +1,12 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 module Analysis.Abstract.Collecting where
 
+import Prologue
 import Control.Monad.Effect.GC
 import Data.Abstract.Address
 import Data.Abstract.Live
 import Data.Abstract.Store
 import Data.Abstract.Value
-import Data.Semigroup
 
 -- | Small-step evaluation which garbage-collects any non-rooted addresses after evaluating each term.
 evCollect :: forall t v m

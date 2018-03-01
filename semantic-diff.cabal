@@ -126,6 +126,8 @@ library
                      , Semantic.Task
                      , Semantic.Queue
                      , Semantic.Util
+                    -- Custom Prelude
+  other-modules:       Prologue
   build-depends:       base >= 4.8 && < 5
                      , aeson
                      , algebraic-graphs
@@ -172,7 +174,15 @@ library
                      , tree-sitter-ruby
                      , tree-sitter-typescript
   default-language:    Haskell2010
-  default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards, StrictData
+  default-extensions: DeriveFoldable
+                    , DeriveFunctor
+                    , DeriveGeneric
+                    , DeriveTraversable
+                    , FlexibleContexts
+                    , FlexibleInstances
+                    , OverloadedStrings
+                    , RecordWildCards
+                    , StrictData
   ghc-options:         -Wall -fno-warn-name-shadowing -O -j
   ghc-prof-options:    -fprof-auto
 

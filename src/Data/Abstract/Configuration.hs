@@ -1,12 +1,11 @@
 {-# LANGUAGE DeriveFoldable, DeriveGeneric, FlexibleContexts, StandaloneDeriving, UndecidableInstances #-}
 module Data.Abstract.Configuration where
 
+import Prologue
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Live
 import Data.Abstract.Store
-import Data.Functor.Classes.Generic
-import GHC.Generics
 
 -- | A single point in a program’s execution.
 data Configuration l t v

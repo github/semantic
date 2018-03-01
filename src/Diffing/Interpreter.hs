@@ -3,13 +3,11 @@ module Diffing.Interpreter
 ( diffTerms
 ) where
 
+import Prologue
+import Data.Align.Generic (galignWith)
 import Analysis.Decorator
-import Control.Applicative (Alternative(..))
 import Control.Monad.Free.Freer
-import Data.Align.Generic
 import Data.Diff
-import Data.Functor.Classes
-import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Term
 import Diffing.Algorithm

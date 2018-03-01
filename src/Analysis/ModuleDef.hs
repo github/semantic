@@ -5,9 +5,8 @@ module Analysis.ModuleDef
 , moduleDefAlgebra
 ) where
 
-import Data.Algebra
+import Prologue
 import Data.Blob
-import Data.Proxy (Proxy(..))
 import Data.Range
 import Data.Record
 import Data.Source as Source
@@ -15,8 +14,6 @@ import Data.Span
 import qualified Data.Syntax.Declaration as Declaration
 import Data.Term
 import qualified Data.Text as T
-import Data.Union
-import GHC.Generics
 
 newtype ModuleDef = ModuleDef { moduleDefIdentifier :: T.Text }
   deriving (Eq, Generic, Show)
