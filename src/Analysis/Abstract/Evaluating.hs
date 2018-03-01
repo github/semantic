@@ -36,13 +36,14 @@ type Evaluating t v
 require :: ( AbstractValue v
            , Evaluatable (Base term)
            , FreeVariables term
-           , MonadAddressable (LocationFor v) v (Evaluator effects term v)
-           , MonadFunctionAbstraction term v (Evaluator effects term v)
+           , MonadAddressable (LocationFor v) v m
+           , MonadEvaluator term v m
+           , MonadFunctionAbstraction term v m
            , Recursive term
            , Semigroup (Cell (LocationFor v) v)
            )
         => term
-        -> Evaluator effects term v v
+        -> m v
 require term = getModuleTable >>= maybe (load term) pure . linkerLookup name
   where name = moduleName term
 
