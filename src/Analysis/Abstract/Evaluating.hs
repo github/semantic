@@ -33,12 +33,11 @@ type Evaluating t v
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
 require :: ( AbstractValue v
-           , Evaluatable (Base term)
            , FreeVariables term
            , MonadAddressable (LocationFor v) v m
+           , MonadAnalysis term v m
            , MonadEvaluator term v m
            , MonadFunction term v m
-           , Recursive term
            , Semigroup (Cell (LocationFor v) v)
            )
         => term
@@ -50,12 +49,11 @@ require term = getModuleTable >>= maybe (load term) pure . linkerLookup name
 --
 -- Always loads/evaluates.
 load :: ( AbstractValue v
-        , Evaluatable (Base term)
         , FreeVariables term
         , MonadAddressable (LocationFor v) v m
+        , MonadAnalysis term v m
         , MonadFunction term v m
         , MonadEvaluator term v m
-        , Recursive term
         , Semigroup (Cell (LocationFor v) v)
         )
      => term
@@ -64,7 +62,7 @@ load term = askModuleTable >>= maybe notFound evalAndCache . linkerLookup name
   where name = moduleName term
         notFound = fail ("cannot find " <> show name)
         evalAndCache e = do
-          v <- foldSubterms eval e
+          v <- evaluateTerm e
           modifyModuleTable (linkerInsert name v)
           pure v
 
