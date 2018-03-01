@@ -1,12 +1,8 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.PHP.Syntax where
 
+import Prologue hiding (Text)
 import Diffing.Algorithm
-import Data.Align.Generic
-import Data.ByteString (ByteString)
-import Data.Functor.Classes.Generic
-import Data.Mergeable
-import GHC.Generics
 
 newtype Text a = Text ByteString
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

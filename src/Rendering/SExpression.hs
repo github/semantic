@@ -4,12 +4,11 @@ module Rendering.SExpression
 , renderSExpressionTerm
 ) where
 
+import Prologue
 import Data.ByteString.Char8 hiding (intersperse, foldr, spanEnd, length, null)
 import Data.Diff
-import Data.Functor.Foldable (cata)
 import Data.Patch
 import Data.Record
-import Data.Semigroup
 import Data.Term
 import Prelude hiding (replicate)
 

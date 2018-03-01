@@ -1,11 +1,8 @@
 {-# LANGUAGE MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
 module Data.JSON.Fields where
 
+import Prologue
 import Data.Aeson
-import Data.Bifunctor.Join
-import Data.Foldable (toList)
-import Data.Proxy (Proxy(..))
-import Data.Union
 
 class ToJSONFields a where
   toJSONFields :: KeyValue kv => a -> [kv]

@@ -1,8 +1,8 @@
 {-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
 module Data.Language where
 
+import Prologue
 import Data.Aeson
-import GHC.Generics
 
 -- | A programming language.
 data Language

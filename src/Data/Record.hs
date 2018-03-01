@@ -1,10 +1,10 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Record where
 
+import Prologue
 import Data.Aeson
 import Data.JSON.Fields
 import Data.Kind
-import Data.Semigroup
 
 -- | A type-safe, extensible record structure.
 -- |

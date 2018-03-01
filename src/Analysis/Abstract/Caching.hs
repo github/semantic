@@ -1,8 +1,9 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, ScopedTypeVariables, TypeApplications #-}
 module Analysis.Abstract.Caching where
 
+import Prologue
+import Data.Monoid (Alt(..))
 import Analysis.Abstract.Collecting
-import Control.Applicative
 import Control.Effect
 import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Cache
@@ -21,11 +22,6 @@ import Data.Abstract.Eval
 import Data.Abstract.Live
 import Data.Abstract.Store
 import Data.Abstract.Value
-import Data.Function (fix)
-import Data.Functor.Foldable (Base, Recursive(..))
-import Data.Maybe
-import Data.Monoid (Alt(..))
-import Data.Semigroup
 import qualified Data.Set as Set
 
 -- | The effects necessary for caching analyses.

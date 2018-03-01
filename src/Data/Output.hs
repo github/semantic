@@ -1,10 +1,8 @@
 module Data.Output where
 
+import Prologue
 import Data.Aeson (Value, encode)
-import Data.ByteString (ByteString)
 import Data.ByteString.Lazy (toStrict)
-import Data.Map (Map)
-import Data.Semigroup
 import Data.Text (Text, intercalate)
 import Data.Text.Encoding (encodeUtf8)
 

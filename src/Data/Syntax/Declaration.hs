@@ -1,18 +1,14 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, UndecidableInstances #-}
 module Data.Syntax.Declaration where
 
-import Control.Applicative
+import Prologue
+import Analysis.Abstract.Evaluating
 import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Evaluatable
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
-import Data.Align.Generic
-import Data.Foldable (toList)
-import Data.Functor.Classes.Generic
-import Data.Mergeable
-import Data.Traversable
+import Data.Abstract.Value
 import Diffing.Algorithm
-import GHC.Generics
 import Prelude hiding (fail)
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }

@@ -2,37 +2,22 @@
 module Data.Syntax where
 
 import qualified Assigning.Assignment as Assignment
-import Control.Applicative
-import Control.Monad.Effect
 import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Evaluatable
-import Control.Monad.Effect.Fail
-import Control.Monad.Error.Class hiding (Error)
+import Control.Monad.Fail
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value (AbstractValue(..))
-import Data.Align.Generic
 import Data.AST
-import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (unpack)
 import qualified Data.Error as Error
-import Data.Foldable (asum, toList)
-import Data.Function ((&), on)
-import Data.Functor.Classes.Generic
-import Data.Ix
-import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
-import Data.Mergeable
-import Data.Pointed
 import Data.Range
 import Data.Record
-import Data.Semigroup
 import Data.Span
 import Data.Term
-import Data.Union
 import Diffing.Algorithm hiding (Empty)
-import GHC.Generics
-import GHC.Stack
 import Prelude hiding (fail)
+import Prologue
 
 -- Combinators
 

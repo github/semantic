@@ -1,18 +1,10 @@
 {-# LANGUAGE DataKinds, DefaultSignatures, GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Diffing.Algorithm where
 
-import Control.Applicative (Alternative(..))
-import Control.Monad (guard)
+import Prologue
 import Control.Monad.Free.Freer
 import Data.Diff
-import Data.Functor.Classes
-import Data.List.NonEmpty (NonEmpty(..))
-import Data.Maybe
-import Data.Proxy
 import Data.Term
-import Data.These
-import Data.Union
-import GHC.Generics
 
 -- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
 data AlgorithmF term1 term2 result partial where
@@ -159,7 +151,8 @@ class Diffable f where
   --   These two functions allow us to say e.g. that comparisons against 'Data.Syntax.Context' should also be made against its subject, but not against any of the comments, resulting in the insertion of both comments and context when documenting an existing function.
   --
   --   By default, 'subalgorithmFor' produces 'empty', rejecting substructural comparisons. This is important for performance, as alternations with 'empty' are eliminated at construction time.
-  subalgorithmFor :: Alternative g -- ^ The 'Alternative' instance will in general be 'Algorithm', but left opaque to make it harder to shoot oneself in the foot.
+  -- ^ The 'Alternative' instance will in general be 'Algorithm', but left opaque to make it harder to shoot oneself in the foot.
+  subalgorithmFor :: Alternative g
                   => (a -> g b)    -- ^ A “blur” function to traverse positions which should not be diffed against.
                   -> (a -> g b)    -- ^ A “focus” function to traverse positions which should be diffed against.
                   -> f a           -- ^ The syntax to diff inside of.

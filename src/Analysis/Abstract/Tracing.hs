@@ -1,6 +1,7 @@
 {-# LANGUAGE AllowAmbiguousTypes, DataKinds, ScopedTypeVariables, TypeApplications, TypeFamilies #-}
 module Analysis.Abstract.Tracing where
 
+import Prologue
 import Control.Effect
 import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.Addressable
@@ -16,11 +17,6 @@ import Data.Abstract.Environment
 import Data.Abstract.Eval
 import Data.Abstract.Store
 import Data.Abstract.Value
-import Data.Function (fix)
-import Data.Functor.Foldable (Base, Recursive(..))
-import Data.Pointed
-import Data.Semigroup
-import Data.Set
 
 -- | The effects necessary for tracing analyses.
 type Tracing g t v

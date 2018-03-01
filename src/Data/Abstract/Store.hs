@@ -1,14 +1,10 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, StandaloneDeriving, UndecidableInstances #-}
 module Data.Abstract.Store where
 
+import Prologue
 import Data.Abstract.Address
 import Data.Abstract.Live
-import Data.Foldable (toList)
-import Data.Functor.Classes.Generic
 import qualified Data.Map as Map
-import Data.Pointed
-import Data.Semigroup
-import GHC.Generics
 
 -- | A map of addresses onto cells holding their values.
 newtype Store l a = Store { unStore :: Map.Map l (Cell l a) }

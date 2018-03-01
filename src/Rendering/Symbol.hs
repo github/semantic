@@ -7,15 +7,13 @@ module Rendering.Symbol
 , defaultSymbolFields
 ) where
 
+import Prologue
 import Analysis.Declaration
 import Data.Aeson
 import Data.Blob
-import Data.Maybe (mapMaybe)
 import Data.Record
 import Data.Span
 import Data.Term
-import Control.Monad (join)
-import GHC.Generics
 import qualified Data.Text as T
 import qualified Data.Map as Map
 import Rendering.TOC

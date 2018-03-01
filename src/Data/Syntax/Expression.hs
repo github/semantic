@@ -3,12 +3,8 @@ module Data.Syntax.Expression where
 
 import Control.Monad.Effect.Evaluatable
 import Data.Abstract.FreeVariables
-import Data.Align.Generic
-import Data.Functor.Classes.Generic
-import Data.Mergeable
-import Data.Traversable
 import Diffing.Algorithm
-import GHC.Generics
+import Prologue hiding (apply)
 import Prelude hiding (fail)
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
