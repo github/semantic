@@ -1,19 +1,21 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, UndecidableInstances #-}
 module Data.Syntax.Declaration where
 
-import Prologue
 import Analysis.Abstract.Evaluating
 import Control.Monad.Effect.Addressable
+import Control.Monad.Effect.Evaluatable
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Address
 import Data.Abstract.Environment
-import Control.Monad.Effect.Evaluatable
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value
+import Data.Range
+import Data.Record
 import Diffing.Algorithm
 import Prelude hiding (fail)
+import Prologue
 import qualified Data.Abstract.Type as Type
 import qualified Data.Abstract.Value as Value
 
@@ -280,10 +282,13 @@ instance ( Show l
          , Evaluatable es t (Value l t) (Base t)
          , Recursive t
          , FreeVariables t
+         -- , HasField fields Range
          )
          => Evaluatable es t (Value l t) Import where
-  eval (Import from _ _) = do
-    let name = freeVariable (subterm from)
+  eval (Import from alias _) = do
+    let name = if isEmpty (project (subterm alias))
+               then freeVariable (subterm from)
+               else freeVariable (subterm alias)
 
     -- Capture current global environment
     env <- get @(EnvironmentFor (Value l t))
@@ -298,6 +303,10 @@ instance ( Show l
     modify (const (envInsert name addr env)) -- const is important—we are throwing away the modified global env and specifically crafting a new environment.
 
     pure interface
+    where
+      isEmpty Empty = True
+      isEmpty _ = False
+
 --
 instance Member Fail es => Evaluatable es t Type.Type Import
 
