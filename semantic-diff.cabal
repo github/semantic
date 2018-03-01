@@ -19,7 +19,6 @@ library
                      -- , Analysis.Abstract.Collecting
                      -- , Analysis.Abstract.Dead
                        Analysis.Abstract.Evaluating
-                     , Analysis.Abstract.Evaluator
                      -- , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
@@ -30,6 +29,8 @@ library
                      -- Semantic assignment
                      , Assigning.Assignment
                      , Assigning.Assignment.Table
+                     -- Control structures & interfaces for abstract interpretation
+                     , Control.Abstract.Evaluator
                      -- Control flow
                      , Control.Effect
                      -- Effects used in abstract interpretation

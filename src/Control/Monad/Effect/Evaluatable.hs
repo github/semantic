@@ -9,7 +9,7 @@ module Control.Monad.Effect.Evaluatable
 , MonadFunctionAbstraction(..)
 ) where
 
-import Analysis.Abstract.Evaluator as Evaluator
+import Control.Abstract.Evaluator as Evaluator
 import Control.Applicative (Alternative(..))
 import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Fail

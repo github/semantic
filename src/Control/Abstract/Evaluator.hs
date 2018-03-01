@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, FunctionalDependencies, RankNTypes, UndecidableInstances #-}
-module Analysis.Abstract.Evaluator where
+module Control.Abstract.Evaluator where
 
 import Control.Applicative
 import Control.Monad.Effect

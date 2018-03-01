@@ -1,7 +1,7 @@
 {-# LANGUAGE FunctionalDependencies, TypeFamilies, UndecidableInstances #-}
 module Control.Monad.Effect.Addressable where
 
-import Analysis.Abstract.Evaluator
+import Control.Abstract.Evaluator
 import Control.Applicative
 import Control.Monad ((<=<))
 import Control.Monad.Effect.Fail
