@@ -46,7 +46,7 @@ evaluateDead term = run @(DeadCodeEvaluating term value) . runEvaluator . runDea
   killAll (subterms term)
   evaluateTerm term
   where subterms :: (Ord a, Recursive a, Foldable (Base a)) => a -> Dead a
-        subterms = para (foldMap (uncurry ((<>) . point)))
+        subterms term = para (foldMap (uncurry ((<>) . point))) term <> point term
 
 
 newtype DeadCodeEvaluation term value a = DeadCodeEvaluation { runDeadCodeEvaluation :: Evaluator (DeadCodeEvaluating term value) term value a }
