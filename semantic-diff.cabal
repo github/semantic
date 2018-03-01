@@ -42,7 +42,7 @@ library
                      -- , Control.Monad.Effect.GC
                      -- , Control.Monad.Effect.NonDet
                      -- , Control.Monad.Effect.Trace
-                     -- General datatype definitions & generic algorithms
+                     -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
                      , Data.Abstract.Cache
                      , Data.Abstract.Configuration
@@ -53,6 +53,7 @@ library
                      , Data.Abstract.Store
                      , Data.Abstract.Type
                      , Data.Abstract.Value
+                     -- General datatype definitions & generic algorithms
                      , Data.Algebra
                      , Data.Align.Generic
                      , Data.AST
