@@ -3,13 +3,14 @@ module Data.Abstract.Evaluatable
 ( Evaluatable(..)
 , AbstractValue(..)
 , module Addressable
+, module Analysis
 , module FreeVariables
 , MonadEvaluator(..)
 , MonadFunction(..)
 ) where
 
 import Control.Abstract.Addressable as Addressable
-import Control.Abstract.Analysis
+import Control.Abstract.Analysis as Analysis
 import Control.Abstract.Evaluator
 import Control.Applicative (Alternative(..))
 import Control.Monad.Effect.Fail
