@@ -91,6 +91,16 @@ type family LocationFor value :: * where
   LocationFor Type.Type = Monovariant
 
 
+-- | Extract the value back out of a cell.
+class CellValue l v where
+  val :: Cell l v -> v
+
+instance CellValue Precise v where
+  val Latest{..} = unLatest
+
+instance CellValue Monovariant v where
+  val = undefined
+
 -- | Value types, e.g. closures, which can root a set of addresses.
 class ValueRoots l v | v -> l where
   -- | Compute the set of addresses rooted by a given value.
