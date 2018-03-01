@@ -31,3 +31,6 @@
 [submodule "vendor/grpc-haskell"]
 	path = vendor/grpc-haskell
 	url = https://github.com/awakesecurity/gRPC-haskell/
+[submodule "vendor/proto3-suite"]
+	path = vendor/proto3-suite
+	url = https://github.com/joshvera/proto3-suite
