@@ -35,10 +35,10 @@ library
                      , Control.Abstract.Function
                      -- Control flow
                      , Control.Effect
-                     -- Effects used in abstract interpretation
+                     -- Effects used for program analysis
                      -- , Control.Monad.Effect.Cache
                      -- , Control.Monad.Effect.Dead
-                     -- , Control.Monad.Effect.Fresh
+                     , Control.Monad.Effect.Fresh
                      -- , Control.Monad.Effect.GC
                      -- , Control.Monad.Effect.NonDet
                      -- , Control.Monad.Effect.Trace
