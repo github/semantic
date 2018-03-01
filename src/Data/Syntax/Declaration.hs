@@ -17,7 +17,6 @@ instance Eq1 Function where liftEq = genericLiftEq
 instance Ord1 Function where liftCompare = genericLiftCompare
 instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement evaluation under the binder for the typechecking evaluator.
 -- TODO: Filter the closed-over environment by the free variables in the term.
 -- TODO: How should we represent function types, where applicable?
 
