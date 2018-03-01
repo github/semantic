@@ -4,10 +4,8 @@ module Control.Monad.Effect.Addressable where
 import Analysis.Abstract.Evaluator
 import Control.Applicative
 import Control.Monad ((<=<))
--- import Control.Monad.Effect (Eff)
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.NonDetEff
--- import Control.Monad.Effect.State
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
