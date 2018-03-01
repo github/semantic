@@ -93,9 +93,9 @@ class MonadEvaluator t v m => MonadFunction t v m where
   abstract :: [Name] -> Subterm t (m v) -> m v
   apply :: v -> [Subterm t (m v)] -> m v
 
-instance ( Evaluatable (Base t)
-         , FreeVariables t
+instance ( FreeVariables t
          , MonadAddressable location (Value location t) m
+         , MonadAnalysis t (Value location t) m
          , MonadEvaluator t (Value location t) m
          , Recursive t
          , Semigroup (Cell location (Value location t))
@@ -111,7 +111,7 @@ instance ( Evaluatable (Base t)
       a <- alloc name
       assign a v
       envInsert name a <$> rest) (pure env) (zip names params)
-    localEnv (mappend bindings) (foldSubterms eval body)
+    localEnv (mappend bindings) (evaluateTerm body)
 
 instance (Alternative m, MonadEvaluator t (Type.Type t) m, MonadFresh m) => MonadFunction t (Type t) m where
   abstract names (Subterm _ body) = do
