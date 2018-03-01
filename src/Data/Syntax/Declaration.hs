@@ -11,8 +11,6 @@ import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value
-import Data.Range
-import Data.Record
 import Diffing.Algorithm
 import Prelude hiding (fail)
 import Prologue
@@ -286,26 +284,19 @@ instance ( Show l
          )
          => Evaluatable es t (Value l t) Import where
   eval (Import from alias _) = do
-    let name = if isEmpty (project (subterm alias))
-               then freeVariable (subterm from)
-               else freeVariable (subterm alias)
-
     -- Capture current global environment
     env <- get @(EnvironmentFor (Value l t))
 
     -- Evaluate the import, the interface value we get back will contain an
     -- environment but evaluating will have also have potentially updated the
     -- global environment.
-    interface <- require @(Value l t) name
+    interface <- require @(Value l t) (freeVariable (subterm from))
 
     -- Restore previous global environment, adding the imported env
-    (name, addr) <- lookupOrAlloc' name interface env
+    (name, addr) <- lookupOrAlloc' (freeVariable (subterm alias)) interface env
     modify (const (envInsert name addr env)) -- const is important—we are throwing away the modified global env and specifically crafting a new environment.
 
     pure interface
-    where
-      isEmpty Empty = True
-      isEmpty _ = False
 
 --
 instance Member Fail es => Evaluatable es t Type.Type Import
