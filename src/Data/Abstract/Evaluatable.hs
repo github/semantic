@@ -21,7 +21,6 @@ import Data.Abstract.FreeVariables as FreeVariables
 import Data.Abstract.Value
 import Data.Algebra
 import Data.Functor.Classes
-import Data.Functor.Foldable (Base, Recursive(..))
 import Data.Proxy
 import Data.Semigroup
 import Data.Term
@@ -74,14 +73,3 @@ instance Evaluatable [] where
     -- environment each time where the free variables in those terms are bound
     -- to the global environment.
     localEnv (const (bindEnv (liftFreeVariables (freeVariables . subterm) xs) env)) (eval xs)
-
-instance ( AbstractValue v
-         , Evaluatable (Base t)
-         , FreeVariables t
-         , MonadAddressable (LocationFor v) v (Evaluator es t v)
-         , MonadFunction t v (Evaluator es t v)
-         , Recursive t
-         , Semigroup (Cell (LocationFor v) v)
-         )
-         => MonadAnalysis t v (Evaluator es t v) where
-  evaluateTerm = foldSubterms eval
