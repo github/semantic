@@ -103,7 +103,7 @@ evaluates :: forall v term.
 evaluates pairs (_, t) = run @(Evaluating term v) (runEvaluator (localModuleTable (const (Linker (Map.fromList (map (first (dropExtensions . blobPath)) pairs)))) (foldSubterms eval t)))
 
 newtype Evaluation term value a = Evaluation { runEvaluation :: Evaluator (Evaluating term value) term value a }
-  deriving (Applicative, Functor, Monad)
+  deriving (Applicative, Functor, Monad, MonadFail)
 
 instance ( AbstractValue v
          , Evaluatable (Base t)
