@@ -71,4 +71,4 @@ evaluates :: forall v term.
           -> Final (Evaluating v) v
 evaluates pairs (Blob{..}, t) = run @(Evaluating v) (local @(Linker (Evaluator v)) (const (Linker (Map.fromList (map toPathActionPair pairs)))) (foldSubterms eval t))
   where
-    toPathActionPair (Blob{..}, t) = (BC.pack (dropExtensions blobPath), Evaluator (foldSubterms eval t))
+    toPathActionPair (Blob{..}, t) = (BC.pack (takeBaseName blobPath), Evaluator (foldSubterms eval t))
