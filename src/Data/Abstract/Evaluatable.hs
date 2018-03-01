@@ -12,14 +12,12 @@ module Data.Abstract.Evaluatable
 import Control.Abstract.Addressable as Addressable
 import Control.Abstract.Analysis as Analysis
 import Control.Abstract.Evaluator
-import Control.Applicative (Alternative(..))
+import Control.Abstract.Function
 import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.Internal
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables as FreeVariables
-import Data.Abstract.Type as Type
 import Data.Abstract.Value
 import Data.Algebra
 import Data.Functor.Classes
@@ -86,44 +84,3 @@ instance ( AbstractValue v
          )
          => MonadAnalysis t v (Evaluator es t v) where
   evaluateTerm = foldSubterms eval
-
--- FIXME: this should live in Control.Abstract.Function once it doesn’t need to reference Evaluatable.
-class MonadEvaluator t v m => MonadFunction t v m where
-  abstract :: [Name] -> Subterm t (m v) -> m v
-  apply :: v -> [Subterm t (m v)] -> m v
-
-instance ( FreeVariables t
-         , MonadAddressable location (Value location t) m
-         , MonadAnalysis t (Value location t) m
-         , MonadEvaluator t (Value location t) m
-         , Recursive t
-         , Semigroup (Cell location (Value location t))
-         )
-         => MonadFunction t (Value location t) m where
-  abstract names (Subterm body _) = inj . Closure names body <$> askLocalEnv
-
-  apply op params = do
-    Closure names body env <- maybe (fail "expected a closure") pure (prj op)
-    bindings <- foldr (\ (name, param) rest -> do
-      v <- subtermValue param
-      a <- alloc name
-      assign a v
-      envInsert name a <$> rest) (pure env) (zip names params)
-    localEnv (mappend bindings) (evaluateTerm body)
-
-instance (Alternative m, MonadEvaluator t (Type.Type t) m, MonadFresh m) => MonadFunction t (Type t) m where
-  abstract names (Subterm _ body) = do
-    (env, tvars) <- foldr (\ name rest -> do
-      a <- alloc name
-      tvar <- Var <$> fresh
-      assign a tvar
-      (env, tvars) <- rest
-      pure (envInsert name a env, tvar : tvars)) (pure mempty) names
-    ret <- localEnv (mappend env) body
-    pure (Type.Product tvars :-> ret)
-
-  apply op params = do
-    tvar <- fresh
-    paramTypes <- traverse subtermValue params
-    _ :-> ret <- op `unify` (Type.Product paramTypes :-> Var tvar)
-    pure ret
