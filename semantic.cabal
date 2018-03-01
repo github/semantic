@@ -1,8 +1,8 @@
-name:                semantic-diff
+name:                semantic
 version:             0.3.0
 synopsis:            Initial project template from stack
 description:         Please see README.md
-homepage:            http://github.com/github/semantic-diff#readme
+homepage:            http://github.com/github/semantic#readme
 author:              Rob Rix, Josh Vera
 maintainer:          rob.rix@github.com
 copyright:           2016 GitHub
@@ -108,7 +108,7 @@ library
                      , Parsing.CMark
                      , Parsing.Parser
                      , Parsing.TreeSitter
-                     , Paths_semantic_diff
+                     , Paths_semantic
                      -- Rendering formats
                      , Rendering.DOT
                      , Rendering.Imports
@@ -193,7 +193,7 @@ executable semantic
   cc-options:          -DU_STATIC_IMPLEMENTATION=1
   cpp-options:         -DU_STATIC_IMPLEMENTATION=1
   build-depends:       base
-                     , semantic-diff
+                     , semantic
   default-language:    Haskell2010
   default-extensions:  FlexibleInstances, OverloadedStrings, RecordWildCards
 
@@ -240,7 +240,7 @@ test-suite test
                      , network
                      , containers
                      , recursion-schemes >= 4.1
-                     , semantic-diff
+                     , semantic
                      , text >= 1.2.1.3
                      , these
   ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j
@@ -249,4 +249,4 @@ test-suite test
 
 source-repository head
   type:     git
-  location: https://github.com/github/semantic-diff
+  location: https://github.com/github/semantic
