@@ -74,6 +74,20 @@ instance Evaluatable [] where
     -- to the global environment.
     localEnv (const (bindEnv (liftFreeVariables (freeVariables . subterm) xs) env)) (eval xs)
 
+class Monad m => MonadAnalysis term value m where
+  evaluateTerm :: ( AbstractValue value
+                  , FreeVariables term
+                  , MonadAddressable (LocationFor value) value m
+                  , MonadFunction term value m
+                  , Ord (LocationFor value)
+                  , Semigroup (Cell (LocationFor value) value)
+                  )
+               => term
+               -> m value
+
+instance (Recursive t, Evaluatable (Base t)) => MonadAnalysis t v (Evaluator es t v) where
+  evaluateTerm = foldSubterms eval
+
 -- FIXME: this should live in Control.Abstract.Function once it doesn’t need to reference Evaluatable.
 class MonadEvaluator t v m => MonadFunction t v m where
   abstract :: [Name] -> Subterm t (m v) -> m v
