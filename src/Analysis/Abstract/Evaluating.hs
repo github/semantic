@@ -11,11 +11,9 @@ import Control.Monad.Effect.State
 import Data.Abstract.Linker
 import Data.Abstract.Store
 import Data.Abstract.Value
-import Data.Abstract.FreeVariables
 import Data.Algebra
 import Data.Blob
 import Data.Functor.Foldable (Base, Recursive(..))
-import Data.Foldable (toList)
 import Data.Semigroup
 import Prelude hiding (fail)
 import qualified Data.Map as Map
