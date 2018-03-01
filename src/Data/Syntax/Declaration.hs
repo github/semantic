@@ -272,15 +272,12 @@ instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
-instance ( Show l
-         , Show t
-         , Semigroup (Cell l (Value l t)) -- lookupOrAlloc
+instance ( Semigroup (Cell l (Value l t))
          , Members (Evaluating (Value l t)) es
          , Addressable l es
          , Evaluatable es t (Value l t) (Base t)
          , Recursive t
          , FreeVariables t
-         -- , HasField fields Range
          )
          => Evaluatable es t (Value l t) Import where
   eval (Import from alias _) = do
@@ -294,11 +291,26 @@ instance ( Show l
 
     -- Restore previous global environment, adding the imported env
     (name, addr) <- lookupOrAlloc' (qualifiedName (subterm alias)) interface env
-    modify (const (envInsert name addr env)) -- const is important—we are throwing away the modified global env and specifically crafting a new environment.
+    modify (const (envInsert name addr env)) -- const is important. We are throwing away the modified global env and specifically crafting a new one.
 
     pure interface
 
 instance Member Fail es => Evaluatable es t Type.Type Import
+
+
+-- | A wildcard import
+data WildcardImport a = WildcardImport { wildcardImportFrom :: !a, wildcardImportSymbol :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 WildcardImport where liftEq = genericLiftEq
+instance Ord1 WildcardImport where liftCompare = genericLiftCompare
+instance Show1 WildcardImport where liftShowsPrec = genericLiftShowsPrec
+
+instance ( Members (Evaluating v) es
+         , FreeVariables t
+         )
+         => Evaluatable es t v WildcardImport where
+  eval (WildcardImport from _) = require @v (qualifiedName (subterm from))
 
 
 -- | An imported symbol

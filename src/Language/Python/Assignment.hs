@@ -37,6 +37,7 @@ type Syntax =
    , Declaration.Import
    , Declaration.ImportSymbol
    , Declaration.Variable
+   , Declaration.WildcardImport
    , Expression.Arithmetic
    , Expression.Boolean
    , Expression.Bitwise
@@ -374,11 +375,12 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 import' :: Assignment
 import' =  makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliasedImport <|> plainImport))
-       <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> (dottedName <|> emptyTerm) <*> emptyTerm <*> someTerm (wildCard <|> dottedName <|> aliasedSymbol <|> importSymbol))
+       <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> (dottedName <|> emptyTerm) <*> emptyTerm <*> someTerm (dottedName <|> aliasedSymbol <|> importSymbol))
+       <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.WildcardImport <$> dottedName <*> wildcard)
   where
     importSymbol = makeTerm <$> location <*> (Declaration.ImportSymbol <$> expression <*> emptyTerm)
     aliasedSymbol = makeTerm <$> symbol AliasedImport <*> children (Declaration.ImportSymbol <$> expression <*> expression)
-    wildCard = makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
+    wildcard = makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
 
     aliasedImport = makeImport <$> symbol AliasedImport <*> children ((,) <$> expression <*> (Just <$> expression))
     plainImport = makeImport <$> symbol DottedName <*> children ((,) <$> expressions <*> pure Nothing)
