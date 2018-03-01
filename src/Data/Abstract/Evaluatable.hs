@@ -16,7 +16,6 @@ import Control.Abstract.Analysis as Analysis
 import Control.Abstract.Evaluator
 import Control.Abstract.Function as Function
 import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Internal
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables as FreeVariables
@@ -28,10 +27,8 @@ import Data.Functor.Classes
 import Data.Proxy
 import Data.Semigroup
 import Data.Term
-import Data.Union (Apply)
 import Prelude hiding (fail)
 import Prologue
-import qualified Data.Union as U
 
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
@@ -51,7 +48,7 @@ class Evaluatable constr where
 
 -- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
 instance Apply Evaluatable fs => Evaluatable (Union fs) where
-  eval = U.apply (Proxy :: Proxy Evaluatable) eval
+  eval = Prologue.apply (Proxy :: Proxy Evaluatable) eval
 
 -- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
 instance Evaluatable s => Evaluatable (TermF s a) where
