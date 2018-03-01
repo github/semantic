@@ -7,17 +7,14 @@ module Control.Monad.Effect.Evaluatable
 , Base
 , Subterm(..)
 , AbstractFunction(..)
-, Analysis(..)
 ) where
 
 import Analysis.Abstract.Evaluator as Evaluator
 import Control.Monad.Effect.Addressable
-import Control.Monad.Effect.Dead
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.Internal
 import Control.Monad.Effect.NonDetEff
-import Control.Monad.Effect.State
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
@@ -25,7 +22,7 @@ import Data.Abstract.Type as Type
 import Data.Abstract.Value
 import Data.Algebra
 import Data.Functor.Classes
-import Data.Functor.Foldable (Base, Corecursive(..), Recursive(..))
+import Data.Functor.Foldable (Base, Recursive(..), project)
 import Data.Proxy
 import Data.Semigroup
 import Data.Term
@@ -36,15 +33,14 @@ import qualified Data.Union as U
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
-  eval :: ( AbstractFunction m term value
-          , MonadAddressable value (LocationFor value) m
+  eval :: ( AbstractFunction effects term value
+          , Addressable (LocationFor value) effects
           , FreeVariables term
           , Ord (LocationFor value)
           , Semigroup (Cell (LocationFor value) value)
-          , MonadEvaluator term value m
           )
-          => SubtermAlgebra constr term (m value)
-  default eval :: (FreeVariables term, Show1 constr, MonadFail m) => SubtermAlgebra constr term (m value)
+          => SubtermAlgebra constr term (Evaluator effects term value value)
+  default eval :: (FreeVariables term, Show1 constr) => SubtermAlgebra constr term (Evaluator effects term value value)
   eval expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
 -- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
@@ -77,17 +73,11 @@ instance Evaluatable [] where
     -- to the global environment.
     localEnv (const (bindEnv (liftFreeVariables (freeVariables . subterm) xs) env)) (eval xs)
 
-class AbstractValue v => AbstractFunction m t v | v -> t where
-  abstract :: [Name] -> Subterm t (m v) -> m v
-  apply :: v -> [Subterm t (m v)] -> m v
+class AbstractValue v => AbstractFunction effects t v | v -> t where
+  abstract :: [Name] -> Subterm t (Evaluator effects t v v) -> Evaluator effects t v v
+  apply :: v -> [Subterm t (Evaluator effects t v v)] -> Evaluator effects t v v
 
-instance ( Analysis t (Value location t) m
-         , FreeVariables t
-         , MonadAddressable (Value location t) location m
-         , MonadEvaluator t (Value location t) m
-         , Semigroup (Cell location (Value location t))
-         )
-         => AbstractFunction m t (Value location t) where
+instance (Addressable location effects, Semigroup (Cell location (Value location t)), Recursive t, Evaluatable (Base t), FreeVariables t) => AbstractFunction effects t (Value location t) where
   -- FIXME: Can we store the action evaluating the body in the Value instead of the body term itself
   abstract names (Subterm body _) = inj . Closure names body <$> askLocalEnv
 
@@ -98,9 +88,9 @@ instance ( Analysis t (Value location t) m
       a <- alloc name
       assign a v
       envInsert name a <$> rest) (pure env) (zip names params)
-    localEnv (mappend bindings) (runAnalysis body)
+    localEnv (mappend bindings) (foldSubterms eval body)
 
-instance Members '[Fresh, NonDetEff] effects => AbstractFunction (Evaluator effects t (Type t)) t (Type t) where
+instance Members '[Fresh, NonDetEff] effects => AbstractFunction effects t (Type t) where
   abstract names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
@@ -116,40 +106,3 @@ instance Members '[Fresh, NonDetEff] effects => AbstractFunction (Evaluator effe
     paramTypes <- traverse subtermValue params
     _ :-> ret <- op `unify` (Type.Product paramTypes :-> Var tvar)
     pure ret
-
-
-class Analysis term value m | m -> term, m -> value where
-  runAnalysis :: term -> m value
-
-instance ( AbstractFunction (Evaluator effects term value) term value
-         , MonadAddressable value (LocationFor value) (Evaluator effects term value)
-         , Evaluatable (Base term)
-         , FreeVariables term
-         , Ord (LocationFor value)
-         , Recursive term
-         , Semigroup (Cell (LocationFor value) value)
-         )
-         => Analysis term value (Evaluator effects term value) where
-  runAnalysis = foldSubterms eval
-
-newtype DeadAnalysis effects term value a = DeadAnalysis { runDeadAnalysis :: Evaluator effects term value a }
-
-instance ( AbstractFunction (Evaluator effects term value) term value
-         , Corecursive term
-         , Evaluatable (Base term)
-         , FreeVariables term
-         , Member (State (Dead term)) effects
-         , MonadAddressable value (LocationFor value) (Evaluator effects term value)
-         , Ord (LocationFor value)
-         , Ord term
-         , Recursive term
-         , Semigroup (Cell (LocationFor value) value)
-         )
-         => Analysis term value (DeadAnalysis effects term value) where
-  runAnalysis = DeadAnalysis . foldSubterms (\ term -> do
-    revive (embed (fmap subterm term))
-    eval term)
-
-instance Member (State (Dead term)) effects => MonadDead term (Evaluator effects term value) where
-  killAll t = Evaluator (killAll t)
-  revive t = Evaluator (revive t)

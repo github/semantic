@@ -37,35 +37,35 @@ type Evaluating t v
 -- | Require/import another term/file and return an Effect.
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
-require :: ( AbstractFunction m term v
-           , Analysis term v m
-           , MonadAddressable v (LocationFor v) m
-           , MonadEvaluator term v m
+require :: ( AbstractFunction effects term v
+           , Addressable (LocationFor v) effects
+           , Evaluatable (Base term)
            , FreeVariables term
+           , Recursive term
            , Semigroup (Cell (LocationFor v) v)
            )
         => term
-        -> m v
+        -> Evaluator effects term v v
 require term = getModuleTable >>= maybe (load term) pure . linkerLookup name
   where name = moduleName term
 
 -- | Load another term/file and return an Effect.
 --
 -- Always loads/evaluates.
-load :: ( AbstractFunction m term v
-        , Analysis term v m
-        , MonadAddressable v (LocationFor v) m
-        , MonadEvaluator term v m
+load :: ( AbstractFunction effects term v
+        , Addressable (LocationFor v) effects
+        , Evaluatable (Base term)
         , FreeVariables term
+        , Recursive term
         , Semigroup (Cell (LocationFor v) v)
         )
      => term
-     -> m v
+     -> Evaluator effects term v v
 load term = askModuleTable >>= maybe notFound evalAndCache . linkerLookup name
   where name = moduleName term
         notFound = fail ("cannot find " <> show name)
         evalAndCache e = do
-          v <- runAnalysis e
+          v <- foldSubterms eval e
           modifyModuleTable (linkerInsert name v)
           pure v
 
@@ -77,8 +77,8 @@ moduleName term = let [n] = toList (freeVariables term) in BC.unpack n
 -- | Evaluate a term to a value.
 evaluate :: forall v term.
          ( Ord (LocationFor v)
-         , AbstractFunction (Evaluator (Evaluating term v) term v) term v
-         , MonadAddressable v (LocationFor v) (Evaluator (Evaluating term v) term v)
+         , AbstractFunction (Evaluating term v) term v
+         , Addressable (LocationFor v) (Evaluating term v)
          , Evaluatable (Base term)
          , FreeVariables term
          , Recursive term
@@ -91,8 +91,8 @@ evaluate = run @(Evaluating term v) . runEvaluator . foldSubterms eval
 -- | Evaluate terms and an entry point to a value.
 evaluates :: forall v term.
           ( Ord (LocationFor v)
-          , AbstractFunction (Evaluator (Evaluating term v) term v) term v
-          , MonadAddressable v (LocationFor v) (Evaluator (Evaluating term v) term v)
+          , AbstractFunction (Evaluating term v) term v
+          , Addressable (LocationFor v) (Evaluating term v)
           , Evaluatable (Base term)
           , FreeVariables term
           , Recursive term
