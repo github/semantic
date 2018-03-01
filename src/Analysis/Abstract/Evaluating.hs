@@ -38,34 +38,19 @@ newtype Evaluator v = Evaluator { runEvaluator :: Eff (Evaluating v) v }
 -- | Require/import another term/file and return an Effect.
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
-require :: forall v term es.
-        ( Members (Evaluating v) es
-        , FreeVariables term
-        )
-        => term -> Eff es v
-require term = get @(Linker v) >>= maybe (load term) pure . linkerLookup name
-  where name = moduleName term
+require :: forall v es. (Members (Evaluating v) es) => ModuleName -> Eff es v
+require name = get @(Linker v) >>= maybe (load name) pure . linkerLookup name
 
 -- | Load another term/file and return an Effect.
 --
 -- Always loads/evaluates.
-load :: forall v term es.
-        ( Members (Evaluating v) es
-        , FreeVariables term
-        )
-        => term -> Eff es v
-load term = ask @(Linker (Evaluator v)) >>= maybe notFound evalAndCache . linkerLookup name
-  where name = moduleName term
-        notFound = fail ("cannot find " <> show name)
+load :: forall v es. (Members (Evaluating v) es) => ModuleName -> Eff es v
+load name = ask @(Linker (Evaluator v)) >>= maybe notFound evalAndCache . linkerLookup name
+  where notFound = fail ("cannot find " <> show name)
         evalAndCache e = do
           v <- raiseEmbedded (runEvaluator e)
           modify @(Linker v) (linkerInsert name v)
           pure v
-
--- | Get a module name from a term (expects single free variables).
-moduleName :: FreeVariables term => term -> Prelude.String
-moduleName term = let [n] = toList (freeVariables term) in BC.unpack n
-
 
 -- | Evaluate a term to a value.
 evaluate :: forall v term.
@@ -90,4 +75,4 @@ evaluates :: forall v term.
           -> Final (Evaluating v) v
 evaluates pairs (Blob{..}, t) = run @(Evaluating v) (local @(Linker (Evaluator v)) (const (Linker (Map.fromList (map toPathActionPair pairs)))) (foldSubterms eval t))
   where
-    toPathActionPair (Blob{..}, t) = (dropExtensions blobPath, Evaluator (foldSubterms eval t))
+    toPathActionPair (Blob{..}, t) = (BC.pack (dropExtensions blobPath), Evaluator (foldSubterms eval t))

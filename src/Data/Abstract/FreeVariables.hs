@@ -31,6 +31,8 @@ class FreeVariables1 syntax where
 freeVariables1 :: (FreeVariables1 t, FreeVariables a) => t a -> Set Name
 freeVariables1 = liftFreeVariables freeVariables
 
+freeVariable :: FreeVariables term => term -> Name
+freeVariable term = let [n] = toList (freeVariables term) in n
 
 instance (FreeVariables1 syntax, Functor syntax) => FreeVariables (Term syntax ann) where
   freeVariables = cata (liftFreeVariables id)
