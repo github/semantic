@@ -81,11 +81,12 @@ class MonadEvaluator t v m => MonadFunctionAbstraction t v m where
 
 instance ( Evaluatable (Base t)
          , FreeVariables t
-         , MonadAddressable location (Value location t) (Evaluator effects t (Value location t))
+         , MonadAddressable location (Value location t) m
+         , MonadEvaluator t (Value location t) m
          , Recursive t
          , Semigroup (Cell location (Value location t))
          )
-         => MonadFunctionAbstraction t (Value location t) (Evaluator effects t (Value location t)) where
+         => MonadFunctionAbstraction t (Value location t) m where
   -- FIXME: Can we store the action evaluating the body in the Value instead of the body term itself
   abstract names (Subterm body _) = inj . Closure names body <$> askLocalEnv
 
