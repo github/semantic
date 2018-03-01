@@ -66,7 +66,7 @@ instance Evaluatable [] where
   eval [x]    = subtermValue x -- Return the value for the last term
   eval (x:xs) = do
     _ <- subtermValue x        -- Evaluate the head term
-    env <- getGlobalEnv                 -- Get the global environment after evaluation
+    env <- getGlobalEnv        -- Get the global environment after evaluation
                                -- since it might have been modified by the
                                -- evaluation above ^.
 
