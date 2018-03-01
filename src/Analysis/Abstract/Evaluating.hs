@@ -101,3 +101,5 @@ evaluates :: forall v term.
           -> (Blob, term)   -- Entrypoint
           -> Final (Evaluating term v) v
 evaluates pairs (_, t) = run @(Evaluating term v) (runEvaluator (localModuleTable (const (Linker (Map.fromList (map (first (dropExtensions . blobPath)) pairs)))) (foldSubterms eval t)))
+
+newtype Evaluation term value a = Evaluation { runEvaluation :: Evaluator (Evaluating term value) term value a }
