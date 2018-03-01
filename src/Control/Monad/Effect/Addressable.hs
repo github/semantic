@@ -74,9 +74,7 @@ instance (Monad m, MonadEvaluator t v m, LocationFor v ~ Precise) => MonadAddres
       uninitializedAddress :: MonadFail m => m a
       uninitializedAddress = fail "uninitialized address"
 
-  alloc _ = fmap allocPrecise getStore
-    where allocPrecise :: Store Precise a -> Address Precise a
-          allocPrecise = Address . Precise . storeSize
+  alloc _ = fmap (Address . Precise . storeSize) getStore
 
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
