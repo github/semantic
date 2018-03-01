@@ -21,12 +21,12 @@ import qualified Data.ByteString.Char8 as BC
 
 -- | The effects necessary for concrete interpretation.
 type Evaluating t v
-  = '[ Fail
-     , State (Store (LocationFor v) v)
-     , State (EnvironmentFor v)  -- Global (imperative) environment
-     , Reader (EnvironmentFor v) -- Local environment (e.g. binding over a closure)
-     , Reader (Linker t)         -- Cache of unevaluated modules
-     , State (Linker v)          -- Cache of evaluated modules
+  = '[ Fail                            -- Failure with an error message
+     , State (Store (LocationFor v) v) -- The heap
+     , State (EnvironmentFor v)        -- Global (imperative) environment
+     , Reader (EnvironmentFor v)       -- Local environment (e.g. binding over a closure)
+     , Reader (Linker t)               -- Cache of unevaluated modules
+     , State (Linker v)                -- Cache of evaluated modules
      ]
 
 -- | Require/import another term/file and return an Effect.
