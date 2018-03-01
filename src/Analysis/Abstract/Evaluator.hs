@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, RankNTypes, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, FunctionalDependencies, RankNTypes, UndecidableInstances #-}
 module Analysis.Abstract.Evaluator where
 
 import Control.Applicative
@@ -12,39 +12,38 @@ import Data.Abstract.Linker
 import Data.Abstract.Value
 import Prelude hiding (fail)
 
-getGlobalEnv :: Evaluator effects term value (EnvironmentFor value)
-getGlobalEnv = Evaluator get
+class MonadFail m => MonadEvaluator term value m | m -> value, m -> term where
+  getGlobalEnv :: m (EnvironmentFor value)
+  modifyGlobalEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m ()
 
-modifyGlobalEnv :: (EnvironmentFor value -> EnvironmentFor value) -> Evaluator effects term value ()
-modifyGlobalEnv f = Evaluator (modify f)
+  askLocalEnv :: m (EnvironmentFor value)
+  localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m a -> m a
 
+  getStore :: m (StoreFor value)
+  modifyStore :: (StoreFor value -> StoreFor value) -> m ()
 
-askLocalEnv :: Evaluator effects term value (EnvironmentFor value)
-askLocalEnv = Evaluator ask
+  getModuleTable :: m (Linker value)
+  modifyModuleTable :: (Linker value -> Linker value) -> m ()
 
-localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> Evaluator effects term value a -> Evaluator effects term value a
-localEnv f a = Evaluator (local f (runEvaluator a))
-
-
-getStore :: Evaluator effects term value (StoreFor value)
-getStore = Evaluator get
-
-modifyStore :: (StoreFor value -> StoreFor value) -> Evaluator effects term value ()
-modifyStore f = Evaluator (modify f)
+  askModuleTable :: m (Linker term)
+  localModuleTable :: (Linker term -> Linker term) -> m a -> m a
 
 
-getModuleTable :: Evaluator effects term value (Linker value)
-getModuleTable = Evaluator get
+instance MonadEvaluator term value (Evaluator effects term value) where
+  getGlobalEnv = Evaluator get
+  modifyGlobalEnv f = Evaluator (modify f)
 
-modifyModuleTable :: (Linker value -> Linker value) -> Evaluator effects term value ()
-modifyModuleTable f = Evaluator (modify f)
+  askLocalEnv = Evaluator ask
+  localEnv f a = Evaluator (local f (runEvaluator a))
 
+  getStore = Evaluator get
+  modifyStore f = Evaluator (modify f)
 
-askModuleTable :: Evaluator effects term value (Linker term)
-askModuleTable = Evaluator ask
+  getModuleTable = Evaluator get
+  modifyModuleTable f = Evaluator (modify f)
 
-localModuleTable :: (Linker term -> Linker term) -> Evaluator effects term value a -> Evaluator effects term value a
-localModuleTable f a = Evaluator (local f (runEvaluator a))
+  askModuleTable = Evaluator ask
+  localModuleTable f a = Evaluator (local f (runEvaluator a))
 
 
 newtype Evaluator effects term value a
