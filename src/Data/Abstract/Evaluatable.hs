@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FunctionalDependencies, DefaultSignatures, UndecidableInstances, ScopedTypeVariables #-}
+{-# LANGUAGE DataKinds, FunctionalDependencies, DefaultSignatures, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( Evaluatable(..)
 , AbstractValue(..)
