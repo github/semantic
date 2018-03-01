@@ -74,6 +74,7 @@ instance Evaluatable [] where
     -- to the global environment.
     localEnv (const (bindEnv (liftFreeVariables (freeVariables . subterm) xs) env)) (eval xs)
 
+-- FIXME: this should live in Control.Abstract.Function once it doesn’t need to reference Evaluatable.
 class MonadEvaluator t v m => MonadFunction t v m where
   abstract :: [Name] -> Subterm t (m v) -> m v
   apply :: v -> [Subterm t (m v)] -> m v
