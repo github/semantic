@@ -23,10 +23,10 @@ import qualified Data.ByteString.Char8 as BC
 type Evaluating t v
   = '[ Fail
      , State (Store (LocationFor v) v)
-     , State (EnvironmentFor v)      -- Global (imperative) environment
-     , Reader (EnvironmentFor v)     -- Local environment (e.g. binding over a closure)
-     , Reader (Linker t) -- Cache of unevaluated modules
-     , State (Linker v)              -- Cache of evaluated modules
+     , State (EnvironmentFor v)  -- Global (imperative) environment
+     , Reader (EnvironmentFor v) -- Local environment (e.g. binding over a closure)
+     , Reader (Linker t)         -- Cache of unevaluated modules
+     , State (Linker v)          -- Cache of evaluated modules
      ]
 
 -- | Require/import another term/file and return an Effect.
