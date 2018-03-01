@@ -32,6 +32,7 @@ library
                      -- Control structures & interfaces for abstract interpretation
                      , Control.Abstract.Addressable
                      , Control.Abstract.Evaluator
+                     , Control.Abstract.Function
                      -- Control flow
                      , Control.Effect
                      -- Effects used in abstract interpretation
