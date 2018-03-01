@@ -7,12 +7,16 @@ module Language.Python.Assignment
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
-import qualified Assigning.Assignment as Assignment
 import Data.Functor (void)
 import Data.List.NonEmpty (some1)
 import Data.Maybe (fromMaybe)
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, parseError, postContextualize)
+import Data.Union
+import GHC.Stack
+import Language.Python.Grammar as Grammar
+import Language.Python.Syntax as Python.Syntax
+import qualified Assigning.Assignment as Assignment
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -21,11 +25,9 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
-import Data.Union
-import GHC.Stack
-import Language.Python.Syntax as Python.Syntax
-import Language.Python.Grammar as Grammar
 
+
+-- | The type of Python syntax.
 type Syntax =
   '[ Comment.Comment
    , Declaration.Class

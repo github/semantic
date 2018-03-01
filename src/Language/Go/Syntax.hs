@@ -1,13 +1,8 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.Go.Syntax where
 
-import Data.Align.Generic
-import Data.ByteString (ByteString)
-import Data.Functor.Classes.Generic
-import Data.Mergeable
+import Prologue
 import Diffing.Algorithm
-import GHC.Generics
-
 
 -- A composite literal in Go
 data Composite a = Composite { compositeType :: !a, compositeElement :: !a }

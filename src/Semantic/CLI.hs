@@ -6,14 +6,10 @@ module Semantic.CLI
 , runParse
 ) where
 
-import Control.Monad ((<=<))
-import Data.ByteString (ByteString)
-import Data.Foldable (find)
-import Data.Functor.Both hiding (fst, snd)
+import Prologue
 import Data.Language
 import Data.List (intercalate)
 import Data.List.Split (splitWhen)
-import Data.Semigroup ((<>))
 import Data.Version (showVersion)
 import Development.GitRev
 import Options.Applicative

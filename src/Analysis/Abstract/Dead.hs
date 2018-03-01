@@ -1,9 +1,10 @@
 {-# LANGUAGE DataKinds, ScopedTypeVariables, TypeApplications #-}
 module Analysis.Abstract.Dead where
 
+import Prologue
 import Control.Effect
 import Control.Monad.Effect hiding (run)
-import Control.Monad.Effect.Address
+import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Dead
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
@@ -13,11 +14,6 @@ import Data.Abstract.Environment
 import Data.Abstract.Eval
 import Data.Abstract.Store
 import Data.Abstract.Value
-import Data.Function (fix)
-import Data.Functor.Foldable
-import Data.Pointed
-import Data.Semigroup
-import Data.Set
 
 -- | The effects necessary for dead code analysis.
 type DeadCodeEvaluating t v
@@ -35,7 +31,7 @@ evalDead :: forall v term
            , Foldable (Base term)
            , Recursive term
            , Eval term v (Eff (DeadCodeEvaluating term v)) (Base term)
-           , MonadAddress (LocationFor v) (Eff (DeadCodeEvaluating term v))
+           , Addressable (LocationFor v) (Eff (DeadCodeEvaluating term v))
            , Semigroup (Cell (LocationFor v) v)
            )
          => term

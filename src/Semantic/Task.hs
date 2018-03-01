@@ -27,30 +27,22 @@ module Semantic.Task
 , runTaskWithOptions
 ) where
 
+import Prologue
 import Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
-import Control.Exception
-import Control.Monad.Error.Class
 import Control.Monad.IO.Class
 import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
 import Control.Monad.Free.Freer
-import Data.Algebra (RAlgebra)
 import Data.Blob
 import Data.Bool
 import qualified Data.ByteString as B
 import Data.Diff
 import qualified Data.Error as Error
-import Data.Foldable (fold, for_)
-import Data.Functor.Both as Both hiding (snd)
-import Data.Bitraversable
-import Data.Bifunctor
-import Data.Functor.Foldable (cata)
 import Data.Language
 import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Term
-import Data.Union
 import Parsing.Parser
 import Parsing.CMark
 import Parsing.TreeSitter
@@ -70,7 +62,7 @@ data TaskF output where
   WriteStat :: Stat -> TaskF ()
   Time :: String -> [(String, String)] -> Task output -> TaskF output
   Parse :: Parser term -> Blob -> TaskF term
-  Decorate :: Functor f => RAlgebra (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
+  Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
   Render :: Renderer input output -> input -> TaskF output
   Distribute :: Traversable t => t (Task output) -> TaskF (t output)
@@ -121,7 +113,7 @@ parse :: Parser term -> Blob -> Task term
 parse parser blob = Parse parser blob `Then` return
 
 -- | A 'Task' which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
-decorate :: Functor f => RAlgebra (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
+decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
 decorate algebra term = Decorate algebra term `Then` return
 
 -- | A 'Task' which diffs a pair of terms using the supplied 'Differ' function.

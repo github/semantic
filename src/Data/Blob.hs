@@ -13,13 +13,10 @@ module Data.Blob
 , pathKeyForBlobPair
 ) where
 
+import Prologue
 import Data.Aeson
 import Data.JSON.Fields
-import Data.Bifunctor.Join
-import Data.Bifunctor
 import Data.Language
-import Data.These
-import Data.Monoid
 import Data.Source as Source
 
 

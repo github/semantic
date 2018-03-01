@@ -5,27 +5,19 @@ module Analysis.Declaration
 , declarationAlgebra
 ) where
 
-import Data.Algebra
+import Prologue
 import Data.Blob
-import Data.Monoid
 import Data.Error (Error(..), showExpectation)
-import Data.Foldable (toList)
 import Data.Language as Language
-import Data.List.NonEmpty (nonEmpty)
-import Data.Proxy (Proxy(..))
 import Data.Range
-import Data.Maybe (mapMaybe)
 import Data.Record
 import Data.Source as Source
-import Data.Semigroup (sconcat)
 import Data.Span
+import Data.Term
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
-import Data.Term
 import qualified Data.Text as T
-import Data.Union
-import GHC.Generics
 import qualified Language.Markdown.Syntax as Markdown
 
 -- | A declaration’s identifier and type.
@@ -51,7 +43,7 @@ data Declaration
 --
 --   If you’re getting 'Nothing' for your syntax node at runtime, you probably forgot step 2.
 declarationAlgebra :: (HasField fields Range, HasField fields Span, Foldable syntax, HasDeclaration syntax)
-                   => Blob -> RAlgebra (Term syntax (Record fields)) (Maybe Declaration)
+                   => Blob -> RAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Maybe Declaration)
 declarationAlgebra blob (In ann syntax) = toDeclaration blob ann syntax
 
 -- | Types for which we can produce a 'Declaration' in 'Maybe'. There is exactly one instance of this typeclass

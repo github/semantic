@@ -6,15 +6,12 @@ module Language.Ruby.Assignment
 , Term
 ) where
 
+import Prologue hiding (for)
 import Assigning.Assignment hiding (Assignment, Error)
-import qualified Assigning.Assignment as Assignment
-import Data.Maybe (fromMaybe)
-import Control.Monad (guard)
 import Data.Record
-import Data.Functor (void)
-import Data.List.NonEmpty (some1)
 import Data.List (elem)
 import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
+import qualified Assigning.Assignment as Assignment
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -22,8 +19,6 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Term as Term
-import Data.Union
-import GHC.Stack
 import Language.Ruby.Grammar as Grammar
 
 -- | The type of Ruby syntax.

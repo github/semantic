@@ -1,15 +1,11 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses #-}
 module Data.Syntax.Comment where
 
-import Data.Abstract.Eval
+import Prologue
+import Control.Monad.Effect.Evaluatable
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value as Value
-import Data.Align.Generic
-import Data.ByteString (ByteString)
-import Data.Functor.Classes.Generic
-import Data.Mergeable
 import Diffing.Algorithm
-import GHC.Generics
 
 -- | An unnested comment (line or block).
 newtype Comment a = Comment { commentContent :: ByteString }
@@ -19,8 +15,8 @@ instance Eq1 Comment where liftEq = genericLiftEq
 instance Ord1 Comment where liftCompare = genericLiftCompare
 instance Show1 Comment where liftShowsPrec = genericLiftShowsPrec
 
-instance (Monad m, AbstractValue v) => Eval t v m Comment where
-  eval _ yield _ = yield unit
+instance (AbstractValue v) => Evaluatable es t v Comment where
+  eval _ = pure unit
 
 -- TODO: nested comment types
 -- TODO: documentation comment types

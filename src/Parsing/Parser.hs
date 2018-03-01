@@ -14,17 +14,15 @@ module Parsing.Parser
 , phpParser
 ) where
 
+import Prologue
 import Assigning.Assignment
 import qualified CMarkGFM
 import Data.AST
-import Data.Functor.Classes (Eq1)
-import Data.Ix
 import Data.Kind
 import Data.Language
 import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Term
-import Data.Union
 import Foreign.Ptr
 import qualified Language.Go.Assignment as Go
 import qualified Language.JSON.Assignment as JSON
@@ -47,9 +45,9 @@ data Parser term where
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST [] grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
   AssignmentParser :: (Enum grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq1 ast, Apply Foldable fs, Apply Functor fs, Foldable ast, Functor ast)
-                   => Parser (Term ast (Node grammar))                           -- ^ A parser producing AST.
-                   -> Assignment ast grammar (Term (Union fs) (Record Location)) -- ^ An assignment from AST onto 'Term's.
-                   -> Parser (Term (Union fs) (Record Location))                 -- ^ A parser producing 'Term's.
+                   => Parser (Term ast (Node grammar))                           -- A parser producing AST.
+                   -> Assignment ast grammar (Term (Union fs) (Record Location)) -- An assignment from AST onto 'Term's.
+                   -> Parser (Term (Union fs) (Record Location))                 -- A parser producing 'Term's.
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
 

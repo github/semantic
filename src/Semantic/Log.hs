@@ -1,10 +1,8 @@
 module Semantic.Log where
 
-import Data.Bifunctor (second)
+import Prologue
 import Data.Error (withSGRCode)
-import Data.Foldable (toList)
 import Data.List (intersperse)
-import Data.Semigroup ((<>))
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
 import qualified Data.Time.Format as Time
 import qualified Data.Time.LocalTime as LocalTime

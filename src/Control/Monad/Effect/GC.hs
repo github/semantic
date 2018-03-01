@@ -1,11 +1,11 @@
 {-# LANGUAGE MultiParamTypeClasses, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Control.Monad.Effect.GC where
 
+import Prologue
 import Control.Monad.Effect
 import Control.Monad.Effect.Reader
 import Data.Abstract.Live
 import Data.Abstract.Value
-import Data.Semigroup ((<>))
 
 -- | 'Monad's offering a local set of 'Live' (rooted/reachable) addresses.
 class Monad m => MonadGC a m where

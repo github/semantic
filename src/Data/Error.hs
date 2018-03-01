@@ -1,18 +1,14 @@
 {-# LANGUAGE GADTs, ImplicitParams, RankNTypes, StandaloneDeriving #-}
 module Data.Error where
 
-import Control.Exception
+import Prologue
 import Data.Blob
 import Data.ByteString (isSuffixOf)
 import Data.ByteString.Char8 (pack, unpack)
 import Data.Ix (inRange)
 import Data.List (intersperse)
-import Data.List.NonEmpty (nonEmpty)
-import Data.Semigroup
 import Data.Source
 import Data.Span
-import Data.Typeable
-import GHC.Stack
 import System.Console.ANSI
 
 data Error grammar = HasCallStack => Error { errorSpan :: Span, errorExpected :: [grammar], errorActual :: Maybe grammar }

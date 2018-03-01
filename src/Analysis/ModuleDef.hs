@@ -5,9 +5,8 @@ module Analysis.ModuleDef
 , moduleDefAlgebra
 ) where
 
-import Data.Algebra
+import Prologue
 import Data.Blob
-import Data.Proxy (Proxy(..))
 import Data.Range
 import Data.Record
 import Data.Source as Source
@@ -15,8 +14,6 @@ import Data.Span
 import qualified Data.Syntax.Declaration as Declaration
 import Data.Term
 import qualified Data.Text as T
-import Data.Union
-import GHC.Generics
 
 newtype ModuleDef = ModuleDef { moduleDefIdentifier :: T.Text }
   deriving (Eq, Generic, Show)
@@ -31,7 +28,7 @@ newtype ModuleDef = ModuleDef { moduleDefIdentifier :: T.Text }
 --   If you’re getting errors about missing a 'CustomHasModuleDef' instance for your syntax type, you probably forgot step 1.
 --
 --   If you’re getting 'Nothing' for your syntax node at runtime, you probably forgot step 2.
-moduleDefAlgebra :: (HasField fields Range, HasField fields Span, Foldable syntax, HasModuleDef syntax) => Blob -> RAlgebra (Term syntax (Record fields)) (Maybe ModuleDef)
+moduleDefAlgebra :: (HasField fields Range, HasField fields Span, Foldable syntax, HasModuleDef syntax) => Blob -> RAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Maybe ModuleDef)
 moduleDefAlgebra blob (In ann syntax) = toModuleDef blob ann syntax
 
 

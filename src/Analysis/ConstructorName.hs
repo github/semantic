@@ -5,14 +5,12 @@ module Analysis.ConstructorName
 , constructorLabel
 ) where
 
+import Prologue
 import Data.Aeson
 import Data.ByteString.Char8 (ByteString, pack, unpack)
 import Data.JSON.Fields
-import Data.Proxy
 import Data.Term
 import Data.Text.Encoding (decodeUtf8)
-import Data.Union
-import GHC.Generics
 
 -- | Compute a 'ConstructorLabel' label for a 'Term'.
 constructorLabel :: ConstructorName syntax => TermF syntax a b -> ConstructorLabel

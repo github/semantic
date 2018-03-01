@@ -16,30 +16,23 @@ module Rendering.TOC
 , toCategoryName
 ) where
 
+import Prologue
 import Analysis.Declaration
 import Data.Aeson
 import Data.Align (bicrosswalk)
-import Data.Bifoldable (bifoldMap)
-import Data.Bifunctor (bimap)
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
 import Data.Diff
-import Data.Foldable (fold, foldl')
-import Data.Functor.Foldable (cata)
-import Data.Function (on)
 import Data.Language as Language
 import Data.List (sortOn)
 import qualified Data.List as List
 import qualified Data.Map as Map
-import Data.Maybe (fromMaybe, mapMaybe)
 import Data.Output
 import Data.Patch
 import Data.Record
-import Data.Semigroup ((<>))
 import Data.Span
 import Data.Term
 import qualified Data.Text as T
-import GHC.Generics
 
 data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }
   deriving (Eq, Show)

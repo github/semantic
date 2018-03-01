@@ -92,30 +92,17 @@ module Assigning.Assignment
 , module Parsers
 ) where
 
+import Prologue
+import Prelude hiding (fail, until)
 import qualified Assigning.Assignment.Table as Table
-import Control.Applicative
-import Control.Monad ((<=<), guard)
-import Control.Monad.Error.Class hiding (Error)
-import Control.Monad.Fail
 import Control.Monad.Free.Freer
 import Data.AST
-import Data.Bifunctor
-import Data.ByteString (ByteString)
 import Data.Error
-import Data.Foldable
-import Data.Function
-import Data.Functor.Classes
-import Data.Ix (Ix(..))
-import Data.List.NonEmpty (NonEmpty(..), nonEmpty)
-import Data.Maybe
 import Data.Range
 import Data.Record
-import Data.Semigroup
 import qualified Data.Source as Source (Source, slice, sourceBytes)
 import Data.Span
 import Data.Term
-import GHC.Stack
-import Prelude hiding (fail, until)
 import Text.Parser.Combinators as Parsers hiding (choice)
 import TreeSitter.Language
 
@@ -183,7 +170,7 @@ choice alternatives
   where (choices, atEnd, handlers) = foldMap toChoices alternatives
         toChoices :: (Enum grammar, Ix grammar) => Assignment ast grammar a -> ([(grammar, Assignment ast grammar a)], [Assignment ast grammar a], [Error (Either String grammar) -> Assignment ast grammar a])
         toChoices rule = case rule of
-          Tracing _ (Choose t a h) `Then` continue -> (Table.toList (fmap (>>= continue) t), toList ((>>= continue) <$> a), toList ((continue <=<) <$> h))
+          Tracing _ (Choose t a h) `Then` continue -> (Table.toPairs (fmap (>>= continue) t), toList ((>>= continue) <$> a), toList ((continue <=<) <$> h))
           Tracing _ (Many  child)   `Then` _ -> let (c, _, _) = toChoices child in (fmap (rule <$) c, [rule], [])
           Tracing _ (Label child _) `Then` _ -> let (c, _, _) = toChoices child in (fmap (rule <$) c, [rule], [])
           Tracing _ (Alt as) `Then` continue -> foldMap (toChoices . continue) as

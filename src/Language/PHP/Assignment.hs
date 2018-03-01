@@ -6,7 +6,7 @@ module Language.PHP.Assignment
 , Term
 ) where
 
-import Data.Union
+import Prologue
 import Data.Record
 import qualified Data.Term as Term
 import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm1, contextualize, postContextualize)
@@ -21,7 +21,6 @@ import qualified Data.Syntax.Type as Type
 import Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import Language.PHP.Grammar as Grammar
-import Data.List.NonEmpty (some1)
 
 type Syntax = '[
     Comment.Comment
@@ -127,7 +126,7 @@ type Syntax = '[
   , Type.Annotation
   , [] ]
 
-type Term = Term.Term (Data.Union.Union Syntax) (Record Location)
+type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in PHP's grammar onto a program in PHP's syntax.
@@ -749,6 +748,6 @@ string = makeTerm <$> (symbol Grammar.String <|> symbol Heredoc) <*> (Literal.Te
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: Assignment
           -> Assignment
-          -> [Assignment.Assignment [] Grammar (Term -> Term -> Data.Union.Union Syntax Term)]
-          -> Assignment.Assignment [] Grammar (Data.Union.Union Syntax Term)
+          -> [Assignment.Assignment [] Grammar (Term -> Term -> Union Syntax Term)]
+          -> Assignment.Assignment [] Grammar (Union Syntax Term)
 infixTerm = infixContext (comment <|> textInterpolation)

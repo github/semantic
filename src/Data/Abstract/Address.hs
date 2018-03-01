@@ -1,12 +1,8 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeFamilyDependencies #-}
 module Data.Abstract.Address where
 
+import Prologue
 import Data.Abstract.FreeVariables
-import Data.Functor.Classes.Generic
-import Data.Pointed
-import Data.Semigroup
-import Data.Set
-import GHC.Generics
 
 -- | An abstract address with a location of @l@ pointing to a variable of type @a@.
 newtype Address l a = Address { unAddress :: l }
