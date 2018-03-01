@@ -35,6 +35,7 @@ class Evaluatable constr where
   eval :: ( AbstractValue value
           , FreeVariables term
           , MonadAddressable (LocationFor value) value m
+          , MonadAnalysis term value m
           , MonadEvaluator term value m
           , MonadFunction term value m
           , Ord (LocationFor value)
