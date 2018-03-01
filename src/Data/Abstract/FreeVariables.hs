@@ -3,6 +3,7 @@ module Data.Abstract.FreeVariables where
 
 import Prologue
 import Data.Term
+import Data.ByteString as B
 
 -- | The type of variable names.
 type Name = ByteString
@@ -29,6 +30,9 @@ freeVariables1 = liftFreeVariables freeVariables
 
 freeVariable :: FreeVariables term => term -> Name
 freeVariable term = let [n] = toList (freeVariables term) in n
+
+qualifiedName :: FreeVariables term => term -> Name
+qualifiedName term = let names = toList (freeVariables term) in B.intercalate "." names
 
 instance (FreeVariables1 syntax, Functor syntax) => FreeVariables (Term syntax ann) where
   freeVariables = cata (liftFreeVariables id)

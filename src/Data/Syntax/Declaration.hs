@@ -290,15 +290,14 @@ instance ( Show l
     -- Evaluate the import, the interface value we get back will contain an
     -- environment but evaluating will have also have potentially updated the
     -- global environment.
-    interface <- require @(Value l t) (freeVariable (subterm from))
+    interface <- require @(Value l t) (qualifiedName (subterm from))
 
     -- Restore previous global environment, adding the imported env
-    (name, addr) <- lookupOrAlloc' (freeVariable (subterm alias)) interface env
+    (name, addr) <- lookupOrAlloc' (qualifiedName (subterm alias)) interface env
     modify (const (envInsert name addr env)) -- const is important—we are throwing away the modified global env and specifically crafting a new environment.
 
     pure interface
 
---
 instance Member Fail es => Evaluatable es t Type.Type Import
 
 

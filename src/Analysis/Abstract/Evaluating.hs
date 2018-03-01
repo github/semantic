@@ -13,11 +13,14 @@ import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Algebra
 import Data.Blob
+import Data.List (intercalate)
+import Data.List.Split (splitWhen)
 import Prelude hiding (fail)
 import Prologue
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.Map as Map
 import System.FilePath.Posix
+
 
 -- | The effects necessary for concrete interpretation.
 type Evaluating v
@@ -71,4 +74,7 @@ evaluates :: forall v term.
           -> Final (Evaluating v) v
 evaluates pairs (Blob{..}, t) = run @(Evaluating v) (local @(Linker (Evaluator v)) (const (Linker (Map.fromList (map toPathActionPair pairs)))) (foldSubterms eval t))
   where
-    toPathActionPair (Blob{..}, t) = (BC.pack (takeBaseName blobPath), Evaluator (foldSubterms eval t))
+    rootDir = dropFileName blobPath
+    replacePathSeps str = intercalate "." (splitWhen (== pathSeparator) str)
+    moduleName Blob{..} = BC.pack $ replacePathSeps (dropExtensions (makeRelative rootDir blobPath))
+    toPathActionPair (b, t) = (moduleName b, Evaluator (foldSubterms eval t))

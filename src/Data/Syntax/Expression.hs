@@ -207,7 +207,7 @@ instance ( FreeVariables t
          , Member (State (StoreFor (Value l t))) es
          ) => Evaluatable es t (Value l t) MemberAccess where
   eval (MemberAccess a b) = do
-    let scope = freeVariable (subterm a)
+    let scope = qualifiedName (subterm a)
     env <- get @(EnvironmentFor (Value l t))
     case envLookup scope env of
       Nothing -> fail ("qualified name not found: " <> show scope)
