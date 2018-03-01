@@ -97,8 +97,7 @@ evaluates pairs (_, t) = run @(Evaluating term v) (runEvaluator (runEvaluation (
 newtype Evaluation term value a = Evaluation { runEvaluation :: Evaluator (Evaluating term value) term value a }
   deriving (Applicative, Functor, Monad, MonadFail)
 
-deriving instance MonadEvaluator term value (Evaluator (Evaluating term value) term value)
-               => MonadEvaluator term value (Evaluation term value)
+deriving instance MonadEvaluator term value (Evaluation term value)
 
 instance ( AbstractValue v
          , Evaluatable (Base t)
