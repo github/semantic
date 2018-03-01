@@ -3,7 +3,6 @@ module Data.Syntax.Statement where
 
 import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
-import Data.Abstract.FreeVariables
 import Diffing.Algorithm
 import Prologue
 

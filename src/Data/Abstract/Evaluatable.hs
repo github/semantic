@@ -2,28 +2,27 @@
 {-# LANGUAGE TypeApplications #-}
 module Data.Abstract.Evaluatable
 ( Evaluatable(..)
+, AbstractValue(..)
 , module Addressable
-, module Evaluator
-, Recursive(..)
-, Base
-, Subterm(..)
+, module FreeVariables
+, MonadEvaluator(..)
 , MonadFunctionAbstraction(..)
 ) where
 
 import Control.Abstract.Addressable as Addressable
-import Control.Abstract.Evaluator as Evaluator
+import Control.Abstract.Evaluator
 import Control.Applicative (Alternative(..))
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.Internal
 import Data.Abstract.Address
 import Data.Abstract.Environment
-import Data.Abstract.FreeVariables
+import Data.Abstract.FreeVariables as FreeVariables
 import Data.Abstract.Type as Type
 import Data.Abstract.Value
 import Data.Algebra
 import Data.Functor.Classes
-import Data.Functor.Foldable (Base, Recursive(..), project)
+import Data.Functor.Foldable (Base, Recursive(..))
 import Data.Proxy
 import Data.Semigroup
 import Data.Term

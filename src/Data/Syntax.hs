@@ -5,8 +5,6 @@ import qualified Assigning.Assignment as Assignment
 import Control.Monad.Fail
 import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
-import Data.Abstract.FreeVariables
-import Data.Abstract.Value (AbstractValue(..))
 import Data.AST
 import Data.ByteString.Char8 (unpack)
 import qualified Data.Error as Error

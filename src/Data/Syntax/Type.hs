@@ -2,7 +2,6 @@
 module Data.Syntax.Type where
 
 import Data.Abstract.Evaluatable
-import Data.Abstract.FreeVariables
 import Diffing.Algorithm
 import Prologue hiding (Map)
 

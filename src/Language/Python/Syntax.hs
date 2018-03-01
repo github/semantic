@@ -2,7 +2,6 @@
 module Language.Python.Syntax where
 
 import Data.Abstract.Evaluatable
-import Data.Abstract.FreeVariables
 import Data.Align.Generic
 import Data.Functor.Classes.Generic
 import Data.Mergeable

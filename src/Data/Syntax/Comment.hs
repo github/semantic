@@ -3,8 +3,6 @@ module Data.Syntax.Comment where
 
 import Prologue
 import Data.Abstract.Evaluatable
-import Data.Abstract.FreeVariables
-import Data.Abstract.Value
 import Diffing.Algorithm
 
 -- | An unnested comment (line or block).

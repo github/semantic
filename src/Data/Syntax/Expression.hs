@@ -2,7 +2,6 @@
 module Data.Syntax.Expression where
 
 import Data.Abstract.Evaluatable
-import Data.Abstract.FreeVariables
 import Diffing.Algorithm
 import Prologue hiding (apply)
 import Prelude hiding (fail)
