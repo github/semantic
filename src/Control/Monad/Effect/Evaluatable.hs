@@ -77,7 +77,13 @@ class AbstractValue v => AbstractFunction effects t v | v -> t where
   abstract :: [Name] -> Subterm t (Evaluator effects t v v) -> Evaluator effects t v v
   apply :: v -> [Subterm t (Evaluator effects t v v)] -> Evaluator effects t v v
 
-instance (Addressable location effects, Semigroup (Cell location (Value location t)), Recursive t, Evaluatable (Base t), FreeVariables t) => AbstractFunction effects t (Value location t) where
+instance ( Addressable location effects
+         , Evaluatable (Base t)
+         , FreeVariables t
+         , Recursive t
+         , Semigroup (Cell location (Value location t))
+         )
+         => AbstractFunction effects t (Value location t) where
   -- FIXME: Can we store the action evaluating the body in the Value instead of the body term itself
   abstract names (Subterm body _) = inj . Closure names body <$> askLocalEnv
 
