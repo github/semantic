@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, MultiParamTypeClasses #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, MultiParamTypeClasses #-}
 module Analysis.Abstract.Evaluating where
 
 import Prologue
@@ -103,3 +103,4 @@ evaluates :: forall v term.
 evaluates pairs (_, t) = run @(Evaluating term v) (runEvaluator (localModuleTable (const (Linker (Map.fromList (map (first (dropExtensions . blobPath)) pairs)))) (foldSubterms eval t)))
 
 newtype Evaluation term value a = Evaluation { runEvaluation :: Evaluator (Evaluating term value) term value a }
+  deriving (Applicative, Functor, Monad)
