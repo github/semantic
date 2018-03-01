@@ -100,7 +100,6 @@ instance ( FreeVariables t
          , Semigroup (Cell location (Value location t))
          )
          => MonadFunction t (Value location t) m where
-  -- FIXME: Can we store the action evaluating the body in the Value instead of the body term itself
   abstract names (Subterm body _) = inj . Closure names body <$> askLocalEnv
 
   apply op params = do
