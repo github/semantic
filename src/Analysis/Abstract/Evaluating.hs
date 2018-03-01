@@ -17,8 +17,6 @@ import Prelude hiding (fail)
 import qualified Data.Map as Map
 import System.FilePath.Posix
 
-import qualified Data.ByteString.Char8 as BC
-
 -- | The effects necessary for concrete interpretation.
 type Evaluating t v
   = '[ Fail                            -- Failure with an error message
@@ -28,39 +26,6 @@ type Evaluating t v
      , Reader (Linker t)               -- Cache of unevaluated modules
      , State (Linker v)                -- Cache of evaluated modules
      ]
-
--- | Require/import another term/file and return an Effect.
---
--- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
-require :: ( FreeVariables term
-           , MonadAnalysis term v m
-           , MonadEvaluator term v m
-           )
-        => term
-        -> m v
-require term = getModuleTable >>= maybe (load term) pure . linkerLookup name
-  where name = moduleName term
-
--- | Load another term/file and return an Effect.
---
--- Always loads/evaluates.
-load :: ( FreeVariables term
-        , MonadAnalysis term v m
-        , MonadEvaluator term v m
-        )
-     => term
-     -> m v
-load term = askModuleTable >>= maybe notFound evalAndCache . linkerLookup name
-  where name = moduleName term
-        notFound = fail ("cannot find " <> show name)
-        evalAndCache e = do
-          v <- evaluateTerm e
-          modifyModuleTable (linkerInsert name v)
-          pure v
-
--- | Get a module name from a term (expects single free variables).
-moduleName :: FreeVariables term => term -> Prelude.String
-moduleName term = let [n] = toList (freeVariables term) in BC.unpack n
 
 
 -- | Evaluate a term to a value.

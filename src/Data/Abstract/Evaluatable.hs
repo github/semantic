@@ -7,6 +7,8 @@ module Data.Abstract.Evaluatable
 , module FreeVariables
 , module Function
 , MonadEvaluator(..)
+, require
+, load
 ) where
 
 import Control.Abstract.Addressable as Addressable
@@ -18,14 +20,17 @@ import Control.Monad.Effect.Internal
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables as FreeVariables
+import Data.Abstract.Linker
 import Data.Abstract.Value
 import Data.Algebra
+import qualified Data.ByteString.Char8 as BC
 import Data.Functor.Classes
 import Data.Proxy
 import Data.Semigroup
 import Data.Term
 import Data.Union (Apply)
 import Prelude hiding (fail)
+import Prologue
 import qualified Data.Union as U
 
 
@@ -73,3 +78,37 @@ instance Evaluatable [] where
     -- environment each time where the free variables in those terms are bound
     -- to the global environment.
     localEnv (const (bindEnv (liftFreeVariables (freeVariables . subterm) xs) env)) (eval xs)
+
+
+-- | Require/import another term/file and return an Effect.
+--
+-- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
+require :: ( FreeVariables term
+           , MonadAnalysis term v m
+           , MonadEvaluator term v m
+           )
+        => term
+        -> m v
+require term = getModuleTable >>= maybe (load term) pure . linkerLookup name
+  where name = moduleName term
+
+-- | Load another term/file and return an Effect.
+--
+-- Always loads/evaluates.
+load :: ( FreeVariables term
+        , MonadAnalysis term v m
+        , MonadEvaluator term v m
+        )
+     => term
+     -> m v
+load term = askModuleTable >>= maybe notFound evalAndCache . linkerLookup name
+  where name = moduleName term
+        notFound = fail ("cannot find " <> show name)
+        evalAndCache e = do
+          v <- evaluateTerm e
+          modifyModuleTable (linkerInsert name v)
+          pure v
+
+-- | Get a module name from a term (expects single free variables).
+moduleName :: FreeVariables term => term -> Prelude.String
+moduleName term = let [n] = toList (freeVariables term) in BC.unpack n
