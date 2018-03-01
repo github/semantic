@@ -35,13 +35,14 @@ import qualified Data.Union as U
 class Evaluatable constr where
   eval :: ( AbstractValue value
           , FreeVariables term
-          , MonadAddressable (LocationFor value) value (Evaluator effects term value)
-          , MonadFunctionAbstraction term value (Evaluator effects term value)
+          , MonadAddressable (LocationFor value) value m
+          , MonadEvaluator term value m
+          , MonadFunctionAbstraction term value m
           , Ord (LocationFor value)
           , Semigroup (Cell (LocationFor value) value)
           )
-          => SubtermAlgebra constr term (Evaluator effects term value value)
-  default eval :: (FreeVariables term, Show1 constr) => SubtermAlgebra constr term (Evaluator effects term value value)
+          => SubtermAlgebra constr term (m value)
+  default eval :: (FreeVariables term, MonadFail m, Show1 constr) => SubtermAlgebra constr term (m value)
   eval expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
 -- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
