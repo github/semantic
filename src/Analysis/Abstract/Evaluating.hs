@@ -3,11 +3,11 @@ module Analysis.Abstract.Evaluating where
 
 import Prologue
 import Control.Effect
-import Control.Monad.Effect.Evaluatable
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Address
+import Data.Abstract.Evaluatable
 import Data.Abstract.Linker
 import Data.Abstract.Store
 import Data.Abstract.Value

@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, TypeApplications #-}
 module Data.Syntax.Expression where
 
-import Control.Monad.Effect.Evaluatable
+import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables
 import Diffing.Algorithm
 import Prologue hiding (apply)

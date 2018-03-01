@@ -2,9 +2,9 @@
 module Data.Syntax.Comment where
 
 import Prologue
-import Control.Monad.Effect.Evaluatable
+import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables
-import Data.Abstract.Value as Value
+import Data.Abstract.Value
 import Diffing.Algorithm
 
 -- | An unnested comment (line or block).

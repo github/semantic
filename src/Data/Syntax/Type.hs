@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses, UndecidableInstances #-}
 module Data.Syntax.Type where
 
-import Control.Monad.Effect.Evaluatable
+import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables
 import Diffing.Algorithm
 import Prologue hiding (Map)

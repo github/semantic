@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, FunctionalDependencies, MultiParamTypeClasses, Rank2Types, GADTs, TypeOperators, DefaultSignatures, UndecidableInstances, ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
-module Control.Monad.Effect.Evaluatable
+module Data.Abstract.Evaluatable
 ( Evaluatable(..)
 , module Addressable
 , module Evaluator

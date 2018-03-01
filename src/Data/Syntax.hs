@@ -2,9 +2,9 @@
 module Data.Syntax where
 
 import qualified Assigning.Assignment as Assignment
-import Control.Monad.Effect.Evaluatable
 import Control.Monad.Fail
 import Data.Abstract.Environment
+import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value (AbstractValue(..))
 import Data.AST

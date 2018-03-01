@@ -37,7 +37,6 @@ library
                      -- Effects used in abstract interpretation
                      -- , Control.Monad.Effect.Cache
                      -- , Control.Monad.Effect.Dead
-                     , Control.Monad.Effect.Evaluatable
                      -- , Control.Monad.Effect.Fresh
                      -- , Control.Monad.Effect.GC
                      -- , Control.Monad.Effect.NonDet
@@ -47,6 +46,7 @@ library
                      , Data.Abstract.Cache
                      , Data.Abstract.Configuration
                      , Data.Abstract.Environment
+                     , Data.Abstract.Evaluatable
                      , Data.Abstract.Linker
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Live
