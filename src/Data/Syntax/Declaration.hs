@@ -282,21 +282,29 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance ( Show l
          , Show t
+         , Semigroup (Cell l (Value l t)) -- lookupOrAlloc
          , Members (Evaluating (Value l t)) es
+         , Addressable l es
          , Evaluatable es t (Value l t) (Base t)
          , Recursive t
          , FreeVariables t
          )
          => Evaluatable es t (Value l t) Import where
   eval (Import from _ _) = do
-    interface <- require @(Value l t) @t (subterm from)
-    -- TODO: Consider returning the value instead of the interface.
-    Interface _ env <- maybe
-                           (fail ("expected an interface, but got: " <> show interface))
-                           pure
-                           (prj interface :: Maybe (Value.Interface l t))
+    let name = freeVariable (subterm from)
 
-    modify (envUnion env)
+    -- Capture current global environment
+    env <- get @(EnvironmentFor (Value l t))
+
+    -- Evaluate the import, the interface value we get back will contain an
+    -- environment but evaluating will have also have potentially updated the
+    -- global environment.
+    interface <- require @(Value l t) name
+
+    -- Restore previous global environment, adding the imported env
+    (name, addr) <- lookupOrAlloc' name interface env
+    modify (const (envInsert name addr env)) -- const is important—we are throwing away the modified global env and specifically crafting a new environment.
+
     pure interface
 --
 instance Member Fail es => Evaluatable es t Type.Type Import
