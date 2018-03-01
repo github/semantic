@@ -90,7 +90,7 @@ instance ( Evaluatable (Base t)
   abstract names (Subterm body _) = inj . Closure names body <$> askLocalEnv
 
   apply op params = do
-    Closure names body env <- maybe (fail "expected a closure") pure (prj op :: Maybe (Closure location t))
+    Closure names body env <- maybe (fail "expected a closure") pure (prj op)
     bindings <- foldr (\ (name, param) rest -> do
       v <- subtermValue param
       a <- alloc name
