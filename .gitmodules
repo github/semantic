@@ -28,3 +28,6 @@
 [submodule "vendor/ghc-mod"]
 	path = vendor/ghc-mod
 	url = https://github.com/joshvera/ghc-mod
+[submodule "vendor/grpc-haskell"]
+	path = vendor/grpc-haskell
+	url = https://github.com/awakesecurity/gRPC-haskell/
