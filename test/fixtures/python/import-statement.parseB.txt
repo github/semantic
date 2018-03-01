@@ -2,15 +2,21 @@
   (
     (Import
       (Identifier)
-      (Empty))
+      (Identifier))
     (Import
       (Identifier)
-      (Empty)))
+      (Identifier)))
   (Import
     (ScopeResolution
       (Identifier)
       (Identifier))
     (Identifier))
   (Import
-    ((Identifier) (Identifier) (Identifier))
-    (Empty)))
+    (
+      (Identifier)
+      (Identifier)
+      (Identifier))
+    (
+      (Identifier)
+      (Identifier)
+      (Identifier))))
