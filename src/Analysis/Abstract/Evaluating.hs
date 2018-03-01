@@ -34,9 +34,9 @@ type Evaluating t v
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
 require :: ( AbstractFunction effects term v
-           , Addressable (LocationFor v) effects
            , Evaluatable (Base term)
            , FreeVariables term
+           , MonadAddressable (LocationFor v) v (Evaluator effects term v)
            , Recursive term
            , Semigroup (Cell (LocationFor v) v)
            )
@@ -49,9 +49,9 @@ require term = getModuleTable >>= maybe (load term) pure . linkerLookup name
 --
 -- Always loads/evaluates.
 load :: ( AbstractFunction effects term v
-        , Addressable (LocationFor v) effects
         , Evaluatable (Base term)
         , FreeVariables term
+        , MonadAddressable (LocationFor v) v (Evaluator effects term v)
         , Recursive term
         , Semigroup (Cell (LocationFor v) v)
         )
@@ -74,9 +74,9 @@ moduleName term = let [n] = toList (freeVariables term) in BC.unpack n
 evaluate :: forall v term.
          ( Ord (LocationFor v)
          , AbstractFunction (Evaluating term v) term v
-         , Addressable (LocationFor v) (Evaluating term v)
          , Evaluatable (Base term)
          , FreeVariables term
+         , MonadAddressable (LocationFor v) v (Evaluator (Evaluating term v) term v)
          , Recursive term
          , Semigroup (Cell (LocationFor v) v)
          )
@@ -88,9 +88,9 @@ evaluate = run @(Evaluating term v) . runEvaluator . foldSubterms eval
 evaluates :: forall v term.
           ( Ord (LocationFor v)
           , AbstractFunction (Evaluating term v) term v
-          , Addressable (LocationFor v) (Evaluating term v)
           , Evaluatable (Base term)
           , FreeVariables term
+          , MonadAddressable (LocationFor v) v (Evaluator (Evaluating term v) term v)
           , Recursive term
           , Semigroup (Cell (LocationFor v) v)
           )
