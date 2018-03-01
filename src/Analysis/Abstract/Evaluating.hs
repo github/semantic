@@ -33,11 +33,11 @@ type Evaluating t v
 -- | Require/import another term/file and return an Effect.
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
-require :: ( AbstractFunction effects term v
-           , AbstractValue v
+require :: ( AbstractValue v
            , Evaluatable (Base term)
            , FreeVariables term
            , MonadAddressable (LocationFor v) v (Evaluator effects term v)
+           , MonadFunctionAbstraction term v (Evaluator effects term v)
            , Recursive term
            , Semigroup (Cell (LocationFor v) v)
            )
@@ -49,11 +49,11 @@ require term = getModuleTable >>= maybe (load term) pure . linkerLookup name
 -- | Load another term/file and return an Effect.
 --
 -- Always loads/evaluates.
-load :: ( AbstractFunction effects term v
-        , AbstractValue v
+load :: ( AbstractValue v
         , Evaluatable (Base term)
         , FreeVariables term
         , MonadAddressable (LocationFor v) v (Evaluator effects term v)
+        , MonadFunctionAbstraction term v (Evaluator effects term v)
         , Recursive term
         , Semigroup (Cell (LocationFor v) v)
         )
@@ -75,11 +75,11 @@ moduleName term = let [n] = toList (freeVariables term) in BC.unpack n
 -- | Evaluate a term to a value.
 evaluate :: forall v term.
          ( Ord (LocationFor v)
-         , AbstractFunction (Evaluating term v) term v
          , AbstractValue v
          , Evaluatable (Base term)
          , FreeVariables term
          , MonadAddressable (LocationFor v) v (Evaluator (Evaluating term v) term v)
+         , MonadFunctionAbstraction term v (Evaluator (Evaluating term v) term v)
          , Recursive term
          , Semigroup (Cell (LocationFor v) v)
          )
@@ -90,11 +90,11 @@ evaluate = run @(Evaluating term v) . runEvaluator . foldSubterms eval
 -- | Evaluate terms and an entry point to a value.
 evaluates :: forall v term.
           ( Ord (LocationFor v)
-          , AbstractFunction (Evaluating term v) term v
           , AbstractValue v
           , Evaluatable (Base term)
           , FreeVariables term
           , MonadAddressable (LocationFor v) v (Evaluator (Evaluating term v) term v)
+          , MonadFunctionAbstraction term v (Evaluator (Evaluating term v) term v)
           , Recursive term
           , Semigroup (Cell (LocationFor v) v)
           )

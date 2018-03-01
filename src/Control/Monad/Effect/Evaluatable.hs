@@ -6,15 +6,15 @@ module Control.Monad.Effect.Evaluatable
 , Recursive(..)
 , Base
 , Subterm(..)
-, AbstractFunction(..)
+, MonadFunctionAbstraction(..)
 ) where
 
 import Analysis.Abstract.Evaluator as Evaluator
+import Control.Applicative (Alternative(..))
 import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.Internal
-import Control.Monad.Effect.NonDetEff
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
@@ -33,10 +33,10 @@ import qualified Data.Union as U
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
-  eval :: ( AbstractFunction effects term value
-          , AbstractValue value
+  eval :: ( AbstractValue value
           , FreeVariables term
           , MonadAddressable (LocationFor value) value (Evaluator effects term value)
+          , MonadFunctionAbstraction term value (Evaluator effects term value)
           , Ord (LocationFor value)
           , Semigroup (Cell (LocationFor value) value)
           )
@@ -74,9 +74,9 @@ instance Evaluatable [] where
     -- to the global environment.
     localEnv (const (bindEnv (liftFreeVariables (freeVariables . subterm) xs) env)) (eval xs)
 
-class AbstractFunction effects t v | v -> t where
-  abstract :: [Name] -> Subterm t (Evaluator effects t v v) -> Evaluator effects t v v
-  apply :: v -> [Subterm t (Evaluator effects t v v)] -> Evaluator effects t v v
+class MonadEvaluator t v m => MonadFunctionAbstraction t v m where
+  abstract :: [Name] -> Subterm t (m v) -> m v
+  apply :: v -> [Subterm t (m v)] -> m v
 
 instance ( Evaluatable (Base t)
          , FreeVariables t
@@ -84,7 +84,7 @@ instance ( Evaluatable (Base t)
          , Recursive t
          , Semigroup (Cell location (Value location t))
          )
-         => AbstractFunction effects t (Value location t) where
+         => MonadFunctionAbstraction t (Value location t) (Evaluator effects t (Value location t)) where
   -- FIXME: Can we store the action evaluating the body in the Value instead of the body term itself
   abstract names (Subterm body _) = inj . Closure names body <$> askLocalEnv
 
@@ -97,7 +97,7 @@ instance ( Evaluatable (Base t)
       envInsert name a <$> rest) (pure env) (zip names params)
     localEnv (mappend bindings) (foldSubterms eval body)
 
-instance Members '[Fresh, NonDetEff] effects => AbstractFunction effects t (Type t) where
+instance (Alternative m, MonadEvaluator t (Type.Type t) m, MonadFresh m) => MonadFunctionAbstraction t (Type t) m where
   abstract names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
