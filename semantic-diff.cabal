@@ -30,11 +30,11 @@ library
                      , Assigning.Assignment
                      , Assigning.Assignment.Table
                      -- Control structures & interfaces for abstract interpretation
+                     , Control.Abstract.Addressable
                      , Control.Abstract.Evaluator
                      -- Control flow
                      , Control.Effect
                      -- Effects used in abstract interpretation
-                     , Control.Monad.Effect.Addressable
                      -- , Control.Monad.Effect.Cache
                      -- , Control.Monad.Effect.Dead
                      , Control.Monad.Effect.Evaluatable

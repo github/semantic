@@ -1,5 +1,5 @@
 {-# LANGUAGE FunctionalDependencies, TypeFamilies, UndecidableInstances #-}
-module Control.Monad.Effect.Addressable where
+module Control.Abstract.Addressable where
 
 import Control.Abstract.Evaluator
 import Control.Applicative

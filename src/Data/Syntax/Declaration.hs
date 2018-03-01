@@ -2,7 +2,6 @@
 module Data.Syntax.Declaration where
 
 import Prologue
-import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Evaluatable
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables

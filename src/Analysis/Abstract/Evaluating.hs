@@ -3,7 +3,6 @@ module Analysis.Abstract.Evaluating where
 
 import Prologue
 import Control.Effect
-import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Evaluatable
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader

@@ -2,7 +2,6 @@
 module Data.Syntax where
 
 import qualified Assigning.Assignment as Assignment
-import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Evaluatable
 import Control.Monad.Fail
 import Data.Abstract.Environment

@@ -2,6 +2,7 @@
 {-# LANGUAGE TypeApplications #-}
 module Control.Monad.Effect.Evaluatable
 ( Evaluatable(..)
+, module Addressable
 , module Evaluator
 , Recursive(..)
 , Base
@@ -9,9 +10,9 @@ module Control.Monad.Effect.Evaluatable
 , MonadFunctionAbstraction(..)
 ) where
 
+import Control.Abstract.Addressable as Addressable
 import Control.Abstract.Evaluator as Evaluator
 import Control.Applicative (Alternative(..))
-import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.Internal
