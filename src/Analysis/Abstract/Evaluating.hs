@@ -32,13 +32,9 @@ type Evaluating t v
 -- | Require/import another term/file and return an Effect.
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
-require :: ( AbstractValue v
-           , FreeVariables term
-           , MonadAddressable (LocationFor v) v m
+require :: ( FreeVariables term
            , MonadAnalysis term v m
            , MonadEvaluator term v m
-           , MonadFunction term v m
-           , Semigroup (Cell (LocationFor v) v)
            )
         => term
         -> m v
@@ -48,13 +44,9 @@ require term = getModuleTable >>= maybe (load term) pure . linkerLookup name
 -- | Load another term/file and return an Effect.
 --
 -- Always loads/evaluates.
-load :: ( AbstractValue v
-        , FreeVariables term
-        , MonadAddressable (LocationFor v) v m
+load :: ( FreeVariables term
         , MonadAnalysis term v m
-        , MonadFunction term v m
         , MonadEvaluator term v m
-        , Semigroup (Cell (LocationFor v) v)
         )
      => term
      -> m v
