@@ -12,7 +12,7 @@ import Data.Abstract.Linker
 import Data.Abstract.Value
 import Prelude hiding (fail)
 
-class MonadEvaluator term value m | m -> term, m -> value where
+class Monad m => MonadEvaluator term value m | m -> term, m -> value where
   getGlobalEnv :: m (EnvironmentFor value)
   modifyGlobalEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m ()
 
