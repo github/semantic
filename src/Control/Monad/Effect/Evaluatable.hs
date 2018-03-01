@@ -34,6 +34,7 @@ import qualified Data.Union as U
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
   eval :: ( AbstractFunction effects term value
+          , AbstractValue value
           , FreeVariables term
           , MonadAddressable (LocationFor value) value (Evaluator effects term value)
           , Ord (LocationFor value)
@@ -73,7 +74,7 @@ instance Evaluatable [] where
     -- to the global environment.
     localEnv (const (bindEnv (liftFreeVariables (freeVariables . subterm) xs) env)) (eval xs)
 
-class AbstractValue v => AbstractFunction effects t v | v -> t where
+class AbstractFunction effects t v | v -> t where
   abstract :: [Name] -> Subterm t (Evaluator effects t v v) -> Evaluator effects t v v
   apply :: v -> [Subterm t (Evaluator effects t v v)] -> Evaluator effects t v v
 
