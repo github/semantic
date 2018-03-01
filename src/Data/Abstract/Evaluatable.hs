@@ -40,7 +40,7 @@ class Evaluatable constr where
           , Ord (LocationFor value)
           , Semigroup (Cell (LocationFor value) value)
           )
-          => SubtermAlgebra constr term (m value)
+       => SubtermAlgebra constr term (m value)
   default eval :: (MonadFail m, Show1 constr) => SubtermAlgebra constr term (m value)
   eval expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
