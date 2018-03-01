@@ -18,11 +18,10 @@
       (Identifier))
   {+(ScopeResolution
     {+(Identifier)+})+})
-  (Import
+  (WildcardImport
     (ScopeResolution
     { (Identifier)
     ->(Identifier) })
-    (Empty)
     (Identifier))
 {+(Import
   {+(ScopeResolution
@@ -38,12 +37,16 @@
     {+(Identifier)+})+})+}
   (Import
     (ScopeResolution
-      {-(Identifier)-}
+    {-(Identifier)-}
       (Identifier)
-      {+(Identifier)+})
+    {+(Identifier)+})
     (Empty)
-    (ScopeResolution{(Identifier)->(Identifier)}))
+    (ScopeResolution
+    { (Identifier)
+    ->(Identifier) }))
   (Import
     (Empty)
     (Empty)
-    (ScopeResolution{(Identifier)->(Identifier)})))
+    (ScopeResolution
+    { (Identifier)
+    ->(Identifier) })))

@@ -13,10 +13,9 @@
       (Identifier))
     (ScopeResolution
       (Identifier)))
-  (Import
+  (WildcardImport
     (ScopeResolution
       (Identifier))
-    (Empty)
     (Identifier))
   (Import
     (ScopeResolution
@@ -35,8 +34,10 @@
       (Identifier)
       (Identifier))
     (Empty)
-    (ScopeResolution(Identifier)))
+    (ScopeResolution
+      (Identifier)))
   (Import
     (Empty)
     (Empty)
-    (ScopeResolution(Identifier))))
+    (ScopeResolution
+      (Identifier))))

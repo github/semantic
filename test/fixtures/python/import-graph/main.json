@@ -67,14 +67,6 @@
         "alias": ""
       }, {
         "span": {
-          "start": [8, 1],
-          "end": [8, 16]
-        },
-        "path": "b",
-        "symbols": [],
-        "alias": ""
-      }, {
-        "span": {
           "start": [9, 1],
           "end": [9, 29]
         },
