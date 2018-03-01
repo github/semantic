@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, MultiParamTypeClasses, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, MultiParamTypeClasses, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating where
 
 import Prologue
