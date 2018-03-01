@@ -13,8 +13,6 @@ import Data.Abstract.Linker
 import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Abstract.FreeVariables
-import Data.Algebra
-import Data.Bifunctor
 import Data.Blob
 import Prelude hiding (fail)
 import qualified Data.Map as Map

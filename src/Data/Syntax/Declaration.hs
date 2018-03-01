@@ -2,12 +2,10 @@
 module Data.Syntax.Declaration where
 
 import Prologue
-import Analysis.Abstract.Evaluating
 import Control.Monad.Effect.Addressable
 import Control.Monad.Effect.Evaluatable
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
-import Data.Abstract.Value
 import Diffing.Algorithm
 import Prelude hiding (fail)
 
