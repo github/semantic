@@ -40,8 +40,8 @@ evaluateDead :: forall term value
                 , Recursive term
                 , Semigroup (Cell (LocationFor value) value)
                 )
-                => term
-                -> Final (DeadCodeEvaluating term value) value
+             => term
+             -> Final (DeadCodeEvaluating term value) value
 evaluateDead term = run @(DeadCodeEvaluating term value) . runEvaluator . runDeadCodeEvaluation $ do
   killAll (subterms term)
   evaluateTerm term

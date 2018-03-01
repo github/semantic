@@ -64,31 +64,31 @@ moduleName term = let [n] = toList (freeVariables term) in BC.unpack n
 
 
 -- | Evaluate a term to a value.
-evaluate :: forall v term.
-         ( AbstractValue v
-         , Evaluatable (Base term)
-         , FreeVariables term
-         , MonadAddressable (LocationFor v) v (Evaluation term v)
-         , MonadFunction term v (Evaluation term v)
-         , Ord (LocationFor v)
-         , Recursive term
-         , Semigroup (Cell (LocationFor v) v)
-         )
+evaluate :: forall v term
+         .  ( AbstractValue v
+            , Evaluatable (Base term)
+            , FreeVariables term
+            , MonadAddressable (LocationFor v) v (Evaluation term v)
+            , MonadFunction term v (Evaluation term v)
+            , Ord (LocationFor v)
+            , Recursive term
+            , Semigroup (Cell (LocationFor v) v)
+            )
          => term
          -> Final (Evaluating term v) v
 evaluate = run @(Evaluating term v) . runEvaluator . runEvaluation . evaluateTerm
 
 -- | Evaluate terms and an entry point to a value.
-evaluates :: forall v term.
-          ( AbstractValue v
-          , Evaluatable (Base term)
-          , FreeVariables term
-          , MonadAddressable (LocationFor v) v (Evaluation term v)
-          , MonadFunction term v (Evaluation term v)
-          , Ord (LocationFor v)
-          , Recursive term
-          , Semigroup (Cell (LocationFor v) v)
-          )
+evaluates :: forall v term
+          .  ( AbstractValue v
+             , Evaluatable (Base term)
+             , FreeVariables term
+             , MonadAddressable (LocationFor v) v (Evaluation term v)
+             , MonadFunction term v (Evaluation term v)
+             , Ord (LocationFor v)
+             , Recursive term
+             , Semigroup (Cell (LocationFor v) v)
+             )
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
           -> Final (Evaluating term v) v
