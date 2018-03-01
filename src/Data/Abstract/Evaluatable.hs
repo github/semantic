@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FunctionalDependencies, MultiParamTypeClasses, GADTs, TypeOperators, DefaultSignatures, UndecidableInstances, ScopedTypeVariables #-}
+{-# LANGUAGE DataKinds, FunctionalDependencies, GADTs, TypeOperators, DefaultSignatures, UndecidableInstances, ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 module Data.Abstract.Evaluatable
 ( Evaluatable(..)
