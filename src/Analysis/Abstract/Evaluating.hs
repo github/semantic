@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, MultiParamTypeClasses #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, MultiParamTypeClasses, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating where
 
 import Prologue
@@ -104,3 +104,14 @@ evaluates pairs (_, t) = run @(Evaluating term v) (runEvaluator (localModuleTabl
 
 newtype Evaluation term value a = Evaluation { runEvaluation :: Evaluator (Evaluating term value) term value a }
   deriving (Applicative, Functor, Monad)
+
+instance ( AbstractValue v
+         , Evaluatable (Base t)
+         , FreeVariables t
+         , MonadAddressable (LocationFor v) v (Evaluation t v)
+         , MonadFunction t v (Evaluation t v)
+         , Recursive t
+         , Semigroup (Cell (LocationFor v) v)
+         )
+         => MonadAnalysis t v (Evaluation t v) where
+  evaluateTerm = foldSubterms eval
