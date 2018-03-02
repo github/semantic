@@ -20,6 +20,7 @@ library
                        Analysis.Abstract.Dead
                      , Analysis.Abstract.Evaluating
                      -- , Analysis.Abstract.Tracing
+                     , Analysis.Abstract.TypeInference
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
                      , Analysis.Decorator
