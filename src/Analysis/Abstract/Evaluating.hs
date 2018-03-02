@@ -18,7 +18,7 @@ import qualified Data.Map as Map
 import System.FilePath.Posix
 
 -- | The effects necessary for concrete interpretation.
-type Evaluating t v
+type EvaluationEffects t v
   = '[ Fail                            -- Failure with an error message
      , State (Store (LocationFor v) v) -- The heap
      , State (EnvironmentFor v)        -- Global (imperative) environment
@@ -40,8 +40,8 @@ evaluate :: forall v term
             , Semigroup (Cell (LocationFor v) v)
             )
          => term
-         -> Final (Evaluating term v) v
-evaluate = run @(Evaluating term v) . runEvaluator . runEvaluation . evaluateTerm
+         -> Final (EvaluationEffects term v) v
+evaluate = run @(EvaluationEffects term v) . runEvaluator . runEvaluation . evaluateTerm
 
 -- | Evaluate terms and an entry point to a value.
 evaluates :: forall v term
@@ -56,10 +56,10 @@ evaluates :: forall v term
              )
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
-          -> Final (Evaluating term v) v
-evaluates pairs (_, t) = run @(Evaluating term v) (runEvaluator (runEvaluation (localModuleTable (const (Linker (Map.fromList (map (first (dropExtensions . blobPath)) pairs)))) (evaluateTerm t))))
+          -> Final (EvaluationEffects term v) v
+evaluates pairs (_, t) = run @(EvaluationEffects term v) (runEvaluator (runEvaluation (localModuleTable (const (Linker (Map.fromList (map (first (dropExtensions . blobPath)) pairs)))) (evaluateTerm t))))
 
-newtype Evaluation term value a = Evaluation { runEvaluation :: Evaluator (Evaluating term value) term value a }
+newtype Evaluation term value a = Evaluation { runEvaluation :: Evaluator (EvaluationEffects term value) term value a }
   deriving (Applicative, Functor, Monad, MonadFail)
 
 deriving instance MonadEvaluator term value (Evaluation term value)
