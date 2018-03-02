@@ -16,22 +16,32 @@ import Prelude hiding (fail)
 --
 --   These presently include:
 --   - environments binding names to addresses
---   - a store mapping addresses to (possibly sets of) values
+--   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
 class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
+  -- | Retrieve the global environment.
   getGlobalEnv :: m (EnvironmentFor value)
+  -- | Update the global environment.
   modifyGlobalEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m ()
 
+  -- | Retrieve the local environment.
   askLocalEnv :: m (EnvironmentFor value)
+  -- | Run an action with a locally-modified environment.
   localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m a -> m a
 
+  -- | Retrieve the heap.
   getStore :: m (StoreFor value)
+  -- | Update the heap.
   modifyStore :: (StoreFor value -> StoreFor value) -> m ()
 
+  -- | Retrieve the table of evaluated modules.
   getModuleTable :: m (Linker value)
+  -- | Update the table of evaluated modules.
   modifyModuleTable :: (Linker value -> Linker value) -> m ()
 
+  -- | Retrieve the table of unevaluated modules.
   askModuleTable :: m (Linker term)
+  -- | Run an action with a locally-modified table of unevaluated modules.
   localModuleTable :: (Linker term -> Linker term) -> m a -> m a
 
 instance MonadEvaluator term value (Evaluator effects term value) where
