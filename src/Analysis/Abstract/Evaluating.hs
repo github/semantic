@@ -57,8 +57,7 @@ evaluates :: forall v term
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
           -> Final (EvaluationEffects term v) v
-evaluates pairs (_, t) = run @(EvaluationEffects term v) (runEvaluator (runEvaluation (localModuleTable (const moduleTable) (evaluateTerm t))))
-  where moduleTable = Linker (Map.fromList (map (first (dropExtensions . blobPath)) pairs))
+evaluates pairs (_, t) = run @(EvaluationEffects term v) (runEvaluator (runEvaluation (withModules pairs (evaluateTerm t))))
 
 withModules :: (MonadAnalysis term value m, MonadEvaluator term value m) => [(Blob, term)] -> m a -> m a
 withModules pairs = localModuleTable (const moduleTable)
