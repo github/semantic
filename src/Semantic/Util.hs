@@ -3,6 +3,7 @@
 module Semantic.Util where
 
 import Prologue
+import Analysis.Abstract.CallGraph
 import Analysis.Abstract.Evaluating
 import Analysis.Declaration
 import Control.Monad.IO.Class
@@ -42,6 +43,8 @@ evaluateRubyFiles paths = do
 
 
 -- Python
+evaluatePythonCallGraph path = evaluateCallGraph <$> (file path >>= runTask . parse pythonParser)
+
 evaluatePythonFile path = evaluate @PythonValue <$>
   (file path >>= runTask . parse pythonParser)
 
