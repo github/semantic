@@ -27,6 +27,7 @@ type DeadCodeEvaluating t v
      ]
 
 
+-- | Run a dead code analysis of the given program.
 evaluateDead :: forall term value
              .  ( AbstractValue value
                 , Corecursive term
