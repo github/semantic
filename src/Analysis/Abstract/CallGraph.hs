@@ -1,6 +1,7 @@
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving #-}
 module Analysis.Abstract.CallGraph where
 
+import Control.Abstract.Evaluator
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
@@ -17,3 +18,6 @@ type CallGraphEffects term value
      , Reader (Linker term)
      , State  (Linker value)
      ]
+
+newtype CallGraphAnalysis term value a = CallGraphAnalysis { runCallGraphAnalysis :: Evaluator (CallGraphEffects term value) term value a }
+  deriving (Applicative, Functor, Monad)
