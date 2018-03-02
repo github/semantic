@@ -49,7 +49,7 @@ instance Ord CallGraph where
 
 
 newtype CallGraphAnalysis term a = CallGraphAnalysis { runCallGraphAnalysis :: Evaluator (CallGraphEffects term) term CallGraph a }
-  deriving (Applicative, Functor, Monad, MonadFail)
+  deriving (Alternative, Applicative, Functor, Monad, MonadFail)
 
 deriving instance MonadEvaluator term CallGraph (CallGraphAnalysis term)
 
