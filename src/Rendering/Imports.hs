@@ -46,7 +46,7 @@ renderToImports blob term = ImportSummary $ toMap (termToModule blob term)
           _ -> defaultModuleName
 
 makeModule :: (HasField fields Span, HasField fields (Maybe Declaration)) => T.Text -> Blob -> [Record fields] -> Module
-makeModule name Blob{..} ds = Module name [T.pack blobPath] (T.pack . show <$> blobLanguage) (mapMaybe importSummary ds) (mapMaybe declarationSummary ds) (mapMaybe referenceSummary ds)
+makeModule name Blob{..} ds = Module name [T.pack blobPath] (T.pack . show <$> blobLanguage) (mapMaybe importSummary ds) (mapMaybe (declarationSummary name) ds) (mapMaybe referenceSummary ds)
 
 
 getModuleDef :: HasField fields (Maybe ModuleDef) => Record fields -> Maybe ModuleDef
@@ -56,8 +56,8 @@ getModuleDef = getField
 moduleDef :: HasField fields (Maybe ModuleDef) => TermF f (Record fields) a -> Maybe (Record fields)
 moduleDef (In annotation _) = annotation <$ getModuleDef annotation
 
-declarationSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Maybe SymbolDeclaration
-declarationSummary record = case getDeclaration record of
+declarationSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Text -> Record fields -> Maybe SymbolDeclaration
+declarationSummary module' record = case getDeclaration record of
   Just declaration | FunctionDeclaration{} <- declaration -> Just (makeSymbolDeclaration declaration)
                    | MethodDeclaration{} <- declaration -> Just (makeSymbolDeclaration declaration)
   _ -> Nothing
@@ -65,6 +65,7 @@ declarationSummary record = case getDeclaration record of
           { declarationName = declarationIdentifier declaration
           , declarationKind = toCategoryName declaration
           , declarationSpan = getField record
+          , declarationModule = module'
           }
 
 importSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Maybe ImportStatement
@@ -104,6 +105,7 @@ data SymbolDeclaration = SymbolDeclaration
   { declarationName :: T.Text
   , declarationKind :: T.Text
   , declarationSpan :: Span
+  , declarationModule :: T.Text
   } deriving (Generic, Eq, Show)
 
 instance ToJSON SymbolDeclaration where
@@ -111,6 +113,7 @@ instance ToJSON SymbolDeclaration where
     [ "name" .= declarationName
     , "kind" .= declarationKind
     , "span" .= declarationSpan
+    , "module" .= declarationModule
     ]
 
 data ImportStatement = ImportStatement
