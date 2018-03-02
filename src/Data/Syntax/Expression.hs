@@ -12,7 +12,7 @@ import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Store
 import Data.Abstract.Type as Type
-import Data.Abstract.Value (CellValue(..), Value, Interface(..), Closure(..), EnvironmentFor, StoreFor)
+import Data.Abstract.Value (Value, Interface(..), Closure(..), EnvironmentFor, StoreFor)
 import Data.Algebra
 import Diffing.Algorithm
 import Prelude hiding (fail)

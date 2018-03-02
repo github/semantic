@@ -295,7 +295,7 @@ instance ( Members (Evaluating v) es
     put @(EnvironmentFor v) mempty
 
     -- Evaluate the import to get it's environment.
-    -- (Evaluating will have also have potentially updated the global environment).
+    -- (requiring will have also have potentially updated the global environment)
     importedEnv <- require @v (qualifiedName (subterm from))
 
     -- Restore previous global environment, adding the imported env
