@@ -34,8 +34,8 @@ evaluateDead :: forall term value
                 , Evaluatable (Base term)
                 , Foldable (Base term)
                 , FreeVariables term
-                , MonadAddressable (LocationFor value) value (DeadCodeEvaluation term value)
-                , MonadFunction term value (DeadCodeEvaluation term value)
+                , MonadAddressable (LocationFor value) value (DeadCodeAnalysis term value)
+                , MonadFunction term value (DeadCodeAnalysis term value)
                 , Ord (LocationFor value)
                 , Ord term
                 , Recursive term
@@ -43,17 +43,17 @@ evaluateDead :: forall term value
                 )
              => term
              -> Final (DeadCodeEvaluating term value) value
-evaluateDead term = run @(DeadCodeEvaluating term value) . runEvaluator . runDeadCodeEvaluation $ do
+evaluateDead term = run @(DeadCodeEvaluating term value) . runEvaluator . runDeadCodeAnalysis $ do
   killAll (subterms term)
   evaluateTerm term
   where subterms :: (Ord a, Recursive a, Foldable (Base a)) => a -> Dead a
         subterms term = para (foldMap (uncurry ((<>) . point))) term <> point term
 
 
-newtype DeadCodeEvaluation term value a = DeadCodeEvaluation { runDeadCodeEvaluation :: Evaluator (DeadCodeEvaluating term value) term value a }
+newtype DeadCodeAnalysis term value a = DeadCodeAnalysis { runDeadCodeAnalysis :: Evaluator (DeadCodeEvaluating term value) term value a }
   deriving (Applicative, Functor, Monad, MonadFail)
 
-deriving instance MonadEvaluator term value (DeadCodeEvaluation term value)
+deriving instance MonadEvaluator term value (DeadCodeAnalysis term value)
 
 
 -- | A set of “dead” (unreachable) terms.
@@ -61,25 +61,25 @@ newtype Dead a = Dead { unDead :: Set a }
   deriving (Eq, Foldable, Semigroup, Monoid, Ord, Pointed, Show)
 
 -- | Update the current 'Dead' set.
-killAll :: Dead t -> DeadCodeEvaluation t v ()
-killAll = DeadCodeEvaluation . Evaluator . put
+killAll :: Dead t -> DeadCodeAnalysis t v ()
+killAll = DeadCodeAnalysis . Evaluator . put
 
 -- | Revive a single term, removing it from the current 'Dead' set.
-revive :: Ord t => t -> DeadCodeEvaluation t v ()
-revive t = DeadCodeEvaluation (Evaluator (modify (Dead . delete t . unDead)))
+revive :: Ord t => t -> DeadCodeAnalysis t v ()
+revive t = DeadCodeAnalysis (Evaluator (modify (Dead . delete t . unDead)))
 
 
 instance ( AbstractValue v
          , Corecursive t
          , Evaluatable (Base t)
          , FreeVariables t
-         , MonadAddressable (LocationFor v) v (DeadCodeEvaluation t v)
-         , MonadFunction t v (DeadCodeEvaluation t v)
+         , MonadAddressable (LocationFor v) v (DeadCodeAnalysis t v)
+         , MonadFunction t v (DeadCodeAnalysis t v)
          , Ord t
          , Recursive t
          , Semigroup (Cell (LocationFor v) v)
          )
-         => MonadAnalysis t v (DeadCodeEvaluation t v) where
+         => MonadAnalysis t v (DeadCodeAnalysis t v) where
   evaluateTerm = foldSubterms (\ term -> do
     revive (embed (subterm <$> term))
     eval term)
