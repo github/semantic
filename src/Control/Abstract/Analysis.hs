@@ -5,5 +5,4 @@ module Control.Abstract.Analysis where
 --
 --   This typeclass is left intentionally unconstrained to avoid circular dependencies between it and other typeclasses.
 class Monad m => MonadAnalysis term value m | m -> term, m -> value where
-  evaluateTerm :: term
-               -> m value
+  evaluateTerm :: term -> m value
