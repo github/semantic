@@ -12,6 +12,12 @@ import Data.Abstract.Linker
 import Data.Abstract.Value
 import Prelude hiding (fail)
 
+-- | A 'Monad' providing the basic essentials for evaluation.
+--
+--   These presently include:
+--   - environments binding names to addresses
+--   - a store mapping addresses to (possibly sets of) values
+--   - tables of modules available for import
 class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   getGlobalEnv :: m (EnvironmentFor value)
   modifyGlobalEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m ()
