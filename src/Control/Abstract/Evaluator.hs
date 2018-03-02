@@ -36,6 +36,11 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   lookupLocalEnv :: Name -> m (Maybe (Address (LocationFor value) value))
   lookupLocalEnv name = envLookup name <$> askLocalEnv
 
+  lookupWith :: (Address (LocationFor value) value -> m value) -> Name -> m (Maybe value)
+  lookupWith with name = do
+    addr <- lookupLocalEnv name
+    maybe (pure Nothing) (fmap Just . with) addr
+
   -- | Retrieve the heap.
   getStore :: m (StoreFor value)
   -- | Update the heap.
