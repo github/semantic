@@ -94,7 +94,7 @@ instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Assignment where
   eval Assignment{..} = do
     v <- subtermValue assignmentValue
-    (var, a) <- askLocalEnv >>= lookupOrAlloc (subterm assignmentTarget) v
+    (var, a) <- lookupOrAlloc (subterm assignmentTarget) v
 
     modifyGlobalEnv (envInsert var a)
     pure v

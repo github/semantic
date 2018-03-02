@@ -22,10 +22,9 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Function where
   eval Function{..} = do
-    env <- askLocalEnv
     let params = toList (liftFreeVariables (freeVariables . subterm) functionParameters)
     v <- abstract params functionBody
-    (name, addr) <- lookupOrAlloc (subterm functionName) v env
+    (name, addr) <- lookupOrAlloc (subterm functionName) v
     modifyGlobalEnv (envInsert name addr)
     pure v
 
@@ -44,11 +43,10 @@ instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 -- local environment.
 instance Evaluatable Method where
   eval Method{..} = do
-    env <- askLocalEnv
     let params = toList (liftFreeVariables (freeVariables . subterm) methodParameters)
     v <- abstract params methodBody
 
-    (name, addr) <- lookupOrAlloc (subterm methodName) v env
+    (name, addr) <- lookupOrAlloc (subterm methodName) v
     modifyGlobalEnv (envInsert name addr)
     pure v
 

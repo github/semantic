@@ -6,7 +6,6 @@ import Control.Applicative
 import Control.Monad ((<=<))
 import Control.Monad.Effect.Fail
 import Data.Abstract.Address
-import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Store
 import Data.Abstract.Value
@@ -33,7 +32,6 @@ lookupOrAlloc :: ( FreeVariables t
                  )
                  => t
                  -> a
-                 -> Environment (LocationFor a) a
                  -> m (Name, Address (LocationFor a) a)
 lookupOrAlloc term = let [name] = toList (freeVariables term) in
                          lookupOrAlloc' name
@@ -45,10 +43,9 @@ lookupOrAlloc term = let [name] = toList (freeVariables term) in
                       )
                       => Name
                       -> a
-                      -> Environment (LocationFor a) a
                       -> m (Name, Address (LocationFor a) a)
-    lookupOrAlloc' name v env = do
-      a <- maybe (alloc name) pure (envLookup name env)
+    lookupOrAlloc' name v = do
+      a <- lookupLocalEnv name >>= maybe (alloc name) pure
       assign a v
       pure (name, a)
 
