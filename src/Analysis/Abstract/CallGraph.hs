@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving #-}
 module Analysis.Abstract.CallGraph where
 
 import Control.Abstract.Evaluator
@@ -20,4 +20,6 @@ type CallGraphEffects term value
      ]
 
 newtype CallGraphAnalysis term value a = CallGraphAnalysis { runCallGraphAnalysis :: Evaluator (CallGraphEffects term value) term value a }
-  deriving (Applicative, Functor, Monad)
+  deriving (Applicative, Functor, Monad, MonadFail)
+
+deriving instance MonadEvaluator term value (CallGraphAnalysis term value)
