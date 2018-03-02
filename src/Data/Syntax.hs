@@ -108,7 +108,7 @@ instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Identifier where
-  eval (Identifier name) = lookupLocalEnv name >>= maybe (fail ("free variable: " <> unpack name)) deref
+  eval (Identifier name) = lookupWith deref name >>= maybe (fail ("free variable: " <> unpack name)) pure
 
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = point x
