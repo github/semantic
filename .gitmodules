@@ -34,3 +34,6 @@
 [submodule "vendor/proto3-suite"]
 	path = vendor/proto3-suite
 	url = https://github.com/joshvera/proto3-suite
+[submodule "vendor/proto3-wire"]
+	path = vendor/proto3-wire
+	url = https://github.com/joshvera/proto3-wire
