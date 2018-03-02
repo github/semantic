@@ -17,7 +17,9 @@ import Prelude hiding (fail)
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
 class MonadEvaluator t v m => MonadFunction t v m where
+  -- | Evaluate an abstraction (a binder like a lambda or method definition).
   abstract :: [Name] -> Subterm t (m v) -> m v
+  -- | Evaluate an application (like a function call).
   apply :: v -> [Subterm t (m v)] -> m v
 
 instance ( FreeVariables t
