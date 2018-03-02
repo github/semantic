@@ -16,7 +16,7 @@ import Data.Set (delete)
 import Prologue
 
 -- | The effects necessary for dead code analysis.
-type DeadCodeEvaluating t v
+type DeadCodeEffects t v
   = '[ State (Dead t)                  -- The set of dead terms
      , Fail                            -- Failure with an error message
      , State (Store (LocationFor v) v) -- The heap
@@ -42,15 +42,15 @@ evaluateDead :: forall term value
                 , Semigroup (Cell (LocationFor value) value)
                 )
              => term
-             -> Final (DeadCodeEvaluating term value) value
-evaluateDead term = run @(DeadCodeEvaluating term value) . runEvaluator . runDeadCodeAnalysis $ do
+             -> Final (DeadCodeEffects term value) value
+evaluateDead term = run @(DeadCodeEffects term value) . runEvaluator . runDeadCodeAnalysis $ do
   killAll (subterms term)
   evaluateTerm term
   where subterms :: (Ord a, Recursive a, Foldable (Base a)) => a -> Dead a
         subterms term = para (foldMap (uncurry ((<>) . point))) term <> point term
 
 
-newtype DeadCodeAnalysis term value a = DeadCodeAnalysis { runDeadCodeAnalysis :: Evaluator (DeadCodeEvaluating term value) term value a }
+newtype DeadCodeAnalysis term value a = DeadCodeAnalysis { runDeadCodeAnalysis :: Evaluator (DeadCodeEffects term value) term value a }
   deriving (Applicative, Functor, Monad, MonadFail)
 
 deriving instance MonadEvaluator term value (DeadCodeAnalysis term value)
