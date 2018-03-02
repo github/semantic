@@ -36,7 +36,7 @@ instance ( FreeVariables t
       envInsert name a <$> rest) (pure env) (zip names params)
     localEnv (mappend bindings) (evaluateTerm body)
 
-instance (Alternative m, MonadEvaluator t (Type t) m, MonadFresh m) => MonadFunction t (Type t) m where
+instance (Alternative m, MonadEvaluator t Type m, MonadFresh m) => MonadFunction t Type m where
   abstract names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name

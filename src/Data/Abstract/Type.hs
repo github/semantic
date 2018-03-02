@@ -8,21 +8,21 @@ import Prelude hiding (fail)
 type TName = Int
 
 -- | A datatype representing primitive types and combinations thereof.
-data Type term
-  = Int                      -- ^ Primitive int type.
-  | Bool                     -- ^ Primitive boolean type.
-  | String                   -- ^ Primitive string type.
-  | Unit                     -- ^ The unit type.
-  | Type term :-> Type term  -- ^ Binary function types.
-  | Var TName                -- ^ A type variable.
-  | Product [Type term]      -- ^ N-ary products.
+data Type
+  = Int            -- ^ Primitive int type.
+  | Bool           -- ^ Primitive boolean type.
+  | String         -- ^ Primitive string type.
+  | Unit           -- ^ The unit type.
+  | Type :-> Type  -- ^ Binary function types.
+  | Var TName      -- ^ A type variable.
+  | Product [Type] -- ^ N-ary products.
   deriving (Eq, Ord, Show)
 
 -- TODO: À la carte representation of types.
 
 
 -- | Unify two 'Type's.
-unify :: MonadFail m => Type term -> Type term -> m (Type term)
+unify :: MonadFail m => Type -> Type -> m Type
 unify Int  Int  = pure Int
 unify Bool Bool = pure Bool
 unify (a1 :-> b1) (a2 :-> b2) = (:->) <$> unify a1 a2 <*> unify b1 b2
