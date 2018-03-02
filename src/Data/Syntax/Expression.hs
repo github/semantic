@@ -195,35 +195,7 @@ instance Ord1 MemberAccess where liftCompare = genericLiftCompare
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for MemberAccess
-instance ( FreeVariables t
-         , Ord l
-         , Show l
-         , Show t
-         , Show (Cell l (Value l t))
-         , CellValue l (Value l t)
-         , Member Fail es
-         , Member (State (EnvironmentFor (Value l t))) es
-         , Member (Reader (EnvironmentFor (Value l t))) es
-         , Member (State (StoreFor (Value l t))) es
-         ) => Evaluatable es t (Value l t) MemberAccess where
-  eval (MemberAccess a b) = do
-    let scope = qualifiedName (subterm a)
-    env <- get @(EnvironmentFor (Value l t))
-    case envLookup scope env of
-      Nothing -> fail ("qualified name not found: " <> show scope)
-      Just addr -> do
-        store <- get @(StoreFor (Value l t))
-        case storeLookup addr store of
-          Nothing -> fail "address not found"
-          Just c -> do
-            let interface = val c
-            Interface _ env <- maybe
-                                 (fail ("expected an interface, but got: " <> show interface))
-                                 pure
-                                 (prj interface :: Maybe (Interface l t))
-            local (const env) (subtermValue b)
-
-instance Member Fail es => Evaluatable es t Type.Type MemberAccess where
+instance Member Fail es => Evaluatable es t v MemberAccess
 
 -- | Subscript (e.g a[1])
 data Subscript a

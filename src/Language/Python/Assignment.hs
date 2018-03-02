@@ -79,6 +79,7 @@ type Syntax =
    , Syntax.Empty
    , Syntax.Error
    , Syntax.Identifier
+   , Syntax.QualifiedIdentifier
    , Syntax.Program
    , Type.Annotation
    , []
@@ -451,8 +452,14 @@ slice = makeTerm <$> symbol Slice <*> children
                           <*> (term expression <|> emptyTerm))
 
 call :: Assignment
-call = makeTerm <$> symbol Call <*> children (Expression.Call <$> pure [] <*> term expression <*> (symbol ArgumentList *> children (manyTerm expression)
-                                                                                <|> someTerm comprehension) <*> emptyTerm)
+call = makeTerm <$> symbol Call <*> children (Expression.Call <$> pure [] <*> term qualifiedIdentifier <*> (symbol ArgumentList *> children (manyTerm expression) <|> someTerm comprehension) <*> emptyTerm)
+  where
+    qualifiedIdentifier =  makeQualifiedIdentifier <$> symbol Attribute <*> children (some identifier)
+                       <|> plainIdentifier
+    plainIdentifier = makeTerm <$> location <*> (Syntax.QualifiedIdentifier <$> identifier)
+    makeQualifiedIdentifier loc [x] = makeTerm loc (Syntax.QualifiedIdentifier x)
+    makeQualifiedIdentifier loc xs = makeTerm loc (Syntax.QualifiedIdentifier (makeTerm' loc (inj xs)))
+
 
 boolean :: Assignment
 boolean =  makeTerm <$> token Grammar.True <*> pure Literal.true

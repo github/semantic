@@ -126,6 +126,25 @@ instance ( Addressable (LocationFor v) es
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = point x
 
+newtype QualifiedIdentifier a = QualifiedIdentifier a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 QualifiedIdentifier where liftEq = genericLiftEq
+instance Ord1 QualifiedIdentifier where liftCompare = genericLiftCompare
+instance Show1 QualifiedIdentifier where liftShowsPrec = genericLiftShowsPrec
+
+instance ( Addressable (LocationFor v) es
+         , Member Fail es
+         , Member (Reader (EnvironmentFor v)) es
+         , Member (State (StoreFor v)) es
+         , FreeVariables t
+         ) => Evaluatable es t v QualifiedIdentifier where
+  eval (QualifiedIdentifier xs) = do
+    env <- ask
+    let name = qualifiedName (subterm xs)
+    maybe (fail ("free variable: " <> unpack name)) deref (envLookup name env)
+
+
 newtype Program a = Program [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
