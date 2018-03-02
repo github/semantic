@@ -30,11 +30,10 @@ type EvaluationEffects t v
 
 -- | Evaluate a term to a value.
 evaluate :: forall v term
-         .  ( AbstractValue v (Evaluation term v)
-            , Evaluatable (Base term)
+         .  ( Evaluatable (Base term)
             , FreeVariables term
             , MonadAddressable (LocationFor v) v (Evaluation term v)
-            , MonadFunction term v (Evaluation term v)
+            , MonadValue term v (Evaluation term v)
             , Ord (LocationFor v)
             , Recursive term
             , Semigroup (Cell (LocationFor v) v)
@@ -45,11 +44,10 @@ evaluate = run @(EvaluationEffects term v) . runEvaluator . runEvaluation . eval
 
 -- | Evaluate terms and an entry point to a value.
 evaluates :: forall v term
-          .  ( AbstractValue v (Evaluation term v)
-             , Evaluatable (Base term)
+          .  ( Evaluatable (Base term)
              , FreeVariables term
              , MonadAddressable (LocationFor v) v (Evaluation term v)
-             , MonadFunction term v (Evaluation term v)
+             , MonadValue term v (Evaluation term v)
              , Ord (LocationFor v)
              , Recursive term
              , Semigroup (Cell (LocationFor v) v)
@@ -70,11 +68,10 @@ newtype Evaluation term value a = Evaluation { runEvaluation :: Evaluator (Evalu
 
 deriving instance MonadEvaluator term value (Evaluation term value)
 
-instance ( AbstractValue v (Evaluation t v)
-         , Evaluatable (Base t)
+instance ( Evaluatable (Base t)
          , FreeVariables t
          , MonadAddressable (LocationFor v) v (Evaluation t v)
-         , MonadFunction t v (Evaluation t v)
+         , MonadValue t v (Evaluation t v)
          , Recursive t
          , Semigroup (Cell (LocationFor v) v)
          )

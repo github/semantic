@@ -92,53 +92,11 @@ class ValueRoots l v | v -> l where
   -- | Compute the set of addresses rooted by a given value.
   valueRoots :: v -> Live l v
 
--- | An interface for constructing abstract values.
---   MonadFail is required for eliminating if-statements.
-class MonadFail m => AbstractValue v m where
-  -- | Construct an abstract unit value.
-  unit :: m v
-
-  -- | Construct an abstract integral value.
-  integer :: Prelude.Integer -> m v
-
-  -- | Construct an abstract boolean value.
-  boolean :: Bool -> m v
-
-  -- | Construct an abstract string value.
-  string :: ByteString -> m v
-
-  -- | Eliminate boolean values. TODO: s/boolean/truthy
-  ifthenelse :: v -> m v -> m v -> m v
-
-
--- Instances
-
 instance (FreeVariables term, Ord location) => ValueRoots location (Value location term) where
   valueRoots v
     | Just (Closure names body env) <- prj v = envRoots env (foldr Set.delete (freeVariables body) names)
     | Just (Interface _ env) <- prj v        = envAll env
     | otherwise                              = mempty
 
--- | Construct a 'Value' wrapping the value arguments (if any).
---   PT TODO: Needs to be moved into some sort of MonadFail context.
-instance MonadFail m => AbstractValue (Value location term) m where
-  unit    = pure $ inj Unit
-  integer = pure . inj . Integer
-  boolean = pure . inj . Boolean
-  string  = pure . inj . String
-
-  ifthenelse cond if' else'
-    | Just (Boolean b) <- prj cond = if b then if' else else'
-    | otherwise = fail "not defined for non-boolean conditions"
-
 instance ValueRoots Monovariant Type.Type where
   valueRoots _ = mempty
-
--- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
-instance (Alternative m, MonadFail m) => AbstractValue Type.Type m where
-  unit      = pure Type.Unit
-  integer _ = pure Type.Int
-  boolean _ = pure Type.Bool
-  string _  = pure Type.String
-
-  ifthenelse cond if' else' = Type.unify cond Type.Bool *> (if' <|> else')

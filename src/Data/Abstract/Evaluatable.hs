@@ -1,11 +1,10 @@
 {-# LANGUAGE DefaultSignatures, FunctionalDependencies, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( Evaluatable(..)
-, AbstractValue(..)
 , module Addressable
 , module Analysis
 , module FreeVariables
-, module Function
+, module Value
 , MonadEvaluator(..)
 , require
 , load
@@ -14,7 +13,7 @@ module Data.Abstract.Evaluatable
 import Control.Abstract.Addressable as Addressable
 import Control.Abstract.Analysis as Analysis
 import Control.Abstract.Evaluator
-import Control.Abstract.Function as Function
+import Control.Abstract.Value as Value
 import Control.Monad.Effect.Fail
 import Data.Abstract.Address
 import Data.Abstract.Environment
@@ -33,12 +32,11 @@ import Prologue
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
-  eval :: ( AbstractValue value m
-          , FreeVariables term
+  eval :: ( FreeVariables term
           , MonadAddressable (LocationFor value) value m
           , MonadAnalysis term value m
           , MonadEvaluator term value m
-          , MonadFunction term value m
+          , MonadValue term value m
           , Ord (LocationFor value)
           , Semigroup (Cell (LocationFor value) value)
           )
