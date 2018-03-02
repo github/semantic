@@ -10,20 +10,35 @@ import Control.Monad.Effect.State
 import Data.Abstract.Evaluatable
 import Data.Abstract.Linker
 import Data.Abstract.Value
+import Prologue hiding (empty)
 
 type CallGraphEffects term
   = '[ Fail
      , NonDetEff
-     , State  (StoreFor CallGraph)
-     , State  (EnvironmentFor CallGraph)
-     , Reader (EnvironmentFor CallGraph)
+     , State  (StoreFor CallGraphS)
+     , State  (EnvironmentFor CallGraphS)
+     , Reader (EnvironmentFor CallGraphS)
      , Reader (Linker term)
-     , State  (Linker CallGraph)
+     , State  (Linker CallGraphS)
      ]
 
 type CallGraph = Graph Name
+type CallGraphS = CallGraph -> CallGraph
 
-newtype CallGraphAnalysis term a = CallGraphAnalysis { runCallGraphAnalysis :: Evaluator (CallGraphEffects term) term CallGraph a }
+newtype CallGraphAnalysis term a = CallGraphAnalysis { runCallGraphAnalysis :: Evaluator (CallGraphEffects term) term CallGraphS a }
   deriving (Applicative, Functor, Monad, MonadFail)
 
-deriving instance MonadEvaluator term CallGraph (CallGraphAnalysis term)
+deriving instance MonadEvaluator term CallGraphS (CallGraphAnalysis term)
+
+
+instance MonadValue term CallGraphS (CallGraphAnalysis term) where
+  unit = pure id
+  integer _ = pure id
+  boolean _ = pure id
+  string _ = pure id
+
+  ifthenelse _ then' else' = liftA2 overlay <$> then' <*> else'
+
+  abstract _ = subtermValue
+
+  apply operator arguments = foldr (liftA2 overlay) operator <$> traverse subtermValue arguments
