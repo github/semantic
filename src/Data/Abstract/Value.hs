@@ -87,6 +87,15 @@ type family LocationFor value :: * where
   LocationFor Type.Type = Monovariant
 
 
+type AbstractEnvironmentFor v = AbstractEnvironment (LocationFor v) v
+class AbstractEnvironment l v | v -> l where
+  environment :: v -> EnvironmentFor v
+
+instance AbstractEnvironment l (Value l t) where
+  environment v
+    | Just (Interface _ env) <- prj v = env
+    | otherwise                       = mempty
+
 -- | Extract the value back out of a cell.
 class CellValue l v where
   val :: Cell l v -> v

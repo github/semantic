@@ -15,7 +15,6 @@ import Diffing.Algorithm
 import Prelude hiding (fail)
 import Prologue
 import qualified Data.Abstract.Type as Type
-import qualified Data.Abstract.Value as Value
 import qualified Data.Map as Map
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
@@ -280,39 +279,38 @@ instance Eq1 Import2 where liftEq = genericLiftEq
 instance Ord1 Import2 where liftCompare = genericLiftCompare
 instance Show1 Import2 where liftShowsPrec = genericLiftShowsPrec
 
-instance ( Semigroup (Cell l (Value l t))
-         , Members (Evaluating (Value l t)) es
-         , Addressable l es
-         , Evaluatable es t (Value l t) (Base t)
+instance ( Members (Evaluating v) es
+         , Evaluatable es t v (Base t)
          , Recursive t
          , FreeVariables t
+         , AbstractValue v
+         , AbstractEnvironmentFor v
          )
-         => Evaluatable es t (Value l t) Import2 where
+         => Evaluatable es t v Import2 where
   eval (Import2 from alias xs) = do
     -- Capture current global environment
-    env <- get @(EnvironmentFor (Value l t))
+    env <- get @(EnvironmentFor v)
 
-    -- Evaluate the import, the interface value we get back will contain an
-    -- environment but evaluating will have also have potentially updated the
-    -- global environment.
-    interface <- require @(Value l t) (qualifiedName (subterm from))
-    (Interface _ modEnv) <- maybe (fail "expected an interface") pure (prj interface :: Maybe (Interface l t))
+    -- TODO: We may or may not want to clear the globalEnv before requiring.
+    put @(EnvironmentFor v) mempty
+
+    -- Evaluate the import to get it's environment.
+    -- (Evaluating will have also have potentially updated the global environment).
+    importedEnv <- require @v (qualifiedName (subterm from))
 
     -- Restore previous global environment, adding the imported env
     let symbols = Map.fromList xs
     let prefix = qualifiedName (subterm alias) <> "."
     env' <- Map.foldrWithKey (\k v rest -> do
       if Map.null symbols
+         -- Copy over all symbols in the environment under their qualified names.
         then envInsert (prefix <> k) v <$> rest
-        else case Map.lookup k symbols of
-          Just symAlias -> envInsert symAlias v <$> rest
-          Nothing -> rest
-      ) (pure env) (unEnvironment modEnv)
+        -- Only copy over specified symbols, possibly aliasing them.
+        else maybe rest (\symAlias -> envInsert symAlias v <$> rest) (Map.lookup k symbols)
+      ) (pure env) (unEnvironment importedEnv)
 
     modify (const env')
-    pure interface
-
-instance Member Fail es => Evaluatable es t Type.Type Import2
+    pure unit
 
 
 -- | A wildcard import
@@ -325,9 +323,13 @@ instance Show1 WildcardImport where liftShowsPrec = genericLiftShowsPrec
 
 instance ( Members (Evaluating v) es
          , FreeVariables t
+         , AbstractEnvironmentFor v
+         , AbstractValue v
          )
          => Evaluatable es t v WildcardImport where
-  eval (WildcardImport from _) = require @v (qualifiedName (subterm from))
+  eval (WildcardImport from _) = put @(EnvironmentFor v) mempty
+                               >> require @v (qualifiedName (subterm from))
+                               >> pure unit
 
 
 -- | An imported symbol
