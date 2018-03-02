@@ -8,6 +8,9 @@ import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
+import Data.Abstract.Address
+import Data.Abstract.Environment
+import Data.Abstract.FreeVariables
 import Data.Abstract.Linker
 import Data.Abstract.Value
 import Prelude hiding (fail)
@@ -28,6 +31,10 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   askLocalEnv :: m (EnvironmentFor value)
   -- | Run an action with a locally-modified environment.
   localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m a -> m a
+
+  -- | Look a 'Name' up in the local environment.
+  lookupLocalEnv :: Name -> m (Maybe (Address (LocationFor value) value))
+  lookupLocalEnv name = envLookup name <$> askLocalEnv
 
   -- | Retrieve the heap.
   getStore :: m (StoreFor value)
