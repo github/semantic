@@ -28,7 +28,28 @@ type CallGraphS = CallGraph -> CallGraph
 newtype CallGraphAnalysis term a = CallGraphAnalysis { runCallGraphAnalysis :: Evaluator (CallGraphEffects term) term CallGraphS a }
   deriving (Applicative, Functor, Monad, MonadFail)
 
-deriving instance MonadEvaluator term CallGraphS (CallGraphAnalysis term)
+instance MonadEvaluator term CallGraphS (CallGraphAnalysis term) where
+  getGlobalEnv = CallGraphAnalysis getGlobalEnv
+  modifyGlobalEnv f = CallGraphAnalysis (modifyGlobalEnv f)
+
+  askLocalEnv = CallGraphAnalysis askLocalEnv
+  localEnv f a = CallGraphAnalysis (localEnv f (runCallGraphAnalysis a))
+
+  lookupWith with name = do
+    addr <- lookupLocalEnv name
+    maybe (pure Nothing) connectWith addr
+    where connectWith addr = do
+            v <- with addr
+            pure (Just (connect <*> v))
+
+  getStore = CallGraphAnalysis getStore
+  modifyStore f = CallGraphAnalysis (modifyStore f)
+
+  getModuleTable = CallGraphAnalysis getModuleTable
+  modifyModuleTable f = CallGraphAnalysis (modifyModuleTable f)
+
+  askModuleTable = CallGraphAnalysis askModuleTable
+  localModuleTable f a = CallGraphAnalysis (localModuleTable f (runCallGraphAnalysis a))
 
 
 instance MonadValue term CallGraphS (CallGraphAnalysis term) where
