@@ -15,8 +15,10 @@ instance Ord1 If where liftCompare = genericLiftCompare
 instance Show1 If where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for If
-instance Evaluatable If
-
+instance Evaluatable If where
+  eval (If cond if' else') = do
+    bool <- subtermValue cond
+    ifthenelse bool (subtermValue if') (subtermValue else')
 
 -- | Else statement. The else condition is any term, that upon successful completion, continues evaluation to the elseBody, e.g. `for ... else` in Python.
 data Else a = Else { elseCondition :: !a, elseBody :: !a }
@@ -185,8 +187,8 @@ instance Ord1 NoOp where liftCompare = genericLiftCompare
 instance Show1 NoOp where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for NoOp
-instance Evaluatable NoOp
-
+instance Evaluatable NoOp where
+  eval _ = unit
 
 -- Loops
 

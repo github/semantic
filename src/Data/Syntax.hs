@@ -127,7 +127,7 @@ instance Evaluatable Program where
     where
       interface val = pure val -- inj . Value.Interface val <$> askLocalEnv
 
-      eval' [] = interface unit
+      eval' [] = unit >>= interface
       eval' [x] = subtermValue x >>= interface
       eval' (x:xs) = do
         _ <- subtermValue x
@@ -156,7 +156,7 @@ instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 instance Evaluatable Empty where
-  eval _ = pure unit
+  eval _ = unit
 
 
 -- | Syntax representing a parsing or assignment error.

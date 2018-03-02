@@ -29,7 +29,7 @@ type DeadCodeEffects t v
 
 -- | Run a dead code analysis of the given program.
 evaluateDead :: forall term value
-             .  ( AbstractValue value
+             .  ( AbstractValue value (DeadCodeAnalysis term value)
                 , Corecursive term
                 , Evaluatable (Base term)
                 , Foldable (Base term)
@@ -70,7 +70,7 @@ revive :: Ord t => t -> DeadCodeAnalysis t v ()
 revive t = DeadCodeAnalysis (Evaluator (modify (Dead . delete t . unDead)))
 
 
-instance ( AbstractValue v
+instance ( AbstractValue v (DeadCodeAnalysis t v)
          , Corecursive t
          , Evaluatable (Base t)
          , FreeVariables t

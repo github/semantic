@@ -30,7 +30,7 @@ type EvaluationEffects t v
 
 -- | Evaluate a term to a value.
 evaluate :: forall v term
-         .  ( AbstractValue v
+         .  ( AbstractValue v (Evaluation term v)
             , Evaluatable (Base term)
             , FreeVariables term
             , MonadAddressable (LocationFor v) v (Evaluation term v)
@@ -45,7 +45,7 @@ evaluate = run @(EvaluationEffects term v) . runEvaluator . runEvaluation . eval
 
 -- | Evaluate terms and an entry point to a value.
 evaluates :: forall v term
-          .  ( AbstractValue v
+          .  ( AbstractValue v (Evaluation term v)
              , Evaluatable (Base term)
              , FreeVariables term
              , MonadAddressable (LocationFor v) v (Evaluation term v)
@@ -70,7 +70,7 @@ newtype Evaluation term value a = Evaluation { runEvaluation :: Evaluator (Evalu
 
 deriving instance MonadEvaluator term value (Evaluation term value)
 
-instance ( AbstractValue v
+instance ( AbstractValue v (Evaluation t v)
          , Evaluatable (Base t)
          , FreeVariables t
          , MonadAddressable (LocationFor v) v (Evaluation t v)

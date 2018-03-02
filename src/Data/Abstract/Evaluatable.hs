@@ -33,7 +33,7 @@ import Prologue
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
-  eval :: ( AbstractValue value
+  eval :: ( AbstractValue value m
           , FreeVariables term
           , MonadAddressable (LocationFor value) value m
           , MonadAnalysis term value m
@@ -63,7 +63,7 @@ instance Evaluatable s => Evaluatable (TermF s a) where
 --   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
 --   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
-  eval []     = pure unit      -- Return unit value if this is an empty list of terms
+  eval []     = unit           -- Return unit value if this is an empty list of terms
   eval [x]    = subtermValue x -- Return the value for the last term
   eval (x:xs) = do
     _ <- subtermValue x        -- Evaluate the head term

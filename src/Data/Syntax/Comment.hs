@@ -14,7 +14,7 @@ instance Ord1 Comment where liftCompare = genericLiftCompare
 instance Show1 Comment where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Comment where
-  eval _ = pure unit
+  eval _ = unit
 
 -- TODO: nested comment types
 -- TODO: documentation comment types
