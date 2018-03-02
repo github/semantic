@@ -81,6 +81,8 @@ instance MonadValue term CallGraph (CallGraphAnalysis term) where
 
   apply operator arguments = foldr overlay operator <$> traverse subtermValue arguments
 
+type instance LocationFor CallGraph = Monovariant
+
 
 instance ( Evaluatable (Base term)
          , FreeVariables term
