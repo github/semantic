@@ -88,7 +88,7 @@ instance ( Evaluatable (Base term)
          , Semigroup (Cell (LocationFor CallGraph) CallGraph)
          )
          => MonadAnalysis term CallGraph (CallGraphAnalysis term) where
-  evaluateTerm = foldSubterms (\ term -> do
+  evaluateTerm = foldSubterms (\ term ->
     connectDeclaration (subterm <$> term) <$> eval term)
 
 
