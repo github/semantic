@@ -3,6 +3,7 @@ module Analysis.Abstract.CallGraph where
 
 import qualified Algebra.Graph as G
 import Algebra.Graph.Class
+import Algebra.Graph.Export.Dot
 import Control.Abstract.Evaluator
 import Control.Effect
 import Control.Monad.Effect.Fail
@@ -34,6 +35,9 @@ newtype CallGraph = CallGraph { unCallGraph :: G.Graph Name }
 instance Monoid CallGraph where
   mempty = empty
   mappend = overlay
+
+renderCallGraph :: CallGraph -> ByteString
+renderCallGraph = export (defaultStyle id) . unCallGraph
 
 instance Ord CallGraph where
   compare (CallGraph G.Empty)           (CallGraph G.Empty)           = EQ
