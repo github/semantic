@@ -263,7 +263,8 @@
             ]
           },
           "kind": "Function",
-          "name": "someFunction"
+          "name": "someFunction",
+          "module": "app"
         }
       ],
       "paths": [
