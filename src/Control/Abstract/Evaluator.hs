@@ -68,6 +68,7 @@ instance Members '[ Fail
   localModuleTable f a = Evaluator (local f (runEvaluator a))
 
 
+-- | An evaluator of @term@s to @value@s, producing incremental results of type @a@ using a list of @effects@.
 newtype Evaluator effects term value a = Evaluator { runEvaluator :: Eff effects a }
   deriving (Applicative, Functor, Monad)
 
