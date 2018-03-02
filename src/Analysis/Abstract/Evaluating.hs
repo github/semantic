@@ -59,6 +59,7 @@ evaluates :: forall v term
           -> Final (EvaluationEffects term v) v
 evaluates pairs (_, t) = run @(EvaluationEffects term v) (runEvaluator (runEvaluation (localModuleTable (const (Linker (Map.fromList (map (first (dropExtensions . blobPath)) pairs)))) (evaluateTerm t))))
 
+-- | An analysis performing concrete evaluation of @term@s to @value@s.
 newtype Evaluation term value a = Evaluation { runEvaluation :: Evaluator (EvaluationEffects term value) term value a }
   deriving (Applicative, Functor, Monad, MonadFail)
 
