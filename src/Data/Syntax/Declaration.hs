@@ -16,6 +16,7 @@ import Prelude hiding (fail)
 import Prologue
 import qualified Data.Abstract.Type as Type
 import qualified Data.Abstract.Value as Value
+import qualified Data.Map as Map
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -267,10 +268,17 @@ instance Member Fail es => Evaluatable es t v Comprehension
 -- | Import declarations.
 data Import a = Import { importFrom :: !a, importAlias :: !a, importSymbols :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
 instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
+instance Member Fail es => Evaluatable es t v Import
+
+data Import2 a = Import2 { import2From :: !a, import2Alias :: !a, import2Symbols :: ![(Name, Name)] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 Import2 where liftEq = genericLiftEq
+instance Ord1 Import2 where liftCompare = genericLiftCompare
+instance Show1 Import2 where liftShowsPrec = genericLiftShowsPrec
 
 instance ( Semigroup (Cell l (Value l t))
          , Members (Evaluating (Value l t)) es
@@ -279,8 +287,8 @@ instance ( Semigroup (Cell l (Value l t))
          , Recursive t
          , FreeVariables t
          )
-         => Evaluatable es t (Value l t) Import where
-  eval (Import from alias _) = do
+         => Evaluatable es t (Value l t) Import2 where
+  eval (Import2 from alias xs) = do
     -- Capture current global environment
     env <- get @(EnvironmentFor (Value l t))
 
@@ -288,14 +296,23 @@ instance ( Semigroup (Cell l (Value l t))
     -- environment but evaluating will have also have potentially updated the
     -- global environment.
     interface <- require @(Value l t) (qualifiedName (subterm from))
+    (Interface _ modEnv) <- maybe (fail "expected an interface") pure (prj interface :: Maybe (Interface l t))
 
     -- Restore previous global environment, adding the imported env
-    (name, addr) <- lookupOrAlloc' (qualifiedName (subterm alias)) interface env
-    modify (const (envInsert name addr env)) -- const is important. We are throwing away the modified global env and specifically crafting a new one.
+    let symbols = Map.fromList xs
+    let prefix = qualifiedName (subterm alias) <> "."
+    env' <- Map.foldrWithKey (\k v rest -> do
+      if Map.null symbols
+        then envInsert (prefix <> k) v <$> rest
+        else case Map.lookup k symbols of
+          Just symAlias -> envInsert symAlias v <$> rest
+          Nothing -> rest
+      ) (pure env) (unEnvironment modEnv)
 
+    modify (const env')
     pure interface
 
-instance Member Fail es => Evaluatable es t Type.Type Import
+instance Member Fail es => Evaluatable es t Type.Type Import2
 
 
 -- | A wildcard import

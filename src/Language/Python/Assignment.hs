@@ -34,8 +34,7 @@ type Syntax =
    , Declaration.Comprehension
    , Declaration.Decorator
    , Declaration.Function
-   , Declaration.Import
-   , Declaration.ImportSymbol
+   , Declaration.Import2
    , Declaration.Variable
    , Declaration.WildcardImport
    , Expression.Arithmetic
@@ -376,18 +375,21 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 import' :: Assignment
 import' =  makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliasedImport <|> plainImport))
-       <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> (dottedName <|> emptyTerm) <*> emptyTerm <*> someTerm (dottedName <|> aliasedSymbol <|> importSymbol))
+        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import2 <$> (dottedName <|> emptyTerm) <*> emptyTerm <*> some (aliasImportSymbol <|> importSymbol))
        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.WildcardImport <$> dottedName <*> wildcard)
   where
-    importSymbol = makeTerm <$> location <*> (Declaration.ImportSymbol <$> expression <*> emptyTerm)
-    aliasedSymbol = makeTerm <$> symbol AliasedImport <*> children (Declaration.ImportSymbol <$> expression <*> expression)
+    rawIdentifier = (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) *> source
+    makeNameAliasPair from (Just alias) = (from, alias)
+    makeNameAliasPair from Nothing = (from, from)
+    importSymbol = makeNameAliasPair <$> rawIdentifier <*> pure Nothing
+    aliasImportSymbol = symbol AliasedImport *> children (makeNameAliasPair <$> rawIdentifier <*> (Just <$> rawIdentifier))
+
     wildcard = makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> source)
 
     aliasedImport = makeImport <$> symbol AliasedImport <*> children ((,) <$> expression <*> (Just <$> expression))
     plainImport = makeImport <$> symbol DottedName <*> children ((,) <$> expressions <*> pure Nothing)
-
-    makeImport loc (from, Just alias) = makeTerm loc (Declaration.Import from alias [])
-    makeImport loc (from, Nothing) = makeTerm loc (Declaration.Import from from [])
+    makeImport loc (from, Just alias) = makeTerm loc (Declaration.Import2 from alias [])
+    makeImport loc (from, Nothing) = makeTerm loc (Declaration.Import2 from from [])
 
 assertStatement :: Assignment
 assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> manyTerm expression <*> emptyTerm)
