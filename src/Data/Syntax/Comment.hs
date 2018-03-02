@@ -2,9 +2,7 @@
 module Data.Syntax.Comment where
 
 import Prologue
-import Control.Monad.Effect.Evaluatable
-import Data.Abstract.FreeVariables
-import Data.Abstract.Value as Value
+import Data.Abstract.Evaluatable
 import Diffing.Algorithm
 
 -- | An unnested comment (line or block).
@@ -15,7 +13,7 @@ instance Eq1 Comment where liftEq = genericLiftEq
 instance Ord1 Comment where liftCompare = genericLiftCompare
 instance Show1 Comment where liftShowsPrec = genericLiftShowsPrec
 
-instance (AbstractValue v) => Evaluatable es t v Comment where
+instance Evaluatable Comment where
   eval _ = pure unit
 
 -- TODO: nested comment types
