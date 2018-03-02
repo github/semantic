@@ -31,6 +31,10 @@ type CallGraphEffects term
 newtype CallGraph = CallGraph { unCallGraph :: G.Graph Name }
   deriving (Eq, Graph, Show)
 
+instance Monoid CallGraph where
+  mempty = empty
+  mappend = overlay
+
 instance Ord CallGraph where
   compare (CallGraph G.Empty)           (CallGraph G.Empty)           = EQ
   compare (CallGraph G.Empty)           _                             = LT
