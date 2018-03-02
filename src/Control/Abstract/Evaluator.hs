@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FunctionalDependencies, RankNTypes, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, FunctionalDependencies, GeneralizedNewtypeDeriving, RankNTypes, StandaloneDeriving, UndecidableInstances #-}
 module Control.Abstract.Evaluator where
 
 import Control.Applicative
@@ -44,7 +44,14 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   -- | Run an action with a locally-modified table of unevaluated modules.
   localModuleTable :: (Linker term -> Linker term) -> m a -> m a
 
-instance MonadEvaluator term value (Evaluator effects term value) where
+instance Members '[ Fail
+                  , Reader (EnvironmentFor value)
+                  , State  (EnvironmentFor value)
+                  , State  (StoreFor value)
+                  , Reader (Linker term)
+                  , State  (Linker value)
+                  ] effects
+         => MonadEvaluator term value (Evaluator effects term value) where
   getGlobalEnv = Evaluator get
   modifyGlobalEnv f = Evaluator (modify f)
 
@@ -61,41 +68,9 @@ instance MonadEvaluator term value (Evaluator effects term value) where
   localModuleTable f a = Evaluator (local f (runEvaluator a))
 
 
-newtype Evaluator effects term value a
-  = Evaluator
-    { runEvaluator :: Members '[ Fail
-                               , Reader (EnvironmentFor value)
-                               , State  (EnvironmentFor value)
-                               , State  (StoreFor value)
-                               , Reader (Linker term)
-                               , State  (Linker value)
-                               ] effects
-                   => Eff effects a
-    }
+newtype Evaluator effects term value a = Evaluator { runEvaluator :: Eff effects a }
+  deriving (Applicative, Functor, Monad)
 
-
-instance Functor (Evaluator effects term value) where
-  fmap f (Evaluator run) = Evaluator (fmap f run)
-
-instance Applicative (Evaluator effects term value) where
-  pure = Evaluator . pure
-
-  Evaluator runF <*> Evaluator runA = Evaluator (runF <*> runA)
-
-instance Member NonDetEff effects => Alternative (Evaluator effects term value) where
-  empty = Evaluator empty
-
-  Evaluator runA <|> Evaluator runB = Evaluator (runA <|> runB)
-
-instance Monad (Evaluator effects term value) where
-  return = pure
-
-  Evaluator runA >>= f = Evaluator (runA >>= runEvaluator . f)
-
-instance MonadFail (Evaluator effects term value) where
-  fail s = Evaluator (fail s)
-
-instance Member Fresh effects => MonadFresh (Evaluator effects term value) where
-  fresh = Evaluator fresh
-
-  reset t = Evaluator (reset t)
+deriving instance Member Fail effects => MonadFail (Evaluator effects term value)
+deriving instance Member NonDetEff effects => Alternative (Evaluator effects term value)
+deriving instance Member Fresh effects => MonadFresh (Evaluator effects term value)
