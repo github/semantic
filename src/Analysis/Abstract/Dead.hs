@@ -50,6 +50,7 @@ evaluateDead term = run @(DeadCodeEffects term value) . runEvaluator . runDeadCo
         subterms term = para (foldMap (uncurry ((<>) . point))) term <> point term
 
 
+-- | A newtype wrapping 'Evaluator' which performs a dead code analysis on evaluation.
 newtype DeadCodeAnalysis term value a = DeadCodeAnalysis { runDeadCodeAnalysis :: Evaluator (DeadCodeEffects term value) term value a }
   deriving (Applicative, Functor, Monad, MonadFail)
 
