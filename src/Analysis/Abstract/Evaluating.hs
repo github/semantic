@@ -37,13 +37,21 @@ newtype Evaluator v = Evaluator { runEvaluator :: Eff (Evaluating v) v }
 -- | Require/import another term/file and return an Effect.
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
-require :: forall v es. (Members (Evaluating v) es, AbstractEnvironmentFor v) => ModuleName -> Eff es (EnvironmentFor v)
+require :: forall v es.
+        ( Members (Evaluating v) es
+        , AbstractEnvironmentFor v
+        )
+        => ModuleName -> Eff es (EnvironmentFor v)
 require name = get @(Linker (EnvironmentFor v)) >>= maybe (load name) pure . linkerLookup name
 
 -- | Load another term/file and return an Effect.
 --
 -- Always loads/evaluates.
-load :: forall v es. (Members (Evaluating v) es, AbstractEnvironmentFor v) => ModuleName -> Eff es (EnvironmentFor v)
+load :: forall v es.
+     ( Members (Evaluating v) es
+     , AbstractEnvironmentFor v
+     )
+     => ModuleName -> Eff es (EnvironmentFor v)
 load name = ask @(Linker (Evaluator v)) >>= maybe notFound evalAndCache . linkerLookup name
   where notFound = fail ("cannot find " <> show name)
         evalAndCache e = do
