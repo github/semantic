@@ -9,7 +9,7 @@ import Data.Abstract.Live
 import qualified Data.Abstract.Type as Type
 import qualified Data.Set as Set
 import Prologue
-import Prelude hiding (Integer, String)
+import Prelude hiding (Integer, String, fail)
 import qualified Prelude
 
 type ValueConstructors location
@@ -101,42 +101,11 @@ class ValueRoots l v | v -> l where
   -- | Compute the set of addresses rooted by a given value.
   valueRoots :: v -> Live l v
 
--- | An interface for constructing abstract values.
-class AbstractValue v where
-  -- | Construct an abstract unit value.
-  unit :: v
-
-  -- | Construct an abstract integral value.
-  integer :: Prelude.Integer -> v
-
-  -- | Construct an abstract boolean value.
-  boolean :: Bool -> v
-
-  -- | Construct an abstract string value.
-  string :: ByteString -> v
-
-
--- Instances
-
 instance (FreeVariables term, Ord location) => ValueRoots location (Value location term) where
   valueRoots v
     | Just (Closure names body env) <- prj v = envRoots env (foldr Set.delete (freeVariables body) names)
     | Just (Interface _ env) <- prj v        = envAll env
     | otherwise                              = mempty
 
--- | Construct a 'Value' wrapping the value arguments (if any).
-instance AbstractValue (Value location term) where
-  unit = inj Unit
-  integer = inj . Integer
-  boolean = inj . Boolean
-  string = inj . String
-
 instance ValueRoots Monovariant Type.Type where
   valueRoots _ = mempty
-
--- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
-instance AbstractValue Type.Type where
-  unit = Type.Unit
-  integer _ = Type.Int
-  boolean _ = Type.Bool
-  string _ = Type.String

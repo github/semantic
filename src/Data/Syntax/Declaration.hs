@@ -215,6 +215,7 @@ instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
+  eval (Import from _ _) = undefined -- let n = qualifiedName (subterm from) in require n *> unit
 
 
 data Import2 a = Import2 { import2From :: !a, import2Alias :: !a, import2Symbols :: ![(Name, Name)] }

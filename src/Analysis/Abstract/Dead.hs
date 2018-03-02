@@ -29,13 +29,12 @@ type DeadCodeEffects t v
 
 -- | Run a dead code analysis of the given program.
 evaluateDead :: forall term value
-             .  ( AbstractValue value
-                , Corecursive term
+             .  ( Corecursive term
                 , Evaluatable (Base term)
                 , Foldable (Base term)
                 , FreeVariables term
                 , MonadAddressable (LocationFor value) value (DeadCodeAnalysis term value)
-                , MonadFunction term value (DeadCodeAnalysis term value)
+                , MonadValue term value (DeadCodeAnalysis term value)
                 , Ord (LocationFor value)
                 , Ord term
                 , Recursive term
@@ -70,12 +69,11 @@ revive :: Ord t => t -> DeadCodeAnalysis t v ()
 revive t = DeadCodeAnalysis (Evaluator (modify (Dead . delete t . unDead)))
 
 
-instance ( AbstractValue v
-         , Corecursive t
+instance ( Corecursive t
          , Evaluatable (Base t)
          , FreeVariables t
          , MonadAddressable (LocationFor v) v (DeadCodeAnalysis t v)
-         , MonadFunction t v (DeadCodeAnalysis t v)
+         , MonadValue t v (DeadCodeAnalysis t v)
          , Ord t
          , Recursive t
          , Semigroup (Cell (LocationFor v) v)

@@ -22,7 +22,7 @@ instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Boolean where
-  eval (Boolean x) = pure (boolean x)
+  eval (Boolean x) = boolean x
 
 
 -- Numeric
@@ -37,7 +37,7 @@ instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShow
 
 instance Evaluatable Data.Syntax.Literal.Integer where
   -- TODO: This instance probably shouldn't have readInteger?
-  eval (Data.Syntax.Literal.Integer x) = pure (integer (maybe 0 fst (readInteger x)))
+  eval (Data.Syntax.Literal.Integer x) = integer (maybe 0 fst (readInteger x))
 
 
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
@@ -115,7 +115,7 @@ instance Ord1 TextElement where liftCompare = genericLiftCompare
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TextElement where
-  eval (TextElement x) = pure (string x)
+  eval (TextElement x) = string x
 
 data Null a = Null
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
