@@ -8,8 +8,8 @@ import Control.Monad.Effect.Fresh
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
-import Data.Abstract.Value as Value
 import Data.Abstract.Type as Type
+import Data.Abstract.Value as Value
 import Prologue
 import Prelude hiding (fail)
 
