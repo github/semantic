@@ -13,6 +13,9 @@ import Data.Abstract.Type
 import Prologue
 import Prelude hiding (fail)
 
+-- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
+--
+--   This allows us to abstract the choice of whether to evaluate under binders for different value types.
 class MonadEvaluator t v m => MonadFunction t v m where
   abstract :: [Name] -> Subterm t (m v) -> m v
   apply :: v -> [Subterm t (m v)] -> m v
