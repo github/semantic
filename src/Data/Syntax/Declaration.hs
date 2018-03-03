@@ -232,20 +232,16 @@ instance Evaluatable Import2 where
     env <- getGlobalEnv
     putGlobalEnv mempty
     importedEnv <- require name
-    env' <- Map.foldrWithKey (\k v rest -> do
-      if Map.null symbols
-         -- Copy over all symbols in the environment under their qualified names.
-        then envInsert (prefix <> k) v <$> rest
-        -- Only copy over specified symbols, possibly aliasing them.
-        else maybe rest (\symAlias -> envInsert symAlias v <$> rest) (Map.lookup k symbols)
-      ) (pure env) (unEnvironment importedEnv)
-
+    env' <- Map.foldrWithKey copy (pure env) (unEnvironment importedEnv)
     modifyGlobalEnv (const env')
     unit
     where
       name = qualifiedName (subterm from)
-      symbols = Map.fromList xs
       prefix = qualifiedName (subterm alias) <> "."
+      symbols = Map.fromList xs
+      copy = if Map.null symbols then qualifyInsert else directInsert
+      qualifyInsert k v rest = envInsert (prefix <> k) v <$> rest
+      directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v <$> rest) (Map.lookup k symbols)
 
 
 -- | A wildcard import

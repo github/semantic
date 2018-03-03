@@ -29,6 +29,9 @@ class (MonadEvaluator t v m) => MonadValue t v m where
   -- | Construct an abstract string value.
   string :: ByteString -> m v
 
+  -- | Construct an abstract interface value.
+  interface :: v -> m v
+
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: v -> m v -> m v -> m v
 
@@ -39,8 +42,6 @@ class (MonadEvaluator t v m) => MonadValue t v m where
 
   -- | Extract the environment from an interface value.
   environment :: v -> m (EnvironmentFor v)
-
-  interface :: v -> m v
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( FreeVariables t
