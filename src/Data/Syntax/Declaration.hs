@@ -5,6 +5,7 @@ import Prologue
 import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
+import qualified Data.Map as Map
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -215,7 +216,8 @@ instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
-  eval (Import from _ _) = undefined -- let n = qualifiedName (subterm from) in require n *> unit
+  eval (Import from _ _) = require name *> unit
+    where name = qualifiedName (subterm from)
 
 
 data Import2 a = Import2 { import2From :: !a, import2Alias :: !a, import2Symbols :: ![(Name, Name)] }
@@ -226,41 +228,24 @@ instance Ord1 Import2 where liftCompare = genericLiftCompare
 instance Show1 Import2 where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import2 where
-  -- TODO:
-  eval (Import2 from alias xs) = undefined-- require (qualifiedName (subterm from)) >> pure unit
+  eval (Import2 from alias xs) = do
+    env <- getGlobalEnv
+    putGlobalEnv mempty
+    importedEnv <- require name
+    env' <- Map.foldrWithKey (\k v rest -> do
+      if Map.null symbols
+         -- Copy over all symbols in the environment under their qualified names.
+        then envInsert (prefix <> k) v <$> rest
+        -- Only copy over specified symbols, possibly aliasing them.
+        else maybe rest (\symAlias -> envInsert symAlias v <$> rest) (Map.lookup k symbols)
+      ) (pure env) (unEnvironment importedEnv)
 
--- instance ( Members (Evaluating v) es
---          , Evaluatable es t v (Base t)
---          , Recursive t
---          , FreeVariables t
---          , AbstractValue v
---          , AbstractEnvironmentFor v
---          )
---          => Evaluatable es t v Import2 where
---   eval (Import2 from alias xs) = do
---     -- Capture current global environment
---     env <- get @(EnvironmentFor v)
---
---     -- TODO: We may or may not want to clear the globalEnv before requiring.
---     put @(EnvironmentFor v) mempty
---
---     -- Evaluate the import to get it's environment.
---     -- (requiring will have also have potentially updated the global environment)
---     importedEnv <- require @v (qualifiedName (subterm from))
---
---     -- Restore previous global environment, adding the imported env
---     let symbols = Map.fromList xs
---     let prefix = qualifiedName (subterm alias) <> "."
---     env' <- Map.foldrWithKey (\k v rest -> do
---       if Map.null symbols
---          -- Copy over all symbols in the environment under their qualified names.
---         then envInsert (prefix <> k) v <$> rest
---         -- Only copy over specified symbols, possibly aliasing them.
---         else maybe rest (\symAlias -> envInsert symAlias v <$> rest) (Map.lookup k symbols)
---       ) (pure env) (unEnvironment importedEnv)
---
---     modify (const env')
---     pure unit
+    modifyGlobalEnv (const env')
+    unit
+    where
+      name = qualifiedName (subterm from)
+      symbols = Map.fromList xs
+      prefix = qualifiedName (subterm alias) <> "."
 
 
 -- | A wildcard import
@@ -271,21 +256,10 @@ instance Eq1 WildcardImport where liftEq = genericLiftEq
 instance Ord1 WildcardImport where liftCompare = genericLiftCompare
 instance Show1 WildcardImport where liftShowsPrec = genericLiftShowsPrec
 
--- instance ( Members (Evaluating v) es
---          , FreeVariables t
---          , AbstractEnvironmentFor v
---          , AbstractValue v
---          )
---          => Evaluatable es t v WildcardImport where
---   eval (WildcardImport from _) = put @(EnvironmentFor v) mempty
---                                >> require @v (qualifiedName (subterm from))
---                                >> pure unit
-
 instance Evaluatable WildcardImport where
-  eval (WildcardImport from _) = undefined
-                               --    putGlobalEnv mempty
-                               -- >> require (qualifiedName (subterm from))
-                               -- >> pure unit
+  eval (WildcardImport from _) = putGlobalEnv mempty *> require name *> unit
+    where name = qualifiedName (subterm from)
+
 
 -- | An imported symbol
 data ImportSymbol a = ImportSymbol { importSymbolName :: !a, importSymbolAlias :: !a }

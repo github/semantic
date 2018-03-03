@@ -1,13 +1,11 @@
-{-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, TypeApplications #-}
+{-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables #-}
 module Data.Syntax where
 
-import qualified Assigning.Assignment as Assignment
 import Control.Monad.Fail
 import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Data.AST
 import Data.ByteString.Char8 (unpack)
-import qualified Data.Error as Error
 import Data.Range
 import Data.Record
 import Data.Span
@@ -15,6 +13,8 @@ import Data.Term
 import Diffing.Algorithm hiding (Empty)
 import Prelude hiding (fail)
 import Prologue
+import qualified Assigning.Assignment as Assignment
+import qualified Data.Error as Error
 
 -- Combinators
 
@@ -139,15 +139,12 @@ instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Program where
   eval (Program xs) = eval' xs
     where
-      -- interface val = inj . Value.Interface val <$> get @(EnvironmentFor (Value l t))
-      interface val = pure val -- inj . Value.Interface val <$> askLocalEnv
-
       eval' [] = unit >>= interface
       eval' [x] = subtermValue x >>= interface
       eval' (x:xs) = do
         _ <- subtermValue x
         env <- getGlobalEnv
-        localEnv (envUnion env) (eval' xs)
+        localEnv (const env) (eval' xs)
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString

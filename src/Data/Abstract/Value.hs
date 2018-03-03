@@ -86,16 +86,6 @@ type family LocationFor value :: * where
   LocationFor (Value location term) = location
   LocationFor Type.Type = Monovariant
 
-
-type AbstractEnvironmentFor v = AbstractEnvironment (LocationFor v) v
-class AbstractEnvironment l v | v -> l where
-  environment :: v -> EnvironmentFor v
-
-instance AbstractEnvironment l (Value l t) where
-  environment v
-    | Just (Interface _ env) <- prj v = env
-    | otherwise                       = mempty
-
 -- | Value types, e.g. closures, which can root a set of addresses.
 class ValueRoots l v | v -> l where
   -- | Compute the set of addresses rooted by a given value.

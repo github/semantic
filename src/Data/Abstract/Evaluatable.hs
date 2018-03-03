@@ -21,7 +21,6 @@ import Data.Abstract.FreeVariables as FreeVariables
 import Data.Abstract.Linker
 import Data.Abstract.Value
 import Data.Algebra
-import qualified Data.ByteString.Char8 as BC
 import Data.Functor.Classes
 import Data.Proxy
 import Data.Semigroup
@@ -80,7 +79,7 @@ instance Evaluatable [] where
 -- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
 require :: ( MonadAnalysis term v m
            , MonadEvaluator term v m
-           , AbstractEnvironmentFor v
+           , MonadValue term v m
            )
         => ModuleName
         -> m (EnvironmentFor v)
@@ -91,7 +90,7 @@ require name = getModuleTable >>= maybe (load name) pure . linkerLookup name
 -- Always loads/evaluates.
 load :: ( MonadAnalysis term v m
         , MonadEvaluator term v m
-        , AbstractEnvironmentFor v
+        , MonadValue term v m
         )
      => ModuleName
      -> m (EnvironmentFor v)
@@ -99,10 +98,6 @@ load name = askModuleTable >>= maybe notFound evalAndCache . linkerLookup name
   where notFound = fail ("cannot find " <> show name)
         evalAndCache e = do
           v <- evaluateTerm e
-          let env = environment v
+          env <- environment v
           modifyModuleTable (linkerInsert name env)
           pure env
-
--- | Get a module name from a term (expects single free variables).
-moduleName :: FreeVariables term => term -> Prelude.String
-moduleName term = let [n] = toList (freeVariables term) in BC.unpack n

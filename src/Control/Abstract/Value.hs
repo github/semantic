@@ -37,6 +37,11 @@ class (MonadEvaluator t v m) => MonadValue t v m where
   -- | Evaluate an application (like a function call).
   apply :: v -> [Subterm t (m v)] -> m v
 
+  -- | Extract the environment from an interface value.
+  environment :: v -> m (EnvironmentFor v)
+
+  interface :: v -> m v
+
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( FreeVariables t
          , MonadAddressable location (Value location t) m
@@ -51,6 +56,7 @@ instance ( FreeVariables t
   integer = pure . inj . Integer
   boolean = pure . inj . Boolean
   string  = pure . inj . Value.String
+  interface v = inj . Value.Interface v <$> getGlobalEnv
 
   ifthenelse cond if' else'
     | Just (Boolean b) <- prj cond = if b then if' else else'
@@ -66,6 +72,10 @@ instance ( FreeVariables t
       assign a v
       envInsert name a <$> rest) (pure env) (zip names params)
     localEnv (mappend bindings) (evaluateTerm body)
+
+  environment v
+    | Just (Interface _ env) <- prj v = pure env
+    | otherwise                       = pure mempty
 
 -- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
 instance (Alternative m, MonadEvaluator t Type m, MonadFresh m) => MonadValue t Type m where
@@ -83,6 +93,8 @@ instance (Alternative m, MonadEvaluator t Type m, MonadFresh m) => MonadValue t 
   integer _ = pure Int
   boolean _ = pure Bool
   string _  = pure Type.String
+  -- TODO
+  interface = undefined
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 
@@ -91,3 +103,6 @@ instance (Alternative m, MonadEvaluator t Type m, MonadFresh m) => MonadValue t 
     paramTypes <- traverse subtermValue params
     _ :-> ret <- op `unify` (Product paramTypes :-> Var tvar)
     pure ret
+
+  -- TODO
+  environment = undefined
