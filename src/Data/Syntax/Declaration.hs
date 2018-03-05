@@ -231,12 +231,11 @@ instance Evaluatable Import2 where
   eval (Import2 from alias xs) = do
     env <- getGlobalEnv
     putGlobalEnv mempty
-    importedEnv <- require name
+    importedEnv <- require (qualifiedName (subterm from))
     env' <- Map.foldrWithKey copy (pure env) (unEnvironment importedEnv)
     modifyGlobalEnv (const env')
     unit
     where
-      name = qualifiedName (subterm from)
       prefix = qualifiedName (subterm alias) <> "."
       symbols = Map.fromList xs
       copy = if Map.null symbols then qualifyInsert else directInsert
