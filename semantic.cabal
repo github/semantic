@@ -33,7 +33,7 @@ library
                      , Control.Abstract.Addressable
                      , Control.Abstract.Analysis
                      , Control.Abstract.Evaluator
-                     , Control.Abstract.Function
+                     , Control.Abstract.Value
                      -- Control flow
                      , Control.Effect
                      -- Effects used for program analysis

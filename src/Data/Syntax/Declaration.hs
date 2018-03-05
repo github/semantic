@@ -217,7 +217,7 @@ instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
-  eval (Import from _ _) = require (subterm from) >> pure unit
+  eval (Import from _ _) = require (subterm from) *> unit
 
 
 -- | An imported symbol
