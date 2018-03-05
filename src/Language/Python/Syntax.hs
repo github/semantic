@@ -1,13 +1,10 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses #-}
 module Language.Python.Syntax where
 
-import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Evaluatable
-import Data.Abstract.FreeVariables
+import Data.Abstract.Evaluatable
 import Data.Align.Generic
 import Data.Functor.Classes.Generic
 import Data.Mergeable
-import Data.Union
 import Diffing.Algorithm
 import GHC.Generics
 
@@ -20,7 +17,7 @@ instance Ord1 Ellipsis where liftCompare = genericLiftCompare
 instance Show1 Ellipsis where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Ellipsis
-instance Member Fail es => Evaluatable es t v Ellipsis
+instance Evaluatable Ellipsis
 
 
 data Redirect a = Redirect !a !a
@@ -31,4 +28,4 @@ instance Ord1 Redirect where liftCompare = genericLiftCompare
 instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Redirect
-instance Member Fail es => Evaluatable es t v Redirect
+instance Evaluatable Redirect

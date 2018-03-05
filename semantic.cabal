@@ -17,8 +17,8 @@ library
                      -- Analyses & term annotations
                        -- Analysis.Abstract.Caching
                      -- , Analysis.Abstract.Collecting
-                     -- , Analysis.Abstract.Dead
-                       Analysis.Abstract.Evaluating
+                       Analysis.Abstract.Dead
+                     , Analysis.Abstract.Evaluating
                      -- , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
@@ -29,28 +29,32 @@ library
                      -- Semantic assignment
                      , Assigning.Assignment
                      , Assigning.Assignment.Table
+                     -- Control structures & interfaces for abstract interpretation
+                     , Control.Abstract.Addressable
+                     , Control.Abstract.Analysis
+                     , Control.Abstract.Evaluator
+                     , Control.Abstract.Function
                      -- Control flow
                      , Control.Effect
-                     -- Effects used in abstract interpretation
-                     , Control.Monad.Effect.Addressable
+                     -- Effects used for program analysis
                      -- , Control.Monad.Effect.Cache
-                     -- , Control.Monad.Effect.Dead
-                     , Control.Monad.Effect.Evaluatable
-                     -- , Control.Monad.Effect.Fresh
+                     , Control.Monad.Effect.Fresh
                      -- , Control.Monad.Effect.GC
                      -- , Control.Monad.Effect.NonDet
                      -- , Control.Monad.Effect.Trace
-                     -- General datatype definitions & generic algorithms
+                     -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
                      , Data.Abstract.Cache
                      , Data.Abstract.Configuration
                      , Data.Abstract.Environment
+                     , Data.Abstract.Evaluatable
                      , Data.Abstract.Linker
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Live
                      , Data.Abstract.Store
                      , Data.Abstract.Type
                      , Data.Abstract.Value
+                     -- General datatype definitions & generic algorithms
                      , Data.Algebra
                      , Data.Align.Generic
                      , Data.AST

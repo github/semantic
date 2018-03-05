@@ -12,8 +12,6 @@ import Analysis.ConstructorName (ConstructorName, constructorLabel)
 import Analysis.IdentifierName (IdentifierName, identifierLabel)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
 import Analysis.ModuleDef (HasModuleDef, moduleDefAlgebra)
-import Control.Monad.Error.Class
-import Data.Align.Generic
 import Data.Blob
 import Data.Diff
 import Data.JSON.Fields

@@ -7,7 +7,6 @@ import Analysis.Abstract.Evaluating
 import Analysis.Declaration
 import Control.Monad.IO.Class
 import Data.Abstract.Address
-import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.AST
 import Data.Blob
