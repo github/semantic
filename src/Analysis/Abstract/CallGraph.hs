@@ -11,6 +11,7 @@ import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Address
+import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Data.Abstract.Linker
 import Data.Abstract.Value
@@ -89,7 +90,11 @@ instance MonadValue term CallGraph (CallGraphAnalysis term) where
 
   ifthenelse _ then' else' = overlay <$> then' <*> else'
 
-  abstract _ = subtermValue
+  abstract names body = foldr bindLocally (subtermValue body) names
+    where bindLocally name rest = do
+            addr <- alloc name
+            assign addr empty
+            localEnv (envInsert name addr) rest
 
   apply operator arguments = foldr overlay operator <$> traverse subtermValue arguments
 
