@@ -25,6 +25,7 @@ import Prologue hiding (empty)
 type CallGraphEffects term
   = '[ Fail
      , NonDetEff
+     , State  CallGraph
      , State  (StoreFor CallGraph)
      , State  (EnvironmentFor CallGraph)
      , Reader (EnvironmentFor CallGraph)
@@ -42,6 +43,13 @@ renderCallGraph = export (defaultStyle id) . unCallGraph
 buildStoreGraph :: StoreFor CallGraph -> CallGraph
 buildStoreGraph = foldMap (uncurry connectBinding) . Map.toList . unStore
   where connectBinding (Monovariant name) body = foldMap (connect (vertex name)) (Set.toList body)
+
+
+getCallGraph :: CallGraphAnalysis term CallGraph
+getCallGraph = CallGraphAnalysis (Evaluator get)
+
+modifyCallGraph :: (CallGraph -> CallGraph) -> CallGraphAnalysis term ()
+modifyCallGraph f = CallGraphAnalysis (Evaluator (modify f))
 
 
 newtype CallGraphAnalysis term a = CallGraphAnalysis { runCallGraphAnalysis :: Evaluator (CallGraphEffects term) term CallGraph a }
