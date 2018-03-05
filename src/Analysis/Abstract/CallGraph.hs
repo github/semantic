@@ -16,6 +16,7 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.Linker
 import Data.Abstract.Value
 import Data.Proxy
+import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import Data.Term
 import Prologue hiding (empty)
@@ -114,6 +115,9 @@ instance CustomIsDeclaration Declaration.Function where
 instance CustomIsDeclaration Declaration.Method where
   customConnectDeclaration Declaration.Method{..} = flip (foldr (connect . vertex)) (freeVariables methodName)
 
+instance CustomIsDeclaration Syntax.Identifier where
+  customConnectDeclaration (Syntax.Identifier name) = overlay (vertex name)
+
 instance Apply IsDeclaration syntaxes => CustomIsDeclaration (Union syntaxes) where
   customConnectDeclaration = Prologue.apply (Proxy :: Proxy IsDeclaration) connectDeclaration
 
@@ -134,6 +138,7 @@ data Strategy = Default | Custom
 type family IsDeclarationStrategy syntax where
   IsDeclarationStrategy Declaration.Function = 'Custom
   IsDeclarationStrategy Declaration.Method = 'Custom
+  IsDeclarationStrategy Syntax.Identifier = 'Custom
   IsDeclarationStrategy (Union fs) = 'Custom
   IsDeclarationStrategy (TermF f a) = 'Custom
   IsDeclarationStrategy a = 'Default
