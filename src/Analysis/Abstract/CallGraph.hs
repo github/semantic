@@ -39,6 +39,10 @@ renderCallGraph :: CallGraph -> ByteString
 renderCallGraph = export (defaultStyle id) . unCallGraph
 
 
+buildCallGraph :: (IsDeclaration syntax, Foldable syntax, FreeVariables1 syntax, Functor syntax) => Term syntax ann -> CallGraph
+buildCallGraph = para (\ (In _ syntax) -> connectDeclaration (fst <$> syntax) (foldMap snd syntax))
+
+
 getCallGraph :: CallGraphAnalysis term CallGraph
 getCallGraph = CallGraphAnalysis (Evaluator get)
 
