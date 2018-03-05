@@ -22,9 +22,11 @@ import Semantic
 import Semantic.IO as IO
 import Semantic.Task
 
+import qualified Language.Go.Assignment as Go
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.Python.Assignment as Python
 
+type GoValue = Value Precise (Term (Union Go.Syntax) (Record Location))
 type RubyValue = Value Precise (Term (Union Ruby.Syntax) (Record Location))
 type PythonValue = Value Precise (Term (Union Python.Syntax) (Record Location))
 
@@ -40,6 +42,9 @@ evaluateRubyFiles paths = do
   (t:ts) <- runTask $ traverse (parse rubyParser) blobs
   pure $ evaluates @RubyValue (zip bs ts) (b, t)
 
+-- Go
+evaluateGoFile path = evaluate @GoValue <$>
+  (file path >>= runTask . parse goParser)
 
 -- Python
 evaluatePythonFile path = evaluate @PythonValue <$>
