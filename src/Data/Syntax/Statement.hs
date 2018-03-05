@@ -14,7 +14,6 @@ instance Eq1 If where liftEq = genericLiftEq
 instance Ord1 If where liftCompare = genericLiftCompare
 instance Show1 If where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for If
 instance Evaluatable If where
   eval (If cond if' else') = do
     bool <- subtermValue cond
