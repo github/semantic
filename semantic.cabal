@@ -127,7 +127,7 @@ library
                      , Semantic.Queue
                      , Semantic.Util
                     -- Custom Prelude
-  other-modules:       Prologue
+                     , Prologue
   build-depends:       base >= 4.8 && < 5
                      , aeson
                      , algebraic-graphs
