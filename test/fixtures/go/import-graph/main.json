@@ -48,7 +48,8 @@
             ]
           },
           "kind": "Function",
-          "name": "foo"
+          "name": "foo",
+          "module": "app"
         },
         {
           "span": {
@@ -62,7 +63,8 @@
             ]
           },
           "kind": "Function",
-          "name": "main"
+          "name": "main",
+          "module": "app"
         }
       ],
       "paths": [
