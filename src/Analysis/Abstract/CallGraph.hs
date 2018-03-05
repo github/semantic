@@ -13,11 +13,8 @@ import Control.Monad.Effect.State
 import Data.Abstract.Address
 import Data.Abstract.Evaluatable
 import Data.Abstract.Linker
-import Data.Abstract.Store
 import Data.Abstract.Value
-import qualified Data.Map as Map
 import Data.Proxy
-import qualified Data.Set as Set
 import qualified Data.Syntax.Declaration as Declaration
 import Data.Term
 import Prologue hiding (empty)
@@ -38,11 +35,6 @@ newtype CallGraph = CallGraph { unCallGraph :: G.Graph Name }
 
 renderCallGraph :: CallGraph -> ByteString
 renderCallGraph = export (defaultStyle id) . unCallGraph
-
-
-buildStoreGraph :: StoreFor CallGraph -> CallGraph
-buildStoreGraph = foldMap (uncurry connectBinding) . Map.toList . unStore
-  where connectBinding (Monovariant name) body = foldMap (connect (vertex name)) (Set.toList body)
 
 
 getCallGraph :: CallGraphAnalysis term CallGraph
