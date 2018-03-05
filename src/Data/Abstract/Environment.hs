@@ -31,7 +31,7 @@ bindEnv names env = Environment (Map.fromList pairs)
 --
 --   Unbound names are silently dropped.
 envRoots :: (Ord l, Foldable t) => Environment l a -> t Name -> Live l a
-envRoots env = foldr ((<>) . maybe mempty liveSingleton . flip envLookup env) mempty
+envRoots env = foldMap (maybe mempty liveSingleton . flip envLookup env)
 
 envAll :: (Ord l) => Environment l a -> Live l a
 envAll (Environment env) = Live $ Set.fromList (Map.elems env)
