@@ -39,7 +39,23 @@ renderCallGraph = export (defaultStyle id) . unCallGraph
 newtype CallGraphAnalysis term a = CallGraphAnalysis { runCallGraphAnalysis :: Evaluator (CallGraphEffects term) term CallGraph a }
   deriving (Alternative, Applicative, Functor, Monad, MonadFail)
 
-deriving instance MonadEvaluator term CallGraph (CallGraphAnalysis term)
+instance MonadEvaluator term CallGraph (CallGraphAnalysis term) where
+  getGlobalEnv = CallGraphAnalysis getGlobalEnv
+  modifyGlobalEnv f = CallGraphAnalysis (modifyGlobalEnv f)
+
+  askLocalEnv = CallGraphAnalysis askLocalEnv
+  localEnv f a = CallGraphAnalysis (localEnv f (runCallGraphAnalysis a))
+
+  lookupWith with name = fmap (overlay (vertex name)) <$> CallGraphAnalysis (lookupWith (runCallGraphAnalysis . with) name)
+
+  getStore = CallGraphAnalysis getStore
+  modifyStore f = CallGraphAnalysis (modifyStore f)
+
+  getModuleTable = CallGraphAnalysis getModuleTable
+  modifyModuleTable f = CallGraphAnalysis (modifyModuleTable f)
+
+  askModuleTable = CallGraphAnalysis askModuleTable
+  localModuleTable f a = CallGraphAnalysis (localModuleTable f (runCallGraphAnalysis a))
 
 evaluateCallGraph :: forall term
                   .  ( Evaluatable (Base term)
