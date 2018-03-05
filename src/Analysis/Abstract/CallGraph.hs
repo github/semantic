@@ -32,24 +32,8 @@ type CallGraphEffects term
 newtype CallGraph = CallGraph { unCallGraph :: G.Graph Name }
   deriving (Eq, Graph, Show)
 
-instance Monoid CallGraph where
-  mempty = empty
-  mappend = overlay
-
 renderCallGraph :: CallGraph -> ByteString
 renderCallGraph = export (defaultStyle id) . unCallGraph
-
-instance Ord CallGraph where
-  compare (CallGraph G.Empty)           (CallGraph G.Empty)           = EQ
-  compare (CallGraph G.Empty)           _                             = LT
-  compare _                             (CallGraph G.Empty)           = GT
-  compare (CallGraph (G.Vertex a))      (CallGraph (G.Vertex b))      = compare a b
-  compare (CallGraph (G.Vertex _))      _                             = LT
-  compare _                             (CallGraph (G.Vertex _))      = GT
-  compare (CallGraph (G.Overlay a1 a2)) (CallGraph (G.Overlay b1 b2)) = (compare `on` CallGraph) a1 b1 <> (compare `on` CallGraph) a2 b2
-  compare (CallGraph (G.Overlay _  _))  _                             = LT
-  compare _                             (CallGraph (G.Overlay _ _))   = GT
-  compare (CallGraph (G.Connect a1 a2)) (CallGraph (G.Connect b1 b2)) = (compare `on` CallGraph) a1 b1 <> (compare `on` CallGraph) a2 b2
 
 
 newtype CallGraphAnalysis term a = CallGraphAnalysis { runCallGraphAnalysis :: Evaluator (CallGraphEffects term) term CallGraph a }
@@ -140,3 +124,20 @@ type family IsDeclarationStrategy syntax where
   IsDeclarationStrategy (Union fs) = 'Custom
   IsDeclarationStrategy (TermF f a) = 'Custom
   IsDeclarationStrategy a = 'Default
+
+
+instance Monoid CallGraph where
+  mempty = empty
+  mappend = overlay
+
+instance Ord CallGraph where
+  compare (CallGraph G.Empty)           (CallGraph G.Empty)           = EQ
+  compare (CallGraph G.Empty)           _                             = LT
+  compare _                             (CallGraph G.Empty)           = GT
+  compare (CallGraph (G.Vertex a))      (CallGraph (G.Vertex b))      = compare a b
+  compare (CallGraph (G.Vertex _))      _                             = LT
+  compare _                             (CallGraph (G.Vertex _))      = GT
+  compare (CallGraph (G.Overlay a1 a2)) (CallGraph (G.Overlay b1 b2)) = (compare `on` CallGraph) a1 b1 <> (compare `on` CallGraph) a2 b2
+  compare (CallGraph (G.Overlay _  _))  _                             = LT
+  compare _                             (CallGraph (G.Overlay _ _))   = GT
+  compare (CallGraph (G.Connect a1 a2)) (CallGraph (G.Connect b1 b2)) = (compare `on` CallGraph) a1 b1 <> (compare `on` CallGraph) a2 b2
