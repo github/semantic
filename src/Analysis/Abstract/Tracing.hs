@@ -94,7 +94,7 @@ instance ( Corecursive term
     env <- askLocalEnv
     store <- getStore
     roots <- pure mempty
-    trace (point (Configuration (embed (subterm <$> term)) roots env store))
+    trace (point (Configuration (embedSubterm term) roots env store))
     eval term
 
 trace :: trace (Configuration (LocationFor value) term value) -> TracingAnalysis trace term value ()
