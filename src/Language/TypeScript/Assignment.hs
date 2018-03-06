@@ -155,7 +155,6 @@ type Syntax = '[
   , TypeScript.Syntax.ImportRequireClause
   , TypeScript.Syntax.ImportClause
   , TypeScript.Syntax.LabeledStatement
-  , TypeScript.Syntax.NamedImports
   , TypeScript.Syntax.NamespaceImport
   , TypeScript.Syntax.Annotation
   , TypeScript.Syntax.With
