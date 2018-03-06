@@ -35,6 +35,7 @@ type Syntax = '[
   , Declaration.TypeAlias
   , Declaration.Import
   , Declaration.QualifiedImport
+  , Declaration.QualifiedExport
   , Declaration.Module
   , Expression.Arithmetic
   , Expression.Bitwise
@@ -706,7 +707,17 @@ ambientDeclaration :: Assignment
 ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> children (TypeScript.Syntax.AmbientDeclaration <$> term (choice [declaration, statementBlock]))
 
 exportStatement :: Assignment
-exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (TypeScript.Syntax.Export <$> (((\a b -> [a, b]) <$> term exportClause <*> term fromClause) <|> ((++) <$> manyTerm decorator <*> (pure <$> term (fromClause <|> exportClause <|> declaration <|> expression <|> identifier <|> importAlias')))))
+exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip Declaration.QualifiedExport <$> exportClause <*> term fromClause)
+  where
+    exportClause = symbol Grammar.ExportClause *> children (many exportSymbol)
+    exportSymbol = symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> (Just <$> rawIdentifier))
+                 <|> symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> (pure Nothing))
+    makeNameAliasPair from (Just alias) = (from, alias)
+    makeNameAliasPair from Nothing = (from, from)
+    rawIdentifier :: Assignment.Assignment [] Grammar ByteString
+    rawIdentifier = (symbol Identifier <|> symbol Identifier') *> source
+  -- <|> (makeExport2 <$> manyTerm decorator <*> emptyTerm <*> (pure <$> term (fromClause <|> exportClause <|> declaration <|> expression <|> identifier <|> importAlias')))))
+    -- makeExport2 decorators fromClause exportClause = Declaration.QualifiedExport fromClause exportClause
 
 fromClause :: Assignment
 fromClause = string
