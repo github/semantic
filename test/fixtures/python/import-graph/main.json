@@ -177,7 +177,8 @@
             ]
           },
           "kind": "Function",
-          "name": "print_cwd"
+          "name": "print_cwd",
+          "module": "main"
         },
         {
           "span": {
@@ -191,7 +192,8 @@
             ]
           },
           "kind": "Function",
-          "name": "create_array"
+          "name": "create_array",
+          "module": "main"
         },
         {
           "span": {
@@ -205,7 +207,8 @@
             ]
           },
           "kind": "Function",
-          "name": "sum_array"
+          "name": "sum_array",
+          "module": "main"
         },
         {
           "span": {
@@ -219,7 +222,8 @@
             ]
           },
           "kind": "Function",
-          "name": "sum_array2"
+          "name": "sum_array2",
+          "module": "main"
         }
       ],
       "paths": [
