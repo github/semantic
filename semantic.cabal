@@ -41,7 +41,6 @@ library
                      , Control.Monad.Effect.Fresh
                      -- , Control.Monad.Effect.GC
                      , Control.Monad.Effect.NonDet
-                     -- , Control.Monad.Effect.Trace
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
                      , Data.Abstract.Cache
