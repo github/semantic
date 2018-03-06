@@ -120,7 +120,9 @@ instance CustomIsDeclaration Declaration.Method where
   customBuildCallGraphAlgebra Declaration.Method{..} = foldMap vertex (freeVariables (subterm methodName)) `connect` subtermValue methodBody
 
 instance CustomIsDeclaration Syntax.Identifier where
-  customBuildCallGraphAlgebra (Syntax.Identifier name) = vertex name
+  customBuildCallGraphAlgebra (Syntax.Identifier name) bound
+    | name `member` bound = empty
+    | otherwise           = vertex name
 
 instance Apply IsDeclaration syntaxes => CustomIsDeclaration (Union syntaxes) where
   customBuildCallGraphAlgebra = Prologue.apply (Proxy :: Proxy IsDeclaration) buildCallGraphAlgebra
