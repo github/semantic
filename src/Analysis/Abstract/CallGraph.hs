@@ -43,7 +43,7 @@ evaluateCallGraph :: forall term
                   .  ( Evaluatable (Base term)
                      , Foldable (Base term)
                      , FreeVariables term
-                     , IsDeclaration (Base term)
+                     , BuildCallGraphAlgebra (Base term)
                      , MonadAddressable (LocationFor CallGraph) CallGraph (CallGraphAnalysis term)
                      , MonadValue term CallGraph (CallGraphAnalysis term)
                      , Ord (LocationFor CallGraph)
@@ -76,7 +76,7 @@ type instance LocationFor CallGraph = Monovariant
 
 instance ( Evaluatable (Base term)
          , FreeVariables term
-         , IsDeclaration (Base term)
+         , BuildCallGraphAlgebra (Base term)
          , MonadAddressable (LocationFor CallGraph) CallGraph (CallGraphAnalysis term)
          , MonadValue term CallGraph (CallGraphAnalysis term)
          , Ord term

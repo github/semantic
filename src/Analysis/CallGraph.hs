@@ -3,7 +3,7 @@ module Analysis.CallGraph
 ( CallGraph(..)
 , renderCallGraph
 , buildCallGraph
-, IsDeclaration(..)
+, BuildCallGraphAlgebra(..)
 ) where
 
 import qualified Algebra.Graph as G
@@ -23,54 +23,54 @@ renderCallGraph :: CallGraph -> ByteString
 renderCallGraph = export (defaultStyle id) . unCallGraph
 
 
-buildCallGraph :: (IsDeclaration syntax, Foldable syntax, FreeVariables1 syntax, Functor syntax) => Term syntax ann -> Set Name -> CallGraph
+buildCallGraph :: (BuildCallGraphAlgebra syntax, Foldable syntax, FreeVariables1 syntax, Functor syntax) => Term syntax ann -> Set Name -> CallGraph
 buildCallGraph = foldSubterms buildCallGraphAlgebra
 
 
-class IsDeclaration syntax where
+class BuildCallGraphAlgebra syntax where
   buildCallGraphAlgebra :: FreeVariables term => syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
 
-instance (IsDeclarationStrategy syntax ~ strategy, IsDeclarationWithStrategy strategy syntax) => IsDeclaration syntax where
+instance (BuildCallGraphAlgebraStrategy syntax ~ strategy, BuildCallGraphAlgebraWithStrategy strategy syntax) => BuildCallGraphAlgebra syntax where
   buildCallGraphAlgebra = buildCallGraphAlgebraWithStrategy (Proxy :: Proxy strategy)
 
-class CustomIsDeclaration syntax where
+class CustomBuildCallGraphAlgebra syntax where
   customBuildCallGraphAlgebra :: FreeVariables term => syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
 
-instance CustomIsDeclaration Declaration.Function where
+instance CustomBuildCallGraphAlgebra Declaration.Function where
   customBuildCallGraphAlgebra Declaration.Function{..} bound = foldMap vertex (freeVariables (subterm functionName)) `connect` subtermValue functionBody (foldMap (freeVariables . subterm) functionParameters <> bound)
 
-instance CustomIsDeclaration Declaration.Method where
+instance CustomBuildCallGraphAlgebra Declaration.Method where
   customBuildCallGraphAlgebra Declaration.Method{..} bound = foldMap vertex (freeVariables (subterm methodName)) `connect` subtermValue methodBody (foldMap (freeVariables . subterm) methodParameters <> bound)
 
-instance CustomIsDeclaration Syntax.Identifier where
+instance CustomBuildCallGraphAlgebra Syntax.Identifier where
   customBuildCallGraphAlgebra (Syntax.Identifier name) bound
     | name `member` bound = empty
     | otherwise           = vertex name
 
-instance Apply IsDeclaration syntaxes => CustomIsDeclaration (Union syntaxes) where
-  customBuildCallGraphAlgebra = Prologue.apply (Proxy :: Proxy IsDeclaration) buildCallGraphAlgebra
+instance Apply BuildCallGraphAlgebra syntaxes => CustomBuildCallGraphAlgebra (Union syntaxes) where
+  customBuildCallGraphAlgebra = Prologue.apply (Proxy :: Proxy BuildCallGraphAlgebra) buildCallGraphAlgebra
 
-instance IsDeclaration syntax => CustomIsDeclaration (TermF syntax a) where
+instance BuildCallGraphAlgebra syntax => CustomBuildCallGraphAlgebra (TermF syntax a) where
   customBuildCallGraphAlgebra = buildCallGraphAlgebra . termFOut
 
-class IsDeclarationWithStrategy (strategy :: Strategy) syntax where
+class BuildCallGraphAlgebraWithStrategy (strategy :: Strategy) syntax where
   buildCallGraphAlgebraWithStrategy :: FreeVariables term => proxy strategy -> syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
 
-instance Foldable syntax => IsDeclarationWithStrategy 'Default syntax where
+instance Foldable syntax => BuildCallGraphAlgebraWithStrategy 'Default syntax where
   buildCallGraphAlgebraWithStrategy _ = foldMap subtermValue
 
-instance CustomIsDeclaration syntax => IsDeclarationWithStrategy 'Custom syntax where
+instance CustomBuildCallGraphAlgebra syntax => BuildCallGraphAlgebraWithStrategy 'Custom syntax where
   buildCallGraphAlgebraWithStrategy _ = customBuildCallGraphAlgebra
 
 data Strategy = Default | Custom
 
-type family IsDeclarationStrategy syntax where
-  IsDeclarationStrategy Declaration.Function = 'Custom
-  IsDeclarationStrategy Declaration.Method = 'Custom
-  IsDeclarationStrategy Syntax.Identifier = 'Custom
-  IsDeclarationStrategy (Union fs) = 'Custom
-  IsDeclarationStrategy (TermF f a) = 'Custom
-  IsDeclarationStrategy a = 'Default
+type family BuildCallGraphAlgebraStrategy syntax where
+  BuildCallGraphAlgebraStrategy Declaration.Function = 'Custom
+  BuildCallGraphAlgebraStrategy Declaration.Method = 'Custom
+  BuildCallGraphAlgebraStrategy Syntax.Identifier = 'Custom
+  BuildCallGraphAlgebraStrategy (Union fs) = 'Custom
+  BuildCallGraphAlgebraStrategy (TermF f a) = 'Custom
+  BuildCallGraphAlgebraStrategy a = 'Default
 
 
 instance Monoid CallGraph where
