@@ -28,22 +28,24 @@ type TracingEffects trace term value
      , State (Linker value)
      ]
 
--- | Linear trace analysis.
-evaluateTrace :: forall value term
+-- | Trace analysis.
+evaluateTrace :: forall trace value term
               . ( Corecursive term
                 , Evaluatable (Base term)
                 , FreeVariables term
+                , Monoid (trace (Configuration (LocationFor value) term value))
                 , Ord (Cell (LocationFor value) value)
                 , Ord term
                 , Ord value
+                , Pointed trace
                 , Recursive term
-                , MonadAddressable (LocationFor value) value (TracingAnalysis [] term value)
-                , MonadValue term value (TracingAnalysis [] term value)
+                , MonadAddressable (LocationFor value) value (TracingAnalysis trace term value)
+                , MonadValue term value (TracingAnalysis trace term value)
                 , Semigroup (Cell (LocationFor value) value)
                 )
               => term
-              -> Final (TracingEffects [] term value) value
-evaluateTrace = run @(TracingEffects [] term value) . runEvaluator . runTracingAnalysis . evaluateTerm
+              -> Final (TracingEffects trace term value) value
+evaluateTrace = run @(TracingEffects trace term value) . runEvaluator . runTracingAnalysis . evaluateTerm
 
 -- | Reachable configuration analysis.
 evaluateReach :: forall value term
