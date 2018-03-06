@@ -8,8 +8,10 @@ type TName = Int
 
 -- | An effect offering a (resettable) sequence of always-incrementing, and therefore “fresh,” type variables.
 data Fresh a where
-  Reset :: TName -> Fresh () -- ^ Request a reset of the sequence of variable names.
-  Fresh :: Fresh TName       -- ^ Request a fresh variable name.
+  -- | Request a reset of the sequence of variable names.
+  Reset :: TName -> Fresh ()
+  -- | Request a fresh variable name.
+  Fresh :: Fresh TName
 
 -- | 'Monad's offering a (resettable) sequence of guaranteed-fresh type variables.
 class Monad m => MonadFresh m where
