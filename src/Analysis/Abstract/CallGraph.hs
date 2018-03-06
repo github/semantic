@@ -40,7 +40,7 @@ renderCallGraph = export (defaultStyle id) . unCallGraph
 
 
 buildCallGraph :: (IsDeclaration syntax, Foldable syntax, FreeVariables1 syntax, Functor syntax) => Term syntax ann -> CallGraph
-buildCallGraph = para (\ (In _ syntax) -> connectDeclaration (fst <$> syntax) (foldMap snd syntax))
+buildCallGraph = foldSubterms buildCallGraphAlgebra
 
 
 getCallGraph :: CallGraphAnalysis term CallGraph
@@ -104,37 +104,37 @@ instance ( Evaluatable (Base term)
 
 
 class IsDeclaration syntax where
-  connectDeclaration :: FreeVariables term => syntax term -> CallGraph -> CallGraph
+  buildCallGraphAlgebra :: FreeVariables term => syntax (Subterm term CallGraph) -> CallGraph
 
 instance (IsDeclarationStrategy syntax ~ strategy, IsDeclarationWithStrategy strategy syntax) => IsDeclaration syntax where
-  connectDeclaration graph = connectDeclarationWithStrategy (Proxy :: Proxy strategy) graph
+  buildCallGraphAlgebra = buildCallGraphAlgebraWithStrategy (Proxy :: Proxy strategy)
 
 class CustomIsDeclaration syntax where
-  customConnectDeclaration :: FreeVariables term => syntax term -> CallGraph -> CallGraph
+  customBuildCallGraphAlgebra :: FreeVariables term => syntax (Subterm term CallGraph) -> CallGraph
 
 instance CustomIsDeclaration Declaration.Function where
-  customConnectDeclaration Declaration.Function{..} = flip (foldr (connect . vertex)) (freeVariables functionName)
+  customBuildCallGraphAlgebra Declaration.Function{..} = foldMap vertex (freeVariables (subterm functionName)) `connect` subtermValue functionBody
 
 instance CustomIsDeclaration Declaration.Method where
-  customConnectDeclaration Declaration.Method{..} = flip (foldr (connect . vertex)) (freeVariables methodName)
+  customBuildCallGraphAlgebra Declaration.Method{..} = foldMap vertex (freeVariables (subterm methodName)) `connect` subtermValue methodBody
 
 instance CustomIsDeclaration Syntax.Identifier where
-  customConnectDeclaration (Syntax.Identifier name) = overlay (vertex name)
+  customBuildCallGraphAlgebra (Syntax.Identifier name) = vertex name
 
 instance Apply IsDeclaration syntaxes => CustomIsDeclaration (Union syntaxes) where
-  customConnectDeclaration = Prologue.apply (Proxy :: Proxy IsDeclaration) connectDeclaration
+  customBuildCallGraphAlgebra = Prologue.apply (Proxy :: Proxy IsDeclaration) buildCallGraphAlgebra
 
 instance IsDeclaration syntax => CustomIsDeclaration (TermF syntax a) where
-  customConnectDeclaration = connectDeclaration . termFOut
+  customBuildCallGraphAlgebra = buildCallGraphAlgebra . termFOut
 
 class IsDeclarationWithStrategy (strategy :: Strategy) syntax where
-  connectDeclarationWithStrategy :: FreeVariables term => proxy strategy -> syntax term -> CallGraph -> CallGraph
+  buildCallGraphAlgebraWithStrategy :: FreeVariables term => proxy strategy -> syntax (Subterm term CallGraph) -> CallGraph
 
-instance IsDeclarationWithStrategy 'Default syntax where
-  connectDeclarationWithStrategy _ _ = id
+instance Foldable syntax => IsDeclarationWithStrategy 'Default syntax where
+  buildCallGraphAlgebraWithStrategy _ = foldMap subtermValue
 
 instance CustomIsDeclaration syntax => IsDeclarationWithStrategy 'Custom syntax where
-  connectDeclarationWithStrategy _ = customConnectDeclaration
+  buildCallGraphAlgebraWithStrategy _ = customBuildCallGraphAlgebra
 
 data Strategy = Default | Custom
 
