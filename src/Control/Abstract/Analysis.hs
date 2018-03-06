@@ -7,6 +7,7 @@ import Prologue
 --
 --   This typeclass is left intentionally unconstrained to avoid circular dependencies between it and other typeclasses.
 class Monad m => MonadAnalysis term value m | m -> term, m -> value where
+  -- | Analyze a term using the semantics of the current analysis. This should generally only be called by definitions of 'evaluateTerm' and 'analyzeTerm' in this or other instances.
   analyzeTerm :: SubtermAlgebra (Base term) term (m value)
 
   -- | Evaluate a term to a value using the semantics of the current analysis.
