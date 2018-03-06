@@ -707,7 +707,7 @@ ambientDeclaration :: Assignment
 ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> children (TypeScript.Syntax.AmbientDeclaration <$> term (choice [declaration, statementBlock]))
 
 exportStatement :: Assignment
-exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip Declaration.QualifiedExport <$> exportClause <*> term fromClause)
+exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip Declaration.QualifiedExport <$> exportClause <*> term (fromClause <|> emptyTerm))
   where
     exportClause = symbol Grammar.ExportClause *> children (many exportSymbol)
     exportSymbol = symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> (Just <$> rawIdentifier))
