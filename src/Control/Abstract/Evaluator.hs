@@ -8,7 +8,7 @@ import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
-import Data.Abstract.Linker
+import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Prelude hiding (fail)
 
@@ -35,21 +35,21 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   modifyStore :: (StoreFor value -> StoreFor value) -> m ()
 
   -- | Retrieve the table of evaluated modules.
-  getModuleTable :: m (Linker value)
+  getModuleTable :: m (ModuleTable value)
   -- | Update the table of evaluated modules.
-  modifyModuleTable :: (Linker value -> Linker value) -> m ()
+  modifyModuleTable :: (ModuleTable value -> ModuleTable value) -> m ()
 
   -- | Retrieve the table of unevaluated modules.
-  askModuleTable :: m (Linker term)
+  askModuleTable :: m (ModuleTable term)
   -- | Run an action with a locally-modified table of unevaluated modules.
-  localModuleTable :: (Linker term -> Linker term) -> m a -> m a
+  localModuleTable :: (ModuleTable term -> ModuleTable term) -> m a -> m a
 
 instance Members '[ Fail
                   , Reader (EnvironmentFor value)
                   , State  (EnvironmentFor value)
                   , State  (StoreFor value)
-                  , Reader (Linker term)
-                  , State  (Linker value)
+                  , Reader (ModuleTable term)
+                  , State  (ModuleTable value)
                   ] effects
          => MonadEvaluator term value (Evaluator effects term value) where
   getGlobalEnv = Evaluator get
