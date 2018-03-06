@@ -59,22 +59,6 @@ evaluateReach :: forall v term
 evaluateReach = run @(TracingEffects Set term v) . runEvaluator . runTracingAnalysis . evaluateTerm
 
 
--- | Small-step evaluation which records every visited configuration.
--- evTell :: forall g t m v
---        . ( Monoid (g (Configuration (LocationFor v) t v))
---          , Pointed g
---          , MonadEvaluator t v m
---          )
---        => (((v -> m v) -> t -> m v) -> (v -> m v) -> t -> m v)
---        -> ((v -> m v) -> t -> m v)
---        -> (v -> m v) -> t -> m v
--- evTell ev0 ev' yield e = do
---   env <- askEnv
---   store <- getStore
---   roots <- askRoots
---   tell (point (Configuration e roots env store) :: g (Configuration (LocationFor v) t v))
---   ev0 ev' yield e
-
 newtype TracingAnalysis trace term value a = TracingAnalysis { runTracingAnalysis :: Evaluator (TracingEffects trace term value) term value a }
   deriving (Applicative, Functor, Monad, MonadFail)
 
