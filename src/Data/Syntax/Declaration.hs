@@ -231,6 +231,14 @@ instance Evaluatable QualifiedImport where
       qualifyInsert k v rest = envInsert (prefix <> k) v <$> rest
       directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v <$> rest) (Map.lookup k symbols)
 
+-- | Qualified Import declarations (symbols are qualified in calling environment).
+data QualifiedExport a = QualifiedExport { qualifiedExportFrom :: !a, qualifiedExportSymbols :: ![(Name, Name)]}
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 QualifiedExport where liftEq = genericLiftEq
+instance Ord1 QualifiedExport where liftCompare = genericLiftCompare
+instance Show1 QualifiedExport where liftShowsPrec = genericLiftShowsPrec
+
 -- | Import declarations (symbols are added directly to calling environment).
 --
 -- If symbols is empty, just import the module for it's side effects.
