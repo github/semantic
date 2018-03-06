@@ -16,6 +16,7 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.Linker
 import Data.Abstract.Value
 import Data.Proxy
+import Data.Set (member)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import Data.Term
@@ -39,7 +40,7 @@ renderCallGraph :: CallGraph -> ByteString
 renderCallGraph = export (defaultStyle id) . unCallGraph
 
 
-buildCallGraph :: (IsDeclaration syntax, Foldable syntax, FreeVariables1 syntax, Functor syntax) => Term syntax ann -> CallGraph
+buildCallGraph :: (IsDeclaration syntax, Foldable syntax, FreeVariables1 syntax, Functor syntax) => Term syntax ann -> Set Name -> CallGraph
 buildCallGraph = foldSubterms buildCallGraphAlgebra
 
 
@@ -104,13 +105,13 @@ instance ( Evaluatable (Base term)
 
 
 class IsDeclaration syntax where
-  buildCallGraphAlgebra :: FreeVariables term => syntax (Subterm term CallGraph) -> CallGraph
+  buildCallGraphAlgebra :: FreeVariables term => syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
 
 instance (IsDeclarationStrategy syntax ~ strategy, IsDeclarationWithStrategy strategy syntax) => IsDeclaration syntax where
   buildCallGraphAlgebra = buildCallGraphAlgebraWithStrategy (Proxy :: Proxy strategy)
 
 class CustomIsDeclaration syntax where
-  customBuildCallGraphAlgebra :: FreeVariables term => syntax (Subterm term CallGraph) -> CallGraph
+  customBuildCallGraphAlgebra :: FreeVariables term => syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
 
 instance CustomIsDeclaration Declaration.Function where
   customBuildCallGraphAlgebra Declaration.Function{..} = foldMap vertex (freeVariables (subterm functionName)) `connect` subtermValue functionBody
@@ -128,7 +129,7 @@ instance IsDeclaration syntax => CustomIsDeclaration (TermF syntax a) where
   customBuildCallGraphAlgebra = buildCallGraphAlgebra . termFOut
 
 class IsDeclarationWithStrategy (strategy :: Strategy) syntax where
-  buildCallGraphAlgebraWithStrategy :: FreeVariables term => proxy strategy -> syntax (Subterm term CallGraph) -> CallGraph
+  buildCallGraphAlgebraWithStrategy :: FreeVariables term => proxy strategy -> syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
 
 instance Foldable syntax => IsDeclarationWithStrategy 'Default syntax where
   buildCallGraphAlgebraWithStrategy _ = foldMap subtermValue
