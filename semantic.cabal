@@ -19,7 +19,7 @@ library
                      -- , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Evaluating
-                     -- , Analysis.Abstract.Tracing
+                     , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
                      , Analysis.Decorator
