@@ -27,7 +27,9 @@ renderCallGraph :: CallGraph -> ByteString
 renderCallGraph = export (defaultStyle id) . unCallGraph
 
 
--- | Types which contribute to a 'CallGraph'.
+-- | Types which contribute to a 'CallGraph'. There is exactly one instance of this typeclass; customizing the 'CallGraph's for a new type is done by defining an instance of 'CustomBuildCallGraphAlgebra' instead.
+--
+--   This typeclass employs the Advanced Overlap techniques designed by Oleg Kiselyov & Simon Peyton Jones: https://wiki.haskell.org/GHC/AdvancedOverlap.
 class BuildCallGraphAlgebra syntax where
   -- | A 'SubtermAlgebra' computing the 'CallGraph' for a piece of @syntax@.
   buildCallGraphAlgebra :: FreeVariables term => syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
