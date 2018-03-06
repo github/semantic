@@ -25,6 +25,7 @@ buildCallGraph :: (CallGraphAlgebra syntax, Foldable syntax, FreeVariables1 synt
 buildCallGraph = foldSubterms callGraphAlgebra
 
 
+-- | Render a 'CallGraph' to a 'ByteString' in DOT notation.
 renderCallGraph :: CallGraph -> ByteString
 renderCallGraph = export (defaultStyle id) . unCallGraph
 
