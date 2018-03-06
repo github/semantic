@@ -37,6 +37,8 @@ class BuildCallGraphAlgebra syntax where
 instance (BuildCallGraphAlgebraStrategy syntax ~ strategy, BuildCallGraphAlgebraWithStrategy strategy syntax) => BuildCallGraphAlgebra syntax where
   buildCallGraphAlgebra = buildCallGraphAlgebraWithStrategy (Proxy :: Proxy strategy)
 
+
+-- | Types whose contribution to a 'CallGraph' is customized. If an instance’s definition is not being used, ensure that the type is mapped to 'Custom' in the 'BuildCallGraphAlgebraStrategy'.
 class CustomBuildCallGraphAlgebra syntax where
   customBuildCallGraphAlgebra :: FreeVariables term => syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
 
