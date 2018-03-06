@@ -1,5 +1,10 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
-module Analysis.CallGraph where
+module Analysis.CallGraph
+( CallGraph(..)
+, renderCallGraph
+, buildCallGraph
+, IsDeclaration(..)
+) where
 
 import qualified Algebra.Graph as G
 import Algebra.Graph.Class
