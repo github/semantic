@@ -30,10 +30,12 @@ type TracingEffects trace term value
 
 -- | Linear trace analysis.
 evaluateTrace :: forall value term
-              . ( Ord value, Ord term, Ord (Cell (LocationFor value) value)
-                , Corecursive term
+              . ( Corecursive term
                 , Evaluatable (Base term)
                 , FreeVariables term
+                , Ord (Cell (LocationFor value) value)
+                , Ord term
+                , Ord value
                 , Recursive term
                 , MonadAddressable (LocationFor value) value (TracingAnalysis [] term value)
                 , MonadValue term value (TracingAnalysis [] term value)
@@ -45,10 +47,13 @@ evaluateTrace = run @(TracingEffects [] term value) . runEvaluator . runTracingA
 
 -- | Reachable configuration analysis.
 evaluateReach :: forall value term
-              . ( Ord value, Ord term, Ord (LocationFor value), Ord (Cell (LocationFor value) value)
-                , Corecursive term
+              . ( Corecursive term
                 , Evaluatable (Base term)
                 , FreeVariables term
+                , Ord (Cell (LocationFor value) value)
+                , Ord (LocationFor value)
+                , Ord term
+                , Ord value
                 , Recursive term
                 , MonadAddressable (LocationFor value) value (TracingAnalysis Set term value)
                 , MonadValue term value (TracingAnalysis Set term value)
