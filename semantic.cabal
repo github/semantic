@@ -21,6 +21,7 @@ library
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Evaluating
                      -- , Analysis.Abstract.Tracing
+                     , Analysis.CallGraph
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
                      , Analysis.Decorator
