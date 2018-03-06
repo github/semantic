@@ -79,6 +79,7 @@ instance CustomBuildCallGraphAlgebra syntax => BuildCallGraphAlgebraWithStrategy
 -- | Which instance of 'CustomBuildCallGraphAlgebra' to use for a given @syntax@ type.
 data Strategy = Default | Custom
 
+-- | A mapping of @syntax@ types onto 'Strategy's.
 type family BuildCallGraphAlgebraStrategy syntax where
   BuildCallGraphAlgebraStrategy Declaration.Function = 'Custom
   BuildCallGraphAlgebraStrategy Declaration.Method = 'Custom
