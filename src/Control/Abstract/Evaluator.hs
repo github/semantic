@@ -52,7 +52,7 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
 
   -- | Get the current 'Configuration' with a passed-in term.
   getConfiguration :: Ord (LocationFor value) => term -> m (Configuration (LocationFor value) term value)
-  getConfiguration term = Configuration term mempty <$> askLocalEnv <*> getStore
+  getConfiguration term = Configuration term <$> askRoots <*> askLocalEnv <*> getStore
 
 instance Members '[ Fail
                   , Reader (EnvironmentFor value)
