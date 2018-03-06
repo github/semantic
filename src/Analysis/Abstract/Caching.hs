@@ -133,10 +133,6 @@ converge f = loop
           else
             loop x'
 
--- | Get the current 'Configuration' with a passed-in term.
-getConfiguration :: Ord (LocationFor v) => t -> CachingAnalysis t v (Configuration (LocationFor v) t v)
-getConfiguration term = Configuration term mempty <$> askLocalEnv <*> getStore
-
 -- | Nondeterministically write each of a collection of stores & return their associated results.
 scatter :: (Alternative m, Foldable t, MonadEvaluator term v m) => t (a, Store (LocationFor v) v) -> m a
 scatter = getAlt . foldMap (\ (value, store') -> Alt (putStore store' *> pure value))

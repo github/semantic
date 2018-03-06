@@ -8,6 +8,7 @@ import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
+import Data.Abstract.Configuration
 import Data.Abstract.Linker
 import Data.Abstract.Value
 import Prelude hiding (fail)
@@ -43,6 +44,10 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   askModuleTable :: m (Linker term)
   -- | Run an action with a locally-modified table of unevaluated modules.
   localModuleTable :: (Linker term -> Linker term) -> m a -> m a
+
+  -- | Get the current 'Configuration' with a passed-in term.
+  getConfiguration :: Ord (LocationFor value) => term -> m (Configuration (LocationFor value) term value)
+  getConfiguration term = Configuration term mempty <$> askLocalEnv <*> getStore
 
 instance Members '[ Fail
                   , Reader (EnvironmentFor value)
