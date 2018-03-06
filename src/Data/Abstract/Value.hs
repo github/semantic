@@ -94,7 +94,6 @@ class ValueRoots l v | v -> l where
 instance (FreeVariables term, Ord location) => ValueRoots location (Value location term) where
   valueRoots v
     | Just (Closure names body env) <- prj v = envRoots env (foldr Set.delete (freeVariables body) names)
-    | Just (Interface _ env) <- prj v        = envAll env
     | otherwise                              = mempty
 
 instance ValueRoots Monovariant Type.Type where
