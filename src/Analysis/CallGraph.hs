@@ -19,12 +19,12 @@ import Prologue hiding (empty)
 newtype CallGraph = CallGraph { unCallGraph :: G.Graph Name }
   deriving (Eq, Graph, Show)
 
-renderCallGraph :: CallGraph -> ByteString
-renderCallGraph = export (defaultStyle id) . unCallGraph
-
-
 buildCallGraph :: (BuildCallGraphAlgebra syntax, Foldable syntax, FreeVariables1 syntax, Functor syntax) => Term syntax ann -> Set Name -> CallGraph
 buildCallGraph = foldSubterms buildCallGraphAlgebra
+
+
+renderCallGraph :: CallGraph -> ByteString
+renderCallGraph = export (defaultStyle id) . unCallGraph
 
 
 class BuildCallGraphAlgebra syntax where
