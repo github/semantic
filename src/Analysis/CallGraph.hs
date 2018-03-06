@@ -62,6 +62,8 @@ instance Apply BuildCallGraphAlgebra syntaxes => CustomBuildCallGraphAlgebra (Un
 instance BuildCallGraphAlgebra syntax => CustomBuildCallGraphAlgebra (TermF syntax a) where
   customBuildCallGraphAlgebra = buildCallGraphAlgebra . termFOut
 
+
+-- | The mechanism selecting 'Default'/'Custom' implementations for 'buildCallGraphAlgebra' depending on the @syntax@ type.
 class BuildCallGraphAlgebraWithStrategy (strategy :: Strategy) syntax where
   buildCallGraphAlgebraWithStrategy :: FreeVariables term => proxy strategy -> syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
 
