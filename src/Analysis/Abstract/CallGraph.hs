@@ -114,10 +114,10 @@ class CustomIsDeclaration syntax where
   customBuildCallGraphAlgebra :: FreeVariables term => syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
 
 instance CustomIsDeclaration Declaration.Function where
-  customBuildCallGraphAlgebra Declaration.Function{..} = foldMap vertex (freeVariables (subterm functionName)) `connect` subtermValue functionBody
+  customBuildCallGraphAlgebra Declaration.Function{..} bound = foldMap vertex (freeVariables (subterm functionName)) `connect` subtermValue functionBody (foldMap (freeVariables . subterm) functionParameters <> bound)
 
 instance CustomIsDeclaration Declaration.Method where
-  customBuildCallGraphAlgebra Declaration.Method{..} = foldMap vertex (freeVariables (subterm methodName)) `connect` subtermValue methodBody
+  customBuildCallGraphAlgebra Declaration.Method{..} bound = foldMap vertex (freeVariables (subterm methodName)) `connect` subtermValue methodBody (foldMap (freeVariables . subterm) methodParameters <> bound)
 
 instance CustomIsDeclaration Syntax.Identifier where
   customBuildCallGraphAlgebra (Syntax.Identifier name) bound
