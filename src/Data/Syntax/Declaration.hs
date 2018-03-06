@@ -239,6 +239,8 @@ instance Eq1 QualifiedExport where liftEq = genericLiftEq
 instance Ord1 QualifiedExport where liftCompare = genericLiftCompare
 instance Show1 QualifiedExport where liftShowsPrec = genericLiftShowsPrec
 
+instance Evaluatable QualifiedExport where
+
 -- | Import declarations (symbols are added directly to calling environment).
 --
 -- If symbols is empty, just import the module for it's side effects.
