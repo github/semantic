@@ -19,13 +19,13 @@ import Prologue
 
 -- | The effects necessary for tracing analyses.
 type TracingEffects trace term value
-  = '[ Writer (trace (Configuration (LocationFor value) term value)) -- For 'MonadTrace'.
-     , Fail                                           -- For 'MonadFail'.
-     , State (StoreFor value)                -- For 'MonadStore'.
-     , Reader (EnvironmentFor value)         -- For 'MonadEnv'.
-     , State (EnvironmentFor value)         -- For 'MonadEnv'.
-     , Reader (Linker term)
-     , State (Linker value)
+  = '[ Writer (trace (Configuration (LocationFor value) term value)) -- For 'trace'.
+     , Fail                                                          -- For 'MonadFail'.
+     , State (StoreFor value)                                        -- For 'MonadEvaluator'.
+     , Reader (EnvironmentFor value)                                 -- For 'MonadEvaluator'.
+     , State (EnvironmentFor value)                                  -- For 'MonadEvaluator'.
+     , Reader (Linker term)                                          -- For 'MonadEvaluator'.
+     , State (Linker value)                                          -- For 'MonadEvaluator'.
      ]
 
 -- | Trace analysis.
