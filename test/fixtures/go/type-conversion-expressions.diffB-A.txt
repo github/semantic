@@ -6,11 +6,12 @@
     (Identifier)
     ([])
     (
-      (TypeConversion
-        (Pointer
-          (Identifier))
-      { (Identifier)
-      ->(Identifier) })
+      (Pointer
+        (Call
+          (Identifier)
+        { (Identifier)
+        ->(Identifier) }
+          (Empty)))
       (Call
         (Pointer
           (Identifier))

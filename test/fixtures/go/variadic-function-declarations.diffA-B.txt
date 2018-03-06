@@ -28,7 +28,8 @@
   { (Identifier)
   ->(Identifier) }
     (
-      (Identifier)
+      (
+        (Identifier))
       (Variadic
         (Identifier)
         (Empty)))
