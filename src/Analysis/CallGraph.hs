@@ -20,7 +20,7 @@ newtype CallGraph = CallGraph { unCallGraph :: G.Graph Name }
   deriving (Eq, Graph, Show)
 
 buildCallGraph :: (CallGraphAlgebra syntax, Foldable syntax, FreeVariables1 syntax, Functor syntax) => Term syntax ann -> Set Name -> CallGraph
-buildCallGraph = foldSubterms buildCallGraphAlgebra
+buildCallGraph = foldSubterms callGraphAlgebra
 
 
 renderCallGraph :: CallGraph -> ByteString
@@ -32,10 +32,10 @@ renderCallGraph = export (defaultStyle id) . unCallGraph
 --   This typeclass employs the Advanced Overlap techniques designed by Oleg Kiselyov & Simon Peyton Jones: https://wiki.haskell.org/GHC/AdvancedOverlap.
 class CallGraphAlgebra syntax where
   -- | A 'SubtermAlgebra' computing the 'CallGraph' for a piece of @syntax@.
-  buildCallGraphAlgebra :: FreeVariables term => syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
+  callGraphAlgebra :: FreeVariables term => syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
 
 instance (CallGraphAlgebraStrategy syntax ~ strategy, CallGraphAlgebraWithStrategy strategy syntax) => CallGraphAlgebra syntax where
-  buildCallGraphAlgebra = buildCallGraphAlgebraWithStrategy (Proxy :: Proxy strategy)
+  callGraphAlgebra = callGraphAlgebraWithStrategy (Proxy :: Proxy strategy)
 
 
 -- | Types whose contribution to a 'CallGraph' is customized. If an instance’s definition is not being used, ensure that the type is mapped to 'Custom' in the 'CallGraphAlgebraStrategy'.
@@ -57,23 +57,23 @@ instance CustomCallGraphAlgebra Syntax.Identifier where
     | otherwise           = vertex name
 
 instance Apply CallGraphAlgebra syntaxes => CustomCallGraphAlgebra (Union syntaxes) where
-  customCallGraphAlgebra = Prologue.apply (Proxy :: Proxy CallGraphAlgebra) buildCallGraphAlgebra
+  customCallGraphAlgebra = Prologue.apply (Proxy :: Proxy CallGraphAlgebra) callGraphAlgebra
 
 instance CallGraphAlgebra syntax => CustomCallGraphAlgebra (TermF syntax a) where
-  customCallGraphAlgebra = buildCallGraphAlgebra . termFOut
+  customCallGraphAlgebra = callGraphAlgebra . termFOut
 
 
--- | The mechanism selecting 'Default'/'Custom' implementations for 'buildCallGraphAlgebra' depending on the @syntax@ type.
+-- | The mechanism selecting 'Default'/'Custom' implementations for 'callGraphAlgebra' depending on the @syntax@ type.
 class CallGraphAlgebraWithStrategy (strategy :: Strategy) syntax where
-  buildCallGraphAlgebraWithStrategy :: FreeVariables term => proxy strategy -> syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
+  callGraphAlgebraWithStrategy :: FreeVariables term => proxy strategy -> syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
 
--- | The 'Default' definition of 'buildCallGraphAlgebra' combines all of the 'CallGraph's within the @syntax@ 'Monoid'ally.
+-- | The 'Default' definition of 'callGraphAlgebra' combines all of the 'CallGraph's within the @syntax@ 'Monoid'ally.
 instance Foldable syntax => CallGraphAlgebraWithStrategy 'Default syntax where
-  buildCallGraphAlgebraWithStrategy _ = foldMap subtermValue
+  callGraphAlgebraWithStrategy _ = foldMap subtermValue
 
 -- | The 'Custom' strategy calls out to the 'customCallGraphAlgebra' method.
 instance CustomCallGraphAlgebra syntax => CallGraphAlgebraWithStrategy 'Custom syntax where
-  buildCallGraphAlgebraWithStrategy _ = customCallGraphAlgebra
+  callGraphAlgebraWithStrategy _ = customCallGraphAlgebra
 
 
 -- | Which instance of 'CustomCallGraphAlgebra' to use for a given @syntax@ type.
