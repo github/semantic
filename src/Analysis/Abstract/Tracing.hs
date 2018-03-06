@@ -90,12 +90,7 @@ instance ( Corecursive term
          , Semigroup (Cell (LocationFor value) value)
          )
          => MonadAnalysis term value (TracingAnalysis trace term value) where
-  analyzeTerm term = do
-    env <- askLocalEnv
-    store <- getStore
-    roots <- pure mempty
-    trace (point (Configuration (embedSubterm term) roots env store))
-    eval term
+  analyzeTerm term = getConfiguration (embedSubterm term) >>= trace . point >> eval term
 
 trace :: trace (Configuration (LocationFor value) term value) -> TracingAnalysis trace term value ()
 trace w = TracingAnalysis (Evaluator (tell w))
