@@ -16,6 +16,7 @@ import qualified Data.Syntax.Declaration as Declaration
 import Data.Term
 import Prologue hiding (empty)
 
+-- | The graph of function definitions to symbols used in a given program.
 newtype CallGraph = CallGraph { unCallGraph :: G.Graph Name }
   deriving (Eq, Graph, Show)
 
