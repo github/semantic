@@ -29,6 +29,7 @@ renderCallGraph = export (defaultStyle id) . unCallGraph
 
 -- | Types which contribute to a 'CallGraph'.
 class BuildCallGraphAlgebra syntax where
+  -- | A 'SubtermAlgebra' computing the 'CallGraph' for a piece of @syntax@.
   buildCallGraphAlgebra :: FreeVariables term => syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
 
 instance (BuildCallGraphAlgebraStrategy syntax ~ strategy, BuildCallGraphAlgebraWithStrategy strategy syntax) => BuildCallGraphAlgebra syntax where
