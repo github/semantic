@@ -364,6 +364,7 @@ jsxChild = choice [ jsxElement', jsxExpression', jsxText ]
 jsxSelfClosingElement :: Assignment
 jsxSelfClosingElement = makeTerm <$> symbol Grammar.JsxSelfClosingElement <*> children (TypeScript.Syntax.JsxSelfClosingElement <$> term jsxElementName <*> manyTerm jsxAttribute')
 
+jsxAttribute' :: Assignment
 jsxAttribute' = jsxAttribute <|> jsxExpression'
 
 jsxOpeningElement' :: Assignment
