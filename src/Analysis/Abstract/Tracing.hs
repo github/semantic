@@ -29,34 +29,34 @@ type TracingEffects trace term value
      ]
 
 -- | Linear trace analysis.
-evaluateTrace :: forall v term
-              . ( Ord v, Ord term, Ord (Cell (LocationFor v) v)
+evaluateTrace :: forall value term
+              . ( Ord value, Ord term, Ord (Cell (LocationFor value) value)
                 , Corecursive term
                 , Evaluatable (Base term)
                 , FreeVariables term
                 , Recursive term
-                , MonadAddressable (LocationFor v) v (TracingAnalysis [] term v)
-                , MonadValue term v (TracingAnalysis [] term v)
-                , Semigroup (Cell (LocationFor v) v)
+                , MonadAddressable (LocationFor value) value (TracingAnalysis [] term value)
+                , MonadValue term value (TracingAnalysis [] term value)
+                , Semigroup (Cell (LocationFor value) value)
                 )
               => term
-              -> Final (TracingEffects [] term v) v
-evaluateTrace = run @(TracingEffects [] term v) . runEvaluator . runTracingAnalysis . evaluateTerm
+              -> Final (TracingEffects [] term value) value
+evaluateTrace = run @(TracingEffects [] term value) . runEvaluator . runTracingAnalysis . evaluateTerm
 
 -- | Reachable configuration analysis.
-evaluateReach :: forall v term
-              . ( Ord v, Ord term, Ord (LocationFor v), Ord (Cell (LocationFor v) v)
+evaluateReach :: forall value term
+              . ( Ord value, Ord term, Ord (LocationFor value), Ord (Cell (LocationFor value) value)
                 , Corecursive term
                 , Evaluatable (Base term)
                 , FreeVariables term
                 , Recursive term
-                , MonadAddressable (LocationFor v) v (TracingAnalysis Set term v)
-                , MonadValue term v (TracingAnalysis Set term v)
-                , Semigroup (Cell (LocationFor v) v)
+                , MonadAddressable (LocationFor value) value (TracingAnalysis Set term value)
+                , MonadValue term value (TracingAnalysis Set term value)
+                , Semigroup (Cell (LocationFor value) value)
                 )
               => term
-              -> Final (TracingEffects Set term v) v
-evaluateReach = run @(TracingEffects Set term v) . runEvaluator . runTracingAnalysis . evaluateTerm
+              -> Final (TracingEffects Set term value) value
+evaluateReach = run @(TracingEffects Set term value) . runEvaluator . runTracingAnalysis . evaluateTerm
 
 
 newtype TracingAnalysis trace term value a = TracingAnalysis { runTracingAnalysis :: Evaluator (TracingEffects trace term value) term value a }
