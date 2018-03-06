@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FunctionalDependencies, GeneralizedNewtypeDeriving, RankNTypes, StandaloneDeriving, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, DefaultSignatures, FunctionalDependencies, GeneralizedNewtypeDeriving, RankNTypes, StandaloneDeriving, UndecidableInstances #-}
 module Control.Abstract.Evaluator where
 
 import Control.Applicative
@@ -10,6 +10,7 @@ import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Configuration
 import Data.Abstract.Linker
+import Data.Abstract.Live
 import Data.Abstract.Value
 import Prelude hiding (fail)
 
@@ -44,6 +45,10 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   askModuleTable :: m (Linker term)
   -- | Run an action with a locally-modified table of unevaluated modules.
   localModuleTable :: (Linker term -> Linker term) -> m a -> m a
+
+  -- | Retrieve the current root set.
+  askRoots :: Ord (LocationFor value) => m (Live (LocationFor value) value)
+  askRoots = pure mempty
 
   -- | Get the current 'Configuration' with a passed-in term.
   getConfiguration :: Ord (LocationFor value) => term -> m (Configuration (LocationFor value) term value)
