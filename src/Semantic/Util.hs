@@ -45,7 +45,7 @@ evaluateRubyFiles paths = do
   pure $ evaluates @RubyValue (zip bs ts) (b, t)
 
 -- Go
-typecheckGoFile path = evaluate @GoValue <$>
+typecheckGoFile path = evaluateCache @Type <$>
   (file path >>= runTask . parse goParser)
 
 -- Python
