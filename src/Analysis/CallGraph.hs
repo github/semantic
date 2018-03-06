@@ -42,12 +42,15 @@ instance (BuildCallGraphAlgebraStrategy syntax ~ strategy, BuildCallGraphAlgebra
 class CustomBuildCallGraphAlgebra syntax where
   customBuildCallGraphAlgebra :: FreeVariables term => syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
 
+-- | 'Declaration.Function's produce a vertex for their name, with edges to any free variables in their body.
 instance CustomBuildCallGraphAlgebra Declaration.Function where
   customBuildCallGraphAlgebra Declaration.Function{..} bound = foldMap vertex (freeVariables (subterm functionName)) `connect` subtermValue functionBody (foldMap (freeVariables . subterm) functionParameters <> bound)
 
+-- | 'Declaration.Method's produce a vertex for their name, with edges to any free variables in their body.
 instance CustomBuildCallGraphAlgebra Declaration.Method where
   customBuildCallGraphAlgebra Declaration.Method{..} bound = foldMap vertex (freeVariables (subterm methodName)) `connect` subtermValue methodBody (foldMap (freeVariables . subterm) methodParameters <> bound)
 
+-- | 'Syntax.Identifier's produce a vertex iff it’s unbound in the 'Set'.
 instance CustomBuildCallGraphAlgebra Syntax.Identifier where
   customBuildCallGraphAlgebra (Syntax.Identifier name) bound
     | name `member` bound = empty
