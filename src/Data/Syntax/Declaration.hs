@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, TypeApplications, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Syntax.Declaration where
 
 import Prologue
