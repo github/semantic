@@ -1,31 +1,21 @@
 (Program
-  (Import
+  (QualifiedImport
     (ScopeResolution
       (Identifier))
-    (Empty)
-    (ScopeResolution
-      (Identifier)))
-  (Import
+    (Empty))
+  (QualifiedImport
     (ScopeResolution
       (Identifier))
-    (Empty)
-    (ScopeResolution
-      (Identifier))
-    (ScopeResolution
-      (Identifier)))
+    (Empty))
   (WildcardImport
     (ScopeResolution
       (Identifier))
     (Identifier))
-  (Import
+  (QualifiedImport
     (ScopeResolution
       (Identifier)
       (Identifier))
+    (Empty))
+  (QualifiedImport
     (Empty)
-    (ScopeResolution
-      (Identifier)))
-  (Import
-    (Empty)
-    (Empty)
-    (ScopeResolution
-      (Identifier))))
+    (Empty)))

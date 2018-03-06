@@ -1,13 +1,15 @@
 (Program
 {-(Throw
   {-(Call
-    {-(Identifier)-}
+    {-(QualifiedIdentifier
+      {-(Identifier)-})-}
     {-(TextElement)-}
     {-(Empty)-})-})-}
 {-(Throw
   {-(
     {-(Call
-      {-(Identifier)-}
+      {-(QualifiedIdentifier
+        {-(Identifier)-})-}
       {-(TextElement)-}
       {-(Empty)-})-}
     {-(Identifier)-})-})-}
@@ -15,13 +17,15 @@
     ([]))
 {+(Throw
   {+(Call
-    {+(Identifier)+}
+    {+(QualifiedIdentifier
+      {+(Identifier)+})+}
     {+(TextElement)+}
     {+(Empty)+})+})+}
 {+(Throw
   {+(
     {+(Call
-      {+(Identifier)+}
+      {+(QualifiedIdentifier
+        {+(Identifier)+})+}
       {+(TextElement)+}
       {+(Empty)+})+}
     {+(Identifier)+})+})+})

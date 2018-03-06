@@ -1,8 +1,7 @@
 (Program
   (Import
   { (TextElement)
-  ->(TextElement) }
-    (Empty))
+  ->(TextElement) })
 {+(Call
   {+(Identifier)+}
   {+(Identifier)+}
@@ -10,5 +9,4 @@
 {-(Import
   {-(
     {-(Symbol)-}
-    {-(TextElement)-})-}
-  {-(Empty)-})-})
+    {-(TextElement)-})-})-})

@@ -1,21 +1,25 @@
 (Program
   (Call
-    (Identifier)
+    (QualifiedIdentifier
+      (Identifier))
   {+(Identifier)+}
     (Empty))
   (Call
-    (Identifier)
+    (QualifiedIdentifier
+      (Identifier))
   {-(Identifier)-}
     (Empty))
   (Call
-    (Identifier)
+    (QualifiedIdentifier
+      (Identifier))
   {-(Identifier)-}
     (Identifier)
   {+(Identifier)+}
     (Empty))
 {-(Call
-  {-(MemberAccess
-    {-(Identifier)-}
-    {-(Identifier)-})-}
+  {-(QualifiedIdentifier
+    {-(
+      {-(Identifier)-}
+      {-(Identifier)-})-})-}
   {-(Integer)-}
   {-(Empty)-})-})

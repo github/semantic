@@ -26,7 +26,7 @@ type Syntax = '[
     Comment.Comment
   , Declaration.Class
   , Declaration.Function
-  , Declaration.QualifiedImport
+  , Declaration.Import
   , Declaration.Method
   , Declaration.Module
   , Expression.Arithmetic
@@ -300,7 +300,7 @@ methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> regularCa
     require = inj <$> (symbol Identifier *> do
       s <- source
       guard (elem s ["autoload", "load", "require", "require_relative"])
-      Declaration.QualifiedImport <$> args' <*> emptyTerm <*> pure [])
+      Declaration.Import <$> args' <*> pure [])
     args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> pure []
     args' = makeTerm'' <$> (symbol ArgumentList <|> symbol ArgumentListWithParens) <*> children (many expression) <|> emptyTerm
 

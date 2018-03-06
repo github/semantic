@@ -1,61 +1,45 @@
 (Program
-  (Import
-    (ScopeResolution
-    { (Identifier)
-    ->(Identifier) })
-    (Empty)
-    (ScopeResolution
-    { (Identifier)
-    ->(Identifier) }))
-  (Import
-    (ScopeResolution
-    { (Identifier)
-    ->(Identifier) })
-    (Empty)
+{+(QualifiedImport
   {+(ScopeResolution
     {+(Identifier)+})+}
-    (ScopeResolution
-      (Identifier))
-  {-(ScopeResolution
-    {-(Identifier)-})-})
-  (WildcardImport
-    (ScopeResolution
-    { (Identifier)
-    ->(Identifier) })
-    (Identifier))
-{+(Import
+  {+(Empty)+})+}
+{+(QualifiedImport
+  {+(ScopeResolution
+    {+(Identifier)+})+}
+  {+(Empty)+})+}
+{+(WildcardImport
+  {+(ScopeResolution
+    {+(Identifier)+})+}
+  {+(Identifier)+})+}
+{+(QualifiedImport
   {+(ScopeResolution
     {+(Identifier)+}
     {+(Identifier)+})+}
+  {+(Empty)+})+}
+{+(QualifiedImport
   {+(Empty)+}
-  {+(ScopeResolution
-    {+(Identifier)+})+})+}
-{+(Import
-  {+(Empty)+}
-  {+(Empty)+}
-  {+(ScopeResolution
-    {+(Identifier)+})+})+}
-{-(Import
+  {+(Empty)+})+}
+{-(QualifiedImport
   {-(ScopeResolution
     {-(Identifier)-})-}
-  {-(Empty)-}
-  {-(ImportSymbol
-    {-(ScopeResolution
-      {-(Identifier)-})-}
+  {-(Empty)-})-}
+{-(QualifiedImport
+  {-(ScopeResolution
     {-(Identifier)-})-}
-  {-(ImportSymbol
-    {-(ScopeResolution
-      {-(Identifier)-})-}
-    {-(Identifier)-})-})-}
-{-(Import
+  {-(Empty)-})-}
+{-(WildcardImport
+  {-(ScopeResolution
+    {-(Identifier)-})-}
+  {-(Identifier)-})-}
+{-(QualifiedImport
+  {-(ScopeResolution
+    {-(Identifier)-})-}
+  {-(Empty)-})-}
+{-(QualifiedImport
   {-(ScopeResolution
     {-(Identifier)-}
     {-(Identifier)-})-}
+  {-(Empty)-})-}
+{-(QualifiedImport
   {-(Empty)-}
-  {-(ScopeResolution
-    {-(Identifier)-})-})-}
-{-(Import
-  {-(Empty)-}
-  {-(Empty)-}
-  {-(ScopeResolution
-    {-(Identifier)-})-})-})
+  {-(Empty)-})-})

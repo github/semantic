@@ -1,25 +1,25 @@
 (Program
   (
-  {-(Import
+  {-(QualifiedImport
     {-(Identifier)-}
     {-(Identifier)-})-}
-    (Import
+    (QualifiedImport
       (Identifier)
       (Identifier))
-  {+(Import
+  {+(QualifiedImport
     {+(ScopeResolution
       {+(Identifier)+})+}
     {+(Identifier)+})+})
 {+(
-  {+(Import
+  {+(QualifiedImport
     {+(ScopeResolution
       {+(Identifier)+}
       {+(Identifier)+})+}
     {+(Identifier)+})+}
-  {+(Import
+  {+(QualifiedImport
     {+(Identifier)+}
     {+(Identifier)+})+})+}
-{+(Import
+{+(QualifiedImport
   {+(
     {+(Identifier)+}
     {+(Identifier)+}
@@ -28,12 +28,12 @@
     {+(Identifier)+}
     {+(Identifier)+}
     {+(Identifier)+})+})+}
-{-(Import
+{-(QualifiedImport
   {-(ScopeResolution
     {-(Identifier)-}
     {-(Identifier)-})-}
   {-(Identifier)-})-}
-{-(Import
+{-(QualifiedImport
   {-(
     {-(Identifier)-}
     {-(Identifier)-}

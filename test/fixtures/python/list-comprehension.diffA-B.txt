@@ -7,13 +7,15 @@
       {+(Identifier)+}
       {+(Identifier)+})+}
     {+(Call
-      {+(Identifier)+}
+      {+(QualifiedIdentifier
+        {+(Identifier)+})+}
       {+(Empty)+})+}
     {+(
       {+(Identifier)+}
       {+(Identifier)+})+}
     {+(Call
-      {+(Identifier)+}
+      {+(QualifiedIdentifier
+        {+(Identifier)+})+}
       {+(Empty)+})+}
     {-(Identifier)-}
     {-(Identifier)-}))

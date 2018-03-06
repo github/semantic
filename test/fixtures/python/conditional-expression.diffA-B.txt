@@ -9,11 +9,13 @@
   { (Identifier)
   ->(Identifier) }
     (Call
-      (Identifier)
+      (QualifiedIdentifier
+        (Identifier))
       (Empty))
   { (Identifier)
   ->(Call
-    {+(Identifier)+}
+    {+(QualifiedIdentifier
+      {+(Identifier)+})+}
     {+(Empty)+}) })
 {-(Assignment
   {-(Identifier)-}

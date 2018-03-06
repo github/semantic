@@ -1,13 +1,16 @@
 (Program
   (Call
-    (Identifier)
-    (Identifier)
-    (Empty))
-  (Call
+    (QualifiedIdentifier
+      (Identifier))
     (Identifier)
     (Empty))
   (Call
-    (Identifier)
+    (QualifiedIdentifier
+      (Identifier))
+    (Empty))
+  (Call
+    (QualifiedIdentifier
+      (Identifier))
     (Identifier)
     (Identifier)
     (Empty)))
