@@ -3,10 +3,12 @@
 module Semantic.Util where
 
 import Prologue
+import Analysis.Abstract.Caching
 import Analysis.Abstract.Evaluating
 import Analysis.Declaration
 import Control.Monad.IO.Class
 import Data.Abstract.Address
+import Data.Abstract.Type
 import Data.Abstract.Value
 import Data.AST
 import Data.Blob
@@ -40,8 +42,10 @@ evaluateRubyFiles paths = do
   (t:ts) <- runTask $ traverse (parse rubyParser) blobs
   pure $ evaluates @RubyValue (zip bs ts) (b, t)
 
-
 -- Python
+typecheckPythonFile path = evaluateCache @Type <$>
+  (file path >>= runTask . parse pythonParser)
+
 evaluatePythonFile path = evaluate @PythonValue <$>
   (file path >>= runTask . parse pythonParser)
 

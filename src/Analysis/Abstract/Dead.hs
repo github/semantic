@@ -80,5 +80,5 @@ instance ( Corecursive t
          )
          => MonadAnalysis t v (DeadCodeAnalysis t v) where
   evaluateTerm = foldSubterms (\ term -> do
-    revive (embed (subterm <$> term))
+    revive (embedSubterm term)
     eval term)

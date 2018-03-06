@@ -15,9 +15,9 @@ library
   hs-source-dirs:      src
   exposed-modules:
                      -- Analyses & term annotations
-                       -- Analysis.Abstract.Caching
+                       Analysis.Abstract.Caching
                      -- , Analysis.Abstract.Collecting
-                       Analysis.Abstract.Dead
+                     , Analysis.Abstract.Dead
                      , Analysis.Abstract.Evaluating
                      -- , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
@@ -37,10 +37,10 @@ library
                      -- Control flow
                      , Control.Effect
                      -- Effects used for program analysis
-                     -- , Control.Monad.Effect.Cache
+                     , Control.Monad.Effect.Cache
                      , Control.Monad.Effect.Fresh
                      -- , Control.Monad.Effect.GC
-                     -- , Control.Monad.Effect.NonDet
+                     , Control.Monad.Effect.NonDet
                      -- , Control.Monad.Effect.Trace
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
