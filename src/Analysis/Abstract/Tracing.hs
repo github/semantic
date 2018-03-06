@@ -47,24 +47,6 @@ evaluateTrace :: forall trace value term
               -> Final (TracingEffects trace term value) value
 evaluateTrace = run @(TracingEffects trace term value) . runEvaluator . runTracingAnalysis . evaluateTerm
 
--- | Reachable configuration analysis.
-evaluateReach :: forall value term
-              . ( Corecursive term
-                , Evaluatable (Base term)
-                , FreeVariables term
-                , Ord (Cell (LocationFor value) value)
-                , Ord (LocationFor value)
-                , Ord term
-                , Ord value
-                , Recursive term
-                , MonadAddressable (LocationFor value) value (TracingAnalysis Set term value)
-                , MonadValue term value (TracingAnalysis Set term value)
-                , Semigroup (Cell (LocationFor value) value)
-                )
-              => term
-              -> Final (TracingEffects Set term value) value
-evaluateReach = run @(TracingEffects Set term value) . runEvaluator . runTracingAnalysis . evaluateTerm
-
 
 newtype TracingAnalysis trace term value a = TracingAnalysis { runTracingAnalysis :: Evaluator (TracingEffects trace term value) term value a }
   deriving (Applicative, Functor, Monad, MonadFail)
