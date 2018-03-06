@@ -18,6 +18,7 @@ import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Text as T
+import qualified Data.Text.Encoding as T
 import qualified Language.Markdown.Syntax as Markdown
 
 -- | A declaration’s identifier and type.
@@ -120,9 +121,9 @@ instance CustomHasDeclaration whole Declaration.Class where
     = Just $ ClassDeclaration (getSource identifierAnn) (getClassSource blob (In ann decl)) blobLanguage
     where getSource = toText . flip Source.slice blobSource . getField
 
-instance (Declaration.ImportSymbol :< fs) => CustomHasDeclaration (Union fs) Declaration.Import where
-  customToDeclaration Blob{..} _ (Declaration.Import (Term (In fromAnn _), _) (Term (In aliasAnn _), _) symbols)
-    = Just $ ImportDeclaration name (getAlias blobLanguage (getSource aliasAnn)) (mapMaybe getSymbol symbols) blobLanguage
+instance CustomHasDeclaration (Union fs) Declaration.QualifiedImport where
+  customToDeclaration Blob{..} _ (Declaration.QualifiedImport (Term (In fromAnn _), _) (Term (In aliasAnn _), _) symbols)
+    = Just $ ImportDeclaration name (getAlias blobLanguage (getSource aliasAnn)) (fmap getSymbol symbols) blobLanguage
     where
       name = getSource fromAnn
       getAlias lang alias | Just TypeScript <- lang, T.null alias = basename name
@@ -130,9 +131,7 @@ instance (Declaration.ImportSymbol :< fs) => CustomHasDeclaration (Union fs) Dec
                           | otherwise = alias
       basename = last . T.splitOn "/"
       getSource = T.dropAround (`elem` ['"', '\'']) . toText . flip Source.slice blobSource . getField
-      getSymbol (Term (In _ f), _) | Just (Declaration.ImportSymbol (Term (In nameAnn _)) (Term (In aliasAnn _))) <- prj f
-                                   = Just (getSource nameAnn, getSource aliasAnn)
-                                   | otherwise = Nothing
+      getSymbol (a, b) = (T.decodeUtf8 a, T.decodeUtf8 b)
 
 instance (Expression.MemberAccess :< fs) => CustomHasDeclaration (Union fs) Expression.Call where
   customToDeclaration Blob{..} _ (Expression.Call _ (Term (In fromAnn fromF), _) _ _)
@@ -168,7 +167,7 @@ class HasDeclarationWithStrategy (strategy :: Strategy) whole syntax where
 type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Class = 'Custom
   DeclarationStrategy Declaration.Function = 'Custom
-  DeclarationStrategy Declaration.Import = 'Custom
+  DeclarationStrategy Declaration.QualifiedImport = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
   DeclarationStrategy Markdown.Heading = 'Custom
   DeclarationStrategy Expression.Call = 'Custom

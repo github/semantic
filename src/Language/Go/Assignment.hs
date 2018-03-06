@@ -27,8 +27,7 @@ type Syntax =
   '[ Comment.Comment
    , Declaration.Constructor
    , Declaration.Function
-   , Declaration.Import
-   , Declaration.ImportSymbol
+   , Declaration.QualifiedImport
    , Declaration.Method
    , Declaration.MethodSignature
    , Declaration.Module
@@ -382,8 +381,8 @@ importDeclaration :: Assignment
 importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTerm (importSpec <|> importSpecList))
   where
     importSpec = makeTerm <$> symbol ImportSpec <*> children (namedImport <|> plainImport)
-    namedImport = flip Declaration.Import <$> expression <*> expression <*> pure []
-    plainImport = Declaration.Import <$> expression <*> emptyTerm <*> pure []
+    namedImport = flip Declaration.QualifiedImport <$> expression <*> expression <*> pure []
+    plainImport = Declaration.QualifiedImport <$> expression <*> emptyTerm <*> pure []
     importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyTerm (importSpec <|> comment))
 
 indexExpression :: Assignment

@@ -34,7 +34,7 @@ type Syntax =
    , Declaration.Comprehension
    , Declaration.Decorator
    , Declaration.Function
-   , Declaration.Import2
+   , Declaration.QualifiedImport
    , Declaration.Variable
    , Declaration.WildcardImport
    , Expression.Arithmetic
@@ -374,9 +374,9 @@ comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 import' :: Assignment
-import' =  makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliasedImport <|> plainImport))
-        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import2 <$> (dottedName <|> emptyTerm) <*> emptyTerm <*> some (aliasImportSymbol <|> importSymbol))
-       <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.WildcardImport <$> dottedName <*> wildcard)
+import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliasedImport <|> plainImport))
+        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.QualifiedImport <$> (dottedName <|> emptyTerm) <*> emptyTerm <*> some (aliasImportSymbol <|> importSymbol))
+        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.WildcardImport <$> dottedName <*> wildcard)
   where
     rawIdentifier = (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) *> source
     makeNameAliasPair from (Just alias) = (from, alias)
@@ -388,8 +388,8 @@ import' =  makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliased
 
     aliasedImport = makeImport <$> symbol AliasedImport <*> children ((,) <$> expression <*> (Just <$> expression))
     plainImport = makeImport <$> symbol DottedName <*> children ((,) <$> expressions <*> pure Nothing)
-    makeImport loc (from, Just alias) = makeTerm loc (Declaration.Import2 from alias [])
-    makeImport loc (from, Nothing) = makeTerm loc (Declaration.Import2 from from [])
+    makeImport loc (from, Just alias) = makeTerm loc (Declaration.QualifiedImport from alias [])
+    makeImport loc (from, Nothing) = makeTerm loc (Declaration.QualifiedImport from from [])
 
 assertStatement :: Assignment
 assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> source)) <*> manyTerm expression <*> emptyTerm)

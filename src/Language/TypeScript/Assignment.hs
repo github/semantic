@@ -34,7 +34,7 @@ type Syntax = '[
   , Declaration.VariableDeclaration
   , Declaration.TypeAlias
   , Declaration.Import
-  , Declaration.ImportSymbol
+  , Declaration.QualifiedImport
   , Declaration.Module
   , Expression.Arithmetic
   , Expression.Bitwise
@@ -337,7 +337,7 @@ false :: Assignment
 false = makeTerm <$> symbol Grammar.False <*> (Literal.false <$ source)
 
 identifier :: Assignment
-identifier = (makeTerm <$> symbol Identifier' <*> (Syntax.Identifier <$> source)) <|> (makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> source))
+identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax.Identifier <$> source)
 
 class' :: Assignment
 class' = makeClass <$> symbol Class <*> children ((,,,,) <$> manyTerm decorator <*> term identifier <*> (symbol TypeParameters *> children (manyTerm typeParameter') <|> pure []) <*> (classHeritage' <|> pure []) <*> classBodyStatements)
@@ -631,29 +631,39 @@ statementIdentifier :: Assignment
 statementIdentifier = makeTerm <$> symbol StatementIdentifier <*> (Syntax.Identifier <$> source)
 
 importStatement :: Assignment
-importStatement =  makeImport <$> symbol Grammar.ImportStatement <*> children ((,) <$> importClause' <*> term string)
-               <|> makeTerm <$> symbol Grammar.ImportStatement <*> children requireClause'
-               <|> makeTerm <$> symbol Grammar.ImportStatement <*> children (declarationImport <$> emptyTerm <*> pure [] <*> term string)
+importStatement = makeImportTerm <$> symbol Grammar.ImportStatement <*> children ((,) <$> importClause <*> term string)
+                <|> makeImport <$> symbol Grammar.ImportStatement <*> children requireImport
+                <|> makeImport <$> symbol Grammar.ImportStatement <*> children bareRequireImport
+
   where
-    makeImport loc ([clause], from) = makeTerm loc (clause from)
-    makeImport loc (clauses, from) = makeTerm loc $ fmap (\c -> makeTerm loc (c from)) clauses
-    importClause' = symbol Grammar.ImportClause *> children (
-      namedImports'
-      <|> (pure <$> namespace')
-      <|> ((\a b -> [a, b]) <$> identifier' <*> namespace')
-      <|> ((:) <$> identifier' <*> namedImports')
-      <|> (pure <$> identifier')
-      )
-    requireClause' = symbol Grammar.ImportRequireClause *> children (declarationImport <$> term identifier <*> pure [] <*> term string)
-    identifier' = (declarationImport <$> emptyTerm <*> (pure <$> term identifier))
-    namespace' = (declarationImport <$> term namespaceImport <*> pure [])
+    -- Straightforward imports
+    makeImport loc (Just alias, symbols, from) = makeTerm loc (Declaration.QualifiedImport from alias symbols)
+    makeImport loc (Nothing, symbols, from) = makeTerm loc (Declaration.Import from symbols)
+    -- Import a file giving it an alias (e.g. import foo = require "./foo")
+    requireImport = symbol Grammar.ImportRequireClause *> children ((,,) <$> (Just <$> (term identifier)) <*> pure [] <*> term string)
+     -- Import a file just for it's side effects (e.g. import "./foo")
+    bareRequireImport = (,,) <$> (pure Nothing) <*> pure [] <*> term string
 
-    namedImports' = symbol Grammar.NamedImports *> children (many (declarationImport <$> emptyTerm <*> (pure <$> term importSymbol)))
-    importSymbol = makeTerm <$> symbol Grammar.ImportSpecifier <*> children (Declaration.ImportSymbol <$> term identifier <*> (term identifier <|> emptyTerm))
-    namespaceImport = symbol Grammar.NamespaceImport *> children (term identifier)
-
-
-    declarationImport alias symbols from = Declaration.Import from alias symbols
+    -- Imports with import clauses
+    makeImportTerm1 loc from (Prelude.True, Just alias, symbols) = makeTerm loc (Declaration.QualifiedImport from alias symbols)
+    makeImportTerm1 loc from (Prelude.True, Nothing, symbols) = makeTerm loc (Declaration.QualifiedImport from from symbols)
+    makeImportTerm1 loc from (_, _, symbols) = makeTerm loc (Declaration.Import from symbols)
+    makeImportTerm loc ([x], from) = makeImportTerm1 loc from x
+    makeImportTerm loc (xs, from) = makeTerm loc $ fmap (makeImportTerm1 loc from) xs
+    importClause = symbol Grammar.ImportClause *>
+      children (   (pure <$> namedImport)
+               <|> (pure <$> namespaceImport)
+               <|> ((\a b -> [a, b]) <$> defaultImport <*> (namedImport <|> namespaceImport))
+               <|> (pure <$> defaultImport)
+               )
+    namedImport = (,,) <$> pure Prelude.False <*> pure Nothing <*> (symbol Grammar.NamedImports *> children (many importSymbol)) -- import { bar } from "./foo"
+    defaultImport =  (,,) <$> pure Prelude.False <*> pure Nothing <*> (pure <$> (makeNameAliasPair <$> rawIdentifier <*> pure Nothing)) -- import defaultMember from "./foo"
+    namespaceImport = symbol Grammar.NamespaceImport *> children ((,,) <$> pure Prelude.True <*> (Just <$> (term identifier)) <*> pure []) -- import * as name from "./foo"
+    importSymbol =   symbol Grammar.ImportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> (Just <$> rawIdentifier))
+                 <|> symbol Grammar.ImportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> (pure Nothing))
+    rawIdentifier = (symbol Identifier <|> symbol Identifier') *> source
+    makeNameAliasPair from (Just alias) = (from, alias)
+    makeNameAliasPair from Nothing = (from, from)
 
 debuggerStatement :: Assignment
 debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> (TypeScript.Syntax.Debugger <$ source)
