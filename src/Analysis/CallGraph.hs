@@ -75,6 +75,8 @@ instance Foldable syntax => BuildCallGraphAlgebraWithStrategy 'Default syntax wh
 instance CustomBuildCallGraphAlgebra syntax => BuildCallGraphAlgebraWithStrategy 'Custom syntax where
   buildCallGraphAlgebraWithStrategy _ = customBuildCallGraphAlgebra
 
+
+-- | Which instance of 'CustomBuildCallGraphAlgebra' to use for a given @syntax@ type.
 data Strategy = Default | Custom
 
 type family BuildCallGraphAlgebraStrategy syntax where
