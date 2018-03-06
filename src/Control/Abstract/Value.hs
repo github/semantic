@@ -17,7 +17,7 @@ import Prelude hiding (fail)
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
 class (MonadEvaluator t v m) => MonadValue t v m where
-    -- | Construct an abstract unit value.
+  -- | Construct an abstract unit value.
   unit :: m v
 
   -- | Construct an abstract integral value.
