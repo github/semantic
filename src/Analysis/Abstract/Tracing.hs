@@ -29,6 +29,8 @@ type TracingEffects trace term value
      ]
 
 -- | Trace analysis.
+--
+--   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
 evaluateTrace :: forall trace value term
               . ( Corecursive term
                 , Evaluatable (Base term)
