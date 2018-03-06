@@ -100,8 +100,7 @@ instance ( Evaluatable (Base term)
          , Semigroup (Cell (LocationFor CallGraph) CallGraph)
          )
          => MonadAnalysis term CallGraph (CallGraphAnalysis term) where
-  evaluateTerm = foldSubterms (\ term ->
-    connectDeclaration (subterm <$> term) <$> eval term)
+  evaluateTerm = foldSubterms eval
 
 
 class IsDeclaration syntax where
