@@ -224,6 +224,7 @@ language_extensions:
   - DeriveTraversable
   - FlexibleContexts
   - FlexibleInstances
+  - MultiParamTypeClasses
   - OverloadedStrings
   - RecordWildCards
   - StrictData
