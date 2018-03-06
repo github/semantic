@@ -10,6 +10,7 @@ import Prologue
 import Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import Data.Record
+import Data.ByteString as B
 import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
@@ -27,7 +28,9 @@ type Syntax =
   '[ Comment.Comment
    , Declaration.Constructor
    , Declaration.Function
+   , Declaration.Import
    , Declaration.QualifiedImport
+   , Declaration.WildcardImport
    , Declaration.Method
    , Declaration.MethodSignature
    , Declaration.Module
@@ -380,10 +383,39 @@ functionDeclaration =  makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncL
 importDeclaration :: Assignment
 importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTerm (importSpec <|> importSpecList))
   where
-    importSpec = makeTerm <$> symbol ImportSpec <*> children (namedImport <|> plainImport)
-    namedImport = flip Declaration.QualifiedImport <$> expression <*> expression <*> pure []
-    plainImport = Declaration.QualifiedImport <$> expression <*> emptyTerm <*> pure []
     importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyTerm (importSpec <|> comment))
+    importSpec =   makeTerm <$> symbol ImportSpec <*> children sideEffectImport
+               <|> makeTerm <$> symbol ImportSpec <*> children dotImport
+               <|> makeTerm <$> symbol ImportSpec <*> children namedImport
+               <|> makeTerm <$> symbol ImportSpec <*> children plainImport
+
+    dotImport = symbol Dot *> (Declaration.WildcardImport <$> expression <*> emptyTerm)
+    -- nonQualifiedImport = inj <$> (symbol PackageIdentifier >>= \loc -> do
+    --   s <- source
+    --   guard (s == ".")
+    --   let sym = makeTerm loc (Syntax.Identifier s)
+    --   Declaration.WildcardImport <$> expression <*> pure sym)
+
+    sideEffectImport = symbol BlankIdentifier *> (Declaration.Import <$> expression <*> pure [])
+    -- sideEffectImport = symbol PackageIdentifier *> do
+    --   s <- source
+    --   guard (s == "_")
+    --   Declaration.Import <$> expression <*> pure []
+
+    namedImport = symbol PackageIdentifier >>= \loc -> do
+      s <- source
+      let alias = makeTerm loc (Syntax.Identifier s)
+      Declaration.QualifiedImport <$> expression <*> pure alias <*> pure []
+
+    plainImport = symbol InterpretedStringLiteral >>= \loc -> do
+      s <- source
+      let from = makeTerm loc (Literal.TextElement s)
+      let alias = makeTerm loc (Syntax.Identifier (baseName s))
+      Declaration.QualifiedImport <$> pure from <*> pure alias <*> pure []
+
+    baseName bs = Prelude.last (B.split (toEnum (fromEnum '/')) (stripQuotes bs))
+    stripQuotes = fromMaybe' (B.stripSuffix "\"") . fromMaybe' (B.stripPrefix "\"")
+    fromMaybe' f x = fromMaybe x (f x)
 
 indexExpression :: Assignment
 indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)
