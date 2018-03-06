@@ -67,9 +67,11 @@ instance BuildCallGraphAlgebra syntax => CustomBuildCallGraphAlgebra (TermF synt
 class BuildCallGraphAlgebraWithStrategy (strategy :: Strategy) syntax where
   buildCallGraphAlgebraWithStrategy :: FreeVariables term => proxy strategy -> syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
 
+-- | The 'Default' definition of 'buildCallGraphAlgebra' combines all of the 'CallGraph's within the @syntax@ 'Monoid'ally.
 instance Foldable syntax => BuildCallGraphAlgebraWithStrategy 'Default syntax where
   buildCallGraphAlgebraWithStrategy _ = foldMap subtermValue
 
+-- | The 'Custom' strategy calls out to the 'customBuildCallGraphAlgebra' method.
 instance CustomBuildCallGraphAlgebra syntax => BuildCallGraphAlgebraWithStrategy 'Custom syntax where
   buildCallGraphAlgebraWithStrategy _ = customBuildCallGraphAlgebra
 
