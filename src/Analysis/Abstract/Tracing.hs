@@ -12,6 +12,7 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.Value
 import Prologue
 
+-- | Traces of program configurations in some 'Monoid'al type @trace@.
 type Trace trace term value = trace (Configuration (LocationFor value) term value)
 
 -- | An effect to trace visited 'Configuration's.
