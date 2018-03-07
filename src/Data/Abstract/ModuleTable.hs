@@ -22,4 +22,4 @@ moduleTableLookup :: ModuleName -> ModuleTable a -> Maybe a
 moduleTableLookup k = Map.lookup k . unModuleTable
 
 moduleTableInsert :: ModuleName -> a -> ModuleTable a -> ModuleTable a
-moduleTableInsert k v ModuleTable {..} = ModuleTable (Map.insert k v unModuleTable)
+moduleTableInsert k v ModuleTable{..} = ModuleTable (Map.insert k v unModuleTable)
