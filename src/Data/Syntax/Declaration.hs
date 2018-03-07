@@ -208,6 +208,7 @@ instance Show1 Comprehension where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Comprehension
 instance Evaluatable Comprehension
 
+
 -- | Qualified Import declarations (symbols are qualified in calling environment).
 data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: !a, qualifiedImportAlias :: !a, qualifiedImportSymbols :: ![(Name, Name)]}
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -231,6 +232,7 @@ instance Evaluatable QualifiedImport where
       qualifyInsert k v rest = envInsert (prefix <> k) v <$> rest
       directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v <$> rest) (Map.lookup k symbols)
 
+
 -- | Import declarations (symbols are added directly to the calling env).
 --
 -- If symbols is empty, just evaluate the module for it's side effects.
@@ -252,6 +254,7 @@ instance Evaluatable Import where
     where
       symbols = Map.fromList xs
       directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v <$> rest) (Map.lookup k symbols)
+
 
 -- | A wildcard import (all symbols are added directly to the calling env)
 --
