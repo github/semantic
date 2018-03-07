@@ -9,7 +9,7 @@ import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Address
 import Data.Abstract.Evaluatable
-import Data.Abstract.Linker
+import Data.Abstract.ModuleTable
 import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Set (delete)
@@ -22,8 +22,8 @@ type DeadCodeEffects t v
      , State (Store (LocationFor v) v) -- The heap
      , State (EnvironmentFor v)        -- Global (imperative) environment
      , Reader (EnvironmentFor v)       -- Local environment (e.g. binding over a closure)
-     , Reader (Linker t)               -- Cache of unevaluated modules
-     , State (Linker v)                -- Cache of evaluated modules
+     , Reader (ModuleTable t)          -- Cache of unevaluated modules
+     , State (ModuleTable v)           -- Cache of evaluated modules
      ]
 
 
