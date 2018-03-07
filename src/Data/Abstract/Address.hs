@@ -34,7 +34,7 @@ newtype Latest a = Latest { unLatest :: a }
   deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
 
 instance Semigroup (Latest a) where
-  (<>) = flip const
+  _ <> a = a
 
 instance Pointed Latest where
   point = Latest
