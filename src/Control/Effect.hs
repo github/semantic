@@ -67,3 +67,6 @@ instance Ord a => RunEffect NonDetEff a where
 
 class LiftEffect f where
   lift :: Eff effects a -> f effects a
+
+instance LiftEffect Eff where
+  lift = id
