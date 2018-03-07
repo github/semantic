@@ -36,7 +36,12 @@ class Newtype1 n where
   type O1 n :: * -> *
 
   pack1 :: O1 n a -> n a
+  default pack1 :: (Generic1 n, GNewtype1 (Rep1 n), O1 n ~ GO1 (Rep1 n)) => O1 n a -> n a
+  pack1 = to1 . gpack1
+
   unpack1 :: n a -> O1 n a
+  default unpack1 :: (Generic1 n, GNewtype1 (Rep1 n), O1 n ~ GO1 (Rep1 n)) => n a -> O1 n a
+  unpack1 = gunpack1 . from1
 
 class GNewtype1 n where
   type GO1 n :: * -> *
