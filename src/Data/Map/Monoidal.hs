@@ -7,7 +7,7 @@ import Data.Semigroup.Reducer
 import Prologue hiding (Map)
 
 newtype Map key value = Map { unMap :: Map.Map key value }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
 instance (Ord key, Semigroup value) => Semigroup (Map key value) where
   Map a <> Map b = Map (Map.unionWith (<>) a b)
