@@ -2,9 +2,15 @@
 module Data.Syntax.Literal where
 
 import Data.Abstract.Evaluatable
-import Data.ByteString.Char8 (readInteger)
+import Data.ByteString.Char8 (readInteger, unpack)
+import qualified Data.ByteString.Char8 as B
+import Data.Monoid (Endo (..), appEndo)
+import Data.Scientific (Scientific)
+import Data.Word (Word8)
 import Diffing.Algorithm
+import Prelude hiding (Float, fail)
 import Prologue hiding (Set)
+import Text.Read (readMaybe)
 
 -- Boolean
 
@@ -45,16 +51,44 @@ instance Evaluatable Data.Syntax.Literal.Integer where
 -- TODO: Consider a Numeric datatype with FloatingPoint/Integral/etc constructors.
 
 -- | A literal float of unspecified width.
-newtype Float a = Float { floatContent :: ByteString }
+data Float a = Float { floatContent  :: Scientific
+                     , floatOriginal :: ByteString
+                     }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Data.Syntax.Literal.Float where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Float where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsPrec
 
+-- | Ensures that numbers of the form '.52' are parsed correctly. You usually want this.
+padWithLeadingZero :: ByteString -> ByteString
+padWithLeadingZero b
+  | fmap fst (B.uncons b) == Just '.' = B.cons '0' b
+  | otherwise                         = b
+
+padWithTrailingZero :: ByteString -> ByteString
+padWithTrailingZero b
+  | fmap snd (B.unsnoc b) == Just '.' = B.snoc b '0'
+  | otherwise                         = b
+
+-- | Removes underscores in numeric literals. Python 3 and Ruby support this, whereas Python 2, JS, and Go do not.
+removeUnderscores :: ByteString -> ByteString
+removeUnderscores = B.filter (/= '_')
+
+-- | Strip suffixes from floating-point literals so as to handle Python's
+--   TODO: tree-sitter-python needs some love so that it parses j-suffixed floats as complexen
+dropAlphaSuffix :: ByteString -> ByteString
+dropAlphaSuffix = B.takeWhile (\x -> x `notElem` ("lLjJiI" :: [Char]))
+
+buildFloat :: MonadFail m => [ByteString -> ByteString] -> ByteString -> m (Float a)
+buildFloat preds val =
+  let munger = appEndo (foldMap Endo preds)
+  in case readMaybe (unpack (munger val)) of
+    Nothing -> fail ("Invalid floating-point value: " <> show val)
+    Just s  -> pure (Float s val)
+
 -- TODO: Implement Eval instance for Float
 instance Evaluatable Data.Syntax.Literal.Float
-
 
 -- Rational literals e.g. `2/3r`
 newtype Rational a = Rational ByteString

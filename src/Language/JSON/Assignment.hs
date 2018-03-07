@@ -50,7 +50,7 @@ array :: Assignment
 array = makeTerm <$> symbol Array <*> children (Literal.Array <$> many jsonValue)
 
 number :: Assignment
-number = makeTerm <$> symbol Number <*> (Literal.Float <$> source)
+number = makeTerm <$> symbol Number <*> (source >>= Literal.buildFloat [Literal.padWithLeadingZero])
 
 string :: Assignment
 string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
