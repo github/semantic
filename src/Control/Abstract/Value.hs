@@ -59,6 +59,9 @@ instance ( FreeVariables t
   string  = pure . inj . Value.String
   interface v = inj . Value.Interface v <$> prunedEnv
     where
+      -- TODO: If the set of exports is empty because no exports have been defined,
+      -- do we export all terms, or no terms?
+      -- This behavior varies across languages. We need better semantics rather than doing it ad-hoc.
       prunedEnv = bindExports <$> getExports <*> getGlobalEnv
 
   ifthenelse cond if' else'
