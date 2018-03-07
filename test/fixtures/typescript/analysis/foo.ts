@@ -1,7 +1,5 @@
-export function bar() {
-  return "this is the bar function"
-}
+export  { bar }
 
-export default function () {
-  return "this is the defaultExport function"
+function bar() {
+  return "this is the bar function"
 }
