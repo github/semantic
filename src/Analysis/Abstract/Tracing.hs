@@ -33,7 +33,10 @@ instance ( Corecursive (TermFor m)
          , Reducer (ConfigurationFor (TermFor m) (ValueFor m)) (TraceFor trace m)
          )
          => MonadAnalysis (TracingAnalysis trace m) where
-  analyzeTerm term = getConfiguration (embedSubterm term) >>= trace . Reducer.unit >> TracingAnalysis (analyzeTerm (second runTracingAnalysis <$> term))
+  analyzeTerm term = do
+    config <- getConfiguration (embedSubterm term)
+    trace (Reducer.unit config)
+    TracingAnalysis (analyzeTerm (second runTracingAnalysis <$> term))
 
 type instance TermFor  (TracingAnalysis trace m) = TermFor  m
 type instance ValueFor (TracingAnalysis trace m) = ValueFor m
