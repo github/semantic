@@ -155,21 +155,3 @@ memoizeEval e = do
       store' <- getStore
       modifyCache (cacheInsert c (v, store'))
       pure v
-
-{-
-
-
--- | Evaluation of a single iteration of an analysis, given a 'MonadCacheIn' instance as an oracle for results and a 'MonadCacheOut' instance to record computed results in.
-evCache :: forall t v m
-        . ( Ord (LocationFor v)
-          , Ord t
-          , Ord v
-          , Ord (Cell (LocationFor v) v)
-          , MonadCaching t v m
-          )
-        => (((v -> m v) -> t -> m v) -> (v -> m v) -> t -> m v)
-        -> ((v -> m v) -> t -> m v)
-        -> (v -> m v) -> t -> m v
-
-
--}
