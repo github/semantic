@@ -63,3 +63,7 @@ instance Ord a => RunEffect NonDetEff a where
   runEffect = relay (pure . point) (\ m k -> case m of
     MZero -> pure mempty
     MPlus -> mappend <$> k True <*> k False)
+
+
+class LiftEffect f where
+  lift :: Eff effects a -> f effects a
