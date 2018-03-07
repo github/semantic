@@ -64,6 +64,7 @@ library
                      , Data.Functor.Classes.Generic
                      , Data.JSON.Fields
                      , Data.Language
+                     , Data.Map.Monoidal
                      , Data.Mergeable
                      , Data.Output
                      , Data.Patch
