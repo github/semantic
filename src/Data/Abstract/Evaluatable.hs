@@ -18,7 +18,7 @@ import Control.Monad.Effect.Fail
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables as FreeVariables
-import Data.Abstract.Linker
+import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Algebra
 import qualified Data.ByteString.Char8 as BC
@@ -84,7 +84,7 @@ require :: ( FreeVariables term
            )
         => term
         -> m v
-require term = getModuleTable >>= maybe (load term) pure . linkerLookup name
+require term = getModuleTable >>= maybe (load term) pure . moduleTableLookup name
   where name = moduleName term
 
 -- | Load another term/file and return an Effect.
@@ -96,12 +96,12 @@ load :: ( FreeVariables term
         )
      => term
      -> m v
-load term = askModuleTable >>= maybe notFound evalAndCache . linkerLookup name
+load term = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
   where name = moduleName term
         notFound = fail ("cannot find " <> show name)
         evalAndCache e = do
           v <- evaluateTerm e
-          modifyModuleTable (linkerInsert name v)
+          modifyModuleTable (moduleTableInsert name v)
           pure v
 
 -- | Get a module name from a term (expects single free variables).
