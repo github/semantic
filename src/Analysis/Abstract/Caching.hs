@@ -126,7 +126,7 @@ converge f = loop
 scatter :: (Alternative m, Foldable t, MonadEvaluator term v m) => t (a, Store (LocationFor v) v) -> m a
 scatter = getAlt . foldMap (\ (value, store') -> Alt (putStore store' *> pure value))
 
--- | Evaluation of a single iteration of an analysis, given a 'MonadCacheIn' instance as an oracle for results and a 'MonadCacheOut' instance to record computed results in.
+-- | Evaluation of a single iteration of an analysis, given an in-cache as an oracle for results and an out-cache to record computed results in.
 memoizeEval :: forall v term
             . ( Ord v
               , Ord term
