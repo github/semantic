@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Tracing where
 
-import Analysis.Abstract.Evaluating
 import Control.Abstract.Addressable
 import Control.Abstract.Analysis
 import Control.Abstract.Evaluator
@@ -23,26 +22,6 @@ type TracingEffects trace term value = Tracer trace term value ': EvaluatorEffec
 -- | Trace analysis.
 --
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
-evaluateTrace :: forall trace value term
-              . ( Corecursive term
-                , Evaluatable (Base term)
-                , FreeVariables term
-                , Monoid (Trace trace term value)
-                , Ord (CellFor value)
-                , Ord term
-                , Ord value
-                , Recursive term
-                , Reducer (ConfigurationFor term value) (Trace trace term value)
-                , MonadAddressable (LocationFor value) (TracingAnalysis trace (Evaluation term value (TracingEffects trace term value)))
-                , MonadAnalysis (Evaluation term value (TracingEffects trace term value))
-                , MonadValue value (TracingAnalysis trace (Evaluation term value (TracingEffects trace term value)))
-                , Semigroup (CellFor value)
-                )
-              => term
-              -> Final (TracingEffects trace term value) value
-evaluateTrace = run . lower @(Evaluation term value (TracingEffects trace term value)) . evaluateTerm
-
-
 newtype TracingAnalysis (trace :: * -> *) m a
   = TracingAnalysis { runTracingAnalysis :: m a }
   deriving (Applicative, Functor, LiftEffect, Monad, MonadEvaluator, MonadFail)
