@@ -50,8 +50,8 @@ instance Evaluatable Data.Syntax.Literal.Integer where
 -- TODO: Consider a Numeric datatype with FloatingPoint/Integral/etc constructors.
 
 -- | A literal float of unspecified width.
-data Float a = Float { floatContent  :: Scientific
-                     , floatOriginal :: ByteString
+data Float a = Float { floatContent  :: !Scientific
+                     , floatOriginal :: !ByteString
                      }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
