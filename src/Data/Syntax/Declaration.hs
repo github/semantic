@@ -6,6 +6,7 @@ import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
 import qualified Data.Map as Map
+import Data.ByteString as B
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -241,8 +242,23 @@ instance Show1 QualifiedExport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedExport where
   eval (QualifiedExport from exportSymbols) = do
-      traverse_ addExport exportSymbols
-      unit
+    env <- getGlobalEnv
+    putGlobalEnv mempty
+
+    -- If there's a from clause, require the module and export its symbols
+    let moduleName = qualifiedName (subterm from)
+    if not (B.null moduleName) then do
+      importedEnv <- require moduleName
+
+      -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
+      for_ exportSymbols $ \(name, alias) -> do
+        let address = Map.lookup name (unEnvironment importedEnv)
+        addExport name (alias, address)
+    else
+      -- Insert the aliases with no addresses.
+      for_ exportSymbols $ \(name, alias) ->
+        addExport name (alias, Nothing)
+    unit
 
 -- | Import declarations (symbols are added directly to calling environment).
 --
