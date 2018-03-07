@@ -41,33 +41,34 @@ deriving instance Ord (LocationFor value) => MonadEvaluator (DeadCodeAnalysis te
 
 
 -- | A set of “dead” (unreachable) terms.
-newtype Dead a = Dead { unDead :: Set a }
+newtype Dead term = Dead { unDead :: Set term }
   deriving (Eq, Foldable, Semigroup, Monoid, Ord, Show)
 
-deriving instance Ord a => Reducer a (Dead a)
+deriving instance Ord term => Reducer term (Dead term)
 
 -- | Update the current 'Dead' set.
-killAll :: Dead t -> DeadCodeAnalysis t v ()
+killAll :: Dead term -> DeadCodeAnalysis term value ()
 killAll = DeadCodeAnalysis . Evaluator . put
 
 -- | Revive a single term, removing it from the current 'Dead' set.
-revive :: Ord t => t -> DeadCodeAnalysis t v ()
+revive :: Ord term => term -> DeadCodeAnalysis term value ()
 revive t = DeadCodeAnalysis (Evaluator (modify (Dead . delete t . unDead)))
 
 -- | Compute the set of all subterms recursively.
 subterms :: (Ord term, Recursive term, Foldable (Base term)) => term -> Dead term
 subterms term = term `cons` para (foldMap (uncurry cons)) term
 
-instance ( Corecursive t
-         , Evaluatable (Base t)
-         , FreeVariables t
-         , MonadAddressable (LocationFor v) (DeadCodeAnalysis t v)
-         , MonadValue v (DeadCodeAnalysis t v)
-         , Ord t
-         , Recursive t
-         , Semigroup (CellFor v)
+
+instance ( Corecursive term
+         , Evaluatable (Base term)
+         , FreeVariables term
+         , MonadAddressable (LocationFor value) (DeadCodeAnalysis term value)
+         , MonadValue value (DeadCodeAnalysis term value)
+         , Ord term
+         , Recursive term
+         , Semigroup (CellFor value)
          )
-         => MonadAnalysis (DeadCodeAnalysis t v) where
+         => MonadAnalysis (DeadCodeAnalysis term value) where
   analyzeTerm term = do
     revive (embedSubterm term)
     eval term
