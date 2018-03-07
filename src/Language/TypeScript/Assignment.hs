@@ -637,7 +637,6 @@ importStatement = makeImportTerm <$> symbol Grammar.ImportStatement <*> children
                 <|> makeImport <$> symbol Grammar.ImportStatement <*> children bareRequireImport
   where
     -- Straightforward imports
-    stripQuotes = B.filter (/= (fromIntegral (ord '\"')))
     makeImport loc (Just alias, symbols, from) = makeTerm loc (Declaration.QualifiedImport from alias symbols)
     makeImport loc (Nothing, symbols, from) = makeTerm loc (Declaration.Import from symbols)
     -- Import a file giving it an alias (e.g. import foo = require "./foo")
@@ -665,6 +664,9 @@ importStatement = makeImportTerm <$> symbol Grammar.ImportStatement <*> children
     rawIdentifier = (symbol Identifier <|> symbol Identifier') *> source
     makeNameAliasPair from (Just alias) = (from, alias)
     makeNameAliasPair from Nothing = (from, from)
+
+
+stripQuotes = B.filter (/= (fromIntegral (ord '\"')))
 
 debuggerStatement :: Assignment
 debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> (TypeScript.Syntax.Debugger <$ source)
@@ -722,7 +724,7 @@ exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip
     -- makeExport2 decorators fromClause exportClause = Declaration.QualifiedExport fromClause exportClause
 
 fromClause :: Assignment
-fromClause = string
+fromClause = makeTerm <$> symbol Grammar.String <*> (Syntax.Identifier . stripQuotes <$> source)
 
 propertySignature :: Assignment
 propertySignature = makePropertySignature <$> symbol Grammar.PropertySignature <*> children ((,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> (term typeAnnotation' <|> emptyTerm))
