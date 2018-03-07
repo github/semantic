@@ -18,10 +18,10 @@ import qualified Data.Set as Set
 
 -- | The effects necessary for caching analyses.
 type CachingEffects term value
-  =  Fresh                                         -- For 'MonadFresh'. TODO: Extract typing constraints into a separate analysis.
-  ': NonDetEff                                     -- For 'Alternative' & 'MonadNonDet'.
-  ': Reader (Cache (LocationFor value) term value) -- For the in-cache.
-  ': State (Cache (LocationFor value) term value)  -- For the out-cache
+  =  Fresh                        -- For 'MonadFresh'. TODO: Extract typing constraints into a separate analysis.
+  ': NonDetEff                    -- For 'Alternative' & 'MonadNonDet'.
+  ': Reader (CacheFor term value) -- For the in-cache.
+  ': State (CacheFor term value)  -- For the out-cache
   ': EvaluatorEffects term value
 
 -- | The cache for term and abstract value types.
@@ -34,25 +34,25 @@ deriving instance MonadEvaluator term value (CachingAnalysis term value)
 
 -- TODO: reabstract these later on
 
-askCache :: CachingAnalysis t v (Cache (LocationFor v) t v)
+askCache :: CachingAnalysis t v (CacheFor t v)
 askCache = CachingAnalysis (Evaluator ask)
 
-localCache :: (Cache (LocationFor v) t v -> Cache (LocationFor v) t v) -> CachingAnalysis t v a -> CachingAnalysis t v a
+localCache :: (CacheFor t v -> CacheFor t v) -> CachingAnalysis t v a -> CachingAnalysis t v a
 localCache f (CachingAnalysis (Evaluator a)) = CachingAnalysis (Evaluator (local f a))
 
-asksCache :: (Cache (LocationFor v) t v -> a) -> CachingAnalysis t v a
+asksCache :: (CacheFor t v -> a) -> CachingAnalysis t v a
 asksCache f = f <$> askCache
 
-getsCache :: (Cache (LocationFor v) t v -> a) -> CachingAnalysis t v a
+getsCache :: (CacheFor t v -> a) -> CachingAnalysis t v a
 getsCache f = f <$> getCache
 
-getCache :: CachingAnalysis t v (Cache (LocationFor v) t v)
+getCache :: CachingAnalysis t v (CacheFor t v)
 getCache = CachingAnalysis (Evaluator get)
 
-putCache :: Cache (LocationFor v) t v -> CachingAnalysis t v ()
+putCache :: CacheFor t v -> CachingAnalysis t v ()
 putCache v = CachingAnalysis (Evaluator (put v))
 
-modifyCache :: (Cache (LocationFor v) t v -> Cache (LocationFor v) t v) -> CachingAnalysis t v ()
+modifyCache :: (CacheFor t v -> CacheFor t v) -> CachingAnalysis t v ()
 modifyCache f = fmap f getCache >>= putCache
 
 -- | This instance coinductively iterates the analysis of a term until the results converge.
@@ -73,7 +73,7 @@ instance ( Corecursive t
     c <- getConfiguration (embedSubterm e)
     -- Convergence here is predicated upon an Eq instance, not α-equivalence
     cache <- converge (\ prevCache -> do
-      putCache (mempty :: Cache (LocationFor v) t v)
+      putCache (mempty :: CacheFor t v)
       putStore (configurationStore c)
       -- We need to reset fresh generation so that this invocation converges.
       reset 0
