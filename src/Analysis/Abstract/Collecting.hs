@@ -2,6 +2,7 @@
 module Analysis.Abstract.Collecting where
 
 import Prologue
+import Control.Abstract.Evaluator
 import Control.Monad.Effect.GC
 import Data.Abstract.Address
 import Data.Abstract.Live
@@ -12,7 +13,7 @@ import Data.Abstract.Value
 evCollect :: forall t v m
           .  ( Ord (LocationFor v)
              , Foldable (Cell (LocationFor v))
-             , MonadStore v m
+             , MonadEvaluator t v m
              , MonadGC v m
              , ValueRoots (LocationFor v) v
              )
