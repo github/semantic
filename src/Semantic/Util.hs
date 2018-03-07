@@ -5,6 +5,7 @@ module Semantic.Util where
 import Prologue
 import Analysis.Abstract.Caching
 import Analysis.Abstract.Evaluating
+import Analysis.Abstract.Tracing
 import Analysis.Declaration
 import Control.Monad.IO.Class
 import Data.Abstract.Address
@@ -45,6 +46,8 @@ evaluateRubyFiles paths = do
 -- Python
 typecheckPythonFile path = evaluateCache @Type <$>
   (file path >>= runTask . parse pythonParser)
+
+tracePythonFile path = evaluateTrace @[] @PythonValue <$> (file path >>= runTask . parse pythonParser)
 
 evaluatePythonFile path = evaluate @PythonValue <$>
   (file path >>= runTask . parse pythonParser)
