@@ -80,7 +80,7 @@ instance ( Corecursive t
          , Semigroup (Cell (LocationFor v) v)
          )
          => MonadAnalysis t v (CachingAnalysis t v) where
-  evaluateTerm = foldSubterms $ \e -> do
+  analyzeTerm e = do
     c <- getConfiguration (embedSubterm e)
     -- Convergence here is predicated upon an Eq instance, not α-equivalence
     cache <- converge (\ prevCache -> do
