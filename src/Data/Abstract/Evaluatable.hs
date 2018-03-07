@@ -101,7 +101,7 @@ load term = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup n
         notFound = fail ("cannot find " <> show name)
         evalAndCache e = do
           v <- evaluateTerm e
-          modifyModuleTable (linkerInsert name v)
+          modifyModuleTable (moduleTableInsert name v)
           pure v
 
 -- | Get a module name from a term (expects single free variables).
