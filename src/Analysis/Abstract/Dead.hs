@@ -44,7 +44,7 @@ deriving instance MonadEvaluator term value (DeadCodeAnalysis term value)
 
 -- | A set of “dead” (unreachable) terms.
 newtype Dead a = Dead { unDead :: Set a }
-  deriving (Eq, Foldable, Semigroup, Monoid, Ord, Pointed, Show)
+  deriving (Eq, Foldable, Semigroup, Monoid, Ord, Show)
 
 deriving instance Ord a => Reducer a (Dead a)
 
