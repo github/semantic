@@ -43,4 +43,4 @@ trace :: ( LiftEffect m
          )
       => TraceFor trace m
       -> TracingAnalysis trace m ()
-trace w = lift (tell w)
+trace = lift . tell
