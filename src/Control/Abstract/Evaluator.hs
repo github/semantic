@@ -63,7 +63,7 @@ type EvaluatorEffects term value
      , State  (Linker value)         -- Cache of evaluated modules
      ]
 
-instance Members (EvaluatorEffects term value) effects => MonadEvaluator term value (Evaluator effects term value) where
+instance Members (EvaluatorEffects term value) effects => MonadEvaluator term value (Evaluator term value effects) where
   getGlobalEnv = Evaluator get
   modifyGlobalEnv f = Evaluator (modify f)
 
@@ -83,10 +83,10 @@ putStore :: MonadEvaluator t value m => StoreFor value -> m ()
 putStore = modifyStore . const
 
 -- | An evaluator of @term@s to @value@s, producing incremental results of type @a@ using a list of @effects@.
-newtype Evaluator effects term value a = Evaluator { runEvaluator :: Eff effects a }
+newtype Evaluator term value effects a = Evaluator { runEvaluator :: Eff effects a }
   deriving (Applicative, Functor, Monad)
 
-deriving instance Member Fail effects => MonadFail (Evaluator effects term value)
-deriving instance Member NonDetEff effects => Alternative (Evaluator effects term value)
-deriving instance Member NonDetEff effects => MonadNonDet (Evaluator effects term value)
-deriving instance Member Fresh effects => MonadFresh (Evaluator effects term value)
+deriving instance Member Fail effects => MonadFail (Evaluator term value effects)
+deriving instance Member NonDetEff effects => Alternative (Evaluator term value effects)
+deriving instance Member NonDetEff effects => MonadNonDet (Evaluator term value effects)
+deriving instance Member Fresh effects => MonadFresh (Evaluator term value effects)

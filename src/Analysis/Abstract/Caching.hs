@@ -24,7 +24,7 @@ type CachingEffects term value
   ': State (Cache (LocationFor value) term value)  -- For the out-cache
   ': EvaluatorEffects term value
 
-newtype CachingAnalysis term value a = CachingAnalysis { runCachingAnalysis :: Evaluator (CachingEffects term value) term value a }
+newtype CachingAnalysis term value a = CachingAnalysis { runCachingAnalysis :: Evaluator term value (CachingEffects term value) a }
   deriving (Alternative, Applicative, Functor, Monad, MonadFail, MonadFresh, MonadNonDet)
 
 deriving instance MonadEvaluator term value (CachingAnalysis term value)

@@ -47,7 +47,7 @@ withModules pairs = localModuleTable (const moduleTable)
   where moduleTable = Linker (Map.fromList (map (first (dropExtensions . blobPath)) pairs))
 
 -- | An analysis performing concrete evaluation of @term@s to @value@s.
-newtype Evaluation term value a = Evaluation { runEvaluation :: Evaluator (EvaluatorEffects term value) term value a }
+newtype Evaluation term value a = Evaluation { runEvaluation :: Evaluator term value (EvaluatorEffects term value) a }
   deriving (Applicative, Functor, Monad, MonadFail)
 
 deriving instance MonadEvaluator term value (Evaluation term value)

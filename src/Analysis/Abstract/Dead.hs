@@ -36,7 +36,7 @@ evaluateDead term = run @(DeadCodeEffects term value) . runEvaluator . runDeadCo
 
 
 -- | A newtype wrapping 'Evaluator' which performs a dead code analysis on evaluation.
-newtype DeadCodeAnalysis term value a = DeadCodeAnalysis { runDeadCodeAnalysis :: Evaluator (DeadCodeEffects term value) term value a }
+newtype DeadCodeAnalysis term value a = DeadCodeAnalysis { runDeadCodeAnalysis :: Evaluator term value (DeadCodeEffects term value) a }
   deriving (Applicative, Functor, Monad, MonadFail)
 
 deriving instance MonadEvaluator term value (DeadCodeAnalysis term value)
