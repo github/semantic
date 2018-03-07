@@ -225,7 +225,7 @@ fieldIdentifier :: Assignment
 fieldIdentifier = makeTerm <$> symbol FieldIdentifier <*> (Syntax.Identifier <$> source)
 
 floatLiteral :: Assignment
-floatLiteral = makeTerm <$> symbol FloatLiteral <*> (source >>= Literal.buildFloat [Literal.padWithLeadingZero, Literal.dropAlphaSuffix])
+floatLiteral = makeTerm <$> symbol FloatLiteral <*> (source >>= Literal.normalizeFloatString [Literal.padWithLeadingZero, Literal.dropAlphaSuffix])
 
 identifier :: Assignment
 identifier =  makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax.Identifier <$> source)

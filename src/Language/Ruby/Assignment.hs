@@ -166,7 +166,7 @@ literal =
   <|> makeTerm <$> token  Grammar.False    <*> pure Literal.false
   <|> makeTerm <$> token  Grammar.Nil      <*> pure Literal.Null
   <|> makeTerm <$> symbol Grammar.Integer  <*> (Literal.Integer <$> source)
-  <|> makeTerm <$> symbol Grammar.Float    <*> (source >>= Literal.buildFloat [Literal.padWithLeadingZero, Literal.removeUnderscores])
+  <|> makeTerm <$> symbol Grammar.Float    <*> (source >>= Literal.normalizeFloatString [Literal.padWithLeadingZero, Literal.removeUnderscores])
   <|> makeTerm <$> symbol Grammar.Rational <*> (Literal.Rational <$> source)
   <|> makeTerm <$> symbol Grammar.Complex  <*> (Literal.Complex <$> source)
    -- TODO: Do we want to represent the difference between .. and ...

@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses, TypeApplications #-}
 module Data.Syntax.Literal where
 
 import Data.Abstract.Evaluatable
@@ -50,9 +50,7 @@ instance Evaluatable Data.Syntax.Literal.Integer where
 -- TODO: Consider a Numeric datatype with FloatingPoint/Integral/etc constructors.
 
 -- | A literal float of unspecified width.
-data Float a = Float { floatContent  :: !Scientific
-                     , floatOriginal :: !ByteString
-                     }
+newtype Float a = Float { floatContent  :: ByteString }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Data.Syntax.Literal.Float where liftEq = genericLiftEq
@@ -80,20 +78,24 @@ removeUnderscores = B.filter (/= '_')
 dropAlphaSuffix :: ByteString -> ByteString
 dropAlphaSuffix = B.takeWhile (\x -> x `notElem` ("lLjJiI" :: [Char]))
 
--- | This is the shared function that processes a bytestring representation of a float
---   into a Float-wrapped @Scientific@. It takes as its arguments a list of functions, which
+-- | This is the shared function that munges a bytestring representation of a float
+--   so that it can be parsed to a @Scientific@ later. It takes as its arguments a list of functions, which
 --   will be some combination of the above 'ByteString -> ByteString' functions. This is meant
 --   to be called from an @Assignment@, hence the @MonadFail@ constraint. Caveat: the list is
 --   order-dependent; the rightmost function will be applied first.
-buildFloat :: MonadFail m => [ByteString -> ByteString] -> ByteString -> m (Float a)
-buildFloat preds val =
+normalizeFloatString :: MonadFail m => [ByteString -> ByteString] -> ByteString -> m (Float a)
+normalizeFloatString preds val =
   let munger = appEndo (foldMap Endo preds)
-  in case readMaybe (unpack (munger val)) of
+  in case readMaybe @Scientific (unpack (munger val)) of
     Nothing -> fail ("Invalid floating-point value: " <> show val)
-    Just s  -> pure (Float s val)
+    Just _  -> pure (Float val)
 
 instance Evaluatable Data.Syntax.Literal.Float where
-  eval (Float s _) = float s
+  eval (Float s) = do
+    sci <- case readMaybe (unpack s) of
+      Just s  -> pure s
+      Nothing -> fail ("Bug: non-normalized float string: " <> show s)
+    float sci
 
 -- Rational literals e.g. `2/3r`
 newtype Rational a = Rational ByteString
