@@ -31,6 +31,8 @@ freeVariables1 = liftFreeVariables freeVariables
 freeVariable :: FreeVariables term => term -> Name
 freeVariable term = let [n] = toList (freeVariables term) in n
 
+-- TODO: Need a dedicated concept of qualified names outside of freevariables (a
+-- Set) b/c you can have something like `a.a.b.a`
 qualifiedName :: FreeVariables term => term -> Name
 qualifiedName term = let names = toList (freeVariables term) in B.intercalate "." names
 
