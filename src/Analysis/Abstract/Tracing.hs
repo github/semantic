@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Tracing where
 
 import Control.Abstract.Addressable
@@ -9,7 +9,6 @@ import Control.Monad.Effect.Writer
 import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.Evaluatable
-import Data.Abstract.Linker
 import Data.Abstract.Value
 import Prologue
 
@@ -17,15 +16,7 @@ import Prologue
 type Tracer trace term value = Writer (trace (Configuration (LocationFor value) term value))
 
 -- | The effects necessary for tracing analyses.
-type TracingEffects trace term value
-  = '[ Tracer trace term value       -- For 'trace'.
-     , Fail                          -- For 'MonadFail'.
-     , State (StoreFor value)        -- For 'MonadEvaluator'.
-     , Reader (EnvironmentFor value) -- For 'MonadEvaluator'.
-     , State (EnvironmentFor value)  -- For 'MonadEvaluator'.
-     , Reader (Linker term)          -- For 'MonadEvaluator'.
-     , State (Linker value)          -- For 'MonadEvaluator'.
-     ]
+type TracingEffects trace term value = Tracer trace term value ': EvaluatorEffects term value
 
 -- | Trace analysis.
 --
