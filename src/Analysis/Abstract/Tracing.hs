@@ -28,7 +28,7 @@ evaluateTrace :: forall trace value term
                 , Ord term
                 , Ord value
                 , Recursive term
-                , Reducer (Configuration (LocationFor value) term value) trace
+                , Reducer (ConfigurationFor term value) trace
                 , MonadAddressable (LocationFor value) value (TracingAnalysis trace term value (TracingEffects trace term value))
                 , MonadValue term value (TracingAnalysis trace term value (TracingEffects trace term value))
                 , Semigroup (Cell (LocationFor value) value)
@@ -52,7 +52,7 @@ instance ( Corecursive term
          , MonadAddressable (LocationFor value) value (TracingAnalysis trace term value effects)
          , MonadValue term value (TracingAnalysis trace term value effects)
          , Recursive term
-         , Reducer (Configuration (LocationFor value) term value) trace
+         , Reducer (ConfigurationFor term value) trace
          , Semigroup (Cell (LocationFor value) value)
          )
          => MonadAnalysis term value (TracingAnalysis trace term value effects) where
