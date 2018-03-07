@@ -48,7 +48,6 @@ newtype TracingAnalysis (trace :: * -> *) m a
   deriving (Applicative, Functor, LiftEffect, Monad, MonadEvaluator, MonadFail)
 
 instance ( Corecursive (TermFor m)
-         , Evaluatable (Base (TermFor m))
          , FreeVariables (TermFor m)
          , LiftEffect m
          , Member (TracerFor trace m) (Effects m)
