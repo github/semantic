@@ -31,7 +31,9 @@ storeLookupAll address = fmap toList . storeLookup address
 
 -- | Append a value onto the cell for a given address, inserting a new cell if none existed.
 storeInsert :: (Ord l, Reducer a (Cell l a)) => Address l a -> a -> Store l a -> Store l a
-storeInsert (Address address) value = Store . Map.insertWith (<>) address (unit value) . unStore
+storeInsert (Address address) value
+  -- Per the docs, 'Map.insertWith' applies its function operand to the new value first, followed by the old value. For 'Latest' this will result in us always keeping the oldest value instead of the latest one, which is exactly opposite to the desired semantics.
+  = Store . Map.insertWith (flip (<>)) address (unit value) . unStore
 
 -- | The number of addresses extant in a 'Store'.
 storeSize :: Store l a -> Int
