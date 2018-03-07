@@ -37,3 +37,9 @@ class Newtype1 n where
 
   pack1 :: O1 n a -> n a
   unpack1 :: n a -> O1 n a
+
+class GNewtype1 n where
+  type GO1 n :: * -> *
+
+  gpack1 :: GO1 n a -> n a
+  gunpack1 :: n a -> GO1 n a
