@@ -19,11 +19,11 @@ import qualified Data.Set as Set
 
 -- | The effects necessary for caching analyses.
 type CachingEffects term value
-  =  Fresh
-  ': NonDetEff
-  ': Reader (Live (LocationFor value) value)
-  ': Reader (Cache (LocationFor value) term value)
-  ': State (Cache (LocationFor value) term value)
+  =  Fresh                                         -- For 'MonadFresh'. TODO: Extract typing constraints into a separate analysis.
+  ': NonDetEff                                     -- For 'Alternative' & 'MonadNonDet'.
+  ': Reader (Live (LocationFor value) value)       -- For 'MonadGC'. TODO: Extract GC stuff into a separate analysis.
+  ': Reader (Cache (LocationFor value) term value) -- For the in-cache.
+  ': State (Cache (LocationFor value) term value)  -- For the out-cache
   ': EvaluatorEffects term value
 
 newtype CachingAnalysis term value a = CachingAnalysis { runCachingAnalysis :: Evaluator (CachingEffects term value) term value a }
