@@ -16,6 +16,7 @@ module Data.Algebra
 
 import Data.Bifoldable
 import Data.Bifunctor
+import Data.Bitraversable
 import Data.Functor.Foldable ( Base
                              , Corecursive(embed)
                              , Recursive(project)
@@ -54,6 +55,9 @@ instance Bifoldable Subterm where
 
 instance Bifunctor Subterm where
   bimap f g (Subterm a b) = Subterm (f a) (g b)
+
+instance Bitraversable Subterm where
+  bitraverse f g (Subterm a b) = Subterm <$> f a <*> g b
 
 -- | Like an R-algebra, but using 'Subterm' to label the fields instead of an anonymous pair.
 type SubtermAlgebra f t a = f (Subterm t a) -> a
