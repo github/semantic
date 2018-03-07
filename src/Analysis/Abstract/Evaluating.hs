@@ -15,8 +15,8 @@ import System.FilePath.Posix
 evaluate :: forall value term
          .  ( Evaluatable (Base term)
             , FreeVariables term
-            , MonadAddressable (LocationFor value) (Evaluation term value)
-            , MonadValue value (Evaluation term value)
+            , MonadAddressable (LocationFor value) (Evaluation term value (EvaluatorEffects term value))
+            , MonadValue value (Evaluation term value (EvaluatorEffects term value))
             , Ord (LocationFor value)
             , Recursive term
             , Semigroup (CellFor value)
@@ -29,8 +29,8 @@ evaluate = run @(EvaluatorEffects term value) . runEvaluator . runEvaluation . e
 evaluates :: forall value term
           .  ( Evaluatable (Base term)
              , FreeVariables term
-             , MonadAddressable (LocationFor value) (Evaluation term value)
-             , MonadValue value (Evaluation term value)
+             , MonadAddressable (LocationFor value) (Evaluation term value (EvaluatorEffects term value))
+             , MonadValue value (Evaluation term value (EvaluatorEffects term value))
              , Ord (LocationFor value)
              , Recursive term
              , Semigroup (CellFor value)
@@ -46,20 +46,21 @@ withModules pairs = localModuleTable (const moduleTable)
   where moduleTable = Linker (Map.fromList (map (first (dropExtensions . blobPath)) pairs))
 
 -- | An analysis performing concrete evaluation of @term@s to @value@s.
-newtype Evaluation term value a = Evaluation { runEvaluation :: Evaluator term value (EvaluatorEffects term value) a }
-  deriving (Applicative, Functor, Monad, MonadFail)
+newtype Evaluation term value effects a = Evaluation { runEvaluation :: Evaluator term value effects a }
+  deriving (Applicative, Functor, LiftEffect, Monad)
 
-deriving instance Ord (LocationFor value) => MonadEvaluator (Evaluation term value)
+deriving instance Member Fail effects => MonadFail (Evaluation term value effects)
+deriving instance (Member Fail effects, MonadEvaluator (Evaluator term value effects), Ord (LocationFor value)) => MonadEvaluator (Evaluation term value effects)
 
 instance ( Evaluatable (Base term)
          , FreeVariables term
-         , MonadAddressable (LocationFor value) (Evaluation term value)
-         , MonadValue value (Evaluation term value)
+         , MonadAddressable (LocationFor value) (Evaluation term value effects)
+         , MonadValue value (Evaluation term value effects)
          , Recursive term
          , Semigroup (CellFor value)
          )
-         => MonadAnalysis (Evaluation term value) where
+         => MonadAnalysis (Evaluation term value effects) where
   analyzeTerm = eval
 
-type instance AnalysisTerm (Evaluation term value) = term
-type instance AnalysisValue (Evaluation term value) = value
+type instance AnalysisTerm (Evaluation term value effects) = term
+type instance AnalysisValue (Evaluation term value effects) = value
