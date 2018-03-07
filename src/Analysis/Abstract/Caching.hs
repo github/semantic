@@ -17,7 +17,7 @@ import Data.Abstract.Cache
 import Data.Abstract.Configuration
 import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
-import Data.Abstract.Linker
+import Data.Abstract.ModuleTable
 import Data.Abstract.Live
 import Data.Abstract.Store
 import Data.Abstract.Value
@@ -34,8 +34,8 @@ type CachingEffects t v
      , State (Store (LocationFor v) v)        -- For 'MonadStore'.
      , Reader (Cache (LocationFor v) t v)     -- For 'MonadCacheIn'.
      , State (Cache (LocationFor v) t v)      -- For 'MonadCacheOut'.
-     , Reader (Linker t)                      -- Cache of unevaluated modules
-     , State (Linker v)                       -- Cache of evaluated modules
+     , Reader (ModuleTable t)                 -- Cache of unevaluated modules
+     , State (ModuleTable v)                       -- Cache of evaluated modules
      ]
 
 newtype CachingAnalysis term value a = CachingAnalysis { runCachingAnalysis :: Evaluator (CachingEffects term value) term value a }
