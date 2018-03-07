@@ -12,7 +12,6 @@ import Data.Record
 import Data.List (elem)
 import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
 import qualified Assigning.Assignment as Assignment
-import qualified Data.ByteString as B
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration

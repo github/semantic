@@ -13,6 +13,7 @@ data Type
   | Bool           -- ^ Primitive boolean type.
   | String         -- ^ Primitive string type.
   | Unit           -- ^ The unit type.
+  | Float          -- ^ Floating-point type.
   | Type :-> Type  -- ^ Binary function types.
   | Var TName      -- ^ A type variable.
   | Product [Type] -- ^ N-ary products.

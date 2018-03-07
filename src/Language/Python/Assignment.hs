@@ -17,7 +17,6 @@ import GHC.Stack
 import Language.Python.Grammar as Grammar
 import Language.Python.Syntax as Python.Syntax
 import qualified Assigning.Assignment as Assignment
-import qualified Data.ByteString as B
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration

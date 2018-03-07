@@ -6,7 +6,6 @@ import Data.ByteString.Char8 (readInteger, unpack)
 import qualified Data.ByteString.Char8 as B
 import Data.Monoid (Endo (..), appEndo)
 import Data.Scientific (Scientific)
-import Data.Word (Word8)
 import Diffing.Algorithm
 import Prelude hiding (Float, fail)
 import Prologue hiding (Set)
@@ -87,8 +86,8 @@ buildFloat preds val =
     Nothing -> fail ("Invalid floating-point value: " <> show val)
     Just s  -> pure (Float s val)
 
--- TODO: Implement Eval instance for Float
-instance Evaluatable Data.Syntax.Literal.Float
+instance Evaluatable Data.Syntax.Literal.Float where
+  eval (Float s _) = float s
 
 -- Rational literals e.g. `2/3r`
 newtype Rational a = Rational ByteString
