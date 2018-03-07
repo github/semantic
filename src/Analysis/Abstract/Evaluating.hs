@@ -41,7 +41,7 @@ evaluates :: forall value term
 evaluates pairs (_, t) = run @(EvaluatorEffects term value) (runEvaluator (runEvaluation (withModules pairs (evaluateTerm t))))
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
-withModules :: (MonadAnalysis m, MonadEvaluator m) => [(Blob, AnalysisTerm m)] -> m a -> m a
+withModules :: (MonadAnalysis m, MonadEvaluator m) => [(Blob, TermFor m)] -> m a -> m a
 withModules pairs = localModuleTable (const moduleTable)
   where moduleTable = Linker (Map.fromList (map (first (dropExtensions . blobPath)) pairs))
 
@@ -62,5 +62,5 @@ instance ( Evaluatable (Base term)
          => MonadAnalysis (Evaluation term value effects) where
   analyzeTerm = eval
 
-type instance AnalysisTerm (Evaluation term value effects) = term
-type instance AnalysisValue (Evaluation term value effects) = value
+type instance TermFor (Evaluation term value effects) = term
+type instance ValueFor (Evaluation term value effects) = value

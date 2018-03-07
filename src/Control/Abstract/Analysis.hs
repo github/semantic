@@ -1,8 +1,8 @@
 {-# LANGUAGE DefaultSignatures, KindSignatures, TypeFamilies #-}
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
-, AnalysisTerm
-, AnalysisValue
+, TermFor
+, ValueFor
 , module X
 , Subterm(..)
 , SubtermAlgebra
@@ -14,19 +14,19 @@ import Control.Monad.Effect.Reader as X
 import Control.Monad.Effect.State as X
 import Prologue
 
-type family AnalysisTerm (m :: * -> *)
-type family AnalysisValue (m :: * -> *)
+type family TermFor (m :: * -> *)
+type family ValueFor (m :: * -> *)
 
 -- | A 'Monad' in which one can evaluate some specific term type to some specific value type.
 --
 --   This typeclass is left intentionally unconstrained to avoid circular dependencies between it and other typeclasses.
 class Monad m => MonadAnalysis m where
   -- | Analyze a term using the semantics of the current analysis. This should generally only be called by definitions of 'evaluateTerm' and 'analyzeTerm' in this or other instances.
-  analyzeTerm :: SubtermAlgebra (Base (AnalysisTerm m)) (AnalysisTerm m) (m (AnalysisValue m))
+  analyzeTerm :: SubtermAlgebra (Base (TermFor m)) (TermFor m) (m (ValueFor m))
 
   -- | Evaluate a term to a value using the semantics of the current analysis.
   --
   --   This should always be called instead of explicitly folding either 'eval' or 'analyzeTerm' over subterms, except in 'MonadAnalysis' instances themselves.
-  evaluateTerm :: AnalysisTerm m -> m (AnalysisValue m)
-  default evaluateTerm :: Recursive (AnalysisTerm m) => AnalysisTerm m -> m (AnalysisValue m)
+  evaluateTerm :: TermFor m -> m (ValueFor m)
+  default evaluateTerm :: Recursive (TermFor m) => TermFor m -> m (ValueFor m)
   evaluateTerm = foldSubterms analyzeTerm

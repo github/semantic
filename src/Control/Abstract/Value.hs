@@ -16,7 +16,7 @@ import Prelude hiding (fail)
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class (MonadEvaluator m, v ~ AnalysisValue m) => MonadValue v m where
+class (MonadEvaluator m, v ~ ValueFor m) => MonadValue v m where
   -- | Construct an abstract unit value.
   unit :: m v
 
@@ -33,16 +33,16 @@ class (MonadEvaluator m, v ~ AnalysisValue m) => MonadValue v m where
   ifthenelse :: v -> m v -> m v -> m v
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
-  abstract :: [Name] -> Subterm (AnalysisTerm m) (m v) -> m v
+  abstract :: [Name] -> Subterm (TermFor m) (m v) -> m v
   -- | Evaluate an application (like a function call).
-  apply :: v -> [Subterm (AnalysisTerm m) (m v)] -> m v
+  apply :: v -> [Subterm (TermFor m) (m v)] -> m v
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( FreeVariables t
          , MonadAddressable location m
          , MonadAnalysis m
-         , AnalysisTerm m ~ t
-         , AnalysisValue m ~ Value location t
+         , TermFor m ~ t
+         , ValueFor m ~ Value location t
          , MonadEvaluator m
          , Recursive t
          , Semigroup (Cell location (Value location t))
@@ -70,7 +70,7 @@ instance ( FreeVariables t
     localEnv (mappend bindings) (evaluateTerm body)
 
 -- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
-instance (Alternative m, MonadEvaluator m, MonadFresh m, AnalysisValue m ~ Type) => MonadValue Type m where
+instance (Alternative m, MonadEvaluator m, MonadFresh m, ValueFor m ~ Type) => MonadValue Type m where
   abstract names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name

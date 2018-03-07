@@ -85,8 +85,8 @@ instance ( Corecursive t
       getCache) mempty
     maybe empty scatter (cacheLookup c cache)
 
-type instance AnalysisTerm (CachingAnalysis term value) = term
-type instance AnalysisValue (CachingAnalysis term value) = value
+type instance TermFor (CachingAnalysis term value) = term
+type instance ValueFor (CachingAnalysis term value) = value
 
 
 -- | Coinductively-cached evaluation.
@@ -126,7 +126,7 @@ converge f = loop
             loop x'
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Alternative m, Foldable t, MonadEvaluator m) => t (a, Store (LocationFor (AnalysisValue m)) (AnalysisValue m)) -> m a
+scatter :: (Alternative m, Foldable t, MonadEvaluator m) => t (a, Store (LocationFor (ValueFor m)) (ValueFor m)) -> m a
 scatter = getAlt . foldMap (\ (value, store') -> Alt (putStore store' *> pure value))
 
 -- | Evaluation of a single iteration of an analysis, given an in-cache as an oracle for results and an out-cache to record computed results in.

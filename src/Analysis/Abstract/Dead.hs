@@ -71,5 +71,5 @@ instance ( Corecursive t
     revive (embedSubterm term)
     eval term
 
-type instance AnalysisTerm (DeadCodeAnalysis term value) = term
-type instance AnalysisValue (DeadCodeAnalysis term value) = value
+type instance TermFor (DeadCodeAnalysis term value) = term
+type instance ValueFor (DeadCodeAnalysis term value) = value

@@ -18,38 +18,38 @@ import Prelude hiding (fail)
 --   - environments binding names to addresses
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
-class (MonadFail m, Ord (LocationFor (AnalysisValue m))) => MonadEvaluator m where
+class (MonadFail m, Ord (LocationFor (ValueFor m))) => MonadEvaluator m where
   -- | Retrieve the global environment.
-  getGlobalEnv :: m (EnvironmentFor (AnalysisValue m))
+  getGlobalEnv :: m (EnvironmentFor (ValueFor m))
   -- | Update the global environment.
-  modifyGlobalEnv :: (EnvironmentFor (AnalysisValue m) -> EnvironmentFor (AnalysisValue m)) -> m ()
+  modifyGlobalEnv :: (EnvironmentFor (ValueFor m) -> EnvironmentFor (ValueFor m)) -> m ()
 
   -- | Retrieve the local environment.
-  askLocalEnv :: m (EnvironmentFor (AnalysisValue m))
+  askLocalEnv :: m (EnvironmentFor (ValueFor m))
   -- | Run an action with a locally-modified environment.
-  localEnv :: (EnvironmentFor (AnalysisValue m) -> EnvironmentFor (AnalysisValue m)) -> m a -> m a
+  localEnv :: (EnvironmentFor (ValueFor m) -> EnvironmentFor (ValueFor m)) -> m a -> m a
 
   -- | Retrieve the heap.
-  getStore :: m (StoreFor (AnalysisValue m))
+  getStore :: m (StoreFor (ValueFor m))
   -- | Update the heap.
-  modifyStore :: (StoreFor (AnalysisValue m) -> StoreFor (AnalysisValue m)) -> m ()
+  modifyStore :: (StoreFor (ValueFor m) -> StoreFor (ValueFor m)) -> m ()
 
   -- | Retrieve the table of evaluated modules.
-  getModuleTable :: m (Linker (AnalysisValue m))
+  getModuleTable :: m (Linker (ValueFor m))
   -- | Update the table of evaluated modules.
-  modifyModuleTable :: (Linker (AnalysisValue m) -> Linker (AnalysisValue m)) -> m ()
+  modifyModuleTable :: (Linker (ValueFor m) -> Linker (ValueFor m)) -> m ()
 
   -- | Retrieve the table of unevaluated modules.
-  askModuleTable :: m (Linker (AnalysisTerm m))
+  askModuleTable :: m (Linker (TermFor m))
   -- | Run an action with a locally-modified table of unevaluated modules.
-  localModuleTable :: (Linker (AnalysisTerm m) -> Linker (AnalysisTerm m)) -> m a -> m a
+  localModuleTable :: (Linker (TermFor m) -> Linker (TermFor m)) -> m a -> m a
 
   -- | Retrieve the current root set.
-  askRoots :: m (Live (LocationFor (AnalysisValue m)) (AnalysisValue m))
+  askRoots :: m (Live (LocationFor (ValueFor m)) (ValueFor m))
   askRoots = pure mempty
 
   -- | Get the current 'Configuration' with a passed-in term.
-  getConfiguration :: term -> m (Configuration (LocationFor (AnalysisValue m)) term (AnalysisValue m))
+  getConfiguration :: term -> m (Configuration (LocationFor (ValueFor m)) term (ValueFor m))
   getConfiguration term = Configuration term <$> askRoots <*> askLocalEnv <*> getStore
 
 type EvaluatorEffects term value
@@ -61,8 +61,8 @@ type EvaluatorEffects term value
      , State  (Linker value)         -- Cache of evaluated modules
      ]
 
-type instance AnalysisTerm (Evaluator term value effects) = term
-type instance AnalysisValue (Evaluator term value effects) = value
+type instance TermFor (Evaluator term value effects) = term
+type instance ValueFor (Evaluator term value effects) = value
 instance (Ord (LocationFor value), Members (EvaluatorEffects term value) effects) => MonadEvaluator (Evaluator term value effects) where
   getGlobalEnv = Evaluator get
   modifyGlobalEnv f = Evaluator (modify f)
@@ -79,7 +79,7 @@ instance (Ord (LocationFor value), Members (EvaluatorEffects term value) effects
   askModuleTable = Evaluator ask
   localModuleTable f a = Evaluator (local f (runEvaluator a))
 
-putStore :: MonadEvaluator m => StoreFor (AnalysisValue m) -> m ()
+putStore :: MonadEvaluator m => StoreFor (ValueFor m) -> m ()
 putStore = modifyStore . const
 
 -- | An evaluator of @term@s to @value@s, producing incremental results of type @a@ using a list of @effects@.

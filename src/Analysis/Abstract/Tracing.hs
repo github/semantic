@@ -14,7 +14,7 @@ import Data.Semigroup.Reducer as Reducer
 import Prologue
 
 type Trace trace term value = trace (ConfigurationFor term value)
-type TraceFor trace m = Trace trace (AnalysisTerm m) (AnalysisValue m)
+type TraceFor trace m = Trace trace (TermFor m) (ValueFor m)
 type Tracer trace term value = Writer (Trace trace term value)
 type TracerFor trace m = Writer (TraceFor trace m)
 -- | The effects necessary for tracing analyses.
@@ -49,23 +49,23 @@ newtype TracingAnalysis (trace :: * -> *) m a
 
 deriving instance MonadEvaluator m => MonadEvaluator (TracingAnalysis trace m)
 
-instance ( Corecursive (AnalysisTerm m)
-         , Evaluatable (Base (AnalysisTerm m))
-         , FreeVariables (AnalysisTerm m)
+instance ( Corecursive (TermFor m)
+         , Evaluatable (Base (TermFor m))
+         , FreeVariables (TermFor m)
          , LiftEffect m
          , Member (TracerFor trace m) (Effects m)
-         , MonadAddressable (LocationFor (AnalysisValue m)) (TracingAnalysis trace m)
+         , MonadAddressable (LocationFor (ValueFor m)) (TracingAnalysis trace m)
          , MonadAnalysis m
-         , MonadValue (AnalysisValue m) (TracingAnalysis trace m)
-         , Recursive (AnalysisTerm m)
-         , Reducer (ConfigurationFor (AnalysisTerm m) (AnalysisValue m)) (TraceFor trace m)
-         , Semigroup (CellFor (AnalysisValue m))
+         , MonadValue (ValueFor m) (TracingAnalysis trace m)
+         , Recursive (TermFor m)
+         , Reducer (ConfigurationFor (TermFor m) (ValueFor m)) (TraceFor trace m)
+         , Semigroup (CellFor (ValueFor m))
          )
          => MonadAnalysis (TracingAnalysis trace m) where
   analyzeTerm term = getConfiguration (embedSubterm term) >>= trace . Reducer.unit >> TracingAnalysis (analyzeTerm (second runTracingAnalysis <$> term))
 
-type instance AnalysisTerm  (TracingAnalysis trace m) = AnalysisTerm  m
-type instance AnalysisValue (TracingAnalysis trace m) = AnalysisValue m
+type instance TermFor  (TracingAnalysis trace m) = TermFor  m
+type instance ValueFor (TracingAnalysis trace m) = ValueFor m
 
 trace :: ( LiftEffect m
          , Member (TracerFor trace m) (Effects m)

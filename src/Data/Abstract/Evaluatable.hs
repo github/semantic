@@ -32,8 +32,8 @@ class Evaluatable constr where
   eval :: ( FreeVariables term
           , MonadAddressable (LocationFor value) m
           , MonadAnalysis m
-          , AnalysisTerm m ~ term
-          , AnalysisValue m ~ value
+          , TermFor m ~ term
+          , ValueFor m ~ value
           , MonadEvaluator m
           , MonadValue value m
           , Ord (LocationFor value)
@@ -77,24 +77,24 @@ instance Evaluatable [] where
 -- | Require/import another term/file and return an Effect.
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
-require :: ( FreeVariables (AnalysisTerm m)
+require :: ( FreeVariables (TermFor m)
            , MonadAnalysis m
            , MonadEvaluator m
            )
-        => AnalysisTerm m
-        -> m (AnalysisValue m)
+        => TermFor m
+        -> m (ValueFor m)
 require term = getModuleTable >>= maybe (load term) pure . linkerLookup name
   where name = moduleName term
 
 -- | Load another term/file and return an Effect.
 --
 -- Always loads/evaluates.
-load :: ( FreeVariables (AnalysisTerm m)
+load :: ( FreeVariables (TermFor m)
         , MonadAnalysis m
         , MonadEvaluator m
         )
-     => AnalysisTerm m
-     -> m (AnalysisValue m)
+     => TermFor m
+     -> m (ValueFor m)
 load term = askModuleTable >>= maybe notFound evalAndCache . linkerLookup name
   where name = moduleName term
         notFound = fail ("cannot find " <> show name)
