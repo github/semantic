@@ -6,7 +6,7 @@
     (Empty))
   (Import
     (TextElement)
-    (Empty))
+    (Identifier))
   (Import
     (TextElement)
     (Identifier))

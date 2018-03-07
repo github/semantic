@@ -127,8 +127,7 @@
     (
     { (Identifier)
     ->(Identifier) }
-      (
-      { (Identifier)
-      ->(Identifier) }
-        (Identifier)))
+    { (Identifier)
+    ->(Identifier) }
+      (Identifier))
     ([])))

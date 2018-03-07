@@ -25,7 +25,8 @@
     (Empty)
     (Identifier)
     (
-      (Identifier)
+      (
+        (Identifier))
       (Variadic
         (Identifier)
         (Empty)))
