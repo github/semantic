@@ -33,43 +33,43 @@ evaluateTrace :: forall trace value term
                 , Ord value
                 , Recursive term
                 , Reducer (ConfigurationFor term value) (Trace trace term value)
-                , MonadAddressable (LocationFor value) (TracingAnalysis trace (Evaluation term value) (TracingEffects trace term value))
+                , MonadAddressable (LocationFor value) (TracingAnalysis trace (Evaluation term value (TracingEffects trace term value)))
                 , MonadAnalysis (Evaluation term value (TracingEffects trace term value))
-                , MonadValue value (TracingAnalysis trace (Evaluation term value) (TracingEffects trace term value))
+                , MonadValue value (TracingAnalysis trace (Evaluation term value (TracingEffects trace term value)))
                 , Semigroup (CellFor value)
                 )
               => term
               -> Final (TracingEffects trace term value) value
-evaluateTrace = run @(TracingEffects trace term value) . runEvaluator . runEvaluation . runTracingAnalysis @trace . evaluateTerm
+evaluateTrace = run . lower @(Evaluation term value (TracingEffects trace term value)) . evaluateTerm
 
 
-newtype TracingAnalysis (trace :: * -> *) underlying (effects :: [* -> *]) a
-  = TracingAnalysis { runTracingAnalysis :: underlying effects a }
+newtype TracingAnalysis (trace :: * -> *) m a
+  = TracingAnalysis { runTracingAnalysis :: m a }
   deriving (Applicative, Functor, LiftEffect, Monad, MonadFail)
 
-deriving instance (AnalysisTerm (underlying effects) ~ term, AnalysisValue (underlying effects) ~ value, MonadEvaluator (underlying effects)) => MonadEvaluator (TracingAnalysis trace underlying effects)
+deriving instance MonadEvaluator m => MonadEvaluator (TracingAnalysis trace m)
 
-instance ( Corecursive (AnalysisTerm (underlying effects))
-         , Evaluatable (Base (AnalysisTerm (underlying effects)))
-         , FreeVariables (AnalysisTerm (underlying effects))
-         , LiftEffect underlying
-         , Member (TracerFor trace (underlying effects)) effects
-         , MonadAddressable (LocationFor (AnalysisValue (underlying effects))) (TracingAnalysis trace underlying effects)
-         , MonadAnalysis (underlying effects)
-         , MonadValue (AnalysisValue (underlying effects)) (TracingAnalysis trace underlying effects)
-         , Recursive (AnalysisTerm (underlying effects))
-         , Reducer (ConfigurationFor (AnalysisTerm (underlying effects)) (AnalysisValue (underlying effects))) (TraceFor trace (underlying effects))
-         , Semigroup (CellFor (AnalysisValue (underlying effects)))
+instance ( Corecursive (AnalysisTerm m)
+         , Evaluatable (Base (AnalysisTerm m))
+         , FreeVariables (AnalysisTerm m)
+         , LiftEffect m
+         , Member (TracerFor trace m) (Effects m)
+         , MonadAddressable (LocationFor (AnalysisValue m)) (TracingAnalysis trace m)
+         , MonadAnalysis m
+         , MonadValue (AnalysisValue m) (TracingAnalysis trace m)
+         , Recursive (AnalysisTerm m)
+         , Reducer (ConfigurationFor (AnalysisTerm m) (AnalysisValue m)) (TraceFor trace m)
+         , Semigroup (CellFor (AnalysisValue m))
          )
-         => MonadAnalysis (TracingAnalysis trace underlying effects) where
+         => MonadAnalysis (TracingAnalysis trace m) where
   analyzeTerm term = getConfiguration (embedSubterm term) >>= trace . Reducer.unit >> TracingAnalysis (analyzeTerm (second runTracingAnalysis <$> term))
 
-type instance AnalysisTerm  (TracingAnalysis trace underlying effects) = AnalysisTerm  (underlying effects)
-type instance AnalysisValue (TracingAnalysis trace underlying effects) = AnalysisValue (underlying effects)
+type instance AnalysisTerm  (TracingAnalysis trace m) = AnalysisTerm  m
+type instance AnalysisValue (TracingAnalysis trace m) = AnalysisValue m
 
-trace :: ( LiftEffect underlying
-         , Member (TracerFor trace (underlying effects)) effects
+trace :: ( LiftEffect m
+         , Member (TracerFor trace m) (Effects m)
          )
-      => TraceFor trace (underlying effects)
-      -> TracingAnalysis trace underlying effects ()
+      => TraceFor trace m
+      -> TracingAnalysis trace m ()
 trace w = lift (tell w)
