@@ -11,6 +11,7 @@ import Data.Functor (void)
 import Data.List.NonEmpty (some1)
 import Data.Maybe (fromMaybe)
 import Data.Record
+import Data.Semigroup
 import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, parseError, postContextualize)
 import Data.Union
 import GHC.Stack
@@ -456,10 +457,12 @@ slice = makeTerm <$> symbol Slice <*> children
 call :: Assignment
 call = makeTerm <$> symbol Call <*> children (Expression.Call <$> pure [] <*> term qualifiedIdentifier <*> (symbol ArgumentList *> children (manyTerm expression) <|> someTerm comprehension) <*> emptyTerm)
   where
-    qualifiedIdentifier =  makeQualifiedIdentifier <$> symbol Attribute <*> children (some identifier)
-                       <|> plainIdentifier
-    plainIdentifier = makeTerm <$> location <*> (Syntax.QualifiedIdentifier <$> identifier)
-    makeQualifiedIdentifier loc [x] = makeTerm loc (Syntax.QualifiedIdentifier x)
+    qualifiedIdentifier =   makeQualifiedIdentifier <$> symbol Attribute <*> children (attribute <|> identifierPair)
+                        <|> makeTerm <$> location <*> (Syntax.QualifiedIdentifier <$> identifier)
+
+    attribute = (\a b -> a <> [b]) <$> (symbol Attribute *> children (attribute <|> identifierPair)) <*> identifier
+    identifierPair = (\a b -> [a, b]) <$> identifier <*> identifier
+
     makeQualifiedIdentifier loc xs = makeTerm loc (Syntax.QualifiedIdentifier (makeTerm' loc (inj xs)))
 
 
