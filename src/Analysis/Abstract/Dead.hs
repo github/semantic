@@ -61,14 +61,12 @@ subterms term = term `cons` para (foldMap (uncurry cons)) term
 
 
 instance ( Corecursive (TermFor m)
-         , Evaluatable (Base (TermFor m))
          , LiftEffect m
          , Member (State (Dead (TermFor m))) (Effects m)
          , MonadAnalysis m
          , MonadEvaluator m
          , Ord (TermFor m)
          , Recursive (TermFor m)
-         , Semigroup (CellFor (ValueFor m))
          )
          => MonadAnalysis (DeadCodeAnalysis m) where
   analyzeTerm term = do
