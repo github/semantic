@@ -5,6 +5,7 @@ module Data.Map.Monoidal
 , lookup
 , size
 , insert
+, filterWithKey
 , module Reducer
 ) where
 
@@ -25,6 +26,9 @@ size = Map.size . unMap
 
 insert :: Ord key => key -> value -> Map key value -> Map key value
 insert key value = Map . Map.insert key value . unMap
+
+filterWithKey :: (key -> value -> Bool) -> Map key value -> Map key value
+filterWithKey f = Map . Map.filterWithKey f . unMap
 
 
 instance (Ord key, Semigroup value) => Semigroup (Map key value) where
