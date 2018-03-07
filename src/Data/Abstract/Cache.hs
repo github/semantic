@@ -27,7 +27,7 @@ cacheSet key value = Cache . Map.insert key value . unCache
 
 -- | Insert the resulting value & 'Store' for a given 'Configuration', appending onto any previous entry.
 cacheInsert :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> (v, Store l v) -> Cache l t v -> Cache l t v
-cacheInsert key value = Cache . flip snoc (key, value) . unCache
+cacheInsert key value = cons (key, value)
 
 
 instance (Eq l, Eq t, Eq1 (Cell l)) => Eq1 (Cache l t) where
