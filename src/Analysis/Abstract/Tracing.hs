@@ -16,6 +16,7 @@ import Prologue
 type Trace trace term value = trace (ConfigurationFor term value)
 type TraceFor trace m = Trace trace (AnalysisTerm m) (AnalysisValue m)
 type Tracer trace term value = Writer (Trace trace term value)
+type TracerFor trace m = Writer (TraceFor trace m)
 -- | The effects necessary for tracing analyses.
 type TracingEffects trace term value = Tracer trace term value ': EvaluatorEffects term value
 
@@ -52,7 +53,7 @@ instance ( Corecursive (AnalysisTerm (underlying effects))
          , Evaluatable (Base (AnalysisTerm (underlying effects)))
          , FreeVariables (AnalysisTerm (underlying effects))
          , LiftEffect underlying
-         , Member (Tracer trace (AnalysisTerm (underlying effects)) (AnalysisValue (underlying effects))) effects
+         , Member (TracerFor trace (underlying effects)) effects
          , MonadAddressable (LocationFor (AnalysisValue (underlying effects))) (TracingAnalysis trace underlying effects)
          , MonadAnalysis (underlying effects)
          , MonadValue (AnalysisValue (underlying effects)) (TracingAnalysis trace underlying effects)
@@ -67,7 +68,7 @@ type instance AnalysisTerm  (TracingAnalysis trace underlying effects) = Analysi
 type instance AnalysisValue (TracingAnalysis trace underlying effects) = AnalysisValue (underlying effects)
 
 trace :: ( LiftEffect underlying
-         , Member (Tracer trace (AnalysisTerm (underlying effects)) (AnalysisValue (underlying effects))) effects
+         , Member (TracerFor trace (underlying effects)) effects
          )
       => TraceFor trace (underlying effects)
       -> TracingAnalysis trace underlying effects ()
