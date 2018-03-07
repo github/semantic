@@ -14,6 +14,7 @@ import Data.Semigroup.Reducer as Reducer
 import Prologue
 
 type Trace trace term value = trace (ConfigurationFor term value)
+type TraceFor trace m = Trace trace (AnalysisTerm m) (AnalysisValue m)
 type Tracer trace term value = Writer (Trace trace term value)
 -- | The effects necessary for tracing analyses.
 type TracingEffects trace term value = Tracer trace term value ': EvaluatorEffects term value
@@ -56,7 +57,7 @@ instance ( Corecursive (AnalysisTerm (underlying effects))
          , MonadAnalysis (underlying effects)
          , MonadValue (AnalysisValue (underlying effects)) (TracingAnalysis trace underlying effects)
          , Recursive (AnalysisTerm (underlying effects))
-         , Reducer (ConfigurationFor (AnalysisTerm (underlying effects)) (AnalysisValue (underlying effects))) (Trace trace (AnalysisTerm (underlying effects)) (AnalysisValue (underlying effects)))
+         , Reducer (ConfigurationFor (AnalysisTerm (underlying effects)) (AnalysisValue (underlying effects))) (TraceFor trace (underlying effects))
          , Semigroup (CellFor (AnalysisValue (underlying effects)))
          )
          => MonadAnalysis (TracingAnalysis trace underlying effects) where
@@ -68,6 +69,6 @@ type instance AnalysisValue (TracingAnalysis trace underlying effects) = Analysi
 trace :: ( LiftEffect underlying
          , Member (Tracer trace (AnalysisTerm (underlying effects)) (AnalysisValue (underlying effects))) effects
          )
-      => Trace trace (AnalysisTerm (underlying effects)) (AnalysisValue (underlying effects))
+      => TraceFor trace (underlying effects)
       -> TracingAnalysis trace underlying effects ()
 trace w = lift (tell w)
