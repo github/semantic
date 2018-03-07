@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Dead where
 
+import Analysis.Abstract.Evaluating
 import Control.Abstract.Addressable
 import Control.Abstract.Evaluator
 import Data.Abstract.Evaluatable
@@ -14,13 +15,15 @@ type DeadCodeEffects term value = State (Dead term) ': EvaluatorEffects term val
 
 
 -- | Run a dead code analysis of the given program.
-evaluateDead :: forall term value
-             .  ( Corecursive term
+evaluateDead :: forall term value effects m
+             .  ( m ~ Evaluation term value effects
+                , effects ~ DeadCodeEffects term value
+                , Corecursive term
                 , Evaluatable (Base term)
                 , Foldable (Base term)
                 , FreeVariables term
-                , MonadAddressable (LocationFor value) (DeadCodeAnalysis term value)
-                , MonadValue value (DeadCodeAnalysis term value)
+                , MonadAddressable (LocationFor value) m
+                , MonadValue value m
                 , Ord (LocationFor value)
                 , Ord term
                 , Recursive term
@@ -28,16 +31,14 @@ evaluateDead :: forall term value
                 )
              => term
              -> Final (DeadCodeEffects term value) value
-evaluateDead term = run @(DeadCodeEffects term value) . runEvaluator . runDeadCodeAnalysis $ do
+evaluateDead term = run @(DeadCodeEffects term value) . lower @(DeadCodeAnalysis m) $ do
   killAll (subterms term)
   evaluateTerm term
 
 
--- | A newtype wrapping 'Evaluator' which performs a dead code analysis on evaluation.
-newtype DeadCodeAnalysis term value a = DeadCodeAnalysis { runDeadCodeAnalysis :: Evaluator term value (DeadCodeEffects term value) a }
-  deriving (Applicative, Functor, Monad, MonadFail)
-
-deriving instance Ord (LocationFor value) => MonadEvaluator (DeadCodeAnalysis term value)
+-- | An analysis tracking dead (unreachable) code.
+newtype DeadCodeAnalysis m a = DeadCodeAnalysis { runDeadCodeAnalysis :: m a }
+  deriving (Applicative, Functor, LiftEffect, Monad, MonadEvaluator, MonadFail)
 
 
 -- | A set of “dead” (unreachable) terms.
@@ -47,31 +48,32 @@ newtype Dead term = Dead { unDead :: Set term }
 deriving instance Ord term => Reducer term (Dead term)
 
 -- | Update the current 'Dead' set.
-killAll :: Dead term -> DeadCodeAnalysis term value ()
-killAll = DeadCodeAnalysis . Evaluator . put
+killAll :: (LiftEffect m, Member (State (Dead (TermFor m))) (Effects m)) => Dead (TermFor m) -> DeadCodeAnalysis m ()
+killAll = lift . put
 
 -- | Revive a single term, removing it from the current 'Dead' set.
-revive :: Ord term => term -> DeadCodeAnalysis term value ()
-revive t = DeadCodeAnalysis (Evaluator (modify (Dead . delete t . unDead)))
+revive :: (LiftEffect m, Member (State (Dead (TermFor m))) (Effects m)) => Ord (TermFor m) => (TermFor m) -> DeadCodeAnalysis m ()
+revive t = lift (modify (Dead . delete t . unDead))
 
 -- | Compute the set of all subterms recursively.
 subterms :: (Ord term, Recursive term, Foldable (Base term)) => term -> Dead term
 subterms term = term `cons` para (foldMap (uncurry cons)) term
 
 
-instance ( Corecursive term
-         , Evaluatable (Base term)
-         , FreeVariables term
-         , MonadAddressable (LocationFor value) (DeadCodeAnalysis term value)
-         , MonadValue value (DeadCodeAnalysis term value)
-         , Ord term
-         , Recursive term
-         , Semigroup (CellFor value)
+instance ( Corecursive (TermFor m)
+         , Evaluatable (Base (TermFor m))
+         , LiftEffect m
+         , Member (State (Dead (TermFor m))) (Effects m)
+         , MonadAnalysis m
+         , MonadEvaluator m
+         , Ord (TermFor m)
+         , Recursive (TermFor m)
+         , Semigroup (CellFor (ValueFor m))
          )
-         => MonadAnalysis (DeadCodeAnalysis term value) where
+         => MonadAnalysis (DeadCodeAnalysis m) where
   analyzeTerm term = do
     revive (embedSubterm term)
-    eval term
+    DeadCodeAnalysis (analyzeTerm (second runDeadCodeAnalysis <$> term))
 
-type instance TermFor (DeadCodeAnalysis term value) = term
-type instance ValueFor (DeadCodeAnalysis term value) = value
+type instance TermFor  (DeadCodeAnalysis m) = TermFor  m
+type instance ValueFor (DeadCodeAnalysis m) = ValueFor m
