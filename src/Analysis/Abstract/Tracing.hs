@@ -17,13 +17,13 @@ type Tracer trace term value = Writer (trace (Configuration (LocationFor value) 
 
 -- | The effects necessary for tracing analyses.
 type TracingEffects trace term value
-  = '[ Writer (trace (Configuration (LocationFor value) term value)) -- For 'trace'.
-     , Fail                                                          -- For 'MonadFail'.
-     , State (StoreFor value)                                        -- For 'MonadEvaluator'.
-     , Reader (EnvironmentFor value)                                 -- For 'MonadEvaluator'.
-     , State (EnvironmentFor value)                                  -- For 'MonadEvaluator'.
-     , Reader (Linker term)                                          -- For 'MonadEvaluator'.
-     , State (Linker value)                                          -- For 'MonadEvaluator'.
+  = '[ Tracer trace term value       -- For 'trace'.
+     , Fail                          -- For 'MonadFail'.
+     , State (StoreFor value)        -- For 'MonadEvaluator'.
+     , Reader (EnvironmentFor value) -- For 'MonadEvaluator'.
+     , State (EnvironmentFor value)  -- For 'MonadEvaluator'.
+     , Reader (Linker term)          -- For 'MonadEvaluator'.
+     , State (Linker value)          -- For 'MonadEvaluator'.
      ]
 
 -- | Trace analysis.
