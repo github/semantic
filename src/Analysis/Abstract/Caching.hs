@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Caching
   ( evaluateCache )
   where
@@ -11,28 +11,20 @@ import Control.Monad.Effect.NonDet
 import Data.Abstract.Address
 import Data.Abstract.Cache
 import Data.Abstract.Configuration
-import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
-import Data.Abstract.Linker
 import Data.Abstract.Live
 import Data.Abstract.Store
 import Data.Abstract.Value
 import qualified Data.Set as Set
 
 -- | The effects necessary for caching analyses.
-type CachingEffects t v
-  = '[ Fresh                                  -- For 'MonadFresh'.
-     , Reader (Live (LocationFor v) v)        -- For 'MonadGC'.
-     , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
-     , State (Environment (LocationFor v) v)  -- For 'MonadEvaluator'.
-     , Fail                                   -- For 'MonadFail'.
-     , NonDetEff                              -- For 'Alternative' & 'MonadNonDet'.
-     , State (Store (LocationFor v) v)        -- For 'MonadStore'.
-     , Reader (Cache (LocationFor v) t v)     -- For 'MonadCacheIn'.
-     , State (Cache (LocationFor v) t v)      -- For 'MonadCacheOut'.
-     , Reader (Linker t)                      -- Cache of unevaluated modules
-     , State (Linker v)                       -- Cache of evaluated modules
-     ]
+type CachingEffects term value
+  =  Fresh
+  ': NonDetEff
+  ': Reader (Live (LocationFor value) value)
+  ': Reader (Cache (LocationFor value) term value)
+  ': State (Cache (LocationFor value) term value)
+  ': EvaluatorEffects term value
 
 newtype CachingAnalysis term value a = CachingAnalysis { runCachingAnalysis :: Evaluator (CachingEffects term value) term value a }
   deriving (Alternative, Applicative, Functor, Monad, MonadFail, MonadFresh, MonadNonDet)
