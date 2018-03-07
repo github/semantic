@@ -20,6 +20,7 @@ type DeadCodeEffects t v
   = '[ State (Dead t)                  -- The set of dead terms
      , Fail                            -- Failure with an error message
      , State (Store (LocationFor v) v) -- The heap
+     , State (Set (Name, Name))                -- Set of exports
      , State (EnvironmentFor v)        -- Global (imperative) environment
      , Reader (EnvironmentFor v)       -- Local environment (e.g. binding over a closure)
      , Reader (Linker t)               -- Cache of unevaluated modules

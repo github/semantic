@@ -57,7 +57,9 @@ instance ( FreeVariables t
   integer = pure . inj . Integer
   boolean = pure . inj . Boolean
   string  = pure . inj . Value.String
-  interface v = inj . Value.Interface v <$> getGlobalEnv
+  interface v = inj . Value.Interface v <$> prunedEnv
+    where
+      prunedEnv = bindExports <$> getExports <*> getGlobalEnv
 
   ifthenelse cond if' else'
     | Just (Boolean b) <- prj cond = if b then if' else else'

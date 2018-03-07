@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, FunctionalDependencies, GeneralizedNewtypeDeriving, RankNTypes, StandaloneDeriving, UndecidableInstances #-}
 module Control.Abstract.Evaluator where
 
-import Control.Applicative
+import Prologue
 import Control.Monad.Effect
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
@@ -9,6 +9,8 @@ import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Linker
+import Data.Abstract.FreeVariables (Name)
+import Data.Set as Set
 import Data.Abstract.Value
 import Prelude hiding (fail)
 
@@ -25,6 +27,10 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   putGlobalEnv :: EnvironmentFor value -> m ()
   -- | Update the global environment.
   modifyGlobalEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m ()
+
+  -- | Scope the set of exported symbols to the global environment
+  addExport :: (Name, Name) -> m ()
+  getExports :: m (Set (Name, Name))
 
   -- | Retrieve the local environment.
   askLocalEnv :: m (EnvironmentFor value)
@@ -48,6 +54,7 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
 
 instance Members '[ Fail
                   , Reader (EnvironmentFor value)
+                  , State  (Set (Name, Name))
                   , State  (EnvironmentFor value)
                   , State  (StoreFor value)
                   , Reader (Linker term)
@@ -57,6 +64,9 @@ instance Members '[ Fail
   getGlobalEnv = Evaluator get
   putGlobalEnv = Evaluator . put
   modifyGlobalEnv f = Evaluator (modify f)
+
+  addExport = Evaluator . modify . Set.insert
+  getExports = Evaluator get
 
   askLocalEnv = Evaluator ask
   localEnv f a = Evaluator (local f (runEvaluator a))
