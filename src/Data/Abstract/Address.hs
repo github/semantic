@@ -36,9 +36,6 @@ newtype Latest a = Latest { unLatest :: a }
 instance Semigroup (Latest a) where
   _ <> a = a
 
-instance Pointed Latest where
-  point = Latest
-
 instance Reducer a (Latest a) where
   unit = Latest
   cons _ = id
