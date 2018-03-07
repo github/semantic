@@ -31,6 +31,7 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   -- | Scope the set of exported symbols to the global environment
   addExport :: (Name, Name) -> m ()
   getExports :: m (Set (Name, Name))
+  setExports :: Set (Name, Name) -> m ()
 
   -- | Retrieve the local environment.
   askLocalEnv :: m (EnvironmentFor value)
@@ -67,6 +68,7 @@ instance Members '[ Fail
 
   addExport = Evaluator . modify . Set.insert
   getExports = Evaluator get
+  setExports = Evaluator . put
 
   askLocalEnv = Evaluator ask
   localEnv f a = Evaluator (local f (runEvaluator a))

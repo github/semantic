@@ -137,7 +137,11 @@ instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Program where
-  eval (Program xs) = eval' xs
+  eval (Program xs) = do
+    set <- getExports
+    v <- eval' xs
+    setExports set
+    pure v
     where
       eval' [] = unit >>= interface
       eval' [x] = subtermValue x >>= interface
