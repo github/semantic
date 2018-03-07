@@ -14,7 +14,7 @@ import Rendering.TOC.Spec
 import Semantic
 import Semantic.Task
 import SpecHelpers
-import Test.Hspec (Spec, describe, it, parallel, pendingWith)
+import Test.Hspec (Spec, describe, it, xit, parallel, pendingWith)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
 import Test.LeanCheck
@@ -23,22 +23,22 @@ import Test.LeanCheck
 spec :: Spec
 spec = parallel $ do
   describe "renderToImports" $ do
-    it "works for Ruby" $ do
+    xit "works for Ruby" $ do
       output <- parseToImports rubyParser "test/fixtures/ruby/import-graph/app.rb"
       expected <- readFileVerbatim "test/fixtures/ruby/import-graph/app.json"
       toVerbatimOutput output `shouldBe` expected
 
-    it "works for Python" $ do
+    xit "works for Python" $ do
       output <- parseToImports pythonParser "test/fixtures/python/import-graph/main.py"
       expected <- readFileVerbatim "test/fixtures/python/import-graph/main.json"
       toVerbatimOutput output `shouldBe` expected
 
-    it "works for Go" $ do
+    xit "works for Go" $ do
       output <- parseToImports goParser "test/fixtures/go/import-graph/main.go"
       expected <- readFileVerbatim "test/fixtures/go/import-graph/main.json"
       toVerbatimOutput output `shouldBe` expected
 
-    it "works for TypeScript" $ do
+    xit "works for TypeScript" $ do
       output <- parseToImports typescriptParser "test/fixtures/typescript/import-graph/app.ts"
       expected <- readFileVerbatim "test/fixtures/typescript/import-graph/app.json"
       toVerbatimOutput output `shouldBe` expected
