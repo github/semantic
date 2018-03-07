@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, StandaloneDeriving, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, UndecidableInstances #-}
 module Data.Abstract.Cache where
 
 import Data.Abstract.Address
@@ -15,6 +15,7 @@ deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Ord (Cache l t v)
 deriving instance (Show l, Show t, Show v, Show (Cell l v)) => Show (Cache l t v)
 deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Semigroup (Cache l t v)
 deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Monoid (Cache l t v)
+deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Reducer (Configuration l t v, (v, Store l v)) (Cache l t v)
 
 -- | Look up the resulting value & 'Store' for a given 'Configuration'.
 cacheLookup :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> Cache l t v -> Maybe (Set (v, Store l v))
