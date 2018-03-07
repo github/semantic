@@ -1,26 +1,16 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Dead where
 
 import Control.Abstract.Addressable
 import Control.Abstract.Evaluator
 import Data.Abstract.Address
 import Data.Abstract.Evaluatable
-import Data.Abstract.Linker
-import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Set (delete)
 import Prologue
 
 -- | The effects necessary for dead code analysis.
-type DeadCodeEffects t v
-  = '[ State (Dead t)                  -- The set of dead terms
-     , Fail                            -- Failure with an error message
-     , State (Store (LocationFor v) v) -- The heap
-     , State (EnvironmentFor v)        -- Global (imperative) environment
-     , Reader (EnvironmentFor v)       -- Local environment (e.g. binding over a closure)
-     , Reader (Linker t)               -- Cache of unevaluated modules
-     , State (Linker v)                -- Cache of evaluated modules
-     ]
+type DeadCodeEffects term value = State (Dead term) ': EvaluatorEffects term value
 
 
 -- | Run a dead code analysis of the given program.
