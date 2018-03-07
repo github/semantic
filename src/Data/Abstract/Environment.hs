@@ -27,6 +27,11 @@ bindEnv :: (Ord l, Foldable t) => t Name -> Environment l a -> Environment l a
 bindEnv names env = Environment (Map.fromList pairs)
   where pairs = foldr (\name b -> maybe b (\v -> (name, v) : b) (envLookup name env)) mempty names
 
+bindExports :: (Ord l, Foldable t) => t (Name, Name) -> Environment l a -> Environment l a
+bindExports aliases env = Environment pairs
+  where
+    pairs = foldr (\(name, alias) b -> maybe b (\v -> Map.insert alias v b) (envLookup name env)) mempty aliases
+
 -- | Retrieve the 'Live' set of addresses to which the given free variable names are bound.
 --
 --   Unbound names are silently dropped.
