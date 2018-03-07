@@ -1,10 +1,11 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, StandaloneDeriving, UndecidableInstances #-}
 module Data.Abstract.Store where
 
-import Prologue
 import Data.Abstract.Address
 import Data.Abstract.Live
 import qualified Data.Map as Map
+import Data.Semigroup.Reducer
+import Prologue
 
 -- | A map of addresses onto cells holding their values.
 newtype Store l a = Store { unStore :: Map.Map l (Cell l a) }
@@ -29,8 +30,8 @@ storeLookupAll :: (Ord l, Foldable (Cell l)) => Address l a -> Store l a -> Mayb
 storeLookupAll address = fmap toList . storeLookup address
 
 -- | Append a value onto the cell for a given address, inserting a new cell if none existed.
-storeInsert :: (Ord l, Semigroup (Cell l a), Pointed (Cell l)) => Address l a -> a -> Store l a -> Store l a
-storeInsert (Address address) value = Store . Map.insertWith (<>) address (point value) . unStore
+storeInsert :: (Ord l, Reducer a (Cell l a)) => Address l a -> a -> Store l a -> Store l a
+storeInsert (Address address) value = Store . Map.insertWith (<>) address (unit value) . unStore
 
 -- | The number of addresses extant in a 'Store'.
 storeSize :: Store l a -> Int

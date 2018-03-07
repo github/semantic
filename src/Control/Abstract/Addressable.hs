@@ -11,12 +11,12 @@ import Data.Abstract.FreeVariables
 import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Foldable (asum, toList)
-import Data.Pointed
 import Data.Semigroup
+import Data.Semigroup.Reducer
 import Prelude hiding (fail)
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Store.
-class (Monad m, Ord l, Pointed (Cell l), l ~ LocationFor a) => MonadAddressable l a m | m -> a where
+class (Monad m, Ord l, l ~ LocationFor a, Reducer a (Cell l a)) => MonadAddressable l a m | m -> a where
   deref :: Address l a
         -> m a
 
@@ -55,8 +55,7 @@ lookupOrAlloc term = let [name] = toList (freeVariables term) in
 -- | Write a value to the given 'Address' in the 'Store'.
 assign :: ( Ord (LocationFor a)
           , MonadEvaluator t a m
-          , Pointed (Cell (LocationFor a))
-          , Semigroup (CellFor a)
+          , Reducer a (CellFor a)
           )
           => Address (LocationFor a) a
           -> a
@@ -78,7 +77,7 @@ instance (Monad m, MonadEvaluator t v m, LocationFor v ~ Precise) => MonadAddres
 
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
-instance (Alternative m, LocationFor v ~ Monovariant, Monad m, MonadEvaluator t v m) => MonadAddressable Monovariant v m where
+instance (Alternative m, Ord v, LocationFor v ~ Monovariant, Monad m, MonadEvaluator t v m) => MonadAddressable Monovariant v m where
   deref = asum . maybe [] (map pure . toList) <=< flip fmap getStore . storeLookup
 
   alloc = pure . Address . Monovariant
