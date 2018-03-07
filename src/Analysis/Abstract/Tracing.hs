@@ -6,6 +6,7 @@ import Control.Abstract.Evaluator
 import Control.Monad.Effect.Writer
 import Data.Abstract.Configuration
 import Data.Semigroup.Reducer as Reducer
+import Data.Abstract.Value
 import Prologue
 
 type Trace trace term value = trace (ConfigurationFor term value)
@@ -27,6 +28,7 @@ instance ( Corecursive (TermFor m)
          , Member (TracerFor trace m) (Effects m)
          , MonadAnalysis m
          , MonadEvaluator m
+         , Ord (LocationFor (ValueFor m))
          , Recursive (TermFor m)
          , Reducer (ConfigurationFor (TermFor m) (ValueFor m)) (TraceFor trace m)
          )

@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DefaultSignatures, GeneralizedNewtypeDeriving, RankNTypes, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE ConstrainedClassMethods, DataKinds, DefaultSignatures, GeneralizedNewtypeDeriving, RankNTypes, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
 module Control.Abstract.Evaluator where
 
 import Control.Abstract.Analysis
@@ -18,7 +18,7 @@ import Prelude hiding (fail)
 --   - environments binding names to addresses
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
-class (MonadFail m, Ord (LocationFor (ValueFor m))) => MonadEvaluator m where
+class MonadFail m => MonadEvaluator m where
   -- | Retrieve the global environment.
   getGlobalEnv :: m (EnvironmentFor (ValueFor m))
   -- | Update the global environment.
@@ -45,11 +45,11 @@ class (MonadFail m, Ord (LocationFor (ValueFor m))) => MonadEvaluator m where
   localModuleTable :: (Linker (TermFor m) -> Linker (TermFor m)) -> m a -> m a
 
   -- | Retrieve the current root set.
-  askRoots :: m (Live (LocationFor (ValueFor m)) (ValueFor m))
+  askRoots :: Ord (LocationFor (ValueFor m)) => m (Live (LocationFor (ValueFor m)) (ValueFor m))
   askRoots = pure mempty
 
   -- | Get the current 'Configuration' with a passed-in term.
-  getConfiguration :: term -> m (Configuration (LocationFor (ValueFor m)) term (ValueFor m))
+  getConfiguration :: Ord (LocationFor (ValueFor m)) => term -> m (Configuration (LocationFor (ValueFor m)) term (ValueFor m))
   getConfiguration term = Configuration term <$> askRoots <*> askLocalEnv <*> getStore
 
 type EvaluatorEffects term value
