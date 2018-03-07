@@ -31,8 +31,6 @@ evaluateDead :: forall term value
 evaluateDead term = run @(DeadCodeEffects term value) . runEvaluator . runDeadCodeAnalysis $ do
   killAll (subterms term)
   evaluateTerm term
-  where subterms :: (Ord a, Recursive a, Foldable (Base a)) => a -> Dead a
-        subterms term = term `cons` para (foldMap (uncurry cons)) term
 
 
 -- | A newtype wrapping 'Evaluator' which performs a dead code analysis on evaluation.
@@ -56,6 +54,9 @@ killAll = DeadCodeAnalysis . Evaluator . put
 revive :: Ord t => t -> DeadCodeAnalysis t v ()
 revive t = DeadCodeAnalysis (Evaluator (modify (Dead . delete t . unDead)))
 
+-- | Compute the set of all subterms recursively.
+subterms :: (Ord term, Recursive term, Foldable (Base term)) => term -> Dead term
+subterms term = term `cons` para (foldMap (uncurry cons)) term
 
 instance ( Corecursive t
          , Evaluatable (Base t)
