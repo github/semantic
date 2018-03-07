@@ -1,8 +1,13 @@
 {-# LANGUAGE DefaultSignatures, FunctionalDependencies #-}
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
+, module X
 ) where
 
+import Control.Effect as X
+import Control.Monad.Effect.Fail as X
+import Control.Monad.Effect.Reader as X
+import Control.Monad.Effect.State as X
 import Prologue
 
 -- | A 'Monad' in which one can evaluate some specific term type to some specific value type.
