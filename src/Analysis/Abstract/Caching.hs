@@ -12,7 +12,6 @@ import Data.Abstract.Address
 import Data.Abstract.Cache
 import Data.Abstract.Configuration
 import Data.Abstract.Evaluatable
-import Data.Abstract.Live
 import Data.Abstract.Store
 import Data.Abstract.Value
 import qualified Data.Set as Set
@@ -21,7 +20,6 @@ import qualified Data.Set as Set
 type CachingEffects term value
   =  Fresh                                         -- For 'MonadFresh'. TODO: Extract typing constraints into a separate analysis.
   ': NonDetEff                                     -- For 'Alternative' & 'MonadNonDet'.
-  ': Reader (Live (LocationFor value) value)       -- For 'MonadGC'. TODO: Extract GC stuff into a separate analysis.
   ': Reader (Cache (LocationFor value) term value) -- For the in-cache.
   ': State (Cache (LocationFor value) term value)  -- For the out-cache
   ': EvaluatorEffects term value
