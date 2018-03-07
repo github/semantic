@@ -1,14 +1,10 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Tracing where
 
-import Control.Abstract.Addressable
 import Control.Abstract.Analysis
 import Control.Abstract.Evaluator
-import Control.Abstract.Value
 import Control.Monad.Effect.Writer
 import Data.Abstract.Configuration
-import Data.Abstract.Evaluatable
-import Data.Abstract.Value
 import Data.Semigroup.Reducer as Reducer
 import Prologue
 
@@ -27,15 +23,12 @@ newtype TracingAnalysis (trace :: * -> *) m a
   deriving (Applicative, Functor, LiftEffect, Monad, MonadEvaluator, MonadFail)
 
 instance ( Corecursive (TermFor m)
-         , FreeVariables (TermFor m)
          , LiftEffect m
          , Member (TracerFor trace m) (Effects m)
-         , MonadAddressable (LocationFor (ValueFor m)) (TracingAnalysis trace m)
          , MonadAnalysis m
-         , MonadValue (ValueFor m) (TracingAnalysis trace m)
+         , MonadEvaluator m
          , Recursive (TermFor m)
          , Reducer (ConfigurationFor (TermFor m) (ValueFor m)) (TraceFor trace m)
-         , Semigroup (CellFor (ValueFor m))
          )
          => MonadAnalysis (TracingAnalysis trace m) where
   analyzeTerm term = getConfiguration (embedSubterm term) >>= trace . Reducer.unit >> TracingAnalysis (analyzeTerm (second runTracingAnalysis <$> term))
