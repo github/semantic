@@ -46,7 +46,8 @@ evaluateTrace :: forall trace value term
 evaluateTrace = run @(TracingEffects trace term value) . runEvaluator . runTracingAnalysis . evaluateTerm
 
 
-newtype TracingAnalysis trace term value a = TracingAnalysis { runTracingAnalysis :: Evaluator (TracingEffects trace term value) term value a }
+newtype TracingAnalysis trace term value a
+  = TracingAnalysis { runTracingAnalysis :: Evaluator (TracingEffects trace term value) term value a }
   deriving (Applicative, Functor, Monad, MonadFail)
 
 deriving instance MonadEvaluator term value (TracingAnalysis trace term value)
