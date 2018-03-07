@@ -8,9 +8,10 @@ import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
+import Data.Abstract.Address
 import Data.Abstract.Linker
 import Data.Abstract.FreeVariables (Name)
-import Data.Set as Set
+import Data.Map as Map
 import Data.Abstract.Value
 import Prelude hiding (fail)
 
@@ -29,9 +30,9 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   modifyGlobalEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m ()
 
   -- | Scope the set of exported symbols to the global environment
-  addExport :: (Name, Name) -> m ()
-  getExports :: m (Set (Name, Name))
-  setExports :: Set (Name, Name) -> m ()
+  addExport :: Name -> (Name, Maybe (Address (LocationFor value) value)) -> m ()
+  getExports :: m (Map Name (Name, Maybe (Address (LocationFor value) value)))
+  setExports :: Map Name (Name, Maybe (Address (LocationFor value) value)) -> m ()
 
   -- | Retrieve the local environment.
   askLocalEnv :: m (EnvironmentFor value)
@@ -55,7 +56,7 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
 
 instance Members '[ Fail
                   , Reader (EnvironmentFor value)
-                  , State  (Set (Name, Name))
+                  , State  (Map Name (Name, Maybe (Address (LocationFor value) value)))
                   , State  (EnvironmentFor value)
                   , State  (StoreFor value)
                   , Reader (Linker term)
@@ -66,7 +67,7 @@ instance Members '[ Fail
   putGlobalEnv = Evaluator . put
   modifyGlobalEnv f = Evaluator (modify f)
 
-  addExport = Evaluator . modify . Set.insert
+  addExport key = Evaluator . modify . Map.insert key
   getExports = Evaluator get
   setExports = Evaluator . put
 

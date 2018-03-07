@@ -25,7 +25,7 @@ type EvaluationEffects t v
   = '[ Fail                              -- Failure with an error message
      , State (Store (LocationFor v) v)   -- The heap
      , State (EnvironmentFor v)          -- Global (imperative) environment
-     , State (Set (Name, Name))                -- Set of exports
+     , State (Map Name (Name, Maybe (Address (LocationFor v) v)))                -- Set of exports
      , Reader (EnvironmentFor v)         -- Local environment (e.g. binding over a closure)
      , Reader (Linker t)                 -- Cache of unevaluated modules
      , State (Linker (EnvironmentFor v)) -- Cache of evaluated modules
