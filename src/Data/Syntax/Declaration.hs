@@ -240,6 +240,9 @@ instance Ord1 QualifiedExport where liftCompare = genericLiftCompare
 instance Show1 QualifiedExport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedExport where
+  eval (QualifiedExport from exportSymbols) = do
+      traverse_ addExport exportSymbols
+      unit
 
 -- | Import declarations (symbols are added directly to calling environment).
 --
