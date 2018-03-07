@@ -7,6 +7,7 @@ import Analysis.Abstract.Caching
 import Analysis.Abstract.Evaluating
 import Analysis.Abstract.Tracing
 import Analysis.Declaration
+import Control.Abstract.Analysis
 import Control.Monad.IO.Class
 import Data.Abstract.Address
 import Data.Abstract.Type
@@ -47,7 +48,7 @@ evaluateRubyFiles paths = do
 typecheckPythonFile path = evaluateCache @Type <$>
   (file path >>= runTask . parse pythonParser)
 
-tracePythonFile path = evaluateTrace @[] @PythonValue <$> (file path >>= runTask . parse pythonParser)
+tracePythonFile path = run . lower @(TracingAnalysis [] (Evaluation Python.Term PythonValue (TracingEffects [] Python.Term PythonValue))) . evaluateTerm <$> (file path >>= runTask . parse pythonParser)
 
 evaluatePythonFile path = evaluate @PythonValue <$>
   (file path >>= runTask . parse pythonParser)
