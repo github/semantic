@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Tracing where
 
 import Control.Abstract.Addressable
@@ -31,32 +31,34 @@ evaluateTrace :: forall trace value term
                 , Ord value
                 , Pointed trace
                 , Recursive term
-                , MonadAddressable (LocationFor value) value (TracingAnalysis trace term value)
-                , MonadValue term value (TracingAnalysis trace term value)
+                , MonadAddressable (LocationFor value) value (TracingAnalysis trace term value (TracingEffects trace term value))
+                , MonadValue term value (TracingAnalysis trace term value (TracingEffects trace term value))
                 , Semigroup (Cell (LocationFor value) value)
                 )
               => term
               -> Final (TracingEffects trace term value) value
-evaluateTrace = run @(TracingEffects trace term value) . runEvaluator . runTracingAnalysis . evaluateTerm
+evaluateTrace = run @(TracingEffects trace term value) . runEvaluator . runTracingAnalysis @trace . evaluateTerm
 
 
-newtype TracingAnalysis trace term value a
-  = TracingAnalysis { runTracingAnalysis :: Evaluator term value (TracingEffects trace term value) a }
-  deriving (Applicative, Functor, Monad, MonadFail)
+newtype TracingAnalysis (trace :: * -> *) term value effects a
+  = TracingAnalysis { runTracingAnalysis :: Evaluator term value effects a }
+  deriving (Applicative, Functor, Monad)
 
-deriving instance MonadEvaluator term value (TracingAnalysis trace term value)
+deriving instance Member Fail effects                           => MonadFail (TracingAnalysis trace term value effects)
+deriving instance Members (EvaluatorEffects term value) effects => MonadEvaluator term value (TracingAnalysis trace term value effects)
 
 instance ( Corecursive term
          , Evaluatable (Base term)
          , FreeVariables term
-         , MonadAddressable (LocationFor value) value (TracingAnalysis trace term value)
-         , MonadValue term value (TracingAnalysis trace term value)
+         , Member (Tracer trace term value) effects
+         , MonadAddressable (LocationFor value) value (TracingAnalysis trace term value effects)
+         , MonadValue term value (TracingAnalysis trace term value effects)
          , Pointed trace
          , Recursive term
          , Semigroup (Cell (LocationFor value) value)
          )
-         => MonadAnalysis term value (TracingAnalysis trace term value) where
+         => MonadAnalysis term value (TracingAnalysis trace term value effects) where
   analyzeTerm term = getConfiguration (embedSubterm term) >>= trace . point >> eval term
 
-trace :: trace (Configuration (LocationFor value) term value) -> TracingAnalysis trace term value ()
+trace :: Member (Tracer trace term value) effects => trace (Configuration (LocationFor value) term value) -> TracingAnalysis trace term value effects ()
 trace w = TracingAnalysis (Evaluator (tell w))
