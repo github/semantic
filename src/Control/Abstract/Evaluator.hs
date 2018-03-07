@@ -54,14 +54,16 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   getConfiguration :: Ord (LocationFor value) => term -> m (Configuration (LocationFor value) term value)
   getConfiguration term = Configuration term <$> askRoots <*> askLocalEnv <*> getStore
 
-instance Members '[ Fail
-                  , Reader (EnvironmentFor value)
-                  , State  (EnvironmentFor value)
-                  , State  (StoreFor value)
-                  , Reader (Linker term)
-                  , State  (Linker value)
-                  ] effects
-         => MonadEvaluator term value (Evaluator effects term value) where
+type EvaluatorEffects term value
+  = '[ Fail
+     , Reader (EnvironmentFor value)
+     , State  (EnvironmentFor value)
+     , State  (StoreFor value)
+     , Reader (Linker term)
+     , State  (Linker value)
+     ]
+
+instance Members (EvaluatorEffects term value) effects => MonadEvaluator term value (Evaluator effects term value) where
   getGlobalEnv = Evaluator get
   modifyGlobalEnv f = Evaluator (modify f)
 
