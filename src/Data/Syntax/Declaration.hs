@@ -246,7 +246,7 @@ instance Evaluatable QualifiedExport where
 
 -- | Import declarations (symbols are added directly to calling environment).
 --
--- If symbols is empty, just import the module for it's side effects.
+-- If symbols is empty, just import the module for its side effects.
 data Import a = Import { importFrom :: !a, importSymbols :: ![(Name, Name)] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
