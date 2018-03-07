@@ -59,12 +59,13 @@ instance Eq1 Data.Syntax.Literal.Float where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Float where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsPrec
 
--- | Ensures that numbers of the form '.52' are parsed correctly. You usually want this.
+-- | Ensures that numbers of the form '.52' are parsed correctly. Most languages need this.
 padWithLeadingZero :: ByteString -> ByteString
 padWithLeadingZero b
   | fmap fst (B.uncons b) == Just '.' = B.cons '0' b
   | otherwise                         = b
 
+-- | As @padWithLeadingZero@, but on the end. Not all languages need this.
 padWithTrailingZero :: ByteString -> ByteString
 padWithTrailingZero b
   | fmap snd (B.unsnoc b) == Just '.' = B.snoc b '0'
@@ -79,6 +80,11 @@ removeUnderscores = B.filter (/= '_')
 dropAlphaSuffix :: ByteString -> ByteString
 dropAlphaSuffix = B.takeWhile (\x -> x `notElem` ("lLjJiI" :: [Char]))
 
+-- | This is the shared function that processes a bytestring representation of a float
+--   into a Float-wrapped @Scientific@. It takes as its arguments a list of functions, which
+--   will be some combination of the above 'ByteString -> ByteString' functions. This is meant
+--   to be called from an @Assignment@, hence the @MonadFail@ constraint. Caveat: the list is
+--   order-dependent; the rightmost function will be applied first.
 buildFloat :: MonadFail m => [ByteString -> ByteString] -> ByteString -> m (Float a)
 buildFloat preds val =
   let munger = appEndo (foldMap Endo preds)
