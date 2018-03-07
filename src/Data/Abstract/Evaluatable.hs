@@ -18,7 +18,7 @@ import Control.Monad.Effect.Fail
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables as FreeVariables
-import Data.Abstract.Linker
+import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Algebra
 import Data.Functor.Classes
@@ -83,7 +83,7 @@ require :: ( MonadAnalysis term v m
            )
         => ModuleName
         -> m (EnvironmentFor v)
-require name = getModuleTable >>= maybe (load name) pure . linkerLookup name
+require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup name
 
 -- | Load another term/file and return an Effect.
 --
@@ -94,10 +94,10 @@ load :: ( MonadAnalysis term v m
         )
      => ModuleName
      -> m (EnvironmentFor v)
-load name = askModuleTable >>= maybe notFound evalAndCache . linkerLookup name
+load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
   where notFound = fail ("cannot find " <> show name)
         evalAndCache e = do
           v <- evaluateTerm e
           env <- environment v
-          modifyModuleTable (linkerInsert name env)
+          modifyModuleTable (moduleTableInsert name env)
           pure env

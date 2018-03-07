@@ -8,7 +8,7 @@ import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Address
 import Data.Abstract.Evaluatable
-import Data.Abstract.Linker
+import Data.Abstract.ModuleTable
 import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Blob
@@ -22,12 +22,12 @@ import System.FilePath.Posix
 
 -- | The effects necessary for concrete interpretation.
 type EvaluationEffects t v
-  = '[ Fail                              -- Failure with an error message
-     , State (Store (LocationFor v) v)   -- The heap
-     , State (EnvironmentFor v)          -- Global (imperative) environment
-     , Reader (EnvironmentFor v)         -- Local environment (e.g. binding over a closure)
-     , Reader (Linker t)                 -- Cache of unevaluated modules
-     , State (Linker (EnvironmentFor v)) -- Cache of evaluated modules
+  = '[ Fail                                   -- Failure with an error message
+     , State (Store (LocationFor v) v)        -- The heap
+     , State (EnvironmentFor v)               -- Global (imperative) environment
+     , Reader (EnvironmentFor v)              -- Local environment (e.g. binding over a closure)
+     , Reader (ModuleTable t)                 -- Cache of unevaluated modules
+     , State (ModuleTable (EnvironmentFor v)) -- Cache of evaluated modules
      ]
 
 -- | Evaluate a term to a value.
@@ -63,7 +63,7 @@ evaluates pairs (b, t) = run @(EvaluationEffects term v) (runEvaluator (runEvalu
 withModules :: (MonadAnalysis term value m, MonadEvaluator term value m) => Blob -> [(Blob, term)] -> m a -> m a
 withModules Blob{..} pairs = localModuleTable (const moduleTable)
   where
-    moduleTable = Linker (Map.fromList (map (first moduleName) pairs))
+    moduleTable = ModuleTable (Map.fromList (map (first moduleName) pairs))
     rootDir = dropFileName blobPath
     replacePathSeps str = intercalate "." (splitWhen (== pathSeparator) str)
     moduleName Blob{..} = BC.pack $ replacePathSeps (dropExtensions (makeRelative rootDir blobPath))
