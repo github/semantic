@@ -41,6 +41,8 @@ instance Pointed Latest where
 
 instance Reducer a (Latest a) where
   unit = Latest
+  cons _ = id
+  snoc _ = unit
 
 instance Eq1 Latest where liftEq = genericLiftEq
 instance Ord1 Latest where liftCompare = genericLiftCompare
