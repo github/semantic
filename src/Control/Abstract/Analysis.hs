@@ -1,5 +1,7 @@
 {-# LANGUAGE DefaultSignatures, FunctionalDependencies #-}
-module Control.Abstract.Analysis where
+module Control.Abstract.Analysis
+( MonadAnalysis(..)
+) where
 
 import Prologue
 
