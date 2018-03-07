@@ -13,9 +13,10 @@ import Data.Abstract.Value
 import Data.Semigroup.Reducer as Reducer
 import Prologue
 
--- | The effects necessary for tracing analyses.
 type Trace trace term value = trace (ConfigurationFor term value)
-type TracingEffects trace term value = Writer (Trace trace term value) ': EvaluatorEffects term value
+type Tracer trace term value = Writer (Trace trace term value)
+-- | The effects necessary for tracing analyses.
+type TracingEffects trace term value = Tracer trace term value ': EvaluatorEffects term value
 
 -- | Trace analysis.
 --
@@ -50,7 +51,7 @@ instance ( Corecursive term
          , Evaluatable (Base term)
          , FreeVariables term
          , LiftEffect underlying
-         , Member (Writer (Trace trace term value)) effects
+         , Member (Tracer trace term value) effects
          , MonadAddressable (LocationFor value) (TracingAnalysis trace underlying term value effects)
          , MonadAnalysis (underlying effects)
          , AnalysisTerm (underlying effects) ~ term
@@ -66,7 +67,7 @@ instance ( Corecursive term
 type instance AnalysisTerm (TracingAnalysis trace underlying term value effects) = term
 type instance AnalysisValue (TracingAnalysis trace underlying term value effects) = value
 
-trace :: (LiftEffect underlying, Member (Writer (Trace trace term value)) effects)
+trace :: (LiftEffect underlying, Member (Tracer trace term value) effects)
       => Trace trace term value
       -> TracingAnalysis trace underlying term value effects ()
 trace w = lift (tell w)
