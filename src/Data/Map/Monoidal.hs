@@ -2,10 +2,11 @@
 -- | This module defines a 'Map' type whose 'Monoid' and 'Reducer' instances merge values using the 'Semigroup' instance for the underlying type.
 module Data.Map.Monoidal
 ( Map
+, module Reducer
 ) where
 
 import qualified Data.Map as Map
-import Data.Semigroup.Reducer
+import Data.Semigroup.Reducer as Reducer
 import Prologue hiding (Map)
 
 newtype Map key value = Map (Map.Map key value)
