@@ -15,8 +15,8 @@ import System.FilePath.Posix
 evaluate :: forall value term
          .  ( Evaluatable (Base term)
             , FreeVariables term
-            , MonadAddressable (LocationFor value) value (Evaluation term value)
-            , MonadValue term value (Evaluation term value)
+            , MonadAddressable (LocationFor value) (Evaluation term value)
+            , MonadValue value (Evaluation term value)
             , Ord (LocationFor value)
             , Recursive term
             , Semigroup (CellFor value)
@@ -29,8 +29,8 @@ evaluate = run @(EvaluatorEffects term value) . runEvaluator . runEvaluation . e
 evaluates :: forall value term
           .  ( Evaluatable (Base term)
              , FreeVariables term
-             , MonadAddressable (LocationFor value) value (Evaluation term value)
-             , MonadValue term value (Evaluation term value)
+             , MonadAddressable (LocationFor value) (Evaluation term value)
+             , MonadValue value (Evaluation term value)
              , Ord (LocationFor value)
              , Recursive term
              , Semigroup (CellFor value)
@@ -41,7 +41,7 @@ evaluates :: forall value term
 evaluates pairs (_, t) = run @(EvaluatorEffects term value) (runEvaluator (runEvaluation (withModules pairs (evaluateTerm t))))
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
-withModules :: (MonadAnalysis term value m, MonadEvaluator term value m) => [(Blob, term)] -> m a -> m a
+withModules :: (MonadAnalysis m, MonadEvaluator m) => [(Blob, AnalysisTerm m)] -> m a -> m a
 withModules pairs = localModuleTable (const moduleTable)
   where moduleTable = Linker (Map.fromList (map (first (dropExtensions . blobPath)) pairs))
 
@@ -49,14 +49,17 @@ withModules pairs = localModuleTable (const moduleTable)
 newtype Evaluation term value a = Evaluation { runEvaluation :: Evaluator term value (EvaluatorEffects term value) a }
   deriving (Applicative, Functor, Monad, MonadFail)
 
-deriving instance MonadEvaluator term value (Evaluation term value)
+deriving instance Ord (LocationFor value) => MonadEvaluator (Evaluation term value)
 
 instance ( Evaluatable (Base term)
          , FreeVariables term
-         , MonadAddressable (LocationFor value) value (Evaluation term value)
-         , MonadValue term value (Evaluation term value)
+         , MonadAddressable (LocationFor value) (Evaluation term value)
+         , MonadValue value (Evaluation term value)
          , Recursive term
          , Semigroup (CellFor value)
          )
-         => MonadAnalysis term value (Evaluation term value) where
+         => MonadAnalysis (Evaluation term value) where
   analyzeTerm = eval
+
+type instance AnalysisTerm (Evaluation term value) = term
+type instance AnalysisValue (Evaluation term value) = value

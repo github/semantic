@@ -1,14 +1,11 @@
-{-# LANGUAGE DataKinds, DefaultSignatures, FunctionalDependencies, GeneralizedNewtypeDeriving, RankNTypes, StandaloneDeriving, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, DefaultSignatures, GeneralizedNewtypeDeriving, RankNTypes, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
 module Control.Abstract.Evaluator where
 
+import Control.Abstract.Analysis
 import Control.Applicative
-import Control.Effect
 import Control.Monad.Effect
-import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDet
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.State
 import Data.Abstract.Configuration
 import Data.Abstract.Linker
 import Data.Abstract.Live
@@ -21,38 +18,38 @@ import Prelude hiding (fail)
 --   - environments binding names to addresses
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
-class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
+class (MonadFail m, Ord (LocationFor (AnalysisValue m))) => MonadEvaluator m where
   -- | Retrieve the global environment.
-  getGlobalEnv :: m (EnvironmentFor value)
+  getGlobalEnv :: m (EnvironmentFor (AnalysisValue m))
   -- | Update the global environment.
-  modifyGlobalEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m ()
+  modifyGlobalEnv :: (EnvironmentFor (AnalysisValue m) -> EnvironmentFor (AnalysisValue m)) -> m ()
 
   -- | Retrieve the local environment.
-  askLocalEnv :: m (EnvironmentFor value)
+  askLocalEnv :: m (EnvironmentFor (AnalysisValue m))
   -- | Run an action with a locally-modified environment.
-  localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m a -> m a
+  localEnv :: (EnvironmentFor (AnalysisValue m) -> EnvironmentFor (AnalysisValue m)) -> m a -> m a
 
   -- | Retrieve the heap.
-  getStore :: m (StoreFor value)
+  getStore :: m (StoreFor (AnalysisValue m))
   -- | Update the heap.
-  modifyStore :: (StoreFor value -> StoreFor value) -> m ()
+  modifyStore :: (StoreFor (AnalysisValue m) -> StoreFor (AnalysisValue m)) -> m ()
 
   -- | Retrieve the table of evaluated modules.
-  getModuleTable :: m (Linker value)
+  getModuleTable :: m (Linker (AnalysisValue m))
   -- | Update the table of evaluated modules.
-  modifyModuleTable :: (Linker value -> Linker value) -> m ()
+  modifyModuleTable :: (Linker (AnalysisValue m) -> Linker (AnalysisValue m)) -> m ()
 
   -- | Retrieve the table of unevaluated modules.
-  askModuleTable :: m (Linker term)
+  askModuleTable :: m (Linker (AnalysisTerm m))
   -- | Run an action with a locally-modified table of unevaluated modules.
-  localModuleTable :: (Linker term -> Linker term) -> m a -> m a
+  localModuleTable :: (Linker (AnalysisTerm m) -> Linker (AnalysisTerm m)) -> m a -> m a
 
   -- | Retrieve the current root set.
-  askRoots :: Ord (LocationFor value) => m (Live (LocationFor value) value)
+  askRoots :: m (Live (LocationFor (AnalysisValue m)) (AnalysisValue m))
   askRoots = pure mempty
 
   -- | Get the current 'Configuration' with a passed-in term.
-  getConfiguration :: Ord (LocationFor value) => term -> m (Configuration (LocationFor value) term value)
+  getConfiguration :: term -> m (Configuration (LocationFor (AnalysisValue m)) term (AnalysisValue m))
   getConfiguration term = Configuration term <$> askRoots <*> askLocalEnv <*> getStore
 
 type EvaluatorEffects term value
@@ -64,7 +61,9 @@ type EvaluatorEffects term value
      , State  (Linker value)         -- Cache of evaluated modules
      ]
 
-instance Members (EvaluatorEffects term value) effects => MonadEvaluator term value (Evaluator term value effects) where
+type instance AnalysisTerm (Evaluator term value effects) = term
+type instance AnalysisValue (Evaluator term value effects) = value
+instance (Ord (LocationFor value), Members (EvaluatorEffects term value) effects) => MonadEvaluator (Evaluator term value effects) where
   getGlobalEnv = Evaluator get
   modifyGlobalEnv f = Evaluator (modify f)
 
@@ -80,7 +79,7 @@ instance Members (EvaluatorEffects term value) effects => MonadEvaluator term va
   askModuleTable = Evaluator ask
   localModuleTable f a = Evaluator (local f (runEvaluator a))
 
-putStore :: MonadEvaluator t value m => StoreFor value -> m ()
+putStore :: MonadEvaluator m => StoreFor (AnalysisValue m) -> m ()
 putStore = modifyStore . const
 
 -- | An evaluator of @term@s to @value@s, producing incremental results of type @a@ using a list of @effects@.

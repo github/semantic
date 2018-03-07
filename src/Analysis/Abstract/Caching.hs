@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Caching
   ( evaluateCache )
   where
@@ -29,7 +29,7 @@ type CacheFor term value = Cache (LocationFor value) term value
 newtype CachingAnalysis term value a = CachingAnalysis { runCachingAnalysis :: Evaluator term value (CachingEffects term value) a }
   deriving (Alternative, Applicative, Functor, Monad, MonadFail, MonadFresh, MonadNonDet)
 
-deriving instance MonadEvaluator term value (CachingAnalysis term value)
+deriving instance Ord (LocationFor value) => MonadEvaluator (CachingAnalysis term value)
 
 -- TODO: reabstract these later on
 
@@ -62,12 +62,12 @@ instance ( Corecursive t
          , Evaluatable (Base t)
          , Foldable (Cell (LocationFor v))
          , FreeVariables t
-         , MonadAddressable (LocationFor v) v (CachingAnalysis t v)
-         , MonadValue t v (CachingAnalysis t v)
+         , MonadAddressable (LocationFor v) (CachingAnalysis t v)
+         , MonadValue v (CachingAnalysis t v)
          , Recursive t
          , Semigroup (CellFor v)
          )
-         => MonadAnalysis t v (CachingAnalysis t v) where
+         => MonadAnalysis (CachingAnalysis t v) where
   analyzeTerm e = do
     c <- getConfiguration (embedSubterm e)
     -- Convergence here is predicated upon an Eq instance, not α-equivalence
@@ -85,6 +85,9 @@ instance ( Corecursive t
       getCache) mempty
     maybe empty scatter (cacheLookup c cache)
 
+type instance AnalysisTerm (CachingAnalysis term value) = term
+type instance AnalysisValue (CachingAnalysis term value) = value
+
 
 -- | Coinductively-cached evaluation.
 evaluateCache :: forall v term
@@ -98,8 +101,8 @@ evaluateCache :: forall v term
                 , Foldable (Cell (LocationFor v))
                 , Functor (Base term)
                 , Recursive term
-                , MonadAddressable (LocationFor v) v (CachingAnalysis term v)
-                , MonadValue term v (CachingAnalysis term v)
+                , MonadAddressable (LocationFor v) (CachingAnalysis term v)
+                , MonadValue v (CachingAnalysis term v)
                 , Semigroup (CellFor v)
                 , ValueRoots (LocationFor v) v
                 )
@@ -123,7 +126,7 @@ converge f = loop
             loop x'
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Alternative m, Foldable t, MonadEvaluator term v m) => t (a, Store (LocationFor v) v) -> m a
+scatter :: (Alternative m, Foldable t, MonadEvaluator m) => t (a, Store (LocationFor (AnalysisValue m)) (AnalysisValue m)) -> m a
 scatter = getAlt . foldMap (\ (value, store') -> Alt (putStore store' *> pure value))
 
 -- | Evaluation of a single iteration of an analysis, given an in-cache as an oracle for results and an out-cache to record computed results in.
@@ -138,8 +141,8 @@ memoizeEval :: forall v term
               , Foldable (Cell (LocationFor v))
               , Functor (Base term)
               , Recursive term
-              , MonadAddressable (LocationFor v) v (CachingAnalysis term v)
-              , MonadValue term v (CachingAnalysis term v)
+              , MonadAddressable (LocationFor v) (CachingAnalysis term v)
+              , MonadValue v (CachingAnalysis term v)
               , Semigroup (CellFor v)
               )
             => SubtermAlgebra (Base term) term (CachingAnalysis term v v)

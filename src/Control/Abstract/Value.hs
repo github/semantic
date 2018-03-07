@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, UndecidableInstances #-}
+{-# LANGUAGE MultiParamTypeClasses, TypeFamilies, UndecidableInstances #-}
 module Control.Abstract.Value where
 
 import Control.Abstract.Addressable
@@ -16,7 +16,7 @@ import Prelude hiding (fail)
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class (MonadEvaluator t v m) => MonadValue t v m where
+class (MonadEvaluator m, v ~ AnalysisValue m) => MonadValue v m where
   -- | Construct an abstract unit value.
   unit :: m v
 
@@ -33,19 +33,21 @@ class (MonadEvaluator t v m) => MonadValue t v m where
   ifthenelse :: v -> m v -> m v -> m v
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
-  abstract :: [Name] -> Subterm t (m v) -> m v
+  abstract :: [Name] -> Subterm (AnalysisTerm m) (m v) -> m v
   -- | Evaluate an application (like a function call).
-  apply :: v -> [Subterm t (m v)] -> m v
+  apply :: v -> [Subterm (AnalysisTerm m) (m v)] -> m v
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( FreeVariables t
-         , MonadAddressable location (Value location t) m
-         , MonadAnalysis t (Value location t) m
-         , MonadEvaluator t (Value location t) m
+         , MonadAddressable location m
+         , MonadAnalysis m
+         , AnalysisTerm m ~ t
+         , AnalysisValue m ~ Value location t
+         , MonadEvaluator m
          , Recursive t
          , Semigroup (Cell location (Value location t))
          )
-         => MonadValue t (Value location t) m where
+         => MonadValue (Value location t) m where
 
   unit    = pure $ inj Value.Unit
   integer = pure . inj . Integer
@@ -68,7 +70,7 @@ instance ( FreeVariables t
     localEnv (mappend bindings) (evaluateTerm body)
 
 -- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
-instance (Alternative m, MonadEvaluator t Type m, MonadFresh m) => MonadValue t Type m where
+instance (Alternative m, MonadEvaluator m, MonadFresh m, AnalysisValue m ~ Type) => MonadValue Type m where
   abstract names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name

@@ -1,10 +1,10 @@
 {-# LANGUAGE FunctionalDependencies, TypeFamilies, UndecidableInstances #-}
 module Control.Abstract.Addressable where
 
+import Control.Abstract.Analysis
 import Control.Abstract.Evaluator
 import Control.Applicative
 import Control.Monad ((<=<))
-import Control.Monad.Effect.Fail
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
@@ -16,19 +16,20 @@ import Data.Semigroup.Reducer
 import Prelude hiding (fail)
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Store.
-class (Monad m, Ord l, l ~ LocationFor a, Reducer a (Cell l a)) => MonadAddressable l a m | m -> a where
-  deref :: Address l a
-        -> m a
+class (Monad m, Ord l, l ~ LocationFor (AnalysisValue m), Reducer (AnalysisValue m) (Cell l (AnalysisValue m))) => MonadAddressable l m where
+  deref :: Address l (AnalysisValue m)
+        -> m (AnalysisValue m)
 
   alloc :: Name
-        -> m (Address l a)
+        -> m (Address l (AnalysisValue m))
 
 -- | Look up or allocate an address for a 'Name' free in a given term & assign it a given value, returning the 'Name' paired with the address.
 --
 --   The term is expected to contain one and only one free 'Name', meaning that care should be taken to apply this only to e.g. identifiers.
 lookupOrAlloc :: ( FreeVariables t
-                 , MonadAddressable (LocationFor a) a m
-                 , MonadEvaluator t a m
+                 , MonadAddressable (LocationFor a) m
+                 , MonadEvaluator m
+                 , a ~ AnalysisValue m
                  , Semigroup (CellFor a)
                  )
                  => t
@@ -40,8 +41,9 @@ lookupOrAlloc term = let [name] = toList (freeVariables term) in
   where
     -- | Look up or allocate an address for a 'Name' & assign it a given value, returning the 'Name' paired with the address.
     lookupOrAlloc' :: ( Semigroup (CellFor a)
-                      , MonadAddressable (LocationFor a) a m
-                      , MonadEvaluator t a m
+                      , MonadAddressable (LocationFor a) m
+                      , a ~ AnalysisValue m
+                      , MonadEvaluator m
                       )
                       => Name
                       -> a
@@ -54,7 +56,8 @@ lookupOrAlloc term = let [name] = toList (freeVariables term) in
 
 -- | Write a value to the given 'Address' in the 'Store'.
 assign :: ( Ord (LocationFor a)
-          , MonadEvaluator t a m
+          , MonadEvaluator m
+          , a ~ AnalysisValue m
           , Reducer a (CellFor a)
           )
           => Address (LocationFor a) a
@@ -66,7 +69,7 @@ assign address = modifyStore . storeInsert address
 -- Instances
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
-instance (Monad m, MonadEvaluator t v m, LocationFor v ~ Precise) => MonadAddressable Precise v m where
+instance (Monad m, MonadEvaluator m, LocationFor (AnalysisValue m) ~ Precise) => MonadAddressable Precise m where
   deref = maybe uninitializedAddress (pure . unLatest) <=< flip fmap getStore . storeLookup
     where
       -- | Fail with a message denoting an uninitialized address (i.e. one which was 'alloc'ated, but never 'assign'ed a value before being 'deref'erenced).
@@ -77,7 +80,7 @@ instance (Monad m, MonadEvaluator t v m, LocationFor v ~ Precise) => MonadAddres
 
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
-instance (Alternative m, Ord v, LocationFor v ~ Monovariant, Monad m, MonadEvaluator t v m) => MonadAddressable Monovariant v m where
+instance (Alternative m, Ord (AnalysisValue m), LocationFor (AnalysisValue m) ~ Monovariant, Monad m, MonadEvaluator m) => MonadAddressable Monovariant m where
   deref = asum . maybe [] (map pure . toList) <=< flip fmap getStore . storeLookup
 
   alloc = pure . Address . Monovariant

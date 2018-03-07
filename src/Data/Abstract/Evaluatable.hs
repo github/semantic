@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures, FunctionalDependencies, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures, FunctionalDependencies, TypeFamilies, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( Evaluatable(..)
 , module Addressable
@@ -30,10 +30,12 @@ import Prologue
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
   eval :: ( FreeVariables term
-          , MonadAddressable (LocationFor value) value m
-          , MonadAnalysis term value m
-          , MonadEvaluator term value m
-          , MonadValue term value m
+          , MonadAddressable (LocationFor value) m
+          , MonadAnalysis m
+          , AnalysisTerm m ~ term
+          , AnalysisValue m ~ value
+          , MonadEvaluator m
+          , MonadValue value m
           , Ord (LocationFor value)
           , Semigroup (CellFor value)
           )
@@ -75,24 +77,24 @@ instance Evaluatable [] where
 -- | Require/import another term/file and return an Effect.
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
-require :: ( FreeVariables term
-           , MonadAnalysis term v m
-           , MonadEvaluator term v m
+require :: ( FreeVariables (AnalysisTerm m)
+           , MonadAnalysis m
+           , MonadEvaluator m
            )
-        => term
-        -> m v
+        => AnalysisTerm m
+        -> m (AnalysisValue m)
 require term = getModuleTable >>= maybe (load term) pure . linkerLookup name
   where name = moduleName term
 
 -- | Load another term/file and return an Effect.
 --
 -- Always loads/evaluates.
-load :: ( FreeVariables term
-        , MonadAnalysis term v m
-        , MonadEvaluator term v m
+load :: ( FreeVariables (AnalysisTerm m)
+        , MonadAnalysis m
+        , MonadEvaluator m
         )
-     => term
-     -> m v
+     => AnalysisTerm m
+     -> m (AnalysisValue m)
 load term = askModuleTable >>= maybe notFound evalAndCache . linkerLookup name
   where name = moduleName term
         notFound = fail ("cannot find " <> show name)

@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Dead where
 
 import Control.Abstract.Addressable
@@ -19,8 +19,8 @@ evaluateDead :: forall term value
                 , Evaluatable (Base term)
                 , Foldable (Base term)
                 , FreeVariables term
-                , MonadAddressable (LocationFor value) value (DeadCodeAnalysis term value)
-                , MonadValue term value (DeadCodeAnalysis term value)
+                , MonadAddressable (LocationFor value) (DeadCodeAnalysis term value)
+                , MonadValue value (DeadCodeAnalysis term value)
                 , Ord (LocationFor value)
                 , Ord term
                 , Recursive term
@@ -39,7 +39,7 @@ evaluateDead term = run @(DeadCodeEffects term value) . runEvaluator . runDeadCo
 newtype DeadCodeAnalysis term value a = DeadCodeAnalysis { runDeadCodeAnalysis :: Evaluator term value (DeadCodeEffects term value) a }
   deriving (Applicative, Functor, Monad, MonadFail)
 
-deriving instance MonadEvaluator term value (DeadCodeAnalysis term value)
+deriving instance Ord (LocationFor value) => MonadEvaluator (DeadCodeAnalysis term value)
 
 
 -- | A set of “dead” (unreachable) terms.
@@ -60,13 +60,16 @@ revive t = DeadCodeAnalysis (Evaluator (modify (Dead . delete t . unDead)))
 instance ( Corecursive t
          , Evaluatable (Base t)
          , FreeVariables t
-         , MonadAddressable (LocationFor v) v (DeadCodeAnalysis t v)
-         , MonadValue t v (DeadCodeAnalysis t v)
+         , MonadAddressable (LocationFor v) (DeadCodeAnalysis t v)
+         , MonadValue v (DeadCodeAnalysis t v)
          , Ord t
          , Recursive t
          , Semigroup (CellFor v)
          )
-         => MonadAnalysis t v (DeadCodeAnalysis t v) where
+         => MonadAnalysis (DeadCodeAnalysis t v) where
   analyzeTerm term = do
     revive (embedSubterm term)
     eval term
+
+type instance AnalysisTerm (DeadCodeAnalysis term value) = term
+type instance AnalysisValue (DeadCodeAnalysis term value) = value
