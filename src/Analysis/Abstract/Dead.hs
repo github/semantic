@@ -5,7 +5,7 @@ import Control.Abstract.Addressable
 import Control.Abstract.Evaluator
 import Data.Abstract.Evaluatable
 import Data.Abstract.Value
-import Data.Semigroup.Reducer
+import Data.Semigroup.Reducer as Reducer
 import Data.Set (delete)
 import Prologue
 
@@ -32,7 +32,7 @@ evaluateDead term = run @(DeadCodeEffects term value) . runEvaluator . runDeadCo
   killAll (subterms term)
   evaluateTerm term
   where subterms :: (Ord a, Recursive a, Foldable (Base a)) => a -> Dead a
-        subterms term = para (foldMap (uncurry ((<>) . point))) term <> point term
+        subterms term = term `cons` para (foldMap (uncurry cons)) term
 
 
 -- | A newtype wrapping 'Evaluator' which performs a dead code analysis on evaluation.
