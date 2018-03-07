@@ -13,6 +13,7 @@ import Data.Abstract.Linker
 import Data.Abstract.Value
 import Prologue
 
+-- | An effect to trace visited 'Configuration's.
 type Tracer trace term value = Writer (trace (Configuration (LocationFor value) term value))
 
 -- | The effects necessary for tracing analyses.
