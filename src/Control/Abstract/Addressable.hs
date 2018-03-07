@@ -29,7 +29,7 @@ class (Monad m, Ord l, Pointed (Cell l), l ~ LocationFor a) => MonadAddressable 
 lookupOrAlloc :: ( FreeVariables t
                  , MonadAddressable (LocationFor a) a m
                  , MonadEvaluator t a m
-                 , Semigroup (Cell (LocationFor a) a)
+                 , Semigroup (CellFor a)
                  )
                  => t
                  -> a
@@ -39,7 +39,7 @@ lookupOrAlloc term = let [name] = toList (freeVariables term) in
                          lookupOrAlloc' name
   where
     -- | Look up or allocate an address for a 'Name' & assign it a given value, returning the 'Name' paired with the address.
-    lookupOrAlloc' :: ( Semigroup (Cell (LocationFor a) a)
+    lookupOrAlloc' :: ( Semigroup (CellFor a)
                       , MonadAddressable (LocationFor a) a m
                       , MonadEvaluator t a m
                       )
@@ -56,7 +56,7 @@ lookupOrAlloc term = let [name] = toList (freeVariables term) in
 assign :: ( Ord (LocationFor a)
           , MonadEvaluator t a m
           , Pointed (Cell (LocationFor a))
-          , Semigroup (Cell (LocationFor a) a)
+          , Semigroup (CellFor a)
           )
           => Address (LocationFor a) a
           -> a

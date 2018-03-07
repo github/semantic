@@ -14,7 +14,6 @@ import Control.Abstract.Addressable as Addressable
 import Control.Abstract.Analysis as Analysis
 import Control.Abstract.Evaluator
 import Control.Abstract.Value as Value
-import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables as FreeVariables
 import Data.Abstract.Linker
@@ -36,7 +35,7 @@ class Evaluatable constr where
           , MonadEvaluator term value m
           , MonadValue term value m
           , Ord (LocationFor value)
-          , Semigroup (Cell (LocationFor value) value)
+          , Semigroup (CellFor value)
           )
        => SubtermAlgebra constr term (m value)
   default eval :: (MonadFail m, Show1 constr) => SubtermAlgebra constr term (m value)

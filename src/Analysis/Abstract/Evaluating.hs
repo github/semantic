@@ -1,15 +1,14 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, MultiParamTypeClasses, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating where
 
-import Prologue
 import Control.Abstract.Evaluator
-import Data.Abstract.Address
 import Data.Abstract.Evaluatable
 import Data.Abstract.Linker
 import Data.Abstract.Value
 import Data.Blob
 import Prelude hiding (fail)
 import qualified Data.Map as Map
+import Prologue
 import System.FilePath.Posix
 
 -- | Evaluate a term to a value.
@@ -20,7 +19,7 @@ evaluate :: forall v term
             , MonadValue term v (Evaluation term v)
             , Ord (LocationFor v)
             , Recursive term
-            , Semigroup (Cell (LocationFor v) v)
+            , Semigroup (CellFor v)
             )
          => term
          -> Final (EvaluatorEffects term v) v
@@ -34,7 +33,7 @@ evaluates :: forall v term
              , MonadValue term v (Evaluation term v)
              , Ord (LocationFor v)
              , Recursive term
-             , Semigroup (Cell (LocationFor v) v)
+             , Semigroup (CellFor v)
              )
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
@@ -57,7 +56,7 @@ instance ( Evaluatable (Base t)
          , MonadAddressable (LocationFor v) v (Evaluation t v)
          , MonadValue t v (Evaluation t v)
          , Recursive t
-         , Semigroup (Cell (LocationFor v) v)
+         , Semigroup (CellFor v)
          )
          => MonadAnalysis t v (Evaluation t v) where
   analyzeTerm = eval

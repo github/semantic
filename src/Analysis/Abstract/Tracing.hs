@@ -6,7 +6,6 @@ import Control.Abstract.Analysis
 import Control.Abstract.Evaluator
 import Control.Abstract.Value
 import Control.Monad.Effect.Writer
-import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.Evaluatable
 import Data.Abstract.Value
@@ -24,14 +23,14 @@ evaluateTrace :: forall trace value term
                 , Evaluatable (Base term)
                 , FreeVariables term
                 , Monoid trace
-                , Ord (Cell (LocationFor value) value)
+                , Ord (CellFor value)
                 , Ord term
                 , Ord value
                 , Recursive term
                 , Reducer (ConfigurationFor term value) trace
                 , MonadAddressable (LocationFor value) value (TracingAnalysis trace term value (TracingEffects trace term value))
                 , MonadValue term value (TracingAnalysis trace term value (TracingEffects trace term value))
-                , Semigroup (Cell (LocationFor value) value)
+                , Semigroup (CellFor value)
                 )
               => term
               -> Final (TracingEffects trace term value) value
@@ -53,7 +52,7 @@ instance ( Corecursive term
          , MonadValue term value (TracingAnalysis trace term value effects)
          , Recursive term
          , Reducer (ConfigurationFor term value) trace
-         , Semigroup (Cell (LocationFor value) value)
+         , Semigroup (CellFor value)
          )
          => MonadAnalysis term value (TracingAnalysis trace term value effects) where
   analyzeTerm term = getConfiguration (embedSubterm term) >>= trace . Reducer.unit >> eval term

@@ -3,7 +3,6 @@ module Analysis.Abstract.Dead where
 
 import Control.Abstract.Addressable
 import Control.Abstract.Evaluator
-import Data.Abstract.Address
 import Data.Abstract.Evaluatable
 import Data.Abstract.Value
 import Data.Set (delete)
@@ -24,7 +23,7 @@ evaluateDead :: forall term value
                 , Ord (LocationFor value)
                 , Ord term
                 , Recursive term
-                , Semigroup (Cell (LocationFor value) value)
+                , Semigroup (CellFor value)
                 )
              => term
              -> Final (DeadCodeEffects term value) value
@@ -62,7 +61,7 @@ instance ( Corecursive t
          , MonadValue t v (DeadCodeAnalysis t v)
          , Ord t
          , Recursive t
-         , Semigroup (Cell (LocationFor v) v)
+         , Semigroup (CellFor v)
          )
          => MonadAnalysis t v (DeadCodeAnalysis t v) where
   analyzeTerm term = do

@@ -56,14 +56,14 @@ modifyCache f = fmap f getCache >>= putCache
 instance ( Corecursive t
          , Ord t
          , Ord v
-         , Ord (Cell (LocationFor v) v)
+         , Ord (CellFor v)
          , Evaluatable (Base t)
          , Foldable (Cell (LocationFor v))
          , FreeVariables t
          , MonadAddressable (LocationFor v) v (CachingAnalysis t v)
          , MonadValue t v (CachingAnalysis t v)
          , Recursive t
-         , Semigroup (Cell (LocationFor v) v)
+         , Semigroup (CellFor v)
          )
          => MonadAnalysis t v (CachingAnalysis t v) where
   analyzeTerm e = do
@@ -88,7 +88,7 @@ evaluateCache :: forall v term
               . ( Ord v
                 , Ord term
                 , Ord (LocationFor v)
-                , Ord (Cell (LocationFor v) v)
+                , Ord (CellFor v)
                 , Corecursive term
                 , Evaluatable (Base term)
                 , FreeVariables term
@@ -97,7 +97,7 @@ evaluateCache :: forall v term
                 , Recursive term
                 , MonadAddressable (LocationFor v) v (CachingAnalysis term v)
                 , MonadValue term v (CachingAnalysis term v)
-                , Semigroup (Cell (LocationFor v) v)
+                , Semigroup (CellFor v)
                 , ValueRoots (LocationFor v) v
                 )
               => term
@@ -128,7 +128,7 @@ memoizeEval :: forall v term
             . ( Ord v
               , Ord term
               , Ord (LocationFor v)
-              , Ord (Cell (LocationFor v) v)
+              , Ord (CellFor v)
               , Corecursive term
               , Evaluatable (Base term)
               , FreeVariables term
@@ -137,7 +137,7 @@ memoizeEval :: forall v term
               , Recursive term
               , MonadAddressable (LocationFor v) v (CachingAnalysis term v)
               , MonadValue term v (CachingAnalysis term v)
-              , Semigroup (Cell (LocationFor v) v)
+              , Semigroup (CellFor v)
               )
             => SubtermAlgebra (Base term) term (CachingAnalysis term v v)
 memoizeEval e = do
