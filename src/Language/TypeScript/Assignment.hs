@@ -21,6 +21,8 @@ import qualified Data.Syntax.Type as Type
 import Language.TypeScript.Grammar as Grammar
 import qualified Language.TypeScript.Syntax as TypeScript.Syntax
 import qualified Data.Term as Term
+import qualified Data.ByteString as B
+import Data.Char (ord)
 
 -- | The type of TypeScript syntax.
 type Syntax = '[
@@ -630,12 +632,12 @@ statementIdentifier :: Assignment
 statementIdentifier = makeTerm <$> symbol StatementIdentifier <*> (Syntax.Identifier <$> source)
 
 importStatement :: Assignment
-importStatement = makeImportTerm <$> symbol Grammar.ImportStatement <*> children ((,) <$> importClause <*> term string)
+importStatement = makeImportTerm <$> symbol Grammar.ImportStatement <*> children ((,) <$> importClause <*> (makeTerm <$> symbol Grammar.String <*> (Syntax.Identifier . stripQuotes <$> source)))
                 <|> makeImport <$> symbol Grammar.ImportStatement <*> children requireImport
                 <|> makeImport <$> symbol Grammar.ImportStatement <*> children bareRequireImport
-
   where
     -- Straightforward imports
+    stripQuotes = B.filter (/= (fromIntegral (ord '\"')))
     makeImport loc (Just alias, symbols, from) = makeTerm loc (Declaration.QualifiedImport from alias symbols)
     makeImport loc (Nothing, symbols, from) = makeTerm loc (Declaration.Import from symbols)
     -- Import a file giving it an alias (e.g. import foo = require "./foo")
