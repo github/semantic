@@ -144,7 +144,7 @@ instance Evaluatable Program where
       eval' (x:xs) = do
         _ <- subtermValue x
         env <- getGlobalEnv
-        localEnv (const env) (eval' xs)
+        localEnv (envUnion env) (eval' xs)
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
