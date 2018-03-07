@@ -5,6 +5,7 @@ import Control.Abstract.Addressable
 import Control.Abstract.Evaluator
 import Data.Abstract.Evaluatable
 import Data.Abstract.Value
+import Data.Semigroup.Reducer
 import Data.Set (delete)
 import Prologue
 
@@ -44,6 +45,8 @@ deriving instance MonadEvaluator term value (DeadCodeAnalysis term value)
 -- | A set of “dead” (unreachable) terms.
 newtype Dead a = Dead { unDead :: Set a }
   deriving (Eq, Foldable, Semigroup, Monoid, Ord, Pointed, Show)
+
+deriving instance Ord a => Reducer a (Dead a)
 
 -- | Update the current 'Dead' set.
 killAll :: Dead t -> DeadCodeAnalysis t v ()
