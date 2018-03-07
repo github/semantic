@@ -9,17 +9,21 @@
       (Type
         (Identifier)
         (Function
-          (Identifier)
+          (
+            (Identifier))
           (Identifier)))
       (Type
         (Identifier)
         (Function
           (
-            (Identifier)
-            (Identifier))
+            (
+              (Identifier))
+            (
+              (Identifier)))
           (
             (
               (BidirectionalChannel
                 (Identifier)))
-            (Identifier))
+            (
+              (Identifier)))
           (Empty))))))

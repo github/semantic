@@ -9,15 +9,20 @@
       (Type
         (Identifier)
         (Function
-          (Identifier)
+          (
+            (Identifier))
           (Identifier)))
       (Type
         (Identifier)
         (Function
           (
-            (Identifier)
-            (Identifier))
+            (
+              (Identifier))
+            (
+              (Identifier)))
           (
-            (Identifier)
-            (Identifier))
+            (
+              (Identifier))
+            (
+              (Identifier)))
           (Empty))))))
