@@ -13,6 +13,8 @@ import Data.Abstract.Linker
 import Data.Abstract.Value
 import Prologue
 
+type Tracer trace term value = Writer (trace (Configuration (LocationFor value) term value))
+
 -- | The effects necessary for tracing analyses.
 type TracingEffects trace term value
   = '[ Writer (trace (Configuration (LocationFor value) term value)) -- For 'trace'.
