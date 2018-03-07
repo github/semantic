@@ -12,8 +12,10 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.Value
 import Prologue
 
+type Trace trace term value = trace (Configuration (LocationFor value) term value)
+
 -- | An effect to trace visited 'Configuration's.
-type Tracer trace term value = Writer (trace (Configuration (LocationFor value) term value))
+type Tracer trace term value = Writer (Trace trace term value)
 
 -- | The effects necessary for tracing analyses.
 type TracingEffects trace term value = Tracer trace term value ': EvaluatorEffects term value
@@ -25,7 +27,7 @@ evaluateTrace :: forall trace value term
               . ( Corecursive term
                 , Evaluatable (Base term)
                 , FreeVariables term
-                , Monoid (trace (Configuration (LocationFor value) term value))
+                , Monoid (Trace trace term value)
                 , Ord (Cell (LocationFor value) value)
                 , Ord term
                 , Ord value
@@ -61,6 +63,6 @@ instance ( Corecursive term
   analyzeTerm term = getConfiguration (embedSubterm term) >>= trace . point >> eval term
 
 trace :: Member (Tracer trace term value) effects
-      => trace (Configuration (LocationFor value) term value)
+      => Trace trace term value
       -> TracingAnalysis trace term value effects ()
 trace w = lift (tell w)
