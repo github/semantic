@@ -4,8 +4,7 @@ module Data.Abstract.Cache where
 import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.Store
-import Data.Map as Map
-import Data.Semigroup.Reducer
+import Data.Map.Monoidal as Map
 import Prologue
 
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Store's.
@@ -27,7 +26,7 @@ cacheSet key value = Cache . Map.insert key value . unCache
 
 -- | Insert the resulting value & 'Store' for a given 'Configuration', appending onto any previous entry.
 cacheInsert :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> (v, Store l v) -> Cache l t v -> Cache l t v
-cacheInsert key value = Cache . Map.insertWith (<>) key (unit value) . unCache
+cacheInsert key value = Cache . flip snoc (key, value) . unCache
 
 
 instance (Eq l, Eq t, Eq1 (Cell l)) => Eq1 (Cache l t) where
