@@ -42,7 +42,7 @@ evaluateTrace = run @(TracingEffects trace term value) . runEvaluator . runTraci
 
 newtype TracingAnalysis (trace :: * -> *) term value effects a
   = TracingAnalysis { runTracingAnalysis :: Evaluator term value effects a }
-  deriving (Applicative, Functor, Monad)
+  deriving (Applicative, Functor, LiftEffect, Monad)
 
 deriving instance Member Fail effects                           => MonadFail (TracingAnalysis trace term value effects)
 deriving instance Members (EvaluatorEffects term value) effects => MonadEvaluator term value (TracingAnalysis trace term value effects)
