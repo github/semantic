@@ -3,6 +3,7 @@
 module Data.Map.Monoidal
 ( Map
 , lookup
+, insert
 , module Reducer
 ) where
 
@@ -17,6 +18,9 @@ newtype Map key value = Map { unMap :: Map.Map key value }
 
 lookup :: Ord key => key -> Map key value -> Maybe value
 lookup key = Map.lookup key . unMap
+
+insert :: Ord key => key -> value -> Map key value -> Map key value
+insert key value = Map . Map.insert key value . unMap
 
 
 instance (Ord key, Semigroup value) => Semigroup (Map key value) where
