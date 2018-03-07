@@ -2,6 +2,8 @@
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , module X
+, Subterm(..)
+, SubtermAlgebra
 ) where
 
 import Control.Effect as X
