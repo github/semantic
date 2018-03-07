@@ -255,6 +255,18 @@ instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
+  eval (Import from xs) = do
+    env <- getGlobalEnv
+    putGlobalEnv mempty
+    importedEnv <- require (qualifiedName (subterm from))
+    env' <- Map.foldrWithKey copy (pure env) (unEnvironment importedEnv)
+    modifyGlobalEnv (const env')
+    unit
+    where
+      symbols = Map.fromList xs
+      copy = if Map.null symbols then qualifyInsert else directInsert
+      qualifyInsert k v rest = envInsert k v <$> rest
+      directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v <$> rest) (Map.lookup k symbols)
 
 -- | A wildcard import
 --
