@@ -55,12 +55,12 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   getConfiguration term = Configuration term <$> askRoots <*> askLocalEnv <*> getStore
 
 type EvaluatorEffects term value
-  = '[ Fail
-     , Reader (EnvironmentFor value)
-     , State  (EnvironmentFor value)
-     , State  (StoreFor value)
-     , Reader (Linker term)
-     , State  (Linker value)
+  = '[ Fail                          -- Failure with an error message
+     , Reader (EnvironmentFor value) -- Local environment (e.g. binding over a closure)
+     , State  (EnvironmentFor value) -- Global (imperative) environment
+     , State  (StoreFor value)       -- The heap
+     , Reader (Linker term)          -- Cache of unevaluated modules
+     , State  (Linker value)         -- Cache of evaluated modules
      ]
 
 instance Members (EvaluatorEffects term value) effects => MonadEvaluator term value (Evaluator effects term value) where
