@@ -159,7 +159,6 @@ library
                      , optparse-applicative
                      , parallel
                      , parsers
-                     , pointed
                      , recursion-schemes
                      , reducers
                      , semigroups
