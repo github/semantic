@@ -20,9 +20,9 @@
       (
         (Identifier)
         (Identifier))
-      (Identifier)
-      (Identifier)
       (
+        (Identifier)
+        (Identifier)
         (Identifier)
         (Identifier)))
     ([]))
@@ -32,8 +32,10 @@
   ->(Identifier) }
     ([])
     (
-      (Identifier)
-      (Identifier))
+      (
+        (Identifier))
+      (
+        (Identifier)))
     ([]))
   (Function
     (Empty)

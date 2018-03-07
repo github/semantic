@@ -389,24 +389,12 @@ importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTe
                <|> makeTerm <$> symbol ImportSpec <*> children namedImport
                <|> makeTerm <$> symbol ImportSpec <*> children plainImport
 
-    dotImport = symbol Dot *> (Declaration.WildcardImport <$> expression <*> emptyTerm)
-    -- nonQualifiedImport = inj <$> (symbol PackageIdentifier >>= \loc -> do
-    --   s <- source
-    --   guard (s == ".")
-    --   let sym = makeTerm loc (Syntax.Identifier s)
-    --   Declaration.WildcardImport <$> expression <*> pure sym)
-
-    sideEffectImport = symbol BlankIdentifier *> (Declaration.Import <$> expression <*> pure [])
-    -- sideEffectImport = symbol PackageIdentifier *> do
-    --   s <- source
-    --   guard (s == "_")
-    --   Declaration.Import <$> expression <*> pure []
-
+    dotImport = symbol Dot *> source *> (Declaration.WildcardImport <$> expression <*> emptyTerm)
+    sideEffectImport = symbol BlankIdentifier *> source *> (Declaration.Import <$> expression <*> pure [])
     namedImport = symbol PackageIdentifier >>= \loc -> do
       s <- source
       let alias = makeTerm loc (Syntax.Identifier s)
       Declaration.QualifiedImport <$> expression <*> pure alias <*> pure []
-
     plainImport = symbol InterpretedStringLiteral >>= \loc -> do
       s <- source
       let from = makeTerm loc (Literal.TextElement s)

@@ -8,7 +8,7 @@
   (Import
   { (TextElement)
   ->(TextElement) }
-    (Empty))
+    (Identifier))
   (Import
   { (TextElement)
   ->(TextElement) }
