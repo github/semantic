@@ -253,10 +253,10 @@ instance Evaluatable Import where
       symbols = Map.fromList xs
       directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v <$> rest) (Map.lookup k symbols)
 
--- | A wildcard import
+-- | A wildcard import (all symbols are added directly to the calling env)
 --
 -- Import a module updating the importing environments.
-data WildcardImport a = WildcardImport { wildcardImportFrom :: !a, wildcardImportSymbol :: !a }
+data WildcardImport a = WildcardImport { wildcardImportFrom :: !a, wildcardImportToken :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 WildcardImport where liftEq = genericLiftEq
