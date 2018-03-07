@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Effect where
 
-import Prologue
 import qualified Control.Monad.Effect as Effect
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Internal hiding (run)
@@ -9,6 +8,8 @@ import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Writer
+import Data.Semigroup.Reducer
+import Prologue
 
 -- | Run a computation in 'Eff' to completion, interpreting each effect with some sensible defaults, and return the 'Final' result.
 run :: RunEffects fs a => Eff fs a -> Final fs a
@@ -60,7 +61,7 @@ instance Monoid w => RunEffect (Writer w) a where
 -- | 'NonDetEff' effects are interpreted into a nondeterministic set of result values.
 instance Ord a => RunEffect NonDetEff a where
   type Result NonDetEff a = Set a
-  runEffect = relay (pure . point) (\ m k -> case m of
+  runEffect = relay (pure . unit) (\ m k -> case m of
     MZero -> pure mempty
     MPlus -> mappend <$> k True <*> k False)
 
