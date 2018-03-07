@@ -14,7 +14,6 @@ import Data.Abstract.Configuration
 import Data.Abstract.Evaluatable
 import Data.Abstract.Store
 import Data.Abstract.Value
-import qualified Data.Set as Set
 
 -- | The effects necessary for caching analyses.
 type CachingEffects term value
@@ -81,7 +80,7 @@ instance ( Corecursive t
       -- to corral all the nondeterminism that happens in this @eval@ invocation, so
       -- that it doesn't "leak" to the calling context and diverge
       -- (otherwise this would never complete).
-      _ <- localCache (const prevCache) (gather Set.singleton (memoizeEval e))
+      _ <- localCache (const prevCache) (gather (memoizeEval e) :: CachingAnalysis t v ())
       getCache) mempty
     maybe empty scatter (cacheLookup c cache)
 
