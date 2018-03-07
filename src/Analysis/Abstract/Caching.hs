@@ -78,8 +78,9 @@ instance ( Corecursive t
       reset 0
       -- This is subtle: though the calling context supports nondeterminism, we want
       -- to corral all the nondeterminism that happens in this @eval@ invocation, so
-      -- that it doesn't "leak" to the calling context and diverge
-      -- (otherwise this would never complete).
+      -- that it doesn't "leak" to the calling context and diverge (otherwise this
+      -- would never complete). We don’t need to use the values, so we 'gather' the
+      -- nondeterministic values into @()@.
       _ <- localCache (const prevCache) (gather (memoizeEval e) :: CachingAnalysis t v ())
       getCache) mempty
     maybe empty scatter (cacheLookup c cache)
