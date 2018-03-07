@@ -8,6 +8,7 @@ import Data.Abstract.Live
 import Data.Abstract.Store
 import Data.Abstract.Value
 
+-- | The configuration for term and abstract value types.
 type ConfigurationFor term value = Configuration (LocationFor value) term value
 
 -- | A single point in a program’s execution.
