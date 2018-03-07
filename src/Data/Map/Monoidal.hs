@@ -10,3 +10,7 @@ newtype Map key value = Map { unMap :: Map.Map key value }
 
 instance (Ord key, Semigroup value) => Semigroup (Map key value) where
   Map a <> Map b = Map (Map.unionWith (<>) a b)
+
+instance (Ord key, Semigroup value) => Monoid (Map key value) where
+  mempty = Map Map.empty
+  mappend = (<>)
