@@ -61,4 +61,4 @@ instance ( Corecursive term
   analyzeTerm term = getConfiguration (embedSubterm term) >>= trace . point >> eval term
 
 trace :: Member (Tracer trace term value) effects => trace (Configuration (LocationFor value) term value) -> TracingAnalysis trace term value effects ()
-trace w = TracingAnalysis (Evaluator (tell w))
+trace w = lift (tell w)
