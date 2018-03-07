@@ -30,3 +30,10 @@ class Monad m => MonadAnalysis m where
   evaluateTerm :: TermFor m -> m (ValueFor m)
   default evaluateTerm :: Recursive (TermFor m) => TermFor m -> m (ValueFor m)
   evaluateTerm = foldSubterms analyzeTerm
+
+
+class Newtype1 n where
+  type O1 n :: * -> *
+
+  pack1 :: O1 n a -> n a
+  unpack1 :: n a -> O1 n a
