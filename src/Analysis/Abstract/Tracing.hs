@@ -5,10 +5,6 @@ import Control.Abstract.Addressable
 import Control.Abstract.Analysis
 import Control.Abstract.Evaluator
 import Control.Abstract.Value
-import Control.Effect
-import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.State
 import Control.Monad.Effect.Writer
 import Data.Abstract.Address
 import Data.Abstract.Configuration

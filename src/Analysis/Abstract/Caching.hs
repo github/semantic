@@ -6,12 +6,8 @@ module Analysis.Abstract.Caching
 import Prologue
 import Data.Monoid (Alt(..))
 import Control.Abstract.Evaluator
-import Control.Effect
-import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDet
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.State
 import Data.Abstract.Address
 import Data.Abstract.Cache
 import Data.Abstract.Configuration
