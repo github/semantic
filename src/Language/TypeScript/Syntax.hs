@@ -71,14 +71,6 @@ instance Ord1 ImportClause where liftCompare = genericLiftCompare
 instance Show1 ImportClause where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ImportClause
 
-newtype NamespaceImport a = NamespaceImport { _namespaceImportSubject :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 NamespaceImport where liftEq = genericLiftEq
-instance Ord1 NamespaceImport where liftCompare = genericLiftCompare
-instance Show1 NamespaceImport where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable NamespaceImport
-
 newtype Tuple a = Tuple { _tupleElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
@@ -238,14 +230,6 @@ instance Eq1 ImportExportSpecifier where liftEq = genericLiftEq
 instance Ord1 ImportExportSpecifier where liftCompare = genericLiftCompare
 instance Show1 ImportExportSpecifier where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ImportExportSpecifier
-
-newtype NamedImports a = NamedImports { _namedImportElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 NamedImports where liftEq = genericLiftEq
-instance Ord1 NamedImports where liftCompare = genericLiftCompare
-instance Show1 NamedImports where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable NamedImports
 
 data With a = With { _withExpression :: !a, _withBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)

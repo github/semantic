@@ -62,7 +62,12 @@ instance ( FreeVariables t
   boolean = pure . inj . Boolean
   string  = pure . inj . Value.String
   float   = pure . inj . Value.Float
-  interface v = inj . Value.Interface v <$> getGlobalEnv
+  interface v = inj . Value.Interface v <$> prunedEnv
+    where
+      -- TODO: If the set of exports is empty because no exports have been defined,
+      -- do we export all terms, or no terms?
+      -- This behavior varies across languages. We need better semantics rather than doing it ad-hoc.
+      prunedEnv = bindExports <$> getExports <*> getGlobalEnv
 
   ifthenelse cond if' else'
     | Just (Boolean b) <- prj cond = if b then if' else else'

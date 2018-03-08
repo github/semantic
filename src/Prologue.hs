@@ -23,6 +23,8 @@ import Data.List.NonEmpty as X (
   , some1
   )
 
+import Debug.Trace as X
+
 import Control.Exception as X hiding (
     evaluate
   , throw

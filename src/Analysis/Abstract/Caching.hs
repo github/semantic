@@ -29,6 +29,7 @@ type CachingEffects t v
      , Reader (Live (LocationFor v) v)        -- For 'MonadGC'.
      , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
      , State (Environment (LocationFor v) v)  -- For 'MonadEvaluator'.
+     , State (Map Name (Name, Maybe (Address (LocationFor v) v)))      -- For 'MonadEvaluator'.
      , Fail                                   -- For 'MonadFail'.
      , NonDetEff                              -- For 'Alternative' & 'MonadNonDet'.
      , State (Store (LocationFor v) v)        -- For 'MonadStore'.

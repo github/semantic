@@ -1,13 +1,16 @@
-{-# LANGUAGE DataKinds, FunctionalDependencies, GeneralizedNewtypeDeriving, RankNTypes, StandaloneDeriving, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, FunctionalDependencies, GeneralizedNewtypeDeriving, RankNTypes, StandaloneDeriving, UndecidableInstances, TypeApplications, ScopedTypeVariables #-}
 module Control.Abstract.Evaluator where
 
-import Control.Applicative
+import Prologue
 import Control.Monad.Effect
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
+import Data.Abstract.Address
+import Data.Abstract.FreeVariables (Name)
+import Data.Map as Map
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Prelude hiding (fail)
@@ -25,6 +28,18 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   putGlobalEnv :: EnvironmentFor value -> m ()
   -- | Update the global environment.
   modifyGlobalEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m ()
+
+  withGlobalEnv :: EnvironmentFor value -> m a -> m a
+
+  -- | Add an export to the global export state.
+  addExport :: Name -> (Name, Maybe (Address (LocationFor value) value)) -> m ()
+
+  -- | Get the global export state.
+  getExports :: m (Map Name (Name, Maybe (Address (LocationFor value) value)))
+  -- | Get the global export state.
+
+  -- | Sets the exports state to the given map for the lifetime of the given action.
+  withExports :: (Map Name (Name, Maybe (Address (LocationFor value) value))) -> m a -> m a
 
   -- | Retrieve the local environment.
   askLocalEnv :: m (EnvironmentFor value)
@@ -48,6 +63,7 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
 
 instance Members '[ Fail
                   , Reader (EnvironmentFor value)
+                  , State  (Map Name (Name, Maybe (Address (LocationFor value) value)))
                   , State  (EnvironmentFor value)
                   , State  (StoreFor value)
                   , Reader (ModuleTable term)
@@ -57,6 +73,11 @@ instance Members '[ Fail
   getGlobalEnv = Evaluator get
   putGlobalEnv = Evaluator . put
   modifyGlobalEnv f = Evaluator (modify f)
+  withGlobalEnv s = Evaluator . localState s . runEvaluator
+
+  addExport key = Evaluator . modify . Map.insert key
+  getExports = Evaluator get
+  withExports s = Evaluator . localState s . runEvaluator
 
   askLocalEnv = Evaluator ask
   localEnv f a = Evaluator (local f (runEvaluator a))
