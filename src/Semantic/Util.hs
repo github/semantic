@@ -46,12 +46,12 @@ evaluateRubyFiles paths = do
 -- Python
 typecheckPythonFile path = run @(CachingAnalysis (Evaluating Python.Term Type)) @(CachingEffects Python.Term Type (EvaluatingEffects Python.Term Type '[])) . evaluateModule . snd <$> parseFile pythonParser path
 
-tracePythonFile path = run @(TracingAnalysis [] PythonEvaluating) @(Tracer [] Python.Term PythonValue ': (EvaluatingEffects Python.Term PythonValue '[])) . evaluateModule . snd <$> parseFile pythonParser path
+tracePythonFile path = run @(TracingAnalysis [] (Evaluating Python.Term PythonValue)) @(Tracer [] Python.Term PythonValue ': (EvaluatingEffects Python.Term PythonValue '[])) . evaluateModule . snd <$> parseFile pythonParser path
 
-type PythonEvaluating = Evaluating Python.Term PythonValue
+type PythonTracer = TracingAnalysis [] (Evaluating Python.Term PythonValue)
 type PythonTracerEffects = DeadCode Python.Term ': Tracer [] Python.Term PythonValue ': EvaluatingEffects Python.Term PythonValue '[]
 
-evaluateDeadTracePythonFile path = run @(DeadCodeAnalysis (TracingAnalysis [] PythonEvaluating)) @PythonTracerEffects . evaluateModule . snd <$> parseFile pythonParser path
+evaluateDeadTracePythonFile path = run @(DeadCodeAnalysis PythonTracer) @PythonTracerEffects . evaluateModule . snd <$> parseFile pythonParser path
 
 evaluatePythonFile path = evaluate @PythonValue . snd <$> parseFile pythonParser path
 
