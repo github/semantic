@@ -14,6 +14,7 @@ import Control.Newtype1 as X
 import Control.Monad.Effect.Fail as X
 import Control.Monad.Effect.Reader as X
 import Control.Monad.Effect.State as X
+import Data.Coerce
 import Prologue
 
 type family TermFor (m :: * -> *)
@@ -33,11 +34,15 @@ class Monad m => MonadAnalysis m where
   default evaluateTerm :: Recursive (TermFor m) => TermFor m -> m (ValueFor m)
   evaluateTerm = foldSubterms analyzeTerm
 
-delegateAnalyzeTerm :: ( TermFor m ~ TermFor (O1 m)
-                       , ValueFor m ~ ValueFor (O1 m)
-                       , Functor (Base (TermFor m))
-                       , MonadAnalysis (O1 m)
-                       , Newtype1 m
+delegateAnalyzeTerm :: ( TermFor (t m) ~ TermFor m
+                       , ValueFor (t m) ~ ValueFor m
+                       , Functor (Base (TermFor (t m)))
+                       , MonadAnalysis m
+                       , Coercible (t m (ValueFor m)) (m (ValueFor m))
+                       , Coercible (m (ValueFor m)) (t m (ValueFor m))
                        )
-                    => SubtermAlgebra (Base (TermFor m)) (TermFor m) (m (ValueFor m))
+                    => SubtermAlgebra (Base (TermFor (t m))) (TermFor (t m)) (t m (ValueFor m))
 delegateAnalyzeTerm term = pack1 (analyzeTerm (second unpack1 <$> term))
+  where pack1 = coerce
+        unpack1 :: Coercible (t m (ValueFor m)) (m (ValueFor m)) => t m (ValueFor m) -> m (ValueFor m)
+        unpack1 = coerce
