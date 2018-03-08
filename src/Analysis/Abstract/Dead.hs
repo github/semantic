@@ -15,23 +15,26 @@ type DeadCodeEffects term value = State (Dead term) ': EvaluatorEffects term val
 
 
 -- | Run a dead code analysis of the given program.
-evaluateDead :: forall term value effects m
-             .  ( m ~ Evaluating term value effects
-                , effects ~ DeadCodeEffects term value
+evaluateDead :: forall m term value effects
+             .  ( term ~ TermFor m
+                , value ~ ValueFor m
+                , effects ~ Effects m
                 , Corecursive term
+                , Member (State (Dead term)) effects
+                , Effectful m
                 , Evaluatable (Base term)
                 , Foldable (Base term)
                 , FreeVariables term
-                , MonadAddressable (LocationFor value) m
-                , MonadValue value m
+                , MonadAnalysis m
                 , Ord (LocationFor value)
                 , Ord term
                 , Recursive term
+                , RunEffects effects value
                 , Semigroup (CellFor value)
                 )
              => term
-             -> Final (DeadCodeEffects term value) value
-evaluateDead term = run @(DeadCodeEffects term value) . lower @(DeadCodeAnalysis m) $ do
+             -> DeadCodeAnalysis m value
+evaluateDead term = do
   killAll (subterms term)
   evaluateTerm term
 
