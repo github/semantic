@@ -71,4 +71,4 @@ instance ( Corecursive (TermFor m)
          => MonadAnalysis (DeadCodeAnalysis m) where
   analyzeTerm term = do
     revive (embedSubterm term)
-    DeadCodeAnalysis (analyzeTerm (second runDeadCodeAnalysis <$> term))
+    delegateAnalyzeTerm term
