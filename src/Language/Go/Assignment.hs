@@ -390,7 +390,8 @@ importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTe
                <|> makeTerm <$> symbol ImportSpec <*> children namedImport
                <|> makeTerm <$> symbol ImportSpec <*> children plainImport
 
-    dotImport = symbol Dot *> source *> (Declaration.WildcardImport <$> expression <*> emptyTerm)
+    dotImport = symbol Dot *> source >>= \s ->
+      Declaration.WildcardImport <$> expression <*> (makeTerm <$> location <*> pure (Syntax.Identifier (name s)))
     sideEffectImport = symbol BlankIdentifier *> source *> (Declaration.Import <$> expression <*> pure [])
     namedImport = symbol PackageIdentifier >>= \loc -> do
       s <- source
