@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, DerivingStrategies, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Tracing where
 
 import Control.Abstract.Analysis
@@ -21,7 +21,9 @@ type TracingEffects trace term value = Tracer trace term value ': EvaluatorEffec
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
 newtype TracingAnalysis (trace :: * -> *) m a
   = TracingAnalysis { runTracingAnalysis :: m a }
-  deriving (Applicative, Functor, Generic1, LiftEffect, Monad, MonadEvaluator, MonadFail, Newtype1)
+  deriving newtype  (Applicative, Functor, LiftEffect, Monad, MonadEvaluator, MonadFail)
+  deriving stock    (Generic1)
+  deriving anyclass (Newtype1)
 
 instance ( Corecursive (TermFor m)
          , LiftEffect m
