@@ -33,46 +33,46 @@ deriving instance Ord (LocationFor value) => MonadEvaluator (CachingAnalysis ter
 
 -- TODO: reabstract these later on
 
-askCache :: CachingAnalysis t v (CacheFor t v)
+askCache :: CachingAnalysis term value (CacheFor term value)
 askCache = CachingAnalysis (Evaluator ask)
 
-localCache :: (CacheFor t v -> CacheFor t v) -> CachingAnalysis t v a -> CachingAnalysis t v a
+localCache :: (CacheFor term value -> CacheFor term value) -> CachingAnalysis term value a -> CachingAnalysis term value a
 localCache f (CachingAnalysis (Evaluator a)) = CachingAnalysis (Evaluator (local f a))
 
-asksCache :: (CacheFor t v -> a) -> CachingAnalysis t v a
+asksCache :: (CacheFor term value -> a) -> CachingAnalysis term value a
 asksCache f = f <$> askCache
 
-getsCache :: (CacheFor t v -> a) -> CachingAnalysis t v a
+getsCache :: (CacheFor term value -> a) -> CachingAnalysis term value a
 getsCache f = f <$> getCache
 
-getCache :: CachingAnalysis t v (CacheFor t v)
+getCache :: CachingAnalysis term value (CacheFor term value)
 getCache = CachingAnalysis (Evaluator get)
 
-putCache :: CacheFor t v -> CachingAnalysis t v ()
-putCache v = CachingAnalysis (Evaluator (put v))
+putCache :: CacheFor term value -> CachingAnalysis term value ()
+putCache cache = CachingAnalysis (Evaluator (put cache))
 
-modifyCache :: (CacheFor t v -> CacheFor t v) -> CachingAnalysis t v ()
+modifyCache :: (CacheFor term value -> CacheFor term value) -> CachingAnalysis term value ()
 modifyCache f = fmap f getCache >>= putCache
 
 -- | This instance coinductively iterates the analysis of a term until the results converge.
-instance ( Corecursive t
-         , Ord t
-         , Ord v
-         , Ord (CellFor v)
-         , Evaluatable (Base t)
-         , Foldable (Cell (LocationFor v))
-         , FreeVariables t
-         , MonadAddressable (LocationFor v) (CachingAnalysis t v)
-         , MonadValue v (CachingAnalysis t v)
-         , Recursive t
-         , Semigroup (CellFor v)
+instance ( Corecursive term
+         , Ord term
+         , Ord value
+         , Ord (CellFor value)
+         , Evaluatable (Base term)
+         , Foldable (Cell (LocationFor value))
+         , FreeVariables term
+         , MonadAddressable (LocationFor value) (CachingAnalysis term value)
+         , MonadValue value (CachingAnalysis term value)
+         , Recursive term
+         , Semigroup (CellFor value)
          )
-         => MonadAnalysis (CachingAnalysis t v) where
+         => MonadAnalysis (CachingAnalysis term value) where
   analyzeTerm e = do
     c <- getConfiguration (embedSubterm e)
     -- Convergence here is predicated upon an Eq instance, not α-equivalence
     cache <- converge (\ prevCache -> do
-      putCache (mempty :: CacheFor t v)
+      putCache (mempty :: CacheFor term value)
       putStore (configurationStore c)
       -- We need to reset fresh generation so that this invocation converges.
       reset 0
@@ -81,31 +81,31 @@ instance ( Corecursive t
       -- that it doesn't "leak" to the calling context and diverge (otherwise this
       -- would never complete). We don’t need to use the values, so we 'gather' the
       -- nondeterministic values into @()@.
-      _ <- localCache (const prevCache) (gather (memoizeEval e) :: CachingAnalysis t v ())
+      _ <- localCache (const prevCache) (gather (memoizeEval e) :: CachingAnalysis term value ())
       getCache) mempty
     maybe empty scatter (cacheLookup c cache)
 
 
 -- | Coinductively-cached evaluation.
-evaluateCache :: forall v term
-              . ( Ord v
+evaluateCache :: forall value term
+              . ( Ord value
                 , Ord term
-                , Ord (LocationFor v)
-                , Ord (CellFor v)
+                , Ord (LocationFor value)
+                , Ord (CellFor value)
                 , Corecursive term
                 , Evaluatable (Base term)
                 , FreeVariables term
-                , Foldable (Cell (LocationFor v))
+                , Foldable (Cell (LocationFor value))
                 , Functor (Base term)
                 , Recursive term
-                , MonadAddressable (LocationFor v) (CachingAnalysis term v)
-                , MonadValue v (CachingAnalysis term v)
-                , Semigroup (CellFor v)
-                , ValueRoots (LocationFor v) v
+                , MonadAddressable (LocationFor value) (CachingAnalysis term value)
+                , MonadValue value (CachingAnalysis term value)
+                , Semigroup (CellFor value)
+                , ValueRoots (LocationFor value) value
                 )
               => term
-              -> Final (CachingEffects term v) v
-evaluateCache = run @(CachingEffects term v) . runEvaluator . runCachingAnalysis . evaluateTerm
+              -> Final (CachingEffects term value) value
+evaluateCache = run @(CachingEffects term value) . runEvaluator . runCachingAnalysis . evaluateTerm
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
 --
@@ -127,22 +127,22 @@ scatter :: (Alternative m, Foldable t, MonadEvaluator m) => t (a, Store (Locatio
 scatter = getAlt . foldMap (\ (value, store') -> Alt (putStore store' *> pure value))
 
 -- | Evaluation of a single iteration of an analysis, given an in-cache as an oracle for results and an out-cache to record computed results in.
-memoizeEval :: forall v term
-            . ( Ord v
+memoizeEval :: forall value term
+            . ( Ord value
               , Ord term
-              , Ord (LocationFor v)
-              , Ord (CellFor v)
+              , Ord (LocationFor value)
+              , Ord (CellFor value)
               , Corecursive term
               , Evaluatable (Base term)
               , FreeVariables term
-              , Foldable (Cell (LocationFor v))
+              , Foldable (Cell (LocationFor value))
               , Functor (Base term)
               , Recursive term
-              , MonadAddressable (LocationFor v) (CachingAnalysis term v)
-              , MonadValue v (CachingAnalysis term v)
-              , Semigroup (CellFor v)
+              , MonadAddressable (LocationFor value) (CachingAnalysis term value)
+              , MonadValue value (CachingAnalysis term value)
+              , Semigroup (CellFor value)
               )
-            => SubtermAlgebra (Base term) term (CachingAnalysis term v v)
+            => SubtermAlgebra (Base term) term (CachingAnalysis term value value)
 memoizeEval e = do
   c <- getConfiguration (embedSubterm e)
   cached <- getsCache (cacheLookup c)
