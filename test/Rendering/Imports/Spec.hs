@@ -28,7 +28,7 @@ spec = parallel $ do
       expected <- readFileVerbatim "test/fixtures/ruby/import-graph/app.json"
       toVerbatimOutput output `shouldBe` expected
 
-    xit "works for Python" $ do
+    it "works for Python" $ do
       output <- parseToImports pythonParser "test/fixtures/python/import-graph/main.py"
       expected <- readFileVerbatim "test/fixtures/python/import-graph/main.json"
       toVerbatimOutput output `shouldBe` expected
