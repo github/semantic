@@ -96,7 +96,6 @@ type family LocationFor value :: * where
   LocationFor (Value location term) = location
   LocationFor Type.Type = Monovariant
 
-
 -- | Value types, e.g. closures, which can root a set of addresses.
 class ValueRoots l v | v -> l where
   -- | Compute the set of addresses rooted by a given value.
@@ -105,7 +104,6 @@ class ValueRoots l v | v -> l where
 instance (FreeVariables term, Ord location) => ValueRoots location (Value location term) where
   valueRoots v
     | Just (Closure names body env) <- prj v = envRoots env (foldr Set.delete (freeVariables body) names)
-    | Just (Interface _ env) <- prj v        = envAll env
     | otherwise                              = mempty
 
 instance ValueRoots Monovariant Type.Type where

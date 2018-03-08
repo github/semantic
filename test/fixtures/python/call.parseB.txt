@@ -12,8 +12,6 @@
     (Identifier)
     (Empty))
   (Call
-    (MemberAccess
-      (Identifier)
-      (Identifier))
+    (Identifier)
     (Integer)
     (Empty)))

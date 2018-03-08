@@ -33,6 +33,9 @@ class (MonadEvaluator t v m) => MonadValue t v m where
   -- | Construct a floating-point value.
   float :: Scientific -> m v
 
+  -- | Construct an abstract interface value.
+  interface :: v -> m v
+
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: v -> m v -> m v -> m v
 
@@ -40,6 +43,9 @@ class (MonadEvaluator t v m) => MonadValue t v m where
   abstract :: [Name] -> Subterm t (m v) -> m v
   -- | Evaluate an application (like a function call).
   apply :: v -> [Subterm t (m v)] -> m v
+
+  -- | Extract the environment from an interface value.
+  environment :: v -> m (EnvironmentFor v)
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( FreeVariables t
@@ -56,6 +62,7 @@ instance ( FreeVariables t
   boolean = pure . inj . Boolean
   string  = pure . inj . Value.String
   float   = pure . inj . Value.Float
+  interface v = inj . Value.Interface v <$> getGlobalEnv
 
   ifthenelse cond if' else'
     | Just (Boolean b) <- prj cond = if b then if' else else'
@@ -71,6 +78,10 @@ instance ( FreeVariables t
       assign a v
       envInsert name a <$> rest) (pure env) (zip names params)
     localEnv (mappend bindings) (evaluateTerm body)
+
+  environment v
+    | Just (Interface _ env) <- prj v = pure env
+    | otherwise                       = pure mempty
 
 -- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
 instance (Alternative m, MonadEvaluator t Type m, MonadFresh m) => MonadValue t Type m where
@@ -89,6 +100,8 @@ instance (Alternative m, MonadEvaluator t Type m, MonadFresh m) => MonadValue t 
   boolean _ = pure Bool
   string _  = pure Type.String
   float _   = pure Type.Float
+  -- TODO
+  interface = undefined
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 
@@ -97,3 +110,6 @@ instance (Alternative m, MonadEvaluator t Type m, MonadFresh m) => MonadValue t 
     paramTypes <- traverse subtermValue params
     _ :-> ret <- op `unify` (Product paramTypes :-> Var tvar)
     pure ret
+
+  -- TODO
+  environment = undefined

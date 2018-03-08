@@ -25,9 +25,7 @@
   {+(Let
     {+(Empty)+}
     {+(Call
-      {+(MemberAccess
-        {+(Identifier)+}
-        {+(Identifier)+})+}
+      {+(Identifier)+}
       {+(Identifier)+}
       {+(TextElement)+}
       {+(Identifier)+}
@@ -36,9 +34,7 @@
   {+(Let
     {+(Empty)+}
     {+(Call
-      {+(MemberAccess
-        {+(Identifier)+}
-        {+(Identifier)+})+}
+      {+(Identifier)+}
       {+(Identifier)+}
       {+(TextElement)+}
       {+(Identifier)+}
