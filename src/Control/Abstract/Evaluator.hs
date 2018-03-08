@@ -22,8 +22,8 @@ import Prelude hiding (fail)
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
 class MonadFail m => MonadEvaluator m where
-  type TermFor m :: *
-  type ValueFor m :: *
+  type TermFor m
+  type ValueFor m
 
   -- | Retrieve the global environment.
   getGlobalEnv :: m (EnvironmentFor (ValueFor m))
