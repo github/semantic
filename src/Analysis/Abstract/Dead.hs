@@ -9,7 +9,7 @@ import Data.Set (delete)
 import Prologue
 
 -- | The effects necessary for dead code analysis.
-type DeadCodeEffects term value = State (Dead term) ': EvaluatorEffects term value
+type DeadCodeEffects term value = State (Dead term) ': EvaluatingEffects term value
 
 
 -- | Run a dead code analysis of the given program.

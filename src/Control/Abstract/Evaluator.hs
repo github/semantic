@@ -58,7 +58,7 @@ class MonadFail m => MonadEvaluator m where
   getConfiguration :: Ord (LocationFor (ValueFor m)) => term -> m (Configuration (LocationFor (ValueFor m)) term (ValueFor m))
   getConfiguration term = Configuration term <$> askRoots <*> askLocalEnv <*> getStore
 
-type EvaluatorEffects term value
+type EvaluatingEffects term value
   = '[ Fail                          -- Failure with an error message
      , Reader (EnvironmentFor value) -- Local environment (e.g. binding over a closure)
      , State  (EnvironmentFor value) -- Global (imperative) environment
@@ -67,7 +67,7 @@ type EvaluatorEffects term value
      , State  (Linker value)         -- Cache of evaluated modules
      ]
 
-instance (Ord (LocationFor value), Members (EvaluatorEffects term value) effects) => MonadEvaluator (Evaluator term value effects) where
+instance (Ord (LocationFor value), Members (EvaluatingEffects term value) effects) => MonadEvaluator (Evaluator term value effects) where
   type TermFor (Evaluator term value effects) = term
   type ValueFor (Evaluator term value effects) = value
 

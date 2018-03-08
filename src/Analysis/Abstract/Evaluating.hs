@@ -17,30 +17,30 @@ import System.FilePath.Posix
 evaluate :: forall value term
          .  ( Evaluatable (Base term)
             , FreeVariables term
-            , MonadAddressable (LocationFor value) (Evaluating term value (EvaluatorEffects term value))
-            , MonadValue value (Evaluating term value (EvaluatorEffects term value))
+            , MonadAddressable (LocationFor value) (Evaluating term value (EvaluatingEffects term value))
+            , MonadValue value (Evaluating term value (EvaluatingEffects term value))
             , Ord (LocationFor value)
             , Recursive term
             , Semigroup (CellFor value)
             )
          => term
-         -> Final (EvaluatorEffects term value) value
-evaluate = run @(EvaluatorEffects term value) . runEvaluator . runEvaluating . evaluateModule
+         -> Final (EvaluatingEffects term value) value
+evaluate = run @(EvaluatingEffects term value) . runEvaluator . runEvaluating . evaluateModule
 
 -- | Evaluate terms and an entry point to a value.
 evaluates :: forall value term
           .  ( Evaluatable (Base term)
              , FreeVariables term
-             , MonadAddressable (LocationFor value) (Evaluating term value (EvaluatorEffects term value))
-             , MonadValue value (Evaluating term value (EvaluatorEffects term value))
+             , MonadAddressable (LocationFor value) (Evaluating term value (EvaluatingEffects term value))
+             , MonadValue value (Evaluating term value (EvaluatingEffects term value))
              , Ord (LocationFor value)
              , Recursive term
              , Semigroup (CellFor value)
              )
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
-          -> Final (EvaluatorEffects term value) value
-evaluates pairs (_, t) = run @(EvaluatorEffects term value) (runEvaluator (runEvaluating (withModules pairs (evaluateModule t))))
+          -> Final (EvaluatingEffects term value) value
+evaluates pairs (_, t) = run @(EvaluatingEffects term value) (runEvaluator (runEvaluating (withModules pairs (evaluateModule t))))
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
 withModules :: (MonadAnalysis m, MonadEvaluator m) => [(Blob, TermFor m)] -> m a -> m a
@@ -59,7 +59,7 @@ deriving instance (Member Fail effects, MonadEvaluator (Evaluator term value eff
 
 instance ( Evaluatable (Base term)
          , FreeVariables term
-         , Members (EvaluatorEffects term value) effects
+         , Members (EvaluatingEffects term value) effects
          , MonadAddressable (LocationFor value) (Evaluating term value effects)
          , MonadValue value (Evaluating term value effects)
          , Recursive term
