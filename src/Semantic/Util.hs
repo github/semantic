@@ -62,6 +62,8 @@ evaluatePythonFiles paths = do
   (t:ts) <- runTask $ traverse (parse pythonParser) blobs
   pure $ evaluates @PythonValue (zip bs ts) (b, t)
 
+parsePythonFile path = runTask (file path >>= fmap . (,) <*> parse pythonParser)
+
 
 -- Diff helpers
 diffWithParser :: (HasField fields Data.Span.Span,
