@@ -23,11 +23,11 @@ newtype Dead term = Dead { unDead :: Set term }
 deriving instance Ord term => Reducer term (Dead term)
 
 -- | Update the current 'Dead' set.
-killAll :: (Effectful m, Member (State (Dead (TermFor m))) (Effects m)) => Dead (TermFor m) -> DeadCodeAnalysis m ()
+killAll :: (Effectful m, Member (State (Dead (TermFor m))) (EffectsFor m)) => Dead (TermFor m) -> DeadCodeAnalysis m ()
 killAll = lift . put
 
 -- | Revive a single term, removing it from the current 'Dead' set.
-revive :: (Effectful m, Member (State (Dead (TermFor m))) (Effects m)) => Ord (TermFor m) => (TermFor m) -> DeadCodeAnalysis m ()
+revive :: (Effectful m, Member (State (Dead (TermFor m))) (EffectsFor m)) => Ord (TermFor m) => (TermFor m) -> DeadCodeAnalysis m ()
 revive t = lift (modify (Dead . delete t . unDead))
 
 -- | Compute the set of all subterms recursively.
@@ -38,7 +38,7 @@ subterms term = term `cons` para (foldMap (uncurry cons)) term
 instance ( Corecursive (TermFor m)
          , Effectful m
          , Foldable (Base (TermFor m))
-         , Member (State (Dead (TermFor m))) (Effects m)
+         , Member (State (Dead (TermFor m))) (EffectsFor m)
          , MonadAnalysis m
          , MonadEvaluator m
          , Ord (TermFor m)

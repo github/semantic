@@ -22,7 +22,7 @@ newtype TracingAnalysis (trace :: * -> *) m a
 
 instance ( Corecursive (TermFor m)
          , Effectful m
-         , Member (TracerFor trace m) (Effects m)
+         , Member (TracerFor trace m) (EffectsFor m)
          , MonadAnalysis m
          , MonadEvaluator m
          , Ord (LocationFor (ValueFor m))
@@ -36,7 +36,7 @@ instance ( Corecursive (TermFor m)
     liftAnalyze analyzeTerm term
 
 trace :: ( Effectful m
-         , Member (TracerFor trace m) (Effects m)
+         , Member (TracerFor trace m) (EffectsFor m)
          )
       => TraceFor trace m
       -> TracingAnalysis trace m ()

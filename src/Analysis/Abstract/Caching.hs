@@ -41,25 +41,25 @@ newtype CachingAnalysis m a = CachingAnalysis { runCachingAnalysis :: m a }
 type InCacheEffectFor  m = Reader (CacheFor m)
 type OutCacheEffectFor m = State  (CacheFor m)
 
-askCache :: (Effectful m, Member (InCacheEffectFor m) (Effects m)) => CachingAnalysis m (CacheFor m)
+askCache :: (Effectful m, Member (InCacheEffectFor m) (EffectsFor m)) => CachingAnalysis m (CacheFor m)
 askCache = lift ask
 
-localCache :: (Effectful m, Member (InCacheEffectFor m) (Effects m)) => (CacheFor m -> CacheFor m) -> CachingAnalysis m a -> CachingAnalysis m a
+localCache :: (Effectful m, Member (InCacheEffectFor m) (EffectsFor m)) => (CacheFor m -> CacheFor m) -> CachingAnalysis m a -> CachingAnalysis m a
 localCache f a = lift (local f (lower a))
 
-asksCache :: (Functor m, Effectful m, Member (InCacheEffectFor m) (Effects m)) => (CacheFor m -> a) -> CachingAnalysis m a
+asksCache :: (Functor m, Effectful m, Member (InCacheEffectFor m) (EffectsFor m)) => (CacheFor m -> a) -> CachingAnalysis m a
 asksCache f = f <$> askCache
 
-getsCache :: (Functor m, Effectful m, Member (OutCacheEffectFor m) (Effects m)) => (CacheFor m -> a) -> CachingAnalysis m a
+getsCache :: (Functor m, Effectful m, Member (OutCacheEffectFor m) (EffectsFor m)) => (CacheFor m -> a) -> CachingAnalysis m a
 getsCache f = f <$> getCache
 
-getCache :: (Effectful m, Member (OutCacheEffectFor m) (Effects m)) => CachingAnalysis m (CacheFor m)
+getCache :: (Effectful m, Member (OutCacheEffectFor m) (EffectsFor m)) => CachingAnalysis m (CacheFor m)
 getCache = lift get
 
-putCache :: (Effectful m, Member (OutCacheEffectFor m) (Effects m)) => CacheFor m -> CachingAnalysis m ()
+putCache :: (Effectful m, Member (OutCacheEffectFor m) (EffectsFor m)) => CacheFor m -> CachingAnalysis m ()
 putCache = lift . put
 
-modifyCache :: (Effectful m, Member (OutCacheEffectFor m) (Effects m), Monad m) => (CacheFor m -> CacheFor m) -> CachingAnalysis m ()
+modifyCache :: (Effectful m, Member (OutCacheEffectFor m) (EffectsFor m), Monad m) => (CacheFor m -> CacheFor m) -> CachingAnalysis m ()
 modifyCache f = fmap f getCache >>= putCache
 
 -- | This instance coinductively iterates the analysis of a term until the results converge.
@@ -71,7 +71,7 @@ instance ( Corecursive (TermFor m)
          , Effectful m
          , MonadFresh m
          , MonadNonDet m
-         , Members (CachingEffectsFor m) (Effects m)
+         , Members (CachingEffectsFor m) (EffectsFor m)
          , Evaluatable (Base (TermFor m))
          , Foldable (Cell (LocationFor (ValueFor m)))
          , FreeVariables (TermFor m)
@@ -126,7 +126,7 @@ memoizeEval :: ( Ord (ValueFor m)
                , Foldable (Cell (LocationFor (ValueFor m)))
                , Functor (Base (TermFor m))
                , Effectful m
-               , Members (CachingEffectsFor m) (Effects m)
+               , Members (CachingEffectsFor m) (EffectsFor m)
                , Recursive (TermFor m)
                , MonadAnalysis m
                -- , Semigroup (CellFor (ValueFor m))

@@ -12,7 +12,7 @@ import Data.Semigroup.Reducer
 import Prologue
 
 -- | Run an 'Effectful' computation to completion, interpreting each effect with some sensible defaults, and return the 'Final' result.
-run :: (Effectful m, RunEffects (Effects m) a) => m a -> Final (Effects m) a
+run :: (Effectful m, RunEffects (EffectsFor m) a) => m a -> Final (EffectsFor m) a
 run = Effect.run . runEffects . lower
 
 -- | A typeclass to run a computation to completion, interpreting each effect with some sensible defaults.
@@ -67,11 +67,11 @@ instance Ord a => RunEffect NonDetEff a where
 
 
 class Effectful m where
-  type Effects m :: [* -> *]
-  lift :: Eff (Effects m) a -> m a
-  lower :: m a -> Eff (Effects m) a
+  type EffectsFor m :: [* -> *]
+  lift :: Eff (EffectsFor m) a -> m a
+  lower :: m a -> Eff (EffectsFor m) a
 
 instance Effectful (Eff effects) where
-  type Effects (Eff effects) = effects
+  type EffectsFor (Eff effects) = effects
   lift = id
   lower = id
