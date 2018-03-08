@@ -13,9 +13,6 @@ type TraceFor trace m = Trace trace (TermFor m) (ValueFor m)
 type Tracer trace term value = Writer (Trace trace term value)
 type TracerFor trace m = Writer (TraceFor trace m)
 
--- | The effects necessary for tracing analyses.
-type TracingEffects trace term value = Tracer trace term value ': EvaluatingEffects term value
-
 -- | Trace analysis.
 --
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.

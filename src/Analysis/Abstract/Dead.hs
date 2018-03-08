@@ -9,8 +9,7 @@ import Data.Set (delete)
 import Prologue
 
 -- | The effects necessary for dead code analysis.
-type DeadCodeEffects term value = State (Dead term) ': EvaluatingEffects term value
-
+type DeadCode term = State (Dead term)
 
 -- | Run a dead code analysis of the given program.
 evaluateDead :: forall m term value effects
@@ -18,7 +17,7 @@ evaluateDead :: forall m term value effects
                 , value ~ ValueFor m
                 , effects ~ Effects m
                 , Corecursive term
-                , Member (State (Dead term)) effects
+                , Member (DeadCode term) effects
                 , Effectful m
                 , Evaluatable (Base term)
                 , Foldable (Base term)

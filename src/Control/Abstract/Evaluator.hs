@@ -1,19 +1,12 @@
 {-# LANGUAGE ConstrainedClassMethods, DataKinds, DefaultSignatures, GeneralizedNewtypeDeriving, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
 module Control.Abstract.Evaluator where
 
-import Control.Applicative
-import Control.Effect
-import Control.Monad.Effect
-import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Fresh
-import Control.Monad.Effect.NonDet
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.State
 import Data.Abstract.Configuration
 import Data.Abstract.Linker
 import Data.Abstract.Live
 import Data.Abstract.Value
 import Prelude hiding (fail)
+import Prologue
 
 -- | A 'Monad' providing the basic essentials for evaluation.
 --
@@ -39,6 +32,8 @@ class MonadFail m => MonadEvaluator m where
   getStore :: m (StoreFor (ValueFor m))
   -- | Update the heap.
   modifyStore :: (StoreFor (ValueFor m) -> StoreFor (ValueFor m)) -> m ()
+  putStore :: StoreFor (ValueFor m) -> m ()
+  putStore = modifyStore . const
 
   -- | Retrieve the table of evaluated modules.
   getModuleTable :: m (Linker (ValueFor m))
@@ -57,43 +52,3 @@ class MonadFail m => MonadEvaluator m where
   -- | Get the current 'Configuration' with a passed-in term.
   getConfiguration :: Ord (LocationFor (ValueFor m)) => term -> m (Configuration (LocationFor (ValueFor m)) term (ValueFor m))
   getConfiguration term = Configuration term <$> askRoots <*> askLocalEnv <*> getStore
-
-type EvaluatingEffects term value
-  = '[ Fail                          -- Failure with an error message
-     , Reader (EnvironmentFor value) -- Local environment (e.g. binding over a closure)
-     , State  (EnvironmentFor value) -- Global (imperative) environment
-     , State  (StoreFor value)       -- The heap
-     , Reader (Linker term)          -- Cache of unevaluated modules
-     , State  (Linker value)         -- Cache of evaluated modules
-     ]
-
-instance (Ord (LocationFor value), Members (EvaluatingEffects term value) effects) => MonadEvaluator (Evaluator term value effects) where
-  type TermFor (Evaluator term value effects) = term
-  type ValueFor (Evaluator term value effects) = value
-
-  getGlobalEnv = Evaluator get
-  modifyGlobalEnv f = Evaluator (modify f)
-
-  askLocalEnv = Evaluator ask
-  localEnv f a = Evaluator (local f (runEvaluator a))
-
-  getStore = Evaluator get
-  modifyStore f = Evaluator (modify f)
-
-  getModuleTable = Evaluator get
-  modifyModuleTable f = Evaluator (modify f)
-
-  askModuleTable = Evaluator ask
-  localModuleTable f a = Evaluator (local f (runEvaluator a))
-
-putStore :: MonadEvaluator m => StoreFor (ValueFor m) -> m ()
-putStore = modifyStore . const
-
--- | An evaluator of @term@s to @value@s, producing incremental results of type @a@ using a list of @effects@.
-newtype Evaluator term value effects a = Evaluator { runEvaluator :: Eff effects a }
-  deriving (Applicative, Functor, Effectful, Monad)
-
-deriving instance Member Fail effects => MonadFail (Evaluator term value effects)
-deriving instance Member NonDetEff effects => Alternative (Evaluator term value effects)
-deriving instance Member NonDetEff effects => MonadNonDet (Evaluator term value effects)
-deriving instance Member Fresh effects => MonadFresh (Evaluator term value effects)
