@@ -16,28 +16,28 @@ type TracerFor trace m = Writer (TraceFor trace m)
 -- | Trace analysis.
 --
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
-newtype TracingAnalysis (trace :: * -> *) m a
-  = TracingAnalysis { runTracingAnalysis :: m a }
+newtype TracingAnalysis (trace :: * -> *) m (effects :: [* -> *]) a
+  = TracingAnalysis { runTracingAnalysis :: m effects a }
   deriving (Applicative, Functor, Effectful, Monad, MonadEvaluator, MonadFail)
 
-instance ( Corecursive (TermFor m)
+instance ( Corecursive (TermFor (m effects))
          , Effectful m
-         , Member (TracerFor trace m) (EffectsFor m)
-         , MonadAnalysis m
-         , MonadEvaluator m
-         , Ord (LocationFor (ValueFor m))
-         , Recursive (TermFor m)
-         , Reducer (ConfigurationFor (TermFor m) (ValueFor m)) (TraceFor trace m)
+         , Member (TracerFor trace (m effects)) effects
+         , MonadAnalysis (m effects)
+         , MonadEvaluator (m effects)
+         , Ord (LocationFor (ValueFor (m effects)))
+         , Recursive (TermFor (m effects))
+         , Reducer (ConfigurationFor (TermFor (m effects)) (ValueFor (m effects))) (TraceFor trace (m effects))
          )
-         => MonadAnalysis (TracingAnalysis trace m) where
+         => MonadAnalysis (TracingAnalysis trace m effects) where
   analyzeTerm term = do
     config <- getConfiguration (embedSubterm term)
     trace (Reducer.unit config)
     liftAnalyze analyzeTerm term
 
 trace :: ( Effectful m
-         , Member (TracerFor trace m) (EffectsFor m)
+         , Member (TracerFor trace (m effects)) effects
          )
-      => TraceFor trace m
-      -> TracingAnalysis trace m ()
+      => TraceFor trace (m effects)
+      -> TracingAnalysis trace m effects ()
 trace = lift . tell

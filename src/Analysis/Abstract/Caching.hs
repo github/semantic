@@ -33,7 +33,7 @@ type CachingEffects term value effects
 -- | The cache for term and abstract value types.
 type CacheFor m = Cache (LocationFor (ValueFor m)) (TermFor m) (ValueFor m)
 
-newtype CachingAnalysis m a = CachingAnalysis { runCachingAnalysis :: m a }
+newtype CachingAnalysis m (effects :: [* -> *]) a = CachingAnalysis { runCachingAnalysis :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadEvaluator, MonadFail, MonadFresh, MonadNonDet)
 
 -- TODO: reabstract these later on
@@ -41,44 +41,44 @@ newtype CachingAnalysis m a = CachingAnalysis { runCachingAnalysis :: m a }
 type InCacheEffectFor  m = Reader (CacheFor m)
 type OutCacheEffectFor m = State  (CacheFor m)
 
-askCache :: (Effectful m, Member (InCacheEffectFor m) (EffectsFor m)) => CachingAnalysis m (CacheFor m)
+askCache :: (Effectful m, Member (InCacheEffectFor (m effects)) effects) => CachingAnalysis m effects (CacheFor (m effects))
 askCache = lift ask
 
-localCache :: (Effectful m, Member (InCacheEffectFor m) (EffectsFor m)) => (CacheFor m -> CacheFor m) -> CachingAnalysis m a -> CachingAnalysis m a
+localCache :: (Effectful m, Member (InCacheEffectFor (m effects)) effects) => (CacheFor (m effects) -> CacheFor (m effects)) -> CachingAnalysis m effects a -> CachingAnalysis m effects a
 localCache f a = lift (local f (lower a))
 
-asksCache :: (Functor m, Effectful m, Member (InCacheEffectFor m) (EffectsFor m)) => (CacheFor m -> a) -> CachingAnalysis m a
+asksCache :: (Functor (m effects), Effectful m, Member (InCacheEffectFor (m effects)) effects) => (CacheFor (m effects) -> a) -> CachingAnalysis m effects a
 asksCache f = f <$> askCache
 
-getsCache :: (Functor m, Effectful m, Member (OutCacheEffectFor m) (EffectsFor m)) => (CacheFor m -> a) -> CachingAnalysis m a
+getsCache :: (Functor (m effects), Effectful m, Member (OutCacheEffectFor (m effects)) effects) => (CacheFor (m effects) -> a) -> CachingAnalysis m effects a
 getsCache f = f <$> getCache
 
-getCache :: (Effectful m, Member (OutCacheEffectFor m) (EffectsFor m)) => CachingAnalysis m (CacheFor m)
+getCache :: (Effectful m, Member (OutCacheEffectFor (m effects)) effects) => CachingAnalysis m effects (CacheFor (m effects))
 getCache = lift get
 
-putCache :: (Effectful m, Member (OutCacheEffectFor m) (EffectsFor m)) => CacheFor m -> CachingAnalysis m ()
+putCache :: (Effectful m, Member (OutCacheEffectFor (m effects)) effects) => CacheFor (m effects) -> CachingAnalysis m effects ()
 putCache = lift . put
 
-modifyCache :: (Effectful m, Member (OutCacheEffectFor m) (EffectsFor m), Monad m) => (CacheFor m -> CacheFor m) -> CachingAnalysis m ()
+modifyCache :: (Effectful m, Member (OutCacheEffectFor (m effects)) effects, Monad (m effects)) => (CacheFor (m effects) -> CacheFor (m effects)) -> CachingAnalysis m effects ()
 modifyCache f = fmap f getCache >>= putCache
 
 -- | This instance coinductively iterates the analysis of a term until the results converge.
-instance ( Corecursive (TermFor m)
-         , Ord (TermFor m)
-         , Ord (ValueFor m)
-         , Ord (CellFor (ValueFor m))
-         , Ord (LocationFor (ValueFor m))
+instance ( Corecursive (TermFor (m effects))
+         , Ord (TermFor (m effects))
+         , Ord (ValueFor (m effects))
+         , Ord (CellFor (ValueFor (m effects)))
+         , Ord (LocationFor (ValueFor (m effects)))
          , Effectful m
-         , MonadFresh m
-         , MonadNonDet m
-         , Members (CachingEffectsFor m) (EffectsFor m)
-         , Evaluatable (Base (TermFor m))
-         , Foldable (Cell (LocationFor (ValueFor m)))
-         , FreeVariables (TermFor m)
-         , MonadAnalysis m
-         , Recursive (TermFor m)
+         , MonadFresh (m effects)
+         , MonadNonDet (m effects)
+         , Members (CachingEffectsFor (m effects)) effects
+         , Evaluatable (Base (TermFor (m effects)))
+         , Foldable (Cell (LocationFor (ValueFor (m effects))))
+         , FreeVariables (TermFor (m effects))
+         , MonadAnalysis (m effects)
+         , Recursive (TermFor (m effects))
          )
-         => MonadAnalysis (CachingAnalysis m) where
+         => MonadAnalysis (CachingAnalysis m effects) where
   analyzeTerm e = do
     c <- getConfiguration (embedSubterm e)
     -- Convergence here is predicated upon an Eq instance, not α-equivalence
@@ -92,7 +92,7 @@ instance ( Corecursive (TermFor m)
       -- that it doesn't "leak" to the calling context and diverge (otherwise this
       -- would never complete). We don’t need to use the values, so we 'gather' the
       -- nondeterministic values into @()@.
-      _ <- localCache (const prevCache) (gather (memoizeEval e) :: CachingAnalysis m ())
+      _ <- localCache (const prevCache) (gather (memoizeEval e) :: CachingAnalysis m effects ())
       getCache) mempty
     maybe empty scatter (cacheLookup c cache)
 
@@ -116,22 +116,22 @@ scatter :: (Alternative m, Foldable t, MonadEvaluator m) => t (a, Store (Locatio
 scatter = getAlt . foldMap (\ (value, store') -> Alt (putStore store' *> pure value))
 
 -- | Evaluation of a single iteration of an analysis, given an in-cache as an oracle for results and an out-cache to record computed results in.
-memoizeEval :: ( Ord (ValueFor m)
-               , Ord (TermFor m)
-               , Ord (LocationFor (ValueFor m))
-               , Ord (CellFor (ValueFor m))
-               , Alternative m
-               , Corecursive (TermFor m)
-               , FreeVariables (TermFor m)
-               , Foldable (Cell (LocationFor (ValueFor m)))
-               , Functor (Base (TermFor m))
+memoizeEval :: ( Ord (ValueFor (m effects))
+               , Ord (TermFor (m effects))
+               , Ord (LocationFor (ValueFor (m effects)))
+               , Ord (CellFor (ValueFor (m effects)))
+               , Alternative (m effects)
+               , Corecursive (TermFor (m effects))
+               , FreeVariables (TermFor (m effects))
+               , Foldable (Cell (LocationFor (ValueFor (m effects))))
+               , Functor (Base (TermFor (m effects)))
                , Effectful m
-               , Members (CachingEffectsFor m) (EffectsFor m)
-               , Recursive (TermFor m)
-               , MonadAnalysis m
-               -- , Semigroup (CellFor (ValueFor m))
+               , Members (CachingEffectsFor (m effects)) effects
+               , Recursive (TermFor (m effects))
+               , MonadAnalysis (m effects)
+               -- , Semigroup (CellFor (ValueFor (m effects)))
                )
-            => SubtermAlgebra (Base (TermFor m)) (TermFor m) (CachingAnalysis m (ValueFor m))
+            => SubtermAlgebra (Base (TermFor (m effects))) (TermFor (m effects)) (CachingAnalysis m effects (ValueFor (m effects)))
 memoizeEval e = do
   c <- getConfiguration (embedSubterm e)
   cached <- getsCache (cacheLookup c)
