@@ -47,9 +47,9 @@ library
                      , Data.Abstract.Configuration
                      , Data.Abstract.Environment
                      , Data.Abstract.Evaluatable
-                     , Data.Abstract.Linker
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Live
+                     , Data.Abstract.ModuleTable
                      , Data.Abstract.Store
                      , Data.Abstract.Type
                      , Data.Abstract.Value
@@ -163,6 +163,7 @@ library
                      , recursion-schemes
                      , reducers
                      , semigroups
+                     , scientific
                      , split
                      , stm-chans
                      , template-haskell

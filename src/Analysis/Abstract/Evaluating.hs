@@ -9,7 +9,7 @@ import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Evaluatable
-import Data.Abstract.Linker
+import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Blob
 import qualified Data.Map as Map
@@ -49,7 +49,7 @@ evaluates pairs (_, t) = run @(Evaluating term value (EvaluatingEffects term val
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
 withModules :: (MonadAnalysis m, MonadEvaluator m) => [(Blob, TermFor m)] -> m a -> m a
 withModules pairs = localModuleTable (const moduleTable)
-  where moduleTable = Linker (Map.fromList (map (first (dropExtensions . blobPath)) pairs))
+  where moduleTable = ModuleTable (Map.fromList (map (first (dropExtensions . blobPath)) pairs))
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
 newtype Evaluating term value effects a = Evaluating { runEvaluating :: Eff effects a }
@@ -65,8 +65,8 @@ type EvaluatingEffects term value
      , Reader (EnvironmentFor value) -- Local environment (e.g. binding over a closure)
      , State  (EnvironmentFor value) -- Global (imperative) environment
      , State  (StoreFor value)       -- The heap
-     , Reader (Linker term)          -- Cache of unevaluated modules
-     , State  (Linker value)         -- Cache of evaluated modules
+     , Reader (ModuleTable term)     -- Cache of unevaluated modules
+     , State  (ModuleTable value)    -- Cache of evaluated modules
      ]
 
 instance (Ord (LocationFor value), Members (EvaluatingEffects term value) effects) => MonadEvaluator (Evaluating term value effects) where

@@ -225,7 +225,7 @@ fieldIdentifier :: Assignment
 fieldIdentifier = makeTerm <$> symbol FieldIdentifier <*> (Syntax.Identifier <$> source)
 
 floatLiteral :: Assignment
-floatLiteral = makeTerm <$> symbol FloatLiteral <*> (Literal.Float <$> source)
+floatLiteral = makeTerm <$> symbol FloatLiteral <*> (source >>= Literal.normalizeFloatString [Literal.padWithLeadingZero, Literal.dropAlphaSuffix])
 
 identifier :: Assignment
 identifier =  makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax.Identifier <$> source)
@@ -382,9 +382,13 @@ importDeclaration :: Assignment
 importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTerm (importSpec <|> importSpecList))
   where
     importSpec = makeTerm <$> symbol ImportSpec <*> children (namedImport <|> plainImport)
-    namedImport = flip Declaration.Import <$> expression <*> expression <*> pure []
-    plainImport = Declaration.Import <$> expression <*> emptyTerm <*> pure []
+    namedImport = flip Declaration.Import <$> expression' <*> expression' <*> pure []
+    plainImport = Declaration.Import <$> expression' <*> emptyTerm <*> pure []
     importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyTerm (importSpec <|> comment))
+
+    expression' = expression <|> dotImport <|> blankImport
+    dotImport = makeTerm <$> symbol Dot <*> (Syntax.Identifier <$> source)
+    blankImport = makeTerm <$> symbol BlankIdentifier <*> (Syntax.Identifier <$> source)
 
 indexExpression :: Assignment
 indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)

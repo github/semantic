@@ -8,8 +8,9 @@ import Data.Abstract.FreeVariables
 import Data.Abstract.Live
 import qualified Data.Abstract.Type as Type
 import qualified Data.Set as Set
+import Data.Scientific (Scientific)
 import Prologue
-import Prelude hiding (Integer, String, fail)
+import Prelude hiding (Float, Integer, String, fail)
 import qualified Prelude
 
 type ValueConstructors location
@@ -17,6 +18,7 @@ type ValueConstructors location
     , Interface location
     , Unit
     , Boolean
+    , Float
     , Integer
     , String
     ]
@@ -74,6 +76,14 @@ newtype String term = String ByteString
 instance Eq1 String where liftEq = genericLiftEq
 instance Ord1 String where liftCompare = genericLiftCompare
 instance Show1 String where liftShowsPrec = genericLiftShowsPrec
+
+-- | Float values.
+newtype Float term = Float Scientific
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Float where liftEq = genericLiftEq
+instance Ord1 Float where liftCompare = genericLiftCompare
+instance Show1 Float where liftShowsPrec = genericLiftShowsPrec
 
 -- | The environment for an abstract value type.
 type EnvironmentFor v = Environment (LocationFor v) v

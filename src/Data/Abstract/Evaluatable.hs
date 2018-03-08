@@ -15,7 +15,7 @@ import Control.Abstract.Analysis as Analysis
 import Control.Abstract.Value as Value
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables as FreeVariables
-import Data.Abstract.Linker
+import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import qualified Data.ByteString.Char8 as BC
 import Data.Functor.Classes
@@ -82,7 +82,7 @@ require :: ( FreeVariables (TermFor m)
            )
         => TermFor m
         -> m (ValueFor m)
-require term = getModuleTable >>= maybe (load term) pure . linkerLookup name
+require term = getModuleTable >>= maybe (load term) pure . moduleTableLookup name
   where name = moduleName term
 
 -- | Load another term/file and return an Effect.
@@ -94,12 +94,12 @@ load :: ( FreeVariables (TermFor m)
         )
      => TermFor m
      -> m (ValueFor m)
-load term = askModuleTable >>= maybe notFound evalAndCache . linkerLookup name
+load term = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
   where name = moduleName term
         notFound = fail ("cannot find " <> show name)
         evalAndCache e = do
           v <- evaluateModule e
-          modifyModuleTable (linkerInsert name v)
+          modifyModuleTable (moduleTableInsert name v)
           pure v
 
 -- | Get a module name from a term (expects single free variables).

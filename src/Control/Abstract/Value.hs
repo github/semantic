@@ -9,6 +9,7 @@ import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value as Value
 import Data.Abstract.Type as Type
+import Data.Scientific (Scientific)
 import Prologue
 import Prelude hiding (fail)
 
@@ -27,6 +28,9 @@ class (MonadEvaluator m, v ~ ValueFor m) => MonadValue v m where
 
   -- | Construct an abstract string value.
   string :: ByteString -> m v
+
+  -- | Construct a floating-point value.
+  float :: Scientific -> m v
 
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: v -> m v -> m v -> m v
@@ -52,6 +56,7 @@ instance ( FreeVariables t
   integer = pure . inj . Integer
   boolean = pure . inj . Boolean
   string  = pure . inj . Value.String
+  float   = pure . inj . Value.Float
 
   ifthenelse cond if' else'
     | Just (Boolean b) <- prj cond = if b then if' else else'
@@ -84,6 +89,7 @@ instance (Alternative m, MonadEvaluator m, MonadFresh m, ValueFor m ~ Type) => M
   integer _ = pure Int
   boolean _ = pure Bool
   string _  = pure Type.String
+  float _   = pure Type.Float
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 

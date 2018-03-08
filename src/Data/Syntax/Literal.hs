@@ -1,10 +1,15 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses, TypeApplications #-}
 module Data.Syntax.Literal where
 
 import Data.Abstract.Evaluatable
-import Data.ByteString.Char8 (readInteger)
+import Data.ByteString.Char8 (readInteger, unpack)
+import qualified Data.ByteString.Char8 as B
+import Data.Monoid (Endo (..), appEndo)
+import Data.Scientific (Scientific)
 import Diffing.Algorithm
+import Prelude hiding (Float, fail)
 import Prologue hiding (Set)
+import Text.Read (readMaybe)
 
 -- Boolean
 
@@ -45,16 +50,52 @@ instance Evaluatable Data.Syntax.Literal.Integer where
 -- TODO: Consider a Numeric datatype with FloatingPoint/Integral/etc constructors.
 
 -- | A literal float of unspecified width.
-newtype Float a = Float { floatContent :: ByteString }
+newtype Float a = Float { floatContent  :: ByteString }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Data.Syntax.Literal.Float where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Float where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Float
-instance Evaluatable Data.Syntax.Literal.Float
+-- | Ensures that numbers of the form '.52' are parsed correctly. Most languages need this.
+padWithLeadingZero :: ByteString -> ByteString
+padWithLeadingZero b
+  | fmap fst (B.uncons b) == Just '.' = B.cons '0' b
+  | otherwise                         = b
 
+-- | As @padWithLeadingZero@, but on the end. Not all languages need this.
+padWithTrailingZero :: ByteString -> ByteString
+padWithTrailingZero b
+  | fmap snd (B.unsnoc b) == Just '.' = B.snoc b '0'
+  | otherwise                         = b
+
+-- | Removes underscores in numeric literals. Python 3 and Ruby support this, whereas Python 2, JS, and Go do not.
+removeUnderscores :: ByteString -> ByteString
+removeUnderscores = B.filter (/= '_')
+
+-- | Strip suffixes from floating-point literals so as to handle Python's
+--   TODO: tree-sitter-python needs some love so that it parses j-suffixed floats as complexen
+dropAlphaSuffix :: ByteString -> ByteString
+dropAlphaSuffix = B.takeWhile (\x -> x `notElem` ("lLjJiI" :: [Char]))
+
+-- | This is the shared function that munges a bytestring representation of a float
+--   so that it can be parsed to a @Scientific@ later. It takes as its arguments a list of functions, which
+--   will be some combination of the above 'ByteString -> ByteString' functions. This is meant
+--   to be called from an @Assignment@, hence the @MonadFail@ constraint. Caveat: the list is
+--   order-dependent; the rightmost function will be applied first.
+normalizeFloatString :: MonadFail m => [ByteString -> ByteString] -> ByteString -> m (Float a)
+normalizeFloatString preds val =
+  let munger = appEndo (foldMap Endo preds)
+  in case readMaybe @Scientific (unpack (munger val)) of
+    Nothing -> fail ("Invalid floating-point value: " <> show val)
+    Just _  -> pure (Float val)
+
+instance Evaluatable Data.Syntax.Literal.Float where
+  eval (Float s) = do
+    sci <- case readMaybe (unpack s) of
+      Just s  -> pure s
+      Nothing -> fail ("Bug: non-normalized float string: " <> show s)
+    float sci
 
 -- Rational literals e.g. `2/3r`
 newtype Rational a = Rational ByteString

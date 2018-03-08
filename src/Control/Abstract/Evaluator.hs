@@ -2,7 +2,7 @@
 module Control.Abstract.Evaluator where
 
 import Data.Abstract.Configuration
-import Data.Abstract.Linker
+import Data.Abstract.ModuleTable
 import Data.Abstract.Live
 import Data.Abstract.Value
 import Prelude hiding (fail)
@@ -36,14 +36,14 @@ class MonadFail m => MonadEvaluator m where
   putStore = modifyStore . const
 
   -- | Retrieve the table of evaluated modules.
-  getModuleTable :: m (Linker (ValueFor m))
+  getModuleTable :: m (ModuleTable (ValueFor m))
   -- | Update the table of evaluated modules.
-  modifyModuleTable :: (Linker (ValueFor m) -> Linker (ValueFor m)) -> m ()
+  modifyModuleTable :: (ModuleTable (ValueFor m) -> ModuleTable (ValueFor m)) -> m ()
 
   -- | Retrieve the table of unevaluated modules.
-  askModuleTable :: m (Linker (TermFor m))
+  askModuleTable :: m (ModuleTable (TermFor m))
   -- | Run an action with a locally-modified table of unevaluated modules.
-  localModuleTable :: (Linker (TermFor m) -> Linker (TermFor m)) -> m a -> m a
+  localModuleTable :: (ModuleTable (TermFor m) -> ModuleTable (TermFor m)) -> m a -> m a
 
   -- | Retrieve the current root set.
   askRoots :: Ord (LocationFor (ValueFor m)) => m (Live (LocationFor (ValueFor m)) (ValueFor m))
