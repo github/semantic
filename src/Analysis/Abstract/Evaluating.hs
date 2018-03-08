@@ -12,7 +12,6 @@ import Data.Abstract.ModuleTable
 import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Blob
-import Data.List (intercalate)
 import Data.List.Split (splitWhen)
 import Prologue
 import qualified Data.ByteString.Char8 as BC
@@ -65,8 +64,8 @@ withModules Blob{..} pairs = localModuleTable (const moduleTable)
   where
     moduleTable = ModuleTable (Map.fromList (map (first moduleName) pairs))
     rootDir = dropFileName blobPath
-    replacePathSeps str = intercalate "." (splitWhen (== pathSeparator) str)
-    moduleName Blob{..} = BC.pack $ replacePathSeps (dropExtensions (makeRelative rootDir blobPath))
+    moduleName Blob{..} = toName (dropExtensions (makeRelative rootDir blobPath))
+    toName str = qualifiedName (fmap BC.pack (splitWhen (== pathSeparator) str))
 
 -- | An analysis performing concrete evaluation of @term@s to @value@s.
 newtype Evaluation term value a = Evaluation { runEvaluation :: Evaluator (EvaluationEffects term value) term value a }

@@ -3,6 +3,7 @@ module Rendering.TOC.Spec where
 
 import Analysis.Decorator (constructorNameAndConstantFields)
 import Analysis.Declaration
+import Data.Abstract.FreeVariables
 import Data.Aeson
 import Data.Bifunctor
 import Data.Blob
@@ -188,14 +189,14 @@ programWithChange :: Term' -> Diff'
 programWithChange body = merge (programInfo, programInfo) (inj [ function' ])
   where
     function' = merge (Just (FunctionDeclaration "foo" mempty Nothing) :. emptyInfo, Just (FunctionDeclaration "foo" mempty Nothing) :. emptyInfo) (inj (Declaration.Function [] name' [] (merge (Nothing :. emptyInfo, Nothing :. emptyInfo) (inj [ inserting body ]))))
-    name' = let info = Nothing :. emptyInfo in merge (info, info) (inj (Syntax.Identifier "foo"))
+    name' = let info = Nothing :. emptyInfo in merge (info, info) (inj (Syntax.Identifier (name "foo")))
 
 -- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
 programWithChangeOutsideFunction :: Term' -> Diff'
 programWithChangeOutsideFunction term = merge (programInfo, programInfo) (inj [ function', term' ])
   where
     function' = merge (Just (FunctionDeclaration "foo" mempty Nothing) :. emptyInfo, Just (FunctionDeclaration "foo" mempty Nothing) :. emptyInfo) (inj (Declaration.Function [] name' [] (merge (Nothing :. emptyInfo, Nothing :. emptyInfo) (inj []))))
-    name' = let info = Nothing :. emptyInfo in  merge (info, info) (inj (Syntax.Identifier "foo"))
+    name' = let info = Nothing :. emptyInfo in  merge (info, info) (inj (Syntax.Identifier (name "foo")))
     term' = inserting term
 
 programWithInsert :: Text -> Term' -> Diff'
@@ -211,9 +212,9 @@ programOf :: Diff' -> Diff'
 programOf diff = merge (programInfo, programInfo) (inj [ diff ])
 
 functionOf :: Text -> Term' -> Term'
-functionOf name body = termIn (Just (FunctionDeclaration name mempty Nothing) :. emptyInfo) (inj (Declaration.Function [] name' [] (termIn (Nothing :. emptyInfo) (inj [body]))))
+functionOf n body = termIn (Just (FunctionDeclaration n mempty Nothing) :. emptyInfo) (inj (Declaration.Function [] name' [] (termIn (Nothing :. emptyInfo) (inj [body]))))
   where
-    name' = termIn (Nothing :. emptyInfo) (inj (Syntax.Identifier (encodeUtf8 name)))
+    name' = termIn (Nothing :. emptyInfo) (inj (Syntax.Identifier (name (encodeUtf8 n))))
 
 programInfo :: Record '[Maybe Declaration, Range, Span]
 programInfo = Nothing :. emptyInfo
@@ -240,7 +241,7 @@ blobsForPaths :: Both FilePath -> IO BlobPair
 blobsForPaths = readFilePair . fmap ("test/fixtures/toc/" <>)
 
 blankDiff :: Diff'
-blankDiff = merge (arrayInfo, arrayInfo) (inj [ inserting (termIn literalInfo (inj (Syntax.Identifier "\"a\""))) ])
+blankDiff = merge (arrayInfo, arrayInfo) (inj [ inserting (termIn literalInfo (inj (Syntax.Identifier (name "\"a\"")))) ])
   where
     arrayInfo = Nothing :. Range 0 3 :. Span (Pos 1 1) (Pos 1 5) :. Nil
     literalInfo = Nothing :. Range 1 2 :. Span (Pos 1 2) (Pos 1 4) :. Nil

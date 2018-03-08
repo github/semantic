@@ -3,10 +3,26 @@ module Data.Abstract.FreeVariables where
 
 import Prologue
 import Data.Term
-import Data.ByteString as B
 
 -- | The type of variable names.
-type Name = ByteString
+data Name = Name ByteString | Qualified ByteString Name
+  deriving (Eq, Ord, Show)
+
+name :: ByteString -> Name
+name = Name
+
+qualifiedName :: [ByteString] -> Name
+qualifiedName [] = Name "THIS IS BROKEN"
+qualifiedName [x] = Name x
+qualifiedName (x:xs) = Qualified x (qualifiedName xs)
+
+friendlyName :: Name -> ByteString
+friendlyName (Name a) = a
+friendlyName (Qualified a b) = a <> "." <> friendlyName b
+
+instance Semigroup Name where
+  (<>) (Name a) n = Qualified a n
+  (<>) (Qualified a rest) n = Qualified a (rest <> n)
 
 
 -- | Types which can contain unbound variables.
@@ -33,8 +49,8 @@ freeVariable term = let [n] = toList (freeVariables term) in n
 
 -- TODO: Need a dedicated concept of qualified names outside of freevariables (a
 -- Set) b/c you can have something like `a.a.b.a`
-qualifiedName :: FreeVariables term => term -> Name
-qualifiedName term = let names = toList (freeVariables term) in B.intercalate "." names
+-- qualifiedName :: FreeVariables term => term -> Name
+-- qualifiedName term = let names = toList (freeVariables term) in B.intercalate "." names
 
 instance (FreeVariables1 syntax, Functor syntax) => FreeVariables (Term syntax ann) where
   freeVariables = cata (liftFreeVariables id)

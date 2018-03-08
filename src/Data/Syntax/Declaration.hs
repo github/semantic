@@ -221,12 +221,12 @@ instance Evaluatable QualifiedImport where
   eval (QualifiedImport from alias xs) = do
     env <- getGlobalEnv
     putGlobalEnv mempty
-    importedEnv <- require (qualifiedName (subterm from))
+    importedEnv <- require (freeVariable (subterm from))
     env' <- Map.foldrWithKey copy (pure env) (unEnvironment importedEnv)
     modifyGlobalEnv (const env')
     unit
     where
-      prefix = qualifiedName (subterm alias) <> "."
+      prefix = freeVariable (subterm alias)
       symbols = Map.fromList xs
       copy = if Map.null symbols then qualifyInsert else directInsert
       qualifyInsert k v rest = envInsert (prefix <> k) v <$> rest
@@ -247,7 +247,7 @@ instance Evaluatable Import where
   eval (Import from xs) = do
     env <- getGlobalEnv
     putGlobalEnv mempty
-    importedEnv <- require (qualifiedName (subterm from))
+    importedEnv <- require (freeVariable (subterm from))
     env' <- Map.foldrWithKey directInsert (pure env) (unEnvironment importedEnv)
     modifyGlobalEnv (const env')
     unit
@@ -267,7 +267,7 @@ instance Ord1 WildcardImport where liftCompare = genericLiftCompare
 instance Show1 WildcardImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable WildcardImport where
-  eval (WildcardImport from _) = putGlobalEnv mempty *> require (qualifiedName (subterm from)) *> unit
+  eval (WildcardImport from _) = putGlobalEnv mempty *> require (freeVariable (subterm from)) *> unit
 
 -- | A declared type (e.g. `a []int` in Go).
 data Type a = Type { typeName :: !a, typeKind :: !a }

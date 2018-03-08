@@ -14,6 +14,7 @@ import Data.Record
 import Data.Source as Source
 import Data.Span
 import Data.Term
+import Data.Abstract.FreeVariables
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
@@ -131,7 +132,7 @@ instance CustomHasDeclaration (Union fs) Declaration.QualifiedImport where
                           | otherwise = alias
       basename = last . T.splitOn "/"
       getSource = T.dropAround (`elem` ['"', '\'']) . toText . flip Source.slice blobSource . getField
-      getSymbol (a, b) = (T.decodeUtf8 a, T.decodeUtf8 b)
+      getSymbol = let f = (T.decodeUtf8 . friendlyName) in bimap f f
 
 instance (Expression.MemberAccess :< fs) => CustomHasDeclaration (Union fs) Expression.Call where
   customToDeclaration Blob{..} _ (Expression.Call _ (Term (In fromAnn fromF), _) _ _)

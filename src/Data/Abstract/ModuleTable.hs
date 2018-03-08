@@ -6,14 +6,13 @@ module Data.Abstract.ModuleTable
   , moduleTableInsert
   ) where
 
-import Data.ByteString
+import Data.Abstract.FreeVariables
 import Data.Semigroup
 import GHC.Generics
 import qualified Data.Map as Map
 
 
-
-type ModuleName = ByteString
+type ModuleName = Name
 
 newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModuleName a }
   deriving (Eq, Foldable, Functor, Generic1, Monoid, Ord, Semigroup, Show, Traversable)

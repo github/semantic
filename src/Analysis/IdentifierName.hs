@@ -5,11 +5,12 @@ module Analysis.IdentifierName
 , identifierLabel
 ) where
 
-import Prologue
+import Data.Abstract.FreeVariables
 import Data.Aeson
 import Data.JSON.Fields
 import Data.Term
 import Data.Text.Encoding (decodeUtf8)
+import Prologue
 import qualified Data.Syntax
 
 -- | Compute a 'IdentifierLabel' label for a 'Term'.
@@ -39,7 +40,7 @@ instance Apply IdentifierName fs => CustomIdentifierName (Union fs) where
   customIdentifierName = apply (Proxy :: Proxy IdentifierName) identifierName
 
 instance CustomIdentifierName Data.Syntax.Identifier where
-  customIdentifierName (Data.Syntax.Identifier name) = Just name
+  customIdentifierName (Data.Syntax.Identifier name) = Just (friendlyName name)
 
 data Strategy = Default | Custom
 
