@@ -287,7 +287,10 @@ instance Ord1 WildcardImport where liftCompare = genericLiftCompare
 instance Show1 WildcardImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable WildcardImport where
-  eval (WildcardImport from _) = putGlobalEnv mempty *> require (qualifiedName (subterm from)) *> unit
+  eval (WildcardImport from _) = do
+    importedEnv <- withGlobalEnv mempty (require (qualifiedName (subterm from)))
+    modifyGlobalEnv (flip (Map.foldrWithKey envInsert) (unEnvironment importedEnv))
+    unit
 
 -- | A declared type (e.g. `a []int` in Go).
 data Type a = Type { typeName :: !a, typeKind :: !a }
