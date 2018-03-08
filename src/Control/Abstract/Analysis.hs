@@ -12,6 +12,7 @@ import Control.Effect as X
 import Control.Monad.Effect.Fail as X
 import Control.Monad.Effect.Reader as X
 import Control.Monad.Effect.State as X
+import Data.Coerce
 import Prologue
 
 type family TermFor (m :: * -> *)
@@ -48,3 +49,8 @@ class GNewtype1 n where
 
   gpack1 :: GO1 n a -> n a
   gunpack1 :: n a -> GO1 n a
+
+instance GNewtype1 (D1 d (C1 c (S1 s (Rec1 a)))) where
+  type GO1 (D1 d (C1 c (S1 s (Rec1 a)))) = a
+  gpack1 = coerce
+  gunpack1 = coerce
