@@ -54,6 +54,7 @@ deriving instance (Member Fail effects, MonadEvaluator (Evaluator term value eff
 
 instance ( Evaluatable (Base term)
          , FreeVariables term
+         , Members (EvaluatorEffects term value) effects
          , MonadAddressable (LocationFor value) (Evaluation term value effects)
          , MonadValue value (Evaluation term value effects)
          , Recursive term

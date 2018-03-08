@@ -18,7 +18,7 @@ import Prologue
 -- | A 'Monad' in which one can evaluate some specific term type to some specific value type.
 --
 --   This typeclass is left intentionally unconstrained to avoid circular dependencies between it and other typeclasses.
-class Monad m => MonadAnalysis m where
+class MonadEvaluator m => MonadAnalysis m where
   -- | Analyze a term using the semantics of the current analysis. This should generally only be called by definitions of 'evaluateTerm' and 'analyzeTerm' in this or other instances.
   analyzeTerm :: SubtermAlgebra (Base (TermFor m)) (TermFor m) (m (ValueFor m))
 
