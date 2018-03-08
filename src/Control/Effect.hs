@@ -11,9 +11,9 @@ import Control.Monad.Effect.Writer
 import Data.Semigroup.Reducer
 import Prologue
 
--- | Run a computation in 'Eff' to completion, interpreting each effect with some sensible defaults, and return the 'Final' result.
-run :: RunEffects fs a => Eff fs a -> Final fs a
-run = Effect.run . runEffects
+-- | Run an 'Effectful' computation to completion, interpreting each effect with some sensible defaults, and return the 'Final' result.
+run :: (Effectful m, RunEffects (Effects m) a) => m a -> Final (Effects m) a
+run = Effect.run . runEffects . lower
 
 -- | A typeclass to run a computation to completion, interpreting each effect with some sensible defaults.
 class RunEffects fs a where

@@ -29,7 +29,7 @@ evaluate :: forall value term
             )
          => term
          -> Final (EvaluatingEffects term value) value
-evaluate = run @(EvaluatingEffects term value) . runEvaluating . evaluateModule
+evaluate = run @(Evaluating term value (EvaluatingEffects term value)) . evaluateModule
 
 -- | Evaluate terms and an entry point to a value.
 evaluates :: forall value term
@@ -44,7 +44,7 @@ evaluates :: forall value term
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
           -> Final (EvaluatingEffects term value) value
-evaluates pairs (_, t) = run @(EvaluatingEffects term value) (runEvaluating (withModules pairs (evaluateModule t)))
+evaluates pairs (_, t) = run @(Evaluating term value (EvaluatingEffects term value)) (withModules pairs (evaluateModule t))
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
 withModules :: (MonadAnalysis m, MonadEvaluator m) => [(Blob, TermFor m)] -> m a -> m a
