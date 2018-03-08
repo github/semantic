@@ -1,27 +1,22 @@
-{-# LANGUAGE DefaultSignatures, UndecidableInstances, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DefaultSignatures, UndecidableInstances #-}
 module Data.Abstract.FreeVariables where
 
-import Data.ByteString (intercalate)
--- import qualified Data.ByteString.Char8 as BC
-import Data.Term
 import Prologue
+import Data.Term
+import Data.ByteString (intercalate)
 import qualified Data.List.NonEmpty as NonEmpty
 
 -- | The type of variable names.
-newtype Name = Name { unName :: NonEmpty ByteString }
-  deriving (Eq, Ord, Show, Semigroup)
-
--- instance Show Name where
---   showsPrec _ n = showChar '\"' . showString (BC.unpack (friendlyName n)) . showChar '\"'
+type Name = NonEmpty ByteString
 
 name :: ByteString -> Name
-name x = Name $ x :| []
+name x = x :| []
 
 qualifiedName :: [ByteString] -> Name
-qualifiedName = Name . NonEmpty.fromList
+qualifiedName = NonEmpty.fromList
 
 friendlyName :: Name -> ByteString
-friendlyName (Name xs) = intercalate "." (NonEmpty.toList xs)
+friendlyName xs = intercalate "." (NonEmpty.toList xs)
 
 
 -- | Types which can contain unbound variables.
