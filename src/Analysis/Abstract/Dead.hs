@@ -31,9 +31,7 @@ evaluateDead :: forall m term value effects
                 )
              => term
              -> DeadCodeAnalysis m value
-evaluateDead term = do
-  killAll (subterms term)
-  evaluateTerm term
+evaluateDead = evaluateModule
 
 
 -- | An analysis tracking dead (unreachable) code.
