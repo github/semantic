@@ -14,8 +14,13 @@
             ]
           },
           "path": "foo",
-          "symbols": [],
-          "alias": "foo"
+          "symbols": [
+            {
+              "alias": "defaultMember",
+              "name": "defaultMember"
+            }
+          ],
+          "alias": ""
         },
         {
           "span": {
@@ -46,11 +51,11 @@
           "path": "ant",
           "symbols": [
             {
-              "alias": "",
+              "alias": "member",
               "name": "member"
             }
           ],
-          "alias": "ant"
+          "alias": ""
         },
         {
           "span": {
@@ -66,31 +71,15 @@
           "path": "antelope",
           "symbols": [
             {
-              "alias": "",
+              "alias": "member1",
               "name": "member1"
-            }
-          ],
-          "alias": "antelope"
-        },
-        {
-          "span": {
-            "start": [
-              4,
-              1
-            ],
-            "end": [
-              4,
-              46
-            ]
-          },
-          "path": "antelope",
-          "symbols": [
+            },
             {
-              "alias": "",
+              "alias": "member2",
               "name": "member2"
             }
           ],
-          "alias": "antelope"
+          "alias": ""
         },
         {
           "span": {
@@ -106,46 +95,15 @@
           "path": "ant-eater",
           "symbols": [
             {
-              "alias": "",
+              "alias": "member1",
               "name": "member1"
-            }
-          ],
-          "alias": "ant-eater"
-        },
-        {
-          "span": {
-            "start": [
-              5,
-              1
-            ],
-            "end": [
-              5,
-              57
-            ]
-          },
-          "path": "ant-eater",
-          "symbols": [
+            },
             {
               "alias": "alias2",
               "name": "member2"
             }
           ],
-          "alias": "ant-eater"
-        },
-        {
-          "span": {
-            "start": [
-              6,
-              1
-            ],
-            "end": [
-              6,
-              70
-            ]
-          },
-          "path": "anaconda",
-          "symbols": [],
-          "alias": "anaconda"
+          "alias": ""
         },
         {
           "span": {
@@ -161,11 +119,11 @@
           "path": "anaconda",
           "symbols": [
             {
-              "alias": "",
-              "name": "member1"
+              "alias": "defaultMember",
+              "name": "defaultMember"
             }
           ],
-          "alias": "anaconda"
+          "alias": ""
         },
         {
           "span": {
@@ -180,12 +138,16 @@
           },
           "path": "anaconda",
           "symbols": [
+            {
+              "alias": "member1",
+              "name": "member1"
+            },
             {
               "alias": "alias2",
               "name": "member2"
             }
           ],
-          "alias": "anaconda"
+          "alias": ""
         },
         {
           "span": {
@@ -199,8 +161,13 @@
             ]
           },
           "path": "alligator",
-          "symbols": [],
-          "alias": "alligator"
+          "symbols": [
+            {
+              "alias": "defaultMember",
+              "name": "defaultMember"
+            }
+          ],
+          "alias": ""
         },
         {
           "span": {
@@ -230,7 +197,7 @@
           },
           "path": "arctic-tern",
           "symbols": [],
-          "alias": "arctic-tern"
+          "alias": ""
         },
         {
           "span": {
@@ -284,6 +251,36 @@
           },
           "symbol": "someFunction",
           "targets": []
+        },
+        {
+          "span": {
+            "start": [
+              16,
+              1
+            ],
+            "end": [
+              16,
+              16
+            ]
+          },
+          "symbol": "defaultMember",
+          "targets": []
+        },
+        {
+          "span": {
+            "start": [
+              17,
+              1
+            ],
+            "end": [
+              17,
+              11
+            ]
+          },
+          "symbol": "foo",
+          "targets": [
+            "name"
+          ]
         }
       ]
     }
