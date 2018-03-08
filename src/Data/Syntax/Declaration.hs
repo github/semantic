@@ -239,13 +239,10 @@ instance Show1 QualifiedExport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedExport where
   eval (QualifiedExport from exportSymbols) = do
-    env <- getGlobalEnv
-    putGlobalEnv mempty
-
     -- If there's a from clause, require the module and export its symbols
     let moduleName = qualifiedName (subterm from)
     if not (B.null moduleName) then do
-      importedEnv <- require moduleName
+      importedEnv <- withGlobalEnv mempty (require moduleName)
 
       -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
       for_ exportSymbols $ \(name, alias) -> do
@@ -256,7 +253,6 @@ instance Evaluatable QualifiedExport where
       for_ exportSymbols $ \(name, alias) ->
         addExport name (alias, Nothing)
 
-    putGlobalEnv env -- Reset the global env state
     unit
 
 -- | Import declarations (symbols are added directly to calling environment).
