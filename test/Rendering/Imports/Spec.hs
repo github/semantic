@@ -23,7 +23,7 @@ import Test.LeanCheck
 spec :: Spec
 spec = parallel $ do
   describe "renderToImports" $ do
-    xit "works for Ruby" $ do
+    it "works for Ruby" $ do
       output <- parseToImports rubyParser "test/fixtures/ruby/import-graph/app.rb"
       expected <- readFileVerbatim "test/fixtures/ruby/import-graph/app.json"
       toVerbatimOutput output `shouldBe` expected
