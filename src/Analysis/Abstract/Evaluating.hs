@@ -2,6 +2,8 @@
 module Analysis.Abstract.Evaluating where
 
 import Control.Abstract.Evaluator
+import Control.Monad.Effect.Fresh
+import Control.Monad.Effect.NonDet
 import Data.Abstract.Evaluatable
 import Data.Abstract.Linker
 import Data.Abstract.Value
@@ -50,6 +52,9 @@ newtype Evaluation term value effects a = Evaluation { runEvaluation :: Evaluato
   deriving (Applicative, Functor, LiftEffect, Monad)
 
 deriving instance Member Fail effects => MonadFail (Evaluation term value effects)
+deriving instance Member Fresh effects => MonadFresh (Evaluation term value effects)
+deriving instance Member NonDetEff effects => Alternative (Evaluation term value effects)
+deriving instance Member NonDetEff effects => MonadNonDet (Evaluation term value effects)
 deriving instance (Member Fail effects, MonadEvaluator (Evaluator term value effects), Ord (LocationFor value)) => MonadEvaluator (Evaluation term value effects)
 
 instance ( Evaluatable (Base term)
