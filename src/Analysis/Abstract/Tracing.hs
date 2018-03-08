@@ -39,9 +39,6 @@ instance ( Corecursive (TermFor m)
     trace (Reducer.unit config)
     delegateAnalyzeTerm term
 
-type instance TermFor  (TracingAnalysis trace m) = TermFor  m
-type instance ValueFor (TracingAnalysis trace m) = ValueFor m
-
 trace :: ( LiftEffect m
          , Member (TracerFor trace m) (Effects m)
          )

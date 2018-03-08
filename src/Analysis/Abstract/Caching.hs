@@ -85,9 +85,6 @@ instance ( Corecursive t
       getCache) mempty
     maybe empty scatter (cacheLookup c cache)
 
-type instance TermFor (CachingAnalysis term value) = term
-type instance ValueFor (CachingAnalysis term value) = value
-
 
 -- | Coinductively-cached evaluation.
 evaluateCache :: forall v term

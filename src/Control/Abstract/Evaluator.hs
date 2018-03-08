@@ -15,9 +15,6 @@ import Data.Abstract.Live
 import Data.Abstract.Value
 import Prelude hiding (fail)
 
-type family TermFor (m :: * -> *)
-type family ValueFor (m :: * -> *)
-
 -- | A 'Monad' providing the basic essentials for evaluation.
 --
 --   These presently include:
@@ -25,6 +22,9 @@ type family ValueFor (m :: * -> *)
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
 class MonadFail m => MonadEvaluator m where
+  type TermFor m :: *
+  type ValueFor m :: *
+
   -- | Retrieve the global environment.
   getGlobalEnv :: m (EnvironmentFor (ValueFor m))
   -- | Update the global environment.
@@ -67,9 +67,10 @@ type EvaluatorEffects term value
      , State  (Linker value)         -- Cache of evaluated modules
      ]
 
-type instance TermFor (Evaluator term value effects) = term
-type instance ValueFor (Evaluator term value effects) = value
 instance (Ord (LocationFor value), Members (EvaluatorEffects term value) effects) => MonadEvaluator (Evaluator term value effects) where
+  type TermFor (Evaluator term value effects) = term
+  type ValueFor (Evaluator term value effects) = value
+
   getGlobalEnv = Evaluator get
   modifyGlobalEnv f = Evaluator (modify f)
 

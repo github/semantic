@@ -72,6 +72,3 @@ instance ( Corecursive (TermFor m)
   analyzeTerm term = do
     revive (embedSubterm term)
     DeadCodeAnalysis (analyzeTerm (second runDeadCodeAnalysis <$> term))
-
-type instance TermFor  (DeadCodeAnalysis m) = TermFor  m
-type instance ValueFor (DeadCodeAnalysis m) = ValueFor m

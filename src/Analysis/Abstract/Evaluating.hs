@@ -61,6 +61,3 @@ instance ( Evaluatable (Base term)
          )
          => MonadAnalysis (Evaluation term value effects) where
   analyzeTerm = eval
-
-type instance TermFor (Evaluation term value effects) = term
-type instance ValueFor (Evaluation term value effects) = value
