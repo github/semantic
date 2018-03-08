@@ -44,13 +44,13 @@ evaluateRubyFiles paths = do
   pure $ evaluates @RubyValue rest first
 
 -- Python
-typecheckPythonFile path = run @(CachingAnalysis (Evaluating Python.Term Type (CachingEffects Python.Term Type (EvaluatingEffects Python.Term Type)))) . evaluateModule <$> (file path >>= runTask . parse pythonParser)
+typecheckPythonFile path = run @(CachingAnalysis (Evaluating Python.Term Type (CachingEffects Python.Term Type (EvaluatingEffects Python.Term Type)))) . evaluateModule . snd <$> parseFile pythonParser path
 
-tracePythonFile path = run @(TracingAnalysis [] (Evaluating Python.Term PythonValue (Tracer [] Python.Term PythonValue ': EvaluatingEffects Python.Term PythonValue))) . evaluateModule <$> (file path >>= runTask . parse pythonParser)
+tracePythonFile path = run @(TracingAnalysis [] (Evaluating Python.Term PythonValue (Tracer [] Python.Term PythonValue ': EvaluatingEffects Python.Term PythonValue))) . evaluateModule . snd <$> parseFile pythonParser path
 
 type PythonTracer = TracingAnalysis [] (Evaluating Python.Term PythonValue (DeadCode Python.Term ': Tracer [] Python.Term PythonValue ': EvaluatingEffects Python.Term PythonValue))
 
-evaluateDeadTracePythonFile path = run @(DeadCodeAnalysis PythonTracer) . evaluateModule <$> (file path >>= runTask . parse pythonParser)
+evaluateDeadTracePythonFile path = run @(DeadCodeAnalysis PythonTracer) . evaluateModule . snd <$> parseFile pythonParser path
 
 evaluatePythonFile path = evaluate @PythonValue . snd <$> parseFile pythonParser path
 
