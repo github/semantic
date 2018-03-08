@@ -21,29 +21,29 @@ import System.FilePath.Posix
 evaluate :: forall value term
          .  ( Evaluatable (Base term)
             , FreeVariables term
-            , MonadAddressable (LocationFor value) (EvaluatingEffects term value '[]) (Evaluating term value)
-            , MonadValue value (EvaluatingEffects term value '[]) (Evaluating term value)
+            , MonadAddressable (LocationFor value) (Evaluating term value (EvaluatingEffects term value '[]))
+            , MonadValue value (Evaluating term value (EvaluatingEffects term value '[]))
             , Recursive term
             )
          => term
          -> Final (EvaluatingEffects term value '[]) value
-evaluate = run . evaluateModule @(EvaluatingEffects term value '[]) @(Evaluating term value)
+evaluate = run . evaluateModule @(Evaluating term value (EvaluatingEffects term value '[]))
 
 -- | Evaluate terms and an entry point to a value.
 evaluates :: forall value term
           .  ( Evaluatable (Base term)
              , FreeVariables term
-             , MonadAddressable (LocationFor value) (EvaluatingEffects term value '[]) (Evaluating term value)
-             , MonadValue value (EvaluatingEffects term value '[]) (Evaluating term value)
+             , MonadAddressable (LocationFor value) (Evaluating term value (EvaluatingEffects term value '[]))
+             , MonadValue value (Evaluating term value (EvaluatingEffects term value '[]))
              , Recursive term
              )
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
           -> Final (EvaluatingEffects term value '[]) value
-evaluates pairs (_, t) = run (withModules pairs (evaluateModule @(EvaluatingEffects term value '[]) @(Evaluating term value) t))
+evaluates pairs (_, t) = run (withModules pairs (evaluateModule @(Evaluating term value (EvaluatingEffects term value '[])) t))
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
-withModules :: (MonadAnalysis effects m, MonadEvaluator effects m) => [(Blob, TermFor m)] -> m effects a -> m effects a
+withModules :: (MonadAnalysis m, MonadEvaluator m) => [(Blob, TermFor m)] -> m a -> m a
 withModules pairs = localModuleTable (const moduleTable)
   where moduleTable = ModuleTable (Map.fromList (map (first (dropExtensions . blobPath)) pairs))
 
@@ -66,9 +66,9 @@ type EvaluatingEffects term value effects
  ': State  (ModuleTable value)    -- Cache of evaluated modules
  ': effects
 
-instance Members (EvaluatingEffects term value '[]) effects => MonadEvaluator effects (Evaluating term value) where
-  type TermFor  (Evaluating term value) = term
-  type ValueFor (Evaluating term value) = value
+instance Members (EvaluatingEffects term value '[]) effects => MonadEvaluator (Evaluating term value effects) where
+  type TermFor  (Evaluating term value effects) = term
+  type ValueFor (Evaluating term value effects) = value
 
   getGlobalEnv = lift get
   modifyGlobalEnv f = lift (modify f)
@@ -88,9 +88,9 @@ instance Members (EvaluatingEffects term value '[]) effects => MonadEvaluator ef
 instance ( Evaluatable (Base term)
          , FreeVariables term
          , Members (EvaluatingEffects term value '[]) effects
-         , MonadAddressable (LocationFor value) effects (Evaluating term value)
-         , MonadValue value effects (Evaluating term value)
+         , MonadAddressable (LocationFor value) (Evaluating term value effects)
+         , MonadValue value (Evaluating term value effects)
          , Recursive term
          )
-         => MonadAnalysis effects (Evaluating term value) where
+         => MonadAnalysis (Evaluating term value effects) where
   analyzeTerm = eval

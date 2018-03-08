@@ -31,12 +31,12 @@ class Evaluatable constr where
   eval :: ( term ~ TermFor m
           , value ~ ValueFor m
           , FreeVariables term
-          , MonadAddressable (LocationFor value) effects m
-          , MonadAnalysis effects m
-          , MonadValue value effects m
+          , MonadAddressable (LocationFor value) m
+          , MonadAnalysis m
+          , MonadValue value m
           )
-       => SubtermAlgebra constr term (m effects value)
-  default eval :: (MonadAnalysis effects m, Show1 constr) => SubtermAlgebra constr term (m effects value)
+       => SubtermAlgebra constr term (m value)
+  default eval :: (MonadFail m, Show1 constr) => SubtermAlgebra constr term (m value)
   eval expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
 -- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
@@ -74,10 +74,10 @@ instance Evaluatable [] where
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
 require :: ( FreeVariables (TermFor m)
-           , MonadAnalysis effects m
+           , MonadAnalysis m
            )
         => TermFor m
-        -> m effects (ValueFor m)
+        -> m (ValueFor m)
 require term = getModuleTable >>= maybe (load term) pure . moduleTableLookup name
   where name = moduleName term
 
@@ -85,10 +85,10 @@ require term = getModuleTable >>= maybe (load term) pure . moduleTableLookup nam
 --
 -- Always loads/evaluates.
 load :: ( FreeVariables (TermFor m)
-        , MonadAnalysis effects m
+        , MonadAnalysis m
         )
      => TermFor m
-     -> m effects (ValueFor m)
+     -> m (ValueFor m)
 load term = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
   where name = moduleName term
         notFound = fail ("cannot find " <> show name)
