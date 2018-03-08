@@ -38,7 +38,7 @@ spec = parallel $ do
       expected <- readFileVerbatim "test/fixtures/go/import-graph/main.json"
       toVerbatimOutput output `shouldBe` expected
 
-    xit "works for TypeScript" $ do
+    it "works for TypeScript" $ do
       output <- parseToImports typescriptParser "test/fixtures/typescript/import-graph/app.ts"
       expected <- readFileVerbatim "test/fixtures/typescript/import-graph/app.json"
       toVerbatimOutput output `shouldBe` expected
