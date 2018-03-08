@@ -219,18 +219,15 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedImport where
   eval (QualifiedImport from alias xs) = do
-    env <- getGlobalEnv
-    putGlobalEnv mempty
-    importedEnv <- require (qualifiedName (subterm from))
-    env' <- Map.foldrWithKey copy (pure env) (unEnvironment importedEnv)
-    modifyGlobalEnv (const env')
+    importedEnv <- withGlobalEnv mempty (require (qualifiedName (subterm from)))
+    modifyGlobalEnv (flip (Map.foldrWithKey copy) (unEnvironment importedEnv))
     unit
     where
       prefix = qualifiedName (subterm alias) <> "."
       symbols = Map.fromList xs
       copy = if Map.null symbols then qualifyInsert else directInsert
-      qualifyInsert k v rest = envInsert (prefix <> k) v <$> rest
-      directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v <$> rest) (Map.lookup k symbols)
+      qualifyInsert k v rest = envInsert (prefix <> k) v rest
+      directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v rest) (Map.lookup k symbols)
 
 -- | Qualified Import declarations (symbols are qualified in calling environment).
 data QualifiedExport a = QualifiedExport { qualifiedExportFrom :: !a, qualifiedExportSymbols :: ![(Name, Name)]}
