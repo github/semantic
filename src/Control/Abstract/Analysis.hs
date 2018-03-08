@@ -1,6 +1,7 @@
 {-# LANGUAGE KindSignatures, TypeFamilies #-}
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
+, evaluateTerm
 , liftAnalyze
 , liftEvaluate
 , module X
@@ -23,14 +24,14 @@ class (MonadEvaluator m, Recursive (TermFor m)) => MonadAnalysis m where
   -- | Analyze a term using the semantics of the current analysis. This should generally only be called by definitions of 'evaluateTerm' and 'analyzeTerm' in this or other instances.
   analyzeTerm :: SubtermAlgebra (Base (TermFor m)) (TermFor m) (m (ValueFor m))
 
-  -- | Evaluate a term to a value using the semantics of the current analysis.
-  --
-  --   This should always be called when e.g. evaluating the bodies of closures instead of explicitly folding either 'eval' or 'analyzeTerm' over subterms, except in 'MonadAnalysis' instances themselves. On the other hand, top-level evaluation should be performed using 'evaluateModule'.
-  evaluateTerm :: TermFor m -> m (ValueFor m)
-  evaluateTerm = foldSubterms analyzeTerm
-
   evaluateModule :: TermFor m -> m (ValueFor m)
   evaluateModule = evaluateTerm
+
+-- | Evaluate a term to a value using the semantics of the current analysis.
+--
+--   This should always be called when e.g. evaluating the bodies of closures instead of explicitly folding either 'eval' or 'analyzeTerm' over subterms, except in 'MonadAnalysis' instances themselves. On the other hand, top-level evaluation should be performed using 'evaluateModule'.
+evaluateTerm :: MonadAnalysis m => TermFor m -> m (ValueFor m)
+evaluateTerm = foldSubterms analyzeTerm
 
 liftAnalyze :: ( term ~ TermFor m
                , term ~ TermFor (t m)
