@@ -37,13 +37,11 @@ file :: MonadIO m => FilePath -> m Blob
 file path = fromJust <$> IO.readFile path (languageForFilePath path)
 
 -- Ruby
-evaluateRubyFile path = Prelude.fst . evaluate @RubyValue <$>
-  (file path >>= runTask . parse rubyParser)
+evaluateRubyFile path = Prelude.fst . evaluate @RubyValue . snd <$> parseFile rubyParser path
 
 evaluateRubyFiles paths = do
-  blobs@(b:bs) <- traverse file paths
-  (t:ts) <- runTask $ traverse (parse rubyParser) blobs
-  pure $ evaluates @RubyValue (zip bs ts) (b, t)
+  first:rest <- traverse (parseFile rubyParser) paths
+  pure $ evaluates @RubyValue rest first
 
 -- Python
 typecheckPythonFile path = run @(CachingAnalysis (Evaluating Python.Term Type (CachingEffects Python.Term Type (EvaluatingEffects Python.Term Type)))) . evaluateModule <$> (file path >>= runTask . parse pythonParser)
@@ -57,8 +55,8 @@ evaluateDeadTracePythonFile path = run @(DeadCodeAnalysis PythonTracer) . evalua
 evaluatePythonFile path = evaluate @PythonValue . snd <$> parseFile pythonParser path
 
 evaluatePythonFiles paths = do
-  pair:pairs <- traverse (parseFile pythonParser) paths
-  pure $ evaluates @PythonValue pairs pair
+  first:rest <- traverse (parseFile pythonParser) paths
+  pure $ evaluates @PythonValue rest first
 
 parseFile parser path = runTask (file path >>= fmap . (,) <*> parse parser)
 
