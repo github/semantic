@@ -54,13 +54,11 @@ type PythonTracer = TracingAnalysis [] (Evaluating Python.Term PythonValue (Dead
 
 evaluateDeadTracePythonFile path = run @(DeadCodeAnalysis PythonTracer) . evaluateModule <$> (file path >>= runTask . parse pythonParser)
 
-evaluatePythonFile path = evaluate @PythonValue <$>
-  (file path >>= runTask . parse pythonParser)
+evaluatePythonFile path = evaluate @PythonValue . snd <$> parsePythonFile path
 
 evaluatePythonFiles paths = do
-  blobs@(b:bs) <- traverse file paths
-  (t:ts) <- runTask $ traverse (parse pythonParser) blobs
-  pure $ evaluates @PythonValue (zip bs ts) (b, t)
+  pair:pairs <- traverse parsePythonFile paths
+  pure $ evaluates @PythonValue pairs pair
 
 parsePythonFile path = runTask (file path >>= fmap . (,) <*> parse pythonParser)
 
