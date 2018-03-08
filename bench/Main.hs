@@ -5,6 +5,11 @@ import Semantic.Util
 import Data.Monoid
 import Control.Monad
 
+-- We use `fmap show` to ensure that all the parts of the result of evaluation are
+-- evaluated themselves. While an NFData instance is the most morally correct way
+-- to do this, I'm reluctant to add NFData instances to every single datatype in the
+-- project—coercing the result into a string will suffice, though it throws off the
+-- memory allocation results a bit.
 pyEval :: FilePath -> Benchmarkable
 pyEval = whnfIO . fmap show . evaluatePythonFile . ("bench/bench-fixtures/python/" <>)
 
