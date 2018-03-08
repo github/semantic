@@ -91,7 +91,7 @@ putStore = modifyStore . const
 
 -- | An evaluator of @term@s to @value@s, producing incremental results of type @a@ using a list of @effects@.
 newtype Evaluator term value effects a = Evaluator { runEvaluator :: Eff effects a }
-  deriving (Applicative, Functor, LiftEffect, Monad)
+  deriving (Applicative, Functor, Effectful, Monad)
 
 deriving instance Member Fail effects => MonadFail (Evaluator term value effects)
 deriving instance Member NonDetEff effects => Alternative (Evaluator term value effects)

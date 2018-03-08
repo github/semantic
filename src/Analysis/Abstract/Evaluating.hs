@@ -49,7 +49,7 @@ withModules pairs = localModuleTable (const moduleTable)
 
 -- | An analysis performing concrete evaluation of @term@s to @value@s.
 newtype Evaluating term value effects a = Evaluating { runEvaluating :: Evaluator term value effects a }
-  deriving (Applicative, Functor, LiftEffect, Monad)
+  deriving (Applicative, Functor, Effectful, Monad)
 
 deriving instance Member Fail effects => MonadFail (Evaluating term value effects)
 deriving instance Member Fresh effects => MonadFresh (Evaluating term value effects)

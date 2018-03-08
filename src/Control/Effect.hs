@@ -66,12 +66,12 @@ instance Ord a => RunEffect NonDetEff a where
     MPlus -> mappend <$> k True <*> k False)
 
 
-class LiftEffect f where
+class Effectful f where
   type Effects f :: [* -> *]
   lift :: Eff (Effects f) a -> f a
   lower :: f a -> Eff (Effects f) a
 
-instance LiftEffect (Eff effects) where
+instance Effectful (Eff effects) where
   type Effects (Eff effects) = effects
   lift = id
   lower = id

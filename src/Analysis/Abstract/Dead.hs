@@ -38,7 +38,7 @@ evaluateDead term = run @(DeadCodeEffects term value) . lower @(DeadCodeAnalysis
 
 -- | An analysis tracking dead (unreachable) code.
 newtype DeadCodeAnalysis m a = DeadCodeAnalysis { runDeadCodeAnalysis :: m a }
-  deriving (Applicative, Functor, LiftEffect, Monad, MonadEvaluator, MonadFail)
+  deriving (Applicative, Functor, Effectful, Monad, MonadEvaluator, MonadFail)
 
 
 -- | A set of “dead” (unreachable) terms.
@@ -48,11 +48,11 @@ newtype Dead term = Dead { unDead :: Set term }
 deriving instance Ord term => Reducer term (Dead term)
 
 -- | Update the current 'Dead' set.
-killAll :: (LiftEffect m, Member (State (Dead (TermFor m))) (Effects m)) => Dead (TermFor m) -> DeadCodeAnalysis m ()
+killAll :: (Effectful m, Member (State (Dead (TermFor m))) (Effects m)) => Dead (TermFor m) -> DeadCodeAnalysis m ()
 killAll = lift . put
 
 -- | Revive a single term, removing it from the current 'Dead' set.
-revive :: (LiftEffect m, Member (State (Dead (TermFor m))) (Effects m)) => Ord (TermFor m) => (TermFor m) -> DeadCodeAnalysis m ()
+revive :: (Effectful m, Member (State (Dead (TermFor m))) (Effects m)) => Ord (TermFor m) => (TermFor m) -> DeadCodeAnalysis m ()
 revive t = lift (modify (Dead . delete t . unDead))
 
 -- | Compute the set of all subterms recursively.
@@ -61,7 +61,7 @@ subterms term = term `cons` para (foldMap (uncurry cons)) term
 
 
 instance ( Corecursive (TermFor m)
-         , LiftEffect m
+         , Effectful m
          , Member (State (Dead (TermFor m))) (Effects m)
          , MonadAnalysis m
          , MonadEvaluator m
