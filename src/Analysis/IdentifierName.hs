@@ -15,7 +15,7 @@ import qualified Data.Syntax
 
 -- | Compute a 'IdentifierLabel' label for a 'Term'.
 identifierLabel :: IdentifierName syntax => TermF syntax a b -> Maybe IdentifierLabel
-identifierLabel (In _ s) = IdentifierLabel <$> (identifierName s)
+identifierLabel (In _ s) = IdentifierLabel <$> identifierName s
 
 newtype IdentifierLabel = IdentifierLabel ByteString
   deriving (Show)
