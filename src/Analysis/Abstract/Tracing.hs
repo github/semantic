@@ -13,6 +13,7 @@ type Trace trace term value = trace (ConfigurationFor term value)
 type TraceFor trace m = Trace trace (TermFor m) (ValueFor m)
 type Tracer trace term value = Writer (Trace trace term value)
 type TracerFor trace m = Writer (TraceFor trace m)
+
 -- | The effects necessary for tracing analyses.
 type TracingEffects trace term value = Tracer trace term value ': EvaluatorEffects term value
 
