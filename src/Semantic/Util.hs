@@ -46,13 +46,13 @@ evaluateRubyFiles paths = do
   pure $ evaluates @RubyValue (zip bs ts) (b, t)
 
 -- Python
-typecheckPythonFile path = run . lower @(CachingAnalysis (Evaluating Python.Term Type (CachingEffects Python.Term Type (EvaluatingEffects Python.Term Type)))) . evaluateTerm <$> (file path >>= runTask . parse pythonParser)
+typecheckPythonFile path = run @(CachingAnalysis (Evaluating Python.Term Type (CachingEffects Python.Term Type (EvaluatingEffects Python.Term Type)))) . evaluateTerm <$> (file path >>= runTask . parse pythonParser)
 
-tracePythonFile path = run . lower @(TracingAnalysis [] (Evaluating Python.Term PythonValue (Tracer [] Python.Term PythonValue ': EvaluatingEffects Python.Term PythonValue))) . evaluateTerm <$> (file path >>= runTask . parse pythonParser)
+tracePythonFile path = run @(TracingAnalysis [] (Evaluating Python.Term PythonValue (Tracer [] Python.Term PythonValue ': EvaluatingEffects Python.Term PythonValue))) . evaluateTerm <$> (file path >>= runTask . parse pythonParser)
 
 type PythonTracer = TracingAnalysis [] (Evaluating Python.Term PythonValue (DeadCode Python.Term ': Tracer [] Python.Term PythonValue ': EvaluatingEffects Python.Term PythonValue))
 
-evaluateDeadTracePythonFile path = run . lower @(DeadCodeAnalysis PythonTracer) . evaluateModule <$> (file path >>= runTask . parse pythonParser)
+evaluateDeadTracePythonFile path = run @(DeadCodeAnalysis PythonTracer) . evaluateModule <$> (file path >>= runTask . parse pythonParser)
 
 evaluatePythonFile path = evaluate @PythonValue <$>
   (file path >>= runTask . parse pythonParser)
