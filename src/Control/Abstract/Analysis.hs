@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures, KindSignatures, TypeFamilies #-}
+{-# LANGUAGE KindSignatures, TypeFamilies #-}
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , liftAnalyze
@@ -19,7 +19,7 @@ import Prologue
 -- | A 'Monad' in which one can evaluate some specific term type to some specific value type.
 --
 --   This typeclass is left intentionally unconstrained to avoid circular dependencies between it and other typeclasses.
-class MonadEvaluator m => MonadAnalysis m where
+class (MonadEvaluator m, Recursive (TermFor m)) => MonadAnalysis m where
   -- | Analyze a term using the semantics of the current analysis. This should generally only be called by definitions of 'evaluateTerm' and 'analyzeTerm' in this or other instances.
   analyzeTerm :: SubtermAlgebra (Base (TermFor m)) (TermFor m) (m (ValueFor m))
 
@@ -27,11 +27,9 @@ class MonadEvaluator m => MonadAnalysis m where
   --
   --   This should always be called when e.g. evaluating the bodies of closures instead of explicitly folding either 'eval' or 'analyzeTerm' over subterms, except in 'MonadAnalysis' instances themselves. On the other hand, top-level evaluation should be performed using 'evaluateModule'.
   evaluateTerm :: TermFor m -> m (ValueFor m)
-  default evaluateTerm :: Recursive (TermFor m) => TermFor m -> m (ValueFor m)
   evaluateTerm = foldSubterms analyzeTerm
 
   evaluateModule :: TermFor m -> m (ValueFor m)
-  default evaluateModule :: Recursive (TermFor m) => TermFor m -> m (ValueFor m)
   evaluateModule = evaluateTerm
 
 liftAnalyze :: ( term ~ TermFor m
