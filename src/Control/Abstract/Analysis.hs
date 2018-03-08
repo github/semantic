@@ -1,6 +1,7 @@
 {-# LANGUAGE DefaultSignatures, KindSignatures, TypeFamilies #-}
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
+, delegateAnalyzeTerm
 , TermFor
 , ValueFor
 , module X
@@ -32,5 +33,11 @@ class Monad m => MonadAnalysis m where
   default evaluateTerm :: Recursive (TermFor m) => TermFor m -> m (ValueFor m)
   evaluateTerm = foldSubterms analyzeTerm
 
-delegateAnalyzeTerm :: (Functor (Base (TermFor m)), Newtype1 m, MonadAnalysis (O1 m), TermFor m ~ TermFor (O1 m), ValueFor m ~ ValueFor (O1 m)) => SubtermAlgebra (Base (TermFor m)) (TermFor m) (m (ValueFor m))
+delegateAnalyzeTerm :: ( TermFor m ~ TermFor (O1 m)
+                       , ValueFor m ~ ValueFor (O1 m)
+                       , Functor (Base (TermFor m))
+                       , MonadAnalysis (O1 m)
+                       , Newtype1 m
+                       )
+                    => SubtermAlgebra (Base (TermFor m)) (TermFor m) (m (ValueFor m))
 delegateAnalyzeTerm term = pack1 (analyzeTerm (second unpack1 <$> term))
