@@ -72,7 +72,7 @@ instance ( Corecursive term
     c <- getConfiguration (embedSubterm e)
     -- Convergence here is predicated upon an Eq instance, not α-equivalence
     cache <- converge (\ prevCache -> do
-      putCache (mempty :: CacheFor term value)
+      putCache mempty
       putStore (configurationStore c)
       -- We need to reset fresh generation so that this invocation converges.
       reset 0
