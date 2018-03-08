@@ -1,16 +1,22 @@
 {-# LANGUAGE ConstrainedClassMethods, DataKinds, DefaultSignatures, GeneralizedNewtypeDeriving, RankNTypes, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
 module Control.Abstract.Evaluator where
 
-import Control.Abstract.Analysis
 import Control.Applicative
+import Control.Effect
 import Control.Monad.Effect
+import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDet
+import Control.Monad.Effect.Reader
+import Control.Monad.Effect.State
 import Data.Abstract.Configuration
 import Data.Abstract.Linker
 import Data.Abstract.Live
 import Data.Abstract.Value
 import Prelude hiding (fail)
+
+type family TermFor (m :: * -> *)
+type family ValueFor (m :: * -> *)
 
 -- | A 'Monad' providing the basic essentials for evaluation.
 --

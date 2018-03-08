@@ -9,15 +9,13 @@ module Control.Abstract.Analysis
 , SubtermAlgebra
 ) where
 
+import Control.Abstract.Evaluator
 import Control.Effect as X
 import Control.Monad.Effect.Fail as X
 import Control.Monad.Effect.Reader as X
 import Control.Monad.Effect.State as X
 import Data.Coerce
 import Prologue
-
-type family TermFor (m :: * -> *)
-type family ValueFor (m :: * -> *)
 
 -- | A 'Monad' in which one can evaluate some specific term type to some specific value type.
 --
