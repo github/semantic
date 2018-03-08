@@ -33,7 +33,6 @@ class Evaluatable constr where
           , MonadAnalysis m
           , TermFor m ~ term
           , ValueFor m ~ value
-          , MonadEvaluator m
           , MonadValue value m
           , Ord (LocationFor value)
           , Semigroup (CellFor value)
@@ -78,7 +77,6 @@ instance Evaluatable [] where
 -- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
 require :: ( FreeVariables (TermFor m)
            , MonadAnalysis m
-           , MonadEvaluator m
            )
         => TermFor m
         -> m (ValueFor m)
@@ -90,7 +88,6 @@ require term = getModuleTable >>= maybe (load term) pure . moduleTableLookup nam
 -- Always loads/evaluates.
 load :: ( FreeVariables (TermFor m)
         , MonadAnalysis m
-        , MonadEvaluator m
         )
      => TermFor m
      -> m (ValueFor m)
