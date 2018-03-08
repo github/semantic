@@ -5,18 +5,22 @@
       { (Identifier)
       ->(Identifier) }
         (Empty))
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Empty)+})+}
       (ImportExportSpecifier
       { (Identifier)
       ->(Identifier) }
         (Empty))
-      (ImportExportSpecifier
-      { (Identifier)
-      ->(Identifier) }
-        (Empty))
-      (ImportExportSpecifier
-      { (Identifier)
-      ->(Identifier) }
-        (Empty))))
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Empty)+})+}
+    {-(ImportExportSpecifier
+      {-(Identifier)-}
+      {-(Empty)-})-}
+    {-(ImportExportSpecifier
+      {-(Identifier)-}
+      {-(Empty)-})-}))
   (Export
     (ExportClause
     {+(ImportExportSpecifier
@@ -65,11 +69,14 @@
         (Identifier)
       { (Identifier)
       ->(Empty) })
-      (Assignment
-        (Empty)
-      { (Identifier)
-      ->(Identifier) }
-        (Empty))
+    {+(Assignment
+      {+(Empty)+}
+      {+(Identifier)+}
+      {+(Empty)+})+}
+    {-(Assignment
+      {-(Empty)-}
+      {-(Identifier)-}
+      {-(Empty)-})-}
     {-(Assignment
       {-(Empty)-}
       {-(Identifier)-}
@@ -133,11 +140,12 @@
     {+(ImportExportSpecifier
       {+(Identifier)+}
       {+(Identifier)+})+}
-      (ImportExportSpecifier
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->(Empty) })
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Empty)+})+}
+    {-(ImportExportSpecifier
+      {-(Identifier)-}
+      {-(Identifier)-})-}
     {-(ImportExportSpecifier
       {-(Identifier)-}
       {-(Empty)-})-})

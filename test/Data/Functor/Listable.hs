@@ -258,7 +258,7 @@ type ListableSyntax = Union
    ]
 
 instance Listable FV.Name where
-  tiers = cons1 FV.Name
+  tiers = cons1 FV.name
 
 instance Listable1 Gram where
   liftTiers tiers = liftCons2 (liftTiers (liftTiers tiers)) (liftTiers (liftTiers tiers)) Gram

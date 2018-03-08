@@ -2,24 +2,24 @@
 {+(QualifiedImport
   {+(Identifier)+}
   {+(Empty)+})+}
-{ (QualifiedImport
-  {-(Identifier)-}
-  {-(Empty)-})
-->(QualifiedImport
+{+(QualifiedImport
   {+(Identifier)+}
-  {+(Empty)+}) }
+  {+(Empty)+})+}
 {+(WildcardImport
   {+(Identifier)+}
   {+(Identifier)+})+}
 {+(QualifiedImport
   {+(Identifier)+}
   {+(Empty)+})+}
-{ (QualifiedImport
-  {-(Identifier)-}
-  {-(Empty)-})
-->(QualifiedImport
+{+(QualifiedImport
   {+(Empty)+}
-  {+(Empty)+}) }
+  {+(Empty)+})+}
+{-(QualifiedImport
+  {-(Identifier)-}
+  {-(Empty)-})-}
+{-(QualifiedImport
+  {-(Identifier)-}
+  {-(Empty)-})-}
 {-(WildcardImport
   {-(Identifier)-}
   {-(Identifier)-})-}

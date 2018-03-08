@@ -3,26 +3,20 @@ module Data.Abstract.FreeVariables where
 
 import Prologue
 import Data.Term
+import Data.ByteString (intercalate)
+import qualified Data.List.NonEmpty as NonEmpty
 
 -- | The type of variable names.
-data Name = Name ByteString | Qualified ByteString Name
-  deriving (Eq, Ord, Show)
+type Name = NonEmpty ByteString
 
 name :: ByteString -> Name
-name = Name
+name x = x :| []
 
 qualifiedName :: [ByteString] -> Name
-qualifiedName [] = Name "THIS IS BROKEN"
-qualifiedName [x] = Name x
-qualifiedName (x:xs) = Qualified x (qualifiedName xs)
+qualifiedName = NonEmpty.fromList
 
 friendlyName :: Name -> ByteString
-friendlyName (Name a) = a
-friendlyName (Qualified a b) = a <> "." <> friendlyName b
-
-instance Semigroup Name where
-  (<>) (Name a) n = Qualified a n
-  (<>) (Qualified a rest) n = Qualified a (rest <> n)
+friendlyName xs = intercalate "." (NonEmpty.toList xs)
 
 
 -- | Types which can contain unbound variables.

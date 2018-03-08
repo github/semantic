@@ -42,34 +42,30 @@
       {+(LShift
         {+(Identifier)+}
         {+(Integer)+})+})+}
-    {+(Assignment
-      {+(Identifier)+}
-      {+(RShift
-        {+(Identifier)+}
-        {+(Integer)+})+})+}
       (Assignment
       { (Identifier)
       ->(Identifier) }
       { (Plus
         {-(Identifier)-}
         {-(Integer)-})
-      ->(DividedBy
+      ->(RShift
         {+(Identifier)+}
         {+(Integer)+}) })
+    {+(Assignment
+      {+(Identifier)+}
+      {+(DividedBy
+        {+(Identifier)+}
+        {+(Integer)+})+})+}
     {+(Assignment
       {+(Identifier)+}
       {+(BXOr
         {+(Identifier)+}
         {+(Integer)+})+})+}
-      (Assignment
-      { (Identifier)
-      ->(Identifier) }
-      { (LShift
-        {-(Identifier)-}
-        {-(Integer)-})
-      ->(Modulo
+    {+(Assignment
+      {+(Identifier)+}
+      {+(Modulo
         {+(Identifier)+}
-        {+(Integer)+}) })
+        {+(Integer)+})+})+}
     {+(Assignment
       {+(Identifier)+}
       {+(Not
@@ -88,6 +84,11 @@
               {+(KeyValue
                 {+(Identifier)+}
                 {+(Integer)+})+})+})+})+})+})+}
+    {-(Assignment
+      {-(Identifier)-}
+      {-(LShift
+        {-(Identifier)-}
+        {-(Integer)-})-})-}
     {-(Assignment
       {-(Identifier)-}
       {-(RShift
