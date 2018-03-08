@@ -138,10 +138,7 @@ instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Program where
   eval (Program xs) = do
-    set <- getExports
-    v <- eval' xs
-    setExports set -- Reset the export state
-    pure v
+    withExports mempty (eval' xs)
     where
       eval' [] = unit >>= interface
       eval' [x] = subtermValue x >>= interface
