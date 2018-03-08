@@ -4,11 +4,11 @@ def a():
 def c(d):
   e
 
-def g(g, *h,):
+def g(g, *h):
   i
 
-def h(i=j):
+def h(i=1):
   i
 
-def i(j:str="default", **c):
+def i(j="default", **c):
   j

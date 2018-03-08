@@ -2,11 +2,11 @@ def foo(): return "bipp"
 
 def bar(): return foo()
 
-def baz(): return baz()
+def baz(): return bar()
 
 def why(): return "elle"
 
 if True:
-    foo()
+    baz()
 else:
     why()
