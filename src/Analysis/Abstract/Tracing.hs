@@ -5,8 +5,8 @@ import Control.Abstract.Analysis
 import Control.Abstract.Evaluator
 import Control.Monad.Effect.Writer
 import Data.Abstract.Configuration
-import Data.Semigroup.Reducer as Reducer
 import Data.Abstract.Value
+import Data.Semigroup.Reducer as Reducer
 import Prologue
 
 type Trace trace term value = trace (ConfigurationFor term value)
