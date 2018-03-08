@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures, TypeFamilies #-}
+{-# LANGUAGE DefaultSignatures, TypeFamilies, UndecidableInstances #-}
 module Control.Newtype1
 ( Newtype1(..)
 ) where
@@ -8,6 +8,7 @@ import Prologue
 
 class Newtype1 n where
   type O1 n :: * -> *
+  type O1 n = GO1 (Rep1 n)
 
   pack1 :: O1 n a -> n a
   default pack1 :: (Generic1 n, GNewtype1 (Rep1 n), O1 n ~ GO1 (Rep1 n)) => O1 n a -> n a
