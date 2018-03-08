@@ -21,7 +21,7 @@ type TracingEffects trace term value = Tracer trace term value ': EvaluatorEffec
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
 newtype TracingAnalysis (trace :: * -> *) m a
   = TracingAnalysis { runTracingAnalysis :: m a }
-  deriving (Applicative, Functor, LiftEffect, Monad, MonadEvaluator, MonadFail)
+  deriving (Applicative, Functor, Generic1, LiftEffect, Monad, MonadEvaluator, MonadFail, Newtype1)
 
 instance ( Corecursive (TermFor m)
          , LiftEffect m
