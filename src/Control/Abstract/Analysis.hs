@@ -29,6 +29,10 @@ class MonadEvaluator m => MonadAnalysis m where
   default evaluateTerm :: Recursive (TermFor m) => TermFor m -> m (ValueFor m)
   evaluateTerm = foldSubterms analyzeTerm
 
+  evaluateModule :: TermFor m -> m (ValueFor m)
+  default evaluateModule :: Recursive (TermFor m) => TermFor m -> m (ValueFor m)
+  evaluateModule = evaluateTerm
+
 delegateAnalyzeTerm :: ( TermFor (t m) ~ TermFor m
                        , ValueFor (t m) ~ ValueFor m
                        , Functor (Base (TermFor (t m)))
