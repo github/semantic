@@ -15,7 +15,7 @@ import Prologue
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
 class MonadFail m => MonadEvaluator m where
-  type TermFor m
+  type TermFor  m
   type ValueFor m
 
   -- | Retrieve the global environment.
