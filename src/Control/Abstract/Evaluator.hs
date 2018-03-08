@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstrainedClassMethods, DataKinds, DefaultSignatures, GeneralizedNewtypeDeriving, RankNTypes, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE ConstrainedClassMethods, DataKinds, DefaultSignatures, GeneralizedNewtypeDeriving, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
 module Control.Abstract.Evaluator where
 
 import Control.Applicative
