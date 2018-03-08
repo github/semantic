@@ -34,8 +34,6 @@ class Evaluatable constr where
           , MonadAddressable (LocationFor value) m
           , MonadAnalysis m
           , MonadValue value m
-          , Ord (LocationFor value)
-          , Semigroup (CellFor value)
           )
        => SubtermAlgebra constr term (m value)
   default eval :: (MonadFail m, Show1 constr) => SubtermAlgebra constr term (m value)
