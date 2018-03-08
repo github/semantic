@@ -63,6 +63,7 @@ subterms term = term `cons` para (foldMap (uncurry cons)) term
 
 instance ( Corecursive (TermFor m)
          , Effectful m
+         , Foldable (Base (TermFor m))
          , Member (State (Dead (TermFor m))) (Effects m)
          , MonadAnalysis m
          , MonadEvaluator m
@@ -73,3 +74,7 @@ instance ( Corecursive (TermFor m)
   analyzeTerm term = do
     revive (embedSubterm term)
     liftAnalyze analyzeTerm term
+
+  evaluateModule term = do
+    killAll (subterms term)
+    liftEvaluate evaluateModule term
