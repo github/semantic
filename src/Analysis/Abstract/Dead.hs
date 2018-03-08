@@ -1,8 +1,6 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Dead where
 
-import Analysis.Abstract.Evaluating
-import Control.Abstract.Addressable
 import Control.Abstract.Evaluator
 import Data.Abstract.Evaluatable
 import Data.Abstract.Value
