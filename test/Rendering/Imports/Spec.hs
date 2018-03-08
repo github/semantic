@@ -33,7 +33,7 @@ spec = parallel $ do
       expected <- readFileVerbatim "test/fixtures/python/import-graph/main.json"
       toVerbatimOutput output `shouldBe` expected
 
-    xit "works for Go" $ do
+    it "works for Go" $ do
       output <- parseToImports goParser "test/fixtures/go/import-graph/main.go"
       expected <- readFileVerbatim "test/fixtures/go/import-graph/main.json"
       toVerbatimOutput output `shouldBe` expected

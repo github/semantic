@@ -130,13 +130,15 @@ instance CustomHasDeclaration (Union fs) Declaration.Import where
       getSource = toText . flip Source.slice blobSource . getField
       getSymbol = let f = (T.decodeUtf8 . friendlyName) in bimap f f
 
-instance CustomHasDeclaration (Union fs) Declaration.QualifiedImport where
-  customToDeclaration Blob{..} _ (Declaration.QualifiedImport (Term (In fromAnn _), _) (Term (In aliasAnn _), _) symbols)
-    = Just $ ImportDeclaration ((stripQuotes . getSource) fromAnn) (getSource aliasAnn) (fmap getSymbol symbols) blobLanguage
+instance (Syntax.Identifier :< fs) => CustomHasDeclaration (Union fs) Declaration.QualifiedImport where
+  customToDeclaration Blob{..} _ (Declaration.QualifiedImport (Term (In fromAnn _), _) (Term (In aliasAnn aliasF), _) symbols)
+    | Just (Syntax.Identifier alias) <- prj aliasF = Just $ ImportDeclaration ((stripQuotes . getSource) fromAnn) (toName alias) (fmap getSymbol symbols) blobLanguage
+    | otherwise = Just $ ImportDeclaration ((stripQuotes . getSource) fromAnn) (getSource aliasAnn) (fmap getSymbol symbols) blobLanguage
     where
       stripQuotes = T.dropAround (`elem` ['"', '\''])
       getSource = toText . flip Source.slice blobSource . getField
-      getSymbol = let f = (T.decodeUtf8 . friendlyName) in bimap f f
+      getSymbol = bimap toName toName
+      toName = T.decodeUtf8 . friendlyName
 
 instance CustomHasDeclaration (Union fs) Declaration.WildcardImport where
   customToDeclaration Blob{..} _ (Declaration.WildcardImport (Term (In fromAnn _), _) _)
