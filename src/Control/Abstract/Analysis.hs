@@ -34,17 +34,19 @@ class MonadEvaluator m => MonadAnalysis m where
   default evaluateModule :: Recursive (TermFor m) => TermFor m -> m (ValueFor m)
   evaluateModule = evaluateTerm
 
-liftAnalyze :: ( TermFor (t m) ~ TermFor m
-               , ValueFor (t m) ~ ValueFor m
-               , Functor (Base (TermFor (t m)))
+liftAnalyze :: ( term ~ TermFor m
+               , term ~ TermFor (t m)
+               , value ~ ValueFor m
+               , value ~ ValueFor (t m)
+               , Functor (Base term)
                , MonadAnalysis m
-               , Coercible (t m (ValueFor m)) (m (ValueFor m))
-               , Coercible (m (ValueFor m)) (t m (ValueFor m))
+               , Coercible (t m value) (m value)
+               , Coercible (m value) (t m value)
                )
-            => SubtermAlgebra (Base (TermFor (t m))) (TermFor (t m)) (t m (ValueFor m))
+            => SubtermAlgebra (Base term) term (t m value)
 liftAnalyze term = pack1 (analyzeTerm (second unpack1 <$> term))
   where pack1 = coerce
-        unpack1 :: Coercible (t m (ValueFor m)) (m (ValueFor m)) => t m (ValueFor m) -> m (ValueFor m)
+        unpack1 :: Coercible (t m value) (m value) => t m value -> m value
         unpack1 = coerce
 
 liftEvaluate :: ( term ~ TermFor m
