@@ -10,7 +10,6 @@ module Control.Abstract.Analysis
 ) where
 
 import Control.Effect as X
-import Control.Newtype1 as X
 import Control.Monad.Effect.Fail as X
 import Control.Monad.Effect.Reader as X
 import Control.Monad.Effect.State as X
