@@ -1,4 +1,4 @@
-{-# LANGUAGE KindSignatures, TypeFamilies #-}
+{-# LANGUAGE TypeFamilies #-}
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , evaluateTerm
