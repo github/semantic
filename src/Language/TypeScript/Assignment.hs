@@ -12,6 +12,9 @@ import Data.Record
 import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, contextualize, postContextualize)
 import Language.TypeScript.Grammar as Grammar
 import Prologue
+import qualified Data.ByteString.Char8 as BC
+import qualified Data.ByteString as B
+import Data.Char (ord)
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
@@ -262,7 +265,12 @@ ternaryExpression :: Assignment
 ternaryExpression = makeTerm <$> symbol Grammar.TernaryExpression <*> children (Statement.If <$> term expression <*> term expression <*> term expression)
 
 memberExpression :: Assignment
-memberExpression = makeTerm <$> (symbol Grammar.MemberExpression <|> symbol Grammar.MemberExpression') <*> children (Expression.MemberAccess <$> term expression <*> term propertyIdentifier)
+memberExpression = (symbol Grammar.MemberExpression <|> symbol Grammar.MemberExpression') *> children (qualifiedIdentifier <|> memberAccess)
+  where
+    memberAccess = makeTerm <$> location <*> (Expression.MemberAccess <$> term expression <*> term propertyIdentifier)
+    qualifiedIdentifier = makeTerm <$> location <*> ((\a b -> Syntax.Identifier (qualifiedName [a, b])) <$> identifier' <*> propertyIdentifier')
+    identifier' = (symbol Identifier <|> symbol Identifier') *> source
+    propertyIdentifier' = symbol PropertyIdentifier *> source
 
 newExpression :: Assignment
 newExpression = makeTerm <$> symbol Grammar.NewExpression <*> children (Expression.New . pure <$> term expression)
@@ -632,7 +640,7 @@ statementIdentifier :: Assignment
 statementIdentifier = makeTerm <$> symbol StatementIdentifier <*> (Syntax.Identifier <$> (name <$> source))
 
 importStatement :: Assignment
-importStatement = makeImportTerm <$> symbol Grammar.ImportStatement <*> children ((,) <$> importClause <*> term string)
+importStatement = makeImportTerm <$> symbol Grammar.ImportStatement <*> children ((,) <$> importClause <*> term path)
                 <|> makeImport <$> symbol Grammar.ImportStatement <*> children requireImport
                 <|> makeImport <$> symbol Grammar.ImportStatement <*> children bareRequireImport
 
@@ -641,9 +649,13 @@ importStatement = makeImportTerm <$> symbol Grammar.ImportStatement <*> children
     makeImport loc (Just alias, symbols, from) = makeTerm loc (Declaration.QualifiedImport from alias symbols)
     makeImport loc (Nothing, symbols, from) = makeTerm loc (Declaration.Import from symbols)
     -- Import a file giving it an alias (e.g. import foo = require "./foo")
-    requireImport = symbol Grammar.ImportRequireClause *> children ((,,) <$> (Just <$> (term identifier)) <*> pure [] <*> term string)
+    requireImport = symbol Grammar.ImportRequireClause *> children ((,,) <$> (Just <$> (term identifier)) <*> pure [] <*> term path)
      -- Import a file just for it's side effects (e.g. import "./foo")
-    bareRequireImport = (,,) <$> (pure Nothing) <*> pure [] <*> term string
+    bareRequireImport = (,,) <$> (pure Nothing) <*> pure [] <*> term path
+
+    path = makeTerm <$> symbol Grammar.String <*> (Syntax.Identifier <$> (qualifiedName' <$> source))
+    qualifiedName' = qualifiedName . BC.split '/' . (BC.dropWhile (== '/')) . (BC.dropWhile (== '.')) . stripQuotes
+    stripQuotes = B.filter (/= (fromIntegral (ord '\"')))
 
     -- Imports with import clauses
     makeImportTerm1 loc from (Prelude.True, Just alias, symbols) = makeTerm loc (Declaration.QualifiedImport from alias symbols)
