@@ -5,7 +5,7 @@ import Control.Applicative
 import Control.Monad.Effect
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
-import Control.Monad.Effect.NonDetEff
+import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.ModuleTable
@@ -70,6 +70,8 @@ instance Members '[ Fail
   askModuleTable = Evaluator ask
   localModuleTable f a = Evaluator (local f (runEvaluator a))
 
+putStore :: MonadEvaluator t value m => StoreFor value -> m ()
+putStore = modifyStore . const
 
 -- | An evaluator of @term@s to @value@s, producing incremental results of type @a@ using a list of @effects@.
 newtype Evaluator effects term value a = Evaluator { runEvaluator :: Eff effects a }
@@ -77,4 +79,5 @@ newtype Evaluator effects term value a = Evaluator { runEvaluator :: Eff effects
 
 deriving instance Member Fail effects => MonadFail (Evaluator effects term value)
 deriving instance Member NonDetEff effects => Alternative (Evaluator effects term value)
+deriving instance Member NonDetEff effects => MonadNonDet (Evaluator effects term value)
 deriving instance Member Fresh effects => MonadFresh (Evaluator effects term value)

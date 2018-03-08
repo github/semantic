@@ -326,7 +326,7 @@ importAlias' :: Assignment
 importAlias' = makeTerm <$> symbol Grammar.ImportAlias <*> children (TypeScript.Syntax.ImportAlias <$> term identifier <*> term (identifier <|> nestedIdentifier))
 
 number :: Assignment
-number = makeTerm <$> symbol Grammar.Number <*> (Literal.Float <$> source)
+number = makeTerm <$> symbol Grammar.Number <*> (source >>= Literal.normalizeFloatString [Literal.padWithLeadingZero])
 
 string :: Assignment
 string = makeTerm <$> symbol Grammar.String <*> (Literal.TextElement <$> source)

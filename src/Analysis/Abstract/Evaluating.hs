@@ -81,4 +81,4 @@ instance ( Evaluatable (Base t)
          , Semigroup (Cell (LocationFor v) v)
          )
          => MonadAnalysis t v (Evaluation t v) where
-  evaluateTerm = foldSubterms eval
+  analyzeTerm = eval

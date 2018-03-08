@@ -79,6 +79,6 @@ instance ( Corecursive t
          , Semigroup (Cell (LocationFor v) v)
          )
          => MonadAnalysis t v (DeadCodeAnalysis t v) where
-  evaluateTerm = foldSubterms (\ term -> do
-    revive (embed (subterm <$> term))
-    eval term)
+  analyzeTerm term = do
+    revive (embedSubterm term)
+    eval term

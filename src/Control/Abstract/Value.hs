@@ -10,6 +10,7 @@ import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value as Value
 import Data.Abstract.Type as Type
+import Data.Scientific (Scientific)
 import Prologue
 import Prelude hiding (fail)
 
@@ -28,6 +29,9 @@ class (MonadEvaluator t v m) => MonadValue t v m where
 
   -- | Construct an abstract string value.
   string :: ByteString -> m v
+
+  -- | Construct a floating-point value.
+  float :: Scientific -> m v
 
   -- | Construct an abstract interface value.
   interface :: v -> m v
@@ -57,6 +61,7 @@ instance ( FreeVariables t
   integer = pure . inj . Integer
   boolean = pure . inj . Boolean
   string  = pure . inj . Value.String
+  float   = pure . inj . Value.Float
   interface v = inj . Value.Interface v <$> getGlobalEnv
 
   ifthenelse cond if' else'
@@ -94,6 +99,7 @@ instance (Alternative m, MonadEvaluator t Type m, MonadFresh m) => MonadValue t 
   integer _ = pure Int
   boolean _ = pure Bool
   string _  = pure Type.String
+  float _   = pure Type.Float
   -- TODO
   interface = undefined
 

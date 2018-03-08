@@ -371,7 +371,11 @@ concatenatedString :: Assignment
 concatenatedString = makeTerm <$> symbol ConcatenatedString <*> children (manyTerm string)
 
 float :: Assignment
-float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
+float = makeTerm <$> symbol Float <*> (source >>= Literal.normalizeFloatString [ Literal.padWithLeadingZero
+                                                                               , Literal.padWithTrailingZero
+                                                                               , Literal.dropAlphaSuffix
+                                                                               , Literal.removeUnderscores
+                                                                               ])
 
 integer :: Assignment
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
