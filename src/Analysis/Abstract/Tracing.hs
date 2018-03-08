@@ -2,7 +2,6 @@
 module Analysis.Abstract.Tracing where
 
 import Control.Abstract.Analysis
-import Control.Abstract.Evaluator
 import Control.Monad.Effect.Writer
 import Data.Abstract.Configuration
 import Data.Abstract.Value

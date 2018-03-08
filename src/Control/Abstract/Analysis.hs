@@ -2,14 +2,12 @@
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , delegateAnalyzeTerm
-, TermFor
-, ValueFor
 , module X
 , Subterm(..)
 , SubtermAlgebra
 ) where
 
-import Control.Abstract.Evaluator
+import Control.Abstract.Evaluator as X
 import Control.Effect as X
 import Control.Monad.Effect.Fail as X
 import Control.Monad.Effect.Reader as X
