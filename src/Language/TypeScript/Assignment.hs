@@ -39,6 +39,7 @@ type Syntax = '[
   , Declaration.Import
   , Declaration.QualifiedImport
   , Declaration.QualifiedExport
+  , Declaration.QualifiedExportFrom
   , Declaration.Module
   , Expression.Arithmetic
   , Expression.Bitwise
@@ -713,7 +714,7 @@ ambientDeclaration :: Assignment
 ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> children (TypeScript.Syntax.AmbientDeclaration <$> term (choice [declaration, statementBlock]))
 
 exportStatement :: Assignment
-exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip Declaration.QualifiedExport <$> exportClause <*> term (fromClause <|> emptyTerm))
+exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> (children (flip Declaration.QualifiedExportFrom <$> exportClause <*> term fromClause)) <|> makeTerm <$> symbol Grammar.ExportStatement <*> (children $ Declaration.QualifiedExport <$> exportClause)
   where
     exportClause = symbol Grammar.ExportClause *> children (many exportSymbol)
     exportSymbol = symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> (Just <$> rawIdentifier))
