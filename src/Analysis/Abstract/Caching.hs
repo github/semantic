@@ -34,32 +34,34 @@ type CachingEffects term value effects
 type CacheFor m = Cache (LocationFor (ValueFor m)) (TermFor m) (ValueFor m)
 
 newtype CachingAnalysis m (effects :: [* -> *]) a = CachingAnalysis { runCachingAnalysis :: m effects a }
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadEvaluator, MonadFail, MonadFresh, MonadNonDet)
+  deriving (Alternative, Applicative, Functor, Monad, MonadEvaluator, MonadFail, MonadFresh, MonadNonDet)
+
+deriving instance Effectful effects (m effects) => Effectful effects (CachingAnalysis m effects)
 
 -- TODO: reabstract these later on
 
 type InCacheEffectFor  m = Reader (CacheFor m)
 type OutCacheEffectFor m = State  (CacheFor m)
 
-askCache :: (Effectful m, Member (InCacheEffectFor (m effects)) effects) => CachingAnalysis m effects (CacheFor (m effects))
+askCache :: (Effectful effects (m effects), Member (InCacheEffectFor (m effects)) effects) => CachingAnalysis m effects (CacheFor (m effects))
 askCache = lift ask
 
-localCache :: (Effectful m, Member (InCacheEffectFor (m effects)) effects) => (CacheFor (m effects) -> CacheFor (m effects)) -> CachingAnalysis m effects a -> CachingAnalysis m effects a
+localCache :: (Effectful effects (m effects), Member (InCacheEffectFor (m effects)) effects) => (CacheFor (m effects) -> CacheFor (m effects)) -> CachingAnalysis m effects a -> CachingAnalysis m effects a
 localCache f a = lift (local f (lower a))
 
-asksCache :: (Functor (m effects), Effectful m, Member (InCacheEffectFor (m effects)) effects) => (CacheFor (m effects) -> a) -> CachingAnalysis m effects a
+asksCache :: (Functor (m effects), Effectful effects (m effects), Member (InCacheEffectFor (m effects)) effects) => (CacheFor (m effects) -> a) -> CachingAnalysis m effects a
 asksCache f = f <$> askCache
 
-getsCache :: (Functor (m effects), Effectful m, Member (OutCacheEffectFor (m effects)) effects) => (CacheFor (m effects) -> a) -> CachingAnalysis m effects a
+getsCache :: (Functor (m effects), Effectful effects (m effects), Member (OutCacheEffectFor (m effects)) effects) => (CacheFor (m effects) -> a) -> CachingAnalysis m effects a
 getsCache f = f <$> getCache
 
-getCache :: (Effectful m, Member (OutCacheEffectFor (m effects)) effects) => CachingAnalysis m effects (CacheFor (m effects))
+getCache :: (Effectful effects (m effects), Member (OutCacheEffectFor (m effects)) effects) => CachingAnalysis m effects (CacheFor (m effects))
 getCache = lift get
 
-putCache :: (Effectful m, Member (OutCacheEffectFor (m effects)) effects) => CacheFor (m effects) -> CachingAnalysis m effects ()
+putCache :: (Effectful effects (m effects), Member (OutCacheEffectFor (m effects)) effects) => CacheFor (m effects) -> CachingAnalysis m effects ()
 putCache = lift . put
 
-modifyCache :: (Effectful m, Member (OutCacheEffectFor (m effects)) effects, Monad (m effects)) => (CacheFor (m effects) -> CacheFor (m effects)) -> CachingAnalysis m effects ()
+modifyCache :: (Effectful effects (m effects), Member (OutCacheEffectFor (m effects)) effects, Monad (m effects)) => (CacheFor (m effects) -> CacheFor (m effects)) -> CachingAnalysis m effects ()
 modifyCache f = fmap f getCache >>= putCache
 
 -- | This instance coinductively iterates the analysis of a term until the results converge.
@@ -68,7 +70,7 @@ instance ( Corecursive (TermFor (m effects))
          , Ord (ValueFor (m effects))
          , Ord (CellFor (ValueFor (m effects)))
          , Ord (LocationFor (ValueFor (m effects)))
-         , Effectful m
+         , Effectful effects (m effects)
          , MonadFresh (m effects)
          , MonadNonDet (m effects)
          , Members (CachingEffectsFor (m effects)) effects
@@ -125,7 +127,7 @@ memoizeEval :: ( Ord (ValueFor (m effects))
                , FreeVariables (TermFor (m effects))
                , Foldable (Cell (LocationFor (ValueFor (m effects))))
                , Functor (Base (TermFor (m effects)))
-               , Effectful m
+               , Effectful effects (m effects)
                , Members (CachingEffectsFor (m effects)) effects
                , Recursive (TermFor (m effects))
                , MonadAnalysis (m effects)

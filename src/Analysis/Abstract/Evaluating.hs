@@ -27,7 +27,7 @@ evaluate :: forall value term
             )
          => term
          -> Final (EvaluatingEffects term value '[]) value
-evaluate = run @(Evaluating term value) @(EvaluatingEffects term value '[]) . evaluateModule
+evaluate = run . evaluateModule @(Evaluating term value (EvaluatingEffects term value '[]))
 
 -- | Evaluate terms and an entry point to a value.
 evaluates :: forall value term
@@ -40,7 +40,7 @@ evaluates :: forall value term
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
           -> Final (EvaluatingEffects term value '[]) value
-evaluates pairs (_, t) = run @(Evaluating term value) @(EvaluatingEffects term value '[]) (withModules pairs (evaluateModule t))
+evaluates pairs (_, t) = run (withModules pairs (evaluateModule @(Evaluating term value (EvaluatingEffects term value '[])) t))
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
 withModules :: (MonadAnalysis m, MonadEvaluator m) => [(Blob, TermFor m)] -> m a -> m a
@@ -49,15 +49,13 @@ withModules pairs = localModuleTable (const moduleTable)
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
 newtype Evaluating term value effects a = Evaluating { runEvaluating :: Eff effects a }
-  deriving (Applicative, Effectful, Functor, Monad)
+  deriving (Applicative, Functor, Monad)
 
 deriving instance Member Fail      effects => MonadFail   (Evaluating term value effects)
 deriving instance Member Fresh     effects => MonadFresh  (Evaluating term value effects)
 deriving instance Member NonDetEff effects => Alternative (Evaluating term value effects)
 deriving instance Member NonDetEff effects => MonadNonDet (Evaluating term value effects)
-
--- instance Effectful (Evaluating term value) where
---   lift = _
+deriving instance Effectful effects (Evaluating term value effects)
 
 type EvaluatingEffects term value effects
   = Fail                          -- Failure with an error message

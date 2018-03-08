@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, FunctionalDependencies, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Effect where
 
 import qualified Control.Monad.Effect as Effect
@@ -12,7 +12,7 @@ import Data.Semigroup.Reducer
 import Prologue
 
 -- | Run an 'Effectful' computation to completion, interpreting each effect with some sensible defaults, and return the 'Final' result.
-run :: (Effectful m, RunEffects effects a) => m effects a -> Final effects a
+run :: (Effectful effects m, RunEffects effects a) => m a -> Final effects a
 run = Effect.run . runEffects . lower
 
 -- | A typeclass to run a computation to completion, interpreting each effect with some sensible defaults.
@@ -66,10 +66,10 @@ instance Ord a => RunEffect NonDetEff a where
     MPlus -> mappend <$> k True <*> k False)
 
 
-class Effectful m where
-  lift :: Eff effects a -> m effects a
-  lower :: m effects a -> Eff effects a
+class Effectful effects m | m -> effects where
+  lift :: Eff effects a -> m a
+  lower :: m a -> Eff effects a
 
-instance Effectful Eff where
+instance Effectful effects (Eff effects) where
   lift = id
   lower = id
