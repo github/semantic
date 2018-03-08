@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, KindSignatures, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Tracing where
 
 import Control.Abstract.Analysis
@@ -18,28 +18,26 @@ type TracerFor trace m = Writer (TraceFor trace m)
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
 newtype TracingAnalysis (trace :: * -> *) m (effects :: [* -> *]) a
   = TracingAnalysis { runTracingAnalysis :: m effects a }
-  deriving (Applicative, Functor, Effectful, Monad, MonadFail)
+  deriving (Applicative, Functor, Effectful, Monad, MonadEvaluator, MonadFail)
 
-deriving instance MonadEvaluator effects m => MonadEvaluator effects (TracingAnalysis trace m)
-
-instance ( Corecursive (TermFor m)
+instance ( Corecursive (TermFor (m effects))
          , Effectful m
-         , Member (TracerFor trace m) effects
-         , MonadAnalysis effects m
-         , MonadEvaluator effects m
-         , Ord (LocationFor (ValueFor m))
-         , Recursive (TermFor m)
-         , Reducer (ConfigurationFor (TermFor m) (ValueFor m)) (TraceFor trace m)
+         , Member (TracerFor trace (m effects)) effects
+         , MonadAnalysis (m effects)
+         , MonadEvaluator (m effects)
+         , Ord (LocationFor (ValueFor (m effects)))
+         , Recursive (TermFor (m effects))
+         , Reducer (ConfigurationFor (TermFor (m effects)) (ValueFor (m effects))) (TraceFor trace (m effects))
          )
-         => MonadAnalysis effects (TracingAnalysis trace m) where
+         => MonadAnalysis (TracingAnalysis trace m effects) where
   analyzeTerm term = do
     config <- getConfiguration (embedSubterm term)
     trace (Reducer.unit config)
     liftAnalyze analyzeTerm term
 
 trace :: ( Effectful m
-         , Member (TracerFor trace m) effects
+         , Member (TracerFor trace (m effects)) effects
          )
-      => TraceFor trace m
+      => TraceFor trace (m effects)
       -> TracingAnalysis trace m effects ()
 trace = lift . tell

@@ -13,9 +13,8 @@ type DeadCode term = State (Dead term)
 
 -- | An analysis tracking dead (unreachable) code.
 newtype DeadCodeAnalysis m (effects :: [* -> *]) a = DeadCodeAnalysis { runDeadCodeAnalysis :: m effects a }
-  deriving (Applicative, Functor, Effectful, Monad, MonadFail)
+  deriving (Applicative, Functor, Effectful, Monad, MonadEvaluator, MonadFail)
 
-deriving instance MonadEvaluator effects m => MonadEvaluator effects (DeadCodeAnalysis m)
 
 -- | A set of “dead” (unreachable) terms.
 newtype Dead term = Dead { unDead :: Set term }
@@ -24,11 +23,11 @@ newtype Dead term = Dead { unDead :: Set term }
 deriving instance Ord term => Reducer term (Dead term)
 
 -- | Update the current 'Dead' set.
-killAll :: (Effectful m, Member (State (Dead (TermFor m))) effects) => Dead (TermFor m) -> DeadCodeAnalysis m effects ()
+killAll :: (Effectful m, Member (State (Dead (TermFor (m effects)))) effects) => Dead (TermFor (m effects)) -> DeadCodeAnalysis m effects ()
 killAll = lift . put
 
 -- | Revive a single term, removing it from the current 'Dead' set.
-revive :: (Effectful m, Member (State (Dead (TermFor m))) effects) => Ord (TermFor m) => TermFor m -> DeadCodeAnalysis m effects ()
+revive :: (Effectful m, Member (State (Dead (TermFor (m effects)))) effects) => Ord (TermFor (m effects)) => (TermFor (m effects)) -> DeadCodeAnalysis m effects ()
 revive t = lift (modify (Dead . delete t . unDead))
 
 -- | Compute the set of all subterms recursively.
@@ -36,16 +35,16 @@ subterms :: (Ord term, Recursive term, Foldable (Base term)) => term -> Dead ter
 subterms term = term `cons` para (foldMap (uncurry cons)) term
 
 
-instance ( Corecursive (TermFor m)
+instance ( Corecursive (TermFor (m effects))
          , Effectful m
-         , Foldable (Base (TermFor m))
-         , Member (State (Dead (TermFor m))) effects
-         , MonadAnalysis effects m
-         , MonadEvaluator effects m
-         , Ord (TermFor m)
-         , Recursive (TermFor m)
+         , Foldable (Base (TermFor (m effects)))
+         , Member (State (Dead (TermFor (m effects)))) effects
+         , MonadAnalysis (m effects)
+         , MonadEvaluator (m effects)
+         , Ord (TermFor (m effects))
+         , Recursive (TermFor (m effects))
          )
-         => MonadAnalysis effects (DeadCodeAnalysis m) where
+         => MonadAnalysis (DeadCodeAnalysis m effects) where
   analyzeTerm term = do
     revive (embedSubterm term)
     liftAnalyze analyzeTerm term
