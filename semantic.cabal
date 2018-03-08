@@ -36,7 +36,6 @@ library
                      , Control.Abstract.Value
                      -- Control flow
                      , Control.Effect
-                     , Control.Newtype1
                      -- Effects used for program analysis
                      , Control.Monad.Effect.Cache
                      , Control.Monad.Effect.Fresh
