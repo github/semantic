@@ -4,6 +4,7 @@ module Semantic.Util where
 
 import Prologue
 import Analysis.Abstract.Caching
+import Analysis.Abstract.Dead
 import Analysis.Abstract.Evaluating
 import Analysis.Abstract.Tracing
 import Analysis.Declaration
@@ -48,6 +49,10 @@ evaluateRubyFiles paths = do
 typecheckPythonFile path = run . lower @(CachingAnalysis (Evaluating Python.Term Type (CachingEffects Python.Term Type (EvaluatorEffects Python.Term Type)))) . evaluateTerm <$> (file path >>= runTask . parse pythonParser)
 
 tracePythonFile path = run . lower @(TracingAnalysis [] (Evaluating Python.Term PythonValue (TracingEffects [] Python.Term PythonValue))) . evaluateTerm <$> (file path >>= runTask . parse pythonParser)
+
+type PythonTracer = TracingAnalysis [] (Evaluating Python.Term PythonValue (State (Dead (Python.Term)) ': TracingEffects [] Python.Term PythonValue))
+
+evaluateDeadTracePythonFile path = run . lower @(DeadCodeAnalysis PythonTracer) . evaluateDead <$> (file path >>= runTask . parse pythonParser)
 
 evaluatePythonFile path = evaluate @PythonValue <$>
   (file path >>= runTask . parse pythonParser)
