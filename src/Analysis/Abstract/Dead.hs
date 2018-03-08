@@ -16,7 +16,7 @@ type DeadCodeEffects term value = State (Dead term) ': EvaluatorEffects term val
 
 -- | Run a dead code analysis of the given program.
 evaluateDead :: forall term value effects m
-             .  ( m ~ Evaluation term value effects
+             .  ( m ~ Evaluating term value effects
                 , effects ~ DeadCodeEffects term value
                 , Corecursive term
                 , Evaluatable (Base term)
