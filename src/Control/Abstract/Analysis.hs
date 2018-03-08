@@ -24,7 +24,7 @@ class MonadEvaluator m => MonadAnalysis m where
 
   -- | Evaluate a term to a value using the semantics of the current analysis.
   --
-  --   This should always be called instead of explicitly folding either 'eval' or 'analyzeTerm' over subterms, except in 'MonadAnalysis' instances themselves.
+  --   This should always be called when e.g. evaluating the bodies of closures instead of explicitly folding either 'eval' or 'analyzeTerm' over subterms, except in 'MonadAnalysis' instances themselves. On the other hand, top-level evaluation should be performed using 'evaluateModule'.
   evaluateTerm :: TermFor m -> m (ValueFor m)
   default evaluateTerm :: Recursive (TermFor m) => TermFor m -> m (ValueFor m)
   evaluateTerm = foldSubterms analyzeTerm
