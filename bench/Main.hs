@@ -3,12 +3,13 @@ module Main where
 import Criterion.Main
 import Semantic.Util
 import Data.Monoid
+import Control.Monad
 
 pyEval :: FilePath -> Benchmarkable
-pyEval = whnfIO . evaluatePythonFile . ("bench/bench-fixtures/python/" <>)
+pyEval = whnfIO . (evaluatePythonFile >=> print) . ("bench/bench-fixtures/python/" <>)
 
 rbEval :: FilePath -> Benchmarkable
-rbEval = whnfIO . evaluateRubyFile . ("bench/bench-fixtures/ruby/" <>)
+rbEval = whnfIO . (evaluateRubyFile >=> print) . ("bench/bench-fixtures/ruby/" <>)
 
 main :: IO ()
 main = defaultMain
