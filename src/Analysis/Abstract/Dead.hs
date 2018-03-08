@@ -3,35 +3,12 @@ module Analysis.Abstract.Dead where
 
 import Control.Abstract.Evaluator
 import Data.Abstract.Evaluatable
-import Data.Abstract.Value
 import Data.Semigroup.Reducer as Reducer
 import Data.Set (delete)
 import Prologue
 
 -- | The effects necessary for dead code analysis.
 type DeadCode term = State (Dead term)
-
--- | Run a dead code analysis of the given program.
-evaluateDead :: forall m term value effects
-             .  ( term ~ TermFor m
-                , value ~ ValueFor m
-                , effects ~ Effects m
-                , Corecursive term
-                , Member (DeadCode term) effects
-                , Effectful m
-                , Evaluatable (Base term)
-                , Foldable (Base term)
-                , FreeVariables term
-                , MonadAnalysis m
-                , Ord (LocationFor value)
-                , Ord term
-                , Recursive term
-                , RunEffects effects value
-                , Semigroup (CellFor value)
-                )
-             => term
-             -> DeadCodeAnalysis m value
-evaluateDead = evaluateModule
 
 
 -- | An analysis tracking dead (unreachable) code.

@@ -52,7 +52,7 @@ tracePythonFile path = run . lower @(TracingAnalysis [] (Evaluating Python.Term 
 
 type PythonTracer = TracingAnalysis [] (Evaluating Python.Term PythonValue (DeadCode Python.Term ': Tracer [] Python.Term PythonValue ': EvaluatingEffects Python.Term PythonValue))
 
-evaluateDeadTracePythonFile path = run . lower @(DeadCodeAnalysis PythonTracer) . evaluateDead <$> (file path >>= runTask . parse pythonParser)
+evaluateDeadTracePythonFile path = run . lower @(DeadCodeAnalysis PythonTracer) . evaluateModule <$> (file path >>= runTask . parse pythonParser)
 
 evaluatePythonFile path = evaluate @PythonValue <$>
   (file path >>= runTask . parse pythonParser)
