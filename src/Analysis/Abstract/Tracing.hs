@@ -38,7 +38,7 @@ instance ( Corecursive (TermFor m)
   analyzeTerm term = do
     config <- getConfiguration (embedSubterm term)
     trace (Reducer.unit config)
-    TracingAnalysis (analyzeTerm (second runTracingAnalysis <$> term))
+    delegateAnalyzeTerm term
 
 type instance TermFor  (TracingAnalysis trace m) = TermFor  m
 type instance ValueFor (TracingAnalysis trace m) = ValueFor m
