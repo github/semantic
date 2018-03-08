@@ -70,7 +70,7 @@ type EvaluatingEffects term value effects
  ': effects
 
 instance Ord (LocationFor value) => MonadEvaluator (Evaluating term value effects) where
-  type TermFor (Evaluating term value effects) = term
+  type TermFor  (Evaluating term value effects) = term
   type ValueFor (Evaluating term value effects) = value
 
   getGlobalEnv = lift get
