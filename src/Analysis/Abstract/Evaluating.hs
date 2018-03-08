@@ -23,9 +23,7 @@ evaluate :: forall value term
             , FreeVariables term
             , MonadAddressable (LocationFor value) (Evaluating term value '[])
             , MonadValue value (Evaluating term value '[])
-            , Ord (LocationFor value)
             , Recursive term
-            , Semigroup (CellFor value)
             )
          => term
          -> Final (EvaluatingEffects term value '[]) value
@@ -37,9 +35,7 @@ evaluates :: forall value term
              , FreeVariables term
              , MonadAddressable (LocationFor value) (Evaluating term value '[])
              , MonadValue value (Evaluating term value '[])
-             , Ord (LocationFor value)
              , Recursive term
-             , Semigroup (CellFor value)
              )
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
@@ -69,7 +65,7 @@ type EvaluatingEffects term value effects
  ': State  (ModuleTable value)    -- Cache of evaluated modules
  ': effects
 
-instance Ord (LocationFor value) => MonadEvaluator (Evaluating term value effects) where
+instance MonadEvaluator (Evaluating term value effects) where
   type TermFor  (Evaluating term value effects) = term
   type ValueFor (Evaluating term value effects) = value
 
@@ -93,7 +89,6 @@ instance ( Evaluatable (Base term)
          , MonadAddressable (LocationFor value) (Evaluating term value effects)
          , MonadValue value (Evaluating term value effects)
          , Recursive term
-         , Semigroup (CellFor value)
          )
          => MonadAnalysis (Evaluating term value effects) where
   analyzeTerm = eval
