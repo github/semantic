@@ -2,6 +2,7 @@
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , delegateAnalyzeTerm
+, liftEvaluate
 , module X
 , Subterm(..)
 , SubtermAlgebra
@@ -45,3 +46,13 @@ delegateAnalyzeTerm term = pack1 (analyzeTerm (second unpack1 <$> term))
   where pack1 = coerce
         unpack1 :: Coercible (t m (ValueFor m)) (m (ValueFor m)) => t m (ValueFor m) -> m (ValueFor m)
         unpack1 = coerce
+
+liftEvaluate :: ( term ~ TermFor m
+                , term ~ TermFor (t m)
+                , value ~ ValueFor m
+                , value ~ ValueFor (t m)
+                , Coercible (m value) (t m value)
+                )
+             => (term ->   m value)
+             -> (term -> t m value)
+liftEvaluate evaluate = coerce . evaluate
