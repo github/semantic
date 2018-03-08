@@ -1,44 +1,33 @@
 (Program
 {+(QualifiedImport
-  {+(ScopeResolution
-    {+(Identifier)+})+}
+  {+(Identifier)+}
   {+(Empty)+})+}
 {+(QualifiedImport
-  {+(ScopeResolution
-    {+(Identifier)+})+}
+  {+(Identifier)+}
   {+(Empty)+})+}
 {+(WildcardImport
-  {+(ScopeResolution
-    {+(Identifier)+})+}
+  {+(Identifier)+}
   {+(Identifier)+})+}
 {+(QualifiedImport
-  {+(ScopeResolution
-    {+(Identifier)+})+}
+  {+(Identifier)+}
   {+(Empty)+})+}
 {+(QualifiedImport
-  {+(ScopeResolution
-    {+(Identifier)+}
-    {+(Identifier)+})+}
+  {+(Identifier)+}
   {+(Empty)+})+}
 {+(QualifiedImport
   {+(Empty)+}
   {+(Empty)+})+}
 {-(QualifiedImport
-  {-(ScopeResolution
-    {-(Identifier)-})-}
+  {-(Identifier)-}
   {-(Empty)-})-}
 {-(QualifiedImport
-  {-(ScopeResolution
-    {-(Identifier)-})-}
+  {-(Identifier)-}
   {-(Empty)-})-}
 {-(WildcardImport
-  {-(ScopeResolution
-    {-(Identifier)-})-}
+  {-(Identifier)-}
   {-(Identifier)-})-}
 {-(QualifiedImport
-  {-(ScopeResolution
-    {-(Identifier)-}
-    {-(Identifier)-})-}
+  {-(Identifier)-}
   {-(Empty)-})-}
 {-(QualifiedImport
   {-(Empty)-}

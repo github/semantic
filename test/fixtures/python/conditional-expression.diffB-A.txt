@@ -2,8 +2,7 @@
 {+(If
   {+(Identifier)+}
   {+(Call
-    {+(QualifiedIdentifier
-      {+(Identifier)+})+}
+    {+(Identifier)+}
     {+(Empty)+})+}
   {+(Identifier)+})+}
   (Assignment
@@ -19,10 +18,8 @@
 {-(If
   {-(Identifier)-}
   {-(Call
-    {-(QualifiedIdentifier
-      {-(Identifier)-})-}
+    {-(Identifier)-}
     {-(Empty)-})-}
   {-(Call
-    {-(QualifiedIdentifier
-      {-(Identifier)-})-}
+    {-(Identifier)-}
     {-(Empty)-})-})-})

@@ -7,38 +7,21 @@
       (Identifier)
       (Identifier))
   {-(QualifiedImport
-    {-(ScopeResolution
-      {-(Identifier)-})-}
+    {-(Identifier)-}
     {-(Identifier)-})-})
 {+(QualifiedImport
-  {+(ScopeResolution
-    {+(Identifier)+}
-    {+(Identifier)+})+}
+  {+(Identifier)+}
   {+(Identifier)+})+}
 {+(QualifiedImport
-  {+(
-    {+(Identifier)+}
-    {+(Identifier)+}
-    {+(Identifier)+})+}
-  {+(
-    {+(Identifier)+}
-    {+(Identifier)+}
-    {+(Identifier)+})+})+}
+  {+(Identifier)+}
+  {+(Identifier)+})+}
 {-(
   {-(QualifiedImport
-    {-(ScopeResolution
-      {-(Identifier)-}
-      {-(Identifier)-})-}
+    {-(Identifier)-}
     {-(Identifier)-})-}
   {-(QualifiedImport
     {-(Identifier)-}
     {-(Identifier)-})-})-}
 {-(QualifiedImport
-  {-(
-    {-(Identifier)-}
-    {-(Identifier)-}
-    {-(Identifier)-})-}
-  {-(
-    {-(Identifier)-}
-    {-(Identifier)-}
-    {-(Identifier)-})-})-})
+  {-(Identifier)-}
+  {-(Identifier)-})-})

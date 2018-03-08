@@ -12,10 +12,7 @@
     (Let
       (Empty)
       (Call
-        (QualifiedIdentifier
-          (
-            (Identifier)
-            (Identifier)))
+        (Identifier)
         (Identifier)
         (TextElement)
         (Identifier)
@@ -24,10 +21,7 @@
     (Let
       (Empty)
       (Call
-        (QualifiedIdentifier
-          (
-            (Identifier)
-            (Identifier)))
+        (Identifier)
         (Identifier)
         (TextElement)
         (Identifier)

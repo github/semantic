@@ -3,15 +3,13 @@
     ([]))
   (Throw
     (Call
-      (QualifiedIdentifier
-        (Identifier))
+      (Identifier)
       (TextElement)
       (Empty)))
   (Throw
     (
       (Call
-        (QualifiedIdentifier
-          (Identifier))
+        (Identifier)
         (TextElement)
         (Empty))
       (Identifier))))

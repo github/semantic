@@ -1,25 +1,19 @@
 (Program
   (Decorator
-    (ScopeResolution
-      (Identifier)
-      (Identifier))
+    (Identifier)
     (Class
       (Identifier)
       (Decorator
-        (ScopeResolution
-          (Identifier))
+        (Identifier)
         ([])
         (Decorator
-          (ScopeResolution
-            (Identifier))
+          (Identifier)
           (Identifier)
           (Decorator
-            (ScopeResolution
-              (Identifier))
+            (Identifier)
             (Identifier)
             (Decorator
-              (ScopeResolution
-                (Identifier))
+              (Identifier)
               (
                 (Integer)
                 (Assignment

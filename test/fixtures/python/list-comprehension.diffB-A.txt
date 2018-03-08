@@ -9,15 +9,13 @@
       {-(Identifier)-}
       {-(Identifier)-})-}
     {-(Call
-      {-(QualifiedIdentifier
-        {-(Identifier)-})-}
+      {-(Identifier)-}
       {-(Empty)-})-}
     {-(
       {-(Identifier)-}
       {-(Identifier)-})-}
     {-(Call
-      {-(QualifiedIdentifier
-        {-(Identifier)-})-}
+      {-(Identifier)-}
       {-(Empty)-})-}))
   (Comprehension
   { (Plus

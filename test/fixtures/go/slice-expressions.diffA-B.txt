@@ -11,24 +11,24 @@
       {+(Integer)+}
       {+(Empty)+}
       {+(Empty)+})+}
-    {+(Slice
-      {+(Identifier)+}
-      {+(Empty)+}
-      {+(Integer)+}
-      {+(Empty)+})+}
-    {+(Slice
-      {+(Identifier)+}
-      {+(Integer)+}
-      {+(Integer)+}
-      {+(Empty)+})+}
       (Slice
       { (Identifier)
       ->(Identifier) }
-        (Integer)
+      { (Integer)
+      ->(Empty) }
       { (Empty)
       ->(Integer) }
-      { (Empty)
-      ->(Integer) })
+        (Empty))
+    {+(Slice
+      {+(Identifier)+}
+      {+(Integer)+}
+      {+(Integer)+}
+      {+(Empty)+})+}
+    {+(Slice
+      {+(Identifier)+}
+      {+(Integer)+}
+      {+(Integer)+}
+      {+(Integer)+})+}
     {+(Slice
       {+(Identifier)+}
       {+(Integer)+}

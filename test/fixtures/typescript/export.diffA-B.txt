@@ -65,15 +65,15 @@
         (Identifier)
       { (Empty)
       ->(Identifier) })
-    {+(Assignment
-      {+(Empty)+}
-      {+(Identifier)+}
-      {+(Empty)+})+}
       (Assignment
         (Empty)
       { (Identifier)
       ->(Identifier) }
-        (Empty))))
+        (Empty))
+    {+(Assignment
+      {+(Empty)+}
+      {+(Identifier)+}
+      {+(Empty)+})+}))
   (Export
   { (Identifier)
   ->(Identifier) })

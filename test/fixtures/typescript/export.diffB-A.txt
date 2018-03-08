@@ -65,14 +65,11 @@
         (Identifier)
       { (Identifier)
       ->(Empty) })
-    {+(Assignment
-      {+(Empty)+}
-      {+(Identifier)+}
-      {+(Empty)+})+}
-    {-(Assignment
-      {-(Empty)-}
-      {-(Identifier)-}
-      {-(Empty)-})-}
+      (Assignment
+        (Empty)
+      { (Identifier)
+      ->(Identifier) }
+        (Empty))
     {-(Assignment
       {-(Empty)-}
       {-(Identifier)-}
@@ -133,14 +130,16 @@
       ->(Identifier) }
       { (Identifier)
       ->(Identifier) })
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Identifier)+})+}
       (ImportExportSpecifier
       { (Identifier)
       ->(Identifier) }
       { (Identifier)
-      ->(Identifier) })
-      (ImportExportSpecifier
-      { (Identifier)
-      ->(Identifier) }
-        (Empty)))
+      ->(Empty) })
+    {-(ImportExportSpecifier
+      {-(Identifier)-}
+      {-(Empty)-})-})
   { (TextElement)
   ->(TextElement) }))

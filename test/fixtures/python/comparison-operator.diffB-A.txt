@@ -5,12 +5,10 @@
 {+(LessThanEqual
   {+(Identifier)+}
   {+(Identifier)+})+}
-  (Not
-    (Equal
-    { (Identifier)
-    ->(Identifier) }
-    { (Identifier)
-    ->(Identifier) }))
+{+(Not
+  {+(Equal
+    {+(Identifier)+}
+    {+(Identifier)+})+})+}
 {+(GreaterThanEqual
   {+(Identifier)+}
   {+(Identifier)+})+}
@@ -27,16 +25,20 @@
 {+(Equal
   {+(Identifier)+}
   {+(Identifier)+})+}
+{+(Not
+  {+(Member
+    {+(Identifier)+}
+    {+(Identifier)+})+})+}
   (Not
-    (Member
+    (Equal
     { (Identifier)
     ->(Identifier) }
     { (Identifier)
     ->(Identifier) }))
-{+(Not
-  {+(Equal
-    {+(Identifier)+}
-    {+(Identifier)+})+})+}
+{-(Not
+  {-(Member
+    {-(Identifier)-}
+    {-(Identifier)-})-})-}
 {-(Equal
   {-(Identifier)-}
   {-(Identifier)-})-}

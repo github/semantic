@@ -2,8 +2,7 @@
   (If
     (Identifier)
     (Call
-      (QualifiedIdentifier
-        (Identifier))
+      (Identifier)
       (Empty))
     (Identifier))
   (Assignment
