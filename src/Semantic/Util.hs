@@ -45,8 +45,7 @@ evaluateRubyFiles paths = do
   pure $ evaluates @RubyValue (zip bs ts) (b, t)
 
 -- Python
-typecheckPythonFile path = evaluateCache @Type <$>
-  (file path >>= runTask . parse pythonParser)
+typecheckPythonFile path = run . lower @(CachingAnalysis (Evaluation Python.Term Type (CachingEffects Python.Term Type (EvaluatorEffects Python.Term Type)))) . evaluateTerm <$> (file path >>= runTask . parse pythonParser)
 
 tracePythonFile path = run . lower @(TracingAnalysis [] (Evaluation Python.Term PythonValue (TracingEffects [] Python.Term PythonValue))) . evaluateTerm <$> (file path >>= runTask . parse pythonParser)
 
