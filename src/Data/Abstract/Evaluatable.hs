@@ -28,11 +28,11 @@ import Prologue
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
-  eval :: ( FreeVariables term
+  eval :: ( term ~ TermFor m
+          , value ~ ValueFor m
+          , FreeVariables term
           , MonadAddressable (LocationFor value) m
           , MonadAnalysis m
-          , TermFor m ~ term
-          , ValueFor m ~ value
           , MonadValue value m
           , Ord (LocationFor value)
           , Semigroup (CellFor value)
