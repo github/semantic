@@ -41,10 +41,10 @@ liftAnalyze :: ( term ~ TermFor m
                , Coercible (m value) (t m value)
                , Coercible (t m value) (m value)
                , Functor (Base term)
-               , MonadAnalysis m
                )
-            => SubtermAlgebra (Base term) term (t m value)
-liftAnalyze term = pack1 (analyzeTerm (second unpack1 <$> term))
+            => SubtermAlgebra (Base term) term (m value)
+            -> SubtermAlgebra (Base term) term (t m value)
+liftAnalyze analyze term = pack1 (analyze (second unpack1 <$> term))
   where pack1 = coerce
         unpack1 :: Coercible (t m value) (m value) => t m value -> m value
         unpack1 = coerce
