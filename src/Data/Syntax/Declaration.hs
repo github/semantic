@@ -210,27 +210,6 @@ instance Show1 Comprehension where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Comprehension
 instance Evaluatable Comprehension
 
-
--- | Qualified Import declarations (symbols are qualified in calling environment).
-data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: !a, qualifiedImportAlias :: !a, qualifiedImportSymbols :: ![(Name, Name)]}
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 QualifiedImport where liftEq = genericLiftEq
-instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
-instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable QualifiedImport where
-  eval (QualifiedImport from alias xs) = do
-    importedEnv <- withGlobalEnv mempty (require (freeVariable (subterm from)))
-    modifyGlobalEnv (flip (Map.foldrWithKey copy) (unEnvironment importedEnv))
-    unit
-    where
-      prefix = freeVariable (subterm alias)
-      symbols = Map.fromList xs
-      copy = if Map.null symbols then qualifyInsert else directInsert
-      qualifyInsert k v rest = envInsert (prefix <> k) v rest
-      directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v rest) (Map.lookup k symbols)
-
 -- | Qualified Export declarations
 newtype QualifiedExport a = QualifiedExport { qualifiedExportSymbols :: [(Name, Name)] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -266,6 +245,28 @@ instance Evaluatable QualifiedExportFrom where
 
     unit
 
+
+-- | Qualified Import declarations (symbols are qualified in calling environment).
+data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: !a, qualifiedImportAlias :: !a, qualifiedImportSymbols :: ![(Name, Name)]}
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 QualifiedImport where liftEq = genericLiftEq
+instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
+instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QualifiedImport where
+  eval (QualifiedImport from alias xs) = do
+    importedEnv <- withGlobalEnv mempty (require (freeVariable (subterm from)))
+    modifyGlobalEnv (flip (Map.foldrWithKey copy) (unEnvironment importedEnv))
+    unit
+    where
+      prefix = freeVariable (subterm alias)
+      symbols = Map.fromList xs
+      copy = if Map.null symbols then qualifyInsert else directInsert
+      qualifyInsert k v rest = envInsert (prefix <> k) v rest
+      directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v rest) (Map.lookup k symbols)
+
+
 -- | Import declarations (symbols are added directly to the calling env).
 --
 -- If symbols is empty, just import the module for its side effects.
@@ -285,6 +286,7 @@ instance Evaluatable Import where
       symbols = Map.fromList xs
       directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v rest) (Map.lookup k symbols)
 
+
 -- | A wildcard import (all symbols are added directly to the calling env)
 --
 -- Import a module updating the importing environments.
@@ -296,7 +298,7 @@ instance Ord1 WildcardImport where liftCompare = genericLiftCompare
 instance Show1 WildcardImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable WildcardImport where
-  eval (WildcardImport from _) = do
+  eval (WildcardImport from _) = do -- require (freeVariable (subterm from)) *> putGlobalEnv mempty *> unit
     importedEnv <- withGlobalEnv mempty (require (freeVariable (subterm from)))
     modifyGlobalEnv (flip (Map.foldrWithKey envInsert) (unEnvironment importedEnv))
     unit
