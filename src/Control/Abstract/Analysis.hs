@@ -1,4 +1,4 @@
-{-# LANGUAGE PolyKinds, TypeFamilies #-}
+{-# LANGUAGE TypeFamilies #-}
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , evaluateTerm
@@ -33,24 +33,24 @@ class (MonadEvaluator m, Recursive (TermFor m)) => MonadAnalysis m where
 evaluateTerm :: MonadAnalysis m => TermFor m -> m (ValueFor m)
 evaluateTerm = foldSubterms analyzeTerm
 
-liftAnalyze :: ( term ~ TermFor (  m effects)
-               , term ~ TermFor (t m effects)
-               , value ~ ValueFor (  m effects)
-               , value ~ ValueFor (t m effects)
-               , Coercible (  m effects value) (t m effects value)
-               , Coercible (t m effects value) (  m effects value)
+liftAnalyze :: ( term ~ TermFor m
+               , term ~ TermFor (t m)
+               , value ~ ValueFor m
+               , value ~ ValueFor (t m)
+               , Coercible (  m value) (t m value)
+               , Coercible (t m value) (  m value)
                , Functor (Base term)
                )
-            => SubtermAlgebra (Base term) term (  m effects value)
-            -> SubtermAlgebra (Base term) term (t m effects value)
+            => SubtermAlgebra (Base term) term (  m value)
+            -> SubtermAlgebra (Base term) term (t m value)
 liftAnalyze analyze term = coerce (analyze (second coerce <$> term))
 
-liftEvaluate :: ( term ~ TermFor (  m effects)
-                , term ~ TermFor (t m effects)
-                , value ~ ValueFor (  m effects)
-                , value ~ ValueFor (t m effects)
-                , Coercible (m effects value) (t m effects value)
+liftEvaluate :: ( term ~ TermFor m
+                , term ~ TermFor (t m)
+                , value ~ ValueFor m
+                , value ~ ValueFor (t m)
+                , Coercible (m value) (t m value)
                 )
-             => (term ->   m effects value)
-             -> (term -> t m effects value)
+             => (term ->   m value)
+             -> (term -> t m value)
 liftEvaluate evaluate = coerce . evaluate

@@ -21,26 +21,26 @@ import System.FilePath.Posix
 evaluate :: forall value term
          .  ( Evaluatable (Base term)
             , FreeVariables term
-            , MonadAddressable (LocationFor value) (Evaluating term value (EvaluatingEffects term value '[]))
-            , MonadValue value (Evaluating term value (EvaluatingEffects term value '[]))
+            , MonadAddressable (LocationFor value) (Evaluating term value '[])
+            , MonadValue value (Evaluating term value '[])
             , Recursive term
             )
          => term
          -> Final (EvaluatingEffects term value '[]) value
-evaluate = run . evaluateModule @(Evaluating term value (EvaluatingEffects term value '[]))
+evaluate = run @(Evaluating term value '[]) . evaluateModule
 
 -- | Evaluate terms and an entry point to a value.
 evaluates :: forall value term
           .  ( Evaluatable (Base term)
              , FreeVariables term
-             , MonadAddressable (LocationFor value) (Evaluating term value (EvaluatingEffects term value '[]))
-             , MonadValue value (Evaluating term value (EvaluatingEffects term value '[]))
+             , MonadAddressable (LocationFor value) (Evaluating term value '[])
+             , MonadValue value (Evaluating term value '[])
              , Recursive term
              )
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
           -> Final (EvaluatingEffects term value '[]) value
-evaluates pairs (_, t) = run (withModules pairs (evaluateModule @(Evaluating term value (EvaluatingEffects term value '[])) t))
+evaluates pairs (_, t) = run @(Evaluating term value '[]) (withModules pairs (evaluateModule t))
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
 withModules :: (MonadAnalysis m, MonadEvaluator m) => [(Blob, TermFor m)] -> m a -> m a
@@ -48,14 +48,13 @@ withModules pairs = localModuleTable (const moduleTable)
   where moduleTable = ModuleTable (Map.fromList (map (first (dropExtensions . blobPath)) pairs))
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
-newtype Evaluating term value effects a = Evaluating { runEvaluating :: Eff effects a }
-  deriving (Applicative, Functor, Monad)
+newtype Evaluating term value effects a = Evaluating { runEvaluating :: Eff (EvaluatingEffects term value effects) a }
+  deriving (Applicative, Functor, Effectful, Monad)
 
-deriving instance Member Fail      effects => MonadFail   (Evaluating term value effects)
-deriving instance Member Fresh     effects => MonadFresh  (Evaluating term value effects)
-deriving instance Member NonDetEff effects => Alternative (Evaluating term value effects)
-deriving instance Member NonDetEff effects => MonadNonDet (Evaluating term value effects)
-deriving instance Effectful effects (Evaluating term value effects)
+deriving instance Member Fail      (EvaluatingEffects term value effects) => MonadFail   (Evaluating term value effects)
+deriving instance Member Fresh     (EvaluatingEffects term value effects) => MonadFresh  (Evaluating term value effects)
+deriving instance Member NonDetEff (EvaluatingEffects term value effects) => Alternative (Evaluating term value effects)
+deriving instance Member NonDetEff (EvaluatingEffects term value effects) => MonadNonDet (Evaluating term value effects)
 
 type EvaluatingEffects term value effects
   = Fail                          -- Failure with an error message
@@ -66,7 +65,7 @@ type EvaluatingEffects term value effects
  ': State  (ModuleTable value)    -- Cache of evaluated modules
  ': effects
 
-instance Members (EvaluatingEffects term value '[]) effects => MonadEvaluator (Evaluating term value effects) where
+instance MonadEvaluator (Evaluating term value effects) where
   type TermFor  (Evaluating term value effects) = term
   type ValueFor (Evaluating term value effects) = value
 
@@ -87,7 +86,6 @@ instance Members (EvaluatingEffects term value '[]) effects => MonadEvaluator (E
 
 instance ( Evaluatable (Base term)
          , FreeVariables term
-         , Members (EvaluatingEffects term value '[]) effects
          , MonadAddressable (LocationFor value) (Evaluating term value effects)
          , MonadValue value (Evaluating term value effects)
          , Recursive term
