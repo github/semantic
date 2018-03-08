@@ -43,6 +43,7 @@ import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
 import Test.LeanCheck
 
+
 spec :: Spec
 spec = parallel $ do
   describe "tableOfContentsBy" $ do
@@ -58,9 +59,11 @@ spec = parallel $ do
       patch (fmap Deleted) (fmap Inserted) (\ as bs -> Replaced (head bs) : fmap Deleted (tail as) <> fmap Inserted (tail bs)) (bimap (foldMap pure) (foldMap pure) (p :: Patch (Term ListableSyntax Int) (Term ListableSyntax Int)))
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
-      \ diff -> let diff' = merge (0, 0) (inj [bimap (const 1) (const 1) (diff :: Diff ListableSyntax Int Int)]) in
-        tableOfContentsBy (\ (n `In` _) -> if n == (0 :: Int) then Just n else Nothing) diff' `shouldBe`
-        replicate (length (diffPatches diff')) (Changed 0)
+      \ diff -> do
+        let diff' = merge (True, True) (inj [bimap (const False) (const False) (diff :: Diff ListableSyntax Bool Bool)])
+        let toc = tableOfContentsBy (\ (n `In` _) -> if n then Just n else Nothing) diff'
+        toc `shouldBe` if null (diffPatches diff') then []
+                                                   else [Changed True]
 
   describe "diffTOC" $ do
     it "blank if there are no methods" $

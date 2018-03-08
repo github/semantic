@@ -89,8 +89,8 @@ diffPatch diff = case unDiff diff of
 
 diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann1 ann2 -> [Patch (TermF syntax ann1 (Diff syntax ann1 ann2)) (TermF syntax ann2 (Diff syntax ann1 ann2))]
 diffPatches = para $ \ diff -> case diff of
-  Patch patch -> bimap (fmap fst) (fmap fst) patch : bifoldMap (foldMap (toList . diffPatch . fst)) (foldMap (toList . diffPatch . fst)) patch
-  Merge merge ->                                                foldMap (toList . diffPatch . fst)  merge
+  Patch patch -> bimap (fmap fst) (fmap fst) patch : bifoldMap (foldMap snd) (foldMap snd) patch
+  Merge merge -> foldMap snd merge
 
 
 -- | Recover the before state of a diff.
