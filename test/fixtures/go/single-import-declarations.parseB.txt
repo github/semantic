@@ -1,13 +1,13 @@
 (Program
   (Module
     (Identifier))
-  (Import
+  (QualifiedImport
+    (TextElement)
+    (Identifier))
+  (WildcardImport
     (TextElement)
     (Empty))
-  (Import
-    (TextElement)
-    (Empty))
-  (Import
+  (QualifiedImport
     (TextElement)
     (Identifier))
   (Function

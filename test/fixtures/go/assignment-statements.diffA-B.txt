@@ -25,11 +25,13 @@
           (
             (Integer)
             (Integer))))
-    {+(Assignment
-      {+(Identifier)+}
-      {+(Times
-        {+(Identifier)+}
-        {+(Integer)+})+})+}
+      (Assignment
+      { (Identifier)
+      ->(Identifier) }
+        (Times
+        { (Identifier)
+        ->(Identifier) }
+          (Integer)))
     {+(Assignment
       {+(Identifier)+}
       {+(Plus
@@ -78,11 +80,6 @@
               {+(KeyValue
                 {+(Identifier)+}
                 {+(Integer)+})+})+})+})+})+})+}
-    {-(Assignment
-      {-(Identifier)-}
-      {-(Times
-        {-(Identifier)-}
-        {-(Integer)-})-})-}
     {-(Assignment
       {-(Identifier)-}
       {-(Plus

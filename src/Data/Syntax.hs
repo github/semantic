@@ -5,7 +5,6 @@ import Control.Monad.Fail
 import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Data.AST
-import Data.ByteString.Char8 (unpack)
 import Data.Range
 import Data.Record
 import Data.Span
@@ -100,7 +99,7 @@ infixContext context left right operators = uncurry (&) <$> postContextualizeThr
 -- Common
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
-newtype Identifier a = Identifier ByteString
+newtype Identifier a = Identifier Name
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Identifier where liftEq = genericLiftEq
@@ -110,23 +109,10 @@ instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Identifier where
   eval (Identifier name) = do
     env <- askLocalEnv
-    maybe (fail ("free variable: " <> unpack name)) deref (envLookup name env)
+    maybe (fail ("free variable: " <> show name)) deref (envLookup name env)
 
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = point x
-
-newtype QualifiedIdentifier a = QualifiedIdentifier a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 QualifiedIdentifier where liftEq = genericLiftEq
-instance Ord1 QualifiedIdentifier where liftCompare = genericLiftCompare
-instance Show1 QualifiedIdentifier where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable QualifiedIdentifier where
-  eval (QualifiedIdentifier xs) = do
-    env <- askLocalEnv
-    let name = qualifiedName (subterm xs)
-    maybe (fail ("free variable: " <> unpack name)) deref (envLookup name env)
 
 
 newtype Program a = Program [a]
@@ -145,7 +131,7 @@ instance Evaluatable Program where
       eval' (x:xs) = do
         _ <- subtermValue x
         env <- getGlobalEnv
-        localEnv (const env) (eval' xs)
+        localEnv (envUnion env) (eval' xs)
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString

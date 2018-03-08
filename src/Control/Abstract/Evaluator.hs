@@ -5,13 +5,13 @@ import Prologue
 import Control.Monad.Effect
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
-import Control.Monad.Effect.NonDetEff
+import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Address
-import Data.Abstract.Linker
 import Data.Abstract.FreeVariables (Name)
 import Data.Map as Map
+import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Prelude hiding (fail)
 
@@ -52,22 +52,22 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   modifyStore :: (StoreFor value -> StoreFor value) -> m ()
 
   -- | Retrieve the table of evaluated modules.
-  getModuleTable :: m (Linker (EnvironmentFor value))
+  getModuleTable :: m (ModuleTable (EnvironmentFor value))
   -- | Update the table of evaluated modules.
-  modifyModuleTable :: (Linker (EnvironmentFor value) -> Linker (EnvironmentFor value)) -> m ()
+  modifyModuleTable :: (ModuleTable (EnvironmentFor value) -> ModuleTable (EnvironmentFor value)) -> m ()
 
   -- | Retrieve the table of unevaluated modules.
-  askModuleTable :: m (Linker term)
+  askModuleTable :: m (ModuleTable term)
   -- | Run an action with a locally-modified table of unevaluated modules.
-  localModuleTable :: (Linker term -> Linker term) -> m a -> m a
+  localModuleTable :: (ModuleTable term -> ModuleTable term) -> m a -> m a
 
 instance Members '[ Fail
                   , Reader (EnvironmentFor value)
                   , State  (Map Name (Name, Maybe (Address (LocationFor value) value)))
                   , State  (EnvironmentFor value)
                   , State  (StoreFor value)
-                  , Reader (Linker term)
-                  , State  (Linker (EnvironmentFor value))
+                  , Reader (ModuleTable term)
+                  , State  (ModuleTable (EnvironmentFor value))
                   ] effects
          => MonadEvaluator term value (Evaluator effects term value) where
   getGlobalEnv = Evaluator get
@@ -91,10 +91,14 @@ instance Members '[ Fail
   askModuleTable = Evaluator ask
   localModuleTable f a = Evaluator (local f (runEvaluator a))
 
+putStore :: MonadEvaluator t value m => StoreFor value -> m ()
+putStore = modifyStore . const
+
 -- | An evaluator of @term@s to @value@s, producing incremental results of type @a@ using a list of @effects@.
 newtype Evaluator effects term value a = Evaluator { runEvaluator :: Eff effects a }
   deriving (Applicative, Functor, Monad)
 
 deriving instance Member Fail effects => MonadFail (Evaluator effects term value)
 deriving instance Member NonDetEff effects => Alternative (Evaluator effects term value)
+deriving instance Member NonDetEff effects => MonadNonDet (Evaluator effects term value)
 deriving instance Member Fresh effects => MonadFresh (Evaluator effects term value)

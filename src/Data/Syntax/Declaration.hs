@@ -7,6 +7,7 @@ import Data.Abstract.Evaluatable
 import Diffing.Algorithm
 import qualified Data.Map as Map
 import Data.ByteString as B
+import qualified Data.List.NonEmpty as NonEmpty
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -209,6 +210,7 @@ instance Show1 Comprehension where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Comprehension
 instance Evaluatable Comprehension
 
+
 -- | Qualified Import declarations (symbols are qualified in calling environment).
 data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: !a, qualifiedImportAlias :: !a, qualifiedImportSymbols :: ![(Name, Name)]}
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -219,11 +221,11 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedImport where
   eval (QualifiedImport from alias xs) = do
-    importedEnv <- withGlobalEnv mempty (require (qualifiedName (subterm from)))
+    importedEnv <- withGlobalEnv mempty (require (freeVariable (subterm from)))
     modifyGlobalEnv (flip (Map.foldrWithKey copy) (unEnvironment importedEnv))
     unit
     where
-      prefix = qualifiedName (subterm alias) <> "."
+      prefix = freeVariable (subterm alias)
       symbols = Map.fromList xs
       copy = if Map.null symbols then qualifyInsert else directInsert
       qualifyInsert k v rest = envInsert (prefix <> k) v rest
@@ -240,8 +242,8 @@ instance Show1 QualifiedExport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedExport where
   eval (QualifiedExport from exportSymbols) = do
     -- If there's a from clause, require the module and export its symbols
-    let moduleName = qualifiedName (subterm from)
-    if not (B.null moduleName) then do
+    let moduleName = freeVariable (subterm from)
+    if not (B.null $ NonEmpty.head moduleName) then do
       importedEnv <- withGlobalEnv mempty (require moduleName)
 
       -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
@@ -255,7 +257,8 @@ instance Evaluatable QualifiedExport where
 
     unit
 
--- | Import declarations (symbols are added directly to calling environment).
+
+-- | Import declarations (symbols are added directly to the calling env).
 --
 -- If symbols is empty, just import the module for its side effects.
 data Import a = Import { importFrom :: !a, importSymbols :: ![(Name, Name)] }
@@ -267,19 +270,17 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
   eval (Import from xs) = do
-    importedEnv <- withGlobalEnv mempty (require (qualifiedName (subterm from)))
-    modifyGlobalEnv (flip (Map.foldrWithKey copy) (unEnvironment importedEnv))
+    importedEnv <- withGlobalEnv mempty (require (freeVariable (subterm from)))
+    modifyGlobalEnv (flip (Map.foldrWithKey directInsert) (unEnvironment importedEnv))
     unit
     where
       symbols = Map.fromList xs
-      copy = if Map.null symbols then qualifyInsert else directInsert
-      qualifyInsert k v rest = envInsert k v rest
       directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v rest) (Map.lookup k symbols)
 
--- | A wildcard import
+-- | A wildcard import (all symbols are added directly to the calling env)
 --
 -- Import a module updating the importing environments.
-data WildcardImport a = WildcardImport { wildcardImportFrom :: !a, wildcardImportSymbol :: !a }
+data WildcardImport a = WildcardImport { wildcardImportFrom :: !a, wildcardImportToken :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 WildcardImport where liftEq = genericLiftEq
@@ -288,7 +289,7 @@ instance Show1 WildcardImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable WildcardImport where
   eval (WildcardImport from _) = do
-    importedEnv <- withGlobalEnv mempty (require (qualifiedName (subterm from)))
+    importedEnv <- withGlobalEnv mempty (require (freeVariable (subterm from)))
     modifyGlobalEnv (flip (Map.foldrWithKey envInsert) (unEnvironment importedEnv))
     unit
 

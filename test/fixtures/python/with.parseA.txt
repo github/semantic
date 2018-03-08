@@ -2,8 +2,7 @@
   (Let
     (Identifier)
     (Call
-      (QualifiedIdentifier
-        (Identifier))
+      (Identifier)
       (Identifier)
       (TextElement)
       (Empty))

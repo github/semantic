@@ -8,10 +8,8 @@
   (If
     (Identifier)
     (Call
-      (QualifiedIdentifier
-        (Identifier))
+      (Identifier)
       (Empty))
     (Call
-      (QualifiedIdentifier
-        (Identifier))
+      (Identifier)
       (Empty))))

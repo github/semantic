@@ -4,14 +4,14 @@
 {+(QualifiedImport
   {+(TextElement)+}
   {+(Identifier)+})+}
+{+(Import
+  {+(TextElement)+})+}
+{+(Import
+  {+(TextElement)+})+}
 { (Import
   {-(TextElement)-})
 ->(Import
   {+(TextElement)+}) }
-{+(Import
-  {+(TextElement)+})+}
-{+(Import
-  {+(TextElement)+})+}
 {+(
   {+(Import
     {+(TextElement)+})+}

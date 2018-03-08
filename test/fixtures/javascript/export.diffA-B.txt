@@ -5,18 +5,22 @@
       { (Identifier)
       ->(Identifier) }
         (Empty))
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Empty)+})+}
       (ImportExportSpecifier
       { (Identifier)
       ->(Identifier) }
         (Empty))
-      (ImportExportSpecifier
-      { (Identifier)
-      ->(Identifier) }
-        (Empty))
-      (ImportExportSpecifier
-      { (Identifier)
-      ->(Identifier) }
-        (Empty))))
+    {+(ImportExportSpecifier
+      {+(Identifier)+}
+      {+(Empty)+})+}
+    {-(ImportExportSpecifier
+      {-(Identifier)-}
+      {-(Empty)-})-}
+    {-(ImportExportSpecifier
+      {-(Identifier)-}
+      {-(Empty)-})-}))
   (Export
     (ExportClause
     {-(ImportExportSpecifier

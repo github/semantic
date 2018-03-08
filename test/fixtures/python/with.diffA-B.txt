@@ -3,8 +3,7 @@
   { (Identifier)
   ->(Empty) }
   { (Call
-    {-(QualifiedIdentifier
-      {-(Identifier)-})-}
+    {-(Identifier)-}
     {-(Identifier)-}
     {-(TextElement)-}
     {-(Empty)-})
@@ -26,10 +25,7 @@
   {+(Let
     {+(Empty)+}
     {+(Call
-      {+(QualifiedIdentifier
-        {+(
-          {+(Identifier)+}
-          {+(Identifier)+})+})+}
+      {+(Identifier)+}
       {+(Identifier)+}
       {+(TextElement)+}
       {+(Identifier)+}
@@ -38,10 +34,7 @@
   {+(Let
     {+(Empty)+}
     {+(Call
-      {+(QualifiedIdentifier
-        {+(
-          {+(Identifier)+}
-          {+(Identifier)+})+})+}
+      {+(Identifier)+}
       {+(Identifier)+}
       {+(TextElement)+}
       {+(Identifier)+}
