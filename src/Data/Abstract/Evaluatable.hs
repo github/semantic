@@ -95,7 +95,7 @@ load :: ( MonadAnalysis term v m
      => ModuleName
      -> m (EnvironmentFor v)
 load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
-  where notFound = fail ("cannot find " <> show name)
+  where notFound = fail ("cannot load module: " <> show name)
         evalAndCache e = do
           v <- evaluateTerm e
           env <- environment v
