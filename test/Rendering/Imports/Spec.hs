@@ -14,7 +14,7 @@ import Rendering.TOC.Spec
 import Semantic
 import Semantic.Task
 import SpecHelpers
-import Test.Hspec (Spec, describe, it, parallel, pendingWith)
+import Test.Hspec (Spec, describe, it, xit, parallel, pendingWith)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.LeanCheck
 import Test.LeanCheck

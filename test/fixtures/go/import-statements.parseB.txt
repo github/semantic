@@ -4,9 +4,9 @@
   (
     (Comment)
     (Comment)
-    (Import
+    (QualifiedImport
       (TextElement)
-      (Empty))
+      (Identifier))
     (Comment))
   (Function
     (Empty)

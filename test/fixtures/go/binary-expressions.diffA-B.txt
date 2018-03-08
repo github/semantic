@@ -22,11 +22,9 @@
         ->(Identifier) }
         { (Identifier)
         ->(Identifier) }))
-      (Equal
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->(Identifier) })
+    {+(Equal
+      {+(Identifier)+}
+      {+(Identifier)+})+}
     {+(Not
       {+(Equal
         {+(Identifier)+}
@@ -76,6 +74,9 @@
     {+(BAnd
       {+(Identifier)+}
       {+(Identifier)+})+}
+    {-(Equal
+      {-(Identifier)-}
+      {-(Identifier)-})-}
     {-(Not
       {-(Equal
         {-(Identifier)-}
