@@ -1,8 +1,7 @@
 -- MonoLocalBinds is to silence a warning about a simplifiable constraint.
-{-# LANGUAGE DataKinds, MonoLocalBinds, TypeOperators, TypeApplications #-}
+{-# LANGUAGE DataKinds, MonoLocalBinds, TypeApplications, TypeOperators #-}
 module Semantic.Util where
 
-import Prologue
 import Analysis.Abstract.Caching
 import Analysis.Abstract.Dead
 import Analysis.Abstract.Evaluating
@@ -23,12 +22,13 @@ import Data.Term
 import Diffing.Algorithm
 import Diffing.Interpreter
 import Parsing.Parser
+import Prologue
 import Semantic
 import Semantic.IO as IO
 import Semantic.Task
 
-import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.Python.Assignment as Python
+import qualified Language.Ruby.Assignment as Ruby
 
 type RubyValue = Value Precise (Term (Union Ruby.Syntax) (Record Location))
 type PythonValue = Value Precise (Term (Union Python.Syntax) (Record Location))
