@@ -36,7 +36,7 @@ instance ( Corecursive (TermFor m)
   analyzeTerm term = do
     config <- getConfiguration (embedSubterm term)
     trace (Reducer.unit config)
-    delegateAnalyzeTerm term
+    liftAnalyze term
 
 trace :: ( Effectful m
          , Member (TracerFor trace m) (Effects m)

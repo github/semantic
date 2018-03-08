@@ -1,7 +1,7 @@
 {-# LANGUAGE DefaultSignatures, KindSignatures, TypeFamilies #-}
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
-, delegateAnalyzeTerm
+, liftAnalyze
 , liftEvaluate
 , module X
 , Subterm(..)
@@ -34,15 +34,15 @@ class MonadEvaluator m => MonadAnalysis m where
   default evaluateModule :: Recursive (TermFor m) => TermFor m -> m (ValueFor m)
   evaluateModule = evaluateTerm
 
-delegateAnalyzeTerm :: ( TermFor (t m) ~ TermFor m
-                       , ValueFor (t m) ~ ValueFor m
-                       , Functor (Base (TermFor (t m)))
-                       , MonadAnalysis m
-                       , Coercible (t m (ValueFor m)) (m (ValueFor m))
-                       , Coercible (m (ValueFor m)) (t m (ValueFor m))
-                       )
-                    => SubtermAlgebra (Base (TermFor (t m))) (TermFor (t m)) (t m (ValueFor m))
-delegateAnalyzeTerm term = pack1 (analyzeTerm (second unpack1 <$> term))
+liftAnalyze :: ( TermFor (t m) ~ TermFor m
+               , ValueFor (t m) ~ ValueFor m
+               , Functor (Base (TermFor (t m)))
+               , MonadAnalysis m
+               , Coercible (t m (ValueFor m)) (m (ValueFor m))
+               , Coercible (m (ValueFor m)) (t m (ValueFor m))
+               )
+            => SubtermAlgebra (Base (TermFor (t m))) (TermFor (t m)) (t m (ValueFor m))
+liftAnalyze term = pack1 (analyzeTerm (second unpack1 <$> term))
   where pack1 = coerce
         unpack1 :: Coercible (t m (ValueFor m)) (m (ValueFor m)) => t m (ValueFor m) -> m (ValueFor m)
         unpack1 = coerce

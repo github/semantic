@@ -140,7 +140,7 @@ memoizeEval e = do
     Nothing -> do
       pairs <- asksCache (fromMaybe mempty . cacheLookup c)
       modifyCache (cacheSet c pairs)
-      v <- delegateAnalyzeTerm e
+      v <- liftAnalyze e
       store' <- getStore
       modifyCache (cacheInsert c (v, store'))
       pure v
