@@ -55,8 +55,8 @@ withModules pairs = localModuleTable (const moduleTable)
 newtype Evaluating term value effects a = Evaluating { runEvaluating :: Eff (EvaluatingEffects term value effects) a }
   deriving (Applicative, Functor, Effectful, Monad)
 
-deriving instance Member Fail (EvaluatingEffects term value effects) => MonadFail (Evaluating term value effects)
-deriving instance Member Fresh (EvaluatingEffects term value effects) => MonadFresh (Evaluating term value effects)
+deriving instance Member Fail      (EvaluatingEffects term value effects) => MonadFail   (Evaluating term value effects)
+deriving instance Member Fresh     (EvaluatingEffects term value effects) => MonadFresh  (Evaluating term value effects)
 deriving instance Member NonDetEff (EvaluatingEffects term value effects) => Alternative (Evaluating term value effects)
 deriving instance Member NonDetEff (EvaluatingEffects term value effects) => MonadNonDet (Evaluating term value effects)
 
