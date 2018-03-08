@@ -140,7 +140,7 @@ instance Evaluatable Program where
   eval (Program xs) = do
     set <- getExports
     v <- eval' xs
-    setExports set
+    setExports set -- Reset the export state
     pure v
     where
       eval' [] = unit >>= interface

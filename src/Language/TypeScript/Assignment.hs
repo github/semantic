@@ -666,6 +666,7 @@ importStatement = makeImportTerm <$> symbol Grammar.ImportStatement <*> children
     makeNameAliasPair from Nothing = (from, from)
 
 
+stripQuotes :: ByteString -> ByteString
 stripQuotes = B.filter (/= (fromIntegral (ord '\"')))
 
 debuggerStatement :: Assignment

@@ -258,6 +258,8 @@ instance Evaluatable QualifiedExport where
       -- Insert the aliases with no addresses.
       for_ exportSymbols $ \(name, alias) ->
         addExport name (alias, Nothing)
+
+    putGlobalEnv env -- Reset the global env state
     unit
 
 -- | Import declarations (symbols are added directly to calling environment).
