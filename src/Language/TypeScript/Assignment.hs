@@ -21,7 +21,7 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
-import qualified Data.ByteString as B
+import qualified Data.ByteString as B (filter)
 import Data.Char (ord)
 import qualified Language.TypeScript.Syntax as TypeScript.Syntax
 
@@ -38,6 +38,7 @@ type Syntax = '[
   , Declaration.TypeAlias
   , Declaration.Import
   , Declaration.QualifiedImport
+  , Declaration.DefaultExport
   , Declaration.QualifiedExport
   , Declaration.QualifiedExportFrom
   , Declaration.Module
@@ -714,7 +715,9 @@ ambientDeclaration :: Assignment
 ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> children (TypeScript.Syntax.AmbientDeclaration <$> term (choice [declaration, statementBlock]))
 
 exportStatement :: Assignment
-exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> (children (flip Declaration.QualifiedExportFrom <$> exportClause <*> term fromClause)) <|> makeTerm <$> symbol Grammar.ExportStatement <*> (children $ Declaration.QualifiedExport <$> exportClause)
+exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> (children (flip Declaration.QualifiedExportFrom <$> exportClause <*> term fromClause))
+  <|> makeTerm <$> symbol Grammar.ExportStatement <*> children (Declaration.QualifiedExport <$> exportClause)
+  <|> makeTerm <$> symbol Grammar.ExportStatement <*> children (Declaration.DefaultExport <$> contextualize decorator (term (declaration <|> expression <|> identifier <|> importAlias')))
   where
     exportClause = symbol Grammar.ExportClause *> children (many exportSymbol)
     exportSymbol = symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> (Just <$> rawIdentifier))

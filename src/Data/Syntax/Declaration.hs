@@ -258,13 +258,21 @@ instance Evaluatable QualifiedExportFrom where
   eval (QualifiedExportFrom from exportSymbols) = do
     let moduleName = freeVariable (subterm from)
     importedEnv <- withGlobalEnv mempty (require moduleName)
-
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \(name, alias) -> do
       let address = Map.lookup name (unEnvironment importedEnv)
       addExport name (alias, address)
-
     unit
+
+newtype DefaultExport a = DefaultExport { defaultExport :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 DefaultExport where liftEq = genericLiftEq
+instance Ord1 DefaultExport where liftCompare = genericLiftCompare
+instance Show1 DefaultExport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable DefaultExport where
+
 
 -- | Import declarations (symbols are added directly to the calling env).
 --
