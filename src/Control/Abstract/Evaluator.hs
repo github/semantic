@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FunctionalDependencies, GeneralizedNewtypeDeriving, RankNTypes, StandaloneDeriving, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, FunctionalDependencies, GeneralizedNewtypeDeriving, RankNTypes, StandaloneDeriving, UndecidableInstances, TypeApplications, ScopedTypeVariables #-}
 module Control.Abstract.Evaluator where
 
 import Prologue
@@ -29,10 +29,18 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   -- | Update the global environment.
   modifyGlobalEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m ()
 
-  -- | Scope the set of exported symbols to the global environment
+  withGlobalEnv :: EnvironmentFor value -> m a -> m a
+
+  -- | Add an export to the global export state.
   addExport :: Name -> (Name, Maybe (Address (LocationFor value) value)) -> m ()
+
+  -- | Get the global export state.
   getExports :: m (Map Name (Name, Maybe (Address (LocationFor value) value)))
-  setExports :: Map Name (Name, Maybe (Address (LocationFor value) value)) -> m ()
+  -- | Get the global export state.
+  setExports :: (Map Name (Name, Maybe (Address (LocationFor value) value))) -> m ()
+
+  -- | Sets the exports state to the given map for the lifetime of the given action.
+  withLocalExports :: (Map Name (Name, Maybe (Address (LocationFor value) value))) -> m a -> m a
 
   -- | Retrieve the local environment.
   askLocalEnv :: m (EnvironmentFor value)
@@ -71,6 +79,8 @@ instance Members '[ Fail
   getExports = Evaluator get
   setExports = Evaluator . put
 
+  withGlobalEnv s = Evaluator . localState s . runEvaluator
+
   askLocalEnv = Evaluator ask
   localEnv f a = Evaluator (local f (runEvaluator a))
 
@@ -83,6 +93,13 @@ instance Members '[ Fail
   askModuleTable = Evaluator ask
   localModuleTable f a = Evaluator (local f (runEvaluator a))
 
+localState :: forall effects a s. Member (State s) effects => s -> Eff effects a -> Eff effects a
+localState s effect = do
+  original <- get @s
+  put s
+  v <- effect
+  put original
+  pure v
 
 -- | An evaluator of @term@s to @value@s, producing incremental results of type @a@ using a list of @effects@.
 newtype Evaluator effects term value a = Evaluator { runEvaluator :: Eff effects a }
