@@ -6,10 +6,10 @@ import Data.Monoid
 import Control.Monad
 
 pyEval :: FilePath -> Benchmarkable
-pyEval = whnfIO . (evaluatePythonFile >=> print) . ("bench/bench-fixtures/python/" <>)
+pyEval = whnfIO . fmap show . evaluatePythonFile . ("bench/bench-fixtures/python/" <>)
 
 rbEval :: FilePath -> Benchmarkable
-rbEval = whnfIO . (evaluateRubyFile >=> print) . ("bench/bench-fixtures/ruby/" <>)
+rbEval = whnfIO . fmap show . evaluateRubyFile . ("bench/bench-fixtures/ruby/" <>)
 
 main :: IO ()
 main = defaultMain
