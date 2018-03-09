@@ -4,6 +4,7 @@ module Control.Abstract.Analysis
 , evaluateTerm
 , liftAnalyze
 , liftEvaluate
+, runAnalysis
 , module X
 , Subterm(..)
 , SubtermAlgebra
@@ -11,6 +12,7 @@ module Control.Abstract.Analysis
 
 import Control.Abstract.Evaluator as X
 import Control.Effect as X
+import qualified Control.Monad.Effect as Effect
 import Control.Monad.Effect.Fail as X
 import Control.Monad.Effect.Reader as X
 import Control.Monad.Effect.State as X
@@ -47,3 +49,7 @@ liftEvaluate :: ( Coercible (m term value (effects :: [* -> *]) value) (t m term
              => (term ->   m term value effects value)
              -> (term -> t m term value effects value)
 liftEvaluate evaluate = coerce . evaluate
+
+
+runAnalysis :: (Effectful (m term value), RunEffects (RequiredEffects term value m) a) => m term value (RequiredEffects term value m) a -> Final (RequiredEffects term value m) a
+runAnalysis = Effect.run . runEffects . lower

@@ -8,7 +8,6 @@ import Analysis.Abstract.Evaluating
 import Analysis.Abstract.Tracing
 import Analysis.Declaration
 import Control.Abstract.Analysis
-import qualified Control.Monad.Effect as Effect
 import Control.Monad.IO.Class
 import Data.Abstract.Address
 import Data.Abstract.Type
@@ -43,9 +42,6 @@ evaluateRubyFile path = Prelude.fst . evaluate @RubyValue . snd <$> parseFile ru
 evaluateRubyFiles paths = do
   first:rest <- traverse (parseFile rubyParser) paths
   pure $ evaluates @RubyValue rest first
-
-runAnalysis :: (Effectful (m term value), RunEffects (RequiredEffects term value m) a) => m term value (RequiredEffects term value m) a -> Final (RequiredEffects term value m) a
-runAnalysis = Effect.run . runEffects . lower
 
 -- Python
 typecheckPythonFile path = runAnalysis @(CachingAnalysis Evaluating) @Python.Term @Type . evaluateModule . snd <$> parseFile pythonParser path
