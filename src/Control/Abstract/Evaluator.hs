@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstrainedClassMethods, DataKinds, MultiParamTypeClasses, KindSignatures, TypeFamilies #-}
+{-# LANGUAGE ConstrainedClassMethods, DataKinds, KindSignatures, MultiParamTypeClasses #-}
 module Control.Abstract.Evaluator where
 
 import Data.Abstract.Configuration
