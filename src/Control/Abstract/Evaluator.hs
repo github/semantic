@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstrainedClassMethods, DataKinds, FunctionalDependencies, KindSignatures #-}
+{-# LANGUAGE ConstrainedClassMethods, FunctionalDependencies #-}
 module Control.Abstract.Evaluator where
 
 import Data.Abstract.Configuration

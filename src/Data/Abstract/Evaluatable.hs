@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures, FunctionalDependencies, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures, MultiParamTypeClasses, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( Evaluatable(..)
 , module Addressable

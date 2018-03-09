@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, FunctionalDependencies, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, MultiParamTypeClasses, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Effect where
 
 import qualified Control.Monad.Effect as Effect

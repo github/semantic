@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FunctionalDependencies, KindSignatures, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE MultiParamTypeClasses, TypeFamilies, UndecidableInstances #-}
 module Control.Abstract.Addressable where
 
 import Control.Abstract.Analysis
