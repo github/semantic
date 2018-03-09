@@ -1,5 +1,7 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Analysis.Abstract.Tracing where
+module Analysis.Abstract.Tracing
+( type TracingAnalysis
+) where
 
 import Control.Abstract.Analysis
 import Control.Monad.Effect.Writer
@@ -11,8 +13,7 @@ import Prologue
 -- | Trace analysis.
 --
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
-newtype TracingAnalysis (trace :: * -> *) m term value (effects :: [* -> *]) a
-  = TracingAnalysis { runTracingAnalysis :: m term value effects a }
+newtype TracingAnalysis (trace :: * -> *) m term value (effects :: [* -> *]) a = TracingAnalysis (m term value effects a)
   deriving (Applicative, Functor, Effectful, Monad, MonadFail)
 
 deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (TracingAnalysis trace m term value effects)
