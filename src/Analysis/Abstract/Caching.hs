@@ -9,7 +9,6 @@ import Control.Monad.Effect.NonDet
 import Data.Abstract.Address
 import Data.Abstract.Cache
 import Data.Abstract.Configuration
-import Data.Abstract.Evaluatable
 import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Monoid (Alt(..))

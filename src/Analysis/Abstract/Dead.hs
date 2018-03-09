@@ -1,8 +1,7 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Dead where
 
-import Control.Abstract.Evaluator
-import Data.Abstract.Evaluatable
+import Control.Abstract.Analysis
 import Data.Semigroup.Reducer as Reducer
 import Data.Set (delete)
 import Prologue
