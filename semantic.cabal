@@ -208,6 +208,7 @@ test-suite test
   main-is:             Spec.hs
   other-modules:       Assigning.Assignment.Spec
                      , Analysis.Python.Spec
+                     , Analysis.TypeScript.Spec
                      , Data.Diff.Spec
                      , Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
