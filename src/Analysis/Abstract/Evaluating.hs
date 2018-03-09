@@ -80,7 +80,6 @@ type EvaluatingEffects term value
 instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
   getGlobalEnv = raise get
   putGlobalEnv = raise . put
-  modifyGlobalEnv f = raise (modify f)
 
   askLocalEnv = raise ask
   localEnv f a = raise (local f (lower a))

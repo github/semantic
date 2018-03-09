@@ -19,8 +19,6 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   getGlobalEnv :: m (EnvironmentFor value)
   -- | Set the global environment
   putGlobalEnv :: EnvironmentFor value -> m ()
-  -- | Update the global environment.
-  modifyGlobalEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m  ()
 
   -- | Retrieve the local environment.
   askLocalEnv :: m (EnvironmentFor value)
@@ -29,7 +27,7 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
 
   -- | Retrieve the heap.
   getStore :: m (StoreFor value)
-  -- | Update the heap.
+  -- | Set the heap.
   putStore :: StoreFor value -> m ()
 
   -- | Retrieve the table of evaluated modules.
@@ -50,5 +48,10 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   getConfiguration :: Ord (LocationFor value) => term -> m (Configuration (LocationFor value) term value)
   getConfiguration term = Configuration term <$> askRoots <*> askLocalEnv <*> getStore
 
+-- | Update the global environment.
+modifyGlobalEnv :: MonadEvaluator term value m => (EnvironmentFor value -> EnvironmentFor value) -> m  ()
+modifyGlobalEnv f = getGlobalEnv >>= putGlobalEnv . f
+
+-- | Update the heap.
 modifyStore :: MonadEvaluator term value m => (StoreFor value -> StoreFor value) -> m ()
 modifyStore f = getStore >>= putStore . f
