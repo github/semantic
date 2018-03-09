@@ -31,14 +31,11 @@ class MonadEvaluator term value m => MonadCaching term value m where
   consultOracle :: ConfigurationFor term value -> m (Set (value, StoreFor value))
   withOracle :: CacheFor term value -> m a -> m a
 
-  getCache :: m (CacheFor term value)
-  putCache :: CacheFor term value -> m ()
+  lookupCache :: ConfigurationFor term value -> m (Maybe (Set (value, StoreFor value)))
+  setCache :: ConfigurationFor term value -> Set (value, StoreFor value) -> m ()
+  cache :: ConfigurationFor term value -> value -> m ()
 
-getsCache :: MonadCaching term value m => (CacheFor term value -> a) -> m a
-getsCache f = f <$> getCache
-
-modifyCache :: MonadCaching term value m => (CacheFor term value -> CacheFor term value) -> m ()
-modifyCache f = fmap f getCache >>= putCache
+  isolateCache :: m a -> m (CacheFor term value)
 
 instance ( Effectful (m term value)
          , Members (CachingEffects term value '[]) effects
@@ -52,8 +49,11 @@ instance ( Effectful (m term value)
   consultOracle configuration = raise (fromMaybe mempty . cacheLookup configuration <$> ask)
   withOracle cache = raise . local (const cache) . lower
 
-  getCache = raise get
-  putCache = raise . put
+  lookupCache configuration = raise (cacheLookup configuration <$> get)
+  setCache configuration = raise . modify . cacheSet configuration
+  cache configuration value = getStore >>= raise . modify . cacheInsert configuration . (,) value
+
+  isolateCache action = raise (put (mempty :: CacheFor term value)) *> action *> raise get
 
 -- | This instance coinductively iterates the analysis of a term until the results converge.
 instance ( Corecursive term
@@ -71,22 +71,20 @@ instance ( Corecursive term
   type RequiredEffects term value (Caching m term value effects) = CachingEffects term value (RequiredEffects term value (m term value effects))
   analyzeTerm e = do
     c <- getConfiguration (embedSubterm e)
-    cached <- getsCache (cacheLookup c)
+    cached <- lookupCache c
     case cached of
       Just pairs -> scatter pairs
       Nothing -> do
         pairs <- consultOracle c
-        modifyCache (cacheSet c pairs)
+        setCache c pairs
         v <- liftAnalyze analyzeTerm e
-        store' <- getStore
-        modifyCache (cacheInsert c (v, store'))
+        cache c v
         pure v
 
   evaluateModule e = do
     c <- getConfiguration e
     -- Convergence here is predicated upon an Eq instance, not α-equivalence
-    cache <- converge (\ prevCache -> do
-      putCache mempty
+    cache <- converge (\ prevCache -> isolateCache $ do
       putStore (configurationStore c)
       -- We need to reset fresh generation so that this invocation converges.
       reset 0
@@ -95,8 +93,7 @@ instance ( Corecursive term
       -- that it doesn't "leak" to the calling context and diverge (otherwise this
       -- would never complete). We don’t need to use the values, so we 'gather' the
       -- nondeterministic values into @()@.
-      _ <- withOracle prevCache (gather (liftEvaluate evaluateModule e) :: Caching m term value effects ())
-      getCache) mempty
+      withOracle prevCache (gather (liftEvaluate evaluateModule e) :: Caching m term value effects ())) mempty
     maybe empty scatter (cacheLookup c cache)
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
