@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Caching
-( type CachingAnalysis
+( type Caching
 ) where
 
 import Control.Abstract.Analysis
@@ -22,10 +22,10 @@ type CachingEffects term value effects
 -- | The cache for term and abstract value types.
 type CacheFor term value = Cache (LocationFor value) term value
 
-newtype CachingAnalysis m term value (effects :: [* -> *]) a = CachingAnalysis (m term value effects a)
+newtype Caching m term value (effects :: [* -> *]) a = Caching (m term value effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
-deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (CachingAnalysis m term value effects)
+deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (Caching m term value effects)
 
 class MonadEvaluator term value m => MonadCaching term value m where
   askCache :: m (CacheFor term value)
@@ -47,7 +47,7 @@ instance ( Effectful (m term value)
          , Members (CachingEffects term value '[]) effects
          , MonadEvaluator term value (m term value effects)
          )
-         => MonadCaching term value (CachingAnalysis m term value effects) where
+         => MonadCaching term value (Caching m term value effects) where
   askCache = lift ask
   localCache f a = lift (local f (lower a))
 
@@ -66,8 +66,8 @@ instance ( Corecursive term
          , Ord term
          , Ord value
          )
-         => MonadAnalysis term value (CachingAnalysis m term value effects) where
-  type RequiredEffects term value (CachingAnalysis m term value effects) = CachingEffects term value (RequiredEffects term value (m term value effects))
+         => MonadAnalysis term value (Caching m term value effects) where
+  type RequiredEffects term value (Caching m term value effects) = CachingEffects term value (RequiredEffects term value (m term value effects))
   analyzeTerm e = do
     c <- getConfiguration (embedSubterm e)
     -- Convergence here is predicated upon an Eq instance, not α-equivalence
@@ -81,7 +81,7 @@ instance ( Corecursive term
       -- that it doesn't "leak" to the calling context and diverge (otherwise this
       -- would never complete). We don’t need to use the values, so we 'gather' the
       -- nondeterministic values into @()@.
-      _ <- localCache (const prevCache) (gather (memoizeEval e) :: CachingAnalysis m term value effects ())
+      _ <- localCache (const prevCache) (gather (memoizeEval e) :: Caching m term value effects ())
       getCache) mempty
     maybe empty scatter (cacheLookup c cache)
 
@@ -116,7 +116,7 @@ memoizeEval :: ( Alternative (m term value effects)
                , Ord term
                , Ord value
                )
-            => SubtermAlgebra (Base term) term (CachingAnalysis m term value effects value)
+            => SubtermAlgebra (Base term) term (Caching m term value effects value)
 memoizeEval e = do
   c <- getConfiguration (embedSubterm e)
   cached <- getsCache (cacheLookup c)
