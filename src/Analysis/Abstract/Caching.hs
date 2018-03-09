@@ -68,7 +68,19 @@ instance ( Corecursive term
          )
          => MonadAnalysis term value (Caching m term value effects) where
   type RequiredEffects term value (Caching m term value effects) = CachingEffects term value (RequiredEffects term value (m term value effects))
-  analyzeTerm = memoizeEval
+  analyzeTerm e = do
+    c <- getConfiguration (embedSubterm e)
+    cached <- getsCache (cacheLookup c)
+    case cached of
+      Just pairs -> scatter pairs
+      Nothing -> do
+        pairs <- asksCache (fromMaybe mempty . cacheLookup c)
+        modifyCache (cacheSet c pairs)
+        v <- liftAnalyze analyzeTerm e
+        store' <- getStore
+        modifyCache (cacheInsert c (v, store'))
+        pure v
+
   evaluateModule e = do
     c <- getConfiguration e
     -- Convergence here is predicated upon an Eq instance, not α-equivalence
@@ -104,29 +116,3 @@ converge f = loop
 -- | Nondeterministically write each of a collection of stores & return their associated results.
 scatter :: (Alternative m, Foldable t, MonadEvaluator term value m) => t (a, Store (LocationFor value) value) -> m a
 scatter = getAlt . foldMap (\ (value, store') -> Alt (putStore store' *> pure value))
-
--- | Evaluation of a single iteration of an analysis, given an in-cache as an oracle for results and an out-cache to record computed results in.
-memoizeEval :: ( Alternative (m term value effects)
-               , Corecursive term
-               , Functor (Base term)
-               , Effectful (m term value)
-               , Members (CachingEffects term value '[]) effects
-               , MonadAnalysis term value (m term value effects)
-               , Ord (CellFor value)
-               , Ord (LocationFor value)
-               , Ord term
-               , Ord value
-               )
-            => SubtermAlgebra (Base term) term (Caching m term value effects value)
-memoizeEval e = do
-  c <- getConfiguration (embedSubterm e)
-  cached <- getsCache (cacheLookup c)
-  case cached of
-    Just pairs -> scatter pairs
-    Nothing -> do
-      pairs <- asksCache (fromMaybe mempty . cacheLookup c)
-      modifyCache (cacheSet c pairs)
-      v <- liftAnalyze analyzeTerm e
-      store' <- getStore
-      modifyCache (cacheInsert c (v, store'))
-      pure v
