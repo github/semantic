@@ -57,16 +57,16 @@ instance ( Effectful (m term value)
 
 -- | This instance coinductively iterates the analysis of a term until the results converge.
 instance ( Corecursive term
-         , Ord term
-         , Ord value
-         , Ord (CellFor value)
-         , Ord (LocationFor value)
          , Effectful (m term value)
+         , Foldable (Cell (LocationFor value))
+         , MonadAnalysis term value (m term value effects)
          , MonadFresh (m term value effects)
          , MonadNonDet (m term value effects)
          , Members (CachingEffects term value '[]) effects
-         , Foldable (Cell (LocationFor value))
-         , MonadAnalysis term value (m term value effects)
+         , Ord (CellFor value)
+         , Ord (LocationFor value)
+         , Ord term
+         , Ord value
          )
          => MonadAnalysis term value (CachingAnalysis m term value effects) where
   type RequiredEffects term value (CachingAnalysis m term value effects) = CachingEffects term value (RequiredEffects term value (m term value effects))
@@ -107,17 +107,17 @@ scatter :: (Alternative m, Foldable t, MonadEvaluator term value m) => t (a, Sto
 scatter = getAlt . foldMap (\ (value, store') -> Alt (putStore store' *> pure value))
 
 -- | Evaluation of a single iteration of an analysis, given an in-cache as an oracle for results and an out-cache to record computed results in.
-memoizeEval :: ( Ord value
-               , Ord term
-               , Ord (LocationFor value)
-               , Ord (CellFor value)
-               , Alternative (m term value effects)
+memoizeEval :: ( Alternative (m term value effects)
                , Corecursive term
                , Foldable (Cell (LocationFor value))
                , Functor (Base term)
                , Effectful (m term value)
                , Members (CachingEffects term value '[]) effects
                , MonadAnalysis term value (m term value effects)
+               , Ord (CellFor value)
+               , Ord (LocationFor value)
+               , Ord term
+               , Ord value
                )
             => SubtermAlgebra (Base term) term (CachingAnalysis m term value effects value)
 memoizeEval e = do
