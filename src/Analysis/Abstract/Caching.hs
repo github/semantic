@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Caching
-( CachingAnalysis(..)
+( type CachingAnalysis
 ) where
 
 import Control.Abstract.Analysis
@@ -22,7 +22,7 @@ type CachingEffects term value effects
 -- | The cache for term and abstract value types.
 type CacheFor term value = Cache (LocationFor value) term value
 
-newtype CachingAnalysis m term value (effects :: [* -> *]) a = CachingAnalysis { runCachingAnalysis :: m term value effects a }
+newtype CachingAnalysis m term value (effects :: [* -> *]) a = CachingAnalysis (m term value effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
 deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (CachingAnalysis m term value effects)
