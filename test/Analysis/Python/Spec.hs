@@ -41,10 +41,9 @@ import Test.Hspec.LeanCheck
 import Test.LeanCheck
 
 
-
 spec :: Spec
 spec = parallel $ do
-  describe "evalutes python" $ do
+  describe "evalutes Python" $ do
     it "imports" $ do
       res <- evaluate "main.py"
 
