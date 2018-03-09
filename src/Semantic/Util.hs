@@ -48,9 +48,9 @@ evaluateRubyFiles paths = do
 -- Python
 typecheckPythonFile path = runAnalysis @(CachingAnalysis Evaluating Python.Term Type) . evaluateModule . snd <$> parseFile pythonParser path
 
-tracePythonFile path = runAnalysis @(TracingAnalysis [] Evaluating Python.Term PythonValue) . evaluateModule . snd <$> parseFile pythonParser path
+tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term PythonValue) . evaluateModule . snd <$> parseFile pythonParser path
 
-evaluateDeadTracePythonFile path = runAnalysis @(DeadCodeAnalysis (TracingAnalysis [] Evaluating) Python.Term PythonValue) . evaluateModule . snd <$> parseFile pythonParser path
+evaluateDeadTracePythonFile path = runAnalysis @(DeadCodeAnalysis (Tracing [] Evaluating) Python.Term PythonValue) . evaluateModule . snd <$> parseFile pythonParser path
 
 evaluatePythonFile path = evaluate @PythonValue . snd <$> parseFile pythonParser path
 
