@@ -17,6 +17,8 @@ import Prologue
 class MonadFail (m term value effects) => MonadEvaluator term value (effects :: [* -> *]) m where
   -- | Retrieve the global environment.
   getGlobalEnv :: m term value effects (EnvironmentFor value)
+  -- | Set the global environment
+  putGlobalEnv :: EnvironmentFor value -> m term value effects ()
   -- | Update the global environment.
   modifyGlobalEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m term value effects  ()
 
@@ -33,9 +35,9 @@ class MonadFail (m term value effects) => MonadEvaluator term value (effects :: 
   putStore = modifyStore . const
 
   -- | Retrieve the table of evaluated modules.
-  getModuleTable :: m term value effects (ModuleTable value)
+  getModuleTable :: m term value effects (ModuleTable (EnvironmentFor value))
   -- | Update the table of evaluated modules.
-  modifyModuleTable :: (ModuleTable value -> ModuleTable value) -> m term value effects ()
+  modifyModuleTable :: (ModuleTable (EnvironmentFor value) -> ModuleTable (EnvironmentFor value)) -> m term value effects ()
 
   -- | Retrieve the table of unevaluated modules.
   askModuleTable :: m term value effects (ModuleTable term)

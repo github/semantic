@@ -29,9 +29,11 @@ import Semantic.Task
 
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
+import qualified Language.TypeScript.Assignment as TypeScript
 
 type RubyValue = Value Precise (Term (Union Ruby.Syntax) (Record Location))
 type PythonValue = Value Precise (Term (Union Python.Syntax) (Record Location))
+type TypeScriptValue = Value Precise (Term (Union TypeScript.Syntax) (Record Location))
 
 file :: MonadIO m => FilePath -> m Blob
 file path = fromJust <$> IO.readFile path (languageForFilePath path)
@@ -55,6 +57,14 @@ evaluatePythonFile path = evaluate @PythonValue . snd <$> parseFile pythonParser
 evaluatePythonFiles paths = do
   first:rest <- traverse (parseFile pythonParser) paths
   pure $ evaluates @PythonValue rest first
+
+-- TypeScript
+evaluateTypeScriptFile path = fst . evaluate @TypeScriptValue . snd <$> parseFile typescriptParser path
+
+evaluateTypeScriptFiles paths = do
+  first:rest <- traverse (parseFile typescriptParser) paths
+  pure $ evaluates @TypeScriptValue rest first
+
 
 parseFile parser path = runTask (file path >>= fmap . (,) <*> parse parser)
 

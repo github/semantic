@@ -32,6 +32,9 @@ class MonadEvaluator term value effects m => MonadValue term value effects m whe
   -- | Construct a floating-point value.
   float :: Scientific -> m term value effects value
 
+  -- | Construct an abstract interface value.
+  interface :: value -> m term value effects value
+
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: value -> m term value effects value -> m term value effects value -> m term value effects value
 
@@ -39,6 +42,9 @@ class MonadEvaluator term value effects m => MonadValue term value effects m whe
   abstract :: [Name] -> Subterm term (m term value effects value) -> m term value effects value
   -- | Evaluate an application (like a function call).
   apply :: value -> [Subterm term (m term value effects value)] -> m term value effects value
+
+  -- | Extract the environment from an interface value.
+  environment :: value -> m term value effects (EnvironmentFor value)
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( FreeVariables term
@@ -55,6 +61,7 @@ instance ( FreeVariables term
   boolean = pure . inj . Boolean
   string  = pure . inj . Value.String
   float   = pure . inj . Value.Float
+  interface v = inj . Value.Interface v <$> getGlobalEnv
 
   ifthenelse cond if' else'
     | Just (Boolean b) <- prj cond = if b then if' else else'
@@ -70,6 +77,10 @@ instance ( FreeVariables term
       assign a v
       envInsert name a <$> rest) (pure env) (zip names params)
     localEnv (mappend bindings) (evaluateTerm body)
+
+  environment v
+    | Just (Interface _ env) <- prj v = pure env
+    | otherwise                       = pure mempty
 
 -- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
 instance (Alternative (m term Type effects), MonadEvaluator term Type effects m, MonadFresh (m term Type effects)) => MonadValue  term Type effects m where
@@ -88,6 +99,8 @@ instance (Alternative (m term Type effects), MonadEvaluator term Type effects m,
   boolean _ = pure Bool
   string _  = pure Type.String
   float _   = pure Type.Float
+  -- TODO
+  interface = undefined
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 
@@ -96,3 +109,6 @@ instance (Alternative (m term Type effects), MonadEvaluator term Type effects m,
     paramTypes <- traverse subtermValue params
     _ :-> ret <- op `unify` (Product paramTypes :-> Var tvar)
     pure ret
+
+  -- TODO
+  environment = undefined

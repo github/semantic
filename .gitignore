@@ -15,6 +15,7 @@ bin/
 
 *.hp
 *.prof
+*.pyc
 
 .bundle/
 .licenses/vendor/gems
