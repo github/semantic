@@ -53,8 +53,6 @@ typecheckPythonFile path = runAnalysis @(CachingAnalysis Evaluating) @Python.Ter
 
 tracePythonFile path = runAnalysis @(TracingAnalysis [] Evaluating) @Python.Term @PythonValue . evaluateModule . snd <$> parseFile pythonParser path
 
--- type PythonTracer = TracingAnalysis [] Evaluating Python.Term PythonValue '[DeadCode Python.Term, Tracer [] Python.Term PythonValue]
-
 evaluateDeadTracePythonFile path = runAnalysis @(DeadCodeAnalysis (TracingAnalysis [] Evaluating)) @Python.Term @PythonValue . evaluateModule . snd <$> parseFile pythonParser path
 
 evaluatePythonFile path = evaluate @PythonValue . snd <$> parseFile pythonParser path
