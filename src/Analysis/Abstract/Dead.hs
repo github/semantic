@@ -1,5 +1,7 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, StandaloneDeriving, TypeFamilies, TypeOperators #-}
-module Analysis.Abstract.Dead where
+module Analysis.Abstract.Dead
+( type DeadCodeAnalysis
+) where
 
 import Control.Abstract.Analysis
 import Data.Semigroup.Reducer as Reducer
@@ -7,7 +9,7 @@ import Data.Set (delete)
 import Prologue
 
 -- | An analysis tracking dead (unreachable) code.
-newtype DeadCodeAnalysis m term value (effects :: [* -> *]) a = DeadCodeAnalysis { runDeadCodeAnalysis :: m term value effects a }
+newtype DeadCodeAnalysis m term value (effects :: [* -> *]) a = DeadCodeAnalysis (m term value effects a)
   deriving (Applicative, Functor, Effectful, Monad, MonadFail)
 
 deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (DeadCodeAnalysis m term value effects)
