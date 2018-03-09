@@ -23,7 +23,7 @@ import System.FilePath.Posix
 evaluate :: forall value term
          .  ( Evaluatable (Base term)
             , FreeVariables term
-            , MonadAddressable (LocationFor value) term value (EvaluatingEffects term value) Evaluating
+            , MonadAddressable (LocationFor value) value (Evaluating term value (EvaluatingEffects term value))
             , MonadValue term value (Evaluating term value (EvaluatingEffects term value))
             , Recursive term
             )
@@ -35,7 +35,7 @@ evaluate = run @(Evaluating term value) @(EvaluatingEffects term value) . evalua
 evaluates :: forall value term
           .  ( Evaluatable (Base term)
              , FreeVariables term
-             , MonadAddressable (LocationFor value) term value (EvaluatingEffects term value) Evaluating
+             , MonadAddressable (LocationFor value) value (Evaluating term value (EvaluatingEffects term value))
              , MonadValue term value (Evaluating term value (EvaluatingEffects term value))
              , Recursive term
              )
@@ -93,7 +93,7 @@ instance Members (EvaluatingEffects term value) effects => MonadEvaluator term v
 instance ( Evaluatable (Base term)
          , FreeVariables term
          , Members (EvaluatingEffects term value) effects
-         , MonadAddressable (LocationFor value) term value effects Evaluating
+         , MonadAddressable (LocationFor value) value (Evaluating term value effects)
          , MonadValue term value (Evaluating term value effects)
          , Recursive term
          )

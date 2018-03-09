@@ -48,7 +48,7 @@ class Monad m => MonadValue term value m | m -> term, m -> value where
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( FreeVariables term
-         , MonadAddressable location term (Value location term) effects m
+         , MonadAddressable location (Value location term) (m term (Value location term) effects)
          , MonadAnalysis term (Value location term) effects m
          , MonadEvaluator term (Value location term) effects m
          , Recursive term

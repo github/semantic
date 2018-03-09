@@ -15,22 +15,22 @@ import Data.Semigroup.Reducer
 import Prelude hiding (fail)
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Store.
-class (Monad (m term value effects), Ord l, l ~ LocationFor value, Reducer value (Cell l value)) => MonadAddressable l term value (effects :: [* -> *]) m where
+class (Monad m, Ord l, l ~ LocationFor value, Reducer value (Cell l value)) => MonadAddressable l value m | m -> value where
   deref :: Address l value
-        -> m term value effects value
+        -> m value
 
   alloc :: Name
-        -> m term value effects (Address l value)
+        -> m (Address l value)
 
 -- | Look up or allocate an address for a 'Name' free in a given term & assign it a given value, returning the 'Name' paired with the address.
 --
 --   The term is expected to contain one and only one free 'Name', meaning that care should be taken to apply this only to e.g. identifiers.
-lookupOrAlloc :: ( FreeVariables t
-                 , MonadAddressable (LocationFor value) term value effects m
+lookupOrAlloc :: ( FreeVariables term
+                 , MonadAddressable (LocationFor value) value (m term value effects)
                  , MonadEvaluator term value effects m
                  , Semigroup (CellFor value)
                  )
-                 => t
+                 => term
                  -> value
                  -> Environment (LocationFor value) value
                  -> m term value effects (Name, Address (LocationFor value) value)
@@ -39,7 +39,7 @@ lookupOrAlloc term = let [name] = toList (freeVariables term) in
 
 -- | Look up or allocate an address for a 'Name' & assign it a given value, returning the 'Name' paired with the address.
 lookupOrAlloc' :: ( Semigroup (CellFor value)
-                  , MonadAddressable (LocationFor value) term value effects m
+                  , MonadAddressable (LocationFor value) value (m term value effects)
                   , MonadEvaluator term value effects m
                   )
                   => Name
@@ -65,7 +65,7 @@ assign address = modifyStore . storeInsert address
 -- Instances
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
-instance (Monad (m term value effects), LocationFor value ~ Precise, MonadEvaluator term value effects m) => MonadAddressable Precise term value effects m where
+instance (Monad (m term value effects), LocationFor value ~ Precise, MonadEvaluator term value effects m) => MonadAddressable Precise value (m term value effects) where
   deref = maybe uninitializedAddress (pure . unLatest) <=< flip fmap getStore . storeLookup
     where
       -- | Fail with a message denoting an uninitialized address (i.e. one which was 'alloc'ated, but never 'assign'ed a value before being 'deref'erenced).
@@ -76,7 +76,7 @@ instance (Monad (m term value effects), LocationFor value ~ Precise, MonadEvalua
 
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
-instance (Alternative (m term value effects), Monad (m term value effects), LocationFor value ~ Monovariant, MonadEvaluator term value effects m, Ord value) => MonadAddressable Monovariant term value effects m where
+instance (Alternative (m term value effects), Monad (m term value effects), LocationFor value ~ Monovariant, MonadEvaluator term value effects m, Ord value) => MonadAddressable Monovariant value (m term value effects) where
   deref = asum . maybe [] (map pure . toList) <=< flip fmap getStore . storeLookup
 
   alloc = pure . Address . Monovariant
