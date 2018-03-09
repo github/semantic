@@ -41,9 +41,7 @@ instance ( Corecursive term
          , Foldable (Base term)
          , Member (State (Dead term)) effects
          , MonadAnalysis term value (m term value effects)
-         , MonadEvaluator term value (m term value effects)
          , Ord term
-         , Recursive term
          )
          => MonadAnalysis term value (DeadCodeAnalysis m term value effects) where
   type RequiredEffects term value (DeadCodeAnalysis m term value effects) = State (Dead term) ': RequiredEffects term value (m term value effects)

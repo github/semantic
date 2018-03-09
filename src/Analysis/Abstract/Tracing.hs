@@ -24,9 +24,7 @@ instance ( Corecursive term
          , Effectful (m term value)
          , Member (Tracer trace term value) effects
          , MonadAnalysis term value (m term value effects)
-         , MonadEvaluator term value (m term value effects)
          , Ord (LocationFor value)
-         , Recursive term
          , Reducer (ConfigurationFor term value) (Trace trace term value)
          )
          => MonadAnalysis term value (TracingAnalysis trace m term value effects) where

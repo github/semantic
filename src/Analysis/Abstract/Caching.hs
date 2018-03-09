@@ -67,11 +67,8 @@ instance ( Corecursive term
          , MonadFresh (m term value effects)
          , MonadNonDet (m term value effects)
          , Members (CachingEffects term value '[]) effects
-         , Evaluatable (Base term)
          , Foldable (Cell (LocationFor value))
-         , FreeVariables term
          , MonadAnalysis term value (m term value effects)
-         , Recursive term
          )
          => MonadAnalysis term value (CachingAnalysis m term value effects) where
   type RequiredEffects term value (CachingAnalysis m term value effects) = CachingEffects term value (RequiredEffects term value (m term value effects))
@@ -118,14 +115,11 @@ memoizeEval :: ( Ord value
                , Ord (CellFor value)
                , Alternative (m term value effects)
                , Corecursive term
-               , FreeVariables term
                , Foldable (Cell (LocationFor value))
                , Functor (Base term)
                , Effectful (m term value)
                , Members (CachingEffects term value '[]) effects
-               , Recursive term
                , MonadAnalysis term value (m term value effects)
-               -- , Semigroup (CellFor value)
                )
             => SubtermAlgebra (Base term) term (CachingAnalysis m term value effects value)
 memoizeEval e = do
