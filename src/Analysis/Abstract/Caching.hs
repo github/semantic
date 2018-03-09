@@ -68,8 +68,9 @@ instance ( Corecursive term
          )
          => MonadAnalysis term value (Caching m term value effects) where
   type RequiredEffects term value (Caching m term value effects) = CachingEffects term value (RequiredEffects term value (m term value effects))
-  analyzeTerm e = do
-    c <- getConfiguration (embedSubterm e)
+  analyzeTerm = memoizeEval
+  evaluateModule e = do
+    c <- getConfiguration e
     -- Convergence here is predicated upon an Eq instance, not α-equivalence
     cache <- converge (\ prevCache -> do
       putCache mempty
@@ -81,7 +82,7 @@ instance ( Corecursive term
       -- that it doesn't "leak" to the calling context and diverge (otherwise this
       -- would never complete). We don’t need to use the values, so we 'gather' the
       -- nondeterministic values into @()@.
-      _ <- localCache (const prevCache) (gather (memoizeEval e) :: Caching m term value effects ())
+      _ <- localCache (const prevCache) (gather (evaluateModule e) :: Caching m term value effects ())
       getCache) mempty
     maybe empty scatter (cacheLookup c cache)
 
