@@ -79,7 +79,6 @@ instance ( Corecursive (TermFor m)
          , Recursive (TermFor m)
          )
          => MonadAnalysis (CachingAnalysis m) where
-  type EffectsRequiredFor (CachingAnalysis m) = CachingEffects (TermFor m) (ValueFor m) (EffectsRequiredFor m)
   analyzeTerm e = do
     c <- getConfiguration (embedSubterm e)
     -- Convergence here is predicated upon an Eq instance, not α-equivalence
