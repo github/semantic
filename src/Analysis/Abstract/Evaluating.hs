@@ -23,26 +23,26 @@ import System.FilePath.Posix
 evaluate :: forall value term
          .  ( Evaluatable (Base term)
             , FreeVariables term
-            , MonadAddressable (LocationFor value) term value (EvaluatingEffects term value '[]) Evaluating
-            , MonadValue term value (EvaluatingEffects term value '[]) Evaluating
+            , MonadAddressable (LocationFor value) term value (EvaluatingEffects term value) Evaluating
+            , MonadValue term value (EvaluatingEffects term value) Evaluating
             , Recursive term
             )
          => term
-         -> Final (EvaluatingEffects term value '[]) value
-evaluate = run @(Evaluating term value) @(EvaluatingEffects term value '[]) . evaluateModule
+         -> Final (EvaluatingEffects term value) value
+evaluate = run @(Evaluating term value) @(EvaluatingEffects term value) . evaluateModule
 
 -- | Evaluate terms and an entry point to a value.
 evaluates :: forall value term
           .  ( Evaluatable (Base term)
              , FreeVariables term
-             , MonadAddressable (LocationFor value) term value (EvaluatingEffects term value '[]) Evaluating
-             , MonadValue term value (EvaluatingEffects term value '[]) Evaluating
+             , MonadAddressable (LocationFor value) term value (EvaluatingEffects term value) Evaluating
+             , MonadValue term value (EvaluatingEffects term value) Evaluating
              , Recursive term
              )
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
-          -> Final (EvaluatingEffects term value '[]) value
-evaluates pairs (b, t) = run @(Evaluating term value) @(EvaluatingEffects term value '[]) (withModules b pairs (evaluateModule t))
+          -> Final (EvaluatingEffects term value) value
+evaluates pairs (b, t) = run @(Evaluating term value) @(EvaluatingEffects term value) (withModules b pairs (evaluateModule t))
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
 withModules :: MonadAnalysis term value effects m => Blob -> [(Blob, term)] -> m term value effects a -> m term value effects a
@@ -64,16 +64,16 @@ deriving instance Member Fresh     effects => MonadFresh  (Evaluating term value
 deriving instance Member NonDetEff effects => Alternative (Evaluating term value effects)
 deriving instance Member NonDetEff effects => MonadNonDet (Evaluating term value effects)
 
-type EvaluatingEffects term value effects
-  = Fail                          -- Failure with an error message
- ': Reader (EnvironmentFor value) -- Local environment (e.g. binding over a closure)
- ': State  (EnvironmentFor value) -- Global (imperative) environment
- ': State  (StoreFor value)       -- The heap
- ': Reader (ModuleTable term)     -- Cache of unevaluated modules
- ': State  (ModuleTable (EnvironmentFor value))    -- Cache of evaluated modules
- ': effects
+type EvaluatingEffects term value
+  = '[ Fail                                        -- Failure with an error message
+     , Reader (EnvironmentFor value)               -- Local environment (e.g. binding over a closure)
+     , State  (EnvironmentFor value)               -- Global (imperative) environment
+     , State  (StoreFor value)                     -- The heap
+     , Reader (ModuleTable term)                   -- Cache of unevaluated modules
+     , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
+     ]
 
-instance Members (EvaluatingEffects term value '[]) effects => MonadEvaluator term value effects Evaluating where
+instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value effects Evaluating where
   getGlobalEnv = lift get
   putGlobalEnv = lift . put
   modifyGlobalEnv f = lift (modify f)
@@ -92,11 +92,11 @@ instance Members (EvaluatingEffects term value '[]) effects => MonadEvaluator te
 
 instance ( Evaluatable (Base term)
          , FreeVariables term
-         , Members (EvaluatingEffects term value '[]) effects
+         , Members (EvaluatingEffects term value) effects
          , MonadAddressable (LocationFor value) term value effects Evaluating
          , MonadValue term value effects Evaluating
          , Recursive term
          )
          => MonadAnalysis term value effects Evaluating where
-  type RequiredEffects term value Evaluating = EvaluatingEffects term value '[]
+  type RequiredEffects term value Evaluating = EvaluatingEffects term value
   analyzeTerm = eval
