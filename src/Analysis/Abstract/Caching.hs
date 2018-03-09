@@ -1,7 +1,5 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Analysis.Abstract.Caching
-  -- ( evaluateCache )
-  where
+module Analysis.Abstract.Caching where
 
 import Control.Abstract.Analysis
 import Control.Monad.Effect.Fresh
