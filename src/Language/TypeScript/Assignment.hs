@@ -643,7 +643,7 @@ statementIdentifier :: Assignment
 statementIdentifier = makeTerm <$> symbol StatementIdentifier <*> (Syntax.Identifier <$> (name <$> source))
 
 importStatement :: Assignment
-importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> children ((,) <$> importClause <*> term path)
+importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> children ((,) <$> importClause <*> term fromClause)
                 <|> makeImport <$> symbol Grammar.ImportStatement <*> children requireImport
                 <|> makeImport <$> symbol Grammar.ImportStatement <*> children bareRequireImport
   where
@@ -651,13 +651,10 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
     makeImport loc (Just alias, symbols, from) = makeTerm loc (Declaration.QualifiedImport from alias symbols)
     makeImport loc (Nothing, symbols, from) = makeTerm loc (Declaration.Import from symbols)
     -- Import a file giving it an alias (e.g. import foo = require "./foo")
-    requireImport = symbol Grammar.ImportRequireClause *> children ((,,) <$> (Just <$> (term identifier)) <*> pure [] <*> term path)
+    requireImport = symbol Grammar.ImportRequireClause *> children ((,,) <$> (Just <$> (term identifier)) <*> pure [] <*> term fromClause)
      -- Import a file just for it's side effects (e.g. import "./foo")
-    bareRequireImport = (,,) <$> (pure Nothing) <*> pure [] <*> term path
+    bareRequireImport = (,,) <$> (pure Nothing) <*> pure [] <*> term fromClause
 
-    path = makeTerm <$> symbol Grammar.String <*> (Syntax.Identifier <$> (qualifiedName' <$> source))
-    qualifiedName' = qualifiedName . BC.split '/' . (BC.dropWhile (== '/')) . (BC.dropWhile (== '.')) . stripQuotes
-    stripQuotes = B.filter (/= (fromIntegral (ord '\"')))
 
     -- Imports with import clauses
     makeImportTerm1 loc from (Prelude.True, Just alias, symbols) = makeTerm loc (Declaration.QualifiedImport from alias symbols)
@@ -680,9 +677,14 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
     makeNameAliasPair from (Just alias) = (from, alias)
     makeNameAliasPair from Nothing = (from, from)
 
+fromClause :: Assignment
+fromClause = makeTerm <$> symbol Grammar.String <*> (Syntax.Identifier <$> (pathToQualifiedName <$> source))
+  where
+    pathToQualifiedName :: ByteString -> Name
+    pathToQualifiedName = qualifiedName . BC.split '/' . (BC.dropWhile (== '/')) . (BC.dropWhile (== '.')) . stripQuotes
 
-stripQuotes :: ByteString -> ByteString
-stripQuotes = B.filter (/= (fromIntegral (ord '\"')))
+    stripQuotes :: ByteString -> ByteString
+    stripQuotes = B.filter (/= (fromIntegral (ord '\"')))
 
 debuggerStatement :: Assignment
 debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> (TypeScript.Syntax.Debugger <$ source)
@@ -739,9 +741,6 @@ exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> (children (fli
     rawIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source)
   -- <|> (makeExport2 <$> manyTerm decorator <*> emptyTerm <*> (pure <$> term (fromClause <|> exportClause <|> declaration <|> expression <|> identifier <|> importAlias')))))
     -- makeExport2 decorators fromClause exportClause = Declaration.QualifiedExport fromClause exportClause
-
-fromClause :: Assignment
-fromClause = makeTerm <$> symbol Grammar.String <*> (Syntax.Identifier . name . stripQuotes <$> source)
 
 propertySignature :: Assignment
 propertySignature = makePropertySignature <$> symbol Grammar.PropertySignature <*> children ((,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> (term typeAnnotation' <|> emptyTerm))
