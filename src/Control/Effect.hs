@@ -67,9 +67,9 @@ instance Ord a => RunEffect NonDetEff a where
 
 
 class Effectful m where
-  lift :: Eff effects a -> m effects a
+  raise :: Eff effects a -> m effects a
   lower :: m effects a -> Eff effects a
 
 instance Effectful Eff where
-  lift = id
+  raise = id
   lower = id

@@ -22,11 +22,11 @@ deriving instance Ord term => Reducer term (Dead term)
 
 -- | Update the current 'Dead' set.
 killAll :: (Effectful (m term value), Member (State (Dead term)) effects) => Dead term -> DeadCode m term value effects ()
-killAll = lift . put
+killAll = raise . put
 
 -- | Revive a single term, removing it from the current 'Dead' set.
 revive :: (Effectful (m term value), Member (State (Dead term)) effects) => Ord term => term -> DeadCode m term value effects ()
-revive t = lift (modify (Dead . delete t . unDead))
+revive t = raise (modify (Dead . delete t . unDead))
 
 -- | Compute the set of all subterms recursively.
 subterms :: (Ord term, Recursive term, Foldable (Base term)) => term -> Dead term

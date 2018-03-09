@@ -37,4 +37,4 @@ trace :: ( Effectful (m term value)
          )
       => trace (ConfigurationFor term value)
       -> Tracing trace m term value effects ()
-trace = lift . tell
+trace = raise . tell

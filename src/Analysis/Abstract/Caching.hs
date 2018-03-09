@@ -48,11 +48,11 @@ instance ( Effectful (m term value)
          , MonadEvaluator term value (m term value effects)
          )
          => MonadCaching term value (Caching m term value effects) where
-  askCache = lift ask
-  localCache f a = lift (local f (lower a))
+  askCache = raise ask
+  localCache f a = raise (local f (lower a))
 
-  getCache = lift get
-  putCache = lift . put
+  getCache = raise get
+  putCache = raise . put
 
 -- | This instance coinductively iterates the analysis of a term until the results converge.
 instance ( Corecursive term

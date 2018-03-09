@@ -78,21 +78,21 @@ type EvaluatingEffects term value
      ]
 
 instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
-  getGlobalEnv = lift get
-  putGlobalEnv = lift . put
-  modifyGlobalEnv f = lift (modify f)
+  getGlobalEnv = raise get
+  putGlobalEnv = raise . put
+  modifyGlobalEnv f = raise (modify f)
 
-  askLocalEnv = lift ask
-  localEnv f a = lift (local f (lower a))
+  askLocalEnv = raise ask
+  localEnv f a = raise (local f (lower a))
 
-  getStore = lift get
-  modifyStore f = lift (modify f)
+  getStore = raise get
+  modifyStore f = raise (modify f)
 
-  getModuleTable = lift get
-  modifyModuleTable f = lift (modify f)
+  getModuleTable = raise get
+  modifyModuleTable f = raise (modify f)
 
-  askModuleTable = lift ask
-  localModuleTable f a = lift (local f (lower a))
+  askModuleTable = raise ask
+  localModuleTable f a = raise (local f (lower a))
 
 instance ( Evaluatable (Base term)
          , FreeVariables term
