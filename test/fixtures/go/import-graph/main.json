@@ -10,21 +10,66 @@
             ],
             "end": [
               3,
-              12
+              19
             ]
           },
-          "path": "os",
+          "path": "lib/Foo",
           "symbols": [],
-          "alias": "os"
+          "alias": ""
+        },
+        {
+          "span": {
+            "start": [
+              4,
+              8
+            ],
+            "end": [
+              4,
+              19
+            ]
+          },
+          "path": "lib/Bar",
+          "symbols": [],
+          "alias": ""
+        },
+        {
+          "span": {
+            "start": [
+              5,
+              8
+            ],
+            "end": [
+              5,
+              20
+            ]
+          },
+          "path": "lib/Math",
+          "symbols": [],
+          "alias": "m"
         },
         {
           "span": {
             "start": [
               6,
-              2
+              8
             ],
             "end": [
               6,
+              18
+            ]
+          },
+          "path": "lib/Math",
+          "symbols": [],
+          "alias": "Math"
+        },
+        {
+          "span": {
+            "start": [
+              9,
+              2
+            ],
+            "end": [
+              9,
               12
             ]
           },
@@ -39,11 +84,11 @@
         {
           "span": {
             "start": [
-              9,
+              12,
               1
             ],
             "end": [
-              9,
+              12,
               14
             ]
           },
@@ -54,11 +99,11 @@
         {
           "span": {
             "start": [
-              11,
+              14,
               1
             ],
             "end": [
-              13,
+              19,
               2
             ]
           },
@@ -74,16 +119,48 @@
         {
           "span": {
             "start": [
-              12,
+              15,
               3
             ],
             "end": [
-              12,
+              15,
               8
             ]
           },
           "symbol": "foo",
           "targets": []
+        },
+        {
+          "span": {
+            "start": [
+              17,
+              3
+            ],
+            "end": [
+              17,
+              10
+            ]
+          },
+          "symbol": "Sin",
+          "targets": [
+            "m"
+          ]
+        },
+        {
+          "span": {
+            "start": [
+              18,
+              3
+            ],
+            "end": [
+              18,
+              13
+            ]
+          },
+          "symbol": "Sin",
+          "targets": [
+            "Math"
+          ]
         }
       ]
     }

@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, MultiParamTypeClasses, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating where
 
-import Prologue
 import Control.Abstract.Evaluator
 import Control.Effect
 import Control.Monad.Effect.Fail
@@ -13,20 +12,22 @@ import Data.Abstract.ModuleTable
 import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Blob
-import Prelude hiding (fail)
+import Data.List.Split (splitWhen)
+import Prologue
+import qualified Data.ByteString.Char8 as BC
 import qualified Data.Map as Map
 import System.FilePath.Posix
 
+
 -- | The effects necessary for concrete interpretation.
 type EvaluationEffects t v
-  = '[ Fail                            -- Failure with an error message
-     , State (Store (LocationFor v) v) -- The heap
-     , State (EnvironmentFor v)        -- Global (imperative) environment
-     , Reader (EnvironmentFor v)       -- Local environment (e.g. binding over a closure)
-     , Reader (ModuleTable t)          -- Cache of unevaluated modules
-     , State (ModuleTable v)           -- Cache of evaluated modules
+  = '[ Fail                                   -- Failure with an error message
+     , State (Store (LocationFor v) v)        -- The heap
+     , State (EnvironmentFor v)               -- Global (imperative) environment
+     , Reader (EnvironmentFor v)              -- Local environment (e.g. binding over a closure)
+     , Reader (ModuleTable t)                 -- Cache of unevaluated modules
+     , State (ModuleTable (EnvironmentFor v)) -- Cache of evaluated modules
      ]
-
 
 -- | Evaluate a term to a value.
 evaluate :: forall v term
@@ -55,12 +56,16 @@ evaluates :: forall v term
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
           -> Final (EvaluationEffects term v) v
-evaluates pairs (_, t) = run @(EvaluationEffects term v) (runEvaluator (runEvaluation (withModules pairs (evaluateTerm t))))
+evaluates pairs (b, t) = run @(EvaluationEffects term v) (runEvaluator (runEvaluation (withModules b pairs (evaluateTerm t))))
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
-withModules :: (MonadAnalysis term value m, MonadEvaluator term value m) => [(Blob, term)] -> m a -> m a
-withModules pairs = localModuleTable (const moduleTable)
-  where moduleTable = ModuleTable (Map.fromList (map (first (dropExtensions . blobPath)) pairs))
+withModules :: (MonadAnalysis term value m, MonadEvaluator term value m) => Blob -> [(Blob, term)] -> m a -> m a
+withModules Blob{..} pairs = localModuleTable (const moduleTable)
+  where
+    moduleTable = ModuleTable (Map.fromList (map (first moduleName) pairs))
+    rootDir = dropFileName blobPath
+    moduleName Blob{..} = toName (dropExtensions (makeRelative rootDir blobPath))
+    toName str = qualifiedName (fmap BC.pack (splitWhen (== pathSeparator) str))
 
 -- | An analysis performing concrete evaluation of @term@s to @value@s.
 newtype Evaluation term value a = Evaluation { runEvaluation :: Evaluator (EvaluationEffects term value) term value a }
@@ -76,4 +81,4 @@ instance ( Evaluatable (Base t)
          , Semigroup (Cell (LocationFor v) v)
          )
          => MonadAnalysis t v (Evaluation t v) where
-  evaluateTerm = foldSubterms eval
+  analyzeTerm = eval

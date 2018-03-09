@@ -1,71 +1,28 @@
 (Program
   (Import
-    (TextElement)
-    (Empty)
-    (Identifier))
-  (Import
+    (TextElement))
+  (QualifiedImport
     (TextElement)
     (Identifier))
   (Import
-    (TextElement)
-    (Empty)
-    (ImportSymbol
-      (Identifier)
-      (Empty)))
+    (TextElement))
+  (Import
+    (TextElement))
+  (Import
+    (TextElement))
   (
     (Import
-      (TextElement)
-      (Empty)
-      (ImportSymbol
-        (Identifier)
-        (Empty)))
+      (TextElement))
     (Import
-      (TextElement)
-      (Empty)
-      (ImportSymbol
-        (Identifier)
-        (Empty))))
+      (TextElement)))
   (
     (Import
-      (TextElement)
-      (Empty)
-      (ImportSymbol
-        (Identifier)
-        (Empty)))
-    (Import
-      (TextElement)
-      (Empty)
-      (ImportSymbol
-        (Identifier)
-        (Identifier))))
-  (
-    (Import
-      (TextElement)
-      (Empty)
-      (Identifier))
-    (Import
-      (TextElement)
-      (Empty)
-      (ImportSymbol
-        (Identifier)
-        (Empty)))
-    (Import
-      (TextElement)
-      (Empty)
-      (ImportSymbol
-        (Identifier)
-        (Identifier))))
-  (
-    (Import
-      (TextElement)
-      (Empty)
-      (Identifier))
-    (Import
+      (TextElement))
+    (QualifiedImport
       (TextElement)
       (Identifier)))
   (Import
-    (TextElement)
-    (Empty))
-  (Import
+    (TextElement))
+  (QualifiedImport
     (TextElement)
     (Identifier)))

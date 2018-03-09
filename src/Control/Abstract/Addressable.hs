@@ -37,20 +37,20 @@ lookupOrAlloc :: ( FreeVariables t
                  -> m (Name, Address (LocationFor a) a)
 lookupOrAlloc term = let [name] = toList (freeVariables term) in
                          lookupOrAlloc' name
-  where
-    -- | Look up or allocate an address for a 'Name' & assign it a given value, returning the 'Name' paired with the address.
-    lookupOrAlloc' :: ( Semigroup (Cell (LocationFor a) a)
-                      , MonadAddressable (LocationFor a) a m
-                      , MonadEvaluator t a m
-                      )
-                      => Name
-                      -> a
-                      -> Environment (LocationFor a) a
-                      -> m (Name, Address (LocationFor a) a)
-    lookupOrAlloc' name v env = do
-      a <- maybe (alloc name) pure (envLookup name env)
-      assign a v
-      pure (name, a)
+
+-- | Look up or allocate an address for a 'Name' & assign it a given value, returning the 'Name' paired with the address.
+lookupOrAlloc' :: ( Semigroup (Cell (LocationFor a) a)
+                  , MonadAddressable (LocationFor a) a m
+                  , MonadEvaluator t a m
+                  )
+                  => Name
+                  -> a
+                  -> Environment (LocationFor a) a
+                  -> m (Name, Address (LocationFor a) a)
+lookupOrAlloc' name v env = do
+  a <- maybe (alloc name) pure (envLookup name env)
+  assign a v
+  pure (name, a)
 
 -- | Write a value to the given 'Address' in the 'Store'.
 assign :: ( Ord (LocationFor a)

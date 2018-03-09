@@ -17,13 +17,13 @@ import Prologue
 
 -- | The effects necessary for dead code analysis.
 type DeadCodeEffects t v
-  = '[ State (Dead t)                  -- The set of dead terms
-     , Fail                            -- Failure with an error message
-     , State (Store (LocationFor v) v) -- The heap
-     , State (EnvironmentFor v)        -- Global (imperative) environment
-     , Reader (EnvironmentFor v)       -- Local environment (e.g. binding over a closure)
-     , Reader (ModuleTable t)          -- Cache of unevaluated modules
-     , State (ModuleTable v)           -- Cache of evaluated modules
+  = '[ State (Dead t)                         -- The set of dead terms
+     , Fail                                   -- Failure with an error message
+     , State (Store (LocationFor v) v)        -- The heap
+     , State (EnvironmentFor v)               -- Global (imperative) environment
+     , Reader (EnvironmentFor v)              -- Local environment (e.g. binding over a closure)
+     , Reader (ModuleTable t)                 -- Cache of unevaluated modules
+     , State (ModuleTable (EnvironmentFor v)) -- Cache of evaluated modules
      ]
 
 
@@ -79,6 +79,6 @@ instance ( Corecursive t
          , Semigroup (Cell (LocationFor v) v)
          )
          => MonadAnalysis t v (DeadCodeAnalysis t v) where
-  evaluateTerm = foldSubterms (\ term -> do
+  analyzeTerm term = do
     revive (embedSubterm term)
-    eval term)
+    eval term

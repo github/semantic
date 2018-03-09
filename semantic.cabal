@@ -163,6 +163,7 @@ library
                      , pointed
                      , recursion-schemes
                      , semigroups
+                     , scientific
                      , split
                      , stm-chans
                      , template-haskell

@@ -35,7 +35,7 @@ type CachingEffects t v
      , Reader (Cache (LocationFor v) t v)     -- For 'MonadCacheIn'.
      , State (Cache (LocationFor v) t v)      -- For 'MonadCacheOut'.
      , Reader (ModuleTable t)                 -- Cache of unevaluated modules
-     , State (ModuleTable v)                       -- Cache of evaluated modules
+     , State (ModuleTable (EnvironmentFor v)) -- Cache of evaluated modules
      ]
 
 newtype CachingAnalysis term value a = CachingAnalysis { runCachingAnalysis :: Evaluator (CachingEffects term value) term value a }
@@ -80,7 +80,7 @@ instance ( Corecursive t
          , Semigroup (Cell (LocationFor v) v)
          )
          => MonadAnalysis t v (CachingAnalysis t v) where
-  evaluateTerm = foldSubterms $ \e -> do
+  analyzeTerm e = do
     c <- getConfiguration (embedSubterm e)
     -- Convergence here is predicated upon an Eq instance, not α-equivalence
     cache <- converge (\ prevCache -> do

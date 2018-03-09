@@ -21,7 +21,6 @@ import Data.Abstract.FreeVariables as FreeVariables
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Algebra
-import qualified Data.ByteString.Char8 as BC
 import Data.Functor.Classes
 import Data.Proxy
 import Data.Semigroup
@@ -78,32 +77,27 @@ instance Evaluatable [] where
 -- | Require/import another term/file and return an Effect.
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
-require :: ( FreeVariables term
-           , MonadAnalysis term v m
+require :: ( MonadAnalysis term v m
            , MonadEvaluator term v m
+           , MonadValue term v m
            )
-        => term
-        -> m v
-require term = getModuleTable >>= maybe (load term) pure . moduleTableLookup name
-  where name = moduleName term
+        => ModuleName
+        -> m (EnvironmentFor v)
+require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup name
 
 -- | Load another term/file and return an Effect.
 --
 -- Always loads/evaluates.
-load :: ( FreeVariables term
-        , MonadAnalysis term v m
+load :: ( MonadAnalysis term v m
         , MonadEvaluator term v m
+        , MonadValue term v m
         )
-     => term
-     -> m v
-load term = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
-  where name = moduleName term
-        notFound = fail ("cannot find " <> show name)
+     => ModuleName
+     -> m (EnvironmentFor v)
+load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
+  where notFound = fail ("cannot load module: " <> show name)
         evalAndCache e = do
           v <- evaluateTerm e
-          modifyModuleTable (moduleTableInsert name v)
-          pure v
-
--- | Get a module name from a term (expects single free variables).
-moduleName :: FreeVariables term => term -> Prelude.String
-moduleName term = let [n] = toList (freeVariables term) in BC.unpack n
+          env <- environment v
+          modifyModuleTable (moduleTableInsert name env)
+          pure env

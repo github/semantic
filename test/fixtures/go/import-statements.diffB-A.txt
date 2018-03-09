@@ -4,10 +4,10 @@
   (
     (Comment)
     (Comment)
-    (Import
+    (QualifiedImport
     { (TextElement)
     ->(TextElement) }
-      (Empty))
+      (Identifier))
     (Comment))
   (Function
     (Empty)

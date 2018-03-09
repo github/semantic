@@ -8,8 +8,9 @@ import Data.Abstract.FreeVariables
 import Data.Abstract.Live
 import qualified Data.Abstract.Type as Type
 import qualified Data.Set as Set
+import Data.Scientific (Scientific)
 import Prologue
-import Prelude hiding (Integer, String, fail)
+import Prelude hiding (Float, Integer, String, fail)
 import qualified Prelude
 
 type ValueConstructors location
@@ -17,6 +18,7 @@ type ValueConstructors location
     , Interface location
     , Unit
     , Boolean
+    , Float
     , Integer
     , String
     ]
@@ -75,6 +77,14 @@ instance Eq1 String where liftEq = genericLiftEq
 instance Ord1 String where liftCompare = genericLiftCompare
 instance Show1 String where liftShowsPrec = genericLiftShowsPrec
 
+-- | Float values.
+newtype Float term = Float Scientific
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Float where liftEq = genericLiftEq
+instance Ord1 Float where liftCompare = genericLiftCompare
+instance Show1 Float where liftShowsPrec = genericLiftShowsPrec
+
 -- | The environment for an abstract value type.
 type EnvironmentFor v = Environment (LocationFor v) v
 
@@ -86,7 +96,6 @@ type family LocationFor value :: * where
   LocationFor (Value location term) = location
   LocationFor Type.Type = Monovariant
 
-
 -- | Value types, e.g. closures, which can root a set of addresses.
 class ValueRoots l v | v -> l where
   -- | Compute the set of addresses rooted by a given value.
@@ -95,7 +104,6 @@ class ValueRoots l v | v -> l where
 instance (FreeVariables term, Ord location) => ValueRoots location (Value location term) where
   valueRoots v
     | Just (Closure names body env) <- prj v = envRoots env (foldr Set.delete (freeVariables body) names)
-    | Just (Interface _ env) <- prj v        = envAll env
     | otherwise                              = mempty
 
 instance ValueRoots Monovariant Type.Type where

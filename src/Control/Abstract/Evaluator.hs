@@ -21,6 +21,8 @@ import Prelude hiding (fail)
 class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   -- | Retrieve the global environment.
   getGlobalEnv :: m (EnvironmentFor value)
+  -- | Set the global environment
+  putGlobalEnv :: EnvironmentFor value -> m ()
   -- | Update the global environment.
   modifyGlobalEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m ()
 
@@ -35,9 +37,9 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   modifyStore :: (StoreFor value -> StoreFor value) -> m ()
 
   -- | Retrieve the table of evaluated modules.
-  getModuleTable :: m (ModuleTable value)
+  getModuleTable :: m (ModuleTable (EnvironmentFor value))
   -- | Update the table of evaluated modules.
-  modifyModuleTable :: (ModuleTable value -> ModuleTable value) -> m ()
+  modifyModuleTable :: (ModuleTable (EnvironmentFor value) -> ModuleTable (EnvironmentFor value)) -> m ()
 
   -- | Retrieve the table of unevaluated modules.
   askModuleTable :: m (ModuleTable term)
@@ -49,10 +51,11 @@ instance Members '[ Fail
                   , State  (EnvironmentFor value)
                   , State  (StoreFor value)
                   , Reader (ModuleTable term)
-                  , State  (ModuleTable value)
+                  , State  (ModuleTable (EnvironmentFor value))
                   ] effects
          => MonadEvaluator term value (Evaluator effects term value) where
   getGlobalEnv = Evaluator get
+  putGlobalEnv = Evaluator . put
   modifyGlobalEnv f = Evaluator (modify f)
 
   askLocalEnv = Evaluator ask
