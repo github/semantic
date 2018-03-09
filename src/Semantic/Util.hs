@@ -44,6 +44,7 @@ evaluateRubyFiles paths = do
   pure $ evaluates @RubyValue rest first
 
 -- Python
+-- TODO: Can we phrase this type as something like (CachingAnalysis Evaluating Python.Term Type '[]) ?
 typecheckPythonFile path = run @(CachingAnalysis (Evaluating Python.Term Type (CachingEffects Python.Term Type '[]))) . evaluateModule . snd <$> parseFile pythonParser path
 
 tracePythonFile path = run @(TracingAnalysis [] (Evaluating Python.Term PythonValue '[Tracer [] Python.Term PythonValue])) . evaluateModule . snd <$> parseFile pythonParser path
