@@ -32,8 +32,7 @@ class MonadEvaluator term value m => MonadCaching term value m where
   withOracle :: CacheFor term value -> m a -> m a
 
   lookupCache :: ConfigurationFor term value -> m (Maybe (Set (value, StoreFor value)))
-  setCache :: ConfigurationFor term value -> Set (value, StoreFor value) -> m ()
-  cache :: ConfigurationFor term value -> value -> m ()
+  caching :: ConfigurationFor term value -> Set (value, StoreFor value) -> m value -> m value
 
   isolateCache :: m a -> m (CacheFor term value)
 
@@ -50,8 +49,11 @@ instance ( Effectful (m term value)
   withOracle cache = raise . local (const cache) . lower
 
   lookupCache configuration = raise (cacheLookup configuration <$> get)
-  setCache configuration = raise . modify . cacheSet configuration
-  cache configuration value = getStore >>= raise . modify . cacheInsert configuration . (,) value
+  caching configuration values action = do
+    raise (modify (cacheSet configuration values))
+    result <- (,) <$> action <*> getStore
+    raise (modify (cacheInsert configuration result))
+    pure (fst result)
 
   isolateCache action = raise (put (mempty :: CacheFor term value)) *> action *> raise get
 
@@ -76,10 +78,7 @@ instance ( Corecursive term
       Just pairs -> scatter pairs
       Nothing -> do
         pairs <- consultOracle c
-        setCache c pairs
-        v <- liftAnalyze analyzeTerm e
-        cache c v
-        pure v
+        caching c pairs (liftAnalyze analyzeTerm e)
 
   evaluateModule e = do
     c <- getConfiguration e
