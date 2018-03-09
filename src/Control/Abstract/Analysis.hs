@@ -22,7 +22,7 @@ import Prologue
 -- | A 'Monad' in which one can evaluate some specific term type to some specific value type.
 --
 --   This typeclass is left intentionally unconstrained to avoid circular dependencies between it and other typeclasses.
-class (MonadEvaluator term value m, Recursive term) => MonadAnalysis term value m | m -> term, m -> value where
+class (MonadEvaluator term value m, Recursive term) => MonadAnalysis term value m where
   type family RequiredEffects term value m :: [* -> *]
   -- | Analyze a term using the semantics of the current analysis. This should generally only be called by definitions of 'evaluateTerm' and 'analyzeTerm' in this or other instances.
   analyzeTerm :: SubtermAlgebra (Base term) term (m value)
