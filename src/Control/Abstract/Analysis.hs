@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE DataKinds, KindSignatures, TypeFamilies #-}
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , evaluateTerm
@@ -21,6 +21,8 @@ import Prologue
 --
 --   This typeclass is left intentionally unconstrained to avoid circular dependencies between it and other typeclasses.
 class (MonadEvaluator m, Recursive (TermFor m)) => MonadAnalysis m where
+  type EffectsRequiredFor m :: [* -> *]
+
   -- | Analyze a term using the semantics of the current analysis. This should generally only be called by definitions of 'evaluateTerm' and 'analyzeTerm' in this or other instances.
   analyzeTerm :: SubtermAlgebra (Base (TermFor m)) (TermFor m) (m (ValueFor m))
 

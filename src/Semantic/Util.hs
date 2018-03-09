@@ -45,11 +45,13 @@ evaluateRubyFiles paths = do
 
 -- Python
 -- TODO: Can we phrase this type as something like (CachingAnalysis Evaluating Python.Term Type '[]) ?
-typecheckPythonFile path = run @(CachingAnalysis (Evaluating Python.Term Type (CachingEffects Python.Term Type '[]))) . evaluateModule . snd <$> parseFile pythonParser path
+typecheckPythonFile :: FilePath
+                       -> IO (Final (EffectsRequiredFor (CachingAnalysis (Evaluating Python.Term Type (CachingEffects Python.Term Type '[])))) Type)
+typecheckPythonFile path = run @(CachingAnalysis (Evaluating Python.Term Type (CachingEffects Python.Term Type (EvaluatingEffects Python.Term Type '[])))) . evaluateModule . snd <$> parseFile pythonParser path
 
-tracePythonFile path = run @(TracingAnalysis [] (Evaluating Python.Term PythonValue '[Tracer [] Python.Term PythonValue])) . evaluateModule . snd <$> parseFile pythonParser path
+tracePythonFile path = run @(TracingAnalysis [] (Evaluating Python.Term PythonValue (Tracer [] Python.Term PythonValue ': (EvaluatingEffects Python.Term PythonValue '[])))) . evaluateModule . snd <$> parseFile pythonParser path
 
-type PythonTracer = TracingAnalysis [] (Evaluating Python.Term PythonValue '[DeadCode Python.Term, Tracer [] Python.Term PythonValue])
+type PythonTracer = TracingAnalysis [] (Evaluating Python.Term PythonValue (DeadCode Python.Term ': Tracer [] Python.Term PythonValue ': (EvaluatingEffects Python.Term PythonValue '[])))
 
 evaluateDeadTracePythonFile path = run @(DeadCodeAnalysis PythonTracer) . evaluateModule . snd <$> parseFile pythonParser path
 

@@ -30,6 +30,7 @@ instance ( Corecursive (TermFor m)
          , Reducer (ConfigurationFor (TermFor m) (ValueFor m)) (TraceFor trace m)
          )
          => MonadAnalysis (TracingAnalysis trace m) where
+  type EffectsRequiredFor (TracingAnalysis trace m) = TracerFor trace m ': EffectsRequiredFor m
   analyzeTerm term = do
     config <- getConfiguration (embedSubterm term)
     trace (Reducer.unit config)

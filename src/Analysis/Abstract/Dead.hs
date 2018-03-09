@@ -45,6 +45,7 @@ instance ( Corecursive (TermFor m)
          , Recursive (TermFor m)
          )
          => MonadAnalysis (DeadCodeAnalysis m) where
+  type EffectsRequiredFor (DeadCodeAnalysis m) = DeadCode (TermFor m) ': EffectsRequiredFor m
   analyzeTerm term = do
     revive (embedSubterm term)
     liftAnalyze analyzeTerm term
