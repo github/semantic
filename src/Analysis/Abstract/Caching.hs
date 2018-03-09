@@ -29,7 +29,7 @@ deriving instance MonadEvaluator term value (m term value effects) => MonadEvalu
 
 class MonadEvaluator term value m => MonadCaching term value m where
   consultOracle :: ConfigurationFor term value -> m (Set (value, StoreFor value))
-  localCache :: (CacheFor term value -> CacheFor term value) -> m a -> m a
+  withOracle :: CacheFor term value -> m a -> m a
 
   getCache :: m (CacheFor term value)
   putCache :: CacheFor term value -> m ()
@@ -50,7 +50,7 @@ instance ( Effectful (m term value)
          )
          => MonadCaching term value (Caching m term value effects) where
   consultOracle configuration = raise (fromMaybe mempty . cacheLookup configuration <$> ask)
-  localCache f a = raise (local f (lower a))
+  withOracle cache = raise . local (const cache) . lower
 
   getCache = raise get
   putCache = raise . put
@@ -95,7 +95,7 @@ instance ( Corecursive term
       -- that it doesn't "leak" to the calling context and diverge (otherwise this
       -- would never complete). We don’t need to use the values, so we 'gather' the
       -- nondeterministic values into @()@.
-      _ <- localCache (const prevCache) (gather (liftEvaluate evaluateModule e) :: Caching m term value effects ())
+      _ <- withOracle prevCache (gather (liftEvaluate evaluateModule e) :: Caching m term value effects ())
       getCache) mempty
     maybe empty scatter (cacheLookup c cache)
 
