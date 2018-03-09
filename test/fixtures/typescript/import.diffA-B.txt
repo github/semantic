@@ -1,52 +1,11 @@
 (Program
-{+(Import
-  {+(TextElement)+})+}
-{+(QualifiedImport
-  {+(TextElement)+}
-  {+(Identifier)+})+}
-{+(Import
-  {+(TextElement)+})+}
-{+(Import
-  {+(TextElement)+})+}
-{ (Import
-  {-(TextElement)-})
-->(Import
-  {+(TextElement)+}) }
-{+(
-  {+(Import
-    {+(TextElement)+})+}
-  {+(Import
-    {+(TextElement)+})+})+}
-{+(
-  {+(Import
-    {+(TextElement)+})+}
-  {+(QualifiedImport
-    {+(TextElement)+}
-    {+(Identifier)+})+})+}
-{+(Import
-  {+(TextElement)+})+}
-{-(QualifiedImport
-  {-(TextElement)-}
-  {-(Identifier)-})-}
-{-(Import
-  {-(TextElement)-})-}
-{-(Import
-  {-(TextElement)-})-}
-{-(Import
-  {-(TextElement)-})-}
-{-(
-  {-(Import
-    {-(TextElement)-})-}
-  {-(Import
-    {-(TextElement)-})-})-}
-{-(
-  {-(Import
-    {-(TextElement)-})-}
-  {-(QualifiedImport
-    {-(TextElement)-}
-    {-(Identifier)-})-})-}
-{-(Import
-  {-(TextElement)-})-}
-{-(QualifiedImport
-  {-(TextElement)-}
-  {-(Identifier)-})-})
+  (Import {(Identifier)->(Identifier)})
+  (QualifiedImport {(Identifier)->(Identifier)}{(Identifier)->(Identifier)})
+  {(Import {-(Identifier)-})->(Import {+(Identifier)+})}
+  {(Import {-(Identifier)-})->(Import {+(Identifier)+})}
+  {(Import {-(Identifier)-})->(Import {+(Identifier)+})}
+  ((Import {(Identifier)->(Identifier)}){(Import {-(Identifier)-})->(Import {+(Identifier)+})})
+  ((Import {(Identifier)->(Identifier)})(QualifiedImport {(Identifier)->(Identifier)} {(Identifier)->(Identifier)}))
+  {+(Import {+(TextElement)+})+}
+  {-(Import {-(TextElement)-})-}
+  {-(QualifiedImport {-(TextElement)-} {-(Identifier)-})-})
