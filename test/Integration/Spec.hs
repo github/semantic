@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, OverloadedStrings #-}
-module Integration.Spec where
+module Integration.Spec (spec) where
 
 import qualified Data.ByteString as B
 import Data.Foldable (find, traverse_)
