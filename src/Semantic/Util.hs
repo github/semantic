@@ -48,7 +48,6 @@ runAnalysis :: (Effectful (m term value), RunEffects (RequiredEffects term value
 runAnalysis = Effect.run . runEffects . lower
 
 -- Python
--- TODO: Can we phrase this type as something like (CachingAnalysis Evaluating Python.Term Type '[]) ?
 typecheckPythonFile path = runAnalysis @(CachingAnalysis Evaluating) @Python.Term @Type . evaluateModule . snd <$> parseFile pythonParser path
 
 tracePythonFile path = runAnalysis @(TracingAnalysis [] Evaluating) @Python.Term @PythonValue . evaluateModule . snd <$> parseFile pythonParser path
