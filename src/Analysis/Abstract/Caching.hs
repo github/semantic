@@ -30,28 +30,25 @@ deriving instance MonadEvaluator term value (m term value effects) => MonadEvalu
 
 -- TODO: reabstract these later on
 
-type InCacheEffectFor  term value = Reader (CacheFor term value)
-type OutCacheEffectFor term value = State  (CacheFor term value)
-
-askCache :: (Effectful (m term value), Member (InCacheEffectFor term value) effects) => CachingAnalysis m term value effects (CacheFor term value)
+askCache :: (Effectful (m term value), Member (Reader (CacheFor term value)) effects) => CachingAnalysis m term value effects (CacheFor term value)
 askCache = lift ask
 
-localCache :: (Effectful (m term value), Member (InCacheEffectFor term value) effects) => (CacheFor term value -> CacheFor term value) -> CachingAnalysis m term value effects a -> CachingAnalysis m term value effects a
+localCache :: (Effectful (m term value), Member (Reader (CacheFor term value)) effects) => (CacheFor term value -> CacheFor term value) -> CachingAnalysis m term value effects a -> CachingAnalysis m term value effects a
 localCache f a = lift (local f (lower a))
 
-asksCache :: (Functor (m term value effects), Effectful (m term value), Member (InCacheEffectFor term value) effects) => (CacheFor term value -> a) -> CachingAnalysis m term value effects a
+asksCache :: (Functor (m term value effects), Effectful (m term value), Member (Reader (CacheFor term value)) effects) => (CacheFor term value -> a) -> CachingAnalysis m term value effects a
 asksCache f = f <$> askCache
 
-getsCache :: (Functor (m term value effects), Effectful (m term value), Member (OutCacheEffectFor term value) effects) => (CacheFor term value -> a) -> CachingAnalysis m term value effects a
+getsCache :: (Functor (m term value effects), Effectful (m term value), Member (State (CacheFor term value)) effects) => (CacheFor term value -> a) -> CachingAnalysis m term value effects a
 getsCache f = f <$> getCache
 
-getCache :: (Effectful (m term value), Member (OutCacheEffectFor term value) effects) => CachingAnalysis m term value effects (CacheFor term value)
+getCache :: (Effectful (m term value), Member (State (CacheFor term value)) effects) => CachingAnalysis m term value effects (CacheFor term value)
 getCache = lift get
 
-putCache :: (Effectful (m term value), Member (OutCacheEffectFor term value) effects) => CacheFor term value -> CachingAnalysis m term value effects ()
+putCache :: (Effectful (m term value), Member (State (CacheFor term value)) effects) => CacheFor term value -> CachingAnalysis m term value effects ()
 putCache = lift . put
 
-modifyCache :: (Effectful (m term value), Member (OutCacheEffectFor term value) effects, Monad (m term value effects)) => (CacheFor term value -> CacheFor term value) -> CachingAnalysis m term value effects ()
+modifyCache :: (Effectful (m term value), Member (State (CacheFor term value)) effects, Monad (m term value effects)) => (CacheFor term value -> CacheFor term value) -> CachingAnalysis m term value effects ()
 modifyCache f = fmap f getCache >>= putCache
 
 -- | This instance coinductively iterates the analysis of a term until the results converge.
