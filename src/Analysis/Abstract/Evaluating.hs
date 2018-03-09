@@ -1,5 +1,9 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Analysis.Abstract.Evaluating where
+module Analysis.Abstract.Evaluating
+( type Evaluating
+, evaluate
+, evaluates
+) where
 
 import Control.Abstract.Evaluator
 import Control.Monad.Effect hiding (run)
@@ -54,7 +58,7 @@ withModules Blob{..} pairs = localModuleTable (const moduleTable)
     toName str = qualifiedName (fmap BC.pack (splitWhen (== pathSeparator) str))
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
-newtype Evaluating term value effects a = Evaluating { runEvaluating :: Eff effects a }
+newtype Evaluating term value effects a = Evaluating (Eff effects a)
   deriving (Applicative, Functor, Effectful, Monad)
 
 
