@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, StandaloneDeriving, TypeFamilies, TypeOperators #-}
 module Analysis.Abstract.Dead
-( type DeadCodeAnalysis
+( type DeadCode
 ) where
 
 import Control.Abstract.Analysis
@@ -9,10 +9,10 @@ import Data.Set (delete)
 import Prologue
 
 -- | An analysis tracking dead (unreachable) code.
-newtype DeadCodeAnalysis m term value (effects :: [* -> *]) a = DeadCodeAnalysis (m term value effects a)
+newtype DeadCode m term value (effects :: [* -> *]) a = DeadCode (m term value effects a)
   deriving (Applicative, Functor, Effectful, Monad, MonadFail)
 
-deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (DeadCodeAnalysis m term value effects)
+deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (DeadCode m term value effects)
 
 -- | A set of “dead” (unreachable) terms.
 newtype Dead term = Dead { unDead :: Set term }
@@ -21,11 +21,11 @@ newtype Dead term = Dead { unDead :: Set term }
 deriving instance Ord term => Reducer term (Dead term)
 
 -- | Update the current 'Dead' set.
-killAll :: (Effectful (m term value), Member (State (Dead term)) effects) => Dead term -> DeadCodeAnalysis m term value effects ()
+killAll :: (Effectful (m term value), Member (State (Dead term)) effects) => Dead term -> DeadCode m term value effects ()
 killAll = lift . put
 
 -- | Revive a single term, removing it from the current 'Dead' set.
-revive :: (Effectful (m term value), Member (State (Dead term)) effects) => Ord term => term -> DeadCodeAnalysis m term value effects ()
+revive :: (Effectful (m term value), Member (State (Dead term)) effects) => Ord term => term -> DeadCode m term value effects ()
 revive t = lift (modify (Dead . delete t . unDead))
 
 -- | Compute the set of all subterms recursively.
@@ -40,8 +40,8 @@ instance ( Corecursive term
          , MonadAnalysis term value (m term value effects)
          , Ord term
          )
-         => MonadAnalysis term value (DeadCodeAnalysis m term value effects) where
-  type RequiredEffects term value (DeadCodeAnalysis m term value effects) = State (Dead term) ': RequiredEffects term value (m term value effects)
+         => MonadAnalysis term value (DeadCode m term value effects) where
+  type RequiredEffects term value (DeadCode m term value effects) = State (Dead term) ': RequiredEffects term value (m term value effects)
   analyzeTerm term = do
     revive (embedSubterm term)
     liftAnalyze analyzeTerm term
