@@ -4,7 +4,6 @@ module Analysis.Abstract.Caching where
 import Control.Abstract.Analysis
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDet
-import Data.Abstract.Address
 import Data.Abstract.Cache
 import Data.Abstract.Configuration
 import Data.Abstract.Store
@@ -58,7 +57,6 @@ instance ( Effectful (m term value)
 -- | This instance coinductively iterates the analysis of a term until the results converge.
 instance ( Corecursive term
          , Effectful (m term value)
-         , Foldable (Cell (LocationFor value))
          , MonadAnalysis term value (m term value effects)
          , MonadFresh (m term value effects)
          , MonadNonDet (m term value effects)
@@ -109,7 +107,6 @@ scatter = getAlt . foldMap (\ (value, store') -> Alt (putStore store' *> pure va
 -- | Evaluation of a single iteration of an analysis, given an in-cache as an oracle for results and an out-cache to record computed results in.
 memoizeEval :: ( Alternative (m term value effects)
                , Corecursive term
-               , Foldable (Cell (LocationFor value))
                , Functor (Base term)
                , Effectful (m term value)
                , Members (CachingEffects term value '[]) effects
