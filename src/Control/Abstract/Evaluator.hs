@@ -30,9 +30,7 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   -- | Retrieve the heap.
   getStore :: m (StoreFor value)
   -- | Update the heap.
-  modifyStore :: (StoreFor value -> StoreFor value) -> m ()
   putStore :: StoreFor value -> m ()
-  putStore = modifyStore . const
 
   -- | Retrieve the table of evaluated modules.
   getModuleTable :: m (ModuleTable (EnvironmentFor value))
@@ -51,3 +49,6 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   -- | Get the current 'Configuration' with a passed-in term.
   getConfiguration :: Ord (LocationFor value) => term -> m (Configuration (LocationFor value) term value)
   getConfiguration term = Configuration term <$> askRoots <*> askLocalEnv <*> getStore
+
+modifyStore :: MonadEvaluator term value m => (StoreFor value -> StoreFor value) -> m ()
+modifyStore f = getStore >>= putStore . f

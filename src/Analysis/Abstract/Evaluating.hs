@@ -86,7 +86,7 @@ instance Members (EvaluatingEffects term value) effects => MonadEvaluator term v
   localEnv f a = raise (local f (lower a))
 
   getStore = raise get
-  modifyStore f = raise (modify f)
+  putStore = raise . put
 
   getModuleTable = raise get
   modifyModuleTable f = raise (modify f)
