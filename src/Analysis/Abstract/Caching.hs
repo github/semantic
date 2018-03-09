@@ -94,7 +94,7 @@ instance ( Corecursive term
       -- that it doesn't "leak" to the calling context and diverge (otherwise this
       -- would never complete). We don’t need to use the values, so we 'gather' the
       -- nondeterministic values into @()@.
-      _ <- localCache (const prevCache) (gather (evaluateModule e) :: Caching m term value effects ())
+      _ <- localCache (const prevCache) (gather (liftEvaluate evaluateModule e) :: Caching m term value effects ())
       getCache) mempty
     maybe empty scatter (cacheLookup c cache)
 
