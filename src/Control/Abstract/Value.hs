@@ -4,7 +4,6 @@ module Control.Abstract.Value where
 import Control.Abstract.Addressable
 import Control.Abstract.Analysis
 import Control.Monad.Effect.Fresh
-import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Value as Value
@@ -47,11 +46,8 @@ class MonadAnalysis term value m => MonadValue term value m where
   environment :: value -> m (EnvironmentFor value)
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( FreeVariables term
-         , MonadAddressable location (Value location term) m
+instance ( MonadAddressable location (Value location term) m
          , MonadAnalysis term (Value location term) m
-         , Recursive term
-         , Semigroup (Cell location (Value location term))
          )
          => MonadValue term (Value location term) m where
 
