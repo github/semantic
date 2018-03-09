@@ -9,7 +9,7 @@ import Data.Abstract.Cache
 import Data.Abstract.Configuration
 import Data.Abstract.Store
 import Data.Abstract.Value
-import Data.Monoid (Alt(..))
+import Data.Monoid (Alt (..))
 import Prologue
 
 -- | The effects necessary for caching analyses.

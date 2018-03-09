@@ -12,8 +12,8 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Blob
-import Data.List.Split (splitWhen)
 import qualified Data.ByteString.Char8 as BC
+import Data.List.Split (splitWhen)
 import qualified Data.Map as Map
 import Prelude hiding (fail)
 import Prologue

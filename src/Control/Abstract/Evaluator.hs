@@ -2,8 +2,8 @@
 module Control.Abstract.Evaluator where
 
 import Data.Abstract.Configuration
-import Data.Abstract.ModuleTable
 import Data.Abstract.Live
+import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Prelude hiding (fail)
 import Prologue

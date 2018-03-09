@@ -6,11 +6,11 @@ import Control.Abstract.Analysis
 import Control.Monad.Effect.Fresh
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
-import Data.Abstract.Value as Value
 import Data.Abstract.Type as Type
+import Data.Abstract.Value as Value
 import Data.Scientific (Scientific)
-import Prologue
 import Prelude hiding (fail)
+import Prologue
 
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
