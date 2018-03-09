@@ -8,8 +8,6 @@ import Data.Abstract.Value
 import Data.Semigroup.Reducer as Reducer
 import Prologue
 
-type Trace trace term value = trace (ConfigurationFor term value)
-
 -- | Trace analysis.
 --
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
@@ -21,21 +19,21 @@ deriving instance MonadEvaluator term value (m term value effects) => MonadEvalu
 
 instance ( Corecursive term
          , Effectful (m term value)
-         , Member (Writer (Trace trace term value)) effects
+         , Member (Writer (trace (ConfigurationFor term value))) effects
          , MonadAnalysis term value (m term value effects)
          , Ord (LocationFor value)
-         , Reducer (ConfigurationFor term value) (Trace trace term value)
+         , Reducer (ConfigurationFor term value) (trace (ConfigurationFor term value))
          )
          => MonadAnalysis term value (TracingAnalysis trace m term value effects) where
-  type RequiredEffects term value (TracingAnalysis trace m term value effects) = Writer (Trace trace term value) ': RequiredEffects term value (m term value effects)
+  type RequiredEffects term value (TracingAnalysis trace m term value effects) = Writer (trace (ConfigurationFor term value)) ': RequiredEffects term value (m term value effects)
   analyzeTerm term = do
     config <- getConfiguration (embedSubterm term)
     trace (Reducer.unit config)
     liftAnalyze analyzeTerm term
 
 trace :: ( Effectful (m term value)
-         , Member (Writer (Trace trace term value)) effects
+         , Member (Writer (trace (ConfigurationFor term value))) effects
          )
-      => Trace trace term value
+      => trace (ConfigurationFor term value)
       -> TracingAnalysis trace m term value effects ()
 trace = lift . tell
