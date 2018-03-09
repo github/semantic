@@ -30,7 +30,7 @@ class Evaluatable constr where
   eval :: ( FreeVariables term
           , MonadAddressable (LocationFor value) term value effects m
           , MonadAnalysis term value effects m
-          , MonadValue term value effects m
+          , MonadValue term value (m term value effects)
           )
        => SubtermAlgebra constr term (m term value effects value)
   default eval :: (MonadAnalysis term value effects m, Show1 constr) => SubtermAlgebra constr term (m term value effects value)
@@ -71,7 +71,7 @@ instance Evaluatable [] where
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
 require :: ( MonadAnalysis term value effects m
-           , MonadValue term value effects m
+           , MonadValue term value (m term value effects)
            )
         => ModuleName
         -> m term value effects (EnvironmentFor value)
@@ -81,7 +81,7 @@ require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup nam
 --
 -- Always loads/evaluates.
 load :: ( MonadAnalysis term value effects m
-        , MonadValue term value effects m
+        , MonadValue term value (m term value effects)
         )
      => ModuleName
      -> m term value effects (EnvironmentFor value)

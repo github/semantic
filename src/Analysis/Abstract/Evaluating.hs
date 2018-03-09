@@ -24,7 +24,7 @@ evaluate :: forall value term
          .  ( Evaluatable (Base term)
             , FreeVariables term
             , MonadAddressable (LocationFor value) term value (EvaluatingEffects term value) Evaluating
-            , MonadValue term value (EvaluatingEffects term value) Evaluating
+            , MonadValue term value (Evaluating term value (EvaluatingEffects term value))
             , Recursive term
             )
          => term
@@ -36,7 +36,7 @@ evaluates :: forall value term
           .  ( Evaluatable (Base term)
              , FreeVariables term
              , MonadAddressable (LocationFor value) term value (EvaluatingEffects term value) Evaluating
-             , MonadValue term value (EvaluatingEffects term value) Evaluating
+             , MonadValue term value (Evaluating term value (EvaluatingEffects term value))
              , Recursive term
              )
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
@@ -94,7 +94,7 @@ instance ( Evaluatable (Base term)
          , FreeVariables term
          , Members (EvaluatingEffects term value) effects
          , MonadAddressable (LocationFor value) term value effects Evaluating
-         , MonadValue term value effects Evaluating
+         , MonadValue term value (Evaluating term value effects)
          , Recursive term
          )
          => MonadAnalysis term value effects Evaluating where
