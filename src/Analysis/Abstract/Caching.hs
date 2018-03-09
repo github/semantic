@@ -28,14 +28,11 @@ newtype Caching m term value (effects :: [* -> *]) a = Caching (m term value eff
 deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (Caching m term value effects)
 
 class MonadEvaluator term value m => MonadCaching term value m where
-  askCache :: m (CacheFor term value)
+  consultOracle :: ConfigurationFor term value -> m (Set (value, StoreFor value))
   localCache :: (CacheFor term value -> CacheFor term value) -> m a -> m a
 
   getCache :: m (CacheFor term value)
   putCache :: CacheFor term value -> m ()
-
-asksCache :: MonadCaching term value m => (CacheFor term value -> a) -> m a
-asksCache f = f <$> askCache
 
 getsCache :: MonadCaching term value m => (CacheFor term value -> a) -> m a
 getsCache f = f <$> getCache
@@ -46,9 +43,13 @@ modifyCache f = fmap f getCache >>= putCache
 instance ( Effectful (m term value)
          , Members (CachingEffects term value '[]) effects
          , MonadEvaluator term value (m term value effects)
+         , Ord (CellFor value)
+         , Ord (LocationFor value)
+         , Ord term
+         , Ord value
          )
          => MonadCaching term value (Caching m term value effects) where
-  askCache = raise ask
+  consultOracle configuration = raise (fromMaybe mempty . cacheLookup configuration <$> ask)
   localCache f a = raise (local f (lower a))
 
   getCache = raise get
@@ -74,7 +75,7 @@ instance ( Corecursive term
     case cached of
       Just pairs -> scatter pairs
       Nothing -> do
-        pairs <- asksCache (fromMaybe mempty . cacheLookup c)
+        pairs <- consultOracle c
         modifyCache (cacheSet c pairs)
         v <- liftAnalyze analyzeTerm e
         store' <- getStore
