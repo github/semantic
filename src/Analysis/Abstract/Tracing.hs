@@ -9,7 +9,6 @@ import Data.Semigroup.Reducer as Reducer
 import Prologue
 
 type Trace trace term value = trace (ConfigurationFor term value)
-type Tracer trace term value = Writer (Trace trace term value)
 
 -- | Trace analysis.
 --
@@ -22,7 +21,7 @@ deriving instance MonadEvaluator term value (m term value effects) => MonadEvalu
 
 instance ( Corecursive term
          , Effectful (m term value)
-         , Member (Tracer trace term value) effects
+         , Member (Writer (Trace trace term value)) effects
          , MonadAnalysis term value (m term value effects)
          , Ord (LocationFor value)
          , Reducer (ConfigurationFor term value) (Trace trace term value)
@@ -35,7 +34,7 @@ instance ( Corecursive term
     liftAnalyze analyzeTerm term
 
 trace :: ( Effectful (m term value)
-         , Member (Tracer trace term value) effects
+         , Member (Writer (Trace trace term value)) effects
          )
       => Trace trace term value
       -> TracingAnalysis trace m term value effects ()
