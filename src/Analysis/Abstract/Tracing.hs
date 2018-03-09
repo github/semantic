@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, KindSignatures, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Tracing where
 
 import Control.Abstract.Analysis
@@ -9,35 +9,36 @@ import Data.Semigroup.Reducer as Reducer
 import Prologue
 
 type Trace trace term value = trace (ConfigurationFor term value)
-type TraceFor trace m = Trace trace (TermFor m) (ValueFor m)
 type Tracer trace term value = Writer (Trace trace term value)
-type TracerFor trace m = Writer (TraceFor trace m)
 
 -- | Trace analysis.
 --
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
-newtype TracingAnalysis (trace :: * -> *) m a
-  = TracingAnalysis { runTracingAnalysis :: m a }
-  deriving (Applicative, Functor, Effectful, Monad, MonadEvaluator, MonadFail)
+newtype TracingAnalysis (trace :: * -> *) m term value (effects :: [* -> *]) a
+  = TracingAnalysis { runTracingAnalysis :: m term value effects a }
+  deriving (Applicative, Functor, Effectful, Monad, MonadFail)
 
-instance ( Corecursive (TermFor m)
-         , Effectful m
-         , Member (TracerFor trace m) (EffectsFor m)
-         , MonadAnalysis m
-         , MonadEvaluator m
-         , Ord (LocationFor (ValueFor m))
-         , Recursive (TermFor m)
-         , Reducer (ConfigurationFor (TermFor m) (ValueFor m)) (TraceFor trace m)
+deriving instance MonadEvaluator term value effects m => MonadEvaluator term value effects (TracingAnalysis trace m)
+
+instance ( Corecursive term
+         , Effectful (m term value)
+         , Member (Tracer trace term value) effects
+         , MonadAnalysis term value effects m
+         , MonadEvaluator term value effects m
+         , Ord (LocationFor value)
+         , Recursive term
+         , Reducer (ConfigurationFor term value) (Trace trace term value)
          )
-         => MonadAnalysis (TracingAnalysis trace m) where
+         => MonadAnalysis term value effects (TracingAnalysis trace m) where
+  type RequiredEffects term value (TracingAnalysis trace m) = Writer (Trace trace term value) ': RequiredEffects term value m
   analyzeTerm term = do
     config <- getConfiguration (embedSubterm term)
     trace (Reducer.unit config)
     liftAnalyze analyzeTerm term
 
-trace :: ( Effectful m
-         , Member (TracerFor trace m) (EffectsFor m)
+trace :: ( Effectful (m term value)
+         , Member (Tracer trace term value) effects
          )
-      => TraceFor trace m
-      -> TracingAnalysis trace m ()
+      => Trace trace term value
+      -> TracingAnalysis trace m term value effects ()
 trace = lift . tell

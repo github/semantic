@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Dead where
 
 import Control.Abstract.Evaluator
@@ -12,9 +12,10 @@ type DeadCode term = State (Dead term)
 
 
 -- | An analysis tracking dead (unreachable) code.
-newtype DeadCodeAnalysis m a = DeadCodeAnalysis { runDeadCodeAnalysis :: m a }
-  deriving (Applicative, Functor, Effectful, Monad, MonadEvaluator, MonadFail)
+newtype DeadCodeAnalysis m term value (effects :: [* -> *]) a = DeadCodeAnalysis { runDeadCodeAnalysis :: m term value effects a }
+  deriving (Applicative, Functor, Effectful, Monad, MonadFail)
 
+deriving instance MonadEvaluator term value effects m => MonadEvaluator term value effects (DeadCodeAnalysis m)
 
 -- | A set of “dead” (unreachable) terms.
 newtype Dead term = Dead { unDead :: Set term }
@@ -23,11 +24,11 @@ newtype Dead term = Dead { unDead :: Set term }
 deriving instance Ord term => Reducer term (Dead term)
 
 -- | Update the current 'Dead' set.
-killAll :: (Effectful m, Member (State (Dead (TermFor m))) (EffectsFor m)) => Dead (TermFor m) -> DeadCodeAnalysis m ()
+killAll :: (Effectful (m term value), Member (State (Dead term)) effects) => Dead term -> DeadCodeAnalysis m term value effects ()
 killAll = lift . put
 
 -- | Revive a single term, removing it from the current 'Dead' set.
-revive :: (Effectful m, Member (State (Dead (TermFor m))) (EffectsFor m)) => Ord (TermFor m) => (TermFor m) -> DeadCodeAnalysis m ()
+revive :: (Effectful (m term value), Member (State (Dead term)) effects) => Ord term => term -> DeadCodeAnalysis m term value effects ()
 revive t = lift (modify (Dead . delete t . unDead))
 
 -- | Compute the set of all subterms recursively.
@@ -35,16 +36,17 @@ subterms :: (Ord term, Recursive term, Foldable (Base term)) => term -> Dead ter
 subterms term = term `cons` para (foldMap (uncurry cons)) term
 
 
-instance ( Corecursive (TermFor m)
-         , Effectful m
-         , Foldable (Base (TermFor m))
-         , Member (State (Dead (TermFor m))) (EffectsFor m)
-         , MonadAnalysis m
-         , MonadEvaluator m
-         , Ord (TermFor m)
-         , Recursive (TermFor m)
+instance ( Corecursive term
+         , Effectful (m term value)
+         , Foldable (Base term)
+         , Member (State (Dead term)) effects
+         , MonadAnalysis term value effects m
+         , MonadEvaluator term value effects m
+         , Ord term
+         , Recursive term
          )
-         => MonadAnalysis (DeadCodeAnalysis m) where
+         => MonadAnalysis term value effects (DeadCodeAnalysis m) where
+  type RequiredEffects term value (DeadCodeAnalysis m) = State (Dead term) ': RequiredEffects term value m
   analyzeTerm term = do
     revive (embedSubterm term)
     liftAnalyze analyzeTerm term

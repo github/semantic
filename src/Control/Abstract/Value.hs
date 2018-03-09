@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, MultiParamTypeClasses, KindSignatures, TypeFamilies, UndecidableInstances #-}
 module Control.Abstract.Value where
 
 import Control.Abstract.Addressable
@@ -16,41 +16,39 @@ import Prelude hiding (fail)
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class (MonadEvaluator m, v ~ ValueFor m) => MonadValue v m where
+class MonadEvaluator term value effects m => MonadValue term value effects m where
   -- | Construct an abstract unit value.
-  unit :: m v
+  unit :: m term value effects value
 
   -- | Construct an abstract integral value.
-  integer :: Prelude.Integer -> m v
+  integer :: Prelude.Integer -> m term value effects value
 
   -- | Construct an abstract boolean value.
-  boolean :: Bool -> m v
+  boolean :: Bool -> m term value effects value
 
   -- | Construct an abstract string value.
-  string :: ByteString -> m v
+  string :: ByteString -> m term value effects value
 
   -- | Construct a floating-point value.
-  float :: Scientific -> m v
+  float :: Scientific -> m term value effects value
 
   -- | Eliminate boolean values. TODO: s/boolean/truthy
-  ifthenelse :: v -> m v -> m v -> m v
+  ifthenelse :: value -> m term value effects value -> m term value effects value -> m term value effects value
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
-  abstract :: [Name] -> Subterm (TermFor m) (m v) -> m v
+  abstract :: [Name] -> Subterm term (m term value effects value) -> m term value effects value
   -- | Evaluate an application (like a function call).
-  apply :: v -> [Subterm (TermFor m) (m v)] -> m v
+  apply :: value -> [Subterm term (m term value effects value)] -> m term value effects value
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( FreeVariables t
-         , MonadAddressable location m
-         , MonadAnalysis m
-         , TermFor m ~ t
-         , ValueFor m ~ Value location t
-         , MonadEvaluator m
-         , Recursive t
-         , Semigroup (Cell location (Value location t))
+instance ( FreeVariables term
+         , MonadAddressable location term (Value location term) effects m
+         , MonadAnalysis term (Value location term) effects m
+         , MonadEvaluator term (Value location term) effects m
+         , Recursive term
+         , Semigroup (Cell location (Value location term))
          )
-         => MonadValue (Value location t) m where
+         => MonadValue term (Value location term) effects m where
 
   unit    = pure $ inj Value.Unit
   integer = pure . inj . Integer
@@ -74,7 +72,7 @@ instance ( FreeVariables t
     localEnv (mappend bindings) (evaluateTerm body)
 
 -- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
-instance (Alternative m, MonadEvaluator m, MonadFresh m, ValueFor m ~ Type) => MonadValue Type m where
+instance (Alternative (m term Type effects), MonadEvaluator term Type effects m, MonadFresh (m term Type effects)) => MonadValue  term Type effects m where
   abstract names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name

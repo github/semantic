@@ -8,6 +8,7 @@ import Analysis.Abstract.Evaluating
 import Analysis.Abstract.Tracing
 import Analysis.Declaration
 import Control.Abstract.Analysis
+import qualified Control.Monad.Effect as Effect
 import Control.Monad.IO.Class
 import Data.Abstract.Address
 import Data.Abstract.Type
@@ -43,15 +44,18 @@ evaluateRubyFiles paths = do
   first:rest <- traverse (parseFile rubyParser) paths
   pure $ evaluates @RubyValue rest first
 
+runAnalysis :: (Effectful (m term value), RunEffects (RequiredEffects term value m) a) => m term value (RequiredEffects term value m) a -> Final (RequiredEffects term value m) a
+runAnalysis = Effect.run . runEffects . lower
+
 -- Python
 -- TODO: Can we phrase this type as something like (CachingAnalysis Evaluating Python.Term Type '[]) ?
-typecheckPythonFile path = run @(CachingAnalysis (Evaluating Python.Term Type (CachingEffects Python.Term Type '[]))) . evaluateModule . snd <$> parseFile pythonParser path
+typecheckPythonFile path = runAnalysis @(CachingAnalysis Evaluating) @Python.Term @Type . evaluateModule . snd <$> parseFile pythonParser path
 
-tracePythonFile path = run @(TracingAnalysis [] (Evaluating Python.Term PythonValue '[Tracer [] Python.Term PythonValue])) . evaluateModule . snd <$> parseFile pythonParser path
+tracePythonFile path = runAnalysis @(TracingAnalysis [] Evaluating) @Python.Term @PythonValue . evaluateModule . snd <$> parseFile pythonParser path
 
-type PythonTracer = TracingAnalysis [] (Evaluating Python.Term PythonValue '[DeadCode Python.Term, Tracer [] Python.Term PythonValue])
+-- type PythonTracer = TracingAnalysis [] Evaluating Python.Term PythonValue '[DeadCode Python.Term, Tracer [] Python.Term PythonValue]
 
-evaluateDeadTracePythonFile path = run @(DeadCodeAnalysis PythonTracer) . evaluateModule . snd <$> parseFile pythonParser path
+evaluateDeadTracePythonFile path = runAnalysis @(DeadCodeAnalysis (TracingAnalysis [] Evaluating)) @Python.Term @PythonValue . evaluateModule . snd <$> parseFile pythonParser path
 
 evaluatePythonFile path = evaluate @PythonValue . snd <$> parseFile pythonParser path
 
