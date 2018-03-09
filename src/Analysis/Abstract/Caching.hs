@@ -2,8 +2,6 @@
 module Analysis.Abstract.Caching where
 
 import Control.Abstract.Analysis
-import Control.Monad.Effect.Fresh
-import Control.Monad.Effect.NonDet
 import Data.Abstract.Cache
 import Data.Abstract.Configuration
 import Data.Abstract.Store

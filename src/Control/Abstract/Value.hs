@@ -3,7 +3,6 @@ module Control.Abstract.Value where
 
 import Control.Abstract.Addressable
 import Control.Abstract.Analysis
-import Control.Monad.Effect.Fresh
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type as Type
