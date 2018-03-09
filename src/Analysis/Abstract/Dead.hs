@@ -6,10 +6,6 @@ import Data.Semigroup.Reducer as Reducer
 import Data.Set (delete)
 import Prologue
 
--- | The effects necessary for dead code analysis.
-type DeadCode term = State (Dead term)
-
-
 -- | An analysis tracking dead (unreachable) code.
 newtype DeadCodeAnalysis m term value (effects :: [* -> *]) a = DeadCodeAnalysis { runDeadCodeAnalysis :: m term value effects a }
   deriving (Applicative, Functor, Effectful, Monad, MonadFail)
