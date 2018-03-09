@@ -33,7 +33,7 @@ class Evaluatable constr where
           , MonadValue term value m
           )
        => SubtermAlgebra constr term (m value)
-  default eval :: (MonadAnalysis term value m, Show1 constr) => SubtermAlgebra constr term (m value)
+  default eval :: (MonadFail m, Show1 constr) => SubtermAlgebra constr term (m value)
   eval expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
 -- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
