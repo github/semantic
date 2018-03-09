@@ -15,7 +15,7 @@ type DeadCode term = State (Dead term)
 newtype DeadCodeAnalysis m term value (effects :: [* -> *]) a = DeadCodeAnalysis { runDeadCodeAnalysis :: m term value effects a }
   deriving (Applicative, Functor, Effectful, Monad, MonadFail)
 
-deriving instance MonadEvaluator term value effects m => MonadEvaluator term value effects (DeadCodeAnalysis m)
+deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (DeadCodeAnalysis m term value effects)
 
 -- | A set of “dead” (unreachable) terms.
 newtype Dead term = Dead { unDead :: Set term }
@@ -40,13 +40,13 @@ instance ( Corecursive term
          , Effectful (m term value)
          , Foldable (Base term)
          , Member (State (Dead term)) effects
-         , MonadAnalysis term value effects m
-         , MonadEvaluator term value effects m
+         , MonadAnalysis term value (m term value effects)
+         , MonadEvaluator term value (m term value effects)
          , Ord term
          , Recursive term
          )
-         => MonadAnalysis term value effects (DeadCodeAnalysis m) where
-  type RequiredEffects term value (DeadCodeAnalysis m) = State (Dead term) ': RequiredEffects term value m
+         => MonadAnalysis term value (DeadCodeAnalysis m term value effects) where
+  type RequiredEffects term value (DeadCodeAnalysis m term value effects) = State (Dead term) ': RequiredEffects term value (m term value effects)
   analyzeTerm term = do
     revive (embedSubterm term)
     liftAnalyze analyzeTerm term

@@ -29,7 +29,7 @@ type CacheFor term value = Cache (LocationFor value) term value
 newtype CachingAnalysis m term value (effects :: [* -> *]) a = CachingAnalysis { runCachingAnalysis :: m term value effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
-deriving instance MonadEvaluator term value effects m => MonadEvaluator term value effects (CachingAnalysis m)
+deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (CachingAnalysis m term value effects)
 
 -- TODO: reabstract these later on
 
@@ -70,11 +70,11 @@ instance ( Corecursive term
          , Evaluatable (Base term)
          , Foldable (Cell (LocationFor value))
          , FreeVariables term
-         , MonadAnalysis term value effects m
+         , MonadAnalysis term value (m term value effects)
          , Recursive term
          )
-         => MonadAnalysis term value effects (CachingAnalysis m) where
-  type RequiredEffects term value (CachingAnalysis m) = CachingEffects term value (RequiredEffects term value m)
+         => MonadAnalysis term value (CachingAnalysis m term value effects) where
+  type RequiredEffects term value (CachingAnalysis m term value effects) = CachingEffects term value (RequiredEffects term value (m term value effects))
   analyzeTerm e = do
     c <- getConfiguration (embedSubterm e)
     -- Convergence here is predicated upon an Eq instance, not α-equivalence
@@ -108,7 +108,7 @@ converge f = loop
             loop x'
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Alternative (m term value effects), Foldable t, MonadEvaluator term value effects m) => t (a, Store (LocationFor value) value) -> m term value effects a
+scatter :: (Alternative m, Foldable t, MonadEvaluator term value m) => t (a, Store (LocationFor value) value) -> m a
 scatter = getAlt . foldMap (\ (value, store') -> Alt (putStore store' *> pure value))
 
 -- | Evaluation of a single iteration of an analysis, given an in-cache as an oracle for results and an out-cache to record computed results in.
@@ -124,7 +124,7 @@ memoizeEval :: ( Ord value
                , Effectful (m term value)
                , Members (CachingEffects term value '[]) effects
                , Recursive term
-               , MonadAnalysis term value effects m
+               , MonadAnalysis term value (m term value effects)
                -- , Semigroup (CellFor value)
                )
             => SubtermAlgebra (Base term) term (CachingAnalysis m term value effects value)

@@ -16,7 +16,7 @@ import Prelude hiding (fail)
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class Monad m => MonadValue term value m | m -> term, m -> value where
+class MonadEvaluator term value m => MonadValue term value m where
   -- | Construct an abstract unit value.
   unit :: m value
 
@@ -48,13 +48,13 @@ class Monad m => MonadValue term value m | m -> term, m -> value where
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( FreeVariables term
-         , MonadAddressable location (Value location term) (m term (Value location term) effects)
-         , MonadAnalysis term (Value location term) effects m
-         , MonadEvaluator term (Value location term) effects m
+         , MonadAddressable location (Value location term) m
+         , MonadAnalysis term (Value location term) m
+         , MonadEvaluator term (Value location term) m
          , Recursive term
          , Semigroup (Cell location (Value location term))
          )
-         => MonadValue term (Value location term) (m term (Value location term) effects) where
+         => MonadValue term (Value location term) m where
 
   unit    = pure $ inj Value.Unit
   integer = pure . inj . Integer
@@ -83,7 +83,7 @@ instance ( FreeVariables term
     | otherwise                       = pure mempty
 
 -- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
-instance (Alternative (m term Type effects), MonadEvaluator term Type effects m, MonadFresh (m term Type effects)) => MonadValue  term Type (m term Type effects) where
+instance (Alternative m, MonadEvaluator term Type m, MonadFresh m) => MonadValue term Type m where
   abstract names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name

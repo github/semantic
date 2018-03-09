@@ -26,26 +26,26 @@ class (Monad m, Ord l, l ~ LocationFor value, Reducer value (Cell l value)) => M
 --
 --   The term is expected to contain one and only one free 'Name', meaning that care should be taken to apply this only to e.g. identifiers.
 lookupOrAlloc :: ( FreeVariables term
-                 , MonadAddressable (LocationFor value) value (m term value effects)
-                 , MonadEvaluator term value effects m
+                 , MonadAddressable (LocationFor value) value m
+                 , MonadEvaluator term value m
                  , Semigroup (CellFor value)
                  )
                  => term
                  -> value
                  -> Environment (LocationFor value) value
-                 -> m term value effects (Name, Address (LocationFor value) value)
+                 -> m (Name, Address (LocationFor value) value)
 lookupOrAlloc term = let [name] = toList (freeVariables term) in
                          lookupOrAlloc' name
 
 -- | Look up or allocate an address for a 'Name' & assign it a given value, returning the 'Name' paired with the address.
 lookupOrAlloc' :: ( Semigroup (CellFor value)
-                  , MonadAddressable (LocationFor value) value (m term value effects)
-                  , MonadEvaluator term value effects m
+                  , MonadAddressable (LocationFor value) value m
+                  , MonadEvaluator term value m
                   )
                   => Name
                   -> value
                   -> Environment (LocationFor value) value
-                  -> m term value effects (Name, Address (LocationFor value) value)
+                  -> m (Name, Address (LocationFor value) value)
 lookupOrAlloc' name v env = do
   a <- maybe (alloc name) pure (envLookup name env)
   assign a v
@@ -53,19 +53,19 @@ lookupOrAlloc' name v env = do
 
 -- | Write a value to the given 'Address' in the 'Store'.
 assign :: ( Ord (LocationFor value)
-          , MonadEvaluator term value effects m
+          , MonadEvaluator term value m
           , Reducer value (CellFor value)
           )
           => Address (LocationFor value) value
           -> value
-          -> m term value effects ()
+          -> m ()
 assign address = modifyStore . storeInsert address
 
 
 -- Instances
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
-instance (Monad (m term value effects), LocationFor value ~ Precise, MonadEvaluator term value effects m) => MonadAddressable Precise value (m term value effects) where
+instance (Monad m, LocationFor value ~ Precise, MonadEvaluator term value m) => MonadAddressable Precise value m where
   deref = maybe uninitializedAddress (pure . unLatest) <=< flip fmap getStore . storeLookup
     where
       -- | Fail with a message denoting an uninitialized address (i.e. one which was 'alloc'ated, but never 'assign'ed a value before being 'deref'erenced).
@@ -76,7 +76,7 @@ instance (Monad (m term value effects), LocationFor value ~ Precise, MonadEvalua
 
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
-instance (Alternative (m term value effects), Monad (m term value effects), LocationFor value ~ Monovariant, MonadEvaluator term value effects m, Ord value) => MonadAddressable Monovariant value (m term value effects) where
+instance (Alternative m, Monad m, LocationFor value ~ Monovariant, MonadEvaluator term value m, Ord value) => MonadAddressable Monovariant value m where
   deref = asum . maybe [] (map pure . toList) <=< flip fmap getStore . storeLookup
 
   alloc = pure . Address . Monovariant

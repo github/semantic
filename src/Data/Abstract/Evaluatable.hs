@@ -28,12 +28,12 @@ import Prologue
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
   eval :: ( FreeVariables term
-          , MonadAddressable (LocationFor value) value (m term value effects)
-          , MonadAnalysis term value effects m
-          , MonadValue term value (m term value effects)
+          , MonadAddressable (LocationFor value) value m
+          , MonadAnalysis term value m
+          , MonadValue term value m
           )
-       => SubtermAlgebra constr term (m term value effects value)
-  default eval :: (MonadAnalysis term value effects m, Show1 constr) => SubtermAlgebra constr term (m term value effects value)
+       => SubtermAlgebra constr term (m value)
+  default eval :: (MonadAnalysis term value m, Show1 constr) => SubtermAlgebra constr term (m value)
   eval expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
 -- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
@@ -70,21 +70,21 @@ instance Evaluatable [] where
 -- | Require/import another term/file and return an Effect.
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
-require :: ( MonadAnalysis term value effects m
-           , MonadValue term value (m term value effects)
+require :: ( MonadAnalysis term value m
+           , MonadValue term value m
            )
         => ModuleName
-        -> m term value effects (EnvironmentFor value)
+        -> m (EnvironmentFor value)
 require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup name
 
 -- | Load another term/file and return an Effect.
 --
 -- Always loads/evaluates.
-load :: ( MonadAnalysis term value effects m
-        , MonadValue term value (m term value effects)
+load :: ( MonadAnalysis term value m
+        , MonadValue term value m
         )
      => ModuleName
-     -> m term value effects (EnvironmentFor value)
+     -> m (EnvironmentFor value)
 load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
   where notFound = fail ("cannot load module: " <> show name)
         evalAndCache e = do

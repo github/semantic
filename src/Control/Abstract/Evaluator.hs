@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstrainedClassMethods, DataKinds, KindSignatures, MultiParamTypeClasses #-}
+{-# LANGUAGE ConstrainedClassMethods, DataKinds, FunctionalDependencies, KindSignatures #-}
 module Control.Abstract.Evaluator where
 
 import Data.Abstract.Configuration
@@ -14,40 +14,40 @@ import Prologue
 --   - environments binding names to addresses
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
-class MonadFail (m term value effects) => MonadEvaluator term value (effects :: [* -> *]) m where
+class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   -- | Retrieve the global environment.
-  getGlobalEnv :: m term value effects (EnvironmentFor value)
+  getGlobalEnv :: m (EnvironmentFor value)
   -- | Set the global environment
-  putGlobalEnv :: EnvironmentFor value -> m term value effects ()
+  putGlobalEnv :: EnvironmentFor value -> m ()
   -- | Update the global environment.
-  modifyGlobalEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m term value effects  ()
+  modifyGlobalEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m  ()
 
   -- | Retrieve the local environment.
-  askLocalEnv :: m term value effects (EnvironmentFor value)
+  askLocalEnv :: m (EnvironmentFor value)
   -- | Run an action with a locally-modified environment.
-  localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m term value effects a -> m term value effects a
+  localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m a -> m a
 
   -- | Retrieve the heap.
-  getStore :: m term value effects (StoreFor value)
+  getStore :: m (StoreFor value)
   -- | Update the heap.
-  modifyStore :: (StoreFor value -> StoreFor value) -> m term value effects ()
-  putStore :: StoreFor value -> m term value effects ()
+  modifyStore :: (StoreFor value -> StoreFor value) -> m ()
+  putStore :: StoreFor value -> m ()
   putStore = modifyStore . const
 
   -- | Retrieve the table of evaluated modules.
-  getModuleTable :: m term value effects (ModuleTable (EnvironmentFor value))
+  getModuleTable :: m (ModuleTable (EnvironmentFor value))
   -- | Update the table of evaluated modules.
-  modifyModuleTable :: (ModuleTable (EnvironmentFor value) -> ModuleTable (EnvironmentFor value)) -> m term value effects ()
+  modifyModuleTable :: (ModuleTable (EnvironmentFor value) -> ModuleTable (EnvironmentFor value)) -> m ()
 
   -- | Retrieve the table of unevaluated modules.
-  askModuleTable :: m term value effects (ModuleTable term)
+  askModuleTable :: m (ModuleTable term)
   -- | Run an action with a locally-modified table of unevaluated modules.
-  localModuleTable :: (ModuleTable term -> ModuleTable term) -> m term value effects a -> m term value effects a
+  localModuleTable :: (ModuleTable term -> ModuleTable term) -> m a -> m a
 
   -- | Retrieve the current root set.
-  askRoots :: Ord (LocationFor value) => m term value effects (Live (LocationFor value) value)
+  askRoots :: Ord (LocationFor value) => m (Live (LocationFor value) value)
   askRoots = pure mempty
 
   -- | Get the current 'Configuration' with a passed-in term.
-  getConfiguration :: Ord (LocationFor value) => term -> m term value effects (Configuration (LocationFor value) term value)
+  getConfiguration :: Ord (LocationFor value) => term -> m (Configuration (LocationFor value) term value)
   getConfiguration term = Configuration term <$> askRoots <*> askLocalEnv <*> getStore

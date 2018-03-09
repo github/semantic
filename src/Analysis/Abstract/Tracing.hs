@@ -18,19 +18,19 @@ newtype TracingAnalysis (trace :: * -> *) m term value (effects :: [* -> *]) a
   = TracingAnalysis { runTracingAnalysis :: m term value effects a }
   deriving (Applicative, Functor, Effectful, Monad, MonadFail)
 
-deriving instance MonadEvaluator term value effects m => MonadEvaluator term value effects (TracingAnalysis trace m)
+deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (TracingAnalysis trace m term value effects)
 
 instance ( Corecursive term
          , Effectful (m term value)
          , Member (Tracer trace term value) effects
-         , MonadAnalysis term value effects m
-         , MonadEvaluator term value effects m
+         , MonadAnalysis term value (m term value effects)
+         , MonadEvaluator term value (m term value effects)
          , Ord (LocationFor value)
          , Recursive term
          , Reducer (ConfigurationFor term value) (Trace trace term value)
          )
-         => MonadAnalysis term value effects (TracingAnalysis trace m) where
-  type RequiredEffects term value (TracingAnalysis trace m) = Writer (Trace trace term value) ': RequiredEffects term value m
+         => MonadAnalysis term value (TracingAnalysis trace m term value effects) where
+  type RequiredEffects term value (TracingAnalysis trace m term value effects) = Writer (Trace trace term value) ': RequiredEffects term value (m term value effects)
   analyzeTerm term = do
     config <- getConfiguration (embedSubterm term)
     trace (Reducer.unit config)

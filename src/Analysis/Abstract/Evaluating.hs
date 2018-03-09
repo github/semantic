@@ -45,7 +45,7 @@ evaluates :: forall value term
 evaluates pairs (b, t) = run @(Evaluating term value) @(EvaluatingEffects term value) (withModules b pairs (evaluateModule t))
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
-withModules :: MonadAnalysis term value effects m => Blob -> [(Blob, term)] -> m term value effects a -> m term value effects a
+withModules :: MonadAnalysis term value m => Blob -> [(Blob, term)] -> m a -> m a
 withModules Blob{..} pairs = localModuleTable (const moduleTable)
   where
     moduleTable = ModuleTable (Map.fromList (map (first moduleName) pairs))
@@ -73,7 +73,7 @@ type EvaluatingEffects term value
      , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
      ]
 
-instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value effects Evaluating where
+instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
   getGlobalEnv = lift get
   putGlobalEnv = lift . put
   modifyGlobalEnv f = lift (modify f)
@@ -97,6 +97,6 @@ instance ( Evaluatable (Base term)
          , MonadValue term value (Evaluating term value effects)
          , Recursive term
          )
-         => MonadAnalysis term value effects Evaluating where
-  type RequiredEffects term value Evaluating = EvaluatingEffects term value
+         => MonadAnalysis term value (Evaluating term value effects) where
+  type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
   analyzeTerm = eval
