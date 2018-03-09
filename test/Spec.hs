@@ -1,5 +1,6 @@
 module Main where
 
+import qualified Analysis.Spec
 import qualified Assigning.Assignment.Spec
 import qualified Data.Diff.Spec
 import qualified Data.Functor.Classes.Generic.Spec
@@ -22,6 +23,7 @@ main :: IO ()
 main = hspec $ do
   describe "Semantic.Stat" Semantic.Stat.Spec.spec
   parallel $ do
+    describe "Analysis" Analysis.Spec.spec
     describe "Assigning.Assignment" Assigning.Assignment.Spec.spec
     describe "Data.Diff" Data.Diff.Spec.spec
     describe "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
