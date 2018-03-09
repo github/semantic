@@ -51,5 +51,5 @@ liftEvaluate :: ( Coercible (m term value (effects :: [* -> *]) value) (t m term
 liftEvaluate evaluate = coerce . evaluate
 
 
-runAnalysis :: (Effectful (m term value), RunEffects effects a, RequiredEffects term value (m term value effects) ~ effects) => m term value effects a -> Final effects a
+runAnalysis :: (Effectful m, RunEffects effects a, RequiredEffects term value (m effects) ~ effects, MonadAnalysis term value (m effects)) => m effects a -> Final effects a
 runAnalysis = Effect.run . runEffects . lower
