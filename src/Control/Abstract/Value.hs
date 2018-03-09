@@ -1,4 +1,5 @@
-{-# LANGUAGE MultiParamTypeClasses, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE MultiParamTypeClasses, Rank2Types, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Value where
 
 import Control.Abstract.Addressable
@@ -7,7 +8,8 @@ import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type as Type
 import Data.Abstract.Value as Value
-import Data.Scientific (Scientific)
+import Data.Bitraversable
+import Data.Scientific (Scientific, fromFloatDigits, toRealFloat)
 import Prelude hiding (fail)
 import Prologue
 
@@ -20,6 +22,18 @@ class MonadAnalysis term value m => MonadValue term value m where
 
   -- | Construct an abstract integral value.
   integer :: Prelude.Integer -> m value
+
+  -- | Lift a unary operator over a 'Num' to a function on 'value's.
+  liftNumeric  :: (forall a . Num a => a -> a)
+               -> (value -> m value)
+
+  -- | Lift a pair of binary operators to a function on 'value's.
+  --   You usually pass the same operator as both arguments, except in the cases where
+  --   Haskell provides different functions for integral and fractional operations, such
+  --   as division, exponentiation, and modulus.
+  liftNumeric2 :: (forall a . (Real a, Floating a) => a -> a -> a)
+               -> (forall b . Integral b           => b -> b -> b)
+               -> (value -> value -> m value)
 
   -- | Construct an abstract boolean value.
   boolean :: Bool -> m value
@@ -34,7 +48,7 @@ class MonadAnalysis term value m => MonadValue term value m where
   interface :: value -> m value
 
   -- | Eliminate boolean values. TODO: s/boolean/truthy
-  ifthenelse :: value -> m value -> m value -> m value
+  ifthenelse :: value -> m a -> m a -> m a
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
   abstract :: [Name] -> Subterm term (m value) -> m value
@@ -43,6 +57,14 @@ class MonadAnalysis term value m => MonadValue term value m where
 
   -- | Extract the environment from an interface value.
   environment :: value -> m (EnvironmentFor value)
+
+-- | Attempt to extract a 'Prelude.Bool' from a given value.
+toBool :: MonadValue term value m => value -> m Bool
+toBool v = ifthenelse v (pure True) (pure False)
+
+-- | As with 'toBool', except from a given 'Subterm'.
+evalToBool :: MonadValue term value m => Subterm t (m value) -> m Bool
+evalToBool = subtermValue >=> toBool
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( MonadAddressable location (Value location term) m
@@ -60,6 +82,28 @@ instance ( MonadAddressable location (Value location term) m
   ifthenelse cond if' else'
     | Just (Boolean b) <- prj cond = if b then if' else else'
     | otherwise = fail "not defined for non-boolean conditions"
+
+  liftNumeric f arg
+    | Just (Integer i)     <- prj arg = pure . inj . Integer     $ f i
+    | Just (Value.Float i) <- prj arg = pure . inj . Value.Float $ f i
+    | otherwise = fail "Invalid operand to liftNumeric"
+   
+  liftNumeric2 f g left right
+    | Just (Integer i, Integer j)         <- au pair = pure . inj . Integer $ g i j
+    | Just (Integer i, Value.Float j)     <- au pair = pure . inj . float   $ f (fromIntegral i) (munge j)
+    | Just (Value.Float i, Value.Float j) <- au pair = pure . inj . float   $ f (munge i) (munge j)
+    | Just (Value.Float i, Integer j)     <- au pair = pure . inj . float   $ f (munge i) (fromIntegral j)
+    | otherwise = fail "Invalid operands to liftNumeric2"
+      where
+        -- Yucky hack to work around the lack of a Floating instance for Scientific.
+        -- This may possibly lose precision, but there's little we can do about that.
+        munge :: Scientific -> Double
+        munge = toRealFloat
+        float :: Double -> Value.Float a
+        float = Value.Float . fromFloatDigits
+        au :: (i :< is, j :< js) => (Union is a, Union js b) -> Maybe (i a, j b)
+        au = bitraverse prj prj
+        pair = (left, right)
 
   abstract names (Subterm body _) = inj . Closure names body <$> askLocalEnv
 
@@ -93,10 +137,21 @@ instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue 
   boolean _ = pure Bool
   string _  = pure Type.String
   float _   = pure Type.Float
+
   -- TODO
   interface = undefined
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
+
+  liftNumeric _ Type.Float = pure Type.Float
+  liftNumeric _ Int        = pure Int
+  liftNumeric _ _          = fail "Invalid type in unary numeric operation"
+
+  liftNumeric2 _ _ left right = case (left, right) of
+    (Type.Float, Int) -> pure Type.Float
+    (Int, Type.Float) -> pure Type.Float
+    _                 -> unify left right
+
 
   apply op params = do
     tvar <- fresh
