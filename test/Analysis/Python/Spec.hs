@@ -51,7 +51,7 @@ spec = parallel $ do
   where
     assertEnvironment result expectedEnv = case result of
       Left e -> expectationFailure ("Evaluating expected to succeed, but failed with: " <> e)
-      Right res -> let Just (Interface _ env) = prj @(Interface Precise) res in env `shouldBe` expectedEnv
+      Right res -> let Just (Interface _ env) = prjValue @(Interface Precise) res in env `shouldBe` expectedEnv
 
     addr = Address . Precise
     fixtures = "test/fixtures/python/analysis/"

@@ -3,6 +3,8 @@ module Analysis.Abstract.Evaluating
 ( type Evaluating
 , evaluate
 , evaluates
+-- Temporary, for testing
+, EvaluatingEffects
 ) where
 
 import Control.Abstract.Evaluator

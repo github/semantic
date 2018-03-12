@@ -44,33 +44,35 @@ import Parsing.Parser
 file :: MonadIO m => FilePath -> m Blob
 file path = fromJust <$> IO.readFile path (IO.languageForFilePath path)
 
-evaluateFiles :: forall v term.
-              ( Data.Abstract.Evaluatable.Evaluatable (Data.Functor.Foldable.Base term)
-              , FreeVariables term
-              , MonadAddressable (LocationFor v) v (Evaluation term v)
-              , MonadValue term v (Evaluation term v)
-              , Ord (LocationFor v)
-              , Recursive term
-              , Semigroup (Cell (LocationFor v) v)
-              )
+parseFile :: Parser term -> FilePath -> IO (Blob, term)
+parseFile parser path = runTask $ do
+  blob <- file path
+  (,) blob <$> parse parser blob
+
+evaluateFiles :: forall value term
+              .  ( Evaluatable (Base term)
+                 , FreeVariables term
+                 , MonadAddressable (LocationFor value) value (Evaluating term value (EvaluatingEffects term value))
+                 , MonadValue term value (Evaluating term value (EvaluatingEffects term value))
+                 , Recursive term
+                 )
               => Parser term
               -> [FilePath]
               -> IO (
                      (
                        (
-                         ( Either Prelude.String v
-                         , Store (LocationFor v) v
+                         ( Either Prelude.String value
+                         , Environment (LocationFor value) value
                          )
-                         , Map.Map Data.Abstract.FreeVariables.Name (Data.Abstract.FreeVariables.Name, Maybe (Address (LocationFor v) v))
+                         , Store (LocationFor value) value
                        )
-                       , Environment (LocationFor v) v
+                       , ModuleTable (Environment (LocationFor value) value)
                      )
-                     , ModuleTable (Environment (LocationFor v) v)
+                     , Map.Map Data.Abstract.FreeVariables.Name (Data.Abstract.FreeVariables.Name, Maybe (Address (LocationFor value) value))
                     )
 evaluateFiles parser paths = do
-  blobs@(b:bs) <- traverse file paths
-  (t:ts) <- runTask $ traverse (parse parser) blobs
-  pure $ evaluates @v (zip bs ts) (b, t)
+  entry:xs <- traverse (parseFile parser) paths
+  pure $ evaluates @value xs entry
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO B.ByteString
