@@ -163,8 +163,6 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Module where
   eval (Module _ xs) = eval' xs
     where
-    interface val = pure val -- inj . Value.Interface val <$> askLocalEnv
-
     eval' [] = unit >>= interface
     eval' [x] = subtermValue x >>= interface
     eval' (x:xs) = do
