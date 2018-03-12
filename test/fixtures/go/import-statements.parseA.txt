@@ -5,7 +5,7 @@
     (Comment)
     (Comment)
     (QualifiedImport
-      (TextElement)
+      (Identifier)
       (Identifier))
     (Comment))
   (Function
