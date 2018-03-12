@@ -13,8 +13,6 @@ import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, 
 import Language.TypeScript.Grammar as Grammar
 import Prologue
 import qualified Data.ByteString.Char8 as BC
-import qualified Data.ByteString as B
-import Data.Char (ord)
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment

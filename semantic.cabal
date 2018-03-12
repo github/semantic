@@ -19,7 +19,7 @@ library
                      -- , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Evaluating
-                     -- , Analysis.Abstract.Tracing
+                     , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
                      , Analysis.Decorator
@@ -40,7 +40,6 @@ library
                      , Control.Monad.Effect.Fresh
                      -- , Control.Monad.Effect.GC
                      , Control.Monad.Effect.NonDet
-                     -- , Control.Monad.Effect.Trace
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
                      , Data.Abstract.Cache
@@ -64,6 +63,7 @@ library
                      , Data.Functor.Classes.Generic
                      , Data.JSON.Fields
                      , Data.Language
+                     , Data.Map.Monoidal
                      , Data.Mergeable
                      , Data.Output
                      , Data.Patch
@@ -158,8 +158,8 @@ library
                      , optparse-applicative
                      , parallel
                      , parsers
-                     , pointed
                      , recursion-schemes
+                     , reducers
                      , scientific
                      , split
                      , stm-chans

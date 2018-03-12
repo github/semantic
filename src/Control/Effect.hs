@@ -1,7 +1,6 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, MultiParamTypeClasses, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Effect where
 
-import Prologue
 import qualified Control.Monad.Effect as Effect
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Internal hiding (run)
@@ -9,10 +8,12 @@ import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Writer
+import Data.Semigroup.Reducer
+import Prologue
 
--- | Run a computation in 'Eff' to completion, interpreting each effect with some sensible defaults, and return the 'Final' result.
-run :: RunEffects fs a => Eff fs a -> Final fs a
-run = Effect.run . runEffects
+-- | Run an 'Effectful' computation to completion, interpreting each effect with some sensible defaults, and return the 'Final' result.
+run :: (Effectful m, RunEffects effects a) => m effects a -> Final effects a
+run = Effect.run . runEffects . lower
 
 -- | A typeclass to run a computation to completion, interpreting each effect with some sensible defaults.
 class RunEffects fs a where
@@ -60,6 +61,20 @@ instance Monoid w => RunEffect (Writer w) a where
 -- | 'NonDetEff' effects are interpreted into a nondeterministic set of result values.
 instance Ord a => RunEffect NonDetEff a where
   type Result NonDetEff a = Set a
-  runEffect = relay (pure . point) (\ m k -> case m of
+  runEffect = relay (pure . unit) (\ m k -> case m of
     MZero -> pure mempty
     MPlus -> mappend <$> k True <*> k False)
+
+
+-- | Types wrapping 'Eff' actions.
+--
+--   Most instances of 'Effectful' will be derived using @-XGeneralizedNewtypeDeriving@, with these ultimately bottoming out on the instance for 'Eff' (for which 'raise' and 'lower' are simply the identity). Because of this, types can be nested arbitrarily deeply and still call 'raise'/'lower' just once to get at the (ultimately) underlying 'Eff'.
+class Effectful (m :: [* -> *] -> * -> *) where
+  -- | Raise an action in 'Eff' into an action in @m@.
+  raise :: Eff effects a -> m effects a
+  -- | Lower an action in @m@ into an action in 'Eff'.
+  lower :: m effects a -> Eff effects a
+
+instance Effectful Eff where
+  raise = id
+  lower = id

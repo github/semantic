@@ -3,66 +3,68 @@ module Control.Abstract.Value where
 
 import Control.Abstract.Addressable
 import Control.Abstract.Analysis
-import Control.Abstract.Evaluator
-import Control.Monad.Effect.Fresh
-import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
-import Data.Abstract.Value as Value
 import Data.Abstract.Type as Type
+import Data.Abstract.Value as Value
 import Data.Scientific (Scientific)
-import Prologue
 import qualified Data.Map as Map
 import Prelude hiding (fail)
+import Prologue
 
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class (MonadEvaluator t v m) => MonadValue t v m where
+class (MonadAnalysis term value m, Show value) => MonadValue term value m where
   -- | Construct an abstract unit value.
-  unit :: m v
+  --   TODO: This might be the same as the empty tuple for some value types
+  unit :: m value
 
   -- | Construct an abstract integral value.
-  integer :: Prelude.Integer -> m v
+  integer :: Prelude.Integer -> m value
 
   -- | Construct an abstract boolean value.
-  boolean :: Bool -> m v
+  boolean :: Bool -> m value
 
   -- | Construct an abstract string value.
-  string :: ByteString -> m v
+  string :: ByteString -> m value
 
   -- | Construct a floating-point value.
-  float :: Scientific -> m v
+  float :: Scientific -> m value
+
+  -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
+  multiple :: [value] -> m value
 
   -- | Construct an abstract interface value.
-  interface :: v -> m v
+  interface :: value -> m value
 
   -- | Eliminate boolean values. TODO: s/boolean/truthy
-  ifthenelse :: v -> m v -> m v -> m v
+  ifthenelse :: value -> m value -> m value -> m value
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
-  abstract :: [Name] -> Subterm t (m v) -> m v
+  abstract :: [Name] -> Subterm term (m value) -> m value
   -- | Evaluate an application (like a function call).
-  apply :: v -> [Subterm t (m v)] -> m v
+  apply :: value -> [Subterm term (m value)] -> m value
 
   -- | Extract the environment from an interface value.
-  environment :: v -> m (EnvironmentFor v)
+  environment :: value -> m (EnvironmentFor value)
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( FreeVariables t
-         , MonadAddressable location (Value location t) m
-         , MonadAnalysis t (Value location t) m
-         , MonadEvaluator t (Value location t) m
-         , Recursive t
-         , Semigroup (Cell location (Value location t))
+instance ( MonadAddressable location (Value location term) m
+         , MonadAnalysis term (Value location term) m
+         , Show location
+         , Show term
          )
-         => MonadValue t (Value location t) m where
+         => MonadValue term (Value location term) m where
 
-  unit    = pure $ inj Value.Unit
-  integer = pure . inj . Integer
-  boolean = pure . inj . Boolean
-  string  = pure . inj . Value.String
-  float   = pure . inj . Value.Float
+  unit    = pure . injValue $ Value.Unit
+  integer = pure . injValue . Integer
+  boolean = pure . injValue . Boolean
+  string  = pure . injValue . Value.String
+  float   = pure . injValue . Value.Float
+  multiple vals =
+    pure . injValue $ Value.Tuple vals
+
   interface v = do
     -- TODO: If the set of exports is empty because no exports have been
     -- defined, do we export all terms, or no terms? This behavior varies across
@@ -70,16 +72,16 @@ instance ( FreeVariables t
     env <- getGlobalEnv
     exports <- getExports
     let env' = if Map.null exports then env else bindExports exports env
-    pure (inj (Value.Interface v env'))
+    pure (injValue (Value.Interface v env'))
 
   ifthenelse cond if' else'
-    | Just (Boolean b) <- prj cond = if b then if' else else'
-    | otherwise = fail "not defined for non-boolean conditions"
+    | Just (Boolean b) <- prjValue cond = if b then if' else else'
+    | otherwise = fail ("not defined for non-boolean conditions: " <> show cond)
 
-  abstract names (Subterm body _) = inj . Closure names body <$> askLocalEnv
+  abstract names (Subterm body _) = injValue . Closure names body <$> askLocalEnv
 
   apply op params = do
-    Closure names body env <- maybe (fail "expected a closure") pure (prj op)
+    Closure names body env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
     bindings <- foldr (\ (name, param) rest -> do
       v <- subtermValue param
       a <- alloc name
@@ -88,11 +90,11 @@ instance ( FreeVariables t
     localEnv (mappend bindings) (evaluateTerm body)
 
   environment v
-    | Just (Interface _ env) <- prj v = pure env
-    | otherwise                       = pure mempty
+    | Just (Interface _ env) <- prjValue v = pure env
+    | otherwise                            = pure mempty
 
 -- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
-instance (Alternative m, MonadEvaluator t Type m, MonadFresh m) => MonadValue t Type m where
+instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue term Type m where
   abstract names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
@@ -108,6 +110,7 @@ instance (Alternative m, MonadEvaluator t Type m, MonadFresh m) => MonadValue t 
   boolean _ = pure Bool
   string _  = pure Type.String
   float _   = pure Type.Float
+  multiple  = pure . Type.Product
   -- TODO
   interface = undefined
 
