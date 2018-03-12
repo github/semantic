@@ -49,6 +49,7 @@ liftAnalyze :: ( Coercible (  m term value (effects :: [* -> *]) value) (t m ter
 liftAnalyze analyze term = coerce (analyze (second coerce <$> term))
 
 
+-- | Run an analysis, performing its effects and returning the result alongside any state.
 runAnalysis :: ( Effectful m
                , RunEffects effects a
                , RequiredEffects term value (m effects) ~ effects
