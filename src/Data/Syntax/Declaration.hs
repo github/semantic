@@ -158,8 +158,19 @@ instance Eq1 Module where liftEq = genericLiftEq
 instance Ord1 Module where liftCompare = genericLiftCompare
 instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Module
-instance Evaluatable Module
+-- TODO: Fix this extremely bogus instance (copied from that of Program)
+-- In Go, functions in the same module can be spread across files.
+-- We need to ensure that all input files have aggregated their content into
+-- a coherent module before we begin evaluating a module.
+instance Evaluatable Module where
+  eval (Module _ xs) = eval' xs
+    where
+    eval' [] = unit >>= interface
+    eval' [x] = subtermValue x >>= interface
+    eval' (x:xs) = do
+      _ <- subtermValue x
+      env <- getGlobalEnv
+      localEnv (envUnion env) (eval' xs)
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }

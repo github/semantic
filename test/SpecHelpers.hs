@@ -5,7 +5,6 @@ module SpecHelpers
 , diffFilePaths
 , parseFilePath
 , readFilePair
-, languageForFilePath
 , Verbatim(..)
 , verbatim
 , readFileVerbatim
@@ -79,17 +78,12 @@ diffFilePaths paths = readFilePair paths >>= runTask . diffBlobPair SExpressionD
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFilePath :: FilePath -> IO B.ByteString
-parseFilePath path = IO.readFile path (languageForFilePath path) >>= pure . fromJust >>= runTask . parseBlob SExpressionTermRenderer
+parseFilePath path = IO.readFile path (IO.languageForFilePath path) >>= pure . fromJust >>= runTask . parseBlob SExpressionTermRenderer
 
 -- | Read two files to a BlobPair.
 readFilePair :: Both FilePath -> IO BlobPair
-readFilePair paths = let paths' = fmap (\p -> (p, languageForFilePath p)) paths in
+readFilePair paths = let paths' = fmap (\p -> (p, IO.languageForFilePath p)) paths in
                      runBothWith IO.readFilePair paths'
-
--- | Returns a Maybe Language based on the FilePath's extension.
-languageForFilePath :: FilePath -> Maybe Language
-languageForFilePath = languageForType . takeExtension
-
 
 readFileVerbatim :: FilePath -> IO Verbatim
 readFileVerbatim = fmap verbatim . B.readFile
