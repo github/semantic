@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, KindSignatures, MultiParamTypeClasses, TypeFamilies #-}
+{-# LANGUAGE DataKinds, MultiParamTypeClasses, TypeFamilies #-}
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , evaluateTerm
