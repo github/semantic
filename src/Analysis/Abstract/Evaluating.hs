@@ -12,6 +12,7 @@ import Data.Abstract.ModuleTable
 import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Blob
+import Data.Language
 import Data.List.Split (splitWhen)
 import Prologue
 import qualified Data.ByteString.Char8 as BC
@@ -65,7 +66,11 @@ withModules Blob{..} pairs = localModuleTable (const moduleTable)
   where
     moduleTable = ModuleTable (Map.fromList (map (first moduleName) pairs))
     rootDir = dropFileName blobPath
-    moduleName Blob{..} = toName (dropExtensions (makeRelative rootDir blobPath))
+    moduleName Blob{..} = let path = dropExtensions (makeRelative rootDir blobPath)
+     in case blobLanguage of
+      -- TODO: Need a better way to handle module registration and resolution
+      Just Go -> toName (takeDirectory path) -- Go allows defining modules across multiple files in the same directory.
+      _ ->  toName path
     toName str = qualifiedName (fmap BC.pack (splitWhen (== pathSeparator) str))
 
 -- | An analysis performing concrete evaluation of @term@s to @value@s.
