@@ -122,17 +122,30 @@ instance CustomHasDeclaration whole Declaration.Class where
     = Just $ ClassDeclaration (getSource identifierAnn) (getClassSource blob (In ann decl)) blobLanguage
     where getSource = toText . flip Source.slice blobSource . getField
 
-instance CustomHasDeclaration (Union fs) Declaration.QualifiedImport where
-  customToDeclaration Blob{..} _ (Declaration.QualifiedImport (Term (In fromAnn _), _) (Term (In aliasAnn _), _) symbols)
-    = Just $ ImportDeclaration name (getAlias blobLanguage (getSource aliasAnn)) (fmap getSymbol symbols) blobLanguage
+instance CustomHasDeclaration (Union fs) Declaration.Import where
+  customToDeclaration Blob{..} _ (Declaration.Import (Term (In fromAnn _), _) symbols)
+    = Just $ ImportDeclaration ((stripQuotes . getSource) fromAnn) "" (fmap getSymbol symbols) blobLanguage
     where
-      name = getSource fromAnn
-      getAlias lang alias | Just TypeScript <- lang, T.null alias = basename name
-                          | Just Go <- lang, T.null alias = basename name
-                          | otherwise = alias
-      basename = last . T.splitOn "/"
-      getSource = T.dropAround (`elem` ['"', '\'']) . toText . flip Source.slice blobSource . getField
+      stripQuotes = T.dropAround (`elem` ['"', '\''])
+      getSource = toText . flip Source.slice blobSource . getField
       getSymbol = let f = (T.decodeUtf8 . friendlyName) in bimap f f
+
+instance (Syntax.Identifier :< fs) => CustomHasDeclaration (Union fs) Declaration.QualifiedImport where
+  customToDeclaration Blob{..} _ (Declaration.QualifiedImport (Term (In fromAnn _), _) (Term (In aliasAnn aliasF), _) symbols)
+    | Just (Syntax.Identifier alias) <- prj aliasF = Just $ ImportDeclaration ((stripQuotes . getSource) fromAnn) (toName alias) (fmap getSymbol symbols) blobLanguage
+    | otherwise = Just $ ImportDeclaration ((stripQuotes . getSource) fromAnn) (getSource aliasAnn) (fmap getSymbol symbols) blobLanguage
+    where
+      stripQuotes = T.dropAround (`elem` ['"', '\''])
+      getSource = toText . flip Source.slice blobSource . getField
+      getSymbol = bimap toName toName
+      toName = T.decodeUtf8 . friendlyName
+
+instance CustomHasDeclaration (Union fs) Declaration.WildcardImport where
+  customToDeclaration Blob{..} _ (Declaration.WildcardImport (Term (In fromAnn _), _) _)
+    = Just $ ImportDeclaration ((stripQuotes . getSource) fromAnn) "" [] blobLanguage
+    where
+      stripQuotes = T.dropAround (`elem` ['"', '\''])
+      getSource = toText . flip Source.slice blobSource . getField
 
 instance (Expression.MemberAccess :< fs) => CustomHasDeclaration (Union fs) Expression.Call where
   customToDeclaration Blob{..} _ (Expression.Call _ (Term (In fromAnn fromF), _) _ _)
@@ -168,7 +181,9 @@ class HasDeclarationWithStrategy (strategy :: Strategy) whole syntax where
 type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Class = 'Custom
   DeclarationStrategy Declaration.Function = 'Custom
+  DeclarationStrategy Declaration.Import = 'Custom
   DeclarationStrategy Declaration.QualifiedImport = 'Custom
+  DeclarationStrategy Declaration.WildcardImport = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
   DeclarationStrategy Markdown.Heading = 'Custom
   DeclarationStrategy Expression.Call = 'Custom

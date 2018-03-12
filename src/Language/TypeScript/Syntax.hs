@@ -77,6 +77,8 @@ newtype Tuple a = Tuple { _tupleElements :: [a] }
 instance Eq1 Tuple where liftEq = genericLiftEq
 instance Ord1 Tuple where liftCompare = genericLiftCompare
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
+
+-- This is a tuple type, not a tuple value, so we can't lean on the shared Tuple value
 instance Evaluatable Tuple
 
 data Constructor a = Constructor { _constructorTypeParameters :: !a, _constructorFormalParameters :: ![a], _constructorType :: !a }

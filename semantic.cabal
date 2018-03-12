@@ -19,7 +19,7 @@ library
                      -- , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Evaluating
-                     -- , Analysis.Abstract.Tracing
+                     , Analysis.Abstract.Tracing
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
                      , Analysis.Decorator
@@ -37,11 +37,9 @@ library
                      -- Control flow
                      , Control.Effect
                      -- Effects used for program analysis
-                     , Control.Monad.Effect.Cache
                      , Control.Monad.Effect.Fresh
                      -- , Control.Monad.Effect.GC
                      , Control.Monad.Effect.NonDet
-                     -- , Control.Monad.Effect.Trace
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
                      , Data.Abstract.Cache
@@ -65,6 +63,7 @@ library
                      , Data.Functor.Classes.Generic
                      , Data.JSON.Fields
                      , Data.Language
+                     , Data.Map.Monoidal
                      , Data.Mergeable
                      , Data.Output
                      , Data.Patch
@@ -141,7 +140,6 @@ library
                      , bifunctors
                      , bytestring
                      , cmark-gfm
-                     , comonad
                      , containers
                      , directory
                      , effects
@@ -160,9 +158,8 @@ library
                      , optparse-applicative
                      , parallel
                      , parsers
-                     , pointed
                      , recursion-schemes
-                     , semigroups
+                     , reducers
                      , scientific
                      , split
                      , stm-chans
@@ -251,6 +248,18 @@ test-suite test
   ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards
+
+benchmark evaluation
+  hs-source-dirs: bench
+  type:           exitcode-stdio-1.0
+  main-is:        Main.hs
+  ghc-options:    -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m -T" -static -j -O
+  cc-options:     -DU_STATIC_IMPLEMENTATION=1
+  cpp-options:    -DU_STATIC_IMPLEMENTATION=1
+  build-depends:  base
+                , criterion
+                , semantic
+
 
 source-repository head
   type:     git

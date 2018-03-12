@@ -82,11 +82,6 @@ merging :: Functor syntax => Term syntax ann -> Diff syntax ann ann
 merging = cata (\ (In ann syntax) -> mergeF (In (ann, ann) syntax))
 
 
-diffPatch :: Diff syntax ann1 ann2 -> Maybe (Patch (TermF syntax ann1 (Diff syntax ann1 ann2)) (TermF syntax ann2 (Diff syntax ann1 ann2)))
-diffPatch diff = case unDiff diff of
-  Patch patch -> Just patch
-  _ -> Nothing
-
 diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann1 ann2 -> [Patch (TermF syntax ann1 (Diff syntax ann1 ann2)) (TermF syntax ann2 (Diff syntax ann1 ann2))]
 diffPatches = para $ \ diff -> case diff of
   Patch patch -> bimap (fmap fst) (fmap fst) patch : bifoldMap (foldMap snd) (foldMap snd) patch

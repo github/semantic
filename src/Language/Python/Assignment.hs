@@ -455,7 +455,7 @@ continueStatement :: Assignment
 continueStatement = makeTerm <$> symbol ContinueStatement <*> (Statement.Continue <$> emptyTerm <* advance)
 
 memberAccess :: Assignment
-memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> term expression <*> term expression)
+memberAccess = makeTerm <$> symbol Attribute <*> children (Expression.MemberAccess <$> expression <*> identifier)
 
 subscript :: Assignment
 subscript = makeTerm <$> symbol Subscript <*> children (Expression.Subscript <$> term expression <*> manyTerm expression)
@@ -467,7 +467,7 @@ slice = makeTerm <$> symbol Slice <*> children
                           <*> (term expression <|> emptyTerm))
 
 call :: Assignment
-call = makeTerm <$> symbol Call <*> children (Expression.Call <$> pure [] <*> term identifier <*> (symbol ArgumentList *> children (manyTerm expression) <|> someTerm comprehension) <*> emptyTerm)
+call = makeTerm <$> symbol Call <*> children (Expression.Call <$> pure [] <*> term (identifier <|> expression) <*> (symbol ArgumentList *> children (manyTerm expression) <|> someTerm comprehension) <*> emptyTerm)
 
 boolean :: Assignment
 boolean =  makeTerm <$> token Grammar.True <*> pure Literal.true

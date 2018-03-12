@@ -7,6 +7,7 @@ import Data.Abstract.Evaluatable
 import Data.AST
 import Data.Range
 import Data.Record
+import qualified Data.Set as Set
 import Data.Span
 import Data.Term
 import Diffing.Algorithm hiding (Empty)
@@ -112,7 +113,7 @@ instance Evaluatable Identifier where
     maybe (fail ("free variable: " <> show name)) deref (envLookup name env)
 
 instance FreeVariables1 Identifier where
-  liftFreeVariables _ (Identifier x) = point x
+  liftFreeVariables _ (Identifier x) = Set.singleton x
 
 
 newtype Program a = Program [a]
