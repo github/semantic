@@ -41,6 +41,11 @@ spec = parallel $ do
             ]
       assertEnvironment res expectedEnv
 
+    it "side effect only imports" $ do
+      res <- evaluate "main2.ts"
+      let expectedEnv = Environment $ fromList []
+      assertEnvironment res expectedEnv
+
   where
     assertEnvironment result expectedEnv = case result of
       Left e -> expectationFailure ("Evaluating expected to succeed, but failed with: " <> e)
