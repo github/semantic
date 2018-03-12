@@ -53,4 +53,5 @@ spec = parallel $ do
         [ fixtures <> entry
         , fixtures <> "foo/foo.go"
         , fixtures <> "bar/bar.go"
+        , fixtures <> "bar/rab.go"
         ]

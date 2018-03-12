@@ -6,4 +6,5 @@ import . "./bar"
 func main() {
 	foo.New()
 	Bar()
+	Rab()
 }
