@@ -52,6 +52,8 @@ liftAnalyze analyze term = coerce (analyze (second coerce <$> term))
 
 
 -- | Run an analysis, performing its effects and returning the result alongside any state.
+--
+--   This enables us to refer to the analysis type as e.g. @Analysis1 (Analysis2 Evaluating) Term Value@ without explicitly mentioning its effects (which are inferred to be simply its 'RequiredEffects').
 runAnalysis :: ( Effectful m
                , RunEffects effects a
                , RequiredEffects term value (m effects) ~ effects
