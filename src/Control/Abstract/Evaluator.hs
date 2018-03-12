@@ -1,9 +1,12 @@
 {-# LANGUAGE ConstrainedClassMethods, FunctionalDependencies #-}
 module Control.Abstract.Evaluator where
 
+import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.ModuleTable
+import Data.Abstract.Store
 import Data.Abstract.Value
+import Data.Semigroup.Reducer
 import Prelude hiding (fail)
 import Prologue
 
@@ -48,6 +51,16 @@ class Monad m => MonadStore value m | m -> value where
 -- | Update the heap.
 modifyStore :: MonadStore value m => (StoreFor value -> StoreFor value) -> m ()
 modifyStore f = getStore >>= putStore . f
+
+-- | Write a value to the given 'Address' in the 'Store'.
+assign :: ( Ord (LocationFor value)
+          , MonadStore value m
+          , Reducer value (CellFor value)
+          )
+          => Address (LocationFor value) value
+          -> value
+          -> m ()
+assign address = modifyStore . storeInsert address
 
 
 class Monad m => MonadModuleTable term value m | m -> term, m -> value where

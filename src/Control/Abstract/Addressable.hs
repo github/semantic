@@ -49,16 +49,6 @@ lookupOrAlloc' name v env = do
   assign a v
   pure (name, a)
 
--- | Write a value to the given 'Address' in the 'Store'.
-assign :: ( Ord (LocationFor value)
-          , MonadStore value m
-          , Reducer value (CellFor value)
-          )
-          => Address (LocationFor value) value
-          -> value
-          -> m ()
-assign address = modifyStore . storeInsert address
-
 
 -- Instances
 
