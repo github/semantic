@@ -39,7 +39,9 @@ class Monad m => MonadEnvironment value m | m -> value where
 
 -- | Update the global environment.
 modifyGlobalEnv :: MonadEvaluator term value m => (EnvironmentFor value -> EnvironmentFor value) -> m  ()
-modifyGlobalEnv f = getGlobalEnv >>= putGlobalEnv . f
+modifyGlobalEnv f = do
+  env <- getGlobalEnv
+  putGlobalEnv $! f env
 
 
 class Monad m => MonadStore value m | m -> value where
