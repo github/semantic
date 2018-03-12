@@ -24,13 +24,17 @@ import Semantic
 import Semantic.IO as IO
 import Semantic.Task
 
+import qualified Language.Go.Assignment as Go
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.Python.Assignment as Python
 import qualified Language.TypeScript.Assignment as TypeScript
 
-type RubyValue = Value Precise (Term (Union Ruby.Syntax) (Record Location))
-type PythonValue = Value Precise (Term (Union Python.Syntax) (Record Location))
-type TypeScriptValue = Value Precise (Term (Union TypeScript.Syntax) (Record Location))
+type Language a = Value Precise (Term (Union a) (Record Location))
+
+type GoValue         = Language Go.Syntax
+type RubyValue       = Language Ruby.Syntax
+type PythonValue     = Language Python.Syntax
+type TypeScriptValue = Language TypeScript.Syntax
 
 file :: MonadIO m => FilePath -> m Blob
 file path = fromJust <$> IO.readFile path (languageForFilePath path)
@@ -43,6 +47,13 @@ evaluateRubyFiles paths = do
   blobs@(b:bs) <- traverse file paths
   (t:ts) <- runTask $ traverse (parse rubyParser) blobs
   pure $ evaluates @RubyValue (zip bs ts) (b, t)
+
+-- Go
+typecheckGoFile path = evaluateCache @Type <$>
+  (file path >>= runTask . parse goParser)
+
+evaluateGoFile path = evaluateCache @GoValue <$>
+  (file path >>= runTask . parse goParser)
 
 -- Python
 typecheckPythonFile path = evaluateCache @Type <$>
