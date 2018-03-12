@@ -19,6 +19,7 @@ import Prelude hiding (fail)
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
 class (MonadEvaluator t v m) => MonadValue t v m where
   -- | Construct an abstract unit value.
+  --   TODO: This might be the same as the empty tuple for some value types
   unit :: m v
 
   -- | Construct an abstract integral value.
@@ -32,6 +33,9 @@ class (MonadEvaluator t v m) => MonadValue t v m where
 
   -- | Construct a floating-point value.
   float :: Scientific -> m v
+
+  -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
+  multiple :: [v] -> m v
 
   -- | Construct an abstract interface value.
   interface :: v -> m v
@@ -57,21 +61,24 @@ instance ( FreeVariables t
          )
          => MonadValue t (Value location t) m where
 
-  unit    = pure $ inj Value.Unit
-  integer = pure . inj . Integer
-  boolean = pure . inj . Boolean
-  string  = pure . inj . Value.String
-  float   = pure . inj . Value.Float
-  interface v = inj . Value.Interface v <$> getGlobalEnv
+  unit    = pure . injValue $ Value.Unit
+  integer = pure . injValue . Integer
+  boolean = pure . injValue . Boolean
+  string  = pure . injValue . Value.String
+  float   = pure . injValue . Value.Float
+  multiple vals =
+    pure . injValue $ Value.Tuple vals
+
+  interface v = injValue . Value.Interface v <$> getGlobalEnv
 
   ifthenelse cond if' else'
-    | Just (Boolean b) <- prj cond = if b then if' else else'
+    | Just (Boolean b) <- prjValue cond = if b then if' else else'
     | otherwise = fail "not defined for non-boolean conditions"
 
-  abstract names (Subterm body _) = inj . Closure names body <$> askLocalEnv
+  abstract names (Subterm body _) = injValue . Closure names body <$> askLocalEnv
 
   apply op params = do
-    Closure names body env <- maybe (fail "expected a closure") pure (prj op)
+    Closure names body env <- maybe (fail "expected a closure") pure (prjValue op)
     bindings <- foldr (\ (name, param) rest -> do
       v <- subtermValue param
       a <- alloc name
@@ -80,8 +87,8 @@ instance ( FreeVariables t
     localEnv (mappend bindings) (evaluateTerm body)
 
   environment v
-    | Just (Interface _ env) <- prj v = pure env
-    | otherwise                       = pure mempty
+    | Just (Interface _ env) <- prjValue v = pure env
+    | otherwise                            = pure mempty
 
 -- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
 instance (Alternative m, MonadEvaluator t Type m, MonadFresh m) => MonadValue t Type m where
@@ -100,6 +107,7 @@ instance (Alternative m, MonadEvaluator t Type m, MonadFresh m) => MonadValue t 
   boolean _ = pure Bool
   string _  = pure Type.String
   float _   = pure Type.Float
+  multiple  = pure . Type.Product
   -- TODO
   interface = undefined
 
