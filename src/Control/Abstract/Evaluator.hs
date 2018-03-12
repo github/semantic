@@ -14,17 +14,7 @@ import Prologue
 --   - environments binding names to addresses
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
-class (MonadFail m, MonadStore value m) => MonadEvaluator term value m | m -> term, m -> value where
-  -- | Retrieve the global environment.
-  getGlobalEnv :: m (EnvironmentFor value)
-  -- | Set the global environment
-  putGlobalEnv :: EnvironmentFor value -> m ()
-
-  -- | Retrieve the local environment.
-  askLocalEnv :: m (EnvironmentFor value)
-  -- | Run an action with a locally-modified environment.
-  localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m a -> m a
-
+class (MonadEnvironment value m, MonadFail m, MonadStore value m) => MonadEvaluator term value m | m -> term, m -> value where
   -- | Retrieve the table of evaluated modules.
   getModuleTable :: m (ModuleTable (EnvironmentFor value))
   -- | Update the table of evaluated modules.
@@ -42,6 +32,17 @@ class (MonadFail m, MonadStore value m) => MonadEvaluator term value m | m -> te
 -- | Get the current 'Configuration' with a passed-in term.
 getConfiguration :: (MonadEvaluator term value m, Ord (LocationFor value)) => term -> m (ConfigurationFor term value)
 getConfiguration term = Configuration term <$> askRoots <*> askLocalEnv <*> getStore
+
+class Monad m => MonadEnvironment value m | m -> value where
+  -- | Retrieve the global environment.
+  getGlobalEnv :: m (EnvironmentFor value)
+  -- | Set the global environment
+  putGlobalEnv :: EnvironmentFor value -> m ()
+
+  -- | Retrieve the local environment.
+  askLocalEnv :: m (EnvironmentFor value)
+  -- | Run an action with a locally-modified environment.
+  localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m a -> m a
 
 -- | Update the global environment.
 modifyGlobalEnv :: MonadEvaluator term value m => (EnvironmentFor value -> EnvironmentFor value) -> m  ()

@@ -77,17 +77,18 @@ type EvaluatingEffects term value
      , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
      ]
 
-instance Member (State (StoreFor value)) effects => MonadStore value (Evaluating term value effects) where
-  getStore = raise get
-  putStore = raise . put
-
-instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
+instance Members '[Reader (EnvironmentFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
   getGlobalEnv = raise get
   putGlobalEnv = raise . put
 
   askLocalEnv = raise ask
   localEnv f a = raise (local f (lower a))
 
+instance Member (State (StoreFor value)) effects => MonadStore value (Evaluating term value effects) where
+  getStore = raise get
+  putStore = raise . put
+
+instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
   getModuleTable = raise get
   modifyModuleTable f = raise (modify f)
 

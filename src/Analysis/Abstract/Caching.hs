@@ -26,6 +26,7 @@ type CacheFor term value = Cache (LocationFor value) term value
 newtype Caching m term value (effects :: [* -> *]) a = Caching (m term value effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
+deriving instance MonadEnvironment value (m term value effects) => MonadEnvironment value (Caching m term value effects)
 deriving instance MonadStore value (m term value effects) => MonadStore value (Caching m term value effects)
 deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (Caching m term value effects)
 
