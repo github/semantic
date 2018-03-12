@@ -2,7 +2,6 @@
 module Control.Abstract.Evaluator where
 
 import Data.Abstract.Configuration
-import Data.Abstract.Live
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Prelude hiding (fail)
@@ -20,13 +19,9 @@ class ( MonadEnvironment value m
       , MonadStore value m
       )
       => MonadEvaluator term value m | m -> term, m -> value where
-  -- | Retrieve the current root set.
-  askRoots :: Ord (LocationFor value) => m (Live (LocationFor value) value)
-  askRoots = pure mempty
-
--- | Get the current 'Configuration' with a passed-in term.
-getConfiguration :: (MonadEvaluator term value m, Ord (LocationFor value)) => term -> m (ConfigurationFor term value)
-getConfiguration term = Configuration term <$> askRoots <*> askLocalEnv <*> getStore
+  -- | Get the current 'Configuration' with a passed-in term.
+  getConfiguration :: Ord (LocationFor value) => term -> m (ConfigurationFor term value)
+  getConfiguration term = Configuration term mempty <$> askLocalEnv <*> getStore
 
 class Monad m => MonadEnvironment value m | m -> value where
   -- | Retrieve the global environment.
