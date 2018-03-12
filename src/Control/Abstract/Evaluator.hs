@@ -24,7 +24,6 @@ class ( MonadEnvironment value m
       => MonadEvaluator term value m | m -> term, m -> value where
   -- | Get the current 'Configuration' with a passed-in term.
   getConfiguration :: Ord (LocationFor value) => term -> m (ConfigurationFor term value)
-  getConfiguration term = Configuration term mempty <$> askLocalEnv <*> getStore
 
 class Monad m => MonadEnvironment value m | m -> value where
   -- | Retrieve the global environment.

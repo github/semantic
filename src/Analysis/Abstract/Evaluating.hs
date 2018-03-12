@@ -12,6 +12,7 @@ import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
+import Data.Abstract.Configuration
 import Data.Abstract.Evaluatable
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
@@ -95,7 +96,8 @@ instance Members '[Reader (ModuleTable term), State (ModuleTable (EnvironmentFor
   askModuleTable = raise ask
   localModuleTable f a = raise (local f (lower a))
 
-instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects)
+instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
+  getConfiguration term = Configuration term mempty <$> askLocalEnv <*> getStore
 
 instance ( Evaluatable (Base term)
          , FreeVariables term
