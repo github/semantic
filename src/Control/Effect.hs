@@ -66,6 +66,9 @@ instance Ord a => RunEffect NonDetEff a where
     MPlus -> mappend <$> k True <*> k False)
 
 
+-- | Types wrapping 'Eff' actions.
+--
+--   Most instances of 'Effectful' will be derived using @-XGeneralizedNewtypeDeriving@, with these ultimately bottoming out on the instance for 'Eff' (for which 'raise' and 'lower' are simply the identity).
 class Effectful m where
   raise :: Eff effects a -> m effects a
   lower :: m effects a -> Eff effects a
