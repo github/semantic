@@ -24,7 +24,9 @@ import Prologue
 --
 --   This typeclass is left intentionally unconstrained to avoid circular dependencies between it and other typeclasses.
 class (MonadEvaluator term value m, Recursive term) => MonadAnalysis term value m where
+  -- | The effects necessary to run the analysis. Analyses which are composed on top of (wrap) other analyses should include the inner analyses 'RequiredEffects' in their own list.
   type family RequiredEffects term value m :: [* -> *]
+
   -- | Analyze a term using the semantics of the current analysis. This should generally only be called by definitions of 'evaluateTerm' and 'analyzeTerm' in this or other instances.
   analyzeTerm :: SubtermAlgebra (Base term) term (m value)
 
