@@ -12,7 +12,7 @@ import Prologue
 class (Alternative m, Monad m) => MonadNonDet m where
   -- | Run a computation, gathering any nondeterministically produced results into a single 'Monoid'al value.
   gather :: Monoid b
-         => (a -> b) -- ^ A function constructing a 'Monoid'al value from a single computed result. This might typically be @point@ (for @Pointed@ functors), 'pure' (for 'Applicative's), or some similar singleton constructor.
+         => (a -> b) -- ^ A function constructing a 'Monoid'al value from a single computed result. This might typically be @unit@ (for @Reducer@s), 'pure' (for 'Applicative's), or some similar singleton constructor.
          -> m a      -- ^ The computation to run locally-nondeterministically.
          -> m b      -- ^ A _deterministic_ computation producing the 'Monoid'al accumulation of the _locally-nondeterministic_ result values.
 
