@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, TypeOperators #-}
-module Rendering.TOC.Spec where
+module Rendering.TOC.Spec (spec) where
 
 import Analysis.Decorator (constructorNameAndConstantFields)
 import Analysis.Declaration

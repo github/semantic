@@ -1,4 +1,4 @@
-module Data.Functor.Classes.Generic.Spec where
+module Data.Functor.Classes.Generic.Spec (spec) where
 
 import Data.Functor.Classes.Generic
 import Data.Functor.Listable
