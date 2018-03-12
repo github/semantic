@@ -140,7 +140,6 @@ library
                      , bifunctors
                      , bytestring
                      , cmark-gfm
-                     , comonad
                      , containers
                      , directory
                      , effects
@@ -161,7 +160,6 @@ library
                      , parsers
                      , pointed
                      , recursion-schemes
-                     , semigroups
                      , scientific
                      , split
                      , stm-chans
