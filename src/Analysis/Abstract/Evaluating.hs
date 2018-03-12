@@ -62,7 +62,6 @@ newtype Evaluating term value effects a = Evaluating (Eff effects a)
   deriving (Applicative, Functor, Effectful, Monad)
 
 
-
 deriving instance Member Fail      effects => MonadFail   (Evaluating term value effects)
 deriving instance Member Fresh     effects => MonadFresh  (Evaluating term value effects)
 deriving instance Member NonDetEff effects => Alternative (Evaluating term value effects)
