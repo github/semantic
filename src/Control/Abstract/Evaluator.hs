@@ -89,6 +89,7 @@ class Monad m => MonadModuleTable term value m | m -> term, m -> value where
   -- | Run an action with a locally-modified table of unevaluated modules.
   localModuleTable :: (ModuleTable term -> ModuleTable term) -> m a -> m a
 
+-- | Update the evaluated module table.
 modifyModuleTable :: MonadModuleTable term value m => (ModuleTable (EnvironmentFor value) -> ModuleTable (EnvironmentFor value)) -> m ()
 modifyModuleTable f = do
   table <- getModuleTable
