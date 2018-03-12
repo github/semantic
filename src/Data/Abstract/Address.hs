@@ -1,8 +1,9 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeFamilyDependencies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses, TypeFamilies, TypeFamilyDependencies #-}
 module Data.Abstract.Address where
 
-import Prologue
 import Data.Abstract.FreeVariables
+import Data.Semigroup.Reducer
+import Prologue
 
 -- | An abstract address with a location of @l@ pointing to a variable of type @a@.
 newtype Address l a = Address { unAddress :: l }
@@ -33,10 +34,12 @@ newtype Latest a = Latest { unLatest :: a }
   deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
 
 instance Semigroup (Latest a) where
-  (<>) = flip const
+  _ <> a = a
 
-instance Pointed Latest where
-  point = Latest
+instance Reducer a (Latest a) where
+  unit = Latest
+  cons _ = id
+  snoc _ = unit
 
 instance Eq1 Latest where liftEq = genericLiftEq
 instance Ord1 Latest where liftCompare = genericLiftCompare

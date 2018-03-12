@@ -14,6 +14,7 @@ module Data.Algebra
 , openFToOpenR
 ) where
 
+import Data.Bifunctor
 import Data.Functor.Foldable ( Base
                              , Corecursive(embed)
                              , Recursive(project)
@@ -45,7 +46,10 @@ type OpenRAlgebra f t a = forall b . (b -> (t, a)) -> f b -> a
 
 -- | A subterm and its computed value, used in 'SubtermAlgebra'.
 data Subterm t a = Subterm { subterm :: !t, subtermValue :: !a }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
+
+instance Bifunctor Subterm where
+  bimap f g (Subterm a b) = Subterm (f a) (g b)
 
 -- | Like an R-algebra, but using 'Subterm' to label the fields instead of an anonymous pair.
 type SubtermAlgebra f t a = f (Subterm t a) -> a
