@@ -28,13 +28,19 @@ newtype Caching m term value (effects :: [* -> *]) a = Caching (m term value eff
 
 deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (Caching m term value effects)
 
+-- | Functionality used to perform caching analysis. This is not exported, and exists primarily for organizational reasons.
 class MonadEvaluator term value m => MonadCaching term value m where
+  -- | Look up the set of values for a given configuration in the in-cache.
   consultOracle :: ConfigurationFor term value -> m (Set (value, StoreFor value))
+  -- | Run an action with the given in-cache.
   withOracle :: CacheFor term value -> m a -> m a
 
+  -- | Look up the set of values for a given configuration in the out-cache.
   lookupCache :: ConfigurationFor term value -> m (Maybe (Set (value, StoreFor value)))
+  -- | Run an action, caching its result and 'Store' under the given configuration.
   caching :: ConfigurationFor term value -> Set (value, StoreFor value) -> m value -> m value
 
+  -- | Run an action starting from an empty out-cache, and return the out-cache afterwards.
   isolateCache :: m a -> m (CacheFor term value)
 
 instance ( Effectful (m term value)
