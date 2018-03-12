@@ -22,6 +22,7 @@ type CachingEffects term value effects
 -- | The cache for term and abstract value types.
 type CacheFor term value = Cache (LocationFor value) term value
 
+-- | A (coinductively-)cached analysis suitable for guaranteeing termination of (suitably finitized) analyses over recursive programs.
 newtype Caching m term value (effects :: [* -> *]) a = Caching (m term value effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
