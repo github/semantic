@@ -29,10 +29,12 @@ import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.Python.Assignment as Python
 import qualified Language.TypeScript.Assignment as TypeScript
 
-type GoValue = Value Precise (Term (Union Go.Syntax) (Record Location))
-type RubyValue = Value Precise (Term (Union Ruby.Syntax) (Record Location))
-type PythonValue = Value Precise (Term (Union Python.Syntax) (Record Location))
-type TypeScriptValue = Value Precise (Term (Union TypeScript.Syntax) (Record Location))
+type Language a = Value Precise (Term (Union a) (Record Location))
+
+type GoValue         = Language Go.Syntax
+type RubyValue       = Language Ruby.Syntax
+type PythonValue     = Language Python.Syntax
+type TypeScriptValue = Language TypeScript.Syntax
 
 file :: MonadIO m => FilePath -> m Blob
 file path = fromJust <$> IO.readFile path (languageForFilePath path)
