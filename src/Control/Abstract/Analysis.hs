@@ -38,6 +38,8 @@ class (MonadEvaluator term value m, Recursive term) => MonadAnalysis term value 
 evaluateTerm :: MonadAnalysis term value m => term -> m value
 evaluateTerm = foldSubterms analyzeTerm
 
+
+-- | Lift a 'SubtermAlgebra' for an underlying analysis into a containing analysis. Use this when defining an analysis which can be composed onto other analyses to ensure that a call to 'analyzeTerm' occurs in the inner analysis and not the outer one.
 liftAnalyze :: ( Coercible (  m term value (effects :: [* -> *]) value) (t m term value effects value)
                , Coercible (t m term value effects value) (  m term value effects value)
                , Functor (Base term)
