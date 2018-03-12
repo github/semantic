@@ -55,6 +55,11 @@ typecheckGoFile path = evaluateCache @Type <$>
 evaluateGoFile path = evaluateCache @GoValue <$>
   (file path >>= runTask . parse goParser)
 
+evaluateGoFiles paths = do
+  blobs@(b:bs) <- traverse file paths
+  (t:ts) <- runTask $ traverse (parse goParser) blobs
+  pure $ evaluates @GoValue (zip bs ts) (b, t)
+
 -- Python
 typecheckPythonFile path = evaluateCache @Type <$>
   (file path >>= runTask . parse pythonParser)
