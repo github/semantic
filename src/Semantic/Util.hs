@@ -66,9 +66,10 @@ evaluateTypeScriptFiles paths = do
   pure $ evaluates @TypeScriptValue rest first
 
 
+parseFile :: Parser term -> FilePath -> IO (Blob, term)
 parseFile parser path = runTask $ do
   blob <- file path
-  (,) blob <$> parse parser blob 
+  (,) blob <$> parse parser blob
 
 
 -- Diff helpers
