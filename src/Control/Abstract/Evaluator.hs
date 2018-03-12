@@ -50,7 +50,9 @@ class Monad m => MonadStore value m | m -> value where
 
 -- | Update the heap.
 modifyStore :: MonadStore value m => (StoreFor value -> StoreFor value) -> m ()
-modifyStore f = getStore >>= putStore . f
+modifyStore f = do
+  s <- getStore
+  putStore $! f s
 
 -- | Write a value to the given 'Address' in the 'Store'.
 assign :: ( Ord (LocationFor value)
