@@ -16,6 +16,7 @@ import Prologue
 newtype Tracing (trace :: * -> *) m term value (effects :: [* -> *]) a = Tracing (m term value effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
+deriving instance MonadStore value (m term value effects) => MonadStore value (Tracing trace m term value effects)
 deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (Tracing trace m term value effects)
 
 instance ( Corecursive term

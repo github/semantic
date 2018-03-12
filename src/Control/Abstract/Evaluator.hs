@@ -14,7 +14,7 @@ import Prologue
 --   - environments binding names to addresses
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
-class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
+class (MonadFail m, MonadStore value m) => MonadEvaluator term value m | m -> term, m -> value where
   -- | Retrieve the global environment.
   getGlobalEnv :: m (EnvironmentFor value)
   -- | Set the global environment
@@ -24,11 +24,6 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   askLocalEnv :: m (EnvironmentFor value)
   -- | Run an action with a locally-modified environment.
   localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m a -> m a
-
-  -- | Retrieve the heap.
-  getStore :: m (StoreFor value)
-  -- | Set the heap.
-  putStore :: StoreFor value -> m ()
 
   -- | Retrieve the table of evaluated modules.
   getModuleTable :: m (ModuleTable (EnvironmentFor value))
@@ -52,6 +47,13 @@ getConfiguration term = Configuration term <$> askRoots <*> askLocalEnv <*> getS
 modifyGlobalEnv :: MonadEvaluator term value m => (EnvironmentFor value -> EnvironmentFor value) -> m  ()
 modifyGlobalEnv f = getGlobalEnv >>= putGlobalEnv . f
 
+
+class Monad m => MonadStore value m | m -> value where
+  -- | Retrieve the heap.
+  getStore :: m (StoreFor value)
+  -- | Set the heap.
+  putStore :: StoreFor value -> m ()
+
 -- | Update the heap.
-modifyStore :: MonadEvaluator term value m => (StoreFor value -> StoreFor value) -> m ()
+modifyStore :: MonadStore value m => (StoreFor value -> StoreFor value) -> m ()
 modifyStore f = getStore >>= putStore . f
