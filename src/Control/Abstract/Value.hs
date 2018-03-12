@@ -17,7 +17,7 @@ import Prelude hiding (fail)
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class (MonadEvaluator t v m) => MonadValue t v m where
+class (MonadEvaluator t v m, Show v) => MonadValue t v m where
   -- | Construct an abstract unit value.
   unit :: m v
 
@@ -49,6 +49,8 @@ class (MonadEvaluator t v m) => MonadValue t v m where
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( FreeVariables t
+         , Show t
+         , Show location
          , MonadAddressable location (Value location t) m
          , MonadAnalysis t (Value location t) m
          , MonadEvaluator t (Value location t) m
@@ -66,12 +68,12 @@ instance ( FreeVariables t
 
   ifthenelse cond if' else'
     | Just (Boolean b) <- prj cond = if b then if' else else'
-    | otherwise = fail "not defined for non-boolean conditions"
+    | otherwise = fail ("not defined for non-boolean condition: " <> show cond)
 
   abstract names (Subterm body _) = inj . Closure names body <$> askLocalEnv
 
   apply op params = do
-    Closure names body env <- maybe (fail "expected a closure") pure (prj op)
+    Closure names body env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prj op)
     bindings <- foldr (\ (name, param) rest -> do
       v <- subtermValue param
       a <- alloc name
