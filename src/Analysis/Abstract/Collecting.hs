@@ -4,7 +4,9 @@ module Analysis.Abstract.Collecting
 ) where
 
 import Control.Abstract.Analysis
+import Data.Abstract.Address
 import Data.Abstract.Live
+import Data.Abstract.Store
 import Data.Abstract.Value
 import Prologue
 
@@ -34,3 +36,28 @@ instance (Effectful m, Monad (m effects), Ord (LocationFor value), Reader (Live 
   askRoots = raise ask
 
   extraRoots roots = raise . local (<> roots) . lower
+
+-- | Collect any addresses in the store not rooted in or reachable from the given 'Live' set.
+gc :: ( Ord (LocationFor a)
+      , Foldable (Cell (LocationFor a))
+      , ValueRoots (LocationFor a) a
+      )
+   => Live (LocationFor a) a  -- ^ The set of addresses to consider rooted.
+   -> Store (LocationFor a) a -- ^ A store to collect unreachable addresses within.
+   -> Store (LocationFor a) a -- ^ A garbage-collected store.
+gc roots store = storeRestrict store (reachable roots store)
+
+-- | Compute the set of addresses reachable from a given root set in a given store.
+reachable :: ( Ord (LocationFor a)
+             , Foldable (Cell (LocationFor a))
+             , ValueRoots (LocationFor a) a
+             )
+          => Live (LocationFor a) a  -- ^ The set of root addresses.
+          -> Store (LocationFor a) a -- ^ The store to trace addresses through.
+          -> Live (LocationFor a) a  -- ^ The set of addresses reachable from the root set.
+reachable roots store = go mempty roots
+  where go seen set = case liveSplit set of
+          Nothing -> seen
+          Just (a, as) -> go (liveInsert a seen) (case storeLookupAll a store of
+            Just values -> liveDifference (foldr ((<>) . valueRoots) mempty values <> as) seen
+            _           -> seen)
