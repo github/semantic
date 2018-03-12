@@ -16,24 +16,32 @@ newtype Collecting m term value (effects :: [* -> *]) a = Collecting (m term val
 deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (Collecting m term value effects)
 
 
-instance ( MonadAnalysis term value (m term value effects)
+instance ( Foldable (Cell (LocationFor value))
+         , MonadAnalysis term value (m term value effects)
+         , Ord (LocationFor value)
+         , ValueRoots (LocationFor value) value
          )
          => MonadAnalysis term value (Collecting m term value effects) where
   type RequiredEffects term value (Collecting m term value effects) = Reader (Live (LocationFor value) value) ': RequiredEffects term value (m term value effects)
 
-  analyzeTerm term = liftAnalyze analyzeTerm term
+  -- Small-step evaluation which garbage-collects any non-rooted addresses after evaluating each term.
+  analyzeTerm term = do
+    roots <- askRoots
+    v <- liftAnalyze analyzeTerm term
+    modifyStore (gc (roots <> valueRoots v))
+    pure v
 
 
 -- | 'Monad's offering a local set of 'Live' (rooted/reachable) addresses.
 class Monad m => MonadGC value m where
   -- | Retrieve the local 'Live' set.
-  askRoots :: m (Live (LocationFor value) value)
+  -- askRoots :: m (Live (LocationFor value) value)
 
   -- | Run a computation with the given 'Live' set added to the local root set.
   extraRoots :: Live (LocationFor value) value -> m a -> m a
 
 instance (Effectful m, Monad (m effects), Ord (LocationFor value), Reader (Live (LocationFor value) value) :< effects) => MonadGC value (m effects) where
-  askRoots = raise ask
+  -- askRoots = raise ask
 
   extraRoots roots = raise . local (<> roots) . lower
 
