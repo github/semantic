@@ -3,7 +3,6 @@ module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , evaluateTerm
 , liftAnalyze
-, liftEvaluate
 , runAnalysis
 , module X
 , Subterm(..)
@@ -46,12 +45,6 @@ liftAnalyze :: ( Coercible (  m term value (effects :: [* -> *]) value) (t m ter
             => SubtermAlgebra (Base term) term (  m term value effects value)
             -> SubtermAlgebra (Base term) term (t m term value effects value)
 liftAnalyze analyze term = coerce (analyze (second coerce <$> term))
-
-liftEvaluate :: ( Coercible (m term value (effects :: [* -> *]) value) (t m term value effects value)
-                )
-             => (term ->   m term value effects value)
-             -> (term -> t m term value effects value)
-liftEvaluate evaluate = coerce . evaluate
 
 
 runAnalysis :: (Effectful m, RunEffects effects a, RequiredEffects term value (m effects) ~ effects, MonadAnalysis term value (m effects)) => m effects a -> Final effects a

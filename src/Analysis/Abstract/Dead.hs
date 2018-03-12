@@ -48,4 +48,4 @@ instance ( Corecursive term
 
   evaluateModule term = do
     killAll (subterms term)
-    liftEvaluate evaluateModule term
+    DeadCode (evaluateModule term)
