@@ -34,6 +34,7 @@ class ( MonadEnvironment value m
   -- | Get the current 'Configuration' with a passed-in term.
   getConfiguration :: Ord (LocationFor value) => term -> m (ConfigurationFor term value)
 
+-- | A 'Monad' abstracting local and global environments.
 class Monad m => MonadEnvironment value m | m -> value where
   -- | Retrieve the global environment.
   getGlobalEnv :: m (EnvironmentFor value)
@@ -52,6 +53,7 @@ modifyGlobalEnv f = do
   putGlobalEnv $! f env
 
 
+-- | A 'Monad' abstracting a heap of values.
 class Monad m => MonadStore value m | m -> value where
   -- | Retrieve the heap.
   getStore :: m (StoreFor value)
@@ -75,6 +77,7 @@ assign :: ( Ord (LocationFor value)
 assign address = modifyStore . storeInsert address
 
 
+-- | A 'Monad' abstracting tables of modules available for import.
 class Monad m => MonadModuleTable term value m | m -> term, m -> value where
   -- | Retrieve the table of evaluated modules.
   getModuleTable :: m (ModuleTable (EnvironmentFor value))
