@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE MultiParamTypeClasses, UndecidableInstances, TypeApplications #-}
 module Control.Abstract.Value where
 
 import Control.Abstract.Addressable
@@ -8,6 +8,7 @@ import Data.Abstract.FreeVariables
 import Data.Abstract.Type as Type
 import Data.Abstract.Value as Value
 import Data.Scientific (Scientific)
+import qualified Data.Map as Map
 import Prelude hiding (fail)
 import Prologue
 
@@ -64,12 +65,14 @@ instance ( MonadAddressable location (Value location term) m
   multiple vals =
     pure . injValue $ Value.Tuple vals
 
-  interface v = injValue . Value.Interface v <$> prunedEnv
-    where
-      -- TODO: If the set of exports is empty because no exports have been defined,
-      -- do we export all terms, or no terms?
-      -- This behavior varies across languages. We need better semantics rather than doing it ad-hoc.
-      prunedEnv = bindExports <$> getExports <*> getGlobalEnv
+  interface v = do
+    -- TODO: If the set of exports is empty because no exports have been
+    -- defined, do we export all terms, or no terms? This behavior varies across
+    -- languages. We need better semantics rather than doing it ad-hoc.
+    env <- getGlobalEnv
+    exports <- getExports
+    let env' = if Map.null exports then env else bindExports exports env
+    pure (injValue (Value.Interface v env'))
 
   ifthenelse cond if' else'
     | Just (Boolean b) <- prjValue cond = if b then if' else else'

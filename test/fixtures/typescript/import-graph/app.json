@@ -277,10 +277,8 @@
               11
             ]
           },
-          "symbol": "foo",
-          "targets": [
-            "name"
-          ]
+          "symbol": "name.foo",
+          "targets": []
         }
       ]
     }

@@ -22,4 +22,4 @@
       (Identifier)
       (Identifier)))
   (Import
-    (TextElement)))
+    (Identifier)))

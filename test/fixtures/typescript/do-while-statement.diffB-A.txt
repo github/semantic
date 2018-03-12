@@ -4,9 +4,7 @@
   ->(Boolean) }
     (
       (Call
-        (MemberAccess
-          (Identifier)
-          (Identifier))
+        (Identifier)
       { (Identifier)
       ->(Identifier) }
         (Empty)))))

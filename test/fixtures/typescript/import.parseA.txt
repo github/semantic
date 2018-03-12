@@ -22,7 +22,7 @@
       (Identifier)
       (Identifier)))
   (Import
-    (TextElement))
+    (Identifier))
   (QualifiedImport
-    (TextElement)
+    (Identifier)
     (Identifier)))
