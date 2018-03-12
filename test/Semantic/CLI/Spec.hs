@@ -1,5 +1,5 @@
 {-# LANGUAGE DuplicateRecordFields #-}
-module Semantic.CLI.Spec where
+module Semantic.CLI.Spec (spec) where
 
 import Control.Monad (when)
 import Data.ByteString (ByteString)
