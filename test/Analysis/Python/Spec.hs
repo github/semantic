@@ -30,7 +30,7 @@ spec = parallel $ do
             [ (qualifiedName ["a", "foo"], addr 0)
             , (qualifiedName ["b", "c", "baz"], addr 1)
             ]
-      res `shouldBe` interface expectedEnv
+      assertEnvironment res expectedEnv
 
     it "imports with aliases" $ do
       res <- evaluate "main1.py"
@@ -38,7 +38,7 @@ spec = parallel $ do
             [ (qualifiedName ["b", "foo"], addr 0)
             , (qualifiedName ["e", "baz"], addr 1)
             ]
-      res `shouldBe` interface expectedEnv
+      assertEnvironment res expectedEnv
 
     it "imports using 'from' syntax" $ do
       res <- evaluate "main2.py"
@@ -46,10 +46,13 @@ spec = parallel $ do
             [ (qualifiedName ["foo"], addr 0)
             , (qualifiedName ["bar"], addr 1)
             ]
-      res `shouldBe` interface expectedEnv
+      assertEnvironment res expectedEnv
 
   where
-    interface e = Right (inj @(Interface Precise) (Interface (inj (Boolean False)) e))
+    assertEnvironment result expectedEnv = case result of
+      Left e -> expectationFailure ("Evaluating expected to succeed, but failed with: " <> e)
+      Right res -> let Just (Interface _ env) = prj @(Interface Precise) res in env `shouldBe` expectedEnv
+
     addr = Address . Precise
     fixtures = "test/fixtures/python/analysis/"
     evaluate entry = fst . fst . fst . fst <$>

@@ -29,7 +29,7 @@ spec = parallel $ do
       let expectedEnv = Environment $ fromList
             [ (qualifiedName ["bar"], addr 0)
             ]
-      res `shouldBe` interface (Value.String "\"this is the baz function\"") expectedEnv
+      assertEnvironment res expectedEnv
 
     it "imports with qualified names" $ do
       res <- evaluate "main1.ts"
@@ -39,10 +39,13 @@ spec = parallel $ do
             , (qualifiedName ["z", "baz"], addr 0)
             , (qualifiedName ["z", "foo"], addr 2)
             ]
-      res `shouldBe` interface (Value.String "\"this is the foo function\"") expectedEnv
+      assertEnvironment res expectedEnv
 
   where
-    interface v e = Right (inj @(Interface Precise) (Interface (inj v) e))
+    assertEnvironment result expectedEnv = case result of
+      Left e -> expectationFailure ("Evaluating expected to succeed, but failed with: " <> e)
+      Right res -> let Just (Interface _ env) = prj @(Interface Precise) res in env `shouldBe` expectedEnv
+
     addr = Address . Precise
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate entry = fst . fst . fst . fst <$>
