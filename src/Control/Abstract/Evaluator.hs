@@ -1,5 +1,14 @@
 {-# LANGUAGE ConstrainedClassMethods, FunctionalDependencies #-}
-module Control.Abstract.Evaluator where
+module Control.Abstract.Evaluator
+( MonadEvaluator(..)
+, MonadEnvironment(..)
+, modifyGlobalEnv
+, MonadStore(..)
+, modifyStore
+, assign
+, MonadModuleTable(..)
+, modifyModuleTable
+) where
 
 import Data.Abstract.Address
 import Data.Abstract.Configuration
