@@ -68,10 +68,15 @@ assign address = modifyStore . storeInsert address
 class Monad m => MonadModuleTable term value m | m -> term, m -> value where
   -- | Retrieve the table of evaluated modules.
   getModuleTable :: m (ModuleTable (EnvironmentFor value))
-  -- | Update the table of evaluated modules.
-  modifyModuleTable :: (ModuleTable (EnvironmentFor value) -> ModuleTable (EnvironmentFor value)) -> m ()
+  -- | Set the table of evaluated modules.
+  putModuleTable :: ModuleTable (EnvironmentFor value) -> m ()
 
   -- | Retrieve the table of unevaluated modules.
   askModuleTable :: m (ModuleTable term)
   -- | Run an action with a locally-modified table of unevaluated modules.
   localModuleTable :: (ModuleTable term -> ModuleTable term) -> m a -> m a
+
+modifyModuleTable :: MonadModuleTable term value m => (ModuleTable (EnvironmentFor value) -> ModuleTable (EnvironmentFor value)) -> m ()
+modifyModuleTable f = do
+  table <- getModuleTable
+  putModuleTable $! f table

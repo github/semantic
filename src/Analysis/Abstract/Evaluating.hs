@@ -90,7 +90,7 @@ instance Member (State (StoreFor value)) effects => MonadStore value (Evaluating
 
 instance Members '[Reader (ModuleTable term), State (ModuleTable (EnvironmentFor value))] effects => MonadModuleTable term value (Evaluating term value effects) where
   getModuleTable = raise get
-  modifyModuleTable f = raise (modify f)
+  putModuleTable = raise . put
 
   askModuleTable = raise ask
   localModuleTable f a = raise (local f (lower a))
