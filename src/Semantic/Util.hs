@@ -52,6 +52,9 @@ evaluateRubyFiles paths = do
 typecheckGoFile path = evaluateCache @Type <$>
   (file path >>= runTask . parse goParser)
 
+evaluateGoFile path = evaluateCache @GoValue <$>
+  (file path >>= runTask . parse goParser)
+
 -- Python
 typecheckPythonFile path = evaluateCache @Type <$>
   (file path >>= runTask . parse pythonParser)
