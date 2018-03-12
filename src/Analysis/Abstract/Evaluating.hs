@@ -68,6 +68,7 @@ deriving instance Member Fresh     effects => MonadFresh  (Evaluating term value
 deriving instance Member NonDetEff effects => Alternative (Evaluating term value effects)
 deriving instance Member NonDetEff effects => MonadNonDet (Evaluating term value effects)
 
+-- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value
   = '[ Fail                                        -- Failure with an error message
      , Reader (EnvironmentFor value)               -- Local environment (e.g. binding over a closure)
