@@ -17,7 +17,7 @@ deriving instance MonadEvaluator term value (m term value effects) => MonadEvalu
 instance ( MonadAnalysis term value (m term value effects)
          )
          => MonadAnalysis term value (Collecting m term value effects) where
-  type RequiredEffects term value (Collecting m term value effects) = RequiredEffects term value (m term value effects)
+  type RequiredEffects term value (Collecting m term value effects) = Reader (Live (LocationFor value) value) ': RequiredEffects term value (m term value effects)
 
   analyzeTerm term = liftAnalyze analyzeTerm term
 
