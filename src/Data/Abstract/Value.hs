@@ -29,10 +29,11 @@ type ValueConstructors location term
 newtype Value location term = Value { deValue :: Union (ValueConstructors location term) (Value location term) }
   deriving (Eq, Show, Ord)
 
-
+-- | Identical to 'inj', but wraps the resulting sub-entity in a 'Value'.
 injValue :: (f :< ValueConstructors location term) => f (Value location term) -> Value location term
 injValue = Value . inj
 
+-- | Identical to 'prj', but unwraps the argument out of its 'Value' wrapper.
 prjValue :: (f :< ValueConstructors location term) => Value location term -> Maybe (f (Value location term))
 prjValue = prj . deValue
 
