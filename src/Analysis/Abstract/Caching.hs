@@ -28,6 +28,7 @@ newtype Caching m term value (effects :: [* -> *]) a = Caching (m term value eff
 
 deriving instance MonadEnvironment value (m term value effects) => MonadEnvironment value (Caching m term value effects)
 deriving instance MonadStore value (m term value effects) => MonadStore value (Caching m term value effects)
+deriving instance MonadModuleTable term value (m term value effects) => MonadModuleTable term value (Caching m term value effects)
 deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (Caching m term value effects)
 
 -- | Functionality used to perform caching analysis. This is not exported, and exists primarily for organizational reasons.

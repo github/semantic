@@ -88,12 +88,14 @@ instance Member (State (StoreFor value)) effects => MonadStore value (Evaluating
   getStore = raise get
   putStore = raise . put
 
-instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
+instance Members '[Reader (ModuleTable term), State (ModuleTable (EnvironmentFor value))] effects => MonadModuleTable term value (Evaluating term value effects) where
   getModuleTable = raise get
   modifyModuleTable f = raise (modify f)
 
   askModuleTable = raise ask
   localModuleTable f a = raise (local f (lower a))
+
+instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects)
 
 instance ( Evaluatable (Base term)
          , FreeVariables term
