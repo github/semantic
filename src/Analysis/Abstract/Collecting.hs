@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Collecting
 ( type Collecting
 ) where
@@ -29,3 +29,8 @@ class Monad m => MonadGC value m where
 
   -- | Run a computation with the given 'Live' set added to the local root set.
   extraRoots :: Live (LocationFor value) value -> m a -> m a
+
+instance (Effectful m, Monad (m effects), Ord (LocationFor value), Reader (Live (LocationFor value) value) :< effects) => MonadGC value (m effects) where
+  askRoots = raise ask
+
+  extraRoots roots = raise . local (<> roots) . lower
