@@ -78,6 +78,7 @@ instance ( Corecursive term
          )
          => MonadAnalysis term value (Caching m term value effects) where
   type RequiredEffects term value (Caching m term value effects) = CachingEffects term value (RequiredEffects term value (m term value effects))
+
   analyzeTerm e = do
     c <- getConfiguration (embedSubterm e)
     cached <- lookupCache c

@@ -102,4 +102,5 @@ instance ( Evaluatable (Base term)
          )
          => MonadAnalysis term value (Evaluating term value effects) where
   type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
+
   analyzeTerm = eval

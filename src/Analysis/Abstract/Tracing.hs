@@ -27,6 +27,7 @@ instance ( Corecursive term
          )
          => MonadAnalysis term value (Tracing trace m term value effects) where
   type RequiredEffects term value (Tracing trace m term value effects) = Writer (trace (ConfigurationFor term value)) ': RequiredEffects term value (m term value effects)
+
   analyzeTerm term = do
     config <- getConfiguration (embedSubterm term)
     trace (Reducer.unit config)
