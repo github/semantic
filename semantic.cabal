@@ -204,6 +204,7 @@ test-suite test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       Assigning.Assignment.Spec
+                     , Analysis.Go.Spec
                      , Analysis.Python.Spec
                      , Analysis.TypeScript.Spec
                      , Data.Diff.Spec
