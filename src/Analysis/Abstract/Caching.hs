@@ -32,8 +32,8 @@ type CachingEffects t v
      , Fail                                   -- For 'MonadFail'.
      , NonDetEff                              -- For 'Alternative' & 'MonadNonDet'.
      , State (Store (LocationFor v) v)        -- For 'MonadStore'.
-     , Reader (Cache (LocationFor v) t v)     -- For 'MonadCacheIn'.
-     , State (Cache (LocationFor v) t v)      -- For 'MonadCacheOut'.
+     , Reader (Cache (LocationFor v) t v)     -- For reading memoized values.
+     , State (Cache (LocationFor v) t v)      -- For writing said values.
      , Reader (ModuleTable t)                 -- Cache of unevaluated modules
      , State (ModuleTable (EnvironmentFor v)) -- Cache of evaluated modules
      ]

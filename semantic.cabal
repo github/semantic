@@ -37,7 +37,6 @@ library
                      -- Control flow
                      , Control.Effect
                      -- Effects used for program analysis
-                     , Control.Monad.Effect.Cache
                      , Control.Monad.Effect.Fresh
                      -- , Control.Monad.Effect.GC
                      , Control.Monad.Effect.NonDet
