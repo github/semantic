@@ -4,11 +4,11 @@ module Data.Abstract.Cache where
 import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.Store
-import Data.Map.Monoidal as Map
+import Data.Map.Monoidal as Monoidal
 import Prologue
 
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Store's.
-newtype Cache l t v = Cache { unCache :: Map.Map (Configuration l t v) (Set (v, Store l v)) }
+newtype Cache l t v = Cache { unCache :: Monoidal.Map (Configuration l t v) (Set (v, Store l v)) }
 
 deriving instance (Eq l, Eq t, Eq v, Eq (Cell l v)) => Eq (Cache l t v)
 deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Ord (Cache l t v)
@@ -19,11 +19,11 @@ deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Reducer (Configuratio
 
 -- | Look up the resulting value & 'Store' for a given 'Configuration'.
 cacheLookup :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> Cache l t v -> Maybe (Set (v, Store l v))
-cacheLookup key = Map.lookup key . unCache
+cacheLookup key = Monoidal.lookup key . unCache
 
 -- | Set the resulting value & 'Store' for a given 'Configuration', overwriting any previous entry.
 cacheSet :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> Set (v, Store l v) -> Cache l t v -> Cache l t v
-cacheSet key value = Cache . Map.insert key value . unCache
+cacheSet key value = Cache . Monoidal.insert key value . unCache
 
 -- | Insert the resulting value & 'Store' for a given 'Configuration', appending onto any previous entry.
 cacheInsert :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> (v, Store l v) -> Cache l t v -> Cache l t v
