@@ -44,9 +44,9 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   askRoots :: Ord (LocationFor value) => m (Live (LocationFor value) value)
   askRoots = pure mempty
 
-  -- | Get the current 'Configuration' with a passed-in term.
-  getConfiguration :: Ord (LocationFor value) => term -> m (Configuration (LocationFor value) term value)
-  getConfiguration term = Configuration term <$> askRoots <*> askLocalEnv <*> getStore
+-- | Get the current 'Configuration' with a passed-in term.
+getConfiguration :: (MonadEvaluator term value m, Ord (LocationFor value)) => term -> m (ConfigurationFor term value)
+getConfiguration term = Configuration term <$> askRoots <*> askLocalEnv <*> getStore
 
 -- | Update the global environment.
 modifyGlobalEnv :: MonadEvaluator term value m => (EnvironmentFor value -> EnvironmentFor value) -> m  ()
