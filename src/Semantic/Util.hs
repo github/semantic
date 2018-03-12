@@ -39,7 +39,7 @@ file :: MonadIO m => FilePath -> m Blob
 file path = fromJust <$> IO.readFile path (languageForFilePath path)
 
 -- Ruby
-evaluateRubyFile path = Prelude.fst . evaluate @RubyValue . snd <$> parseFile rubyParser path
+evaluateRubyFile path = fst . evaluate @RubyValue . snd <$> parseFile rubyParser path
 
 evaluateRubyFiles paths = do
   first:rest <- traverse (parseFile rubyParser) paths
