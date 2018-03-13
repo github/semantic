@@ -12,13 +12,6 @@ import Data.Scientific (Scientific, fromFloatDigits, toRealFloat)
 import Prelude hiding (fail)
 import Prologue
 
--- TODO: move this useful projection function elsewhere
-au :: ( f :< ValueConstructors loc term1
-      , g :< ValueConstructors loc term2)
-   => (Value loc term1, Value loc term2)
-   -> Maybe (f (Value loc term1), g (Value loc term2))
-au = bitraverse prjValue prjValue
-
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
@@ -72,10 +65,6 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
 toBool :: MonadValue term value m => value -> m Bool
 toBool v = ifthenelse v (pure True) (pure False)
 
--- | As with 'toBool', except from a given 'Subterm'.
-evalToBool :: MonadValue term value m => Subterm t (m value) -> m Bool
-evalToBool = subtermValue >=> toBool
-
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( MonadAddressable location (Value location term) m
          , MonadAnalysis term (Value location term) m
@@ -104,11 +93,11 @@ instance ( MonadAddressable location (Value location term) m
     | otherwise = fail "Invalid operand to liftNumeric"
 
   liftNumeric2 f g left right
-    | Just (Integer i, Integer j)         <- au pair = pure . injValue . Integer $ g i j
-    | Just (Integer i, Value.Float j)     <- au pair = pure . injValue . float   $ f (fromIntegral i) (munge j)
-    | Just (Value.Float i, Value.Float j) <- au pair = pure . injValue . float   $ f (munge i) (munge j)
-    | Just (Value.Float i, Integer j)     <- au pair = pure . injValue . float   $ f (munge i) (fromIntegral j)
-    | otherwise = fail "Invalid operands to liftNumeric2"
+    | Just (Integer i, Integer j)         <- prjPair pair = pure . injValue . Integer $ g i j
+    | Just (Integer i, Value.Float j)     <- prjPair pair = pure . injValue . float   $ f (fromIntegral i) (munge j)
+    | Just (Value.Float i, Value.Float j) <- prjPair pair = pure . injValue . float   $ f (munge i) (munge j)
+    | Just (Value.Float i, Integer j)     <- prjPair pair = pure . injValue . float   $ f (munge i) (fromIntegral j)
+    | otherwise = fail ("Invalid operands to liftNumeric2 " <> )
       where
         -- Yucky hack to work around the lack of a Floating instance for Scientific.
         -- This may possibly lose precision, but there's little we can do about that.
