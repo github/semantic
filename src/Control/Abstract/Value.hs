@@ -12,6 +12,13 @@ import Data.Scientific (Scientific, fromFloatDigits, toRealFloat)
 import Prelude hiding (fail)
 import Prologue
 
+-- TODO: move this useful projection function elsewhere
+au :: ( f :< ValueConstructors loc term1
+      , g :< ValueConstructors loc term2)
+   => (Value loc term1, Value loc term2)
+   -> Maybe (f (Value loc term1), g (Value loc term2))
+au = bitraverse prjValue prjValue
+
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
@@ -92,15 +99,15 @@ instance ( MonadAddressable location (Value location term) m
     | otherwise = fail ("not defined for non-boolean conditions: " <> show cond)
 
   liftNumeric f arg
-    | Just (Integer i)     <- prj arg = pure . inj . Integer     $ f i
-    | Just (Value.Float i) <- prj arg = pure . inj . Value.Float $ f i
+    | Just (Integer i)     <- prjValue arg = pure . injValue . Integer     $ f i
+    | Just (Value.Float i) <- prjValue arg = pure . injValue . Value.Float $ f i
     | otherwise = fail "Invalid operand to liftNumeric"
 
   liftNumeric2 f g left right
-    | Just (Integer i, Integer j)         <- au pair = pure . inj . Integer $ g i j
-    | Just (Integer i, Value.Float j)     <- au pair = pure . inj . float   $ f (fromIntegral i) (munge j)
-    | Just (Value.Float i, Value.Float j) <- au pair = pure . inj . float   $ f (munge i) (munge j)
-    | Just (Value.Float i, Integer j)     <- au pair = pure . inj . float   $ f (munge i) (fromIntegral j)
+    | Just (Integer i, Integer j)         <- au pair = pure . injValue . Integer $ g i j
+    | Just (Integer i, Value.Float j)     <- au pair = pure . injValue . float   $ f (fromIntegral i) (munge j)
+    | Just (Value.Float i, Value.Float j) <- au pair = pure . injValue . float   $ f (munge i) (munge j)
+    | Just (Value.Float i, Integer j)     <- au pair = pure . injValue . float   $ f (munge i) (fromIntegral j)
     | otherwise = fail "Invalid operands to liftNumeric2"
       where
         -- Yucky hack to work around the lack of a Floating instance for Scientific.
@@ -109,8 +116,6 @@ instance ( MonadAddressable location (Value location term) m
         munge = toRealFloat
         float :: Double -> Value.Float a
         float = Value.Float . fromFloatDigits
-        au :: (i :< is, j :< js) => (Union is a, Union js b) -> Maybe (i a, j b)
-        au = bitraverse prj prj
         pair = (left, right)
 
   abstract names (Subterm body _) = injValue . Closure names body <$> askLocalEnv
