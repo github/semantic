@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, ViewPatterns #-}
 module Data.Syntax.Statement where
 
 import Data.Abstract.Environment
@@ -199,7 +199,8 @@ instance Ord1 For where liftCompare = genericLiftCompare
 instance Show1 For where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for For
-instance Evaluatable For
+instance Evaluatable For where
+  eval (fmap subtermValue -> For {..}) = forLoop forBefore forCondition forStep forBody
 
 
 data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }
