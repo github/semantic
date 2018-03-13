@@ -71,6 +71,7 @@ evaluatePythonFiles paths = do
   pure $ evaluates @PythonValue rest first
 
 -- TypeScript
+typecheckTypeScriptFile path = fst . runAnalysis @(Caching Evaluating TypeScript.Term Type) . evaluateModule . snd <$> parseFile typescriptParser path
 evaluateTypeScriptFile path = fst . evaluate @TypeScriptValue . snd <$> parseFile typescriptParser path
 
 evaluateTypeScriptFiles paths = do
