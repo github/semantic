@@ -6,8 +6,6 @@ module Data.Abstract.Evaluatable
 , module FreeVariables
 , module Value
 , MonadEvaluator(..)
-, require
-, load
 , Imperative(..)
 ) where
 
@@ -15,7 +13,6 @@ import Control.Abstract.Addressable as Addressable
 import Control.Abstract.Analysis as Analysis
 import Control.Abstract.Value as Value
 import Data.Abstract.FreeVariables as FreeVariables
-import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Functor.Classes
 import Data.Proxy
@@ -54,29 +51,6 @@ instance Evaluatable s => Evaluatable (TermF s a) where
 --   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   eval = maybe unit (runImperative . foldMap1 (Imperative . subtermValue)) . nonEmpty
-
-
--- | Require/import another term/file and return an Effect.
---
--- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
-require :: MonadAnalysis term value m
-        => ModuleName
-        -> m (EnvironmentFor value)
-require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup name
-
--- | Load another term/file and return an Effect.
---
--- Always loads/evaluates.
-load :: MonadAnalysis term value m
-     => ModuleName
-     -> m (EnvironmentFor value)
-load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
-  where notFound = fail ("cannot load module: " <> show name)
-        evalAndCache e = do
-          void $ evaluateModule e
-          env <- getGlobalEnv
-          modifyModuleTable (moduleTableInsert name env)
-          pure env
 
 
 -- | A 'Semigroup' providing an imperative context which extends the local environment with new bindings.
