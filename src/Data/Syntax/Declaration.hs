@@ -234,7 +234,7 @@ instance Evaluatable QualifiedImport where
     putGlobalEnv mempty
     importedEnv <- require (freeVariable (subterm from))
     env' <- Map.foldrWithKey copy (pure env) (unEnvironment importedEnv)
-    modifyGlobalEnv (const env')
+    putGlobalEnv env'
     unit
     where
       prefix = freeVariable (subterm alias)
@@ -260,7 +260,7 @@ instance Evaluatable Import where
     putGlobalEnv mempty
     importedEnv <- require (freeVariable (subterm from))
     env' <- Map.foldrWithKey directInsert (pure env) (unEnvironment importedEnv)
-    modifyGlobalEnv (const env')
+    putGlobalEnv env'
     unit
     where
       symbols = Map.fromList xs
