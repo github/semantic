@@ -45,22 +45,22 @@ type OpenFAlgebra f a = forall b . (b -> a) -> f b -> a
 type OpenRAlgebra f t a = forall b . (b -> (t, a)) -> f b -> a
 
 -- | A subterm and its computed value, used in 'SubtermAlgebra'.
-data Subterm t a = Subterm { subterm :: !t, subtermValue :: !a }
+data Subterm m t a = Subterm { subterm :: !t, subtermValue :: !(m a) }
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
-instance Bifunctor Subterm where
-  bimap f g (Subterm a b) = Subterm (f a) (g b)
+instance Functor m => Bifunctor (Subterm m) where
+  bimap f g (Subterm a b) = Subterm (f a) (fmap g b)
 
 -- | Like an R-algebra, but using 'Subterm' to label the fields instead of an anonymous pair.
-type SubtermAlgebra f t a = f (Subterm t a) -> a
+type SubtermAlgebra f m t a = f (Subterm m t a) -> m a
 
 
 -- | Fold a 'Recursive' structure using a 'SubtermAlgebra'. Like 'para', but with named fields for subterms and values.
-foldSubterms :: Recursive t => SubtermAlgebra (Base t) t a -> t -> a
+foldSubterms :: Recursive t => SubtermAlgebra (Base t) m t a -> t -> m a
 foldSubterms algebra = go where go = algebra . fmap (Subterm <*> go) . project
 
 -- | Extract a term from said term's 'Base' functor populated with 'Subterm' fields.
-embedSubterm :: Corecursive t => Base t (Subterm t a) -> t
+embedSubterm :: Corecursive t => Base t (Subterm m t a) -> t
 embedSubterm e = embed (subterm <$> e)
 
 -- | Promote an 'FAlgebra' into an 'RAlgebra' (by dropping the original parameter).
