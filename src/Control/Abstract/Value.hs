@@ -7,7 +7,7 @@ import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type as Type
 import Data.Abstract.Value as Value
-import Data.Monoid (Alt (..))
+import Data.Bitraversable
 import Data.Scientific (Scientific, fromFloatDigits, toRealFloat)
 import Prelude hiding (fail)
 import Prologue
