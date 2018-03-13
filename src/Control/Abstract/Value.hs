@@ -73,6 +73,9 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: value -> m a -> m a -> m a
 
+  -- | Simple control flow
+  while :: m value -> m value -> m value
+
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
   abstract :: [Name] -> Subterm term (m value) -> m value
   -- | Evaluate an application (like a function call).
@@ -88,6 +91,10 @@ toBool v = ifthenelse v (pure True) (pure False)
 -- | As with 'toBool', except from a given 'Subterm'.
 evalToBool :: MonadValue term value m => Subterm t (m value) -> m Bool
 evalToBool = subtermValue >=> toBool
+
+-- | Do-while loop, built on top of while.
+doWhile :: MonadValue term value m => m value -> m value -> m value
+doWhile body cond = body *> while cond body
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( MonadAddressable location (Value location term) m
@@ -110,6 +117,13 @@ instance ( MonadAddressable location (Value location term) m
   ifthenelse cond if' else'
     | Just (Boolean b) <- prjValue cond = if b then if' else else'
     | otherwise = fail ("not defined for non-boolean conditions: " <> show cond)
+
+  while cond body = do
+    this <- cond
+    case prjValue this of
+      Just (Boolean True)  -> body *> while cond body
+      Just (Boolean False) -> unit
+      Nothing              -> fail ("type error: non-boolean condition " <> show this)
 
   liftNumeric f arg
     | Just (Integer i)     <- prjValue arg = pure . injValue . Integer     $ f i
@@ -189,6 +203,8 @@ instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue 
   interface = undefined
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
+
+  while _ _ = pure Type.Unit
 
   liftNumeric _ Type.Float = pure Type.Float
   liftNumeric _ Int        = pure Int

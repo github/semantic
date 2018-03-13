@@ -220,9 +220,8 @@ instance Eq1 While where liftEq = genericLiftEq
 instance Ord1 While where liftCompare = genericLiftCompare
 instance Show1 While where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for While
-instance Evaluatable While
-
+instance Evaluatable While where
+  eval While{..} = while (subtermValue whileCondition)  (subtermValue whileBody)
 
 data DoWhile a = DoWhile { doWhileCondition :: !a, doWhileBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -231,9 +230,8 @@ instance Eq1 DoWhile where liftEq = genericLiftEq
 instance Ord1 DoWhile where liftCompare = genericLiftCompare
 instance Show1 DoWhile where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for DoWhile
-instance Evaluatable DoWhile
-
+instance Evaluatable DoWhile where
+  eval DoWhile{..} = doWhile (subtermValue doWhileBody) (subtermValue doWhileCondition)
 
 -- Exception handling
 
