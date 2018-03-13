@@ -33,9 +33,15 @@ instance Eq1 Comparison where liftEq = genericLiftEq
 instance Ord1 Comparison where liftCompare = genericLiftCompare
 instance Show1 Comparison where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Comparison
-instance Evaluatable Comparison
-
+instance Evaluatable Comparison where
+  eval = traverse subtermValue >=> go where
+    go x = case x of
+      (LessThan a b)         -> liftComparison (<) a b
+      (LessThanEqual a b)    -> liftComparison (<=) a b
+      (GreaterThan a b)      -> liftComparison (>) a b
+      (GreaterThanEqual a b) -> liftComparison (>=) a b
+      (Equal a b)            -> liftComparison (==) a b
+      (Comparison _ _)       -> fail "generalized comparison operator unimplemented"
 
 -- | Binary arithmetic operators.
 data Arithmetic a

@@ -12,6 +12,10 @@ import Data.Scientific (Scientific, fromFloatDigits, toRealFloat)
 import Prelude hiding (fail)
 import Prologue
 
+-- TODO: move this useful projection function elsewhere
+au :: (i :< is, j :< js) => (Union is a, Union js b) -> Maybe (i a, j b)
+au = bitraverse prj prj
+
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
@@ -33,6 +37,10 @@ class MonadAnalysis term value m => MonadValue term value m where
   liftNumeric2 :: (forall a . (Real a, Floating a) => a -> a -> a)
                -> (forall b . Integral b           => b -> b -> b)
                -> (value -> value -> m value)
+
+
+  liftComparison :: (forall a . Ord a => a -> a -> Bool)
+                 -> (value -> value -> m value)
 
   -- | Construct an abstract boolean value.
   boolean :: Bool -> m value
@@ -86,7 +94,7 @@ instance ( MonadAddressable location (Value location term) m
     | Just (Integer i)     <- prj arg = pure . inj . Integer     $ f i
     | Just (Value.Float i) <- prj arg = pure . inj . Value.Float $ f i
     | otherwise = fail "Invalid operand to liftNumeric"
-   
+
   liftNumeric2 f g left right
     | Just (Integer i, Integer j)         <- au pair = pure . inj . Integer $ g i j
     | Just (Integer i, Value.Float j)     <- au pair = pure . inj . float   $ f (fromIntegral i) (munge j)
@@ -100,9 +108,18 @@ instance ( MonadAddressable location (Value location term) m
         munge = toRealFloat
         float :: Double -> Value.Float a
         float = Value.Float . fromFloatDigits
-        au :: (i :< is, j :< js) => (Union is a, Union js b) -> Maybe (i a, j b)
-        au = bitraverse prj prj
         pair = (left, right)
+
+  liftComparison f left right
+    | Just (Integer i, Integer j)           <- au pair = boolean (f i j)
+    | Just (Integer i, Value.Float j)       <- au pair = boolean (f (fromIntegral i) j)
+    | Just (Value.Float i, Integer j)       <- au pair = boolean (f i (fromIntegral j))
+    | Just (Value.Float i, Value.Float j)   <- au pair = boolean (f i j)
+    | Just (Value.String i, Value.String j) <- au pair = boolean (f i j)
+    | Just (Boolean i, Boolean j)           <- au pair = boolean (f i j)
+    | Just (Value.Unit, Value.Unit)         <- au pair = boolean True
+    | otherwise = fail "Type error: invalid arguments to liftComparison"
+      where pair = (left, right)
 
   abstract names (Subterm body _) = inj . Closure names body <$> askLocalEnv
 
@@ -151,6 +168,8 @@ instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue 
     (Int, Type.Float) -> pure Type.Float
     _                 -> unify left right
 
+  -- TODO: this probably isn't right
+  liftComparison _ left right = unify left right
 
   apply op params = do
     tvar <- fresh
