@@ -35,13 +35,13 @@ instance ( Foldable (Cell (LocationFor value))
 -- | 'Monad's offering a local set of 'Live' (rooted/reachable) addresses.
 class Monad m => MonadGC value m where
   -- | Retrieve the local 'Live' set.
-  -- askRoots :: m (Live (LocationFor value) value)
+  askRoots :: m (Live (LocationFor value) value)
 
   -- | Run a computation with the given 'Live' set added to the local root set.
   extraRoots :: Live (LocationFor value) value -> m a -> m a
 
 instance (Effectful m, Monad (m effects), Ord (LocationFor value), Reader (Live (LocationFor value) value) :< effects) => MonadGC value (m effects) where
-  -- askRoots = raise ask
+  askRoots = raise ask
 
   extraRoots roots = raise . local (<> roots) . lower
 
