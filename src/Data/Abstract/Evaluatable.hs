@@ -39,7 +39,7 @@ instance Apply Evaluatable fs => Evaluatable (Union fs) where
 
 -- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
 instance Evaluatable s => Evaluatable (TermF s a) where
-  eval In{..} = eval termFOut
+  eval = eval . termFOut
 
 
 -- Instances
