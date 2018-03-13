@@ -15,36 +15,47 @@ module SpecHelpers (
 -- import Control.Monad.IO.Class
 import Data.Abstract.Address as X
 import Data.Abstract.Environment as X
-import Data.Abstract.Evaluatable as X
+-- import Data.Abstract.Evaluatable as X
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.ModuleTable as X
 import Data.Abstract.Store as X
 -- import Data.Abstract.Value as Value
-import Data.Blob
-import Data.Functor.Both
+import Data.Blob as X
 -- import Data.Functor.Foldable
 -- import Data.Language
 -- import Data.Map as Map
-import Data.Maybe as X
 -- import Data.Semigroup
--- import Data.Source
+import Data.Source as X
 -- import Data.Text.Encoding (decodeUtf8)
--- import Data.Union
+-- import Data.Union as X hiding (apply)
 import Data.Output as X
+import Data.Record as X
+import Data.Term as X
+import Data.Span as X
+import Data.Range as X
+import Data.Language as X
+import Data.Functor.Listable as X
 import Parsing.Parser as X
 -- import qualified Data.Text as T
 import Rendering.Renderer as X
 import Semantic as X
 import Semantic.Task as X
 import Semantic.Util as X
--- import System.FilePath
+import System.FilePath as X
+
+import Data.Maybe as X
+import Data.Functor.Both as X (Both(..), runBothWith, both)
 import Data.Monoid as X (Monoid(..), First(..), Last(..))
 import Data.Semigroup as X (Semigroup(..))
 
+import Data.ByteString as X (ByteString)
+
 import Test.Hspec as X (Spec, describe, it, xit, parallel, pendingWith)
 import Test.Hspec.Expectations.Pretty as X
-import Test.Hspec.LeanCheck
-import Test.LeanCheck
+import Test.Hspec.LeanCheck as X
+import Test.LeanCheck as X
+
+-- import Prelude as X (fst, snd, Show(..), Eq(..), IO(..))
 
 import qualified Data.ByteString as B
 import qualified Semantic.IO as IO
