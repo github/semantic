@@ -395,7 +395,6 @@ importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTe
     dotImport = flip Declaration.WildcardImport <$> (makeTerm <$> symbol Dot <*> (Syntax.Identifier <$> (name <$> source))) <*> importFromPath
     sideEffectImport = symbol BlankIdentifier *> source *> (Declaration.Import <$> importFromPath <*> pure [])
     namedImport = flip Declaration.QualifiedImport <$> packageIdentifier <*> importFromPath <*> pure []
-    -- plainImport = importFromPath >>= \from -> Declaration.QualifiedImport <$> pure from <*> pure from <*> pure []
     plainImport = symbol InterpretedStringLiteral >>= \loc -> do
       names <- pathToNames <$> source
       let from = makeTerm loc (Syntax.Identifier (qualifiedName names))
