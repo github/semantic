@@ -59,9 +59,7 @@ instance Evaluatable [] where
 -- | Require/import another term/file and return an Effect.
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
-require :: ( MonadAnalysis term value m
-           , MonadValue term value m
-           )
+require :: MonadAnalysis term value m
         => ModuleName
         -> m (EnvironmentFor value)
 require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup name
@@ -69,9 +67,7 @@ require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup nam
 -- | Load another term/file and return an Effect.
 --
 -- Always loads/evaluates.
-load :: ( MonadAnalysis term value m
-        , MonadValue term value m
-        )
+load :: MonadAnalysis term value m
      => ModuleName
      -> m (EnvironmentFor value)
 load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
