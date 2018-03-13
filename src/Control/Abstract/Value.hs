@@ -85,10 +85,6 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
 toBool :: MonadValue term value m => value -> m Bool
 toBool v = ifthenelse v (pure True) (pure False)
 
--- | As with 'toBool', except from a given 'Subterm'.
-evalToBool :: MonadValue term value m => Subterm t (m value) -> m Bool
-evalToBool = subtermValue >=> toBool
-
 -- | The fundamental looping primitive, built on top of ifthenelse.
 while :: MonadValue term value m => m value -> m value -> m value
 while cond body = do
@@ -127,14 +123,14 @@ instance ( MonadAddressable location (Value location term) m
   liftNumeric f arg
     | Just (Integer i)     <- prjValue arg = pure . injValue . Integer     $ f i
     | Just (Value.Float i) <- prjValue arg = pure . injValue . Value.Float $ f i
-    | otherwise = fail "Invalid operand to liftNumeric"
+    | otherwise = fail ("Invalid operand to liftNumeric: " <> show arg)
 
   liftNumeric2 f g left right
-    | Just (Integer i, Integer j)         <- au pair = pure . injValue . Integer $ g i j
-    | Just (Integer i, Value.Float j)     <- au pair = pure . injValue . float   $ f (fromIntegral i) (munge j)
-    | Just (Value.Float i, Value.Float j) <- au pair = pure . injValue . float   $ f (munge i) (munge j)
-    | Just (Value.Float i, Integer j)     <- au pair = pure . injValue . float   $ f (munge i) (fromIntegral j)
-    | otherwise = fail "Invalid operands to liftNumeric2"
+    | Just (Integer i, Integer j)         <- prjPair pair = pure . injValue . Integer $ g i j
+    | Just (Integer i, Value.Float j)     <- prjPair pair = pure . injValue . float   $ f (fromIntegral i) (munge j)
+    | Just (Value.Float i, Value.Float j) <- prjPair pair = pure . injValue . float   $ f (munge i) (munge j)
+    | Just (Value.Float i, Integer j)     <- prjPair pair = pure . injValue . float   $ f (munge i) (fromIntegral j)
+    | otherwise = fail ("Invalid operands to liftNumeric2: " <> show pair)
       where
         -- Yucky hack to work around the lack of a Floating instance for Scientific.
         -- This may possibly lose precision, but there's little we can do about that.
