@@ -207,6 +207,7 @@ test-suite test
   other-modules:       Assigning.Assignment.Spec
                      , Analysis.Go.Spec
                      , Analysis.Python.Spec
+                     , Analysis.Ruby.Spec
                      , Analysis.TypeScript.Spec
                      , Data.Diff.Spec
                      , Data.Functor.Classes.Generic.Spec
