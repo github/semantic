@@ -37,6 +37,13 @@ injValue = Value . inj
 prjValue :: (f :< ValueConstructors location term) => Value location term -> Maybe (f (Value location term))
 prjValue = prj . deValue
 
+-- | Convenience function for projecting two values.
+prjPair :: ( f :< ValueConstructors loc term1 , g :< ValueConstructors loc term2)
+        => (Value loc term1, Value loc term2)
+        -> Maybe (f (Value loc term1), g (Value loc term2))
+prjPair = bitraverse prjValue prjValue
+
+
 -- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
 
 -- | A function value consisting of a list of parameters, the body of the function, and an environment of bindings captured by the body.
