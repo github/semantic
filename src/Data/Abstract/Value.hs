@@ -115,6 +115,9 @@ type StoreFor v = Store (LocationFor v) v
 -- | The cell for an abstract value type.
 type CellFor value = Cell (LocationFor value) value
 
+-- | The address set type for an abstract value type.
+type LiveFor value = Live (LocationFor value) value
+
 -- | The location type (the body of 'Address'es) which should be used for an abstract value type.
 type family LocationFor value :: * where
   LocationFor (Value location term) = location
