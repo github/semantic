@@ -236,9 +236,8 @@ instance Eq1 Tuple where liftEq = genericLiftEq
 instance Ord1 Tuple where liftCompare = genericLiftCompare
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Tuple
-instance Evaluatable Tuple
-
+instance Evaluatable Tuple where
+  eval (Tuple cs) = multiple =<< traverse subtermValue cs
 
 newtype Set a = Set { setElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)

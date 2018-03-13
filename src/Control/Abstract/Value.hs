@@ -19,8 +19,9 @@ au = bitraverse prj prj
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class MonadAnalysis term value m => MonadValue term value m where
+class (MonadAnalysis term value m, Show value) => MonadValue term value m where
   -- | Construct an abstract unit value.
+  --   TODO: This might be the same as the empty tuple for some value types
   unit :: m value
 
   -- | Construct an abstract integral value.
@@ -51,6 +52,9 @@ class MonadAnalysis term value m => MonadValue term value m where
   -- | Construct a floating-point value.
   float :: Scientific -> m value
 
+  -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
+  multiple :: [value] -> m value
+
   -- | Construct an abstract interface value.
   interface :: value -> m value
 
@@ -76,19 +80,24 @@ evalToBool = subtermValue >=> toBool
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( MonadAddressable location (Value location term) m
          , MonadAnalysis term (Value location term) m
+         , Show location
+         , Show term
          )
          => MonadValue term (Value location term) m where
 
-  unit    = pure $ inj Value.Unit
-  integer = pure . inj . Integer
-  boolean = pure . inj . Boolean
-  string  = pure . inj . Value.String
-  float   = pure . inj . Value.Float
-  interface v = inj . Value.Interface v <$> getGlobalEnv
+  unit    = pure . injValue $ Value.Unit
+  integer = pure . injValue . Integer
+  boolean = pure . injValue . Boolean
+  string  = pure . injValue . Value.String
+  float   = pure . injValue . Value.Float
+  multiple vals =
+    pure . injValue $ Value.Tuple vals
+
+  interface v = injValue . Value.Interface v <$> getGlobalEnv
 
   ifthenelse cond if' else'
-    | Just (Boolean b) <- prj cond = if b then if' else else'
-    | otherwise = fail "not defined for non-boolean conditions"
+    | Just (Boolean b) <- prjValue cond = if b then if' else else'
+    | otherwise = fail ("not defined for non-boolean conditions: " <> show cond)
 
   liftNumeric f arg
     | Just (Integer i)     <- prj arg = pure . inj . Integer     $ f i
@@ -121,10 +130,10 @@ instance ( MonadAddressable location (Value location term) m
     | otherwise = fail "Type error: invalid arguments to liftComparison"
       where pair = (left, right)
 
-  abstract names (Subterm body _) = inj . Closure names body <$> askLocalEnv
+  abstract names (Subterm body _) = injValue . Closure names body <$> askLocalEnv
 
   apply op params = do
-    Closure names body env <- maybe (fail "expected a closure") pure (prj op)
+    Closure names body env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
     bindings <- foldr (\ (name, param) rest -> do
       v <- subtermValue param
       a <- alloc name
@@ -133,8 +142,8 @@ instance ( MonadAddressable location (Value location term) m
     localEnv (mappend bindings) (evaluateTerm body)
 
   environment v
-    | Just (Interface _ env) <- prj v = pure env
-    | otherwise                       = pure mempty
+    | Just (Interface _ env) <- prjValue v = pure env
+    | otherwise                            = pure mempty
 
 -- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
 instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue term Type m where
@@ -153,7 +162,7 @@ instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue 
   boolean _ = pure Bool
   string _  = pure Type.String
   float _   = pure Type.Float
-
+  multiple  = pure . Type.Product
   -- TODO
   interface = undefined
 

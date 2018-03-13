@@ -1,4 +1,4 @@
-module Rendering.Imports.Spec where
+module Rendering.Imports.Spec (spec) where
 
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
 import Analysis.ModuleDef (HasModuleDef, moduleDefAlgebra)
@@ -10,7 +10,7 @@ import qualified Data.Map as Map
 import qualified Semantic.Util as Util
 import Rendering.Imports
 import Rendering.Renderer
-import Rendering.TOC.Spec
+import Rendering.TOC.Spec hiding (spec)
 import Semantic
 import Semantic.Task
 import SpecHelpers

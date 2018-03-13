@@ -28,23 +28,34 @@ import Semantic
 import Semantic.IO as IO
 import Semantic.Task
 
+import qualified Language.Go.Assignment as Go
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 
-type RubyValue = Value Precise (Term (Union Ruby.Syntax) (Record Location))
-type PythonValue = Value Precise (Term (Union Python.Syntax) (Record Location))
-type TypeScriptValue = Value Precise (Term (Union TypeScript.Syntax) (Record Location))
+type Language a = Value Precise (Term (Union a) (Record Location))
+
+type GoValue         = Language Go.Syntax
+type RubyValue       = Language Ruby.Syntax
+type PythonValue     = Language Python.Syntax
+type TypeScriptValue = Language TypeScript.Syntax
 
 file :: MonadIO m => FilePath -> m Blob
 file path = fromJust <$> IO.readFile path (languageForFilePath path)
 
 -- Ruby
-evaluateRubyFile path = Prelude.fst . evaluate @RubyValue . snd <$> parseFile rubyParser path
+evaluateRubyFile path = fst . evaluate @RubyValue . snd <$> parseFile rubyParser path
 
 evaluateRubyFiles paths = do
   first:rest <- traverse (parseFile rubyParser) paths
   pure $ evaluates @RubyValue rest first
+
+-- Go
+typecheckGoFile path = runAnalysis @(Caching Evaluating Go.Term Type) . evaluateModule . snd <$>
+  parseFile goParser path
+
+evaluateGoFile path = runAnalysis @(Evaluating Go.Term GoValue) . evaluateModule . snd <$>
+  parseFile goParser path
 
 -- Python
 typecheckPythonFile path = runAnalysis @(Caching Evaluating Python.Term Type) . evaluateModule . snd <$> parseFile pythonParser path
@@ -67,7 +78,10 @@ evaluateTypeScriptFiles paths = do
   pure $ evaluates @TypeScriptValue rest first
 
 
-parseFile parser path = runTask (file path >>= fmap . (,) <*> parse parser)
+parseFile :: Parser term -> FilePath -> IO (Blob, term)
+parseFile parser path = runTask $ do
+  blob <- file path
+  (,) blob <$> parse parser blob
 
 
 -- Diff helpers
