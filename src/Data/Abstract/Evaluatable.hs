@@ -65,7 +65,7 @@ instance Evaluatable [] where
     -- Finally, evaluate the rest of the terms, but do so by calculating a new
     -- environment each time where the free variables in those terms are bound
     -- to the global environment.
-    localEnv (const (bindEnv (liftFreeVariables (freeVariables . subterm) xs) env)) (eval xs)
+    localEnv (const (bindEnv (foldMap (freeVariables . subterm) xs) env)) (eval xs)
 
 
 -- | Require/import another term/file and return an Effect.
