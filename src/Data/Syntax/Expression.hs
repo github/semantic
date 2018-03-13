@@ -36,12 +36,12 @@ instance Show1 Comparison where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Comparison where
   eval = traverse subtermValue >=> go where
     go x = case x of
-      (LessThan a b)         -> liftComparison (<) a b
-      (LessThanEqual a b)    -> liftComparison (<=) a b
-      (GreaterThan a b)      -> liftComparison (>) a b
-      (GreaterThanEqual a b) -> liftComparison (>=) a b
-      (Equal a b)            -> liftComparison (==) a b
-      (Comparison _ _)       -> fail "generalized comparison operator unimplemented"
+      (LessThan a b)         -> liftComparison (Concrete (<)) a b
+      (LessThanEqual a b)    -> liftComparison (Concrete (<=)) a b
+      (GreaterThan a b)      -> liftComparison (Concrete (>)) a b
+      (GreaterThanEqual a b) -> liftComparison (Concrete (>=)) a b
+      (Equal a b)            -> liftComparison (Concrete (==)) a b
+      (Comparison a b)       -> liftComparison Generalized a b
 
 -- | Binary arithmetic operators.
 data Arithmetic a
