@@ -1,18 +1,11 @@
-module Semantic.Spec where
+module Semantic.Spec (spec) where
 
-import Data.Blob
 import Data.Diff
-import Data.Functor (void)
-import Data.Functor.Both as Both
-import Data.Language
 import Data.Patch
-import Data.Term
-import Rendering.Renderer
-import Semantic
-import Semantic.Task
 import System.Exit
-import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
-import Test.Hspec.Expectations.Pretty
+
+import SpecHelpers
+
 
 spec :: Spec
 spec = parallel $ do

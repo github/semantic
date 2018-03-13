@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, OverloadedStrings #-}
 module Integration.Spec (spec) where
 
 import Data.Foldable (find, traverse_)
@@ -7,6 +6,7 @@ import qualified Data.ByteString as B
 import System.FilePath.Glob
 
 import SpecHelpers
+
 
 spec :: Spec
 spec = parallel $ do

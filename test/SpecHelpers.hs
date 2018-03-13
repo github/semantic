@@ -50,7 +50,7 @@ import Data.Semigroup as X (Semigroup(..))
 
 import Data.ByteString as X (ByteString)
 
-import Test.Hspec as X (Spec, SpecWith, context, describe, it, xit, parallel, pendingWith, runIO)
+import Test.Hspec as X (Spec, SpecWith, context, describe, it, xit, parallel, pendingWith, around, runIO)
 import Test.Hspec.Expectations.Pretty as X
 import Test.Hspec.LeanCheck as X
 import Test.LeanCheck as X
