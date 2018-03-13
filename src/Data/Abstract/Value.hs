@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, FunctionalDependencies, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, FunctionalDependencies, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Data.Abstract.Value where
 
 import Data.Abstract.Address
@@ -13,32 +13,42 @@ import Prologue
 import Prelude hiding (Float, Integer, String, fail)
 import qualified Prelude
 
-type ValueConstructors location
-  = '[Closure location
+type ValueConstructors location term
+  = '[Closure location term
     , Interface location
     , Unit
     , Boolean
     , Float
     , Integer
     , String
+    , Tuple
     ]
 
 -- | Open union of primitive values that terms can be evaluated to.
-type Value location = Union (ValueConstructors location)
+--   Fix by another name.
+newtype Value location term = Value { deValue :: Union (ValueConstructors location term) (Value location term) }
+  deriving (Eq, Show, Ord)
+
+-- | Identical to 'inj', but wraps the resulting sub-entity in a 'Value'.
+injValue :: (f :< ValueConstructors location term) => f (Value location term) -> Value location term
+injValue = Value . inj
+
+-- | Identical to 'prj', but unwraps the argument out of its 'Value' wrapper.
+prjValue :: (f :< ValueConstructors location term) => Value location term -> Maybe (f (Value location term))
+prjValue = prj . deValue
 
 -- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
--- TODO: Wrap the Value union in a newtype to differentiate from (eventual) à la carte Types.
 
 -- | A function value consisting of a list of parameters, the body of the function, and an environment of bindings captured by the body.
-data Closure location term = Closure [Name] term (Environment location (Value location term))
+data Closure location term value = Closure [Name] term (Environment location value)
   deriving (Eq, Generic1, Ord, Show)
 
-instance (Eq location) => Eq1 (Closure location) where liftEq = genericLiftEq
-instance (Ord location) => Ord1 (Closure location) where liftCompare = genericLiftCompare
-instance (Show location) => Show1 (Closure location) where liftShowsPrec = genericLiftShowsPrec
+instance (Eq location, Eq term) => Eq1 (Closure location term) where liftEq = genericLiftEq
+instance (Ord location, Ord term) => Ord1 (Closure location term) where liftCompare = genericLiftCompare
+instance (Show location, Show term) => Show1 (Closure location term) where liftShowsPrec = genericLiftShowsPrec
 
 -- | A program value consisting of the value of the program and it's enviornment of bindings.
-data Interface location term = Interface (Value location term) (Environment location (Value location term))
+data Interface location value = Interface value (Environment location value)
   deriving (Eq, Generic1, Ord, Show)
 
 instance (Eq location) => Eq1 (Interface location) where liftEq = genericLiftEq
@@ -46,7 +56,7 @@ instance (Ord location) => Ord1 (Interface location) where liftCompare = generic
 instance (Show location) => Show1 (Interface location) where liftShowsPrec = genericLiftShowsPrec
 
 -- | The unit value. Typically used to represent the result of imperative statements.
-data Unit term = Unit
+data Unit value = Unit
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 Unit where liftEq = genericLiftEq
@@ -54,7 +64,7 @@ instance Ord1 Unit where liftCompare = genericLiftCompare
 instance Show1 Unit where liftShowsPrec = genericLiftShowsPrec
 
 -- | Boolean values.
-newtype Boolean term = Boolean Prelude.Bool
+newtype Boolean value = Boolean Prelude.Bool
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 Boolean where liftEq = genericLiftEq
@@ -62,7 +72,7 @@ instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
 -- | Arbitrary-width integral values.
-newtype Integer term = Integer Prelude.Integer
+newtype Integer value = Integer Prelude.Integer
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 Integer where liftEq = genericLiftEq
@@ -70,7 +80,7 @@ instance Ord1 Integer where liftCompare = genericLiftCompare
 instance Show1 Integer where liftShowsPrec = genericLiftShowsPrec
 
 -- | String values.
-newtype String term = String ByteString
+newtype String value = String ByteString
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 String where liftEq = genericLiftEq
@@ -78,12 +88,23 @@ instance Ord1 String where liftCompare = genericLiftCompare
 instance Show1 String where liftShowsPrec = genericLiftShowsPrec
 
 -- | Float values.
-newtype Float term = Float Scientific
+newtype Float value = Float Scientific
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 Float where liftEq = genericLiftEq
 instance Ord1 Float where liftCompare = genericLiftCompare
 instance Show1 Float where liftShowsPrec = genericLiftShowsPrec
+
+-- Zero or more values.
+-- TODO: Investigate whether we should use Vector for this.
+-- TODO: Should we have a Some type over a nonemmpty list? Or does this merit one?
+
+newtype Tuple value = Tuple [value]
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Tuple where liftEq = genericLiftEq
+instance Ord1 Tuple where liftCompare = genericLiftCompare
+instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
 -- | The environment for an abstract value type.
 type EnvironmentFor v = Environment (LocationFor v) v
@@ -106,8 +127,8 @@ class ValueRoots l v | v -> l where
 
 instance (FreeVariables term, Ord location) => ValueRoots location (Value location term) where
   valueRoots v
-    | Just (Closure names body env) <- prj v = envRoots env (foldr Set.delete (freeVariables body) names)
-    | otherwise                              = mempty
+    | Just (Closure names body env) <- prjValue v = envRoots env (foldr Set.delete (freeVariables (body :: term)) names)
+    | otherwise                                   = mempty
 
 instance ValueRoots Monovariant Type.Type where
   valueRoots _ = mempty
