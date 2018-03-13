@@ -1,5 +1,6 @@
 -- MonoLocalBinds is to silence a warning about a simplifiable constraint.
-{-# LANGUAGE DataKinds, MonoLocalBinds, TypeApplications, TypeOperators #-}
+{-# LANGUAGE DataKinds, MonoLocalBinds, ScopedTypeVariables, TypeFamilies, TypeApplications, TypeOperators  #-}
+{-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.Util where
 
 import Analysis.Abstract.Caching
@@ -9,6 +10,7 @@ import Analysis.Abstract.Tracing
 import Analysis.Declaration
 import Control.Abstract.Analysis
 import Control.Monad.IO.Class
+import Data.Abstract.Evaluatable
 import Data.Abstract.Address
 import Data.Abstract.Type
 import Data.Abstract.Value
@@ -38,9 +40,6 @@ type GoValue         = Language Go.Syntax
 type RubyValue       = Language Ruby.Syntax
 type PythonValue     = Language Python.Syntax
 type TypeScriptValue = Language TypeScript.Syntax
-
-file :: MonadIO m => FilePath -> m Blob
-file path = fromJust <$> IO.readFile path (languageForFilePath path)
 
 -- Ruby
 evaluateRubyFile path = fst . evaluate @RubyValue . snd <$> parseFile rubyParser path
@@ -81,12 +80,31 @@ evaluateTypeScriptFiles paths = do
   first:rest <- traverse (parseFile typescriptParser) paths
   pure $ evaluates @TypeScriptValue rest first
 
+-- Evaluate a list of files (head file is considered the entry point).
+evaluateFiles :: forall value term effects
+              .  ( Evaluatable (Base term)
+                 , FreeVariables term
+                 , effects ~ RequiredEffects term value (Evaluating term value effects)
+                 , MonadAddressable (LocationFor value) value (Evaluating term value effects)
+                 , MonadValue term value (Evaluating term value effects)
+                 , Recursive term
+                 )
+              => Parser term
+              -> [FilePath]
+              -> IO (Final effects value)
+evaluateFiles parser paths = do
+  entry:xs <- traverse (parseFile parser) paths
+  pure $ evaluates @value xs entry
 
+-- Read and parse a file.
 parseFile :: Parser term -> FilePath -> IO (Blob, term)
 parseFile parser path = runTask $ do
   blob <- file path
   (,) blob <$> parse parser blob
 
+-- Read a file from the filesystem into a Blob.
+file :: MonadIO m => FilePath -> m Blob
+file path = fromJust <$> IO.readFile path (languageForFilePath path)
 
 -- Diff helpers
 diffWithParser :: (HasField fields Data.Span.Span,
