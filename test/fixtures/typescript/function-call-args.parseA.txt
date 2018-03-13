@@ -23,9 +23,7 @@
           (Empty)))
       (
         (Call
-          (MemberAccess
-            (Identifier)
-            (Identifier))
+          (Identifier)
           (Identifier)
           (Empty))
         (Return

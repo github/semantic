@@ -1,6 +1,4 @@
 (Program
   (Assignment
-    (MemberAccess
-      (Identifier)
-      (Identifier))
+    (Identifier)
     (Float)))

@@ -1,5 +1,5 @@
-// Use `tsc test.ts foo.ts && node test.js` to test evaluation
+// Use `tsc main.ts foo.ts && node main.js` to test evaluation
 
-import * as name from "./foo";
+import { baz as bar } from "foo";
 
-console.log(name.bar())
+bar()

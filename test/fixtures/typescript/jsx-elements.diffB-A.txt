@@ -9,27 +9,40 @@
         {+(JsxExpression
           {+(Call
             {+(Identifier)+}
-            {+(MemberAccess
-              {+(Identifier)+}
-              {+(Identifier)+})+}
+            {+(Identifier)+}
             {+(Empty)+})+})+}
         {-(JsxAttribute
           {-(Identifier)-}
           {-(JsxExpression
-            {-(MemberAccess
-              {-(Identifier)-}
-              {-(Identifier)-})-})-})-})
+            {-(Identifier)-})-})-})
         (JsxExpression
           (Identifier))
         (JsxClosingElement
           (Identifier)))))
-  {+(VariableDeclaration
-    {+(Assignment
-      {+(Empty)+}
-      {+(Identifier)+}
-      {+(JsxElement{+(JsxOpeningElement{+(NestedIdentifier{+(Identifier)+}{+(Identifier)+})+})+}{+(JsxClosingElement{+(NestedIdentifier{+(Identifier)+}{+(Identifier)+})+})+})+})+})+}
-  {+(VariableDeclaration
-    {+(Assignment
-      {+(Empty)+}
-      {+(Identifier)+}
-      {+(JsxSelfClosingElement{+(NestedIdentifier{+(Identifier)+}{+(Identifier)+})+}{+(JsxAttribute{+(Identifier)+}{+(Empty)+})+}{+(JsxAttribute{+(Identifier)+}{+(TextElement)+})+})+})+})+})
+{+(VariableDeclaration
+  {+(Assignment
+    {+(Empty)+}
+    {+(Identifier)+}
+    {+(JsxElement
+      {+(JsxOpeningElement
+        {+(NestedIdentifier
+          {+(Identifier)+}
+          {+(Identifier)+})+})+}
+      {+(JsxClosingElement
+        {+(NestedIdentifier
+          {+(Identifier)+}
+          {+(Identifier)+})+})+})+})+})+}
+{+(VariableDeclaration
+  {+(Assignment
+    {+(Empty)+}
+    {+(Identifier)+}
+    {+(JsxSelfClosingElement
+      {+(NestedIdentifier
+        {+(Identifier)+}
+        {+(Identifier)+})+}
+      {+(JsxAttribute
+        {+(Identifier)+}
+        {+(Empty)+})+}
+      {+(JsxAttribute
+        {+(Identifier)+}
+        {+(TextElement)+})+})+})+})+})

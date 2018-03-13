@@ -5,6 +5,8 @@ import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
 import qualified Data.Map as Map
+import qualified Data.ByteString as B
+import qualified Data.List.NonEmpty as NonEmpty
 import Prologue
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
@@ -219,6 +221,39 @@ instance Show1 Comprehension where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Comprehension
 instance Evaluatable Comprehension
 
+-- | Qualified Export declarations
+newtype QualifiedExport a = QualifiedExport { qualifiedExportSymbols :: [(Name, Name)] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 QualifiedExport where liftEq = genericLiftEq
+instance Ord1 QualifiedExport where liftCompare = genericLiftCompare
+instance Show1 QualifiedExport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QualifiedExport where
+  eval (QualifiedExport exportSymbols) = do
+    -- Insert the aliases with no addresses.
+    for_ exportSymbols $ \(name, alias) ->
+      addExport name (alias, Nothing)
+    unit
+
+-- | Qualified Export declarations that export from another module.
+data QualifiedExportFrom a = QualifiedExportFrom { qualifiedExportFrom :: !a, qualifiedExportFromSymbols :: ![(Name, Name)]}
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 QualifiedExportFrom where liftEq = genericLiftEq
+instance Ord1 QualifiedExportFrom where liftCompare = genericLiftCompare
+instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QualifiedExportFrom where
+  eval (QualifiedExportFrom from exportSymbols) = do
+    let moduleName = freeVariable (subterm from)
+    importedEnv <- withGlobalEnv mempty (require moduleName)
+    -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
+    for_ exportSymbols $ \(name, alias) -> do
+      let address = Map.lookup name (unEnvironment importedEnv)
+      addExport name (alias, address)
+    unit
+
 
 -- | Qualified Import declarations (symbols are qualified in calling environment).
 data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: !a, qualifiedImportAlias :: !a, qualifiedImportSymbols :: ![(Name, Name)]}
@@ -230,23 +265,29 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedImport where
   eval (QualifiedImport from alias xs) = do
-    env <- getGlobalEnv
-    putGlobalEnv mempty
-    importedEnv <- require (freeVariable (subterm from))
-    env' <- Map.foldrWithKey copy (pure env) (unEnvironment importedEnv)
-    modifyGlobalEnv (const env')
+    importedEnv <- withGlobalEnv mempty (require (freeVariable (subterm from)))
+    modifyGlobalEnv (flip (Map.foldrWithKey copy) (unEnvironment importedEnv))
     unit
     where
       prefix = freeVariable (subterm alias)
       symbols = Map.fromList xs
       copy = if Map.null symbols then qualifyInsert else directInsert
-      qualifyInsert k v rest = envInsert (prefix <> k) v <$> rest
-      directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v <$> rest) (Map.lookup k symbols)
+      qualifyInsert k v rest = envInsert (prefix <> k) v rest
+      directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v rest) (Map.lookup k symbols)
+
+newtype DefaultExport a = DefaultExport { defaultExport :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 DefaultExport where liftEq = genericLiftEq
+instance Ord1 DefaultExport where liftCompare = genericLiftCompare
+instance Show1 DefaultExport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable DefaultExport where
 
 
 -- | Import declarations (symbols are added directly to the calling env).
 --
--- If symbols is empty, just evaluate the module for it's side effects.
+-- If symbols is empty, just import the module for its side effects.
 data Import a = Import { importFrom :: !a, importSymbols :: ![(Name, Name)] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
@@ -256,15 +297,12 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
   eval (Import from xs) = do
-    env <- getGlobalEnv
-    putGlobalEnv mempty
-    importedEnv <- require (freeVariable (subterm from))
-    env' <- Map.foldrWithKey directInsert (pure env) (unEnvironment importedEnv)
-    modifyGlobalEnv (const env')
+    importedEnv <- withGlobalEnv mempty (require (freeVariable (subterm from)))
+    modifyGlobalEnv (flip (Map.foldrWithKey directInsert) (unEnvironment importedEnv))
     unit
     where
       symbols = Map.fromList xs
-      directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v <$> rest) (Map.lookup k symbols)
+      directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v rest) (Map.lookup k symbols)
 
 
 -- | A wildcard import (all symbols are added directly to the calling env)
@@ -278,7 +316,10 @@ instance Ord1 WildcardImport where liftCompare = genericLiftCompare
 instance Show1 WildcardImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable WildcardImport where
-  eval (WildcardImport from _) = putGlobalEnv mempty *> require (freeVariable (subterm from)) *> unit
+  eval (WildcardImport from _) = do -- require (freeVariable (subterm from)) *> putGlobalEnv mempty *> unit
+    importedEnv <- withGlobalEnv mempty (require (freeVariable (subterm from)))
+    modifyGlobalEnv (flip (Map.foldrWithKey envInsert) (unEnvironment importedEnv))
+    unit
 
 -- | A declared type (e.g. `a []int` in Go).
 data Type a = Type { typeName :: !a, typeKind :: !a }

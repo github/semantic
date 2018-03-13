@@ -9,9 +9,7 @@
           (JsxExpression
             (Call
               (Identifier)
-              (MemberAccess
-                (Identifier)
-                (Identifier))
+              (Identifier)
               (Empty))))
         (JsxExpression
           (Identifier))
@@ -24,7 +22,8 @@
       (JsxElement
         (JsxOpeningElement
           (NestedIdentifier
-            (Identifier) (Identifier)))
+            (Identifier)
+            (Identifier)))
         (JsxClosingElement
           (NestedIdentifier
             (Identifier)
@@ -37,9 +36,9 @@
         (NestedIdentifier
           (Identifier)
           (Identifier))
-          (JsxAttribute
-            (Identifier)
-            (Empty))
-          (JsxAttribute
-            (Identifier)
-            (TextElement))))))
+        (JsxAttribute
+          (Identifier)
+          (Empty))
+        (JsxAttribute
+          (Identifier)
+          (TextElement))))))
