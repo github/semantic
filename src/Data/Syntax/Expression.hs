@@ -2,7 +2,9 @@
 module Data.Syntax.Expression where
 
 import Data.Abstract.Evaluatable
+import Data.Fixed
 import Diffing.Algorithm
+import Prelude hiding (fail)
 import Prologue hiding (apply)
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
@@ -51,8 +53,15 @@ instance Ord1 Arithmetic where liftCompare = genericLiftCompare
 instance Show1 Arithmetic where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Arithmetic
-instance Evaluatable Arithmetic
-
+instance Evaluatable Arithmetic where
+  eval = traverse subtermValue >=> go where
+    go (Plus a b)      = liftNumeric2 (+) (+) a b
+    go (Minus a b)     = liftNumeric2 (-) (-) a b
+    go (Times a b)     = liftNumeric2 (*) (*) a b
+    go (DividedBy a b) = liftNumeric2 (/) div a b
+    go (Modulo a b)    = liftNumeric2 mod' mod a b
+    go (Power a b)     = liftNumeric2 (**) (^) a b
+    go (Negate a)      = liftNumeric negate a
 
 -- | Boolean operators.
 data Boolean a
@@ -66,9 +75,17 @@ instance Eq1 Boolean where liftEq = genericLiftEq
 instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Boolean
-instance Evaluatable Boolean
-
+instance Evaluatable Boolean where
+  -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
+  eval = go . fmap subtermValue where
+    go (And a b) = do
+      cond <- a
+      ifthenelse cond b (pure cond)
+    go (Or a b) = do
+      cond <- a
+      ifthenelse cond (pure cond) b
+    go (Not a) = a >>= toBool >>= boolean . not
+    go (XOr a b) = liftA2 (/=) (a >>= toBool) (b >>= toBool) >>= boolean
 
 -- | Javascript delete operator
 newtype Delete a = Delete a

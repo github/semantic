@@ -1,12 +1,23 @@
 {-# LANGUAGE ConstrainedClassMethods, FunctionalDependencies #-}
-module Control.Abstract.Evaluator where
+module Control.Abstract.Evaluator
+( MonadEvaluator(..)
+, MonadEnvironment(..)
+, modifyGlobalEnv
+, MonadStore(..)
+, modifyStore
+, assign
+, MonadModuleTable(..)
+, modifyModuleTable
+) where
 
 import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.FreeVariables
 import Data.Abstract.Live
 import Data.Abstract.ModuleTable
+import Data.Abstract.Store
 import Data.Abstract.Value
+import Data.Semigroup.Reducer
 import Prelude hiding (fail)
 import Prologue
 
@@ -16,7 +27,17 @@ import Prologue
 --   - environments binding names to addresses
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
-class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
+class ( MonadEnvironment value m
+      , MonadFail m
+      , MonadModuleTable term value m
+      , MonadStore value m
+      )
+      => MonadEvaluator term value m | m -> term, m -> value where
+  -- | Get the current 'Configuration' with a passed-in term.
+  getConfiguration :: Ord (LocationFor value) => term -> m (ConfigurationFor term value)
+
+-- | A 'Monad' abstracting local and global environments.
+class Monad m => MonadEnvironment value m | m -> value where
   -- | Retrieve the global environment.
   getGlobalEnv :: m (EnvironmentFor value)
   -- | Set the global environment
@@ -35,33 +56,51 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   -- | Run an action with a locally-modified environment.
   localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m a -> m a
 
+-- | Update the global environment.
+modifyGlobalEnv :: MonadEvaluator term value m => (EnvironmentFor value -> EnvironmentFor value) -> m  ()
+modifyGlobalEnv f = do
+  env <- getGlobalEnv
+  putGlobalEnv $! f env
+
+
+-- | A 'Monad' abstracting a heap of values.
+class Monad m => MonadStore value m | m -> value where
   -- | Retrieve the heap.
   getStore :: m (StoreFor value)
   -- | Set the heap.
   putStore :: StoreFor value -> m ()
 
+-- | Update the heap.
+modifyStore :: MonadStore value m => (StoreFor value -> StoreFor value) -> m ()
+modifyStore f = do
+  s <- getStore
+  putStore $! f s
+
+-- | Write a value to the given 'Address' in the 'Store'.
+assign :: ( Ord (LocationFor value)
+          , MonadStore value m
+          , Reducer value (CellFor value)
+          )
+          => Address (LocationFor value) value
+          -> value
+          -> m ()
+assign address = modifyStore . storeInsert address
+
+
+-- | A 'Monad' abstracting tables of modules available for import.
+class Monad m => MonadModuleTable term value m | m -> term, m -> value where
   -- | Retrieve the table of evaluated modules.
   getModuleTable :: m (ModuleTable (EnvironmentFor value))
-  -- | Update the table of evaluated modules.
-  modifyModuleTable :: (ModuleTable (EnvironmentFor value) -> ModuleTable (EnvironmentFor value)) -> m ()
+  -- | Set the table of evaluated modules.
+  putModuleTable :: ModuleTable (EnvironmentFor value) -> m ()
 
   -- | Retrieve the table of unevaluated modules.
   askModuleTable :: m (ModuleTable term)
   -- | Run an action with a locally-modified table of unevaluated modules.
   localModuleTable :: (ModuleTable term -> ModuleTable term) -> m a -> m a
 
-  -- | Retrieve the current root set.
-  askRoots :: Ord (LocationFor value) => m (Live (LocationFor value) value)
-  askRoots = pure mempty
-
-  -- | Get the current 'Configuration' with a passed-in term.
-  getConfiguration :: Ord (LocationFor value) => term -> m (Configuration (LocationFor value) term value)
-  getConfiguration term = Configuration term <$> askRoots <*> askLocalEnv <*> getStore
-
--- | Update the global environment.
-modifyGlobalEnv :: MonadEvaluator term value m => (EnvironmentFor value -> EnvironmentFor value) -> m  ()
-modifyGlobalEnv f = getGlobalEnv >>= putGlobalEnv . f
-
--- | Update the heap.
-modifyStore :: MonadEvaluator term value m => (StoreFor value -> StoreFor value) -> m ()
-modifyStore f = getStore >>= putStore . f
+-- | Update the evaluated module table.
+modifyModuleTable :: MonadModuleTable term value m => (ModuleTable (EnvironmentFor value) -> ModuleTable (EnvironmentFor value)) -> m ()
+modifyModuleTable f = do
+  table <- getModuleTable
+  putModuleTable $! f table
