@@ -54,23 +54,23 @@ extraRoots roots = raise . local (<> roots) . lower
 
 
 -- | Collect any addresses in the store not rooted in or reachable from the given 'Live' set.
-gc :: ( Ord (LocationFor a)
-      , Foldable (Cell (LocationFor a))
-      , ValueRoots a
+gc :: ( Ord (LocationFor value)
+      , Foldable (Cell (LocationFor value))
+      , ValueRoots value
       )
-   => LiveFor a  -- ^ The set of addresses to consider rooted.
-   -> StoreFor a -- ^ A store to collect unreachable addresses within.
-   -> StoreFor a -- ^ A garbage-collected store.
+   => LiveFor value  -- ^ The set of addresses to consider rooted.
+   -> StoreFor value -- ^ A store to collect unreachable addresses within.
+   -> StoreFor value -- ^ A garbage-collected store.
 gc roots store = storeRestrict store (reachable roots store)
 
 -- | Compute the set of addresses reachable from a given root set in a given store.
-reachable :: ( Ord (LocationFor a)
-             , Foldable (Cell (LocationFor a))
-             , ValueRoots a
+reachable :: ( Ord (LocationFor value)
+             , Foldable (Cell (LocationFor value))
+             , ValueRoots value
              )
-          => LiveFor a  -- ^ The set of root addresses.
-          -> StoreFor a -- ^ The store to trace addresses through.
-          -> LiveFor a  -- ^ The set of addresses reachable from the root set.
+          => LiveFor value  -- ^ The set of root addresses.
+          -> StoreFor value -- ^ The store to trace addresses through.
+          -> LiveFor value  -- ^ The set of addresses reachable from the root set.
 reachable roots store = go mempty roots
   where go seen set = case liveSplit set of
           Nothing -> seen
