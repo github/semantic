@@ -147,9 +147,10 @@ instance CustomHasDeclaration (Union fs) Declaration.WildcardImport where
       stripQuotes = T.dropAround (`elem` ['"', '\''])
       getSource = toText . flip Source.slice blobSource . getField
 
-instance (Expression.MemberAccess :< fs) => CustomHasDeclaration (Union fs) Expression.Call where
+instance (Syntax.Identifier :< fs, Expression.MemberAccess :< fs) => CustomHasDeclaration (Union fs) Expression.Call where
   customToDeclaration Blob{..} _ (Expression.Call _ (Term (In fromAnn fromF), _) _ _)
     | Just (Expression.MemberAccess (Term (In leftAnn leftF)) (Term (In idenAnn _))) <- prj fromF = Just $ CallReference (getSource idenAnn) (memberAccess leftAnn leftF)
+    | Just (Syntax.Identifier name) <- prj fromF = Just $ CallReference (T.decodeUtf8 (friendlyName name)) []
     | otherwise = Just $ CallReference (getSource fromAnn) []
     where
       memberAccess modAnn termFOut

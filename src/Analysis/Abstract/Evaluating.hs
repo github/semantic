@@ -14,6 +14,7 @@ import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Configuration
 import Data.Abstract.Evaluatable
+import Data.Abstract.Address
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Blob
@@ -76,11 +77,18 @@ type EvaluatingEffects term value
      , State  (StoreFor value)                     -- The heap
      , Reader (ModuleTable term)                   -- Cache of unevaluated modules
      , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
+
+     , State (Map Name (Name, Maybe (Address (LocationFor value) value))) -- Set of exports
      ]
 
-instance Members '[Reader (EnvironmentFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
+instance Members '[State (Map Name (Name, Maybe (Address (LocationFor value) value))), Reader (EnvironmentFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
   getGlobalEnv = raise get
   putGlobalEnv = raise . put
+  withGlobalEnv s = raise . localState s . lower
+
+  addExport key = raise . modify . Map.insert key
+  getExports = raise get
+  withExports s = raise . localState s . lower
 
   askLocalEnv = raise ask
   localEnv f a = raise (local f (lower a))

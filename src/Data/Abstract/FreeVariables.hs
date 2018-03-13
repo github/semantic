@@ -39,7 +39,9 @@ freeVariables1 :: (FreeVariables1 t, FreeVariables a) => t a -> Set Name
 freeVariables1 = liftFreeVariables freeVariables
 
 freeVariable :: FreeVariables term => term -> Name
-freeVariable term = let [n] = toList (freeVariables term) in n
+freeVariable term = case toList (freeVariables term) of
+  [n] -> n
+  xs -> Prelude.fail ("expected single free variable, but got: " <> show xs)
 
 -- TODO: Need a dedicated concept of qualified names outside of freevariables (a
 -- Set) b/c you can have something like `a.a.b.a`
