@@ -14,8 +14,9 @@ spec = parallel $ do
       res <- evaluate "main.go"
       let expectedEnv = Environment $ fromList
             [ (qualifiedName ["foo", "New"], addr 0)
-            , (qualifiedName ["Bar"], addr 1)
-            , (qualifiedName ["main"], addr 2)
+            , (qualifiedName ["Rab"], addr 1)
+            , (qualifiedName ["Bar"], addr 2)
+            , (qualifiedName ["main"], addr 3)
             ]
       assertEnvironment res expectedEnv
 
@@ -23,7 +24,9 @@ spec = parallel $ do
       res <- evaluate "main1.go"
       let expectedEnv = Environment $ fromList
             [ (qualifiedName ["f", "New"], addr 0)
-            , (qualifiedName ["main"], addr 2) -- side effects of eval'ing `import _ "./bar"` used addr 1.
+            , (qualifiedName ["main"], addr 3) -- addr 3 is due to side effects of
+                                               -- eval'ing `import _ "./bar"` which
+                                               -- used addr 1 & 2.
             ]
       assertEnvironment res expectedEnv
 
@@ -39,6 +42,5 @@ spec = parallel $ do
         [ fixtures <> entry
         , fixtures <> "foo/foo.go"
         , fixtures <> "bar/bar.go"
-        -- TODO: Modules defined in multiple files stomp on eachother in the ModuleTable.
-        -- , fixtures <> "bar/rab.go"
+        , fixtures <> "bar/rab.go"
         ]

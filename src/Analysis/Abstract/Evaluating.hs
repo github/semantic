@@ -57,7 +57,7 @@ evaluates pairs (b, t) = runAnalysis @(Evaluating term value) (withModules b pai
 withModules :: MonadAnalysis term value m => Blob -> [(Blob, term)] -> m a -> m a
 withModules Blob{..} pairs = localModuleTable (const moduleTable)
   where
-    moduleTable = ModuleTable (Map.fromList (map (first moduleName) pairs))
+    moduleTable = ModuleTable (Map.fromListWith (<>) (map (\(b, t) -> (moduleName b, [t])) pairs))
     rootDir = dropFileName blobPath
     moduleName Blob{..} = let path = dropExtensions (makeRelative rootDir blobPath)
      in case blobLanguage of
@@ -82,7 +82,7 @@ type EvaluatingEffects term value
      , Reader (EnvironmentFor value)               -- Local environment (e.g. binding over a closure)
      , State  (EnvironmentFor value)               -- Global (imperative) environment
      , State  (StoreFor value)                     -- The heap
-     , Reader (ModuleTable term)                   -- Cache of unevaluated modules
+     , Reader (ModuleTable [term])                 -- Cache of unevaluated modules
      , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
 
      , State (Map Name (Name, Maybe (Address (LocationFor value) value))) -- Set of exports

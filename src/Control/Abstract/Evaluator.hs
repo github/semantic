@@ -46,9 +46,9 @@ class MonadFail m => MonadEvaluator term value m | m -> term, m -> value where
   modifyModuleTable :: (ModuleTable (EnvironmentFor value) -> ModuleTable (EnvironmentFor value)) -> m ()
 
   -- | Retrieve the table of unevaluated modules.
-  askModuleTable :: m (ModuleTable term)
+  askModuleTable :: m (ModuleTable [term])
   -- | Run an action with a locally-modified table of unevaluated modules.
-  localModuleTable :: (ModuleTable term -> ModuleTable term) -> m a -> m a
+  localModuleTable :: (ModuleTable [term] -> ModuleTable [term]) -> m a -> m a
 
   -- | Retrieve the current root set.
   askRoots :: Ord (LocationFor value) => m (Live (LocationFor value) value)

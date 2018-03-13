@@ -87,8 +87,10 @@ load :: ( MonadAnalysis term value m
      -> m (EnvironmentFor value)
 load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
   where notFound = fail ("cannot load module: " <> show name)
-        evalAndCache e = do
-          v <- evaluateModule e
+        evalAndCache :: (MonadValue term value m, MonadAnalysis term value m) => [term] -> m (EnvironmentFor value)
+        evalAndCache []     = pure mempty
+        evalAndCache (x:xs) = do
+          v <- evaluateModule x
           env <- environment v
           modifyModuleTable (moduleTableInsert name env)
-          pure env
+          ((<>) env) <$> evalAndCache xs
