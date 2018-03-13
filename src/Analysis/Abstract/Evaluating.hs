@@ -12,8 +12,9 @@ import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
-import Data.Abstract.Address
+import Data.Abstract.Configuration
 import Data.Abstract.Evaluatable
+import Data.Abstract.Address
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Blob
@@ -86,7 +87,7 @@ type EvaluatingEffects term value
      , State (Map Name (Name, Maybe (Address (LocationFor value) value))) -- Set of exports
      ]
 
-instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
+instance Members '[State (Map Name (Name, Maybe (Address (LocationFor value) value))), Reader (EnvironmentFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
   getGlobalEnv = raise get
   putGlobalEnv = raise . put
   withGlobalEnv s = raise . localState s . lower
@@ -98,14 +99,19 @@ instance Members (EvaluatingEffects term value) effects => MonadEvaluator term v
   askLocalEnv = raise ask
   localEnv f a = raise (local f (lower a))
 
+instance Member (State (StoreFor value)) effects => MonadStore value (Evaluating term value effects) where
   getStore = raise get
   putStore = raise . put
 
+instance Members '[Reader (ModuleTable [term]), State (ModuleTable (EnvironmentFor value))] effects => MonadModuleTable term value (Evaluating term value effects) where
   getModuleTable = raise get
-  modifyModuleTable f = raise (modify f)
+  putModuleTable = raise . put
 
   askModuleTable = raise ask
   localModuleTable f a = raise (local f (lower a))
+
+instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
+  getConfiguration term = Configuration term mempty <$> askLocalEnv <*> getStore
 
 instance ( Evaluatable (Base term)
          , FreeVariables term
