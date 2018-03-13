@@ -25,28 +25,30 @@ import Prologue
 import System.FilePath.Posix
 
 -- | Evaluate a term to a value.
-evaluate :: forall value term
-         .  ( Evaluatable (Base term)
+evaluate :: forall value term effects
+         .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
+            , Evaluatable (Base term)
             , FreeVariables term
-            , MonadAddressable (LocationFor value) value (Evaluating term value (EvaluatingEffects term value))
-            , MonadValue term value (Evaluating term value (EvaluatingEffects term value))
+            , MonadAddressable (LocationFor value) value (Evaluating term value effects)
+            , MonadValue term value (Evaluating term value effects)
             , Recursive term
             )
          => term
-         -> Final (EvaluatingEffects term value) value
+         -> Final effects value
 evaluate = runAnalysis @(Evaluating term value) . evaluateModule
 
 -- | Evaluate terms and an entry point to a value.
-evaluates :: forall value term
-          .  ( Evaluatable (Base term)
+evaluates :: forall value term effects
+          .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
+             , Evaluatable (Base term)
              , FreeVariables term
-             , MonadAddressable (LocationFor value) value (Evaluating term value (EvaluatingEffects term value))
-             , MonadValue term value (Evaluating term value (EvaluatingEffects term value))
+             , MonadAddressable (LocationFor value) value (Evaluating term value effects)
+             , MonadValue term value (Evaluating term value effects)
              , Recursive term
              )
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
-          -> Final (EvaluatingEffects term value) value
+          -> Final effects value
 evaluates pairs (b, t) = runAnalysis @(Evaluating term value) (withModules b pairs (evaluateModule t))
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
