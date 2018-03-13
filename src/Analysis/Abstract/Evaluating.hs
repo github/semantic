@@ -12,6 +12,7 @@ import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
+import Data.Abstract.Configuration
 import Data.Abstract.Evaluatable
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
@@ -62,12 +63,12 @@ newtype Evaluating term value effects a = Evaluating (Eff effects a)
   deriving (Applicative, Functor, Effectful, Monad)
 
 
-
 deriving instance Member Fail      effects => MonadFail   (Evaluating term value effects)
 deriving instance Member Fresh     effects => MonadFresh  (Evaluating term value effects)
 deriving instance Member NonDetEff effects => Alternative (Evaluating term value effects)
 deriving instance Member NonDetEff effects => MonadNonDet (Evaluating term value effects)
 
+-- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value
   = '[ Fail                                        -- Failure with an error message
      , Reader (EnvironmentFor value)               -- Local environment (e.g. binding over a closure)
@@ -77,21 +78,26 @@ type EvaluatingEffects term value
      , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
      ]
 
-instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
+instance Members '[Reader (EnvironmentFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
   getGlobalEnv = raise get
   putGlobalEnv = raise . put
 
   askLocalEnv = raise ask
   localEnv f a = raise (local f (lower a))
 
+instance Member (State (StoreFor value)) effects => MonadStore value (Evaluating term value effects) where
   getStore = raise get
   putStore = raise . put
 
+instance Members '[Reader (ModuleTable term), State (ModuleTable (EnvironmentFor value))] effects => MonadModuleTable term value (Evaluating term value effects) where
   getModuleTable = raise get
-  modifyModuleTable f = raise (modify f)
+  putModuleTable = raise . put
 
   askModuleTable = raise ask
   localModuleTable f a = raise (local f (lower a))
+
+instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
+  getConfiguration term = Configuration term mempty <$> askLocalEnv <*> getStore
 
 instance ( Evaluatable (Base term)
          , FreeVariables term
@@ -102,4 +108,5 @@ instance ( Evaluatable (Base term)
          )
          => MonadAnalysis term value (Evaluating term value effects) where
   type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
+
   analyzeTerm = eval

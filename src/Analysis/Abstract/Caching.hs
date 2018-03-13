@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Caching
 ( type Caching
 ) where
@@ -13,27 +13,37 @@ import Prologue
 
 -- | The effects necessary for caching analyses.
 type CachingEffects term value effects
-  = Fresh
- ': NonDetEff
- ': Reader (CacheFor term value)
- ': State  (CacheFor term value)
+  = Fresh                        -- For 'MonadFresh'.
+ ': NonDetEff                    -- For 'Alternative' and 'MonadNonDet'.
+ ': Reader (CacheFor term value) -- The in-cache used as an oracle while converging on a result.
+ ': State  (CacheFor term value) -- The out-cache used to record results in each iteration of convergence.
  ': effects
 
 -- | The cache for term and abstract value types.
 type CacheFor term value = Cache (LocationFor value) term value
 
+-- | A (coinductively-)cached analysis suitable for guaranteeing termination of (suitably finitized) analyses over recursive programs.
 newtype Caching m term value (effects :: [* -> *]) a = Caching (m term value effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
+deriving instance MonadEnvironment value (m term value effects) => MonadEnvironment value (Caching m term value effects)
+deriving instance MonadStore value (m term value effects) => MonadStore value (Caching m term value effects)
+deriving instance MonadModuleTable term value (m term value effects) => MonadModuleTable term value (Caching m term value effects)
 deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (Caching m term value effects)
 
+-- | Functionality used to perform caching analysis. This is not exported, and exists primarily for organizational reasons.
 class MonadEvaluator term value m => MonadCaching term value m where
+  -- | Look up the set of values for a given configuration in the in-cache.
   consultOracle :: ConfigurationFor term value -> m (Set (value, StoreFor value))
+  -- | Run an action with the given in-cache.
   withOracle :: CacheFor term value -> m a -> m a
 
+  -- | Look up the set of values for a given configuration in the out-cache.
   lookupCache :: ConfigurationFor term value -> m (Maybe (Set (value, StoreFor value)))
+  -- | Run an action, caching its result and 'Store' under the given configuration.
   caching :: ConfigurationFor term value -> Set (value, StoreFor value) -> m value -> m value
 
+  -- | Run an action starting from an empty out-cache, and return the out-cache afterwards.
   isolateCache :: m a -> m (CacheFor term value)
 
 instance ( Effectful (m term value)
@@ -70,7 +80,10 @@ instance ( Corecursive term
          , Ord value
          )
          => MonadAnalysis term value (Caching m term value effects) where
+  -- We require the 'CachingEffects' in addition to the underlying analysis’ 'RequiredEffects'.
   type RequiredEffects term value (Caching m term value effects) = CachingEffects term value (RequiredEffects term value (m term value effects))
+
+  -- Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
   analyzeTerm e = do
     c <- getConfiguration (embedSubterm e)
     cached <- lookupCache c
@@ -92,7 +105,7 @@ instance ( Corecursive term
       -- that it doesn't "leak" to the calling context and diverge (otherwise this
       -- would never complete). We don’t need to use the values, so we 'gather' the
       -- nondeterministic values into @()@.
-      withOracle prevCache (gather (liftEvaluate evaluateModule e) :: Caching m term value effects ())) mempty
+      withOracle prevCache (gather (const ()) (Caching (evaluateModule e)))) mempty
     maybe empty scatter (cacheLookup c cache)
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.

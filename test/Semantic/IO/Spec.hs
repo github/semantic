@@ -1,4 +1,4 @@
-module Semantic.IO.Spec where
+module Semantic.IO.Spec (spec) where
 
 import Data.Blob
 import Data.Functor.Both as Both
