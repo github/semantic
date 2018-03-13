@@ -8,6 +8,7 @@ module Data.Abstract.Evaluatable
 , MonadEvaluator(..)
 , require
 , load
+, Imperative(..)
 ) where
 
 import Control.Abstract.Addressable as Addressable
@@ -92,3 +93,16 @@ load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup n
           env <- environment v
           modifyModuleTable (moduleTableInsert name env)
           pure env
+
+
+-- | A 'Semigroup' providing an imperative context which extends the local environment with new bindings.
+newtype Imperative m a = Imperative { runImperative :: m a }
+
+instance MonadEnvironment value m => Semigroup (Imperative m a) where
+  Imperative a <> Imperative b = Imperative $ a *> do
+    env <- getGlobalEnv
+    localEnv (<> env) b
+
+instance MonadValue term value m => Monoid (Imperative m value) where
+  mempty = Imperative unit
+  mappend = (<>)
