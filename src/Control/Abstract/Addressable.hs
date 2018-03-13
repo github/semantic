@@ -50,6 +50,20 @@ lookupOrAlloc' name v env = do
   pure (name, a)
 
 
+letrec :: ( MonadAddressable (LocationFor value) value m
+          , MonadEnvironment value m
+          , MonadStore value m
+          )
+       => Name
+       -> m value
+       -> m value
+letrec name body = do
+  addr <- alloc name
+  v <- localEnv (envInsert name addr) body
+  assign addr v
+  pure v
+
+
 -- Instances
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
