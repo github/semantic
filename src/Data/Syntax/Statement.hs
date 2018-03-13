@@ -185,7 +185,6 @@ instance Eq1 NoOp where liftEq = genericLiftEq
 instance Ord1 NoOp where liftCompare = genericLiftCompare
 instance Show1 NoOp where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for NoOp
 instance Evaluatable NoOp where
   eval _ = unit
 
@@ -198,7 +197,6 @@ instance Eq1 For where liftEq = genericLiftEq
 instance Ord1 For where liftCompare = genericLiftCompare
 instance Show1 For where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for For
 instance Evaluatable For where
   eval (fmap subtermValue -> For {..}) = forLoop forBefore forCondition forStep forBody
 
