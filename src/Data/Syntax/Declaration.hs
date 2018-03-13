@@ -161,7 +161,7 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 -- We need to ensure that all input files have aggregated their content into
 -- a coherent module before we begin evaluating a module.
 instance Evaluatable Module where
-  eval (Module _ xs) = runImperative $ foldMap (Imperative . subtermValue) xs
+  eval (Module _ xs) = eval xs
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
