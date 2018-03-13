@@ -49,9 +49,9 @@ prjPair = bitraverse prjValue prjValue
 --   that, say, a @Number Scientific@ contains a 'Scientific' and not an integer
 --   in disguise.
 data Number a where
-  Whole :: Prelude.Integer  -> Number Prelude.Integer
-  Ratio :: Prelude.Rational -> Number Prelude.Rational
-  Decim :: Scientific       -> Number Scientific
+  Whole :: !Prelude.Integer  -> Number Prelude.Integer
+  Ratio :: !Prelude.Rational -> Number Prelude.Rational
+  Decim :: !Scientific       -> Number Scientific
 
 deriving instance Eq a => Eq (Number a)
 
