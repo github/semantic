@@ -4,6 +4,7 @@ module Data.Syntax.Statement where
 import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
+import Prelude hiding (fail)
 import Prologue
 
 -- | Conditional. This must have an else block, which can be filled with some default value when omitted in the source, e.g. 'pure ()' for C-style if-without-else or 'pure Nothing' for Ruby-style, in both cases assuming some appropriate Applicative context into which the If will be lifted.
@@ -198,7 +199,16 @@ instance Ord1 For where liftCompare = genericLiftCompare
 instance Show1 For where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable For where
-  eval (fmap subtermValue -> For {..}) = forLoop forBefore forCondition forStep forBody
+--   eval (fmap subtermValue -> For {..}) = forLoop forBefore forCondition forStep forBody
+  eval (For before cond step body) = do
+    void $ subtermValue before
+    env <- getGlobalEnv
+    localEnv (<> env) (fix $ \ loop -> do
+      cond' <- subtermValue cond
+      ifthenelse cond' (do
+        void $ subtermValue body
+        void $ subtermValue step
+        loop) unit)
 
 
 data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }
