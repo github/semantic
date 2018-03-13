@@ -44,13 +44,13 @@ import Semantic.Util as X
 import System.FilePath as X
 
 import Data.Maybe as X
-import Data.Functor.Both as X (Both(..), runBothWith, both)
+import Data.Functor.Both as X (Both, runBothWith, both)
 import Data.Monoid as X (Monoid(..), First(..), Last(..))
 import Data.Semigroup as X (Semigroup(..))
 
 import Data.ByteString as X (ByteString)
 
-import Test.Hspec as X (Spec, describe, it, xit, parallel, pendingWith)
+import Test.Hspec as X (Spec, SpecWith, context, describe, it, xit, parallel, pendingWith, runIO)
 import Test.Hspec.Expectations.Pretty as X
 import Test.Hspec.LeanCheck as X
 import Test.LeanCheck as X
