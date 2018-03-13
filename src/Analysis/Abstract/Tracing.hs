@@ -1,73 +1,45 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, ScopedTypeVariables, TypeApplications, TypeFamilies #-}
-module Analysis.Abstract.Tracing where
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+module Analysis.Abstract.Tracing
+( type Tracing
+) where
 
-import Prologue
-import Control.Effect
-import Control.Monad.Effect hiding (run)
-import Control.Monad.Effect.Addressable
-import Control.Monad.Effect.Env
-import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.State
-import Control.Monad.Effect.Trace
+import Control.Abstract.Analysis
 import Control.Monad.Effect.Writer
-import Data.Abstract.Address
 import Data.Abstract.Configuration
-import Data.Abstract.Environment
-import Data.Abstract.Eval
-import Data.Abstract.Store
 import Data.Abstract.Value
+import Data.Semigroup.Reducer as Reducer
+import Prologue
 
--- | The effects necessary for tracing analyses.
-type Tracing g t v
-  = '[ Writer (g (Configuration (LocationFor v) t v)) -- For 'MonadTrace'.
-     , Fail                                           -- For 'MonadFail'.
-     , State (Store (LocationFor v) v)                -- For 'MonadStore'.
-     , Reader (Environment (LocationFor v) v)         -- For 'MonadEnv'.
-     ]
+-- | Trace analysis.
+--
+--   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
+newtype Tracing (trace :: * -> *) m term value (effects :: [* -> *]) a = Tracing (m term value effects a)
+  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
--- | Linear trace analysis.
-evalTrace :: forall v term
-          . ( Ord v, Ord term, Ord (Cell (LocationFor v) v)
-            , Functor (Base term)
-            , Recursive term
-            , Addressable (LocationFor v) (Eff (Tracing [] term v))
-            , MonadGC v (Eff (Tracing [] term v))
-            , Semigroup (Cell (LocationFor v) v)
-            , Eval term v (Eff (Tracing [] term v)) (Base term)
-            )
-          => term -> Final (Tracing [] term v) v
-evalTrace = run @(Tracing [] term v) . fix (evTell @[] (\ recur yield -> eval recur yield . project)) pure
+deriving instance MonadEnvironment value (m term value effects) => MonadEnvironment value (Tracing trace m term value effects)
+deriving instance MonadStore value (m term value effects) => MonadStore value (Tracing trace m term value effects)
+deriving instance MonadModuleTable term value (m term value effects) => MonadModuleTable term value (Tracing trace m term value effects)
+deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (Tracing trace m term value effects)
 
--- | Reachable configuration analysis.
-evalReach :: forall v term
-          . ( Ord v, Ord term, Ord (LocationFor v), Ord (Cell (LocationFor v) v)
-            , Functor (Base term)
-            , Recursive term
-            , Addressable (LocationFor v) (Eff (Tracing Set term v))
-            , MonadGC v (Eff (Tracing Set term v))
-            , Semigroup (Cell (LocationFor v) v)
-            , Eval term v (Eff (Tracing Set term v)) (Base term)
-            )
-          => term -> Final (Tracing Set term v) v
-evalReach = run @(Tracing Set term v) . fix (evTell @Set (\ recur yield -> eval recur yield . project)) pure
-
-
--- | Small-step evaluation which records every visited configuration.
-evTell :: forall g t m v
-       . ( Monoid (g (Configuration (LocationFor v) t v))
-         , Pointed g
-         , MonadTrace t v g m
-         , MonadEnv v m
-         , MonadStore v m
-         , MonadGC v m
+instance ( Corecursive term
+         , Effectful (m term value)
+         , Member (Writer (trace (ConfigurationFor term value))) effects
+         , MonadAnalysis term value (m term value effects)
+         , Ord (LocationFor value)
+         , Reducer (ConfigurationFor term value) (trace (ConfigurationFor term value))
          )
-       => (((v -> m v) -> t -> m v) -> (v -> m v) -> t -> m v)
-       -> ((v -> m v) -> t -> m v)
-       -> (v -> m v) -> t -> m v
-evTell ev0 ev' yield e = do
-  env <- askEnv
-  store <- getStore
-  roots <- askRoots
-  trace (point (Configuration e roots env store) :: g (Configuration (LocationFor v) t v))
-  ev0 ev' yield e
+         => MonadAnalysis term value (Tracing trace m term value effects) where
+  type RequiredEffects term value (Tracing trace m term value effects) = Writer (trace (ConfigurationFor term value)) ': RequiredEffects term value (m term value effects)
+
+  analyzeTerm term = do
+    config <- getConfiguration (embedSubterm term)
+    trace (Reducer.unit config)
+    liftAnalyze analyzeTerm term
+
+-- | Log the given trace of configurations.
+trace :: ( Effectful (m term value)
+         , Member (Writer (trace (ConfigurationFor term value))) effects
+         )
+      => trace (ConfigurationFor term value)
+      -> Tracing trace m term value effects ()
+trace = raise . tell

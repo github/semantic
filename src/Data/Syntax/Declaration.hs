@@ -1,11 +1,11 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Syntax.Declaration where
 
-import Prologue
 import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
 import qualified Data.Map as Map
+import Prologue
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -88,7 +88,7 @@ instance Evaluatable OptionalParameter
 
 -- TODO: Should we replace this with Function and differentiate by context?
 -- TODO: How should we distinguish class/instance methods?
-
+-- TODO: It would be really nice to have a more meaningful type contained in here than [a]
 -- | A declaration of possibly many variables such as var foo = 5, bar = 6 in JavaScript.
 newtype VariableDeclaration a = VariableDeclaration { variableDeclarations :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -97,9 +97,9 @@ instance Eq1 VariableDeclaration where liftEq = genericLiftEq
 instance Ord1 VariableDeclaration where liftCompare = genericLiftCompare
 instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for VariableDeclaration
-instance Evaluatable VariableDeclaration
-
+instance Evaluatable VariableDeclaration where
+  eval (VariableDeclaration [])   = unit
+  eval (VariableDeclaration decs) = multiple =<< traverse subtermValue decs
 
 -- | A TypeScript/Java style interface declaration to implement.
 data InterfaceDeclaration a = InterfaceDeclaration { interfaceDeclarationContext :: ![a], interfaceDeclarationIdentifier :: !a, interfaceDeclarationBody :: !a }
