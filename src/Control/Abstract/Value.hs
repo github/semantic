@@ -34,9 +34,6 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
   -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
   multiple :: [value] -> m value
 
-  -- | Construct an abstract interface value.
-  interface :: value -> m value
-
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: value -> m value -> m value -> m value
 
@@ -45,8 +42,6 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
   -- | Evaluate an application (like a function call).
   apply :: value -> [Subterm term (m value)] -> m value
 
-  -- | Extract the environment from an interface value.
-  environment :: value -> m (EnvironmentFor value)
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( MonadAddressable location (Value location term) m
@@ -64,8 +59,6 @@ instance ( MonadAddressable location (Value location term) m
   multiple vals =
     pure . injValue $ Value.Tuple vals
 
-  interface v = injValue . Value.Interface v <$> getGlobalEnv
-
   ifthenelse cond if' else'
     | Just (Boolean b) <- prjValue cond = if b then if' else else'
     | otherwise = fail ("not defined for non-boolean conditions: " <> show cond)
@@ -80,10 +73,6 @@ instance ( MonadAddressable location (Value location term) m
       assign a v
       envInsert name a <$> rest) (pure env) (zip names params)
     localEnv (mappend bindings) (evaluateTerm body)
-
-  environment v
-    | Just (Interface _ env) <- prjValue v = pure env
-    | otherwise                            = pure mempty
 
 -- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
 instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue term Type m where
@@ -103,8 +92,6 @@ instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue 
   string _  = pure Type.String
   float _   = pure Type.Float
   multiple  = pure . Type.Product
-  -- TODO
-  interface = undefined
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 
@@ -113,6 +100,3 @@ instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue 
     paramTypes <- traverse subtermValue params
     _ :-> ret <- op `unify` (Product paramTypes :-> Var tvar)
     pure ret
-
-  -- TODO
-  environment = undefined
