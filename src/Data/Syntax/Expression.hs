@@ -6,6 +6,7 @@ import Data.Fixed
 import Diffing.Algorithm
 import Prelude hiding (fail)
 import Prologue hiding (apply)
+import Data.Abstract.Value (liftThorny, liftSimple, safeExp)
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
@@ -61,12 +62,12 @@ instance Show1 Arithmetic where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Arithmetic
 instance Evaluatable Arithmetic where
   eval = traverse subtermValue >=> go where
-    go (Plus a b)      = liftNumeric2 (+) (+) a b
-    go (Minus a b)     = liftNumeric2 (-) (-) a b
-    go (Times a b)     = liftNumeric2 (*) (*) a b
-    go (DividedBy a b) = liftNumeric2 (/) div a b
-    go (Modulo a b)    = liftNumeric2 mod' mod a b
-    go (Power a b)     = liftNumeric2 (**) (^) a b
+    go (Plus a b)      = liftNumeric2 add a b  where add    = liftSimple (+)
+    go (Minus a b)     = liftNumeric2 sub a b  where sub    = liftSimple (-)
+    go (Times a b)     = liftNumeric2 mul a b  where mul    = liftSimple (*)
+    go (DividedBy a b) = liftNumeric2 div' a b where div'   = liftThorny div (/)
+    go (Modulo a b)    = liftNumeric2 mod'' a b where mod'' = liftThorny mod mod'
+    go (Power a b)     = liftNumeric2 safeExp a b
     go (Negate a)      = liftNumeric negate a
 
 -- | Boolean operators.

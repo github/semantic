@@ -7,7 +7,7 @@ import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type as Type
 import Data.Abstract.Value as Value
-import Data.Scientific (Scientific, fromFloatDigits, toRealFloat)
+import Data.Scientific (Scientific)
 import Prelude hiding (fail)
 import Prologue
 
@@ -40,8 +40,7 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
   --   You usually pass the same operator as both arguments, except in the cases where
   --   Haskell provides different functions for integral and fractional operations, such
   --   as division, exponentiation, and modulus.
-  liftNumeric2 :: (forall a . (Real a, Floating a) => a -> a -> a)
-               -> (forall b . Integral b           => b -> b -> b)
+  liftNumeric2 :: (forall a b. Number a -> Number b -> SomeNumber)
                -> (value -> value -> m value)
 
   -- | Lift a Comparator (usually wrapping a function like == or <=) to a function on values.
@@ -55,6 +54,9 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
 
   -- | Construct a floating-point value.
   float :: Scientific -> m value
+
+  -- | Construct a rational value.
+  rational :: Prelude.Rational -> m value
 
   -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
   multiple :: [value] -> m value
@@ -115,10 +117,11 @@ instance ( MonadAddressable location (Value location term) m
          => MonadValue term (Value location term) m where
 
   unit    = pure . injValue $ Value.Unit
-  integer = pure . injValue . Integer
+  integer = pure . injValue . Integer . Whole
   boolean = pure . injValue . Boolean
   string  = pure . injValue . Value.String
-  float   = pure . injValue . Value.Float
+  float   = pure . injValue . Value.Float . Decim
+  rational = pure . injValue . Value.Rational . Ratio
   multiple vals =
     pure . injValue $ Value.Tuple vals
 
@@ -129,33 +132,37 @@ instance ( MonadAddressable location (Value location term) m
     | otherwise = fail ("not defined for non-boolean conditions: " <> show cond)
 
   liftNumeric f arg
-    | Just (Integer i)     <- prjValue arg = pure . injValue . Integer     $ f i
-    | Just (Value.Float i) <- prjValue arg = pure . injValue . Value.Float $ f i
+    | Just (Integer (Whole i))     <- prjValue arg = integer $ f i
+    | Just (Value.Float (Decim d)) <- prjValue arg = float   $ f d
     | otherwise = fail ("Invalid operand to liftNumeric: " <> show arg)
 
-  liftNumeric2 f g left right
-    | Just (Integer i, Integer j)         <- prjPair pair = pure . injValue . Integer $ g i j
-    | Just (Integer i, Value.Float j)     <- prjPair pair = pure . injValue . float   $ f (fromIntegral i) (munge j)
-    | Just (Value.Float i, Value.Float j) <- prjPair pair = pure . injValue . float   $ f (munge i) (munge j)
-    | Just (Value.Float i, Integer j)     <- prjPair pair = pure . injValue . float   $ f (munge i) (fromIntegral j)
+  liftNumeric2 f left right
+    | Just (Integer i, Integer j)               <- prjPair pair = f i j & specialize
+    | Just (Integer i, Value.Rational j)        <- prjPair pair = f i j & specialize
+    | Just (Integer i, Value.Float j)           <- prjPair pair = f i j & specialize
+    | Just (Value.Rational i, Integer j)        <- prjPair pair = f i j & specialize
+    | Just (Value.Rational i, Value.Rational j) <- prjPair pair = f i j & specialize
+    | Just (Value.Rational i, Value.Float j)    <- prjPair pair = f i j & specialize
+    | Just (Value.Float i, Integer j)           <- prjPair pair = f i j & specialize
+    | Just (Value.Float i, Value.Rational j)    <- prjPair pair = f i j & specialize
+    | Just (Value.Float i, Value.Float j)       <- prjPair pair = f i j & specialize
     | otherwise = fail ("Invalid operands to liftNumeric2: " <> show pair)
       where
-        -- Yucky hack to work around the lack of a Floating instance for Scientific.
-        -- This may possibly lose precision, but there's little we can do about that.
-        munge :: Scientific -> Double
-        munge = toRealFloat
-        float :: Double -> Value.Float a
-        float = Value.Float . fromFloatDigits
+        -- Dispatch whatever's contained inside a 'SomeNumber' to its appropriate 'MonadValue' ctor
+        specialize :: MonadValue term value m => SomeNumber -> m value
+        specialize (SomeNumber (Whole i)) = integer i
+        specialize (SomeNumber (Ratio r)) = rational r
+        specialize (SomeNumber (Decim d)) = float d
         pair = (left, right)
 
   liftComparison comparator left right
-    | Just (Integer i, Integer j)           <- prjPair pair = go i j
-    | Just (Integer i, Value.Float j)       <- prjPair pair = go (fromIntegral i) j
-    | Just (Value.Float i, Integer j)       <- prjPair pair = go i (fromIntegral j)
-    | Just (Value.Float i, Value.Float j)   <- prjPair pair = go i j
-    | Just (Value.String i, Value.String j) <- prjPair pair = go i j
-    | Just (Boolean i, Boolean j)           <- prjPair pair = go i j
-    | Just (Value.Unit, Value.Unit)         <- prjPair pair = boolean True
+    | Just (Integer (Whole i), Integer (Whole j))         <- prjPair pair = go i j
+    | Just (Integer (Whole i), Value.Float (Decim j))     <- prjPair pair = go (fromIntegral i) j
+    | Just (Value.Float (Decim i), Integer (Whole j))     <- prjPair pair = go i (fromIntegral j)
+    | Just (Value.Float (Decim i), Value.Float (Decim j)) <- prjPair pair = go i j
+    | Just (Value.String i, Value.String j)               <- prjPair pair = go i j
+    | Just (Boolean i, Boolean j)                         <- prjPair pair = go i j
+    | Just (Value.Unit, Value.Unit)                       <- prjPair pair = boolean True
     | otherwise = fail ("Type error: invalid arguments to liftComparison: " <> show pair)
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
@@ -203,6 +210,7 @@ instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue 
   boolean _ = pure Bool
   string _  = pure Type.String
   float _   = pure Type.Float
+  rational _ = pure Type.Rational
   multiple  = pure . Type.Product
   -- TODO
   interface = undefined
@@ -213,7 +221,7 @@ instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue 
   liftNumeric _ Int        = pure Int
   liftNumeric _ _          = fail "Invalid type in unary numeric operation"
 
-  liftNumeric2 _ _ left right = case (left, right) of
+  liftNumeric2 _ left right = case (left, right) of
     (Type.Float, Int) -> pure Type.Float
     (Int, Type.Float) -> pure Type.Float
     _                 -> unify left right

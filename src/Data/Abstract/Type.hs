@@ -14,6 +14,7 @@ data Type
   | String         -- ^ Primitive string type.
   | Unit           -- ^ The unit type.
   | Float          -- ^ Floating-point type.
+  | Rational       -- ^ Rational type.
   | Type :-> Type  -- ^ Binary function types.
   | Var TName      -- ^ A type variable.
   | Product [Type] -- ^ N-ary products.
