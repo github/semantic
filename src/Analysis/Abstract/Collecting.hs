@@ -49,8 +49,8 @@ askRoots :: (Effectful m, Member (Reader (Live (LocationFor value) value)) effec
 askRoots = raise ask
 
 -- | Run a computation with the given 'Live' set added to the local root set.
-extraRoots :: (Effectful m, Member (Reader (Live (LocationFor value) value)) effects, Ord (LocationFor value)) => Live (LocationFor value) value -> m effects a -> m effects a
-extraRoots roots = raise . local (<> roots) . lower
+-- extraRoots :: (Effectful m, Member (Reader (Live (LocationFor value) value)) effects, Ord (LocationFor value)) => Live (LocationFor value) value -> m effects a -> m effects a
+-- extraRoots roots = raise . local (<> roots) . lower
 
 
 -- | Collect any addresses in the store not rooted in or reachable from the given 'Live' set.
