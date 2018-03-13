@@ -90,14 +90,14 @@ instance ( MonadAddressable location (Value location term) m
   liftNumeric f arg
     | Just (Integer i)     <- prjValue arg = pure . injValue . Integer     $ f i
     | Just (Value.Float i) <- prjValue arg = pure . injValue . Value.Float $ f i
-    | otherwise = fail "Invalid operand to liftNumeric"
+    | otherwise = fail ("Invalid operand to liftNumeric: " <> show arg)
 
   liftNumeric2 f g left right
     | Just (Integer i, Integer j)         <- prjPair pair = pure . injValue . Integer $ g i j
     | Just (Integer i, Value.Float j)     <- prjPair pair = pure . injValue . float   $ f (fromIntegral i) (munge j)
     | Just (Value.Float i, Value.Float j) <- prjPair pair = pure . injValue . float   $ f (munge i) (munge j)
     | Just (Value.Float i, Integer j)     <- prjPair pair = pure . injValue . float   $ f (munge i) (fromIntegral j)
-    | otherwise = fail ("Invalid operands to liftNumeric2 " <> )
+    | otherwise = fail ("Invalid operands to liftNumeric2: " <> show pair)
       where
         -- Yucky hack to work around the lack of a Floating instance for Scientific.
         -- This may possibly lose precision, but there's little we can do about that.
