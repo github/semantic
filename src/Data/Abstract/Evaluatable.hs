@@ -14,13 +14,12 @@ module Data.Abstract.Evaluatable
 import Control.Abstract.Addressable as Addressable
 import Control.Abstract.Analysis as Analysis
 import Control.Abstract.Value as Value
-import Data.Abstract.Environment
 import Data.Abstract.FreeVariables as FreeVariables
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Functor.Classes
 import Data.Proxy
-import Data.Semigroup
+import Data.Semigroup.Foldable
 import Data.Term
 import Prelude hiding (fail)
 import Prologue
@@ -54,18 +53,7 @@ instance Evaluatable s => Evaluatable (TermF s a) where
 --   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
 --   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
-  eval []     = unit           -- Return unit value if this is an empty list of terms
-  eval [x]    = subtermValue x -- Return the value for the last term
-  eval (x:xs) = do
-    _ <- subtermValue x        -- Evaluate the head term
-    env <- getGlobalEnv        -- Get the global environment after evaluation
-                               -- since it might have been modified by the
-                               -- evaluation above ^.
-
-    -- Finally, evaluate the rest of the terms, but do so by calculating a new
-    -- environment each time where the free variables in those terms are bound
-    -- to the global environment.
-    localEnv (<> (bindEnv (foldMap (freeVariables . subterm) xs) env)) (eval xs)
+  eval = maybe unit (runImperative . foldMap1 (Imperative . subtermValue)) . nonEmpty
 
 
 -- | Require/import another term/file and return an Effect.
