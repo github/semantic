@@ -34,12 +34,12 @@ import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 
-type Language a = Value Precise (Term (Union a) (Record Location))
+type PreciseValue a = Value Precise (Term (Union a) (Record Location))
 
-type GoValue         = Language Go.Syntax
-type RubyValue       = Language Ruby.Syntax
-type PythonValue     = Language Python.Syntax
-type TypeScriptValue = Language TypeScript.Syntax
+type GoValue         = PreciseValue Go.Syntax
+type RubyValue       = PreciseValue Ruby.Syntax
+type PythonValue     = PreciseValue Python.Syntax
+type TypeScriptValue = PreciseValue TypeScript.Syntax
 
 -- Ruby
 evaluateRubyFile = evaluateFile @RubyValue rubyParser
