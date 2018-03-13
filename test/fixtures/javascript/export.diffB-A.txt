@@ -1,153 +1,24 @@
 (Program
-  (Export
-    (ExportClause
-      (ImportExportSpecifier
-      { (Identifier)
-      ->(Identifier) }
-        (Empty))
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Empty)+})+}
-      (ImportExportSpecifier
-      { (Identifier)
-      ->(Identifier) }
-        (Empty))
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Empty)+})+}
-    {-(ImportExportSpecifier
-      {-(Identifier)-}
-      {-(Empty)-})-}
-    {-(ImportExportSpecifier
-      {-(Identifier)-}
-      {-(Empty)-})-}))
-  (Export
-    (ExportClause
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Identifier)+})+}
-      (ImportExportSpecifier
-        (Identifier)
-        (Identifier))
-      (ImportExportSpecifier
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->(Empty) })
-    {-(ImportExportSpecifier
-      {-(Identifier)-}
-      {-(Empty)-})-}))
-  (Export
+  {(QualifiedExport)->(QualifiedExport)}
+  {(QualifiedExport)->(QualifiedExport)}
+  (DefaultExport
     (VariableDeclaration
-      (Assignment
-        (Empty)
-      { (Identifier)
-      ->(Identifier) }
-        (Empty))
-      (Assignment
-        (Empty)
-      { (Identifier)
-      ->(Identifier) }
-        (Empty))
-      (Assignment
-        (Empty)
-      { (Identifier)
-      ->(Identifier) }
-        (Empty))))
-  (Export
+      (Assignment(Empty){(Identifier)->(Identifier)}(Empty))
+      (Assignment(Empty){(Identifier)->(Identifier)}(Empty))
+      (Assignment(Empty){(Identifier)->(Identifier)}(Empty))))
+  (DefaultExport
     (VariableDeclaration
-    {+(Assignment
-      {+(Empty)+}
-      {+(Identifier)+}
-      {+(Identifier)+})+}
-      (Assignment
-        (Empty)
-        (Identifier)
-        (Identifier))
-      (Assignment
-        (Empty)
-        (Identifier)
-      { (Identifier)
-      ->(Empty) })
-    {+(Assignment
-      {+(Empty)+}
-      {+(Identifier)+}
-      {+(Empty)+})+}
-    {-(Assignment
-      {-(Empty)-}
-      {-(Identifier)-}
-      {-(Empty)-})-}
-    {-(Assignment
-      {-(Empty)-}
-      {-(Identifier)-}
-      {-(Empty)-})-}))
-  (Export
-  { (Identifier)
-  ->(Identifier) })
-{-(Export
-  {-(Function
-    {-(Empty)-}
-    {-(Empty)-}
-    {-(Identifier)-}
-    {-([])-})-})-}
-  (Export
-    (Function
-      (Empty)
-      (Empty)
-      (Empty)
-      ([])))
-  (Export
-  {+(Function
-    {+(Empty)+}
-    {+(Empty)+}
-    {+(Identifier)+}
-    {+([])+})+}
-  {-(ExportClause
-    {-(ImportExportSpecifier
-      {-(Identifier)-}
-      {-(Identifier)-})-})-})
-  (Export
-  {+(ExportClause
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Identifier)+})+})+}
-  {-(TextElement)-})
-{+(Export
-  {+(TextElement)+})+}
-  (Export
-    (ExportClause
-      (ImportExportSpecifier
-      { (Identifier)
-      ->(Identifier) }
-        (Empty))
-      (ImportExportSpecifier
-      { (Identifier)
-      ->(Identifier) }
-        (Empty))
-      (ImportExportSpecifier
-      { (Identifier)
-      ->(Identifier) }
-        (Empty)))
-  { (TextElement)
-  ->(TextElement) })
-  (Export
-    (ExportClause
-      (ImportExportSpecifier
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->(Identifier) })
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Identifier)+})+}
-    {+(ImportExportSpecifier
-      {+(Identifier)+}
-      {+(Empty)+})+}
-    {-(ImportExportSpecifier
-      {-(Identifier)-}
-      {-(Identifier)-})-}
-    {-(ImportExportSpecifier
-      {-(Identifier)-}
-      {-(Empty)-})-})
-  { (TextElement)
-  ->(TextElement) }))
+      {+(Assignment{+(Empty)+}{+(Identifier)+}{+(Identifier)+})+}
+      (Assignment(Empty)(Identifier)(Identifier))
+      (Assignment(Empty)(Identifier){(Identifier)->(Empty)})
+      {+(Assignment{+(Empty)+}{+(Identifier)+}{+(Empty)+})+}
+      {-(Assignment{-(Empty)-}{-(Identifier)-}{-(Empty)-})-}
+      {-(Assignment{-(Empty)-}{-(Identifier)-}{-(Empty)-})-}))
+  (DefaultExport {(Identifier)->(Identifier)})
+  {-(DefaultExport {-(Function{-(Empty)-}{-(Empty)-}{-(Identifier)-}{-([])-})-})-}
+  (DefaultExport (Function(Empty)(Empty)(Empty)([])))
+  {+(DefaultExport {+(Function{+(Empty)+}{+(Empty)+}{+(Identifier)+}{+([])+})+})+}
+  {(QualifiedExport)->(QualifiedExport)}
+  (DefaultExport {(TextElement)->(TextElement)})
+  {(QualifiedExportFrom {-(Identifier)-})->(QualifiedExportFrom {+(Identifier)+})}
+  {(QualifiedExportFrom {-(Identifier)-})->(QualifiedExportFrom {+(Identifier)+})})

@@ -1,8 +1,6 @@
 (Program
   (If
-    (MemberAccess
-      (Identifier)
-      (Identifier))
+    (Identifier)
     (
       (Call
         (Identifier)
