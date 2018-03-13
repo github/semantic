@@ -198,7 +198,12 @@ instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue 
     (Int, Type.Float) -> pure Type.Float
     _                 -> unify left right
 
-  liftComparison _ left right = pure left <|> pure right
+  liftComparison (Concrete _) Int Type.Float = pure Bool
+  liftComparison (Concrete _) Type.Float Int = pure Bool
+  liftComparison (Concrete _) left right = unify left right *> pure Bool
+  liftComparison Generalized Int Type.Float = pure Int
+  liftComparison Generalized Type.Float Int = pure Int
+  liftComparison Generalized left right = unify left right *> pure Int
 
   apply op params = do
     tvar <- fresh
