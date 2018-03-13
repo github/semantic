@@ -199,15 +199,7 @@ instance Ord1 For where liftCompare = genericLiftCompare
 instance Show1 For where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable For where
-  eval (fmap subtermValue -> For before cond step body) = do
-    void before
-    env <- getGlobalEnv
-    localEnv (mappend env) (fix $ \ loop -> do
-      cond' <- cond
-      ifthenelse cond' (do
-        void body
-        void step
-        loop) unit)
+  eval (fmap subtermValue -> For before cond step body) = forLoop before cond step body
 
 
 data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }

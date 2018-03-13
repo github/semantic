@@ -83,8 +83,15 @@ forLoop :: MonadValue term value m
         -> m value -- | Increment/stepper
         -> m value -- | Body
         -> m value
-forLoop initial cond step body =
-  initial *> while cond (body *> step)
+forLoop initial cond step body = do
+  void initial
+  env <- getGlobalEnv
+  localEnv (mappend env) (fix $ \ loop -> do
+      cond' <- cond
+      ifthenelse cond' (do
+        void body
+        void step
+        loop) unit)
 
 -- | The fundamental looping primitive, built on top of ifthenelse.
 while :: MonadValue term value m => m value -> m value -> m value
