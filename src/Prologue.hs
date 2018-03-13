@@ -51,7 +51,6 @@ import Data.Functor.Classes.Generic as X
 import Data.Functor.Foldable as X (Base, Recursive(..), Corecursive(..))
 import Data.Mergeable as X (Mergeable)
 import Data.Monoid as X (Monoid(..), First(..), Last(..))
-import Data.Pointed as X
 import Data.Proxy as X (Proxy(..))
 import Data.Semigroup as X (Semigroup(..))
 import Data.Traversable as X

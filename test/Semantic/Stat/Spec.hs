@@ -1,4 +1,4 @@
-module Semantic.Stat.Spec where
+module Semantic.Stat.Spec (spec) where
 
 import Semantic.Stat
 import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
