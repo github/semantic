@@ -24,11 +24,11 @@ data Type
 
 -- | Unify two 'Type's.
 unify :: MonadFail m => Type -> Type -> m Type
-unify Int  Int  = pure Int
-unify Bool Bool = pure Bool
 unify (a1 :-> b1) (a2 :-> b2) = (:->) <$> unify a1 a2 <*> unify b1 b2
 -- FIXME: this should be constructing a substitution.
 unify (Var _) b = pure b
 unify a (Var _) = pure a
 unify (Product as) (Product bs) = Product <$> sequenceA (alignWith (these pure pure unify) as bs)
-unify t1 t2 = fail ("cannot unify " ++ show t1 ++ " with " ++ show t2)
+unify t1 t2
+  | t1 == t2  = pure t2
+  | otherwise = fail ("cannot unify " ++ show t1 ++ " with " ++ show t2)
