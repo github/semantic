@@ -72,6 +72,15 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
 toBool :: MonadValue term value m => value -> m Bool
 toBool v = ifthenelse v (pure True) (pure False)
 
+forLoop :: MonadValue term value m
+        => m value -- | Initial statement
+        -> m value -- | Condition
+        -> m value -- | Increment/stepper
+        -> m value -- | Body
+        -> m value
+forLoop initial cond step body =
+  initial *> while cond (body *> step)
+
 -- | The fundamental looping primitive, built on top of ifthenelse.
 while :: MonadValue term value m => m value -> m value -> m value
 while cond body = do
