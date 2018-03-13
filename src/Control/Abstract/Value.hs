@@ -12,13 +12,6 @@ import Data.Scientific (Scientific, fromFloatDigits, toRealFloat)
 import Prelude hiding (fail)
 import Prologue
 
--- TODO: move this useful projection function elsewhere
-au :: ( f :< ValueConstructors loc term1
-      , g :< ValueConstructors loc term2)
-   => (Value loc term1, Value loc term2)
-   -> Maybe (f (Value loc term1), g (Value loc term2))
-au = bitraverse prjValue prjValue
-
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
 --   have built-in generalized-comparison ("spaceship") operators. If you want to
 --   encapsulate a traditional, boolean-returning operator, wrap it in 'Concrete';
@@ -141,23 +134,25 @@ instance ( MonadAddressable location (Value location term) m
         pair = (left, right)
 
   liftComparison comparator left right
-    | Just (Integer i, Integer j)           <- au pair = go i j
-    | Just (Integer i, Value.Float j)       <- au pair = go (fromIntegral i) j
-    | Just (Value.Float i, Integer j)       <- au pair = go i (fromIntegral j)
-    | Just (Value.Float i, Value.Float j)   <- au pair = go i j
-    | Just (Value.String i, Value.String j) <- au pair = go i j
-    | Just (Boolean i, Boolean j)           <- au pair = go i j
-    | Just (Value.Unit, Value.Unit)         <- au pair = boolean True
+    | Just (Integer i, Integer j)           <- prjPair pair = go i j
+    | Just (Integer i, Value.Float j)       <- prjPair pair = go (fromIntegral i) j
+    | Just (Value.Float i, Integer j)       <- prjPair pair = go i (fromIntegral j)
+    | Just (Value.Float i, Value.Float j)   <- prjPair pair = go i j
+    | Just (Value.String i, Value.String j) <- prjPair pair = go i j
+    | Just (Boolean i, Boolean j)           <- prjPair pair = go i j
+    | Just (Value.Unit, Value.Unit)         <- prjPair pair = boolean True
     | otherwise = fail ("Type error: invalid arguments to liftComparison: " <> show pair)
       where
+        -- Explicit type signature is necessary here because we're passing all sorts of things
+        -- to these comparison functions.
         go :: (Ord a, MonadValue term value m) => a -> a -> m value
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
-          Generalized -> integer (munge (compare l r))
+          Generalized -> integer (orderingToInt (compare l r))
 
-        munge LT = negate 1
-        munge EQ = 0
-        munge GT = 1
+        -- Map from [LT, EQ, GT] to [-1, 0, 1]
+        orderingToInt :: Ordering -> Prelude.Integer
+        orderingToInt = toInteger . pred . fromEnum
 
         pair = (left, right)
 
