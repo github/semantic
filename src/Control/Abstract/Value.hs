@@ -7,7 +7,7 @@ import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type as Type
 import Data.Abstract.Value as Value
-import Data.Bitraversable
+import Data.Monoid (Alt (..))
 import Data.Scientific (Scientific, fromFloatDigits, toRealFloat)
 import Prelude hiding (fail)
 import Prologue
@@ -203,7 +203,7 @@ instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue 
     (Int, Type.Float) -> pure Type.Float
     _                 -> unify left right
 
-  liftComparison _ left right = left <|> right
+  liftComparison _ left right = pure left <|> pure right
 
   apply op params = do
     tvar <- fresh
