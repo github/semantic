@@ -226,15 +226,15 @@ instance Evaluatable QualifiedImport where
     env <- getGlobalEnv
     putGlobalEnv mempty
     importedEnv <- require (freeVariable (subterm from))
-    env' <- Map.foldrWithKey copy (pure env) (unEnvironment importedEnv)
+    let env' = Map.foldrWithKey copy env (unEnvironment importedEnv)
     putGlobalEnv env'
     unit
     where
       prefix = freeVariable (subterm alias)
       symbols = Map.fromList xs
       copy = if Map.null symbols then qualifyInsert else directInsert
-      qualifyInsert k v rest = envInsert (prefix <> k) v <$> rest
-      directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v <$> rest) (Map.lookup k symbols)
+      qualifyInsert k v rest = envInsert (prefix <> k) v rest
+      directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v rest) (Map.lookup k symbols)
 
 
 -- | Import declarations (symbols are added directly to the calling env).
@@ -252,12 +252,12 @@ instance Evaluatable Import where
     env <- getGlobalEnv
     putGlobalEnv mempty
     importedEnv <- require (freeVariable (subterm from))
-    env' <- Map.foldrWithKey directInsert (pure env) (unEnvironment importedEnv)
+    let env' = Map.foldrWithKey directInsert env (unEnvironment importedEnv)
     putGlobalEnv env'
     unit
     where
       symbols = Map.fromList xs
-      directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v <$> rest) (Map.lookup k symbols)
+      directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v rest) (Map.lookup k symbols)
 
 
 -- | A wildcard import (all symbols are added directly to the calling env)
