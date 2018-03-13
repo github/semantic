@@ -50,6 +50,7 @@ instance Evaluatable s => Evaluatable (TermF s a) where
 --   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
 --   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
+  -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
   eval = maybe unit (runImperative . foldMap1 (Imperative . subtermValue)) . nonEmpty
 
 
