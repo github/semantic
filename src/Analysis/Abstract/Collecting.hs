@@ -5,6 +5,7 @@ module Analysis.Abstract.Collecting
 
 import Control.Abstract.Analysis
 import Data.Abstract.Address
+import Data.Abstract.Configuration
 import Data.Abstract.Live
 import Data.Abstract.Store
 import Data.Abstract.Value
@@ -16,7 +17,13 @@ newtype Collecting m term value (effects :: [* -> *]) a = Collecting (m term val
 deriving instance MonadEnvironment value (m term value effects) => MonadEnvironment value (Collecting m term value effects)
 deriving instance MonadStore value (m term value effects) => MonadStore value (Collecting m term value effects)
 deriving instance MonadModuleTable term value (m term value effects) => MonadModuleTable term value (Collecting m term value effects)
-deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (Collecting m term value effects)
+
+instance ( Effectful (m term value)
+         , Member (Reader (Live (LocationFor value) value)) effects
+         , MonadEvaluator term value (m term value effects)
+         )
+         => MonadEvaluator term value (Collecting m term value effects) where
+  getConfiguration term = Configuration term <$> askRoots <*> askLocalEnv <*> getStore
 
 
 instance ( Effectful (m term value)
