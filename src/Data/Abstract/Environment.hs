@@ -20,9 +20,6 @@ envLookup k = Map.lookup k . unEnvironment
 envInsert :: Name -> Address l a -> Environment l a -> Environment l a
 envInsert name value (Environment m) = Environment (Map.insert name value m)
 
-envUnion :: Environment l a -> Environment l a -> Environment l a
-envUnion (Environment e1) (Environment e2) = Environment $ Map.union e1 e2
-
 bindEnv :: (Ord l, Foldable t) => t Name -> Environment l a -> Environment l a
 bindEnv names env = Environment (Map.fromList pairs)
   where pairs = foldr (\name b -> maybe b (\v -> (name, v) : b) (envLookup name env)) mempty names
