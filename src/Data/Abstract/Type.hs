@@ -12,6 +12,7 @@ data Type
   = Int            -- ^ Primitive int type.
   | Bool           -- ^ Primitive boolean type.
   | String         -- ^ Primitive string type.
+  | Symbol         -- ^ Type of unique symbols.
   | Unit           -- ^ The unit type.
   | Float          -- ^ Floating-point type.
   | Type :-> Type  -- ^ Binary function types.

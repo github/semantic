@@ -41,6 +41,10 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
   -- | Construct an abstract string value.
   string :: ByteString -> m value
 
+  -- | Construct a self-evaluating symbol value.
+  --   TODO: Should these be interned in some table to provide stronger uniqueness guarantees?
+  symbol :: ByteString -> m value
+
   -- | Construct a floating-point value.
   float :: Scientific -> m value
 
@@ -78,6 +82,7 @@ instance ( MonadAddressable location (Value location term) m
   boolean = pure . injValue . Boolean
   string  = pure . injValue . Value.String
   float   = pure . injValue . Value.Float
+  symbol  = pure . injValue . Value.Symbol
   multiple vals =
     pure . injValue $ Value.Tuple vals
 
@@ -139,6 +144,7 @@ instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue 
   boolean _ = pure Bool
   string _  = pure Type.String
   float _   = pure Type.Float
+  symbol _  = pure Type.Symbol
   multiple  = pure . Type.Product
   -- TODO
   interface = undefined

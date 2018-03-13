@@ -21,6 +21,7 @@ type ValueConstructors location term
     , Float
     , Integer
     , String
+    , Symbol
     , Tuple
     ]
 
@@ -93,6 +94,15 @@ newtype String value = String ByteString
 instance Eq1 String where liftEq = genericLiftEq
 instance Ord1 String where liftCompare = genericLiftCompare
 instance Show1 String where liftShowsPrec = genericLiftShowsPrec
+
+-- | Possibly-interned Symbol values.
+--   TODO: Should this store a 'Text'?
+newtype Symbol value = Symbol ByteString
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Symbol where liftEq = genericLiftEq
+instance Ord1 Symbol where liftCompare = genericLiftCompare
+instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 
 -- | Float values.
 newtype Float value = Float Scientific
