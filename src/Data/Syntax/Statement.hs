@@ -1,9 +1,10 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, ViewPatterns #-}
 module Data.Syntax.Statement where
 
 import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
+import Prelude hiding (fail)
 import Prologue
 
 -- | Conditional. This must have an else block, which can be filled with some default value when omitted in the source, e.g. 'pure ()' for C-style if-without-else or 'pure Nothing' for Ruby-style, in both cases assuming some appropriate Applicative context into which the If will be lifted.
@@ -185,7 +186,6 @@ instance Eq1 NoOp where liftEq = genericLiftEq
 instance Ord1 NoOp where liftCompare = genericLiftCompare
 instance Show1 NoOp where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for NoOp
 instance Evaluatable NoOp where
   eval _ = unit
 
@@ -198,8 +198,8 @@ instance Eq1 For where liftEq = genericLiftEq
 instance Ord1 For where liftCompare = genericLiftCompare
 instance Show1 For where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for For
-instance Evaluatable For
+instance Evaluatable For where
+  eval (fmap subtermValue -> For before cond step body) = forLoop before cond step body
 
 
 data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }
@@ -220,9 +220,8 @@ instance Eq1 While where liftEq = genericLiftEq
 instance Ord1 While where liftCompare = genericLiftCompare
 instance Show1 While where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for While
-instance Evaluatable While
-
+instance Evaluatable While where
+  eval While{..} = while (subtermValue whileCondition)  (subtermValue whileBody)
 
 data DoWhile a = DoWhile { doWhileCondition :: !a, doWhileBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -231,9 +230,8 @@ instance Eq1 DoWhile where liftEq = genericLiftEq
 instance Ord1 DoWhile where liftCompare = genericLiftCompare
 instance Show1 DoWhile where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for DoWhile
-instance Evaluatable DoWhile
-
+instance Evaluatable DoWhile where
+  eval DoWhile{..} = doWhile (subtermValue doWhileBody) (subtermValue doWhileCondition)
 
 -- Exception handling
 
