@@ -42,45 +42,40 @@ type PythonValue     = Language Python.Syntax
 type TypeScriptValue = Language TypeScript.Syntax
 
 -- Ruby
-evaluateRubyFile path = fst . evaluate @RubyValue . snd <$> parseFile rubyParser path
-
-evaluateRubyFiles paths = do
-  first:rest <- traverse (parseFile rubyParser) paths
-  pure $ evaluates @RubyValue rest first
+evaluateRubyFile = evaluateFile @RubyValue rubyParser
+evaluateRubyFiles = evaluateFiles @RubyValue rubyParser
 
 -- Go
-typecheckGoFile path = runAnalysis @(Caching Evaluating Go.Term Type) . evaluateModule . snd <$>
-  parseFile goParser path
-
-evaluateGoFile path = runAnalysis @(Evaluating Go.Term GoValue) . evaluateModule . snd <$>
-  parseFile goParser path
-
-evaluateGoFiles paths = do
-  blobs@(b:bs) <- traverse file paths
-  (t:ts) <- runTask $ traverse (parse goParser) blobs
-  pure $ evaluates @GoValue (zip bs ts) (b, t)
+evaluateGoFile = evaluateFile @GoValue goParser
+evaluateGoFiles = evaluateFiles @GoValue goParser
+typecheckGoFile path = runAnalysis @(Caching Evaluating Go.Term Type) . evaluateModule . snd <$> parseFile goParser path
 
 -- Python
+evaluatePythonFile path = evaluate @PythonValue . snd <$> parseFile pythonParser path
+evaluatePythonFiles = evaluateFiles @PythonValue pythonParser
 typecheckPythonFile path = runAnalysis @(Caching Evaluating Python.Term Type) . evaluateModule . snd <$> parseFile pythonParser path
-
 tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term PythonValue) . evaluateModule . snd <$> parseFile pythonParser path
-
 evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] Evaluating) Python.Term PythonValue) . evaluateModule . snd <$> parseFile pythonParser path
 
-evaluatePythonFile path = evaluate @PythonValue . snd <$> parseFile pythonParser path
-
-evaluatePythonFiles paths = do
-  first:rest <- traverse (parseFile pythonParser) paths
-  pure $ evaluates @PythonValue rest first
-
 -- TypeScript
-evaluateTypeScriptFile path = fst . evaluate @TypeScriptValue . snd <$> parseFile typescriptParser path
+evaluateTypeScriptFile = evaluateFile @TypeScriptValue typescriptParser
+evaluateTypeScriptFiles = evaluateFiles @TypeScriptValue typescriptParser
 
-evaluateTypeScriptFiles paths = do
-  first:rest <- traverse (parseFile typescriptParser) paths
-  pure $ evaluates @TypeScriptValue rest first
+-- Evalute a single file.
+evaluateFile :: forall value term effects
+             .  ( Evaluatable (Base term)
+                , FreeVariables term
+                , effects ~ RequiredEffects term value (Evaluating term value effects)
+                , MonadAddressable (LocationFor value) value (Evaluating term value effects)
+                , MonadValue term value (Evaluating term value effects)
+                , Recursive term
+                )
+             => Parser term
+             -> FilePath
+             -> IO (Final effects value)
+evaluateFile parser path = runAnalysis @(Evaluating term value) . evaluateModule . snd <$> parseFile parser path
 
--- Evaluate a list of files (head file is considered the entry point).
+-- Evaluate a list of files (head of file list is considered the entry point).
 evaluateFiles :: forall value term effects
               .  ( Evaluatable (Base term)
                  , FreeVariables term
