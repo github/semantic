@@ -1,78 +1,49 @@
 {-# LANGUAGE DataKinds, GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators, TypeApplications #-}
-module SpecHelpers
-( file
-, evaluateFiles
+module SpecHelpers (
+  module X
 , diffFilePaths
 , parseFilePath
 , readFilePair
 , Verbatim(..)
 , verbatim
 , readFileVerbatim
-) where
+, ) where
 
+import Analysis.Abstract.Evaluating
+import Control.Exception
 import Control.Monad ((<=<))
 import Control.Monad.IO.Class
-import Control.Exception
+import Data.Abstract.Address as X
+import Data.Abstract.Environment as X
+import Data.Abstract.Evaluatable as X
+import Data.Abstract.FreeVariables as X
+import Data.Abstract.ModuleTable as X
+import Data.Abstract.Store as X
+-- import Data.Abstract.Value as Value
 import Data.Blob
-import qualified Data.ByteString as B
 import Data.Functor.Both
+import Data.Functor.Foldable
 import Data.Language
+import Data.Map as Map
 import Data.Maybe (fromMaybe, fromJust)
+import Data.Semigroup
 import Data.Source
+import Data.Text.Encoding (decodeUtf8)
+-- import Data.Union
+import Parsing.Parser as X
+import qualified Data.ByteString as B
+-- import qualified Data.Text as T
+import qualified Semantic.IO as IO
 import Rendering.Renderer
 import Semantic
 import Semantic.Task
-import qualified Semantic.IO as IO
-import System.FilePath
-import qualified Data.Text as T
-import Data.Text.Encoding (decodeUtf8)
+import Semantic.Util as X
+-- import System.FilePath
+import Data.Monoid as X (Monoid(..), First(..), Last(..))
+import Data.Semigroup as X (Semigroup(..))
 
-import Analysis.Abstract.Evaluating
-import Data.Map as Map
-import Data.Union
-import Data.Semigroup
-import Data.Functor.Foldable
-import Data.Abstract.Evaluatable
-import Data.Abstract.Address
-import Data.Abstract.Environment
-import Data.Abstract.FreeVariables
-import Data.Abstract.ModuleTable
-import Data.Abstract.Store
-import Data.Abstract.Value as Value
-import Parsing.Parser
-
-file :: MonadIO m => FilePath -> m Blob
-file path = fromJust <$> IO.readFile path (IO.languageForFilePath path)
-
-parseFile :: Parser term -> FilePath -> IO (Blob, term)
-parseFile parser path = runTask $ do
-  blob <- file path
-  (,) blob <$> parse parser blob
-
-evaluateFiles :: forall value term
-              .  ( Evaluatable (Base term)
-                 , FreeVariables term
-                 , MonadAddressable (LocationFor value) value (Evaluating term value (EvaluatingEffects term value))
-                 , MonadValue term value (Evaluating term value (EvaluatingEffects term value))
-                 , Recursive term
-                 )
-              => Parser term
-              -> [FilePath]
-              -> IO (
-                     (
-                       (
-                         ( Either Prelude.String value
-                         , Environment (LocationFor value) value
-                         )
-                         , Store (LocationFor value) value
-                       )
-                       , ModuleTable (Environment (LocationFor value) value)
-                     )
-                     , Map.Map Data.Abstract.FreeVariables.Name (Data.Abstract.FreeVariables.Name, Maybe (Address (LocationFor value) value))
-                    )
-evaluateFiles parser paths = do
-  entry:xs <- traverse (parseFile parser) paths
-  pure $ evaluates @value xs entry
+import Test.Hspec as X (Spec, describe, it, xit, parallel, pendingWith)
+import Test.Hspec.Expectations.Pretty as X
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO B.ByteString
