@@ -45,7 +45,7 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
                -> (forall b . Integral b           => b -> b -> b)
                -> (value -> value -> m value)
 
-
+  -- | Lift a Comparator (usually wrapping a function like == or <=) to a function on values.
   liftComparison :: Comparator -> (value -> value -> m value)
 
   -- | Construct an abstract boolean value.
