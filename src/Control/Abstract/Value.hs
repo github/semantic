@@ -67,6 +67,8 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
   -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
   multiple :: [value] -> m value
 
+  getString :: value -> m ByteString
+
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: value -> m a -> m a -> m a
 
@@ -131,6 +133,10 @@ instance ( FreeVariables term
   rational = pure . injValue . Value.Rational . Ratio
 
   multiple = pure . injValue . Value.Tuple
+
+  getString v
+    | Just (Value.String n) <- prjValue v = pure n
+    | otherwise                           = fail "not a string"
 
   ifthenelse cond if' else'
     | Just (Boolean b) <- prjValue cond = if b then if' else else'
