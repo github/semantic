@@ -44,18 +44,14 @@ instance ( Effectful (m term value)
     pure v
 
 
--- | 'Monad's offering a local set of 'Live' (rooted/reachable) addresses.
-class Monad m => MonadGC value m where
-  -- | Retrieve the local 'Live' set.
-  askRoots :: m (Live (LocationFor value) value)
+-- | Retrieve the local 'Live' set.
+askRoots :: (Effectful m, Member (Reader (Live (LocationFor value) value)) effects) => m effects (Live (LocationFor value) value)
+askRoots = raise ask
 
-  -- | Run a computation with the given 'Live' set added to the local root set.
-  extraRoots :: Live (LocationFor value) value -> m a -> m a
+-- | Run a computation with the given 'Live' set added to the local root set.
+extraRoots :: (Effectful m, Member (Reader (Live (LocationFor value) value)) effects, Ord (LocationFor value)) => Live (LocationFor value) value -> m effects a -> m effects a
+extraRoots roots = raise . local (<> roots) . lower
 
-instance (Effectful m, Monad (m effects), Ord (LocationFor value), Reader (Live (LocationFor value) value) :< effects) => MonadGC value (m effects) where
-  askRoots = raise ask
-
-  extraRoots roots = raise . local (<> roots) . lower
 
 -- | Collect any addresses in the store not rooted in or reachable from the given 'Live' set.
 gc :: ( Ord (LocationFor a)
