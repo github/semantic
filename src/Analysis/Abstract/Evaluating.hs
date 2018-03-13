@@ -57,7 +57,7 @@ evaluates pairs (b, t) = runAnalysis @(Evaluating term value) (withModules b pai
 withModules :: MonadAnalysis term value m => Blob -> [(Blob, term)] -> m a -> m a
 withModules Blob{..} pairs = localModuleTable (const moduleTable)
   where
-    moduleTable = ModuleTable (Map.fromListWith (<>) (map (\(b, t) -> (moduleName b, [t])) pairs))
+    moduleTable = ModuleTable (Map.fromListWith (<>) (map (bimap moduleName pure) pairs))
     rootDir = dropFileName blobPath
     moduleName Blob{..} = let path = dropExtensions (makeRelative rootDir blobPath)
      in case blobLanguage of
