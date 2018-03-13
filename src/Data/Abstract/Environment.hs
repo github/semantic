@@ -24,7 +24,8 @@ envInsert :: Name -> Address l a -> Environment l a -> Environment l a
 envInsert name value (Environment m) = Environment (Map.insert name value m)
 
 bindEnv :: (Ord l, Foldable t) => t Name -> Environment l a -> Environment l a
-bindEnv names env = foldMap (\ name -> maybe mempty (unit . (,) name) (envLookup name env)) names
+bindEnv names env = foldMap bound names
+  where envForName name = maybe mempty (curry unit name) (envLookup name env)
 
 -- | Retrieve the 'Live' set of addresses to which the given free variable names are bound.
 --
