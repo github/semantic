@@ -4,7 +4,7 @@ module Analysis.Abstract.Evaluating
 , evaluate
 , evaluates
 -- Temporary, for testing
-, EvaluatingEffects
+-- , EvaluatingEffects
 ) where
 
 import Control.Abstract.Evaluator
@@ -28,11 +28,12 @@ import qualified Data.Map as Map
 import System.FilePath.Posix
 
 -- | Evaluate a term to a value.
-evaluate :: forall value term
+evaluate :: forall value term effects
          .  ( Evaluatable (Base term)
             , FreeVariables term
-            , MonadAddressable (LocationFor value) value (Evaluating term value (EvaluatingEffects term value))
-            , MonadValue term value (Evaluating term value (EvaluatingEffects term value))
+            , effects ~ RequiredEffects term value (Evaluating term value effects)
+            , MonadAddressable (LocationFor value) value (Evaluating term value effects)
+            , MonadValue term value (Evaluating term value effects)
             , Recursive term
             )
          => term
