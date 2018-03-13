@@ -1,25 +1,10 @@
 {-# LANGUAGE TypeApplications #-}
-module Analysis.Python.Spec where
+module Analysis.Python.Spec (spec) where
 
-import Data.Abstract.Address
-import Data.Abstract.Environment
-import Data.Abstract.FreeVariables
-import Data.Abstract.Value as Value
-import Data.AST
-import Data.Map as Map
-import Data.Record
-import Data.Semigroup
-import Data.Term
-import Data.Union
-import Parsing.Parser
-
+import Data.Abstract.Value
+import Data.Map
 import SpecHelpers
-import Test.Hspec (Spec, describe, it, xit, parallel, pendingWith)
-import Test.Hspec.Expectations.Pretty
-import qualified Language.Python.Assignment as Python
 
-
-type PythonValue = Value Precise (Term (Union Python.Syntax) (Record Location))
 
 spec :: Spec
 spec = parallel $ do
