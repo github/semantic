@@ -9,10 +9,10 @@ module SpecHelpers (
 , readFileVerbatim
 , ) where
 
-import Analysis.Abstract.Evaluating
-import Control.Exception
-import Control.Monad ((<=<))
-import Control.Monad.IO.Class
+-- import Analysis.Abstract.Evaluating
+-- import Control.Exception
+-- import Control.Monad ((<=<))
+-- import Control.Monad.IO.Class
 import Data.Abstract.Address as X
 import Data.Abstract.Environment as X
 import Data.Abstract.Evaluatable as X
@@ -22,21 +22,20 @@ import Data.Abstract.Store as X
 -- import Data.Abstract.Value as Value
 import Data.Blob
 import Data.Functor.Both
-import Data.Functor.Foldable
-import Data.Language
-import Data.Map as Map
-import Data.Maybe (fromMaybe, fromJust)
-import Data.Semigroup
-import Data.Source
-import Data.Text.Encoding (decodeUtf8)
+-- import Data.Functor.Foldable
+-- import Data.Language
+-- import Data.Map as Map
+import Data.Maybe as X
+-- import Data.Semigroup
+-- import Data.Source
+-- import Data.Text.Encoding (decodeUtf8)
 -- import Data.Union
+import Data.Output as X
 import Parsing.Parser as X
-import qualified Data.ByteString as B
 -- import qualified Data.Text as T
-import qualified Semantic.IO as IO
-import Rendering.Renderer
-import Semantic
-import Semantic.Task
+import Rendering.Renderer as X
+import Semantic as X
+import Semantic.Task as X
 import Semantic.Util as X
 -- import System.FilePath
 import Data.Monoid as X (Monoid(..), First(..), Last(..))
@@ -44,6 +43,11 @@ import Data.Semigroup as X (Semigroup(..))
 
 import Test.Hspec as X (Spec, describe, it, xit, parallel, pendingWith)
 import Test.Hspec.Expectations.Pretty as X
+import Test.Hspec.LeanCheck
+import Test.LeanCheck
+
+import qualified Data.ByteString as B
+import qualified Semantic.IO as IO
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO B.ByteString
