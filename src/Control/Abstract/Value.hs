@@ -203,8 +203,7 @@ instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue 
     (Int, Type.Float) -> pure Type.Float
     _                 -> unify left right
 
-  -- TODO: this probably isn't right
-  liftComparison _ left right = unify left right
+  liftComparison _ left right = left <|> right
 
   apply op params = do
     tvar <- fresh
