@@ -19,7 +19,9 @@ deriving instance MonadModuleTable term value (m term value effects) => MonadMod
 deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (Collecting m term value effects)
 
 
-instance ( Foldable (Cell (LocationFor value))
+instance ( Effectful (m term value)
+         , Foldable (Cell (LocationFor value))
+         , Member (Reader (Live (LocationFor value) value)) effects
          , MonadAnalysis term value (m term value effects)
          , Ord (LocationFor value)
          , ValueRoots (LocationFor value) value
