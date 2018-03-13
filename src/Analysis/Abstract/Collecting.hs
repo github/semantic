@@ -31,7 +31,7 @@ instance ( Effectful (m term value)
          , Member (Reader (Live (LocationFor value) value)) effects
          , MonadAnalysis term value (m term value effects)
          , Ord (LocationFor value)
-         , ValueRoots (LocationFor value) value
+         , ValueRoots value
          )
          => MonadAnalysis term value (Collecting m term value effects) where
   type RequiredEffects term value (Collecting m term value effects) = Reader (Live (LocationFor value) value) ': RequiredEffects term value (m term value effects)
@@ -56,7 +56,7 @@ extraRoots roots = raise . local (<> roots) . lower
 -- | Collect any addresses in the store not rooted in or reachable from the given 'Live' set.
 gc :: ( Ord (LocationFor a)
       , Foldable (Cell (LocationFor a))
-      , ValueRoots (LocationFor a) a
+      , ValueRoots a
       )
    => Live (LocationFor a) a  -- ^ The set of addresses to consider rooted.
    -> Store (LocationFor a) a -- ^ A store to collect unreachable addresses within.
@@ -66,7 +66,7 @@ gc roots store = storeRestrict store (reachable roots store)
 -- | Compute the set of addresses reachable from a given root set in a given store.
 reachable :: ( Ord (LocationFor a)
              , Foldable (Cell (LocationFor a))
-             , ValueRoots (LocationFor a) a
+             , ValueRoots a
              )
           => Live (LocationFor a) a  -- ^ The set of root addresses.
           -> Store (LocationFor a) a -- ^ The store to trace addresses through.
