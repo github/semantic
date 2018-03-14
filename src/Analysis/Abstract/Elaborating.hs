@@ -1,9 +1,11 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, TypeFamilies #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
 module Analysis.Abstract.Elaborating
 ( type Elaborating
 ) where
 
 import Control.Abstract.Analysis
+import Control.Abstract.Value
+import Data.Term
 import Prologue
 
 newtype Elaborating m term value (effects :: [* -> *]) a = Elaborating (m term value effects a)
@@ -18,3 +20,11 @@ instance MonadAnalysis term value (m term value effects)
          => MonadAnalysis term value (Elaborating m term value effects) where
   type RequiredEffects term value (Elaborating m term value effects) = RequiredEffects term value (m term value effects)
   analyzeTerm = liftAnalyze analyzeTerm
+
+instance ( elab ~ Term (Base term) value
+         , MonadAnalysis term elab (m term elab effects)
+         , Recursive term
+         , Show1 (Base term)
+         , Show value
+         )
+         => MonadValue term elab (Elaborating m term elab effects) where
