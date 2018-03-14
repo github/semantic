@@ -5,8 +5,6 @@ import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
 import qualified Data.Map as Map
-import qualified Data.ByteString as B
-import qualified Data.List.NonEmpty as NonEmpty
 import Prologue
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
@@ -163,14 +161,7 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 -- We need to ensure that all input files have aggregated their content into
 -- a coherent module before we begin evaluating a module.
 instance Evaluatable Module where
-  eval (Module _ xs) = eval' xs
-    where
-    eval' [] = unit >>= interface
-    eval' [x] = subtermValue x >>= interface
-    eval' (x:xs) = do
-      _ <- subtermValue x
-      env <- getGlobalEnv
-      localEnv (envUnion env) (eval' xs)
+  eval (Module _ xs) = eval xs
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
