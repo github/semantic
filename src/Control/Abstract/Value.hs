@@ -65,7 +65,7 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
   abstract :: [Name] -> Subterm term (m value) -> m value
   -- | Evaluate an application (like a function call).
-  apply :: value -> [Subterm term (m value)] -> m value
+  apply :: value -> [m value] -> m value
 
 -- | Attempt to extract a 'Prelude.Bool' from a given value.
 toBool :: MonadValue term value m => value -> m Bool
@@ -198,7 +198,7 @@ instance ( MonadAddressable location (Value location term) m
   apply op params = do
     Closure names body env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
     bindings <- foldr (\ (name, param) rest -> do
-      v <- subtermValue param
+      v <- param
       a <- alloc name
       assign a v
       envInsert name a <$> rest) (pure env) (zip names params)
@@ -245,6 +245,6 @@ instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue 
 
   apply op params = do
     tvar <- fresh
-    paramTypes <- traverse subtermValue params
+    paramTypes <- sequenceA params
     _ :-> ret <- op `unify` (Product paramTypes :-> Var tvar)
     pure ret
