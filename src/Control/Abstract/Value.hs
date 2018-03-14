@@ -83,11 +83,7 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
 toBool :: MonadValue term value m => value -> m Bool
 toBool v = ifthenelse v (pure True) (pure False)
 
-forLoop :: ( MonadAddressable (LocationFor value) value m
-           , MonadEnvironment value m
-           , MonadStore value m
-           , MonadValue term value m
-           )
+forLoop :: MonadValue term value m
         => m value -- | Initial statement
         -> m value -- | Condition
         -> m value -- | Increment/stepper
@@ -99,11 +95,7 @@ forLoop initial cond step body = do
   localEnv (mappend env) (while cond (body *> step))
 
 -- | The fundamental looping primitive, built on top of ifthenelse.
-while :: ( MonadAddressable (LocationFor value) value m
-         , MonadEnvironment value m
-         , MonadStore value m
-         , MonadValue term value m
-         )
+while :: MonadValue term value m
       => m value
       -> m value
       -> m value
@@ -112,11 +104,7 @@ while cond body = loop $ \ continue -> do
   ifthenelse this (body *> continue) unit
 
 -- | Do-while loop, built on top of while.
-doWhile :: ( MonadAddressable (LocationFor value) value m
-           , MonadEnvironment value m
-           , MonadStore value m
-           , MonadValue term value m
-           )
+doWhile :: MonadValue term value m
         => m value
         -> m value
         -> m value
