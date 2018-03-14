@@ -8,7 +8,6 @@ import Data.Abstract.FreeVariables
 import Data.Abstract.Live
 import Data.Abstract.Number
 import qualified Data.Abstract.Type as Type
-import qualified Data.Set as Set
 import Data.Scientific (Scientific)
 import Prologue
 import Prelude hiding (Float, Integer, String, Rational, fail)
@@ -145,10 +144,10 @@ class ValueRoots value where
   -- | Compute the set of addresses rooted by a given value.
   valueRoots :: value -> LiveFor value
 
-instance (FreeVariables term, Ord location) => ValueRoots (Value location term) where
+instance Ord location => ValueRoots (Value location term) where
   valueRoots v
-    | Just (Closure names body env) <- prjValue v = envRoots env (foldr Set.delete (freeVariables (body :: term)) names)
-    | otherwise                                   = mempty
+    | Just (Closure _ body env) <- prjValue v = envAll env `const` (body :: term)
+    | otherwise                               = mempty
 
 instance ValueRoots Type.Type where
   valueRoots _ = mempty

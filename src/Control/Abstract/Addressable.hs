@@ -30,7 +30,7 @@ lookupOrAlloc :: ( FreeVariables term
                  )
                  => term
                  -> value
-                 -> Environment (LocationFor value) value
+                 -> EnvironmentFor value
                  -> m (Name, Address (LocationFor value) value)
 lookupOrAlloc term = let [name] = toList (freeVariables term) in
                          lookupOrAlloc' name
@@ -42,12 +42,26 @@ lookupOrAlloc' :: ( Semigroup (CellFor value)
                   )
                   => Name
                   -> value
-                  -> Environment (LocationFor value) value
+                  -> EnvironmentFor value
                   -> m (Name, Address (LocationFor value) value)
 lookupOrAlloc' name v env = do
   a <- maybe (alloc name) pure (envLookup name env)
   assign a v
   pure (name, a)
+
+
+letrec :: ( MonadAddressable (LocationFor value) value m
+          , MonadEnvironment value m
+          , MonadStore value m
+          )
+       => Name
+       -> m value
+       -> m (value, Address (LocationFor value) value)
+letrec name body = do
+  addr <- alloc name
+  v <- localEnv (envInsert name addr) body
+  assign addr v
+  pure (v, addr)
 
 
 -- Instances
