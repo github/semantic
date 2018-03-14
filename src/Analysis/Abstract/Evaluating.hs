@@ -18,11 +18,12 @@ import Data.Abstract.Address
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Blob
-import qualified Data.ByteString.Char8 as BC
+import Data.Language
 import Data.List.Split (splitWhen)
-import qualified Data.Map as Map
 import Prelude hiding (fail)
 import Prologue
+import qualified Data.ByteString.Char8 as BC
+import qualified Data.Map as Map
 import System.FilePath.Posix
 
 -- | Evaluate a term to a value.
@@ -56,9 +57,13 @@ evaluates pairs (b, t) = runAnalysis @(Evaluating term value) (withModules b pai
 withModules :: MonadAnalysis term value m => Blob -> [(Blob, term)] -> m a -> m a
 withModules Blob{..} pairs = localModuleTable (const moduleTable)
   where
-    moduleTable = ModuleTable (Map.fromList (map (first moduleName) pairs))
+    moduleTable = ModuleTable (Map.fromListWith (<>) (map (bimap moduleName pure) pairs))
     rootDir = dropFileName blobPath
-    moduleName Blob{..} = toName (dropExtensions (makeRelative rootDir blobPath))
+    moduleName Blob{..} = let path = dropExtensions (makeRelative rootDir blobPath)
+     in case blobLanguage of
+      -- TODO: Need a better way to handle module registration and resolution
+      Just Go -> toName (takeDirectory path) -- Go allows defining modules across multiple files in the same directory.
+      _ ->  toName path
     toName str = qualifiedName (fmap BC.pack (splitWhen (== pathSeparator) str))
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
@@ -77,7 +82,7 @@ type EvaluatingEffects term value
      , Reader (EnvironmentFor value)               -- Local environment (e.g. binding over a closure)
      , State  (EnvironmentFor value)               -- Global (imperative) environment
      , State  (StoreFor value)                     -- The heap
-     , Reader (ModuleTable term)                   -- Cache of unevaluated modules
+     , Reader (ModuleTable [term])                 -- Cache of unevaluated modules
      , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
 
      , State (Map Name (Name, Maybe (Address (LocationFor value) value))) -- Set of exports
@@ -99,7 +104,7 @@ instance Member (State (StoreFor value)) effects => MonadStore value (Evaluating
   getStore = raise get
   putStore = raise . put
 
-instance Members '[Reader (ModuleTable term), State (ModuleTable (EnvironmentFor value))] effects => MonadModuleTable term value (Evaluating term value effects) where
+instance Members '[Reader (ModuleTable [term]), State (ModuleTable (EnvironmentFor value))] effects => MonadModuleTable term value (Evaluating term value effects) where
   getModuleTable = raise get
   putModuleTable = raise . put
 

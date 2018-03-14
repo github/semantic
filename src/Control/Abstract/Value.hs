@@ -8,7 +8,6 @@ import Data.Abstract.FreeVariables
 import Data.Abstract.Number as Number
 import Data.Abstract.Type as Type
 import Data.Abstract.Value as Value
-import qualified Data.Map as Map
 import Data.Scientific (Scientific)
 import Prelude hiding (fail)
 import Prologue

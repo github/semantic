@@ -1,13 +1,12 @@
 module Semantic.Stat.Spec (spec) where
 
-import Semantic.Stat
-import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
-import Test.Hspec.Expectations.Pretty
-import System.Environment
 import Control.Exception
 import Network.Socket hiding (recv)
 import Network.Socket.ByteString
+import Semantic.Stat
+import System.Environment
 
+import SpecHelpers
 
 withSocketPair :: ((Socket, Socket) -> IO c) -> IO c
 withSocketPair = bracket create release

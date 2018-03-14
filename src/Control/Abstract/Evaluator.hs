@@ -94,9 +94,9 @@ class Monad m => MonadModuleTable term value m | m -> term, m -> value where
   putModuleTable :: ModuleTable (EnvironmentFor value) -> m ()
 
   -- | Retrieve the table of unevaluated modules.
-  askModuleTable :: m (ModuleTable term)
+  askModuleTable :: m (ModuleTable [term])
   -- | Run an action with a locally-modified table of unevaluated modules.
-  localModuleTable :: (ModuleTable term -> ModuleTable term) -> m a -> m a
+  localModuleTable :: (ModuleTable [term] -> ModuleTable [term]) -> m a -> m a
 
 -- | Update the evaluated module table.
 modifyModuleTable :: MonadModuleTable term value m => (ModuleTable (EnvironmentFor value) -> ModuleTable (EnvironmentFor value)) -> m ()
