@@ -15,7 +15,6 @@ import qualified Prelude
 
 type ValueConstructors location term
   = '[Closure location term
-    , Interface location
     , Unit
     , Boolean
     , Float
@@ -53,19 +52,6 @@ data Closure location term value = Closure [Name] term (Environment location val
 instance (Eq location, Eq term) => Eq1 (Closure location term) where liftEq = genericLiftEq
 instance (Ord location, Ord term) => Ord1 (Closure location term) where liftCompare = genericLiftCompare
 instance (Show location, Show term) => Show1 (Closure location term) where liftShowsPrec = genericLiftShowsPrec
-
--- | A program value consisting of the value of the program and its environment of bindings.
---   The @Value@ stored herein is the last value evaluated within a given @Program@,
---   or @Unit@ if the language doesn't provide a final value when evaluating a
---   compilation unit. If you want to get at the bindings of an interface (which
---   is probably what you want), look them up in the provided environment, not
---   in the value.
-data Interface location value = Interface value (Environment location value)
-  deriving (Eq, Generic1, Ord, Show)
-
-instance (Eq location) => Eq1 (Interface location) where liftEq = genericLiftEq
-instance (Ord location) => Ord1 (Interface location) where liftCompare = genericLiftCompare
-instance (Show location) => Show1 (Interface location) where liftShowsPrec = genericLiftShowsPrec
 
 -- | The unit value. Typically used to represent the result of imperative statements.
 data Unit value = Unit
