@@ -13,3 +13,8 @@ deriving instance MonadEnvironment value (m term value effects) => MonadEnvironm
 deriving instance MonadStore value (m term value effects) => MonadStore value (Elaborating m term value effects)
 deriving instance MonadModuleTable term value (m term value effects) => MonadModuleTable term value (Elaborating m term value effects)
 deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (Elaborating m term value effects)
+
+instance MonadAnalysis term value (m term value effects)
+         => MonadAnalysis term value (Elaborating m term value effects) where
+  type RequiredEffects term value (Elaborating m term value effects) = RequiredEffects term value (m term value effects)
+  analyzeTerm = liftAnalyze analyzeTerm
