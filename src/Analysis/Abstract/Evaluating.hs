@@ -18,6 +18,7 @@ import Data.Abstract.Address
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Blob
+import qualified Data.IntMap as IntMap
 import Data.Language
 import Data.List.Split (splitWhen)
 import Prelude hiding (fail)
@@ -70,7 +71,6 @@ withModules Blob{..} pairs = localModuleTable (const moduleTable)
 newtype Evaluating term value effects a = Evaluating (Eff effects a)
   deriving (Applicative, Functor, Effectful, Monad)
 
-
 deriving instance Member Fail      effects => MonadFail   (Evaluating term value effects)
 deriving instance Member Fresh     effects => MonadFresh  (Evaluating term value effects)
 deriving instance Member NonDetEff effects => Alternative (Evaluating term value effects)
@@ -86,7 +86,17 @@ type EvaluatingEffects term value
      , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
 
      , State (Map Name (Name, Maybe (Address (LocationFor value) value))) -- Set of exports
+     , State (IntMap.IntMap term) -- For jumps
      ]
+
+instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl term (Evaluating term value effects) where
+  label term = do
+    m <- raise get
+    let i = IntMap.size m
+    raise (put (IntMap.insert i term m))
+    pure i
+
+  goto label = IntMap.lookup label <$> raise get >>= maybe (fail ("unknown label: " <> show label)) pure
 
 instance Members '[State (Map Name (Name, Maybe (Address (LocationFor value) value))), Reader (EnvironmentFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
   getGlobalEnv = raise get
