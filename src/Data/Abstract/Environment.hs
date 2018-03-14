@@ -7,6 +7,7 @@ import Data.Abstract.Live
 import Data.Semigroup.Reducer
 import Prologue
 import qualified Data.Map as Map
+import qualified Data.Set as Set
 
 -- | A map of names to addresses that represents the evaluation environment.
 newtype Environment l a = Environment { unEnvironment :: Map.Map Name (Address l a) }
@@ -41,6 +42,9 @@ exportInsert name value = Exports . Map.insert name value . unExports
 --   Unbound names are silently dropped.
 envRoots :: (Ord l, Foldable t) => Environment l a -> t Name -> Live l a
 envRoots env = foldr ((<>) . maybe mempty liveSingleton . flip envLookup env) mempty
+
+envAll :: (Ord l) => Environment l a -> Live l a
+envAll (Environment env) = Live $ Set.fromList (Map.elems env)
 
 
 -- Instances
