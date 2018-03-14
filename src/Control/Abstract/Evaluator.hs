@@ -27,7 +27,8 @@ import Prologue
 --   - environments binding names to addresses
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
-class ( MonadEnvironment value m
+class ( MonadControl term m
+      , MonadEnvironment value m
       , MonadFail m
       , MonadModuleTable term value m
       , MonadStore value m
