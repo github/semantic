@@ -67,6 +67,8 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
   -- | Evaluate an application (like a function call).
   apply :: value -> [m value] -> m value
 
+  loop :: (m value -> m value) -> m value
+
 -- | Attempt to extract a 'Prelude.Bool' from a given value.
 toBool :: MonadValue term value m => value -> m Bool
 toBool v = ifthenelse v (pure True) (pure False)
@@ -95,7 +97,7 @@ while :: ( MonadAddressable (LocationFor value) value m
       => m value
       -> m value
       -> m value
-while cond body = loop $ do
+while cond body = loop $ \ continue -> do
   this <- cond
   ifthenelse this (body *> continue) unit
 
@@ -108,27 +110,9 @@ doWhile :: ( MonadAddressable (LocationFor value) value m
         => m value
         -> m value
         -> m value
-doWhile body cond = loop $ body *> do
+doWhile body cond = loop $ \ continue -> body *> do
   this <- cond
   ifthenelse this continue unit
-
-loop :: ( MonadAddressable (LocationFor value) value m
-        , MonadEnvironment value m
-        , MonadStore value m
-        )
-     => m value
-     -> m value
-loop = fmap fst . letrec (name "loop")
-
-continue :: ( MonadAddressable (LocationFor value) value m
-            , MonadEnvironment value m
-            , MonadFail m
-            , MonadStore value m
-            )
-         => m value
-continue = do
-  env <- askLocalEnv
-  maybe (fail "free loop variable") deref (envLookup (name "loop") env)
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( FreeVariables term
@@ -205,6 +189,8 @@ instance ( FreeVariables term
       envInsert name a <$> rest) (pure env) (zip names params)
     localEnv (mappend bindings) (evaluateTerm body)
 
+  loop = fix
+
 -- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
 instance (Alternative m, MonadAnalysis term (Type f) m, MonadFresh m) => MonadValue term (Type f) m where
   abstract names (Subterm _ body) = do
@@ -249,3 +235,5 @@ instance (Alternative m, MonadAnalysis term (Type f) m, MonadFresh m) => MonadVa
     paramTypes <- sequenceA params
     _ :-> ret <- op `unify` (Product paramTypes :-> Var tvar)
     pure ret
+
+  loop f = f empty
