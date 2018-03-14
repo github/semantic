@@ -24,9 +24,9 @@ newtype Monovariant = Monovariant { unMonovariant :: Name }
 
 
 -- | The type into which stored values will be written for a given location type.
-type family Cell location = (res :: * -> *) | res -> location
-type instance Cell Precise = Latest
-type instance Cell Monovariant = Set
+type family Cell location = res | res -> location where
+  Cell Precise = Latest
+  Cell Monovariant = Set
 
 
 -- | A cell holding a single value. Writes will replace any prior value.
