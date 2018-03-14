@@ -1,19 +1,22 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving #-}
 module Data.Abstract.Environment where
 
-import Prologue
 import Data.Abstract.Address
 import Data.Abstract.FreeVariables
 import Data.Abstract.Live
-import qualified Data.Map as Map
 import Data.Semigroup.Reducer
-import qualified Data.Set as Set
+import Prologue
+import qualified Data.Map as Map
 
 -- | A map of names to addresses that represents the evaluation environment.
 newtype Environment l a = Environment { unEnvironment :: Map.Map Name (Address l a) }
   deriving (Eq, Foldable, Functor, Generic1, Monoid, Ord, Semigroup, Show, Traversable)
 
 deriving instance Reducer (Name, Address l a) (Environment l a)
+
+-- | A map of export names to an alias & address tuple.
+newtype Exports l a = Exports { unExports :: Map.Map Name (Name, Maybe (Address l a)) }
+  deriving (Eq, Foldable, Functor, Generic1, Monoid, Ord, Semigroup, Show, Traversable)
 
 -- | Lookup a 'Name' in the environment.
 envLookup :: Name -> Environment l a -> Maybe (Address l a)
@@ -27,11 +30,14 @@ bindEnv :: (Ord l, Foldable t) => t Name -> Environment l a -> Environment l a
 bindEnv names env = foldMap envForName names
   where envForName name = maybe mempty (curry unit name) (envLookup name env)
 
-bindExports :: (Ord l) => Map Name (Name, Maybe (Address l a)) -> Environment l a -> Environment l a
-bindExports aliases env = Environment pairs
+exportInsert :: Name -> (Name, Maybe (Address l a)) -> Exports l a -> Exports l a
+exportInsert name value = Exports . Map.insert name value . unExports
+
+bindExports :: (Ord l) => Exports l a -> Environment l a -> Environment l a
+bindExports Exports{..} env = Environment pairs
   where
     pairs = Map.foldrWithKey (\name (alias, address) accum ->
-      maybe accum (\v -> Map.insert alias v accum) (address <|> envLookup name env)) mempty aliases
+      maybe accum (\v -> Map.insert alias v accum) (address <|> envLookup name env)) mempty unExports
 
 -- | Retrieve the 'Live' set of addresses to which the given free variable names are bound.
 --
@@ -39,11 +45,13 @@ bindExports aliases env = Environment pairs
 envRoots :: (Ord l, Foldable t) => Environment l a -> t Name -> Live l a
 envRoots env = foldr ((<>) . maybe mempty liveSingleton . flip envLookup env) mempty
 
-envAll :: (Ord l) => Environment l a -> Live l a
-envAll (Environment env) = Live $ Set.fromList (Map.elems env)
 
 -- Instances
 
 instance Eq l => Eq1 (Environment l) where liftEq = genericLiftEq
 instance Ord l => Ord1 (Environment l) where liftCompare = genericLiftCompare
 instance Show l => Show1 (Environment l) where liftShowsPrec = genericLiftShowsPrec
+
+instance Eq l => Eq1 (Exports l) where liftEq = genericLiftEq
+instance Ord l => Ord1 (Exports l) where liftCompare = genericLiftCompare
+instance Show l => Show1 (Exports l) where liftShowsPrec = genericLiftShowsPrec

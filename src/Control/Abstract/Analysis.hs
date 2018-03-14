@@ -77,7 +77,7 @@ load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup n
           -- TODO: If the set of exports is empty because no exports have been
           -- defined, do we export all terms, or no terms? This behavior varies across
           -- languages. We need better semantics rather than doing it ad-hoc.
-          let env' = if Map.null exports then env else bindExports exports env
+          let env' = if Map.null (unExports exports) then env else bindExports exports env
           modifyModuleTable (moduleTableInsert name env')
           (env' <>) <$> evalAndCache xs
 

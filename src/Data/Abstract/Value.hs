@@ -126,6 +126,9 @@ instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 -- | The environment for an abstract value type.
 type EnvironmentFor v = Environment (LocationFor v) v
 
+-- | The exports for an abstract value type.
+type ExportsFor v = Exports (LocationFor v) v
+
 -- | The store for an abstract value type.
 type StoreFor v = Store (LocationFor v) v
 

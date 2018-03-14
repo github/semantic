@@ -3,6 +3,7 @@ module Control.Abstract.Evaluator
 ( MonadEvaluator(..)
 , MonadEnvironment(..)
 , modifyGlobalEnv
+, addExport
 , MonadStore(..)
 , modifyStore
 , assign
@@ -12,6 +13,7 @@ module Control.Abstract.Evaluator
 
 import Data.Abstract.Address
 import Data.Abstract.Configuration
+import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.ModuleTable
 import Data.Abstract.Store
@@ -43,12 +45,12 @@ class Monad m => MonadEnvironment value m | m -> value where
   putGlobalEnv :: EnvironmentFor value -> m ()
   withGlobalEnv :: EnvironmentFor value -> m a -> m a
 
-  -- | Add an export to the global export state.
-  addExport :: Name -> (Name, Maybe (Address (LocationFor value) value)) -> m ()
   -- | Get the global export state.
-  getExports :: m (Map Name (Name, Maybe (Address (LocationFor value) value)))
+  getExports :: m (ExportsFor value)
+  -- | Set the global export state.
+  putExports :: ExportsFor value -> m ()
   -- | Sets the exports state to the given map for the lifetime of the given action.
-  withExports :: Map Name (Name, Maybe (Address (LocationFor value) value)) -> m a -> m a
+  withExports :: ExportsFor value -> m a -> m a
 
   -- | Retrieve the local environment.
   askLocalEnv :: m (EnvironmentFor value)
@@ -60,6 +62,12 @@ modifyGlobalEnv :: MonadEvaluator term value m => (EnvironmentFor value -> Envir
 modifyGlobalEnv f = do
   env <- getGlobalEnv
   putGlobalEnv $! f env
+
+-- | Add an export to the global export state.
+addExport :: MonadEvaluator term value m => Name -> (Name, Maybe (Address (LocationFor value) value)) -> m ()
+addExport name value = do
+  exports <- getExports
+  putExports $! exportInsert name value exports
 
 
 -- | A 'Monad' abstracting a heap of values.
