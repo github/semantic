@@ -105,8 +105,11 @@ instance Eq1 Data.Syntax.Literal.Rational where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Literal.Rational where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Literal.Rational where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Rational
-instance Evaluatable Data.Syntax.Literal.Rational
+instance Evaluatable Data.Syntax.Literal.Rational where
+  eval (Rational r) = let trimmed = B.takeWhile (/= 'r') r in
+    case readMaybe @Prelude.Integer (unpack trimmed) of
+      Just i  -> rational (toRational i)
+      Nothing -> fail ("Bug: invalid rational " <> show r)
 
 
 -- Complex literals e.g. `3 + 2i`

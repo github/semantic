@@ -48,6 +48,7 @@ library
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Live
                      , Data.Abstract.ModuleTable
+                     , Data.Abstract.Number
                      , Data.Abstract.Store
                      , Data.Abstract.Type
                      , Data.Abstract.Value

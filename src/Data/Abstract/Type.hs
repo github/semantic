@@ -15,6 +15,7 @@ data Type
   | Symbol         -- ^ Type of unique symbols.
   | Unit           -- ^ The unit type.
   | Float          -- ^ Floating-point type.
+  | Rational       -- ^ Rational type.
   | Type :-> Type  -- ^ Binary function types.
   | Var TName      -- ^ A type variable.
   | Product [Type] -- ^ N-ary products.

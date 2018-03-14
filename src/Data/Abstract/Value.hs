@@ -6,11 +6,12 @@ import Data.Abstract.Environment
 import Data.Abstract.Store
 import Data.Abstract.FreeVariables
 import Data.Abstract.Live
+import Data.Abstract.Number
 import qualified Data.Abstract.Type as Type
 import qualified Data.Set as Set
 import Data.Scientific (Scientific)
 import Prologue
-import Prelude hiding (Float, Integer, String)
+import Prelude hiding (Float, Integer, String, Rational, fail)
 import qualified Prelude
 
 type ValueConstructors location term
@@ -20,6 +21,7 @@ type ValueConstructors location term
     , Float
     , Integer
     , String
+    , Rational
     , Symbol
     , Tuple
     ]
@@ -42,7 +44,6 @@ prjPair :: ( f :< ValueConstructors loc term1 , g :< ValueConstructors loc term2
         => (Value loc term1, Value loc term2)
         -> Maybe (f (Value loc term1), g (Value loc term2))
 prjPair = bitraverse prjValue prjValue
-
 
 -- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
 
@@ -71,12 +72,20 @@ instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
 -- | Arbitrary-width integral values.
-newtype Integer value = Integer Prelude.Integer
+newtype Integer value = Integer (Number Prelude.Integer)
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 Integer where liftEq = genericLiftEq
 instance Ord1 Integer where liftCompare = genericLiftCompare
 instance Show1 Integer where liftShowsPrec = genericLiftShowsPrec
+
+-- | Arbitrary-width rational values values.
+newtype Rational value = Rational (Number Prelude.Rational)
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Rational where liftEq = genericLiftEq
+instance Ord1 Rational where liftCompare = genericLiftCompare
+instance Show1 Rational where liftShowsPrec = genericLiftShowsPrec
 
 -- | String values.
 newtype String value = String ByteString
@@ -96,7 +105,7 @@ instance Ord1 Symbol where liftCompare = genericLiftCompare
 instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 
 -- | Float values.
-newtype Float value = Float Scientific
+newtype Float value = Float (Number Scientific)
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 Float where liftEq = genericLiftEq
