@@ -145,9 +145,12 @@ instance Eq1 Class where liftEq = genericLiftEq
 instance Ord1 Class where liftCompare = genericLiftCompare
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Class
-instance Evaluatable Class
-
+instance Evaluatable Class where
+  eval Class{..} = do
+    env <- askLocalEnv
+    body <- subtermValue classBody
+    (name, addr) <- lookupOrAlloc (subterm classIdentifier) body env
+    body <$ modifyGlobalEnv (envInsert name addr)
 
 data Module a = Module { moduleIdentifier :: !a, moduleScope :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)

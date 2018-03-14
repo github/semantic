@@ -26,14 +26,16 @@ class (Monad m, Ord l, l ~ LocationFor value, Reducer value (Cell l value)) => M
 lookupOrAlloc :: ( FreeVariables term
                  , MonadAddressable (LocationFor value) value m
                  , MonadStore value m
+                 , MonadFail m
                  , Semigroup (CellFor value)
                  )
                  => term
                  -> value
                  -> Environment (LocationFor value) value
                  -> m (Name, Address (LocationFor value) value)
-lookupOrAlloc term = let [name] = toList (freeVariables term) in
-                         lookupOrAlloc' name
+lookupOrAlloc term v env = case toList (freeVariables term) of
+  [name] -> lookupOrAlloc' name v env
+  other  -> fail ("lookupOrAlloc: expected only one free variable in term: " <> show other)
 
 -- | Look up or allocate an address for a 'Name' & assign it a given value, returning the 'Name' paired with the address.
 lookupOrAlloc' :: ( Semigroup (CellFor value)

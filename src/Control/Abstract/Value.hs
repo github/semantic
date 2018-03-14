@@ -72,8 +72,10 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
   abstract :: [Name] -> Subterm term (m value) -> m value
+  
   -- | Evaluate an application (like a function call).
   apply :: value -> [Subterm term (m value)] -> m value
+
 
 -- | Attempt to extract a 'Prelude.Bool' from a given value.
 toBool :: MonadValue term value m => value -> m Bool
@@ -178,6 +180,8 @@ instance ( MonadAddressable location (Value location term) m
 
         pair = (left, right)
 
+        
+
   abstract names (Subterm body _) = injValue . Closure names body <$> askLocalEnv
 
   apply op params = do
@@ -188,6 +192,7 @@ instance ( MonadAddressable location (Value location term) m
       assign a v
       envInsert name a <$> rest) (pure env) (zip names params)
     localEnv (mappend bindings) (evaluateTerm body)
+  
 
 -- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
 instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue term Type m where
