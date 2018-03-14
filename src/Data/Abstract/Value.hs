@@ -123,8 +123,8 @@ class Ord (LocationFor value) => AbstractValue value where
 instance Ord location => AbstractValue (Value location term) where
   type LocationFor (Value location term) = location
 
-instance AbstractValue (Type.Type m) where
-  type LocationFor (Type.Type m) = Monovariant
+instance AbstractValue Type.Type where
+  type LocationFor Type.Type = Monovariant
 
 
 -- | Value types, e.g. closures, which can root a set of addresses.
@@ -137,5 +137,5 @@ instance Ord location => ValueRoots (Value location term) where
     | Just (Closure names body env) <- prjValue v = envAll (foldr envDelete env names) `const` (body :: term)
     | otherwise                                   = mempty
 
-instance ValueRoots (Type.Type m) where
+instance ValueRoots Type.Type where
   valueRoots _ = mempty

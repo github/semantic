@@ -51,14 +51,14 @@ evaluateRubyFiles paths = do
   pure $ evaluates @RubyValue rest first
 
 -- Go
-typecheckGoFile path = runAnalysis @(Caching Evaluating Go.Term (Type [])) . evaluateModule . snd <$>
+typecheckGoFile path = runAnalysis @(Caching Evaluating Go.Term Type) . evaluateModule . snd <$>
   parseFile goParser path
 
 evaluateGoFile path = runAnalysis @(Evaluating Go.Term GoValue) . evaluateModule . snd <$>
   parseFile goParser path
 
 -- Python
-typecheckPythonFile path = runAnalysis @(Caching Evaluating Python.Term (Type [])) . evaluateModule . snd <$> parseFile pythonParser path
+typecheckPythonFile path = runAnalysis @(Caching Evaluating Python.Term Type) . evaluateModule . snd <$> parseFile pythonParser path
 
 tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term PythonValue) . evaluateModule . snd <$> parseFile pythonParser path
 
@@ -71,7 +71,7 @@ evaluatePythonFiles paths = do
   pure $ evaluates @PythonValue rest first
 
 -- TypeScript
-typecheckTypeScriptFile path = runAnalysis @(Caching Evaluating TypeScript.Term (Type [])) . evaluateModule . snd <$> parseFile typescriptParser path
+typecheckTypeScriptFile path = runAnalysis @(Caching Evaluating TypeScript.Term Type) . evaluateModule . snd <$> parseFile typescriptParser path
 evaluateTypeScriptFile path = fst . evaluate @TypeScriptValue . snd <$> parseFile typescriptParser path
 
 evaluateTypeScriptFiles paths = do

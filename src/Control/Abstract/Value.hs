@@ -195,7 +195,7 @@ instance ( FreeVariables term
   loop = fix
 
 -- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
-instance (Alternative m, MonadAnalysis term (Type f) m, MonadFresh m) => MonadValue term (Type f) m where
+instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue term Type m where
   abstract names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
