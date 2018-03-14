@@ -205,9 +205,8 @@ instance Eq1 Array where liftEq = genericLiftEq
 instance Ord1 Array where liftCompare = genericLiftCompare
 instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Array
-instance Evaluatable Array
-
+instance Evaluatable Array where
+  eval (Array a) = array =<< traverse subtermValue a
 
 newtype Hash a = Hash { hashElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
