@@ -8,6 +8,7 @@ module Control.Abstract.Evaluator
 , assign
 , MonadModuleTable(..)
 , modifyModuleTable
+, MonadControl(..)
 ) where
 
 import Data.Abstract.Address
@@ -103,3 +104,10 @@ modifyModuleTable :: MonadModuleTable term value m => (ModuleTable (EnvironmentF
 modifyModuleTable f = do
   table <- getModuleTable
   putModuleTable $! f table
+
+
+type Label = Int
+
+class Monad m => MonadControl term m where
+  label :: term -> m Label
+  goto :: Label -> m term
