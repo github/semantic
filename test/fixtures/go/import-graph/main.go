@@ -12,8 +12,8 @@ import (
 func foo() {}
 
 func main() {
-  foo()
+	foo()
 
-  m.Sin()
-  Math.Sin()
+	m.Sin()
+	Math.Sin()
 }

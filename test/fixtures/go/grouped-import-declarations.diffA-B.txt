@@ -3,22 +3,18 @@
     (Identifier))
   (
     (QualifiedImport
-    { (TextElement)
-    ->(TextElement) }
+    { (Identifier)
+    ->(Identifier) }
     { (Identifier)
     ->(Identifier) })
-  {+(WildcardImport
-    {+(TextElement)+}
-    {+(Identifier)+})+}
-  {+(QualifiedImport
-    {+(TextElement)+}
-    {+(Identifier)+})+}
-  {-(WildcardImport
-    {-(TextElement)-}
-    {-(Identifier)-})-}
-  {-(QualifiedImport
-    {-(TextElement)-}
-    {-(Identifier)-})-})
+    (WildcardImport
+    { (Identifier)
+    ->(Identifier) }
+      (Identifier))
+    (QualifiedImport
+    { (Identifier)
+    ->(Identifier) }
+      (Identifier)))
   (Function
     (Empty)
     (Identifier)

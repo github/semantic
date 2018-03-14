@@ -3,13 +3,13 @@
     (Identifier))
   (
     (QualifiedImport
-      (TextElement)
+      (Identifier)
       (Identifier))
     (WildcardImport
-      (TextElement)
+      (Identifier)
       (Identifier))
     (QualifiedImport
-      (TextElement)
+      (Identifier)
       (Identifier)))
   (Function
     (Empty)

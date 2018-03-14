@@ -1,47 +1,21 @@
 {-# LANGUAGE DataKinds, TypeOperators #-}
 module Rendering.TOC.Spec (spec) where
 
-import Analysis.Decorator (constructorNameAndConstantFields)
 import Analysis.Declaration
-import Data.Abstract.FreeVariables
 import Data.Aeson
 import Data.Bifunctor
-import Data.Blob
-import Data.ByteString (ByteString)
 import Data.Diff
-import Data.Functor.Both
-import Data.Functor.Foldable (cata)
-import Data.Functor.Listable
-import Data.Language
-import Data.Maybe (fromMaybe, isJust)
-import Data.Monoid (Last(..))
-import Data.Output
 import Data.Patch
-import Data.Range
-import Data.Record
-import Data.Semigroup ((<>))
-import Data.Source
-import Data.Span
-import qualified Data.Syntax as Syntax
-import qualified Data.Syntax.Declaration as Declaration
-import Data.Term
 import Data.Text (Text)
 import Data.Text.Encoding (encodeUtf8)
-import Data.These
 import Data.Union
 import Diffing.Interpreter
-import Parsing.Parser
 import Prelude hiding (readFile)
-import Rendering.Renderer
+import qualified Data.Syntax as Syntax
+import qualified Data.Syntax.Declaration as Declaration
 import Rendering.TOC
-import Semantic
-import Semantic.Task
-import Semantic.Util
+
 import SpecHelpers
-import Test.Hspec (Spec, describe, it, parallel, pendingWith)
-import Test.Hspec.Expectations.Pretty
-import Test.Hspec.LeanCheck
-import Test.LeanCheck
 
 
 spec :: Spec
@@ -248,6 +222,3 @@ blankDiff = merge (arrayInfo, arrayInfo) (inj [ inserting (termIn literalInfo (i
   where
     arrayInfo = Nothing :. Range 0 3 :. Span (Pos 1 1) (Pos 1 5) :. Nil
     literalInfo = Nothing :. Range 1 2 :. Span (Pos 1 2) (Pos 1 4) :. Nil
-
-blankDiffBlobs :: Both Blob
-blankDiffBlobs = both (Blob (fromText "[]") "a.js" (Just TypeScript)) (Blob (fromText "[a]") "b.js" (Just TypeScript))
