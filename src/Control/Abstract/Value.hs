@@ -140,8 +140,9 @@ instance ( MonadAddressable location (Value location term) m
     | otherwise = fail ("not defined for non-boolean conditions: " <> show cond)
 
   liftNumeric f arg
-    | Just (Integer (Whole i))     <- prjValue arg = integer $ f i
-    | Just (Value.Float (Decim d)) <- prjValue arg = float   $ f d
+    | Just (Integer (Whole i))        <- prjValue arg = integer $ f i
+    | Just (Value.Float (Decim d))    <- prjValue arg = float   $ f d
+    | Just (Value.Rational (Ratio r)) <- prjValue arg = rational $ f r
     | otherwise = fail ("Invalid operand to liftNumeric: " <> show arg)
 
   liftNumeric2 f left right
