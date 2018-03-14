@@ -105,10 +105,10 @@ instance Ord1 Tuple where liftCompare = genericLiftCompare
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
 -- | The environment for an abstract value type.
-type EnvironmentFor v = Environment (Address (LocationFor v) v)
+type EnvironmentFor value = Environment (Address (LocationFor value) value)
 
 -- | The store for an abstract value type.
-type StoreFor v = Store (LocationFor v) v
+type StoreFor value = Store (LocationFor value) value
 
 -- | The cell for an abstract value type.
 type CellFor value = Cell (LocationFor value) value
