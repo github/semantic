@@ -16,28 +16,28 @@ run :: (Effectful m, RunEffects effects a) => m effects a -> Final effects a
 run = Effect.run . runEffects . lower
 
 -- | A typeclass to run a computation to completion, interpreting each effect with some sensible defaults.
-class RunEffects effects a where
+class RunEffects fs a where
   -- | The final result type of the computation, factoring in the results of any effects, e.g. pairing 'State' results with the final state, wrapping 'Fail' results in 'Either', etc.
-  type Final effects a
-  runEffects :: Eff effects a -> Eff '[] (Final effects a)
+  type Final fs a
+  runEffects :: Eff fs a -> Eff '[] (Final fs a)
 
-instance (RunEffect effect1 a, RunEffects (effect2 ': effects) (Result effect1 a)) => RunEffects (effect1 ': effect2 ': effects) a where
-  type Final (effect1 ': effect2 ': effects) a = Final (effect2 ': effects) (Result effect1 a)
+instance (RunEffect f1 a, RunEffects (f2 ': fs) (Result f1 a)) => RunEffects (f1 ': f2 ': fs) a where
+  type Final (f1 ': f2 ': fs) a = Final (f2 ': fs) (Result f1 a)
   runEffects = runEffects . runEffect
 
-instance RunEffect effect a => RunEffects '[effect] a where
-  type Final '[effect] a = Result effect a
+instance RunEffect f a => RunEffects '[f] a where
+  type Final '[f] a = Result f a
   runEffects = runEffect
 
 
 -- | A typeclass to interpret a single effect with some sensible defaults (defined per-effect).
-class RunEffect effect a where
+class RunEffect f a where
   -- | The incremental result of an effect w.r.t. the parameter value, factoring in the interpretation of the effect.
-  type Result effect a
-  type instance Result effect a = a
+  type Result f a
+  type instance Result f a = a
 
   -- | Interpret the topmost effect in a computation with some sensible defaults (defined per-effect), and return the incremental 'Result'.
-  runEffect :: Eff (effect ': effects) a -> Eff effects (Result effect a)
+  runEffect :: Eff (f ': fs) a -> Eff fs (Result f a)
 
 -- | 'State' effects with 'Monoid'al states are interpreted starting from the 'mempty' state value into a pair of result value and final state.
 instance Monoid b => RunEffect (State b) a where
