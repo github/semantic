@@ -1,3 +1,3 @@
 (Program
-  (Export
+  (DefaultExport
     (Identifier)))

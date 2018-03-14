@@ -1,28 +1,28 @@
 (Program
   (Import
-    (TextElement))
+    (Identifier))
   (QualifiedImport
-    (TextElement)
+    (Identifier)
     (Identifier))
   (Import
-    (TextElement))
+    (Identifier))
   (Import
-    (TextElement))
+    (Identifier))
   (Import
-    (TextElement))
+    (Identifier))
   (
     (Import
-      (TextElement))
+      (Identifier))
     (Import
-      (TextElement)))
+      (Identifier)))
   (
     (Import
-      (TextElement))
+      (Identifier))
     (QualifiedImport
-      (TextElement)
+      (Identifier)
       (Identifier)))
   (Import
-    (TextElement))
+    (Identifier))
   (QualifiedImport
-    (TextElement)
+    (Identifier)
     (Identifier)))

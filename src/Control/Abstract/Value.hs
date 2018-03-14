@@ -7,10 +7,20 @@ import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Type as Type
 import Data.Abstract.Value as Value
-import Data.Bitraversable
+import qualified Data.Map as Map
 import Data.Scientific (Scientific, fromFloatDigits, toRealFloat)
 import Prelude hiding (fail)
 import Prologue
+
+-- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
+--   have built-in generalized-comparison ("spaceship") operators. If you want to
+--   encapsulate a traditional, boolean-returning operator, wrap it in 'Concrete';
+--   if you want the generalized comparator, pass in 'Generalized'. In MonadValue
+--   instances, you can then then handle the different cases to return different
+--   types, if that's what you need.
+data Comparator
+  = Concrete (forall a . Ord a => a -> a -> Bool)
+  | Generalized
 
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
@@ -34,6 +44,9 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
   liftNumeric2 :: (forall a . (Real a, Floating a) => a -> a -> a)
                -> (forall b . Integral b           => b -> b -> b)
                -> (value -> value -> m value)
+
+  -- | Lift a Comparator (usually wrapping a function like == or <=) to a function on values.
+  liftComparison :: Comparator -> (value -> value -> m value)
 
   -- | Construct an abstract boolean value.
   boolean :: Bool -> m value
@@ -69,6 +82,35 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
 toBool :: MonadValue term value m => value -> m Bool
 toBool v = ifthenelse v (pure True) (pure False)
 
+forLoop :: MonadValue term value m
+        => m value -- | Initial statement
+        -> m value -- | Condition
+        -> m value -- | Increment/stepper
+        -> m value -- | Body
+        -> m value
+forLoop initial cond step body = do
+  void initial
+  env <- getGlobalEnv
+  localEnv (mappend env) (fix $ \ loop -> do
+      cond' <- cond
+      ifthenelse cond' (do
+        void body
+        void step
+        loop) unit)
+
+-- | The fundamental looping primitive, built on top of ifthenelse.
+while :: MonadValue term value m => m value -> m value -> m value
+while cond body = do
+  this <- cond
+  ifthenelse this (body *> while cond body) unit
+
+-- | Do-while loop, built on top of while.
+doWhile :: MonadValue term value m => m value -> m value -> m value
+doWhile body cond = do
+  void body
+  this <- cond
+  ifthenelse this (doWhile body cond) unit
+
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( MonadAddressable location (Value location term) m
          , MonadAnalysis term (Value location term) m
@@ -86,7 +128,14 @@ instance ( MonadAddressable location (Value location term) m
   multiple vals =
     pure . injValue $ Value.Tuple vals
 
-  interface v = injValue . Value.Interface v <$> getGlobalEnv
+  interface v = do
+    -- TODO: If the set of exports is empty because no exports have been
+    -- defined, do we export all terms, or no terms? This behavior varies across
+    -- languages. We need better semantics rather than doing it ad-hoc.
+    env <- getGlobalEnv
+    exports <- getExports
+    let env' = if Map.null exports then env else bindExports exports env
+    pure (injValue (Value.Interface v env'))
 
   ifthenelse cond if' else'
     | Just (Boolean b) <- prjValue cond = if b then if' else else'
@@ -110,6 +159,29 @@ instance ( MonadAddressable location (Value location term) m
         munge = toRealFloat
         float :: Double -> Value.Float a
         float = Value.Float . fromFloatDigits
+        pair = (left, right)
+
+  liftComparison comparator left right
+    | Just (Integer i, Integer j)           <- prjPair pair = go i j
+    | Just (Integer i, Value.Float j)       <- prjPair pair = go (fromIntegral i) j
+    | Just (Value.Float i, Integer j)       <- prjPair pair = go i (fromIntegral j)
+    | Just (Value.Float i, Value.Float j)   <- prjPair pair = go i j
+    | Just (Value.String i, Value.String j) <- prjPair pair = go i j
+    | Just (Boolean i, Boolean j)           <- prjPair pair = go i j
+    | Just (Value.Unit, Value.Unit)         <- prjPair pair = boolean True
+    | otherwise = fail ("Type error: invalid arguments to liftComparison: " <> show pair)
+      where
+        -- Explicit type signature is necessary here because we're passing all sorts of things
+        -- to these comparison functions.
+        go :: (Ord a, MonadValue term value m) => a -> a -> m value
+        go l r = case comparator of
+          Concrete f  -> boolean (f l r)
+          Generalized -> integer (orderingToInt (compare l r))
+
+        -- Map from [LT, EQ, GT] to [-1, 0, 1]
+        orderingToInt :: Ordering -> Prelude.Integer
+        orderingToInt = toInteger . pred . fromEnum
+
         pair = (left, right)
 
   abstract names (Subterm body _) = injValue . Closure names body <$> askLocalEnv
@@ -160,6 +232,7 @@ instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue 
     (Int, Type.Float) -> pure Type.Float
     _                 -> unify left right
 
+  liftComparison _ left right = pure left <|> pure right
 
   apply op params = do
     tvar <- fresh
