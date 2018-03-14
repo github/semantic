@@ -131,7 +131,8 @@ continue = do
   maybe (fail "free loop variable") deref (envLookup (name "loop") env)
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( MonadAddressable location (Value location term) m
+instance ( FreeVariables term
+         , MonadAddressable location (Value location term) m
          , MonadAnalysis term (Value location term) m
          , Show location
          , Show term
@@ -193,7 +194,7 @@ instance ( MonadAddressable location (Value location term) m
 
         pair = (left, right)
 
-  abstract names (Subterm body _) = injValue . Closure names body <$> askLocalEnv
+  abstract names (Subterm body _) = injValue . Closure names body . bindEnv (freeVariables body) <$> askLocalEnv
 
   apply op params = do
     Closure names body env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
