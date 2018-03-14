@@ -23,7 +23,7 @@ newtype Monovariant = Monovariant { unMonovariant :: Name }
   deriving (Eq, Ord, Show)
 
 
-class (Foldable (Cell location), Ord location) => AbstractLocation location where
+class AbstractLocation location where
   -- | The type into which stored values will be written for a given location type.
   type family Cell location :: * -> *
 
