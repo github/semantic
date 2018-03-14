@@ -6,7 +6,7 @@
     (Identifier))
   (WildcardImport
     (TextElement)
-    (Empty))
+    (Identifier))
   (QualifiedImport
     (TextElement)
     (Identifier))

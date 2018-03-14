@@ -38,16 +38,12 @@
             (Empty)))
         (
           (Call
-            (MemberAccess
-              (Identifier)
-              (Identifier))
+            (Identifier)
           { (Identifier)
           ->(Identifier) }
             (Empty))
           (Call
-            (MemberAccess
-              (Identifier)
-              (Identifier))
+            (Identifier)
           { (Identifier)
           ->(Identifier) }
             (Empty)))))))

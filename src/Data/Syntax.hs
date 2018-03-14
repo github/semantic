@@ -124,7 +124,8 @@ instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Program where
-  eval (Program xs) = eval xs
+  eval (Program xs) = do
+    withExports mempty (eval xs)
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString

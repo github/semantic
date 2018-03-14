@@ -1,5 +1,5 @@
 (Program
-  (Export
+  (DefaultExport
     (Function
       (Empty)
       (Empty)

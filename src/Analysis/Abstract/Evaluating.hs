@@ -14,6 +14,7 @@ import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Configuration
 import Data.Abstract.Evaluatable
+import Data.Abstract.Address
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Blob
@@ -25,30 +26,28 @@ import Prologue
 import System.FilePath.Posix
 
 -- | Evaluate a term to a value.
-evaluate :: forall value term effects
-         .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
-            , Evaluatable (Base term)
+evaluate :: forall value term
+         .  ( Evaluatable (Base term)
             , FreeVariables term
-            , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-            , MonadValue term value (Evaluating term value effects)
+            , MonadAddressable (LocationFor value) value (Evaluating term value (EvaluatingEffects term value))
+            , MonadValue term value (Evaluating term value (EvaluatingEffects term value))
             , Recursive term
             )
          => term
-         -> Final effects value
+         -> Final (EvaluatingEffects term value) value
 evaluate = runAnalysis @(Evaluating term value) . evaluateModule
 
 -- | Evaluate terms and an entry point to a value.
-evaluates :: forall value term effects
-          .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
-             , Evaluatable (Base term)
+evaluates :: forall value term
+          .  ( Evaluatable (Base term)
              , FreeVariables term
-             , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-             , MonadValue term value (Evaluating term value effects)
+             , MonadAddressable (LocationFor value) value (Evaluating term value (EvaluatingEffects term value))
+             , MonadValue term value (Evaluating term value (EvaluatingEffects term value))
              , Recursive term
              )
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
-          -> Final effects value
+          -> Final (EvaluatingEffects term value) value
 evaluates pairs (b, t) = runAnalysis @(Evaluating term value) (withModules b pairs (evaluateModule t))
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
@@ -78,11 +77,18 @@ type EvaluatingEffects term value
      , State  (StoreFor value)                     -- The heap
      , Reader (ModuleTable term)                   -- Cache of unevaluated modules
      , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
+
+     , State (Map Name (Name, Maybe (Address (LocationFor value) value))) -- Set of exports
      ]
 
-instance Members '[Reader (EnvironmentFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
+instance Members '[State (Map Name (Name, Maybe (Address (LocationFor value) value))), Reader (EnvironmentFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
   getGlobalEnv = raise get
   putGlobalEnv = raise . put
+  withGlobalEnv s = raise . localState s . lower
+
+  addExport key = raise . modify . Map.insert key
+  getExports = raise get
+  withExports s = raise . localState s . lower
 
   askLocalEnv = raise ask
   localEnv f a = raise (local f (lower a))

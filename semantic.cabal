@@ -161,7 +161,6 @@ library
                      , recursion-schemes
                      , reducers
                      , scientific
-                     , semigroupoids
                      , split
                      , stm-chans
                      , template-haskell
