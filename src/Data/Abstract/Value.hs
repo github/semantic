@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, FunctionalDependencies, FlexibleContexts, FlexibleInstances, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE ConstraintKinds, DataKinds, FunctionalDependencies, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Data.Abstract.Value where
 
 import Data.Abstract.Address
@@ -6,9 +6,10 @@ import Data.Abstract.Environment
 import Data.Abstract.Store
 import Data.Abstract.FreeVariables
 import Data.Abstract.Live
+import Data.Abstract.Number
 import qualified Data.Abstract.Type as Type
 import qualified Data.Set as Set
-import Data.Scientific (Scientific, toRealFloat, fromFloatDigits)
+import Data.Scientific (Scientific)
 import Prologue
 import Prelude hiding (Float, Integer, String, Rational, fail)
 import qualified Prelude
@@ -44,75 +45,7 @@ prjPair :: ( f :< ValueConstructors loc term1 , g :< ValueConstructors loc term2
         -> Maybe (f (Value loc term1), g (Value loc term2))
 prjPair = bitraverse prjValue prjValue
 
--- | A generalized number type that unifies all interpretable numeric types.
---   This is a GADT, so you can specialize the 'a' parameter and be confident
---   that, say, a @Number Scientific@ contains a 'Scientific' and not an integer
---   in disguise.
-data Number a where
-  Whole :: !Prelude.Integer  -> Number Prelude.Integer
-  Ratio :: !Prelude.Rational -> Number Prelude.Rational
-  Decim :: !Scientific       -> Number Scientific
-
-deriving instance Eq a => Eq (Number a)
-
-instance Show (Number a) where
-  show (Whole i) = show i
-  show (Ratio r) = show r
-  show (Decim d) = show d
-
--- | Every 'Number' can be coerced to a 'Scientific'. Used in the 'Ord' instance.
-collapse :: Number a -> Scientific
-collapse (Whole i) = fromInteger i
-collapse (Ratio r) = fromRational r
-collapse (Decim s) = s
-
-instance Eq a => Ord (Number a) where compare = compare `on` collapse
-
--- | A box that hides the @a@ parameter to a given 'Number'. Pattern-match
---   on it to extract the information contained.
-data SomeNumber = forall a . SomeNumber (Number a)
-
--- | Smart constructors for 'SomeNumber'.
-whole :: Prelude.Integer -> SomeNumber
-whole = SomeNumber . Whole
-
-ratio :: Prelude.Rational -> SomeNumber
-ratio = SomeNumber . Ratio
-
-decim :: Scientific -> SomeNumber
-decim = SomeNumber . Decim
-
--- | Promote a function on 'Real' values into one operating on 'Number's.
---   You pass things like @+@ and @-@ here.
-liftSimple :: (forall n . Real n => n -> n -> n)
-           -> (Number a -> Number b -> SomeNumber)
-liftSimple f = liftThorny f f
-
--- | Promote two functions, one on 'Integral' and one on 'Fractional' and 'Real' values,
---   to operate on 'Numbers'. Examples of this: 'mod' and 'mod'', 'div' and '/'.
-liftThorny :: (forall n . Integral n             => n -> n -> n)
-           -> (forall f . (Fractional f, Real f) => f -> f -> f)
-           -> (Number a -> Number b -> SomeNumber)
-liftThorny f _ (Whole i) (Whole j) = whole (f i j)
-liftThorny _ g (Whole i) (Ratio j) = ratio (g (toRational i) j)
-liftThorny _ g (Whole i) (Decim j) = decim (g (fromIntegral i) j)
-liftThorny _ g (Ratio i) (Ratio j) = ratio (g i j)
-liftThorny _ g (Ratio i) (Whole j) = ratio (g i (fromIntegral j))
-liftThorny _ g (Ratio i) (Decim j) = decim (g (fromRational i) j)
-liftThorny _ g (Decim i) (Whole j) = decim (g i (fromIntegral j))
-liftThorny _ g (Decim i) (Ratio j) = decim (g i (fromRational j))
-liftThorny _ g (Decim i) (Decim j) = decim (g i j)
-
--- | Exponential behavior is too hard to generalize, so here's a manually implemented version.
---   TODO: Given a 'Ratio' raised to some 'Whole', we could check to see if it's an integer
---   and round it before the exponentiation, giving back a 'Whole'.
-safeExp :: Number a -> Number b -> SomeNumber
-safeExp (Whole i) (Whole j) = whole (i ^ j)
-safeExp (Ratio i) (Whole j) = ratio (i ^^ j)
-safeExp i j                 = decim (fromFloatDigits ((munge i) ** (munge j)))
-  where munge = (toRealFloat . collapse) :: Number a -> Double
-
--- TODO: Parameerize Value by the set of constructors s.t. each language can have a distinct value union.
+-- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
 
 -- | A function value consisting of a list of parameters, the body of the function, and an environment of bindings captured by the body.
 data Closure location term value = Closure [Name] term (Environment location value)

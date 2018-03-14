@@ -5,6 +5,7 @@ import Control.Abstract.Addressable
 import Control.Abstract.Analysis
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
+import Data.Abstract.Number as Number
 import Data.Abstract.Type as Type
 import Data.Abstract.Value as Value
 import qualified Data.Map as Map
@@ -117,14 +118,14 @@ instance ( MonadAddressable location (Value location term) m
          )
          => MonadValue term (Value location term) m where
 
-  unit    = pure . injValue $ Value.Unit
-  integer = pure . injValue . Integer . Whole
-  boolean = pure . injValue . Boolean
-  string  = pure . injValue . Value.String
-  float   = pure . injValue . Value.Float . Decim
+  unit     = pure . injValue $ Value.Unit
+  integer  = pure . injValue . Value.Integer . Number.Integer
+  boolean  = pure . injValue . Boolean
+  string   = pure . injValue . Value.String
+  float    = pure . injValue . Value.Float . Decimal
   rational = pure . injValue . Value.Rational . Ratio
-  multiple vals =
-    pure . injValue $ Value.Tuple vals
+
+  multiple = pure . injValue . Value.Tuple
 
   interface v = do
     -- TODO: If the set of exports is empty because no exports have been
@@ -140,38 +141,38 @@ instance ( MonadAddressable location (Value location term) m
     | otherwise = fail ("not defined for non-boolean conditions: " <> show cond)
 
   liftNumeric f arg
-    | Just (Integer (Whole i))        <- prjValue arg = integer $ f i
-    | Just (Value.Float (Decim d))    <- prjValue arg = float   $ f d
-    | Just (Value.Rational (Ratio r)) <- prjValue arg = rational $ f r
+    | Just (Value.Integer (Number.Integer i)) <- prjValue arg = integer $ f i
+    | Just (Value.Float (Decimal d))          <- prjValue arg = float   $ f d
+    | Just (Value.Rational (Ratio r))         <- prjValue arg = rational $ f r
     | otherwise = fail ("Invalid operand to liftNumeric: " <> show arg)
 
   liftNumeric2 f left right
-    | Just (Integer i, Integer j)               <- prjPair pair = f i j & specialize
-    | Just (Integer i, Value.Rational j)        <- prjPair pair = f i j & specialize
-    | Just (Integer i, Value.Float j)           <- prjPair pair = f i j & specialize
-    | Just (Value.Rational i, Integer j)        <- prjPair pair = f i j & specialize
+    | Just (Value.Integer i, Value.Integer j)   <- prjPair pair = f i j & specialize
+    | Just (Value.Integer i, Value.Rational j)  <- prjPair pair = f i j & specialize
+    | Just (Value.Integer i, Value.Float j)     <- prjPair pair = f i j & specialize
+    | Just (Value.Rational i, Value.Integer j)  <- prjPair pair = f i j & specialize
     | Just (Value.Rational i, Value.Rational j) <- prjPair pair = f i j & specialize
     | Just (Value.Rational i, Value.Float j)    <- prjPair pair = f i j & specialize
-    | Just (Value.Float i, Integer j)           <- prjPair pair = f i j & specialize
+    | Just (Value.Float i, Value.Integer j)     <- prjPair pair = f i j & specialize
     | Just (Value.Float i, Value.Rational j)    <- prjPair pair = f i j & specialize
     | Just (Value.Float i, Value.Float j)       <- prjPair pair = f i j & specialize
     | otherwise = fail ("Invalid operands to liftNumeric2: " <> show pair)
       where
         -- Dispatch whatever's contained inside a 'SomeNumber' to its appropriate 'MonadValue' ctor
         specialize :: MonadValue term value m => SomeNumber -> m value
-        specialize (SomeNumber (Whole i)) = integer i
-        specialize (SomeNumber (Ratio r)) = rational r
-        specialize (SomeNumber (Decim d)) = float d
+        specialize (SomeNumber (Number.Integer i)) = integer i
+        specialize (SomeNumber (Ratio r))          = rational r
+        specialize (SomeNumber (Decimal d))        = float d
         pair = (left, right)
 
   liftComparison comparator left right
-    | Just (Integer (Whole i), Integer (Whole j))         <- prjPair pair = go i j
-    | Just (Integer (Whole i), Value.Float (Decim j))     <- prjPair pair = go (fromIntegral i) j
-    | Just (Value.Float (Decim i), Integer (Whole j))     <- prjPair pair = go i (fromIntegral j)
-    | Just (Value.Float (Decim i), Value.Float (Decim j)) <- prjPair pair = go i j
-    | Just (Value.String i, Value.String j)               <- prjPair pair = go i j
-    | Just (Boolean i, Boolean j)                         <- prjPair pair = go i j
-    | Just (Value.Unit, Value.Unit)                       <- prjPair pair = boolean True
+    | Just (Value.Integer (Number.Integer i), Value.Integer (Number.Integer j)) <- prjPair pair = go i j
+    | Just (Value.Integer (Number.Integer i), Value.Float (Decimal j))          <- prjPair pair = go (fromIntegral i) j
+    | Just (Value.Float (Decimal i), Value.Integer (Number.Integer j))          <- prjPair pair = go i (fromIntegral j)
+    | Just (Value.Float (Decimal i), Value.Float (Decimal j))                   <- prjPair pair = go i j
+    | Just (Value.String i, Value.String j)                                     <- prjPair pair = go i j
+    | Just (Boolean i, Boolean j)                                               <- prjPair pair = go i j
+    | Just (Value.Unit, Value.Unit)                                             <- prjPair pair = boolean True
     | otherwise = fail ("Type error: invalid arguments to liftComparison: " <> show pair)
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
