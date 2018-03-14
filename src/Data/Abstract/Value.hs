@@ -10,12 +10,11 @@ import qualified Data.Abstract.Type as Type
 import qualified Data.Set as Set
 import Data.Scientific (Scientific)
 import Prologue
-import Prelude hiding (Float, Integer, String, fail)
+import Prelude hiding (Float, Integer, String)
 import qualified Prelude
 
 type ValueConstructors location term
   = '[Closure location term
-    , Interface location
     , Unit
     , Boolean
     , Float
@@ -37,6 +36,13 @@ injValue = Value . inj
 prjValue :: (f :< ValueConstructors location term) => Value location term -> Maybe (f (Value location term))
 prjValue = prj . deValue
 
+-- | Convenience function for projecting two values.
+prjPair :: ( f :< ValueConstructors loc term1 , g :< ValueConstructors loc term2)
+        => (Value loc term1, Value loc term2)
+        -> Maybe (f (Value loc term1), g (Value loc term2))
+prjPair = bitraverse prjValue prjValue
+
+
 -- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
 
 -- | A function value consisting of a list of parameters, the body of the function, and an environment of bindings captured by the body.
@@ -46,14 +52,6 @@ data Closure location term value = Closure [Name] term (Environment location val
 instance (Eq location, Eq term) => Eq1 (Closure location term) where liftEq = genericLiftEq
 instance (Ord location, Ord term) => Ord1 (Closure location term) where liftCompare = genericLiftCompare
 instance (Show location, Show term) => Show1 (Closure location term) where liftShowsPrec = genericLiftShowsPrec
-
--- | A program value consisting of the value of the program and it's enviornment of bindings.
-data Interface location value = Interface value (Environment location value)
-  deriving (Eq, Generic1, Ord, Show)
-
-instance (Eq location) => Eq1 (Interface location) where liftEq = genericLiftEq
-instance (Ord location) => Ord1 (Interface location) where liftCompare = genericLiftCompare
-instance (Show location) => Show1 (Interface location) where liftShowsPrec = genericLiftShowsPrec
 
 -- | The unit value. Typically used to represent the result of imperative statements.
 data Unit value = Unit

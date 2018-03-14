@@ -1,5 +1,3 @@
 (Program
   (Delete
-    (MemberAccess
-      (Identifier)
-      (Identifier))))
+    (Identifier)))

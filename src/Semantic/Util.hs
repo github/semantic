@@ -1,5 +1,6 @@
 -- MonoLocalBinds is to silence a warning about a simplifiable constraint.
 {-# LANGUAGE DataKinds, MonoLocalBinds, TypeApplications, TypeOperators #-}
+{-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.Util where
 
 import Analysis.Abstract.Caching

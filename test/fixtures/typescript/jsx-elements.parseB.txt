@@ -9,9 +9,7 @@
           (JsxAttribute
             (Identifier)
             (JsxExpression
-              (MemberAccess
-                (Identifier)
-                (Identifier)))))
+              (Identifier))))
         (JsxExpression
           (Identifier))
         (JsxClosingElement
