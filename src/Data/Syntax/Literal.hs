@@ -177,7 +177,7 @@ instance Ord1 Symbol where liftCompare = genericLiftCompare
 instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Symbol where
-  eval (Symbol s) = symbol (B.dropWhile (== ':') s)
+  eval (Symbol s) = symbol s
 
 newtype Regex a = Regex { regexContent :: ByteString }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
