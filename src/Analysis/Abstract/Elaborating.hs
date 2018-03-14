@@ -1,5 +1,10 @@
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, TypeFamilies #-}
 module Analysis.Abstract.Elaborating
-( Elaborating
+( type Elaborating
 ) where
 
-newtype Elaborating m term value effects a = Elaborating (m term value effects a)
+import Control.Abstract.Analysis
+import Prologue
+
+newtype Elaborating m term value (effects :: [* -> *]) a = Elaborating (m term value effects a)
+  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
