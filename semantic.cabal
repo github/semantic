@@ -16,7 +16,7 @@ library
   exposed-modules:
                      -- Analyses & term annotations
                        Analysis.Abstract.Caching
-                     -- , Analysis.Abstract.Collecting
+                     , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Evaluating
                      , Analysis.Abstract.Tracing
@@ -38,7 +38,6 @@ library
                      , Control.Effect
                      -- Effects used for program analysis
                      , Control.Monad.Effect.Fresh
-                     -- , Control.Monad.Effect.GC
                      , Control.Monad.Effect.NonDet
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
