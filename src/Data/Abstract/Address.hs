@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, TypeFamilyDependencies #-}
+{-# LANGUAGE MultiParamTypeClasses, TypeFamilies #-}
 module Data.Abstract.Address where
 
 import Data.Abstract.FreeVariables
@@ -25,7 +25,7 @@ newtype Monovariant = Monovariant { unMonovariant :: Name }
 
 class AbstractLocation location where
   -- | The type into which stored values will be written for a given location type.
-  type family Cell location = (res :: * -> *) | res -> location
+  type family Cell location :: * -> *
 
 instance AbstractLocation Precise where
   type Cell Precise = Latest
