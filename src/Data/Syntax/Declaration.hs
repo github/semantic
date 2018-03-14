@@ -161,14 +161,7 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 -- We need to ensure that all input files have aggregated their content into
 -- a coherent module before we begin evaluating a module.
 instance Evaluatable Module where
-  eval (Module _ xs) = eval' xs
-    where
-    eval' [] = unit >>= interface
-    eval' [x] = subtermValue x >>= interface
-    eval' (x:xs) = do
-      _ <- subtermValue x
-      env <- getGlobalEnv
-      localEnv (envUnion env) (eval' xs)
+  eval (Module _ xs) = eval xs
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
@@ -245,6 +238,7 @@ instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedExportFrom where
   eval (QualifiedExportFrom from exportSymbols) = do
     let moduleName = freeVariable (subterm from)
+    -- importedEnv <- require moduleName
     importedEnv <- withGlobalEnv mempty (require moduleName)
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \(name, alias) -> do
@@ -263,6 +257,7 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedImport where
   eval (QualifiedImport from alias xs) = do
+    -- importedEnv <- require (freeVariable (subterm from))
     importedEnv <- withGlobalEnv mempty (require (freeVariable (subterm from)))
     modifyGlobalEnv (flip (Map.foldrWithKey copy) (unEnvironment importedEnv))
     unit
@@ -295,6 +290,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
   eval (Import from xs) = do
+    -- importedEnv <- require (freeVariable (subterm from))
     importedEnv <- withGlobalEnv mempty (require (freeVariable (subterm from)))
     modifyGlobalEnv (flip (Map.foldrWithKey directInsert) (unEnvironment importedEnv))
     unit
@@ -314,7 +310,8 @@ instance Ord1 WildcardImport where liftCompare = genericLiftCompare
 instance Show1 WildcardImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable WildcardImport where
-  eval (WildcardImport from _) = do -- require (freeVariable (subterm from)) *> putGlobalEnv mempty *> unit
+  eval (WildcardImport from _) = do
+    -- importedEnv <- require (freeVariable (subterm from))
     importedEnv <- withGlobalEnv mempty (require (freeVariable (subterm from)))
     modifyGlobalEnv (flip (Map.foldrWithKey envInsert) (unEnvironment importedEnv))
     unit

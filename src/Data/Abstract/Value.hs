@@ -6,21 +6,23 @@ import Data.Abstract.Environment
 import Data.Abstract.Store
 import Data.Abstract.FreeVariables
 import Data.Abstract.Live
+import Data.Abstract.Number
 import qualified Data.Abstract.Type as Type
 import qualified Data.Set as Set
 import Data.Scientific (Scientific)
 import Prologue
-import Prelude hiding (Float, Integer, String)
+import Prelude hiding (Float, Integer, String, Rational, fail)
 import qualified Prelude
 
 type ValueConstructors location term
   = '[Closure location term
-    , Interface location
     , Unit
     , Boolean
     , Float
     , Integer
     , String
+    , Rational
+    , Symbol
     , Tuple
     ]
 
@@ -43,7 +45,6 @@ prjPair :: ( f :< ValueConstructors loc term1 , g :< ValueConstructors loc term2
         -> Maybe (f (Value loc term1), g (Value loc term2))
 prjPair = bitraverse prjValue prjValue
 
-
 -- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
 
 -- | A function value consisting of a list of parameters, the body of the function, and an environment of bindings captured by the body.
@@ -53,19 +54,6 @@ data Closure location term value = Closure [Name] term (Environment location val
 instance (Eq location, Eq term) => Eq1 (Closure location term) where liftEq = genericLiftEq
 instance (Ord location, Ord term) => Ord1 (Closure location term) where liftCompare = genericLiftCompare
 instance (Show location, Show term) => Show1 (Closure location term) where liftShowsPrec = genericLiftShowsPrec
-
--- | A program value consisting of the value of the program and its environment of bindings.
---   The @Value@ stored herein is the last value evaluated within a given @Program@,
---   or @Unit@ if the language doesn't provide a final value when evaluating a
---   compilation unit. If you want to get at the bindings of an interface (which
---   is probably what you want), look them up in the provided environment, not
---   in the value.
-data Interface location value = Interface value (Environment location value)
-  deriving (Eq, Generic1, Ord, Show)
-
-instance (Eq location) => Eq1 (Interface location) where liftEq = genericLiftEq
-instance (Ord location) => Ord1 (Interface location) where liftCompare = genericLiftCompare
-instance (Show location) => Show1 (Interface location) where liftShowsPrec = genericLiftShowsPrec
 
 -- | The unit value. Typically used to represent the result of imperative statements.
 data Unit value = Unit
@@ -84,12 +72,20 @@ instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
 -- | Arbitrary-width integral values.
-newtype Integer value = Integer Prelude.Integer
+newtype Integer value = Integer (Number Prelude.Integer)
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 Integer where liftEq = genericLiftEq
 instance Ord1 Integer where liftCompare = genericLiftCompare
 instance Show1 Integer where liftShowsPrec = genericLiftShowsPrec
+
+-- | Arbitrary-width rational values values.
+newtype Rational value = Rational (Number Prelude.Rational)
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Rational where liftEq = genericLiftEq
+instance Ord1 Rational where liftCompare = genericLiftCompare
+instance Show1 Rational where liftShowsPrec = genericLiftShowsPrec
 
 -- | String values.
 newtype String value = String ByteString
@@ -99,8 +95,17 @@ instance Eq1 String where liftEq = genericLiftEq
 instance Ord1 String where liftCompare = genericLiftCompare
 instance Show1 String where liftShowsPrec = genericLiftShowsPrec
 
+-- | Possibly-interned Symbol values.
+--   TODO: Should this store a 'Text'?
+newtype Symbol value = Symbol ByteString
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Symbol where liftEq = genericLiftEq
+instance Ord1 Symbol where liftCompare = genericLiftCompare
+instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
+
 -- | Float values.
-newtype Float value = Float Scientific
+newtype Float value = Float (Number Scientific)
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 Float where liftEq = genericLiftEq
@@ -127,20 +132,23 @@ type StoreFor v = Store (LocationFor v) v
 -- | The cell for an abstract value type.
 type CellFor value = Cell (LocationFor value) value
 
+-- | The address set type for an abstract value type.
+type LiveFor value = Live (LocationFor value) value
+
 -- | The location type (the body of 'Address'es) which should be used for an abstract value type.
 type family LocationFor value :: * where
   LocationFor (Value location term) = location
   LocationFor Type.Type = Monovariant
 
 -- | Value types, e.g. closures, which can root a set of addresses.
-class ValueRoots l v | v -> l where
+class ValueRoots value where
   -- | Compute the set of addresses rooted by a given value.
-  valueRoots :: v -> Live l v
+  valueRoots :: value -> LiveFor value
 
-instance (FreeVariables term, Ord location) => ValueRoots location (Value location term) where
+instance (FreeVariables term, Ord location) => ValueRoots (Value location term) where
   valueRoots v
     | Just (Closure names body env) <- prjValue v = envRoots env (foldr Set.delete (freeVariables (body :: term)) names)
     | otherwise                                   = mempty
 
-instance ValueRoots Monovariant Type.Type where
+instance ValueRoots Type.Type where
   valueRoots _ = mempty

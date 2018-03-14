@@ -124,15 +124,8 @@ instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Program where
-  eval (Program xs) = do
-    withExports mempty (eval' xs)
-    where
-      eval' [] = unit >>= interface
-      eval' [x] = subtermValue x >>= interface
-      eval' (x:xs) = do
-        _ <- subtermValue x
-        env <- getGlobalEnv
-        localEnv (envUnion env) (eval' xs)
+  -- eval (Program xs) = withExports mempty (eval xs)
+  eval (Program xs) = eval xs
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString

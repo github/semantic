@@ -7,13 +7,13 @@ module Language.TypeScript.Assignment
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
+import qualified Assigning.Assignment as Assignment
 import Data.Abstract.FreeVariables
+import qualified Data.ByteString as B (filter)
+import qualified Data.ByteString.Char8 as BC
+import Data.Char (ord)
 import Data.Record
 import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, contextualize, postContextualize)
-import Language.TypeScript.Grammar as Grammar
-import Prologue
-import qualified Data.ByteString.Char8 as BC
-import qualified Assigning.Assignment as Assignment
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -22,9 +22,9 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
-import qualified Data.ByteString as B (filter)
-import Data.Char (ord)
+import Language.TypeScript.Grammar as Grammar
 import qualified Language.TypeScript.Syntax as TypeScript.Syntax
+import Prologue
 
 -- | The type of TypeScript syntax.
 type Syntax = '[
