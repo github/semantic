@@ -12,19 +12,19 @@ import Prologue
 type ConfigurationFor term value = Configuration (LocationFor value) term value
 
 -- | A single point in a program’s execution.
-data Configuration l t v
+data Configuration location term value
   = Configuration
-    { configurationTerm        :: t                         -- ^ The “instruction,” i.e. the current term to evaluate.
-    , configurationRoots       :: Live l v                  -- ^ The set of rooted addresses.
-    , configurationEnvironment :: Environment (Address l v) -- ^ The environment binding any free variables in 'configurationTerm'.
-    , configurationStore       :: Store l v                 -- ^ The store of values.
+    { configurationTerm        :: term                                 -- ^ The “instruction,” i.e. the current term to evaluate.
+    , configurationRoots       :: Live location value                  -- ^ The set of rooted addresses.
+    , configurationEnvironment :: Environment (Address location value) -- ^ The environment binding any free variables in 'configurationTerm'.
+    , configurationStore       :: Store location value                 -- ^ The store of values.
     }
     deriving (Generic1)
 
-deriving instance (Eq l, Eq t, Eq v, Eq (Cell l v)) => Eq (Configuration l t v)
-deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Ord (Configuration l t v)
-deriving instance (Show l, Show t, Show v, Show (Cell l v)) => Show (Configuration l t v)
-deriving instance (Ord l, Foldable (Cell l)) => Foldable (Configuration l t)
-instance (Eq l, Eq t, Eq1 (Cell l)) => Eq1 (Configuration l t) where liftEq = genericLiftEq
-instance (Ord l, Ord t, Ord1 (Cell l)) => Ord1 (Configuration l t) where liftCompare = genericLiftCompare
-instance (Show l, Show t, Show1 (Cell l)) => Show1 (Configuration l t) where liftShowsPrec = genericLiftShowsPrec
+deriving instance (Eq location, Eq term, Eq value, Eq (Cell location value)) => Eq (Configuration location term value)
+deriving instance (Ord location, Ord term, Ord value, Ord (Cell location value)) => Ord (Configuration location term value)
+deriving instance (Show location, Show term, Show value, Show (Cell location value)) => Show (Configuration location term value)
+deriving instance (Ord location, Foldable (Cell location)) => Foldable (Configuration location term)
+instance (Eq location, Eq term, Eq1 (Cell location)) => Eq1 (Configuration location term) where liftEq = genericLiftEq
+instance (Ord location, Ord term, Ord1 (Cell location)) => Ord1 (Configuration location term) where liftCompare = genericLiftCompare
+instance (Show location, Show term, Show1 (Cell location)) => Show1 (Configuration location term) where liftShowsPrec = genericLiftShowsPrec
