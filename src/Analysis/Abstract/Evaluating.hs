@@ -72,14 +72,15 @@ deriving instance Member NonDetEff effects => Alternative (Evaluating term value
 deriving instance Member NonDetEff effects => MonadNonDet (Evaluating term value effects)
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
-type EvaluatingEffects term value (effects :: [* -> *])
-  = '[ Fail                                                                -- Failure with an error message
-     , Reader (EnvironmentFor value)                                       -- Local environment (e.g. binding over a closure)
-     , State  (EnvironmentFor value)                                       -- Global (imperative) environment
-     , State  (StoreFor value)                                             -- The heap
-     , Reader (ModuleTable term)                                           -- Cache of unevaluated modules
-     , State  (ModuleTable (EnvironmentFor value))                         -- Cache of evaluated modules
-     , State  (Map Name (Name, Maybe (Address (LocationFor value) value))) -- Set of exports
+type EvaluatingEffects term value
+  = '[ Fail                                        -- Failure with an error message
+     , Reader (EnvironmentFor value)               -- Local environment (e.g. binding over a closure)
+     , State  (EnvironmentFor value)               -- Global (imperative) environment
+     , State  (StoreFor value)                     -- The heap
+     , Reader (ModuleTable term)                   -- Cache of unevaluated modules
+     , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
+
+     , State (Map Name (Name, Maybe (Address (LocationFor value) value))) -- Set of exports
      ]
 
 instance Members '[State (Map Name (Name, Maybe (Address (LocationFor value) value))), Reader (EnvironmentFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
@@ -105,17 +106,17 @@ instance Members '[Reader (ModuleTable term), State (ModuleTable (EnvironmentFor
   askModuleTable = raise ask
   localModuleTable f a = raise (local f (lower a))
 
-instance Members (EvaluatingEffects term value effects) effects => MonadEvaluator term value (Evaluating term value effects) where
+instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
   getConfiguration term = Configuration term mempty <$> askLocalEnv <*> getStore
 
 instance ( Evaluatable (Base term)
          , FreeVariables term
-         , Members (EvaluatingEffects term value effects) effects
+         , Members (EvaluatingEffects term value) effects
          , MonadAddressable (LocationFor value) value (Evaluating term value effects)
          , MonadValue term value (Evaluating term value effects)
          , Recursive term
          )
          => MonadAnalysis term value (Evaluating term value effects) where
-  type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value effects
+  type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
 
   analyzeTerm = eval
