@@ -1,7 +1,9 @@
 (Program
   (Import
-    (TextElement))
+    (TextElement)
+    (Empty))
   (Import
     (
       (Symbol)
-      (TextElement))))
+      (TextElement))
+    (Empty)))
