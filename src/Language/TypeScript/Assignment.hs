@@ -7,12 +7,13 @@ module Language.TypeScript.Assignment
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
+import qualified Assigning.Assignment as Assignment
 import Data.Abstract.FreeVariables
+import qualified Data.ByteString as B (filter)
+import qualified Data.ByteString.Char8 as BC
+import Data.Char (ord)
 import Data.Record
 import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, contextualize, postContextualize)
-import Language.TypeScript.Grammar as Grammar
-import Prologue
-import qualified Assigning.Assignment as Assignment
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -21,7 +22,9 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
+import Language.TypeScript.Grammar as Grammar
 import qualified Language.TypeScript.Syntax as TypeScript.Syntax
+import Prologue
 
 -- | The type of TypeScript syntax.
 type Syntax = '[
@@ -36,6 +39,9 @@ type Syntax = '[
   , Declaration.TypeAlias
   , Declaration.Import
   , Declaration.QualifiedImport
+  , Declaration.DefaultExport
+  , Declaration.QualifiedExport
+  , Declaration.QualifiedExportFrom
   , Declaration.Module
   , Expression.Arithmetic
   , Expression.Bitwise
@@ -156,8 +162,6 @@ type Syntax = '[
   , TypeScript.Syntax.ImportRequireClause
   , TypeScript.Syntax.ImportClause
   , TypeScript.Syntax.LabeledStatement
-  , TypeScript.Syntax.NamedImports
-  , TypeScript.Syntax.NamespaceImport
   , TypeScript.Syntax.Annotation
   , TypeScript.Syntax.With
   , TypeScript.Syntax.ForOf
@@ -262,7 +266,12 @@ ternaryExpression :: Assignment
 ternaryExpression = makeTerm <$> symbol Grammar.TernaryExpression <*> children (Statement.If <$> term expression <*> term expression <*> term expression)
 
 memberExpression :: Assignment
-memberExpression = makeTerm <$> (symbol Grammar.MemberExpression <|> symbol Grammar.MemberExpression') <*> children (Expression.MemberAccess <$> term expression <*> term propertyIdentifier)
+memberExpression = (symbol Grammar.MemberExpression <|> symbol Grammar.MemberExpression') *> children (qualifiedIdentifier <|> memberAccess)
+  where
+    memberAccess = makeTerm <$> location <*> (Expression.MemberAccess <$> term expression <*> term propertyIdentifier)
+    qualifiedIdentifier = makeTerm <$> location <*> ((\a b -> Syntax.Identifier (qualifiedName [a, b])) <$> identifier' <*> propertyIdentifier')
+    identifier' = (symbol Identifier <|> symbol Identifier') *> source
+    propertyIdentifier' = symbol PropertyIdentifier *> source
 
 newExpression :: Assignment
 newExpression = makeTerm <$> symbol Grammar.NewExpression <*> children (Expression.New . pure <$> term expression)
@@ -632,18 +641,21 @@ statementIdentifier :: Assignment
 statementIdentifier = makeTerm <$> symbol StatementIdentifier <*> (Syntax.Identifier <$> (name <$> source))
 
 importStatement :: Assignment
-importStatement = makeImportTerm <$> symbol Grammar.ImportStatement <*> children ((,) <$> importClause <*> term string)
+importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> children ((,) <$> importClause <*> term path)
                 <|> makeImport <$> symbol Grammar.ImportStatement <*> children requireImport
                 <|> makeImport <$> symbol Grammar.ImportStatement <*> children bareRequireImport
-
   where
     -- Straightforward imports
     makeImport loc (Just alias, symbols, from) = makeTerm loc (Declaration.QualifiedImport from alias symbols)
     makeImport loc (Nothing, symbols, from) = makeTerm loc (Declaration.Import from symbols)
     -- Import a file giving it an alias (e.g. import foo = require "./foo")
-    requireImport = symbol Grammar.ImportRequireClause *> children ((,,) <$> (Just <$> (term identifier)) <*> pure [] <*> term string)
+    requireImport = symbol Grammar.ImportRequireClause *> children ((,,) <$> (Just <$> (term identifier)) <*> pure [] <*> term path)
      -- Import a file just for it's side effects (e.g. import "./foo")
-    bareRequireImport = (,,) <$> (pure Nothing) <*> pure [] <*> term string
+    bareRequireImport = (,,) <$> (pure Nothing) <*> pure [] <*> term path
+
+    path = makeTerm <$> symbol Grammar.String <*> (Syntax.Identifier <$> (qualifiedName' <$> source))
+    qualifiedName' = qualifiedName . BC.split '/' . (BC.dropWhile (== '/')) . (BC.dropWhile (== '.')) . stripQuotes
+    stripQuotes = B.filter (/= (fromIntegral (ord '\"')))
 
     -- Imports with import clauses
     makeImportTerm1 loc from (Prelude.True, Just alias, symbols) = makeTerm loc (Declaration.QualifiedImport from alias symbols)
@@ -665,6 +677,10 @@ importStatement = makeImportTerm <$> symbol Grammar.ImportStatement <*> children
     rawIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source)
     makeNameAliasPair from (Just alias) = (from, alias)
     makeNameAliasPair from Nothing = (from, from)
+
+
+stripQuotes :: ByteString -> ByteString
+stripQuotes = B.filter (/= (fromIntegral (ord '\"')))
 
 debuggerStatement :: Assignment
 debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> (TypeScript.Syntax.Debugger <$ source)
@@ -709,16 +725,21 @@ ambientDeclaration :: Assignment
 ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> children (TypeScript.Syntax.AmbientDeclaration <$> term (choice [declaration, statementBlock]))
 
 exportStatement :: Assignment
-exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (TypeScript.Syntax.Export <$> (((\a b -> [a, b]) <$> term exportClause <*> term fromClause) <|> ((++) <$> manyTerm decorator <*> (pure <$> term (fromClause <|> exportClause <|> declaration <|> expression <|> identifier <|> importAlias')))))
+exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> (children (flip Declaration.QualifiedExportFrom <$> exportClause <*> term fromClause))
+  <|> makeTerm <$> symbol Grammar.ExportStatement <*> children (Declaration.QualifiedExport <$> exportClause)
+  <|> makeTerm <$> symbol Grammar.ExportStatement <*> children (Declaration.DefaultExport <$> contextualize decorator (term (declaration <|> expression <|> identifier <|> importAlias')))
+  where
+    exportClause = symbol Grammar.ExportClause *> children (many exportSymbol)
+    exportSymbol = symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> (Just <$> rawIdentifier))
+                 <|> symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> (pure Nothing))
+    makeNameAliasPair from (Just alias) = (from, alias)
+    makeNameAliasPair from Nothing = (from, from)
+    rawIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source)
+  -- <|> (makeExport2 <$> manyTerm decorator <*> emptyTerm <*> (pure <$> term (fromClause <|> exportClause <|> declaration <|> expression <|> identifier <|> importAlias')))))
+    -- makeExport2 decorators fromClause exportClause = Declaration.QualifiedExport fromClause exportClause
 
 fromClause :: Assignment
-fromClause = string
-
-exportClause :: Assignment
-exportClause = makeTerm <$> symbol Grammar.ExportClause <*> children (TypeScript.Syntax.ExportClause <$> manyTerm importExportSpecifier)
-
-importExportSpecifier :: Assignment
-importExportSpecifier = makeTerm <$> (symbol Grammar.ExportSpecifier <|> symbol Grammar.ImportSpecifier) <*> children (TypeScript.Syntax.ImportExportSpecifier <$> term identifier <*> (term identifier <|> emptyTerm))
+fromClause = makeTerm <$> symbol Grammar.String <*> (Syntax.Identifier . name . stripQuotes <$> source)
 
 propertySignature :: Assignment
 propertySignature = makePropertySignature <$> symbol Grammar.PropertySignature <*> children ((,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> (term typeAnnotation' <|> emptyTerm))

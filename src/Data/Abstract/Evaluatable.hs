@@ -6,20 +6,16 @@ module Data.Abstract.Evaluatable
 , module FreeVariables
 , module Value
 , MonadEvaluator(..)
-, require
-, load
 ) where
 
 import Control.Abstract.Addressable as Addressable
 import Control.Abstract.Analysis as Analysis
 import Control.Abstract.Value as Value
-import Data.Abstract.Environment
 import Data.Abstract.FreeVariables as FreeVariables
-import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Functor.Classes
 import Data.Proxy
-import Data.Semigroup
+import Data.Semigroup.Foldable
 import Data.Term
 import Prelude hiding (fail)
 import Prologue
@@ -42,7 +38,7 @@ instance Apply Evaluatable fs => Evaluatable (Union fs) where
 
 -- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
 instance Evaluatable s => Evaluatable (TermF s a) where
-  eval In{..} = eval termFOut
+  eval = eval . termFOut
 
 
 -- Instances
@@ -53,42 +49,17 @@ instance Evaluatable s => Evaluatable (TermF s a) where
 --   2. Each statement can affect the environment of later statements (e.g. by 'modify'-ing the environment); and
 --   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
-  eval []     = unit           -- Return unit value if this is an empty list of terms
-  eval [x]    = subtermValue x -- Return the value for the last term
-  eval (x:xs) = do
-    _ <- subtermValue x        -- Evaluate the head term
-    env <- getGlobalEnv        -- Get the global environment after evaluation
-                               -- since it might have been modified by the
-                               -- evaluation above ^.
+  -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
+  eval = maybe unit (runImperative . foldMap1 (Imperative . subtermValue)) . nonEmpty
 
-    -- Finally, evaluate the rest of the terms, but do so by calculating a new
-    -- environment each time where the free variables in those terms are bound
-    -- to the global environment.
-    localEnv (const (bindEnv (liftFreeVariables (freeVariables . subterm) xs) env)) (eval xs)
+-- | A 'Semigroup' providing an imperative context which extends the local environment with new bindings.
+newtype Imperative m a = Imperative { runImperative :: m a }
 
+instance MonadEnvironment value m => Semigroup (Imperative m a) where
+  Imperative a <> Imperative b = Imperative $ a *> do
+    env <- getGlobalEnv
+    localEnv (<> env) b
 
--- | Require/import another term/file and return an Effect.
---
--- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
-require :: ( MonadAnalysis term value m
-           , MonadValue term value m
-           )
-        => ModuleName
-        -> m (EnvironmentFor value)
-require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup name
-
--- | Load another term/file and return an Effect.
---
--- Always loads/evaluates.
-load :: ( MonadAnalysis term value m
-        , MonadValue term value m
-        )
-     => ModuleName
-     -> m (EnvironmentFor value)
-load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
-  where notFound = fail ("cannot load module: " <> show name)
-        evalAndCache e = do
-          v <- evaluateModule e
-          env <- environment v
-          modifyModuleTable (moduleTableInsert name env)
-          pure env
+instance MonadValue term value m => Monoid (Imperative m value) where
+  mempty = Imperative unit
+  mappend = (<>)

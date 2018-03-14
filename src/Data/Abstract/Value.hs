@@ -10,12 +10,11 @@ import qualified Data.Abstract.Type as Type
 import qualified Data.Set as Set
 import Data.Scientific (Scientific)
 import Prologue
-import Prelude hiding (Float, Integer, String, fail)
+import Prelude hiding (Float, Integer, String)
 import qualified Prelude
 
 type ValueConstructors location term
   = '[Closure location term
-    , Interface location
     , Unit
     , Boolean
     , Float
@@ -53,14 +52,6 @@ data Closure location term value = Closure [Name] term (Environment location val
 instance (Eq location, Eq term) => Eq1 (Closure location term) where liftEq = genericLiftEq
 instance (Ord location, Ord term) => Ord1 (Closure location term) where liftCompare = genericLiftCompare
 instance (Show location, Show term) => Show1 (Closure location term) where liftShowsPrec = genericLiftShowsPrec
-
--- | A program value consisting of the value of the program and it's enviornment of bindings.
-data Interface location value = Interface value (Environment location value)
-  deriving (Eq, Generic1, Ord, Show)
-
-instance (Eq location) => Eq1 (Interface location) where liftEq = genericLiftEq
-instance (Ord location) => Ord1 (Interface location) where liftCompare = genericLiftCompare
-instance (Show location) => Show1 (Interface location) where liftShowsPrec = genericLiftShowsPrec
 
 -- | The unit value. Typically used to represent the result of imperative statements.
 data Unit value = Unit
@@ -122,20 +113,23 @@ type StoreFor v = Store (LocationFor v) v
 -- | The cell for an abstract value type.
 type CellFor value = Cell (LocationFor value) value
 
+-- | The address set type for an abstract value type.
+type LiveFor value = Live (LocationFor value) value
+
 -- | The location type (the body of 'Address'es) which should be used for an abstract value type.
 type family LocationFor value :: * where
   LocationFor (Value location term) = location
   LocationFor Type.Type = Monovariant
 
 -- | Value types, e.g. closures, which can root a set of addresses.
-class ValueRoots l v | v -> l where
+class ValueRoots value where
   -- | Compute the set of addresses rooted by a given value.
-  valueRoots :: v -> Live l v
+  valueRoots :: value -> LiveFor value
 
-instance (FreeVariables term, Ord location) => ValueRoots location (Value location term) where
+instance (FreeVariables term, Ord location) => ValueRoots (Value location term) where
   valueRoots v
     | Just (Closure names body env) <- prjValue v = envRoots env (foldr Set.delete (freeVariables (body :: term)) names)
     | otherwise                                   = mempty
 
-instance ValueRoots Monovariant Type.Type where
+instance ValueRoots Type.Type where
   valueRoots _ = mempty

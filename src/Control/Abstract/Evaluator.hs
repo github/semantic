@@ -12,6 +12,7 @@ module Control.Abstract.Evaluator
 
 import Data.Abstract.Address
 import Data.Abstract.Configuration
+import Data.Abstract.FreeVariables
 import Data.Abstract.ModuleTable
 import Data.Abstract.Store
 import Data.Abstract.Value
@@ -40,6 +41,14 @@ class Monad m => MonadEnvironment value m | m -> value where
   getGlobalEnv :: m (EnvironmentFor value)
   -- | Set the global environment
   putGlobalEnv :: EnvironmentFor value -> m ()
+  withGlobalEnv :: EnvironmentFor value -> m a -> m a
+
+  -- | Add an export to the global export state.
+  addExport :: Name -> (Name, Maybe (Address (LocationFor value) value)) -> m ()
+  -- | Get the global export state.
+  getExports :: m (Map Name (Name, Maybe (Address (LocationFor value) value)))
+  -- | Sets the exports state to the given map for the lifetime of the given action.
+  withExports :: Map Name (Name, Maybe (Address (LocationFor value) value)) -> m a -> m a
 
   -- | Retrieve the local environment.
   askLocalEnv :: m (EnvironmentFor value)

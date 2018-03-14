@@ -9,7 +9,7 @@
   (WildcardImport
   { (TextElement)
   ->(TextElement) }
-    (Empty))
+    (Identifier))
   (QualifiedImport
   { (TextElement)
   ->(TextElement) }
