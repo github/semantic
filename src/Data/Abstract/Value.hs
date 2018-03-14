@@ -13,8 +13,8 @@ import Prologue
 import Prelude hiding (Float, Integer, String, Rational, fail)
 import qualified Prelude
 
-type ValueConstructors location term
-  = '[Closure location term
+type ValueConstructors location
+  = '[Closure location
     , Unit
     , Boolean
     , Float
@@ -27,19 +27,19 @@ type ValueConstructors location term
 
 -- | Open union of primitive values that terms can be evaluated to.
 --   Fix by another name.
-newtype Value location term = Value { deValue :: Union (ValueConstructors location term) (Value location term) }
+newtype Value location term = Value { deValue :: Union (ValueConstructors location) (Value location term) }
   deriving (Eq, Show, Ord)
 
 -- | Identical to 'inj', but wraps the resulting sub-entity in a 'Value'.
-injValue :: (f :< ValueConstructors location term) => f (Value location term) -> Value location term
+injValue :: (f :< ValueConstructors location) => f (Value location term) -> Value location term
 injValue = Value . inj
 
 -- | Identical to 'prj', but unwraps the argument out of its 'Value' wrapper.
-prjValue :: (f :< ValueConstructors location term) => Value location term -> Maybe (f (Value location term))
+prjValue :: (f :< ValueConstructors location) => Value location term -> Maybe (f (Value location term))
 prjValue = prj . deValue
 
 -- | Convenience function for projecting two values.
-prjPair :: ( f :< ValueConstructors loc term1 , g :< ValueConstructors loc term2)
+prjPair :: (f :< ValueConstructors loc , g :< ValueConstructors loc)
         => (Value loc term1, Value loc term2)
         -> Maybe (f (Value loc term1), g (Value loc term2))
 prjPair = bitraverse prjValue prjValue
@@ -47,12 +47,12 @@ prjPair = bitraverse prjValue prjValue
 -- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
 
 -- | A function value consisting of a list of parameters, the body of the function, and an environment of bindings captured by the body.
-data Closure location term value = Closure [Name] term (Environment location value)
+data Closure location value = Closure [Name] Int (Environment location value)
   deriving (Eq, Generic1, Ord, Show)
 
-instance (Eq location, Eq term) => Eq1 (Closure location term) where liftEq = genericLiftEq
-instance (Ord location, Ord term) => Ord1 (Closure location term) where liftCompare = genericLiftCompare
-instance (Show location, Show term) => Show1 (Closure location term) where liftShowsPrec = genericLiftShowsPrec
+instance Eq location => Eq1 (Closure location) where liftEq = genericLiftEq
+instance Ord location => Ord1 (Closure location) where liftCompare = genericLiftCompare
+instance Show location => Show1 (Closure location) where liftShowsPrec = genericLiftShowsPrec
 
 -- | The unit value. Typically used to represent the result of imperative statements.
 data Unit value = Unit
@@ -146,8 +146,8 @@ class ValueRoots value where
 
 instance Ord location => ValueRoots (Value location term) where
   valueRoots v
-    | Just (Closure _ body env) <- prjValue v = envAll env `const` (body :: term)
-    | otherwise                               = mempty
+    | Just (Closure _ _ env) <- prjValue v = envAll env
+    | otherwise                            = mempty
 
 instance ValueRoots Type.Type where
   valueRoots _ = mempty

@@ -184,16 +184,18 @@ instance ( FreeVariables term
 
         pair = (left, right)
 
-  abstract names (Subterm body _) = injValue . Closure names body . bindEnv (foldr Set.delete (freeVariables body) names) <$> askLocalEnv
+  abstract names (Subterm body _) = do
+    l <- label body
+    injValue . Closure names l . bindEnv (foldr Set.delete (freeVariables body) names) <$> askLocalEnv
 
   apply op params = do
-    Closure names body env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
+    Closure names l env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
     bindings <- foldr (\ (name, param) rest -> do
       v <- param
       a <- alloc name
       assign a v
       envInsert name a <$> rest) (pure env) (zip names params)
-    localEnv (mappend bindings) (evaluateTerm body)
+    localEnv (mappend bindings) (goto l >>= evaluateTerm)
 
   loop = fix
 
