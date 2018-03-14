@@ -179,9 +179,8 @@ instance Eq1 Symbol where liftEq = genericLiftEq
 instance Ord1 Symbol where liftCompare = genericLiftCompare
 instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Symbol
-instance Evaluatable Symbol
-
+instance Evaluatable Symbol where
+  eval (Symbol s) = symbol s
 
 newtype Regex a = Regex { regexContent :: ByteString }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)

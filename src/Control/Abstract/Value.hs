@@ -54,6 +54,10 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
   -- | Construct an abstract string value.
   string :: ByteString -> m value
 
+  -- | Construct a self-evaluating symbol value.
+  --   TODO: Should these be interned in some table to provide stronger uniqueness guarantees?
+  symbol :: ByteString -> m value
+
   -- | Construct a floating-point value.
   float :: Scientific -> m value
 
@@ -117,6 +121,7 @@ instance ( MonadAddressable location (Value location term) m
   boolean  = pure . injValue . Boolean
   string   = pure . injValue . Value.String
   float    = pure . injValue . Value.Float . Decimal
+  symbol   = pure . injValue . Value.Symbol
   rational = pure . injValue . Value.Rational . Ratio
 
   multiple = pure . injValue . Value.Tuple
@@ -196,13 +201,14 @@ instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue 
     ret <- localEnv (mappend env) body
     pure (Product tvars :-> ret)
 
-  unit      = pure Type.Unit
-  integer _ = pure Int
-  boolean _ = pure Bool
-  string _  = pure Type.String
-  float _   = pure Type.Float
+  unit       = pure Type.Unit
+  integer _  = pure Int
+  boolean _  = pure Bool
+  string _   = pure Type.String
+  float _    = pure Type.Float
+  symbol _   = pure Type.Symbol
   rational _ = pure Type.Rational
-  multiple  = pure . Type.Product
+  multiple   = pure . Type.Product
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 
