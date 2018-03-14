@@ -30,7 +30,7 @@ lookupOrAlloc :: ( FreeVariables term
                  )
                  => term
                  -> value
-                 -> Environment (LocationFor value) value
+                 -> EnvironmentFor value
                  -> m (Name, Address (LocationFor value) value)
 lookupOrAlloc term = let [name] = toList (freeVariables term) in
                          lookupOrAlloc' name
@@ -42,7 +42,7 @@ lookupOrAlloc' :: ( Semigroup (CellFor value)
                   )
                   => Name
                   -> value
-                  -> Environment (LocationFor value) value
+                  -> EnvironmentFor value
                   -> m (Name, Address (LocationFor value) value)
 lookupOrAlloc' name v env = do
   a <- maybe (alloc name) pure (envLookup name env)
