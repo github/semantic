@@ -146,8 +146,8 @@ class ValueRoots value where
 
 instance Ord location => ValueRoots (Value location term) where
   valueRoots v
-    | Just (Closure names body env) <- prjValue v = envAll (foldr envDelete env names) `const` (body :: term)
-    | otherwise                                   = mempty
+    | Just (Closure _ body env) <- prjValue v = envAll env `const` (body :: term)
+    | otherwise                               = mempty
 
 instance ValueRoots Type.Type where
   valueRoots _ = mempty
