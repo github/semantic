@@ -117,11 +117,11 @@ type CellFor value = Cell (LocationFor value) value
 type LiveFor value = Live (LocationFor value) value
 
 
-class Eq (LocationFor value) => AbstractValue value where
+class Ord (LocationFor value) => AbstractValue value where
   -- | The location type (the body of 'Address'es) which should be used for an abstract value type.
   type LocationFor value :: *
 
-instance Eq location => AbstractValue (Value location term) where
+instance Ord location => AbstractValue (Value location term) where
   type LocationFor (Value location term) = location
 
 instance AbstractValue Type.Type where
