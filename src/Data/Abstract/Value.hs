@@ -117,9 +117,9 @@ type CellFor value = Cell (LocationFor value) value
 type LiveFor value = Live (LocationFor value) value
 
 -- | The location type (the body of 'Address'es) which should be used for an abstract value type.
-type family LocationFor value :: * where
-  LocationFor (Value location term) = location
-  LocationFor Type.Type = Monovariant
+type family LocationFor value :: *
+type instance LocationFor (Value location term) = location
+type instance LocationFor Type.Type = Monovariant
 
 -- | Value types, e.g. closures, which can root a set of addresses.
 class ValueRoots value where
