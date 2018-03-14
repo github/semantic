@@ -73,14 +73,13 @@ deriving instance Member NonDetEff effects => MonadNonDet (Evaluating term value
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value (effects :: [* -> *])
-  = '[ Fail                                        -- Failure with an error message
-     , Reader (EnvironmentFor value)               -- Local environment (e.g. binding over a closure)
-     , State  (EnvironmentFor value)               -- Global (imperative) environment
-     , State  (StoreFor value)                     -- The heap
-     , Reader (ModuleTable term)                   -- Cache of unevaluated modules
-     , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
-
-     , State (Map Name (Name, Maybe (Address (LocationFor value) value))) -- Set of exports
+  = '[ Fail                                                                -- Failure with an error message
+     , Reader (EnvironmentFor value)                                       -- Local environment (e.g. binding over a closure)
+     , State  (EnvironmentFor value)                                       -- Global (imperative) environment
+     , State  (StoreFor value)                                             -- The heap
+     , Reader (ModuleTable term)                                           -- Cache of unevaluated modules
+     , State  (ModuleTable (EnvironmentFor value))                         -- Cache of evaluated modules
+     , State  (Map Name (Name, Maybe (Address (LocationFor value) value))) -- Set of exports
      ]
 
 instance Members '[State (Map Name (Name, Maybe (Address (LocationFor value) value))), Reader (EnvironmentFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
