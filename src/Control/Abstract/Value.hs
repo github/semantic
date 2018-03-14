@@ -205,7 +205,7 @@ instance ( MonadAddressable location (Value location term) m
     localEnv (mappend bindings) (evaluateTerm body)
 
 -- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
-instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue term Type m where
+instance (Alternative m, MonadAnalysis term (Type f) m, MonadFresh m) => MonadValue term (Type f) m where
   abstract names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
