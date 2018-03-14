@@ -15,10 +15,10 @@ import Data.Semigroup.Reducer
 import Prelude hiding (fail)
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Store.
-class (Monad m, Ord l, l ~ LocationFor value, Reducer value (Cell l value)) => MonadAddressable l value m where
-  deref :: Address l value -> m value
+class (Monad m, Ord location, location ~ LocationFor value, Reducer value (Cell location value)) => MonadAddressable location value m where
+  deref :: Address location value -> m value
 
-  alloc :: Name -> m (Address l value)
+  alloc :: Name -> m (Address location value)
 
 -- | Look up or allocate an address for a 'Name' free in a given term & assign it a given value, returning the 'Name' paired with the address.
 --
