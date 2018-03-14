@@ -13,21 +13,21 @@ import Prologue
 
 -- | Run an 'Effectful' computation to completion, interpreting each effect with some sensible defaults, and return the 'Final' result.
 run :: (Effectful m, RunEffects effects a) => m effects a -> Final effects a
-run = runEffects . lower
+run = Effect.run . runEffects . lower
 
 -- | A typeclass to run a computation to completion, interpreting each effect with some sensible defaults.
 class RunEffects effects a where
   -- | The final result type of the computation, factoring in the results of any effects, e.g. pairing 'State' results with the final state, wrapping 'Fail' results in 'Either', etc.
   type Final effects a
-  runEffects :: Eff effects a -> Final effects a
+  runEffects :: Eff effects a -> Eff '[] (Final effects a)
 
-instance (RunEffect effect1 a, RunEffects effects (Result effect1 a)) => RunEffects (effect1 ': effects) a where
-  type Final (effect1 ': effects) a = Final effects (Result effect1 a)
+instance (RunEffect effect1 a, RunEffects (effect2 ': effects) (Result effect1 a)) => RunEffects (effect1 ': effect2 ': effects) a where
+  type Final (effect1 ': effect2 ': effects) a = Final (effect2 ': effects) (Result effect1 a)
   runEffects = runEffects . runEffect
 
-instance RunEffects '[] a where
-  type Final '[] a = a
-  runEffects = Effect.run
+instance RunEffect effect a => RunEffects '[effect] a where
+  type Final '[effect] a = Result effect a
+  runEffects = runEffect
 
 
 -- | A typeclass to interpret a single effect with some sensible defaults (defined per-effect).
