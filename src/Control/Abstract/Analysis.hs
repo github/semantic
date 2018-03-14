@@ -67,19 +67,25 @@ load :: ( MonadAnalysis term value m
      => ModuleName
      -> m (EnvironmentFor value)
 load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
-  where notFound = fail ("cannot load module: " <> show name)
-        evalAndCache :: (MonadAnalysis term value m, Ord (LocationFor value)) => [term] -> m (EnvironmentFor value)
-        evalAndCache []     = pure mempty
-        evalAndCache (x:xs) = do
-          void $ evaluateModule x
-          env <- getGlobalEnv
-          exports <- getExports
-          -- TODO: If the set of exports is empty because no exports have been
-          -- defined, do we export all terms, or no terms? This behavior varies across
-          -- languages. We need better semantics rather than doing it ad-hoc.
-          let env' = if Map.null (unExports exports) then env else bindExports exports env
-          modifyModuleTable (moduleTableInsert name env')
-          (env' <>) <$> evalAndCache xs
+  where
+    notFound = fail ("cannot load module: " <> show name)
+    evalAndCache :: (MonadAnalysis term value m, Ord (LocationFor value)) => [term] -> m (EnvironmentFor value)
+    evalAndCache []     = pure mempty
+    evalAndCache (x:xs) = do
+      void $ evaluateModule x
+      env <- filterEnv <$> getExports <*> getGlobalEnv
+      modifyModuleTable (moduleTableInsert name env)
+      (env <>) <$> evalAndCache xs
+
+    -- TODO: If the set of exports is empty because no exports have been
+    -- defined, do we export all terms, or no terms? This behavior varies across
+    -- languages. We need better semantics rather than doing it ad-hoc.
+    filterEnv :: (Ord l) => Exports l a -> Environment l a -> Environment l a
+    filterEnv Exports{..} env
+      | Map.null unExports = env
+      | otherwise          = Environment $ Map.foldrWithKey maybeInsert mempty unExports
+      where maybeInsert name (alias, address) accum =
+              maybe accum (\v -> Map.insert alias v accum) (address <|> envLookup name env)
 
 -- | Lift a 'SubtermAlgebra' for an underlying analysis into a containing analysis. Use this when defining an analysis which can be composed onto other analyses to ensure that a call to 'analyzeTerm' occurs in the inner analysis and not the outer one.
 liftAnalyze :: ( Coercible (  m term value (effects :: [* -> *]) value) (t m term value effects value)

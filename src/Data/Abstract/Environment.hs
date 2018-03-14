@@ -33,12 +33,6 @@ bindEnv names env = foldMap envForName names
 exportInsert :: Name -> (Name, Maybe (Address l a)) -> Exports l a -> Exports l a
 exportInsert name value = Exports . Map.insert name value . unExports
 
-bindExports :: (Ord l) => Exports l a -> Environment l a -> Environment l a
-bindExports Exports{..} env = Environment pairs
-  where
-    pairs = Map.foldrWithKey (\name (alias, address) accum ->
-      maybe accum (\v -> Map.insert alias v accum) (address <|> envLookup name env)) mempty unExports
-
 -- | Retrieve the 'Live' set of addresses to which the given free variable names are bound.
 --
 --   Unbound names are silently dropped.
