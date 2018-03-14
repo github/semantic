@@ -5,8 +5,6 @@ import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
 import qualified Data.Map as Map
-import qualified Data.ByteString as B
-import qualified Data.List.NonEmpty as NonEmpty
 import Prologue
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }

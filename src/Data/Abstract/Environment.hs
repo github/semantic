@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving #-}
 module Data.Abstract.Environment where
 
 import Prologue
@@ -6,11 +6,14 @@ import Data.Abstract.Address
 import Data.Abstract.FreeVariables
 import Data.Abstract.Live
 import qualified Data.Map as Map
+import Data.Semigroup.Reducer
 import qualified Data.Set as Set
 
 -- | A map of names to addresses that represents the evaluation environment.
 newtype Environment l a = Environment { unEnvironment :: Map.Map Name (Address l a) }
   deriving (Eq, Foldable, Functor, Generic1, Monoid, Ord, Semigroup, Show, Traversable)
+
+deriving instance Reducer (Name, Address l a) (Environment l a)
 
 -- | Lookup a 'Name' in the environment.
 envLookup :: Name -> Environment l a -> Maybe (Address l a)
@@ -19,9 +22,6 @@ envLookup k = Map.lookup k . unEnvironment
 -- | Insert a 'Name' in the environment.
 envInsert :: Name -> Address l a -> Environment l a -> Environment l a
 envInsert name value (Environment m) = Environment (Map.insert name value m)
-
-envUnion :: Environment l a -> Environment l a -> Environment l a
-envUnion (Environment e1) (Environment e2) = Environment $ Map.union e1 e2
 
 bindEnv :: (Ord l, Foldable t) => t Name -> Environment l a -> Environment l a
 bindEnv names env = foldMap envForName names

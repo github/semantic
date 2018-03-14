@@ -2,6 +2,8 @@
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , evaluateTerm
+, require
+, load
 , liftAnalyze
 , runAnalysis
 , module X
@@ -17,7 +19,12 @@ import Control.Monad.Effect.Fresh as X
 import Control.Monad.Effect.NonDet as X
 import Control.Monad.Effect.Reader as X
 import Control.Monad.Effect.State as X
+import Data.Abstract.Environment
+import Data.Abstract.ModuleTable
+import Data.Abstract.Value
 import Data.Coerce
+import qualified Data.Map as Map
+import Prelude hiding (fail)
 import Prologue
 
 -- | A 'Monad' in which one can evaluate some specific term type to some specific value type.
@@ -39,6 +46,38 @@ class (MonadEvaluator term value m, Recursive term) => MonadAnalysis term value 
 --   This should always be called when e.g. evaluating the bodies of closures instead of explicitly folding either 'eval' or 'analyzeTerm' over subterms, except in 'MonadAnalysis' instances themselves. On the other hand, top-level evaluation should be performed using 'evaluateModule'.
 evaluateTerm :: MonadAnalysis term value m => term -> m value
 evaluateTerm = foldSubterms analyzeTerm
+
+
+-- | Require/import another term/file and return an Effect.
+--
+-- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
+require :: ( MonadAnalysis term value m
+           , Ord (LocationFor value)
+           )
+        => ModuleName
+        -> m (EnvironmentFor value)
+require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup name
+
+-- | Load another term/file and return an Effect.
+--
+-- Always loads/evaluates.
+load :: ( MonadAnalysis term value m
+        , Ord (LocationFor value)
+        )
+     => ModuleName
+     -> m (EnvironmentFor value)
+load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
+  where notFound = fail ("cannot load module: " <> show name)
+        evalAndCache e = do
+          void $ evaluateModule e
+          -- TODO: If the set of exports is empty because no exports have been
+          -- defined, do we export all terms, or no terms? This behavior varies across
+          -- languages. We need better semantics rather than doing it ad-hoc.
+          env <- getGlobalEnv
+          exports <- getExports
+          let env' = if Map.null exports then env else bindExports exports env
+          modifyModuleTable (moduleTableInsert name env')
+          pure env'
 
 
 -- | Lift a 'SubtermAlgebra' for an underlying analysis into a containing analysis. Use this when defining an analysis which can be composed onto other analyses to ensure that a call to 'analyzeTerm' occurs in the inner analysis and not the outer one.

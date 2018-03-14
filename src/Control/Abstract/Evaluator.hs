@@ -13,7 +13,6 @@ module Control.Abstract.Evaluator
 import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.FreeVariables
-import Data.Abstract.Live
 import Data.Abstract.ModuleTable
 import Data.Abstract.Store
 import Data.Abstract.Value
