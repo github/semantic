@@ -46,7 +46,7 @@ prjPair = bitraverse prjValue prjValue
 -- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
 
 -- | A function value consisting of a list of parameters, the body of the function, and an environment of bindings captured by the body.
-data Closure location term value = Closure [Name] term (Environment location value)
+data Closure location term value = Closure [Name] term (Environment (Address location value))
   deriving (Eq, Generic1, Ord, Show)
 
 instance (Eq location, Eq term) => Eq1 (Closure location term) where liftEq = genericLiftEq
@@ -105,7 +105,7 @@ instance Ord1 Tuple where liftCompare = genericLiftCompare
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
 -- | The environment for an abstract value type.
-type EnvironmentFor v = Environment (LocationFor v) v
+type EnvironmentFor v = Environment (Address (LocationFor v) v)
 
 -- | The store for an abstract value type.
 type StoreFor v = Store (LocationFor v) v
