@@ -22,12 +22,11 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Function where
   eval Function{..} = do
-    env <- askLocalEnv
-    let params = toList (liftFreeVariables (freeVariables . subterm) functionParameters)
-    v <- abstract params functionBody
-    (name, addr) <- lookupOrAlloc (subterm functionName) v env
+    (v, addr) <- letrec name (abstract (paramNames functionParameters) functionBody)
     modifyGlobalEnv (envInsert name addr)
     pure v
+    where paramNames = foldMap (pure . freeVariable . subterm)
+          name = freeVariable (subterm functionName)
 
 
 data Method a = Method { methodContext :: ![a], methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
@@ -44,13 +43,12 @@ instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 -- local environment.
 instance Evaluatable Method where
   eval Method{..} = do
-    env <- askLocalEnv
-    let params = toList (liftFreeVariables (freeVariables . subterm) methodParameters)
-    v <- abstract params methodBody
-
-    (name, addr) <- lookupOrAlloc (subterm methodName) v env
+    (v, addr) <- letrec name (abstract (paramNames methodParameters) methodBody)
     modifyGlobalEnv (envInsert name addr)
     pure v
+    where paramNames = foldMap (pure . freeVariable . subterm)
+          name = freeVariable (subterm methodName)
+
 
 -- | A method signature in TypeScript or a method spec in Go.
 data MethodSignature a = MethodSignature { _methodSignatureContext :: ![a], _methodSignatureName :: !a, _methodSignatureParameters :: ![a] }
