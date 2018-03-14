@@ -67,6 +67,9 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
   -- | Evaluate an application (like a function call).
   apply :: value -> [m value] -> m value
 
+  -- | Primitive looping combinator, approximately equivalent to 'fix'. This should be used in place of direct recursion, as it allows abstraction over recursion.
+  --
+  --   The function argument takes an action which recurs through the loop.
   loop :: (m value -> m value) -> m value
 
 -- | Attempt to extract a 'Prelude.Bool' from a given value.
