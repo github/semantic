@@ -9,6 +9,7 @@ import Data.Abstract.Number as Number
 import Data.Abstract.Type as Type
 import Data.Abstract.Value as Value
 import Data.Scientific (Scientific)
+import qualified Data.Set as Set
 import Prelude hiding (fail)
 import Prologue
 
@@ -183,7 +184,7 @@ instance ( FreeVariables term
 
         pair = (left, right)
 
-  abstract names (Subterm body _) = injValue . Closure names body . bindEnv (freeVariables body) <$> askLocalEnv
+  abstract names (Subterm body _) = injValue . Closure names body . bindEnv (foldr Set.delete (freeVariables body) names) <$> askLocalEnv
 
   apply op params = do
     Closure names body env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
