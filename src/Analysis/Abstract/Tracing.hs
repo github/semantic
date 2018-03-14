@@ -17,6 +17,7 @@ import Prologue hiding (trace)
 newtype Tracing (trace :: * -> *) m term value (effects :: [* -> *]) a = Tracing (m term value effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
+deriving instance MonadControl term (m term value effects) => MonadControl term (Tracing trace m term value effects)
 deriving instance MonadEnvironment value (m term value effects) => MonadEnvironment value (Tracing trace m term value effects)
 deriving instance MonadStore value (m term value effects) => MonadStore value (Tracing trace m term value effects)
 deriving instance MonadModuleTable term value (m term value effects) => MonadModuleTable term value (Tracing trace m term value effects)

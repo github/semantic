@@ -12,6 +12,7 @@ import Prologue
 newtype DeadCode m term value (effects :: [* -> *]) a = DeadCode (m term value effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
+deriving instance MonadControl term (m term value effects) => MonadControl term (DeadCode m term value effects)
 deriving instance MonadEnvironment value (m term value effects) => MonadEnvironment value (DeadCode m term value effects)
 deriving instance MonadStore value (m term value effects) => MonadStore value (DeadCode m term value effects)
 deriving instance MonadModuleTable term value (m term value effects) => MonadModuleTable term value (DeadCode m term value effects)
