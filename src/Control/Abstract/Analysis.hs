@@ -99,4 +99,4 @@ runAnalysis :: ( Effectful m
                )
             => m effects a
             -> Final effects a
-runAnalysis = run
+runAnalysis = runEffects . lower
