@@ -259,6 +259,8 @@ instance Evaluatable DefaultExport where
 
 
 -- | Qualified Import declarations (symbols are qualified in calling environment).
+--
+-- If the list of symbols is empty copy and qualify everything to the calling environment.
 data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: !a, qualifiedImportAlias :: !a, qualifiedImportSymbols :: ![(Name, Name)]}
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
@@ -275,15 +277,15 @@ instance Evaluatable QualifiedImport where
     where
       prefix = freeVariable (subterm alias)
       symbols = Map.fromList xs
-      copy = if Map.null symbols then qualifyInsert else directInsert
-      qualifyInsert k v rest = envInsert (prefix <> k) v rest
-      directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v rest) (Map.lookup k symbols)
+      copy = if Map.null symbols then copyAll else copySymbols
+      copyAll k v rest = envInsert (prefix <> k) v rest
+      copySymbols k v rest = maybe rest (\symAlias -> envInsert (prefix <> symAlias) v rest) (Map.lookup k symbols)
 
 
--- | Import declarations (symbols are added directly to the calling env).
+-- | Import declarations (symbols are added directly to the calling environment).
 --
--- If symbols is empty, just import the module for its side effects.
-data Import a = Import { importFrom :: !a, importSymbols :: ![(Name, Name)] }
+-- If the list of symbols is empty copy everything to the calling environment.
+data Import a = Import { importFrom :: !a, importSymbols :: ![(Name, Name)], importWildcardToken :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Import where liftEq = genericLiftEq
@@ -291,31 +293,29 @@ instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
-  eval (Import from xs) = do
+  eval (Import from xs _) = do
     let moduleName = freeVariable (subterm from)
     importedEnv <- withGlobalEnv mempty (require moduleName)
-    modifyGlobalEnv (flip (Map.foldrWithKey directInsert) (unEnvironment importedEnv))
+    modifyGlobalEnv (flip (Map.foldrWithKey copy) (unEnvironment importedEnv))
     unit
     where
       symbols = Map.fromList xs
-      directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v rest) (Map.lookup k symbols)
+      copy = if Map.null symbols then copyAll else copySymbols
+      copyAll = envInsert
+      copySymbols k v rest = maybe rest (\symAlias -> envInsert symAlias v rest) (Map.lookup k symbols)
 
-
--- | A wildcard import (all symbols are added directly to the calling env)
---
--- Import a module updating the importing environments.
-data WildcardImport a = WildcardImport { wildcardImportFrom :: !a, wildcardImportToken :: !a }
+-- | Side effect only imports (no symbols made available to the calling environment).
+data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: !a, sideEffectImportToken :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
-instance Eq1 WildcardImport where liftEq = genericLiftEq
-instance Ord1 WildcardImport where liftCompare = genericLiftCompare
-instance Show1 WildcardImport where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 SideEffectImport where liftEq = genericLiftEq
+instance Ord1 SideEffectImport where liftCompare = genericLiftCompare
+instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable WildcardImport where
-  eval (WildcardImport from _) = do
+instance Evaluatable SideEffectImport where
+  eval (SideEffectImport from _) = do
     let moduleName = freeVariable (subterm from)
-    importedEnv <- withGlobalEnv mempty (require moduleName)
-    modifyGlobalEnv (flip (Map.foldrWithKey envInsert) (unEnvironment importedEnv))
+    void $ withGlobalEnv mempty (require moduleName)
     unit
 
 
