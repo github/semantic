@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses, TypeFamilies, TypeFamilyDependencies #-}
+{-# LANGUAGE MultiParamTypeClasses, TypeFamilyDependencies #-}
 module Data.Abstract.Address where
 
 import Data.Abstract.FreeVariables
