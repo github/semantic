@@ -77,7 +77,7 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
 toBool :: MonadValue term value m => value -> m Bool
 toBool v = ifthenelse v (pure True) (pure False)
 
-forLoop :: MonadValue term value m
+forLoop :: (MonadAddressable (LocationFor value) value m, MonadEnvironment value m, MonadStore value m, MonadValue term value m)
         => m value -- | Initial statement
         -> m value -- | Condition
         -> m value -- | Increment/stepper
@@ -89,17 +89,24 @@ forLoop initial cond step body = do
   localEnv (mappend env) (while cond (body *> step))
 
 -- | The fundamental looping primitive, built on top of ifthenelse.
-while :: MonadValue term value m => m value -> m value -> m value
-while cond body = do
+while :: (MonadAddressable (LocationFor value) value m, MonadEnvironment value m, MonadStore value m, MonadValue term value m) => m value -> m value -> m value
+while cond body = loop $ do
   this <- cond
-  ifthenelse this (body *> while cond body) unit
+  ifthenelse this (body *> continue) unit
 
 -- | Do-while loop, built on top of while.
-doWhile :: MonadValue term value m => m value -> m value -> m value
-doWhile body cond = do
-  void body
+doWhile :: (MonadAddressable (LocationFor value) value m, MonadEnvironment value m, MonadStore value m, MonadValue term value m) => m value -> m value -> m value
+doWhile body cond = loop $ body *> do
   this <- cond
-  ifthenelse this (doWhile body cond) unit
+  ifthenelse this continue unit
+
+loop :: (MonadAddressable (LocationFor value) value m, MonadEnvironment value m, MonadStore value m) => m value -> m value
+loop = letrec (name "loop")
+
+continue :: (MonadAddressable (LocationFor value) value m, MonadEnvironment value m, MonadStore value m, MonadValue term value m) => m value
+continue = do
+  env <- askLocalEnv
+  maybe (fail "free loop variable") deref (envLookup (name "loop") env)
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( MonadAddressable location (Value location term) m
