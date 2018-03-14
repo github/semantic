@@ -118,7 +118,7 @@ loop :: ( MonadAddressable (LocationFor value) value m
         )
      => m value
      -> m value
-loop = letrec (name "loop")
+loop = fmap fst . letrec (name "loop")
 
 continue :: ( MonadAddressable (LocationFor value) value m
             , MonadEnvironment value m

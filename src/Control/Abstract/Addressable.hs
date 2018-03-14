@@ -56,12 +56,12 @@ letrec :: ( MonadAddressable (LocationFor value) value m
           )
        => Name
        -> m value
-       -> m value
+       -> m (value, Address (LocationFor value) value)
 letrec name body = do
   addr <- alloc name
   v <- localEnv (envInsert name addr) body
   assign addr v
-  pure v
+  pure (v, addr)
 
 
 -- Instances
