@@ -23,6 +23,9 @@ envLookup k = Map.lookup k . unEnvironment
 envInsert :: Name -> Address l a -> Environment (Address l a) -> Environment (Address l a)
 envInsert name value (Environment m) = Environment (Map.insert name value m)
 
+envDelete :: Name -> Environment (Address l a) -> Environment (Address l a)
+envDelete name = Environment . Map.delete name . unEnvironment
+
 bindEnv :: (Ord l, Foldable t) => t Name -> Environment (Address l a) -> Environment (Address l a)
 bindEnv names env = foldMap envForName names
   where envForName name = maybe mempty (curry unit name) (envLookup name env)
