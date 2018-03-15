@@ -1,19 +1,12 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, OverloadedStrings #-}
-module Integration.Spec where
+module Integration.Spec (spec) where
 
-import qualified Data.ByteString as B
 import Data.Foldable (find, traverse_)
-import Data.Functor.Both
 import Data.List (union, concat, transpose)
-import Data.Maybe (fromMaybe)
-import Data.Semigroup ((<>))
-import qualified Data.Text as T
-import Data.Text.Encoding (decodeUtf8)
-import System.FilePath
+import qualified Data.ByteString as B
 import System.FilePath.Glob
+
 import SpecHelpers
-import Test.Hspec (Spec, describe, it, SpecWith, runIO, parallel, pendingWith)
-import Test.Hspec.Expectations.Pretty
+
 
 spec :: Spec
 spec = parallel $ do

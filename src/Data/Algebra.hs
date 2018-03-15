@@ -6,6 +6,7 @@ module Data.Algebra
 , OpenRAlgebra
 , Subterm(..)
 , SubtermAlgebra
+, embedSubterm
 , foldSubterms
 , fToR
 , fToOpenR
@@ -13,7 +14,13 @@ module Data.Algebra
 , openFToOpenR
 ) where
 
-import Data.Functor.Foldable (Base, Recursive(project))
+import Data.Bifunctor
+import Data.Functor.Classes.Generic as X
+import Data.Functor.Foldable ( Base
+                             , Corecursive(embed)
+                             , Recursive(project)
+                             )
+import GHC.Generics
 
 -- | An F-algebra on some 'Recursive' type @t@.
 --
@@ -41,7 +48,14 @@ type OpenRAlgebra f t a = forall b . (b -> (t, a)) -> f b -> a
 
 -- | A subterm and its computed value, used in 'SubtermAlgebra'.
 data Subterm t a = Subterm { subterm :: !t, subtermValue :: !a }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
+
+instance Bifunctor Subterm where
+  bimap f g (Subterm a b) = Subterm (f a) (g b)
+
+instance Eq t => Eq1 (Subterm t) where liftEq = genericLiftEq
+instance Ord t => Ord1 (Subterm t) where liftCompare = genericLiftCompare
+instance Show t => Show1 (Subterm t) where liftShowsPrec = genericLiftShowsPrec
 
 -- | Like an R-algebra, but using 'Subterm' to label the fields instead of an anonymous pair.
 type SubtermAlgebra f t a = f (Subterm t a) -> a
@@ -51,6 +65,9 @@ type SubtermAlgebra f t a = f (Subterm t a) -> a
 foldSubterms :: Recursive t => SubtermAlgebra (Base t) t a -> t -> a
 foldSubterms algebra = go where go = algebra . fmap (Subterm <*> go) . project
 
+-- | Extract a term from said term's 'Base' functor populated with 'Subterm' fields.
+embedSubterm :: Corecursive t => Base t (Subterm t a) -> t
+embedSubterm e = embed (subterm <$> e)
 
 -- | Promote an 'FAlgebra' into an 'RAlgebra' (by dropping the original parameter).
 fToR :: Functor (Base t) => FAlgebra (Base t) a -> RAlgebra (Base t) t a

@@ -27,7 +27,7 @@ buildCallGraph = foldSubterms callGraphAlgebra
 
 -- | Render a 'CallGraph' to a 'ByteString' in DOT notation.
 renderCallGraph :: CallGraph -> ByteString
-renderCallGraph = export (defaultStyle id) . unCallGraph
+renderCallGraph = export (defaultStyle friendlyName) . unCallGraph
 
 
 -- | Types which contribute to a 'CallGraph'. There is exactly one instance of this typeclass; customizing the 'CallGraph's for a new type is done by defining an instance of 'CustomCallGraphAlgebra' instead.

@@ -1,25 +1,23 @@
 (Program
   (Hash
-  {+(KeyValue
-    {+(Symbol)+}
-    {+(TextElement)+})+}
-  {+(KeyValue
-    {+(Symbol)+}
-    {+(Integer)+})+}
+    (KeyValue
+    { (Identifier)
+    ->(Symbol) }
+    { (TextElement)
+    ->(TextElement) })
+    (KeyValue
+    { (Identifier)
+    ->(Symbol) }
+    { (Integer)
+    ->(Integer) })
     (KeyValue
     { (Identifier)
     ->(TextElement) }
-    { (TextElement)
+    { (Boolean)
     ->(Boolean) })
   {+(KeyValue
     {+(Symbol)+}
-    {+(Integer)+})+}
-  {-(KeyValue
-    {-(Identifier)-}
-    {-(Integer)-})-}
-  {-(KeyValue
-    {-(Identifier)-}
-    {-(Boolean)-})-})
+    {+(Integer)+})+})
 {+(Hash)+}
 {+(Hash
   {+(Context

@@ -1,1 +1,13 @@
-(Program(Function(Empty)(Empty)(Identifier)((VariableDeclaration(Assignment(Empty)(Identifier)(Float)))(Yield(Identifier)))))
+(Program
+  (Function
+    (Empty)
+    (Empty)
+    (Identifier)
+    (
+      (VariableDeclaration
+        (Assignment
+          (Empty)
+          (Identifier)
+          (Float)))
+      (Yield
+        (Identifier)))))

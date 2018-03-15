@@ -1,20 +1,20 @@
-{-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables, TypeApplications #-}
+{-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables #-}
 module Data.Syntax where
 
-import qualified Assigning.Assignment as Assignment
 import Control.Monad.Fail
 import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Data.AST
-import Data.ByteString.Char8 (unpack)
-import qualified Data.Error as Error
 import Data.Range
 import Data.Record
+import qualified Data.Set as Set
 import Data.Span
 import Data.Term
 import Diffing.Algorithm hiding (Empty)
 import Prelude hiding (fail)
 import Prologue
+import qualified Assigning.Assignment as Assignment
+import qualified Data.Error as Error
 
 -- Combinators
 
@@ -100,7 +100,7 @@ infixContext context left right operators = uncurry (&) <$> postContextualizeThr
 -- Common
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
-newtype Identifier a = Identifier ByteString
+newtype Identifier a = Identifier Name
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Identifier where liftEq = genericLiftEq
@@ -108,10 +108,11 @@ instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Identifier where
-  eval (Identifier name) = lookupWith deref name >>= maybe (fail ("free variable: " <> unpack name)) pure
+  eval (Identifier name) = lookupWith deref name >>= maybe (fail ("free variable: " <> show name)) pure
 
 instance FreeVariables1 Identifier where
-  liftFreeVariables _ (Identifier x) = point x
+  liftFreeVariables _ (Identifier x) = Set.singleton x
+
 
 newtype Program a = Program [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -121,20 +122,11 @@ instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Program where
-  eval (Program xs) = eval' xs
-    where
-      interface val = pure val -- inj . Value.Interface val <$> askLocalEnv
-
-      eval' [] = unit >>= interface
-      eval' [x] = subtermValue x >>= interface
-      eval' (x:xs) = do
-        _ <- subtermValue x
-        env <- getGlobalEnv
-        localEnv (envUnion env) (eval' xs)
+  eval (Program xs) = eval xs
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 AccessibilityModifier where liftEq = genericLiftEq
 instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare

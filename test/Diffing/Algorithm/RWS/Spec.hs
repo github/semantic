@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 module Diffing.Algorithm.RWS.Spec where
 
+import Data.Abstract.FreeVariables
 import Analysis.Decorator
 import Data.Array.IArray
 import Data.Bifunctor
@@ -36,7 +37,7 @@ spec = parallel $ do
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (wrap (stripTerm <$> tas)), Just (wrap (stripTerm <$> tbs)))
 
     it "produces unbiased insertions within branches" $
-      let (a, b) = (decorate (termIn Nil (inj [ termIn Nil (inj (Syntax.Identifier "a")) ])), decorate (termIn Nil (inj [ termIn Nil (inj (Syntax.Identifier "b")) ]))) in
+      let (a, b) = (decorate (termIn Nil (inj [ termIn Nil (inj (Syntax.Identifier (name "a"))) ])), decorate (termIn Nil (inj [ termIn Nil (inj (Syntax.Identifier (name "b"))) ]))) in
       fmap (bimap stripTerm stripTerm) (rws comparableTerms (equalTerms comparableTerms) [ b ] [ a, b ]) `shouldBe` fmap (bimap stripTerm stripTerm) [ That a, These b b ]
 
   where decorate = defaultFeatureVectorDecorator constructorNameAndConstantFields

@@ -1,4 +1,2 @@
 (Program
-  (MemberAccess
-    (Identifier)
-    (Identifier)))
+  (Identifier))

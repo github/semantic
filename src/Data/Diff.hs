@@ -22,7 +22,7 @@ import Data.Aeson
 import Data.Bifoldable
 import Data.Bifunctor
 import Data.Bitraversable
-import Data.Foldable (asum, toList)
+import Data.Foldable (asum)
 import Data.Functor.Classes
 import Data.Functor.Foldable hiding (fold)
 import Data.JSON.Fields
@@ -82,15 +82,10 @@ merging :: Functor syntax => Term syntax ann -> Diff syntax ann ann
 merging = cata (\ (In ann syntax) -> mergeF (In (ann, ann) syntax))
 
 
-diffPatch :: Diff syntax ann1 ann2 -> Maybe (Patch (TermF syntax ann1 (Diff syntax ann1 ann2)) (TermF syntax ann2 (Diff syntax ann1 ann2)))
-diffPatch diff = case unDiff diff of
-  Patch patch -> Just patch
-  _ -> Nothing
-
 diffPatches :: (Foldable syntax, Functor syntax) => Diff syntax ann1 ann2 -> [Patch (TermF syntax ann1 (Diff syntax ann1 ann2)) (TermF syntax ann2 (Diff syntax ann1 ann2))]
 diffPatches = para $ \ diff -> case diff of
-  Patch patch -> bimap (fmap fst) (fmap fst) patch : bifoldMap (foldMap (toList . diffPatch . fst)) (foldMap (toList . diffPatch . fst)) patch
-  Merge merge ->                                                foldMap (toList . diffPatch . fst)  merge
+  Patch patch -> bimap (fmap fst) (fmap fst) patch : bifoldMap (foldMap snd) (foldMap snd) patch
+  Merge merge -> foldMap snd merge
 
 
 -- | Recover the before state of a diff.

@@ -1,18 +1,23 @@
 (Program
   (Module
     (Identifier))
-  (Import
-  { (TextElement)
-  ->(TextElement) }
-    (Empty))
-  (Import
-  { (TextElement)
-  ->(TextElement) }
-    (Empty))
-  (Import
-  { (TextElement)
-  ->(TextElement) }
-    (Identifier))
+{+(QualifiedImport
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+{+(WildcardImport
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+  (QualifiedImport
+  { (Identifier)
+  ->(Identifier) }
+  { (Identifier)
+  ->(Identifier) })
+{-(WildcardImport
+  {-(Identifier)-}
+  {-(Identifier)-})-}
+{-(QualifiedImport
+  {-(Identifier)-}
+  {-(Identifier)-})-}
   (Function
     (Empty)
     (Identifier)

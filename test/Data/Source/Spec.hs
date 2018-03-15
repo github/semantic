@@ -1,4 +1,4 @@
-module Data.Source.Spec where
+module Data.Source.Spec (spec) where
 
 import Data.Char (chr)
 import Data.Functor.Listable
