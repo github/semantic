@@ -275,9 +275,9 @@ instance Evaluatable QualifiedImport where
     where
       prefix = freeVariable (subterm alias)
       symbols = Map.fromList xs
-      copy = if Map.null symbols then copyAll else copySymbols
-      copyAll k v rest = envInsert (prefix <> k) v rest
-      copySymbols k v rest = maybe rest (\symAlias -> envInsert (prefix <> symAlias) v rest) (Map.lookup k symbols)
+      copy = if Map.null symbols then insert else maybeInsert
+      insert sym = envInsert (prefix <> sym)
+      maybeInsert sym v env = maybe env (\symAlias -> insert symAlias v env) (Map.lookup sym symbols)
 
 
 -- | Import declarations (symbols are added directly to the calling environment).
@@ -298,9 +298,8 @@ instance Evaluatable Import where
     unit
     where
       symbols = Map.fromList xs
-      copy = if Map.null symbols then copyAll else copySymbols
-      copyAll = envInsert
-      copySymbols k v rest = maybe rest (\symAlias -> envInsert symAlias v rest) (Map.lookup k symbols)
+      copy = if Map.null symbols then envInsert else maybeInsert
+      maybeInsert k v env = maybe env (\symAlias -> envInsert symAlias v env) (Map.lookup k symbols)
 
 -- | Side effect only imports (no symbols made available to the calling environment).
 data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: !a, sideEffectImportToken :: !a }
