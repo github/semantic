@@ -29,8 +29,8 @@ spec = parallel $ do
     addr = Address . Precise
     fixtures = "test/fixtures/ruby/analysis/"
     evaluate entry = snd <$> evaluate' entry
-    evaluate' entry = fst . fst . fst <$>
-      evaluateFiles @RubyValue rubyParser
+    evaluate' entry = fst . fst . fst . fst <$>
+      evaluateFiles rubyParser
       [ fixtures <> entry
       , fixtures <> "foo.rb"
       ]
