@@ -107,6 +107,7 @@ modifyModuleTable f = do
   putModuleTable $! f table
 
 
+-- | The type of labels.
 type Label = Int
 
 class Monad m => MonadControl term m where
