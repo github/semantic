@@ -34,8 +34,8 @@ bindEnv :: (Ord l, Foldable t) => t Name -> Environment l a -> Environment l a
 bindEnv names env = foldMap envForName names
   where envForName name = maybe mempty (curry unit name) (envLookup name env)
 
-exportInsert :: Name -> (Name, Maybe (Address l a)) -> Exports l a -> Exports l a
-exportInsert name value = Exports . Map.insert name value . unExports
+exportInsert :: Name -> Name -> Maybe (Address l a) -> Exports l a -> Exports l a
+exportInsert name alias address = Exports . Map.insert name (alias, address) . unExports
 
 -- | Retrieve the 'Live' set of addresses to which the given free variable names are bound.
 --

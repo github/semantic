@@ -70,7 +70,7 @@ modifyExports f = do
 
 -- | Add an export to the global export state.
 addExport :: MonadEnvironment value m => Name -> Name -> Maybe (Address (LocationFor value) value) -> m ()
-addExport name alias address = modifyExports (exportInsert name (alias, address))
+addExport name alias = modifyExports . exportInsert name alias
 
 -- | A 'Monad' abstracting a heap of values.
 class Monad m => MonadStore value m | m -> value where
