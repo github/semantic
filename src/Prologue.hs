@@ -82,4 +82,4 @@ maybeM f = maybe f pure
 
 -- | Either extract the 'Just' of a 'Maybe' or invoke 'fail' with the provided string.
 maybeFail :: MonadFail m => String -> Maybe a -> m a
-maybeFail s = maybeFail (X.fail s)
+maybeFail s = maybeM (X.fail s)
