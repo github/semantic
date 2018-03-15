@@ -9,9 +9,9 @@ import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
 import Data.Abstract.Value
-import Data.Monoid (Alt(..))
 import Data.Semigroup.Reducer
 import Prelude hiding (fail)
+import Prologue
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Heap.
 class (Monad m, Ord l, l ~ LocationFor value, Reducer value (Cell l value)) => MonadAddressable l value m where
@@ -58,10 +58,6 @@ instance (Alternative m, LocationFor value ~ Monovariant, MonadFail m, MonadHeap
 -- | Dereference the given 'Address' in the heap, using the supplied function to act on the cell, or failing if the address is uninitialized.
 derefWith :: (MonadFail m, MonadHeap value m, Ord (LocationFor value)) => (CellFor value -> m a) -> Address (LocationFor value) value -> m a
 derefWith with = maybe uninitializedAddress with <=< lookupHeap
-
--- | Fold a collection by mapping each element onto an 'Alternative' action.
-foldMapA :: (Alternative m, Foldable t) => (b -> m a) -> t b -> m a
-foldMapA f = getAlt . foldMap (Alt . f)
 
 -- | Fail with a message denoting an uninitialized address (i.e. one which was 'alloc'ated, but never 'assign'ed a value before being 'deref'erenced).
 uninitializedAddress :: MonadFail m => m a
