@@ -9,9 +9,6 @@ module Language.TypeScript.Assignment
 import Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import Data.Abstract.FreeVariables
-import qualified Data.ByteString as B (filter)
-import qualified Data.ByteString.Char8 as BC
-import Data.Char (ord)
 import Data.Record
 import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, contextualize, postContextualize)
 import qualified Data.Syntax as Syntax
@@ -676,12 +673,6 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
 
 fromClause :: Assignment
 fromClause = makeTerm <$> symbol Grammar.String <*> (Syntax.Identifier <$> (pathToQualifiedName <$> source))
-  where
-    pathToQualifiedName :: ByteString -> Name
-    pathToQualifiedName = qualifiedName . BC.split '/' . (BC.dropWhile (== '/')) . (BC.dropWhile (== '.')) . stripQuotes
-
-    stripQuotes :: ByteString -> ByteString
-    stripQuotes = B.filter (/= (fromIntegral (ord '\"')))
 
 debuggerStatement :: Assignment
 debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> (TypeScript.Syntax.Debugger <$ source)
