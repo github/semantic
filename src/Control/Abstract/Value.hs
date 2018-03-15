@@ -193,13 +193,13 @@ instance ( Monad m
     injValue . Closure names l . bindEnv (foldr Set.delete (freeVariables body) names) <$> askLocalEnv
 
   apply op params = do
-    Closure names l env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
+    Closure names label env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
     bindings <- foldr (\ (name, param) rest -> do
       v <- param
       a <- alloc name
       assign a v
       envInsert name a <$> rest) (pure env) (zip names params)
-    localEnv (mappend bindings) (goto l >>= evaluateTerm)
+    localEnv (mappend bindings) (goto label >>= evaluateTerm)
 
   loop = fix
 
