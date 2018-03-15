@@ -8,7 +8,6 @@ import Data.Abstract.Cache
 import Data.Abstract.Configuration
 import Data.Abstract.Heap
 import Data.Abstract.Value
-import Data.Monoid (Alt (..))
 import Prologue
 
 -- | The effects necessary for caching analyses.
@@ -126,4 +125,4 @@ converge f = loop
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
 scatter :: (Alternative m, Foldable t, MonadEvaluator term value m) => t (a, Heap (LocationFor value) value) -> m a
-scatter = getAlt . foldMap (\ (value, heap') -> Alt (putHeap heap' *> pure value))
+scatter = foldMapA (\ (value, heap') -> putHeap heap' *> pure value)
