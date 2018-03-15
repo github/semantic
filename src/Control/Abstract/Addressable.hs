@@ -20,31 +20,16 @@ class (Monad m, Ord l, l ~ LocationFor value, Reducer value (Cell l value)) => M
 
   alloc :: Name -> m (Address l value)
 
--- | Look up or allocate an address for a 'Name' free in a given term & assign it a given value, returning the 'Name' paired with the address.
---
---   The term is expected to contain one and only one free 'Name', meaning that care should be taken to apply this only to e.g. identifiers.
-lookupOrAlloc :: ( FreeVariables term
+-- | Look up or allocate an address for a 'Name' & assign it a given value, returning the 'Name' paired with the address.
+lookupOrAlloc :: ( Semigroup (CellFor value)
                  , MonadAddressable (LocationFor value) value m
                  , MonadEnvironment value m
                  , MonadStore value m
-                 , Semigroup (CellFor value)
                  )
-                 => term
+                 => Name
                  -> value
                  -> m (Name, Address (LocationFor value) value)
-lookupOrAlloc term = let [name] = toList (freeVariables term) in
-                         lookupOrAlloc' name
-
--- | Look up or allocate an address for a 'Name' & assign it a given value, returning the 'Name' paired with the address.
-lookupOrAlloc' :: ( Semigroup (CellFor value)
-                  , MonadAddressable (LocationFor value) value m
-                  , MonadEnvironment value m
-                  , MonadStore value m
-                  )
-                  => Name
-                  -> value
-                  -> m (Name, Address (LocationFor value) value)
-lookupOrAlloc' name v = do
+lookupOrAlloc name v = do
   a <- lookupLocalEnv name >>= maybe (alloc name) pure
   assign a v
   pure (name, a)
