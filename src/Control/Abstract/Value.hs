@@ -68,6 +68,7 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
   multiple :: [value] -> m value
 
   asString :: value -> m ByteString
+  asBool :: value -> m Bool
 
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: value -> m a -> m a -> m a
@@ -138,6 +139,9 @@ instance ( FreeVariables term
     | Just (Value.String n) <- prjValue v = pure n
     | otherwise                           = fail ("expected " <> show v <> " to be a string")
 
+  asBool v
+    | Just (Value.Boolean x) <- prjValue v = pure x
+    | otherwise                            = fail ("expected " <> show v <> " to be a boolean")
 
   ifthenelse cond if' else'
     | Just (Boolean b) <- prjValue cond = if b then if' else else'

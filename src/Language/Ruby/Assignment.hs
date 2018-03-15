@@ -75,6 +75,7 @@ type Syntax = '[
   , Syntax.Identifier
   , Syntax.Program
   , Ruby.Syntax.Require
+  , Ruby.Syntax.Load
   , []
   ]
 
@@ -296,7 +297,7 @@ pair :: Assignment
 pair =   makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> (expression <|> emptyTerm))
 
 methodCall :: Assignment
-methodCall =   makeTerm' <$> symbol MethodCall <*> children (require <|> regularCall)
+methodCall =   makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> regularCall)
            -- <|> makeTerm <$> symbol MethodCall <*> children (Expression.Call <$> pure [] <*> expression <*> args <*> (block <|> emptyTerm))
   where
     regularCall = inj <$> (Expression.Call <$> pure [] <*> expression <*> args <*> (block <|> emptyTerm))
@@ -304,7 +305,12 @@ methodCall =   makeTerm' <$> symbol MethodCall <*> children (require <|> regular
       s <- source
       guard (elem s ["require", "require_relative"])
       Ruby.Syntax.Require (s == "require_relative") <$> nameExpression)
+    load = inj <$> (symbol Identifier *> do
+      s <- source
+      guard (elem s ["load"])
+      Ruby.Syntax.Load <$> loadArgs)
     args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> pure []
+    loadArgs = (symbol ArgumentList <|> symbol ArgumentListWithParens)  *> children (some expression)
     nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
 
 call :: Assignment

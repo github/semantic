@@ -14,10 +14,11 @@ import Data.Record
 import Data.Source as Source
 import Data.Span
 import Data.Term
-import Data.Abstract.FreeVariables
+import Data.Abstract.FreeVariables hiding (stripQuotes)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
+import qualified Language.Ruby.Syntax as Ruby.Syntax
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import qualified Language.Markdown.Syntax as Markdown
@@ -98,54 +99,59 @@ instance CustomHasDeclaration whole Declaration.Function where
     -- Do not summarize anonymous functions
     | isEmpty identifierAnn = Nothing
     -- Named functions
-    | otherwise             = Just $ FunctionDeclaration (getSource identifierAnn) (getFunctionSource blob (In ann decl)) blobLanguage
-    where getSource = toText . flip Source.slice blobSource . getField
-          isEmpty = (== 0) . rangeLength . getField
+    | otherwise             = Just $ FunctionDeclaration (getSource blobSource identifierAnn) (getFunctionSource blob (In ann decl)) blobLanguage
+    where isEmpty = (== 0) . rangeLength . getField
 
 -- | Produce a 'MethodDeclaration' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'Range'), the 'declarationIdentifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
 instance CustomHasDeclaration whole Declaration.Method where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _)
     -- Methods without a receiver
-    | isEmpty receiverAnn = Just $ MethodDeclaration (getSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage Nothing
+    | isEmpty receiverAnn = Just $ MethodDeclaration (getSource blobSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage Nothing
     -- Methods with a receiver type and an identifier (e.g. (a *Type) in Go).
     | blobLanguage == Just Go
-    , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ MethodDeclaration (getSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage (Just (getSource receiverType))
+    , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ MethodDeclaration (getSource blobSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage (Just (getSource blobSource receiverType))
     -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
-    | otherwise           = Just $ MethodDeclaration (getSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage (Just (getSource receiverAnn))
-    where getSource = toText . flip Source.slice blobSource . getField
-          isEmpty = (== 0) . rangeLength . getField
+    | otherwise           = Just $ MethodDeclaration (getSource blobSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage (Just (getSource blobSource receiverAnn))
+    where isEmpty = (== 0) . rangeLength . getField
 
 -- | Produce a 'ClassDeclaration' for 'Declaration.Class' nodes.
 instance CustomHasDeclaration whole Declaration.Class where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Class _ (Term (In identifierAnn _), _) _ _)
-    -- Classes
-    = Just $ ClassDeclaration (getSource identifierAnn) (getClassSource blob (In ann decl)) blobLanguage
-    where getSource = toText . flip Source.slice blobSource . getField
+    = Just $ ClassDeclaration (getSource blobSource identifierAnn) (getClassSource blob (In ann decl)) blobLanguage
 
 instance CustomHasDeclaration (Union fs) Declaration.Import where
   customToDeclaration Blob{..} _ (Declaration.Import (Term (In fromAnn _), _) symbols _)
-    = Just $ ImportDeclaration ((stripQuotes . getSource) fromAnn) "" (fmap getSymbol symbols) blobLanguage
+    = Just $ ImportDeclaration ((stripQuotes . getSource blobSource) fromAnn) "" (fmap getSymbol symbols) blobLanguage
     where
-      stripQuotes = T.dropAround (`elem` ['"', '\''])
-      getSource = toText . flip Source.slice blobSource . getField
       getSymbol = let f = (T.decodeUtf8 . friendlyName) in bimap f f
 
 instance (Syntax.Identifier :< fs) => CustomHasDeclaration (Union fs) Declaration.QualifiedImport where
   customToDeclaration Blob{..} _ (Declaration.QualifiedImport (Term (In fromAnn _), _) (Term (In aliasAnn aliasF), _) symbols)
-    | Just (Syntax.Identifier alias) <- prj aliasF = Just $ ImportDeclaration ((stripQuotes . getSource) fromAnn) (toName alias) (fmap getSymbol symbols) blobLanguage
-    | otherwise = Just $ ImportDeclaration ((stripQuotes . getSource) fromAnn) (getSource aliasAnn) (fmap getSymbol symbols) blobLanguage
+    | Just (Syntax.Identifier alias) <- prj aliasF = Just $ ImportDeclaration ((stripQuotes . getSource blobSource) fromAnn) (toName alias) (fmap getSymbol symbols) blobLanguage
+    | otherwise = Just $ ImportDeclaration ((stripQuotes . getSource blobSource) fromAnn) (getSource blobSource aliasAnn) (fmap getSymbol symbols) blobLanguage
     where
-      stripQuotes = T.dropAround (`elem` ['"', '\''])
-      getSource = toText . flip Source.slice blobSource . getField
       getSymbol = bimap toName toName
       toName = T.decodeUtf8 . friendlyName
 
 instance CustomHasDeclaration (Union fs) Declaration.SideEffectImport where
   customToDeclaration Blob{..} _ (Declaration.SideEffectImport (Term (In fromAnn _), _) _)
-    = Just $ ImportDeclaration ((stripQuotes . getSource) fromAnn) "" [] blobLanguage
-    where
-      stripQuotes = T.dropAround (`elem` ['"', '\''])
-      getSource = toText . flip Source.slice blobSource . getField
+    = Just $ ImportDeclaration ((stripQuotes . getSource blobSource) fromAnn) "" [] blobLanguage
+
+instance CustomHasDeclaration (Union fs) Ruby.Syntax.Require where
+  customToDeclaration Blob{..} _ (Ruby.Syntax.Require _ (Term (In fromAnn _), _))
+    = Just $ ImportDeclaration ((stripQuotes . getSource blobSource) fromAnn) "" [] blobLanguage
+
+instance CustomHasDeclaration (Union fs) Ruby.Syntax.Load where
+  customToDeclaration Blob{..} _ (Ruby.Syntax.Load ((Term (In fromArgs _), _):_))
+    = Just $ ImportDeclaration ((stripQuotes . getSource blobSource) fromArgs) "" [] blobLanguage
+  customToDeclaration Blob{..} _ (Ruby.Syntax.Load _)
+    = Nothing
+
+getSource :: HasField fields Range => Source -> Record fields -> Text
+getSource blobSource = toText . flip Source.slice blobSource . getField
+
+stripQuotes :: Text -> Text
+stripQuotes = T.dropAround (`elem` ['"', '\''])
 
 instance (Syntax.Identifier :< fs, Expression.MemberAccess :< fs) => CustomHasDeclaration (Union fs) Expression.Call where
   customToDeclaration Blob{..} _ (Expression.Call _ (Term (In fromAnn fromF), _) _ _)
@@ -185,6 +191,7 @@ type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Import = 'Custom
   DeclarationStrategy Declaration.QualifiedImport = 'Custom
   DeclarationStrategy Declaration.SideEffectImport = 'Custom
+  DeclarationStrategy Ruby.Syntax.Require = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
   DeclarationStrategy Markdown.Heading = 'Custom
   DeclarationStrategy Expression.Call = 'Custom
