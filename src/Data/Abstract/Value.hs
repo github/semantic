@@ -3,8 +3,8 @@ module Data.Abstract.Value where
 
 import Data.Abstract.Address
 import Data.Abstract.Environment
-import Data.Abstract.Store
 import Data.Abstract.FreeVariables
+import Data.Abstract.Heap
 import Data.Abstract.Live
 import Data.Abstract.Number
 import qualified Data.Abstract.Type as Type
@@ -125,8 +125,8 @@ instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 -- | The environment for an abstract value type.
 type EnvironmentFor v = Environment (LocationFor v) v
 
--- | The store for an abstract value type.
-type StoreFor v = Store (LocationFor v) v
+-- | The 'Heap' for an abstract value type.
+type HeapFor value = Heap (LocationFor value) value
 
 -- | The cell for an abstract value type.
 type CellFor value = Cell (LocationFor value) value

@@ -6,7 +6,7 @@ module Analysis.Abstract.Caching
 import Control.Abstract.Analysis
 import Data.Abstract.Cache
 import Data.Abstract.Configuration
-import Data.Abstract.Store
+import Data.Abstract.Heap
 import Data.Abstract.Value
 import Data.Monoid (Alt (..))
 import Prologue
@@ -28,21 +28,21 @@ newtype Caching m term value (effects :: [* -> *]) a = Caching (m term value eff
 
 deriving instance MonadControl term (m term value effects) => MonadControl term (Caching m term value effects)
 deriving instance MonadEnvironment value (m term value effects) => MonadEnvironment value (Caching m term value effects)
-deriving instance MonadStore value (m term value effects) => MonadStore value (Caching m term value effects)
+deriving instance MonadHeap value (m term value effects) => MonadHeap value (Caching m term value effects)
 deriving instance MonadModuleTable term value (m term value effects) => MonadModuleTable term value (Caching m term value effects)
 deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (Caching m term value effects)
 
 -- | Functionality used to perform caching analysis. This is not exported, and exists primarily for organizational reasons.
 class MonadEvaluator term value m => MonadCaching term value m where
   -- | Look up the set of values for a given configuration in the in-cache.
-  consultOracle :: ConfigurationFor term value -> m (Set (value, StoreFor value))
+  consultOracle :: ConfigurationFor term value -> m (Set (value, HeapFor value))
   -- | Run an action with the given in-cache.
   withOracle :: CacheFor term value -> m a -> m a
 
   -- | Look up the set of values for a given configuration in the out-cache.
-  lookupCache :: ConfigurationFor term value -> m (Maybe (Set (value, StoreFor value)))
-  -- | Run an action, caching its result and 'Store' under the given configuration.
-  caching :: ConfigurationFor term value -> Set (value, StoreFor value) -> m value -> m value
+  lookupCache :: ConfigurationFor term value -> m (Maybe (Set (value, HeapFor value)))
+  -- | Run an action, caching its result and 'Heap' under the given configuration.
+  caching :: ConfigurationFor term value -> Set (value, HeapFor value) -> m value -> m value
 
   -- | Run an action starting from an empty out-cache, and return the out-cache afterwards.
   isolateCache :: m a -> m (CacheFor term value)
@@ -62,7 +62,7 @@ instance ( Effectful (m term value)
   lookupCache configuration = raise (cacheLookup configuration <$> get)
   caching configuration values action = do
     raise (modify (cacheSet configuration values))
-    result <- (,) <$> action <*> getStore
+    result <- (,) <$> action <*> getHeap
     raise (modify (cacheInsert configuration result))
     pure (fst result)
 
@@ -98,7 +98,7 @@ instance ( Corecursive term
     c <- getConfiguration e
     -- Convergence here is predicated upon an Eq instance, not α-equivalence
     cache <- converge (\ prevCache -> isolateCache $ do
-      putStore (configurationStore c)
+      putHeap (configurationHeap c)
       -- We need to reset fresh generation so that this invocation converges.
       reset 0
       -- This is subtle: though the calling context supports nondeterminism, we want
@@ -125,5 +125,5 @@ converge f = loop
             loop x'
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Alternative m, Foldable t, MonadEvaluator term value m) => t (a, Store (LocationFor value) value) -> m a
-scatter = getAlt . foldMap (\ (value, store') -> Alt (putStore store' *> pure value))
+scatter :: (Alternative m, Foldable t, MonadEvaluator term value m) => t (a, Heap (LocationFor value) value) -> m a
+scatter = getAlt . foldMap (\ (value, heap') -> Alt (putHeap heap' *> pure value))

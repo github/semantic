@@ -3,8 +3,8 @@ module Control.Abstract.Evaluator
 ( MonadEvaluator(..)
 , MonadEnvironment(..)
 , modifyGlobalEnv
-, MonadStore(..)
-, modifyStore
+, MonadHeap(..)
+, modifyHeap
 , assign
 , MonadModuleTable(..)
 , modifyModuleTable
@@ -14,8 +14,8 @@ module Control.Abstract.Evaluator
 import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.FreeVariables
+import Data.Abstract.Heap
 import Data.Abstract.ModuleTable
-import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Semigroup.Reducer
 import Prelude hiding (fail)
@@ -31,7 +31,7 @@ class ( MonadControl term m
       , MonadEnvironment value m
       , MonadFail m
       , MonadModuleTable term value m
-      , MonadStore value m
+      , MonadHeap value m
       )
       => MonadEvaluator term value m | m -> term, m -> value where
   -- | Get the current 'Configuration' with a passed-in term.
@@ -65,27 +65,27 @@ modifyGlobalEnv f = do
 
 
 -- | A 'Monad' abstracting a heap of values.
-class Monad m => MonadStore value m | m -> value where
+class Monad m => MonadHeap value m | m -> value where
   -- | Retrieve the heap.
-  getStore :: m (StoreFor value)
+  getHeap :: m (HeapFor value)
   -- | Set the heap.
-  putStore :: StoreFor value -> m ()
+  putHeap :: HeapFor value -> m ()
 
 -- | Update the heap.
-modifyStore :: MonadStore value m => (StoreFor value -> StoreFor value) -> m ()
-modifyStore f = do
-  s <- getStore
-  putStore $! f s
+modifyHeap :: MonadHeap value m => (HeapFor value -> HeapFor value) -> m ()
+modifyHeap f = do
+  s <- getHeap
+  putHeap $! f s
 
 -- | Write a value to the given 'Address' in the 'Store'.
 assign :: ( Ord (LocationFor value)
-          , MonadStore value m
+          , MonadHeap value m
           , Reducer value (CellFor value)
           )
        => Address (LocationFor value) value
        -> value
        -> m ()
-assign address = modifyStore . storeInsert address
+assign address = modifyHeap . heapInsert address
 
 
 -- | A 'Monad' abstracting tables of modules available for import.

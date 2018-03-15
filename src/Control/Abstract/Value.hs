@@ -199,7 +199,7 @@ instance ( Monad m
   loop = fix
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, MonadStore Type m) => MonadValue Type m where
+instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, MonadHeap Type m) => MonadValue Type m where
   abstract names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
