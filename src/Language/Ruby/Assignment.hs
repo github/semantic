@@ -297,8 +297,7 @@ pair :: Assignment
 pair =   makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> (expression <|> emptyTerm))
 
 methodCall :: Assignment
-methodCall =   makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> regularCall)
-           -- <|> makeTerm <$> symbol MethodCall <*> children (Expression.Call <$> pure [] <*> expression <*> args <*> (block <|> emptyTerm))
+methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> regularCall)
   where
     regularCall = inj <$> (Expression.Call <$> pure [] <*> expression <*> args <*> (block <|> emptyTerm))
     require = inj <$> (symbol Identifier *> do
