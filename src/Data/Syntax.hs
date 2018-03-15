@@ -110,7 +110,7 @@ instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Identifier where
   eval (Identifier name) = do
     env <- askLocalEnv
-    maybe (fail ("free variable: " <> show name)) deref (envLookup name env)
+    maybe (fail ("free variable: " <> show (friendlyName name))) deref (envLookup name env)
 
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = Set.singleton x
