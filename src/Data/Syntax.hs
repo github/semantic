@@ -2,7 +2,6 @@
 module Data.Syntax where
 
 import Control.Monad.Fail
-import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Data.AST
 import Data.Range
