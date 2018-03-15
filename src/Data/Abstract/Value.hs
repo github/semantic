@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, FunctionalDependencies, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, TypeFamilies, TypeOperators #-}
 module Data.Abstract.Value where
 
 import Data.Abstract.Address
