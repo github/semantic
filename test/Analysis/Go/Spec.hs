@@ -33,7 +33,7 @@ spec = parallel $ do
   where
     addr = Address . Precise
     fixtures = "test/fixtures/go/analysis/"
-    evaluate entry = snd . fst . fst . fst <$>
+    evaluate entry = snd . fst . fst . fst . fst <$>
       evaluateFiles @(Value Precise) goParser
         [ fixtures <> entry
         , fixtures <> "foo/foo.go"
