@@ -33,55 +33,55 @@ import qualified Language.Python.Assignment as Python
 import qualified Language.TypeScript.Assignment as TypeScript
 
 -- Ruby
-evaluateRubyFile = evaluateFile @(Value Precise) rubyParser
-evaluateRubyFiles = evaluateFiles @(Value Precise) rubyParser
+evaluateRubyFile = evaluateFile rubyParser
+evaluateRubyFiles = evaluateFiles rubyParser
 
 -- Go
-evaluateGoFile = evaluateFile @(Value Precise) goParser
-evaluateGoFiles = evaluateFiles @(Value Precise) goParser
+evaluateGoFile = evaluateFile goParser
+evaluateGoFiles = evaluateFiles goParser
 typecheckGoFile path = runAnalysis @(Caching Evaluating Go.Term Type) . evaluateModule . snd <$> parseFile goParser path
 
 -- Python
-evaluatePythonFile path = evaluate @(Value Precise) . snd <$> parseFile pythonParser path
-evaluatePythonFiles = evaluateFiles @(Value Precise) pythonParser
+evaluatePythonFile path = evaluate . snd <$> parseFile pythonParser path
+evaluatePythonFiles = evaluateFiles pythonParser
 typecheckPythonFile path = runAnalysis @(Caching Evaluating Python.Term Type) . evaluateModule . snd <$> parseFile pythonParser path
 tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term (Value Precise)) . evaluateModule . snd <$> parseFile pythonParser path
 evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] Evaluating) Python.Term (Value Precise)) . evaluateModule . snd <$> parseFile pythonParser path
 
 -- TypeScript
 typecheckTypeScriptFile path = runAnalysis @(Caching Evaluating TypeScript.Term Type) . evaluateModule . snd <$> parseFile typescriptParser path
-evaluateTypeScriptFile = evaluateFile @(Value Precise) typescriptParser
-evaluateTypeScriptFiles = evaluateFiles @(Value Precise) typescriptParser
+evaluateTypeScriptFile = evaluateFile typescriptParser
+evaluateTypeScriptFiles = evaluateFiles typescriptParser
 
 -- Evalute a single file.
-evaluateFile :: forall value term effects
+evaluateFile :: forall term effects
              .  ( Evaluatable (Base term)
                 , FreeVariables term
-                , effects ~ RequiredEffects term value (Evaluating term value effects)
-                , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-                , MonadValue value (Evaluating term value effects)
+                , effects ~ RequiredEffects term (Value Precise) (Evaluating term (Value Precise) effects)
+                , MonadAddressable Precise (Value Precise) (Evaluating term (Value Precise) effects)
+                , MonadValue (Value Precise) (Evaluating term (Value Precise) effects)
                 , Recursive term
                 )
              => Parser term
              -> FilePath
-             -> IO (Final effects value)
-evaluateFile parser path = runAnalysis @(Evaluating term value) . evaluateModule . snd <$> parseFile parser path
+             -> IO (Final effects (Value Precise))
+evaluateFile parser path = evaluate . snd <$> parseFile parser path
 
 -- Evaluate a list of files (head of file list is considered the entry point).
-evaluateFiles :: forall value term effects
+evaluateFiles :: forall term effects
               .  ( Evaluatable (Base term)
                  , FreeVariables term
-                 , effects ~ RequiredEffects term value (Evaluating term value effects)
-                 , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-                 , MonadValue value (Evaluating term value effects)
+                 , effects ~ RequiredEffects term (Value Precise) (Evaluating term (Value Precise) effects)
+                 , MonadAddressable Precise (Value Precise) (Evaluating term (Value Precise) effects)
+                 , MonadValue (Value Precise) (Evaluating term (Value Precise) effects)
                  , Recursive term
                  )
               => Parser term
               -> [FilePath]
-              -> IO (Final effects value)
+              -> IO (Final effects (Value Precise))
 evaluateFiles parser paths = do
   entry:xs <- traverse (parseFile parser) paths
-  pure $ evaluates @value xs entry
+  pure $ evaluates @(Value Precise) xs entry
 
 -- Read and parse a file.
 parseFile :: Parser term -> FilePath -> IO (Blob, term)
