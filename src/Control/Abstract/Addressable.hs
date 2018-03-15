@@ -26,11 +26,11 @@ lookupOrAlloc :: ( MonadAddressable (LocationFor value) value m
                  )
                  => Name
                  -> value
-                 -> m (Name, Address (LocationFor value) value)
+                 -> m (Address (LocationFor value) value)
 lookupOrAlloc name v = do
   a <- lookupLocalEnv name >>= maybe (alloc name) pure
   assign a v
-  pure (name, a)
+  pure a
 
 
 letrec :: ( MonadAddressable (LocationFor value) value m

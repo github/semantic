@@ -94,10 +94,10 @@ instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Assignment where
   eval Assignment{..} = do
     v <- subtermValue assignmentValue
-    (var, a) <- lookupOrAlloc (freeVariable (subterm assignmentTarget)) v
-
-    modifyGlobalEnv (envInsert var a)
+    addr <- lookupOrAlloc name v
+    modifyGlobalEnv (envInsert name addr)
     pure v
+    where name = freeVariable (subterm assignmentTarget)
 
 -- | Post increment operator (e.g. 1++ in Go, or i++ in C).
 newtype PostIncrement a = PostIncrement a
