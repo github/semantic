@@ -19,18 +19,13 @@ class (Monad m, Ord l, l ~ LocationFor value, Reducer value (Cell l value)) => M
 
   alloc :: Name -> m (Address l value)
 
--- | Look up or allocate an address for a 'Name' & assign it a given value, returning the 'Name' paired with the address.
+-- | Look up or allocate an address for a 'Name'.
 lookupOrAlloc :: ( MonadAddressable (LocationFor value) value m
                  , MonadEnvironment value m
-                 , MonadStore value m
                  )
                  => Name
-                 -> value
                  -> m (Address (LocationFor value) value)
-lookupOrAlloc name v = do
-  a <- lookupLocalEnv name >>= maybe (alloc name) pure
-  assign a v
-  pure a
+lookupOrAlloc name = lookupLocalEnv name >>= maybe (alloc name) pure
 
 
 letrec :: ( MonadAddressable (LocationFor value) value m

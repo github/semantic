@@ -94,7 +94,8 @@ instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Assignment where
   eval Assignment{..} = do
     v <- subtermValue assignmentValue
-    addr <- lookupOrAlloc name v
+    addr <- lookupOrAlloc name
+    assign addr v
     modifyGlobalEnv (envInsert name addr)
     pure v
     where name = freeVariable (subterm assignmentTarget)
