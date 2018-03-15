@@ -1,7 +1,9 @@
 {-# LANGUAGE UndecidableInstances #-}
-module Prologue (
-  module X
-, ) where
+module Prologue
+  ( module X
+  , maybeM
+  , maybeFail
+  ) where
 
 
 import Data.Bifunctor.Join as X
@@ -67,3 +69,11 @@ import Data.Hashable as X (
 -- Generics
 import GHC.Generics as X hiding (moduleName)
 import GHC.Stack as X
+
+-- Extract the 'Just' of a Maybe in an Applicative context or, given Nothing, run the provided action.
+maybeM :: Applicative f => f a -> Maybe a -> f a
+maybeM f = maybe f pure
+
+-- Either extract the 'Just' of a Maybe or invoke `fail` with the provided string.
+maybeFail :: MonadFail m => String -> Maybe a -> m a
+maybeFail s = maybeFail (X.fail s)
