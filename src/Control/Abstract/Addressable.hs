@@ -69,16 +69,18 @@ letrec name body = do
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
 instance (MonadFail m, LocationFor value ~ Precise, MonadHeap value m) => MonadAddressable Precise value m where
-  deref = maybe uninitializedAddress (pure . unLatest) <=< lookupHeap
-
+  deref = derefWith (pure . unLatest)
   alloc _ = fmap (Address . Precise . heapSize) getHeap
 
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
 instance (Alternative m, LocationFor value ~ Monovariant, MonadFail m, MonadHeap value m, Ord value) => MonadAddressable Monovariant value m where
-  deref = maybe uninitializedAddress (foldMapA pure) <=< lookupHeap
-
+  deref = derefWith (foldMapA pure)
   alloc = pure . Address . Monovariant
+
+-- | Dereference the given 'Address' in the heap, using the supplied function to act on the cell, or failing if the address is uninitialized.
+derefWith :: (MonadFail m, MonadHeap value m, Ord (LocationFor value)) => (CellFor value -> m a) -> Address (LocationFor value) value -> m a
+derefWith with = maybe uninitializedAddress with <=< lookupHeap
 
 -- | Fold a collection by mapping each element onto an 'Alternative' action.
 foldMapA :: (Alternative m, Foldable t) => (b -> m a) -> t b -> m a
