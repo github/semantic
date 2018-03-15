@@ -79,6 +79,10 @@ instance (Alternative m, LocationFor value ~ Monovariant, MonadHeap value m, Ord
 
   alloc = pure . Address . Monovariant
 
+-- | Fold a collection by mapping each element onto an 'Alternative' action.
+foldMapA :: (Alternative m, Foldable t) => (b -> m a) -> t b -> m a
+foldMapA f = getAlt . foldMap (Alt . f)
+
 -- | Fail with a message denoting an uninitialized address (i.e. one which was 'alloc'ated, but never 'assign'ed a value before being 'deref'erenced).
 uninitializedAddress :: MonadFail m => m a
 uninitializedAddress = fail "uninitialized address"
