@@ -101,6 +101,9 @@ library
                      , Language.Python.Assignment
                      , Language.Python.Grammar
                      , Language.Python.Syntax
+                     , Language.Java.Assignment
+                     , Language.Java.Grammar
+                     , Language.Java.Syntax
                      -- Parser glue
                      , Parsing.CMark
                      , Parsing.Parser
