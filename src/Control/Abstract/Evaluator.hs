@@ -112,10 +112,6 @@ modifyModuleTable f = do
   putModuleTable $! f table
 
 
--- | The type of labels.
---   TODO: This should be rolled into 'Name' and tracked in the environment, both so that we can abstract over labels like any other location, and so that we can garbage collect unreachable labels.
-type Label = Int
-
 -- | A 'Monad' abstracting jumps in imperative control.
 class Monad m => MonadControl term m where
   -- | Allocate a 'Label' for the given @term@.
