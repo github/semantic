@@ -43,13 +43,14 @@ class Monad m => MonadEnvironment value m | m -> value where
   getGlobalEnv :: m (EnvironmentFor value)
   -- | Set the global environment
   putGlobalEnv :: EnvironmentFor value -> m ()
+  -- | Sets the global environment for the lifetime of the given action.
   withGlobalEnv :: EnvironmentFor value -> m a -> m a
 
   -- | Get the global export state.
   getExports :: m (ExportsFor value)
   -- | Set the global export state.
   putExports :: ExportsFor value -> m ()
-  -- | Sets the exports state to the given map for the lifetime of the given action.
+  -- | Sets the exports the lifetime of the given action.
   withExports :: ExportsFor value -> m a -> m a
 
   -- | Retrieve the local environment.
