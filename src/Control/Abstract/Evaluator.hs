@@ -5,6 +5,7 @@ module Control.Abstract.Evaluator
 , modifyGlobalEnv
 , MonadHeap(..)
 , modifyHeap
+, lookupHeap
 , assign
 , MonadModuleTable(..)
 , modifyModuleTable
@@ -76,6 +77,10 @@ modifyHeap :: MonadHeap value m => (HeapFor value -> HeapFor value) -> m ()
 modifyHeap f = do
   s <- getHeap
   putHeap $! f s
+
+-- | Look up the cell for the given 'Address' in the 'Heap'.
+lookupHeap :: (MonadHeap value m, Ord (LocationFor value)) => Address (LocationFor value) value -> m (Maybe (CellFor value))
+lookupHeap = flip fmap getHeap . heapLookup
 
 -- | Write a value to the given 'Address' in the 'Store'.
 assign :: ( Ord (LocationFor value)
