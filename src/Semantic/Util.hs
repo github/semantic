@@ -14,7 +14,6 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.Address
 import Data.Abstract.Type
 import Data.Abstract.Value
-import Data.AST
 import Data.Blob
 import Data.Diff
 import Data.Range
@@ -31,66 +30,58 @@ import Semantic.Task
 
 import qualified Language.Go.Assignment as Go
 import qualified Language.Python.Assignment as Python
-import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 
-type PreciseValue a = Value Precise (Term (Union a) (Record Location))
-
-type GoValue         = PreciseValue Go.Syntax
-type RubyValue       = PreciseValue Ruby.Syntax
-type PythonValue     = PreciseValue Python.Syntax
-type TypeScriptValue = PreciseValue TypeScript.Syntax
-
 -- Ruby
-evaluateRubyFile = evaluateFile @RubyValue rubyParser
-evaluateRubyFiles = evaluateFiles @RubyValue rubyParser
+evaluateRubyFile = evaluateFile rubyParser
+evaluateRubyFiles = evaluateFiles rubyParser
 
 -- Go
-evaluateGoFile = evaluateFile @GoValue goParser
-evaluateGoFiles = evaluateFiles @GoValue goParser
+evaluateGoFile = evaluateFile goParser
+evaluateGoFiles = evaluateFiles goParser
 typecheckGoFile path = runAnalysis @(Caching Evaluating Go.Term Type) . evaluateModule . snd <$> parseFile goParser path
 
 -- Python
-evaluatePythonFile path = evaluate @PythonValue . snd <$> parseFile pythonParser path
-evaluatePythonFiles = evaluateFiles @PythonValue pythonParser
+evaluatePythonFile path = evaluate . snd <$> parseFile pythonParser path
+evaluatePythonFiles = evaluateFiles pythonParser
 typecheckPythonFile path = runAnalysis @(Caching Evaluating Python.Term Type) . evaluateModule . snd <$> parseFile pythonParser path
-tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term PythonValue) . evaluateModule . snd <$> parseFile pythonParser path
-evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] Evaluating) Python.Term PythonValue) . evaluateModule . snd <$> parseFile pythonParser path
+tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term Value) . evaluateModule . snd <$> parseFile pythonParser path
+evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] Evaluating) Python.Term Value) . evaluateModule . snd <$> parseFile pythonParser path
 
 -- TypeScript
 typecheckTypeScriptFile path = runAnalysis @(Caching Evaluating TypeScript.Term Type) . evaluateModule . snd <$> parseFile typescriptParser path
-evaluateTypeScriptFile = evaluateFile @TypeScriptValue typescriptParser
-evaluateTypeScriptFiles = evaluateFiles @TypeScriptValue typescriptParser
+evaluateTypeScriptFile = evaluateFile typescriptParser
+evaluateTypeScriptFiles = evaluateFiles typescriptParser
 
 -- Evalute a single file.
-evaluateFile :: forall value term effects
+evaluateFile :: forall term effects
              .  ( Evaluatable (Base term)
                 , FreeVariables term
-                , effects ~ RequiredEffects term value (Evaluating term value effects)
-                , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-                , MonadValue term value (Evaluating term value effects)
+                , effects ~ RequiredEffects term Value (Evaluating term Value effects)
+                , MonadAddressable Precise Value (Evaluating term Value effects)
+                , MonadValue Value (Evaluating term Value effects)
                 , Recursive term
                 )
              => Parser term
              -> FilePath
-             -> IO (Final effects value)
-evaluateFile parser path = runAnalysis @(Evaluating term value) . evaluateModule . snd <$> parseFile parser path
+             -> IO (Final effects Value)
+evaluateFile parser path = evaluate . snd <$> parseFile parser path
 
 -- Evaluate a list of files (head of file list is considered the entry point).
-evaluateFiles :: forall value term effects
+evaluateFiles :: forall term effects
               .  ( Evaluatable (Base term)
                  , FreeVariables term
-                 , effects ~ RequiredEffects term value (Evaluating term value effects)
-                 , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-                 , MonadValue term value (Evaluating term value effects)
+                 , effects ~ RequiredEffects term Value (Evaluating term Value effects)
+                 , MonadAddressable Precise Value (Evaluating term Value effects)
+                 , MonadValue Value (Evaluating term Value effects)
                  , Recursive term
                  )
               => Parser term
               -> [FilePath]
-              -> IO (Final effects value)
+              -> IO (Final effects Value)
 evaluateFiles parser paths = do
   entry:xs <- traverse (parseFile parser) paths
-  pure $ evaluates @value xs entry
+  pure $ evaluates @Value xs entry
 
 -- Read and parse a file.
 parseFile :: Parser term -> FilePath -> IO (Blob, term)

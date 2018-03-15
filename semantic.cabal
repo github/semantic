@@ -47,10 +47,10 @@ library
                      , Data.Abstract.Environment
                      , Data.Abstract.Evaluatable
                      , Data.Abstract.FreeVariables
+                     , Data.Abstract.Heap
                      , Data.Abstract.Live
                      , Data.Abstract.ModuleTable
                      , Data.Abstract.Number
-                     , Data.Abstract.Store
                      , Data.Abstract.Type
                      , Data.Abstract.Value
                      -- General datatype definitions & generic algorithms
