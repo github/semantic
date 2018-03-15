@@ -46,7 +46,7 @@ prjPair = bitraverse prjValue prjValue
 
 -- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
 
--- | A function value consisting of a list of parameters, the body of the function, and an environment of bindings captured by the body.
+-- | A function value consisting of a list of parameters, a label to jump to the body of the function, and an environment of bindings captured by the body.
 data Closure location value = Closure [Name] Int (Environment location value)
   deriving (Eq, Generic1, Ord, Show)
 
