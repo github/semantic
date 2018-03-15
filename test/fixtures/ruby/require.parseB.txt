@@ -1,9 +1,8 @@
 (Program
-  (Import
+  (Require
+    (TextElement))
+  (Call
+    (Identifier)
+    (Symbol)
     (TextElement)
-    (Empty))
-  (Import
-    (
-      (Symbol)
-      (TextElement))
     (Empty)))
