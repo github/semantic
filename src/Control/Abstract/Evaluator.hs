@@ -14,6 +14,7 @@ module Control.Abstract.Evaluator
 
 import Data.Abstract.Address
 import Data.Abstract.Configuration
+import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
 import Data.Abstract.ModuleTable
@@ -57,6 +58,16 @@ class Monad m => MonadEnvironment value m | m -> value where
   askLocalEnv :: m (EnvironmentFor value)
   -- | Run an action with a locally-modified environment.
   localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m a -> m a
+
+  -- | Look a 'Name' up in the local environment.
+  lookupLocalEnv :: Name -> m (Maybe (Address (LocationFor value) value))
+  lookupLocalEnv name = envLookup name <$> askLocalEnv
+
+  -- | Look up a 'Name' in the local environment, running an action with the resolved address (if any).
+  lookupWith :: (Address (LocationFor value) value -> m value) -> Name -> m (Maybe value)
+  lookupWith with name = do
+    addr <- lookupLocalEnv name
+    maybe (pure Nothing) (fmap Just . with) addr
 
 -- | Update the global environment.
 modifyGlobalEnv :: MonadEnvironment value m => (EnvironmentFor value -> EnvironmentFor value) -> m  ()
