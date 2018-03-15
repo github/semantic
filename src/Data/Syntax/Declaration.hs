@@ -273,7 +273,7 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedImport where
   eval (QualifiedImport from alias xs) = do
     let moduleName = freeVariable (subterm from)
-    importedEnv <- withGlobalEnv mempty (require moduleName)
+    importedEnv <- isolate (require moduleName)
     modifyGlobalEnv (flip (Map.foldrWithKey copy) (unEnvironment importedEnv))
     unit
     where
@@ -297,7 +297,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Import where
   eval (Import from xs _) = do
     let moduleName = freeVariable (subterm from)
-    importedEnv <- withGlobalEnv mempty (require moduleName)
+    importedEnv <- isolate (require moduleName)
     modifyGlobalEnv (flip (Map.foldrWithKey copy) (unEnvironment importedEnv))
     unit
     where
@@ -316,7 +316,7 @@ instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable SideEffectImport where
   eval (SideEffectImport from _) = do
     let moduleName = freeVariable (subterm from)
-    void $ withGlobalEnv mempty (require moduleName)
+    void $ isolate (require moduleName)
     unit
 
 

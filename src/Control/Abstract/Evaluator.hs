@@ -50,7 +50,7 @@ class Monad m => MonadEnvironment value m | m -> value where
   getExports :: m (ExportsFor value)
   -- | Set the global export state.
   putExports :: ExportsFor value -> m ()
-  -- | Sets the exports the lifetime of the given action.
+  -- | Sets the global export state for the lifetime of the given action.
   withExports :: ExportsFor value -> m a -> m a
 
   -- | Retrieve the local environment.
@@ -64,6 +64,7 @@ modifyGlobalEnv f = do
   env <- getGlobalEnv
   putGlobalEnv $! f env
 
+-- | Update the global export state.
 modifyExports :: MonadEnvironment value m => (ExportsFor value -> ExportsFor value) -> m ()
 modifyExports f = do
   exports <- getExports
