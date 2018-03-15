@@ -10,7 +10,6 @@ import Data.Abstract.FreeVariables
 import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Foldable (asum, toList)
-import Data.Semigroup
 import Data.Semigroup.Reducer
 import Prelude hiding (fail)
 
@@ -20,34 +19,13 @@ class (Monad m, Ord l, l ~ LocationFor value, Reducer value (Cell l value)) => M
 
   alloc :: Name -> m (Address l value)
 
--- | Look up or allocate an address for a 'Name' free in a given term & assign it a given value, returning the 'Name' paired with the address.
---
---   The term is expected to contain one and only one free 'Name', meaning that care should be taken to apply this only to e.g. identifiers.
-lookupOrAlloc :: ( FreeVariables term
-                 , MonadAddressable (LocationFor value) value m
-                 , MonadStore value m
-                 , Semigroup (CellFor value)
+-- | Look up or allocate an address for a 'Name'.
+lookupOrAlloc :: ( MonadAddressable (LocationFor value) value m
+                 , MonadEnvironment value m
                  )
-                 => term
-                 -> value
-                 -> EnvironmentFor value
-                 -> m (Name, Address (LocationFor value) value)
-lookupOrAlloc term = let [name] = toList (freeVariables term) in
-                         lookupOrAlloc' name
-
--- | Look up or allocate an address for a 'Name' & assign it a given value, returning the 'Name' paired with the address.
-lookupOrAlloc' :: ( Semigroup (CellFor value)
-                  , MonadAddressable (LocationFor value) value m
-                  , MonadStore value m
-                  )
-                  => Name
-                  -> value
-                  -> EnvironmentFor value
-                  -> m (Name, Address (LocationFor value) value)
-lookupOrAlloc' name v env = do
-  a <- maybe (alloc name) pure (envLookup name env)
-  assign a v
-  pure (name, a)
+                 => Name
+                 -> m (Address (LocationFor value) value)
+lookupOrAlloc name = lookupLocalEnv name >>= maybe (alloc name) pure
 
 
 letrec :: ( MonadAddressable (LocationFor value) value m
@@ -58,7 +36,7 @@ letrec :: ( MonadAddressable (LocationFor value) value m
        -> m value
        -> m (value, Address (LocationFor value) value)
 letrec name body = do
-  addr <- alloc name
+  addr <- lookupOrAlloc name
   v <- localEnv (envInsert name addr) body
   assign addr v
   pure (v, addr)
