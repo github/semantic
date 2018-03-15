@@ -1,23 +1,10 @@
 module Rendering.Imports.Spec (spec) where
 
-import Analysis.Declaration (HasDeclaration, declarationAlgebra)
-import Analysis.ModuleDef (HasModuleDef, moduleDefAlgebra)
-import Data.Output
-import Parsing.Parser
-import qualified Data.ByteString as B
-import qualified Data.ByteString.Char8 as BC
-import qualified Data.Map as Map
-import qualified Semantic.Util as Util
+import Analysis.Declaration (declarationAlgebra)
+import Analysis.ModuleDef (moduleDefAlgebra)
 import Rendering.Imports
-import Rendering.Renderer
-import Rendering.TOC.Spec hiding (spec)
-import Semantic
-import Semantic.Task
+
 import SpecHelpers
-import Test.Hspec (Spec, describe, it, xit, parallel, pendingWith)
-import Test.Hspec.Expectations.Pretty
-import Test.Hspec.LeanCheck
-import Test.LeanCheck
 
 
 spec :: Spec
@@ -46,5 +33,5 @@ spec = parallel $ do
   where
     toVerbatimOutput = verbatim . toOutput
     parseToImports parser path = do
-      blob <- Util.file path
+      blob <- file path
       runTask (parse parser blob >>= decorate (declarationAlgebra blob) >>= decorate (moduleDefAlgebra blob) >>= render (renderToImports blob))

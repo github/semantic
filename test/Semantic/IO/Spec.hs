@@ -1,16 +1,12 @@
 module Semantic.IO.Spec (spec) where
 
-import Data.Blob
-import Data.Functor.Both as Both
-import Data.Language
-import Data.Maybe
-import Data.String
 import Prelude hiding (readFile)
 import Semantic.IO
 import System.Exit (ExitCode(..))
 import System.IO (IOMode(..), openFile)
-import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall, anyIOException)
-import Test.Hspec.Expectations.Pretty
+
+import SpecHelpers
+
 
 spec :: Spec
 spec = parallel $ do
@@ -83,5 +79,3 @@ spec = parallel $ do
           h <- openFile path ReadMode
           blobs <- readBlobPairsFromHandle h
           pure blobs
-
-data Fixture = Fixture { shas :: Both String, expectedBlobs :: [Both Blob] }

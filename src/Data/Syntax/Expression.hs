@@ -19,7 +19,7 @@ instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Call where
   eval Call{..} = do
     op <- subtermValue callFunction
-    apply op callParams
+    apply op (map subtermValue callParams)
 
 data Comparison a
   = LessThan !a !a
