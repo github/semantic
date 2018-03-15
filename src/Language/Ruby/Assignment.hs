@@ -302,9 +302,8 @@ methodCall =   makeTerm' <$> symbol MethodCall <*> children (require <|> regular
     regularCall = inj <$> (Expression.Call <$> pure [] <*> expression <*> args <*> (block <|> emptyTerm))
     require = inj <$> (symbol Identifier *> do
       s <- source
-      guard (elem s ["require_relative"])
-      -- guard (elem s ["autoload", "load", "require", "require_relative"])
-      Ruby.Syntax.Require <$> nameExpression)
+      guard (elem s ["require", "require_relative"])
+      Ruby.Syntax.Require (s == "require_relative") <$> nameExpression)
     args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> pure []
     nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
 

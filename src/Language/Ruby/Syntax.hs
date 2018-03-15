@@ -9,7 +9,7 @@ import Diffing.Algorithm
 import Prologue
 import qualified Data.Map as Map
 
-newtype Require a = Require { requirePath :: a }
+data Require a = Require { requireRelative :: Bool, requirePath :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Require where liftEq = genericLiftEq
@@ -17,9 +17,8 @@ instance Ord1 Require where liftCompare = genericLiftCompare
 instance Show1 Require where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Require where
-  eval (Require path) = do
-    v <- subtermValue path
-    path <- getString v
-    importedEnv <- withGlobalEnv mempty (require (pathToQualifiedName path))
+  eval (Require _ x) = do
+    name <- pathToQualifiedName <$> (subtermValue x >>= asString)
+    importedEnv <- isolate (require name)
     modifyGlobalEnv (flip (Map.foldrWithKey envInsert) (unEnvironment importedEnv))
     unit
