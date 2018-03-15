@@ -59,7 +59,7 @@ evaluateFile :: forall value term effects
                 , FreeVariables term
                 , effects ~ RequiredEffects term value (Evaluating term value effects)
                 , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-                , MonadValue term value (Evaluating term value effects)
+                , MonadValue value (Evaluating term value effects)
                 , Recursive term
                 )
              => Parser term
@@ -73,7 +73,7 @@ evaluateFiles :: forall value term effects
                  , FreeVariables term
                  , effects ~ RequiredEffects term value (Evaluating term value effects)
                  , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-                 , MonadValue term value (Evaluating term value effects)
+                 , MonadValue value (Evaluating term value effects)
                  , Recursive term
                  )
               => Parser term

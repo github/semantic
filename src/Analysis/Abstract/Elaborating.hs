@@ -28,4 +28,4 @@ instance ( elab ~ Term (Base term) value
          , Show1 (Base term)
          , Show value
          )
-         => MonadValue term elab (Elaborating m term elab effects) where
+         => MonadValue elab (Elaborating m term elab effects) where

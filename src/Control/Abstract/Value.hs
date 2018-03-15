@@ -26,7 +26,7 @@ data Comparator
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class (MonadAnalysis term value m, Show value) => MonadValue term value m where
+class (MonadEnvironment value m, MonadFail m, MonadStore value m, Show value) => MonadValue value m where
   -- | Construct an abstract unit value.
   --   TODO: This might be the same as the empty tuple for some value types
   unit :: m value
@@ -71,7 +71,7 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
   ifthenelse :: value -> m a -> m a -> m a
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
-  abstract :: [Name] -> Subterm term (m value) -> m value
+  abstract :: (FreeVariables term, MonadControl term m) => [Name] -> Subterm term (m value) -> m value
   -- | Evaluate an application (like a function call).
   apply :: value -> [m value] -> m value
 
@@ -81,10 +81,10 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
   loop :: (m value -> m value) -> m value
 
 -- | Attempt to extract a 'Prelude.Bool' from a given value.
-toBool :: MonadValue term value m => value -> m Bool
+toBool :: MonadValue value m => value -> m Bool
 toBool v = ifthenelse v (pure True) (pure False)
 
-forLoop :: MonadValue term value m
+forLoop :: MonadValue value m
         => m value -- | Initial statement
         -> m value -- | Condition
         -> m value -- | Increment/stepper
@@ -96,7 +96,7 @@ forLoop initial cond step body = do
   localEnv (mappend env) (while cond (body *> step))
 
 -- | The fundamental looping primitive, built on top of ifthenelse.
-while :: MonadValue term value m
+while :: MonadValue value m
       => m value
       -> m value
       -> m value
@@ -105,7 +105,7 @@ while cond body = loop $ \ continue -> do
   ifthenelse this (body *> continue) unit
 
 -- | Do-while loop, built on top of while.
-doWhile :: MonadValue term value m
+doWhile :: MonadValue value m
         => m value
         -> m value
         -> m value
@@ -114,13 +114,14 @@ doWhile body cond = loop $ \ continue -> body *> do
   ifthenelse this continue unit
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( FreeVariables term
-         , MonadAddressable location (Value location) m
+instance ( MonadAddressable location (Value location) m
          , MonadAnalysis term (Value location) m
+         , MonadEnvironment (Value location) m
+         , MonadFail m
+         , MonadStore (Value location) m
          , Show location
-         , Show term
          )
-         => MonadValue term (Value location) m where
+         => MonadValue (Value location) m where
 
   unit     = pure . injValue $ Value.Unit
   integer  = pure . injValue . Value.Integer . Number.Integer
@@ -155,7 +156,7 @@ instance ( FreeVariables term
     | otherwise = fail ("Invalid operands to liftNumeric2: " <> show pair)
       where
         -- Dispatch whatever's contained inside a 'SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: MonadValue term value m => SomeNumber -> m value
+        specialize :: MonadValue value m => SomeNumber -> m value
         specialize (SomeNumber (Number.Integer i)) = integer i
         specialize (SomeNumber (Ratio r))          = rational r
         specialize (SomeNumber (Decimal d))        = float d
@@ -173,7 +174,7 @@ instance ( FreeVariables term
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: (Ord a, MonadValue term value m) => a -> a -> m value
+        go :: (Ord a, MonadValue value m) => a -> a -> m value
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
           Generalized -> integer (orderingToInt (compare l r))
@@ -200,7 +201,7 @@ instance ( FreeVariables term
   loop = fix
 
 -- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
-instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue term Type m where
+instance (Alternative m, MonadAnalysis term Type m, MonadEnvironment Type m, MonadFail m, MonadFresh m, MonadStore Type m) => MonadValue Type m where
   abstract names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
