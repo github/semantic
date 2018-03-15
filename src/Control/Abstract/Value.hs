@@ -8,8 +8,8 @@ import Data.Abstract.FreeVariables
 import Data.Abstract.Number as Number
 import Data.Abstract.Type as Type
 import Data.Abstract.Value as Value
-import qualified Data.Map as Map
 import Data.Scientific (Scientific)
+import qualified Data.Set as Set
 import Prelude hiding (fail)
 import Prologue
 
@@ -76,7 +76,12 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
   abstract :: [Name] -> Subterm term (m value) -> m value
   -- | Evaluate an application (like a function call).
-  apply :: value -> [Subterm term (m value)] -> m value
+  apply :: value -> [m value] -> m value
+
+  -- | Primitive looping combinator, approximately equivalent to 'fix'. This should be used in place of direct recursion, as it allows abstraction over recursion.
+  --
+  --   The function argument takes an action which recurs through the loop.
+  loop :: (m value -> m value) -> m value
 
 -- | Attempt to extract a 'Prelude.Bool' from a given value.
 toBool :: MonadValue term value m => value -> m Bool
@@ -91,28 +96,29 @@ forLoop :: MonadValue term value m
 forLoop initial cond step body = do
   void initial
   env <- getGlobalEnv
-  localEnv (mappend env) (fix $ \ loop -> do
-      cond' <- cond
-      ifthenelse cond' (do
-        void body
-        void step
-        loop) unit)
+  localEnv (mappend env) (while cond (body *> step))
 
 -- | The fundamental looping primitive, built on top of ifthenelse.
-while :: MonadValue term value m => m value -> m value -> m value
-while cond body = do
+while :: MonadValue term value m
+      => m value
+      -> m value
+      -> m value
+while cond body = loop $ \ continue -> do
   this <- cond
-  ifthenelse this (body *> while cond body) unit
+  ifthenelse this (body *> continue) unit
 
 -- | Do-while loop, built on top of while.
-doWhile :: MonadValue term value m => m value -> m value -> m value
-doWhile body cond = do
-  void body
+doWhile :: MonadValue term value m
+        => m value
+        -> m value
+        -> m value
+doWhile body cond = loop $ \ continue -> body *> do
   this <- cond
-  ifthenelse this (doWhile body cond) unit
+  ifthenelse this continue unit
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( MonadAddressable location (Value location term) m
+instance ( FreeVariables term
+         , MonadAddressable location (Value location term) m
          , MonadAnalysis term (Value location term) m
          , Show location
          , Show term
@@ -183,16 +189,18 @@ instance ( MonadAddressable location (Value location term) m
 
         pair = (left, right)
 
-  abstract names (Subterm body _) = injValue . Closure names body <$> askLocalEnv
+  abstract names (Subterm body _) = injValue . Closure names body . bindEnv (foldr Set.delete (freeVariables body) names) <$> askLocalEnv
 
   apply op params = do
     Closure names body env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
     bindings <- foldr (\ (name, param) rest -> do
-      v <- subtermValue param
+      v <- param
       a <- alloc name
       assign a v
       envInsert name a <$> rest) (pure env) (zip names params)
     localEnv (mappend bindings) (evaluateTerm body)
+
+  loop = fix
 
 -- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
 instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue term Type m where
@@ -227,10 +235,19 @@ instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue 
     (Int, Type.Float) -> pure Type.Float
     _                 -> unify left right
 
-  liftComparison _ left right = pure left <|> pure right
+  liftComparison (Concrete _) left right = case (left, right) of
+    (Type.Float, Int) ->                     pure Bool
+    (Int, Type.Float) ->                     pure Bool
+    _                 -> unify left right *> pure Bool
+  liftComparison Generalized left right = case (left, right) of
+    (Type.Float, Int) ->                     pure Int
+    (Int, Type.Float) ->                     pure Int
+    _                 -> unify left right *> pure Int
 
   apply op params = do
     tvar <- fresh
-    paramTypes <- traverse subtermValue params
+    paramTypes <- sequenceA params
     _ :-> ret <- op `unify` (Product paramTypes :-> Var tvar)
     pure ret
+
+  loop f = f empty

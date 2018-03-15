@@ -8,7 +8,9 @@ module Language.Go.Assignment
 
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Abstract.FreeVariables
-import Data.ByteString as B
+import qualified Data.ByteString.Char8 as BC
+import qualified Data.ByteString as B
+import Data.Char (ord)
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
 import Language.Go.Grammar as Grammar
@@ -390,22 +392,20 @@ importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTe
                <|> makeTerm <$> symbol ImportSpec <*> children namedImport
                <|> makeTerm <$> symbol ImportSpec <*> children plainImport
 
-    dotImport = symbol Dot *> source >>= \s ->
-      Declaration.WildcardImport <$> expression <*> (makeTerm <$> location <*> pure (Syntax.Identifier (name s)))
-    sideEffectImport = symbol BlankIdentifier *> source *> (Declaration.Import <$> expression <*> pure [])
-    namedImport = symbol PackageIdentifier >>= \loc -> do
-      s <- source
-      let alias = makeTerm loc (Syntax.Identifier (name s))
-      Declaration.QualifiedImport <$> expression <*> pure alias <*> pure []
+    dotImport = flip Declaration.WildcardImport <$> (makeTerm <$> symbol Dot <*> (Syntax.Identifier <$> (name <$> source))) <*> importFromPath
+    sideEffectImport = symbol BlankIdentifier *> source *> (Declaration.Import <$> importFromPath <*> pure [])
+    namedImport = flip Declaration.QualifiedImport <$> packageIdentifier <*> importFromPath <*> pure []
     plainImport = symbol InterpretedStringLiteral >>= \loc -> do
-      s <- source
-      let from = makeTerm loc (Literal.TextElement s)
-      let alias = makeTerm loc (Syntax.Identifier (baseName s))
+      names <- pathToNames <$> source
+      let from = makeTerm loc (Syntax.Identifier (qualifiedName names))
+      let alias = makeTerm loc (Syntax.Identifier (name (last names))) -- Go takes `import "lib/Math"` and uses `Math` as the qualified name (e.g. `Math.Sin()`)
       Declaration.QualifiedImport <$> pure from <*> pure alias <*> pure []
 
-    baseName bs = name $ Prelude.last (B.split (toEnum (fromEnum '/')) (stripQuotes bs))
-    stripQuotes = fromMaybe' (B.stripSuffix "\"") . fromMaybe' (B.stripPrefix "\"")
-    fromMaybe' f x = fromMaybe x (f x)
+    importFromPath = makeTerm <$> symbol InterpretedStringLiteral <*> (Syntax.Identifier <$> (pathToQualifiedName <$> source))
+
+    pathToQualifiedName = qualifiedName . pathToNames
+    pathToNames = BC.split '/' . (BC.dropWhile (== '/')) . (BC.dropWhile (== '.')) . stripQuotes
+    stripQuotes = B.filter (/= (fromIntegral (ord '\"')))
 
 indexExpression :: Assignment
 indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)

@@ -56,7 +56,7 @@ class Monad m => MonadEnvironment value m | m -> value where
   localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m a -> m a
 
 -- | Update the global environment.
-modifyGlobalEnv :: MonadEvaluator term value m => (EnvironmentFor value -> EnvironmentFor value) -> m  ()
+modifyGlobalEnv :: MonadEnvironment value m => (EnvironmentFor value -> EnvironmentFor value) -> m  ()
 modifyGlobalEnv f = do
   env <- getGlobalEnv
   putGlobalEnv $! f env
@@ -80,9 +80,9 @@ assign :: ( Ord (LocationFor value)
           , MonadStore value m
           , Reducer value (CellFor value)
           )
-          => Address (LocationFor value) value
-          -> value
-          -> m ()
+       => Address (LocationFor value) value
+       -> value
+       -> m ()
 assign address = modifyStore . storeInsert address
 
 
@@ -94,9 +94,9 @@ class Monad m => MonadModuleTable term value m | m -> term, m -> value where
   putModuleTable :: ModuleTable (EnvironmentFor value) -> m ()
 
   -- | Retrieve the table of unevaluated modules.
-  askModuleTable :: m (ModuleTable term)
+  askModuleTable :: m (ModuleTable [term])
   -- | Run an action with a locally-modified table of unevaluated modules.
-  localModuleTable :: (ModuleTable term -> ModuleTable term) -> m a -> m a
+  localModuleTable :: (ModuleTable [term] -> ModuleTable [term]) -> m a -> m a
 
 -- | Update the evaluated module table.
 modifyModuleTable :: MonadModuleTable term value m => (ModuleTable (EnvironmentFor value) -> ModuleTable (EnvironmentFor value)) -> m ()

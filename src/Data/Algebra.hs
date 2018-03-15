@@ -15,10 +15,12 @@ module Data.Algebra
 ) where
 
 import Data.Bifunctor
+import Data.Functor.Classes.Generic as X
 import Data.Functor.Foldable ( Base
                              , Corecursive(embed)
                              , Recursive(project)
                              )
+import GHC.Generics
 
 -- | An F-algebra on some 'Recursive' type @t@.
 --
@@ -46,10 +48,14 @@ type OpenRAlgebra f t a = forall b . (b -> (t, a)) -> f b -> a
 
 -- | A subterm and its computed value, used in 'SubtermAlgebra'.
 data Subterm t a = Subterm { subterm :: !t, subtermValue :: !a }
-  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
 
 instance Bifunctor Subterm where
   bimap f g (Subterm a b) = Subterm (f a) (g b)
+
+instance Eq t => Eq1 (Subterm t) where liftEq = genericLiftEq
+instance Ord t => Ord1 (Subterm t) where liftCompare = genericLiftCompare
+instance Show t => Show1 (Subterm t) where liftShowsPrec = genericLiftShowsPrec
 
 -- | Like an R-algebra, but using 'Subterm' to label the fields instead of an anonymous pair.
 type SubtermAlgebra f t a = f (Subterm t a) -> a
