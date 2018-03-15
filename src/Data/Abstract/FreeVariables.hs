@@ -19,6 +19,11 @@ friendlyName :: Name -> ByteString
 friendlyName xs = intercalate "." (NonEmpty.toList xs)
 
 
+-- | The type of labels.
+--   TODO: This should be rolled into 'Name' and tracked in the environment, both so that we can abstract over labels like any other location, and so that we can garbage collect unreachable labels.
+type Label = Int
+
+
 -- | Types which can contain unbound variables.
 class FreeVariables term where
   -- | The set of free variables in the given value.

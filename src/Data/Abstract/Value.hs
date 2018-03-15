@@ -1,10 +1,10 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, FunctionalDependencies, FlexibleContexts, FlexibleInstances, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, TypeFamilies, TypeOperators #-}
 module Data.Abstract.Value where
 
 import Data.Abstract.Address
 import Data.Abstract.Environment
-import Data.Abstract.Store
 import Data.Abstract.FreeVariables
+import Data.Abstract.Heap
 import Data.Abstract.Live
 import Data.Abstract.Number
 import qualified Data.Abstract.Type as Type
@@ -13,46 +13,47 @@ import Prologue
 import Prelude hiding (Float, Integer, String, Rational, fail)
 import qualified Prelude
 
-type ValueConstructors location term
-  = '[Closure location term
-    , Unit
+type ValueConstructors
+  = '[Array
     , Boolean
+    , Closure
     , Float
     , Integer
     , String
     , Rational
     , Symbol
     , Tuple
+    , Unit
     ]
 
 -- | Open union of primitive values that terms can be evaluated to.
 --   Fix by another name.
-newtype Value location term = Value { deValue :: Union (ValueConstructors location term) (Value location term) }
+newtype Value = Value { deValue :: Union ValueConstructors Value }
   deriving (Eq, Show, Ord)
 
 -- | Identical to 'inj', but wraps the resulting sub-entity in a 'Value'.
-injValue :: (f :< ValueConstructors location term) => f (Value location term) -> Value location term
+injValue :: (f :< ValueConstructors) => f Value -> Value
 injValue = Value . inj
 
 -- | Identical to 'prj', but unwraps the argument out of its 'Value' wrapper.
-prjValue :: (f :< ValueConstructors location term) => Value location term -> Maybe (f (Value location term))
+prjValue :: (f :< ValueConstructors) => Value -> Maybe (f Value)
 prjValue = prj . deValue
 
 -- | Convenience function for projecting two values.
-prjPair :: ( f :< ValueConstructors loc term1 , g :< ValueConstructors loc term2)
-        => (Value loc term1, Value loc term2)
-        -> Maybe (f (Value loc term1), g (Value loc term2))
+prjPair :: (f :< ValueConstructors , g :< ValueConstructors)
+        => (Value, Value)
+        -> Maybe (f Value, g Value)
 prjPair = bitraverse prjValue prjValue
 
 -- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
 
--- | A function value consisting of a list of parameters, the body of the function, and an environment of bindings captured by the body.
-data Closure location term value = Closure [Name] term (Environment location value)
+-- | A function value consisting of a list of parameter 'Name's, a 'Label' to jump to the body of the function, and an 'Environment' of bindings captured by the body.
+data Closure value = Closure [Name] Label (Environment Precise value)
   deriving (Eq, Generic1, Ord, Show)
 
-instance (Eq location, Eq term) => Eq1 (Closure location term) where liftEq = genericLiftEq
-instance (Ord location, Ord term) => Ord1 (Closure location term) where liftCompare = genericLiftCompare
-instance (Show location, Show term) => Show1 (Closure location term) where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 Closure where liftEq = genericLiftEq
+instance Ord1 Closure where liftCompare = genericLiftCompare
+instance Show1 Closure where liftShowsPrec = genericLiftShowsPrec
 
 -- | The unit value. Typically used to represent the result of imperative statements.
 data Unit value = Unit
@@ -111,10 +112,9 @@ instance Eq1 Float where liftEq = genericLiftEq
 instance Ord1 Float where liftCompare = genericLiftCompare
 instance Show1 Float where liftShowsPrec = genericLiftShowsPrec
 
--- Zero or more values.
--- TODO: Investigate whether we should use Vector for this.
--- TODO: Should we have a Some type over a nonemmpty list? Or does this merit one?
-
+-- | Zero or more values. Fixed-size at interpretation time.
+--   TODO: Investigate whether we should use Vector for this.
+--   TODO: Should we have a Some type over a nonemmpty list? Or does this merit one?
 newtype Tuple value = Tuple [value]
   deriving (Eq, Generic1, Ord, Show)
 
@@ -122,14 +122,23 @@ instance Eq1 Tuple where liftEq = genericLiftEq
 instance Ord1 Tuple where liftCompare = genericLiftCompare
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
+-- | Zero or more values. Dynamically resized as needed at interpretation time.
+--   TODO: Vector? Seq?
+newtype Array value = Array [value]
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Array where liftEq = genericLiftEq
+instance Ord1 Array where liftCompare = genericLiftCompare
+instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
+
 -- | The environment for an abstract value type.
 type EnvironmentFor v = Environment (LocationFor v) v
 
 -- | The exports for an abstract value type.
 type ExportsFor v = Exports (LocationFor v) v
 
--- | The store for an abstract value type.
-type StoreFor v = Store (LocationFor v) v
+-- | The 'Heap' for an abstract value type.
+type HeapFor value = Heap (LocationFor value) value
 
 -- | The cell for an abstract value type.
 type CellFor value = Cell (LocationFor value) value
@@ -138,19 +147,19 @@ type CellFor value = Cell (LocationFor value) value
 type LiveFor value = Live (LocationFor value) value
 
 -- | The location type (the body of 'Address'es) which should be used for an abstract value type.
-type family LocationFor value :: * where
-  LocationFor (Value location term) = location
-  LocationFor Type.Type = Monovariant
+type family LocationFor value :: *
+type instance LocationFor Value = Precise
+type instance LocationFor Type.Type = Monovariant
 
 -- | Value types, e.g. closures, which can root a set of addresses.
 class ValueRoots value where
   -- | Compute the set of addresses rooted by a given value.
   valueRoots :: value -> LiveFor value
 
-instance Ord location => ValueRoots (Value location term) where
+instance ValueRoots Value where
   valueRoots v
-    | Just (Closure _ body env) <- prjValue v = envAll env `const` (body :: term)
-    | otherwise                               = mempty
+    | Just (Closure _ _ env) <- prjValue v = envAll env
+    | otherwise                            = mempty
 
 instance ValueRoots Type.Type where
   valueRoots _ = mempty

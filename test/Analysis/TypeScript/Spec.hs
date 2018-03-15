@@ -40,7 +40,7 @@ spec = parallel $ do
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate entry = snd <$> evaluate' entry
     evaluate' entry = fst . fst . fst <$>
-      evaluateFiles @TypeScriptValue typescriptParser
+      evaluateFiles typescriptParser
         [ fixtures <> entry
         , fixtures <> "a.ts"
         , fixtures <> "foo.ts"

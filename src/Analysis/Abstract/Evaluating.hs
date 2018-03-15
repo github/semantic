@@ -17,6 +17,7 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Blob
+import qualified Data.IntMap as IntMap
 import Data.Language
 import Data.List.Split (splitWhen)
 import Prelude hiding (fail)
@@ -31,7 +32,7 @@ evaluate :: forall value term effects
             , Evaluatable (Base term)
             , FreeVariables term
             , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-            , MonadValue term value (Evaluating term value effects)
+            , MonadValue value (Evaluating term value effects)
             , Recursive term
             )
          => term
@@ -44,7 +45,7 @@ evaluates :: forall value term effects
              , Evaluatable (Base term)
              , FreeVariables term
              , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-             , MonadValue term value (Evaluating term value effects)
+             , MonadValue value (Evaluating term value effects)
              , Recursive term
              )
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
@@ -69,7 +70,6 @@ withModules Blob{..} pairs = localModuleTable (const moduleTable)
 newtype Evaluating term value effects a = Evaluating (Eff effects a)
   deriving (Applicative, Functor, Effectful, Monad)
 
-
 deriving instance Member Fail      effects => MonadFail   (Evaluating term value effects)
 deriving instance Member Fresh     effects => MonadFresh  (Evaluating term value effects)
 deriving instance Member NonDetEff effects => Alternative (Evaluating term value effects)
@@ -80,11 +80,21 @@ type EvaluatingEffects term value
   = '[ Fail                                        -- Failure with an error message
      , Reader (EnvironmentFor value)               -- Local environment (e.g. binding over a closure)
      , State  (EnvironmentFor value)               -- Global (imperative) environment
-     , State  (StoreFor value)                     -- The heap
+     , State  (HeapFor value)                      -- The heap
      , Reader (ModuleTable [term])                 -- Cache of unevaluated modules
      , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
      , State  (ExportsFor value)                   -- Exports (used to filter environments when they are imported)
+     , State  (IntMap.IntMap term)                 -- For jumps
      ]
+
+instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl term (Evaluating term value effects) where
+  label term = do
+    m <- raise get
+    let i = IntMap.size m
+    raise (put (IntMap.insert i term m))
+    pure i
+
+  goto label = IntMap.lookup label <$> raise get >>= maybe (fail ("unknown label: " <> show label)) pure
 
 instance Members '[State (ExportsFor value), Reader (EnvironmentFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
   getGlobalEnv = raise get
@@ -98,9 +108,9 @@ instance Members '[State (ExportsFor value), Reader (EnvironmentFor value), Stat
   askLocalEnv = raise ask
   localEnv f a = raise (local f (lower a))
 
-instance Member (State (StoreFor value)) effects => MonadStore value (Evaluating term value effects) where
-  getStore = raise get
-  putStore = raise . put
+instance Member (State (HeapFor value)) effects => MonadHeap value (Evaluating term value effects) where
+  getHeap = raise get
+  putHeap = raise . put
 
 instance Members '[Reader (ModuleTable [term]), State (ModuleTable (EnvironmentFor value))] effects => MonadModuleTable term value (Evaluating term value effects) where
   getModuleTable = raise get
@@ -110,13 +120,13 @@ instance Members '[Reader (ModuleTable [term]), State (ModuleTable (EnvironmentF
   localModuleTable f a = raise (local f (lower a))
 
 instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
-  getConfiguration term = Configuration term mempty <$> askLocalEnv <*> getStore
+  getConfiguration term = Configuration term mempty <$> askLocalEnv <*> getHeap
 
 instance ( Evaluatable (Base term)
          , FreeVariables term
          , Members (EvaluatingEffects term value) effects
          , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-         , MonadValue term value (Evaluating term value effects)
+         , MonadValue value (Evaluating term value effects)
          , Recursive term
          )
          => MonadAnalysis term value (Evaluating term value effects) where
