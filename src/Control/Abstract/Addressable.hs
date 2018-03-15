@@ -69,10 +69,6 @@ letrec name body = do
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
 instance (MonadFail m, LocationFor value ~ Precise, MonadHeap value m) => MonadAddressable Precise value m where
   deref = maybe uninitializedAddress (pure . unLatest) <=< flip fmap getHeap . heapLookup
-    where
-      -- | Fail with a message denoting an uninitialized address (i.e. one which was 'alloc'ated, but never 'assign'ed a value before being 'deref'erenced).
-      uninitializedAddress :: MonadFail m => m a
-      uninitializedAddress = fail "uninitialized address"
 
   alloc _ = fmap (Address . Precise . heapSize) getHeap
 
@@ -82,3 +78,7 @@ instance (Alternative m, LocationFor value ~ Monovariant, MonadHeap value m, Ord
   deref = asum . maybe [] (map pure . toList) <=< flip fmap getHeap . heapLookup
 
   alloc = pure . Address . Monovariant
+
+-- | Fail with a message denoting an uninitialized address (i.e. one which was 'alloc'ated, but never 'assign'ed a value before being 'deref'erenced).
+uninitializedAddress :: MonadFail m => m a
+uninitializedAddress = fail "uninitialized address"
