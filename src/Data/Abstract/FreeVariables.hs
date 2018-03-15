@@ -20,16 +20,16 @@ name x = x :| []
 qualifiedName :: [ByteString] -> Name
 qualifiedName = NonEmpty.fromList
 
+-- | Construct a qualified 'Name' from a `/` delimited path.
+pathToQualifiedName :: ByteString -> Name
+pathToQualifiedName = qualifiedName . splitOnPathSeparator
+
 -- | Split a 'ByteString' path on `/`, stripping quotes and any `./` prefix.
 splitOnPathSeparator :: ByteString -> [ByteString]
 splitOnPathSeparator = BC.split '/' . BC.dropWhile (== '/') . BC.dropWhile (== '.') . stripQuotes
   where stripQuotes = B.filter (/= fromIntegral (ord '\"'))
 
--- | Construct a qualified 'Name' from a `/` delimited path.
-pathToQualifiedName :: ByteString -> Name
-pathToQualifiedName = qualifiedName . splitOnPathSeparator
-
--- | User friendly version of a qualified 'Name'.
+-- | User friendly 'ByteString' of a qualified 'Name'.
 friendlyName :: Name -> ByteString
 friendlyName xs = intercalate "." (NonEmpty.toList xs)
 
