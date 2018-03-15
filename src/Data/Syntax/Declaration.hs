@@ -223,7 +223,7 @@ instance Evaluatable QualifiedExport where
   eval (QualifiedExport exportSymbols) = do
     -- Insert the aliases with no addresses.
     for_ exportSymbols $ \(name, alias) ->
-      addExport name (alias, Nothing)
+      addExport name alias Nothing
     unit
 
 
@@ -242,7 +242,7 @@ instance Evaluatable QualifiedExportFrom where
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \(name, alias) -> do
       let address = Map.lookup name (unEnvironment importedEnv)
-      addExport name (alias, address)
+      addExport name alias address
     unit
 
 

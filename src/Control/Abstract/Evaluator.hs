@@ -58,17 +58,19 @@ class Monad m => MonadEnvironment value m | m -> value where
   localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m a -> m a
 
 -- | Update the global environment.
-modifyGlobalEnv :: MonadEnvironment value m => (EnvironmentFor value -> EnvironmentFor value) -> m  ()
+modifyGlobalEnv :: MonadEnvironment value m => (EnvironmentFor value -> EnvironmentFor value) -> m ()
 modifyGlobalEnv f = do
   env <- getGlobalEnv
   putGlobalEnv $! f env
 
--- | Add an export to the global export state.
-addExport :: MonadEvaluator term value m => Name -> (Name, Maybe (Address (LocationFor value) value)) -> m ()
-addExport name value = do
+modifyExports :: MonadEnvironment value m => (ExportsFor value -> ExportsFor value) -> m ()
+modifyExports f = do
   exports <- getExports
-  putExports $! exportInsert name value exports
+  putExports $! f exports
 
+-- | Add an export to the global export state.
+addExport :: MonadEnvironment value m => Name -> Name -> Maybe (Address (LocationFor value) value) -> m ()
+addExport name alias address = modifyExports (exportInsert name (alias, address))
 
 -- | A 'Monad' abstracting a heap of values.
 class Monad m => MonadStore value m | m -> value where
