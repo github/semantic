@@ -26,7 +26,7 @@ data Comparator
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class (MonadEnvironment value m, MonadFail m, MonadStore value m, Show value) => MonadValue value m where
+class (Monad m, Show value) => MonadValue value m where
   -- | Construct an abstract unit value.
   --   TODO: This might be the same as the empty tuple for some value types
   unit :: m value
@@ -84,7 +84,7 @@ class (MonadEnvironment value m, MonadFail m, MonadStore value m, Show value) =>
 toBool :: MonadValue value m => value -> m Bool
 toBool v = ifthenelse v (pure True) (pure False)
 
-forLoop :: MonadValue value m
+forLoop :: (MonadEnvironment value m, MonadValue value m)
         => m value -- | Initial statement
         -> m value -- | Condition
         -> m value -- | Increment/stepper
@@ -114,11 +114,9 @@ doWhile body cond = loop $ \ continue -> body *> do
   ifthenelse this continue unit
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( MonadAddressable location (Value location) m
+instance ( Monad m
+         , MonadAddressable location (Value location) m
          , MonadAnalysis term (Value location) m
-         , MonadEnvironment (Value location) m
-         , MonadFail m
-         , MonadStore (Value location) m
          , Show location
          )
          => MonadValue (Value location) m where
@@ -200,8 +198,8 @@ instance ( MonadAddressable location (Value location) m
 
   loop = fix
 
--- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
-instance (Alternative m, MonadAnalysis term Type m, MonadEnvironment Type m, MonadFail m, MonadFresh m, MonadStore Type m) => MonadValue Type m where
+-- | Discard the value arguments (if any), constructing a 'Type' instead.
+instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, MonadStore Type m) => MonadValue Type m where
   abstract names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name

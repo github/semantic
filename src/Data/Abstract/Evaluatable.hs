@@ -60,6 +60,6 @@ instance MonadEnvironment value m => Semigroup (Imperative m a) where
     env <- getGlobalEnv
     localEnv (<> env) b
 
-instance MonadValue value m => Monoid (Imperative m value) where
+instance (MonadEnvironment value m, MonadValue value m) => Monoid (Imperative m value) where
   mempty = Imperative unit
   mappend = (<>)
