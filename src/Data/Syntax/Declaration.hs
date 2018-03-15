@@ -5,6 +5,7 @@ import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
 import qualified Data.Map as Map
+import Prelude hiding (fail)
 import Prologue
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
@@ -238,12 +239,15 @@ instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedExportFrom where
   eval (QualifiedExportFrom from exportSymbols) = do
     let moduleName = freeVariable (subterm from)
-    importedEnv <- withGlobalEnv mempty (require moduleName)
+    importedEnv <- isolate (require moduleName)
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \(name, alias) -> do
       let address = Map.lookup name (unEnvironment importedEnv)
-      addExport name alias address
+      maybe (cannotExport moduleName name) (addExport name alias . Just) address
     unit
+    where
+      cannotExport moduleName name = fail $
+        "module " <> show (friendlyName moduleName) <> " does not export " <> show (friendlyName name)
 
 
 newtype DefaultExport a = DefaultExport { defaultExport :: a }
