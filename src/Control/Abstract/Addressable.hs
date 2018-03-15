@@ -10,7 +10,6 @@ import Data.Abstract.FreeVariables
 import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Foldable (asum, toList)
-import Data.Semigroup
 import Data.Semigroup.Reducer
 import Prelude hiding (fail)
 
@@ -21,8 +20,7 @@ class (Monad m, Ord l, l ~ LocationFor value, Reducer value (Cell l value)) => M
   alloc :: Name -> m (Address l value)
 
 -- | Look up or allocate an address for a 'Name' & assign it a given value, returning the 'Name' paired with the address.
-lookupOrAlloc :: ( Semigroup (CellFor value)
-                 , MonadAddressable (LocationFor value) value m
+lookupOrAlloc :: ( MonadAddressable (LocationFor value) value m
                  , MonadEnvironment value m
                  , MonadStore value m
                  )
