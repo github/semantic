@@ -14,15 +14,16 @@ import Prelude hiding (Float, Integer, String, Rational, fail)
 import qualified Prelude
 
 type ValueConstructors location term
-  = '[Closure location term
-    , Unit
+  = '[Array
     , Boolean
+    , Closure location term
     , Float
     , Integer
     , String
     , Rational
     , Symbol
     , Tuple
+    , Unit
     ]
 
 -- | Open union of primitive values that terms can be evaluated to.
@@ -111,16 +112,24 @@ instance Eq1 Float where liftEq = genericLiftEq
 instance Ord1 Float where liftCompare = genericLiftCompare
 instance Show1 Float where liftShowsPrec = genericLiftShowsPrec
 
--- Zero or more values.
--- TODO: Investigate whether we should use Vector for this.
--- TODO: Should we have a Some type over a nonemmpty list? Or does this merit one?
-
+-- | Zero or more values. Fixed-size at interpretation time.
+--   TODO: Investigate whether we should use Vector for this.
+--   TODO: Should we have a Some type over a nonemmpty list? Or does this merit one?
 newtype Tuple value = Tuple [value]
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 Tuple where liftEq = genericLiftEq
 instance Ord1 Tuple where liftCompare = genericLiftCompare
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
+
+-- | Zero or more values. Dynamically resized as needed at interpretation time.
+--   TODO: Vector? Seq?
+newtype Array value = Array [value]
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Array where liftEq = genericLiftEq
+instance Ord1 Array where liftCompare = genericLiftCompare
+instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 
 -- | The environment for an abstract value type.
 type EnvironmentFor v = Environment (LocationFor v) v
