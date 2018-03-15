@@ -27,21 +27,21 @@ type ValueConstructors location
 
 -- | Open union of primitive values that terms can be evaluated to.
 --   Fix by another name.
-newtype Value location term = Value { deValue :: Union (ValueConstructors location) (Value location term) }
+newtype Value location = Value { deValue :: Union (ValueConstructors location) (Value location) }
   deriving (Eq, Show, Ord)
 
 -- | Identical to 'inj', but wraps the resulting sub-entity in a 'Value'.
-injValue :: (f :< ValueConstructors location) => f (Value location term) -> Value location term
+injValue :: (f :< ValueConstructors location) => f (Value location) -> Value location
 injValue = Value . inj
 
 -- | Identical to 'prj', but unwraps the argument out of its 'Value' wrapper.
-prjValue :: (f :< ValueConstructors location) => Value location term -> Maybe (f (Value location term))
+prjValue :: (f :< ValueConstructors location) => Value location -> Maybe (f (Value location))
 prjValue = prj . deValue
 
 -- | Convenience function for projecting two values.
-prjPair :: (f :< ValueConstructors loc , g :< ValueConstructors loc)
-        => (Value loc term1, Value loc term2)
-        -> Maybe (f (Value loc term1), g (Value loc term2))
+prjPair :: (f :< ValueConstructors loc1 , g :< ValueConstructors loc2)
+        => (Value loc1, Value loc2)
+        -> Maybe (f (Value loc1), g (Value loc2))
 prjPair = bitraverse prjValue prjValue
 
 -- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
@@ -136,7 +136,7 @@ type LiveFor value = Live (LocationFor value) value
 
 -- | The location type (the body of 'Address'es) which should be used for an abstract value type.
 type family LocationFor value :: * where
-  LocationFor (Value location term) = location
+  LocationFor (Value location) = location
   LocationFor Type.Type = Monovariant
 
 -- | Value types, e.g. closures, which can root a set of addresses.
@@ -144,7 +144,7 @@ class ValueRoots value where
   -- | Compute the set of addresses rooted by a given value.
   valueRoots :: value -> LiveFor value
 
-instance Ord location => ValueRoots (Value location term) where
+instance Ord location => ValueRoots (Value location) where
   valueRoots v
     | Just (Closure _ _ env) <- prjValue v = envAll env
     | otherwise                            = mempty

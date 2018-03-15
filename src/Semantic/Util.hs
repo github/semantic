@@ -14,7 +14,6 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.Address
 import Data.Abstract.Type
 import Data.Abstract.Value
-import Data.AST
 import Data.Blob
 import Data.Diff
 import Data.Range
@@ -31,36 +30,28 @@ import Semantic.Task
 
 import qualified Language.Go.Assignment as Go
 import qualified Language.Python.Assignment as Python
-import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 
-type PreciseValue a = Value Precise (Term (Union a) (Record Location))
-
-type GoValue         = PreciseValue Go.Syntax
-type RubyValue       = PreciseValue Ruby.Syntax
-type PythonValue     = PreciseValue Python.Syntax
-type TypeScriptValue = PreciseValue TypeScript.Syntax
-
 -- Ruby
-evaluateRubyFile = evaluateFile @RubyValue rubyParser
-evaluateRubyFiles = evaluateFiles @RubyValue rubyParser
+evaluateRubyFile = evaluateFile @(Value Precise) rubyParser
+evaluateRubyFiles = evaluateFiles @(Value Precise) rubyParser
 
 -- Go
-evaluateGoFile = evaluateFile @GoValue goParser
-evaluateGoFiles = evaluateFiles @GoValue goParser
+evaluateGoFile = evaluateFile @(Value Precise) goParser
+evaluateGoFiles = evaluateFiles @(Value Precise) goParser
 typecheckGoFile path = runAnalysis @(Caching Evaluating Go.Term Type) . evaluateModule . snd <$> parseFile goParser path
 
 -- Python
-evaluatePythonFile path = evaluate @PythonValue . snd <$> parseFile pythonParser path
-evaluatePythonFiles = evaluateFiles @PythonValue pythonParser
+evaluatePythonFile path = evaluate @(Value Precise) . snd <$> parseFile pythonParser path
+evaluatePythonFiles = evaluateFiles @(Value Precise) pythonParser
 typecheckPythonFile path = runAnalysis @(Caching Evaluating Python.Term Type) . evaluateModule . snd <$> parseFile pythonParser path
-tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term PythonValue) . evaluateModule . snd <$> parseFile pythonParser path
-evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] Evaluating) Python.Term PythonValue) . evaluateModule . snd <$> parseFile pythonParser path
+tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term (Value Precise)) . evaluateModule . snd <$> parseFile pythonParser path
+evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] Evaluating) Python.Term (Value Precise)) . evaluateModule . snd <$> parseFile pythonParser path
 
 -- TypeScript
 typecheckTypeScriptFile path = runAnalysis @(Caching Evaluating TypeScript.Term Type) . evaluateModule . snd <$> parseFile typescriptParser path
-evaluateTypeScriptFile = evaluateFile @TypeScriptValue typescriptParser
-evaluateTypeScriptFiles = evaluateFiles @TypeScriptValue typescriptParser
+evaluateTypeScriptFile = evaluateFile @(Value Precise) typescriptParser
+evaluateTypeScriptFiles = evaluateFiles @(Value Precise) typescriptParser
 
 -- Evalute a single file.
 evaluateFile :: forall value term effects

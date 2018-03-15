@@ -115,12 +115,12 @@ doWhile body cond = loop $ \ continue -> body *> do
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( FreeVariables term
-         , MonadAddressable location (Value location term) m
-         , MonadAnalysis term (Value location term) m
+         , MonadAddressable location (Value location) m
+         , MonadAnalysis term (Value location) m
          , Show location
          , Show term
          )
-         => MonadValue term (Value location term) m where
+         => MonadValue term (Value location) m where
 
   unit     = pure . injValue $ Value.Unit
   integer  = pure . injValue . Value.Integer . Number.Integer
