@@ -1,9 +1,9 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.Go.Syntax where
 
-import Prologue
-import Data.Abstract.Evaluatable
+import Data.Abstract.Evaluatable hiding (Label)
 import Diffing.Algorithm
+import Prologue
 
 -- A composite literal in Go
 data Composite a = Composite { compositeType :: !a, compositeElement :: !a }
