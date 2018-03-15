@@ -36,7 +36,7 @@ letrec :: ( MonadAddressable (LocationFor value) value m
        -> m value
        -> m (value, Address (LocationFor value) value)
 letrec name body = do
-  addr <- alloc name
+  addr <- lookupOrAlloc name
   v <- localEnv (envInsert name addr) body
   assign addr v
   pure (v, addr)
