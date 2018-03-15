@@ -8,9 +8,6 @@ module Language.Go.Assignment
 
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Abstract.FreeVariables
-import qualified Data.ByteString.Char8 as BC
-import qualified Data.ByteString as B
-import Data.Char (ord)
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
 import Language.Go.Grammar as Grammar

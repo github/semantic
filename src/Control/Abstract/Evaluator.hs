@@ -3,23 +3,26 @@ module Control.Abstract.Evaluator
 ( MonadEvaluator(..)
 , MonadEnvironment(..)
 , modifyGlobalEnv
+, modifyExports
 , addExport
-, MonadStore(..)
-, modifyStore
+, MonadHeap(..)
+, modifyHeap
+, lookupHeap
 , assign
 , MonadModuleTable(..)
 , modifyModuleTable
+, MonadControl(..)
 ) where
 
 import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
+import Data.Abstract.Heap
 import Data.Abstract.ModuleTable
-import Data.Abstract.Store
 import Data.Abstract.Value
 import Data.Semigroup.Reducer
-import Prelude hiding (fail)
+import Prelude
 import Prologue
 
 -- | A 'Monad' providing the basic essentials for evaluation.
@@ -28,10 +31,11 @@ import Prologue
 --   - environments binding names to addresses
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
-class ( MonadEnvironment value m
+class ( MonadControl term m
+      , MonadEnvironment value m
       , MonadFail m
       , MonadModuleTable term value m
-      , MonadStore value m
+      , MonadHeap value m
       )
       => MonadEvaluator term value m | m -> term, m -> value where
   -- | Get the current 'Configuration' with a passed-in term.
@@ -58,6 +62,16 @@ class Monad m => MonadEnvironment value m | m -> value where
   -- | Run an action with a locally-modified environment.
   localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m a -> m a
 
+  -- | Look a 'Name' up in the local environment.
+  lookupLocalEnv :: Name -> m (Maybe (Address (LocationFor value) value))
+  lookupLocalEnv name = envLookup name <$> askLocalEnv
+
+  -- | Look up a 'Name' in the local environment, running an action with the resolved address (if any).
+  lookupWith :: (Address (LocationFor value) value -> m value) -> Name -> m (Maybe value)
+  lookupWith with name = do
+    addr <- lookupLocalEnv name
+    maybe (pure Nothing) (fmap Just . with) addr
+
 -- | Update the global environment.
 modifyGlobalEnv :: MonadEnvironment value m => (EnvironmentFor value -> EnvironmentFor value) -> m ()
 modifyGlobalEnv f = do
@@ -75,27 +89,31 @@ addExport :: MonadEnvironment value m => Name -> Name -> Maybe (Address (Locatio
 addExport name alias = modifyExports . exportInsert name alias
 
 -- | A 'Monad' abstracting a heap of values.
-class Monad m => MonadStore value m | m -> value where
+class Monad m => MonadHeap value m | m -> value where
   -- | Retrieve the heap.
-  getStore :: m (StoreFor value)
+  getHeap :: m (HeapFor value)
   -- | Set the heap.
-  putStore :: StoreFor value -> m ()
+  putHeap :: HeapFor value -> m ()
 
 -- | Update the heap.
-modifyStore :: MonadStore value m => (StoreFor value -> StoreFor value) -> m ()
-modifyStore f = do
-  s <- getStore
-  putStore $! f s
+modifyHeap :: MonadHeap value m => (HeapFor value -> HeapFor value) -> m ()
+modifyHeap f = do
+  s <- getHeap
+  putHeap $! f s
+
+-- | Look up the cell for the given 'Address' in the 'Heap'.
+lookupHeap :: (MonadHeap value m, Ord (LocationFor value)) => Address (LocationFor value) value -> m (Maybe (CellFor value))
+lookupHeap = flip fmap getHeap . heapLookup
 
 -- | Write a value to the given 'Address' in the 'Store'.
 assign :: ( Ord (LocationFor value)
-          , MonadStore value m
+          , MonadHeap value m
           , Reducer value (CellFor value)
           )
        => Address (LocationFor value) value
        -> value
        -> m ()
-assign address = modifyStore . storeInsert address
+assign address = modifyHeap . heapInsert address
 
 
 -- | A 'Monad' abstracting tables of modules available for import.
@@ -115,3 +133,13 @@ modifyModuleTable :: MonadModuleTable term value m => (ModuleTable (EnvironmentF
 modifyModuleTable f = do
   table <- getModuleTable
   putModuleTable $! f table
+
+
+-- | A 'Monad' abstracting jumps in imperative control.
+class Monad m => MonadControl term m where
+  -- | Allocate a 'Label' for the given @term@.
+  --
+  --   Labels must be allocated before being jumped to with 'goto', but are suitable for nonlocal jumps; thus, they can be used to implement coroutines, exception handling, call with current continuation, and other esoteric control mechanisms.
+  label :: term -> m Label
+  -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
+  goto :: Label -> m term

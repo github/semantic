@@ -42,7 +42,7 @@ instance Evaluatable Load where
     doLoad path shouldWrap
   eval (Load _) = fail "invalid argument supplied to load, path is required"
 
-doLoad :: (MonadAnalysis term value m, MonadValue term value m, Ord (LocationFor value)) => ByteString -> Bool -> m value
+doLoad :: (MonadAnalysis term value m, MonadValue value m, Ord (LocationFor value)) => ByteString -> Bool -> m value
 doLoad path shouldWrap = do
   let name = pathToQualifiedName path
   importedEnv <- isolate (load name)

@@ -26,7 +26,7 @@ class Evaluatable constr where
   eval :: ( FreeVariables term
           , MonadAddressable (LocationFor value) value m
           , MonadAnalysis term value m
-          , MonadValue term value m
+          , MonadValue value m
           )
        => SubtermAlgebra constr term (m value)
   default eval :: (MonadFail m, Show1 constr) => SubtermAlgebra constr term (m value)
@@ -60,6 +60,6 @@ instance MonadEnvironment value m => Semigroup (Imperative m a) where
     env <- getGlobalEnv
     localEnv (<> env) b
 
-instance MonadValue term value m => Monoid (Imperative m value) where
+instance (MonadEnvironment value m, MonadValue value m) => Monoid (Imperative m value) where
   mempty = Imperative unit
   mappend = (<>)
