@@ -9,10 +9,11 @@ import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
 import Data.Abstract.Value
-import Data.Foldable (asum, toList)
+import Data.Monoid (Alt(..))
 import Data.Semigroup
 import Data.Semigroup.Reducer
 import Prelude hiding (fail)
+import Prologue
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Heap.
 class (Monad m, Ord l, l ~ LocationFor value, Reducer value (Cell l value)) => MonadAddressable l value m where
@@ -68,14 +69,14 @@ letrec name body = do
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
 instance (MonadFail m, LocationFor value ~ Precise, MonadHeap value m) => MonadAddressable Precise value m where
-  deref = maybe uninitializedAddress (pure . unLatest) <=< flip fmap getHeap . heapLookup
+  deref = maybe uninitializedAddress (pure . unLatest) <=< lookupHeap
 
   alloc _ = fmap (Address . Precise . heapSize) getHeap
 
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
-instance (Alternative m, LocationFor value ~ Monovariant, MonadHeap value m, Ord value) => MonadAddressable Monovariant value m where
-  deref = asum . maybe [] (map pure . toList) <=< flip fmap getHeap . heapLookup
+instance (Alternative m, LocationFor value ~ Monovariant, MonadFail m, MonadHeap value m, Ord value) => MonadAddressable Monovariant value m where
+  deref = maybe uninitializedAddress (foldMapA pure) <=< lookupHeap
 
   alloc = pure . Address . Monovariant
 
