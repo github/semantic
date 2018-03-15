@@ -38,7 +38,7 @@ spec = parallel $ do
     addr = Address . Precise
     fixtures = "test/fixtures/python/analysis/"
     evaluate entry = snd . fst . fst . fst . fst <$>
-      evaluateFiles @(Value Precise) pythonParser
+      evaluateFiles pythonParser
       [ fixtures <> entry
       , fixtures <> "a.py"
       , fixtures <> "b/c.py"

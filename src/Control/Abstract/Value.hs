@@ -118,11 +118,11 @@ doWhile body cond = loop $ \ continue -> body *> do
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Monad m
-         , MonadAddressable location (Value location) m
-         , MonadAnalysis term (Value location) m
+         , MonadAddressable location Value m
+         , MonadAnalysis term Value m
          , Show location
          )
-         => MonadValue (Value location) m where
+         => MonadValue Value m where
 
   unit     = pure . injValue $ Value.Unit
   integer  = pure . injValue . Value.Integer . Number.Integer

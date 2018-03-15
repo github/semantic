@@ -13,10 +13,10 @@ import Prologue
 import Prelude hiding (Float, Integer, String, Rational, fail)
 import qualified Prelude
 
-type ValueConstructors location
+type ValueConstructors
   = '[Array
     , Boolean
-    , Closure location
+    , Closure
     , Float
     , Integer
     , String
@@ -28,32 +28,32 @@ type ValueConstructors location
 
 -- | Open union of primitive values that terms can be evaluated to.
 --   Fix by another name.
-newtype Value location = Value { deValue :: Union (ValueConstructors location) (Value location) }
+newtype Value = Value { deValue :: Union ValueConstructors Value }
   deriving (Eq, Show, Ord)
 
 -- | Identical to 'inj', but wraps the resulting sub-entity in a 'Value'.
-injValue :: (f :< ValueConstructors location) => f (Value location) -> Value location
+injValue :: (f :< ValueConstructors) => f Value -> Value
 injValue = Value . inj
 
 -- | Identical to 'prj', but unwraps the argument out of its 'Value' wrapper.
-prjValue :: (f :< ValueConstructors location) => Value location -> Maybe (f (Value location))
+prjValue :: (f :< ValueConstructors) => Value -> Maybe (f Value)
 prjValue = prj . deValue
 
 -- | Convenience function for projecting two values.
-prjPair :: (f :< ValueConstructors loc1 , g :< ValueConstructors loc2)
-        => (Value loc1, Value loc2)
-        -> Maybe (f (Value loc1), g (Value loc2))
+prjPair :: (f :< ValueConstructors , g :< ValueConstructors)
+        => (Value, Value)
+        -> Maybe (f Value, g Value)
 prjPair = bitraverse prjValue prjValue
 
 -- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
 
 -- | A function value consisting of a list of parameter 'Name's, a 'Label' to jump to the body of the function, and an 'Environment' of bindings captured by the body.
-data Closure location value = Closure [Name] Label (Environment location value)
+data Closure value = Closure [Name] Label (Environment Precise value)
   deriving (Eq, Generic1, Ord, Show)
 
-instance Eq location => Eq1 (Closure location) where liftEq = genericLiftEq
-instance Ord location => Ord1 (Closure location) where liftCompare = genericLiftCompare
-instance Show location => Show1 (Closure location) where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 Closure where liftEq = genericLiftEq
+instance Ord1 Closure where liftCompare = genericLiftCompare
+instance Show1 Closure where liftShowsPrec = genericLiftShowsPrec
 
 -- | The unit value. Typically used to represent the result of imperative statements.
 data Unit value = Unit
@@ -145,7 +145,7 @@ type LiveFor value = Live (LocationFor value) value
 
 -- | The location type (the body of 'Address'es) which should be used for an abstract value type.
 type family LocationFor value :: * where
-  LocationFor (Value location) = location
+  LocationFor Value = Precise
   LocationFor Type.Type = Monovariant
 
 -- | Value types, e.g. closures, which can root a set of addresses.
@@ -153,7 +153,7 @@ class ValueRoots value where
   -- | Compute the set of addresses rooted by a given value.
   valueRoots :: value -> LiveFor value
 
-instance Ord location => ValueRoots (Value location) where
+instance ValueRoots Value where
   valueRoots v
     | Just (Closure _ _ env) <- prjValue v = envAll env
     | otherwise                            = mempty

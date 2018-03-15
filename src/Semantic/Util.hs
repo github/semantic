@@ -45,8 +45,8 @@ typecheckGoFile path = runAnalysis @(Caching Evaluating Go.Term Type) . evaluate
 evaluatePythonFile path = evaluate . snd <$> parseFile pythonParser path
 evaluatePythonFiles = evaluateFiles pythonParser
 typecheckPythonFile path = runAnalysis @(Caching Evaluating Python.Term Type) . evaluateModule . snd <$> parseFile pythonParser path
-tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term (Value Precise)) . evaluateModule . snd <$> parseFile pythonParser path
-evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] Evaluating) Python.Term (Value Precise)) . evaluateModule . snd <$> parseFile pythonParser path
+tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term Value) . evaluateModule . snd <$> parseFile pythonParser path
+evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] Evaluating) Python.Term Value) . evaluateModule . snd <$> parseFile pythonParser path
 
 -- TypeScript
 typecheckTypeScriptFile path = runAnalysis @(Caching Evaluating TypeScript.Term Type) . evaluateModule . snd <$> parseFile typescriptParser path
@@ -57,31 +57,31 @@ evaluateTypeScriptFiles = evaluateFiles typescriptParser
 evaluateFile :: forall term effects
              .  ( Evaluatable (Base term)
                 , FreeVariables term
-                , effects ~ RequiredEffects term (Value Precise) (Evaluating term (Value Precise) effects)
-                , MonadAddressable Precise (Value Precise) (Evaluating term (Value Precise) effects)
-                , MonadValue (Value Precise) (Evaluating term (Value Precise) effects)
+                , effects ~ RequiredEffects term Value (Evaluating term Value effects)
+                , MonadAddressable Precise Value (Evaluating term Value effects)
+                , MonadValue Value (Evaluating term Value effects)
                 , Recursive term
                 )
              => Parser term
              -> FilePath
-             -> IO (Final effects (Value Precise))
+             -> IO (Final effects Value)
 evaluateFile parser path = evaluate . snd <$> parseFile parser path
 
 -- Evaluate a list of files (head of file list is considered the entry point).
 evaluateFiles :: forall term effects
               .  ( Evaluatable (Base term)
                  , FreeVariables term
-                 , effects ~ RequiredEffects term (Value Precise) (Evaluating term (Value Precise) effects)
-                 , MonadAddressable Precise (Value Precise) (Evaluating term (Value Precise) effects)
-                 , MonadValue (Value Precise) (Evaluating term (Value Precise) effects)
+                 , effects ~ RequiredEffects term Value (Evaluating term Value effects)
+                 , MonadAddressable Precise Value (Evaluating term Value effects)
+                 , MonadValue Value (Evaluating term Value effects)
                  , Recursive term
                  )
               => Parser term
               -> [FilePath]
-              -> IO (Final effects (Value Precise))
+              -> IO (Final effects Value)
 evaluateFiles parser paths = do
   entry:xs <- traverse (parseFile parser) paths
-  pure $ evaluates @(Value Precise) xs entry
+  pure $ evaluates @Value xs entry
 
 -- Read and parse a file.
 parseFile :: Parser term -> FilePath -> IO (Blob, term)
