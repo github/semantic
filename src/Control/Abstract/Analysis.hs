@@ -20,10 +20,10 @@ import Control.Monad.Effect.NonDet as X
 import Control.Monad.Effect.Reader as X
 import Control.Monad.Effect.State as X
 import Data.Abstract.Environment
+import Data.Abstract.Exports
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Coerce
-import qualified Data.Map as Map
 import Prelude hiding (fail)
 import Prologue
 

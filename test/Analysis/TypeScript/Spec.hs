@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE OverloadedLists, TypeApplications #-}
 module Analysis.TypeScript.Spec (spec) where
 
 import Data.Abstract.Value
@@ -12,14 +12,14 @@ spec = parallel $ do
   describe "evalutes TypeScript" $ do
     it "imports with aliased symbols" $ do
       env <- evaluate "main.ts"
-      let expectedEnv = Environment $ fromList
+      let expectedEnv =
             [ (qualifiedName ["bar"], addr 0)
             ]
       env `shouldBe` expectedEnv
 
     it "imports with qualified names" $ do
       env <- evaluate "main1.ts"
-      let expectedEnv = Environment $ fromList
+      let expectedEnv =
             [ (qualifiedName ["b", "baz"], addr 0)
             , (qualifiedName ["b", "foo"], addr 2)
             , (qualifiedName ["z", "baz"], addr 0)
@@ -29,7 +29,7 @@ spec = parallel $ do
 
     it "side effect only imports" $ do
       env <- evaluate "main2.ts"
-      env `shouldBe` Environment (fromList [])
+      env `shouldBe` mempty
 
     it "fails exporting symbols not defined in the module" $ do
       env <- fst <$> evaluate' "bad-export.ts"

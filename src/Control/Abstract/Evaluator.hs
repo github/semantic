@@ -17,6 +17,7 @@ module Control.Abstract.Evaluator
 import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.Environment
+import Data.Abstract.Exports
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
 import Data.Abstract.ModuleTable

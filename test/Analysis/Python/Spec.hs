@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE OverloadedLists, TypeApplications #-}
 module Analysis.Python.Spec (spec) where
 
 import Data.Abstract.Value
@@ -12,7 +12,7 @@ spec = parallel $ do
   describe "evalutes Python" $ do
     it "imports" $ do
       env <- evaluate "main.py"
-      let expectedEnv = Environment $ fromList
+      let expectedEnv =
             [ (qualifiedName ["a", "foo"], addr 0)
             , (qualifiedName ["b", "c", "baz"], addr 1)
             ]
@@ -20,7 +20,7 @@ spec = parallel $ do
 
     it "imports with aliases" $ do
       env <- evaluate "main1.py"
-      let expectedEnv = Environment $ fromList
+      let expectedEnv =
             [ (qualifiedName ["b", "foo"], addr 0)
             , (qualifiedName ["e", "baz"], addr 1)
             ]
@@ -28,7 +28,7 @@ spec = parallel $ do
 
     it "imports using 'from' syntax" $ do
       env <- evaluate "main2.py"
-      let expectedEnv = Environment $ fromList
+      let expectedEnv =
             [ (qualifiedName ["foo"], addr 0)
             , (qualifiedName ["bar"], addr 1)
             ]
