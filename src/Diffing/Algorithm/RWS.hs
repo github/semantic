@@ -1,4 +1,5 @@
 {-# LANGUAGE GADTs, DataKinds, RankNTypes, TypeOperators #-}
+{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-} -- FIXME
 module Diffing.Algorithm.RWS
 ( rws
 , Options(..)
