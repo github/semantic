@@ -47,6 +47,7 @@ import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
+import qualified Data.Abstract.FreeVariables as FV
 import Data.Term
 import Data.Text as T (Text, pack)
 import qualified Data.Text.Encoding as T
@@ -256,6 +257,8 @@ type ListableSyntax = Union
    , []
    ]
 
+instance Listable FV.Name where
+  tiers = cons1 FV.name
 
 instance Listable1 Gram where
   liftTiers tiers = liftCons2 (liftTiers (liftTiers tiers)) (liftTiers (liftTiers tiers)) Gram

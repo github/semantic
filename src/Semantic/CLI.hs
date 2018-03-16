@@ -6,19 +6,15 @@ module Semantic.CLI
 , runParse
 ) where
 
-import Control.Monad ((<=<))
-import Data.ByteString (ByteString)
-import Data.Foldable (find)
-import Data.Functor.Both hiding (fst, snd)
+import Prologue
 import Data.Language
 import Data.List (intercalate)
 import Data.List.Split (splitWhen)
-import Data.Semigroup ((<>))
 import Data.Version (showVersion)
 import Development.GitRev
 import Options.Applicative
 import Rendering.Renderer
-import qualified Paths_semantic_diff as Library (version)
+import qualified Paths_semantic as Library (version)
 import Semantic.IO (languageForFilePath)
 import qualified Semantic.Log as Log
 import qualified Semantic.Task as Task
@@ -79,9 +75,10 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
           <|> flag'                                        (SomeRenderer TagsTermRenderer)        (long "tags" <> help "Output JSON tags")
           <|> flag'                                        (SomeRenderer . SymbolsTermRenderer)   (long "symbols" <> help "Output JSON symbol list")
               <*> (   option symbolFieldsReader (  long "fields"
-                                             <> help "Comma delimited list of specific fields to return (symbols output only)."
-                                             <> metavar "FIELDS")
+                                                <> help "Comma delimited list of specific fields to return (symbols output only)."
+                                                <> metavar "FIELDS")
                   <|> pure defaultSymbolFields)
+          <|> flag'                                        (SomeRenderer ImportsTermRenderer)     (long "import-graph" <> help "Output JSON import graph")
           <|> flag'                                        (SomeRenderer DOTTermRenderer)         (long "dot" <> help "Output DOT graph parse trees"))
       <*> (   Right <$> some (argument filePathReader (metavar "FILES..."))
           <|> pure (Left stdin) )

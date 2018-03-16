@@ -6,19 +6,16 @@ module Language.Markdown.Assignment
 , Language.Markdown.Assignment.Term
 ) where
 
+import Prologue
 import Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import qualified CMarkGFM
-import Data.ByteString (ByteString)
-import Data.Functor (void)
 import Data.Record
 import Data.Syntax (makeTerm)
 import qualified Data.Syntax as Syntax
 import Data.Term as Term (Term(..), TermF(..), termFAnnotation, termFOut, termIn)
 import qualified Data.Text as Text
 import Data.Text.Encoding (encodeUtf8)
-import Data.Union
-import GHC.Stack
 import Parsing.CMark as Grammar (Grammar(..))
 import qualified Language.Markdown.Syntax as Markup
 

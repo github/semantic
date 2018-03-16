@@ -1,6 +1,9 @@
 (Program
-  (Export
-  {+(Function
+  (DefaultExport
+  { (Class
+    {-(Identifier)-}
+    {-([])-})
+  ->(Function
     {+(Empty)+}
     {+(Empty)+}
     {+(Identifier)+}
@@ -24,7 +27,4 @@
       {+(Return
         {+(Hash
           {+(ShorthandPropertyIdentifier)+}
-          {+(ShorthandPropertyIdentifier)+})+})+})+})+}
-  {-(Class
-    {-(Identifier)-}
-    {-([])-})-}))
+          {+(ShorthandPropertyIdentifier)+})+})+})+}) }))

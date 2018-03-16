@@ -1,19 +1,12 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, OverloadedStrings #-}
-module Integration.Spec where
+module Integration.Spec (spec) where
 
-import qualified Data.ByteString as B
 import Data.Foldable (find, traverse_)
-import Data.Functor.Both
 import Data.List (union, concat, transpose)
-import Data.Maybe (fromMaybe)
-import Data.Semigroup ((<>))
-import qualified Data.Text as T
-import Data.Text.Encoding (decodeUtf8)
-import System.FilePath
+import qualified Data.ByteString as B
 import System.FilePath.Glob
+
 import SpecHelpers
-import Test.Hspec (Spec, describe, it, SpecWith, runIO, parallel, pendingWith)
-import Test.Hspec.Expectations.Pretty
+
 
 spec :: Spec
 spec = parallel $ do
@@ -104,18 +97,3 @@ testDiff paths expectedOutput = do
   actual <- verbatim <$> diffFilePaths paths
   expected <- verbatim <$> B.readFile expectedOutput
   actual `shouldBe` expected
-
-stripWhitespace :: B.ByteString -> B.ByteString
-stripWhitespace = B.foldl' go B.empty
-  where go acc x | x `B.elem` " \t\n" = acc
-                 | otherwise = B.snoc acc x
-
--- | A wrapper around 'B.ByteString' with a more readable 'Show' instance.
-newtype Verbatim = Verbatim B.ByteString
-  deriving (Eq)
-
-instance Show Verbatim where
-  showsPrec _ (Verbatim byteString) = ('\n':) . (T.unpack (decodeUtf8 byteString) ++)
-
-verbatim :: B.ByteString -> Verbatim
-verbatim = Verbatim . stripWhitespace

@@ -1,130 +1,112 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, ScopedTypeVariables, TypeApplications #-}
-module Analysis.Abstract.Caching where
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+module Analysis.Abstract.Caching
+( type Caching
+) where
 
-import Analysis.Abstract.Collecting
-import Control.Applicative
-import Control.Effect
-import Control.Monad.Effect.Address
-import Control.Monad.Effect.Cache
-import Control.Monad.Effect.Env
-import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Fresh
-import Control.Monad.Effect.Internal hiding (run)
-import Control.Monad.Effect.NonDet
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.State
-import Control.Monad.Effect.Store
-import Data.Abstract.Address
+import Control.Abstract.Analysis
 import Data.Abstract.Cache
 import Data.Abstract.Configuration
-import Data.Abstract.Environment
-import Data.Abstract.Eval
-import Data.Abstract.Live
-import Data.Abstract.Store
+import Data.Abstract.Heap
 import Data.Abstract.Value
-import Data.Function (fix)
-import Data.Functor.Foldable (Base, Recursive(..))
-import Data.Maybe
-import Data.Monoid (Alt(..))
-import Data.Semigroup
-import qualified Data.Set as Set
+import Prologue
 
 -- | The effects necessary for caching analyses.
-type Caching t v
-  = '[ Fresh                                  -- For 'MonadFresh'.
-     , Reader (Live (LocationFor v) v)        -- For 'MonadGC'.
-     , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
-     , Fail                                   -- For 'MonadFail'.
-     , NonDetEff                              -- For 'Alternative' & 'MonadNonDet'.
-     , State (Store (LocationFor v) v)        -- For 'MonadStore'.
-     , Reader (Cache (LocationFor v) t v)     -- For 'MonadCacheIn'.
-     , State (Cache (LocationFor v) t v)      -- For 'MonadCacheOut'.
-     ]
+type CachingEffects term value effects
+  = Fresh                        -- For 'MonadFresh'.
+ ': NonDetEff                    -- For 'Alternative' and 'MonadNonDet'.
+ ': Reader (CacheFor term value) -- The in-cache used as an oracle while converging on a result.
+ ': State  (CacheFor term value) -- The out-cache used to record results in each iteration of convergence.
+ ': effects
 
--- | A constraint synonym for the interfaces necessary for caching analyses.
-type MonadCaching t v m
-  = ( MonadEnv v m
-    , MonadStore v m
-    , MonadCacheIn t v m
-    , MonadCacheOut t v m
-    , MonadGC v m
-    , Alternative m
-    )
+-- | The cache for term and abstract value types.
+type CacheFor term value = Cache (LocationFor value) term value
 
+-- | A (coinductively-)cached analysis suitable for guaranteeing termination of (suitably finitized) analyses over recursive programs.
+newtype Caching m term value (effects :: [* -> *]) a = Caching (m term value effects a)
+  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
--- | Coinductively-cached evaluation.
-evalCache :: forall v term
-          . ( Ord v
-            , Ord term
-            , Ord (LocationFor v)
-            , Ord (Cell (LocationFor v) v)
-            , Foldable (Cell (LocationFor v))
-            , Functor (Base term)
-            , Recursive term
-            , MonadAddress (LocationFor v) (Eff (Caching term v))
-            , Semigroup (Cell (LocationFor v) v)
-            , ValueRoots (LocationFor v) v
-            , Eval term v (Eff (Caching term v)) (Base term)
-            )
-          => term
-          -> Final (Caching term v) v
-evalCache e = run @(Caching term v) (fixCache (fix (evCache (evCollect (\ recur yield -> eval recur yield . project)))) pure e)
+deriving instance MonadControl term (m term value effects) => MonadControl term (Caching m term value effects)
+deriving instance MonadEnvironment value (m term value effects) => MonadEnvironment value (Caching m term value effects)
+deriving instance MonadHeap value (m term value effects) => MonadHeap value (Caching m term value effects)
+deriving instance MonadModuleTable term value (m term value effects) => MonadModuleTable term value (Caching m term value effects)
+deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (Caching m term value effects)
 
+-- | Functionality used to perform caching analysis. This is not exported, and exists primarily for organizational reasons.
+class MonadEvaluator term value m => MonadCaching term value m where
+  -- | Look up the set of values for a given configuration in the in-cache.
+  consultOracle :: ConfigurationFor term value -> m (Set (value, HeapFor value))
+  -- | Run an action with the given in-cache.
+  withOracle :: CacheFor term value -> m a -> m a
 
--- | Evaluation of a single iteration of an analysis, given a 'MonadCacheIn' instance as an oracle for results and a 'MonadCacheOut' instance to record computed results in.
-evCache :: forall t v m
-        . ( Ord (LocationFor v)
-          , Ord t
-          , Ord v
-          , Ord (Cell (LocationFor v) v)
-          , MonadCaching t v m
-          )
-        => (((v -> m v) -> t -> m v) -> (v -> m v) -> t -> m v)
-        -> ((v -> m v) -> t -> m v)
-        -> (v -> m v) -> t -> m v
-evCache ev0 ev' yield e = do
-  c <- getConfiguration e
-  cached <- getsCache (cacheLookup c)
-  case cached of
-    Just pairs -> scatter pairs
-    Nothing -> do
-      pairs <- asksCache (fromMaybe mempty . cacheLookup c)
-      modifyCache (cacheSet c pairs)
-      v <- ev0 ev' yield e
-      store' <- getStore
-      modifyCache (cacheInsert c (v, store'))
-      pure v
+  -- | Look up the set of values for a given configuration in the out-cache.
+  lookupCache :: ConfigurationFor term value -> m (Maybe (Set (value, HeapFor value)))
+  -- | Run an action, caching its result and 'Heap' under the given configuration.
+  caching :: ConfigurationFor term value -> Set (value, HeapFor value) -> m value -> m value
 
--- | Coinductively iterate the analysis of a term until the results converge.
-fixCache :: forall t v m
-         . ( Ord (LocationFor v)
-           , Ord t
-           , Ord v
-           , Ord (Cell (LocationFor v) v)
-           , MonadCaching t v m
-           , MonadNonDet m
-           , MonadFresh m
-           )
-         => ((v -> m v) -> t -> m v)
-         -> (v -> m v) -> t -> m v
-fixCache ev' yield e = do
-  c <- getConfiguration e
-  cache <- converge (\ prevCache -> do
-    putCache (mempty :: Cache (LocationFor v) t v)
-    putStore (configurationStore c)
-    reset 0
-    _ <- localCache (const prevCache) (gather Set.singleton (ev' yield e))
-    getCache) mempty
-  maybe empty scatter (cacheLookup c cache)
+  -- | Run an action starting from an empty out-cache, and return the out-cache afterwards.
+  isolateCache :: m a -> m (CacheFor term value)
 
--- | Get the current 'Configuration' with a passed-in term.
-getConfiguration :: (MonadEnv v m, MonadGC v m, MonadStore v m) => t -> m (Configuration (LocationFor v) t v)
-getConfiguration term = Configuration term <$> askRoots <*> askEnv <*> getStore
+instance ( Effectful (m term value)
+         , Members (CachingEffects term value '[]) effects
+         , MonadEvaluator term value (m term value effects)
+         , Ord (CellFor value)
+         , Ord (LocationFor value)
+         , Ord term
+         , Ord value
+         )
+         => MonadCaching term value (Caching m term value effects) where
+  consultOracle configuration = raise (fromMaybe mempty . cacheLookup configuration <$> ask)
+  withOracle cache = raise . local (const cache) . lower
 
+  lookupCache configuration = raise (cacheLookup configuration <$> get)
+  caching configuration values action = do
+    raise (modify (cacheSet configuration values))
+    result <- (,) <$> action <*> getHeap
+    raise (modify (cacheInsert configuration result))
+    pure (fst result)
 
--- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Alternative m, Foldable t, MonadStore a m) => t (a, Store (LocationFor a) a) -> m a
-scatter = getAlt . foldMap (\ (value, store') -> Alt (putStore store' *> pure value))
+  isolateCache action = raise (put (mempty :: CacheFor term value)) *> action *> raise get
+
+-- | This instance coinductively iterates the analysis of a term until the results converge.
+instance ( Corecursive term
+         , Effectful (m term value)
+         , MonadAnalysis term value (m term value effects)
+         , MonadFresh (m term value effects)
+         , MonadNonDet (m term value effects)
+         , Members (CachingEffects term value '[]) effects
+         , Ord (CellFor value)
+         , Ord (LocationFor value)
+         , Ord term
+         , Ord value
+         )
+         => MonadAnalysis term value (Caching m term value effects) where
+  -- We require the 'CachingEffects' in addition to the underlying analysis’ 'RequiredEffects'.
+  type RequiredEffects term value (Caching m term value effects) = CachingEffects term value (RequiredEffects term value (m term value effects))
+
+  -- Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
+  analyzeTerm e = do
+    c <- getConfiguration (embedSubterm e)
+    cached <- lookupCache c
+    case cached of
+      Just pairs -> scatter pairs
+      Nothing -> do
+        pairs <- consultOracle c
+        caching c pairs (liftAnalyze analyzeTerm e)
+
+  evaluateModule e = do
+    c <- getConfiguration e
+    -- Convergence here is predicated upon an Eq instance, not α-equivalence
+    cache <- converge (\ prevCache -> isolateCache $ do
+      putHeap (configurationHeap c)
+      -- We need to reset fresh generation so that this invocation converges.
+      reset 0
+      -- This is subtle: though the calling context supports nondeterminism, we want
+      -- to corral all the nondeterminism that happens in this @eval@ invocation, so
+      -- that it doesn't "leak" to the calling context and diverge (otherwise this
+      -- would never complete). We don’t need to use the values, so we 'gather' the
+      -- nondeterministic values into @()@.
+      withOracle prevCache (gather (const ()) (Caching (evaluateModule e)))) mempty
+    maybe empty scatter (cacheLookup c cache)
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
 --
@@ -140,3 +122,7 @@ converge f = loop
             pure x
           else
             loop x'
+
+-- | Nondeterministically write each of a collection of stores & return their associated results.
+scatter :: (Alternative m, Foldable t, MonadEvaluator term value m) => t (a, Heap (LocationFor value) value) -> m a
+scatter = foldMapA (\ (value, heap') -> putHeap heap' *> pure value)

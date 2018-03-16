@@ -1,26 +1,12 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Syntax.Expression where
 
-import Control.Monad.Effect.Address
-import Control.Monad.Effect.Env
-import Control.Monad.Effect.Fresh
-import Control.Monad.Effect.Store
-import Data.Abstract.Address
-import Data.Abstract.Environment
-import Data.Abstract.Eval
-import Data.Abstract.FreeVariables
-import Data.Abstract.Type as Type
-import Data.Abstract.Value (Value, Closure(..))
-import Data.Maybe
-import Data.Union
-import Data.Semigroup
-import Data.Traversable
-import Data.Align.Generic
-import Data.Functor.Classes.Generic
-import Data.Mergeable
+import Data.Abstract.Evaluatable
+import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent)
+import Data.Fixed
 import Diffing.Algorithm
-import GHC.Generics
 import Prelude hiding (fail)
+import Prologue hiding (apply)
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
@@ -30,39 +16,10 @@ instance Eq1 Call where liftEq = genericLiftEq
 instance Ord1 Call where liftCompare = genericLiftCompare
 instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 
-instance ( Ord l
-         , MonadFail m
-         , Semigroup (Cell l (Value l t))
-         , MonadEnv (Value l t) m
-         , MonadStore (Value l t) m
-         , MonadAddress l m
-         )
-         => Eval t (Value l t) m Call where
-  eval recur yield Call{..} = do
-    closure <- recur pure callFunction
-    Closure names body env <- maybe (fail "expected a closure") pure (prj closure :: Maybe (Closure l t))
-    bindings <- for (zip names callParams) $ \(name, param) -> do
-      v <- recur pure param
-      a <- alloc name
-      assign a v
-      pure (name, a)
-    localEnv (const (foldr (uncurry envInsert) env bindings)) (recur pure body) >>= yield
-
--- TODO: extraRoots for evalCollect
-instance ( MonadFail m
-         , MonadFresh m
-         , MonadGC Type m
-         , MonadEnv Type m
-         , FreeVariables t
-         )
-         => Eval t Type m Call where
-  eval recur yield Call{..} = do
-    opTy <- recur pure callFunction
-    tvar <- fresh
-    inTys <- traverse (recur pure) callParams
-    _ :-> outTy <- opTy `unify` (Type.Product inTys :-> Var tvar)
-    yield outTy
-
+instance Evaluatable Call where
+  eval Call{..} = do
+    op <- subtermValue callFunction
+    apply op (map subtermValue callParams)
 
 data Comparison a
   = LessThan !a !a
@@ -77,9 +34,15 @@ instance Eq1 Comparison where liftEq = genericLiftEq
 instance Ord1 Comparison where liftCompare = genericLiftCompare
 instance Show1 Comparison where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Comparison
-instance (MonadFail m) => Eval t v m Comparison
-
+instance Evaluatable Comparison where
+  eval = traverse subtermValue >=> go where
+    go x = case x of
+      (LessThan a b)         -> liftComparison (Concrete (<)) a b
+      (LessThanEqual a b)    -> liftComparison (Concrete (<=)) a b
+      (GreaterThan a b)      -> liftComparison (Concrete (>)) a b
+      (GreaterThanEqual a b) -> liftComparison (Concrete (>=)) a b
+      (Equal a b)            -> liftComparison (Concrete (==)) a b
+      (Comparison a b)       -> liftComparison Generalized a b
 
 -- | Binary arithmetic operators.
 data Arithmetic a
@@ -97,23 +60,39 @@ instance Ord1 Arithmetic where liftCompare = genericLiftCompare
 instance Show1 Arithmetic where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Arithmetic
-instance (MonadFail m) => Eval t v m Arithmetic
-
+instance Evaluatable Arithmetic where
+  eval = traverse subtermValue >=> go where
+    go (Plus a b)      = liftNumeric2 add a b  where add    = liftReal (+)
+    go (Minus a b)     = liftNumeric2 sub a b  where sub    = liftReal (-)
+    go (Times a b)     = liftNumeric2 mul a b  where mul    = liftReal (*)
+    go (DividedBy a b) = liftNumeric2 div' a b where div'   = liftIntegralFrac div (/)
+    go (Modulo a b)    = liftNumeric2 mod'' a b where mod'' = liftIntegralFrac mod mod'
+    go (Power a b)     = liftNumeric2 liftedExponent a b
+    go (Negate a)      = liftNumeric negate a
 
 -- | Boolean operators.
 data Boolean a
   = Or !a !a
   | And !a !a
   | Not !a
+  | XOr !a !a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Boolean where liftEq = genericLiftEq
 instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Boolean
-instance (MonadFail m) => Eval t v m Boolean
-
+instance Evaluatable Boolean where
+  -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
+  eval = go . fmap subtermValue where
+    go (And a b) = do
+      cond <- a
+      ifthenelse cond b (pure cond)
+    go (Or a b) = do
+      cond <- a
+      ifthenelse cond (pure cond) b
+    go (Not a) = a >>= toBool >>= boolean . not
+    go (XOr a b) = liftA2 (/=) (a >>= toBool) (b >>= toBool) >>= boolean
 
 -- | Javascript delete operator
 newtype Delete a = Delete a
@@ -124,7 +103,7 @@ instance Ord1 Delete where liftCompare = genericLiftCompare
 instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Delete
-instance (MonadFail m) => Eval t v m Delete
+instance Evaluatable Delete
 
 
 -- | A sequence expression such as Javascript or C's comma operator.
@@ -136,7 +115,7 @@ instance Ord1 SequenceExpression where liftCompare = genericLiftCompare
 instance Show1 SequenceExpression where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for SequenceExpression
-instance (MonadFail m) => Eval t v m SequenceExpression
+instance Evaluatable SequenceExpression
 
 
 -- | Javascript void operator
@@ -148,7 +127,7 @@ instance Ord1 Void where liftCompare = genericLiftCompare
 instance Show1 Void where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Void
-instance (MonadFail m) => Eval t v m Void
+instance Evaluatable Void
 
 
 -- | Javascript typeof operator
@@ -160,7 +139,7 @@ instance Ord1 Typeof where liftCompare = genericLiftCompare
 instance Show1 Typeof where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Typeof
-instance (MonadFail m) => Eval t v m Typeof
+instance Evaluatable Typeof
 
 
 -- | Bitwise operators.
@@ -178,9 +157,18 @@ instance Eq1 Bitwise where liftEq = genericLiftEq
 instance Ord1 Bitwise where liftCompare = genericLiftCompare
 instance Show1 Bitwise where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Bitwise
-instance (MonadFail m) => Eval t v m Bitwise
-
+instance Evaluatable Bitwise where
+  eval = traverse subtermValue >=> go where
+    genLShift x y = shiftL x (fromIntegral y)
+    genRShift x y = shiftR x (fromIntegral y)
+    go x = case x of
+      (BOr a b)            -> liftBitwise2 (.|.) a b
+      (BAnd a b)           -> liftBitwise2 (.&.) a b
+      (BXOr a b)           -> liftBitwise2 xor a b
+      (LShift a b)         -> liftBitwise2 genLShift a b
+      (RShift a b)         -> liftBitwise2 genRShift a b
+      (UnsignedRShift a b) -> liftBitwise2 genRShift a b
+      (Complement a)       -> liftBitwise complement a
 
 -- | Member Access (e.g. a.b)
 data MemberAccess a
@@ -192,8 +180,7 @@ instance Ord1 MemberAccess where liftCompare = genericLiftCompare
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for MemberAccess
-instance (MonadFail m) => Eval t v m MemberAccess
-
+instance Evaluatable MemberAccess
 
 -- | Subscript (e.g a[1])
 data Subscript a
@@ -206,7 +193,7 @@ instance Ord1 Subscript where liftCompare = genericLiftCompare
 instance Show1 Subscript where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Subscript
-instance (MonadFail m) => Eval t v m Subscript
+instance Evaluatable Subscript
 
 
 -- | Enumeration (e.g. a[1:10:1] in Python (start at index 1, stop at index 10, step 1 element from start to stop))
@@ -218,7 +205,7 @@ instance Ord1 Enumeration where liftCompare = genericLiftCompare
 instance Show1 Enumeration where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Enumeration
-instance (MonadFail m) => Eval t v m Enumeration
+instance Evaluatable Enumeration
 
 
 -- | InstanceOf (e.g. a instanceof b in JavaScript
@@ -230,7 +217,7 @@ instance Ord1 InstanceOf where liftCompare = genericLiftCompare
 instance Show1 InstanceOf where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for InstanceOf
-instance (MonadFail m) => Eval t v m InstanceOf
+instance Evaluatable InstanceOf
 
 
 -- | ScopeResolution (e.g. import a.b in Python or a::b in C++)
@@ -242,7 +229,7 @@ instance Ord1 ScopeResolution where liftCompare = genericLiftCompare
 instance Show1 ScopeResolution where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for ScopeResolution
-instance (MonadFail m) => Eval t v m ScopeResolution
+instance Evaluatable ScopeResolution
 
 
 -- | A non-null expression such as Typescript or Swift's ! expression.
@@ -254,7 +241,7 @@ instance Ord1 NonNullExpression where liftCompare = genericLiftCompare
 instance Show1 NonNullExpression where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for NonNullExpression
-instance (MonadFail m) => Eval t v m NonNullExpression
+instance Evaluatable NonNullExpression
 
 
 -- | An await expression in Javascript or C#.
@@ -266,11 +253,11 @@ instance Ord1 Await where liftCompare = genericLiftCompare
 instance Show1 Await where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Await
-instance (MonadFail m) => Eval t v m Await
+instance Evaluatable Await
 
 
 -- | An object constructor call in Javascript, Java, etc.
-newtype New a = New { newSubject :: a }
+newtype New a = New { newSubject :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 New where liftEq = genericLiftEq
@@ -278,7 +265,7 @@ instance Ord1 New where liftCompare = genericLiftCompare
 instance Show1 New where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for New
-instance (MonadFail m) => Eval t v m New
+instance Evaluatable New
 
 
 -- | A cast expression to a specified type.
@@ -290,4 +277,4 @@ instance Ord1 Cast where liftCompare = genericLiftCompare
 instance Show1 Cast where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Cast
-instance (MonadFail m) => Eval t v m Cast
+instance Evaluatable Cast

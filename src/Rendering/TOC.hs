@@ -16,30 +16,23 @@ module Rendering.TOC
 , toCategoryName
 ) where
 
+import Prologue
 import Analysis.Declaration
 import Data.Aeson
 import Data.Align (bicrosswalk)
-import Data.Bifoldable (bifoldMap)
-import Data.Bifunctor (bimap)
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
 import Data.Diff
-import Data.Foldable (fold, foldl')
-import Data.Functor.Foldable (cata)
-import Data.Function (on)
 import Data.Language as Language
 import Data.List (sortOn)
 import qualified Data.List as List
 import qualified Data.Map as Map
-import Data.Maybe (fromMaybe, mapMaybe)
 import Data.Output
 import Data.Patch
 import Data.Record
-import Data.Semigroup ((<>))
 import Data.Span
 import Data.Term
 import qualified Data.Text as T
-import GHC.Generics
 
 data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }
   deriving (Eq, Show)
@@ -166,11 +159,12 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
         summaryKey = T.pack $ pathKeyForBlobPair blobs
 
 diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [TOCSummary]
-diffTOC = mapMaybe entrySummary . dedupe . filter removeImports . tableOfContentsBy declaration
+diffTOC = mapMaybe entrySummary . dedupe . filter extraDeclarations . tableOfContentsBy declaration
   where
-    removeImports :: HasField fields (Maybe Declaration) => Entry (Record fields) -> Bool
-    removeImports entry = case getDeclaration (entryPayload entry) of
-      Just (ImportDeclaration{..}) -> False
+    extraDeclarations :: HasField fields (Maybe Declaration) => Entry (Record fields) -> Bool
+    extraDeclarations entry = case getDeclaration (entryPayload entry) of
+      Just ImportDeclaration{..} -> False
+      Just CallReference{..} -> False
       _ -> True
 
 renderToCTerm :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> Summaries
@@ -189,5 +183,6 @@ toCategoryName declaration = case declaration of
   ImportDeclaration{} -> "Import"
   FunctionDeclaration{} -> "Function"
   MethodDeclaration{} -> "Method"
+  CallReference{} -> "Call"
   HeadingDeclaration _ _ _ l -> "Heading " <> T.pack (show l)
   ErrorDeclaration{} -> "ParseError"

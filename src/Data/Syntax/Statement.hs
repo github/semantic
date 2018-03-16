@@ -1,20 +1,11 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, ViewPatterns #-}
 module Data.Syntax.Statement where
 
-import Control.Monad.Effect.Address
-import Control.Monad.Effect.Env
-import Control.Monad.Effect.Store
-import Data.Abstract.Address
 import Data.Abstract.Environment
-import Data.Abstract.Eval
-import Data.Abstract.FreeVariables
-import Data.Abstract.Value
-import Data.Semigroup
-import Data.Align.Generic
-import Data.Functor.Classes.Generic
-import Data.Mergeable
+import Data.Abstract.Evaluatable
 import Diffing.Algorithm
-import GHC.Generics
+import Prelude hiding (fail)
+import Prologue
 
 -- | Conditional. This must have an else block, which can be filled with some default value when omitted in the source, e.g. 'pure ()' for C-style if-without-else or 'pure Nothing' for Ruby-style, in both cases assuming some appropriate Applicative context into which the If will be lifted.
 data If a = If { ifCondition :: !a, ifThenBody :: !a, ifElseBody :: !a }
@@ -24,9 +15,10 @@ instance Eq1 If where liftEq = genericLiftEq
 instance Ord1 If where liftCompare = genericLiftCompare
 instance Show1 If where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for If
-instance (MonadFail m) => Eval t v m If
-
+instance Evaluatable If where
+  eval (If cond if' else') = do
+    bool <- subtermValue cond
+    ifthenelse bool (subtermValue if') (subtermValue else')
 
 -- | Else statement. The else condition is any term, that upon successful completion, continues evaluation to the elseBody, e.g. `for ... else` in Python.
 data Else a = Else { elseCondition :: !a, elseBody :: !a }
@@ -37,7 +29,7 @@ instance Ord1 Else where liftCompare = genericLiftCompare
 instance Show1 Else where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Else
-instance (MonadFail m) => Eval t v m Else
+instance Evaluatable Else
 
 -- TODO: Alternative definition would flatten if/else if/else chains: data If a = If ![(a, a)] !(Maybe a)
 
@@ -50,7 +42,7 @@ instance Ord1 Goto where liftCompare = genericLiftCompare
 instance Show1 Goto where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Goto
-instance (MonadFail m) => Eval t v m Goto
+instance Evaluatable Goto
 
 
 -- | A pattern-matching or computed jump control-flow statement, like 'switch' in C or JavaScript, or 'case' in Ruby or Haskell.
@@ -62,7 +54,7 @@ instance Ord1 Match where liftCompare = genericLiftCompare
 instance Show1 Match where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Match
-instance (MonadFail m) => Eval t v m Match
+instance Evaluatable Match
 
 
 -- | A pattern in a pattern-matching or computed jump control-flow statement, like 'case' in C or JavaScript, 'when' in Ruby, or the left-hand side of '->' in the body of Haskell 'case' expressions.
@@ -74,7 +66,7 @@ instance Ord1 Pattern where liftCompare = genericLiftCompare
 instance Show1 Pattern where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Pattern
-instance (MonadFail m) => Eval t v m Pattern
+instance Evaluatable Pattern
 
 
 -- | A let statement or local binding, like 'a as b' or 'let a = b'.
@@ -86,7 +78,7 @@ instance Ord1 Let where liftCompare = genericLiftCompare
 instance Show1 Let where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Let
-instance (MonadFail m) => Eval t v m Let
+instance Evaluatable Let
 
 
 -- Assignment
@@ -99,21 +91,14 @@ instance Eq1 Assignment where liftEq = genericLiftEq
 instance Ord1 Assignment where liftCompare = genericLiftCompare
 instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
-instance ( Monad m
-         , Semigroup (Cell (LocationFor v) v)
-         , MonadAddress (LocationFor v) m
-         , MonadStore v m
-         , MonadEnv v m
-         , FreeVariables t
-         )
-         => Eval t v m Assignment where
-  eval ev yield Assignment{..} = do
-    env <- askEnv
-    v <- ev pure assignmentValue
-
-    (var, a) <- envLookupOrAlloc' assignmentTarget env v
-
-    localEnv (envInsert var a) (yield v)
+instance Evaluatable Assignment where
+  eval Assignment{..} = do
+    v <- subtermValue assignmentValue
+    addr <- lookupOrAlloc name
+    assign addr v
+    modifyGlobalEnv (envInsert name addr)
+    pure v
+    where name = freeVariable (subterm assignmentTarget)
 
 -- | Post increment operator (e.g. 1++ in Go, or i++ in C).
 newtype PostIncrement a = PostIncrement a
@@ -124,7 +109,7 @@ instance Ord1 PostIncrement where liftCompare = genericLiftCompare
 instance Show1 PostIncrement where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for PostIncrement
-instance (MonadFail m) => Eval t v m PostIncrement
+instance Evaluatable PostIncrement
 
 
 -- | Post decrement operator (e.g. 1-- in Go, or i-- in C).
@@ -136,7 +121,7 @@ instance Ord1 PostDecrement where liftCompare = genericLiftCompare
 instance Show1 PostDecrement where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for PostDecrement
-instance (MonadFail m) => Eval t v m PostDecrement
+instance Evaluatable PostDecrement
 
 
 -- Returns
@@ -148,10 +133,8 @@ instance Eq1 Return where liftEq = genericLiftEq
 instance Ord1 Return where liftCompare = genericLiftCompare
 instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Return
-instance (MonadFail m) => Eval t v m Return where
-  eval ev yield (Return a) = ev yield a
-
+instance Evaluatable Return where
+  eval (Return x) = subtermValue x
 
 newtype Yield a = Yield a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -161,7 +144,7 @@ instance Ord1 Yield where liftCompare = genericLiftCompare
 instance Show1 Yield where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Yield
-instance (MonadFail m) => Eval t v m Yield
+instance Evaluatable Yield
 
 
 newtype Break a = Break a
@@ -172,7 +155,7 @@ instance Ord1 Break where liftCompare = genericLiftCompare
 instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Break
-instance (MonadFail m) => Eval t v m Break
+instance Evaluatable Break
 
 
 newtype Continue a = Continue a
@@ -183,7 +166,7 @@ instance Ord1 Continue where liftCompare = genericLiftCompare
 instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Continue
-instance (MonadFail m) => Eval t v m Continue
+instance Evaluatable Continue
 
 
 newtype Retry a = Retry a
@@ -194,7 +177,7 @@ instance Ord1 Retry where liftCompare = genericLiftCompare
 instance Show1 Retry where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Retry
-instance (MonadFail m) => Eval t v m Retry
+instance Evaluatable Retry
 
 
 newtype NoOp a = NoOp a
@@ -204,9 +187,8 @@ instance Eq1 NoOp where liftEq = genericLiftEq
 instance Ord1 NoOp where liftCompare = genericLiftCompare
 instance Show1 NoOp where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for NoOp
-instance (MonadFail m) => Eval t v m NoOp
-
+instance Evaluatable NoOp where
+  eval _ = unit
 
 -- Loops
 
@@ -217,8 +199,8 @@ instance Eq1 For where liftEq = genericLiftEq
 instance Ord1 For where liftCompare = genericLiftCompare
 instance Show1 For where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for For
-instance (MonadFail m) => Eval t v m For
+instance Evaluatable For where
+  eval (fmap subtermValue -> For before cond step body) = forLoop before cond step body
 
 
 data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }
@@ -229,7 +211,7 @@ instance Ord1 ForEach where liftCompare = genericLiftCompare
 instance Show1 ForEach where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for ForEach
-instance (MonadFail m) => Eval t v m ForEach
+instance Evaluatable ForEach
 
 
 data While a = While { whileCondition :: !a, whileBody :: !a }
@@ -239,9 +221,8 @@ instance Eq1 While where liftEq = genericLiftEq
 instance Ord1 While where liftCompare = genericLiftCompare
 instance Show1 While where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for While
-instance (MonadFail m) => Eval t v m While
-
+instance Evaluatable While where
+  eval While{..} = while (subtermValue whileCondition)  (subtermValue whileBody)
 
 data DoWhile a = DoWhile { doWhileCondition :: !a, doWhileBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -250,9 +231,8 @@ instance Eq1 DoWhile where liftEq = genericLiftEq
 instance Ord1 DoWhile where liftCompare = genericLiftCompare
 instance Show1 DoWhile where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for DoWhile
-instance (MonadFail m) => Eval t v m DoWhile
-
+instance Evaluatable DoWhile where
+  eval DoWhile{..} = doWhile (subtermValue doWhileBody) (subtermValue doWhileCondition)
 
 -- Exception handling
 
@@ -264,7 +244,7 @@ instance Ord1 Throw where liftCompare = genericLiftCompare
 instance Show1 Throw where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Throw
-instance (MonadFail m) => Eval t v m Throw
+instance Evaluatable Throw
 
 
 data Try a = Try { tryBody :: !a, tryCatch :: ![a] }
@@ -275,7 +255,7 @@ instance Ord1 Try where liftCompare = genericLiftCompare
 instance Show1 Try where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Try
-instance (MonadFail m) => Eval t v m Try
+instance Evaluatable Try
 
 
 data Catch a = Catch { catchException :: !a, catchBody :: !a }
@@ -286,7 +266,7 @@ instance Ord1 Catch where liftCompare = genericLiftCompare
 instance Show1 Catch where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Catch
-instance (MonadFail m) => Eval t v m Catch
+instance Evaluatable Catch
 
 
 newtype Finally a = Finally a
@@ -297,7 +277,7 @@ instance Ord1 Finally where liftCompare = genericLiftCompare
 instance Show1 Finally where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Finally
-instance (MonadFail m) => Eval t v m Finally
+instance Evaluatable Finally
 
 
 -- Scoping
@@ -311,7 +291,7 @@ instance Ord1 ScopeEntry where liftCompare = genericLiftCompare
 instance Show1 ScopeEntry where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for ScopeEntry
-instance (MonadFail m) => Eval t v m ScopeEntry
+instance Evaluatable ScopeEntry
 
 
 -- | ScopeExit (e.g. `END {}` block in Ruby or Perl).
@@ -323,4 +303,4 @@ instance Ord1 ScopeExit where liftCompare = genericLiftCompare
 instance Show1 ScopeExit where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for ScopeExit
-instance (MonadFail m) => Eval t v m ScopeExit
+instance Evaluatable ScopeExit

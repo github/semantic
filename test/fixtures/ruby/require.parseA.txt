@@ -1,7 +1,6 @@
 (Program
-  (Import
-    (TextElement)
-    (Empty))
+  (Require
+    (TextElement))
   (Call
     (Identifier)
     (Identifier)

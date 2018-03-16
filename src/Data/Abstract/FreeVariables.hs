@@ -1,15 +1,35 @@
 {-# LANGUAGE DefaultSignatures, UndecidableInstances #-}
 module Data.Abstract.FreeVariables where
 
-import Data.ByteString (ByteString)
-import Data.Functor.Foldable
-import Data.Proxy
-import Data.Set
+import Prologue
 import Data.Term
-import Data.Union
+import Data.ByteString (intercalate)
+import qualified Data.List.NonEmpty as NonEmpty
+import Data.Abstract.Path
 
 -- | The type of variable names.
-type Name = ByteString
+type Name = NonEmpty ByteString
+
+-- | Construct a qualified name from a 'ByteString'
+name :: ByteString -> Name
+name x = x :| []
+
+-- | Construct a qualified name from a list of 'ByteString's
+qualifiedName :: [ByteString] -> Name
+qualifiedName = NonEmpty.fromList
+
+-- | Construct a qualified 'Name' from a `/` delimited path.
+pathToQualifiedName :: ByteString -> Name
+pathToQualifiedName = qualifiedName . splitOnPathSeparator
+
+-- | User friendly 'ByteString' of a qualified 'Name'.
+friendlyName :: Name -> ByteString
+friendlyName xs = intercalate "." (NonEmpty.toList xs)
+
+
+-- | The type of labels.
+--   TODO: This should be rolled into 'Name' and tracked in the environment, both so that we can abstract over labels like any other location, and so that we can garbage collect unreachable labels.
+type Label = Int
 
 
 -- | Types which can contain unbound variables.
@@ -31,6 +51,15 @@ class FreeVariables1 syntax where
 freeVariables1 :: (FreeVariables1 t, FreeVariables a) => t a -> Set Name
 freeVariables1 = liftFreeVariables freeVariables
 
+freeVariable :: FreeVariables term => term -> Name
+freeVariable term = case toList (freeVariables term) of
+  [n] -> n
+  xs -> Prelude.fail ("expected single free variable, but got: " <> show xs)
+
+-- TODO: Need a dedicated concept of qualified names outside of freevariables (a
+-- Set) b/c you can have something like `a.a.b.a`
+-- qualifiedName :: FreeVariables term => term -> Name
+-- qualifiedName term = let names = toList (freeVariables term) in B.intercalate "." names
 
 instance (FreeVariables1 syntax, Functor syntax) => FreeVariables (Term syntax ann) where
   freeVariables = cata (liftFreeVariables id)

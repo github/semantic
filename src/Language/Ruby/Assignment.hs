@@ -7,14 +7,13 @@ module Language.Ruby.Assignment
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
-import qualified Assigning.Assignment as Assignment
-import Data.Maybe (fromMaybe)
-import Control.Monad (guard)
-import Data.Record
-import Data.Functor (void)
-import Data.List.NonEmpty (some1)
+import Data.Abstract.FreeVariables
 import Data.List (elem)
+import Data.Record
 import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
+import Language.Ruby.Grammar as Grammar
+import Prologue hiding (for)
+import qualified Assigning.Assignment as Assignment
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -22,16 +21,13 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Term as Term
-import Data.Union
-import GHC.Stack
-import Language.Ruby.Grammar as Grammar
+import qualified Language.Ruby.Syntax as Ruby.Syntax
 
 -- | The type of Ruby syntax.
 type Syntax = '[
     Comment.Comment
   , Declaration.Class
   , Declaration.Function
-  , Declaration.Import
   , Declaration.Method
   , Declaration.Module
   , Expression.Arithmetic
@@ -78,6 +74,8 @@ type Syntax = '[
   , Syntax.Error
   , Syntax.Identifier
   , Syntax.Program
+  , Ruby.Syntax.Require
+  , Ruby.Syntax.Load
   , []
   ]
 
@@ -161,7 +159,7 @@ identifier =
   <|> mk BlockArgument
   <|> mk ReservedIdentifier
   <|> mk Uninterpreted
-  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
+  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> (name <$> source))
 
 -- TODO: Handle interpolation in all literals that support it (strings, regexes, symbols, subshells, etc).
 literal :: Assignment
@@ -170,7 +168,7 @@ literal =
   <|> makeTerm <$> token  Grammar.False    <*> pure Literal.false
   <|> makeTerm <$> token  Grammar.Nil      <*> pure Literal.Null
   <|> makeTerm <$> symbol Grammar.Integer  <*> (Literal.Integer <$> source)
-  <|> makeTerm <$> symbol Grammar.Float    <*> (Literal.Float <$> source)
+  <|> makeTerm <$> symbol Grammar.Float    <*> (source >>= Literal.normalizeFloatString [Literal.padWithLeadingZero, Literal.removeUnderscores])
   <|> makeTerm <$> symbol Grammar.Rational <*> (Literal.Rational <$> source)
   <|> makeTerm <$> symbol Grammar.Complex  <*> (Literal.Complex <$> source)
    -- TODO: Do we want to represent the difference between .. and ...
@@ -192,7 +190,7 @@ keyword =
       mk KeywordFILE
   <|> mk KeywordLINE
   <|> mk KeywordENCODING
-  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
+  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> (name <$> source))
 
 beginBlock :: Assignment
 beginBlock = makeTerm <$> symbol BeginBlock <*> children (Statement.ScopeEntry <$> many expression)
@@ -222,7 +220,7 @@ parameter =
   <|> mk OptionalParameter
   <|> makeTerm <$> symbol DestructuredParameter <*> children (many parameter)
   <|> expression
-  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
+  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> (name <$> source))
 
 method :: Assignment
 method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> pure [] <*> emptyTerm <*> expression <*> params <*> expressions')
@@ -248,12 +246,12 @@ comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 alias :: Assignment
-alias = makeTerm <$> symbol Alias <*> children (Expression.Call <$> pure [] <*> name <*> some expression <*> emptyTerm)
-  where name = makeTerm <$> location <*> (Syntax.Identifier <$> source)
+alias = makeTerm <$> symbol Alias <*> children (Expression.Call <$> pure [] <*> name' <*> some expression <*> emptyTerm)
+  where name' = makeTerm <$> location <*> (Syntax.Identifier <$> (name <$> source))
 
 undef :: Assignment
-undef = makeTerm <$> symbol Undef <*> children (Expression.Call <$> pure [] <*> name <*> some expression <*> emptyTerm)
-  where name = makeTerm <$> location <*> (Syntax.Identifier <$> source)
+undef = makeTerm <$> symbol Undef <*> children (Expression.Call <$> pure [] <*> name' <*> some expression <*> emptyTerm)
+  where name' = makeTerm <$> location <*> (Syntax.Identifier <$> (name <$> source))
 
 if' :: Assignment
 if' =   ifElsif If
@@ -299,15 +297,20 @@ pair :: Assignment
 pair =   makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> (expression <|> emptyTerm))
 
 methodCall :: Assignment
-methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> regularCall)
+methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> regularCall)
   where
     regularCall = inj <$> (Expression.Call <$> pure [] <*> expression <*> args <*> (block <|> emptyTerm))
     require = inj <$> (symbol Identifier *> do
       s <- source
-      guard (elem s ["autoload", "load", "require", "require_relative"])
-      Declaration.Import <$> args' <*> emptyTerm <*> pure [])
+      guard (elem s ["require", "require_relative"])
+      Ruby.Syntax.Require (s == "require_relative") <$> nameExpression)
+    load = inj <$> (symbol Identifier *> do
+      s <- source
+      guard (elem s ["load"])
+      Ruby.Syntax.Load <$> loadArgs)
     args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> pure []
-    args' = makeTerm'' <$> (symbol ArgumentList <|> symbol ArgumentListWithParens) <*> children (many expression) <|> emptyTerm
+    loadArgs = (symbol ArgumentList <|> symbol ArgumentListWithParens)  *> children (some expression)
+    nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
 
 call :: Assignment
 call = makeTerm <$> symbol Call <*> children (Expression.MemberAccess <$> expression <*> (expression <|> args))
@@ -351,7 +354,7 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
 
     lhs  = makeTerm <$> symbol LeftAssignmentList  <*> children (many expr) <|> expr
     rhs  = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr
-    expr = makeTerm <$> symbol RestAssignment      <*> (Syntax.Identifier <$> source)
+    expr = makeTerm <$> symbol RestAssignment      <*> (Syntax.Identifier <$> (name <$> source))
        <|> makeTerm <$> symbol DestructuredLeftAssignment <*> children (many expr)
        <|> expression
 
@@ -360,7 +363,7 @@ unary = symbol Unary >>= \ location ->
       makeTerm location . Expression.Complement <$> children ( symbol AnonTilde *> expression )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonBang *> expression )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonNot *> expression )
-  <|> makeTerm location <$> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonDefinedQuestion <*> (Syntax.Identifier <$> source)) <*> some expression <*> emptyTerm)
+  <|> makeTerm location <$> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonDefinedQuestion <*> (Syntax.Identifier <$> (name <$> source))) <*> some expression <*> emptyTerm)
   <|> makeTerm location . Expression.Negate <$> children ( symbol AnonMinus' *> expression )
   <|> children ( symbol AnonPlus *> expression )
 

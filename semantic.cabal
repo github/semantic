@@ -1,8 +1,8 @@
-name:                semantic-diff
+name:                semantic
 version:             0.3.0
 synopsis:            Initial project template from stack
 description:         Please see README.md
-homepage:            http://github.com/github/semantic-diff#readme
+homepage:            http://github.com/github/semantic#readme
 author:              Rob Rix, Josh Vera
 maintainer:          rob.rix@github.com
 copyright:           2016 GitHub
@@ -20,37 +20,41 @@ library
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Evaluating
                      , Analysis.Abstract.Tracing
+                     , Analysis.CallGraph
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
                      , Analysis.Decorator
                      , Analysis.Declaration
                      , Analysis.IdentifierName
+                     , Analysis.ModuleDef
                      -- Semantic assignment
                      , Assigning.Assignment
                      , Assigning.Assignment.Table
+                     -- Control structures & interfaces for abstract interpretation
+                     , Control.Abstract.Addressable
+                     , Control.Abstract.Analysis
+                     , Control.Abstract.Evaluator
+                     , Control.Abstract.Value
                      -- Control flow
                      , Control.Effect
-                     -- Effects used in abstract interpretation
-                     , Control.Monad.Effect.Address
-                     , Control.Monad.Effect.Cache
-                     , Control.Monad.Effect.Dead
-                     , Control.Monad.Effect.Env
+                     -- Effects used for program analysis
                      , Control.Monad.Effect.Fresh
-                     , Control.Monad.Effect.GC
                      , Control.Monad.Effect.NonDet
-                     , Control.Monad.Effect.Store
-                     , Control.Monad.Effect.Trace
-                     -- General datatype definitions & generic algorithms
+                     -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
                      , Data.Abstract.Cache
                      , Data.Abstract.Configuration
                      , Data.Abstract.Environment
-                     , Data.Abstract.Eval
+                     , Data.Abstract.Evaluatable
                      , Data.Abstract.FreeVariables
+                     , Data.Abstract.Heap
                      , Data.Abstract.Live
-                     , Data.Abstract.Store
+                     , Data.Abstract.ModuleTable
+                     , Data.Abstract.Number
+                     , Data.Abstract.Path
                      , Data.Abstract.Type
                      , Data.Abstract.Value
+                     -- General datatype definitions & generic algorithms
                      , Data.Algebra
                      , Data.Align.Generic
                      , Data.AST
@@ -61,6 +65,7 @@ library
                      , Data.Functor.Classes.Generic
                      , Data.JSON.Fields
                      , Data.Language
+                     , Data.Map.Monoidal
                      , Data.Mergeable
                      , Data.Output
                      , Data.Patch
@@ -95,9 +100,13 @@ library
                      , Language.JSON.Assignment
                      , Language.Ruby.Grammar
                      , Language.Ruby.Assignment
+                     , Language.Ruby.Syntax
                      , Language.TypeScript.Assignment
                      , Language.TypeScript.Grammar
                      , Language.TypeScript.Syntax
+                     , Language.PHP.Assignment
+                     , Language.PHP.Grammar
+                     , Language.PHP.Syntax
                      , Language.Python.Assignment
                      , Language.Python.Grammar
                      , Language.Python.Syntax
@@ -108,9 +117,10 @@ library
                      , Parsing.CMark
                      , Parsing.Parser
                      , Parsing.TreeSitter
-                     , Paths_semantic_diff
+                     , Paths_semantic
                      -- Rendering formats
                      , Rendering.DOT
+                     , Rendering.Imports
                      , Rendering.JSON
                      , Rendering.Renderer
                      , Rendering.SExpression
@@ -125,15 +135,17 @@ library
                      , Semantic.Task
                      , Semantic.Queue
                      , Semantic.Util
+                    -- Custom Prelude
+  other-modules:       Prologue
   build-depends:       base >= 4.8 && < 5
                      , aeson
+                     , algebraic-graphs
                      , ansi-terminal
                      , array
                      , async
                      , bifunctors
                      , bytestring
                      , cmark-gfm
-                     , comonad
                      , containers
                      , directory
                      , effects
@@ -152,9 +164,10 @@ library
                      , optparse-applicative
                      , parallel
                      , parsers
-                     , pointed
                      , recursion-schemes
-                     , semigroups
+                     , reducers
+                     , scientific
+                     , semigroupoids
                      , split
                      , stm-chans
                      , template-haskell
@@ -165,12 +178,21 @@ library
                      , haskell-tree-sitter
                      , tree-sitter-go
                      , tree-sitter-json
+                     , tree-sitter-php
                      , tree-sitter-python
                      , tree-sitter-ruby
                      , tree-sitter-typescript
                      , tree-sitter-java
   default-language:    Haskell2010
-  default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards, StrictData
+  default-extensions: DeriveFoldable
+                    , DeriveFunctor
+                    , DeriveGeneric
+                    , DeriveTraversable
+                    , FlexibleContexts
+                    , FlexibleInstances
+                    , OverloadedStrings
+                    , RecordWildCards
+                    , StrictData
   ghc-options:         -Wall -fno-warn-name-shadowing -O -j
   ghc-prof-options:    -fprof-auto
 
@@ -181,7 +203,7 @@ executable semantic
   cc-options:          -DU_STATIC_IMPLEMENTATION=1
   cpp-options:         -DU_STATIC_IMPLEMENTATION=1
   build-depends:       base
-                     , semantic-diff
+                     , semantic
   default-language:    Haskell2010
   default-extensions:  FlexibleInstances, OverloadedStrings, RecordWildCards
 
@@ -190,6 +212,10 @@ test-suite test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       Assigning.Assignment.Spec
+                     , Analysis.Go.Spec
+                     , Analysis.Python.Spec
+                     , Analysis.Ruby.Spec
+                     , Analysis.TypeScript.Spec
                      , Data.Diff.Spec
                      , Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
@@ -200,6 +226,7 @@ test-suite test
                      , Diffing.Algorithm.SES.Spec
                      , Diffing.Interpreter.Spec
                      , Integration.Spec
+                     , Rendering.Imports.Spec
                      , Rendering.TOC.Spec
                      , Semantic.Spec
                      , Semantic.CLI.Spec
@@ -227,13 +254,26 @@ test-suite test
                      , network
                      , containers
                      , recursion-schemes >= 4.1
-                     , semantic-diff
+                     , semantic
                      , text >= 1.2.1.3
                      , these
   ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards
 
+benchmark evaluation
+  hs-source-dirs: bench
+  type:           exitcode-stdio-1.0
+  main-is:        Main.hs
+  ghc-options:    -threaded -rtsopts "-with-rtsopts=-N -A4m -n2m -T" -static -j -O
+  cc-options:     -DU_STATIC_IMPLEMENTATION=1
+  cpp-options:    -DU_STATIC_IMPLEMENTATION=1
+  default-language: Haskell2010
+  build-depends:  base
+                , criterion
+                , semantic
+
+
 source-repository head
   type:     git
-  location: https://github.com/github/semantic-diff
+  location: https://github.com/github/semantic

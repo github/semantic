@@ -5,18 +5,17 @@ module Analysis.IdentifierName
 , identifierLabel
 ) where
 
+import Data.Abstract.FreeVariables
 import Data.Aeson
-import Data.ByteString
 import Data.JSON.Fields
-import Data.Proxy
 import Data.Term
 import Data.Text.Encoding (decodeUtf8)
-import Data.Union
+import Prologue
 import qualified Data.Syntax
 
 -- | Compute a 'IdentifierLabel' label for a 'Term'.
 identifierLabel :: IdentifierName syntax => TermF syntax a b -> Maybe IdentifierLabel
-identifierLabel (In _ s) = IdentifierLabel <$> (identifierName s)
+identifierLabel (In _ s) = IdentifierLabel <$> identifierName s
 
 newtype IdentifierLabel = IdentifierLabel ByteString
   deriving (Show)
@@ -41,7 +40,7 @@ instance Apply IdentifierName fs => CustomIdentifierName (Union fs) where
   customIdentifierName = apply (Proxy :: Proxy IdentifierName) identifierName
 
 instance CustomIdentifierName Data.Syntax.Identifier where
-  customIdentifierName (Data.Syntax.Identifier name) = Just name
+  customIdentifierName (Data.Syntax.Identifier name) = Just (friendlyName name)
 
 data Strategy = Default | Custom
 

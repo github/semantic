@@ -1,44 +1,62 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, FunctionalDependencies, FlexibleContexts, FlexibleInstances, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, TypeFamilies, TypeOperators #-}
 module Data.Abstract.Value where
 
 import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
+import Data.Abstract.Heap
 import Data.Abstract.Live
+import Data.Abstract.Number
 import qualified Data.Abstract.Type as Type
-import Data.ByteString (ByteString)
-import Data.Functor.Classes.Generic
-import Data.Semigroup
-import qualified Data.Set as Set
-import Data.Union
-import GHC.Generics
-import Prelude hiding (Integer, String)
+import Data.Scientific (Scientific)
+import Prologue
+import Prelude hiding (Float, Integer, String, Rational, fail)
 import qualified Prelude
 
-type ValueConstructors location
-  = '[Closure location
-    , Unit
+type ValueConstructors
+  = '[Array
     , Boolean
+    , Closure
+    , Float
     , Integer
     , String
+    , Rational
+    , Symbol
+    , Tuple
+    , Unit
     ]
 
 -- | Open union of primitive values that terms can be evaluated to.
-type Value location = Union (ValueConstructors location)
+--   Fix by another name.
+newtype Value = Value { deValue :: Union ValueConstructors Value }
+  deriving (Eq, Show, Ord)
+
+-- | Identical to 'inj', but wraps the resulting sub-entity in a 'Value'.
+injValue :: (f :< ValueConstructors) => f Value -> Value
+injValue = Value . inj
+
+-- | Identical to 'prj', but unwraps the argument out of its 'Value' wrapper.
+prjValue :: (f :< ValueConstructors) => Value -> Maybe (f Value)
+prjValue = prj . deValue
+
+-- | Convenience function for projecting two values.
+prjPair :: (f :< ValueConstructors , g :< ValueConstructors)
+        => (Value, Value)
+        -> Maybe (f Value, g Value)
+prjPair = bitraverse prjValue prjValue
 
 -- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
--- TODO: Wrap the Value union in a newtype to differentiate from (eventual) à la carte Types.
 
--- | A function value consisting of a list of parameters, the body of the function, and an environment of bindings captured by the body.
-data Closure location term = Closure [Name] term (Environment location (Value location term))
+-- | A function value consisting of a list of parameter 'Name's, a 'Label' to jump to the body of the function, and an 'Environment' of bindings captured by the body.
+data Closure value = Closure [Name] Label (Environment Precise value)
   deriving (Eq, Generic1, Ord, Show)
 
-instance (Eq location) => Eq1 (Closure location) where liftEq = genericLiftEq
-instance (Ord location) => Ord1 (Closure location) where liftCompare = genericLiftCompare
-instance (Show location) => Show1 (Closure location) where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 Closure where liftEq = genericLiftEq
+instance Ord1 Closure where liftCompare = genericLiftCompare
+instance Show1 Closure where liftShowsPrec = genericLiftShowsPrec
 
 -- | The unit value. Typically used to represent the result of imperative statements.
-data Unit term = Unit
+data Unit value = Unit
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 Unit where liftEq = genericLiftEq
@@ -46,7 +64,7 @@ instance Ord1 Unit where liftCompare = genericLiftCompare
 instance Show1 Unit where liftShowsPrec = genericLiftShowsPrec
 
 -- | Boolean values.
-newtype Boolean term = Boolean Prelude.Bool
+newtype Boolean value = Boolean Prelude.Bool
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 Boolean where liftEq = genericLiftEq
@@ -54,68 +72,94 @@ instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
 -- | Arbitrary-width integral values.
-newtype Integer term = Integer Prelude.Integer
+newtype Integer value = Integer (Number Prelude.Integer)
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 Integer where liftEq = genericLiftEq
 instance Ord1 Integer where liftCompare = genericLiftCompare
 instance Show1 Integer where liftShowsPrec = genericLiftShowsPrec
 
+-- | Arbitrary-width rational values values.
+newtype Rational value = Rational (Number Prelude.Rational)
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Rational where liftEq = genericLiftEq
+instance Ord1 Rational where liftCompare = genericLiftCompare
+instance Show1 Rational where liftShowsPrec = genericLiftShowsPrec
+
 -- | String values.
-newtype String term = String ByteString
+newtype String value = String ByteString
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq1 String where liftEq = genericLiftEq
 instance Ord1 String where liftCompare = genericLiftCompare
 instance Show1 String where liftShowsPrec = genericLiftShowsPrec
 
+-- | Possibly-interned Symbol values.
+--   TODO: Should this store a 'Text'?
+newtype Symbol value = Symbol ByteString
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Symbol where liftEq = genericLiftEq
+instance Ord1 Symbol where liftCompare = genericLiftCompare
+instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
+
+-- | Float values.
+newtype Float value = Float (Number Scientific)
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Float where liftEq = genericLiftEq
+instance Ord1 Float where liftCompare = genericLiftCompare
+instance Show1 Float where liftShowsPrec = genericLiftShowsPrec
+
+-- | Zero or more values. Fixed-size at interpretation time.
+--   TODO: Investigate whether we should use Vector for this.
+--   TODO: Should we have a Some type over a nonemmpty list? Or does this merit one?
+newtype Tuple value = Tuple [value]
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Tuple where liftEq = genericLiftEq
+instance Ord1 Tuple where liftCompare = genericLiftCompare
+instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
+
+-- | Zero or more values. Dynamically resized as needed at interpretation time.
+--   TODO: Vector? Seq?
+newtype Array value = Array [value]
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Array where liftEq = genericLiftEq
+instance Ord1 Array where liftCompare = genericLiftCompare
+instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
+
+-- | The environment for an abstract value type.
+type EnvironmentFor v = Environment (LocationFor v) v
+
+-- | The exports for an abstract value type.
+type ExportsFor v = Exports (LocationFor v) v
+
+-- | The 'Heap' for an abstract value type.
+type HeapFor value = Heap (LocationFor value) value
+
+-- | The cell for an abstract value type.
+type CellFor value = Cell (LocationFor value) value
+
+-- | The address set type for an abstract value type.
+type LiveFor value = Live (LocationFor value) value
 
 -- | The location type (the body of 'Address'es) which should be used for an abstract value type.
-type family LocationFor value :: * where
-  LocationFor (Value location term) = location
-  LocationFor Type.Type = Monovariant
-
+type family LocationFor value :: *
+type instance LocationFor Value = Precise
+type instance LocationFor Type.Type = Monovariant
 
 -- | Value types, e.g. closures, which can root a set of addresses.
-class ValueRoots l v | v -> l where
+class ValueRoots value where
   -- | Compute the set of addresses rooted by a given value.
-  valueRoots :: v -> Live l v
+  valueRoots :: value -> LiveFor value
 
--- | An interface for constructing abstract values.
-class AbstractValue v where
-  -- | Construct an abstract unit value.
-  unit :: v
-
-  -- | Construct an abstract integral value.
-  integer :: Prelude.Integer -> v
-
-  -- | Construct an abstract boolean value.
-  boolean :: Bool -> v
-
-  -- | Construct an abstract string value.
-  string :: ByteString -> v
-
-
--- Instances
-
-instance (FreeVariables term, Ord location) => ValueRoots location (Value location term) where
+instance ValueRoots Value where
   valueRoots v
-    | Just (Closure names body env) <- prj v = envRoots env (foldr Set.delete (freeVariables body) names)
-    | otherwise                              = mempty
+    | Just (Closure _ _ env) <- prjValue v = envAll env
+    | otherwise                            = mempty
 
--- | Construct a 'Value' wrapping the value arguments (if any).
-instance AbstractValue (Value location term) where
-  unit = inj Unit
-  integer = inj . Integer
-  boolean = inj . Boolean
-  string = inj . String
-
-instance ValueRoots Monovariant Type.Type where
+instance ValueRoots Type.Type where
   valueRoots _ = mempty
-
--- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
-instance AbstractValue Type.Type where
-  unit = Type.Unit
-  integer _ = Type.Int
-  boolean _ = Type.Bool
-  string _ = Type.String

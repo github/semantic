@@ -1,30 +1,7 @@
 (Program
-  (Export
-    (ExportClause
-      (ImportExportSpecifier
-        (Identifier)
-        (Empty))
-      (ImportExportSpecifier
-        (Identifier)
-        (Empty))
-      (ImportExportSpecifier
-        (Identifier)
-        (Empty))
-      (ImportExportSpecifier
-        (Identifier)
-        (Empty))))
-  (Export
-    (ExportClause
-      (ImportExportSpecifier
-        (Identifier)
-        (Identifier))
-      (ImportExportSpecifier
-        (Identifier)
-        (Identifier))
-      (ImportExportSpecifier
-        (Identifier)
-        (Empty))))
-  (Export
+  (QualifiedExport)
+  (QualifiedExport)
+  (DefaultExport
     (VariableDeclaration
       (Assignment
         (Empty)
@@ -38,7 +15,7 @@
         (Empty)
         (Identifier)
         (Empty))))
-  (Export
+  (DefaultExport
     (VariableDeclaration
       (Assignment
         (Empty)
@@ -56,48 +33,24 @@
         (Empty)
         (Identifier)
         (Empty))))
-  (Export
+  (DefaultExport
     (Identifier))
-  (Export
+  (DefaultExport
     (Function
       (Empty)
       (Empty)
       (Empty)
       ([])))
-  (Export
+  (DefaultExport
     (Function
       (Empty)
       (Empty)
       (Identifier)
       ([])))
-  (Export
-    (ExportClause
-      (ImportExportSpecifier
-        (Identifier)
-        (Identifier))))
-  (Export
+  (QualifiedExport)
+  (DefaultExport
     (TextElement))
-  (Export
-    (ExportClause
-      (ImportExportSpecifier
-        (Identifier)
-        (Empty))
-      (ImportExportSpecifier
-        (Identifier)
-        (Empty))
-      (ImportExportSpecifier
-        (Identifier)
-        (Empty)))
-    (TextElement))
-  (Export
-    (ExportClause
-      (ImportExportSpecifier
-        (Identifier)
-        (Identifier))
-      (ImportExportSpecifier
-        (Identifier)
-        (Identifier))
-      (ImportExportSpecifier
-        (Identifier)
-        (Empty)))
-    (TextElement)))
+  (QualifiedExportFrom
+    (Identifier))
+  (QualifiedExportFrom
+    (Identifier)))

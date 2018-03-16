@@ -1,0 +1,450 @@
+{
+  "modules": {
+    "main": {
+      "imports": [
+        {
+          "span": {
+            "start": [
+              1,
+              1
+            ],
+            "end": [
+              1,
+              10
+            ]
+          },
+          "path": "os",
+          "symbols": [],
+          "alias": "os"
+        },
+        {
+          "span": {
+            "start": [
+              2,
+              8
+            ],
+            "end": [
+              2,
+              19
+            ]
+          },
+          "path": "numpy",
+          "symbols": [],
+          "alias": "np"
+        },
+        {
+          "span": {
+            "start": [
+              3,
+              1
+            ],
+            "end": [
+              3,
+              9
+            ]
+          },
+          "path": "a",
+          "symbols": [],
+          "alias": "a"
+        },
+        {
+          "span": {
+            "start": [
+              3,
+              11
+            ],
+            "end": [
+              3,
+              17
+            ]
+          },
+          "path": "b",
+          "symbols": [],
+          "alias": "c"
+        },
+        {
+          "span": {
+            "start": [
+              4,
+              8
+            ],
+            "end": [
+              4,
+              16
+            ]
+          },
+          "path": "b.c",
+          "symbols": [],
+          "alias": "d"
+        },
+        {
+          "span": {
+            "start": [
+              4,
+              16
+            ],
+            "end": [
+              4,
+              19
+            ]
+          },
+          "path": "e",
+          "symbols": [],
+          "alias": "e"
+        },
+        {
+          "span": {
+            "start": [
+              6,
+              1
+            ],
+            "end": [
+              6,
+              16
+            ]
+          },
+          "path": "b",
+          "symbols": [
+            {
+              "alias": "a",
+              "name": "a"
+            }
+          ],
+          "alias": ""
+        },
+        {
+          "span": {
+            "start": [
+              7,
+              1
+            ],
+            "end": [
+              7,
+              21
+            ]
+          },
+          "path": "b",
+          "symbols": [
+            {
+              "alias": "c",
+              "name": "c"
+            },
+            {
+              "alias": "a",
+              "name": "a"
+            }
+          ],
+          "alias": ""
+        },
+        {
+          "span": {
+            "start": [
+              8,
+              1
+            ],
+            "end": [
+              8,
+              16
+            ]
+          },
+          "path": "b",
+          "symbols": [],
+          "alias": ""
+        },
+        {
+          "span": {
+            "start": [
+              9,
+              1
+            ],
+            "end": [
+              9,
+              29
+            ]
+          },
+          "path": "b",
+          "symbols": [
+            {
+              "alias": "x",
+              "name": "a"
+            },
+            {
+              "alias": "y",
+              "name": "b"
+            }
+          ],
+          "alias": ""
+        }
+      ],
+      "name": "main",
+      "language": "Python",
+      "declarations": [
+        {
+          "span": {
+            "start": [
+              11,
+              1
+            ],
+            "end": [
+              13,
+              1
+            ]
+          },
+          "kind": "Function",
+          "name": "print_cwd",
+          "module": "main"
+        },
+        {
+          "span": {
+            "start": [
+              14,
+              1
+            ],
+            "end": [
+              17,
+              1
+            ]
+          },
+          "kind": "Function",
+          "name": "create_array",
+          "module": "main"
+        },
+        {
+          "span": {
+            "start": [
+              18,
+              1
+            ],
+            "end": [
+              21,
+              1
+            ]
+          },
+          "kind": "Function",
+          "name": "sum_array",
+          "module": "main"
+        },
+        {
+          "span": {
+            "start": [
+              22,
+              1
+            ],
+            "end": [
+              24,
+              1
+            ]
+          },
+          "kind": "Function",
+          "name": "sum_array2",
+          "module": "main"
+        }
+      ],
+      "paths": [
+        "test/fixtures/python/import-graph/main.py"
+      ],
+      "calls": [
+        {
+          "span": {
+            "start": [
+              12,
+              5
+            ],
+            "end": [
+              12,
+              23
+            ]
+          },
+          "symbol": "print",
+          "targets": []
+        },
+        {
+          "span": {
+            "start": [
+              12,
+              11
+            ],
+            "end": [
+              12,
+              22
+            ]
+          },
+          "symbol": "os.getcwd",
+          "targets": []
+        },
+        {
+          "span": {
+            "start": [
+              15,
+              9
+            ],
+            "end": [
+              15,
+              31
+            ]
+          },
+          "symbol": "np.array",
+          "targets": []
+        },
+        {
+          "span": {
+            "start": [
+              19,
+              13
+            ],
+            "end": [
+              19,
+              20
+            ]
+          },
+          "symbol": "x.sum",
+          "targets": []
+        },
+        {
+          "span": {
+            "start": [
+              23,
+              12
+            ],
+            "end": [
+              23,
+              19
+            ]
+          },
+          "symbol": "x.sum",
+          "targets": []
+        },
+        {
+          "span": {
+            "start": [
+              26,
+              5
+            ],
+            "end": [
+              26,
+              45
+            ]
+          },
+          "symbol": "print",
+          "targets": []
+        },
+        {
+          "span": {
+            "start": [
+              27,
+              5
+            ],
+            "end": [
+              27,
+              16
+            ]
+          },
+          "symbol": "print_cwd",
+          "targets": []
+        },
+        {
+          "span": {
+            "start": [
+              28,
+              9
+            ],
+            "end": [
+              28,
+              23
+            ]
+          },
+          "symbol": "create_array",
+          "targets": []
+        },
+        {
+          "span": {
+            "start": [
+              29,
+              13
+            ],
+            "end": [
+              29,
+              25
+            ]
+          },
+          "symbol": "sum_array",
+          "targets": []
+        },
+        {
+          "span": {
+            "start": [
+              30,
+              14
+            ],
+            "end": [
+              30,
+              27
+            ]
+          },
+          "symbol": "sum_array2",
+          "targets": []
+        },
+        {
+          "span": {
+            "start": [
+              31,
+              5
+            ],
+            "end": [
+              31,
+              55
+            ]
+          },
+          "symbol": "print",
+          "targets": []
+        },
+        {
+          "span": {
+            "start": [
+              31,
+              11
+            ],
+            "end": [
+              31,
+              54
+            ]
+          },
+          "symbol": "format",
+          "targets": [
+            "'-' * 60 + '\\nYour sum is {}'"
+          ]
+        },
+        {
+          "span": {
+            "start": [
+              32,
+              5
+            ],
+            "end": [
+              32,
+              70
+            ]
+          },
+          "symbol": "print",
+          "targets": []
+        },
+        {
+          "span": {
+            "start": [
+              32,
+              11
+            ],
+            "end": [
+              32,
+              58
+            ]
+          },
+          "symbol": "format",
+          "targets": [
+            "'-' * 60 + '\\nYour sum2 is {}\\n'"
+          ]
+        }
+      ]
+    }
+  }
+}

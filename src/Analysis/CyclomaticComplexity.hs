@@ -5,12 +5,11 @@ module Analysis.CyclomaticComplexity
 , cyclomaticComplexityAlgebra
 ) where
 
+import Prologue
 import Data.Aeson
-import Data.Proxy
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Statement as Statement
 import Data.Term
-import Data.Union
 
 -- | The cyclomatic complexity of a (sub)term.
 newtype CyclomaticComplexity = CyclomaticComplexity Int

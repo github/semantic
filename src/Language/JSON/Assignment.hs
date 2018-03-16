@@ -6,6 +6,7 @@ module Language.JSON.Assignment
 , Term)
 where
 
+import Prologue
 import Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import Data.Record
@@ -13,8 +14,6 @@ import Data.Syntax (makeTerm, parseError)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
-import Data.Union
-import GHC.Stack
 import Language.JSON.Grammar as Grammar
 
 type Syntax =
@@ -51,7 +50,7 @@ array :: Assignment
 array = makeTerm <$> symbol Array <*> children (Literal.Array <$> many jsonValue)
 
 number :: Assignment
-number = makeTerm <$> symbol Number <*> (Literal.Float <$> source)
+number = makeTerm <$> symbol Number <*> (source >>= Literal.normalizeFloatString [Literal.padWithLeadingZero])
 
 string :: Assignment
 string = makeTerm <$> symbol String <*> (Literal.TextElement <$> source)

@@ -2,14 +2,14 @@
   (Module
     (Identifier))
   (
+    (QualifiedImport
+      (Identifier)
+      (Identifier))
     (Import
-      (TextElement)
-      (Empty))
-    (Import
-      (TextElement)
-      (Empty))
-    (Import
-      (TextElement)
+      (Identifier)
+      (TextElement))
+    (QualifiedImport
+      (Identifier)
       (Identifier)))
   (Function
     (Empty)

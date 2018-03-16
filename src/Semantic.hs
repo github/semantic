@@ -7,24 +7,17 @@ module Semantic
 , diffTermPair
 ) where
 
+import Prologue
 import Analysis.ConstructorName (ConstructorName, constructorLabel)
 import Analysis.IdentifierName (IdentifierName, identifierLabel)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
-import Control.Exception
-import Control.Monad ((>=>))
-import Control.Monad.Error.Class
-import Data.Align.Generic
-import Data.Bifoldable
-import Data.Bifunctor.Join
+import Analysis.ModuleDef (HasModuleDef, moduleDefAlgebra)
 import Data.Blob
-import Data.ByteString (ByteString)
 import Data.Diff
-import Data.Functor.Classes
 import Data.JSON.Fields
 import Data.Output
 import Data.Record
 import Data.Term
-import Data.Typeable
 import Diffing.Algorithm (Diffable)
 import Diffing.Interpreter
 import Parsing.Parser
@@ -51,11 +44,12 @@ parseBlobs renderer blobs = toOutput' <$> distributeFoldMap (parseBlob renderer)
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
 parseBlob :: TermRenderer output -> Blob -> Task output
 parseBlob renderer blob@Blob{..}
-  | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[ConstructorName, HasDeclaration, IdentifierName, Foldable, Functor, ToJSONFields1]) <$> blobLanguage
+  | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[ConstructorName, HasModuleDef, HasDeclaration, IdentifierName, Foldable, Functor, ToJSONFields1]) <$> blobLanguage
   = parse parser blob >>= case renderer of
     JSONTermRenderer           -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)
     SExpressionTermRenderer    -> decorate constructorLabel . (Nil <$)                   >=> render renderSExpressionTerm
     TagsTermRenderer           -> decorate (declarationAlgebra blob)                     >=> render (renderToTags blob)
+    ImportsTermRenderer        -> decorate (declarationAlgebra blob) >=> decorate (moduleDefAlgebra blob) >=> render (renderToImports blob)
     SymbolsTermRenderer fields -> decorate (declarationAlgebra blob)                     >=> render (renderToSymbols fields blob)
     DOTTermRenderer            ->                                                            render (renderDOTTerm blob)
   | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))

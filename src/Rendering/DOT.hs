@@ -4,71 +4,52 @@ module Rendering.DOT
 , renderDOTTerm
 ) where
 
+import Prologue hiding (empty)
+import Algebra.Graph
+import Algebra.Graph.Export.Dot
 import Analysis.ConstructorName
-import Control.Applicative
-import Data.Bifunctor.Join (Join(..))
 import Data.Blob
 import qualified Data.ByteString.Char8 as B
+import qualified Data.IntMap as IntMap
 import Data.Diff
-import Data.Foldable
-import Data.Functor.Foldable hiding (fold)
-import qualified Data.Map as Map
 import Data.Patch
-import Data.Semigroup
 import Data.Term
-import Data.These (These, mergeThese)
 
-renderDOTDiff :: (ConstructorName syntax, Foldable syntax, Functor syntax) => Join These Blob -> Diff syntax ann1 ann2 -> B.ByteString
-renderDOTDiff blobs diff = renderGraph (snd (cata diffAlgebra diff 0)) { graphName = Just (B.pack (mergeThese combine (runJoin (blobPath <$> blobs)))) }
-  where combine p1 p2 = p1 <> " -> " <> p2
-
-renderDOTTerm :: (ConstructorName syntax, Foldable syntax, Functor syntax) => Blob -> Term syntax ann -> B.ByteString
-renderDOTTerm Blob{..} term = renderGraph (snd (cata termAlgebra term 0)) { graphName = Just (B.pack blobPath) }
-
-diffAlgebra :: (ConstructorName syntax, Foldable syntax) => DiffF syntax ann1 ann2 (Int -> ([Int], Graph)) -> Int -> ([Int], Graph)
-diffAlgebra d i = case d of
-  Merge t               -> termAlgebra t i
-  Patch (Delete  t1)    -> termAlgebra t1 i `modifyHeadNode` setColour "red"
-  Patch (Insert     t2) -> termAlgebra t2 i `modifyHeadNode` setColour "green"
-  Patch (Replace t1 t2) -> let r1 =  termAlgebra t1 i                                                       `modifyHeadNode` setColour "red"
-                           in  r1 <> termAlgebra t2 (succ (maximum (i : map nodeID (graphNodes (snd r1))))) `modifyHeadNode` setColour "green"
-  where modifyHeadNode (i, g) f | n:ns <- graphNodes g = (i, g { graphNodes = f n : ns })
-                                | otherwise            = (i, g)
-        setColour c n = n { nodeAttributes = Map.insert "color" c (nodeAttributes n) }
-
-termAlgebra :: (ConstructorName syntax, Foldable syntax) => TermF syntax ann (Int -> ([Int], Graph)) -> Int -> ([Int], Graph)
-termAlgebra t i = ([succ i], Graph
-  Nothing
-  (Node (succ i) (Map.singleton "label" (unConstructorLabel (constructorLabel t))) : graphNodes g)
-  (concatMap (map (Edge (succ i))) is <> graphEdges g))
-  where (_, is, g) = foldr combine (succ i, [], mempty) (toList t)
-        combine f (i, is, gs) = let (i', g) = f i in (maximum (i : map nodeID (graphNodes g)), i' : is, g <> gs)
-
-
-data Graph = Graph { graphName :: Maybe B.ByteString, graphNodes :: [Node], graphEdges :: [Edge] }
-  deriving (Eq, Ord, Show)
-
-data Node = Node { nodeID :: Int, nodeAttributes :: Map.Map B.ByteString B.ByteString }
-  deriving (Eq, Ord, Show)
-
-data Edge = Edge { edgeFrom :: Int, edgeTo :: Int }
-  deriving (Eq, Ord, Show)
-
-
-renderGraph :: Graph -> B.ByteString
-renderGraph Graph{..} = "digraph " <> maybe "" quote graphName <> " {\n" <> foldr ((<>) . renderNode) "" graphNodes <> foldr ((<>) . renderEdge) "" graphEdges <> "}"
+renderDOTDiff :: (ConstructorName syntax, Foldable syntax, Functor syntax) => BlobPair -> Diff syntax ann1 ann2 -> B.ByteString
+renderDOTDiff blobs diff = renderGraph (defaultStyleViaShow { graphName = B.pack (quote (pathKeyForBlobPair blobs)) }) (cata diffAlgebra diff 0 [])
   where quote a = "\"" <> a <> "\""
 
-renderNode :: Node -> B.ByteString
-renderNode Node{..} = "\t" <> B.pack (show nodeID) <> " [ " <> foldr (\ (key, value) rest -> key <> " = \"" <> value <> "\" " <> rest) "" (Map.toList nodeAttributes) <> "];\n"
+renderDOTTerm :: (ConstructorName syntax, Foldable syntax, Functor syntax) => Blob -> Term syntax ann -> B.ByteString
+renderDOTTerm Blob{..} term = renderGraph (defaultStyleViaShow { graphName = B.pack (quote blobPath) }) (cata termAlgebra term 0 [])
+  where quote a = "\"" <> a <> "\""
 
-renderEdge :: Edge -> B.ByteString
-renderEdge Edge{..} = "\t" <> B.pack (show edgeFrom) <> " -> " <> B.pack (show edgeTo) <> ";\n"
+diffAlgebra :: (ConstructorName syntax, Foldable syntax) => DiffF syntax ann1 ann2 (Int -> [Attribute B.ByteString] -> State) -> Int -> [Attribute B.ByteString] -> State
+diffAlgebra d i as = case d of
+  Merge t               -> termAlgebra t  i as
+  Patch (Delete  t1)    -> termAlgebra t1 i ("color" := "red"   : as)
+  Patch (Insert     t2) -> termAlgebra t2 i ("color" := "green" : as)
+  Patch (Replace t1 t2) -> let r1 =  termAlgebra t1 i                         ("color" := "red"   : as)
+                           in  r1 <> termAlgebra t2 (maximum (stateGraph r1)) ("color" := "green" : as)
+
+termAlgebra :: (ConstructorName syntax, Foldable syntax) => TermF syntax ann (Int -> [Attribute B.ByteString] -> State) -> Int -> [Attribute B.ByteString] -> State
+termAlgebra t i defaultAttrs = State
+  root
+  (root `connect` stateRoots combined `overlay` (stateGraph combined))
+  (IntMap.insert (succ i) ("label" := unConstructorLabel (constructorLabel t) : defaultAttrs) (stateVertexAttributes combined))
+  where root = vertex (succ i)
+        combined = foldl' combine (State empty root mempty) t
+        combine prev makeSubgraph = prev <> makeSubgraph (maximum (stateGraph prev)) defaultAttrs
 
 
-instance Semigroup Graph where
-  Graph n1 ns1 es1 <> Graph n2 ns2 es2 = Graph (n1 <|> n2) (ns1 <> ns2) (es1 <> es2)
+data State = State { stateRoots :: Graph Int, stateGraph :: Graph Int, stateVertexAttributes :: IntMap.IntMap [Attribute B.ByteString] }
 
-instance Monoid Graph where
-  mempty = Graph Nothing [] []
+instance Semigroup State where
+  State r1 g1 v1 <> State r2 g2 v2 = State (r1 `overlay` r2) (g1 `overlay` g2) (v1 <> v2)
+
+instance Monoid State where
+  mempty = State empty empty mempty
   mappend = (<>)
+
+
+renderGraph :: Style Int B.ByteString -> State -> B.ByteString
+renderGraph style State{..} = export (style { vertexAttributes = flip (IntMap.findWithDefault []) stateVertexAttributes }) stateGraph

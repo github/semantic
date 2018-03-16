@@ -1,46 +1,22 @@
 {-# LANGUAGE DataKinds, TypeOperators #-}
-module Rendering.TOC.Spec where
+module Rendering.TOC.Spec (spec) where
 
-import Analysis.Decorator (constructorNameAndConstantFields)
 import Analysis.Declaration
 import Data.Aeson
 import Data.Bifunctor
-import Data.Blob
-import Data.ByteString (ByteString)
 import Data.Diff
-import Data.Functor.Both
-import Data.Functor.Foldable (cata)
-import Data.Functor.Listable
-import Data.Language
-import Data.Maybe (fromMaybe, isJust)
-import Data.Monoid (Last(..))
-import Data.Output
 import Data.Patch
-import Data.Range
-import Data.Record
-import Data.Semigroup ((<>))
-import Data.Source
-import Data.Span
-import qualified Data.Syntax as Syntax
-import qualified Data.Syntax.Declaration as Declaration
-import Data.Term
 import Data.Text (Text)
 import Data.Text.Encoding (encodeUtf8)
-import Data.These
 import Data.Union
 import Diffing.Interpreter
-import Parsing.Parser
 import Prelude hiding (readFile)
-import Rendering.Renderer
+import qualified Data.Syntax as Syntax
+import qualified Data.Syntax.Declaration as Declaration
 import Rendering.TOC
-import Semantic
-import Semantic.Task
-import Semantic.Util
+
 import SpecHelpers
-import Test.Hspec (Spec, describe, it, parallel, pendingWith)
-import Test.Hspec.Expectations.Pretty
-import Test.Hspec.LeanCheck
-import Test.LeanCheck
+
 
 spec :: Spec
 spec = parallel $ do
@@ -57,9 +33,11 @@ spec = parallel $ do
       patch (fmap Deleted) (fmap Inserted) (\ as bs -> Replaced (head bs) : fmap Deleted (tail as) <> fmap Inserted (tail bs)) (bimap (foldMap pure) (foldMap pure) (p :: Patch (Term ListableSyntax Int) (Term ListableSyntax Int)))
 
     prop "produces changed entries for relevant nodes containing irrelevant patches" $
-      \ diff -> let diff' = merge (0, 0) (inj [bimap (const 1) (const 1) (diff :: Diff ListableSyntax Int Int)]) in
-        tableOfContentsBy (\ (n `In` _) -> if n == (0 :: Int) then Just n else Nothing) diff' `shouldBe`
-        replicate (length (diffPatches diff')) (Changed 0)
+      \ diff -> do
+        let diff' = merge (True, True) (inj [bimap (const False) (const False) (diff :: Diff ListableSyntax Bool Bool)])
+        let toc = tableOfContentsBy (\ (n `In` _) -> if n then Just n else Nothing) diff'
+        toc `shouldBe` if null (diffPatches diff') then []
+                                                   else [Changed True]
 
   describe "diffTOC" $ do
     it "blank if there are no methods" $
@@ -188,14 +166,14 @@ programWithChange :: Term' -> Diff'
 programWithChange body = merge (programInfo, programInfo) (inj [ function' ])
   where
     function' = merge (Just (FunctionDeclaration "foo" mempty Nothing) :. emptyInfo, Just (FunctionDeclaration "foo" mempty Nothing) :. emptyInfo) (inj (Declaration.Function [] name' [] (merge (Nothing :. emptyInfo, Nothing :. emptyInfo) (inj [ inserting body ]))))
-    name' = let info = Nothing :. emptyInfo in merge (info, info) (inj (Syntax.Identifier "foo"))
+    name' = let info = Nothing :. emptyInfo in merge (info, info) (inj (Syntax.Identifier (name "foo")))
 
 -- Return a diff where term is inserted in the program, below a function found on both sides of the diff.
 programWithChangeOutsideFunction :: Term' -> Diff'
 programWithChangeOutsideFunction term = merge (programInfo, programInfo) (inj [ function', term' ])
   where
     function' = merge (Just (FunctionDeclaration "foo" mempty Nothing) :. emptyInfo, Just (FunctionDeclaration "foo" mempty Nothing) :. emptyInfo) (inj (Declaration.Function [] name' [] (merge (Nothing :. emptyInfo, Nothing :. emptyInfo) (inj []))))
-    name' = let info = Nothing :. emptyInfo in  merge (info, info) (inj (Syntax.Identifier "foo"))
+    name' = let info = Nothing :. emptyInfo in  merge (info, info) (inj (Syntax.Identifier (name "foo")))
     term' = inserting term
 
 programWithInsert :: Text -> Term' -> Diff'
@@ -211,9 +189,9 @@ programOf :: Diff' -> Diff'
 programOf diff = merge (programInfo, programInfo) (inj [ diff ])
 
 functionOf :: Text -> Term' -> Term'
-functionOf name body = termIn (Just (FunctionDeclaration name mempty Nothing) :. emptyInfo) (inj (Declaration.Function [] name' [] (termIn (Nothing :. emptyInfo) (inj [body]))))
+functionOf n body = termIn (Just (FunctionDeclaration n mempty Nothing) :. emptyInfo) (inj (Declaration.Function [] name' [] (termIn (Nothing :. emptyInfo) (inj [body]))))
   where
-    name' = termIn (Nothing :. emptyInfo) (inj (Syntax.Identifier (encodeUtf8 name)))
+    name' = termIn (Nothing :. emptyInfo) (inj (Syntax.Identifier (name (encodeUtf8 n))))
 
 programInfo :: Record '[Maybe Declaration, Range, Span]
 programInfo = Nothing :. emptyInfo
@@ -240,10 +218,7 @@ blobsForPaths :: Both FilePath -> IO BlobPair
 blobsForPaths = readFilePair . fmap ("test/fixtures/toc/" <>)
 
 blankDiff :: Diff'
-blankDiff = merge (arrayInfo, arrayInfo) (inj [ inserting (termIn literalInfo (inj (Syntax.Identifier "\"a\""))) ])
+blankDiff = merge (arrayInfo, arrayInfo) (inj [ inserting (termIn literalInfo (inj (Syntax.Identifier (name "\"a\"")))) ])
   where
     arrayInfo = Nothing :. Range 0 3 :. Span (Pos 1 1) (Pos 1 5) :. Nil
     literalInfo = Nothing :. Range 1 2 :. Span (Pos 1 2) (Pos 1 4) :. Nil
-
-blankDiffBlobs :: Both Blob
-blankDiffBlobs = both (Blob (fromText "[]") "a.js" (Just TypeScript)) (Blob (fromText "[a]") "b.js" (Just TypeScript))

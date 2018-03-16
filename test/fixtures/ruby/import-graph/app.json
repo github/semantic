@@ -1,0 +1,90 @@
+{
+  "modules": {
+    "app": {
+      "imports": [
+        {
+          "span": {
+            "start": [
+              1,
+              1
+            ],
+            "end": [
+              1,
+              15
+            ]
+          },
+          "path": "json",
+          "symbols": [],
+          "alias": ""
+        },
+        {
+          "span": {
+            "start": [
+              2,
+              1
+            ],
+            "end": [
+              2,
+              21
+            ]
+          },
+          "path": "a",
+          "symbols": [],
+          "alias": ""
+        }
+      ],
+      "name": "app",
+      "language": "Ruby",
+      "declarations": [
+        {
+          "span": {
+            "start": [
+              4,
+              1
+            ],
+            "end": [
+              6,
+              4
+            ]
+          },
+          "kind": "Method",
+          "name": "foo",
+          "module": "app"
+        }
+      ],
+      "paths": [
+        "test/fixtures/ruby/import-graph/app.rb"
+      ],
+      "calls": [
+        {
+          "span": {
+            "start": [
+              5,
+              3
+            ],
+            "end": [
+              5,
+              9
+            ]
+          },
+          "symbol": "puts",
+          "targets": []
+        },
+        {
+          "span": {
+            "start": [
+              8,
+              1
+            ],
+            "end": [
+              8,
+              7
+            ]
+          },
+          "symbol": "foo",
+          "targets": []
+        }
+      ]
+    }
+  }
+}

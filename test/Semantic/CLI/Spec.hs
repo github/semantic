@@ -1,18 +1,12 @@
-{-# LANGUAGE DuplicateRecordFields #-}
-module Semantic.CLI.Spec where
+module Semantic.CLI.Spec (spec) where
 
 import Control.Monad (when)
-import Data.ByteString (ByteString)
 import Data.Foldable (for_)
-import Data.Functor.Both
-import Data.Language
-import Data.Semigroup ((<>))
-import Rendering.Renderer
 import Semantic.CLI
-import Semantic.Task
 import System.IO (Handle)
-import Test.Hspec hiding (shouldBe, shouldNotBe, shouldThrow, errorCall)
-import Test.Hspec.Expectations.Pretty
+
+import SpecHelpers
+
 
 spec :: Spec
 spec = parallel $ do

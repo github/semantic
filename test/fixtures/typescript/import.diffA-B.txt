@@ -1,95 +1,68 @@
 (Program
-  (Import
-  { (TextElement)
-  ->(TextElement) }
-    (Empty)
-    (Identifier))
-  (Import
-  { (TextElement)
-  ->(TextElement) }
-  { (Identifier)
-  ->(Identifier) })
-  (Import
-  { (TextElement)
-  ->(TextElement) }
-    (Empty)
-    (ImportSymbol
-    { (Identifier)
-    ->(Identifier) }
-      (Empty)))
-  (
-    (Import
-    { (TextElement)
-    ->(TextElement) }
-      (Empty)
-      (ImportSymbol
-      { (Identifier)
-      ->(Identifier) }
-        (Empty)))
-    (Import
-    { (TextElement)
-    ->(TextElement) }
-      (Empty)
-      (ImportSymbol
-      { (Identifier)
-      ->(Identifier) }
-        (Empty))))
-  (
-    (Import
-    { (TextElement)
-    ->(TextElement) }
-      (Empty)
-      (ImportSymbol
-      { (Identifier)
-      ->(Identifier) }
-        (Empty)))
-    (Import
-    { (TextElement)
-    ->(TextElement) }
-      (Empty)
-      (ImportSymbol
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->(Identifier) })))
-  (
-    (Import
-    { (TextElement)
-    ->(TextElement) }
-      (Empty)
-      (Identifier))
-    (Import
-    { (TextElement)
-    ->(TextElement) }
-      (Empty)
-      (ImportSymbol
-      { (Identifier)
-      ->(Identifier) }
-        (Empty)))
-    (Import
-    { (TextElement)
-    ->(TextElement) }
-      (Empty)
-      (ImportSymbol
-      { (Identifier)
-      ->(Identifier) }
-      { (Identifier)
-      ->(Identifier) })))
-  (
-    (Import
-    { (TextElement)
-    ->(TextElement) }
-      (Empty)
-      (Identifier))
-    (Import
-    { (TextElement)
-    ->(TextElement) }
-    { (Identifier)
-    ->(Identifier) }))
-  (Import
-  { (TextElement)
-  ->(TextElement) }
-    (Empty))
+{+(Import
+  {+(Identifier)+}
+  {+(Empty)+})+}
+{+(QualifiedImport
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+{+(Import
+  {+(Identifier)+}
+  {+(Empty)+})+}
+{+(Import
+  {+(Identifier)+}
+  {+(Empty)+})+}
+{+(Import
+  {+(Identifier)+}
+  {+(Empty)+})+}
+{+(
+  {+(Import
+    {+(Identifier)+}
+    {+(Empty)+})+}
+  {+(Import
+    {+(Identifier)+}
+    {+(Empty)+})+})+}
+{+(
+  {+(Import
+    {+(Identifier)+}
+    {+(Empty)+})+}
+  {+(QualifiedImport
+    {+(Identifier)+}
+    {+(Identifier)+})+})+}
+{+(SideEffectImport
+  {+(Identifier)+}
+  {+(Empty)+})+}
 {-(Import
-  {-(TextElement)-}
+  {-(Identifier)-}
+  {-(Empty)-})-}
+{-(QualifiedImport
+  {-(Identifier)-}
+  {-(Identifier)-})-}
+{-(Import
+  {-(Identifier)-}
+  {-(Empty)-})-}
+{-(Import
+  {-(Identifier)-}
+  {-(Empty)-})-}
+{-(Import
+  {-(Identifier)-}
+  {-(Empty)-})-}
+{-(
+  {-(Import
+    {-(Identifier)-}
+    {-(Empty)-})-}
+  {-(Import
+    {-(Identifier)-}
+    {-(Empty)-})-})-}
+{-(
+  {-(Import
+    {-(Identifier)-}
+    {-(Empty)-})-}
+  {-(QualifiedImport
+    {-(Identifier)-}
+    {-(Identifier)-})-})-}
+{-(SideEffectImport
+  {-(Identifier)-}
+  {-(Empty)-})-}
+{-(QualifiedImport
+  {-(Identifier)-}
   {-(Identifier)-})-})

@@ -4,18 +4,10 @@
   {+(Identifier)+}
   {+(Identifier)+})+}
 {-(Assignment
-  {-(MemberAccess
-    {-(Identifier)-}
-    {-(Identifier)-})-}
+  {-(Identifier)-}
   {-(If
+    {-(Identifier)-}
+    {-(Identifier)-}
     {-(MemberAccess
       {-(Identifier)-}
-      {-(Identifier)-})-}
-    {-(MemberAccess
-      {-(Identifier)-}
-      {-(Identifier)-})-}
-    {-(MemberAccess
-      {-(MemberAccess
-        {-(Identifier)-}
-        {-(Identifier)-})-}
       {-(Identifier)-})-})-})-})

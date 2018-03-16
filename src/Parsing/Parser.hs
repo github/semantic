@@ -11,19 +11,18 @@ module Parsing.Parser
 , pythonParser
 , rubyParser
 , typescriptParser
+, phpParser
 ) where
 
+import Prologue
 import Assigning.Assignment
 import qualified CMarkGFM
 import Data.AST
-import Data.Functor.Classes (Eq1)
-import Data.Ix
 import Data.Kind
 import Data.Language
 import Data.Record
 import qualified Data.Syntax as Syntax
 import Data.Term
-import Data.Union
 import Foreign.Ptr
 import qualified Language.Go.Assignment as Go
 import qualified Language.JSON.Assignment as JSON
@@ -31,9 +30,11 @@ import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
+import qualified Language.PHP.Assignment as PHP
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import TreeSitter.Go
 import TreeSitter.JSON
+import TreeSitter.PHP
 import TreeSitter.Python
 import TreeSitter.Ruby
 import TreeSitter.TypeScript
@@ -44,9 +45,9 @@ data Parser term where
   ASTParser :: (Bounded grammar, Enum grammar) => Ptr TS.Language -> Parser (AST [] grammar)
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
   AssignmentParser :: (Enum grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq1 ast, Apply Foldable fs, Apply Functor fs, Foldable ast, Functor ast)
-                   => Parser (Term ast (Node grammar))                           -- ^ A parser producing AST.
-                   -> Assignment ast grammar (Term (Union fs) (Record Location)) -- ^ An assignment from AST onto 'Term's.
-                   -> Parser (Term (Union fs) (Record Location))                 -- ^ A parser producing 'Term's.
+                   => Parser (Term ast (Node grammar))                           -- A parser producing AST.
+                   -> Assignment ast grammar (Term (Union fs) (Record Location)) -- An assignment from AST onto 'Term's.
+                   -> Parser (Term (Union fs) (Record Location))                 -- A parser producing 'Term's.
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
 
@@ -72,6 +73,7 @@ someParser :: ( ApplyAll typeclasses (Union Go.Syntax)
               , ApplyAll typeclasses (Union Python.Syntax)
               , ApplyAll typeclasses (Union Ruby.Syntax)
               , ApplyAll typeclasses (Union TypeScript.Syntax)
+              , ApplyAll typeclasses (Union PHP.Syntax)
               )
            => proxy typeclasses                        -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
            -> Language                                 -- ^ The 'Language' to select.
@@ -84,6 +86,7 @@ someParser _ Markdown   = SomeParser markdownParser
 someParser _ Python     = SomeParser pythonParser
 someParser _ Ruby       = SomeParser rubyParser
 someParser _ TypeScript = SomeParser typescriptParser
+someParser _ PHP        = SomeParser phpParser
 
 
 goParser :: Parser Go.Term
@@ -91,6 +94,9 @@ goParser = AssignmentParser (ASTParser tree_sitter_go) Go.assignment
 
 rubyParser :: Parser Ruby.Term
 rubyParser = AssignmentParser (ASTParser tree_sitter_ruby) Ruby.assignment
+
+phpParser :: Parser PHP.Term
+phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
 
 pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment

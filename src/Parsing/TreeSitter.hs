@@ -3,12 +3,10 @@ module Parsing.TreeSitter
 ( parseToAST
 ) where
 
-import Control.Exception
-import Control.Monad ((<=<))
+import Prologue
 import Data.AST (AST, Node(Node))
 import Data.Blob
 import Data.ByteString.Unsafe (unsafeUseAsCStringLen)
-import Data.Functor.Foldable hiding (Nil)
 import Data.Range
 import Data.Source
 import Data.Span

@@ -1,5 +1,5 @@
 {-# LANGUAGE RankNTypes, ScopedTypeVariables #-}
-module Data.Mergeable.Spec where
+module Data.Mergeable.Spec (spec) where
 
 import Control.Applicative (Alternative(..))
 import Data.Functor.Identity
