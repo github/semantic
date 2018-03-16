@@ -56,7 +56,7 @@ class (Monad m, Show value) => MonadValue value m where
   --   necessary to satisfy implementation details of Haskell left/right shift,
   --   but it's fine, since these are only ever operating on integral values.
   liftBitwise2 :: (forall a . (Integral a, Bits a) => a -> a -> a)
-               -> (value -> value -> m value)              
+               -> (value -> value -> m value)
 
   -- | Construct an abstract boolean value.
   boolean :: Bool -> m value
@@ -130,7 +130,6 @@ doWhile body cond = loop $ \ continue -> body *> do
 instance ( Monad m
          , MonadAddressable location Value m
          , MonadAnalysis term Value m
-         , Show location
          )
          => MonadValue Value m where
 
