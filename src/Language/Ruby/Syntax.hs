@@ -3,14 +3,12 @@ module Language.Ruby.Syntax where
 
 import Control.Monad (unless)
 import Control.Abstract.Value (MonadValue)
-import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Data.Abstract.Path
 import Data.Abstract.Value (LocationFor)
 import Diffing.Algorithm
 import Prelude hiding (fail)
 import Prologue
-import qualified Data.Map as Map
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -23,7 +21,7 @@ instance Evaluatable Require where
   eval (Require _ x) = do
     name <- pathToQualifiedName <$> (subtermValue x >>= asString)
     importedEnv <- isolate (require name)
-    modifyGlobalEnv (flip (Map.foldrWithKey envInsert) (unEnvironment importedEnv))
+    modifyEnv (mappend importedEnv)
     unit
 
 newtype Load a = Load { loadArgs :: [a] }
@@ -47,7 +45,7 @@ doLoad :: (MonadAnalysis term value m, MonadValue value m, Ord (LocationFor valu
 doLoad path shouldWrap = do
   let name = pathToQualifiedName path
   importedEnv <- isolate (load name)
-  unless shouldWrap $ modifyGlobalEnv (flip (Map.foldrWithKey envInsert) (unEnvironment importedEnv))
+  unless shouldWrap $ modifyEnv (mappend importedEnv)
   unit
   where pathToQualifiedName = qualifiedName . splitOnPathSeparator' dropExtension
 
