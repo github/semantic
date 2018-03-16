@@ -37,9 +37,12 @@ import qualified Data.Text as T
 data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }
   deriving (Eq, Show)
 
+instance Semigroup Summaries where
+  (<>) (Summaries c1 e1) (Summaries c2 e2) = Summaries (Map.unionWith (<>) c1 c2) (Map.unionWith (<>) e1 e2)
+
 instance Monoid Summaries where
   mempty = Summaries mempty mempty
-  mappend (Summaries c1 e1) (Summaries c2 e2) = Summaries (Map.unionWith (<>) c1 c2) (Map.unionWith (<>) e1 e2)
+  mappend = (<>)
 
 instance Output Summaries where
   toOutput = toStrict . (<> "\n") . encode

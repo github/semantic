@@ -91,10 +91,12 @@ type family CallGraphAlgebraStrategy syntax where
   CallGraphAlgebraStrategy (TermF f a) = 'Custom
   CallGraphAlgebraStrategy a = 'Default
 
+instance Semigroup CallGraph where
+  (<>) = overlay
 
 instance Monoid CallGraph where
   mempty = empty
-  mappend = overlay
+  mappend = (<>)
 
 instance Ord CallGraph where
   compare (CallGraph G.Empty)           (CallGraph G.Empty)           = EQ
