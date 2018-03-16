@@ -26,11 +26,11 @@ envInsert name value (Environment m) = Environment (Map.insert name value m)
 envDelete :: Name -> Environment l a -> Environment l a
 envDelete name = Environment . Map.delete name . unEnvironment
 
-bindEnv :: (Ord l, Foldable t) => t Name -> Environment l a -> Environment l a
+bindEnv :: Foldable t => t Name -> Environment l a -> Environment l a
 bindEnv names env = foldMap envForName names
   where envForName name = maybe mempty (curry unit name) (envLookup name env)
 
-bindExports :: (Ord l) => Map Name (Name, Maybe (Address l a)) -> Environment l a -> Environment l a
+bindExports :: Map Name (Name, Maybe (Address l a)) -> Environment l a -> Environment l a
 bindExports aliases env = Environment pairs
   where
     pairs = Map.foldrWithKey (\name (alias, address) accum ->

@@ -21,7 +21,7 @@ newtype CallGraph = CallGraph { unCallGraph :: G.Graph Name }
   deriving (Eq, Graph, Show)
 
 -- | Build the 'CallGraph' for a 'Term' recursively.
-buildCallGraph :: (CallGraphAlgebra syntax, Foldable syntax, FreeVariables1 syntax, Functor syntax) => Term syntax ann -> Set Name -> CallGraph
+buildCallGraph :: (CallGraphAlgebra syntax, FreeVariables1 syntax, Functor syntax) => Term syntax ann -> Set Name -> CallGraph
 buildCallGraph = foldSubterms callGraphAlgebra
 
 

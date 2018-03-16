@@ -499,7 +499,7 @@ chainl1Term :: Assignment -> Assignment.Assignment [] Grammar (Term -> Term -> T
 chainl1Term expr op = postContextualize (comment <|> symbol AnonLambda *> empty) expr `chainl1` op
 
 -- | Match a series of terms or comments until a delimiter is matched.
-manyTermsTill :: Show b => Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
+manyTermsTill :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
 manyTermsTill step end = manyTill (step <|> comment) end
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
