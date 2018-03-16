@@ -3,7 +3,7 @@ module Control.Abstract.Value where
 
 import Control.Abstract.Addressable
 import Control.Abstract.Analysis
-import Data.Abstract.Environment
+import qualified Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables
 import Data.Abstract.Number as Number
 import Data.Abstract.Type as Type
@@ -215,7 +215,7 @@ instance ( Monad m
 
   abstract names (Subterm body _) = do
     l <- label body
-    injValue . Closure names l . bindEnv (foldr Set.delete (freeVariables body) names) <$> askLocalEnv
+    injValue . Closure names l . Env.bindEnv (foldr Set.delete (freeVariables body) names) <$> askLocalEnv
 
   apply op params = do
     Closure names label env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
@@ -223,7 +223,7 @@ instance ( Monad m
       v <- param
       a <- alloc name
       assign a v
-      envInsert name a <$> rest) (pure env) (zip names params)
+      Env.insert name a <$> rest) (pure env) (zip names params)
     localEnv (mappend bindings) (goto label >>= evaluateTerm)
 
   loop = fix
@@ -236,7 +236,7 @@ instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, Mon
       tvar <- Var <$> fresh
       assign a tvar
       (env, tvars) <- rest
-      pure (envInsert name a env, tvar : tvars)) (pure mempty) names
+      pure (Env.insert name a env, tvar : tvars)) (pure mempty) names
     ret <- localEnv (mappend env) body
     pure (Product tvars :-> ret)
 

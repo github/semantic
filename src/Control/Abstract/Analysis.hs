@@ -19,7 +19,8 @@ import Control.Monad.Effect.Fresh as X
 import Control.Monad.Effect.NonDet as X
 import Control.Monad.Effect.Reader as X
 import Control.Monad.Effect.State as X
-import Data.Abstract.Environment
+import Data.Abstract.Environment (Environment)
+import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Exports
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
@@ -87,7 +88,7 @@ load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup n
     filterEnv :: (Ord l) => Exports l a -> Environment l a -> Environment l a
     filterEnv ports env
       | exportNull ports = env
-      | otherwise      = exportsToEnv ports <> envRename (exportAliases ports) env
+      | otherwise      = exportsToEnv ports <> Env.rename (exportAliases ports) env
 
 -- | Lift a 'SubtermAlgebra' for an underlying analysis into a containing analysis. Use this when defining an analysis which can be composed onto other analyses to ensure that a call to 'analyzeTerm' occurs in the inner analysis and not the outer one.
 liftAnalyze :: ( Coercible (  m term value (effects :: [* -> *]) value) (t m term value effects value)

@@ -5,7 +5,7 @@ import Control.Abstract.Analysis
 import Control.Applicative
 import Control.Monad ((<=<))
 import Data.Abstract.Address
-import Data.Abstract.Environment
+import Data.Abstract.Environment (insert)
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
 import Data.Abstract.Value
@@ -37,7 +37,7 @@ letrec :: ( MonadAddressable (LocationFor value) value m
        -> m (value, Address (LocationFor value) value)
 letrec name body = do
   addr <- lookupOrAlloc name
-  v <- localEnv (envInsert name addr) body
+  v <- localEnv (insert name addr) body
   assign addr v
   pure (v, addr)
 

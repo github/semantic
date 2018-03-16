@@ -16,7 +16,7 @@ module Control.Abstract.Evaluator
 
 import Data.Abstract.Address
 import Data.Abstract.Configuration
-import Data.Abstract.Environment
+import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Exports
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
@@ -65,7 +65,7 @@ class Monad m => MonadEnvironment value m | m -> value where
 
   -- | Look a 'Name' up in the local environment.
   lookupLocalEnv :: Name -> m (Maybe (Address (LocationFor value) value))
-  lookupLocalEnv name = envLookup name <$> askLocalEnv
+  lookupLocalEnv name = Env.lookup name <$> askLocalEnv
 
   -- | Look up a 'Name' in the local environment, running an action with the resolved address (if any).
   lookupWith :: (Address (LocationFor value) value -> m value) -> Name -> m (Maybe value)

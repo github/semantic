@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Syntax.Declaration where
 
-import Data.Abstract.Environment
+import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
 import Prelude hiding (fail)
@@ -23,7 +23,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Function where
   eval Function{..} = do
     (v, addr) <- letrec name (abstract (paramNames functionParameters) functionBody)
-    modifyGlobalEnv (envInsert name addr)
+    modifyGlobalEnv (Env.insert name addr)
     pure v
     where paramNames = foldMap (pure . freeVariable . subterm)
           name = freeVariable (subterm functionName)
@@ -44,7 +44,7 @@ instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Method where
   eval Method{..} = do
     (v, addr) <- letrec name (abstract (paramNames methodParameters) methodBody)
-    modifyGlobalEnv (envInsert name addr)
+    modifyGlobalEnv (Env.insert name addr)
     pure v
     where paramNames = foldMap (pure . freeVariable . subterm)
           name = freeVariable (subterm methodName)
@@ -148,10 +148,10 @@ instance Evaluatable Class where
     let name = freeVariable (subterm classIdentifier)
     (v, addr) <- letrec name $ do
       void $ subtermValue classBody
-      classEnv <- envHead <$> askLocalEnv
+      classEnv <- Env.head <$> askLocalEnv
       klass name classEnv
 
-    v <$ modifyGlobalEnv (envInsert name addr)
+    v <$ modifyGlobalEnv (Env.insert name addr)
 
 data Module a = Module { moduleIdentifier :: !a, moduleScope :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -247,7 +247,7 @@ instance Evaluatable QualifiedExportFrom where
     importedEnv <- isolate (require moduleName)
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \(name, alias) -> do
-      let address = envLookup name importedEnv
+      let address = Env.lookup name importedEnv
       maybe (cannotExport moduleName name) (addExport name alias . Just) address
     unit
     where
@@ -278,12 +278,12 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedImport where
   eval (QualifiedImport from alias xs) = do
     importedEnv <- isolate (require moduleName)
-    modifyGlobalEnv (mappend (envRename (renames importedEnv) importedEnv))
+    modifyGlobalEnv (mappend (Env.rename (renames importedEnv) importedEnv))
     unit
     where
       moduleName = freeVariable (subterm from)
       renames importedEnv
-        | null xs = fmap prepend (envNames importedEnv)
+        | null xs = fmap prepend (Env.names importedEnv)
         | otherwise = xs
       prefix = freeVariable (subterm alias)
       prepend n = (n, prefix <> n)
@@ -307,7 +307,7 @@ instance Evaluatable Import where
       moduleName = freeVariable (subterm from)
       renamed importedEnv
         | null xs = importedEnv
-        | otherwise = envRename xs importedEnv
+        | otherwise = Env.rename xs importedEnv
 
 -- | Side effect only imports (no symbols made available to the calling environment).
 data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: !a, sideEffectImportToken :: !a }

@@ -13,7 +13,7 @@ import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Configuration
-import Data.Abstract.Environment
+import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
@@ -107,9 +107,9 @@ instance Members '[State (ExportsFor value), State (EnvironmentFor value)] effec
 
   askLocalEnv = raise get
   localEnv f a = do
-    modifyGlobalEnv (f . envPush)
+    modifyGlobalEnv (f . Env.push)
     result <- a
-    result <$ modifyGlobalEnv envPop
+    result <$ modifyGlobalEnv Env.pop
 
 instance Member (State (HeapFor value)) effects => MonadHeap value (Evaluating term value effects) where
   getHeap = raise get
