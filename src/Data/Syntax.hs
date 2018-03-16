@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For HasCallStack
 module Data.Syntax where
 
 import Control.Monad.Fail
