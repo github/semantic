@@ -1,8 +1,10 @@
 {-# LANGUAGE UndecidableInstances #-}
 module Prologue
-( module X
-, foldMapA
-) where
+  ( module X
+  , foldMapA
+  , maybeM
+  , maybeFail
+  ) where
 
 
 import Data.Bifunctor.Join as X
@@ -73,3 +75,11 @@ import GHC.Stack as X
 -- | Fold a collection by mapping each element onto an 'Alternative' action.
 foldMapA :: (Alternative m, Foldable t) => (b -> m a) -> t b -> m a
 foldMapA f = getAlt . foldMap (Alt . f)
+
+-- | Extract the 'Just' of a 'Maybe' in an 'Applicative' context or, given 'Nothing', run the provided action.
+maybeM :: Applicative f => f a -> Maybe a -> f a
+maybeM f = maybe f pure
+
+-- | Either extract the 'Just' of a 'Maybe' or invoke 'fail' with the provided string.
+maybeFail :: MonadFail m => String -> Maybe a -> m a
+maybeFail s = maybeM (X.fail s)
