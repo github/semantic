@@ -1,34 +1,34 @@
 (Program
-{+(QualifiedImport
+{+(Import
   {+(Identifier)+}
   {+(Empty)+})+}
-{+(QualifiedImport
+{+(Import
   {+(Identifier)+}
   {+(Empty)+})+}
-{+(WildcardImport
+{ (Import
+  {-(Identifier)-}
+  {-(Empty)-})
+->(Import
   {+(Identifier)+}
-  {+(Identifier)+})+}
-{+(QualifiedImport
+  {+(Empty)+}) }
+{+(Import
   {+(Identifier)+}
   {+(Empty)+})+}
-{+(QualifiedImport
+{+(Import
   {+(Identifier)+}
   {+(Empty)+})+}
-{+(QualifiedImport
+{ (Import
+  {-(Identifier)-}
+  {-(Empty)-})
+->(Import
   {+(Empty)+}
-  {+(Empty)+})+}
-{-(QualifiedImport
+  {+(Empty)+}) }
+{-(Import
   {-(Identifier)-}
   {-(Empty)-})-}
-{-(QualifiedImport
+{-(Import
   {-(Identifier)-}
   {-(Empty)-})-}
-{-(WildcardImport
-  {-(Identifier)-}
-  {-(Identifier)-})-}
-{-(QualifiedImport
-  {-(Identifier)-}
-  {-(Empty)-})-}
-{-(QualifiedImport
+{-(Import
   {-(Empty)-}
   {-(Empty)-})-})

@@ -108,7 +108,7 @@ instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Identifier where
-  eval (Identifier name) = lookupWith deref name >>= maybe (fail ("free variable: " <> show name)) pure
+  eval (Identifier name) = lookupWith deref name >>= maybe (fail ("free variable: " <> show (friendlyName name))) pure
 
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = Set.singleton x

@@ -7,14 +7,18 @@
     ->(Identifier) }
     { (Identifier)
     ->(Identifier) })
-    (WildcardImport
-    { (Identifier)
-    ->(Identifier) }
-      (Identifier))
-    (QualifiedImport
-    { (Identifier)
-    ->(Identifier) }
-      (Identifier)))
+  {+(Import
+    {+(Identifier)+}
+    {+(TextElement)+})+}
+  {+(QualifiedImport
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {-(Import
+    {-(Identifier)-}
+    {-(TextElement)-})-}
+  {-(QualifiedImport
+    {-(Identifier)-}
+    {-(Identifier)-})-})
   (Function
     (Empty)
     (Identifier)

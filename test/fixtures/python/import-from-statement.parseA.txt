@@ -1,16 +1,16 @@
 (Program
-  (QualifiedImport
+  (Import
     (Identifier)
     (Empty))
-  (QualifiedImport
+  (Import
     (Identifier)
     (Empty))
-  (WildcardImport
-    (Identifier)
-    (Identifier))
-  (QualifiedImport
+  (Import
     (Identifier)
     (Empty))
-  (QualifiedImport
+  (Import
+    (Identifier)
+    (Empty))
+  (Import
     (Empty)
     (Empty)))
