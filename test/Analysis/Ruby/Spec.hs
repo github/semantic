@@ -1,4 +1,3 @@
-{-# LANGUAGE TypeApplications #-}
 module Analysis.Ruby.Spec (spec) where
 
 import Data.Abstract.Value
