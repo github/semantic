@@ -77,7 +77,6 @@ localize :: MonadEnvironment value m => m a -> m a
 localize = localEnv id
 
 -- | Update the global environment.
--- TODO: RENAME ME BECAUSE MY NAME IS A LIE
 modifyEnv :: MonadEnvironment value m => (EnvironmentFor value -> EnvironmentFor value) -> m ()
 modifyEnv f = do
   env <- getEnv
