@@ -38,8 +38,8 @@ library
                      -- Control flow
                      , Control.Effect
                      -- Effects used for program analysis
-                     , Control.Monad.Effect.Fresh
-                     , Control.Monad.Effect.NonDet
+                     , Control.Effect.Fresh
+                     , Control.Effect.NonDet
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
                      , Data.Abstract.Cache
