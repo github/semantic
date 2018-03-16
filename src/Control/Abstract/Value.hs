@@ -249,6 +249,8 @@ instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, Mon
   multiple   = pure . Type.Product
   array      = pure . Type.Array
 
+  asString _ = fail "Must evaluate to Value to use asString"
+
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 
   liftNumeric _ Type.Float = pure Type.Float
