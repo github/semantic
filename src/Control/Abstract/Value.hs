@@ -48,6 +48,16 @@ class (Monad m, Show value) => MonadValue value m where
   -- | Lift a Comparator (usually wrapping a function like == or <=) to a function on values.
   liftComparison :: Comparator -> (value -> value -> m value)
 
+  -- | Lift a unary bitwise operator to values. This is usually 'complement'.
+  liftBitwise :: (forall a . Bits a => a -> a)
+              -> (value -> m value)
+
+  -- | Lift a binary bitwise operator to values. The Integral constraint is
+  --   necessary to satisfy implementation details of Haskell left/right shift,
+  --   but it's fine, since these are only ever operating on integral values.
+  liftBitwise2 :: (forall a . (Integral a, Bits a) => a -> a -> a)
+               -> (value -> value -> m value)              
+
   -- | Construct an abstract boolean value.
   boolean :: Bool -> m value
 
@@ -198,6 +208,15 @@ instance ( Monad m
 
         pair = (left, right)
 
+  liftBitwise operator target
+    | Just (Value.Integer (Number.Integer i)) <- prjValue target = integer $ operator i
+    | otherwise = fail ("Type error: invalid unary bitwise operation on " <> show target)
+
+  liftBitwise2 operator left right
+    | Just (Value.Integer (Number.Integer i), Value.Integer (Number.Integer j)) <- prjPair pair = integer $ operator i j
+    | otherwise = fail ("Type error: invalid binary bitwise operation on " <> show pair)
+      where pair = (left, right)
+
   abstract names (Subterm body _) = do
     l <- label body
     injValue . Closure names l . bindEnv (foldr Set.delete (freeVariables body) names) <$> askLocalEnv
@@ -245,6 +264,12 @@ instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, Mon
     (Type.Float, Int) -> pure Type.Float
     (Int, Type.Float) -> pure Type.Float
     _                 -> unify left right
+
+  liftBitwise _ Int = pure Int
+  liftBitwise _ t   = fail ("Invalid type passed to unary bitwise operation: " <> show t)
+
+  liftBitwise2 _ Int Int = pure Int
+  liftBitwise2 _ t1 t2   = fail ("Invalid types passed to binary bitwise operation: " <> show (t1, t2))
 
   liftComparison (Concrete _) left right = case (left, right) of
     (Type.Float, Int) ->                     pure Bool
