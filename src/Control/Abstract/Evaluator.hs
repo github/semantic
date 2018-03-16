@@ -74,6 +74,7 @@ class Monad m => MonadEnvironment value m | m -> value where
     maybe (pure Nothing) (fmap Just . with) addr
 
 -- | Update the global environment.
+-- TODO: RENAME ME BECAUSE MY NAME IS A LIE
 modifyGlobalEnv :: MonadEnvironment value m => (EnvironmentFor value -> EnvironmentFor value) -> m ()
 modifyGlobalEnv f = do
   env <- getGlobalEnv

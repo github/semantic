@@ -150,7 +150,6 @@ instance Evaluatable Class where
       void $ subtermValue classBody
       classEnv <- Env.head <$> askLocalEnv
       klass name classEnv
-
     v <$ modifyGlobalEnv (Env.insert name addr)
 
 data Module a = Module { moduleIdentifier :: !a, moduleScope :: ![a] }

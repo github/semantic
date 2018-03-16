@@ -35,6 +35,7 @@ evaluate :: forall value term effects
             , MonadAddressable (LocationFor value) value (Evaluating term value effects)
             , MonadValue value (Evaluating term value effects)
             , Recursive term
+            , Show (LocationFor value)
             )
          => term
          -> Final effects value
@@ -48,6 +49,7 @@ evaluates :: forall value term effects
              , MonadAddressable (LocationFor value) value (Evaluating term value effects)
              , MonadValue value (Evaluating term value effects)
              , Recursive term
+             , Show (LocationFor value)
              )
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
@@ -131,6 +133,7 @@ instance ( Evaluatable (Base term)
          , MonadAddressable (LocationFor value) value (Evaluating term value effects)
          , MonadValue value (Evaluating term value effects)
          , Recursive term
+         , Show (LocationFor value)
          )
          => MonadAnalysis term value (Evaluating term value effects) where
   type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
