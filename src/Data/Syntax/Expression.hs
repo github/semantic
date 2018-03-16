@@ -157,9 +157,18 @@ instance Eq1 Bitwise where liftEq = genericLiftEq
 instance Ord1 Bitwise where liftCompare = genericLiftCompare
 instance Show1 Bitwise where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Bitwise
-instance Evaluatable Bitwise
-
+instance Evaluatable Bitwise where
+  eval = traverse subtermValue >=> go where
+    genLShift x y = shiftL x (fromIntegral y)
+    genRShift x y = shiftR x (fromIntegral y)
+    go x = case x of
+      (BOr a b)            -> liftBitwise2 (.|.) a b
+      (BAnd a b)           -> liftBitwise2 (.&.) a b
+      (BXOr a b)           -> liftBitwise2 xor a b
+      (LShift a b)         -> liftBitwise2 genLShift a b
+      (RShift a b)         -> liftBitwise2 genRShift a b
+      (UnsignedRShift a b) -> liftBitwise2 genRShift a b
+      (Complement a)       -> liftBitwise complement a
 
 -- | Member Access (e.g. a.b)
 data MemberAccess a
