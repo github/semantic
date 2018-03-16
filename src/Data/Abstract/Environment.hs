@@ -26,6 +26,10 @@ import qualified Data.Set as Set
 import           GHC.Exts (IsList (..))
 import           Prologue
 
+-- $setup
+-- >>> let bright = push (insert (name "foo") (Address (Precise 0)) mempty)
+-- >>> let shadowed = insert (name "foo") (Address (Precise 1)) bright
+
 -- | A map of names to addresses that represents the evaluation environment.
 newtype Environment l a = Environment { unEnvironment :: NonEmpty (Map.Map Name (Address l a)) }
   deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
@@ -42,6 +46,7 @@ instance IsList (Environment l a) where
   fromList xs                   = Environment (Map.fromList xs :| [])
   toList (Environment (x :| _)) = Map.toList x
 
+-- TODO: property-check me
 instance Semigroup (Environment l a) where
   Environment (a :| as) <> Environment (b :| bs) =
     Environment ((a <> b) :| alignWith (mergeThese (<>)) as bs)
@@ -64,11 +69,17 @@ pop (Environment (_ :| a : as)) = Environment (a :| as)
 head :: Environment l a -> Environment l a
 head (Environment (a :| _)) = Environment (a :| [])
 
--- TODO: Test the flattening behavior
+-- | Extract an association list of bindings from an 'Environment'. This displays frontmost-biased shadowing behavior, to wit:
+--
+-- >>> pairs shadowed
+-- [("foo" :| [],Address {unAddress = Precise {unPrecise = 1}})]
 pairs :: Environment l a -> [(Name, Address l a)]
 pairs = Map.toList . fold . unEnvironment
 
 -- | Lookup a 'Name' in the environment.
+--
+-- >>> lookup (name "foo") shadowed
+-- Just (Address {unAddress = Precise {unPrecise = 1}})
 lookup :: Name -> Environment l a -> Maybe (Address l a)
 lookup k = foldMapA (Map.lookup k) . unEnvironment
 
@@ -76,8 +87,16 @@ lookup k = foldMapA (Map.lookup k) . unEnvironment
 insert :: Name -> Address l a -> Environment l a -> Environment l a
 insert name value (Environment (a :| as)) = Environment (Map.insert name value a :| as)
 
+-- | Remove a 'Name' from the environment.
+--
+-- >>> delete (name "foo") shadowed
+-- Environment {unEnvironment = fromList [] :| []}
 delete :: Name -> Environment l a -> Environment l a
-delete name = Environment . fmap (Map.delete name) . unEnvironment
+delete name = trim . Environment . fmap (Map.delete name) . unEnvironment
+
+trim :: Environment l a -> Environment l a
+trim (Environment (a :| as)) = Environment (a :| filtered)
+  where filtered = filter (not . Map.null) as
 
 bindEnv :: (Ord l, Foldable t) => t Name -> Environment l a -> Environment l a
 bindEnv names env = foldMap envForName names

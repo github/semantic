@@ -46,9 +46,10 @@ letrec name body = do
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
 instance (MonadFail m, LocationFor value ~ Precise, MonadHeap value m) => MonadAddressable Precise value m where
-  deref = derefWith (pure . unLatest)
-  alloc _ = fmap (Address . Precise . heapSize) getHeap
-
+  deref = derefWith (maybeM uninitializedAddress . unLatest)
+  alloc _ = do
+    addr <- fmap (Address . Precise . heapSize) getHeap
+    addr <$ modifyHeap (heapInit addr mempty)
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
 instance (Alternative m, LocationFor value ~ Monovariant, MonadFail m, MonadHeap value m, Ord value) => MonadAddressable Monovariant value m where

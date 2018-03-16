@@ -85,6 +85,8 @@ class (Monad m, Show value) => MonadValue value m where
 
   klass :: Name -> EnvironmentFor value -> m value
 
+  objectEnvironment :: value -> m (EnvironmentFor value)
+
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
   abstract :: (FreeVariables term, MonadControl term m) => [Name] -> Subterm term (m value) -> m value
   -- | Evaluate an application (like a function call).
@@ -150,6 +152,10 @@ instance ( Monad m
   array    = pure . injValue . Value.Array
 
   klass n  = pure . injValue . Class n
+
+  objectEnvironment o
+    | Just (Class _ env) <- prjValue o = pure env
+    | otherwise = fail ("non-object type passed to objectEnvironment: " <> show o)
 
   ifthenelse cond if' else'
     | Just (Boolean b) <- prjValue cond = if b then if' else else'

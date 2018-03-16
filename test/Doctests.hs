@@ -26,5 +26,5 @@ extensions =
 
 sources :: [String]
 sources =
-  [ "src/Data/Semiring.hs"
+  [ "src/Data/Abstract/Environment.hs"
   ]
