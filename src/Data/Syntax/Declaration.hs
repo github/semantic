@@ -145,10 +145,12 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
   eval Class{..} = do
-    env <- askLocalEnv
-    body <- subtermValue classBody
-    (name, addr) <- lookupOrAlloc (subterm classIdentifier) body env
-    body <$ modifyGlobalEnv (envInsert name addr)
+    let name = freeVariable (subterm classIdentifier)
+    (v, addr) <- letrec name $ do
+
+      subtermValue classBody
+
+    v <$ modifyGlobalEnv (envInsert name addr)
 
 data Module a = Module { moduleIdentifier :: !a, moduleScope :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
