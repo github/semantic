@@ -16,6 +16,7 @@ import qualified Prelude
 type ValueConstructors
   = '[Array
     , Boolean
+    , Class
     , Closure
     , Float
     , Integer
@@ -130,6 +131,15 @@ newtype Array value = Array [value]
 instance Eq1 Array where liftEq = genericLiftEq
 instance Ord1 Array where liftCompare = genericLiftCompare
 instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
+
+data Class value = Class
+  { _className  :: Name
+  , _classScope :: Environment Precise value
+  } deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Class where liftEq = genericLiftEq
+instance Ord1 Class where liftCompare = genericLiftCompare
+instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 -- | The environment for an abstract value type.
 type EnvironmentFor v = Environment (LocationFor v) v

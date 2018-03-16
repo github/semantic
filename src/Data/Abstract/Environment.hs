@@ -34,6 +34,9 @@ envPop :: Environment l a -> Environment l a
 envPop (Environment (_ :| [])) = mempty
 envPop (Environment (_ :| a : as)) = Environment (a :| as)
 
+envHead :: Environment l a -> Environment l a
+envHead (Environment (a :| _)) = Environment (a :| [])
+
 -- TODO: Test the flattening behavior
 envPairs :: Environment l a -> [(Name, Address l a)]
 envPairs = Map.toList . fold . unEnvironment

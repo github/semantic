@@ -83,6 +83,8 @@ class (Monad m, Show value) => MonadValue value m where
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: value -> m a -> m a -> m a
 
+  klass :: Name -> EnvironmentFor value -> m value
+
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
   abstract :: (FreeVariables term, MonadControl term m) => [Name] -> Subterm term (m value) -> m value
   -- | Evaluate an application (like a function call).
@@ -146,6 +148,8 @@ instance ( Monad m
   multiple = pure . injValue . Value.Tuple
 
   array    = pure . injValue . Value.Array
+
+  klass n  = pure . injValue . Class n
 
   ifthenelse cond if' else'
     | Just (Boolean b) <- prjValue cond = if b then if' else else'

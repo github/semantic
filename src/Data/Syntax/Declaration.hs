@@ -147,8 +147,9 @@ instance Evaluatable Class where
   eval Class{..} = do
     let name = freeVariable (subterm classIdentifier)
     (v, addr) <- letrec name $ do
-
-      subtermValue classBody
+      void $ subtermValue classBody
+      classEnv <- envHead <$> askLocalEnv
+      klass name classEnv
 
     v <$ modifyGlobalEnv (envInsert name addr)
 
