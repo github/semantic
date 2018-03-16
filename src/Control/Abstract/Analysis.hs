@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, MultiParamTypeClasses, TypeFamilies #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For runAnalysis
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , evaluateTerm
