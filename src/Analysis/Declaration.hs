@@ -123,7 +123,7 @@ instance CustomHasDeclaration whole Declaration.Class where
     where getSource = toText . flip Source.slice blobSource . getField
 
 instance CustomHasDeclaration (Union fs) Declaration.Import where
-  customToDeclaration Blob{..} _ (Declaration.Import (Term (In fromAnn _), _) symbols)
+  customToDeclaration Blob{..} _ (Declaration.Import (Term (In fromAnn _), _) symbols _)
     = Just $ ImportDeclaration ((stripQuotes . getSource) fromAnn) "" (fmap getSymbol symbols) blobLanguage
     where
       stripQuotes = T.dropAround (`elem` ['"', '\''])
@@ -140,8 +140,8 @@ instance (Syntax.Identifier :< fs) => CustomHasDeclaration (Union fs) Declaratio
       getSymbol = bimap toName toName
       toName = T.decodeUtf8 . friendlyName
 
-instance CustomHasDeclaration (Union fs) Declaration.WildcardImport where
-  customToDeclaration Blob{..} _ (Declaration.WildcardImport (Term (In fromAnn _), _) _)
+instance CustomHasDeclaration (Union fs) Declaration.SideEffectImport where
+  customToDeclaration Blob{..} _ (Declaration.SideEffectImport (Term (In fromAnn _), _) _)
     = Just $ ImportDeclaration ((stripQuotes . getSource) fromAnn) "" [] blobLanguage
     where
       stripQuotes = T.dropAround (`elem` ['"', '\''])
@@ -184,7 +184,7 @@ type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Function = 'Custom
   DeclarationStrategy Declaration.Import = 'Custom
   DeclarationStrategy Declaration.QualifiedImport = 'Custom
-  DeclarationStrategy Declaration.WildcardImport = 'Custom
+  DeclarationStrategy Declaration.SideEffectImport = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
   DeclarationStrategy Markdown.Heading = 'Custom
   DeclarationStrategy Expression.Call = 'Custom

@@ -1,10 +1,30 @@
 (Program
   (DefaultExport
-    {(Function
+  { (Function
+    {-(Empty)-}
+    {-(Empty)-}
+    {-(Identifier)-}
+    {-(RequiredParameter
       {-(Empty)-}
       {-(Empty)-}
-      {-(Identifier)-}
-      {-(RequiredParameter{-(Empty)-}{-(Empty)-}{-(Annotation{-(PredefinedType)-})-}{-(Assignment{-(Identifier)-}{-(Empty)-})-})-}
-      {-(RequiredParameter{-(Empty)-}{-(Empty)-}{-(Annotation{-(PredefinedType)-})-}{-(Assignment{-(Identifier)-}{-(Empty)-})-})-}
-      {-({-(Return{-(Hash{-(ShorthandPropertyIdentifier)-}{-(ShorthandPropertyIdentifier)-})-})-})-})
-    ->(Class{+(Identifier)+}{+([])+})}))
+      {-(Annotation
+        {-(PredefinedType)-})-}
+      {-(Assignment
+        {-(Identifier)-}
+        {-(Empty)-})-})-}
+    {-(RequiredParameter
+      {-(Empty)-}
+      {-(Empty)-}
+      {-(Annotation
+        {-(PredefinedType)-})-}
+      {-(Assignment
+        {-(Identifier)-}
+        {-(Empty)-})-})-}
+    {-(
+      {-(Return
+        {-(Hash
+          {-(ShorthandPropertyIdentifier)-}
+          {-(ShorthandPropertyIdentifier)-})-})-})-})
+  ->(Class
+    {+(Identifier)+}
+    {+([])+}) }))

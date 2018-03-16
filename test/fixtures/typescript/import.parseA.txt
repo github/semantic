@@ -1,28 +1,36 @@
 (Program
   (Import
-    (Identifier))
+    (Identifier)
+    (Empty))
   (QualifiedImport
     (Identifier)
     (Identifier))
   (Import
-    (Identifier))
+    (Identifier)
+    (Empty))
   (Import
-    (Identifier))
+    (Identifier)
+    (Empty))
   (Import
-    (Identifier))
+    (Identifier)
+    (Empty))
   (
     (Import
-      (Identifier))
+      (Identifier)
+      (Empty))
     (Import
-      (Identifier)))
+      (Identifier)
+      (Empty)))
   (
     (Import
-      (Identifier))
+      (Identifier)
+      (Empty))
     (QualifiedImport
       (Identifier)
       (Identifier)))
-  (Import
-    (Identifier))
+  (SideEffectImport
+    (Identifier)
+    (Empty))
   (QualifiedImport
     (Identifier)
     (Identifier)))
