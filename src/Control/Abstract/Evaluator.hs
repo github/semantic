@@ -18,7 +18,7 @@ module Control.Abstract.Evaluator
 import Data.Abstract.Address
 import Data.Abstract.Configuration
 import qualified Data.Abstract.Environment as Env
-import Data.Abstract.Exports
+import qualified Data.Abstract.Exports as Export
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
 import Data.Abstract.ModuleTable
@@ -93,7 +93,7 @@ modifyExports f = do
 
 -- | Add an export to the global export state.
 addExport :: MonadEnvironment value m => Name -> Name -> Maybe (Address (LocationFor value) value) -> m ()
-addExport name alias = modifyExports . exportInsert name alias
+addExport name alias = modifyExports . Export.insert name alias
 
 -- | A 'Monad' abstracting a heap of values.
 class Monad m => MonadHeap value m | m -> value where
