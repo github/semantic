@@ -73,6 +73,9 @@ class Monad m => MonadEnvironment value m | m -> value where
     addr <- lookupLocalEnv name
     maybe (pure Nothing) (fmap Just . with) addr
 
+localize :: MonadEnvironment value m => m a -> m a
+localize = localEnv id
+
 -- | Update the global environment.
 -- TODO: RENAME ME BECAUSE MY NAME IS A LIE
 modifyGlobalEnv :: MonadEnvironment value m => (EnvironmentFor value -> EnvironmentFor value) -> m ()

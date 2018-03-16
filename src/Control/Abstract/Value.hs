@@ -109,7 +109,7 @@ forLoop :: (MonadEnvironment value m, MonadValue value m)
         -> m value -- ^ Body
         -> m value
 forLoop initial cond step body =
-  localEnv id (initial *> while cond (body *> step))
+  localize (initial *> while cond (body *> step))
 
 -- | The fundamental looping primitive, built on top of ifthenelse.
 while :: MonadValue value m
