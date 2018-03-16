@@ -2,7 +2,8 @@
 module Data.Abstract.Value where
 
 import Data.Abstract.Address
-import Data.Abstract.Environment
+import Data.Abstract.Environment (Environment)
+import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Exports
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
@@ -133,6 +134,8 @@ instance Eq1 Array where liftEq = genericLiftEq
 instance Ord1 Array where liftCompare = genericLiftCompare
 instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 
+-- | Class values. There will someday be a difference between classes and objects,
+--   but for the time being we're pretending all languages have prototypical inheritance.
 data Class value = Class
   { _className  :: Name
   , _classScope :: Environment Precise value
@@ -169,7 +172,7 @@ class ValueRoots value where
 
 instance ValueRoots Value where
   valueRoots v
-    | Just (Closure _ _ env) <- prjValue v = envAll env
+    | Just (Closure _ _ env) <- prjValue v = Env.addresses env
     | otherwise                            = mempty
 
 instance ValueRoots Type.Type where

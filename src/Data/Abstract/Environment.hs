@@ -1,9 +1,9 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, TypeFamilies #-}
 module Data.Abstract.Environment
   ( Environment
-  , bindEnv
+  , addresses
+  , bind
   , delete
-  , envAll
   , head
   , insert
   , lookup
@@ -22,7 +22,6 @@ import           Data.Abstract.Live
 import           Data.Align
 import qualified Data.Map as Map
 import           Data.Semigroup.Reducer
-import qualified Data.Set as Set
 import           GHC.Exts (IsList (..))
 import           Prologue
 
@@ -30,7 +29,7 @@ import           Prologue
 -- >>> let bright = push (insert (name "foo") (Address (Precise 0)) mempty)
 -- >>> let shadowed = insert (name "foo") (Address (Precise 1)) bright
 
--- | A stack of maps of names to addresses, representing a lexically-scoped evaluation environment.
+-- | A LIFO stack of maps of names to addresses, representing a lexically-scoped evaluation environment.
 --   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
 --   scope for "a", then the next, and so on.
 newtype Environment l a = Environment { unEnvironment :: NonEmpty (Map.Map Name (Address l a)) }
@@ -103,8 +102,8 @@ trim :: Environment l a -> Environment l a
 trim (Environment (a :| as)) = Environment (a :| filtered)
   where filtered = filter (not . Map.null) as
 
-bindEnv :: (Ord l, Foldable t) => t Name -> Environment l a -> Environment l a
-bindEnv names env = foldMap envForName names
+bind :: (Ord l, Foldable t) => t Name -> Environment l a -> Environment l a
+bind names env = foldMap envForName names
   where envForName name = maybe mempty (curry unit name) (lookup name env)
 
 -- | Get all bound 'Name's in an environment.
@@ -124,5 +123,5 @@ rename pairs env = foldMap rename pairs where
 roots :: (Ord l, Foldable t) => Environment l a -> t Name -> Live l a
 roots env = foldMap (maybe mempty liveSingleton . flip lookup env)
 
-envAll :: Ord l => Environment l a -> Live l a
-envAll = Live . fromList . fmap snd . pairs
+addresses :: Ord l => Environment l a -> Live l a
+addresses = Live . fromList . fmap snd . pairs
