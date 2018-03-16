@@ -48,6 +48,7 @@ letrec name body = do
 instance (MonadFail m, LocationFor value ~ Precise, MonadHeap value m) => MonadAddressable Precise value m where
   deref = derefWith (maybeM uninitializedAddress . unLatest)
   alloc _ = do
+    -- Compute the next available address in the heap, then write an empty value into it.
     addr <- fmap (Address . Precise . heapSize) getHeap
     addr <$ modifyHeap (heapInit addr mempty)
 

@@ -261,6 +261,9 @@ instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, Mon
   rational _ = pure Type.Rational
   multiple   = pure . Type.Product
   array      = pure . Type.Array
+  klass _ _  = pure Object
+
+  objectEnvironment _ = pure mempty
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 
