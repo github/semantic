@@ -10,7 +10,7 @@ module SpecHelpers (
 , ) where
 
 import Data.Abstract.Address as X
-import Data.Abstract.FreeVariables as X
+import Data.Abstract.FreeVariables as X hiding (dropExtension)
 import Data.Abstract.Heap as X
 import Data.Abstract.ModuleTable as X
 import Data.Blob as X

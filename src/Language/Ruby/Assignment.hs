@@ -21,13 +21,13 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Term as Term
+import qualified Language.Ruby.Syntax as Ruby.Syntax
 
 -- | The type of Ruby syntax.
 type Syntax = '[
     Comment.Comment
   , Declaration.Class
   , Declaration.Function
-  , Declaration.Import
   , Declaration.Method
   , Declaration.Module
   , Expression.Arithmetic
@@ -74,6 +74,8 @@ type Syntax = '[
   , Syntax.Error
   , Syntax.Identifier
   , Syntax.Program
+  , Ruby.Syntax.Require
+  , Ruby.Syntax.Load
   , []
   ]
 
@@ -295,15 +297,20 @@ pair :: Assignment
 pair =   makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> (expression <|> emptyTerm))
 
 methodCall :: Assignment
-methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> regularCall)
+methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> regularCall)
   where
     regularCall = inj <$> (Expression.Call <$> pure [] <*> expression <*> args <*> (block <|> emptyTerm))
     require = inj <$> (symbol Identifier *> do
       s <- source
-      guard (elem s ["autoload", "load", "require", "require_relative"])
-      Declaration.Import <$> args' <*> pure [] <*> emptyTerm)
+      guard (elem s ["require", "require_relative"])
+      Ruby.Syntax.Require (s == "require_relative") <$> nameExpression)
+    load = inj <$> (symbol Identifier *> do
+      s <- source
+      guard (elem s ["load"])
+      Ruby.Syntax.Load <$> loadArgs)
     args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> pure []
-    args' = makeTerm'' <$> (symbol ArgumentList <|> symbol ArgumentListWithParens) <*> children (many expression) <|> emptyTerm
+    loadArgs = (symbol ArgumentList <|> symbol ArgumentListWithParens)  *> children (some expression)
+    nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
 
 call :: Assignment
 call = makeTerm <$> symbol Call <*> children (Expression.MemberAccess <$> expression <*> (expression <|> args))

@@ -52,6 +52,7 @@ library
                      , Data.Abstract.Live
                      , Data.Abstract.ModuleTable
                      , Data.Abstract.Number
+                     , Data.Abstract.Path
                      , Data.Abstract.Type
                      , Data.Abstract.Value
                      -- General datatype definitions & generic algorithms
@@ -100,6 +101,7 @@ library
                      , Language.JSON.Assignment
                      , Language.Ruby.Grammar
                      , Language.Ruby.Assignment
+                     , Language.Ruby.Syntax
                      , Language.TypeScript.Assignment
                      , Language.TypeScript.Grammar
                      , Language.TypeScript.Syntax
@@ -209,6 +211,7 @@ test-suite test
   other-modules:       Assigning.Assignment.Spec
                      , Analysis.Go.Spec
                      , Analysis.Python.Spec
+                     , Analysis.Ruby.Spec
                      , Analysis.TypeScript.Spec
                      , Data.Diff.Spec
                      , Data.Functor.Classes.Generic.Spec

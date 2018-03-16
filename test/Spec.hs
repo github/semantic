@@ -2,6 +2,7 @@ module Main where
 
 import qualified Analysis.Go.Spec
 import qualified Analysis.Python.Spec
+import qualified Analysis.Ruby.Spec
 import qualified Analysis.TypeScript.Spec
 import qualified Assigning.Assignment.Spec
 import qualified Data.Diff.Spec
@@ -27,6 +28,7 @@ main = hspec $ do
   parallel $ do
     describe "Analysis.Go" Analysis.Go.Spec.spec
     describe "Analysis.Python" Analysis.Python.Spec.spec
+    describe "Analysis.Ruby" Analysis.Ruby.Spec.spec
     describe "Analysis.TypeScript" Analysis.TypeScript.Spec.spec
     describe "Assigning.Assignment" Assigning.Assignment.Spec.spec
     describe "Data.Diff" Data.Diff.Spec.spec
