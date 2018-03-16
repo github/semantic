@@ -118,8 +118,7 @@ newtype DedupeKey = DedupeKey (Maybe T.Text, Maybe T.Text) deriving (Eq, Ord)
 dedupe :: forall fields. HasField fields (Maybe Declaration) => [Entry (Record fields)] -> [Entry (Record fields)]
 dedupe = let tuples = sortOn fst . Map.elems . snd . foldl' go (0, Map.empty) in (fmap . fmap) snd tuples
   where
-    go :: HasField fields (Maybe Declaration)
-       => (Int, Map.Map DedupeKey (Int, Entry (Record fields)))
+    go :: (Int, Map.Map DedupeKey (Int, Entry (Record fields)))
        -> Entry (Record fields)
        -> (Int, Map.Map DedupeKey (Int, Entry (Record fields)))
     go (index, m) x | Just (_, similar) <- Map.lookup (dedupeKey x) m
