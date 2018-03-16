@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For HasCallStack
 module Language.Python.Assignment
 ( assignment
 , Syntax
