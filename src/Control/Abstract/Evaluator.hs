@@ -3,6 +3,8 @@ module Control.Abstract.Evaluator
 ( MonadEvaluator(..)
 , MonadEnvironment(..)
 , modifyGlobalEnv
+, modifyExports
+, addExport
 , MonadHeap(..)
 , modifyHeap
 , lookupHeap
@@ -20,7 +22,7 @@ import Data.Abstract.Heap
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Semigroup.Reducer
-import Prelude hiding (fail)
+import Prelude
 import Prologue
 
 -- | A 'Monad' providing the basic essentials for evaluation.
@@ -45,14 +47,15 @@ class Monad m => MonadEnvironment value m | m -> value where
   getGlobalEnv :: m (EnvironmentFor value)
   -- | Set the global environment
   putGlobalEnv :: EnvironmentFor value -> m ()
+  -- | Sets the global environment for the lifetime of the given action.
   withGlobalEnv :: EnvironmentFor value -> m a -> m a
 
-  -- | Add an export to the global export state.
-  addExport :: Name -> (Name, Maybe (Address (LocationFor value) value)) -> m ()
   -- | Get the global export state.
-  getExports :: m (Map Name (Name, Maybe (Address (LocationFor value) value)))
-  -- | Sets the exports state to the given map for the lifetime of the given action.
-  withExports :: Map Name (Name, Maybe (Address (LocationFor value) value)) -> m a -> m a
+  getExports :: m (ExportsFor value)
+  -- | Set the global export state.
+  putExports :: ExportsFor value -> m ()
+  -- | Sets the global export state for the lifetime of the given action.
+  withExports :: ExportsFor value -> m a -> m a
 
   -- | Retrieve the local environment.
   askLocalEnv :: m (EnvironmentFor value)
@@ -70,11 +73,20 @@ class Monad m => MonadEnvironment value m | m -> value where
     maybe (pure Nothing) (fmap Just . with) addr
 
 -- | Update the global environment.
-modifyGlobalEnv :: MonadEnvironment value m => (EnvironmentFor value -> EnvironmentFor value) -> m  ()
+modifyGlobalEnv :: MonadEnvironment value m => (EnvironmentFor value -> EnvironmentFor value) -> m ()
 modifyGlobalEnv f = do
   env <- getGlobalEnv
   putGlobalEnv $! f env
 
+-- | Update the global export state.
+modifyExports :: MonadEnvironment value m => (ExportsFor value -> ExportsFor value) -> m ()
+modifyExports f = do
+  exports <- getExports
+  putExports $! f exports
+
+-- | Add an export to the global export state.
+addExport :: MonadEnvironment value m => Name -> Name -> Maybe (Address (LocationFor value) value) -> m ()
+addExport name alias = modifyExports . exportInsert name alias
 
 -- | A 'Monad' abstracting a heap of values.
 class Monad m => MonadHeap value m | m -> value where

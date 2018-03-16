@@ -14,7 +14,6 @@ import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Configuration
 import Data.Abstract.Evaluatable
-import Data.Abstract.Address
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Blob
@@ -81,12 +80,11 @@ type EvaluatingEffects term value
   = '[ Fail                                        -- Failure with an error message
      , Reader (EnvironmentFor value)               -- Local environment (e.g. binding over a closure)
      , State  (EnvironmentFor value)               -- Global (imperative) environment
-     , State  (HeapFor value)                     -- The heap
+     , State  (HeapFor value)                      -- The heap
      , Reader (ModuleTable [term])                 -- Cache of unevaluated modules
      , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
-
-     , State (Map Name (Name, Maybe (Address (LocationFor value) value))) -- Set of exports
-     , State (IntMap.IntMap term) -- For jumps
+     , State  (ExportsFor value)                   -- Exports (used to filter environments when they are imported)
+     , State  (IntMap.IntMap term)                 -- For jumps
      ]
 
 instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl term (Evaluating term value effects) where
@@ -98,13 +96,13 @@ instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl ter
 
   goto label = IntMap.lookup label <$> raise get >>= maybe (fail ("unknown label: " <> show label)) pure
 
-instance Members '[State (Map Name (Name, Maybe (Address (LocationFor value) value))), Reader (EnvironmentFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
+instance Members '[State (ExportsFor value), Reader (EnvironmentFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
   getGlobalEnv = raise get
   putGlobalEnv = raise . put
   withGlobalEnv s = raise . localState s . lower
 
-  addExport key = raise . modify . Map.insert key
   getExports = raise get
+  putExports = raise . put
   withExports s = raise . localState s . lower
 
   askLocalEnv = raise ask

@@ -33,7 +33,7 @@ type Syntax =
    , Declaration.Function
    , Declaration.Import
    , Declaration.QualifiedImport
-   , Declaration.WildcardImport
+   , Declaration.SideEffectImport
    , Declaration.Method
    , Declaration.MethodSignature
    , Declaration.Module
@@ -386,23 +386,26 @@ functionDeclaration =  makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncL
 importDeclaration :: Assignment
 importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTerm (importSpec <|> importSpecList))
   where
-    importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyTerm (importSpec <|> comment))
-    importSpec =   makeTerm <$> symbol ImportSpec <*> children sideEffectImport
-               <|> makeTerm <$> symbol ImportSpec <*> children dotImport
-               <|> makeTerm <$> symbol ImportSpec <*> children namedImport
-               <|> makeTerm <$> symbol ImportSpec <*> children plainImport
-
-    dotImport = flip Declaration.WildcardImport <$> (makeTerm <$> symbol Dot <*> (Syntax.Identifier <$> (name <$> source))) <*> importFromPath
-    sideEffectImport = symbol BlankIdentifier *> source *> (Declaration.Import <$> importFromPath <*> pure [])
-    namedImport = flip Declaration.QualifiedImport <$> packageIdentifier <*> importFromPath <*> pure []
-    plainImport = symbol InterpretedStringLiteral >>= \loc -> do
+    -- `import . "lib/Math"`
+    dotImport = inj <$> (makeImport <$> dot <*> importFromPath)
+    -- dotImport = inj <$> (flip Declaration.Import <$> (symbol Dot *> source *> pure []) <*> importFromPath)
+    -- `import _ "lib/Math"`
+    sideEffectImport = inj <$> (flip Declaration.SideEffectImport <$> underscore <*> importFromPath)
+    -- `import m "lib/Math"`
+    namedImport = inj <$> (flip Declaration.QualifiedImport <$> packageIdentifier <*> importFromPath <*> pure [])
+    -- `import "lib/Math"`
+    plainImport = inj <$> (symbol InterpretedStringLiteral >>= \loc -> do
       names <- pathToNames <$> source
       let from = makeTerm loc (Syntax.Identifier (qualifiedName names))
       let alias = makeTerm loc (Syntax.Identifier (name (last names))) -- Go takes `import "lib/Math"` and uses `Math` as the qualified name (e.g. `Math.Sin()`)
-      Declaration.QualifiedImport <$> pure from <*> pure alias <*> pure []
+      Declaration.QualifiedImport <$> pure from <*> pure alias <*> pure [])
 
+    makeImport dot path = Declaration.Import path [] dot
+    dot = makeTerm <$> symbol Dot <*> (Literal.TextElement <$> source)
+    underscore = makeTerm <$> symbol BlankIdentifier <*> (Literal.TextElement <$> source)
+    importSpec     = makeTerm' <$> symbol ImportSpec <*> children (sideEffectImport <|> dotImport <|> namedImport <|> plainImport)
+    importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyTerm (importSpec <|> comment))
     importFromPath = makeTerm <$> symbol InterpretedStringLiteral <*> (Syntax.Identifier <$> (pathToQualifiedName <$> source))
-
     pathToQualifiedName = qualifiedName . pathToNames
     pathToNames = BC.split '/' . (BC.dropWhile (== '/')) . (BC.dropWhile (== '.')) . stripQuotes
     stripQuotes = B.filter (/= (fromIntegral (ord '\"')))
