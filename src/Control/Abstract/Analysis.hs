@@ -45,7 +45,7 @@ class (MonadEvaluator term value m, Recursive term) => MonadAnalysis term value 
 
   -- | Isolate the given action with an empty global environment and exports.
   isolate :: m a -> m a
-  isolate = withGlobalEnv mempty . withExports mempty
+  isolate = withEnv mempty . withExports mempty
 
 -- | Evaluate a term to a value using the semantics of the current analysis.
 --
@@ -79,7 +79,7 @@ load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup n
     evalAndCache []     = pure mempty
     evalAndCache (x:xs) = do
       void $ evaluateModule x
-      env <- filterEnv <$> getExports <*> getGlobalEnv
+      env <- filterEnv <$> getExports <*> getEnv
       modifyModuleTable (moduleTableInsert name env)
       (env <>) <$> evalAndCache xs
 

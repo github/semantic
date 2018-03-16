@@ -99,19 +99,18 @@ instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl ter
   goto label = IntMap.lookup label <$> raise get >>= maybe (fail ("unknown label: " <> show label)) pure
 
 instance Members '[State (ExportsFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
-  getGlobalEnv = raise get
-  putGlobalEnv = raise . put
-  withGlobalEnv s = raise . localState s . lower
+  getEnv = raise get
+  putEnv = raise . put
+  withEnv s = raise . localState s . lower
 
   getExports = raise get
   putExports = raise . put
   withExports s = raise . localState s . lower
 
-  askLocalEnv = raise get
   localEnv f a = do
-    modifyGlobalEnv (f . Env.push)
+    modifyEnv (f . Env.push)
     result <- a
-    result <$ modifyGlobalEnv Env.pop
+    result <$ modifyEnv Env.pop
 
 instance Member (State (HeapFor value)) effects => MonadHeap value (Evaluating term value effects) where
   getHeap = raise get
@@ -125,7 +124,7 @@ instance Members '[Reader (ModuleTable [term]), State (ModuleTable (EnvironmentF
   localModuleTable f a = raise (local f (lower a))
 
 instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
-  getConfiguration term = Configuration term mempty <$> askLocalEnv <*> getHeap
+  getConfiguration term = Configuration term mempty <$> getEnv <*> getHeap
 
 instance ( Evaluatable (Base term)
          , FreeVariables term

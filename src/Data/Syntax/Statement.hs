@@ -96,7 +96,7 @@ instance Evaluatable Assignment where
     v <- subtermValue assignmentValue
     addr <- lookupOrAlloc name
     assign addr v
-    modifyGlobalEnv (Env.insert name addr)
+    modifyEnv (Env.insert name addr)
     pure v
     where name = freeVariable (subterm assignmentTarget)
 

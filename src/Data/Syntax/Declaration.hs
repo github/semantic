@@ -23,7 +23,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Function where
   eval Function{..} = do
     (v, addr) <- letrec name (abstract (paramNames functionParameters) functionBody)
-    modifyGlobalEnv (Env.insert name addr)
+    modifyEnv (Env.insert name addr)
     pure v
     where paramNames = foldMap (pure . freeVariable . subterm)
           name = freeVariable (subterm functionName)
@@ -44,7 +44,7 @@ instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Method where
   eval Method{..} = do
     (v, addr) <- letrec name (abstract (paramNames methodParameters) methodBody)
-    modifyGlobalEnv (Env.insert name addr)
+    modifyEnv (Env.insert name addr)
     pure v
     where paramNames = foldMap (pure . freeVariable . subterm)
           name = freeVariable (subterm methodName)
@@ -148,9 +148,9 @@ instance Evaluatable Class where
     let name = freeVariable (subterm classIdentifier)
     (v, addr) <- letrec name $ do
       void $ subtermValue classBody
-      classEnv <- Env.head <$> askLocalEnv
+      classEnv <- Env.head <$> getEnv
       klass name classEnv
-    v <$ modifyGlobalEnv (Env.insert name addr)
+    v <$ modifyEnv (Env.insert name addr)
 
 data Module a = Module { moduleIdentifier :: !a, moduleScope :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -277,7 +277,7 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedImport where
   eval (QualifiedImport from alias xs) = do
     importedEnv <- isolate (require moduleName)
-    modifyGlobalEnv (mappend (Env.rename (renames importedEnv) importedEnv))
+    modifyEnv (mappend (Env.rename (renames importedEnv) importedEnv))
     unit
     where
       moduleName = freeVariable (subterm from)
@@ -300,7 +300,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Import where
   eval (Import from xs _) = do
     importedEnv <- isolate (require moduleName)
-    modifyGlobalEnv (mappend (renamed importedEnv))
+    modifyEnv (mappend (renamed importedEnv))
     unit
     where
       moduleName = freeVariable (subterm from)

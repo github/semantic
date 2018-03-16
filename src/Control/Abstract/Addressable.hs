@@ -25,7 +25,7 @@ lookupOrAlloc :: ( MonadAddressable (LocationFor value) value m
                  )
                  => Name
                  -> m (Address (LocationFor value) value)
-lookupOrAlloc name = lookupLocalEnv name >>= maybe (alloc name) pure
+lookupOrAlloc name = lookupEnv name >>= maybe (alloc name) pure
 
 
 letrec :: ( MonadAddressable (LocationFor value) value m
