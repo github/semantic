@@ -8,6 +8,7 @@ module Language.Go.Assignment
 
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Abstract.FreeVariables
+import Data.Abstract.Path
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
 import Language.Go.Grammar as Grammar

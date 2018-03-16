@@ -51,6 +51,7 @@ library
                      , Data.Abstract.Live
                      , Data.Abstract.ModuleTable
                      , Data.Abstract.Number
+                     , Data.Abstract.Path
                      , Data.Abstract.Type
                      , Data.Abstract.Value
                      -- General datatype definitions & generic algorithms

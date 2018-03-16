@@ -5,9 +5,7 @@ import Prologue
 import Data.Term
 import Data.ByteString (intercalate)
 import qualified Data.List.NonEmpty as NonEmpty
-import qualified Data.ByteString.Char8 as BC
-import qualified Data.ByteString as B
-import Data.Char (ord)
+import Data.Abstract.Path
 
 -- | The type of variable names.
 type Name = NonEmpty ByteString
@@ -23,24 +21,6 @@ qualifiedName = NonEmpty.fromList
 -- | Construct a qualified 'Name' from a `/` delimited path.
 pathToQualifiedName :: ByteString -> Name
 pathToQualifiedName = qualifiedName . splitOnPathSeparator
-
--- | Split a 'ByteString' path on `/`, stripping quotes and any `./` prefix.
-splitOnPathSeparator :: ByteString -> [ByteString]
-splitOnPathSeparator = splitOnPathSeparator' id
-
-splitOnPathSeparator' :: (ByteString -> ByteString) -> ByteString -> [ByteString]
-splitOnPathSeparator' f = BC.split '/' . f . dropRelativePrefix . stripQuotes
-
-stripQuotes :: ByteString -> ByteString
-stripQuotes = B.filter (/= fromIntegral (ord '\"'))
-
-dropRelativePrefix :: ByteString -> ByteString
-dropRelativePrefix = BC.dropWhile (== '/') . BC.dropWhile (== '.')
-
-dropExtension :: ByteString -> ByteString
-dropExtension path = case BC.split '.' path of
-  [] -> path
-  xs -> BC.intercalate "." (Prelude.init xs)
 
 -- | User friendly 'ByteString' of a qualified 'Name'.
 friendlyName :: Name -> ByteString

@@ -5,6 +5,7 @@ import Control.Monad (unless)
 import Control.Abstract.Value (MonadValue)
 import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
+import Data.Abstract.Path
 import Data.Abstract.Value (LocationFor)
 import Diffing.Algorithm
 import Prelude hiding (fail)
