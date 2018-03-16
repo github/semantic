@@ -5,16 +5,24 @@ import Prologue
 import Data.Term
 import Data.ByteString (intercalate)
 import qualified Data.List.NonEmpty as NonEmpty
+import Data.Abstract.Path
 
 -- | The type of variable names.
 type Name = NonEmpty ByteString
 
+-- | Construct a qualified name from a 'ByteString'
 name :: ByteString -> Name
 name x = x :| []
 
+-- | Construct a qualified name from a list of 'ByteString's
 qualifiedName :: [ByteString] -> Name
 qualifiedName = NonEmpty.fromList
 
+-- | Construct a qualified 'Name' from a `/` delimited path.
+pathToQualifiedName :: ByteString -> Name
+pathToQualifiedName = qualifiedName . splitOnPathSeparator
+
+-- | User friendly 'ByteString' of a qualified 'Name'.
 friendlyName :: Name -> ByteString
 friendlyName xs = intercalate "." (NonEmpty.toList xs)
 
