@@ -1,4 +1,3 @@
-{-# LANGUAGE DeriveAnyClass #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Data.Patch
 ( Patch(..)
