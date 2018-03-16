@@ -13,6 +13,7 @@ import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Configuration
+import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
@@ -78,8 +79,7 @@ deriving instance Member NonDetEff effects => MonadNonDet (Evaluating term value
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value
   = '[ Fail                                        -- Failure with an error message
-     , Reader (EnvironmentFor value)               -- Local environment (e.g. binding over a closure)
-     , State  (EnvironmentFor value)               -- Global (imperative) environment
+     , State  (EnvironmentFor value)               -- Environments (both local and global)
      , State  (HeapFor value)                      -- The heap
      , Reader (ModuleTable [term])                 -- Cache of unevaluated modules
      , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
@@ -96,7 +96,7 @@ instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl ter
 
   goto label = IntMap.lookup label <$> raise get >>= maybe (fail ("unknown label: " <> show label)) pure
 
-instance Members '[State (ExportsFor value), Reader (EnvironmentFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
+instance Members '[State (ExportsFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
   getGlobalEnv = raise get
   putGlobalEnv = raise . put
   withGlobalEnv s = raise . localState s . lower
@@ -105,8 +105,11 @@ instance Members '[State (ExportsFor value), Reader (EnvironmentFor value), Stat
   putExports = raise . put
   withExports s = raise . localState s . lower
 
-  askLocalEnv = raise ask
-  localEnv f a = raise (local f (lower a))
+  askLocalEnv = raise get
+  localEnv f a = do
+    modifyGlobalEnv (f . envPush)
+    result <- a
+    result <$ modifyGlobalEnv envPop
 
 instance Member (State (HeapFor value)) effects => MonadHeap value (Evaluating term value effects) where
   getHeap = raise get

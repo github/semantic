@@ -27,6 +27,13 @@ instance Monoid (Environment l a) where
   mappend = (<>)
   mempty  = Environment (mempty :| [])
 
+envPush :: Environment l a -> Environment l a
+envPush (Environment (a :| as)) = Environment (mempty :| a : as)
+
+envPop :: Environment l a -> Environment l a
+envPop (Environment (_ :| [])) = mempty
+envPop (Environment (_ :| a : as)) = Environment (a :| as)
+
 -- TODO: Test the flattening behavior
 envPairs :: Environment l a -> [(Name, Address l a)]
 envPairs = Map.toList . fold . unEnvironment
