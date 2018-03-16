@@ -30,7 +30,9 @@ import           Prologue
 -- >>> let bright = push (insert (name "foo") (Address (Precise 0)) mempty)
 -- >>> let shadowed = insert (name "foo") (Address (Precise 1)) bright
 
--- | A map of names to addresses that represents the evaluation environment.
+-- | A stack of maps of names to addresses, representing a lexically-scoped evaluation environment.
+--   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
+--   scope for "a", then the next, and so on.
 newtype Environment l a = Environment { unEnvironment :: NonEmpty (Map.Map Name (Address l a)) }
   deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
 
@@ -54,22 +56,25 @@ instance Semigroup (Environment l a) where
 instance Reducer (Name, Address l a) (Environment l a) where
   unit a = Environment (unit a :| [])
 
--- Possibly unlawful. If this breaks, you get to keep both pieces.
+-- | This instance is possibly unlawful. If this breaks, you get to keep both pieces.
 instance Monoid (Environment l a) where
   mappend = (<>)
   mempty  = Environment (mempty :| [])
 
+-- | Make and enter a new empty scope in the given environment.
 push :: Environment l a -> Environment l a
 push (Environment (a :| as)) = Environment (mempty :| a : as)
 
+-- | Remove the frontmost scope.
 pop :: Environment l a -> Environment l a
 pop (Environment (_ :| []))     = mempty
 pop (Environment (_ :| a : as)) = Environment (a :| as)
 
+-- | Drop all scopes save for the frontmost one.
 head :: Environment l a -> Environment l a
 head (Environment (a :| _)) = Environment (a :| [])
 
--- | Extract an association list of bindings from an 'Environment'. This displays frontmost-biased shadowing behavior, to wit:
+-- | Extract an association list of bindings from an 'Environment'.
 --
 -- >>> pairs shadowed
 -- [("foo" :| [],Address {unAddress = Precise {unPrecise = 1}})]
@@ -102,6 +107,7 @@ bindEnv :: (Ord l, Foldable t) => t Name -> Environment l a -> Environment l a
 bindEnv names env = foldMap envForName names
   where envForName name = maybe mempty (curry unit name) (lookup name env)
 
+-- | Get all bound 'Name's in an environment.
 names :: Environment l a -> [Name]
 names = fmap fst . pairs
 
@@ -118,6 +124,5 @@ rename pairs env = foldMap rename pairs where
 roots :: (Ord l, Foldable t) => Environment l a -> t Name -> Live l a
 roots env = foldMap (maybe mempty liveSingleton . flip lookup env)
 
--- TODO, VERY BROKEN, DON'T COMMIT THIS: needs to prefer inwardly-bound names to handle scoping
-envAll :: (Ord l) => Environment l a -> Live l a
-envAll (Environment env) = Live $ Set.fromList (foldMap Map.elems env)
+envAll :: Ord l => Environment l a -> Live l a
+envAll = Live . fromList . fmap snd . pairs

@@ -1,17 +1,18 @@
 {-# LANGUAGE ConstrainedClassMethods, FunctionalDependencies #-}
 module Control.Abstract.Evaluator
-( MonadEvaluator(..)
-, MonadEnvironment(..)
-, modifyGlobalEnv
-, modifyExports
-, addExport
-, MonadHeap(..)
-, modifyHeap
-, lookupHeap
-, assign
-, MonadModuleTable(..)
-, modifyModuleTable
-, MonadControl(..)
+  ( MonadEvaluator(..)
+  , MonadEnvironment(..)
+  , modifyGlobalEnv
+  , modifyExports
+  , addExport
+  , MonadHeap(..)
+  , modifyHeap
+  , localize
+  , lookupHeap
+  , assign
+  , MonadModuleTable(..)
+  , modifyModuleTable
+  , MonadControl(..)
 ) where
 
 import Data.Abstract.Address
@@ -73,6 +74,7 @@ class Monad m => MonadEnvironment value m | m -> value where
     addr <- lookupLocalEnv name
     maybe (pure Nothing) (fmap Just . with) addr
 
+-- | Run a computation in a new local environment.
 localize :: MonadEnvironment value m => m a -> m a
 localize = localEnv id
 

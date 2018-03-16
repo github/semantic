@@ -83,8 +83,10 @@ class (Monad m, Show value) => MonadValue value m where
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: value -> m a -> m a -> m a
 
+  -- | Build a class value from a name and environment.
   klass :: Name -> EnvironmentFor value -> m value
 
+  -- | Extract the environment from a class.
   objectEnvironment :: value -> m (EnvironmentFor value)
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).

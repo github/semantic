@@ -30,6 +30,8 @@ type family Cell l = res | res -> l where
 
 
 -- | A cell holding a single value. Writes will replace any prior value.
+--   This is isomorphic to 'Last' from Data.Monoid, but is more convenient
+--   because it has a 'Reducer' instance.
 newtype Latest a = Latest { unLatest :: Maybe a }
   deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
 
