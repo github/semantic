@@ -56,7 +56,7 @@ class (Monad m, Show value) => MonadValue value m where
   --   necessary to satisfy implementation details of Haskell left/right shift,
   --   but it's fine, since these are only ever operating on integral values.
   liftBitwise2 :: (forall a . (Integral a, Bits a) => a -> a -> a)
-               -> (value -> value -> m value)              
+               -> (value -> value -> m value)
 
   -- | Construct an abstract boolean value.
   boolean :: Bool -> m value
@@ -80,8 +80,8 @@ class (Monad m, Show value) => MonadValue value m where
   -- | Construct an array of zero or more values.
   array :: [value] -> m value
 
+-- | Extract a 'ByteString' from a given value.
   asString :: value -> m ByteString
-  asBool :: value -> m Bool
 
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: value -> m a -> m a -> m a
@@ -151,10 +151,6 @@ instance ( Monad m
   asString v
     | Just (Value.String n) <- prjValue v = pure n
     | otherwise                           = fail ("expected " <> show v <> " to be a string")
-
-  asBool v
-    | Just (Value.Boolean x) <- prjValue v = pure x
-    | otherwise                            = fail ("expected " <> show v <> " to be a boolean")
 
   ifthenelse cond if' else'
     | Just (Boolean b) <- prjValue cond = if b then if' else else'
