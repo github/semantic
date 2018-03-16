@@ -6,7 +6,7 @@ module Assigning.Assignment.Table
 , lookup
 ) where
 
-import Prologue hiding (toList)
+import Prologue
 import Prelude hiding (lookup)
 import qualified Data.IntMap as IntMap
 import qualified Data.IntSet as IntSet
