@@ -24,6 +24,8 @@ assignmentExample lang = case lang of
   "Haskell" -> mk "hs" "haskell"
   "Markdown" -> mk "md" "markdown"
   "JSON" -> mk "json" "json"
+  "Java" -> mk "java" "java"
+  "PHP" -> mk "php" "php"
   _ -> mk "" ""
   where mk fileExtension parser = putStrLn ("example: fmap (() <$) . runTask . parse " ++ parser ++ "Parser =<< Semantic.Util.file \"example." ++ fileExtension ++ "\"") >> return ("import Parsing.Parser\nimport Semantic.Task\nimport Semantic.Util")
 :}
