@@ -26,7 +26,7 @@ data Comparator
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class (MonadAnalysis term value m, Show value) => MonadValue term value m where
+class (Monad m, Show value) => MonadValue value m where
   -- | Construct an abstract unit value.
   --   TODO: This might be the same as the empty tuple for some value types
   unit :: m value
@@ -67,11 +67,14 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
   -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
   multiple :: [value] -> m value
 
+  -- | Construct an array of zero or more values.
+  array :: [value] -> m value
+
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: value -> m a -> m a -> m a
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
-  abstract :: [Name] -> Subterm term (m value) -> m value
+  abstract :: (FreeVariables term, MonadControl term m) => [Name] -> Subterm term (m value) -> m value
   -- | Evaluate an application (like a function call).
   apply :: value -> [m value] -> m value
 
@@ -81,10 +84,10 @@ class (MonadAnalysis term value m, Show value) => MonadValue term value m where
   loop :: (m value -> m value) -> m value
 
 -- | Attempt to extract a 'Prelude.Bool' from a given value.
-toBool :: MonadValue term value m => value -> m Bool
+toBool :: MonadValue value m => value -> m Bool
 toBool v = ifthenelse v (pure True) (pure False)
 
-forLoop :: MonadValue term value m
+forLoop :: (MonadEnvironment value m, MonadValue value m)
         => m value -- | Initial statement
         -> m value -- | Condition
         -> m value -- | Increment/stepper
@@ -96,7 +99,7 @@ forLoop initial cond step body = do
   localEnv (mappend env) (while cond (body *> step))
 
 -- | The fundamental looping primitive, built on top of ifthenelse.
-while :: MonadValue term value m
+while :: MonadValue value m
       => m value
       -> m value
       -> m value
@@ -105,7 +108,7 @@ while cond body = loop $ \ continue -> do
   ifthenelse this (body *> continue) unit
 
 -- | Do-while loop, built on top of while.
-doWhile :: MonadValue term value m
+doWhile :: MonadValue value m
         => m value
         -> m value
         -> m value
@@ -114,13 +117,12 @@ doWhile body cond = loop $ \ continue -> body *> do
   ifthenelse this continue unit
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( FreeVariables term
-         , MonadAddressable location (Value location term) m
-         , MonadAnalysis term (Value location term) m
+instance ( Monad m
+         , MonadAddressable location Value m
+         , MonadAnalysis term Value m
          , Show location
-         , Show term
          )
-         => MonadValue term (Value location term) m where
+         => MonadValue Value m where
 
   unit     = pure . injValue $ Value.Unit
   integer  = pure . injValue . Value.Integer . Number.Integer
@@ -131,6 +133,8 @@ instance ( FreeVariables term
   rational = pure . injValue . Value.Rational . Ratio
 
   multiple = pure . injValue . Value.Tuple
+
+  array    = pure . injValue . Value.Array
 
   ifthenelse cond if' else'
     | Just (Boolean b) <- prjValue cond = if b then if' else else'
@@ -155,7 +159,7 @@ instance ( FreeVariables term
     | otherwise = fail ("Invalid operands to liftNumeric2: " <> show pair)
       where
         -- Dispatch whatever's contained inside a 'SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: MonadValue term value m => SomeNumber -> m value
+        specialize :: MonadValue value m => SomeNumber -> m value
         specialize (SomeNumber (Number.Integer i)) = integer i
         specialize (SomeNumber (Ratio r))          = rational r
         specialize (SomeNumber (Decimal d))        = float d
@@ -173,7 +177,7 @@ instance ( FreeVariables term
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: (Ord a, MonadValue term value m) => a -> a -> m value
+        go :: (Ord a, MonadValue value m) => a -> a -> m value
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
           Generalized -> integer (orderingToInt (compare l r))
@@ -184,21 +188,23 @@ instance ( FreeVariables term
 
         pair = (left, right)
 
-  abstract names (Subterm body _) = injValue . Closure names body . bindEnv (foldr Set.delete (freeVariables body) names) <$> askLocalEnv
+  abstract names (Subterm body _) = do
+    l <- label body
+    injValue . Closure names l . bindEnv (foldr Set.delete (freeVariables body) names) <$> askLocalEnv
 
   apply op params = do
-    Closure names body env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
+    Closure names label env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
     bindings <- foldr (\ (name, param) rest -> do
       v <- param
       a <- alloc name
       assign a v
       envInsert name a <$> rest) (pure env) (zip names params)
-    localEnv (mappend bindings) (evaluateTerm body)
+    localEnv (mappend bindings) (goto label >>= evaluateTerm)
 
   loop = fix
 
--- | Discard the value arguments (if any), constructing a 'Type.Type' instead.
-instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue term Type m where
+-- | Discard the value arguments (if any), constructing a 'Type' instead.
+instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, MonadHeap Type m) => MonadValue Type m where
   abstract names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
@@ -217,6 +223,7 @@ instance (Alternative m, MonadAnalysis term Type m, MonadFresh m) => MonadValue 
   symbol _   = pure Type.Symbol
   rational _ = pure Type.Rational
   multiple   = pure . Type.Product
+  array      = pure . Type.Array
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 

@@ -34,8 +34,8 @@ spec = parallel $ do
   where
     addr = Address . Precise
     fixtures = "test/fixtures/typescript/analysis/"
-    evaluate entry = snd . fst . fst . fst <$>
-      evaluateFiles @TypeScriptValue typescriptParser
+    evaluate entry = snd . fst . fst . fst . fst <$>
+      evaluateFiles typescriptParser
         [ fixtures <> entry
         , fixtures <> "a.ts"
         , fixtures <> "foo.ts"
