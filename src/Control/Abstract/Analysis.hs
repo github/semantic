@@ -68,17 +68,18 @@ load :: ( MonadAnalysis term value m
      -> m (EnvironmentFor value)
 load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
   where notFound = fail ("cannot load module: " <> show name)
-        evalAndCache e = do
-          void $ evaluateModule e
+        evalAndCache :: (MonadAnalysis term value m, Ord (LocationFor value)) => [term] -> m (EnvironmentFor value)
+        evalAndCache []     = pure mempty
+        evalAndCache (x:xs) = do
+          void $ evaluateModule x
+          env <- getGlobalEnv
+          exports <- getExports
           -- TODO: If the set of exports is empty because no exports have been
           -- defined, do we export all terms, or no terms? This behavior varies across
           -- languages. We need better semantics rather than doing it ad-hoc.
-          env <- getGlobalEnv
-          exports <- getExports
           let env' = if Map.null exports then env else bindExports exports env
           modifyModuleTable (moduleTableInsert name env')
-          pure env'
-
+          (env' <>) <$> evalAndCache xs
 
 -- | Lift a 'SubtermAlgebra' for an underlying analysis into a containing analysis. Use this when defining an analysis which can be composed onto other analyses to ensure that a call to 'analyzeTerm' occurs in the inner analysis and not the outer one.
 liftAnalyze :: ( Coercible (  m term value (effects :: [* -> *]) value) (t m term value effects value)

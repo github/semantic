@@ -2,7 +2,6 @@
 module Data.Syntax where
 
 import Control.Monad.Fail
-import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Data.AST
 import Data.Range
@@ -108,9 +107,7 @@ instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Identifier where
-  eval (Identifier name) = do
-    env <- askLocalEnv
-    maybe (fail ("free variable: " <> show name)) deref (envLookup name env)
+  eval (Identifier name) = lookupWith deref name >>= maybe (fail ("free variable: " <> show name)) pure
 
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = Set.singleton x
@@ -124,8 +121,7 @@ instance Ord1 Program where liftCompare = genericLiftCompare
 instance Show1 Program where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Program where
-  eval (Program xs) = do
-    withExports mempty (eval xs)
+  eval (Program xs) = eval xs
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString

@@ -22,12 +22,11 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Function where
   eval Function{..} = do
-    env <- askLocalEnv
-    let params = toList (liftFreeVariables (freeVariables . subterm) functionParameters)
-    v <- abstract params functionBody
-    (name, addr) <- lookupOrAlloc (subterm functionName) v env
+    (v, addr) <- letrec name (abstract (paramNames functionParameters) functionBody)
     modifyGlobalEnv (envInsert name addr)
     pure v
+    where paramNames = foldMap (pure . freeVariable . subterm)
+          name = freeVariable (subterm functionName)
 
 
 data Method a = Method { methodContext :: ![a], methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
@@ -44,13 +43,12 @@ instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 -- local environment.
 instance Evaluatable Method where
   eval Method{..} = do
-    env <- askLocalEnv
-    let params = toList (liftFreeVariables (freeVariables . subterm) methodParameters)
-    v <- abstract params methodBody
-
-    (name, addr) <- lookupOrAlloc (subterm methodName) v env
+    (v, addr) <- letrec name (abstract (paramNames methodParameters) methodBody)
     modifyGlobalEnv (envInsert name addr)
     pure v
+    where paramNames = foldMap (pure . freeVariable . subterm)
+          name = freeVariable (subterm methodName)
+
 
 -- | A method signature in TypeScript or a method spec in Go.
 data MethodSignature a = MethodSignature { _methodSignatureContext :: ![a], _methodSignatureName :: !a, _methodSignatureParameters :: ![a] }
@@ -215,6 +213,7 @@ instance Show1 Comprehension where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Comprehension
 instance Evaluatable Comprehension
 
+
 -- | Qualified Export declarations
 newtype QualifiedExport a = QualifiedExport { qualifiedExportSymbols :: [(Name, Name)] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -229,6 +228,7 @@ instance Evaluatable QualifiedExport where
     for_ exportSymbols $ \(name, alias) ->
       addExport name (alias, Nothing)
     unit
+
 
 -- | Qualified Export declarations that export from another module.
 data QualifiedExportFrom a = QualifiedExportFrom { qualifiedExportFrom :: !a, qualifiedExportFromSymbols :: ![(Name, Name)]}
@@ -249,6 +249,16 @@ instance Evaluatable QualifiedExportFrom where
     unit
 
 
+newtype DefaultExport a = DefaultExport { defaultExport :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 DefaultExport where liftEq = genericLiftEq
+instance Ord1 DefaultExport where liftCompare = genericLiftCompare
+instance Show1 DefaultExport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable DefaultExport where
+
+
 -- | Qualified Import declarations (symbols are qualified in calling environment).
 data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: !a, qualifiedImportAlias :: !a, qualifiedImportSymbols :: ![(Name, Name)]}
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -259,7 +269,8 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedImport where
   eval (QualifiedImport from alias xs) = do
-    importedEnv <- withGlobalEnv mempty (require (freeVariable (subterm from)))
+    let moduleName = freeVariable (subterm from)
+    importedEnv <- withGlobalEnv mempty (require moduleName)
     modifyGlobalEnv (flip (Map.foldrWithKey copy) (unEnvironment importedEnv))
     unit
     where
@@ -268,15 +279,6 @@ instance Evaluatable QualifiedImport where
       copy = if Map.null symbols then qualifyInsert else directInsert
       qualifyInsert k v rest = envInsert (prefix <> k) v rest
       directInsert k v rest = maybe rest (\symAlias -> envInsert symAlias v rest) (Map.lookup k symbols)
-
-newtype DefaultExport a = DefaultExport { defaultExport :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 DefaultExport where liftEq = genericLiftEq
-instance Ord1 DefaultExport where liftCompare = genericLiftCompare
-instance Show1 DefaultExport where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable DefaultExport where
 
 
 -- | Import declarations (symbols are added directly to the calling env).
@@ -291,7 +293,8 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
   eval (Import from xs) = do
-    importedEnv <- withGlobalEnv mempty (require (freeVariable (subterm from)))
+    let moduleName = freeVariable (subterm from)
+    importedEnv <- withGlobalEnv mempty (require moduleName)
     modifyGlobalEnv (flip (Map.foldrWithKey directInsert) (unEnvironment importedEnv))
     unit
     where
@@ -310,10 +313,12 @@ instance Ord1 WildcardImport where liftCompare = genericLiftCompare
 instance Show1 WildcardImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable WildcardImport where
-  eval (WildcardImport from _) = do -- require (freeVariable (subterm from)) *> putGlobalEnv mempty *> unit
-    importedEnv <- withGlobalEnv mempty (require (freeVariable (subterm from)))
+  eval (WildcardImport from _) = do
+    let moduleName = freeVariable (subterm from)
+    importedEnv <- withGlobalEnv mempty (require moduleName)
     modifyGlobalEnv (flip (Map.foldrWithKey envInsert) (unEnvironment importedEnv))
     unit
+
 
 -- | A declared type (e.g. `a []int` in Go).
 data Type a = Type { typeName :: !a, typeKind :: !a }

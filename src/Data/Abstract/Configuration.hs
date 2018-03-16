@@ -1,12 +1,12 @@
 {-# LANGUAGE DeriveFoldable, DeriveGeneric, FlexibleContexts, StandaloneDeriving, UndecidableInstances #-}
 module Data.Abstract.Configuration where
 
-import Prologue
 import Data.Abstract.Address
 import Data.Abstract.Environment
+import Data.Abstract.Heap
 import Data.Abstract.Live
-import Data.Abstract.Store
 import Data.Abstract.Value
+import Prologue
 
 -- | The configuration for term and abstract value types.
 type ConfigurationFor term value = Configuration (LocationFor value) term value
@@ -14,10 +14,10 @@ type ConfigurationFor term value = Configuration (LocationFor value) term value
 -- | A single point in a program’s execution.
 data Configuration l t v
   = Configuration
-    { configurationTerm :: t                      -- ^ The “instruction,” i.e. the current term to evaluate.
-    , configurationRoots :: Live l v              -- ^ The set of rooted addresses.
+    { configurationTerm        :: t               -- ^ The “instruction,” i.e. the current term to evaluate.
+    , configurationRoots       :: Live l v        -- ^ The set of rooted addresses.
     , configurationEnvironment :: Environment l v -- ^ The environment binding any free variables in 'configurationTerm'.
-    , configurationStore :: Store l v             -- ^ The store of values.
+    , configurationHeap        :: Heap l v        -- ^ The heap of values.
     }
     deriving (Generic1)
 

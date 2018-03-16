@@ -19,6 +19,7 @@ data Type
   | Type :-> Type  -- ^ Binary function types.
   | Var TName      -- ^ A type variable.
   | Product [Type] -- ^ N-ary products.
+  | Array [Type]   -- ^ Arrays. Note that this is heterogenous.
   deriving (Eq, Ord, Show)
 
 -- TODO: À la carte representation of types.
