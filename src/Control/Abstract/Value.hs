@@ -101,10 +101,10 @@ toBool :: MonadValue value m => value -> m Bool
 toBool v = ifthenelse v (pure True) (pure False)
 
 forLoop :: (MonadEnvironment value m, MonadValue value m)
-        => m value -- | Initial statement
-        -> m value -- | Condition
-        -> m value -- | Increment/stepper
-        -> m value -- | Body
+        => m value -- ^ Initial statement
+        -> m value -- ^ Condition
+        -> m value -- ^ Increment/stepper
+        -> m value -- ^ Body
         -> m value
 forLoop initial cond step body = do
   void initial
