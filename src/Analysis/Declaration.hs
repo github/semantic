@@ -14,7 +14,7 @@ import Data.Record
 import Data.Source as Source
 import Data.Span
 import Data.Term
-import Data.Abstract.FreeVariables hiding (stripQuotes)
+import Data.Abstract.FreeVariables
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
