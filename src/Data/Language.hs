@@ -7,6 +7,7 @@ import Data.Aeson
 -- | A programming language.
 data Language
     = Go
+    | Java
     | JavaScript
     | JSON
     | JSX
@@ -20,6 +21,7 @@ data Language
 -- | Returns a Language based on the file extension (including the ".").
 languageForType :: String -> Maybe Language
 languageForType mediaType = case mediaType of
+    ".java" -> Just Java
     ".json" -> Just JSON
     ".md" -> Just Markdown
     ".rb" -> Just Ruby
