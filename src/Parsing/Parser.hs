@@ -6,6 +6,7 @@ module Parsing.Parser
 , ApplyAll
 -- À la carte parsers
 , goParser
+, javaParser
 , jsonParser
 , markdownParser
 , pythonParser
@@ -25,6 +26,7 @@ import qualified Data.Syntax as Syntax
 import Data.Term
 import Foreign.Ptr
 import qualified Language.Go.Assignment as Go
+import qualified Language.Java.Assignment as Java
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
 import qualified Language.Python.Assignment as Python
@@ -34,6 +36,7 @@ import qualified Language.PHP.Assignment as PHP
 import qualified TreeSitter.Language as TS (Language, Symbol)
 import TreeSitter.Go
 import TreeSitter.JSON
+import TreeSitter.Java
 import TreeSitter.PHP
 import TreeSitter.Python
 import TreeSitter.Ruby
@@ -68,6 +71,7 @@ data SomeParser typeclasses ann where
 --
 --   > case someParser (Proxy :: Proxy '[Show1]) <$> blobLanguage language of { Just (SomeParser parser) -> runTask (parse parser blob) >>= putStrLn . show ; _ -> return () }
 someParser :: ( ApplyAll typeclasses (Union Go.Syntax)
+              , ApplyAll typeclasses (Union Java.Syntax)
               , ApplyAll typeclasses (Union JSON.Syntax)
               , ApplyAll typeclasses (Union Markdown.Syntax)
               , ApplyAll typeclasses (Union Python.Syntax)
@@ -80,6 +84,7 @@ someParser :: ( ApplyAll typeclasses (Union Go.Syntax)
            -> SomeParser typeclasses (Record Location) -- ^ A 'SomeParser' abstracting the syntax type to be produced.
 someParser _ Go         = SomeParser goParser
 someParser _ JavaScript = SomeParser typescriptParser
+someParser _ Java       = SomeParser javaParser
 someParser _ JSON       = SomeParser jsonParser
 someParser _ JSX        = SomeParser typescriptParser
 someParser _ Markdown   = SomeParser markdownParser
@@ -100,6 +105,9 @@ phpParser = AssignmentParser (ASTParser tree_sitter_php) PHP.assignment
 
 pythonParser :: Parser Python.Term
 pythonParser = AssignmentParser (ASTParser tree_sitter_python) Python.assignment
+
+javaParser :: Parser Java.Term
+javaParser = AssignmentParser (ASTParser tree_sitter_java) Java.assignment
 
 jsonParser :: Parser JSON.Term
 jsonParser = AssignmentParser (ASTParser tree_sitter_json) JSON.assignment
