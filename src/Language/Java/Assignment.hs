@@ -27,7 +27,6 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 
--- ' - lift into datakind
 type Syntax =
   '[ Comment.Comment
    , Literal.Integer
@@ -43,7 +42,7 @@ type Syntax =
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
--- | Assignment from AST in Python's grammar onto a program in Python's syntax.
+-- | Assignment from AST in Java's grammar onto a program in Java's syntax.
 assignment :: Assignment
 assignment = handleError $ makeTerm <$> symbol Grammar.Program <*> children (Syntax.Program <$> manyTerm expression) <|> parseError
 
@@ -62,7 +61,6 @@ expression = handleError (choice expressionChoices)
 
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
-  -- Long-term, can we de/serialize assignments and avoid paying the cost of construction altogether?
   [
     integer
   , string
