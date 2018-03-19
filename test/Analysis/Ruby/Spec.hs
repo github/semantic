@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedLists #-}
+
 module Analysis.Ruby.Spec (spec) where
 
 import Data.Abstract.Value
@@ -11,18 +13,18 @@ spec = parallel $ do
   describe "evalutes Ruby" $ do
     it "require_relative" $ do
       env <- evaluate "main.rb"
-      let expectedEnv = Environment $ fromList [ (qualifiedName ["foo"], addr 0) ]
+      let expectedEnv = [ (qualifiedName ["foo"], addr 0) ]
       env `shouldBe` expectedEnv
 
     it "load" $ do
       env <- evaluate "load.rb"
-      let expectedEnv = Environment $ fromList [ (qualifiedName ["foo"], addr 0) ]
+      let expectedEnv = [ (qualifiedName ["foo"], addr 0) ]
       env `shouldBe` expectedEnv
 
     it "load wrap" $ do
       res <- evaluate' "load-wrap.rb"
       fst res `shouldBe` Left "free variable: \"foo\""
-      snd res `shouldBe` Environment (fromList [ ])
+      snd res `shouldBe` []
 
   where
     addr = Address . Precise

@@ -24,7 +24,7 @@ instance ( Effectful (m term value)
          , MonadEvaluator term value (m term value effects)
          )
          => MonadEvaluator term value (Collecting m term value effects) where
-  getConfiguration term = Configuration term <$> askRoots <*> askLocalEnv <*> getHeap
+  getConfiguration term = Configuration term <$> askRoots <*> getEnv <*> getHeap
 
 
 instance ( Effectful (m term value)

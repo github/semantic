@@ -46,6 +46,7 @@ library
                      , Data.Abstract.Configuration
                      , Data.Abstract.Environment
                      , Data.Abstract.Evaluatable
+                     , Data.Abstract.Exports
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Heap
                      , Data.Abstract.Live

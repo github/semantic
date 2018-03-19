@@ -27,6 +27,7 @@ class Evaluatable constr where
           , MonadAddressable (LocationFor value) value m
           , MonadAnalysis term value m
           , MonadValue value m
+          , Show (LocationFor value)
           )
        => SubtermAlgebra constr term (m value)
   default eval :: (MonadFail m, Show1 constr) => SubtermAlgebra constr term (m value)
@@ -56,9 +57,7 @@ instance Evaluatable [] where
 newtype Imperative m a = Imperative { runImperative :: m a }
 
 instance MonadEnvironment value m => Semigroup (Imperative m a) where
-  Imperative a <> Imperative b = Imperative $ a *> do
-    env <- getGlobalEnv
-    localEnv (<> env) b
+  Imperative a <> Imperative b = Imperative (a *> b)
 
 instance (MonadEnvironment value m, MonadValue value m) => Monoid (Imperative m value) where
   mempty = Imperative unit
