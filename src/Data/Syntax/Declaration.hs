@@ -277,7 +277,7 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedImport where
   eval (QualifiedImport from alias xs) = do
     importedEnv <- isolate (require moduleName)
-    modifyEnv (mappend (Env.mergeBindings (renames importedEnv) importedEnv))
+    modifyEnv (mappend (Env.overwrite (renames importedEnv) importedEnv))
     unit
     where
       moduleName = freeVariable (subterm from)
@@ -306,7 +306,7 @@ instance Evaluatable Import where
       moduleName = freeVariable (subterm from)
       renamed importedEnv
         | null xs = importedEnv
-        | otherwise = Env.mergeBindings xs importedEnv
+        | otherwise = Env.overwrite xs importedEnv
 
 -- | Side effect only imports (no symbols made available to the calling environment).
 data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: !a, sideEffectImportToken :: !a }

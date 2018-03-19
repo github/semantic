@@ -90,7 +90,7 @@ load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup n
     filterEnv :: (Ord l) => Exports l a -> Environment l a -> Environment l a
     filterEnv ports env
       | Export.null ports = env
-      | otherwise = Export.toEnvironment ports <> Env.mergeBindings (Export.aliases ports) env
+      | otherwise = Export.toEnvironment ports <> Env.overwrite (Export.aliases ports) env
 
 -- | Lift a 'SubtermAlgebra' for an underlying analysis into a containing analysis. Use this when defining an analysis which can be composed onto other analyses to ensure that a call to 'analyzeTerm' occurs in the inner analysis and not the outer one.
 liftAnalyze :: ( Coercible (  m term value (effects :: [* -> *]) value) (t m term value effects value)

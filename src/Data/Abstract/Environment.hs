@@ -7,8 +7,8 @@ module Data.Abstract.Environment
   , head
   , insert
   , lookup
-  , mergeBindings
   , names
+  , overwrite
   , pairs
   , pop
   , push
@@ -110,9 +110,9 @@ bind names env = foldMap envForName names
 names :: Environment l a -> [Name]
 names = fmap fst . pairs
 
--- TODO: rename this, because it both filters and renames
-mergeBindings :: [(Name, Name)] -> Environment l a -> Environment l a
-mergeBindings pairs env = foldMap go pairs where
+-- | Overwrite a set of key-value bindings in the provided environment.
+overwrite :: [(Name, Name)] -> Environment l a -> Environment l a
+overwrite pairs env = foldMap go pairs where
   go (k, v) = case lookup k env of
     Nothing   -> mempty
     Just addr -> unit (v, addr)
