@@ -151,7 +151,7 @@ rangeToSpan source (Range rangeStart rangeEnd) = Span startPos endPos
         (before, rest) = span ((< rangeStart) . end) (sourceLineRanges source)
         (lineRanges, _) = span ((<= rangeEnd) . start) rest
         firstRange = fromMaybe emptyRange (getFirst (foldMap (First . Just) lineRanges))
-        lastRange  = fromMaybe emptyRange (getLast (foldMap (Last . Just) lineRanges))
+        lastRange  = fromMaybe firstRange (getLast (foldMap (Last . Just) lineRanges))
 
 
 -- Instances
