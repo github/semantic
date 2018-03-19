@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedLists #-}
 module Analysis.PHP.Spec (spec) where
 
 import Data.Abstract.Value
@@ -11,9 +12,7 @@ spec = parallel $ do
   describe "evalutes PHP" $ do
     it "include" $ do
       env <- evaluate "main.php"
-      let expectedEnv = Environment $ fromList
-            [ (qualifiedName ["foo"], addr 0)
-            ]
+      let expectedEnv = [ (qualifiedName ["foo"], addr 0) ]
       env `shouldBe` expectedEnv
 
   where
