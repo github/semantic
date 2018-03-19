@@ -1,4 +1,3 @@
-{-# LANGUAGE DeriveAnyClass #-}
 module Data.Range
 ( Range(..)
 , rangeLength
