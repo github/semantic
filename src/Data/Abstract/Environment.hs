@@ -102,7 +102,7 @@ trim :: Environment l a -> Environment l a
 trim (Environment (a :| as)) = Environment (a :| filtered)
   where filtered = filter (not . Map.null) as
 
-bind :: (Ord l, Foldable t) => t Name -> Environment l a -> Environment l a
+bind :: Foldable t => t Name -> Environment l a -> Environment l a
 bind names env = foldMap envForName names
   where envForName name = maybe mempty (curry unit name) (lookup name env)
 
