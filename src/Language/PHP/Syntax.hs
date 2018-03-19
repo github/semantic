@@ -49,7 +49,7 @@ instance Show1 Include where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Include where
   eval (Include path) = do
     let name = freeVariable (subterm path)
-    importedEnv <- isolate (require name)
+    importedEnv <- isolate (load name)
     modifyEnv (mappend importedEnv)
     unit
 
