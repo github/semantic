@@ -56,13 +56,6 @@ instance Evaluatable Include where
     where
       toName = qualifiedName . splitOnPathSeparator . dropExtension . dropRelativePrefix . stripQuotes
 
-data IncludePath a = IncludePath { includePath :: a, includePathExtension :: a }
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
-
-instance Eq1 IncludePath where liftEq          = genericLiftEq
-instance Ord1 IncludePath where liftCompare    = genericLiftCompare
-instance Show1 IncludePath where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable IncludePath
 
 newtype IncludeOnce a = IncludeOnce a
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
