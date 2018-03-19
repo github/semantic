@@ -37,9 +37,7 @@
 --
 --   Assignments can represent alternatives as either committed or uncommitted choices, both written with '<|>'. “Committed” in this context means that a failure in one of the alternatives will not result in backtracking followed by an attempt of one of the other alternatives; thus, committed choice is more efficient. (By the same token, it enables much better error messages since backtracking erases most of the relevant context.) Committed choices are constructed via the following rules:
 --
---   1. 'empty' is dropped from choices:
---   prop> empty <|> a = a -- empty is the left-identity of <|>
---   prop> a <|> empty = a -- empty is the right-identity of <|>
+--   1. 'empty' is dropped from choices.
 --
 --   2. 'symbol' rules construct a committed choice (with only a single alternative).
 --

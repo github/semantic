@@ -2,7 +2,7 @@
   (Comparison
     (Identifier)
     (Identifier))
-  (Equal
+  (Matches
     (Identifier)
     (Identifier))
   (Assignment

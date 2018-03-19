@@ -6,10 +6,9 @@ import System.Environment
 import Test.DocTest
 
 main :: IO ()
-main = getArgs >>= run
-
-run :: [String] -> IO ()
-run args = doctest (map ("-X" ++) extensions ++ args ++ ["-isrc"] ++ sources)
+main = do
+  args <- getArgs
+  doctest (map ("-X" ++) extensions ++ "-isrc" : "--fast" : if null args then ["src"] else args)
 
 extensions :: [String]
 extensions =
@@ -22,9 +21,4 @@ extensions =
   , "OverloadedStrings"
   , "RecordWildCards"
   , "StrictData"
-  ]
-
-sources :: [String]
-sources =
-  [ "src/Data/Abstract/Environment.hs"
   ]

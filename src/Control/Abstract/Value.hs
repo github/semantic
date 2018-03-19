@@ -80,7 +80,7 @@ class (Monad m, Show value) => MonadValue value m where
   -- | Construct an array of zero or more values.
   array :: [value] -> m value
 
--- | Extract a 'ByteString' from a given value.
+  -- | Extract a 'ByteString' from a given value.
   asString :: value -> m ByteString
 
   -- | Eliminate boolean values. TODO: s/boolean/truthy

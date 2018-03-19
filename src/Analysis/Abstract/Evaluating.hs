@@ -8,8 +8,6 @@ module Analysis.Abstract.Evaluating
 import Control.Abstract.Evaluator
 import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Fresh
-import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Configuration

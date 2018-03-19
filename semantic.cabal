@@ -38,8 +38,8 @@ library
                      -- Control flow
                      , Control.Effect
                      -- Effects used for program analysis
-                     , Control.Monad.Effect.Fresh
-                     , Control.Monad.Effect.NonDet
+                     , Control.Effect.Fresh
+                     , Control.Effect.NonDet
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
                      , Data.Abstract.Cache
@@ -263,8 +263,10 @@ test-suite doctests
   hs-source-dirs:      test
   main-is:             Doctests.hs
   default-language:    Haskell2010
+  ghc-options:         -dynamic -threaded -j
   build-depends:       base
                      , doctest
+                     , QuickCheck
 
 benchmark evaluation
   hs-source-dirs: bench
