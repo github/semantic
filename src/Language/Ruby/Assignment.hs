@@ -36,6 +36,7 @@ type Syntax = '[
   , Expression.Call
   , Expression.Comparison
   , Expression.Enumeration
+  , Expression.Match
   , Expression.MemberAccess
   , Expression.ScopeResolution
   , Expression.Subscript
@@ -368,7 +369,6 @@ unary = symbol Unary >>= \ location ->
   <|> children ( symbol AnonPlus *> expression )
 
 -- TODO: Distinguish `===` from `==` ?
--- TODO: Distinuish `=~` and `!~` ?
 binary :: Assignment
 binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expression
   [ (inj .) . Expression.Plus             <$ symbol AnonPlus
@@ -382,8 +382,8 @@ binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expressi
   , (inj .) . Expression.Or               <$ (symbol AnonOr <|> symbol AnonPipePipe)
   , (inj .) . Expression.BOr              <$ symbol AnonPipe
   , (inj .) . Expression.BXOr             <$ symbol AnonCaret
-  , (inj .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual <|> symbol AnonEqualTilde)
-  , (inj .) . invert Expression.Equal     <$ (symbol AnonBangEqual <|> symbol AnonBangTilde)
+  , (inj .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual)
+  , (inj .) . invert Expression.Equal     <$ symbol AnonBangEqual
   , (inj .) . Expression.LShift           <$ symbol AnonLAngleLAngle
   , (inj .) . Expression.RShift           <$ symbol AnonRAngleRAngle
   , (inj .) . Expression.Comparison       <$ symbol AnonLAngleEqualRAngle
@@ -391,6 +391,8 @@ binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expressi
   , (inj .) . Expression.GreaterThan      <$ symbol AnonRAngle
   , (inj .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
   , (inj .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
+  , (inj .) . Expression.Matches          <$ symbol AnonEqualTilde
+  , (inj .) . Expression.NotMatches       <$ symbol AnonBangTilde
   ])
   where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
