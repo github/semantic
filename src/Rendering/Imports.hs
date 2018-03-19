@@ -22,9 +22,12 @@ import Rendering.TOC (termTableOfContentsBy, declaration, getDeclaration, toCate
 
 newtype ImportSummary = ImportSummary (Map.Map T.Text Module) deriving (Eq, Show)
 
+instance Semigroup ImportSummary where
+  (<>) (ImportSummary m1) (ImportSummary m2) = ImportSummary (Map.unionWith mappend m1 m2)
+
 instance Monoid ImportSummary where
   mempty = ImportSummary mempty
-  mappend (ImportSummary m1) (ImportSummary m2) = ImportSummary (Map.unionWith mappend m1 m2)
+  mappend = (<>)
 
 instance Output ImportSummary where
   toOutput = toStrict . (<> "\n") . encode
@@ -87,9 +90,12 @@ data Module = Module
   , moduleCalls :: [CallExpression]
   } deriving (Generic, Eq, Show)
 
+instance Semigroup Module where
+  (<>) (Module n1 p1 l1 i1 d1 r1) (Module _ p2 _ i2 d2 r2) = Module n1 (p1 <> p2) l1 (i1 <> i2) (d1 <> d2) (r1 <> r2)
+
 instance Monoid Module where
   mempty = mempty
-  mappend (Module n1 p1 l1 i1 d1 r1) (Module _ p2 _ i2 d2 r2) = Module n1 (p1 <> p2) l1 (i1 <> i2) (d1 <> d2) (r1 <> r2)
+  mappend = (<>)
 
 instance ToJSON Module where
   toJSON Module{..} = object

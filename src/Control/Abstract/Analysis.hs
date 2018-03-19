@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, MultiParamTypeClasses, TypeFamilies #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For runAnalysis
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , evaluateTerm
@@ -84,7 +85,7 @@ load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup n
     -- TODO: If the set of exports is empty because no exports have been
     -- defined, do we export all terms, or no terms? This behavior varies across
     -- languages. We need better semantics rather than doing it ad-hoc.
-    filterEnv :: (Ord l) => Exports l a -> Environment l a -> Environment l a
+    filterEnv :: Exports l a -> Environment l a -> Environment l a
     filterEnv Exports{..} env
       | Map.null unExports = env
       | otherwise          = Environment $ Map.foldrWithKey maybeInsert mempty unExports
