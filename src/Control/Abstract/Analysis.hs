@@ -20,11 +20,13 @@ import qualified Control.Monad.Effect as Effect
 import Control.Monad.Effect.Fail as X
 import Control.Monad.Effect.Reader as X
 import Control.Monad.Effect.State as X
-import Data.Abstract.Environment
+import Data.Abstract.Environment (Environment)
+import qualified Data.Abstract.Environment as Env
+import Data.Abstract.Exports (Exports)
+import qualified Data.Abstract.Exports as Export
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Coerce
-import qualified Data.Map as Map
 import Prelude hiding (fail)
 import Prologue
 
@@ -44,7 +46,7 @@ class (MonadEvaluator term value m, Recursive term) => MonadAnalysis term value 
 
   -- | Isolate the given action with an empty global environment and exports.
   isolate :: m a -> m a
-  isolate = withGlobalEnv mempty . withExports mempty
+  isolate = withEnv mempty . withExports mempty
 
 -- | Evaluate a term to a value using the semantics of the current analysis.
 --
@@ -78,19 +80,17 @@ load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup n
     evalAndCache []     = pure mempty
     evalAndCache (x:xs) = do
       void $ evaluateModule x
-      env <- filterEnv <$> getExports <*> getGlobalEnv
+      env <- filterEnv <$> getExports <*> getEnv
       modifyModuleTable (moduleTableInsert name env)
       (env <>) <$> evalAndCache xs
 
     -- TODO: If the set of exports is empty because no exports have been
     -- defined, do we export all terms, or no terms? This behavior varies across
     -- languages. We need better semantics rather than doing it ad-hoc.
-    filterEnv :: Exports l a -> Environment l a -> Environment l a
-    filterEnv Exports{..} env
-      | Map.null unExports = env
-      | otherwise          = Environment $ Map.foldrWithKey maybeInsert mempty unExports
-      where maybeInsert name (alias, address) accum =
-              maybe accum (\v -> Map.insert alias v accum) (address <|> envLookup name env)
+    filterEnv :: (Ord l) => Exports l a -> Environment l a -> Environment l a
+    filterEnv ports env
+      | Export.null ports = env
+      | otherwise = Export.toEnvironment ports <> Env.overwrite (Export.aliases ports) env
 
 -- | Lift a 'SubtermAlgebra' for an underlying analysis into a containing analysis. Use this when defining an analysis which can be composed onto other analyses to ensure that a call to 'analyzeTerm' occurs in the inner analysis and not the outer one.
 liftAnalyze :: ( Coercible (  m term value (effects :: [* -> *]) value) (t m term value effects value)

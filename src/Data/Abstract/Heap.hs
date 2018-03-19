@@ -36,6 +36,10 @@ heapLookupAll address = fmap toList . heapLookup address
 heapInsert :: (Ord l, Reducer a (Cell l a)) => Address l a -> a -> Heap l a -> Heap l a
 heapInsert (Address address) value = flip snoc (address, value)
 
+-- | Manually insert a cell into the heap at a given address.
+heapInit :: Ord l => Address l a -> Cell l a -> Heap l a -> Heap l a
+heapInit (Address address) cell (Heap h) = Heap (Monoidal.insert address cell h)
+
 -- | The number of addresses extant in a 'Heap'.
 heapSize :: Heap l a -> Int
 heapSize = Monoidal.size . unStore

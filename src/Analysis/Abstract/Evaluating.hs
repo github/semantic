@@ -11,6 +11,7 @@ import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Configuration
+import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
@@ -32,6 +33,7 @@ evaluate :: forall value term effects
             , MonadAddressable (LocationFor value) value (Evaluating term value effects)
             , MonadValue value (Evaluating term value effects)
             , Recursive term
+            , Show (LocationFor value)
             )
          => term
          -> Final effects value
@@ -45,6 +47,7 @@ evaluates :: forall value term effects
              , MonadAddressable (LocationFor value) value (Evaluating term value effects)
              , MonadValue value (Evaluating term value effects)
              , Recursive term
+             , Show (LocationFor value)
              )
           => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
           -> (Blob, term)   -- Entrypoint
@@ -76,8 +79,7 @@ deriving instance Member NonDetEff effects => MonadNonDet (Evaluating term value
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value
   = '[ Fail                                        -- Failure with an error message
-     , Reader (EnvironmentFor value)               -- Local environment (e.g. binding over a closure)
-     , State  (EnvironmentFor value)               -- Global (imperative) environment
+     , State  (EnvironmentFor value)               -- Environments (both local and global)
      , State  (HeapFor value)                      -- The heap
      , Reader (ModuleTable [term])                 -- Cache of unevaluated modules
      , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
@@ -94,17 +96,19 @@ instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl ter
 
   goto label = IntMap.lookup label <$> raise get >>= maybe (fail ("unknown label: " <> show label)) pure
 
-instance Members '[State (ExportsFor value), Reader (EnvironmentFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
-  getGlobalEnv = raise get
-  putGlobalEnv = raise . put
-  withGlobalEnv s = raise . localState s . lower
+instance Members '[State (ExportsFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
+  getEnv = raise get
+  putEnv = raise . put
+  withEnv s = raise . localState s . lower
 
   getExports = raise get
   putExports = raise . put
   withExports s = raise . localState s . lower
 
-  askLocalEnv = raise ask
-  localEnv f a = raise (local f (lower a))
+  localEnv f a = do
+    modifyEnv (f . Env.push)
+    result <- a
+    result <$ modifyEnv Env.pop
 
 instance Member (State (HeapFor value)) effects => MonadHeap value (Evaluating term value effects) where
   getHeap = raise get
@@ -118,7 +122,7 @@ instance Members '[Reader (ModuleTable [term]), State (ModuleTable (EnvironmentF
   localModuleTable f a = raise (local f (lower a))
 
 instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
-  getConfiguration term = Configuration term mempty <$> askLocalEnv <*> getHeap
+  getConfiguration term = Configuration term mempty <$> getEnv <*> getHeap
 
 instance ( Evaluatable (Base term)
          , FreeVariables term
@@ -126,6 +130,7 @@ instance ( Evaluatable (Base term)
          , MonadAddressable (LocationFor value) value (Evaluating term value effects)
          , MonadValue value (Evaluating term value effects)
          , Recursive term
+         , Show (LocationFor value)
          )
          => MonadAnalysis term value (Evaluating term value effects) where
   type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value

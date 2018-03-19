@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, ViewPatterns #-}
 module Data.Syntax.Statement where
 
-import Data.Abstract.Environment
+import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
 import Prelude hiding (fail)
@@ -96,7 +96,7 @@ instance Evaluatable Assignment where
     v <- subtermValue assignmentValue
     addr <- lookupOrAlloc name
     assign addr v
-    modifyGlobalEnv (envInsert name addr)
+    modifyEnv (Env.insert name addr)
     pure v
     where name = freeVariable (subterm assignmentTarget)
 

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, ViewPatterns #-}
 module Data.Syntax.Expression where
 
 import Data.Abstract.Evaluatable
@@ -191,8 +191,10 @@ instance Eq1 MemberAccess where liftEq = genericLiftEq
 instance Ord1 MemberAccess where liftCompare = genericLiftCompare
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for MemberAccess
-instance Evaluatable MemberAccess
+instance Evaluatable MemberAccess where
+  eval (fmap subtermValue -> MemberAccess mem acc) = do
+    lhs <- mem >>= objectEnvironment
+    localEnv (mappend lhs) acc
 
 -- | Subscript (e.g a[1])
 data Subscript a

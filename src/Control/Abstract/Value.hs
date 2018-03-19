@@ -3,7 +3,7 @@ module Control.Abstract.Value where
 
 import Control.Abstract.Addressable
 import Control.Abstract.Analysis
-import Data.Abstract.Environment
+import qualified Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables
 import Data.Abstract.Number as Number
 import Data.Abstract.Type as Type
@@ -86,6 +86,12 @@ class (Monad m, Show value) => MonadValue value m where
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: value -> m a -> m a -> m a
 
+  -- | Build a class value from a name and environment.
+  klass :: Name -> EnvironmentFor value -> m value
+
+  -- | Extract the environment from a class.
+  objectEnvironment :: value -> m (EnvironmentFor value)
+
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
   abstract :: (FreeVariables term, MonadControl term m) => [Name] -> Subterm term (m value) -> m value
   -- | Evaluate an application (like a function call).
@@ -95,6 +101,7 @@ class (Monad m, Show value) => MonadValue value m where
   --
   --   The function argument takes an action which recurs through the loop.
   loop :: (m value -> m value) -> m value
+
 
 -- | Attempt to extract a 'Prelude.Bool' from a given value.
 toBool :: MonadValue value m => value -> m Bool
@@ -106,10 +113,8 @@ forLoop :: (MonadEnvironment value m, MonadValue value m)
         -> m value -- ^ Increment/stepper
         -> m value -- ^ Body
         -> m value
-forLoop initial cond step body = do
-  void initial
-  env <- getGlobalEnv
-  localEnv (mappend env) (while cond (body *> step))
+forLoop initial cond step body =
+  localize (initial *> while cond (body *> step))
 
 -- | The fundamental looping primitive, built on top of ifthenelse.
 while :: MonadValue value m
@@ -146,6 +151,12 @@ instance ( Monad m
 
   multiple = pure . injValue . Value.Tuple
   array    = pure . injValue . Value.Array
+
+  klass n  = pure . injValue . Class n
+
+  objectEnvironment o
+    | Just (Class _ env) <- prjValue o = pure env
+    | otherwise = fail ("non-object type passed to objectEnvironment: " <> show o)
 
   asString v
     | Just (Value.String n) <- prjValue v = pure n
@@ -203,6 +214,7 @@ instance ( Monad m
 
         pair = (left, right)
 
+
   liftBitwise operator target
     | Just (Value.Integer (Number.Integer i)) <- prjValue target = integer $ operator i
     | otherwise = fail ("Type error: invalid unary bitwise operation on " <> show target)
@@ -214,7 +226,7 @@ instance ( Monad m
 
   abstract names (Subterm body _) = do
     l <- label body
-    injValue . Closure names l . bindEnv (foldr Set.delete (freeVariables body) names) <$> askLocalEnv
+    injValue . Closure names l . Env.bind (foldr Set.delete (freeVariables body) names) <$> getEnv
 
   apply op params = do
     Closure names label env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
@@ -222,7 +234,7 @@ instance ( Monad m
       v <- param
       a <- alloc name
       assign a v
-      envInsert name a <$> rest) (pure env) (zip names params)
+      Env.insert name a <$> rest) (pure env) (zip names params)
     localEnv (mappend bindings) (goto label >>= evaluateTerm)
 
   loop = fix
@@ -235,7 +247,7 @@ instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, Mon
       tvar <- Var <$> fresh
       assign a tvar
       (env, tvars) <- rest
-      pure (envInsert name a env, tvar : tvars)) (pure mempty) names
+      pure (Env.insert name a env, tvar : tvars)) (pure mempty) names
     ret <- localEnv (mappend env) body
     pure (Product tvars :-> ret)
 
@@ -248,6 +260,9 @@ instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, Mon
   rational _ = pure Type.Rational
   multiple   = pure . Type.Product
   array      = pure . Type.Array
+  klass _ _  = pure Object
+
+  objectEnvironment _ = pure mempty
 
   asString _ = fail "Must evaluate to Value to use asString"
 

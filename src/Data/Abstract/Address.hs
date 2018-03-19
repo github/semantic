@@ -30,16 +30,22 @@ type family Cell l = res | res -> l where
 
 
 -- | A cell holding a single value. Writes will replace any prior value.
-newtype Latest a = Latest { unLatest :: a }
+--   This is isomorphic to 'Last' from Data.Monoid, but is more convenient
+--   because it has a 'Reducer' instance.
+newtype Latest a = Latest { unLatest :: Maybe a }
   deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
 
 instance Semigroup (Latest a) where
-  _ <> a = a
+  a <> Latest Nothing = a
+  _ <> b              = b
+
+-- | 'Option' semantics rather than that of 'Maybe', which is broken.
+instance Monoid (Latest a) where
+  mappend = (<>)
+  mempty  = Latest Nothing
 
 instance Reducer a (Latest a) where
-  unit = Latest
-  cons _ = id
-  snoc _ = unit
+  unit = Latest . Just
 
 instance Eq1 Latest where liftEq = genericLiftEq
 instance Ord1 Latest where liftCompare = genericLiftCompare

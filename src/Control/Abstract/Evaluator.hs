@@ -1,22 +1,24 @@
 {-# LANGUAGE ConstrainedClassMethods, FunctionalDependencies #-}
 module Control.Abstract.Evaluator
-( MonadEvaluator(..)
-, MonadEnvironment(..)
-, modifyGlobalEnv
-, modifyExports
-, addExport
-, MonadHeap(..)
-, modifyHeap
-, lookupHeap
-, assign
-, MonadModuleTable(..)
-, modifyModuleTable
-, MonadControl(..)
+  ( MonadEvaluator(..)
+  , MonadEnvironment(..)
+  , modifyEnv
+  , modifyExports
+  , addExport
+  , MonadHeap(..)
+  , modifyHeap
+  , localize
+  , lookupHeap
+  , assign
+  , MonadModuleTable(..)
+  , modifyModuleTable
+  , MonadControl(..)
 ) where
 
 import Data.Abstract.Address
 import Data.Abstract.Configuration
-import Data.Abstract.Environment
+import qualified Data.Abstract.Environment as Env
+import qualified Data.Abstract.Exports as Export
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
 import Data.Abstract.ModuleTable
@@ -43,12 +45,12 @@ class ( MonadControl term m
 
 -- | A 'Monad' abstracting local and global environments.
 class Monad m => MonadEnvironment value m | m -> value where
-  -- | Retrieve the global environment.
-  getGlobalEnv :: m (EnvironmentFor value)
-  -- | Set the global environment
-  putGlobalEnv :: EnvironmentFor value -> m ()
-  -- | Sets the global environment for the lifetime of the given action.
-  withGlobalEnv :: EnvironmentFor value -> m a -> m a
+  -- | Retrieve the environment.
+  getEnv :: m (EnvironmentFor value)
+  -- | Set the environment.
+  putEnv :: EnvironmentFor value -> m ()
+  -- | Sets the environment for the lifetime of the given action.
+  withEnv :: EnvironmentFor value -> m a -> m a
 
   -- | Get the global export state.
   getExports :: m (ExportsFor value)
@@ -57,26 +59,28 @@ class Monad m => MonadEnvironment value m | m -> value where
   -- | Sets the global export state for the lifetime of the given action.
   withExports :: ExportsFor value -> m a -> m a
 
-  -- | Retrieve the local environment.
-  askLocalEnv :: m (EnvironmentFor value)
   -- | Run an action with a locally-modified environment.
   localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m a -> m a
 
-  -- | Look a 'Name' up in the local environment.
-  lookupLocalEnv :: Name -> m (Maybe (Address (LocationFor value) value))
-  lookupLocalEnv name = envLookup name <$> askLocalEnv
+  -- | Look a 'Name' up in the environment.
+  lookupEnv :: Name -> m (Maybe (Address (LocationFor value) value))
+  lookupEnv name = Env.lookup name <$> getEnv
 
-  -- | Look up a 'Name' in the local environment, running an action with the resolved address (if any).
+  -- | Look up a 'Name' in the environment, running an action with the resolved address (if any).
   lookupWith :: (Address (LocationFor value) value -> m value) -> Name -> m (Maybe value)
   lookupWith with name = do
-    addr <- lookupLocalEnv name
+    addr <- lookupEnv name
     maybe (pure Nothing) (fmap Just . with) addr
 
+-- | Run a computation in a new local environment.
+localize :: MonadEnvironment value m => m a -> m a
+localize = localEnv id
+
 -- | Update the global environment.
-modifyGlobalEnv :: MonadEnvironment value m => (EnvironmentFor value -> EnvironmentFor value) -> m ()
-modifyGlobalEnv f = do
-  env <- getGlobalEnv
-  putGlobalEnv $! f env
+modifyEnv :: MonadEnvironment value m => (EnvironmentFor value -> EnvironmentFor value) -> m ()
+modifyEnv f = do
+  env <- getEnv
+  putEnv $! f env
 
 -- | Update the global export state.
 modifyExports :: MonadEnvironment value m => (ExportsFor value -> ExportsFor value) -> m ()
@@ -86,7 +90,7 @@ modifyExports f = do
 
 -- | Add an export to the global export state.
 addExport :: MonadEnvironment value m => Name -> Name -> Maybe (Address (LocationFor value) value) -> m ()
-addExport name alias = modifyExports . exportInsert name alias
+addExport name alias = modifyExports . Export.insert name alias
 
 -- | A 'Monad' abstracting a heap of values.
 class Monad m => MonadHeap value m | m -> value where
