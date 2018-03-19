@@ -59,7 +59,6 @@ instance Eq1 Arithmetic where liftEq = genericLiftEq
 instance Ord1 Arithmetic where liftCompare = genericLiftCompare
 instance Show1 Arithmetic where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Arithmetic
 instance Evaluatable Arithmetic where
   eval = traverse subtermValue >=> go where
     go (Plus a b)      = liftNumeric2 add a b  where add    = liftReal (+)
@@ -69,6 +68,19 @@ instance Evaluatable Arithmetic where
     go (Modulo a b)    = liftNumeric2 mod'' a b where mod'' = liftIntegralFrac mod mod'
     go (Power a b)     = liftNumeric2 liftedExponent a b
     go (Negate a)      = liftNumeric negate a
+
+-- | Regex matching operators (Ruby's =~ and ~!)
+data Match a
+  = Matches !a !a
+  | NotMatches !a !a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 Match where liftEq = genericLiftEq
+instance Ord1 Match where liftCompare = genericLiftCompare
+instance Show1 Match where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for Match
+instance Evaluatable Match
 
 -- | Boolean operators.
 data Boolean a
