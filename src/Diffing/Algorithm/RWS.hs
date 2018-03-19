@@ -1,4 +1,5 @@
 {-# LANGUAGE GADTs, DataKinds, RankNTypes, TypeOperators #-}
+{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-} -- FIXME
 module Diffing.Algorithm.RWS
 ( rws
 , Options(..)
@@ -98,7 +99,7 @@ defaultP = 0
 defaultQ = 3
 
 
-toKdMap :: Functor syntax => [(Int, Term syntax (Record (FeatureVector ': fields)))] -> KdMap.KdMap Double FeatureVector (Int, Term syntax (Record (FeatureVector ': fields)))
+toKdMap :: [(Int, Term syntax (Record (FeatureVector ': fields)))] -> KdMap.KdMap Double FeatureVector (Int, Term syntax (Record (FeatureVector ': fields)))
 toKdMap = KdMap.build unFV . fmap (rhead . termAnnotation . snd &&& id)
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
@@ -134,8 +135,7 @@ pqGramDecorator getLabel p q = cata algebra
     gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
     assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
 
-    assignLabels :: Functor f
-                 => label
+    assignLabels :: label
                  -> Term f (Record (Gram label ': fields))
                  -> State [Maybe label] (Term f (Record (Gram label ': fields)))
     assignLabels label (Term.Term (In (gram :. rest) functor)) = do
