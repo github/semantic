@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedLists, TypeApplications #-}
+{-# LANGUAGE OverloadedLists #-}
 module Analysis.Go.Spec (spec) where
 
 import Data.Abstract.Value
