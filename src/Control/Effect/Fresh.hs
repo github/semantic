@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
-module Control.Monad.Effect.Fresh where
+module Control.Effect.Fresh where
 
 import Control.Effect
 import Control.Monad.Effect.Internal
