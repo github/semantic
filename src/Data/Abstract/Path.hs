@@ -3,7 +3,6 @@ module Data.Abstract.Path where
 import Prologue
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString as B
-import Data.Char (ord)
 
 -- | Split a 'ByteString' path on `/`, stripping quotes and any `./` prefix.
 splitOnPathSeparator :: ByteString -> [ByteString]
@@ -13,7 +12,7 @@ splitOnPathSeparator' :: (ByteString -> ByteString) -> ByteString -> [ByteString
 splitOnPathSeparator' f = BC.split '/' . f . dropRelativePrefix . stripQuotes
 
 stripQuotes :: ByteString -> ByteString
-stripQuotes = B.filter (/= fromIntegral (ord '\"'))
+stripQuotes = B.filter (`B.notElem` "\'\"")
 
 dropRelativePrefix :: ByteString -> ByteString
 dropRelativePrefix = BC.dropWhile (== '/') . BC.dropWhile (== '.')
