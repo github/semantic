@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, GADTs, InstanceSigs, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For HasCallStack
 -- | Assignment of AST onto some other structure (typically terms).
 --
 --   Parsing yields an AST represented as a Rose tree labelled with symbols in the language’s grammar and source locations (byte Range and Span). An Assignment represents a (partial) map from AST nodes onto some other structure; in essence, it’s a parser that operates over trees. (For our purposes, this structure is typically Terms annotated with source locations.) Assignments are able to match based on symbol, sequence, and hierarchy; thus, in @x = y@, both @x@ and @y@ might have the same symbol, @Identifier@, the left can be assigned to a variable declaration, while the right can be assigned to a variable reference.
@@ -36,9 +37,7 @@
 --
 --   Assignments can represent alternatives as either committed or uncommitted choices, both written with '<|>'. “Committed” in this context means that a failure in one of the alternatives will not result in backtracking followed by an attempt of one of the other alternatives; thus, committed choice is more efficient. (By the same token, it enables much better error messages since backtracking erases most of the relevant context.) Committed choices are constructed via the following rules:
 --
---   1. 'empty' is dropped from choices:
---   prop> empty <|> a = a -- empty is the left-identity of <|>
---   prop> a <|> empty = a -- empty is the right-identity of <|>
+--   1. 'empty' is dropped from choices.
 --
 --   2. 'symbol' rules construct a committed choice (with only a single alternative).
 --
@@ -303,7 +302,7 @@ instance (Enum grammar, Eq1 ast, Ix grammar) => Semigroup (Assignment ast gramma
 
 instance (Enum grammar, Eq1 ast, Ix grammar) => Monoid (Assignment ast grammar a) where
   mempty = empty
-  mappend = (<|>)
+  mappend = (<>)
 
 instance (Enum grammar, Eq1 ast, Ix grammar) => Alternative (Assignment ast grammar) where
   empty :: HasCallStack => Assignment ast grammar a

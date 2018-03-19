@@ -21,7 +21,7 @@ newtype CallGraph = CallGraph { unCallGraph :: G.Graph Name }
   deriving (Eq, Graph, Show)
 
 -- | Build the 'CallGraph' for a 'Term' recursively.
-buildCallGraph :: (CallGraphAlgebra syntax, Foldable syntax, FreeVariables1 syntax, Functor syntax) => Term syntax ann -> Set Name -> CallGraph
+buildCallGraph :: (CallGraphAlgebra syntax, FreeVariables1 syntax, Functor syntax) => Term syntax ann -> Set Name -> CallGraph
 buildCallGraph = foldSubterms callGraphAlgebra
 
 
@@ -91,10 +91,12 @@ type family CallGraphAlgebraStrategy syntax where
   CallGraphAlgebraStrategy (TermF f a) = 'Custom
   CallGraphAlgebraStrategy a = 'Default
 
+instance Semigroup CallGraph where
+  (<>) = overlay
 
 instance Monoid CallGraph where
   mempty = empty
-  mappend = overlay
+  mappend = (<>)
 
 instance Ord CallGraph where
   compare (CallGraph G.Empty)           (CallGraph G.Empty)           = EQ

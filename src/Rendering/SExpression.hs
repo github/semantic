@@ -20,7 +20,7 @@ renderSExpressionDiff diff = cata printDiffF diff 0 <> "\n"
 renderSExpressionTerm :: (ConstrainAll Show fields, Foldable syntax, Functor syntax) => Term syntax (Record fields) -> ByteString
 renderSExpressionTerm term = cata (\ term n -> nl n <> replicate (2 * n) ' ' <> printTermF term n) term 0 <> "\n"
 
-printDiffF :: (ConstrainAll Show fields, Foldable syntax, Functor syntax) => DiffF syntax (Record fields) (Record fields) (Int -> ByteString) -> Int -> ByteString
+printDiffF :: (ConstrainAll Show fields, Foldable syntax) => DiffF syntax (Record fields) (Record fields) (Int -> ByteString) -> Int -> ByteString
 printDiffF diff n = case diff of
   Patch (Delete term) -> nl n <> pad (n - 1) <> "{-" <> printTermF term n <> "-}"
   Patch (Insert term) -> nl n <> pad (n - 1) <> "{+" <> printTermF term n <> "+}"
@@ -28,7 +28,7 @@ printDiffF diff n = case diff of
                               <> nl (n + 1) <> pad (n - 1) <> "->" <> printTermF term2 n <> " }"
   Merge (In (_, ann) syntax) -> nl n <> pad n <> "(" <> showAnnotation ann <> foldMap (\ d -> d (n + 1)) syntax <> ")"
 
-printTermF :: (ConstrainAll Show fields, Foldable syntax, Functor syntax) => TermF syntax (Record fields) (Int -> ByteString) -> Int -> ByteString
+printTermF :: (ConstrainAll Show fields, Foldable syntax) => TermF syntax (Record fields) (Int -> ByteString) -> Int -> ByteString
 printTermF (In annotation syntax) n = "(" <> showAnnotation annotation <> foldMap (\t -> t (n + 1)) syntax <> ")"
 
 nl :: Int -> ByteString

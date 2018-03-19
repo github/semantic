@@ -80,7 +80,7 @@ class (Monad m, Show value) => MonadValue value m where
   -- | Construct an array of zero or more values.
   array :: [value] -> m value
 
--- | Extract a 'ByteString' from a given value.
+  -- | Extract a 'ByteString' from a given value.
   asString :: value -> m ByteString
 
   -- | Eliminate boolean values. TODO: s/boolean/truthy
@@ -101,10 +101,10 @@ toBool :: MonadValue value m => value -> m Bool
 toBool v = ifthenelse v (pure True) (pure False)
 
 forLoop :: (MonadEnvironment value m, MonadValue value m)
-        => m value -- | Initial statement
-        -> m value -- | Condition
-        -> m value -- | Increment/stepper
-        -> m value -- | Body
+        => m value -- ^ Initial statement
+        -> m value -- ^ Condition
+        -> m value -- ^ Increment/stepper
+        -> m value -- ^ Body
         -> m value
 forLoop initial cond step body = do
   void initial
@@ -133,7 +133,6 @@ doWhile body cond = loop $ \ continue -> body *> do
 instance ( Monad m
          , MonadAddressable location Value m
          , MonadAnalysis term Value m
-         , Show location
          )
          => MonadValue Value m where
 
@@ -249,6 +248,8 @@ instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, Mon
   rational _ = pure Type.Rational
   multiple   = pure . Type.Product
   array      = pure . Type.Array
+
+  asString _ = fail "Must evaluate to Value to use asString"
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 
