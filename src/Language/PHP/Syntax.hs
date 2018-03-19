@@ -52,7 +52,7 @@ instance Evaluatable Include where
   eval (Include path) = do
     let name = freeVariable (subterm path)
     importedEnv <- isolate (require name)
-    modifyGlobalEnv (flip (Map.foldrWithKey envInsert) (unEnvironment importedEnv))
+    modifyEnv (mappend importedEnv)
     unit
 
 data IncludePath a = IncludePath { includePath :: a, includePathExtension :: a }
