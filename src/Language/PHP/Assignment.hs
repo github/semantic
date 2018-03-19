@@ -454,10 +454,12 @@ relativeScope :: Assignment
 relativeScope = makeTerm <$> symbol RelativeScope <*> (Syntax.RelativeScope <$> source)
 
 qualifiedName :: Assignment
-qualifiedName = makeTerm <$> symbol QualifiedName <*> children (Syntax.QualifiedName <$> (term namespaceNameAsPrefix <|> emptyTerm) <*> term name)
-
-namespaceNameAsPrefix :: Assignment
-namespaceNameAsPrefix = symbol NamespaceNameAsPrefix *> children (term namespaceName <|> emptyTerm)
+qualifiedName = makeTerm <$> symbol QualifiedName <*> children (Syntax.Identifier . FV.qualifiedName <$> names)
+  where
+    names = (\a b -> a <> [b]) <$> (namespaceNameAsPrefix <|> pure []) <*> name'
+    namespaceNameAsPrefix = symbol NamespaceNameAsPrefix *> children (namespaceName' <|> pure [])
+    namespaceName' = symbol NamespaceName *> children (some name')
+    name' = (symbol Name <|> symbol Name') *> source
 
 namespaceName :: Assignment
 namespaceName = makeTerm <$> symbol NamespaceName <*> children (Syntax.NamespaceName <$> someTerm name)
