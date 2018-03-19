@@ -1,11 +1,9 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.PHP.Syntax where
 
-import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
 import Prologue hiding (Text)
-import qualified Data.Map as Map
 
 newtype Text a = Text ByteString
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
