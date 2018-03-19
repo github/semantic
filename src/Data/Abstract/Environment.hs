@@ -7,11 +7,11 @@ module Data.Abstract.Environment
   , head
   , insert
   , lookup
+  , mergeBindings
   , names
   , pairs
   , pop
   , push
-  , rename
   , roots
   ) where
 
@@ -111,9 +111,9 @@ names :: Environment l a -> [Name]
 names = fmap fst . pairs
 
 -- TODO: rename this, because it both filters and renames
-rename :: [(Name, Name)] -> Environment l a -> Environment l a
-rename pairs env = foldMap rename pairs where
-  rename (k, v) = case lookup k env of
+mergeBindings :: [(Name, Name)] -> Environment l a -> Environment l a
+mergeBindings pairs env = foldMap go pairs where
+  go (k, v) = case lookup k env of
     Nothing   -> mempty
     Just addr -> unit (v, addr)
 
