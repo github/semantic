@@ -1,5 +1,5 @@
 {-# LANGUAGE TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Control.Monad.Effect.NonDet
+module Control.Effect.NonDet
 ( MonadNonDet(..)
 , NonDetEff
 ) where
