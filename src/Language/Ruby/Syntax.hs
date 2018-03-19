@@ -19,10 +19,12 @@ instance Show1 Require where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Require where
   eval (Require _ x) = do
-    name <- pathToQualifiedName <$> (subtermValue x >>= asString)
+    name <- toName <$> (subtermValue x >>= asString)
     importedEnv <- isolate (require name)
     modifyEnv (mappend importedEnv)
     unit
+    where
+      toName = qualifiedName . splitOnPathSeparator . dropRelativePrefix . stripQuotes
 
 newtype Load a = Load { loadArgs :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -43,10 +45,10 @@ instance Evaluatable Load where
 
 doLoad :: (MonadAnalysis term value m, MonadValue value m, Ord (LocationFor value)) => ByteString -> Bool -> m value
 doLoad path shouldWrap = do
-  let name = pathToQualifiedName path
-  importedEnv <- isolate (load name)
+  importedEnv <- isolate (load (toName path))
   unless shouldWrap $ modifyEnv (mappend importedEnv)
   unit
-  where pathToQualifiedName = qualifiedName . splitOnPathSeparator' dropExtension
+  where
+    toName = qualifiedName . splitOnPathSeparator . dropExtension . dropRelativePrefix . stripQuotes
 
 -- TODO: autoload

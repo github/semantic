@@ -4,12 +4,8 @@ import Prologue
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString as B
 
--- | Split a 'ByteString' path on `/`, stripping quotes and any `./` prefix.
 splitOnPathSeparator :: ByteString -> [ByteString]
-splitOnPathSeparator = splitOnPathSeparator' id
-
-splitOnPathSeparator' :: (ByteString -> ByteString) -> ByteString -> [ByteString]
-splitOnPathSeparator' f = BC.split '/' . f . dropRelativePrefix . stripQuotes
+splitOnPathSeparator = BC.split '/'
 
 stripQuotes :: ByteString -> ByteString
 stripQuotes = B.filter (`B.notElem` "\'\"")

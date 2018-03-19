@@ -393,7 +393,7 @@ importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTe
     namedImport = inj <$> (flip Declaration.QualifiedImport <$> packageIdentifier <*> importFromPath <*> pure [])
     -- `import "lib/Math"`
     plainImport = inj <$> (symbol InterpretedStringLiteral >>= \loc -> do
-      names <- splitOnPathSeparator <$> source
+      names <- toName <$> source
       let from = makeTerm loc (Syntax.Identifier (qualifiedName names))
       let alias = makeTerm loc (Syntax.Identifier (name (last names))) -- Go takes `import "lib/Math"` and uses `Math` as the qualified name (e.g. `Math.Sin()`)
       Declaration.QualifiedImport <$> pure from <*> pure alias <*> pure [])
@@ -403,7 +403,11 @@ importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTe
     underscore = makeTerm <$> symbol BlankIdentifier <*> (Literal.TextElement <$> source)
     importSpec     = makeTerm' <$> symbol ImportSpec <*> children (sideEffectImport <|> dotImport <|> namedImport <|> plainImport)
     importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyTerm (importSpec <|> comment))
-    importFromPath = makeTerm <$> symbol InterpretedStringLiteral <*> (Syntax.Identifier <$> (pathToQualifiedName <$> source))
+    importFromPath = makeTerm <$> symbol InterpretedStringLiteral <*> (Syntax.Identifier <$> (toQualifiedName <$> source))
+
+    toQualifiedName = qualifiedName . toName
+    toName = splitOnPathSeparator . dropRelativePrefix . stripQuotes
+
 
 indexExpression :: Assignment
 indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)
