@@ -36,9 +36,9 @@ type Syntax =
    , Declaration.Comprehension
    , Declaration.Decorator
    , Declaration.Function
+   , Declaration.Import
    , Declaration.QualifiedImport
    , Declaration.Variable
-   , Declaration.WildcardImport
    , Expression.Arithmetic
    , Expression.Boolean
    , Expression.Bitwise
@@ -385,22 +385,24 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 import' :: Assignment
 import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliasedImport <|> plainImport))
-        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.QualifiedImport <$> (identifier <|> emptyTerm) <*> emptyTerm <*> some (aliasImportSymbol <|> importSymbol))
-        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.WildcardImport <$> identifier <*> wildcard)
+        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> (identifier <|> emptyTerm) <*> (wildcard <|> (some (aliasImportSymbol <|> importSymbol))) <*> emptyTerm)
   where
+    -- `import a as b`
+    aliasedImport = makeImport <$> symbol AliasedImport <*> children ((,) <$> expression <*> (Just <$> expression))
+    -- `import a`
+    plainImport = makeImport <$> location <*> ((,) <$> identifier <*> pure Nothing)
+    -- `from a import foo `
+    importSymbol = makeNameAliasPair <$> rawIdentifier <*> pure Nothing
+    -- `from a import foo as bar`
+    aliasImportSymbol = symbol AliasedImport *> children (makeNameAliasPair <$> rawIdentifier <*> (Just <$> rawIdentifier))
+    -- `from a import *`
+    wildcard = symbol WildcardImport *> source *> pure []
+
     rawIdentifier = (name <$> identifier') <|> (qualifiedName <$> dottedName')
     dottedName' = symbol DottedName *> children (some identifier')
     identifier' = (symbol Identifier <|> symbol Identifier') *> source
-
     makeNameAliasPair from (Just alias) = (from, alias)
     makeNameAliasPair from Nothing = (from, from)
-    importSymbol = makeNameAliasPair <$> rawIdentifier <*> pure Nothing
-    aliasImportSymbol = symbol AliasedImport *> children (makeNameAliasPair <$> rawIdentifier <*> (Just <$> rawIdentifier))
-
-    wildcard = makeTerm <$> symbol WildcardImport <*> (Syntax.Identifier <$> (name <$> source))
-
-    aliasedImport = makeImport <$> symbol AliasedImport <*> children ((,) <$> expression <*> (Just <$> expression))
-    plainImport = makeImport <$> location <*> ((,) <$> identifier <*> pure Nothing)
     makeImport loc (from, Just alias) = makeTerm loc (Declaration.QualifiedImport from alias [])
     makeImport loc (from, Nothing) = makeTerm loc (Declaration.QualifiedImport from from [])
 

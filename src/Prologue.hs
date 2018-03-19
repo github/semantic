@@ -8,6 +8,7 @@ module Prologue
 
 
 import Data.Bifunctor.Join as X
+import Data.Bits as X
 import Data.ByteString as X (ByteString)
 import Data.Functor.Both as X (Both, runBothWith, both)
 import Data.IntMap as X (IntMap)

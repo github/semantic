@@ -4,9 +4,9 @@
   (QualifiedImport
     (Identifier)
     (Identifier))
-  (WildcardImport
+  (Import
     (Identifier)
-    (Identifier))
+    (TextElement))
   (QualifiedImport
     (Identifier)
     (Identifier))

@@ -1,4 +1,3 @@
-{-# LANGUAGE TypeApplications #-}
 module Analysis.TypeScript.Spec (spec) where
 
 import Data.Abstract.Value
@@ -31,12 +30,18 @@ spec = parallel $ do
       env <- evaluate "main2.ts"
       env `shouldBe` Environment (fromList [])
 
+    it "fails exporting symbols not defined in the module" $ do
+      env <- fst <$> evaluate' "bad-export.ts"
+      env `shouldBe` Left "module \"foo\" does not export \"pip\""
+
   where
     addr = Address . Precise
     fixtures = "test/fixtures/typescript/analysis/"
-    evaluate entry = snd . fst . fst . fst . fst <$>
+    evaluate entry = snd <$> evaluate' entry
+    evaluate' entry = fst . fst . fst . fst <$>
       evaluateFiles typescriptParser
         [ fixtures <> entry
         , fixtures <> "a.ts"
         , fixtures <> "foo.ts"
+        , fixtures <> "pip.ts"
         ]

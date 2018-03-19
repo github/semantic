@@ -1,4 +1,3 @@
-{-# LANGUAGE TypeApplications #-}
 module Analysis.Python.Spec (spec) where
 
 import Data.Abstract.Value
