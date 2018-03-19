@@ -6,6 +6,10 @@ import Data.Abstract.Path
 import Diffing.Algorithm
 import Prologue hiding (Text)
 
+
+toQualifiedName :: ByteString -> Name
+toQualifiedName = qualifiedName . splitOnPathSeparator . dropExtension . dropRelativePrefix . stripQuotes
+
 newtype Text a = Text ByteString
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
@@ -49,13 +53,10 @@ instance Show1 Include where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Include where
   eval (Include path) = do
-    name <- toName <$> (subtermValue path >>= asString)
+    name <- toQualifiedName <$> (subtermValue path >>= asString)
     importedEnv <- isolate (load name)
     modifyEnv (mappend importedEnv)
     unit
-    where
-      toName = qualifiedName . splitOnPathSeparator . dropExtension . dropRelativePrefix . stripQuotes
-
 
 newtype IncludeOnce a = IncludeOnce a
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
