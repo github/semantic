@@ -262,7 +262,7 @@ test-suite doctests
   hs-source-dirs:      test
   main-is:             Doctests.hs
   default-language:    Haskell2010
-  ghc-options:         -dynamic
+  ghc-options:         -dynamic -threaded
   build-depends:       base
                      , doctest
                      , QuickCheck
