@@ -2,6 +2,7 @@
 module Language.PHP.Syntax where
 
 import Data.Abstract.Evaluatable
+import Data.Abstract.Path
 import Diffing.Algorithm
 import Prologue hiding (Text)
 
@@ -48,10 +49,12 @@ instance Show1 Include where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Include where
   eval (Include path) = do
-    let name = freeVariable (subterm path)
+    name <- toName <$> (subtermValue path >>= asString)
     importedEnv <- isolate (load name)
     modifyEnv (mappend importedEnv)
     unit
+    where
+      toName = qualifiedName . splitOnPathSeparator . dropExtension . dropRelativePrefix . stripQuotes
 
 data IncludePath a = IncludePath { includePath :: a, includePathExtension :: a }
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
