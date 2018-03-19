@@ -13,7 +13,7 @@ data SplitPatch a
   deriving (Foldable, Eq, Functor, Show, Traversable)
 
 -- | Get the range of a SplitDiff.
-getRange :: Functor f => HasField fields Range => SplitDiff f (Record fields) -> Range
+getRange :: HasField fields Range => SplitDiff f (Record fields) -> Range
 getRange diff = getField $ case diff of
   Free annotated -> termFAnnotation annotated
   Pure patch -> termAnnotation (splitTerm patch)

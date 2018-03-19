@@ -181,16 +181,16 @@ library
                      , tree-sitter-ruby
                      , tree-sitter-typescript
   default-language:    Haskell2010
-  default-extensions: DeriveFoldable
-                    , DeriveFunctor
-                    , DeriveGeneric
-                    , DeriveTraversable
-                    , FlexibleContexts
-                    , FlexibleInstances
-                    , OverloadedStrings
-                    , RecordWildCards
-                    , StrictData
-  ghc-options:         -Wall -fno-warn-name-shadowing -O -j
+  default-extensions:  DeriveFoldable
+                     , DeriveFunctor
+                     , DeriveGeneric
+                     , DeriveTraversable
+                     , FlexibleContexts
+                     , FlexibleInstances
+                     , OverloadedStrings
+                     , RecordWildCards
+                     , StrictData
+  ghc-options:         -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O -j
   ghc-prof-options:    -fprof-auto
 
 executable semantic
