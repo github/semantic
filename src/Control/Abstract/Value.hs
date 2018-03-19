@@ -133,7 +133,6 @@ doWhile body cond = loop $ \ continue -> body *> do
 instance ( Monad m
          , MonadAddressable location Value m
          , MonadAnalysis term Value m
-         , Show location
          )
          => MonadValue Value m where
 
@@ -249,6 +248,8 @@ instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, Mon
   rational _ = pure Type.Rational
   multiple   = pure . Type.Product
   array      = pure . Type.Array
+
+  asString _ = fail "Must evaluate to Value to use asString"
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 

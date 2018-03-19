@@ -1,5 +1,6 @@
 module Data.Range
 ( Range(..)
+, emptyRange
 , rangeLength
 , offsetRange
 , intersectsRange
@@ -13,6 +14,9 @@ import Data.JSON.Fields
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: {-# UNPACK #-} !Int, end :: {-# UNPACK #-} !Int }
   deriving (Eq, Show, Generic)
+
+emptyRange :: Range
+emptyRange = Range 0 0
 
 -- | Return the length of the range.
 rangeLength :: Range -> Int
