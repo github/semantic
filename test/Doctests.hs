@@ -8,7 +8,7 @@ import Test.DocTest
 main :: IO ()
 main = do
   args <- getArgs
-  doctest (map ("-X" ++) extensions ++ args ++ "-isrc" : if null args then ["src"] else args)
+  doctest (map ("-X" ++) extensions ++ "-isrc" : if null args then ["src"] else args)
 
 extensions :: [String]
 extensions =
