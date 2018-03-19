@@ -265,6 +265,7 @@ test-suite doctests
   ghc-options:         -dynamic
   build-depends:       base
                      , doctest
+                     , QuickCheck
 
 benchmark evaluation
   hs-source-dirs: bench
