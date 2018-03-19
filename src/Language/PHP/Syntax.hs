@@ -2,13 +2,11 @@
 module Language.PHP.Syntax where
 
 import Data.Abstract.Evaluatable
+import Data.Abstract.Value (LocationFor)
 import Data.Abstract.Path
 import Diffing.Algorithm
 import Prologue hiding (Text)
 
-
-toQualifiedName :: ByteString -> Name
-toQualifiedName = qualifiedName . splitOnPathSeparator . dropExtension . dropRelativePrefix . stripQuotes
 
 newtype Text a = Text ByteString
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -28,13 +26,22 @@ instance Show1 VariableName where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable VariableName
 
 
-newtype RequireOnce a = RequireOnce a
-  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+toQualifiedName :: ByteString -> Name
+toQualifiedName = qualifiedName . splitOnPathSeparator . dropExtension . dropRelativePrefix . stripQuotes
 
-instance Eq1 RequireOnce where liftEq = genericLiftEq
-instance Ord1 RequireOnce where liftCompare = genericLiftCompare
-instance Show1 RequireOnce where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable RequireOnce
+doInclude :: (MonadValue value m, MonadAnalysis term value m, Ord (LocationFor value)) => Subterm t (m value) -> m value
+doInclude path = do
+  name <- toQualifiedName <$> (subtermValue path >>= asString)
+  importedEnv <- isolate (load name)
+  modifyEnv (mappend importedEnv)
+  unit
+
+doIncludeOnce :: (MonadValue value m, MonadAnalysis term value m, Ord (LocationFor value)) => Subterm t (m value) -> m value
+doIncludeOnce path = do
+  name <- toQualifiedName <$> (subtermValue path >>= asString)
+  importedEnv <- isolate (require name)
+  modifyEnv (mappend importedEnv)
+  unit
 
 newtype Require a = Require a
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -42,7 +49,21 @@ newtype Require a = Require a
 instance Eq1 Require where liftEq          = genericLiftEq
 instance Ord1 Require where liftCompare    = genericLiftCompare
 instance Show1 Require where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable Require
+
+instance Evaluatable Require where
+  eval (Require path) = doInclude path
+
+
+newtype RequireOnce a = RequireOnce a
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 RequireOnce where liftEq = genericLiftEq
+instance Ord1 RequireOnce where liftCompare = genericLiftCompare
+instance Show1 RequireOnce where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable RequireOnce where
+  eval (RequireOnce path) = doIncludeOnce path
+
 
 newtype Include a = Include a
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -52,11 +73,8 @@ instance Ord1 Include where liftCompare    = genericLiftCompare
 instance Show1 Include where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Include where
-  eval (Include path) = do
-    name <- toQualifiedName <$> (subtermValue path >>= asString)
-    importedEnv <- isolate (load name)
-    modifyEnv (mappend importedEnv)
-    unit
+  eval (Include path) = doInclude path
+
 
 newtype IncludeOnce a = IncludeOnce a
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -64,7 +82,10 @@ newtype IncludeOnce a = IncludeOnce a
 instance Eq1 IncludeOnce where liftEq          = genericLiftEq
 instance Ord1 IncludeOnce where liftCompare    = genericLiftCompare
 instance Show1 IncludeOnce where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable IncludeOnce
+
+instance Evaluatable IncludeOnce where
+  eval (IncludeOnce path) = doIncludeOnce path
+
 
 newtype ArrayElement a = ArrayElement a
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
