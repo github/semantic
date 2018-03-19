@@ -1,9 +1,11 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.PHP.Syntax where
 
+import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
 import Prologue hiding (Text)
+import qualified Data.Map as Map
 
 newtype Text a = Text ByteString
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -45,7 +47,21 @@ newtype Include a = Include a
 instance Eq1 Include where liftEq          = genericLiftEq
 instance Ord1 Include where liftCompare    = genericLiftCompare
 instance Show1 Include where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable Include
+
+instance Evaluatable Include where
+  eval (Include path) = do
+    let name = freeVariable (subterm path)
+    importedEnv <- isolate (require name)
+    modifyGlobalEnv (flip (Map.foldrWithKey envInsert) (unEnvironment importedEnv))
+    unit
+
+data IncludePath a = IncludePath { includePath :: a, includePathExtension :: a }
+  deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 IncludePath where liftEq          = genericLiftEq
+instance Ord1 IncludePath where liftCompare    = genericLiftCompare
+instance Show1 IncludePath where liftShowsPrec = genericLiftShowsPrec
+instance Evaluatable IncludePath
 
 newtype IncludeOnce a = IncludeOnce a
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

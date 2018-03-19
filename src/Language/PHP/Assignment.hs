@@ -13,6 +13,7 @@ import Language.PHP.Grammar as Grammar
 import Prologue
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Abstract.FreeVariables as FV
+import qualified Data.Abstract.Path as Path
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -715,8 +716,11 @@ arrayElementInitializer :: Assignment
 arrayElementInitializer = makeTerm <$> symbol ArrayElementInitializer <*> children (Literal.KeyValue <$> term expression <*> term expression) <|> (symbol ArrayElementInitializer *> children (term expression))
 
 includeExpression :: Assignment
-includeExpression = makeTerm <$> symbol IncludeExpression <*> children (Syntax.Include <$> term expression)
+includeExpression = makeTerm <$> symbol IncludeExpression <*> children (Syntax.Include <$> term includePath)
 
+-- TODO: Dropping the .php file extension here means we loose diff-ability.
+includePath :: Assignment
+includePath = makeTerm <$> symbol Grammar.String <*> (Syntax.Identifier . FV.pathToQualifiedName . Path.dropExtension <$> source)
 
 includeOnceExpression :: Assignment
 includeOnceExpression = makeTerm <$> symbol IncludeOnceExpression <*> children (Syntax.IncludeOnce <$> term expression)
