@@ -378,4 +378,3 @@ instance (Enum grammar, Ix grammar, Show grammar, Show1 ast) => Show1 (Assignmen
           showChildren = liftShowList sp sl
 
 {-# ANN module ("HLint: ignore Avoid return" :: String) #-}
-{-# ANN module ("HLint: ignore Parse error" :: String)  #-}

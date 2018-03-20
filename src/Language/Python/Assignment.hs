@@ -512,5 +512,3 @@ infixTerm :: HasCallStack
           -> [Assignment.Assignment [] Grammar (Term -> Term -> Union Syntax Term)]
           -> Assignment.Assignment [] Grammar (Union Syntax Term)
 infixTerm = infixContext comment
-
-{-# ANN module ("HLint: ignore Parse error" :: String) #-}
