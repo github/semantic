@@ -121,7 +121,7 @@ expressionChoices =
   , mk Yield Statement.Yield
   , module'
   , pair
-  , parenthesized_expressions
+  , parenthesizedExpressions
   , parseError
   , rescue
   , scopeResolution
@@ -140,8 +140,8 @@ expressionChoices =
 expressions :: Assignment
 expressions = makeTerm'' <$> location <*> many expression
 
-parenthesized_expressions :: Assignment
-parenthesized_expressions = makeTerm'' <$> symbol ParenthesizedStatements <*> children (many expression)
+parenthesizedExpressions :: Assignment
+parenthesizedExpressions = makeTerm'' <$> symbol ParenthesizedStatements <*> children (many expression)
 
 identifier :: Assignment
 identifier =
@@ -241,7 +241,7 @@ lambda = makeTerm <$> symbol Lambda <*> children (
 block :: Assignment
 block =  makeTerm <$> symbol DoBlock <*> children (Declaration.Function <$> pure [] <*> emptyTerm <*> params <*> expressions)
      <|> makeTerm <$> symbol Block <*> children (Declaration.Function <$> pure [] <*> emptyTerm <*> params <*> expressions)
-  where params = (symbol BlockParameters) *> children (many parameter) <|> pure []
+  where params = symbol BlockParameters *> children (many parameter) <|> pure []
 
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
@@ -281,14 +281,14 @@ until' =
 
 for :: Assignment
 for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> (makeTerm <$> location <*> manyTermsTill expression (symbol In)) <*> inClause <*> expressions)
-  where inClause = symbol In *> children (expression)
+  where inClause = symbol In *> children expression
 
 case' :: Assignment
 case' = makeTerm <$> symbol Case <*> children (Statement.Match <$> (symbol When *> emptyTerm <|> expression) <*> whens)
   where
     whens = makeTerm <$> location <*> many (when' <|> else' <|> expression)
-    when' = makeTerm <$> symbol When <*> children (Statement.Pattern <$> (makeTerm <$> location <*> some pattern) <*> whens)
-    pattern = postContextualize comment (symbol Pattern *> children ((symbol SplatArgument *> children expression) <|> expression))
+    when' = makeTerm <$> symbol When <*> children (Statement.Pattern <$> (makeTerm <$> location <*> some pattern') <*> whens)
+    pattern' = postContextualize comment (symbol Pattern *> children ((symbol SplatArgument *> children expression) <|> expression))
     else' = postContextualize comment (symbol Else *> children expressions)
 
 subscript :: Assignment
@@ -303,11 +303,11 @@ methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> 
     regularCall = inj <$> (Expression.Call <$> pure [] <*> expression <*> args <*> (block <|> emptyTerm))
     require = inj <$> (symbol Identifier *> do
       s <- source
-      guard (elem s ["require", "require_relative"])
+      guard (s `elem` ["require", "require_relative"])
       Ruby.Syntax.Require (s == "require_relative") <$> nameExpression)
     load = inj <$> (symbol Identifier *> do
       s <- source
-      guard (elem s ["load"])
+      guard (s == "load")
       Ruby.Syntax.Load <$> loadArgs)
     args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> pure []
     loadArgs = (symbol ArgumentList <|> symbol ArgumentListWithParens)  *> children (some expression)
@@ -316,7 +316,7 @@ methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> 
 call :: Assignment
 call = makeTerm <$> symbol Call <*> children (Expression.MemberAccess <$> expression <*> (expression <|> args))
   where
-    args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (expressions)
+    args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expressions
 
 rescue :: Assignment
 rescue =  rescue'
@@ -350,7 +350,7 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
                 , assign Expression.BXOr      <$ symbol AnonCaretEqual
                 ])
   where
-    assign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
+    assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
     assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
 
     lhs  = makeTerm <$> symbol LeftAssignmentList  <*> children (many expr) <|> expr
@@ -423,3 +423,5 @@ infixTerm :: HasCallStack
           -> [Assignment.Assignment [] Grammar (Term -> Term -> Union Syntax Term)]
           -> Assignment.Assignment [] Grammar (Union Syntax Term)
 infixTerm = infixContext comment
+
+{-# ANN module ("HLint: ignore Eta reduce" :: String) #-}
