@@ -108,9 +108,6 @@ load' name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup 
     evalAndCache []     = (,) <$> pure mempty <*> unit
     evalAndCache [x]    = evalAndCache' x
     evalAndCache (x:xs) = do
-      -- v <- evaluateModule x
-      -- env <- filterEnv <$> getExports <*> getEnv
-      -- modifyModuleTable (moduleTableInsert name (env, v))
       (env, _) <- evalAndCache' x
       (env', v') <- evalAndCache xs
       pure (env <> env', v')
