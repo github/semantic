@@ -5,7 +5,7 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent)
 import Data.Fixed
 import Diffing.Algorithm
-import Prelude hiding (fail)
+import Prelude
 import Prologue hiding (apply)
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.

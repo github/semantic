@@ -9,13 +9,8 @@ module Language.Python.Assignment
 
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Abstract.FreeVariables
-import Data.Functor (void)
-import Data.List.NonEmpty (some1)
-import Data.Maybe (fromMaybe)
 import Data.Record
-import Data.Semigroup
 import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, parseError, postContextualize)
-import Data.Union
 import GHC.Stack
 import Language.Python.Grammar as Grammar
 import Language.Python.Syntax as Python.Syntax
@@ -28,6 +23,7 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
+import Prologue
 
 
 -- | The type of Python syntax.
@@ -250,7 +246,7 @@ functionDefinition
   <|> makeFunctionDeclaration <$> (symbol Lambda' <|> symbol Lambda) <*> children ((,,,) <$ token AnonLambda <*> emptyTerm <*> (symbol LambdaParameters *> children (manyTerm expression) <|> pure []) <*> optional (symbol Type *> children (term expression)) <*> expressions)
   where
     makeFunctionDeclaration loc (functionName', functionParameters, ty, functionBody) = makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function [] functionName' functionParameters functionBody) (fromMaybe (makeTerm loc Syntax.Empty) ty)
-    makeAsyncFunctionDeclaration loc (async', functionName', functionParameters, ty, functionBody) = makeTerm loc $ Type.Annotation (makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function [] functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) id ty)) async'
+    makeAsyncFunctionDeclaration loc (async', functionName', functionParameters, ty, functionBody) = makeTerm loc $ Type.Annotation (makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function [] functionName' functionParameters functionBody) (fromMaybe (makeTerm loc Syntax.Empty) ty)) async'
 
 async' :: Assignment
 async' = makeTerm <$> symbol AnonAsync <*> (Syntax.Identifier <$> (name <$> source))
@@ -335,7 +331,7 @@ assignment' =  makeTerm  <$> symbol Assignment <*> children (Statement.Assignmen
                   , assign Expression.BXOr      <$ symbol AnonCaretEqual
                   ])
   where rvalue = expressionList <|> assignment' <|> yield
-        assign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
+        assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
         assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
 
 yield :: Assignment
@@ -386,7 +382,7 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 import' :: Assignment
 import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliasedImport <|> plainImport))
-        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> (identifier <|> emptyTerm) <*> (wildcard <|> (some (aliasImportSymbol <|> importSymbol))) <*> emptyTerm)
+        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> (identifier <|> emptyTerm) <*> (wildcard <|> some (aliasImportSymbol <|> importSymbol)) <*> emptyTerm)
   where
     -- `import a as b`
     aliasedImport = makeImport <$> symbol AliasedImport <*> children ((,) <$> expression <*> (Just <$> expression))
@@ -397,7 +393,7 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     -- `from a import foo as bar`
     aliasImportSymbol = symbol AliasedImport *> children (makeNameAliasPair <$> rawIdentifier <*> (Just <$> rawIdentifier))
     -- `from a import *`
-    wildcard = symbol WildcardImport *> source *> pure []
+    wildcard = symbol WildcardImport *> source $> []
 
     rawIdentifier = (name <$> identifier') <|> (qualifiedName <$> dottedName')
     dottedName' = symbol DottedName *> children (some identifier')
@@ -512,3 +508,5 @@ infixTerm :: HasCallStack
           -> [Assignment.Assignment [] Grammar (Term -> Term -> Union Syntax Term)]
           -> Assignment.Assignment [] Grammar (Union Syntax Term)
 infixTerm = infixContext comment
+
+{-# ANN module ("HLint: ignore Eta reduce" :: String) #-}

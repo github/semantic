@@ -18,7 +18,7 @@ data FeatureVector = FV !Double# !Double# !Double# !Double# !Double#
                         !Double# !Double# !Double# !Double# !Double#
 
 unFV :: FeatureVector -> [Double]
-unFV !(FV d00 d01 d02 d03 d04 d05 d06 d07 d08 d09 d10 d11 d12 d13 d14)
+unFV (FV d00 d01 d02 d03 d04 d05 d06 d07 d08 d09 d10 d11 d12 d13 d14)
   = [ D# d00, D# d01, D# d02, D# d03, D# d04
     , D# d05, D# d06, D# d07, D# d08, D# d09
     , D# d10, D# d11, D# d12, D# d13, D# d14 ]
@@ -48,8 +48,8 @@ unitVector !hash =
         (invMagnitude *## d10) (invMagnitude *## d11) (invMagnitude *## d12) (invMagnitude *## d13) (invMagnitude *## d14)
 
 addVectors :: FeatureVector -> FeatureVector -> FeatureVector
-addVectors !(FV a00 a01 a02 a03 a04 a05 a06 a07 a08 a09 a10 a11 a12 a13 a14)
-           !(FV b00 b01 b02 b03 b04 b05 b06 b07 b08 b09 b10 b11 b12 b13 b14)
+addVectors (FV a00 a01 a02 a03 a04 a05 a06 a07 a08 a09 a10 a11 a12 a13 a14)
+           (FV b00 b01 b02 b03 b04 b05 b06 b07 b08 b09 b10 b11 b12 b13 b14)
            = FV (a00 +## b00) (a01 +## b01) (a02 +## b02) (a03 +## b03) (a04 +## b04)
                 (a05 +## b05) (a06 +## b06) (a07 +## b07) (a08 +## b08) (a09 +## b09)
                 (a10 +## b10) (a11 +## b11) (a12 +## b12) (a13 +## b13) (a14 +## b14)

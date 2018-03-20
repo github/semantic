@@ -30,7 +30,7 @@ import Text.Read
 readFile :: forall m. MonadIO m => FilePath -> Maybe Language -> m (Maybe Blob.Blob)
 readFile "/dev/null" _ = pure Nothing
 readFile path language = do
-  raw <- liftIO $ (Just <$> B.readFile path)
+  raw <- liftIO (Just <$> B.readFile path)
   pure $ Blob.sourceBlob path language . fromBytes <$> raw
 
 readFilePair :: forall m. MonadIO m => (FilePath, Maybe Language) -> (FilePath, Maybe Language) -> m Blob.BlobPair
@@ -64,7 +64,7 @@ readBlobsFromHandle = fmap toBlobs . readFromHandle
   where toBlobs BlobParse{..} = fmap toBlob blobs
 
 readBlobsFromPaths :: MonadIO m => [(FilePath, Maybe Language)] -> m [Blob.Blob]
-readBlobsFromPaths files = traverse (uncurry Semantic.IO.readFile) files >>= pure . catMaybes
+readBlobsFromPaths files = catMaybes <$> traverse (uncurry Semantic.IO.readFile) files
 
 readBlobsFromDir :: MonadIO m => FilePath -> m [Blob.Blob]
 readBlobsFromDir path = do

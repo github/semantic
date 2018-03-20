@@ -126,14 +126,14 @@ instance Eq1 QualifiedName where liftEq = genericLiftEq
 instance Ord1 QualifiedName where liftCompare = genericLiftCompare
 instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
 
-data NamespaceName a = NamespaceName [a]
+newtype NamespaceName a = NamespaceName [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 NamespaceName where liftEq = genericLiftEq
 instance Ord1 NamespaceName where liftCompare = genericLiftCompare
 instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
 
-data ConstDeclaration a = ConstDeclaration [a]
+newtype ConstDeclaration a = ConstDeclaration [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ConstDeclaration where liftEq = genericLiftEq
@@ -147,92 +147,91 @@ instance Eq1 ClassConstDeclaration where liftEq = genericLiftEq
 instance Ord1 ClassConstDeclaration where liftCompare = genericLiftCompare
 instance Show1 ClassConstDeclaration where liftShowsPrec = genericLiftShowsPrec
 
-data ClassInterfaceClause a = ClassInterfaceClause [a]
+newtype ClassInterfaceClause a = ClassInterfaceClause [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ClassInterfaceClause where liftEq = genericLiftEq
 instance Ord1 ClassInterfaceClause where liftCompare = genericLiftCompare
 instance Show1 ClassInterfaceClause where liftShowsPrec = genericLiftShowsPrec
 
-data ClassBaseClause a = ClassBaseClause a
+newtype ClassBaseClause a = ClassBaseClause a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ClassBaseClause where liftEq = genericLiftEq
 instance Ord1 ClassBaseClause where liftCompare = genericLiftCompare
 instance Show1 ClassBaseClause where liftShowsPrec = genericLiftShowsPrec
 
-
-data UseClause a = UseClause [a]
+newtype UseClause a = UseClause [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 UseClause where liftEq = genericLiftEq
 instance Ord1 UseClause where liftCompare = genericLiftCompare
 instance Show1 UseClause where liftShowsPrec = genericLiftShowsPrec
 
-data ReturnType a = ReturnType a
+newtype ReturnType a = ReturnType a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ReturnType where liftEq = genericLiftEq
 instance Ord1 ReturnType where liftCompare = genericLiftCompare
 instance Show1 ReturnType where liftShowsPrec = genericLiftShowsPrec
 
-data TypeDeclaration a = TypeDeclaration a
+newtype TypeDeclaration a = TypeDeclaration a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 TypeDeclaration where liftEq = genericLiftEq
 instance Ord1 TypeDeclaration where liftCompare = genericLiftCompare
 instance Show1 TypeDeclaration where liftShowsPrec = genericLiftShowsPrec
 
-data BaseTypeDeclaration a = BaseTypeDeclaration a
+newtype BaseTypeDeclaration a = BaseTypeDeclaration a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 BaseTypeDeclaration where liftEq = genericLiftEq
 instance Ord1 BaseTypeDeclaration where liftCompare = genericLiftCompare
 instance Show1 BaseTypeDeclaration where liftShowsPrec = genericLiftShowsPrec
 
-data ScalarType a = ScalarType ByteString
+newtype ScalarType a = ScalarType ByteString
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ScalarType where liftEq = genericLiftEq
 instance Ord1 ScalarType where liftCompare = genericLiftCompare
 instance Show1 ScalarType where liftShowsPrec = genericLiftShowsPrec
 
-data EmptyIntrinsic a = EmptyIntrinsic a
+newtype EmptyIntrinsic a = EmptyIntrinsic a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 EmptyIntrinsic where liftEq = genericLiftEq
 instance Ord1 EmptyIntrinsic where liftCompare = genericLiftCompare
 instance Show1 EmptyIntrinsic where liftShowsPrec = genericLiftShowsPrec
 
-data ExitIntrinsic a = ExitIntrinsic a
+newtype ExitIntrinsic a = ExitIntrinsic a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ExitIntrinsic where liftEq = genericLiftEq
 instance Ord1 ExitIntrinsic where liftCompare = genericLiftCompare
 instance Show1 ExitIntrinsic where liftShowsPrec = genericLiftShowsPrec
 
-data IssetIntrinsic a = IssetIntrinsic a
+newtype IssetIntrinsic a = IssetIntrinsic a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 IssetIntrinsic where liftEq = genericLiftEq
 instance Ord1 IssetIntrinsic where liftCompare = genericLiftCompare
 instance Show1 IssetIntrinsic where liftShowsPrec = genericLiftShowsPrec
 
-data EvalIntrinsic a = EvalIntrinsic a
+newtype EvalIntrinsic a = EvalIntrinsic a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 EvalIntrinsic where liftEq = genericLiftEq
 instance Ord1 EvalIntrinsic where liftCompare = genericLiftCompare
 instance Show1 EvalIntrinsic where liftShowsPrec = genericLiftShowsPrec
 
-data PrintIntrinsic a = PrintIntrinsic a
+newtype PrintIntrinsic a = PrintIntrinsic a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 PrintIntrinsic where liftEq = genericLiftEq
 instance Ord1 PrintIntrinsic where liftCompare = genericLiftCompare
 instance Show1 PrintIntrinsic where liftShowsPrec = genericLiftShowsPrec
 
-data NamespaceAliasingClause a = NamespaceAliasingClause a
+newtype NamespaceAliasingClause a = NamespaceAliasingClause a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 NamespaceAliasingClause where liftEq = genericLiftEq
@@ -379,14 +378,14 @@ instance Eq1 Declare where liftEq = genericLiftEq
 instance Ord1 Declare where liftCompare = genericLiftCompare
 instance Show1 Declare where liftShowsPrec = genericLiftShowsPrec
 
-data DeclareDirective a = DeclareDirective a
+newtype DeclareDirective a = DeclareDirective a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 DeclareDirective where liftEq = genericLiftEq
 instance Ord1 DeclareDirective where liftCompare = genericLiftCompare
 instance Show1 DeclareDirective where liftShowsPrec = genericLiftShowsPrec
 
-data LabeledStatement a = LabeledStatement { _labeledStatementIdentifier :: a }
+newtype LabeledStatement a = LabeledStatement { _labeledStatementIdentifier :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 LabeledStatement where liftEq = genericLiftEq

@@ -244,7 +244,7 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
                   Children child -> do
                     (a, state') <- go child state { stateNodes = toList f, stateCallSites = maybe id (:) (tracingCallSite t) stateCallSites } >>= requireExhaustive (tracingCallSite t)
                     yield a (advanceState state' { stateNodes = stateNodes, stateCallSites = stateCallSites })
-                  Choose choices _ handler | Just choice <- Table.lookup (nodeSymbol node) choices -> (go choice state `catchError` (maybe throwError (flip go state .) handler)) >>= uncurry yield
+                  Choose choices _ handler | Just choice <- Table.lookup (nodeSymbol node) choices -> (go choice state `catchError` maybe throwError (flip go state .) handler) >>= uncurry yield
                   _ -> anywhere (Just node)
 
                 anywhere node = case runTracing t of
@@ -269,7 +269,7 @@ requireExhaustive callSite (a, state) = let state' = skipTokens state in case st
   Term (In node _) : _ -> Left (withStateCallStack callSite state (nodeError [] node))
 
 withStateCallStack :: Maybe (String, SrcLoc) -> State ast grammar -> (HasCallStack => a) -> a
-withStateCallStack callSite state action = withCallStack (freezeCallStack (fromCallSiteList (maybe id (:) callSite (stateCallSites state)))) action
+withStateCallStack callSite state = withCallStack (freezeCallStack (fromCallSiteList (maybe id (:) callSite (stateCallSites state))))
 
 skipTokens :: Symbol grammar => State ast grammar -> State ast grammar
 skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . nodeSymbol . termAnnotation) (stateNodes state) }
@@ -376,3 +376,5 @@ instance (Enum grammar, Ix grammar, Show grammar, Show1 ast) => Show1 (Assignmen
     Fail s -> showsUnaryWith showsPrec "Fail" d s
     where showChild = liftShowsPrec sp sl
           showChildren = liftShowList sp sl
+
+{-# ANN module ("HLint: ignore Avoid return" :: String) #-}

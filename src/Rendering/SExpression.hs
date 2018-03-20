@@ -5,7 +5,7 @@ module Rendering.SExpression
 ) where
 
 import Prologue
-import Data.ByteString.Char8 hiding (intersperse, foldr, spanEnd, length, null)
+import Data.ByteString.Char8
 import Data.Diff
 import Data.Patch
 import Data.Record

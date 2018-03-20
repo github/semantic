@@ -245,7 +245,7 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
   , assign Expression.RShift <$ symbol AnonRAngleRAngleEqual
   , assign Expression.UnsignedRShift <$ symbol AnonRAngleRAngleRAngleEqual
   , assign Expression.BOr <$ symbol AnonPipeEqual ])
-  where assign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
+  where assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
         assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
 
 
@@ -300,7 +300,7 @@ abstractMethodSignature = makeSignature <$> symbol Grammar.AbstractMethodSignatu
   where makeSignature loc (modifier, propertyName, (typeParams, params, annotation)) = makeTerm loc (TypeScript.Syntax.AbstractMethodSignature [modifier, typeParams, annotation] propertyName params)
 
 classHeritage' :: Assignment.Assignment [] Grammar [Term]
-classHeritage' = symbol Grammar.ClassHeritage *> children (((++) `on` toList) <$> optional (term extendsClause) <*> optional (term implementsClause'))
+classHeritage' = symbol Grammar.ClassHeritage *> children ((mappend `on` toList) <$> optional (term extendsClause) <*> optional (term implementsClause'))
 
 extendsClause :: Assignment
 extendsClause = makeTerm <$> symbol Grammar.ExtendsClause <*> children (TypeScript.Syntax.ExtendsClause <$> manyTerm (typeReference <|> expression))
@@ -643,7 +643,7 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
                 <|> makeTerm' <$> symbol Grammar.ImportStatement <*> children (requireImport <|> sideEffectImport)
   where
     -- `import foo = require "./foo"`
-    requireImport = inj <$> (symbol Grammar.ImportRequireClause *> children (flip Declaration.QualifiedImport <$> (term identifier) <*> term fromClause <*> pure []))
+    requireImport = inj <$> (symbol Grammar.ImportRequireClause *> children (flip Declaration.QualifiedImport <$> term identifier <*> term fromClause <*> pure []))
     -- `import "./foo"`
     sideEffectImport = inj <$> (Declaration.SideEffectImport <$> term fromClause <*> emptyTerm)
     -- `import { bar } from "./foo"`
@@ -651,7 +651,7 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
     -- `import defaultMember from "./foo"`
     defaultImport =  (,,,) <$> pure Prelude.False <*> pure Nothing <*> (pure <$> (makeNameAliasPair <$> rawIdentifier <*> pure Nothing)) <*> emptyTerm
     -- `import * as name from "./foo"`
-    namespaceImport = symbol Grammar.NamespaceImport *> children ((,,,) <$> pure Prelude.True <*> (Just <$> (term identifier)) <*> pure [] <*> emptyTerm)
+    namespaceImport = symbol Grammar.NamespaceImport *> children ((,,,) <$> pure Prelude.True <*> (Just <$> term identifier) <*> pure [] <*> emptyTerm)
 
     -- Combinations of the above.
     importClause = symbol Grammar.ImportClause *>
@@ -666,7 +666,7 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
     makeImportTerm1 loc from (_, _, symbols, extra) = makeTerm loc (Declaration.Import from symbols extra)
     makeImportTerm loc ([x], from) = makeImportTerm1 loc from x
     makeImportTerm loc (xs, from) = makeTerm loc $ fmap (makeImportTerm1 loc from) xs
-    importSymbol = symbol Grammar.ImportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> ((Just <$> rawIdentifier) <|> (pure Nothing)))
+    importSymbol = symbol Grammar.ImportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> ((Just <$> rawIdentifier) <|> pure Nothing))
     rawIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source)
     makeNameAliasPair from (Just alias) = (from, alias)
     makeNameAliasPair from Nothing = (from, from)
@@ -717,13 +717,13 @@ ambientDeclaration :: Assignment
 ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> children (TypeScript.Syntax.AmbientDeclaration <$> term (choice [declaration, statementBlock]))
 
 exportStatement :: Assignment
-exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> (children (flip Declaration.QualifiedExportFrom <$> exportClause <*> term fromClause))
+exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip Declaration.QualifiedExportFrom <$> exportClause <*> term fromClause)
   <|> makeTerm <$> symbol Grammar.ExportStatement <*> children (Declaration.QualifiedExport <$> exportClause)
   <|> makeTerm <$> symbol Grammar.ExportStatement <*> children (Declaration.DefaultExport <$> contextualize decorator (term (declaration <|> expression <|> identifier <|> importAlias')))
   where
     exportClause = symbol Grammar.ExportClause *> children (many exportSymbol)
     exportSymbol = symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> (Just <$> rawIdentifier))
-                 <|> symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> (pure Nothing))
+                 <|> symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> pure Nothing)
     makeNameAliasPair from (Just alias) = (from, alias)
     makeNameAliasPair from Nothing = (from, from)
     rawIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source)

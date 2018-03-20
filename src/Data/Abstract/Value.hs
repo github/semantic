@@ -12,7 +12,7 @@ import Data.Abstract.Number
 import qualified Data.Abstract.Type as Type
 import Data.Scientific (Scientific)
 import Prologue
-import Prelude hiding (Float, Integer, String, Rational, fail)
+import Prelude hiding (Float, Integer, String, Rational)
 import qualified Prelude
 
 type ValueConstructors

@@ -47,7 +47,7 @@ instance Mergeable Maybe where
 instance Mergeable Identity where merge f = fmap Identity . f . runIdentity
 
 instance (Apply Functor fs, Apply Mergeable fs) => Mergeable (Union fs) where
-  merge f u = apply' (Proxy :: Proxy Mergeable) (\ reinj g -> reinj <$> merge f g) u
+  merge f = apply' (Proxy :: Proxy Mergeable) (\ reinj g -> reinj <$> merge f g)
 
 
 -- Generics
