@@ -10,9 +10,16 @@ import SpecHelpers
 spec :: Spec
 spec = parallel $ do
   describe "evalutes PHP" $ do
-    it "include" $ do
+    it "include and require" $ do
       env <- evaluate "main.php"
-      let expectedEnv = [ (qualifiedName ["foo"], addr 0) ]
+      let expectedEnv = [ (qualifiedName ["foo"], addr 0)
+                        , (qualifiedName ["bar"], addr 1) ]
+      env `shouldBe` expectedEnv
+
+    it "include_once and require_once" $ do
+      env <- evaluate "main_once.php"
+      let expectedEnv = [ (qualifiedName ["foo"], addr 0)
+                        , (qualifiedName ["bar"], addr 1) ]
       env `shouldBe` expectedEnv
 
   where
@@ -22,4 +29,5 @@ spec = parallel $ do
       evaluateFiles phpParser
       [ fixtures <> entry
       , fixtures <> "foo.php"
+      , fixtures <> "bar.php"
       ]
