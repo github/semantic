@@ -3,7 +3,6 @@ module Language.PHP.Syntax where
 
 import Analysis.Abstract.Evaluating
 import Data.Abstract.Evaluatable
-import Data.Abstract.Value (LocationFor)
 import Data.Abstract.Path
 import Diffing.Algorithm
 import Prologue hiding (Text)
@@ -26,23 +25,30 @@ instance Ord1 VariableName where liftCompare = genericLiftCompare
 instance Show1 VariableName where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable VariableName
 
+-- TODO: Variables defined in an included file take on scope of the source line
+-- on which the inclusion occurs in the including file. However, functions and
+-- classes defined in the included file are always in global scope.
+
+-- TODO: If inclusion occurs inside a function definition within the including
+-- file, the complete contents of the included file are treated as though it
+-- were defined inside that function.
+
+doInclude :: (MonadValue value m, MonadAnalysis term value m) => Subterm t (m value) -> m value
+doInclude path = do
+  name <- toQualifiedName <$> (subtermValue path >>= asString)
+  (importedEnv, v) <- isolate (load' name)
+  modifyEnv (mappend importedEnv)
+  pure v
+
+doIncludeOnce :: (MonadValue value m, MonadAnalysis term value m) => Subterm t (m value) -> m value
+doIncludeOnce path = do
+  name <- toQualifiedName <$> (subtermValue path >>= asString)
+  (importedEnv, v) <- isolate (require' name)
+  modifyEnv (mappend importedEnv)
+  pure v
 
 toQualifiedName :: ByteString -> Name
 toQualifiedName = qualifiedName . splitOnPathSeparator . dropExtension . dropRelativePrefix . stripQuotes
-
-doInclude :: (MonadValue value m, MonadAnalysis term value m, Ord (LocationFor value)) => Subterm t (m value) -> m value
-doInclude path = do
-  name <- toQualifiedName <$> (subtermValue path >>= asString)
-  importedEnv <- isolate (load name)
-  modifyEnv (mappend importedEnv)
-  unit
-
-doIncludeOnce :: (MonadValue value m, MonadAnalysis term value m, Ord (LocationFor value)) => Subterm t (m value) -> m value
-doIncludeOnce path = do
-  name <- toQualifiedName <$> (subtermValue path >>= asString)
-  importedEnv <- isolate (require name)
-  modifyEnv (mappend importedEnv)
-  unit
 
 newtype Require a = Require a
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
