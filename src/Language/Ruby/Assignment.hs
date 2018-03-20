@@ -379,7 +379,16 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
     rhs  = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr
     expr = makeTerm <$> symbol RestAssignment      <*> (Syntax.Identifier . name <$> source)
        <|> makeTerm <$> symbol DestructuredLeftAssignment <*> children (many expr)
+       <|> lhsIdent
        <|> expression
+
+lhsIdent :: Assignment
+lhsIdent = do
+  sym <- symbol Identifier <|> symbol Identifier'
+  locals <- getRubyLocals
+  ident <- source
+  putRubyLocals (ident : locals)
+  pure $ makeTerm sym $ Syntax.Identifier $ name ident
 
 unary :: Assignment
 unary = symbol Unary >>= \ location ->
