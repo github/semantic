@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.Ruby.Syntax where
 
+import Analysis.Abstract.Evaluating
 import Control.Monad (unless)
 import Control.Abstract.Value (MonadValue)
 import Data.Abstract.Evaluatable

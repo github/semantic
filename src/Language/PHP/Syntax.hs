@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.PHP.Syntax where
 
+import Analysis.Abstract.Evaluating
 import Data.Abstract.Evaluatable
 import Data.Abstract.Value (LocationFor)
 import Data.Abstract.Path
