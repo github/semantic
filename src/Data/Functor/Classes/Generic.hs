@@ -46,7 +46,7 @@ class GShow1 f where
   -- | showsPrec function for an application of the type constructor based on showsPrec and showList functions for the argument type.
   gliftShowsPrec :: GShow1Options -> (Int -> a -> ShowS) -> ([a] -> ShowS) -> Int -> f a -> ShowS
 
-data GShow1Options = GShow1Options { optionsUseRecordSyntax :: Bool }
+newtype GShow1Options = GShow1Options { optionsUseRecordSyntax :: Bool }
 
 defaultGShow1Options :: GShow1Options
 defaultGShow1Options = GShow1Options { optionsUseRecordSyntax = False }
@@ -180,5 +180,3 @@ instance (Show1 f, GShow1 g) => GShow1 (f :.: g) where
 
 showBraces :: Bool -> ShowS -> ShowS
 showBraces should rest = if should then showChar '{' . rest . showChar '}' else rest
-
-{-# ANN module ("HLint: ignore Use newtype instead of data" :: String) #-}
