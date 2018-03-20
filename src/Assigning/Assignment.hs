@@ -77,6 +77,8 @@ module Assigning.Assignment
 , while
 , until
 , manyThrough
+, getRubyLocals
+, putRubyLocals
 -- Results
 , Error(..)
 , errorCallStack
@@ -121,6 +123,8 @@ data AssignmentF ast grammar a where
   Alt :: [a] -> AssignmentF ast grammar a
   Label :: Assignment ast grammar a -> String -> AssignmentF ast grammar a
   Fail :: String -> AssignmentF ast grammar a
+  GetRubyLocals :: AssignmentF ast grammar [ByteString]
+  PutRubyLocals :: [ByteString] -> AssignmentF ast grammar ()
 
 data Tracing f a where
   Tracing :: { tracingCallSite :: Maybe (String, SrcLoc), runTracing :: f a } -> Tracing f a
@@ -139,6 +143,12 @@ tracing f = case getCallStack callStack of
 --   If assigning at the end of input or at the end of a list of children, the location will be returned as an empty Range and Span at the current offset. Otherwise, it will be the Range and Span of the current node.
 location :: HasCallStack => Assignment ast grammar (Record Location)
 location = tracing Location `Then` return
+
+getRubyLocals :: HasCallStack => Assignment ast grammar [ByteString]
+getRubyLocals = tracing GetRubyLocals `Then` return
+
+putRubyLocals :: HasCallStack => [ByteString] -> Assignment ast grammar ()
+putRubyLocals l = tracing (PutRubyLocals l) `Then` return
 
 -- | Zero-width production of the current node.
 currentNode :: HasCallStack => Assignment ast grammar (TermF ast (Node grammar) ())
@@ -239,6 +249,8 @@ runAssignment source = \ assignment state -> go assignment state >>= requireExha
         run yield t initialState = state `seq` maybe (anywhere Nothing) atNode (listToMaybe stateNodes)
           where atNode (Term (In node f)) = case runTracing t of
                   Location -> yield (nodeLocation node) state
+                  GetRubyLocals -> yield stateRubyLocals state
+                  PutRubyLocals l -> yield () (state { stateRubyLocals = l })
                   CurrentNode -> yield (In node (() <$ f)) state
                   Source -> yield (Source.sourceBytes (Source.slice (nodeByteRange node) source)) (advanceState state)
                   Children child -> do
@@ -277,7 +289,7 @@ skipTokens state = state { stateNodes = dropWhile ((/= Regular) . symbolType . n
 -- | Advances the state past the current (head) node (if any), dropping it off stateNodes, and updating stateOffset & statePos to its end; or else returns the state unchanged.
 advanceState :: State ast grammar -> State ast grammar
 advanceState state@State{..}
-  | Term (In Node{..} _) : rest <- stateNodes = State (end nodeByteRange) (spanEnd nodeSpan) stateCallSites rest
+  | Term (In Node{..} _) : rest <- stateNodes = State (end nodeByteRange) (spanEnd nodeSpan) stateCallSites rest stateRubyLocals
   | otherwise = state
 
 -- | State kept while running 'Assignment's.
@@ -286,13 +298,14 @@ data State ast grammar = State
   , statePos :: {-# UNPACK #-} !Pos  -- ^ The (1-indexed) line/column position in the Source thus far reached.
   , stateCallSites :: ![(String, SrcLoc)] -- ^ The symbols & source locations of the calls thus far.
   , stateNodes :: ![AST ast grammar]      -- ^ The remaining nodes to assign. Note that 'children' rules recur into subterms, and thus this does not necessarily reflect all of the terms remaining to be assigned in the overall algorithm, only those “in scope.”
+  , stateRubyLocals :: ![ByteString]      -- Special state necessary for the Ruby assignment. When we refactor Assignment to use effects we should pull this out into Language.Ruby.Assignment
   }
 
 deriving instance (Eq grammar, Eq1 ast) => Eq (State ast grammar)
 deriving instance (Show grammar, Show1 ast) => Show (State ast grammar)
 
 makeState :: [AST ast grammar] -> State ast grammar
-makeState = State 0 (Pos 1 1) []
+makeState ns = State 0 (Pos 1 1) [] ns []
 
 
 -- Instances
@@ -374,6 +387,8 @@ instance (Enum grammar, Ix grammar, Show grammar, Show1 ast) => Show1 (Assignmen
     Alt as -> showsUnaryWith (const sl) "Alt" d (toList as)
     Label child string -> showsBinaryWith (liftShowsPrec sp sl) showsPrec "Label" d child string
     Fail s -> showsUnaryWith showsPrec "Fail" d s
+    GetRubyLocals -> showString "GetRubyLocals"
+    PutRubyLocals _ -> showString "PutRubyLocals _"
     where showChild = liftShowsPrec sp sl
           showChildren = liftShowList sp sl
 
