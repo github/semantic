@@ -111,6 +111,7 @@ expressionChoices =
   , for
   , heredoc
   , identifier
+  , misc
   , if'
   , lambda
   , literal
@@ -147,10 +148,18 @@ parenthesizedExpressions :: Assignment
 parenthesizedExpressions = makeTerm'' <$> symbol ParenthesizedStatements <*> children (Syntax.Paren <$> expressions)
 
 identifier :: Assignment
-identifier =
-      mk Identifier
-  <|> mk Identifier'
-  <|> mk Constant
+identifier = do
+  sym <- symbol Identifier <|> symbol Identifier'
+  locals <- getRubyLocals
+  ident <- source
+  let term = makeTerm sym (Syntax.Identifier $ name ident)
+  if ident `elem` locals
+    then pure term
+    else makeTerm sym <$> (Expression.Call [] term [] <$> emptyTerm)
+
+misc :: Assignment
+misc =
+      mk Constant
   <|> mk InstanceVariable
   <|> mk ClassVariable
   <|> mk GlobalVariable
