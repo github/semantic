@@ -180,3 +180,5 @@ instance (Show1 f, GShow1 g) => GShow1 (f :.: g) where
 
 showBraces :: Bool -> ShowS -> ShowS
 showBraces should rest = if should then showChar '{' . rest . showChar '}' else rest
+
+{-# ANN module ("HLint: ignore Use newtype instead of data" :: String) #-}

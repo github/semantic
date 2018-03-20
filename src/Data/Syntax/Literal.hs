@@ -76,7 +76,7 @@ removeUnderscores = B.filter (/= '_')
 -- | Strip suffixes from floating-point literals so as to handle Python's
 --   TODO: tree-sitter-python needs some love so that it parses j-suffixed floats as complexen
 dropAlphaSuffix :: ByteString -> ByteString
-dropAlphaSuffix = B.takeWhile (\x -> x `notElem` ("lLjJiI" :: [Char]))
+dropAlphaSuffix = B.takeWhile (\x -> x `notElem` ("lLjJiI" :: Prelude.String))
 
 -- | This is the shared function that munges a bytestring representation of a float
 --   so that it can be parsed to a @Scientific@ later. It takes as its arguments a list of functions, which

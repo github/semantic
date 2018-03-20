@@ -24,7 +24,7 @@ import Data.Bifunctor
 import Data.Bitraversable
 import Data.Foldable (asum)
 import Data.Functor.Classes
-import Data.Functor.Foldable hiding (fold)
+import Data.Functor.Foldable
 import Data.JSON.Fields
 import Data.Mergeable (Mergeable(sequenceAlt))
 import Data.Patch

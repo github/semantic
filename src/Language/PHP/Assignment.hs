@@ -300,7 +300,7 @@ scopedCallExpression = makeTerm <$> symbol ScopedCallExpression <*> children (Ex
   where makeMemberAccess loc expr memberName = makeTerm loc (Expression.MemberAccess expr memberName)
 
 functionCallExpression :: Assignment
-functionCallExpression = makeTerm <$> symbol FunctionCallExpression <*> children (Expression.Call [] <$> (term (qualifiedName <|> callableExpression)) <*> arguments <*> emptyTerm)
+functionCallExpression = makeTerm <$> symbol FunctionCallExpression <*> children (Expression.Call [] <$> term (qualifiedName <|> callableExpression) <*> arguments <*> emptyTerm)
 
 callableExpression :: Assignment
 callableExpression = choice [
@@ -376,7 +376,7 @@ defaultArgumentSpecifier = symbol DefaultArgumentSpecifier *> children (term exp
 
 variadicParameter :: Assignment
 variadicParameter = makeTerm <$> symbol VariadicParameter <*> children (makeTypeAnnotation <$> (term typeDeclaration <|> emptyTerm) <*> term variableName)
-  where makeTypeAnnotation ty variableName = (Type.Annotation variableName ty)
+  where makeTypeAnnotation ty variableName = Type.Annotation variableName ty
 
 functionUseClause :: Assignment
 functionUseClause = makeTerm <$> symbol AnonymousFunctionUseClause <*> children (Syntax.UseClause <$> someTerm variableName)
@@ -397,10 +397,10 @@ compoundStatement :: Assignment
 compoundStatement = makeTerm <$> symbol CompoundStatement <*> children (manyTerm statement)
 
 objectCreationExpression :: Assignment
-objectCreationExpression = (makeTerm <$> symbol ObjectCreationExpression <*> children (fmap Expression.New $ ((:) <$> term classTypeDesignator <*> (arguments <|> pure []))))
+objectCreationExpression = (makeTerm <$> symbol ObjectCreationExpression <*> children (Expression.New <$> ((:) <$> term classTypeDesignator <*> (arguments <|> pure []))))
 
   <|> (makeTerm <$> symbol ObjectCreationExpression <*> children (makeAnonClass <$ token AnonNew <* token AnonClass <*> emptyTerm <*> (arguments <|> pure []) <*> (term classBaseClause <|> emptyTerm) <*> (term classInterfaceClause <|> emptyTerm) <*> (makeTerm <$> location <*> manyTerm classMemberDeclaration)))
-  where makeAnonClass identifier args baseClause interfaceClause declarations = (Declaration.Class [] identifier (args ++ [baseClause, interfaceClause]) declarations)
+  where makeAnonClass identifier args baseClause interfaceClause declarations = Declaration.Class [] identifier (args <> [baseClause, interfaceClause]) declarations
 
 classMemberDeclaration :: Assignment
 classMemberDeclaration = choice [
@@ -680,7 +680,7 @@ namespaceDefinition = makeTerm <$> symbol NamespaceDefinition <*> children (Synt
 
 namespaceUseDeclaration :: Assignment
 namespaceUseDeclaration = makeTerm <$> symbol NamespaceUseDeclaration <*> children (Syntax.NamespaceUseDeclaration <$>
-  (((++) <$> (pure <$> (term namespaceFunctionOrConst <|> emptyTerm)) <*> someTerm namespaceUseClause) <|> ((\a b cs -> a : b : cs) <$> term namespaceFunctionOrConst <*> term namespaceName <*> someTerm namespaceUseGroupClause1) <|> ((:) <$> term namespaceName <*> someTerm namespaceUseGroupClause2)))
+  ((mappend <$> (pure <$> (term namespaceFunctionOrConst <|> emptyTerm)) <*> someTerm namespaceUseClause) <|> ((\a b cs -> a : b : cs) <$> term namespaceFunctionOrConst <*> term namespaceName <*> someTerm namespaceUseGroupClause1) <|> ((:) <$> term namespaceName <*> someTerm namespaceUseGroupClause2)))
 
 namespaceUseClause :: Assignment
 namespaceUseClause = makeTerm <$> symbol NamespaceUseClause <*> children (fmap Syntax.NamespaceUseClause $ (\a b -> [a, b]) <$> term qualifiedName <*> (term namespaceAliasingClause <|> emptyTerm))
@@ -752,3 +752,5 @@ infixTerm :: Assignment
           -> [Assignment.Assignment [] Grammar (Term -> Term -> Union Syntax Term)]
           -> Assignment.Assignment [] Grammar (Union Syntax Term)
 infixTerm = infixContext (comment <|> textInterpolation)
+
+{-# ANN module ("HLint: ignore Eta reduce" :: String) #-}

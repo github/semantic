@@ -6,7 +6,7 @@ module Analysis.Abstract.Evaluating
 ) where
 
 import Control.Abstract.Evaluator
-import Control.Monad.Effect hiding (run)
+import Control.Monad.Effect
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State

@@ -3,6 +3,7 @@ module Data.Align.Generic where
 
 import Control.Applicative
 import Control.Monad
+import Data.Functor (($>))
 import Data.List.NonEmpty (NonEmpty(..))
 import Data.Maybe (fromMaybe)
 import Data.Proxy
@@ -52,7 +53,7 @@ instance GAlign Par1 where
 
 -- | 'GAlign' over non-parameter fields. Only equal values are aligned.
 instance Eq c => GAlign (K1 i c) where
-  galignWith _ (K1 a) (K1 b) = guard (a == b) *> pure (K1 b)
+  galignWith _ (K1 a) (K1 b) = guard (a == b) $> K1 b
 
 -- | 'GAlign' over applications over parameters.
 instance GAlign f => GAlign (Rec1 f) where

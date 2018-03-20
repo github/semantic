@@ -286,11 +286,11 @@ instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, Mon
   liftComparison (Concrete _) left right = case (left, right) of
     (Type.Float, Int) ->                     pure Bool
     (Int, Type.Float) ->                     pure Bool
-    _                 -> unify left right *> pure Bool
+    _                 -> unify left right $> Bool
   liftComparison Generalized left right = case (left, right) of
     (Type.Float, Int) ->                     pure Int
     (Int, Type.Float) ->                     pure Int
-    _                 -> unify left right *> pure Int
+    _                 -> unify left right $> Bool
 
   apply op params = do
     tvar <- fresh

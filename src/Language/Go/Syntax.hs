@@ -72,7 +72,7 @@ instance Ord1 Rune where liftCompare = genericLiftCompare
 instance Show1 Rune where liftShowsPrec = genericLiftShowsPrec
 
 -- | A select statement in Go (e.g. `select { case x := <-c: x() }` where each case is a send or receive operation on channels).
-data Select a = Select { selectCases :: !a }
+newtype Select a = Select { selectCases :: a }
   deriving (Diffable, Eq, FreeVariables1, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 -- TODO: Implement Eval instance for Select
@@ -138,7 +138,7 @@ instance Show1 Receive where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Receive
 
 -- | A receive operator unary expression in Go (e.g. `<-channel` )
-data ReceiveOperator a = ReceiveOperator a
+newtype ReceiveOperator a = ReceiveOperator a
   deriving (Diffable, Eq, FreeVariables1, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 ReceiveOperator where liftEq = genericLiftEq

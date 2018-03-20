@@ -95,8 +95,8 @@ algorithmForTerms :: Diffable syntax
                   -> Algorithm (Term syntax ann1) (Term syntax ann2) (Diff syntax ann1 ann2) (Diff syntax ann1 ann2)
 algorithmForTerms t1@(Term (In ann1 f1)) t2@(Term (In ann2 f2))
   =   mergeFor t1 t2
-  <|> deleteF . In ann1      <$> subalgorithmFor byDeleting  (flip mergeFor t2) f1
-  <|> insertF . In      ann2 <$> subalgorithmFor byInserting (     mergeFor t1) f2
+  <|> deleteF . In ann1      <$> subalgorithmFor byDeleting  (`mergeFor` t2) f1
+  <|> insertF . In      ann2 <$> subalgorithmFor byInserting (mergeFor t1) f2
   where mergeFor (Term (In ann1 f1)) (Term (In ann2 f2)) = merge (ann1, ann2) <$> algorithmFor f1 f2
 
 -- | An O(1) relation on terms indicating their non-recursive comparability (i.e. are they of the same “kind” in a way that warrants comparison), defined in terms of the comparability of their respective syntax.
@@ -246,7 +246,7 @@ instance GDiffable Par1 where
 -- | Diff two constant parameters (K1 is the Generic1 newtype representing type parameter constants).
 -- i.e. data Foo = Foo Int (the 'Int' is a constant parameter).
 instance Eq c => GDiffable (K1 i c) where
-  galgorithmFor (K1 a1) (K1 a2) = guard (a1 == a2) *> pure (K1 a1)
+  galgorithmFor (K1 a1) (K1 a2) = guard (a1 == a2) $> K1 a1
 
 -- | Diff two terms whose constructors contain 0 type parameters.
 -- i.e. data Foo = Foo.
@@ -256,3 +256,5 @@ instance GDiffable U1 where
 -- | Diff two 'Diffable' containers of parameters.
 instance Diffable f => GDiffable (Rec1 f) where
   galgorithmFor a1 a2 = Rec1 <$> algorithmFor (unRec1 a1) (unRec1 a2)
+
+{-# ANN module ("HLint: ignore Avoid return" :: String) #-}

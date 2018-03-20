@@ -256,3 +256,5 @@ instance MonadIO Task where
 instance MonadError SomeException Task where
   throwError error = Throw error `Then` return
   catchError during handler = Catch during handler `Then` return
+
+{-# ANN module ("HLint: ignore Avoid return" :: String) #-}

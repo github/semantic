@@ -4,6 +4,11 @@ import "hint" HLint.Generalise
 
 ignore "Use mappend"
 ignore "Redundant do"
+-- TODO: investigate whether cost-center analysis is better with lambda-case than it was
+ignore "Use lambda-case"
+-- Hlint chokes and dies on certain where-clause annotations with type operators. TODO file a bug
+ignore "Parse error"
+
 error "generalize ++" = (++) ==> (<>)
 -- AMP fallout
 error "generalize mapM"  = mapM  ==> traverse
