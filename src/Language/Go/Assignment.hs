@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, RankNTypes, TupleSections, TypeOperators #-}
+{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
 module Language.Go.Assignment
 ( assignment
 , Syntax
@@ -275,7 +275,7 @@ channelType =  makeTerm' <$> symbol ChannelType <*> children (mkChannelType <$> 
                                | otherwise         = inj . Go.Type.BidirectionalChannel
 
 fieldDeclaration :: Assignment
-fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> (manyTermsTill expression (void (symbol TypeIdentifier)) <|> (manyTerm expression)) <*> optional expression <*> optional expression)
+fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> (manyTermsTill expression (void (symbol TypeIdentifier)) <|> manyTerm expression) <*> optional expression <*> optional expression)
   where
     mkFieldDeclarationWithTag loc (fields, type', tag) | Just ty <- type', Just tag' <- tag = makeTerm loc (Go.Syntax.Field [ty, tag'] (makeTerm loc fields))
                                                        | Just ty <- type'                   = makeTerm loc (Go.Syntax.Field [ty] (makeTerm loc fields))
@@ -413,7 +413,7 @@ indexExpression :: Assignment
 indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)
 
 methodDeclaration :: Assignment
-methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> term fieldIdentifier <*> manyTerm parameters <*> ((makeTerm <$> location <*> (manyTermsTill expression (void (symbol Block)))) <|> emptyTerm) <*> (term block <|> emptyTerm))
+methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> term fieldIdentifier <*> manyTerm parameters <*> ((makeTerm <$> location <*> manyTermsTill expression (void (symbol Block))) <|> emptyTerm) <*> (term block <|> emptyTerm))
   where
     receiver = symbol ParameterList *> children ((symbol ParameterDeclaration *> children expressions) <|> expressions)
     mkTypedMethodDeclaration receiver' name' parameters' type'' body' = Declaration.Method [type''] receiver' name' parameters' body'
@@ -473,13 +473,13 @@ unaryExpression = makeTerm' <$> symbol UnaryExpression <*> (  notExpression
                                                           <|> unaryComplement
                                                           <|> unaryPlus )
   where
-    notExpression   = inj <$> (children (Expression.Not <$ symbol AnonBang <*> expression))
-    unaryAmpersand  = inj <$> (children (Literal.Reference <$ symbol AnonAmpersand <*> expression))
-    unaryComplement = inj <$> (children (Expression.Complement <$ symbol AnonCaret <*> expression))
-    unaryMinus      = inj <$> (children (Expression.Negate <$ symbol AnonMinus <*> expression))
-    unaryPlus       =          children (symbol AnonPlus *> (Term.termOut <$> expression))
-    unaryPointer    = inj <$> (children (Literal.Pointer <$ symbol AnonStar <*> expression))
-    unaryReceive    = inj <$> (children (Go.Syntax.ReceiveOperator <$ symbol AnonLAngleMinus <*> expression))
+    notExpression   = inj <$> children (Expression.Not <$ symbol AnonBang <*> expression)
+    unaryAmpersand  = inj <$> children (Literal.Reference <$ symbol AnonAmpersand <*> expression)
+    unaryComplement = inj <$> children (Expression.Complement <$ symbol AnonCaret <*> expression)
+    unaryMinus      = inj <$> children (Expression.Negate <$ symbol AnonMinus <*> expression)
+    unaryPlus       =         children (symbol AnonPlus *> (Term.termOut <$> expression))
+    unaryPointer    = inj <$> children (Literal.Pointer <$ symbol AnonStar <*> expression)
+    unaryReceive    = inj <$> children (Go.Syntax.ReceiveOperator <$ symbol AnonLAngleMinus <*> expression)
 
 varDeclaration :: Assignment
 varDeclaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
@@ -493,7 +493,7 @@ variadicParameterDeclaration =  makeTerm <$> symbol VariadicParameterDeclaration
 varSpecification :: Assignment
 varSpecification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> children (Statement.Assignment <$> pure [] <*> (annotatedLHS <|> identifiers) <*> expressions)
     where
-      annotatedLHS = makeTerm <$> location <*> (Type.Annotation <$> (makeTerm <$> location <*> (manyTermsTill identifier (void (symbol TypeIdentifier)))) <*> expression)
+      annotatedLHS = makeTerm <$> location <*> (Type.Annotation <$> (makeTerm <$> location <*> manyTermsTill identifier (void (symbol TypeIdentifier))) <*> expression)
 
 
 -- Statements
@@ -517,7 +517,7 @@ assignment' =  makeTerm' <$> symbol AssignmentStatement <*> children (infixTerm 
     assign :: Term -> Term -> Union Syntax Term
     assign l r = inj (Statement.Assignment [] l r)
 
-    augmentedAssign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
+    augmentedAssign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
     augmentedAssign c l r = assign l (makeTerm1 (c l r))
 
     invert cons a b = Expression.Not (makeTerm1 (cons a b))
@@ -614,3 +614,5 @@ manyTerm = many . term
 -- | Match a term and contextualize any comments preceeding or proceeding the term.
 term :: Assignment -> Assignment
 term term' = contextualize comment term' <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
+
+{-# ANN module ("HLint: ignore Eta reduce" :: String) #-}

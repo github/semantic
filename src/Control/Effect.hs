@@ -3,7 +3,7 @@ module Control.Effect where
 
 import qualified Control.Monad.Effect as Effect
 import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Internal hiding (run)
+import Control.Monad.Effect.Internal
 import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State

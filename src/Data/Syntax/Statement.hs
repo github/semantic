@@ -4,7 +4,7 @@ module Data.Syntax.Statement where
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
-import Prelude hiding (fail)
+import Prelude
 import Prologue
 
 -- | Conditional. This must have an else block, which can be filled with some default value when omitted in the source, e.g. 'pure ()' for C-style if-without-else or 'pure Nothing' for Ruby-style, in both cases assuming some appropriate Applicative context into which the If will be lifted.
