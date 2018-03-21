@@ -157,7 +157,7 @@ instance ( Monad m
 
   klass n Nothing env = pure . injValue $ Class n env
   klass n (Just super) env
-    | Just (Class _ superEnv) <- prjValue super = pure . injValue $ Class n (superEnv <> env)
+    | Just (Class _ superEnv) <- prjValue super = pure . injValue $ Class n (Env.push superEnv <> env)
     | otherwise = fail ("Attempted to inherit from a non-class object: " <> show super)
 
 
