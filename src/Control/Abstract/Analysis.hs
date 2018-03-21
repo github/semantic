@@ -3,7 +3,7 @@
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , evaluateTerm
-, withModules
+, withModulesForBlobs
 , require
 , load
 , liftAnalyze
@@ -61,8 +61,8 @@ evaluateTerm = foldSubterms analyzeTerm
 
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
-withModules :: MonadAnalysis term value m => Blob -> [(Blob, term)] -> m a -> m a
-withModules blob pairs = localModuleTable (const moduleTable)
+withModulesForBlobs :: MonadAnalysis term value m => Blob -> [(Blob, term)] -> m a -> m a
+withModulesForBlobs blob pairs = localModuleTable (const moduleTable)
   where
     moduleTable = ModuleTable (Map.fromListWith (<>) (map toModulePair pairs))
     rootDir = dropFileName (blobPath blob)
