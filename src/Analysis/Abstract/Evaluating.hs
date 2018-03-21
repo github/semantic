@@ -18,13 +18,8 @@ import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Blob
 import qualified Data.IntMap as IntMap
-import Data.Language
-import Data.List.Split (splitWhen)
 import Prelude hiding (fail)
 import Prologue
-import qualified Data.ByteString.Char8 as BC
-import qualified Data.Map as Map
-import System.FilePath.Posix
 
 -- | Evaluate a term to a value.
 evaluate :: forall value term effects
@@ -54,20 +49,6 @@ evaluates :: forall value term effects
           -> (Blob, term)   -- Entrypoint
           -> Final effects value
 evaluates pairs (b, t) = runAnalysis @(Evaluating term value) (withModules b pairs (evaluateModule t))
-
--- | Run an action with the passed ('Blob', @term@) pairs available for imports.
-withModules :: MonadAnalysis term value m => Blob -> [(Blob, term)] -> m a -> m a
-withModules blob pairs = localModuleTable (const moduleTable)
-  where
-    moduleTable = ModuleTable (Map.fromListWith (<>) (map toModulePair pairs))
-    rootDir = dropFileName (blobPath blob)
-    toModulePair (blob, term) = let name = moduleName blob in (name, [Module name (blobPath blob) term])
-    moduleName Blob{..} = let path = dropExtensions (makeRelative rootDir blobPath)
-     in case blobLanguage of
-      -- TODO: Need a better way to handle module registration and resolution
-      Just Go -> toName (takeDirectory path) -- Go allows defining modules across multiple files in the same directory.
-      _ ->  toName path
-    toName str = qualifiedName (fmap BC.pack (splitWhen (== pathSeparator) str))
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
 newtype Evaluating term value effects a = Evaluating (Eff effects a)
