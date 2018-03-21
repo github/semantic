@@ -17,7 +17,6 @@ import Data.Functor.Classes
 import Data.Proxy
 import Data.Semigroup.Foldable
 import Data.Term
-import Prelude hiding (fail)
 import Prologue
 
 
