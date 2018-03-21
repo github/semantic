@@ -51,6 +51,7 @@ library
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Heap
                      , Data.Abstract.Live
+                     , Data.Abstract.Module
                      , Data.Abstract.ModuleTable
                      , Data.Abstract.Number
                      , Data.Abstract.Path
