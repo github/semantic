@@ -18,7 +18,10 @@ data Module term = Module { moduleName :: ModuleName, modulePath :: FilePath, mo
 
 
 -- | Construct a 'Module' for a 'Blob' and @term@, relative to some root 'FilePath'.
-moduleForBlob :: FilePath -> Blob -> term -> Module term
+moduleForBlob :: FilePath    -- ^ The root directory relative to which the module will be resolved.
+              -> Blob        -- ^ The 'Blob' containing the module.
+              -> term        -- ^ The @term@ representing the body of the module.
+              -> Module term -- ^ A 'Module' named appropriate for the 'Blob', holding the @term@, and constructed relative to the root 'FilePath'.
 moduleForBlob rootDir blob term = Module (moduleName blob) (blobPath blob) term
   where moduleName Blob{..} = let path = dropExtensions (makeRelative rootDir blobPath)
          in case blobLanguage of
