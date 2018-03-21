@@ -76,14 +76,15 @@ deriving instance Member NonDetEff effects => MonadNonDet (Evaluating term value
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value
-  = '[ Fail                                        -- Failure with an error message
+  = '[
+       Resumable Prelude.String value
+     , Fail                                        -- Failure with an error message
      , State  (EnvironmentFor value)               -- Environments (both local and global)
      , State  (HeapFor value)                      -- The heap
      , Reader (ModuleTable [term])                 -- Cache of unevaluated modules
      , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
      , State  (ExportsFor value)                   -- Exports (used to filter environments when they are imported)
      , State  (IntMap.IntMap term)                 -- For jumps
-     , Resumable Prelude.String value
      ]
 
 
