@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances, GADTs #-}
 module Analysis.Abstract.Evaluating
 ( type Evaluating
 , evaluate
@@ -6,6 +6,7 @@ module Analysis.Abstract.Evaluating
 ) where
 
 import Control.Abstract.Evaluator
+import Control.Monad.Effect.Internal (Arrow, relay, interpose)
 import Control.Monad.Effect
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
@@ -86,6 +87,24 @@ type EvaluatingEffects term value
      , State  (ExportsFor value)                   -- Exports (used to filter environments when they are imported)
      , State  (IntMap.IntMap term)                 -- For jumps
      ]
+
+data ResumeExc exc v a where
+   ResumeExc :: exc -> ResumeExc exc v v
+
+throwError :: forall exc v e. (ResumeExc exc v :< e) => exc -> Eff e v
+throwError e = send (ResumeExc e :: ResumeExc exc v v)
+
+runError :: Eff (ResumeExc exc v ': e) a -> Eff e (Either exc a)
+runError =
+   relay (pure . Right) (\ (ResumeExc e) _k -> pure (Left e))
+
+resumeError :: forall v exc e a. (ResumeExc exc v :< e) =>
+        Eff e a -> (Arrow e v a -> exc -> Eff e a) -> Eff e a
+resumeError m handle = interpose @(ResumeExc exc v) pure (\(ResumeExc e) yield -> handle yield e) m
+
+catchError :: forall v exc e proxy a. (ResumeExc exc v :< e) =>
+        proxy v -> Eff e a -> (exc -> Eff e a) -> Eff e a
+catchError _ m handle = resumeError @v m (\k e -> handle e)
 
 instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl term (Evaluating term value effects) where
   label term = do
