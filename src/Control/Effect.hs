@@ -7,6 +7,7 @@ import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Writer
+import Control.Monad.Effect.Resumable
 import Data.Semigroup.Reducer
 import Prologue
 
