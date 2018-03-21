@@ -9,8 +9,8 @@ import Data.Semigroup
 
 -- $setup
 -- >>> import Test.QuickCheck
--- >>> instance Arbitrary (f a) => Arbitrary (App f a) where arbitrary = App <$> arbitrary
--- >>> instance Arbitrary (f a) => Arbitrary (AppMerge f a) where arbitrary = AppMerge <$> arbitrary
+-- >>> instance Arbitrary (f a) => Arbitrary (App f a) where arbitrary = App <$> arbitrary ; shrink = map App . shrink . runApp
+-- >>> instance Arbitrary (f a) => Arbitrary (AppMerge f a) where arbitrary = AppMerge <$> arbitrary ; shrink = map AppMerge . shrink . runAppMerge
 
 -- | 'Semigroup' under '*>'.
 newtype App f a = App { runApp :: f a }
