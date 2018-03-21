@@ -81,7 +81,7 @@ evaluateFiles :: forall term effects
               -> IO (Final effects Value)
 evaluateFiles parser paths = do
   entry:xs <- traverse (parseFile parser) paths
-  pure $ evaluates @Value xs entry
+  pure . runAnalysis @(Evaluating term Value) . withModules (fst entry) xs $ evaluateModule (snd entry)
 
 -- Read and parse a file.
 parseFile :: Parser term -> FilePath -> IO (Blob, term)
