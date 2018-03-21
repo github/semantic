@@ -24,6 +24,7 @@ import Data.Abstract.Environment (Environment)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Exports (Exports)
 import qualified Data.Abstract.Exports as Export
+import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Coerce
@@ -73,7 +74,7 @@ load :: ( MonadAnalysis term value m
         )
      => ModuleName
      -> m (EnvironmentFor value)
-load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
+load name = askModuleTable >>= maybe notFound (evalAndCache . map moduleBody) . moduleTableLookup name
   where
     notFound = fail ("cannot load module: " <> show name)
     evalAndCache :: (MonadAnalysis term value m, Ord (LocationFor value)) => [term] -> m (EnvironmentFor value)

@@ -21,6 +21,7 @@ import qualified Data.Abstract.Environment as Env
 import qualified Data.Abstract.Exports as Export
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
+import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Semigroup.Reducer
@@ -128,9 +129,9 @@ class Monad m => MonadModuleTable term value m | m -> term, m -> value where
   putModuleTable :: ModuleTable (EnvironmentFor value) -> m ()
 
   -- | Retrieve the table of unevaluated modules.
-  askModuleTable :: m (ModuleTable [term])
+  askModuleTable :: m (ModuleTable [Module term])
   -- | Run an action with a locally-modified table of unevaluated modules.
-  localModuleTable :: (ModuleTable [term] -> ModuleTable [term]) -> m a -> m a
+  localModuleTable :: (ModuleTable [Module term] -> ModuleTable [Module term]) -> m a -> m a
 
 -- | Update the evaluated module table.
 modifyModuleTable :: MonadModuleTable term value m => (ModuleTable (EnvironmentFor value) -> ModuleTable (EnvironmentFor value)) -> m ()

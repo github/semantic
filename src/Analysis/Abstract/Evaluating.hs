@@ -13,6 +13,7 @@ import Control.Monad.Effect.State
 import Data.Abstract.Configuration
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
+import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Blob
@@ -56,10 +57,11 @@ evaluates pairs (b, t) = runAnalysis @(Evaluating term value) (withModules b pai
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
 withModules :: MonadAnalysis term value m => Blob -> [(Blob, term)] -> m a -> m a
-withModules Blob{..} pairs = localModuleTable (const moduleTable)
+withModules blob pairs = localModuleTable (const moduleTable)
   where
-    moduleTable = ModuleTable (Map.fromListWith (<>) (map (bimap moduleName pure) pairs))
-    rootDir = dropFileName blobPath
+    moduleTable = ModuleTable (Map.fromListWith (<>) (map toModulePair pairs))
+    rootDir = dropFileName (blobPath blob)
+    toModulePair (blob, term) = let name = moduleName blob in (name, [Module name (blobPath blob) term])
     moduleName Blob{..} = let path = dropExtensions (makeRelative rootDir blobPath)
      in case blobLanguage of
       -- TODO: Need a better way to handle module registration and resolution
@@ -81,7 +83,7 @@ type EvaluatingEffects term value
   = '[ Fail                                        -- Failure with an error message
      , State  (EnvironmentFor value)               -- Environments (both local and global)
      , State  (HeapFor value)                      -- The heap
-     , Reader (ModuleTable [term])                 -- Cache of unevaluated modules
+     , Reader (ModuleTable [Module term])          -- Cache of unevaluated modules
      , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
      , State  (ExportsFor value)                   -- Exports (used to filter environments when they are imported)
      , State  (IntMap.IntMap term)                 -- For jumps
@@ -114,7 +116,7 @@ instance Member (State (HeapFor value)) effects => MonadHeap value (Evaluating t
   getHeap = raise get
   putHeap = raise . put
 
-instance Members '[Reader (ModuleTable [term]), State (ModuleTable (EnvironmentFor value))] effects => MonadModuleTable term value (Evaluating term value effects) where
+instance Members '[Reader (ModuleTable [Module term]), State (ModuleTable (EnvironmentFor value))] effects => MonadModuleTable term value (Evaluating term value effects) where
   getModuleTable = raise get
   putModuleTable = raise . put
 
