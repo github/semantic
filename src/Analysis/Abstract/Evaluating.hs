@@ -6,7 +6,6 @@ module Analysis.Abstract.Evaluating
 ) where
 
 import Control.Abstract.Evaluator
-import Control.Monad.Effect.Internal (Arrow, relay, interpose)
 import Control.Monad.Effect
 import Control.Monad.Effect.Resumable
 import Data.Abstract.Configuration
