@@ -1,5 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module Data.Semigroup.App where
+module Data.Semigroup.App
+( AppMerge(..)
+) where
 
 import Control.Applicative
 import Data.Semigroup
