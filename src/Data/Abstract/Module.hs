@@ -17,6 +17,7 @@ data Module term = Module { moduleName :: ModuleName, modulePath :: FilePath, mo
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
 
+-- | Construct a 'Module' for a 'Blob' and @term@, relative to some root 'FilePath'.
 moduleForBlob :: FilePath -> Blob -> term -> Module term
 moduleForBlob rootDir blob term = Module (moduleName blob) (blobPath blob) term
   where moduleName Blob{..} = let path = dropExtensions (makeRelative rootDir blobPath)
