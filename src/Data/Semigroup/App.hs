@@ -19,5 +19,6 @@ instance (Applicative f, Monoid a, Semigroup a) => Monoid (AppMerge f a) where
   mappend = (<>)
 
 
+-- | 'Semigroup' under '*>'.
 newtype App f a = App { runApp :: f a }
   deriving (Alternative, Applicative, Bounded, Enum, Eq, Foldable, Functor, Monad, Ord, Show, Traversable)
