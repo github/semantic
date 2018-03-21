@@ -11,6 +11,7 @@ import Control.Monad.Effect
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
+import Control.Monad.Effect.Resumable
 import Data.Abstract.Configuration
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
@@ -86,36 +87,19 @@ type EvaluatingEffects term value
      , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
      , State  (ExportsFor value)                   -- Exports (used to filter environments when they are imported)
      , State  (IntMap.IntMap term)                 -- For jumps
-     , ResumeExc Prelude.String value
+     , Resumable Prelude.String value
      ]
 
-data ResumeExc exc v a where
-   ResumeExc :: exc -> ResumeExc exc v v
 
-throwError :: forall exc v e. (ResumeExc exc v :< e) => exc -> Eff e v
-throwError e = send (ResumeExc e :: ResumeExc exc v v)
-
-runError :: Eff (ResumeExc exc v ': e) a -> Eff e (Either exc a)
-runError =
-   relay (pure . Right) (\ (ResumeExc e) _k -> pure (Left e))
-
-resumeError :: forall v exc e a. (ResumeExc exc v :< e) =>
-        Eff e a -> (Arrow e v a -> exc -> Eff e a) -> Eff e a
-resumeError m handle = interpose @(ResumeExc exc v) pure (\(ResumeExc e) yield -> handle yield e) m
-
-resumeException :: forall v m exc e a. (Effectful m, ResumeExc exc v :< e) => m e a -> ((v -> m e a) -> exc -> m e a) -> m e a
+resumeException :: forall v m exc e a. (Effectful m, Resumable exc v :< e) => m e a -> ((v -> m e a) -> exc -> m e a) -> m e a
 resumeException m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
 
-catchError :: forall v exc e proxy a. (ResumeExc exc v :< e) =>
-        proxy v -> Eff e a -> (exc -> Eff e a) -> Eff e a
-catchError _ m handle = resumeError @v m (\k e -> handle e)
-
--- | 'ResumeExc' effects are interpreted into 'Either' s.t. failures are in 'Left' and successful results are in 'Right'.
-instance RunEffect (ResumeExc exc v) a where
-  type Result (ResumeExc exc v) a = Either exc a
+-- | 'Resumable' effects are interpreted into 'Either' s.t. failures are in 'Left' and successful results are in 'Right'.
+instance RunEffect (Resumable exc v) a where
+  type Result (Resumable exc v) a = Either exc a
   runEffect = runError
 
-instance Members '[ResumeExc Prelude.String value] effects => MonadResume Prelude.String value (Evaluating term value effects) where
+instance Members '[Resumable Prelude.String value] effects => MonadResume Prelude.String value (Evaluating term value effects) where
    throwException = raise . throwError
 
 instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl term (Evaluating term value effects) where
