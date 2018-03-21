@@ -10,3 +10,7 @@ newtype AppMerge f a = AppMerge { runAppMerge :: f a }
 
 instance (Applicative f, Semigroup a) => Semigroup (AppMerge f a) where
   AppMerge a <> AppMerge b = AppMerge ((<>) <$> a <*> b)
+
+instance (Applicative f, Monoid a, Semigroup a) => Monoid (AppMerge f a) where
+  mempty = AppMerge (pure mempty)
+  mappend = (<>)
