@@ -13,7 +13,7 @@ module Control.Abstract.Evaluator
   , MonadModuleTable(..)
   , modifyModuleTable
   , MonadControl(..)
-  , MonadResume(..)
+  , MonadThrow(..)
 ) where
 
 import Data.Abstract.Address
@@ -149,5 +149,5 @@ class Monad m => MonadControl term m where
   -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
   goto :: Label -> m term
 
-class Monad m => MonadResume exc v m | m -> exc where
+class Monad m => MonadThrow exc v m | m -> exc where
   throwException :: exc -> m v
