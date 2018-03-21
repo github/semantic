@@ -244,7 +244,7 @@ instance ( Monad m
         assign a v
         Env.insert name a <$> rest) (pure env) (zip names params)
       localEnv (mappend bindings) (goto label >>= evaluateTerm)
-    | otherwise = fail ("Type error: expected class or closure")
+    | otherwise = fail "Type error: expected class or closure"
 
   loop = fix
 
