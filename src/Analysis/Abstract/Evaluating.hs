@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating
 ( type Evaluating
-, evaluate
 ) where
 
 import Control.Abstract.Evaluator
@@ -18,21 +17,6 @@ import Data.Abstract.Value
 import qualified Data.IntMap as IntMap
 import Prelude hiding (fail)
 import Prologue
-
--- | Evaluate a term to a value.
-evaluate :: forall value term effects
-         .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
-            , Evaluatable (Base term)
-            , FreeVariables term
-            , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-            , MonadValue value (Evaluating term value effects)
-            , Recursive term
-            , Show (LocationFor value)
-            )
-         => term
-         -> Final effects value
-evaluate = runAnalysis @(Evaluating term value) . evaluateModule
-
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
 newtype Evaluating term value effects a = Evaluating (Eff effects a)
