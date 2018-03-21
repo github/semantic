@@ -106,6 +106,11 @@ catchError :: forall v exc e proxy a. (ResumeExc exc v :< e) =>
         proxy v -> Eff e a -> (exc -> Eff e a) -> Eff e a
 catchError _ m handle = resumeError @v m (\k e -> handle e)
 
+-- | 'ResumeExc' effects are interpreted into 'Either' s.t. failures are in 'Left' and successful results are in 'Right'.
+instance RunEffect (ResumeExc exc v) a where
+  type Result (ResumeExc exc v) a = Either exc a
+  runEffect = runError
+
 instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl term (Evaluating term value effects) where
   label term = do
     m <- raise get
