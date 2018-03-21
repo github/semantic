@@ -25,3 +25,7 @@ newtype App f a = App { runApp :: f a }
 
 instance Applicative f => Semigroup (App f a) where
   App a <> App b = App (a *> b)
+
+instance (Applicative f, Monoid a) => Monoid (App f a) where
+  mempty = App (pure mempty)
+  mappend = (<>)
