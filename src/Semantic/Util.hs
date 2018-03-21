@@ -65,7 +65,7 @@ evaluateFile :: forall term effects
              => Parser term
              -> FilePath
              -> IO (Final effects Value)
-evaluateFile parser path = evaluate . snd <$> parseFile parser path
+evaluateFile parser path = runAnalysis @(Evaluating term Value) . evaluateModule . snd <$> parseFile parser path
 
 -- Evaluate a list of files (head of file list is considered the entry point).
 evaluateFiles :: forall term effects
