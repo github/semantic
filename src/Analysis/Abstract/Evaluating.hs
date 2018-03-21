@@ -90,12 +90,7 @@ type EvaluatingEffects term value
 resumeException :: forall v m exc e a. (Effectful m, Resumable exc v :< e) => m e a -> ((v -> m e a) -> exc -> m e a) -> m e a
 resumeException m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
 
--- | 'Resumable' effects are interpreted into 'Either' s.t. failures are in 'Left' and successful results are in 'Right'.
-instance RunEffect (Resumable exc v) a where
-  type Result (Resumable exc v) a = Either exc a
-  runEffect = runError
-
-instance Members '[Resumable Prelude.String value] effects => MonadResume Prelude.String value (Evaluating term value effects) where
+instance Members '[Resumable Prelude.String value] effects => MonadThrow Prelude.String value (Evaluating term value effects) where
    throwException = raise . throwError
 
 instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl term (Evaluating term value effects) where

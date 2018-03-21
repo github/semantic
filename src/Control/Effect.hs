@@ -62,6 +62,11 @@ instance Ord a => RunEffect NonDetEff a where
   type Result NonDetEff a = Set a
   runEffect = runNonDetEff unit
 
+-- | 'Resumable' effects are interpreted into 'Either' s.t. failures are in 'Left' and successful results are in 'Right'.
+instance RunEffect (Resumable exc v) a where
+  type Result (Resumable exc v) a = Either exc a
+  runEffect = runError
+
 
 -- | Types wrapping 'Eff' actions.
 --
