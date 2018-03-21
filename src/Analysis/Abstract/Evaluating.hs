@@ -103,6 +103,9 @@ resumeError :: forall v exc e a. (ResumeExc exc v :< e) =>
         Eff e a -> (Arrow e v a -> exc -> Eff e a) -> Eff e a
 resumeError m handle = interpose @(ResumeExc exc v) pure (\(ResumeExc e) yield -> handle yield e) m
 
+resumeException :: forall v m exc e a. (Effectful m, ResumeExc exc v :< e) => m e a -> ((v -> m e a) -> exc -> m e a) -> m e a
+resumeException m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
+
 catchError :: forall v exc e proxy a. (ResumeExc exc v :< e) =>
         proxy v -> Eff e a -> (exc -> Eff e a) -> Eff e a
 catchError _ m handle = resumeError @v m (\k e -> handle e)
@@ -163,4 +166,4 @@ instance ( Evaluatable (Base term)
          => MonadAnalysis term value (Evaluating term value effects) where
   type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
 
-  analyzeTerm term = let evaled = eval term in raise $ resumeError @value (lower evaled) (\yield exc -> lower (string (BC.pack exc) `asTypeOf` evaled) >>= yield)
+  analyzeTerm term = resumeException @value (eval term) (\yield exc -> string (BC.pack exc) >>= yield)
