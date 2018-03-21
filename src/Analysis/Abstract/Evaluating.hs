@@ -8,9 +8,6 @@ module Analysis.Abstract.Evaluating
 import Control.Abstract.Evaluator
 import Control.Monad.Effect.Internal (Arrow, relay, interpose)
 import Control.Monad.Effect
-import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.State
 import Control.Monad.Effect.Resumable
 import Data.Abstract.Configuration
 import qualified Data.Abstract.Environment as Env

@@ -1,9 +1,8 @@
 {-# LANGUAGE DataKinds, MultiParamTypeClasses, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Effect where
 
-import qualified Control.Monad.Effect as Effect
+import Control.Monad.Effect as Effect
 import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Internal
 import Control.Monad.Effect.NonDetEff
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
@@ -61,9 +60,7 @@ instance Monoid w => RunEffect (Writer w) a where
 -- | 'NonDetEff' effects are interpreted into a nondeterministic set of result values.
 instance Ord a => RunEffect NonDetEff a where
   type Result NonDetEff a = Set a
-  runEffect = relay (pure . unit) (\ m k -> case m of
-    MZero -> pure mempty
-    MPlus -> mappend <$> k True <*> k False)
+  runEffect = runNonDetEff unit
 
 
 -- | Types wrapping 'Eff' actions.
