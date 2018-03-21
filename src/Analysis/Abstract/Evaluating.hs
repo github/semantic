@@ -111,6 +111,9 @@ instance RunEffect (ResumeExc exc v) a where
   type Result (ResumeExc exc v) a = Either exc a
   runEffect = runError
 
+instance Members '[ResumeExc Prelude.String value] effects => MonadResume Prelude.String value (Evaluating term value effects) where
+   throwException = raise . throwError
+
 instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl term (Evaluating term value effects) where
   label term = do
     m <- raise get
