@@ -22,7 +22,7 @@ instance Applicative f => Semigroup (App f a) where
   App a <> App b = App (a *> b)
 
 
--- | 'Semigroup' under '<*>' and '<>'.
+-- | 'Semigroup' and 'Monoid' under '<*>' and '<>'.
 newtype AppMerge f a = AppMerge { runAppMerge :: f a }
   deriving (Alternative, Applicative, Bounded, Enum, Eq, Foldable, Functor, Monad, Ord, Show, Traversable)
 
