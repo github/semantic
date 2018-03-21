@@ -200,11 +200,13 @@ instance Ord1 NamespaceName where liftCompare = genericLiftCompare
 instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable NamespaceName where
-  eval (NamespaceName [])     = fail "nonempty NamespaceName not allowed"
-  eval (NamespaceName [x])    = subtermValue x
-  eval (NamespaceName (x:xs)) = do
-    x' <- subtermValue x >>= objectEnvironment
-    localEnv (mappend x') (eval (NamespaceName xs))
+  eval (NamespaceName xs) = go xs
+    where
+      go []     = fail "nonempty NamespaceName not allowed"
+      go [x]    = subtermValue x
+      go (x:xs) = do
+        env <- subtermValue x >>= objectEnvironment
+        localEnv (mappend env) (go xs)
 
 newtype ConstDeclaration a = ConstDeclaration [a]
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -359,14 +361,31 @@ instance Ord1 Namespace where liftCompare = genericLiftCompare
 instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Namespace where
-  eval Namespace{..} = do
-    -- TODO: Need a version of letrec that takes list of names/free variables
-    let name = freeVariable (subterm namespaceName)
-    (v, addr) <- letrec name $ do
-      void $ subtermValue namespaceBody
-      namespaceEnv <- Env.head <$> getEnv
-      klass name namespaceEnv
-    v <$ modifyEnv (Env.insert name addr)
+  eval Namespace{..} = go names
+    where
+      names = toList (freeVariables (subterm namespaceName))
+
+      go [] = fail "gotta fix this"
+      go [name] = do
+        v <- localEnv id $ do
+          void $ subtermValue namespaceBody
+          namespaceEnv <- Env.head <$> getEnv
+          klass name namespaceEnv
+
+        addr <- lookupOrAlloc name
+        assign addr v
+        v <$ modifyEnv (Env.insert name addr)
+      go (name:xs) = do
+        (v, res) <- localEnv id $ do
+          res <- go xs
+          namespaceEnv <- Env.head <$> getEnv
+          v <- klass name namespaceEnv
+          pure (v, res)
+
+        addr <- trace (show name) (lookupOrAlloc name)
+        assign addr v
+        modifyEnv (insert name addr)
+        pure res
 
 data TraitDeclaration a = TraitDeclaration { traitName :: a, traitStatements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
