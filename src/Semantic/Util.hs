@@ -92,9 +92,10 @@ evaluateWithPrelude :: forall term effects
                     -> FilePath
                     -> IO (Final effects Value)
 evaluateWithPrelude parser path = do
-  let paths = [TypeLevel.symbolVal (Proxy :: Proxy (PreludePath term)), path]
-  entry:xs <- traverse (parseFile parser) paths
-  pure $ evaluates @Value xs entry
+  let preludePath = TypeLevel.symbolVal (Proxy :: Proxy (PreludePath term))
+  prelude <- parseFile parser preludePath
+  blob <- parseFile parser path
+  pure $ evaluateWith (snd prelude) (snd blob)
 
 -- Evaluate a list of files (head of file list is considered the entry point).
 evaluateFiles :: forall term effects

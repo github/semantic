@@ -3,6 +3,7 @@ module Analysis.Abstract.Evaluating
 ( type Evaluating
 , evaluate
 , evaluates
+, evaluateWith
 ) where
 
 import Control.Abstract.Evaluator
@@ -38,6 +39,22 @@ evaluate :: forall value term effects
          => term
          -> Final effects value
 evaluate = runAnalysis @(Evaluating term value) . evaluateModule
+
+evaluateWith :: forall value term effects
+             .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
+                , Evaluatable (Base term)
+                , FreeVariables term
+                , MonadAddressable (LocationFor value) value (Evaluating term value effects)
+                , MonadValue value (Evaluating term value effects)
+                , Recursive term
+                , Show (LocationFor value)
+                )
+         => term
+         -> term
+         -> Final effects value
+evaluateWith prelude t = runAnalysis @(Evaluating term value) $ do
+  preludeEnv <- evaluateModule prelude *> getEnv
+  withEnv preludeEnv (evaluateModule t)
 
 -- | Evaluate terms and an entry point to a value.
 evaluates :: forall value term effects
