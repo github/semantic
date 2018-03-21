@@ -2,7 +2,6 @@
 module Analysis.Abstract.Evaluating
 ( type Evaluating
 , evaluate
-, evaluates
 ) where
 
 import Control.Abstract.Evaluator
@@ -16,7 +15,6 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
-import Data.Blob
 import qualified Data.IntMap as IntMap
 import Prelude hiding (fail)
 import Prologue
@@ -35,20 +33,6 @@ evaluate :: forall value term effects
          -> Final effects value
 evaluate = runAnalysis @(Evaluating term value) . evaluateModule
 
--- | Evaluate terms and an entry point to a value.
-evaluates :: forall value term effects
-          .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
-             , Evaluatable (Base term)
-             , FreeVariables term
-             , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-             , MonadValue value (Evaluating term value effects)
-             , Recursive term
-             , Show (LocationFor value)
-             )
-          => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
-          -> (Blob, term)   -- Entrypoint
-          -> Final effects value
-evaluates pairs (b, t) = runAnalysis @(Evaluating term value) (withModules b pairs (evaluateModule t))
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
 newtype Evaluating term value effects a = Evaluating (Eff effects a)
