@@ -21,13 +21,6 @@ newtype App f a = App { runApp :: f a }
 instance Applicative f => Semigroup (App f a) where
   App a <> App b = App (a *> b)
 
--- $ Identity:
---   prop> \ a -> mempty <> a == (a :: App Maybe String)
---   prop> \ a -> a <> mempty == (a :: App Maybe String)
-instance (Applicative f, Monoid a) => Monoid (App f a) where
-  mempty = App (pure mempty)
-  mappend = (<>)
-
 
 -- | 'Semigroup' under '<*>' and '<>'.
 newtype AppMerge f a = AppMerge { runAppMerge :: f a }
