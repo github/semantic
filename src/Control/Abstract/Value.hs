@@ -88,7 +88,7 @@ class (Monad m, Show value) => MonadValue value m where
 
   -- | Build a class value from a name and environment.
   klass :: Name                 -- ^ The new class's identifier
-        -> Maybe value          -- ^ A list of superclasses
+        -> Maybe value          -- ^ An optional superclass.
         -> EnvironmentFor value -- ^ The environment to capture
         -> m value
 
