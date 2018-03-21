@@ -25,15 +25,11 @@ import Data.Abstract.Environment (Environment)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Exports (Exports)
 import qualified Data.Abstract.Exports as Export
-import Data.Abstract.FreeVariables
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Blob
-import qualified Data.ByteString.Char8 as BC
 import Data.Coerce
-import Data.Language
-import Data.List.Split (splitWhen)
 import qualified Data.Map as Map
 import Prelude hiding (fail)
 import Prologue
@@ -70,13 +66,7 @@ withModules blob pairs = localModuleTable (const moduleTable)
   where
     moduleTable = ModuleTable (Map.fromListWith (<>) (map toModulePair pairs))
     rootDir = dropFileName (blobPath blob)
-    toModulePair (blob, term) = let name = moduleName blob in (name, [Module name (blobPath blob) term])
-    moduleName Blob{..} = let path = dropExtensions (makeRelative rootDir blobPath)
-     in case blobLanguage of
-      -- TODO: Need a better way to handle module registration and resolution
-      Just Go -> toName (takeDirectory path) -- Go allows defining modules across multiple files in the same directory.
-      _ ->  toName path
-    toName str = qualifiedName (fmap BC.pack (splitWhen (== pathSeparator) str))
+    toModulePair (blob, term) = let m = moduleForBlob rootDir blob term in (moduleName m, [m])
 
 
 -- | Require/import another term/file and return an Effect.
