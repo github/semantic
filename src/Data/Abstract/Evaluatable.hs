@@ -16,6 +16,7 @@ import Data.Abstract.Value
 import Data.Functor.Classes
 import Data.Proxy
 import Data.Semigroup.Foldable
+import Data.Semigroup.App
 import Data.Term
 import Prelude hiding (fail)
 import Prologue
@@ -51,7 +52,7 @@ instance Evaluatable s => Evaluatable (TermF s a) where
 --   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval = maybe unit (runImperative . foldMap1 (Imperative . subtermValue)) . nonEmpty
+  eval = maybe unit (runApp . foldMap1 (App . subtermValue)) . nonEmpty
 
 -- | A 'Semigroup' providing an imperative context which extends the local environment with new bindings.
 newtype Imperative m a = Imperative { runImperative :: m a }
