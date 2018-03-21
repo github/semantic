@@ -87,7 +87,10 @@ class (Monad m, Show value) => MonadValue value m where
   ifthenelse :: value -> m a -> m a -> m a
 
   -- | Build a class value from a name and environment.
-  klass :: Name -> EnvironmentFor value -> m value
+  klass :: Name                 -- ^ The new class's identifier
+        -> Maybe value          -- ^ A list of superclasses
+        -> EnvironmentFor value -- ^ The environment to capture
+        -> m value
 
   -- | Extract the environment from a class.
   objectEnvironment :: value -> m (EnvironmentFor value)
@@ -152,7 +155,11 @@ instance ( Monad m
   multiple = pure . injValue . Value.Tuple
   array    = pure . injValue . Value.Array
 
-  klass n  = pure . injValue . Class n
+  klass n Nothing env = pure . injValue $ Class n env
+  klass n (Just super) env
+    | Just (Class _ superEnv) <- prjValue super = pure . injValue $ Class n (Env.push superEnv <> env)
+    | otherwise = fail ("Attempted to inherit from a non-class object: " <> show super)
+
 
   objectEnvironment o
     | Just (Class _ env) <- prjValue o = pure env
@@ -260,7 +267,8 @@ instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, Mon
   rational _ = pure Type.Rational
   multiple   = pure . Type.Product
   array      = pure . Type.Array
-  klass _ _  = pure Object
+
+  klass _ _ _  = pure Object
 
   objectEnvironment _ = pure mempty
 

@@ -146,10 +146,11 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Class where
   eval Class{..} = do
     let name = freeVariable (subterm classIdentifier)
+    supers <- traverse subtermValue classSuperclasses
     (v, addr) <- letrec name $ do
       void $ subtermValue classBody
       classEnv <- Env.head <$> getEnv
-      klass name classEnv
+      klass name (listToMaybe supers) classEnv
     v <$ modifyEnv (Env.insert name addr)
 
 data Module a = Module { moduleIdentifier :: !a, moduleScope :: ![a] }
