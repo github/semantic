@@ -21,7 +21,7 @@ import qualified Data.IntMap as IntMap
 import Data.Language
 import Data.List.Split (splitWhen)
 import Prelude hiding (fail)
-import Prologue
+import Prologue hiding (throwError)
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.Map as Map
 import System.FilePath.Posix
@@ -86,6 +86,7 @@ type EvaluatingEffects term value
      , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
      , State  (ExportsFor value)                   -- Exports (used to filter environments when they are imported)
      , State  (IntMap.IntMap term)                 -- For jumps
+     , ResumeExc Prelude.String value
      ]
 
 data ResumeExc exc v a where
@@ -162,4 +163,4 @@ instance ( Evaluatable (Base term)
          => MonadAnalysis term value (Evaluating term value effects) where
   type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
 
-  analyzeTerm = eval
+  analyzeTerm term = let evaled = eval term in raise $ resumeError @value (lower evaled) (\yield exc -> lower (string (BC.pack exc) `asTypeOf` evaled) >>= yield)
