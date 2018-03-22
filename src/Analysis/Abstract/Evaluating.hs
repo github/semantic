@@ -5,7 +5,6 @@ module Analysis.Abstract.Evaluating
 
 import Control.Abstract.Evaluator
 import Control.Monad.Effect
-import Control.Monad.Effect.Resumable
 import Data.Abstract.Configuration
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
@@ -39,9 +38,6 @@ type EvaluatingEffects term value
      , State  (IntMap.IntMap term)                 -- For jumps
      ]
 
-
-instance Members '[Resumable Prelude.String value] effects => MonadThrow Prelude.String value (Evaluating term value effects) where
-   throwException = raise . throwError
 
 instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl term (Evaluating term value effects) where
   label term = do

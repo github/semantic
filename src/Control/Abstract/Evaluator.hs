@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstrainedClassMethods, FunctionalDependencies #-}
+{-# LANGUAGE ConstrainedClassMethods, DataKinds, FunctionalDependencies, UndecidableInstances #-}
 module Control.Abstract.Evaluator
 ( MonadEvaluator(..)
 , MonadEnvironment(..)
@@ -17,6 +17,8 @@ module Control.Abstract.Evaluator
 , EvaluateModule(..)
 ) where
 
+import Control.Effect
+import Control.Monad.Effect.Resumable
 import Data.Abstract.Address
 import Data.Abstract.Configuration
 import qualified Data.Abstract.Environment as Env
@@ -27,7 +29,7 @@ import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Semigroup.Reducer
-import Prologue
+import Prologue hiding (throwError)
 
 -- | A 'Monad' providing the basic essentials for evaluation.
 --
@@ -161,3 +163,6 @@ class Monad m => MonadThrow exc v m where
 
 newtype EvaluateModule term = EvaluateModule (Module term)
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
+
+instance (Effectful m, Members '[Resumable exc value] effects, Monad (m effects)) => MonadThrow exc value (m effects) where
+  throwException = raise . throwError
