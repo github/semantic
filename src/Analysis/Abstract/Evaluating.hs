@@ -3,6 +3,8 @@ module Analysis.Abstract.Evaluating
 ( type Evaluating
 , evaluate
 , evaluates
+, require
+, load
 ) where
 
 import Control.Abstract.Evaluator
@@ -12,6 +14,9 @@ import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Data.Abstract.Configuration
 import qualified Data.Abstract.Environment as Env
+import Data.Abstract.Environment (Environment)
+import qualified Data.Abstract.Exports as Export
+import Data.Abstract.Exports (Exports)
 import Data.Abstract.Evaluatable
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
@@ -67,6 +72,46 @@ withModules Blob{..} pairs = localModuleTable (const moduleTable)
       _ ->  toName path
     toName str = qualifiedName (fmap BC.pack (splitWhen (== pathSeparator) str))
 
+-- | Require/import another module by name and return it's environment and value.
+--
+-- Looks up the term's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
+require :: (MonadAnalysis term value m, MonadValue value m)
+        => ModuleName
+        -> m (EnvironmentFor value, value)
+require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup name
+
+-- | Load another module by name and return it's environment and value.
+--
+-- Always loads/evaluates.
+load :: (MonadAnalysis term value m, MonadValue value m)
+     => ModuleName
+     -> m (EnvironmentFor value, value)
+load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
+  where
+    notFound = fail ("cannot load module: " <> show name)
+    evalAndCache :: (MonadAnalysis term value m, MonadValue value m) => [term] -> m (EnvironmentFor value, value)
+    evalAndCache []     = (,) <$> pure mempty <*> unit
+    evalAndCache [x]    = evalAndCache' x
+    evalAndCache (x:xs) = do
+      (env, _) <- evalAndCache' x
+      (env', v') <- evalAndCache xs
+      pure (env <> env', v')
+
+    evalAndCache' :: (MonadAnalysis term value m) => term -> m (EnvironmentFor value, value)
+    evalAndCache' x = do
+      v <- evaluateModule x
+      env <- filterEnv <$> getExports <*> getEnv
+      modifyModuleTable (moduleTableInsert name (env, v))
+      pure (env, v)
+
+    -- TODO: If the set of exports is empty because no exports have been
+    -- defined, do we export all terms, or no terms? This behavior varies across
+    -- languages. We need better semantics rather than doing it ad-hoc.
+    filterEnv :: Exports l a -> Environment l a -> Environment l a
+    filterEnv ports env
+      | Export.null ports = env
+      | otherwise = Export.toEnvironment ports <> Env.overwrite (Export.aliases ports) env
+
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
 newtype Evaluating term value effects a = Evaluating (Eff effects a)
   deriving (Applicative, Functor, Effectful, Monad)
@@ -82,7 +127,7 @@ type EvaluatingEffects term value
      , State  (EnvironmentFor value)               -- Environments (both local and global)
      , State  (HeapFor value)                      -- The heap
      , Reader (ModuleTable [term])                 -- Cache of unevaluated modules
-     , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
+     , State  (ModuleTable (EnvironmentFor value, value)) -- Cache of evaluated modules
      , State  (ExportsFor value)                   -- Exports (used to filter environments when they are imported)
      , State  (IntMap.IntMap term)                 -- For jumps
      ]
@@ -114,7 +159,7 @@ instance Member (State (HeapFor value)) effects => MonadHeap value (Evaluating t
   getHeap = raise get
   putHeap = raise . put
 
-instance Members '[Reader (ModuleTable [term]), State (ModuleTable (EnvironmentFor value))] effects => MonadModuleTable term value (Evaluating term value effects) where
+instance Members '[Reader (ModuleTable [term]), State (ModuleTable (EnvironmentFor value, value))] effects => MonadModuleTable term value (Evaluating term value effects) where
   getModuleTable = raise get
   putModuleTable = raise . put
 
