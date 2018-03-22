@@ -159,14 +159,11 @@ instance ( Monad m
 
   namespace n env = do
     maybeAddr <- lookupEnv n
-
-    ns <- maybe (pure (Namespace n env)) (\addr -> do
-      v <- prjValue <$> deref addr
-      case v of
-        Just (Namespace n env') -> pure (Namespace n (env' <> env))
-        Nothing -> fail ("tried to extend, but " <> show v <> " is not a namespace")
-      ) maybeAddr
-    pure (injValue ns)
+    env' <- maybe (pure mempty) (asNamespaceEnv <=< deref) maybeAddr
+    pure (injValue (Namespace n (env' <> env)))
+    where asNamespaceEnv v
+            | Just (Namespace _ env') <- prjValue v = pure env'
+            | otherwise                             = fail ("expected " <> show v <> " to be a namespace")
 
   -- TODO: Rename to scopedEnvironment
   objectEnvironment o
