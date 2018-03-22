@@ -28,6 +28,7 @@ class Evaluatable constr where
           , MonadValue value m
           , Show (LocationFor value)
           , MonadThrow Prelude.String value m
+          , MonadThrow (EvaluateModule term) value m
           )
        => SubtermAlgebra constr term (m value)
   default eval :: (MonadThrow Prelude.String value m, Show1 constr) => SubtermAlgebra constr term (m value)

@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, MultiParamTypeClasses, TypeFamilies #-}
+{-# LANGUAGE DataKinds, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For runAnalysis
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
@@ -76,6 +76,7 @@ evaluateModules (m:ms) = withModules ms (evaluateModule m)
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
 require :: ( MonadAnalysis term value m
+           , MonadThrow (EvaluateModule term) value m
            , Ord (LocationFor value)
            )
         => ModuleName
@@ -86,6 +87,7 @@ require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup nam
 --
 -- Always loads/evaluates.
 load :: ( MonadAnalysis term value m
+        , MonadThrow (EvaluateModule term) value m
         , Ord (LocationFor value)
         )
      => ModuleName
@@ -93,10 +95,10 @@ load :: ( MonadAnalysis term value m
 load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
   where
     notFound = fail ("cannot load module: " <> show name)
-    evalAndCache :: (MonadAnalysis term value m, Ord (LocationFor value)) => [Module term] -> m (EnvironmentFor value)
+    evalAndCache :: forall term value m . (MonadAnalysis term value m, MonadThrow (EvaluateModule term) value m, Ord (LocationFor value)) => [Module term] -> m (EnvironmentFor value)
     evalAndCache []     = pure mempty
     evalAndCache (x:xs) = do
-      void $ evaluateModule x
+      void (throwException (EvaluateModule x) :: m value)
       env <- filterEnv <$> getExports <*> getEnv
       modifyModuleTable (moduleTableInsert name env)
       (env <>) <$> evalAndCache xs
