@@ -60,6 +60,7 @@ evaluateTerm :: MonadAnalysis term value m => term -> m value
 evaluateTerm = foldSubterms analyzeTerm
 
 
+-- | Run an action with the a list of 'Module's available for imports.
 withModules :: MonadAnalysis term value m => [Module term] -> m a -> m a
 withModules = localModuleTable . const . ModuleTable.fromList
 
