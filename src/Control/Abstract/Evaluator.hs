@@ -44,6 +44,8 @@ class ( MonadControl term m
   getConfiguration :: Ord (LocationFor value) => term -> m (ConfigurationFor term value)
 
   -- | Retrieve the stack of modules currently being evaluated.
+  --
+  --   With great power comes great responsibility. If you 'evaluateModule' any of these, you probably deserve what you get.
   askModuleStack :: m [Module term]
 
 
