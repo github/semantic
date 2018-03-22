@@ -1,6 +1,7 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
 module Analysis.Abstract.ImportGraph
 ( ImportGraph(..)
+, ImportGraphing
 , renderImportGraph
 , buildImportGraph
 , ImportGraphAlgebra(..)
@@ -9,6 +10,7 @@ module Analysis.Abstract.ImportGraph
 import qualified Algebra.Graph as G
 import Algebra.Graph.Class
 import Algebra.Graph.Export.Dot
+import Control.Abstract.Analysis
 import Data.Abstract.FreeVariables
 import Data.Set (member)
 import qualified Data.Syntax as Syntax
@@ -28,6 +30,15 @@ buildImportGraph = foldSubterms importGraphAlgebra
 -- | Render a 'ImportGraph' to a 'ByteString' in DOT notation.
 renderImportGraph :: ImportGraph -> ByteString
 renderImportGraph = export (defaultStyle friendlyName) . unImportGraph
+
+newtype ImportGraphing m term value (effects :: [* -> *]) a = ImportGraphing (m term value effects a)
+  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
+
+deriving instance MonadControl term (m term value effects) => MonadControl term (ImportGraphing m term value effects)
+deriving instance MonadEnvironment value (m term value effects) => MonadEnvironment value (ImportGraphing m term value effects)
+deriving instance MonadHeap value (m term value effects) => MonadHeap value (ImportGraphing m term value effects)
+deriving instance MonadModuleTable term value (m term value effects) => MonadModuleTable term value (ImportGraphing m term value effects)
+deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (ImportGraphing m term value effects)
 
 
 -- | Types which contribute to a 'ImportGraph'. There is exactly one instance of this typeclass; customizing the 'ImportGraph's for a new type is done by defining an instance of 'CustomImportGraphAlgebra' instead.
