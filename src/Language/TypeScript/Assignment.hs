@@ -9,6 +9,7 @@ module Language.TypeScript.Assignment
 import Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import Data.Abstract.FreeVariables
+import Data.Abstract.Path
 import Data.Record
 import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, contextualize, postContextualize)
 import qualified Data.Syntax as Syntax
@@ -672,7 +673,9 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
     makeNameAliasPair from Nothing = (from, from)
 
 fromClause :: Assignment
-fromClause = makeTerm <$> symbol Grammar.String <*> (Syntax.Identifier <$> (pathToQualifiedName <$> source))
+fromClause = makeTerm <$> symbol Grammar.String <*> (Syntax.Identifier <$> (toName <$> source))
+  where
+    toName = qualifiedName . splitOnPathSeparator . dropRelativePrefix . stripQuotes
 
 debuggerStatement :: Assignment
 debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> (TypeScript.Syntax.Debugger <$ source)

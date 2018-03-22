@@ -88,7 +88,7 @@ class (Monad m, Show value) => MonadValue value m where
 
   -- | Build a class value from a name and environment.
   klass :: Name                 -- ^ The new class's identifier
-        -> Maybe value          -- ^ A list of superclasses
+        -> Maybe value          -- ^ An optional superclass.
         -> EnvironmentFor value -- ^ The environment to capture
         -> m value
 
@@ -236,7 +236,6 @@ instance ( Monad m
     injValue . Closure names l . Env.bind (foldr Set.delete (freeVariables body) names) <$> getEnv
 
   apply op params
-    | Just klass@Class{} <- prjValue op = pure . injValue $ klass
     | Just (Closure names label env) <- prjValue op = do
       bindings <- foldr (\ (name, param) rest -> do
         v <- param
