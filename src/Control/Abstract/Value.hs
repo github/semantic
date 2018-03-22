@@ -89,6 +89,9 @@ class (Monad m, Show value) => MonadValue value m where
   -- | Build a class value from a name and environment.
   klass :: Name -> EnvironmentFor value -> m value
 
+  -- | Build a namespace value from a name and environment stack
+  namespace :: Name -> EnvironmentFor value -> m value
+
   -- | Extract the environment from a class.
   objectEnvironment :: value -> m (EnvironmentFor value)
 
@@ -154,8 +157,21 @@ instance ( Monad m
 
   klass n  = pure . injValue . Class n
 
+  namespace n env = do
+    maybeAddr <- lookupEnv n
+
+    ns <- maybe (pure (Namespace n env)) (\addr -> do
+      v <- prjValue <$> deref addr
+      case v of
+        Just (Namespace n env') -> pure (Namespace n (env' <> env))
+        Nothing -> fail ("tried to extend, but " <> show v <> " is not a namespace")
+      ) maybeAddr
+    pure (injValue ns)
+
+  -- TODO: Rename to scopedEnvironment
   objectEnvironment o
     | Just (Class _ env) <- prjValue o = pure env
+    | Just (Namespace _ env) <- prjValue o = pure env
     | otherwise = fail ("non-object type passed to objectEnvironment: " <> show o)
 
   asString v
