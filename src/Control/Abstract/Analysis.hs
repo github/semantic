@@ -63,10 +63,13 @@ evaluateTerm = foldSubterms analyzeTerm
 withModules :: MonadAnalysis term value m => [Module term] -> m a -> m a
 withModules = localModuleTable . const . ModuleTable.fromList
 
+modulesForBlobs :: Blob -> [(Blob, term)] -> [Module term]
+modulesForBlobs blob = map (uncurry (moduleForBlob (Just rootDir)))
+  where rootDir = dropFileName (blobPath blob)
+
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
 withModulesForBlobs :: MonadAnalysis term value m => Blob -> [(Blob, term)] -> m a -> m a
-withModulesForBlobs blob = withModules . map (uncurry (moduleForBlob (Just rootDir)))
-  where rootDir = dropFileName (blobPath blob)
+withModulesForBlobs blob = withModules . modulesForBlobs blob
 
 
 -- | Require/import another term/file and return an Effect.
