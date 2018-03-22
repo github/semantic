@@ -12,6 +12,7 @@ import Algebra.Graph.Class
 import Algebra.Graph.Export.Dot
 import Control.Abstract.Analysis
 import Data.Abstract.FreeVariables
+import Data.Abstract.Module
 import Data.Set (member)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
@@ -45,6 +46,8 @@ instance MonadAnalysis term value (m term value effects) => MonadAnalysis term v
   type RequiredEffects term value (ImportGraphing m term value effects) = RequiredEffects term value (m term value effects)
 
   analyzeTerm = liftAnalyze analyzeTerm
+
+  evaluateModule m@Module{..} = ImportGraphing (evaluateModule m)
 
 
 -- | Types which contribute to a 'ImportGraph'. There is exactly one instance of this typeclass; customizing the 'ImportGraph's for a new type is done by defining an instance of 'CustomImportGraphAlgebra' instead.
