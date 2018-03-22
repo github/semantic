@@ -48,6 +48,8 @@ instance ( Effectful (m term value)
     modifyHeap (gc (roots <> valueRoots v))
     pure v
 
+  analyzeModule = liftAnalyze analyzeModule
+
 
 -- | Retrieve the local 'Live' set.
 askRoots :: (Effectful m, Member (Reader (Live (LocationFor value) value)) effects) => m effects (Live (LocationFor value) value)

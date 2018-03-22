@@ -3,6 +3,7 @@
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , evaluateTerm
+, evaluateModule
 , withModules
 , evaluateModules
 , require
@@ -43,9 +44,7 @@ class (MonadEvaluator term value m, Recursive term) => MonadAnalysis term value 
   -- | Analyze a term using the semantics of the current analysis. This should generally only be called by definitions of 'evaluateTerm' and 'analyzeTerm' in this or other instances.
   analyzeTerm :: SubtermAlgebra (Base term) term (m value)
 
-  -- | Evaluate a (root-level) term to a value using the semantics of the current analysis. This should be used to evaluate single-term programs as well as each module in multi-term programs.
-  evaluateModule :: Module term -> m value
-  evaluateModule = evaluateTerm . moduleBody
+  analyzeModule :: SubtermAlgebra Module term (m value)
 
   -- | Isolate the given action with an empty global environment and exports.
   isolate :: m a -> m a
@@ -56,6 +55,10 @@ class (MonadEvaluator term value m, Recursive term) => MonadAnalysis term value 
 --   This should always be called when e.g. evaluating the bodies of closures instead of explicitly folding either 'eval' or 'analyzeTerm' over subterms, except in 'MonadAnalysis' instances themselves. On the other hand, top-level evaluation should be performed using 'evaluateModule'.
 evaluateTerm :: MonadAnalysis term value m => term -> m value
 evaluateTerm = foldSubterms analyzeTerm
+
+-- | Evaluate a (root-level) term to a value using the semantics of the current analysis. This should be used to evaluate single-term programs as well as each module in multi-term programs.
+evaluateModule :: MonadAnalysis term value m => Module term -> m value
+evaluateModule m = analyzeModule (fmap (Subterm <*> evaluateTerm) m)
 
 
 -- | Run an action with the a list of 'Module's available for imports.

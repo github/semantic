@@ -38,6 +38,8 @@ instance ( Corecursive term
     trace (Reducer.unit config)
     liftAnalyze analyzeTerm term
 
+  analyzeModule = liftAnalyze analyzeModule
+
 -- | Log the given trace of configurations.
 trace :: ( Effectful (m term value)
          , Member (Writer (trace (ConfigurationFor term value))) effects

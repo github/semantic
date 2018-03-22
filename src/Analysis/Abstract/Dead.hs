@@ -52,6 +52,6 @@ instance ( Corecursive term
     revive (embedSubterm term)
     liftAnalyze analyzeTerm term
 
-  evaluateModule m = do
-    killAll (subterms (moduleBody m))
-    DeadCode (evaluateModule m)
+  analyzeModule m = do
+    killAll (subterms (subterm (moduleBody m)))
+    liftAnalyze analyzeModule m

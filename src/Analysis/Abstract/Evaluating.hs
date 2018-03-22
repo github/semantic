@@ -91,7 +91,7 @@ instance ( Evaluatable (Base term)
 
   analyzeTerm = eval
 
-  evaluateModule m = pushModule m (evaluateTerm (moduleBody m))
+  analyzeModule m = pushModule (subterm <$> m) (subtermValue (moduleBody m))
 
 pushModule :: Member (Reader [Module term]) effects => Module term -> Evaluating term value effects a -> Evaluating term value effects a
 pushModule m = raise . local (m :) . lower
