@@ -30,6 +30,7 @@ deriving instance Member NonDetEff effects => MonadNonDet (Evaluating term value
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value
   = '[ Fail                                        -- Failure with an error message
+     , Reader [Module term]                        -- The stack of currently-evaluating modules.
      , State  (EnvironmentFor value)               -- Environments (both local and global)
      , State  (HeapFor value)                      -- The heap
      , Reader (ModuleTable [Module term])          -- Cache of unevaluated modules
