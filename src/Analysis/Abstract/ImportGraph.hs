@@ -41,6 +41,9 @@ instance ( Member (State ImportGraph) effects
 
   evaluateModule m@Module{..} = ImportGraphing (evaluateModule m)
 
+modifyImportGraph :: (Effectful (m term value), Member (State ImportGraph) effects) => (ImportGraph -> ImportGraph) -> ImportGraphing m term value effects ()
+modifyImportGraph = raise . modify
+
 
 instance Semigroup ImportGraph where
   (<>) = overlay
