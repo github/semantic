@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, MultiParamTypeClasses, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, MultiParamTypeClasses, TypeFamilies, TypeOperators, UndecidableInstances, ScopedTypeVariables #-}
 module Control.Effect where
 
 import Control.Monad.Effect as Effect
