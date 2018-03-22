@@ -158,3 +158,6 @@ class Monad m => MonadControl term m where
 
 class Monad m => MonadThrow exc v m where
   throwException :: exc -> m v
+
+newtype EvaluateModule term = EvaluateModule (Module term)
+  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
