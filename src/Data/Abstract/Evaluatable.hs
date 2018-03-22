@@ -35,7 +35,7 @@ class Evaluatable constr where
           , MonadAnalysis term value m
           , MonadValue value m
           , Show (LocationFor value)
-          , MonadThrow Prelude.String value m
+          , MonadThrow (Unspecialized value) m
           )
        => SubtermAlgebra constr term (m value)
   default eval :: (MonadThrow (Unspecialized value) m, Show1 constr) => SubtermAlgebra constr term (m value)
