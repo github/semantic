@@ -38,6 +38,10 @@ spec = parallel $ do
       res <- evaluate' "subclass.py"
       fst res `shouldBe` Right (injValue (String "\"bar\""))
 
+    it "handles multiple inheritance left-to-right" $ do
+      res <- evaluate' "multiple_inheritance.py"
+      fst res `shouldBe` Right (injValue (String "\"foo!\""))
+
   where
     addr = Address . Precise
     fixtures = "test/fixtures/python/analysis/"
