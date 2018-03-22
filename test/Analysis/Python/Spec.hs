@@ -34,10 +34,19 @@ spec = parallel $ do
             ]
       env `shouldBe` expectedEnv
 
+    it "subclasses" $ do
+      res <- evaluate' "subclass.py"
+      fst res `shouldBe` Right (injValue (String "\"bar\""))
+
+    it "handles multiple inheritance left-to-right" $ do
+      res <- evaluate' "multiple_inheritance.py"
+      fst res `shouldBe` Right (injValue (String "\"foo!\""))
+
   where
     addr = Address . Precise
     fixtures = "test/fixtures/python/analysis/"
-    evaluate entry = snd . fst . fst . fst . fst <$>
+    evaluate entry = snd <$> evaluate' entry
+    evaluate' entry = fst . fst . fst . fst <$>
       evaluateFiles pythonParser
       [ fixtures <> entry
       , fixtures <> "a.py"

@@ -151,7 +151,7 @@ instance Evaluatable Class where
     (v, addr) <- letrec name $ do
       void $ subtermValue classBody
       classEnv <- Env.head <$> getEnv
-      klass name (listToMaybe supers) classEnv
+      klass name supers classEnv
     v <$ modifyEnv (Env.insert name addr)
 
 data Module a = Module { moduleIdentifier :: !a, moduleScope :: ![a] }
