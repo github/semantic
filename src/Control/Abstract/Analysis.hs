@@ -22,6 +22,7 @@ import Control.Effect.NonDet as X
 import qualified Control.Monad.Effect as Effect
 import Control.Monad.Effect.Fail as X
 import Control.Monad.Effect.Reader as X
+import Control.Monad.Effect.Resumable
 import Control.Monad.Effect.State as X
 import Data.Abstract.Environment (Environment)
 import qualified Data.Abstract.Environment as Env
@@ -58,16 +59,36 @@ evaluateTerm :: MonadAnalysis term value m => term -> m value
 evaluateTerm = foldSubterms analyzeTerm
 
 -- | Evaluate a (root-level) term to a value using the semantics of the current analysis. This should be used to evaluate single-term programs as well as each module in multi-term programs.
-evaluateModule :: MonadAnalysis term value m => Module term -> m value
-evaluateModule m = analyzeModule (fmap (Subterm <*> evaluateTerm) m)
+evaluateModule :: forall m term value effects
+               .  ( Effectful m
+                  , Member (Resumable (EvaluateModule term) value) effects
+                  , MonadAnalysis term value (m effects)
+                  )
+               => Module term
+               -> m effects value
+evaluateModule m = resumeException (evaluateM m)
+  (\ yield (EvaluateModule m) -> evaluateM m >>= yield)
+  where evaluateM :: Module term -> m effects value
+        evaluateM = analyzeModule . fmap (Subterm <*> evaluateTerm)
 
 
 -- | Run an action with the a list of 'Module's available for imports.
-withModules :: MonadAnalysis term value m => [Module term] -> m a -> m a
+withModules :: ( Effectful m
+               , Member (Resumable (EvaluateModule term) value) effects
+               , MonadAnalysis term value (m effects)
+               )
+               => [Module term]
+               -> m effects a
+               -> m effects a
 withModules = localModuleTable . const . ModuleTable.fromList
 
 -- | Evaluate with a list of modules in scope, taking the head module as the entry point.
-evaluateModules :: MonadAnalysis term value m => [Module term] -> m value
+evaluateModules :: ( Effectful m
+                   , Member (Resumable (EvaluateModule term) value) effects
+                   , MonadAnalysis term value (m effects)
+                   )
+                => [Module term]
+                -> m effects value
 evaluateModules [] = fail "evaluateModules: empty list"
 evaluateModules (m:ms) = withModules ms (evaluateModule m)
 
