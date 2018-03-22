@@ -382,7 +382,7 @@ instance Evaluatable Namespace where
           v <- klass name namespaceEnv
           pure (v, res)
 
-        addr <- trace (show name) (lookupOrAlloc name)
+        addr <- lookupOrAlloc name
         assign addr v
         modifyEnv (insert name addr)
         pure res
