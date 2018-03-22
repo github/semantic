@@ -4,6 +4,7 @@ module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , evaluateTerm
 , withModules
+, evaluateModules
 , require
 , load
 , liftAnalyze
@@ -60,6 +61,10 @@ evaluateTerm = foldSubterms analyzeTerm
 -- | Run an action with the a list of 'Module's available for imports.
 withModules :: MonadAnalysis term value m => [Module term] -> m a -> m a
 withModules = localModuleTable . const . ModuleTable.fromList
+
+evaluateModules :: MonadAnalysis term value m => [Module term] -> m value
+evaluateModules [] = fail "evaluateModules: empty list"
+evaluateModules (m:ms) = withModules ms (evaluateModule m)
 
 
 -- | Require/import another term/file and return an Effect.
