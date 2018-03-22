@@ -1,22 +1,21 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating
 ( type Evaluating
 ) where
 
 import Control.Abstract.Evaluator
 import Control.Monad.Effect
-import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.State
+import Control.Monad.Effect.Resumable
 import Data.Abstract.Configuration
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
+import qualified Data.ByteString.Char8 as BC
 import qualified Data.IntMap as IntMap
 import Prelude hiding (fail)
-import Prologue
+import Prologue hiding (throwError)
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
 newtype Evaluating term value effects a = Evaluating (Eff effects a)
@@ -24,12 +23,13 @@ newtype Evaluating term value effects a = Evaluating (Eff effects a)
 
 deriving instance Member Fail      effects => MonadFail   (Evaluating term value effects)
 deriving instance Member Fresh     effects => MonadFresh  (Evaluating term value effects)
-deriving instance Member NonDetEff effects => Alternative (Evaluating term value effects)
-deriving instance Member NonDetEff effects => MonadNonDet (Evaluating term value effects)
+deriving instance Member NonDet effects => Alternative (Evaluating term value effects)
+deriving instance Member NonDet effects => MonadNonDet (Evaluating term value effects)
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value
-  = '[ Fail                                        -- Failure with an error message
+  = '[ Resumable Prelude.String value
+     , Fail                                        -- Failure with an error message
      , Reader [Module term]                        -- The stack of currently-evaluating modules.
      , State  (EnvironmentFor value)               -- Environments (both local and global)
      , State  (HeapFor value)                      -- The heap
@@ -38,6 +38,10 @@ type EvaluatingEffects term value
      , State  (ExportsFor value)                   -- Exports (used to filter environments when they are imported)
      , State  (IntMap.IntMap term)                 -- For jumps
      ]
+
+
+instance Members '[Resumable Prelude.String value] effects => MonadThrow Prelude.String value (Evaluating term value effects) where
+   throwException = raise . throwError
 
 instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl term (Evaluating term value effects) where
   label term = do
@@ -89,7 +93,7 @@ instance ( Evaluatable (Base term)
          => MonadAnalysis term value (Evaluating term value effects) where
   type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
 
-  analyzeTerm = eval
+  analyzeTerm term = resumeException @value (eval term) (\yield exc -> string (BC.pack exc) >>= yield)
 
   analyzeModule m = pushModule (subterm <$> m) (subtermValue (moduleBody m))
 
