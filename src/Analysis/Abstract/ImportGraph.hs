@@ -31,7 +31,8 @@ deriving instance MonadModuleTable term value (m term value effects) => MonadMod
 deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (ImportGraphing m term value effects)
 
 
-instance ( Member (State ImportGraph) effects
+instance ( Effectful (m term value)
+         , Member (State ImportGraph) effects
          , MonadAnalysis term value (m term value effects)
          )
          => MonadAnalysis term value (ImportGraphing m term value effects) where
@@ -39,7 +40,11 @@ instance ( Member (State ImportGraph) effects
 
   analyzeTerm = liftAnalyze analyzeTerm
 
-  evaluateModule m@Module{..} = ImportGraphing (evaluateModule m)
+  evaluateModule m = do
+    ms <- askModuleStack
+    let parent = maybe empty (vertex . moduleName) (listToMaybe ms)
+    modifyImportGraph (parent >< vertex (moduleName m) <>)
+    ImportGraphing (evaluateModule m)
 
 (><) :: Graph a => a -> a -> a
 (><) = connect
