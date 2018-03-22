@@ -63,15 +63,6 @@ instance Ord a => RunEffect NonDet a where
   type Result NonDet a = Set a
   runEffect = runNonDet unit
 
--- | 'Resumable' effects are interpreted into 'Either' s.t. failures are in 'Left' and successful results are in 'Right'.
-instance RunEffect (Resumable exc v) a where
-  type Result (Resumable exc v) a = Either exc a
-  runEffect = runError
-
-resumeException :: forall v m exc e a. (Effectful m, Resumable exc v :< e) => m e a -> ((v -> m e a) -> exc -> m e a) -> m e a
-resumeException m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
-
-
 -- | Types wrapping 'Eff' actions.
 --
 --   Most instances of 'Effectful' will be derived using @-XGeneralizedNewtypeDeriving@, with these ultimately bottoming out on the instance for 'Eff' (for which 'raise' and 'lower' are simply the identity). Because of this, types can be nested arbitrarily deeply and still call 'raise'/'lower' just once to get at the (ultimately) underlying 'Eff'.

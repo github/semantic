@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances, GADTs, Rank2Types #-}
 module Analysis.Abstract.Evaluating
 ( type Evaluating
 , evaluate
@@ -7,6 +7,7 @@ module Analysis.Abstract.Evaluating
 , load
 ) where
 
+import Control.Monad.Effect.Internal
 import Control.Abstract.Evaluator
 import Control.Monad.Effect
 import Control.Monad.Effect.Resumable
@@ -133,8 +134,38 @@ type EvaluatingEffects term value
      ]
 
 
-instance Members '[Resumable Prelude.String value] effects => MonadThrow Prelude.String value (Evaluating term value effects) where
-   throwException = raise . throwError
+data Resumable1 (exc :: * -> *) a where
+  Resumable1 :: exc v -> Resumable1 exc v
+
+throwError1 :: forall exc v e. (Resumable1 exc :< e) => exc v -> Eff e v
+throwError1 e = send (Resumable1 e :: Resumable1 exc v)
+
+runError1 :: Eff (Resumable1 exc ': e) a -> Eff e (Either (SomeExc exc) a)
+runError1 = relay (pure . Right) (\ (Resumable1 e) _k -> pure (Left (SomeExc e)))
+
+resumeError1 :: forall exc e a. (Resumable1 exc :< e) =>
+       Eff e a -> (forall v. Arrow e v a -> exc v -> Eff e a) -> Eff e a
+resumeError1 m handle = interpose @(Resumable1 exc) pure (\(Resumable1 e) yield -> handle yield e) m
+
+catchError1 :: forall exc e a. (Resumable1 exc :< e) => Eff e a -> (forall v. exc v -> Eff e a) -> Eff e a
+catchError1 m handle = resumeError1 m (const handle)
+
+resumeException :: forall exc m e a. (Effectful m, Resumable1 exc :< e) => m e a -> (forall v. (v -> m e a) -> exc v -> m e a) -> m e a
+resumeException m handle = raise (resumeError1 (lower m) (\yield -> lower . handle (raise . yield)))
+
+
+data SomeExc exc where
+  SomeExc :: exc v -> SomeExc exc
+
+instance (Show1 exc) => Show (SomeExc exc) where
+  showsPrec num (SomeExc exc) = liftShowsPrec (const (const id)) (const id) num exc
+
+-- | 'Resumable' effects are interpreted into 'Either' s.t. failures are in 'Left' and successful results are in 'Right'.
+instance RunEffect (Resumable1 exc) a where
+  type Result (Resumable1 exc) a = Either (SomeExc exc) a
+  runEffect = runError1
+
+
 
 instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl term (Evaluating term value effects) where
   label term = do
