@@ -23,6 +23,7 @@ import Data.Term
 import Diffing.Algorithm
 import Diffing.Interpreter
 import qualified GHC.TypeLits as TypeLevel
+import Language.Preluded
 import Parsing.Parser
 import Prologue
 import Semantic
@@ -35,8 +36,7 @@ import qualified Language.TypeScript.Assignment as TypeScript
 import qualified Language.Ruby.Assignment as Ruby
 
 -- Ruby
-evaluateRubyFile = evaluateFile rubyParser
-evaluatePreludedRubyFile = evaluateWithPrelude rubyParser
+evaluateRubyFile = evaluateWithPrelude rubyParser
 evaluateRubyFiles = evaluateFiles rubyParser
 
 -- Go
@@ -45,7 +45,7 @@ evaluateGoFiles = evaluateFiles goParser
 typecheckGoFile path = runAnalysis @(Caching Evaluating Go.Term Type) . evaluateModule . snd <$> parseFile goParser path
 
 -- Python
-evaluatePythonFile = evaluateFile pythonParser
+evaluatePythonFile = evaluateWithPrelude pythonParser
 evaluatePythonFiles = evaluateFiles pythonParser
 typecheckPythonFile path = runAnalysis @(Caching Evaluating Python.Term Type) . evaluateModule . snd <$> parseFile pythonParser path
 tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term Value) . evaluateModule . snd <$> parseFile pythonParser path
@@ -55,15 +55,6 @@ evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] Evaluating
 typecheckTypeScriptFile path = runAnalysis @(Caching Evaluating TypeScript.Term Type) . evaluateModule . snd <$> parseFile typescriptParser path
 evaluateTypeScriptFile = evaluateFile typescriptParser
 evaluateTypeScriptFiles = evaluateFiles typescriptParser
-
-class HasPreludePath syntax where
-  type PreludePath syntax :: TypeLevel.Symbol
-
-instance HasPreludePath Ruby.Term where
-  type PreludePath Ruby.Term = "preludes/ruby.rb"
-
-instance HasPreludePath Python.Term where
-  type PreludePath Python.Term = "preludes/python.py"
 
 -- Evalute a single file.
 evaluateFile :: forall term effects

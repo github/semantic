@@ -52,6 +52,12 @@ class Monad m => MonadEnvironment value m | m -> value where
   -- | Sets the environment for the lifetime of the given action.
   withEnv :: EnvironmentFor value -> m a -> m a
 
+  -- | Retrieve the default environment.
+  defaultEnvironment :: m (EnvironmentFor value)
+
+  -- | Set the default environment for the lifetime of an action
+  withDefaultEnvironment :: EnvironmentFor value -> m a -> m a
+
   -- | Get the global export state.
   getExports :: m (ExportsFor value)
   -- | Set the global export state.

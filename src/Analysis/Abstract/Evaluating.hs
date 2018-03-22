@@ -53,8 +53,14 @@ evaluateWith :: forall value term effects
          -> term
          -> Final effects value
 evaluateWith prelude t = runAnalysis @(Evaluating term value) $ do
-  preludeEnv <- evaluateModule prelude *> getEnv
-  withEnv preludeEnv (evaluateModule t)
+  -- evaluateTerm here rather than evaluateModule
+  -- TODO: we could add evaluatePrelude to MonadAnalysis as an alias for evaluateModule,
+  -- overridden in Evaluating to not reset the environment. In the future we'll want the
+  -- result of evaluating the Prelude to be a build artifact, rather than something that's
+  -- evaluated every single time, but that's contingent upon a whole lot of other future
+  -- scaffolding.
+  preludeEnv <- evaluateTerm prelude *> getEnv
+  withDefaultEnvironment preludeEnv (evaluateModule t)
 
 -- | Evaluate terms and an entry point to a value.
 evaluates :: forall value term effects
@@ -99,6 +105,7 @@ type EvaluatingEffects term value
      , State  (EnvironmentFor value)               -- Environments (both local and global)
      , State  (HeapFor value)                      -- The heap
      , Reader (ModuleTable [term])                 -- Cache of unevaluated modules
+     , Reader (EnvironmentFor value)               -- Default environment used by evaluateModule
      , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
      , State  (ExportsFor value)                   -- Exports (used to filter environments when they are imported)
      , State  (IntMap.IntMap term)                 -- For jumps
@@ -113,10 +120,16 @@ instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl ter
 
   goto label = IntMap.lookup label <$> raise get >>= maybe (fail ("unknown label: " <> show label)) pure
 
-instance Members '[State (ExportsFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
+instance Members '[ State (ExportsFor value)
+                  , State (EnvironmentFor value)
+                  , Reader (EnvironmentFor value)
+                  ] effects => MonadEnvironment value (Evaluating term value effects) where
   getEnv = raise get
   putEnv = raise . put
   withEnv s = raise . localState s . lower
+
+  defaultEnvironment = raise ask
+  withDefaultEnvironment e = raise . local (const e) . lower
 
   getExports = raise get
   putExports = raise . put
@@ -151,5 +164,9 @@ instance ( Evaluatable (Base term)
          )
          => MonadAnalysis term value (Evaluating term value effects) where
   type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
+
+  evaluateModule t = do
+    def <- defaultEnvironment
+    withEnv def (evaluateTerm t)
 
   analyzeTerm = eval
