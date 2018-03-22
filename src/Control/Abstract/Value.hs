@@ -274,7 +274,7 @@ instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, Mon
   multiple   = pure . Type.Product
   array      = pure . Type.Array
   klass _ _  = pure Object
-
+  namespace _ _ = pure Type.Unit
   objectEnvironment _ = pure mempty
 
   asString _ = fail "Must evaluate to Value to use asString"
