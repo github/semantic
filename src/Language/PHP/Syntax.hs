@@ -366,28 +366,19 @@ instance Evaluatable Namespace where
       names = toList (freeVariables (subterm namespaceName))
 
       go [] = fail "expected at least one free variable in namespaceName, found none"
-      go [name] = do
-        (v, addr) <- letrec' name $ do
-          void $ subtermValue namespaceBody
-          namespaceEnv <- Env.head <$> getEnv
-          namespace name namespaceEnv
-        v <$ modifyEnv (insert name addr)
-      go (name:xs) = do
-        (rest, addr) <- localEnv id $ do
-          rest <- go xs
-
-          namespaceEnv <- Env.head <$> getEnv
-          addr <- lookupOrAlloc name
-          v <- namespace name namespaceEnv
-          assign addr v
-          pure (rest, addr)
-
-        rest <$ modifyEnv (insert name addr)
+      go [name] = letrec' name $ \addr ->
+        makeNamespace name addr <* subtermValue namespaceBody
+      go (name:xs) = letrec' name $ \addr ->
+        go xs <* makeNamespace name addr
+      makeNamespace name addr = do
+        namespaceEnv <- Env.head <$> getEnv
+        v <- namespace name namespaceEnv
+        assign addr v
+        pure v
       letrec' name body = do
         addr <- lookupOrAlloc name
-        v <- localEnv id body
-        assign addr v
-        pure (v, addr)
+        v <- localEnv id (body addr)
+        v <$ modifyEnv (insert name addr)
 
 data TraitDeclaration a = TraitDeclaration { traitName :: a, traitStatements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
