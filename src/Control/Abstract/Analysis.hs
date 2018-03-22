@@ -80,13 +80,13 @@ load :: ( MonadAnalysis term value m
         )
      => ModuleName
      -> m (EnvironmentFor value)
-load name = askModuleTable >>= maybe notFound (evalAndCache . map moduleBody) . moduleTableLookup name
+load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
   where
     notFound = fail ("cannot load module: " <> show name)
-    evalAndCache :: (MonadAnalysis term value m, Ord (LocationFor value)) => [term] -> m (EnvironmentFor value)
+    evalAndCache :: (MonadAnalysis term value m, Ord (LocationFor value)) => [Module term] -> m (EnvironmentFor value)
     evalAndCache []     = pure mempty
     evalAndCache (x:xs) = do
-      void $ evaluateModule x
+      void $ evaluateModule (moduleBody x)
       env <- filterEnv <$> getExports <*> getEnv
       modifyModuleTable (moduleTableInsert name env)
       (env <>) <$> evalAndCache xs
