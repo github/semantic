@@ -65,7 +65,7 @@ withModules = localModuleTable . const . ModuleTable.fromList
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
 withModulesForBlobs :: MonadAnalysis term value m => Blob -> [(Blob, term)] -> m a -> m a
-withModulesForBlobs blob = withModules . map (uncurry (moduleForBlob rootDir))
+withModulesForBlobs blob = withModules . map (uncurry (moduleForBlob (Just rootDir)))
   where rootDir = dropFileName (blobPath blob)
 
 
