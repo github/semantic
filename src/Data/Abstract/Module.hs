@@ -26,5 +26,5 @@ moduleForBlob rootDir blob term = Module (moduleName blob) (blobPath blob) term
   where moduleName Blob{..} | Just Go <- blobLanguage = toName (takeDirectory (modulePath blobPath))
                             | otherwise               = toName                (modulePath blobPath)
                             -- TODO: Need a better way to handle module registration and resolution
-        toName str = qualifiedName (BC.pack <$> splitWhen (== pathSeparator) str)
+        toName = qualifiedName . map BC.pack . splitWhen (== pathSeparator)
         modulePath = dropExtensions . maybe takeFileName makeRelative rootDir
