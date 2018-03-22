@@ -23,4 +23,5 @@ moduleTableInsert k v ModuleTable{..} = ModuleTable (Map.insert k v unModuleTabl
 
 
 fromList :: [Module term] -> ModuleTable [Module term]
-fromList modules = ModuleTable (Map.fromListWith (<>) (map ((,) . moduleName <*> pure) modules))
+fromList modules = ModuleTable (Map.fromListWith (<>) (map toEntry modules))
+  where toEntry m = (moduleName m, [m])
