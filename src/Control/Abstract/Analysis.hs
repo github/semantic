@@ -4,7 +4,6 @@ module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , evaluateTerm
 , withModules
-, withModulesForBlobs
 , require
 , load
 , liftAnalyze
@@ -29,11 +28,9 @@ import qualified Data.Abstract.Exports as Export
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Value
-import Data.Blob
 import Data.Coerce
 import Prelude hiding (fail)
 import Prologue
-import System.FilePath.Posix
 
 -- | A 'Monad' in which one can evaluate some specific term type to some specific value type.
 --
@@ -63,14 +60,6 @@ evaluateTerm = foldSubterms analyzeTerm
 -- | Run an action with the a list of 'Module's available for imports.
 withModules :: MonadAnalysis term value m => [Module term] -> m a -> m a
 withModules = localModuleTable . const . ModuleTable.fromList
-
-modulesForBlobs :: Blob -> [(Blob, term)] -> [Module term]
-modulesForBlobs blob = map (uncurry (moduleForBlob (Just rootDir)))
-  where rootDir = dropFileName (blobPath blob)
-
--- | Run an action with the passed ('Blob', @term@) pairs available for imports.
-withModulesForBlobs :: MonadAnalysis term value m => Blob -> [(Blob, term)] -> m a -> m a
-withModulesForBlobs blob = withModules . modulesForBlobs blob
 
 
 -- | Require/import another term/file and return an Effect.

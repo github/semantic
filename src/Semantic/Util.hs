@@ -12,6 +12,7 @@ import Control.Abstract.Analysis
 import Control.Monad.IO.Class
 import Data.Abstract.Evaluatable
 import Data.Abstract.Address
+import Data.Abstract.Module
 import Data.Abstract.Type
 import Data.Abstract.Value
 import Data.Blob
@@ -27,6 +28,7 @@ import Prologue
 import Semantic
 import Semantic.IO as IO
 import Semantic.Task
+import System.FilePath.Posix
 
 import qualified Language.Go.Assignment as Go
 import qualified Language.Python.Assignment as Python
@@ -81,7 +83,12 @@ evaluateFiles :: forall term effects
               -> IO (Final effects Value)
 evaluateFiles parser paths = do
   entry:xs <- traverse (parseFile parser) paths
-  pure . runAnalysis @(Evaluating term Value) . withModulesForBlobs (fst entry) xs $ evaluateModule (snd entry)
+  let rootDir = dropFileName (blobPath (fst entry))
+  pure . runAnalysis @(Evaluating term Value) . withModules (modulesForBlobs (Just rootDir) xs) $ evaluateModule (snd entry)
+
+modulesForBlobs :: Maybe FilePath -> [(Blob, term)] -> [Module term]
+modulesForBlobs = map . uncurry . moduleForBlob
+
 
 -- Read and parse a file.
 parseFile :: Parser term -> FilePath -> IO (Blob, term)
