@@ -33,7 +33,6 @@ import Semantic.Task
 import qualified Language.Go.Assignment as Go
 import qualified Language.Python.Assignment as Python
 import qualified Language.TypeScript.Assignment as TypeScript
-import qualified Language.Ruby.Assignment as Ruby
 
 -- Ruby
 evaluateRubyFile = evaluateWithPrelude rubyParser
