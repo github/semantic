@@ -44,6 +44,7 @@ class (MonadEvaluator term value m, Recursive term) => MonadAnalysis term value 
   -- | Analyze a term using the semantics of the current analysis. This should generally only be called by 'evaluateTerm' and by definitions of 'analyzeTerm' in instances for composite analyses.
   analyzeTerm :: SubtermAlgebra (Base term) term (m value)
 
+  -- | Analyze a module using the semantics of the current analysis. This should generally only be called by 'evaluateModule' and by definitions of 'analyzeModule' in instances for composite analyses.
   analyzeModule :: SubtermAlgebra Module term (m value)
 
   -- | Isolate the given action with an empty global environment and exports.
