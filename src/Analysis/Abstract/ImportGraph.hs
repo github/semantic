@@ -41,6 +41,12 @@ deriving instance MonadModuleTable term value (m term value effects) => MonadMod
 deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (ImportGraphing m term value effects)
 
 
+instance MonadAnalysis term value (m term value effects) => MonadAnalysis term value (ImportGraphing m term value effects) where
+  type RequiredEffects term value (ImportGraphing m term value effects) = RequiredEffects term value (m term value effects)
+
+  analyzeTerm = liftAnalyze analyzeTerm
+
+
 -- | Types which contribute to a 'ImportGraph'. There is exactly one instance of this typeclass; customizing the 'ImportGraph's for a new type is done by defining an instance of 'CustomImportGraphAlgebra' instead.
 --
 --   This typeclass employs the Advanced Overlap techniques designed by Oleg Kiselyov & Simon Peyton Jones: https://wiki.haskell.org/GHC/AdvancedOverlap.
