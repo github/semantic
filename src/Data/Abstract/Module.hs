@@ -23,8 +23,10 @@ moduleForBlob :: Maybe FilePath -- ^ The root directory relative to which the mo
               -> term           -- ^ The @term@ representing the body of the module.
               -> Module term    -- ^ A 'Module' named appropriate for the 'Blob', holding the @term@, and constructed relative to the root 'FilePath', if any.
 moduleForBlob rootDir blob term = Module (moduleName blob) (blobPath blob) term
-  where moduleName Blob{..} | Just Go <- blobLanguage = toName (takeDirectory (modulePath blobPath))
-                            | otherwise               = toName                (modulePath blobPath)
+  where moduleName Blob{..} | Just Go <- blobLanguage = moduleNameForPath (takeDirectory (modulePath blobPath))
+                            | otherwise               = moduleNameForPath                (modulePath blobPath)
                             -- TODO: Need a better way to handle module registration and resolution
-        toName = qualifiedName . map BC.pack . splitWhen (== pathSeparator)
         modulePath = dropExtensions . maybe takeFileName makeRelative rootDir
+
+moduleNameForPath :: FilePath -> ModuleName
+moduleNameForPath = qualifiedName . map BC.pack . splitWhen (== pathSeparator)
