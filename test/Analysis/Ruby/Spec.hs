@@ -30,12 +30,16 @@ spec = parallel $ do
       res <- evaluate' "subclass.rb"
       fst res `shouldBe` Right (injValue (String "\"<bar>\""))
 
+    it "has prelude" $ do
+      res <- evaluate' "preluded.rb"
+      fst res `shouldBe` Right (injValue (String "\"<foo>\""))      
+
   where
     addr = Address . Precise
     fixtures = "test/fixtures/ruby/analysis/"
     evaluate entry = snd <$> evaluate' entry
     evaluate' entry = fst . fst . fst . fst <$>
-      evaluateFiles rubyParser
+      evaluateFilesWithPrelude rubyParser
       [ fixtures <> entry
       , fixtures <> "foo.rb"
       ]

@@ -36,7 +36,7 @@ import qualified Language.TypeScript.Assignment as TypeScript
 
 -- Ruby
 evaluateRubyFile = evaluateWithPrelude rubyParser
-evaluateRubyFiles = evaluateFiles rubyParser
+evaluateRubyFiles = evaluateFilesWithPrelude rubyParser
 
 -- Go
 evaluateGoFile = evaluateFile goParser
@@ -106,6 +106,24 @@ evaluateFiles :: forall term effects
 evaluateFiles parser paths = do
   entry:xs <- traverse (parseFile parser) paths
   pure $ evaluates @Value xs entry
+
+evaluateFilesWithPrelude :: forall term effects
+                         .  ( Evaluatable (Base term)
+                            , FreeVariables term
+                            , effects ~ RequiredEffects term Value (Evaluating term Value effects)
+                            , MonadAddressable Precise Value (Evaluating term Value effects)
+                            , MonadValue Value (Evaluating term Value effects)
+                            , Recursive term
+                            , TypeLevel.KnownSymbol (PreludePath term)
+                            )
+                         => Parser term
+                         -> [FilePath]
+                         -> IO (Final effects Value)
+evaluateFilesWithPrelude parser paths = do
+  let preludePath = TypeLevel.symbolVal (Proxy :: Proxy (PreludePath term))
+  prelude <- parseFile parser preludePath
+  entry:xs <- traverse (parseFile parser) paths
+  pure $ evaluatesWith @Value (snd prelude) xs entry
 
 -- Read and parse a file.
 parseFile :: Parser term -> FilePath -> IO (Blob, term)

@@ -1,12 +1,13 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating
-( type Evaluating
-, evaluate
-, evaluates
-, evaluateWith
-, require
-, load
-) where
+  ( type Evaluating
+  , evaluate
+  , evaluates
+  , evaluateWith
+  , evaluatesWith
+  , require
+  , load
+  ) where
 
 import Control.Abstract.Evaluator
 import Control.Monad.Effect
@@ -81,6 +82,24 @@ evaluates :: forall value term effects
           -> (Blob, term)   -- Entrypoint
           -> Final effects value
 evaluates pairs (b, t) = runAnalysis @(Evaluating term value) (withModules b pairs (evaluateModule t))
+
+-- | Evaluate terms and an entry point to a value with a given prelude.
+evaluatesWith :: forall value term effects
+              .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
+                 , Evaluatable (Base term)
+                 , FreeVariables term
+                 , MonadAddressable (LocationFor value) value (Evaluating term value effects)
+                 , MonadValue value (Evaluating term value effects)
+                 , Recursive term
+                 , Show (LocationFor value)
+                 )
+              => term           -- ^ Prelude to evaluate once              
+              -> [(Blob, term)] -- ^ List of (blob, term) pairs that make up the program to be evaluated
+              -> (Blob, term)   -- ^ Entrypoint
+              -> Final effects value
+evaluatesWith prelude pairs (b, t)  = runAnalysis @(Evaluating term value) $ do
+  preludeEnv <- evaluateTerm prelude *> getEnv
+  withDefaultEnvironment preludeEnv (withModules b pairs (evaluateModule t))
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
 withModules :: MonadAnalysis term value m => Blob -> [(Blob, term)] -> m a -> m a
