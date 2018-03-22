@@ -83,7 +83,7 @@ evaluateFiles :: forall term effects
               -> IO (Final effects Value)
 evaluateFiles parser paths = do
   entry:xs <- traverse (parseFile parser) paths
-  let rootDir = dropFileName (blobPath (fst entry))
+  let rootDir = dropFileName (head paths)
   pure . runAnalysis @(Evaluating term Value) . withModules (modulesForBlobs (Just rootDir) xs) $ evaluateModule (snd entry)
 
 modulesForBlobs :: Maybe FilePath -> [(Blob, term)] -> [Module term]
