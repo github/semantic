@@ -158,6 +158,9 @@ resumeException m handle = raise (resumeError1 (lower m) (\yield -> lower . hand
 data SomeExc exc where
   SomeExc :: exc v -> SomeExc exc
 
+instance Eq1 exc => Eq (SomeExc exc) where
+  (SomeExc exc1) == (SomeExc exc2) = liftEq (==) exc1 exc2
+
 instance (Show1 exc) => Show (SomeExc exc) where
   showsPrec num (SomeExc exc) = liftShowsPrec (const (const id)) (const id) num exc
 
