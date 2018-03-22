@@ -3,6 +3,7 @@
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , evaluateTerm
+, withModules
 , withModulesForBlobs
 , require
 , load
@@ -59,6 +60,10 @@ class (MonadEvaluator term value m, Recursive term) => MonadAnalysis term value 
 evaluateTerm :: MonadAnalysis term value m => term -> m value
 evaluateTerm = foldSubterms analyzeTerm
 
+
+withModules :: MonadAnalysis term value m => [Module term] -> m a -> m a
+withModules modules = localModuleTable (const moduleTable)
+  where moduleTable = ModuleTable (Map.fromListWith (<>) (map ((,) . moduleName <*> pure) modules))
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
 withModulesForBlobs :: MonadAnalysis term value m => Blob -> [(Blob, term)] -> m a -> m a
