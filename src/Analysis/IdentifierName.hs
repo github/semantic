@@ -5,13 +5,13 @@ module Analysis.IdentifierName
 , identifierLabel
 ) where
 
-import Data.Abstract.FreeVariables
-import Data.Aeson
-import Data.JSON.Fields
-import Data.Term
-import Data.Text.Encoding (decodeUtf8)
-import Prologue
+import           Data.Abstract.FreeVariables
+import           Data.Aeson
+import           Data.JSON.Fields
 import qualified Data.Syntax
+import           Data.Term
+import           Data.Text.Encoding (decodeUtf8)
+import           Prologue
 
 -- | Compute a 'IdentifierLabel' label for a 'Term'.
 identifierLabel :: IdentifierName syntax => TermF syntax a b -> Maybe IdentifierLabel
