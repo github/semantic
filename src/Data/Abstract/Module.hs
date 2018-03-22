@@ -28,4 +28,4 @@ moduleForBlob rootDir blob term = Module (moduleName blob) (blobPath blob) term
           -- TODO: Need a better way to handle module registration and resolution
           Just Go -> toName (takeDirectory path) -- Go allows defining modules across multiple files in the same directory.
           _ ->  toName path
-        toName str = qualifiedName (fmap BC.pack (splitWhen (== pathSeparator) str))
+        toName str = qualifiedName (BC.pack <$> splitWhen (== pathSeparator) str)
