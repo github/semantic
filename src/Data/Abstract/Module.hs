@@ -22,7 +22,7 @@ moduleForBlob :: Maybe FilePath -- ^ The root directory relative to which the mo
               -> Blob           -- ^ The 'Blob' containing the module.
               -> term           -- ^ The @term@ representing the body of the module.
               -> Module term    -- ^ A 'Module' named appropriate for the 'Blob', holding the @term@, and constructed relative to the root 'FilePath', if any.
-moduleForBlob rootDir blob term = Module (moduleNameForPath (modulePathForBlob blob)) (blobPath blob) term
+moduleForBlob rootDir blob = Module (moduleNameForPath (modulePathForBlob blob)) (blobPath blob)
   where modulePathForBlob Blob{..} | Just Go <- blobLanguage = takeDirectory (modulePath blobPath)
                                    | otherwise               =                modulePath blobPath
                                    -- TODO: Need a better way to handle module registration and resolution
