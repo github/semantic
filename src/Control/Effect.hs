@@ -3,7 +3,7 @@ module Control.Effect where
 
 import Control.Monad.Effect as Effect
 import Control.Monad.Effect.Fail
-import Control.Monad.Effect.NonDetEff
+import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Writer
@@ -58,10 +58,10 @@ instance Monoid w => RunEffect (Writer w) a where
   type Result (Writer w) a = (a, w)
   runEffect = runWriter
 
--- | 'NonDetEff' effects are interpreted into a nondeterministic set of result values.
-instance Ord a => RunEffect NonDetEff a where
-  type Result NonDetEff a = Set a
-  runEffect = runNonDetEff unit
+-- | 'NonDet' effects are interpreted into a nondeterministic set of result values.
+instance Ord a => RunEffect NonDet a where
+  type Result NonDet a = Set a
+  runEffect = runNonDet unit
 
 -- | 'Resumable' effects are interpreted into 'Either' s.t. failures are in 'Left' and successful results are in 'Right'.
 instance RunEffect (Resumable exc v) a where

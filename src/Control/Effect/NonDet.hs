@@ -1,11 +1,11 @@
 {-# LANGUAGE TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Effect.NonDet
 ( MonadNonDet(..)
-, NonDetEff
+, NonDet
 ) where
 
 import Control.Monad.Effect.Internal
-import Control.Monad.Effect.NonDetEff as NonDetEff
+import Control.Monad.Effect.NonDet as NonDet
 import Prologue
 
 -- | 'Monad's offering local isolation of nondeterminism effects.
@@ -16,6 +16,6 @@ class (Alternative m, Monad m) => MonadNonDet m where
          -> m a      -- ^ The computation to run locally-nondeterministically.
          -> m b      -- ^ A _deterministic_ computation producing the 'Monoid'al accumulation of the _locally-nondeterministic_ result values.
 
--- | Effect stacks containing 'NonDetEff' offer a 'MonadNonDet' instance which implements 'gather' by interpreting the requests for nondeterminism locally, without removing 'NonDetEff' from the stack—i.e. the _capacity_ for nondeterminism is still present in the effect stack, but any local nondeterminism has been applied.
-instance (NonDetEff :< fs) => MonadNonDet (Eff fs) where
-  gather = NonDetEff.gather
+-- | Effect stacks containing 'NonDet' offer a 'MonadNonDet' instance which implements 'gather' by interpreting the requests for nondeterminism locally, without removing 'NonDet' from the stack—i.e. the _capacity_ for nondeterminism is still present in the effect stack, but any local nondeterminism has been applied.
+instance (NonDet :< fs) => MonadNonDet (Eff fs) where
+  gather = NonDet.gather
