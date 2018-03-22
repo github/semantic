@@ -8,9 +8,9 @@ module Data.Abstract.ModuleTable
 ) where
 
 import Data.Abstract.Module
+import qualified Data.Map as Map
 import Data.Semigroup
 import GHC.Generics (Generic1)
-import qualified Data.Map as Map
 
 newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModuleName a }
   deriving (Eq, Foldable, Functor, Generic1, Monoid, Ord, Semigroup, Show, Traversable)
