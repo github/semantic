@@ -124,9 +124,9 @@ assign address = modifyHeap . heapInsert address
 -- | A 'Monad' abstracting tables of modules available for import.
 class Monad m => MonadModuleTable term value m | m -> term, m -> value where
   -- | Retrieve the table of evaluated modules.
-  getModuleTable :: m (ModuleTable (EnvironmentFor value))
+  getModuleTable :: m (ModuleTable (EnvironmentFor value, value))
   -- | Set the table of evaluated modules.
-  putModuleTable :: ModuleTable (EnvironmentFor value) -> m ()
+  putModuleTable :: ModuleTable (EnvironmentFor value, value) -> m ()
 
   -- | Retrieve the table of unevaluated modules.
   askModuleTable :: m (ModuleTable [term])
@@ -134,7 +134,7 @@ class Monad m => MonadModuleTable term value m | m -> term, m -> value where
   localModuleTable :: (ModuleTable [term] -> ModuleTable [term]) -> m a -> m a
 
 -- | Update the evaluated module table.
-modifyModuleTable :: MonadModuleTable term value m => (ModuleTable (EnvironmentFor value) -> ModuleTable (EnvironmentFor value)) -> m ()
+modifyModuleTable :: MonadModuleTable term value m => (ModuleTable (EnvironmentFor value, value) -> ModuleTable (EnvironmentFor value, value)) -> m ()
 modifyModuleTable f = do
   table <- getModuleTable
   putModuleTable $! f table

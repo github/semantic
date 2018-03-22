@@ -26,6 +26,10 @@ spec = parallel $ do
       fst res `shouldBe` Left "free variable: \"foo\""
       snd res `shouldBe` []
 
+    it "subclass" $ do
+      res <- evaluate' "subclass.rb"
+      fst res `shouldBe` Right (injValue (String "\"<bar>\""))
+
   where
     addr = Address . Precise
     fixtures = "test/fixtures/ruby/analysis/"
