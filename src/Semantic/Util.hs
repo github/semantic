@@ -93,6 +93,10 @@ parseFile parser rootDir path = runTask $ do
   blob <- file path
   moduleForBlob rootDir blob <$> parse parser blob
 
+parseFiles :: Parser term -> [FilePath] -> IO [Module term]
+parseFiles parser paths = traverse (parseFile parser (Just (dropFileName (head paths)))) paths
+
+
 -- Read a file from the filesystem into a Blob.
 file :: MonadIO m => FilePath -> m Blob
 file path = fromJust <$> IO.readFile path (languageForFilePath path)
