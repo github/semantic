@@ -58,7 +58,7 @@ class (MonadEvaluator term value m, Recursive term) => MonadAnalysis term value 
 evaluateTerm :: MonadAnalysis term value m => term -> m value
 evaluateTerm = foldSubterms analyzeTerm
 
--- | Evaluate a (root-level) term to a value using the semantics of the current analysis. This should be used to evaluate single-term programs as well as each module in multi-term programs.
+-- | Evaluate a (root-level) term to a value using the semantics of the current analysis. This should be used to evaluate single-term programs, or (via 'evaluateModules') the entry point of multi-term programs.
 evaluateModule :: forall m term value effects
                .  ( Effectful m
                   , Member (Resumable (EvaluateModule term) value) effects
