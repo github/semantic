@@ -27,7 +27,7 @@ import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Exports (Exports)
 import qualified Data.Abstract.Exports as Export
 import Data.Abstract.Module
-import Data.Abstract.ModuleTable
+import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Value
 import Data.Blob
 import Data.Coerce
@@ -62,8 +62,7 @@ evaluateTerm = foldSubterms analyzeTerm
 
 
 withModules :: MonadAnalysis term value m => [Module term] -> m a -> m a
-withModules modules = localModuleTable (const moduleTable)
-  where moduleTable = ModuleTable (Map.fromListWith (<>) (map ((,) . moduleName <*> pure) modules))
+withModules = localModuleTable . const . ModuleTable.fromList
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
 withModulesForBlobs :: MonadAnalysis term value m => Blob -> [(Blob, term)] -> m a -> m a

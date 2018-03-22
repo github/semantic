@@ -4,11 +4,12 @@ module Data.Abstract.ModuleTable
   , ModuleTable (..)
   , moduleTableLookup
   , moduleTableInsert
+  , fromList
   ) where
 
 import Data.Abstract.Module
 import Data.Semigroup
-import GHC.Generics
+import GHC.Generics (Generic1)
 import qualified Data.Map as Map
 
 newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModuleName a }
@@ -19,3 +20,7 @@ moduleTableLookup k = Map.lookup k . unModuleTable
 
 moduleTableInsert :: ModuleName -> a -> ModuleTable a -> ModuleTable a
 moduleTableInsert k v ModuleTable{..} = ModuleTable (Map.insert k v unModuleTable)
+
+
+fromList :: [Module term] -> ModuleTable [Module term]
+fromList modules = ModuleTable (Map.fromListWith (<>) (map ((,) . moduleName <*> pure) modules))
