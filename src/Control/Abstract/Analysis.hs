@@ -62,6 +62,7 @@ evaluateTerm = foldSubterms analyzeTerm
 withModules :: MonadAnalysis term value m => [Module term] -> m a -> m a
 withModules = localModuleTable . const . ModuleTable.fromList
 
+-- | Evaluate with a list of modules in scope, taking the head module as the entry point.
 evaluateModules :: MonadAnalysis term value m => [Module term] -> m value
 evaluateModules [] = fail "evaluateModules: empty list"
 evaluateModules (m:ms) = withModules ms (evaluateModule m)
