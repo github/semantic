@@ -24,8 +24,8 @@ moduleForBlob :: Maybe FilePath -- ^ The root directory relative to which the mo
               -> Module term    -- ^ A 'Module' named appropriate for the 'Blob', holding the @term@, and constructed relative to the root 'FilePath', if any.
 moduleForBlob rootDir blob term = Module (moduleName blob) (blobPath blob) term
   where moduleName Blob{..} = let path = dropExtensions (maybe takeFileName makeRelative rootDir blobPath)
-         in case blobLanguage of
+         in toName $ case blobLanguage of
           -- TODO: Need a better way to handle module registration and resolution
-          Just Go -> toName (takeDirectory path) -- Go allows defining modules across multiple files in the same directory.
-          _ ->  toName path
+          Just Go -> takeDirectory path -- Go allows defining modules across multiple files in the same directory.
+          _       ->               path
         toName str = qualifiedName (BC.pack <$> splitWhen (== pathSeparator) str)
