@@ -1,11 +1,11 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Abstract.ModuleTable
-  ( ModuleName
-  , ModuleTable (..)
-  , moduleTableLookup
-  , moduleTableInsert
-  , fromList
-  ) where
+( ModuleName
+, ModuleTable (..)
+, moduleTableLookup
+, moduleTableInsert
+, fromList
+) where
 
 import Data.Abstract.Module
 import Data.Semigroup
