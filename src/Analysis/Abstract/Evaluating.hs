@@ -121,8 +121,7 @@ deriving instance Member NonDet    effects => MonadNonDet (Evaluating term value
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value
-  = '[
-       Resumable Prelude.String value
+  = '[ Resumable Prelude.String value
      , Fail                                        -- Failure with an error message
      , State  (EnvironmentFor value)               -- Environments (both local and global)
      , State  (HeapFor value)                      -- The heap
