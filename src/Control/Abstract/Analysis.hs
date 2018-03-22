@@ -31,7 +31,6 @@ import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Value
 import Data.Blob
 import Data.Coerce
-import qualified Data.Map as Map
 import Prelude hiding (fail)
 import Prologue
 import System.FilePath.Posix
@@ -66,11 +65,8 @@ withModules = localModuleTable . const . ModuleTable.fromList
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
 withModulesForBlobs :: MonadAnalysis term value m => Blob -> [(Blob, term)] -> m a -> m a
-withModulesForBlobs blob pairs = localModuleTable (const moduleTable)
-  where
-    moduleTable = ModuleTable (Map.fromListWith (<>) (map toModulePair pairs))
-    rootDir = dropFileName (blobPath blob)
-    toModulePair (blob, term) = let m = moduleForBlob rootDir blob term in (moduleName m, [m])
+withModulesForBlobs blob = withModules . map (uncurry (moduleForBlob rootDir))
+  where rootDir = dropFileName (blobPath blob)
 
 
 -- | Require/import another term/file and return an Effect.
