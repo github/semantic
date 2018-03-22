@@ -41,7 +41,7 @@ class (MonadEvaluator term value m, Recursive term) => MonadAnalysis term value 
   -- | The effects necessary to run the analysis. Analyses which are composed on top of (wrap) other analyses should include the inner analyses 'RequiredEffects' in their own list.
   type family RequiredEffects term value m :: [* -> *]
 
-  -- | Analyze a term using the semantics of the current analysis. This should generally only be called by definitions of 'evaluateTerm' and 'analyzeTerm' in this or other instances.
+  -- | Analyze a term using the semantics of the current analysis. This should generally only be called by 'evaluateTerm' and by definitions of 'analyzeTerm' in instances for composite analyses.
   analyzeTerm :: SubtermAlgebra (Base term) term (m value)
 
   analyzeModule :: SubtermAlgebra Module term (m value)
