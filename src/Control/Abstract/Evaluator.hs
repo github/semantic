@@ -1,19 +1,20 @@
 {-# LANGUAGE ConstrainedClassMethods, FunctionalDependencies #-}
 module Control.Abstract.Evaluator
-  ( MonadEvaluator(..)
-  , MonadEnvironment(..)
-  , modifyEnv
-  , modifyExports
-  , addExport
-  , MonadHeap(..)
-  , modifyHeap
-  , localize
-  , lookupHeap
-  , assign
-  , MonadModuleTable(..)
-  , modifyModuleTable
-  , MonadControl(..)
-  , MonadThrow(..)
+( MonadEvaluator(..)
+, MonadEnvironment(..)
+, modifyEnv
+, modifyExports
+, addExport
+, MonadHeap(..)
+, modifyHeap
+, localize
+, lookupHeap
+, assign
+, MonadModuleTable(..)
+, modifyModuleTable
+, MonadControl(..)
+, MonadThrow(..)
+, EvaluateModule(..)
 ) where
 
 import Data.Abstract.Address
