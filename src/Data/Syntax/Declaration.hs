@@ -244,7 +244,7 @@ instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedExportFrom where
   eval (QualifiedExportFrom from exportSymbols) = do
     let moduleName = freeVariable (subterm from)
-    importedEnv <- isolate (require moduleName)
+    (importedEnv, _) <- isolate (require moduleName)
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \(name, alias) -> do
       let address = Env.lookup name importedEnv
@@ -277,7 +277,7 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedImport where
   eval (QualifiedImport from alias xs) = do
-    importedEnv <- isolate (require moduleName)
+    (importedEnv, _) <- isolate (require moduleName)
     modifyEnv (mappend (Env.overwrite (renames importedEnv) importedEnv))
     unit
     where
@@ -300,7 +300,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
   eval (Import from xs _) = do
-    importedEnv <- isolate (require moduleName)
+    (importedEnv, _) <- isolate (require moduleName)
     modifyEnv (mappend (renamed importedEnv))
     unit
     where

@@ -36,14 +36,14 @@ instance Evaluatable VariableName
 doInclude :: (MonadValue value m, MonadAnalysis term value m) => Subterm t (m value) -> m value
 doInclude path = do
   name <- toQualifiedName <$> (subtermValue path >>= asString)
-  (importedEnv, v) <- isolate (load' name)
+  (importedEnv, v) <- isolate (load name)
   modifyEnv (mappend importedEnv)
   pure v
 
 doIncludeOnce :: (MonadValue value m, MonadAnalysis term value m) => Subterm t (m value) -> m value
 doIncludeOnce path = do
   name <- toQualifiedName <$> (subtermValue path >>= asString)
-  (importedEnv, v) <- isolate (require' name)
+  (importedEnv, v) <- isolate (require name)
   modifyEnv (mappend importedEnv)
   pure v
 

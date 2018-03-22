@@ -4,9 +4,7 @@ module Analysis.Abstract.Evaluating
 , evaluate
 , evaluates
 , require
-, require'
 , load
-, load'
 ) where
 
 import Control.Abstract.Evaluator
@@ -74,34 +72,21 @@ withModules Blob{..} pairs = localModuleTable (const moduleTable)
       _ ->  toName path
     toName str = qualifiedName (fmap BC.pack (splitWhen (== pathSeparator) str))
 
-
--- | Require/import another module by name and return it's environment
+-- | Require/import another module by name and return it's environment and value.
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
 require :: (MonadAnalysis term value m, MonadValue value m)
         => ModuleName
-        -> m (EnvironmentFor value)
-require name = fst <$> require' name
-
--- | Require/import another module by name and return it's environment and value.
-require' :: (MonadAnalysis term value m, MonadValue value m)
-        => ModuleName
         -> m (EnvironmentFor value, value)
-require' name = getModuleTable >>= maybe (load' name) pure . moduleTableLookup name
+require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup name
 
--- | Load another module by name and return it's environment
+-- | Load another module by name and return it's environment and value.
 --
 -- Always loads/evaluates.
 load :: (MonadAnalysis term value m, MonadValue value m)
      => ModuleName
-     -> m (EnvironmentFor value)
-load name = fst <$> load' name
-
--- | Load another module by name and return it's environment and value.
-load' :: (MonadAnalysis term value m, MonadValue value m)
-     => ModuleName
      -> m (EnvironmentFor value, value)
-load' name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
+load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
   where
     notFound = fail ("cannot load module: " <> show name)
     evalAndCache :: (MonadAnalysis term value m, MonadValue value m) => [term] -> m (EnvironmentFor value, value)
