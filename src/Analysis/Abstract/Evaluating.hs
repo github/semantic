@@ -76,6 +76,8 @@ instance Members '[Reader (ModuleTable [Module term]), State (ModuleTable (Envir
 instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
   getConfiguration term = Configuration term mempty <$> getEnv <*> getHeap
 
+  askModuleStack = raise ask
+
 instance ( Evaluatable (Base term)
          , FreeVariables term
          , Members (EvaluatingEffects term value) effects

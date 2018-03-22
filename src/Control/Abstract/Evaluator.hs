@@ -43,6 +43,9 @@ class ( MonadControl term m
   -- | Get the current 'Configuration' with a passed-in term.
   getConfiguration :: Ord (LocationFor value) => term -> m (ConfigurationFor term value)
 
+  askModuleStack :: m [Module term]
+
+
 -- | A 'Monad' abstracting local and global environments.
 class Monad m => MonadEnvironment value m | m -> value where
   -- | Retrieve the environment.
