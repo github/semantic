@@ -41,6 +41,11 @@ instance ( Member (State ImportGraph) effects
 
   evaluateModule m@Module{..} = ImportGraphing (evaluateModule m)
 
+(><) :: Graph a => a -> a -> a
+(><) = connect
+
+infixr 7 ><
+
 modifyImportGraph :: (Effectful (m term value), Member (State ImportGraph) effects) => (ImportGraph -> ImportGraph) -> ImportGraphing m term value effects ()
 modifyImportGraph = raise . modify
 
