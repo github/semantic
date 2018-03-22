@@ -43,8 +43,8 @@ class (MonadEvaluator term value m, Recursive term) => MonadAnalysis term value 
   analyzeTerm :: SubtermAlgebra (Base term) term (m value)
 
   -- | Evaluate a (root-level) term to a value using the semantics of the current analysis. This should be used to evaluate single-term programs as well as each module in multi-term programs.
-  evaluateModule :: term -> m value
-  evaluateModule = evaluateTerm
+  evaluateModule :: Module term -> m value
+  evaluateModule = evaluateTerm . moduleBody
 
   -- | Isolate the given action with an empty global environment and exports.
   isolate :: m a -> m a
@@ -86,7 +86,7 @@ load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup n
     evalAndCache :: (MonadAnalysis term value m, Ord (LocationFor value)) => [Module term] -> m (EnvironmentFor value)
     evalAndCache []     = pure mempty
     evalAndCache (x:xs) = do
-      void $ evaluateModule (moduleBody x)
+      void $ evaluateModule x
       env <- filterEnv <$> getExports <*> getEnv
       modifyModuleTable (moduleTableInsert name env)
       (env <>) <$> evalAndCache xs

@@ -41,17 +41,17 @@ evaluateRubyFiles = evaluateFiles rubyParser
 -- Go
 evaluateGoFile = evaluateFile goParser
 evaluateGoFiles = evaluateFiles goParser
-typecheckGoFile path = runAnalysis @(Caching Evaluating Go.Term Type) . evaluateModule . moduleBody <$> parseFile goParser Nothing path
+typecheckGoFile path = runAnalysis @(Caching Evaluating Go.Term Type) . evaluateModule <$> parseFile goParser Nothing path
 
 -- Python
 evaluatePythonFile = evaluateFile pythonParser
 evaluatePythonFiles = evaluateFiles pythonParser
-typecheckPythonFile path = runAnalysis @(Caching Evaluating Python.Term Type) . evaluateModule . moduleBody <$> parseFile pythonParser Nothing path
-tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term Value) . evaluateModule . moduleBody <$> parseFile pythonParser Nothing path
-evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] Evaluating) Python.Term Value) . evaluateModule . moduleBody <$> parseFile pythonParser Nothing path
+typecheckPythonFile path = runAnalysis @(Caching Evaluating Python.Term Type) . evaluateModule <$> parseFile pythonParser Nothing path
+tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term Value) . evaluateModule <$> parseFile pythonParser Nothing path
+evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] Evaluating) Python.Term Value) . evaluateModule <$> parseFile pythonParser Nothing path
 
 -- TypeScript
-typecheckTypeScriptFile path = runAnalysis @(Caching Evaluating TypeScript.Term Type) . evaluateModule . moduleBody <$> parseFile typescriptParser Nothing path
+typecheckTypeScriptFile path = runAnalysis @(Caching Evaluating TypeScript.Term Type) . evaluateModule <$> parseFile typescriptParser Nothing path
 evaluateTypeScriptFile = evaluateFile typescriptParser
 evaluateTypeScriptFiles = evaluateFiles typescriptParser
 
@@ -67,7 +67,7 @@ evaluateFile :: forall term effects
              => Parser term
              -> FilePath
              -> IO (Final effects Value)
-evaluateFile parser path = runAnalysis @(Evaluating term Value) . evaluateModule . moduleBody <$> parseFile parser Nothing path
+evaluateFile parser path = runAnalysis @(Evaluating term Value) . evaluateModule <$> parseFile parser Nothing path
 
 -- Evaluate a list of files (head of file list is considered the entry point).
 evaluateFiles :: forall term effects
@@ -84,7 +84,7 @@ evaluateFiles :: forall term effects
 evaluateFiles parser paths = do
   let rootDir = dropFileName (head paths)
   entry:xs <- traverse (parseFile parser (Just rootDir)) paths
-  pure . runAnalysis @(Evaluating term Value) . withModules xs $ evaluateModule (moduleBody entry)
+  pure . runAnalysis @(Evaluating term Value) . withModules xs $ evaluateModule entry
 
 
 -- Read and parse a file.

@@ -7,6 +7,7 @@ import Control.Abstract.Analysis
 import Data.Abstract.Cache
 import Data.Abstract.Configuration
 import Data.Abstract.Heap
+import Data.Abstract.Module
 import Data.Abstract.Value
 import Prologue
 
@@ -93,8 +94,8 @@ instance ( Corecursive term
         pairs <- consultOracle c
         caching c pairs (liftAnalyze analyzeTerm e)
 
-  evaluateModule e = do
-    c <- getConfiguration e
+  evaluateModule m = do
+    c <- getConfiguration (moduleBody m)
     -- Convergence here is predicated upon an Eq instance, not α-equivalence
     cache <- converge (\ prevCache -> isolateCache $ do
       putHeap (configurationHeap c)
@@ -105,7 +106,7 @@ instance ( Corecursive term
       -- that it doesn't "leak" to the calling context and diverge (otherwise this
       -- would never complete). We don’t need to use the values, so we 'gather' the
       -- nondeterministic values into @()@.
-      withOracle prevCache (gather (const ()) (Caching (evaluateModule e)))) mempty
+      withOracle prevCache (gather (const ()) (Caching (evaluateModule m)))) mempty
     maybe empty scatter (cacheLookup c cache)
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
