@@ -1,6 +1,7 @@
+{-# LANGUAGE DataKinds, TypeFamilies #-}
+
 module Language.Preluded
     ( Preluded (..)
-    , export
     ) where
 
 import GHC.TypeLits
