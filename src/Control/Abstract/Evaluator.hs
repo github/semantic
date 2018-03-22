@@ -43,6 +43,7 @@ class ( MonadControl term m
   -- | Get the current 'Configuration' with a passed-in term.
   getConfiguration :: Ord (LocationFor value) => term -> m (ConfigurationFor term value)
 
+  -- | Retrieve the stack of modules currently being evaluated.
   askModuleStack :: m [Module term]
 
 
