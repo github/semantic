@@ -353,7 +353,7 @@ instance Ord1 NamespaceUseGroupClause where liftCompare = genericLiftCompare
 instance Show1 NamespaceUseGroupClause where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable NamespaceUseGroupClause
 
-data Namespace a = Namespace { namespaceName :: a, namespaceBody :: a}
+data Namespace a = Namespace { namespaceName :: a, namespaceBody :: a }
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Namespace where liftEq = genericLiftEq
@@ -365,27 +365,29 @@ instance Evaluatable Namespace where
     where
       names = toList (freeVariables (subterm namespaceName))
 
-      go [] = fail "gotta fix this"
+      go [] = fail "expected at least one free variable in namespaceName, found none"
       go [name] = do
-        v <- localEnv id $ do
+        (v, addr) <- letrec' name $ do
           void $ subtermValue namespaceBody
           namespaceEnv <- Env.head <$> getEnv
-          klass name namespaceEnv
-
-        addr <- lookupOrAlloc name
-        assign addr v
-        v <$ modifyEnv (Env.insert name addr)
+          namespace name namespaceEnv
+        v <$ modifyEnv (insert name addr)
       go (name:xs) = do
-        (v, res) <- localEnv id $ do
-          res <- go xs
-          namespaceEnv <- Env.head <$> getEnv
-          v <- klass name namespaceEnv
-          pure (v, res)
+        (rest, addr) <- localEnv id $ do
+          rest <- go xs
 
+          namespaceEnv <- Env.head <$> getEnv
+          addr <- lookupOrAlloc name
+          v <- namespace name namespaceEnv
+          assign addr v
+          pure (rest, addr)
+
+        rest <$ modifyEnv (insert name addr)
+      letrec' name body = do
         addr <- lookupOrAlloc name
+        v <- localEnv id body
         assign addr v
-        modifyEnv (insert name addr)
-        pure res
+        pure (v, addr)
 
 data TraitDeclaration a = TraitDeclaration { traitName :: a, traitStatements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
