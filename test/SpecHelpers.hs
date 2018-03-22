@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators, TypeApplications #-}
+{-# LANGUAGE GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators, TypeApplications #-}
 module SpecHelpers (
   module X
 , diffFilePaths
