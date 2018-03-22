@@ -87,7 +87,10 @@ class (Monad m, Show value) => MonadValue value m where
   ifthenelse :: value -> m a -> m a -> m a
 
   -- | Build a class value from a name and environment.
-  klass :: Name -> EnvironmentFor value -> m value
+  klass :: Name                 -- ^ The new class's identifier
+        -> [value]              -- ^ A list of superclasses
+        -> EnvironmentFor value -- ^ The environment to capture
+        -> m value
 
   -- | Build a namespace value from a name and environment stack
   namespace :: Name -> EnvironmentFor value -> m value
@@ -155,7 +158,11 @@ instance ( Monad m
   multiple = pure . injValue . Value.Tuple
   array    = pure . injValue . Value.Array
 
-  klass n  = pure . injValue . Class n
+  klass n [] env = pure . injValue $ Class n env
+  klass n supers env = do
+    product <- mconcat <$> traverse objectEnvironment supers
+    pure . injValue $ Class n (Env.push product <> env)
+
 
   namespace n env = do
     maybeAddr <- lookupEnv n
@@ -273,8 +280,10 @@ instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, Mon
   rational _ = pure Type.Rational
   multiple   = pure . Type.Product
   array      = pure . Type.Array
-  klass _ _  = pure Object
+
+  klass _ _ _   = pure Object
   namespace _ _ = pure Type.Unit
+
   objectEnvironment _ = pure mempty
 
   asString _ = fail "Must evaluate to Value to use asString"
