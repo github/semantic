@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.ImportGraph
 ( ImportGraph(..)
 , ImportGraphing
@@ -42,8 +42,11 @@ deriving instance MonadModuleTable term value (m term value effects) => MonadMod
 deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (ImportGraphing m term value effects)
 
 
-instance MonadAnalysis term value (m term value effects) => MonadAnalysis term value (ImportGraphing m term value effects) where
-  type RequiredEffects term value (ImportGraphing m term value effects) = RequiredEffects term value (m term value effects)
+instance ( Member (State ImportGraph) effects
+         , MonadAnalysis term value (m term value effects)
+         )
+         => MonadAnalysis term value (ImportGraphing m term value effects) where
+  type RequiredEffects term value (ImportGraphing m term value effects) = State ImportGraph ': RequiredEffects term value (m term value effects)
 
   analyzeTerm = liftAnalyze analyzeTerm
 
