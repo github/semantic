@@ -71,6 +71,7 @@ instance RunEffect (Resumable exc v) a where
 resumeException :: forall v m exc e a. (Effectful m, Resumable exc v :< e) => m e a -> ((v -> m e a) -> exc -> m e a) -> m e a
 resumeException m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
 
+-- | Reassociate 'Either's, combining errors into 'Left' values and successes in a single level of 'Right'.
 mergeEither :: Either a (Either b c) -> Either (Either a b) c
 mergeEither = either (Left . Left) (either (Left . Right) Right)
 
