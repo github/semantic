@@ -66,8 +66,7 @@ evaluateModule :: forall m term value effects
                   )
                => Module term
                -> m effects value
-evaluateModule m = resumeException (evaluateM m)
-  (\ yield (EvaluateModule m) -> evaluateM m >>= yield)
+evaluateModule m = evaluateM m `resumeException` (\ yield (EvaluateModule m) -> evaluateM m >>= yield)
   where evaluateM :: Module term -> m effects value
         evaluateM = analyzeModule . fmap (Subterm <*> evaluateTerm)
 
