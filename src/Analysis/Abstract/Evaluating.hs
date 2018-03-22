@@ -88,9 +88,6 @@ type EvaluatingEffects term value
      ]
 
 
-resumeException :: forall v m exc e a. (Effectful m, Resumable exc v :< e) => m e a -> ((v -> m e a) -> exc -> m e a) -> m e a
-resumeException m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
-
 instance Members '[Resumable Prelude.String value] effects => MonadThrow Prelude.String value (Evaluating term value effects) where
    throwException = raise . throwError
 
