@@ -25,7 +25,6 @@ import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Semigroup.Reducer
-import Prelude
 import Prologue
 
 -- | A 'Monad' providing the basic essentials for evaluation.
