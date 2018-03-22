@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, Rank2Types, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE MultiParamTypeClasses, Rank2Types, TypeFamilies, TypeOperators, UndecidableInstances, GADTs, StandaloneDeriving #-}
 module Control.Abstract.Value where
 
 import Control.Abstract.Addressable
@@ -137,10 +137,20 @@ doWhile body cond = loop $ \ continue -> body *> do
   this <- cond
   ifthenelse this continue unit
 
+
+data ValueExc v where
+  ValueExc :: Prelude.String -> ValueExc Value
+  StringExc :: Prelude.String -> ValueExc ByteString
+
+deriving instance Show (ValueExc v)
+instance Show1 ValueExc where
+  liftShowsPrec _ _ = showsPrec
+
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Monad m
          , MonadAddressable location Value m
          , MonadAnalysis term Value m
+         , MonadThrow ValueExc m
          )
          => MonadValue Value m where
 
@@ -158,7 +168,7 @@ instance ( Monad m
   klass n Nothing env = pure . injValue $ Class n env
   klass n (Just super) env
     | Just (Class _ superEnv) <- prjValue super = pure . injValue $ Class n (Env.push superEnv <> env)
-    | otherwise = fail ("Attempted to inherit from a non-class object: " <> show super)
+    | otherwise = throwException (ValueExc ("Attempted to inherit from a non-class object: " <> show super))
 
 
   objectEnvironment o
@@ -167,7 +177,7 @@ instance ( Monad m
 
   asString v
     | Just (Value.String n) <- prjValue v = pure n
-    | otherwise                           = fail ("expected " <> show v <> " to be a string")
+    | otherwise                           = throwException (StringExc ("expected " <> show v <> " to be a string"))
 
   ifthenelse cond if' else'
     | Just (Boolean b) <- prjValue cond = if b then if' else else'

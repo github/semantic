@@ -123,7 +123,8 @@ deriving instance Member NonDet effects => MonadNonDet (Evaluating term value ef
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value
   = '[
-       Resumable Prelude.String value
+       Resumable1 ValueExc
+     , Resumable1 (Unspecialized value)
      , Fail                                        -- Failure with an error message
      , State  (EnvironmentFor value)               -- Environments (both local and global)
      , State  (HeapFor value)                      -- The heap
@@ -166,6 +167,8 @@ instance RunEffect (Resumable1 exc) a where
   runEffect = runError1
 
 
+instance (Monad (m effects), Effectful m, Members '[Resumable1 exc] effects) => MonadThrow exc (m effects) where
+   throwException = raise . throwError1
 
 instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl term (Evaluating term value effects) where
   label term = do
@@ -215,4 +218,4 @@ instance ( Evaluatable (Base term)
          => MonadAnalysis term value (Evaluating term value effects) where
   type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
 
-  analyzeTerm term = resumeException @value (eval term) (\yield exc -> string (BC.pack exc) >>= yield)
+  analyzeTerm term = resumeException @(Unspecialized value) (eval term) (\yield (Unspecialized str) -> string (BC.pack str) >>= yield)
