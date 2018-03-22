@@ -82,8 +82,7 @@ evaluateFiles :: forall term effects
               -> [FilePath]
               -> IO (Final effects Value)
 evaluateFiles parser paths = do
-  let rootDir = dropFileName (head paths)
-  entry:xs <- traverse (parseFile parser (Just rootDir)) paths
+  entry:xs <- parseFiles parser paths
   pure . runAnalysis @(Evaluating term Value) . withModules xs $ evaluateModule entry
 
 
