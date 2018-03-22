@@ -34,7 +34,7 @@ doRequire :: (MonadAnalysis term value m, MonadValue value m)
 doRequire name = do
   moduleTable <- getModuleTable
   case moduleTableLookup name moduleTable of
-    Nothing -> (,) <$> load name <*> boolean True
+    Nothing -> (,) <$> (fst <$> load name) <*> boolean True
     Just (env, _) -> (,) <$> pure env <*> boolean False
 
 
@@ -57,7 +57,7 @@ instance Evaluatable Load where
 
 doLoad :: (MonadAnalysis term value m, MonadValue value m) => ByteString -> Bool -> m value
 doLoad path shouldWrap = do
-  importedEnv <- isolate (load (toName path))
+  (importedEnv, _) <- isolate (load (toName path))
   unless shouldWrap $ modifyEnv (mappend importedEnv)
   boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
   where
