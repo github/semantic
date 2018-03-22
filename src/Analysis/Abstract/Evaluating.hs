@@ -88,3 +88,8 @@ instance ( Evaluatable (Base term)
   type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
 
   analyzeTerm = eval
+
+  evaluateModule m = pushModule m (evaluateTerm (moduleBody m))
+
+pushModule :: Member (Reader [Module term]) effects => Module term -> Evaluating term value effects a -> Evaluating term value effects a
+pushModule m = raise . local (m :) . lower
