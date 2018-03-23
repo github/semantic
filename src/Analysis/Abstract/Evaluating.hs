@@ -5,6 +5,9 @@ module Analysis.Abstract.Evaluating
 ( type Evaluating
 , evaluate
 , evaluates
+, findValue
+, findEnv
+, findHeap
 , require
 , load
 ) where
@@ -17,6 +20,8 @@ import           Data.Abstract.Environment (Environment)
 import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Exports (Exports)
+import Data.Abstract.Environment (Environment)
+import Data.Abstract.Heap (Heap(..))
 import qualified Data.Abstract.Exports as Export
 import           Data.Abstract.ModuleTable
 import           Data.Abstract.Value
@@ -29,6 +34,8 @@ import qualified Data.Map as Map
 import           Prelude hiding (fail)
 import           Prologue hiding (throwError)
 import           System.FilePath.Posix
+import qualified Data.Map.Monoidal as Monoidal
+import System.FilePath.Posix
 
 -- | Evaluate a term to a value.
 evaluate :: forall value term effects
@@ -133,6 +140,21 @@ type EvaluatingEffects term value
      , State  (ExportsFor value)                   -- Exports (used to filter environments when they are imported)
      , State  (IntMap.IntMap term)                 -- For jumps
      ]
+
+-- | Find the value in the 'Final' result of running.
+findValue :: forall value term effects. (effects ~ RequiredEffects term value (Evaluating term value effects))
+          => Final effects value -> Either Prelude.String (Either (SomeExc (Unspecialized value)) (Either (SomeExc ValueExc) value))
+findValue (((((v, _), _), _), _), _) = v
+
+-- | Find the 'Environment' in the 'Final' result of running.
+findEnv :: forall value term effects . (effects ~ RequiredEffects term value (Evaluating term value effects))
+        => Final effects value -> EnvironmentFor value
+findEnv (((((_, env), _), _), _), _) = env
+
+-- | Find the 'Heap' in the 'Final' result of running.
+findHeap :: forall value term effects . (effects ~ RequiredEffects term value (Evaluating term value effects))
+         => Final effects value -> Monoidal.Map (LocationFor value) (CellFor value)
+findHeap (((((_, _), Heap heap), _), _), _) = heap
 
 
 resumeException :: forall exc m e a. (Effectful m, Resumable exc :< e) => m e a -> (forall v. (v -> m e a) -> exc v -> m e a) -> m e a
