@@ -156,7 +156,7 @@ instance Listable1 f => Listable2 (FreeF f) where
 instance (Listable1 f, Listable a) => Listable1 (FreeF f a) where
   liftTiers = liftTiers2 tiers
 
-instance (Functor f, Listable1 f) => Listable1 (Free.Free f) where
+instance Listable1 f => Listable1 (Free.Free f) where
   liftTiers pureTiers = go
     where go = liftCons1 (liftTiers2 pureTiers go) free
           free (FreeF.Free f) = Free.Free f
