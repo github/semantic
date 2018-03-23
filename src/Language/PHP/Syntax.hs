@@ -363,7 +363,7 @@ instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Namespace where
   eval Namespace{..} = go names
     where
-      names = toList (freeVariables (subterm namespaceName))
+      names = freeVariables (subterm namespaceName)
       go [] = fail "expected at least one free variable in namespaceName, found none"
       go [name] = letrec' name $ \addr ->
         subtermValue namespaceBody *> makeNamespace name addr
