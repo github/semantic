@@ -179,7 +179,7 @@ instance ( Monad m
   scopedEnvironment o
     | Just (Class _ env) <- prjValue o = pure env
     | Just (Namespace _ env) <- prjValue o = pure env
-    | otherwise = fail ("non-object type passed to scopedEnvironment: " <> show o)
+    | otherwise = fail ("object type passed to scopedEnvironment doesn't have an environment: " <> show o)
 
   asString v
     | Just (Value.String n) <- prjValue v = pure n
