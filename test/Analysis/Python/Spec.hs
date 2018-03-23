@@ -36,11 +36,11 @@ spec = parallel $ do
 
     it "subclasses" $ do
       res <- evaluate' "subclass.py"
-      join (fst res) `shouldBe` Right (injValue (String "\"bar\""))
+      fst res `shouldBe` Right (Right (Right (injValue (String "\"bar\""))))
 
     it "handles multiple inheritance left-to-right" $ do
       res <- evaluate' "multiple_inheritance.py"
-      join (fst res) `shouldBe` Right (injValue (String "\"foo!\""))
+      fst res `shouldBe`  Right (Right (Right (injValue (String "\"foo!\""))))
 
   where
     addr = Address . Precise

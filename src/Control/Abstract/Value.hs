@@ -1,17 +1,18 @@
-{-# LANGUAGE MultiParamTypeClasses, Rank2Types, TypeFamilies, TypeOperators, UndecidableInstances, GADTs, StandaloneDeriving #-}
+{-# LANGUAGE GADTs, MultiParamTypeClasses, Rank2Types, StandaloneDeriving, TypeFamilies, TypeOperators,
+             UndecidableInstances #-}
 module Control.Abstract.Value where
 
-import Control.Abstract.Addressable
-import Control.Abstract.Analysis
+import           Control.Abstract.Addressable
+import           Control.Abstract.Analysis
 import qualified Data.Abstract.Environment as Env
-import Data.Abstract.FreeVariables
-import Data.Abstract.Number as Number
-import Data.Abstract.Type as Type
-import Data.Abstract.Value as Value
-import Data.Scientific (Scientific)
+import           Data.Abstract.FreeVariables
+import           Data.Abstract.Number as Number
+import           Data.Abstract.Type as Type
+import           Data.Abstract.Value as Value
+import           Data.Scientific (Scientific)
 import qualified Data.Set as Set
-import Prelude hiding (fail)
-import Prologue
+import           Prelude hiding (fail)
+import           Prologue
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
 --   have built-in generalized-comparison ("spaceship") operators. If you want to
@@ -141,6 +142,11 @@ doWhile body cond = loop $ \ continue -> body *> do
 data ValueExc v where
   ValueExc :: Prelude.String -> ValueExc Value
   StringExc :: Prelude.String -> ValueExc ByteString
+
+instance Eq1 ValueExc where
+  liftEq _ (ValueExc a) (ValueExc b)   = a == b
+  liftEq _ (StringExc a) (StringExc b) = a == b
+  liftEq _ _ _                         = False
 
 deriving instance Show (ValueExc v)
 instance Show1 ValueExc where

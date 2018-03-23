@@ -24,6 +24,9 @@ import Prologue
 data Unspecialized a b where
   Unspecialized :: { getUnspecialized :: Prelude.String } -> Unspecialized value value
 
+instance Eq1 (Unspecialized a) where
+  liftEq _ (Unspecialized a) (Unspecialized b) = a == b
+
 deriving instance Eq (Unspecialized a b)
 deriving instance Show (Unspecialized a b)
 instance Show1 (Unspecialized a) where
