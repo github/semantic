@@ -18,7 +18,6 @@ import Data.Proxy
 import Data.Semigroup.Foldable
 import Data.Semigroup.App
 import Data.Term
-import Prelude hiding (fail)
 import Prologue
 
 
@@ -29,10 +28,11 @@ class Evaluatable constr where
           , MonadAnalysis term value m
           , MonadValue value m
           , Show (LocationFor value)
+          , MonadThrow Prelude.String value m
           )
        => SubtermAlgebra constr term (m value)
-  default eval :: (MonadFail m, Show1 constr) => SubtermAlgebra constr term (m value)
-  eval expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
+  default eval :: (MonadThrow Prelude.String value m, Show1 constr) => SubtermAlgebra constr term (m value)
+  eval expr = throwException $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
 -- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
 instance Apply Evaluatable fs => Evaluatable (Union fs) where
