@@ -37,7 +37,9 @@ instance ( Effectful (m term value)
          , ValueRoots value
          )
          => MonadAnalysis term value (Collecting m term value effects) where
-  type RequiredEffects term value (Collecting m term value effects) rest = RequiredEffects term value (m term value effects) (Reader (Live (LocationFor value) value) ': rest)
+  type RequiredEffects term value (Collecting m term value effects)
+    = Reader (Live (LocationFor value) value)
+   ': RequiredEffects term value (m term value effects)
 
   -- Small-step evaluation which garbage-collects any non-rooted addresses after evaluating each term.
   analyzeTerm term = do
