@@ -169,7 +169,7 @@ type EvaluatingEffects term value
      , State  (EnvironmentFor value)                      -- Environments (both local and global)
      , State  (HeapFor value)                             -- The heap
      , Reader (ModuleTable [term])                        -- Cache of unevaluated modules
-     , Reader (EnvironmentFor value)                      -- Default environment used by evaluateModule
+     , Reader (EnvironmentFor value)                      -- Default environment used as a fallback in lookupEnv
      , State  (ModuleTable (EnvironmentFor value, value)) -- Cache of evaluated modules
      , State  (ExportsFor value)                          -- Exports (used to filter environments when they are imported)
      , State  (IntMap.IntMap term)                        -- For jumps
