@@ -93,7 +93,11 @@ class (Monad m, Show value) => MonadValue value m where
         -> m value
 
   -- | Build a namespace value from a name and environment stack
-  namespace :: Name -> EnvironmentFor value -> m value
+  --
+  -- Namespaces model monoidal environments.
+  namespace :: Name                 -- ^ The namespace's identifier
+            -> EnvironmentFor value -- ^ The environment to mappend
+            -> m value
 
   -- | Extract the environment from a class.
   objectEnvironment :: value -> m (EnvironmentFor value)
