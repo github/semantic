@@ -26,18 +26,18 @@ deriving instance Member NonDet effects => Alternative (Evaluating term value ef
 deriving instance Member NonDet effects => MonadNonDet (Evaluating term value effects)
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
-type EvaluatingEffects term value
-  = '[ Resumable Prelude.String value
-     , Fail                                        -- Failure with an error message
-     , Resumable (EvaluateModule term) value       -- Requests to evaluate a module in the outermost analysis
-     , Reader [Module term]                        -- The stack of currently-evaluating modules.
-     , State  (EnvironmentFor value)               -- Environments (both local and global)
-     , State  (HeapFor value)                      -- The heap
-     , Reader (ModuleTable [Module term])                 -- Cache of unevaluated modules
-     , State  (ModuleTable (EnvironmentFor value, value)) -- Cache of evaluated modules
-     , State  (ExportsFor value)                   -- Exports (used to filter environments when they are imported)
-     , State  (IntMap.IntMap term)                 -- For jumps
-     ]
+type EvaluatingEffects term value rest
+  = Resumable Prelude.String value
+ ': Fail                                        -- Failure with an error message
+ ': Resumable (EvaluateModule term) value       -- Requests to evaluate a module in the outermost analysis
+ ': Reader [Module term]                        -- The stack of currently-evaluating modules.
+ ': State  (EnvironmentFor value)               -- Environments (both local and global)
+ ': State  (HeapFor value)                      -- The heap
+ ': Reader (ModuleTable [Module term])                 -- Cache of unevaluated modules
+ ': State  (ModuleTable (EnvironmentFor value, value)) -- Cache of evaluated modules
+ ': State  (ExportsFor value)                   -- Exports (used to filter environments when they are imported)
+ ': State  (IntMap.IntMap term)                 -- For jumps
+ ': rest
 
 
 instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl term (Evaluating term value effects) where
@@ -74,21 +74,21 @@ instance Members '[Reader (ModuleTable [Module term]), State (ModuleTable (Envir
   askModuleTable = raise ask
   localModuleTable f a = raise (local f (lower a))
 
-instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
+instance Members (EvaluatingEffects term value '[]) effects => MonadEvaluator term value (Evaluating term value effects) where
   getConfiguration term = Configuration term mempty <$> getEnv <*> getHeap
 
   askModuleStack = raise ask
 
 instance ( Evaluatable (Base term)
          , FreeVariables term
-         , Members (EvaluatingEffects term value) effects
+         , Members (EvaluatingEffects term value '[]) effects
          , MonadAddressable (LocationFor value) value (Evaluating term value effects)
          , MonadValue value (Evaluating term value effects)
          , Recursive term
          , Show (LocationFor value)
          )
          => MonadAnalysis term value (Evaluating term value effects) where
-  type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
+  type RequiredEffects term value (Evaluating term value effects) rest = EvaluatingEffects term value rest
 
   analyzeTerm term = resumeException @value (eval term) (\yield exc -> string (BC.pack exc) >>= yield)
 

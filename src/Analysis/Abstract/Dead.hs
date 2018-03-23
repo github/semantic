@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Dead
 ( type DeadCode
 ) where
@@ -46,7 +46,7 @@ instance ( Corecursive term
          , Ord term
          )
          => MonadAnalysis term value (DeadCode m term value effects) where
-  type RequiredEffects term value (DeadCode m term value effects) = State (Dead term) ': RequiredEffects term value (m term value effects)
+  type RequiredEffects term value (DeadCode m term value effects) rest = RequiredEffects term value (m term value effects) (State (Dead term) ': rest)
 
   analyzeTerm term = do
     revive (embedSubterm term)

@@ -63,7 +63,7 @@ evaluateTypeScriptFiles = evaluateFiles typescriptParser
 evaluateFile :: forall term effects
              .  ( Evaluatable (Base term)
                 , FreeVariables term
-                , effects ~ RequiredEffects term Value (Evaluating term Value effects)
+                , effects ~ RequiredEffects term Value (Evaluating term Value effects) '[]
                 , MonadAddressable Precise Value (Evaluating term Value effects)
                 , MonadValue Value (Evaluating term Value effects)
                 , Recursive term
@@ -77,7 +77,7 @@ evaluateFile parser path = runAnalysis @(Evaluating term Value) . evaluateModule
 evaluateFiles :: forall term effects
               .  ( Evaluatable (Base term)
                  , FreeVariables term
-                 , effects ~ RequiredEffects term Value (Evaluating term Value effects)
+                 , effects ~ RequiredEffects term Value (Evaluating term Value effects) '[]
                  , MonadAddressable Precise Value (Evaluating term Value effects)
                  , MonadValue Value (Evaluating term Value effects)
                  , Recursive term
