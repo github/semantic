@@ -1,5 +1,12 @@
 {-# LANGUAGE MultiParamTypeClasses, Rank2Types, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Control.Abstract.Value where
+module Control.Abstract.Value
+( MonadValue(..)
+, Comparator(..)
+, while
+, doWhile
+, forLoop
+, toBool
+) where
 
 import Control.Abstract.Addressable
 import Control.Abstract.Analysis
