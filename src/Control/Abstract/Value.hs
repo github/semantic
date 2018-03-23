@@ -94,13 +94,13 @@ class (Monad m, Show value) => MonadValue value m where
 
   -- | Build a namespace value from a name and environment stack
   --
-  -- Namespaces model monoidal environments.
+  -- Namespaces model closures with monoidal environments.
   namespace :: Name                 -- ^ The namespace's identifier
             -> EnvironmentFor value -- ^ The environment to mappend
             -> m value
 
-  -- | Extract the environment from a class.
-  objectEnvironment :: value -> m (EnvironmentFor value)
+  -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
+  scopedEnvironment :: value -> m (EnvironmentFor value)
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
   abstract :: (FreeVariables term, MonadControl term m) => [Name] -> Subterm term (m value) -> m value
@@ -164,7 +164,7 @@ instance ( Monad m
 
   klass n [] env = pure . injValue $ Class n env
   klass n supers env = do
-    product <- mconcat <$> traverse objectEnvironment supers
+    product <- mconcat <$> traverse scopedEnvironment supers
     pure . injValue $ Class n (Env.push product <> env)
 
 
@@ -176,11 +176,10 @@ instance ( Monad m
             | Just (Namespace _ env') <- prjValue v = pure env'
             | otherwise                             = fail ("expected " <> show v <> " to be a namespace")
 
-  -- TODO: Rename to scopedEnvironment
-  objectEnvironment o
+  scopedEnvironment o
     | Just (Class _ env) <- prjValue o = pure env
     | Just (Namespace _ env) <- prjValue o = pure env
-    | otherwise = fail ("non-object type passed to objectEnvironment: " <> show o)
+    | otherwise = fail ("non-object type passed to scopedEnvironment: " <> show o)
 
   asString v
     | Just (Value.String n) <- prjValue v = pure n
@@ -288,7 +287,7 @@ instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, Mon
   klass _ _ _   = pure Object
   namespace _ _ = pure Type.Unit
 
-  objectEnvironment _ = pure mempty
+  scopedEnvironment _ = pure mempty
 
   asString _ = fail "Must evaluate to Value to use asString"
 

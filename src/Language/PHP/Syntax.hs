@@ -188,7 +188,7 @@ instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedName where
   eval (fmap subtermValue -> QualifiedName name iden) = do
-    lhs <- name >>= objectEnvironment
+    lhs <- name >>= scopedEnvironment
     localEnv (mappend lhs) iden
 
 
@@ -205,7 +205,7 @@ instance Evaluatable NamespaceName where
       go []     = fail "nonempty NamespaceName not allowed"
       go [x]    = subtermValue x
       go (x:xs) = do
-        env <- subtermValue x >>= objectEnvironment
+        env <- subtermValue x >>= scopedEnvironment
         localEnv (mappend env) (go xs)
 
 newtype ConstDeclaration a = ConstDeclaration [a]
