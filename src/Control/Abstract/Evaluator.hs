@@ -6,6 +6,7 @@ module Control.Abstract.Evaluator
   , modifyExports
   , addExport
   , MonadHeap(..)
+  , fullEnvironment
   , modifyHeap
   , localize
   , lookupHeap
@@ -68,9 +69,9 @@ class Monad m => MonadEnvironment value m | m -> value where
   -- | Run an action with a locally-modified environment.
   localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m a -> m a
 
-  -- | Look a 'Name' up in the environment.
+  -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
   lookupEnv :: Name -> m (Maybe (Address (LocationFor value) value))
-  lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <|> (Env.lookup name <$> defaultEnvironment)
+  lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
 
   -- | Look up a 'Name' in the environment, running an action with the resolved address (if any).
   lookupWith :: (Address (LocationFor value) value -> m value) -> Name -> m (Maybe value)
@@ -98,6 +99,9 @@ modifyExports f = do
 addExport :: MonadEnvironment value m => Name -> Name -> Maybe (Address (LocationFor value) value) -> m ()
 addExport name alias = modifyExports . Export.insert name alias
 
+fullEnvironment :: MonadEnvironment value m => m (EnvironmentFor value)
+fullEnvironment = mappend <$> getEnv <*> defaultEnvironment
+
 -- | A 'Monad' abstracting a heap of values.
 class Monad m => MonadHeap value m | m -> value where
   -- | Retrieve the heap.
@@ -110,6 +114,7 @@ modifyHeap :: MonadHeap value m => (HeapFor value -> HeapFor value) -> m ()
 modifyHeap f = do
   s <- getHeap
   putHeap $! f s
+
 
 -- | Look up the cell for the given 'Address' in the 'Heap'.
 lookupHeap :: (MonadHeap value m, Ord (LocationFor value)) => Address (LocationFor value) value -> m (Maybe (CellFor value))
