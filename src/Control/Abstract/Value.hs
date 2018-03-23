@@ -83,6 +83,7 @@ class (Monad m, Show value) => MonadValue value m where
   -- | Construct a key-value pair for use in a hash.
   kvPair :: value -> value -> m value
 
+  -- | Extract the contents of a key-value pair as a tuple.
   asPair :: value -> m (value, value)
 
   -- | Construct a hash out of pairs.
