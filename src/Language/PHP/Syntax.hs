@@ -364,17 +364,16 @@ instance Evaluatable Namespace where
   eval Namespace{..} = go names
     where
       names = toList (freeVariables (subterm namespaceName))
-
       go [] = fail "expected at least one free variable in namespaceName, found none"
-      go [name] = letrec' name $ \addr -> do
+      go [name] = letrec' name $ \addr ->
         subtermValue namespaceBody *> makeNamespace name addr
       go (name:xs) = letrec' name $ \addr ->
         go xs <* makeNamespace name addr
+
       makeNamespace name addr = do
         namespaceEnv <- Env.head <$> getEnv
         v <- namespace name namespaceEnv
-        assign addr v
-        pure v
+        v <$ assign addr v
       letrec' name body = do
         addr <- lookupOrAlloc name
         v <- localEnv id (body addr)
