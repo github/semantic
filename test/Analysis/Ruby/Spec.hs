@@ -28,7 +28,7 @@ spec = parallel $ do
 
     it "subclass" $ do
       res <- evaluate' "subclass.rb"
-      join (fst res) `shouldBe` Right (injValue (String "\"<bar>\"")
+      join (fst res) `shouldBe` Right (injValue (String "\"<bar>\""))
 
   where
     addr = Address . Precise
