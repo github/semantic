@@ -21,10 +21,12 @@ type ValueConstructors
     , Class
     , Closure
     , Float
+    , Hash
     , Integer
+    , KVPair
     , Namespace
-    , String
     , Rational
+    , String
     , Symbol
     , Tuple
     , Unit
@@ -154,6 +156,26 @@ data Namespace value = Namespace
 instance Eq1 Namespace where liftEq = genericLiftEq
 instance Ord1 Namespace where liftCompare = genericLiftCompare
 instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
+
+data KVPair value = KVPair value value
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 KVPair where liftEq = genericLiftEq
+instance Ord1 KVPair where liftCompare = genericLiftCompare
+instance Show1 KVPair where liftShowsPrec = genericLiftShowsPrec
+
+-- You would think this would be a @Map value value@ or a @[(value, value)].
+-- You would be incorrect, as we can't derive a Generic1 instance for the above,
+-- and in addition a 'Map' representation would lose information given hash literals
+-- that assigned multiple values to one given key. Instead, this holds KVPair
+-- values. The smart constructor for hashes in MonadValue ensures that these are
+-- only populated with pairs.
+newtype Hash value = Hash [value]
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Hash where liftEq = genericLiftEq
+instance Ord1 Hash where liftCompare = genericLiftCompare
+instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
 
 -- | The environment for an abstract value type.
 type EnvironmentFor v = Environment (LocationFor v) v

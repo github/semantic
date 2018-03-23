@@ -9,18 +9,19 @@ type TName = Int
 
 -- | A datatype representing primitive types and combinations thereof.
 data Type
-  = Int            -- ^ Primitive int type.
-  | Bool           -- ^ Primitive boolean type.
-  | String         -- ^ Primitive string type.
-  | Symbol         -- ^ Type of unique symbols.
-  | Unit           -- ^ The unit type.
-  | Float          -- ^ Floating-point type.
-  | Rational       -- ^ Rational type.
-  | Type :-> Type  -- ^ Binary function types.
-  | Var TName      -- ^ A type variable.
-  | Product [Type] -- ^ N-ary products.
-  | Array [Type]   -- ^ Arrays. Note that this is heterogenous.
-  | Object         -- ^ Objects. Once we have some notion of inheritance we'll need to store a superclass.
+  = Int                 -- ^ Primitive int type.
+  | Bool                -- ^ Primitive boolean type.
+  | String              -- ^ Primitive string type.
+  | Symbol              -- ^ Type of unique symbols.
+  | Unit                -- ^ The unit type.
+  | Float               -- ^ Floating-point type.
+  | Rational            -- ^ Rational type.
+  | Type :-> Type       -- ^ Binary function types.
+  | Var TName           -- ^ A type variable.
+  | Product [Type]      -- ^ N-ary products.
+  | Array [Type]        -- ^ Arrays. Note that this is heterogenous.
+  | Hash [(Type, Type)] -- ^ Heterogenous key-value maps.
+  | Object              -- ^ Objects. Once we have some notion of inheritance we'll need to store a superclass.
   deriving (Eq, Ord, Show)
 
 -- TODO: À la carte representation of types.

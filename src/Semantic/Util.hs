@@ -5,7 +5,7 @@ module Semantic.Util where
 
 import Analysis.Abstract.Caching
 import Analysis.Abstract.Dead
-import Analysis.Abstract.Evaluating
+import Analysis.Abstract.Evaluating as X
 import Analysis.Abstract.Tracing
 import Analysis.Declaration
 import Control.Abstract.Analysis
