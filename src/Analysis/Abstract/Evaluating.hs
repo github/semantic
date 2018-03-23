@@ -14,7 +14,7 @@ import Data.Abstract.Value
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.IntMap as IntMap
 import Prelude hiding (fail)
-import Prologue hiding (throwError)
+import Prologue
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
 newtype Evaluating term value effects a = Evaluating (Eff effects a)
@@ -90,9 +90,9 @@ instance ( Evaluatable (Base term)
          => MonadAnalysis term value (Evaluating term value effects) where
   type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
 
-  analyzeTerm term = resumeException @value (eval term) (\yield exc -> string (BC.pack exc) >>= yield)
+  analyzeTerm eval term = resumeException @value (eval term) (\yield exc -> string (BC.pack exc) >>= yield)
 
-  analyzeModule m = pushModule (subterm <$> m) (subtermValue (moduleBody m))
+  analyzeModule eval m = pushModule (subterm <$> m) (eval m)
 
 pushModule :: Member (Reader [Module term]) effects => Module term -> Evaluating term value effects a -> Evaluating term value effects a
 pushModule m = raise . local (m :) . lower

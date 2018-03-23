@@ -85,16 +85,16 @@ instance ( Corecursive term
   type RequiredEffects term value (Caching m term value effects) = CachingEffects term value (RequiredEffects term value (m term value effects))
 
   -- Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
-  analyzeTerm e = do
+  analyzeTerm recur e = do
     c <- getConfiguration (embedSubterm e)
     cached <- lookupCache c
     case cached of
       Just pairs -> scatter pairs
       Nothing -> do
         pairs <- consultOracle c
-        caching c pairs (liftAnalyze analyzeTerm e)
+        caching c pairs (liftAnalyze analyzeTerm recur e)
 
-  analyzeModule m = do
+  analyzeModule recur m = do
     c <- getConfiguration (subterm (moduleBody m))
     -- Convergence here is predicated upon an Eq instance, not α-equivalence
     cache <- converge (\ prevCache -> isolateCache $ do
@@ -106,7 +106,7 @@ instance ( Corecursive term
       -- that it doesn't "leak" to the calling context and diverge (otherwise this
       -- would never complete). We don’t need to use the values, so we 'gather' the
       -- nondeterministic values into @()@.
-      withOracle prevCache (gather (const ()) (liftAnalyze analyzeModule m))) mempty
+      withOracle prevCache (gather (const ()) (liftAnalyze analyzeModule recur m))) mempty
     maybe empty scatter (cacheLookup c cache)
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.

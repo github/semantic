@@ -40,11 +40,11 @@ instance ( Effectful (m term value)
 
   analyzeTerm = liftAnalyze analyzeTerm
 
-  analyzeModule m = do
+  analyzeModule recur m = do
     ms <- askModuleStack
     let parent = maybe empty (vertex . moduleName) (listToMaybe ms)
     modifyImportGraph (parent >< vertex (moduleName m) <>)
-    liftAnalyze analyzeModule m
+    liftAnalyze analyzeModule recur m
 
 (><) :: Graph a => a -> a -> a
 (><) = connect

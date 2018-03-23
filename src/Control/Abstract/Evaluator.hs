@@ -52,6 +52,9 @@ class ( MonadControl term m
   --   With great power comes great responsibility. If you 'evaluateModule' any of these, you probably deserve what you get.
   askModuleStack :: m [Module term]
 
+  -- evaluateTerm :: term -> m value
+  -- evaluateTerm = foldSubterms (analyzeTerm id)
+
 
 -- | A 'Monad' abstracting local and global environments.
 class Monad m => MonadEnvironment value m | m -> value where
@@ -150,7 +153,7 @@ modifyModuleTable f = do
 
 
 -- | A 'Monad' abstracting jumps in imperative control.
-class Monad m => MonadControl term m where
+class Monad m => MonadControl term m | m -> term where
   -- | Allocate a 'Label' for the given @term@.
   --
   --   Labels must be allocated before being jumped to with 'goto', but are suitable for nonlocal jumps; thus, they can be used to implement coroutines, exception handling, call with current continuation, and other esoteric control mechanisms.

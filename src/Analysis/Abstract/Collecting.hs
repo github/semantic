@@ -28,6 +28,8 @@ instance ( Effectful (m term value)
 
   askModuleStack = Collecting askModuleStack
 
+  -- evaluateTerm = foldSubterms (analyzeTerm id)
+
 
 instance ( Effectful (m term value)
          , Foldable (Cell (LocationFor value))
@@ -42,9 +44,9 @@ instance ( Effectful (m term value)
    ': RequiredEffects term value (m term value effects)
 
   -- Small-step evaluation which garbage-collects any non-rooted addresses after evaluating each term.
-  analyzeTerm term = do
+  analyzeTerm recur term = do
     roots <- askRoots
-    v <- liftAnalyze analyzeTerm term
+    v <- liftAnalyze analyzeTerm recur term
     modifyHeap (gc (roots <> valueRoots v))
     pure v
 

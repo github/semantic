@@ -32,14 +32,14 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
-doInclude :: (MonadAnalysis term value m, MonadThrow (EvaluateModule term) value m, MonadValue value m) => Subterm t (m value) -> m value
+doInclude :: MonadEvaluatable term value m => Subterm t (m value) -> m value
 doInclude path = do
   name <- toQualifiedName <$> (subtermValue path >>= asString)
   (importedEnv, v) <- isolate (load name)
   modifyEnv (mappend importedEnv)
   pure v
 
-doIncludeOnce :: (MonadAnalysis term value m, MonadThrow (EvaluateModule term) value m, MonadValue value m) => Subterm t (m value) -> m value
+doIncludeOnce :: MonadEvaluatable term value m => Subterm t (m value) -> m value
 doIncludeOnce path = do
   name <- toQualifiedName <$> (subtermValue path >>= asString)
   (importedEnv, v) <- isolate (require name)
