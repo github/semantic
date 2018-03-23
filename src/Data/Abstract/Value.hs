@@ -165,9 +165,11 @@ instance Ord1 KVPair where liftCompare = genericLiftCompare
 instance Show1 KVPair where liftShowsPrec = genericLiftShowsPrec
 
 -- You would think this would be a @Map value value@ or a @[(value, value)].
--- You would be incorrect, as we can't derive a Generic1 instance for the above.
--- Instead, this holds KVPair values. The smart constructor for hashes ensures
--- that it is only provided with pairs.
+-- You would be incorrect, as we can't derive a Generic1 instance for the above,
+-- and in addition a 'Map' representation would lose information given hash literals
+-- that assigned multiple values to one given key. Instead, this holds KVPair
+-- values. The smart constructor for hashes in MonadValue ensures that these are
+-- only populated with pairs.
 newtype Hash value = Hash [value]
   deriving (Eq, Generic1, Ord, Show)
 
