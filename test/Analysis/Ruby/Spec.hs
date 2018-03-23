@@ -30,7 +30,7 @@ spec = parallel $ do
 
     it "subclass" $ do
       res <- evaluate' "subclass.rb"
-      fst res `shouldBe` Right (injValue (String "\"<bar>\""))
+      join (fst res) `shouldBe` Right (injValue (String "\"<bar>\""))
 
     it "has prelude" $ do
       res <- evaluate' "preluded.rb"

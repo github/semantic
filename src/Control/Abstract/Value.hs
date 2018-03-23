@@ -92,8 +92,15 @@ class (Monad m, Show value) => MonadValue value m where
         -> EnvironmentFor value -- ^ The environment to capture
         -> m value
 
-  -- | Extract the environment from a class.
-  objectEnvironment :: value -> m (EnvironmentFor value)
+  -- | Build a namespace value from a name and environment stack
+  --
+  -- Namespaces model closures with monoidal environments.
+  namespace :: Name                 -- ^ The namespace's identifier
+            -> EnvironmentFor value -- ^ The environment to mappend
+            -> m value
+
+  -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
+  scopedEnvironment :: value -> m (EnvironmentFor value)
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
   abstract :: (FreeVariables term, MonadControl term m) => [Name] -> Subterm term (m value) -> m value
@@ -157,13 +164,22 @@ instance ( Monad m
 
   klass n [] env = pure . injValue $ Class n env
   klass n supers env = do
-    product <- mconcat <$> traverse objectEnvironment supers
+    product <- mconcat <$> traverse scopedEnvironment supers
     pure . injValue $ Class n (Env.push product <> env)
 
 
-  objectEnvironment o
+  namespace n env = do
+    maybeAddr <- lookupEnv n
+    env' <- maybe (pure mempty) (asNamespaceEnv <=< deref) maybeAddr
+    pure (injValue (Namespace n (env' <> env)))
+    where asNamespaceEnv v
+            | Just (Namespace _ env') <- prjValue v = pure env'
+            | otherwise                             = fail ("expected " <> show v <> " to be a namespace")
+
+  scopedEnvironment o
     | Just (Class _ env) <- prjValue o = pure env
-    | otherwise = fail ("non-object type passed to objectEnvironment: " <> show o)
+    | Just (Namespace _ env) <- prjValue o = pure env
+    | otherwise = fail ("object type passed to scopedEnvironment doesn't have an environment: " <> show o)
 
   asString v
     | Just (Value.String n) <- prjValue v = pure n
@@ -268,9 +284,10 @@ instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, Mon
   multiple   = pure . Type.Product
   array      = pure . Type.Array
 
-  klass _ _ _  = pure Object
+  klass _ _ _   = pure Object
+  namespace _ _ = pure Type.Unit
 
-  objectEnvironment _ = pure mempty
+  scopedEnvironment _ = pure mempty
 
   asString _ = fail "Must evaluate to Value to use asString"
 
