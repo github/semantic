@@ -161,12 +161,11 @@ instance Eq1 Module where liftEq = genericLiftEq
 instance Ord1 Module where liftCompare = genericLiftCompare
 instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Fix this extremely bogus instance (copied from that of Program)
--- In Go, functions in the same module can be spread across files.
--- We need to ensure that all input files have aggregated their content into
--- a coherent module before we begin evaluating a module.
 instance Evaluatable Module where
-  eval (Module _ xs) = eval xs
+  eval (Module iden xs) = letrec' name $ \addr -> do
+    void $ eval xs
+    makeNamespace name addr
+    where name = freeVariable (subterm iden)
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
