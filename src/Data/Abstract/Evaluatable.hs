@@ -43,7 +43,7 @@ class Evaluatable constr where
           )
        => SubtermAlgebra constr term (m value)
   default eval :: (MonadThrow (Unspecialized value) m, Show1 constr) => SubtermAlgebra constr term (m value)
-  eval expr = throwException $ (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
+  eval expr = throwException (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 -- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
 instance Apply Evaluatable fs => Evaluatable (Union fs) where

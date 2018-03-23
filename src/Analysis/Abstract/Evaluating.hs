@@ -27,7 +27,7 @@ import           Data.Language
 import           Data.List.Split (splitWhen)
 import qualified Data.Map as Map
 import           Prelude hiding (fail)
-import           Prologue hiding (throwError)
+import           Prologue
 import           System.FilePath.Posix
 
 -- | Evaluate a term to a value.
