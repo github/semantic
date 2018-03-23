@@ -1,5 +1,6 @@
 {-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, Rank2Types, ScopedTypeVariables,
              StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Analysis.Abstract.Evaluating
 ( type Evaluating
 , evaluate
@@ -11,7 +12,6 @@ module Analysis.Abstract.Evaluating
 import           Control.Abstract.Evaluator
 import           Control.Monad.Effect
 import           Control.Monad.Effect.Internal
-import           Control.Monad.Effect.Resumable
 import           Data.Abstract.Configuration
 import           Data.Abstract.Environment (Environment)
 import qualified Data.Abstract.Environment as Env
@@ -149,8 +149,8 @@ resumeError1 :: forall exc e a. (Resumable1 exc :< e) =>
        Eff e a -> (forall v. Arrow e v a -> exc v -> Eff e a) -> Eff e a
 resumeError1 m handle = interpose @(Resumable1 exc) pure (\(Resumable1 e) yield -> handle yield e) m
 
-catchError1 :: forall exc e a. (Resumable1 exc :< e) => Eff e a -> (forall v. exc v -> Eff e a) -> Eff e a
-catchError1 m handle = resumeError1 m (const handle)
+-- catchError1 :: forall exc e a. (Resumable1 exc :< e) => Eff e a -> (forall v. exc v -> Eff e a) -> Eff e a
+-- catchError1 m handle = resumeError1 m (const handle)
 
 resumeException :: forall exc m e a. (Effectful m, Resumable1 exc :< e) => m e a -> (forall v. (v -> m e a) -> exc v -> m e a) -> m e a
 resumeException m handle = raise (resumeError1 (lower m) (\yield -> lower . handle (raise . yield)))
