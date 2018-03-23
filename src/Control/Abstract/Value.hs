@@ -235,15 +235,14 @@ instance ( Monad m
     l <- label body
     injValue . Closure names l . Env.bind (foldr Set.delete (freeVariables body) names) <$> getEnv
 
-  apply op params
-    | Just (Closure names label env) <- prjValue op = do
-      bindings <- foldr (\ (name, param) rest -> do
-        v <- param
-        a <- alloc name
-        assign a v
-        Env.insert name a <$> rest) (pure env) (zip names params)
-      localEnv (mappend bindings) (goto label >>= evaluateTerm)
-    | otherwise = fail "Type error: expected class or closure"
+  apply op params = do
+    Closure names label env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
+    bindings <- foldr (\ (name, param) rest -> do
+      v <- param
+      a <- alloc name
+      assign a v
+      Env.insert name a <$> rest) (pure env) (zip names params)
+    localEnv (mappend bindings) (goto label >>= evaluateTerm)
 
   loop = fix
 

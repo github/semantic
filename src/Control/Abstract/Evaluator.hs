@@ -99,6 +99,8 @@ modifyExports f = do
 addExport :: MonadEnvironment value m => Name -> Name -> Maybe (Address (LocationFor value) value) -> m ()
 addExport name alias = modifyExports . Export.insert name alias
 
+-- | Obtain an environment that is the composition of the current and default environments.
+--   Useful for debugging.
 fullEnvironment :: MonadEnvironment value m => m (EnvironmentFor value)
 fullEnvironment = mappend <$> getEnv <*> defaultEnvironment
 
