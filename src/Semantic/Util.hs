@@ -50,6 +50,10 @@ typecheckPythonFile path = runAnalysis @(Caching Evaluating Python.Term Type) . 
 tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term Value) . evaluateModule <$> parseFile pythonParser Nothing path
 evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] Evaluating) Python.Term Value) . evaluateModule <$> parseFile pythonParser Nothing path
 
+-- PHP
+evaluatePHPFile = evaluateFile phpParser
+evaluatePHPFiles = evaluateFiles phpParser
+
 -- TypeScript
 typecheckTypeScriptFile path = runAnalysis @(Caching Evaluating TypeScript.Term Type) . evaluateModule <$> parseFile typescriptParser Nothing path
 evaluateTypeScriptFile = evaluateFile typescriptParser

@@ -1,6 +1,7 @@
 module Main where
 
 import qualified Analysis.Go.Spec
+import qualified Analysis.PHP.Spec
 import qualified Analysis.Python.Spec
 import qualified Analysis.Ruby.Spec
 import qualified Analysis.TypeScript.Spec
@@ -27,6 +28,7 @@ main = hspec $ do
   describe "Semantic.Stat" Semantic.Stat.Spec.spec
   parallel $ do
     describe "Analysis.Go" Analysis.Go.Spec.spec
+    describe "Analysis.PHP" Analysis.PHP.Spec.spec
     describe "Analysis.Python" Analysis.Python.Spec.spec
     describe "Analysis.Ruby" Analysis.Ruby.Spec.spec
     describe "Analysis.TypeScript" Analysis.TypeScript.Spec.spec

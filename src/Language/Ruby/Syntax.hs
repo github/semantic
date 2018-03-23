@@ -1,11 +1,13 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.Ruby.Syntax where
 
+import Analysis.Abstract.Evaluating
 import Control.Monad (unless)
 import Control.Abstract.Value (MonadValue)
 import Data.Abstract.Evaluatable
+import Data.Abstract.ModuleTable
 import Data.Abstract.Path
-import Data.Abstract.Value (LocationFor)
+import Data.Abstract.Value (EnvironmentFor)
 import Diffing.Algorithm
 import Prelude hiding (fail)
 import Prologue
@@ -19,10 +21,22 @@ instance Show1 Require where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Require where
   eval (Require _ x) = do
-    name <- pathToQualifiedName <$> (subtermValue x >>= asString)
-    importedEnv <- isolate (require name)
+    name <- toName <$> (subtermValue x >>= asString)
+    (importedEnv, v) <- isolate (doRequire name)
     modifyEnv (mappend importedEnv)
-    unit
+    pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
+    where
+      toName = qualifiedName . splitOnPathSeparator . dropRelativePrefix . stripQuotes
+
+doRequire :: (MonadAnalysis term value m, MonadThrow (EvaluateModule term) value m, MonadValue value m)
+          => ModuleName
+          -> m (EnvironmentFor value, value)
+doRequire name = do
+  moduleTable <- getModuleTable
+  case moduleTableLookup name moduleTable of
+    Nothing -> (,) <$> (fst <$> load name) <*> boolean True
+    Just (env, _) -> (,) <$> pure env <*> boolean False
+
 
 newtype Load a = Load { loadArgs :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -41,12 +55,12 @@ instance Evaluatable Load where
     doLoad path shouldWrap
   eval (Load _) = fail "invalid argument supplied to load, path is required"
 
-doLoad :: (MonadAnalysis term value m, MonadThrow (EvaluateModule term) value m, MonadValue value m, Ord (LocationFor value)) => ByteString -> Bool -> m value
+doLoad :: (MonadAnalysis term value m, MonadThrow (EvaluateModule term) value m, MonadValue value m) => ByteString -> Bool -> m value
 doLoad path shouldWrap = do
-  let name = pathToQualifiedName path
-  importedEnv <- isolate (load name)
+  (importedEnv, _) <- isolate (load (toName path))
   unless shouldWrap $ modifyEnv (mappend importedEnv)
-  unit
-  where pathToQualifiedName = qualifiedName . splitOnPathSeparator' dropExtension
+  boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
+  where
+    toName = qualifiedName . splitOnPathSeparator . dropExtension . dropRelativePrefix . stripQuotes
 
 -- TODO: autoload

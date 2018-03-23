@@ -74,6 +74,7 @@ library
                      , Data.Patch
                      , Data.Range
                      , Data.Record
+                     , Data.Semigroup.App
                      , Data.Source
                      , Data.Span
                      , Data.SplitDiff
@@ -212,6 +213,7 @@ test-suite test
   main-is:             Spec.hs
   other-modules:       Assigning.Assignment.Spec
                      , Analysis.Go.Spec
+                     , Analysis.PHP.Spec
                      , Analysis.Python.Spec
                      , Analysis.Ruby.Spec
                      , Analysis.TypeScript.Spec

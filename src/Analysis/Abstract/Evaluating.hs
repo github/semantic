@@ -1,12 +1,17 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating
 ( type Evaluating
+, require
+, load
 ) where
 
 import Control.Abstract.Evaluator
 import Control.Monad.Effect
 import Data.Abstract.Configuration
 import qualified Data.Abstract.Environment as Env
+import Data.Abstract.Environment (Environment)
+import qualified Data.Abstract.Exports as Export
+import Data.Abstract.Exports (Exports)
 import Data.Abstract.Evaluatable
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
@@ -15,6 +20,52 @@ import qualified Data.ByteString.Char8 as BC
 import qualified Data.IntMap as IntMap
 import Prelude hiding (fail)
 import Prologue hiding (throwError)
+
+-- | Require/import another module by name and return it's environment and value.
+--
+-- Looks up the term's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
+require :: ( MonadAnalysis term value m
+           , MonadThrow (EvaluateModule term) value m
+           , MonadValue value m
+           )
+        => ModuleName
+        -> m (EnvironmentFor value, value)
+require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup name
+
+-- | Load another module by name and return it's environment and value.
+--
+-- Always loads/evaluates.
+load :: forall term value m
+     .  ( MonadAnalysis term value m
+        , MonadThrow (EvaluateModule term) value m
+        , MonadValue value m
+        )
+     => ModuleName
+     -> m (EnvironmentFor value, value)
+load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
+  where
+    notFound = fail ("cannot load module: " <> show name)
+
+    evalAndCache []     = (,) <$> pure mempty <*> unit
+    evalAndCache [x]    = evalAndCache' x
+    evalAndCache (x:xs) = do
+      (env, _) <- evalAndCache' x
+      (env', v') <- evalAndCache xs
+      pure (env <> env', v')
+
+    evalAndCache' x = do
+      v <- throwException (EvaluateModule x) :: m value
+      env <- filterEnv <$> getExports <*> getEnv
+      modifyModuleTable (moduleTableInsert name (env, v))
+      pure (env, v)
+
+    -- TODO: If the set of exports is empty because no exports have been
+    -- defined, do we export all terms, or no terms? This behavior varies across
+    -- languages. We need better semantics rather than doing it ad-hoc.
+    filterEnv :: Exports l a -> Environment l a -> Environment l a
+    filterEnv ports env
+      | Export.null ports = env
+      | otherwise = Export.toEnvironment ports <> Env.overwrite (Export.aliases ports) env
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
 newtype Evaluating term value effects a = Evaluating (Eff effects a)
@@ -33,8 +84,8 @@ type EvaluatingEffects term value
      , Reader [Module term]                        -- The stack of currently-evaluating modules.
      , State  (EnvironmentFor value)               -- Environments (both local and global)
      , State  (HeapFor value)                      -- The heap
-     , Reader (ModuleTable [Module term])          -- Cache of unevaluated modules
-     , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
+     , Reader (ModuleTable [Module term])                 -- Cache of unevaluated modules
+     , State  (ModuleTable (EnvironmentFor value, value)) -- Cache of evaluated modules
      , State  (ExportsFor value)                   -- Exports (used to filter environments when they are imported)
      , State  (IntMap.IntMap term)                 -- For jumps
      ]
@@ -67,7 +118,7 @@ instance Member (State (HeapFor value)) effects => MonadHeap value (Evaluating t
   getHeap = raise get
   putHeap = raise . put
 
-instance Members '[Reader (ModuleTable [Module term]), State (ModuleTable (EnvironmentFor value))] effects => MonadModuleTable term value (Evaluating term value effects) where
+instance Members '[Reader (ModuleTable [Module term]), State (ModuleTable (EnvironmentFor value, value))] effects => MonadModuleTable term value (Evaluating term value effects) where
   getModuleTable = raise get
   putModuleTable = raise . put
 

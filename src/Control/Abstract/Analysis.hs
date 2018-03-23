@@ -6,8 +6,6 @@ module Control.Abstract.Analysis
 , evaluateModule
 , withModules
 , evaluateModules
-, require
-, load
 , liftAnalyze
 , runAnalysis
 , module X
@@ -24,13 +22,8 @@ import Control.Monad.Effect.Fail as X
 import Control.Monad.Effect.Reader as X
 import Control.Monad.Effect.Resumable
 import Control.Monad.Effect.State as X
-import Data.Abstract.Environment (Environment)
-import qualified Data.Abstract.Environment as Env
-import Data.Abstract.Exports (Exports)
-import qualified Data.Abstract.Exports as Export
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
-import Data.Abstract.Value
 import Data.Coerce
 import Prelude hiding (fail)
 import Prologue
@@ -91,45 +84,6 @@ evaluateModules :: ( Effectful m
 evaluateModules [] = fail "evaluateModules: empty list"
 evaluateModules (m:ms) = withModules ms (evaluateModule m)
 
-
--- | Require/import another term/file and return an Effect.
---
--- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
-require :: ( MonadAnalysis term value m
-           , MonadThrow (EvaluateModule term) value m
-           , Ord (LocationFor value)
-           )
-        => ModuleName
-        -> m (EnvironmentFor value)
-require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup name
-
--- | Load another term/file and return an Effect.
---
--- Always loads/evaluates.
-load :: ( MonadAnalysis term value m
-        , MonadThrow (EvaluateModule term) value m
-        , Ord (LocationFor value)
-        )
-     => ModuleName
-     -> m (EnvironmentFor value)
-load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
-  where
-    notFound = fail ("cannot load module: " <> show name)
-    evalAndCache :: forall term value m . (MonadAnalysis term value m, MonadThrow (EvaluateModule term) value m, Ord (LocationFor value)) => [Module term] -> m (EnvironmentFor value)
-    evalAndCache []     = pure mempty
-    evalAndCache (x:xs) = do
-      void (throwException (EvaluateModule x) :: m value)
-      env <- filterEnv <$> getExports <*> getEnv
-      modifyModuleTable (moduleTableInsert name env)
-      (env <>) <$> evalAndCache xs
-
-    -- TODO: If the set of exports is empty because no exports have been
-    -- defined, do we export all terms, or no terms? This behavior varies across
-    -- languages. We need better semantics rather than doing it ad-hoc.
-    filterEnv :: (Ord l) => Exports l a -> Environment l a -> Environment l a
-    filterEnv ports env
-      | Export.null ports = env
-      | otherwise = Export.toEnvironment ports <> Env.overwrite (Export.aliases ports) env
 
 -- | Lift a 'SubtermAlgebra' for an underlying analysis into a containing analysis. Use this when defining an analysis which can be composed onto other analyses to ensure that a call to 'analyzeTerm' occurs in the inner analysis and not the outer one.
 liftAnalyze :: ( Coercible (  m term value (effects :: [* -> *]) value) (t m term value effects value)
