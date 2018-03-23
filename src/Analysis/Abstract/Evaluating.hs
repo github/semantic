@@ -123,8 +123,7 @@ deriving instance Member NonDet    effects => MonadNonDet (Evaluating term value
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value
-  = '[
-       Resumable1 ValueExc
+  = '[ Resumable1 ValueExc
      , Resumable1 (Unspecialized value)
      , Fail                                        -- Failure with an error message
      , State  (EnvironmentFor value)               -- Environments (both local and global)

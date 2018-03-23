@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
 module Analysis.ModuleDef
 ( ModuleDef(..)
 , HasModuleDef
