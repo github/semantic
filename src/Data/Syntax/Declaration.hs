@@ -26,7 +26,7 @@ instance Evaluatable Function where
     (v, addr) <- letrec name (abstract (paramNames functionParameters) functionBody)
     modifyEnv (Env.insert name addr)
     pure v
-    where paramNames = foldMap (pure . freeVariable . subterm)
+    where paramNames = foldMap (freeVariables . subterm)
           name = freeVariable (subterm functionName)
 
 
@@ -47,7 +47,7 @@ instance Evaluatable Method where
     (v, addr) <- letrec name (abstract (paramNames methodParameters) methodBody)
     modifyEnv (Env.insert name addr)
     pure v
-    where paramNames = foldMap (pure . freeVariable . subterm)
+    where paramNames = foldMap (freeVariables . subterm)
           name = freeVariable (subterm methodName)
 
 
