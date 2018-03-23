@@ -1,17 +1,13 @@
 {-# LANGUAGE DefaultSignatures, MultiParamTypeClasses, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( Evaluatable(..)
-, module Addressable
-, module Analysis
-, module FreeVariables
-, module Value
-, MonadEvaluator(..)
+, module X
 ) where
 
-import Control.Abstract.Addressable as Addressable
-import Control.Abstract.Analysis as Analysis
-import Control.Abstract.Value as Value
-import Data.Abstract.FreeVariables as FreeVariables
+import Control.Abstract.Addressable as X
+import Control.Abstract.Analysis as X
+import Control.Abstract.Value as X
+import Data.Abstract.FreeVariables as X
 import Data.Abstract.Value
 import Data.Functor.Classes
 import Data.Proxy
