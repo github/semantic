@@ -41,6 +41,17 @@ letrec name body = do
   assign addr v
   pure (v, addr)
 
+-- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
+letrec' :: ( MonadAddressable (LocationFor value) value m
+           , MonadEnvironment value m
+           )
+        => Name
+        -> (Address (LocationFor value) value -> m value)
+        -> m value
+letrec' name body = do
+  addr <- lookupOrAlloc name
+  v <- localEnv id (body addr)
+  v <$ modifyEnv (insert name addr)
 
 -- Instances
 

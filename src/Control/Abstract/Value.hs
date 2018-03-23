@@ -5,10 +5,12 @@ import Control.Abstract.Addressable
 import Control.Abstract.Analysis
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables
+import Data.Abstract.Address (Address)
 import Data.Abstract.Number as Number
 import Data.Abstract.Type as Type
 import Data.Abstract.Value as Value
 import Data.Scientific (Scientific)
+import Data.Semigroup.Reducer hiding (unit)
 import qualified Data.Set as Set
 import Prelude hiding (fail)
 import Prologue
@@ -152,6 +154,21 @@ doWhile :: MonadValue value m
 doWhile body cond = loop $ \ continue -> body *> do
   this <- cond
   ifthenelse this continue unit
+
+-- | Make a namespace closure capturing the current environment.
+makeNamespace :: ( MonadValue value m
+                 , MonadEnvironment value m
+                 , MonadHeap value m
+                 , Reducer value (CellFor value)
+                 , Ord (LocationFor value)
+                 )
+              => Name
+              -> Address (LocationFor value) value
+              -> m value
+makeNamespace name addr = do
+  namespaceEnv <- Env.head <$> getEnv
+  v <- namespace name namespaceEnv
+  v <$ assign addr v
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Monad m
