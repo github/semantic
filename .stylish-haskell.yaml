@@ -225,6 +225,8 @@ language_extensions:
   - FlexibleContexts
   - FlexibleInstances
   - MultiParamTypeClasses
+  - StandaloneDeriving
+  - DataKinds
   - OverloadedStrings
   - RecordWildCards
   - StrictData

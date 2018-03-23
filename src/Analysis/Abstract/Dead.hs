@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators #-}
 module Analysis.Abstract.Dead
 ( type DeadCode
 ) where
