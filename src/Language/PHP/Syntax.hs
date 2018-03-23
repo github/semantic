@@ -366,8 +366,8 @@ instance Evaluatable Namespace where
       names = toList (freeVariables (subterm namespaceName))
 
       go [] = fail "expected at least one free variable in namespaceName, found none"
-      go [name] = letrec' name $ \addr ->
-        makeNamespace name addr <* subtermValue namespaceBody
+      go [name] = letrec' name $ \addr -> do
+        subtermValue namespaceBody *> makeNamespace name addr
       go (name:xs) = letrec' name $ \addr ->
         go xs <* makeNamespace name addr
       makeNamespace name addr = do
