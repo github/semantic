@@ -173,7 +173,7 @@ instance ( Monad m
   kvPair k = pure . injValue . Value.KVPair k
 
   asPair k
-    | Just (Value.KVPair k v) <- prjValue k = return (k, v)
+    | Just (Value.KVPair k v) <- prjValue k = pure (k, v)
     | otherwise = fail ("expected key-value pair, got " <> show k)
 
   hash = pure . injValue . Value.Hash . fmap (injValue . uncurry Value.KVPair)
