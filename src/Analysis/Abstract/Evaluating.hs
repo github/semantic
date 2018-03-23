@@ -150,7 +150,7 @@ findEnv (((((_, env), _), _), _), _) = env
 -- | Find the 'Heap' in the 'Final' result of running.
 findHeap :: forall value term effects . (effects ~ RequiredEffects term value (Evaluating term value effects))
          => Final effects value -> Monoidal.Map (LocationFor value) (CellFor value)
-findHeap (((((_, _), (Heap heap)), _), _), _) = heap
+findHeap (((((_, _), Heap heap), _), _), _) = heap
 
 instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl term (Evaluating term value effects) where
   label term = do
