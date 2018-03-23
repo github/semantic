@@ -3,3 +3,5 @@ class Foo < Object
     "<foo>"
   end
 end
+
+Foo.inspect()

@@ -93,7 +93,7 @@ evaluatesWith :: forall value term effects
                  , Recursive term
                  , Show (LocationFor value)
                  )
-              => term           -- ^ Prelude to evaluate once              
+              => term           -- ^ Prelude to evaluate once
               -> [(Blob, term)] -- ^ List of (blob, term) pairs that make up the program to be evaluated
               -> (Blob, term)   -- ^ Entrypoint
               -> Final effects value
@@ -228,9 +228,5 @@ instance ( Evaluatable (Base term)
          )
          => MonadAnalysis term value (Evaluating term value effects) where
   type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
-
-  evaluateModule t = do
-    def <- defaultEnvironment
-    withEnv def (evaluateTerm t)
 
   analyzeTerm = eval

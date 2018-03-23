@@ -70,7 +70,7 @@ class Monad m => MonadEnvironment value m | m -> value where
 
   -- | Look a 'Name' up in the environment.
   lookupEnv :: Name -> m (Maybe (Address (LocationFor value) value))
-  lookupEnv name = Env.lookup name <$> getEnv
+  lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <|> (Env.lookup name <$> defaultEnvironment)
 
   -- | Look up a 'Name' in the environment, running an action with the resolved address (if any).
   lookupWith :: (Address (LocationFor value) value -> m value) -> Name -> m (Maybe value)
