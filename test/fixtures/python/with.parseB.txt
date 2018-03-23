@@ -12,7 +12,9 @@
     (Let
       (Empty)
       (Call
-        (Identifier)
+        (MemberAccess
+          (Identifier)
+          (Identifier))
         (Identifier)
         (TextElement)
         (Identifier)
@@ -21,7 +23,9 @@
     (Let
       (Empty)
       (Call
-        (Identifier)
+        (MemberAccess
+          (Identifier)
+          (Identifier))
         (Identifier)
         (TextElement)
         (Identifier)
