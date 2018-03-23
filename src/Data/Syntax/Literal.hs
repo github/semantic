@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses, TypeApplications #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses, TypeApplications, ViewPatterns #-}
 module Data.Syntax.Literal where
 
 import Control.Arrow ((>>>))
@@ -227,7 +227,8 @@ instance Ord1 KeyValue where liftCompare = genericLiftCompare
 instance Show1 KeyValue where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable KeyValue where
-  eval = traverse subtermValue >=> go where go KeyValue{..} = kvPair key value
+  eval (fmap subtermValue -> KeyValue{..}) =
+    join (kvPair <$> key <*> value)
 
 newtype Tuple a = Tuple { tupleContents :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
