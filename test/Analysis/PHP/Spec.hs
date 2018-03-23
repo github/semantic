@@ -23,8 +23,8 @@ spec = parallel $ do
 
     it "evaluates namespaces" $ do
       res <- evaluate "namespaces.php"
-      (findEnv res) `shouldBe` [ (name "NS1", addr 0)
-                               , (name "Foo", addr 6) ]
+      findEnv res `shouldBe` [ (name "NS1", addr 0)
+                             , (name "Foo", addr 6) ]
 
       let heap = findHeap res
       Map.lookup (Precise 0) heap `shouldBe` ns "NS1" [ (name "Sub1", addr 1)

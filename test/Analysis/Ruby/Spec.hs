@@ -21,8 +21,8 @@ spec = parallel $ do
 
     it "load wrap" $ do
       res <- evaluate "load-wrap.rb"
-      (findValue res) `shouldBe` Left "free variable: \"foo\""
-      (findEnv res) `shouldBe` []
+      findValue res `shouldBe` Left "free variable: \"foo\""
+      findEnv res `shouldBe` []
 
     it "subclass" $ do
       v <- findValue <$> evaluate "subclass.rb"
