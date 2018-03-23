@@ -116,13 +116,12 @@ newtype Evaluating term value effects a = Evaluating (Eff effects a)
 
 deriving instance Member Fail      effects => MonadFail   (Evaluating term value effects)
 deriving instance Member Fresh     effects => MonadFresh  (Evaluating term value effects)
-deriving instance Member NonDet effects => Alternative (Evaluating term value effects)
-deriving instance Member NonDet effects => MonadNonDet (Evaluating term value effects)
+deriving instance Member NonDet    effects => Alternative (Evaluating term value effects)
+deriving instance Member NonDet    effects => MonadNonDet (Evaluating term value effects)
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value
-  = '[
-       Resumable Prelude.String value
+  = '[ Resumable Prelude.String value
      , Fail                                        -- Failure with an error message
      , State  (EnvironmentFor value)               -- Environments (both local and global)
      , State  (HeapFor value)                      -- The heap

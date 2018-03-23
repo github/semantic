@@ -13,7 +13,7 @@ import Prologue
 -- | The effects necessary for caching analyses.
 type CachingEffects term value effects
   = Fresh                        -- For 'MonadFresh'.
- ': NonDet                    -- For 'Alternative' and 'MonadNonDet'.
+ ': NonDet                       -- For 'Alternative' and 'MonadNonDet'.
  ': Reader (CacheFor term value) -- The in-cache used as an oracle while converging on a result.
  ': State  (CacheFor term value) -- The out-cache used to record results in each iteration of convergence.
  ': effects
