@@ -34,6 +34,7 @@ import Data.Functor.Both as X (Both, runBothWith, both)
 import Data.Maybe as X
 import Data.Monoid as X (Monoid(..), First(..), Last(..))
 import Data.Semigroup as X (Semigroup(..))
+import Control.Monad as X
 
 import Test.Hspec as X (Spec, SpecWith, context, describe, it, xit, parallel, pendingWith, around, runIO)
 import Test.Hspec.Expectations.Pretty as X

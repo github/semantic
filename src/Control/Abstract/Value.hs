@@ -88,7 +88,7 @@ class (Monad m, Show value) => MonadValue value m where
 
   -- | Build a class value from a name and environment.
   klass :: Name                 -- ^ The new class's identifier
-        -> Maybe value          -- ^ An optional superclass.
+        -> [value]              -- ^ A list of superclasses
         -> EnvironmentFor value -- ^ The environment to capture
         -> m value
 
@@ -165,11 +165,10 @@ instance ( Monad m
   multiple = pure . injValue . Value.Tuple
   array    = pure . injValue . Value.Array
 
-  klass n Nothing env = pure . injValue $ Class n env
-  klass n (Just super) env
-    | Just (Class _ superEnv) <- prjValue super = pure . injValue $ Class n (Env.push superEnv <> env)
-    | otherwise = throwException (ValueExc ("Attempted to inherit from a non-class object: " <> show super))
-
+  klass n [] env = pure . injValue $ Class n env
+  klass n supers env = do
+    product <- mconcat <$> traverse objectEnvironment supers
+    pure . injValue $ Class n (Env.push product <> env)
 
   objectEnvironment o
     | Just (Class _ env) <- prjValue o = pure env

@@ -1,4 +1,5 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances, GADTs, Rank2Types #-}
+{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, Rank2Types, ScopedTypeVariables,
+             StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating
 ( type Evaluating
 , evaluate
@@ -7,27 +8,27 @@ module Analysis.Abstract.Evaluating
 , load
 ) where
 
-import Control.Monad.Effect.Internal
-import Control.Abstract.Evaluator
-import Control.Monad.Effect
-import Control.Monad.Effect.Resumable
-import Data.Abstract.Configuration
+import           Control.Abstract.Evaluator
+import           Control.Monad.Effect
+import           Control.Monad.Effect.Internal
+import           Control.Monad.Effect.Resumable
+import           Data.Abstract.Configuration
+import           Data.Abstract.Environment (Environment)
 import qualified Data.Abstract.Environment as Env
-import Data.Abstract.Environment (Environment)
+import           Data.Abstract.Evaluatable
+import           Data.Abstract.Exports (Exports)
 import qualified Data.Abstract.Exports as Export
-import Data.Abstract.Exports (Exports)
-import Data.Abstract.Evaluatable
-import Data.Abstract.ModuleTable
-import Data.Abstract.Value
-import Data.Blob
-import qualified Data.IntMap as IntMap
-import Data.Language
-import Data.List.Split (splitWhen)
-import Prelude hiding (fail)
-import Prologue hiding (throwError)
+import           Data.Abstract.ModuleTable
+import           Data.Abstract.Value
+import           Data.Blob
 import qualified Data.ByteString.Char8 as BC
+import qualified Data.IntMap as IntMap
+import           Data.Language
+import           Data.List.Split (splitWhen)
 import qualified Data.Map as Map
-import System.FilePath.Posix
+import           Prelude hiding (fail)
+import           Prologue hiding (throwError)
+import           System.FilePath.Posix
 
 -- | Evaluate a term to a value.
 evaluate :: forall value term effects
@@ -68,7 +69,7 @@ withModules Blob{..} pairs = localModuleTable (const moduleTable)
      in case blobLanguage of
       -- TODO: Need a better way to handle module registration and resolution
       Just Go -> toName (takeDirectory path) -- Go allows defining modules across multiple files in the same directory.
-      _ ->  toName path
+      _       ->  toName path
     toName str = qualifiedName (fmap BC.pack (splitWhen (== pathSeparator) str))
 
 -- | Require/import another module by name and return it's environment and value.
@@ -117,8 +118,8 @@ newtype Evaluating term value effects a = Evaluating (Eff effects a)
 
 deriving instance Member Fail      effects => MonadFail   (Evaluating term value effects)
 deriving instance Member Fresh     effects => MonadFresh  (Evaluating term value effects)
-deriving instance Member NonDet effects => Alternative (Evaluating term value effects)
-deriving instance Member NonDet effects => MonadNonDet (Evaluating term value effects)
+deriving instance Member NonDet    effects => Alternative (Evaluating term value effects)
+deriving instance Member NonDet    effects => MonadNonDet (Evaluating term value effects)
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value

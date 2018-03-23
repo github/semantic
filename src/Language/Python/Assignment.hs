@@ -340,12 +340,9 @@ yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children (term ( expr
 -- Identifiers and qualified identifiers (e.g. `a.b.c`) from things like DottedName and Attribute
 identifier :: Assignment
 identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax.Identifier <$> (name <$> source))
-  <|> makeQualifiedIdentifier <$> symbol Attribute <*> children (attribute <|> identifierPair)
   <|> makeQualifiedIdentifier <$> symbol DottedName <*> children (some identifier')
   <|> symbol DottedName *> children identifier
   where
-    attribute = (\a b -> a <> [b]) <$> (symbol Attribute *> children (attribute <|> identifierPair)) <*> identifier'
-    identifierPair = (\a b -> [a, b]) <$> identifier' <*> identifier'
     identifier' = (symbol Identifier <|> symbol Identifier') *> source
     makeQualifiedIdentifier loc xs = makeTerm loc (Syntax.Identifier (qualifiedName xs))
 

@@ -218,6 +218,7 @@ newline: native
 # command line instead of using language pragmas in the file. stylish-haskell
 # needs to be aware of these, so it can parse the file correctly.
 language_extensions:
+  - ExplicitNamespaces
   - DeriveFoldable
   - DeriveFunctor
   - DeriveGeneric
