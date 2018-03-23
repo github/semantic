@@ -45,7 +45,7 @@ typecheckGoFile path = runAnalysis @(Caching Evaluating Go.Term Type) . evaluate
 
 -- Python
 evaluatePythonFile = evaluateWithPrelude pythonParser
-evaluatePythonFiles = evaluateFiles pythonParser
+evaluatePythonFiles = evaluateFilesWithPrelude pythonParser
 typecheckPythonFile path = runAnalysis @(Caching Evaluating Python.Term Type) . evaluateModule . snd <$> parseFile pythonParser path
 tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term Value) . evaluateModule . snd <$> parseFile pythonParser path
 evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] Evaluating) Python.Term Value) . evaluateModule . snd <$> parseFile pythonParser path
