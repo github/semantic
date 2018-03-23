@@ -20,9 +20,8 @@ import           Data.Abstract.Environment (Environment)
 import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Exports (Exports)
-import Data.Abstract.Environment (Environment)
-import Data.Abstract.Heap (Heap(..))
 import qualified Data.Abstract.Exports as Export
+import           Data.Abstract.Heap (Heap (..))
 import           Data.Abstract.ModuleTable
 import           Data.Abstract.Value
 import           Data.Blob
@@ -31,11 +30,10 @@ import qualified Data.IntMap as IntMap
 import           Data.Language
 import           Data.List.Split (splitWhen)
 import qualified Data.Map as Map
+import qualified Data.Map.Monoidal as Monoidal
 import           Prelude hiding (fail)
 import           Prologue hiding (throwError)
 import           System.FilePath.Posix
-import qualified Data.Map.Monoidal as Monoidal
-import System.FilePath.Posix
 
 -- | Evaluate a term to a value.
 evaluate :: forall value term effects
