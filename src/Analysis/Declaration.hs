@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, MultiParamTypeClasses, TypeOperators, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE TypeOperators, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
 module Analysis.Declaration
 ( Declaration(..)
 , HasDeclaration
