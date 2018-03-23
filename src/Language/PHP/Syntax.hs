@@ -1,10 +1,12 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, ViewPatterns #-}
 module Language.PHP.Syntax where
 
 import Analysis.Abstract.Evaluating
 import Data.Abstract.Evaluatable
+import Data.Abstract.Environment as Env
 import Data.Abstract.Path
 import Diffing.Algorithm
+import Prelude hiding (fail)
 import Prologue hiding (Text)
 
 
@@ -177,13 +179,18 @@ instance Ord1 RelativeScope where liftCompare = genericLiftCompare
 instance Show1 RelativeScope where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable RelativeScope
 
-data QualifiedName a = QualifiedName a a
+data QualifiedName a = QualifiedName !a !a
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 QualifiedName where liftEq = genericLiftEq
 instance Ord1 QualifiedName where liftCompare = genericLiftCompare
 instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable QualifiedName
+
+instance Evaluatable QualifiedName where
+  eval (fmap subtermValue -> QualifiedName name iden) = do
+    lhs <- name >>= scopedEnvironment
+    localEnv (mappend lhs) iden
+
 
 newtype NamespaceName a = NamespaceName [a]
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -191,7 +198,15 @@ newtype NamespaceName a = NamespaceName [a]
 instance Eq1 NamespaceName where liftEq = genericLiftEq
 instance Ord1 NamespaceName where liftCompare = genericLiftCompare
 instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable NamespaceName
+
+instance Evaluatable NamespaceName where
+  eval (NamespaceName xs) = go xs
+    where
+      go []     = fail "nonempty NamespaceName not allowed"
+      go [x]    = subtermValue x
+      go (x:xs) = do
+        env <- subtermValue x >>= scopedEnvironment
+        localEnv (mappend env) (go xs)
 
 newtype ConstDeclaration a = ConstDeclaration [a]
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -338,13 +353,31 @@ instance Ord1 NamespaceUseGroupClause where liftCompare = genericLiftCompare
 instance Show1 NamespaceUseGroupClause where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable NamespaceUseGroupClause
 
-data Namespace a = Namespace { namespaceName :: a, namespaceBody :: a}
+data Namespace a = Namespace { namespaceName :: a, namespaceBody :: a }
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 Namespace where liftEq = genericLiftEq
 instance Ord1 Namespace where liftCompare = genericLiftCompare
 instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable Namespace
+
+instance Evaluatable Namespace where
+  eval Namespace{..} = go names
+    where
+      names = toList (freeVariables (subterm namespaceName))
+      go [] = fail "expected at least one free variable in namespaceName, found none"
+      go [name] = letrec' name $ \addr ->
+        subtermValue namespaceBody *> makeNamespace name addr
+      go (name:xs) = letrec' name $ \addr ->
+        go xs <* makeNamespace name addr
+
+      makeNamespace name addr = do
+        namespaceEnv <- Env.head <$> getEnv
+        v <- namespace name namespaceEnv
+        v <$ assign addr v
+      letrec' name body = do
+        addr <- lookupOrAlloc name
+        v <- localEnv id (body addr)
+        v <$ modifyEnv (insert name addr)
 
 data TraitDeclaration a = TraitDeclaration { traitName :: a, traitStatements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

@@ -22,6 +22,7 @@ type ValueConstructors
     , Closure
     , Float
     , Integer
+    , Namespace
     , String
     , Rational
     , Symbol
@@ -144,6 +145,15 @@ data Class value = Class
 instance Eq1 Class where liftEq = genericLiftEq
 instance Ord1 Class where liftCompare = genericLiftCompare
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
+
+data Namespace value = Namespace
+  { namespaceName  :: Name
+  , namespaceScope :: Environment Precise value
+  } deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Namespace where liftEq = genericLiftEq
+instance Ord1 Namespace where liftCompare = genericLiftCompare
+instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
 
 -- | The environment for an abstract value type.
 type EnvironmentFor v = Environment (LocationFor v) v
