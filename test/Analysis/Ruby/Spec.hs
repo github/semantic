@@ -13,18 +13,20 @@ spec = parallel $ do
   describe "evalutes Ruby" $ do
     it "require_relative" $ do
       env <- evaluate "main.rb"
-      let expectedEnv = [ (qualifiedName ["foo"], addr 0) ]
+      let expectedEnv = [ (qualifiedName ["Object"], addr 0)
+                        , (qualifiedName ["foo"], addr 3)]
       env `shouldBe` expectedEnv
 
     it "load" $ do
       env <- evaluate "load.rb"
-      let expectedEnv = [ (qualifiedName ["foo"], addr 0) ]
+      let expectedEnv = [ (qualifiedName ["Object"], addr 0)
+                        , (qualifiedName ["foo"], addr 3) ]
       env `shouldBe` expectedEnv
 
     it "load wrap" $ do
       res <- evaluate' "load-wrap.rb"
       fst res `shouldBe` Left "free variable: \"foo\""
-      snd res `shouldBe` []
+      snd res `shouldBe` [(qualifiedName ["Object"], addr 0)]
 
     it "subclass" $ do
       res <- evaluate' "subclass.rb"
@@ -32,7 +34,7 @@ spec = parallel $ do
 
     it "has prelude" $ do
       res <- evaluate' "preluded.rb"
-      fst res `shouldBe` Right (injValue (String "\"<foo>\""))      
+      fst res `shouldBe` Right (injValue (String "\"<foo>\""))
 
   where
     addr = Address . Precise
