@@ -269,8 +269,10 @@
               22
             ]
           },
-          "symbol": "os.getcwd",
-          "targets": []
+          "symbol": "getcwd",
+          "targets": [
+            "os"
+          ]
         },
         {
           "span": {
@@ -283,8 +285,10 @@
               31
             ]
           },
-          "symbol": "np.array",
-          "targets": []
+          "symbol": "array",
+          "targets": [
+            "np"
+          ]
         },
         {
           "span": {
@@ -297,8 +301,10 @@
               20
             ]
           },
-          "symbol": "x.sum",
-          "targets": []
+          "symbol": "sum",
+          "targets": [
+            "x"
+          ]
         },
         {
           "span": {
@@ -311,8 +317,10 @@
               19
             ]
           },
-          "symbol": "x.sum",
-          "targets": []
+          "symbol": "sum",
+          "targets": [
+            "x"
+          ]
         },
         {
           "span": {
