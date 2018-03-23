@@ -80,6 +80,14 @@ class (Monad m, Show value) => MonadValue value m where
   -- | Construct an array of zero or more values.
   array :: [value] -> m value
 
+  -- | Construct a key-value pair for use in a hash.
+  kvPair :: value -> value -> m value
+
+  asPair :: value -> m (value, value)
+
+  -- | Construct a hash out of pairs.
+  hash :: [(value, value)] -> m value
+
   -- | Extract a 'ByteString' from a given value.
   asString :: value -> m ByteString
 
@@ -161,6 +169,14 @@ instance ( Monad m
 
   multiple = pure . injValue . Value.Tuple
   array    = pure . injValue . Value.Array
+
+  kvPair k = pure . injValue . Value.KVPair k
+
+  asPair k
+    | Just (Value.KVPair k v) <- prjValue k = return (k, v)
+    | otherwise = fail ("expected key-value pair, got " <> show k)
+
+  hash = pure . injValue . Value.Hash . fmap (injValue . uncurry Value.KVPair)
 
   klass n [] env = pure . injValue $ Class n env
   klass n supers env = do
@@ -283,6 +299,8 @@ instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, Mon
   rational _ = pure Type.Rational
   multiple   = pure . Type.Product
   array      = pure . Type.Array
+  hash       = pure . Type.Hash
+  kvPair k v = pure (Product [k, v])
 
   klass _ _ _   = pure Object
   namespace _ _ = pure Type.Unit
@@ -290,6 +308,7 @@ instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, Mon
   scopedEnvironment _ = pure mempty
 
   asString _ = fail "Must evaluate to Value to use asString"
+  asPair _   = fail "Must evaluate to Value to use asPair"
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 

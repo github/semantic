@@ -20,6 +20,7 @@ data Type
   | Var TName      -- ^ A type variable.
   | Product [Type] -- ^ N-ary products.
   | Array [Type]   -- ^ Arrays. Note that this is heterogenous.
+  | Hash [(Type, Type)]
   | Object         -- ^ Objects. Once we have some notion of inheritance we'll need to store a superclass.
   deriving (Eq, Ord, Show)
 
