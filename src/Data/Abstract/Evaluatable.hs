@@ -1,19 +1,26 @@
-{-# LANGUAGE DefaultSignatures, MultiParamTypeClasses, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( Evaluatable(..)
 , module X
+, require
+, load
 ) where
 
 import Control.Abstract.Addressable as X
 import Control.Abstract.Analysis as X
 import Control.Abstract.Value as X
+import qualified Data.Abstract.Environment as Env
+import qualified Data.Abstract.Exports as Exports
 import Data.Abstract.FreeVariables as X
+import Data.Abstract.Module
+import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Functor.Classes
 import Data.Proxy
 import Data.Semigroup.Foldable
 import Data.Semigroup.App
 import Data.Term
+import Prelude hiding (fail)
 import Prologue
 
 
@@ -50,3 +57,50 @@ instance Evaluatable s => Evaluatable (TermF s a) where
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
   eval = maybe unit (runApp . foldMap1 (App . subtermValue)) . nonEmpty
+
+
+-- | Require/import another module by name and return it's environment and value.
+--
+-- Looks up the term's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
+require :: ( MonadAnalysis term value m
+           , MonadThrow (EvaluateModule term) value m
+           , MonadValue value m
+           )
+        => ModuleName
+        -> m (EnvironmentFor value, value)
+require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup name
+
+-- | Load another module by name and return it's environment and value.
+--
+-- Always loads/evaluates.
+load :: forall term value m
+     .  ( MonadAnalysis term value m
+        , MonadThrow (EvaluateModule term) value m
+        , MonadValue value m
+        )
+     => ModuleName
+     -> m (EnvironmentFor value, value)
+load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
+  where
+    notFound = fail ("cannot load module: " <> show name)
+
+    evalAndCache []     = (,) <$> pure mempty <*> unit
+    evalAndCache [x]    = evalAndCache' x
+    evalAndCache (x:xs) = do
+      (env, _) <- evalAndCache' x
+      (env', v') <- evalAndCache xs
+      pure (env <> env', v')
+
+    evalAndCache' x = do
+      v <- throwException (EvaluateModule x) :: m value
+      env <- filterEnv <$> getExports <*> getEnv
+      modifyModuleTable (moduleTableInsert name (env, v))
+      pure (env, v)
+
+    -- TODO: If the set of exports is empty because no exports have been
+    -- defined, do we export all terms, or no terms? This behavior varies across
+    -- languages. We need better semantics rather than doing it ad-hoc.
+    filterEnv :: Exports.Exports l a -> Env.Environment l a -> Env.Environment l a
+    filterEnv ports env
+      | Exports.null ports = env
+      | otherwise = Exports.toEnvironment ports <> Env.overwrite (Exports.aliases ports) env
