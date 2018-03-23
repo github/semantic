@@ -11,7 +11,7 @@ module Analysis.Abstract.Evaluating
 
 import           Control.Abstract.Evaluator
 import           Control.Monad.Effect
-import           Control.Monad.Effect.Internal
+import           Control.Monad.Effect.Resumable
 import           Data.Abstract.Configuration
 import           Data.Abstract.Environment (Environment)
 import qualified Data.Abstract.Environment as Env
@@ -27,7 +27,7 @@ import           Data.Language
 import           Data.List.Split (splitWhen)
 import qualified Data.Map as Map
 import           Prelude hiding (fail)
-import           Prologue
+import           Prologue hiding (throwError)
 import           System.FilePath.Posix
 
 -- | Evaluate a term to a value.
@@ -123,8 +123,8 @@ deriving instance Member NonDet    effects => MonadNonDet (Evaluating term value
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value
-  = '[ Resumable1 ValueExc
-     , Resumable1 (Unspecialized value)
+  = '[ Resumable ValueExc
+     , Resumable (Unspecialized value)
      , Fail                                        -- Failure with an error message
      , State  (EnvironmentFor value)               -- Environments (both local and global)
      , State  (HeapFor value)                      -- The heap
@@ -135,43 +135,12 @@ type EvaluatingEffects term value
      ]
 
 
-data Resumable1 (exc :: * -> *) a where
-  Resumable1 :: exc v -> Resumable1 exc v
-
-throwError1 :: forall exc v e. (Resumable1 exc :< e) => exc v -> Eff e v
-throwError1 e = send (Resumable1 e :: Resumable1 exc v)
-
-runError1 :: Eff (Resumable1 exc ': e) a -> Eff e (Either (SomeExc exc) a)
-runError1 = relay (pure . Right) (\ (Resumable1 e) _k -> pure (Left (SomeExc e)))
-
-resumeError1 :: forall exc e a. (Resumable1 exc :< e) =>
-       Eff e a -> (forall v. Arrow e v a -> exc v -> Eff e a) -> Eff e a
-resumeError1 m handle = interpose @(Resumable1 exc) pure (\(Resumable1 e) yield -> handle yield e) m
-
--- catchError1 :: forall exc e a. (Resumable1 exc :< e) => Eff e a -> (forall v. exc v -> Eff e a) -> Eff e a
--- catchError1 m handle = resumeError1 m (const handle)
-
-resumeException :: forall exc m e a. (Effectful m, Resumable1 exc :< e) => m e a -> (forall v. (v -> m e a) -> exc v -> m e a) -> m e a
-resumeException m handle = raise (resumeError1 (lower m) (\yield -> lower . handle (raise . yield)))
+resumeException :: forall exc m e a. (Effectful m, Resumable exc :< e) => m e a -> (forall v. (v -> m e a) -> exc v -> m e a) -> m e a
+resumeException m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
 
 
-data SomeExc exc where
-  SomeExc :: exc v -> SomeExc exc
-
-instance Eq1 exc => Eq (SomeExc exc) where
-  SomeExc exc1 == SomeExc exc2 = liftEq (const (const True)) exc1 exc2
-
-instance (Show1 exc) => Show (SomeExc exc) where
-  showsPrec num (SomeExc exc) = liftShowsPrec (const (const id)) (const id) num exc
-
--- | 'Resumable' effects are interpreted into 'Either' s.t. failures are in 'Left' and successful results are in 'Right'.
-instance RunEffect (Resumable1 exc) a where
-  type Result (Resumable1 exc) a = Either (SomeExc exc) a
-  runEffect = runError1
-
-
-instance (Monad (m effects), Effectful m, Members '[Resumable1 exc] effects) => MonadThrow exc (m effects) where
-   throwException = raise . throwError1
+instance (Monad (m effects), Effectful m, Members '[Resumable exc] effects) => MonadThrow exc (m effects) where
+   throwException = raise . throwError
 
 instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl term (Evaluating term value effects) where
   label term = do

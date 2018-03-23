@@ -5,6 +5,7 @@ import Control.Monad.Effect as Effect
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader
+import Control.Monad.Effect.Resumable
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Writer
 import Data.Semigroup.Reducer
@@ -61,6 +62,12 @@ instance Monoid w => RunEffect (Writer w) a where
 instance Ord a => RunEffect NonDet a where
   type Result NonDet a = Set a
   runEffect = runNonDet unit
+
+-- | 'Resumable' effects are interpreted into 'Either' s.t. failures are in 'Left' and successful results are in 'Right'.
+instance RunEffect (Resumable exc) a where
+  type Result (Resumable exc) a = Either (SomeExc exc) a
+  runEffect = runError
+
 
 -- | Types wrapping 'Eff' actions.
 --
