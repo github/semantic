@@ -117,7 +117,6 @@ modifyHeap f = do
   s <- getHeap
   putHeap $! f s
 
-
 -- | Look up the cell for the given 'Address' in the 'Heap'.
 lookupHeap :: (MonadHeap value m, Ord (LocationFor value)) => Address (LocationFor value) value -> m (Maybe (CellFor value))
 lookupHeap = flip fmap getHeap . heapLookup
