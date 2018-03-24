@@ -35,6 +35,7 @@ type MonadEvaluatable term value m =
   , Show (LocationFor value)
   )
 
+-- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
   eval :: MonadEvaluatable term value m
        => SubtermAlgebra constr term (m value)
