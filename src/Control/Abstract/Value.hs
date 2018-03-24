@@ -20,7 +20,6 @@ import Control.Abstract.Evaluator
 import Data.Abstract.FreeVariables
 import Data.Abstract.Number as Number
 import Data.Scientific (Scientific)
-import Prelude hiding (fail)
 import Prologue
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
@@ -90,6 +89,15 @@ class (Monad m, Show value) => MonadValue value m where
   -- | Construct an array of zero or more values.
   array :: [value] -> m value
 
+  -- | Construct a key-value pair for use in a hash.
+  kvPair :: value -> value -> m value
+
+  -- | Extract the contents of a key-value pair as a tuple.
+  asPair :: value -> m (value, value)
+
+  -- | Construct a hash out of pairs.
+  hash :: [(value, value)] -> m value
+
   -- | Extract a 'ByteString' from a given value.
   asString :: value -> m ByteString
 
@@ -102,8 +110,15 @@ class (Monad m, Show value) => MonadValue value m where
         -> EnvironmentFor value -- ^ The environment to capture
         -> m value
 
-  -- | Extract the environment from a class.
-  objectEnvironment :: value -> m (EnvironmentFor value)
+  -- | Build a namespace value from a name and environment stack
+  --
+  -- Namespaces model closures with monoidal environments.
+  namespace :: Name                 -- ^ The namespace's identifier
+            -> EnvironmentFor value -- ^ The environment to mappend
+            -> m value
+
+  -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
+  scopedEnvironment :: value -> m (EnvironmentFor value)
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
   abstract :: (FreeVariables term, MonadControl term m) => [Name] -> Subterm term (m value) -> m value

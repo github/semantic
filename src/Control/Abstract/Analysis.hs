@@ -22,7 +22,6 @@ import Control.Monad.Effect.State as X
 import Data.Abstract.Module
 import Data.Coerce
 import Data.Type.Coercion
-import Prelude hiding (fail)
 import Prologue
 
 -- | A 'Monad' in which one can evaluate some specific term type to some specific value type.

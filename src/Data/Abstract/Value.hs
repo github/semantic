@@ -19,9 +19,12 @@ type ValueConstructors
     , Class
     , Closure
     , Float
+    , Hash
     , Integer
-    , String
+    , KVPair
+    , Namespace
     , Rational
+    , String
     , Symbol
     , Tuple
     , Unit
@@ -143,6 +146,35 @@ instance Eq1 Class where liftEq = genericLiftEq
 instance Ord1 Class where liftCompare = genericLiftCompare
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
+data Namespace value = Namespace
+  { namespaceName  :: Name
+  , namespaceScope :: Environment Precise value
+  } deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Namespace where liftEq = genericLiftEq
+instance Ord1 Namespace where liftCompare = genericLiftCompare
+instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
+
+data KVPair value = KVPair value value
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 KVPair where liftEq = genericLiftEq
+instance Ord1 KVPair where liftCompare = genericLiftCompare
+instance Show1 KVPair where liftShowsPrec = genericLiftShowsPrec
+
+-- You would think this would be a @Map value value@ or a @[(value, value)].
+-- You would be incorrect, as we can't derive a Generic1 instance for the above,
+-- and in addition a 'Map' representation would lose information given hash literals
+-- that assigned multiple values to one given key. Instead, this holds KVPair
+-- values. The smart constructor for hashes in MonadValue ensures that these are
+-- only populated with pairs.
+newtype Hash value = Hash [value]
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Hash where liftEq = genericLiftEq
+instance Ord1 Hash where liftCompare = genericLiftCompare
+instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
+
 
 type instance LocationFor Value = Precise
 
@@ -155,7 +187,7 @@ instance ValueRoots Value where
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
   unit     = pure . injValue $ Unit
-  integer  = pure . injValue . Data.Abstract.Value.Integer . Number.Integer
+  integer  = pure . injValue . Integer . Number.Integer
   boolean  = pure . injValue . Boolean
   string   = pure . injValue . String
   float    = pure . injValue . Float . Number.Decimal
@@ -165,15 +197,32 @@ instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
   multiple = pure . injValue . Tuple
   array    = pure . injValue . Array
 
+  kvPair k = pure . injValue . KVPair k
+
+  asPair k
+    | Just (KVPair k v) <- prjValue k = pure (k, v)
+    | otherwise = fail ("expected key-value pair, got " <> show k)
+
+  hash = pure . injValue . Hash . fmap (injValue . uncurry KVPair)
+
   klass n [] env = pure . injValue $ Class n env
   klass n supers env = do
-    product <- mconcat <$> traverse objectEnvironment supers
+    product <- mconcat <$> traverse scopedEnvironment supers
     pure . injValue $ Class n (Env.push product <> env)
 
 
-  objectEnvironment o
+  namespace n env = do
+    maybeAddr <- lookupEnv n
+    env' <- maybe (pure mempty) (asNamespaceEnv <=< deref) maybeAddr
+    pure (injValue (Namespace n (env' <> env)))
+    where asNamespaceEnv v
+            | Just (Namespace _ env') <- prjValue v = pure env'
+            | otherwise                             = fail ("expected " <> show v <> " to be a namespace")
+
+  scopedEnvironment o
     | Just (Class _ env) <- prjValue o = pure env
-    | otherwise = fail ("non-object type passed to objectEnvironment: " <> show o)
+    | Just (Namespace _ env) <- prjValue o = pure env
+    | otherwise = fail ("object type passed to scopedEnvironment doesn't have an environment: " <> show o)
 
   asString v
     | Just (String n) <- prjValue v = pure n
@@ -201,7 +250,7 @@ instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
     | Just (Float i, Float j)       <- prjPair pair = f i j & specialize
     | otherwise = fail ("Invalid operands to liftNumeric2: " <> show pair)
       where
-        -- Dispatch whatever's contained inside a 'SomeNumber' to its appropriate 'MonadValue' ctor
+        -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
         specialize :: MonadValue value m => Number.SomeNumber -> m value
         specialize (Number.SomeNumber (Number.Integer i)) = integer i
         specialize (Number.SomeNumber (Number.Ratio r))          = rational r
@@ -243,7 +292,7 @@ instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
 
   abstract names (Subterm body _) = do
     l <- label body
-    injValue . Closure names l . Env.bind (foldr Set.delete (freeVariables body) names) <$> getEnv
+    injValue . Closure names l . Env.bind (foldr Set.delete (Set.fromList (freeVariables body)) names) <$> getEnv
 
   apply op params = do
     Closure names label env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)

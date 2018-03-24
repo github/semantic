@@ -1,6 +1,9 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating
 ( type Evaluating
+, findValue
+, findEnv
+, findHeap
 ) where
 
 import Control.Abstract.Evaluator
@@ -8,10 +11,12 @@ import Control.Monad.Effect
 import Data.Abstract.Configuration
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
+import Data.Abstract.Heap
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.IntMap as IntMap
+import qualified Data.Map.Monoidal as Monoidal
 import Prelude hiding (fail)
 import Prologue
 
@@ -36,6 +41,21 @@ type EvaluatingEffects term value
      , State  (ExportsFor value)                   -- Exports (used to filter environments when they are imported)
      , State  (IntMap.IntMap term)                 -- For jumps
      ]
+
+-- | Find the value in the 'Final' result of running.
+findValue :: forall value term effects . (effects ~ RequiredEffects term value (Evaluating term value effects))
+          => Final effects value -> Either Prelude.String (Either Prelude.String value)
+findValue (((((v, _), _), _), _), _) = v
+
+-- | Find the 'Environment' in the 'Final' result of running.
+findEnv :: forall value term effects . (effects ~ RequiredEffects term value (Evaluating term value effects))
+        => Final effects value -> EnvironmentFor value
+findEnv (((((_, env), _), _), _), _) = env
+
+-- | Find the 'Heap' in the 'Final' result of running.
+findHeap :: forall value term effects . (effects ~ RequiredEffects term value (Evaluating term value effects))
+         => Final effects value -> Monoidal.Map (LocationFor value) (CellFor value)
+findHeap (((((_, _), Heap heap), _), _), _) = heap
 
 
 instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl term (Evaluating term value effects) where

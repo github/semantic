@@ -64,12 +64,12 @@ instance Monoid ImportGraph where
 
 instance Ord ImportGraph where
   compare (ImportGraph G.Empty)           (ImportGraph G.Empty)           = EQ
-  compare (ImportGraph G.Empty)           _                             = LT
-  compare _                             (ImportGraph G.Empty)           = GT
+  compare (ImportGraph G.Empty)           _                               = LT
+  compare _                               (ImportGraph G.Empty)           = GT
   compare (ImportGraph (G.Vertex a))      (ImportGraph (G.Vertex b))      = compare a b
-  compare (ImportGraph (G.Vertex _))      _                             = LT
-  compare _                             (ImportGraph (G.Vertex _))      = GT
+  compare (ImportGraph (G.Vertex _))      _                               = LT
+  compare _                               (ImportGraph (G.Vertex _))      = GT
   compare (ImportGraph (G.Overlay a1 a2)) (ImportGraph (G.Overlay b1 b2)) = (compare `on` ImportGraph) a1 b1 <> (compare `on` ImportGraph) a2 b2
-  compare (ImportGraph (G.Overlay _  _))  _                             = LT
-  compare _                             (ImportGraph (G.Overlay _ _))   = GT
+  compare (ImportGraph (G.Overlay _  _))  _                               = LT
+  compare _                               (ImportGraph (G.Overlay _ _))   = GT
   compare (ImportGraph (G.Connect a1 a2)) (ImportGraph (G.Connect b1 b2)) = (compare `on` ImportGraph) a1 b1 <> (compare `on` ImportGraph) a2 b2
