@@ -167,8 +167,7 @@ require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup nam
 -- | Load another module by name and return it's environment and value.
 --
 -- Always loads/evaluates.
-load :: forall term value m
-     .  MonadEvaluatable term value m
+load :: MonadEvaluatable term value m
      => ModuleName
      -> m (EnvironmentFor value, value)
 load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
@@ -183,7 +182,7 @@ load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup n
       pure (env <> env', v')
 
     evalAndCache' x = do
-      v <- evaluateModule x :: m value
+      v <- evaluateModule x
       env <- filterEnv <$> getExports <*> getEnv
       modifyModuleTable (moduleTableInsert name (env, v))
       pure (env, v)
