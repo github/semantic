@@ -111,7 +111,7 @@ evaluateModules (m:ms) = withModules ms (evaluateModule m)
 
 -- | Lift a 'SubtermAlgebra' for an underlying analysis into a containing analysis. Use this when defining an analysis which can be composed onto other analyses to ensure that a call to 'analyzeTerm' occurs in the inner analysis and not the outer one.
 liftAnalyze :: ( Coercible (  m term value effects value) (t m term value (effects :: [* -> *]) value)
-               , Coercible (t m term value effects value) (  m term value effects               value)
+               , Coercible (t m term value effects value) (  m term value  effects              value)
                )
             => ((base (Subterm term (outer value)) ->   m term value effects value) -> (base (Subterm term (outer value)) ->   m term value effects value))
             -> ((base (Subterm term (outer value)) -> t m term value effects value) -> (base (Subterm term (outer value)) -> t m term value effects value))
