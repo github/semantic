@@ -79,7 +79,6 @@ instance Members (EvaluatingEffects term value) effects => MonadEvaluator term v
 
 instance ( Members (EvaluatingEffects term value) effects
          , MonadValue value (Evaluating term value effects)
-         , Recursive term
          )
          => MonadAnalysis term value (Evaluating term value effects) where
   type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value

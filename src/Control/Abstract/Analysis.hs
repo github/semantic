@@ -38,7 +38,7 @@ import Prologue
 -- | A 'Monad' in which one can evaluate some specific term type to some specific value type.
 --
 --   This typeclass is left intentionally unconstrained to avoid circular dependencies between it and other typeclasses.
-class (MonadEvaluator term value m, Recursive term) => MonadAnalysis term value m where
+class MonadEvaluator term value m => MonadAnalysis term value m where
   -- | The effects necessary to run the analysis. Analyses which are composed on top of (wrap) other analyses should include the inner analyses 'RequiredEffects' in their own list.
   type family RequiredEffects term value m :: [* -> *]
 
@@ -68,6 +68,7 @@ type MonadEvaluatable term value m =
   , MonadAnalysis term value m
   , MonadThrow Prelude.String value m
   , MonadValue value m
+  , Recursive term
   , Show (LocationFor value)
   )
 
