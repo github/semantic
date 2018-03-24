@@ -77,13 +77,9 @@ instance Members (EvaluatingEffects term value) effects => MonadEvaluator term v
 
   askModuleStack = raise ask
 
-instance ( Evaluatable (Base term)
-         , FreeVariables term
-         , Members (EvaluatingEffects term value) effects
-         , MonadAddressable (LocationFor value) value (Evaluating term value effects)
+instance ( Members (EvaluatingEffects term value) effects
          , MonadValue value (Evaluating term value effects)
          , Recursive term
-         , Show (LocationFor value)
          )
          => MonadAnalysis term value (Evaluating term value effects) where
   type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
