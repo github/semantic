@@ -16,8 +16,8 @@ import Data.Abstract.Value
 import Data.Functor.Classes
 import Data.Proxy
 import Data.Semigroup.Foldable
+import Data.Semigroup.App
 import Data.Term
-import Prelude hiding (fail)
 import Prologue
 
 
@@ -28,10 +28,11 @@ class Evaluatable constr where
           , MonadAnalysis term value m
           , MonadValue value m
           , Show (LocationFor value)
+          , MonadThrow Prelude.String value m
           )
        => SubtermAlgebra constr term (m value)
-  default eval :: (MonadFail m, Show1 constr) => SubtermAlgebra constr term (m value)
-  eval expr = fail $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
+  default eval :: (MonadThrow Prelude.String value m, Show1 constr) => SubtermAlgebra constr term (m value)
+  eval expr = throwException $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
 
 -- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
 instance Apply Evaluatable fs => Evaluatable (Union fs) where
@@ -51,14 +52,4 @@ instance Evaluatable s => Evaluatable (TermF s a) where
 --   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval = maybe unit (runImperative . foldMap1 (Imperative . subtermValue)) . nonEmpty
-
--- | A 'Semigroup' providing an imperative context which extends the local environment with new bindings.
-newtype Imperative m a = Imperative { runImperative :: m a }
-
-instance MonadEnvironment value m => Semigroup (Imperative m a) where
-  Imperative a <> Imperative b = Imperative (a *> b)
-
-instance (MonadEnvironment value m, MonadValue value m) => Monoid (Imperative m value) where
-  mempty = Imperative unit
-  mappend = (<>)
+  eval = maybe unit (runApp . foldMap1 (App . subtermValue)) . nonEmpty

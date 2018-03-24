@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators, TypeApplications #-}
+{-# LANGUAGE GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators, TypeApplications #-}
 module SpecHelpers (
   module X
 , diffFilePaths
@@ -9,6 +9,7 @@ module SpecHelpers (
 , Verbatim(..)
 , ) where
 
+import Analysis.Abstract.Evaluating as X (findValue, findEnv, findHeap)
 import Data.Abstract.Address as X
 import Data.Abstract.FreeVariables as X hiding (dropExtension)
 import Data.Abstract.Heap as X
@@ -34,6 +35,7 @@ import Data.Functor.Both as X (Both, runBothWith, both)
 import Data.Maybe as X
 import Data.Monoid as X (Monoid(..), First(..), Last(..))
 import Data.Semigroup as X (Semigroup(..))
+import Control.Monad as X
 
 import Test.Hspec as X (Spec, SpecWith, context, describe, it, xit, parallel, pendingWith, around, runIO)
 import Test.Hspec.Expectations.Pretty as X
@@ -42,6 +44,7 @@ import Test.LeanCheck as X
 
 import qualified Data.ByteString as B
 import qualified Semantic.IO as IO
+
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO ByteString

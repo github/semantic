@@ -1,6 +1,7 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses, TypeApplications #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses, TypeApplications, ViewPatterns #-}
 module Data.Syntax.Literal where
 
+import Control.Arrow ((>>>))
 import Data.Abstract.Evaluatable
 import Data.ByteString.Char8 (readInteger, unpack)
 import qualified Data.ByteString.Char8 as B
@@ -8,7 +9,7 @@ import Data.Monoid (Endo (..), appEndo)
 import Data.Scientific (Scientific)
 import Diffing.Algorithm
 import Prelude hiding (Float, fail)
-import Prologue hiding (Set)
+import Prologue hiding (Set, hash)
 import Text.Read (readMaybe)
 
 -- Boolean
@@ -215,9 +216,8 @@ instance Eq1 Hash where liftEq = genericLiftEq
 instance Ord1 Hash where liftCompare = genericLiftCompare
 instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Hash
-instance Evaluatable Hash
-
+instance Evaluatable Hash where
+  eval = hashElements >>> traverse (subtermValue >=> asPair) >=> hash
 
 data KeyValue a = KeyValue { key :: !a, value :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -226,9 +226,9 @@ instance Eq1 KeyValue where liftEq = genericLiftEq
 instance Ord1 KeyValue where liftCompare = genericLiftCompare
 instance Show1 KeyValue where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for KeyValue
-instance Evaluatable KeyValue
-
+instance Evaluatable KeyValue where
+  eval (fmap subtermValue -> KeyValue{..}) =
+    join (kvPair <$> key <*> value)
 
 newtype Tuple a = Tuple { tupleContents :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)

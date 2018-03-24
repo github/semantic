@@ -80,6 +80,15 @@ class (Monad m, Show value) => MonadValue value m where
   -- | Construct an array of zero or more values.
   array :: [value] -> m value
 
+  -- | Construct a key-value pair for use in a hash.
+  kvPair :: value -> value -> m value
+
+  -- | Extract the contents of a key-value pair as a tuple.
+  asPair :: value -> m (value, value)
+
+  -- | Construct a hash out of pairs.
+  hash :: [(value, value)] -> m value
+
   -- | Extract a 'ByteString' from a given value.
   asString :: value -> m ByteString
 
@@ -87,10 +96,20 @@ class (Monad m, Show value) => MonadValue value m where
   ifthenelse :: value -> m a -> m a -> m a
 
   -- | Build a class value from a name and environment.
-  klass :: Name -> EnvironmentFor value -> m value
+  klass :: Name                 -- ^ The new class's identifier
+        -> [value]              -- ^ A list of superclasses
+        -> EnvironmentFor value -- ^ The environment to capture
+        -> m value
 
-  -- | Extract the environment from a class.
-  objectEnvironment :: value -> m (EnvironmentFor value)
+  -- | Build a namespace value from a name and environment stack
+  --
+  -- Namespaces model closures with monoidal environments.
+  namespace :: Name                 -- ^ The namespace's identifier
+            -> EnvironmentFor value -- ^ The environment to mappend
+            -> m value
+
+  -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
+  scopedEnvironment :: value -> m (EnvironmentFor value)
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
   abstract :: (FreeVariables term, MonadControl term m) => [Name] -> Subterm term (m value) -> m value
@@ -152,11 +171,32 @@ instance ( Monad m
   multiple = pure . injValue . Value.Tuple
   array    = pure . injValue . Value.Array
 
-  klass n  = pure . injValue . Class n
+  kvPair k = pure . injValue . Value.KVPair k
 
-  objectEnvironment o
+  asPair k
+    | Just (Value.KVPair k v) <- prjValue k = pure (k, v)
+    | otherwise = fail ("expected key-value pair, got " <> show k)
+
+  hash = pure . injValue . Value.Hash . fmap (injValue . uncurry Value.KVPair)
+
+  klass n [] env = pure . injValue $ Class n env
+  klass n supers env = do
+    product <- mconcat <$> traverse scopedEnvironment supers
+    pure . injValue $ Class n (Env.push product <> env)
+
+
+  namespace n env = do
+    maybeAddr <- lookupEnv n
+    env' <- maybe (pure mempty) (asNamespaceEnv <=< deref) maybeAddr
+    pure (injValue (Namespace n (env' <> env)))
+    where asNamespaceEnv v
+            | Just (Namespace _ env') <- prjValue v = pure env'
+            | otherwise                             = fail ("expected " <> show v <> " to be a namespace")
+
+  scopedEnvironment o
     | Just (Class _ env) <- prjValue o = pure env
-    | otherwise = fail ("non-object type passed to objectEnvironment: " <> show o)
+    | Just (Namespace _ env) <- prjValue o = pure env
+    | otherwise = fail ("object type passed to scopedEnvironment doesn't have an environment: " <> show o)
 
   asString v
     | Just (Value.String n) <- prjValue v = pure n
@@ -226,7 +266,7 @@ instance ( Monad m
 
   abstract names (Subterm body _) = do
     l <- label body
-    injValue . Closure names l . Env.bind (foldr Set.delete (freeVariables body) names) <$> getEnv
+    injValue . Closure names l . Env.bind (foldr Set.delete (Set.fromList (freeVariables body)) names) <$> getEnv
 
   apply op params = do
     Closure names label env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
@@ -260,11 +300,16 @@ instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, Mon
   rational _ = pure Type.Rational
   multiple   = pure . Type.Product
   array      = pure . Type.Array
-  klass _ _  = pure Object
+  hash       = pure . Type.Hash
+  kvPair k v = pure (Product [k, v])
 
-  objectEnvironment _ = pure mempty
+  klass _ _ _   = pure Object
+  namespace _ _ = pure Type.Unit
+
+  scopedEnvironment _ = pure mempty
 
   asString _ = fail "Must evaluate to Value to use asString"
+  asPair _   = fail "Must evaluate to Value to use asPair"
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 

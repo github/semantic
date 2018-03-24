@@ -12,13 +12,16 @@ main = do
 
 extensions :: [String]
 extensions =
-  [ "DeriveFoldable"
+  [ "DataKinds"
+  , "DeriveFoldable"
   , "DeriveFunctor"
   , "DeriveGeneric"
   , "DeriveTraversable"
   , "FlexibleContexts"
   , "FlexibleInstances"
+  , "MultiParamTypeClasses"
   , "OverloadedStrings"
   , "RecordWildCards"
+  , "StandaloneDeriving"
   , "StrictData"
   ]

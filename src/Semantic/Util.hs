@@ -5,7 +5,7 @@ module Semantic.Util where
 
 import Analysis.Abstract.Caching
 import Analysis.Abstract.Dead
-import Analysis.Abstract.Evaluating
+import Analysis.Abstract.Evaluating as X
 import Analysis.Abstract.Tracing
 import Analysis.Declaration
 import Control.Abstract.Analysis
@@ -49,6 +49,10 @@ evaluatePythonFiles = evaluateFiles pythonParser
 typecheckPythonFile path = runAnalysis @(Caching Evaluating Python.Term Type) . evaluateModule <$> parseFile pythonParser Nothing path
 tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term Value) . evaluateModule <$> parseFile pythonParser Nothing path
 evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] Evaluating) Python.Term Value) . evaluateModule <$> parseFile pythonParser Nothing path
+
+-- PHP
+evaluatePHPFile = evaluateFile phpParser
+evaluatePHPFiles = evaluateFiles phpParser
 
 -- TypeScript
 typecheckTypeScriptFile path = runAnalysis @(Caching Evaluating TypeScript.Term Type) . evaluateModule <$> parseFile typescriptParser Nothing path
