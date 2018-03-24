@@ -63,7 +63,6 @@ evaluateTerm = foldSubterms (analyzeTerm eval)
 type MonadEvaluatable term value m =
   ( Evaluatable (Base term)
   , FreeVariables term
-  , Monad m
   , MonadAddressable (LocationFor value) value m
   , MonadAnalysis term value m
   , MonadThrow Prelude.String value m

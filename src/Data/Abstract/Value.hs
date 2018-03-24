@@ -153,8 +153,7 @@ instance ValueRoots Value where
 
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance MonadEvaluatable term Value m => MonadValue Value m where
-
+instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
   unit     = pure . injValue $ Unit
   integer  = pure . injValue . Data.Abstract.Value.Integer . Number.Integer
   boolean  = pure . injValue . Boolean
