@@ -27,8 +27,6 @@ instance ( Effectful (m term value)
 
   askModuleStack = Collecting askModuleStack
 
-  -- evaluateTerm = foldSubterms (analyzeTerm id)
-
 
 instance ( Effectful (m term value)
          , Foldable (Cell (LocationFor value))
