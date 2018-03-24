@@ -153,15 +153,7 @@ instance ValueRoots Value where
 
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Evaluatable (Base term)
-         , FreeVariables term
-         , Monad m
-         , MonadAddressable Precise Value m
-         , MonadEvaluateModule term Value m
-         , MonadValue Value m
-         , MonadThrow Prelude.String Value m
-         )
-         => MonadValue Value m where
+instance MonadEvaluatable term Value m => MonadValue Value m where
 
   unit     = pure . injValue $ Unit
   integer  = pure . injValue . Data.Abstract.Value.Integer . Number.Integer
