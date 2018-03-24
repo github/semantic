@@ -1,5 +1,12 @@
+{-# LANGUAGE ConstraintKinds, DefaultSignatures, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
+, MonadEvaluatable
+, Evaluatable(..)
+, evaluateTerm
+, evaluateModule
+, withModules
+, evaluateModules
 , require
 , load
 ) where
@@ -11,8 +18,40 @@ import qualified Data.Abstract.Exports as Exports
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
+import Data.Semigroup.App
+import Data.Semigroup.Foldable
+import Data.Term
 import Prelude hiding (fail)
 import Prologue
+
+type MonadEvaluatable term value m =
+  ( Evaluatable (Base term)
+  , FreeVariables term
+  , MonadAddressable (LocationFor value) value m
+  , MonadAnalysis term value m
+  , MonadThrow Prelude.String value m
+  , MonadValue value m
+  , Recursive term
+  , Show (LocationFor value)
+  )
+
+class Evaluatable constr where
+  eval :: MonadEvaluatable term value m
+       => SubtermAlgebra constr term (m value)
+  default eval :: (MonadThrow Prelude.String value m, Show1 constr) => SubtermAlgebra constr term (m value)
+  eval expr = throwException $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
+
+-- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
+instance Apply Evaluatable fs => Evaluatable (Union fs) where
+  eval = Prologue.apply (Proxy :: Proxy Evaluatable) eval
+
+-- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
+instance Evaluatable s => Evaluatable (TermF s a) where
+  eval = eval . termFOut
+
+instance Evaluatable [] where
+  -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
+  eval = maybe unit (runApp . foldMap1 (App . subtermValue)) . nonEmpty
 
 -- | Require/import another module by name and return it's environment and value.
 --
@@ -52,3 +91,33 @@ load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup n
     filterEnv ports env
       | Exports.null ports = env
       | otherwise = Exports.toEnvironment ports <> Env.overwrite (Exports.aliases ports) env
+
+
+-- | Evaluate a term to a value using the semantics of the current analysis.
+--
+--   This should always be called when e.g. evaluating the bodies of closures instead of explicitly folding either 'eval' or 'analyzeTerm' over subterms, except in 'MonadAnalysis' instances themselves. On the other hand, top-level evaluation should be performed using 'evaluateModule'.
+evaluateTerm :: MonadEvaluatable term value m
+             => term
+             -> m value
+evaluateTerm = foldSubterms (analyzeTerm eval)
+
+-- | Evaluate a (root-level) term to a value using the semantics of the current analysis. This should be used to evaluate single-term programs, or (via 'evaluateModules') the entry point of multi-term programs.
+evaluateModule :: MonadEvaluatable term value m
+               => Module term
+               -> m value
+evaluateModule m = analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evaluateTerm) m)
+
+
+-- | Run an action with the a list of 'Module's available for imports.
+withModules :: MonadEvaluatable term value m
+            => [Module term]
+            -> m a
+            -> m a
+withModules = localModuleTable . const . ModuleTable.fromList
+
+-- | Evaluate with a list of modules in scope, taking the head module as the entry point.
+evaluateModules :: MonadEvaluatable term value m
+                => [Module term]
+                -> m value
+evaluateModules [] = fail "evaluateModules: empty list"
+evaluateModules (m:ms) = withModules ms (evaluateModule m)

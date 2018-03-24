@@ -5,7 +5,7 @@ import Control.Abstract.Analysis
 import Data.Abstract.Address
 import Data.Abstract.Environment (Environment)
 import qualified Data.Abstract.Environment as Env
-import Data.Abstract.FreeVariables
+import Data.Abstract.Evaluatable
 import qualified Data.Abstract.Number as Number
 import Data.Scientific (Scientific)
 import qualified Data.Set as Set

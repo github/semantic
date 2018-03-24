@@ -1,18 +1,12 @@
-{-# LANGUAGE ConstraintKinds, DefaultSignatures, RankNTypes, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE RankNTypes, ScopedTypeVariables, TypeFamilies #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For runAnalysis
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
-, evaluateTerm
-, evaluateModule
-, withModules
-, evaluateModules
 , liftAnalyze
 , runAnalysis
 , module X
 , Subterm(..)
 , SubtermAlgebra
-, Evaluatable(..)
-, MonadEvaluatable
 ) where
 
 import Control.Abstract.Addressable as X
@@ -25,13 +19,8 @@ import qualified Control.Monad.Effect as Effect
 import Control.Monad.Effect.Fail as X
 import Control.Monad.Effect.Reader as X
 import Control.Monad.Effect.State as X
-import Data.Abstract.FreeVariables
 import Data.Abstract.Module
-import Data.Abstract.ModuleTable as ModuleTable
 import Data.Coerce
-import Data.Semigroup.App
-import Data.Semigroup.Foldable
-import Data.Term
 import Data.Type.Coercion
 import Prelude hiding (fail)
 import Prologue
@@ -53,61 +42,6 @@ class MonadEvaluator term value m => MonadAnalysis term value m where
   isolate :: m a -> m a
   isolate = withEnv mempty . withExports mempty
 
--- | Evaluate a term to a value using the semantics of the current analysis.
---
---   This should always be called when e.g. evaluating the bodies of closures instead of explicitly folding either 'eval' or 'analyzeTerm' over subterms, except in 'MonadAnalysis' instances themselves. On the other hand, top-level evaluation should be performed using 'evaluateModule'.
-evaluateTerm :: MonadEvaluatable term value m
-             => term
-             -> m value
-evaluateTerm = foldSubterms (analyzeTerm eval)
-
-type MonadEvaluatable term value m =
-  ( Evaluatable (Base term)
-  , FreeVariables term
-  , MonadAddressable (LocationFor value) value m
-  , MonadAnalysis term value m
-  , MonadThrow Prelude.String value m
-  , MonadValue value m
-  , Recursive term
-  , Show (LocationFor value)
-  )
-
-class Evaluatable constr where
-  eval :: MonadEvaluatable term value m
-       => SubtermAlgebra constr term (m value)
-  default eval :: (MonadThrow Prelude.String value m, Show1 constr) => SubtermAlgebra constr term (m value)
-  eval expr = throwException $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
-
--- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
-instance Apply Evaluatable fs => Evaluatable (Union fs) where
-  eval = Prologue.apply (Proxy :: Proxy Evaluatable) eval
-
--- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
-instance Evaluatable s => Evaluatable (TermF s a) where
-  eval = eval . termFOut
-
-
--- | Evaluate a (root-level) term to a value using the semantics of the current analysis. This should be used to evaluate single-term programs, or (via 'evaluateModules') the entry point of multi-term programs.
-evaluateModule :: MonadEvaluatable term value m
-               => Module term
-               -> m value
-evaluateModule m = analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evaluateTerm) m)
-
-
--- | Run an action with the a list of 'Module's available for imports.
-withModules :: MonadEvaluatable term value m
-            => [Module term]
-            -> m a
-            -> m a
-withModules = localModuleTable . const . ModuleTable.fromList
-
--- | Evaluate with a list of modules in scope, taking the head module as the entry point.
-evaluateModules :: MonadEvaluatable term value m
-                => [Module term]
-                -> m value
-evaluateModules [] = fail "evaluateModules: empty list"
-evaluateModules (m:ms) = withModules ms (evaluateModule m)
-
 
 -- | Lift a 'SubtermAlgebra' for an underlying analysis into a containing analysis. Use this when defining an analysis which can be composed onto other analyses to ensure that a call to 'analyzeTerm' occurs in the inner analysis and not the outer one.
 liftAnalyze :: Coercible (  m term value effects value) (t m term value (effects :: [* -> *]) value)
@@ -127,8 +61,3 @@ runAnalysis :: ( Effectful m
             => m effects a
             -> Final effects a
 runAnalysis = Effect.run . runEffects . lower
-
-
-instance Evaluatable [] where
-  -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval = maybe unit (runApp . foldMap1 (App . subtermValue)) . nonEmpty
