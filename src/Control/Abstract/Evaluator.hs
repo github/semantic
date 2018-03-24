@@ -58,9 +58,6 @@ class ( MonadControl term m
   --   With great power comes great responsibility. If you 'evaluateModule' any of these, you probably deserve what you get.
   askModuleStack :: m [Module term]
 
-  -- evaluateTerm :: term -> m value
-  -- evaluateTerm = foldSubterms (analyzeTerm id)
-
 
 -- | A 'Monad' abstracting local and global environments.
 class Monad m => MonadEnvironment value m | m -> value where
