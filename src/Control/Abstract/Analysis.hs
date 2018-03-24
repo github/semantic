@@ -3,7 +3,7 @@
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , evaluateTerm
--- , evaluateModule
+, evaluateModule
 , withModules
 , evaluateModules
 , liftAnalyze
@@ -11,7 +11,6 @@ module Control.Abstract.Analysis
 , module X
 , Subterm(..)
 , SubtermAlgebra
-, MonadEvaluateModule(..)
 , Evaluatable(..)
 , MonadEvaluatable
 ) where
@@ -44,11 +43,9 @@ class (MonadEvaluator term value m, Recursive term) => MonadAnalysis term value 
   type family RequiredEffects term value m :: [* -> *]
 
   -- | Analyze a term using the semantics of the current analysis. This should generally only be called by 'evaluateTerm' and by definitions of 'analyzeTerm' in instances for composite analyses.
-  -- analyzeTerm :: MonadEvaluateModule term value outer => (outer value -> m value) -> Base term (Subterm term (outer value)) -> m value
   analyzeTerm :: (Base term (Subterm term (outer value)) -> m value) -> (Base term (Subterm term (outer value)) -> m value)
 
   -- | Analyze a module using the semantics of the current analysis. This should generally only be called by 'evaluateModule' and by definitions of 'analyzeModule' in instances for composite analyses.
-  -- analyzeModule :: MonadEvaluateModule term value outer => (outer value -> m value) -> Module (Subterm term (outer value)) -> m value
   analyzeModule :: (Module (Subterm term (outer value)) -> m value) -> (Module (Subterm term (outer value)) -> m value)
 
   -- | Isolate the given action with an empty global environment and exports.
@@ -58,9 +55,7 @@ class (MonadEvaluator term value m, Recursive term) => MonadAnalysis term value 
 -- | Evaluate a term to a value using the semantics of the current analysis.
 --
 --   This should always be called when e.g. evaluating the bodies of closures instead of explicitly folding either 'eval' or 'analyzeTerm' over subterms, except in 'MonadAnalysis' instances themselves. On the other hand, top-level evaluation should be performed using 'evaluateModule'.
-evaluateTerm :: ( Evaluatable (Base term)
-                , MonadEvaluatable term value m
-                )
+evaluateTerm :: MonadEvaluatable term value m
              => term
              -> m value
 evaluateTerm = foldSubterms (analyzeTerm eval)
@@ -92,35 +87,21 @@ instance Evaluatable s => Evaluatable (TermF s a) where
 
 
 -- | Evaluate a (root-level) term to a value using the semantics of the current analysis. This should be used to evaluate single-term programs, or (via 'evaluateModules') the entry point of multi-term programs.
--- evaluateModule :: forall m term value effects
---                .  ( Effectful m
---                   , Member (Resumable (EvaluateModule term) value) effects
---                   , MonadAnalysis term value (m effects)
---                   )
---                => Module term
---                -> m effects value
--- evaluateModule m = evaluateM m `resumeException` (\ yield (EvaluateModule m) -> evaluateM m >>= yield)
---   where evaluateM :: Module term -> m effects value
---         evaluateM = analyzeModule . fmap (Subterm <*> evaluateTerm)
-
-
-class MonadAnalysis term value m => MonadEvaluateModule term value m where
-  evaluateModule :: Module term -> m value
-
-instance (MonadAnalysis term value m, MonadEvaluatable term value m, Evaluatable (Base term))
-         => MonadEvaluateModule term value m where
-  evaluateModule m = analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evaluateTerm) m :: Module (Subterm term (m value)))
+evaluateModule :: MonadEvaluatable term value m
+               => Module term
+               -> m value
+evaluateModule m = analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evaluateTerm) m)
 
 
 -- | Run an action with the a list of 'Module's available for imports.
-withModules :: MonadEvaluateModule term value m
+withModules :: MonadEvaluatable term value m
             => [Module term]
             -> m a
             -> m a
 withModules = localModuleTable . const . ModuleTable.fromList
 
 -- | Evaluate with a list of modules in scope, taking the head module as the entry point.
-evaluateModules :: MonadEvaluateModule term value m
+evaluateModules :: MonadEvaluatable term value m
                 => [Module term]
                 -> m value
 evaluateModules [] = fail "evaluateModules: empty list"
