@@ -28,7 +28,6 @@ deriving instance Member NonDet    effects => MonadNonDet (Evaluating term value
 type EvaluatingEffects term value
   = '[ Resumable Prelude.String value
      , Fail                                        -- Failure with an error message
-     , Resumable (EvaluateModule term) value       -- Requests to evaluate a module in the outermost analysis
      , Reader [Module term]                        -- The stack of currently-evaluating modules.
      , State  (EnvironmentFor value)               -- Environments (both local and global)
      , State  (HeapFor value)                      -- The heap

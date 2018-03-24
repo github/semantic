@@ -14,7 +14,6 @@ module Control.Abstract.Evaluator
 , modifyModuleTable
 , MonadControl(..)
 , MonadThrow(..)
-, EvaluateModule(..)
 , EnvironmentFor
 , ExportsFor
 , HeapFor
@@ -170,9 +169,6 @@ class Monad m => MonadControl term m | m -> term where
 
 class Monad m => MonadThrow exc v m where
   throwException :: exc -> m v
-
-newtype EvaluateModule term = EvaluateModule (Module term)
-  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
 instance (Effectful m, Members '[Resumable exc value] effects, Monad (m effects)) => MonadThrow exc value (m effects) where
   throwException = raise . throwError
