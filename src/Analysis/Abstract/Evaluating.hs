@@ -10,7 +10,6 @@ import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
-import Data.Abstract.Value
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.IntMap as IntMap
 import Prelude hiding (fail)

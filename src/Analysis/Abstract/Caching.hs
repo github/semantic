@@ -8,7 +8,6 @@ import Data.Abstract.Cache
 import Data.Abstract.Configuration
 import Data.Abstract.Heap
 import Data.Abstract.Module
-import Data.Abstract.Value
 import Prologue
 
 -- | The effects necessary for caching analyses.

@@ -5,8 +5,6 @@ module Analysis.Abstract.Tracing
 
 import Control.Abstract.Analysis
 import Control.Monad.Effect.Writer
-import Data.Abstract.Configuration
-import Data.Abstract.Value
 import Data.Semigroup.Reducer as Reducer
 import Data.Union
 import Prologue hiding (trace)

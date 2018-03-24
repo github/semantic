@@ -8,7 +8,6 @@ import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.Heap
 import Data.Abstract.Live
-import Data.Abstract.Value
 import Prologue
 
 newtype Collecting m term value (effects :: [* -> *]) a = Collecting (m term value effects a)
