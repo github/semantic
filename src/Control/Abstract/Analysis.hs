@@ -109,14 +109,7 @@ instance Evaluatable s => Evaluatable (TermF s a) where
 class MonadAnalysis term value m => MonadEvaluateModule term value m where
   evaluateModule :: Module term -> m value
 
-instance ( Evaluatable (Base term)
-         , FreeVariables term
-         , MonadAddressable (LocationFor value) value m
-         , MonadAnalysis term value m
-         , MonadValue value m
-         , Show (LocationFor value)
-         , MonadThrow Prelude.String value m
-         )
+instance (MonadAnalysis term value m, MonadEvaluatable term value m, Evaluatable (Base term))
          => MonadEvaluateModule term value m where
   evaluateModule m = analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evaluateTerm) m :: Module (Subterm term (m value)))
 
