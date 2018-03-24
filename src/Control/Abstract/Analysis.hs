@@ -32,11 +32,13 @@ class MonadEvaluator term value m => MonadAnalysis term value m where
   -- | The effects necessary to run the analysis. Analyses which are composed on top of (wrap) other analyses should include the inner analyses 'RequiredEffects' in their own list.
   type family RequiredEffects term value m :: [* -> *]
 
-  -- | Analyze a term using the semantics of the current analysis. This should generally only be called by 'evaluateTerm' and by definitions of 'analyzeTerm' in instances for composite analyses.
-  analyzeTerm :: (Base term (Subterm term (outer value)) -> m value) -> (Base term (Subterm term (outer value)) -> m value)
+  -- | Analyze a term using the semantics of the current analysis.
+  analyzeTerm :: (Base term (Subterm term (outer value)) -> m value)
+              -> (Base term (Subterm term (outer value)) -> m value)
 
   -- | Analyze a module using the semantics of the current analysis. This should generally only be called by 'evaluateModule' and by definitions of 'analyzeModule' in instances for composite analyses.
-  analyzeModule :: (Module (Subterm term (outer value)) -> m value) -> (Module (Subterm term (outer value)) -> m value)
+  analyzeModule :: (Module (Subterm term (outer value)) -> m value)
+                -> (Module (Subterm term (outer value)) -> m value)
 
   -- | Isolate the given action with an empty global environment and exports.
   isolate :: m a -> m a
