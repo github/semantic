@@ -14,12 +14,6 @@ module Control.Abstract.Analysis
 , MonadEvaluateModule(..)
 , Evaluatable(..)
 , MonadEvaluatable
-, MonadValue(..)
-, while
-, doWhile
-, forLoop
-, toBool
-, Comparator(..)
 , require
 , load
 ) where
@@ -34,20 +28,14 @@ import qualified Control.Monad.Effect as Effect
 import Control.Monad.Effect.Fail as X
 import Control.Monad.Effect.Reader as X
 import Control.Monad.Effect.State as X
-import Data.Abstract.Address
 import qualified Data.Abstract.Environment as Env
 import qualified Data.Abstract.Exports as Exports
 import Data.Abstract.FreeVariables
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
-import Data.Abstract.Number as Number
-import Data.Abstract.Type as Type
-import Data.Abstract.Value as Value
 import Data.Coerce
-import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
-import qualified Data.Set as Set
 import Data.Term
 import Prelude hiding (fail)
 import Prologue
@@ -75,12 +63,7 @@ class (MonadEvaluator term value m, Recursive term) => MonadAnalysis term value 
 --
 --   This should always be called when e.g. evaluating the bodies of closures instead of explicitly folding either 'eval' or 'analyzeTerm' over subterms, except in 'MonadAnalysis' instances themselves. On the other hand, top-level evaluation should be performed using 'evaluateModule'.
 evaluateTerm :: ( Evaluatable (Base term)
-                , FreeVariables term
-                , MonadAddressable (LocationFor value) value m
-                , MonadEvaluateModule term value m
-                , MonadValue value m
-                , Show (LocationFor value)
-                , MonadThrow Prelude.String value m
+                , MonadEvaluatable term value m
                 )
              => term
              -> m value
@@ -174,182 +157,6 @@ runAnalysis :: ( Effectful m
             -> Final effects a
 runAnalysis = Effect.run . runEffects . lower
 
-
-
--- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Evaluatable (Base term)
-         , FreeVariables term
-         , Monad m
-         , MonadAddressable Precise Value m
-         , MonadEvaluateModule term Value m
-         , MonadValue Value m
-         , MonadThrow Prelude.String Value m
-         )
-         => MonadValue Value m where
-
-  unit     = pure . injValue $ Value.Unit
-  integer  = pure . injValue . Value.Integer . Number.Integer
-  boolean  = pure . injValue . Boolean
-  string   = pure . injValue . Value.String
-  float    = pure . injValue . Value.Float . Decimal
-  symbol   = pure . injValue . Value.Symbol
-  rational = pure . injValue . Value.Rational . Ratio
-
-  multiple = pure . injValue . Value.Tuple
-  array    = pure . injValue . Value.Array
-
-  klass n [] env = pure . injValue $ Class n env
-  klass n supers env = do
-    product <- mconcat <$> traverse objectEnvironment supers
-    pure . injValue $ Class n (Env.push product <> env)
-
-
-  objectEnvironment o
-    | Just (Class _ env) <- prjValue o = pure env
-    | otherwise = fail ("non-object type passed to objectEnvironment: " <> show o)
-
-  asString v
-    | Just (Value.String n) <- prjValue v = pure n
-    | otherwise                           = fail ("expected " <> show v <> " to be a string")
-
-  ifthenelse cond if' else'
-    | Just (Boolean b) <- prjValue cond = if b then if' else else'
-    | otherwise = fail ("not defined for non-boolean conditions: " <> show cond)
-
-  liftNumeric f arg
-    | Just (Value.Integer (Number.Integer i)) <- prjValue arg = integer $ f i
-    | Just (Value.Float (Decimal d))          <- prjValue arg = float   $ f d
-    | Just (Value.Rational (Ratio r))         <- prjValue arg = rational $ f r
-    | otherwise = fail ("Invalid operand to liftNumeric: " <> show arg)
-
-  liftNumeric2 f left right
-    | Just (Value.Integer i, Value.Integer j)   <- prjPair pair = f i j & specialize
-    | Just (Value.Integer i, Value.Rational j)  <- prjPair pair = f i j & specialize
-    | Just (Value.Integer i, Value.Float j)     <- prjPair pair = f i j & specialize
-    | Just (Value.Rational i, Value.Integer j)  <- prjPair pair = f i j & specialize
-    | Just (Value.Rational i, Value.Rational j) <- prjPair pair = f i j & specialize
-    | Just (Value.Rational i, Value.Float j)    <- prjPair pair = f i j & specialize
-    | Just (Value.Float i, Value.Integer j)     <- prjPair pair = f i j & specialize
-    | Just (Value.Float i, Value.Rational j)    <- prjPair pair = f i j & specialize
-    | Just (Value.Float i, Value.Float j)       <- prjPair pair = f i j & specialize
-    | otherwise = fail ("Invalid operands to liftNumeric2: " <> show pair)
-      where
-        -- Dispatch whatever's contained inside a 'SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: MonadValue value m => SomeNumber -> m value
-        specialize (SomeNumber (Number.Integer i)) = integer i
-        specialize (SomeNumber (Ratio r))          = rational r
-        specialize (SomeNumber (Decimal d))        = float d
-        pair = (left, right)
-
-  liftComparison comparator left right
-    | Just (Value.Integer (Number.Integer i), Value.Integer (Number.Integer j)) <- prjPair pair = go i j
-    | Just (Value.Integer (Number.Integer i), Value.Float (Decimal j))          <- prjPair pair = go (fromIntegral i) j
-    | Just (Value.Float (Decimal i), Value.Integer (Number.Integer j))          <- prjPair pair = go i (fromIntegral j)
-    | Just (Value.Float (Decimal i), Value.Float (Decimal j))                   <- prjPair pair = go i j
-    | Just (Value.String i, Value.String j)                                     <- prjPair pair = go i j
-    | Just (Boolean i, Boolean j)                                               <- prjPair pair = go i j
-    | Just (Value.Unit, Value.Unit)                                             <- prjPair pair = boolean True
-    | otherwise = fail ("Type error: invalid arguments to liftComparison: " <> show pair)
-      where
-        -- Explicit type signature is necessary here because we're passing all sorts of things
-        -- to these comparison functions.
-        go :: (Ord a, MonadValue value m) => a -> a -> m value
-        go l r = case comparator of
-          Concrete f  -> boolean (f l r)
-          Generalized -> integer (orderingToInt (compare l r))
-
-        -- Map from [LT, EQ, GT] to [-1, 0, 1]
-        orderingToInt :: Ordering -> Prelude.Integer
-        orderingToInt = toInteger . pred . fromEnum
-
-        pair = (left, right)
-
-
-  liftBitwise operator target
-    | Just (Value.Integer (Number.Integer i)) <- prjValue target = integer $ operator i
-    | otherwise = fail ("Type error: invalid unary bitwise operation on " <> show target)
-
-  liftBitwise2 operator left right
-    | Just (Value.Integer (Number.Integer i), Value.Integer (Number.Integer j)) <- prjPair pair = integer $ operator i j
-    | otherwise = fail ("Type error: invalid binary bitwise operation on " <> show pair)
-      where pair = (left, right)
-
-  abstract names (Subterm body _) = do
-    l <- label body
-    injValue . Closure names l . Env.bind (foldr Set.delete (freeVariables body) names) <$> getEnv
-
-  apply op params = do
-    Closure names label env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
-    bindings <- foldr (\ (name, param) rest -> do
-      v <- param
-      a <- alloc name
-      assign a v
-      Env.insert name a <$> rest) (pure env) (zip names params)
-    localEnv (mappend bindings) (goto label >>= evaluateTerm)
-
-  loop = fix
-
--- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, MonadHeap Type m) => MonadValue Type m where
-  abstract names (Subterm _ body) = do
-    (env, tvars) <- foldr (\ name rest -> do
-      a <- alloc name
-      tvar <- Var <$> fresh
-      assign a tvar
-      (env, tvars) <- rest
-      pure (Env.insert name a env, tvar : tvars)) (pure mempty) names
-    ret <- localEnv (mappend env) body
-    pure (Product tvars :-> ret)
-
-  unit       = pure Type.Unit
-  integer _  = pure Int
-  boolean _  = pure Bool
-  string _   = pure Type.String
-  float _    = pure Type.Float
-  symbol _   = pure Type.Symbol
-  rational _ = pure Type.Rational
-  multiple   = pure . Type.Product
-  array      = pure . Type.Array
-
-  klass _ _ _  = pure Object
-
-  objectEnvironment _ = pure mempty
-
-  asString _ = fail "Must evaluate to Value to use asString"
-
-  ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
-
-  liftNumeric _ Type.Float = pure Type.Float
-  liftNumeric _ Int        = pure Int
-  liftNumeric _ _          = fail "Invalid type in unary numeric operation"
-
-  liftNumeric2 _ left right = case (left, right) of
-    (Type.Float, Int) -> pure Type.Float
-    (Int, Type.Float) -> pure Type.Float
-    _                 -> unify left right
-
-  liftBitwise _ Int = pure Int
-  liftBitwise _ t   = fail ("Invalid type passed to unary bitwise operation: " <> show t)
-
-  liftBitwise2 _ Int Int = pure Int
-  liftBitwise2 _ t1 t2   = fail ("Invalid types passed to binary bitwise operation: " <> show (t1, t2))
-
-  liftComparison (Concrete _) left right = case (left, right) of
-    (Type.Float, Int) ->                     pure Bool
-    (Int, Type.Float) ->                     pure Bool
-    _                 -> unify left right $> Bool
-  liftComparison Generalized left right = case (left, right) of
-    (Type.Float, Int) ->                     pure Int
-    (Int, Type.Float) ->                     pure Int
-    _                 -> unify left right $> Bool
-
-  apply op params = do
-    tvar <- fresh
-    paramTypes <- sequenceA params
-    _ :-> ret <- op `unify` (Product paramTypes :-> Var tvar)
-    pure ret
-
-  loop f = f empty
 
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.

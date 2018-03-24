@@ -8,7 +8,6 @@ import Data.Abstract.Address
 import Data.Abstract.Environment (insert)
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
-import Data.Abstract.Value
 import Data.Semigroup.Reducer
 import Prelude hiding (fail)
 import Prologue

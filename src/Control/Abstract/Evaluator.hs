@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstrainedClassMethods, DataKinds, FunctionalDependencies, UndecidableInstances #-}
+{-# LANGUAGE ConstrainedClassMethods, DataKinds, FunctionalDependencies, TypeFamilies, UndecidableInstances #-}
 module Control.Abstract.Evaluator
 ( MonadEvaluator(..)
 , MonadEnvironment(..)
@@ -15,6 +15,13 @@ module Control.Abstract.Evaluator
 , MonadControl(..)
 , MonadThrow(..)
 , EvaluateModule(..)
+, EnvironmentFor
+, ExportsFor
+, HeapFor
+, CellFor
+, LiveFor
+, LocationFor
+, ConfigurationFor
 ) where
 
 import Control.Effect
@@ -25,9 +32,9 @@ import qualified Data.Abstract.Environment as Env
 import qualified Data.Abstract.Exports as Export
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
+import Data.Abstract.Live
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
-import Data.Abstract.Value
 import Data.Semigroup.Reducer
 import Prologue hiding (throwError)
 
@@ -169,3 +176,25 @@ newtype EvaluateModule term = EvaluateModule (Module term)
 
 instance (Effectful m, Members '[Resumable exc value] effects, Monad (m effects)) => MonadThrow exc value (m effects) where
   throwException = raise . throwError
+
+
+-- | The environment for an abstract value type.
+type EnvironmentFor v = Env.Environment (LocationFor v) v
+
+-- | The exports for an abstract value type.
+type ExportsFor v = Export.Exports (LocationFor v) v
+
+-- | The 'Heap' for an abstract value type.
+type HeapFor value = Heap (LocationFor value) value
+
+-- | The cell for an abstract value type.
+type CellFor value = Cell (LocationFor value) value
+
+-- | The address set type for an abstract value type.
+type LiveFor value = Live (LocationFor value) value
+
+-- | The configuration for term and abstract value types.
+type ConfigurationFor term value = Configuration (LocationFor value) term value
+
+-- | The location type (the body of 'Address'es) which should be used for an abstract value type.
+type family LocationFor value :: *

@@ -6,12 +6,19 @@ module Control.Abstract.Value
 , doWhile
 , forLoop
 , toBool
+, ValueRoots(..)
+, EnvironmentFor
+, ExportsFor
+, HeapFor
+, CellFor
+, LiveFor
+, LocationFor
+, ConfigurationFor
 ) where
 
 import Control.Abstract.Evaluator
 import Data.Abstract.FreeVariables
 import Data.Abstract.Number as Number
-import Data.Abstract.Value as Value
 import Data.Scientific (Scientific)
 import Prelude hiding (fail)
 import Prologue
@@ -139,3 +146,9 @@ doWhile :: MonadValue value m
 doWhile body cond = loop $ \ continue -> body *> do
   this <- cond
   ifthenelse this continue unit
+
+
+-- | Value types, e.g. closures, which can root a set of addresses.
+class ValueRoots value where
+  -- | Compute the set of addresses rooted by a given value.
+  valueRoots :: value -> LiveFor value

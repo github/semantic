@@ -2,11 +2,9 @@
 module Language.Ruby.Syntax where
 
 import Control.Monad (unless)
-import Control.Abstract.Value (MonadValue)
 import Data.Abstract.Evaluatable
 import Data.Abstract.ModuleTable
 import Data.Abstract.Path
-import Data.Abstract.Value (EnvironmentFor)
 import Diffing.Algorithm
 import Prelude hiding (fail)
 import Prologue
