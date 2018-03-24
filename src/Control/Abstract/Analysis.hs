@@ -32,6 +32,7 @@ import Data.Coerce
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
 import Data.Term
+import Data.Type.Coercion
 import Prelude hiding (fail)
 import Prologue
 
@@ -109,12 +110,10 @@ evaluateModules (m:ms) = withModules ms (evaluateModule m)
 
 
 -- | Lift a 'SubtermAlgebra' for an underlying analysis into a containing analysis. Use this when defining an analysis which can be composed onto other analyses to ensure that a call to 'analyzeTerm' occurs in the inner analysis and not the outer one.
-liftAnalyze :: ( Coercible (  m term value effects value) (t m term value (effects :: [* -> *]) value)
-               , Coercible (t m term value effects value) (  m term value  effects              value)
-               )
+liftAnalyze :: Coercible (  m term value effects value) (t m term value (effects :: [* -> *]) value)
             => ((base (Subterm term (outer value)) ->   m term value effects value) -> (base (Subterm term (outer value)) ->   m term value effects value))
             -> ((base (Subterm term (outer value)) -> t m term value effects value) -> (base (Subterm term (outer value)) -> t m term value effects value))
-liftAnalyze analyze recur term = coerce (analyze (coerce . recur) term)
+liftAnalyze analyze recur term = coerce (analyze (coerceWith (sym Coercion) . recur) term)
 
 
 -- | Run an analysis, performing its effects and returning the result alongside any state.
