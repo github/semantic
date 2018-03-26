@@ -31,6 +31,7 @@ type MonadEvaluatable term value m =
   , MonadAddressable (LocationFor value) value m
   , MonadAnalysis term value m
   , MonadThrow (Unspecialized value) m
+  , MonadThrow (ValueExc value) m
   , MonadValue value m
   , Recursive term
   , Show (LocationFor value)
