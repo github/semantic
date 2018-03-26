@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstrainedClassMethods, DataKinds, FunctionalDependencies, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE ConstrainedClassMethods, DataKinds, FunctionalDependencies, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Evaluator
 ( MonadEvaluator(..)
 , MonadEnvironment(..)
@@ -15,6 +15,7 @@ module Control.Abstract.Evaluator
 , modifyModuleTable
 , MonadControl(..)
 , MonadThrow(..)
+, resumeException
 , EnvironmentFor
 , ExportsFor
 , HeapFor
@@ -177,11 +178,15 @@ class Monad m => MonadControl term m | m -> term where
   -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
   goto :: Label -> m term
 
-class Monad m => MonadThrow exc v m where
-  throwException :: exc -> m v
 
-instance (Effectful m, Members '[Resumable exc value] effects, Monad (m effects)) => MonadThrow exc value (m effects) where
-  throwException = raise . throwError
+class Monad m => MonadThrow exc m where
+  throwException :: exc v -> m v
+
+instance (Monad (m effects), Effectful m, Members '[Resumable exc] effects) => MonadThrow exc (m effects) where
+   throwException = raise . throwError
+
+resumeException :: forall exc m e a. (Effectful m, Resumable exc :< e) => m e a -> (forall v. (v -> m e a) -> exc v -> m e a) -> m e a
+resumeException m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
 
 
 -- | The environment for an abstract value type.

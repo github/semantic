@@ -1,7 +1,8 @@
-{-# LANGUAGE ConstraintKinds, DefaultSignatures, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , MonadEvaluatable
+, Unspecialized(..)
 , Evaluatable(..)
 , evaluateTerm
 , evaluateModule
@@ -29,18 +30,29 @@ type MonadEvaluatable term value m =
   , FreeVariables term
   , MonadAddressable (LocationFor value) value m
   , MonadAnalysis term value m
-  , MonadThrow Prelude.String value m
+  , MonadThrow (Unspecialized value) m
   , MonadValue value m
   , Recursive term
   , Show (LocationFor value)
   )
 
+data Unspecialized a b where
+  Unspecialized :: { getUnspecialized :: Prelude.String } -> Unspecialized value value
+
+instance Eq1 (Unspecialized a) where
+  liftEq _ (Unspecialized a) (Unspecialized b) = a == b
+
+deriving instance Eq (Unspecialized a b)
+deriving instance Show (Unspecialized a b)
+instance Show1 (Unspecialized a) where
+  liftShowsPrec _ _ = showsPrec
+
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
   eval :: MonadEvaluatable term value m
        => SubtermAlgebra constr term (m value)
-  default eval :: (MonadThrow Prelude.String value m, Show1 constr) => SubtermAlgebra constr term (m value)
-  eval expr = throwException $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
+  default eval :: (MonadThrow (Unspecialized value) m, Show1 constr) => SubtermAlgebra constr term (m value)
+  eval expr = throwException (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 
 -- Instances

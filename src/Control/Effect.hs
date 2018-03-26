@@ -5,9 +5,9 @@ import Control.Monad.Effect as Effect
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader
+import Control.Monad.Effect.Resumable
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Writer
-import Control.Monad.Effect.Resumable
 import Data.Semigroup.Reducer
 import Prologue
 
@@ -64,16 +64,9 @@ instance Ord a => RunEffect NonDet a where
   runEffect = runNonDet unit
 
 -- | 'Resumable' effects are interpreted into 'Either' s.t. failures are in 'Left' and successful results are in 'Right'.
-instance RunEffect (Resumable exc v) a where
-  type Result (Resumable exc v) a = Either exc a
+instance RunEffect (Resumable exc) a where
+  type Result (Resumable exc) a = Either (SomeExc exc) a
   runEffect = runError
-
-resumeException :: forall v m exc e a. (Effectful m, Resumable exc v :< e) => m e a -> ((v -> m e a) -> exc -> m e a) -> m e a
-resumeException m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
-
--- | Reassociate 'Either's, combining errors into 'Left' values and successes in a single level of 'Right'.
-mergeEither :: Either a (Either b c) -> Either (Either a b) c
-mergeEither = either (Left . Left) (either (Left . Right) Right)
 
 
 -- | Types wrapping 'Eff' actions.
