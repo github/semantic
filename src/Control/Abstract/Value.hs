@@ -155,6 +155,7 @@ doWhile body cond = loop $ \ continue -> body *> do
   ifthenelse this continue unit
 
 
+-- The type of exceptions that can be thrown when constructing values in `MonadValue`.
 data ValueExc v where
   ValueExc :: Prelude.String -> ValueExc Value
   StringExc :: Prelude.String -> ValueExc ByteString
