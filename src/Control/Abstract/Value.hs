@@ -177,10 +177,12 @@ class ValueRoots value where
 data ValueExc value resume where
   ValueExc :: Prelude.String -> ValueExc value value
   StringExc :: Prelude.String -> ValueExc value ByteString
+  NamespaceError :: Prelude.String -> ValueExc value (EnvironmentFor value)
 
 instance Eq1 (ValueExc value) where
   liftEq _ (ValueExc a)  (ValueExc b)  = a == b
   liftEq _ (StringExc a) (StringExc b) = a == b
+  liftEq _ (NamespaceError a) (NamespaceError b) = a == b
   liftEq _ _             _             = False
 
 deriving instance Show (ValueExc value resume)
