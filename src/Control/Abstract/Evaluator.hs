@@ -162,5 +162,5 @@ class Monad m => MonadControl term m where
   -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
   goto :: Label -> m term
 
-class Monad m => MonadThrow exc v m | m -> exc where
-  throwException :: exc -> m v
+class Monad m => MonadThrow exc m where
+  throwException :: exc v -> m v

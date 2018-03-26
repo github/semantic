@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures, MultiParamTypeClasses, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures, MultiParamTypeClasses, UndecidableInstances, GADTs, StandaloneDeriving #-}
 module Data.Abstract.Evaluatable
 ( Evaluatable(..)
 , module Addressable
@@ -6,6 +6,7 @@ module Data.Abstract.Evaluatable
 , module FreeVariables
 , module Value
 , MonadEvaluator(..)
+, Unspecialized(..)
 ) where
 
 import Control.Abstract.Addressable as Addressable
@@ -20,6 +21,16 @@ import Data.Semigroup.App
 import Data.Term
 import Prologue
 
+data Unspecialized a b where
+  Unspecialized :: { getUnspecialized :: Prelude.String } -> Unspecialized value value
+
+instance Eq1 (Unspecialized a) where
+  liftEq _ (Unspecialized a) (Unspecialized b) = a == b
+
+deriving instance Eq (Unspecialized a b)
+deriving instance Show (Unspecialized a b)
+instance Show1 (Unspecialized a) where
+  liftShowsPrec _ _ = showsPrec
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
@@ -28,11 +39,11 @@ class Evaluatable constr where
           , MonadAnalysis term value m
           , MonadValue value m
           , Show (LocationFor value)
-          , MonadThrow Prelude.String value m
+          , MonadThrow (Unspecialized value) m
           )
        => SubtermAlgebra constr term (m value)
-  default eval :: (MonadThrow Prelude.String value m, Show1 constr) => SubtermAlgebra constr term (m value)
-  eval expr = throwException $ "Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""
+  default eval :: (MonadThrow (Unspecialized value) m, Show1 constr) => SubtermAlgebra constr term (m value)
+  eval expr = throwException (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 -- | If we can evaluate any syntax which can occur in a 'Union', we can evaluate the 'Union'.
 instance Apply Evaluatable fs => Evaluatable (Union fs) where
