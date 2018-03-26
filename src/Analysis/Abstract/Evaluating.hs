@@ -46,17 +46,17 @@ type EvaluatingEffects term value
      ]
 
 -- | Find the value in the 'Final' result of running.
-findValue :: forall value term effects. (effects ~ RequiredEffects term value (Evaluating term value effects))
+findValue :: (effects ~ RequiredEffects term value (Evaluating term value effects))
           => Final effects value -> Either Prelude.String (Either (SomeExc (Unspecialized value)) (Either (SomeExc (ValueExc value)) value))
 findValue (((((v, _), _), _), _), _) = v
 
 -- | Find the 'Environment' in the 'Final' result of running.
-findEnv :: forall value term effects . (effects ~ RequiredEffects term value (Evaluating term value effects))
+findEnv :: (effects ~ RequiredEffects term value (Evaluating term value effects))
         => Final effects value -> EnvironmentFor value
 findEnv (((((_, env), _), _), _), _) = env
 
 -- | Find the 'Heap' in the 'Final' result of running.
-findHeap :: forall value term effects . (effects ~ RequiredEffects term value (Evaluating term value effects))
+findHeap :: (effects ~ RequiredEffects term value (Evaluating term value effects))
          => Final effects value -> Monoidal.Map (LocationFor value) (CellFor value)
 findHeap (((((_, _), Heap heap), _), _), _) = heap
 
