@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, StandaloneDeriving, TemplateHaskell, TypeFamilies, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating
 ( Evaluating
 , findValue
@@ -16,6 +16,7 @@ import           Data.Abstract.Module
 import           Data.Abstract.ModuleTable
 import qualified Data.IntMap as IntMap
 import qualified Data.Map.Monoidal as Monoidal
+import           Lens.Micro.TH
 import           Prelude hiding (fail)
 import           Prologue
 
@@ -44,12 +45,14 @@ type EvaluatingEffects term value
      ]
 
 data EvaluatingState term value = EvaluatingState
-  { environment :: EnvironmentFor value
-  , heap        :: HeapFor value
-  , modules     :: ModuleTable (EnvironmentFor value, value)
-  , exports     :: ExportsFor value
-  , jumps       :: IntMap.IntMap term
+  { _environment :: EnvironmentFor value
+  , _heap        :: HeapFor value
+  , _modules     :: ModuleTable (EnvironmentFor value, value)
+  , _exports     :: ExportsFor value
+  , _jumps       :: IntMap.IntMap term
   }
+
+makeLenses ''EvaluatingState
 
 -- | Find the value in the 'Final' result of running.
 findValue :: (effects ~ RequiredEffects term value (Evaluating term value effects))
