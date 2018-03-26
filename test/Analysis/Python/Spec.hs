@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedLists, #-}
+{-# LANGUAGE OverloadedLists #-}
 module Analysis.Python.Spec (spec) where
 
 import Data.Abstract.Value
