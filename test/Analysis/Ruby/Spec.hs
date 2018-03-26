@@ -13,20 +13,18 @@ spec = parallel $ do
   describe "Ruby" $ do
     it "evaluates require_relative" $ do
       env <- findEnv <$> evaluate "main.rb"
-      let expectedEnv = [ (qualifiedName ["Object"], addr 0)
-                        , (qualifiedName ["foo"], addr 3)]
-      env `shouldBe` expectedEnv
+      env `shouldBe` [ (name "Object", addr 0)
+                     , (name "foo", addr 3) ]
 
     it "evalutes load" $ do
       env <- findEnv <$> evaluate "load.rb"
-      let expectedEnv = [ (qualifiedName ["Object"], addr 0)
-                        , (qualifiedName ["foo"], addr 3) ]
-      env `shouldBe` expectedEnv
+      env `shouldBe` [ (name "Object", addr 0)
+                     , (name "foo", addr 3) ]
 
     it "evalutes load with wrapper" $ do
       res <- evaluate "load-wrap.rb"
       findValue res `shouldBe` Left "free variable: \"foo\""
-      findEnv res `shouldBe` [(qualifiedName ["Object"], addr 0)]
+      findEnv res `shouldBe` [ (name "Object", addr 0) ]
 
     it "evalutes subclass" $ do
       res <- findValue <$> evaluate "subclass.rb"
