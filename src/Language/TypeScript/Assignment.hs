@@ -151,9 +151,6 @@ type Syntax = '[
   , TypeScript.Syntax.RequiredParameter
   , TypeScript.Syntax.RestParameter
   , TypeScript.Syntax.PropertySignature
-  , TypeScript.Syntax.ImportExportSpecifier
-  , TypeScript.Syntax.ExportClause
-  , TypeScript.Syntax.Export
   , TypeScript.Syntax.AmbientDeclaration
   , TypeScript.Syntax.EnumDeclaration
   , TypeScript.Syntax.ExtendsClause

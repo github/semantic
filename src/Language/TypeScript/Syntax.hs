@@ -209,30 +209,6 @@ instance Ord1 ObjectType where liftCompare = genericLiftCompare
 instance Show1 ObjectType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ObjectType
 
-newtype Export a = Export { _exportElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 Export where liftEq = genericLiftEq
-instance Ord1 Export where liftCompare = genericLiftCompare
-instance Show1 Export where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable Export
-
-newtype ExportClause a = ExportClause { _exportClauseElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 ExportClause where liftEq = genericLiftEq
-instance Ord1 ExportClause where liftCompare = genericLiftCompare
-instance Show1 ExportClause where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable ExportClause
-
-data ImportExportSpecifier a = ImportExportSpecifier { _specifierSubject :: !a, _specifierAlias :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 ImportExportSpecifier where liftEq = genericLiftEq
-instance Ord1 ImportExportSpecifier where liftCompare = genericLiftCompare
-instance Show1 ImportExportSpecifier where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable ImportExportSpecifier
-
 data With a = With { _withExpression :: !a, _withBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
@@ -247,7 +223,9 @@ newtype AmbientDeclaration a = AmbientDeclaration { _ambientDeclarationBody :: a
 instance Eq1 AmbientDeclaration where liftEq = genericLiftEq
 instance Ord1 AmbientDeclaration where liftCompare = genericLiftCompare
 instance Show1 AmbientDeclaration where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable AmbientDeclaration
+
+instance Evaluatable AmbientDeclaration where
+  eval (AmbientDeclaration body) = subtermValue body
 
 data EnumDeclaration a = EnumDeclaration { _enumDeclarationIdentifier :: !a, _enumDeclarationBody :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -417,14 +395,6 @@ instance Eq1 ImportAlias where liftEq = genericLiftEq
 instance Ord1 ImportAlias where liftCompare = genericLiftCompare
 instance Show1 ImportAlias where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ImportAlias
-
-data InternalModule a = InternalModule { _internalModuleIdentifier :: !a, _internalModuleStatements :: ![a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 InternalModule where liftEq = genericLiftEq
-instance Ord1 InternalModule where liftCompare = genericLiftCompare
-instance Show1 InternalModule where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable InternalModule
 
 data Super a = Super
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
