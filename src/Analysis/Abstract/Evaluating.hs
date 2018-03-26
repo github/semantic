@@ -55,6 +55,7 @@ data EvaluatingState term value = EvaluatingState
 
 makeLenses ''EvaluatingState
 
+
 (.=) :: Member (State (EvaluatingState term value)) effects => ASetter (EvaluatingState term value) (EvaluatingState term value) a b -> b -> Evaluating term value effects ()
 lens .= val = raise (modify (lens .~ val))
 
