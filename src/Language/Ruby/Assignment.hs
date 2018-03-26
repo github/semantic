@@ -147,6 +147,18 @@ expressions = makeTerm'' <$> location <*> many expression
 parenthesizedExpressions :: Assignment
 parenthesizedExpressions = makeTerm'' <$> symbol ParenthesizedStatements <*> children (Syntax.Paren <$> expressions)
 
+withExtendedScope :: Assignment.Assignment ast grammar a -> Assignment.Assignment ast grammar a
+withExtendedScope inner = do
+  locals <- getRubyLocals
+  result <- inner
+  putRubyLocals locals
+  pure result
+
+withNewScope :: Assignment.Assignment ast grammar a -> Assignment.Assignment ast grammar a
+withNewScope inner = withExtendedScope $ do
+  putRubyLocals []
+  inner
+
 identifier :: Assignment
 identifier = do
   sym <- symbol Identifier <|> symbol Identifier'
@@ -204,14 +216,14 @@ endBlock :: Assignment
 endBlock = makeTerm <$> symbol EndBlock <*> children (Statement.ScopeExit <$> many expression)
 
 class' :: Assignment
-class' = makeTerm <$> symbol Class <*> children (Ruby.Syntax.Class <$> expression <*> (superclass <|> pure []) <*> expressions)
+class' = makeTerm <$> symbol Class <*> (withNewScope . children) (Ruby.Syntax.Class <$> expression <*> (superclass <|> pure []) <*> expressions)
   where superclass = pure <$ symbol Superclass <*> children expression
 
 singletonClass :: Assignment
-singletonClass = makeTerm <$> symbol SingletonClass <*> children (Ruby.Syntax.Class <$> expression <*> pure [] <*> expressions)
+singletonClass = makeTerm <$> symbol SingletonClass <*> (withNewScope . children) (Ruby.Syntax.Class <$> expression <*> pure [] <*> expressions)
 
 module' :: Assignment
-module' = makeTerm <$> symbol Module <*> children (Ruby.Syntax.Module <$> expression <*> many expression)
+module' = makeTerm <$> symbol Module <*> (withNewScope . children) (Ruby.Syntax.Module <$> expression <*> many expression)
 
 scopeResolution :: Assignment
 scopeResolution = makeTerm <$> symbol ScopeResolution <*> children (Expression.ScopeResolution <$> many expression)
@@ -228,24 +240,25 @@ parameter =
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
 
 method :: Assignment
-method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> pure [] <*> emptyTerm <*> expression <*> params <*> expressions')
+method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method <$> pure [] <*> emptyTerm <*> expression <*> params <*> expressions')
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
         expressions' = makeTerm <$> location <*> many expression
 
 singletonMethod :: Assignment
-singletonMethod = makeTerm <$> symbol SingletonMethod <*> children (Declaration.Method <$> pure [] <*> expression <*> expression <*> params <*> expressions)
+singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withNewScope . children) (Declaration.Method <$> pure [] <*> expression <*> expression <*> params <*> expressions)
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
 
 lambda :: Assignment
-lambda = makeTerm <$> symbol Lambda <*> children (
+lambda = makeTerm <$> symbol Lambda <*> (withExtendedScope . children) (
   Declaration.Function [] <$> emptyTerm
                           <*> ((symbol BlockParameters <|> symbol LambdaParameters) *> children (many parameter) <|> pure [])
                           <*> expressions)
 
 block :: Assignment
-block =  makeTerm <$> symbol DoBlock <*> blockChildren
-     <|> makeTerm <$> symbol Block <*> blockChildren
-  where blockChildren = children (Declaration.Function <$> pure [] <*> emptyTerm <*> params <*> expressions)
+block =  makeTerm <$> symbol DoBlock <*> scopedBlockChildren
+     <|> makeTerm <$> symbol Block <*> scopedBlockChildren
+  where scopedBlockChildren = withExtendedScope blockChildren
+        blockChildren = children (Declaration.Function <$> pure [] <*> emptyTerm <*> params <*> expressions)
         params = symbol BlockParameters *> children (many parameter) <|> pure []
 
 comment :: Assignment
