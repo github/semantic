@@ -1,28 +1,28 @@
 {-# LANGUAGE ConstrainedClassMethods, DataKinds, FunctionalDependencies, TypeFamilies, UndecidableInstances #-}
 module Control.Abstract.Evaluator
-( MonadEvaluator(..)
-, MonadEnvironment(..)
-, modifyEnv
-, modifyExports
-, addExport
-, fullEnvironment
-, MonadHeap(..)
-, modifyHeap
-, localize
-, lookupHeap
-, assign
-, MonadModuleTable(..)
-, modifyModuleTable
-, MonadControl(..)
-, MonadThrow(..)
-, EnvironmentFor
-, ExportsFor
-, HeapFor
-, CellFor
-, LiveFor
-, LocationFor
-, ConfigurationFor
-) where
+  ( MonadEvaluator(..)
+  , MonadEnvironment(..)
+  , modifyEnv
+  , modifyExports
+  , addExport
+  , fullEnvironment
+  , MonadHeap(..)
+  , modifyHeap
+  , localize
+  , lookupHeap
+  , assign
+  , MonadModuleTable(..)
+  , modifyModuleTable
+  , MonadControl(..)
+  , MonadThrow(..)
+  , EnvironmentFor
+  , ExportsFor
+  , HeapFor
+  , CellFor
+  , LiveFor
+  , LocationFor
+  , ConfigurationFor
+  ) where
 
 import Control.Effect
 import Control.Monad.Effect.Resumable
