@@ -16,6 +16,7 @@ import           Data.Abstract.Module
 import           Data.Abstract.ModuleTable
 import qualified Data.IntMap as IntMap
 import qualified Data.Map.Monoidal as Monoidal
+import           Lens.Micro
 import           Lens.Micro.TH
 import           Prelude hiding (fail)
 import           Prologue
@@ -53,6 +54,10 @@ data EvaluatingState term value = EvaluatingState
   }
 
 makeLenses ''EvaluatingState
+
+(.=) :: (Effectful m, Member (State s) effects) => ASetter s s a b -> b -> m effects ()
+lens .= val = raise (modify (lens .~ val))
+
 
 -- | Find the value in the 'Final' result of running.
 findValue :: (effects ~ RequiredEffects term value (Evaluating term value effects))
