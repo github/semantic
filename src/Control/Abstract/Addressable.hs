@@ -1,14 +1,13 @@
 {-# LANGUAGE MultiParamTypeClasses, TypeFamilies, UndecidableInstances #-}
 module Control.Abstract.Addressable where
 
-import Control.Abstract.Analysis
+import Control.Abstract.Evaluator
 import Control.Applicative
 import Control.Monad ((<=<))
 import Data.Abstract.Address
 import Data.Abstract.Environment (insert)
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
-import Data.Abstract.Value
 import Data.Semigroup.Reducer
 import Prelude hiding (fail)
 import Prologue

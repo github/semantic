@@ -1,12 +1,12 @@
-{-# LANGUAGE ConstrainedClassMethods, FunctionalDependencies #-}
+{-# LANGUAGE ConstrainedClassMethods, DataKinds, FunctionalDependencies, TypeFamilies, UndecidableInstances #-}
 module Control.Abstract.Evaluator
   ( MonadEvaluator(..)
   , MonadEnvironment(..)
   , modifyEnv
   , modifyExports
   , addExport
-  , MonadHeap(..)
   , fullEnvironment
+  , MonadHeap(..)
   , modifyHeap
   , localize
   , lookupHeap
@@ -15,19 +15,29 @@ module Control.Abstract.Evaluator
   , modifyModuleTable
   , MonadControl(..)
   , MonadThrow(..)
-) where
+  -- Type synonyms specialized for location types
+  , CellFor
+  , ConfigurationFor
+  , EnvironmentFor
+  , ExportsFor
+  , HeapFor
+  , LiveFor
+  , LocationFor
+  ) where
 
+import Control.Effect
+import Control.Monad.Effect.Resumable
 import Data.Abstract.Address
 import Data.Abstract.Configuration
 import qualified Data.Abstract.Environment as Env
 import qualified Data.Abstract.Exports as Export
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
+import Data.Abstract.Live
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
-import Data.Abstract.Value
 import Data.Semigroup.Reducer
-import Prologue
+import Prologue hiding (throwError)
 
 -- | A 'Monad' providing the basic essentials for evaluation.
 --
@@ -168,5 +178,32 @@ class Monad m => MonadControl term m where
   -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
   goto :: Label -> m term
 
+
+-- | 'Monad's which can throw exceptions of type @exc v@ which can be resumed with a value of type @v@.
 class Monad m => MonadThrow exc m where
   throwException :: exc v -> m v
+
+instance (Effectful m, Members '[Resumable exc] effects, Monad (m effects)) => MonadThrow exc (m effects) where
+  throwException = raise . throwError
+
+
+-- | The cell for an abstract value type.
+type CellFor value = Cell (LocationFor value) value
+
+-- | The configuration for term and abstract value types.
+type ConfigurationFor term value = Configuration (LocationFor value) term value
+
+-- | The environment for an abstract value type.
+type EnvironmentFor value = Env.Environment (LocationFor value) value
+
+-- | The exports for an abstract value type.
+type ExportsFor value = Export.Exports (LocationFor value) value
+
+-- | The 'Heap' for an abstract value type.
+type HeapFor value = Heap (LocationFor value) value
+
+-- | The address set type for an abstract value type.
+type LiveFor value = Live (LocationFor value) value
+
+-- | The location type (the body of 'Address'es) which should be used for an abstract value type.
+type family LocationFor value :: *
