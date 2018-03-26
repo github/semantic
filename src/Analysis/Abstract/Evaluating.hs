@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, Rank2Types, ScopedTypeVariables,
-             StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+             StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Analysis.Abstract.Evaluating
 ( type Evaluating

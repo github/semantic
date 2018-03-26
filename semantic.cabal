@@ -197,6 +197,7 @@ library
                      , RecordWildCards
                      , StandaloneDeriving
                      , StrictData
+                     , TypeApplications
   ghc-options:         -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O -j
   ghc-prof-options:    -fprof-auto
 
@@ -273,6 +274,7 @@ test-suite test
                      , OverloadedStrings
                      , RecordWildCards
                      , StandaloneDeriving
+                     , TypeApplications
 
 test-suite doctests
   type:                exitcode-stdio-1.0
