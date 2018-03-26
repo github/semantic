@@ -28,7 +28,7 @@ library
                      , Analysis.Decorator
                      , Analysis.Declaration
                      , Analysis.IdentifierName
-                     , Analysis.ModuleDef
+                     , Analysis.PackageDef
                      -- Semantic assignment
                      , Assigning.Assignment
                      , Assigning.Assignment.Table
