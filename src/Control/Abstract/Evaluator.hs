@@ -169,7 +169,7 @@ modifyModuleTable f = do
 
 
 -- | A 'Monad' abstracting jumps in imperative control.
-class Monad m => MonadControl term m | m -> term where
+class Monad m => MonadControl term m where
   -- | Allocate a 'Label' for the given @term@.
   --
   --   Labels must be allocated before being jumped to with 'goto', but are suitable for nonlocal jumps; thus, they can be used to implement coroutines, exception handling, call with current continuation, and other esoteric control mechanisms.
