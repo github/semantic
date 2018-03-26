@@ -159,7 +159,7 @@ instance Show1 Field where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Field
 instance Evaluatable Field
 
--- | A field declaration in a Go struct type declaration.
+
 data Package a = Package { packageName :: !a, packageContents :: ![a] }
   deriving (Diffable, Eq, FreeVariables1, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
@@ -169,6 +169,7 @@ instance Show1 Package where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Package where
   eval (Package _ xs) = eval xs
+  
 
 -- | A type assertion in Go (e.g. `x.(T)` where the value of `x` is not nil and is of type `T`).
 data TypeAssertion a = TypeAssertion { typeAssertionSubject :: !a, typeAssertionType :: !a }
