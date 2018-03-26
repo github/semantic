@@ -227,7 +227,7 @@ instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
     pure (injValue (Namespace n (env' <> env)))
     where asNamespaceEnv v
             | Just (Namespace _ env') <- prjValue v = pure env'
-            | otherwise                             = fail ("expected " <> show v <> " to be a namespace")
+            | otherwise                             = throwException $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
   scopedEnvironment o
     | Just (Class _ env) <- prjValue o = pure env
