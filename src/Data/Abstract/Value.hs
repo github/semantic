@@ -239,15 +239,15 @@ instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
     | otherwise = fail ("Invalid operand to liftNumeric: " <> show arg)
 
   liftNumeric2 f left right
-    | Just (Integer i, Integer j)   <- prjPair pair = f i j & specialize
-    | Just (Integer i, Rational j)  <- prjPair pair = f i j & specialize
-    | Just (Integer i, Float j)     <- prjPair pair = f i j & specialize
+    | Just (Integer  i, Integer j)  <- prjPair pair = f i j & specialize
+    | Just (Integer  i, Rational j) <- prjPair pair = f i j & specialize
+    | Just (Integer  i, Float j)    <- prjPair pair = f i j & specialize
     | Just (Rational i, Integer j)  <- prjPair pair = f i j & specialize
     | Just (Rational i, Rational j) <- prjPair pair = f i j & specialize
     | Just (Rational i, Float j)    <- prjPair pair = f i j & specialize
-    | Just (Float i, Integer j)     <- prjPair pair = f i j & specialize
-    | Just (Float i, Rational j)    <- prjPair pair = f i j & specialize
-    | Just (Float i, Float j)       <- prjPair pair = f i j & specialize
+    | Just (Float    i, Integer j)  <- prjPair pair = f i j & specialize
+    | Just (Float    i, Rational j) <- prjPair pair = f i j & specialize
+    | Just (Float    i, Float j)    <- prjPair pair = f i j & specialize
     | otherwise = fail ("Invalid operands to liftNumeric2: " <> show pair)
       where
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
@@ -259,12 +259,12 @@ instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
 
   liftComparison comparator left right
     | Just (Integer (Number.Integer i), Integer (Number.Integer j)) <- prjPair pair = go i j
-    | Just (Integer (Number.Integer i), Float (Number.Decimal j))          <- prjPair pair = go (fromIntegral i) j
-    | Just (Float (Number.Decimal i), Integer (Number.Integer j))          <- prjPair pair = go i (fromIntegral j)
-    | Just (Float (Number.Decimal i), Float (Number.Decimal j))                   <- prjPair pair = go i j
-    | Just (String i, String j)                                     <- prjPair pair = go i j
-    | Just (Boolean i, Boolean j)                                               <- prjPair pair = go i j
-    | Just (Unit, Unit)                                             <- prjPair pair = boolean True
+    | Just (Integer (Number.Integer i), Float   (Number.Decimal j)) <- prjPair pair = go (fromIntegral i) j
+    | Just (Float   (Number.Decimal i), Integer (Number.Integer j)) <- prjPair pair = go i                (fromIntegral j)
+    | Just (Float   (Number.Decimal i), Float   (Number.Decimal j)) <- prjPair pair = go i j
+    | Just (String  i,                  String  j)                  <- prjPair pair = go i j
+    | Just (Boolean i,                  Boolean j)                  <- prjPair pair = go i j
+    | Just (Unit,                       Unit)                       <- prjPair pair = boolean True
     | otherwise = fail ("Type error: invalid arguments to liftComparison: " <> show pair)
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
