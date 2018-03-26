@@ -179,6 +179,7 @@ class Monad m => MonadControl term m where
   goto :: Label -> m term
 
 
+-- | 'Monad's which can throw exceptions of type @exc v@ which can be resumed with a value of type @v@.
 class Monad m => MonadThrow exc m where
   throwException :: exc v -> m v
 
