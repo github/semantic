@@ -84,18 +84,17 @@ evaluateWith :: forall value term effects
                 , Recursive term
                 , Show (LocationFor value)
                 )
-         => term
-         -> term
+         => Module term
+         -> Module term
          -> Final effects value
-evaluateWith prelude t = runAnalysis @(Evaluating term value) $ do
-  -- evaluateTerm here rather than evaluateModule
+evaluateWith prelude m = runAnalysis @(Evaluating term value) $ do
   -- TODO: we could add evaluatePrelude to MonadAnalysis as an alias for evaluateModule,
   -- overridden in Evaluating to not reset the environment. In the future we'll want the
   -- result of evaluating the Prelude to be a build artifact, rather than something that's
   -- evaluated every single time, but that's contingent upon a whole lot of other future
   -- scaffolding.
-  preludeEnv <- evaluateTerm prelude *> getEnv
-  withDefaultEnvironment preludeEnv (evaluateModule t)
+  preludeEnv <- evaluateModule prelude *> getEnv
+  withDefaultEnvironment preludeEnv (evaluateModule m)
 
 evaluateWithPrelude :: forall term effects
                     .  ( Evaluatable (Base term)
@@ -111,9 +110,9 @@ evaluateWithPrelude :: forall term effects
                     -> IO (Final effects Value)
 evaluateWithPrelude parser path = do
   let preludePath = TypeLevel.symbolVal (Proxy :: Proxy (PreludePath term))
-  prelude <- parseFile parser preludePath
-  blob <- parseFile parser path
-  pure $ evaluateWith (snd prelude) (snd blob)
+  prelude <- parseFile parser Nothing preludePath
+  m <- parseFile parser Nothing path
+  pure $ evaluateWith prelude m
 
 
 -- Evaluate a list of files (head of file list is considered the entry point).
@@ -140,13 +139,13 @@ evaluatesWith :: forall value term effects
                  , Recursive term
                  , Show (LocationFor value)
                  )
-              => term           -- ^ Prelude to evaluate once
-              -> [(Blob, term)] -- ^ List of (blob, term) pairs that make up the program to be evaluated
-              -> (Blob, term)   -- ^ Entrypoint
+              => Module term   -- ^ Prelude to evaluate once
+              -> [Module term] -- ^ List of (blob, term) pairs that make up the program to be evaluated
+              -> Module term   -- ^ Entrypoint
               -> Final effects value
-evaluatesWith prelude pairs (b, t)  = runAnalysis @(Evaluating term value) $ do
-  preludeEnv <- evaluateTerm prelude *> getEnv
-  withDefaultEnvironment preludeEnv (withModules b pairs (evaluateModule t))
+evaluatesWith prelude modules m  = runAnalysis @(Evaluating term value) $ do
+  preludeEnv <- evaluateModule prelude *> getEnv
+  withDefaultEnvironment preludeEnv (withModules modules (evaluateModule m))
 
 evaluateFilesWithPrelude :: forall term effects
                          .  ( Evaluatable (Base term)
@@ -162,9 +161,9 @@ evaluateFilesWithPrelude :: forall term effects
                          -> IO (Final effects Value)
 evaluateFilesWithPrelude parser paths = do
   let preludePath = TypeLevel.symbolVal (Proxy :: Proxy (PreludePath term))
-  prelude <- parseFile parser preludePath
-  entry:xs <- traverse (parseFile parser) paths
-  pure $ evaluatesWith @Value (snd prelude) xs entry
+  prelude <- parseFile parser Nothing preludePath
+  entry:xs <- traverse (parseFile parser Nothing) paths
+  pure $ evaluatesWith @Value prelude xs entry
 
 -- Read and parse a file.
 parseFile :: Parser term -> Maybe FilePath -> FilePath -> IO (Module term)
