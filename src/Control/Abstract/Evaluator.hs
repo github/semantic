@@ -6,6 +6,7 @@ module Control.Abstract.Evaluator
   , modifyExports
   , addExport
   , MonadHeap(..)
+  , fullEnvironment
   , modifyHeap
   , localize
   , lookupHeap
@@ -59,6 +60,13 @@ class Monad m => MonadEnvironment value m | m -> value where
   -- | Sets the environment for the lifetime of the given action.
   withEnv :: EnvironmentFor value -> m a -> m a
 
+  -- | Retrieve the default environment.
+  defaultEnvironment :: m (EnvironmentFor value)
+
+  -- | Set the default environment for the lifetime of an action.
+  --   Usually only invoked in a top-level evaluation function.
+  withDefaultEnvironment :: EnvironmentFor value -> m a -> m a
+
   -- | Get the global export state.
   getExports :: m (ExportsFor value)
   -- | Set the global export state.
@@ -69,9 +77,9 @@ class Monad m => MonadEnvironment value m | m -> value where
   -- | Run an action with a locally-modified environment.
   localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m a -> m a
 
-  -- | Look a 'Name' up in the environment.
+  -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
   lookupEnv :: Name -> m (Maybe (Address (LocationFor value) value))
-  lookupEnv name = Env.lookup name <$> getEnv
+  lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
 
   -- | Look up a 'Name' in the environment, running an action with the resolved address (if any).
   lookupWith :: (Address (LocationFor value) value -> m value) -> Name -> m (Maybe value)
@@ -98,6 +106,11 @@ modifyExports f = do
 -- | Add an export to the global export state.
 addExport :: MonadEnvironment value m => Name -> Name -> Maybe (Address (LocationFor value) value) -> m ()
 addExport name alias = modifyExports . Export.insert name alias
+
+-- | Obtain an environment that is the composition of the current and default environments.
+--   Useful for debugging.
+fullEnvironment :: MonadEnvironment value m => m (EnvironmentFor value)
+fullEnvironment = mappend <$> getEnv <*> defaultEnvironment
 
 -- | A 'Monad' abstracting a heap of values.
 class Monad m => MonadHeap value m | m -> value where

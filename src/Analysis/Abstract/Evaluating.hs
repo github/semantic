@@ -79,14 +79,15 @@ deriving instance Member NonDet    effects => MonadNonDet (Evaluating term value
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value
   = '[ Resumable Prelude.String value
-     , Fail                                        -- Failure with an error message
-     , Reader [Module term]                        -- The stack of currently-evaluating modules.
-     , State  (EnvironmentFor value)               -- Environments (both local and global)
-     , State  (HeapFor value)                      -- The heap
+     , Fail                                               -- Failure with an error message
+     , Reader [Module term]                               -- The stack of currently-evaluating modules.
+     , State  (EnvironmentFor value)                      -- Environments (both local and global)
+     , State  (HeapFor value)                             -- The heap
      , Reader (ModuleTable [Module term])                 -- Cache of unevaluated modules
+     , Reader (EnvironmentFor value)                      -- Default environment used as a fallback in lookupEnv
      , State  (ModuleTable (EnvironmentFor value, value)) -- Cache of evaluated modules
-     , State  (ExportsFor value)                   -- Exports (used to filter environments when they are imported)
-     , State  (IntMap.IntMap term)                 -- For jumps
+     , State  (ExportsFor value)                          -- Exports (used to filter environments when they are imported)
+     , State  (IntMap.IntMap term)                        -- For jumps
      ]
 
 -- | Find the value in the 'Final' result of running.
@@ -117,10 +118,16 @@ instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl ter
 
   goto label = IntMap.lookup label <$> raise get >>= maybe (fail ("unknown label: " <> show label)) pure
 
-instance Members '[State (ExportsFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
+instance Members '[ State (ExportsFor value)
+                  , State (EnvironmentFor value)
+                  , Reader (EnvironmentFor value)
+                  ] effects => MonadEnvironment value (Evaluating term value effects) where
   getEnv = raise get
   putEnv = raise . put
   withEnv s = raise . localState s . lower
+
+  defaultEnvironment = raise ask
+  withDefaultEnvironment e = raise . local (const e) . lower
 
   getExports = raise get
   putExports = raise . put
