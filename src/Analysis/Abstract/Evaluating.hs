@@ -1,4 +1,6 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, Rank2Types, ScopedTypeVariables,
+             StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Analysis.Abstract.Evaluating
 ( type Evaluating
 , findValue
@@ -8,24 +10,24 @@ module Analysis.Abstract.Evaluating
 , load
 ) where
 
-import Control.Abstract.Evaluator
-import Control.Monad.Effect
-import Control.Monad.Effect.Resumable
-import Data.Abstract.Configuration
+import           Control.Abstract.Evaluator
+import           Control.Monad.Effect
+import           Control.Monad.Effect.Resumable
+import           Data.Abstract.Configuration
+import           Data.Abstract.Environment (Environment)
 import qualified Data.Abstract.Environment as Env
-import Data.Abstract.Environment (Environment)
-import Data.Abstract.Heap (Heap(..))
+import           Data.Abstract.Evaluatable
+import           Data.Abstract.Exports (Exports)
 import qualified Data.Abstract.Exports as Export
-import Data.Abstract.Exports (Exports)
-import Data.Abstract.Evaluatable
-import Data.Abstract.Module
-import Data.Abstract.ModuleTable
-import Data.Abstract.Value
-import qualified Data.IntMap as IntMap
-import Prelude hiding (fail)
-import Prologue hiding (throwError)
+import           Data.Abstract.Heap
+import           Data.Abstract.Module
+import           Data.Abstract.ModuleTable
+import           Data.Abstract.Value
 import qualified Data.ByteString.Char8 as BC
+import qualified Data.IntMap as IntMap
 import qualified Data.Map.Monoidal as Monoidal
+import           Prelude hiding (fail)
+import           Prologue hiding (throwError)
 
 -- | Require/import another module by name and return it's environment and value.
 --
@@ -78,7 +80,8 @@ deriving instance Member NonDet    effects => MonadNonDet (Evaluating term value
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value
-  = '[ Resumable Prelude.String value
+  = '[ Resumable ValueExc
+     , Resumable (Unspecialized value)
      , Fail                                               -- Failure with an error message
      , Reader [Module term]                               -- The stack of currently-evaluating modules.
      , State  (EnvironmentFor value)                      -- Environments (both local and global)
@@ -91,8 +94,8 @@ type EvaluatingEffects term value
      ]
 
 -- | Find the value in the 'Final' result of running.
-findValue :: forall value term effects . (effects ~ RequiredEffects term value (Evaluating term value effects))
-          => Final effects value -> Either Prelude.String (Either Prelude.String value)
+findValue :: forall value term effects. (effects ~ RequiredEffects term value (Evaluating term value effects))
+          => Final effects value -> Either Prelude.String (Either (SomeExc (Unspecialized value)) (Either (SomeExc ValueExc) value))
 findValue (((((v, _), _), _), _), _) = v
 
 -- | Find the 'Environment' in the 'Final' result of running.
@@ -106,7 +109,11 @@ findHeap :: forall value term effects . (effects ~ RequiredEffects term value (E
 findHeap (((((_, _), Heap heap), _), _), _) = heap
 
 
-instance Members '[Resumable Prelude.String value] effects => MonadThrow Prelude.String value (Evaluating term value effects) where
+resumeException :: forall exc m e a. (Effectful m, Resumable exc :< e) => m e a -> (forall v. (v -> m e a) -> exc v -> m e a) -> m e a
+resumeException m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
+
+
+instance (Monad (m effects), Effectful m, Members '[Resumable exc] effects) => MonadThrow exc (m effects) where
    throwException = raise . throwError
 
 instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl term (Evaluating term value effects) where
@@ -165,7 +172,7 @@ instance ( Evaluatable (Base term)
          => MonadAnalysis term value (Evaluating term value effects) where
   type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
 
-  analyzeTerm term = resumeException @value (eval term) (\yield exc -> string (BC.pack exc) >>= yield)
+  analyzeTerm term = resumeException @(Unspecialized value) (eval term) (\yield (Unspecialized str) -> string (BC.pack str) >>= yield)
 
   analyzeModule m = pushModule (subterm <$> m) (subtermValue (moduleBody m))
 
