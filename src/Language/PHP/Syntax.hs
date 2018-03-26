@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveAnyClass, ViewPatterns #-}
 module Language.PHP.Syntax where
 
-import Analysis.Abstract.Evaluating
 import Data.Abstract.Evaluatable
 import Data.Abstract.Environment as Env
 import Data.Abstract.Path
@@ -35,14 +34,14 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
-doInclude :: (MonadValue value m, MonadAnalysis term value m) => Subterm t (m value) -> m value
+doInclude :: MonadEvaluatable term value m => Subterm t (m value) -> m value
 doInclude path = do
   name <- toQualifiedName <$> (subtermValue path >>= asString)
   (importedEnv, v) <- isolate (load name)
   modifyEnv (mappend importedEnv)
   pure v
 
-doIncludeOnce :: (MonadValue value m, MonadAnalysis term value m) => Subterm t (m value) -> m value
+doIncludeOnce :: MonadEvaluatable term value m => Subterm t (m value) -> m value
 doIncludeOnce path = do
   name <- toQualifiedName <$> (subtermValue path >>= asString)
   (importedEnv, v) <- isolate (require name)

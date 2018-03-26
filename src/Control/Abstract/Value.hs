@@ -1,18 +1,27 @@
-{-# LANGUAGE GADTs, MultiParamTypeClasses, Rank2Types, StandaloneDeriving, TypeFamilies, TypeOperators,
-             UndecidableInstances #-}
-module Control.Abstract.Value where
+{-# LANGUAGE GADTs, MultiParamTypeClasses, Rank2Types, TypeFamilies, TypeOperators, UndecidableInstances #-}
+module Control.Abstract.Value
+( MonadValue(..)
+, Comparator(..)
+, while
+, doWhile
+, forLoop
+, toBool
+, ValueRoots(..)
+, ValueExc(..)
+, EnvironmentFor
+, ExportsFor
+, HeapFor
+, CellFor
+, LiveFor
+, LocationFor
+, ConfigurationFor
+) where
 
-import           Control.Abstract.Addressable
-import           Control.Abstract.Analysis
-import qualified Data.Abstract.Environment as Env
-import           Data.Abstract.FreeVariables
-import           Data.Abstract.Number as Number
-import           Data.Abstract.Type as Type
-import           Data.Abstract.Value as Value
-import           Data.Scientific (Scientific)
-import qualified Data.Set as Set
-import           Prelude hiding (fail)
-import           Prologue
+import Control.Abstract.Evaluator
+import Data.Abstract.FreeVariables
+import Data.Abstract.Number as Number
+import Data.Scientific (Scientific)
+import Prologue
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
 --   have built-in generalized-comparison ("spaceship") operators. If you want to
@@ -96,6 +105,9 @@ class (Monad m, Show value) => MonadValue value m where
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: value -> m a -> m a -> m a
 
+  -- | Construct the nil/null datatype.
+  null :: m value
+
   -- | Build a class value from a name and environment.
   klass :: Name                 -- ^ The new class's identifier
         -> [value]              -- ^ A list of superclasses
@@ -155,208 +167,22 @@ doWhile body cond = loop $ \ continue -> body *> do
   ifthenelse this continue unit
 
 
+-- | Value types, e.g. closures, which can root a set of addresses.
+class ValueRoots value where
+  -- | Compute the set of addresses rooted by a given value.
+  valueRoots :: value -> LiveFor value
+
+
 -- The type of exceptions that can be thrown when constructing values in `MonadValue`.
-data ValueExc v where
-  ValueExc :: Prelude.String -> ValueExc Value
-  StringExc :: Prelude.String -> ValueExc ByteString
+data ValueExc value resume where
+  ValueExc :: Prelude.String -> ValueExc value value
+  StringExc :: Prelude.String -> ValueExc value ByteString
 
-instance Eq1 ValueExc where
-  liftEq _ (ValueExc a) (ValueExc b)   = a == b
+instance Eq1 (ValueExc value) where
+  liftEq _ (ValueExc a)  (ValueExc b)  = a == b
   liftEq _ (StringExc a) (StringExc b) = a == b
-  liftEq _ _ _                         = False
+  liftEq _ _             _             = False
 
-deriving instance Show (ValueExc v)
-instance Show1 ValueExc where
+deriving instance Show (ValueExc value resume)
+instance Show1 (ValueExc value) where
   liftShowsPrec _ _ = showsPrec
-
--- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Monad m
-         , MonadAddressable location Value m
-         , MonadAnalysis term Value m
-         , MonadThrow ValueExc m
-         )
-         => MonadValue Value m where
-
-  unit     = pure . injValue $ Value.Unit
-  integer  = pure . injValue . Value.Integer . Number.Integer
-  boolean  = pure . injValue . Boolean
-  string   = pure . injValue . Value.String
-  float    = pure . injValue . Value.Float . Decimal
-  symbol   = pure . injValue . Value.Symbol
-  rational = pure . injValue . Value.Rational . Ratio
-
-  multiple = pure . injValue . Value.Tuple
-  array    = pure . injValue . Value.Array
-
-  kvPair k = pure . injValue . Value.KVPair k
-
-  asPair k
-    | Just (Value.KVPair k v) <- prjValue k = pure (k, v)
-    | otherwise = fail ("expected key-value pair, got " <> show k)
-
-  hash = pure . injValue . Value.Hash . fmap (injValue . uncurry Value.KVPair)
-
-  klass n [] env = pure . injValue $ Class n env
-  klass n supers env = do
-    product <- mconcat <$> traverse scopedEnvironment supers
-    pure . injValue $ Class n (Env.push product <> env)
-
-  namespace n env = do
-    maybeAddr <- lookupEnv n
-    env' <- maybe (pure mempty) (asNamespaceEnv <=< deref) maybeAddr
-    pure (injValue (Namespace n (env' <> env)))
-    where asNamespaceEnv v
-            | Just (Namespace _ env') <- prjValue v = pure env'
-            | otherwise                             = fail ("expected " <> show v <> " to be a namespace")
-
-  scopedEnvironment o
-    | Just (Class _ env) <- prjValue o = pure env
-    | Just (Namespace _ env) <- prjValue o = pure env
-    | otherwise = fail ("object type passed to scopedEnvironment doesn't have an environment: " <> show o)
-
-  asString v
-    | Just (Value.String n) <- prjValue v = pure n
-    | otherwise                           = throwException (StringExc ("expected " <> show v <> " to be a string"))
-
-  ifthenelse cond if' else'
-    | Just (Boolean b) <- prjValue cond = if b then if' else else'
-    | otherwise = fail ("not defined for non-boolean conditions: " <> show cond)
-
-  liftNumeric f arg
-    | Just (Value.Integer (Number.Integer i)) <- prjValue arg = integer $ f i
-    | Just (Value.Float (Decimal d))          <- prjValue arg = float   $ f d
-    | Just (Value.Rational (Ratio r))         <- prjValue arg = rational $ f r
-    | otherwise = fail ("Invalid operand to liftNumeric: " <> show arg)
-
-  liftNumeric2 f left right
-    | Just (Value.Integer i, Value.Integer j)   <- prjPair pair = f i j & specialize
-    | Just (Value.Integer i, Value.Rational j)  <- prjPair pair = f i j & specialize
-    | Just (Value.Integer i, Value.Float j)     <- prjPair pair = f i j & specialize
-    | Just (Value.Rational i, Value.Integer j)  <- prjPair pair = f i j & specialize
-    | Just (Value.Rational i, Value.Rational j) <- prjPair pair = f i j & specialize
-    | Just (Value.Rational i, Value.Float j)    <- prjPair pair = f i j & specialize
-    | Just (Value.Float i, Value.Integer j)     <- prjPair pair = f i j & specialize
-    | Just (Value.Float i, Value.Rational j)    <- prjPair pair = f i j & specialize
-    | Just (Value.Float i, Value.Float j)       <- prjPair pair = f i j & specialize
-    | otherwise = fail ("Invalid operands to liftNumeric2: " <> show pair)
-      where
-        -- Dispatch whatever's contained inside a 'SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: MonadValue value m => SomeNumber -> m value
-        specialize (SomeNumber (Number.Integer i)) = integer i
-        specialize (SomeNumber (Ratio r))          = rational r
-        specialize (SomeNumber (Decimal d))        = float d
-        pair = (left, right)
-
-  liftComparison comparator left right
-    | Just (Value.Integer (Number.Integer i), Value.Integer (Number.Integer j)) <- prjPair pair = go i j
-    | Just (Value.Integer (Number.Integer i), Value.Float (Decimal j))          <- prjPair pair = go (fromIntegral i) j
-    | Just (Value.Float (Decimal i), Value.Integer (Number.Integer j))          <- prjPair pair = go i (fromIntegral j)
-    | Just (Value.Float (Decimal i), Value.Float (Decimal j))                   <- prjPair pair = go i j
-    | Just (Value.String i, Value.String j)                                     <- prjPair pair = go i j
-    | Just (Boolean i, Boolean j)                                               <- prjPair pair = go i j
-    | Just (Value.Unit, Value.Unit)                                             <- prjPair pair = boolean True
-    | otherwise = fail ("Type error: invalid arguments to liftComparison: " <> show pair)
-      where
-        -- Explicit type signature is necessary here because we're passing all sorts of things
-        -- to these comparison functions.
-        go :: (Ord a, MonadValue value m) => a -> a -> m value
-        go l r = case comparator of
-          Concrete f  -> boolean (f l r)
-          Generalized -> integer (orderingToInt (compare l r))
-
-        -- Map from [LT, EQ, GT] to [-1, 0, 1]
-        orderingToInt :: Ordering -> Prelude.Integer
-        orderingToInt = toInteger . pred . fromEnum
-
-        pair = (left, right)
-
-
-  liftBitwise operator target
-    | Just (Value.Integer (Number.Integer i)) <- prjValue target = integer $ operator i
-    | otherwise = fail ("Type error: invalid unary bitwise operation on " <> show target)
-
-  liftBitwise2 operator left right
-    | Just (Value.Integer (Number.Integer i), Value.Integer (Number.Integer j)) <- prjPair pair = integer $ operator i j
-    | otherwise = fail ("Type error: invalid binary bitwise operation on " <> show pair)
-      where pair = (left, right)
-
-  abstract names (Subterm body _) = do
-    l <- label body
-    injValue . Closure names l . Env.bind (foldr Set.delete (Set.fromList (freeVariables body)) names) <$> getEnv
-
-  apply op params = do
-    Closure names label env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
-    bindings <- foldr (\ (name, param) rest -> do
-      v <- param
-      a <- alloc name
-      assign a v
-      Env.insert name a <$> rest) (pure env) (zip names params)
-    localEnv (mappend bindings) (goto label >>= evaluateTerm)
-
-  loop = fix
-
--- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, MonadHeap Type m) => MonadValue Type m where
-  abstract names (Subterm _ body) = do
-    (env, tvars) <- foldr (\ name rest -> do
-      a <- alloc name
-      tvar <- Var <$> fresh
-      assign a tvar
-      (env, tvars) <- rest
-      pure (Env.insert name a env, tvar : tvars)) (pure mempty) names
-    ret <- localEnv (mappend env) body
-    pure (Product tvars :-> ret)
-
-  unit       = pure Type.Unit
-  integer _  = pure Int
-  boolean _  = pure Bool
-  string _   = pure Type.String
-  float _    = pure Type.Float
-  symbol _   = pure Type.Symbol
-  rational _ = pure Type.Rational
-  multiple   = pure . Type.Product
-  array      = pure . Type.Array
-  hash       = pure . Type.Hash
-  kvPair k v = pure (Product [k, v])
-
-  klass _ _ _   = pure Object
-  namespace _ _ = pure Type.Unit
-
-  scopedEnvironment _ = pure mempty
-
-  asString _ = fail "Must evaluate to Value to use asString"
-  asPair _   = fail "Must evaluate to Value to use asPair"
-
-  ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
-
-  liftNumeric _ Type.Float = pure Type.Float
-  liftNumeric _ Int        = pure Int
-  liftNumeric _ _          = fail "Invalid type in unary numeric operation"
-
-  liftNumeric2 _ left right = case (left, right) of
-    (Type.Float, Int) -> pure Type.Float
-    (Int, Type.Float) -> pure Type.Float
-    _                 -> unify left right
-
-  liftBitwise _ Int = pure Int
-  liftBitwise _ t   = fail ("Invalid type passed to unary bitwise operation: " <> show t)
-
-  liftBitwise2 _ Int Int = pure Int
-  liftBitwise2 _ t1 t2   = fail ("Invalid types passed to binary bitwise operation: " <> show (t1, t2))
-
-  liftComparison (Concrete _) left right = case (left, right) of
-    (Type.Float, Int) ->                     pure Bool
-    (Int, Type.Float) ->                     pure Bool
-    _                 -> unify left right $> Bool
-  liftComparison Generalized left right = case (left, right) of
-    (Type.Float, Int) ->                     pure Int
-    (Int, Type.Float) ->                     pure Int
-    _                 -> unify left right $> Bool
-
-  apply op params = do
-    tvar <- fresh
-    paramTypes <- sequenceA params
-    _ :-> ret <- op `unify` (Product paramTypes :-> Var tvar)
-    pure ret
-
-  loop f = f empty

@@ -1,13 +1,10 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.Ruby.Syntax where
 
-import Analysis.Abstract.Evaluating
 import Control.Monad (unless)
-import Control.Abstract.Value (MonadValue)
 import Data.Abstract.Evaluatable
 import Data.Abstract.ModuleTable
 import Data.Abstract.Path
-import Data.Abstract.Value (EnvironmentFor)
 import Diffing.Algorithm
 import Prelude hiding (fail)
 import Prologue
@@ -28,7 +25,7 @@ instance Evaluatable Require where
     where
       toName = qualifiedName . splitOnPathSeparator . dropRelativePrefix . stripQuotes
 
-doRequire :: (MonadAnalysis term value m, MonadValue value m)
+doRequire :: MonadEvaluatable term value m
           => ModuleName
           -> m (EnvironmentFor value, value)
 doRequire name = do
@@ -55,7 +52,7 @@ instance Evaluatable Load where
     doLoad path shouldWrap
   eval (Load _) = fail "invalid argument supplied to load, path is required"
 
-doLoad :: (MonadAnalysis term value m, MonadValue value m) => ByteString -> Bool -> m value
+doLoad :: MonadEvaluatable term value m => ByteString -> Bool -> m value
 doLoad path shouldWrap = do
   (importedEnv, _) <- isolate (load (toName path))
   unless shouldWrap $ modifyEnv (mappend importedEnv)

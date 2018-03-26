@@ -18,8 +18,9 @@ library
                        Analysis.Abstract.Caching
                      , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
-                     , Analysis.Abstract.ImportGraph
                      , Analysis.Abstract.Evaluating
+                     , Analysis.Abstract.ImportGraph
+                     , Analysis.Abstract.Quiet
                      , Analysis.Abstract.Tracing
                      , Analysis.CallGraph
                      , Analysis.ConstructorName
