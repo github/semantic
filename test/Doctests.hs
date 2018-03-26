@@ -24,4 +24,5 @@ extensions =
   , "RecordWildCards"
   , "StandaloneDeriving"
   , "StrictData"
+  , "TypeApplications"
   ]
