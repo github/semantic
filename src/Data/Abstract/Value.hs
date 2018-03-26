@@ -23,6 +23,7 @@ type ValueConstructors
     , Integer
     , KVPair
     , Namespace
+    , Null
     , Rational
     , String
     , Symbol
@@ -175,6 +176,13 @@ instance Eq1 Hash where liftEq = genericLiftEq
 instance Ord1 Hash where liftCompare = genericLiftCompare
 instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
 
+data Null value = Null
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Null where liftEq = genericLiftEq
+instance Ord1 Null where liftCompare = genericLiftCompare
+instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
+
 
 type instance LocationFor Value = Precise
 
@@ -198,6 +206,8 @@ instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
   array    = pure . injValue . Array
 
   kvPair k = pure . injValue . KVPair k
+
+  null     = pure . injValue $ Null
 
   asPair k
     | Just (KVPair k v) <- prjValue k = pure (k, v)

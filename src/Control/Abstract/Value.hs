@@ -105,6 +105,9 @@ class (Monad m, Show value) => MonadValue value m where
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: value -> m a -> m a -> m a
 
+  -- | Construct the nil/null datatype.
+  null :: m value
+
   -- | Build a class value from a name and environment.
   klass :: Name                 -- ^ The new class's identifier
         -> [value]              -- ^ A list of superclasses
