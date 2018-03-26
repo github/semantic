@@ -23,14 +23,18 @@ spec = parallel $ do
                         , (qualifiedName ["foo"], addr 3) ]
       env `shouldBe` expectedEnv
 
-    it "load wrap" $ do
+    it "evalutes load with wrapper" $ do
       res <- evaluate "load-wrap.rb"
       findValue res `shouldBe` Left "free variable: \"foo\""
       findEnv res `shouldBe` [(qualifiedName ["Object"], addr 0)]
 
-    it "subclass" $ do
+    it "evalutes subclass" $ do
       res <- findValue <$> evaluate "subclass.rb"
       res `shouldBe` Right (Right (Right (injValue (String "\"<bar>\""))))
+
+    it "evaluates modules" $ do
+      res <- findValue <$> evaluate "modules.rb"
+      res `shouldBe` Right (Right (Right (injValue (String "\"<hello>\""))))
 
     it "has prelude" $ do
       res <- findValue <$> evaluate "preluded.rb"
