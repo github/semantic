@@ -2,8 +2,8 @@
 module Data.Abstract.Evaluatable
 ( module X
 , MonadEvaluatable
-, Unspecialized(..)
 , Evaluatable(..)
+, Unspecialized(..)
 , evaluateTerm
 , evaluateModule
 , withModules
