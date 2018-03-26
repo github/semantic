@@ -62,6 +62,22 @@ doLoad path shouldWrap = do
 
 -- TODO: autoload
 
+data Class a = Class { classIdentifier :: !a, classSuperClasses :: ![a], classBody :: !a }
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Diffable Class where
+  equivalentBySubterm = Just . classIdentifier
+
+instance Eq1 Class where liftEq = genericLiftEq
+instance Ord1 Class where liftCompare = genericLiftCompare
+instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Class where
+  eval Class{..} = do
+    supers <- traverse subtermValue classSuperClasses
+    letrec' name $ \addr ->
+      subtermValue classBody <* makeNamespace name addr supers
+    where name = freeVariable (subterm classIdentifier)
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -72,5 +88,5 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
   eval (Module iden xs) = letrec' name $ \addr ->
-    eval xs <* makeNamespace name addr
+    eval xs <* makeNamespace name addr []
     where name = freeVariable (subterm iden)

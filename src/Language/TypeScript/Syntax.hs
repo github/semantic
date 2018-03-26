@@ -397,7 +397,7 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
   eval (Module iden xs) = letrec' name $ \addr ->
-    eval xs <* makeNamespace name addr
+    eval xs <* makeNamespace name addr []
     where name = freeVariable (subterm iden)
 
 data InternalModule a = InternalModule { internalModuleIdentifier :: !a, internalModuleStatements :: ![a] }
@@ -409,7 +409,7 @@ instance Show1 InternalModule where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable InternalModule where
   eval (InternalModule iden xs) = letrec' name $ \addr ->
-    eval xs <* makeNamespace name addr
+    eval xs <* makeNamespace name addr []
     where name = freeVariable (subterm iden)
 
 

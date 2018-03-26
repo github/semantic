@@ -179,10 +179,12 @@ makeNamespace :: ( MonadValue value m
                  )
               => Name
               -> Address (LocationFor value) value
+              -> [value]
               -> m value
-makeNamespace name addr = do
+makeNamespace name addr supers = do
+  superEnv <- mconcat <$> traverse scopedEnvironment supers
   namespaceEnv <- Env.head <$> getEnv
-  v <- namespace name namespaceEnv
+  v <- namespace name (Env.overwritingUnion superEnv namespaceEnv)
   v <$ assign addr v
 
 
