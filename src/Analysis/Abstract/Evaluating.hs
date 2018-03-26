@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables,
              StandaloneDeriving, TypeApplications, TypeFamilies, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating
-( type Evaluating
+( Evaluating
 , findValue
 , findEnv
 , findHeap
