@@ -26,6 +26,8 @@ instance ( Effectful (m term value)
          => MonadEvaluator term value (Collecting m term value effects) where
   getConfiguration term = Configuration term <$> askRoots <*> getEnv <*> getHeap
 
+  askModuleStack = Collecting askModuleStack
+
 
 instance ( Effectful (m term value)
          , Foldable (Cell (LocationFor value))
@@ -45,6 +47,8 @@ instance ( Effectful (m term value)
     v <- liftAnalyze analyzeTerm term
     modifyHeap (gc (roots <> valueRoots v))
     pure v
+
+  analyzeModule = liftAnalyze analyzeModule
 
 
 -- | Retrieve the local 'Live' set.

@@ -2,17 +2,13 @@
              StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Analysis.Abstract.Evaluating
-  ( type Evaluating
-  , evaluate
-  , evaluates
-  , evaluateWith
-  , evaluatesWith
-  , findValue
-  , findEnv
-  , findHeap
-  , require
-  , load
-  ) where
+( type Evaluating
+, findValue
+, findEnv
+, findHeap
+, require
+, load
+) where
 
 import           Control.Abstract.Evaluator
 import           Control.Monad.Effect
@@ -23,101 +19,15 @@ import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Exports (Exports)
 import qualified Data.Abstract.Exports as Export
-import           Data.Abstract.Heap (Heap (..))
+import           Data.Abstract.Heap
+import           Data.Abstract.Module
 import           Data.Abstract.ModuleTable
 import           Data.Abstract.Value
-import           Data.Blob
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.IntMap as IntMap
-import           Data.Language
-import           Data.List.Split (splitWhen)
-import qualified Data.Map as Map
 import qualified Data.Map.Monoidal as Monoidal
 import           Prelude hiding (fail)
 import           Prologue hiding (throwError)
-import           System.FilePath.Posix
-
--- | Evaluate a term to a value.
-evaluate :: forall value term effects
-         .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
-            , Evaluatable (Base term)
-            , FreeVariables term
-            , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-            , MonadValue value (Evaluating term value effects)
-            , Recursive term
-            , Show (LocationFor value)
-            )
-         => term
-         -> Final effects value
-evaluate = runAnalysis @(Evaluating term value) . evaluateModule
-
-evaluateWith :: forall value term effects
-             .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
-                , Evaluatable (Base term)
-                , FreeVariables term
-                , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-                , MonadValue value (Evaluating term value effects)
-                , Recursive term
-                , Show (LocationFor value)
-                )
-         => term
-         -> term
-         -> Final effects value
-evaluateWith prelude t = runAnalysis @(Evaluating term value) $ do
-  -- evaluateTerm here rather than evaluateModule
-  -- TODO: we could add evaluatePrelude to MonadAnalysis as an alias for evaluateModule,
-  -- overridden in Evaluating to not reset the environment. In the future we'll want the
-  -- result of evaluating the Prelude to be a build artifact, rather than something that's
-  -- evaluated every single time, but that's contingent upon a whole lot of other future
-  -- scaffolding.
-  preludeEnv <- evaluateTerm prelude *> getEnv
-  withDefaultEnvironment preludeEnv (evaluateModule t)
-
--- | Evaluate terms and an entry point to a value.
-evaluates :: forall value term effects
-          .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
-             , Evaluatable (Base term)
-             , FreeVariables term
-             , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-             , MonadValue value (Evaluating term value effects)
-             , Recursive term
-             , Show (LocationFor value)
-             )
-          => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
-          -> (Blob, term)   -- Entrypoint
-          -> Final effects value
-evaluates pairs (b, t) = runAnalysis @(Evaluating term value) (withModules b pairs (evaluateModule t))
-
--- | Evaluate terms and an entry point to a value with a given prelude.
-evaluatesWith :: forall value term effects
-              .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
-                 , Evaluatable (Base term)
-                 , FreeVariables term
-                 , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-                 , MonadValue value (Evaluating term value effects)
-                 , Recursive term
-                 , Show (LocationFor value)
-                 )
-              => term           -- ^ Prelude to evaluate once
-              -> [(Blob, term)] -- ^ List of (blob, term) pairs that make up the program to be evaluated
-              -> (Blob, term)   -- ^ Entrypoint
-              -> Final effects value
-evaluatesWith prelude pairs (b, t)  = runAnalysis @(Evaluating term value) $ do
-  preludeEnv <- evaluateTerm prelude *> getEnv
-  withDefaultEnvironment preludeEnv (withModules b pairs (evaluateModule t))
-
--- | Run an action with the passed ('Blob', @term@) pairs available for imports.
-withModules :: MonadAnalysis term value m => Blob -> [(Blob, term)] -> m a -> m a
-withModules Blob{..} pairs = localModuleTable (const moduleTable)
-  where
-    moduleTable = ModuleTable (Map.fromListWith (<>) (map (bimap moduleName pure) pairs))
-    rootDir = dropFileName blobPath
-    moduleName Blob{..} = let path = dropExtensions (makeRelative rootDir blobPath)
-     in case blobLanguage of
-      -- TODO: Need a better way to handle module registration and resolution
-      Just Go -> toName (takeDirectory path) -- Go allows defining modules across multiple files in the same directory.
-      _       ->  toName path
-    toName str = qualifiedName (fmap BC.pack (splitWhen (== pathSeparator) str))
 
 -- | Require/import another module by name and return it's environment and value.
 --
@@ -136,7 +46,7 @@ load :: (MonadAnalysis term value m, MonadValue value m)
 load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
   where
     notFound = fail ("cannot load module: " <> show name)
-    evalAndCache :: (MonadAnalysis term value m, MonadValue value m) => [term] -> m (EnvironmentFor value, value)
+    evalAndCache :: (MonadAnalysis term value m, MonadValue value m) => [Module term] -> m (EnvironmentFor value, value)
     evalAndCache []     = (,) <$> pure mempty <*> unit
     evalAndCache [x]    = evalAndCache' x
     evalAndCache (x:xs) = do
@@ -144,7 +54,7 @@ load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup n
       (env', v') <- evalAndCache xs
       pure (env <> env', v')
 
-    evalAndCache' :: (MonadAnalysis term value m) => term -> m (EnvironmentFor value, value)
+    evalAndCache' :: (MonadAnalysis term value m) => Module term -> m (EnvironmentFor value, value)
     evalAndCache' x = do
       v <- evaluateModule x
       env <- filterEnv <$> getExports <*> getEnv
@@ -172,10 +82,11 @@ deriving instance Member NonDet    effects => MonadNonDet (Evaluating term value
 type EvaluatingEffects term value
   = '[ Resumable ValueExc
      , Resumable (Unspecialized value)
-     , Fail                                        -- Failure with an error message
+     , Fail                                               -- Failure with an error message
+     , Reader [Module term]                               -- The stack of currently-evaluating modules.
      , State  (EnvironmentFor value)                      -- Environments (both local and global)
      , State  (HeapFor value)                             -- The heap
-     , Reader (ModuleTable [term])                        -- Cache of unevaluated modules
+     , Reader (ModuleTable [Module term])                 -- Cache of unevaluated modules
      , Reader (EnvironmentFor value)                      -- Default environment used as a fallback in lookupEnv
      , State  (ModuleTable (EnvironmentFor value, value)) -- Cache of evaluated modules
      , State  (ExportsFor value)                          -- Exports (used to filter environments when they are imported)
@@ -238,7 +149,7 @@ instance Member (State (HeapFor value)) effects => MonadHeap value (Evaluating t
   getHeap = raise get
   putHeap = raise . put
 
-instance Members '[Reader (ModuleTable [term]), State (ModuleTable (EnvironmentFor value, value))] effects => MonadModuleTable term value (Evaluating term value effects) where
+instance Members '[Reader (ModuleTable [Module term]), State (ModuleTable (EnvironmentFor value, value))] effects => MonadModuleTable term value (Evaluating term value effects) where
   getModuleTable = raise get
   putModuleTable = raise . put
 
@@ -247,6 +158,8 @@ instance Members '[Reader (ModuleTable [term]), State (ModuleTable (EnvironmentF
 
 instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
   getConfiguration term = Configuration term mempty <$> getEnv <*> getHeap
+
+  askModuleStack = raise ask
 
 instance ( Evaluatable (Base term)
          , FreeVariables term
@@ -260,3 +173,8 @@ instance ( Evaluatable (Base term)
   type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
 
   analyzeTerm term = resumeException @(Unspecialized value) (eval term) (\yield (Unspecialized str) -> string (BC.pack str) >>= yield)
+
+  analyzeModule m = pushModule (subterm <$> m) (subtermValue (moduleBody m))
+
+pushModule :: Member (Reader [Module term]) effects => Module term -> Evaluating term value effects a -> Evaluating term value effects a
+pushModule m = raise . local (m :) . lower

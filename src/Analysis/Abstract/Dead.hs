@@ -4,6 +4,7 @@ module Analysis.Abstract.Dead
 ) where
 
 import Control.Abstract.Analysis
+import Data.Abstract.Module
 import Data.Semigroup.Reducer as Reducer
 import Data.Set (delete)
 import Prologue
@@ -51,6 +52,6 @@ instance ( Corecursive term
     revive (embedSubterm term)
     liftAnalyze analyzeTerm term
 
-  evaluateModule term = do
-    killAll (subterms term)
-    DeadCode (evaluateModule term)
+  analyzeModule m = do
+    killAll (subterms (subterm (moduleBody m)))
+    liftAnalyze analyzeModule m
