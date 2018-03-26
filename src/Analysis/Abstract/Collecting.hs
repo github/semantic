@@ -8,7 +8,6 @@ import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.Heap
 import Data.Abstract.Live
-import Data.Abstract.Value
 import Prologue
 
 newtype Collecting m term value (effects :: [* -> *]) a = Collecting (m term value effects a)
@@ -26,6 +25,8 @@ instance ( Effectful (m term value)
          => MonadEvaluator term value (Collecting m term value effects) where
   getConfiguration term = Configuration term <$> askRoots <*> getEnv <*> getHeap
 
+  askModuleStack = Collecting askModuleStack
+
 
 instance ( Effectful (m term value)
          , Foldable (Cell (LocationFor value))
@@ -40,11 +41,13 @@ instance ( Effectful (m term value)
    ': RequiredEffects term value (m term value effects)
 
   -- Small-step evaluation which garbage-collects any non-rooted addresses after evaluating each term.
-  analyzeTerm term = do
+  analyzeTerm recur term = do
     roots <- askRoots
-    v <- liftAnalyze analyzeTerm term
+    v <- liftAnalyze analyzeTerm recur term
     modifyHeap (gc (roots <> valueRoots v))
     pure v
+
+  analyzeModule = liftAnalyze analyzeModule
 
 
 -- | Retrieve the local 'Live' set.

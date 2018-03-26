@@ -13,25 +13,33 @@ spec = parallel $ do
   describe "evalutes Ruby" $ do
     it "require_relative" $ do
       env <- findEnv <$> evaluate "main.rb"
-      env `shouldBe` [ (qualifiedName ["foo"], addr 0) ]
+      let expectedEnv = [ (qualifiedName ["Object"], addr 0)
+                        , (qualifiedName ["foo"], addr 3)]
+      env `shouldBe` expectedEnv
 
     it "load" $ do
       env <- findEnv <$> evaluate "load.rb"
-      env `shouldBe` [ (qualifiedName ["foo"], addr 0) ]
+      let expectedEnv = [ (qualifiedName ["Object"], addr 0)
+                        , (qualifiedName ["foo"], addr 3) ]
+      env `shouldBe` expectedEnv
 
     it "load wrap" $ do
       res <- evaluate "load-wrap.rb"
       findValue res `shouldBe` Left "free variable: \"foo\""
-      findEnv res `shouldBe` []
+      findEnv res `shouldBe` [(qualifiedName ["Object"], addr 0)]
 
     it "subclass" $ do
-      v <- findValue <$> evaluate "subclass.rb"
-      v `shouldBe` Right (Right (injValue (String "\"<bar>\"")))
+      res <- findValue <$> evaluate "subclass.rb"
+      res `shouldBe` Right (Right (Right (injValue (String "\"<bar>\""))))
+
+    it "has prelude" $ do
+      res <- findValue <$> evaluate "preluded.rb"
+      res `shouldBe` Right (Right (Right (injValue (String "\"<foo>\""))))
 
   where
     addr = Address . Precise
     fixtures = "test/fixtures/ruby/analysis/"
-    evaluate entry = evaluateFiles rubyParser
+    evaluate entry = evaluateFilesWithPrelude rubyParser
       [ fixtures <> entry
       , fixtures <> "foo.rb"
       ]

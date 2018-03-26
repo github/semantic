@@ -4,6 +4,7 @@ module Analysis.Abstract.Dead
 ) where
 
 import Control.Abstract.Analysis
+import Data.Abstract.Module
 import Data.Semigroup.Reducer as Reducer
 import Data.Set (delete)
 import Prologue
@@ -43,14 +44,15 @@ instance ( Corecursive term
          , Member (State (Dead term)) effects
          , MonadAnalysis term value (m term value effects)
          , Ord term
+         , Recursive term
          )
          => MonadAnalysis term value (DeadCode m term value effects) where
   type RequiredEffects term value (DeadCode m term value effects) = State (Dead term) ': RequiredEffects term value (m term value effects)
 
-  analyzeTerm term = do
+  analyzeTerm recur term = do
     revive (embedSubterm term)
-    liftAnalyze analyzeTerm term
+    liftAnalyze analyzeTerm recur term
 
-  evaluateModule term = do
-    killAll (subterms term)
-    DeadCode (evaluateModule term)
+  analyzeModule recur m = do
+    killAll (subterms (subterm (moduleBody m)))
+    liftAnalyze analyzeModule recur m

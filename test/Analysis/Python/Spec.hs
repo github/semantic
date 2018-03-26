@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedLists, TypeApplications #-}
+{-# LANGUAGE OverloadedLists #-}
 module Analysis.Python.Spec (spec) where
 
 import Data.Abstract.Value
@@ -30,11 +30,11 @@ spec = parallel $ do
 
     it "subclasses" $ do
       v <- findValue <$> evaluate "subclass.py"
-      v `shouldBe` Right (Right (injValue (String "\"bar\"")))
+      v `shouldBe` Right (Right (Right (injValue (String "\"bar\""))))
 
     it "handles multiple inheritance left-to-right" $ do
       v <- findValue <$> evaluate "multiple_inheritance.py"
-      v `shouldBe` Right (Right (injValue (String "\"foo!\"")))
+      v `shouldBe` Right (Right (Right (injValue (String "\"foo!\""))))
 
   where
     addr = Address . Precise

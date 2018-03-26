@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses, TypeApplications, ViewPatterns #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses, ViewPatterns #-}
 module Data.Syntax.Literal where
 
 import Control.Arrow ((>>>))
@@ -8,8 +8,8 @@ import qualified Data.ByteString.Char8 as B
 import Data.Monoid (Endo (..), appEndo)
 import Data.Scientific (Scientific)
 import Diffing.Algorithm
-import Prelude hiding (Float, fail)
-import Prologue hiding (Set, hash)
+import Prelude hiding (Float, fail, null)
+import Prologue hiding (Set, hash, null)
 import Text.Read (readMaybe)
 
 -- Boolean
@@ -169,9 +169,7 @@ instance Eq1 Null where liftEq = genericLiftEq
 instance Ord1 Null where liftCompare = genericLiftCompare
 instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Null
-instance Evaluatable Null
-
+instance Evaluatable Null where eval = const null
 
 newtype Symbol a = Symbol { symbolContent :: ByteString }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)

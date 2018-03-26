@@ -19,6 +19,8 @@ library
                      , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Evaluating
+                     , Analysis.Abstract.ImportGraph
+                     , Analysis.Abstract.Quiet
                      , Analysis.Abstract.Tracing
                      , Analysis.CallGraph
                      , Analysis.ConstructorName
@@ -50,6 +52,7 @@ library
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Heap
                      , Data.Abstract.Live
+                     , Data.Abstract.Module
                      , Data.Abstract.ModuleTable
                      , Data.Abstract.Number
                      , Data.Abstract.Path
@@ -109,6 +112,7 @@ library
                      , Language.PHP.Assignment
                      , Language.PHP.Grammar
                      , Language.PHP.Syntax
+                     , Language.Preluded
                      , Language.Python.Assignment
                      , Language.Python.Grammar
                      , Language.Python.Syntax
@@ -194,6 +198,7 @@ library
                      , RecordWildCards
                      , StandaloneDeriving
                      , StrictData
+                     , TypeApplications
   ghc-options:         -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O -j
   ghc-prof-options:    -fprof-auto
 
@@ -270,6 +275,7 @@ test-suite test
                      , OverloadedStrings
                      , RecordWildCards
                      , StandaloneDeriving
+                     , TypeApplications
 
 test-suite doctests
   type:                exitcode-stdio-1.0
