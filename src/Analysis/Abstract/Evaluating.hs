@@ -58,6 +58,9 @@ makeLenses ''EvaluatingState
 (.=) :: (Effectful m, Member (State s) effects) => ASetter s s a b -> b -> m effects ()
 lens .= val = raise (modify (lens .~ val))
 
+view :: (Effectful m, Member (State s) effects) => Getting a s a -> m effects a
+view lens = raise ((^. lens) <$> get)
+
 
 -- | Find the value in the 'Final' result of running.
 findValue :: (effects ~ RequiredEffects term value (Evaluating term value effects))
