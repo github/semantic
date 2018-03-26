@@ -55,10 +55,10 @@ data EvaluatingState term value = EvaluatingState
 
 makeLenses ''EvaluatingState
 
-(.=) :: (Effectful m, Member (State s) effects) => ASetter s s a b -> b -> m effects ()
+(.=) :: Member (State (EvaluatingState term value)) effects => ASetter (EvaluatingState term value) (EvaluatingState term value) a b -> b -> Evaluating term value effects ()
 lens .= val = raise (modify (lens .~ val))
 
-view :: (Effectful m, Member (State s) effects) => Getting a s a -> m effects a
+view :: Member (State (EvaluatingState term value)) effects => Getting a (EvaluatingState term value) a -> Evaluating term value effects a
 view lens = raise ((^. lens) <$> get)
 
 
