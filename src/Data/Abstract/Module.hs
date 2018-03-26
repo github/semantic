@@ -25,7 +25,7 @@ moduleForBlob :: Maybe FilePath -- ^ The root directory relative to which the mo
 moduleForBlob rootDir blob = Module (moduleNameForPath (modulePathForBlob blob)) (blobPath blob)
   where modulePathForBlob Blob{..} | Just Go <- blobLanguage = takeDirectory (modulePath blobPath)
                                    | otherwise               =                modulePath blobPath
-                                   -- TODO: Need a better way to handle module registration and resolution
+        -- TODO: Need a better way to handle module registration and resolution
         modulePath = dropExtensions . maybe takeFileName makeRelative rootDir
 
 moduleNameForPath :: FilePath -> ModuleName
