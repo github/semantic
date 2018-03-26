@@ -162,9 +162,8 @@ instance Ord1 Module where liftCompare = genericLiftCompare
 instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
-  eval (Module iden xs) = letrec' name $ \addr -> do
-    void $ eval xs
-    makeNamespace name addr
+  eval (Module iden xs) = letrec' name $ \addr ->
+    eval xs <* makeNamespace name addr
     where name = freeVariable (subterm iden)
 
 -- | A decorator in Python
