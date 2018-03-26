@@ -388,6 +388,31 @@ instance Ord1 Update where liftCompare = genericLiftCompare
 instance Show1 Update where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Update
 
+data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 Module where liftEq = genericLiftEq
+instance Ord1 Module where liftCompare = genericLiftCompare
+instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Module where
+  eval (Module iden xs) = letrec' name $ \addr ->
+    eval xs <* makeNamespace name addr
+    where name = freeVariable (subterm iden)
+
+data InternalModule a = InternalModule { internalModuleIdentifier :: !a, internalModuleStatements :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 InternalModule where liftEq = genericLiftEq
+instance Ord1 InternalModule where liftCompare = genericLiftCompare
+instance Show1 InternalModule where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable InternalModule where
+  eval (InternalModule iden xs) = letrec' name $ \addr ->
+    eval xs <* makeNamespace name addr
+    where name = freeVariable (subterm iden)
+
+
 data ImportAlias a = ImportAlias { _importAliasSubject :: !a, _importAlias :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 

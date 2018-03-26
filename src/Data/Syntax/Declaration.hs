@@ -153,18 +153,6 @@ instance Evaluatable Class where
       klass name supers classEnv
     v <$ modifyEnv (Env.insert name addr)
 
-data Namespace a = Namespace { namespaceIdentifier :: !a, namespaceStatements :: ![a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 Namespace where liftEq = genericLiftEq
-instance Ord1 Namespace where liftCompare = genericLiftCompare
-instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable Namespace where
-  eval (Namespace iden xs) = letrec' name $ \addr ->
-    eval xs <* makeNamespace name addr
-    where name = freeVariable (subterm iden)
-
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)

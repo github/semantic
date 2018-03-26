@@ -29,7 +29,6 @@ type Syntax = '[
   , Declaration.Class
   , Declaration.Function
   , Declaration.Method
-  , Declaration.Namespace
   , Expression.Arithmetic
   , Expression.Bitwise
   , Expression.Boolean
@@ -77,6 +76,7 @@ type Syntax = '[
   , Syntax.Program
   , Ruby.Syntax.Require
   , Ruby.Syntax.Load
+  , Ruby.Syntax.Module
   , []
   ]
 
@@ -207,7 +207,7 @@ singletonClass :: Assignment
 singletonClass = makeTerm <$> symbol SingletonClass <*> children (Declaration.Class <$> pure [] <*> expression <*> pure [] <*> expressions)
 
 module' :: Assignment
-module' = makeTerm <$> symbol Module <*> children (Declaration.Namespace <$> expression <*> many expression)
+module' = makeTerm <$> symbol Module <*> children (Ruby.Syntax.Module <$> expression <*> many expression)
 
 scopeResolution :: Assignment
 scopeResolution = makeTerm <$> symbol ScopeResolution <*> children (Expression.ScopeResolution <$> many expression)

@@ -41,7 +41,6 @@ type Syntax = '[
   , Declaration.DefaultExport
   , Declaration.QualifiedExport
   , Declaration.QualifiedExportFrom
-  , Declaration.Namespace
   , Expression.Arithmetic
   , Expression.Bitwise
   , Expression.Boolean
@@ -124,6 +123,8 @@ type Syntax = '[
   , TypeScript.Syntax.LiteralType
   , TypeScript.Syntax.Union
   , TypeScript.Syntax.Intersection
+  , TypeScript.Syntax.Module
+  , TypeScript.Syntax.InternalModule
   , TypeScript.Syntax.FunctionType
   , TypeScript.Syntax.Tuple
   , TypeScript.Syntax.Constructor
@@ -756,10 +757,10 @@ optionalParameter = makeOptionalParam <$> symbol Grammar.OptionalParameter <*> c
   where makeOptionalParam loc (modifier, readonly, subject, annotation, initializer) = makeTerm loc (TypeScript.Syntax.OptionalParameter [modifier, readonly, annotation] (makeTerm loc (Statement.Assignment [] subject initializer)))
 
 internalModule :: Assignment
-internalModule = makeTerm <$> symbol Grammar.InternalModule <*> children (Declaration.Namespace <$> term (string <|> identifier <|> nestedIdentifier) <*> statements)
+internalModule = makeTerm <$> symbol Grammar.InternalModule <*> children (TypeScript.Syntax.InternalModule <$> term (string <|> identifier <|> nestedIdentifier) <*> statements)
 
 module' :: Assignment
-module' = makeTerm <$> symbol Module <*> children (Declaration.Namespace <$> term (string <|> identifier <|> nestedIdentifier) <*> (statements <|> pure []))
+module' = makeTerm <$> symbol Module <*> children (TypeScript.Syntax.Module <$> term (string <|> identifier <|> nestedIdentifier) <*> (statements <|> pure []))
 
 
 statements :: Assignment.Assignment [] Grammar [Term]
