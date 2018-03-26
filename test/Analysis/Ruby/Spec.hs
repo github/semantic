@@ -10,14 +10,14 @@ import SpecHelpers
 
 spec :: Spec
 spec = parallel $ do
-  describe "evalutes Ruby" $ do
-    it "require_relative" $ do
+  describe "Ruby" $ do
+    it "evaluates require_relative" $ do
       env <- findEnv <$> evaluate "main.rb"
       let expectedEnv = [ (qualifiedName ["Object"], addr 0)
                         , (qualifiedName ["foo"], addr 3)]
       env `shouldBe` expectedEnv
 
-    it "load" $ do
+    it "evalutes load" $ do
       env <- findEnv <$> evaluate "load.rb"
       let expectedEnv = [ (qualifiedName ["Object"], addr 0)
                         , (qualifiedName ["foo"], addr 3) ]
