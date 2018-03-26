@@ -1,5 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables,
-             StandaloneDeriving, TypeApplications, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating
 ( Evaluating
 , findValue
@@ -7,7 +6,7 @@ module Analysis.Abstract.Evaluating
 , findHeap
 ) where
 
-import           Control.Abstract.Evaluator
+import           Control.Abstract.Analysis
 import           Control.Monad.Effect
 import           Data.Abstract.Configuration
 import qualified Data.Abstract.Environment as Env
@@ -15,7 +14,6 @@ import           Data.Abstract.Evaluatable
 import           Data.Abstract.Heap
 import           Data.Abstract.Module
 import           Data.Abstract.ModuleTable
-import qualified Data.ByteString.Char8 as BC
 import qualified Data.IntMap as IntMap
 import qualified Data.Map.Monoidal as Monoidal
 import           Prelude hiding (fail)
@@ -112,7 +110,7 @@ instance ( Members (EvaluatingEffects term value) effects
          => MonadAnalysis term value (Evaluating term value effects) where
   type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
 
-  analyzeTerm eval term = resumeException @(Unspecialized value) (eval term) (\yield (Unspecialized str) -> string (BC.pack str) >>= yield)
+  analyzeTerm = id
 
   analyzeModule eval m = pushModule (subterm <$> m) (eval m)
 
