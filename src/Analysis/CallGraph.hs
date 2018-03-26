@@ -10,7 +10,6 @@ import qualified Algebra.Graph as G
 import Algebra.Graph.Class
 import Algebra.Graph.Export.Dot
 import Data.Abstract.FreeVariables
-import Data.Set (member)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import Data.Term
@@ -21,7 +20,7 @@ newtype CallGraph = CallGraph { unCallGraph :: G.Graph Name }
   deriving (Eq, Graph, Show)
 
 -- | Build the 'CallGraph' for a 'Term' recursively.
-buildCallGraph :: (CallGraphAlgebra syntax, FreeVariables1 syntax, Functor syntax) => Term syntax ann -> Set Name -> CallGraph
+buildCallGraph :: (CallGraphAlgebra syntax, FreeVariables1 syntax, Functor syntax) => Term syntax ann -> [Name] -> CallGraph
 buildCallGraph = foldSubterms callGraphAlgebra
 
 
@@ -35,7 +34,7 @@ renderCallGraph = export (defaultStyle friendlyName) . unCallGraph
 --   This typeclass employs the Advanced Overlap techniques designed by Oleg Kiselyov & Simon Peyton Jones: https://wiki.haskell.org/GHC/AdvancedOverlap.
 class CallGraphAlgebra syntax where
   -- | A 'SubtermAlgebra' computing the 'CallGraph' for a piece of @syntax@.
-  callGraphAlgebra :: FreeVariables term => syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
+  callGraphAlgebra :: FreeVariables term => syntax (Subterm term ([Name] -> CallGraph)) -> [Name] -> CallGraph
 
 instance (CallGraphAlgebraStrategy syntax ~ strategy, CallGraphAlgebraWithStrategy strategy syntax) => CallGraphAlgebra syntax where
   callGraphAlgebra = callGraphAlgebraWithStrategy (Proxy :: Proxy strategy)
@@ -43,7 +42,7 @@ instance (CallGraphAlgebraStrategy syntax ~ strategy, CallGraphAlgebraWithStrate
 
 -- | Types whose contribution to a 'CallGraph' is customized. If an instance’s definition is not being used, ensure that the type is mapped to 'Custom' in the 'CallGraphAlgebraStrategy'.
 class CustomCallGraphAlgebra syntax where
-  customCallGraphAlgebra :: FreeVariables term => syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
+  customCallGraphAlgebra :: FreeVariables term => syntax (Subterm term ([Name] -> CallGraph)) -> [Name] -> CallGraph
 
 -- | 'Declaration.Function's produce a vertex for their name, with edges to any free variables in their body.
 instance CustomCallGraphAlgebra Declaration.Function where
@@ -56,8 +55,8 @@ instance CustomCallGraphAlgebra Declaration.Method where
 -- | 'Syntax.Identifier's produce a vertex iff it’s unbound in the 'Set'.
 instance CustomCallGraphAlgebra Syntax.Identifier where
   customCallGraphAlgebra (Syntax.Identifier name) bound
-    | name `member` bound = empty
-    | otherwise           = vertex name
+    | name `elem` bound = empty
+    | otherwise         = vertex name
 
 instance Apply CallGraphAlgebra syntaxes => CustomCallGraphAlgebra (Union syntaxes) where
   customCallGraphAlgebra = Prologue.apply (Proxy :: Proxy CallGraphAlgebra) callGraphAlgebra
@@ -68,7 +67,7 @@ instance CallGraphAlgebra syntax => CustomCallGraphAlgebra (TermF syntax a) wher
 
 -- | The mechanism selecting 'Default'/'Custom' implementations for 'callGraphAlgebra' depending on the @syntax@ type.
 class CallGraphAlgebraWithStrategy (strategy :: Strategy) syntax where
-  callGraphAlgebraWithStrategy :: FreeVariables term => proxy strategy -> syntax (Subterm term (Set Name -> CallGraph)) -> Set Name -> CallGraph
+  callGraphAlgebraWithStrategy :: FreeVariables term => proxy strategy -> syntax (Subterm term ([Name] -> CallGraph)) -> [Name] -> CallGraph
 
 -- | The 'Default' definition of 'callGraphAlgebra' combines all of the 'CallGraph's within the @syntax@ 'Monoid'ally.
 instance Foldable syntax => CallGraphAlgebraWithStrategy 'Default syntax where

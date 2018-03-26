@@ -363,17 +363,22 @@ instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Namespace where
   eval Namespace{..} = go names
     where
-      names = toList (freeVariables (subterm namespaceName))
+      names = freeVariables (subterm namespaceName)
       go [] = fail "expected at least one free variable in namespaceName, found none"
+      -- The last name creates a closure over the namespace body.
       go [name] = letrec' name $ \addr ->
         subtermValue namespaceBody *> makeNamespace name addr
+      -- Each namespace name creates a closure over the subsequent namespace closures
       go (name:xs) = letrec' name $ \addr ->
         go xs <* makeNamespace name addr
 
+      -- Make a namespace closure capturing the current environment.
       makeNamespace name addr = do
         namespaceEnv <- Env.head <$> getEnv
         v <- namespace name namespaceEnv
         v <$ assign addr v
+
+      -- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
       letrec' name body = do
         addr <- lookupOrAlloc name
         v <- localEnv id (body addr)

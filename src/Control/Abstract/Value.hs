@@ -281,7 +281,7 @@ instance ( Monad m
 
   abstract names (Subterm body _) = do
     l <- label body
-    injValue . Closure names l . Env.bind (foldr Set.delete (freeVariables body) names) <$> getEnv
+    injValue . Closure names l . Env.bind (foldr Set.delete (Set.fromList (freeVariables body)) names) <$> getEnv
 
   apply op params = do
     Closure names label env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)

@@ -22,6 +22,8 @@ import Data.Span
 import Data.Term
 import Diffing.Algorithm
 import Diffing.Interpreter
+import qualified GHC.TypeLits as TypeLevel
+import Language.Preluded
 import Parsing.Parser
 import Prologue
 import Semantic
@@ -33,8 +35,8 @@ import qualified Language.Python.Assignment as Python
 import qualified Language.TypeScript.Assignment as TypeScript
 
 -- Ruby
-evaluateRubyFile = evaluateFile rubyParser
-evaluateRubyFiles = evaluateFiles rubyParser
+evaluateRubyFile = evaluateWithPrelude rubyParser
+evaluateRubyFiles = evaluateFilesWithPrelude rubyParser
 
 -- Go
 evaluateGoFile = evaluateFile goParser
@@ -42,8 +44,8 @@ evaluateGoFiles = evaluateFiles goParser
 typecheckGoFile path = runAnalysis @(Caching Evaluating Go.Term Type) . evaluateModule . snd <$> parseFile goParser path
 
 -- Python
-evaluatePythonFile = evaluateFile pythonParser
-evaluatePythonFiles = evaluateFiles pythonParser
+evaluatePythonFile = evaluateWithPrelude pythonParser
+evaluatePythonFiles = evaluateFilesWithPrelude pythonParser
 typecheckPythonFile path = runAnalysis @(Caching Evaluating Python.Term Type) . evaluateModule . snd <$> parseFile pythonParser path
 tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term Value) . evaluateModule . snd <$> parseFile pythonParser path
 evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] Evaluating) Python.Term Value) . evaluateModule . snd <$> parseFile pythonParser path
@@ -71,6 +73,24 @@ evaluateFile :: forall term effects
              -> IO (Final effects Value)
 evaluateFile parser path = evaluate . snd <$> parseFile parser path
 
+evaluateWithPrelude :: forall term effects
+                    .  ( Evaluatable (Base term)
+                       , FreeVariables term
+                       , effects ~ RequiredEffects term Value (Evaluating term Value effects)
+                       , MonadAddressable Precise Value (Evaluating term Value effects)
+                       , MonadValue Value (Evaluating term Value effects)
+                       , Recursive term
+                       , TypeLevel.KnownSymbol (PreludePath term)
+                       )
+                    => Parser term
+                    -> FilePath
+                    -> IO (Final effects Value)
+evaluateWithPrelude parser path = do
+  let preludePath = TypeLevel.symbolVal (Proxy :: Proxy (PreludePath term))
+  prelude <- parseFile parser preludePath
+  blob <- parseFile parser path
+  pure $ evaluateWith (snd prelude) (snd blob)
+
 -- Evaluate a list of files (head of file list is considered the entry point).
 evaluateFiles :: forall term effects
               .  ( Evaluatable (Base term)
@@ -86,6 +106,24 @@ evaluateFiles :: forall term effects
 evaluateFiles parser paths = do
   entry:xs <- traverse (parseFile parser) paths
   pure $ evaluates @Value xs entry
+
+evaluateFilesWithPrelude :: forall term effects
+                         .  ( Evaluatable (Base term)
+                            , FreeVariables term
+                            , effects ~ RequiredEffects term Value (Evaluating term Value effects)
+                            , MonadAddressable Precise Value (Evaluating term Value effects)
+                            , MonadValue Value (Evaluating term Value effects)
+                            , Recursive term
+                            , TypeLevel.KnownSymbol (PreludePath term)
+                            )
+                         => Parser term
+                         -> [FilePath]
+                         -> IO (Final effects Value)
+evaluateFilesWithPrelude parser paths = do
+  let preludePath = TypeLevel.symbolVal (Proxy :: Proxy (PreludePath term))
+  prelude <- parseFile parser preludePath
+  entry:xs <- traverse (parseFile parser) paths
+  pure $ evaluatesWith @Value (snd prelude) xs entry
 
 -- Read and parse a file.
 parseFile :: Parser term -> FilePath -> IO (Blob, term)
