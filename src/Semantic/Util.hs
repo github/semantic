@@ -143,7 +143,7 @@ evaluatesWith :: forall value term effects
               -> [Module term] -- ^ List of (blob, term) pairs that make up the program to be evaluated
               -> Module term   -- ^ Entrypoint
               -> Final effects value
-evaluatesWith prelude modules m  = runAnalysis @(Evaluating term value) $ do
+evaluatesWith prelude modules m = runAnalysis @(Evaluating term value) $ do
   preludeEnv <- evaluateModule prelude *> getEnv
   withDefaultEnvironment preludeEnv (withModules modules (evaluateModule m))
 
@@ -164,6 +164,7 @@ evaluateFilesWithPrelude parser paths = do
   prelude <- parseFile parser Nothing preludePath
   entry:xs <- traverse (parseFile parser Nothing) paths
   pure $ evaluatesWith @Value prelude xs entry
+
 
 -- Read and parse a file.
 parseFile :: Parser term -> Maybe FilePath -> FilePath -> IO (Module term)
