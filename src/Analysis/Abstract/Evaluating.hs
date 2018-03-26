@@ -34,11 +34,11 @@ deriving instance Member NonDet    effects => MonadNonDet (Evaluating term value
 type EvaluatingEffects term value
   = '[ Resumable (ValueExc value)
      , Resumable (Unspecialized value)
-     , Fail                                               -- Failure with an error message
-     , Reader [Module term]                               -- The stack of currently-evaluating modules.
-     , Reader (ModuleTable [Module term])                 -- Cache of unevaluated modules
-     , Reader (EnvironmentFor value)                      -- Default environment used as a fallback in lookupEnv
-     , State  (EvaluatingState term value)                -- Environment, heap, modules, exports, and jumps.
+     , Fail                                -- Failure with an error message
+     , Reader [Module term]                -- The stack of currently-evaluating modules.
+     , Reader (ModuleTable [Module term])  -- Cache of unevaluated modules
+     , Reader (EnvironmentFor value)       -- Default environment used as a fallback in lookupEnv
+     , State  (EvaluatingState term value) -- Environment, heap, modules, exports, and jumps.
      ]
 
 data EvaluatingState term value = EvaluatingState
