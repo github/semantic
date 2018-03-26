@@ -15,13 +15,14 @@ module Control.Abstract.Evaluator
   , modifyModuleTable
   , MonadControl(..)
   , MonadThrow(..)
+  -- Type synonyms specialized for location types
+  , CellFor
+  , ConfigurationFor
   , EnvironmentFor
   , ExportsFor
   , HeapFor
-  , CellFor
   , LiveFor
   , LocationFor
-  , ConfigurationFor
   ) where
 
 import Control.Effect
@@ -177,12 +178,19 @@ class Monad m => MonadControl term m where
   -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
   goto :: Label -> m term
 
+
 class Monad m => MonadThrow exc m where
   throwException :: exc v -> m v
 
 instance (Effectful m, Members '[Resumable exc] effects, Monad (m effects)) => MonadThrow exc (m effects) where
   throwException = raise . throwError
 
+
+-- | The cell for an abstract value type.
+type CellFor value = Cell (LocationFor value) value
+
+-- | The configuration for term and abstract value types.
+type ConfigurationFor term value = Configuration (LocationFor value) term value
 
 -- | The environment for an abstract value type.
 type EnvironmentFor value = Env.Environment (LocationFor value) value
@@ -193,14 +201,8 @@ type ExportsFor value = Export.Exports (LocationFor value) value
 -- | The 'Heap' for an abstract value type.
 type HeapFor value = Heap (LocationFor value) value
 
--- | The cell for an abstract value type.
-type CellFor value = Cell (LocationFor value) value
-
 -- | The address set type for an abstract value type.
 type LiveFor value = Live (LocationFor value) value
-
--- | The configuration for term and abstract value types.
-type ConfigurationFor term value = Configuration (LocationFor value) term value
 
 -- | The location type (the body of 'Address'es) which should be used for an abstract value type.
 type family LocationFor value :: *
