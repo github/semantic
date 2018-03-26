@@ -23,10 +23,10 @@ import qualified Data.Abstract.Environment as Env
 import qualified Data.Abstract.Exports as Export
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
+import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Value
 import Data.Semigroup.Reducer
-import Prelude
 import Prologue
 
 -- | A 'Monad' providing the basic essentials for evaluation.
@@ -44,6 +44,12 @@ class ( MonadControl term m
       => MonadEvaluator term value m | m -> term, m -> value where
   -- | Get the current 'Configuration' with a passed-in term.
   getConfiguration :: Ord (LocationFor value) => term -> m (ConfigurationFor term value)
+
+  -- | Retrieve the stack of modules currently being evaluated.
+  --
+  --   With great power comes great responsibility. If you 'evaluateModule' any of these, you probably deserve what you get.
+  askModuleStack :: m [Module term]
+
 
 -- | A 'Monad' abstracting local and global environments.
 class Monad m => MonadEnvironment value m | m -> value where
@@ -142,9 +148,9 @@ class Monad m => MonadModuleTable term value m | m -> term, m -> value where
   putModuleTable :: ModuleTable (EnvironmentFor value, value) -> m ()
 
   -- | Retrieve the table of unevaluated modules.
-  askModuleTable :: m (ModuleTable [term])
+  askModuleTable :: m (ModuleTable [Module term])
   -- | Run an action with a locally-modified table of unevaluated modules.
-  localModuleTable :: (ModuleTable [term] -> ModuleTable [term]) -> m a -> m a
+  localModuleTable :: (ModuleTable [Module term] -> ModuleTable [Module term]) -> m a -> m a
 
 -- | Update the evaluated module table.
 modifyModuleTable :: MonadModuleTable term value m => (ModuleTable (EnvironmentFor value, value) -> ModuleTable (EnvironmentFor value, value)) -> m ()
@@ -162,5 +168,5 @@ class Monad m => MonadControl term m where
   -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
   goto :: Label -> m term
 
-class Monad m => MonadThrow exc v m | m -> exc where
-  throwException :: exc -> m v
+class Monad m => MonadThrow exc m where
+  throwException :: exc v -> m v

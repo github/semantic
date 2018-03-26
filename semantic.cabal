@@ -18,6 +18,7 @@ library
                        Analysis.Abstract.Caching
                      , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
+                     , Analysis.Abstract.ImportGraph
                      , Analysis.Abstract.Evaluating
                      , Analysis.Abstract.Tracing
                      , Analysis.CallGraph
@@ -50,6 +51,7 @@ library
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Heap
                      , Data.Abstract.Live
+                     , Data.Abstract.Module
                      , Data.Abstract.ModuleTable
                      , Data.Abstract.Number
                      , Data.Abstract.Path
