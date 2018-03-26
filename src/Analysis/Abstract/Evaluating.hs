@@ -43,6 +43,14 @@ type EvaluatingEffects term value
      , State  (IntMap.IntMap term)                        -- For jumps
      ]
 
+data EvaluatingState term value = EvaluatingState
+  { environment :: EnvironmentFor value
+  , heap        :: HeapFor value
+  , modules     :: ModuleTable (EnvironmentFor value, value)
+  , exports     :: ExportsFor value
+  , jumps       :: IntMap.IntMap term
+  }
+
 -- | Find the value in the 'Final' result of running.
 findValue :: (effects ~ RequiredEffects term value (Evaluating term value effects))
           => Final effects value -> Either Prelude.String (Either (SomeExc (Unspecialized value)) (Either (SomeExc (ValueExc value)) value))
