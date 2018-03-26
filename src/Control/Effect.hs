@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, TypeOperators, UndecidableInstances, ScopedTypeVariables #-}
+{-# LANGUAGE RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Effect where
 
 import Control.Monad.Effect as Effect
@@ -67,6 +67,13 @@ instance Ord a => RunEffect NonDet a where
 instance RunEffect (Resumable exc) a where
   type Result (Resumable exc) a = Either (SomeExc exc) a
   runEffect = runError
+
+resumeException :: (Resumable exc :< e, Effectful m) => m e a -> (forall v . (v -> m e a) -> exc v -> m e a) -> m e a
+resumeException m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
+
+-- | Reassociate 'Either's, combining errors into 'Left' values and successes in a single level of 'Right'.
+mergeEither :: Either a (Either b c) -> Either (Either a b) c
+mergeEither = either (Left . Left) (either (Left . Right) Right)
 
 
 -- | Types wrapping 'Eff' actions.

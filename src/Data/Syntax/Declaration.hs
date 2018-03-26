@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Syntax.Declaration where
 
-import Analysis.Abstract.Evaluating
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
