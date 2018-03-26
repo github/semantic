@@ -185,10 +185,10 @@ instance (Effectful m, Members '[Resumable exc] effects, Monad (m effects)) => M
 
 
 -- | The environment for an abstract value type.
-type EnvironmentFor v = Env.Environment (LocationFor v) v
+type EnvironmentFor value = Env.Environment (LocationFor value) value
 
 -- | The exports for an abstract value type.
-type ExportsFor v = Export.Exports (LocationFor v) v
+type ExportsFor value = Export.Exports (LocationFor value) value
 
 -- | The 'Heap' for an abstract value type.
 type HeapFor value = Heap (LocationFor value) value
