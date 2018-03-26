@@ -29,7 +29,7 @@ type Syntax = '[
   , Declaration.Class
   , Declaration.Function
   , Declaration.Method
-  , Declaration.Module
+  , Declaration.Namespace
   , Expression.Arithmetic
   , Expression.Bitwise
   , Expression.Boolean
@@ -207,7 +207,7 @@ singletonClass :: Assignment
 singletonClass = makeTerm <$> symbol SingletonClass <*> children (Declaration.Class <$> pure [] <*> expression <*> pure [] <*> expressions)
 
 module' :: Assignment
-module' = makeTerm <$> symbol Module <*> children (Declaration.Module <$> expression <*> many expression)
+module' = makeTerm <$> symbol Module <*> children (Declaration.Namespace <$> expression <*> many expression)
 
 scopeResolution :: Assignment
 scopeResolution = makeTerm <$> symbol ScopeResolution <*> children (Expression.ScopeResolution <$> many expression)

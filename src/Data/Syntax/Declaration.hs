@@ -153,15 +153,15 @@ instance Evaluatable Class where
       klass name supers classEnv
     v <$ modifyEnv (Env.insert name addr)
 
-data Module a = Module { moduleIdentifier :: !a, moduleScope :: ![a] }
+data Namespace a = Namespace { namespaceIdentifier :: !a, namespaceStatements :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
-instance Eq1 Module where liftEq = genericLiftEq
-instance Ord1 Module where liftCompare = genericLiftCompare
-instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 Namespace where liftEq = genericLiftEq
+instance Ord1 Namespace where liftCompare = genericLiftCompare
+instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable Module where
-  eval (Module iden xs) = letrec' name $ \addr ->
+instance Evaluatable Namespace where
+  eval (Namespace iden xs) = letrec' name $ \addr ->
     eval xs <* makeNamespace name addr
     where name = freeVariable (subterm iden)
 

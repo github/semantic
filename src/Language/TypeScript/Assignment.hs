@@ -41,7 +41,7 @@ type Syntax = '[
   , Declaration.DefaultExport
   , Declaration.QualifiedExport
   , Declaration.QualifiedExportFrom
-  , Declaration.Module
+  , Declaration.Namespace
   , Expression.Arithmetic
   , Expression.Bitwise
   , Expression.Boolean
@@ -762,7 +762,7 @@ internalModule :: Assignment
 internalModule = makeTerm <$> symbol Grammar.InternalModule <*> children (TypeScript.Syntax.InternalModule <$> term (string <|> identifier <|> nestedIdentifier) <*> statements)
 
 module' :: Assignment
-module' = makeTerm <$> symbol Module <*> children (Declaration.Module <$> term (string <|> identifier <|> nestedIdentifier) <*> (statements <|> pure []))
+module' = makeTerm <$> symbol Module <*> children (Declaration.Namespace <$> term (string <|> identifier <|> nestedIdentifier) <*> (statements <|> pure []))
 
 
 statements :: Assignment.Assignment [] Grammar [Term]
