@@ -61,6 +61,9 @@ lens .= val = raise (modify (lens .~ val))
 view :: Member (State (EvaluatingState term value)) effects => Getting a (EvaluatingState term value) a -> Evaluating term value effects a
 view lens = raise ((^. lens) <$> get)
 
+localEvaluatingState :: Member (State (EvaluatingState term value)) effects => (EvaluatingState term value -> EvaluatingState term value) -> Evaluating term value effects a -> Evaluating term value effects a
+localEvaluatingState f = raise . localState f . lower
+
 
 -- | Find the value in the 'Final' result of running.
 findValue :: (effects ~ RequiredEffects term value (Evaluating term value effects))
