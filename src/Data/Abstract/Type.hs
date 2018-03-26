@@ -22,6 +22,7 @@ data Type
   | Array [Type]        -- ^ Arrays. Note that this is heterogenous.
   | Hash [(Type, Type)] -- ^ Heterogenous key-value maps.
   | Object              -- ^ Objects. Once we have some notion of inheritance we'll need to store a superclass.
+  | Null                -- ^ The null type. Unlike 'Unit', this unifies with any other type.
   deriving (Eq, Ord, Show)
 
 -- TODO: À la carte representation of types.
@@ -30,6 +31,8 @@ data Type
 -- | Unify two 'Type's.
 unify :: MonadFail m => Type -> Type -> m Type
 unify (a1 :-> b1) (a2 :-> b2) = (:->) <$> unify a1 a2 <*> unify b1 b2
+unify a Null = pure a
+unify Null b = pure b
 -- FIXME: this should be constructing a substitution.
 unify (Var _) b = pure b
 unify a (Var _) = pure a
