@@ -1,23 +1,23 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, Rank2Types, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating
-( type Evaluating
+( Evaluating
 , findValue
 , findEnv
 , findHeap
 ) where
 
-import Control.Abstract.Analysis
-import Control.Monad.Effect
-import Data.Abstract.Configuration
+import           Control.Abstract.Analysis
+import           Control.Monad.Effect
+import           Data.Abstract.Configuration
 import qualified Data.Abstract.Environment as Env
-import Data.Abstract.Evaluatable
-import Data.Abstract.Heap
-import Data.Abstract.Module
-import Data.Abstract.ModuleTable
+import           Data.Abstract.Evaluatable
+import           Data.Abstract.Heap
+import           Data.Abstract.Module
+import           Data.Abstract.ModuleTable
 import qualified Data.IntMap as IntMap
 import qualified Data.Map.Monoidal as Monoidal
-import Prelude hiding (fail)
-import Prologue
+import           Prelude hiding (fail)
+import           Prologue
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
 newtype Evaluating term value effects a = Evaluating (Eff effects a)

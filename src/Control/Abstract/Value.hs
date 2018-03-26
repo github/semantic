@@ -105,6 +105,9 @@ class (Monad m, Show value) => MonadValue value m where
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: value -> m a -> m a -> m a
 
+  -- | Construct the nil/null datatype.
+  null :: m value
+
   -- | Build a class value from a name and environment.
   klass :: Name                 -- ^ The new class's identifier
         -> [value]              -- ^ A list of superclasses
@@ -170,14 +173,15 @@ class ValueRoots value where
   valueRoots :: value -> LiveFor value
 
 
+-- The type of exceptions that can be thrown when constructing values in `MonadValue`.
 data ValueExc value resume where
   ValueExc :: Prelude.String -> ValueExc value value
   StringExc :: Prelude.String -> ValueExc value ByteString
 
 instance Eq1 (ValueExc value) where
-  liftEq _ (ValueExc a) (ValueExc b)   = a == b
+  liftEq _ (ValueExc a)  (ValueExc b)  = a == b
   liftEq _ (StringExc a) (StringExc b) = a == b
-  liftEq _ _ _                         = False
+  liftEq _ _             _             = False
 
 deriving instance Show (ValueExc value resume)
 instance Show1 (ValueExc value) where

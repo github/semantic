@@ -1,29 +1,29 @@
 {-# LANGUAGE ConstrainedClassMethods, DataKinds, FunctionalDependencies, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Evaluator
-( MonadEvaluator(..)
-, MonadEnvironment(..)
-, modifyEnv
-, modifyExports
-, addExport
-, fullEnvironment
-, MonadHeap(..)
-, modifyHeap
-, localize
-, lookupHeap
-, assign
-, MonadModuleTable(..)
-, modifyModuleTable
-, MonadControl(..)
-, MonadThrow(..)
-, resumeException
-, EnvironmentFor
-, ExportsFor
-, HeapFor
-, CellFor
-, LiveFor
-, LocationFor
-, ConfigurationFor
-) where
+  ( MonadEvaluator(..)
+  , MonadEnvironment(..)
+  , modifyEnv
+  , modifyExports
+  , addExport
+  , fullEnvironment
+  , MonadHeap(..)
+  , modifyHeap
+  , localize
+  , lookupHeap
+  , assign
+  , MonadModuleTable(..)
+  , modifyModuleTable
+  , MonadControl(..)
+  , MonadThrow(..)
+  -- Type synonyms specialized for location types
+  , CellFor
+  , ConfigurationFor
+  , EnvironmentFor
+  , ExportsFor
+  , HeapFor
+  , LiveFor
+  , LocationFor
+  ) where
 
 import Control.Effect
 import Control.Monad.Effect.Resumable
@@ -170,7 +170,7 @@ modifyModuleTable f = do
 
 
 -- | A 'Monad' abstracting jumps in imperative control.
-class Monad m => MonadControl term m | m -> term where
+class Monad m => MonadControl term m where
   -- | Allocate a 'Label' for the given @term@.
   --
   --   Labels must be allocated before being jumped to with 'goto', but are suitable for nonlocal jumps; thus, they can be used to implement coroutines, exception handling, call with current continuation, and other esoteric control mechanisms.
@@ -179,33 +179,31 @@ class Monad m => MonadControl term m | m -> term where
   goto :: Label -> m term
 
 
+-- | 'Monad's which can throw exceptions of type @exc v@ which can be resumed with a value of type @v@.
 class Monad m => MonadThrow exc m where
   throwException :: exc v -> m v
 
-instance (Monad (m effects), Effectful m, Members '[Resumable exc] effects) => MonadThrow exc (m effects) where
-   throwException = raise . throwError
+instance (Effectful m, Members '[Resumable exc] effects, Monad (m effects)) => MonadThrow exc (m effects) where
+  throwException = raise . throwError
 
-resumeException :: forall exc m e a. (Effectful m, Resumable exc :< e) => m e a -> (forall v. (v -> m e a) -> exc v -> m e a) -> m e a
-resumeException m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
-
-
--- | The environment for an abstract value type.
-type EnvironmentFor v = Env.Environment (LocationFor v) v
-
--- | The exports for an abstract value type.
-type ExportsFor v = Export.Exports (LocationFor v) v
-
--- | The 'Heap' for an abstract value type.
-type HeapFor value = Heap (LocationFor value) value
 
 -- | The cell for an abstract value type.
 type CellFor value = Cell (LocationFor value) value
 
--- | The address set type for an abstract value type.
-type LiveFor value = Live (LocationFor value) value
-
 -- | The configuration for term and abstract value types.
 type ConfigurationFor term value = Configuration (LocationFor value) term value
+
+-- | The environment for an abstract value type.
+type EnvironmentFor value = Env.Environment (LocationFor value) value
+
+-- | The exports for an abstract value type.
+type ExportsFor value = Export.Exports (LocationFor value) value
+
+-- | The 'Heap' for an abstract value type.
+type HeapFor value = Heap (LocationFor value) value
+
+-- | The address set type for an abstract value type.
+type LiveFor value = Live (LocationFor value) value
 
 -- | The location type (the body of 'Address'es) which should be used for an abstract value type.
 type family LocationFor value :: *
