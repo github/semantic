@@ -25,6 +25,7 @@ type ValueConstructors
     , Integer
     , KVPair
     , Namespace
+    , Null
     , Rational
     , String
     , Symbol
@@ -176,6 +177,13 @@ newtype Hash value = Hash [value]
 instance Eq1 Hash where liftEq = genericLiftEq
 instance Ord1 Hash where liftCompare = genericLiftCompare
 instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
+
+data Null value = Null
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Null where liftEq = genericLiftEq
+instance Ord1 Null where liftCompare = genericLiftCompare
+instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
 -- | The environment for an abstract value type.
 type EnvironmentFor v = Environment (LocationFor v) v

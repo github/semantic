@@ -96,6 +96,9 @@ class (Monad m, Show value) => MonadValue value m where
   -- | Eliminate boolean values. TODO: s/boolean/truthy
   ifthenelse :: value -> m a -> m a -> m a
 
+  -- | Construct the nil/null datatype.
+  null :: m value
+
   -- | Build a class value from a name and environment.
   klass :: Name                 -- ^ The new class's identifier
         -> [value]              -- ^ A list of superclasses
@@ -189,6 +192,8 @@ instance ( Monad m
   array    = pure . injValue . Value.Array
 
   kvPair k = pure . injValue . Value.KVPair k
+
+  null     = pure . injValue $ Value.Null
 
   asPair k
     | Just (Value.KVPair k v) <- prjValue k = pure (k, v)
@@ -321,6 +326,7 @@ instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, Mon
 
   klass _ _ _   = pure Object
   namespace _ _ = pure Type.Unit
+  null          = pure Type.Null
 
   scopedEnvironment _ = pure mempty
 

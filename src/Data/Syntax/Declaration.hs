@@ -284,7 +284,7 @@ instance Evaluatable QualifiedImport where
     where
       moduleName = freeVariable (subterm from)
       renames importedEnv
-        | null xs = fmap prepend (Env.names importedEnv)
+        | Prologue.null xs = fmap prepend (Env.names importedEnv)
         | otherwise = xs
       prefix = freeVariable (subterm alias)
       prepend n = (n, prefix <> n)
@@ -307,7 +307,7 @@ instance Evaluatable Import where
     where
       moduleName = freeVariable (subterm from)
       renamed importedEnv
-        | null xs = importedEnv
+        | Prologue.null xs = importedEnv
         | otherwise = Env.overwrite xs importedEnv
 
 -- | Side effect only imports (no symbols made available to the calling environment).
