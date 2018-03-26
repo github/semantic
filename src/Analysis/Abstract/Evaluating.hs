@@ -53,6 +53,13 @@ data EvaluatingState term value = EvaluatingState
   , _jumps       :: IntMap.IntMap term
   }
 
+instance (Ord (LocationFor value), Semigroup (CellFor value)) => Semigroup (EvaluatingState term value) where
+  EvaluatingState e1 h1 m1 x1 j1 <> EvaluatingState e2 h2 m2 x2 j2 = EvaluatingState (e1 <> e2) (h1 <> h2) (m1 <> m2) (x1 <> x2) (j1 <> j2)
+
+instance (Ord (LocationFor value), Semigroup (CellFor value)) => Monoid (EvaluatingState term value) where
+  mempty = EvaluatingState mempty mempty mempty mempty mempty
+  mappend = (<>)
+
 makeLenses ''EvaluatingState
 
 
