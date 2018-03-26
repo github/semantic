@@ -31,8 +31,10 @@ spec = parallel $ do
       res `shouldBe` Right (Right (Right (injValue (String "\"<bar>\""))))
 
     it "evaluates modules" $ do
-      res <- findValue <$> evaluate "modules.rb"
-      res `shouldBe` Right (Right (Right (injValue (String "\"<hello>\""))))
+      res <- evaluate "modules.rb"
+      findValue res `shouldBe` Right (Right (Right (injValue (String "\"<hello>\""))))
+      findEnv res `shouldBe` [ (name "Object", addr 0)
+                             , (name "Bar", addr 3) ]
 
     it "has prelude" $ do
       res <- findValue <$> evaluate "preluded.rb"
