@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstrainedClassMethods, DataKinds, FunctionalDependencies, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstrainedClassMethods, DataKinds, FunctionalDependencies, TypeFamilies, UndecidableInstances #-}
 module Control.Abstract.Evaluator
   ( MonadEvaluator(..)
   , MonadEnvironment(..)
