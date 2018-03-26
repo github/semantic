@@ -75,6 +75,27 @@ evaluateFile :: forall term effects
              -> IO (Final effects Value)
 evaluateFile parser path = runAnalysis @(Evaluating term Value) . evaluateModule <$> parseFile parser Nothing path
 
+evaluateWith :: forall value term effects
+             .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
+                , Evaluatable (Base term)
+                , FreeVariables term
+                , MonadAddressable (LocationFor value) value (Evaluating term value effects)
+                , MonadValue value (Evaluating term value effects)
+                , Recursive term
+                , Show (LocationFor value)
+                )
+         => Module term
+         -> Module term
+         -> Final effects value
+evaluateWith prelude m = runAnalysis @(Evaluating term value) $ do
+  -- TODO: we could add evaluatePrelude to MonadAnalysis as an alias for evaluateModule,
+  -- overridden in Evaluating to not reset the environment. In the future we'll want the
+  -- result of evaluating the Prelude to be a build artifact, rather than something that's
+  -- evaluated every single time, but that's contingent upon a whole lot of other future
+  -- scaffolding.
+  preludeEnv <- evaluateModule prelude *> getEnv
+  withDefaultEnvironment preludeEnv (evaluateModule m)
+
 evaluateWithPrelude :: forall term effects
                     .  ( Evaluatable (Base term)
                        , FreeVariables term
@@ -92,27 +113,6 @@ evaluateWithPrelude parser path = do
   prelude <- parseFile parser Nothing preludePath
   m <- parseFile parser Nothing path
   pure $ evaluateWith prelude m
-
-evaluateWith :: forall value term effects
-             .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
-                , Evaluatable (Base term)
-                , FreeVariables term
-                , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-                , MonadValue value (Evaluating term value effects)
-                , Recursive term
-                , Show (LocationFor value)
-                )
-         => Module term
-         -> Module term
-         -> Final effects value
-evaluateWith prelude t = runAnalysis @(Evaluating term value) $ do
-  -- TODO: we could add evaluatePrelude to MonadAnalysis as an alias for evaluateModule,
-  -- overridden in Evaluating to not reset the environment. In the future we'll want the
-  -- result of evaluating the Prelude to be a build artifact, rather than something that's
-  -- evaluated every single time, but that's contingent upon a whole lot of other future
-  -- scaffolding.
-  preludeEnv <- evaluateModule prelude *> getEnv
-  withDefaultEnvironment preludeEnv (evaluateModule t)
 
 
 -- Evaluate a list of files (head of file list is considered the entry point).
