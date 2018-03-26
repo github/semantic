@@ -4,6 +4,7 @@ module Analysis.Ruby.Spec (spec) where
 
 import Data.Abstract.Value
 import Data.Map
+import Data.Map.Monoidal as Map
 
 import SpecHelpers
 
@@ -27,8 +28,16 @@ spec = parallel $ do
       findEnv res `shouldBe` [ (name "Object", addr 0) ]
 
     it "evalutes subclass" $ do
-      res <- findValue <$> evaluate "subclass.rb"
-      res `shouldBe` Right (Right (Right (injValue (String "\"<bar>\""))))
+      res <- evaluate "subclass.rb"
+      findValue res `shouldBe` Right (Right (Right (injValue (String "\"<bar>\""))))
+      findEnv res `shouldBe` [ (name "Bar", addr 6)
+                             , (name "Foo", addr 3)
+                             , (name "Object", addr 0) ]
+
+      let heap = findHeap res
+      Map.lookup (Precise 6) heap `shouldBe` ns "Bar" [ (name "baz", addr 8)
+                                                      , (name "foo", addr 5)
+                                                      , (name "inspect", addr 7) ]
 
     it "evaluates modules" $ do
       res <- evaluate "modules.rb"
@@ -41,6 +50,7 @@ spec = parallel $ do
       res `shouldBe` Right (Right (Right (injValue (String "\"<foo>\""))))
 
   where
+    ns n = Just . Latest . Just . injValue . Namespace (name n)
     addr = Address . Precise
     fixtures = "test/fixtures/ruby/analysis/"
     evaluate entry = evaluateFilesWithPrelude rubyParser
