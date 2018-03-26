@@ -1,14 +1,16 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating
-( type Evaluating
-, evaluate
-, evaluates
-, findValue
-, findEnv
-, findHeap
-, require
-, load
-) where
+  ( type Evaluating
+  , evaluate
+  , evaluates
+  , evaluateWith
+  , evaluatesWith
+  , findValue
+  , findEnv
+  , findHeap
+  , require
+  , load
+  ) where
 
 import Control.Abstract.Evaluator
 import Control.Monad.Effect
@@ -47,6 +49,28 @@ evaluate :: forall value term effects
          -> Final effects value
 evaluate = runAnalysis @(Evaluating term value) . evaluateModule
 
+evaluateWith :: forall value term effects
+             .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
+                , Evaluatable (Base term)
+                , FreeVariables term
+                , MonadAddressable (LocationFor value) value (Evaluating term value effects)
+                , MonadValue value (Evaluating term value effects)
+                , Recursive term
+                , Show (LocationFor value)
+                )
+         => term
+         -> term
+         -> Final effects value
+evaluateWith prelude t = runAnalysis @(Evaluating term value) $ do
+  -- evaluateTerm here rather than evaluateModule
+  -- TODO: we could add evaluatePrelude to MonadAnalysis as an alias for evaluateModule,
+  -- overridden in Evaluating to not reset the environment. In the future we'll want the
+  -- result of evaluating the Prelude to be a build artifact, rather than something that's
+  -- evaluated every single time, but that's contingent upon a whole lot of other future
+  -- scaffolding.
+  preludeEnv <- evaluateTerm prelude *> getEnv
+  withDefaultEnvironment preludeEnv (evaluateModule t)
+
 -- | Evaluate terms and an entry point to a value.
 evaluates :: forall value term effects
           .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
@@ -61,6 +85,24 @@ evaluates :: forall value term effects
           -> (Blob, term)   -- Entrypoint
           -> Final effects value
 evaluates pairs (b, t) = runAnalysis @(Evaluating term value) (withModules b pairs (evaluateModule t))
+
+-- | Evaluate terms and an entry point to a value with a given prelude.
+evaluatesWith :: forall value term effects
+              .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
+                 , Evaluatable (Base term)
+                 , FreeVariables term
+                 , MonadAddressable (LocationFor value) value (Evaluating term value effects)
+                 , MonadValue value (Evaluating term value effects)
+                 , Recursive term
+                 , Show (LocationFor value)
+                 )
+              => term           -- ^ Prelude to evaluate once
+              -> [(Blob, term)] -- ^ List of (blob, term) pairs that make up the program to be evaluated
+              -> (Blob, term)   -- ^ Entrypoint
+              -> Final effects value
+evaluatesWith prelude pairs (b, t)  = runAnalysis @(Evaluating term value) $ do
+  preludeEnv <- evaluateTerm prelude *> getEnv
+  withDefaultEnvironment preludeEnv (withModules b pairs (evaluateModule t))
 
 -- | Run an action with the passed ('Blob', @term@) pairs available for imports.
 withModules :: MonadAnalysis term value m => Blob -> [(Blob, term)] -> m a -> m a
@@ -128,12 +170,13 @@ deriving instance Member NonDet    effects => MonadNonDet (Evaluating term value
 type EvaluatingEffects term value
   = '[ Resumable Prelude.String value
      , Fail                                        -- Failure with an error message
-     , State  (EnvironmentFor value)               -- Environments (both local and global)
-     , State  (HeapFor value)                      -- The heap
-     , Reader (ModuleTable [term])                 -- Cache of unevaluated modules
+     , State  (EnvironmentFor value)                      -- Environments (both local and global)
+     , State  (HeapFor value)                             -- The heap
+     , Reader (ModuleTable [term])                        -- Cache of unevaluated modules
+     , Reader (EnvironmentFor value)                      -- Default environment used as a fallback in lookupEnv
      , State  (ModuleTable (EnvironmentFor value, value)) -- Cache of evaluated modules
-     , State  (ExportsFor value)                   -- Exports (used to filter environments when they are imported)
-     , State  (IntMap.IntMap term)                 -- For jumps
+     , State  (ExportsFor value)                          -- Exports (used to filter environments when they are imported)
+     , State  (IntMap.IntMap term)                        -- For jumps
      ]
 
 -- | Find the value in the 'Final' result of running.
@@ -164,10 +207,16 @@ instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl ter
 
   goto label = IntMap.lookup label <$> raise get >>= maybe (fail ("unknown label: " <> show label)) pure
 
-instance Members '[State (ExportsFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
+instance Members '[ State (ExportsFor value)
+                  , State (EnvironmentFor value)
+                  , Reader (EnvironmentFor value)
+                  ] effects => MonadEnvironment value (Evaluating term value effects) where
   getEnv = raise get
   putEnv = raise . put
   withEnv s = raise . localState s . lower
+
+  defaultEnvironment = raise ask
+  withDefaultEnvironment e = raise . local (const e) . lower
 
   getExports = raise get
   putExports = raise . put

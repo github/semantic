@@ -109,6 +109,7 @@ library
                      , Language.PHP.Assignment
                      , Language.PHP.Grammar
                      , Language.PHP.Syntax
+                     , Language.Preluded
                      , Language.Python.Assignment
                      , Language.Python.Grammar
                      , Language.Python.Syntax
