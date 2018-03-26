@@ -243,9 +243,10 @@ lambda = makeTerm <$> symbol Lambda <*> children (
                           <*> expressions)
 
 block :: Assignment
-block =  makeTerm <$> symbol DoBlock <*> children (Declaration.Function <$> pure [] <*> emptyTerm <*> params <*> expressions)
-     <|> makeTerm <$> symbol Block <*> children (Declaration.Function <$> pure [] <*> emptyTerm <*> params <*> expressions)
-  where params = symbol BlockParameters *> children (many parameter) <|> pure []
+block =  makeTerm <$> symbol DoBlock <*> blockChildren
+     <|> makeTerm <$> symbol Block <*> blockChildren
+  where blockChildren = children (Declaration.Function <$> pure [] <*> emptyTerm <*> params <*> expressions)
+        params = symbol BlockParameters *> children (many parameter) <|> pure []
 
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
