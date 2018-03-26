@@ -1,4 +1,5 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, MultiParamTypeClasses, Rank2Types, ScopedTypeVariables,
+             StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating
 ( type Evaluating
 , findValue
@@ -6,19 +7,19 @@ module Analysis.Abstract.Evaluating
 , findHeap
 ) where
 
-import Control.Abstract.Evaluator
-import Control.Monad.Effect
-import Data.Abstract.Configuration
+import           Control.Abstract.Evaluator
+import           Control.Monad.Effect
+import           Data.Abstract.Configuration
 import qualified Data.Abstract.Environment as Env
-import Data.Abstract.Evaluatable
-import Data.Abstract.Heap
-import Data.Abstract.Module
-import Data.Abstract.ModuleTable
+import           Data.Abstract.Evaluatable
+import           Data.Abstract.Heap
+import           Data.Abstract.Module
+import           Data.Abstract.ModuleTable
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.IntMap as IntMap
 import qualified Data.Map.Monoidal as Monoidal
-import Prelude hiding (fail)
-import Prologue
+import           Prelude hiding (fail)
+import           Prologue
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
 newtype Evaluating term value effects a = Evaluating (Eff effects a)
@@ -31,7 +32,8 @@ deriving instance Member NonDet    effects => MonadNonDet (Evaluating term value
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value
-  = '[ Resumable Prelude.String value
+  = '[ Resumable (ValueExc value)
+     , Resumable (Unspecialized value)
      , Fail                                               -- Failure with an error message
      , Reader [Module term]                               -- The stack of currently-evaluating modules.
      , State  (EnvironmentFor value)                      -- Environments (both local and global)
@@ -44,8 +46,8 @@ type EvaluatingEffects term value
      ]
 
 -- | Find the value in the 'Final' result of running.
-findValue :: forall value term effects . (effects ~ RequiredEffects term value (Evaluating term value effects))
-          => Final effects value -> Either Prelude.String (Either Prelude.String value)
+findValue :: forall value term effects. (effects ~ RequiredEffects term value (Evaluating term value effects))
+          => Final effects value -> Either Prelude.String (Either (SomeExc (Unspecialized value)) (Either (SomeExc (ValueExc value)) value))
 findValue (((((v, _), _), _), _), _) = v
 
 -- | Find the 'Environment' in the 'Final' result of running.
@@ -110,7 +112,7 @@ instance ( Members (EvaluatingEffects term value) effects
          => MonadAnalysis term value (Evaluating term value effects) where
   type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
 
-  analyzeTerm eval term = resumeException @value (eval term) (\yield exc -> string (BC.pack exc) >>= yield)
+  analyzeTerm eval term = resumeException @(Unspecialized value) (eval term) (\yield (Unspecialized str) -> string (BC.pack str) >>= yield)
 
   analyzeModule eval m = pushModule (subterm <$> m) (eval m)
 

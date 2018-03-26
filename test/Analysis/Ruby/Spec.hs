@@ -30,11 +30,11 @@ spec = parallel $ do
 
     it "subclass" $ do
       res <- findValue <$> evaluate "subclass.rb"
-      res `shouldBe` Right (Right (injValue (String "\"<bar>\"")))
+      res `shouldBe` Right (Right (Right (injValue (String "\"<bar>\""))))
 
     it "has prelude" $ do
       res <- findValue <$> evaluate "preluded.rb"
-      res `shouldBe` Right (Right (injValue (String "\"<foo>\"")))
+      res `shouldBe` Right (Right (Right (injValue (String "\"<foo>\""))))
 
   where
     addr = Address . Precise

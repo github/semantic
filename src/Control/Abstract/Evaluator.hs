@@ -177,10 +177,10 @@ class Monad m => MonadControl term m | m -> term where
   -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
   goto :: Label -> m term
 
-class Monad m => MonadThrow exc v m where
-  throwException :: exc -> m v
+class Monad m => MonadThrow exc m where
+  throwException :: exc v -> m v
 
-instance (Effectful m, Members '[Resumable exc value] effects, Monad (m effects)) => MonadThrow exc value (m effects) where
+instance (Effectful m, Members '[Resumable exc] effects, Monad (m effects)) => MonadThrow exc (m effects) where
   throwException = raise . throwError
 
 

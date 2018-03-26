@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, Rank2Types, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, MultiParamTypeClasses, Rank2Types, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Value
 ( MonadValue(..)
 , Comparator(..)
@@ -7,6 +7,7 @@ module Control.Abstract.Value
 , forLoop
 , toBool
 , ValueRoots(..)
+, ValueExc(..)
 , EnvironmentFor
 , ExportsFor
 , HeapFor
@@ -167,3 +168,18 @@ doWhile body cond = loop $ \ continue -> body *> do
 class ValueRoots value where
   -- | Compute the set of addresses rooted by a given value.
   valueRoots :: value -> LiveFor value
+
+
+-- The type of exceptions that can be thrown when constructing values in `MonadValue`.
+data ValueExc value resume where
+  ValueExc :: Prelude.String -> ValueExc value value
+  StringExc :: Prelude.String -> ValueExc value ByteString
+
+instance Eq1 (ValueExc value) where
+  liftEq _ (ValueExc a)  (ValueExc b)  = a == b
+  liftEq _ (StringExc a) (StringExc b) = a == b
+  liftEq _ _             _             = False
+
+deriving instance Show (ValueExc value resume)
+instance Show1 (ValueExc value) where
+  liftShowsPrec _ _ = showsPrec
