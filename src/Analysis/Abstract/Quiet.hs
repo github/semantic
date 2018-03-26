@@ -6,6 +6,13 @@ import Control.Monad.Effect.Resumable
 import Data.Abstract.Evaluatable
 import Prologue
 
+-- | An analysis which resumes exceptions instead of failing.
+--
+--   Use it by composing it onto an analysis:
+--
+--   > runAnalysis @(Quietly Evaluating term value) (…)
+--
+--   Note that exceptions thrown by other analyses may not be caught if 'Quietly' doesn’t know about them, i.e. if they’re not part of the generic 'MonadValue', 'MonadAddressable', etc. machinery.
 newtype Quietly m term value (effects :: [* -> *]) a = Quietly (m term value effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
