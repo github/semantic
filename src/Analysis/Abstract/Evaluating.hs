@@ -41,11 +41,11 @@ type EvaluatingEffects term value
      ]
 
 data EvaluatingState term value = EvaluatingState
-  { _environment :: EnvironmentFor value
-  , _heap        :: HeapFor value
-  , _modules     :: ModuleTable (EnvironmentFor value, value)
-  , _exports     :: ExportsFor value
-  , _jumps       :: IntMap.IntMap term
+  { environment :: EnvironmentFor value
+  , heap        :: HeapFor value
+  , modules     :: ModuleTable (EnvironmentFor value, value)
+  , exports     :: ExportsFor value
+  , jumps       :: IntMap.IntMap term
   }
 
 instance (Ord (LocationFor value), Semigroup (CellFor value)) => Semigroup (EvaluatingState term value) where
@@ -55,20 +55,20 @@ instance (Ord (LocationFor value), Semigroup (CellFor value)) => Monoid (Evaluat
   mempty = EvaluatingState mempty mempty mempty mempty mempty
   mappend = (<>)
 
-environment :: Lens' (EvaluatingState term value) (EnvironmentFor value)
-environment = lens _environment (\ s e -> s {_environment = e})
+_environment :: Lens' (EvaluatingState term value) (EnvironmentFor value)
+_environment = lens environment (\ s e -> s {environment = e})
 
-heap :: Lens' (EvaluatingState term value) (HeapFor value)
-heap = lens _heap (\ s h -> s {_heap = h})
+_heap :: Lens' (EvaluatingState term value) (HeapFor value)
+_heap = lens heap (\ s h -> s {heap = h})
 
-modules :: Lens' (EvaluatingState term value) (ModuleTable (EnvironmentFor value, value))
-modules = lens _modules (\ s m -> s {_modules = m})
+_modules :: Lens' (EvaluatingState term value) (ModuleTable (EnvironmentFor value, value))
+_modules = lens modules (\ s m -> s {modules = m})
 
-exports :: Lens' (EvaluatingState term value) (ExportsFor value)
-exports = lens _exports (\ s e -> s {_exports = e})
+_exports :: Lens' (EvaluatingState term value) (ExportsFor value)
+_exports = lens exports (\ s e -> s {exports = e})
 
-jumps :: Lens' (EvaluatingState term value) (IntMap.IntMap term)
-jumps = lens _jumps (\ s j -> s {_jumps = j})
+_jumps :: Lens' (EvaluatingState term value) (IntMap.IntMap term)
+_jumps = lens jumps (\ s j -> s {jumps = j})
 
 
 (.=) :: Member (State (EvaluatingState term value)) effects => ASetter (EvaluatingState term value) (EvaluatingState term value) a b -> b -> Evaluating term value effects ()
@@ -89,37 +89,37 @@ findValue = fst
 -- | Find the 'Environment' in the 'Final' result of running.
 findEnv :: (effects ~ RequiredEffects term value (Evaluating term value effects))
         => Final effects value -> EnvironmentFor value
-findEnv = _environment . snd
+findEnv = environment . snd
 
 -- | Find the 'Heap' in the 'Final' result of running.
 findHeap :: (effects ~ RequiredEffects term value (Evaluating term value effects))
          => Final effects value -> Monoidal.Map (LocationFor value) (CellFor value)
-findHeap = unHeap . _heap . snd
+findHeap = unHeap . heap . snd
 
 
 instance Members '[Fail, State (EvaluatingState term value)] effects => MonadControl term (Evaluating term value effects) where
   label term = do
-    m <- view jumps
+    m <- view _jumps
     let i = IntMap.size m
-    jumps .= IntMap.insert i term m
+    _jumps .= IntMap.insert i term m
     pure i
 
-  goto label = IntMap.lookup label <$> view jumps >>= maybe (fail ("unknown label: " <> show label)) pure
+  goto label = IntMap.lookup label <$> view _jumps >>= maybe (fail ("unknown label: " <> show label)) pure
 
 instance Members '[ State (EvaluatingState term value)
                   , Reader (EnvironmentFor value)
                   ] effects
       => MonadEnvironment value (Evaluating term value effects) where
-  getEnv = view environment
-  putEnv = (environment .=)
-  withEnv s = localEvaluatingState (environment .~ s)
+  getEnv = view _environment
+  putEnv = (_environment .=)
+  withEnv s = localEvaluatingState (_environment .~ s)
 
   defaultEnvironment = raise ask
   withDefaultEnvironment e = raise . local (const e) . lower
 
-  getExports = view exports
-  putExports = (exports .=)
-  withExports s = localEvaluatingState (exports .~ s)
+  getExports = view _exports
+  putExports = (_exports .=)
+  withExports s = localEvaluatingState (_exports .~ s)
 
   localEnv f a = do
     modifyEnv (f . Env.push)
@@ -127,12 +127,12 @@ instance Members '[ State (EvaluatingState term value)
     result <$ modifyEnv Env.pop
 
 instance Member (State (EvaluatingState term value)) effects => MonadHeap value (Evaluating term value effects) where
-  getHeap = view heap
-  putHeap = (heap .=)
+  getHeap = view _heap
+  putHeap = (_heap .=)
 
 instance Members '[Reader (ModuleTable [Module term]), State (EvaluatingState term value)] effects => MonadModuleTable term value (Evaluating term value effects) where
-  getModuleTable = view modules
-  putModuleTable = (modules .=)
+  getModuleTable = view _modules
+  putModuleTable = (_modules .=)
 
   askModuleTable = raise ask
   localModuleTable f a = raise (local f (lower a))
