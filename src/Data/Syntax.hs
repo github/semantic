@@ -2,7 +2,7 @@
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For HasCallStack
 module Data.Syntax where
 
-import Data.Abstract.Evaluatable
+import Data.Abstract.Evaluatable hiding (catchError)
 import Data.AST
 import Data.Range
 import Data.Record
