@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating
 ( Evaluating
+, EvaluatingState(..)
 , findValue
 , findEnv
 , findHeap
