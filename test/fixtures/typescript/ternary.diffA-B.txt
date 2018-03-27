@@ -1,11 +1,19 @@
 (Program
 {+(Assignment
-  {+(Identifier)+}
+  {+(MemberAccess
+    {+(Identifier)+}
+    {+(Identifier)+})+}
   {+(If
-    {+(Identifier)+}
-    {+(Identifier)+}
     {+(MemberAccess
       {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(MemberAccess
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(MemberAccess
+      {+(MemberAccess
+        {+(Identifier)+}
+        {+(Identifier)+})+}
       {+(Identifier)+})+})+})+}
 {-(If
   {-(Identifier)-}

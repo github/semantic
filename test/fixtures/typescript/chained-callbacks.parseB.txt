@@ -16,5 +16,7 @@
           (Empty)))
       (
         (Return
-          (Identifier))))
+          (MemberAccess
+            (Identifier)
+            (Identifier)))))
     (Empty)))

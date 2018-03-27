@@ -1,7 +1,9 @@
 (Program
   (New
     (Call
-      (Identifier)
+      (MemberAccess
+        (Identifier)
+        (Identifier))
       (Float)
     { (TextElement)
     ->(TextElement) }
