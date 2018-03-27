@@ -2,9 +2,6 @@
 module Analysis.Abstract.Evaluating
 ( Evaluating
 , EvaluatingState(..)
-, findValue
-, findEnv
-, findHeap
 ) where
 
 import           Control.Abstract.Analysis
@@ -80,22 +77,6 @@ view lens = raise (gets (^. lens))
 
 localEvaluatingState :: Member (State (EvaluatingState term value)) effects => (EvaluatingState term value -> EvaluatingState term value) -> Evaluating term value effects a -> Evaluating term value effects a
 localEvaluatingState f = raise . localState f . lower
-
-
--- | Find the value in the 'Final' result of running.
-findValue :: (effects ~ RequiredEffects term value (Evaluating term value effects))
-          => Final effects value -> Either Prelude.String (Either (SomeExc (Unspecialized value)) (Either (SomeExc (ValueExc value)) value))
-findValue = fst
-
--- | Find the 'Environment' in the 'Final' result of running.
-findEnv :: (effects ~ RequiredEffects term value (Evaluating term value effects))
-        => Final effects value -> EnvironmentFor value
-findEnv = environment . snd
-
--- | Find the 'Heap' in the 'Final' result of running.
-findHeap :: (effects ~ RequiredEffects term value (Evaluating term value effects))
-         => Final effects value -> Monoidal.Map (LocationFor value) (CellFor value)
-findHeap = unHeap . heap . snd
 
 
 instance Members '[Fail, State (EvaluatingState term value)] effects => MonadControl term (Evaluating term value effects) where
