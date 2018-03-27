@@ -11,6 +11,7 @@ import Algebra.Graph.Export.Dot
 import Control.Abstract.Analysis
 import Data.Abstract.FreeVariables
 import Data.Abstract.Module
+import Data.Abstract.Evaluatable (EvalError(..))
 import Prologue hiding (empty)
 
 -- | The graph of function definitions to symbols used in a given program.
@@ -34,11 +35,18 @@ deriving instance MonadEvaluator term value (m term value effects) => MonadEvalu
 instance ( Effectful (m term value)
          , Member (State ImportGraph) effects
          , MonadAnalysis term value (m term value effects)
+         , Member (Resumable (EvalError term value)) effects 
          )
          => MonadAnalysis term value (ImportGraphing m term value effects) where
   type RequiredEffects term value (ImportGraphing m term value effects) = State ImportGraph ': RequiredEffects term value (m term value effects)
 
-  analyzeTerm = liftAnalyze analyzeTerm
+  analyzeTerm eval term = resumeException @(EvalError term value) (liftAnalyze analyzeTerm eval term) (\yield (LoadError name) ->
+    do
+      ms <- askModuleStack
+      let parent = maybe empty (vertex . moduleName) (listToMaybe ms)
+      modifyImportGraph (parent >< vertex name <>)
+      yield []
+    )
 
   analyzeModule recur m = do
     ms <- askModuleStack
