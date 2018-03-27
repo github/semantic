@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, TypeOperators #-}
+{-# LANGUAGE GADTs, TypeOperators #-}
 
 module Control.Abstract.Matching
   ( Matcher
