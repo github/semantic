@@ -11,7 +11,7 @@ import Prologue
 import Analysis.ConstructorName (ConstructorName, constructorLabel)
 import Analysis.IdentifierName (IdentifierName, identifierLabel)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
-import Analysis.ModuleDef (HasModuleDef, moduleDefAlgebra)
+import Analysis.PackageDef (HasPackageDef, packageDefAlgebra)
 import Data.Blob
 import Data.Diff
 import Data.JSON.Fields
@@ -44,12 +44,12 @@ parseBlobs renderer blobs = toOutput' <$> distributeFoldMap (parseBlob renderer)
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
 parseBlob :: TermRenderer output -> Blob -> Task output
 parseBlob renderer blob@Blob{..}
-  | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[ConstructorName, HasModuleDef, HasDeclaration, IdentifierName, Foldable, Functor, ToJSONFields1]) <$> blobLanguage
+  | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[ConstructorName, HasPackageDef, HasDeclaration, IdentifierName, Foldable, Functor, ToJSONFields1]) <$> blobLanguage
   = parse parser blob >>= case renderer of
     JSONTermRenderer           -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)
     SExpressionTermRenderer    -> decorate constructorLabel . (Nil <$)                   >=> render renderSExpressionTerm
     TagsTermRenderer           -> decorate (declarationAlgebra blob)                     >=> render (renderToTags blob)
-    ImportsTermRenderer        -> decorate (declarationAlgebra blob) >=> decorate (moduleDefAlgebra blob) >=> render (renderToImports blob)
+    ImportsTermRenderer        -> decorate (declarationAlgebra blob) >=> decorate (packageDefAlgebra blob) >=> render (renderToImports blob)
     SymbolsTermRenderer fields -> decorate (declarationAlgebra blob)                     >=> render (renderToSymbols fields blob)
     DOTTermRenderer            ->                                                            render (renderDOTTerm blob)
   | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))

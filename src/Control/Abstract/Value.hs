@@ -6,6 +6,7 @@ module Control.Abstract.Value
 , doWhile
 , forLoop
 , toBool
+, makeNamespace
 , ValueRoots(..)
 , ValueExc(..)
 , EnvironmentFor
@@ -19,8 +20,12 @@ module Control.Abstract.Value
 
 import Control.Abstract.Evaluator
 import Data.Abstract.FreeVariables
+import Data.Abstract.Environment as Env
+import Data.Abstract.Address (Address)
 import Data.Abstract.Number as Number
 import Data.Scientific (Scientific)
+import Data.Semigroup.Reducer hiding (unit)
+import Prelude
 import Prologue
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
@@ -165,6 +170,22 @@ doWhile :: MonadValue value m
 doWhile body cond = loop $ \ continue -> body *> do
   this <- cond
   ifthenelse this continue unit
+
+makeNamespace :: ( MonadValue value m
+                 , MonadEnvironment value m
+                 , MonadHeap value m
+                 , Reducer value (CellFor value)
+                 , Ord (LocationFor value)
+                 )
+              => Name
+              -> Address (LocationFor value) value
+              -> [value]
+              -> m value
+makeNamespace name addr supers = do
+  superEnv <- mconcat <$> traverse scopedEnvironment supers
+  namespaceEnv <- Env.head <$> getEnv
+  v <- namespace name (Env.overwritingUnion superEnv namespaceEnv)
+  v <$ assign addr v
 
 
 -- | Value types, e.g. closures, which can root a set of addresses.

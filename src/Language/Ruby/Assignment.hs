@@ -26,10 +26,8 @@ import qualified Language.Ruby.Syntax as Ruby.Syntax
 -- | The type of Ruby syntax.
 type Syntax = '[
     Comment.Comment
-  , Declaration.Class
   , Declaration.Function
   , Declaration.Method
-  , Declaration.Module
   , Expression.Arithmetic
   , Expression.Bitwise
   , Expression.Boolean
@@ -77,6 +75,8 @@ type Syntax = '[
   , Syntax.Program
   , Ruby.Syntax.Require
   , Ruby.Syntax.Load
+  , Ruby.Syntax.Class
+  , Ruby.Syntax.Module
   , []
   ]
 
@@ -200,14 +200,14 @@ endBlock :: Assignment
 endBlock = makeTerm <$> symbol EndBlock <*> children (Statement.ScopeExit <$> many expression)
 
 class' :: Assignment
-class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> pure [] <*> expression <*> (superclass <|> pure []) <*> expressions)
+class' = makeTerm <$> symbol Class <*> children (Ruby.Syntax.Class <$> expression <*> (superclass <|> pure []) <*> expressions)
   where superclass = pure <$ symbol Superclass <*> children expression
 
 singletonClass :: Assignment
-singletonClass = makeTerm <$> symbol SingletonClass <*> children (Declaration.Class <$> pure [] <*> expression <*> pure [] <*> expressions)
+singletonClass = makeTerm <$> symbol SingletonClass <*> children (Ruby.Syntax.Class <$> expression <*> pure [] <*> expressions)
 
 module' :: Assignment
-module' = makeTerm <$> symbol Module <*> children (Declaration.Module <$> expression <*> many expression)
+module' = makeTerm <$> symbol Module <*> children (Ruby.Syntax.Module <$> expression <*> many expression)
 
 scopeResolution :: Assignment
 scopeResolution = makeTerm <$> symbol ScopeResolution <*> children (Expression.ScopeResolution <$> many expression)

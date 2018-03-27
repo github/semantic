@@ -25,7 +25,7 @@ instance Evaluatable Function where
     (v, addr) <- letrec name (abstract (paramNames functionParameters) functionBody)
     modifyEnv (Env.insert name addr)
     pure v
-    where paramNames = foldMap (pure . freeVariable . subterm)
+    where paramNames = foldMap (freeVariables . subterm)
           name = freeVariable (subterm functionName)
 
 
@@ -46,7 +46,7 @@ instance Evaluatable Method where
     (v, addr) <- letrec name (abstract (paramNames methodParameters) methodBody)
     modifyEnv (Env.insert name addr)
     pure v
-    where paramNames = foldMap (pure . freeVariable . subterm)
+    where paramNames = foldMap (freeVariables . subterm)
           name = freeVariable (subterm methodName)
 
 
@@ -152,20 +152,6 @@ instance Evaluatable Class where
       classEnv <- Env.head <$> getEnv
       klass name supers classEnv
     v <$ modifyEnv (Env.insert name addr)
-
-data Module a = Module { moduleIdentifier :: !a, moduleScope :: ![a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 Module where liftEq = genericLiftEq
-instance Ord1 Module where liftCompare = genericLiftCompare
-instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
-
--- TODO: Fix this extremely bogus instance (copied from that of Program)
--- In Go, functions in the same module can be spread across files.
--- We need to ensure that all input files have aggregated their content into
--- a coherent module before we begin evaluating a module.
-instance Evaluatable Module where
-  eval (Module _ xs) = eval xs
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }

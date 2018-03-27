@@ -41,7 +41,6 @@ type Syntax = '[
   , Declaration.DefaultExport
   , Declaration.QualifiedExport
   , Declaration.QualifiedExportFrom
-  , Declaration.Module
   , Expression.Arithmetic
   , Expression.Bitwise
   , Expression.Boolean
@@ -124,6 +123,8 @@ type Syntax = '[
   , TypeScript.Syntax.LiteralType
   , TypeScript.Syntax.Union
   , TypeScript.Syntax.Intersection
+  , TypeScript.Syntax.Module
+  , TypeScript.Syntax.InternalModule
   , TypeScript.Syntax.FunctionType
   , TypeScript.Syntax.Tuple
   , TypeScript.Syntax.Constructor
@@ -131,7 +132,6 @@ type Syntax = '[
   , TypeScript.Syntax.ImportAlias
   , TypeScript.Syntax.Debugger
   , TypeScript.Syntax.ShorthandPropertyIdentifier
-  , TypeScript.Syntax.InternalModule
   , TypeScript.Syntax.Super
   , TypeScript.Syntax.Undefined
   , TypeScript.Syntax.ClassHeritage
@@ -151,9 +151,6 @@ type Syntax = '[
   , TypeScript.Syntax.RequiredParameter
   , TypeScript.Syntax.RestParameter
   , TypeScript.Syntax.PropertySignature
-  , TypeScript.Syntax.ImportExportSpecifier
-  , TypeScript.Syntax.ExportClause
-  , TypeScript.Syntax.Export
   , TypeScript.Syntax.AmbientDeclaration
   , TypeScript.Syntax.EnumDeclaration
   , TypeScript.Syntax.ExtendsClause
@@ -725,8 +722,6 @@ exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip
     makeNameAliasPair from (Just alias) = (from, alias)
     makeNameAliasPair from Nothing = (from, from)
     rawIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source)
-  -- <|> (makeExport2 <$> manyTerm decorator <*> emptyTerm <*> (pure <$> term (fromClause <|> exportClause <|> declaration <|> expression <|> identifier <|> importAlias')))))
-    -- makeExport2 decorators fromClause exportClause = Declaration.QualifiedExport fromClause exportClause
 
 propertySignature :: Assignment
 propertySignature = makePropertySignature <$> symbol Grammar.PropertySignature <*> children ((,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> (term typeAnnotation' <|> emptyTerm))
@@ -760,7 +755,7 @@ internalModule :: Assignment
 internalModule = makeTerm <$> symbol Grammar.InternalModule <*> children (TypeScript.Syntax.InternalModule <$> term (string <|> identifier <|> nestedIdentifier) <*> statements)
 
 module' :: Assignment
-module' = makeTerm <$> symbol Module <*> children (Declaration.Module <$> term (string <|> identifier <|> nestedIdentifier) <*> (statements <|> pure []))
+module' = makeTerm <$> symbol Module <*> children (TypeScript.Syntax.Module <$> term (string <|> identifier <|> nestedIdentifier) <*> (statements <|> pure []))
 
 
 statements :: Assignment.Assignment [] Grammar [Term]
