@@ -21,7 +21,7 @@ import Control.Abstract.Evaluator
 import Data.Abstract.FreeVariables
 import Data.Abstract.Number as Number
 import Data.Scientific (Scientific)
-import Prologue
+import Prologue hiding (TypeError)
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
 --   have built-in generalized-comparison ("spaceship") operators. If you want to
@@ -175,14 +175,16 @@ class ValueRoots value where
 
 -- The type of exceptions that can be thrown when constructing values in `MonadValue`.
 data ValueExc value resume where
-  ValueExc :: Prelude.String -> ValueExc value value
-  StringExc :: Prelude.String -> ValueExc value ByteString
+  TypeError :: Prelude.String -> ValueExc value value
+  StringError :: Prelude.String -> ValueExc value ByteString
   NamespaceError :: Prelude.String -> ValueExc value (EnvironmentFor value)
+  ScopedEnvironmentError :: Prelude.String -> ValueExc value (EnvironmentFor value)
 
 instance Eq1 (ValueExc value) where
-  liftEq _ (ValueExc a)  (ValueExc b)  = a == b
-  liftEq _ (StringExc a) (StringExc b) = a == b
+  liftEq _ (TypeError a)  (TypeError b)  = a == b
+  liftEq _ (StringError a) (StringError b) = a == b
   liftEq _ (NamespaceError a) (NamespaceError b) = a == b
+  liftEq _ (ScopedEnvironmentError a) (ScopedEnvironmentError b) = a == b
   liftEq _ _             _             = False
 
 deriving instance Show (ValueExc value resume)

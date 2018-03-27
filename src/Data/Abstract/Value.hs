@@ -232,7 +232,7 @@ instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
   scopedEnvironment o
     | Just (Class _ env) <- prjValue o = pure env
     | Just (Namespace _ env) <- prjValue o = pure env
-    | otherwise = fail ("object type passed to scopedEnvironment doesn't have an environment: " <> show o)
+    | otherwise = throwException $ ScopedEnvironmentError ("object type passed to scopedEnvironment doesn't have an environment: " <> show o)
 
   asString v
     | Just (String n) <- prjValue v = pure n
@@ -305,7 +305,7 @@ instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
     injValue . Closure names l . Env.bind (foldr Set.delete (Set.fromList (freeVariables body)) names) <$> getEnv
 
   apply op params = do
-    Closure names label env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
+    Closure names label env <- maybe (throwException $ TypeError ("expected a closure, got: " <> show op)) pure (prjValue op)
     bindings <- foldr (\ (name, param) rest -> do
       v <- param
       a <- alloc name
