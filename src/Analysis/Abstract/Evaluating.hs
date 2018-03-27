@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, StandaloneDeriving, TemplateHaskell, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating
 ( Evaluating
 , findValue
@@ -17,7 +17,6 @@ import           Data.Abstract.ModuleTable
 import qualified Data.IntMap as IntMap
 import qualified Data.Map.Monoidal as Monoidal
 import           Lens.Micro
-import           Lens.Micro.TH
 import           Prelude hiding (fail)
 import           Prologue
 
@@ -56,7 +55,20 @@ instance (Ord (LocationFor value), Semigroup (CellFor value)) => Monoid (Evaluat
   mempty = EvaluatingState mempty mempty mempty mempty mempty
   mappend = (<>)
 
-makeLenses ''EvaluatingState
+environment :: Lens' (EvaluatingState term value) (EnvironmentFor value)
+environment = lens _environment (\ s e -> s {_environment = e})
+
+heap :: Lens' (EvaluatingState term value) (HeapFor value)
+heap = lens _heap (\ s h -> s {_heap = h})
+
+modules :: Lens' (EvaluatingState term value) (ModuleTable (EnvironmentFor value, value))
+modules = lens _modules (\ s m -> s {_modules = m})
+
+exports :: Lens' (EvaluatingState term value) (ExportsFor value)
+exports = lens _exports (\ s e -> s {_exports = e})
+
+jumps :: Lens' (EvaluatingState term value) (IntMap.IntMap term)
+jumps = lens _jumps (\ s j -> s {_jumps = j})
 
 
 (.=) :: Member (State (EvaluatingState term value)) effects => ASetter (EvaluatingState term value) (EvaluatingState term value) a b -> b -> Evaluating term value effects ()
