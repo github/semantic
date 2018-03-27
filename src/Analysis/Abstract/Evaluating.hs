@@ -68,7 +68,7 @@ _jumps = lens jumps (\ s j -> s {jumps = j})
 
 
 (.=) :: Member (State (EvaluatingState term value)) effects => ASetter (EvaluatingState term value) (EvaluatingState term value) a b -> b -> Evaluating term value effects ()
-lens .= val = raise (modify (lens .~ val))
+lens .= val = raise (modify' (lens .~ val))
 
 view :: Member (State (EvaluatingState term value)) effects => Getting a (EvaluatingState term value) a -> Evaluating term value effects a
 view lens = raise (gets (^. lens))
