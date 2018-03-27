@@ -1,13 +1,9 @@
 class Object
-  def self.new
+  def new
     self
   end
 
-  def self.inspect
-    return "Object"
-  end
-
   def inspect
-    return "\#<Object:0x...>"
+    return "<object>"
   end
 end
