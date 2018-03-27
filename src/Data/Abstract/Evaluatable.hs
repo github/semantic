@@ -41,7 +41,7 @@ type MonadEvaluatable term value m =
   )
 
 data EvalError term value resume where
-  FreeVariableError :: Prelude.String -> EvalError term value value
+  -- FreeVariableError :: Prelude.String -> EvalError term value value
   LoadError         :: ModuleName -> EvalError term value [Module term]
 
 deriving instance Eq (EvalError term a b)
