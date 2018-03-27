@@ -1,7 +1,9 @@
 (Program
   (If
   { (Identifier)
-  ->(Identifier) }
+  ->(MemberAccess
+    {+(Identifier)+}
+    {+(Identifier)+}) }
     (
       (Call
         (Identifier)

@@ -9,11 +9,15 @@
         {+(JsxAttribute
           {+(Identifier)+}
           {+(JsxExpression
-            {+(Identifier)+})+})+}
+            {+(MemberAccess
+              {+(Identifier)+}
+              {+(Identifier)+})+})+})+}
         {-(JsxExpression
           {-(Call
             {-(Identifier)-}
-            {-(Identifier)-}
+            {-(MemberAccess
+              {-(Identifier)-}
+              {-(Identifier)-})-}
             {-(Empty)-})-})-})
         (JsxExpression
           (Identifier))

@@ -9,7 +9,9 @@
           (JsxExpression
             (Call
               (Identifier)
-              (Identifier)
+              (MemberAccess
+                (Identifier)
+                (Identifier))
               (Empty))))
         (JsxExpression
           (Identifier))
