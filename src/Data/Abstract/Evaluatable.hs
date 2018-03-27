@@ -9,22 +9,23 @@ module Data.Abstract.Evaluatable
 , evaluateModule
 , withModules
 , evaluateModules
+, throwEvalError
 , require
 , load
 ) where
 
-import Control.Abstract.Addressable as X
-import Control.Abstract.Analysis as X
+import           Control.Abstract.Addressable as X
+import           Control.Abstract.Analysis as X
 import qualified Data.Abstract.Environment as Env
 import qualified Data.Abstract.Exports as Exports
-import Data.Abstract.FreeVariables as X
-import Data.Abstract.Module
-import Data.Abstract.ModuleTable as ModuleTable
-import Data.Semigroup.App
-import Data.Semigroup.Foldable
-import Data.Term
-import Prelude hiding (fail)
-import Prologue
+import           Data.Abstract.FreeVariables as X
+import           Data.Abstract.Module
+import           Data.Abstract.ModuleTable as ModuleTable
+import           Data.Semigroup.App
+import           Data.Semigroup.Foldable
+import           Data.Term
+import           Prelude hiding (fail)
+import           Prologue
 
 type MonadEvaluatable term value m =
   ( Evaluatable (Base term)
@@ -33,14 +34,23 @@ type MonadEvaluatable term value m =
   , MonadAnalysis term value m
   , MonadThrow (Unspecialized value) m
   , MonadThrow (ValueExc value) m
-  , MonadThrow (EvalError value) m
+  , MonadThrow (EvalError term value) m
   , MonadValue value m
   , Recursive term
   , Show (LocationFor value)
   )
 
-data EvalError value resume where
-  FreeVariableError :: Prelude.String -> EvalError value value
+data EvalError term value resume where
+  FreeVariableError :: Prelude.String -> EvalError term value value
+  LoadError         :: ModuleName -> EvalError term value [Module term]
+
+deriving instance Eq (EvalError term a b)
+deriving instance Show (EvalError term a b)
+instance Show1 (EvalError term value) where
+  liftShowsPrec _ _ = showsPrec
+
+throwEvalError :: MonadEvaluatable term value m =>  EvalError term value resume -> m resume
+throwEvalError = throwException
 
 data Unspecialized a b where
   Unspecialized :: { getUnspecialized :: Prelude.String } -> Unspecialized value value
@@ -94,9 +104,9 @@ require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup nam
 load :: MonadEvaluatable term value m
      => ModuleName
      -> m (EnvironmentFor value, value)
-load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
+load name = askModuleTable >>= maybe notFound pure . moduleTableLookup name >>= evalAndCache
   where
-    notFound = fail ("cannot load module: " <> show name)
+    notFound = throwEvalError (LoadError name)
 
     evalAndCache []     = (,) <$> pure mempty <*> unit
     evalAndCache [x]    = evalAndCache' x
@@ -146,5 +156,5 @@ withModules = localModuleTable . const . ModuleTable.fromList
 evaluateModules :: MonadEvaluatable term value m
                 => [Module term]
                 -> m value
-evaluateModules [] = fail "evaluateModules: empty list"
+evaluateModules []     = fail "evaluateModules: empty list"
 evaluateModules (m:ms) = withModules ms (evaluateModule m)

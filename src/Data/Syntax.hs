@@ -106,7 +106,7 @@ instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Identifier where
-  eval (Identifier name) = lookupWith deref name >>= maybe (throwException $ FreeVariableError ("free variable: " <> show (friendlyName name))) pure
+  eval (Identifier name) = lookupWith deref name >>= maybe (throwEvalError (FreeVariableError ("free variable: " <> show (friendlyName name)) :: EvalError term value value)) pure
 
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = pure x
