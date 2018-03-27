@@ -175,17 +175,17 @@ class ValueRoots value where
 
 -- The type of exceptions that can be thrown when constructing values in `MonadValue`.
 data ValueExc value resume where
-  TypeError :: Prelude.String -> ValueExc value value
-  StringError :: Prelude.String -> ValueExc value ByteString
-  NamespaceError :: Prelude.String -> ValueExc value (EnvironmentFor value)
+  TypeError              :: Prelude.String -> ValueExc value value
+  StringError            :: Prelude.String -> ValueExc value ByteString
+  NamespaceError         :: Prelude.String -> ValueExc value (EnvironmentFor value)
   ScopedEnvironmentError :: Prelude.String -> ValueExc value (EnvironmentFor value)
 
 instance Eq1 (ValueExc value) where
-  liftEq _ (TypeError a)  (TypeError b)  = a == b
-  liftEq _ (StringError a) (StringError b) = a == b
-  liftEq _ (NamespaceError a) (NamespaceError b) = a == b
+  liftEq _ (TypeError a)  (TypeError b)                          = a == b
+  liftEq _ (StringError a) (StringError b)                       = a == b
+  liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
   liftEq _ (ScopedEnvironmentError a) (ScopedEnvironmentError b) = a == b
-  liftEq _ _             _             = False
+  liftEq _ _             _                                       = False
 
 deriving instance Show (ValueExc value resume)
 instance Show1 (ValueExc value) where
