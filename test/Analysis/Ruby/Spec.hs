@@ -12,28 +12,28 @@ spec :: Spec
 spec = parallel $ do
   describe "evalutes Ruby" $ do
     it "require_relative" $ do
-      env <- findEnv <$> evaluate "main.rb"
+      env <- environment . snd <$> evaluate "main.rb"
       let expectedEnv = [ (qualifiedName ["Object"], addr 0)
                         , (qualifiedName ["foo"], addr 3)]
       env `shouldBe` expectedEnv
 
     it "load" $ do
-      env <- findEnv <$> evaluate "load.rb"
+      env <- environment . snd <$> evaluate "load.rb"
       let expectedEnv = [ (qualifiedName ["Object"], addr 0)
                         , (qualifiedName ["foo"], addr 3) ]
       env `shouldBe` expectedEnv
 
     it "load wrap" $ do
       res <- evaluate "load-wrap.rb"
-      findValue res `shouldBe` Left "free variable: \"foo\""
-      findEnv res `shouldBe` [(qualifiedName ["Object"], addr 0)]
+      fst res `shouldBe` Left "free variable: \"foo\""
+      environment (snd res) `shouldBe` [(qualifiedName ["Object"], addr 0)]
 
     it "subclass" $ do
-      res <- findValue <$> evaluate "subclass.rb"
+      res <- fst <$> evaluate "subclass.rb"
       res `shouldBe` Right (Right (Right (injValue (String "\"<bar>\""))))
 
     it "has prelude" $ do
-      res <- findValue <$> evaluate "preluded.rb"
+      res <- fst <$> evaluate "preluded.rb"
       res `shouldBe` Right (Right (Right (injValue (String "\"<foo>\""))))
 
   where
