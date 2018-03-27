@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, KindSignatures, RankNTypes, TypeOperators #-}
+{-# LANGUAGE GADTs, KindSignatures, TypeOperators #-}
 
 module Control.Abstract.Matching
   ( Matcher
@@ -121,7 +121,7 @@ paraMatcher m t = interp (embedTerm t) m <|> foldMapA snd t
 interp :: (Alternative m, Monad m) => t -> Matcher t a -> m a
 interp t (Choice a b) = interp t a <|> interp t b
 interp t Target       = pure t
-interp t (Match f m)  = foldMapA (flip interp m) (f t)
+interp t (Match f m)  = foldMapA (`interp` m) (f t)
 interp _ (Pure a)     = pure a
 interp _ Empty        = empty
 interp t (Then m f)   = interp t m >>= interp t . f
