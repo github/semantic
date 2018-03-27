@@ -30,7 +30,8 @@ deriving instance Member NonDet    effects => MonadNonDet (Evaluating term value
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value
-  = '[ Resumable (ValueExc value)
+  = '[ Resumable (EvalError value)
+     , Resumable (ValueExc value)
      , Resumable (Unspecialized value)
      , Fail                                               -- Failure with an error message
      , Reader [Module term]                               -- The stack of currently-evaluating modules.
@@ -45,7 +46,7 @@ type EvaluatingEffects term value
 
 -- | Find the value in the 'Final' result of running.
 findValue :: (effects ~ RequiredEffects term value (Evaluating term value effects))
-          => Final effects value -> Either Prelude.String (Either (SomeExc (Unspecialized value)) (Either (SomeExc (ValueExc value)) value))
+          => Final effects value -> Either Prelude.String (Either (SomeExc (Unspecialized value)) (Either (SomeExc (ValueExc value)) (Either (SomeExc (EvalError value)) value)))
 findValue (((((v, _), _), _), _), _) = v
 
 -- | Find the 'Environment' in the 'Final' result of running.

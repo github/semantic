@@ -2,7 +2,6 @@
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For HasCallStack
 module Data.Syntax where
 
-import Control.Monad.Fail
 import Data.Abstract.Evaluatable
 import Data.AST
 import Data.Range
@@ -107,7 +106,7 @@ instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Identifier where
-  eval (Identifier name) = lookupWith deref name >>= maybe (fail ("free variable: " <> show (friendlyName name))) pure
+  eval (Identifier name) = lookupWith deref name >>= maybe (throwException $ FreeVariableError ("free variable: " <> show (friendlyName name))) pure
 
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = pure x

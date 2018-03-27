@@ -9,7 +9,7 @@ import Data.Abstract.Evaluatable
 import qualified Data.Abstract.Number as Number
 import Data.Scientific (Scientific)
 import qualified Data.Set as Set
-import Prologue
+import Prologue hiding (TypeError)
 import Prelude hiding (Float, Integer, String, Rational, fail)
 import qualified Prelude
 
@@ -305,7 +305,7 @@ instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
     injValue . Closure names l . Env.bind (foldr Set.delete (Set.fromList (freeVariables body)) names) <$> getEnv
 
   apply op params = do
-    Closure names label env <- maybe (throwException $ TypeError ("expected a closure, got: " <> show op)) pure (prjValue op)
+    Closure names label env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
     bindings <- foldr (\ (name, param) rest -> do
       v <- param
       a <- alloc name

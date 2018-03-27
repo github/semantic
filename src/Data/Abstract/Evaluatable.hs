@@ -4,6 +4,7 @@ module Data.Abstract.Evaluatable
 , MonadEvaluatable
 , Evaluatable(..)
 , Unspecialized(..)
+, EvalError(..)
 , evaluateTerm
 , evaluateModule
 , withModules
@@ -32,10 +33,14 @@ type MonadEvaluatable term value m =
   , MonadAnalysis term value m
   , MonadThrow (Unspecialized value) m
   , MonadThrow (ValueExc value) m
+  , MonadThrow (EvalError value) m
   , MonadValue value m
   , Recursive term
   , Show (LocationFor value)
   )
+
+data EvalError value resume where
+  FreeVariableError :: Prelude.String -> EvalError value value
 
 data Unspecialized a b where
   Unspecialized :: { getUnspecialized :: Prelude.String } -> Unspecialized value value
