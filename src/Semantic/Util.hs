@@ -7,6 +7,7 @@ import Analysis.Abstract.Caching
 import Analysis.Abstract.Dead
 import Analysis.Abstract.Evaluating as X
 import Analysis.Abstract.Tracing
+import Analysis.Abstract.ImportGraph
 import Analysis.Declaration
 import Control.Abstract.Analysis
 import Control.Monad.IO.Class
@@ -34,11 +35,13 @@ import System.FilePath.Posix
 
 import qualified Language.Go.Assignment as Go
 import qualified Language.Python.Assignment as Python
+import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 
 -- Ruby
 evaluateRubyFile = evaluateWithPrelude rubyParser
 evaluateRubyFiles = evaluateFilesWithPrelude rubyParser
+evaluateRubyImportGraph paths = runAnalysis @(ImportGraphing Evaluating Ruby.Term Value) . evaluateModules <$> parseFiles rubyParser paths
 
 -- Go
 evaluateGoFile = evaluateFile goParser
