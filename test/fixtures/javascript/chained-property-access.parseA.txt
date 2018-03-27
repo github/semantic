@@ -5,11 +5,17 @@
         (Call
           (MemberAccess
             (Call
-              (Identifier)
+              (MemberAccess
+                (Identifier)
+                (Identifier))
               (Empty))
             (Identifier))
-          (Identifier)
+          (MemberAccess
+            (Identifier)
+            (Identifier))
           (Empty))
         (Identifier))
-      (Identifier)
+      (MemberAccess
+        (Identifier)
+        (Identifier))
       (Empty))))

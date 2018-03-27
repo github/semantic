@@ -5,13 +5,19 @@
         (Call
           (MemberAccess
             (Call
-              (Identifier)
+              (MemberAccess
+                (Identifier)
+                (Identifier))
               (Empty))
             (Identifier))
-        { (Identifier)
-        ->(Identifier) }
+          (MemberAccess
+          { (Identifier)
+          ->(Identifier) }
+            (Identifier))
           (Empty))
         (Identifier))
-    { (Identifier)
-    ->(Identifier) }
+      (MemberAccess
+      { (Identifier)
+      ->(Identifier) }
+        (Identifier))
       (Empty))))
