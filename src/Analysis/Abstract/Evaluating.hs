@@ -9,11 +9,9 @@ import           Control.Monad.Effect
 import           Data.Abstract.Configuration
 import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.Heap
 import           Data.Abstract.Module
 import           Data.Abstract.ModuleTable
 import qualified Data.IntMap as IntMap
-import qualified Data.Map.Monoidal as Monoidal
 import           Lens.Micro
 import           Prelude hiding (fail)
 import           Prologue
