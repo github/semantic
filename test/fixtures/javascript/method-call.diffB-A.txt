@@ -1,6 +1,8 @@
 (Program
   (Call
-    (Identifier)
+    (MemberAccess
+      (Identifier)
+      (Identifier))
     (Identifier)
   { (TextElement)
   ->(TextElement) }
