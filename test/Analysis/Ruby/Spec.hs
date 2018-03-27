@@ -17,17 +17,17 @@ spec = parallel $ do
       env `shouldBe` [ (name "Object", addr 0)
                      , (name "foo", addr 3) ]
 
-    it "evalutes load" $ do
+    it "evaluates load" $ do
       env <- findEnv <$> evaluate "load.rb"
       env `shouldBe` [ (name "Object", addr 0)
                      , (name "foo", addr 3) ]
 
-    it "evalutes load with wrapper" $ do
+    it "evaluates load with wrapper" $ do
       res <- evaluate "load-wrap.rb"
       findValue res `shouldBe` Left "free variable: \"foo\""
       findEnv res `shouldBe` [ (name "Object", addr 0) ]
 
-    it "evalutes subclass" $ do
+    it "evaluates subclass" $ do
       res <- evaluate "subclass.rb"
       findValue res `shouldBe` Right (Right (Right (injValue (String "\"<bar>\""))))
       findEnv res `shouldBe` [ (name "Bar", addr 6)
