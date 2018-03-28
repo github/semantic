@@ -22,12 +22,11 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Function where
   eval Function{..} = do
-    (v, addr) <- letrec name (abstract (paramNames functionParameters) functionBody)
-    modifyEnv (Env.insert name addr)
+    name' <- freeVariable' functionName
+    (v, addr) <- letrec name' (abstract (paramNames functionParameters) functionBody)
+    modifyEnv (Env.insert name' addr)
     pure v
     where paramNames = foldMap (freeVariables . subterm)
-          name = freeVariable (subterm functionName)
-
 
 data Method a = Method { methodContext :: ![a], methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -43,11 +42,12 @@ instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 -- local environment.
 instance Evaluatable Method where
   eval Method{..} = do
+    name <- freeVariable' methodName
     (v, addr) <- letrec name (abstract (paramNames methodParameters) methodBody)
     modifyEnv (Env.insert name addr)
     pure v
     where paramNames = foldMap (freeVariables . subterm)
-          name = freeVariable (subterm methodName)
+
 
 
 -- | A method signature in TypeScript or a method spec in Go.
@@ -145,7 +145,7 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
   eval Class{..} = do
-    let name = freeVariable (subterm classIdentifier)
+    name <- freeVariable' classIdentifier
     supers <- traverse subtermValue classSuperclasses
     (v, addr) <- letrec name $ do
       void $ subtermValue classBody
@@ -229,7 +229,7 @@ instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedExportFrom where
   eval (QualifiedExportFrom from exportSymbols) = do
-    let moduleName = freeVariable (subterm from)
+    moduleName <- freeVariable' from
     (importedEnv, _) <- isolate (require moduleName)
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \(name, alias) -> do
@@ -263,16 +263,16 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedImport where
   eval (QualifiedImport from alias xs) = do
+    moduleName <- freeVariable' from
     (importedEnv, _) <- isolate (require moduleName)
-    modifyEnv (mappend (Env.overwrite (renames importedEnv) importedEnv))
+    prefix <- freeVariable' alias
+    modifyEnv (mappend (Env.overwrite (renames prefix importedEnv) importedEnv))
     unit
     where
-      moduleName = freeVariable (subterm from)
-      renames importedEnv
-        | Prologue.null xs = fmap prepend (Env.names importedEnv)
+      renames prefix importedEnv
+        | Prologue.null xs = fmap (prepend prefix) (Env.names importedEnv)
         | otherwise = xs
-      prefix = freeVariable (subterm alias)
-      prepend n = (n, prefix <> n)
+      prepend prefix n = (n, prefix <> n)
 
 -- | Import declarations (symbols are added directly to the calling environment).
 --
@@ -286,11 +286,11 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
   eval (Import from xs _) = do
+    moduleName <- freeVariable' from
     (importedEnv, _) <- isolate (require moduleName)
     modifyEnv (mappend (renamed importedEnv))
     unit
     where
-      moduleName = freeVariable (subterm from)
       renamed importedEnv
         | Prologue.null xs = importedEnv
         | otherwise = Env.overwrite xs importedEnv
@@ -305,7 +305,7 @@ instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable SideEffectImport where
   eval (SideEffectImport from _) = do
-    let moduleName = freeVariable (subterm from)
+    moduleName <- freeVariable' from
     void $ isolate (require moduleName)
     unit
 
