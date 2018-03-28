@@ -4,12 +4,12 @@ module Data.Abstract.Evaluatable
 , MonadEvaluatable
 , Evaluatable(..)
 , Unspecialized(..)
-, EvalError(..)
+, LoadError(..)
 , evaluateTerm
 , evaluateModule
 , withModules
 , evaluateModules
-, throwEvalError
+, throwLoadError
 , require
 , load
 ) where
@@ -34,23 +34,22 @@ type MonadEvaluatable term value m =
   , MonadAnalysis term value m
   , MonadThrow (Unspecialized value) m
   , MonadThrow (ValueExc value) m
-  , MonadThrow (EvalError term value) m
+  , MonadThrow (LoadError term value) m
   , MonadValue value m
   , Recursive term
   , Show (LocationFor value)
   )
 
-data EvalError term value resume where
-  -- FreeVariableError :: Prelude.String -> EvalError term value value
-  LoadError         :: ModuleName -> EvalError term value [Module term]
+data LoadError term value resume where
+  LoadError         :: ModuleName -> LoadError term value [Module term]
 
-deriving instance Eq (EvalError term a b)
-deriving instance Show (EvalError term a b)
-instance Show1 (EvalError term value) where
+deriving instance Eq (LoadError term a b)
+deriving instance Show (LoadError term a b)
+instance Show1 (LoadError term value) where
   liftShowsPrec _ _ = showsPrec
 
-throwEvalError :: MonadEvaluatable term value m =>  EvalError term value resume -> m resume
-throwEvalError = throwException
+throwLoadError :: MonadEvaluatable term value m => LoadError term value resume -> m resume
+throwLoadError = throwException
 
 data Unspecialized a b where
   Unspecialized :: { getUnspecialized :: Prelude.String } -> Unspecialized value value
@@ -106,7 +105,7 @@ load :: MonadEvaluatable term value m
      -> m (EnvironmentFor value, value)
 load name = askModuleTable >>= maybe notFound pure . moduleTableLookup name >>= evalAndCache
   where
-    notFound = throwEvalError (LoadError name)
+    notFound = throwLoadError (LoadError name)
 
     evalAndCache []     = (,) <$> pure mempty <*> unit
     evalAndCache [x]    = evalAndCache' x
