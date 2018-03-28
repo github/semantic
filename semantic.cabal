@@ -16,6 +16,7 @@ library
   exposed-modules:
                      -- Analyses & term annotations
                        Analysis.Abstract.BadVariables
+                       Analysis.Abstract.BadValues
                      , Analysis.Abstract.Caching
                      , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
