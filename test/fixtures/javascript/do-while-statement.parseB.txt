@@ -3,6 +3,8 @@
     (Boolean)
     (
       (Call
-        (Identifier)
+        (MemberAccess
+          (Identifier)
+          (Identifier))
         (Identifier)
         (Empty)))))

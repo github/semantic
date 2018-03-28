@@ -4,39 +4,53 @@ module Analysis.Ruby.Spec (spec) where
 
 import Data.Abstract.Value
 import Data.Map
+import Data.Map.Monoidal as Map
 
 import SpecHelpers
 
 
 spec :: Spec
 spec = parallel $ do
-  describe "evalutes Ruby" $ do
-    it "require_relative" $ do
+  describe "Ruby" $ do
+    it "evaluates require_relative" $ do
       env <- findEnv <$> evaluate "main.rb"
-      let expectedEnv = [ (qualifiedName ["Object"], addr 0)
-                        , (qualifiedName ["foo"], addr 3)]
-      env `shouldBe` expectedEnv
+      env `shouldBe` [ (name "Object", addr 0)
+                     , (name "foo", addr 3) ]
 
-    it "load" $ do
+    it "evaluates load" $ do
       env <- findEnv <$> evaluate "load.rb"
-      let expectedEnv = [ (qualifiedName ["Object"], addr 0)
-                        , (qualifiedName ["foo"], addr 3) ]
-      env `shouldBe` expectedEnv
+      env `shouldBe` [ (name "Object", addr 0)
+                     , (name "foo", addr 3) ]
 
-    it "load wrap" $ do
+    it "evaluates load with wrapper" $ do
       res <- evaluate "load-wrap.rb"
       findValue res `shouldBe` Left "free variable: \"foo\""
-      findEnv res `shouldBe` [(qualifiedName ["Object"], addr 0)]
+      findEnv res `shouldBe` [ (name "Object", addr 0) ]
 
-    it "subclass" $ do
-      res <- findValue <$> evaluate "subclass.rb"
-      res `shouldBe` Right (Right (Right (injValue (String "\"<bar>\""))))
+    it "evaluates subclass" $ do
+      res <- evaluate "subclass.rb"
+      findValue res `shouldBe` Right (Right (Right (injValue (String "\"<bar>\""))))
+      findEnv res `shouldBe` [ (name "Bar", addr 6)
+                             , (name "Foo", addr 3)
+                             , (name "Object", addr 0) ]
+
+      let heap = findHeap res
+      Map.lookup (Precise 6) heap `shouldBe` ns "Bar" [ (name "baz", addr 8)
+                                                      , (name "foo", addr 5)
+                                                      , (name "inspect", addr 7) ]
+
+    it "evaluates modules" $ do
+      res <- evaluate "modules.rb"
+      findValue res `shouldBe` Right (Right (Right (injValue (String "\"<hello>\""))))
+      findEnv res `shouldBe` [ (name "Object", addr 0)
+                             , (name "Bar", addr 3) ]
 
     it "has prelude" $ do
       res <- findValue <$> evaluate "preluded.rb"
       res `shouldBe` Right (Right (Right (injValue (String "\"<foo>\""))))
 
   where
+    ns n = Just . Latest . Just . injValue . Namespace (name n)
     addr = Address . Precise
     fixtures = "test/fixtures/ruby/analysis/"
     evaluate entry = evaluateFilesWithPrelude rubyParser

@@ -1,7 +1,7 @@
 module Rendering.Imports.Spec (spec) where
 
 import Analysis.Declaration (declarationAlgebra)
-import Analysis.ModuleDef (moduleDefAlgebra)
+import Analysis.PackageDef (packageDefAlgebra)
 import Rendering.Imports
 
 import SpecHelpers
@@ -34,4 +34,4 @@ spec = parallel $ do
     toVerbatimOutput = verbatim . toOutput
     parseToImports parser path = do
       blob <- file path
-      runTask (parse parser blob >>= decorate (declarationAlgebra blob) >>= decorate (moduleDefAlgebra blob) >>= render (renderToImports blob))
+      runTask (parse parser blob >>= decorate (declarationAlgebra blob) >>= decorate (packageDefAlgebra blob) >>= render (renderToImports blob))
