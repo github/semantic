@@ -111,9 +111,6 @@ runMatcher :: (Alternative m, Monad m, Corecursive t, Recursive t, Foldable (Bas
            -> m a
 runMatcher m = para (paraMatcher m)
 
-embedTerm :: Corecursive t => Base t (t, a) -> t
-embedTerm e = embed (fst <$> e)
-
 paraMatcher :: (Alternative m, Monad m, Corecursive t, Foldable (Base t)) => Matcher t a -> RAlgebra (Base t) t (m a)
 paraMatcher m t = interp (embedTerm t) m <|> foldMapA snd t
 
