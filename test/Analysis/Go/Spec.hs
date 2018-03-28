@@ -2,9 +2,6 @@
 module Analysis.Go.Spec (spec) where
 
 import Data.Abstract.Value
-import Data.Map
-import Data.Either
-
 import SpecHelpers
 
 
@@ -12,7 +9,7 @@ spec :: Spec
 spec = parallel $ do
   describe "evalutes Go" $ do
     it "imports and wildcard imports" $ do
-      env <- findEnv <$> evaluate "main.go"
+      env <- environment . snd <$> evaluate "main.go"
       env `shouldBe` [ (qualifiedName ["foo", "New"], addr 0)
                      , (qualifiedName ["Rab"], addr 1)
                      , (qualifiedName ["Bar"], addr 2)
@@ -20,7 +17,7 @@ spec = parallel $ do
                      ]
 
     it "imports with aliases (and side effects only)" $ do
-      env <- findEnv <$> evaluate "main1.go"
+      env <- environment . snd <$> evaluate "main1.go"
       env `shouldBe` [ (qualifiedName ["f", "New"], addr 0)
                      , (qualifiedName ["main"], addr 3) -- addr 3 is due to side effects of
                                                         -- eval'ing `import _ "./bar"` which

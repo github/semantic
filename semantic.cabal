@@ -163,6 +163,7 @@ library
                      , hashable
                      , kdt
                      , mersenne-random-pure64
+                     , microlens
                      , mtl
                      , network
                      , network-uri

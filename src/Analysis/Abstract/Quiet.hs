@@ -2,7 +2,6 @@
 module Analysis.Abstract.Quiet where
 
 import Control.Abstract.Analysis
-import Control.Monad.Effect.Resumable
 import Data.Abstract.Evaluatable
 import Prologue
 

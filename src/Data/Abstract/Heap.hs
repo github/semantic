@@ -8,7 +8,7 @@ import Data.Semigroup.Reducer
 import Prologue
 
 -- | A map of addresses onto cells holding their values.
-newtype Heap l a = Heap { unStore :: Monoidal.Map l (Cell l a) }
+newtype Heap l a = Heap { unHeap :: Monoidal.Map l (Cell l a) }
   deriving (Generic1)
 
 deriving instance (Eq l, Eq (Cell l a)) => Eq (Heap l a)
@@ -26,7 +26,7 @@ deriving instance (Ord l, Reducer a (Cell l a)) => Reducer (l, a) (Heap l a)
 
 -- | Look up the cell of values for an 'Address' in a 'Heap', if any.
 heapLookup :: Ord l => Address l a -> Heap l a -> Maybe (Cell l a)
-heapLookup (Address address) = Monoidal.lookup address . unStore
+heapLookup (Address address) = Monoidal.lookup address . unHeap
 
 -- | Look up the list of values stored for a given address, if any.
 heapLookupAll :: (Ord l, Foldable (Cell l)) => Address l a -> Heap l a -> Maybe [a]
@@ -42,7 +42,7 @@ heapInit (Address address) cell (Heap h) = Heap (Monoidal.insert address cell h)
 
 -- | The number of addresses extant in a 'Heap'.
 heapSize :: Heap l a -> Int
-heapSize = Monoidal.size . unStore
+heapSize = Monoidal.size . unHeap
 
 -- | Restrict a 'Heap' to only those 'Address'es in the given 'Live' set (in essence garbage collecting the rest).
 heapRestrict :: Ord l => Heap l a -> Live l a -> Heap l a

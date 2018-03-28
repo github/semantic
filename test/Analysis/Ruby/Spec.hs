@@ -16,40 +16,40 @@ spec :: Spec
 spec = parallel $ do
   describe "Ruby" $ do
     it "evaluates require_relative" $ do
-      env <- findEnv <$> evaluate "main.rb"
+      env <- environment . snd <$> evaluate "main.rb"
       env `shouldBe` [ (name "Object", addr 0)
                      , (name "foo", addr 3) ]
 
     it "evaluates load" $ do
-      env <- findEnv <$> evaluate "load.rb"
+      env <- environment . snd <$> evaluate "load.rb"
       env `shouldBe` [ (name "Object", addr 0)
                      , (name "foo", addr 3) ]
 
     it "evaluates load with wrapper" $ do
       res <- evaluate "load-wrap.rb"
-      findValue res `shouldBe` Right (Right (Right (Right (Left (SomeExc (FreeVariableError ("foo" :| [])))))))
-      findEnv res `shouldBe` [ (name "Object", addr 0) ]
+      fst res `shouldBe` Right (Right (Right (Right (Left (SomeExc (FreeVariableError ("foo" :| [])))))))
+      environment (snd res) `shouldBe` [ (name "Object", addr 0) ]
 
     it "evaluates subclass" $ do
       res <- evaluate "subclass.rb"
-      findValue res `shouldBe` Right (Right (Right (Right (Right (injValue (String "\"<bar>\""))))))
-      findEnv res `shouldBe` [ (name "Bar", addr 6)
-                             , (name "Foo", addr 3)
-                             , (name "Object", addr 0) ]
+      fst res `shouldBe` Right (Right (Right (Right (Right (injValue (String "\"<bar>\""))))))
+      environment (snd res) `shouldBe` [ (name "Bar", addr 6)
+                                       , (name "Foo", addr 3)
+                                       , (name "Object", addr 0) ]
 
-      let heap = findHeap res
-      Map.lookup (Precise 6) heap `shouldBe` ns "Bar" [ (name "baz", addr 8)
-                                                      , (name "foo", addr 5)
-                                                      , (name "inspect", addr 7) ]
+      heapLookup (Address (Precise 6)) (heap (snd res))
+        `shouldBe` ns "Bar" [ (name "baz", addr 8)
+                            , (name "foo", addr 5)
+                            , (name "inspect", addr 7) ]
 
     it "evaluates modules" $ do
       res <- evaluate "modules.rb"
-      findValue res `shouldBe` Right (Right (Right (Right (Right (injValue (String "\"<hello>\""))))))
-      findEnv res `shouldBe` [ (name "Object", addr 0)
-                             , (name "Bar", addr 3) ]
+      fst res `shouldBe` Right (Right (Right (Right (Right (injValue (String "\"<hello>\""))))))
+      environment (snd res) `shouldBe` [ (name "Object", addr 0)
+                                       , (name "Bar", addr 3) ]
 
     it "has prelude" $ do
-      res <- findValue <$> evaluate "preluded.rb"
+      res <- fst <$> evaluate "preluded.rb"
       res `shouldBe` Right (Right (Right (Right (Right (injValue (String "\"<foo>\""))))))
 
   where
