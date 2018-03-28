@@ -5,7 +5,7 @@ module Data.Abstract.Environment
   , bind
   , delete
   , head
-  , overwritingUnion
+  , mergeNewer
   , insert
   , lookup
   , names
@@ -77,8 +77,8 @@ head (Environment (a :| _)) = Environment (a :| [])
 
 -- | Take the union of two environments. When duplicate keys are found in the
 --   name to address map, the second definition wins.
-overwritingUnion :: Environment l a -> Environment l a -> Environment l a
-overwritingUnion (Environment (a :| as)) (Environment (b :| bs)) =
+mergeNewer :: Environment l a -> Environment l a -> Environment l a
+mergeNewer (Environment (a :| as)) (Environment (b :| bs)) =
   Environment (combine a b :| alignWith (mergeThese combine) as bs)
   where combine = Map.unionWith (flip const)
 

@@ -222,7 +222,7 @@ instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
   namespace n env = do
     maybeAddr <- lookupEnv n
     env' <- maybe (pure mempty) (asNamespaceEnv <=< deref) maybeAddr
-    pure (injValue (Namespace n (Env.overwritingUnion env' env)))
+    pure (injValue (Namespace n (Env.mergeNewer env' env)))
     where asNamespaceEnv v
             | Just (Namespace _ env') <- prjValue v = pure env'
             | otherwise                             = fail ("expected " <> show v <> " to be a namespace")
