@@ -184,7 +184,7 @@ makeNamespace :: ( MonadValue value m
 makeNamespace name addr supers = do
   superEnv <- mconcat <$> traverse scopedEnvironment supers
   namespaceEnv <- Env.head <$> getEnv
-  v <- namespace name (Env.overwritingUnion superEnv namespaceEnv)
+  v <- namespace name (Env.mergeNewer superEnv namespaceEnv)
   v <$ assign addr v
 
 
