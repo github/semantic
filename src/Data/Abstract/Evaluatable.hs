@@ -5,6 +5,7 @@ module Data.Abstract.Evaluatable
 , Evaluatable(..)
 , Unspecialized(..)
 , LoadError(..)
+, EvalError(..)
 , evaluateTerm
 , evaluateModule
 , withModules
@@ -35,6 +36,7 @@ type MonadEvaluatable term value m =
   , MonadThrow (Unspecialized value) m
   , MonadThrow (ValueExc value) m
   , MonadThrow (LoadError term value) m
+  , MonadThrow (EvalError value) m
   , MonadValue value m
   , Recursive term
   , Show (LocationFor value)
@@ -46,6 +48,14 @@ data LoadError term value resume where
 deriving instance Eq (LoadError term a b)
 deriving instance Show (LoadError term a b)
 instance Show1 (LoadError term value) where
+  liftShowsPrec _ _ = showsPrec
+
+data EvalError value resume where
+  FreeVariableError :: Name -> EvalError value value
+
+deriving instance Eq (EvalError a b)
+deriving instance Show (EvalError a b)
+instance Show1 (EvalError value) where
   liftShowsPrec _ _ = showsPrec
 
 throwLoadError :: MonadEvaluatable term value m => LoadError term value resume -> m resume
