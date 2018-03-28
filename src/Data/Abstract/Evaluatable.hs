@@ -49,6 +49,8 @@ deriving instance Eq (LoadError term a b)
 deriving instance Show (LoadError term a b)
 instance Show1 (LoadError term value) where
   liftShowsPrec _ _ = showsPrec
+instance Eq1 (LoadError term a) where
+  liftEq _ (LoadError a) (LoadError b) = a == b
 
 data EvalError value resume where
   FreeVariableError :: Name -> EvalError value value
@@ -57,6 +59,8 @@ deriving instance Eq (EvalError a b)
 deriving instance Show (EvalError a b)
 instance Show1 (EvalError value) where
   liftShowsPrec _ _ = showsPrec
+instance Eq1 (EvalError term) where
+  liftEq _ (FreeVariableError a) (FreeVariableError b) = a == b
 
 throwLoadError :: MonadEvaluatable term value m => LoadError term value resume -> m resume
 throwLoadError = throwException
