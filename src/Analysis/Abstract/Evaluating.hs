@@ -44,6 +44,10 @@ data EvaluatingState term value = EvaluatingState
   , jumps       :: IntMap.IntMap term
   }
 
+deriving instance (Eq (CellFor value), Eq (LocationFor value), Eq term, Eq value) => Eq (EvaluatingState term value)
+deriving instance (Ord (CellFor value), Ord (LocationFor value), Ord term, Ord value) => Ord (EvaluatingState term value)
+deriving instance (Show (CellFor value), Show (LocationFor value), Show term, Show value) => Show (EvaluatingState term value)
+
 instance (Ord (LocationFor value), Semigroup (CellFor value)) => Semigroup (EvaluatingState term value) where
   EvaluatingState e1 h1 m1 x1 j1 <> EvaluatingState e2 h2 m2 x2 j2 = EvaluatingState (e1 <> e2) (h1 <> h2) (m1 <> m2) (x1 <> x2) (j1 <> j2)
 
