@@ -36,6 +36,7 @@ library
                      , Control.Abstract.Addressable
                      , Control.Abstract.Analysis
                      , Control.Abstract.Evaluator
+                     , Control.Abstract.Matching
                      , Control.Abstract.Value
                      -- Control flow
                      , Control.Effect
@@ -233,6 +234,7 @@ test-suite test
                      , Diffing.Algorithm.SES.Spec
                      , Diffing.Interpreter.Spec
                      , Integration.Spec
+                     , Matching.Go.Spec
                      , Rendering.Imports.Spec
                      , Rendering.TOC.Spec
                      , Semantic.Spec
