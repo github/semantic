@@ -11,8 +11,6 @@ module Data.Abstract.Evaluatable
 , withModules
 , evaluateModules
 , throwLoadError
-, throwEvalError
-, freeVariable'
 , require
 , load
 ) where
@@ -56,7 +54,6 @@ instance Eq1 (LoadError term a) where
 
 data EvalError value resume where
   FreeVariableError :: Name -> EvalError value value
-  FreeVariablesError :: [Name] -> EvalError value Name
 
 deriving instance Eq (EvalError a b)
 deriving instance Show (EvalError a b)
@@ -64,15 +61,9 @@ instance Show1 (EvalError value) where
   liftShowsPrec _ _ = showsPrec
 instance Eq1 (EvalError term) where
   liftEq _ (FreeVariableError a) (FreeVariableError b) = a == b
-  liftEq _ (FreeVariablesError a) (FreeVariablesError b) = a == b
-  liftEq _ _ _ = False
-
 
 throwLoadError :: MonadEvaluatable term value m => LoadError term value resume -> m resume
 throwLoadError = throwException
-
-throwEvalError :: MonadEvaluatable term value m => EvalError value resume -> m resume
-throwEvalError = throwException
 
 data Unspecialized a b where
   Unspecialized :: { getUnspecialized :: Prelude.String } -> Unspecialized value value
@@ -84,17 +75,6 @@ deriving instance Eq (Unspecialized a b)
 deriving instance Show (Unspecialized a b)
 instance Show1 (Unspecialized a) where
   liftShowsPrec _ _ = showsPrec
-
-freeVariable' :: (Show (LocationFor value), FreeVariables term2,
-                      FreeVariables term1, Recursive term1, MonadValue value m,
-                      MonadThrow (EvalError value) m, MonadThrow (ValueExc value) m,
-                      MonadThrow (Unspecialized value) m,
-                      MonadThrow (LoadError term1 value) m, MonadAnalysis term1 value m,
-                      MonadAddressable (LocationFor value) value m,
-                      Evaluatable (Base term1)) =>
-                     Subterm term2 a -> m Name
-freeVariable' name = either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm name)
-
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where

@@ -46,10 +46,10 @@ class FreeVariables1 syntax where
 freeVariables1 :: (FreeVariables1 t, FreeVariables a) => t a -> [Name]
 freeVariables1 = liftFreeVariables freeVariables
 
-freeVariable :: FreeVariables term => term -> Either [Name] Name
+freeVariable :: FreeVariables term => term -> Name
 freeVariable term = case freeVariables term of
-  [n] -> Right n
-  xs -> Left xs
+  [n] -> n
+  xs -> Prelude.fail ("expected single free variable, but got: " <> show xs)
 
 instance (FreeVariables1 syntax, Functor syntax) => FreeVariables (Term syntax ann) where
   freeVariables = cata (liftFreeVariables id)

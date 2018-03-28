@@ -1,10 +1,7 @@
-require "bar"
+require File.join(__FILE__, "../foo.rb")
 require "foo"
 
-x
-x
-{}
-# bar()
+bar()
 
 # def foo
 #   return "in foo"
