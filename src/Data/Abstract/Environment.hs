@@ -5,6 +5,7 @@ module Data.Abstract.Environment
   , bind
   , delete
   , head
+  , overwritingUnion
   , insert
   , lookup
   , names
@@ -72,6 +73,14 @@ pop (Environment (_ :| a : as)) = Environment (a :| as)
 -- | Drop all scopes save for the frontmost one.
 head :: Environment l a -> Environment l a
 head (Environment (a :| _)) = Environment (a :| [])
+
+
+-- | Take the union of two environments. When duplicate keys are found in the
+--   name to address map, the second definition wins.
+overwritingUnion :: Environment l a -> Environment l a -> Environment l a
+overwritingUnion (Environment (a :| as)) (Environment (b :| bs)) =
+  Environment (combine a b :| alignWith (mergeThese combine) as bs)
+  where combine = Map.unionWith (flip const)
 
 -- | Extract an association list of bindings from an 'Environment'.
 --

@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, RankNTypes, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, RankNTypes, TypeFamilies, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating
 ( Evaluating
 , EvaluatingState(..)

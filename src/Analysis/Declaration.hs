@@ -119,6 +119,10 @@ instance CustomHasDeclaration whole Declaration.Class where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Class _ (Term (In identifierAnn _), _) _ _)
     = Just $ ClassDeclaration (getSource blobSource identifierAnn) (getClassSource blob (In ann decl)) blobLanguage
 
+instance CustomHasDeclaration whole Ruby.Syntax.Class where
+  customToDeclaration blob@Blob{..} ann decl@(Ruby.Syntax.Class (Term (In identifierAnn _), _) _ _)
+    = Just $ ClassDeclaration (getSource blobSource identifierAnn) (getRubyClassSource blob (In ann decl)) blobLanguage
+
 instance CustomHasDeclaration (Union fs) Declaration.Import where
   customToDeclaration Blob{..} _ (Declaration.Import (Term (In fromAnn _), _) symbols _)
     = Just $ ImportDeclaration ((stripQuotes . getSource blobSource) fromAnn) "" (fmap getSymbol symbols) blobLanguage
@@ -191,6 +195,7 @@ type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Import = 'Custom
   DeclarationStrategy Declaration.QualifiedImport = 'Custom
   DeclarationStrategy Declaration.SideEffectImport = 'Custom
+  DeclarationStrategy Ruby.Syntax.Class = 'Custom
   DeclarationStrategy Ruby.Syntax.Require = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
   DeclarationStrategy Markdown.Heading = 'Custom
@@ -228,4 +233,11 @@ getClassSource Blob{..} (In a r)
   = let declRange = getField a
         bodyRange = getField <$> case r of
           Declaration.Class _ _ _ (Term (In a' _), _) -> Just a'
+    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
+
+getRubyClassSource :: (HasField fields Range) => Blob -> TermF Ruby.Syntax.Class (Record fields) (Term syntax (Record fields), a) -> T.Text
+getRubyClassSource Blob{..} (In a r)
+  = let declRange = getField a
+        bodyRange = getField <$> case r of
+          Ruby.Syntax.Class _ _ (Term (In a' _), _) -> Just a'
     in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange

@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses, TypeApplications, ViewPatterns #-}
+{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses, ViewPatterns #-}
 module Data.Syntax.Literal where
 
 import Control.Arrow ((>>>))

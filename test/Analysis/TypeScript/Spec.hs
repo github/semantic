@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedLists, TypeApplications #-}
+{-# LANGUAGE OverloadedLists #-}
 module Analysis.TypeScript.Spec (spec) where
 
 import Data.Abstract.Value

@@ -191,7 +191,6 @@ instance ValueRoots Value where
     | Just (Closure _ _ env) <- prjValue v = Env.addresses env
     | otherwise                            = mempty
 
-
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
   unit     = pure . injValue $ Unit
@@ -220,11 +219,10 @@ instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
     product <- mconcat <$> traverse scopedEnvironment supers
     pure . injValue $ Class n (Env.push product <> env)
 
-
   namespace n env = do
     maybeAddr <- lookupEnv n
     env' <- maybe (pure mempty) (asNamespaceEnv <=< deref) maybeAddr
-    pure (injValue (Namespace n (env' <> env)))
+    pure (injValue (Namespace n (Env.overwritingUnion env' env)))
     where asNamespaceEnv v
             | Just (Namespace _ env') <- prjValue v = pure env'
             | otherwise                             = fail ("expected " <> show v <> " to be a namespace")
