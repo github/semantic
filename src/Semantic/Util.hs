@@ -3,11 +3,12 @@
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.Util where
 
+import Analysis.Abstract.BadVariables
 import Analysis.Abstract.Caching
 import Analysis.Abstract.Dead
 import Analysis.Abstract.Evaluating as X
-import Analysis.Abstract.Tracing
 import Analysis.Abstract.ImportGraph
+import Analysis.Abstract.Tracing
 import Analysis.Declaration
 import Control.Abstract.Analysis
 import Control.Monad.IO.Class
@@ -42,6 +43,7 @@ import qualified Language.TypeScript.Assignment as TypeScript
 evaluateRubyFile = evaluateWithPrelude rubyParser
 evaluateRubyFiles = evaluateFilesWithPrelude rubyParser
 evaluateRubyImportGraph paths = runAnalysis @(ImportGraphing Evaluating Ruby.Term Value) . evaluateModules <$> parseFiles rubyParser paths
+evaluateRubyBadVariables paths = runAnalysis @(BadVariables Evaluating Ruby.Term Value) . evaluateModules <$> parseFiles rubyParser paths
 
 -- Go
 evaluateGoFile = evaluateFile goParser
