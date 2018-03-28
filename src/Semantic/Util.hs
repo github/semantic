@@ -4,6 +4,7 @@
 module Semantic.Util where
 
 import Analysis.Abstract.BadVariables
+import Analysis.Abstract.BadValues
 import Analysis.Abstract.Caching
 import Analysis.Abstract.Quiet
 import Analysis.Abstract.Dead
@@ -43,7 +44,7 @@ import qualified Language.TypeScript.Assignment as TypeScript
 -- Ruby
 evaluateRubyFile = evaluateWithPrelude rubyParser
 evaluateRubyFiles = evaluateFilesWithPrelude rubyParser
-evaluateRubyImportGraph paths = runAnalysis @(ImportGraphing (BadVariables (Quietly Evaluating)) Ruby.Term Value) . evaluateModules <$> parseFiles rubyParser paths
+evaluateRubyImportGraph paths = runAnalysis @(ImportGraphing (BadVariables (BadValues (Quietly Evaluating))) Ruby.Term Value) . evaluateModules <$> parseFiles rubyParser paths
 evaluateRubyBadVariables paths = runAnalysis @(BadVariables Evaluating Ruby.Term Value) . evaluateModules <$> parseFiles rubyParser paths
 
 -- Go
