@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, RankNTypes, StandaloneDeriving, TypeFamilies, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating
 ( Evaluating
 , EvaluatingState(..)
@@ -77,8 +77,12 @@ lens .= val = raise (modify' (lens .~ val))
 view :: Member (State (EvaluatingState term value)) effects => Getting a (EvaluatingState term value) a -> Evaluating term value effects a
 view lens = raise (gets (^. lens))
 
-localEvaluatingState :: Member (State (EvaluatingState term value)) effects => (EvaluatingState term value -> EvaluatingState term value) -> Evaluating term value effects a -> Evaluating term value effects a
-localEvaluatingState f = raise . localState f . lower
+localEvaluatingState :: Member (State (EvaluatingState term value)) effects => Lens' (EvaluatingState term value) prj -> (prj -> prj) -> Evaluating term value effects a -> Evaluating term value effects a
+localEvaluatingState lens f action = do
+  original <- view lens
+  raise (modify' (lens %~ f))
+  v <- action
+  v <$ raise (modify' (lens .~ original))
 
 
 instance Members '[Fail, State (EvaluatingState term value)] effects => MonadControl term (Evaluating term value effects) where
@@ -96,14 +100,14 @@ instance Members '[ State (EvaluatingState term value)
       => MonadEnvironment value (Evaluating term value effects) where
   getEnv = view _environment
   putEnv = (_environment .=)
-  withEnv s = localEvaluatingState (_environment .~ s)
+  withEnv s = localEvaluatingState _environment (const s)
 
   defaultEnvironment = raise ask
   withDefaultEnvironment e = raise . local (const e) . lower
 
   getExports = view _exports
   putExports = (_exports .=)
-  withExports s = localEvaluatingState (_exports .~ s)
+  withExports s = localEvaluatingState _exports (const s)
 
   localEnv f a = do
     modifyEnv (f . Env.push)
