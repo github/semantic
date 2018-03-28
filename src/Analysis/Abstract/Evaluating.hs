@@ -1,9 +1,7 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, RankNTypes, TypeFamilies, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating
 ( Evaluating
-, findValue
-, findEnv
-, findHeap
+, EvaluatingState(..)
 ) where
 
 import           Control.Abstract.Analysis
@@ -11,11 +9,10 @@ import           Control.Monad.Effect
 import           Data.Abstract.Configuration
 import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.Heap
 import           Data.Abstract.Module
 import           Data.Abstract.ModuleTable
 import qualified Data.IntMap as IntMap
-import qualified Data.Map.Monoidal as Monoidal
+import           Lens.Micro
 import           Prelude hiding (fail)
 import           Prologue
 
@@ -32,69 +29,98 @@ deriving instance Member NonDet    effects => MonadNonDet (Evaluating term value
 type EvaluatingEffects term value
   = '[ Resumable (ValueExc value)
      , Resumable (Unspecialized value)
-     , Fail                                               -- Failure with an error message
-     , Reader [Module term]                               -- The stack of currently-evaluating modules.
-     , State  (EnvironmentFor value)                      -- Environments (both local and global)
-     , State  (HeapFor value)                             -- The heap
-     , Reader (ModuleTable [Module term])                 -- Cache of unevaluated modules
-     , Reader (EnvironmentFor value)                      -- Default environment used as a fallback in lookupEnv
-     , State  (ModuleTable (EnvironmentFor value, value)) -- Cache of evaluated modules
-     , State  (ExportsFor value)                          -- Exports (used to filter environments when they are imported)
-     , State  (IntMap.IntMap term)                        -- For jumps
+     , Fail                                -- Failure with an error message
+     , Reader [Module term]                -- The stack of currently-evaluating modules.
+     , Reader (ModuleTable [Module term])  -- Cache of unevaluated modules
+     , Reader (EnvironmentFor value)       -- Default environment used as a fallback in lookupEnv
+     , State  (EvaluatingState term value) -- Environment, heap, modules, exports, and jumps.
      ]
 
--- | Find the value in the 'Final' result of running.
-findValue :: (effects ~ RequiredEffects term value (Evaluating term value effects))
-          => Final effects value -> Either Prelude.String (Either (SomeExc (Unspecialized value)) (Either (SomeExc (ValueExc value)) value))
-findValue (((((v, _), _), _), _), _) = v
+data EvaluatingState term value = EvaluatingState
+  { environment :: EnvironmentFor value
+  , heap        :: HeapFor value
+  , modules     :: ModuleTable (EnvironmentFor value, value)
+  , exports     :: ExportsFor value
+  , jumps       :: IntMap.IntMap term
+  }
 
--- | Find the 'Environment' in the 'Final' result of running.
-findEnv :: (effects ~ RequiredEffects term value (Evaluating term value effects))
-        => Final effects value -> EnvironmentFor value
-findEnv (((((_, env), _), _), _), _) = env
+deriving instance (Eq (CellFor value), Eq (LocationFor value), Eq term, Eq value) => Eq (EvaluatingState term value)
+deriving instance (Ord (CellFor value), Ord (LocationFor value), Ord term, Ord value) => Ord (EvaluatingState term value)
+deriving instance (Show (CellFor value), Show (LocationFor value), Show term, Show value) => Show (EvaluatingState term value)
 
--- | Find the 'Heap' in the 'Final' result of running.
-findHeap :: (effects ~ RequiredEffects term value (Evaluating term value effects))
-         => Final effects value -> Monoidal.Map (LocationFor value) (CellFor value)
-findHeap (((((_, _), Heap heap), _), _), _) = heap
+instance (Ord (LocationFor value), Semigroup (CellFor value)) => Semigroup (EvaluatingState term value) where
+  EvaluatingState e1 h1 m1 x1 j1 <> EvaluatingState e2 h2 m2 x2 j2 = EvaluatingState (e1 <> e2) (h1 <> h2) (m1 <> m2) (x1 <> x2) (j1 <> j2)
+
+instance (Ord (LocationFor value), Semigroup (CellFor value)) => Monoid (EvaluatingState term value) where
+  mempty = EvaluatingState mempty mempty mempty mempty mempty
+  mappend = (<>)
+
+_environment :: Lens' (EvaluatingState term value) (EnvironmentFor value)
+_environment = lens environment (\ s e -> s {environment = e})
+
+_heap :: Lens' (EvaluatingState term value) (HeapFor value)
+_heap = lens heap (\ s h -> s {heap = h})
+
+_modules :: Lens' (EvaluatingState term value) (ModuleTable (EnvironmentFor value, value))
+_modules = lens modules (\ s m -> s {modules = m})
+
+_exports :: Lens' (EvaluatingState term value) (ExportsFor value)
+_exports = lens exports (\ s e -> s {exports = e})
+
+_jumps :: Lens' (EvaluatingState term value) (IntMap.IntMap term)
+_jumps = lens jumps (\ s j -> s {jumps = j})
 
 
-instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl term (Evaluating term value effects) where
+(.=) :: Member (State (EvaluatingState term value)) effects => ASetter (EvaluatingState term value) (EvaluatingState term value) a b -> b -> Evaluating term value effects ()
+lens .= val = raise (modify' (lens .~ val))
+
+view :: Member (State (EvaluatingState term value)) effects => Getting a (EvaluatingState term value) a -> Evaluating term value effects a
+view lens = raise (gets (^. lens))
+
+localEvaluatingState :: Member (State (EvaluatingState term value)) effects => Lens' (EvaluatingState term value) prj -> (prj -> prj) -> Evaluating term value effects a -> Evaluating term value effects a
+localEvaluatingState lens f action = do
+  original <- view lens
+  lens .= f original
+  v <- action
+  v <$ lens .= original
+
+
+instance Members '[Fail, State (EvaluatingState term value)] effects => MonadControl term (Evaluating term value effects) where
   label term = do
-    m <- raise get
+    m <- view _jumps
     let i = IntMap.size m
-    raise (put (IntMap.insert i term m))
+    _jumps .= IntMap.insert i term m
     pure i
 
-  goto label = IntMap.lookup label <$> raise get >>= maybe (fail ("unknown label: " <> show label)) pure
+  goto label = IntMap.lookup label <$> view _jumps >>= maybe (fail ("unknown label: " <> show label)) pure
 
-instance Members '[ State (ExportsFor value)
-                  , State (EnvironmentFor value)
+instance Members '[ State (EvaluatingState term value)
                   , Reader (EnvironmentFor value)
-                  ] effects => MonadEnvironment value (Evaluating term value effects) where
-  getEnv = raise get
-  putEnv = raise . put
-  withEnv s = raise . localState s . lower
+                  ] effects
+      => MonadEnvironment value (Evaluating term value effects) where
+  getEnv = view _environment
+  putEnv = (_environment .=)
+  withEnv s = localEvaluatingState _environment (const s)
 
   defaultEnvironment = raise ask
   withDefaultEnvironment e = raise . local (const e) . lower
 
-  getExports = raise get
-  putExports = raise . put
-  withExports s = raise . localState s . lower
+  getExports = view _exports
+  putExports = (_exports .=)
+  withExports s = localEvaluatingState _exports (const s)
 
   localEnv f a = do
     modifyEnv (f . Env.push)
     result <- a
     result <$ modifyEnv Env.pop
 
-instance Member (State (HeapFor value)) effects => MonadHeap value (Evaluating term value effects) where
-  getHeap = raise get
-  putHeap = raise . put
+instance Member (State (EvaluatingState term value)) effects => MonadHeap value (Evaluating term value effects) where
+  getHeap = view _heap
+  putHeap = (_heap .=)
 
-instance Members '[Reader (ModuleTable [Module term]), State (ModuleTable (EnvironmentFor value, value))] effects => MonadModuleTable term value (Evaluating term value effects) where
-  getModuleTable = raise get
-  putModuleTable = raise . put
+instance Members '[Reader (ModuleTable [Module term]), State (EvaluatingState term value)] effects => MonadModuleTable term value (Evaluating term value effects) where
+  getModuleTable = view _modules
+  putModuleTable = (_modules .=)
 
   askModuleTable = raise ask
   localModuleTable f a = raise (local f (lower a))
