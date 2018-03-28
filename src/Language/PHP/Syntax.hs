@@ -2,7 +2,6 @@
 module Language.PHP.Syntax where
 
 import Data.Abstract.Evaluatable
-import Data.Abstract.Environment as Env
 import Data.Abstract.Path
 import Diffing.Algorithm
 import Prelude hiding (fail)
@@ -366,22 +365,10 @@ instance Evaluatable Namespace where
       go [] = fail "expected at least one free variable in namespaceName, found none"
       -- The last name creates a closure over the namespace body.
       go [name] = letrec' name $ \addr ->
-        subtermValue namespaceBody *> makeNamespace name addr
+        subtermValue namespaceBody *> makeNamespace name addr []
       -- Each namespace name creates a closure over the subsequent namespace closures
       go (name:xs) = letrec' name $ \addr ->
-        go xs <* makeNamespace name addr
-
-      -- Make a namespace closure capturing the current environment.
-      makeNamespace name addr = do
-        namespaceEnv <- Env.head <$> getEnv
-        v <- namespace name namespaceEnv
-        v <$ assign addr v
-
-      -- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
-      letrec' name body = do
-        addr <- lookupOrAlloc name
-        v <- localEnv id (body addr)
-        v <$ modifyEnv (insert name addr)
+        go xs <* makeNamespace name addr []
 
 data TraitDeclaration a = TraitDeclaration { traitName :: a, traitStatements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

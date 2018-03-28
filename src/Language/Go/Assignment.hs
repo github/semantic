@@ -34,7 +34,6 @@ type Syntax =
    , Declaration.SideEffectImport
    , Declaration.Method
    , Declaration.MethodSignature
-   , Declaration.Module
    , Declaration.Type
    , Declaration.TypeAlias
    , Expression.Arithmetic
@@ -52,6 +51,7 @@ type Syntax =
    , Go.Syntax.Field
    , Go.Syntax.Go
    , Go.Syntax.Label
+   , Go.Syntax.Package
    , Go.Syntax.Receive
    , Go.Syntax.ReceiveOperator
    , Go.Syntax.Rune
@@ -427,7 +427,7 @@ methodSpecList :: Assignment
 methodSpecList = symbol MethodSpecList *> children expressions
 
 packageClause :: Assignment
-packageClause = makeTerm <$> symbol PackageClause <*> children (Declaration.Module <$> expression <*> pure [])
+packageClause = makeTerm <$> symbol PackageClause <*> children (Go.Syntax.Package <$> expression <*> pure [])
 
 parameters :: Assignment
 parameters = symbol ParameterList *> children expressions

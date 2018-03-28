@@ -1,5 +1,5 @@
 (Program
-  (Module
+  (Package
     (Identifier))
   (QualifiedImport
     (Identifier)
