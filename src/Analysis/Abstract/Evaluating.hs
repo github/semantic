@@ -80,9 +80,9 @@ view lens = raise (gets (^. lens))
 localEvaluatingState :: Member (State (EvaluatingState term value)) effects => Lens' (EvaluatingState term value) prj -> (prj -> prj) -> Evaluating term value effects a -> Evaluating term value effects a
 localEvaluatingState lens f action = do
   original <- view lens
-  raise (modify' (lens %~ f))
+  lens .= f original
   v <- action
-  v <$ raise (modify' (lens .~ original))
+  v <$ lens .= original
 
 
 instance Members '[Fail, State (EvaluatingState term value)] effects => MonadControl term (Evaluating term value effects) where
