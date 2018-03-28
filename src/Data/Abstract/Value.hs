@@ -230,7 +230,6 @@ instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
   scopedEnvironment o
     | Just (Class _ env) <- prjValue o = pure env
     | Just (Namespace _ env) <- prjValue o = pure env
-    | Just (Closure _ _ env) <- prjValue o = pure env -- TODO: Not sure if this is right.
     | otherwise = throwException $ ScopedEnvironmentError ("object type passed to scopedEnvironment doesn't have an environment: " <> show o)
 
   asString v
