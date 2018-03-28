@@ -9,7 +9,7 @@ import Data.Record
 import Data.Span
 import Data.Term
 import Diffing.Algorithm hiding (Empty)
-import Prelude hiding (fail)
+import Prelude
 import Prologue
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Error as Error
