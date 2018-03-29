@@ -57,8 +57,8 @@ liftAnalyze analyze recur term = coerce (analyze (coerceWith (sym Coercion) . r
 --   This enables us to refer to the analysis type as e.g. @Analysis1 (Analysis2 Evaluating) Term Value@ without explicitly mentioning its effects (which are inferred to be simply its 'Effects').
 runAnalysis :: ( Effectful m
                , Effects term value (m effects) ~ effects
-               , RunEffects effects a
                , MonadAnalysis term value (m effects)
+               , RunEffects effects a
                )
             => m effects a
             -> Final effects a
