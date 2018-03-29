@@ -1,4 +1,5 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving,
+             TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.ImportGraph
 ( ImportGraph(..)
 , renderImportGraph
@@ -6,13 +7,13 @@ module Analysis.Abstract.ImportGraph
 ) where
 
 import qualified Algebra.Graph as G
-import Algebra.Graph.Class
-import Algebra.Graph.Export.Dot
-import Control.Abstract.Analysis
-import Data.Abstract.FreeVariables
-import Data.Abstract.Module
-import Data.Abstract.Evaluatable (LoadError(..))
-import Prologue hiding (empty)
+import           Algebra.Graph.Class
+import           Algebra.Graph.Export.Dot
+import           Control.Abstract.Analysis
+import           Data.Abstract.Evaluatable (LoadError (..))
+import           Data.Abstract.FreeVariables
+import           Data.Abstract.Module
+import           Prologue hiding (empty)
 
 -- | The graph of function definitions to symbols used in a given program.
 newtype ImportGraph = ImportGraph { unImportGraph :: G.Graph Name }
