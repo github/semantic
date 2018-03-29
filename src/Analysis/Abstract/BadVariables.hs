@@ -5,6 +5,7 @@ import Control.Abstract.Analysis
 import Data.Abstract.Evaluatable
 import Prologue
 
+-- An analysis that resumes from evaluation errors and records the list of unresolved free variables.
 newtype BadVariables m term value (effects :: [* -> *]) a = BadVariables (m term value effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
