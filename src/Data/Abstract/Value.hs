@@ -184,12 +184,15 @@ instance Ord1 Null where liftCompare = genericLiftCompare
 instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
 
-type instance LocationFor Value = Precise
+instance AbstractValue Value where
+  type LocationFor Value = Precise
+
 
 instance ValueRoots Value where
   valueRoots v
     | Just (Closure _ _ env) <- prjValue v = Env.addresses env
     | otherwise                            = mempty
+
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
