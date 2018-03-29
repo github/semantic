@@ -7,3 +7,5 @@ import Data.Record
 type Provenance = Record Location
 
 data Located location = Located { provenance :: !Provenance, location :: location }
+
+newtype LocatedValue value = LocatedValue { getLocatedValue :: value }
