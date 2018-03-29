@@ -49,6 +49,11 @@ instance ( Effectful (m term value)
     insertVertexName (moduleName m)
     liftAnalyze analyzeModule recur m
 
+insertVertexName :: (Effectful (m term value)
+                   , Member (State ImportGraph) effects
+                   , MonadEvaluator term value (m term value effects))
+                 => NonEmpty ByteString
+                 -> ImportGraphing m term value effects ()
 insertVertexName name = do
     ms <- askModuleStack
     let parent = maybe empty (vertex . moduleName) (listToMaybe ms)
