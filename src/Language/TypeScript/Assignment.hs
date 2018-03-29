@@ -35,9 +35,6 @@ type Syntax = '[
   , Declaration.PublicFieldDefinition
   , Declaration.VariableDeclaration
   , Declaration.TypeAlias
-  , Declaration.Import
-  , Declaration.QualifiedImport
-  , Declaration.SideEffectImport
   , Declaration.DefaultExport
   , Declaration.QualifiedExport
   , Declaration.QualifiedExportFrom
@@ -165,6 +162,9 @@ type Syntax = '[
   , TypeScript.Syntax.Update
   , TypeScript.Syntax.ComputedPropertyName
   , TypeScript.Syntax.Decorator
+  , TypeScript.Syntax.Import
+  , TypeScript.Syntax.QualifiedImport
+  , TypeScript.Syntax.SideEffectImport
   , []
   ]
 
@@ -632,13 +632,13 @@ statementIdentifier :: Assignment
 statementIdentifier = makeTerm <$> symbol StatementIdentifier <*> (Syntax.Identifier <$> (name <$> source))
 
 importStatement :: Assignment
-importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> children ((,) <$> importClause <*> term fromClause)
+importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> children ((,) <$> importClause <*> fromClause)
                 <|> makeTerm' <$> symbol Grammar.ImportStatement <*> children (requireImport <|> sideEffectImport)
   where
     -- `import foo = require "./foo"`
-    requireImport = inj <$> (symbol Grammar.ImportRequireClause *> children (flip Declaration.QualifiedImport <$> term identifier <*> term fromClause <*> pure []))
+    requireImport = inj <$> (symbol Grammar.ImportRequireClause *> children (flip TypeScript.Syntax.QualifiedImport <$> term identifier <*> fromClause <*> pure []))
     -- `import "./foo"`
-    sideEffectImport = inj <$> (Declaration.SideEffectImport <$> term fromClause <*> emptyTerm)
+    sideEffectImport = inj <$> (TypeScript.Syntax.SideEffectImport <$> fromClause <*> emptyTerm)
     -- `import { bar } from "./foo"`
     namedImport = (,,,) <$> pure Prelude.False <*> pure Nothing <*> (symbol Grammar.NamedImports *> children (many importSymbol)) <*> emptyTerm
     -- `import defaultMember from "./foo"`
@@ -654,15 +654,18 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
         <|> ((\a b -> [a, b]) <$> defaultImport <*> (namedImport <|> namespaceImport))
         <|> (pure <$> defaultImport))
 
-    makeImportTerm1 loc from (Prelude.True, Just alias, symbols, _) = makeTerm loc (Declaration.QualifiedImport from alias symbols)
-    makeImportTerm1 loc from (Prelude.True, Nothing, symbols, _) = makeTerm loc (Declaration.QualifiedImport from from symbols)
-    makeImportTerm1 loc from (_, _, symbols, extra) = makeTerm loc (Declaration.Import from symbols extra)
+    makeImportTerm1 loc from (Prelude.True, Just alias, symbols, _) = makeTerm loc (TypeScript.Syntax.QualifiedImport from alias symbols)
+    makeImportTerm1 loc from (Prelude.True, Nothing, symbols, _) = makeTerm loc (TypeScript.Syntax.QualifiedImport from (makeTerm loc (Syntax.Identifier (toName from))) symbols)
+    makeImportTerm1 loc from (_, _, symbols, extra) = makeTerm loc (TypeScript.Syntax.Import from symbols extra)
     makeImportTerm loc ([x], from) = makeImportTerm1 loc from x
     makeImportTerm loc (xs, from) = makeTerm loc $ fmap (makeImportTerm1 loc from) xs
     importSymbol = symbol Grammar.ImportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> ((Just <$> rawIdentifier) <|> pure Nothing))
     rawIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source)
     makeNameAliasPair from (Just alias) = (from, alias)
     makeNameAliasPair from Nothing = (from, from)
+
+    -- TODO: Need to validate that inline comments are still handled with this change in assigning to Path and not a Term.
+    fromClause = symbol Grammar.String *> (path <$> source)
 
 fromClause :: Assignment
 fromClause = makeTerm <$> symbol Grammar.String <*> (Syntax.Identifier <$> (toName <$> source))

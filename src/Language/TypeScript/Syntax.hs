@@ -1,9 +1,63 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.TypeScript.Syntax where
 
-import Prologue
 import Data.Abstract.Evaluatable
+import Data.Abstract.Path
+import qualified Data.Abstract.Environment as Env
 import Diffing.Algorithm
+import System.FilePath.Posix
+import Prologue
+import Prelude hiding (fail)
+
+data Import a = Import { importFrom :: Path, importSymbols :: ![(Name, Name)], importWildcardToken :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 Import where liftEq = genericLiftEq
+instance Ord1 Import where liftCompare = genericLiftCompare
+instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
+
+  -- http://www.typescriptlang.org/docs/handbook/module-resolution.html
+instance Evaluatable Import where
+  eval (Import (Path _ NonRelative) _ _) = fail "non-relative imports are not implememented"
+  eval (Import (Path path Relative) symbols _) = do
+    currentModuleDir <- takeDirectory <$> currentModuleFilePath
+    let path' = makeRelative currentModuleDir path
+    let dir = takeDirectory path'
+    let searchPaths =  (path' <.>) <$> exts
+                    -- <> [dir </> "package.json"] TODO: Requires parsing package.json and getting the path of the "types" property.
+                    <> (((dir </> "index") <.>) <$> exts)
+    maybeModulePath <- resolve searchPaths
+    case maybeModulePath of
+      Nothing -> fail ("module: " <> show path <> " not found. looked for: " <> show searchPaths)
+      Just modulePath -> do
+        (importedEnv, _) <- isolate (require modulePath)
+        modifyEnv (mappend (renamed importedEnv)) *> unit
+    where
+      exts = ["ts", "tsx", "d.ts"]
+      renamed importedEnv
+        | Prologue.null symbols = importedEnv
+        | otherwise = Env.overwrite symbols importedEnv
+
+
+data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: Path, qualifiedImportAlias :: !a, qualifiedImportSymbols :: ![(Name, Name)]}
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 QualifiedImport where liftEq = genericLiftEq
+instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
+instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QualifiedImport
+
+data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: Path, sideEffectImportToken :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 SideEffectImport where liftEq = genericLiftEq
+instance Ord1 SideEffectImport where liftCompare = genericLiftCompare
+instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable SideEffectImport
+
+
 
 -- | Lookup type for a type-level key in a typescript map.
 data LookupType a = LookupType { lookupTypeIdentifier :: a, lookupTypeKey :: a }
