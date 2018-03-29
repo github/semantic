@@ -67,7 +67,6 @@ evaluateFile :: forall term effects
                 , FreeVariables term
                 , effects ~ RequiredEffects term Value (Evaluating term Value effects)
                 , MonadAddressable Precise Value (Evaluating term Value effects)
-                , MonadValue Value (Evaluating term Value effects)
                 , Recursive term
                 )
              => Parser term
@@ -101,7 +100,6 @@ evaluateWithPrelude :: forall term effects
                        , FreeVariables term
                        , effects ~ RequiredEffects term Value (Evaluating term Value effects)
                        , MonadAddressable Precise Value (Evaluating term Value effects)
-                       , MonadValue Value (Evaluating term Value effects)
                        , Recursive term
                        , TypeLevel.KnownSymbol (PreludePath term)
                        )
@@ -121,7 +119,6 @@ evaluateFiles :: forall term effects
                  , FreeVariables term
                  , effects ~ RequiredEffects term Value (Evaluating term Value effects)
                  , MonadAddressable Precise Value (Evaluating term Value effects)
-                 , MonadValue Value (Evaluating term Value effects)
                  , Recursive term
                  )
               => Parser term
@@ -152,7 +149,6 @@ evaluateFilesWithPrelude :: forall term effects
                             , FreeVariables term
                             , effects ~ RequiredEffects term Value (Evaluating term Value effects)
                             , MonadAddressable Precise Value (Evaluating term Value effects)
-                            , MonadValue Value (Evaluating term Value effects)
                             , Recursive term
                             , TypeLevel.KnownSymbol (PreludePath term)
                             )
