@@ -13,6 +13,7 @@ data Located location = Located { provenance :: !Provenance, location :: locatio
   deriving (Eq, Ord, Show)
 
 newtype LocatedValue value = LocatedValue { getLocatedValue :: value }
+  deriving (Eq, Ord, Show)
 
 instance AbstractValue (LocatedValue value) where
   type LocationFor (LocatedValue value) = Located (LocationFor value)
