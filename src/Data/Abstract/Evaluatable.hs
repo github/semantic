@@ -42,6 +42,8 @@ type MonadEvaluatable term value m =
   , Show (LocationFor value)
   )
 
+
+-- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
 data LoadError term value resume where
   LoadError :: ModuleName -> LoadError term value [Module term]
 
@@ -52,7 +54,9 @@ instance Show1 (LoadError term value) where
 instance Eq1 (LoadError term a) where
   liftEq _ (LoadError a) (LoadError b) = a == b
 
+-- | The type of error thrown when failing to evaluate a term.
 data EvalError value resume where
+  -- Indicates we weren't able to dereference a name from the evaluated environment.
   FreeVariableError :: Name -> EvalError value value
 
 deriving instance Eq (EvalError a b)
