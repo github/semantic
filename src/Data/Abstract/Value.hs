@@ -9,7 +9,7 @@ import Data.Abstract.Evaluatable
 import qualified Data.Abstract.Number as Number
 import Data.Scientific (Scientific)
 import qualified Data.Set as Set
-import Prologue
+import Prologue hiding (TypeError)
 import Prelude hiding (Float, Integer, String, Rational, fail)
 import qualified Prelude
 
@@ -225,12 +225,12 @@ instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
     pure (injValue (Namespace n (Env.mergeNewer env' env)))
     where asNamespaceEnv v
             | Just (Namespace _ env') <- prjValue v = pure env'
-            | otherwise                             = fail ("expected " <> show v <> " to be a namespace")
+            | otherwise                             = throwException $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
   scopedEnvironment o
     | Just (Class _ env) <- prjValue o = pure env
     | Just (Namespace _ env) <- prjValue o = pure env
-    | otherwise = fail ("object type passed to scopedEnvironment doesn't have an environment: " <> show o)
+    | otherwise = throwException $ ScopedEnvironmentError ("object type passed to scopedEnvironment doesn't have an environment: " <> show o)
 
   asString v
     | Just (String n) <- prjValue v = pure n

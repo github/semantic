@@ -27,7 +27,9 @@ deriving instance Member NonDet    effects => MonadNonDet (Evaluating term value
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value
-  = '[ Resumable (ValueExc value)
+  = '[ Resumable (EvalError value)
+     , Resumable (LoadError term value)
+     , Resumable (ValueExc value)
      , Resumable (Unspecialized value)
      , Fail                                -- Failure with an error message
      , Reader [Module term]                -- The stack of currently-evaluating modules.

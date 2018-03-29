@@ -19,6 +19,7 @@ import qualified Control.Monad.Effect as Effect
 import Control.Monad.Effect.Fail as X
 import Control.Monad.Effect.Reader as X
 import Control.Monad.Effect.State as X
+import Control.Monad.Effect.Resumable as X
 import Data.Abstract.Module
 import Data.Coerce
 import Data.Type.Coercion

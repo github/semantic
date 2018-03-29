@@ -1,4 +1,5 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving,
+             TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.ImportGraph
 ( ImportGraph(..)
 , renderImportGraph
@@ -6,12 +7,13 @@ module Analysis.Abstract.ImportGraph
 ) where
 
 import qualified Algebra.Graph as G
-import Algebra.Graph.Class
-import Algebra.Graph.Export.Dot
-import Control.Abstract.Analysis
-import Data.Abstract.FreeVariables
-import Data.Abstract.Module
-import Prologue hiding (empty)
+import           Algebra.Graph.Class
+import           Algebra.Graph.Export.Dot
+import           Control.Abstract.Analysis
+import           Data.Abstract.Evaluatable (LoadError (..))
+import           Data.Abstract.FreeVariables
+import           Data.Abstract.Module
+import           Prologue hiding (empty)
 
 -- | The graph of function definitions to symbols used in a given program.
 newtype ImportGraph = ImportGraph { unImportGraph :: G.Graph Name }
@@ -34,17 +36,29 @@ deriving instance MonadEvaluator term value (m term value effects) => MonadEvalu
 instance ( Effectful (m term value)
          , Member (State ImportGraph) effects
          , MonadAnalysis term value (m term value effects)
+         , Member (Resumable (LoadError term value)) effects
          )
          => MonadAnalysis term value (ImportGraphing m term value effects) where
   type RequiredEffects term value (ImportGraphing m term value effects) = State ImportGraph ': RequiredEffects term value (m term value effects)
 
-  analyzeTerm = liftAnalyze analyzeTerm
+  analyzeTerm eval term = resumeException
+                            @(LoadError term value)
+                            (liftAnalyze analyzeTerm eval term)
+                            (\yield (LoadError name) -> insertVertexName name >> yield [])
 
   analyzeModule recur m = do
+    insertVertexName (moduleName m)
+    liftAnalyze analyzeModule recur m
+
+insertVertexName :: (Effectful (m term value)
+                   , Member (State ImportGraph) effects
+                   , MonadEvaluator term value (m term value effects))
+                 => NonEmpty ByteString
+                 -> ImportGraphing m term value effects ()
+insertVertexName name = do
     ms <- askModuleStack
     let parent = maybe empty (vertex . moduleName) (listToMaybe ms)
-    modifyImportGraph (parent >< vertex (moduleName m) <>)
-    liftAnalyze analyzeModule recur m
+    modifyImportGraph (parent >< vertex name <>)
 
 (><) :: Graph a => a -> a -> a
 (><) = connect
