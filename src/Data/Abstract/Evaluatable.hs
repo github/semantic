@@ -43,7 +43,7 @@ type MonadEvaluatable term value m =
   )
 
 data LoadError term value resume where
-  LoadError         :: ModuleName -> LoadError term value [Module term]
+  LoadError :: ModuleName -> LoadError term value [Module term]
 
 deriving instance Eq (LoadError term a b)
 deriving instance Show (LoadError term a b)
