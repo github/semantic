@@ -33,15 +33,7 @@ instance ( Corecursive term
 
   analyzeTerm recur term = do
     config <- getConfiguration (embedSubterm term)
-    trace @m @trace @term @value (Reducer.unit config)
+    raise (tell @(trace (ConfigurationFor term value)) (Reducer.unit config))
     liftAnalyze analyzeTerm recur term
 
   analyzeModule = liftAnalyze analyzeModule
-
--- | Log the given trace of configurations.
-trace :: ( Effectful m
-         , Member (Writer (trace (ConfigurationFor term value))) effects
-         )
-      => trace (ConfigurationFor term value)
-      -> Tracing trace m effects ()
-trace = raise . tell
