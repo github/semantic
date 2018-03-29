@@ -7,7 +7,7 @@ import Control.Abstract.Analysis
 import Control.Monad.Effect.Writer
 import Data.Semigroup.Reducer as Reducer
 import Data.Union
-import Prologue hiding (trace)
+import Prologue
 
 -- | Trace analysis.
 --
