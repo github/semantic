@@ -5,12 +5,14 @@ module Data.Abstract.Module
 ) where
 
 import Data.Blob
+import Prologue
 import System.FilePath.Posix
 
 type ModuleName = FilePath
 
 data Module term = Module
   { modulePath :: FilePath      -- ^ Path to this module
+  , moduleRoot :: FilePath      -- ^ Root path for module resolution
   , moduleBody :: term          -- ^ @term@ body of the module
   } deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
@@ -20,5 +22,7 @@ moduleForBlob :: Maybe FilePath -- ^ The root directory relative to which the mo
               -> Blob           -- ^ The 'Blob' containing the module.
               -> term           -- ^ The @term@ representing the body of the module.
               -> Module term    -- ^ A 'Module' named appropriate for the 'Blob', holding the @term@, and constructed relative to the root 'FilePath', if any.
-moduleForBlob rootDir = Module . modulePath . blobPath
-  where modulePath = maybe takeFileName makeRelative rootDir
+moduleForBlob rootDir Blob{..} = Module (modulePath blobPath) root
+  where
+    root = fromMaybe (takeDirectory blobPath) rootDir
+    modulePath = maybe takeFileName makeRelative rootDir

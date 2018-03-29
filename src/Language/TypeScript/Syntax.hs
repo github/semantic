@@ -3,11 +3,39 @@ module Language.TypeScript.Syntax where
 
 import Data.Abstract.Evaluatable
 import Data.Abstract.Path
+import qualified Data.Abstract.Module as M
 import qualified Data.Abstract.Environment as Env
 import Diffing.Algorithm
 import System.FilePath.Posix
 import Prologue
 import Prelude hiding (fail)
+
+resolveRelativeTSModule :: MonadEvaluatable term value m => FilePath -> m M.ModuleName
+resolveRelativeTSModule path = do
+  M.Module{..} <- currentModule
+  let path' = makeRelative (takeDirectory modulePath) path
+  resolveTSModule path' >>= either notFound pure
+  where
+    notFound xs = fail $ "module: " <> show path <> " not found. looked for: " <> show xs
+
+resolveAbsoluteTSModule :: MonadEvaluatable term value m => FilePath -> m M.ModuleName
+resolveAbsoluteTSModule path = do
+  M.Module{..} <- currentModule
+  let path' = makeRelative moduleRoot ("node_modules" </> path)
+  -- TODO: Need to traverse up the directory structure looking for node_modules dirs.
+  resolveTSModule path' >>= either notFound pure
+  where
+    notFound xs = fail $ "module: " <> show path <> " not found. looked for: " <> show xs
+
+resolveTSModule :: MonadEvaluatable term value m => FilePath -> m (Either [FilePath] M.ModuleName)
+resolveTSModule path = maybe (Left searchPaths) Right <$> resolve searchPaths
+  where exts = ["ts", "tsx", "d.ts"]
+        searchPaths =
+          ((path <.>) <$> exts)
+          -- TODO: Requires parsing package.json, getting the path of the
+          --       "types" property and adding that value to the search Paths.
+          -- <> [searchDir </> "package.json"]
+          <> (((path </> "index") <.>) <$> exts)
 
 data Import a = Import { importFrom :: Path, importSymbols :: ![(Name, Name)], importWildcardToken :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -18,25 +46,21 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
   -- http://www.typescriptlang.org/docs/handbook/module-resolution.html
 instance Evaluatable Import where
-  eval (Import (Path _ NonRelative) _ _) = fail "non-relative imports are not implememented"
+  eval (Import (Path path NonRelative) symbols _) = do
+    modulePath <- resolveAbsoluteTSModule path
+    doImport modulePath symbols *> unit
   eval (Import (Path path Relative) symbols _) = do
-    currentModuleDir <- takeDirectory <$> currentModuleFilePath
-    let path' = makeRelative currentModuleDir path
-    let dir = takeDirectory path'
-    let searchPaths =  (path' <.>) <$> exts
-                    -- <> [dir </> "package.json"] TODO: Requires parsing package.json and getting the path of the "types" property.
-                    <> (((dir </> "index") <.>) <$> exts)
-    maybeModulePath <- resolve searchPaths
-    case maybeModulePath of
-      Nothing -> fail ("module: " <> show path <> " not found. looked for: " <> show searchPaths)
-      Just modulePath -> do
-        (importedEnv, _) <- isolate (require modulePath)
-        modifyEnv (mappend (renamed importedEnv)) *> unit
-    where
-      exts = ["ts", "tsx", "d.ts"]
-      renamed importedEnv
-        | Prologue.null symbols = importedEnv
-        | otherwise = Env.overwrite symbols importedEnv
+    modulePath <- resolveRelativeTSModule path
+    doImport modulePath symbols *> unit
+
+doImport :: MonadEvaluatable term value m => M.ModuleName -> [(Name, Name)] -> m ()
+doImport modulePath symbols = do
+  (importedEnv, _) <- isolate (require modulePath)
+  modifyEnv (mappend (renamed importedEnv))
+  where
+    renamed importedEnv
+      | Prologue.null symbols = importedEnv
+      | otherwise = Env.overwrite symbols importedEnv
 
 
 data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: Path, qualifiedImportAlias :: !a, qualifiedImportSymbols :: ![(Name, Name)]}
@@ -46,7 +70,23 @@ instance Eq1 QualifiedImport where liftEq = genericLiftEq
 instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
 instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable QualifiedImport
+instance Evaluatable QualifiedImport where
+  eval (QualifiedImport (Path _ NonRelative) _ _) = fail "non-relative imports are not implemented"
+  eval (QualifiedImport (Path path Relative) alias symbols) = do
+    modulePath <- resolveRelativeTSModule path
+    doQualifiedImport modulePath alias symbols *> unit
+
+doQualifiedImport :: MonadEvaluatable term value m => M.ModuleName -> Subterm term a -> [(Name, Name)] -> m ()
+doQualifiedImport modulePath alias symbols = do
+  (importedEnv, _) <- isolate (require modulePath)
+  modifyEnv (mappend (Env.overwrite (renames importedEnv) importedEnv))
+  where
+    renames importedEnv
+      | Prologue.null symbols = fmap prepend (Env.names importedEnv)
+      | otherwise = symbols
+    prefix = freeVariable (subterm alias)
+    prepend n = (n, prefix <> n)
+
 
 data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: Path, sideEffectImportToken :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)

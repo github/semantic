@@ -1,7 +1,7 @@
 {-# LANGUAGE ConstrainedClassMethods, DataKinds, FunctionalDependencies, TypeFamilies, UndecidableInstances #-}
 module Control.Abstract.Evaluator
   ( MonadEvaluator(..)
-  , currentModuleFilePath
+  , currentModule
   , MonadEnvironment(..)
   , modifyEnv
   , modifyExports
@@ -61,9 +61,9 @@ class ( MonadControl term m
   --   With great power comes great responsibility. If you 'evaluateModule' any of these, you probably deserve what you get.
   askModuleStack :: m [Module term]
 
--- | Get the path of the current module.
-currentModuleFilePath :: (MonadEvaluator term value m) => m FilePath
-currentModuleFilePath = modulePath . head <$> askModuleStack
+-- | Get the current module.
+currentModule :: (MonadEvaluator term value m) => m (Module term)
+currentModule = head <$> askModuleStack
 
 -- | A 'Monad' abstracting local and global environments.
 class Monad m => MonadEnvironment value m | m -> value where
