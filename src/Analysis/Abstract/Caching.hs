@@ -70,10 +70,10 @@ instance ( Effectful m
 -- | This instance coinductively iterates the analysis of a term until the results converge.
 instance ( Corecursive term
          , Effectful m
+         , Members (CachingEffects term value '[]) effects
          , MonadAnalysis term value (m effects)
          , MonadFresh (m effects)
          , MonadNonDet (m effects)
-         , Members (CachingEffects term value '[]) effects
          , Ord (CellFor value)
          , Ord (LocationFor value)
          , Ord term
