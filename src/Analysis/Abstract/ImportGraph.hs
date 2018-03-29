@@ -9,17 +9,17 @@ import qualified Algebra.Graph as G
 import Algebra.Graph.Class
 import Algebra.Graph.Export.Dot
 import Control.Abstract.Analysis
-import Data.Abstract.FreeVariables
 import Data.Abstract.Module
+import qualified Data.ByteString.Char8 as BC
 import Prologue hiding (empty)
 
 -- | The graph of function definitions to symbols used in a given program.
-newtype ImportGraph = ImportGraph { unImportGraph :: G.Graph Name }
+newtype ImportGraph = ImportGraph { unImportGraph :: G.Graph FilePath }
   deriving (Eq, Graph, Show)
 
 -- | Render a 'ImportGraph' to a 'ByteString' in DOT notation.
 renderImportGraph :: ImportGraph -> ByteString
-renderImportGraph = export (defaultStyle friendlyName) . unImportGraph
+renderImportGraph = export (defaultStyle BC.pack) . unImportGraph
 
 newtype ImportGraphing m term value (effects :: [* -> *]) a = ImportGraphing (m term value effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
@@ -42,8 +42,8 @@ instance ( Effectful (m term value)
 
   analyzeModule recur m = do
     ms <- askModuleStack
-    let parent = maybe empty (vertex . moduleName) (listToMaybe ms)
-    modifyImportGraph (parent >< vertex (moduleName m) <>)
+    let parent = maybe empty (vertex . modulePath) (listToMaybe ms)
+    modifyImportGraph (parent >< vertex (modulePath m) <>)
     liftAnalyze analyzeModule recur m
 
 (><) :: Graph a => a -> a -> a
