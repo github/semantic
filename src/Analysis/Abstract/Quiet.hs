@@ -11,7 +11,7 @@ import Prologue
 --
 --   Use it by composing it onto an analysis:
 --
---   > runAnalysis @(Quietly Evaluating term value) (…)
+--   > runAnalysis @(Quietly (Evaluating term value)) (…)
 --
 --   Note that exceptions thrown by other analyses may not be caught if 'Quietly' doesn’t know about them, i.e. if they’re not part of the generic 'MonadValue', 'MonadAddressable', etc. machinery.
 newtype Quietly m (effects :: [* -> *]) a = Quietly (m effects a)
