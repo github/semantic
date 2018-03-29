@@ -1,5 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Analysis.Abstract.BadVariables where
+module Analysis.Abstract.BadVariables
+( BadVariables
+) where
 
 import Control.Abstract.Analysis
 import Data.Abstract.Evaluatable

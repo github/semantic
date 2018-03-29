@@ -1,6 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Dead
-( type DeadCode
+( DeadCode
 ) where
 
 import Control.Abstract.Analysis

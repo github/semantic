@@ -1,6 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Collecting
-( type Collecting
+( Collecting
 ) where
 
 import Control.Abstract.Analysis

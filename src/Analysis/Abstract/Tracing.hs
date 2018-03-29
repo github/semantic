@@ -1,6 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Tracing
-( type Tracing
+( Tracing
 ) where
 
 import Control.Abstract.Analysis

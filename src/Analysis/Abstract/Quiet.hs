@@ -1,5 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeApplications, TypeFamilies, UndecidableInstances #-}
-module Analysis.Abstract.Quiet where
+module Analysis.Abstract.Quiet
+( Quietly
+) where
 
 import Control.Abstract.Analysis
 import Data.Abstract.Evaluatable
