@@ -10,6 +10,7 @@ import Data.Span
 type Provenance = Record '[Range, Span]
 
 data Located location = Located { provenance :: !Provenance, location :: location }
+  deriving (Eq, Ord, Show)
 
 newtype LocatedValue value = LocatedValue { getLocatedValue :: value }
 
