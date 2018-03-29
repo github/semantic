@@ -5,3 +5,5 @@ import Data.Record
 
 -- TODO: Dependencies
 type Provenance = Record Location
+
+data Located location = Located { provenance :: !Provenance, location :: location }
