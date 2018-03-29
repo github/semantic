@@ -42,27 +42,27 @@ import qualified Language.TypeScript.Assignment as TypeScript
 -- Ruby
 evaluateRubyFile = evaluateWithPrelude rubyParser
 evaluateRubyFiles = evaluateFilesWithPrelude rubyParser
-evaluateRubyImportGraph paths = runAnalysis @(ImportGraphing Evaluating Ruby.Term Value) . evaluateModules <$> parseFiles rubyParser paths
-evaluateRubyBadVariables paths = runAnalysis @(BadVariables Evaluating Ruby.Term Value) . evaluateModules <$> parseFiles rubyParser paths
+evaluateRubyImportGraph paths = runAnalysis @(ImportGraphing (Evaluating Ruby.Term Value)) . evaluateModules <$> parseFiles rubyParser paths
+evaluateRubyBadVariables paths = runAnalysis @(BadVariables (Evaluating Ruby.Term Value)) . evaluateModules <$> parseFiles rubyParser paths
 
 -- Go
 evaluateGoFile = evaluateFile goParser
 evaluateGoFiles = evaluateFiles goParser
-typecheckGoFile path = runAnalysis @(Caching Evaluating Go.Term Type) . evaluateModule <$> parseFile goParser Nothing path
+typecheckGoFile path = runAnalysis @(Caching (Evaluating Go.Term Type)) . evaluateModule <$> parseFile goParser Nothing path
 
 -- Python
 evaluatePythonFile = evaluateWithPrelude pythonParser
 evaluatePythonFiles = evaluateFilesWithPrelude pythonParser
-typecheckPythonFile path = runAnalysis @(Caching Evaluating Python.Term Type) . evaluateModule <$> parseFile pythonParser Nothing path
-tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term Value) . evaluateModule <$> parseFile pythonParser Nothing path
-evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] Evaluating) Python.Term Value) . evaluateModule <$> parseFile pythonParser Nothing path
+typecheckPythonFile path = runAnalysis @(Caching (Evaluating Python.Term Type)) . evaluateModule <$> parseFile pythonParser Nothing path
+tracePythonFile path = runAnalysis @(Tracing [] (Evaluating Python.Term Value)) . evaluateModule <$> parseFile pythonParser Nothing path
+evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] (Evaluating Python.Term Value))) . evaluateModule <$> parseFile pythonParser Nothing path
 
 -- PHP
 evaluatePHPFile = evaluateFile phpParser
 evaluatePHPFiles = evaluateFiles phpParser
 
 -- TypeScript
-typecheckTypeScriptFile path = runAnalysis @(Caching Evaluating TypeScript.Term Type) . evaluateModule <$> parseFile typescriptParser Nothing path
+typecheckTypeScriptFile path = runAnalysis @(Caching (Evaluating TypeScript.Term Type)) . evaluateModule <$> parseFile typescriptParser Nothing path
 evaluateTypeScriptFile = evaluateFile typescriptParser
 evaluateTypeScriptFiles = evaluateFiles typescriptParser
 

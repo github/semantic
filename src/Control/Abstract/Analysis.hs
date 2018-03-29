@@ -46,9 +46,9 @@ class MonadEvaluator term value m => MonadAnalysis term value m where
 
 
 -- | Lift a 'SubtermAlgebra' for an underlying analysis into a containing analysis. Use this when defining an analysis which can be composed onto other analyses to ensure that a call to 'analyzeTerm' occurs in the inner analysis and not the outer one.
-liftAnalyze :: Coercible (  m term value effects value) (t m term value (effects :: [* -> *]) value)
-            => ((base (Subterm term (outer value)) ->   m term value effects value) -> (base (Subterm term (outer value)) ->   m term value effects value))
-            -> ((base (Subterm term (outer value)) -> t m term value effects value) -> (base (Subterm term (outer value)) -> t m term value effects value))
+liftAnalyze :: Coercible (  m effects value) (t m (effects :: [* -> *]) value)
+            => ((base (Subterm term (outer value)) ->   m effects value) -> (base (Subterm term (outer value)) ->   m effects value))
+            -> ((base (Subterm term (outer value)) -> t m effects value) -> (base (Subterm term (outer value)) -> t m effects value))
 liftAnalyze analyze recur term = coerce (analyze (coerceWith (sym Coercion) . recur) term)
 
 

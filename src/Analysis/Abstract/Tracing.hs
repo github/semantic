@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Tracing
 ( type Tracing
 ) where
@@ -12,36 +12,36 @@ import Prologue hiding (trace)
 -- | Trace analysis.
 --
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
-newtype Tracing (trace :: * -> *) m term value (effects :: [* -> *]) a = Tracing (m term value effects a)
+newtype Tracing (trace :: * -> *) m (effects :: [* -> *]) a = Tracing (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
-deriving instance MonadControl term (m term value effects) => MonadControl term (Tracing trace m term value effects)
-deriving instance MonadEnvironment value (m term value effects) => MonadEnvironment value (Tracing trace m term value effects)
-deriving instance MonadHeap value (m term value effects) => MonadHeap value (Tracing trace m term value effects)
-deriving instance MonadModuleTable term value (m term value effects) => MonadModuleTable term value (Tracing trace m term value effects)
-deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (Tracing trace m term value effects)
+deriving instance MonadControl term (m effects) => MonadControl term (Tracing trace m effects)
+deriving instance MonadEnvironment value (m effects) => MonadEnvironment value (Tracing trace m effects)
+deriving instance MonadHeap value (m effects) => MonadHeap value (Tracing trace m effects)
+deriving instance MonadModuleTable term value (m effects) => MonadModuleTable term value (Tracing trace m effects)
+deriving instance MonadEvaluator term value (m effects) => MonadEvaluator term value (Tracing trace m effects)
 
 instance ( Corecursive term
-         , Effectful (m term value)
+         , Effectful m
          , Member (Writer (trace (ConfigurationFor term value))) effects
-         , MonadAnalysis term value (m term value effects)
+         , MonadAnalysis term value (m effects)
          , Ord (LocationFor value)
          , Reducer (ConfigurationFor term value) (trace (ConfigurationFor term value))
          )
-         => MonadAnalysis term value (Tracing trace m term value effects) where
-  type RequiredEffects term value (Tracing trace m term value effects) = Writer (trace (ConfigurationFor term value)) ': RequiredEffects term value (m term value effects)
+         => MonadAnalysis term value (Tracing trace m effects) where
+  type RequiredEffects term value (Tracing trace m effects) = Writer (trace (ConfigurationFor term value)) ': RequiredEffects term value (m effects)
 
   analyzeTerm recur term = do
     config <- getConfiguration (embedSubterm term)
-    trace (Reducer.unit config)
+    trace @m @trace @term @value (Reducer.unit config)
     liftAnalyze analyzeTerm recur term
 
   analyzeModule = liftAnalyze analyzeModule
 
 -- | Log the given trace of configurations.
-trace :: ( Effectful (m term value)
+trace :: ( Effectful m
          , Member (Writer (trace (ConfigurationFor term value))) effects
          )
       => trace (ConfigurationFor term value)
-      -> Tracing trace m term value effects ()
+      -> Tracing trace m effects ()
 trace = raise . tell

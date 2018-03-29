@@ -22,14 +22,14 @@ type CachingEffects term value effects
 type CacheFor term value = Cache (LocationFor value) term value
 
 -- | A (coinductively-)cached analysis suitable for guaranteeing termination of (suitably finitized) analyses over recursive programs.
-newtype Caching m term value (effects :: [* -> *]) a = Caching (m term value effects a)
+newtype Caching m (effects :: [* -> *]) a = Caching (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
-deriving instance MonadControl term (m term value effects) => MonadControl term (Caching m term value effects)
-deriving instance MonadEnvironment value (m term value effects) => MonadEnvironment value (Caching m term value effects)
-deriving instance MonadHeap value (m term value effects) => MonadHeap value (Caching m term value effects)
-deriving instance MonadModuleTable term value (m term value effects) => MonadModuleTable term value (Caching m term value effects)
-deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (Caching m term value effects)
+deriving instance MonadControl term (m effects) => MonadControl term (Caching m effects)
+deriving instance MonadEnvironment value (m effects) => MonadEnvironment value (Caching m effects)
+deriving instance MonadHeap value (m effects) => MonadHeap value (Caching m effects)
+deriving instance MonadModuleTable term value (m effects) => MonadModuleTable term value (Caching m effects)
+deriving instance MonadEvaluator term value (m effects) => MonadEvaluator term value (Caching m effects)
 
 -- | Functionality used to perform caching analysis. This is not exported, and exists primarily for organizational reasons.
 class MonadEvaluator term value m => MonadCaching term value m where
@@ -46,15 +46,15 @@ class MonadEvaluator term value m => MonadCaching term value m where
   -- | Run an action starting from an empty out-cache, and return the out-cache afterwards.
   isolateCache :: m a -> m (CacheFor term value)
 
-instance ( Effectful (m term value)
+instance ( Effectful m
          , Members (CachingEffects term value '[]) effects
-         , MonadEvaluator term value (m term value effects)
+         , MonadEvaluator term value (m effects)
          , Ord (CellFor value)
          , Ord (LocationFor value)
          , Ord term
          , Ord value
          )
-         => MonadCaching term value (Caching m term value effects) where
+         => MonadCaching term value (Caching m effects) where
   consultOracle configuration = raise (fromMaybe mempty . cacheLookup configuration <$> ask)
   withOracle cache = raise . local (const cache) . lower
 
@@ -69,19 +69,19 @@ instance ( Effectful (m term value)
 
 -- | This instance coinductively iterates the analysis of a term until the results converge.
 instance ( Corecursive term
-         , Effectful (m term value)
-         , MonadAnalysis term value (m term value effects)
-         , MonadFresh (m term value effects)
-         , MonadNonDet (m term value effects)
+         , Effectful m
+         , MonadAnalysis term value (m effects)
+         , MonadFresh (m effects)
+         , MonadNonDet (m effects)
          , Members (CachingEffects term value '[]) effects
          , Ord (CellFor value)
          , Ord (LocationFor value)
          , Ord term
          , Ord value
          )
-         => MonadAnalysis term value (Caching m term value effects) where
+         => MonadAnalysis term value (Caching m effects) where
   -- We require the 'CachingEffects' in addition to the underlying analysis’ 'RequiredEffects'.
-  type RequiredEffects term value (Caching m term value effects) = CachingEffects term value (RequiredEffects term value (m term value effects))
+  type RequiredEffects term value (Caching m effects) = CachingEffects term value (RequiredEffects term value (m effects))
 
   -- Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
   analyzeTerm recur e = do
