@@ -29,7 +29,7 @@ instance ( Corecursive term
          , Reducer (ConfigurationFor term value) (trace (ConfigurationFor term value))
          )
          => MonadAnalysis term value (Tracing trace m effects) where
-  type RequiredEffects term value (Tracing trace m effects) = Writer (trace (ConfigurationFor term value)) ': RequiredEffects term value (m effects)
+  type Effects term value (Tracing trace m effects) = Writer (trace (ConfigurationFor term value)) ': Effects term value (m effects)
 
   analyzeTerm recur term = do
     config <- getConfiguration (embedSubterm term)

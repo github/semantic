@@ -29,8 +29,8 @@ import Prologue
 --
 --   This typeclass is left intentionally unconstrained to avoid circular dependencies between it and other typeclasses.
 class MonadEvaluator term value m => MonadAnalysis term value m where
-  -- | The effects necessary to run the analysis. Analyses which are composed on top of (wrap) other analyses should include the inner analyses 'RequiredEffects' in their own list.
-  type family RequiredEffects term value m :: [* -> *]
+  -- | The effects necessary to run the analysis. Analyses which are composed on top of (wrap) other analyses should include the inner analyses 'Effects' in their own list.
+  type family Effects term value m :: [* -> *]
 
   -- | Analyze a term using the semantics of the current analysis.
   analyzeTerm :: (Base term (Subterm term (outer value)) -> m value)
@@ -54,10 +54,10 @@ liftAnalyze analyze recur term = coerce (analyze (coerceWith (sym Coercion) . r
 
 -- | Run an analysis, performing its effects and returning the result alongside any state.
 --
---   This enables us to refer to the analysis type as e.g. @Analysis1 (Analysis2 Evaluating) Term Value@ without explicitly mentioning its effects (which are inferred to be simply its 'RequiredEffects').
+--   This enables us to refer to the analysis type as e.g. @Analysis1 (Analysis2 Evaluating) Term Value@ without explicitly mentioning its effects (which are inferred to be simply its 'Effects').
 runAnalysis :: ( Effectful m
+               , Effects term value (m effects) ~ effects
                , RunEffects effects a
-               , RequiredEffects term value (m effects) ~ effects
                , MonadAnalysis term value (m effects)
                )
             => m effects a

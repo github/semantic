@@ -29,7 +29,7 @@ instance ( Effectful m
          , MonadValue value (Quietly m effects)
          )
       => MonadAnalysis term value (Quietly m effects) where
-  type RequiredEffects term value (Quietly m effects) = RequiredEffects term value (m effects)
+  type Effects term value (Quietly m effects) = Effects term value (m effects)
 
   analyzeTerm eval term = resumeException @(Unspecialized value) (liftAnalyze analyzeTerm eval term) (\yield (Unspecialized _) -> unit >>= yield)
 

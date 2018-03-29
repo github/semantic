@@ -47,7 +47,7 @@ instance ( Corecursive term
          , Recursive term
          )
          => MonadAnalysis term value (DeadCode m effects) where
-  type RequiredEffects term value (DeadCode m effects) = State (Dead term) ': RequiredEffects term value (m effects)
+  type Effects term value (DeadCode m effects) = State (Dead term) ': Effects term value (m effects)
 
   analyzeTerm recur term = do
     revive (embedSubterm term)

@@ -39,7 +39,7 @@ instance ( Effectful m
          , Member (Resumable (LoadError term value)) effects
          )
          => MonadAnalysis term value (ImportGraphing m effects) where
-  type RequiredEffects term value (ImportGraphing m effects) = State ImportGraph ': RequiredEffects term value (m effects)
+  type Effects term value (ImportGraphing m effects) = State ImportGraph ': Effects term value (m effects)
 
   analyzeTerm eval term = resumeException
                             @(LoadError term value)

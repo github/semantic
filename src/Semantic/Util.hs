@@ -70,7 +70,7 @@ evaluateTypeScriptFiles = evaluateFiles typescriptParser
 evaluateFile :: forall term effects
              .  ( Evaluatable (Base term)
                 , FreeVariables term
-                , effects ~ RequiredEffects term Value (Evaluating term Value effects)
+                , effects ~ Effects term Value (Evaluating term Value effects)
                 , MonadAddressable Precise Value (Evaluating term Value effects)
                 , MonadValue Value (Evaluating term Value effects)
                 , Recursive term
@@ -81,7 +81,7 @@ evaluateFile :: forall term effects
 evaluateFile parser path = runAnalysis @(Evaluating term Value) . evaluateModule <$> parseFile parser Nothing path
 
 evaluateWith :: forall value term effects
-             .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
+             .  ( effects ~ Effects term value (Evaluating term value effects)
                 , Evaluatable (Base term)
                 , FreeVariables term
                 , MonadAddressable (LocationFor value) value (Evaluating term value effects)
@@ -104,7 +104,7 @@ evaluateWith prelude m = runAnalysis @(Evaluating term value) $ do
 evaluateWithPrelude :: forall term effects
                     .  ( Evaluatable (Base term)
                        , FreeVariables term
-                       , effects ~ RequiredEffects term Value (Evaluating term Value effects)
+                       , effects ~ Effects term Value (Evaluating term Value effects)
                        , MonadAddressable Precise Value (Evaluating term Value effects)
                        , MonadValue Value (Evaluating term Value effects)
                        , Recursive term
@@ -124,7 +124,7 @@ evaluateWithPrelude parser path = do
 evaluateFiles :: forall term effects
               .  ( Evaluatable (Base term)
                  , FreeVariables term
-                 , effects ~ RequiredEffects term Value (Evaluating term Value effects)
+                 , effects ~ Effects term Value (Evaluating term Value effects)
                  , MonadAddressable Precise Value (Evaluating term Value effects)
                  , MonadValue Value (Evaluating term Value effects)
                  , Recursive term
@@ -136,7 +136,7 @@ evaluateFiles parser paths = runAnalysis @(Evaluating term Value) . evaluateModu
 
 -- | Evaluate terms and an entry point to a value with a given prelude.
 evaluatesWith :: forall value term effects
-              .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
+              .  ( effects ~ Effects term value (Evaluating term value effects)
                  , Evaluatable (Base term)
                  , FreeVariables term
                  , MonadAddressable (LocationFor value) value (Evaluating term value effects)
@@ -155,7 +155,7 @@ evaluatesWith prelude modules m = runAnalysis @(Evaluating term value) $ do
 evaluateFilesWithPrelude :: forall term effects
                          .  ( Evaluatable (Base term)
                             , FreeVariables term
-                            , effects ~ RequiredEffects term Value (Evaluating term Value effects)
+                            , effects ~ Effects term Value (Evaluating term Value effects)
                             , MonadAddressable Precise Value (Evaluating term Value effects)
                             , MonadValue Value (Evaluating term Value effects)
                             , Recursive term

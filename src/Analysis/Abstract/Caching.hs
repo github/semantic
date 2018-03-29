@@ -80,8 +80,8 @@ instance ( Corecursive term
          , Ord value
          )
          => MonadAnalysis term value (Caching m effects) where
-  -- We require the 'CachingEffects' in addition to the underlying analysis’ 'RequiredEffects'.
-  type RequiredEffects term value (Caching m effects) = CachingEffects term value (RequiredEffects term value (m effects))
+  -- We require the 'CachingEffects' in addition to the underlying analysis’ 'Effects'.
+  type Effects term value (Caching m effects) = CachingEffects term value (Effects term value (m effects))
 
   -- Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
   analyzeTerm recur e = do

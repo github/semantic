@@ -24,7 +24,7 @@ instance ( Effectful m
          , MonadValue value (BadVariables m effects)
          )
       => MonadAnalysis term value (BadVariables m effects) where
-  type RequiredEffects term value (BadVariables m effects) = State [Name] ': RequiredEffects term value (m effects)
+  type Effects term value (BadVariables m effects) = State [Name] ': Effects term value (m effects)
 
   analyzeTerm eval term = resumeException @(EvalError value) (liftAnalyze analyzeTerm eval term) (
         \yield (FreeVariableError name) ->
