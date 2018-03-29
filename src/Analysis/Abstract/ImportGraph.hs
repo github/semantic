@@ -40,19 +40,19 @@ instance ( Effectful (m term value)
          => MonadAnalysis term value (ImportGraphing m term value effects) where
   type RequiredEffects term value (ImportGraphing m term value effects) = State ImportGraph ': RequiredEffects term value (m term value effects)
 
-  analyzeTerm eval term = resumeException @(LoadError term value) (liftAnalyze analyzeTerm eval term) (\yield (LoadError name) ->
-    do
-      ms <- askModuleStack
-      let parent = maybe empty (vertex . moduleName) (listToMaybe ms)
-      modifyImportGraph (parent >< vertex name <>)
-      yield []
-    )
+  analyzeTerm eval term = resumeException
+                            @(LoadError term value)
+                            (liftAnalyze analyzeTerm eval term)
+                            (\yield (LoadError name) -> insertVertexName name >> yield [])
 
   analyzeModule recur m = do
+    insertVertexName (moduleName m)
+    liftAnalyze analyzeModule recur m
+
+insertVertexName name = do
     ms <- askModuleStack
     let parent = maybe empty (vertex . moduleName) (listToMaybe ms)
-    modifyImportGraph (parent >< vertex (moduleName m) <>)
-    liftAnalyze analyzeModule recur m
+    modifyImportGraph (parent >< vertex name <>)
 
 (><) :: Graph a => a -> a -> a
 (><) = connect
