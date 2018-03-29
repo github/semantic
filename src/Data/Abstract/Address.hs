@@ -1,4 +1,4 @@
-{-# LANGUAGE MultiParamTypeClasses, TypeFamilyDependencies #-}
+{-# LANGUAGE TypeFamilies #-}
 module Data.Abstract.Address where
 
 import Data.Abstract.FreeVariables
@@ -24,7 +24,7 @@ newtype Monovariant = Monovariant { unMonovariant :: Name }
 
 
 -- | The type into which stored values will be written for a given location type.
-type family Cell l = res | res -> l where
+type family Cell l where
   Cell Precise = Latest
   Cell Monovariant = Set
 
