@@ -26,6 +26,6 @@ instance ( Effectful m
 
   analyzeTerm eval term = resumeException @(EvalError value) (liftAnalyze analyzeTerm eval term) (
         \yield (FreeVariableError name) ->
-            raise (modify (name :)) >> unit >>= yield)
+            raise (modify' (name :)) >> unit >>= yield)
 
   analyzeModule = liftAnalyze analyzeModule
