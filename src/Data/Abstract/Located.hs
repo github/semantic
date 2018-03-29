@@ -2,11 +2,12 @@
 module Data.Abstract.Located where
 
 import Control.Abstract.Evaluator
-import Data.AST
+import Data.Range
 import Data.Record
+import Data.Span
 
 -- TODO: Dependencies
-type Provenance = Record Location
+type Provenance = Record '[Range, Span]
 
 data Located location = Located { provenance :: !Provenance, location :: location }
 
