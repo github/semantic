@@ -18,7 +18,7 @@ instance Location location => Location (Located location) where
   type Cell (Located location) = Cell location
 
 
-newtype LocatedValue value = LocatedValue { getLocatedValue :: value }
+newtype LocatedValue value = LocatedValue { unLocatedValue :: value }
   deriving (Eq, Ord, Show)
 
 instance AbstractValue (LocatedValue value) where
