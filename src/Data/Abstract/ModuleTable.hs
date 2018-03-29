@@ -3,6 +3,7 @@ module Data.Abstract.ModuleTable
 ( ModuleName
 , ModuleTable (..)
 , moduleTableLookup
+, moduleTableMember
 , moduleTableInsert
 , fromList
 ) where
@@ -18,8 +19,11 @@ newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModuleName a }
 moduleTableLookup :: ModuleName -> ModuleTable a -> Maybe a
 moduleTableLookup k = Map.lookup k . unModuleTable
 
+moduleTableMember :: ModuleName -> ModuleTable a -> Bool
+moduleTableMember k = Map.member k . unModuleTable
+
 moduleTableInsert :: ModuleName -> a -> ModuleTable a -> ModuleTable a
-moduleTableInsert k v ModuleTable{..} = ModuleTable (Map.insert k v unModuleTable)
+moduleTableInsert k v = ModuleTable . Map.insert k v . unModuleTable
 
 
 -- | Construct a 'ModuleTable' from a list of 'Module's.
