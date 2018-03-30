@@ -34,7 +34,7 @@ spec = parallel $ do
     ns n = Just . Latest . Just . injValue . Namespace (name n)
     addr = Address . Precise
     fixtures = "test/fixtures/php/analysis/"
-    evaluate entry = evaluateFiles phpParser
+    evaluate entry = evaluateFiles phpParser (takeDirectory entry)
       [ fixtures <> entry
       , fixtures <> "foo.php"
       , fixtures <> "bar.php"
