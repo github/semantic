@@ -60,7 +60,7 @@ instance ( Alternative m
          , Reducer Type (Cell location Type)
          )
       => MonadValue location Type m where
-  abstract names (Subterm _ body) = do
+  lambda names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
       tvar <- Var <$> fresh
