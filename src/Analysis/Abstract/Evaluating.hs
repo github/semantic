@@ -14,6 +14,7 @@ import           Data.Abstract.Exports
 import           Data.Abstract.Heap
 import           Data.Abstract.Module
 import           Data.Abstract.ModuleTable
+import           Data.Abstract.Origin
 import qualified Data.IntMap as IntMap
 import           Lens.Micro
 import           Prelude hiding (fail)
@@ -37,6 +38,7 @@ type EvaluatingEffects location term value
      , Fail                                         -- Failure with an error message
      , Fresh                                        -- For allocating new addresses and/or type variables.
      , Reader [Module term]                         -- The stack of currently-evaluating modules.
+     , Reader Origin                                -- The current term’s origin.
      , Reader (ModuleTable [Module term])           -- Cache of unevaluated modules
      , Reader (Environment location value)          -- Default environment used as a fallback in lookupEnv
      , State  (EvaluatingState location term value) -- Environment, heap, modules, exports, and jumps.
@@ -138,6 +140,10 @@ instance Members (EvaluatingEffects location term value) effects
   getConfiguration term = Configuration term mempty <$> getEnv <*> getHeap
 
   askModuleStack = raise ask
+
+instance Member (Reader Origin) effects
+      => MonadOrigin (Evaluating location term value effects) where
+  askOrigin = raise ask
 
 instance ( Members (EvaluatingEffects location term value) effects
          , MonadValue location value (Evaluating location term value effects)
