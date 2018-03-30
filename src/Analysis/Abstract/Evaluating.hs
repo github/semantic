@@ -20,14 +20,16 @@ import           Prologue
 newtype Evaluating term value effects a = Evaluating (Eff effects a)
   deriving (Applicative, Functor, Effectful, Monad)
 
-deriving instance Member Fail      effects => MonadFail   (Evaluating term value effects)
-deriving instance Member Fresh     effects => MonadFresh  (Evaluating term value effects)
-deriving instance Member NonDet    effects => Alternative (Evaluating term value effects)
-deriving instance Member NonDet    effects => MonadNonDet (Evaluating term value effects)
+deriving instance Member Fail   effects => MonadFail   (Evaluating term value effects)
+deriving instance Member Fresh  effects => MonadFresh  (Evaluating term value effects)
+deriving instance Member NonDet effects => Alternative (Evaluating term value effects)
+deriving instance Member NonDet effects => MonadNonDet (Evaluating term value effects)
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects term value
-  = '[ Resumable (ValueExc value)
+  = '[ Resumable (EvalError value)
+     , Resumable (LoadError term value)
+     , Resumable (ValueExc value)
      , Resumable (Unspecialized value)
      , Fail                                -- Failure with an error message
      , Reader [Module term]                -- The stack of currently-evaluating modules.
@@ -134,7 +136,7 @@ instance ( Members (EvaluatingEffects term value) effects
          , MonadValue value (Evaluating term value effects)
          )
          => MonadAnalysis term value (Evaluating term value effects) where
-  type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
+  type Effects term value (Evaluating term value effects) = EvaluatingEffects term value
 
   analyzeTerm = id
 
