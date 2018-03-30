@@ -7,13 +7,13 @@ import Prologue
 
 -- TODO: Upstream dependencies
 data Origin term ty where
-  Unknown ::                                   Origin term any
-  Package ::                   P.Package () -> Origin term 'P
-  Module  :: Origin term 'P -> M.ModuleInfo -> Origin term 'M
-  Term    :: Origin term 'M -> Base term () -> Origin term 'T
+  Unknown ::                                    Origin term any
+  Package ::                   P.PackageInfo -> Origin term 'P
+  Module  :: Origin term 'P -> M.ModuleInfo  -> Origin term 'M
+  Term    :: Origin term 'M -> Base term ()  -> Origin term 'T
 
 packageOrigin :: P.Package term -> SomeOrigin term
-packageOrigin p = SomeOrigin (Package (() <$ p { P.packageModules = mempty, P.packageEntryPoints = mempty }))
+packageOrigin = SomeOrigin . Package . P.packageInfo
 
 moduleOrigin :: M.Module term -> SomeOrigin term
 moduleOrigin = SomeOrigin . Module Unknown . M.moduleInfo
