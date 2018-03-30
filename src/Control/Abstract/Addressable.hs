@@ -4,7 +4,6 @@ module Control.Abstract.Addressable where
 import Control.Abstract.Evaluator
 import Control.Applicative
 import Control.Effect.Fresh
-import Control.Monad ((<=<))
 import Data.Abstract.Address
 import Data.Abstract.Environment (insert)
 import Data.Abstract.FreeVariables
@@ -60,7 +59,7 @@ letrec' name body = do
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
 instance MonadFail m => MonadAddressable Precise m where
-  derefCell _ = maybeM uninitializedAddress . unLatest
+  derefCell addr = maybeM (uninitializedAddress addr) . unLatest
   alloc _ = Address . Precise <$> fresh
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
@@ -69,9 +68,9 @@ instance (Alternative m, Monad m) => MonadAddressable Monovariant m where
   alloc = pure . Address . Monovariant
 
 -- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
-deref :: (MonadFail m, MonadAddressable location m, MonadHeap location value m) => Address location value -> m value
-deref addr = maybe uninitializedAddress (derefCell addr) <=< lookupHeap $ addr
+deref :: (MonadFail m, MonadAddressable location m, MonadHeap location value m, Show location) => Address location value -> m value
+deref addr = lookupHeap addr >>= maybe (uninitializedAddress addr) (derefCell addr)
 
 -- | Fail with a message denoting an uninitialized address (i.e. one which was 'alloc'ated, but never 'assign'ed a value before being 'deref'erenced).
-uninitializedAddress :: MonadFail m => m a
-uninitializedAddress = fail "uninitialized address"
+uninitializedAddress :: (MonadFail m, Show location) => Address location value -> m a
+uninitializedAddress addr = fail $ "uninitialized address: " <> show addr
