@@ -23,6 +23,11 @@ moduleOrigin = SomeOrigin . Module Unknown
 termOrigin :: term -> SomeOrigin term
 termOrigin = SomeOrigin . Term Unknown
 
+originModule :: SomeOrigin term -> Maybe (M.Module term)
+originModule (SomeOrigin (Term (Module _ m) _)) = Just m
+originModule (SomeOrigin (Module _ m))          = Just m
+originModule _                                  = Nothing
+
 deriving instance Eq term => Eq (Origin term ty)
 deriving instance Show term => Show (Origin term ty)
 
