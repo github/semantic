@@ -61,6 +61,7 @@ resolveTSModule path = maybe (Left searchPaths) Right <$> resolve searchPaths
           -- <> [searchDir </> "package.json"]
           <> (((path </> "index") <.>) <$> exts)
 
+
 data Import a = Import { importFrom :: Path, importSymbols :: ![(Name, Name)], importWildcardToken :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
@@ -121,6 +122,58 @@ instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable SideEffectImport
 
+-- | Qualified Export declarations
+newtype QualifiedExport a = QualifiedExport { qualifiedExportSymbols :: [(Name, Name)] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 QualifiedExport where liftEq = genericLiftEq
+instance Ord1 QualifiedExport where liftCompare = genericLiftCompare
+instance Show1 QualifiedExport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QualifiedExport where
+  eval (QualifiedExport exportSymbols) = do
+    -- Insert the aliases with no addresses.
+    for_ exportSymbols $ \(name, alias) ->
+      addExport name alias Nothing
+    unit
+
+
+-- | Qualified Export declarations that export from another module.
+data QualifiedExportFrom a = QualifiedExportFrom { qualifiedExportFrom :: Path, qualifiedExportFromSymbols :: ![(Name, Name)]}
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 QualifiedExportFrom where liftEq = genericLiftEq
+instance Ord1 QualifiedExportFrom where liftCompare = genericLiftCompare
+instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QualifiedExportFrom where
+  eval (QualifiedExportFrom (Path path NonRelative) symbols) = do
+    modulePath <- resolveNonRelativeTSModule path
+    doQualifiedExportFrom modulePath symbols *> unit
+  eval (QualifiedExportFrom (Path path Relative) symbols) = do
+    modulePath <- resolveRelativeTSModule path
+    doQualifiedExportFrom modulePath symbols *> unit
+
+doQualifiedExportFrom :: MonadEvaluatable term value m => M.ModuleName -> [(Name, Name)] -> m ()
+doQualifiedExportFrom modulePath exportSymbols = do
+    (importedEnv, _) <- isolate (require modulePath)
+    -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
+    for_ exportSymbols $ \(name, alias) -> do
+      let address = Env.lookup name importedEnv
+      maybe (cannotExport modulePath name) (addExport name alias . Just) address
+    where
+      cannotExport moduleName name = fail $
+        "module " <> show moduleName <> " does not export " <> show (friendlyName name)
+
+
+newtype DefaultExport a = DefaultExport { defaultExport :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 DefaultExport where liftEq = genericLiftEq
+instance Ord1 DefaultExport where liftCompare = genericLiftCompare
+instance Show1 DefaultExport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable DefaultExport where
 
 
 -- | Lookup type for a type-level key in a typescript map.

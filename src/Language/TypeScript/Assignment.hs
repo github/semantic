@@ -35,9 +35,6 @@ type Syntax = '[
   , Declaration.PublicFieldDefinition
   , Declaration.VariableDeclaration
   , Declaration.TypeAlias
-  , Declaration.DefaultExport
-  , Declaration.QualifiedExport
-  , Declaration.QualifiedExportFrom
   , Expression.Arithmetic
   , Expression.Bitwise
   , Expression.Boolean
@@ -165,6 +162,9 @@ type Syntax = '[
   , TypeScript.Syntax.Import
   , TypeScript.Syntax.QualifiedImport
   , TypeScript.Syntax.SideEffectImport
+  , TypeScript.Syntax.DefaultExport
+  , TypeScript.Syntax.QualifiedExport
+  , TypeScript.Syntax.QualifiedExportFrom
   , []
   ]
 
@@ -667,11 +667,6 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
     -- TODO: Need to validate that inline comments are still handled with this change in assigning to Path and not a Term.
     fromClause = symbol Grammar.String *> (path <$> source)
 
-fromClause :: Assignment
-fromClause = makeTerm <$> symbol Grammar.String <*> (Syntax.Identifier <$> (toName <$> source))
-  where
-    toName = qualifiedName . splitOnPathSeparator . dropRelativePrefix . stripQuotes
-
 debuggerStatement :: Assignment
 debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> (TypeScript.Syntax.Debugger <$ source)
 
@@ -715,9 +710,9 @@ ambientDeclaration :: Assignment
 ambientDeclaration = makeTerm <$> symbol Grammar.AmbientDeclaration <*> children (TypeScript.Syntax.AmbientDeclaration <$> term (choice [declaration, statementBlock]))
 
 exportStatement :: Assignment
-exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip Declaration.QualifiedExportFrom <$> exportClause <*> term fromClause)
-  <|> makeTerm <$> symbol Grammar.ExportStatement <*> children (Declaration.QualifiedExport <$> exportClause)
-  <|> makeTerm <$> symbol Grammar.ExportStatement <*> children (Declaration.DefaultExport <$> contextualize decorator (term (declaration <|> expression <|> identifier <|> importAlias')))
+exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip TypeScript.Syntax.QualifiedExportFrom <$> exportClause <*> fromClause)
+  <|> makeTerm <$> symbol Grammar.ExportStatement <*> children (TypeScript.Syntax.QualifiedExport <$> exportClause)
+  <|> makeTerm <$> symbol Grammar.ExportStatement <*> children (TypeScript.Syntax.DefaultExport <$> contextualize decorator (term (declaration <|> expression <|> identifier <|> importAlias')))
   where
     exportClause = symbol Grammar.ExportClause *> children (many exportSymbol)
     exportSymbol = symbol Grammar.ExportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> (Just <$> rawIdentifier))
@@ -725,6 +720,8 @@ exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip
     makeNameAliasPair from (Just alias) = (from, alias)
     makeNameAliasPair from Nothing = (from, from)
     rawIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source)
+    -- TODO: Need to validate that inline comments are still handled with this change in assigning to Path and not a Term.
+    fromClause = symbol Grammar.String *> (path <$> source)
 
 propertySignature :: Assignment
 propertySignature = makePropertySignature <$> symbol Grammar.PropertySignature <*> children ((,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> (term typeAnnotation' <|> emptyTerm))
