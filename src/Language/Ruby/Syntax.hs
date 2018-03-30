@@ -1,16 +1,16 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.Ruby.Syntax where
 
-import Control.Monad (unless)
-import Data.Abstract.Evaluatable
-import Data.Abstract.Path hiding (dropExtension)
-import Data.Abstract.ModuleTable
+import           Control.Monad (unless)
+import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Module as M
-import Diffing.Algorithm
-import Prelude hiding (fail)
-import Prologue
+import           Data.Abstract.ModuleTable
+import           Data.Abstract.Path
 import qualified Data.ByteString.Char8 as BC
-import System.FilePath.Posix
+import           Diffing.Algorithm
+import           Prelude hiding (fail)
+import           Prologue
+import           System.FilePath.Posix
 
 
 -- TODO: Fully sort out ruby require/load mechanics
