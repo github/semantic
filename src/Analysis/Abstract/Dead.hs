@@ -13,11 +13,11 @@ import Prologue
 newtype DeadCode m (effects :: [* -> *]) a = DeadCode (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
-deriving instance MonadControl term (m effects)           => MonadControl term (DeadCode m effects)
-deriving instance MonadEnvironment value (m effects)      => MonadEnvironment value (DeadCode m effects)
-deriving instance MonadHeap location value (m effects)    => MonadHeap location value (DeadCode m effects)
-deriving instance MonadModuleTable term value (m effects) => MonadModuleTable term value (DeadCode m effects)
-deriving instance MonadEvaluator term value (m effects)   => MonadEvaluator term value (DeadCode m effects)
+deriving instance MonadControl term (m effects)               => MonadControl term (DeadCode m effects)
+deriving instance MonadEnvironment location value (m effects) => MonadEnvironment location value (DeadCode m effects)
+deriving instance MonadHeap location value (m effects)        => MonadHeap location value (DeadCode m effects)
+deriving instance MonadModuleTable term value (m effects)     => MonadModuleTable term value (DeadCode m effects)
+deriving instance MonadEvaluator term value (m effects)       => MonadEvaluator term value (DeadCode m effects)
 
 -- | A set of “dead” (unreachable) terms.
 newtype Dead term = Dead { unDead :: Set term }

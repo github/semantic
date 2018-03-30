@@ -21,7 +21,7 @@ module Control.Abstract.Value
 import Control.Abstract.Evaluator
 import Data.Abstract.FreeVariables
 import Data.Abstract.Environment as Env
-import Data.Abstract.Address (Address, Cell)
+import Data.Abstract.Address (Address)
 import Data.Abstract.Number as Number
 import Data.Scientific (Scientific)
 import Data.Semigroup.Reducer hiding (unit)
@@ -144,7 +144,7 @@ class (Monad m, Show value) => MonadValue value m where
 toBool :: MonadValue value m => value -> m Bool
 toBool v = ifthenelse v (pure True) (pure False)
 
-forLoop :: (MonadEnvironment value m, MonadValue value m)
+forLoop :: (MonadEnvironment (LocationFor value) value m, MonadValue value m)
         => m value -- ^ Initial statement
         -> m value -- ^ Condition
         -> m value -- ^ Increment/stepper
@@ -172,13 +172,13 @@ doWhile body cond = loop $ \ continue -> body *> do
   ifthenelse this continue unit
 
 makeNamespace :: ( MonadValue value m
-                 , MonadEnvironment value m
-                 , MonadHeap location value m
-                 , Ord location
-                 , Reducer value (Cell location value)
+                 , MonadEnvironment (LocationFor value) value m
+                 , MonadHeap (LocationFor value) value m
+                 , Ord (LocationFor value)
+                 , Reducer value (CellFor value)
                  )
               => Name
-              -> Address location value
+              -> Address (LocationFor value) value
               -> [value]
               -> m value
 makeNamespace name addr supers = do

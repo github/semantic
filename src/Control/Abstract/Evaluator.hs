@@ -29,8 +29,8 @@ import Control.Effect
 import Control.Monad.Effect.Resumable
 import Data.Abstract.Address
 import Data.Abstract.Configuration
-import qualified Data.Abstract.Environment as Env
-import qualified Data.Abstract.Exports as Export
+import Data.Abstract.Environment as Env
+import Data.Abstract.Exports as Export
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
 import Data.Abstract.Live
@@ -46,7 +46,7 @@ import Prologue hiding (throwError)
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
 class ( MonadControl term m
-      , MonadEnvironment value m
+      , MonadEnvironment (LocationFor value) value m
       , MonadFail m
       , MonadModuleTable term value m
       , MonadHeap (LocationFor value) value m
@@ -62,64 +62,64 @@ class ( MonadControl term m
 
 
 -- | A 'Monad' abstracting local and global environments.
-class Monad m => MonadEnvironment value m | m -> value where
+class Monad m => MonadEnvironment location value m | m -> value, m -> location where
   -- | Retrieve the environment.
-  getEnv :: m (EnvironmentFor value)
+  getEnv :: m (Environment location value)
   -- | Set the environment.
-  putEnv :: EnvironmentFor value -> m ()
+  putEnv :: Environment location value -> m ()
   -- | Sets the environment for the lifetime of the given action.
-  withEnv :: EnvironmentFor value -> m a -> m a
+  withEnv :: Environment location value -> m a -> m a
 
   -- | Retrieve the default environment.
-  defaultEnvironment :: m (EnvironmentFor value)
+  defaultEnvironment :: m (Environment location value)
 
   -- | Set the default environment for the lifetime of an action.
   --   Usually only invoked in a top-level evaluation function.
-  withDefaultEnvironment :: EnvironmentFor value -> m a -> m a
+  withDefaultEnvironment :: Environment location value -> m a -> m a
 
   -- | Get the global export state.
-  getExports :: m (ExportsFor value)
+  getExports :: m (Exports location value)
   -- | Set the global export state.
-  putExports :: ExportsFor value -> m ()
+  putExports :: Exports location value -> m ()
   -- | Sets the global export state for the lifetime of the given action.
-  withExports :: ExportsFor value -> m a -> m a
+  withExports :: Exports location value -> m a -> m a
 
   -- | Run an action with a locally-modified environment.
-  localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m a -> m a
+  localEnv :: (Environment location value -> Environment location value) -> m a -> m a
 
   -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
-  lookupEnv :: Name -> m (Maybe (Address (LocationFor value) value))
+  lookupEnv :: Name -> m (Maybe (Address location value))
   lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
 
   -- | Look up a 'Name' in the environment, running an action with the resolved address (if any).
-  lookupWith :: (Address (LocationFor value) value -> m value) -> Name -> m (Maybe value)
+  lookupWith :: (Address location value -> m value) -> Name -> m (Maybe value)
   lookupWith with name = do
     addr <- lookupEnv name
     maybe (pure Nothing) (fmap Just . with) addr
 
 -- | Run a computation in a new local environment.
-localize :: MonadEnvironment value m => m a -> m a
+localize :: MonadEnvironment location value m => m a -> m a
 localize = localEnv id
 
 -- | Update the global environment.
-modifyEnv :: MonadEnvironment value m => (EnvironmentFor value -> EnvironmentFor value) -> m ()
+modifyEnv :: MonadEnvironment location value m => (Environment location value -> Environment location value) -> m ()
 modifyEnv f = do
   env <- getEnv
   putEnv $! f env
 
 -- | Update the global export state.
-modifyExports :: MonadEnvironment value m => (ExportsFor value -> ExportsFor value) -> m ()
+modifyExports :: MonadEnvironment location value m => (Exports location value -> Exports location value) -> m ()
 modifyExports f = do
   exports <- getExports
   putExports $! f exports
 
 -- | Add an export to the global export state.
-addExport :: MonadEnvironment value m => Name -> Name -> Maybe (Address (LocationFor value) value) -> m ()
+addExport :: MonadEnvironment location value m => Name -> Name -> Maybe (Address location value) -> m ()
 addExport name alias = modifyExports . Export.insert name alias
 
 -- | Obtain an environment that is the composition of the current and default environments.
 --   Useful for debugging.
-fullEnvironment :: MonadEnvironment value m => m (EnvironmentFor value)
+fullEnvironment :: MonadEnvironment location value m => m (Environment location value)
 fullEnvironment = mappend <$> getEnv <*> defaultEnvironment
 
 -- | A 'Monad' abstracting a heap of values.

@@ -19,21 +19,21 @@ class (Monad m, Ord location, Reducer value (Cell location value)) => MonadAddre
   alloc :: Name -> m (Address location value)
 
 -- | Look up or allocate an address for a 'Name'.
-lookupOrAlloc :: ( MonadAddressable (LocationFor value) value m
-                 , MonadEnvironment value m
+lookupOrAlloc :: ( MonadAddressable location value m
+                 , MonadEnvironment location value m
                  )
                  => Name
-                 -> m (Address (LocationFor value) value)
+                 -> m (Address location value)
 lookupOrAlloc name = lookupEnv name >>= maybe (alloc name) pure
 
 
-letrec :: ( MonadAddressable (LocationFor value) value m
-          , MonadEnvironment value m
-          , MonadHeap (LocationFor value) value m
+letrec :: ( MonadAddressable location value m
+          , MonadEnvironment location value m
+          , MonadHeap location value m
           )
        => Name
        -> m value
-       -> m (value, Address (LocationFor value) value)
+       -> m (value, Address location value)
 letrec name body = do
   addr <- lookupOrAlloc name
   v <- localEnv (insert name addr) body
@@ -41,11 +41,11 @@ letrec name body = do
   pure (v, addr)
 
 -- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
-letrec' :: ( MonadAddressable (LocationFor value) value m
-           , MonadEnvironment value m
+letrec' :: ( MonadAddressable location value m
+           , MonadEnvironment location value m
            )
         => Name
-        -> (Address (LocationFor value) value -> m value)
+        -> (Address location value -> m value)
         -> m value
 letrec' name body = do
   addr <- lookupOrAlloc name

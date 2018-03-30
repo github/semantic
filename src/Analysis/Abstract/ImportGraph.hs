@@ -26,11 +26,11 @@ renderImportGraph = export (defaultStyle friendlyName) . unImportGraph
 newtype ImportGraphing m (effects :: [* -> *]) a = ImportGraphing (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
-deriving instance MonadControl term (m effects)           => MonadControl term (ImportGraphing m effects)
-deriving instance MonadEnvironment value (m effects)      => MonadEnvironment value (ImportGraphing m effects)
-deriving instance MonadHeap location value (m effects)    => MonadHeap location value (ImportGraphing m effects)
-deriving instance MonadModuleTable term value (m effects) => MonadModuleTable term value (ImportGraphing m effects)
-deriving instance MonadEvaluator term value (m effects)   => MonadEvaluator term value (ImportGraphing m effects)
+deriving instance MonadControl term (m effects)               => MonadControl term (ImportGraphing m effects)
+deriving instance MonadEnvironment location value (m effects) => MonadEnvironment location value (ImportGraphing m effects)
+deriving instance MonadHeap location value (m effects)        => MonadHeap location value (ImportGraphing m effects)
+deriving instance MonadModuleTable term value (m effects)     => MonadModuleTable term value (ImportGraphing m effects)
+deriving instance MonadEvaluator term value (m effects)       => MonadEvaluator term value (ImportGraphing m effects)
 
 
 instance ( Effectful m

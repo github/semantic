@@ -96,10 +96,12 @@ instance Members '[Fail, State (EvaluatingState term value)] effects => MonadCon
 
   goto label = IntMap.lookup label <$> view _jumps >>= maybe (fail ("unknown label: " <> show label)) pure
 
-instance Members '[ State (EvaluatingState term value)
-                  , Reader (EnvironmentFor value)
-                  ] effects
-      => MonadEnvironment value (Evaluating term value effects) where
+instance ( location ~ LocationFor value
+         , Members '[ State (EvaluatingState term value)
+                    , Reader (EnvironmentFor value)
+                    ] effects
+         )
+      => MonadEnvironment location value (Evaluating term value effects) where
   getEnv = view _environment
   putEnv = (_environment .=)
   withEnv s = localEvaluatingState _environment (const s)
