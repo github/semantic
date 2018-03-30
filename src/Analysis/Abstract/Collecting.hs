@@ -55,7 +55,7 @@ askRoots :: (Effectful m, Member (Reader (Live location value)) effects) => m ef
 askRoots = raise ask
 
 -- | Run a computation with the given 'Live' set added to the local root set.
--- extraRoots :: (Effectful m, Member (Reader (Live (LocationFor value) value)) effects, Ord (LocationFor value)) => Live (LocationFor value) value -> m effects a -> m effects a
+-- extraRoots :: (Effectful m, Member (Reader (Live location value)) effects, Ord location) => Live location value -> m effects a -> m effects a
 -- extraRoots roots = raise . local (<> roots) . lower
 
 
