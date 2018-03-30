@@ -186,8 +186,8 @@ evaluateModules :: ( Effectful m
                    , MonadEvaluatable location term value (m effects)
                    )
                 => [Module term]
-                -> m effects [value]
-evaluateModules = evaluatePackage . Package.fromModules
+                -> m effects value
+evaluateModules = fmap Prelude.head . evaluatePackage . Package.fromModules
 
 evaluatePackage :: ( Effectful m
                    , Member (Reader (SomeOrigin term)) effects

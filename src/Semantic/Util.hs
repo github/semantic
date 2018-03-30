@@ -130,7 +130,7 @@ evaluateFiles :: forall term effects
                  )
               => Parser term
               -> [FilePath]
-              -> IO (Final effects [Value Precise])
+              -> IO (Final effects (Value Precise))
 evaluateFiles parser paths = runAnalysis @(Evaluating Precise term (Value Precise)) . evaluateModules <$> parseFiles parser paths
 
 -- | Evaluate terms and an entry point to a value with a given prelude.
