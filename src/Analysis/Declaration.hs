@@ -125,19 +125,19 @@ instance CustomHasDeclaration whole Ruby.Syntax.Class where
   customToDeclaration blob@Blob{..} ann decl@(Ruby.Syntax.Class (Term (In identifierAnn _), _) _ _)
     = Just $ ClassDeclaration (getSource blobSource identifierAnn) (getRubyClassSource blob (In ann decl)) blobLanguage
 
-instance CustomHasDeclaration (Union fs) Declaration.Import where
-  customToDeclaration Blob{..} _ (Declaration.Import (Term (In fromAnn _), _) symbols _)
-    = Just $ ImportDeclaration ((stripQuotes . getSource blobSource) fromAnn) "" (fmap getSymbol symbols) blobLanguage
-    where
-      getSymbol = let f = (T.decodeUtf8 . friendlyName) in bimap f f
+-- instance CustomHasDeclaration (Union fs) Declaration.Import where
+--   customToDeclaration Blob{..} _ (Declaration.Import (Term (In fromAnn _), _) symbols _)
+--     = Just $ ImportDeclaration ((stripQuotes . getSource blobSource) fromAnn) "" (fmap getSymbol symbols) blobLanguage
+--     where
+--       getSymbol = let f = (T.decodeUtf8 . friendlyName) in bimap f f
 
-instance (Syntax.Identifier :< fs) => CustomHasDeclaration (Union fs) Declaration.QualifiedImport where
-  customToDeclaration Blob{..} _ (Declaration.QualifiedImport (Term (In fromAnn _), _) (Term (In aliasAnn aliasF), _) symbols)
-    | Just (Syntax.Identifier alias) <- prj aliasF = Just $ ImportDeclaration ((stripQuotes . getSource blobSource) fromAnn) (toName alias) (fmap getSymbol symbols) blobLanguage
-    | otherwise = Just $ ImportDeclaration ((stripQuotes . getSource blobSource) fromAnn) (getSource blobSource aliasAnn) (fmap getSymbol symbols) blobLanguage
-    where
-      getSymbol = bimap toName toName
-      toName = T.decodeUtf8 . friendlyName
+-- instance (Syntax.Identifier :< fs) => CustomHasDeclaration (Union fs) Declaration.QualifiedImport where
+--   customToDeclaration Blob{..} _ (Declaration.QualifiedImport (Term (In fromAnn _), _) (Term (In aliasAnn aliasF), _) symbols)
+--     | Just (Syntax.Identifier alias) <- prj aliasF = Just $ ImportDeclaration ((stripQuotes . getSource blobSource) fromAnn) (toName alias) (fmap getSymbol symbols) blobLanguage
+--     | otherwise = Just $ ImportDeclaration ((stripQuotes . getSource blobSource) fromAnn) (getSource blobSource aliasAnn) (fmap getSymbol symbols) blobLanguage
+--     where
+--       getSymbol = bimap toName toName
+--       toName = T.decodeUtf8 . friendlyName
 
 instance CustomHasDeclaration (Union fs) Go.Syntax.SideEffectImport where
   customToDeclaration Blob{..} _ (Go.Syntax.SideEffectImport (P.Path path _) _)
@@ -194,8 +194,8 @@ class HasDeclarationWithStrategy (strategy :: Strategy) whole syntax where
 type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Class = 'Custom
   DeclarationStrategy Declaration.Function = 'Custom
-  DeclarationStrategy Declaration.Import = 'Custom
-  DeclarationStrategy Declaration.QualifiedImport = 'Custom
+  -- DeclarationStrategy Declaration.Import = 'Custom
+  -- DeclarationStrategy Declaration.QualifiedImport = 'Custom
   DeclarationStrategy Go.Syntax.SideEffectImport = 'Custom
   DeclarationStrategy Ruby.Syntax.Class = 'Custom
   DeclarationStrategy Ruby.Syntax.Require = 'Custom
