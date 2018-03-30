@@ -35,6 +35,7 @@ type EvaluatingEffects location term value
      , Resumable (ValueExc location value)
      , Resumable (Unspecialized value)
      , Fail                                         -- Failure with an error message
+     , Fresh                                        -- For allocating new addresses and/or type variables.
      , Reader [Module term]                         -- The stack of currently-evaluating modules.
      , Reader (ModuleTable [Module term])           -- Cache of unevaluated modules
      , Reader (Environment location value)          -- Default environment used as a fallback in lookupEnv

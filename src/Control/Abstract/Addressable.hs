@@ -3,11 +3,11 @@ module Control.Abstract.Addressable where
 
 import Control.Abstract.Evaluator
 import Control.Applicative
+import Control.Effect.Fresh
 import Control.Monad ((<=<))
 import Data.Abstract.Address
 import Data.Abstract.Environment (insert)
 import Data.Abstract.FreeVariables
-import Data.Abstract.Heap
 import Data.Semigroup.Reducer
 import Prelude hiding (fail)
 import Prologue
@@ -16,12 +16,12 @@ import Prologue
 class (Monad m, Ord location) => MonadAddressable location m where
   derefCell :: Address location value -> Cell location value -> m value
 
-  alloc :: MonadHeap location value m => Name -> m (Address location value)
+  alloc :: MonadFresh m => Name -> m (Address location value)
 
 -- | Look up or allocate an address for a 'Name'.
 lookupOrAlloc :: ( MonadAddressable location m
                  , MonadEnvironment location value m
-                 , MonadHeap location value m
+                 , MonadFresh m
                  )
               => Name
               -> m (Address location value)
@@ -30,6 +30,7 @@ lookupOrAlloc name = lookupEnv name >>= maybe (alloc name) pure
 
 letrec :: ( MonadAddressable location m
           , MonadEnvironment location value m
+          , MonadFresh m
           , MonadHeap location value m
           , Reducer value (Cell location value)
           )
@@ -45,7 +46,7 @@ letrec name body = do
 -- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
 letrec' :: ( MonadAddressable location m
            , MonadEnvironment location value m
-           , MonadHeap location value m
+           , MonadFresh m
            )
         => Name
         -> (Address location value -> m value)
@@ -60,10 +61,7 @@ letrec' name body = do
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
 instance MonadFail m => MonadAddressable Precise m where
   derefCell _ = maybeM uninitializedAddress . unLatest
-  alloc _ = do
-    -- Compute the next available address in the heap, then write an empty value into it.
-    addr <- fmap (Address . Precise . heapSize) getHeap
-    addr <$ modifyHeap (heapInit addr mempty)
+  alloc _ = Address . Precise <$> fresh
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
 instance (Alternative m, Monad m) => MonadAddressable Monovariant m where
