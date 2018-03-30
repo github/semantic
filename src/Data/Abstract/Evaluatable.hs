@@ -26,7 +26,7 @@ import           Data.Abstract.FreeVariables as X
 import           Data.Abstract.Module
 import           Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Origin (SomeOrigin, packageOrigin)
-import           Data.Abstract.Package
+import           Data.Abstract.Package as Package
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
 import           Data.Semigroup.Reducer hiding (unit)
@@ -181,11 +181,13 @@ withModules :: MonadEvaluatable location term value m
 withModules = localModuleTable . const . ModuleTable.fromModules
 
 -- | Evaluate with a list of modules in scope, taking the head module as the entry point.
-evaluateModules :: MonadEvaluatable location term value m
+evaluateModules :: ( Effectful m
+                   , Member (Reader (SomeOrigin term)) effects
+                   , MonadEvaluatable location term value (m effects)
+                   )
                 => [Module term]
-                -> m value
-evaluateModules []     = fail "evaluateModules: empty list"
-evaluateModules (m:ms) = withModules ms (evaluateModule m)
+                -> m effects [value]
+evaluateModules = evaluatePackage . Package.fromModules
 
 evaluatePackage :: ( Effectful m
                    , Member (Reader (SomeOrigin term)) effects
