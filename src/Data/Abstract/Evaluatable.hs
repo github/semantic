@@ -24,6 +24,7 @@ import qualified Data.Abstract.Exports as Exports
 import           Data.Abstract.FreeVariables as X
 import           Data.Abstract.Module
 import           Data.Abstract.ModuleTable as ModuleTable
+import           Data.Abstract.Origin (SomeOrigin, packageOrigin)
 import           Data.Abstract.Package
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
@@ -181,7 +182,18 @@ evaluateModules :: MonadEvaluatable location term value m
 evaluateModules []     = fail "evaluateModules: empty list"
 evaluateModules (m:ms) = withModules ms (evaluateModule m)
 
-evaluatePackage :: MonadEvaluatable location term value m
+evaluatePackage :: ( Effectful m
+                   , Member (Reader (SomeOrigin term)) effects
+                   , MonadEvaluatable location term value (m effects)
+                   )
                 => Package term
-                -> m value
-evaluatePackage _ = fail "nope"
+                -> m effects value
+evaluatePackage p = pushPackage p (fail "nope")
+
+pushPackage :: ( Effectful m
+               , Member (Reader (SomeOrigin term)) effects
+               )
+            => Package term
+            -> m effects a
+            -> m effects a
+pushPackage p = raise . local (<> packageOrigin p) . lower
