@@ -147,13 +147,19 @@ instance Member (Reader Origin) effects
 
 instance ( Members (EvaluatingEffects location term value) effects
          , MonadValue location value (Evaluating location term value effects)
+         , HasOrigin (Base term)
          )
       => MonadAnalysis location term value (Evaluating location term value effects) where
   type Effects location term value (Evaluating location term value effects) = EvaluatingEffects location term value
 
-  analyzeTerm = id
+  analyzeTerm eval term = do
+    ms <- askModuleStack
+    pushOrigin (originFor ms (term)) (eval term)
 
   analyzeModule eval m = pushModule (subterm <$> m) (eval m)
 
 pushModule :: Member (Reader [Module term]) effects => Module term -> Evaluating location term value effects a -> Evaluating location term value effects a
 pushModule m = raise . local (m :) . lower
+
+pushOrigin :: Member (Reader Origin) effects => Origin -> Evaluating location term value effects a -> Evaluating location term value effects a
+pushOrigin o = raise . local (const o) . lower

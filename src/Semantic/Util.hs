@@ -15,6 +15,7 @@ import Control.Monad.IO.Class
 import Data.Abstract.Evaluatable hiding (head)
 import Data.Abstract.Address
 import Data.Abstract.Module
+import Data.Abstract.Origin
 import Data.Abstract.Type
 import Data.Abstract.Value
 import Data.Blob
@@ -72,6 +73,7 @@ evaluateFile :: forall term effects
              .  ( Evaluatable (Base term)
                 , FreeVariables term
                 , effects ~ Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects)
+                , HasOrigin (Base term)
                 , MonadAddressable Precise (Evaluating Precise term (Value Precise) effects)
                 , Recursive term
                 )
@@ -84,6 +86,7 @@ evaluateWith :: forall location value term effects
              .  ( effects ~ Effects location term value (Evaluating location term value effects)
                 , Evaluatable (Base term)
                 , FreeVariables term
+                , HasOrigin (Base term)
                 , MonadAddressable location (Evaluating location term value effects)
                 , MonadValue location value (Evaluating location term value effects)
                 , Recursive term
@@ -106,6 +109,7 @@ evaluateWithPrelude :: forall term effects
                     .  ( Evaluatable (Base term)
                        , FreeVariables term
                        , effects ~ Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects)
+                       , HasOrigin (Base term)
                        , MonadAddressable Precise (Evaluating Precise term (Value Precise) effects)
                        , Recursive term
                        , TypeLevel.KnownSymbol (PreludePath term)
@@ -125,6 +129,7 @@ evaluateFiles :: forall term effects
               .  ( Evaluatable (Base term)
                  , FreeVariables term
                  , effects ~ Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects)
+                 , HasOrigin (Base term)
                  , MonadAddressable Precise (Evaluating Precise term (Value Precise) effects)
                  , Recursive term
                  )
@@ -138,6 +143,7 @@ evaluatesWith :: forall location value term effects
               .  ( effects ~ Effects location term value (Evaluating location term value effects)
                  , Evaluatable (Base term)
                  , FreeVariables term
+                 , HasOrigin (Base term)
                  , MonadAddressable location (Evaluating location term value effects)
                  , MonadValue location value (Evaluating location term value effects)
                  , Recursive term
@@ -156,6 +162,7 @@ evaluateFilesWithPrelude :: forall term effects
                          .  ( Evaluatable (Base term)
                             , FreeVariables term
                             , effects ~ Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects)
+                            , HasOrigin (Base term)
                             , MonadAddressable Precise (Evaluating Precise term (Value Precise) effects)
                             , Recursive term
                             , TypeLevel.KnownSymbol (PreludePath term)
