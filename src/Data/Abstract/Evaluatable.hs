@@ -197,13 +197,7 @@ evaluatePackage p = pushPackage p (localModuleTable (<> packageModules p)
   (traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints p))))
   where evaluateEntryPoint (m, sym) = do
           (_, v) <- require m
-          case sym of
-            Just sym -> do
-              f <- lookupWith deref sym
-              case f of
-                Just f  -> X.apply f []
-                Nothing -> fail $ "free variable: " <> show sym
-            Nothing -> pure v
+          maybe (pure v) ((`X.apply` []) <=< variable) sym
 
 pushPackage :: ( Effectful m
                , Member (Reader (SomeOrigin term)) effects
