@@ -150,7 +150,7 @@ instance ( Members (EvaluatingEffects location term value) effects
 
   analyzeTerm eval term = do
     ms <- askModuleStack
-    pushOrigin (originFor ms (term)) (eval term)
+    pushOrigin (originFor ms term) (eval term)
 
   analyzeModule eval m = pushModule (subterm <$> m) (eval m)
 
