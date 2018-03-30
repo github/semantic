@@ -62,7 +62,7 @@ insertVertexName :: forall m location term value effects
                  -> ImportGraphing m effects ()
 insertVertexName name = do
     o <- raise ask
-    let parent = maybe empty (vertex . moduleName . moduleInfo) (originModule @term o)
+    let parent = maybe empty (vertex . moduleName) (originModule @term o)
     modifyImportGraph (parent >< vertex name <>)
 
 (><) :: Graph a => a -> a -> a

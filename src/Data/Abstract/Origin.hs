@@ -9,19 +9,19 @@ import Prologue
 data Origin term ty where
   Unknown ::                                   Origin term any
   Package ::                   P.Package () -> Origin term 'P
-  Module  :: Origin term 'P -> M.Module  () -> Origin term 'M
+  Module  :: Origin term 'P -> M.ModuleInfo -> Origin term 'M
   Term    :: Origin term 'M -> Base term () -> Origin term 'T
 
 packageOrigin :: P.Package term -> SomeOrigin term
 packageOrigin p = SomeOrigin (Package (() <$ p { P.packageModules = mempty, P.packageEntryPoints = mempty }))
 
-moduleOrigin :: M.Module term -> SomeOrigin term
-moduleOrigin = SomeOrigin . Module Unknown . (() <$)
+moduleOrigin :: M.ModuleInfo -> SomeOrigin term
+moduleOrigin = SomeOrigin . Module Unknown
 
 termOrigin :: Functor (Base term) => Base term a -> SomeOrigin term
 termOrigin = SomeOrigin . Term Unknown . (() <$)
 
-originModule :: SomeOrigin term -> Maybe (M.Module ())
+originModule :: SomeOrigin term -> Maybe M.ModuleInfo
 originModule (SomeOrigin (Term (Module _ m) _)) = Just m
 originModule (SomeOrigin (Module _ m))          = Just m
 originModule _                                  = Nothing
