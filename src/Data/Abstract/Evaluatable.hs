@@ -30,7 +30,6 @@ import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
 import           Data.Semigroup.Reducer hiding (unit)
 import           Data.Term
-import           Prelude hiding (fail)
 import           Prologue
 
 type MonadEvaluatable location term value m =
