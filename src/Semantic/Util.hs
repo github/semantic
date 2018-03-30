@@ -23,6 +23,7 @@ import Data.Span
 import Data.Term
 import Diffing.Algorithm
 import Diffing.Interpreter
+import System.FilePath.Glob
 import qualified GHC.TypeLits as TypeLevel
 import Language.Preluded
 import Parsing.Parser
@@ -37,29 +38,53 @@ import qualified Language.Python.Assignment as Python
 import qualified Language.TypeScript.Assignment as TypeScript
 
 -- Ruby
-evaluateRubyFile = evaluateWithPrelude rubyParser
-evaluateRubyFiles = evaluateFilesWithPrelude rubyParser
+evalRubyProject = evaluateProject rubyParser ["rb"]
+evalRubyFile = evaluateWithPrelude rubyParser
+evalRubyFiles = evaluateFilesWithPrelude rubyParser
 
 -- Go
-evaluateGoFile = evaluateFile goParser
-evaluateGoFiles = evaluateFiles goParser
+evalGoProject = evaluateProject goParser ["go"]
+evalGoFile = evaluateFile goParser
+evalGoFiles = evaluateFiles goParser
 typecheckGoFile path = runAnalysis @(Caching Evaluating Go.Term Type) . evaluateModule <$> parseFile goParser Nothing path
 
 -- Python
-evaluatePythonFile = evaluateWithPrelude pythonParser
-evaluatePythonFiles = evaluateFilesWithPrelude pythonParser
+evalPythonProject = evaluateProject pythonParser ["py"]
+evalPythonFile = evaluateWithPrelude pythonParser
+evalPythonFiles = evaluateFilesWithPrelude pythonParser
 typecheckPythonFile path = runAnalysis @(Caching Evaluating Python.Term Type) . evaluateModule <$> parseFile pythonParser Nothing path
 tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term Value) . evaluateModule <$> parseFile pythonParser Nothing path
 evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] Evaluating) Python.Term Value) . evaluateModule <$> parseFile pythonParser Nothing path
 
 -- PHP
-evaluatePHPFile = evaluateFile phpParser
-evaluatePHPFiles = evaluateFiles phpParser
+evalPHP = evaluateProject phpParser ["php"]
+evalPHPFile = evaluateFile phpParser
+evalPHPFiles = evaluateFiles phpParser
 
 -- TypeScript
+evalTypeScriptProject = evaluateProject typescriptParser ["ts", "tsx"]
+evalTypeScriptFile = evaluateFile typescriptParser
+evalTypeScriptFiles = evaluateFiles typescriptParser
 typecheckTypeScriptFile path = runAnalysis @(Caching Evaluating TypeScript.Term Type) . evaluateModule <$> parseFile typescriptParser Nothing path
-evaluateTypeScriptFile = evaluateFile typescriptParser
-evaluateTypeScriptFiles = evaluateFiles typescriptParser
+
+evaluateProject :: forall term effects
+                .  ( Evaluatable (Base term)
+                   , FreeVariables term
+                   , effects ~ RequiredEffects term Value (Evaluating term Value effects)
+                   , MonadAddressable Precise Value (Evaluating term Value effects)
+                   , MonadValue Value (Evaluating term Value effects)
+                   , Recursive term
+                   )
+                => Parser term
+                -> [FilePath]
+                -> FilePath
+                -> IO (Final effects Value)
+evaluateProject parser exts entryPoint = do
+  let rootDir = takeDirectory entryPoint
+  paths <- filter (/= entryPoint) <$> getPaths exts rootDir
+  evaluateFiles parser rootDir (entryPoint : paths)
+
+getPaths exts = fmap fold . globDir (compile . mappend "**/*." <$> exts)
 
 -- Evalute a single file.
 evaluateFile :: forall term effects
@@ -125,9 +150,10 @@ evaluateFiles :: forall term effects
                  , Recursive term
                  )
               => Parser term
+              -> FilePath
               -> [FilePath]
               -> IO (Final effects Value)
-evaluateFiles parser paths = runAnalysis @(Evaluating term Value) . evaluateModules <$> parseFiles parser paths
+evaluateFiles parser rootDir paths = runAnalysis @(Evaluating term Value) . evaluateModules <$> parseFiles parser rootDir paths
 
 -- | Evaluate terms and an entry point to a value with a given prelude.
 evaluatesWith :: forall value term effects
@@ -165,16 +191,15 @@ evaluateFilesWithPrelude parser paths = do
   entry:xs <- traverse (parseFile parser Nothing) paths
   pure $ evaluatesWith @Value prelude xs entry
 
-
 -- Read and parse a file.
 parseFile :: Parser term -> Maybe FilePath -> FilePath -> IO (Module term)
 parseFile parser rootDir path = runTask $ do
   blob <- file path
   moduleForBlob rootDir blob <$> parse parser blob
 
-parseFiles :: Parser term -> [FilePath] -> IO [Module term]
-parseFiles parser paths = traverse (parseFile parser (Just (dropFileName (head paths)))) paths
-
+parseFiles :: Parser term -> FilePath -> [FilePath] -> IO [Module term]
+parseFiles parser rootDir = traverse (parseFile parser (Just rootDir))
+-- where x = (Just (dropFileName (head paths)))
 
 -- Read a file from the filesystem into a Blob.
 file :: MonadIO m => FilePath -> m Blob
