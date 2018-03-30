@@ -2,8 +2,8 @@
 module Data.Abstract.ModuleTable
 ( ModuleName
 , ModuleTable (..)
-, moduleTableLookup
-, moduleTableInsert
+, lookup
+, insert
 , fromList
 ) where
 
@@ -11,15 +11,16 @@ import Data.Abstract.Module
 import qualified Data.Map as Map
 import Data.Semigroup
 import GHC.Generics (Generic1)
+import Prelude hiding (lookup)
 
 newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModuleName a }
   deriving (Eq, Foldable, Functor, Generic1, Monoid, Ord, Semigroup, Show, Traversable)
 
-moduleTableLookup :: ModuleName -> ModuleTable a -> Maybe a
-moduleTableLookup k = Map.lookup k . unModuleTable
+lookup :: ModuleName -> ModuleTable a -> Maybe a
+lookup k = Map.lookup k . unModuleTable
 
-moduleTableInsert :: ModuleName -> a -> ModuleTable a -> ModuleTable a
-moduleTableInsert k v ModuleTable{..} = ModuleTable (Map.insert k v unModuleTable)
+insert :: ModuleName -> a -> ModuleTable a -> ModuleTable a
+insert k v ModuleTable{..} = ModuleTable (Map.insert k v unModuleTable)
 
 
 -- | Construct a 'ModuleTable' from a list of 'Module's.

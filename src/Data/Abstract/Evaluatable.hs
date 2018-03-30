@@ -119,7 +119,7 @@ instance Evaluatable [] where
 require :: MonadEvaluatable location term value m
         => ModuleName
         -> m (Environment location value, value)
-require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup name
+require name = getModuleTable >>= maybe (load name) pure . ModuleTable.lookup name
 
 -- | Load another module by name and return it's environment and value.
 --
@@ -127,7 +127,7 @@ require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup nam
 load :: MonadEvaluatable location term value m
      => ModuleName
      -> m (Environment location value, value)
-load name = askModuleTable >>= maybe notFound pure . moduleTableLookup name >>= evalAndCache
+load name = askModuleTable >>= maybe notFound pure . ModuleTable.lookup name >>= evalAndCache
   where
     notFound = throwLoadError (LoadError name)
 
@@ -141,7 +141,7 @@ load name = askModuleTable >>= maybe notFound pure . moduleTableLookup name >>= 
     evalAndCache' x = do
       v <- evaluateModule x
       env <- filterEnv <$> getExports <*> getEnv
-      modifyModuleTable (moduleTableInsert name (env, v))
+      modifyModuleTable (ModuleTable.insert name (env, v))
       pure (env, v)
 
     -- TODO: If the set of exports is empty because no exports have been
