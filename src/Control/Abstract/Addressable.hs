@@ -13,10 +13,10 @@ import Prelude hiding (fail)
 import Prologue
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Heap.
-class (Monad m, Ord l, l ~ LocationFor value, Reducer value (Cell l value)) => MonadAddressable l value m where
-  deref :: Address l value -> m value
+class (Monad m, Ord location, location ~ LocationFor value, Reducer value (Cell location value)) => MonadAddressable location value m where
+  deref :: Address location value -> m value
 
-  alloc :: Name -> m (Address l value)
+  alloc :: Name -> m (Address location value)
 
 -- | Look up or allocate an address for a 'Name'.
 lookupOrAlloc :: ( MonadAddressable (LocationFor value) value m
