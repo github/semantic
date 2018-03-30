@@ -46,11 +46,6 @@ class ( MonadControl term m
   -- | Get the current 'Configuration' with a passed-in term.
   getConfiguration :: Ord location => term -> m (Configuration location term value)
 
-  -- | Retrieve the stack of modules currently being evaluated.
-  --
-  --   With great power comes great responsibility. If you 'evaluateModule' any of these, you probably deserve what you get.
-  askModuleStack :: m [Module term]
-
 
 -- | A 'Monad' abstracting local and global environments.
 class Monad m => MonadEnvironment location value m | m -> value, m -> location where

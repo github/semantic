@@ -37,7 +37,6 @@ type EvaluatingEffects location term value
      , Resumable (Unspecialized value)
      , Fail                                         -- Failure with an error message
      , Fresh                                        -- For allocating new addresses and/or type variables.
-     , Reader [Module term]                         -- The stack of currently-evaluating modules.
      , Reader (SomeOrigin term)                     -- The current term’s origin.
      , Reader (ModuleTable [Module term])           -- Cache of unevaluated modules
      , Reader (Environment location value)          -- Default environment used as a fallback in lookupEnv
@@ -139,8 +138,6 @@ instance Members (EvaluatingEffects location term value) effects
       => MonadEvaluator location term value (Evaluating location term value effects) where
   getConfiguration term = Configuration term mempty <$> getEnv <*> getHeap
 
-  askModuleStack = raise ask
-
 instance ( Corecursive term
          , Members (EvaluatingEffects location term value) effects
          , MonadValue location value (Evaluating location term value effects)
@@ -150,10 +147,7 @@ instance ( Corecursive term
 
   analyzeTerm eval term = pushOrigin (termOrigin (embedSubterm term)) (eval term)
 
-  analyzeModule eval m = pushOrigin (moduleOrigin (subterm <$> m)) (pushModule (subterm <$> m) (eval m))
-
-pushModule :: Member (Reader [Module term]) effects => Module term -> Evaluating location term value effects a -> Evaluating location term value effects a
-pushModule m = raise . local (m :) . lower
+  analyzeModule eval m = pushOrigin (moduleOrigin (subterm <$> m)) (eval m)
 
 pushOrigin :: Member (Reader (SomeOrigin term)) effects => SomeOrigin term -> Evaluating location term value effects a -> Evaluating location term value effects a
 pushOrigin o = raise . local (<> o) . lower

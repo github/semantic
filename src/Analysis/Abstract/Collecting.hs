@@ -25,8 +25,6 @@ instance ( Effectful m
       => MonadEvaluator location term value (Collecting m effects) where
   getConfiguration term = Configuration term <$> askRoots <*> getEnv <*> getHeap
 
-  askModuleStack = Collecting askModuleStack
-
 
 instance ( Effectful m
          , Foldable (Cell location)

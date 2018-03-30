@@ -13,6 +13,7 @@ import           Control.Abstract.Analysis
 import           Data.Abstract.Evaluatable (LoadError (..))
 import           Data.Abstract.FreeVariables
 import           Data.Abstract.Module
+import           Data.Abstract.Origin
 import           Prologue hiding (empty)
 
 -- | The graph of function definitions to symbols used in a given program.
@@ -34,6 +35,7 @@ deriving instance MonadEvaluator location term value (m effects)   => MonadEvalu
 
 
 instance ( Effectful m
+         , Member (Reader (SomeOrigin term)) effects
          , Member (State ImportGraph) effects
          , MonadAnalysis location term value (m effects)
          , Member (Resumable (LoadError term value)) effects
@@ -50,14 +52,17 @@ instance ( Effectful m
     insertVertexName (moduleName m)
     liftAnalyze analyzeModule recur m
 
-insertVertexName :: (Effectful m
-                   , Member (State ImportGraph) effects
-                   , MonadEvaluator location term value (m effects))
+insertVertexName :: forall m location term value effects
+                 .  ( Effectful m
+                    , Member (Reader (SomeOrigin term)) effects
+                    , Member (State ImportGraph) effects
+                    , MonadEvaluator location term value (m effects)
+                    )
                  => NonEmpty ByteString
                  -> ImportGraphing m effects ()
 insertVertexName name = do
-    ms <- askModuleStack
-    let parent = maybe empty (vertex . moduleName) (listToMaybe ms)
+    o <- askOrigin
+    let parent = maybe empty (vertex . moduleName) (originModule @term o)
     modifyImportGraph (parent >< vertex name <>)
 
 (><) :: Graph a => a -> a -> a
