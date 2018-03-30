@@ -8,6 +8,7 @@ module Data.Abstract.Evaluatable
 , EvalError(..)
 , evaluateTerm
 , evaluateModule
+, evaluatePackage
 , withModules
 , evaluateModules
 , throwLoadError
@@ -23,6 +24,7 @@ import qualified Data.Abstract.Exports as Exports
 import           Data.Abstract.FreeVariables as X
 import           Data.Abstract.Module
 import           Data.Abstract.ModuleTable as ModuleTable
+import           Data.Abstract.Package
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
 import           Data.Semigroup.Reducer hiding (unit)
@@ -178,3 +180,8 @@ evaluateModules :: MonadEvaluatable location term value m
                 -> m value
 evaluateModules []     = fail "evaluateModules: empty list"
 evaluateModules (m:ms) = withModules ms (evaluateModule m)
+
+evaluatePackage :: MonadEvaluatable location term value m
+                => Package term
+                -> m value
+evaluatePackage _ = fail "nope"
