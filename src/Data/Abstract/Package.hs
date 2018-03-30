@@ -6,9 +6,14 @@ import Data.Abstract.ModuleTable as ModuleTable
 
 type PackageName = Name
 
+data PackageInfo = PackageInfo
+  { packageName    :: Maybe PackageName
+  , packageVersion :: Maybe Version
+  }
+  deriving (Eq, Ord, Show)
+
 data Package term = Package
-  { packageName        :: Maybe PackageName
-  , packageVersion     :: Maybe Version
+  { packageInfo        :: PackageInfo
   , packageModules     :: ModuleTable [Module term]
   , packageEntryPoints :: ModuleTable (Maybe Name)
   }
@@ -19,6 +24,6 @@ newtype Version = Version { versionString :: String }
 
 
 fromModules :: [Module term] -> Package term
-fromModules []     = Package Nothing Nothing mempty mempty
-fromModules (m:ms) = Package Nothing Nothing (ModuleTable.fromModules (m:ms)) entryPoints
+fromModules []     = Package (PackageInfo Nothing Nothing) mempty mempty
+fromModules (m:ms) = Package (PackageInfo Nothing Nothing) (ModuleTable.fromModules (m:ms)) entryPoints
   where entryPoints = ModuleTable.singleton (moduleName (moduleInfo m)) Nothing

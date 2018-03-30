@@ -181,7 +181,7 @@ parseFiles parser paths = traverse (parseFile parser (Just (dropFileName (head p
 
 parsePackage :: PackageName -> Parser term -> [FilePath] -> IO (Package term)
 parsePackage name parser files = setName . Package.fromModules <$> parseFiles parser files
-  where setName p = p { Package.packageName = Just name }
+  where setName p = p { packageInfo = PackageInfo (Just name) Nothing }
 
 
 -- Read a file from the filesystem into a Blob.
