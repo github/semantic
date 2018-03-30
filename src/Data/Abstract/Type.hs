@@ -5,6 +5,7 @@ import Control.Abstract.Analysis
 import Data.Abstract.Address
 import Data.Abstract.Environment as Env
 import Data.Align (alignWith)
+import Data.Semigroup.Reducer (Reducer)
 import Prelude hiding (fail)
 import Prologue
 
@@ -43,12 +44,20 @@ unify t1 t2
   | otherwise = fail ("cannot unify " ++ show t1 ++ " with " ++ show t2)
 
 
-instance ValueRoots Monovariant Type where
+instance Ord location => ValueRoots location Type where
   valueRoots _ = mempty
 
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance (Alternative m, MonadEnvironment Monovariant Type m, MonadFail m, MonadFresh m, MonadHeap Monovariant Type m) => MonadValue Monovariant Type m where
+instance ( Alternative m
+         , MonadAddressable location m
+         , MonadEnvironment location Type m
+         , MonadFail m
+         , MonadFresh m
+         , MonadHeap location Type m
+         , Reducer Type (Cell location Type)
+         )
+      => MonadValue location Type m where
   abstract names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
