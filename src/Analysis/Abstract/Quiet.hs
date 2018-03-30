@@ -26,7 +26,7 @@ deriving instance MonadEvaluator location term value (m effects)   => MonadEvalu
 instance ( Effectful m
          , Member (Resumable (Unspecialized value)) effects
          , MonadAnalysis term value (m effects)
-         , MonadValue value (Quietly m effects)
+         , MonadValue (LocationFor value) value (Quietly m effects)
          )
       => MonadAnalysis term value (Quietly m effects) where
   type Effects term value (Quietly m effects) = Effects term value (m effects)

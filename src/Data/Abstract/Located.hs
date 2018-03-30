@@ -28,7 +28,7 @@ newtype LocatedValue value = LocatedValue { unLocatedValue :: value }
 instance AbstractValue (LocatedValue value) where
   type LocationFor (LocatedValue value) = Located (LocationFor value)
 
-instance MonadValue value m => MonadValue (LocatedValue value) m where
+instance MonadValue (Located location) value m => MonadValue (Located location) (LocatedValue value) m where
   unit = LocatedValue <$> unit
   null = LocatedValue <$> null
   integer = fmap LocatedValue . integer

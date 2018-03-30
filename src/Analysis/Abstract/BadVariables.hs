@@ -21,7 +21,7 @@ instance ( Effectful m
          , Member (Resumable (EvalError value)) effects
          , Member (State [Name]) effects
          , MonadAnalysis term value (m effects)
-         , MonadValue value (BadVariables m effects)
+         , MonadValue (LocationFor value) value (BadVariables m effects)
          )
       => MonadAnalysis term value (BadVariables m effects) where
   type Effects term value (BadVariables m effects) = State [Name] ': Effects term value (m effects)

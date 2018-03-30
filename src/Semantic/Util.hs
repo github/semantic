@@ -84,7 +84,7 @@ evaluateWith :: forall value term effects
                 , Evaluatable (Base term)
                 , FreeVariables term
                 , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-                , MonadValue value (Evaluating term value effects)
+                , MonadValue (LocationFor value) value (Evaluating term value effects)
                 , Recursive term
                 , Show (LocationFor value)
                 )
@@ -137,7 +137,7 @@ evaluatesWith :: forall value term effects
                  , Evaluatable (Base term)
                  , FreeVariables term
                  , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-                 , MonadValue value (Evaluating term value effects)
+                 , MonadValue (LocationFor value) value (Evaluating term value effects)
                  , Recursive term
                  , Show (LocationFor value)
                  )

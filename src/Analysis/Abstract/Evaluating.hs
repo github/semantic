@@ -144,7 +144,7 @@ instance ( location ~ LocationFor value
   askModuleStack = raise ask
 
 instance ( Members (EvaluatingEffects term value) effects
-         , MonadValue value (Evaluating term value effects)
+         , MonadValue (LocationFor value) value (Evaluating term value effects)
          )
          => MonadAnalysis term value (Evaluating term value effects) where
   type Effects term value (Evaluating term value effects) = EvaluatingEffects term value

@@ -37,7 +37,7 @@ type MonadEvaluatable term value m =
   , MonadThrow (ValueExc value) m
   , MonadThrow (LoadError term value) m
   , MonadThrow (EvalError value) m
-  , MonadValue value m
+  , MonadValue (LocationFor value) value m
   , Recursive term
   , Show (LocationFor value)
   )

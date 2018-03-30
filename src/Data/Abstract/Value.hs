@@ -195,7 +195,7 @@ instance ValueRoots Value where
 
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
+instance (Monad m, MonadEvaluatable term Value m) => MonadValue Precise Value m where
   unit     = pure . injValue $ Unit
   integer  = pure . injValue . Integer . Number.Integer
   boolean  = pure . injValue . Boolean
@@ -262,7 +262,7 @@ instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
     | otherwise = fail ("Invalid operands to liftNumeric2: " <> show pair)
       where
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: MonadValue value m => Number.SomeNumber -> m value
+        specialize :: MonadValue Precise value m => Number.SomeNumber -> m value
         specialize (Number.SomeNumber (Number.Integer i)) = integer i
         specialize (Number.SomeNumber (Number.Ratio r))          = rational r
         specialize (Number.SomeNumber (Number.Decimal d))        = float d
@@ -280,7 +280,7 @@ instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: (Ord a, MonadValue value m) => a -> a -> m value
+        go :: (Ord a, MonadValue Precise value m) => a -> a -> m value
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
           Generalized -> integer (orderingToInt (compare l r))
