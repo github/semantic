@@ -30,7 +30,7 @@ deriving instance MonadControl term (m effects)                    => MonadContr
 deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (ImportGraphing m effects)
 deriving instance MonadHeap location value (m effects)             => MonadHeap location value (ImportGraphing m effects)
 deriving instance MonadModuleTable location term value (m effects) => MonadModuleTable location term value (ImportGraphing m effects)
-deriving instance MonadEvaluator term value (m effects)            => MonadEvaluator term value (ImportGraphing m effects)
+deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (ImportGraphing m effects)
 
 
 instance ( Effectful m
@@ -52,7 +52,7 @@ instance ( Effectful m
 
 insertVertexName :: (Effectful m
                    , Member (State ImportGraph) effects
-                   , MonadEvaluator term value (m effects))
+                   , MonadEvaluator location term value (m effects))
                  => NonEmpty ByteString
                  -> ImportGraphing m effects ()
 insertVertexName name = do

@@ -135,7 +135,10 @@ instance ( location ~ LocationFor value
   askModuleTable = raise ask
   localModuleTable f a = raise (local f (lower a))
 
-instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
+instance ( location ~ LocationFor value
+         , Members (EvaluatingEffects term value) effects
+         )
+      => MonadEvaluator location term value (Evaluating term value effects) where
   getConfiguration term = Configuration term mempty <$> getEnv <*> getHeap
 
   askModuleStack = raise ask

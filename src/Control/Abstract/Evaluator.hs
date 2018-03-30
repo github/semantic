@@ -46,14 +46,14 @@ import Prologue hiding (throwError)
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
 class ( MonadControl term m
-      , MonadEnvironment (LocationFor value) value m
+      , MonadEnvironment location value m
       , MonadFail m
-      , MonadModuleTable (LocationFor value) term value m
-      , MonadHeap (LocationFor value) value m
+      , MonadModuleTable location term value m
+      , MonadHeap location value m
       )
-      => MonadEvaluator term value m | m -> term, m -> value where
+      => MonadEvaluator location term value m | m -> location, m -> term, m -> value where
   -- | Get the current 'Configuration' with a passed-in term.
-  getConfiguration :: Ord (LocationFor value) => term -> m (ConfigurationFor term value)
+  getConfiguration :: Ord location => term -> m (Configuration location term value)
 
   -- | Retrieve the stack of modules currently being evaluated.
   --

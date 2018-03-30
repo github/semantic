@@ -19,10 +19,10 @@ deriving instance MonadHeap location value (m effects)             => MonadHeap 
 deriving instance MonadModuleTable location term value (m effects) => MonadModuleTable location term value (Collecting m effects)
 
 instance ( Effectful m
-         , Member (Reader (Live (LocationFor value) value)) effects
-         , MonadEvaluator term value (m effects)
+         , Member (Reader (Live location value)) effects
+         , MonadEvaluator location term value (m effects)
          )
-      => MonadEvaluator term value (Collecting m effects) where
+      => MonadEvaluator location term value (Collecting m effects) where
   getConfiguration term = Configuration term <$> askRoots <*> getEnv <*> getHeap
 
   askModuleStack = Collecting askModuleStack
@@ -51,7 +51,7 @@ instance ( Effectful m
 
 
 -- | Retrieve the local 'Live' set.
-askRoots :: (Effectful m, Member (Reader (Live (LocationFor value) value)) effects) => m effects (Live (LocationFor value) value)
+askRoots :: (Effectful m, Member (Reader (Live location value)) effects) => m effects (Live location value)
 askRoots = raise ask
 
 -- | Run a computation with the given 'Live' set added to the local root set.
