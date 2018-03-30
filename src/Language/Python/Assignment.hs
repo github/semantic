@@ -9,6 +9,7 @@ module Language.Python.Assignment
 
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Abstract.FreeVariables
+import Data.Abstract.Path
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, parseError, postContextualize)
 import GHC.Stack
@@ -33,8 +34,6 @@ type Syntax =
    , Declaration.Comprehension
    , Declaration.Decorator
    , Declaration.Function
-   , Declaration.Import
-   , Declaration.QualifiedImport
    , Declaration.Variable
    , Expression.Arithmetic
    , Expression.Boolean
@@ -73,6 +72,8 @@ type Syntax =
    , Statement.While
    , Statement.Yield
    , Python.Syntax.Ellipsis
+   , Python.Syntax.Import
+   , Python.Syntax.QualifiedImport
    , Syntax.Context
    , Syntax.Empty
    , Syntax.Error
@@ -379,12 +380,12 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 import' :: Assignment
 import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliasedImport <|> plainImport))
-        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> (identifier <|> emptyTerm) <*> (wildcard <|> some (aliasImportSymbol <|> importSymbol)) <*> emptyTerm)
+        <|> makeTerm <$> symbol ImportFromStatement <*> children (Python.Syntax.Import <$> importPath <*> (wildcard <|> some (aliasImportSymbol <|> importSymbol)) <*> emptyTerm)
   where
     -- `import a as b`
-    aliasedImport = makeImport <$> symbol AliasedImport <*> children ((,) <$> expression <*> (Just <$> expression))
+    aliasedImport = makeImport <$> symbol AliasedImport <*> children ((,) <$> importPath <*> (Just <$> expression))
     -- `import a`
-    plainImport = makeImport <$> location <*> ((,) <$> identifier <*> pure Nothing)
+    plainImport = makeImport <$> location <*> ((,) <$> importPath <*> pure Nothing)
     -- `from a import foo `
     importSymbol = makeNameAliasPair <$> rawIdentifier <*> pure Nothing
     -- `from a import foo as bar`
@@ -392,13 +393,16 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     -- `from a import *`
     wildcard = symbol WildcardImport *> source $> []
 
+    -- TODO: could be more than just an identifier
+    importPath = (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) *> (path <$> source)
+
     rawIdentifier = (name <$> identifier') <|> (qualifiedName <$> dottedName')
     dottedName' = symbol DottedName *> children (some identifier')
     identifier' = (symbol Identifier <|> symbol Identifier') *> source
     makeNameAliasPair from (Just alias) = (from, alias)
     makeNameAliasPair from Nothing = (from, from)
-    makeImport loc (from, Just alias) = makeTerm loc (Declaration.QualifiedImport from alias [])
-    makeImport loc (from, Nothing) = makeTerm loc (Declaration.QualifiedImport from from [])
+    makeImport loc (from, Just alias) = makeTerm loc (Python.Syntax.QualifiedImport from alias [])
+    makeImport loc (from, Nothing) = makeTerm loc (Python.Syntax.QualifiedImport from (makeTerm loc (Syntax.Identifier (toName from))) [])
 
 assertStatement :: Assignment
 assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> (name <$> source))) <*> manyTerm expression <*> emptyTerm)

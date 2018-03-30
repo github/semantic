@@ -203,51 +203,6 @@ instance Show1 Comprehension where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Comprehension
 
 
--- | Qualified Import declarations (symbols are qualified in calling environment).
---
--- If the list of symbols is empty copy and qualify everything to the calling environment.
-data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: !a, qualifiedImportAlias :: !a, qualifiedImportSymbols :: ![(Name, Name)]}
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 QualifiedImport where liftEq = genericLiftEq
-instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
-instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable QualifiedImport where
-  eval (QualifiedImport from alias xs) = do
-    (importedEnv, _) <- isolate (require moduleName)
-    modifyEnv (mappend (Env.overwrite (renames importedEnv) importedEnv))
-    unit
-    where
-      moduleName = freeVariable (subterm from)
-      renames importedEnv
-        | Prologue.null xs = fmap prepend (Env.names importedEnv)
-        | otherwise = xs
-      prefix = freeVariable (subterm alias)
-      prepend n = (n, prefix <> n)
-
--- | Import declarations (symbols are added directly to the calling environment).
---
--- If the list of symbols is empty copy everything to the calling environment.
-data Import a = Import { importFrom :: !a, importSymbols :: ![(Name, Name)], importWildcardToken :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 Import where liftEq = genericLiftEq
-instance Ord1 Import where liftCompare = genericLiftCompare
-instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable Import where
-  eval (Import from xs _) = do
-    (importedEnv, _) <- isolate (require moduleName)
-    modifyEnv (mappend (renamed importedEnv))
-    unit
-    where
-      moduleName = freeVariable (subterm from)
-      renamed importedEnv
-        | Prologue.null xs = importedEnv
-        | otherwise = Env.overwrite xs importedEnv
-
-
 -- | A declared type (e.g. `a []int` in Go).
 data Type a = Type { typeName :: !a, typeKind :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
