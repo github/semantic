@@ -17,6 +17,9 @@
           (Empty)))
       (
         (Return
-        { (Identifier)
-        ->(Identifier) })))
+          (MemberAccess
+          { (Identifier)
+          ->(Identifier) }
+          { (Identifier)
+          ->(Identifier) }))))
     (Empty)))

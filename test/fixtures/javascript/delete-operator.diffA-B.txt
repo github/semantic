@@ -3,4 +3,6 @@
   { (Subscript
     {-(Identifier)-}
     {-(TextElement)-})
-  ->(Identifier) }))
+  ->(MemberAccess
+    {+(Identifier)+}
+    {+(Identifier)+}) }))

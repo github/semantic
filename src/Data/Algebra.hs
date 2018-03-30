@@ -1,18 +1,19 @@
 {-# LANGUAGE RankNTypes #-}
 module Data.Algebra
-( FAlgebra
-, RAlgebra
-, OpenFAlgebra
-, OpenRAlgebra
-, Subterm(..)
-, SubtermAlgebra
-, embedSubterm
-, foldSubterms
-, fToR
-, fToOpenR
-, rToOpenR
-, openFToOpenR
-) where
+  ( FAlgebra
+  , RAlgebra
+  , OpenFAlgebra
+  , OpenRAlgebra
+  , Subterm(..)
+  , SubtermAlgebra
+  , embedSubterm
+  , embedTerm
+  , foldSubterms
+  , fToR
+  , fToOpenR
+  , rToOpenR
+  , openFToOpenR
+  ) where
 
 import Data.Bifunctor
 import Data.Functor.Classes.Generic as X
@@ -64,6 +65,10 @@ type SubtermAlgebra f t a = f (Subterm t a) -> a
 -- | Fold a 'Recursive' structure using a 'SubtermAlgebra'. Like 'para', but with named fields for subterms and values.
 foldSubterms :: Recursive t => SubtermAlgebra (Base t) t a -> t -> a
 foldSubterms algebra = go where go = algebra . fmap (Subterm <*> go) . project
+
+-- | Extract a term from the carrier tuple associated with a paramorphism. See also 'embedSubterm'.
+embedTerm :: Corecursive t => Base t (t, a) -> t
+embedTerm e = embed (fst <$> e)
 
 -- | Extract a term from said term's 'Base' functor populated with 'Subterm' fields.
 embedSubterm :: Corecursive t => Base t (Subterm t a) -> t

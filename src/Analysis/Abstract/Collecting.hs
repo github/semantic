@@ -1,6 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Collecting
-( type Collecting
+( Collecting
 ) where
 
 import Control.Abstract.Analysis
@@ -10,35 +10,35 @@ import Data.Abstract.Heap
 import Data.Abstract.Live
 import Prologue
 
-newtype Collecting m term value (effects :: [* -> *]) a = Collecting (m term value effects a)
+newtype Collecting m (effects :: [* -> *]) a = Collecting (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
-deriving instance MonadControl term (m term value effects) => MonadControl term (Collecting m term value effects)
-deriving instance MonadEnvironment value (m term value effects) => MonadEnvironment value (Collecting m term value effects)
-deriving instance MonadHeap value (m term value effects) => MonadHeap value (Collecting m term value effects)
-deriving instance MonadModuleTable term value (m term value effects) => MonadModuleTable term value (Collecting m term value effects)
+deriving instance MonadControl term (m effects)           => MonadControl term (Collecting m effects)
+deriving instance MonadEnvironment value (m effects)      => MonadEnvironment value (Collecting m effects)
+deriving instance MonadHeap value (m effects)             => MonadHeap value (Collecting m effects)
+deriving instance MonadModuleTable term value (m effects) => MonadModuleTable term value (Collecting m effects)
 
-instance ( Effectful (m term value)
+instance ( Effectful m
          , Member (Reader (Live (LocationFor value) value)) effects
-         , MonadEvaluator term value (m term value effects)
+         , MonadEvaluator term value (m effects)
          )
-         => MonadEvaluator term value (Collecting m term value effects) where
+      => MonadEvaluator term value (Collecting m effects) where
   getConfiguration term = Configuration term <$> askRoots <*> getEnv <*> getHeap
 
   askModuleStack = Collecting askModuleStack
 
 
-instance ( Effectful (m term value)
+instance ( Effectful m
          , Foldable (Cell (LocationFor value))
          , Member (Reader (Live (LocationFor value) value)) effects
-         , MonadAnalysis term value (m term value effects)
+         , MonadAnalysis term value (m effects)
          , Ord (LocationFor value)
          , ValueRoots value
          )
-         => MonadAnalysis term value (Collecting m term value effects) where
-  type RequiredEffects term value (Collecting m term value effects)
+      => MonadAnalysis term value (Collecting m effects) where
+  type Effects term value (Collecting m effects)
     = Reader (Live (LocationFor value) value)
-   ': RequiredEffects term value (m term value effects)
+   ': Effects term value (m effects)
 
   -- Small-step evaluation which garbage-collects any non-rooted addresses after evaluating each term.
   analyzeTerm recur term = do

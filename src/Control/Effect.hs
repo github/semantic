@@ -1,5 +1,12 @@
 {-# LANGUAGE RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Control.Effect where
+module Control.Effect
+( Control.Effect.run
+, RunEffects(..)
+, RunEffect(..)
+, Effectful(..)
+, resumeException
+, mergeEither
+) where
 
 import Control.Monad.Effect as Effect
 import Control.Monad.Effect.Fail

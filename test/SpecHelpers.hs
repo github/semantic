@@ -9,7 +9,7 @@ module SpecHelpers (
 , Verbatim(..)
 , ) where
 
-import Analysis.Abstract.Evaluating as X (findValue, findEnv, findHeap)
+import Analysis.Abstract.Evaluating as X (EvaluatingState(..))
 import Data.Abstract.Address as X
 import Data.Abstract.FreeVariables as X hiding (dropExtension)
 import Data.Abstract.Heap as X
