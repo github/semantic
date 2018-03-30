@@ -119,7 +119,7 @@ instance Evaluatable [] where
 require :: MonadEvaluatable location term value m
         => ModuleName
         -> m (Environment location value, value)
-require name = getModuleTable >>= maybe (load name) pure . ModuleTable.lookup name
+require name = getModuleTable >>= maybeM (load name) . ModuleTable.lookup name
 
 -- | Load another module by name and return it's environment and value.
 --
@@ -127,7 +127,7 @@ require name = getModuleTable >>= maybe (load name) pure . ModuleTable.lookup na
 load :: MonadEvaluatable location term value m
      => ModuleName
      -> m (Environment location value, value)
-load name = askModuleTable >>= maybe notFound pure . ModuleTable.lookup name >>= evalAndCache
+load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= evalAndCache
   where
     notFound = throwLoadError (LoadError name)
 
