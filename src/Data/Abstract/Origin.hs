@@ -15,8 +15,8 @@ data Origin term ty where
 packageOrigin :: P.Package term -> SomeOrigin term
 packageOrigin p = SomeOrigin (Package (() <$ p { P.packageModules = mempty, P.packageEntryPoints = mempty }))
 
-moduleOrigin :: M.ModuleInfo -> SomeOrigin term
-moduleOrigin = SomeOrigin . Module Unknown
+moduleOrigin :: M.Module term -> SomeOrigin term
+moduleOrigin = SomeOrigin . Module Unknown . M.moduleInfo
 
 termOrigin :: Functor (Base term) => Base term a -> SomeOrigin term
 termOrigin = SomeOrigin . Term Unknown . (() <$)
