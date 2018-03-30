@@ -4,27 +4,30 @@ module Data.Abstract.Evaluatable
 , MonadEvaluatable
 , Evaluatable(..)
 , Unspecialized(..)
+, LoadError(..)
+, EvalError(..)
 , evaluateTerm
 , evaluateModule
 , withModules
 , evaluateModules
+, throwLoadError
 , resolve
 , require
 , load
 ) where
 
-import Control.Abstract.Addressable as X
-import Control.Abstract.Analysis as X
+import           Control.Abstract.Addressable as X
+import           Control.Abstract.Analysis as X
 import qualified Data.Abstract.Environment as Env
 import qualified Data.Abstract.Exports as Exports
-import Data.Abstract.FreeVariables as X
-import Data.Abstract.Module
-import Data.Abstract.ModuleTable as ModuleTable
-import Data.Semigroup.App
-import Data.Semigroup.Foldable
-import Data.Term
-import Prelude hiding (fail)
-import Prologue
+import           Data.Abstract.FreeVariables as X
+import           Data.Abstract.Module
+import           Data.Abstract.ModuleTable as ModuleTable
+import           Data.Semigroup.App
+import           Data.Semigroup.Foldable
+import           Data.Term
+import           Prelude hiding (fail)
+import           Prologue
 
 type MonadEvaluatable term value m =
   ( Evaluatable (Base term)
@@ -32,10 +35,40 @@ type MonadEvaluatable term value m =
   , MonadAddressable (LocationFor value) value m
   , MonadAnalysis term value m
   , MonadThrow (Unspecialized value) m
+  , MonadThrow (ValueExc value) m
+  , MonadThrow (LoadError term value) m
+  , MonadThrow (EvalError value) m
   , MonadValue value m
   , Recursive term
   , Show (LocationFor value)
   )
+
+
+-- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
+data LoadError term value resume where
+  LoadError :: ModuleName -> LoadError term value [Module term]
+
+deriving instance Eq (LoadError term a b)
+deriving instance Show (LoadError term a b)
+instance Show1 (LoadError term value) where
+  liftShowsPrec _ _ = showsPrec
+instance Eq1 (LoadError term a) where
+  liftEq _ (LoadError a) (LoadError b) = a == b
+
+-- | The type of error thrown when failing to evaluate a term.
+data EvalError value resume where
+  -- Indicates we weren't able to dereference a name from the evaluated environment.
+  FreeVariableError :: Name -> EvalError value value
+
+deriving instance Eq (EvalError a b)
+deriving instance Show (EvalError a b)
+instance Show1 (EvalError value) where
+  liftShowsPrec _ _ = showsPrec
+instance Eq1 (EvalError term) where
+  liftEq _ (FreeVariableError a) (FreeVariableError b) = a == b
+
+throwLoadError :: MonadEvaluatable term value m => LoadError term value resume -> m resume
+throwLoadError = throwException
 
 data Unspecialized a b where
   Unspecialized :: { getUnspecialized :: Prelude.String } -> Unspecialized value value
@@ -96,9 +129,9 @@ require name = getModuleTable >>= maybe (load name) pure . moduleTableLookup nam
 load :: MonadEvaluatable term value m
      => ModuleName
      -> m (EnvironmentFor value, value)
-load name = askModuleTable >>= maybe notFound evalAndCache . moduleTableLookup name
+load name = askModuleTable >>= maybe notFound pure . moduleTableLookup name >>= evalAndCache
   where
-    notFound = fail ("cannot load module: " <> show name)
+    notFound = throwLoadError (LoadError name)
 
     evalAndCache []     = (,) <$> pure mempty <*> unit
     evalAndCache [x]    = evalAndCache' x
@@ -148,5 +181,5 @@ withModules = localModuleTable . const . ModuleTable.fromList
 evaluateModules :: MonadEvaluatable term value m
                 => [Module term]
                 -> m value
-evaluateModules [] = fail "evaluateModules: empty list"
+evaluateModules []     = fail "evaluateModules: empty list"
 evaluateModules (m:ms) = withModules ms (evaluateModule m)

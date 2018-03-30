@@ -3,9 +3,11 @@
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.Util where
 
+import Analysis.Abstract.BadVariables
 import Analysis.Abstract.Caching
 import Analysis.Abstract.Dead
 import Analysis.Abstract.Evaluating as X
+import Analysis.Abstract.ImportGraph
 import Analysis.Abstract.Tracing
 import Analysis.Declaration
 import Control.Abstract.Analysis
@@ -35,26 +37,29 @@ import System.FilePath.Posix
 
 import qualified Language.Go.Assignment as Go
 import qualified Language.Python.Assignment as Python
+import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 
 -- Ruby
 evalRubyProject = evaluateProject rubyParser ["rb"]
 evalRubyFile = evaluateWithPrelude rubyParser
 evalRubyFiles = evaluateFilesWithPrelude rubyParser
+evaluateRubyImportGraph paths = runAnalysis @(ImportGraphing (Evaluating Ruby.Term Value)) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
+evaluateRubyBadVariables paths = runAnalysis @(BadVariables (Evaluating Ruby.Term Value)) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
 
 -- Go
 evalGoProject = evaluateProject goParser ["go"]
 evalGoFile = evaluateFile goParser
 evalGoFiles = evaluateFiles goParser
-typecheckGoFile path = runAnalysis @(Caching Evaluating Go.Term Type) . evaluateModule <$> parseFile goParser Nothing path
+typecheckGoFile path = runAnalysis @(Caching (Evaluating Go.Term Type)) . evaluateModule <$> parseFile goParser Nothing path
 
 -- Python
 evalPythonProject = evaluateProject pythonParser ["py"]
 evalPythonFile = evaluateWithPrelude pythonParser
 evalPythonFiles = evaluateFilesWithPrelude pythonParser
-typecheckPythonFile path = runAnalysis @(Caching Evaluating Python.Term Type) . evaluateModule <$> parseFile pythonParser Nothing path
-tracePythonFile path = runAnalysis @(Tracing [] Evaluating Python.Term Value) . evaluateModule <$> parseFile pythonParser Nothing path
-evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] Evaluating) Python.Term Value) . evaluateModule <$> parseFile pythonParser Nothing path
+typecheckPythonFile path = runAnalysis @(Caching (Evaluating Python.Term Type)) . evaluateModule <$> parseFile pythonParser Nothing path
+tracePythonFile path = runAnalysis @(Tracing [] (Evaluating Python.Term Value)) . evaluateModule <$> parseFile pythonParser Nothing path
+evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] (Evaluating Python.Term Value))) . evaluateModule <$> parseFile pythonParser Nothing path
 
 -- PHP
 evalPHP = evaluateProject phpParser ["php"]
@@ -65,12 +70,12 @@ evalPHPFiles = evaluateFiles phpParser
 evalTypeScriptProject = evaluateProject typescriptParser ["ts", "tsx"]
 evalTypeScriptFile = evaluateFile typescriptParser
 evalTypeScriptFiles = evaluateFiles typescriptParser
-typecheckTypeScriptFile path = runAnalysis @(Caching Evaluating TypeScript.Term Type) . evaluateModule <$> parseFile typescriptParser Nothing path
+typecheckTypeScriptFile path = runAnalysis @(Caching (Evaluating TypeScript.Term Type)) . evaluateModule <$> parseFile typescriptParser Nothing path
 
 evaluateProject :: forall term effects
                 .  ( Evaluatable (Base term)
                    , FreeVariables term
-                   , effects ~ RequiredEffects term Value (Evaluating term Value effects)
+                   , effects ~ Effects term Value (Evaluating term Value effects)
                    , MonadAddressable Precise Value (Evaluating term Value effects)
                    , MonadValue Value (Evaluating term Value effects)
                    , Recursive term
@@ -90,7 +95,7 @@ getPaths exts = fmap fold . globDir (compile . mappend "**/*." <$> exts)
 evaluateFile :: forall term effects
              .  ( Evaluatable (Base term)
                 , FreeVariables term
-                , effects ~ RequiredEffects term Value (Evaluating term Value effects)
+                , effects ~ Effects term Value (Evaluating term Value effects)
                 , MonadAddressable Precise Value (Evaluating term Value effects)
                 , MonadValue Value (Evaluating term Value effects)
                 , Recursive term
@@ -101,7 +106,7 @@ evaluateFile :: forall term effects
 evaluateFile parser path = runAnalysis @(Evaluating term Value) . evaluateModule <$> parseFile parser Nothing path
 
 evaluateWith :: forall value term effects
-             .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
+             .  ( effects ~ Effects term value (Evaluating term value effects)
                 , Evaluatable (Base term)
                 , FreeVariables term
                 , MonadAddressable (LocationFor value) value (Evaluating term value effects)
@@ -124,7 +129,7 @@ evaluateWith prelude m = runAnalysis @(Evaluating term value) $ do
 evaluateWithPrelude :: forall term effects
                     .  ( Evaluatable (Base term)
                        , FreeVariables term
-                       , effects ~ RequiredEffects term Value (Evaluating term Value effects)
+                       , effects ~ Effects term Value (Evaluating term Value effects)
                        , MonadAddressable Precise Value (Evaluating term Value effects)
                        , MonadValue Value (Evaluating term Value effects)
                        , Recursive term
@@ -144,7 +149,7 @@ evaluateWithPrelude parser path = do
 evaluateFiles :: forall term effects
               .  ( Evaluatable (Base term)
                  , FreeVariables term
-                 , effects ~ RequiredEffects term Value (Evaluating term Value effects)
+                 , effects ~ Effects term Value (Evaluating term Value effects)
                  , MonadAddressable Precise Value (Evaluating term Value effects)
                  , MonadValue Value (Evaluating term Value effects)
                  , Recursive term
@@ -157,7 +162,7 @@ evaluateFiles parser rootDir paths = runAnalysis @(Evaluating term Value) . eval
 
 -- | Evaluate terms and an entry point to a value with a given prelude.
 evaluatesWith :: forall value term effects
-              .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
+              .  ( effects ~ Effects term value (Evaluating term value effects)
                  , Evaluatable (Base term)
                  , FreeVariables term
                  , MonadAddressable (LocationFor value) value (Evaluating term value effects)
@@ -176,7 +181,7 @@ evaluatesWith prelude modules m = runAnalysis @(Evaluating term value) $ do
 evaluateFilesWithPrelude :: forall term effects
                          .  ( Evaluatable (Base term)
                             , FreeVariables term
-                            , effects ~ RequiredEffects term Value (Evaluating term Value effects)
+                            , effects ~ Effects term Value (Evaluating term Value effects)
                             , MonadAddressable Precise Value (Evaluating term Value effects)
                             , MonadValue Value (Evaluating term Value effects)
                             , Recursive term

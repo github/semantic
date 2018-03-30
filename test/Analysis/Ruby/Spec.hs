@@ -2,7 +2,10 @@
 
 module Analysis.Ruby.Spec (spec) where
 
+import Data.Abstract.Evaluatable (EvalError(..))
 import Data.Abstract.Value
+import Control.Monad.Effect (SomeExc(..))
+import Data.List.NonEmpty (NonEmpty(..))
 import Data.Map
 import Data.Map.Monoidal as Map
 
@@ -24,12 +27,12 @@ spec = parallel $ do
 
     it "evaluates load with wrapper" $ do
       res <- evaluate "load-wrap.rb"
-      fst res `shouldBe` Left "free variable: \"foo\""
+      fst res `shouldBe` Right (Right (Right (Right (Left (SomeExc (FreeVariableError ("foo" :| [])))))))
       environment (snd res) `shouldBe` [ (name "Object", addr 0) ]
 
     it "evaluates subclass" $ do
       res <- evaluate "subclass.rb"
-      fst res `shouldBe` Right (Right (Right (injValue (String "\"<bar>\""))))
+      fst res `shouldBe` Right (Right (Right (Right (Right (injValue (String "\"<bar>\""))))))
       environment (snd res) `shouldBe` [ (name "Bar", addr 6)
                                        , (name "Foo", addr 3)
                                        , (name "Object", addr 0) ]
@@ -41,13 +44,13 @@ spec = parallel $ do
 
     it "evaluates modules" $ do
       res <- evaluate "modules.rb"
-      fst res `shouldBe` Right (Right (Right (injValue (String "\"<hello>\""))))
+      fst res `shouldBe` Right (Right (Right (Right (Right (injValue (String "\"<hello>\""))))))
       environment (snd res) `shouldBe` [ (name "Object", addr 0)
                                        , (name "Bar", addr 3) ]
 
     it "has prelude" $ do
       res <- fst <$> evaluate "preluded.rb"
-      res `shouldBe` Right (Right (Right (injValue (String "\"<foo>\""))))
+      res `shouldBe` Right (Right (Right (Right (Right (injValue (String "\"<foo>\""))))))
 
   where
     ns n = Just . Latest . Just . injValue . Namespace (name n)
