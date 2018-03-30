@@ -4,7 +4,7 @@ module Data.Abstract.ModuleTable
 , ModuleTable (..)
 , lookup
 , insert
-, fromList
+, fromModules
 , toPairs
 ) where
 
@@ -25,8 +25,8 @@ insert k v ModuleTable{..} = ModuleTable (Map.insert k v unModuleTable)
 
 
 -- | Construct a 'ModuleTable' from a list of 'Module's.
-fromList :: [Module term] -> ModuleTable [Module term]
-fromList = ModuleTable . Map.fromListWith (<>) . map toEntry
+fromModules :: [Module term] -> ModuleTable [Module term]
+fromModules = ModuleTable . Map.fromListWith (<>) . map toEntry
   where toEntry m = (moduleName m, [m])
 
 toPairs :: ModuleTable a -> [(ModuleName, a)]

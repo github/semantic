@@ -178,7 +178,7 @@ withModules :: MonadEvaluatable location term value m
             => [Module term]
             -> m a
             -> m a
-withModules = localModuleTable . const . ModuleTable.fromList
+withModules = localModuleTable . const . ModuleTable.fromModules
 
 -- | Evaluate with a list of modules in scope, taking the head module as the entry point.
 evaluateModules :: MonadEvaluatable location term value m
