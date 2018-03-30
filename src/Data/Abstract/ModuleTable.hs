@@ -5,6 +5,7 @@ module Data.Abstract.ModuleTable
 , lookup
 , insert
 , fromList
+, toPairs
 ) where
 
 import Data.Abstract.Module
@@ -27,3 +28,6 @@ insert k v ModuleTable{..} = ModuleTable (Map.insert k v unModuleTable)
 fromList :: [Module term] -> ModuleTable [Module term]
 fromList modules = ModuleTable (Map.fromListWith (<>) (map toEntry modules))
   where toEntry m = (moduleName m, [m])
+
+toPairs :: ModuleTable a -> [(ModuleName, a)]
+toPairs = Map.toList . unModuleTable
