@@ -1,31 +1,55 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.TypeScript.Syntax where
 
-import Data.Abstract.Evaluatable
-import Data.Abstract.Path
-import qualified Data.Abstract.Module as M
 import qualified Data.Abstract.Environment as Env
-import Diffing.Algorithm
-import System.FilePath.Posix
-import Prologue
-import Prelude hiding (fail)
+import           Data.Abstract.Evaluatable
+import qualified Data.Abstract.Module as M
+import           Data.Abstract.Path
+import           Diffing.Algorithm
+import           Prelude hiding (fail)
+import           Prologue
+import           System.FilePath.Posix
 
+-- | Resolve a relative TypeScript import to a known 'ModuleName' or fail.
+--
+-- import { b } from "./moduleB" in /root/src/moduleA.ts
+--
+-- /root/src/moduleB.ts
+-- /root/src/moduleB/package.json (if it specifies a "types" property)
+-- /root/src/moduleB/index.ts
 resolveRelativeTSModule :: MonadEvaluatable term value m => FilePath -> m M.ModuleName
 resolveRelativeTSModule path = do
   M.Module{..} <- currentModule
   let path' = makeRelative (takeDirectory modulePath) path
   resolveTSModule path' >>= either notFound pure
   where
-    notFound xs = fail $ "module: " <> show path <> " not found. looked for: " <> show xs
+    notFound xs = fail $ "Unable to resolve relative module import: " <> show path <> ", looked for it in: " <> show xs
 
-resolveAbsoluteTSModule :: MonadEvaluatable term value m => FilePath -> m M.ModuleName
-resolveAbsoluteTSModule path = do
+
+-- | Resolve a non-relative TypeScript import to a known 'ModuleName' or fail.
+--
+-- import { b } from "moduleB" in source file /root/src/moduleA.ts
+--
+-- /root/src/node_modules/moduleB.ts
+-- /root/src/node_modules/moduleB/package.json (if it specifies a "types" property)
+-- /root/src/node_modules/moduleB/index.ts
+--
+-- /root/node_modules/moduleB.ts, etc
+-- /node_modules/moduleB.ts, etc
+resolveNonRelativeTSModule :: MonadEvaluatable term value m => FilePath -> m M.ModuleName
+resolveNonRelativeTSModule name = do
   M.Module{..} <- currentModule
-  let path' = makeRelative moduleRoot ("node_modules" </> path)
-  -- TODO: Need to traverse up the directory structure looking for node_modules dirs.
-  resolveTSModule path' >>= either notFound pure
+  go "." (makeRelative moduleRoot modulePath) mempty
   where
-    notFound xs = fail $ "module: " <> show path <> " not found. looked for: " <> show xs
+    nodeModulesPath dir = takeDirectory dir </> "node_modules" </> name
+    -- Recursively search in a 'node_modules' directory, stepping up a directory each time.
+    go root path searched = do
+      res <- resolveTSModule (nodeModulesPath path)
+      case res of
+        Left xs | parentDir <- takeDirectory path , root /= parentDir -> go root parentDir (searched <> xs)
+                | otherwise -> notFound (searched <> xs)
+        Right m -> pure m
+    notFound xs = fail $ "Unable to resolve non-relative module import: " <> show name <> ", looked for it in: " <> show xs
 
 resolveTSModule :: MonadEvaluatable term value m => FilePath -> m (Either [FilePath] M.ModuleName)
 resolveTSModule path = maybe (Left searchPaths) Right <$> resolve searchPaths
@@ -47,7 +71,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
   -- http://www.typescriptlang.org/docs/handbook/module-resolution.html
 instance Evaluatable Import where
   eval (Import (Path path NonRelative) symbols _) = do
-    modulePath <- resolveAbsoluteTSModule path
+    modulePath <- resolveNonRelativeTSModule path
     doImport modulePath symbols *> unit
   eval (Import (Path path Relative) symbols _) = do
     modulePath <- resolveRelativeTSModule path
