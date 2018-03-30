@@ -58,6 +58,7 @@ library
                      , Data.Abstract.Module
                      , Data.Abstract.ModuleTable
                      , Data.Abstract.Number
+                     , Data.Abstract.Origin
                      , Data.Abstract.Path
                      , Data.Abstract.Type
                      , Data.Abstract.Value
