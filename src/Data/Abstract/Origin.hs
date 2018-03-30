@@ -7,7 +7,7 @@ import Prologue
 
 data Origin
   = Unknown
-  | Local ModuleName FilePath Range Span
+  | Local !ModuleName !FilePath !Range !Span
   deriving (Eq, Ord, Show)
 
 instance Semigroup Origin where
