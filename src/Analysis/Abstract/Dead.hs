@@ -42,12 +42,12 @@ instance ( Corecursive term
          , Effectful m
          , Foldable (Base term)
          , Member (State (Dead term)) effects
-         , MonadAnalysis term value (m effects)
+         , MonadAnalysis location term value (m effects)
          , Ord term
          , Recursive term
          )
-         => MonadAnalysis term value (DeadCode m effects) where
-  type Effects term value (DeadCode m effects) = State (Dead term) ': Effects term value (m effects)
+      => MonadAnalysis location term value (DeadCode m effects) where
+  type Effects location term value (DeadCode m effects) = State (Dead term) ': Effects location term value (m effects)
 
   analyzeTerm recur term = do
     revive (embedSubterm term)

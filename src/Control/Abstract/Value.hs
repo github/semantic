@@ -23,6 +23,7 @@ import Data.Abstract.FreeVariables
 import Data.Abstract.Environment as Env
 import Data.Abstract.Address (Address, Cell)
 import Data.Abstract.Number as Number
+import Data.Abstract.Live (Live)
 import Data.Scientific (Scientific)
 import Data.Semigroup.Reducer hiding (unit)
 import Prelude
@@ -189,9 +190,9 @@ makeNamespace name addr supers = do
 
 
 -- | Value types, e.g. closures, which can root a set of addresses.
-class ValueRoots value where
+class ValueRoots location value where
   -- | Compute the set of addresses rooted by a given value.
-  valueRoots :: value -> LiveFor value
+  valueRoots :: value -> Live location value
 
 
 -- The type of exceptions that can be thrown when constructing values in `MonadValue`.

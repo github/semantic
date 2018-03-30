@@ -28,9 +28,9 @@ import Prologue
 -- | A 'Monad' in which one can evaluate some specific term type to some specific value type.
 --
 --   This typeclass is left intentionally unconstrained to avoid circular dependencies between it and other typeclasses.
-class MonadEvaluator (LocationFor value) term value m => MonadAnalysis term value m where
+class MonadEvaluator location term value m => MonadAnalysis location term value m where
   -- | The effects necessary to run the analysis. Analyses which are composed on top of (wrap) other analyses should include the inner analyses 'Effects' in their own list.
-  type family Effects term value m :: [* -> *]
+  type family Effects location term value m :: [* -> *]
 
   -- | Analyze a term using the semantics of the current analysis.
   analyzeTerm :: (Base term (Subterm term (outer value)) -> m value)
@@ -56,8 +56,8 @@ liftAnalyze analyze recur term = coerce (analyze (coerceWith (sym Coercion) . r
 --
 --   This enables us to refer to the analysis type as e.g. @Analysis1 (Analysis2 Evaluating) Term Value@ without explicitly mentioning its effects (which are inferred to be simply its 'Effects').
 runAnalysis :: ( Effectful m
-               , Effects term value (m effects) ~ effects
-               , MonadAnalysis term value (m effects)
+               , Effects location term value (m effects) ~ effects
+               , MonadAnalysis location term value (m effects)
                , RunEffects effects a
                )
             => m effects a

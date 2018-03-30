@@ -188,14 +188,14 @@ instance AbstractValue Value where
   type LocationFor Value = Precise
 
 
-instance ValueRoots Value where
+instance ValueRoots Precise Value where
   valueRoots v
     | Just (Closure _ _ env) <- prjValue v = Env.addresses env
     | otherwise                            = mempty
 
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance (Monad m, MonadEvaluatable term Value m) => MonadValue Precise Value m where
+instance (Monad m, MonadEvaluatable Precise term Value m) => MonadValue Precise Value m where
   unit     = pure . injValue $ Unit
   integer  = pure . injValue . Integer . Number.Integer
   boolean  = pure . injValue . Boolean

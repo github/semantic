@@ -5,6 +5,7 @@ module Analysis.Abstract.Tracing
 
 import Control.Abstract.Analysis
 import Control.Monad.Effect.Writer
+import Data.Abstract.Configuration
 import Data.Semigroup.Reducer as Reducer
 import Data.Union
 import Prologue
@@ -23,17 +24,17 @@ deriving instance MonadEvaluator location term value (m effects)   => MonadEvalu
 
 instance ( Corecursive term
          , Effectful m
-         , Member (Writer (trace (ConfigurationFor term value))) effects
-         , MonadAnalysis term value (m effects)
-         , Ord (LocationFor value)
-         , Reducer (ConfigurationFor term value) (trace (ConfigurationFor term value))
+         , Member (Writer (trace (Configuration location term value))) effects
+         , MonadAnalysis location term value (m effects)
+         , Ord location
+         , Reducer (Configuration location term value) (trace (Configuration location term value))
          )
-         => MonadAnalysis term value (Tracing trace m effects) where
-  type Effects term value (Tracing trace m effects) = Writer (trace (ConfigurationFor term value)) ': Effects term value (m effects)
+      => MonadAnalysis location term value (Tracing trace m effects) where
+  type Effects location term value (Tracing trace m effects) = Writer (trace (Configuration location term value)) ': Effects location term value (m effects)
 
   analyzeTerm recur term = do
     config <- getConfiguration (embedSubterm term)
-    raise (tell @(trace (ConfigurationFor term value)) (Reducer.unit config))
+    raise (tell @(trace (Configuration location term value)) (Reducer.unit config))
     liftAnalyze analyzeTerm recur term
 
   analyzeModule = liftAnalyze analyzeModule

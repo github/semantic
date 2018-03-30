@@ -68,18 +68,18 @@ instance ( Effectful m
 -- | This instance coinductively iterates the analysis of a term until the results converge.
 instance ( Corecursive term
          , Effectful m
-         , Members (CachingEffects (LocationFor value) term value '[]) effects
-         , MonadAnalysis term value (m effects)
+         , Members (CachingEffects location term value '[]) effects
+         , MonadAnalysis location term value (m effects)
          , MonadFresh (m effects)
          , MonadNonDet (m effects)
-         , Ord (CellFor value)
-         , Ord (LocationFor value)
+         , Ord (Cell location value)
+         , Ord location
          , Ord term
          , Ord value
          )
-         => MonadAnalysis term value (Caching m effects) where
+      => MonadAnalysis location term value (Caching m effects) where
   -- We require the 'CachingEffects' in addition to the underlying analysis’ 'Effects'.
-  type Effects term value (Caching m effects) = CachingEffects (LocationFor value) term value (Effects term value (m effects))
+  type Effects location term value (Caching m effects) = CachingEffects location term value (Effects location term value (m effects))
 
   -- Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
   analyzeTerm recur e = do

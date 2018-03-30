@@ -20,11 +20,11 @@ deriving instance MonadEvaluator location term value (m effects)   => MonadEvalu
 instance ( Effectful m
          , Member (Resumable (EvalError value)) effects
          , Member (State [Name]) effects
-         , MonadAnalysis term value (m effects)
-         , MonadValue (LocationFor value) value (BadVariables m effects)
+         , MonadAnalysis location term value (m effects)
+         , MonadValue location value (BadVariables m effects)
          )
-      => MonadAnalysis term value (BadVariables m effects) where
-  type Effects term value (BadVariables m effects) = State [Name] ': Effects term value (m effects)
+      => MonadAnalysis location term value (BadVariables m effects) where
+  type Effects location term value (BadVariables m effects) = State [Name] ': Effects location term value (m effects)
 
   analyzeTerm eval term = resumeException @(EvalError value) (liftAnalyze analyzeTerm eval term) (
         \yield (FreeVariableError name) ->

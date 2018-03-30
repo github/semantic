@@ -25,11 +25,11 @@ deriving instance MonadEvaluator location term value (m effects)   => MonadEvalu
 
 instance ( Effectful m
          , Member (Resumable (Unspecialized value)) effects
-         , MonadAnalysis term value (m effects)
-         , MonadValue (LocationFor value) value (Quietly m effects)
+         , MonadAnalysis location term value (m effects)
+         , MonadValue location value (Quietly m effects)
          )
-      => MonadAnalysis term value (Quietly m effects) where
-  type Effects term value (Quietly m effects) = Effects term value (m effects)
+      => MonadAnalysis location term value (Quietly m effects) where
+  type Effects location term value (Quietly m effects) = Effects location term value (m effects)
 
   analyzeTerm eval term = resumeException @(Unspecialized value) (liftAnalyze analyzeTerm eval term) (\yield (Unspecialized _) -> unit >>= yield)
 

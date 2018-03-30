@@ -35,11 +35,11 @@ deriving instance MonadEvaluator location term value (m effects)   => MonadEvalu
 
 instance ( Effectful m
          , Member (State ImportGraph) effects
-         , MonadAnalysis term value (m effects)
+         , MonadAnalysis location term value (m effects)
          , Member (Resumable (LoadError term value)) effects
          )
-         => MonadAnalysis term value (ImportGraphing m effects) where
-  type Effects term value (ImportGraphing m effects) = State ImportGraph ': Effects term value (m effects)
+      => MonadAnalysis location term value (ImportGraphing m effects) where
+  type Effects location term value (ImportGraphing m effects) = State ImportGraph ': Effects location term value (m effects)
 
   analyzeTerm eval term = resumeException
                             @(LoadError term value)

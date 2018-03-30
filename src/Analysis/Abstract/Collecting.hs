@@ -29,16 +29,16 @@ instance ( Effectful m
 
 
 instance ( Effectful m
-         , Foldable (Cell (LocationFor value))
-         , Member (Reader (Live (LocationFor value) value)) effects
-         , MonadAnalysis term value (m effects)
-         , Ord (LocationFor value)
-         , ValueRoots value
+         , Foldable (Cell location)
+         , Member (Reader (Live location value)) effects
+         , MonadAnalysis location term value (m effects)
+         , Ord location
+         , ValueRoots location value
          )
-      => MonadAnalysis term value (Collecting m effects) where
-  type Effects term value (Collecting m effects)
-    = Reader (Live (LocationFor value) value)
-   ': Effects term value (m effects)
+      => MonadAnalysis location term value (Collecting m effects) where
+  type Effects location term value (Collecting m effects)
+    = Reader (Live location value)
+   ': Effects location term value (m effects)
 
   -- Small-step evaluation which garbage-collects any non-rooted addresses after evaluating each term.
   analyzeTerm recur term = do
@@ -60,23 +60,23 @@ askRoots = raise ask
 
 
 -- | Collect any addresses in the heap not rooted in or reachable from the given 'Live' set.
-gc :: ( Ord (LocationFor value)
-      , Foldable (Cell (LocationFor value))
-      , ValueRoots value
+gc :: ( Ord location
+      , Foldable (Cell location)
+      , ValueRoots location value
       )
-   => LiveFor value -- ^ The set of addresses to consider rooted.
-   -> HeapFor value -- ^ A heap to collect unreachable addresses within.
-   -> HeapFor value -- ^ A garbage-collected heap.
+   => Live location value -- ^ The set of addresses to consider rooted.
+   -> Heap location value -- ^ A heap to collect unreachable addresses within.
+   -> Heap location value -- ^ A garbage-collected heap.
 gc roots heap = heapRestrict heap (reachable roots heap)
 
 -- | Compute the set of addresses reachable from a given root set in a given heap.
-reachable :: ( Ord (LocationFor value)
-             , Foldable (Cell (LocationFor value))
-             , ValueRoots value
+reachable :: ( Ord location
+             , Foldable (Cell location)
+             , ValueRoots location value
              )
-          => LiveFor value -- ^ The set of root addresses.
-          -> HeapFor value -- ^ The heap to trace addresses through.
-          -> LiveFor value -- ^ The set of addresses reachable from the root set.
+          => Live location value -- ^ The set of root addresses.
+          -> Heap location value -- ^ The heap to trace addresses through.
+          -> Live location value -- ^ The set of addresses reachable from the root set.
 reachable roots heap = go mempty roots
   where go seen set = case liveSplit set of
           Nothing -> seen

@@ -47,7 +47,7 @@ instance AbstractValue Type where
   type LocationFor Type = Monovariant
 
 
-instance ValueRoots Type where
+instance ValueRoots Monovariant Type where
   valueRoots _ = mempty
 
 
