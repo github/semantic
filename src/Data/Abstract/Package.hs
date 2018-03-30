@@ -10,15 +10,9 @@ data Package term = Package
   { packageName        :: Maybe PackageName
   , packageVersion     :: Maybe Version
   , packageModules     :: ModuleTable [Module term]
-  , packageEntryPoints :: [EntryPoint]
+  , packageEntryPoints :: ModuleTable (Maybe Name)
   }
   deriving (Eq, Functor, Ord, Show)
-
-data EntryPoint = EntryPoint
-  { entryPointModuleName :: ModuleName
-  , entryPointSymbol     :: Maybe Name
-  }
-  deriving (Eq, Ord, Show)
 
 newtype Version = Version { versionString :: String }
   deriving (Eq, Ord, Show)
