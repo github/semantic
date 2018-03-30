@@ -1,5 +1,8 @@
+{-# LANGUAGE UndecidableInstances #-}
 module Data.Abstract.Origin where
 
+import Control.Effect
+import Control.Monad.Effect.Reader
 import Data.Abstract.Module
 import Data.Range
 import Data.Record
@@ -24,6 +27,13 @@ instance (HasField fields Range, HasField fields Span) => HasOrigin (TermF synta
 
 class Monad m => MonadOrigin m where
   askOrigin :: m Origin
+
+instance ( Effectful m
+         , Member (Reader Origin) effects
+         , Monad (m effects)
+         )
+      => MonadOrigin (m effects) where
+  askOrigin = raise ask
 
 
 instance Semigroup Origin where

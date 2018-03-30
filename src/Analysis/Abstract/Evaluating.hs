@@ -141,10 +141,6 @@ instance Members (EvaluatingEffects location term value) effects
 
   askModuleStack = raise ask
 
-instance Member (Reader Origin) effects
-      => MonadOrigin (Evaluating location term value effects) where
-  askOrigin = raise ask
-
 instance ( Members (EvaluatingEffects location term value) effects
          , MonadValue location value (Evaluating location term value effects)
          , HasOrigin (Base term)
