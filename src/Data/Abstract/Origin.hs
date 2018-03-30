@@ -5,6 +5,7 @@ import Data.Range
 import Data.Span
 import Prologue
 
+-- TODO: Upstream dependencies
 data Origin
   = Unknown
   | Local !ModuleName !FilePath !Range !Span
