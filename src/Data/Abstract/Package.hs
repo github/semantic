@@ -14,4 +14,5 @@ data Package term = Package
 
 data EntryPoint = EntryPoint
   { entryPointModuleName :: ModuleName
+  , entryPointSymbol     :: Maybe Name
   }
