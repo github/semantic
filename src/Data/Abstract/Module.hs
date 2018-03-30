@@ -14,8 +14,10 @@ data Module term = Module
   { modulePath :: FilePath      -- ^ Path to this module
   , moduleRoot :: FilePath      -- ^ Root path for module resolution
   , moduleBody :: term          -- ^ @term@ body of the module
-  } deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
+  } deriving (Eq, Foldable, Functor, Ord, Traversable)
 
+instance Show (Module term) where
+  showsPrec _ Module{..} = showString modulePath
 
 -- | Construct a 'Module' for a 'Blob' and @term@, relative to some root 'FilePath'.
 moduleForBlob :: Maybe FilePath -- ^ The root directory relative to which the module will be resolved, if any.
