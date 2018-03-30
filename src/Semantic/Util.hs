@@ -15,6 +15,7 @@ import Control.Monad.IO.Class
 import Data.Abstract.Evaluatable hiding (head)
 import Data.Abstract.Address
 import Data.Abstract.Module
+import Data.Abstract.Package as Package
 import Data.Abstract.Type
 import Data.Abstract.Value
 import Data.Blob
@@ -177,6 +178,10 @@ parseFile parser rootDir path = runTask $ do
 
 parseFiles :: Parser term -> [FilePath] -> IO [Module term]
 parseFiles parser paths = traverse (parseFile parser (Just (dropFileName (head paths)))) paths
+
+parsePackage :: PackageName -> Parser term -> [FilePath] -> IO (Package term)
+parsePackage name parser files = setName . Package.fromModules <$> parseFiles parser files
+  where setName p = p { Package.packageName = Just name }
 
 
 -- Read a file from the filesystem into a Blob.
