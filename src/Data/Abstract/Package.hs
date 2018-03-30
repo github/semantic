@@ -2,7 +2,7 @@ module Data.Abstract.Package where
 
 import Data.Abstract.FreeVariables
 import Data.Abstract.Module
-import Data.Abstract.ModuleTable
+import Data.Abstract.ModuleTable as ModuleTable
 
 type PackageName = Name
 
@@ -16,3 +16,7 @@ data Package term = Package
 
 newtype Version = Version { versionString :: String }
   deriving (Eq, Ord, Show)
+
+
+fromModules :: [Module term] -> Package term
+fromModules modules = Package Nothing Nothing (ModuleTable.fromModules modules) mempty
