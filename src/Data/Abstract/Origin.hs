@@ -13,3 +13,7 @@ data Origin
 instance Semigroup Origin where
   a       <> Unknown = a
   _       <> b       = b
+
+instance Monoid Origin where
+  mempty = Unknown
+  mappend = (<>)
