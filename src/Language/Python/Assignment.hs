@@ -9,7 +9,6 @@ module Language.Python.Assignment
 
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Abstract.FreeVariables
-import Data.Abstract.Path
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, parseError, postContextualize)
 import GHC.Stack
@@ -394,7 +393,9 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     wildcard = symbol WildcardImport *> source $> []
 
     -- TODO: could be more than just an identifier
-    importPath = (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) *> (path <$> source)
+    importPath = importIden <|> importDottedName
+    importIden = (symbol Identifier <|> symbol Identifier') *> (moduleName <$> source)
+    importDottedName = symbol DottedName *> (qualifiedModuleName <$> children (some ((symbol Identifier <|> symbol Identifier') *> source)))
 
     rawIdentifier = (name <$> identifier') <|> (qualifiedName <$> dottedName')
     dottedName' = symbol DottedName *> children (some identifier')
@@ -402,7 +403,7 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     makeNameAliasPair from (Just alias) = (from, alias)
     makeNameAliasPair from Nothing = (from, from)
     makeImport loc (from, Just alias) = makeTerm loc (Python.Syntax.QualifiedImport from alias [])
-    makeImport loc (from, Nothing) = makeTerm loc (Python.Syntax.QualifiedImport from (makeTerm loc (Syntax.Identifier (toName from))) [])
+    makeImport loc (from, Nothing) = makeTerm loc (Python.Syntax.QualifiedImport from (makeTerm loc (Syntax.Identifier (Python.Syntax.toName from))) [])
 
 assertStatement :: Assignment
 assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> (name <$> source))) <*> manyTerm expression <*> emptyTerm)
