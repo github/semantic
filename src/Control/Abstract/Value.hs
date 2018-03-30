@@ -9,13 +9,6 @@ module Control.Abstract.Value
 , makeNamespace
 , ValueRoots(..)
 , ValueExc(..)
-, EnvironmentFor
-, ExportsFor
-, HeapFor
-, CellFor
-, LiveFor
-, LocationFor
-, ConfigurationFor
 ) where
 
 import Control.Abstract.Evaluator
