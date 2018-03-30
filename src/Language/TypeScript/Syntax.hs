@@ -18,13 +18,13 @@ import           System.FilePath.Posix
 -- /root/src/moduleB/package.json (if it specifies a "types" property)
 -- /root/src/moduleB/index.ts
 resolveRelativeTSModule :: MonadEvaluatable term value m => FilePath -> m M.ModuleName
-resolveRelativeTSModule path = do
+resolveRelativeTSModule relImportPath = do
   M.Module{..} <- currentModule
-  let path' = makeRelative (takeDirectory modulePath) path
-  resolveTSModule path' >>= either notFound pure
+  let relRootDir = takeDirectory (makeRelative moduleRoot modulePath)
+  let path = normalise (relRootDir </> normalise relImportPath)
+  resolveTSModule path >>= either notFound pure
   where
-    notFound xs = fail $ "Unable to resolve relative module import: " <> show path <> ", looked for it in: " <> show xs
-
+    notFound xs = fail $ "Unable to resolve relative module import: " <> show relImportPath <> ", looked for it in: " <> show xs
 
 -- | Resolve a non-relative TypeScript import to a known 'ModuleName' or fail.
 --
