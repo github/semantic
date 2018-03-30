@@ -118,11 +118,17 @@ instance ( location ~ LocationFor value
     result <- a
     result <$ modifyEnv Env.pop
 
-instance (Member (State (EvaluatingState term value)) effects, location ~ LocationFor value) => MonadHeap location value (Evaluating term value effects) where
+instance ( location ~ LocationFor value
+         , Member (State (EvaluatingState term value)) effects
+         )
+      => MonadHeap location value (Evaluating term value effects) where
   getHeap = view _heap
   putHeap = (_heap .=)
 
-instance Members '[Reader (ModuleTable [Module term]), State (EvaluatingState term value)] effects => MonadModuleTable term value (Evaluating term value effects) where
+instance ( location ~ LocationFor value
+         , Members '[Reader (ModuleTable [Module term]), State (EvaluatingState term value)] effects
+         )
+      => MonadModuleTable location term value (Evaluating term value effects) where
   getModuleTable = view _modules
   putModuleTable = (_modules .=)
 

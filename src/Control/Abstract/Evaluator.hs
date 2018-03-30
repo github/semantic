@@ -48,7 +48,7 @@ import Prologue hiding (throwError)
 class ( MonadControl term m
       , MonadEnvironment (LocationFor value) value m
       , MonadFail m
-      , MonadModuleTable term value m
+      , MonadModuleTable (LocationFor value) term value m
       , MonadHeap (LocationFor value) value m
       )
       => MonadEvaluator term value m | m -> term, m -> value where
@@ -151,11 +151,11 @@ assign address = modifyHeap . heapInsert address
 
 
 -- | A 'Monad' abstracting tables of modules available for import.
-class Monad m => MonadModuleTable term value m | m -> term, m -> value where
+class Monad m => MonadModuleTable location term value m | m -> location, m -> term, m -> value where
   -- | Retrieve the table of evaluated modules.
-  getModuleTable :: m (ModuleTable (EnvironmentFor value, value))
+  getModuleTable :: m (ModuleTable (Environment location value, value))
   -- | Set the table of evaluated modules.
-  putModuleTable :: ModuleTable (EnvironmentFor value, value) -> m ()
+  putModuleTable :: ModuleTable (Environment location value, value) -> m ()
 
   -- | Retrieve the table of unevaluated modules.
   askModuleTable :: m (ModuleTable [Module term])
@@ -163,7 +163,7 @@ class Monad m => MonadModuleTable term value m | m -> term, m -> value where
   localModuleTable :: (ModuleTable [Module term] -> ModuleTable [Module term]) -> m a -> m a
 
 -- | Update the evaluated module table.
-modifyModuleTable :: MonadModuleTable term value m => (ModuleTable (EnvironmentFor value, value) -> ModuleTable (EnvironmentFor value, value)) -> m ()
+modifyModuleTable :: MonadModuleTable location term value m => (ModuleTable (Environment location value, value) -> ModuleTable (Environment location value, value)) -> m ()
 modifyModuleTable f = do
   table <- getModuleTable
   putModuleTable $! f table
