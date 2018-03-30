@@ -188,7 +188,7 @@ evaluatePackage :: ( Effectful m
                    )
                 => Package term
                 -> m effects value
-evaluatePackage p = pushPackage p (localModuleTable (const (packageModules p)) (fail "nope"))
+evaluatePackage p = pushPackage p (localModuleTable (<> packageModules p) (fail "nope"))
 
 pushPackage :: ( Effectful m
                , Member (Reader (SomeOrigin term)) effects
