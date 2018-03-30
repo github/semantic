@@ -83,6 +83,7 @@ merge :: Origin term ty1 -> Origin term ty2 -> SomeOrigin term
 merge a            Unknown            = SomeOrigin a
 merge (Package p)  (Module Unknown m) = SomeOrigin (Module (Package p) m)
 merge (Module p m) (Term Unknown t)   = SomeOrigin (Term (Module p m) t)
+merge (Term m _)   (Term Unknown t)   = SomeOrigin (Term m t)
 merge _            b                  = SomeOrigin b
 
 instance Semigroup (SomeOrigin term) where
