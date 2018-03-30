@@ -66,6 +66,7 @@ data EvalError value resume where
   -- Indicates we weren't able to dereference a name from the evaluated environment.
   FreeVariableError :: Name -> EvalError value value
 
+-- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: MonadEvaluatable location term value m => Name -> m value
 variable name = lookupWith deref name >>= maybeM (throwException (FreeVariableError name))
 
