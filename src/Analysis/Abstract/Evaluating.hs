@@ -38,7 +38,7 @@ type EvaluatingEffects location term value
      , Fail                                         -- Failure with an error message
      , Fresh                                        -- For allocating new addresses and/or type variables.
      , Reader [Module term]                         -- The stack of currently-evaluating modules.
-     , Reader Origin                                -- The current term’s origin.
+     , Reader (SomeOrigin term)                     -- The current term’s origin.
      , Reader (ModuleTable [Module term])           -- Cache of unevaluated modules
      , Reader (Environment location value)          -- Default environment used as a fallback in lookupEnv
      , State  (EvaluatingState location term value) -- Environment, heap, modules, exports, and jumps.
@@ -141,21 +141,19 @@ instance Members (EvaluatingEffects location term value) effects
 
   askModuleStack = raise ask
 
-instance ( Members (EvaluatingEffects location term value) effects
+instance ( Corecursive term
+         , Members (EvaluatingEffects location term value) effects
          , MonadValue location value (Evaluating location term value effects)
-         , HasOrigin (Base term)
          )
       => MonadAnalysis location term value (Evaluating location term value effects) where
   type Effects location term value (Evaluating location term value effects) = EvaluatingEffects location term value
 
-  analyzeTerm eval term = do
-    ms <- askModuleStack
-    pushOrigin (originFor ms term) (eval term)
+  analyzeTerm eval term = pushOrigin (termOrigin (embedSubterm term)) (eval term)
 
-  analyzeModule eval m = pushModule (subterm <$> m) (eval m)
+  analyzeModule eval m = pushOrigin (moduleOrigin (subterm <$> m)) (pushModule (subterm <$> m) (eval m))
 
 pushModule :: Member (Reader [Module term]) effects => Module term -> Evaluating location term value effects a -> Evaluating location term value effects a
 pushModule m = raise . local (m :) . lower
 
-pushOrigin :: Member (Reader Origin) effects => Origin -> Evaluating location term value effects a -> Evaluating location term value effects a
-pushOrigin o = raise . local (const o) . lower
+pushOrigin :: Member (Reader (SomeOrigin term)) effects => SomeOrigin term -> Evaluating location term value effects a -> Evaluating location term value effects a
+pushOrigin o = raise . local (<> o) . lower

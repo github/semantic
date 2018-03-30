@@ -1,45 +1,88 @@
-{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE GADTs, UndecidableInstances #-}
 module Data.Abstract.Origin where
 
 import Control.Effect
 import Control.Monad.Effect.Reader
-import Data.Abstract.Module
-import Data.Range
-import Data.Record
-import Data.Span
-import Data.Term
+import qualified Data.Abstract.Module as M
+import qualified Data.Abstract.Package as P
 import Prologue
 
 -- TODO: Upstream dependencies
-data Origin
-  = Unknown
-  | Local !ModuleName !FilePath !Range !Span
+data Origin term ty where
+  Unknown :: Origin term any
+  Package :: P.Package term -> Origin term 'P
+  Module :: Origin term 'P -> M.Module term -> Origin term 'M
+  Term :: Origin term 'M -> term -> Origin term 'T
+
+packageOrigin :: P.Package term -> SomeOrigin term
+packageOrigin = SomeOrigin . Package
+
+moduleOrigin :: M.Module term -> SomeOrigin term
+moduleOrigin = SomeOrigin . Module Unknown
+
+termOrigin :: term -> SomeOrigin term
+termOrigin = SomeOrigin . Term Unknown
+
+deriving instance Eq term => Eq (Origin term ty)
+deriving instance Show term => Show (Origin term ty)
+
+eqOrigins :: Eq term => Origin term ty1 -> Origin term ty2 -> Bool
+eqOrigins Unknown        Unknown        = True
+eqOrigins (Package p1)   (Package p2)   = p1 == p2
+eqOrigins (Module p1 m1) (Module p2 m2) = p1 == p2 && m1 == m2
+eqOrigins (Term m1 t1)   (Term m2 t2)   = m1 == m2 && t1 == t2
+eqOrigins _              _              = False
+
+compareOrigins :: Ord term => Origin term ty1 -> Origin term ty2 -> Ordering
+compareOrigins Unknown        Unknown        = EQ
+compareOrigins Unknown        _              = LT
+compareOrigins _              Unknown        = GT
+compareOrigins (Package p1)   (Package p2)   = compare p1 p2
+compareOrigins (Package _)    _              = LT
+compareOrigins _              (Package _)    = GT
+compareOrigins (Module p1 m1) (Module p2 m2) = compare p1 p2 <> compare m1 m2
+compareOrigins (Module _ _)   _              = LT
+compareOrigins _              (Module _ _)   = GT
+compareOrigins (Term m1 t1)   (Term m2 t2)   = compare m1 m2 <> compare t1 t2
+
+instance Ord term => Ord (Origin term ty) where
+  compare = compareOrigins
+
+data OriginType = P | M | T
   deriving (Eq, Ord, Show)
 
+data SomeOrigin term where
+  SomeOrigin :: Origin term ty -> SomeOrigin term
 
-class HasOrigin f where
-  originFor :: [Module a] -> f b -> Origin
+instance Eq term => Eq (SomeOrigin term) where
+  SomeOrigin o1 == SomeOrigin o2 = eqOrigins o1 o2
 
-instance (HasField fields Range, HasField fields Span) => HasOrigin (TermF syntax (Record fields)) where
-  originFor []    _          = Unknown
-  originFor (m:_) (In ann _) = Local (moduleName m) (modulePath m) (getField ann) (getField ann)
+instance Ord term => Ord (SomeOrigin term) where
+  compare (SomeOrigin o1) (SomeOrigin o2) = compareOrigins o1 o2
+
+deriving instance Show term => Show (SomeOrigin term)
 
 
-class Monad m => MonadOrigin m where
-  askOrigin :: m Origin
+class Monad m => MonadOrigin term m where
+  askOrigin :: m (SomeOrigin term)
 
 instance ( Effectful m
-         , Member (Reader Origin) effects
+         , Member (Reader (SomeOrigin term)) effects
          , Monad (m effects)
          )
-      => MonadOrigin (m effects) where
+      => MonadOrigin term (m effects) where
   askOrigin = raise ask
 
 
-instance Semigroup Origin where
-  a       <> Unknown = a
-  _       <> b       = b
+merge :: Origin term ty1 -> Origin term ty2 -> SomeOrigin term
+merge a            Unknown            = SomeOrigin a
+merge (Package p)  (Module Unknown m) = SomeOrigin (Module (Package p) m)
+merge (Module p m) (Term Unknown t)   = SomeOrigin (Term (Module p m) t)
+merge _            b                  = SomeOrigin b
 
-instance Monoid Origin where
-  mempty = Unknown
+instance Semigroup (SomeOrigin term) where
+  SomeOrigin a <> SomeOrigin b = merge a b
+
+instance Monoid (SomeOrigin term) where
+  mempty = SomeOrigin Unknown
   mappend = (<>)
