@@ -11,6 +11,7 @@ module Data.Abstract.ModuleTable
 import Data.Abstract.Module
 import qualified Data.Map as Map
 import Data.Semigroup
+import Prologue
 import GHC.Generics (Generic1)
 
 newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModuleName a }
@@ -28,5 +29,5 @@ moduleTableInsert k v = ModuleTable . Map.insert k v . unModuleTable
 
 -- | Construct a 'ModuleTable' from a list of 'Module's.
 fromList :: [Module term] -> ModuleTable [Module term]
-fromList modules = ModuleTable (Map.fromListWith (<>) (map toEntry modules))
+fromList modules = let m = ModuleTable (Map.fromListWith (<>) (map toEntry modules)) in traceShow m m
   where toEntry m = (modulePath m, [m])
