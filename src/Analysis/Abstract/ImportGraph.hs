@@ -28,7 +28,7 @@ newtype ImportGraphing m (effects :: [* -> *]) a = ImportGraphing (m effects a)
 
 deriving instance MonadControl term (m effects)           => MonadControl term (ImportGraphing m effects)
 deriving instance MonadEnvironment value (m effects)      => MonadEnvironment value (ImportGraphing m effects)
-deriving instance MonadHeap value (m effects)             => MonadHeap value (ImportGraphing m effects)
+deriving instance MonadHeap location value (m effects)    => MonadHeap location value (ImportGraphing m effects)
 deriving instance MonadModuleTable term value (m effects) => MonadModuleTable term value (ImportGraphing m effects)
 deriving instance MonadEvaluator term value (m effects)   => MonadEvaluator term value (ImportGraphing m effects)
 

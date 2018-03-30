@@ -116,7 +116,7 @@ instance Members '[ State (EvaluatingState term value)
     result <- a
     result <$ modifyEnv Env.pop
 
-instance Member (State (EvaluatingState term value)) effects => MonadHeap value (Evaluating term value effects) where
+instance (Member (State (EvaluatingState term value)) effects, location ~ LocationFor value) => MonadHeap location value (Evaluating term value effects) where
   getHeap = view _heap
   putHeap = (_heap .=)
 

@@ -21,7 +21,7 @@ module Control.Abstract.Value
 import Control.Abstract.Evaluator
 import Data.Abstract.FreeVariables
 import Data.Abstract.Environment as Env
-import Data.Abstract.Address (Address)
+import Data.Abstract.Address (Address, Cell)
 import Data.Abstract.Number as Number
 import Data.Scientific (Scientific)
 import Data.Semigroup.Reducer hiding (unit)
@@ -173,12 +173,12 @@ doWhile body cond = loop $ \ continue -> body *> do
 
 makeNamespace :: ( MonadValue value m
                  , MonadEnvironment value m
-                 , MonadHeap value m
-                 , Reducer value (CellFor value)
-                 , Ord (LocationFor value)
+                 , MonadHeap location value m
+                 , Ord location
+                 , Reducer value (Cell location value)
                  )
               => Name
-              -> Address (LocationFor value) value
+              -> Address location value
               -> [value]
               -> m value
 makeNamespace name addr supers = do

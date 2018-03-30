@@ -19,7 +19,7 @@ newtype Quietly m (effects :: [* -> *]) a = Quietly (m effects a)
 
 deriving instance MonadControl term (m effects)           => MonadControl term (Quietly m effects)
 deriving instance MonadEnvironment value (m effects)      => MonadEnvironment value (Quietly m effects)
-deriving instance MonadHeap value (m effects)             => MonadHeap value (Quietly m effects)
+deriving instance MonadHeap location value (m effects)    => MonadHeap location value (Quietly m effects)
 deriving instance MonadModuleTable term value (m effects) => MonadModuleTable term value (Quietly m effects)
 deriving instance MonadEvaluator term value (m effects)   => MonadEvaluator term value (Quietly m effects)
 

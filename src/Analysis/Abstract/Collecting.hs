@@ -15,7 +15,7 @@ newtype Collecting m (effects :: [* -> *]) a = Collecting (m effects a)
 
 deriving instance MonadControl term (m effects)           => MonadControl term (Collecting m effects)
 deriving instance MonadEnvironment value (m effects)      => MonadEnvironment value (Collecting m effects)
-deriving instance MonadHeap value (m effects)             => MonadHeap value (Collecting m effects)
+deriving instance MonadHeap location value (m effects)    => MonadHeap location value (Collecting m effects)
 deriving instance MonadModuleTable term value (m effects) => MonadModuleTable term value (Collecting m effects)
 
 instance ( Effectful m

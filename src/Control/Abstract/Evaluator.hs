@@ -49,7 +49,7 @@ class ( MonadControl term m
       , MonadEnvironment value m
       , MonadFail m
       , MonadModuleTable term value m
-      , MonadHeap value m
+      , MonadHeap (LocationFor value) value m
       )
       => MonadEvaluator term value m | m -> term, m -> value where
   -- | Get the current 'Configuration' with a passed-in term.
@@ -123,28 +123,28 @@ fullEnvironment :: MonadEnvironment value m => m (EnvironmentFor value)
 fullEnvironment = mappend <$> getEnv <*> defaultEnvironment
 
 -- | A 'Monad' abstracting a heap of values.
-class Monad m => MonadHeap value m | m -> value where
+class Monad m => MonadHeap location value m | m -> value, m -> location where
   -- | Retrieve the heap.
-  getHeap :: m (HeapFor value)
+  getHeap :: m (Heap location value)
   -- | Set the heap.
-  putHeap :: HeapFor value -> m ()
+  putHeap :: Heap location value -> m ()
 
 -- | Update the heap.
-modifyHeap :: MonadHeap value m => (HeapFor value -> HeapFor value) -> m ()
+modifyHeap :: MonadHeap location value m => (Heap location value -> Heap location value) -> m ()
 modifyHeap f = do
   s <- getHeap
   putHeap $! f s
 
 -- | Look up the cell for the given 'Address' in the 'Heap'.
-lookupHeap :: (MonadHeap value m, Ord (LocationFor value)) => Address (LocationFor value) value -> m (Maybe (CellFor value))
+lookupHeap :: (MonadHeap location value m, Ord location) => Address location value -> m (Maybe (Cell location value))
 lookupHeap = flip fmap getHeap . heapLookup
 
 -- | Write a value to the given 'Address' in the 'Store'.
-assign :: ( Ord (LocationFor value)
-          , MonadHeap value m
-          , Reducer value (CellFor value)
+assign :: ( Ord location
+          , MonadHeap location value m
+          , Reducer value (Cell location value)
           )
-       => Address (LocationFor value) value
+       => Address location value
        -> value
        -> m ()
 assign address = modifyHeap . heapInsert address

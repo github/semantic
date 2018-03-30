@@ -13,7 +13,7 @@ newtype BadVariables m (effects :: [* -> *]) a = BadVariables (m effects a)
 
 deriving instance MonadControl term (m effects)           => MonadControl term (BadVariables m effects)
 deriving instance MonadEnvironment value (m effects)      => MonadEnvironment value (BadVariables m effects)
-deriving instance MonadHeap value (m effects)             => MonadHeap value (BadVariables m effects)
+deriving instance MonadHeap location value (m effects)    => MonadHeap location value (BadVariables m effects)
 deriving instance MonadModuleTable term value (m effects) => MonadModuleTable term value (BadVariables m effects)
 deriving instance MonadEvaluator term value (m effects)   => MonadEvaluator term value (BadVariables m effects)
 
