@@ -9,15 +9,18 @@ import Data.Abstract.Origin
 import Prologue
 
 data Located location term = Located { location :: location, origin :: !(SomeOrigin term) }
-  deriving (Eq, Ord, Show)
 
-instance (Location location, Ord term) => Location (Located location term) where
+deriving instance (Eq location, Eq (Base term ())) => Eq (Located location term)
+deriving instance (Ord location, Ord (Base term ())) => Ord (Located location term)
+deriving instance (Show location, Show (Base term ())) => Show (Located location term)
+
+instance (Location location, Ord (Base term ())) => Location (Located location term) where
   type Cell (Located location term) = Cell location
 
 instance ( Effectful m
          , Member (Reader (SomeOrigin term)) effects
          , MonadAddressable location (m effects)
-         , Ord term
+         , Ord (Base term ())
          )
       => MonadAddressable (Located location term) (m effects) where
   derefCell (Address (Located loc _)) = derefCell (Address loc)

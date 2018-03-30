@@ -138,14 +138,14 @@ instance Members (EvaluatingEffects location term value) effects
       => MonadEvaluator location term value (Evaluating location term value effects) where
   getConfiguration term = Configuration term mempty <$> getEnv <*> getHeap
 
-instance ( Corecursive term
+instance ( Functor (Base term)
          , Members (EvaluatingEffects location term value) effects
          , MonadValue location value (Evaluating location term value effects)
          )
       => MonadAnalysis location term value (Evaluating location term value effects) where
   type Effects location term value (Evaluating location term value effects) = EvaluatingEffects location term value
 
-  analyzeTerm eval term = pushOrigin (termOrigin (embedSubterm term)) (eval term)
+  analyzeTerm eval term = pushOrigin (termOrigin term) (eval term)
 
   analyzeModule eval m = pushOrigin (moduleOrigin (subterm <$> m)) (eval m)
 
