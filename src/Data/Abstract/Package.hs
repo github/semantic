@@ -7,7 +7,7 @@ import qualified Data.Map as Map
 type PackageName = Name
 
 data Package term = Package
-  { packageName        :: PackageName
+  { packageName        :: Maybe PackageName
   , packageVersion     :: Maybe Version
   , packageModules     :: Map.Map ModuleName [Module term]
   , packageEntryPoints :: [EntryPoint]
