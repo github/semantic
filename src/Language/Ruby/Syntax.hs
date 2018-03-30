@@ -31,8 +31,8 @@ doRequire :: MonadEvaluatable location term value m
 doRequire name = do
   moduleTable <- getModuleTable
   case ModuleTable.lookup name moduleTable of
-    Nothing -> (,) <$> (fst <$> load name) <*> boolean True
-    Just (env, _) -> (,) <$> pure env <*> boolean False
+    Nothing       -> (,) . fst <$> load name <*> boolean True
+    Just (env, _) -> (,) env   <$>               boolean False
 
 
 newtype Load a = Load { loadArgs :: [a] }
