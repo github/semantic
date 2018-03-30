@@ -14,7 +14,7 @@ import Prologue
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Heap.
 class (Monad m, Ord location) => MonadAddressable location m where
-  deref :: MonadHeap location value m => Address location value -> m value
+  derefCell :: Address location value -> Cell location value -> m value
 
   alloc :: MonadHeap location value m => Name -> m (Address location value)
 
@@ -59,20 +59,20 @@ letrec' name body = do
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
 instance MonadFail m => MonadAddressable Precise m where
-  deref = derefWith (maybeM uninitializedAddress . unLatest)
+  derefCell _ = maybeM uninitializedAddress . unLatest
   alloc _ = do
     -- Compute the next available address in the heap, then write an empty value into it.
     addr <- fmap (Address . Precise . heapSize) getHeap
     addr <$ modifyHeap (heapInit addr mempty)
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
-instance (Alternative m, MonadFail m) => MonadAddressable Monovariant m where
-  deref = derefWith (foldMapA pure)
+instance (Alternative m, Monad m) => MonadAddressable Monovariant m where
+  derefCell _ = foldMapA pure
   alloc = pure . Address . Monovariant
 
--- | Dereference the given 'Address' in the heap, using the supplied function to act on the cell, or failing if the address is uninitialized.
-derefWith :: (MonadFail m, MonadHeap location value m, Ord location) => (Cell location value -> m a) -> Address location value -> m a
-derefWith with = maybe uninitializedAddress with <=< lookupHeap
+-- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
+deref :: (MonadFail m, MonadAddressable location m, MonadHeap location value m) => Address location value -> m value
+deref addr = maybe uninitializedAddress (derefCell addr) <=< lookupHeap $ addr
 
 -- | Fail with a message denoting an uninitialized address (i.e. one which was 'alloc'ated, but never 'assign'ed a value before being 'deref'erenced).
 uninitializedAddress :: MonadFail m => m a
