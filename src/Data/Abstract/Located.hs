@@ -5,10 +5,6 @@ import Control.Abstract.Addressable
 import Data.Abstract.Address
 import Data.Abstract.Origin
 
-class Monad m => MonadOrigin m where
-  askOrigin :: m Origin
-
-
 data Located location = Located { location :: location, provenance :: !Origin }
   deriving (Eq, Ord, Show)
 

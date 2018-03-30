@@ -11,6 +11,11 @@ data Origin
   | Local !ModuleName !FilePath !Range !Span
   deriving (Eq, Ord, Show)
 
+
+class Monad m => MonadOrigin m where
+  askOrigin :: m Origin
+
+
 instance Semigroup Origin where
   a       <> Unknown = a
   _       <> b       = b
