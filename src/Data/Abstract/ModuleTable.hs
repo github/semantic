@@ -31,7 +31,7 @@ insert k v ModuleTable{..} = ModuleTable (Map.insert k v unModuleTable)
 -- | Construct a 'ModuleTable' from a list of 'Module's.
 fromModules :: [Module term] -> ModuleTable [Module term]
 fromModules = ModuleTable . Map.fromListWith (<>) . map toEntry
-  where toEntry m = (moduleName m, [m])
+  where toEntry m = (moduleName (moduleInfo m), [m])
 
 toPairs :: ModuleTable a -> [(ModuleName, a)]
 toPairs = Map.toList . unModuleTable

@@ -20,4 +20,5 @@ newtype Version = Version { versionString :: String }
 
 fromModules :: [Module term] -> Package term
 fromModules []     = Package Nothing Nothing mempty mempty
-fromModules (m:ms) = Package Nothing Nothing (ModuleTable.fromModules (m:ms)) (ModuleTable.singleton (moduleName m) Nothing)
+fromModules (m:ms) = Package Nothing Nothing (ModuleTable.fromModules (m:ms)) entryPoints
+  where entryPoints = ModuleTable.singleton (moduleName (moduleInfo m)) Nothing
