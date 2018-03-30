@@ -2,7 +2,9 @@ module Data.Abstract.Origin where
 
 import Data.Abstract.Module
 import Data.Range
+import Data.Record
 import Data.Span
+import Data.Term
 import Prologue
 
 -- TODO: Upstream dependencies
@@ -10,6 +12,14 @@ data Origin
   = Unknown
   | Local !ModuleName !FilePath !Range !Span
   deriving (Eq, Ord, Show)
+
+
+class HasOrigin f where
+  originFor :: [Module a] -> f b -> Origin
+
+instance (HasField fields Range, HasField fields Span) => HasOrigin (TermF syntax (Record fields)) where
+  originFor []    _          = Unknown
+  originFor (m:_) (In ann _) = Local (moduleName m) (modulePath m) (getField ann) (getField ann)
 
 
 class Monad m => MonadOrigin m where
