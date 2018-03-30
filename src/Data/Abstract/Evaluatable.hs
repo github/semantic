@@ -188,7 +188,8 @@ evaluatePackage :: ( Effectful m
                    )
                 => Package term
                 -> m effects [value]
-evaluatePackage p = pushPackage p (localModuleTable (<> packageModules p) (traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints p))))
+evaluatePackage p = pushPackage p (localModuleTable (<> packageModules p)
+  (traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints p))))
   where evaluateEntryPoint (m, sym) = do
           (_, v) <- require m
           case sym of
