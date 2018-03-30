@@ -25,9 +25,6 @@ instance Location location => Location (Located location) where
 newtype LocatedValue value = LocatedValue { unLocatedValue :: value }
   deriving (Eq, Ord, Show)
 
-instance AbstractValue (LocatedValue value) where
-  type LocationFor (LocatedValue value) = Located (LocationFor value)
-
 instance MonadValue (Located location) value m => MonadValue (Located location) (LocatedValue value) m where
   unit = LocatedValue <$> unit
   null = LocatedValue <$> null

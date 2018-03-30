@@ -184,10 +184,6 @@ instance Ord1 Null where liftCompare = genericLiftCompare
 instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
 
-instance AbstractValue Value where
-  type LocationFor Value = Precise
-
-
 instance ValueRoots Precise Value where
   valueRoots v
     | Just (Closure _ _ env) <- prjValue v = Env.addresses env

@@ -43,10 +43,6 @@ unify t1 t2
   | otherwise = fail ("cannot unify " ++ show t1 ++ " with " ++ show t2)
 
 
-instance AbstractValue Type where
-  type LocationFor Type = Monovariant
-
-
 instance ValueRoots Monovariant Type where
   valueRoots _ = mempty
 
