@@ -1,3 +1,9 @@
 module Data.Abstract.Origin where
 
-data Origin = Unknown
+import Data.Abstract.Module
+import Data.Range
+import Data.Span
+
+data Origin
+  = Unknown
+  | Local ModuleName FilePath Range Span
