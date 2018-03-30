@@ -13,13 +13,16 @@ data Package term = Package
   , packageModules     :: Map.Map ModuleName [Module term]
   , packageEntryPoints :: [EntryPoint]
   }
+  deriving (Eq, Ord, Show)
 
 data EntryPoint = EntryPoint
   { entryPointModuleName :: ModuleName
   , entryPointSymbol     :: Maybe Name
   }
+  deriving (Eq, Ord, Show)
 
 newtype Version = Version { versionString :: String }
+  deriving (Eq, Ord, Show)
 
 
 instance Semigroup (Package term) where
