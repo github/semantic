@@ -9,9 +9,8 @@ module Data.Abstract.Evaluatable
 , variable
 , evaluateTerm
 , evaluateModule
-, evaluatePackage
-, withModules
 , evaluateModules
+, evaluatePackage
 , throwLoadError
 , require
 , load
@@ -171,14 +170,6 @@ evaluateModule :: MonadEvaluatable location term value m
                => Module term
                -> m value
 evaluateModule m = analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evaluateTerm) m)
-
-
--- | Run an action with the a list of 'Module's available for imports.
-withModules :: MonadEvaluatable location term value m
-            => [Module term]
-            -> m a
-            -> m a
-withModules = localModuleTable . const . ModuleTable.fromModules
 
 -- | Evaluate with a list of modules in scope, taking the head module as the entry point.
 evaluateModules :: ( Effectful m
