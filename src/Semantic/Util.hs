@@ -145,12 +145,11 @@ evaluatesWith :: forall location value term effects
                  , Show location
                  )
               => Module term   -- ^ Prelude to evaluate once
-              -> [Module term] -- ^ List of (blob, term) pairs that make up the program to be evaluated
-              -> Module term   -- ^ Entrypoint
+              -> [Module term] -- ^ List of modules that make up the program to be evaluated
               -> Final effects value
-evaluatesWith prelude modules m = runAnalysis @(Evaluating location term value) $ do
+evaluatesWith prelude modules = runAnalysis @(Evaluating location term value) $ do
   preludeEnv <- evaluateModule prelude *> getEnv
-  withDefaultEnvironment preludeEnv (withModules modules (evaluateModule m))
+  withDefaultEnvironment preludeEnv (evaluateModules modules)
 
 evaluateFilesWithPrelude :: forall term effects
                          .  ( Evaluatable (Base term)
@@ -166,8 +165,8 @@ evaluateFilesWithPrelude :: forall term effects
 evaluateFilesWithPrelude parser paths = do
   let preludePath = TypeLevel.symbolVal (Proxy :: Proxy (PreludePath term))
   prelude <- parseFile parser Nothing preludePath
-  entry:xs <- traverse (parseFile parser Nothing) paths
-  pure $ evaluatesWith @Precise @(Value Precise) prelude xs entry
+  xs <- traverse (parseFile parser Nothing) paths
+  pure $ evaluatesWith @Precise @(Value Precise) prelude xs
 
 
 -- Read and parse a file.
