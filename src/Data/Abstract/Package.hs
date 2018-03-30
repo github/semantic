@@ -13,7 +13,7 @@ data Package term = Package
   , packageModules     :: Map.Map ModuleName [Module term]
   , packageEntryPoints :: [EntryPoint]
   }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Functor, Ord, Show)
 
 data EntryPoint = EntryPoint
   { entryPointModuleName :: ModuleName
