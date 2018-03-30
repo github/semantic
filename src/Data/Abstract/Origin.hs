@@ -1,8 +1,6 @@
 {-# LANGUAGE GADTs, UndecidableInstances #-}
 module Data.Abstract.Origin where
 
-import Control.Effect
-import Control.Monad.Effect.Reader
 import qualified Data.Abstract.Module as M
 import qualified Data.Abstract.Package as P
 import Prologue
@@ -66,17 +64,6 @@ instance Ord term => Ord (SomeOrigin term) where
   compare (SomeOrigin o1) (SomeOrigin o2) = compareOrigins o1 o2
 
 deriving instance Show term => Show (SomeOrigin term)
-
-
-class Monad m => MonadOrigin term m where
-  askOrigin :: m (SomeOrigin term)
-
-instance ( Effectful m
-         , Member (Reader (SomeOrigin term)) effects
-         , Monad (m effects)
-         )
-      => MonadOrigin term (m effects) where
-  askOrigin = raise ask
 
 
 merge :: Origin term ty1 -> Origin term ty2 -> SomeOrigin term
