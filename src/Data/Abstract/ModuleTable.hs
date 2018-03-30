@@ -2,6 +2,7 @@
 module Data.Abstract.ModuleTable
 ( ModuleName
 , ModuleTable (..)
+, singleton
 , lookup
 , insert
 , fromModules
@@ -16,6 +17,9 @@ import Prelude hiding (lookup)
 
 newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModuleName a }
   deriving (Eq, Foldable, Functor, Generic1, Monoid, Ord, Semigroup, Show, Traversable)
+
+singleton :: ModuleName -> a -> ModuleTable a
+singleton name = ModuleTable . Map.singleton name
 
 lookup :: ModuleName -> ModuleTable a -> Maybe a
 lookup k = Map.lookup k . unModuleTable
