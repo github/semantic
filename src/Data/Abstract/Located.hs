@@ -5,7 +5,7 @@ import Control.Abstract.Addressable
 import Data.Abstract.Address
 import Data.Abstract.Origin
 
-data Located location = Located { location :: location, provenance :: !Origin }
+data Located location = Located { location :: location, origin :: !Origin }
   deriving (Eq, Ord, Show)
 
 instance Location location => Location (Located location) where
