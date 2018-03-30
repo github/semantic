@@ -15,7 +15,7 @@ import Prologue
 class (MonadFresh m, Ord location) => MonadAddressable location m where
   derefCell :: Address location value -> Cell location value -> m value
 
-  alloc :: Name -> m (Address location value)
+  allocLoc :: Name -> m location
 
 -- | Look up or allocate an address for a 'Name'.
 lookupOrAlloc :: ( MonadAddressable location m
@@ -57,16 +57,19 @@ letrec' name body = do
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
 instance (MonadFail m, MonadFresh m) => MonadAddressable Precise m where
   derefCell addr = maybeM (uninitializedAddress addr) . unLatest
-  alloc _ = Address . Precise <$> fresh
+  allocLoc _ = Precise <$> fresh
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
 instance (Alternative m, MonadFresh m) => MonadAddressable Monovariant m where
   derefCell _ = foldMapA pure
-  alloc = pure . Address . Monovariant
+  allocLoc = pure . Monovariant
 
 -- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
 deref :: (MonadFail m, MonadAddressable location m, MonadHeap location value m, Show location) => Address location value -> m value
 deref addr = lookupHeap addr >>= maybe (uninitializedAddress addr) (derefCell addr)
+
+alloc :: MonadAddressable location m => Name -> m (Address location value)
+alloc = fmap Address . allocLoc
 
 -- | Fail with a message denoting an uninitialized address (i.e. one which was 'alloc'ated, but never 'assign'ed a value before being 'deref'erenced).
 uninitializedAddress :: (MonadFail m, Show location) => Address location value -> m a
