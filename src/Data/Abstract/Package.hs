@@ -2,14 +2,14 @@ module Data.Abstract.Package where
 
 import Data.Abstract.FreeVariables
 import Data.Abstract.Module
-import qualified Data.Map as Map
+import Data.Abstract.ModuleTable
 
 type PackageName = Name
 
 data Package term = Package
   { packageName        :: Maybe PackageName
   , packageVersion     :: Maybe Version
-  , packageModules     :: Map.Map ModuleName [Module term]
+  , packageModules     :: ModuleTable [Module term]
   , packageEntryPoints :: [EntryPoint]
   }
   deriving (Eq, Functor, Ord, Show)
