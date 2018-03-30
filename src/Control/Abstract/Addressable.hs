@@ -13,23 +13,25 @@ import Prelude hiding (fail)
 import Prologue
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Heap.
-class (Monad m, Ord location, Reducer value (Cell location value)) => MonadAddressable location value m where
-  deref :: Address location value -> m value
+class (Monad m, Ord location) => MonadAddressable location m where
+  deref :: MonadHeap location value m => Address location value -> m value
 
-  alloc :: Name -> m (Address location value)
+  alloc :: MonadHeap location value m => Name -> m (Address location value)
 
 -- | Look up or allocate an address for a 'Name'.
-lookupOrAlloc :: ( MonadAddressable location value m
+lookupOrAlloc :: ( MonadAddressable location m
                  , MonadEnvironment location value m
+                 , MonadHeap location value m
                  )
-                 => Name
-                 -> m (Address location value)
+              => Name
+              -> m (Address location value)
 lookupOrAlloc name = lookupEnv name >>= maybe (alloc name) pure
 
 
-letrec :: ( MonadAddressable location value m
+letrec :: ( MonadAddressable location m
           , MonadEnvironment location value m
           , MonadHeap location value m
+          , Reducer value (Cell location value)
           )
        => Name
        -> m value
@@ -41,8 +43,9 @@ letrec name body = do
   pure (v, addr)
 
 -- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
-letrec' :: ( MonadAddressable location value m
+letrec' :: ( MonadAddressable location m
            , MonadEnvironment location value m
+           , MonadHeap location value m
            )
         => Name
         -> (Address location value -> m value)
@@ -55,7 +58,7 @@ letrec' name body = do
 -- Instances
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
-instance (MonadFail m, MonadHeap Precise value m) => MonadAddressable Precise value m where
+instance MonadFail m => MonadAddressable Precise m where
   deref = derefWith (maybeM uninitializedAddress . unLatest)
   alloc _ = do
     -- Compute the next available address in the heap, then write an empty value into it.
@@ -63,7 +66,7 @@ instance (MonadFail m, MonadHeap Precise value m) => MonadAddressable Precise va
     addr <$ modifyHeap (heapInit addr mempty)
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
-instance (Alternative m, MonadFail m, MonadHeap Monovariant value m, Ord value) => MonadAddressable Monovariant value m where
+instance (Alternative m, MonadFail m) => MonadAddressable Monovariant m where
   deref = derefWith (foldMapA pure)
   alloc = pure . Address . Monovariant
 

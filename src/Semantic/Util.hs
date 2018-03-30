@@ -21,6 +21,7 @@ import Data.Blob
 import Data.Diff
 import Data.Range
 import Data.Record
+import Data.Semigroup.Reducer
 import Data.Span
 import Data.Term
 import Diffing.Algorithm
@@ -71,7 +72,7 @@ evaluateFile :: forall term effects
              .  ( Evaluatable (Base term)
                 , FreeVariables term
                 , effects ~ Effects Precise term Value (Evaluating Precise term Value effects)
-                , MonadAddressable Precise Value (Evaluating Precise term Value effects)
+                , MonadAddressable Precise (Evaluating Precise term Value effects)
                 , Recursive term
                 )
              => Parser term
@@ -83,9 +84,10 @@ evaluateWith :: forall location value term effects
              .  ( effects ~ Effects location term value (Evaluating location term value effects)
                 , Evaluatable (Base term)
                 , FreeVariables term
-                , MonadAddressable location value (Evaluating location term value effects)
+                , MonadAddressable location (Evaluating location term value effects)
                 , MonadValue location value (Evaluating location term value effects)
                 , Recursive term
+                , Reducer value (Cell location value)
                 , Show location
                 )
          => Module term
@@ -104,7 +106,7 @@ evaluateWithPrelude :: forall term effects
                     .  ( Evaluatable (Base term)
                        , FreeVariables term
                        , effects ~ Effects Precise term Value (Evaluating Precise term Value effects)
-                       , MonadAddressable Precise Value (Evaluating Precise term Value effects)
+                       , MonadAddressable Precise (Evaluating Precise term Value effects)
                        , Recursive term
                        , TypeLevel.KnownSymbol (PreludePath term)
                        )
@@ -123,7 +125,7 @@ evaluateFiles :: forall term effects
               .  ( Evaluatable (Base term)
                  , FreeVariables term
                  , effects ~ Effects Precise term Value (Evaluating Precise term Value effects)
-                 , MonadAddressable Precise Value (Evaluating Precise term Value effects)
+                 , MonadAddressable Precise (Evaluating Precise term Value effects)
                  , Recursive term
                  )
               => Parser term
@@ -136,9 +138,10 @@ evaluatesWith :: forall location value term effects
               .  ( effects ~ Effects location term value (Evaluating location term value effects)
                  , Evaluatable (Base term)
                  , FreeVariables term
-                 , MonadAddressable location value (Evaluating location term value effects)
+                 , MonadAddressable location (Evaluating location term value effects)
                  , MonadValue location value (Evaluating location term value effects)
                  , Recursive term
+                 , Reducer value (Cell location value)
                  , Show location
                  )
               => Module term   -- ^ Prelude to evaluate once
@@ -153,7 +156,7 @@ evaluateFilesWithPrelude :: forall term effects
                          .  ( Evaluatable (Base term)
                             , FreeVariables term
                             , effects ~ Effects Precise term Value (Evaluating Precise term Value effects)
-                            , MonadAddressable Precise Value (Evaluating Precise term Value effects)
+                            , MonadAddressable Precise (Evaluating Precise term Value effects)
                             , Recursive term
                             , TypeLevel.KnownSymbol (PreludePath term)
                             )

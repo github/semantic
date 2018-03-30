@@ -17,6 +17,7 @@ module Data.Abstract.Evaluatable
 
 import           Control.Abstract.Addressable as X
 import           Control.Abstract.Analysis as X
+import           Data.Abstract.Address
 import           Data.Abstract.Environment as X
 import qualified Data.Abstract.Exports as Exports
 import           Data.Abstract.FreeVariables as X
@@ -24,6 +25,7 @@ import           Data.Abstract.Module
 import           Data.Abstract.ModuleTable as ModuleTable
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
+import           Data.Semigroup.Reducer hiding (unit)
 import           Data.Term
 import           Prelude hiding (fail)
 import           Prologue
@@ -31,7 +33,7 @@ import           Prologue
 type MonadEvaluatable location term value m =
   ( Evaluatable (Base term)
   , FreeVariables term
-  , MonadAddressable location value m
+  , MonadAddressable location m
   , MonadAnalysis location term value m
   , MonadThrow (Unspecialized value) m
   , MonadThrow (ValueExc location value) m
@@ -39,6 +41,7 @@ type MonadEvaluatable location term value m =
   , MonadThrow (EvalError value) m
   , MonadValue location value m
   , Recursive term
+  , Reducer value (Cell location value)
   , Show location
   )
 
