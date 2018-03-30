@@ -3,12 +3,33 @@ module Language.TypeScript.Syntax where
 
 import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
+import qualified Data.ByteString.Char8 as BC
+import qualified Data.ByteString as B
 import qualified Data.Abstract.Module as M
-import           Data.Abstract.Path
 import           Diffing.Algorithm
 import           Prelude hiding (fail)
 import           Prologue
 import           System.FilePath.Posix
+
+data Relative = Relative | NonRelative
+  deriving (Eq, Ord, Show)
+
+data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: Relative }
+  deriving (Eq, Ord, Show)
+
+importPath :: ByteString -> ImportPath
+importPath str = let path = stripQuotes str in ImportPath (BC.unpack path) (pathType path)
+  where
+    stripQuotes = B.filter (`B.notElem` "\'\"")
+    pathType xs | not (B.null xs), BC.head xs == '.' = Relative
+                | otherwise = NonRelative
+
+toName :: ImportPath -> Name
+toName = name . BC.pack . unPath
+
+resolveTypeScriptModule :: MonadEvaluatable term value m => ImportPath -> m M.ModuleName
+resolveTypeScriptModule (ImportPath path Relative)    = resolveRelativeTSModule path
+resolveTypeScriptModule (ImportPath path NonRelative) = resolveNonRelativeTSModule path
 
 -- | Resolve a relative TypeScript import to a known 'ModuleName' or fail.
 --
@@ -62,7 +83,7 @@ resolveTSModule path = maybe (Left searchPaths) Right <$> resolve searchPaths
           <> (((path </> "index") <.>) <$> exts)
 
 
-data Import a = Import { importFrom :: Path, importSymbols :: ![(Name, Name)], importWildcardToken :: !a }
+data Import a = Import { importFrom :: ImportPath, importSymbols :: ![(Name, Name)], importWildcardToken :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Import where liftEq = genericLiftEq
@@ -71,24 +92,17 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
   -- http://www.typescriptlang.org/docs/handbook/module-resolution.html
 instance Evaluatable Import where
-  eval (Import (Path path NonRelative) symbols _) = do
-    modulePath <- resolveNonRelativeTSModule path
-    doImport modulePath symbols *> unit
-  eval (Import (Path path Relative) symbols _) = do
-    modulePath <- resolveRelativeTSModule path
-    doImport modulePath symbols *> unit
-
-doImport :: MonadEvaluatable term value m => M.ModuleName -> [(Name, Name)] -> m ()
-doImport modulePath symbols = do
-  (importedEnv, _) <- isolate (require modulePath)
-  modifyEnv (mappend (renamed importedEnv))
-  where
-    renamed importedEnv
-      | Prologue.null symbols = importedEnv
-      | otherwise = Env.overwrite symbols importedEnv
+  eval (Import importPath symbols _) = do
+    modulePath <- resolveTypeScriptModule importPath
+    (importedEnv, _) <- isolate (require modulePath)
+    modifyEnv (mappend (renamed importedEnv)) *> unit
+    where
+      renamed importedEnv
+        | Prologue.null symbols = importedEnv
+        | otherwise = Env.overwrite symbols importedEnv
 
 
-data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: Path, qualifiedImportAlias :: !a, qualifiedImportSymbols :: ![(Name, Name)]}
+data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: ImportPath, qualifiedImportAlias :: !a, qualifiedImportSymbols :: ![(Name, Name)]}
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 QualifiedImport where liftEq = genericLiftEq
@@ -96,24 +110,19 @@ instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
 instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedImport where
-  eval (QualifiedImport (Path _ NonRelative) _ _) = fail "non-relative imports are not implemented"
-  eval (QualifiedImport (Path path Relative) alias symbols) = do
-    modulePath <- resolveRelativeTSModule path
-    doQualifiedImport modulePath alias symbols *> unit
-
-doQualifiedImport :: MonadEvaluatable term value m => M.ModuleName -> Subterm term a -> [(Name, Name)] -> m ()
-doQualifiedImport modulePath alias symbols = do
-  (importedEnv, _) <- isolate (require modulePath)
-  modifyEnv (mappend (Env.overwrite (renames importedEnv) importedEnv))
-  where
-    renames importedEnv
-      | Prologue.null symbols = fmap prepend (Env.names importedEnv)
-      | otherwise = symbols
-    prefix = freeVariable (subterm alias)
-    prepend n = (n, prefix <> n)
+  eval (QualifiedImport importPath alias symbols) = do
+    modulePath <- resolveTypeScriptModule importPath
+    (importedEnv, _) <- isolate (require modulePath)
+    modifyEnv (mappend (Env.overwrite (renames importedEnv) importedEnv)) *> unit
+    where
+      renames importedEnv
+        | Prologue.null symbols = fmap prepend (Env.names importedEnv)
+        | otherwise = symbols
+      prefix = freeVariable (subterm alias)
+      prepend n = (n, prefix <> n)
 
 
-data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: Path, sideEffectImportToken :: !a }
+data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: ImportPath, sideEffectImportToken :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 SideEffectImport where liftEq = genericLiftEq
@@ -139,7 +148,7 @@ instance Evaluatable QualifiedExport where
 
 
 -- | Qualified Export declarations that export from another module.
-data QualifiedExportFrom a = QualifiedExportFrom { qualifiedExportFrom :: Path, qualifiedExportFromSymbols :: ![(Name, Name)]}
+data QualifiedExportFrom a = QualifiedExportFrom { qualifiedExportFrom :: ImportPath, qualifiedExportFromSymbols :: ![(Name, Name)]}
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 QualifiedExportFrom where liftEq = genericLiftEq
@@ -147,20 +156,14 @@ instance Ord1 QualifiedExportFrom where liftCompare = genericLiftCompare
 instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedExportFrom where
-  eval (QualifiedExportFrom (Path path NonRelative) symbols) = do
-    modulePath <- resolveNonRelativeTSModule path
-    doQualifiedExportFrom modulePath symbols *> unit
-  eval (QualifiedExportFrom (Path path Relative) symbols) = do
-    modulePath <- resolveRelativeTSModule path
-    doQualifiedExportFrom modulePath symbols *> unit
-
-doQualifiedExportFrom :: MonadEvaluatable term value m => M.ModuleName -> [(Name, Name)] -> m ()
-doQualifiedExportFrom modulePath exportSymbols = do
+  eval (QualifiedExportFrom importPath exportSymbols) = do
+    modulePath <- resolveTypeScriptModule importPath
     (importedEnv, _) <- isolate (require modulePath)
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \(name, alias) -> do
       let address = Env.lookup name importedEnv
       maybe (cannotExport modulePath name) (addExport name alias . Just) address
+    unit
     where
       cannotExport moduleName name = fail $
         "module " <> show moduleName <> " does not export " <> show (friendlyName name)

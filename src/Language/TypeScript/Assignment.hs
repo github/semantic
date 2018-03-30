@@ -9,7 +9,6 @@ module Language.TypeScript.Assignment
 import Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import Data.Abstract.FreeVariables
-import Data.Abstract.Path
 import Data.Record
 import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, contextualize, postContextualize)
 import qualified Data.Syntax as Syntax
@@ -655,7 +654,7 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
         <|> (pure <$> defaultImport))
 
     makeImportTerm1 loc from (Prelude.True, Just alias, symbols, _) = makeTerm loc (TypeScript.Syntax.QualifiedImport from alias symbols)
-    makeImportTerm1 loc from (Prelude.True, Nothing, symbols, _) = makeTerm loc (TypeScript.Syntax.QualifiedImport from (makeTerm loc (Syntax.Identifier (toName from))) symbols)
+    makeImportTerm1 loc from (Prelude.True, Nothing, symbols, _) = makeTerm loc (TypeScript.Syntax.QualifiedImport from (makeTerm loc (Syntax.Identifier (TypeScript.Syntax.toName from))) symbols)
     makeImportTerm1 loc from (_, _, symbols, extra) = makeTerm loc (TypeScript.Syntax.Import from symbols extra)
     makeImportTerm loc ([x], from) = makeImportTerm1 loc from x
     makeImportTerm loc (xs, from) = makeTerm loc $ fmap (makeImportTerm1 loc from) xs
@@ -665,7 +664,7 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
     makeNameAliasPair from Nothing = (from, from)
 
     -- TODO: Need to validate that inline comments are still handled with this change in assigning to Path and not a Term.
-    fromClause = symbol Grammar.String *> (path <$> source)
+    fromClause = symbol Grammar.String *> (TypeScript.Syntax.importPath <$> source)
 
 debuggerStatement :: Assignment
 debuggerStatement = makeTerm <$> symbol Grammar.DebuggerStatement <*> (TypeScript.Syntax.Debugger <$ source)
@@ -721,7 +720,7 @@ exportStatement = makeTerm <$> symbol Grammar.ExportStatement <*> children (flip
     makeNameAliasPair from Nothing = (from, from)
     rawIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source)
     -- TODO: Need to validate that inline comments are still handled with this change in assigning to Path and not a Term.
-    fromClause = symbol Grammar.String *> (path <$> source)
+    fromClause = symbol Grammar.String *> (TypeScript.Syntax.importPath <$> source)
 
 propertySignature :: Assignment
 propertySignature = makePropertySignature <$> symbol Grammar.PropertySignature <*> children ((,,,) <$> (term accessibilityModifier' <|> emptyTerm) <*> (term readonly' <|> emptyTerm) <*> term propertyName <*> (term typeAnnotation' <|> emptyTerm))
