@@ -131,7 +131,7 @@ load name = askModuleTable >>= maybe notFound pure . ModuleTable.lookup name >>=
   where
     notFound = throwLoadError (LoadError name)
 
-    evalAndCache []     = (,) <$> pure mempty <*> unit
+    evalAndCache []     = (,) mempty <$> unit
     evalAndCache [x]    = evalAndCache' x
     evalAndCache (x:xs) = do
       (env, _) <- evalAndCache' x
