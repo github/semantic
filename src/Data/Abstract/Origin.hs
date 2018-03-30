@@ -13,7 +13,7 @@ data Origin term ty where
   Term    :: Origin term 'M -> Base term () -> Origin term 'T
 
 packageOrigin :: P.Package term -> SomeOrigin term
-packageOrigin = SomeOrigin . Package . (() <$)
+packageOrigin p = SomeOrigin (Package (() <$ p { P.packageModules = mempty, P.packageEntryPoints = mempty }))
 
 moduleOrigin :: M.Module term -> SomeOrigin term
 moduleOrigin = SomeOrigin . Module Unknown . (() <$)
