@@ -6,6 +6,7 @@ module Data.Abstract.Evaluatable
 , Unspecialized(..)
 , LoadError(..)
 , EvalError(..)
+, variable
 , evaluateTerm
 , evaluateModule
 , evaluatePackage
@@ -64,6 +65,9 @@ instance Eq1 (LoadError term a) where
 data EvalError value resume where
   -- Indicates we weren't able to dereference a name from the evaluated environment.
   FreeVariableError :: Name -> EvalError value value
+
+variable :: MonadEvaluatable location term value m => Name -> m value
+variable name = lookupWith deref name >>= maybeM (throwException (FreeVariableError name))
 
 deriving instance Eq (EvalError a b)
 deriving instance Show (EvalError a b)
