@@ -3,14 +3,35 @@ module Language.Go.Syntax where
 
 import Data.Abstract.Evaluatable hiding (Label)
 import Data.Abstract.Environment as Env
-import Data.Abstract.Path
+import qualified Data.Abstract.Module as M
 import Diffing.Algorithm
+import qualified Data.ByteString.Char8 as BC
+import qualified Data.ByteString as B
 import Prologue
+import Prelude hiding (fail)
+
+newtype ImportPath = ImportPath { unPath :: FilePath }
+  deriving (Eq, Ord, Show)
+
+importPath :: ByteString -> ImportPath
+importPath str = let path = stripQuotes str in ImportPath (BC.unpack path)
+  where stripQuotes = B.filter (`B.notElem` "\'\"")
+
+toName :: ImportPath -> Name
+toName = name . BC.pack . unPath
+
+resolveGoImport :: MonadEvaluatable term value m => FilePath -> m [M.ModuleName]
+resolveGoImport relImportPath = do
+  -- TODO: This is where we need to enumerator all files in the right dir.
+  maybeModule <- resolve [relImportPath]
+  maybe notFound (pure . pure) maybeModule
+  where
+    notFound = fail $ "Unable to resolve module import: " <> show relImportPath
 
 -- | Import declarations (symbols are added directly to the calling environment).
 --
 -- If the list of symbols is empty copy everything to the calling environment.
-data Import a = Import { importFrom :: Path, importSymbols :: ![(Name, Name)], importWildcardToken :: !a }
+data Import a = Import { importFrom :: ImportPath, importSymbols :: ![(Name, Name)], importWildcardToken :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Import where liftEq = genericLiftEq
@@ -18,9 +39,11 @@ instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
-  eval (Import (Path name _) xs _) = do
-    (importedEnv, _) <- isolate (require name)
-    modifyEnv (mappend (renamed importedEnv))
+  eval (Import (ImportPath name) xs _) = do
+    paths <- resolveGoImport name
+    for_ paths $ \path -> do
+      (importedEnv, _) <- isolate (require path)
+      modifyEnv (mappend (renamed importedEnv))
     unit
     where
       renamed importedEnv
@@ -31,7 +54,7 @@ instance Evaluatable Import where
 -- | Qualified Import declarations (symbols are qualified in calling environment).
 --
 -- If the list of symbols is empty copy and qualify everything to the calling environment.
-data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: !Path, qualifiedImportAlias :: !a, qualifiedImportSymbols :: ![(Name, Name)]}
+data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: !ImportPath, qualifiedImportAlias :: !a, qualifiedImportSymbols :: ![(Name, Name)]}
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 QualifiedImport where liftEq = genericLiftEq
@@ -39,9 +62,11 @@ instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
 instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedImport where
-  eval (QualifiedImport (Path name _) alias xs) = do
-    (importedEnv, _) <- isolate (require name)
-    modifyEnv (mappend (Env.overwrite (renames importedEnv) importedEnv))
+  eval (QualifiedImport (ImportPath name) alias xs) = do
+    paths <- resolveGoImport name
+    for_ paths $ \path -> do
+      (importedEnv, _) <- isolate (require path)
+      modifyEnv (mappend (Env.overwrite (renames importedEnv) importedEnv))
     unit
     where
       renames importedEnv
@@ -52,7 +77,7 @@ instance Evaluatable QualifiedImport where
 
 
 -- | Side effect only imports (no symbols made available to the calling environment).
-data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: !Path, sideEffectImportToken :: !a }
+data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: !ImportPath, sideEffectImportToken :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 SideEffectImport where liftEq = genericLiftEq
@@ -60,7 +85,10 @@ instance Ord1 SideEffectImport where liftCompare = genericLiftCompare
 instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable SideEffectImport where
-  eval (SideEffectImport (Path path _) _) = isolate (require path) *> unit
+  eval (SideEffectImport (ImportPath name) _) = do
+    paths <- resolveGoImport name
+    for_ paths (isolate . require)
+    unit
 
 -- A composite literal in Go
 data Composite a = Composite { compositeType :: !a, compositeElement :: !a }

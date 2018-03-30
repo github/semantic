@@ -8,7 +8,6 @@ module Language.Go.Assignment
 
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Abstract.FreeVariables
-import Data.Abstract.Path
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
 import Language.Go.Grammar as Grammar
@@ -393,7 +392,7 @@ importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTe
     namedImport = inj <$> (flip Go.Syntax.QualifiedImport <$> packageIdentifier <*> importFromPath <*> pure [])
     -- `import "lib/Math"`
     plainImport = inj <$> (symbol InterpretedStringLiteral >>= \loc -> do
-      from <- path <$> source
+      from <- importPath <$> source
       let alias = makeTerm loc (Syntax.Identifier (toName from)) -- Go takes `import "lib/Math"` and uses `Math` as the qualified name (e.g. `Math.Sin()`)
       Go.Syntax.QualifiedImport <$> pure from <*> pure alias <*> pure [])
 
@@ -402,7 +401,7 @@ importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTe
     underscore = makeTerm <$> symbol BlankIdentifier <*> (Literal.TextElement <$> source)
     importSpec     = makeTerm' <$> symbol ImportSpec <*> children (sideEffectImport <|> dotImport <|> namedImport <|> plainImport)
     importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyTerm (importSpec <|> comment))
-    importFromPath = symbol InterpretedStringLiteral *> (path <$> source)
+    importFromPath = symbol InterpretedStringLiteral *> (importPath <$> source)
 
 indexExpression :: Assignment
 indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)
