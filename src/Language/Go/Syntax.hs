@@ -2,8 +2,20 @@
 module Language.Go.Syntax where
 
 import Data.Abstract.Evaluatable hiding (Label)
+import Data.Abstract.Path
 import Diffing.Algorithm
 import Prologue
+
+-- | Side effect only imports (no symbols made available to the calling environment).
+data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: !Path, sideEffectImportToken :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 SideEffectImport where liftEq = genericLiftEq
+instance Ord1 SideEffectImport where liftCompare = genericLiftCompare
+instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable SideEffectImport where
+  eval (SideEffectImport (Path path _) _) = isolate (require path) *> unit
 
 -- A composite literal in Go
 data Composite a = Composite { compositeType :: !a, compositeElement :: !a }
@@ -169,7 +181,7 @@ instance Show1 Package where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Package where
   eval (Package _ xs) = eval xs
-  
+
 
 -- | A type assertion in Go (e.g. `x.(T)` where the value of `x` is not nil and is of type `T`).
 data TypeAssertion a = TypeAssertion { typeAssertionSubject :: !a, typeAssertionType :: !a }

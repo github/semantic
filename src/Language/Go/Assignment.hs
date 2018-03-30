@@ -31,7 +31,6 @@ type Syntax =
    , Declaration.Function
    , Declaration.Import
    , Declaration.QualifiedImport
-   , Declaration.SideEffectImport
    , Declaration.Method
    , Declaration.MethodSignature
    , Declaration.Type
@@ -66,6 +65,7 @@ type Syntax =
    , Go.Type.BidirectionalChannel
    , Go.Type.ReceiveChannel
    , Go.Type.SendChannel
+   , Go.Syntax.SideEffectImport
    , Literal.Array
    , Literal.Complex
    , Literal.Float
@@ -388,7 +388,7 @@ importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTe
     dotImport = inj <$> (makeImport <$> dot <*> importFromPath)
     -- dotImport = inj <$> (flip Declaration.Import <$> (symbol Dot *> source *> pure []) <*> importFromPath)
     -- `import _ "lib/Math"`
-    sideEffectImport = inj <$> (flip Declaration.SideEffectImport <$> underscore <*> importFromPath)
+    sideEffectImport = inj <$> (flip Go.Syntax.SideEffectImport <$> underscore <*> importFromPath')
     -- `import m "lib/Math"`
     namedImport = inj <$> (flip Declaration.QualifiedImport <$> packageIdentifier <*> importFromPath <*> pure [])
     -- `import "lib/Math"`
@@ -404,6 +404,7 @@ importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTe
     importSpec     = makeTerm' <$> symbol ImportSpec <*> children (sideEffectImport <|> dotImport <|> namedImport <|> plainImport)
     importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyTerm (importSpec <|> comment))
     importFromPath = makeTerm <$> symbol InterpretedStringLiteral <*> (Syntax.Identifier <$> (toQualifiedName <$> source))
+    importFromPath' = symbol InterpretedStringLiteral *> (path <$> source)
 
     toQualifiedName = qualifiedName . toName
     toName = splitOnPathSeparator . dropRelativePrefix . stripQuotes

@@ -15,10 +15,12 @@ import Data.Source as Source
 import Data.Span
 import Data.Term
 import Data.Abstract.FreeVariables
+import qualified Data.Abstract.Path as P
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import qualified Language.Ruby.Syntax as Ruby.Syntax
+import qualified Language.Go.Syntax as Go.Syntax
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import qualified Language.Markdown.Syntax as Markdown
@@ -137,9 +139,9 @@ instance (Syntax.Identifier :< fs) => CustomHasDeclaration (Union fs) Declaratio
       getSymbol = bimap toName toName
       toName = T.decodeUtf8 . friendlyName
 
-instance CustomHasDeclaration (Union fs) Declaration.SideEffectImport where
-  customToDeclaration Blob{..} _ (Declaration.SideEffectImport (Term (In fromAnn _), _) _)
-    = Just $ ImportDeclaration ((stripQuotes . getSource blobSource) fromAnn) "" [] blobLanguage
+instance CustomHasDeclaration (Union fs) Go.Syntax.SideEffectImport where
+  customToDeclaration Blob{..} _ (Go.Syntax.SideEffectImport (P.Path path _) _)
+    = Just $ ImportDeclaration (T.pack path) "" [] blobLanguage
 
 instance CustomHasDeclaration (Union fs) Ruby.Syntax.Require where
   customToDeclaration Blob{..} _ (Ruby.Syntax.Require _ (Term (In fromAnn _), _))
@@ -194,7 +196,7 @@ type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Function = 'Custom
   DeclarationStrategy Declaration.Import = 'Custom
   DeclarationStrategy Declaration.QualifiedImport = 'Custom
-  DeclarationStrategy Declaration.SideEffectImport = 'Custom
+  DeclarationStrategy Go.Syntax.SideEffectImport = 'Custom
   DeclarationStrategy Ruby.Syntax.Class = 'Custom
   DeclarationStrategy Ruby.Syntax.Require = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom

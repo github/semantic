@@ -247,20 +247,6 @@ instance Evaluatable Import where
         | Prologue.null xs = importedEnv
         | otherwise = Env.overwrite xs importedEnv
 
--- | Side effect only imports (no symbols made available to the calling environment).
-data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: !a, sideEffectImportToken :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 SideEffectImport where liftEq = genericLiftEq
-instance Ord1 SideEffectImport where liftCompare = genericLiftCompare
-instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable SideEffectImport where
-  eval (SideEffectImport from _) = do
-    let moduleName = freeVariable (subterm from)
-    void $ isolate (require moduleName)
-    unit
-
 
 -- | A declared type (e.g. `a []int` in Go).
 data Type a = Type { typeName :: !a, typeKind :: !a }
