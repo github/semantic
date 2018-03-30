@@ -35,7 +35,6 @@ type MonadEvaluatable location term value m =
   , FreeVariables term
   , MonadAddressable location m
   , MonadAnalysis location term value m
-  , MonadFresh m
   , MonadThrow (Unspecialized value) m
   , MonadThrow (ValueExc location value) m
   , MonadThrow (LoadError term value) m

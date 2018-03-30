@@ -12,15 +12,14 @@ import Prelude hiding (fail)
 import Prologue
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Heap.
-class (Monad m, Ord location) => MonadAddressable location m where
+class (MonadFresh m, Ord location) => MonadAddressable location m where
   derefCell :: Address location value -> Cell location value -> m value
 
-  alloc :: MonadFresh m => Name -> m (Address location value)
+  alloc :: Name -> m (Address location value)
 
 -- | Look up or allocate an address for a 'Name'.
 lookupOrAlloc :: ( MonadAddressable location m
                  , MonadEnvironment location value m
-                 , MonadFresh m
                  )
               => Name
               -> m (Address location value)
@@ -29,7 +28,6 @@ lookupOrAlloc name = lookupEnv name >>= maybe (alloc name) pure
 
 letrec :: ( MonadAddressable location m
           , MonadEnvironment location value m
-          , MonadFresh m
           , MonadHeap location value m
           , Reducer value (Cell location value)
           )
@@ -45,7 +43,6 @@ letrec name body = do
 -- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
 letrec' :: ( MonadAddressable location m
            , MonadEnvironment location value m
-           , MonadFresh m
            )
         => Name
         -> (Address location value -> m value)
@@ -58,12 +55,12 @@ letrec' name body = do
 -- Instances
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
-instance MonadFail m => MonadAddressable Precise m where
+instance (MonadFail m, MonadFresh m) => MonadAddressable Precise m where
   derefCell addr = maybeM (uninitializedAddress addr) . unLatest
   alloc _ = Address . Precise <$> fresh
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
-instance (Alternative m, Monad m) => MonadAddressable Monovariant m where
+instance (Alternative m, MonadFresh m) => MonadAddressable Monovariant m where
   derefCell _ = foldMapA pure
   alloc = pure . Address . Monovariant
 
