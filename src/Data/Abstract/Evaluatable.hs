@@ -197,7 +197,7 @@ evaluatePackage p = pushPackage p (localModuleTable (<> packageModules p)
   (traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints p))))
   where evaluateEntryPoint (m, sym) = do
           (_, v) <- require m
-          maybe (pure v) ((`X.apply` []) <=< variable) sym
+          maybe (pure v) ((`call` []) <=< variable) sym
 
 pushPackage :: ( Effectful m
                , Member (Reader (SomeOrigin term)) effects

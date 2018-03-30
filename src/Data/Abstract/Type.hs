@@ -118,7 +118,7 @@ instance ( Alternative m
     (Int, Float) ->                     pure Int
     _                 -> unify left right $> Bool
 
-  apply op params = do
+  call op params = do
     tvar <- fresh
     paramTypes <- sequenceA params
     _ :-> ret <- op `unify` (Product paramTypes :-> Var tvar)
