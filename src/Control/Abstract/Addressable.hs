@@ -63,7 +63,7 @@ instance (MonadFail m, MonadHeap Precise value m) => MonadAddressable Precise va
     addr <$ modifyHeap (heapInit addr mempty)
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
-instance (Alternative m, LocationFor value ~ Monovariant, MonadFail m, MonadHeap Monovariant value m, Ord value) => MonadAddressable Monovariant value m where
+instance (Alternative m, MonadFail m, MonadHeap Monovariant value m, Ord value) => MonadAddressable Monovariant value m where
   deref = derefWith (foldMapA pure)
   alloc = pure . Address . Monovariant
 
