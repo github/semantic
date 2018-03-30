@@ -9,6 +9,8 @@ import Data.Semigroup.Reducer (Reducer)
 import Prelude hiding (fail)
 import Prologue
 
+type TName = Int
+
 -- | A datatype representing primitive types and combinations thereof.
 data Type
   = Int                 -- ^ Primitive int type.
