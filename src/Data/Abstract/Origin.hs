@@ -5,7 +5,6 @@ import qualified Data.Abstract.Module as M
 import qualified Data.Abstract.Package as P
 import Prologue
 
--- TODO: Upstream dependencies
 data Origin term ty where
   Unknown ::                                    Origin term any
   Package ::                   P.PackageInfo -> Origin term 'P
