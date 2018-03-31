@@ -18,8 +18,8 @@ packageOrigin = SomeOrigin . Package . P.packageInfo
 moduleOrigin :: M.Module term -> SomeOrigin term
 moduleOrigin = SomeOrigin . Module Unknown . M.moduleInfo
 
-termOrigin :: Functor (Base term) => Base term a -> SomeOrigin term
-termOrigin = SomeOrigin . Term Unknown . (() <$)
+termOrigin :: Recursive term => term -> SomeOrigin term
+termOrigin = SomeOrigin . Term Unknown . (() <$) . project
 
 originModule :: SomeOrigin term -> Maybe M.ModuleInfo
 originModule (SomeOrigin (Term (Module _ m) _)) = Just m

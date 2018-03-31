@@ -70,7 +70,8 @@ evaluateTypeScriptFiles = evaluateFiles typescriptParser
 
 -- Evalute a single file.
 evaluateFile :: forall term effects
-             .  ( Evaluatable (Base term)
+             .  ( Corecursive term
+                , Evaluatable (Base term)
                 , FreeVariables term
                 , effects ~ Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects)
                 , MonadAddressable Precise (Evaluating Precise term (Value Precise) effects)
@@ -82,7 +83,8 @@ evaluateFile :: forall term effects
 evaluateFile parser path = runAnalysis @(Evaluating Precise term (Value Precise)) . evaluateModule <$> parseFile parser Nothing path
 
 evaluateWith :: forall location value term effects
-             .  ( effects ~ Effects location term value (Evaluating location term value effects)
+             .  ( Corecursive term
+                , effects ~ Effects location term value (Evaluating location term value effects)
                 , Evaluatable (Base term)
                 , FreeVariables term
                 , MonadAddressable location (Evaluating location term value effects)
@@ -104,7 +106,8 @@ evaluateWith prelude m = runAnalysis @(Evaluating location term value) $ do
   withDefaultEnvironment preludeEnv (evaluateModule m)
 
 evaluateWithPrelude :: forall term effects
-                    .  ( Evaluatable (Base term)
+                    .  ( Corecursive term
+                       , Evaluatable (Base term)
                        , FreeVariables term
                        , effects ~ Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects)
                        , MonadAddressable Precise (Evaluating Precise term (Value Precise) effects)
@@ -123,7 +126,8 @@ evaluateWithPrelude parser path = do
 
 -- Evaluate a list of files (head of file list is considered the entry point).
 evaluateFiles :: forall term effects
-              .  ( Evaluatable (Base term)
+              .  ( Corecursive term
+                 , Evaluatable (Base term)
                  , FreeVariables term
                  , effects ~ Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects)
                  , MonadAddressable Precise (Evaluating Precise term (Value Precise) effects)
@@ -136,7 +140,8 @@ evaluateFiles parser paths = runAnalysis @(Evaluating Precise term (Value Precis
 
 -- | Evaluate terms and an entry point to a value with a given prelude.
 evaluatesWith :: forall location value term effects
-              .  ( effects ~ Effects location term value (Evaluating location term value effects)
+              .  ( Corecursive term
+                 , effects ~ Effects location term value (Evaluating location term value effects)
                  , Evaluatable (Base term)
                  , FreeVariables term
                  , MonadAddressable location (Evaluating location term value effects)
@@ -153,7 +158,8 @@ evaluatesWith prelude modules = runAnalysis @(Evaluating location term value) $ 
   withDefaultEnvironment preludeEnv (evaluateModules modules)
 
 evaluateFilesWithPrelude :: forall term effects
-                         .  ( Evaluatable (Base term)
+                         .  ( Corecursive term
+                            , Evaluatable (Base term)
                             , FreeVariables term
                             , effects ~ Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects)
                             , MonadAddressable Precise (Evaluating Precise term (Value Precise) effects)
