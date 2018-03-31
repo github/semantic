@@ -149,6 +149,3 @@ instance ( Corecursive term
   analyzeTerm eval term = pushOrigin (termOrigin (embedSubterm term)) (eval term)
 
   analyzeModule eval m = pushOrigin (moduleOrigin (subterm <$> m)) (eval m)
-
-pushOrigin :: Member (Reader (SomeOrigin term)) effects => SomeOrigin term -> Evaluating location term value effects a -> Evaluating location term value effects a
-pushOrigin o = raise . local (<> o) . lower

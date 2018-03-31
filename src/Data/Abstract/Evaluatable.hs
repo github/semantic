@@ -14,6 +14,7 @@ module Data.Abstract.Evaluatable
 , throwLoadError
 , require
 , load
+, pushOrigin
 ) where
 
 import           Control.Abstract.Addressable as X
@@ -185,16 +186,16 @@ evaluatePackage :: ( Effectful m
                    )
                 => Package term
                 -> m effects [value]
-evaluatePackage p = pushPackage p (localModuleTable (<> packageModules p)
+evaluatePackage p = pushOrigin (packageOrigin p) (localModuleTable (<> packageModules p)
   (traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints p))))
   where evaluateEntryPoint (m, sym) = do
           (_, v) <- require m
           maybe (pure v) ((`call` []) <=< variable) sym
 
-pushPackage :: ( Effectful m
-               , Member (Reader (SomeOrigin term)) effects
-               )
-            => Package term
-            -> m effects a
-            -> m effects a
-pushPackage p = raise . local (<> packageOrigin p) . lower
+pushOrigin :: ( Effectful m
+              , Member (Reader (SomeOrigin term)) effects
+              )
+           => SomeOrigin term
+           -> m effects a
+           -> m effects a
+pushOrigin o = raise . local (<> o) . lower
