@@ -60,7 +60,7 @@ instance ( Effectful m
   analyzeTerm eval term@(In _ syntax) = do
     case prj syntax of
       Just (Syntax.Identifier name) -> do
-        insertVertex (Variable name)
+        inclusion (Variable name)
         o <- lookupEnv name
         case o >>= withSomeOrigin originModule . origin . unAddress of
           Just ModuleInfo{..} -> modifyImportGraph (vertex (Variable name) >< vertex (Module moduleName) <>)
@@ -70,13 +70,13 @@ instance ( Effectful m
     resumeException
       @(LoadError term value)
       (liftAnalyze analyzeTerm eval term)
-      (\yield (LoadError name) -> insertVertex (Module name) >> yield [])
+      (\yield (LoadError name) -> inclusion (Module name) >> yield [])
 
   analyzeModule recur m = do
     let name = moduleName (moduleInfo m)
     o <- raise ask
     modifyImportGraph (packageGraph @term o >< vertex (Module name) <>)
-    insertVertex (Module name)
+    inclusion (Module name)
     liftAnalyze analyzeModule recur m
 
 parentGraph :: SomeOrigin term -> ImportGraph
@@ -88,15 +88,15 @@ packageGraph = maybe empty (vertex . Package . packageName) . withSomeOrigin ori
 moduleGraph :: SomeOrigin term -> ImportGraph
 moduleGraph = maybe empty (vertex . Module . moduleName) . withSomeOrigin originModule
 
-insertVertex :: forall m location term value effects
-             .  ( Effectful m
-                , Member (Reader (SomeOrigin term)) effects
-                , Member (State ImportGraph) effects
-                , MonadEvaluator location term value (m effects)
-                )
-             => Vertex
-             -> ImportGraphing m effects ()
-insertVertex v = do
+inclusion :: forall m location term value effects
+          .  ( Effectful m
+             , Member (Reader (SomeOrigin term)) effects
+             , Member (State ImportGraph) effects
+             , MonadEvaluator location term value (m effects)
+             )
+          => Vertex
+          -> ImportGraphing m effects ()
+inclusion v = do
     o <- raise ask
     modifyImportGraph (parentGraph @term o >< vertex v <>)
 
