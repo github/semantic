@@ -11,15 +11,6 @@ data Origin term ty where
   Module  :: Origin term 'P -> M.ModuleInfo  -> Origin term 'M
   Term    :: Origin term 'M -> Base term ()  -> Origin term 'T
 
-packageOrigin :: P.Package term -> SomeOrigin term
-packageOrigin = SomeOrigin . Package . P.packageInfo
-
-moduleOrigin :: M.Module term -> SomeOrigin term
-moduleOrigin = SomeOrigin . Module Unknown . M.moduleInfo
-
-termOrigin :: Recursive term => term -> SomeOrigin term
-termOrigin = SomeOrigin . Term Unknown . (() <$) . project
-
 originModule :: Origin term ty -> Maybe M.ModuleInfo
 originModule (Term o _)   = originModule o
 originModule (Module _ m) = Just m
@@ -61,6 +52,15 @@ data OriginType = P | M | T
 
 data SomeOrigin term where
   SomeOrigin :: Origin term ty -> SomeOrigin term
+
+packageOrigin :: P.Package term -> SomeOrigin term
+packageOrigin = SomeOrigin . Package . P.packageInfo
+
+moduleOrigin :: M.Module term -> SomeOrigin term
+moduleOrigin = SomeOrigin . Module Unknown . M.moduleInfo
+
+termOrigin :: Recursive term => term -> SomeOrigin term
+termOrigin = SomeOrigin . Term Unknown . (() <$) . project
 
 withSomeOrigin :: (forall ty . Origin term ty -> b) -> SomeOrigin term -> b
 withSomeOrigin with (SomeOrigin o) = with o
