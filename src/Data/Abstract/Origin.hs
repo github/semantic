@@ -12,6 +12,7 @@ data Origin term ty where
   Module  :: Origin term 'P -> M.ModuleInfo  -> Origin term 'M
   Term    :: Origin term 'M -> Base term ()  -> Origin term 'T
 
+-- | A type index indicating the finest grain of information available in a given 'Origin'.
 data OriginType = P | M | T
   deriving (Eq, Ord, Show)
 
