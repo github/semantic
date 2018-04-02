@@ -34,7 +34,10 @@ data Vertex
 
 -- | Render a 'ImportGraph' to a 'ByteString' in DOT notation.
 renderImportGraph :: ImportGraph -> ByteString
-renderImportGraph = export (defaultStyle (friendlyName . vertexName)) . unImportGraph
+renderImportGraph = export style . unImportGraph
+
+style :: Style Vertex ByteString
+style = defaultStyle (friendlyName . vertexName)
 
 newtype ImportGraphing m (effects :: [* -> *]) a = ImportGraphing (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
