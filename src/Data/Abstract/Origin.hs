@@ -28,20 +28,20 @@ originPackage _            = Nothing
 deriving instance Eq (Base term ()) => Eq (Origin term ty)
 deriving instance Show (Base term ()) => Show (Origin term ty)
 
-compareOrigins :: Ord (Base term ()) => Origin term ty1 -> Origin term ty2 -> Ordering
-compareOrigins Unknown        Unknown        = EQ
-compareOrigins Unknown        _              = LT
-compareOrigins _              Unknown        = GT
-compareOrigins (Package p1)   (Package p2)   = compare p1 p2
-compareOrigins (Package _)    _              = LT
-compareOrigins _              (Package _)    = GT
-compareOrigins (Module p1 m1) (Module p2 m2) = compare p1 p2 <> compare m1 m2
-compareOrigins (Module _ _)   _              = LT
-compareOrigins _              (Module _ _)   = GT
-compareOrigins (Term m1 t1)   (Term m2 t2)   = compare m1 m2 <> compare t1 t2
+liftCompareOrigins :: (Base term () -> Base term () -> Ordering) -> Origin term ty1 -> Origin term ty2 -> Ordering
+liftCompareOrigins _ Unknown        Unknown        = EQ
+liftCompareOrigins _ Unknown        _              = LT
+liftCompareOrigins _ _              Unknown        = GT
+liftCompareOrigins _ (Package p1)   (Package p2)   = compare p1 p2
+liftCompareOrigins _ (Package _)    _              = LT
+liftCompareOrigins _ _              (Package _)    = GT
+liftCompareOrigins c (Module p1 m1) (Module p2 m2) = liftCompareOrigins c p1 p2 <> compare m1 m2
+liftCompareOrigins _ (Module _ _)   _              = LT
+liftCompareOrigins _ _              (Module _ _)   = GT
+liftCompareOrigins c (Term m1 t1)   (Term m2 t2)   = liftCompareOrigins c m1 m2 <> c t1 t2
 
 instance Ord (Base term ()) => Ord (Origin term ty) where
-  compare = compareOrigins
+  compare = liftCompareOrigins compare
 
 data OriginType = P | M | T
   deriving (Eq, Ord, Show)
@@ -61,11 +61,11 @@ termOrigin = SomeOrigin . Term Unknown . (() <$) . project
 withSomeOrigin :: (forall ty . Origin term ty -> b) -> SomeOrigin term -> b
 withSomeOrigin with (SomeOrigin o) = with o
 
-instance Ord (Base term ()) => Eq (SomeOrigin term) where
-  SomeOrigin o1 == SomeOrigin o2 = compareOrigins o1 o2 == EQ
+instance Eq (Base term ()) => Eq (SomeOrigin term) where
+  SomeOrigin o1 == SomeOrigin o2 = liftCompareOrigins (\ t1 t2 -> if t1 == t2 then EQ else LT) o1 o2 == EQ
 
 instance Ord (Base term ()) => Ord (SomeOrigin term) where
-  compare (SomeOrigin o1) (SomeOrigin o2) = compareOrigins o1 o2
+  compare (SomeOrigin o1) (SomeOrigin o2) = liftCompareOrigins compare o1 o2
 
 deriving instance Show (Base term ()) => Show (SomeOrigin term)
 
