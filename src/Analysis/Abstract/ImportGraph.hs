@@ -79,6 +79,9 @@ instance ( Effectful m
     insertVertexName name
     liftAnalyze analyzeModule recur m
 
+parentGraph :: SomeOrigin term -> ImportGraph
+parentGraph = connect <$> packageGraph <*> moduleGraph
+
 packageGraph :: SomeOrigin term -> ImportGraph
 packageGraph = maybe empty (vertex . Package . packageName) . withSomeOrigin originPackage
 
@@ -95,7 +98,7 @@ insertVertexName :: forall m location term value effects
                  -> ImportGraphing m effects ()
 insertVertexName name = do
     o <- raise ask
-    modifyImportGraph (moduleGraph @term o >< vertex (Module name) <>)
+    modifyImportGraph (parentGraph @term o >< vertex (Module name) <>)
 
 (><) :: Graph a => a -> a -> a
 (><) = connect
