@@ -83,7 +83,7 @@ resolvePythonModules q@(QualifiedModuleName qualifiedName) = do
 -- | Import declarations (symbols are added directly to the calling environment).
 --
 -- If the list of symbols is empty copy everything to the calling environment.
-data Import a = Import { importFrom :: QualifiedModuleName a, importSymbols :: ![(Name, Name)], importWildcardToken :: !a }
+data Import a = Import { importFrom :: QualifiedModuleName a, importSymbols :: ![(Name, Name)] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Import where liftEq = genericLiftEq
@@ -91,11 +91,13 @@ instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
-  eval (Import name xs _) = do
+  eval (Import name xs) = do
     modulePaths <- resolvePythonModules name
-    for_ modulePaths $ \x -> do
-      (importedEnv, _) <- isolate (require x)
-      modifyEnv (mappend (renamed importedEnv))
+    for_ (NonEmpty.init modulePaths) (isolate . require)
+
+    let path = NonEmpty.last modulePaths
+    (importedEnv, _) <- isolate (require path)
+    modifyEnv (mappend (renamed importedEnv))
     unit
     where
       renamed importedEnv
