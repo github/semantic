@@ -186,8 +186,13 @@ evaluatePackage :: ( Effectful m
                    )
                 => Package term
                 -> m effects [value]
-evaluatePackage p = pushOrigin (packageOrigin p) (localModuleTable (<> packageModules (packageBody p))
-  (traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints (packageBody p)))))
+evaluatePackage p = pushOrigin (packageOrigin p) (evaluatePackageBody (packageBody p))
+
+evaluatePackageBody :: MonadEvaluatable location term value m
+                    => PackageBody term
+                    -> m [value]
+evaluatePackageBody body = localModuleTable (<> packageModules body)
+  (traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints body)))
   where evaluateEntryPoint (m, sym) = do
           (_, v) <- require m
           maybe (pure v) ((`call` []) <=< variable) sym
