@@ -61,11 +61,7 @@ instance ( Effectful m
     case prj syntax of
       Just (Syntax.Identifier name) -> do
         inclusion (Variable name)
-        o <- lookupEnv name
-        case o >>= withSomeOrigin originModule . origin . unAddress of
-          Just ModuleInfo{..} -> modifyImportGraph (vertex (Variable name) >< vertex (Module moduleName) <>)
-          Nothing -> pure ()
-        pure ()
+        definition name
       _ -> pure ()
     resumeException
       @(LoadError term value)
@@ -99,6 +95,14 @@ inclusion :: forall m location term value effects
 inclusion v = do
     o <- raise ask
     modifyImportGraph (parentGraph @term o >< vertex v <>)
+
+definition :: ( Effectful m
+              , Member (State ImportGraph) effects
+              , MonadEvaluator (Located location term) term value (m effects)
+              ) => Name -> ImportGraphing m effects ()
+definition name = do
+  graph <- maybe empty (parentGraph . origin . unAddress) <$> lookupEnv name
+  modifyImportGraph (vertex (Variable name) >< graph <>)
 
 (><) :: Graph a => a -> a -> a
 (><) = connect
