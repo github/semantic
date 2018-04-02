@@ -48,6 +48,7 @@ liftCompareOrigins c (Term m1 t1)   (Term m2 t2)   = liftCompareOrigins c m1 m2 
 instance Ord (Base term ()) => Ord (Origin term ty) where
   compare = liftCompareOrigins compare
 
+-- | An existential abstraction over 'Origin's of different types.
 data SomeOrigin term where
   SomeOrigin :: Origin term ty -> SomeOrigin term
 
