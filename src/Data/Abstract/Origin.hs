@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, UndecidableInstances #-}
+{-# LANGUAGE GADTs, RankNTypes, UndecidableInstances #-}
 module Data.Abstract.Origin where
 
 import qualified Data.Abstract.Module as M
@@ -55,6 +55,9 @@ data OriginType = P | M | T
 
 data SomeOrigin term where
   SomeOrigin :: Origin term ty -> SomeOrigin term
+
+withSomeOrigin :: (forall ty . Origin term ty -> b) -> SomeOrigin term -> b
+withSomeOrigin with (SomeOrigin o) = with o
 
 instance Eq (Base term ()) => Eq (SomeOrigin term) where
   SomeOrigin o1 == SomeOrigin o2 = eqOrigins o1 o2
