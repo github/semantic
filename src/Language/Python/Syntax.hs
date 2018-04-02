@@ -35,9 +35,6 @@ moduleName x = QualifiedModuleName $ BC.unpack x :| []
 qualifiedModuleName :: [ByteString] -> QualifiedModuleName a
 qualifiedModuleName xs = QualifiedModuleName $ NonEmpty.fromList (BC.unpack <$> xs)
 
-toName :: QualifiedModuleName a -> Name
-toName = BC.pack . friendlyName
-
 friendlyName :: QualifiedModuleName a -> String
 friendlyName (QualifiedModuleName xs) = intercalate "." (NonEmpty.toList xs)
 
@@ -93,14 +90,17 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Import where
   eval (Import name xs) = do
     modulePaths <- resolvePythonModules name
+
+    -- Eval parent modules first
     for_ (NonEmpty.init modulePaths) (isolate . require)
 
+    -- Last module path is the one we want to import
     let path = NonEmpty.last modulePaths
     (importedEnv, _) <- isolate (require path)
-    modifyEnv (mappend (renamed importedEnv))
+    modifyEnv (mappend (select importedEnv))
     unit
     where
-      renamed importedEnv
+      select importedEnv
         | Prologue.null xs = importedEnv
         | otherwise = Env.overwrite xs importedEnv
 
@@ -114,19 +114,20 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 -- import a.b.c
 instance Evaluatable QualifiedImport where
-  eval (QualifiedImport name@(QualifiedModuleName names)) = do
+  eval (QualifiedImport name@QualifiedModuleName{..}) = do
     modulePaths <- resolvePythonModules name
-    go (NonEmpty.toList (NonEmpty.zip (BC.pack <$> names) modulePaths))
+    go (NonEmpty.zip (BC.pack <$> unQualifiedModuleName) modulePaths)
     where
-      go [] = undefined
-      go [(name, path)] = letrec' name $ \addr -> do
+      -- Evaluate and import the last module, updating the environment
+      go ((name, path) :| []) = letrec' name $ \addr -> do
         (importedEnv, _) <- isolate (require path)
         modifyEnv (mappend importedEnv)
         void $ makeNamespace name addr []
         unit
-      go ((name, path) : xs) = letrec' name $ \addr -> do
+      -- Evaluate each parent module, creating a just namespace
+      go ((name, path) :| xs) = letrec' name $ \addr -> do
         void $ isolate (require path)
-        void $ go xs
+        void $ go (NonEmpty.fromList xs)
         makeNamespace name addr []
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedModuleName a, qualifiedAliasedImportAlias :: !a }
@@ -140,8 +141,11 @@ instance Show1 QualifiedAliasedImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedAliasedImport where
   eval (QualifiedAliasedImport name aliasTerm) = do
     modulePaths <- resolvePythonModules name
+
+    -- Evaluate each parent module
     for_ (NonEmpty.init modulePaths) (isolate . require)
 
+    -- Evaluate and import the last module, aliasing and updating the environment
     let alias = freeVariable (subterm aliasTerm)
     letrec' alias $ \addr -> do
       let path = NonEmpty.last modulePaths
