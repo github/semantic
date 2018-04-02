@@ -234,7 +234,7 @@ instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
 
   asString v
     | Just (String n) <- prjValue v = pure n
-    | otherwise                           = fail ("expected " <> show v <> " to be a string")
+    | otherwise                     = fail ("expected " <> show v <> " to be a string")
 
   ifthenelse cond if' else'
     | Just (Boolean b) <- prjValue cond = if b then if' else else'
