@@ -71,7 +71,7 @@ instance ( Effectful m
   analyzeModule recur m = do
     let name = moduleName (moduleInfo m)
     o <- raise ask
-    modifyImportGraph (packageGraph @term o >< vertex (Module name) <>)
+    appendGraph (packageGraph @term o >< vertex (Module name))
     inclusion (Module name)
     liftAnalyze analyzeModule recur m
 
@@ -94,7 +94,7 @@ inclusion :: forall m location term value effects
           -> ImportGraphing m effects ()
 inclusion v = do
     o <- raise ask
-    modifyImportGraph (parentGraph @term o >< vertex v <>)
+    appendGraph (parentGraph @term o >< vertex v)
 
 definition :: ( Effectful m
               , Member (State ImportGraph) effects
@@ -102,15 +102,15 @@ definition :: ( Effectful m
               ) => Name -> ImportGraphing m effects ()
 definition name = do
   graph <- maybe empty (parentGraph . origin . unAddress) <$> lookupEnv name
-  modifyImportGraph (vertex (Variable name) >< graph <>)
+  appendGraph (vertex (Variable name) >< graph)
 
 (><) :: Graph a => a -> a -> a
 (><) = connect
 
 infixr 7 ><
 
-modifyImportGraph :: (Effectful m, Member (State ImportGraph) effects) => (ImportGraph -> ImportGraph) -> ImportGraphing m effects ()
-modifyImportGraph = raise . modify'
+appendGraph :: (Effectful m, Member (State ImportGraph) effects) => ImportGraph -> ImportGraphing m effects ()
+appendGraph = raise . modify' . (<>)
 
 
 instance Semigroup ImportGraph where
