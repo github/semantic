@@ -186,7 +186,7 @@ parseFiles :: Parser term -> [FilePath] -> IO [Module term]
 parseFiles parser paths = traverse (parseFile parser (Just (dropFileName (head paths)))) paths
 
 parsePackage :: PackageName -> Parser term -> [FilePath] -> IO (Package term)
-parsePackage name parser files = Package (PackageInfo (Just name) Nothing) . Package.fromModules <$> parseFiles parser files
+parsePackage name parser files = Package (PackageInfo name Nothing) . Package.fromModules <$> parseFiles parser files
 
 
 -- Read a file from the filesystem into a Blob.

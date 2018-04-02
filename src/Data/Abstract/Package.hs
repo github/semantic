@@ -8,7 +8,7 @@ type PackageName = Name
 
 -- | Metadata for a package (name and version).
 data PackageInfo = PackageInfo
-  { packageName    :: Maybe PackageName
+  { packageName    :: PackageName
   , packageVersion :: Maybe Version
   }
   deriving (Eq, Ord, Show)
