@@ -71,7 +71,7 @@ insertVertexName name = do
 infixr 7 ><
 
 modifyImportGraph :: (Effectful m, Member (State ImportGraph) effects) => (ImportGraph -> ImportGraph) -> ImportGraphing m effects ()
-modifyImportGraph = raise . modify
+modifyImportGraph = raise . modify'
 
 
 instance Semigroup ImportGraph where
