@@ -37,7 +37,12 @@ renderImportGraph :: ImportGraph -> ByteString
 renderImportGraph = export style . unImportGraph
 
 style :: Style Vertex ByteString
-style = defaultStyle (friendlyName . vertexName)
+style = (defaultStyle (friendlyName . vertexName))
+  { vertexAttributes = vertexAttributes
+  }
+  where vertexAttributes Package{}  = [ "style" := "dashed", "shape" := "box" ]
+        vertexAttributes Module{}   = [ "style" := "dotted, rounded", "shape" := "box" ]
+        vertexAttributes Variable{} = [  ]
 
 newtype ImportGraphing m (effects :: [* -> *]) a = ImportGraphing (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
