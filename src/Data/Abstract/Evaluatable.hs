@@ -196,6 +196,7 @@ evaluatePackageBody body = localModuleTable (<> packageModules body)
           (_, v) <- require m
           maybe (pure v) ((`call` []) <=< variable) sym
 
+-- | Push a 'SomeOrigin' onto the stack. This should be used to contextualize execution with information about the originating term, module, or package.
 pushOrigin :: ( Effectful m
               , Member (Reader (SomeOrigin term)) effects
               )
