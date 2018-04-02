@@ -12,6 +12,9 @@ data Origin term ty where
   Module  :: Origin term 'P -> M.ModuleInfo  -> Origin term 'M
   Term    :: Origin term 'M -> Base term ()  -> Origin term 'T
 
+data OriginType = P | M | T
+  deriving (Eq, Ord, Show)
+
 -- | Project the 'ModuleInfo' out of an 'Origin', if available.
 originModule :: Origin term ty -> Maybe M.ModuleInfo
 originModule (Term o _)   = originModule o
@@ -43,9 +46,6 @@ liftCompareOrigins c (Term m1 t1)   (Term m2 t2)   = liftCompareOrigins c m1 m2 
 
 instance Ord (Base term ()) => Ord (Origin term ty) where
   compare = liftCompareOrigins compare
-
-data OriginType = P | M | T
-  deriving (Eq, Ord, Show)
 
 data SomeOrigin term where
   SomeOrigin :: Origin term ty -> SomeOrigin term
