@@ -5,6 +5,7 @@ import qualified Data.Abstract.Module as M
 import qualified Data.Abstract.Package as P
 import Prologue
 
+-- | An 'Origin' encapsulates the location at which a name is bound or allocated.
 data Origin term ty where
   Unknown ::                                    Origin term any
   Package ::                   P.PackageInfo -> Origin term 'P
