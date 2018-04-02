@@ -25,6 +25,12 @@ import           Prologue hiding (empty, packageName)
 newtype ImportGraph = ImportGraph { unImportGraph :: G.Graph Name }
   deriving (Eq, Graph, Show)
 
+data Vertex
+  = Package PackageName
+  | Module ModuleName
+  | Variable Name
+  deriving (Eq, Ord, Show)
+
 -- | Render a 'ImportGraph' to a 'ByteString' in DOT notation.
 renderImportGraph :: ImportGraph -> ByteString
 renderImportGraph = export (defaultStyle friendlyName) . unImportGraph
