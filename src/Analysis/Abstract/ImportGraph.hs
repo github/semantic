@@ -7,34 +7,34 @@ module Analysis.Abstract.ImportGraph
 ) where
 
 import qualified Algebra.Graph as G
-import           Algebra.Graph.Class
-import           Algebra.Graph.Export.Dot
+import           Algebra.Graph.Class hiding (Vertex)
+import           Algebra.Graph.Export.Dot hiding (vertexName)
 import           Control.Abstract.Analysis
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable (LoadError (..))
 import           Data.Abstract.FreeVariables
 import           Data.Abstract.Located
-import           Data.Abstract.Module
-import           Data.Abstract.Origin
-import           Data.Abstract.Package
+import           Data.Abstract.Module hiding (Module)
+import           Data.Abstract.Origin hiding (Module, Package)
+import           Data.Abstract.Package hiding (Package)
 import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Prologue hiding (empty, packageName)
 
 -- | The graph of function definitions to symbols used in a given program.
-newtype ImportGraph = ImportGraph { unImportGraph :: G.Graph Name }
+newtype ImportGraph = ImportGraph { unImportGraph :: G.Graph Vertex }
   deriving (Eq, Graph, Show)
 
 -- | A vertex of some specific type.
 data Vertex
-  = Package PackageName
-  | Module ModuleName
-  | Variable Name
+  = Package  { vertexName :: PackageName }
+  | Module   { vertexName :: ModuleName }
+  | Variable { vertexName :: Name }
   deriving (Eq, Ord, Show)
 
 -- | Render a 'ImportGraph' to a 'ByteString' in DOT notation.
 renderImportGraph :: ImportGraph -> ByteString
-renderImportGraph = export (defaultStyle friendlyName) . unImportGraph
+renderImportGraph = export (defaultStyle (friendlyName . vertexName)) . unImportGraph
 
 newtype ImportGraphing m (effects :: [* -> *]) a = ImportGraphing (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
@@ -63,7 +63,7 @@ instance ( Effectful m
         insertVertexName name
         o <- lookupEnv name
         case o >>= withSomeOrigin originModule . origin . unAddress of
-          Just ModuleInfo{..} -> modifyImportGraph (vertex name >< vertex moduleName <>)
+          Just ModuleInfo{..} -> modifyImportGraph (vertex (Variable name) >< vertex (Module moduleName) <>)
           Nothing -> pure ()
         pure ()
       _ -> pure ()
@@ -75,12 +75,12 @@ instance ( Effectful m
   analyzeModule recur m = do
     let name = moduleName (moduleInfo m)
     o <- raise ask
-    modifyImportGraph (packageVertex @term o >< vertex name <>)
+    modifyImportGraph (packageVertex @term o >< vertex (Module name) <>)
     insertVertexName name
     liftAnalyze analyzeModule recur m
 
 packageVertex :: SomeOrigin term -> ImportGraph
-packageVertex = maybe empty (vertex . packageName) . withSomeOrigin originPackage
+packageVertex = maybe empty (vertex . Package . packageName) . withSomeOrigin originPackage
 
 insertVertexName :: forall m location term value effects
                  .  ( Effectful m
@@ -92,8 +92,8 @@ insertVertexName :: forall m location term value effects
                  -> ImportGraphing m effects ()
 insertVertexName name = do
     o <- raise ask
-    let parent = maybe empty (vertex . moduleName) (withSomeOrigin (originModule @term) o)
-    modifyImportGraph (parent >< vertex name <>)
+    let parent = maybe empty (vertex . Module . moduleName) (withSomeOrigin (originModule @term) o)
+    modifyImportGraph (parent >< vertex (Module name) <>)
 
 (><) :: Graph a => a -> a -> a
 (><) = connect
