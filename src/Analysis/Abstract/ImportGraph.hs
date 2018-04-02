@@ -10,10 +10,14 @@ import qualified Algebra.Graph as G
 import           Algebra.Graph.Class
 import           Algebra.Graph.Export.Dot
 import           Control.Abstract.Analysis
+import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable (LoadError (..))
 import           Data.Abstract.FreeVariables
+import           Data.Abstract.Located
 import           Data.Abstract.Module
 import           Data.Abstract.Origin
+import qualified Data.Syntax as Syntax
+import           Data.Term
 import           Prologue hiding (empty)
 
 -- | The graph of function definitions to symbols used in a given program.
@@ -36,17 +40,28 @@ deriving instance MonadEvaluator location term value (m effects)   => MonadEvalu
 
 instance ( Effectful m
          , Member (Reader (SomeOrigin term)) effects
-         , Member (State ImportGraph) effects
-         , MonadAnalysis location term value (m effects)
          , Member (Resumable (LoadError term value)) effects
+         , Member (State ImportGraph) effects
+         , Member Syntax.Identifier syntax
+         , MonadAnalysis (Located location term) term value (m effects)
+         , term ~ Term (Union syntax) ann
          )
-      => MonadAnalysis location term value (ImportGraphing m effects) where
-  type Effects location term value (ImportGraphing m effects) = State ImportGraph ': Effects location term value (m effects)
+      => MonadAnalysis (Located location term) term value (ImportGraphing m effects) where
+  type Effects (Located location term) term value (ImportGraphing m effects) = State ImportGraph ': Effects (Located location term) term value (m effects)
 
-  analyzeTerm eval term = resumeException
-                            @(LoadError term value)
-                            (liftAnalyze analyzeTerm eval term)
-                            (\yield (LoadError name) -> insertVertexName name >> yield [])
+  analyzeTerm eval term@(In _ syntax) = do
+    case prj syntax of
+      Just (Syntax.Identifier name) -> do
+        o <- lookupEnv name -- (\ (Address (Located _ origin)) -> pure origin) name
+        case o >>= originModule . origin . unAddress of
+          Just ModuleInfo{..} -> modifyImportGraph (vertex moduleName >< vertex name <>)
+          Nothing -> pure ()
+        pure ()
+      _ -> pure ()
+    resumeException
+      @(LoadError term value)
+      (liftAnalyze analyzeTerm eval term)
+      (\yield (LoadError name) -> insertVertexName name >> yield [])
 
   analyzeModule recur m = do
     insertVertexName (moduleName (moduleInfo m))

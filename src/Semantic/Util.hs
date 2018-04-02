@@ -45,7 +45,7 @@ import qualified Language.TypeScript.Assignment as TypeScript
 -- Ruby
 evaluateRubyFile = evaluateWithPrelude rubyParser
 evaluateRubyFiles = evaluateFilesWithPrelude rubyParser
-evaluateRubyImportGraph paths = runAnalysis @(ImportGraphing (Evaluating Precise Ruby.Term (Value Precise))) . evaluateModules <$> parseFiles rubyParser paths
+evaluateRubyImportGraph paths = runAnalysis @(ImportGraphing (Evaluating (Located Precise Ruby.Term) Ruby.Term (Value (Located Precise Ruby.Term)))) . evaluateModules <$> parseFiles rubyParser paths
 evaluateRubyBadVariables paths = runAnalysis @(BadVariables (Evaluating Precise Ruby.Term (Value Precise))) . evaluateModules <$> parseFiles rubyParser paths
 
 -- Go
