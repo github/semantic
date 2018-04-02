@@ -12,14 +12,14 @@ spec = parallel $ do
   describe "evalutes TypeScript" $ do
     it "imports with aliased symbols" $ do
       env <- environment . snd <$> evaluate "main.ts"
-      env `shouldBe` [ (qualifiedName ["bar"], addr 0) ]
+      env `shouldBe` [ ("bar", addr 0) ]
 
     it "imports with qualified names" $ do
       env <- environment . snd <$> evaluate "main1.ts"
-      env `shouldBe` [ (qualifiedName ["b", "baz"], addr 0)
-                     , (qualifiedName ["b", "foo"], addr 2)
-                     , (qualifiedName ["z", "baz"], addr 0)
-                     , (qualifiedName ["z", "foo"], addr 2)
+      env `shouldBe` [ ("b.baz", addr 0) -- TODO
+                     , ("b.foo", addr 2)
+                     , ("z.baz", addr 0)
+                     , ("z.foo", addr 2)
                      ]
 
     it "side effect only imports" $ do

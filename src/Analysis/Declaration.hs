@@ -14,7 +14,6 @@ import Data.Record
 import Data.Source as Source
 import Data.Span
 import Data.Term
-import Data.Abstract.FreeVariables
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
@@ -161,7 +160,7 @@ stripQuotes = T.dropAround (`elem` ['"', '\''])
 instance (Syntax.Identifier :< fs, Expression.MemberAccess :< fs) => CustomHasDeclaration (Union fs) Expression.Call where
   customToDeclaration Blob{..} _ (Expression.Call _ (Term (In fromAnn fromF), _) _ _)
     | Just (Expression.MemberAccess (Term (In leftAnn leftF)) (Term (In idenAnn _))) <- prj fromF = Just $ CallReference (getSource idenAnn) (memberAccess leftAnn leftF)
-    | Just (Syntax.Identifier name) <- prj fromF = Just $ CallReference (T.decodeUtf8 (friendlyName name)) []
+    | Just (Syntax.Identifier name) <- prj fromF = Just $ CallReference (T.decodeUtf8 name) []
     | otherwise = Just $ CallReference (getSource fromAnn) []
     where
       memberAccess modAnn termFOut

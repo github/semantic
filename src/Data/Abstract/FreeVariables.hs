@@ -3,24 +3,9 @@ module Data.Abstract.FreeVariables where
 
 import Prologue
 import Data.Term
-import Data.ByteString (intercalate)
-import qualified Data.List.NonEmpty as NonEmpty
 
 -- | The type of variable names.
-type Name = NonEmpty ByteString
-
--- | Construct a qualified name from a 'ByteString'
-name :: ByteString -> Name
-name x = x :| []
-
--- | Construct a qualified name from a list of 'ByteString's
-qualifiedName :: [ByteString] -> Name
-qualifiedName = NonEmpty.fromList
-
--- | User friendly 'ByteString' of a qualified 'Name'.
-friendlyName :: Name -> ByteString
-friendlyName xs = intercalate "." (NonEmpty.toList xs)
-
+type Name = ByteString
 
 -- | The type of labels.
 --   TODO: This should be rolled into 'Name' and tracked in the environment, both so that we can abstract over labels like any other location, and so that we can garbage collect unreachable labels.
@@ -49,7 +34,7 @@ freeVariables1 = liftFreeVariables freeVariables
 freeVariable :: FreeVariables term => term -> Name
 freeVariable term = case freeVariables term of
   [n] -> n
-  xs -> Prelude.fail ("expected single free variable, but got: " <> show xs)
+  xs  -> error ("expected single free variable, but got: " <> show xs)
 
 instance (FreeVariables1 syntax, Functor syntax) => FreeVariables (Term syntax ann) where
   freeVariables = cata (liftFreeVariables id)

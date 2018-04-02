@@ -18,7 +18,7 @@ importPath str = let path = stripQuotes str in ImportPath (BC.unpack path)
   where stripQuotes = B.filter (`B.notElem` "\'\"")
 
 toName :: ImportPath -> Name
-toName = name . BC.pack . unPath
+toName = BC.pack . unPath
 
 resolveGoImport :: MonadEvaluatable term value m => FilePath -> m [M.ModuleName]
 resolveGoImport relImportPath = do

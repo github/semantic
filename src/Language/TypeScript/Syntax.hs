@@ -25,7 +25,7 @@ importPath str = let path = stripQuotes str in ImportPath (BC.unpack path) (path
                 | otherwise = NonRelative
 
 toName :: ImportPath -> Name
-toName = name . BC.pack . unPath
+toName = BC.pack . unPath
 
 resolveTypeScriptModule :: MonadEvaluatable term value m => ImportPath -> m M.ModuleName
 resolveTypeScriptModule (ImportPath path Relative)    = resolveRelativeTSModule path
@@ -166,7 +166,7 @@ instance Evaluatable QualifiedExportFrom where
     unit
     where
       cannotExport moduleName name = fail $
-        "module " <> show moduleName <> " does not export " <> show (friendlyName name)
+        "module " <> show moduleName <> " does not export " <> show name
 
 
 newtype DefaultExport a = DefaultExport { defaultExport :: a }

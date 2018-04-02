@@ -12,20 +12,20 @@ spec = parallel $ do
   describe "evalutes Python" $ do
     it "imports" $ do
       env <- environment . snd <$> evaluate "main.py"
-      env `shouldBe` [ (qualifiedName ["a", "foo"], addr 0)
-                     , (qualifiedName ["b", "c", "baz"], addr 1)
+      env `shouldBe` [ ("a.foo", addr 0) -- TODO
+                     , ("b.c.baz", addr 1)
                      ]
 
     it "imports with aliases" $ do
       env <- environment . snd <$> evaluate "main1.py"
-      env `shouldBe` [ (qualifiedName ["b", "foo"], addr 0)
-                     , (qualifiedName ["e", "baz"], addr 1)
+      env `shouldBe` [ ("b.foo", addr 0)
+                     , ("e.baz", addr 1)
                      ]
 
     it "imports using 'from' syntax" $ do
       env <- environment . snd <$> evaluate "main2.py"
-      env `shouldBe` [ (qualifiedName ["foo"], addr 0)
-                     , (qualifiedName ["bar"], addr 1)
+      env `shouldBe` [ ("foo", addr 0)
+                     , ("bar", addr 1)
                      ]
 
     it "subclasses" $ do
