@@ -28,6 +28,7 @@ originPackage _            = Nothing
 deriving instance Eq (Base term ()) => Eq (Origin term ty)
 deriving instance Show (Base term ()) => Show (Origin term ty)
 
+-- | Compare two origins with arbitrary type indices using a function to compare term functors.
 liftCompareOrigins :: (Base term () -> Base term () -> Ordering) -> Origin term ty1 -> Origin term ty2 -> Ordering
 liftCompareOrigins _ Unknown        Unknown        = EQ
 liftCompareOrigins _ Unknown        _              = LT
