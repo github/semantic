@@ -52,7 +52,7 @@ instance ( Effectful m
   analyzeTerm eval term@(In _ syntax) = do
     case prj syntax of
       Just (Syntax.Identifier name) -> do
-        o <- lookupEnv name -- (\ (Address (Located _ origin)) -> pure origin) name
+        o <- lookupEnv name
         case o >>= originModule . origin . unAddress of
           Just ModuleInfo{..} -> modifyImportGraph (vertex name >< vertex moduleName <>)
           Nothing -> pure ()
