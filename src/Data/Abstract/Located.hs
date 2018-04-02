@@ -10,7 +10,7 @@ import Prologue
 
 data Located location term = Located { location :: location, origin :: !(SomeOrigin term) }
 
-deriving instance (Eq location, Eq (Base term ())) => Eq (Located location term)
+deriving instance (Eq location, Ord (Base term ())) => Eq (Located location term)
 deriving instance (Ord location, Ord (Base term ())) => Ord (Located location term)
 deriving instance (Show location, Show (Base term ())) => Show (Located location term)
 

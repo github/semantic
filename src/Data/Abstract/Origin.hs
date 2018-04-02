@@ -28,13 +28,6 @@ originPackage _            = Nothing
 deriving instance Eq (Base term ()) => Eq (Origin term ty)
 deriving instance Show (Base term ()) => Show (Origin term ty)
 
-eqOrigins :: Eq (Base term ()) => Origin term ty1 -> Origin term ty2 -> Bool
-eqOrigins Unknown        Unknown        = True
-eqOrigins (Package p1)   (Package p2)   = p1 == p2
-eqOrigins (Module p1 m1) (Module p2 m2) = p1 == p2 && m1 == m2
-eqOrigins (Term m1 t1)   (Term m2 t2)   = m1 == m2 && t1 == t2
-eqOrigins _              _              = False
-
 compareOrigins :: Ord (Base term ()) => Origin term ty1 -> Origin term ty2 -> Ordering
 compareOrigins Unknown        Unknown        = EQ
 compareOrigins Unknown        _              = LT
@@ -68,8 +61,8 @@ termOrigin = SomeOrigin . Term Unknown . (() <$) . project
 withSomeOrigin :: (forall ty . Origin term ty -> b) -> SomeOrigin term -> b
 withSomeOrigin with (SomeOrigin o) = with o
 
-instance Eq (Base term ()) => Eq (SomeOrigin term) where
-  SomeOrigin o1 == SomeOrigin o2 = eqOrigins o1 o2
+instance Ord (Base term ()) => Eq (SomeOrigin term) where
+  SomeOrigin o1 == SomeOrigin o2 = compareOrigins o1 o2 == EQ
 
 instance Ord (Base term ()) => Ord (SomeOrigin term) where
   compare (SomeOrigin o1) (SomeOrigin o2) = compareOrigins o1 o2
