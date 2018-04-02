@@ -53,7 +53,7 @@ instance ( Effectful m
     case prj syntax of
       Just (Syntax.Identifier name) -> do
         o <- lookupEnv name
-        case o >>= originModule . origin . unAddress of
+        case o >>= withSomeOrigin originModule . origin . unAddress of
           Just ModuleInfo{..} -> modifyImportGraph (vertex name >< vertex moduleName <>)
           Nothing -> pure ()
         pure ()
@@ -77,7 +77,7 @@ insertVertexName :: forall m location term value effects
                  -> ImportGraphing m effects ()
 insertVertexName name = do
     o <- raise ask
-    let parent = maybe empty (vertex . moduleName) (originModule @term o)
+    let parent = maybe empty (vertex . moduleName) (withSomeOrigin (originModule @term) o)
     modifyImportGraph (parent >< vertex name <>)
 
 (><) :: Graph a => a -> a -> a
