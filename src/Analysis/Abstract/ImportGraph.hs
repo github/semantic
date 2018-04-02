@@ -16,9 +16,10 @@ import           Data.Abstract.FreeVariables
 import           Data.Abstract.Located
 import           Data.Abstract.Module
 import           Data.Abstract.Origin
+import           Data.Abstract.Package
 import qualified Data.Syntax as Syntax
 import           Data.Term
-import           Prologue hiding (empty)
+import           Prologue hiding (empty, packageName)
 
 -- | The graph of function definitions to symbols used in a given program.
 newtype ImportGraph = ImportGraph { unImportGraph :: G.Graph Name }
@@ -65,8 +66,14 @@ instance ( Effectful m
       (\yield (LoadError name) -> insertVertexName name >> yield [])
 
   analyzeModule recur m = do
-    insertVertexName (moduleName (moduleInfo m))
+    let name = moduleName (moduleInfo m)
+    o <- raise ask
+    modifyImportGraph (packageVertex @term o >< vertex name <>)
+    insertVertexName name
     liftAnalyze analyzeModule recur m
+
+packageVertex :: SomeOrigin term -> ImportGraph
+packageVertex = maybe empty vertex . (>>= packageName) . withSomeOrigin originPackage
 
 insertVertexName :: forall m location term value effects
                  .  ( Effectful m
