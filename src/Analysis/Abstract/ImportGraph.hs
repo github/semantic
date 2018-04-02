@@ -52,6 +52,7 @@ instance ( Effectful m
   analyzeTerm eval term@(In _ syntax) = do
     case prj syntax of
       Just (Syntax.Identifier name) -> do
+        insertVertexName name
         o <- lookupEnv name
         case o >>= withSomeOrigin originModule . origin . unAddress of
           Just ModuleInfo{..} -> modifyImportGraph (vertex name >< vertex moduleName <>)
