@@ -22,20 +22,21 @@ import           System.FilePath.Posix
 
 -- TODO: Model relative imports
 
-newtype QualifiedModuleName a = QualifiedModuleName { unQualifiedModuleName :: NonEmpty FilePath }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+newtype QualifiedModuleName = QualifiedModuleName { unQualifiedModuleName :: NonEmpty FilePath }
+  deriving (Eq, Ord, Show)
+  -- deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
-instance Eq1 QualifiedModuleName where liftEq = genericLiftEq
-instance Ord1 QualifiedModuleName where liftCompare = genericLiftCompare
-instance Show1 QualifiedModuleName where liftShowsPrec = genericLiftShowsPrec
+-- instance Eq1 QualifiedModuleName where liftEq = genericLiftEq
+-- instance Ord1 QualifiedModuleName where liftCompare = genericLiftCompare
+-- instance Show1 QualifiedModuleName where liftShowsPrec = genericLiftShowsPrec
 
-moduleName :: ByteString -> QualifiedModuleName a
+moduleName :: ByteString -> QualifiedModuleName
 moduleName x = QualifiedModuleName $ BC.unpack x :| []
 
-qualifiedModuleName :: [ByteString] -> QualifiedModuleName a
+qualifiedModuleName :: [ByteString] -> QualifiedModuleName
 qualifiedModuleName xs = QualifiedModuleName $ NonEmpty.fromList (BC.unpack <$> xs)
 
-friendlyName :: QualifiedModuleName a -> String
+friendlyName :: QualifiedModuleName -> String
 friendlyName (QualifiedModuleName xs) = intercalate "." (NonEmpty.toList xs)
 
 -- Python module resolution.
@@ -59,7 +60,7 @@ friendlyName (QualifiedModuleName xs) = intercalate "." (NonEmpty.toList xs)
 -- Subsequent imports of `parent.two` or `parent.three` will execute
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
-resolvePythonModules :: MonadEvaluatable term value m => QualifiedModuleName a -> m (NonEmpty M.ModuleName)
+resolvePythonModules :: MonadEvaluatable term value m => QualifiedModuleName -> m (NonEmpty M.ModuleName)
 resolvePythonModules q@(QualifiedModuleName qualifiedName) = do
   M.Module{..} <- currentModule
   let relRootDir = takeDirectory (makeRelative moduleRoot modulePath)
@@ -80,7 +81,7 @@ resolvePythonModules q@(QualifiedModuleName qualifiedName) = do
 -- | Import declarations (symbols are added directly to the calling environment).
 --
 -- If the list of symbols is empty copy everything to the calling environment.
-data Import a = Import { importFrom :: QualifiedModuleName a, importSymbols :: ![(Name, Name)] }
+data Import a = Import { importFrom :: QualifiedModuleName, importSymbols :: ![(Name, Name)] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Import where liftEq = genericLiftEq
@@ -108,7 +109,7 @@ instance Evaluatable Import where
         | otherwise = Env.overwrite xs importedEnv
 
 
-newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: QualifiedModuleName a }
+newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: QualifiedModuleName }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 QualifiedImport where liftEq = genericLiftEq
@@ -133,7 +134,7 @@ instance Evaluatable QualifiedImport where
         void $ go (NonEmpty.fromList xs)
         makeNamespace name addr []
 
-data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedModuleName a, qualifiedAliasedImportAlias :: !a }
+data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedModuleName, qualifiedAliasedImportAlias :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 QualifiedAliasedImport where liftEq = genericLiftEq
