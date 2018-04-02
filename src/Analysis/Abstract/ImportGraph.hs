@@ -75,12 +75,12 @@ instance ( Effectful m
   analyzeModule recur m = do
     let name = moduleName (moduleInfo m)
     o <- raise ask
-    modifyImportGraph (packageVertex @term o >< vertex (Module name) <>)
+    modifyImportGraph (packageGraph @term o >< vertex (Module name) <>)
     insertVertexName name
     liftAnalyze analyzeModule recur m
 
-packageVertex :: SomeOrigin term -> ImportGraph
-packageVertex = maybe empty (vertex . Package . packageName) . withSomeOrigin originPackage
+packageGraph :: SomeOrigin term -> ImportGraph
+packageGraph = maybe empty (vertex . Package . packageName) . withSomeOrigin originPackage
 
 insertVertexName :: forall m location term value effects
                  .  ( Effectful m
