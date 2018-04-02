@@ -12,6 +12,7 @@ module Data.Abstract.Evaluatable
 , evaluateModules
 , throwLoadError
 , resolve
+, listModulesInDir
 , require
 , load
 ) where
@@ -108,12 +109,18 @@ instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
   eval = maybe unit (runApp . foldMap1 (App . subtermValue)) . nonEmpty
 
+-- Resolve a list of module paths to a possible module table entry.
 resolve :: MonadEvaluatable term value m
         => [ModuleName]
         -> m (Maybe ModuleName)
 resolve names = do
   tbl <- askModuleTable
   pure $ find (`moduleTableMember` tbl) names
+
+listModulesInDir :: MonadEvaluatable term value m
+        => FilePath
+        -> m [ModuleName]
+listModulesInDir dir = moduleTableKeysForDir dir <$> askModuleTable
 
 -- | Require/import another module by name and return it's environment and value.
 --

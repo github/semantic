@@ -2,13 +2,12 @@
 module Language.Go.Syntax where
 
 import Data.Abstract.Evaluatable hiding (Label)
-import Data.Abstract.Environment as Env
 import qualified Data.Abstract.Module as M
 import Diffing.Algorithm
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString as B
+import System.FilePath.Posix
 import Prologue
-import Prelude hiding (fail)
 
 newtype ImportPath = ImportPath { unPath :: FilePath }
   deriving (Eq, Ord, Show)
@@ -17,21 +16,20 @@ importPath :: ByteString -> ImportPath
 importPath str = let path = stripQuotes str in ImportPath (BC.unpack path)
   where stripQuotes = B.filter (`B.notElem` "\'\"")
 
-toName :: ImportPath -> Name
-toName = BC.pack . unPath
+defaultAlias :: ImportPath -> Name
+defaultAlias = BC.pack . takeFileName . unPath
 
+-- TODO: need to delineate between relative and absolute Go imports
 resolveGoImport :: MonadEvaluatable term value m => FilePath -> m [M.ModuleName]
 resolveGoImport relImportPath = do
-  -- TODO: This is where we need to enumerator all files in the right dir.
-  maybeModule <- resolve [relImportPath]
-  maybe notFound (pure . pure) maybeModule
-  where
-    notFound = fail $ "Unable to resolve module import: " <> show relImportPath
+  M.Module{..} <- currentModule
+  let relRootDir = takeDirectory (makeRelative moduleRoot modulePath)
+  listModulesInDir $ normalise (relRootDir </> normalise relImportPath)
 
 -- | Import declarations (symbols are added directly to the calling environment).
 --
 -- If the list of symbols is empty copy everything to the calling environment.
-data Import a = Import { importFrom :: ImportPath, importSymbols :: ![(Name, Name)], importWildcardToken :: !a }
+data Import a = Import { importFrom :: ImportPath, importWildcardToken :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Import where liftEq = genericLiftEq
@@ -39,22 +37,18 @@ instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
-  eval (Import (ImportPath name) xs _) = do
+  eval (Import (ImportPath name) _) = do
     paths <- resolveGoImport name
     for_ paths $ \path -> do
       (importedEnv, _) <- isolate (require path)
-      modifyEnv (mappend (renamed importedEnv))
+      modifyEnv (mappend importedEnv)
     unit
-    where
-      renamed importedEnv
-        | Prologue.null xs = importedEnv
-        | otherwise = Env.overwrite xs importedEnv
 
 
 -- | Qualified Import declarations (symbols are qualified in calling environment).
 --
 -- If the list of symbols is empty copy and qualify everything to the calling environment.
-data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: !ImportPath, qualifiedImportAlias :: !a, qualifiedImportSymbols :: ![(Name, Name)]}
+data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: !ImportPath, qualifiedImportAlias :: !a}
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 QualifiedImport where liftEq = genericLiftEq
@@ -62,19 +56,16 @@ instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
 instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedImport where
-  eval (QualifiedImport (ImportPath name) alias xs) = do
+  eval (QualifiedImport (ImportPath name) aliasTerm) = do
     paths <- resolveGoImport name
-    for_ paths $ \path -> do
-      (importedEnv, _) <- isolate (require path)
-      modifyEnv (mappend (Env.overwrite (renames importedEnv) importedEnv))
-    unit
-    where
-      renames importedEnv
-        | Prologue.null xs = fmap prepend (Env.names importedEnv)
-        | otherwise = xs
-      prefix = freeVariable (subterm alias)
-      prepend n = (n, prefix <> n)
+    let alias = freeVariable (subterm aliasTerm)
+    void $ letrec' alias $ \addr -> do
+      for_ paths $ \path -> do
+        (importedEnv, _) <- isolate (require path)
+        modifyEnv (mappend importedEnv)
 
+      makeNamespace alias addr []
+    unit
 
 -- | Side effect only imports (no symbols made available to the calling environment).
 data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: !ImportPath, sideEffectImportToken :: !a }

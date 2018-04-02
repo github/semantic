@@ -5,6 +5,7 @@ module Data.Abstract.ModuleTable
 , moduleTableLookup
 , moduleTableMember
 , moduleTableInsert
+, moduleTableKeysForDir
 , fromList
 ) where
 
@@ -12,6 +13,7 @@ import Data.Abstract.Module
 import qualified Data.Map as Map
 import Data.Semigroup
 import Prologue
+import System.FilePath.Posix
 import GHC.Generics (Generic1)
 
 newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModuleName a }
@@ -25,6 +27,9 @@ moduleTableMember k = Map.member k . unModuleTable
 
 moduleTableInsert :: ModuleName -> a -> ModuleTable a -> ModuleTable a
 moduleTableInsert k v = ModuleTable . Map.insert k v . unModuleTable
+
+moduleTableKeysForDir :: FilePath -> ModuleTable a -> [ModuleName]
+moduleTableKeysForDir k = filter (\e -> k == takeDirectory e) . Map.keys . unModuleTable
 
 
 -- | Construct a 'ModuleTable' from a list of 'Module's.
