@@ -101,35 +101,36 @@ instance Evaluatable Import where
         | Prologue.null symbols = importedEnv
         | otherwise = Env.overwrite symbols importedEnv
 
-
-data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: ImportPath, qualifiedImportAlias :: !a, qualifiedImportSymbols :: ![(Name, Name)]}
+data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: ImportPath, qualifiedAliasedImportAlias :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
-instance Eq1 QualifiedImport where liftEq = genericLiftEq
-instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
-instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 QualifiedAliasedImport where liftEq = genericLiftEq
+instance Ord1 QualifiedAliasedImport where liftCompare = genericLiftCompare
+instance Show1 QualifiedAliasedImport where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable QualifiedImport where
-  eval (QualifiedImport importPath alias symbols) = do
+instance Evaluatable QualifiedAliasedImport where
+  eval (QualifiedAliasedImport importPath aliasTerm) = do
     modulePath <- resolveTypeScriptModule importPath
-    (importedEnv, _) <- isolate (require modulePath)
-    modifyEnv (mappend (Env.overwrite (renames importedEnv) importedEnv)) *> unit
-    where
-      renames importedEnv
-        | Prologue.null symbols = fmap prepend (Env.names importedEnv)
-        | otherwise = symbols
-      prefix = freeVariable (subterm alias)
-      prepend n = (n, prefix <> n)
+    let alias = freeVariable (subterm aliasTerm)
+    letrec' alias $ \addr -> do
+      (importedEnv, _) <- isolate (require modulePath)
+      modifyEnv (mappend importedEnv)
+      void $ makeNamespace alias addr []
+      unit
 
-
-data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: ImportPath, sideEffectImportToken :: !a }
+newtype SideEffectImport a = SideEffectImport { sideEffectImportFrom :: ImportPath }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 SideEffectImport where liftEq = genericLiftEq
 instance Ord1 SideEffectImport where liftCompare = genericLiftCompare
 instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable SideEffectImport
+instance Evaluatable SideEffectImport where
+  eval (SideEffectImport importPath) = do
+    modulePath <- resolveTypeScriptModule importPath
+    void $ isolate (require modulePath)
+    unit
+
 
 -- | Qualified Export declarations
 newtype QualifiedExport a = QualifiedExport { qualifiedExportSymbols :: [(Name, Name)] }

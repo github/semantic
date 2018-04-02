@@ -158,7 +158,7 @@ type Syntax = '[
   , TypeScript.Syntax.ComputedPropertyName
   , TypeScript.Syntax.Decorator
   , TypeScript.Syntax.Import
-  , TypeScript.Syntax.QualifiedImport
+  , TypeScript.Syntax.QualifiedAliasedImport
   , TypeScript.Syntax.SideEffectImport
   , TypeScript.Syntax.DefaultExport
   , TypeScript.Syntax.QualifiedExport
@@ -634,15 +634,15 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
                 <|> makeTerm' <$> symbol Grammar.ImportStatement <*> children (requireImport <|> sideEffectImport)
   where
     -- `import foo = require "./foo"`
-    requireImport = inj <$> (symbol Grammar.ImportRequireClause *> children (flip TypeScript.Syntax.QualifiedImport <$> term identifier <*> fromClause <*> pure []))
+    requireImport = inj <$> (symbol Grammar.ImportRequireClause *> children (flip TypeScript.Syntax.QualifiedAliasedImport <$> term identifier <*> fromClause))
     -- `import "./foo"`
-    sideEffectImport = inj <$> (TypeScript.Syntax.SideEffectImport <$> fromClause <*> emptyTerm)
+    sideEffectImport = inj <$> (TypeScript.Syntax.SideEffectImport <$> fromClause)
     -- `import { bar } from "./foo"`
-    namedImport = (,,,) <$> pure Prelude.False <*> pure Nothing <*> (symbol Grammar.NamedImports *> children (many importSymbol)) <*> emptyTerm
+    namedImport = (,,,) Prelude.False Nothing <$> (symbol Grammar.NamedImports *> children (many importSymbol)) <*> emptyTerm
     -- `import defaultMember from "./foo"`
-    defaultImport =  (,,,) <$> pure Prelude.False <*> pure Nothing <*> (pure <$> (makeNameAliasPair <$> rawIdentifier <*> pure Nothing)) <*> emptyTerm
+    defaultImport =  (,,,) Prelude.False Nothing <$> (pure <$> (makeNameAliasPair <$> rawIdentifier <*> pure Nothing)) <*> emptyTerm
     -- `import * as name from "./foo"`
-    namespaceImport = symbol Grammar.NamespaceImport *> children ((,,,) <$> pure Prelude.True <*> (Just <$> term identifier) <*> pure [] <*> emptyTerm)
+    namespaceImport = symbol Grammar.NamespaceImport *> children ((,,,) Prelude.True <$> (Just <$> term identifier) <*> pure [] <*> emptyTerm)
 
     -- Combinations of the above.
     importClause = symbol Grammar.ImportClause *>
@@ -652,8 +652,8 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
         <|> ((\a b -> [a, b]) <$> defaultImport <*> (namedImport <|> namespaceImport))
         <|> (pure <$> defaultImport))
 
-    makeImportTerm1 loc from (Prelude.True, Just alias, symbols, _) = makeTerm loc (TypeScript.Syntax.QualifiedImport from alias symbols)
-    makeImportTerm1 loc from (Prelude.True, Nothing, symbols, _) = makeTerm loc (TypeScript.Syntax.QualifiedImport from (makeTerm loc (Syntax.Identifier (TypeScript.Syntax.toName from))) symbols)
+    makeImportTerm1 loc from (Prelude.True, Just alias, _, _) = makeTerm loc (TypeScript.Syntax.QualifiedAliasedImport from alias)
+    makeImportTerm1 loc from (Prelude.True, Nothing, symbols, extra) = makeTerm loc (TypeScript.Syntax.Import from symbols extra)
     makeImportTerm1 loc from (_, _, symbols, extra) = makeTerm loc (TypeScript.Syntax.Import from symbols extra)
     makeImportTerm loc ([x], from) = makeImportTerm1 loc from x
     makeImportTerm loc (xs, from) = makeTerm loc $ fmap (makeImportTerm1 loc from) xs
