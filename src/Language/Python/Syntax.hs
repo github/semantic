@@ -87,6 +87,9 @@ instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
+-- from a import b
+-- from a import b as c
+-- from a import *
 instance Evaluatable Import where
   eval (Import name xs) = do
     modulePaths <- resolvePythonModules name
