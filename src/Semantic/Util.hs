@@ -45,7 +45,7 @@ import qualified Language.TypeScript.Assignment as TypeScript
 -- Ruby
 evaluateRubyFile = evaluateWithPrelude rubyParser
 evaluateRubyFiles = evaluateFilesWithPrelude rubyParser
-evaluateRubyImportGraph paths = runAnalysis @(ImportGraphing (Caching (Evaluating (Located Monovariant Ruby.Term) Ruby.Term Type))) . evaluateModules <$> parseFiles rubyParser paths
+evaluateRubyImportGraph paths = runAnalysis @(ImportGraphing (Evaluating (Located Precise Ruby.Term) Ruby.Term (Value (Located Precise Ruby.Term)))) . evaluateModules <$> parseFiles rubyParser paths
 evaluateRubyBadVariables paths = runAnalysis @(BadVariables (Evaluating Precise Ruby.Term (Value Precise))) . evaluateModules <$> parseFiles rubyParser paths
 
 -- Go
@@ -56,7 +56,7 @@ typecheckGoFile path = runAnalysis @(Caching (Evaluating Monovariant Go.Term Typ
 -- Python
 evaluatePythonFile = evaluateWithPrelude pythonParser
 evaluatePythonFiles = evaluateFilesWithPrelude pythonParser
-evaluatePythonImportGraph name paths = runAnalysis @(ImportGraphing (Caching (Evaluating (Located Monovariant Python.Term) Python.Term Type))) . evaluatePackage <$> parsePackage name pythonParser paths
+evaluatePythonImportGraph paths = runAnalysis @(ImportGraphing (Evaluating (Located Precise Python.Term) Python.Term (Value (Located Precise Python.Term)))) . evaluateModules <$> parseFiles pythonParser paths
 typecheckPythonFile path = runAnalysis @(Caching (Evaluating Monovariant Python.Term Type)) . evaluateModule <$> parseFile pythonParser Nothing path
 tracePythonFile path = runAnalysis @(Tracing [] (Evaluating Precise Python.Term (Value Precise))) . evaluateModule <$> parseFile pythonParser Nothing path
 evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] (Evaluating Precise Python.Term (Value Precise)))) . evaluateModule <$> parseFile pythonParser Nothing path
