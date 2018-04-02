@@ -12,6 +12,7 @@ data Origin term ty where
   Module  :: Origin term 'P -> M.ModuleInfo  -> Origin term 'M
   Term    :: Origin term 'M -> Base term ()  -> Origin term 'T
 
+-- | Project the 'ModuleInfo' out of an 'Origin', if available.
 originModule :: Origin term ty -> Maybe M.ModuleInfo
 originModule (Term o _)   = originModule o
 originModule (Module _ m) = Just m
