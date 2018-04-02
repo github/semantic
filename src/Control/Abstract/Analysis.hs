@@ -14,9 +14,9 @@ import Control.Abstract.Evaluator as X
 import Control.Abstract.Value as X
 import Control.Effect as X
 import Control.Effect.Fresh as X
-import Control.Effect.NonDet as X
 import qualified Control.Monad.Effect as Effect
 import Control.Monad.Effect.Fail as X
+import Control.Monad.Effect.NonDet as X
 import Control.Monad.Effect.Reader as X
 import Control.Monad.Effect.State as X
 import Control.Monad.Effect.Resumable as X
