@@ -20,9 +20,9 @@ defaultAlias :: ImportPath -> Name
 defaultAlias = BC.pack . takeFileName . unPath
 
 -- TODO: need to delineate between relative and absolute Go imports
-resolveGoImport :: MonadEvaluatable term value m => FilePath -> m [M.ModuleName]
+resolveGoImport :: MonadEvaluatable location term value m => FilePath -> m [M.ModuleName]
 resolveGoImport relImportPath = do
-  M.Module{..} <- currentModule
+  M.ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory (makeRelative moduleRoot modulePath)
   listModulesInDir $ normalise (relRootDir </> normalise relImportPath)
 

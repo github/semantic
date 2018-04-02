@@ -21,6 +21,8 @@ import           System.FilePath.Posix
 -- 3. Parameterize and use eval (Evaluatable instance) and `subtermValue x >>= asString` in syntaxes like QualifiedImport
 
 -- TODO: Model relative imports
+-- import .a
+-- import ..a
 
 newtype QualifiedModuleName = QualifiedModuleName { unQualifiedModuleName :: NonEmpty FilePath }
   deriving (Eq, Ord, Show)
@@ -60,9 +62,9 @@ friendlyName (QualifiedModuleName xs) = intercalate "." (NonEmpty.toList xs)
 -- Subsequent imports of `parent.two` or `parent.three` will execute
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
-resolvePythonModules :: MonadEvaluatable term value m => QualifiedModuleName -> m (NonEmpty M.ModuleName)
+resolvePythonModules :: MonadEvaluatable location term value m => QualifiedModuleName -> m (NonEmpty M.ModuleName)
 resolvePythonModules q@(QualifiedModuleName qualifiedName) = do
-  M.Module{..} <- currentModule
+  M.ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory (makeRelative moduleRoot modulePath)
   for (moduleNames qualifiedName) $ \name -> do
     go relRootDir name

@@ -15,7 +15,7 @@ import Analysis.Abstract.Evaluating as X (EvaluatingState(..))
 import Data.Abstract.Address as X
 import Data.Abstract.FreeVariables as X hiding (dropExtension)
 import Data.Abstract.Heap as X
-import Data.Abstract.ModuleTable as X
+import Data.Abstract.ModuleTable as X hiding (lookup)
 import Data.Blob as X
 import Data.Functor.Listable as X
 import Data.Language as X

@@ -4,7 +4,7 @@ module Language.Ruby.Syntax where
 import           Control.Monad (unless)
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Module as M
-import           Data.Abstract.ModuleTable
+import           Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Path
 import qualified Data.ByteString.Char8 as BC
 import           Diffing.Algorithm
@@ -16,14 +16,14 @@ import           System.FilePath.Posix
 -- TODO: Fully sort out ruby require/load mechanics
 --
 -- require "json"
-resolveRubyName :: MonadEvaluatable term value m => ByteString -> m M.ModuleName
+resolveRubyName :: MonadEvaluatable location term value m => ByteString -> m M.ModuleName
 resolveRubyName n = resolve [name <.> "rb"] >>= maybeFail notFound
   where name = toName n
         notFound = "Unable to resolve: " <> name
         toName = BC.unpack . dropRelativePrefix . stripQuotes
 
 -- load "/root/src/file.rb"
-resolveRubyPath :: MonadEvaluatable term value m => ByteString -> m M.ModuleName
+resolveRubyPath :: MonadEvaluatable location term value m => ByteString -> m M.ModuleName
 resolveRubyPath n = resolve [name] >>= maybeFail notFound
   where name = toName n
         notFound = "Unable to resolve: " <> name
@@ -44,14 +44,14 @@ instance Evaluatable Require where
     modifyEnv (mappend importedEnv)
     pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
-doRequire :: MonadEvaluatable term value m
+doRequire :: MonadEvaluatable location term value m
           => ModuleName
-          -> m (EnvironmentFor value, value)
+          -> m (Environment location value, value)
 doRequire name = do
   moduleTable <- getModuleTable
-  case moduleTableLookup name moduleTable of
+  case ModuleTable.lookup name moduleTable of
     Nothing       -> (,) . fst <$> load name <*> boolean True
-    Just (env, _) -> (,) env                 <$> boolean False
+    Just (env, _) -> (,) env   <$>               boolean False
 
 
 newtype Load a = Load { loadArgs :: [a] }
@@ -71,7 +71,7 @@ instance Evaluatable Load where
     doLoad path shouldWrap
   eval (Load _) = fail "invalid argument supplied to load, path is required"
 
-doLoad :: MonadEvaluatable term value m => ByteString -> Bool -> m value
+doLoad :: MonadEvaluatable location term value m => ByteString -> Bool -> m value
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   (importedEnv, _) <- isolate (load path')

@@ -34,13 +34,13 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
-resolvePHPName :: MonadEvaluatable term value m => ByteString -> m M.ModuleName
+resolvePHPName :: MonadEvaluatable location term value m => ByteString -> m M.ModuleName
 resolvePHPName n = resolve [name] >>= maybeFail notFound
   where name = toName n
         notFound = "Unable to resolve: " <> name
         toName = BC.unpack . dropRelativePrefix . stripQuotes
 
-doInclude :: MonadEvaluatable term value m => Subterm t (m value) -> m value
+doInclude :: MonadEvaluatable location term value m => Subterm t (m value) -> m value
 doInclude pathTerm = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
@@ -48,7 +48,7 @@ doInclude pathTerm = do
   modifyEnv (mappend importedEnv)
   pure v
 
-doIncludeOnce :: MonadEvaluatable term value m => Subterm t (m value) -> m value
+doIncludeOnce :: MonadEvaluatable location term value m => Subterm t (m value) -> m value
 doIncludeOnce pathTerm = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name

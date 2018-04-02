@@ -22,7 +22,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Function where
   eval Function{..} = do
-    (v, addr) <- letrec name (abstract (paramNames functionParameters) functionBody)
+    (v, addr) <- letrec name (lambda (paramNames functionParameters) functionBody)
     modifyEnv (Env.insert name addr)
     pure v
     where paramNames = foldMap (freeVariables . subterm)
@@ -43,7 +43,7 @@ instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 -- local environment.
 instance Evaluatable Method where
   eval Method{..} = do
-    (v, addr) <- letrec name (abstract (paramNames methodParameters) methodBody)
+    (v, addr) <- letrec name (lambda (paramNames methodParameters) methodBody)
     modifyEnv (Env.insert name addr)
     pure v
     where paramNames = foldMap (freeVariables . subterm)
