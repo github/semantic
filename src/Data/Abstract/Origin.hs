@@ -18,6 +18,7 @@ originModule (Term o _)   = originModule o
 originModule (Module _ m) = Just m
 originModule _            = Nothing
 
+-- | Project the 'PackageInfo' out of an 'Origin', if available.
 originPackage :: Origin term ty -> Maybe P.PackageInfo
 originPackage (Term o _)   = originPackage o
 originPackage (Module o _) = originPackage o
