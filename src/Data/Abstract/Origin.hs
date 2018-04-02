@@ -20,10 +20,10 @@ moduleOrigin = SomeOrigin . Module Unknown . M.moduleInfo
 termOrigin :: Recursive term => term -> SomeOrigin term
 termOrigin = SomeOrigin . Term Unknown . (() <$) . project
 
-originModule :: SomeOrigin term -> Maybe M.ModuleInfo
-originModule (SomeOrigin (Term (Module _ m) _)) = Just m
-originModule (SomeOrigin (Module _ m))          = Just m
-originModule _                                  = Nothing
+originModule :: Origin term ty -> Maybe M.ModuleInfo
+originModule (Term o _)   = originModule o
+originModule (Module _ m) = Just m
+originModule _            = Nothing
 
 deriving instance Eq (Base term ()) => Eq (Origin term ty)
 deriving instance Show (Base term ()) => Show (Origin term ty)
