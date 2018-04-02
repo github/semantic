@@ -1,7 +1,6 @@
 {-# LANGUAGE OverloadedLists #-}
 module Analysis.PHP.Spec (spec) where
 
-import Data.Abstract.Value
 import SpecHelpers
 
 
@@ -31,11 +30,5 @@ spec = parallel $ do
       heapLookup (Address (Precise 2)) (heap res) `shouldBe` ns "Sub2" [ ("f", addr 3) ]
 
   where
-    ns n = Just . Latest . Just . injValue . Namespace n
-    addr = Address . Precise
     fixtures = "test/fixtures/php/analysis/"
-    evaluate entry = evaluateFiles phpParser (takeDirectory entry)
-      [ fixtures <> entry
-      , fixtures <> "foo.php"
-      , fixtures <> "bar.php"
-      ]
+    evaluate entry = evalPHPProject (fixtures <> entry)

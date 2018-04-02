@@ -5,6 +5,8 @@ module SpecHelpers (
 , parseFilePath
 , readFilePair
 , readFileVerbatim
+, addr
+, ns
 , verbatim
 , Verbatim(..)
 , ) where
@@ -44,7 +46,7 @@ import Test.LeanCheck as X
 
 import qualified Data.ByteString as B
 import qualified Semantic.IO as IO
-
+import Data.Abstract.Value
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO ByteString
@@ -52,7 +54,7 @@ diffFilePaths paths = readFilePair paths >>= runTask . diffBlobPair SExpressionD
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFilePath :: FilePath -> IO ByteString
-parseFilePath path = IO.readFile path (IO.languageForFilePath path) >>= pure . fromJust >>= runTask . parseBlob SExpressionTermRenderer
+parseFilePath path = (fromJust <$> IO.readFile path (IO.languageForFilePath path)) >>= runTask . parseBlob SExpressionTermRenderer
 
 -- | Read two files to a BlobPair.
 readFilePair :: Both FilePath -> IO BlobPair
@@ -61,6 +63,9 @@ readFilePair paths = let paths' = fmap (\p -> (p, IO.languageForFilePath p)) pat
 
 readFileVerbatim :: FilePath -> IO Verbatim
 readFileVerbatim = fmap verbatim . B.readFile
+
+ns n = Just . Latest . Just . injValue . Namespace n
+addr = Address . Precise
 
 newtype Verbatim = Verbatim ByteString
   deriving (Eq)

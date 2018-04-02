@@ -59,7 +59,7 @@ tracePythonFile path = runAnalysis @(Tracing [] (Evaluating Python.Term Value)) 
 evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] (Evaluating Python.Term Value))) . evaluateModule <$> parseFile pythonParser Nothing path
 
 -- PHP
-evalPHP = evaluateProject phpParser ["php"]
+evalPHPProject = evaluateProject phpParser ["php"]
 evalPHPFile = evaluateFile phpParser
 
 -- TypeScript
