@@ -82,6 +82,9 @@ instance ( Effectful m
 packageGraph :: SomeOrigin term -> ImportGraph
 packageGraph = maybe empty (vertex . Package . packageName) . withSomeOrigin originPackage
 
+moduleGraph :: SomeOrigin term -> ImportGraph
+moduleGraph = maybe empty (vertex . Module . moduleName) . withSomeOrigin originModule
+
 insertVertexName :: forall m location term value effects
                  .  ( Effectful m
                     , Member (Reader (SomeOrigin term)) effects
@@ -92,8 +95,7 @@ insertVertexName :: forall m location term value effects
                  -> ImportGraphing m effects ()
 insertVertexName name = do
     o <- raise ask
-    let parent = maybe empty (vertex . Module . moduleName) (withSomeOrigin (originModule @term) o)
-    modifyImportGraph (parent >< vertex (Module name) <>)
+    modifyImportGraph (moduleGraph @term o >< vertex (Module name) <>)
 
 (><) :: Graph a => a -> a -> a
 (><) = connect
