@@ -25,6 +25,12 @@ originModule (Term o _)   = originModule o
 originModule (Module _ m) = Just m
 originModule _            = Nothing
 
+originPackage :: Origin term ty -> Maybe P.PackageInfo
+originPackage (Term o _)   = originPackage o
+originPackage (Module o _) = originPackage o
+originPackage (Package p)  = Just p
+originPackage _            = Nothing
+
 deriving instance Eq (Base term ()) => Eq (Origin term ty)
 deriving instance Show (Base term ()) => Show (Origin term ty)
 
