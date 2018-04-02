@@ -7,7 +7,7 @@ import SpecHelpers
 
 spec :: Spec
 spec = parallel $ do
-  describe "evalutes Go" $ do
+  describe "evaluates Go" $ do
     it "imports and wildcard imports" $ do
       env <- environment . snd <$> evaluate "main.go"
       env `shouldBe` [ ("foo.New", addr 0) -- TODO?
