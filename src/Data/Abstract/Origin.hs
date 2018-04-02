@@ -64,6 +64,7 @@ moduleOrigin = SomeOrigin . Module Unknown . M.moduleInfo
 termOrigin :: Recursive term => term -> SomeOrigin term
 termOrigin = SomeOrigin . Term Unknown . (() <$) . project
 
+-- | Project information out of a 'SomeOrigin' using a helper function.
 withSomeOrigin :: (forall ty . Origin term ty -> b) -> SomeOrigin term -> b
 withSomeOrigin with (SomeOrigin o) = with o
 
