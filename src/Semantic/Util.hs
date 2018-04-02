@@ -14,6 +14,7 @@ import Control.Abstract.Analysis
 import Control.Monad.IO.Class
 import Data.Abstract.Evaluatable hiding (head)
 import Data.Abstract.Address
+import Data.Abstract.Located
 import Data.Abstract.Module
 import Data.Abstract.Package as Package
 import Data.Abstract.Type
@@ -55,6 +56,7 @@ typecheckGoFile path = runAnalysis @(Caching (Evaluating Monovariant Go.Term Typ
 -- Python
 evaluatePythonFile = evaluateWithPrelude pythonParser
 evaluatePythonFiles = evaluateFilesWithPrelude pythonParser
+evaluatePythonImportGraph paths = runAnalysis @(ImportGraphing (Evaluating (Located Precise Python.Term) Python.Term (Value (Located Precise Python.Term)))) . evaluateModules <$> parseFiles pythonParser paths
 typecheckPythonFile path = runAnalysis @(Caching (Evaluating Monovariant Python.Term Type)) . evaluateModule <$> parseFile pythonParser Nothing path
 tracePythonFile path = runAnalysis @(Tracing [] (Evaluating Precise Python.Term (Value Precise))) . evaluateModule <$> parseFile pythonParser Nothing path
 evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] (Evaluating Precise Python.Term (Value Precise)))) . evaluateModule <$> parseFile pythonParser Nothing path
