@@ -54,7 +54,7 @@ instance ( Effectful m
       Just (Syntax.Identifier name) -> do
         o <- lookupEnv name -- (\ (Address (Located _ origin)) -> pure origin) name
         case o >>= originModule . origin . unAddress of
-          Just ModuleInfo{..} -> modifyImportGraph (vertex moduleName >< vertex name <>)
+          Just ModuleInfo{..} -> modifyImportGraph (vertex name >< vertex moduleName <>)
           Nothing -> pure ()
         pure ()
       _ -> pure ()
