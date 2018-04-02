@@ -185,6 +185,7 @@ evaluatePackage :: ( Effectful m
                 -> m effects [value]
 evaluatePackage p = pushOrigin (packageOrigin p) (evaluatePackageBody (packageBody p))
 
+-- | Evaluate a given package body (module table and entry points).
 evaluatePackageBody :: MonadEvaluatable location term value m
                     => PackageBody term
                     -> m [value]
