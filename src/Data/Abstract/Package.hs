@@ -29,7 +29,7 @@ data PackageBody term = PackageBody
   }
   deriving (Eq, Functor, Ord, Show)
 
-fromModules :: [Module term] -> Package term
-fromModules []     = Package (PackageInfo Nothing Nothing) (PackageBody mempty mempty)
-fromModules (m:ms) = Package (PackageInfo Nothing Nothing) (PackageBody (ModuleTable.fromModules (m:ms)) entryPoints)
+fromModules :: [Module term] -> PackageBody term
+fromModules []     = PackageBody mempty mempty
+fromModules (m:ms) = PackageBody (ModuleTable.fromModules (m:ms)) entryPoints
   where entryPoints = ModuleTable.singleton (moduleName (moduleInfo m)) Nothing

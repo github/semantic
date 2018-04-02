@@ -172,13 +172,10 @@ evaluateModule :: MonadEvaluatable location term value m
 evaluateModule m = analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evaluateTerm) m)
 
 -- | Evaluate with a list of modules in scope, taking the head module as the entry point.
-evaluateModules :: ( Effectful m
-                   , Member (Reader (SomeOrigin term)) effects
-                   , MonadEvaluatable location term value (m effects)
-                   )
+evaluateModules :: MonadEvaluatable location term value m
                 => [Module term]
-                -> m effects value
-evaluateModules = fmap Prelude.head . evaluatePackage . Package.fromModules
+                -> m value
+evaluateModules = fmap Prelude.head . evaluatePackageBody . Package.fromModules
 
 evaluatePackage :: ( Effectful m
                    , Member (Reader (SomeOrigin term)) effects
