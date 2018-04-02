@@ -73,11 +73,7 @@
   (DefaultExport
   { (TextElement)
   ->(TextElement) })
-{ (QualifiedExportFrom
-  {-(Identifier)-})
-->(QualifiedExportFrom
-  {+(Identifier)+}) }
-{ (QualifiedExportFrom
-  {-(Identifier)-})
-->(QualifiedExportFrom
-  {+(Identifier)+}) })
+{ (QualifiedExportFrom)
+->(QualifiedExportFrom) }
+{ (QualifiedExportFrom)
+->(QualifiedExportFrom) })

@@ -62,10 +62,8 @@
 {+(QualifiedExport)+}
 {+(DefaultExport
   {+(TextElement)+})+}
-{+(QualifiedExportFrom
-  {+(Identifier)+})+}
-{+(QualifiedExportFrom
-  {+(Identifier)+})+}
+{+(QualifiedExportFrom)+}
+{+(QualifiedExportFrom)+}
 {-(DefaultExport
   {-(Function
     {-(Empty)-}
@@ -75,7 +73,5 @@
 {-(QualifiedExport)-}
 {-(DefaultExport
   {-(TextElement)-})-}
-{-(QualifiedExportFrom
-  {-(Identifier)-})-}
-{-(QualifiedExportFrom
-  {-(Identifier)-})-})
+{-(QualifiedExportFrom)-}
+{-(QualifiedExportFrom)-})
