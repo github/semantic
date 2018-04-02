@@ -60,7 +60,7 @@ instance ( Alternative m
          , Reducer Type (Cell location Type)
          )
       => MonadValue location Type m where
-  abstract names (Subterm _ body) = do
+  lambda names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
       tvar <- Var <$> fresh
@@ -118,7 +118,7 @@ instance ( Alternative m
     (Int, Float) ->                     pure Int
     _                 -> unify left right $> Bool
 
-  apply op params = do
+  call op params = do
     tvar <- fresh
     paramTypes <- sequenceA params
     _ :-> ret <- op `unify` (Product paramTypes :-> Var tvar)

@@ -3,7 +3,7 @@ module Language.Ruby.Syntax where
 
 import Control.Monad (unless)
 import Data.Abstract.Evaluatable
-import Data.Abstract.ModuleTable
+import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Path
 import Diffing.Algorithm
 import Prelude hiding (fail)
@@ -30,9 +30,9 @@ doRequire :: MonadEvaluatable location term value m
           -> m (Environment location value, value)
 doRequire name = do
   moduleTable <- getModuleTable
-  case moduleTableLookup name moduleTable of
-    Nothing -> (,) <$> (fst <$> load name) <*> boolean True
-    Just (env, _) -> (,) <$> pure env <*> boolean False
+  case ModuleTable.lookup name moduleTable of
+    Nothing       -> (,) . fst <$> load name <*> boolean True
+    Just (env, _) -> (,) env   <$>               boolean False
 
 
 newtype Load a = Load { loadArgs :: [a] }

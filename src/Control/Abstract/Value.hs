@@ -124,9 +124,9 @@ class (Monad m, Show value) => MonadValue location value m | m value -> location
   scopedEnvironment :: value -> m (Environment location value)
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
-  abstract :: (FreeVariables term, MonadControl term m) => [Name] -> Subterm term (m value) -> m value
+  lambda :: (FreeVariables term, MonadControl term m) => [Name] -> Subterm term (m value) -> m value
   -- | Evaluate an application (like a function call).
-  apply :: value -> [m value] -> m value
+  call :: value -> [m value] -> m value
 
   -- | Primitive looping combinator, approximately equivalent to 'fix'. This should be used in place of direct recursion, as it allows abstraction over recursion.
   --

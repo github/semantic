@@ -15,7 +15,7 @@ import Control.Monad.IO.Class
 import Data.Abstract.Evaluatable hiding (head)
 import Data.Abstract.Address
 import Data.Abstract.Module
-import Data.Abstract.Origin
+import Data.Abstract.Package as Package
 import Data.Abstract.Type
 import Data.Abstract.Value
 import Data.Blob
@@ -70,10 +70,10 @@ evaluateTypeScriptFiles = evaluateFiles typescriptParser
 
 -- Evalute a single file.
 evaluateFile :: forall term effects
-             .  ( Evaluatable (Base term)
+             .  ( Corecursive term
+                , Evaluatable (Base term)
                 , FreeVariables term
                 , effects ~ Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects)
-                , HasOrigin (Base term)
                 , MonadAddressable Precise (Evaluating Precise term (Value Precise) effects)
                 , Recursive term
                 )
@@ -83,10 +83,10 @@ evaluateFile :: forall term effects
 evaluateFile parser path = runAnalysis @(Evaluating Precise term (Value Precise)) . evaluateModule <$> parseFile parser Nothing path
 
 evaluateWith :: forall location value term effects
-             .  ( effects ~ Effects location term value (Evaluating location term value effects)
+             .  ( Corecursive term
+                , effects ~ Effects location term value (Evaluating location term value effects)
                 , Evaluatable (Base term)
                 , FreeVariables term
-                , HasOrigin (Base term)
                 , MonadAddressable location (Evaluating location term value effects)
                 , MonadValue location value (Evaluating location term value effects)
                 , Recursive term
@@ -106,10 +106,10 @@ evaluateWith prelude m = runAnalysis @(Evaluating location term value) $ do
   withDefaultEnvironment preludeEnv (evaluateModule m)
 
 evaluateWithPrelude :: forall term effects
-                    .  ( Evaluatable (Base term)
+                    .  ( Corecursive term
+                       , Evaluatable (Base term)
                        , FreeVariables term
                        , effects ~ Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects)
-                       , HasOrigin (Base term)
                        , MonadAddressable Precise (Evaluating Precise term (Value Precise) effects)
                        , Recursive term
                        , TypeLevel.KnownSymbol (PreludePath term)
@@ -126,10 +126,10 @@ evaluateWithPrelude parser path = do
 
 -- Evaluate a list of files (head of file list is considered the entry point).
 evaluateFiles :: forall term effects
-              .  ( Evaluatable (Base term)
+              .  ( Corecursive term
+                 , Evaluatable (Base term)
                  , FreeVariables term
                  , effects ~ Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects)
-                 , HasOrigin (Base term)
                  , MonadAddressable Precise (Evaluating Precise term (Value Precise) effects)
                  , Recursive term
                  )
@@ -140,10 +140,10 @@ evaluateFiles parser paths = runAnalysis @(Evaluating Precise term (Value Precis
 
 -- | Evaluate terms and an entry point to a value with a given prelude.
 evaluatesWith :: forall location value term effects
-              .  ( effects ~ Effects location term value (Evaluating location term value effects)
+              .  ( Corecursive term
+                 , effects ~ Effects location term value (Evaluating location term value effects)
                  , Evaluatable (Base term)
                  , FreeVariables term
-                 , HasOrigin (Base term)
                  , MonadAddressable location (Evaluating location term value effects)
                  , MonadValue location value (Evaluating location term value effects)
                  , Recursive term
@@ -151,18 +151,17 @@ evaluatesWith :: forall location value term effects
                  , Show location
                  )
               => Module term   -- ^ Prelude to evaluate once
-              -> [Module term] -- ^ List of (blob, term) pairs that make up the program to be evaluated
-              -> Module term   -- ^ Entrypoint
+              -> [Module term] -- ^ List of modules that make up the program to be evaluated
               -> Final effects value
-evaluatesWith prelude modules m = runAnalysis @(Evaluating location term value) $ do
+evaluatesWith prelude modules = runAnalysis @(Evaluating location term value) $ do
   preludeEnv <- evaluateModule prelude *> getEnv
-  withDefaultEnvironment preludeEnv (withModules modules (evaluateModule m))
+  withDefaultEnvironment preludeEnv (evaluateModules modules)
 
 evaluateFilesWithPrelude :: forall term effects
-                         .  ( Evaluatable (Base term)
+                         .  ( Corecursive term
+                            , Evaluatable (Base term)
                             , FreeVariables term
                             , effects ~ Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects)
-                            , HasOrigin (Base term)
                             , MonadAddressable Precise (Evaluating Precise term (Value Precise) effects)
                             , Recursive term
                             , TypeLevel.KnownSymbol (PreludePath term)
@@ -173,8 +172,8 @@ evaluateFilesWithPrelude :: forall term effects
 evaluateFilesWithPrelude parser paths = do
   let preludePath = TypeLevel.symbolVal (Proxy :: Proxy (PreludePath term))
   prelude <- parseFile parser Nothing preludePath
-  entry:xs <- traverse (parseFile parser Nothing) paths
-  pure $ evaluatesWith @Precise @(Value Precise) prelude xs entry
+  xs <- traverse (parseFile parser Nothing) paths
+  pure $ evaluatesWith @Precise @(Value Precise) prelude xs
 
 
 -- Read and parse a file.
@@ -185,6 +184,9 @@ parseFile parser rootDir path = runTask $ do
 
 parseFiles :: Parser term -> [FilePath] -> IO [Module term]
 parseFiles parser paths = traverse (parseFile parser (Just (dropFileName (head paths)))) paths
+
+parsePackage :: PackageName -> Parser term -> [FilePath] -> IO (Package term)
+parsePackage name parser files = Package (PackageInfo name Nothing) . Package.fromModules <$> parseFiles parser files
 
 
 -- Read a file from the filesystem into a Blob.
