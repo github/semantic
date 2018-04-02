@@ -7,9 +7,13 @@ import Prologue
 
 -- | An 'Origin' encapsulates the location at which a name is bound or allocated.
 data Origin term ty where
+  -- | We don’t know anything, or there isn’t even something to know anything about.
   Unknown ::                                    Origin term any
+  -- | We know the package.
   Package ::                   P.PackageInfo -> Origin term 'P
+  -- | We know the module, and possibly package.
   Module  :: Origin term 'P -> M.ModuleInfo  -> Origin term 'M
+  -- | We know the term, and possibly module and package.
   Term    :: Origin term 'M -> Base term ()  -> Origin term 'T
 
 -- | A type index indicating the finest grain of information available in a given 'Origin'.
