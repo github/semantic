@@ -52,12 +52,15 @@ instance Ord (Base term ()) => Ord (Origin term ty) where
 data SomeOrigin term where
   SomeOrigin :: Origin term ty -> SomeOrigin term
 
+-- | Construct a 'SomeOrigin' from 'P.Package' metadata.
 packageOrigin :: P.Package term -> SomeOrigin term
 packageOrigin = SomeOrigin . Package . P.packageInfo
 
+-- | Construct a 'SomeOrigin' from 'M.Module' metadata.
 moduleOrigin :: M.Module term -> SomeOrigin term
 moduleOrigin = SomeOrigin . Module Unknown . M.moduleInfo
 
+-- | Construct a 'SomeOrigin' from a recursive term type.
 termOrigin :: Recursive term => term -> SomeOrigin term
 termOrigin = SomeOrigin . Term Unknown . (() <$) . project
 
