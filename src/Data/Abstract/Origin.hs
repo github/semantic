@@ -77,6 +77,7 @@ instance Ord (Base term ()) => Ord (SomeOrigin term) where
 deriving instance Show (Base term ()) => Show (SomeOrigin term)
 
 
+-- | Merge two 'Origin's of possibly differing type indices into a 'SomeOrigin' containing as much information as is available in either side, with ties broken in favour of the right-hand argument.
 merge :: Origin term ty1 -> Origin term ty2 -> SomeOrigin term
 merge a                     Unknown                     = SomeOrigin a
 merge (Package p)           (Module Unknown m)          = SomeOrigin (Module (Package p) m)
