@@ -75,9 +75,6 @@ instance ( Effectful m
     inclusion (Module name)
     liftAnalyze analyzeModule recur m
 
-parentGraph :: SomeOrigin term -> ImportGraph
-parentGraph = connect <$> packageGraph <*> moduleGraph
-
 packageGraph :: SomeOrigin term -> ImportGraph
 packageGraph = maybe empty (vertex . Package . packageName) . withSomeOrigin originPackage
 
@@ -94,14 +91,14 @@ inclusion :: forall m location term value effects
           -> ImportGraphing m effects ()
 inclusion v = do
     o <- raise ask
-    appendGraph (parentGraph @term o >< vertex v)
+    appendGraph (moduleGraph @term o >< vertex v)
 
 definition :: ( Effectful m
               , Member (State ImportGraph) effects
               , MonadEvaluator (Located location term) term value (m effects)
               ) => Name -> ImportGraphing m effects ()
 definition name = do
-  graph <- maybe empty (parentGraph . origin . unAddress) <$> lookupEnv name
+  graph <- maybe empty (moduleGraph . origin . unAddress) <$> lookupEnv name
   appendGraph (vertex (Variable name) >< graph)
 
 (><) :: Graph a => a -> a -> a
