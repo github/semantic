@@ -83,7 +83,7 @@ resolveTSModule path = maybe (Left searchPaths) Right <$> resolve searchPaths
           <> (((path </> "index") <.>) <$> exts)
 
 
-data Import a = Import { importFrom :: ImportPath, importSymbols :: ![(Name, Name)], importWildcardToken :: !a }
+data Import a = Import { importSymbols :: ![(Name, Name)], importFrom :: ImportPath }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Import where liftEq = genericLiftEq
@@ -92,7 +92,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
   -- http://www.typescriptlang.org/docs/handbook/module-resolution.html
 instance Evaluatable Import where
-  eval (Import importPath symbols _) = do
+  eval (Import symbols importPath) = do
     modulePath <- resolveTypeScriptModule importPath
     (importedEnv, _) <- isolate (require modulePath)
     modifyEnv (mappend (renamed importedEnv)) *> unit
@@ -101,7 +101,7 @@ instance Evaluatable Import where
         | Prologue.null symbols = importedEnv
         | otherwise = Env.overwrite symbols importedEnv
 
-data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: ImportPath, qualifiedAliasedImportAlias :: !a }
+data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportAlias :: !a, qualifiedAliasedImportFrom :: ImportPath }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 QualifiedAliasedImport where liftEq = genericLiftEq
@@ -109,7 +109,7 @@ instance Ord1 QualifiedAliasedImport where liftCompare = genericLiftCompare
 instance Show1 QualifiedAliasedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedAliasedImport where
-  eval (QualifiedAliasedImport importPath aliasTerm) = do
+  eval (QualifiedAliasedImport aliasTerm importPath ) = do
     modulePath <- resolveTypeScriptModule importPath
     let alias = freeVariable (subterm aliasTerm)
     letrec' alias $ \addr -> do

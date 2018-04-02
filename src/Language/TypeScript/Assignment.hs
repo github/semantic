@@ -634,15 +634,15 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
                 <|> makeTerm' <$> symbol Grammar.ImportStatement <*> children (requireImport <|> sideEffectImport)
   where
     -- `import foo = require "./foo"`
-    requireImport = inj <$> (symbol Grammar.ImportRequireClause *> children (flip TypeScript.Syntax.QualifiedAliasedImport <$> term identifier <*> fromClause))
+    requireImport = inj <$> (symbol Grammar.ImportRequireClause *> children (TypeScript.Syntax.QualifiedAliasedImport <$> term identifier <*> fromClause))
     -- `import "./foo"`
     sideEffectImport = inj <$> (TypeScript.Syntax.SideEffectImport <$> fromClause)
     -- `import { bar } from "./foo"`
-    namedImport = (,,,) Prelude.False Nothing <$> (symbol Grammar.NamedImports *> children (many importSymbol)) <*> emptyTerm
+    namedImport = (,) Nothing <$> (symbol Grammar.NamedImports *> children (many importSymbol))
     -- `import defaultMember from "./foo"`
-    defaultImport =  (,,,) Prelude.False Nothing <$> (pure <$> (makeNameAliasPair <$> rawIdentifier <*> pure Nothing)) <*> emptyTerm
+    defaultImport =  (,) Nothing <$> (pure <$> (makeNameAliasPair <$> rawIdentifier <*> pure Nothing))
     -- `import * as name from "./foo"`
-    namespaceImport = symbol Grammar.NamespaceImport *> children ((,,,) Prelude.True <$> (Just <$> term identifier) <*> pure [] <*> emptyTerm)
+    namespaceImport = symbol Grammar.NamespaceImport *> children ((,) . Just <$> term identifier <*> pure [])
 
     -- Combinations of the above.
     importClause = symbol Grammar.ImportClause *>
@@ -652,9 +652,8 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
         <|> ((\a b -> [a, b]) <$> defaultImport <*> (namedImport <|> namespaceImport))
         <|> (pure <$> defaultImport))
 
-    makeImportTerm1 loc from (Prelude.True, Just alias, _, _) = makeTerm loc (TypeScript.Syntax.QualifiedAliasedImport from alias)
-    makeImportTerm1 loc from (Prelude.True, Nothing, symbols, extra) = makeTerm loc (TypeScript.Syntax.Import from symbols extra)
-    makeImportTerm1 loc from (_, _, symbols, extra) = makeTerm loc (TypeScript.Syntax.Import from symbols extra)
+    makeImportTerm1 loc from (Just alias, _) = makeTerm loc (TypeScript.Syntax.QualifiedAliasedImport alias from)
+    makeImportTerm1 loc from (Nothing, symbols) = makeTerm loc (TypeScript.Syntax.Import symbols from)
     makeImportTerm loc ([x], from) = makeImportTerm1 loc from x
     makeImportTerm loc (xs, from) = makeTerm loc $ fmap (makeImportTerm1 loc from) xs
     importSymbol = symbol Grammar.ImportSpecifier *> children (makeNameAliasPair <$> rawIdentifier <*> ((Just <$> rawIdentifier) <|> pure Nothing))
