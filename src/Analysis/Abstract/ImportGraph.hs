@@ -25,6 +25,7 @@ import           Prologue hiding (empty, packageName)
 newtype ImportGraph = ImportGraph { unImportGraph :: G.Graph Name }
   deriving (Eq, Graph, Show)
 
+-- | A vertex of some specific type.
 data Vertex
   = Package PackageName
   | Module ModuleName
