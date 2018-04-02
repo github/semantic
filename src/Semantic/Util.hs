@@ -41,22 +41,19 @@ import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 
 -- Ruby
-evalRubyProject = evaluateProject rubyParser ["rb"]
+evalRubyProject = evaluateProjectWithPrelude rubyParser ["rb"]
 evalRubyFile = evaluateWithPrelude rubyParser
-evalRubyFiles = evaluateFilesWithPrelude rubyParser
 evaluateRubyImportGraph paths = runAnalysis @(ImportGraphing (Evaluating Ruby.Term Value)) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
 evaluateRubyBadVariables paths = runAnalysis @(BadVariables (Evaluating Ruby.Term Value)) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
 
 -- Go
 evalGoProject = evaluateProject goParser ["go"]
 evalGoFile = evaluateFile goParser
-evalGoFiles = evaluateFiles goParser
 typecheckGoFile path = runAnalysis @(Caching (Evaluating Go.Term Type)) . evaluateModule <$> parseFile goParser Nothing path
 
 -- Python
 evalPythonProject = evaluateProject pythonParser ["py"]
 evalPythonFile = evaluateWithPrelude pythonParser
-evalPythonFiles = evaluateFilesWithPrelude pythonParser
 typecheckPythonFile path = runAnalysis @(Caching (Evaluating Python.Term Type)) . evaluateModule <$> parseFile pythonParser Nothing path
 tracePythonFile path = runAnalysis @(Tracing [] (Evaluating Python.Term Value)) . evaluateModule <$> parseFile pythonParser Nothing path
 evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] (Evaluating Python.Term Value))) . evaluateModule <$> parseFile pythonParser Nothing path
@@ -64,12 +61,10 @@ evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] (Evaluatin
 -- PHP
 evalPHP = evaluateProject phpParser ["php"]
 evalPHPFile = evaluateFile phpParser
-evalPHPFiles = evaluateFiles phpParser
 
 -- TypeScript
 evalTypeScriptProject = evaluateProject typescriptParser ["ts", "tsx"]
 evalTypeScriptFile = evaluateFile typescriptParser
-evalTypeScriptFiles = evaluateFiles typescriptParser
 typecheckTypeScriptFile path = runAnalysis @(Caching (Evaluating TypeScript.Term Type)) . evaluateModule <$> parseFile typescriptParser Nothing path
 
 evaluateProject :: forall term effects
@@ -88,6 +83,24 @@ evaluateProject parser exts entryPoint = do
   let rootDir = takeDirectory entryPoint
   paths <- filter (/= entryPoint) <$> getPaths exts rootDir
   evaluateFiles parser rootDir (entryPoint : paths)
+
+evaluateProjectWithPrelude :: forall term effects
+                .  ( Evaluatable (Base term)
+                   , FreeVariables term
+                   , effects ~ Effects term Value (Evaluating term Value effects)
+                   , MonadAddressable Precise Value (Evaluating term Value effects)
+                   , MonadValue Value (Evaluating term Value effects)
+                   , Recursive term
+                   , TypeLevel.KnownSymbol (PreludePath term)
+                   )
+                => Parser term
+                -> [FilePath]
+                -> FilePath
+                -> IO (Final effects Value)
+evaluateProjectWithPrelude parser exts entryPoint = do
+  let rootDir = takeDirectory entryPoint
+  paths <- filter (/= entryPoint) <$> getPaths exts rootDir
+  evaluateFilesWithPrelude parser rootDir (entryPoint : paths)
 
 getPaths exts = fmap fold . globDir (compile . mappend "**/*." <$> exts)
 
@@ -188,12 +201,13 @@ evaluateFilesWithPrelude :: forall term effects
                             , TypeLevel.KnownSymbol (PreludePath term)
                             )
                          => Parser term
+                         -> FilePath
                          -> [FilePath]
                          -> IO (Final effects Value)
-evaluateFilesWithPrelude parser paths = do
+evaluateFilesWithPrelude parser rootDir paths = do
   let preludePath = TypeLevel.symbolVal (Proxy :: Proxy (PreludePath term))
   prelude <- parseFile parser Nothing preludePath
-  entry:xs <- traverse (parseFile parser Nothing) paths
+  entry:xs <-  parseFiles parser rootDir paths
   pure $ evaluatesWith @Value prelude xs entry
 
 -- Read and parse a file.
