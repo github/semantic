@@ -25,7 +25,7 @@ renderImportGraph :: ImportGraph -> ByteString
 renderImportGraph = export (defaultStyle friendlyName) . unImportGraph
 
 newtype ImportGraphing m (effects :: [* -> *]) a = ImportGraphing (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
+  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
 deriving instance MonadControl term (m effects)                    => MonadControl term (ImportGraphing m effects)
 deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (ImportGraphing m effects)
