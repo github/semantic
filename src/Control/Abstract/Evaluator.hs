@@ -15,25 +15,16 @@ module Control.Abstract.Evaluator
   , modifyModuleTable
   , MonadControl(..)
   , MonadThrow(..)
-  -- Type synonyms specialized for location types
-  , CellFor
-  , ConfigurationFor
-  , EnvironmentFor
-  , ExportsFor
-  , HeapFor
-  , LiveFor
-  , LocationFor
   ) where
 
 import Control.Effect
 import Control.Monad.Effect.Resumable
 import Data.Abstract.Address
 import Data.Abstract.Configuration
-import qualified Data.Abstract.Environment as Env
-import qualified Data.Abstract.Exports as Export
+import Data.Abstract.Environment as Env
+import Data.Abstract.Exports as Export
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
-import Data.Abstract.Live
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Semigroup.Reducer
@@ -46,14 +37,14 @@ import Prologue hiding (throwError)
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
 class ( MonadControl term m
-      , MonadEnvironment value m
+      , MonadEnvironment location value m
       , MonadFail m
-      , MonadModuleTable term value m
-      , MonadHeap value m
+      , MonadModuleTable location term value m
+      , MonadHeap location value m
       )
-      => MonadEvaluator term value m | m -> term, m -> value where
+      => MonadEvaluator location term value m | m -> location, m -> term, m -> value where
   -- | Get the current 'Configuration' with a passed-in term.
-  getConfiguration :: Ord (LocationFor value) => term -> m (ConfigurationFor term value)
+  getConfiguration :: Ord location => term -> m (Configuration location term value)
 
   -- | Retrieve the stack of modules currently being evaluated.
   --
@@ -62,100 +53,100 @@ class ( MonadControl term m
 
 
 -- | A 'Monad' abstracting local and global environments.
-class Monad m => MonadEnvironment value m | m -> value where
+class Monad m => MonadEnvironment location value m | m -> value, m -> location where
   -- | Retrieve the environment.
-  getEnv :: m (EnvironmentFor value)
+  getEnv :: m (Environment location value)
   -- | Set the environment.
-  putEnv :: EnvironmentFor value -> m ()
+  putEnv :: Environment location value -> m ()
   -- | Sets the environment for the lifetime of the given action.
-  withEnv :: EnvironmentFor value -> m a -> m a
+  withEnv :: Environment location value -> m a -> m a
 
   -- | Retrieve the default environment.
-  defaultEnvironment :: m (EnvironmentFor value)
+  defaultEnvironment :: m (Environment location value)
 
   -- | Set the default environment for the lifetime of an action.
   --   Usually only invoked in a top-level evaluation function.
-  withDefaultEnvironment :: EnvironmentFor value -> m a -> m a
+  withDefaultEnvironment :: Environment location value -> m a -> m a
 
   -- | Get the global export state.
-  getExports :: m (ExportsFor value)
+  getExports :: m (Exports location value)
   -- | Set the global export state.
-  putExports :: ExportsFor value -> m ()
+  putExports :: Exports location value -> m ()
   -- | Sets the global export state for the lifetime of the given action.
-  withExports :: ExportsFor value -> m a -> m a
+  withExports :: Exports location value -> m a -> m a
 
   -- | Run an action with a locally-modified environment.
-  localEnv :: (EnvironmentFor value -> EnvironmentFor value) -> m a -> m a
+  localEnv :: (Environment location value -> Environment location value) -> m a -> m a
 
   -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
-  lookupEnv :: Name -> m (Maybe (Address (LocationFor value) value))
+  lookupEnv :: Name -> m (Maybe (Address location value))
   lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
 
   -- | Look up a 'Name' in the environment, running an action with the resolved address (if any).
-  lookupWith :: (Address (LocationFor value) value -> m value) -> Name -> m (Maybe value)
+  lookupWith :: (Address location value -> m value) -> Name -> m (Maybe value)
   lookupWith with name = do
     addr <- lookupEnv name
     maybe (pure Nothing) (fmap Just . with) addr
 
 -- | Run a computation in a new local environment.
-localize :: MonadEnvironment value m => m a -> m a
+localize :: MonadEnvironment location value m => m a -> m a
 localize = localEnv id
 
 -- | Update the global environment.
-modifyEnv :: MonadEnvironment value m => (EnvironmentFor value -> EnvironmentFor value) -> m ()
+modifyEnv :: MonadEnvironment location value m => (Environment location value -> Environment location value) -> m ()
 modifyEnv f = do
   env <- getEnv
   putEnv $! f env
 
 -- | Update the global export state.
-modifyExports :: MonadEnvironment value m => (ExportsFor value -> ExportsFor value) -> m ()
+modifyExports :: MonadEnvironment location value m => (Exports location value -> Exports location value) -> m ()
 modifyExports f = do
   exports <- getExports
   putExports $! f exports
 
 -- | Add an export to the global export state.
-addExport :: MonadEnvironment value m => Name -> Name -> Maybe (Address (LocationFor value) value) -> m ()
+addExport :: MonadEnvironment location value m => Name -> Name -> Maybe (Address location value) -> m ()
 addExport name alias = modifyExports . Export.insert name alias
 
 -- | Obtain an environment that is the composition of the current and default environments.
 --   Useful for debugging.
-fullEnvironment :: MonadEnvironment value m => m (EnvironmentFor value)
+fullEnvironment :: MonadEnvironment location value m => m (Environment location value)
 fullEnvironment = mappend <$> getEnv <*> defaultEnvironment
 
 -- | A 'Monad' abstracting a heap of values.
-class Monad m => MonadHeap value m | m -> value where
+class Monad m => MonadHeap location value m | m -> value, m -> location where
   -- | Retrieve the heap.
-  getHeap :: m (HeapFor value)
+  getHeap :: m (Heap location value)
   -- | Set the heap.
-  putHeap :: HeapFor value -> m ()
+  putHeap :: Heap location value -> m ()
 
 -- | Update the heap.
-modifyHeap :: MonadHeap value m => (HeapFor value -> HeapFor value) -> m ()
+modifyHeap :: MonadHeap location value m => (Heap location value -> Heap location value) -> m ()
 modifyHeap f = do
   s <- getHeap
   putHeap $! f s
 
 -- | Look up the cell for the given 'Address' in the 'Heap'.
-lookupHeap :: (MonadHeap value m, Ord (LocationFor value)) => Address (LocationFor value) value -> m (Maybe (CellFor value))
+lookupHeap :: (MonadHeap location value m, Ord location) => Address location value -> m (Maybe (Cell location value))
 lookupHeap = flip fmap getHeap . heapLookup
 
 -- | Write a value to the given 'Address' in the 'Store'.
-assign :: ( Ord (LocationFor value)
-          , MonadHeap value m
-          , Reducer value (CellFor value)
+assign :: ( Ord location
+          , MonadHeap location value m
+          , Reducer value (Cell location value)
           )
-       => Address (LocationFor value) value
+       => Address location value
        -> value
        -> m ()
 assign address = modifyHeap . heapInsert address
 
 
 -- | A 'Monad' abstracting tables of modules available for import.
-class Monad m => MonadModuleTable term value m | m -> term, m -> value where
+class Monad m => MonadModuleTable location term value m | m -> location, m -> term, m -> value where
   -- | Retrieve the table of evaluated modules.
-  getModuleTable :: m (ModuleTable (EnvironmentFor value, value))
+  getModuleTable :: m (ModuleTable (Environment location value, value))
   -- | Set the table of evaluated modules.
-  putModuleTable :: ModuleTable (EnvironmentFor value, value) -> m ()
+  putModuleTable :: ModuleTable (Environment location value, value) -> m ()
 
   -- | Retrieve the table of unevaluated modules.
   askModuleTable :: m (ModuleTable [Module term])
@@ -163,7 +154,7 @@ class Monad m => MonadModuleTable term value m | m -> term, m -> value where
   localModuleTable :: (ModuleTable [Module term] -> ModuleTable [Module term]) -> m a -> m a
 
 -- | Update the evaluated module table.
-modifyModuleTable :: MonadModuleTable term value m => (ModuleTable (EnvironmentFor value, value) -> ModuleTable (EnvironmentFor value, value)) -> m ()
+modifyModuleTable :: MonadModuleTable location term value m => (ModuleTable (Environment location value, value) -> ModuleTable (Environment location value, value)) -> m ()
 modifyModuleTable f = do
   table <- getModuleTable
   putModuleTable $! f table
@@ -185,25 +176,3 @@ class Monad m => MonadThrow exc m where
 
 instance (Effectful m, Members '[Resumable exc] effects, Monad (m effects)) => MonadThrow exc (m effects) where
   throwException = raise . throwError
-
-
--- | The cell for an abstract value type.
-type CellFor value = Cell (LocationFor value) value
-
--- | The configuration for term and abstract value types.
-type ConfigurationFor term value = Configuration (LocationFor value) term value
-
--- | The environment for an abstract value type.
-type EnvironmentFor value = Env.Environment (LocationFor value) value
-
--- | The exports for an abstract value type.
-type ExportsFor value = Export.Exports (LocationFor value) value
-
--- | The 'Heap' for an abstract value type.
-type HeapFor value = Heap (LocationFor value) value
-
--- | The address set type for an abstract value type.
-type LiveFor value = Live (LocationFor value) value
-
--- | The location type (the body of 'Address'es) which should be used for an abstract value type.
-type family LocationFor value :: *

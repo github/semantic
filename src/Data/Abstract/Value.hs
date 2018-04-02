@@ -2,7 +2,6 @@
 module Data.Abstract.Value where
 
 import Control.Abstract.Analysis
-import Data.Abstract.Address
 import Data.Abstract.Environment (Environment)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
@@ -13,16 +12,16 @@ import Prologue hiding (TypeError)
 import Prelude hiding (Float, Integer, String, Rational, fail)
 import qualified Prelude
 
-type ValueConstructors
+type ValueConstructors location
   = '[Array
     , Boolean
-    , Class
-    , Closure
+    , Class location
+    , Closure location
     , Float
     , Hash
     , Integer
     , KVPair
-    , Namespace
+    , Namespace location
     , Null
     , Rational
     , String
@@ -33,32 +32,32 @@ type ValueConstructors
 
 -- | Open union of primitive values that terms can be evaluated to.
 --   Fix by another name.
-newtype Value = Value { deValue :: Union ValueConstructors Value }
+newtype Value location = Value { deValue :: Union (ValueConstructors location) (Value location) }
   deriving (Eq, Show, Ord)
 
 -- | Identical to 'inj', but wraps the resulting sub-entity in a 'Value'.
-injValue :: (f :< ValueConstructors) => f Value -> Value
+injValue :: (f :< ValueConstructors location) => f (Value location) -> Value location
 injValue = Value . inj
 
 -- | Identical to 'prj', but unwraps the argument out of its 'Value' wrapper.
-prjValue :: (f :< ValueConstructors) => Value -> Maybe (f Value)
+prjValue :: (f :< ValueConstructors location) => Value location -> Maybe (f (Value location))
 prjValue = prj . deValue
 
 -- | Convenience function for projecting two values.
-prjPair :: (f :< ValueConstructors , g :< ValueConstructors)
-        => (Value, Value)
-        -> Maybe (f Value, g Value)
+prjPair :: (f :< ValueConstructors location , g :< ValueConstructors location)
+        => (Value location, Value location)
+        -> Maybe (f (Value location), g (Value location))
 prjPair = bitraverse prjValue prjValue
 
 -- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
 
 -- | A function value consisting of a list of parameter 'Name's, a 'Label' to jump to the body of the function, and an 'Environment' of bindings captured by the body.
-data Closure value = Closure [Name] Label (Environment Precise value)
+data Closure location value = Closure [Name] Label (Environment location value)
   deriving (Eq, Generic1, Ord, Show)
 
-instance Eq1 Closure where liftEq = genericLiftEq
-instance Ord1 Closure where liftCompare = genericLiftCompare
-instance Show1 Closure where liftShowsPrec = genericLiftShowsPrec
+instance Eq location => Eq1 (Closure location) where liftEq = genericLiftEq
+instance Ord location => Ord1 (Closure location) where liftCompare = genericLiftCompare
+instance Show location => Show1 (Closure location) where liftShowsPrec = genericLiftShowsPrec
 
 -- | The unit value. Typically used to represent the result of imperative statements.
 data Unit value = Unit
@@ -138,23 +137,23 @@ instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 
 -- | Class values. There will someday be a difference between classes and objects,
 --   but for the time being we're pretending all languages have prototypical inheritance.
-data Class value = Class
+data Class location value = Class
   { _className  :: Name
-  , _classScope :: Environment Precise value
+  , _classScope :: Environment location value
   } deriving (Eq, Generic1, Ord, Show)
 
-instance Eq1 Class where liftEq = genericLiftEq
-instance Ord1 Class where liftCompare = genericLiftCompare
-instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
+instance Eq location => Eq1 (Class location) where liftEq = genericLiftEq
+instance Ord location => Ord1 (Class location) where liftCompare = genericLiftCompare
+instance Show location => Show1 (Class location) where liftShowsPrec = genericLiftShowsPrec
 
-data Namespace value = Namespace
+data Namespace location value = Namespace
   { namespaceName  :: Name
-  , namespaceScope :: Environment Precise value
+  , namespaceScope :: Environment location value
   } deriving (Eq, Generic1, Ord, Show)
 
-instance Eq1 Namespace where liftEq = genericLiftEq
-instance Ord1 Namespace where liftCompare = genericLiftCompare
-instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
+instance Eq location => Eq1 (Namespace location) where liftEq = genericLiftEq
+instance Ord location => Ord1 (Namespace location) where liftCompare = genericLiftCompare
+instance Show location => Show1 (Namespace location) where liftShowsPrec = genericLiftShowsPrec
 
 data KVPair value = KVPair value value
   deriving (Eq, Generic1, Ord, Show)
@@ -184,15 +183,14 @@ instance Ord1 Null where liftCompare = genericLiftCompare
 instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
 
-type instance LocationFor Value = Precise
-
-instance ValueRoots Value where
+instance Ord location => ValueRoots location (Value location) where
   valueRoots v
     | Just (Closure _ _ env) <- prjValue v = Env.addresses env
     | otherwise                            = mempty
 
+
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
+instance (Monad m, MonadEvaluatable location term (Value location) m) => MonadValue location (Value location) m where
   unit     = pure . injValue $ Unit
   integer  = pure . injValue . Integer . Number.Integer
   boolean  = pure . injValue . Boolean
@@ -259,7 +257,7 @@ instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
     | otherwise = fail ("Invalid operands to liftNumeric2: " <> show pair)
       where
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: MonadValue value m => Number.SomeNumber -> m value
+        specialize :: MonadValue location value m => Number.SomeNumber -> m value
         specialize (Number.SomeNumber (Number.Integer i)) = integer i
         specialize (Number.SomeNumber (Number.Ratio r))          = rational r
         specialize (Number.SomeNumber (Number.Decimal d))        = float d
@@ -277,7 +275,7 @@ instance (Monad m, MonadEvaluatable term Value m) => MonadValue Value m where
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: (Ord a, MonadValue value m) => a -> a -> m value
+        go :: (Ord a, MonadValue location value m) => a -> a -> m value
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
           Generalized -> integer (orderingToInt (compare l r))

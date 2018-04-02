@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, MultiParamTypeClasses, Rank2Types, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FunctionalDependencies, GADTs, Rank2Types, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Value
 ( MonadValue(..)
 , Comparator(..)
@@ -9,20 +9,14 @@ module Control.Abstract.Value
 , makeNamespace
 , ValueRoots(..)
 , ValueExc(..)
-, EnvironmentFor
-, ExportsFor
-, HeapFor
-, CellFor
-, LiveFor
-, LocationFor
-, ConfigurationFor
 ) where
 
 import Control.Abstract.Evaluator
 import Data.Abstract.FreeVariables
 import Data.Abstract.Environment as Env
-import Data.Abstract.Address (Address)
+import Data.Abstract.Address (Address, Cell)
 import Data.Abstract.Number as Number
+import Data.Abstract.Live (Live)
 import Data.Scientific (Scientific)
 import Data.Semigroup.Reducer hiding (unit)
 import Prelude
@@ -41,7 +35,7 @@ data Comparator
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class (Monad m, Show value) => MonadValue value m where
+class (Monad m, Show value) => MonadValue location value m | m value -> location where
   -- | Construct an abstract unit value.
   --   TODO: This might be the same as the empty tuple for some value types
   unit :: m value
@@ -114,20 +108,20 @@ class (Monad m, Show value) => MonadValue value m where
   null :: m value
 
   -- | Build a class value from a name and environment.
-  klass :: Name                 -- ^ The new class's identifier
-        -> [value]              -- ^ A list of superclasses
-        -> EnvironmentFor value -- ^ The environment to capture
+  klass :: Name                       -- ^ The new class's identifier
+        -> [value]                    -- ^ A list of superclasses
+        -> Environment location value -- ^ The environment to capture
         -> m value
 
   -- | Build a namespace value from a name and environment stack
   --
   -- Namespaces model closures with monoidal environments.
-  namespace :: Name                 -- ^ The namespace's identifier
-            -> EnvironmentFor value -- ^ The environment to mappend
+  namespace :: Name                       -- ^ The namespace's identifier
+            -> Environment location value -- ^ The environment to mappend
             -> m value
 
   -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
-  scopedEnvironment :: value -> m (EnvironmentFor value)
+  scopedEnvironment :: value -> m (Environment location value)
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
   abstract :: (FreeVariables term, MonadControl term m) => [Name] -> Subterm term (m value) -> m value
@@ -141,10 +135,10 @@ class (Monad m, Show value) => MonadValue value m where
 
 
 -- | Attempt to extract a 'Prelude.Bool' from a given value.
-toBool :: MonadValue value m => value -> m Bool
+toBool :: MonadValue location value m => value -> m Bool
 toBool v = ifthenelse v (pure True) (pure False)
 
-forLoop :: (MonadEnvironment value m, MonadValue value m)
+forLoop :: (MonadEnvironment location value m, MonadValue location value m)
         => m value -- ^ Initial statement
         -> m value -- ^ Condition
         -> m value -- ^ Increment/stepper
@@ -154,7 +148,7 @@ forLoop initial cond step body =
   localize (initial *> while cond (body *> step))
 
 -- | The fundamental looping primitive, built on top of ifthenelse.
-while :: MonadValue value m
+while :: MonadValue location value m
       => m value
       -> m value
       -> m value
@@ -163,7 +157,7 @@ while cond body = loop $ \ continue -> do
   ifthenelse this (body *> continue) unit
 
 -- | Do-while loop, built on top of while.
-doWhile :: MonadValue value m
+doWhile :: MonadValue location value m
         => m value
         -> m value
         -> m value
@@ -171,14 +165,14 @@ doWhile body cond = loop $ \ continue -> body *> do
   this <- cond
   ifthenelse this continue unit
 
-makeNamespace :: ( MonadValue value m
-                 , MonadEnvironment value m
-                 , MonadHeap value m
-                 , Reducer value (CellFor value)
-                 , Ord (LocationFor value)
+makeNamespace :: ( MonadValue location value m
+                 , MonadEnvironment location value m
+                 , MonadHeap location value m
+                 , Ord location
+                 , Reducer value (Cell location value)
                  )
               => Name
-              -> Address (LocationFor value) value
+              -> Address location value
               -> [value]
               -> m value
 makeNamespace name addr supers = do
@@ -189,25 +183,25 @@ makeNamespace name addr supers = do
 
 
 -- | Value types, e.g. closures, which can root a set of addresses.
-class ValueRoots value where
+class ValueRoots location value where
   -- | Compute the set of addresses rooted by a given value.
-  valueRoots :: value -> LiveFor value
+  valueRoots :: value -> Live location value
 
 
 -- The type of exceptions that can be thrown when constructing values in `MonadValue`.
-data ValueExc value resume where
-  TypeError              :: Prelude.String -> ValueExc value value
-  StringError            :: Prelude.String -> ValueExc value ByteString
-  NamespaceError         :: Prelude.String -> ValueExc value (EnvironmentFor value)
-  ScopedEnvironmentError :: Prelude.String -> ValueExc value (EnvironmentFor value)
+data ValueExc location value resume where
+  TypeError              :: Prelude.String -> ValueExc location value value
+  StringError            :: Prelude.String -> ValueExc location value ByteString
+  NamespaceError         :: Prelude.String -> ValueExc location value (Environment location value)
+  ScopedEnvironmentError :: Prelude.String -> ValueExc location value (Environment location value)
 
-instance Eq1 (ValueExc value) where
+instance Eq1 (ValueExc location value) where
   liftEq _ (TypeError a)  (TypeError b)                          = a == b
   liftEq _ (StringError a) (StringError b)                       = a == b
   liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
   liftEq _ (ScopedEnvironmentError a) (ScopedEnvironmentError b) = a == b
   liftEq _ _             _                                       = False
 
-deriving instance Show (ValueExc value resume)
-instance Show1 (ValueExc value) where
+deriving instance Show (ValueExc location value resume)
+instance Show1 (ValueExc location value) where
   liftShowsPrec _ _ = showsPrec
