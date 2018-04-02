@@ -16,16 +16,17 @@ data PackageInfo = PackageInfo
 newtype Version = Version { versionString :: String }
   deriving (Eq, Ord, Show)
 
+data PackageBody term = PackageBody
+  { packageModules     :: ModuleTable [Module term]
+  , packageEntryPoints :: ModuleTable (Maybe Name)
+  }
+  deriving (Eq, Functor, Ord, Show)
+
+
 -- | A package represents the unit of dependency, i.e. something which can depend upon, or be depended upon by, other packages. Packages have modules and may have entry points from which evaluation can proceed.
 data Package term = Package
   { packageInfo :: PackageInfo
   , packageBody :: PackageBody term
-  }
-  deriving (Eq, Functor, Ord, Show)
-
-data PackageBody term = PackageBody
-  { packageModules     :: ModuleTable [Module term]
-  , packageEntryPoints :: ModuleTable (Maybe Name)
   }
   deriving (Eq, Functor, Ord, Show)
 
