@@ -172,26 +172,31 @@ evaluateModule :: MonadEvaluatable location term value m
 evaluateModule m = analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evaluateTerm) m)
 
 -- | Evaluate with a list of modules in scope, taking the head module as the entry point.
-evaluateModules :: ( Effectful m
-                   , Member (Reader (SomeOrigin term)) effects
-                   , MonadEvaluatable location term value (m effects)
-                   )
+evaluateModules :: MonadEvaluatable location term value m
                 => [Module term]
-                -> m effects value
-evaluateModules = fmap Prelude.head . evaluatePackage . Package.fromModules
+                -> m value
+evaluateModules = fmap Prelude.head . evaluatePackageBody . Package.fromModules
 
+-- | Evaluate a given package.
 evaluatePackage :: ( Effectful m
                    , Member (Reader (SomeOrigin term)) effects
                    , MonadEvaluatable location term value (m effects)
                    )
                 => Package term
                 -> m effects [value]
-evaluatePackage p = pushOrigin (packageOrigin p) (localModuleTable (<> packageModules p)
-  (traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints p))))
+evaluatePackage p = pushOrigin (packageOrigin p) (evaluatePackageBody (packageBody p))
+
+-- | Evaluate a given package body (module table and entry points).
+evaluatePackageBody :: MonadEvaluatable location term value m
+                    => PackageBody term
+                    -> m [value]
+evaluatePackageBody body = localModuleTable (<> packageModules body)
+  (traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints body)))
   where evaluateEntryPoint (m, sym) = do
           (_, v) <- require m
           maybe (pure v) ((`call` []) <=< variable) sym
 
+-- | Push a 'SomeOrigin' onto the stack. This should be used to contextualize execution with information about the originating term, module, or package.
 pushOrigin :: ( Effectful m
               , Member (Reader (SomeOrigin term)) effects
               )

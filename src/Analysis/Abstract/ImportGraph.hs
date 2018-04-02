@@ -73,7 +73,7 @@ instance ( Effectful m
     liftAnalyze analyzeModule recur m
 
 packageVertex :: SomeOrigin term -> ImportGraph
-packageVertex = maybe empty vertex . (>>= packageName) . withSomeOrigin originPackage
+packageVertex = maybe empty (vertex . packageName) . withSomeOrigin originPackage
 
 insertVertexName :: forall m location term value effects
                  .  ( Effectful m

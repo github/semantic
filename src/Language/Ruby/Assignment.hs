@@ -108,7 +108,6 @@ expressionChoices =
   , heredoc
   , identifier
   , if'
-  , keyword
   , lambda
   , literal
   , method
@@ -185,13 +184,6 @@ literal =
 heredoc :: Assignment
 heredoc =  makeTerm <$> symbol HeredocBeginning <*> (Literal.TextElement <$> source)
        <|> makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> source)
-
-keyword :: Assignment
-keyword =
-      mk KeywordFILE
-  <|> mk KeywordLINE
-  <|> mk KeywordENCODING
-  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> (name <$> source))
 
 beginBlock :: Assignment
 beginBlock = makeTerm <$> symbol BeginBlock <*> children (Statement.ScopeEntry <$> many expression)
