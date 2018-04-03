@@ -81,74 +81,74 @@ type Differ syntax ann1 ann2 = Term syntax ann1 -> Term syntax ann2 -> Diff synt
 -- | A function to render terms or diffs.
 type Renderer i o = i -> o
 
--- | A 'Task' which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
-readBlobs :: Either Handle [(FilePath, Maybe Language)] -> Task [Blob]
+-- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
+readBlobs :: Member TaskF effs => Either Handle [(FilePath, Maybe Language)] -> Eff effs [Blob]
 readBlobs = send . ReadBlobs
 
--- | A 'Task' which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
-readBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> Task [BlobPair]
+-- | A task which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
+readBlobPairs :: Member TaskF effs => Either Handle [Both (FilePath, Maybe Language)] -> Eff effs [BlobPair]
 readBlobPairs = send . ReadBlobPairs
 
--- | A 'Task' which writes a 'B.ByteString' to a 'Handle' or a 'FilePath'.
-writeToOutput :: Either Handle FilePath -> B.ByteString -> Task ()
+-- | A task which writes a 'B.ByteString' to a 'Handle' or a 'FilePath'.
+writeToOutput :: Member TaskF effs => Either Handle FilePath -> B.ByteString -> Eff effs ()
 writeToOutput path = send . WriteToOutput path
 
--- | A 'Task' which logs a message at a specific log level to stderr.
-writeLog :: Level -> String -> [(String, String)] -> Task ()
+-- | A task which logs a message at a specific log level to stderr.
+writeLog :: Member TaskF effs => Level -> String -> [(String, String)] -> Eff effs ()
 writeLog level message = send . WriteLog level message
 
--- | A 'Task' which writes a stat.
+-- | A task which writes a stat.
 writeStat :: Stat -> Task ()
 writeStat = send . WriteStat
 
--- | A 'Task' which measures and stats the timing of another 'Task'.
-time :: String -> [(String, String)] -> Task output -> Task output
+-- | A task which measures and stats the timing of another 'Task'.
+time :: Member TaskF effs => String -> [(String, String)] -> Task output -> Eff effs output
 time statName tags = send . Time statName tags
 
--- | A 'Task' which parses a 'Blob' with the given 'Parser'.
-parse :: Parser term -> Blob -> Task term
+-- | A task which parses a 'Blob' with the given 'Parser'.
+parse :: Member TaskF effs => Parser term -> Blob -> Eff effs term
 parse parser = send . Parse parser
 
--- | A 'Task' which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
-decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
+-- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
+decorate :: (Functor f, Member TaskF effs) => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Eff effs (Term f (Record (field ': fields)))
 decorate algebra = send . Decorate algebra
 
--- | A 'Task' which diffs a pair of terms using the supplied 'Differ' function.
-diff :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
+-- | A task which diffs a pair of terms using the supplied 'Differ' function.
+diff :: Member TaskF effs => Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Eff effs (Diff syntax ann1 ann2)
 diff differ term1 term2 = send (Semantic.Task.Diff differ term1 term2)
 
--- | A 'Task' which renders some input using the supplied 'Renderer' function.
-render :: Renderer input output -> input -> Task output
+-- | A task which renders some input using the supplied 'Renderer' function.
+render :: Member TaskF effs => Renderer input output -> input -> Eff effs output
 render renderer = send . Render renderer
 
--- | Distribute a 'Traversable' container of 'Task's over the available cores (i.e. execute them concurrently), collecting their results.
+-- | Distribute a 'Traversable' container of tasks over the available cores (i.e. execute them concurrently), collecting their results.
 --
 --   This is a concurrent analogue of 'sequenceA'.
-distribute :: Traversable t => t (Task output) -> Task (t output)
+distribute :: (Member TaskF effs, Traversable t) => t (Task output) -> Eff effs (t output)
 distribute = send . Distribute
 
--- | Distribute a 'Bitraversable' container of 'Task's over the available cores (i.e. execute them concurrently), collecting their results.
+-- | Distribute a 'Bitraversable' container of tasks over the available cores (i.e. execute them concurrently), collecting their results.
 --
 --   This is a concurrent analogue of 'bisequenceA'.
-bidistribute :: Bitraversable t => t (Task output1) (Task output2) -> Task (t output1 output2)
+bidistribute :: (Bitraversable t, Member TaskF effs) => t (Task output1) (Task output2) -> Eff effs (t output1 output2)
 bidistribute = send . Bidistribute
 
 -- | Distribute the application of a function to each element of a 'Traversable' container of inputs over the available cores (i.e. perform the function concurrently for each element), collecting the results.
 --
 --   This is a concurrent analogue of 'for' or 'traverse' (with the arguments flipped).
-distributeFor :: Traversable t => t a -> (a -> Task output) -> Task (t output)
+distributeFor :: (Member TaskF effs, Traversable t) => t a -> (a -> Task output) -> Eff effs (t output)
 distributeFor inputs toTask = distribute (fmap toTask inputs)
 
 -- | Distribute the application of a function to each element of a 'Bitraversable' container of inputs over the available cores (i.e. perform the functions concurrently for each element), collecting the results.
 --
 --   This is a concurrent analogue of 'bifor' or 'bitraverse' (with the arguments flipped).
-bidistributeFor :: Bitraversable t => t a b -> (a -> Task output1) -> (b -> Task output2) -> Task (t output1 output2)
+bidistributeFor :: (Bitraversable t, Member TaskF effs) => t a b -> (a -> Task output1) -> (b -> Task output2) -> Eff effs (t output1 output2)
 bidistributeFor inputs toTask1 toTask2 = bidistribute (bimap toTask1 toTask2 inputs)
 
 -- | Distribute the application of a function to each element of a 'Traversable' container of inputs over the available cores (i.e. perform the function concurrently for each element), combining the results 'Monoid'ally into a final value.
 --
 --   This is a concurrent analogue of 'foldMap'.
-distributeFoldMap :: (Traversable t, Monoid output) => (a -> Task output) -> t a -> Task output
+distributeFoldMap :: (Member TaskF effs, Monoid output, Traversable t) => (a -> Task output) -> t a -> Eff effs output
 distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 
 -- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
