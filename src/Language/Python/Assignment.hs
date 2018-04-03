@@ -387,9 +387,9 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     -- `from a import *`
     wildcard = symbol WildcardImport *> source $> []
 
-    importPath = qualifiedModuleName <$> (importDottedName <|> importRelative)
-    importDottedName = symbol DottedName *> children (NonEmpty.some1 identifierSource)
-    importRelative = symbol RelativeImport *> children ((:|) <$> importPrefix <*> ((symbol DottedName *> children (many identifierSource)) <|> pure []))
+    importPath = importDottedName <|> importRelative
+    importDottedName = symbol DottedName *> children (qualifiedModuleName <$> NonEmpty.some1 identifierSource)
+    importRelative = symbol RelativeImport *> children (relativeModuleName <$> importPrefix <*> ((symbol DottedName *> children (many identifierSource)) <|> pure []))
     importPrefix = symbol ImportPrefix *> source
     identifierSource = (symbol Identifier <|> symbol Identifier') *> source
 

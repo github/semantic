@@ -13,24 +13,24 @@ import           Data.Mergeable
 import           Diffing.Algorithm
 import           GHC.Generics
 import           Prologue
+import           Prelude hiding (fail)
 import           System.FilePath.Posix
 
+data QualifiedModuleName = QualifiedModuleName { unQualifiedModuleName :: NonEmpty FilePath }
+                         | RelativeQualifiedModuleName { relativePrefix :: FilePath, m :: Maybe QualifiedModuleName }
 
--- TODO: Model relative imports. E.g.:
--- import .a.b.c
--- import ..a
-
-newtype QualifiedModuleName = QualifiedModuleName { unQualifiedModuleName :: NonEmpty FilePath }
   deriving (Eq, Ord, Show)
-
-moduleName :: ByteString -> QualifiedModuleName
-moduleName x = QualifiedModuleName $ BC.unpack x :| []
 
 qualifiedModuleName :: NonEmpty ByteString -> QualifiedModuleName
 qualifiedModuleName xs = QualifiedModuleName (BC.unpack <$> xs)
 
+relativeModuleName :: ByteString -> [ByteString] -> QualifiedModuleName
+relativeModuleName prefix [] = RelativeQualifiedModuleName (BC.unpack prefix) Nothing
+relativeModuleName prefix paths = RelativeQualifiedModuleName (BC.unpack prefix) (Just (qualifiedModuleName (NonEmpty.fromList paths)))
+
 friendlyName :: QualifiedModuleName -> String
 friendlyName (QualifiedModuleName xs) = intercalate "." (NonEmpty.toList xs)
+friendlyName (RelativeQualifiedModuleName prefix qn) = prefix <> maybe "" friendlyName qn
 
 -- Python module resolution.
 -- https://docs.python.org/3/reference/import.html#importsystem
@@ -55,20 +55,27 @@ friendlyName (QualifiedModuleName xs) = intercalate "." (NonEmpty.toList xs)
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
 resolvePythonModules :: MonadEvaluatable location term value m => QualifiedModuleName -> m (NonEmpty ModulePath)
-resolvePythonModules q@(QualifiedModuleName qualifiedName) = do
+resolvePythonModules q = do
   ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory (makeRelative moduleRoot modulePath)
-  for (moduleNames qualifiedName) $ \name -> do
-    go relRootDir name
+  for (moduleNames q) $ \name -> do
+    x <- trace ("resolving: " <> show name) $ go relRootDir name
+    trace ("found: " <> show x) (pure x)
   where
-    moduleNames = NonEmpty.scanl1 (</>)
+    -- TODO: deal with relative .. and ..., etc imports later
+    moduleNames :: QualifiedModuleName -> NonEmpty FilePath
+    moduleNames QualifiedModuleName{..} = NonEmpty.scanl1 (</>) unQualifiedModuleName
+    moduleNames (RelativeQualifiedModuleName x Nothing) = error $ "importing from '" <> show x <> "' is not implemented"
+    moduleNames (RelativeQualifiedModuleName "." (Just paths)) = moduleNames paths
+    moduleNames (RelativeQualifiedModuleName x (Just paths)) = error $ "importing from '" <> show x <> "' is not implemented " <> show paths
+
     notFound xs = "Unable to resolve module import: " <> friendlyName q <> ", searched: " <> show xs
     go rootDir x = do
       let path = normalise (rootDir </> normalise x)
       let searchPaths = [ path </> "__init__.py"
                         , path <.> ".py"
                         ]
-      trace ("searched: " <> show searchPaths) $
+      trace ("searching in: " <> show searchPaths) $
         resolve searchPaths >>= maybeFail (notFound searchPaths)
 
 
@@ -127,6 +134,7 @@ instance Evaluatable QualifiedImport where
         void $ isolate (require path)
         void $ go (NonEmpty.fromList xs)
         makeNamespace name addr []
+  eval (QualifiedImport _) = fail "technically this is not allowed in python"
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedModuleName, qualifiedAliasedImportAlias :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
