@@ -243,6 +243,9 @@ runParser Options{..} blob@Blob{..} = go
       _ -> fold syntax
 
 
+-- | Catch exceptions in 'IO' actions embedded in 'Eff', handling them with the passed function.
+--
+--   Note that while the type allows 'IO' to occur anywhere within the effect list, it must actually occur at the end to be able to run the computation.
 catchException :: ( Exc.Exception e
                   , Member IO r
                   )
