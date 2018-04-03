@@ -32,6 +32,7 @@ deriving instance Member NonDet effects => MonadNonDet (Evaluating location term
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects location term value
   = '[ Resumable (EvalError value)
+     , Resumable (ResolutionError value)
      , Resumable (LoadError term value)
      , Resumable (ValueError location value)
      , Resumable (Unspecialized value)

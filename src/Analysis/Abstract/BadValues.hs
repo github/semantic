@@ -6,6 +6,7 @@ import Data.Abstract.Evaluatable
 import Analysis.Abstract.Evaluating
 import Data.Abstract.Environment as Env
 import Prologue
+import Data.ByteString.Char8 (pack)
 
 newtype BadValues m (effects :: [* -> *]) a = BadValues (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
@@ -27,10 +28,11 @@ instance ( Effectful m
   type Effects location term value (BadValues m effects) = State [Name] ': Effects location term value (m effects)
 
   analyzeTerm eval term = resumeException @(ValueError location value) (liftAnalyze analyzeTerm eval term) (
-        \yield ValueError -> case ValueError of
+        \yield error -> case error of
           (ScopedEnvironmentError _) -> do
             env <- getEnv
             yield (Env.push env)
-          (CallError val) -> yield val)
+          (CallError val) -> yield val
+          (StringError val) -> yield (pack $ show val))
 
   analyzeModule = liftAnalyze analyzeModule

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, ScopedTypeVariables #-}
 module Language.Ruby.Syntax where
 
 import           Control.Monad (unless)
@@ -16,12 +16,18 @@ import           System.FilePath.Posix
 -- TODO: Fully sort out ruby require/load mechanics
 --
 -- require "json"
-resolveRubyName :: MonadEvaluatable location term value m => ByteString -> m ModulePath
-resolveRubyName name = let n = cleanNameOrPath name in resolve [n <.> "rb"] >>= maybeFailNotFound n
+resolveRubyName :: forall value term location m. MonadEvaluatable location term value m => ByteString -> m ModulePath
+resolveRubyName name = do
+  let name' = cleanNameOrPath name
+  modulePath <- resolve [name' <.> "rb"]
+  maybe (throwException @(ResolutionError value) $ RubyError name') pure modulePath
 
 -- load "/root/src/file.rb"
-resolveRubyPath :: MonadEvaluatable location term value m => ByteString -> m ModulePath
-resolveRubyPath path = let n = cleanNameOrPath path in resolve [n] >>= maybeFailNotFound n
+resolveRubyPath :: forall value term location m. MonadEvaluatable location term value m => ByteString -> m ModulePath
+resolveRubyPath path = do
+  let name' = cleanNameOrPath path
+  modulePath <- resolve [name']
+  maybe (throwException @(ResolutionError value) $ RubyError name') pure modulePath
 
 maybeFailNotFound :: MonadFail m => String -> Maybe a -> m a
 maybeFailNotFound name = maybeFail notFound
