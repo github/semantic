@@ -1,5 +1,4 @@
 {-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, UndecidableInstances #-}
-
 module Data.Abstract.Evaluatable
 ( module X
 , MonadEvaluatable

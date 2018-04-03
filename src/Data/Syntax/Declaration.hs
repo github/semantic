@@ -4,7 +4,6 @@ module Data.Syntax.Declaration where
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
-import Prelude hiding (fail)
 import Prologue
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
