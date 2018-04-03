@@ -7,7 +7,7 @@ module Semantic
 , diffTermPair
 ) where
 
-import Prologue
+import Prologue hiding (MonadError(..))
 import Analysis.ConstructorName (ConstructorName, constructorLabel)
 import Analysis.IdentifierName (IdentifierName, identifierLabel)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
