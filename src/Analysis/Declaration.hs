@@ -18,7 +18,6 @@ import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
 import qualified Language.Ruby.Syntax as Ruby.Syntax
-import qualified Language.Go.Syntax as Go.Syntax
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import qualified Language.Markdown.Syntax as Markdown
@@ -123,39 +122,8 @@ instance CustomHasDeclaration whole Ruby.Syntax.Class where
   customToDeclaration blob@Blob{..} ann decl@(Ruby.Syntax.Class (Term (In identifierAnn _), _) _ _)
     = Just $ ClassDeclaration (getSource blobSource identifierAnn) (getRubyClassSource blob (In ann decl)) blobLanguage
 
--- instance CustomHasDeclaration (Union fs) Declaration.Import where
---   customToDeclaration Blob{..} _ (Declaration.Import (Term (In fromAnn _), _) symbols _)
---     = Just $ ImportDeclaration ((stripQuotes . getSource blobSource) fromAnn) "" (fmap getSymbol symbols) blobLanguage
---     where
---       getSymbol = let f = (T.decodeUtf8 . friendlyName) in bimap f f
-
--- instance (Syntax.Identifier :< fs) => CustomHasDeclaration (Union fs) Declaration.QualifiedImport where
---   customToDeclaration Blob{..} _ (Declaration.QualifiedImport (Term (In fromAnn _), _) (Term (In aliasAnn aliasF), _) symbols)
---     | Just (Syntax.Identifier alias) <- prj aliasF = Just $ ImportDeclaration ((stripQuotes . getSource blobSource) fromAnn) (toName alias) (fmap getSymbol symbols) blobLanguage
---     | otherwise = Just $ ImportDeclaration ((stripQuotes . getSource blobSource) fromAnn) (getSource blobSource aliasAnn) (fmap getSymbol symbols) blobLanguage
---     where
---       getSymbol = bimap toName toName
---       toName = T.decodeUtf8 . friendlyName
-
-instance CustomHasDeclaration (Union fs) Go.Syntax.SideEffectImport where
-  customToDeclaration Blob{..} _ (Go.Syntax.SideEffectImport (Go.Syntax.ImportPath path) _)
-    = Just $ ImportDeclaration (T.pack path) "" [] blobLanguage
-
-instance CustomHasDeclaration (Union fs) Ruby.Syntax.Require where
-  customToDeclaration Blob{..} _ (Ruby.Syntax.Require _ (Term (In fromAnn _), _))
-    = Just $ ImportDeclaration ((stripQuotes . getSource blobSource) fromAnn) "" [] blobLanguage
-
-instance CustomHasDeclaration (Union fs) Ruby.Syntax.Load where
-  customToDeclaration Blob{..} _ (Ruby.Syntax.Load ((Term (In fromArgs _), _):_))
-    = Just $ ImportDeclaration ((stripQuotes . getSource blobSource) fromArgs) "" [] blobLanguage
-  customToDeclaration Blob{..} _ (Ruby.Syntax.Load _)
-    = Nothing
-
 getSource :: HasField fields Range => Source -> Record fields -> Text
 getSource blobSource = toText . flip Source.slice blobSource . getField
-
-stripQuotes :: Text -> Text
-stripQuotes = T.dropAround (`elem` ['"', '\''])
 
 instance (Syntax.Identifier :< fs, Expression.MemberAccess :< fs) => CustomHasDeclaration (Union fs) Expression.Call where
   customToDeclaration Blob{..} _ (Expression.Call _ (Term (In fromAnn fromF), _) _ _)
@@ -191,12 +159,8 @@ class HasDeclarationWithStrategy (strategy :: Strategy) whole syntax where
 --   If you’re seeing errors about missing a 'CustomHasDeclaration' instance for a given type, you’ve probably listed it in here but not defined a 'CustomHasDeclaration' instance for it, or else you’ve listed the wrong type in here. Conversely, if your 'customHasDeclaration' method is never being called, you may have forgotten to list the type in here.
 type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Class = 'Custom
-  DeclarationStrategy Declaration.Function = 'Custom
-  -- DeclarationStrategy Declaration.Import = 'Custom
-  -- DeclarationStrategy Declaration.QualifiedImport = 'Custom
-  DeclarationStrategy Go.Syntax.SideEffectImport = 'Custom
   DeclarationStrategy Ruby.Syntax.Class = 'Custom
-  DeclarationStrategy Ruby.Syntax.Require = 'Custom
+  DeclarationStrategy Declaration.Function = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
   DeclarationStrategy Markdown.Heading = 'Custom
   DeclarationStrategy Expression.Call = 'Custom
