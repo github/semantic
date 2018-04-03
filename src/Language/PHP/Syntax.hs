@@ -3,6 +3,7 @@ module Language.PHP.Syntax where
 
 import Data.Abstract.Evaluatable
 import Data.Abstract.Path
+import qualified Data.List.NonEmpty as NonEmpty
 import Diffing.Algorithm
 import Prelude hiding (fail)
 import Prologue hiding (Text)
@@ -190,7 +191,7 @@ instance Evaluatable QualifiedName where
     localEnv (mappend lhs) iden
 
 
-newtype NamespaceName a = NamespaceName [a]
+newtype NamespaceName a = NamespaceName (NonEmpty a)
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 NamespaceName where liftEq = genericLiftEq
@@ -200,11 +201,10 @@ instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable NamespaceName where
   eval (NamespaceName xs) = go xs
     where
-      go []     = fail "nonempty NamespaceName not allowed"
-      go [x]    = subtermValue x
-      go (x:xs) = do
+      go (x :| []) = subtermValue x
+      go (x :| xs) = do
         env <- subtermValue x >>= scopedEnvironment
-        localEnv (mappend env) (go xs)
+        localEnv (mappend env) (go (NonEmpty.fromList xs))
 
 newtype ConstDeclaration a = ConstDeclaration [a]
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

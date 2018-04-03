@@ -13,6 +13,7 @@ import Language.PHP.Grammar as Grammar
 import Prologue
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Abstract.FreeVariables as FV
+import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -459,7 +460,7 @@ namespaceNameAsPrefix :: Assignment
 namespaceNameAsPrefix = symbol NamespaceNameAsPrefix *> children (term namespaceName <|> emptyTerm)
 
 namespaceName :: Assignment
-namespaceName = makeTerm <$> symbol NamespaceName <*> children (Syntax.NamespaceName <$> someTerm name)
+namespaceName = makeTerm <$> symbol NamespaceName <*> children (Syntax.NamespaceName . NonEmpty.fromList <$> someTerm name)
 
 updateExpression :: Assignment
 updateExpression = makeTerm <$> symbol UpdateExpression <*> children (Syntax.Update <$> term expression)
