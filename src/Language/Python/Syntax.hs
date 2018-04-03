@@ -16,21 +16,12 @@ import           Prologue
 import           System.FilePath.Posix
 
 
--- 1. Regular data type (not parameterized) - easy to work with, loss of diff info
--- 2. Parameterize and use freeVariables to get filepath info out (hacky)
--- 3. Parameterize and use eval (Evaluatable instance) and `subtermValue x >>= asString` in syntaxes like QualifiedImport
-
--- TODO: Model relative imports
+-- TODO: Model relative imports. E.g.:
 -- import .a
 -- import ..a
 
 newtype QualifiedModuleName = QualifiedModuleName { unQualifiedModuleName :: NonEmpty FilePath }
   deriving (Eq, Ord, Show)
-  -- deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
--- instance Eq1 QualifiedModuleName where liftEq = genericLiftEq
--- instance Ord1 QualifiedModuleName where liftCompare = genericLiftCompare
--- instance Show1 QualifiedModuleName where liftShowsPrec = genericLiftShowsPrec
 
 moduleName :: ByteString -> QualifiedModuleName
 moduleName x = QualifiedModuleName $ BC.unpack x :| []
