@@ -24,7 +24,6 @@ import Data.Blob
 import Data.Diff
 import Data.Range
 import Data.Record
-import Data.Semigroup.Reducer
 import Data.Span
 import Data.Term
 import Diffing.Algorithm
