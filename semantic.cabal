@@ -81,6 +81,7 @@ library
                      , Data.Range
                      , Data.Record
                      , Data.Semigroup.App
+                     , Data.Scientific.Exts
                      , Data.Source
                      , Data.Span
                      , Data.SplitDiff
@@ -151,6 +152,7 @@ library
                      , ansi-terminal
                      , array
                      , async
+                     , attoparsec
                      , bifunctors
                      , bytestring
                      , cmark-gfm
@@ -233,6 +235,7 @@ test-suite test
                      , Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Mergeable.Spec
+                     , Data.Scientific.Spec
                      , Data.Source.Spec
                      , Data.Term.Spec
                      , Diffing.Algorithm.RWS.Spec
