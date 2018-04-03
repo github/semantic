@@ -17,7 +17,7 @@ import           System.FilePath.Posix
 
 
 -- TODO: Model relative imports. E.g.:
--- import .a
+-- import .a.b.c
 -- import ..a
 
 newtype QualifiedModuleName = QualifiedModuleName { unQualifiedModuleName :: NonEmpty FilePath }
@@ -33,8 +33,9 @@ friendlyName :: QualifiedModuleName -> String
 friendlyName (QualifiedModuleName xs) = intercalate "." (NonEmpty.toList xs)
 
 -- Python module resolution.
---
 -- https://docs.python.org/3/reference/import.html#importsystem
+--
+-- TODO: Namespace packages
 --
 -- Regular packages resolution:
 --
