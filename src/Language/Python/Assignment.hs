@@ -388,8 +388,8 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     wildcard = symbol WildcardImport *> source $> []
 
     importPath = importDottedName <|> importRelative
-    importDottedName = symbol DottedName *> children (qualifiedModuleName <$> NonEmpty.some1 identifierSource)
-    importRelative = symbol RelativeImport *> children (relativeModuleName <$> importPrefix <*> ((symbol DottedName *> children (many identifierSource)) <|> pure []))
+    importDottedName = symbol DottedName *> children (qualifiedName <$> NonEmpty.some1 identifierSource)
+    importRelative = symbol RelativeImport *> children (relativeQualifiedName <$> importPrefix <*> ((symbol DottedName *> children (many identifierSource)) <|> pure []))
     importPrefix = symbol ImportPrefix *> source
     identifierSource = (symbol Identifier <|> symbol Identifier') *> source
 
