@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, TypeFamilies, TypeOperators, UndecidableInstances, ScopedTypeVariables #-}
 module Data.Abstract.Value where
 
 import Control.Abstract.Analysis
@@ -190,7 +190,7 @@ instance Ord location => ValueRoots location (Value location) where
 
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance (Monad m, MonadEvaluatable location term (Value location) m) => MonadValue location (Value location) m where
+instance forall location term m. (Monad m, MonadEvaluatable location term (Value location) m) => MonadValue location (Value location) m where
   unit     = pure . injValue $ Unit
   integer  = pure . injValue . Integer . Number.Integer
   boolean  = pure . injValue . Boolean
@@ -301,12 +301,14 @@ instance (Monad m, MonadEvaluatable location term (Value location) m) => MonadVa
     injValue . Closure names l . Env.bind (foldr Set.delete (Set.fromList (freeVariables body)) names) <$> getEnv
 
   call op params = do
-    Closure names label env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
-    bindings <- foldr (\ (name, param) rest -> do
-      v <- param
-      a <- alloc name
-      assign a v
-      Env.insert name a <$> rest) (pure env) (zip names params)
-    localEnv (mappend bindings) (goto label >>= evaluateTerm)
+    case prjValue op of
+      Just (Closure names label env) -> do
+        bindings <- foldr (\ (name, param) rest -> do
+          v <- param
+          a <- alloc name
+          assign a v
+          Env.insert name a <$> rest) (pure env) (zip names params)
+        localEnv (mappend bindings) (goto label >>= evaluateTerm)
+      Nothing -> throwException @(ValueExc location (Value location)) (CallError op)
 
   loop = fix

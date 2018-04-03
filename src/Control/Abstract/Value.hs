@@ -194,14 +194,16 @@ data ValueExc location value resume where
   StringError            :: Prelude.String -> ValueExc location value ByteString
   NamespaceError         :: Prelude.String -> ValueExc location value (Environment location value)
   ScopedEnvironmentError :: Prelude.String -> ValueExc location value (Environment location value)
+  CallError              :: value          -> ValueExc location value value
 
-instance Eq1 (ValueExc location value) where
+instance Eq value => Eq1 (ValueExc location value) where
   liftEq _ (TypeError a)  (TypeError b)                          = a == b
   liftEq _ (StringError a) (StringError b)                       = a == b
   liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
   liftEq _ (ScopedEnvironmentError a) (ScopedEnvironmentError b) = a == b
+  liftEq _ (CallError a) (CallError b)                           = a == b
   liftEq _ _             _                                       = False
 
-deriving instance Show (ValueExc location value resume)
-instance Show1 (ValueExc location value) where
+deriving instance (Show value) => Show (ValueExc location value resume)
+instance (Show value) => Show1 (ValueExc location value) where
   liftShowsPrec _ _ = showsPrec
