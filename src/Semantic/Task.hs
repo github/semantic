@@ -71,11 +71,11 @@ data TaskF output where
   Diff :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
   Render :: Renderer input output -> input -> TaskF output
 
-type Logger = AsyncQueue Message Options
-type Statter = AsyncQueue Stat StatsClient
+type LogQueue = AsyncQueue Message Options
+type StatQueue = AsyncQueue Stat StatsClient
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
-type Task = Eff '[Distribute, TaskF, Reader Options, Reader Logger, Reader Statter, Exc SomeException, IO]
+type Task = Eff '[Distribute, TaskF, Reader Options, Reader LogQueue, Reader StatQueue, Exc SomeException, IO]
 
 -- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
 type Differ syntax ann1 ann2 = Term syntax ann1 -> Term syntax ann2 -> Diff syntax ann1 ann2
@@ -96,18 +96,18 @@ writeToOutput :: Member TaskF effs => Either Handle FilePath -> B.ByteString -> 
 writeToOutput path = send . WriteToOutput path
 
 -- | A task which logs a message at a specific log level to stderr.
-writeLog :: Members '[Reader Logger, IO] effs => Level -> String -> [(String, String)] -> Eff effs ()
+writeLog :: Members '[Reader LogQueue, IO] effs => Level -> String -> [(String, String)] -> Eff effs ()
 writeLog level message pairs = do
   logger <- ask
   queueLogMessage logger level message pairs
 
 -- | A task which writes a stat.
-writeStat :: Members '[Reader Statter, IO] effs => Stat -> Eff effs ()
-writeStat stat = ask >>= \ statter -> liftIO (queue (statter :: Statter) stat)
+writeStat :: Members '[Reader StatQueue, IO] effs => Stat -> Eff effs ()
+writeStat stat = ask >>= \ statter -> liftIO (queue (statter :: StatQueue) stat)
 
 -- | A task which measures and stats the timing of another task.
-time :: (Member (Reader Statter) effs, Member IO effs) => String -> [(String, String)] -> Eff effs output -> Eff effs output
-time statName tags task = ask >>= \ statter -> withTiming (liftIO . queue (statter :: Statter)) statName tags task
+time :: (Member (Reader StatQueue) effs, Member IO effs) => String -> [(String, String)] -> Eff effs output -> Eff effs output
+time statName tags task = ask >>= \ statter -> withTiming (liftIO . queue (statter :: StatQueue)) statName tags task
 
 -- | A task which parses a 'Blob' with the given 'Parser'.
 parse :: Member TaskF effs => Parser term -> Blob -> Eff effs term
@@ -178,15 +178,15 @@ runTaskWithOptions options task = do
   either (die . displayException) pure result
   where
     run :: Options
-        -> Logger
-        -> Statter
+        -> LogQueue
+        -> StatQueue
         -> Task a
         -> IO (Either SomeException a)
     run options logger statter = run'
       where
         run' :: Task a -> IO (Either SomeException a)
         run' = runM . runError . flip runReader statter . flip runReader logger . flip runReader options . go . runDistribute
-        go :: Members '[Reader Options, Reader Logger, Reader Statter, Exc SomeException, IO] effs => Eff (TaskF ': effs) a -> Eff effs a
+        go :: Members '[Reader Options, Reader LogQueue, Reader StatQueue, Exc SomeException, IO] effs => Eff (TaskF ': effs) a -> Eff effs a
         go = interpret (\ task -> case task of
           ReadBlobs (Left handle) -> rethrowing (IO.readBlobsFromHandle handle)
           ReadBlobs (Right paths@[(path, Nothing)]) -> rethrowing (IO.isDirectory path >>= bool (IO.readBlobsFromPaths paths) (IO.readBlobsFromDir path))
@@ -206,12 +206,12 @@ runTaskWithOptions options task = do
         parBitraversable :: Bitraversable t => Strategy a -> Strategy b -> Strategy (t a b)
         parBitraversable strat1 strat2 = bitraverse (rparWith strat1) (rparWith strat2)
 
-logError :: Members '[Reader Options, Reader Logger, IO] effs => Level -> Blob -> Error.Error String -> [(String, String)] -> Eff effs ()
+logError :: Members '[Reader Options, Reader LogQueue, IO] effs => Level -> Blob -> Error.Error String -> [(String, String)] -> Eff effs ()
 logError level blob err pairs = do
   Options{..} <- ask
   writeLog level (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) pairs
 
-runParser :: Members '[Reader Options, Reader Logger, Reader Statter, Exc SomeException, IO] effs => Blob -> Parser term -> Eff effs term
+runParser :: Members '[Reader Options, Reader LogQueue, Reader StatQueue, Exc SomeException, IO] effs => Blob -> Parser term -> Eff effs term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $
