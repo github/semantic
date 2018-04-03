@@ -22,26 +22,27 @@ module Semantic.Stat
 ) where
 
 
-import Prologue
-import Data.List (intercalate)
-import Data.List.Split (splitOneOf)
-import Network.Socket (Socket(..), SocketType(..), socket, connect, close, getAddrInfo, addrFamily, addrAddress, defaultProtocol)
-import Network.Socket.ByteString
-import Network.URI
-import Numeric
 import qualified Data.ByteString.Char8 as B
-import System.Environment
-import System.IO.Error
+import           Data.List (intercalate)
+import           Data.List.Split (splitOneOf)
 import qualified Data.Time.Clock as Time
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
+import           Network.Socket
+    (Socket (..), SocketType (..), addrAddress, addrFamily, close, connect, defaultProtocol, getAddrInfo, socket)
+import           Network.Socket.ByteString
+import           Network.URI
+import           Numeric
+import           Prologue
+import           System.Environment
+import           System.IO.Error
 
 -- | A named piece of data you wish to record a specific 'Metric' for.
 -- See https://docs.datadoghq.com/guides/dogstatsd/ for more details.
 data Stat
   = Stat
-  { statName :: String  -- ^ Stat name, usually separated by '.' (e.g. "system.metric.name")
+  { statName  :: String  -- ^ Stat name, usually separated by '.' (e.g. "system.metric.name")
   , statValue :: Metric -- ^ 'Metric' value.
-  , statTags :: Tags    -- ^ Key/value 'Tags' (optional).
+  , statTags  :: Tags    -- ^ Key/value 'Tags' (optional).
   }
 
 -- | The various supported metric types in Datadog.
@@ -99,8 +100,8 @@ data StatsClient
   = StatsClient
   { statsClientUDPSocket :: Socket
   , statsClientNamespace :: String
-  , statsClientUDPHost :: String
-  , statsClientUDPPort :: String
+  , statsClientUDPHost   :: String
+  , statsClientUDPPort   :: String
   }
 
 -- | Create a default stats client. This function consults two optional
@@ -193,7 +194,7 @@ instance Render Tags where
   renders xs = renderString "|#" . (\x -> x <> intercalate "," (renderTag <$> xs))
     where
       renderTag (k, "") = k
-      renderTag (k, v) = k <> ":" <> v
+      renderTag (k, v)  = k <> ":" <> v
 
 instance Render Int where
   renders = shows
