@@ -54,7 +54,7 @@ evalGoFile = evaluateFile goParser
 typecheckGoFile path = runAnalysis @(Caching (Evaluating Monovariant Go.Term Type)) . evaluateModule <$> parseFile goParser Nothing path
 
 -- Python
-evalPythonProject = evaluateProject pythonParser ["py"]
+evalPythonProject = evaluateProjectWithPrelude pythonParser ["py"]
 evalPythonFile = evaluateWithPrelude pythonParser
 typecheckPythonFile path = runAnalysis @(Caching (Evaluating Monovariant Python.Term Type)) . evaluateModule <$> parseFile pythonParser Nothing path
 tracePythonFile path = runAnalysis @(Tracing [] (Evaluating Precise Python.Term (Value Precise))) . evaluateModule <$> parseFile pythonParser Nothing path
