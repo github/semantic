@@ -63,7 +63,6 @@ data TaskF output where
   ReadBlobs :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
   ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [BlobPair]
   WriteToOutput :: Either Handle FilePath -> B.ByteString -> TaskF ()
-  WriteStat :: Stat -> TaskF ()
   Parse :: Parser term -> Blob -> TaskF term
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
@@ -102,8 +101,8 @@ writeLog level message pairs = do
   queueLogMessage logger level message pairs
 
 -- | A task which writes a stat.
-writeStat :: Stat -> Task ()
-writeStat = send . WriteStat
+writeStat :: Members '[Reader Statter, IO] effs => Stat -> Eff effs ()
+writeStat stat = ask >>= \ statter -> liftIO (queue (statter :: Statter) stat)
 
 -- | A task which measures and stats the timing of another task.
 time :: (Member (Reader Statter) effs, Member IO effs) => String -> [(String, String)] -> Eff effs output -> Eff effs output
@@ -193,7 +192,6 @@ runTaskWithOptions options task = do
           ReadBlobs (Right paths) -> rethrowing (IO.readBlobsFromPaths paths)
           ReadBlobPairs source -> rethrowing (either IO.readBlobPairsFromHandle (traverse (runBothWith IO.readFilePair)) source)
           WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents)
-          WriteStat stat -> ask >>= \ statter -> liftIO (queue (statter :: Statter) stat)
           Parse parser blob -> go (runParser blob parser)
           Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
           Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
