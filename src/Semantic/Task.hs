@@ -72,6 +72,9 @@ data TaskF output where
   Distribute :: Traversable t => t (Task output) -> TaskF (t output)
   Bidistribute :: Bitraversable t => t (Task output1) (Task output2) -> TaskF (t output1 output2)
 
+type Logger = AsyncQueue Message Options
+type Statter = AsyncQueue Stat StatsClient
+
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type Task = Eff '[TaskF, Exc SomeException, IO]
 
@@ -174,8 +177,8 @@ runTaskWithOptions options task = do
   either (die . displayException) pure result
   where
     run :: Options
-        -> AsyncQueue Message Options
-        -> AsyncQueue Stat StatsClient
+        -> Logger
+        -> Statter
         -> Task a
         -> IO (Either SomeException a)
     run options logger statter = run'
