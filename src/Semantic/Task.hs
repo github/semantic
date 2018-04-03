@@ -205,45 +205,42 @@ runTaskWithOptions options task = do
         parBitraversable strat1 strat2 = bitraverse (rparWith strat1) (rparWith strat2)
 
 runParser :: Blob -> Parser term -> Task term
-runParser blob@Blob{..} = go
-  where
-    go :: Parser term -> Task term
-    go parser = case parser of
-      ASTParser language ->
-        time "parse.tree_sitter_ast_parse" languageTag $
-          rethrowing (parseToAST language blob)
-      AssignmentParser parser assignment -> do
-        Options{..} <- ask
-        ast <- go parser `catchError` \ (SomeException err) -> do
-          writeStat (Stat.increment "parse.parse_failures" languageTag)
-          writeLog Error "failed parsing" (("task", "parse") : blobFields)
+runParser blob@Blob{..} parser = case parser of
+  ASTParser language ->
+    time "parse.tree_sitter_ast_parse" languageTag $
+      rethrowing (parseToAST language blob)
+  AssignmentParser parser assignment -> do
+    Options{..} <- ask
+    ast <- runParser blob parser `catchError` \ (SomeException err) -> do
+      writeStat (Stat.increment "parse.parse_failures" languageTag)
+      writeLog Error "failed parsing" (("task", "parse") : blobFields)
+      throwError (toException err)
+    time "parse.assign" languageTag $
+      case Assignment.assign blobSource assignment ast of
+        Left err -> do
+          writeStat (Stat.increment "parse.assign_errors" languageTag)
+          writeLog Error (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "assign") : blobFields)
           throwError (toException err)
-        time "parse.assign" languageTag $
-          case Assignment.assign blobSource assignment ast of
-            Left err -> do
-              writeStat (Stat.increment "parse.assign_errors" languageTag)
-              writeLog Error (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "assign") : blobFields)
-              throwError (toException err)
-            Right term -> do
-              for_ (errors term) $ \ err -> case Error.errorActual err of
-                  (Just "ParseError") -> do
-                    writeStat (Stat.increment "parse.parse_errors" languageTag)
-                    writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "parse") : blobFields)
-                  _ -> do
-                    writeStat (Stat.increment "parse.assign_warnings" languageTag)
-                    writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "assign") : blobFields)
-              writeStat (Stat.count "parse.nodes" (length term) languageTag)
-              pure term
-      MarkdownParser ->
-        time "parse.cmark_parse" languageTag $
-          let term = cmarkParser blobSource
-          in length term `seq` pure term
-    blobFields = ("path", blobPath) : languageTag
-    languageTag = maybe [] (pure . (,) ("language" :: String) . show) blobLanguage
-    errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
-    errors = cata $ \ (In a syntax) -> case syntax of
-      _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (getField a) err]
-      _ -> fold syntax
+        Right term -> do
+          for_ (errors term) $ \ err -> case Error.errorActual err of
+              (Just "ParseError") -> do
+                writeStat (Stat.increment "parse.parse_errors" languageTag)
+                writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "parse") : blobFields)
+              _ -> do
+                writeStat (Stat.increment "parse.assign_warnings" languageTag)
+                writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "assign") : blobFields)
+          writeStat (Stat.count "parse.nodes" (length term) languageTag)
+          pure term
+  MarkdownParser ->
+    time "parse.cmark_parse" languageTag $
+      let term = cmarkParser blobSource
+      in length term `seq` pure term
+  where blobFields = ("path", blobPath) : languageTag
+        languageTag = maybe [] (pure . (,) ("language" :: String) . show) blobLanguage
+        errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
+        errors = cata $ \ (In a syntax) -> case syntax of
+          _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (getField a) err]
+          _ -> fold syntax
 
 
 -- | Catch exceptions in 'IO' actions embedded in 'Eff', handling them with the passed function.
