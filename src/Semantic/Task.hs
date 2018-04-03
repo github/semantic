@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Semantic.Task
 ( Task
@@ -183,21 +183,21 @@ runTaskWithOptions options task = do
         run' :: Task a -> IO (Either SomeException a)
         run' = runM . runError . go
         go :: Task a -> Eff '[Exc SomeException, IO] a
-        go = relay pure (\ task yield -> case task of
-          ReadBlobs (Left handle) -> rethrowing (IO.readBlobsFromHandle handle) >>= yield
-          ReadBlobs (Right paths@[(path, Nothing)]) -> rethrowing (IO.isDirectory path >>= bool (IO.readBlobsFromPaths paths) (IO.readBlobsFromDir path)) >>= yield
-          ReadBlobs (Right paths) -> rethrowing (IO.readBlobsFromPaths paths) >>= yield
-          ReadBlobPairs source -> rethrowing (either IO.readBlobPairsFromHandle (traverse (runBothWith IO.readFilePair)) source) >>= yield
-          WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents) >>= yield
-          WriteLog level message pairs -> queueLogMessage logger level message pairs >>= yield
-          WriteStat stat -> liftIO (queue statter stat) >>= yield
-          Time statName tags task -> withTiming (liftIO . queue statter) statName tags (go task) >>= yield
-          Parse parser blob -> go (runParser options blob parser) >>= yield
-          Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield
-          Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2) >>= yield
-          Render renderer input -> pure (renderer input) >>= yield
-          Distribute tasks -> liftIO (Async.mapConcurrently run' tasks) >>= either throwError yield . sequenceA . withStrategy (parTraversable (parTraversable rseq))
-          Bidistribute tasks -> liftIO (Async.runConcurrently (bitraverse (Async.Concurrently . run') (Async.Concurrently . run') tasks)) >>= either throwError yield . bisequenceA . withStrategy (parBitraversable (parTraversable rseq) (parTraversable rseq)))
+        go = interpret (\ task -> case task of
+          ReadBlobs (Left handle) -> rethrowing (IO.readBlobsFromHandle handle)
+          ReadBlobs (Right paths@[(path, Nothing)]) -> rethrowing (IO.isDirectory path >>= bool (IO.readBlobsFromPaths paths) (IO.readBlobsFromDir path))
+          ReadBlobs (Right paths) -> rethrowing (IO.readBlobsFromPaths paths)
+          ReadBlobPairs source -> rethrowing (either IO.readBlobPairsFromHandle (traverse (runBothWith IO.readFilePair)) source)
+          WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents)
+          WriteLog level message pairs -> queueLogMessage logger level message pairs
+          WriteStat stat -> liftIO (queue statter stat)
+          Time statName tags task -> withTiming (liftIO . queue statter) statName tags (go task)
+          Parse parser blob -> go (runParser options blob parser)
+          Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
+          Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
+          Render renderer input -> pure (renderer input)
+          Distribute tasks -> liftIO (Async.mapConcurrently run' tasks) >>= either throwError pure . sequenceA . withStrategy (parTraversable (parTraversable rseq))
+          Bidistribute tasks -> liftIO (Async.runConcurrently (bitraverse (Async.Concurrently . run') (Async.Concurrently . run') tasks)) >>= either throwError pure . bisequenceA . withStrategy (parBitraversable (parTraversable rseq) (parTraversable rseq)))
 
         parBitraversable :: Bitraversable t => Strategy a -> Strategy b -> Strategy (t a b)
         parBitraversable strat1 strat2 = bitraverse (rparWith strat1) (rparWith strat2)
@@ -261,6 +261,10 @@ rethrowing :: ( Member (Exc SomeException) r
            => IO a
            -> Eff r a
 rethrowing m = catchException (liftIO m) (throwError . toException @SomeException)
+
+-- | Handle the topmost effect by interpreting it into the underlying effects.
+interpret :: (forall a. eff a -> Eff effs a) -> Eff (eff ': effs) a -> Eff effs a
+interpret f = relay pure (\ eff yield -> f eff >>= yield)
 
 instance Member IO effs => MonadIO (Eff effs) where
   liftIO = send
