@@ -185,7 +185,7 @@ runTaskWithOptions options task = do
       where
         run' :: Task a -> IO (Either SomeException a)
         run' = runM . runError . flip runReader statter . flip runReader logger . flip runReader options . go
-        go :: Task a -> Eff '[Reader Options, Reader Logger, Reader Statter, Exc SomeException, IO] a
+        go :: Members '[Reader Options, Reader Logger, Reader Statter, Exc SomeException, IO] effs => Eff (TaskF ': effs) a -> Eff effs a
         go = interpret (\ task -> case task of
           ReadBlobs (Left handle) -> rethrowing (IO.readBlobsFromHandle handle)
           ReadBlobs (Right paths@[(path, Nothing)]) -> rethrowing (IO.isDirectory path >>= bool (IO.readBlobsFromPaths paths) (IO.readBlobsFromDir path))
