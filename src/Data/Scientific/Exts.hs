@@ -88,6 +88,8 @@ parser = signed (choice [hex, oct, bin, dec]) where
     -- ...and the exponent.
     exponent  <- notUnder <$> takeWhile (inClass "eE_0123456789+-")
 
+    done
+
     -- Ensure we don't read an empty string, or one consisting only of a dot and/or an exponent.
     when (null trailings && null leadings) (fail "Does not accept a single dot")
 
