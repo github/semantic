@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.BadValues where
 
 import Control.Abstract.Analysis
@@ -7,26 +7,26 @@ import Analysis.Abstract.Evaluating
 import Data.Abstract.Environment as Env
 import Prologue
 
-newtype BadValues m term value (effects :: [* -> *]) a = BadValues (m term value effects a)
+newtype BadValues m (effects :: [* -> *]) a = BadValues (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
-deriving instance MonadControl term (m term value effects) => MonadControl term (BadValues m term value effects)
-deriving instance MonadEnvironment value (m term value effects) => MonadEnvironment value (BadValues m term value effects)
-deriving instance MonadHeap value (m term value effects) => MonadHeap value (BadValues m term value effects)
-deriving instance MonadModuleTable term value (m term value effects) => MonadModuleTable term value (BadValues m term value effects)
-deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (BadValues m term value effects)
+deriving instance MonadControl term (m effects)                    => MonadControl term (BadValues m effects)
+deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (BadValues m effects)
+deriving instance MonadHeap location value (m effects)             => MonadHeap location value (BadValues m effects)
+deriving instance MonadModuleTable location term value (m effects) => MonadModuleTable location term value (BadValues m effects)
+deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (BadValues m effects)
 
-instance ( Effectful (m term value)
-         , Member (Resumable (ValueExc value)) effects
-         , Member (State (EvaluatingState term value)) effects
+instance ( Effectful m
+         , Member (Resumable (ValueExc location value)) effects
+         , Member (State (EvaluatingState location term value)) effects
          , Member (State [Name]) effects
-         , MonadAnalysis term value (m term value effects)
-         , MonadValue value (BadValues m term value effects)
+         , MonadAnalysis location term value (m effects)
+         , MonadValue location value (BadValues m effects)
          )
-      => MonadAnalysis term value (BadValues m term value effects) where
-  type RequiredEffects term value (BadValues m term value effects) = State [Name] ': RequiredEffects term value (m term value effects)
+      => MonadAnalysis location term value (BadValues m effects) where
+  type Effects location term value (BadValues m effects) = State [Name] ': Effects location term value (m effects)
 
-  analyzeTerm eval term = resumeException @(ValueExc value) (liftAnalyze analyzeTerm eval term) (
+  analyzeTerm eval term = resumeException @(ValueExc location value) (liftAnalyze analyzeTerm eval term) (
         \yield (ScopedEnvironmentError _) ->
           do
             env <- getEnv

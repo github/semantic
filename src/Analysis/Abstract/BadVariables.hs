@@ -1,30 +1,33 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators #-}
-module Analysis.Abstract.BadVariables where
+{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+module Analysis.Abstract.BadVariables
+( BadVariables
+) where
 
 import Control.Abstract.Analysis
 import Data.Abstract.Evaluatable
 import Prologue
 
-newtype BadVariables m term value (effects :: [* -> *]) a = BadVariables (m term value effects a)
+-- An analysis that resumes from evaluation errors and records the list of unresolved free variables.
+newtype BadVariables m (effects :: [* -> *]) a = BadVariables (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
 
-deriving instance MonadControl term (m term value effects) => MonadControl term (BadVariables m term value effects)
-deriving instance MonadEnvironment value (m term value effects) => MonadEnvironment value (BadVariables m term value effects)
-deriving instance MonadHeap value (m term value effects) => MonadHeap value (BadVariables m term value effects)
-deriving instance MonadModuleTable term value (m term value effects) => MonadModuleTable term value (BadVariables m term value effects)
-deriving instance MonadEvaluator term value (m term value effects) => MonadEvaluator term value (BadVariables m term value effects)
+deriving instance MonadControl term (m effects)                    => MonadControl term (BadVariables m effects)
+deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (BadVariables m effects)
+deriving instance MonadHeap location value (m effects)             => MonadHeap location value (BadVariables m effects)
+deriving instance MonadModuleTable location term value (m effects) => MonadModuleTable location term value (BadVariables m effects)
+deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (BadVariables m effects)
 
-instance ( Effectful (m term value)
+instance ( Effectful m
          , Member (Resumable (EvalError value)) effects
          , Member (State [Name]) effects
-         , MonadAnalysis term value (m term value effects)
-         , MonadValue value (BadVariables m term value effects)
+         , MonadAnalysis location term value (m effects)
+         , MonadValue location value (BadVariables m effects)
          )
-      => MonadAnalysis term value (BadVariables m term value effects) where
-  type RequiredEffects term value (BadVariables m term value effects) = State [Name] ': RequiredEffects term value (m term value effects)
+      => MonadAnalysis location term value (BadVariables m effects) where
+  type Effects location term value (BadVariables m effects) = State [Name] ': Effects location term value (m effects)
 
   analyzeTerm eval term = resumeException @(EvalError value) (liftAnalyze analyzeTerm eval term) (
         \yield (FreeVariableError name) ->
-            raise (modify (name :)) >> unit >>= yield)
+            raise (modify' (name :)) >> unit >>= yield)
 
   analyzeModule = liftAnalyze analyzeModule

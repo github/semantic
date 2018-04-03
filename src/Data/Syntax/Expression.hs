@@ -6,7 +6,7 @@ import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent)
 import Data.Fixed
 import Diffing.Algorithm
 import Prelude
-import Prologue hiding (apply)
+import Prologue
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
@@ -19,7 +19,7 @@ instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Call where
   eval Call{..} = do
     op <- subtermValue callFunction
-    apply op (map subtermValue callParams)
+    call op (map subtermValue callParams)
 
 data Comparison a
   = LessThan !a !a

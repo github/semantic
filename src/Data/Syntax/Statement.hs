@@ -77,8 +77,11 @@ instance Eq1 Let where liftEq = genericLiftEq
 instance Ord1 Let where liftCompare = genericLiftCompare
 instance Show1 Let where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Let
-instance Evaluatable Let
+instance Evaluatable Let where
+  eval Let{..} = do
+    addr <- snd <$> letrec name (subtermValue letValue)
+    localEnv (Env.insert name addr) (subtermValue letBody)
+    where name = freeVariable (subterm letVariable)
 
 
 -- Assignment

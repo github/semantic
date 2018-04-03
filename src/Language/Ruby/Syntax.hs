@@ -3,7 +3,7 @@ module Language.Ruby.Syntax where
 
 import Control.Monad (unless)
 import Data.Abstract.Evaluatable
-import Data.Abstract.ModuleTable
+import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Path
 import Diffing.Algorithm
 import Prelude hiding (fail)
@@ -25,14 +25,14 @@ instance Evaluatable Require where
     where
       toName = qualifiedName . splitOnPathSeparator . dropRelativePrefix . stripQuotes
 
-doRequire :: MonadEvaluatable term value m
+doRequire :: MonadEvaluatable location term value m
           => ModuleName
-          -> m (EnvironmentFor value, value)
+          -> m (Environment location value, value)
 doRequire name = do
   moduleTable <- getModuleTable
-  case moduleTableLookup name moduleTable of
-    Nothing -> (,) <$> (fst <$> load name) <*> boolean True
-    Just (env, _) -> (,) <$> pure env <*> boolean False
+  case ModuleTable.lookup name moduleTable of
+    Nothing       -> (,) . fst <$> load name <*> boolean True
+    Just (env, _) -> (,) env   <$>               boolean False
 
 
 newtype Load a = Load { loadArgs :: [a] }
@@ -52,7 +52,7 @@ instance Evaluatable Load where
     doLoad path shouldWrap
   eval (Load _) = fail "invalid argument supplied to load, path is required"
 
-doLoad :: MonadEvaluatable term value m => ByteString -> Bool -> m value
+doLoad :: MonadEvaluatable location term value m => ByteString -> Bool -> m value
 doLoad path shouldWrap = do
   (importedEnv, _) <- isolate (load (toName path))
   unless shouldWrap $ modifyEnv (mappend importedEnv)
