@@ -27,31 +27,31 @@ module Semantic.Task
 , runTaskWithOptions
 ) where
 
-import Prologue
-import Analysis.Decorator (decoratorWithAlgebra)
+import           Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
-import Control.Monad.IO.Class
-import Control.Parallel.Strategies
 import qualified Control.Concurrent.Async as Async
-import Control.Monad.Free.Freer
-import Data.Blob
-import Data.Bool
+import           Control.Monad.Free.Freer
+import           Control.Monad.IO.Class
+import           Control.Parallel.Strategies
+import           Data.Blob
+import           Data.Bool
 import qualified Data.ByteString as B
-import Data.Diff
+import           Data.Diff
 import qualified Data.Error as Error
-import Data.Language
-import Data.Record
+import           Data.Language
+import           Data.Record
 import qualified Data.Syntax as Syntax
-import Data.Term
-import Parsing.Parser
-import Parsing.CMark
-import Parsing.TreeSitter
-import System.Exit (die)
-import System.IO (Handle, stderr)
+import           Data.Term
+import           Parsing.CMark
+import           Parsing.Parser
+import           Parsing.TreeSitter
+import           Prologue
 import qualified Semantic.IO as IO
-import Semantic.Log
-import Semantic.Stat as Stat
-import Semantic.Queue
+import           Semantic.Log
+import           Semantic.Queue
+import           Semantic.Stat as Stat
+import           System.Exit (die)
+import           System.IO (Handle, stderr)
 
 
 data TaskF output where
@@ -205,7 +205,7 @@ runTaskWithOptions options task = do
             result <- go during
             case result of
               Left err -> go (handler err) >>= either (pure . Left) yield
-              Right a -> yield a) . fmap Right
+              Right a  -> yield a) . fmap Right
 
         parBitraversable :: Bitraversable t => Strategy a -> Strategy b -> Strategy (t a b)
         parBitraversable strat1 strat2 = bitraverse (rparWith strat1) (rparWith strat2)
