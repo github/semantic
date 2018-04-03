@@ -35,6 +35,7 @@ import qualified Control.Concurrent.Async as Async
 import qualified Control.Exception as Exc
 import           Control.Monad.Effect.Exception
 import           Control.Monad.Effect.Internal as Eff
+import           Control.Monad.Effect.Reader
 import           Control.Monad.IO.Class
 import           Control.Parallel.Strategies
 import           Data.Blob
@@ -76,7 +77,7 @@ type Logger = AsyncQueue Message Options
 type Statter = AsyncQueue Stat StatsClient
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
-type Task = Eff '[TaskF, Exc SomeException, IO]
+type Task = Eff '[TaskF, Reader Statter, Exc SomeException, IO]
 
 -- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
 type Differ syntax ann1 ann2 = Term syntax ann1 -> Term syntax ann2 -> Diff syntax ann1 ann2
@@ -184,8 +185,8 @@ runTaskWithOptions options task = do
     run options logger statter = run'
       where
         run' :: Task a -> IO (Either SomeException a)
-        run' = runM . runError . go
-        go :: Task a -> Eff '[Exc SomeException, IO] a
+        run' = runM . runError . flip runReader statter . go
+        go :: Task a -> Eff '[Reader Statter, Exc SomeException, IO] a
         go = interpret (\ task -> case task of
           ReadBlobs (Left handle) -> rethrowing (IO.readBlobsFromHandle handle)
           ReadBlobs (Right paths@[(path, Nothing)]) -> rethrowing (IO.isDirectory path >>= bool (IO.readBlobsFromPaths paths) (IO.readBlobsFromDir path))
@@ -193,8 +194,8 @@ runTaskWithOptions options task = do
           ReadBlobPairs source -> rethrowing (either IO.readBlobPairsFromHandle (traverse (runBothWith IO.readFilePair)) source)
           WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents)
           WriteLog level message pairs -> queueLogMessage logger level message pairs
-          WriteStat stat -> liftIO (queue statter stat)
-          Time statName tags task -> withTiming (liftIO . queue statter) statName tags (go task)
+          WriteStat stat -> ask >>= \ statter -> liftIO (queue (statter :: Statter) stat)
+          Time statName tags task -> ask >>= \ statter -> withTiming (liftIO . queue (statter :: Statter)) statName tags (go task)
           Parse parser blob -> go (runParser options blob parser)
           Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
           Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
