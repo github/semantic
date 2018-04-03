@@ -17,17 +17,18 @@ import           System.FilePath.Posix
 --
 -- require "json"
 resolveRubyName :: MonadEvaluatable location term value m => ByteString -> m M.ModuleName
-resolveRubyName n = resolve [name <.> "rb"] >>= maybeFail notFound
-  where name = toName n
-        notFound = "Unable to resolve: " <> name
-        toName = BC.unpack . dropRelativePrefix . stripQuotes
+resolveRubyName name = let n = cleanNameOrPath name in resolve [n <.> "rb"] >>= maybeFailNotFound n
 
 -- load "/root/src/file.rb"
 resolveRubyPath :: MonadEvaluatable location term value m => ByteString -> m M.ModuleName
-resolveRubyPath n = resolve [name] >>= maybeFail notFound
-  where name = toName n
-        notFound = "Unable to resolve: " <> name
-        toName = BC.unpack . dropRelativePrefix . stripQuotes
+resolveRubyPath path = let n = cleanNameOrPath path in resolve [n] >>= maybeFailNotFound n
+
+maybeFailNotFound :: MonadFail m => String -> Maybe a -> m a
+maybeFailNotFound name = maybeFail notFound
+  where notFound = "Unable to resolve: " <> name
+
+cleanNameOrPath :: ByteString -> String
+cleanNameOrPath = BC.unpack . dropRelativePrefix . stripQuotes
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
