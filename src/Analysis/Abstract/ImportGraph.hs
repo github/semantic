@@ -93,6 +93,7 @@ packageGraph = maybe empty (vertex . Package . packageName) . withSomeOrigin ori
 moduleGraph :: SomeOrigin term -> ImportGraph
 moduleGraph = maybe empty (vertex . Module . moduleName) . withSomeOrigin originModule
 
+-- | Add an edge from the current package to the passed vertex.
 packageInclusion :: forall m location term value effects
                  .  ( Effectful m
                     , Member (Reader (SomeOrigin term)) effects
@@ -105,6 +106,7 @@ packageInclusion v = do
   o <- raise ask
   appendGraph (packageGraph @term o >< vertex v)
 
+-- | Add an edge from the current module to the passed vertex.
 moduleInclusion :: forall m location term value effects
                 .  ( Effectful m
                    , Member (Reader (SomeOrigin term)) effects
@@ -117,6 +119,7 @@ moduleInclusion v = do
   o <- raise ask
   appendGraph (moduleGraph @term o >< vertex v)
 
+-- | Add an edge from the passed variable name to the module it originated within.
 variableDefinition :: ( Effectful m
               , Member (State ImportGraph) effects
               , MonadEvaluator (Located location term) term value (m effects)
