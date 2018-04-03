@@ -104,7 +104,7 @@ packageInclusion :: forall m location term value effects
                  -> ImportGraphing m effects ()
 packageInclusion v = do
   o <- raise ask
-  appendGraph (packageGraph @term o >< vertex v)
+  appendGraph (packageGraph @term o `connect` vertex v)
 
 -- | Add an edge from the current module to the passed vertex.
 moduleInclusion :: forall m location term value effects
@@ -117,7 +117,7 @@ moduleInclusion :: forall m location term value effects
                 -> ImportGraphing m effects ()
 moduleInclusion v = do
   o <- raise ask
-  appendGraph (moduleGraph @term o >< vertex v)
+  appendGraph (moduleGraph @term o `connect` vertex v)
 
 -- | Add an edge from the passed variable name to the module it originated within.
 variableDefinition :: ( Effectful m
@@ -126,12 +126,7 @@ variableDefinition :: ( Effectful m
               ) => Name -> ImportGraphing m effects ()
 variableDefinition name = do
   graph <- maybe empty (moduleGraph . origin . unAddress) <$> lookupEnv name
-  appendGraph (vertex (Variable name) >< graph)
-
-(><) :: Graph a => a -> a -> a
-(><) = connect
-
-infixr 7 ><
+  appendGraph (vertex (Variable name) `connect` graph)
 
 appendGraph :: (Effectful m, Member (State ImportGraph) effects) => ImportGraph -> ImportGraphing m effects ()
 appendGraph = raise . modify' . (<>)
