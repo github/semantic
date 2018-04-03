@@ -5,7 +5,7 @@ import qualified Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString as B
-import qualified Data.Abstract.Module as M
+import           Data.Abstract.Module (ModulePath, ModuleInfo(..))
 import           Diffing.Algorithm
 import           Prelude hiding (fail)
 import           Prologue
@@ -27,7 +27,7 @@ importPath str = let path = stripQuotes str in ImportPath (BC.unpack path) (path
 toName :: ImportPath -> Name
 toName = BC.pack . unPath
 
-resolveTypeScriptModule :: MonadEvaluatable location term value m => ImportPath -> m M.ModuleName
+resolveTypeScriptModule :: MonadEvaluatable location term value m => ImportPath -> m ModulePath
 resolveTypeScriptModule (ImportPath path Relative)    = resolveRelativeTSModule path
 resolveTypeScriptModule (ImportPath path NonRelative) = resolveNonRelativeTSModule path
 
@@ -38,9 +38,9 @@ resolveTypeScriptModule (ImportPath path NonRelative) = resolveNonRelativeTSModu
 -- /root/src/moduleB.ts
 -- /root/src/moduleB/package.json (if it specifies a "types" property)
 -- /root/src/moduleB/index.ts
-resolveRelativeTSModule :: MonadEvaluatable location term value m => FilePath -> m M.ModuleName
+resolveRelativeTSModule :: MonadEvaluatable location term value m => FilePath -> m ModulePath
 resolveRelativeTSModule relImportPath = do
-  M.ModuleInfo{..} <- currentModule
+  ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory (makeRelative moduleRoot modulePath)
   let path = normalise (relRootDir </> normalise relImportPath)
   resolveTSModule path >>= either notFound pure
@@ -57,9 +57,9 @@ resolveRelativeTSModule relImportPath = do
 --
 -- /root/node_modules/moduleB.ts, etc
 -- /node_modules/moduleB.ts, etc
-resolveNonRelativeTSModule :: MonadEvaluatable location term value m => FilePath -> m M.ModuleName
+resolveNonRelativeTSModule :: MonadEvaluatable location term value m => FilePath -> m ModulePath
 resolveNonRelativeTSModule name = do
-  M.ModuleInfo{..} <- currentModule
+  ModuleInfo{..} <- currentModule
   go "." (makeRelative moduleRoot modulePath) mempty
   where
     nodeModulesPath dir = takeDirectory dir </> "node_modules" </> name
@@ -72,7 +72,7 @@ resolveNonRelativeTSModule name = do
         Right m -> pure m
     notFound xs = fail $ "Unable to resolve non-relative module import: " <> show name <> ", looked for it in: " <> show xs
 
-resolveTSModule :: MonadEvaluatable location term value m => FilePath -> m (Either [FilePath] M.ModuleName)
+resolveTSModule :: MonadEvaluatable location term value m => FilePath -> m (Either [FilePath] ModulePath)
 resolveTSModule path = maybe (Left searchPaths) Right <$> resolve searchPaths
   where exts = ["ts", "tsx", "d.ts"]
         searchPaths =

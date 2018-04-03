@@ -3,7 +3,7 @@ module Language.Python.Syntax where
 
 import           Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
-import qualified Data.Abstract.Module as M
+import           Data.Abstract.Module
 import           Data.Align.Generic
 import qualified Data.ByteString.Char8 as BC
 import           Data.Functor.Classes.Generic
@@ -62,9 +62,9 @@ friendlyName (QualifiedModuleName xs) = intercalate "." (NonEmpty.toList xs)
 -- Subsequent imports of `parent.two` or `parent.three` will execute
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
-resolvePythonModules :: MonadEvaluatable location term value m => QualifiedModuleName -> m (NonEmpty M.ModuleName)
+resolvePythonModules :: MonadEvaluatable location term value m => QualifiedModuleName -> m (NonEmpty ModulePath)
 resolvePythonModules q@(QualifiedModuleName qualifiedName) = do
-  M.ModuleInfo{..} <- currentModule
+  ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory (makeRelative moduleRoot modulePath)
   for (moduleNames qualifiedName) $ \name -> do
     go relRootDir name

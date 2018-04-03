@@ -2,7 +2,7 @@
 module Language.Go.Syntax where
 
 import Data.Abstract.Evaluatable hiding (Label)
-import qualified Data.Abstract.Module as M
+import Data.Abstract.Module
 import Diffing.Algorithm
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString as B
@@ -20,9 +20,9 @@ defaultAlias :: ImportPath -> Name
 defaultAlias = BC.pack . takeFileName . unPath
 
 -- TODO: need to delineate between relative and absolute Go imports
-resolveGoImport :: MonadEvaluatable location term value m => FilePath -> m [M.ModuleName]
+resolveGoImport :: MonadEvaluatable location term value m => FilePath -> m [ModulePath]
 resolveGoImport relImportPath = do
-  M.ModuleInfo{..} <- currentModule
+  ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory (makeRelative moduleRoot modulePath)
   listModulesInDir $ normalise (relRootDir </> normalise relImportPath)
 

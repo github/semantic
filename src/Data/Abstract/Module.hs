@@ -1,7 +1,7 @@
 module Data.Abstract.Module
 ( Module(..)
 , ModuleInfo(..)
-, ModuleName
+, ModulePath
 , moduleForBlob
 ) where
 
@@ -9,7 +9,7 @@ import Data.Blob
 import Prologue
 import System.FilePath.Posix
 
-type ModuleName = FilePath
+type ModulePath = FilePath
 
 data ModuleInfo = ModuleInfo { modulePath :: FilePath, moduleRoot :: FilePath }
   deriving (Eq, Ord, Show)

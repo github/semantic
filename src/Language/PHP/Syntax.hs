@@ -2,7 +2,7 @@
 module Language.PHP.Syntax where
 
 import           Data.Abstract.Evaluatable
-import qualified Data.Abstract.Module as M
+import           Data.Abstract.Module
 import           Data.Abstract.Path
 import qualified Data.ByteString.Char8 as BC
 import           Diffing.Algorithm
@@ -34,7 +34,7 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
-resolvePHPName :: MonadEvaluatable location term value m => ByteString -> m M.ModuleName
+resolvePHPName :: MonadEvaluatable location term value m => ByteString -> m ModulePath
 resolvePHPName n = resolve [name] >>= maybeFail notFound
   where name = toName n
         notFound = "Unable to resolve: " <> name

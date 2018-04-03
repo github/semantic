@@ -3,7 +3,7 @@ module Language.Ruby.Syntax where
 
 import           Control.Monad (unless)
 import           Data.Abstract.Evaluatable
-import qualified Data.Abstract.Module as M
+import           Data.Abstract.Module (ModulePath)
 import           Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Path
 import qualified Data.ByteString.Char8 as BC
@@ -16,11 +16,11 @@ import           System.FilePath.Posix
 -- TODO: Fully sort out ruby require/load mechanics
 --
 -- require "json"
-resolveRubyName :: MonadEvaluatable location term value m => ByteString -> m M.ModuleName
+resolveRubyName :: MonadEvaluatable location term value m => ByteString -> m ModulePath
 resolveRubyName name = let n = cleanNameOrPath name in resolve [n <.> "rb"] >>= maybeFailNotFound n
 
 -- load "/root/src/file.rb"
-resolveRubyPath :: MonadEvaluatable location term value m => ByteString -> m M.ModuleName
+resolveRubyPath :: MonadEvaluatable location term value m => ByteString -> m ModulePath
 resolveRubyPath path = let n = cleanNameOrPath path in resolve [n] >>= maybeFailNotFound n
 
 maybeFailNotFound :: MonadFail m => String -> Maybe a -> m a
@@ -46,7 +46,7 @@ instance Evaluatable Require where
     pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
 doRequire :: MonadEvaluatable location term value m
-          => ModuleName
+          => ModulePath
           -> m (Environment location value, value)
 doRequire name = do
   moduleTable <- getModuleTable
