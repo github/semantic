@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, RankNTypes, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, RankNTypes, TypeFamilies, UndecidableInstances, ScopedTypeVariables #-}
 module Analysis.Abstract.Evaluating
 ( Evaluating
 , EvaluatingState(..)
@@ -49,17 +49,18 @@ data EvaluatingState location term value = EvaluatingState
   , modules     :: ModuleTable (Environment location value, value)
   , exports     :: Exports location value
   , jumps       :: IntMap.IntMap term
+  , origin      :: SomeOrigin term
   }
 
-deriving instance (Eq (Cell location value), Eq location, Eq term, Eq value) => Eq (EvaluatingState location term value)
-deriving instance (Ord (Cell location value), Ord location, Ord term, Ord value) => Ord (EvaluatingState location term value)
-deriving instance (Show (Cell location value), Show location, Show term, Show value) => Show (EvaluatingState location term value)
+deriving instance (Eq (Cell location value), Eq location, Eq term, Eq value, Eq (Base term ())) => Eq (EvaluatingState location term value)
+deriving instance (Ord (Cell location value), Ord location, Ord term, Ord value, Ord (Base term ())) => Ord (EvaluatingState location term value)
+deriving instance (Show (Cell location value), Show location, Show term, Show value, Show (Base term ())) => Show (EvaluatingState location term value)
 
 instance (Ord location, Semigroup (Cell location value)) => Semigroup (EvaluatingState location term value) where
-  EvaluatingState e1 h1 m1 x1 j1 <> EvaluatingState e2 h2 m2 x2 j2 = EvaluatingState (e1 <> e2) (h1 <> h2) (m1 <> m2) (x1 <> x2) (j1 <> j2)
+  EvaluatingState e1 h1 m1 x1 j1 o1 <> EvaluatingState e2 h2 m2 x2 j2 o2 = EvaluatingState (e1 <> e2) (h1 <> h2) (m1 <> m2) (x1 <> x2) (j1 <> j2) (o1 <> o2)
 
 instance (Ord location, Semigroup (Cell location value)) => Monoid (EvaluatingState location term value) where
-  mempty = EvaluatingState mempty mempty mempty mempty mempty
+  mempty = EvaluatingState mempty mempty mempty mempty mempty mempty
   mappend = (<>)
 
 _environment :: Lens' (EvaluatingState location term value) (Environment location value)
@@ -76,6 +77,9 @@ _exports = lens exports (\ s e -> s {exports = e})
 
 _jumps :: Lens' (EvaluatingState location term value) (IntMap.IntMap term)
 _jumps = lens jumps (\ s j -> s {jumps = j})
+
+_origin :: Lens' (EvaluatingState location term value) (SomeOrigin term)
+_origin = lens origin (\ s o -> s {origin = o})
 
 
 (.=) :: Member (State (EvaluatingState location term value)) effects => ASetter (EvaluatingState location term value) (EvaluatingState location term value) a b -> b -> Evaluating location term value effects ()
@@ -126,13 +130,21 @@ instance Member (State (EvaluatingState location term value)) effects
   getHeap = view _heap
   putHeap = (_heap .=)
 
-instance Members '[Reader (ModuleTable [Module term]), State (EvaluatingState location term value)] effects
+instance Members '[ Reader (ModuleTable [Module term])
+                  , State (EvaluatingState location term value)
+                  , Reader (SomeOrigin term)
+                  , Fail
+                  ] effects
       => MonadModuleTable location term value (Evaluating location term value effects) where
   getModuleTable = view _modules
   putModuleTable = (_modules .=)
 
   askModuleTable = raise ask
   localModuleTable f a = raise (local f (lower a))
+
+  currentModule = do
+    o <- raise ask
+    maybeFail "unable to get currentModule" $ withSomeOrigin (originModule @term) o
 
 instance Members (EvaluatingEffects location term value) effects
       => MonadEvaluator location term value (Evaluating location term value effects) where

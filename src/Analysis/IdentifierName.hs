@@ -5,7 +5,6 @@ module Analysis.IdentifierName
 , identifierLabel
 ) where
 
-import           Data.Abstract.FreeVariables
 import           Data.Aeson
 import           Data.JSON.Fields
 import qualified Data.Syntax
@@ -40,7 +39,7 @@ instance Apply IdentifierName fs => CustomIdentifierName (Union fs) where
   customIdentifierName = apply (Proxy :: Proxy IdentifierName) identifierName
 
 instance CustomIdentifierName Data.Syntax.Identifier where
-  customIdentifierName (Data.Syntax.Identifier name) = Just (friendlyName name)
+  customIdentifierName (Data.Syntax.Identifier name) = Just name
 
 data Strategy = Default | Custom
 

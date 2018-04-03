@@ -5,7 +5,6 @@
     (Comment)
     (Comment)
     (QualifiedImport
-      (Identifier)
       (Identifier))
     (Comment))
   (Function

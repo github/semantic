@@ -1,27 +1,14 @@
 (Program
   (
-  {+(QualifiedImport
-    {+(Identifier)+}
-    {+(Identifier)+})+}
-    (QualifiedImport
-      (Identifier)
-      (Identifier))
-  {-(QualifiedImport
-    {-(Identifier)-}
+  {+(QualifiedImport)+}
+    (QualifiedImport)
+  {-(QualifiedAliasedImport
     {-(Identifier)-})-})
-{+(QualifiedImport
-  {+(Identifier)+}
+{+(QualifiedAliasedImport
   {+(Identifier)+})+}
-{+(QualifiedImport
-  {+(Identifier)+}
-  {+(Identifier)+})+}
+{+(QualifiedImport)+}
 {-(
-  {-(QualifiedImport
-    {-(Identifier)-}
+  {-(QualifiedAliasedImport
     {-(Identifier)-})-}
-  {-(QualifiedImport
-    {-(Identifier)-}
-    {-(Identifier)-})-})-}
-{-(QualifiedImport
-  {-(Identifier)-}
-  {-(Identifier)-})-})
+  {-(QualifiedImport)-})-}
+{-(QualifiedImport)-})

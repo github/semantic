@@ -25,13 +25,11 @@
           (
             (Integer)
             (Integer))))
-      (Assignment
-      { (Identifier)
-      ->(Identifier) }
-        (Times
-        { (Identifier)
-        ->(Identifier) }
-          (Integer)))
+    {+(Assignment
+      {+(Identifier)+}
+      {+(Times
+        {+(Identifier)+}
+        {+(Integer)+})+})+}
     {+(Assignment
       {+(Identifier)+}
       {+(Plus
@@ -42,15 +40,11 @@
       {+(LShift
         {+(Identifier)+}
         {+(Integer)+})+})+}
-      (Assignment
-      { (Identifier)
-      ->(Identifier) }
-      { (Plus
-        {-(Identifier)-}
-        {-(Integer)-})
-      ->(RShift
+    {+(Assignment
+      {+(Identifier)+}
+      {+(RShift
         {+(Identifier)+}
-        {+(Integer)+}) })
+        {+(Integer)+})+})+}
     {+(Assignment
       {+(Identifier)+}
       {+(DividedBy
@@ -61,11 +55,15 @@
       {+(BXOr
         {+(Identifier)+}
         {+(Integer)+})+})+}
-    {+(Assignment
-      {+(Identifier)+}
-      {+(Modulo
+      (Assignment
+      { (Identifier)
+      ->(Identifier) }
+      { (Times
+        {-(Identifier)-}
+        {-(Integer)-})
+      ->(Modulo
         {+(Identifier)+}
-        {+(Integer)+})+})+}
+        {+(Integer)+}) })
     {+(Assignment
       {+(Identifier)+}
       {+(Not
@@ -84,6 +82,11 @@
               {+(KeyValue
                 {+(Identifier)+}
                 {+(Integer)+})+})+})+})+})+})+}
+    {-(Assignment
+      {-(Identifier)-}
+      {-(Plus
+        {-(Identifier)-}
+        {-(Integer)-})-})-}
     {-(Assignment
       {-(Identifier)-}
       {-(LShift

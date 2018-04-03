@@ -10,14 +10,18 @@
   { (Identifier)
   ->(Identifier) }
     (Integer))
-  (Assignment
-  { (
+{+(Assignment
+  {+(Identifier)+}
+  {+(
+    {+(Integer)+}
+    {+(Integer)+})+})+}
+{-(Assignment
+  {-(
     {-(Identifier)-}
-    {-(Identifier)-})
-  ->(Identifier) }
-    (
-      (Integer)
-      (Integer)))
+    {-(Identifier)-})-}
+  {-(
+    {-(Integer)-}
+    {-(Integer)-})-})-}
 {-(Assignment
   {-(Identifier)-}
   {-(

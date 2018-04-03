@@ -11,18 +11,18 @@ import           Algebra.Graph.Class
 import           Algebra.Graph.Export.Dot
 import           Control.Abstract.Analysis
 import           Data.Abstract.Evaluatable (LoadError (..))
-import           Data.Abstract.FreeVariables
 import           Data.Abstract.Module
 import           Data.Abstract.Origin
+import qualified Data.ByteString.Char8 as BC
 import           Prologue hiding (empty)
 
 -- | The graph of function definitions to symbols used in a given program.
-newtype ImportGraph = ImportGraph { unImportGraph :: G.Graph Name }
+newtype ImportGraph = ImportGraph { unImportGraph :: G.Graph FilePath }
   deriving (Eq, Graph, Show)
 
 -- | Render a 'ImportGraph' to a 'ByteString' in DOT notation.
 renderImportGraph :: ImportGraph -> ByteString
-renderImportGraph = export (defaultStyle friendlyName) . unImportGraph
+renderImportGraph = export (defaultStyle BC.pack) . unImportGraph
 
 newtype ImportGraphing m (effects :: [* -> *]) a = ImportGraphing (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
@@ -49,7 +49,7 @@ instance ( Effectful m
                             (\yield (LoadError name) -> insertVertexName name >> yield [])
 
   analyzeModule recur m = do
-    insertVertexName (moduleName (moduleInfo m))
+    insertVertexName (modulePath (moduleInfo m))
     liftAnalyze analyzeModule recur m
 
 insertVertexName :: forall m location term value effects
@@ -58,11 +58,11 @@ insertVertexName :: forall m location term value effects
                     , Member (State ImportGraph) effects
                     , MonadEvaluator location term value (m effects)
                     )
-                 => NonEmpty ByteString
+                 => FilePath
                  -> ImportGraphing m effects ()
 insertVertexName name = do
     o <- raise ask
-    let parent = maybe empty (vertex . moduleName) (withSomeOrigin (originModule @term) o)
+    let parent = maybe empty (vertex . modulePath) (withSomeOrigin (originModule @term) o)
     modifyImportGraph (parent >< vertex name <>)
 
 (><) :: Graph a => a -> a -> a
