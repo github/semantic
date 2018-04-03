@@ -204,13 +204,18 @@ runTaskWithOptions options task = do
         parBitraversable :: Bitraversable t => Strategy a -> Strategy b -> Strategy (t a b)
         parBitraversable strat1 strat2 = bitraverse (rparWith strat1) (rparWith strat2)
 
+logError :: Members '[Reader Options, Reader Logger, IO] effs => Level -> Blob -> Error.Error String -> [(String, String)] -> Eff effs ()
+logError level blob err pairs = do
+  Options{..} <- ask
+  logger <- ask
+  queueLogMessage logger level (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) pairs
+
 runParser :: Blob -> Parser term -> Task term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $
       rethrowing (parseToAST language blob)
   AssignmentParser parser assignment -> do
-    Options{..} <- ask
     ast <- runParser blob parser `catchError` \ (SomeException err) -> do
       writeStat (Stat.increment "parse.parse_failures" languageTag)
       writeLog Error "failed parsing" (("task", "parse") : blobFields)
@@ -219,16 +224,16 @@ runParser blob@Blob{..} parser = case parser of
       case Assignment.assign blobSource assignment ast of
         Left err -> do
           writeStat (Stat.increment "parse.assign_errors" languageTag)
-          writeLog Error (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "assign") : blobFields)
+          logError Error blob err (("task", "assign") : blobFields)
           throwError (toException err)
         Right term -> do
           for_ (errors term) $ \ err -> case Error.errorActual err of
               (Just "ParseError") -> do
                 writeStat (Stat.increment "parse.parse_errors" languageTag)
-                writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "parse") : blobFields)
+                logError Warning blob err (("task", "parse") : blobFields)
               _ -> do
                 writeStat (Stat.increment "parse.assign_warnings" languageTag)
-                writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "assign") : blobFields)
+                logError Warning blob err (("task", "assign") : blobFields)
           writeStat (Stat.count "parse.nodes" (length term) languageTag)
           pure term
   MarkdownParser ->
