@@ -22,6 +22,7 @@ module Semantic.Stat
 ) where
 
 
+import           Control.Monad.IO.Class
 import qualified Data.ByteString.Char8 as B
 import           Data.List (intercalate)
 import           Data.List.Split (splitOneOf)
@@ -78,11 +79,11 @@ timing :: String -> Double -> Tags -> Stat
 timing n v = Stat n (Timer v)
 
 -- | Run an IO Action and record timing
-withTiming :: (Stat -> IO ()) -> String -> Tags -> IO a -> IO a
+withTiming :: MonadIO io => (Stat -> io ()) -> String -> Tags -> io a -> io a
 withTiming statter name tags f = do
-  start <- Time.getCurrentTime
+  start <- liftIO Time.getCurrentTime
   result <- f
-  end <- Time.getCurrentTime
+  end <- liftIO Time.getCurrentTime
   let duration = realToFrac (Time.diffUTCTime end start * 1000)
   statter (timing name duration tags)
   pure result
@@ -109,8 +110,8 @@ data StatsClient
 --     * STATS_ADDR     - String URI to send stats to in the form of `host:port`.
 --     * DOGSTATSD_HOST - String hostname which will override the above host.
 --                        Generally used on kubes pods.
-defaultStatsClient :: IO StatsClient
-defaultStatsClient = do
+defaultStatsClient :: MonadIO io => io StatsClient
+defaultStatsClient = liftIO $ do
   addr <- lookupEnv "STATS_ADDR"
   let (host', port) = parseAddr (fmap ("statsd://" <>) addr)
 
@@ -131,20 +132,20 @@ defaultStatsClient = do
 
 
 -- | Create a StatsClient at the specified host and port with a namespace prefix.
-statsClient :: String -> String -> String -> IO StatsClient
-statsClient host port statsClientNamespace = do
+statsClient :: MonadIO io => String -> String -> String -> io StatsClient
+statsClient host port statsClientNamespace = liftIO $ do
   (addr:_) <- getAddrInfo Nothing (Just host) (Just port)
   sock <- socket (addrFamily addr) Datagram defaultProtocol
   connect sock (addrAddress addr)
   pure (StatsClient sock statsClientNamespace host port)
 
 -- | Close the client's underlying socket.
-closeStatClient :: StatsClient -> IO ()
-closeStatClient StatsClient{..} = close statsClientUDPSocket
+closeStatClient :: MonadIO io => StatsClient -> io ()
+closeStatClient StatsClient{..} = liftIO (close statsClientUDPSocket)
 
 -- | Send a stat over the StatsClient's socket.
-sendStat :: StatsClient -> Stat -> IO ()
-sendStat StatsClient{..} = void . tryIOError . sendAll statsClientUDPSocket . B.pack . renderDatagram statsClientNamespace
+sendStat :: MonadIO io => StatsClient -> Stat -> io ()
+sendStat StatsClient{..} = liftIO . void . tryIOError . sendAll statsClientUDPSocket . B.pack . renderDatagram statsClientNamespace
 
 
 -- Datagram Rendering
