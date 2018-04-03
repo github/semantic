@@ -27,8 +27,8 @@ import           GHC.Exts (IsList (..))
 import           Prologue
 
 -- $setup
--- >>> let bright = push (insert (name "foo") (Address (Precise 0)) mempty)
--- >>> let shadowed = insert (name "foo") (Address (Precise 1)) bright
+-- >>> let bright = push (insert "foo" (Address (Precise 0)) mempty)
+-- >>> let shadowed = insert "foo" (Address (Precise 1)) bright
 
 -- | A LIFO stack of maps of names to addresses, representing a lexically-scoped evaluation environment.
 --   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
@@ -85,13 +85,13 @@ mergeNewer (Environment (a :| as)) (Environment (b :| bs)) =
 -- | Extract an association list of bindings from an 'Environment'.
 --
 -- >>> pairs shadowed
--- [("foo" :| [],Address {unAddress = Precise {unPrecise = 1}})]
+-- [("foo",Address {unAddress = Precise {unPrecise = 1}})]
 pairs :: Environment l a -> [(Name, Address l a)]
 pairs = Map.toList . fold . unEnvironment
 
 -- | Lookup a 'Name' in the environment.
 --
--- >>> lookup (name "foo") shadowed
+-- >>> lookup "foo" shadowed
 -- Just (Address {unAddress = Precise {unPrecise = 1}})
 lookup :: Name -> Environment l a -> Maybe (Address l a)
 lookup k = foldMapA (Map.lookup k) . unEnvironment
@@ -102,7 +102,7 @@ insert name value (Environment (a :| as)) = Environment (Map.insert name value a
 
 -- | Remove a 'Name' from the environment.
 --
--- >>> delete (name "foo") shadowed
+-- >>> delete "foo" shadowed
 -- Environment {unEnvironment = fromList [] :| []}
 delete :: Name -> Environment l a -> Environment l a
 delete name = trim . Environment . fmap (Map.delete name) . unEnvironment
