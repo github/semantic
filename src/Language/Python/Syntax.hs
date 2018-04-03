@@ -26,8 +26,8 @@ newtype QualifiedModuleName = QualifiedModuleName { unQualifiedModuleName :: Non
 moduleName :: ByteString -> QualifiedModuleName
 moduleName x = QualifiedModuleName $ BC.unpack x :| []
 
-qualifiedModuleName :: [ByteString] -> QualifiedModuleName
-qualifiedModuleName xs = QualifiedModuleName $ NonEmpty.fromList (BC.unpack <$> xs)
+qualifiedModuleName :: NonEmpty ByteString -> QualifiedModuleName
+qualifiedModuleName xs = QualifiedModuleName (BC.unpack <$> xs)
 
 friendlyName :: QualifiedModuleName -> String
 friendlyName (QualifiedModuleName xs) = intercalate "." (NonEmpty.toList xs)

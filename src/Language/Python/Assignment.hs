@@ -22,6 +22,7 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
+import qualified Data.List.NonEmpty as NonEmpty
 import Prologue
 
 
@@ -386,10 +387,10 @@ import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliase
     -- `from a import *`
     wildcard = symbol WildcardImport *> source $> []
 
-    importPath = importIden <|> importDottedName <|> importRelative
-    importIden = moduleName <$> identifierSource
-    importDottedName = symbol DottedName *> (qualifiedModuleName <$> children (some identifierSource))
-    importRelative = symbol RelativeImport *> (qualifiedModuleName <$> ((:) <$> source <*> children (many identifierSource)))
+    importPath = qualifiedModuleName <$> (importDottedName <|> importRelative)
+    importDottedName = symbol DottedName *> children (NonEmpty.some1 identifierSource)
+    importRelative = symbol RelativeImport *> children ((:|) <$> importPrefix <*> ((symbol DottedName *> children (many identifierSource)) <|> pure []))
+    importPrefix = symbol ImportPrefix *> source
     identifierSource = (symbol Identifier <|> symbol Identifier') *> source
 
     aliasIdentifier = (symbol Identifier <|> symbol Identifier') *> source <|> symbol DottedName *> source
