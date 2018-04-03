@@ -63,7 +63,6 @@ data TaskF output where
   ReadBlobs :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
   ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [BlobPair]
   WriteToOutput :: Either Handle FilePath -> B.ByteString -> TaskF ()
-  WriteLog :: Level -> String -> [(String, String)] -> TaskF ()
   WriteStat :: Stat -> TaskF ()
   Parse :: Parser term -> Blob -> TaskF term
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
@@ -97,8 +96,10 @@ writeToOutput :: Member TaskF effs => Either Handle FilePath -> B.ByteString -> 
 writeToOutput path = send . WriteToOutput path
 
 -- | A task which logs a message at a specific log level to stderr.
-writeLog :: Member TaskF effs => Level -> String -> [(String, String)] -> Eff effs ()
-writeLog level message = send . WriteLog level message
+writeLog :: Members '[Reader Logger, IO] effs => Level -> String -> [(String, String)] -> Eff effs ()
+writeLog level message pairs = do
+  logger <- ask
+  queueLogMessage logger level message pairs
 
 -- | A task which writes a stat.
 writeStat :: Stat -> Task ()
@@ -192,7 +193,6 @@ runTaskWithOptions options task = do
           ReadBlobs (Right paths) -> rethrowing (IO.readBlobsFromPaths paths)
           ReadBlobPairs source -> rethrowing (either IO.readBlobPairsFromHandle (traverse (runBothWith IO.readFilePair)) source)
           WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents)
-          WriteLog level message pairs -> ask >>= \ logger -> queueLogMessage logger level message pairs
           WriteStat stat -> ask >>= \ statter -> liftIO (queue (statter :: Statter) stat)
           Parse parser blob -> go (runParser blob parser)
           Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
@@ -207,8 +207,7 @@ runTaskWithOptions options task = do
 logError :: Members '[Reader Options, Reader Logger, IO] effs => Level -> Blob -> Error.Error String -> [(String, String)] -> Eff effs ()
 logError level blob err pairs = do
   Options{..} <- ask
-  logger <- ask
-  queueLogMessage logger level (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) pairs
+  writeLog level (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) pairs
 
 runParser :: Blob -> Parser term -> Task term
 runParser blob@Blob{..} parser = case parser of
