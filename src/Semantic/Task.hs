@@ -58,6 +58,9 @@ import           Semantic.Stat as Stat
 import           System.Exit (die)
 import           System.IO (Handle, stderr)
 
+data Distribute output where
+  Distribute :: Traversable t => t (Task output) -> Distribute (t output)
+  Bidistribute :: Bitraversable t => t (Task output1) (Task output2) -> Distribute (t output1 output2)
 
 data TaskF output where
   ReadBlobs :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
@@ -67,14 +70,12 @@ data TaskF output where
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
   Render :: Renderer input output -> input -> TaskF output
-  Distribute :: Traversable t => t (Task output) -> TaskF (t output)
-  Bidistribute :: Bitraversable t => t (Task output1) (Task output2) -> TaskF (t output1 output2)
 
 type Logger = AsyncQueue Message Options
 type Statter = AsyncQueue Stat StatsClient
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
-type Task = Eff '[TaskF, Reader Options, Reader Logger, Reader Statter, Exc SomeException, IO]
+type Task = Eff '[Distribute, TaskF, Reader Options, Reader Logger, Reader Statter, Exc SomeException, IO]
 
 -- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
 type Differ syntax ann1 ann2 = Term syntax ann1 -> Term syntax ann2 -> Diff syntax ann1 ann2
@@ -127,31 +128,31 @@ render renderer = send . Render renderer
 -- | Distribute a 'Traversable' container of tasks over the available cores (i.e. execute them concurrently), collecting their results.
 --
 --   This is a concurrent analogue of 'sequenceA'.
-distribute :: (Member TaskF effs, Traversable t) => t (Task output) -> Eff effs (t output)
+distribute :: (Member Distribute effs, Traversable t) => t (Task output) -> Eff effs (t output)
 distribute = send . Distribute
 
 -- | Distribute a 'Bitraversable' container of tasks over the available cores (i.e. execute them concurrently), collecting their results.
 --
 --   This is a concurrent analogue of 'bisequenceA'.
-bidistribute :: (Bitraversable t, Member TaskF effs) => t (Task output1) (Task output2) -> Eff effs (t output1 output2)
+bidistribute :: (Bitraversable t, Member Distribute effs) => t (Task output1) (Task output2) -> Eff effs (t output1 output2)
 bidistribute = send . Bidistribute
 
 -- | Distribute the application of a function to each element of a 'Traversable' container of inputs over the available cores (i.e. perform the function concurrently for each element), collecting the results.
 --
 --   This is a concurrent analogue of 'for' or 'traverse' (with the arguments flipped).
-distributeFor :: (Member TaskF effs, Traversable t) => t a -> (a -> Task output) -> Eff effs (t output)
+distributeFor :: (Member Distribute effs, Traversable t) => t a -> (a -> Task output) -> Eff effs (t output)
 distributeFor inputs toTask = distribute (fmap toTask inputs)
 
 -- | Distribute the application of a function to each element of a 'Bitraversable' container of inputs over the available cores (i.e. perform the functions concurrently for each element), collecting the results.
 --
 --   This is a concurrent analogue of 'bifor' or 'bitraverse' (with the arguments flipped).
-bidistributeFor :: (Bitraversable t, Member TaskF effs) => t a b -> (a -> Task output1) -> (b -> Task output2) -> Eff effs (t output1 output2)
+bidistributeFor :: (Bitraversable t, Member Distribute effs) => t a b -> (a -> Task output1) -> (b -> Task output2) -> Eff effs (t output1 output2)
 bidistributeFor inputs toTask1 toTask2 = bidistribute (bimap toTask1 toTask2 inputs)
 
 -- | Distribute the application of a function to each element of a 'Traversable' container of inputs over the available cores (i.e. perform the function concurrently for each element), combining the results 'Monoid'ally into a final value.
 --
 --   This is a concurrent analogue of 'foldMap'.
-distributeFoldMap :: (Member TaskF effs, Monoid output, Traversable t) => (a -> Task output) -> t a -> Eff effs output
+distributeFoldMap :: (Member Distribute effs, Monoid output, Traversable t) => (a -> Task output) -> t a -> Eff effs output
 distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 
 -- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
@@ -184,7 +185,7 @@ runTaskWithOptions options task = do
     run options logger statter = run'
       where
         run' :: Task a -> IO (Either SomeException a)
-        run' = runM . runError . flip runReader statter . flip runReader logger . flip runReader options . go
+        run' = runM . runError . flip runReader statter . flip runReader logger . flip runReader options . go . runDistribute
         go :: Members '[Reader Options, Reader Logger, Reader Statter, Exc SomeException, IO] effs => Eff (TaskF ': effs) a -> Eff effs a
         go = interpret (\ task -> case task of
           ReadBlobs (Left handle) -> rethrowing (IO.readBlobsFromHandle handle)
@@ -195,7 +196,10 @@ runTaskWithOptions options task = do
           Parse parser blob -> runParser blob parser
           Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
           Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
-          Render renderer input -> pure (renderer input)
+          Render renderer input -> pure (renderer input))
+
+        runDistribute :: Members '[Exc SomeException, IO] effs => Eff (Distribute ': effs) a -> Eff effs a
+        runDistribute = interpret (\ task -> case task of
           Distribute tasks -> liftIO (Async.mapConcurrently run' tasks) >>= either throwError pure . sequenceA . withStrategy (parTraversable (parTraversable rseq))
           Bidistribute tasks -> liftIO (Async.runConcurrently (bitraverse (Async.Concurrently . run') (Async.Concurrently . run') tasks)) >>= either throwError pure . bisequenceA . withStrategy (parBitraversable (parTraversable rseq) (parTraversable rseq)))
 
