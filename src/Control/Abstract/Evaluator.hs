@@ -147,6 +147,9 @@ class Monad m => MonadModuleTable location term value m | m -> location, m -> te
   -- | Run an action with a locally-modified table of unevaluated modules.
   localModuleTable :: (ModuleTable [Module term] -> ModuleTable [Module term]) -> m a -> m a
 
+  -- | Get the currently evaluating 'ModuleInfo'.
+  currentModule :: m ModuleInfo
+
 -- | Update the evaluated module table.
 modifyModuleTable :: MonadModuleTable location term value m => (ModuleTable (Environment location value, value) -> ModuleTable (Environment location value, value)) -> m ()
 modifyModuleTable f = do

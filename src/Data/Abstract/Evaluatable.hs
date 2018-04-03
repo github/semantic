@@ -1,6 +1,4 @@
 {-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, UndecidableInstances #-}
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving,
-             TypeFamilies, TypeOperators #-}
 
 module Data.Abstract.Evaluatable
 ( module X
@@ -9,7 +7,6 @@ module Data.Abstract.Evaluatable
 , Unspecialized(..)
 , LoadError(..)
 , EvalError(..)
-, currentModule
 , variable
 , evaluateTerm
 , evaluateModule
@@ -31,7 +28,7 @@ import qualified Data.Abstract.Exports as Exports
 import           Data.Abstract.FreeVariables as X
 import           Data.Abstract.Module
 import           Data.Abstract.ModuleTable as ModuleTable
-import           Data.Abstract.Origin (SomeOrigin, packageOrigin, originModule, withSomeOrigin)
+import           Data.Abstract.Origin (SomeOrigin, packageOrigin)
 import           Data.Abstract.Package as Package
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
@@ -70,22 +67,6 @@ instance Eq1 (LoadError term a) where
 data EvalError value resume where
   -- Indicates we weren't able to dereference a name from the evaluated environment.
   FreeVariableError :: Name -> EvalError value value
-
--- | Get the current module.
--- currentModule :: forall m location term value effects
---                  .  ( Effectful m
---                     , Member (Reader (SomeOrigin term)) effects
---                     , MonadEvaluator location term value (m effects)
---                     )
---                   => m effects ModuleInfo
-currentModule :: m ModuleInfo
-currentModule = undefined
--- currentModule = do
---   o <- raise ask
---   let Just m = withSomeOrigin (originModule @term) o
---   pure m
-  -- pure moduleInfo m
--- currentModule = head <$> askModuleStack
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: MonadEvaluatable location term value m => Name -> m value
