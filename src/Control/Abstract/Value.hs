@@ -191,7 +191,7 @@ class ValueRoots location value where
 -- The type of exceptions that can be thrown when constructing values in `MonadValue`.
 data ValueExc location value resume where
   TypeError              :: Prelude.String -> ValueExc location value value
-  StringError            :: Prelude.String -> ValueExc location value ByteString
+  StringError            :: value          -> ValueExc location value ByteString
   NamespaceError         :: Prelude.String -> ValueExc location value (Environment location value)
   ScopedEnvironmentError :: Prelude.String -> ValueExc location value (Environment location value)
   CallError              :: value          -> ValueExc location value value

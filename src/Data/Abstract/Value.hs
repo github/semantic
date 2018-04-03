@@ -232,7 +232,7 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
 
   asString v
     | Just (String n) <- prjValue v = pure n
-    | otherwise                     = fail ("expected " <> show v <> " to be a string")
+    | otherwise                     = throwException $ StringError v
 
   ifthenelse cond if' else'
     | Just (Boolean b) <- prjValue cond = if b then if' else else'
