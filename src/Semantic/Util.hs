@@ -99,7 +99,7 @@ parseProject parser exts entryPoint = do
   let rootDir = takeDirectory entryPoint
   paths <- getPaths exts rootDir
   modules <- parseFiles parser rootDir paths
-  pure $ fromModulesWithEntryPoint modules entryPoint
+  pure $ fromModulesWithEntryPoint modules (takeFileName entryPoint)
 
 withPrelude prelude a = do
   preludeEnv <- evaluateModule prelude *> getEnv
