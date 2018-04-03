@@ -192,7 +192,7 @@ runTaskWithOptions options task = do
           ReadBlobs (Right paths) -> rethrowing (IO.readBlobsFromPaths paths)
           ReadBlobPairs source -> rethrowing (either IO.readBlobPairsFromHandle (traverse (runBothWith IO.readFilePair)) source)
           WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents)
-          Parse parser blob -> go (runParser blob parser)
+          Parse parser blob -> runParser blob parser
           Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
           Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
           Render renderer input -> pure (renderer input)
@@ -207,7 +207,7 @@ logError level blob err pairs = do
   Options{..} <- ask
   writeLog level (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) pairs
 
-runParser :: Blob -> Parser term -> Task term
+runParser :: Members '[Reader Options, Reader Logger, Reader Statter, Exc SomeException, IO] effs => Blob -> Parser term -> Eff effs term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $
