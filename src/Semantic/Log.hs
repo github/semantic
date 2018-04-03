@@ -1,5 +1,6 @@
 module Semantic.Log where
 
+import           Control.Monad.IO.Class
 import           Data.Error (withSGRCode)
 import           Data.List (intersperse)
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
@@ -27,14 +28,14 @@ data Level
 
 
 -- | Queue a message to be logged.
-queueLogMessage :: AsyncQueue Message Options -> Level -> String -> [(String, String)] -> IO ()
+queueLogMessage :: MonadIO io => AsyncQueue Message Options -> Level -> String -> [(String, String)] -> io ()
 queueLogMessage q@AsyncQueue{..} level message pairs
-  | Just logLevel <- optionsLevel asyncQueueExtra, level <= logLevel = Time.getCurrentTime >>= LocalTime.utcToLocalZonedTime >>= queue q . Message level message pairs
+  | Just logLevel <- optionsLevel asyncQueueExtra, level <= logLevel = liftIO Time.getCurrentTime >>= liftIO . LocalTime.utcToLocalZonedTime >>= liftIO . queue q . Message level message pairs
   | otherwise = pure ()
 
 -- | Log a message to stderr.
-logMessage :: Options -> Message -> IO ()
-logMessage options@Options{..} = hPutStr stderr . optionsFormatter options
+logMessage :: MonadIO io => Options -> Message -> io ()
+logMessage options@Options{..} = liftIO . hPutStr stderr . optionsFormatter options
 
 -- | Format log messaging using "logfmt".
 --
@@ -102,8 +103,8 @@ defaultOptions = Options
   , optionsProcessID = 0
   }
 
-configureOptionsForHandle :: Handle -> Options -> IO Options
-configureOptionsForHandle handle options = do
+configureOptionsForHandle :: MonadIO io => Handle -> Options -> io Options
+configureOptionsForHandle handle options = liftIO $ do
   pid <- getProcessID
   isTerminal <- hIsTerminalDevice handle
   pure $ options
