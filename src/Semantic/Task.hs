@@ -194,7 +194,7 @@ runTaskWithOptions options task = do
           WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents)
           WriteLog level message pairs -> ask >>= \ logger -> queueLogMessage logger level message pairs
           WriteStat stat -> ask >>= \ statter -> liftIO (queue (statter :: Statter) stat)
-          Parse parser blob -> ask >>= \ options -> go (runParser options blob parser)
+          Parse parser blob -> go (runParser blob parser)
           Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
           Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
           Render renderer input -> pure (renderer input)
@@ -204,8 +204,8 @@ runTaskWithOptions options task = do
         parBitraversable :: Bitraversable t => Strategy a -> Strategy b -> Strategy (t a b)
         parBitraversable strat1 strat2 = bitraverse (rparWith strat1) (rparWith strat2)
 
-runParser :: Options -> Blob -> Parser term -> Task term
-runParser Options{..} blob@Blob{..} = go
+runParser :: Blob -> Parser term -> Task term
+runParser blob@Blob{..} = go
   where
     go :: Parser term -> Task term
     go parser = case parser of
@@ -213,6 +213,7 @@ runParser Options{..} blob@Blob{..} = go
         time "parse.tree_sitter_ast_parse" languageTag $
           rethrowing (parseToAST language blob)
       AssignmentParser parser assignment -> do
+        Options{..} <- ask
         ast <- go parser `catchError` \ (SomeException err) -> do
           writeStat (Stat.increment "parse.parse_failures" languageTag)
           writeLog Error "failed parsing" (("task", "parse") : blobFields)
