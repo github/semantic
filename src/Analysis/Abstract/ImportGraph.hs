@@ -21,7 +21,7 @@ import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Prologue hiding (empty, packageName)
 
--- | The graph of function definitions to symbols used in a given program.
+-- | The graph of function variableDefinitions to symbols used in a given program.
 newtype ImportGraph = ImportGraph { unImportGraph :: G.Graph Vertex }
   deriving (Eq, Graph, Show)
 
@@ -73,19 +73,18 @@ instance ( Effectful m
   analyzeTerm eval term@(In _ syntax) = do
     case prj syntax of
       Just (Syntax.Identifier name) -> do
-        inclusion (Variable name)
-        definition name
+        moduleInclusion (Variable name)
+        variableDefinition name
       _ -> pure ()
     resumeException
       @(LoadError term value)
       (liftAnalyze analyzeTerm eval term)
-      (\yield (LoadError name) -> inclusion (Module name) >> yield [])
+      (\yield (LoadError name) -> moduleInclusion (Module name) >> yield [])
 
   analyzeModule recur m = do
     let name = moduleName (moduleInfo m)
-    o <- raise ask
-    appendGraph (packageGraph @term o >< vertex (Module name))
-    inclusion (Module name)
+    packageInclusion (Module name)
+    moduleInclusion (Module name)
     liftAnalyze analyzeModule recur m
 
 packageGraph :: SomeOrigin term -> ImportGraph
@@ -94,23 +93,35 @@ packageGraph = maybe empty (vertex . Package . packageName) . withSomeOrigin ori
 moduleGraph :: SomeOrigin term -> ImportGraph
 moduleGraph = maybe empty (vertex . Module . moduleName) . withSomeOrigin originModule
 
-inclusion :: forall m location term value effects
-          .  ( Effectful m
-             , Member (Reader (SomeOrigin term)) effects
-             , Member (State ImportGraph) effects
-             , MonadEvaluator location term value (m effects)
-             )
-          => Vertex
-          -> ImportGraphing m effects ()
-inclusion v = do
-    o <- raise ask
-    appendGraph (moduleGraph @term o >< vertex v)
+packageInclusion :: forall m location term value effects
+                 .  ( Effectful m
+                    , Member (Reader (SomeOrigin term)) effects
+                    , Member (State ImportGraph) effects
+                    , MonadEvaluator location term value (m effects)
+                    )
+                 => Vertex
+                 -> ImportGraphing m effects ()
+packageInclusion v = do
+  o <- raise ask
+  appendGraph (packageGraph @term o >< vertex v)
 
-definition :: ( Effectful m
+moduleInclusion :: forall m location term value effects
+                .  ( Effectful m
+                   , Member (Reader (SomeOrigin term)) effects
+                   , Member (State ImportGraph) effects
+                   , MonadEvaluator location term value (m effects)
+                   )
+                => Vertex
+                -> ImportGraphing m effects ()
+moduleInclusion v = do
+  o <- raise ask
+  appendGraph (moduleGraph @term o >< vertex v)
+
+variableDefinition :: ( Effectful m
               , Member (State ImportGraph) effects
               , MonadEvaluator (Located location term) term value (m effects)
               ) => Name -> ImportGraphing m effects ()
-definition name = do
+variableDefinition name = do
   graph <- maybe empty (moduleGraph . origin . unAddress) <$> lookupEnv name
   appendGraph (vertex (Variable name) >< graph)
 
