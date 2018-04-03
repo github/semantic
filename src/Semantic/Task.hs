@@ -65,7 +65,6 @@ data TaskF output where
   WriteToOutput :: Either Handle FilePath -> B.ByteString -> TaskF ()
   WriteLog :: Level -> String -> [(String, String)] -> TaskF ()
   WriteStat :: Stat -> TaskF ()
-  Time :: String -> [(String, String)] -> Task output -> TaskF output
   Parse :: Parser term -> Blob -> TaskF term
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
@@ -105,9 +104,9 @@ writeLog level message = send . WriteLog level message
 writeStat :: Stat -> Task ()
 writeStat = send . WriteStat
 
--- | A task which measures and stats the timing of another 'Task'.
-time :: Member TaskF effs => String -> [(String, String)] -> Task output -> Eff effs output
-time statName tags = send . Time statName tags
+-- | A task which measures and stats the timing of another task.
+time :: (Member (Reader Statter) effs, Member IO effs) => String -> [(String, String)] -> Eff effs output -> Eff effs output
+time statName tags task = ask >>= \ statter -> withTiming (liftIO . queue (statter :: Statter)) statName tags task
 
 -- | A task which parses a 'Blob' with the given 'Parser'.
 parse :: Member TaskF effs => Parser term -> Blob -> Eff effs term
@@ -195,7 +194,6 @@ runTaskWithOptions options task = do
           WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents)
           WriteLog level message pairs -> queueLogMessage logger level message pairs
           WriteStat stat -> ask >>= \ statter -> liftIO (queue (statter :: Statter) stat)
-          Time statName tags task -> ask >>= \ statter -> withTiming (liftIO . queue (statter :: Statter)) statName tags (go task)
           Parse parser blob -> go (runParser options blob parser)
           Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
           Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
