@@ -309,6 +309,6 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
           assign a v
           Env.insert name a <$> rest) (pure env) (zip names params)
         localEnv (mappend bindings) (goto label >>= evaluateTerm)
-      Nothing -> throwException @(ValueExc location (Value location)) (CallError op)
+      Nothing -> throwException @(ValueError location (Value location)) (CallError op)
 
   loop = fix

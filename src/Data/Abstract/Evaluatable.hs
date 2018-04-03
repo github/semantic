@@ -42,7 +42,7 @@ type MonadEvaluatable location term value m =
   , MonadAddressable location m
   , MonadAnalysis location term value m
   , MonadThrow (Unspecialized value) m
-  , MonadThrow (ValueExc location value) m
+  , MonadThrow (ValueError location value) m
   , MonadThrow (LoadError term value) m
   , MonadThrow (EvalError value) m
   , MonadValue location value m

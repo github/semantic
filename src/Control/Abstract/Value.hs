@@ -8,7 +8,7 @@ module Control.Abstract.Value
 , toBool
 , makeNamespace
 , ValueRoots(..)
-, ValueExc(..)
+, ValueError(..)
 ) where
 
 import Control.Abstract.Evaluator
@@ -189,14 +189,14 @@ class ValueRoots location value where
 
 
 -- The type of exceptions that can be thrown when constructing values in `MonadValue`.
-data ValueExc location value resume where
-  TypeError              :: Prelude.String -> ValueExc location value value
-  StringError            :: value          -> ValueExc location value ByteString
-  NamespaceError         :: Prelude.String -> ValueExc location value (Environment location value)
-  ScopedEnvironmentError :: Prelude.String -> ValueExc location value (Environment location value)
-  CallError              :: value          -> ValueExc location value value
+data ValueError location value resume where
+  TypeError              :: Prelude.String -> ValueError location value value
+  StringError            :: value          -> ValueError location value ByteString
+  NamespaceError         :: Prelude.String -> ValueError location value (Environment location value)
+  ScopedEnvironmentError :: Prelude.String -> ValueError location value (Environment location value)
+  CallError              :: value          -> ValueError location value value
 
-instance Eq value => Eq1 (ValueExc location value) where
+instance Eq value => Eq1 (ValueError location value) where
   liftEq _ (TypeError a)  (TypeError b)                          = a == b
   liftEq _ (StringError a) (StringError b)                       = a == b
   liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
@@ -204,6 +204,6 @@ instance Eq value => Eq1 (ValueExc location value) where
   liftEq _ (CallError a) (CallError b)                           = a == b
   liftEq _ _             _                                       = False
 
-deriving instance (Show value) => Show (ValueExc location value resume)
-instance (Show value) => Show1 (ValueExc location value) where
+deriving instance (Show value) => Show (ValueError location value resume)
+instance (Show value) => Show1 (ValueError location value) where
   liftShowsPrec _ _ = showsPrec

@@ -33,7 +33,7 @@ deriving instance Member NonDet effects => MonadNonDet (Evaluating location term
 type EvaluatingEffects location term value
   = '[ Resumable (EvalError value)
      , Resumable (LoadError term value)
-     , Resumable (ValueExc location value)
+     , Resumable (ValueError location value)
      , Resumable (Unspecialized value)
      , Fail                                         -- Failure with an error message
      , Fresh                                        -- For allocating new addresses and/or type variables.

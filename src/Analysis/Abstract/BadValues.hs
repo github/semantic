@@ -17,7 +17,7 @@ deriving instance MonadModuleTable location term value (m effects) => MonadModul
 deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (BadValues m effects)
 
 instance ( Effectful m
-         , Member (Resumable (ValueExc location value)) effects
+         , Member (Resumable (ValueError location value)) effects
          , Member (State (EvaluatingState location term value)) effects
          , Member (State [Name]) effects
          , MonadAnalysis location term value (m effects)
@@ -26,8 +26,8 @@ instance ( Effectful m
       => MonadAnalysis location term value (BadValues m effects) where
   type Effects location term value (BadValues m effects) = State [Name] ': Effects location term value (m effects)
 
-  analyzeTerm eval term = resumeException @(ValueExc location value) (liftAnalyze analyzeTerm eval term) (
-        \yield valueExc -> case valueExc of
+  analyzeTerm eval term = resumeException @(ValueError location value) (liftAnalyze analyzeTerm eval term) (
+        \yield ValueError -> case ValueError of
           (ScopedEnvironmentError _) -> do
             env <- getEnv
             yield (Env.push env)
