@@ -254,6 +254,7 @@ catchException :: ( Exc.Exception e
                -> Eff r a
 catchException m handler = interpose pure (\ m yield -> send (Exc.try m) >>= either handler yield) m
 
+-- | Lift an 'IO' action into 'Eff', catching and rethrowing any exceptions it throws into an 'Exc' effect.
 rethrowing :: ( Member (Exc SomeException) r
               , Member IO r
               )
