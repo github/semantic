@@ -243,22 +243,20 @@ runParser Options{..} blob@Blob{..} = go
       _ -> fold syntax
 
 
-catchDynE :: ( Exc.Exception e
-             , Member IO r
-             )
-          => Eff r a
-          -> (e -> Eff r a)
-          -> Eff r a
-catchDynE m handler = interpose pure (\ m yield -> send (Exc.try m) >>= either handler yield) m
+catchException :: ( Exc.Exception e
+                  , Member IO r
+                  )
+               => Eff r a
+               -> (e -> Eff r a)
+               -> Eff r a
+catchException m handler = interpose pure (\ m yield -> send (Exc.try m) >>= either handler yield) m
 
 rethrowing :: ( Member (Exc SomeException) r
               , Member IO r
               )
            => IO a
            -> Eff r a
-rethrowing m = liftIO m `catchDynE` throwError . toException @SomeException
-
-infixl 1 `catchDynE`
+rethrowing m = catchException (liftIO m) (throwError . toException @SomeException)
 
 instance Member IO effs => MonadIO (Eff effs) where
   liftIO = send
