@@ -27,9 +27,10 @@ instance ( Effectful m
   type Effects location term value (BadValues m effects) = State [Name] ': Effects location term value (m effects)
 
   analyzeTerm eval term = resumeException @(ValueExc location value) (liftAnalyze analyzeTerm eval term) (
-        \yield (ScopedEnvironmentError _) ->
-          do
+        \yield valueExc -> case valueExc of
+          (ScopedEnvironmentError _) -> do
             env <- getEnv
-            yield (Env.push env))
+            yield (Env.push env)
+          (CallError val) -> yield val)
 
   analyzeModule = liftAnalyze analyzeModule
