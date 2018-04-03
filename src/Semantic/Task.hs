@@ -76,7 +76,7 @@ type Logger = AsyncQueue Message Options
 type Statter = AsyncQueue Stat StatsClient
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
-type Task = Eff '[TaskF, Reader Statter, Exc SomeException, IO]
+type Task = Eff '[TaskF, Reader Logger, Reader Statter, Exc SomeException, IO]
 
 -- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
 type Differ syntax ann1 ann2 = Term syntax ann1 -> Term syntax ann2 -> Diff syntax ann1 ann2
@@ -184,15 +184,15 @@ runTaskWithOptions options task = do
     run options logger statter = run'
       where
         run' :: Task a -> IO (Either SomeException a)
-        run' = runM . runError . flip runReader statter . go
-        go :: Task a -> Eff '[Reader Statter, Exc SomeException, IO] a
+        run' = runM . runError . flip runReader statter . flip runReader logger . go
+        go :: Task a -> Eff '[Reader Logger, Reader Statter, Exc SomeException, IO] a
         go = interpret (\ task -> case task of
           ReadBlobs (Left handle) -> rethrowing (IO.readBlobsFromHandle handle)
           ReadBlobs (Right paths@[(path, Nothing)]) -> rethrowing (IO.isDirectory path >>= bool (IO.readBlobsFromPaths paths) (IO.readBlobsFromDir path))
           ReadBlobs (Right paths) -> rethrowing (IO.readBlobsFromPaths paths)
           ReadBlobPairs source -> rethrowing (either IO.readBlobPairsFromHandle (traverse (runBothWith IO.readFilePair)) source)
           WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents)
-          WriteLog level message pairs -> queueLogMessage logger level message pairs
+          WriteLog level message pairs -> ask >>= \ logger -> queueLogMessage logger level message pairs
           WriteStat stat -> ask >>= \ statter -> liftIO (queue (statter :: Statter) stat)
           Parse parser blob -> go (runParser options blob parser)
           Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
