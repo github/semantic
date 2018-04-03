@@ -40,7 +40,7 @@ insert k v = ModuleTable . Map.insert k v . unModuleTable
 
 -- | Construct a 'ModuleTable' from a list of 'Module's.
 fromModules :: [Module term] -> ModuleTable [Module term]
-fromModules = ModuleTable . Map.fromListWith (<>) . map toEntry
+fromModules modules = let x = ModuleTable (Map.fromListWith (<>) (map toEntry modules)) in traceShow x x
   where toEntry m = (modulePath (moduleInfo m), [m])
 
 toPairs :: ModuleTable a -> [(ModulePath, a)]

@@ -15,7 +15,10 @@ data ModuleInfo = ModuleInfo { modulePath :: FilePath, moduleRoot :: FilePath }
   deriving (Eq, Ord, Show)
 
 data Module term = Module { moduleInfo :: ModuleInfo, moduleBody :: term }
-  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Ord, Traversable)
+
+instance Show (Module term) where
+  showsPrec _ Module{..} = shows moduleInfo
 
 
 -- | Construct a 'Module' for a 'Blob' and @term@, relative to some root 'FilePath'.
