@@ -244,8 +244,9 @@ diffWithParser :: ( HasField fields Data.Span.Span
                   , Diffable syntax
                   , GAlign syntax
                   , HasDeclaration syntax
+                  , Members '[Distribute WrappedTask, TaskF] effs
                   )
                => Parser (Term syntax (Record fields))
                -> BlobPair
-               -> Task (Diff syntax (Record (Maybe Declaration ': fields)) (Record (Maybe Declaration ': fields)))
+               -> Eff effs (Diff syntax (Record (Maybe Declaration ': fields)) (Record (Maybe Declaration ': fields)))
 diffWithParser parser blobs = distributeFor blobs (\ blob -> WrapTask $ parse parser blob >>= decorate (declarationAlgebra blob)) >>= diffTermPair diffTerms . runJoin
