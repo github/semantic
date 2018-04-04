@@ -17,7 +17,7 @@ deriving instance MonadModuleTable location term value (m effects) => MonadModul
 deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (BadModuleResolutions m effects)
 
 instance ( Effectful m
-         , Member (Resumable (ValueError location value)) effects
+         , Member (Resumable (ResolutionError value)) effects
          , Member (State (EvaluatingState location term value)) effects
          , Member (State [Name]) effects
          , MonadAnalysis location term value (m effects)
@@ -26,8 +26,8 @@ instance ( Effectful m
       => MonadAnalysis location term value (BadModuleResolutions m effects) where
   type Effects location term value (BadModuleResolutions m effects) = State [Name] ': Effects location term value (m effects)
 
-  analyzeTerm eval term = resumeException @(ResolutionError location value) (liftAnalyze analyzeTerm eval term) (
+  analyzeTerm eval term = resumeException @(ResolutionError value) (liftAnalyze analyzeTerm eval term) (
         \yield error -> case error of
-          (PythonResolutionError _) -> yield ("" :| []))
+          (RubyError name) -> yield "")
 
   analyzeModule = liftAnalyze analyzeModule

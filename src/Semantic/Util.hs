@@ -4,6 +4,7 @@
 module Semantic.Util where
 
 import Analysis.Abstract.BadVariables
+import Analysis.Abstract.BadModuleResolutions
 import Analysis.Abstract.BadValues
 import Analysis.Abstract.Caching
 import Analysis.Abstract.Quiet
@@ -47,7 +48,7 @@ import qualified Language.TypeScript.Assignment as TypeScript
 evalRubyProject path = runEvaluating <$> (withPrelude <$> parsePrelude rubyParser <*> (evaluatePackageBody <$> parseProject rubyParser ["rb"] path))
 evalRubyFile path = runEvaluating <$> (withPrelude <$> parsePrelude rubyParser <*> (evaluateModule <$> parseFile rubyParser Nothing path))
 
-evaluateRubyProjectGraph path = runAnalysis @(ImportGraphing (BadVariables (BadValues (Quietly (Evaluating Precise Ruby.Term (Value Precise)))))) . evaluatePackageBody <$> parseProject rubyParser ["rb"] path
+evaluateRubyProjectGraph path = runAnalysis @(ImportGraphing (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating Precise Ruby.Term (Value Precise))))))) . evaluatePackageBody <$> parseProject rubyParser ["rb"] path
 
 evaluateRubyImportGraph paths = runAnalysis @(ImportGraphing (BadVariables (BadValues (Quietly (Evaluating Precise Ruby.Term (Value Precise)))))) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
 evaluateRubyBadVariables paths = runAnalysis @(BadVariables (Evaluating Precise Ruby.Term (Value Precise))) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
