@@ -128,7 +128,7 @@ runTaskWithOptions options task = do
 
   (result, stat) <- withTiming "run" [] $ do
     let run :: Task a -> IO (Either SomeException a)
-        run = runM . runError . flip runReader (Queues logger statter) . runTelemetry . flip runReader options . IO.runFiles . runTaskF . runDistribute (run . unwrapTask)
+        run = runM . runError . flip runReader (Queues logger statter) . runTelemetry . flip runReader options . IO.runFiles . runTaskF . flip runDistribute (Action (run . unwrapTask))
     run task
   queue statter stat
 
