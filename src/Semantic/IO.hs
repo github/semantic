@@ -74,7 +74,7 @@ readBlobsFromHandle = fmap toBlobs . readFromHandle
   where toBlobs BlobParse{..} = fmap toBlob blobs
 
 readBlobsFromPaths :: MonadIO m => [(FilePath, Maybe Language)] -> m [Blob.Blob]
-readBlobsFromPaths files = catMaybes <$> traverse (uncurry Semantic.IO.readFile) files
+readBlobsFromPaths files = catMaybes <$> traverse (uncurry readFile) files
 
 readBlobsFromDir :: MonadIO m => FilePath -> m [Blob.Blob]
 readBlobsFromDir path = do
