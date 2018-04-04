@@ -39,3 +39,8 @@ runTelemetry :: Members '[Reader LogQueue, Reader StatQueue, IO] effs => Eff (Te
 runTelemetry = interpret (\ t -> case t of
   WriteStat stat -> ask >>= \ statter -> liftIO (queue (statter :: StatQueue) stat)
   WriteLog level message pairs -> ask >>= \ logger -> queueLogMessage logger level message pairs)
+
+ignoreTelemetry :: Eff (Telemetry ': effs) a -> Eff effs a
+ignoreTelemetry = interpret (\ t -> case t of
+  WriteStat{} -> pure ()
+  WriteLog{}  -> pure ())
