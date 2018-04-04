@@ -121,7 +121,7 @@ render :: Member TaskF effs => Renderer input output -> input -> Eff effs output
 render renderer = send . Render renderer
 
 
-importGraph :: (Apply Eq1 syntax, Apply Analysis.Evaluatable syntax, Apply FreeVariables1 syntax, Apply Functor syntax, Apply Ord1 syntax, Apply Show1 syntax, Member Syntax.Identifier syntax, Ord ann, Show ann) => Member TaskF effs => Package (Term (Union syntax) ann) -> Eff effs B.ByteString
+importGraph :: (Apply Eq1 syntax, Apply Analysis.Evaluatable syntax, Apply FreeVariables1 syntax, Apply Functor syntax, Apply Ord1 syntax, Apply Show1 syntax, Member Syntax.Identifier syntax, Member TaskF effs, Ord ann, Show ann) => Package (Term (Union syntax) ann) -> Eff effs B.ByteString
 importGraph package = send (ImportGraph package)
 
 
