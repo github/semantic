@@ -16,6 +16,9 @@ module Semantic.Task
 , time
 -- * High-level flow
 , parse
+, parseModule
+, parseModules
+, parsePackage
 , analyze
 , decorate
 , diff
@@ -55,6 +58,7 @@ import           Data.Abstract.Address
 import qualified Data.Abstract.Evaluatable as Analysis
 import           Data.Abstract.FreeVariables
 import           Data.Abstract.Located
+import           Data.Abstract.Module
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value)
 import           Data.Blob
@@ -100,6 +104,21 @@ type Renderer i o = i -> o
 -- | A task which parses a 'Blob' with the given 'Parser'.
 parse :: Member TaskF effs => Parser term -> Blob -> Eff effs term
 parse parser = send . Parse parser
+
+-- | Parse a file into a 'Module'.
+parseModule :: Members '[IO.Files, TaskF] effs => Parser term -> Maybe FilePath -> FilePath -> Eff effs (Module term)
+parseModule parser rootDir path = do
+  blob <- head <$> IO.readBlobs (Right [(path, IO.languageForFilePath path)])
+  moduleForBlob rootDir blob <$> parse parser blob
+
+-- | Parse a list of files into 'Module's.
+parseModules :: Parser term -> FilePath -> [FilePath] -> Task [Module term]
+parseModules parser rootDir = traverse (parseModule parser (Just rootDir))
+
+-- | Parse a list of files into a 'Package'.
+parsePackage :: PackageName -> Parser term -> FilePath -> [FilePath] -> Task (Package term)
+parsePackage name parser rootDir paths = Package (PackageInfo name Nothing) . Package.fromModules <$> parseModules parser rootDir paths
+
 
 -- | A task running some 'Analysis.MonadAnalysis' to completion.
 analyze :: Member TaskF effs => Analysis.SomeAnalysis m result -> Eff effs result

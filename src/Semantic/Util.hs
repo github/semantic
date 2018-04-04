@@ -35,7 +35,8 @@ import Parsing.Parser
 import Prologue
 import Semantic.Diff (diffTermPair)
 import Semantic.IO as IO
-import Semantic.Task
+import Semantic.Task hiding (parsePackage)
+import qualified Semantic.Task as Task
 import System.FilePath.Posix
 
 import qualified Language.Go.Assignment as Go
@@ -227,7 +228,7 @@ parseFiles :: Parser term -> FilePath -> [FilePath] -> IO [Module term]
 parseFiles parser rootDir = traverse (parseFile parser (Just rootDir))
 
 parsePackage :: PackageName -> Parser term -> FilePath -> [FilePath] -> IO (Package term)
-parsePackage name parser rootDir files = Package (PackageInfo name Nothing) . Package.fromModules <$> parseFiles parser rootDir files
+parsePackage name parser rootDir = runTask . Task.parsePackage name parser rootDir
 
 
 -- Read a file from the filesystem into a Blob.
