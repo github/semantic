@@ -189,12 +189,12 @@ runTaskWithOptions options task = do
     run options logger statter = run'
       where
         run' :: Task a -> IO (Either SomeException a)
-        run' = runM . runError . flip runReader statter . flip runReader logger . runTelemetry . flip runReader options . runTaskF . runDistribute
+        run' = runM . runError . flip runReader statter . flip runReader logger . runTelemetry . flip runReader options . runTaskF . runDistribute (run' . unwrapTask)
 
-        runDistribute :: Members '[Exc SomeException, IO] effs => Eff (Distribute WrappedTask ': effs) a -> Eff effs a
-        runDistribute = interpret (\ task -> case task of
-          Distribute tasks -> liftIO (Async.mapConcurrently (run' . unwrapTask) tasks) >>= either throwError pure . sequenceA . withStrategy (parTraversable (parTraversable rseq))
-          Bidistribute tasks -> liftIO (Async.runConcurrently (bitraverse (Async.Concurrently . run' . unwrapTask) (Async.Concurrently . run' . unwrapTask) tasks)) >>= either throwError pure . bisequenceA . withStrategy (parBitraversable (parTraversable rseq) (parTraversable rseq)))
+        runDistribute :: Members '[Exc SomeException, IO] effs => (forall output . task output -> IO (Either SomeException output)) -> Eff (Distribute task ': effs) a -> Eff effs a
+        runDistribute run = interpret (\ task -> case task of
+          Distribute tasks -> liftIO (Async.mapConcurrently run tasks) >>= either throwError pure . sequenceA . withStrategy (parTraversable (parTraversable rseq))
+          Bidistribute tasks -> liftIO (Async.runConcurrently (bitraverse (Async.Concurrently . run) (Async.Concurrently . run) tasks)) >>= either throwError pure . bisequenceA . withStrategy (parBitraversable (parTraversable rseq) (parTraversable rseq)))
 
         parBitraversable :: Bitraversable t => Strategy a -> Strategy b -> Strategy (t a b)
         parBitraversable strat1 strat2 = bitraverse (rparWith strat1) (rparWith strat2)
