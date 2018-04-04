@@ -54,6 +54,7 @@ import qualified Semantic.IO as IO
 import           Semantic.Log
 import           Semantic.Queue
 import           Semantic.Stat as Stat
+import           Semantic.Telemetry
 import           System.Exit (die)
 import           System.IO (Handle, stderr)
 
@@ -65,12 +66,6 @@ data TaskF output where
   Decorate      :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff          :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
   Render        :: Renderer input output -> input -> TaskF output
-
--- | A queue for logging.
-type LogQueue = AsyncQueue Message Options
-
--- | A queue for stats.
-type StatQueue = AsyncQueue Stat StatsClient
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type Task = Eff '[Distribute WrappedTask, TaskF, Reader Options, Telemetry, Reader LogQueue, Reader StatQueue, Exc SomeException, IO]
@@ -96,14 +91,6 @@ readBlobPairs = send . ReadBlobPairs
 -- | A task which writes a 'B.ByteString' to a 'Handle' or a 'FilePath'.
 writeToOutput :: Member TaskF effs => Either Handle FilePath -> B.ByteString -> Eff effs ()
 writeToOutput path = send . WriteToOutput path
-
--- | A task which logs a message at a specific log level to stderr.
-writeLog :: Member Telemetry effs => Level -> String -> [(String, String)] -> Eff effs ()
-writeLog level message pairs = send (WriteLog level message pairs)
-
--- | A task which writes a stat.
-writeStat :: Member Telemetry effs => Stat -> Eff effs ()
-writeStat stat = send (WriteStat stat)
 
 -- | A task which measures and stats the timing of another task.
 time :: Members '[Telemetry, IO] effs => String -> [(String, String)] -> Eff effs output -> Eff effs output
@@ -206,17 +193,6 @@ runTaskF = interpret (\ task -> case task of
   Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
   Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
   Render renderer input -> pure (renderer input))
-
-
--- | Statting and logging effects.
-data Telemetry output where
-  WriteStat :: Stat                                  -> Telemetry ()
-  WriteLog  :: Level -> String -> [(String, String)] -> Telemetry ()
-
-runTelemetry :: Members '[Reader LogQueue, Reader StatQueue, IO] effs => Eff (Telemetry ': effs) a -> Eff effs a
-runTelemetry = interpret (\ t -> case t of
-  WriteStat stat -> ask >>= \ statter -> liftIO (queue (statter :: StatQueue) stat)
-  WriteLog level message pairs -> ask >>= \ logger -> queueLogMessage logger level message pairs)
 
 
 -- | Catch exceptions in 'IO' actions embedded in 'Eff', handling them with the passed function.

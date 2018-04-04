@@ -143,6 +143,7 @@ library
                      , Semantic.Queue
                      , Semantic.Stat
                      , Semantic.Task
+                     , Semantic.Telemetry
                      , Semantic.Util
                     -- Custom Prelude
   other-modules:       Prologue
