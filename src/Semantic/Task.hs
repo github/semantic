@@ -185,18 +185,7 @@ runTaskWithOptions options task = do
     run options logger statter = run'
       where
         run' :: Task a -> IO (Either SomeException a)
-        run' = runM . runError . flip runReader statter . flip runReader logger . runTelemetry . flip runReader options . go . runDistribute
-        go :: Members '[Reader Options, Telemetry, Reader LogQueue, Reader StatQueue, Exc SomeException, IO] effs => Eff (TaskF ': effs) a -> Eff effs a
-        go = interpret (\ task -> case task of
-          ReadBlobs (Left handle) -> rethrowing (IO.readBlobsFromHandle handle)
-          ReadBlobs (Right paths@[(path, Nothing)]) -> rethrowing (IO.isDirectory path >>= bool (IO.readBlobsFromPaths paths) (IO.readBlobsFromDir path))
-          ReadBlobs (Right paths) -> rethrowing (IO.readBlobsFromPaths paths)
-          ReadBlobPairs source -> rethrowing (either IO.readBlobPairsFromHandle (traverse (runBothWith IO.readFilePair)) source)
-          WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents)
-          Parse parser blob -> runParser blob parser
-          Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
-          Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
-          Render renderer input -> pure (renderer input))
+        run' = runM . runError . flip runReader statter . flip runReader logger . runTelemetry . flip runReader options . runTaskF . runDistribute
 
         runDistribute :: Members '[Exc SomeException, IO] effs => Eff (Distribute ': effs) a -> Eff effs a
         runDistribute = interpret (\ task -> case task of
@@ -246,6 +235,19 @@ runParser blob@Blob{..} parser = case parser of
         errors = cata $ \ (In a syntax) -> case syntax of
           _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (getField a) err]
           _ -> fold syntax
+
+
+runTaskF :: Members '[Reader Options, Telemetry, Reader LogQueue, Reader StatQueue, Exc SomeException, IO] effs => Eff (TaskF ': effs) a -> Eff effs a
+runTaskF = interpret (\ task -> case task of
+  ReadBlobs (Left handle) -> rethrowing (IO.readBlobsFromHandle handle)
+  ReadBlobs (Right paths@[(path, Nothing)]) -> rethrowing (IO.isDirectory path >>= bool (IO.readBlobsFromPaths paths) (IO.readBlobsFromDir path))
+  ReadBlobs (Right paths) -> rethrowing (IO.readBlobsFromPaths paths)
+  ReadBlobPairs source -> rethrowing (either IO.readBlobPairsFromHandle (traverse (runBothWith IO.readFilePair)) source)
+  WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents)
+  Parse parser blob -> runParser blob parser
+  Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
+  Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
+  Render renderer input -> pure (renderer input))
 
 
 -- | Statting and logging effects.
