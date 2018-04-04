@@ -8,6 +8,7 @@ module Semantic.IO
 , readBlobsFromPaths
 , readBlobsFromDir
 , languageForFilePath
+, NoLanguageForBlob(..)
 , Files
 , readBlobs
 , readBlobPairs
@@ -122,6 +123,10 @@ instance FromJSON BlobPair where
       (Just b, Nothing) -> pure $ Join (This b)
       (Nothing, Just a) -> pure $ Join (That a)
       _ -> fail "Expected object with 'before' and/or 'after' keys only"
+
+
+newtype NoLanguageForBlob = NoLanguageForBlob FilePath
+  deriving (Eq, Exception, Ord, Show, Typeable)
 
 
 data Files out where

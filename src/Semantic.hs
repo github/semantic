@@ -22,6 +22,7 @@ import Diffing.Algorithm (Diffable)
 import Diffing.Interpreter
 import Parsing.Parser
 import Rendering.Renderer
+import Semantic.IO (NoLanguageForBlob(..))
 import Semantic.Stat as Stat
 import Semantic.Task as Task
 
@@ -53,9 +54,6 @@ parseBlob renderer blob@Blob{..}
     SymbolsTermRenderer fields -> decorate (declarationAlgebra blob)                     >=> render (renderToSymbols fields blob)
     DOTTermRenderer            ->                                                            render (renderDOTTerm blob)
   | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
-
-newtype NoLanguageForBlob = NoLanguageForBlob FilePath
-  deriving (Eq, Exception, Ord, Show, Typeable)
 
 
 diffBlobPairs :: Output output => DiffRenderer output -> [BlobPair] -> Task ByteString
