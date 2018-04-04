@@ -1,7 +1,7 @@
 {-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeOperators, UndecidableInstances #-}
 module Semantic.Task
 ( Task
-, TaskF
+, TaskEff
 , WrappedTask(..)
 , Level(..)
 , RAlgebra
@@ -81,18 +81,18 @@ import           Semantic.Telemetry
 import           System.Exit (die)
 import           System.IO (stderr)
 
-data TaskF output where
-  Parse         :: Parser term -> Blob -> TaskF term
-  Analyze       :: Analysis.SomeAnalysis m result -> TaskF result
-  Decorate      :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
-  Diff          :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
-  Render        :: Renderer input output -> input -> TaskF output
+data Task output where
+  Parse         :: Parser term -> Blob -> Task term
+  Analyze       :: Analysis.SomeAnalysis m result -> Task result
+  Decorate      :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
+  Diff          :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
+  Render        :: Renderer input output -> input -> Task output
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
-type Task = Eff '[Distribute WrappedTask, TaskF, IO.Files, Reader Options, Telemetry, Exc SomeException, IO]
+type TaskEff = Eff '[Distribute WrappedTask, Task, IO.Files, Reader Options, Telemetry, Exc SomeException, IO]
 
 -- | A wrapper for a 'Task', to embed in other effects.
-newtype WrappedTask a = WrapTask { unwrapTask :: Task a }
+newtype WrappedTask a = WrapTask { unwrapTask :: TaskEff a }
   deriving (Applicative, Functor, Monad)
 
 -- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
@@ -102,42 +102,42 @@ type Differ syntax ann1 ann2 = Term syntax ann1 -> Term syntax ann2 -> Diff synt
 type Renderer i o = i -> o
 
 -- | A task which parses a 'Blob' with the given 'Parser'.
-parse :: Member TaskF effs => Parser term -> Blob -> Eff effs term
+parse :: Member Task effs => Parser term -> Blob -> Eff effs term
 parse parser = send . Parse parser
 
 -- | Parse a file into a 'Module'.
-parseModule :: Members '[IO.Files, TaskF] effs => Parser term -> Maybe FilePath -> FilePath -> Eff effs (Module term)
+parseModule :: Members '[IO.Files, Task] effs => Parser term -> Maybe FilePath -> FilePath -> Eff effs (Module term)
 parseModule parser rootDir path = do
   blob <- head <$> IO.readBlobs (Right [(path, IO.languageForFilePath path)])
   moduleForBlob rootDir blob <$> parse parser blob
 
 -- | Parse a list of files into 'Module's.
-parseModules :: Parser term -> FilePath -> [FilePath] -> Task [Module term]
+parseModules :: Members '[IO.Files, Task] effs => Parser term -> FilePath -> [FilePath] -> Eff effs [Module term]
 parseModules parser rootDir = traverse (parseModule parser (Just rootDir))
 
 -- | Parse a list of files into a 'Package'.
-parsePackage :: PackageName -> Parser term -> FilePath -> [FilePath] -> Task (Package term)
+parsePackage :: Members '[IO.Files, Task] effs => PackageName -> Parser term -> FilePath -> [FilePath] -> Eff effs (Package term)
 parsePackage name parser rootDir paths = Package (PackageInfo name Nothing) . Package.fromModules <$> parseModules parser rootDir paths
 
 
 -- | A task running some 'Analysis.MonadAnalysis' to completion.
-analyze :: Member TaskF effs => Analysis.SomeAnalysis m result -> Eff effs result
+analyze :: Member Task effs => Analysis.SomeAnalysis m result -> Eff effs result
 analyze = send . Analyze
 
 -- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
-decorate :: (Functor f, Member TaskF effs) => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Eff effs (Term f (Record (field ': fields)))
+decorate :: (Functor f, Member Task effs) => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Eff effs (Term f (Record (field ': fields)))
 decorate algebra = send . Decorate algebra
 
 -- | A task which diffs a pair of terms using the supplied 'Differ' function.
-diff :: Member TaskF effs => Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Eff effs (Diff syntax ann1 ann2)
+diff :: Member Task effs => Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Eff effs (Diff syntax ann1 ann2)
 diff differ term1 term2 = send (Semantic.Task.Diff differ term1 term2)
 
 -- | A task which renders some input using the supplied 'Renderer' function.
-render :: Member TaskF effs => Renderer input output -> input -> Eff effs output
+render :: Member Task effs => Renderer input output -> input -> Eff effs output
 render renderer = send . Render renderer
 
 
-importGraph :: (Apply Eq1 syntax, Apply Analysis.Evaluatable syntax, Apply FreeVariables1 syntax, Apply Functor syntax, Apply Ord1 syntax, Apply Show1 syntax, Member Syntax.Identifier syntax, Member TaskF effs, Ord ann, Show ann) => Package (Term (Union syntax) ann) -> Eff effs B.ByteString
+importGraph :: (Apply Eq1 syntax, Apply Analysis.Evaluatable syntax, Apply FreeVariables1 syntax, Apply Functor syntax, Apply Ord1 syntax, Apply Show1 syntax, Member Syntax.Identifier syntax, Member Task effs, Ord ann, Show ann) => Package (Term (Union syntax) ann) -> Eff effs B.ByteString
 importGraph package = renderGraph <$> analyze (Analysis.SomeAnalysis (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package))
   where asAnalysisForTypeOfPackage :: Abstract.ImportGraphing (Evaluating (Located Precise term) term (Value (Located Precise term))) effects value -> Package term -> Abstract.ImportGraphing (Evaluating (Located Precise term) term (Value (Located Precise term))) effects value
         asAnalysisForTypeOfPackage = const
@@ -150,19 +150,19 @@ importGraph package = renderGraph <$> analyze (Analysis.SomeAnalysis (Analysis.e
 -- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
 --
 -- > runTask = runTaskWithOptions defaultOptions
-runTask :: Task a -> IO a
+runTask :: TaskEff a -> IO a
 runTask = runTaskWithOptions defaultOptions
 
 
--- | Execute a 'Task' with the passed 'Options', yielding its result value in 'IO'.
-runTaskWithOptions :: Options -> Task a -> IO a
+-- | Execute a 'TaskEff' with the passed 'Options', yielding its result value in 'IO'.
+runTaskWithOptions :: Options -> TaskEff a -> IO a
 runTaskWithOptions options task = do
   options <- configureOptionsForHandle stderr options
   statter <- defaultStatsClient >>= newQueue sendStat
   logger <- newQueue logMessage options
 
   (result, stat) <- withTiming "run" [] $ do
-    let run :: Task a -> IO (Either SomeException a)
+    let run :: TaskEff a -> IO (Either SomeException a)
         run task = Run.run task (Action (run . unwrapTask)) options (Queues logger statter)
     run task
   queue statter stat
@@ -214,7 +214,7 @@ runParser blob@Blob{..} parser = case parser of
           _ -> fold syntax
 
 
-runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, IO] effs => Eff (TaskF ': effs) a -> Eff effs a
+runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, IO] effs => Eff (Task ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
   Parse parser blob -> runParser blob parser
   Analyze analysis -> pure (Analysis.runSomeAnalysis analysis)
@@ -222,5 +222,5 @@ runTaskF = interpret $ \ task -> case task of
   Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
   Render renderer input -> pure (renderer input)
 
-instance (Members '[Reader Options, Telemetry, Exc SomeException, IO] effects, Run effects result rest) => Run (TaskF ': effects) result rest where
+instance (Members '[Reader Options, Telemetry, Exc SomeException, IO] effects, Run effects result rest) => Run (Task ': effects) result rest where
   run = run . runTaskF

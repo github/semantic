@@ -244,7 +244,7 @@ diffWithParser :: ( HasField fields Data.Span.Span
                   , Diffable syntax
                   , GAlign syntax
                   , HasDeclaration syntax
-                  , Members '[Distribute WrappedTask, TaskF] effs
+                  , Members '[Distribute WrappedTask, Task] effs
                   )
                => Parser (Term syntax (Record fields))
                -> BlobPair
