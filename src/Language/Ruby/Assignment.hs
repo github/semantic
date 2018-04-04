@@ -147,14 +147,14 @@ expressions = makeTerm'' <$> location <*> many expression
 parenthesizedExpressions :: Assignment
 parenthesizedExpressions = makeTerm'' <$> symbol ParenthesizedStatements <*> children (Syntax.Paren <$> expressions)
 
-withExtendedScope :: (Enum grammar, Ix grammar, Eq1 ast) => Assignment.Assignment ast grammar a -> Assignment.Assignment ast grammar a
+withExtendedScope :: Assignment' a -> Assignment' a
 withExtendedScope inner = do
   locals <- getRubyLocals
   result <- inner
   putRubyLocals locals
   pure result
 
-withNewScope :: (Enum grammar, Ix grammar, Eq1 ast) => Assignment.Assignment ast grammar a -> Assignment.Assignment ast grammar a
+withNewScope :: Assignment' a -> Assignment' a
 withNewScope inner = withExtendedScope $ do
   putRubyLocals []
   inner
