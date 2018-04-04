@@ -1,5 +1,4 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Semantic.Task
 ( Task
 , Level(..)
@@ -267,10 +266,3 @@ rethrowing :: ( Member (Exc SomeException) r
            => IO a
            -> Eff r a
 rethrowing m = catchException (liftIO m) (throwError . toException @SomeException)
-
--- | Handle the topmost effect by interpreting it into the underlying effects.
-interpret :: (forall a. eff a -> Eff effs a) -> Eff (eff ': effs) a -> Eff effs a
-interpret f = relay pure (\ eff yield -> f eff >>= yield)
-
-instance Member IO effs => MonadIO (Eff effs) where
-  liftIO = send
