@@ -15,7 +15,7 @@ import Rendering.Renderer
 import Semantic.IO (NoLanguageForBlob(..))
 import Semantic.Task
 
-parseBlobs :: Output output => TermRenderer output -> [Blob] -> Task ByteString
+parseBlobs :: Members '[Distribute WrappedTask, TaskF, Exc SomeException] effs => Output output => TermRenderer output -> [Blob] -> Eff effs ByteString
 parseBlobs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . parseBlob renderer) blobs
   where toOutput' = case renderer of
           JSONTermRenderer -> toOutput . renderJSONTerms
@@ -23,7 +23,7 @@ parseBlobs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . parseBlo
           _ -> toOutput
 
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
-parseBlob :: TermRenderer output -> Blob -> Task output
+parseBlob :: Members '[TaskF, Exc SomeException] effs => TermRenderer output -> Blob -> Eff effs output
 parseBlob renderer blob@Blob{..}
   | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[ConstructorName, HasPackageDef, HasDeclaration, IdentifierName, Foldable, Functor, ToJSONFields1]) <$> blobLanguage
   = parse parser blob >>= case renderer of

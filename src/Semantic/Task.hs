@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Semantic.Task
 ( Task
+, TaskF
 , WrappedTask(..)
 , Level(..)
 , RAlgebra
@@ -31,8 +32,12 @@ module Semantic.Task
 -- * Interpreting
 , runTask
 , runTaskWithOptions
--- * Exceptions
+-- * Re-exports
+, Distribute
+, Eff
+, Exc
 , throwError
+, SomeException
 ) where
 
 import qualified Analysis.Abstract.ImportGraph as Abstract
