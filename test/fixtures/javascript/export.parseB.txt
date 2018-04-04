@@ -50,7 +50,5 @@
   (QualifiedExport)
   (DefaultExport
     (TextElement))
-  (QualifiedExportFrom
-    (Identifier))
-  (QualifiedExportFrom
-    (Identifier)))
+  (QualifiedExportFrom)
+  (QualifiedExportFrom))

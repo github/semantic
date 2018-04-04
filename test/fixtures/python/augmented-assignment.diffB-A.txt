@@ -7,23 +7,21 @@
   ->(Plus
     {+(Identifier)+}
     {+(Integer)+}) })
-{+(Assignment
-  {+(Identifier)+}
-  {+(RShift
-    {+(Identifier)+}
-    {+(Integer)+})+})+}
-{+(Assignment
-  {+(Identifier)+}
-  {+(DividedBy
-    {+(Identifier)+}
-    {+(Integer)+})+})+}
-{-(Assignment
-  {-(Identifier)-}
-  {-(DividedBy
+  (Assignment
+  { (Identifier)
+  ->(Identifier) }
+  { (DividedBy
     {-(Identifier)-}
-    {-(Integer)-})-})-}
-{-(Assignment
-  {-(Identifier)-}
-  {-(Plus
+    {-(Integer)-})
+  ->(RShift
+    {+(Identifier)+}
+    {+(Integer)+}) })
+  (Assignment
+  { (Identifier)
+  ->(Identifier) }
+  { (Plus
     {-(Identifier)-}
-    {-(Integer)-})-})-})
+    {-(Integer)-})
+  ->(DividedBy
+    {+(Identifier)+}
+    {+(Integer)+}) }))

@@ -35,15 +35,15 @@
         (Identifier)
       { (Empty)
       ->(Identifier) })
-    {+(Assignment
-      {+(Empty)+}
-      {+(Identifier)+}
-      {+(Empty)+})+}
       (Assignment
         (Empty)
       { (Identifier)
       ->(Identifier) }
-        (Empty))))
+        (Empty))
+    {+(Assignment
+      {+(Empty)+}
+      {+(Identifier)+}
+      {+(Empty)+})+}))
   (DefaultExport
   { (Identifier)
   ->(Identifier) })
@@ -62,10 +62,8 @@
 {+(QualifiedExport)+}
 {+(DefaultExport
   {+(TextElement)+})+}
-{+(QualifiedExportFrom
-  {+(Identifier)+})+}
-{+(QualifiedExportFrom
-  {+(Identifier)+})+}
+{+(QualifiedExportFrom)+}
+{+(QualifiedExportFrom)+}
 {-(DefaultExport
   {-(Function
     {-(Empty)-}
@@ -75,7 +73,5 @@
 {-(QualifiedExport)-}
 {-(DefaultExport
   {-(TextElement)-})-}
-{-(QualifiedExportFrom
-  {-(Identifier)-})-}
-{-(QualifiedExportFrom
-  {-(Identifier)-})-})
+{-(QualifiedExportFrom)-}
+{-(QualifiedExportFrom)-})
