@@ -144,15 +144,18 @@ assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Prog
 term :: Assignment -> Assignment
 term term = contextualize (comment <|> textInterpolation) (postContextualize (comment <|> textInterpolation) term)
 
+commentedTerm :: Assignment -> Assignment
+commentedTerm term = contextualize (comment <|> textInterpolation) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> textInterpolation) <*> emptyTerm)
+
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
-manyTerm term = many (contextualize (comment <|> textInterpolation) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> textInterpolation) <*> emptyTerm))
+manyTerm = many . commentedTerm
 
 someTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
 someTerm = liftA NonEmpty.toList . someTerm'
 
 someTerm' :: Assignment -> Assignment.Assignment [] Grammar (NonEmpty Term)
-someTerm' term = NonEmpty.some1 (contextualize (comment <|> textInterpolation) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> textInterpolation) <*> emptyTerm))
+someTerm' = NonEmpty.some1 . commentedTerm
 
 text :: Assignment
 text = makeTerm <$> symbol Text <*> (Syntax.Text <$> source)
