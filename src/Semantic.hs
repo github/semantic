@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, DeriveDataTypeable, GADTs, TypeOperators #-}
+{-# LANGUAGE GADTs #-}
 module Semantic
 ( parseBlobs
 , parseBlob
@@ -11,7 +11,6 @@ import Prologue hiding (MonadError(..))
 import Analysis.ConstructorName (ConstructorName, constructorLabel)
 import Analysis.IdentifierName (IdentifierName, identifierLabel)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
-import Analysis.PackageDef (HasPackageDef, packageDefAlgebra)
 import Data.Blob
 import Data.Diff
 import Data.JSON.Fields
@@ -22,6 +21,7 @@ import Diffing.Algorithm (Diffable)
 import Diffing.Interpreter
 import Parsing.Parser
 import Rendering.Renderer
+import Semantic.Command.Parse
 import Semantic.IO (NoLanguageForBlob(..))
 import Semantic.Stat as Stat
 import Semantic.Task as Task
@@ -34,27 +34,6 @@ import Semantic.Task as Task
 --   - No knowledge of the filesystem or Git.
 --   - Built in concurrency where appropriate.
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
-
-parseBlobs :: Output output => TermRenderer output -> [Blob] -> Task ByteString
-parseBlobs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . parseBlob renderer) blobs
-  where toOutput' = case renderer of
-          JSONTermRenderer -> toOutput . renderJSONTerms
-          SymbolsTermRenderer _ -> toOutput . renderSymbolTerms
-          _ -> toOutput
-
--- | A task to parse a 'Blob' and render the resulting 'Term'.
-parseBlob :: TermRenderer output -> Blob -> Task output
-parseBlob renderer blob@Blob{..}
-  | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[ConstructorName, HasPackageDef, HasDeclaration, IdentifierName, Foldable, Functor, ToJSONFields1]) <$> blobLanguage
-  = parse parser blob >>= case renderer of
-    JSONTermRenderer           -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)
-    SExpressionTermRenderer    -> decorate constructorLabel . (Nil <$)                   >=> render renderSExpressionTerm
-    TagsTermRenderer           -> decorate (declarationAlgebra blob)                     >=> render (renderToTags blob)
-    ImportsTermRenderer        -> decorate (declarationAlgebra blob) >=> decorate (packageDefAlgebra blob) >=> render (renderToImports blob)
-    SymbolsTermRenderer fields -> decorate (declarationAlgebra blob)                     >=> render (renderToSymbols fields blob)
-    DOTTermRenderer            ->                                                            render (renderDOTTerm blob)
-  | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
-
 
 diffBlobPairs :: Output output => DiffRenderer output -> [BlobPair] -> Task ByteString
 diffBlobPairs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . diffBlobPair renderer) blobs
