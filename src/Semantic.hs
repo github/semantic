@@ -79,9 +79,9 @@ diffBlobPair renderer blobs
 
         run :: (Foldable syntax, Functor syntax) => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (BlobPair -> Diff syntax ann ann -> output) -> Task output
         run parse diff renderer = do
-          terms <- bidistributeFor (runJoin blobs) (WrapTask . parse) (WrapTask . parse)
+          terms <- distributeFor blobs (WrapTask . parse)
           time "diff" languageTag $ do
-            diff <- diffTermPair diff terms
+            diff <- diffTermPair diff (runJoin terms)
             writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
             render (renderer blobs) diff
           where
