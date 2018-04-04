@@ -149,7 +149,10 @@ manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
 manyTerm term = many (contextualize (comment <|> textInterpolation) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> textInterpolation) <*> emptyTerm))
 
 someTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
-someTerm term = some (contextualize (comment <|> textInterpolation) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> textInterpolation) <*> emptyTerm))
+someTerm = liftA NonEmpty.toList . someTerm'
+
+someTerm' :: Assignment -> Assignment.Assignment [] Grammar (NonEmpty Term)
+someTerm' term = NonEmpty.some1 (contextualize (comment <|> textInterpolation) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> textInterpolation) <*> emptyTerm))
 
 text :: Assignment
 text = makeTerm <$> symbol Text <*> (Syntax.Text <$> source)
@@ -466,7 +469,7 @@ namespaceNameAsPrefix :: Assignment
 namespaceNameAsPrefix = symbol NamespaceNameAsPrefix *> children (term namespaceName <|> emptyTerm)
 
 namespaceName :: Assignment
-namespaceName = makeTerm <$> symbol NamespaceName <*> children (Syntax.NamespaceName . NonEmpty.fromList <$> someTerm name)
+namespaceName = makeTerm <$> symbol NamespaceName <*> children (Syntax.NamespaceName <$> someTerm' name)
 
 updateExpression :: Assignment
 updateExpression = makeTerm <$> symbol UpdateExpression <*> children (Syntax.Update <$> term expression)
