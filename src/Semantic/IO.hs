@@ -17,26 +17,26 @@ module Semantic.IO
 , rethrowing
 ) where
 
-import Prologue hiding (fail, MonadError(..))
 import qualified Control.Exception as Exc
-import Control.Monad.Effect hiding (run)
-import Control.Monad.Effect.Exception
-import Control.Monad.Effect.Run
-import Control.Monad.IO.Class
-import Data.Aeson
+import           Control.Monad.Effect hiding (run)
+import           Control.Monad.Effect.Exception
+import           Control.Monad.Effect.Run
+import           Control.Monad.IO.Class
+import           Data.Aeson
 import qualified Data.Blob as Blob
-import Data.Bool
-import Data.Language
-import Data.Source
+import           Data.Bool
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
-import Prelude hiding (readFile)
-import System.Exit
-import System.FilePath
-import System.IO (Handle)
-import System.FilePath.Glob
-import System.Directory (doesDirectoryExist)
-import Text.Read
+import           Data.Language
+import           Data.Source
+import           Prelude hiding (readFile)
+import           Prologue hiding (MonadError (..), fail)
+import           System.Directory (doesDirectoryExist)
+import           System.Exit
+import           System.FilePath
+import           System.FilePath.Glob
+import           System.IO (Handle)
+import           Text.Read
 
 -- | Read a utf8-encoded file to a 'Blob'.
 readFile :: forall m. MonadIO m => FilePath -> Maybe Language -> m (Maybe Blob.Blob)
@@ -52,8 +52,8 @@ readFilePair a b = do
   case (before, after) of
     (Just a, Nothing) -> pure (Join (This a))
     (Nothing, Just b) -> pure (Join (That b))
-    (Just a, Just b) -> pure (Join (These a b))
-    _ -> fail "expected file pair with content on at least one side"
+    (Just a, Just b)  -> pure (Join (These a b))
+    _                 -> fail "expected file pair with content on at least one side"
 
 isDirectory :: MonadIO m => FilePath -> m Bool
 isDirectory path = liftIO (doesDirectoryExist path)
@@ -89,14 +89,14 @@ readFromHandle :: (FromJSON a, MonadIO m) => Handle -> m a
 readFromHandle h = do
   input <- liftIO $ BL.hGetContents h
   case eitherDecode input of
-    Left e -> liftIO (die (e <> ". Invalid input on " <> show h <> ", expecting JSON"))
+    Left e  -> liftIO (die (e <> ". Invalid input on " <> show h <> ", expecting JSON"))
     Right d -> pure d
 
 toBlob :: Blob -> Blob.Blob
 toBlob Blob{..} = Blob.sourceBlob path language' (fromText content)
   where language' = case language of
           "" -> languageForFilePath path
-          _ -> readMaybe language
+          _  -> readMaybe language
 
 
 newtype BlobDiff = BlobDiff { blobs :: [BlobPair] }
@@ -119,10 +119,10 @@ instance FromJSON BlobPair where
     before <- o .:? "before"
     after <- o .:? "after"
     case (before, after) of
-      (Just b, Just a) -> pure $ Join (These b a)
+      (Just b, Just a)  -> pure $ Join (These b a)
       (Just b, Nothing) -> pure $ Join (This b)
       (Nothing, Just a) -> pure $ Join (That a)
-      _ -> fail "Expected object with 'before' and/or 'after' keys only"
+      _                 -> fail "Expected object with 'before' and/or 'after' keys only"
 
 
 newtype NoLanguageForBlob = NoLanguageForBlob FilePath
