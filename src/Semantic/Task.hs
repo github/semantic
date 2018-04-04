@@ -5,29 +5,35 @@ module Semantic.Task
 , Level(..)
 , RAlgebra
 , Differ
+-- * I/O
 , IO.readBlobs
 , IO.readBlobPairs
 , IO.writeToOutput
+-- * Telemetry
 , writeLog
 , writeStat
 , time
+-- * High-level flow
 , parse
 , decorate
 , diff
 , render
 , importGraph
--- TODO: group these
+-- * Concurrency
 , distribute
 , distributeFor
 , distributeFoldMap
 , bidistribute
 , bidistributeFor
+-- * Configuration
 , defaultOptions
 , configureOptionsForHandle
 , terminalFormatter
 , logfmtFormatter
+-- * Interpreting
 , runTask
 , runTaskWithOptions
+-- * Exceptions
 , throwError
 ) where
 
