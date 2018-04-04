@@ -9,7 +9,7 @@ import Prologue
 import Data.ByteString.Char8 (pack)
 
 newtype BadValues m (effects :: [* -> *]) a = BadValues (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
+  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
 deriving instance MonadControl term (m effects)                    => MonadControl term (BadValues m effects)
 deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (BadValues m effects)

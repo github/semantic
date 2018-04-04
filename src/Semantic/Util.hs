@@ -17,6 +17,7 @@ import Control.Abstract.Analysis
 import Control.Monad.IO.Class
 import Data.Abstract.Evaluatable hiding (head)
 import Data.Abstract.Address
+import Data.Abstract.Located
 import Data.Abstract.Module
 import Data.Abstract.Package as Package
 import Data.Abstract.Type
@@ -48,9 +49,10 @@ import qualified Language.TypeScript.Assignment as TypeScript
 evalRubyProject path = runEvaluating <$> (withPrelude <$> parsePrelude rubyParser <*> (evaluatePackageBody <$> parseProject rubyParser ["rb"] path))
 evalRubyFile path = runEvaluating <$> (withPrelude <$> parsePrelude rubyParser <*> (evaluateModule <$> parseFile rubyParser Nothing path))
 
-evaluateRubyProjectGraph path = runAnalysis @(ImportGraphing (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating Precise Ruby.Term (Value Precise))))))) . evaluatePackageBody <$> parseProject rubyParser ["rb"] path
+evaluateRubyProjectGraph path = runAnalysis @(ImportGraphing (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise Ruby.Term) Ruby.Term (Value (Located Precise Ruby.Term)))))))) . evaluatePackageBody <$> parseProject rubyParser ["rb"] path
 
-evaluateRubyImportGraph paths = runAnalysis @(ImportGraphing (BadVariables (BadValues (Quietly (Evaluating Precise Ruby.Term (Value Precise)))))) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
+evaluateRubyImportGraph paths = runAnalysis @(ImportGraphing (Evaluating (Located Precise Ruby.Term) Ruby.Term (Value (Located Precise Ruby.Term)))) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
+
 evaluateRubyBadVariables paths = runAnalysis @(BadVariables (Evaluating Precise Ruby.Term (Value Precise))) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
 
 -- Go
@@ -62,6 +64,8 @@ typecheckGoFile path = runAnalysis @(Caching (Evaluating Monovariant Go.Term Typ
 -- Python
 evalPythonProject path = runEvaluating . evaluatePackageBody <$> parseProject pythonParser ["py"] path
 evalPythonFile path = runEvaluating <$> (withPrelude <$> parsePrelude pythonParser <*> (evaluateModule <$> parseFile pythonParser Nothing path))
+
+evaluatePythonImportGraph name paths = runAnalysis @(ImportGraphing (Evaluating (Located Precise Python.Term) Python.Term (Value (Located Precise Python.Term)))) . evaluatePackage <$> parsePackage name pythonParser (dropFileName (head paths)) paths
 
 typecheckPythonFile path = runAnalysis @(Caching (Evaluating Monovariant Python.Term Type)) . evaluateModule <$> parseFile pythonParser Nothing path
 tracePythonFile path = runAnalysis @(Tracing [] (Evaluating Precise Python.Term (Value Precise))) . evaluateModule <$> parseFile pythonParser Nothing path

@@ -11,7 +11,7 @@ import Data.Abstract.Live
 import Prologue
 
 newtype Collecting m (effects :: [* -> *]) a = Collecting (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
+  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
 deriving instance MonadControl term (m effects)                    => MonadControl term (Collecting m effects)
 deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (Collecting m effects)

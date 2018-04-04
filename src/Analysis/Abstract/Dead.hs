@@ -11,7 +11,7 @@ import Prologue
 
 -- | An analysis tracking dead (unreachable) code.
 newtype DeadCode m (effects :: [* -> *]) a = DeadCode (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
+  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
 deriving instance MonadControl term (m effects)                    => MonadControl term (DeadCode m effects)
 deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (DeadCode m effects)

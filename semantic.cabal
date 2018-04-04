@@ -17,7 +17,7 @@ library
                      -- Analyses & term annotations
                        Analysis.Abstract.BadVariables
                        Analysis.Abstract.BadValues
-                       Analysis.Abstract.BadResolutionErrors
+                       Analysis.Abstract.BadModuleResolutions
                      , Analysis.Abstract.Caching
                      , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
@@ -45,7 +45,6 @@ library
                      , Control.Effect
                      -- Effects used for program analysis
                      , Control.Effect.Fresh
-                     , Control.Effect.NonDet
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
                      , Data.Abstract.Cache

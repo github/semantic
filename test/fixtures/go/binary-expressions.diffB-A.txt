@@ -27,13 +27,17 @@
       ->(Identifier) }
       { (Identifier)
       ->(Identifier) })
-    {+(Not
-      {+(Equal
-        {+(Identifier)+}
-        {+(Identifier)+})+})+}
-    {+(LessThan
-      {+(Identifier)+}
-      {+(Identifier)+})+}
+      (Not
+        (Equal
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) }))
+      (LessThan
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) })
     {+(LessThanEqual
       {+(Identifier)+}
       {+(Identifier)+})+}
@@ -76,13 +80,6 @@
     {+(BAnd
       {+(Identifier)+}
       {+(Identifier)+})+}
-    {-(Not
-      {-(Equal
-        {-(Identifier)-}
-        {-(Identifier)-})-})-}
-    {-(LessThan
-      {-(Identifier)-}
-      {-(Identifier)-})-}
     {-(LessThanEqual
       {-(Identifier)-}
       {-(Identifier)-})-}

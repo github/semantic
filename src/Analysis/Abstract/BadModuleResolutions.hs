@@ -8,7 +8,7 @@ import Data.Abstract.Environment as Env
 import Prologue
 
 newtype BadModuleResolutions m (effects :: [* -> *]) a = BadModuleResolutions (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
+  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
 deriving instance MonadControl term (m effects)                    => MonadControl term (BadModuleResolutions m effects)
 deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (BadModuleResolutions m effects)

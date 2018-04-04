@@ -77,7 +77,7 @@ class Monad m => MonadEnvironment location value m | m -> value, m -> location w
   lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
 
   -- | Look up a 'Name' in the environment, running an action with the resolved address (if any).
-  lookupWith :: (Address location value -> m value) -> Name -> m (Maybe value)
+  lookupWith :: (Address location value -> m a) -> Name -> m (Maybe a)
   lookupWith with name = do
     addr <- lookupEnv name
     maybe (pure Nothing) (fmap Just . with) addr

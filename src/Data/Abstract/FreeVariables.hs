@@ -1,11 +1,20 @@
 {-# LANGUAGE DefaultSignatures, UndecidableInstances #-}
 module Data.Abstract.FreeVariables where
 
-import Prologue
-import Data.Term
+import qualified Data.ByteString.Char8 as BC
+import           Data.String
+import           Data.Term
+import           Prologue
 
 -- | The type of variable names.
-type Name = ByteString
+newtype Name = Name { unName :: ByteString }
+  deriving (Eq, Ord, Show)
+
+name :: ByteString -> Name
+name = Name
+
+instance IsString Name where
+  fromString = Name . BC.pack
 
 -- | The type of labels.
 --   TODO: This should be rolled into 'Name' and tracked in the environment, both so that we can abstract over labels like any other location, and so that we can garbage collect unreachable labels.

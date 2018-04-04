@@ -14,7 +14,7 @@ import Prologue
 --
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
 newtype Tracing (trace :: * -> *) m (effects :: [* -> *]) a = Tracing (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
+  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
 deriving instance MonadControl term (m effects)                    => MonadControl term (Tracing trace m effects)
 deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (Tracing trace m effects)

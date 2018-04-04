@@ -12,7 +12,8 @@ import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, 
 import Language.PHP.Grammar as Grammar
 import Prologue
 import qualified Assigning.Assignment as Assignment
--- import qualified Data.Abstract.FreeVariables as FV
+import qualified Data.Abstract.FreeVariables as FV
+import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -130,19 +131,31 @@ type Syntax = '[
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar Term
 
+append :: a -> [a] -> [a]
+append x xs = xs ++ [x]
+
+bookend :: a -> [a] -> a -> [a]
+bookend head list last = head : append last list
+
 -- | Assignment from AST in PHP's grammar onto a program in PHP's syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> ((\a b c -> a : b ++ [c]) <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> (bookend <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
 
 term :: Assignment -> Assignment
 term term = contextualize (comment <|> textInterpolation) (postContextualize (comment <|> textInterpolation) term)
 
+commentedTerm :: Assignment -> Assignment
+commentedTerm term = contextualize (comment <|> textInterpolation) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> textInterpolation) <*> emptyTerm)
+
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
-manyTerm term = many (contextualize (comment <|> textInterpolation) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> textInterpolation) <*> emptyTerm))
+manyTerm = many . commentedTerm
 
 someTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
-someTerm term = some (contextualize (comment <|> textInterpolation) term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> textInterpolation) <*> emptyTerm))
+someTerm = fmap NonEmpty.toList . someTerm'
+
+someTerm' :: Assignment -> Assignment.Assignment [] Grammar (NonEmpty Term)
+someTerm' = NonEmpty.some1 . commentedTerm
 
 text :: Assignment
 text = makeTerm <$> symbol Text <*> (Syntax.Text <$> source)
@@ -429,7 +442,7 @@ classConstDeclaration :: Assignment
 classConstDeclaration = makeTerm <$> symbol ClassConstDeclaration <*> children (Syntax.ClassConstDeclaration <$> (term visibilityModifier <|> emptyTerm) <*> manyTerm constElement)
 
 visibilityModifier :: Assignment
-visibilityModifier = makeTerm <$> symbol VisibilityModifier <*> (Syntax.Identifier <$> source)
+visibilityModifier = makeTerm <$> symbol VisibilityModifier <*> (Syntax.Identifier . FV.name <$> source)
 
 constElement :: Assignment
 constElement = makeTerm <$> symbol ConstElement <*> children (Statement.Assignment [] <$> term name <*> term expression)
@@ -459,7 +472,7 @@ namespaceNameAsPrefix :: Assignment
 namespaceNameAsPrefix = symbol NamespaceNameAsPrefix *> children (term namespaceName <|> emptyTerm)
 
 namespaceName :: Assignment
-namespaceName = makeTerm <$> symbol NamespaceName <*> children (Syntax.NamespaceName <$> someTerm name)
+namespaceName = makeTerm <$> symbol NamespaceName <*> children (Syntax.NamespaceName <$> someTerm' name)
 
 updateExpression :: Assignment
 updateExpression = makeTerm <$> symbol UpdateExpression <*> children (Syntax.Update <$> term expression)
@@ -635,7 +648,7 @@ propertyDeclaration :: Assignment
 propertyDeclaration = makeTerm <$> symbol PropertyDeclaration <*> children (Syntax.PropertyDeclaration <$> term propertyModifier <*> someTerm propertyElement)
 
 propertyModifier :: Assignment
-propertyModifier = (makeTerm <$> symbol PropertyModifier <*> children (Syntax.PropertyModifier <$> (term visibilityModifier <|> emptyTerm) <*> (term staticModifier <|> emptyTerm))) <|> term (makeTerm <$> symbol PropertyModifier <*> (Syntax.Identifier <$> source))
+propertyModifier = (makeTerm <$> symbol PropertyModifier <*> children (Syntax.PropertyModifier <$> (term visibilityModifier <|> emptyTerm) <*> (term staticModifier <|> emptyTerm))) <|> term (makeTerm <$> symbol PropertyModifier <*> (Syntax.Identifier . FV.name <$> source))
 
 propertyElement :: Assignment
 propertyElement = makeTerm <$> symbol PropertyElement <*> children (Statement.Assignment [] <$> term variableName <*> term propertyInitializer) <|> (symbol PropertyElement *> children (term variableName))
@@ -696,7 +709,7 @@ namespaceAliasingClause = makeTerm <$> symbol NamespaceAliasingClause <*> childr
 
 -- | TODO Do something better than Identifier
 namespaceFunctionOrConst :: Assignment
-namespaceFunctionOrConst = makeTerm <$> symbol NamespaceFunctionOrConst <*> (Syntax.Identifier <$> source)
+namespaceFunctionOrConst = makeTerm <$> symbol NamespaceFunctionOrConst <*> (Syntax.Identifier . FV.name <$> source)
 
 globalDeclaration :: Assignment
 globalDeclaration = makeTerm <$> symbol GlobalDeclaration <*> children (Syntax.GlobalDeclaration <$> manyTerm simpleVariable')
@@ -732,7 +745,7 @@ variableName :: Assignment
 variableName = makeTerm <$> symbol VariableName <*> children (Syntax.VariableName <$> term name)
 
 name :: Assignment
-name = makeTerm <$> (symbol Name <|> symbol Name') <*> (Syntax.Identifier <$> source)
+name = makeTerm <$> (symbol Name <|> symbol Name') <*> (Syntax.Identifier . FV.name <$> source)
 
 functionStaticDeclaration :: Assignment
 functionStaticDeclaration = makeTerm <$> symbol FunctionStaticDeclaration <*> children (Declaration.VariableDeclaration <$> manyTerm staticVariableDeclaration)
