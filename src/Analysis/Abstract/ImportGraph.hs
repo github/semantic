@@ -17,6 +17,7 @@ import           Data.Abstract.Located
 import           Data.Abstract.Module hiding (Module)
 import           Data.Abstract.Origin hiding (Module, Package)
 import           Data.Abstract.Package hiding (Package)
+import qualified Data.ByteString.Char8 as BC
 import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Prologue hiding (empty, packageName)
@@ -27,9 +28,9 @@ newtype ImportGraph = ImportGraph { unImportGraph :: G.Graph Vertex }
 
 -- | A vertex of some specific type.
 data Vertex
-  = Package  { vertexName :: PackageName }
-  | Module   { vertexName :: ModuleName }
-  | Variable { vertexName :: Name }
+  = Package  { vertexName :: ByteString }
+  | Module   { vertexName :: ByteString }
+  | Variable { vertexName :: ByteString }
   deriving (Eq, Ord, Show)
 
 -- | Render a 'ImportGraph' to a 'ByteString' in DOT notation.
@@ -37,7 +38,7 @@ renderImportGraph :: ImportGraph -> ByteString
 renderImportGraph = export style . unImportGraph
 
 style :: Style Vertex ByteString
-style = (defaultStyle (friendlyName . vertexName))
+style = (defaultStyle vertexName)
   { vertexAttributes = vertexAttributes
   , edgeAttributes   = edgeAttributes
   }
@@ -73,25 +74,25 @@ instance ( Effectful m
   analyzeTerm eval term@(In _ syntax) = do
     case prj syntax of
       Just (Syntax.Identifier name) -> do
-        moduleInclusion (Variable name)
+        moduleInclusion (Variable (unName name))
         variableDefinition name
       _ -> pure ()
     resumeException
       @(LoadError term value)
       (liftAnalyze analyzeTerm eval term)
-      (\yield (LoadError name) -> moduleInclusion (Module name) >> yield [])
+      (\yield (LoadError name) -> moduleInclusion (Module (BC.pack name)) >> yield [])
 
   analyzeModule recur m = do
-    let name = moduleName (moduleInfo m)
+    let name = BC.pack (modulePath (moduleInfo m))
     packageInclusion (Module name)
     moduleInclusion (Module name)
     liftAnalyze analyzeModule recur m
 
 packageGraph :: SomeOrigin term -> ImportGraph
-packageGraph = maybe empty (vertex . Package . packageName) . withSomeOrigin originPackage
+packageGraph = maybe empty (vertex . Package . unName . packageName) . withSomeOrigin originPackage
 
 moduleGraph :: SomeOrigin term -> ImportGraph
-moduleGraph = maybe empty (vertex . Module . moduleName) . withSomeOrigin originModule
+moduleGraph = maybe empty (vertex . Module . BC.pack . modulePath) . withSomeOrigin originModule
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: forall m location term value effects
@@ -126,7 +127,7 @@ variableDefinition :: ( Effectful m
               ) => Name -> ImportGraphing m effects ()
 variableDefinition name = do
   graph <- maybe empty (moduleGraph . origin . unAddress) <$> lookupEnv name
-  appendGraph (vertex (Variable name) `connect` graph)
+  appendGraph (vertex (Variable (unName name)) `connect` graph)
 
 appendGraph :: (Effectful m, Member (State ImportGraph) effects) => ImportGraph -> ImportGraphing m effects ()
 appendGraph = raise . modify' . (<>)

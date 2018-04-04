@@ -1,12 +1,13 @@
 {-# LANGUAGE DeriveAnyClass, ViewPatterns #-}
 module Language.PHP.Syntax where
 
-import Data.Abstract.Evaluatable
-import Data.Abstract.Path
-import Diffing.Algorithm
-import Prelude hiding (fail)
-import Prologue hiding (Text)
-
+import           Data.Abstract.Evaluatable
+import           Data.Abstract.Module
+import           Data.Abstract.Path
+import qualified Data.ByteString.Char8 as BC
+import           Diffing.Algorithm
+import           Prelude hiding (fail)
+import           Prologue hiding (Text)
 
 newtype Text a = Text ByteString
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -33,22 +34,27 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
+resolvePHPName :: MonadEvaluatable location term value m => ByteString -> m ModulePath
+resolvePHPName n = resolve [name] >>= maybeFail notFound
+  where name = toName n
+        notFound = "Unable to resolve: " <> name
+        toName = BC.unpack . dropRelativePrefix . stripQuotes
+
 doInclude :: MonadEvaluatable location term value m => Subterm t (m value) -> m value
-doInclude path = do
-  name <- toQualifiedName <$> (subtermValue path >>= asString)
-  (importedEnv, v) <- isolate (load name)
+doInclude pathTerm = do
+  name <- subtermValue pathTerm >>= asString
+  path <- resolvePHPName name
+  (importedEnv, v) <- isolate (load path)
   modifyEnv (mappend importedEnv)
   pure v
 
 doIncludeOnce :: MonadEvaluatable location term value m => Subterm t (m value) -> m value
-doIncludeOnce path = do
-  name <- toQualifiedName <$> (subtermValue path >>= asString)
-  (importedEnv, v) <- isolate (require name)
+doIncludeOnce pathTerm = do
+  name <- subtermValue pathTerm >>= asString
+  path <- resolvePHPName name
+  (importedEnv, v) <- isolate (require path)
   modifyEnv (mappend importedEnv)
   pure v
-
-toQualifiedName :: ByteString -> Name
-toQualifiedName = qualifiedName . splitOnPathSeparator . dropExtension . dropRelativePrefix . stripQuotes
 
 newtype Require a = Require a
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

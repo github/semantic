@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstrainedClassMethods, DataKinds, FunctionalDependencies, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE ConstrainedClassMethods, DataKinds, FunctionalDependencies, RankNTypes, TypeFamilies, UndecidableInstances #-}
 module Control.Abstract.Evaluator
   ( MonadEvaluator(..)
   , MonadEnvironment(..)
@@ -45,7 +45,6 @@ class ( MonadControl term m
       => MonadEvaluator location term value m | m -> location, m -> term, m -> value where
   -- | Get the current 'Configuration' with a passed-in term.
   getConfiguration :: Ord location => term -> m (Configuration location term value)
-
 
 -- | A 'Monad' abstracting local and global environments.
 class Monad m => MonadEnvironment location value m | m -> value, m -> location where
@@ -147,6 +146,9 @@ class Monad m => MonadModuleTable location term value m | m -> location, m -> te
   askModuleTable :: m (ModuleTable [Module term])
   -- | Run an action with a locally-modified table of unevaluated modules.
   localModuleTable :: (ModuleTable [Module term] -> ModuleTable [Module term]) -> m a -> m a
+
+  -- | Get the currently evaluating 'ModuleInfo'.
+  currentModule :: m ModuleInfo
 
 -- | Update the evaluated module table.
 modifyModuleTable :: MonadModuleTable location term value m => (ModuleTable (Environment location value, value) -> ModuleTable (Environment location value, value)) -> m ()

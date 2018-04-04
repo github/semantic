@@ -2,7 +2,7 @@ package main
 
 import (
 	f "./foo"
-  _ "./bar"
+	_ "./bar"
 )
 
 func main() {

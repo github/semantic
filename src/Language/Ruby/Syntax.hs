@@ -1,13 +1,34 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.Ruby.Syntax where
 
-import Control.Monad (unless)
-import Data.Abstract.Evaluatable
-import Data.Abstract.ModuleTable as ModuleTable
-import Data.Abstract.Path
-import Diffing.Algorithm
-import Prelude hiding (fail)
-import Prologue
+import           Control.Monad (unless)
+import           Data.Abstract.Evaluatable
+import           Data.Abstract.Module (ModulePath)
+import           Data.Abstract.ModuleTable as ModuleTable
+import           Data.Abstract.Path
+import qualified Data.ByteString.Char8 as BC
+import           Diffing.Algorithm
+import           Prelude hiding (fail)
+import           Prologue
+import           System.FilePath.Posix
+
+
+-- TODO: Fully sort out ruby require/load mechanics
+--
+-- require "json"
+resolveRubyName :: MonadEvaluatable location term value m => ByteString -> m ModulePath
+resolveRubyName name = let n = cleanNameOrPath name in resolve [n <.> "rb"] >>= maybeFailNotFound n
+
+-- load "/root/src/file.rb"
+resolveRubyPath :: MonadEvaluatable location term value m => ByteString -> m ModulePath
+resolveRubyPath path = let n = cleanNameOrPath path in resolve [n] >>= maybeFailNotFound n
+
+maybeFailNotFound :: MonadFail m => String -> Maybe a -> m a
+maybeFailNotFound name = maybeFail notFound
+  where notFound = "Unable to resolve: " <> name
+
+cleanNameOrPath :: ByteString -> String
+cleanNameOrPath = BC.unpack . dropRelativePrefix . stripQuotes
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -18,15 +39,14 @@ instance Show1 Require where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Require where
   eval (Require _ x) = do
-    name <- toName <$> (subtermValue x >>= asString)
-    (importedEnv, v) <- isolate (doRequire name)
+    name <- subtermValue x >>= asString
+    path <- resolveRubyName name
+    (importedEnv, v) <- isolate (doRequire path)
     modifyEnv (mappend importedEnv)
     pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
-    where
-      toName = qualifiedName . splitOnPathSeparator . dropRelativePrefix . stripQuotes
 
 doRequire :: MonadEvaluatable location term value m
-          => ModuleName
+          => ModulePath
           -> m (Environment location value, value)
 doRequire name = do
   moduleTable <- getModuleTable
@@ -54,11 +74,10 @@ instance Evaluatable Load where
 
 doLoad :: MonadEvaluatable location term value m => ByteString -> Bool -> m value
 doLoad path shouldWrap = do
-  (importedEnv, _) <- isolate (load (toName path))
+  path' <- resolveRubyPath path
+  (importedEnv, _) <- isolate (load path')
   unless shouldWrap $ modifyEnv (mappend importedEnv)
   boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
-  where
-    toName = qualifiedName . splitOnPathSeparator . dropExtension . dropRelativePrefix . stripQuotes
 
 -- TODO: autoload
 
