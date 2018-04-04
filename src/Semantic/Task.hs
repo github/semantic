@@ -80,7 +80,6 @@ import           System.IO (stderr)
 data TaskF output where
   Parse         :: Parser term -> Blob -> TaskF term
   Analyze       :: Analysis.SomeAnalysis m result -> TaskF result
-  ImportGraph   :: (Apply Eq1 syntax, Apply Analysis.Evaluatable syntax, Apply FreeVariables1 syntax, Apply Functor syntax, Apply Ord1 syntax, Apply Show1 syntax, Member Syntax.Identifier syntax, Ord ann, Show ann) => Package (Term (Union syntax) ann) -> TaskF B.ByteString
   Decorate      :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff          :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
   Render        :: Renderer input output -> input -> TaskF output
@@ -102,7 +101,7 @@ type Renderer i o = i -> o
 parse :: Member TaskF effs => Parser term -> Blob -> Eff effs term
 parse parser = send . Parse parser
 
--- | A task running some 'Analysis.MonadAnalysis' to completion. 
+-- | A task running some 'Analysis.MonadAnalysis' to completion.
 analyze :: Member TaskF effs => Analysis.SomeAnalysis m result -> Eff effs result
 analyze = send . Analyze
 
@@ -120,7 +119,13 @@ render renderer = send . Render renderer
 
 
 importGraph :: (Apply Eq1 syntax, Apply Analysis.Evaluatable syntax, Apply FreeVariables1 syntax, Apply Functor syntax, Apply Ord1 syntax, Apply Show1 syntax, Member Syntax.Identifier syntax, Member TaskF effs, Ord ann, Show ann) => Package (Term (Union syntax) ann) -> Eff effs B.ByteString
-importGraph package = send (ImportGraph package)
+importGraph package = renderGraph <$> analyze (Analysis.SomeAnalysis (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package))
+  where asAnalysisForTypeOfPackage :: Abstract.ImportGraphing (Evaluating (Located Precise (Term (Union syntax) ann)) (Term (Union syntax) ann) (Value (Located Precise (Term (Union syntax) ann)))) effects value -> Package (Term (Union syntax) ann) -> Abstract.ImportGraphing (Evaluating (Located Precise (Term (Union syntax) ann)) (Term (Union syntax) ann) (Value (Located Precise (Term (Union syntax) ann)))) effects value
+        asAnalysisForTypeOfPackage = const
+
+        renderGraph result = case result of
+          (Right (Right (Right (Right (Right (_, graph))))), _) -> Abstract.renderImportGraph graph
+          _ -> error "blah"
 
 
 -- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
@@ -197,13 +202,6 @@ runTaskF = interpret $ \ task -> case task of
   Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
   Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
   Render renderer input -> pure (renderer input)
-  ImportGraph package -> do
-    let result = Analysis.runAnalysis (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package)
-    case result of
-      (Right (Right (Right (Right (Right (_, graph))))), _) -> pure $ Abstract.renderImportGraph graph
-      _ -> error "blah"
-  where asAnalysisForTypeOfPackage :: Abstract.ImportGraphing (Evaluating (Located Precise (Term (Union syntax) ann)) (Term (Union syntax) ann) (Value (Located Precise (Term (Union syntax) ann)))) effects value -> Package (Term (Union syntax) ann) -> Abstract.ImportGraphing (Evaluating (Located Precise (Term (Union syntax) ann)) (Term (Union syntax) ann) (Value (Located Precise (Term (Union syntax) ann)))) effects value
-        asAnalysisForTypeOfPackage = const
 
 instance (Members '[Reader Options, Telemetry, Exc SomeException, IO] effects, Run effects result rest) => Run (TaskF ': effects) result rest where
   run = run . runTaskF
