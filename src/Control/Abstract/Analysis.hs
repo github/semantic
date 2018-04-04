@@ -1,9 +1,10 @@
-{-# LANGUAGE RankNTypes, ScopedTypeVariables, TypeFamilies #-}
+{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For runAnalysis
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , liftAnalyze
 , runAnalysis
+, SomeAnalysis(..)
 , module X
 , Subterm(..)
 , SubtermAlgebra
@@ -62,3 +63,14 @@ runAnalysis :: ( Effectful m
             => m effects a
             -> Final effects a
 runAnalysis = X.run
+
+
+-- | An abstraction over analyses.
+data SomeAnalysis m result where
+  SomeAnalysis :: ( Effectful m
+                  , effects ~ Effects location term value (m effects)
+                  , MonadAnalysis location term value (m effects)
+                  , RunEffects effects a
+                  )
+               => m effects a
+               -> SomeAnalysis m (Final effects a)
