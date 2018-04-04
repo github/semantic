@@ -1,7 +1,6 @@
 module Data.Scientific.Exts
     ( module Data.Scientific
     , parseScientific
-    , parser
     ) where
 
 import Prelude hiding (filter, null, takeWhile)
