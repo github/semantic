@@ -191,11 +191,6 @@ runTaskWithOptions options task = do
         run' :: Task a -> IO (Either SomeException a)
         run' = runM . runError . flip runReader statter . flip runReader logger . runTelemetry . flip runReader options . runTaskF . runDistribute (run' . unwrapTask)
 
-        runDistribute :: Members '[Exc SomeException, IO] effs => (forall output . task output -> IO (Either SomeException output)) -> Eff (Distribute task ': effs) a -> Eff effs a
-        runDistribute run = interpret (\ task -> case task of
-          Distribute tasks -> liftIO (Async.mapConcurrently run tasks) >>= either throwError pure . sequenceA . withStrategy (parTraversable (parTraversable rseq))
-          Bidistribute tasks -> liftIO (Async.runConcurrently (bitraverse (Async.Concurrently . run) (Async.Concurrently . run) tasks)) >>= either throwError pure . bisequenceA . withStrategy (parBitraversable (parTraversable rseq) (parTraversable rseq)))
-
 logError :: Member Telemetry effs => Options -> Level -> Blob -> Error.Error String -> [(String, String)] -> Eff effs ()
 logError Options{..} level blob err = writeLog level (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err)
 
@@ -237,6 +232,11 @@ runParser blob@Blob{..} parser = case parser of
           _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (getField a) err]
           _ -> fold syntax
 
+
+runDistribute :: Members '[Exc SomeException, IO] effs => (forall output . task output -> IO (Either SomeException output)) -> Eff (Distribute task ': effs) a -> Eff effs a
+runDistribute run = interpret (\ task -> case task of
+  Distribute tasks -> liftIO (Async.mapConcurrently run tasks) >>= either throwError pure . sequenceA . withStrategy (parTraversable (parTraversable rseq))
+  Bidistribute tasks -> liftIO (Async.runConcurrently (bitraverse (Async.Concurrently . run) (Async.Concurrently . run) tasks)) >>= either throwError pure . bisequenceA . withStrategy (parBitraversable (parTraversable rseq) (parTraversable rseq)))
 
 parBitraversable :: Bitraversable t => Strategy a -> Strategy b -> Strategy (t a b)
 parBitraversable strat1 strat2 = bitraverse (rparWith strat1) (rparWith strat2)
