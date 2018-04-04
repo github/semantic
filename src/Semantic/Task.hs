@@ -45,7 +45,6 @@ import           Data.Abstract.Address
 import qualified Data.Abstract.Evaluatable as Analysis
 import           Data.Abstract.FreeVariables
 import           Data.Abstract.Located
-import           Data.Abstract.Module
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value)
 import           Data.Blob
