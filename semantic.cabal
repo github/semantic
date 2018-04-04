@@ -43,7 +43,6 @@ library
                      , Control.Effect
                      -- Effects used for program analysis
                      , Control.Effect.Fresh
-                     , Control.Effect.NonDet
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
                      , Data.Abstract.Cache
