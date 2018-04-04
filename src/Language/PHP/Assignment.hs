@@ -484,7 +484,7 @@ literal :: Assignment
 literal = integer <|> float <|> string
 
 float :: Assignment
-float = makeTerm <$> symbol Float <*> (source >>= Literal.normalizeFloatString [Literal.padWithLeadingZero])
+float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
 
 integer :: Assignment
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)

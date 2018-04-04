@@ -9,6 +9,7 @@ import qualified Assigning.Assignment.Spec
 import qualified Data.Diff.Spec
 import qualified Data.Functor.Classes.Generic.Spec
 import qualified Data.Mergeable.Spec
+import qualified Data.Scientific.Spec
 import qualified Data.Source.Spec
 import qualified Data.Term.Spec
 import qualified Diffing.Algorithm.RWS.Spec
@@ -36,6 +37,7 @@ main = hspec $ do
     describe "Data.Diff" Data.Diff.Spec.spec
     describe "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
     describe "Data.Mergeable" Data.Mergeable.Spec.spec
+    describe "Data.Scientific" Data.Scientific.Spec.spec
     describe "Data.Source" Data.Source.Spec.spec
     describe "Data.Term" Data.Term.Spec.spec
     describe "Diffing.Algorithm.RWS" Diffing.Algorithm.RWS.Spec.spec
