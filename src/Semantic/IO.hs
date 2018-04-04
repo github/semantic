@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, GADTs, ScopedTypeVariables, TupleSections, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, DeriveDataTypeable, DuplicateRecordFields, GADTs, ScopedTypeVariables, TupleSections, TypeOperators, UndecidableInstances #-}
 module Semantic.IO
 ( readFile
 , readFilePair
