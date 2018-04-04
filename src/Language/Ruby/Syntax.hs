@@ -74,7 +74,7 @@ instance Evaluatable Load where
     doLoad path False
   eval (Load [x, wrap]) = do
     path <- subtermValue x >>= asString
-    shouldWrap <- subtermValue wrap >>= toBool
+    shouldWrap <- subtermValue wrap >>= asBool
     doLoad path shouldWrap
   eval (Load _) = fail "invalid argument supplied to load, path is required"
 

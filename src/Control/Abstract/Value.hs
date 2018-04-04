@@ -5,7 +5,6 @@ module Control.Abstract.Value
 , while
 , doWhile
 , forLoop
-, toBool
 , makeNamespace
 , ValueRoots(..)
 , ValueError(..)
@@ -102,7 +101,10 @@ class (Monad m, Show value) => MonadValue location value m | m value -> location
   asString :: value -> m ByteString
 
   -- | Eliminate boolean values. TODO: s/boolean/truthy
-  ifthenelse :: value -> m a -> m a -> m a
+  ifthenelse :: value -> m value -> m value -> m value
+
+  -- | Extract a 'Bool' from a given value.
+  asBool :: value -> m Bool
 
   -- | Construct the nil/null datatype.
   null :: m value
@@ -135,9 +137,6 @@ class (Monad m, Show value) => MonadValue location value m | m value -> location
 
 
 -- | Attempt to extract a 'Prelude.Bool' from a given value.
-toBool :: MonadValue location value m => value -> m Bool
-toBool v = ifthenelse v (pure True) (pure False)
-
 forLoop :: (MonadEnvironment location value m, MonadValue location value m)
         => m value -- ^ Initial statement
         -> m value -- ^ Condition
@@ -195,6 +194,7 @@ data ValueError location value resume where
   NamespaceError         :: Prelude.String -> ValueError location value (Environment location value)
   ScopedEnvironmentError :: Prelude.String -> ValueError location value (Environment location value)
   CallError              :: value          -> ValueError location value value
+  BoolError              :: value          -> ValueError location value Bool
 
 instance Eq value => Eq1 (ValueError location value) where
   liftEq _ (TypeError a)  (TypeError b)                          = a == b
@@ -202,6 +202,7 @@ instance Eq value => Eq1 (ValueError location value) where
   liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
   liftEq _ (ScopedEnvironmentError a) (ScopedEnvironmentError b) = a == b
   liftEq _ (CallError a) (CallError b)                           = a == b
+  liftEq _ (BoolError a) (BoolError c)                           = (a == c)
   liftEq _ _             _                                       = False
 
 deriving instance (Show value) => Show (ValueError location value resume)

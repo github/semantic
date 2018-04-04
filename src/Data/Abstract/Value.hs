@@ -234,9 +234,14 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
     | Just (String n) <- prjValue v = pure n
     | otherwise                     = throwException @(ValueError location (Value location)) $ StringError v
 
-  ifthenelse cond if' else'
-    | Just (Boolean b) <- prjValue cond = if b then if' else else'
-    | otherwise = fail ("not defined for non-boolean conditions: " <> show cond)
+  ifthenelse cond if' else' = do
+    bool <- asBool cond
+    if bool then if' else else'
+
+  asBool val
+    | Just (Boolean b) <- prjValue val = pure b
+    | otherwise = throwException @(ValueError location (Value location)) $ BoolError val
+
 
   liftNumeric f arg
     | Just (Integer (Number.Integer i)) <- prjValue arg = integer $ f i
