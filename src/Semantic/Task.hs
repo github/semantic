@@ -76,6 +76,7 @@ type StatQueue = AsyncQueue Stat StatsClient
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type Task = Eff '[Distribute WrappedTask, TaskF, Reader Options, Telemetry, Reader LogQueue, Reader StatQueue, Exc SomeException, IO]
 
+-- | A wrapper for a 'Task', to embed in other effects.
 newtype WrappedTask a = WrapTask { unwrapTask :: Task a }
   deriving (Applicative, Functor, Monad)
 
