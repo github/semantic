@@ -229,7 +229,7 @@ runParser blob@Blob{..} parser = case parser of
           throwError (toException err)
         Right term -> do
           for_ (errors term) $ \ err -> case Error.errorActual err of
-              (Just "ParseError") -> do
+              Just "ParseError" -> do
                 writeStat (Stat.increment "parse.parse_errors" languageTag)
                 logError Warning blob err (("task", "parse") : blobFields)
               _ -> do
