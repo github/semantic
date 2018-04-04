@@ -45,17 +45,17 @@ parser = signed (choice [hex, oct, bin, dec]) where
   -- Parse a hex value, leaning on the parser provided by Attoparsec.
   hex = fromIntegral <$> (string "0x" *> hexadecimal @Integer)
 
-  -- Here's where things start getting icky. We lean on Haskell's octal integer support, parsing
+  -- We lean on Haskell's octal integer support, parsing
   -- the given string as an integer then coercing it to a Scientific.
   oct = do
     void (char '0' <* optional (char 'o'))
     digs <- takeWhile1 isOctDigit <* done
     fromIntegral <$> attempt @Integer (unpack ("0o" <> digs))
 
-  -- This is where it starts getting really horrible. Despite having binary literal support, Integer's
+  -- The case for binary literals is somewhat baroque. Despite having binary literal support, Integer's
   -- Read instance does not handle binary literals. So we have to shell out to Numeric.readInt, which is
-  -- in all respects a miserable excuse for an API, and apply a ReadS manually. This sucks so much.
-  -- The use of 'error' looks partial, but I really promise you it isn't.
+  -- is a very strange API, but works for our use case. The use of 'error' looks partial, but if Attoparsec
+  -- and readInt do their jobs, it should never happen.
   bin = do
     void (string "0b")
     let isBin = inClass "01"
