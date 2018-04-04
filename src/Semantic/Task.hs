@@ -58,7 +58,7 @@ import           System.Exit (die)
 import           System.IO (Handle, stderr)
 
 data Distribute output where
-  Distribute   :: Traversable t => t (Task output) -> Distribute (t output)
+  Distribute   :: Traversable t   => t (Task output)                 -> Distribute (t output)
   Bidistribute :: Bitraversable t => t (Task output1) (Task output2) -> Distribute (t output1 output2)
 
 data TaskF output where
@@ -252,7 +252,7 @@ runTaskF = interpret (\ task -> case task of
 
 -- | Statting and logging effects.
 data Telemetry output where
-  WriteStat :: Stat -> Telemetry ()
+  WriteStat :: Stat                                  -> Telemetry ()
   WriteLog  :: Level -> String -> [(String, String)] -> Telemetry ()
 
 runTelemetry :: Members '[Reader LogQueue, Reader StatQueue, IO] effs => Eff (Telemetry ': effs) a -> Eff effs a
