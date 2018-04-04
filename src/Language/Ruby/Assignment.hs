@@ -73,10 +73,11 @@ type Syntax = '[
   , Syntax.Error
   , Syntax.Identifier
   , Syntax.Program
-  , Ruby.Syntax.Require
-  , Ruby.Syntax.Load
   , Ruby.Syntax.Class
+  , Ruby.Syntax.Load
+  , Ruby.Syntax.LowPrecedenceBoolean
   , Ruby.Syntax.Module
+  , Ruby.Syntax.Require
   , []
   ]
 
@@ -369,9 +370,11 @@ binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expressi
   , (inj .) . Expression.Power            <$ symbol AnonStarStar
   , (inj .) . Expression.DividedBy        <$ symbol AnonSlash
   , (inj .) . Expression.Modulo           <$ symbol AnonPercent
-  , (inj .) . Expression.And              <$ (symbol AnonAnd <|> symbol AnonAmpersandAmpersand)
+  , (inj .) . Expression.And              <$ symbol AnonAmpersandAmpersand
+  , (inj .) . Ruby.Syntax.LowAnd          <$ symbol AnonAnd
   , (inj .) . Expression.BAnd             <$ symbol AnonAmpersand
-  , (inj .) . Expression.Or               <$ (symbol AnonOr <|> symbol AnonPipePipe)
+  , (inj .) . Expression.Or               <$ symbol AnonPipePipe
+  , (inj .) . Ruby.Syntax.LowOr           <$ symbol AnonOr
   , (inj .) . Expression.BOr              <$ symbol AnonPipe
   , (inj .) . Expression.BXOr             <$ symbol AnonCaret
   , (inj .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual)
