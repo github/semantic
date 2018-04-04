@@ -172,24 +172,16 @@ runTaskWithOptions options task = do
   statter <- defaultStatsClient >>= newQueue sendStat
   logger <- newQueue logMessage options
 
-  (result, stat) <- withTiming "run" [] $
-    run options logger statter task
+  (result, stat) <- withTiming "run" [] $ do
+    let run :: Task a -> IO (Either SomeException a)
+        run = runM . runError . flip runReader statter . flip runReader logger . runTelemetry . flip runReader options . runTaskF . runDistribute (run . unwrapTask)
+    run task
   queue statter stat
 
   closeQueue statter
   closeStatClient (asyncQueueExtra statter)
   closeQueue logger
   either (die . displayException) pure result
-  where
-    run :: Options
-        -> LogQueue
-        -> StatQueue
-        -> Task a
-        -> IO (Either SomeException a)
-    run options logger statter = run'
-      where
-        run' :: Task a -> IO (Either SomeException a)
-        run' = runM . runError . flip runReader statter . flip runReader logger . runTelemetry . flip runReader options . runTaskF . runDistribute (run' . unwrapTask)
 
 logError :: Member Telemetry effs => Options -> Level -> Blob -> Error.Error String -> [(String, String)] -> Eff effs ()
 logError Options{..} level blob err = writeLog level (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err)
