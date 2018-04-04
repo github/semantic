@@ -136,6 +136,7 @@ library
                      , Rendering.TOC
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic
+                     , Semantic.Distribute
                      , Semantic.CLI
                      , Semantic.IO
                      , Semantic.Log

@@ -31,13 +31,11 @@ module Semantic.Task
 
 import           Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
-import qualified Control.Concurrent.Async as Async
 import qualified Control.Exception as Exc
 import           Control.Monad.Effect.Exception
 import           Control.Monad.Effect.Internal as Eff
 import           Control.Monad.Effect.Reader
 import           Control.Monad.IO.Class
-import           Control.Parallel.Strategies
 import           Data.Blob
 import           Data.Bool
 import qualified Data.ByteString as B
@@ -51,16 +49,13 @@ import           Parsing.CMark
 import           Parsing.Parser
 import           Parsing.TreeSitter
 import           Prologue hiding (MonadError(..))
+import           Semantic.Distribute
 import qualified Semantic.IO as IO
 import           Semantic.Log
 import           Semantic.Queue
 import           Semantic.Stat as Stat
 import           System.Exit (die)
 import           System.IO (Handle, stderr)
-
-data Distribute task output where
-  Distribute   :: Traversable t   => t (task output)                 -> Distribute task (t output)
-  Bidistribute :: Bitraversable t => t (task output1) (task output2) -> Distribute task (t output1 output2)
 
 data TaskF output where
   ReadBlobs     :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
@@ -132,35 +127,6 @@ diff differ term1 term2 = send (Semantic.Task.Diff differ term1 term2)
 render :: Member TaskF effs => Renderer input output -> input -> Eff effs output
 render renderer = send . Render renderer
 
--- | Distribute a 'Traversable' container of tasks over the available cores (i.e. execute them concurrently), collecting their results.
---
---   This is a concurrent analogue of 'sequenceA'.
-distribute :: (Member (Distribute WrappedTask) effs, Traversable t) => t (Task output) -> Eff effs (t output)
-distribute = send . Distribute . fmap WrapTask
-
--- | Distribute a 'Bitraversable' container of tasks over the available cores (i.e. execute them concurrently), collecting their results.
---
---   This is a concurrent analogue of 'bisequenceA'.
-bidistribute :: (Bitraversable t, Member (Distribute WrappedTask) effs) => t (Task output1) (Task output2) -> Eff effs (t output1 output2)
-bidistribute = send . Bidistribute . bimap WrapTask WrapTask
-
--- | Distribute the application of a function to each element of a 'Traversable' container of inputs over the available cores (i.e. perform the function concurrently for each element), collecting the results.
---
---   This is a concurrent analogue of 'for' or 'traverse' (with the arguments flipped).
-distributeFor :: (Member (Distribute WrappedTask) effs, Traversable t) => t a -> (a -> Task output) -> Eff effs (t output)
-distributeFor inputs toTask = distribute (fmap toTask inputs)
-
--- | Distribute the application of a function to each element of a 'Bitraversable' container of inputs over the available cores (i.e. perform the functions concurrently for each element), collecting the results.
---
---   This is a concurrent analogue of 'bifor' or 'bitraverse' (with the arguments flipped).
-bidistributeFor :: (Bitraversable t, Member (Distribute WrappedTask) effs) => t a b -> (a -> Task output1) -> (b -> Task output2) -> Eff effs (t output1 output2)
-bidistributeFor inputs toTask1 toTask2 = bidistribute (bimap toTask1 toTask2 inputs)
-
--- | Distribute the application of a function to each element of a 'Traversable' container of inputs over the available cores (i.e. perform the function concurrently for each element), combining the results 'Monoid'ally into a final value.
---
---   This is a concurrent analogue of 'foldMap'.
-distributeFoldMap :: (Member (Distribute WrappedTask) effs, Monoid output, Traversable t) => (a -> Task output) -> t a -> Eff effs output
-distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 
 -- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
 --
@@ -227,15 +193,6 @@ runParser blob@Blob{..} parser = case parser of
         errors = cata $ \ (In a syntax) -> case syntax of
           _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (getField a) err]
           _ -> fold syntax
-
-
-runDistribute :: Members '[Exc SomeException, IO] effs => (forall output . task output -> IO (Either SomeException output)) -> Eff (Distribute task ': effs) a -> Eff effs a
-runDistribute run = interpret (\ task -> case task of
-  Distribute tasks -> liftIO (Async.mapConcurrently run tasks) >>= either throwError pure . sequenceA . withStrategy (parTraversable (parTraversable rseq))
-  Bidistribute tasks -> liftIO (Async.runConcurrently (bitraverse (Async.Concurrently . run) (Async.Concurrently . run) tasks)) >>= either throwError pure . bisequenceA . withStrategy (parBitraversable (parTraversable rseq) (parTraversable rseq)))
-
-parBitraversable :: Bitraversable t => Strategy a -> Strategy b -> Strategy (t a b)
-parBitraversable strat1 strat2 = bitraverse (rparWith strat1) (rparWith strat2)
 
 
 runTaskF :: Members '[Reader Options, Telemetry, Reader LogQueue, Reader StatQueue, Exc SomeException, IO] effs => Eff (TaskF ': effs) a -> Eff effs a

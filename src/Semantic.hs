@@ -35,7 +35,7 @@ import Semantic.Task as Task
 --   - Easy to consume this interface from other application (e.g a cmdline or web server app).
 
 parseBlobs :: Output output => TermRenderer output -> [Blob] -> Task ByteString
-parseBlobs renderer blobs = toOutput' <$> distributeFoldMap (parseBlob renderer) blobs
+parseBlobs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . parseBlob renderer) blobs
   where toOutput' = case renderer of
           JSONTermRenderer -> toOutput . renderJSONTerms
           SymbolsTermRenderer _ -> toOutput . renderSymbolTerms
@@ -59,7 +59,7 @@ newtype NoLanguageForBlob = NoLanguageForBlob FilePath
 
 
 diffBlobPairs :: Output output => DiffRenderer output -> [BlobPair] -> Task ByteString
-diffBlobPairs renderer blobs = toOutput' <$> distributeFoldMap (diffBlobPair renderer) blobs
+diffBlobPairs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . diffBlobPair renderer) blobs
   where toOutput' = case renderer of
           JSONDiffRenderer -> toOutput . renderJSONDiffs
           _ -> toOutput
@@ -79,7 +79,7 @@ diffBlobPair renderer blobs
 
         run :: (Foldable syntax, Functor syntax) => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (BlobPair -> Diff syntax ann ann -> output) -> Task output
         run parse diff renderer = do
-          terms <- bidistributeFor (runJoin blobs) parse parse
+          terms <- bidistributeFor (runJoin blobs) (WrapTask . parse) (WrapTask . parse)
           time "diff" languageTag $ do
             diff <- diffTermPair diff terms
             writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
