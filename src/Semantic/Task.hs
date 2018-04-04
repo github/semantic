@@ -58,17 +58,17 @@ import           System.Exit (die)
 import           System.IO (Handle, stderr)
 
 data Distribute output where
-  Distribute :: Traversable t => t (Task output) -> Distribute (t output)
+  Distribute   :: Traversable t => t (Task output) -> Distribute (t output)
   Bidistribute :: Bitraversable t => t (Task output1) (Task output2) -> Distribute (t output1 output2)
 
 data TaskF output where
-  ReadBlobs :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
+  ReadBlobs     :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
   ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [BlobPair]
   WriteToOutput :: Either Handle FilePath -> B.ByteString -> TaskF ()
-  Parse :: Parser term -> Blob -> TaskF term
-  Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
-  Diff :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
-  Render :: Renderer input output -> input -> TaskF output
+  Parse         :: Parser term -> Blob -> TaskF term
+  Decorate      :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
+  Diff          :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
+  Render        :: Renderer input output -> input -> TaskF output
 
 type LogQueue = AsyncQueue Message Options
 type StatQueue = AsyncQueue Stat StatsClient
@@ -253,7 +253,7 @@ runTaskF = interpret (\ task -> case task of
 -- | Statting and logging effects.
 data Telemetry output where
   WriteStat :: Stat -> Telemetry ()
-  WriteLog :: Level -> String -> [(String, String)] -> Telemetry ()
+  WriteLog  :: Level -> String -> [(String, String)] -> Telemetry ()
 
 runTelemetry :: Members '[Reader LogQueue, Reader StatQueue, IO] effs => Eff (Telemetry ': effs) a -> Eff effs a
 runTelemetry = interpret (\ t -> case t of
