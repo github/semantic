@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs #-}
-module Semantic.Command.Parse where
+module Semantic.Parse where
 
 import Analysis.ConstructorName (ConstructorName, constructorLabel)
 import Analysis.IdentifierName (IdentifierName, identifierLabel)

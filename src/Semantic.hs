@@ -21,8 +21,8 @@ import Diffing.Algorithm (Diffable)
 import Diffing.Interpreter
 import Parsing.Parser
 import Rendering.Renderer
-import Semantic.Command.Parse
 import Semantic.IO (NoLanguageForBlob(..))
+import Semantic.Parse
 import Semantic.Stat as Stat
 import Semantic.Task as Task
 

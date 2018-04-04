@@ -136,11 +136,11 @@ library
                      -- High-level flow & operational functionality (logging, stats, etc.)
                      , Semantic
                      , Semantic.CLI
-                     , Semantic.Command.Diff
-                     , Semantic.Command.Parse
+                     , Semantic.Diff
                      , Semantic.Distribute
                      , Semantic.IO
                      , Semantic.Log
+                     , Semantic.Parse
                      , Semantic.Queue
                      , Semantic.Stat
                      , Semantic.Task
