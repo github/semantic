@@ -41,8 +41,9 @@ import           Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
 import qualified Control.Abstract.Analysis as Analysis
 import           Control.Monad.Effect.Exception
-import           Control.Monad.Effect.Internal as Eff
+import           Control.Monad.Effect.Internal as Eff hiding (run)
 import           Control.Monad.Effect.Reader
+import           Control.Monad.Effect.Run as Run
 import           Data.Abstract.Address
 import qualified Data.Abstract.Evaluatable as Analysis
 import           Data.Abstract.FreeVariables
@@ -190,3 +191,6 @@ runTaskF = interpret $ \ task -> case task of
       _ -> error "blah"
   where asAnalysisForTypeOfPackage :: Abstract.ImportGraphing (Evaluating (Located Precise (Term (Union syntax) ann)) (Term (Union syntax) ann) (Value (Located Precise (Term (Union syntax) ann)))) effects value -> Package (Term (Union syntax) ann) -> Abstract.ImportGraphing (Evaluating (Located Precise (Term (Union syntax) ann)) (Term (Union syntax) ann) (Value (Located Precise (Term (Union syntax) ann)))) effects value
         asAnalysisForTypeOfPackage = const
+
+instance (Members '[Reader Options, Telemetry, Exc SomeException, IO] effects, Run effects result rest) => Run (TaskF ': effects) result rest where
+  run = run . runTaskF
