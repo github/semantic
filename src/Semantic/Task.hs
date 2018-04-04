@@ -15,6 +15,8 @@ module Semantic.Task
 , decorate
 , diff
 , render
+, importGraph
+-- TODO: group these
 , distribute
 , distributeFor
 , distributeFoldMap
@@ -29,13 +31,21 @@ module Semantic.Task
 , throwError
 ) where
 
+import qualified Analysis.Abstract.ImportGraph as Abstract
+import           Analysis.Abstract.Evaluating
 import           Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
+import qualified Control.Abstract.Analysis as Analysis
 import qualified Control.Exception as Exc
 import           Control.Monad.Effect.Exception
 import           Control.Monad.Effect.Internal as Eff
 import           Control.Monad.Effect.Reader
 import           Control.Monad.IO.Class
+import           Data.Abstract.Address
+import qualified Data.Abstract.Evaluatable as Analysis
+import           Data.Abstract.FreeVariables
+import           Data.Abstract.Package
+import           Data.Abstract.Value (Value)
 import           Data.Blob
 import           Data.Bool
 import qualified Data.ByteString as B
@@ -63,6 +73,7 @@ data TaskF output where
   ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [BlobPair]
   WriteToOutput :: Either Handle FilePath -> B.ByteString -> TaskF ()
   Parse         :: Parser term -> Blob -> TaskF term
+  ImportGraph   :: (Corecursive term, Analysis.Evaluatable (Base term), FreeVariables term, Recursive term) => PackageBody term -> TaskF B.ByteString
   Decorate      :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff          :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
   Render        :: Renderer input output -> input -> TaskF output
@@ -107,6 +118,10 @@ diff differ term1 term2 = send (Semantic.Task.Diff differ term1 term2)
 -- | A task which renders some input using the supplied 'Renderer' function.
 render :: Member TaskF effs => Renderer input output -> input -> Eff effs output
 render renderer = send . Render renderer
+
+
+importGraph :: (Corecursive term, Analysis.Evaluatable (Base term), FreeVariables term, Recursive term) => Member TaskF effs => PackageBody term -> Eff effs B.ByteString
+importGraph package = send (ImportGraph package)
 
 
 -- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
@@ -177,7 +192,7 @@ runParser blob@Blob{..} parser = case parser of
 
 
 runTaskF :: Members '[Reader Options, Telemetry, Reader LogQueue, Reader StatQueue, Exc SomeException, IO] effs => Eff (TaskF ': effs) a -> Eff effs a
-runTaskF = interpret (\ task -> case task of
+runTaskF = interpret $ \ task -> case task of
   ReadBlobs (Left handle) -> rethrowing (IO.readBlobsFromHandle handle)
   ReadBlobs (Right paths@[(path, Nothing)]) -> rethrowing (IO.isDirectory path >>= bool (IO.readBlobsFromPaths paths) (IO.readBlobsFromDir path))
   ReadBlobs (Right paths) -> rethrowing (IO.readBlobsFromPaths paths)
@@ -186,7 +201,14 @@ runTaskF = interpret (\ task -> case task of
   Parse parser blob -> runParser blob parser
   Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
   Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
-  Render renderer input -> pure (renderer input))
+  Render renderer input -> pure (renderer input)
+  ImportGraph package -> do
+    let result = Analysis.runAnalysis (Analysis.evaluatePackageBody package `asAnalysisForTypeOfPackage` package)
+    case result of
+      (Right (Right (Right (Right (Right (_, graph))))), _) -> pure $ Abstract.renderImportGraph graph
+      _ -> error "blah"
+  where asAnalysisForTypeOfPackage :: Abstract.ImportGraphing (Evaluating Precise term (Value Precise)) effects value -> PackageBody term -> Abstract.ImportGraphing (Evaluating Precise term (Value Precise)) effects value
+        asAnalysisForTypeOfPackage = const
 
 
 -- | Catch exceptions in 'IO' actions embedded in 'Eff', handling them with the passed function.
