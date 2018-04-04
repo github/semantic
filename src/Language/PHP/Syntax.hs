@@ -190,7 +190,7 @@ instance Evaluatable QualifiedName where
     localEnv (mappend lhs) iden
 
 
-newtype NamespaceName a = NamespaceName [a]
+newtype NamespaceName a = NamespaceName (NonEmpty a)
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 NamespaceName where liftEq = genericLiftEq
@@ -198,13 +198,11 @@ instance Ord1 NamespaceName where liftCompare = genericLiftCompare
 instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable NamespaceName where
-  eval (NamespaceName xs) = go xs
+  eval (NamespaceName xs) = foldl1 f $ fmap subtermValue xs
     where
-      go []     = fail "nonempty NamespaceName not allowed"
-      go [x]    = subtermValue x
-      go (x:xs) = do
-        env <- subtermValue x >>= scopedEnvironment
-        localEnv (mappend env) (go xs)
+      f ns nam = do
+        env <- ns >>= scopedEnvironment
+        localEnv (mappend env) nam
 
 newtype ConstDeclaration a = ConstDeclaration [a]
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

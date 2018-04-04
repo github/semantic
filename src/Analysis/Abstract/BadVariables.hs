@@ -9,7 +9,7 @@ import Prologue
 
 -- An analysis that resumes from evaluation errors and records the list of unresolved free variables.
 newtype BadVariables m (effects :: [* -> *]) a = BadVariables (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh, MonadNonDet)
+  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
 deriving instance MonadControl term (m effects)                    => MonadControl term (BadVariables m effects)
 deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (BadVariables m effects)
