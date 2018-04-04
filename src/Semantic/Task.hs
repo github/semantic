@@ -92,12 +92,6 @@ readBlobPairs = send . ReadBlobPairs
 writeToOutput :: Member TaskF effs => Either Handle FilePath -> B.ByteString -> Eff effs ()
 writeToOutput path = send . WriteToOutput path
 
--- | A task which measures and stats the timing of another task.
-time :: Members '[Telemetry, IO] effs => String -> [(String, String)] -> Eff effs output -> Eff effs output
-time statName tags task = do
-  (a, stat) <- withTiming statName tags task
-  a <$ writeStat stat
-
 -- | A task which parses a 'Blob' with the given 'Parser'.
 parse :: Member TaskF effs => Parser term -> Blob -> Eff effs term
 parse parser = send . Parse parser
