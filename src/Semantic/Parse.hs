@@ -15,7 +15,7 @@ import Rendering.Renderer
 import Semantic.IO (NoLanguageForBlob(..))
 import Semantic.Task
 
-parseBlobs :: Members '[Distribute WrappedTask, TaskF, Exc SomeException] effs => Output output => TermRenderer output -> [Blob] -> Eff effs ByteString
+parseBlobs :: (Members '[Distribute WrappedTask, TaskF, Exc SomeException] effs, Output output) => TermRenderer output -> [Blob] -> Eff effs ByteString
 parseBlobs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . parseBlob renderer) blobs
   where toOutput' = case renderer of
           JSONTermRenderer -> toOutput . renderJSONTerms
