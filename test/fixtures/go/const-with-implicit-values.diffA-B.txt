@@ -6,15 +6,18 @@
     (Identifier)
     ([])
     (
+    {+(Assignment
+      {+(Identifier)+}
+      {+(Identifier)+})+}
       (Assignment
       { (Identifier)
       ->(Identifier) }
-        (Identifier))
+      { (Identifier)
+      ->([]) })
       (Assignment
       { (Identifier)
       ->(Identifier) }
         ([]))
-      (Assignment
-      { (Identifier)
-      ->(Identifier) }
-        ([])))))
+    {-(Assignment
+      {-(Identifier)-}
+      {-([])-})-})))

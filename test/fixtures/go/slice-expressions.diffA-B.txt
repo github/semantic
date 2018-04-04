@@ -11,11 +11,14 @@
       {+(Integer)+}
       {+(Empty)+}
       {+(Empty)+})+}
-    {+(Slice
-      {+(Identifier)+}
-      {+(Empty)+}
-      {+(Integer)+}
-      {+(Empty)+})+}
+      (Slice
+      { (Identifier)
+      ->(Identifier) }
+      { (Integer)
+      ->(Empty) }
+      { (Empty)
+      ->(Integer) }
+        (Empty))
     {+(Slice
       {+(Identifier)+}
       {+(Integer)+}
@@ -24,8 +27,9 @@
       (Slice
       { (Identifier)
       ->(Identifier) }
-        (Integer)
       { (Empty)
+      ->(Integer) }
+      { (Integer)
       ->(Integer) }
       { (Empty)
       ->(Integer) })
@@ -34,11 +38,6 @@
       {+(Integer)+}
       {+(Integer)+}
       {+(Empty)+})+}
-    {-(Slice
-      {-(Identifier)-}
-      {-(Empty)-}
-      {-(Integer)-}
-      {-(Empty)-})-}
     {-(Slice
       {-(Identifier)-}
       {-(Empty)-}
