@@ -1,9 +1,10 @@
-{-# LANGUAGE GADTs, TypeOperators #-}
+{-# LANGUAGE GADTs, RankNTypes, TypeOperators #-}
 module Semantic.Telemetry where
 
-import Control.Monad.Effect
+import Control.Monad.Effect.Internal
 import Control.Monad.Effect.Reader
 import Control.Monad.IO.Class
+import Prologue
 import Semantic.Log
 import Semantic.Queue
 import Semantic.Stat
@@ -28,19 +29,25 @@ time statName tags task = do
   a <$ writeStat stat
 
 
--- | A queue for logging.
-type LogQueue = AsyncQueue Message Options
+-- | Queues for logging and statting.
+data Queues = Queues { logger :: AsyncQueue Message Options, statter :: AsyncQueue Stat StatsClient }
 
--- | A queue for stats.
-type StatQueue = AsyncQueue Stat StatsClient
-
-
-runTelemetry :: Members '[Reader LogQueue, Reader StatQueue, IO] effs => Eff (Telemetry ': effs) a -> Eff effs a
-runTelemetry = interpret (\ t -> case t of
-  WriteStat stat -> ask >>= \ statter -> liftIO (queue (statter :: StatQueue) stat)
-  WriteLog level message pairs -> ask >>= \ logger -> queueLogMessage logger level message pairs)
+runTelemetry :: Member IO (Reader Queues ': effs) => Eff (Telemetry ': effs) a -> Eff (Reader Queues ': effs) a
+runTelemetry = reinterpret (\ t -> case t of
+  WriteStat stat -> asks statter >>= \ statter -> liftIO (queue statter stat)
+  WriteLog level message pairs -> asks logger >>= \ logger -> queueLogMessage logger level message pairs)
 
 ignoreTelemetry :: Eff (Telemetry ': effs) a -> Eff effs a
 ignoreTelemetry = interpret (\ t -> case t of
   WriteStat{} -> pure ()
   WriteLog{}  -> pure ())
+
+
+reinterpret :: (forall x. effect x -> Eff (newEffect ': effs) x)
+            -> Eff (effect ': effs) a
+            -> Eff (newEffect ': effs) a
+reinterpret handle = loop
+  where loop (Val x)  = pure x
+        loop (E u' q) = case decompose u' of
+            Right eff -> handle eff >>=            q >>> loop
+            Left  u   -> E (weaken u) (tsingleton (q >>> loop))

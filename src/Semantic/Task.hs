@@ -79,7 +79,7 @@ data TaskF output where
   Render        :: Renderer input output -> input -> TaskF output
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
-type Task = Eff '[Distribute WrappedTask, TaskF, IO.Files, Reader Options, Telemetry, Reader LogQueue, Reader StatQueue, Exc SomeException, IO]
+type Task = Eff '[Distribute WrappedTask, TaskF, IO.Files, Reader Options, Telemetry, Exc SomeException, IO]
 
 -- | A wrapper for a 'Task', to embed in other effects.
 newtype WrappedTask a = WrapTask { unwrapTask :: Task a }
@@ -128,7 +128,7 @@ runTaskWithOptions options task = do
 
   (result, stat) <- withTiming "run" [] $ do
     let run :: Task a -> IO (Either SomeException a)
-        run = runM . runError . flip runReader statter . flip runReader logger . runTelemetry . flip runReader options . IO.runFiles . runTaskF . runDistribute (run . unwrapTask)
+        run = runM . runError . flip runReader (Queues logger statter) . runTelemetry . flip runReader options . IO.runFiles . runTaskF . runDistribute (run . unwrapTask)
     run task
   queue statter stat
 
@@ -179,7 +179,7 @@ runParser blob@Blob{..} parser = case parser of
           _ -> fold syntax
 
 
-runTaskF :: Members '[Reader Options, Telemetry, Reader LogQueue, Reader StatQueue, Exc SomeException, IO] effs => Eff (TaskF ': effs) a -> Eff effs a
+runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, IO] effs => Eff (TaskF ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
   Parse parser blob -> runParser blob parser
   Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
