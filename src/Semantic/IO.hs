@@ -96,8 +96,8 @@ newtype BlobParse = BlobParse { blobs :: [Blob] }
 type BlobPair = Join These Blob
 
 data Blob = Blob
-  { path :: FilePath
-  , content :: Text
+  { path     :: FilePath
+  , content  :: Text
   , language :: String
   }
   deriving (Show, Generic, FromJSON)
