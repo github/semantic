@@ -44,7 +44,7 @@ readFilePair a b = do
     _ -> fail "expected file pair with content on at least one side"
 
 isDirectory :: MonadIO m => FilePath -> m Bool
-isDirectory path = liftIO (doesDirectoryExist path) >>= pure
+isDirectory path = liftIO (doesDirectoryExist path)
 
 -- | Return a language based on a FilePath's extension, or Nothing if extension is not found or not supported.
 languageForFilePath :: FilePath -> Maybe Language
