@@ -23,8 +23,6 @@ module Semantic.Task
 , distribute
 , distributeFor
 , distributeFoldMap
-, bidistribute
-, bidistributeFor
 -- * Configuration
 , defaultOptions
 , configureOptionsForHandle
