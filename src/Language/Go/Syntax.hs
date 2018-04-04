@@ -2,8 +2,85 @@
 module Language.Go.Syntax where
 
 import Data.Abstract.Evaluatable hiding (Label)
+import Data.Abstract.Module
+import Data.Abstract.FreeVariables (name)
 import Diffing.Algorithm
+import qualified Data.ByteString.Char8 as BC
+import qualified Data.ByteString as B
+import System.FilePath.Posix
 import Prologue
+
+newtype ImportPath = ImportPath { unPath :: FilePath }
+  deriving (Eq, Ord, Show)
+
+importPath :: ByteString -> ImportPath
+importPath str = let path = stripQuotes str in ImportPath (BC.unpack path)
+  where stripQuotes = B.filter (`B.notElem` "\'\"")
+
+defaultAlias :: ImportPath -> Name
+defaultAlias = name . BC.pack . takeFileName . unPath
+
+-- TODO: need to delineate between relative and absolute Go imports
+resolveGoImport :: MonadEvaluatable location term value m => FilePath -> m [ModulePath]
+resolveGoImport relImportPath = do
+  ModuleInfo{..} <- currentModule
+  let relRootDir = takeDirectory (makeRelative moduleRoot modulePath)
+  listModulesInDir $ normalise (relRootDir </> normalise relImportPath)
+
+-- | Import declarations (symbols are added directly to the calling environment).
+--
+-- If the list of symbols is empty copy everything to the calling environment.
+data Import a = Import { importFrom :: ImportPath, importWildcardToken :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 Import where liftEq = genericLiftEq
+instance Ord1 Import where liftCompare = genericLiftCompare
+instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Import where
+  eval (Import (ImportPath name) _) = do
+    paths <- resolveGoImport name
+    for_ paths $ \path -> do
+      (importedEnv, _) <- isolate (require path)
+      modifyEnv (mappend importedEnv)
+    unit
+
+
+-- | Qualified Import declarations (symbols are qualified in calling environment).
+--
+-- If the list of symbols is empty copy and qualify everything to the calling environment.
+data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: !ImportPath, qualifiedImportAlias :: !a}
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 QualifiedImport where liftEq = genericLiftEq
+instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
+instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QualifiedImport where
+  eval (QualifiedImport (ImportPath name) aliasTerm) = do
+    paths <- resolveGoImport name
+    let alias = freeVariable (subterm aliasTerm)
+    void $ letrec' alias $ \addr -> do
+      for_ paths $ \path -> do
+        (importedEnv, _) <- isolate (require path)
+        modifyEnv (mappend importedEnv)
+
+      makeNamespace alias addr []
+    unit
+
+-- | Side effect only imports (no symbols made available to the calling environment).
+data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: !ImportPath, sideEffectImportToken :: !a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 SideEffectImport where liftEq = genericLiftEq
+instance Ord1 SideEffectImport where liftCompare = genericLiftCompare
+instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable SideEffectImport where
+  eval (SideEffectImport (ImportPath name) _) = do
+    paths <- resolveGoImport name
+    for_ paths (isolate . require)
+    unit
 
 -- A composite literal in Go
 data Composite a = Composite { compositeType :: !a, compositeElement :: !a }
@@ -169,7 +246,7 @@ instance Show1 Package where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Package where
   eval (Package _ xs) = eval xs
-  
+
 
 -- | A type assertion in Go (e.g. `x.(T)` where the value of `x` is not nil and is of type `T`).
 data TypeAssertion a = TypeAssertion { typeAssertionSubject :: !a, typeAssertionType :: !a }
