@@ -40,6 +40,9 @@ parBitraversable :: Bitraversable t => Strategy a -> Strategy b -> Strategy (t a
 parBitraversable strat1 strat2 = bitraverse (rparWith strat1) (rparWith strat2)
 
 
+-- | An action evaluating @task@s to some output in 'IO', or failing with an exception.
+--
+--   This is necessary because GHC won’t allow us to use a rank-n quantified type in the third parameter to our instance of 'Run', below.
 newtype Action task = Action { runAction :: forall output . task output -> IO (Either SomeException output) }
 
 instance (Members '[Exc SomeException, IO] effects, Run effects result rest) => Run (Distribute task ': effects) result (Action task -> rest) where
