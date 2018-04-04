@@ -1,8 +1,9 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeOperators #-}
+{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Semantic.Telemetry where
 
-import Control.Monad.Effect.Internal
+import Control.Monad.Effect.Internal hiding (run)
 import Control.Monad.Effect.Reader
+import Control.Monad.Effect.Run
 import Control.Monad.IO.Class
 import Prologue
 import Semantic.Log
@@ -51,3 +52,7 @@ reinterpret handle = loop
         loop (E u' q) = case decompose u' of
             Right eff -> handle eff >>=            q >>> loop
             Left  u   -> E (weaken u) (tsingleton (q >>> loop))
+
+
+instance (Member IO (Reader Queues ': effects), Run (Reader Queues ': effects) result rest) => Run (Telemetry ': effects) result rest where
+  run = run . runTelemetry
