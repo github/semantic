@@ -1,9 +1,9 @@
 (Program
-  (Or
+  (LowOr
     (Identifier)
     (Identifier))
-  (And
-    (Or
+  (LowAnd
+    (LowOr
       (Identifier)
       (Identifier))
     (Identifier)))
