@@ -5,9 +5,9 @@ module Semantic.Task
 , Level(..)
 , RAlgebra
 , Differ
-, readBlobs
-, readBlobPairs
-, writeToOutput
+, IO.readBlobs
+, IO.readBlobPairs
+, IO.writeToOutput
 , writeLog
 , writeStat
 , time
@@ -36,11 +36,9 @@ import           Analysis.Abstract.Evaluating
 import           Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
 import qualified Control.Abstract.Analysis as Analysis
-import qualified Control.Exception as Exc
 import           Control.Monad.Effect.Exception
 import           Control.Monad.Effect.Internal as Eff
 import           Control.Monad.Effect.Reader
-import           Control.Monad.IO.Class
 import           Data.Abstract.Address
 import qualified Data.Abstract.Evaluatable as Analysis
 import           Data.Abstract.FreeVariables
@@ -48,11 +46,9 @@ import           Data.Abstract.Located
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value)
 import           Data.Blob
-import           Data.Bool
 import qualified Data.ByteString as B
 import           Data.Diff
 import qualified Data.Error as Error
-import           Data.Language
 import           Data.Record
 import qualified Data.Syntax as Syntax
 import           Data.Term
@@ -67,12 +63,9 @@ import           Semantic.Queue
 import           Semantic.Stat as Stat
 import           Semantic.Telemetry
 import           System.Exit (die)
-import           System.IO (Handle, stderr)
+import           System.IO (stderr)
 
 data TaskF output where
-  ReadBlobs     :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
-  ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [BlobPair]
-  WriteToOutput :: Either Handle FilePath -> B.ByteString -> TaskF ()
   Parse         :: Parser term -> Blob -> TaskF term
   ImportGraph   :: (Apply Eq1 syntax, Apply Analysis.Evaluatable syntax, Apply FreeVariables1 syntax, Apply Functor syntax, Apply Ord1 syntax, Apply Show1 syntax, Member Syntax.Identifier syntax, Ord ann, Show ann) => Package (Term (Union syntax) ann) -> TaskF B.ByteString
   Decorate      :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
@@ -80,7 +73,7 @@ data TaskF output where
   Render        :: Renderer input output -> input -> TaskF output
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
-type Task = Eff '[Distribute WrappedTask, TaskF, Reader Options, Telemetry, Reader LogQueue, Reader StatQueue, Exc SomeException, IO]
+type Task = Eff '[Distribute WrappedTask, TaskF, IO.Files, Reader Options, Telemetry, Reader LogQueue, Reader StatQueue, Exc SomeException, IO]
 
 -- | A wrapper for a 'Task', to embed in other effects.
 newtype WrappedTask a = WrapTask { unwrapTask :: Task a }
@@ -91,18 +84,6 @@ type Differ syntax ann1 ann2 = Term syntax ann1 -> Term syntax ann2 -> Diff synt
 
 -- | A function to render terms or diffs.
 type Renderer i o = i -> o
-
--- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
-readBlobs :: Member TaskF effs => Either Handle [(FilePath, Maybe Language)] -> Eff effs [Blob]
-readBlobs = send . ReadBlobs
-
--- | A task which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
-readBlobPairs :: Member TaskF effs => Either Handle [Both (FilePath, Maybe Language)] -> Eff effs [BlobPair]
-readBlobPairs = send . ReadBlobPairs
-
--- | A task which writes a 'B.ByteString' to a 'Handle' or a 'FilePath'.
-writeToOutput :: Member TaskF effs => Either Handle FilePath -> B.ByteString -> Eff effs ()
-writeToOutput path = send . WriteToOutput path
 
 -- | A task which parses a 'Blob' with the given 'Parser'.
 parse :: Member TaskF effs => Parser term -> Blob -> Eff effs term
@@ -141,7 +122,7 @@ runTaskWithOptions options task = do
 
   (result, stat) <- withTiming "run" [] $ do
     let run :: Task a -> IO (Either SomeException a)
-        run = runM . runError . flip runReader statter . flip runReader logger . runTelemetry . flip runReader options . runTaskF . runDistribute (run . unwrapTask)
+        run = runM . runError . flip runReader statter . flip runReader logger . runTelemetry . flip runReader options . IO.runFiles . runTaskF . runDistribute (run . unwrapTask)
     run task
   queue statter stat
 
@@ -157,7 +138,7 @@ runParser :: Members '[Reader Options, Telemetry, Exc SomeException, IO] effs =>
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $
-      rethrowing (parseToAST language blob)
+      IO.rethrowing (parseToAST language blob)
   AssignmentParser parser assignment -> do
     ast <- runParser blob parser `catchError` \ (SomeException err) -> do
       writeStat (Stat.increment "parse.parse_failures" languageTag)
@@ -194,11 +175,6 @@ runParser blob@Blob{..} parser = case parser of
 
 runTaskF :: Members '[Reader Options, Telemetry, Reader LogQueue, Reader StatQueue, Exc SomeException, IO] effs => Eff (TaskF ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
-  ReadBlobs (Left handle) -> rethrowing (IO.readBlobsFromHandle handle)
-  ReadBlobs (Right paths@[(path, Nothing)]) -> rethrowing (IO.isDirectory path >>= bool (IO.readBlobsFromPaths paths) (IO.readBlobsFromDir path))
-  ReadBlobs (Right paths) -> rethrowing (IO.readBlobsFromPaths paths)
-  ReadBlobPairs source -> rethrowing (either IO.readBlobPairsFromHandle (traverse (runBothWith IO.readFilePair)) source)
-  WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents)
   Parse parser blob -> runParser blob parser
   Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
   Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
@@ -210,23 +186,3 @@ runTaskF = interpret $ \ task -> case task of
       _ -> error "blah"
   where asAnalysisForTypeOfPackage :: Abstract.ImportGraphing (Evaluating (Located Precise (Term (Union syntax) ann)) (Term (Union syntax) ann) (Value (Located Precise (Term (Union syntax) ann)))) effects value -> Package (Term (Union syntax) ann) -> Abstract.ImportGraphing (Evaluating (Located Precise (Term (Union syntax) ann)) (Term (Union syntax) ann) (Value (Located Precise (Term (Union syntax) ann)))) effects value
         asAnalysisForTypeOfPackage = const
-
-
--- | Catch exceptions in 'IO' actions embedded in 'Eff', handling them with the passed function.
---
---   Note that while the type allows 'IO' to occur anywhere within the effect list, it must actually occur at the end to be able to run the computation.
-catchException :: ( Exc.Exception e
-                  , Member IO r
-                  )
-               => Eff r a
-               -> (e -> Eff r a)
-               -> Eff r a
-catchException m handler = interpose pure (\ m yield -> send (Exc.try m) >>= either handler yield) m
-
--- | Lift an 'IO' action into 'Eff', catching and rethrowing any exceptions it throws into an 'Exc' effect.
-rethrowing :: ( Member (Exc SomeException) r
-              , Member IO r
-              )
-           => IO a
-           -> Eff r a
-rethrowing m = catchException (liftIO m) (throwError . toException @SomeException)

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, ScopedTypeVariables, TupleSections #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, GADTs, ScopedTypeVariables, TupleSections, TypeOperators #-}
 module Semantic.IO
 ( readFile
 , readFilePair
@@ -8,12 +8,22 @@ module Semantic.IO
 , readBlobsFromPaths
 , readBlobsFromDir
 , languageForFilePath
+, Files
+, readBlobs
+, readBlobPairs
+, writeToOutput
+, runFiles
+, rethrowing
 ) where
 
-import Prologue hiding (fail)
+import Prologue hiding (fail, MonadError(..))
+import qualified Control.Exception as Exc
+import Control.Monad.Effect
+import Control.Monad.Effect.Exception
 import Control.Monad.IO.Class
 import Data.Aeson
 import qualified Data.Blob as Blob
+import Data.Bool
 import Data.Language
 import Data.Source
 import qualified Data.ByteString as B
@@ -111,3 +121,49 @@ instance FromJSON BlobPair where
       (Just b, Nothing) -> pure $ Join (This b)
       (Nothing, Just a) -> pure $ Join (That a)
       _ -> fail "Expected object with 'before' and/or 'after' keys only"
+
+
+data Files out where
+  ReadBlobs     :: Either Handle [(FilePath, Maybe Language)] -> Files [Blob.Blob]
+  ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> Files [Blob.BlobPair]
+  WriteToOutput :: Either Handle FilePath -> B.ByteString -> Files ()
+
+-- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
+readBlobs :: Member Files effs => Either Handle [(FilePath, Maybe Language)] -> Eff effs [Blob.Blob]
+readBlobs = send . ReadBlobs
+
+-- | A task which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
+readBlobPairs :: Member Files effs => Either Handle [Both (FilePath, Maybe Language)] -> Eff effs [Blob.BlobPair]
+readBlobPairs = send . ReadBlobPairs
+
+-- | A task which writes a 'B.ByteString' to a 'Handle' or a 'FilePath'.
+writeToOutput :: Member Files effs => Either Handle FilePath -> B.ByteString -> Eff effs ()
+writeToOutput path = send . WriteToOutput path
+
+runFiles :: Members '[Exc SomeException, IO] effs => Eff (Files ': effs) a -> Eff effs a
+runFiles = interpret $ \ files -> case files of
+  ReadBlobs (Left handle) -> rethrowing (readBlobsFromHandle handle)
+  ReadBlobs (Right paths@[(path, Nothing)]) -> rethrowing (isDirectory path >>= bool (readBlobsFromPaths paths) (readBlobsFromDir path))
+  ReadBlobs (Right paths) -> rethrowing (readBlobsFromPaths paths)
+  ReadBlobPairs source -> rethrowing (either readBlobPairsFromHandle (traverse (runBothWith readFilePair)) source)
+  WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents)
+
+
+-- | Catch exceptions in 'IO' actions embedded in 'Eff', handling them with the passed function.
+--
+--   Note that while the type allows 'IO' to occur anywhere within the effect list, it must actually occur at the end to be able to run the computation.
+catchException :: ( Exc.Exception e
+                  , Member IO r
+                  )
+               => Eff r a
+               -> (e -> Eff r a)
+               -> Eff r a
+catchException m handler = interpose pure (\ m yield -> send (Exc.try m) >>= either handler yield) m
+
+-- | Lift an 'IO' action into 'Eff', catching and rethrowing any exceptions it throws into an 'Exc' effect.
+rethrowing :: ( Member (Exc SomeException) r
+              , Member IO r
+              )
+           => IO a
+           -> Eff r a
+rethrowing m = catchException (liftIO m) (throwError . toException @SomeException)
