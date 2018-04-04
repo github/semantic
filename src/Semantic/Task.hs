@@ -16,6 +16,7 @@ module Semantic.Task
 , time
 -- * High-level flow
 , parse
+, analyze
 , decorate
 , diff
 , render
@@ -78,6 +79,7 @@ import           System.IO (stderr)
 
 data TaskF output where
   Parse         :: Parser term -> Blob -> TaskF term
+  Analyze       :: Analysis.SomeAnalysis m result -> TaskF result
   ImportGraph   :: (Apply Eq1 syntax, Apply Analysis.Evaluatable syntax, Apply FreeVariables1 syntax, Apply Functor syntax, Apply Ord1 syntax, Apply Show1 syntax, Member Syntax.Identifier syntax, Ord ann, Show ann) => Package (Term (Union syntax) ann) -> TaskF B.ByteString
   Decorate      :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff          :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
@@ -99,6 +101,10 @@ type Renderer i o = i -> o
 -- | A task which parses a 'Blob' with the given 'Parser'.
 parse :: Member TaskF effs => Parser term -> Blob -> Eff effs term
 parse parser = send . Parse parser
+
+-- | A task running some 'Analysis.MonadAnalysis' to completion. 
+analyze :: Member TaskF effs => Analysis.SomeAnalysis m result -> Eff effs result
+analyze = send . Analyze
 
 -- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
 decorate :: (Functor f, Member TaskF effs) => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Eff effs (Term f (Record (field ': fields)))
@@ -187,6 +193,7 @@ runParser blob@Blob{..} parser = case parser of
 runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, IO] effs => Eff (TaskF ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
   Parse parser blob -> runParser blob parser
+  Analyze analysis -> pure (Analysis.runSomeAnalysis analysis)
   Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
   Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
   Render renderer input -> pure (renderer input)
