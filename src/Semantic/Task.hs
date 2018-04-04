@@ -44,6 +44,7 @@ import           Control.Monad.IO.Class
 import           Data.Abstract.Address
 import qualified Data.Abstract.Evaluatable as Analysis
 import           Data.Abstract.FreeVariables
+import           Data.Abstract.Located
 import           Data.Abstract.Package
 import           Data.Abstract.Value (Value)
 import           Data.Blob
@@ -73,7 +74,7 @@ data TaskF output where
   ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [BlobPair]
   WriteToOutput :: Either Handle FilePath -> B.ByteString -> TaskF ()
   Parse         :: Parser term -> Blob -> TaskF term
-  ImportGraph   :: (Corecursive term, Analysis.Evaluatable (Base term), FreeVariables term, Recursive term) => PackageBody term -> TaskF B.ByteString
+  ImportGraph   :: (Apply Eq1 syntax, Apply Analysis.Evaluatable syntax, Apply FreeVariables1 syntax, Apply Functor syntax, Apply Ord1 syntax, Apply Show1 syntax, Member Syntax.Identifier syntax, Ord ann, Show ann) => PackageBody (Term (Union syntax) ann) -> TaskF B.ByteString
   Decorate      :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
   Diff          :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
   Render        :: Renderer input output -> input -> TaskF output
@@ -120,7 +121,7 @@ render :: Member TaskF effs => Renderer input output -> input -> Eff effs output
 render renderer = send . Render renderer
 
 
-importGraph :: (Corecursive term, Analysis.Evaluatable (Base term), FreeVariables term, Recursive term) => Member TaskF effs => PackageBody term -> Eff effs B.ByteString
+importGraph :: (Apply Eq1 syntax, Apply Analysis.Evaluatable syntax, Apply FreeVariables1 syntax, Apply Functor syntax, Apply Ord1 syntax, Apply Show1 syntax, Member Syntax.Identifier syntax, Ord ann, Show ann) => Member TaskF effs => PackageBody (Term (Union syntax) ann) -> Eff effs B.ByteString
 importGraph package = send (ImportGraph package)
 
 
@@ -207,7 +208,7 @@ runTaskF = interpret $ \ task -> case task of
     case result of
       (Right (Right (Right (Right (Right (_, graph))))), _) -> pure $ Abstract.renderImportGraph graph
       _ -> error "blah"
-  where asAnalysisForTypeOfPackage :: Abstract.ImportGraphing (Evaluating Precise term (Value Precise)) effects value -> PackageBody term -> Abstract.ImportGraphing (Evaluating Precise term (Value Precise)) effects value
+  where asAnalysisForTypeOfPackage :: Abstract.ImportGraphing (Evaluating (Located Precise (Term (Union syntax) ann)) (Term (Union syntax) ann) (Value (Located Precise (Term (Union syntax) ann)))) effects value -> PackageBody (Term (Union syntax) ann) -> Abstract.ImportGraphing (Evaluating (Located Precise (Term (Union syntax) ann)) (Term (Union syntax) ann) (Value (Located Precise (Term (Union syntax) ann)))) effects value
         asAnalysisForTypeOfPackage = const
 
 
