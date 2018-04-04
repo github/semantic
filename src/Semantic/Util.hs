@@ -49,7 +49,7 @@ import qualified Language.TypeScript.Assignment as TypeScript
 evalRubyProject path = runEvaluating <$> (withPrelude <$> parsePrelude rubyParser <*> (evaluatePackageBody <$> parseProject rubyParser ["rb"] path))
 evalRubyFile path = runEvaluating <$> (withPrelude <$> parsePrelude rubyParser <*> (evaluateModule <$> parseFile rubyParser Nothing path))
 
-evaluateRubyProjectGraph path = runAnalysis @(ImportGraphing (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise Ruby.Term) Ruby.Term (Value (Located Precise Ruby.Term)))))))) . evaluatePackageBody <$> parseProject rubyParser ["rb"] path
+evaluateRubyProjectGraph path = runAnalysis @(ImportGraphing (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise Ruby.Term) Ruby.Term (Value (Located Precise Ruby.Term)))))))) <$> (withPrelude <$> parsePrelude rubyParser <*> (evaluatePackageBody <$> parseProject rubyParser ["rb"] path))
 
 evaluateRubyImportGraph paths = runAnalysis @(ImportGraphing (Evaluating (Located Precise Ruby.Term) Ruby.Term (Value (Located Precise Ruby.Term)))) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
 
