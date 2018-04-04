@@ -53,7 +53,7 @@ parser = signed (choice [hex, oct, bin, dec]) where
     fromIntegral <$> attempt @Integer (unpack ("0o" <> digs))
 
   -- The case for binary literals is somewhat baroque. Despite having binary literal support, Integer's
-  -- Read instance does not handle binary literals. So we have to shell out to Numeric.readInt, which is
+  -- Read instance does not handle binary literals. So we have to shell out to Numeric.readInt, which
   -- is a very strange API, but works for our use case. The use of 'error' looks partial, but if Attoparsec
   -- and readInt do their jobs, it should never happen.
   bin = do
