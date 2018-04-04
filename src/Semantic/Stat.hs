@@ -79,14 +79,13 @@ timing :: String -> Double -> Tags -> Stat
 timing n v = Stat n (Timer v)
 
 -- | Run an IO Action and record timing
-withTiming :: MonadIO io => (Stat -> io ()) -> String -> Tags -> io a -> io a
-withTiming statter name tags f = do
+withTiming :: MonadIO io => String -> Tags -> io a -> io (a, Stat)
+withTiming name tags action = do
   start <- liftIO Time.getCurrentTime
-  result <- f
+  result <- action
   end <- liftIO Time.getCurrentTime
   let duration = realToFrac (Time.diffUTCTime end start * 1000)
-  statter (timing name duration tags)
-  pure result
+  pure (result, timing name duration tags)
 
 -- | Histogram measurement.
 histogram :: String -> Double -> Tags -> Stat

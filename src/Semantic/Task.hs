@@ -105,8 +105,10 @@ writeStat :: Members '[Reader StatQueue, IO] effs => Stat -> Eff effs ()
 writeStat stat = ask >>= \ statter -> liftIO (queue (statter :: StatQueue) stat)
 
 -- | A task which measures and stats the timing of another task.
-time :: (Member (Reader StatQueue) effs, Member IO effs) => String -> [(String, String)] -> Eff effs output -> Eff effs output
-time statName tags task = ask >>= \ statter -> withTiming (liftIO . queue (statter :: StatQueue)) statName tags task
+time :: Members '[Reader StatQueue, IO] effs => String -> [(String, String)] -> Eff effs output -> Eff effs output
+time statName tags task = do
+  (a, stat) <- withTiming statName tags task
+  a <$ writeStat stat
 
 -- | A task which parses a 'Blob' with the given 'Parser'.
 parse :: Member TaskF effs => Parser term -> Blob -> Eff effs term
@@ -168,8 +170,9 @@ runTaskWithOptions options task = do
   statter <- defaultStatsClient >>= newQueue sendStat
   logger <- newQueue logMessage options
 
-  result <- withTiming (queue statter) "run" [] $
+  (result, stat) <- withTiming "run" [] $
     run options logger statter task
+  queue statter stat
 
   closeQueue statter
   closeStatClient (asyncQueueExtra statter)
