@@ -236,16 +236,15 @@ file :: MonadIO m => FilePath -> m Blob
 file path = fromJust <$> IO.readFile path (languageForFilePath path)
 
 -- Diff helpers
-diffWithParser ::
-               ( HasField fields Data.Span.Span
-               , HasField fields Range
-               , Eq1 syntax
-               , Show1 syntax
-               , Traversable syntax
-               , Diffable syntax
-               , GAlign syntax
-               , HasDeclaration syntax
-               )
+diffWithParser :: ( HasField fields Data.Span.Span
+                  , HasField fields Range
+                  , Eq1 syntax
+                  , Show1 syntax
+                  , Traversable syntax
+                  , Diffable syntax
+                  , GAlign syntax
+                  , HasDeclaration syntax
+                  )
                => Parser (Term syntax (Record fields))
                -> BlobPair
                -> Task (Diff syntax (Record (Maybe Declaration ': fields)) (Record (Maybe Declaration ': fields)))
@@ -253,12 +252,11 @@ diffWithParser parser = run (\ blob -> parse parser blob >>= decorate (declarati
   where
     run parse blobs = distributeFor blobs (WrapTask . parse) >>= diffTermPair diffTerms . runJoin
 
-diffBlobWithParser ::
-                   ( HasField fields Data.Span.Span
-                   , HasField fields Range
-                   , Traversable syntax
-                   , HasDeclaration syntax
-                   )
+diffBlobWithParser :: ( HasField fields Data.Span.Span
+                      , HasField fields Range
+                      , Traversable syntax
+                      , HasDeclaration syntax
+                      )
                   => Parser (Term syntax (Record fields))
                   -> Blob
                   -> Task (Term syntax (Record (Maybe Declaration : fields)))
