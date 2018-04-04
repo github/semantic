@@ -2,13 +2,10 @@
   (Package
     (Identifier))
   (QualifiedImport
-    (Identifier)
     (Identifier))
   (Import
-    (Identifier)
     (TextElement))
   (QualifiedImport
-    (Identifier)
     (Identifier))
   (Function
     (Empty)

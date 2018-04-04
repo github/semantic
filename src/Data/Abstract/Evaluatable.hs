@@ -13,6 +13,8 @@ module Data.Abstract.Evaluatable
 , evaluatePackage
 , evaluatePackageBody
 , throwLoadError
+, resolve
+, listModulesInDir
 , require
 , load
 , pushOrigin
@@ -52,7 +54,7 @@ type MonadEvaluatable location term value m =
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
 data LoadError term value resume where
-  LoadError :: ModuleName -> LoadError term value [Module term]
+  LoadError :: ModulePath -> LoadError term value [Module term]
 
 deriving instance Eq (LoadError term a b)
 deriving instance Show (LoadError term a b)
@@ -118,11 +120,24 @@ instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
   eval = maybe unit (runApp . foldMap1 (App . subtermValue)) . nonEmpty
 
+-- Resolve a list of module paths to a possible module table entry.
+resolve :: MonadEvaluatable location term value m
+        => [FilePath]
+        -> m (Maybe ModulePath)
+resolve names = do
+  tbl <- askModuleTable
+  pure $ find (`ModuleTable.member` tbl) names
+
+listModulesInDir :: MonadEvaluatable location term value m
+        => FilePath
+        -> m [ModulePath]
+listModulesInDir dir = ModuleTable.modulePathsInDir dir <$> askModuleTable
+
 -- | Require/import another module by name and return it's environment and value.
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
 require :: MonadEvaluatable location term value m
-        => ModuleName
+        => ModulePath
         -> m (Environment location value, value)
 require name = getModuleTable >>= maybeM (load name) . ModuleTable.lookup name
 
@@ -130,7 +145,7 @@ require name = getModuleTable >>= maybeM (load name) . ModuleTable.lookup name
 --
 -- Always loads/evaluates.
 load :: MonadEvaluatable location term value m
-     => ModuleName
+     => ModulePath
      -> m (Environment location value, value)
 load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= evalAndCache
   where

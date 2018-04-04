@@ -19,8 +19,8 @@ spec :: Spec
 spec = parallel $ do
   describe "diffTerms" $ do
     it "returns a replacement when comparing two unicode equivalent terms" $
-      let termA = termIn Nil (inj (Syntax.Identifier (name "t\776")))
-          termB = termIn Nil (inj (Syntax.Identifier (name "\7831"))) in
+      let termA = termIn Nil (inj (Syntax.Identifier "t\776"))
+          termB = termIn Nil (inj (Syntax.Identifier "\7831")) in
           diffTerms termA termB `shouldBe` replacing termA (termB :: Term ListableSyntax (Record '[]))
 
     prop "produces correct diffs" $
@@ -32,7 +32,7 @@ spec = parallel $ do
                  length (diffPatches diff) `shouldBe` 0
 
     it "produces unbiased insertions within branches" $
-      let term s = termIn Nil (inj [ termIn Nil (inj (Syntax.Identifier (name s))) ]) :: Term ListableSyntax (Record '[])
+      let term s = termIn Nil (inj [ termIn Nil (inj (Syntax.Identifier s)) ]) :: Term ListableSyntax (Record '[])
           wrap = termIn Nil . inj in
       diffTerms (wrap [ term "b" ]) (wrap [ term "a", term "b" ]) `shouldBe` merge (Nil, Nil) (inj [ inserting (term "a"), merging (term "b") ])
 
