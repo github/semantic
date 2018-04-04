@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, TypeSynonymInstances, DeriveAnyClass, DuplicateRecordFields, ScopedTypeVariables, TupleSections #-}
+{-# LANGUAGE DeriveAnyClass, DuplicateRecordFields, ScopedTypeVariables, TupleSections #-}
 module Semantic.IO
 ( readFile
 , readFilePair
