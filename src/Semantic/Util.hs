@@ -260,6 +260,4 @@ diffBlobWithParser :: ( HasField fields Data.Span.Span
                   => Parser (Term syntax (Record fields))
                   -> Blob
                   -> Task (Term syntax (Record (Maybe Declaration : fields)))
-diffBlobWithParser parser = run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))
-  where
-    run parse = parse
+diffBlobWithParser parser blob = parse parser blob >>= decorate (declarationAlgebra blob)
