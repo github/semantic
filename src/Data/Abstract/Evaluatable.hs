@@ -11,6 +11,7 @@ module Data.Abstract.Evaluatable
 , evaluateModule
 , evaluateModules
 , evaluatePackage
+, evaluatePackageBody
 , throwLoadError
 , require
 , load
