@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Semantic.Task
 ( Task
+, WrappedTask(..)
 , Level(..)
 , RAlgebra
 , Differ
