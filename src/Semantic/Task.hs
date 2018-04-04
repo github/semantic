@@ -120,7 +120,7 @@ render renderer = send . Render renderer
 
 importGraph :: (Apply Eq1 syntax, Apply Analysis.Evaluatable syntax, Apply FreeVariables1 syntax, Apply Functor syntax, Apply Ord1 syntax, Apply Show1 syntax, Member Syntax.Identifier syntax, Member TaskF effs, Ord ann, Show ann) => Package (Term (Union syntax) ann) -> Eff effs B.ByteString
 importGraph package = renderGraph <$> analyze (Analysis.SomeAnalysis (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package))
-  where asAnalysisForTypeOfPackage :: Abstract.ImportGraphing (Evaluating (Located Precise (Term (Union syntax) ann)) (Term (Union syntax) ann) (Value (Located Precise (Term (Union syntax) ann)))) effects value -> Package (Term (Union syntax) ann) -> Abstract.ImportGraphing (Evaluating (Located Precise (Term (Union syntax) ann)) (Term (Union syntax) ann) (Value (Located Precise (Term (Union syntax) ann)))) effects value
+  where asAnalysisForTypeOfPackage :: Abstract.ImportGraphing (Evaluating (Located Precise term) term (Value (Located Precise term))) effects value -> Package term -> Abstract.ImportGraphing (Evaluating (Located Precise term) term (Value (Located Precise term))) effects value
         asAnalysisForTypeOfPackage = const
 
         renderGraph result = case result of
