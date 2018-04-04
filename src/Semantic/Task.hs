@@ -38,6 +38,7 @@ module Semantic.Task
 , Exc
 , throwError
 , SomeException
+, Telemetry
 ) where
 
 import qualified Analysis.Abstract.ImportGraph as Abstract

@@ -19,14 +19,14 @@ import Semantic.IO (NoLanguageForBlob(..))
 import Semantic.Stat as Stat
 import Semantic.Task as Task
 
-diffBlobPairs :: Output output => DiffRenderer output -> [BlobPair] -> Task ByteString
+diffBlobPairs :: (Members '[Distribute WrappedTask, TaskF, Telemetry, Exc SomeException, IO] effs, Output output) => DiffRenderer output -> [BlobPair] -> Eff effs ByteString
 diffBlobPairs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . diffBlobPair renderer) blobs
   where toOutput' = case renderer of
           JSONDiffRenderer -> toOutput . renderJSONDiffs
           _ -> toOutput
 
 -- | A task to parse a pair of 'Blob's, diff them, and render the 'Diff'.
-diffBlobPair :: DiffRenderer output -> BlobPair -> Task output
+diffBlobPair :: Members '[Distribute WrappedTask, TaskF, Telemetry, Exc SomeException, IO] effs => DiffRenderer output -> BlobPair -> Eff effs output
 diffBlobPair renderer blobs
   | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[ConstructorName, Diffable, Eq1, GAlign, HasDeclaration, IdentifierName, Show1, ToJSONFields1, Traversable]) <$> effectiveLanguage
   = case renderer of
@@ -38,7 +38,7 @@ diffBlobPair renderer blobs
   where effectivePath = pathForBlobPair blobs
         effectiveLanguage = languageForBlobPair blobs
 
-        run :: (Foldable syntax, Functor syntax) => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (BlobPair -> Diff syntax ann ann -> output) -> Task output
+        run :: (Foldable syntax, Functor syntax) => Members [Distribute WrappedTask, TaskF, Telemetry, IO] effs => (Blob -> Task (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (BlobPair -> Diff syntax ann ann -> output) -> Eff effs output
         run parse diff renderer = do
           terms <- distributeFor blobs (WrapTask . parse)
           time "diff" languageTag $ do
@@ -49,7 +49,7 @@ diffBlobPair renderer blobs
             languageTag = languageTagForBlobPair blobs
 
 -- | A task to diff 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
-diffTermPair :: Functor syntax => Differ syntax ann1 ann2 -> These (Term syntax ann1) (Term syntax ann2) -> Task (Diff syntax ann1 ann2)
+diffTermPair :: (Functor syntax, Member TaskF effs) => Differ syntax ann1 ann2 -> These (Term syntax ann1) (Term syntax ann2) -> Eff effs (Diff syntax ann1 ann2)
 diffTermPair _      (This  t1   ) = pure (deleting t1)
 diffTermPair _      (That     t2) = pure (inserting t2)
 diffTermPair differ (These t1 t2) = diff differ t1 t2
