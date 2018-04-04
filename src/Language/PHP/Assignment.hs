@@ -131,9 +131,15 @@ type Syntax = '[
 type Term = Term.Term (Union Syntax) (Record Location)
 type Assignment = Assignment.Assignment [] Grammar Term
 
+append :: a -> [a] -> [a]
+append x xs = xs ++ [x]
+
+bookend :: a -> [a] -> a -> [a]
+bookend head list last = head : append last list
+
 -- | Assignment from AST in PHP's grammar onto a program in PHP's syntax.
 assignment :: Assignment
-assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> ((\a b c -> a : b ++ [c]) <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
+assignment = handleError $ makeTerm <$> symbol Program <*> children (Syntax.Program <$> (bookend <$> (text <|> emptyTerm) <*> manyTerm statement <*> (text <|> emptyTerm))) <|> parseError
 
 term :: Assignment -> Assignment
 term term = contextualize (comment <|> textInterpolation) (postContextualize (comment <|> textInterpolation) term)
