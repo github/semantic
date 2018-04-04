@@ -147,8 +147,10 @@ location = tracing Location `Then` return
 getRubyLocals :: HasCallStack => Assignment ast grammar [ByteString]
 getRubyLocals = tracing GetRubyLocals `Then` return
 
-putRubyLocals :: HasCallStack => [ByteString] -> Assignment ast grammar ()
-putRubyLocals l = tracing (PutRubyLocals l) `Then` return
+putRubyLocals :: (HasCallStack, Enum grammar, Eq1 ast, Ix grammar) => [ByteString] -> Assignment ast grammar ()
+putRubyLocals l = mk (PutRubyLocals l) <|> mk End
+  where
+    mk a = tracing a `Then` return
 
 -- | Zero-width production of the current node.
 currentNode :: HasCallStack => Assignment ast grammar (TermF ast (Node grammar) ())
