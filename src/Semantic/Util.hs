@@ -33,7 +33,7 @@ import qualified GHC.TypeLits as TypeLevel
 import Language.Preluded
 import Parsing.Parser
 import Prologue
-import Semantic
+import Semantic.Diff (diffTermPair)
 import Semantic.IO as IO
 import Semantic.Task
 import System.FilePath.Posix
