@@ -16,10 +16,11 @@ import Options.Applicative
 import Rendering.Renderer
 import qualified Paths_semantic as Library (version)
 import Semantic.IO (languageForFilePath)
+import qualified Semantic.Diff as Semantic (diffBlobPairs)
 import qualified Semantic.Log as Log
+import qualified Semantic.Parse as Semantic (parseBlobs)
 import qualified Semantic.Task as Task
 import System.IO (Handle, stdin, stdout)
-import qualified Semantic (parseBlobs, diffBlobPairs)
 import Text.Read
 
 
