@@ -3,6 +3,7 @@ module Language.Python.Syntax where
 
 import           Data.Abstract.Environment as Env
 import           Data.Abstract.Evaluatable
+import qualified Data.Abstract.FreeVariables as FV
 import           Data.Abstract.Module
 import           Data.Align.Generic
 import qualified Data.ByteString.Char8 as BC
@@ -12,8 +13,8 @@ import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Mergeable
 import           Diffing.Algorithm
 import           GHC.Generics
-import           Prologue
 import           Prelude hiding (fail)
+import           Prologue
 import           System.FilePath.Posix
 
 data QualifiedName
@@ -124,7 +125,7 @@ instance Evaluatable QualifiedImport where
   eval (QualifiedImport (RelativeQualifiedName _ _))        = fail "technically this is not allowed in python"
   eval (QualifiedImport name@(QualifiedName qualifiedName)) = do
     modulePaths <- resolvePythonModules name
-    go (NonEmpty.zip (BC.pack <$> qualifiedName) modulePaths)
+    go (NonEmpty.zip ((FV.name . BC.pack) <$> qualifiedName) modulePaths)
     where
       -- Evaluate and import the last module, updating the environment
       go ((name, path) :| []) = letrec' name $ \addr -> do

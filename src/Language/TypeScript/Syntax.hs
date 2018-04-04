@@ -2,6 +2,7 @@
 module Language.TypeScript.Syntax where
 
 import qualified Data.Abstract.Environment as Env
+import qualified Data.Abstract.FreeVariables as FV
 import           Data.Abstract.Evaluatable
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString as B
@@ -25,7 +26,7 @@ importPath str = let path = stripQuotes str in ImportPath (BC.unpack path) (path
                 | otherwise = NonRelative
 
 toName :: ImportPath -> Name
-toName = BC.pack . unPath
+toName = FV.name . BC.pack . unPath
 
 resolveTypeScriptModule :: MonadEvaluatable location term value m => ImportPath -> m ModulePath
 resolveTypeScriptModule (ImportPath path Relative)    = resolveRelativeTSModule path
@@ -167,7 +168,7 @@ instance Evaluatable QualifiedExportFrom where
     unit
     where
       cannotExport moduleName name = fail $
-        "module " <> show moduleName <> " does not export " <> show name
+        "module " <> show moduleName <> " does not export " <> show (unName name)
 
 
 newtype DefaultExport a = DefaultExport { defaultExport :: a }

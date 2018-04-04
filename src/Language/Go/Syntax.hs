@@ -3,6 +3,7 @@ module Language.Go.Syntax where
 
 import Data.Abstract.Evaluatable hiding (Label)
 import Data.Abstract.Module
+import Data.Abstract.FreeVariables (name)
 import Diffing.Algorithm
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString as B
@@ -17,7 +18,7 @@ importPath str = let path = stripQuotes str in ImportPath (BC.unpack path)
   where stripQuotes = B.filter (`B.notElem` "\'\"")
 
 defaultAlias :: ImportPath -> Name
-defaultAlias = BC.pack . takeFileName . unPath
+defaultAlias = name . BC.pack . takeFileName . unPath
 
 -- TODO: need to delineate between relative and absolute Go imports
 resolveGoImport :: MonadEvaluatable location term value m => FilePath -> m [ModulePath]

@@ -12,7 +12,7 @@ import Data.Syntax (emptyTerm, handleError, parseError, infixContext, makeTerm, 
 import Language.PHP.Grammar as Grammar
 import Prologue
 import qualified Assigning.Assignment as Assignment
--- import qualified Data.Abstract.FreeVariables as FV
+import qualified Data.Abstract.FreeVariables as FV
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -429,7 +429,7 @@ classConstDeclaration :: Assignment
 classConstDeclaration = makeTerm <$> symbol ClassConstDeclaration <*> children (Syntax.ClassConstDeclaration <$> (term visibilityModifier <|> emptyTerm) <*> manyTerm constElement)
 
 visibilityModifier :: Assignment
-visibilityModifier = makeTerm <$> symbol VisibilityModifier <*> (Syntax.Identifier <$> source)
+visibilityModifier = makeTerm <$> symbol VisibilityModifier <*> (Syntax.Identifier . FV.name <$> source)
 
 constElement :: Assignment
 constElement = makeTerm <$> symbol ConstElement <*> children (Statement.Assignment [] <$> term name <*> term expression)
@@ -635,7 +635,7 @@ propertyDeclaration :: Assignment
 propertyDeclaration = makeTerm <$> symbol PropertyDeclaration <*> children (Syntax.PropertyDeclaration <$> term propertyModifier <*> someTerm propertyElement)
 
 propertyModifier :: Assignment
-propertyModifier = (makeTerm <$> symbol PropertyModifier <*> children (Syntax.PropertyModifier <$> (term visibilityModifier <|> emptyTerm) <*> (term staticModifier <|> emptyTerm))) <|> term (makeTerm <$> symbol PropertyModifier <*> (Syntax.Identifier <$> source))
+propertyModifier = (makeTerm <$> symbol PropertyModifier <*> children (Syntax.PropertyModifier <$> (term visibilityModifier <|> emptyTerm) <*> (term staticModifier <|> emptyTerm))) <|> term (makeTerm <$> symbol PropertyModifier <*> (Syntax.Identifier . FV.name <$> source))
 
 propertyElement :: Assignment
 propertyElement = makeTerm <$> symbol PropertyElement <*> children (Statement.Assignment [] <$> term variableName <*> term propertyInitializer) <|> (symbol PropertyElement *> children (term variableName))
@@ -696,7 +696,7 @@ namespaceAliasingClause = makeTerm <$> symbol NamespaceAliasingClause <*> childr
 
 -- | TODO Do something better than Identifier
 namespaceFunctionOrConst :: Assignment
-namespaceFunctionOrConst = makeTerm <$> symbol NamespaceFunctionOrConst <*> (Syntax.Identifier <$> source)
+namespaceFunctionOrConst = makeTerm <$> symbol NamespaceFunctionOrConst <*> (Syntax.Identifier . FV.name <$> source)
 
 globalDeclaration :: Assignment
 globalDeclaration = makeTerm <$> symbol GlobalDeclaration <*> children (Syntax.GlobalDeclaration <$> manyTerm simpleVariable')
@@ -732,7 +732,7 @@ variableName :: Assignment
 variableName = makeTerm <$> symbol VariableName <*> children (Syntax.VariableName <$> term name)
 
 name :: Assignment
-name = makeTerm <$> (symbol Name <|> symbol Name') <*> (Syntax.Identifier <$> source)
+name = makeTerm <$> (symbol Name <|> symbol Name') <*> (Syntax.Identifier . FV.name <$> source)
 
 functionStaticDeclaration :: Assignment
 functionStaticDeclaration = makeTerm <$> symbol FunctionStaticDeclaration <*> children (Declaration.VariableDeclaration <$> manyTerm staticVariableDeclaration)
