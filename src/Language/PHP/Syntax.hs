@@ -3,7 +3,6 @@ module Language.PHP.Syntax where
 
 import Data.Abstract.Evaluatable
 import Data.Abstract.Path
-import qualified Data.List.NonEmpty as NonEmpty
 import Diffing.Algorithm
 import Prelude hiding (fail)
 import Prologue hiding (Text)
@@ -199,12 +198,11 @@ instance Ord1 NamespaceName where liftCompare = genericLiftCompare
 instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable NamespaceName where
-  eval (NamespaceName xs) = go xs
+  eval (NamespaceName xs) = foldl1 f $ fmap subtermValue xs
     where
-      go (x :| []) = subtermValue x
-      go (x :| xs) = do
-        env <- subtermValue x >>= scopedEnvironment
-        localEnv (mappend env) (go (NonEmpty.fromList xs))
+      f ns nam = do
+        env <- ns >>= scopedEnvironment
+        localEnv (mappend env) nam
 
 newtype ConstDeclaration a = ConstDeclaration [a]
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
