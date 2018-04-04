@@ -152,7 +152,7 @@ manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
 manyTerm = many . commentedTerm
 
 someTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
-someTerm = liftA NonEmpty.toList . someTerm'
+someTerm = fmap NonEmpty.toList . someTerm'
 
 someTerm' :: Assignment -> Assignment.Assignment [] Grammar (NonEmpty Term)
 someTerm' = NonEmpty.some1 . commentedTerm
