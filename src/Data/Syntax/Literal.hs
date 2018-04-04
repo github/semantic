@@ -59,8 +59,8 @@ instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsP
 
 instance Evaluatable Data.Syntax.Literal.Float where
   eval (Float s) =
-    float =<< case parseScientific s of
-      Right num -> pure num
+    case parseScientific s of
+      Right num -> float num
       Left  err -> fail ("Parse error: " <> err)
 
 -- Rational literals e.g. `2/3r`
