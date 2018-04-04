@@ -5,6 +5,7 @@ module Control.Abstract.Analysis
 , liftAnalyze
 , runAnalysis
 , SomeAnalysis(..)
+, runSomeAnalysis
 , module X
 , Subterm(..)
 , SubtermAlgebra
@@ -74,3 +75,6 @@ data SomeAnalysis m result where
                   )
                => m effects a
                -> SomeAnalysis m (Final effects a)
+
+runSomeAnalysis :: SomeAnalysis m result -> result
+runSomeAnalysis (SomeAnalysis a) = X.run a
