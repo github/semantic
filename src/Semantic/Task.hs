@@ -70,7 +70,10 @@ data TaskF output where
   Diff          :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
   Render        :: Renderer input output -> input -> TaskF output
 
+-- | A queue for logging.
 type LogQueue = AsyncQueue Message Options
+
+-- | A queue for stats.
 type StatQueue = AsyncQueue Stat StatsClient
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
