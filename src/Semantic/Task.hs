@@ -196,9 +196,6 @@ runTaskWithOptions options task = do
           Distribute tasks -> liftIO (Async.mapConcurrently run tasks) >>= either throwError pure . sequenceA . withStrategy (parTraversable (parTraversable rseq))
           Bidistribute tasks -> liftIO (Async.runConcurrently (bitraverse (Async.Concurrently . run) (Async.Concurrently . run) tasks)) >>= either throwError pure . bisequenceA . withStrategy (parBitraversable (parTraversable rseq) (parTraversable rseq)))
 
-        parBitraversable :: Bitraversable t => Strategy a -> Strategy b -> Strategy (t a b)
-        parBitraversable strat1 strat2 = bitraverse (rparWith strat1) (rparWith strat2)
-
 logError :: Member Telemetry effs => Options -> Level -> Blob -> Error.Error String -> [(String, String)] -> Eff effs ()
 logError Options{..} level blob err = writeLog level (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err)
 
@@ -239,6 +236,10 @@ runParser blob@Blob{..} parser = case parser of
         errors = cata $ \ (In a syntax) -> case syntax of
           _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (getField a) err]
           _ -> fold syntax
+
+
+parBitraversable :: Bitraversable t => Strategy a -> Strategy b -> Strategy (t a b)
+parBitraversable strat1 strat2 = bitraverse (rparWith strat1) (rparWith strat2)
 
 
 runTaskF :: Members '[Reader Options, Telemetry, Reader LogQueue, Reader StatQueue, Exc SomeException, IO] effs => Eff (TaskF ': effs) a -> Eff effs a
