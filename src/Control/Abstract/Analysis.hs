@@ -76,5 +76,6 @@ data SomeAnalysis m result where
                => m effects a
                -> SomeAnalysis m (Final effects a)
 
+-- | Run an abstracted analysis.
 runSomeAnalysis :: SomeAnalysis m result -> result
 runSomeAnalysis (SomeAnalysis a) = X.run a
