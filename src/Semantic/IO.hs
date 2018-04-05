@@ -9,10 +9,10 @@ module Semantic.IO
 , readBlobsFromDir
 , languageForFilePath
 , NoLanguageForBlob(..)
-, Files
 , readBlobs
 , readBlobPairs
 , writeToOutput
+, Files
 , runFiles
 , rethrowing
 ) where
@@ -129,11 +129,6 @@ newtype NoLanguageForBlob = NoLanguageForBlob FilePath
   deriving (Eq, Exception, Ord, Show, Typeable)
 
 
-data Files out where
-  ReadBlobs     :: Either Handle [(FilePath, Maybe Language)] -> Files [Blob.Blob]
-  ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> Files [Blob.BlobPair]
-  WriteToOutput :: Either Handle FilePath -> B.ByteString -> Files ()
-
 -- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
 readBlobs :: Member Files effs => Either Handle [(FilePath, Maybe Language)] -> Eff effs [Blob.Blob]
 readBlobs = send . ReadBlobs
@@ -145,6 +140,12 @@ readBlobPairs = send . ReadBlobPairs
 -- | A task which writes a 'B.ByteString' to a 'Handle' or a 'FilePath'.
 writeToOutput :: Member Files effs => Either Handle FilePath -> B.ByteString -> Eff effs ()
 writeToOutput path = send . WriteToOutput path
+
+
+data Files out where
+  ReadBlobs     :: Either Handle [(FilePath, Maybe Language)] -> Files [Blob.Blob]
+  ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> Files [Blob.BlobPair]
+  WriteToOutput :: Either Handle FilePath -> B.ByteString -> Files ()
 
 runFiles :: Members '[Exc SomeException, IO] effs => Eff (Files ': effs) a -> Eff effs a
 runFiles = interpret $ \ files -> case files of
