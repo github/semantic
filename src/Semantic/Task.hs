@@ -81,13 +81,6 @@ import           Semantic.Telemetry
 import           System.Exit (die)
 import           System.IO (stderr)
 
-data Task output where
-  Parse         :: Parser term -> Blob -> Task term
-  Analyze       :: Analysis.SomeAnalysis m result -> Task result
-  Decorate      :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
-  Diff          :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
-  Render        :: Renderer input output -> input -> Task output
-
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
 type TaskEff = Eff '[Distribute WrappedTask, Task, IO.Files, Reader Options, Telemetry, Exc SomeException, IO]
 
@@ -153,7 +146,6 @@ importGraph package = renderGraph <$> analyze (Analysis.SomeAnalysis (Analysis.e
 runTask :: TaskEff a -> IO a
 runTask = runTaskWithOptions defaultOptions
 
-
 -- | Execute a 'TaskEff' with the passed 'Options', yielding its result value in 'IO'.
 runTaskWithOptions :: Options -> TaskEff a -> IO a
 runTaskWithOptions options task = do
@@ -171,6 +163,23 @@ runTaskWithOptions options task = do
   closeStatClient (asyncQueueExtra statter)
   closeQueue logger
   either (die . displayException) pure result
+
+
+data Task output where
+  Parse         :: Parser term -> Blob -> Task term
+  Analyze       :: Analysis.SomeAnalysis m result -> Task result
+  Decorate      :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
+  Diff          :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
+  Render        :: Renderer input output -> input -> Task output
+
+runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, IO] effs => Eff (Task ': effs) a -> Eff effs a
+runTaskF = interpret $ \ task -> case task of
+  Parse parser blob -> runParser blob parser
+  Analyze analysis -> pure (Analysis.runSomeAnalysis analysis)
+  Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
+  Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
+  Render renderer input -> pure (renderer input)
+
 
 logError :: Member Telemetry effs => Options -> Level -> Blob -> Error.Error String -> [(String, String)] -> Eff effs ()
 logError Options{..} level blob err = writeLog level (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err)
@@ -213,14 +222,6 @@ runParser blob@Blob{..} parser = case parser of
           _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (getField a) err]
           _ -> fold syntax
 
-
-runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, IO] effs => Eff (Task ': effs) a -> Eff effs a
-runTaskF = interpret $ \ task -> case task of
-  Parse parser blob -> runParser blob parser
-  Analyze analysis -> pure (Analysis.runSomeAnalysis analysis)
-  Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
-  Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
-  Render renderer input -> pure (renderer input)
 
 instance (Members '[Reader Options, Telemetry, Exc SomeException, IO] effects, Run effects result rest) => Run (Task ': effects) result rest where
   run = run . runTaskF
