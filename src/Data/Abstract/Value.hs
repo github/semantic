@@ -259,7 +259,7 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
     | Just (Float    i, Integer j)  <- prjPair pair = f i j & specialize
     | Just (Float    i, Rational j) <- prjPair pair = f i j & specialize
     | Just (Float    i, Float j)    <- prjPair pair = f i j & specialize
-    | otherwise = fail ("Invalid operands to liftNumeric2: " <> show pair)
+    | otherwise = throwValueError (Numeric2Error left right)
       where
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
         specialize :: MonadValue location value m => Number.SomeNumber -> m value

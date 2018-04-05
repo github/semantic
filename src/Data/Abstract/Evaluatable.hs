@@ -15,6 +15,7 @@ module Data.Abstract.Evaluatable
 , evaluatePackageBody
 , throwLoadError
 , throwEvalError
+, throwValueError
 , resolve
 , listModulesInDir
 , require
@@ -94,6 +95,10 @@ instance Eq1 (EvalError term) where
   liftEq _ (FreeVariableError a) (FreeVariableError b) = a == b
   liftEq _ (FreeVariablesError a) (FreeVariablesError b) = a == b
   liftEq _ _ _ = False
+
+
+throwValueError :: MonadEvaluatable location term value m => ValueError location value resume -> m resume
+throwValueError = throwException
 
 throwLoadError :: MonadEvaluatable location term value m => LoadError term value resume -> m resume
 throwLoadError = throwException

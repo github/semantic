@@ -27,7 +27,8 @@ instance ( Effectful m
   type Effects location term value (BadVariables m effects) = State [Name] ': Effects location term value (m effects)
 
   analyzeTerm eval term = resumeException @(EvalError value) (liftAnalyze analyzeTerm eval term) (
-        \yield (FreeVariableError name) ->
-            raise (modify' (name :)) >> unit >>= yield)
+        \yield err -> case err of
+          (FreeVariableError name) -> raise (modify' (name :)) >> unit >>= yield
+          (FreeVariablesError names) -> raise (modify' (names <>)) >> yield (last names) )
 
   analyzeModule = liftAnalyze analyzeModule

@@ -34,6 +34,8 @@ instance ( Effectful m
             yield (Env.push env)
           (CallError val) -> yield val
           (StringError val) -> yield (pack $ show val)
-          (BoolError val) -> yield True)
+          BoolError{} -> yield True
+          Numeric2Error{} -> unit >>= yield
+          )
 
   analyzeModule = liftAnalyze analyzeModule
