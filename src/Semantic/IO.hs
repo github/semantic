@@ -148,6 +148,7 @@ data Files out where
   ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> Files [Blob.BlobPair]
   WriteToOutput :: Either Handle FilePath -> B.ByteString -> Files ()
 
+-- | Run a 'Files' effect in 'IO'.
 runFiles :: Members '[Exc SomeException, IO] effs => Eff (Files ': effs) a -> Eff effs a
 runFiles = interpret $ \ files -> case files of
   ReadBlobs (Left handle) -> rethrowing (readBlobsFromHandle handle)
