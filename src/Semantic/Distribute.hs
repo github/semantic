@@ -36,9 +36,6 @@ runDistribute :: Members '[Exc SomeException, IO] effs => Eff (Distribute task '
 runDistribute m action = interpret (\ (Distribute tasks) ->
   liftIO (Async.mapConcurrently (runAction action) tasks) >>= either throwError pure . sequenceA . withStrategy (parTraversable (parTraversable rseq))) m
 
-parBitraversable :: Bitraversable t => Strategy a -> Strategy b -> Strategy (t a b)
-parBitraversable strat1 strat2 = bitraverse (rparWith strat1) (rparWith strat2)
-
 
 -- | An action evaluating @task@s to some output in 'IO', or failing with an exception.
 --
