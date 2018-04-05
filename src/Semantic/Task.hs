@@ -1,82 +1,93 @@
-{-# LANGUAGE DataKinds, GADTs, MultiParamTypeClasses, TypeOperators #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeOperators, UndecidableInstances #-}
 module Semantic.Task
 ( Task
+, TaskEff
+, WrappedTask(..)
 , Level(..)
 , RAlgebra
 , Differ
-, readBlobs
-, readBlobPairs
-, writeToOutput
+-- * I/O
+, IO.readBlobs
+, IO.readBlobPairs
+, IO.writeToOutput
+-- * Telemetry
 , writeLog
 , writeStat
 , time
+-- * High-level flow
 , parse
+, parseModule
+, parseModules
+, parsePackage
+, analyze
 , decorate
 , diff
 , render
+, graphImports
+-- * Concurrency
 , distribute
 , distributeFor
 , distributeFoldMap
-, bidistribute
-, bidistributeFor
+-- * Configuration
 , defaultOptions
 , configureOptionsForHandle
 , terminalFormatter
 , logfmtFormatter
+-- * Interpreting
 , runTask
 , runTaskWithOptions
+-- * Re-exports
+, Distribute
+, Eff
+, Exc
+, throwError
+, SomeException
+, Telemetry
 ) where
 
-import Prologue
-import Analysis.Decorator (decoratorWithAlgebra)
+import qualified Analysis.Abstract.ImportGraph as Abstract
+import           Analysis.Abstract.Evaluating
+import           Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
-import Control.Monad.IO.Class
-import Control.Parallel.Strategies
-import qualified Control.Concurrent.Async as Async
-import Control.Monad.Free.Freer
-import Data.Blob
-import Data.Bool
+import qualified Control.Abstract.Analysis as Analysis
+import qualified Control.Exception as Exc
+import           Control.Monad.Effect.Exception
+import           Control.Monad.Effect.Internal as Eff hiding (run)
+import           Control.Monad.Effect.Reader
+import           Control.Monad.Effect.Run as Run
+import           Data.Abstract.Address
+import qualified Data.Abstract.Evaluatable as Analysis
+import           Data.Abstract.FreeVariables
+import           Data.Abstract.Located
+import           Data.Abstract.Module
+import           Data.Abstract.Package as Package
+import           Data.Abstract.Value (Value)
+import           Data.Blob
 import qualified Data.ByteString as B
-import Data.Diff
+import           Data.Diff
 import qualified Data.Error as Error
-import Data.Language
-import Data.Record
+import           Data.Record
 import qualified Data.Syntax as Syntax
-import Data.Term
-import Parsing.Parser
-import Parsing.CMark
-import Parsing.TreeSitter
-import System.Exit (die)
-import System.IO (Handle, stderr)
+import           Data.Term
+import           Parsing.CMark
+import           Parsing.Parser
+import           Parsing.TreeSitter
+import           Prologue hiding (MonadError(..))
+import           Semantic.Distribute
 import qualified Semantic.IO as IO
-import Semantic.Log
-import Semantic.Stat as Stat
-import Semantic.Queue
-
-
-data TaskF output where
-  ReadBlobs :: Either Handle [(FilePath, Maybe Language)] -> TaskF [Blob]
-  ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> TaskF [BlobPair]
-  WriteToOutput :: Either Handle FilePath -> B.ByteString -> TaskF ()
-  WriteLog :: Level -> String -> [(String, String)] -> TaskF ()
-  WriteStat :: Stat -> TaskF ()
-  Time :: String -> [(String, String)] -> Task output -> TaskF output
-  Parse :: Parser term -> Blob -> TaskF term
-  Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> TaskF (Term f (Record (field ': fields)))
-  Diff :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> TaskF (Diff syntax ann1 ann2)
-  Render :: Renderer input output -> input -> TaskF output
-  Distribute :: Traversable t => t (Task output) -> TaskF (t output)
-  Bidistribute :: Bitraversable t => t (Task output1) (Task output2) -> TaskF (t output1 output2)
-
-  -- | For MonadIO.
-  LiftIO :: IO a -> TaskF a
-
-  -- | For MonadError.
-  Throw :: SomeException -> TaskF a
-  Catch :: Task a -> (SomeException -> Task a) -> TaskF a
+import           Semantic.Log
+import           Semantic.Queue
+import           Semantic.Stat as Stat
+import           Semantic.Telemetry
+import           System.Exit (die)
+import           System.IO (stderr)
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
-type Task = Freer TaskF
+type TaskEff = Eff '[Distribute WrappedTask, Task, IO.Files, Reader Options, Telemetry, Exc SomeException, IO]
+
+-- | A wrapper for a 'Task', to embed in other effects.
+newtype WrappedTask a = WrapTask { unwrapTask :: TaskEff a }
+  deriving (Applicative, Functor, Monad)
 
 -- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
 type Differ syntax ann1 ann2 = Term syntax ann1 -> Term syntax ann2 -> Diff syntax ann1 ann2
@@ -84,177 +95,139 @@ type Differ syntax ann1 ann2 = Term syntax ann1 -> Term syntax ann2 -> Diff synt
 -- | A function to render terms or diffs.
 type Renderer i o = i -> o
 
--- | A 'Task' which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
-readBlobs :: Either Handle [(FilePath, Maybe Language)] -> Task [Blob]
-readBlobs from = ReadBlobs from `Then` return
+-- | A task which parses a 'Blob' with the given 'Parser'.
+parse :: Member Task effs => Parser term -> Blob -> Eff effs term
+parse parser = send . Parse parser
 
--- | A 'Task' which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
-readBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> Task [BlobPair]
-readBlobPairs from = ReadBlobPairs from `Then` return
+-- | Parse a file into a 'Module'.
+parseModule :: Members '[IO.Files, Task] effs => Parser term -> Maybe FilePath -> FilePath -> Eff effs (Module term)
+parseModule parser rootDir path = do
+  blob <- head <$> IO.readBlobs (Right [(path, IO.languageForFilePath path)])
+  moduleForBlob rootDir blob <$> parse parser blob
 
--- | A 'Task' which writes a 'B.ByteString' to a 'Handle' or a 'FilePath'.
-writeToOutput :: Either Handle FilePath -> B.ByteString -> Task ()
-writeToOutput path contents = WriteToOutput path contents `Then` return
+-- | Parse a list of files into 'Module's.
+parseModules :: Members '[IO.Files, Task] effs => Parser term -> FilePath -> [FilePath] -> Eff effs [Module term]
+parseModules parser rootDir = traverse (parseModule parser (Just rootDir))
 
--- | A 'Task' which logs a message at a specific log level to stderr.
-writeLog :: Level -> String -> [(String, String)] -> Task ()
-writeLog level message pairs = WriteLog level message pairs `Then` return
+-- | Parse a list of files into a 'Package'.
+parsePackage :: Members '[IO.Files, Task] effs => PackageName -> Parser term -> FilePath -> [FilePath] -> Eff effs (Package term)
+parsePackage name parser rootDir paths = Package (PackageInfo name Nothing) . Package.fromModules <$> parseModules parser rootDir paths
 
--- | A 'Task' which writes a stat.
-writeStat :: Stat -> Task ()
-writeStat stat = WriteStat stat `Then` return
 
--- | A 'Task' which measures and stats the timing of another 'Task'.
-time :: String -> [(String, String)] -> Task output -> Task output
-time statName tags task = Time statName tags task `Then` return
+-- | A task running some 'Analysis.MonadAnalysis' to completion.
+analyze :: Member Task effs => Analysis.SomeAnalysis m result -> Eff effs result
+analyze = send . Analyze
 
--- | A 'Task' which parses a 'Blob' with the given 'Parser'.
-parse :: Parser term -> Blob -> Task term
-parse parser blob = Parse parser blob `Then` return
+-- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
+decorate :: (Functor f, Member Task effs) => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Eff effs (Term f (Record (field ': fields)))
+decorate algebra = send . Decorate algebra
 
--- | A 'Task' which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
-decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
-decorate algebra term = Decorate algebra term `Then` return
+-- | A task which diffs a pair of terms using the supplied 'Differ' function.
+diff :: Member Task effs => Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Eff effs (Diff syntax ann1 ann2)
+diff differ term1 term2 = send (Semantic.Task.Diff differ term1 term2)
 
--- | A 'Task' which diffs a pair of terms using the supplied 'Differ' function.
-diff :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
-diff differ term1 term2 = Semantic.Task.Diff differ term1 term2 `Then` return
+-- | A task which renders some input using the supplied 'Renderer' function.
+render :: Member Task effs => Renderer input output -> input -> Eff effs output
+render renderer = send . Render renderer
 
--- | A 'Task' which renders some input using the supplied 'Renderer' function.
-render :: Renderer input output -> input -> Task output
-render renderer input = Render renderer input `Then` return
 
--- | Distribute a 'Traversable' container of 'Task's over the available cores (i.e. execute them concurrently), collecting their results.
---
---   This is a concurrent analogue of 'sequenceA'.
-distribute :: Traversable t => t (Task output) -> Task (t output)
-distribute tasks = Distribute tasks `Then` return
+-- | Render and serialize the import graph for a given 'Package'.
+graphImports :: (Apply Eq1 syntax, Apply Analysis.Evaluatable syntax, Apply FreeVariables1 syntax, Apply Functor syntax, Apply Ord1 syntax, Apply Show1 syntax, Member Syntax.Identifier syntax, Members '[Exc SomeException, Task] effs, Ord ann, Show ann) => Package (Term (Union syntax) ann) -> Eff effs B.ByteString
+graphImports package = analyze (Analysis.SomeAnalysis (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package)) >>= renderGraph
+  where asAnalysisForTypeOfPackage :: Abstract.ImportGraphing (Evaluating (Located Precise term) term (Value (Located Precise term))) effects value -> Package term -> Abstract.ImportGraphing (Evaluating (Located Precise term) term (Value (Located Precise term))) effects value
+        asAnalysisForTypeOfPackage = const
 
--- | Distribute a 'Bitraversable' container of 'Task's over the available cores (i.e. execute them concurrently), collecting their results.
---
---   This is a concurrent analogue of 'bisequenceA'.
-bidistribute :: Bitraversable t => t (Task output1) (Task output2) -> Task (t output1 output2)
-bidistribute tasks = Bidistribute tasks `Then` return
+        renderGraph result = case result of
+          (Right (Right (Right (Right (Right (_, graph))))), _) -> pure $! Abstract.renderImportGraph graph
+          _ -> throwError (toException (Exc.ErrorCall "graphImports: import graph rendering failed"))
 
--- | Distribute the application of a function to each element of a 'Traversable' container of inputs over the available cores (i.e. perform the function concurrently for each element), collecting the results.
---
---   This is a concurrent analogue of 'for' or 'traverse' (with the arguments flipped).
-distributeFor :: Traversable t => t a -> (a -> Task output) -> Task (t output)
-distributeFor inputs toTask = distribute (fmap toTask inputs)
-
--- | Distribute the application of a function to each element of a 'Bitraversable' container of inputs over the available cores (i.e. perform the functions concurrently for each element), collecting the results.
---
---   This is a concurrent analogue of 'bifor' or 'bitraverse' (with the arguments flipped).
-bidistributeFor :: Bitraversable t => t a b -> (a -> Task output1) -> (b -> Task output2) -> Task (t output1 output2)
-bidistributeFor inputs toTask1 toTask2 = bidistribute (bimap toTask1 toTask2 inputs)
-
--- | Distribute the application of a function to each element of a 'Traversable' container of inputs over the available cores (i.e. perform the function concurrently for each element), combining the results 'Monoid'ally into a final value.
---
---   This is a concurrent analogue of 'foldMap'.
-distributeFoldMap :: (Traversable t, Monoid output) => (a -> Task output) -> t a -> Task output
-distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 
 -- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
 --
 -- > runTask = runTaskWithOptions defaultOptions
-runTask :: Task a -> IO a
+runTask :: TaskEff a -> IO a
 runTask = runTaskWithOptions defaultOptions
 
-
--- | Execute a 'Task' with the passed 'Options', yielding its result value in 'IO'.
-runTaskWithOptions :: Options -> Task a -> IO a
+-- | Execute a 'TaskEff' with the passed 'Options', yielding its result value in 'IO'.
+runTaskWithOptions :: Options -> TaskEff a -> IO a
 runTaskWithOptions options task = do
   options <- configureOptionsForHandle stderr options
   statter <- defaultStatsClient >>= newQueue sendStat
   logger <- newQueue logMessage options
 
-  result <- withTiming (queue statter) "run" [] $
-    run options logger statter task
+  (result, stat) <- withTiming "run" [] $ do
+    let run :: TaskEff a -> IO (Either SomeException a)
+        run task = Run.run task (Action (run . unwrapTask)) options (Queues logger statter)
+    run task
+  queue statter stat
 
   closeQueue statter
   closeStatClient (asyncQueueExtra statter)
   closeQueue logger
   either (die . displayException) pure result
-  where
-    run :: Options
-        -> AsyncQueue Message Options
-        -> AsyncQueue Stat StatsClient
-        -> Task a
-        -> IO (Either SomeException a)
-    run options logger statter = go
-      where
-        go :: Task a -> IO (Either SomeException a)
-        go = iterFreerA (\ yield task -> case task of
-          ReadBlobs (Left handle) -> (IO.readBlobsFromHandle handle >>= yield) `catchError` (pure . Left . toException)
-          ReadBlobs (Right paths@[(path, Nothing)]) -> (IO.isDirectory path >>= bool (IO.readBlobsFromPaths paths) (IO.readBlobsFromDir path) >>= yield) `catchError` (pure . Left . toException)
-          ReadBlobs (Right paths) -> (IO.readBlobsFromPaths paths >>= yield) `catchError` (pure . Left . toException)
-          ReadBlobPairs source -> (either IO.readBlobPairsFromHandle (traverse (runBothWith IO.readFilePair)) source >>= yield) `catchError` (pure . Left . toException)
-          WriteToOutput destination contents -> either B.hPutStr B.writeFile destination contents >>= yield
-          WriteLog level message pairs -> queueLogMessage logger level message pairs >>= yield
-          WriteStat stat -> queue statter stat >>= yield
-          Time statName tags task -> withTiming (queue statter) statName tags (go task) >>= either (pure . Left) yield
-          Parse parser blob -> go (runParser options blob parser) >>= either (pure . Left) yield
-          Decorate algebra term -> pure (decoratorWithAlgebra algebra term) >>= yield
-          Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2) >>= yield
-          Render renderer input -> pure (renderer input) >>= yield
-          Distribute tasks -> Async.mapConcurrently go tasks >>= either (pure . Left) yield . sequenceA . withStrategy (parTraversable (parTraversable rseq))
-          Bidistribute tasks -> Async.runConcurrently (bitraverse (Async.Concurrently . go) (Async.Concurrently . go) tasks) >>= either (pure . Left) yield . bisequenceA . withStrategy (parBitraversable (parTraversable rseq) (parTraversable rseq))
-          LiftIO action -> action >>= yield
-          Throw err -> pure (Left err)
-          Catch during handler -> do
-            result <- go during
-            case result of
-              Left err -> go (handler err) >>= either (pure . Left) yield
-              Right a -> yield a) . fmap Right
 
-        parBitraversable :: Bitraversable t => Strategy a -> Strategy b -> Strategy (t a b)
-        parBitraversable strat1 strat2 = bitraverse (rparWith strat1) (rparWith strat2)
 
-runParser :: Options -> Blob -> Parser term -> Task term
-runParser Options{..} blob@Blob{..} = go
-  where
-    go :: Parser term -> Task term
-    go parser = case parser of
-      ASTParser language ->
-        time "parse.tree_sitter_ast_parse" languageTag $
-          liftIO ((Right <$> parseToAST language blob) `catchError` (pure . Left . toException)) >>= either throwError pure
-      AssignmentParser parser assignment -> do
-        ast <- go parser `catchError` \ err -> do
-          writeStat (Stat.increment "parse.parse_failures" languageTag)
-          writeLog Error "failed parsing" (("task", "parse") : blobFields)
-          throwError err
-        time "parse.assign" languageTag $
-          case Assignment.assign blobSource assignment ast of
-            Left err -> do
-              writeStat (Stat.increment "parse.assign_errors" languageTag)
-              writeLog Error (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "assign") : blobFields)
-              throwError (toException err)
-            Right term -> do
-              for_ (errors term) $ \ err -> case Error.errorActual err of
-                  (Just "ParseError") -> do
-                    writeStat (Stat.increment "parse.parse_errors" languageTag)
-                    writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "parse") : blobFields)
-                  _ -> do
-                    writeStat (Stat.increment "parse.assign_warnings" languageTag)
-                    writeLog Warning (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err) (("task", "assign") : blobFields)
-              writeStat (Stat.count "parse.nodes" (length term) languageTag)
-              pure term
-      MarkdownParser ->
-        time "parse.cmark_parse" languageTag $
-          let term = cmarkParser blobSource
-          in length term `seq` pure term
-    blobFields = ("path", blobPath) : languageTag
-    languageTag = maybe [] (pure . (,) ("language" :: String) . show) blobLanguage
-    errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
-    errors = cata $ \ (In a syntax) -> case syntax of
-      _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (getField a) err]
-      _ -> fold syntax
+-- | An effect describing high-level tasks to be performed.
+data Task output where
+  Parse    :: Parser term -> Blob -> Task term
+  Analyze  :: Analysis.SomeAnalysis m result -> Task result
+  Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
+  Diff     :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
+  Render   :: Renderer input output -> input -> Task output
 
-instance MonadIO Task where
-  liftIO action = LiftIO action `Then` return
+-- | Run a 'Task' effect by performing the actions in 'IO'.
+runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, IO] effs => Eff (Task ': effs) a -> Eff effs a
+runTaskF = interpret $ \ task -> case task of
+  Parse parser blob -> runParser blob parser
+  Analyze analysis -> pure (Analysis.runSomeAnalysis analysis)
+  Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
+  Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
+  Render renderer input -> pure (renderer input)
 
-instance MonadError SomeException Task where
-  throwError error = Throw error `Then` return
-  catchError during handler = Catch during handler `Then` return
 
-{-# ANN module ("HLint: ignore Avoid return" :: String) #-}
+-- | Log an 'Error.Error' at the specified 'Level'.
+logError :: Member Telemetry effs => Options -> Level -> Blob -> Error.Error String -> [(String, String)] -> Eff effs ()
+logError Options{..} level blob err = writeLog level (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err)
+
+-- | Parse a 'Blob' in 'IO'.
+runParser :: Members '[Reader Options, Telemetry, Exc SomeException, IO] effs => Blob -> Parser term -> Eff effs term
+runParser blob@Blob{..} parser = case parser of
+  ASTParser language ->
+    time "parse.tree_sitter_ast_parse" languageTag $
+      IO.rethrowing (parseToAST language blob)
+  AssignmentParser parser assignment -> do
+    ast <- runParser blob parser `catchError` \ (SomeException err) -> do
+      writeStat (Stat.increment "parse.parse_failures" languageTag)
+      writeLog Error "failed parsing" (("task", "parse") : blobFields)
+      throwError (toException err)
+    options <- ask
+    time "parse.assign" languageTag $
+      case Assignment.assign blobSource assignment ast of
+        Left err -> do
+          writeStat (Stat.increment "parse.assign_errors" languageTag)
+          logError options Error blob err (("task", "assign") : blobFields)
+          throwError (toException err)
+        Right term -> do
+          for_ (errors term) $ \ err -> case Error.errorActual err of
+              Just "ParseError" -> do
+                writeStat (Stat.increment "parse.parse_errors" languageTag)
+                logError options Warning blob err (("task", "parse") : blobFields)
+              _ -> do
+                writeStat (Stat.increment "parse.assign_warnings" languageTag)
+                logError options Warning blob err (("task", "assign") : blobFields)
+          writeStat (Stat.count "parse.nodes" (length term) languageTag)
+          pure term
+  MarkdownParser ->
+    time "parse.cmark_parse" languageTag $
+      let term = cmarkParser blobSource
+      in length term `seq` pure term
+  where blobFields = ("path", blobPath) : languageTag
+        languageTag = maybe [] (pure . (,) ("language" :: String) . show) blobLanguage
+        errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
+        errors = cata $ \ (In a syntax) -> case syntax of
+          _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (getField a) err]
+          _ -> fold syntax
+
+
+instance (Members '[Reader Options, Telemetry, Exc SomeException, IO] effects, Run effects result rest) => Run (Task ': effects) result rest where
+  run = run . runTaskF

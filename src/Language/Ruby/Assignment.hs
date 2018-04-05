@@ -73,10 +73,11 @@ type Syntax = '[
   , Syntax.Error
   , Syntax.Identifier
   , Syntax.Program
-  , Ruby.Syntax.Require
-  , Ruby.Syntax.Load
   , Ruby.Syntax.Class
+  , Ruby.Syntax.Load
+  , Ruby.Syntax.LowPrecedenceBoolean
   , Ruby.Syntax.Module
+  , Ruby.Syntax.Require
   , []
   ]
 
@@ -157,7 +158,6 @@ identifier =
   <|> mk SplatArgument
   <|> mk HashSplatArgument
   <|> mk BlockArgument
-  <|> mk ReservedIdentifier
   <|> mk Uninterpreted
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
 
@@ -168,7 +168,7 @@ literal =
   <|> makeTerm <$> token  Grammar.False    <*> pure Literal.false
   <|> makeTerm <$> token  Grammar.Nil      <*> pure Literal.Null
   <|> makeTerm <$> symbol Grammar.Integer  <*> (Literal.Integer <$> source)
-  <|> makeTerm <$> symbol Grammar.Float    <*> (source >>= Literal.normalizeFloatString [Literal.padWithLeadingZero, Literal.removeUnderscores])
+  <|> makeTerm <$> symbol Grammar.Float    <*> (Literal.Float <$> source)
   <|> makeTerm <$> symbol Grammar.Rational <*> (Literal.Rational <$> source)
   <|> makeTerm <$> symbol Grammar.Complex  <*> (Literal.Complex <$> source)
    -- TODO: Do we want to represent the difference between .. and ...
@@ -369,9 +369,11 @@ binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expressi
   , (inj .) . Expression.Power            <$ symbol AnonStarStar
   , (inj .) . Expression.DividedBy        <$ symbol AnonSlash
   , (inj .) . Expression.Modulo           <$ symbol AnonPercent
-  , (inj .) . Expression.And              <$ (symbol AnonAnd <|> symbol AnonAmpersandAmpersand)
+  , (inj .) . Expression.And              <$ symbol AnonAmpersandAmpersand
+  , (inj .) . Ruby.Syntax.LowAnd          <$ symbol AnonAnd
   , (inj .) . Expression.BAnd             <$ symbol AnonAmpersand
-  , (inj .) . Expression.Or               <$ (symbol AnonOr <|> symbol AnonPipePipe)
+  , (inj .) . Expression.Or               <$ symbol AnonPipePipe
+  , (inj .) . Ruby.Syntax.LowOr           <$ symbol AnonOr
   , (inj .) . Expression.BOr              <$ symbol AnonPipe
   , (inj .) . Expression.BXOr             <$ symbol AnonCaret
   , (inj .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual)

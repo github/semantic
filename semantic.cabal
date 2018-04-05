@@ -82,6 +82,7 @@ library
                      , Data.Range
                      , Data.Record
                      , Data.Semigroup.App
+                     , Data.Scientific.Exts
                      , Data.Source
                      , Data.Span
                      , Data.SplitDiff
@@ -136,13 +137,16 @@ library
                      , Rendering.Symbol
                      , Rendering.TOC
                      -- High-level flow & operational functionality (logging, stats, etc.)
-                     , Semantic
                      , Semantic.CLI
+                     , Semantic.Diff
+                     , Semantic.Distribute
                      , Semantic.IO
                      , Semantic.Log
+                     , Semantic.Parse
+                     , Semantic.Queue
                      , Semantic.Stat
                      , Semantic.Task
-                     , Semantic.Queue
+                     , Semantic.Telemetry
                      , Semantic.Util
                     -- Custom Prelude
   other-modules:       Prologue
@@ -152,6 +156,7 @@ library
                      , ansi-terminal
                      , array
                      , async
+                     , attoparsec
                      , bifunctors
                      , bytestring
                      , cmark-gfm
@@ -234,6 +239,7 @@ test-suite test
                      , Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Mergeable.Spec
+                     , Data.Scientific.Spec
                      , Data.Source.Spec
                      , Data.Term.Spec
                      , Diffing.Algorithm.RWS.Spec

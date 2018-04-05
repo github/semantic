@@ -35,9 +35,10 @@ import qualified GHC.TypeLits as TypeLevel
 import Language.Preluded
 import Parsing.Parser
 import Prologue
-import Semantic
+import Semantic.Diff (diffTermPair)
 import Semantic.IO as IO
-import Semantic.Task
+import Semantic.Task hiding (parsePackage)
+import qualified Semantic.Task as Task
 import System.FilePath.Posix
 
 import qualified Language.Go.Assignment as Go
@@ -123,7 +124,7 @@ parseFiles :: Parser term -> FilePath -> [FilePath] -> IO [Module term]
 parseFiles parser rootDir = traverse (parseFile parser (Just rootDir))
 
 parsePackage :: PackageName -> Parser term -> FilePath -> [FilePath] -> IO (Package term)
-parsePackage name parser rootDir files = Package (PackageInfo name Nothing) . Package.fromModules <$> parseFiles parser rootDir files
+parsePackage name parser rootDir = runTask . Task.parsePackage name parser rootDir
 
 
 -- Read a file from the filesystem into a Blob.
@@ -131,32 +132,17 @@ file :: MonadIO m => FilePath -> m Blob
 file path = fromJust <$> IO.readFile path (languageForFilePath path)
 
 -- Diff helpers
-diffWithParser ::
-               ( HasField fields Data.Span.Span
-               , HasField fields Range
-               , Eq1 syntax
-               , Show1 syntax
-               , Traversable syntax
-               , Diffable syntax
-               , GAlign syntax
-               , HasDeclaration syntax
-               )
+diffWithParser :: ( HasField fields Data.Span.Span
+                  , HasField fields Range
+                  , Eq1 syntax
+                  , Show1 syntax
+                  , Traversable syntax
+                  , Diffable syntax
+                  , GAlign syntax
+                  , HasDeclaration syntax
+                  , Members '[Distribute WrappedTask, Task] effs
+                  )
                => Parser (Term syntax (Record fields))
                -> BlobPair
-               -> Task (Diff syntax (Record (Maybe Declaration ': fields)) (Record (Maybe Declaration ': fields)))
-diffWithParser parser = run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))
-  where
-    run parse blobs = bidistributeFor (runJoin blobs) parse parse >>= diffTermPair diffTerms
-
-diffBlobWithParser ::
-                   ( HasField fields Data.Span.Span
-                   , HasField fields Range
-                   , Traversable syntax
-                   , HasDeclaration syntax
-                   )
-                  => Parser (Term syntax (Record fields))
-                  -> Blob
-                  -> Task (Term syntax (Record (Maybe Declaration : fields)))
-diffBlobWithParser parser = run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))
-  where
-    run parse = parse
+               -> Eff effs (Diff syntax (Record (Maybe Declaration ': fields)) (Record (Maybe Declaration ': fields)))
+diffWithParser parser blobs = distributeFor blobs (\ blob -> WrapTask $ parse parser blob >>= decorate (declarationAlgebra blob)) >>= diffTermPair diffTerms . runJoin
