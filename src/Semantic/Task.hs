@@ -23,7 +23,7 @@ module Semantic.Task
 , decorate
 , diff
 , render
-, importGraph
+, graphImports
 -- * Concurrency
 , distribute
 , distributeFor
@@ -131,8 +131,8 @@ render renderer = send . Render renderer
 
 
 -- | Render and serialize the import graph for a given 'Package'.
-importGraph :: (Apply Eq1 syntax, Apply Analysis.Evaluatable syntax, Apply FreeVariables1 syntax, Apply Functor syntax, Apply Ord1 syntax, Apply Show1 syntax, Member Syntax.Identifier syntax, Member Task effs, Ord ann, Show ann) => Package (Term (Union syntax) ann) -> Eff effs B.ByteString
-importGraph package = renderGraph <$> analyze (Analysis.SomeAnalysis (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package))
+graphImports :: (Apply Eq1 syntax, Apply Analysis.Evaluatable syntax, Apply FreeVariables1 syntax, Apply Functor syntax, Apply Ord1 syntax, Apply Show1 syntax, Member Syntax.Identifier syntax, Member Task effs, Ord ann, Show ann) => Package (Term (Union syntax) ann) -> Eff effs B.ByteString
+graphImports package = renderGraph <$> analyze (Analysis.SomeAnalysis (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package))
   where asAnalysisForTypeOfPackage :: Abstract.ImportGraphing (Evaluating (Located Precise term) term (Value (Located Precise term))) effects value -> Package term -> Abstract.ImportGraphing (Evaluating (Located Precise term) term (Value (Located Precise term))) effects value
         asAnalysisForTypeOfPackage = const
 
