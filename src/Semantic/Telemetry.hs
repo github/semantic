@@ -41,11 +41,13 @@ data Telemetry output where
 -- | Queues for logging and statting.
 data Queues = Queues { logger :: AsyncQueue Message Options, statter :: AsyncQueue Stat StatsClient }
 
+-- | Run a 'Telemetry' effect by expecting a 'Reader' of 'Queue's to write stats and logs to.
 runTelemetry :: Member IO (Reader Queues ': effs) => Eff (Telemetry ': effs) a -> Eff (Reader Queues ': effs) a
 runTelemetry = reinterpret (\ t -> case t of
   WriteStat stat -> asks statter >>= \ statter -> liftIO (queue statter stat)
   WriteLog level message pairs -> asks logger >>= \ logger -> queueLogMessage logger level message pairs)
 
+-- | Run a 'Telemetry' effect by ignoring statting/logging.
 ignoreTelemetry :: Eff (Telemetry ': effs) a -> Eff effs a
 ignoreTelemetry = interpret (\ t -> case t of
   WriteStat{} -> pure ()
