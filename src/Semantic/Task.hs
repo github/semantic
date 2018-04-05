@@ -187,6 +187,7 @@ runTaskF = interpret $ \ task -> case task of
 logError :: Member Telemetry effs => Options -> Level -> Blob -> Error.Error String -> [(String, String)] -> Eff effs ()
 logError Options{..} level blob err = writeLog level (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err)
 
+-- | Parse a 'Blob' in 'IO'.
 runParser :: Members '[Reader Options, Telemetry, Exc SomeException, IO] effs => Blob -> Parser term -> Eff effs term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
