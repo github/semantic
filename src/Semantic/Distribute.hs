@@ -1,5 +1,12 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
-module Semantic.Distribute where
+module Semantic.Distribute
+( distribute
+, distributeFor
+, distributeFoldMap
+, Distribute
+, runDistribute
+, Action(..)
+) where
 
 import qualified Control.Concurrent.Async as Async
 import           Control.Monad.Effect hiding (run)
