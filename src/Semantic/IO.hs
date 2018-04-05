@@ -142,6 +142,7 @@ writeToOutput :: Member Files effs => Either Handle FilePath -> B.ByteString -> 
 writeToOutput path = send . WriteToOutput path
 
 
+-- | An effect to read/write 'Blob.Blob's from 'Handle's or 'FilePath's.
 data Files out where
   ReadBlobs     :: Either Handle [(FilePath, Maybe Language)] -> Files [Blob.Blob]
   ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> Files [Blob.BlobPair]
