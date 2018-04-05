@@ -158,7 +158,6 @@ identifier =
   <|> mk SplatArgument
   <|> mk HashSplatArgument
   <|> mk BlockArgument
-  <|> mk ReservedIdentifier
   <|> mk Uninterpreted
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
 
