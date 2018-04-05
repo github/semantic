@@ -295,9 +295,9 @@ pair =   makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression 
 methodCall :: Assignment
 methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> funcCall <|> regularCall)
   where
-    funcCall = inj <$> (Ruby.Syntax.Send Nothing <$> methodSelector <*> args) -- TODO block
+    funcCall = inj <$> (Ruby.Syntax.Send Nothing <$> methodSelector <*> args <*> (block <|> emptyTerm))
 
-    regularCall = inj <$> (symbol Call *> children (Ruby.Syntax.Send <$> (Just <$> expression) <*> methodSelector) <*> args) -- TODO block
+    regularCall = inj <$> (symbol Call *> children (Ruby.Syntax.Send <$> (Just <$> expression) <*> methodSelector) <*> args <*> (block <|> emptyTerm))
 
     require = inj <$> (symbol Identifier *> do
       s <- source
@@ -317,7 +317,7 @@ methodSelector = mk Identifier <|> mk Identifier'
     mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> (name <$> source))
 
 call :: Assignment
-call = makeTerm <$> symbol Call <*> children (Ruby.Syntax.Send <$> (Just <$> expression) <*> methodSelector <*> pure [])
+call = makeTerm <$> symbol Call <*> children (Ruby.Syntax.Send <$> (Just <$> expression) <*> methodSelector <*> pure [] <*> (block <|> emptyTerm))
 
 rescue :: Assignment
 rescue =  rescue'
