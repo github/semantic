@@ -28,10 +28,12 @@ distributeFoldMap :: (Member (Distribute task) effs, Monoid output, Traversable 
 distributeFoldMap toTask inputs = fmap fold (distribute (fmap toTask inputs))
 
 
+-- | Distribute effects run tasks concurrently.
 data Distribute task output where
   Distribute :: Traversable t => t (task output) -> Distribute task (t output)
 
 
+-- | Evaluate a 'Distribute' effect concurrently.
 runDistribute :: Members '[Exc SomeException, IO] effs => Eff (Distribute task ': effs) a -> Action task -> Eff effs a
 runDistribute m action = interpret (\ (Distribute tasks) ->
   liftIO (Async.mapConcurrently (runAction action) tasks) >>= either throwError pure . sequenceA . withStrategy (parTraversable (parTraversable rseq))) m
