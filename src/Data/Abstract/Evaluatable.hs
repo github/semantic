@@ -14,6 +14,7 @@ module Data.Abstract.Evaluatable
 , evaluatePackage
 , evaluatePackageBody
 , throwLoadError
+, throwEvalError
 , resolve
 , listModulesInDir
 , require
@@ -79,6 +80,7 @@ instance Eq1 (LoadError term a) where
 data EvalError value resume where
   -- Indicates we weren't able to dereference a name from the evaluated environment.
   FreeVariableError :: Name -> EvalError value value
+  FreeVariablesError :: [Name] -> EvalError value Name
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: MonadEvaluatable location term value m => Name -> m value
@@ -90,9 +92,14 @@ instance Show1 (EvalError value) where
   liftShowsPrec _ _ = showsPrec
 instance Eq1 (EvalError term) where
   liftEq _ (FreeVariableError a) (FreeVariableError b) = a == b
+  liftEq _ (FreeVariablesError a) (FreeVariablesError b) = a == b
+  liftEq _ _ _ = False
 
 throwLoadError :: MonadEvaluatable location term value m => LoadError term value resume -> m resume
 throwLoadError = throwException
+
+throwEvalError :: MonadEvaluatable location term value m => EvalError value resume -> m resume
+throwEvalError = throwException
 
 data Unspecialized a b where
   Unspecialized :: { getUnspecialized :: Prelude.String } -> Unspecialized value value

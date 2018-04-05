@@ -79,9 +79,9 @@ instance Show1 Let where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Let where
   eval Let{..} = do
+    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm letVariable)
     addr <- snd <$> letrec name (subtermValue letValue)
     localEnv (Env.insert name addr) (subtermValue letBody)
-    where name = freeVariable (subterm letVariable)
 
 
 -- Assignment

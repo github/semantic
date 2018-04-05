@@ -59,7 +59,7 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedImport where
   eval (QualifiedImport (ImportPath name) aliasTerm) = do
     paths <- resolveGoImport name
-    let alias = freeVariable (subterm aliasTerm)
+    alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
     void $ letrec' alias $ \addr -> do
       for_ paths $ \path -> do
         (importedEnv, _) <- isolate (require path)

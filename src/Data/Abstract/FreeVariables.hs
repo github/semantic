@@ -40,10 +40,10 @@ class FreeVariables1 syntax where
 freeVariables1 :: (FreeVariables1 t, FreeVariables a) => t a -> [Name]
 freeVariables1 = liftFreeVariables freeVariables
 
-freeVariable :: (HasCallStack, FreeVariables term) => term -> Name
+freeVariable :: FreeVariables term => term -> Either [Name] Name
 freeVariable term = case freeVariables term of
-  [n] -> n
-  xs -> error ("expected single free variable, but got: " <> show xs)
+  [n] -> Right n
+  xs -> Left xs
 
 instance (FreeVariables1 syntax, Functor syntax) => FreeVariables (Term syntax ann) where
   freeVariables = cata (liftFreeVariables id)

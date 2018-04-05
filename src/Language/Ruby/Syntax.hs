@@ -100,9 +100,9 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Class where
   eval Class{..} = do
     supers <- traverse subtermValue classSuperClasses
+    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm classIdentifier)
     letrec' name $ \addr ->
       subtermValue classBody <* makeNamespace name addr supers
-    where name = freeVariable (subterm classIdentifier)
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -112,6 +112,7 @@ instance Ord1 Module where liftCompare = genericLiftCompare
 instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
-  eval (Module iden xs) = letrec' name $ \addr ->
-    eval xs <* makeNamespace name addr []
-    where name = freeVariable (subterm iden)
+  eval (Module iden xs) = do
+    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
+    letrec' name $ \addr ->
+      eval xs <* makeNamespace name addr []
