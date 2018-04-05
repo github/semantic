@@ -125,6 +125,7 @@ instance FromJSON BlobPair where
       _                 -> fail "Expected object with 'before' and/or 'after' keys only"
 
 
+-- | An exception indicating that we’ve tried to diff or parse a blob of unknown language.
 newtype NoLanguageForBlob = NoLanguageForBlob FilePath
   deriving (Eq, Exception, Ord, Show, Typeable)
 
