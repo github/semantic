@@ -135,13 +135,16 @@ library
                      , Rendering.Symbol
                      , Rendering.TOC
                      -- High-level flow & operational functionality (logging, stats, etc.)
-                     , Semantic
                      , Semantic.CLI
+                     , Semantic.Diff
+                     , Semantic.Distribute
                      , Semantic.IO
                      , Semantic.Log
+                     , Semantic.Parse
+                     , Semantic.Queue
                      , Semantic.Stat
                      , Semantic.Task
-                     , Semantic.Queue
+                     , Semantic.Telemetry
                      , Semantic.Util
                     -- Custom Prelude
   other-modules:       Prologue

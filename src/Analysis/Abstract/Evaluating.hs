@@ -151,7 +151,6 @@ instance Members (EvaluatingEffects location term value) effects
 
 instance ( Corecursive term
          , Members (EvaluatingEffects location term value) effects
-         , MonadValue location value (Evaluating location term value effects)
          , Recursive term
          )
       => MonadAnalysis location term value (Evaluating location term value effects) where
