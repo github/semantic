@@ -10,11 +10,6 @@ import Semantic.Log
 import Semantic.Queue
 import Semantic.Stat
 
--- | Statting and logging effects.
-data Telemetry output where
-  WriteStat :: Stat                                  -> Telemetry ()
-  WriteLog  :: Level -> String -> [(String, String)] -> Telemetry ()
-
 -- | A task which logs a message at a specific log level to stderr.
 writeLog :: Member Telemetry effs => Level -> String -> [(String, String)] -> Eff effs ()
 writeLog level message pairs = send (WriteLog level message pairs)
@@ -29,6 +24,11 @@ time statName tags task = do
   (a, stat) <- withTiming statName tags task
   a <$ writeStat stat
 
+
+-- | Statting and logging effects.
+data Telemetry output where
+  WriteStat :: Stat                                  -> Telemetry ()
+  WriteLog  :: Level -> String -> [(String, String)] -> Telemetry ()
 
 -- | Queues for logging and statting.
 data Queues = Queues { logger :: AsyncQueue Message Options, statter :: AsyncQueue Stat StatsClient }
