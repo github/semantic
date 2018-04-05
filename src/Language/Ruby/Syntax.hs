@@ -44,7 +44,12 @@ instance Ord1 Send where liftCompare = genericLiftCompare
 instance Show1 Send where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Send where
-  eval (Send _ _ _ _) = fail "send unimplemented!"
+  eval Send{..} = do
+    recvEnv <- case sendReceiver of
+      Just recv -> subtermValue recv >>= scopedEnvironment
+      Nothing -> getEnv -- send to implicit self
+    func <- localEnv (mappend recvEnv) (subtermValue sendSelector)
+    call func (map subtermValue sendArgs) -- TODO pass through sendBlock
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
