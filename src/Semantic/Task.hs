@@ -183,6 +183,7 @@ runTaskF = interpret $ \ task -> case task of
   Render renderer input -> pure (renderer input)
 
 
+-- | Log an 'Error.Error' at the specified 'Level'.
 logError :: Member Telemetry effs => Options -> Level -> Blob -> Error.Error String -> [(String, String)] -> Eff effs ()
 logError Options{..} level blob err = writeLog level (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err)
 
