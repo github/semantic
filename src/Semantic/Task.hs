@@ -166,11 +166,11 @@ runTaskWithOptions options task = do
 
 
 data Task output where
-  Parse         :: Parser term -> Blob -> Task term
-  Analyze       :: Analysis.SomeAnalysis m result -> Task result
-  Decorate      :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
-  Diff          :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
-  Render        :: Renderer input output -> input -> Task output
+  Parse    :: Parser term -> Blob -> Task term
+  Analyze  :: Analysis.SomeAnalysis m result -> Task result
+  Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
+  Diff     :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
+  Render   :: Renderer input output -> input -> Task output
 
 runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, IO] effs => Eff (Task ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
