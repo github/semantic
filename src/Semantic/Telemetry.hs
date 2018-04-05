@@ -52,6 +52,7 @@ ignoreTelemetry = interpret (\ t -> case t of
   WriteLog{}  -> pure ())
 
 
+-- | Interpret an effect by replacing it with another effect.
 reinterpret :: (forall x. effect x -> Eff (newEffect ': effs) x)
             -> Eff (effect ': effs) a
             -> Eff (newEffect ': effs) a
