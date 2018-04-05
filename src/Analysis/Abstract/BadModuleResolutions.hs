@@ -4,7 +4,6 @@ module Analysis.Abstract.BadModuleResolutions where
 import Control.Abstract.Analysis
 import Data.Abstract.Evaluatable
 import Analysis.Abstract.Evaluating
-import Data.Abstract.Environment as Env
 import Prologue
 
 newtype BadModuleResolutions m (effects :: [* -> *]) a = BadModuleResolutions (m effects a)
@@ -28,6 +27,6 @@ instance ( Effectful m
 
   analyzeTerm eval term = resumeException @(ResolutionError value) (liftAnalyze analyzeTerm eval term) (
         \yield error -> case error of
-          (RubyError name) -> yield "")
+          (RubyError _) -> yield "")
 
   analyzeModule = liftAnalyze analyzeModule
