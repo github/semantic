@@ -109,3 +109,22 @@ instance Evaluatable Module where
   eval (Module iden xs) = letrec' name $ \addr ->
     eval xs <* makeNamespace name addr []
     where name = freeVariable (subterm iden)
+
+data LowPrecedenceBoolean a
+  = LowAnd !a !a
+  | LowOr !a !a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Evaluatable LowPrecedenceBoolean where
+  -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
+  eval = go . fmap subtermValue where
+    go (LowAnd a b) = do
+      cond <- a
+      ifthenelse cond b (pure cond)
+    go (LowOr a b) = do
+      cond <- a
+      ifthenelse cond (pure cond) b
+
+instance Eq1 LowPrecedenceBoolean where liftEq = genericLiftEq
+instance Ord1 LowPrecedenceBoolean where liftCompare = genericLiftCompare
+instance Show1 LowPrecedenceBoolean where liftShowsPrec = genericLiftShowsPrec
