@@ -1,5 +1,13 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
-module Semantic.Telemetry where
+module Semantic.Telemetry
+( writeLog
+, writeStat
+, time
+, Telemetry
+, Queues(..)
+, runTelemetry
+, ignoreTelemetry
+) where
 
 import Control.Monad.Effect.Internal hiding (run)
 import Control.Monad.Effect.Reader
