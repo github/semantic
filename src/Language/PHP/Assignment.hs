@@ -103,6 +103,7 @@ type Syntax = '[
   , Syntax.NamespaceUseDeclaration
   , Syntax.NamespaceUseGroupClause
   , Syntax.NewVariable
+  , Syntax.Paren
   , Syntax.PrintIntrinsic
   , Syntax.Program
   , Syntax.PropertyDeclaration
@@ -287,7 +288,7 @@ primaryExpression = choice [
   ]
 
 parenthesizedExpression :: Assignment
-parenthesizedExpression = symbol ParenthesizedExpression *> children (term expression)
+parenthesizedExpression = makeTerm <$> symbol ParenthesizedExpression <*> (Syntax.Paren <$> children (term expression))
 
 classConstantAccessExpression :: Assignment
 classConstantAccessExpression = makeTerm <$> symbol ClassConstantAccessExpression <*> children (Expression.MemberAccess <$> term scopeResolutionQualifier <*> term name)

@@ -72,6 +72,7 @@ type Syntax = '[
   , Syntax.Empty
   , Syntax.Error
   , Syntax.Identifier
+  , Syntax.Paren
   , Syntax.Program
   , Ruby.Syntax.Class
   , Ruby.Syntax.Load
@@ -141,7 +142,7 @@ expressions :: Assignment
 expressions = makeTerm'' <$> location <*> many expression
 
 parenthesizedExpressions :: Assignment
-parenthesizedExpressions = makeTerm'' <$> symbol ParenthesizedStatements <*> children (many expression)
+parenthesizedExpressions = makeTerm'' <$> symbol ParenthesizedStatements <*> children (Syntax.Paren <$> expressions)
 
 identifier :: Assignment
 identifier =

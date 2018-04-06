@@ -146,6 +146,17 @@ instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 instance Evaluatable Empty where
   eval _ = unit
 
+-- | A parenthesized expression or statement. All the languages we target support this concept.
+
+newtype Paren a = Paren a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 Paren where liftEq = genericLiftEq
+instance Ord1 Paren where liftCompare = genericLiftCompare
+instance Show1 Paren where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Paren where
+  eval (Paren a) = subtermValue a
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }

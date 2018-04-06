@@ -16,9 +16,10 @@
         (
           (SendChannel
             (Identifier))
-          (Minus
-            (Identifier)
-            (Identifier)))
+          (Paren
+            (Minus
+              (Identifier)
+              (Identifier))))
         (Empty))
       (Call
         (Identifier)

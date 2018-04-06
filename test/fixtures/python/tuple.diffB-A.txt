@@ -2,12 +2,16 @@
 {+(Tuple
   {+(Identifier)+}
   {+(Identifier)+})+}
-  (Tuple
+{+(Tuple
   {+(Identifier)+}
-    (Identifier)
-    (Identifier)
-  {-(Identifier)-})
+  {+(Identifier)+}
+  {+(Identifier)+})+}
+{-(Tuple
+  {-(Identifier)-}
+  {-(Identifier)-}
+  {-(Identifier)-})-}
 {-(Tuple
   {-(Identifier)-}
   {-(Identifier)-})-}
-{-(Identifier)-})
+{-(Paren
+  {-(Identifier)-})-})
