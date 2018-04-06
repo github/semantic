@@ -1,3 +1,3 @@
-require_dependency "foo"
+require_relative "foo"
 
 foo(1)
