@@ -21,11 +21,11 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Function where
   eval Function{..} = do
+    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm functionName)
     (v, addr) <- letrec name (lambda (paramNames functionParameters) functionBody)
     modifyEnv (Env.insert name addr)
     pure v
     where paramNames = foldMap (freeVariables . subterm)
-          name = freeVariable (subterm functionName)
 
 
 data Method a = Method { methodContext :: ![a], methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
@@ -42,11 +42,11 @@ instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 -- local environment.
 instance Evaluatable Method where
   eval Method{..} = do
+    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm methodName)
     (v, addr) <- letrec name (lambda (paramNames methodParameters) methodBody)
     modifyEnv (Env.insert name addr)
     pure v
     where paramNames = foldMap (freeVariables . subterm)
-          name = freeVariable (subterm methodName)
 
 
 -- | A method signature in TypeScript or a method spec in Go.
@@ -144,7 +144,7 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
   eval Class{..} = do
-    let name = freeVariable (subterm classIdentifier)
+    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm classIdentifier)
     supers <- traverse subtermValue classSuperclasses
     (v, addr) <- letrec name $ do
       void $ subtermValue classBody

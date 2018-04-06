@@ -6,6 +6,7 @@ module Data.Abstract.Evaluatable
 , Unspecialized(..)
 , LoadError(..)
 , EvalError(..)
+, ResolutionError(..)
 , variable
 , evaluateTerm
 , evaluateModule
@@ -13,6 +14,8 @@ module Data.Abstract.Evaluatable
 , evaluatePackage
 , evaluatePackageBody
 , throwLoadError
+, throwEvalError
+, throwValueError
 , resolve
 , listModulesInDir
 , require
@@ -42,15 +45,26 @@ type MonadEvaluatable location term value m =
   , MonadAddressable location m
   , MonadAnalysis location term value m
   , MonadThrow (Unspecialized value) m
-  , MonadThrow (ValueExc location value) m
+  , MonadThrow (ValueError location value) m
   , MonadThrow (LoadError term value) m
   , MonadThrow (EvalError value) m
+  , MonadThrow (ResolutionError value) m
   , MonadValue location value m
   , Recursive term
   , Reducer value (Cell location value)
   , Show location
   )
 
+-- | An error thrown when we can't resolve a module from a qualified name.
+data ResolutionError value resume where
+  RubyError :: String -> ResolutionError value ModulePath
+
+deriving instance Eq (ResolutionError a b)
+deriving instance Show (ResolutionError a b)
+instance Show1 (ResolutionError value) where
+  liftShowsPrec _ _ = showsPrec
+instance Eq1 (ResolutionError value) where
+  liftEq _ (RubyError a) (RubyError b) = a == b
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
 data LoadError term value resume where
@@ -67,6 +81,7 @@ instance Eq1 (LoadError term a) where
 data EvalError value resume where
   -- Indicates we weren't able to dereference a name from the evaluated environment.
   FreeVariableError :: Name -> EvalError value value
+  FreeVariablesError :: [Name] -> EvalError value Name
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: MonadEvaluatable location term value m => Name -> m value
@@ -78,9 +93,18 @@ instance Show1 (EvalError value) where
   liftShowsPrec _ _ = showsPrec
 instance Eq1 (EvalError term) where
   liftEq _ (FreeVariableError a) (FreeVariableError b) = a == b
+  liftEq _ (FreeVariablesError a) (FreeVariablesError b) = a == b
+  liftEq _ _ _ = False
+
+
+throwValueError :: MonadEvaluatable location term value m => ValueError location value resume -> m resume
+throwValueError = throwException
 
 throwLoadError :: MonadEvaluatable location term value m => LoadError term value resume -> m resume
 throwLoadError = throwException
+
+throwEvalError :: MonadEvaluatable location term value m => EvalError value resume -> m resume
+throwEvalError = throwException
 
 data Unspecialized a b where
   Unspecialized :: { getUnspecialized :: Prelude.String } -> Unspecialized value value

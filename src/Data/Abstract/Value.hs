@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DataKinds, TypeFamilies, TypeOperators, UndecidableInstances, ScopedTypeVariables #-}
 module Data.Abstract.Value where
 
 import Control.Abstract.Analysis
@@ -190,7 +190,7 @@ instance Ord location => ValueRoots location (Value location) where
 
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance (Monad m, MonadEvaluatable location term (Value location) m) => MonadValue location (Value location) m where
+instance forall location term m. (Monad m, MonadEvaluatable location term (Value location) m) => MonadValue location (Value location) m where
   unit     = pure . injValue $ Unit
   integer  = pure . injValue . Integer . Number.Integer
   boolean  = pure . injValue . Boolean
@@ -232,11 +232,16 @@ instance (Monad m, MonadEvaluatable location term (Value location) m) => MonadVa
 
   asString v
     | Just (String n) <- prjValue v = pure n
-    | otherwise                     = fail ("expected " <> show v <> " to be a string")
+    | otherwise                     = throwException @(ValueError location (Value location)) $ StringError v
 
-  ifthenelse cond if' else'
-    | Just (Boolean b) <- prjValue cond = if b then if' else else'
-    | otherwise = fail ("not defined for non-boolean conditions: " <> show cond)
+  ifthenelse cond if' else' = do
+    bool <- asBool cond
+    if bool then if' else else'
+
+  asBool val
+    | Just (Boolean b) <- prjValue val = pure b
+    | otherwise = throwException @(ValueError location (Value location)) $ BoolError val
+
 
   liftNumeric f arg
     | Just (Integer (Number.Integer i)) <- prjValue arg = integer $ f i
@@ -254,7 +259,7 @@ instance (Monad m, MonadEvaluatable location term (Value location) m) => MonadVa
     | Just (Float    i, Integer j)  <- prjPair pair = f i j & specialize
     | Just (Float    i, Rational j) <- prjPair pair = f i j & specialize
     | Just (Float    i, Float j)    <- prjPair pair = f i j & specialize
-    | otherwise = fail ("Invalid operands to liftNumeric2: " <> show pair)
+    | otherwise = throwValueError (Numeric2Error left right)
       where
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
         specialize :: MonadValue location value m => Number.SomeNumber -> m value
@@ -301,12 +306,14 @@ instance (Monad m, MonadEvaluatable location term (Value location) m) => MonadVa
     injValue . Closure names l . Env.bind (foldr Set.delete (Set.fromList (freeVariables body)) names) <$> getEnv
 
   call op params = do
-    Closure names label env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
-    bindings <- foldr (\ (name, param) rest -> do
-      v <- param
-      a <- alloc name
-      assign a v
-      Env.insert name a <$> rest) (pure env) (zip names params)
-    localEnv (mappend bindings) (goto label >>= evaluateTerm)
+    case prjValue op of
+      Just (Closure names label env) -> do
+        bindings <- foldr (\ (name, param) rest -> do
+          v <- param
+          a <- alloc name
+          assign a v
+          Env.insert name a <$> rest) (pure env) (zip names params)
+        localEnv (mappend bindings) (goto label >>= evaluateTerm)
+      Nothing -> throwException @(ValueError location (Value location)) (CallError op)
 
   loop = fix
