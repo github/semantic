@@ -1,16 +1,20 @@
 (Program
   (If
-    (Identifier)
+    (Paren
+      (Identifier))
     (Identifier)
     (If
-      (Identifier)
+      (Paren
+        (Identifier))
       (
         (Identifier))
       (If
-        (Identifier)
+        (Paren
+          (Identifier))
         (Identifier)
         (If
-          (Identifier)
+          (Paren
+            (Identifier))
           (
             (Identifier))
           (Identifier))))))

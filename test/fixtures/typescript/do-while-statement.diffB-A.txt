@@ -1,7 +1,8 @@
 (Program
   (DoWhile
-  { (Boolean)
-  ->(Boolean) }
+    (Paren
+    { (Boolean)
+    ->(Boolean) })
     (
       (Call
         (MemberAccess
