@@ -138,6 +138,14 @@ instance (Syntax.Identifier :< fs, Expression.MemberAccess :< fs) => CustomHasDe
         | otherwise = [getSource modAnn]
       getSource = toText . flip Source.slice blobSource . getField
 
+instance CustomHasDeclaration (Union fs) Ruby.Syntax.Send where
+  customToDeclaration Blob{..} _ (Ruby.Syntax.Send _ selector _ _) =
+    Just $ CallReference selectorText [] -- TODO what is this list supposed to represent?
+      where
+        (Term (In selectorAnn _), _) = selector
+        getSource = toText . flip Source.slice blobSource . getField
+        selectorText = getSource selectorAnn
+
 -- | Produce a 'Declaration' for 'Union's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
 instance Apply (HasDeclaration' whole) fs => CustomHasDeclaration whole (Union fs) where
   customToDeclaration blob ann = apply (Proxy :: Proxy (HasDeclaration' whole)) (toDeclaration' blob ann)
@@ -160,6 +168,7 @@ class HasDeclarationWithStrategy (strategy :: Strategy) whole syntax where
 --   If you’re seeing errors about missing a 'CustomHasDeclaration' instance for a given type, you’ve probably listed it in here but not defined a 'CustomHasDeclaration' instance for it, or else you’ve listed the wrong type in here. Conversely, if your 'customHasDeclaration' method is never being called, you may have forgotten to list the type in here.
 type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Class = 'Custom
+  DeclarationStrategy Ruby.Syntax.Send = 'Custom
   DeclarationStrategy Ruby.Syntax.Class = 'Custom
   DeclarationStrategy Declaration.Function = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
