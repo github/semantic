@@ -2,8 +2,11 @@
 module Parsing.Parser
 ( Parser(..)
 , SomeParser(..)
+, SomeAnalysisParser(..)
 , someParser
+, someAnalysisParser
 , ApplyAll
+, ApplyAll'
 -- À la carte parsers
 , goParser
 , jsonParser
@@ -39,6 +42,32 @@ import TreeSitter.Python
 import TreeSitter.Ruby
 import TreeSitter.TypeScript
 
+
+type family ApplyAll' (typeclasses :: [(* -> *) -> Constraint]) (fs :: [* -> *]) :: Constraint where
+  ApplyAll' (typeclass ': typeclasses) fs = (Apply typeclass fs, ApplyAll' typeclasses fs)
+  ApplyAll' '[] fs = ()
+
+data SomeAnalysisParser typeclasses ann where
+  SomeAnalysisParser :: (Member Syntax.Identifier fs, ApplyAll' typeclasses fs) => Parser (Term (Union fs) ann) -> [String] -> SomeAnalysisParser typeclasses ann
+
+someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
+                      , ApplyAll' typeclasses PHP.Syntax
+                      , ApplyAll' typeclasses Python.Syntax
+                      , ApplyAll' typeclasses Ruby.Syntax
+                      , ApplyAll' typeclasses TypeScript.Syntax
+                      )
+                   => proxy typeclasses                        -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
+                   -> Language                                 -- ^ The 'Language' to select.
+                   -> SomeAnalysisParser typeclasses (Record Location) -- ^ A 'SomeAnalysisParser abstracting the syntax type to be produced.
+someAnalysisParser _ Go         = SomeAnalysisParser goParser ["go"]
+someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser ["js"]
+someAnalysisParser _ PHP        = SomeAnalysisParser phpParser ["php"]
+someAnalysisParser _ Python     = SomeAnalysisParser pythonParser ["py"]
+someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser ["rb"]
+someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser ["ts", "tsx", "d.tsx"]
+someAnalysisParser _ l          = error $ "Analysis not supported for: " <> show l
+
+
 -- | A parser from 'Source' onto some term type.
 data Parser term where
   -- | A parser producing 'AST' using a 'TS.Language'.
@@ -51,10 +80,12 @@ data Parser term where
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
 
--- | Apply all of a list of typeclasses to all of a list of functors using 'Apply'. Used by 'someParser' to constrain all of the language-specific syntax types to the typeclasses in question.
+-- | Apply all of a list of typeclasses to all of a list of functors using 'Apply'. Used by 'someAnalysisParser to constrain all of the language-specific syntax types to the typeclasses in question.
 type family ApplyAll (typeclasses :: [(* -> *) -> Constraint]) (syntax :: * -> *) :: Constraint where
   ApplyAll (typeclass ': typeclasses) syntax = (typeclass syntax, ApplyAll typeclasses syntax)
   ApplyAll '[] syntax = ()
+
+
 
 -- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
 --

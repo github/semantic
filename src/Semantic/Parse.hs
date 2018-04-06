@@ -5,6 +5,8 @@ import Analysis.ConstructorName (ConstructorName, constructorLabel)
 import Analysis.IdentifierName (IdentifierName, identifierLabel)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
 import Analysis.PackageDef (HasPackageDef, packageDefAlgebra)
+import qualified Data.Abstract.Evaluatable as Analysis
+import Data.Abstract.FreeVariables
 import Data.Blob
 import Data.JSON.Fields
 import Data.Output
@@ -15,21 +17,20 @@ import Rendering.Renderer
 import Semantic.IO (NoLanguageForBlob(..), Files)
 import Semantic.Task
 import System.FilePath.Posix
-import Data.Language as Language
+import Data.ByteString.Char8 as BC (pack)
 
-graph :: (Members '[Distribute WrappedTask, Files, Task, Exc SomeException] effs, Output output) => TermRenderer output -> Blob -> Eff effs ByteString
-graph renderer blob@Blob{..} = do
-    parser <- parserForLanguage blobLanguage
+
+graph :: (Members '[Distribute WrappedTask, Files, Task, Exc SomeException] effs) => TermRenderer output -> Blob -> Eff effs ByteString
+graph _ Blob{..}
+  | Just (SomeAnalysisParser parser exts) <- someAnalysisParser
+    (Proxy :: Proxy '[ Analysis.Evaluatable, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) <$> blobLanguage = do
     let rootDir = takeDirectory blobPath
-    paths <- filter (/= blobPath) <$> listFiles rootDir ["go"]
-    package <- parsePackage "test" parser rootDir (blobPath : paths)
+    paths <- filter (/= blobPath) <$> listFiles rootDir exts
+    package <- parsePackage (packageName blobPath) parser rootDir (blobPath : paths)
     graphImports package
+  | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
 
-
-  where
-    -- parserForLanguage (Just Language.Ruby) = pure rubyParser
-    parserForLanguage (Just Language.Go) = pure goParser
-    parserForLanguage _ = throwError (SomeException (NoLanguageForBlob blobPath))
+  where packageName = name . BC.pack . dropExtensions . takeFileName
 
 
 parseBlobs :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Output output) => TermRenderer output -> [Blob] -> Eff effs ByteString
