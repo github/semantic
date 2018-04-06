@@ -27,6 +27,6 @@ instance ( Effectful m
 
   analyzeTerm eval term = resumeException @(ResolutionError value) (liftAnalyze analyzeTerm eval term) (
         \yield error -> case error of
-          (RubyError _) -> yield "")
+          (RubyError nameToResolve) -> yield nameToResolve)
 
   analyzeModule = liftAnalyze analyzeModule
