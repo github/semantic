@@ -1,6 +1,6 @@
 (Program
   (Identifier)
-  (MemberAccess
+  (Send
     (Identifier)
     (Identifier))
   (Identifier))
