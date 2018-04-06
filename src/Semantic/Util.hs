@@ -85,9 +85,7 @@ typecheckTypeScriptFile path = runAnalysis @(Caching (Evaluating Monovariant Typ
 runEvaluating :: forall term effects a.
                  ( Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects) ~ effects
                  , Corecursive term
-                 , Recursive term
-                 , Evaluatable (Base term)
-                 , FreeVariables term)
+                 , Recursive term )
               => Evaluating Precise term (Value Precise) effects a
               -> Final effects a
 runEvaluating = runAnalysis @(Evaluating Precise term (Value Precise))
