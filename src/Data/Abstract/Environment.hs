@@ -1,6 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses, TypeFamilies #-}
 module Data.Abstract.Environment
-  ( Environment
+  ( Environment(..)
   , addresses
   , bind
   , delete
@@ -25,6 +25,7 @@ import qualified Data.Map as Map
 import           Data.Semigroup.Reducer
 import           GHC.Exts (IsList (..))
 import           Prologue
+import qualified Data.List.NonEmpty as NonEmpty
 
 -- $setup
 -- >>> let bright = push (insert (name "foo") (Address (Precise 0)) mempty)
@@ -74,13 +75,15 @@ pop (Environment (_ :| a : as)) = Environment (a :| as)
 head :: Environment l a -> Environment l a
 head (Environment (a :| _)) = Environment (a :| [])
 
-
 -- | Take the union of two environments. When duplicate keys are found in the
 --   name to address map, the second definition wins.
 mergeNewer :: Environment l a -> Environment l a -> Environment l a
-mergeNewer (Environment (a :| as)) (Environment (b :| bs)) =
-  Environment (combine a b :| alignWith (mergeThese combine) as bs)
-  where combine = Map.unionWith (flip const)
+mergeNewer (Environment a) (Environment b) =
+    Environment (NonEmpty.fromList . reverse $ alignWith (mergeThese combine) (reverse as) (reverse bs))
+    where
+      combine = Map.unionWith (flip const)
+      as = NonEmpty.toList a
+      bs = NonEmpty.toList b
 
 -- | Extract an association list of bindings from an 'Environment'.
 --

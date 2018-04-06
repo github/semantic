@@ -11,6 +11,8 @@ import           Diffing.Algorithm
 import           Prelude hiding (fail)
 import           Prologue
 import           System.FilePath.Posix
+import qualified Data.List.NonEmpty as NonEmpty
+import Data.Abstract.Environment
 
 
 -- TODO: Fully sort out ruby require/load mechanics
@@ -48,7 +50,7 @@ instance Evaluatable Require where
     name <- subtermValue x >>= asString
     path <- resolveRubyName name
     (importedEnv, v) <- isolate (doRequire path)
-    modifyEnv (mappend importedEnv)
+    modifyEnv (`mergeNewer` importedEnv)
     pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
 doRequire :: MonadEvaluatable location term value m
