@@ -11,11 +11,11 @@ module Control.Abstract.Value
 ) where
 
 import Control.Abstract.Evaluator
-import Data.Abstract.FreeVariables
-import Data.Abstract.Environment as Env
 import Data.Abstract.Address (Address, Cell)
-import Data.Abstract.Number as Number
+import Data.Abstract.Environment as Env
+import Data.Abstract.FreeVariables
 import Data.Abstract.Live (Live)
+import Data.Abstract.Number as Number
 import Data.Scientific (Scientific)
 import Data.Semigroup.Reducer hiding (unit)
 import Prelude
@@ -202,7 +202,7 @@ instance Eq value => Eq1 (ValueError location value) where
   liftEq _ (ScopedEnvironmentError a) (ScopedEnvironmentError b) = a == b
   liftEq _ (CallError a) (CallError b)                           = a == b
   liftEq _ (BoolError a) (BoolError c)                           = a == c
-  liftEq _ (Numeric2Error a b) (Numeric2Error c d)                           = (a == c) && (b == d)
+  liftEq _ (Numeric2Error a b) (Numeric2Error c d)               = (a == c) && (b == d)
   liftEq _ _             _                                       = False
 
 deriving instance (Show value) => Show (ValueError location value resume)
