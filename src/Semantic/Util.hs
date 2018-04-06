@@ -63,7 +63,7 @@ evalGoFile path = runEvaluating . evaluateModule <$> parseFile goParser Nothing 
 typecheckGoFile path = runAnalysis @(Caching (Evaluating Monovariant Go.Term Type)) . evaluateModule <$> parseFile goParser Nothing path
 
 -- Python
-evalPythonProject path = runEvaluating . evaluatePackageBody <$> parseProject pythonParser ["py"] path
+evalPythonProject path = runEvaluatingWithPrelude pythonParser ["py"] path
 evalPythonFile path = runEvaluating <$> (withPrelude <$> parsePrelude pythonParser <*> (evaluateModule <$> parseFile pythonParser Nothing path))
 
 evaluatePythonImportGraph name paths = runAnalysis @(ImportGraphing (Evaluating (Located Precise Python.Term) Python.Term (Value (Located Precise Python.Term)))) . evaluatePackage <$> parsePackage name pythonParser (dropFileName (head paths)) paths
@@ -80,6 +80,8 @@ evalPHPFile path = runEvaluating . evaluateModule <$> parseFile phpParser Nothin
 evalTypeScriptProject path = runEvaluating . evaluatePackageBody <$> parseProject typescriptParser ["ts", "tsx"] path
 evalTypeScriptFile path = runEvaluating . evaluateModule <$> parseFile typescriptParser Nothing path
 typecheckTypeScriptFile path = runAnalysis @(Caching (Evaluating Monovariant TypeScript.Term Type)) . evaluateModule <$> parseFile typescriptParser Nothing path
+
+runEvaluatingWithPrelude parser exts path = fmap runEvaluating . (withPrelude <$> parsePrelude parser <*> evaluatePackageBody <$> parseProject parser exts path)
 
 -- TODO: Remove this by exporting EvaluatingEffects
 runEvaluating :: forall term effects a.
