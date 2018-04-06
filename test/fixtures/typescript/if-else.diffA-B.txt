@@ -1,23 +1,27 @@
 (Program
   (If
-  { (Identifier)
-  ->(Identifier) }
+    (Paren
+    { (Identifier)
+    ->(Identifier) })
   { (Identifier)
   ->(Identifier) }
     (If
-    { (Identifier)
-    ->(Identifier) }
+      (Paren
+      { (Identifier)
+      ->(Identifier) })
     { (Identifier)
     ->(
       {+(Identifier)+}) }
       (If
-      { (Identifier)
-      ->(Identifier) }
+        (Paren
+        { (Identifier)
+        ->(Identifier) })
       { (Identifier)
       ->(Identifier) }
         (If
-        { (Identifier)
-        ->(Identifier) }
+          (Paren
+          { (Identifier)
+          ->(Identifier) })
         { (Identifier)
         ->(
           {+(Identifier)+}) }

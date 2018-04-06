@@ -4,10 +4,11 @@
     (Hash
       (KeyValue
         (Identifier)
-        (SequenceExpression
-          (Float)
+        (Paren
           (SequenceExpression
-            (Plus
-              (Float)
-              (Float))
-            (Float)))))))
+            (Float)
+            (SequenceExpression
+              (Plus
+                (Float)
+                (Float))
+              (Float))))))))
