@@ -7,6 +7,8 @@ module Semantic.Task
 , RAlgebra
 , Differ
 -- * I/O
+, IO.listFiles
+, IO.readBlob
 , IO.readBlobs
 , IO.readBlobPairs
 , IO.writeToOutput

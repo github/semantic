@@ -12,8 +12,25 @@ import Data.Record
 import Parsing.Parser
 import Prologue hiding (MonadError(..))
 import Rendering.Renderer
-import Semantic.IO (NoLanguageForBlob(..))
+import Semantic.IO (NoLanguageForBlob(..), Files)
 import Semantic.Task
+import System.FilePath.Posix
+import Data.Language as Language
+
+graph :: (Members '[Distribute WrappedTask, Files, Task, Exc SomeException] effs, Output output) => TermRenderer output -> Blob -> Eff effs ByteString
+graph renderer blob@Blob{..} = do
+    parser <- parserForLanguage blobLanguage
+    let rootDir = takeDirectory blobPath
+    paths <- filter (/= blobPath) <$> listFiles rootDir ["go"]
+    package <- parsePackage "test" parser rootDir (blobPath : paths)
+    graphImports package
+
+
+  where
+    -- parserForLanguage (Just Language.Ruby) = pure rubyParser
+    parserForLanguage (Just Language.Go) = pure goParser
+    parserForLanguage _ = throwError (SomeException (NoLanguageForBlob blobPath))
+
 
 parseBlobs :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Output output) => TermRenderer output -> [Blob] -> Eff effs ByteString
 parseBlobs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . parseBlob renderer) blobs
