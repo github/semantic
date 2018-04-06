@@ -81,7 +81,7 @@ evalTypeScriptProject path = runEvaluating . evaluatePackageBody <$> parseProjec
 evalTypeScriptFile path = runEvaluating . evaluateModule <$> parseFile typescriptParser Nothing path
 typecheckTypeScriptFile path = runAnalysis @(Caching (Evaluating Monovariant TypeScript.Term Type)) . evaluateModule <$> parseFile typescriptParser Nothing path
 
-runEvaluatingWithPrelude parser exts path = fmap runEvaluating . (withPrelude <$> parsePrelude parser <*> evaluatePackageBody <$> parseProject parser exts path)
+runEvaluatingWithPrelude parser exts path = runEvaluating <$> (withPrelude <$> parsePrelude parser <*> (evaluatePackageBody <$> parseProject parser exts path))
 
 -- TODO: Remove this by exporting EvaluatingEffects
 runEvaluating :: forall term effects a.
