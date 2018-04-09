@@ -1,4 +1,3 @@
 (Program
-  (Call
-    (Identifier)
-    (Empty)))
+  (Send
+    (Identifier)))
