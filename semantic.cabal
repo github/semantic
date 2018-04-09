@@ -140,6 +140,7 @@ library
                      , Semantic.CLI
                      , Semantic.Diff
                      , Semantic.Distribute
+                     , Semantic.Graph
                      , Semantic.IO
                      , Semantic.Log
                      , Semantic.Parse
