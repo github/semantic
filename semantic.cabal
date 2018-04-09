@@ -237,7 +237,6 @@ test-suite test
                      , Data.Diff.Spec
                      , Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
-                     , Data.Mergeable.Spec
                      , Data.Scientific.Spec
                      , Data.Source.Spec
                      , Data.Term.Spec
