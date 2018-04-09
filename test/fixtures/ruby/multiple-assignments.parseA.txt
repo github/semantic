@@ -36,17 +36,17 @@
     (Identifier))
   (Assignment
     (
-      (MemberAccess
+      (Send
         (Identifier)
         (Identifier))
-      (MemberAccess
+      (Send
         (Identifier)
         (Identifier)))
     (
-      (MemberAccess
+      (Send
         (Identifier)
         (Identifier))
-      (MemberAccess
+      (Send
         (Identifier)
         (Identifier))))
   (Assignment

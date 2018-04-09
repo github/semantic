@@ -1,25 +1,17 @@
 (Program
 {+(Identifier)+}
-{+(MemberAccess
-  {+(Identifier)+}
-  {+(Identifier)+})+}
+{-(Send
+  {-(Identifier)-}
+  {-(TextElement)-})-}
+  (Send
+    (Identifier)
+    (Identifier))
 {+(Identifier)+}
-{-(Call
-  {-(Identifier)-}
-  {-(TextElement)-}
-  {-(Empty)-})-}
-{-(Call
-  {-(MemberAccess
-    {-(Identifier)-}
-    {-(Identifier)-})-}
-  {-(Empty)-})-}
-{-(Call
+{-(Send
   {-(Identifier)-}
   {-(Integer)-}
-  {-(Integer)-}
-  {-(Empty)-})-}
-{-(Call
+  {-(Integer)-})-}
+{-(Send
   {-(Identifier)-}
   {-(Integer)-}
-  {-(Integer)-}
-  {-(Empty)-})-})
+  {-(Integer)-})-})
