@@ -17,15 +17,14 @@ import           Data.Abstract.Located
 import           Data.Abstract.Module hiding (Module)
 import           Data.Abstract.Origin hiding (Module, Package)
 import           Data.Abstract.Package hiding (Package)
+import           Data.Aeson
 import qualified Data.ByteString.Char8 as BC
+import           Data.ByteString.Lazy (toStrict)
+import           Data.Output
 import qualified Data.Syntax as Syntax
 import           Data.Term
+import           Data.Text.Encoding as T
 import           Prologue hiding (empty, packageName)
-
-import Data.Aeson
-import Data.Output
-import Data.Text.Encoding as T
-import Data.ByteString.Lazy (toStrict)
 
 -- | The graph of function variableDefinitions to symbols used in a given program.
 newtype ImportGraph = ImportGraph { unImportGraph :: G.Graph Vertex }
