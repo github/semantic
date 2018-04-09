@@ -1,20 +1,15 @@
 (Program
-  (Call
+  (Send
     (Identifier)
-    (TextElement)
-    (Empty))
-  (Call
-    (MemberAccess
-      (Identifier)
-      (Identifier))
-    (Empty))
-  (Call
+    (TextElement))
+  (Send
+    (Identifier)
+    (Identifier))
+  (Send
     (Identifier)
     (Integer)
-    (Integer)
-    (Empty))
-  (Call
+    (Integer))
+  (Send
     (Identifier)
     (Integer)
-    (Integer)
-    (Empty)))
+    (Integer)))
