@@ -9,7 +9,6 @@ import qualified Data.ByteString.Char8 as BC
 import           Data.Functor.Classes.Generic
 import           Data.List (intercalate)
 import qualified Data.List.NonEmpty as NonEmpty
-import           Data.Mergeable
 import           Diffing.Algorithm
 import           GHC.Generics
 import           Prelude hiding (fail)
