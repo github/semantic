@@ -31,32 +31,12 @@ import Data.ByteString.Lazy (toStrict)
 newtype ImportGraph = ImportGraph { unImportGraph :: G.Graph Vertex }
   deriving (Eq, Graph, Show)
 
-instance Output ImportGraph where
-  toOutput = toStrict . (<> "\n") . encode
-
-instance ToJSON ImportGraph where
-  toJSON ImportGraph{..} = object [ "vertices" .= vertices, "edges" .= edges ]
-    where
-      vertices = toJSON (G.vertexList unImportGraph)
-      edges = fmap (\(a, b) -> object [ "source" .= vertexToText a, "target" .= vertexToText b ]) (G.edgeList unImportGraph)
-
-vertexToText :: Vertex -> Text
-vertexToText = decodeUtf8 . vertexName
-
-vertexToType :: Vertex -> Text
-vertexToType Package{..} = "package"
-vertexToType Module{..} = "module"
-vertexToType Variable{..} = "variable"
-
 -- | A vertex of some specific type.
 data Vertex
   = Package  { vertexName :: ByteString }
   | Module   { vertexName :: ByteString }
   | Variable { vertexName :: ByteString }
   deriving (Eq, Ord, Show)
-
-instance ToJSON Vertex where
-  toJSON v = object [ "name" .= vertexToText v, "type" .= vertexToType v ]
 
 -- | Render a 'ImportGraph' to a 'ByteString' in DOT notation.
 renderImportGraph :: ImportGraph -> ByteString
@@ -176,3 +156,23 @@ instance Ord ImportGraph where
   compare (ImportGraph (G.Overlay _  _))  _                               = LT
   compare _                               (ImportGraph (G.Overlay _ _))   = GT
   compare (ImportGraph (G.Connect a1 a2)) (ImportGraph (G.Connect b1 b2)) = (compare `on` ImportGraph) a1 b1 <> (compare `on` ImportGraph) a2 b2
+
+instance Output ImportGraph where
+  toOutput = toStrict . (<> "\n") . encode
+
+instance ToJSON ImportGraph where
+  toJSON ImportGraph{..} = object [ "vertices" .= vertices, "edges" .= edges ]
+    where
+      vertices = toJSON (G.vertexList unImportGraph)
+      edges = fmap (\(a, b) -> object [ "source" .= vertexToText a, "target" .= vertexToText b ]) (G.edgeList unImportGraph)
+
+instance ToJSON Vertex where
+  toJSON v = object [ "name" .= vertexToText v, "type" .= vertexToType v ]
+
+vertexToText :: Vertex -> Text
+vertexToText = decodeUtf8 . vertexName
+
+vertexToType :: Vertex -> Text
+vertexToType Package{}  = "package"
+vertexToType Module{}   = "module"
+vertexToType Variable{} = "variable"
