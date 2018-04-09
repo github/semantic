@@ -14,9 +14,9 @@ import GHC.Generics
 --
 -- This is a kind of distributive law which produces (at least) the union of the two functors’ shapes; i.e. unlike 'Traversable', an 'empty' value in the inner functor does not produce an 'empty' result, and unlike 'Crosswalk', an 'empty' value in the outer functor does not produce an 'empty' result.
 --
--- For example, 'Data.Diff' uses 'sequenceAlt' to select one side or the other of a diff node, while correctly handling the fact that some patches don’t have any content for that side:
+-- For example, 'Data.Diff' uses 'sequenceAlt' to select one side or the other of a diff node, while correctly handling the fact that some patches don’t have any content for that side.
 class Functor t => Mergeable t where
-  -- | Sequnce a 'Mergeable' functor by merging the 'Alternative' values.
+  -- | Sequence a 'Mergeable' functor by merging the 'Alternative' values.
   sequenceAlt :: Alternative f => t (f a) -> f (t a)
   default sequenceAlt :: (Generic1 t, GMergeable (Rep1 t), Alternative f) => t (f a) -> f (t a)
   sequenceAlt = genericSequenceAlt
