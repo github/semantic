@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DefaultSignatures, GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures, GADTs, TypeOperators, UndecidableInstances #-}
 module Diffing.Algorithm where
 
 import Control.Monad.Free.Freer
