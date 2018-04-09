@@ -2,9 +2,10 @@
   (Require
   { (TextElement)
   ->(TextElement) })
-  (Send
+  (Call
   { (Identifier)
   ->(Identifier) }
   {+(Symbol)+}
   {+(TextElement)+}
-  {-(Identifier)-}))
+  {-(Identifier)-}
+    (Empty)))

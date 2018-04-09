@@ -53,6 +53,7 @@ import           Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
 import qualified Control.Abstract.Analysis as Analysis
 import qualified Control.Exception as Exc
+import           Control.Monad
 import           Control.Monad.Effect.Exception
 import           Control.Monad.Effect.Internal as Eff hiding (run)
 import           Control.Monad.Effect.Reader
@@ -228,6 +229,7 @@ runParser blob@Blob{..} parser = case parser of
               _ -> do
                 writeStat (Stat.increment "parse.assign_warnings" languageTag)
                 logError options Warning blob err (("task", "assign") : blobFields)
+                when (optionsFailOnWarning options) $ throwError (toException err)
           writeStat (Stat.count "parse.nodes" (length term) languageTag)
           pure term
   MarkdownParser ->

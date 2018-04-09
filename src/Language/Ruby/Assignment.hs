@@ -74,7 +74,6 @@ type Syntax = '[
   , Syntax.Identifier
   , Syntax.Paren
   , Syntax.Program
-  , Ruby.Syntax.Send
   , Ruby.Syntax.Class
   , Ruby.Syntax.Load
   , Ruby.Syntax.LowPrecedenceBoolean
@@ -84,8 +83,7 @@ type Syntax = '[
   ]
 
 type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment' a = HasCallStack => Assignment.Assignment [] Grammar a
-type Assignment = Assignment' Term
+type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
@@ -293,12 +291,9 @@ pair :: Assignment
 pair =   makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> (expression <|> emptyTerm))
 
 methodCall :: Assignment
-methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> funcCall <|> regularCall)
+methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> regularCall)
   where
-    funcCall = inj <$> (Ruby.Syntax.Send Nothing <$> methodSelector <*> args <*> optional block)
-
-    regularCall = inj <$> (symbol Call *> children (Ruby.Syntax.Send <$> (Just <$> expression) <*> methodSelector) <*> args <*> optional block)
-
+    regularCall = inj <$> (Expression.Call <$> pure [] <*> expression <*> args <*> (block <|> emptyTerm))
     require = inj <$> (symbol Identifier *> do
       s <- source
       guard (s `elem` ["require", "require_relative"])
@@ -307,17 +302,14 @@ methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> 
       s <- source
       guard (s == "load")
       Ruby.Syntax.Load <$> loadArgs)
-    args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> many expression
+    args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> pure []
     loadArgs = (symbol ArgumentList <|> symbol ArgumentListWithParens)  *> children (some expression)
     nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
 
-methodSelector :: Assignment
-methodSelector = mk Identifier <|> mk Identifier'
-  where
-    mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> (name <$> source))
-
 call :: Assignment
-call = makeTerm <$> symbol Call <*> children (Ruby.Syntax.Send <$> (Just <$> expression) <*> methodSelector <*> pure [] <*> optional block)
+call = makeTerm <$> symbol Call <*> children (Expression.MemberAccess <$> expression <*> (args <|> expressions))
+  where
+    args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expressions
 
 rescue :: Assignment
 rescue =  rescue'
