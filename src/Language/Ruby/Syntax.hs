@@ -36,22 +36,6 @@ maybeFailNotFound name = maybeFail notFound
 cleanNameOrPath :: ByteString -> String
 cleanNameOrPath = BC.unpack . dropRelativePrefix . stripQuotes
 
-data Send a = Send { sendReceiver :: Maybe a, sendSelector :: a, sendArgs :: [a], sendBlock :: Maybe a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 Send where liftEq = genericLiftEq
-instance Ord1 Send where liftCompare = genericLiftCompare
-instance Show1 Send where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable Send where
-  eval Send{..} = do
-    func <- case sendReceiver of
-      Just recv -> do
-        recvEnv <- subtermValue recv >>= scopedEnvironment
-        localEnv (mappend recvEnv) (subtermValue sendSelector)
-      Nothing -> subtermValue sendSelector -- TODO Does this require `localize` so we don't leak terms when resolving `sendSelector`?
-    call func (map subtermValue sendArgs) -- TODO pass through sendBlock
-
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 

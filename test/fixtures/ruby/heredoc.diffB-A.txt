@@ -1,9 +1,12 @@
 (Program
 {+(TextElement)+}
 {+(TextElement)+}
-{-(Send
-  {-(Send
-    {-(Identifier)-}
-    {-(TextElement)-}
-    {-(TextElement)-})-}
-  {-(Identifier)-})-})
+{-(Call
+  {-(MemberAccess
+    {-(Call
+      {-(Identifier)-}
+      {-(TextElement)-}
+      {-(TextElement)-}
+      {-(Empty)-})-}
+    {-(Identifier)-})-}
+  {-(Empty)-})-})

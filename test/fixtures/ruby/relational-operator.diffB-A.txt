@@ -1,5 +1,5 @@
 (Program
-{ (Comparison
+{(Comparison
   {-(Identifier)-}
   {-(Identifier)-})
 ->(Equal
@@ -17,5 +17,4 @@
   {-(Identifier)-})-}
 {-(Assignment
   {-(Identifier)-}
-  {-(Not
-    {-(Identifier)-})-})-})
+  {-(Not{-(Identifier)-})-})- })

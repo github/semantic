@@ -6,9 +6,10 @@
     {+(Integer)+}
     {+(Integer)+}
     {+(Integer)+})+}
-  {+(Send
+  {+(Call
     {+(Identifier)+}
-    {+(Identifier)+})+})+}
+    {+(Identifier)+}
+    {+(Empty)+})+})+}
 {-(ForEach
   {-(
     {-(Identifier)-})-}

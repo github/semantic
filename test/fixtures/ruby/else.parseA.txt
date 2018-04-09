@@ -1,8 +1,9 @@
 (Program
   (Try
     (
-      (Send
-        (Identifier))
+      (Call
+        (Identifier)
+        (Empty))
       (Else
         (Empty)
         ([])))))

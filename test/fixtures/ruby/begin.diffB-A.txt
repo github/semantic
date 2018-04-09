@@ -4,7 +4,8 @@
     (Identifier)
     (
       (Try
-      { (Send
+      { (Call
         {-(Identifier)-}
-        {-(TextElement)-})
+        {-(TextElement)-}
+        {-(Empty)-})
       ->([]) }))))
