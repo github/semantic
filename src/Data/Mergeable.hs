@@ -37,15 +37,24 @@ instance Mergeable [] where
   merge f (x:xs) = ((:) <$> f x <|> pure id) <*> merge f xs
   merge _ [] = pure []
 
+  sequenceAlt = foldr (\ x -> (((:) <$> x <|> pure id) <*>)) (pure [])
+
 instance Mergeable NonEmpty where
-  merge f (x:|[]) = (:|) <$> f x <*> pure []
+  merge f (x :|[])    = (:|) <$> f x  <*> pure []
   merge f (x1:|x2:xs) = (:|) <$> f x1 <*> merge f (x2 : xs) <|> merge f (x2:|xs)
+
+  sequenceAlt (x :|[])    = (:|) <$> x  <*> pure []
+  sequenceAlt (x1:|x2:xs) = (:|) <$> x1 <*> sequenceAlt (x2 : xs) <|> sequenceAlt (x2:|xs)
 
 instance Mergeable Maybe where
   merge f (Just a) = Just <$> f a
   merge _ Nothing = pure empty
 
-instance Mergeable Identity where merge f = fmap Identity . f . runIdentity
+  sequenceAlt = maybe (pure empty) (fmap Just)
+
+instance Mergeable Identity where
+  merge f = fmap Identity . f . runIdentity
+  sequenceAlt = fmap Identity . runIdentity
 
 instance (Apply Functor fs, Apply Mergeable fs) => Mergeable (Union fs) where
   merge f = apply' (Proxy :: Proxy Mergeable) (\ reinj g -> reinj <$> merge f g)
