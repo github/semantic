@@ -35,7 +35,6 @@ import Control.Monad as X hiding (fail, return, unless, when)
 import Control.Monad.Except as X (MonadError (..))
 import Control.Monad.Fail as X (MonadFail (..))
 import Data.Algebra as X
-import Data.Align.Generic as X (GAlign)
 import Data.Bifoldable as X
 import Data.Bifunctor as X (Bifunctor (..))
 import Data.Bitraversable as X
