@@ -1,5 +1,4 @@
 {-# LANGUAGE DataKinds, DefaultSignatures, GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-} -- FIXME
 module Diffing.Algorithm where
 
 import Control.Monad.Free.Freer
@@ -222,7 +221,7 @@ instance Diffable [] where
 
 -- | Diff two non-empty lists using RWS.
 instance Diffable NonEmpty where
-  algorithmFor (a1:|as1) (a2:|as2) = (\ (a:as) -> a:|as) <$> byRWS (a1:as1) (a2:as2)
+  algorithmFor (a1:|as1) (a2:|as2) = nonEmpty <$> byRWS (a1:as1) (a2:as2) >>= maybe empty pure
 
   tryAlignWith f (a1:|as1) (a2:|as2) = (:|) <$> f (These a1 a2) <*> tryAlignWith f as1 as2
 
