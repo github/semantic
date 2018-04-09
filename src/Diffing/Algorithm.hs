@@ -2,10 +2,10 @@
 {-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-} -- FIXME
 module Diffing.Algorithm where
 
-import Prologue
 import Control.Monad.Free.Freer
 import Data.Diff
 import Data.Term
+import Prologue
 
 -- | A single step in a diffing algorithm, parameterized by the types of terms, diffs, and the result of the applicable algorithm.
 data AlgorithmF term1 term2 result partial where
@@ -142,6 +142,10 @@ class Diffable f where
                  -> Algorithm term1 term2 result (f result)
   algorithmFor = genericAlgorithmFor
 
+  tryAlignWith :: Alternative g => (These a1 a2 -> g b) -> f a1 -> f a2 -> g (f b)
+  default tryAlignWith :: (Alternative g, Generic1 f, GDiffable (Rep1 f)) => (These a1 a2 -> g b) -> f a1 -> f a2 -> g (f b)
+  tryAlignWith f a b = to1 <$> gtryAlignWith f (from1 a) (from1 b)
+
   -- | Construct an algorithm to diff against positions inside an @f@.
   --
   --   This is very like 'traverse', with two key differences:
@@ -189,6 +193,8 @@ genericComparableTo a1 a2 = gcomparableTo (from1 a1) (from1 a2)
 instance Apply Diffable fs => Diffable (Union fs) where
   algorithmFor u1 u2 = fromMaybe empty (apply2' (Proxy :: Proxy Diffable) (\ inj f1 f2 -> inj <$> algorithmFor f1 f2) u1 u2)
 
+  tryAlignWith f u1 u2 = fromMaybe empty (apply2' (Proxy :: Proxy Diffable) (\ inj t1 t2 -> inj <$> tryAlignWith f t1 t2) u1 u2)
+
   subalgorithmFor blur focus = apply' (Proxy :: Proxy Diffable) (\ inj f -> inj <$> subalgorithmFor blur focus f)
 
   equivalentBySubterm = apply (Proxy :: Proxy Diffable) equivalentBySubterm
@@ -201,17 +207,30 @@ instance Apply Diffable fs => Diffable (Union fs) where
 instance Diffable Maybe where
   algorithmFor = diffMaybe
 
+  tryAlignWith f (Just a1) (Just a2) = Just <$> f (These a1 a2)
+  tryAlignWith f (Just a1) Nothing   = Just <$> f (This a1)
+  tryAlignWith f Nothing   (Just a2) = Just <$> f (That a2)
+  tryAlignWith _ Nothing   Nothing   = pure Nothing
+
 -- | Diff two lists using RWS.
 instance Diffable [] where
   algorithmFor = byRWS
+
+  tryAlignWith f (a1:as1) (a2:as2) = (:) <$> f (These a1 a2) <*> tryAlignWith f as1 as2
+  tryAlignWith f []       as2      = traverse (f . That) as2
+  tryAlignWith f as1      []       = traverse (f . This) as1
 
 -- | Diff two non-empty lists using RWS.
 instance Diffable NonEmpty where
   algorithmFor (a1:|as1) (a2:|as2) = (\ (a:as) -> a:|as) <$> byRWS (a1:as1) (a2:as2)
 
+  tryAlignWith f (a1:|as1) (a2:|as2) = (:|) <$> f (These a1 a2) <*> tryAlignWith f as1 as2
+
 -- | A generic type class for diffing two terms defined by the Generic1 interface.
 class GDiffable f where
   galgorithmFor :: f term1 -> f term2 -> Algorithm term1 term2 result (f result)
+
+  gtryAlignWith :: Alternative g => (These a1 a2 -> g b) -> f a1 -> f a2 -> g (f b)
 
   gcomparableTo :: f term1 -> f term2 -> Bool
   gcomparableTo _ _ = True
@@ -220,6 +239,8 @@ class GDiffable f where
 instance GDiffable f => GDiffable (M1 i c f) where
   galgorithmFor (M1 a1) (M1 a2) = M1 <$> galgorithmFor a1 a2
 
+  gtryAlignWith f (M1 a) (M1 b) = M1 <$> gtryAlignWith f a b
+
   gcomparableTo (M1 a1) (M1 a2) = gcomparableTo a1 a2
 
 -- | Diff the fields of a product type.
@@ -227,12 +248,19 @@ instance GDiffable f => GDiffable (M1 i c f) where
 instance (GDiffable f, GDiffable g) => GDiffable (f :*: g) where
   galgorithmFor (a1 :*: b1) (a2 :*: b2) = (:*:) <$> galgorithmFor a1 a2 <*> galgorithmFor b1 b2
 
+  gtryAlignWith f (a1 :*: b1) (a2 :*: b2) = (:*:) <$> gtryAlignWith f a1 a2 <*> gtryAlignWith f b1 b2
+
 -- | Diff the constructors of a sum type.
 -- i.e. data Foo a = Foo a | Bar a (the 'Foo a' is captured by L1 and 'Bar a' is R1).
 instance (GDiffable f, GDiffable g) => GDiffable (f :+: g) where
   galgorithmFor (L1 a1) (L1 a2) = L1 <$> galgorithmFor a1 a2
   galgorithmFor (R1 b1) (R1 b2) = R1 <$> galgorithmFor b1 b2
   galgorithmFor _ _ = empty
+
+  gtryAlignWith f a b = case (a, b) of
+    (L1 a, L1 b) -> L1 <$> gtryAlignWith f a b
+    (R1 a, R1 b) -> R1 <$> gtryAlignWith f a b
+    _ -> empty
 
   gcomparableTo (L1 _) (L1 _) = True
   gcomparableTo (R1 _) (R1 _) = True
@@ -243,18 +271,26 @@ instance (GDiffable f, GDiffable g) => GDiffable (f :+: g) where
 instance GDiffable Par1 where
   galgorithmFor (Par1 a1) (Par1 a2) = Par1 <$> diff a1 a2
 
+  gtryAlignWith f (Par1 a) (Par1 b) = Par1 <$> f (These a b)
+
 -- | Diff two constant parameters (K1 is the Generic1 newtype representing type parameter constants).
 -- i.e. data Foo = Foo Int (the 'Int' is a constant parameter).
 instance Eq c => GDiffable (K1 i c) where
   galgorithmFor (K1 a1) (K1 a2) = guard (a1 == a2) $> K1 a1
+
+  gtryAlignWith _ (K1 a) (K1 b) = guard (a == b) $> K1 b
 
 -- | Diff two terms whose constructors contain 0 type parameters.
 -- i.e. data Foo = Foo.
 instance GDiffable U1 where
   galgorithmFor _ _ = pure U1
 
+  gtryAlignWith _ _ _ = pure U1
+
 -- | Diff two 'Diffable' containers of parameters.
 instance Diffable f => GDiffable (Rec1 f) where
   galgorithmFor a1 a2 = Rec1 <$> algorithmFor (unRec1 a1) (unRec1 a2)
+
+  gtryAlignWith f (Rec1 a) (Rec1 b) = Rec1 <$> tryAlignWith f a b
 
 {-# ANN module ("HLint: ignore Avoid return" :: String) #-}
