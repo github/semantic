@@ -22,9 +22,10 @@
     {+(Integer)+}
     {+(Integer)+}
     {+(Empty)+}) }
-  { (Send
+  { (Call
     {-(Identifier)-}
-    {-(Identifier)-})
+    {-(Identifier)-}
+    {-(Empty)-})
   ->(Boolean) })
 {+(ForEach
   {+(
