@@ -307,7 +307,7 @@ methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> 
       s <- source
       guard (s == "load")
       Ruby.Syntax.Load <$> loadArgs)
-    args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> pure []
+    args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> many expression
     loadArgs = (symbol ArgumentList <|> symbol ArgumentListWithParens)  *> children (some expression)
     nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
 
