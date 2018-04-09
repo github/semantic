@@ -1,12 +1,10 @@
 (Program
   (Try
     (
-      (Call
-        (Identifier)
-        (Empty))
+      (Send
+        (Identifier))
       (Else
         (Empty)
-      { (Call
-        {-(Identifier)-}
-        {-(Empty)-})
+      { (Send
+        {-(Identifier)-})
       ->([]) }))))

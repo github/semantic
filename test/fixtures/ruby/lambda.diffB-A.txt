@@ -1,9 +1,8 @@
 (Program
-{+(Call
+{+(Send
   {+(Identifier)+}
-  {+(Hash)+}
-  {+(Empty)+})+}
-  (Call
+  {+(Hash)+})+}
+  (Send
     (Identifier)
     (Function
       (Empty)
@@ -12,7 +11,7 @@
       {-(Identifier)-}
       {-(Integer)-})
     ->(Identifier) }))
-{+(Call
+{+(Send
   {+(Identifier)+}
   {+(Function
     {+(Empty)+}

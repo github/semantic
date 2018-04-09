@@ -1,8 +1,7 @@
 (Program
   (Require
     (TextElement))
-  (Call
+  (Send
     (Identifier)
     (Symbol)
-    (TextElement)
-    (Empty)))
+    (TextElement)))
