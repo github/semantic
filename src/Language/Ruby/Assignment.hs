@@ -307,7 +307,7 @@ methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> 
     nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
 
 call :: Assignment
-call = makeTerm <$> symbol Call <*> children (Expression.MemberAccess <$> expression <*> (expressions <|> args))
+call = makeTerm <$> symbol Call <*> children (Expression.MemberAccess <$> expression <*> (args <|> expressions))
   where
     args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expressions
 
