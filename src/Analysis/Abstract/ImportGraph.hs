@@ -22,9 +22,31 @@ import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Prologue hiding (empty, packageName)
 
+import Data.Aeson
+import Data.Output
+import Data.Text.Encoding as T
+import Data.ByteString.Lazy (toStrict)
+
 -- | The graph of function variableDefinitions to symbols used in a given program.
 newtype ImportGraph = ImportGraph { unImportGraph :: G.Graph Vertex }
   deriving (Eq, Graph, Show)
+
+instance Output ImportGraph where
+  toOutput = toStrict . (<> "\n") . encode
+
+instance ToJSON ImportGraph where
+  toJSON ImportGraph{..} = object [ "vertices" .= vertices, "edges" .= edges ]
+    where
+      vertices = toJSON (G.vertexList unImportGraph)
+      edges = fmap (\(a, b) -> object [ "source" .= vertexToText a, "target" .= vertexToText b ]) (G.edgeList unImportGraph)
+
+vertexToText :: Vertex -> Text
+vertexToText = decodeUtf8 . vertexName
+
+vertexToType :: Vertex -> Text
+vertexToType Package{..} = "package"
+vertexToType Module{..} = "module"
+vertexToType Variable{..} = "variable"
 
 -- | A vertex of some specific type.
 data Vertex
@@ -32,6 +54,9 @@ data Vertex
   | Module   { vertexName :: ByteString }
   | Variable { vertexName :: ByteString }
   deriving (Eq, Ord, Show)
+
+instance ToJSON Vertex where
+  toJSON v = object [ "name" .= vertexToText v, "type" .= vertexToType v ]
 
 -- | Render a 'ImportGraph' to a 'ByteString' in DOT notation.
 renderImportGraph :: ImportGraph -> ByteString

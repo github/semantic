@@ -18,7 +18,8 @@ import qualified Paths_semantic as Library (version)
 import Semantic.IO (languageForFilePath)
 import qualified Semantic.Diff as Semantic (diffBlobPairs)
 import qualified Semantic.Log as Log
-import qualified Semantic.Parse as Semantic (parseBlobs, graph)
+import qualified Semantic.Parse as Semantic (parseBlobs)
+import qualified Semantic.Graph as Semantic (graph)
 import qualified Semantic.Task as Task
 import System.IO (Handle, stdin, stdout)
 import Text.Read
@@ -33,7 +34,7 @@ runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Ta
 runParse :: SomeRenderer TermRenderer -> Either Handle [(FilePath, Maybe Language)] -> Task.TaskEff ByteString
 runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
 
-runGraph :: SomeRenderer TermRenderer -> (FilePath, Maybe Language) -> Task.TaskEff ByteString
+runGraph :: SomeRenderer GraphRenderer -> (FilePath, Maybe Language) -> Task.TaskEff ByteString
 runGraph (SomeRenderer r) = Semantic.graph r <=< Task.readBlob
 
 -- | A parser for the application's command-line arguments.
@@ -89,7 +90,9 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
 
     graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute import/call graph for an entry point"))
     graphArgumentsParser = runGraph
-      <$> flag (SomeRenderer DOTTermRenderer) (SomeRenderer DOTTermRenderer) (long "dot" <> help "Output in DOT graph format (default)")
+      <$> (   flag (SomeRenderer DOTGraphRenderer) (SomeRenderer DOTGraphRenderer) (long "dot" <> help "Output in DOT graph format (default)")
+          <|> flag'                                (SomeRenderer JSONGraphRenderer) (long "json" <> help "Output JSON graph")
+          )
       <*> argument filePathReader (metavar "ENTRY_FILE")
 
     filePathReader = eitherReader parseFilePath

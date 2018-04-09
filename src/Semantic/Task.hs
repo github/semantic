@@ -65,7 +65,6 @@ import           Data.Abstract.Module
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value)
 import           Data.Blob
-import qualified Data.ByteString as B
 import           Data.Diff
 import qualified Data.Error as Error
 import           Data.Record
@@ -133,7 +132,7 @@ render :: Member Task effs => Renderer input output -> input -> Eff effs output
 render renderer = send . Render renderer
 
 
--- | Render and serialize the import graph for a given 'Package'.
+-- | Render the import graph for a given 'Package'.
 graphImports :: (
                   Show ann
                 , Ord ann
@@ -147,15 +146,14 @@ graphImports :: (
                 , Members '[Exc SomeException, Task] effs
                 , term ~ Term (Union syntax) ann
                 )
-             => Package term -> Eff effs B.ByteString
-graphImports package = analyze (Analysis.SomeAnalysis (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package)) >>= renderGraph
+             => Package term -> Eff effs Abstract.ImportGraph
+graphImports package = analyze (Analysis.SomeAnalysis (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package)) >>= extractGraph
   where asAnalysisForTypeOfPackage :: Abstract.ImportGraphing (Evaluating (Located Precise term) term (Value (Located Precise term))) effects value -> Package term -> Abstract.ImportGraphing (Evaluating (Located Precise term) term (Value (Located Precise term))) effects value
         asAnalysisForTypeOfPackage = const
 
-        renderGraph result = case result of
-          (Right (Right (Right (Right (Right (Right (_, graph)))))), _) -> pure $! Abstract.renderImportGraph graph
-          _ -> throwError (toException (Exc.ErrorCall "graphImports: import graph rendering failed"))
-
+        extractGraph result = case result of
+          (Right (Right (Right (Right (Right (Right (_, graph)))))), _) -> pure $! graph
+          _ -> throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
 
 -- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
 --

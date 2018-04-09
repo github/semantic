@@ -2,6 +2,7 @@
 module Rendering.Renderer
 ( DiffRenderer(..)
 , TermRenderer(..)
+, GraphRenderer(..)
 , SomeRenderer(..)
 , renderSExpressionDiff
 , renderSExpressionTerm
@@ -65,6 +66,13 @@ data TermRenderer output where
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)
 
+
+data GraphRenderer output where
+  JSONGraphRenderer :: GraphRenderer ByteString
+  DOTGraphRenderer :: GraphRenderer ByteString
+
+deriving instance Eq (GraphRenderer output)
+deriving instance Show (GraphRenderer output)
 
 -- | Abstraction of some renderer to some 'Monoid'al output which can be serialized to a 'ByteString'.
 --
