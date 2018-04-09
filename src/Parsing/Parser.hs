@@ -80,12 +80,10 @@ data Parser term where
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
 
--- | Apply all of a list of typeclasses to all of a list of functors using 'Apply'. Used by 'someAnalysisParser to constrain all of the language-specific syntax types to the typeclasses in question.
+-- | Apply all of a list of typeclasses to all of a list of functors using 'Apply'. Used by 'someParser to constrain all of the language-specific syntax types to the typeclasses in question.
 type family ApplyAll (typeclasses :: [(* -> *) -> Constraint]) (syntax :: * -> *) :: Constraint where
   ApplyAll (typeclass ': typeclasses) syntax = (typeclass syntax, ApplyAll typeclasses syntax)
   ApplyAll '[] syntax = ()
-
-
 
 -- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
 --
