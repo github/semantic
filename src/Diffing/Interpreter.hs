@@ -3,8 +3,6 @@ module Diffing.Interpreter
 ( diffTerms
 ) where
 
-import Prologue
-import Data.Align.Generic (galignWith)
 import Analysis.Decorator
 import Control.Monad.Free.Freer
 import Data.Diff
@@ -12,6 +10,7 @@ import Data.Record
 import Data.Term
 import Diffing.Algorithm
 import Diffing.Algorithm.RWS
+import Prologue
 
 -- | Diff two à la carte terms recursively.
 diffTerms :: (Diffable syntax, Eq1 syntax, GAlign syntax, Show1 syntax, Traversable syntax)
@@ -33,7 +32,7 @@ runAlgorithm :: forall syntax fields1 fields2 m result
              -> m result
 runAlgorithm = iterFreerA (\ yield step -> case step of
   Diffing.Algorithm.Diff t1 t2 -> runAlgorithm (algorithmForTerms t1 t2) <|> pure (replacing t1 t2) >>= yield
-  Linear (Term (In ann1 f1)) (Term (In ann2 f2)) -> merge (ann1, ann2) <$> galignWith (runAlgorithm . diffThese) f1 f2 >>= yield
+  Linear (Term (In ann1 f1)) (Term (In ann2 f2)) -> merge (ann1, ann2) <$> tryAlignWith (runAlgorithm . diffThese) f1 f2 >>= yield
   RWS as bs -> traverse (runAlgorithm . diffThese) (rws comparableTerms equivalentTerms as bs) >>= yield
   Delete a -> yield (deleting a)
   Insert b -> yield (inserting b)
