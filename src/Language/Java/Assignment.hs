@@ -8,7 +8,7 @@ module Language.Java.Assignment
 
 import Assigning.Assignment hiding (Assignment, Error)
 import Data.Abstract.FreeVariables
-import Data.Functor (void)
+import Data.Functor (void, ($>))
 import Data.List.NonEmpty (some1)
 import Data.Record
 import Data.Semigroup
@@ -29,13 +29,21 @@ import qualified Data.Term as Term
 
 type Syntax =
   '[ Comment.Comment
+   , Declaration.Class
+   , Declaration.Method
    , Literal.Integer
    , Literal.String
    , Literal.TextElement
    , Syntax.Context
    , Syntax.Empty
    , Syntax.Error
+   , Syntax.Identifier
    , Syntax.Program
+   , Type.Int
+   , Type.Void
+   , Type.Float
+   , Type.Annotation
+   , Statement.Return
    , []
    ]
 
@@ -62,7 +70,11 @@ expression = handleError (choice expressionChoices)
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
   [
-    integer
+    class'
+  , identifier
+  , integer
+  , method
+  , return'
   , string
   ]
 
@@ -74,3 +86,24 @@ integer = makeTerm <$> symbol IntegerLiteral <*> children (symbol DecimalInteger
 
 string :: Assignment
 string = makeTerm <$> symbol StringLiteral <*> (Literal.TextElement <$> source)
+
+class' :: Assignment
+class' = makeTerm <$> symbol ClassDeclaration <*> children (Declaration.Class [] <$> term identifier <*> pure [] <*> classBody)
+  where classBody = makeTerm <$> symbol ClassBody <*> children (manyTerm expression)
+
+identifier :: Assignment
+identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> (name <$> source))
+
+method :: Assignment
+method = makeTerm <$> symbol MethodDeclaration <*> children ((method <$ symbol MethodHeader <*> emptyTerm <*> children ((,) <$> type' <* symbol MethodDeclarator <*> children ( (,) <$> identifier <*> manyTerm parameter)) ) <* symbol MethodBody <*> children (makeTerm <$> symbol Block <*> children (manyTerm expression)))
+  where method receiver (returnType, (name, params)) body = Declaration.Method [returnType] receiver name params body
+        parameter = makeTerm <$> symbol FormalParameter <*> children (flip Type.Annotation <$> type' <* symbol VariableDeclaratorId <*> children identifier)
+-- TODO: re-introduce makeTerm later; matching types as part of the type rule for now
+
+return' :: Assignment
+return' = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> expression)
+
+type' :: Assignment
+type' = makeTerm <$> token VoidType <*> pure Type.Void
+  <|> makeTerm <$> token IntegralType <*> pure Type.Int
+  <|> makeTerm <$> symbol FloatingPointType <*> children (token AnonFloat $> Type.Float <|> token AnonDouble $> Type.Double)

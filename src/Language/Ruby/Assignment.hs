@@ -223,7 +223,7 @@ parameter =
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> (name <$> source))
 
 method :: Assignment
-method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> pure [] <*> emptyTerm <*> expression <*> params <*> expressions')
+method = makeTerm <$> symbol Method <*> children (Declaration.Method [] <$> emptyTerm <*> expression <*> params <*> expressions')
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
         expressions' = makeTerm <$> location <*> many expression
 
