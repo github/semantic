@@ -4,7 +4,10 @@
 module Semantic.Util where
 
 import Analysis.Abstract.BadVariables
+import Analysis.Abstract.BadModuleResolutions
+import Analysis.Abstract.BadValues
 import Analysis.Abstract.Caching
+import Analysis.Abstract.Quiet
 import Analysis.Abstract.Dead
 import Analysis.Abstract.Evaluating as X
 import Analysis.Abstract.ImportGraph
@@ -23,7 +26,6 @@ import Data.Blob
 import Data.Diff
 import Data.Range
 import Data.Record
-import Data.Semigroup.Reducer
 import Data.Span
 import Data.Term
 import Diffing.Algorithm
@@ -45,178 +47,72 @@ import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 
 -- Ruby
-evalRubyProject = evaluateProjectWithPrelude rubyParser ["rb"]
-evalRubyFile = evaluateWithPrelude rubyParser
-evaluateRubyImportGraph name paths = runAnalysis @(ImportGraphing (Evaluating (Located Precise Ruby.Term) Ruby.Term (Value (Located Precise Ruby.Term)))) . evaluatePackage <$> parsePackage name rubyParser (dropFileName (head paths)) paths
-evaluateRubyBadVariables paths = runAnalysis @(BadVariables (Evaluating Precise Ruby.Term (Value Precise))) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
+evalRubyProject = runEvaluatingWithPrelude rubyParser ["rb"]
+evalRubyFile path = runEvaluating <$> (withPrelude <$> parsePrelude rubyParser <*> (evaluateModule <$> parseFile rubyParser Nothing path))
+
+evalRubyProjectGraph path = runAnalysis @(ImportGraphing (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise Ruby.Term) Ruby.Term (Value (Located Precise Ruby.Term)))))))) <$> (withPrelude <$> parsePrelude rubyParser <*> (evaluatePackageBody <$> parseProject rubyParser ["rb"] path))
+
+evalRubyImportGraph paths = runAnalysis @(ImportGraphing (Evaluating (Located Precise Ruby.Term) Ruby.Term (Value (Located Precise Ruby.Term)))) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
+
+evalRubyBadVariables paths = runAnalysis @(BadVariables (Evaluating Precise Ruby.Term (Value Precise))) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
 
 -- Go
-evalGoProject = evaluateProject goParser ["go"]
-evalGoFile = evaluateFile goParser
+evalGoProject path = runEvaluating . evaluatePackageBody <$> parseProject goParser ["go"] path
+evalGoFile path = runEvaluating . evaluateModule <$> parseFile goParser Nothing path
+
 typecheckGoFile path = runAnalysis @(Caching (Evaluating Monovariant Go.Term Type)) . evaluateModule <$> parseFile goParser Nothing path
 
 -- Python
-evalPythonProject = evaluateProjectWithPrelude pythonParser ["py"]
-evalPythonFile = evaluateWithPrelude pythonParser
-evaluatePythonImportGraph name paths = runAnalysis @(ImportGraphing (Evaluating (Located Precise Python.Term) Python.Term (Value (Located Precise Python.Term)))) . evaluatePackage <$> parsePackage name pythonParser (dropFileName (head paths)) paths
+evalPythonProject = runEvaluatingWithPrelude pythonParser ["py"]
+evalPythonFile path = runEvaluating <$> (withPrelude <$> parsePrelude pythonParser <*> (evaluateModule <$> parseFile pythonParser Nothing path))
+
+evalPythonImportGraph name paths = runAnalysis @(ImportGraphing (Evaluating (Located Precise Python.Term) Python.Term (Value (Located Precise Python.Term)))) . evaluatePackage <$> parsePackage name pythonParser (dropFileName (head paths)) paths
+
 typecheckPythonFile path = runAnalysis @(Caching (Evaluating Monovariant Python.Term Type)) . evaluateModule <$> parseFile pythonParser Nothing path
 tracePythonFile path = runAnalysis @(Tracing [] (Evaluating Precise Python.Term (Value Precise))) . evaluateModule <$> parseFile pythonParser Nothing path
-evaluateDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] (Evaluating Precise Python.Term (Value Precise)))) . evaluateModule <$> parseFile pythonParser Nothing path
+evalDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] (Evaluating Precise Python.Term (Value Precise)))) . evaluateModule <$> parseFile pythonParser Nothing path
 
 -- PHP
-evalPHPProject = evaluateProject phpParser ["php"]
-evalPHPFile = evaluateFile phpParser
+evalPHPProject path = runEvaluating . evaluatePackageBody <$> parseProject phpParser ["php"] path
+evalPHPFile path = runEvaluating . evaluateModule <$> parseFile phpParser Nothing path
 
 -- TypeScript
-evalTypeScriptProject = evaluateProject typescriptParser ["ts", "tsx"]
-evalTypeScriptFile = evaluateFile typescriptParser
+evalTypeScriptProject path = runEvaluating . evaluatePackageBody <$> parseProject typescriptParser ["ts", "tsx"] path
+evalTypeScriptFile path = runEvaluating . evaluateModule <$> parseFile typescriptParser Nothing path
 typecheckTypeScriptFile path = runAnalysis @(Caching (Evaluating Monovariant TypeScript.Term Type)) . evaluateModule <$> parseFile typescriptParser Nothing path
 
-evaluateProject :: forall term effects
-                .  ( Corecursive term
-                  , Evaluatable (Base term)
-                  , FreeVariables term
-                  , effects ~ Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects)
-                  , MonadAddressable Precise (Evaluating Precise term (Value Precise) effects)
-                  , Recursive term
-                  )
-                => Parser term
-                -> [FilePath]
-                -> FilePath
-                -> IO (Final effects (Value Precise))
-evaluateProject parser exts entryPoint = do
-  let rootDir = takeDirectory entryPoint
-  paths <- filter (/= entryPoint) <$> getPaths exts rootDir
-  evaluateFiles parser rootDir (entryPoint : paths)
+runEvaluatingWithPrelude parser exts path = runEvaluating <$> (withPrelude <$> parsePrelude parser <*> (evaluatePackageBody <$> parseProject parser exts path))
 
-evaluateProjectWithPrelude :: forall term effects
-                           .  ( Corecursive term
-                              , Evaluatable (Base term)
-                              , FreeVariables term
-                              , effects ~ Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects)
-                              , MonadAddressable Precise (Evaluating Precise term (Value Precise) effects)
-                              , Recursive term
-                              , TypeLevel.KnownSymbol (PreludePath term)
-                           )
-                        => Parser term
-                        -> [FilePath]
-                        -> FilePath
-                        -> IO (Final effects (Value Precise))
-evaluateProjectWithPrelude parser exts entryPoint = do
+-- TODO: Remove this by exporting EvaluatingEffects
+runEvaluating :: forall term effects a.
+                 ( Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects) ~ effects
+                 , Corecursive term
+                 , Recursive term )
+              => Evaluating Precise term (Value Precise) effects a
+              -> Final effects a
+runEvaluating = runAnalysis @(Evaluating Precise term (Value Precise))
+
+parsePrelude :: forall term. TypeLevel.KnownSymbol (PreludePath term) => Parser term -> IO (Module term)
+parsePrelude parser = do
+  let preludePath = TypeLevel.symbolVal (Proxy :: Proxy (PreludePath term))
+  parseFile parser Nothing preludePath
+
+parseProject :: Parser term
+                -> [Prelude.String]
+                -> FilePath
+                -> IO (PackageBody term)
+parseProject parser exts entryPoint = do
   let rootDir = takeDirectory entryPoint
-  paths <- filter (/= entryPoint) <$> getPaths exts rootDir
-  evaluateFilesWithPrelude parser rootDir (entryPoint : paths)
+  paths <- getPaths exts rootDir
+  modules <- parseFiles parser rootDir paths
+  pure $ fromModulesWithEntryPoint modules (takeFileName entryPoint)
+
+withPrelude prelude a = do
+  preludeEnv <- evaluateModule prelude *> getEnv
+  withDefaultEnvironment preludeEnv a
 
 getPaths exts = fmap fold . globDir (compile . mappend "**/*." <$> exts)
 
--- Evalute a single file.
-evaluateFile :: forall term effects
-             .  ( Corecursive term
-                , Evaluatable (Base term)
-                , FreeVariables term
-                , effects ~ Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects)
-                , MonadAddressable Precise (Evaluating Precise term (Value Precise) effects)
-                , Recursive term
-                )
-             => Parser term
-             -> FilePath
-             -> IO (Final effects (Value Precise))
-evaluateFile parser path = runAnalysis @(Evaluating Precise term (Value Precise)) . evaluateModule <$> parseFile parser Nothing path
-
-evaluateWith :: forall location value term effects
-             .  ( Corecursive term
-                , effects ~ Effects location term value (Evaluating location term value effects)
-                , Evaluatable (Base term)
-                , FreeVariables term
-                , MonadAddressable location (Evaluating location term value effects)
-                , MonadValue location value (Evaluating location term value effects)
-                , Recursive term
-                , Reducer value (Cell location value)
-                , Show location
-                )
-         => Module term
-         -> Module term
-         -> Final effects value
-evaluateWith prelude m = runAnalysis @(Evaluating location term value) $ do
-  -- TODO: we could add evaluatePrelude to MonadAnalysis as an alias for evaluateModule,
-  -- overridden in Evaluating to not reset the environment. In the future we'll want the
-  -- result of evaluating the Prelude to be a build artifact, rather than something that's
-  -- evaluated every single time, but that's contingent upon a whole lot of other future
-  -- scaffolding.
-  preludeEnv <- evaluateModule prelude *> getEnv
-  withDefaultEnvironment preludeEnv (evaluateModule m)
-
-evaluateWithPrelude :: forall term effects
-                    .  ( Corecursive term
-                       , Evaluatable (Base term)
-                       , FreeVariables term
-                       , effects ~ Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects)
-                       , MonadAddressable Precise (Evaluating Precise term (Value Precise) effects)
-                       , Recursive term
-                       , TypeLevel.KnownSymbol (PreludePath term)
-                       )
-                    => Parser term
-                    -> FilePath
-                    -> IO (Final effects (Value Precise))
-evaluateWithPrelude parser path = do
-  let preludePath = TypeLevel.symbolVal (Proxy :: Proxy (PreludePath term))
-  prelude <- parseFile parser Nothing preludePath
-  m <- parseFile parser Nothing path
-  pure $ evaluateWith @Precise prelude m
-
-
--- Evaluate a list of files (head of file list is considered the entry point).
-evaluateFiles :: forall term effects
-              .  ( Corecursive term
-                 , Evaluatable (Base term)
-                 , FreeVariables term
-                 , effects ~ Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects)
-                 , MonadAddressable Precise (Evaluating Precise term (Value Precise) effects)
-                 , Recursive term
-                 )
-              => Parser term
-              -> FilePath
-              -> [FilePath]
-              -> IO (Final effects (Value Precise))
-evaluateFiles parser rootDir paths = runAnalysis @(Evaluating Precise term (Value Precise)) . evaluateModules <$> parseFiles parser rootDir paths
-
--- | Evaluate terms and an entry point to a value with a given prelude.
-evaluatesWith :: forall location value term effects
-              .  ( Corecursive term
-                 , effects ~ Effects location term value (Evaluating location term value effects)
-                 , Evaluatable (Base term)
-                 , FreeVariables term
-                 , MonadAddressable location (Evaluating location term value effects)
-                 , MonadValue location value (Evaluating location term value effects)
-                 , Recursive term
-                 , Reducer value (Cell location value)
-                 , Show location
-                 )
-              => Module term   -- ^ Prelude to evaluate once
-              -> [Module term] -- ^ List of modules that make up the program to be evaluated
-              -> Final effects value
-evaluatesWith prelude modules = runAnalysis @(Evaluating location term value) $ do
-  preludeEnv <- evaluateModule prelude *> getEnv
-  withDefaultEnvironment preludeEnv (evaluateModules modules)
-
-evaluateFilesWithPrelude :: forall term effects
-                         .  ( Corecursive term
-                            , Evaluatable (Base term)
-                            , FreeVariables term
-                            , effects ~ Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects)
-                            , MonadAddressable Precise (Evaluating Precise term (Value Precise) effects)
-                            , Recursive term
-                            , TypeLevel.KnownSymbol (PreludePath term)
-                            )
-                         => Parser term
-                         -> FilePath
-                         -> [FilePath]
-                         -> IO (Final effects (Value Precise))
-evaluateFilesWithPrelude parser rootDir paths = do
-  let preludePath = TypeLevel.symbolVal (Proxy :: Proxy (PreludePath term))
-  prelude <- parseFile parser Nothing preludePath
-  xs <- parseFiles parser rootDir paths
-  pure $ evaluatesWith @Precise @(Value Precise) prelude xs
 
 -- Read and parse a file.
 parseFile :: Parser term -> Maybe FilePath -> FilePath -> IO (Module term)

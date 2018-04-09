@@ -32,5 +32,9 @@ data Package term = Package
 
 fromModules :: [Module term] -> PackageBody term
 fromModules []     = PackageBody mempty mempty
-fromModules (m:ms) = PackageBody (ModuleTable.fromModules (m:ms)) entryPoints
-  where entryPoints = ModuleTable.singleton (modulePath (moduleInfo m)) Nothing
+fromModules (m:ms) = fromModulesWithEntryPoint (m : ms) (modulePath (moduleInfo m))
+
+fromModulesWithEntryPoint :: [Module term] -> FilePath -> PackageBody term
+fromModulesWithEntryPoint ms path = PackageBody (ModuleTable.fromModules ms) entryPoints
+  where entryPoints = ModuleTable.singleton path Nothing
+

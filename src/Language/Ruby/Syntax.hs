@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, ScopedTypeVariables #-}
 module Language.Ruby.Syntax where
 
 import           Control.Monad (unless)
@@ -16,12 +16,18 @@ import           System.FilePath.Posix
 -- TODO: Fully sort out ruby require/load mechanics
 --
 -- require "json"
-resolveRubyName :: MonadEvaluatable location term value m => ByteString -> m ModulePath
-resolveRubyName name = let n = cleanNameOrPath name in resolve [n <.> "rb"] >>= maybeFailNotFound n
+resolveRubyName :: forall value term location m. MonadEvaluatable location term value m => ByteString -> m ModulePath
+resolveRubyName name = do
+  let name' = cleanNameOrPath name
+  modulePath <- resolve [name' <.> "rb"]
+  maybe (throwException @(ResolutionError value) $ RubyError name') pure modulePath
 
 -- load "/root/src/file.rb"
-resolveRubyPath :: MonadEvaluatable location term value m => ByteString -> m ModulePath
-resolveRubyPath path = let n = cleanNameOrPath path in resolve [n] >>= maybeFailNotFound n
+resolveRubyPath :: forall value term location m. MonadEvaluatable location term value m => ByteString -> m ModulePath
+resolveRubyPath path = do
+  let name' = cleanNameOrPath path
+  modulePath <- resolve [name']
+  maybe (throwException @(ResolutionError value) $ RubyError name') pure modulePath
 
 maybeFailNotFound :: MonadFail m => String -> Maybe a -> m a
 maybeFailNotFound name = maybeFail notFound
@@ -42,7 +48,7 @@ instance Evaluatable Require where
     name <- subtermValue x >>= asString
     path <- resolveRubyName name
     (importedEnv, v) <- isolate (doRequire path)
-    modifyEnv (mappend importedEnv)
+    modifyEnv (`mergeNewer` importedEnv)
     pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
 doRequire :: MonadEvaluatable location term value m
@@ -68,7 +74,7 @@ instance Evaluatable Load where
     doLoad path False
   eval (Load [x, wrap]) = do
     path <- subtermValue x >>= asString
-    shouldWrap <- subtermValue wrap >>= toBool
+    shouldWrap <- subtermValue wrap >>= asBool
     doLoad path shouldWrap
   eval (Load _) = fail "invalid argument supplied to load, path is required"
 
@@ -94,9 +100,9 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Class where
   eval Class{..} = do
     supers <- traverse subtermValue classSuperClasses
+    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm classIdentifier)
     letrec' name $ \addr ->
       subtermValue classBody <* makeNamespace name addr supers
-    where name = freeVariable (subterm classIdentifier)
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -106,9 +112,10 @@ instance Ord1 Module where liftCompare = genericLiftCompare
 instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Module where
-  eval (Module iden xs) = letrec' name $ \addr ->
-    eval xs <* makeNamespace name addr []
-    where name = freeVariable (subterm iden)
+  eval (Module iden xs) = do
+    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
+    letrec' name $ \addr ->
+      eval xs <* makeNamespace name addr []
 
 data LowPrecedenceBoolean a
   = LowAnd !a !a

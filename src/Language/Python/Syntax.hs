@@ -125,7 +125,7 @@ instance Evaluatable QualifiedImport where
   eval (QualifiedImport (RelativeQualifiedName _ _))        = fail "technically this is not allowed in python"
   eval (QualifiedImport name@(QualifiedName qualifiedName)) = do
     modulePaths <- resolvePythonModules name
-    go (NonEmpty.zip ((FV.name . BC.pack) <$> qualifiedName) modulePaths)
+    go (NonEmpty.zip (FV.name . BC.pack <$> qualifiedName) modulePaths)
     where
       -- Evaluate and import the last module, updating the environment
       go ((name, path) :| []) = letrec' name $ \addr -> do
@@ -155,7 +155,7 @@ instance Evaluatable QualifiedAliasedImport where
     for_ (NonEmpty.init modulePaths) (isolate . require)
 
     -- Evaluate and import the last module, aliasing and updating the environment
-    let alias = freeVariable (subterm aliasTerm)
+    alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
     letrec' alias $ \addr -> do
       let path = NonEmpty.last modulePaths
       (importedEnv, _) <- isolate (require path)

@@ -91,6 +91,7 @@ instance ( Alternative m
 
   asString _ = fail "Must evaluate to Value to use asString"
   asPair _   = fail "Must evaluate to Value to use asPair"
+  asBool _ = fail "Must evaluate to Value to use asBool"
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 

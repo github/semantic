@@ -138,7 +138,7 @@ graphImports package = analyze (Analysis.SomeAnalysis (Analysis.evaluatePackage 
         asAnalysisForTypeOfPackage = const
 
         renderGraph result = case result of
-          (Right (Right (Right (Right (Right (_, graph))))), _) -> pure $! Abstract.renderImportGraph graph
+          (Right (Right (Right (Right (Right (Right (_, graph)))))), _) -> pure $! Abstract.renderImportGraph graph
           _ -> throwError (toException (Exc.ErrorCall "graphImports: import graph rendering failed"))
 
 
