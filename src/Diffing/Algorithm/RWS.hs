@@ -14,16 +14,16 @@ module Diffing.Algorithm.RWS
 , equalTerms
 ) where
 
-import Prologue
-import Data.Align.Generic (galignWith)
 import Control.Monad.State.Strict
 import Data.Diff (DiffF(..), deleting, inserting, merge, replacing)
 import qualified Data.KdMap.Static as KdMap
 import Data.List (sortOn)
 import Data.Record
 import Data.Term as Term
+import Diffing.Algorithm
 import Diffing.Algorithm.RWS.FeatureVector
 import Diffing.Algorithm.SES
+import Prologue
 
 type Label f fields label = forall b. TermF f (Record fields) b -> label
 
@@ -32,7 +32,7 @@ type Label f fields label = forall b. TermF f (Record fields) b -> label
 --   This is used both to determine whether two root terms can be compared in O(1), and, recursively, to determine whether two nodes are equal in O(n); thus, comparability is defined s.t. two terms are equal if they are recursively comparable subterm-wise.
 type ComparabilityRelation syntax ann1 ann2 = forall a b. TermF syntax ann1 a -> TermF syntax ann2 b -> Bool
 
-rws :: (Foldable syntax, Functor syntax, GAlign syntax)
+rws :: (Foldable syntax, Functor syntax, Diffable syntax)
     => ComparabilityRelation syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2))
     -> (Term syntax (Record (FeatureVector ': fields1)) -> Term syntax (Record (FeatureVector ': fields2)) -> Bool)
     -> [Term syntax (Record (FeatureVector ': fields1))]
@@ -159,13 +159,13 @@ equalTerms canCompare = go
 -- | Return an edit distance between two terms, up to a certain depth.
 --
 --   Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
-editDistanceUpTo :: (GAlign syntax, Foldable syntax, Functor syntax) => Int -> Term syntax ann1 -> Term syntax ann2 -> Int
+editDistanceUpTo :: (Diffable syntax, Foldable syntax, Functor syntax) => Int -> Term syntax ann1 -> Term syntax ann2 -> Int
 editDistanceUpTo m a b = diffCost m (approximateDiff a b)
   where diffCost = flip . cata $ \ diff m -> case diff of
           _ | m <= 0 -> 0
           Merge body -> sum (fmap ($ pred m) body)
           body -> succ (sum (fmap ($ pred m) body))
-        approximateDiff a b = maybe (replacing a b) (merge (termAnnotation a, termAnnotation b)) (galignWith (Just . these deleting inserting approximateDiff) (termOut a) (termOut b))
+        approximateDiff a b = maybe (replacing a b) (merge (termAnnotation a, termAnnotation b)) (tryAlignWith (Just . these deleting inserting approximateDiff) (termOut a) (termOut b))
 
 
 -- Instances
