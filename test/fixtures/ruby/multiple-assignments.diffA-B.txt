@@ -37,17 +37,17 @@
   {-(Identifier)-})-}
 {-(Assignment
   {-(
-    {-(Send
+    {-(MemberAccess
       {-(Identifier)-}
       {-(Identifier)-})-}
-    {-(Send
+    {-(MemberAccess
       {-(Identifier)-}
       {-(Identifier)-})-})-}
   {-(
-    {-(Send
+    {-(MemberAccess
       {-(Identifier)-}
       {-(Identifier)-})-}
-    {-(Send
+    {-(MemberAccess
       {-(Identifier)-}
       {-(Identifier)-})-})-})-}
 {-(Assignment

@@ -2,11 +2,13 @@
   (If
     (Identifier)
     (
-      (Send
-        (Identifier)))
+      (Call
+        (Identifier)
+        (Empty)))
     (If
       (Identifier)
       ([]
-      {-(Send
-        {-(Identifier)-})-})
+      {-(Call
+        {-(Identifier)-}
+        {-(Empty)-})-})
       (Empty))))
