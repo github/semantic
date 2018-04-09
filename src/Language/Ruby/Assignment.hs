@@ -111,7 +111,6 @@ expressionChoices =
   , for
   , heredoc
   , identifier
-  , misc
   , if'
   , lambda
   , literal
@@ -159,19 +158,11 @@ withNewScope inner = withExtendedScope $ do
   putRubyLocals []
   inner
 
+-- Looks up identifiers in the list of locals to determine vcall vs. local identifier.
 identifier :: Assignment
-identifier = do
-  sym <- symbol Identifier <|> symbol Identifier'
-  locals <- getRubyLocals
-  ident <- source
-  let term = makeTerm sym (Syntax.Identifier $ name ident)
-  if ident `elem` locals
-    then pure term
-    else makeTerm sym <$> (Expression.Call [] term [] <$> emptyTerm)
-
-misc :: Assignment
-misc =
-      mk Constant
+identifier =
+      vcallOrLocal
+  <|> mk Constant
   <|> mk InstanceVariable
   <|> mk ClassVariable
   <|> mk GlobalVariable
@@ -183,7 +174,19 @@ misc =
   <|> mk HashSplatArgument
   <|> mk BlockArgument
   <|> mk Uninterpreted
-  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
+  where
+    mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
+    vcallOrLocal = do
+      loc <- symbol Identifier <|> symbol Identifier'
+      locals <- getRubyLocals
+      ident <- source
+      if ident `elem` locals
+        then pure $ makeTerm loc (Syntax.Identifier (name ident))
+        else makeTerm loc <$> (Expression.Call [] (makeTerm loc (Syntax.Identifier (name ident))) [] <$> emptyTerm)
+
+-- Regular identifiers prioritized over vcalls.
+plainIdentifier :: Assignment
+plainIdentifier = makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax.Identifier . name <$> source)
 
 -- TODO: Handle interpolation in all literals that support it (strings, regexes, symbols, subshells, etc).
 literal :: Assignment
@@ -240,7 +243,7 @@ parameter =
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
 
 method :: Assignment
-method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method <$> pure [] <*> emptyTerm <*> expression <*> params <*> expressions')
+method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method <$> pure [] <*> emptyTerm <*> (plainIdentifier <|> expression) <*> params <*> expressions')
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
         expressions' = makeTerm <$> location <*> many expression
 
