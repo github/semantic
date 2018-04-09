@@ -1,5 +1,5 @@
 (Program
-  (Send
+  (Call
     (Identifier)
     (Function
       (Empty)

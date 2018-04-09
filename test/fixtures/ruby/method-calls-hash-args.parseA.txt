@@ -1,6 +1,7 @@
 (Program
-  (Send
+  (Call
     (Identifier)
     (KeyValue
       (Symbol)
-      (Boolean))))
+      (Boolean))
+    (Empty)))
