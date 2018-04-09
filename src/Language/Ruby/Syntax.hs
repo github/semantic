@@ -45,10 +45,11 @@ instance Show1 Send where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Send where
   eval Send{..} = do
-    recvEnv <- case sendReceiver of
-      Just recv -> subtermValue recv >>= scopedEnvironment
-      Nothing -> getEnv -- send to implicit self
-    func <- localEnv (mappend recvEnv) (subtermValue sendSelector)
+    func <- case sendReceiver of
+      Just recv -> do
+        recvEnv <- subtermValue recv >>= scopedEnvironment
+        localEnv (mappend recvEnv) (subtermValue sendSelector)
+      Nothing -> subtermValue sendSelector -- TODO Does this require `localize` so we don't leak terms when resolving `sendSelector`?
     call func (map subtermValue sendArgs) -- TODO pass through sendBlock
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
