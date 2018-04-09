@@ -27,7 +27,8 @@ class Functor t => Mergeable t where
 
   -- | Sequnce a 'Mergeable' functor by 'merge'ing the 'Alternative' values.
   sequenceAlt :: Alternative f => t (f a) -> f (t a)
-  sequenceAlt = merge id
+  default sequenceAlt :: (Generic1 t, GMergeable (Rep1 t), Alternative f) => t (f a) -> f (t a)
+  sequenceAlt = genericSequenceAlt
 
 
 -- Instances
@@ -48,37 +49,50 @@ instance Mergeable Identity where merge f = fmap Identity . f . runIdentity
 
 instance (Apply Functor fs, Apply Mergeable fs) => Mergeable (Union fs) where
   merge f = apply' (Proxy :: Proxy Mergeable) (\ reinj g -> reinj <$> merge f g)
+  sequenceAlt = apply' (Proxy :: Proxy Mergeable) (\ inj t -> inj <$> sequenceAlt t)
 
 
 -- Generics
 
 class GMergeable t where
   gmerge :: Alternative f => (a -> f b) -> t a -> f (t b)
+  gsequenceAlt :: Alternative f => t (f a) -> f (t a)
 
 genericMerge :: (Generic1 t, GMergeable (Rep1 t), Alternative f) => (a -> f b) -> t a -> f (t b)
 genericMerge f = fmap to1 . gmerge f . from1
+
+genericSequenceAlt :: (Generic1 t, GMergeable (Rep1 t), Alternative f) => t (f a) -> f (t a)
+genericSequenceAlt = fmap to1 . gsequenceAlt . from1
 
 
 -- Instances
 
 instance GMergeable U1 where
   gmerge _ _ = pure U1
+  gsequenceAlt _ = pure U1
 
 instance GMergeable Par1 where
   gmerge f (Par1 a) = Par1 <$> f a
+  gsequenceAlt (Par1 a) = Par1 <$> a
 
 instance GMergeable (K1 i c) where
   gmerge _ (K1 a) = pure (K1 a)
+  gsequenceAlt (K1 a) = pure (K1 a)
 
 instance Mergeable f => GMergeable (Rec1 f) where
   gmerge f (Rec1 a) = Rec1 <$> merge f a
+  gsequenceAlt (Rec1 a) = Rec1 <$> sequenceAlt a
 
 instance GMergeable f => GMergeable (M1 i c f) where
   gmerge f (M1 a) = M1 <$> gmerge f a
+  gsequenceAlt (M1 a) = M1 <$> gsequenceAlt a
 
 instance (GMergeable f, GMergeable g) => GMergeable (f :+: g) where
   gmerge f (L1 a) = L1 <$> gmerge f a
   gmerge f (R1 b) = R1 <$> gmerge f b
+  gsequenceAlt (L1 a) = L1 <$> gsequenceAlt a
+  gsequenceAlt (R1 a) = R1 <$> gsequenceAlt a
 
 instance (GMergeable f, GMergeable g) => GMergeable (f :*: g) where
   gmerge f (a :*: b) = (:*:) <$> gmerge f a <*> gmerge f b
+  gsequenceAlt (a :*: b) = (:*:) <$> gsequenceAlt a <*> gsequenceAlt b
