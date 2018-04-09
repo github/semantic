@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE GADTs, RankNTypes, TypeOperators #-}
 module Diffing.Interpreter
 ( diffTerms
 ) where
@@ -13,7 +13,7 @@ import Diffing.Algorithm.RWS
 import Prologue
 
 -- | Diff two à la carte terms recursively.
-diffTerms :: (Diffable syntax, Eq1 syntax, GAlign syntax, Show1 syntax, Traversable syntax)
+diffTerms :: (Diffable syntax, Eq1 syntax, Show1 syntax, Traversable syntax)
           => Term syntax (Record fields1)
           -> Term syntax (Record fields2)
           -> Diff syntax (Record fields1) (Record fields2)
@@ -22,13 +22,12 @@ diffTerms t1 t2 = stripDiff (fromMaybe (replacing t1' t2') (runAlgorithm (diff t
                      , defaultFeatureVectorDecorator constructorNameAndConstantFields t2)
 
 -- | Run an 'Algorithm' to completion in an 'Alternative' context using the supplied comparability & equivalence relations.
-runAlgorithm :: forall syntax fields1 fields2 m result
-             .  (Diffable syntax, Eq1 syntax, GAlign syntax, Traversable syntax, Alternative m, Monad m)
+runAlgorithm :: (Diffable syntax, Eq1 syntax, Traversable syntax, Alternative m, Monad m)
              => Algorithm
-               (Term syntax (Record (FeatureVector ': fields1)))
-               (Term syntax (Record (FeatureVector ': fields2)))
-               (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
-               result
+                  (Term syntax (Record (FeatureVector ': fields1)))
+                  (Term syntax (Record (FeatureVector ': fields2)))
+                  (Diff syntax (Record (FeatureVector ': fields1)) (Record (FeatureVector ': fields2)))
+                  result
              -> m result
 runAlgorithm = iterFreerA (\ yield step -> case step of
   Diffing.Algorithm.Diff t1 t2 -> runAlgorithm (algorithmForTerms t1 t2) <|> pure (replacing t1 t2) >>= yield

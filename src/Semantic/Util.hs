@@ -138,7 +138,6 @@ diffWithParser :: ( HasField fields Data.Span.Span
                   , Show1 syntax
                   , Traversable syntax
                   , Diffable syntax
-                  , GAlign syntax
                   , HasDeclaration syntax
                   , Members '[Distribute WrappedTask, Task] effs
                   )
