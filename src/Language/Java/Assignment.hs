@@ -35,6 +35,7 @@ type Syntax =
    , Java.Syntax.ArrayType
    , Literal.Array
    , Literal.Integer
+   , Literal.Float
    , Literal.String
    , Literal.TextElement
    , Statement.Assignment
@@ -78,9 +79,10 @@ expressionChoices =
     array_initializer
   , char
   , class'
-  , constantDeclaration
+  -- , constantDeclaration
   , identifier
   , integer
+  , float
   , method
   , return'
   , string
@@ -101,26 +103,31 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 -- TODO: Rename these to be conventionally namned functions (camelCase )
 local_variable_declaration :: Assignment
-local_variable_declaration = makeDecl <$> symbol LocalVariableDeclaration <*> many type' <*> children (Declaration.VariableDeclaration <$> vDeclList)
+local_variable_declaration = makeDecl <$> symbol LocalVariableDeclaration <*> children ((,) <$> some type' <*> vDeclList)
   where
     makeSingleDecl loc types (target, value) = makeTerm loc (Statement.Assignment types target value)
-    makeDecl loc types decls = fmap (makeSingleDecl loc types) decls
-    vDeclList = symbol VariableDeclaratorList *> children (many variableDeclarator)
-    variableDeclarator = makeTerm <$> symbol VariableDeclarator <*> ((,) <*> variable_declarator_id <*> expression)
+    makeDecl loc (types, decls) = makeTerm loc $ fmap (makeSingleDecl loc types) decls
+    -- makeImportTerm loc ([x], from) = makeImportTerm1 loc from x
+    -- makeImportTerm loc (xs, from) = makeTerm loc $ fmap (makeImportTerm1 loc from) xs
+    vDeclList = symbol VariableDeclaratorList *> children (some variableDeclarator)
+    variableDeclarator = symbol VariableDeclarator *> children ((,) <$> variable_declarator_id <*> expression)
 
 local_variable_declaration_statement :: Assignment
-local_variable_declaration_statement = makeTerm <$> symbol LocalVariableDeclarationStatement <*> children (many local_variable_declaration)
+local_variable_declaration_statement = symbol LocalVariableDeclarationStatement *> children local_variable_declaration
 
 unannotated_type :: Assignment
 unannotated_type = makeTerm <$> symbol Grammar.ArrayType <*> (Java.Syntax.ArrayType <$> source)
 
 variable_declarator_id :: Assignment
-variable_declarator_id = makeTerm <$> symbol VariableDeclaratorId <*> (Syntax.Identifier <$> (name <$> source))
+variable_declarator_id = symbol VariableDeclaratorId *> children identifier
 
 
 
 integer :: Assignment
 integer = makeTerm <$> symbol IntegerLiteral <*> children (symbol DecimalIntegerLiteral >> Literal.Integer <$> source)
+
+float :: Assignment
+float = makeTerm <$> symbol FloatingPointLiteral <*> (Literal.Float <$> source)
 
 string :: Assignment
 string = makeTerm <$> symbol StringLiteral <*> (Literal.TextElement <$> source)
