@@ -1,10 +1,8 @@
 (Program
-  (Call
-    (MemberAccess
-      (Identifier)
-      (Identifier))
-    (Empty))
-  (Call
+  (Send
+    (Identifier)
+    (Identifier))
+  (Send
     (Identifier)
     (Identifier)
     (Identifier)
@@ -13,16 +11,13 @@
       (Integer))
     (KeyValue
       (Identifier)
-      (Integer))
-    (Empty))
-  (Call
+      (Integer)))
+  (Send
     (Identifier)
-    (Call
+    (Send
       (Identifier)
-      (Identifier)
-      (Empty))
-    (Empty))
-  (Call
+      (Identifier)))
+  (Send
     (Identifier)
     (KeyValue
       (Array)
@@ -34,5 +29,4 @@
       (Identifier)
       (Function
         (Empty)
-        (Integer)))
-    (Empty)))
+        (Integer)))))
