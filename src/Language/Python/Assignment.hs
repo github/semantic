@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For HasCallStack
 module Language.Python.Assignment
 ( assignment
 , Syntax
@@ -7,14 +8,9 @@ module Language.Python.Assignment
 ) where
 
 import Assigning.Assignment hiding (Assignment, Error)
-import Data.Abstract.FreeVariables
-import Data.Functor (void)
-import Data.List.NonEmpty (some1)
-import Data.Maybe (fromMaybe)
+import Data.Abstract.FreeVariables (name)
 import Data.Record
-import Data.Semigroup
 import Data.Syntax (contextualize, emptyTerm, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1, parseError, postContextualize)
-import Data.Union
 import GHC.Stack
 import Language.Python.Grammar as Grammar
 import Language.Python.Syntax as Python.Syntax
@@ -27,6 +23,8 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
+import qualified Data.List.NonEmpty as NonEmpty
+import Prologue
 
 
 -- | The type of Python syntax.
@@ -36,8 +34,6 @@ type Syntax =
    , Declaration.Comprehension
    , Declaration.Decorator
    , Declaration.Function
-   , Declaration.Import
-   , Declaration.QualifiedImport
    , Declaration.Variable
    , Expression.Arithmetic
    , Expression.Boolean
@@ -76,10 +72,14 @@ type Syntax =
    , Statement.While
    , Statement.Yield
    , Python.Syntax.Ellipsis
+   , Python.Syntax.Import
+   , Python.Syntax.QualifiedImport
+   , Python.Syntax.QualifiedAliasedImport
    , Syntax.Context
    , Syntax.Empty
    , Syntax.Error
    , Syntax.Identifier
+   , Syntax.Paren
    , Syntax.Program
    , Type.Annotation
    , []
@@ -182,16 +182,16 @@ expressionList :: Assignment
 expressionList = makeTerm'' <$> symbol ExpressionList <*> children (someTerm expression)
 
 listSplat :: Assignment
-listSplat = makeTerm <$> symbol ListSplat <*> (Syntax.Identifier <$> (name <$> source))
+listSplat = makeTerm <$> symbol ListSplat <*> (Syntax.Identifier . name <$> source)
 
 dictionarySplat :: Assignment
-dictionarySplat = makeTerm <$> symbol DictionarySplat <*> (Syntax.Identifier <$> (name <$> source))
+dictionarySplat = makeTerm <$> symbol DictionarySplat <*> (Syntax.Identifier . name <$> source)
 
 keywordArgument :: Assignment
 keywordArgument = makeTerm <$> symbol KeywordArgument <*> children (Statement.Assignment [] <$> term expression <*> term expression)
 
 parenthesizedExpression :: Assignment
-parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
+parenthesizedExpression = makeTerm <$> symbol ParenthesizedExpression <*> (Syntax.Paren <$> children expressions)
 
 parameter :: Assignment
 parameter =  makeTerm <$> symbol DefaultParameter <*> children (Statement.Assignment [] <$> term expression <*> term expression)
@@ -249,10 +249,10 @@ functionDefinition
   <|> makeFunctionDeclaration <$> (symbol Lambda' <|> symbol Lambda) <*> children ((,,,) <$ token AnonLambda <*> emptyTerm <*> (symbol LambdaParameters *> children (manyTerm expression) <|> pure []) <*> optional (symbol Type *> children (term expression)) <*> expressions)
   where
     makeFunctionDeclaration loc (functionName', functionParameters, ty, functionBody) = makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function [] functionName' functionParameters functionBody) (fromMaybe (makeTerm loc Syntax.Empty) ty)
-    makeAsyncFunctionDeclaration loc (async', functionName', functionParameters, ty, functionBody) = makeTerm loc $ Type.Annotation (makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function [] functionName' functionParameters functionBody) (maybe (makeTerm loc Syntax.Empty) id ty)) async'
+    makeAsyncFunctionDeclaration loc (async', functionName', functionParameters, ty, functionBody) = makeTerm loc $ Type.Annotation (makeTerm loc $ Type.Annotation (makeTerm loc $ Declaration.Function [] functionName' functionParameters functionBody) (fromMaybe (makeTerm loc Syntax.Empty) ty)) async'
 
 async' :: Assignment
-async' = makeTerm <$> symbol AnonAsync <*> (Syntax.Identifier <$> (name <$> source))
+async' = makeTerm <$> symbol AnonAsync <*> (Syntax.Identifier . name <$> source)
 
 classDefinition :: Assignment
 classDefinition = makeTerm <$> symbol ClassDefinition <*> children (Declaration.Class [] <$> term expression <*> argumentList <*> expressions)
@@ -334,23 +334,14 @@ assignment' =  makeTerm  <$> symbol Assignment <*> children (Statement.Assignmen
                   , assign Expression.BXOr      <$ symbol AnonCaretEqual
                   ])
   where rvalue = expressionList <|> assignment' <|> yield
-        assign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
+        assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
         assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
 
 yield :: Assignment
 yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children (term ( expression <|> emptyTerm )))
 
--- Identifiers and qualified identifiers (e.g. `a.b.c`) from things like DottedName and Attribute
 identifier :: Assignment
-identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax.Identifier <$> (name <$> source))
-  <|> makeQualifiedIdentifier <$> symbol Attribute <*> children (attribute <|> identifierPair)
-  <|> makeQualifiedIdentifier <$> symbol DottedName <*> children (some identifier')
-  <|> symbol DottedName *> children identifier
-  where
-    attribute = (\a b -> a <> [b]) <$> (symbol Attribute *> children (attribute <|> identifierPair)) <*> identifier'
-    identifierPair = (\a b -> [a, b]) <$> identifier' <*> identifier'
-    identifier' = (symbol Identifier <|> symbol Identifier') *> source
-    makeQualifiedIdentifier loc xs = makeTerm loc (Syntax.Identifier (qualifiedName xs))
+identifier = makeTerm <$> (symbol Identifier <|> symbol Identifier' <|> symbol DottedName) <*> (Syntax.Identifier . name <$> source)
 
 set :: Assignment
 set = makeTerm <$> symbol Set <*> children (Literal.Set <$> manyTerm expression)
@@ -371,11 +362,7 @@ concatenatedString :: Assignment
 concatenatedString = makeTerm <$> symbol ConcatenatedString <*> children (manyTerm string)
 
 float :: Assignment
-float = makeTerm <$> symbol Float <*> (source >>= Literal.normalizeFloatString [ Literal.padWithLeadingZero
-                                                                               , Literal.padWithTrailingZero
-                                                                               , Literal.dropAlphaSuffix
-                                                                               , Literal.removeUnderscores
-                                                                               ])
+float = makeTerm <$> symbol Float <*> (Literal.Float <$> source)
 
 integer :: Assignment
 integer = makeTerm <$> symbol Integer <*> (Literal.Integer <$> source)
@@ -385,29 +372,31 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 import' :: Assignment
 import' =   makeTerm'' <$> symbol ImportStatement <*> children (manyTerm (aliasedImport <|> plainImport))
-        <|> makeTerm <$> symbol ImportFromStatement <*> children (Declaration.Import <$> (identifier <|> emptyTerm) <*> (wildcard <|> (some (aliasImportSymbol <|> importSymbol))) <*> emptyTerm)
+        <|> makeTerm <$> symbol ImportFromStatement <*> children (Python.Syntax.Import <$> importPath <*> (wildcard <|> some (aliasImportSymbol <|> importSymbol)))
   where
     -- `import a as b`
-    aliasedImport = makeImport <$> symbol AliasedImport <*> children ((,) <$> expression <*> (Just <$> expression))
+    aliasedImport = makeTerm <$> symbol AliasedImport <*> children (Python.Syntax.QualifiedAliasedImport  <$> importPath <*> expression)
     -- `import a`
-    plainImport = makeImport <$> location <*> ((,) <$> identifier <*> pure Nothing)
+    plainImport = makeTerm <$> location <*> (Python.Syntax.QualifiedImport <$> importPath)
     -- `from a import foo `
-    importSymbol = makeNameAliasPair <$> rawIdentifier <*> pure Nothing
+    importSymbol = makeNameAliasPair <$> aliasIdentifier <*> pure Nothing
     -- `from a import foo as bar`
-    aliasImportSymbol = symbol AliasedImport *> children (makeNameAliasPair <$> rawIdentifier <*> (Just <$> rawIdentifier))
+    aliasImportSymbol = symbol AliasedImport *> children (makeNameAliasPair <$> aliasIdentifier <*> (Just <$> aliasIdentifier))
     -- `from a import *`
-    wildcard = symbol WildcardImport *> source *> pure []
+    wildcard = symbol WildcardImport *> (name <$> source) $> []
 
-    rawIdentifier = (name <$> identifier') <|> (qualifiedName <$> dottedName')
-    dottedName' = symbol DottedName *> children (some identifier')
-    identifier' = (symbol Identifier <|> symbol Identifier') *> source
+    importPath = importDottedName <|> importRelative
+    importDottedName = symbol DottedName *> children (qualifiedName <$> NonEmpty.some1 identifierSource)
+    importRelative = symbol RelativeImport *> children (relativeQualifiedName <$> importPrefix <*> ((symbol DottedName *> children (many identifierSource)) <|> pure []))
+    importPrefix = symbol ImportPrefix *> source
+    identifierSource = (symbol Identifier <|> symbol Identifier') *> source
+
+    aliasIdentifier = (symbol Identifier <|> symbol Identifier') *> (name <$> source) <|> symbol DottedName *> (name <$> source)
     makeNameAliasPair from (Just alias) = (from, alias)
     makeNameAliasPair from Nothing = (from, from)
-    makeImport loc (from, Just alias) = makeTerm loc (Declaration.QualifiedImport from alias [])
-    makeImport loc (from, Nothing) = makeTerm loc (Declaration.QualifiedImport from from [])
 
 assertStatement :: Assignment
-assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier <$> (name <$> source))) <*> manyTerm expression <*> emptyTerm)
+assertStatement = makeTerm <$> symbol AssertStatement <*> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonAssert <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)
 
 printStatement :: Assignment
 printStatement = do
@@ -416,25 +405,25 @@ printStatement = do
     print <- term printKeyword
     term (redirectCallTerm location print <|> printCallTerm location print)
   where
-    printKeyword = makeTerm <$> symbol AnonPrint <*> (Syntax.Identifier <$> (name <$> source))
+    printKeyword = makeTerm <$> symbol AnonPrint <*> (Syntax.Identifier . name <$> source)
     redirectCallTerm location identifier = makeTerm location <$ symbol Chevron <*> (flip Python.Syntax.Redirect <$> children (term expression) <*> term (printCallTerm location identifier))
     printCallTerm location identifier = makeTerm location <$> (Expression.Call [] identifier <$> manyTerm expression <*> emptyTerm)
 
 nonlocalStatement :: Assignment
-nonlocalStatement = makeTerm <$> symbol NonlocalStatement <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> symbol AnonNonlocal <*> (Syntax.Identifier <$> (name <$> source))) <*> manyTerm expression <*> emptyTerm)
+nonlocalStatement = makeTerm <$> symbol NonlocalStatement <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> symbol AnonNonlocal <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)
 
 globalStatement :: Assignment
-globalStatement = makeTerm <$> symbol GlobalStatement <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> symbol AnonGlobal <*> (Syntax.Identifier <$> (name <$> source))) <*> manyTerm expression <*> emptyTerm)
+globalStatement = makeTerm <$> symbol GlobalStatement <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> symbol AnonGlobal <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)
 
 await :: Assignment
-await = makeTerm <$> symbol Await <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> symbol AnonAwait <*> (Syntax.Identifier <$> (name <$> source))) <*> manyTerm expression <*> emptyTerm)
+await = makeTerm <$> symbol Await <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> symbol AnonAwait <*> (Syntax.Identifier . name <$> source)) <*> manyTerm expression <*> emptyTerm)
 
 returnStatement :: Assignment
 returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> term (expressionList <|> emptyTerm))
 
 deleteStatement :: Assignment
 deleteStatement = makeTerm <$> symbol DeleteStatement <*> children (Expression.Call <$> pure [] <*> term deleteIdentifier <* symbol ExpressionList <*> children (manyTerm expression) <*> emptyTerm)
-  where deleteIdentifier = makeTerm <$> symbol AnonDel <*> (Syntax.Identifier <$> (name <$> source))
+  where deleteIdentifier = makeTerm <$> symbol AnonDel <*> (Syntax.Identifier . name <$> source)
 
 raiseStatement :: Assignment
 raiseStatement = makeTerm <$> symbol RaiseStatement <*> children (Statement.Throw <$> expressions)
@@ -445,7 +434,7 @@ ifStatement = makeTerm <$> symbol IfStatement <*> children (Statement.If <$> ter
         makeElif (loc, makeIf) rest = makeTerm loc (makeIf rest)
 
 execStatement :: Assignment
-execStatement = makeTerm <$> symbol ExecStatement <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> location <*> (Syntax.Identifier <$> (name <$> source))) <*> manyTerm (string <|> expression) <*> emptyTerm)
+execStatement = makeTerm <$> symbol ExecStatement <*> children (Expression.Call <$> pure [] <*> term (makeTerm <$> location <*> (Syntax.Identifier . name <$> source)) <*> manyTerm (string <|> expression) <*> emptyTerm)
 
 passStatement :: Assignment
 passStatement = makeTerm <$> symbol PassStatement <*> (Statement.NoOp <$> emptyTerm <* advance)
@@ -501,7 +490,7 @@ chainl1Term :: Assignment -> Assignment.Assignment [] Grammar (Term -> Term -> T
 chainl1Term expr op = postContextualize (comment <|> symbol AnonLambda *> empty) expr `chainl1` op
 
 -- | Match a series of terms or comments until a delimiter is matched.
-manyTermsTill :: Show b => Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
+manyTermsTill :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
 manyTermsTill step end = manyTill (step <|> comment) end
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
@@ -511,3 +500,5 @@ infixTerm :: HasCallStack
           -> [Assignment.Assignment [] Grammar (Term -> Term -> Union Syntax Term)]
           -> Assignment.Assignment [] Grammar (Union Syntax Term)
 infixTerm = infixContext comment
+
+{-# ANN module ("HLint: ignore Eta reduce" :: String) #-}

@@ -15,10 +15,15 @@ library
   hs-source-dirs:      src
   exposed-modules:
                      -- Analyses & term annotations
-                       Analysis.Abstract.Caching
+                       Analysis.Abstract.BadVariables
+                       Analysis.Abstract.BadValues
+                       Analysis.Abstract.BadModuleResolutions
+                     , Analysis.Abstract.Caching
                      , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Evaluating
+                     , Analysis.Abstract.ImportGraph
+                     , Analysis.Abstract.Quiet
                      , Analysis.Abstract.Tracing
                      , Analysis.CallGraph
                      , Analysis.ConstructorName
@@ -26,7 +31,7 @@ library
                      , Analysis.Decorator
                      , Analysis.Declaration
                      , Analysis.IdentifierName
-                     , Analysis.ModuleDef
+                     , Analysis.PackageDef
                      -- Semantic assignment
                      , Assigning.Assignment
                      , Assigning.Assignment.Table
@@ -34,23 +39,28 @@ library
                      , Control.Abstract.Addressable
                      , Control.Abstract.Analysis
                      , Control.Abstract.Evaluator
+                     , Control.Abstract.Matching
                      , Control.Abstract.Value
                      -- Control flow
                      , Control.Effect
                      -- Effects used for program analysis
-                     , Control.Monad.Effect.Fresh
-                     , Control.Monad.Effect.NonDet
+                     , Control.Effect.Fresh
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
                      , Data.Abstract.Cache
                      , Data.Abstract.Configuration
                      , Data.Abstract.Environment
                      , Data.Abstract.Evaluatable
+                     , Data.Abstract.Exports
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Heap
                      , Data.Abstract.Live
+                     , Data.Abstract.Located
+                     , Data.Abstract.Module
                      , Data.Abstract.ModuleTable
                      , Data.Abstract.Number
+                     , Data.Abstract.Origin
+                     , Data.Abstract.Package
                      , Data.Abstract.Path
                      , Data.Abstract.Type
                      , Data.Abstract.Value
@@ -71,6 +81,8 @@ library
                      , Data.Patch
                      , Data.Range
                      , Data.Record
+                     , Data.Semigroup.App
+                     , Data.Scientific.Exts
                      , Data.Source
                      , Data.Span
                      , Data.SplitDiff
@@ -107,6 +119,7 @@ library
                      , Language.PHP.Assignment
                      , Language.PHP.Grammar
                      , Language.PHP.Syntax
+                     , Language.Preluded
                      , Language.Python.Assignment
                      , Language.Python.Grammar
                      , Language.Python.Syntax
@@ -127,13 +140,16 @@ library
                      , Rendering.Symbol
                      , Rendering.TOC
                      -- High-level flow & operational functionality (logging, stats, etc.)
-                     , Semantic
                      , Semantic.CLI
+                     , Semantic.Diff
+                     , Semantic.Distribute
                      , Semantic.IO
                      , Semantic.Log
+                     , Semantic.Parse
+                     , Semantic.Queue
                      , Semantic.Stat
                      , Semantic.Task
-                     , Semantic.Queue
+                     , Semantic.Telemetry
                      , Semantic.Util
                     -- Custom Prelude
   other-modules:       Prologue
@@ -143,6 +159,7 @@ library
                      , ansi-terminal
                      , array
                      , async
+                     , attoparsec
                      , bifunctors
                      , bytestring
                      , cmark-gfm
@@ -158,6 +175,7 @@ library
                      , hashable
                      , kdt
                      , mersenne-random-pure64
+                     , microlens
                      , mtl
                      , network
                      , network-uri
@@ -184,16 +202,20 @@ library
                      , tree-sitter-typescript
                      , tree-sitter-java
   default-language:    Haskell2010
-  default-extensions: DeriveFoldable
-                    , DeriveFunctor
-                    , DeriveGeneric
-                    , DeriveTraversable
-                    , FlexibleContexts
-                    , FlexibleInstances
-                    , OverloadedStrings
-                    , RecordWildCards
-                    , StrictData
-  ghc-options:         -Wall -fno-warn-name-shadowing -O -j
+  default-extensions:  DataKinds
+                     , DeriveFoldable
+                     , DeriveFunctor
+                     , DeriveGeneric
+                     , DeriveTraversable
+                     , FlexibleContexts
+                     , FlexibleInstances
+                     , MultiParamTypeClasses
+                     , OverloadedStrings
+                     , RecordWildCards
+                     , StandaloneDeriving
+                     , StrictData
+                     , TypeApplications
+  ghc-options:         -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -fno-warn-name-shadowing -O -j
   ghc-prof-options:    -fprof-auto
 
 executable semantic
@@ -213,6 +235,7 @@ test-suite test
   main-is:             Spec.hs
   other-modules:       Assigning.Assignment.Spec
                      , Analysis.Go.Spec
+                     , Analysis.PHP.Spec
                      , Analysis.Python.Spec
                      , Analysis.Ruby.Spec
                      , Analysis.TypeScript.Spec
@@ -220,13 +243,14 @@ test-suite test
                      , Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Mergeable.Spec
+                     , Data.Scientific.Spec
                      , Data.Source.Spec
                      , Data.Term.Spec
                      , Diffing.Algorithm.RWS.Spec
                      , Diffing.Algorithm.SES.Spec
                      , Diffing.Interpreter.Spec
                      , Integration.Spec
-                     , Rendering.Imports.Spec
+                     , Matching.Go.Spec
                      , Rendering.TOC.Spec
                      , Semantic.Spec
                      , Semantic.CLI.Spec
@@ -259,7 +283,26 @@ test-suite test
                      , these
   ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j
   default-language:    Haskell2010
-  default-extensions:  DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, RecordWildCards
+  default-extensions:  DataKinds
+                     , DeriveFunctor
+                     , DeriveGeneric
+                     , FlexibleContexts
+                     , FlexibleInstances
+                     , MultiParamTypeClasses
+                     , OverloadedStrings
+                     , RecordWildCards
+                     , StandaloneDeriving
+                     , TypeApplications
+
+test-suite doctests
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      test
+  main-is:             Doctests.hs
+  default-language:    Haskell2010
+  ghc-options:         -dynamic -threaded -j
+  build-depends:       base
+                     , doctest
+                     , QuickCheck
 
 benchmark evaluation
   hs-source-dirs: bench

@@ -1,24 +1,47 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Abstract.ModuleTable
-  ( ModuleName
-  , ModuleTable (..)
-  , moduleTableLookup
-  , moduleTableInsert
-  ) where
+( ModulePath
+, ModuleTable (..)
+, singleton
+, lookup
+, member
+, modulePathsInDir
+, insert
+, fromModules
+, toPairs
+) where
 
-import Data.Abstract.FreeVariables
-import Data.Semigroup
-import GHC.Generics
+import Data.Abstract.Module
 import qualified Data.Map as Map
+import Data.Semigroup
+import Prologue
+import System.FilePath.Posix
+import GHC.Generics (Generic1)
+import Prelude hiding (lookup)
 
-
-type ModuleName = Name
-
-newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModuleName a }
+newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModulePath a }
   deriving (Eq, Foldable, Functor, Generic1, Monoid, Ord, Semigroup, Show, Traversable)
 
-moduleTableLookup :: ModuleName -> ModuleTable a -> Maybe a
-moduleTableLookup k = Map.lookup k . unModuleTable
+singleton :: ModulePath -> a -> ModuleTable a
+singleton name = ModuleTable . Map.singleton name
 
-moduleTableInsert :: ModuleName -> a -> ModuleTable a -> ModuleTable a
-moduleTableInsert k v ModuleTable{..} = ModuleTable (Map.insert k v unModuleTable)
+modulePathsInDir :: FilePath -> ModuleTable a -> [ModulePath]
+modulePathsInDir k = filter (\e -> k == takeDirectory e) . Map.keys . unModuleTable
+
+lookup :: ModulePath -> ModuleTable a -> Maybe a
+lookup k = Map.lookup k . unModuleTable
+
+member :: ModulePath -> ModuleTable a -> Bool
+member k = Map.member k . unModuleTable
+
+insert :: ModulePath -> a -> ModuleTable a -> ModuleTable a
+insert k v = ModuleTable . Map.insert k v . unModuleTable
+
+
+-- | Construct a 'ModuleTable' from a list of 'Module's.
+fromModules :: [Module term] -> ModuleTable [Module term]
+fromModules modules = let x = ModuleTable (Map.fromListWith (<>) (map toEntry modules)) in traceShow x x
+  where toEntry m = (modulePath (moduleInfo m), [m])
+
+toPairs :: ModuleTable a -> [(ModulePath, a)]
+toPairs = Map.toList . unModuleTable

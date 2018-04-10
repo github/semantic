@@ -1,9 +1,185 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.TypeScript.Syntax where
 
-import Prologue
-import Data.Abstract.Evaluatable
-import Diffing.Algorithm
+import qualified Data.Abstract.Environment as Env
+import qualified Data.Abstract.FreeVariables as FV
+import           Data.Abstract.Evaluatable
+import qualified Data.ByteString.Char8 as BC
+import qualified Data.ByteString as B
+import           Data.Abstract.Module (ModulePath, ModuleInfo(..))
+import           Diffing.Algorithm
+import           Prelude hiding (fail)
+import           Prologue
+import           System.FilePath.Posix
+
+data Relative = Relative | NonRelative
+  deriving (Eq, Ord, Show)
+
+data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: Relative }
+  deriving (Eq, Ord, Show)
+
+importPath :: ByteString -> ImportPath
+importPath str = let path = stripQuotes str in ImportPath (BC.unpack path) (pathType path)
+  where
+    stripQuotes = B.filter (`B.notElem` "\'\"")
+    pathType xs | not (B.null xs), BC.head xs == '.' = Relative
+                | otherwise = NonRelative
+
+toName :: ImportPath -> Name
+toName = FV.name . BC.pack . unPath
+
+resolveTypeScriptModule :: MonadEvaluatable location term value m => ImportPath -> m ModulePath
+resolveTypeScriptModule (ImportPath path Relative)    = resolveRelativeTSModule path
+resolveTypeScriptModule (ImportPath path NonRelative) = resolveNonRelativeTSModule path
+
+-- | Resolve a relative TypeScript import to a known 'ModuleName' or fail.
+--
+-- import { b } from "./moduleB" in /root/src/moduleA.ts
+--
+-- /root/src/moduleB.ts
+-- /root/src/moduleB/package.json (if it specifies a "types" property)
+-- /root/src/moduleB/index.ts
+resolveRelativeTSModule :: MonadEvaluatable location term value m => FilePath -> m ModulePath
+resolveRelativeTSModule relImportPath = do
+  ModuleInfo{..} <- currentModule
+  let relRootDir = takeDirectory (makeRelative moduleRoot modulePath)
+  let path = normalise (relRootDir </> normalise relImportPath)
+  resolveTSModule path >>= either notFound pure
+  where
+    notFound xs = fail $ "Unable to resolve relative module import: " <> show relImportPath <> ", looked for it in: " <> show xs
+
+-- | Resolve a non-relative TypeScript import to a known 'ModuleName' or fail.
+--
+-- import { b } from "moduleB" in source file /root/src/moduleA.ts
+--
+-- /root/src/node_modules/moduleB.ts
+-- /root/src/node_modules/moduleB/package.json (if it specifies a "types" property)
+-- /root/src/node_modules/moduleB/index.ts
+--
+-- /root/node_modules/moduleB.ts, etc
+-- /node_modules/moduleB.ts, etc
+resolveNonRelativeTSModule :: MonadEvaluatable location term value m => FilePath -> m ModulePath
+resolveNonRelativeTSModule name = do
+  ModuleInfo{..} <- currentModule
+  go "." (makeRelative moduleRoot modulePath) mempty
+  where
+    nodeModulesPath dir = takeDirectory dir </> "node_modules" </> name
+    -- Recursively search in a 'node_modules' directory, stepping up a directory each time.
+    go root path searched = do
+      res <- resolveTSModule (nodeModulesPath path)
+      case res of
+        Left xs | parentDir <- takeDirectory path , root /= parentDir -> go root parentDir (searched <> xs)
+                | otherwise -> notFound (searched <> xs)
+        Right m -> pure m
+    notFound xs = fail $ "Unable to resolve non-relative module import: " <> show name <> ", looked for it in: " <> show xs
+
+resolveTSModule :: MonadEvaluatable location term value m => FilePath -> m (Either [FilePath] ModulePath)
+resolveTSModule path = maybe (Left searchPaths) Right <$> resolve searchPaths
+  where exts = ["ts", "tsx", "d.ts"]
+        searchPaths =
+          ((path <.>) <$> exts)
+          -- TODO: Requires parsing package.json, getting the path of the
+          --       "types" property and adding that value to the search Paths.
+          -- <> [searchDir </> "package.json"]
+          <> (((path </> "index") <.>) <$> exts)
+
+
+data Import a = Import { importSymbols :: ![(Name, Name)], importFrom :: ImportPath }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 Import where liftEq = genericLiftEq
+instance Ord1 Import where liftCompare = genericLiftCompare
+instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
+
+  -- http://www.typescriptlang.org/docs/handbook/module-resolution.html
+instance Evaluatable Import where
+  eval (Import symbols importPath) = do
+    modulePath <- resolveTypeScriptModule importPath
+    (importedEnv, _) <- isolate (require modulePath)
+    modifyEnv (mappend (renamed importedEnv)) *> unit
+    where
+      renamed importedEnv
+        | Prologue.null symbols = importedEnv
+        | otherwise = Env.overwrite symbols importedEnv
+
+data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportAlias :: !a, qualifiedAliasedImportFrom :: ImportPath }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 QualifiedAliasedImport where liftEq = genericLiftEq
+instance Ord1 QualifiedAliasedImport where liftCompare = genericLiftCompare
+instance Show1 QualifiedAliasedImport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QualifiedAliasedImport where
+  eval (QualifiedAliasedImport aliasTerm importPath ) = do
+    modulePath <- resolveTypeScriptModule importPath
+    alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
+    letrec' alias $ \addr -> do
+      (importedEnv, _) <- isolate (require modulePath)
+      modifyEnv (mappend importedEnv)
+      void $ makeNamespace alias addr []
+      unit
+
+newtype SideEffectImport a = SideEffectImport { sideEffectImportFrom :: ImportPath }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 SideEffectImport where liftEq = genericLiftEq
+instance Ord1 SideEffectImport where liftCompare = genericLiftCompare
+instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable SideEffectImport where
+  eval (SideEffectImport importPath) = do
+    modulePath <- resolveTypeScriptModule importPath
+    void $ isolate (require modulePath)
+    unit
+
+
+-- | Qualified Export declarations
+newtype QualifiedExport a = QualifiedExport { qualifiedExportSymbols :: [(Name, Name)] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 QualifiedExport where liftEq = genericLiftEq
+instance Ord1 QualifiedExport where liftCompare = genericLiftCompare
+instance Show1 QualifiedExport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QualifiedExport where
+  eval (QualifiedExport exportSymbols) = do
+    -- Insert the aliases with no addresses.
+    for_ exportSymbols $ \(name, alias) ->
+      addExport name alias Nothing
+    unit
+
+
+-- | Qualified Export declarations that export from another module.
+data QualifiedExportFrom a = QualifiedExportFrom { qualifiedExportFrom :: ImportPath, qualifiedExportFromSymbols :: ![(Name, Name)]}
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 QualifiedExportFrom where liftEq = genericLiftEq
+instance Ord1 QualifiedExportFrom where liftCompare = genericLiftCompare
+instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable QualifiedExportFrom where
+  eval (QualifiedExportFrom importPath exportSymbols) = do
+    modulePath <- resolveTypeScriptModule importPath
+    (importedEnv, _) <- isolate (require modulePath)
+    -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
+    for_ exportSymbols $ \(name, alias) -> do
+      let address = Env.lookup name importedEnv
+      maybe (cannotExport modulePath name) (addExport name alias . Just) address
+    unit
+    where
+      cannotExport moduleName name = fail $
+        "module " <> show moduleName <> " does not export " <> show (unName name)
+
+
+newtype DefaultExport a = DefaultExport { defaultExport :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 DefaultExport where liftEq = genericLiftEq
+instance Ord1 DefaultExport where liftCompare = genericLiftCompare
+instance Show1 DefaultExport where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable DefaultExport where
+
 
 -- | Lookup type for a type-level key in a typescript map.
 data LookupType a = LookupType { lookupTypeIdentifier :: a, lookupTypeKey :: a }
@@ -209,30 +385,6 @@ instance Ord1 ObjectType where liftCompare = genericLiftCompare
 instance Show1 ObjectType where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ObjectType
 
-newtype Export a = Export { _exportElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 Export where liftEq = genericLiftEq
-instance Ord1 Export where liftCompare = genericLiftCompare
-instance Show1 Export where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable Export
-
-newtype ExportClause a = ExportClause { _exportClauseElements :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 ExportClause where liftEq = genericLiftEq
-instance Ord1 ExportClause where liftCompare = genericLiftCompare
-instance Show1 ExportClause where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable ExportClause
-
-data ImportExportSpecifier a = ImportExportSpecifier { _specifierSubject :: !a, _specifierAlias :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 ImportExportSpecifier where liftEq = genericLiftEq
-instance Ord1 ImportExportSpecifier where liftCompare = genericLiftCompare
-instance Show1 ImportExportSpecifier where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable ImportExportSpecifier
-
 data With a = With { _withExpression :: !a, _withBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
@@ -247,7 +399,9 @@ newtype AmbientDeclaration a = AmbientDeclaration { _ambientDeclarationBody :: a
 instance Eq1 AmbientDeclaration where liftEq = genericLiftEq
 instance Ord1 AmbientDeclaration where liftCompare = genericLiftCompare
 instance Show1 AmbientDeclaration where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable AmbientDeclaration
+
+instance Evaluatable AmbientDeclaration where
+  eval (AmbientDeclaration body) = subtermValue body
 
 data EnumDeclaration a = EnumDeclaration { _enumDeclarationIdentifier :: !a, _enumDeclarationBody :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -410,6 +564,35 @@ instance Ord1 Update where liftCompare = genericLiftCompare
 instance Show1 Update where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Update
 
+data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 Module where liftEq = genericLiftEq
+instance Ord1 Module where liftCompare = genericLiftCompare
+instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Module where
+  eval (Module iden xs) = do
+    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
+    letrec' name $ \addr ->
+      eval xs <* makeNamespace name addr []
+
+
+
+data InternalModule a = InternalModule { internalModuleIdentifier :: !a, internalModuleStatements :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 InternalModule where liftEq = genericLiftEq
+instance Ord1 InternalModule where liftCompare = genericLiftCompare
+instance Show1 InternalModule where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable InternalModule where
+  eval (InternalModule iden xs) = do
+    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
+    letrec' name $ \addr ->
+      eval xs <* makeNamespace name addr []
+
+
 data ImportAlias a = ImportAlias { _importAliasSubject :: !a, _importAlias :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
@@ -417,14 +600,6 @@ instance Eq1 ImportAlias where liftEq = genericLiftEq
 instance Ord1 ImportAlias where liftCompare = genericLiftCompare
 instance Show1 ImportAlias where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ImportAlias
-
-data InternalModule a = InternalModule { _internalModuleIdentifier :: !a, _internalModuleStatements :: ![a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 InternalModule where liftEq = genericLiftEq
-instance Ord1 InternalModule where liftCompare = genericLiftCompare
-instance Show1 InternalModule where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable InternalModule
 
 data Super a = Super
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)

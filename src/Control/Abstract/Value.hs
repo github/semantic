@@ -1,17 +1,25 @@
-{-# LANGUAGE MultiParamTypeClasses, Rank2Types, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Control.Abstract.Value where
+{-# LANGUAGE FunctionalDependencies, GADTs, Rank2Types, TypeFamilies, TypeOperators, UndecidableInstances #-}
+module Control.Abstract.Value
+( MonadValue(..)
+, Comparator(..)
+, while
+, doWhile
+, forLoop
+, makeNamespace
+, ValueRoots(..)
+, ValueError(..)
+) where
 
-import Control.Abstract.Addressable
-import Control.Abstract.Analysis
-import Data.Abstract.Environment
+import Control.Abstract.Evaluator
+import Data.Abstract.Address (Address, Cell)
+import Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables
+import Data.Abstract.Live (Live)
 import Data.Abstract.Number as Number
-import Data.Abstract.Type as Type
-import Data.Abstract.Value as Value
 import Data.Scientific (Scientific)
-import qualified Data.Set as Set
-import Prelude hiding (fail)
-import Prologue
+import Data.Semigroup.Reducer hiding (unit)
+import Prelude
+import Prologue hiding (TypeError)
 
 -- | This datum is passed into liftComparison to handle the fact that Ruby and PHP
 --   have built-in generalized-comparison ("spaceship") operators. If you want to
@@ -26,7 +34,7 @@ data Comparator
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class (Monad m, Show value) => MonadValue value m where
+class (Monad m, Show value) => MonadValue location value m | m value -> location where
   -- | Construct an abstract unit value.
   --   TODO: This might be the same as the empty tuple for some value types
   unit :: m value
@@ -80,39 +88,66 @@ class (Monad m, Show value) => MonadValue value m where
   -- | Construct an array of zero or more values.
   array :: [value] -> m value
 
--- | Extract a 'ByteString' from a given value.
+  -- | Construct a key-value pair for use in a hash.
+  kvPair :: value -> value -> m value
+
+  -- | Extract the contents of a key-value pair as a tuple.
+  asPair :: value -> m (value, value)
+
+  -- | Construct a hash out of pairs.
+  hash :: [(value, value)] -> m value
+
+  -- | Extract a 'ByteString' from a given value.
   asString :: value -> m ByteString
 
   -- | Eliminate boolean values. TODO: s/boolean/truthy
-  ifthenelse :: value -> m a -> m a -> m a
+  ifthenelse :: value -> m value -> m value -> m value
+
+  -- | Extract a 'Bool' from a given value.
+  asBool :: value -> m Bool
+
+  -- | Construct the nil/null datatype.
+  null :: m value
+
+  -- | Build a class value from a name and environment.
+  klass :: Name                       -- ^ The new class's identifier
+        -> [value]                    -- ^ A list of superclasses
+        -> Environment location value -- ^ The environment to capture
+        -> m value
+
+  -- | Build a namespace value from a name and environment stack
+  --
+  -- Namespaces model closures with monoidal environments.
+  namespace :: Name                       -- ^ The namespace's identifier
+            -> Environment location value -- ^ The environment to mappend
+            -> m value
+
+  -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
+  scopedEnvironment :: value -> m (Environment location value)
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
-  abstract :: (FreeVariables term, MonadControl term m) => [Name] -> Subterm term (m value) -> m value
+  lambda :: (FreeVariables term, MonadControl term m) => [Name] -> Subterm term (m value) -> m value
   -- | Evaluate an application (like a function call).
-  apply :: value -> [m value] -> m value
+  call :: value -> [m value] -> m value
 
   -- | Primitive looping combinator, approximately equivalent to 'fix'. This should be used in place of direct recursion, as it allows abstraction over recursion.
   --
   --   The function argument takes an action which recurs through the loop.
   loop :: (m value -> m value) -> m value
 
--- | Attempt to extract a 'Prelude.Bool' from a given value.
-toBool :: MonadValue value m => value -> m Bool
-toBool v = ifthenelse v (pure True) (pure False)
 
-forLoop :: (MonadEnvironment value m, MonadValue value m)
-        => m value -- | Initial statement
-        -> m value -- | Condition
-        -> m value -- | Increment/stepper
-        -> m value -- | Body
+-- | Attempt to extract a 'Prelude.Bool' from a given value.
+forLoop :: (MonadEnvironment location value m, MonadValue location value m)
+        => m value -- ^ Initial statement
+        -> m value -- ^ Condition
+        -> m value -- ^ Increment/stepper
+        -> m value -- ^ Body
         -> m value
-forLoop initial cond step body = do
-  void initial
-  env <- getGlobalEnv
-  localEnv (mappend env) (while cond (body *> step))
+forLoop initial cond step body =
+  localize (initial *> while cond (body *> step))
 
 -- | The fundamental looping primitive, built on top of ifthenelse.
-while :: MonadValue value m
+while :: MonadValue location value m
       => m value
       -> m value
       -> m value
@@ -121,7 +156,7 @@ while cond body = loop $ \ continue -> do
   ifthenelse this (body *> continue) unit
 
 -- | Do-while loop, built on top of while.
-doWhile :: MonadValue value m
+doWhile :: MonadValue location value m
         => m value
         -> m value
         -> m value
@@ -129,157 +164,47 @@ doWhile body cond = loop $ \ continue -> body *> do
   this <- cond
   ifthenelse this continue unit
 
--- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Monad m
-         , MonadAddressable location Value m
-         , MonadAnalysis term Value m
-         , Show location
-         )
-         => MonadValue Value m where
+makeNamespace :: ( MonadValue location value m
+                 , MonadEnvironment location value m
+                 , MonadHeap location value m
+                 , Ord location
+                 , Reducer value (Cell location value)
+                 )
+              => Name
+              -> Address location value
+              -> [value]
+              -> m value
+makeNamespace name addr supers = do
+  superEnv <- mconcat <$> traverse scopedEnvironment supers
+  namespaceEnv <- Env.head <$> getEnv
+  v <- namespace name (Env.mergeNewer superEnv namespaceEnv)
+  v <$ assign addr v
 
-  unit     = pure . injValue $ Value.Unit
-  integer  = pure . injValue . Value.Integer . Number.Integer
-  boolean  = pure . injValue . Boolean
-  string   = pure . injValue . Value.String
-  float    = pure . injValue . Value.Float . Decimal
-  symbol   = pure . injValue . Value.Symbol
-  rational = pure . injValue . Value.Rational . Ratio
 
-  multiple = pure . injValue . Value.Tuple
-  array    = pure . injValue . Value.Array
+-- | Value types, e.g. closures, which can root a set of addresses.
+class ValueRoots location value where
+  -- | Compute the set of addresses rooted by a given value.
+  valueRoots :: value -> Live location value
 
-  asString v
-    | Just (Value.String n) <- prjValue v = pure n
-    | otherwise                           = fail ("expected " <> show v <> " to be a string")
 
-  ifthenelse cond if' else'
-    | Just (Boolean b) <- prjValue cond = if b then if' else else'
-    | otherwise = fail ("not defined for non-boolean conditions: " <> show cond)
+-- The type of exceptions that can be thrown when constructing values in `MonadValue`.
+data ValueError location value resume where
+  StringError            :: value          -> ValueError location value ByteString
+  NamespaceError         :: Prelude.String -> ValueError location value (Environment location value)
+  ScopedEnvironmentError :: Prelude.String -> ValueError location value (Environment location value)
+  CallError              :: value          -> ValueError location value value
+  BoolError              :: value          -> ValueError location value Bool
+  Numeric2Error          :: value          -> value -> ValueError location value value
 
-  liftNumeric f arg
-    | Just (Value.Integer (Number.Integer i)) <- prjValue arg = integer $ f i
-    | Just (Value.Float (Decimal d))          <- prjValue arg = float   $ f d
-    | Just (Value.Rational (Ratio r))         <- prjValue arg = rational $ f r
-    | otherwise = fail ("Invalid operand to liftNumeric: " <> show arg)
+instance Eq value => Eq1 (ValueError location value) where
+  liftEq _ (StringError a) (StringError b)                       = a == b
+  liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
+  liftEq _ (ScopedEnvironmentError a) (ScopedEnvironmentError b) = a == b
+  liftEq _ (CallError a) (CallError b)                           = a == b
+  liftEq _ (BoolError a) (BoolError c)                           = a == c
+  liftEq _ (Numeric2Error a b) (Numeric2Error c d)               = (a == c) && (b == d)
+  liftEq _ _             _                                       = False
 
-  liftNumeric2 f left right
-    | Just (Value.Integer i, Value.Integer j)   <- prjPair pair = f i j & specialize
-    | Just (Value.Integer i, Value.Rational j)  <- prjPair pair = f i j & specialize
-    | Just (Value.Integer i, Value.Float j)     <- prjPair pair = f i j & specialize
-    | Just (Value.Rational i, Value.Integer j)  <- prjPair pair = f i j & specialize
-    | Just (Value.Rational i, Value.Rational j) <- prjPair pair = f i j & specialize
-    | Just (Value.Rational i, Value.Float j)    <- prjPair pair = f i j & specialize
-    | Just (Value.Float i, Value.Integer j)     <- prjPair pair = f i j & specialize
-    | Just (Value.Float i, Value.Rational j)    <- prjPair pair = f i j & specialize
-    | Just (Value.Float i, Value.Float j)       <- prjPair pair = f i j & specialize
-    | otherwise = fail ("Invalid operands to liftNumeric2: " <> show pair)
-      where
-        -- Dispatch whatever's contained inside a 'SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: MonadValue value m => SomeNumber -> m value
-        specialize (SomeNumber (Number.Integer i)) = integer i
-        specialize (SomeNumber (Ratio r))          = rational r
-        specialize (SomeNumber (Decimal d))        = float d
-        pair = (left, right)
-
-  liftComparison comparator left right
-    | Just (Value.Integer (Number.Integer i), Value.Integer (Number.Integer j)) <- prjPair pair = go i j
-    | Just (Value.Integer (Number.Integer i), Value.Float (Decimal j))          <- prjPair pair = go (fromIntegral i) j
-    | Just (Value.Float (Decimal i), Value.Integer (Number.Integer j))          <- prjPair pair = go i (fromIntegral j)
-    | Just (Value.Float (Decimal i), Value.Float (Decimal j))                   <- prjPair pair = go i j
-    | Just (Value.String i, Value.String j)                                     <- prjPair pair = go i j
-    | Just (Boolean i, Boolean j)                                               <- prjPair pair = go i j
-    | Just (Value.Unit, Value.Unit)                                             <- prjPair pair = boolean True
-    | otherwise = fail ("Type error: invalid arguments to liftComparison: " <> show pair)
-      where
-        -- Explicit type signature is necessary here because we're passing all sorts of things
-        -- to these comparison functions.
-        go :: (Ord a, MonadValue value m) => a -> a -> m value
-        go l r = case comparator of
-          Concrete f  -> boolean (f l r)
-          Generalized -> integer (orderingToInt (compare l r))
-
-        -- Map from [LT, EQ, GT] to [-1, 0, 1]
-        orderingToInt :: Ordering -> Prelude.Integer
-        orderingToInt = toInteger . pred . fromEnum
-
-        pair = (left, right)
-
-  liftBitwise operator target
-    | Just (Value.Integer (Number.Integer i)) <- prjValue target = integer $ operator i
-    | otherwise = fail ("Type error: invalid unary bitwise operation on " <> show target)
-
-  liftBitwise2 operator left right
-    | Just (Value.Integer (Number.Integer i), Value.Integer (Number.Integer j)) <- prjPair pair = integer $ operator i j
-    | otherwise = fail ("Type error: invalid binary bitwise operation on " <> show pair)
-      where pair = (left, right)
-
-  abstract names (Subterm body _) = do
-    l <- label body
-    injValue . Closure names l . bindEnv (foldr Set.delete (freeVariables body) names) <$> askLocalEnv
-
-  apply op params = do
-    Closure names label env <- maybe (fail ("expected a closure, got: " <> show op)) pure (prjValue op)
-    bindings <- foldr (\ (name, param) rest -> do
-      v <- param
-      a <- alloc name
-      assign a v
-      envInsert name a <$> rest) (pure env) (zip names params)
-    localEnv (mappend bindings) (goto label >>= evaluateTerm)
-
-  loop = fix
-
--- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance (Alternative m, MonadEnvironment Type m, MonadFail m, MonadFresh m, MonadHeap Type m) => MonadValue Type m where
-  abstract names (Subterm _ body) = do
-    (env, tvars) <- foldr (\ name rest -> do
-      a <- alloc name
-      tvar <- Var <$> fresh
-      assign a tvar
-      (env, tvars) <- rest
-      pure (envInsert name a env, tvar : tvars)) (pure mempty) names
-    ret <- localEnv (mappend env) body
-    pure (Product tvars :-> ret)
-
-  unit       = pure Type.Unit
-  integer _  = pure Int
-  boolean _  = pure Bool
-  string _   = pure Type.String
-  float _    = pure Type.Float
-  symbol _   = pure Type.Symbol
-  rational _ = pure Type.Rational
-  multiple   = pure . Type.Product
-  array      = pure . Type.Array
-
-  ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
-
-  liftNumeric _ Type.Float = pure Type.Float
-  liftNumeric _ Int        = pure Int
-  liftNumeric _ _          = fail "Invalid type in unary numeric operation"
-
-  liftNumeric2 _ left right = case (left, right) of
-    (Type.Float, Int) -> pure Type.Float
-    (Int, Type.Float) -> pure Type.Float
-    _                 -> unify left right
-
-  liftBitwise _ Int = pure Int
-  liftBitwise _ t   = fail ("Invalid type passed to unary bitwise operation: " <> show t)
-
-  liftBitwise2 _ Int Int = pure Int
-  liftBitwise2 _ t1 t2   = fail ("Invalid types passed to binary bitwise operation: " <> show (t1, t2))
-
-  liftComparison (Concrete _) left right = case (left, right) of
-    (Type.Float, Int) ->                     pure Bool
-    (Int, Type.Float) ->                     pure Bool
-    _                 -> unify left right *> pure Bool
-  liftComparison Generalized left right = case (left, right) of
-    (Type.Float, Int) ->                     pure Int
-    (Int, Type.Float) ->                     pure Int
-    _                 -> unify left right *> pure Int
-
-  apply op params = do
-    tvar <- fresh
-    paramTypes <- sequenceA params
-    _ :-> ret <- op `unify` (Product paramTypes :-> Var tvar)
-    pure ret
-
-  loop f = f empty
+deriving instance (Show value) => Show (ValueError location value resume)
+instance (Show value) => Show1 (ValueError location value) where
+  liftShowsPrec _ _ = showsPrec

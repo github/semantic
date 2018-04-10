@@ -1,5 +1,5 @@
 (Program
-  (Module
+  (Package
     (Identifier))
   (Function
     (Empty)
@@ -12,8 +12,9 @@
           (Identifier)
           (Empty)))
       (Call
-        (Pointer
-          (Identifier))
+        (Paren
+          (Pointer
+            (Identifier)))
         (Identifier)
         (Empty))
       (TypeConversion
@@ -71,8 +72,9 @@
         (Identifier)
         (Empty))
       (Call
-        (MemberAccess
-          (Identifier)
-          (Identifier))
+        (Paren
+          (MemberAccess
+            (Identifier)
+            (Identifier)))
         (Identifier)
         (Empty)))))

@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedLists, OverloadedStrings #-}
 module Analysis.Python.Spec (spec) where
 
 import Data.Abstract.Value
@@ -8,37 +9,42 @@ import SpecHelpers
 
 spec :: Spec
 spec = parallel $ do
-  describe "evalutes Python" $ do
+  describe "evaluates Python" $ do
     it "imports" $ do
-      env <- evaluate "main.py"
-      let expectedEnv = Environment $ fromList
-            [ (qualifiedName ["a", "foo"], addr 0)
-            , (qualifiedName ["b", "c", "baz"], addr 1)
-            ]
-      env `shouldBe` expectedEnv
+      res <- snd <$> evaluate "main.py"
+      environment res `shouldBe` [ ("print", addr 0)
+                                 , ("a", addr 1)
+                                 , ("b", addr 3)
+                                 ]
+
+      heapLookup (Address (Precise 1)) (heap res) `shouldBe` ns "a" [ ("foo", addr 2) ]
+      heapLookup (Address (Precise 3)) (heap res) `shouldBe` ns "b" [ ("c", addr 4) ]
+      heapLookup (Address (Precise 4)) (heap res) `shouldBe` ns "c" [ ("baz", addr 5) ]
 
     it "imports with aliases" $ do
-      env <- evaluate "main1.py"
-      let expectedEnv = Environment $ fromList
-            [ (qualifiedName ["b", "foo"], addr 0)
-            , (qualifiedName ["e", "baz"], addr 1)
-            ]
-      env `shouldBe` expectedEnv
+      env <- environment . snd <$> evaluate "main1.py"
+      env `shouldBe` [ ("print", addr 0)
+                     , ("b", addr 1)
+                     , ("e", addr 3)
+                     ]
 
     it "imports using 'from' syntax" $ do
-      env <- evaluate "main2.py"
-      let expectedEnv = Environment $ fromList
-            [ (qualifiedName ["foo"], addr 0)
-            , (qualifiedName ["bar"], addr 1)
-            ]
-      env `shouldBe` expectedEnv
+      env <- environment . snd <$> evaluate "main2.py"
+      env `shouldBe` [ ("print", addr 0)
+                     , ("foo", addr 1)
+                     , ("bar", addr 2)
+                     ]
+
+    it "subclasses" $ do
+      v <- fst <$> evaluate "subclass.py"
+      v `shouldBe` Right (Right (Right (Right (Right (Right (pure (injValue (String "\"bar\""))))))))
+
+    it "handles multiple inheritance left-to-right" $ do
+      v <- fst <$> evaluate "multiple_inheritance.py"
+      v `shouldBe` Right (Right (Right (Right (Right (Right (pure (injValue (String "\"foo!\""))))))))
 
   where
+    ns n = Just . Latest . Just . injValue . Namespace n
     addr = Address . Precise
     fixtures = "test/fixtures/python/analysis/"
-    evaluate entry = snd . fst . fst . fst . fst <$>
-      evaluateFiles pythonParser
-      [ fixtures <> entry
-      , fixtures <> "a.py"
-      , fixtures <> "b/c.py"
-      ]
+    evaluate entry = evalPythonProject (fixtures <> entry)

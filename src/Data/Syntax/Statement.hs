@@ -1,10 +1,10 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, ViewPatterns #-}
 module Data.Syntax.Statement where
 
-import Data.Abstract.Environment
+import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
-import Prelude hiding (fail)
+import Prelude
 import Prologue
 
 -- | Conditional. This must have an else block, which can be filled with some default value when omitted in the source, e.g. 'pure ()' for C-style if-without-else or 'pure Nothing' for Ruby-style, in both cases assuming some appropriate Applicative context into which the If will be lifted.
@@ -77,8 +77,11 @@ instance Eq1 Let where liftEq = genericLiftEq
 instance Ord1 Let where liftCompare = genericLiftCompare
 instance Show1 Let where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Let
-instance Evaluatable Let
+instance Evaluatable Let where
+  eval Let{..} = do
+    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm letVariable)
+    addr <- snd <$> letrec name (subtermValue letValue)
+    localEnv (Env.insert name addr) (subtermValue letBody)
 
 
 -- Assignment
@@ -93,12 +96,8 @@ instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Assignment where
   eval Assignment{..} = do
-    v <- subtermValue assignmentValue
-    addr <- lookupOrAlloc name
-    assign addr v
-    modifyGlobalEnv (envInsert name addr)
-    pure v
-    where name = freeVariable (subterm assignmentTarget)
+    lhs <- subtermValue assignmentTarget >>= scopedEnvironment
+    localEnv (mappend lhs) (subtermValue assignmentValue)
 
 -- | Post increment operator (e.g. 1++ in Go, or i++ in C).
 newtype PostIncrement a = PostIncrement a

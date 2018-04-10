@@ -37,9 +37,12 @@ import qualified Data.Text as T
 data Summaries = Summaries { changes, errors :: !(Map.Map T.Text [Value]) }
   deriving (Eq, Show)
 
+instance Semigroup Summaries where
+  (<>) (Summaries c1 e1) (Summaries c2 e2) = Summaries (Map.unionWith (<>) c1 c2) (Map.unionWith (<>) e1 e2)
+
 instance Monoid Summaries where
   mempty = Summaries mempty mempty
-  mappend (Summaries c1 e1) (Summaries c2 e2) = Summaries (Map.unionWith (<>) c1 c2) (Map.unionWith (<>) e1 e2)
+  mappend = (<>)
 
 instance Output Summaries where
   toOutput = toStrict . (<> "\n") . encode
@@ -118,8 +121,7 @@ newtype DedupeKey = DedupeKey (Maybe T.Text, Maybe T.Text) deriving (Eq, Ord)
 dedupe :: forall fields. HasField fields (Maybe Declaration) => [Entry (Record fields)] -> [Entry (Record fields)]
 dedupe = let tuples = sortOn fst . Map.elems . snd . foldl' go (0, Map.empty) in (fmap . fmap) snd tuples
   where
-    go :: HasField fields (Maybe Declaration)
-       => (Int, Map.Map DedupeKey (Int, Entry (Record fields)))
+    go :: (Int, Map.Map DedupeKey (Int, Entry (Record fields)))
        -> Entry (Record fields)
        -> (Int, Map.Map DedupeKey (Int, Entry (Record fields)))
     go (index, m) x | Just (_, similar) <- Map.lookup (dedupeKey x) m

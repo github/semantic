@@ -1,8 +1,11 @@
 (Program
   (DoWhile
-    (Boolean)
+    (Paren
+      (Boolean))
     (
       (Call
-        (Identifier)
+        (MemberAccess
+          (Identifier)
+          (Identifier))
         (Identifier)
         (Empty)))))

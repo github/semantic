@@ -1,6 +1,7 @@
 module Main where
 
 import qualified Analysis.Go.Spec
+import qualified Analysis.PHP.Spec
 import qualified Analysis.Python.Spec
 import qualified Analysis.Ruby.Spec
 import qualified Analysis.TypeScript.Spec
@@ -8,14 +9,15 @@ import qualified Assigning.Assignment.Spec
 import qualified Data.Diff.Spec
 import qualified Data.Functor.Classes.Generic.Spec
 import qualified Data.Mergeable.Spec
+import qualified Data.Scientific.Spec
 import qualified Data.Source.Spec
 import qualified Data.Term.Spec
 import qualified Diffing.Algorithm.RWS.Spec
 import qualified Diffing.Algorithm.SES.Spec
 import qualified Diffing.Interpreter.Spec
 import qualified Integration.Spec
+import qualified Matching.Go.Spec
 import qualified Rendering.TOC.Spec
-import qualified Rendering.Imports.Spec
 import qualified Semantic.Spec
 import qualified Semantic.CLI.Spec
 import qualified Semantic.IO.Spec
@@ -27,6 +29,7 @@ main = hspec $ do
   describe "Semantic.Stat" Semantic.Stat.Spec.spec
   parallel $ do
     describe "Analysis.Go" Analysis.Go.Spec.spec
+    describe "Analysis.PHP" Analysis.PHP.Spec.spec
     describe "Analysis.Python" Analysis.Python.Spec.spec
     describe "Analysis.Ruby" Analysis.Ruby.Spec.spec
     describe "Analysis.TypeScript" Analysis.TypeScript.Spec.spec
@@ -34,13 +37,14 @@ main = hspec $ do
     describe "Data.Diff" Data.Diff.Spec.spec
     describe "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
     describe "Data.Mergeable" Data.Mergeable.Spec.spec
+    describe "Data.Scientific" Data.Scientific.Spec.spec
     describe "Data.Source" Data.Source.Spec.spec
     describe "Data.Term" Data.Term.Spec.spec
     describe "Diffing.Algorithm.RWS" Diffing.Algorithm.RWS.Spec.spec
     describe "Diffing.Algorithm.SES" Diffing.Algorithm.SES.Spec.spec
     describe "Diffing.Interpreter" Diffing.Interpreter.Spec.spec
+    describe "Matching" Matching.Go.Spec.spec
     describe "Rendering.TOC" Rendering.TOC.Spec.spec
-    describe "Rendering.Imports" Rendering.Imports.Spec.spec
     describe "Semantic" Semantic.Spec.spec
     describe "Semantic.CLI" Semantic.CLI.Spec.spec
     describe "Semantic.IO" Semantic.IO.Spec.spec

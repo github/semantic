@@ -1,6 +1,7 @@
 (Program
   (If
-    (Identifier)
+    (Paren
+      (Identifier))
     (
       (Call
         (Identifier)

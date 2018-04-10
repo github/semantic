@@ -1,11 +1,9 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
 module Data.Syntax.Declaration where
 
-import Data.Abstract.Environment
+import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
-import qualified Data.Map as Map
-import Prelude hiding (fail)
 import Prologue
 
 data Function a = Function { functionContext :: ![a], functionName :: !a, functionParameters :: ![a], functionBody :: !a }
@@ -23,11 +21,11 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Function where
   eval Function{..} = do
-    (v, addr) <- letrec name (abstract (paramNames functionParameters) functionBody)
-    modifyGlobalEnv (envInsert name addr)
+    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm functionName)
+    (v, addr) <- letrec name (lambda (paramNames functionParameters) functionBody)
+    modifyEnv (Env.insert name addr)
     pure v
-    where paramNames = foldMap (pure . freeVariable . subterm)
-          name = freeVariable (subterm functionName)
+    where paramNames = foldMap (freeVariables . subterm)
 
 
 data Method a = Method { methodContext :: ![a], methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
@@ -44,11 +42,11 @@ instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 -- local environment.
 instance Evaluatable Method where
   eval Method{..} = do
-    (v, addr) <- letrec name (abstract (paramNames methodParameters) methodBody)
-    modifyGlobalEnv (envInsert name addr)
+    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm methodName)
+    (v, addr) <- letrec name (lambda (paramNames methodParameters) methodBody)
+    modifyEnv (Env.insert name addr)
     pure v
-    where paramNames = foldMap (pure . freeVariable . subterm)
-          name = freeVariable (subterm methodName)
+    where paramNames = foldMap (freeVariables . subterm)
 
 
 -- | A method signature in TypeScript or a method spec in Go.
@@ -144,23 +142,15 @@ instance Eq1 Class where liftEq = genericLiftEq
 instance Ord1 Class where liftCompare = genericLiftCompare
 instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Class
-instance Evaluatable Class
-
-
-data Module a = Module { moduleIdentifier :: !a, moduleScope :: ![a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 Module where liftEq = genericLiftEq
-instance Ord1 Module where liftCompare = genericLiftCompare
-instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
-
--- TODO: Fix this extremely bogus instance (copied from that of Program)
--- In Go, functions in the same module can be spread across files.
--- We need to ensure that all input files have aggregated their content into
--- a coherent module before we begin evaluating a module.
-instance Evaluatable Module where
-  eval (Module _ xs) = eval xs
+instance Evaluatable Class where
+  eval Class{..} = do
+    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm classIdentifier)
+    supers <- traverse subtermValue classSuperclasses
+    (v, addr) <- letrec name $ do
+      void $ subtermValue classBody
+      classEnv <- Env.head <$> getEnv
+      klass name supers classEnv
+    v <$ modifyEnv (Env.insert name addr)
 
 -- | A decorator in Python
 data Decorator a = Decorator { decoratorIdentifier :: !a, decoratorParamaters :: ![a], decoratorBody :: !a }
@@ -210,114 +200,6 @@ instance Show1 Comprehension where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Comprehension
 instance Evaluatable Comprehension
-
-
--- | Qualified Export declarations
-newtype QualifiedExport a = QualifiedExport { qualifiedExportSymbols :: [(Name, Name)] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 QualifiedExport where liftEq = genericLiftEq
-instance Ord1 QualifiedExport where liftCompare = genericLiftCompare
-instance Show1 QualifiedExport where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable QualifiedExport where
-  eval (QualifiedExport exportSymbols) = do
-    -- Insert the aliases with no addresses.
-    for_ exportSymbols $ \(name, alias) ->
-      addExport name alias Nothing
-    unit
-
-
--- | Qualified Export declarations that export from another module.
-data QualifiedExportFrom a = QualifiedExportFrom { qualifiedExportFrom :: !a, qualifiedExportFromSymbols :: ![(Name, Name)]}
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 QualifiedExportFrom where liftEq = genericLiftEq
-instance Ord1 QualifiedExportFrom where liftCompare = genericLiftCompare
-instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable QualifiedExportFrom where
-  eval (QualifiedExportFrom from exportSymbols) = do
-    let moduleName = freeVariable (subterm from)
-    importedEnv <- isolate (require moduleName)
-    -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
-    for_ exportSymbols $ \(name, alias) -> do
-      let address = Map.lookup name (unEnvironment importedEnv)
-      maybe (cannotExport moduleName name) (addExport name alias . Just) address
-    unit
-    where
-      cannotExport moduleName name = fail $
-        "module " <> show (friendlyName moduleName) <> " does not export " <> show (friendlyName name)
-
-
-newtype DefaultExport a = DefaultExport { defaultExport :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 DefaultExport where liftEq = genericLiftEq
-instance Ord1 DefaultExport where liftCompare = genericLiftCompare
-instance Show1 DefaultExport where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable DefaultExport where
-
-
--- | Qualified Import declarations (symbols are qualified in calling environment).
---
--- If the list of symbols is empty copy and qualify everything to the calling environment.
-data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: !a, qualifiedImportAlias :: !a, qualifiedImportSymbols :: ![(Name, Name)]}
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 QualifiedImport where liftEq = genericLiftEq
-instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
-instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable QualifiedImport where
-  eval (QualifiedImport from alias xs) = do
-    let moduleName = freeVariable (subterm from)
-    importedEnv <- isolate (require moduleName)
-    modifyGlobalEnv (flip (Map.foldrWithKey copy) (unEnvironment importedEnv))
-    unit
-    where
-      prefix = freeVariable (subterm alias)
-      symbols = Map.fromList xs
-      copy = if Map.null symbols then insert else maybeInsert
-      insert sym = envInsert (prefix <> sym)
-      maybeInsert sym v env = maybe env (\symAlias -> insert symAlias v env) (Map.lookup sym symbols)
-
-
--- | Import declarations (symbols are added directly to the calling environment).
---
--- If the list of symbols is empty copy everything to the calling environment.
-data Import a = Import { importFrom :: !a, importSymbols :: ![(Name, Name)], importWildcardToken :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 Import where liftEq = genericLiftEq
-instance Ord1 Import where liftCompare = genericLiftCompare
-instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable Import where
-  eval (Import from xs _) = do
-    let moduleName = freeVariable (subterm from)
-    importedEnv <- isolate (require moduleName)
-    modifyGlobalEnv (flip (Map.foldrWithKey copy) (unEnvironment importedEnv))
-    unit
-    where
-      symbols = Map.fromList xs
-      copy = if Map.null symbols then envInsert else maybeInsert
-      maybeInsert k v env = maybe env (\symAlias -> envInsert symAlias v env) (Map.lookup k symbols)
-
--- | Side effect only imports (no symbols made available to the calling environment).
-data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: !a, sideEffectImportToken :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
-
-instance Eq1 SideEffectImport where liftEq = genericLiftEq
-instance Ord1 SideEffectImport where liftCompare = genericLiftCompare
-instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
-
-instance Evaluatable SideEffectImport where
-  eval (SideEffectImport from _) = do
-    let moduleName = freeVariable (subterm from)
-    void $ isolate (require moduleName)
-    unit
 
 
 -- | A declared type (e.g. `a []int` in Go).

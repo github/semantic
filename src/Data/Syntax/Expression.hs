@@ -1,12 +1,12 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, ViewPatterns #-}
 module Data.Syntax.Expression where
 
 import Data.Abstract.Evaluatable
 import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent)
 import Data.Fixed
 import Diffing.Algorithm
-import Prelude hiding (fail)
-import Prologue hiding (apply)
+import Prelude
+import Prologue
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
@@ -19,7 +19,7 @@ instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Call where
   eval Call{..} = do
     op <- subtermValue callFunction
-    apply op (map subtermValue callParams)
+    call op (map subtermValue callParams)
 
 data Comparison a
   = LessThan !a !a
@@ -59,7 +59,6 @@ instance Eq1 Arithmetic where liftEq = genericLiftEq
 instance Ord1 Arithmetic where liftCompare = genericLiftCompare
 instance Show1 Arithmetic where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Arithmetic
 instance Evaluatable Arithmetic where
   eval = traverse subtermValue >=> go where
     go (Plus a b)      = liftNumeric2 add a b  where add    = liftReal (+)
@@ -69,6 +68,19 @@ instance Evaluatable Arithmetic where
     go (Modulo a b)    = liftNumeric2 mod'' a b where mod'' = liftIntegralFrac mod mod'
     go (Power a b)     = liftNumeric2 liftedExponent a b
     go (Negate a)      = liftNumeric negate a
+
+-- | Regex matching operators (Ruby's =~ and ~!)
+data Match a
+  = Matches !a !a
+  | NotMatches !a !a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 Match where liftEq = genericLiftEq
+instance Ord1 Match where liftCompare = genericLiftCompare
+instance Show1 Match where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for Match
+instance Evaluatable Match
 
 -- | Boolean operators.
 data Boolean a
@@ -91,8 +103,8 @@ instance Evaluatable Boolean where
     go (Or a b) = do
       cond <- a
       ifthenelse cond (pure cond) b
-    go (Not a) = a >>= toBool >>= boolean . not
-    go (XOr a b) = liftA2 (/=) (a >>= toBool) (b >>= toBool) >>= boolean
+    go (Not a) = a >>= asBool >>= boolean . not
+    go (XOr a b) = liftA2 (/=) (a >>= asBool) (b >>= asBool) >>= boolean
 
 -- | Javascript delete operator
 newtype Delete a = Delete a
@@ -179,8 +191,10 @@ instance Eq1 MemberAccess where liftEq = genericLiftEq
 instance Ord1 MemberAccess where liftCompare = genericLiftCompare
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for MemberAccess
-instance Evaluatable MemberAccess
+instance Evaluatable MemberAccess where
+  eval (fmap subtermValue -> MemberAccess mem acc) = do
+    lhs <- mem >>= scopedEnvironment
+    localEnv (mappend lhs) acc
 
 -- | Subscript (e.g a[1])
 data Subscript a

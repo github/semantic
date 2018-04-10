@@ -1,10 +1,13 @@
 (Program
   (DoWhile
-  { (Boolean)
-  ->(Boolean) }
+    (Paren
+    { (Boolean)
+    ->(Boolean) })
     (
       (Call
-        (Identifier)
+        (MemberAccess
+          (Identifier)
+          (Identifier))
       { (Identifier)
       ->(Identifier) }
         (Empty)))))

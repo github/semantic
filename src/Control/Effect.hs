@@ -1,11 +1,18 @@
-{-# LANGUAGE DataKinds, MultiParamTypeClasses, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Control.Effect where
+{-# LANGUAGE RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
+module Control.Effect
+( Control.Effect.run
+, RunEffects(..)
+, RunEffect(..)
+, Effectful(..)
+, resumeException
+, mergeEither
+) where
 
-import qualified Control.Monad.Effect as Effect
+import Control.Monad.Effect as Effect
 import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Internal hiding (run)
-import Control.Monad.Effect.NonDetEff
+import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader
+import Control.Monad.Effect.Resumable
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Writer
 import Data.Semigroup.Reducer
@@ -13,21 +20,21 @@ import Prologue
 
 -- | Run an 'Effectful' computation to completion, interpreting each effect with some sensible defaults, and return the 'Final' result.
 run :: (Effectful m, RunEffects effects a) => m effects a -> Final effects a
-run = Effect.run . runEffects . lower
+run = runEffects . lower
 
 -- | A typeclass to run a computation to completion, interpreting each effect with some sensible defaults.
 class RunEffects fs a where
   -- | The final result type of the computation, factoring in the results of any effects, e.g. pairing 'State' results with the final state, wrapping 'Fail' results in 'Either', etc.
   type Final fs a
-  runEffects :: Eff fs a -> Eff '[] (Final fs a)
+  runEffects :: Eff fs a -> Final fs a
 
-instance (RunEffect f1 a, RunEffects (f2 ': fs) (Result f1 a)) => RunEffects (f1 ': f2 ': fs) a where
-  type Final (f1 ': f2 ': fs) a = Final (f2 ': fs) (Result f1 a)
+instance (RunEffect f a, RunEffects fs (Result f a)) => RunEffects (f ': fs) a where
+  type Final (f ': fs) a = Final fs (Result f a)
   runEffects = runEffects . runEffect
 
-instance RunEffect f a => RunEffects '[f] a where
-  type Final '[f] a = Result f a
-  runEffects = runEffect
+instance RunEffects '[] a where
+  type Final '[] a = a
+  runEffects = Effect.run
 
 
 -- | A typeclass to interpret a single effect with some sensible defaults (defined per-effect).
@@ -58,12 +65,22 @@ instance Monoid w => RunEffect (Writer w) a where
   type Result (Writer w) a = (a, w)
   runEffect = runWriter
 
--- | 'NonDetEff' effects are interpreted into a nondeterministic set of result values.
-instance Ord a => RunEffect NonDetEff a where
-  type Result NonDetEff a = Set a
-  runEffect = relay (pure . unit) (\ m k -> case m of
-    MZero -> pure mempty
-    MPlus -> mappend <$> k True <*> k False)
+-- | 'NonDet' effects are interpreted into a nondeterministic set of result values.
+instance Ord a => RunEffect NonDet a where
+  type Result NonDet a = Set a
+  runEffect = runNonDet unit
+
+-- | 'Resumable' effects are interpreted into 'Either' s.t. failures are in 'Left' and successful results are in 'Right'.
+instance RunEffect (Resumable exc) a where
+  type Result (Resumable exc) a = Either (SomeExc exc) a
+  runEffect = runError
+
+resumeException :: (Resumable exc :< e, Effectful m) => m e a -> (forall v . (v -> m e a) -> exc v -> m e a) -> m e a
+resumeException m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
+
+-- | Reassociate 'Either's, combining errors into 'Left' values and successes in a single level of 'Right'.
+mergeEither :: Either a (Either b c) -> Either (Either a b) c
+mergeEither = either (Left . Left) (either (Left . Right) Right)
 
 
 -- | Types wrapping 'Eff' actions.

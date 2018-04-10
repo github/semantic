@@ -4,7 +4,6 @@
     (Identifier)
     (
       (Try
-        (Call
+        (Send
           (Identifier)
-          (TextElement)
-          (Empty))))))
+          (TextElement))))))

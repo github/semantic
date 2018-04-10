@@ -31,7 +31,7 @@ newtype CyclomaticComplexity = CyclomaticComplexity Int
 --   If you’re getting errors about missing a 'CustomHasCyclomaticComplexity' instance for your syntax type, you probably forgot step 1.
 --
 --   If you’re getting 'Nothing' for your syntax node at runtime, you probably forgot step 2.
-cyclomaticComplexityAlgebra :: (Foldable syntax, HasCyclomaticComplexity syntax) => TermF syntax ann CyclomaticComplexity -> CyclomaticComplexity
+cyclomaticComplexityAlgebra :: HasCyclomaticComplexity syntax => TermF syntax ann CyclomaticComplexity -> CyclomaticComplexity
 cyclomaticComplexityAlgebra (In _ syntax) = toCyclomaticComplexity syntax
 
 

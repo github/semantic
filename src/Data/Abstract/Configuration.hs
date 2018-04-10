@@ -5,11 +5,7 @@ import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Heap
 import Data.Abstract.Live
-import Data.Abstract.Value
 import Prologue
-
--- | The configuration for term and abstract value types.
-type ConfigurationFor term value = Configuration (LocationFor value) term value
 
 -- | A single point in a program’s execution.
 data Configuration l t v

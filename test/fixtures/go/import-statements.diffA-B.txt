@@ -1,13 +1,13 @@
 (Program
-  (Module
+  (Package
     (Identifier))
   (
     (Comment)
     (Comment)
-    (QualifiedImport
-    { (Identifier)
-    ->(Identifier) }
-      (Identifier))
+  { (QualifiedImport
+    {-(Identifier)-})
+  ->(QualifiedImport
+    {+(Identifier)+}) }
     (Comment))
   (Function
     (Empty)

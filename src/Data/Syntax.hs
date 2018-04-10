@@ -1,16 +1,15 @@
 {-# LANGUAGE DeriveAnyClass, GADTs, TypeOperators, MultiParamTypeClasses, UndecidableInstances, ScopedTypeVariables #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For HasCallStack
 module Data.Syntax where
 
-import Control.Monad.Fail
-import Data.Abstract.Evaluatable
+import Data.Abstract.Evaluatable hiding (catchError)
 import Data.AST
 import Data.Range
 import Data.Record
-import qualified Data.Set as Set
 import Data.Span
 import Data.Term
 import Diffing.Algorithm hiding (Empty)
-import Prelude hiding (fail)
+import Prelude
 import Prologue
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Error as Error
@@ -107,10 +106,10 @@ instance Ord1 Identifier where liftCompare = genericLiftCompare
 instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Identifier where
-  eval (Identifier name) = lookupWith deref name >>= maybe (fail ("free variable: " <> show (friendlyName name))) pure
+  eval (Identifier name) = variable name
 
 instance FreeVariables1 Identifier where
-  liftFreeVariables _ (Identifier x) = Set.singleton x
+  liftFreeVariables _ (Identifier x) = pure x
 
 
 newtype Program a = Program [a]
@@ -147,6 +146,17 @@ instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 instance Evaluatable Empty where
   eval _ = unit
 
+-- | A parenthesized expression or statement. All the languages we target support this concept.
+
+newtype Paren a = Paren a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 Paren where liftEq = genericLiftEq
+instance Ord1 Paren where liftCompare = genericLiftCompare
+instance Show1 Paren where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Paren where
+  eval (Paren a) = subtermValue a
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }

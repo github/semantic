@@ -1,14 +1,15 @@
 (Program
-  (Call
+  (Send
     (Identifier)
-    (Hash)
-    (Empty))
-  (Call
+    (Function
+      (Empty)
+      ([])))
+  (Send
     (Identifier)
     (Function
       (Empty)
       (Identifier)))
-  (Call
+  (Send
     (Identifier)
     (Function
       (Empty)

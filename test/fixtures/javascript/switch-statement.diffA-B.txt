@@ -1,7 +1,8 @@
 (Program
   (Match
-  { (Float)
-  ->(Float) }
+    (Paren
+    { (Float)
+    ->(Float) })
     (
       (Pattern
         (Float)

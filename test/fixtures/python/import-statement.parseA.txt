@@ -1,18 +1,10 @@
 (Program
   (
-    (QualifiedImport
-      (Identifier)
-      (Identifier))
-    (QualifiedImport
-      (Identifier)
+    (QualifiedImport)
+    (QualifiedAliasedImport
       (Identifier)))
   (
-    (QualifiedImport
-      (Identifier)
+    (QualifiedAliasedImport
       (Identifier))
-    (QualifiedImport
-      (Identifier)
-      (Identifier)))
-  (QualifiedImport
-    (Identifier)
-    (Identifier)))
+    (QualifiedImport))
+  (QualifiedImport))

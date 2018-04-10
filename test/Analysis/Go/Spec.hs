@@ -1,41 +1,30 @@
+{-# LANGUAGE OverloadedLists #-}
 module Analysis.Go.Spec (spec) where
-
-import Data.Abstract.Value
-import Data.Map
 
 import SpecHelpers
 
 
 spec :: Spec
 spec = parallel $ do
-  describe "evalutes Go" $ do
+  describe "evaluates Go" $ do
     it "imports and wildcard imports" $ do
-      env <- evaluate "main.go"
-      let expectedEnv = Environment $ fromList
-            [ (qualifiedName ["foo", "New"], addr 0)
-            , (qualifiedName ["Rab"], addr 1)
-            , (qualifiedName ["Bar"], addr 2)
-            , (qualifiedName ["main"], addr 3)
-            ]
-      env `shouldBe` expectedEnv
+      res <- snd <$> evaluate "main.go"
+      environment res `shouldBe` [ ("foo", addr 0)
+                                 , ("Bar", addr 2)
+                                 , ("Rab", addr 3)
+                                 , ("main", addr 4)
+                                 ]
+
+      heapLookup (Address (Precise 0)) (heap res) `shouldBe` ns "foo" [ ("New", addr 1) ]
 
     it "imports with aliases (and side effects only)" $ do
-      env <- evaluate "main1.go"
-      let expectedEnv = Environment $ fromList
-            [ (qualifiedName ["f", "New"], addr 0)
-            , (qualifiedName ["main"], addr 3) -- addr 3 is due to side effects of
-                                               -- eval'ing `import _ "./bar"` which
-                                               -- used addr 1 & 2.
-            ]
-      env `shouldBe` expectedEnv
+      res <- snd <$> evaluate "main1.go"
+      environment res `shouldBe` [ ("f", addr 0)
+                                 , ("main", addr 4) -- addr 4 is due to side effects of eval'ing `import _ "./bar"` which used addr 2 & 3. f defines New which got addr 1.
+                                 ]
+
+      heapLookup (Address (Precise 0)) (heap res) `shouldBe` ns "f" [ ("New", addr 1) ]
 
   where
-    addr = Address . Precise
     fixtures = "test/fixtures/go/analysis/"
-    evaluate entry = snd . fst . fst . fst . fst <$>
-      evaluateFiles goParser
-        [ fixtures <> entry
-        , fixtures <> "foo/foo.go"
-        , fixtures <> "bar/bar.go"
-        , fixtures <> "bar/rab.go"
-        ]
+    evaluate entry = evalGoProject (fixtures <> entry)

@@ -66,7 +66,7 @@ decim = SomeNumber . Decimal
 --   on two 'Number' values and return a temporarily-indeterminate 'SomeNumber'
 --   value. At the callsite, we can then unwrap the 'SomeNumber' and handle the
 --   specific cases.
---   
+--
 --   Promote a function on 'Real' values into one operating on 'Number's.
 --   You pass things like @+@ and @-@ here.
 liftReal :: (forall n . Real n => n -> n -> n)
@@ -94,5 +94,5 @@ liftIntegralFrac _ g (Decimal i) (Decimal j) = decim (g i j)
 liftedExponent :: Number a -> Number b -> SomeNumber
 liftedExponent (Integer i) (Integer j) = whole (i ^ j)
 liftedExponent (Ratio i) (Integer j)   = ratio (i ^^ j)
-liftedExponent i j                     = decim (fromFloatDigits ((munge i) ** (munge j)))
+liftedExponent i j                     = decim (fromFloatDigits (munge i ** munge j))
   where munge = (toRealFloat . toScientific) :: Number a -> Double

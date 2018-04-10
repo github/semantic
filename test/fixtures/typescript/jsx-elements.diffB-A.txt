@@ -9,12 +9,16 @@
         {+(JsxExpression
           {+(Call
             {+(Identifier)+}
-            {+(Identifier)+}
+            {+(MemberAccess
+              {+(Identifier)+}
+              {+(Identifier)+})+}
             {+(Empty)+})+})+}
         {-(JsxAttribute
           {-(Identifier)-}
           {-(JsxExpression
-            {-(Identifier)-})-})-})
+            {-(MemberAccess
+              {-(Identifier)-}
+              {-(Identifier)-})-})-})-})
         (JsxExpression
           (Identifier))
         (JsxClosingElement

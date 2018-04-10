@@ -1,17 +1,17 @@
-{-# LANGUAGE DataKinds, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.IdentifierName
 ( IdentifierName(..)
 , IdentifierLabel(..)
 , identifierLabel
 ) where
 
-import Data.Abstract.FreeVariables
-import Data.Aeson
-import Data.JSON.Fields
-import Data.Term
-import Data.Text.Encoding (decodeUtf8)
-import Prologue
+import           Data.Abstract.FreeVariables (Name (..))
+import           Data.Aeson
+import           Data.JSON.Fields
 import qualified Data.Syntax
+import           Data.Term
+import           Data.Text.Encoding (decodeUtf8)
+import           Prologue
 
 -- | Compute a 'IdentifierLabel' label for a 'Term'.
 identifierLabel :: IdentifierName syntax => TermF syntax a b -> Maybe IdentifierLabel
@@ -40,7 +40,7 @@ instance Apply IdentifierName fs => CustomIdentifierName (Union fs) where
   customIdentifierName = apply (Proxy :: Proxy IdentifierName) identifierName
 
 instance CustomIdentifierName Data.Syntax.Identifier where
-  customIdentifierName (Data.Syntax.Identifier name) = Just (friendlyName name)
+  customIdentifierName (Data.Syntax.Identifier (Name name)) = Just name
 
 data Strategy = Default | Custom
 

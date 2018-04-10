@@ -16,26 +16,27 @@ import Options.Applicative
 import Rendering.Renderer
 import qualified Paths_semantic as Library (version)
 import Semantic.IO (languageForFilePath)
+import qualified Semantic.Diff as Semantic (diffBlobPairs)
 import qualified Semantic.Log as Log
+import qualified Semantic.Parse as Semantic (parseBlobs)
 import qualified Semantic.Task as Task
 import System.IO (Handle, stdin, stdout)
-import qualified Semantic (parseBlobs, diffBlobPairs)
 import Text.Read
 
 
 main :: IO ()
 main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskWithOptions
 
-runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both (FilePath, Maybe Language)] -> Task.Task ByteString
+runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both (FilePath, Maybe Language)] -> Task.TaskEff ByteString
 runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Task.readBlobPairs
 
-runParse :: SomeRenderer TermRenderer -> Either Handle [(FilePath, Maybe Language)] -> Task.Task ByteString
+runParse :: SomeRenderer TermRenderer -> Either Handle [(FilePath, Maybe Language)] -> Task.TaskEff ByteString
 runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
 
 -- | A parser for the application's command-line arguments.
 --
 --   Returns a 'Task' to read the input, run the requested operation, and write the output to the specified output path or stdout.
-arguments :: ParserInfo (Log.Options, Task.Task ())
+arguments :: ParserInfo (Log.Options, Task.TaskEff ())
 arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsParser)) description
   where
     version = infoOption versionString (long "version" <> short 'v' <> help "Output the version of the program")
@@ -52,6 +53,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       <*> pure False -- PrintSource
       <*> pure Log.logfmtFormatter -- Formatter
       <*> pure 0 -- ProcessID
+      <*> switch (long "fail-on-warning" <> help "Fail on assignment warnings.")
     argumentsParser = (. Task.writeToOutput) . (>>=)
       <$> hsubparser (diffCommand <> parseCommand)
       <*> (   Right <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout")

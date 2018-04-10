@@ -22,26 +22,28 @@ module Semantic.Stat
 ) where
 
 
-import Prologue
-import Data.List (intercalate)
-import Data.List.Split (splitOneOf)
-import Network.Socket (Socket(..), SocketType(..), socket, connect, close, getAddrInfo, addrFamily, addrAddress, defaultProtocol)
-import Network.Socket.ByteString
-import Network.URI
-import Numeric
+import           Control.Monad.IO.Class
 import qualified Data.ByteString.Char8 as B
-import System.Environment
-import System.IO.Error
+import           Data.List (intercalate)
+import           Data.List.Split (splitOneOf)
 import qualified Data.Time.Clock as Time
 import qualified Data.Time.Clock.POSIX as Time (getCurrentTime)
+import           Network.Socket
+    (Socket (..), SocketType (..), addrAddress, addrFamily, close, connect, defaultProtocol, getAddrInfo, socket)
+import           Network.Socket.ByteString
+import           Network.URI
+import           Numeric
+import           Prologue
+import           System.Environment
+import           System.IO.Error
 
 -- | A named piece of data you wish to record a specific 'Metric' for.
 -- See https://docs.datadoghq.com/guides/dogstatsd/ for more details.
 data Stat
   = Stat
-  { statName :: String  -- ^ Stat name, usually separated by '.' (e.g. "system.metric.name")
+  { statName  :: String  -- ^ Stat name, usually separated by '.' (e.g. "system.metric.name")
   , statValue :: Metric -- ^ 'Metric' value.
-  , statTags :: Tags    -- ^ Key/value 'Tags' (optional).
+  , statTags  :: Tags    -- ^ Key/value 'Tags' (optional).
   }
 
 -- | The various supported metric types in Datadog.
@@ -77,14 +79,13 @@ timing :: String -> Double -> Tags -> Stat
 timing n v = Stat n (Timer v)
 
 -- | Run an IO Action and record timing
-withTiming :: (Stat -> IO ()) -> String -> Tags -> IO a -> IO a
-withTiming statter name tags f = do
-  start <- Time.getCurrentTime
-  result <- f
-  end <- Time.getCurrentTime
+withTiming :: MonadIO io => String -> Tags -> io a -> io (a, Stat)
+withTiming name tags action = do
+  start <- liftIO Time.getCurrentTime
+  result <- action
+  end <- liftIO Time.getCurrentTime
   let duration = realToFrac (Time.diffUTCTime end start * 1000)
-  statter (timing name duration tags)
-  pure result
+  pure (result, timing name duration tags)
 
 -- | Histogram measurement.
 histogram :: String -> Double -> Tags -> Stat
@@ -99,8 +100,8 @@ data StatsClient
   = StatsClient
   { statsClientUDPSocket :: Socket
   , statsClientNamespace :: String
-  , statsClientUDPHost :: String
-  , statsClientUDPPort :: String
+  , statsClientUDPHost   :: String
+  , statsClientUDPPort   :: String
   }
 
 -- | Create a default stats client. This function consults two optional
@@ -108,8 +109,8 @@ data StatsClient
 --     * STATS_ADDR     - String URI to send stats to in the form of `host:port`.
 --     * DOGSTATSD_HOST - String hostname which will override the above host.
 --                        Generally used on kubes pods.
-defaultStatsClient :: IO StatsClient
-defaultStatsClient = do
+defaultStatsClient :: MonadIO io => io StatsClient
+defaultStatsClient = liftIO $ do
   addr <- lookupEnv "STATS_ADDR"
   let (host', port) = parseAddr (fmap ("statsd://" <>) addr)
 
@@ -130,20 +131,20 @@ defaultStatsClient = do
 
 
 -- | Create a StatsClient at the specified host and port with a namespace prefix.
-statsClient :: String -> String -> String -> IO StatsClient
-statsClient host port statsClientNamespace = do
+statsClient :: MonadIO io => String -> String -> String -> io StatsClient
+statsClient host port statsClientNamespace = liftIO $ do
   (addr:_) <- getAddrInfo Nothing (Just host) (Just port)
   sock <- socket (addrFamily addr) Datagram defaultProtocol
   connect sock (addrAddress addr)
   pure (StatsClient sock statsClientNamespace host port)
 
 -- | Close the client's underlying socket.
-closeStatClient :: StatsClient -> IO ()
-closeStatClient StatsClient{..} = close statsClientUDPSocket
+closeStatClient :: MonadIO io => StatsClient -> io ()
+closeStatClient StatsClient{..} = liftIO (close statsClientUDPSocket)
 
 -- | Send a stat over the StatsClient's socket.
-sendStat :: StatsClient -> Stat -> IO ()
-sendStat StatsClient{..} = void . tryIOError . sendAll statsClientUDPSocket . B.pack . renderDatagram statsClientNamespace
+sendStat :: MonadIO io => StatsClient -> Stat -> io ()
+sendStat StatsClient{..} = liftIO . void . tryIOError . sendAll statsClientUDPSocket . B.pack . renderDatagram statsClientNamespace
 
 
 -- Datagram Rendering
@@ -193,7 +194,7 @@ instance Render Tags where
   renders xs = renderString "|#" . (\x -> x <> intercalate "," (renderTag <$> xs))
     where
       renderTag (k, "") = k
-      renderTag (k, v) = k <> ":" <> v
+      renderTag (k, v)  = k <> ":" <> v
 
 instance Render Int where
   renders = shows

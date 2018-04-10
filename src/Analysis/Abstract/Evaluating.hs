@@ -1,135 +1,162 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, RankNTypes, TypeFamilies, UndecidableInstances, ScopedTypeVariables #-}
 module Analysis.Abstract.Evaluating
-( type Evaluating
-, evaluate
-, evaluates
+( Evaluating
+, EvaluatingState(..)
 ) where
 
-import Control.Abstract.Evaluator
-import Control.Monad.Effect hiding (run)
-import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Fresh
-import Control.Monad.Effect.NonDet
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.State
-import Data.Abstract.Configuration
-import Data.Abstract.Evaluatable
-import Data.Abstract.ModuleTable
-import Data.Abstract.Value
-import Data.Blob
+import           Control.Abstract.Analysis
+import           Control.Monad.Effect
+import           Data.Abstract.Address
+import           Data.Abstract.Configuration
+import           Data.Abstract.Environment as Env
+import           Data.Abstract.Evaluatable
+import           Data.Abstract.Exports
+import           Data.Abstract.Heap
+import           Data.Abstract.Module
+import           Data.Abstract.ModuleTable
+import           Data.Abstract.Origin
 import qualified Data.IntMap as IntMap
-import Data.Language
-import Data.List.Split (splitWhen)
-import Prelude hiding (fail)
-import Prologue
-import qualified Data.ByteString.Char8 as BC
-import qualified Data.Map as Map
-import System.FilePath.Posix
-
--- | Evaluate a term to a value.
-evaluate :: forall value term effects
-         .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
-            , Evaluatable (Base term)
-            , FreeVariables term
-            , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-            , MonadValue value (Evaluating term value effects)
-            , Recursive term
-            )
-         => term
-         -> Final effects value
-evaluate = runAnalysis @(Evaluating term value) . evaluateModule
-
--- | Evaluate terms and an entry point to a value.
-evaluates :: forall value term effects
-          .  ( effects ~ RequiredEffects term value (Evaluating term value effects)
-             , Evaluatable (Base term)
-             , FreeVariables term
-             , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-             , MonadValue value (Evaluating term value effects)
-             , Recursive term
-             )
-          => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
-          -> (Blob, term)   -- Entrypoint
-          -> Final effects value
-evaluates pairs (b, t) = runAnalysis @(Evaluating term value) (withModules b pairs (evaluateModule t))
-
--- | Run an action with the passed ('Blob', @term@) pairs available for imports.
-withModules :: MonadAnalysis term value m => Blob -> [(Blob, term)] -> m a -> m a
-withModules Blob{..} pairs = localModuleTable (const moduleTable)
-  where
-    moduleTable = ModuleTable (Map.fromListWith (<>) (map (bimap moduleName pure) pairs))
-    rootDir = dropFileName blobPath
-    moduleName Blob{..} = let path = dropExtensions (makeRelative rootDir blobPath)
-     in case blobLanguage of
-      -- TODO: Need a better way to handle module registration and resolution
-      Just Go -> toName (takeDirectory path) -- Go allows defining modules across multiple files in the same directory.
-      _ ->  toName path
-    toName str = qualifiedName (fmap BC.pack (splitWhen (== pathSeparator) str))
+import           Lens.Micro
+import           Prelude hiding (fail)
+import           Prologue
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
-newtype Evaluating term value effects a = Evaluating (Eff effects a)
+newtype Evaluating location term value effects a = Evaluating (Eff effects a)
   deriving (Applicative, Functor, Effectful, Monad)
 
-deriving instance Member Fail      effects => MonadFail   (Evaluating term value effects)
-deriving instance Member Fresh     effects => MonadFresh  (Evaluating term value effects)
-deriving instance Member NonDetEff effects => Alternative (Evaluating term value effects)
-deriving instance Member NonDetEff effects => MonadNonDet (Evaluating term value effects)
+deriving instance Member Fail   effects => MonadFail   (Evaluating location term value effects)
+deriving instance Member Fresh  effects => MonadFresh  (Evaluating location term value effects)
+deriving instance Member NonDet effects => Alternative (Evaluating location term value effects)
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
-type EvaluatingEffects term value
-  = '[ Fail                                        -- Failure with an error message
-     , Reader (EnvironmentFor value)               -- Local environment (e.g. binding over a closure)
-     , State  (EnvironmentFor value)               -- Global (imperative) environment
-     , State  (HeapFor value)                      -- The heap
-     , Reader (ModuleTable [term])                 -- Cache of unevaluated modules
-     , State  (ModuleTable (EnvironmentFor value)) -- Cache of evaluated modules
-     , State  (ExportsFor value)                   -- Exports (used to filter environments when they are imported)
-     , State  (IntMap.IntMap term)                 -- For jumps
+type EvaluatingEffects location term value
+  = '[ Resumable (EvalError value)
+     , Resumable (ResolutionError value)
+     , Resumable (LoadError term value)
+     , Resumable (ValueError location value)
+     , Resumable (Unspecialized value)
+     , Fail                                         -- Failure with an error message
+     , Fresh                                        -- For allocating new addresses and/or type variables.
+     , Reader (SomeOrigin term)                     -- The current term’s origin.
+     , Reader (ModuleTable [Module term])           -- Cache of unevaluated modules
+     , Reader (Environment location value)          -- Default environment used as a fallback in lookupEnv
+     , State  (EvaluatingState location term value) -- Environment, heap, modules, exports, and jumps.
      ]
 
-instance Members '[Fail, State (IntMap.IntMap term)] effects => MonadControl term (Evaluating term value effects) where
+data EvaluatingState location term value = EvaluatingState
+  { environment :: Environment location value
+  , heap        :: Heap location value
+  , modules     :: ModuleTable (Environment location value, value)
+  , exports     :: Exports location value
+  , jumps       :: IntMap.IntMap term
+  , origin      :: SomeOrigin term
+  }
+
+deriving instance (Eq (Cell location value), Eq location, Eq term, Eq value, Eq (Base term ())) => Eq (EvaluatingState location term value)
+deriving instance (Ord (Cell location value), Ord location, Ord term, Ord value, Ord (Base term ())) => Ord (EvaluatingState location term value)
+deriving instance (Show (Cell location value), Show location, Show term, Show value, Show (Base term ())) => Show (EvaluatingState location term value)
+
+instance (Ord location, Semigroup (Cell location value)) => Semigroup (EvaluatingState location term value) where
+  EvaluatingState e1 h1 m1 x1 j1 o1 <> EvaluatingState e2 h2 m2 x2 j2 o2 = EvaluatingState (e1 <> e2) (h1 <> h2) (m1 <> m2) (x1 <> x2) (j1 <> j2) (o1 <> o2)
+
+instance (Ord location, Semigroup (Cell location value)) => Monoid (EvaluatingState location term value) where
+  mempty = EvaluatingState mempty mempty mempty mempty mempty mempty
+  mappend = (<>)
+
+_environment :: Lens' (EvaluatingState location term value) (Environment location value)
+_environment = lens environment (\ s e -> s {environment = e})
+
+_heap :: Lens' (EvaluatingState location term value) (Heap location value)
+_heap = lens heap (\ s h -> s {heap = h})
+
+_modules :: Lens' (EvaluatingState location term value) (ModuleTable (Environment location value, value))
+_modules = lens modules (\ s m -> s {modules = m})
+
+_exports :: Lens' (EvaluatingState location term value) (Exports location value)
+_exports = lens exports (\ s e -> s {exports = e})
+
+_jumps :: Lens' (EvaluatingState location term value) (IntMap.IntMap term)
+_jumps = lens jumps (\ s j -> s {jumps = j})
+
+_origin :: Lens' (EvaluatingState location term value) (SomeOrigin term)
+_origin = lens origin (\ s o -> s {origin = o})
+
+
+(.=) :: Member (State (EvaluatingState location term value)) effects => ASetter (EvaluatingState location term value) (EvaluatingState location term value) a b -> b -> Evaluating location term value effects ()
+lens .= val = raise (modify' (lens .~ val))
+
+view :: Member (State (EvaluatingState location term value)) effects => Getting a (EvaluatingState location term value) a -> Evaluating location term value effects a
+view lens = raise (gets (^. lens))
+
+localEvaluatingState :: Member (State (EvaluatingState location term value)) effects => Lens' (EvaluatingState location term value) prj -> (prj -> prj) -> Evaluating location term value effects a -> Evaluating location term value effects a
+localEvaluatingState lens f action = do
+  original <- view lens
+  lens .= f original
+  v <- action
+  v <$ lens .= original
+
+
+instance Members '[Fail, State (EvaluatingState location term value)] effects => MonadControl term (Evaluating location term value effects) where
   label term = do
-    m <- raise get
+    m <- view _jumps
     let i = IntMap.size m
-    raise (put (IntMap.insert i term m))
+    _jumps .= IntMap.insert i term m
     pure i
 
-  goto label = IntMap.lookup label <$> raise get >>= maybe (fail ("unknown label: " <> show label)) pure
+  goto label = IntMap.lookup label <$> view _jumps >>= maybe (fail ("unknown label: " <> show label)) pure
 
-instance Members '[State (ExportsFor value), Reader (EnvironmentFor value), State (EnvironmentFor value)] effects => MonadEnvironment value (Evaluating term value effects) where
-  getGlobalEnv = raise get
-  putGlobalEnv = raise . put
-  withGlobalEnv s = raise . localState s . lower
+instance Members '[ State (EvaluatingState location term value)
+                  , Reader (Environment location value)
+                  ] effects
+      => MonadEnvironment location value (Evaluating location term value effects) where
+  getEnv = view _environment
+  putEnv = (_environment .=)
+  withEnv s = localEvaluatingState _environment (const s)
 
-  getExports = raise get
-  putExports = raise . put
-  withExports s = raise . localState s . lower
+  defaultEnvironment = raise ask
+  withDefaultEnvironment e = raise . local (const e) . lower
 
-  askLocalEnv = raise ask
-  localEnv f a = raise (local f (lower a))
+  getExports = view _exports
+  putExports = (_exports .=)
+  withExports s = localEvaluatingState _exports (const s)
 
-instance Member (State (HeapFor value)) effects => MonadHeap value (Evaluating term value effects) where
-  getHeap = raise get
-  putHeap = raise . put
+  localEnv f a = do
+    modifyEnv (f . Env.push)
+    result <- a
+    result <$ modifyEnv Env.pop
 
-instance Members '[Reader (ModuleTable [term]), State (ModuleTable (EnvironmentFor value))] effects => MonadModuleTable term value (Evaluating term value effects) where
-  getModuleTable = raise get
-  putModuleTable = raise . put
+instance Member (State (EvaluatingState location term value)) effects
+      => MonadHeap location value (Evaluating location term value effects) where
+  getHeap = view _heap
+  putHeap = (_heap .=)
+
+instance Members '[ Reader (ModuleTable [Module term])
+                  , State (EvaluatingState location term value)
+                  , Reader (SomeOrigin term)
+                  , Fail
+                  ] effects
+      => MonadModuleTable location term value (Evaluating location term value effects) where
+  getModuleTable = view _modules
+  putModuleTable = (_modules .=)
 
   askModuleTable = raise ask
   localModuleTable f a = raise (local f (lower a))
 
-instance Members (EvaluatingEffects term value) effects => MonadEvaluator term value (Evaluating term value effects) where
-  getConfiguration term = Configuration term mempty <$> askLocalEnv <*> getHeap
+  currentModule = do
+    o <- raise ask
+    maybeFail "unable to get currentModule" $ withSomeOrigin (originModule @term) o
 
-instance ( Evaluatable (Base term)
-         , FreeVariables term
-         , Members (EvaluatingEffects term value) effects
-         , MonadAddressable (LocationFor value) value (Evaluating term value effects)
-         , MonadValue value (Evaluating term value effects)
+instance Members (EvaluatingEffects location term value) effects
+      => MonadEvaluator location term value (Evaluating location term value effects) where
+  getConfiguration term = Configuration term mempty <$> getEnv <*> getHeap
+
+instance ( Corecursive term
+         , Members (EvaluatingEffects location term value) effects
          , Recursive term
          )
-         => MonadAnalysis term value (Evaluating term value effects) where
-  type RequiredEffects term value (Evaluating term value effects) = EvaluatingEffects term value
+      => MonadAnalysis location term value (Evaluating location term value effects) where
+  type Effects location term value (Evaluating location term value effects) = EvaluatingEffects location term value
 
-  analyzeTerm = eval
+  analyzeTerm eval term = pushOrigin (termOrigin (embedSubterm term)) (eval term)
+
+  analyzeModule eval m = pushOrigin (moduleOrigin (subterm <$> m)) (eval m)

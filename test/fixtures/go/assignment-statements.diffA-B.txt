@@ -1,5 +1,5 @@
 (Program
-  (Module
+  (Package
     (Identifier))
   (Function
     (Empty)
@@ -25,13 +25,11 @@
           (
             (Integer)
             (Integer))))
-      (Assignment
-      { (Identifier)
-      ->(Identifier) }
-        (Times
-        { (Identifier)
-        ->(Identifier) }
-          (Integer)))
+    {+(Assignment
+      {+(Identifier)+}
+      {+(Times
+        {+(Identifier)+}
+        {+(Integer)+})+})+}
     {+(Assignment
       {+(Identifier)+}
       {+(Plus
@@ -80,6 +78,11 @@
               {+(KeyValue
                 {+(Identifier)+}
                 {+(Integer)+})+})+})+})+})+})+}
+    {-(Assignment
+      {-(Identifier)-}
+      {-(Times
+        {-(Identifier)-}
+        {-(Integer)-})-})-}
     {-(Assignment
       {-(Identifier)-}
       {-(Plus

@@ -1,18 +1,19 @@
 (Program
-{-(Call
-  {-(Identifier)-}
-  {-(Hash)-}
-  {-(Empty)-})-}
-  (Call
+  (Send
     (Identifier)
     (Function
       (Empty)
     {+(Identifier)+}
-    { (Identifier)
+    { ([])
     ->(Plus
       {+(Identifier)+}
       {+(Integer)+}) }))
-{-(Call
+{-(Send
+  {-(Identifier)-}
+  {-(Function
+    {-(Empty)-}
+    {-(Identifier)-})-})-}
+{-(Send
   {-(Identifier)-}
   {-(Function
     {-(Empty)-}

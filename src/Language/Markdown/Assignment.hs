@@ -6,17 +6,18 @@ module Language.Markdown.Assignment
 , Language.Markdown.Assignment.Term
 ) where
 
-import Prologue
 import Assigning.Assignment hiding (Assignment, Error)
-import qualified Assigning.Assignment as Assignment
-import qualified CMarkGFM
 import Data.Record
 import Data.Syntax (makeTerm)
-import qualified Data.Syntax as Syntax
 import Data.Term as Term (Term(..), TermF(..), termFAnnotation, termFOut, termIn)
-import qualified Data.Text as Text
 import Data.Text.Encoding (encodeUtf8)
 import Parsing.CMark as Grammar (Grammar(..))
+import Prologue
+import qualified Assigning.Assignment as Assignment
+import qualified CMarkGFM
+import qualified Data.ByteString as B
+import qualified Data.Syntax as Syntax
+import qualified Data.Text as Text
 import qualified Language.Markdown.Syntax as Markup
 
 type Syntax =
@@ -72,21 +73,30 @@ paragraph :: Assignment
 paragraph = makeTerm <$> symbol Paragraph <*> children (Markup.Paragraph <$> many inlineElement)
 
 list :: Assignment
-list = termIn <$> symbol List <*> ((\ (CMarkGFM.LIST CMarkGFM.ListAttributes{..}) -> case listType of
-  CMarkGFM.BULLET_LIST -> inj . Markup.UnorderedList
-  CMarkGFM.ORDERED_LIST -> inj . Markup.OrderedList) . termFAnnotation . termFOut <$> currentNode <*> children (many item))
+list = termIn <$> symbol List <*> (makeList . termFAnnotation . termFOut <$> currentNode <*> children (many item))
+  where
+    makeList (CMarkGFM.LIST CMarkGFM.ListAttributes{..}) = case listType of
+      CMarkGFM.BULLET_LIST -> inj . Markup.UnorderedList
+      CMarkGFM.ORDERED_LIST -> inj . Markup.OrderedList
+    makeList _ = inj . Markup.UnorderedList
 
 item :: Assignment
 item = makeTerm <$> symbol Item <*> children (many blockElement)
 
 heading :: Assignment
-heading = makeTerm <$> symbol Heading <*> ((\ (CMarkGFM.HEADING level) -> Markup.Heading level) . termFAnnotation . termFOut <$> currentNode <*> children (many inlineElement) <*> manyTill blockElement (void (symbol Heading) <|> eof))
+heading = makeTerm <$> symbol Heading <*> (makeHeading . termFAnnotation . termFOut <$> currentNode <*> children (many inlineElement) <*> manyTill blockElement (void (symbol Heading) <|> eof))
+  where
+    makeHeading (CMarkGFM.HEADING level) = Markup.Heading level
+    makeHeading _ = Markup.Heading 0
 
 blockQuote :: Assignment
 blockQuote = makeTerm <$> symbol BlockQuote <*> children (Markup.BlockQuote <$> many blockElement)
 
 codeBlock :: Assignment
-codeBlock = makeTerm <$> symbol CodeBlock <*> ((\ (CMarkGFM.CODE_BLOCK language _) -> Markup.Code (nullText language)) . termFAnnotation . termFOut <$> currentNode <*> source)
+codeBlock = makeTerm <$> symbol CodeBlock <*> (makeCode . termFAnnotation . termFOut <$> currentNode <*> source)
+  where
+    makeCode (CMarkGFM.CODE_BLOCK language _) = Markup.Code (nullText language)
+    makeCode _ = Markup.Code Nothing
 
 thematicBreak :: Assignment
 thematicBreak = makeTerm <$> token ThematicBreak <*> pure Markup.ThematicBreak
@@ -135,10 +145,16 @@ htmlInline :: Assignment
 htmlInline = makeTerm <$> symbol HTMLInline <*> (Markup.HTMLBlock <$> source)
 
 link :: Assignment
-link = makeTerm <$> symbol Link <*> ((\ (CMarkGFM.LINK url title) -> Markup.Link (encodeUtf8 url) (nullText title)) . termFAnnotation . termFOut <$> currentNode) <* advance
+link = makeTerm <$> symbol Link <*> (makeLink . termFAnnotation . termFOut <$> currentNode) <* advance
+  where
+    makeLink (CMarkGFM.LINK url title) = Markup.Link (encodeUtf8 url) (nullText title)
+    makeLink _ = Markup.Link B.empty Nothing
 
 image :: Assignment
-image = makeTerm <$> symbol Image <*> ((\ (CMarkGFM.IMAGE url title) -> Markup.Image (encodeUtf8 url) (nullText title)) . termFAnnotation . termFOut <$> currentNode) <* advance
+image = makeTerm <$> symbol Image <*> (makeImage . termFAnnotation . termFOut <$> currentNode) <* advance
+  where
+    makeImage (CMarkGFM.IMAGE url title) = Markup.Image (encodeUtf8 url) (nullText title)
+    makeImage _ = Markup.Image B.empty Nothing
 
 code :: Assignment
 code = makeTerm <$> symbol Code <*> (Markup.Code Nothing <$> source)

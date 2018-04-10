@@ -1,10 +1,13 @@
 (Program
-{+(Comparison
+{ (Equal
+  {-(Identifier)-}
+  {-(Identifier)-})
+->(Comparison
+  {+(Identifier)+}
+  {+(Identifier)+}) }
+{+(Matches
   {+(Identifier)+}
   {+(Identifier)+})+}
-  (Equal
-    (Identifier)
-    (Identifier))
 {+(Assignment
   {+(Identifier)+}
   {+(Not

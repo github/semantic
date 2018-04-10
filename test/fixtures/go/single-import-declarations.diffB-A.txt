@@ -1,22 +1,17 @@
 (Program
-  (Module
+  (Package
     (Identifier))
 {+(QualifiedImport
-  {+(Identifier)+}
   {+(Identifier)+})+}
 {+(Import
-  {+(Identifier)+}
   {+(TextElement)+})+}
-  (QualifiedImport
-  { (Identifier)
-  ->(Identifier) }
-  { (Identifier)
-  ->(Identifier) })
+{ (QualifiedImport
+  {-(Identifier)-})
+->(QualifiedImport
+  {+(Identifier)+}) }
 {-(Import
-  {-(Identifier)-}
   {-(TextElement)-})-}
 {-(QualifiedImport
-  {-(Identifier)-}
   {-(Identifier)-})-}
   (Function
     (Empty)
