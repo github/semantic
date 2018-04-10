@@ -298,7 +298,7 @@ methodCall =  makeTerm' <$> symbol MethodCall <*> children (require <|> load <|>
     send = inj <$> (regularCall <|> funcCall <|> scopeCall)
     funcCall = Ruby.Syntax.Send Nothing <$> methodSelector <*> args <*> optional block
     regularCall = symbol Call *> children (Ruby.Syntax.Send <$> (Just <$> postContextualize heredoc expression) <*> methodSelector) <*> args <*> optional block
-    scopeCall = symbol ScopeResolution *> children (Ruby.Syntax.Send . Just <$> postContextualize heredoc expression <*> methodSelector) <*> args <*> optional block
+    scopeCall = symbol ScopeResolution *> children (Ruby.Syntax.Send . Just <$> expression <*> methodSelector) <*> args <*> optional block
 
     require = inj <$> ((symbol Identifier <|> symbol Identifier') *> do
       s <- source
@@ -318,9 +318,7 @@ methodSelector = mk Identifier <|> mk Identifier' <|> mk Constant
     mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> (name <$> source))
 
 call :: Assignment
-call = makeTerm <$> symbol Call <*> children (Ruby.Syntax.Send <$> (Just <$> postContextualize heredoc expression) <*> (methodSelector <|> emptyTerm) <*> args <*> optional block)
-  where
-    args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> many expression
+call = makeTerm <$> symbol Call <*> children (Ruby.Syntax.Send <$> (Just <$> term expression) <*> methodSelector <*> many expression <*> optional block)
 
 rescue :: Assignment
 rescue =  rescue'
@@ -416,7 +414,8 @@ invert term = makeTerm <$> location <*> fmap Expression.Not term
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 term :: Assignment -> Assignment
-term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
+term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> heredocEnd) <*> emptyTerm)
+  where heredocEnd = makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> source)
 
 -- | Match a series of terms or comments until a delimiter is matched.
 manyTermsTill :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
