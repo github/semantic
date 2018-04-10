@@ -1,16 +1,18 @@
 (Program
-{-(Send
-  {-(Identifier)-}
-  {-(Hash)-})-}
   (Send
     (Identifier)
     (Function
       (Empty)
     {+(Identifier)+}
-    { (Identifier)
+    { ([])
     ->(Plus
       {+(Identifier)+}
       {+(Integer)+}) }))
+{-(Send
+  {-(Identifier)-}
+  {-(Function
+    {-(Empty)-}
+    {-(Identifier)-})-})-}
 {-(Send
   {-(Identifier)-}
   {-(Function

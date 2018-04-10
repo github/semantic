@@ -1,7 +1,9 @@
 (Program
   (Send
     (Identifier)
-    (Hash))
+    (Function
+      (Empty)
+      ([])))
   (Send
     (Identifier)
     (Function
