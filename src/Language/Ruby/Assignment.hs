@@ -292,14 +292,20 @@ subscript = makeTerm <$> symbol ElementReference <*> children (Expression.Subscr
 pair :: Assignment
 pair =   makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> (expression <|> emptyTerm))
 
-methodCall :: Assignment
-methodCall =  makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> send)
-  where
-    send = inj <$> (regularCall <|> funcCall <|> scopeCall)
-    funcCall = Ruby.Syntax.Send Nothing <$> methodSelector <*> args <*> optional block
-    regularCall = symbol Call *> children (Ruby.Syntax.Send <$> (Just <$> postContextualize heredoc expression) <*> methodSelector) <*> args <*> optional block
-    scopeCall = symbol ScopeResolution *> children (Ruby.Syntax.Send . Just <$> expression <*> methodSelector) <*> args <*> optional block
+args :: Assignment' [Term]
+args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> many expression
 
+methodCall :: Assignment
+methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> send)
+  where
+    send = inj <$> ((regularCall <|> funcCall <|> scopeCall <|> dotCall) <*> optional block)
+
+    funcCall = Ruby.Syntax.Send Nothing <$> selector <*> args
+    regularCall = symbol Call *> children (Ruby.Syntax.Send <$> (Just <$> postContextualize heredoc expression) <*> selector) <*> args
+    scopeCall = symbol ScopeResolution *> children (Ruby.Syntax.Send <$> (Just <$> expression) <*> selector) <*> args
+    dotCall = symbol Call *> children (Ruby.Syntax.Send <$> (Just <$> term expression) <*> pure Nothing <*> args)
+
+    selector = Just <$> methodSelector
     require = inj <$> ((symbol Identifier <|> symbol Identifier') *> do
       s <- source
       guard (s `elem` ["require", "require_relative"])
@@ -308,7 +314,6 @@ methodCall =  makeTerm' <$> symbol MethodCall <*> children (require <|> load <|>
       s <- source
       guard (s == "load")
       Ruby.Syntax.Load <$> loadArgs)
-    args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> many expression
     loadArgs = (symbol ArgumentList <|> symbol ArgumentListWithParens)  *> children (some expression)
     nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
 
@@ -322,7 +327,9 @@ methodSelector = makeTerm <$> symbols <*> (Syntax.Identifier <$> (name <$> sourc
           <|> symbol Super -- TODO(@charliesome): super calls are *not* method calls and need to be assigned into their own syntax terms
 
 call :: Assignment
-call = makeTerm <$> symbol Call <*> children (Ruby.Syntax.Send <$> (Just <$> term expression) <*> methodSelector <*> many expression <*> optional block)
+call = makeTerm <$> symbol Call <*> children (
+    (Ruby.Syntax.Send <$> (Just <$> term expression) <*> (Just <$> methodSelector) <*> pure [] <*> pure Nothing) <|>
+    (Ruby.Syntax.Send <$> (Just <$> term expression) <*> pure Nothing <*> args <*> pure Nothing))
 
 rescue :: Assignment
 rescue =  rescue'
