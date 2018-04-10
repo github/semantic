@@ -27,10 +27,10 @@ import qualified Language.Markdown.Syntax as Markdown
 data Declaration
   = MethodDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationReceiver :: Maybe T.Text }
   | ClassDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
-  | ImportDeclaration   { declarationIdentifier :: T.Text, declarationAlias :: T.Text, declarationSymbols :: [(T.Text, T.Text)], declarationLanguage :: Maybe Language }
+  | ImportDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationAlias :: T.Text, declarationSymbols :: [(T.Text, T.Text)] }
   | FunctionDeclaration { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   | HeadingDeclaration  { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationLevel :: Int }
-  | CallReference       { declarationIdentifier :: T.Text, declarationImportIdentifier :: [T.Text] }
+  | CallReference       { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationImportIdentifier :: [T.Text] }
   | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   deriving (Eq, Generic, Show)
 
@@ -128,9 +128,9 @@ getSource blobSource = toText . flip Source.slice blobSource . getField
 
 instance (Syntax.Identifier :< fs, Expression.MemberAccess :< fs) => CustomHasDeclaration (Union fs) Expression.Call where
   customToDeclaration Blob{..} _ (Expression.Call _ (Term (In fromAnn fromF), _) _ _)
-    | Just (Expression.MemberAccess (Term (In leftAnn leftF)) (Term (In idenAnn _))) <- prj fromF = Just $ CallReference (getSource idenAnn) (memberAccess leftAnn leftF)
-    | Just (Syntax.Identifier (Name name)) <- prj fromF = Just $ CallReference (T.decodeUtf8 name) []
-    | otherwise = Just $ CallReference (getSource fromAnn) []
+    | Just (Expression.MemberAccess (Term (In leftAnn leftF)) (Term (In idenAnn _))) <- prj fromF = Just $ CallReference (getSource idenAnn) mempty blobLanguage (memberAccess leftAnn leftF)
+    | Just (Syntax.Identifier (Name name)) <- prj fromF = Just $ CallReference (T.decodeUtf8 name) mempty blobLanguage []
+    | otherwise = Just $ CallReference (getSource fromAnn) mempty blobLanguage []
     where
       memberAccess modAnn termFOut
         | Just (Expression.MemberAccess (Term (In leftAnn leftF)) (Term (In rightAnn rightF))) <- prj termFOut
