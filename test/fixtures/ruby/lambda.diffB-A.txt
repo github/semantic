@@ -1,5 +1,5 @@
 (Program
-  (Call
+  (Send
     (Identifier)
     (Function
       (Empty)
@@ -8,12 +8,12 @@
       {-(Identifier)-}
       {-(Integer)-})
     ->([]) }))
-{+(Call
+{+(Send
   {+(Identifier)+}
   {+(Function
     {+(Empty)+}
     {+(Identifier)+})+})+}
-{+(Call
+{+(Send
   {+(Identifier)+}
   {+(Function
     {+(Empty)+}
