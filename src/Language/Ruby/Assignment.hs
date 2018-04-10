@@ -74,6 +74,7 @@ type Syntax = '[
   , Syntax.Identifier
   , Syntax.Paren
   , Syntax.Program
+  , Ruby.Syntax.Send
   , Ruby.Syntax.Class
   , Ruby.Syntax.Load
   , Ruby.Syntax.LowPrecedenceBoolean
@@ -83,7 +84,8 @@ type Syntax = '[
   ]
 
 type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
+type Assignment' a = HasCallStack => Assignment.Assignment [] Grammar a
+type Assignment = Assignment' Term
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
@@ -290,11 +292,21 @@ subscript = makeTerm <$> symbol ElementReference <*> children (Expression.Subscr
 pair :: Assignment
 pair =   makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> (expression <|> emptyTerm))
 
+args :: Assignment' [Term]
+args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> many expression
+
 methodCall :: Assignment
-methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> regularCall)
+methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> send)
   where
-    regularCall = inj <$> (Expression.Call <$> pure [] <*> expression <*> args <*> (block <|> emptyTerm))
-    require = inj <$> (symbol Identifier *> do
+    send = inj <$> ((regularCall <|> funcCall <|> scopeCall <|> dotCall) <*> optional block)
+
+    funcCall = Ruby.Syntax.Send Nothing <$> selector <*> args
+    regularCall = symbol Call *> children (Ruby.Syntax.Send <$> (Just <$> postContextualize heredoc expression) <*> selector) <*> args
+    scopeCall = symbol ScopeResolution *> children (Ruby.Syntax.Send <$> (Just <$> expression) <*> selector) <*> args
+    dotCall = symbol Call *> children (Ruby.Syntax.Send <$> (Just <$> term expression) <*> pure Nothing <*> args)
+
+    selector = Just <$> term methodSelector
+    require = inj <$> ((symbol Identifier <|> symbol Identifier') *> do
       s <- source
       guard (s `elem` ["require", "require_relative"])
       Ruby.Syntax.Require (s == "require_relative") <$> nameExpression)
@@ -302,14 +314,22 @@ methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> 
       s <- source
       guard (s == "load")
       Ruby.Syntax.Load <$> loadArgs)
-    args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> pure []
     loadArgs = (symbol ArgumentList <|> symbol ArgumentListWithParens)  *> children (some expression)
     nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
 
-call :: Assignment
-call = makeTerm <$> symbol Call <*> children (Expression.MemberAccess <$> expression <*> (args <|> expressions))
+methodSelector :: Assignment
+methodSelector = makeTerm <$> symbols <*> (Syntax.Identifier <$> (name <$> source))
   where
-    args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expressions
+    symbols = symbol Identifier
+          <|> symbol Identifier'
+          <|> symbol Constant
+          <|> symbol Operator
+          <|> symbol Super -- TODO(@charliesome): super calls are *not* method calls and need to be assigned into their own syntax terms
+
+call :: Assignment
+call = makeTerm <$> symbol Call <*> children (
+    (Ruby.Syntax.Send <$> (Just <$> term expression) <*> (Just <$> methodSelector) <*> pure [] <*> pure Nothing) <|>
+    (Ruby.Syntax.Send <$> (Just <$> term expression) <*> pure Nothing <*> args <*> pure Nothing))
 
 rescue :: Assignment
 rescue =  rescue'
@@ -405,7 +425,8 @@ invert term = makeTerm <$> location <*> fmap Expression.Not term
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 term :: Assignment -> Assignment
-term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
+term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> heredocEnd) <*> emptyTerm)
+  where heredocEnd = makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> source)
 
 -- | Match a series of terms or comments until a delimiter is matched.
 manyTermsTill :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]

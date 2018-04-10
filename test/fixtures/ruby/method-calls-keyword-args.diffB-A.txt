@@ -1,10 +1,9 @@
 (Program
-  (Call
+  (Send
     (Identifier)
     (KeyValue
       (Identifier)
       (Boolean))
   {-(KeyValue
     {-(Identifier)-}
-    {-(Integer)-})-}
-    (Empty)))
+    {-(Integer)-})-}))
