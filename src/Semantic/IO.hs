@@ -77,7 +77,6 @@ readBlobsFromHandle :: MonadIO m => Handle -> m [Blob.Blob]
 readBlobsFromHandle = fmap toBlobs . readFromHandle
   where toBlobs BlobParse{..} = fmap toBlob blobs
 
-
 readBlobFromPath :: MonadIO m => (FilePath, Maybe Language) -> m Blob.Blob
 readBlobFromPath file = do
   maybeFile <- uncurry readFile file

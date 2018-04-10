@@ -91,7 +91,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
 
     graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute import/call graph for an entry point"))
     graphArgumentsParser = runGraph
-      <$> (   flag (SomeRenderer DOTGraphRenderer) (SomeRenderer DOTGraphRenderer) (long "dot" <> help "Output in DOT graph format (default)")
+      <$> (   flag (SomeRenderer DOTGraphRenderer) (SomeRenderer DOTGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
           <|> flag'                                (SomeRenderer JSONGraphRenderer) (long "json" <> help "Output JSON graph")
           )
       <*> argument filePathReader (metavar "ENTRY_FILE")
