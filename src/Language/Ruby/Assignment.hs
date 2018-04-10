@@ -313,9 +313,12 @@ methodCall =  makeTerm' <$> symbol MethodCall <*> children (require <|> load <|>
     nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
 
 methodSelector :: Assignment
-methodSelector = mk Identifier <|> mk Identifier' <|> mk Constant
+methodSelector = makeTerm <$> symbols <*> (Syntax.Identifier <$> (name <$> source))
   where
-    mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> (name <$> source))
+    symbols = symbol Identifier
+          <|> symbol Identifier'
+          <|> symbol Constant
+          <|> symbol Operator
 
 call :: Assignment
 call = makeTerm <$> symbol Call <*> children (Ruby.Syntax.Send <$> (Just <$> term expression) <*> methodSelector <*> many expression <*> optional block)
