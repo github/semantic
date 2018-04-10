@@ -1,8 +1,4 @@
 (Program
-{+(Call
-  {+(Identifier)+}
-  {+(Hash)+}
-  {+(Empty)+})+}
   (Call
     (Identifier)
     (Function
@@ -11,7 +7,12 @@
     { (Plus
       {-(Identifier)-}
       {-(Integer)-})
-    ->(Identifier) }))
+    ->([]) }))
+{+(Call
+  {+(Identifier)+}
+  {+(Function
+    {+(Empty)+}
+    {+(Identifier)+})+})+}
 {+(Call
   {+(Identifier)+}
   {+(Function
