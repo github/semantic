@@ -1,8 +1,9 @@
 (Program
   (Call
     (Identifier)
-    (Hash)
-    (Empty))
+    (Function
+      (Empty)
+      ([])))
   (Call
     (Identifier)
     (Function
