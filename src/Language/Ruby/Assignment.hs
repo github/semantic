@@ -319,6 +319,7 @@ methodSelector = makeTerm <$> symbols <*> (Syntax.Identifier <$> (name <$> sourc
           <|> symbol Identifier'
           <|> symbol Constant
           <|> symbol Operator
+          <|> symbol Super -- TODO(@charliesome): super calls are *not* method calls and need to be assigned into their own syntax terms
 
 call :: Assignment
 call = makeTerm <$> symbol Call <*> children (Ruby.Syntax.Send <$> (Just <$> term expression) <*> methodSelector <*> many expression <*> optional block)
