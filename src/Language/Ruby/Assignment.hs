@@ -305,7 +305,7 @@ methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> 
     scopeCall = symbol ScopeResolution *> children (Ruby.Syntax.Send <$> (Just <$> expression) <*> selector) <*> args
     dotCall = symbol Call *> children (Ruby.Syntax.Send <$> (Just <$> term expression) <*> pure Nothing <*> args)
 
-    selector = Just <$> methodSelector
+    selector = Just <$> term methodSelector
     require = inj <$> ((symbol Identifier <|> symbol Identifier') *> do
       s <- source
       guard (s `elem` ["require", "require_relative"])
