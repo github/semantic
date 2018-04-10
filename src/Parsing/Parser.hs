@@ -50,14 +50,15 @@ type family ApplyAll' (typeclasses :: [(* -> *) -> Constraint]) (fs :: [* -> *])
 data SomeAnalysisParser typeclasses ann where
   SomeAnalysisParser :: (Member Syntax.Identifier fs, ApplyAll' typeclasses fs) => Parser (Term (Union fs) ann) -> [String] -> SomeAnalysisParser typeclasses ann
 
+-- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
 someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
                       , ApplyAll' typeclasses PHP.Syntax
                       , ApplyAll' typeclasses Python.Syntax
                       , ApplyAll' typeclasses Ruby.Syntax
                       , ApplyAll' typeclasses TypeScript.Syntax
                       )
-                   => proxy typeclasses                        -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
-                   -> Language                                 -- ^ The 'Language' to select.
+                   => proxy typeclasses                                -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
+                   -> Language                                         -- ^ The 'Language' to select.
                    -> SomeAnalysisParser typeclasses (Record Location) -- ^ A 'SomeAnalysisParser abstracting the syntax type to be produced.
 someAnalysisParser _ Go         = SomeAnalysisParser goParser ["go"]
 someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser ["js"]
