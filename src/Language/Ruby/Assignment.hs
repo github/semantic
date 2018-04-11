@@ -231,13 +231,25 @@ scopeResolution = makeTerm <$> symbol ScopeResolution <*> children (Expression.S
 parameter :: Assignment
 parameter =
       lhsIdent
-  <|> mk SplatParameter
-  <|> mk HashSplatParameter
-  <|> mk BlockParameter
-  <|> mk KeywordParameter
-  <|> mk OptionalParameter
+  <|> splatParameter
+  <|> hashSplatParameter
+  <|> blockParameter
+  <|> keywordParameter
+  <|> optionalParameter
   <|> makeTerm <$> symbol DestructuredParameter <*> children (many parameter)
-  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
+  where
+    -- splat and hash splat arguments can be unnamed. we don't currently
+    -- support unnamed arguments in the term syntax, so the use of emptyTerm
+    -- here is a huge hack. what we should be able to do is return a Nothing
+    -- for the argument name for splats and hash splats. TODO fix me:
+    mkSplat s = symbol s *> children (lhsIdent <|> emptyTerm)
+    splatParameter = mkSplat SplatParameter
+    hashSplatParameter = mkSplat HashSplatParameter
+    blockParameter = symbol BlockParameter *> children lhsIdent
+    -- we don't yet care about default expressions for optional (including
+    -- keyword) parameters, but we need to match on them to prevent errors:
+    keywordParameter = symbol KeywordParameter *> children (lhsIdent <* optional expression)
+    optionalParameter = symbol OptionalParameter *> children (lhsIdent <* expression)
 
 method :: Assignment
 method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method <$> pure [] <*> emptyTerm <*> methodSelector <*> params <*> expressions')
