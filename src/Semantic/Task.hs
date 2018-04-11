@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.Task
 ( Task
 , TaskEff
@@ -47,8 +47,12 @@ module Semantic.Task
 , Telemetry
 ) where
 
-import qualified Analysis.Abstract.ImportGraph as Abstract
+import           Analysis.Abstract.BadModuleResolutions
+import           Analysis.Abstract.BadValues
+import           Analysis.Abstract.BadVariables
 import           Analysis.Abstract.Evaluating
+import qualified Analysis.Abstract.ImportGraph as Abstract
+import           Analysis.Abstract.Quiet
 import           Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
 import qualified Control.Abstract.Analysis as Analysis
@@ -74,7 +78,7 @@ import           Data.Term
 import           Parsing.CMark
 import           Parsing.Parser
 import           Parsing.TreeSitter
-import           Prologue hiding (MonadError(..))
+import           Prologue hiding (MonadError (..))
 import           Semantic.Distribute
 import qualified Semantic.IO as IO
 import           Semantic.Log
@@ -133,6 +137,12 @@ render :: Member Task effs => Renderer input output -> input -> Eff effs output
 render renderer = send . Render renderer
 
 
+type ImportGraphAnalysis term effects value =
+  Abstract.ImportGraphing
+    (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term)))))))
+    effects
+    value
+
 -- | Render the import graph for a given 'Package'.
 graphImports :: (
                   Show ann
@@ -147,14 +157,22 @@ graphImports :: (
                 , Members '[Exc SomeException, Task] effs
                 , term ~ Term (Union syntax) ann
                 )
-             => Package term -> Eff effs Abstract.ImportGraph
-graphImports package = analyze (Analysis.SomeAnalysis (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package)) >>= extractGraph
-  where asAnalysisForTypeOfPackage :: Abstract.ImportGraphing (Evaluating (Located Precise term) term (Value (Located Precise term))) effects value -> Package term -> Abstract.ImportGraphing (Evaluating (Located Precise term) term (Value (Located Precise term))) effects value
-        asAnalysisForTypeOfPackage = const
+             => Maybe (Module term) -> Package term -> Eff effs Abstract.ImportGraph
+graphImports prelude package = analyze (Analysis.SomeAnalysis (withPrelude prelude (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package))) >>= extractGraph
+  where
+    asAnalysisForTypeOfPackage :: ImportGraphAnalysis term effs value
+                               -> Package term
+                               -> ImportGraphAnalysis term effs value
+    asAnalysisForTypeOfPackage = const
 
-        extractGraph result = case result of
-          (Right (Right (Right (Right (Right (Right (_, graph)))))), _) -> pure $! graph
-          _ -> throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
+    extractGraph result = case result of
+      (Right (Right (Right (Right (Right (Right ((((_, graph), _), _), _)))))), _) -> pure $! graph
+      _ -> throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
+
+    withPrelude Nothing a = a
+    withPrelude (Just prelude) a = do
+      preludeEnv <- Analysis.evaluateModule prelude *> Analysis.getEnv
+      Analysis.withDefaultEnvironment preludeEnv a
 
 -- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
 --
