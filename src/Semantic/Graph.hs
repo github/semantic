@@ -4,15 +4,9 @@ module Semantic.Graph where
 import qualified Analysis.Abstract.ImportGraph as Abstract
 import qualified Data.Abstract.Evaluatable as Analysis
 import           Data.Abstract.FreeVariables
-import           Data.Abstract.Module
-import           Data.AST
 import           Data.Blob
 import           Data.ByteString.Char8 as BC (pack)
 import           Data.Output
-import           Data.Record
-import           Data.Term
-import qualified GHC.TypeLits as TypeLevel
-import           Language.Preluded
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
 import           Rendering.Renderer
