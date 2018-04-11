@@ -5,6 +5,5 @@
       (Empty)
       (Identifier)
       (Plus
-        (Send
-          (Identifier))
+        (Identifier)
         (Integer)))))
