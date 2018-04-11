@@ -180,9 +180,10 @@ identifier =
       loc <- symbol Identifier <|> symbol Identifier'
       locals <- getRubyLocals
       ident <- source
+      let identTerm = makeTerm loc (Syntax.Identifier (name ident))
       if ident `elem` locals
-        then pure $ makeTerm loc (Syntax.Identifier (name ident))
-        else makeTerm loc <$> (Expression.Call [] (makeTerm loc (Syntax.Identifier (name ident))) [] <$> emptyTerm)
+        then pure identTerm
+        else pure $ makeTerm loc (Ruby.Syntax.Send Nothing (Just identTerm) [] Nothing)
 
 -- TODO: Handle interpolation in all literals that support it (strings, regexes, symbols, subshells, etc).
 literal :: Assignment
