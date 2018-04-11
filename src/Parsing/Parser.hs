@@ -43,8 +43,6 @@ import TreeSitter.Ruby
 import TreeSitter.TypeScript
 import qualified GHC.TypeLits as TypeLevel
 import           Language.Preluded
-import           Data.Semigroup.Reducer hiding (unit)
-import           Data.Abstract.Address hiding (Location)
 
 
 type family ApplyAll' (typeclasses :: [(* -> *) -> Constraint]) (fs :: [* -> *]) :: Constraint where
