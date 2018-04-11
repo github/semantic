@@ -184,10 +184,6 @@ identifier =
         then pure $ makeTerm loc (Syntax.Identifier (name ident))
         else makeTerm loc <$> (Expression.Call [] (makeTerm loc (Syntax.Identifier (name ident))) [] <$> emptyTerm)
 
--- Regular identifiers prioritized over vcalls.
-plainIdentifier :: Assignment
-plainIdentifier = makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax.Identifier . name <$> source)
-
 -- TODO: Handle interpolation in all literals that support it (strings, regexes, symbols, subshells, etc).
 literal :: Assignment
 literal =
@@ -243,12 +239,12 @@ parameter =
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
 
 method :: Assignment
-method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method <$> pure [] <*> emptyTerm <*> (plainIdentifier <|> expression) <*> params <*> expressions')
+method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method <$> pure [] <*> emptyTerm <*> methodSelector <*> params <*> expressions')
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
         expressions' = makeTerm <$> location <*> many expression
 
 singletonMethod :: Assignment
-singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withNewScope . children) (Declaration.Method <$> pure [] <*> expression <*> expression <*> params <*> expressions)
+singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withNewScope . children) (Declaration.Method <$> pure [] <*> expression <*> methodSelector <*> params <*> expressions)
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
 
 lambda :: Assignment
