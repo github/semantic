@@ -229,13 +229,14 @@ scopeResolution = makeTerm <$> symbol ScopeResolution <*> children (Expression.S
 
 parameter :: Assignment
 parameter =
-      mk SplatParameter
+      mk Identifier
+  <|> mk Identifier'
+  <|> mk SplatParameter
   <|> mk HashSplatParameter
   <|> mk BlockParameter
   <|> mk KeywordParameter
   <|> mk OptionalParameter
   <|> makeTerm <$> symbol DestructuredParameter <*> children (many parameter)
-  <|> expression
   where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
 
 method :: Assignment
