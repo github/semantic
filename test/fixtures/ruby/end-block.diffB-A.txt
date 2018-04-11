@@ -1,6 +1,9 @@
 (Program
 {+(ScopeExit
-  {+(Identifier)+})+}
-{-(Identifier)-}
+  {+(Send
+    {+(Identifier)+})+})+}
+{-(Send
+  {-(Identifier)-})-}
 {-(ScopeExit
-  {-(Identifier)-})-})
+  {-(Send
+    {-(Identifier)-})-})-})

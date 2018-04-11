@@ -1,12 +1,17 @@
 (Program
   (Subscript
-    (Identifier)
-    (Identifier))
+    (Send
+      (Identifier))
+    (Send
+      (Identifier)))
   (Subscript
-    (Identifier)
+    (Send
+      (Identifier))
     (Symbol))
   (Assignment
     (Subscript
-      (Identifier)
-      (Identifier))
+      (Send
+        (Identifier))
+      (Send
+        (Identifier)))
     (Integer)))

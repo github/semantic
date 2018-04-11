@@ -6,13 +6,15 @@
     {+(Identifier)+}
     { ([])
     ->(Plus
-      {+(Identifier)+}
+      {+(Send
+        {+(Identifier)+})+}
       {+(Integer)+}) }))
 {-(Send
   {-(Identifier)-}
   {-(Function
     {-(Empty)-}
-    {-(Identifier)-})-})-}
+    {-(Send
+      {-(Identifier)-})-})-})-}
 {-(Send
   {-(Identifier)-}
   {-(Function
@@ -30,7 +32,8 @@
   {-(Empty)-}
   {-(Function
     {-(Empty)-}
-    {-(Identifier)-})-})-}
+    {-(Send
+      {-(Identifier)-})-})-})-}
 {-(Function
   {-(Empty)-}
   {-(Identifier)-}

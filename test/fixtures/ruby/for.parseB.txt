@@ -1,11 +1,13 @@
 (Program
   (ForEach
     (
-      (Identifier))
+      (Send
+        (Identifier)))
     (Array
       (Integer)
       (Integer)
       (Integer))
     (Send
       (Identifier)
-      (Identifier))))
+      (Send
+        (Identifier)))))

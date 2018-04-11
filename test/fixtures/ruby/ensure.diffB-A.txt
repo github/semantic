@@ -1,7 +1,9 @@
 (Program
   (Try
     (
-      (Identifier)
+      (Send
+        (Identifier))
       (Finally
-      { (Identifier)
+      { (Send
+        {-(Identifier)-})
       ->([]) }))))

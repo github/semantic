@@ -1,8 +1,10 @@
 (Program
   (Try
     (
-      (Identifier)
+      (Send
+        (Identifier))
       (Catch
         ([])
       { ([])
-      ->(Identifier) }))))
+      ->(Send
+        {+(Identifier)+}) }))))

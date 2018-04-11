@@ -2,17 +2,20 @@
   (Hash
     (KeyValue
     { (Symbol)
-    ->(Identifier) }
+    ->(Send
+      {+(Identifier)+}) }
     { (TextElement)
     ->(TextElement) })
     (KeyValue
     { (Symbol)
-    ->(Identifier) }
+    ->(Send
+      {+(Identifier)+}) }
     { (Integer)
     ->(Integer) })
     (KeyValue
     { (TextElement)
-    ->(Identifier) }
+    ->(Send
+      {+(Identifier)+}) }
     { (Boolean)
     ->(Boolean) })
   {-(KeyValue
@@ -23,7 +26,8 @@
   {-(Context
     {-(Comment)-}
     {-(KeyValue
-      {-(Identifier)-}
+      {-(Send
+        {-(Identifier)-})-}
       {-(Integer)-})-})-}
   {-(Context
     {-(Comment)-}

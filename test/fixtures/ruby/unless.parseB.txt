@@ -1,11 +1,13 @@
 (Program
   (If
     (Not
-      (Identifier))
+      (Send
+        (Identifier)))
     ([])
     (Empty))
   (If
     (Not
-      (Identifier))
+      (Send
+        (Identifier)))
     ([])
     (Empty)))

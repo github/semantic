@@ -1,0 +1,9 @@
+(Program
+  (ForEach
+    (
+      (Send
+        (Identifier)))
+    (Send
+      (Identifier))
+    (Continue
+      (Empty))))
