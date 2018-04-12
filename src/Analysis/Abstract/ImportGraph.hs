@@ -17,9 +17,13 @@ import           Data.Abstract.Located
 import           Data.Abstract.Module hiding (Module)
 import           Data.Abstract.Origin hiding (Module, Package)
 import           Data.Abstract.Package hiding (Package)
+import           Data.Aeson
 import qualified Data.ByteString.Char8 as BC
+import           Data.ByteString.Lazy (toStrict)
+import           Data.Output
 import qualified Data.Syntax as Syntax
 import           Data.Term
+import           Data.Text.Encoding as T
 import           Prologue hiding (empty, packageName)
 
 -- | The graph of function variableDefinitions to symbols used in a given program.
@@ -151,3 +155,23 @@ instance Ord ImportGraph where
   compare (ImportGraph (G.Overlay _  _))  _                               = LT
   compare _                               (ImportGraph (G.Overlay _ _))   = GT
   compare (ImportGraph (G.Connect a1 a2)) (ImportGraph (G.Connect b1 b2)) = (compare `on` ImportGraph) a1 b1 <> (compare `on` ImportGraph) a2 b2
+
+instance Output ImportGraph where
+  toOutput = toStrict . (<> "\n") . encode
+
+instance ToJSON ImportGraph where
+  toJSON ImportGraph{..} = object [ "vertices" .= vertices, "edges" .= edges ]
+    where
+      vertices = toJSON (G.vertexList unImportGraph)
+      edges = fmap (\(a, b) -> object [ "source" .= vertexToText a, "target" .= vertexToText b ]) (G.edgeList unImportGraph)
+
+instance ToJSON Vertex where
+  toJSON v = object [ "name" .= vertexToText v, "type" .= vertexToType v ]
+
+vertexToText :: Vertex -> Text
+vertexToText = decodeUtf8 . vertexName
+
+vertexToType :: Vertex -> Text
+vertexToType Package{}  = "package"
+vertexToType Module{}   = "module"
+vertexToType Variable{} = "variable"

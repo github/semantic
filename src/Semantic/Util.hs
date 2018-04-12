@@ -37,7 +37,7 @@ import Parsing.Parser
 import Prologue
 import Semantic.Diff (diffTermPair)
 import Semantic.IO as IO
-import Semantic.Task hiding (parsePackage)
+import Semantic.Task
 import qualified Semantic.Task as Task
 import System.FilePath.Posix
 
@@ -65,8 +65,7 @@ typecheckGoFile path = runAnalysis @(Caching (Evaluating Monovariant Go.Term Typ
 -- Python
 evalPythonProject = runEvaluatingWithPrelude pythonParser ["py"]
 evalPythonFile path = runEvaluating <$> (withPrelude <$> parsePrelude pythonParser <*> (evaluateModule <$> parseFile pythonParser Nothing path))
-
-evalPythonImportGraph name paths = runAnalysis @(ImportGraphing (Evaluating (Located Precise Python.Term) Python.Term (Value (Located Precise Python.Term)))) . evaluatePackage <$> parsePackage name pythonParser (dropFileName (head paths)) paths
+evalPythonProjectGraph path = runAnalysis @(ImportGraphing (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise Python.Term) Python.Term (Value (Located Precise Python.Term)))))))) <$> (withPrelude <$> parsePrelude pythonParser <*> (evaluatePackageBody <$> parseProject pythonParser ["py"] path))
 
 typecheckPythonFile path = runAnalysis @(Caching (Evaluating Monovariant Python.Term Type)) . evaluateModule <$> parseFile pythonParser Nothing path
 tracePythonFile path = runAnalysis @(Tracing [] (Evaluating Precise Python.Term (Value Precise))) . evaluateModule <$> parseFile pythonParser Nothing path

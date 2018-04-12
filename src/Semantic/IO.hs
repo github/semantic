@@ -9,6 +9,8 @@ module Semantic.IO
 , readBlobsFromDir
 , languageForFilePath
 , NoLanguageForBlob(..)
+, listFiles
+, readBlob
 , readBlobs
 , readBlobPairs
 , writeToOutput
@@ -75,6 +77,11 @@ readBlobsFromHandle :: MonadIO m => Handle -> m [Blob.Blob]
 readBlobsFromHandle = fmap toBlobs . readFromHandle
   where toBlobs BlobParse{..} = fmap toBlob blobs
 
+readBlobFromPath :: MonadIO m => (FilePath, Maybe Language) -> m Blob.Blob
+readBlobFromPath file = do
+  maybeFile <- uncurry readFile file
+  maybe (fail ("cannot read '" <> show file <> "', file not found or language not supported.")) pure maybeFile
+
 readBlobsFromPaths :: MonadIO m => [(FilePath, Maybe Language)] -> m [Blob.Blob]
 readBlobsFromPaths files = catMaybes <$> traverse (uncurry readFile) files
 
@@ -129,6 +136,11 @@ instance FromJSON BlobPair where
 newtype NoLanguageForBlob = NoLanguageForBlob FilePath
   deriving (Eq, Exception, Ord, Show, Typeable)
 
+listFiles :: Member Files effs => FilePath -> [String] -> Eff effs [FilePath]
+listFiles dir exts = send (ListFiles dir exts)
+
+readBlob :: Member Files effs => (FilePath, Maybe Language) -> Eff effs Blob.Blob
+readBlob = send . ReadBlob
 
 -- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
 readBlobs :: Member Files effs => Either Handle [(FilePath, Maybe Language)] -> Eff effs [Blob.Blob]
@@ -145,6 +157,9 @@ writeToOutput path = send . WriteToOutput path
 
 -- | An effect to read/write 'Blob.Blob's from 'Handle's or 'FilePath's.
 data Files out where
+  ReadBlob      :: (FilePath, Maybe Language) -> Files Blob.Blob
+  ListFiles     :: FilePath -> [String] -> Files [FilePath]
+
   ReadBlobs     :: Either Handle [(FilePath, Maybe Language)] -> Files [Blob.Blob]
   ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> Files [Blob.BlobPair]
   WriteToOutput :: Either Handle FilePath -> B.ByteString -> Files ()
@@ -152,6 +167,9 @@ data Files out where
 -- | Run a 'Files' effect in 'IO'.
 runFiles :: Members '[Exc SomeException, IO] effs => Eff (Files ': effs) a -> Eff effs a
 runFiles = interpret $ \ files -> case files of
+  ReadBlob path -> rethrowing (readBlobFromPath path)
+  ListFiles directory exts -> liftIO $ fmap fold (globDir (compile . mappend "**/*." <$> exts) directory)
+
   ReadBlobs (Left handle) -> rethrowing (readBlobsFromHandle handle)
   ReadBlobs (Right paths@[(path, Nothing)]) -> rethrowing (isDirectory path >>= bool (readBlobsFromPaths paths) (readBlobsFromDir path))
   ReadBlobs (Right paths) -> rethrowing (readBlobsFromPaths paths)
