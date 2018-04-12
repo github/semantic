@@ -15,6 +15,16 @@ instance Show1 ArrayType where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for ArrayType
 instance Evaluatable ArrayType
 
+newtype Import a = Import [a]
+  deriving (Diffable, Eq, FreeVariables1, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Import where liftEq = genericLiftEq
+instance Ord1 Import where liftCompare = genericLiftCompare
+instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for ArrayType
+instance Evaluatable Import
+
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 

@@ -33,6 +33,7 @@ type Syntax =
    , Declaration.Method
    , Declaration.VariableDeclaration
    , Java.Syntax.ArrayType
+   , Java.Syntax.Import
    , Java.Syntax.Module
    , Literal.Array
    , Literal.Boolean
@@ -87,6 +88,7 @@ expressionChoices =
   , float
   -- , hexadecimal
   , identifier
+  , import'
   , integer
   , method
   , module'
@@ -182,7 +184,8 @@ method = makeTerm <$> symbol MethodDeclaration <*> children (
 module' :: Assignment
 module' = makeTerm <$> symbol ModuleDeclaration <*> children (Java.Syntax.Module <$> expression <*> many expression)
 
-importStatement = makeTerm <$> symbol
+import' :: Assignment
+import' =   makeTerm <$> symbol ImportDeclaration <*> children (Java.Syntax.Import <$> some identifier)
 
 return' :: Assignment
 return' = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> expression)
