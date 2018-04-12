@@ -33,6 +33,7 @@ type Syntax =
    , Declaration.Method
    , Declaration.VariableDeclaration
    , Java.Syntax.ArrayType
+   , Java.Syntax.Module
    , Literal.Array
    , Literal.Boolean
    , Literal.Integer
@@ -79,25 +80,28 @@ expression = handleError (choice expressionChoices)
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
   [
-    array_initializer
+    arrayInitializer
   , char
   , class'
   -- , constantDeclaration
+  , float
+  -- , hexadecimal
   , identifier
   , integer
-  , float
   , method
+  , module'
   , null'
   , return'
   , string
-  , local_variable_declaration_statement
+  , localVariableDeclaration
+  , localVariableDeclarationStatement
   ]
 
 modifier :: Assignment
 modifier = makeTerm <$> symbol Modifier <*> (Syntax.AccessibilityModifier <$> source)
 
-array_initializer :: Assignment
-array_initializer = makeTerm <$> symbol ArrayInitializer <*> (Literal.Array <$> many expression)
+arrayInitializer :: Assignment
+arrayInitializer = makeTerm <$> symbol ArrayInitializer <*> (Literal.Array <$> many expression)
 
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
@@ -105,20 +109,20 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 -- constantDeclaration :: Assignment
 -- constantDeclaration = makeTerm <$> symbol ConstantDeclaration <*>
 
--- TODO: Rename these to be conventionally namned functions (camelCase )
-local_variable_declaration :: Assignment
-local_variable_declaration = makeDecl <$> symbol LocalVariableDeclaration <*> children ((,) <$> some type' <*> vDeclList)
+localVariableDeclaration :: Assignment
+localVariableDeclaration = makeDecl <$> symbol LocalVariableDeclaration <*> children ((,) <$> some type' <*> vDeclList)
   where
     makeSingleDecl loc types (target, value) = makeTerm loc (Statement.Assignment types target value)
     makeDecl loc (types, decls) = makeTerm loc $ fmap (makeSingleDecl loc types) decls
     vDeclList = symbol VariableDeclaratorList *> children (some variableDeclarator)
     variableDeclarator = symbol VariableDeclarator *> children ((,) <$> variable_declarator_id <*> expression)
 
-local_variable_declaration_statement :: Assignment
-local_variable_declaration_statement = symbol LocalVariableDeclarationStatement *> children local_variable_declaration
+localVariableDeclarationStatement :: Assignment
+localVariableDeclarationStatement = symbol LocalVariableDeclarationStatement *> children localVariableDeclaration
 
-unannotated_type :: Assignment
-unannotated_type = makeTerm <$> symbol Grammar.ArrayType <*> (Java.Syntax.ArrayType <$> source)
+-- so it's legit to have
+unannotatedType :: Assignment
+unannotatedType = makeTerm <$> symbol Grammar.ArrayType <*> (Java.Syntax.ArrayType <$> source)
 
 variable_declarator_id :: Assignment
 variable_declarator_id = symbol VariableDeclaratorId *> children identifier
@@ -129,18 +133,28 @@ variable_declarator_id = symbol VariableDeclaratorId *> children identifier
 boolean :: Assignment
 boolean = makeTerm <$> token BooleanLiteral <*> pure Literal.true
 
-null' :: Assignment
-null' = makeTerm <$> symbol NullLiteral <*> (Literal.Null <$ source)
---
 -- boolean :: Assignment
 -- boolean =  makeTerm <$> token Grammar.True <*> pure Literal.true
 --        <|> makeTerm <$> token Grammar.False <*> pure Literal.false
+
+null' :: Assignment
+null' = makeTerm <$> symbol NullLiteral <*> (Literal.Null <$ source)
+-- why is this <$?
 
 integer :: Assignment
 integer = makeTerm <$> symbol IntegerLiteral <*> children (symbol DecimalIntegerLiteral >> Literal.Integer <$> source)
 
 float :: Assignment
 float = makeTerm <$> symbol FloatingPointLiteral <*> (Literal.Float <$> source)
+
+-- hexadecimalInt :: Assignment
+-- hexadecimalInt = makeTerm <$> symbol HexIntegerLiteral <*> (Literal.Integer <$> source)
+--
+-- hexadecimalFloat :: Assignment
+-- hexadecimalFloat = makeTerm <$> symbol HexFloatingPointLiteral <*> (Literal.Float <$> source)
+--
+-- octalInt :: Assignment
+-- hexadecimalInt = makeTerm <$> symbol OctalIntegerLiteral <*> (Literal.Integer <$> source)
 
 string :: Assignment
 string = makeTerm <$> symbol StringLiteral <*> (Literal.TextElement <$> source)
@@ -152,8 +166,9 @@ class' :: Assignment
 class' = makeTerm <$> symbol ClassDeclaration <*> children (Declaration.Class <$> many modifier <*> term identifier <*> pure [] <*> classBody)
   where classBody = makeTerm <$> symbol ClassBody <*> children (manyTerm expression)
 
+-- consolidated with scopedIdentifier
 identifier :: Assignment
-identifier = makeTerm <$> symbol Identifier <*> (Syntax.Identifier <$> (name <$> source))
+identifier = makeTerm <$> (symbol Identifier <|> symbol ScopedIdentifier) <*> (Syntax.Identifier . name <$> source)
 
 method :: Assignment
 method = makeTerm <$> symbol MethodDeclaration <*> children (
@@ -162,8 +177,12 @@ method = makeTerm <$> symbol MethodDeclaration <*> children (
           )
   where makeMethod modifiers receiver (returnType, (name, params)) body = Declaration.Method (returnType : modifiers) receiver name params body
         parameter = makeTerm <$> symbol FormalParameter <*> children (flip Type.Annotation <$> type' <* symbol VariableDeclaratorId <*> children identifier)
-
 -- TODO: re-introduce makeTerm later; matching types as part of the type rule for now
+
+module' :: Assignment
+module' = makeTerm <$> symbol ModuleDeclaration <*> children (Java.Syntax.Module <$> expression <*> many expression)
+
+importStatement = makeTerm <$> symbol
 
 return' :: Assignment
 return' = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> expression)

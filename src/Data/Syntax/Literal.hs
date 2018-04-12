@@ -44,9 +44,7 @@ instance Evaluatable Data.Syntax.Literal.Integer where
   -- TODO: This instance probably shouldn't have readInteger?
   eval (Data.Syntax.Literal.Integer x) = integer (maybe 0 fst (readInteger x))
 
-
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
--- TODO: Do we care about differentiating between hex/octal/decimal/binary integer literals?
 -- TODO: Consider a Numeric datatype with FloatingPoint/Integral/etc constructors.
 
 -- | A literal float of unspecified width.
