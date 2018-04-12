@@ -17,44 +17,45 @@ module Parsing.Parser
 , phpParser
 ) where
 
-import Prologue
-import Assigning.Assignment
+import           Assigning.Assignment
 import qualified CMarkGFM
-import Data.AST
-import Data.Kind
-import Data.Language
-import Data.Record
+import           Data.AST
+import           Data.Kind
+import           Data.Language
+import           Data.Record
 import qualified Data.Syntax as Syntax
-import Data.Term
-import Foreign.Ptr
+import           Data.Term
+import           Foreign.Ptr
+import qualified GHC.TypeLits as TypeLevel
 import qualified Language.Go.Assignment as Go
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
+import qualified Language.PHP.Assignment as PHP
+import           Language.Preluded
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
-import qualified Language.PHP.Assignment as PHP
+import           Prologue
+import           TreeSitter.Go
+import           TreeSitter.JSON
 import qualified TreeSitter.Language as TS (Language, Symbol)
-import TreeSitter.Go
-import TreeSitter.JSON
-import TreeSitter.PHP
-import TreeSitter.Python
-import TreeSitter.Ruby
-import TreeSitter.TypeScript
-import qualified GHC.TypeLits as TypeLevel
-import           Language.Preluded
+import           TreeSitter.PHP
+import           TreeSitter.Python
+import           TreeSitter.Ruby
+import           TreeSitter.TypeScript
 
 
 type family ApplyAll' (typeclasses :: [(* -> *) -> Constraint]) (fs :: [* -> *]) :: Constraint where
   ApplyAll' (typeclass ': typeclasses) fs = (Apply typeclass fs, ApplyAll' typeclasses fs)
   ApplyAll' '[] fs = ()
 
+-- | A parser, suitable for program analysis, for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
 data SomeAnalysisParser typeclasses ann where
   SomeAnalysisParser :: ( Member Syntax.Identifier fs
                         , ApplyAll' typeclasses fs)
-                     => Parser (Term (Union fs) ann)
-                     -> [String]
-                     -> Maybe String
+                     => Parser (Term (Union fs) ann) -- ^ A parser.
+                     -> [String]                     -- ^ List of valid file extensions to be used for module resolution.
+                     -> Maybe String                 -- ^ Maybe path to prelude.
                      -> SomeAnalysisParser typeclasses ann
 
 -- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
