@@ -34,8 +34,10 @@ type Syntax =
    , Declaration.VariableDeclaration
    , Java.Syntax.ArrayType
    , Literal.Array
+   , Literal.Boolean
    , Literal.Integer
    , Literal.Float
+   , Literal.Null
    , Literal.String
    , Literal.TextElement
    , Statement.Assignment
@@ -45,6 +47,7 @@ type Syntax =
    , Syntax.Identifier
    , Syntax.AccessibilityModifier
    , Syntax.Program
+   , Type.Bool
    , Type.Int
    , Type.Void
    , Type.Float
@@ -84,6 +87,7 @@ expressionChoices =
   , integer
   , float
   , method
+  , null'
   , return'
   , string
   , local_variable_declaration_statement
@@ -107,8 +111,6 @@ local_variable_declaration = makeDecl <$> symbol LocalVariableDeclaration <*> ch
   where
     makeSingleDecl loc types (target, value) = makeTerm loc (Statement.Assignment types target value)
     makeDecl loc (types, decls) = makeTerm loc $ fmap (makeSingleDecl loc types) decls
-    -- makeImportTerm loc ([x], from) = makeImportTerm1 loc from x
-    -- makeImportTerm loc (xs, from) = makeTerm loc $ fmap (makeImportTerm1 loc from) xs
     vDeclList = symbol VariableDeclaratorList *> children (some variableDeclarator)
     variableDeclarator = symbol VariableDeclarator *> children ((,) <$> variable_declarator_id <*> expression)
 
@@ -121,7 +123,18 @@ unannotated_type = makeTerm <$> symbol Grammar.ArrayType <*> (Java.Syntax.ArrayT
 variable_declarator_id :: Assignment
 variable_declarator_id = symbol VariableDeclaratorId *> children identifier
 
+-- Literals
 
+-- TODO: Need to disaggregate true/false in
+boolean :: Assignment
+boolean = makeTerm <$> token BooleanLiteral <*> pure Literal.true
+
+null' :: Assignment
+null' = makeTerm <$> symbol NullLiteral <*> (Literal.Null <$ source)
+--
+-- boolean :: Assignment
+-- boolean =  makeTerm <$> token Grammar.True <*> pure Literal.true
+--        <|> makeTerm <$> token Grammar.False <*> pure Literal.false
 
 integer :: Assignment
 integer = makeTerm <$> symbol IntegerLiteral <*> children (symbol DecimalIntegerLiteral >> Literal.Integer <$> source)
@@ -159,4 +172,5 @@ type' :: Assignment
 type' =   makeTerm <$> token VoidType <*> pure Type.Void
      <|>  makeTerm <$> token IntegralType <*> pure Type.Int
      <|>  makeTerm <$> token FloatingPointType <*> pure Type.Float
+     <|>  makeTerm <$> token BooleanType <*> pure Type.Bool
      -- <|> makeTerm <$> symbol FloatingPointType <*> children (token AnonFloat $> Type.Float <|> token AnonDouble $> Type.Double)

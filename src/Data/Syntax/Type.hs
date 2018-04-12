@@ -3,7 +3,7 @@ module Data.Syntax.Type where
 
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
-import Prelude hiding (Int, Float)
+import Prelude hiding (Int, Float, Bool)
 import Prologue hiding (Map)
 
 data Array a = Array { arraySize :: Maybe a, arrayElementType :: a }
@@ -157,5 +157,12 @@ instance Eq1 Float where liftEq = genericLiftEq
 instance Ord1 Float where liftCompare = genericLiftCompare
 instance Show1 Float where liftShowsPrec = genericLiftShowsPrec
 
+data Bool a = Bool
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 Bool where liftEq = genericLiftEq
+instance Ord1 Bool where liftCompare = genericLiftCompare
+instance Show1 Bool where liftShowsPrec = genericLiftShowsPrec
+
 -- TODO: Implement Eval instance for Float
-instance Evaluatable Float
+instance Evaluatable Bool
