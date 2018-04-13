@@ -80,7 +80,14 @@ evalTypeScriptProject path = runEvaluating . evaluatePackageBody <$> parseProjec
 evalTypeScriptFile path = runEvaluating . evaluateModule <$> parseFile typescriptParser Nothing path
 typecheckTypeScriptFile path = runAnalysis @(Caching (Evaluating Monovariant TypeScript.Term Type)) . evaluateModule <$> parseFile typescriptParser Nothing path
 
+-- JavaScript
+evalJavaScriptProject path = runAnalysis @(EvaluatingWithHoles TypeScript.Term) . evaluatePackageBody <$> parseProject typescriptParser ["js"] path
+
 runEvaluatingWithPrelude parser exts path = runEvaluating <$> (withPrelude <$> parsePrelude parser <*> (evaluatePackageBody <$> parseProject parser exts path))
+
+type EvaluatingWithHoles term = BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term))))))
+type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
+
 
 -- TODO: Remove this by exporting EvaluatingEffects
 runEvaluating :: forall term effects a.
