@@ -66,6 +66,7 @@ type Syntax = '[
   , Statement.Break
   , Statement.Catch
   , Statement.Continue
+  , Statement.DoWhile
   , Statement.Else
   , Statement.Finally
   , Statement.For
@@ -78,11 +79,10 @@ type Syntax = '[
   , Statement.Return
   , Statement.ScopeEntry
   , Statement.ScopeExit
+  , Statement.Throw
   , Statement.Try
   , Statement.While
   , Statement.Yield
-  , Statement.Throw
-  , Statement.DoWhile
   , Syntax.AccessibilityModifier
   , Syntax.Empty
   , Syntax.Error
