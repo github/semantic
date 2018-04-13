@@ -70,6 +70,7 @@ type Syntax = '[
   , Statement.Finally
   , Statement.For
   , Statement.ForEach
+  , Statement.HashBang
   , Statement.If
   , Statement.Match
   , Statement.Pattern
@@ -598,6 +599,7 @@ statement = handleError everything
       , continueStatement
       , returnStatement
       , throwStatement
+      , hashBang
       , emptyStatement
       , labeledStatement ]
 
@@ -624,6 +626,9 @@ returnStatement = makeTerm <$> symbol ReturnStatement <*> children (Statement.Re
 
 throwStatement :: Assignment
 throwStatement = makeTerm <$> symbol Grammar.ThrowStatement <*> children (Statement.Throw <$> term expressions)
+
+hashBang :: Assignment
+hashBang = makeTerm <$> symbol HashBangLine <*> (Statement.HashBang <$> source)
 
 labeledStatement :: Assignment
 labeledStatement = makeTerm <$> symbol Grammar.LabeledStatement <*> children (TypeScript.Syntax.LabeledStatement <$> statementIdentifier <*> term statement)
