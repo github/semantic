@@ -166,6 +166,7 @@ type Syntax = '[
   , TypeScript.Syntax.DefaultExport
   , TypeScript.Syntax.QualifiedExport
   , TypeScript.Syntax.QualifiedExportFrom
+  , TypeScript.Syntax.JavaScriptRequire
   , []
   ]
 
@@ -785,8 +786,18 @@ variableDeclaration :: Assignment
 variableDeclaration = makeTerm <$> (symbol Grammar.VariableDeclaration <|> symbol Grammar.LexicalDeclaration) <*> children (Declaration.VariableDeclaration <$> manyTerm variableDeclarator)
 
 variableDeclarator :: Assignment
-variableDeclarator = makeVarDecl <$> symbol VariableDeclarator <*> children ((,,) <$> term (identifier <|> destructuringPattern) <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
-  where makeVarDecl loc (subject, annotations, value) = makeTerm loc (Statement.Assignment [annotations] subject value)
+variableDeclarator =
+      makeTerm <$> symbol VariableDeclarator <*> children (TypeScript.Syntax.JavaScriptRequire <$> identifier <*> requireCall)
+  <|> makeVarDecl <$> symbol VariableDeclarator <*> children ((,,) <$> term (identifier <|> destructuringPattern) <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
+  where
+    makeVarDecl loc (subject, annotations, value) = makeTerm loc (Statement.Assignment [annotations] subject value)
+
+    requireCall = symbol CallExpression *> children ((symbol Identifier <|> symbol Identifier') *> do
+      s <- source
+      guard (s == "require")
+      symbol Arguments *> children (symbol Grammar.String *> (TypeScript.Syntax.importPath <$> source))
+      )
+
 
 parenthesizedExpression :: Assignment
 parenthesizedExpression = makeTerm <$> symbol ParenthesizedExpression <*> (Syntax.Paren <$> children (term expressions))

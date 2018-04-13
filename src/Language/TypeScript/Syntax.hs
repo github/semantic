@@ -28,9 +28,11 @@ importPath str = let path = stripQuotes str in ImportPath (BC.unpack path) (path
 toName :: ImportPath -> Name
 toName = FV.name . BC.pack . unPath
 
-resolveTypeScriptModule :: MonadEvaluatable location term value m => ImportPath -> m ModulePath
-resolveTypeScriptModule (ImportPath path Relative)    = resolveRelativeTSModule path
-resolveTypeScriptModule (ImportPath path NonRelative) = resolveNonRelativeTSModule path
+-- Node.js resolution algorithm: https://nodejs.org/api/modules.html#modules_all_together
+-- TypeScript has a couple of different strategies, but the main one mimics Node.js.
+resolveWithNodejsStrategy :: MonadEvaluatable location term value m => ImportPath -> [String] -> m ModulePath
+resolveWithNodejsStrategy (ImportPath path Relative)    exts = resolveRelativePath path exts
+resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativePath path exts
 
 -- | Resolve a relative TypeScript import to a known 'ModuleName' or fail.
 --
@@ -39,12 +41,12 @@ resolveTypeScriptModule (ImportPath path NonRelative) = resolveNonRelativeTSModu
 -- /root/src/moduleB.ts
 -- /root/src/moduleB/package.json (if it specifies a "types" property)
 -- /root/src/moduleB/index.ts
-resolveRelativeTSModule :: MonadEvaluatable location term value m => FilePath -> m ModulePath
-resolveRelativeTSModule relImportPath = do
+resolveRelativePath :: MonadEvaluatable location term value m => FilePath -> [String] -> m ModulePath
+resolveRelativePath relImportPath exts = do
   ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory (makeRelative moduleRoot modulePath)
   let path = normalise (relRootDir </> normalise relImportPath)
-  resolveTSModule path >>= either notFound pure
+  resolveTSModule path exts >>= either notFound pure
   where
     notFound xs = fail $ "Unable to resolve relative module import: " <> show relImportPath <> ", looked for it in: " <> show xs
 
@@ -58,24 +60,24 @@ resolveRelativeTSModule relImportPath = do
 --
 -- /root/node_modules/moduleB.ts, etc
 -- /node_modules/moduleB.ts, etc
-resolveNonRelativeTSModule :: MonadEvaluatable location term value m => FilePath -> m ModulePath
-resolveNonRelativeTSModule name = do
+resolveNonRelativePath :: MonadEvaluatable location term value m => FilePath -> [String] -> m ModulePath
+resolveNonRelativePath name exts = do
   ModuleInfo{..} <- currentModule
   go "." (makeRelative moduleRoot modulePath) mempty
   where
     nodeModulesPath dir = takeDirectory dir </> "node_modules" </> name
     -- Recursively search in a 'node_modules' directory, stepping up a directory each time.
     go root path searched = do
-      res <- resolveTSModule (nodeModulesPath path)
+      res <- resolveTSModule (nodeModulesPath path) exts
       case res of
         Left xs | parentDir <- takeDirectory path , root /= parentDir -> go root parentDir (searched <> xs)
                 | otherwise -> notFound (searched <> xs)
         Right m -> pure m
     notFound xs = fail $ "Unable to resolve non-relative module import: " <> show name <> ", looked for it in: " <> show xs
 
-resolveTSModule :: MonadEvaluatable location term value m => FilePath -> m (Either [FilePath] ModulePath)
-resolveTSModule path = maybe (Left searchPaths) Right <$> resolve searchPaths
-  where exts = ["ts", "tsx", "d.ts"]
+resolveTSModule :: MonadEvaluatable location term value m => FilePath -> [String] -> m (Either [FilePath] ModulePath)
+resolveTSModule path exts = maybe (Left searchPaths) Right <$> resolve searchPaths
+  where -- exts = ["ts", "tsx", "d.ts"]
         searchPaths =
           ((path <.>) <$> exts)
           -- TODO: Requires parsing package.json, getting the path of the
@@ -83,6 +85,11 @@ resolveTSModule path = maybe (Left searchPaths) Right <$> resolve searchPaths
           -- <> [searchDir </> "package.json"]
           <> (((path </> "index") <.>) <$> exts)
 
+typescriptExtensions :: [String]
+typescriptExtensions = ["ts", "tsx", "d.ts"]
+
+javascriptExtensions :: [String]
+javascriptExtensions = ["js"]
 
 data Import a = Import { importSymbols :: ![(Name, Name)], importFrom :: ImportPath }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -94,13 +101,30 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
   -- http://www.typescriptlang.org/docs/handbook/module-resolution.html
 instance Evaluatable Import where
   eval (Import symbols importPath) = do
-    modulePath <- resolveTypeScriptModule importPath
+    modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     (importedEnv, _) <- isolate (require modulePath)
     modifyEnv (mappend (renamed importedEnv)) *> unit
     where
       renamed importedEnv
         | Prologue.null symbols = importedEnv
         | otherwise = Env.overwrite symbols importedEnv
+
+data JavaScriptRequire a = JavaScriptRequire { javascriptRequireIden :: !a, javascriptRequireFrom :: ImportPath }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 JavaScriptRequire where liftEq = genericLiftEq
+instance Ord1 JavaScriptRequire where liftCompare = genericLiftCompare
+instance Show1 JavaScriptRequire where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable JavaScriptRequire where
+  eval (JavaScriptRequire aliasTerm importPath) = do
+    modulePath <- resolveWithNodejsStrategy importPath javascriptExtensions
+    alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
+    letrec' alias $ \addr -> do
+      (importedEnv, _) <- isolate (require modulePath)
+      modifyEnv (mappend importedEnv)
+      void $ makeNamespace alias addr []
+      unit
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportAlias :: !a, qualifiedAliasedImportFrom :: ImportPath }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -110,8 +134,8 @@ instance Ord1 QualifiedAliasedImport where liftCompare = genericLiftCompare
 instance Show1 QualifiedAliasedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedAliasedImport where
-  eval (QualifiedAliasedImport aliasTerm importPath ) = do
-    modulePath <- resolveTypeScriptModule importPath
+  eval (QualifiedAliasedImport aliasTerm importPath) = do
+    modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
     letrec' alias $ \addr -> do
       (importedEnv, _) <- isolate (require modulePath)
@@ -128,7 +152,7 @@ instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable SideEffectImport where
   eval (SideEffectImport importPath) = do
-    modulePath <- resolveTypeScriptModule importPath
+    modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     void $ isolate (require modulePath)
     unit
 
@@ -159,7 +183,7 @@ instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedExportFrom where
   eval (QualifiedExportFrom importPath exportSymbols) = do
-    modulePath <- resolveTypeScriptModule importPath
+    modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     (importedEnv, _) <- isolate (require modulePath)
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \(name, alias) -> do
