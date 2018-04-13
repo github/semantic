@@ -417,7 +417,6 @@ conditional = makeTerm <$> symbol Conditional <*> children (Statement.If <$> exp
 emptyStatement :: Assignment
 emptyStatement = makeTerm <$> symbol EmptyStatement <*> (Syntax.Empty <$ source <|> pure Syntax.Empty)
 
-
 -- Helper functions
 
 invert :: Assignment -> Assignment

@@ -37,3 +37,13 @@ instance Evaluatable Module where
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
     letrec' name $ \addr ->
       eval xs <* makeNamespace name addr []
+
+newtype Package a = Package [a]
+  deriving (Diffable, Eq, FreeVariables1, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance Eq1 Package where liftEq = genericLiftEq
+instance Ord1 Package where liftCompare = genericLiftCompare
+instance Show1 Package where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for ArrayType
+instance Evaluatable Package

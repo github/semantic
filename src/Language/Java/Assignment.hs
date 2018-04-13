@@ -30,12 +30,13 @@ import qualified Data.Term as Term
 type Syntax =
   '[ Comment.Comment
    , Declaration.Class
-   -- , Declaration.InterfaceDeclaration
+   , Declaration.InterfaceDeclaration
    , Declaration.Method
    , Declaration.VariableDeclaration
    , Java.Syntax.ArrayType
    , Java.Syntax.Import
    , Java.Syntax.Module
+   , Java.Syntax.Package
    , Literal.Array
    , Literal.Boolean
    , Literal.Integer
@@ -79,6 +80,9 @@ term term = contextualize comment (postContextualize comment term)
 expression :: Assignment
 expression = handleError (choice expressionChoices)
 
+expressions :: Assignment
+expressions = makeTerm'' <$> location <*> many expression
+
 expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
   [
@@ -88,13 +92,14 @@ expressionChoices =
   -- , constantDeclaration
   , float
   -- , hexadecimal
-  -- , interface
+  , interface
   , identifier
   , import'
   , integer
   , method
   , module'
   , null'
+  , package
   , return'
   , string
   , localVariableDeclaration
@@ -132,7 +137,7 @@ variable_declarator_id = symbol VariableDeclaratorId *> children identifier
 
 -- Literals
 
--- TODO: Need to disaggregate true/false in
+-- TODO: Need to disaggregate true/false in treesitter
 boolean :: Assignment
 boolean = makeTerm <$> token BooleanLiteral <*> pure Literal.true
 
@@ -144,20 +149,12 @@ null' :: Assignment
 null' = makeTerm <$> symbol NullLiteral <*> (Literal.Null <$ source)
 -- why is this <$?
 
+-- Supports all integer and floating point literals (hex, octal, binary)
 integer :: Assignment
-integer = makeTerm <$> symbol IntegerLiteral <*> children (symbol DecimalIntegerLiteral >> Literal.Integer <$> source)
+integer = makeTerm <$> symbol IntegerLiteral <*> children (Literal.Integer <$> source)
 
 float :: Assignment
-float = makeTerm <$> symbol FloatingPointLiteral <*> (Literal.Float <$> source)
-
--- hexadecimalInt :: Assignment
--- hexadecimalInt = makeTerm <$> symbol HexIntegerLiteral <*> (Literal.Integer <$> source)
---
--- hexadecimalFloat :: Assignment
--- hexadecimalFloat = makeTerm <$> symbol HexFloatingPointLiteral <*> (Literal.Float <$> source)
---
--- octalInt :: Assignment
--- hexadecimalInt = makeTerm <$> symbol OctalIntegerLiteral <*> (Literal.Integer <$> source)
+float = makeTerm <$> symbol FloatingPointLiteral <*> children (Literal.Float <$> source)
 
 string :: Assignment
 string = makeTerm <$> symbol StringLiteral <*> (Literal.TextElement <$> source)
@@ -180,7 +177,7 @@ method = makeTerm <$> symbol MethodDeclaration <*> children (
           )
   where makeMethod modifiers receiver (returnType, (name, params)) body = Declaration.Method (returnType : modifiers) receiver name params body
         parameter = makeTerm <$> symbol FormalParameter <*> children (flip Type.Annotation <$> type' <* symbol VariableDeclaratorId <*> children identifier)
--- TODO: re-introduce makeTerm later; matching types as part of the type rule for now
+-- TODO: re-introduce makeTerm later; matching types as part of the type rule for now.
 
 module' :: Assignment
 module' = makeTerm <$> symbol ModuleDeclaration <*> children (Java.Syntax.Module <$> expression <*> many expression)
@@ -188,8 +185,16 @@ module' = makeTerm <$> symbol ModuleDeclaration <*> children (Java.Syntax.Module
 import' :: Assignment
 import' = makeTerm <$> symbol ImportDeclaration <*> children (Java.Syntax.Import <$> some identifier)
 
--- interface :: Assignment
--- interface = makeTerm <$> symbol InterfaceDeclaration <*> (Declaration.InterfaceDeclaration <$> source)
+interface :: Assignment
+interface = makeTerm <$> symbol InterfaceDeclaration <*> children (normal <|> annotationType)
+  where
+    interfaceBody = makeTerm <$> symbol InterfaceBody <*> children (many expression)
+    normal = symbol NormalInterfaceDeclaration *> children (Declaration.InterfaceDeclaration [] <$> identifier <*> interfaceBody)
+    annotationType = symbol AnnotationTypeDeclaration *> children (Declaration.InterfaceDeclaration [] <$> identifier <*> annotationTypeBody)
+    annotationTypeBody = makeTerm <$> symbol AnnotationTypeBody <*> children (many expression)
+
+package :: Assignment
+package = makeTerm <$> symbol PackageDeclaration <*> children (Java.Syntax.Package <$> some identifier)
 
 return' :: Assignment
 return' = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> expression)
@@ -200,3 +205,36 @@ type' =   makeTerm <$> token VoidType <*> pure Type.Void
      <|>  makeTerm <$> token FloatingPointType <*> pure Type.Float
      <|>  makeTerm <$> token BooleanType <*> pure Type.Bool
      -- <|> makeTerm <$> symbol FloatingPointType <*> children (token AnonFloat $> Type.Float <|> token AnonDouble $> Type.Double)
+
+-- method expressions
+
+-- TODO: consolidate ifthen  and ifthenelse in grammar
+-- if' :: Assignment
+-- if' = makeTerm <$> symbol Conditional <*> children (Statement.If <$> expression <*> expression <*> expression)
+--
+-- if' :: Assignment
+-- if' = makeTerm <$> symbol IfThenStatement <*> children (Statement.If <$> expression <*> expression <*> (else' <|> emptyTerm))
+--   <|> makeTerm
+--
+-- else' :: Assignment
+-- else' = makeTerm <$> symbol IfThenElseStatement <*> children
+
+-- from Ruby
+-- if' :: Assignment
+-- if' =   ifElsif If
+--     <|> makeTerm <$> symbol IfModifier <*> children (flip Statement.If <$> expression <*> expression <*> emptyTerm)
+--   where
+--     ifElsif s = makeTerm <$> symbol s <*> children (Statement.If <$> expression <*> expressions' <*> (elsif' <|> else' <|> emptyTerm))
+--     expressions' = makeTerm <$> location <*> manyTermsTill expression (void (symbol Else) <|> void (symbol Elsif) <|> eof)
+--     elsif' = postContextualize comment (ifElsif Elsif)
+--     else' = postContextualize comment (symbol Else *> children expressions)
+--
+-- for :: Assignment
+-- for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> (makeTerm <$> location <*> manyTermsTill expression (symbol In)) <*> inClause <*> expressions)
+--   where inClause = symbol In *> children expression
+
+-- expression
+
+-- infix operators
+-- binary :: Assignment
+-- binary = makeTerm
