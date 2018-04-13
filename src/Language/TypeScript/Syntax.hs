@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, ScopedTypeVariables #-}
 module Language.TypeScript.Syntax where
 
 import qualified Data.Abstract.Environment as Env
@@ -30,7 +30,7 @@ toName = FV.name . BC.pack . unPath
 
 -- Node.js resolution algorithm: https://nodejs.org/api/modules.html#modules_all_together
 -- TypeScript has a couple of different strategies, but the main one mimics Node.js.
-resolveWithNodejsStrategy :: MonadEvaluatable location term value m => ImportPath -> [String] -> m ModulePath
+resolveWithNodejsStrategy :: forall value term location m. MonadEvaluatable location term value m => ImportPath -> [String] -> m ModulePath
 resolveWithNodejsStrategy (ImportPath path Relative)    exts = resolveRelativePath path exts
 resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativePath path exts
 
@@ -41,14 +41,15 @@ resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativ
 -- /root/src/moduleB.ts
 -- /root/src/moduleB/package.json (if it specifies a "types" property)
 -- /root/src/moduleB/index.ts
-resolveRelativePath :: MonadEvaluatable location term value m => FilePath -> [String] -> m ModulePath
+resolveRelativePath :: forall value term location m. MonadEvaluatable location term value m => FilePath -> [String] -> m ModulePath
 resolveRelativePath relImportPath exts = do
   ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory (makeRelative moduleRoot modulePath)
   let path = normalise (relRootDir </> normalise relImportPath)
   resolveTSModule path exts >>= either notFound pure
   where
-    notFound xs = fail $ "Unable to resolve relative module import: " <> show relImportPath <> ", looked for it in: " <> show xs
+    notFound _ = throwException @(ResolutionError value) $ RubyError relImportPath
+    -- notFound xs = fail $ "Unable to resolve relative module import: " <> show relImportPath <> ", looked for it in: " <> show xs
 
 -- | Resolve a non-relative TypeScript import to a known 'ModuleName' or fail.
 --
@@ -60,7 +61,7 @@ resolveRelativePath relImportPath exts = do
 --
 -- /root/node_modules/moduleB.ts, etc
 -- /node_modules/moduleB.ts, etc
-resolveNonRelativePath :: MonadEvaluatable location term value m => FilePath -> [String] -> m ModulePath
+resolveNonRelativePath :: forall value term location m. MonadEvaluatable location term value m => FilePath -> [String] -> m ModulePath
 resolveNonRelativePath name exts = do
   ModuleInfo{..} <- currentModule
   go "." (makeRelative moduleRoot modulePath) mempty
@@ -73,7 +74,8 @@ resolveNonRelativePath name exts = do
         Left xs | parentDir <- takeDirectory path , root /= parentDir -> go root parentDir (searched <> xs)
                 | otherwise -> notFound (searched <> xs)
         Right m -> pure m
-    notFound xs = fail $ "Unable to resolve non-relative module import: " <> show name <> ", looked for it in: " <> show xs
+    -- notFound xs = fail $ "Unable to resolve non-relative module import: " <> show name <> ", looked for it in: " <> show xs
+    notFound _ = throwException @(ResolutionError value) $ RubyError name
 
 resolveTSModule :: MonadEvaluatable location term value m => FilePath -> [String] -> m (Either [FilePath] ModulePath)
 resolveTSModule path exts = maybe (Left searchPaths) Right <$> resolve searchPaths
