@@ -30,6 +30,7 @@ import qualified Data.Term as Term
 type Syntax =
   '[ Comment.Comment
    , Declaration.Class
+   -- , Declaration.InterfaceDeclaration
    , Declaration.Method
    , Declaration.VariableDeclaration
    , Java.Syntax.ArrayType
@@ -87,6 +88,7 @@ expressionChoices =
   -- , constantDeclaration
   , float
   -- , hexadecimal
+  -- , interface
   , identifier
   , import'
   , integer
@@ -122,7 +124,6 @@ localVariableDeclaration = makeDecl <$> symbol LocalVariableDeclaration <*> chil
 localVariableDeclarationStatement :: Assignment
 localVariableDeclarationStatement = symbol LocalVariableDeclarationStatement *> children localVariableDeclaration
 
--- so it's legit to have
 unannotatedType :: Assignment
 unannotatedType = makeTerm <$> symbol Grammar.ArrayType <*> (Java.Syntax.ArrayType <$> source)
 
@@ -185,7 +186,10 @@ module' :: Assignment
 module' = makeTerm <$> symbol ModuleDeclaration <*> children (Java.Syntax.Module <$> expression <*> many expression)
 
 import' :: Assignment
-import' =   makeTerm <$> symbol ImportDeclaration <*> children (Java.Syntax.Import <$> some identifier)
+import' = makeTerm <$> symbol ImportDeclaration <*> children (Java.Syntax.Import <$> some identifier)
+
+-- interface :: Assignment
+-- interface = makeTerm <$> symbol InterfaceDeclaration <*> (Declaration.InterfaceDeclaration <$> source)
 
 return' :: Assignment
 return' = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> expression)
