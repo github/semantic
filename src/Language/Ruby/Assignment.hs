@@ -411,11 +411,11 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
 
 lhsIdent :: Assignment
 lhsIdent = do
-  sym <- symbol Identifier <|> symbol Identifier'
+  loc <- symbol Identifier <|> symbol Identifier'
   locals <- getRubyLocals
   ident <- source
   putRubyLocals (ident : locals)
-  pure $ makeTerm sym $ Syntax.Identifier $ name ident
+  pure $ makeTerm loc (Syntax.Identifier (name ident))
 
 unary :: Assignment
 unary = symbol Unary >>= \ location ->
