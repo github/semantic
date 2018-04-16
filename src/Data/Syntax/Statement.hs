@@ -96,8 +96,15 @@ instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Assignment where
   eval Assignment{..} = do
-    lhs <- subtermValue assignmentTarget >>= scopedEnvironment
-    localEnv (mappend lhs) (subtermValue assignmentValue)
+    case freeVariables (subterm assignmentTarget) of
+      [name] -> do
+        v <- subtermValue assignmentValue
+        addr <- lookupOrAlloc name
+        assign addr v
+        modifyEnv (Env.insert name addr) $> v
+      _ -> do
+        lhs <- subtermValue assignmentTarget >>= scopedEnvironment
+        localEnv (mappend lhs) (subtermValue assignmentValue)
 
 -- | Post increment operator (e.g. 1++ in Go, or i++ in C).
 newtype PostIncrement a = PostIncrement a
