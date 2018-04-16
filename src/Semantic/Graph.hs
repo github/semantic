@@ -4,7 +4,10 @@ module Semantic.Graph where
 import qualified Analysis.Abstract.ImportGraph as Abstract
 import qualified Data.Abstract.Evaluatable as Analysis
 import           Data.Abstract.FreeVariables
+import qualified Data.Abstract.ModuleTable as ModuleTable
+import           Data.Abstract.Package
 import           Data.Blob
+import           Data.List (intercalate)
 import           Data.ByteString.Char8 as BC (pack)
 import           Data.Output
 import           Parsing.Parser
@@ -14,7 +17,7 @@ import           Semantic.IO (Files, NoLanguageForBlob (..))
 import           Semantic.Task
 import           System.FilePath.Posix
 
-graph :: (Members '[Distribute WrappedTask, Files, Task, Exc SomeException] effs)
+graph :: (Members '[Distribute WrappedTask, Files, Task, Exc SomeException, Telemetry] effs)
       => Maybe FilePath
       -> GraphRenderer output
       -> Blob
@@ -25,7 +28,12 @@ graph maybeRootDir renderer Blob{..}
     let rootDir = fromMaybe (takeDirectory blobPath) maybeRootDir
     paths <- filter (/= blobPath) <$> listFiles rootDir exts
     prelude <- traverse (parseModule parser Nothing) preludePath
-    package <- parsePackage (packageName blobPath) parser rootDir (blobPath : paths)
+    let name = packageName blobPath
+    package <- parsePackage name parser rootDir (blobPath : paths)
+
+    let modulePaths = intercalate "," $ ModuleTable.keys (packageModules (packageBody package))
+    writeLog Info ("Package " <> show name <> " loaded") [("paths", modulePaths)]
+
     graphImports prelude package >>= case renderer of
       JSONGraphRenderer -> pure . toOutput
       DOTGraphRenderer -> pure . Abstract.renderImportGraph
