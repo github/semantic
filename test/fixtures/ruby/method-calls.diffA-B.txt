@@ -14,8 +14,7 @@
     {-(Symbol)-}
     {-(Integer)-})-}
   {-(KeyValue
-    {-(Send
-      {-(Identifier)-})-}
+    {-(Symbol)-}
     {-(Integer)-})-})-}
 {-(Send
   {-(Identifier)-}
