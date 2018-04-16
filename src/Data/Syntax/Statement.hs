@@ -310,3 +310,14 @@ instance Show1 ScopeExit where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for ScopeExit
 instance Evaluatable ScopeExit
+
+-- | HashBang line (e.g. `#!/usr/bin/env node`)
+newtype HashBang a = HashBang ByteString
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 HashBang where liftEq = genericLiftEq
+instance Ord1 HashBang where liftCompare = genericLiftCompare
+instance Show1 HashBang where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for HashBang
+instance Evaluatable HashBang

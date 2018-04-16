@@ -3,4 +3,5 @@
     (Empty)
     (Function
       (Empty)
-      (Identifier))))
+      (Send
+        (Identifier)))))

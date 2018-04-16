@@ -7,4 +7,5 @@
   ->(Identifier) }
   {+(Symbol)+}
   {+(TextElement)+}
-  {-(Identifier)-}))
+  {-(Send
+    {-(Identifier)-})-}))

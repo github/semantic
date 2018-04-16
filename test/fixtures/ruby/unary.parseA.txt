@@ -1,0 +1,20 @@
+(Program
+  (Complement
+    (Send
+      (Identifier)))
+  (Not
+    (Send
+      (Identifier)))
+  (Negate
+    (Send
+      (Identifier)))
+  (Send
+    (Identifier))
+  (Not
+    (Send
+      (Identifier)))
+  (Call
+    (Identifier)
+    (Send
+      (Identifier))
+    (Empty)))

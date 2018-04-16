@@ -1,7 +1,10 @@
 (Program
   (If
   { (Not
-    {-(Identifier)-})
-  ->(Identifier) }
-    (Identifier)
+    {-(Send
+      {-(Identifier)-})-})
+  ->(Send
+    {+(Identifier)+}) }
+    (Send
+      (Identifier))
     (Empty)))

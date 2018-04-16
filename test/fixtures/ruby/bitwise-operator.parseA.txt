@@ -1,10 +1,16 @@
 (Program
   (BOr
-    (Identifier)
-    (Identifier))
+    (Send
+      (Identifier))
+    (Send
+      (Identifier)))
   (RShift
-    (Identifier)
-    (Identifier))
+    (Send
+      (Identifier))
+    (Send
+      (Identifier)))
   (BXOr
-    (Identifier)
-    (Identifier)))
+    (Send
+      (Identifier))
+    (Send
+      (Identifier))))

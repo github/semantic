@@ -1,18 +1,25 @@
 (Program
   (Match
-    (Identifier)
+    (Send
+      (Identifier))
     (
       (Pattern
         (
-        { (Identifier)
-        ->(Identifier) })
+          (Send
+          { (Identifier)
+          ->(Identifier) }))
         (
-        {+(Identifier)+}
-        {+(Identifier)+}
+        {+(Send
+          {+(Identifier)+})+}
+        {+(Send
+          {+(Identifier)+})+}
         {-(Pattern
           {-(
-            {-(Identifier)-}
-            {-(Identifier)-})-}
+            {-(Send
+              {-(Identifier)-})-}
+            {-(Send
+              {-(Identifier)-})-})-}
           {-(
-            {-(Identifier)-}
+            {-(Send
+              {-(Identifier)-})-}
             {-([])-})-})-})))))

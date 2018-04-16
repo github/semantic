@@ -1,4 +1,6 @@
 (Program
-  (Identifier)
+  (Send
+    (Identifier))
   (ScopeExit
-    (Identifier)))
+    (Send
+      (Identifier))))

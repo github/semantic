@@ -1,10 +1,14 @@
 (Program
   (Match
-    (Identifier)
+    (Send
+      (Identifier))
     (
       (Pattern
         (
-          (Identifier))
+          (Send
+            (Identifier)))
         (
-          (Identifier)
-          (Identifier))))))
+          (Send
+            (Identifier))
+          (Send
+            (Identifier)))))))

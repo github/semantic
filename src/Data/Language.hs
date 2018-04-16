@@ -24,7 +24,7 @@ languageForType mediaType = case mediaType of
     ".md" -> Just Markdown
     ".rb" -> Just Ruby
     ".go" -> Just Go
-    ".js" -> Just TypeScript
+    ".js" -> Just JavaScript
     ".ts" -> Just TypeScript
     ".tsx" -> Just TypeScript
     ".jsx" -> Just JSX

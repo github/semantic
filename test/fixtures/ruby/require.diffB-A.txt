@@ -5,6 +5,7 @@
   (Send
   { (Identifier)
   ->(Identifier) }
-  {+(Identifier)+}
+  {+(Send
+    {+(Identifier)+})+}
   {-(Symbol)-}
   {-(TextElement)-}))
