@@ -340,7 +340,7 @@ methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> 
     dotCall = symbol Call *> children (Ruby.Syntax.Send <$> (Just <$> term expression) <*> pure Nothing <*> args)
 
     selector = Just <$> term methodSelector
-    require = inj <$> ((symbol Identifier <|> symbol Identifier') *> do
+    require = inj <$> (symbol Identifier *> do
       s <- source
       guard (s `elem` ["require", "require_relative"])
       Ruby.Syntax.Require (s == "require_relative") <$> nameExpression)
@@ -355,7 +355,6 @@ methodSelector :: Assignment
 methodSelector = makeTerm <$> symbols <*> (Syntax.Identifier <$> (name <$> source))
   where
     symbols = symbol Identifier
-          <|> symbol Identifier'
           <|> symbol Constant
           <|> symbol Operator
           <|> symbol Setter
@@ -410,7 +409,7 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
 
 identWithLocals :: Assignment' (Record Location, ByteString, [ByteString])
 identWithLocals = do
-  loc <- symbol Identifier <|> symbol Identifier'
+  loc <- symbol Identifier
   -- source advances, so it's important we call getRubyLocals first
   locals <- getRubyLocals
   ident <- source
