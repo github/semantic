@@ -6,7 +6,8 @@
   {+(Identifier)+}
     (Function
       (Empty)
-    { (Identifier)
+    { (Send
+      {-(Identifier)-})
     ->(
       {+(Integer)+}
       {+(Integer)+}) })))

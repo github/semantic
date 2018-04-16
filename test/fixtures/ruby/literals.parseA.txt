@@ -1,0 +1,16 @@
+(Program
+  (Boolean)
+  (Boolean)
+  (Null)
+  (Symbol)
+  (Integer)
+  (Identifier)
+  (Identifier)
+  (Enumeration
+    (Integer)
+    (Integer)
+    (Empty))
+  (Enumeration
+    (Integer)
+    (Integer)
+    (Empty)))

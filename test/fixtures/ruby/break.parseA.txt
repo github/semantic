@@ -1,5 +1,6 @@
 (Program
   (While
-    (Identifier)
+    (Send
+      (Identifier))
     (Break
       (Empty))))

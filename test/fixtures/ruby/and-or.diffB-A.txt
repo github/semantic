@@ -1,12 +1,19 @@
 (Program
 {+(LowAnd
-  {+(Identifier)+}
-  {+(Identifier)+})+}
+  {+(Send
+    {+(Identifier)+})+}
+  {+(Send
+    {+(Identifier)+})+})+}
 {-(LowOr
-  {-(Identifier)-}
-  {-(Identifier)-})-}
+  {-(Send
+    {-(Identifier)-})-}
+  {-(Send
+    {-(Identifier)-})-})-}
 {-(LowAnd
   {-(LowOr
-    {-(Identifier)-}
-    {-(Identifier)-})-}
-  {-(Identifier)-})-})
+    {-(Send
+      {-(Identifier)-})-}
+    {-(Send
+      {-(Identifier)-})-})-}
+  {-(Send
+    {-(Identifier)-})-})-})

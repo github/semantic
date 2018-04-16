@@ -17,7 +17,8 @@
     (Context
       (Comment)
       (KeyValue
-        (Identifier)
+        (Send
+          (Identifier))
         (Integer)))
     (Context
       (Comment)

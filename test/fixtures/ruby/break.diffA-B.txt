@@ -1,7 +1,9 @@
 (Program
   (While
-  { (Identifier)
+  { (Send
+    {-(Identifier)-})
   ->(Not
-    {+(Identifier)+}) }
+    {+(Send
+      {+(Identifier)+})+}) }
     (Break
       (Empty))))
