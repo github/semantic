@@ -3,7 +3,8 @@
     (Identifier)
     (TextElement))
   (Send
-    (Identifier)
+    (Send
+      (Identifier))
     (Identifier))
   (Send
     (Identifier)

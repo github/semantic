@@ -1,11 +1,14 @@
 (Program
   (Try
     (
-      (Identifier)
+      (Send
+        (Identifier))
       (Catch
         (
           (
             (Identifier))
           (
-            (Identifier)))
-        (Identifier)))))
+            (Send
+              (Identifier))))
+        (Send
+          (Identifier))))))

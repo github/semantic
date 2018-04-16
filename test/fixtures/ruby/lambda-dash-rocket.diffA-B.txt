@@ -9,4 +9,5 @@
     { (
       {-(Integer)-}
       {-(Integer)-})
-    ->(Identifier) })))
+    ->(Send
+      {+(Identifier)+}) })))

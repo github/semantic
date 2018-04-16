@@ -1,4 +1,6 @@
 (Program
   (Or
-    (Identifier)
-    (Identifier)))
+    (Send
+      (Identifier))
+    (Send
+      (Identifier))))

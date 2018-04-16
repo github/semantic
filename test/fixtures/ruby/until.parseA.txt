@@ -1,9 +1,12 @@
 (Program
   (While
     (Not
-      (Identifier))
+      (Send
+        (Identifier)))
     ([]))
   (While
     (Not
-      (Identifier))
-    (Identifier)))
+      (Send
+        (Identifier)))
+    (Send
+      (Identifier))))

@@ -1,16 +1,15 @@
 (Program
-{+(Identifier)+}
-{-(Send
-  {-(Identifier)-}
-  {-(TextElement)-})-}
   (Send
     (Identifier)
+  {-(TextElement)-})
+  (Send
+    (Send
+      (Identifier))
     (Identifier))
-{+(Identifier)+}
-{-(Send
-  {-(Identifier)-}
+  (Send
+    (Identifier)
   {-(Integer)-}
-  {-(Integer)-})-}
+  {-(Integer)-})
 {-(Send
   {-(Identifier)-}
   {-(Integer)-}

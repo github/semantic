@@ -1,16 +1,21 @@
 (Program
   (Subscript
-  { (Identifier)
-  ->(Identifier) }
-  {+(Identifier)+}
+    (Send
+    { (Identifier)
+    ->(Identifier) })
+  {+(Send
+    {+(Identifier)+})+}
   {-(TextElement)-})
   (Subscript
-  { (Identifier)
-  ->(Identifier) }
+    (Send
+    { (Identifier)
+    ->(Identifier) })
   { (Symbol)
   ->(Symbol) })
 {+(Assignment
   {+(Subscript
-    {+(Identifier)+}
-    {+(Identifier)+})+}
+    {+(Send
+      {+(Identifier)+})+}
+    {+(Send
+      {+(Identifier)+})+})+}
   {+(Integer)+})+})

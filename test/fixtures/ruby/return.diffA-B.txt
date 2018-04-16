@@ -1,4 +1,5 @@
 (Program
   (Return
-  { (Identifier)
+  { (Send
+    {-(Identifier)-})
   ->(Empty) }))

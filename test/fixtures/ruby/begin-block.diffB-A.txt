@@ -1,6 +1,9 @@
 (Program
 {+(ScopeEntry
-  {+(Identifier)+})+}
-{-(Identifier)-}
+  {+(Send
+    {+(Identifier)+})+})+}
+{-(Send
+  {-(Identifier)-})-}
 {-(ScopeEntry
-  {-(Identifier)-})-})
+  {-(Send
+    {-(Identifier)-})-})-})
