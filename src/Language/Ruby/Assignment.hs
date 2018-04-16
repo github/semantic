@@ -177,9 +177,7 @@ identifier =
   where
     mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
     vcallOrLocal = do
-      loc <- symbol Identifier <|> symbol Identifier'
-      locals <- getRubyLocals
-      ident <- source
+      (loc, ident, locals) <- identWithLocals
       let identTerm = makeTerm loc (Syntax.Identifier (name ident))
       if ident `elem` locals
         then pure identTerm
@@ -410,11 +408,17 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
        <|> lhsIdent
        <|> expression
 
-lhsIdent :: Assignment
-lhsIdent = do
+identWithLocals :: Assignment' (Record Location, ByteString, [ByteString])
+identWithLocals = do
   loc <- symbol Identifier <|> symbol Identifier'
+  -- source advances, so it's important we call getRubyLocals first
   locals <- getRubyLocals
   ident <- source
+  pure (loc, ident, locals)
+
+lhsIdent :: Assignment
+lhsIdent = do
+  (loc, ident, locals) <- identWithLocals
   putRubyLocals (ident : locals)
   pure $ makeTerm loc (Syntax.Identifier (name ident))
 
