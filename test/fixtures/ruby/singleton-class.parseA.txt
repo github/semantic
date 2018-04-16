@@ -1,0 +1,11 @@
+(Program
+  (Class
+    (Identifier)
+    ([]))
+  (Class
+    (ScopeResolution
+      (Identifier)
+      (Identifier))
+    (Send
+      (Identifier)
+      (Symbol))))

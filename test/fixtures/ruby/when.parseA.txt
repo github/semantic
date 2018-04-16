@@ -1,10 +1,12 @@
 (Program
   (Match
-    (Identifier)
+    (Send
+      (Identifier))
     (
       (Pattern
         (
-          (Identifier))
+          (Send
+            (Identifier)))
         ([]))))
   (Match
     (Empty)

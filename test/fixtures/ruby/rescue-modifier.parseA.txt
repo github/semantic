@@ -1,6 +1,7 @@
 (Program
   (Try
-    (Identifier)
+    (Send
+      (Identifier))
     (Catch
       (Null)
       (Empty))))

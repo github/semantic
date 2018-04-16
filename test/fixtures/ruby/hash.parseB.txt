@@ -1,11 +1,14 @@
 (Program
   (Hash
     (KeyValue
-      (Identifier)
+      (Send
+        (Identifier))
       (TextElement))
     (KeyValue
-      (Identifier)
+      (Send
+        (Identifier))
       (Integer))
     (KeyValue
-      (Identifier)
+      (Send
+        (Identifier))
       (Boolean))))

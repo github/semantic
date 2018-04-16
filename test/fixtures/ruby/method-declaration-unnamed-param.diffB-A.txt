@@ -3,5 +3,5 @@
     (Empty)
     (Identifier)
     (Identifier)
-  {-(Identifier)-}
+  {-(Empty)-}
     ([])))
