@@ -14,11 +14,15 @@ import           Semantic.IO (Files, NoLanguageForBlob (..))
 import           Semantic.Task
 import           System.FilePath.Posix
 
-graph :: (Members '[Distribute WrappedTask, Files, Task, Exc SomeException] effs) => GraphRenderer output -> Blob -> Eff effs ByteString
-graph renderer Blob{..}
+graph :: (Members '[Distribute WrappedTask, Files, Task, Exc SomeException] effs)
+      => Maybe FilePath
+      -> GraphRenderer output
+      -> Blob
+      -> Eff effs ByteString
+graph maybeRootDir renderer Blob{..}
   | Just (SomeAnalysisParser parser exts preludePath) <- someAnalysisParser
     (Proxy :: Proxy '[ Analysis.Evaluatable, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) <$> blobLanguage = do
-    let rootDir = takeDirectory blobPath
+    let rootDir = fromMaybe (takeDirectory blobPath) maybeRootDir
     paths <- filter (/= blobPath) <$> listFiles rootDir exts
     prelude <- traverse (parseModule parser Nothing) preludePath
     package <- parsePackage (packageName blobPath) parser rootDir (blobPath : paths)
