@@ -229,15 +229,16 @@ scopeResolution :: Assignment
 scopeResolution = makeTerm <$> symbol ScopeResolution <*> children (Expression.ScopeResolution <$> many expression)
 
 parameter :: Assignment
-parameter =
-      lhsIdent
-  <|> splatParameter
-  <|> hashSplatParameter
-  <|> blockParameter
-  <|> keywordParameter
-  <|> optionalParameter
-  <|> makeTerm <$> symbol DestructuredParameter <*> children (many parameter)
+parameter = postContextualize comment (term uncontextualizedParameter)
   where
+    uncontextualizedParameter =
+          lhsIdent
+      <|> splatParameter
+      <|> hashSplatParameter
+      <|> blockParameter
+      <|> keywordParameter
+      <|> optionalParameter
+      <|> makeTerm <$> symbol DestructuredParameter <*> children (many parameter)
     -- splat and hash splat arguments can be unnamed. we don't currently
     -- support unnamed arguments in the term syntax, so the use of emptyTerm
     -- here is a huge hack. what we should be able to do is return a Nothing
