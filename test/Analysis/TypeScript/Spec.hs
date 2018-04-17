@@ -2,6 +2,7 @@
 module Analysis.TypeScript.Spec (spec) where
 
 import SpecHelpers
+import Data.Abstract.Evaluatable
 
 
 spec :: Spec
