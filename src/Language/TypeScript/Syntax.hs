@@ -4,6 +4,7 @@ module Language.TypeScript.Syntax where
 import qualified Data.Abstract.Environment as Env
 import qualified Data.Abstract.FreeVariables as FV
 import           Data.Abstract.Evaluatable
+import           Data.Abstract.Path
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString as B
 import           Data.Abstract.Module (ModulePath, ModuleInfo(..))
@@ -45,7 +46,8 @@ resolveRelativePath :: forall value term location m. MonadEvaluatable location t
 resolveRelativePath relImportPath exts = do
   ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory (makeRelative moduleRoot modulePath)
-  let path = normalise (relRootDir </> normalise relImportPath)
+  let path = joinPaths relRootDir relImportPath
+  traceM $ show relImportPath <> " -> " <> show path
   resolveTSModule path exts >>= either notFound pure
   where
     notFound _ = throwException @(ResolutionError value) $ TypeScriptError relImportPath
@@ -76,7 +78,7 @@ resolveNonRelativePath name exts = do
     notFound _ = throwException @(ResolutionError value) $ TypeScriptError name
 
 resolveTSModule :: MonadEvaluatable location term value m => FilePath -> [String] -> m (Either [FilePath] ModulePath)
-resolveTSModule path exts = maybe (Left searchPaths) Right <$> resolve searchPaths
+resolveTSModule path exts = trace ("typescript (resolve): " <> show path) $ maybe (Left searchPaths) Right <$> resolve searchPaths
   where searchPaths =
           ((path <.>) <$> exts)
           -- TODO: Requires parsing package.json, getting the path of the

@@ -7,6 +7,7 @@ import qualified Analysis.Ruby.Spec
 import qualified Analysis.TypeScript.Spec
 import qualified Assigning.Assignment.Spec
 import qualified Data.Diff.Spec
+import qualified Data.Abstract.Path.Spec
 import qualified Data.Functor.Classes.Generic.Spec
 import qualified Data.Mergeable.Spec
 import qualified Data.Scientific.Spec
@@ -35,6 +36,7 @@ main = hspec $ do
     describe "Analysis.TypeScript" Analysis.TypeScript.Spec.spec
     describe "Assigning.Assignment" Assigning.Assignment.Spec.spec
     describe "Data.Diff" Data.Diff.Spec.spec
+    describe "Data.Abstract.Path" Data.Abstract.Path.Spec.spec
     describe "Data.Functor.Classes.Generic" Data.Functor.Classes.Generic.Spec.spec
     describe "Data.Mergeable" Data.Mergeable.Spec.spec
     describe "Data.Scientific" Data.Scientific.Spec.spec
