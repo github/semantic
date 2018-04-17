@@ -25,7 +25,7 @@ defaultAlias = name . BC.pack . takeFileName . unPath
 resolveGoImport :: MonadEvaluatable location term value m => FilePath -> m [ModulePath]
 resolveGoImport relImportPath = do
   ModuleInfo{..} <- currentModule
-  let relRootDir = takeDirectory (makeRelative moduleRoot modulePath)
+  let relRootDir = takeDirectory modulePath
   listModulesInDir (joinPaths relRootDir relImportPath)
 
 -- | Import declarations (symbols are added directly to the calling environment).

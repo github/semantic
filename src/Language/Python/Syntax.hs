@@ -55,11 +55,11 @@ resolvePythonModules :: MonadEvaluatable location term value m => QualifiedName 
 resolvePythonModules q = do
   relRootDir <- rootDir q <$> currentModule
   for (moduleNames q) $ \name -> do
-    x <- trace ("resolving: " <> show name) $ search relRootDir name
-    trace ("found: " <> show x) (pure x)
+    x <- search relRootDir name
+    traceResolve name x $ pure x
   where
-    rootDir (QualifiedName _) ModuleInfo{..}           = takeDirectory (makeRelative moduleRoot modulePath)
-    rootDir (RelativeQualifiedName n _) ModuleInfo{..} = upDir numDots (takeDirectory (makeRelative moduleRoot modulePath))
+    rootDir (QualifiedName _) ModuleInfo{..}           = takeDirectory modulePath
+    rootDir (RelativeQualifiedName n _) ModuleInfo{..} = upDir numDots (takeDirectory modulePath)
       where numDots = pred (length n)
             upDir n dir | n <= 0 = dir
                         | otherwise = takeDirectory (upDir (pred n) dir)
@@ -74,8 +74,7 @@ resolvePythonModules q = do
       let searchPaths = [ path </> "__init__.py"
                         , path <.> ".py"
                         ]
-      trace ("searching in: " <> show searchPaths) $
-        resolve searchPaths >>= maybeFail (notFound searchPaths)
+      resolve searchPaths >>= maybeFail (notFound searchPaths)
 
     friendlyName :: QualifiedName -> String
     friendlyName (QualifiedName xs)                = intercalate "." (NonEmpty.toList xs)

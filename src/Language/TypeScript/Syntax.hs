@@ -45,10 +45,9 @@ resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativ
 resolveRelativePath :: forall value term location m. MonadEvaluatable location term value m => FilePath -> [String] -> m ModulePath
 resolveRelativePath relImportPath exts = do
   ModuleInfo{..} <- currentModule
-  let relRootDir = takeDirectory (makeRelative moduleRoot modulePath)
+  let relRootDir = takeDirectory modulePath
   let path = joinPaths relRootDir relImportPath
-  traceM $ show relImportPath <> " -> " <> show path
-  resolveTSModule path exts >>= either notFound pure
+  resolveTSModule path exts >>= either notFound (\x -> traceResolve relImportPath x (pure x))
   where
     notFound _ = throwException @(ResolutionError value) $ TypeScriptError relImportPath
 
@@ -65,7 +64,7 @@ resolveRelativePath relImportPath exts = do
 resolveNonRelativePath :: forall value term location m. MonadEvaluatable location term value m => FilePath -> [String] -> m ModulePath
 resolveNonRelativePath name exts = do
   ModuleInfo{..} <- currentModule
-  go "." (makeRelative moduleRoot modulePath) mempty
+  go "." modulePath mempty
   where
     nodeModulesPath dir = takeDirectory dir </> "node_modules" </> name
     -- Recursively search in a 'node_modules' directory, stepping up a directory each time.
@@ -74,11 +73,11 @@ resolveNonRelativePath name exts = do
       case res of
         Left xs | parentDir <- takeDirectory path , root /= parentDir -> go root parentDir (searched <> xs)
                 | otherwise -> notFound (searched <> xs)
-        Right m -> pure m
+        Right m -> traceResolve name m $ pure m
     notFound _ = throwException @(ResolutionError value) $ TypeScriptError name
 
 resolveTSModule :: MonadEvaluatable location term value m => FilePath -> [String] -> m (Either [FilePath] ModulePath)
-resolveTSModule path exts = trace ("typescript (resolve): " <> show path) $ maybe (Left searchPaths) Right <$> resolve searchPaths
+resolveTSModule path exts = maybe (Left searchPaths) Right <$> resolve searchPaths
   where searchPaths =
           ((path <.>) <$> exts)
           -- TODO: Requires parsing package.json, getting the path of the
