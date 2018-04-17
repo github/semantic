@@ -10,6 +10,9 @@ module Data.Abstract.ModuleTable
 , keys
 , fromModules
 , toPairs
+, LoadStack (..)
+, loadStackPush
+, loadStackPop
 ) where
 
 import Data.Abstract.Module
@@ -19,6 +22,7 @@ import Prologue
 import System.FilePath.Posix
 import GHC.Generics (Generic1)
 import Prelude hiding (lookup)
+
 
 newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModulePath a }
   deriving (Eq, Foldable, Functor, Generic1, Monoid, Ord, Semigroup, Show, Traversable)
@@ -48,3 +52,15 @@ fromModules modules = ModuleTable (Map.fromListWith (<>) (map toEntry modules))
 
 toPairs :: ModuleTable a -> [(ModulePath, a)]
 toPairs = Map.toList . unModuleTable
+
+
+-- | Stack of module paths used to help break circular loads/imports.
+newtype LoadStack = LoadStack { unLoadStack :: [ModulePath] }
+  deriving (Eq, Ord, Show, Monoid, Semigroup)
+
+loadStackPush :: ModulePath -> LoadStack -> LoadStack
+loadStackPush x LoadStack{..} = LoadStack (x : unLoadStack)
+
+loadStackPop :: LoadStack -> LoadStack
+loadStackPop (LoadStack []) = LoadStack []
+loadStackPop (LoadStack (_:xs)) = LoadStack xs
