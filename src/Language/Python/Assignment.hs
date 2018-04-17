@@ -295,6 +295,7 @@ binaryOperator = makeTerm' <$> symbol BinaryOperator <*> children (infixTerm exp
   [ (inj .) . Expression.Plus      <$ symbol AnonPlus
   , (inj .) . Expression.Minus     <$ symbol AnonMinus
   , (inj .) . Expression.Times     <$ symbol AnonStar
+  , (inj .) . Expression.Times     <$ symbol AnonAt -- Matrix multiplication, TODO: May not want to assign to Expression.Times.
   , (inj .) . Expression.DividedBy <$ symbol AnonSlash
   , (inj .) . Expression.DividedBy <$ symbol AnonSlashSlash
   , (inj .) . Expression.Modulo    <$ symbol AnonPercent
@@ -318,6 +319,7 @@ assignment' =  makeAssignment <$> symbol Assignment <*> children ((,,) <$> term 
                   [ assign Expression.Plus      <$ symbol AnonPlusEqual
                   , assign Expression.Minus     <$ symbol AnonMinusEqual
                   , assign Expression.Times     <$ symbol AnonStarEqual
+                  , assign Expression.Times     <$ symbol AnonAtEqual -- Matrix multiplication assignment. TODO: May not want to assign to Expression.Times.
                   , assign Expression.Power     <$ symbol AnonStarStarEqual
                   , assign Expression.DividedBy <$ symbol AnonSlashEqual
                   , assign Expression.DividedBy <$ symbol AnonSlashSlashEqual
