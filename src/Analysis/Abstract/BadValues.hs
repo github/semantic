@@ -37,6 +37,7 @@ instance ( Effectful m
           BoolError{} -> yield True
           Numeric2Error{} -> unit >>= yield
           NamespaceError{} -> getEnv >>= yield
+          KeyValueError{} -> unit >>= \x -> yield (x, x)
           )
 
   analyzeModule = liftAnalyze analyzeModule

@@ -206,9 +206,9 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
 
   null     = pure . injValue $ Null
 
-  asPair k
-    | Just (KVPair k v) <- prjValue k = pure (k, v)
-    | otherwise = fail ("expected key-value pair, got " <> show k)
+  asPair val
+    | Just (KVPair k v) <- prjValue val = pure (k, v)
+    | otherwise = throwException @(ValueError location (Value location)) $ KeyValueError val
 
   hash = pure . injValue . Hash . fmap (injValue . uncurry KVPair)
 

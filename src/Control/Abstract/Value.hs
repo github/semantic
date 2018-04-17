@@ -195,6 +195,7 @@ data ValueError location value resume where
   CallError              :: value          -> ValueError location value value
   BoolError              :: value          -> ValueError location value Bool
   Numeric2Error          :: value          -> value -> ValueError location value value
+  KeyValueError          :: value          -> ValueError location value (value, value)
 
 instance Eq value => Eq1 (ValueError location value) where
   liftEq _ (StringError a) (StringError b)                       = a == b
