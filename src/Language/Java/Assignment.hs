@@ -6,7 +6,7 @@ module Language.Java.Assignment
 , Term
 ) where
 
-import Assigning.Assignment hiding (Assignment, Error)
+import Assigning.Assignment hiding (Assignment, Error, while, try)
 import Data.Abstract.FreeVariables
 import Data.Functor (void, ($>))
 import Data.List.NonEmpty (some1)
@@ -26,6 +26,7 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
+import Prelude hiding (break)
 
 type Syntax =
   '[ Comment.Comment
@@ -34,6 +35,7 @@ type Syntax =
    , Declaration.Method
    , Declaration.VariableDeclaration
    , Java.Syntax.ArrayType
+   , Java.Syntax.EnumDeclaration
    , Java.Syntax.Import
    , Java.Syntax.Module
    , Java.Syntax.Package
@@ -45,6 +47,17 @@ type Syntax =
    , Literal.String
    , Literal.TextElement
    , Statement.Assignment
+   , Statement.Break
+   , Statement.Catch
+   , Statement.Continue
+   , Statement.DoWhile
+   , Statement.Finally
+   , Statement.If
+   , Statement.Match
+   , Statement.Pattern
+   , Statement.While
+   , Statement.Throw
+   , Statement.Try
    , Syntax.Context
    , Syntax.Empty
    , Syntax.Error
@@ -76,9 +89,12 @@ someTerm term = some (contextualize comment term <|> makeTerm1 <$> (Syntax.Conte
 
 term :: Assignment -> Assignment
 term term = contextualize comment (postContextualize comment term)
+-- matches comments before and after the node
 
 expression :: Assignment
 expression = handleError (choice expressionChoices)
+-- <?> "expression"
+-- choice walks the expressionChoices and inserts <|> (notionally but not really lol)
 
 expressions :: Assignment
 expressions = makeTerm'' <$> location <*> many expression
@@ -87,11 +103,18 @@ expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
   [
     arrayInitializer
+  , block
+  , boolean
+  , break
   , char
   , class'
+  , continue
   -- , constantDeclaration
+  , doWhile
   , float
+  , enum
   -- , hexadecimal
+  , if'
   , interface
   , identifier
   , import'
@@ -102,9 +125,15 @@ expressionChoices =
   , package
   , return'
   , string
+  , switch
+  , throw
+  , try
   , localVariableDeclaration
   , localVariableDeclarationStatement
+  , while
   ]
+  -- adding something to expressionChoices list is useful because expression (above) uses expressionChoices, and so
+  -- it is available to form assignments when we encounter any of those terms
 
 modifier :: Assignment
 modifier = makeTerm <$> symbol Modifier <*> (Syntax.AccessibilityModifier <$> source)
@@ -139,11 +168,11 @@ variable_declarator_id = symbol VariableDeclaratorId *> children identifier
 
 -- TODO: Need to disaggregate true/false in treesitter
 boolean :: Assignment
-boolean = makeTerm <$> token BooleanLiteral <*> pure Literal.true
+boolean =  makeTerm <$> symbol BooleanLiteral <*> children
+          (token Grammar.True $> Literal.true
+          <|> token Grammar.False $> Literal.false)
 
--- boolean :: Assignment
--- boolean =  makeTerm <$> token Grammar.True <*> pure Literal.true
---        <|> makeTerm <$> token Grammar.False <*> pure Literal.false
+-- *> pure = $>
 
 null' :: Assignment
 null' = makeTerm <$> symbol NullLiteral <*> (Literal.Null <$ source)
@@ -168,7 +197,7 @@ class' = makeTerm <$> symbol ClassDeclaration <*> children (Declaration.Class <$
 
 -- consolidated with scopedIdentifier
 identifier :: Assignment
-identifier = makeTerm <$> (symbol Identifier <|> symbol ScopedIdentifier) <*> (Syntax.Identifier . name <$> source)
+identifier = makeTerm <$> (symbol Identifier <|> symbol ScopedIdentifier <|> symbol TypeIdentifier) <*> (Syntax.Identifier . name <$> source)
 
 method :: Assignment
 method = makeTerm <$> symbol MethodDeclaration <*> children (
@@ -196,39 +225,87 @@ interface = makeTerm <$> symbol InterfaceDeclaration <*> children (normal <|> an
 package :: Assignment
 package = makeTerm <$> symbol PackageDeclaration <*> children (Java.Syntax.Package <$> some identifier)
 
+enum :: Assignment
+enum = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Java.Syntax.EnumDeclaration <$> term identifier <*> manyTerm enumConstant)
+    where enumConstant = symbol EnumConstant *> children (term identifier)
+-- list of 0 or more
+-- Java.Syntax.EnumDeclaration is taking something that has been matched and applying a function over it
+-- makeTerm (a function) is not matching, but rather mapping over a matched term
+-- makeTerm is lifted into the <$> functor, which is applied to the result of its child assignments
+-- <*> apply is used when you've got a function built up on the LHS
+-- we don't have a makeTerm, so we don't have a function on the LHS to apply <*>, hence we just match on the symbol EnumConstant, and use it as a marker to descend into children
+-- we want the effect, not the result, of symbol because we want to match the EnumConstant node without caring about its range or span
+-- we don't care about the range and span because the identifier rule produces a term which already has a range and span
+-- show only has one argument, so we don't need to <*> because when we fmap it over a list, it's fully applied
+-- term = also accounts for preceding comments
+-- (+) <$> [1,2,3] :: Num a => [a -> a] -- it is a function that takes one number and returns another number of the same type
+
 return' :: Assignment
-return' = makeTerm <$> symbol ReturnStatement <*> children (Statement.Return <$> expression)
+return' = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children (expression))
+-- can move the children into or out of the fmap rule because the children expression returns the result of a child
+-- so if you fmap over the result of RHS it's equivalent
+-- if you f <$> (g <$> a) == f . g <$> a (fusion law)
+--   if you have two nested fmaps, same as composing
 
 type' :: Assignment
-type' =   makeTerm <$> token VoidType <*> pure Type.Void
-     <|>  makeTerm <$> token IntegralType <*> pure Type.Int
-     <|>  makeTerm <$> token FloatingPointType <*> pure Type.Float
-     <|>  makeTerm <$> token BooleanType <*> pure Type.Bool
+type' =  choice [
+       makeTerm <$> token VoidType <*> pure Type.Void
+     , makeTerm <$> token IntegralType <*> pure Type.Int
+     , makeTerm <$> token FloatingPointType <*> pure Type.Float
+     , makeTerm <$> token BooleanType <*> pure Type.Bool
+     , symbol CatchType *> children (term type')
+     , identifier
+    ]
      -- <|> makeTerm <$> symbol FloatingPointType <*> children (token AnonFloat $> Type.Float <|> token AnonDouble $> Type.Double)
+     -- we had to say token with the first 4 because pure don't advance past the first nodes; implies no effect, just produces value
+     -- if we want to match a node and consume that node (which we have to do) we need to use token because it has that behavior
 
 -- method expressions
 
--- TODO: consolidate ifthen  and ifthenelse in grammar
--- if' :: Assignment
--- if' = makeTerm <$> symbol Conditional <*> children (Statement.If <$> expression <*> expression <*> expression)
---
--- if' :: Assignment
--- if' = makeTerm <$> symbol IfThenStatement <*> children (Statement.If <$> expression <*> expression <*> (else' <|> emptyTerm))
---   <|> makeTerm
---
--- else' :: Assignment
--- else' = makeTerm <$> symbol IfThenElseStatement <*> children
+if' :: Assignment
+if' = makeTerm <$> symbol IfThenElseStatement <*> children (Statement.If <$> term expression <*> term expression <*> (term expression <|> emptyTerm))
 
--- from Ruby
--- if' :: Assignment
--- if' =   ifElsif If
---     <|> makeTerm <$> symbol IfModifier <*> children (flip Statement.If <$> expression <*> expression <*> emptyTerm)
---   where
---     ifElsif s = makeTerm <$> symbol s <*> children (Statement.If <$> expression <*> expressions' <*> (elsif' <|> else' <|> emptyTerm))
---     expressions' = makeTerm <$> location <*> manyTermsTill expression (void (symbol Else) <|> void (symbol Elsif) <|> eof)
---     elsif' = postContextualize comment (ifElsif Elsif)
---     else' = postContextualize comment (symbol Else *> children expressions)
---
+block :: Assignment
+block = makeTerm <$> symbol Block <*> children (manyTerm expression)
+
+while :: Assignment
+while = makeTerm <$> symbol WhileStatement <*> children (Statement.While <$> term expression <*> term expression)
+
+doWhile :: Assignment
+doWhile = makeTerm <$> symbol DoStatement <*> children (flip Statement.DoWhile <$> term expression <*> term expression)
+-- flipping so when we match body it goes into second field and when we match condition it goes into the first field
+
+switch :: Assignment
+switch = makeTerm <$> symbol SwitchStatement <*> children (Statement.Match <$> term expression <*> switchBlock)
+  where
+    switchBlock = makeTerm <$> symbol SwitchBlock <*> children (manyTerm switchLabel)
+    switchLabel = makeTerm <$> symbol SwitchLabel <*> (Statement.Pattern <$> children (term expression <|> emptyTerm) <*> expressions)
+-- not identifier, expression
+
+break :: Assignment
+break = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> (term expression <|> emptyTerm))
+-- manyTerm matches 0 or more and also produces a list
+-- term expression <|> emptyTerm accounts for an expression or nothing at all
+
+continue :: Assignment
+continue = makeTerm <$> symbol ContinueStatement <*> children (Statement.Continue <$> (term expression <|> emptyTerm))
+
+throw :: Assignment
+throw = makeTerm <$> symbol ThrowStatement <*> children (Statement.Throw <$> term expression)
+
+try :: Assignment
+try = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> term expression <*> (append <$> optional catches <*> optional finally))
+  where
+    catches = symbol Catches *> children (manyTerm catch)
+    catch = makeTerm <$> symbol CatchClause <*> children (Statement.Catch <$> catchFormalParameter <*> term expression)
+    catchFormalParameter = makeTerm <$> symbol CatchFormalParameter <*> children (flip Type.Annotation <$> type' <* symbol VariableDeclaratorId <*> children identifier)
+    finally = makeTerm <$> symbol Finally <*> children (Statement.Finally <$> term expression)
+    -- append catches finally =
+    append Nothing Nothing = []
+    append Nothing (Just a) = [a]
+    append (Just a) Nothing = a
+    append (Just a) (Just b) = a <> [b]
+
 -- for :: Assignment
 -- for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> (makeTerm <$> location <*> manyTermsTill expression (symbol In)) <*> inClause <*> expressions)
 --   where inClause = symbol In *> children expression
