@@ -17,6 +17,7 @@ module Data.Abstract.Evaluatable
 , throwEvalError
 , throwValueError
 , resolve
+, traceResolve
 , listModulesInDir
 , require
 , load
@@ -169,6 +170,9 @@ resolve :: MonadEvaluatable location term value m
 resolve names = do
   tbl <- askModuleTable
   pure $ find (`ModuleTable.member` tbl) names
+
+traceResolve :: (Show a, Show b) => a -> b -> c -> c
+traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 
 listModulesInDir :: MonadEvaluatable location term value m
         => FilePath
