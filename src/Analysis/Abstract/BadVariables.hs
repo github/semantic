@@ -29,6 +29,7 @@ instance ( Effectful m
   analyzeTerm eval term = resumeException @(EvalError value) (liftAnalyze analyzeTerm eval term) (
         \yield err -> case err of
           DefaultExportError{}     -> yield ()
+          ExportError{}            -> yield ()
           IntegerFormatError{}     -> yield 0
           FloatFormatError{}       -> yield 0
           RationalFormatError{}    -> yield 0

@@ -189,7 +189,7 @@ instance Evaluatable QualifiedExportFrom where
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \(name, alias) -> do
       let address = Env.lookup name importedEnv
-      maybe (cannotExport modulePath name) (addExport name alias . Just) address
+      maybe (throwEvalError $ ExportError modulePath name) (addExport name alias . Just) address
     unit
     where
       cannotExport moduleName name = fail $

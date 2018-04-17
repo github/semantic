@@ -93,6 +93,7 @@ data EvalError value resume where
   FloatFormatError    :: ByteString -> EvalError value Scientific
   RationalFormatError :: ByteString -> EvalError value Rational
   DefaultExportError  :: EvalError value ()
+  ExportError         :: ModulePath -> Name -> EvalError value ()
 
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
@@ -104,10 +105,14 @@ deriving instance Show (EvalError a b)
 instance Show1 (EvalError value) where
   liftShowsPrec _ _ = showsPrec
 instance Eq1 (EvalError term) where
-  liftEq _ (FreeVariableError a) (FreeVariableError b)   = a == b
-  liftEq _ (FreeVariablesError a) (FreeVariablesError b) = a == b
-  liftEq _ DefaultExportError DefaultExportError         = True
-  liftEq _ _ _                                           = False
+  liftEq _ (FreeVariableError a) (FreeVariableError b)     = a == b
+  liftEq _ (FreeVariablesError a) (FreeVariablesError b)   = a == b
+  liftEq _ DefaultExportError DefaultExportError           = True
+  liftEq _ (ExportError a b) (ExportError c d)             = (a == c) && (b == d)
+  liftEq _ (IntegerFormatError a) (IntegerFormatError b)   = a == b
+  liftEq _ (FloatFormatError a) (FloatFormatError b)       = a == b
+  liftEq _ (RationalFormatError a) (RationalFormatError b) = a == b
+  liftEq _ _ _                                             = False
 
 
 throwValueError :: MonadEvaluatable location term value m => ValueError location value resume -> m resume
