@@ -42,7 +42,7 @@ instance Evaluatable Import where
   eval (Import (ImportPath name) _) = do
     paths <- resolveGoImport name
     for_ paths $ \path -> do
-      (importedEnv, _) <- isolate (require path)
+      (importedEnv, _) <- traceResolve name path $ isolate (require path)
       modifyEnv (mappend importedEnv)
     unit
 
@@ -63,7 +63,7 @@ instance Evaluatable QualifiedImport where
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
     void $ letrec' alias $ \addr -> do
       for_ paths $ \path -> do
-        (importedEnv, _) <- isolate (require path)
+        (importedEnv, _) <- traceResolve name path $ isolate (require path)
         modifyEnv (mappend importedEnv)
 
       makeNamespace alias addr []
@@ -80,7 +80,7 @@ instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable SideEffectImport where
   eval (SideEffectImport (ImportPath name) _) = do
     paths <- resolveGoImport name
-    for_ paths (isolate . require)
+    for_ paths $ \path -> traceResolve name path $ isolate (require path)
     unit
 
 -- A composite literal in Go

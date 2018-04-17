@@ -44,7 +44,7 @@ doInclude :: MonadEvaluatable location term value m => Subterm t (m value) -> m 
 doInclude pathTerm = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
-  (importedEnv, v) <- isolate (load path)
+  (importedEnv, v) <- traceResolve name path $ isolate (load path)
   modifyEnv (mappend importedEnv)
   pure v
 
@@ -52,7 +52,7 @@ doIncludeOnce :: MonadEvaluatable location term value m => Subterm t (m value) -
 doIncludeOnce pathTerm = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
-  (importedEnv, v) <- isolate (require path)
+  (importedEnv, v) <- traceResolve name path $ isolate (require path)
   modifyEnv (mappend importedEnv)
   pure v
 
