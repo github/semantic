@@ -297,18 +297,18 @@ unaryOperator = symbol UnaryOperator >>= \ location -> arithmetic location <|> b
 
 binaryOperator :: Assignment
 binaryOperator = makeTerm' <$> symbol BinaryOperator <*> children (infixTerm expression (term expression)
-  [ (inj .) . Expression.Plus      <$ symbol AnonPlus
-  , (inj .) . Expression.Minus     <$ symbol AnonMinus
-  , (inj .) . Expression.Times     <$ symbol AnonStar
-  , (inj .) . Expression.DividedBy <$ symbol AnonSlash
-  , (inj .) . Expression.DividedBy <$ symbol AnonSlashSlash
-  , (inj .) . Expression.Modulo    <$ symbol AnonPercent
-  , (inj .) . Expression.Power     <$ symbol AnonStarStar
-  , (inj .) . Expression.BOr       <$ symbol AnonPipe
-  , (inj .) . Expression.BAnd      <$ symbol AnonAmpersand
-  , (inj .) . Expression.BXOr      <$ symbol AnonCaret
-  , (inj .) . Expression.LShift    <$ symbol AnonLAngleLAngle
-  , (inj .) . Expression.RShift    <$ symbol AnonRAngleRAngle
+  [ (inj .) . Expression.Plus          <$ symbol AnonPlus
+  , (inj .) . Expression.Minus         <$ symbol AnonMinus
+  , (inj .) . Expression.Times         <$ symbol AnonStar
+  , (inj .) . Expression.DividedBy     <$ symbol AnonSlash
+  , (inj .) . Expression.FloorDivision <$ symbol AnonSlashSlash
+  , (inj .) . Expression.Modulo        <$ symbol AnonPercent
+  , (inj .) . Expression.Power         <$ symbol AnonStarStar
+  , (inj .) . Expression.BOr           <$ symbol AnonPipe
+  , (inj .) . Expression.BAnd          <$ symbol AnonAmpersand
+  , (inj .) . Expression.BXOr          <$ symbol AnonCaret
+  , (inj .) . Expression.LShift        <$ symbol AnonLAngleLAngle
+  , (inj .) . Expression.RShift        <$ symbol AnonRAngleRAngle
   ])
 
 booleanOperator :: Assignment

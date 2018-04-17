@@ -6,6 +6,7 @@ module Data.Abstract.Number
     , liftReal
     , liftIntegralFrac
     , liftedExponent
+    , liftedFloorDiv
     ) where
 
 import Data.Scientific
@@ -95,4 +96,9 @@ liftedExponent :: Number a -> Number b -> SomeNumber
 liftedExponent (Integer i) (Integer j) = whole (i ^ j)
 liftedExponent (Ratio i) (Integer j)   = ratio (i ^^ j)
 liftedExponent i j                     = decim (fromFloatDigits (munge i ** munge j))
+  where munge = (toRealFloat . toScientific) :: Number a -> Double
+
+liftedFloorDiv :: Number a -> Number b -> SomeNumber
+liftedFloorDiv (Integer i) (Integer j) = whole (i `div` j)
+liftedFloorDiv i j                     = decim (fromIntegral @Prelude.Integer (floor (fromFloatDigits (munge i / munge j))))
   where munge = (toRealFloat . toScientific) :: Number a -> Double
