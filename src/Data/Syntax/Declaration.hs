@@ -238,7 +238,13 @@ instance Ord1 TypeAlias where liftCompare = genericLiftCompare
 instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for TypeAlias
-instance Evaluatable TypeAlias
+instance Evaluatable TypeAlias where
+  eval TypeAlias{..} = do
+    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable (subterm typeAliasIdentifier))
+    v <- subtermValue typeAliasKind
+    addr <- lookupOrAlloc name
+    assign addr v
+    modifyEnv (Env.insert name addr) $> v
 
 instance Declarations a => Declarations (TypeAlias a) where
   declaredName TypeAlias{..} = declaredName typeAliasIdentifier
