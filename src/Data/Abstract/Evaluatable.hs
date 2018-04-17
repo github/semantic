@@ -58,6 +58,7 @@ type MonadEvaluatable location term value m =
 -- | An error thrown when we can't resolve a module from a qualified name.
 data ResolutionError value resume where
   RubyError :: String -> ResolutionError value ModulePath
+  TypeScriptError :: String -> ResolutionError value ModulePath
 
 deriving instance Eq (ResolutionError a b)
 deriving instance Show (ResolutionError a b)
@@ -65,6 +66,8 @@ instance Show1 (ResolutionError value) where
   liftShowsPrec _ _ = showsPrec
 instance Eq1 (ResolutionError value) where
   liftEq _ (RubyError a) (RubyError b) = a == b
+  liftEq _ (TypeScriptError a) (TypeScriptError b) = a == b
+  liftEq _ _ _ = False
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
 data LoadError term value resume where
@@ -183,10 +186,19 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= eva
       pure (env <> env', v')
 
     evalAndCache' x = do
-      v <- evaluateModule x
-      env <- filterEnv <$> getExports <*> getEnv
-      modifyModuleTable (ModuleTable.insert name (env, v))
-      pure (env, v)
+      let mPath = modulePath (moduleInfo x)
+      LoadStack{..} <- getLoadStack
+      if mPath `elem` unLoadStack
+        then do -- Circular load, don't keep evaluating.
+          v <- unit
+          pure (mempty, v)
+        else do
+          modifyLoadStack (loadStackPush mPath)
+          v <- evaluateModule x
+          modifyLoadStack loadStackPop
+          env <- filterEnv <$> getExports <*> getEnv
+          modifyModuleTable (ModuleTable.insert name (env, v))
+          pure (env, v)
 
     -- TODO: If the set of exports is empty because no exports have been
     -- defined, do we export all terms, or no terms? This behavior varies across

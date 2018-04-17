@@ -1,7 +1,11 @@
 (Program
   (LessThan
-    (Identifier)
-    (Identifier))
+    (Send
+      (Identifier))
+    (Send
+      (Identifier)))
   (GreaterThan
-    (Identifier)
-    (Identifier)))
+    (Send
+      (Identifier))
+    (Send
+      (Identifier))))

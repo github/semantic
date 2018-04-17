@@ -17,7 +17,7 @@
     (Context
       (Comment)
       (KeyValue
-        (Identifier)
+        (Symbol)
         (Integer)))
     (Context
       (Comment)

@@ -1,17 +1,17 @@
 (Program
   (Hash
     (KeyValue
-    { (Identifier)
+    { (Symbol)
     ->(Symbol) }
     { (TextElement)
     ->(TextElement) })
     (KeyValue
-    { (Identifier)
+    { (Symbol)
     ->(Symbol) }
     { (Integer)
     ->(Integer) })
     (KeyValue
-    { (Identifier)
+    { (Symbol)
     ->(TextElement) }
     { (Boolean)
     ->(Boolean) })
@@ -23,7 +23,7 @@
   {+(Context
     {+(Comment)+}
     {+(KeyValue
-      {+(Identifier)+}
+      {+(Symbol)+}
       {+(Integer)+})+})+}
   {+(Context
     {+(Comment)+}

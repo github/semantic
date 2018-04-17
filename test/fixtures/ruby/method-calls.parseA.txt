@@ -1,22 +1,26 @@
 (Program
   (Send
-    (Identifier)
+    (Send
+      (Identifier))
     (Identifier))
   (Send
     (Identifier)
-    (Identifier)
-    (Identifier)
+    (Send
+      (Identifier))
+    (Send
+      (Identifier))
     (KeyValue
       (Symbol)
       (Integer))
     (KeyValue
-      (Identifier)
+      (Symbol)
       (Integer)))
   (Send
     (Identifier)
     (Send
       (Identifier)
-      (Identifier)))
+      (Send
+        (Identifier))))
   (Send
     (Identifier)
     (KeyValue

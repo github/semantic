@@ -1,6 +1,8 @@
 (Program
   (If
     (Not
+      (Send
+        (Identifier)))
+    (Send
       (Identifier))
-    (Identifier)
     (Empty)))

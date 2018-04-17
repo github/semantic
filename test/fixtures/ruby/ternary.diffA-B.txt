@@ -1,8 +1,11 @@
 (Program
   (If
-  { (Identifier)
-  ->(Identifier) }
-  { (Identifier)
-  ->(Identifier) }
-  { (Identifier)
-  ->(Identifier) }))
+    (Send
+    { (Identifier)
+    ->(Identifier) })
+    (Send
+    { (Identifier)
+    ->(Identifier) })
+    (Send
+    { (Identifier)
+    ->(Identifier) })))

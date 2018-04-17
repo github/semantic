@@ -45,10 +45,12 @@
       {-(Identifier)-})-})-}
   {-(
     {-(Send
-      {-(Identifier)-}
+      {-(Send
+        {-(Identifier)-})-}
       {-(Identifier)-})-}
     {-(Send
-      {-(Identifier)-}
+      {-(Send
+        {-(Identifier)-})-}
       {-(Identifier)-})-})-})-}
 {-(Assignment
   {-(

@@ -1,5 +1,7 @@
 (Program
-{+(Identifier)+}
+{+(Send
+  {+(Identifier)+})+}
   (ScopeExit
-  { (Identifier)
-  ->(Identifier) }))
+    (Send
+    { (Identifier)
+    ->(Identifier) })))

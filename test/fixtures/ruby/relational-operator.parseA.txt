@@ -1,11 +1,17 @@
 (Program
   (Equal
-    (Identifier)
-    (Identifier))
+    (Send
+      (Identifier))
+    (Send
+      (Identifier)))
   (Not
     (Equal
-      (Identifier)
-      (Identifier)))
+      (Send
+        (Identifier))
+      (Send
+        (Identifier))))
   (Equal
-    (Identifier)
-    (Identifier)))
+    (Send
+      (Identifier))
+    (Send
+      (Identifier))))

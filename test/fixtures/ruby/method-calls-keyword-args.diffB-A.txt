@@ -2,8 +2,8 @@
   (Send
     (Identifier)
     (KeyValue
-      (Identifier)
+      (Symbol)
       (Boolean))
   {-(KeyValue
-    {-(Identifier)-}
+    {-(Symbol)-}
     {-(Integer)-})-}))

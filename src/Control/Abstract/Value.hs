@@ -198,6 +198,7 @@ data ValueError location value resume where
   ComparisonError        :: value          -> value -> ValueError location value value
   BitwiseError           :: value -> ValueError location value value
   Bitwise2Error          :: value -> value -> ValueError location value value
+  KeyValueError          :: value          -> ValueError location value (value, value)
 
 instance Eq value => Eq1 (ValueError location value) where
   liftEq _ (StringError a) (StringError b)                       = a == b
@@ -209,6 +210,7 @@ instance Eq value => Eq1 (ValueError location value) where
   liftEq _ (ComparisonError a b) (ComparisonError c d)           = (a == c) && (b == d)
   liftEq _ (Bitwise2Error a b) (Bitwise2Error c d)               = (a == c) && (b == d)
   liftEq _ (BitwiseError a) (BitwiseError b)                     = a == b
+  liftEq _ (KeyValueError a) (KeyValueError b)                   = a == b
   liftEq _ _             _                                       = False
 
 deriving instance (Show value) => Show (ValueError location value resume)
