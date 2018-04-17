@@ -2,6 +2,7 @@
 module Analysis.Abstract.Evaluating
 ( Evaluating
 , EvaluatingState(..)
+, State
 ) where
 
 import           Control.Abstract.Analysis
@@ -15,6 +16,7 @@ import           Data.Abstract.Heap
 import           Data.Abstract.Module
 import           Data.Abstract.ModuleTable
 import           Data.Abstract.Origin
+import           Data.Empty
 import qualified Data.IntMap as IntMap
 import           Lens.Micro
 import           Prelude hiding (fail)
@@ -60,9 +62,8 @@ deriving instance (Show (Cell location value), Show location, Show term, Show va
 instance (Ord location, Semigroup (Cell location value)) => Semigroup (EvaluatingState location term value) where
   EvaluatingState e1 h1 m1 l1 x1 j1 o1 <> EvaluatingState e2 h2 m2 l2 x2 j2 o2 = EvaluatingState (e1 <> e2) (h1 <> h2) (m1 <> m2) (l1 <> l2) (x1 <> x2) (j1 <> j2) (o1 <> o2)
 
-instance (Ord location, Semigroup (Cell location value)) => Monoid (EvaluatingState location term value) where
-  mempty = EvaluatingState mempty mempty mempty mempty mempty mempty mempty
-  mappend = (<>)
+instance (Ord location, Semigroup (Cell location value)) => Empty (EvaluatingState location term value) where
+  empty = EvaluatingState mempty mempty mempty mempty mempty mempty mempty
 
 _environment :: Lens' (EvaluatingState location term value) (Environment location value)
 _environment = lens environment (\ s e -> s {environment = e})

@@ -71,6 +71,7 @@ library
                      , Data.AST
                      , Data.Blob
                      , Data.Diff
+                     , Data.Empty
                      , Data.Error
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
@@ -238,6 +239,7 @@ test-suite test
                      , Analysis.Ruby.Spec
                      , Analysis.TypeScript.Spec
                      , Data.Diff.Spec
+                     , Data.Abstract.Path.Spec
                      , Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Mergeable.Spec

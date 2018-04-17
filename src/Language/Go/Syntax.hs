@@ -3,6 +3,7 @@ module Language.Go.Syntax where
 
 import Data.Abstract.Evaluatable hiding (Label)
 import Data.Abstract.Module
+import Data.Abstract.Path
 import Data.Abstract.FreeVariables (name)
 import Diffing.Algorithm
 import qualified Data.ByteString.Char8 as BC
@@ -25,7 +26,7 @@ resolveGoImport :: MonadEvaluatable location term value m => FilePath -> m [Modu
 resolveGoImport relImportPath = do
   ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory (makeRelative moduleRoot modulePath)
-  listModulesInDir $ normalise (relRootDir </> normalise relImportPath)
+  listModulesInDir (joinPaths relRootDir relImportPath)
 
 -- | Import declarations (symbols are added directly to the calling environment).
 --
