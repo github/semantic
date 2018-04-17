@@ -17,7 +17,7 @@
   (Power
     (Identifier)
     (Identifier))
-  (DividedBy
+  (FloorDivision
     (Identifier)
     (Identifier))
   (Modulo
