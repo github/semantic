@@ -71,8 +71,6 @@ instance Evaluatable Arithmetic where
     go (Negate a)          = liftNumeric negate a
     go (FloorDivision a b) = liftNumeric2 liftedFloorDiv a b
 
-
-
 -- | Regex matching operators (Ruby's =~ and ~!)
 data Match a
   = Matches !a !a
