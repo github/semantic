@@ -276,7 +276,7 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
     | Just (String  i,                  String  j)                  <- prjPair pair = go i j
     | Just (Boolean i,                  Boolean j)                  <- prjPair pair = go i j
     | Just (Unit,                       Unit)                       <- prjPair pair = boolean True
-    | otherwise = fail ("Type error: invalid arguments to liftComparison: " <> show pair)
+    | otherwise = throwValueError (ComparisonError left right)
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.

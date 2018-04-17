@@ -36,6 +36,7 @@ instance ( Effectful m
           (StringError val) -> yield (pack $ show val)
           BoolError{} -> yield True
           Numeric2Error{} -> unit >>= yield
+          ComparisonError{} -> unit >>= yield
           NamespaceError{} -> getEnv >>= yield
           )
 
