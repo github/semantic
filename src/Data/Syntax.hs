@@ -111,6 +111,8 @@ instance Evaluatable Identifier where
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = pure x
 
+instance Declarations1 Identifier where
+  liftDeclaredName _ (Identifier x) = pure x
 
 newtype Program a = Program [a]
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)

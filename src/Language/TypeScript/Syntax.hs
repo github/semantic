@@ -435,13 +435,16 @@ instance Show1 AmbientDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable AmbientDeclaration where
   eval (AmbientDeclaration body) = subtermValue body
 
-data EnumDeclaration a = EnumDeclaration { _enumDeclarationIdentifier :: !a, _enumDeclarationBody :: ![a] }
+data EnumDeclaration a = EnumDeclaration { enumDeclarationIdentifier :: !a, _enumDeclarationBody :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 EnumDeclaration where liftEq = genericLiftEq
 instance Ord1 EnumDeclaration where liftCompare = genericLiftCompare
 instance Show1 EnumDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable EnumDeclaration
+
+instance Declarations a => Declarations (EnumDeclaration a) where
+  declaredName EnumDeclaration{..} = declaredName enumDeclarationIdentifier
 
 newtype ExtendsClause a = ExtendsClause { _extendsClauses :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -624,6 +627,9 @@ instance Evaluatable InternalModule where
     letrec' name $ \addr ->
       eval xs <* makeNamespace name addr []
 
+instance Declarations a => Declarations (InternalModule a) where
+  declaredName InternalModule{..} = declaredName internalModuleIdentifier
+
 
 data ImportAlias a = ImportAlias { _importAliasSubject :: !a, _importAlias :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -657,13 +663,15 @@ instance Ord1 ClassHeritage where liftCompare = genericLiftCompare
 instance Show1 ClassHeritage where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ClassHeritage
 
-data AbstractClass a = AbstractClass { _abstractClassIdentifier :: !a,  _abstractClassTypeParameters :: !a, _classHeritage :: ![a], _classBody :: !a }
+data AbstractClass a = AbstractClass { abstractClassIdentifier :: !a,  _abstractClassTypeParameters :: !a, _classHeritage :: ![a], _classBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 AbstractClass where liftEq = genericLiftEq
 instance Ord1 AbstractClass where liftCompare = genericLiftCompare
 instance Show1 AbstractClass where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable AbstractClass
+instance Declarations a => Declarations (AbstractClass a) where
+  declaredName AbstractClass{..} = declaredName abstractClassIdentifier
 
 data JsxElement a = JsxElement { _jsxOpeningElement :: !a,  _jsxElements :: ![a], _jsxClosingElement :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
