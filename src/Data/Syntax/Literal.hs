@@ -7,7 +7,7 @@ import Data.ByteString.Char8 (readInteger, unpack)
 import qualified Data.ByteString.Char8 as B
 import Data.Scientific.Exts
 import Diffing.Algorithm
-import Prelude hiding (Float, fail, null)
+import Prelude hiding (Float, null)
 import Prologue hiding (Set, hash, null)
 import Text.Read (readMaybe)
 
@@ -42,7 +42,8 @@ instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShow
 
 instance Evaluatable Data.Syntax.Literal.Integer where
   -- TODO: This instance probably shouldn't have readInteger?
-  eval (Data.Syntax.Literal.Integer x) = integer (maybe 0 fst (readInteger x))
+  eval (Data.Syntax.Literal.Integer x) =
+    integer =<< maybeM (throwEvalError (IntegerFormatError x)) (fst <$> readInteger x)
 
 
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
@@ -59,9 +60,7 @@ instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsP
 
 instance Evaluatable Data.Syntax.Literal.Float where
   eval (Float s) =
-    case parseScientific s of
-      Right num -> float num
-      Left  err -> fail ("Parse error: " <> err)
+    float =<< either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s)
 
 -- Rational literals e.g. `2/3r`
 newtype Rational a = Rational ByteString
@@ -72,10 +71,11 @@ instance Ord1 Data.Syntax.Literal.Rational where liftCompare = genericLiftCompar
 instance Show1 Data.Syntax.Literal.Rational where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Data.Syntax.Literal.Rational where
-  eval (Rational r) = let trimmed = B.takeWhile (/= 'r') r in
-    case readMaybe @Prelude.Integer (unpack trimmed) of
-      Just i  -> rational (toRational i)
-      Nothing -> fail ("Bug: invalid rational " <> show r)
+  eval (Rational r) =
+    let
+      trimmed = B.takeWhile (/= 'r') r
+      parsed = readMaybe @Prelude.Integer (unpack trimmed)
+    in rational =<< maybe (throwEvalError (RationalFormatError r)) (pure . toRational) parsed
 
 
 -- Complex literals e.g. `3 + 2i`
