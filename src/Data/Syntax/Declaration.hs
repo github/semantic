@@ -27,6 +27,9 @@ instance Evaluatable Function where
     pure v
     where paramNames = foldMap (freeVariables . subterm)
 
+instance Declarations a => Declarations (Function a) where
+  declaredName Function{..} = declaredName functionName
+
 
 data Method a = Method { methodContext :: ![a], methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -98,6 +101,12 @@ instance Evaluatable VariableDeclaration where
   eval (VariableDeclaration [])   = unit
   eval (VariableDeclaration decs) = multiple =<< traverse subtermValue decs
 
+instance Declarations a => Declarations (VariableDeclaration a) where
+  declaredName (VariableDeclaration vars) = case vars of
+    [var] -> declaredName var
+    _     -> Nothing
+
+
 -- | A TypeScript/Java style interface declaration to implement.
 data InterfaceDeclaration a = InterfaceDeclaration { interfaceDeclarationContext :: ![a], interfaceDeclarationIdentifier :: !a, interfaceDeclarationBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -108,6 +117,9 @@ instance Show1 InterfaceDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for InterfaceDeclaration
 instance Evaluatable InterfaceDeclaration
+
+instance Declarations a => Declarations (InterfaceDeclaration a) where
+  declaredName InterfaceDeclaration{..} = declaredName interfaceDeclarationIdentifier
 
 
 -- | A public field definition such as a field definition in a JavaScript class.
@@ -135,8 +147,8 @@ instance Evaluatable Variable
 data Class a = Class { classContext :: ![a], classIdentifier :: !a, classSuperclasses :: ![a], classBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
-instance FreeVariables a => Declarations (Class a) where
-  declaredName (Class _ name _ _) = either (const Nothing) Just (freeVariable name)
+instance Declarations a => Declarations (Class a) where
+  declaredName (Class _ name _ _) = declaredName name
 
 instance Diffable Class where
   equivalentBySubterm = Just . classIdentifier
@@ -227,3 +239,6 @@ instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for TypeAlias
 instance Evaluatable TypeAlias
+
+instance Declarations a => Declarations (TypeAlias a) where
+  declaredName TypeAlias{..} = declaredName typeAliasIdentifier
