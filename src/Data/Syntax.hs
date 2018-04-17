@@ -99,7 +99,7 @@ infixContext context left right operators = uncurry (&) <$> postContextualizeThr
 
 -- | An identifier of some other construct, whether a containing declaration (e.g. a class name) or a reference (e.g. a variable).
 newtype Identifier a = Identifier Name
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, Declarations1)
 
 instance Eq1 Identifier where liftEq = genericLiftEq
 instance Ord1 Identifier where liftCompare = genericLiftCompare
@@ -113,7 +113,7 @@ instance FreeVariables1 Identifier where
 
 
 newtype Program a = Program [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Program where liftEq = genericLiftEq
 instance Ord1 Program where liftCompare = genericLiftCompare
@@ -124,7 +124,7 @@ instance Evaluatable Program where
 
 -- | An accessibility modifier, e.g. private, public, protected, etc.
 newtype AccessibilityModifier a = AccessibilityModifier ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 AccessibilityModifier where liftEq = genericLiftEq
 instance Ord1 AccessibilityModifier where liftCompare = genericLiftCompare
@@ -137,7 +137,7 @@ instance Evaluatable AccessibilityModifier
 --
 --   This can be used to represent an implicit no-op, e.g. the alternative in an 'if' statement without an 'else'.
 data Empty a = Empty
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Empty where liftEq _ _ _ = True
 instance Ord1 Empty where liftCompare _ _ _ = EQ
@@ -149,7 +149,7 @@ instance Evaluatable Empty where
 -- | A parenthesized expression or statement. All the languages we target support this concept.
 
 newtype Paren a = Paren a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Paren where liftEq = genericLiftEq
 instance Ord1 Paren where liftCompare = genericLiftCompare
@@ -160,7 +160,7 @@ instance Evaluatable Paren where
 
 -- | Syntax representing a parsing or assignment error.
 data Error a = Error { errorCallStack :: ErrorStack, errorExpected :: [String], errorActual :: Maybe String, errorChildren :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Error where liftEq = genericLiftEq
 instance Ord1 Error where liftCompare = genericLiftCompare
@@ -191,7 +191,7 @@ instance Ord ErrorStack where
 
 
 data Context a = Context { contextTerms :: NonEmpty a, contextSubject :: a }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Diffable Context where
   subalgorithmFor blur focus (Context n s) = Context <$> traverse blur n <*> focus s

@@ -147,6 +147,7 @@ type ImportGraphAnalysis term effects value =
 graphImports :: (
                   Show ann
                 , Ord ann
+                , Apply Analysis.Declarations1 syntax
                 , Apply Analysis.Evaluatable syntax
                 , Apply FreeVariables1 syntax
                 , Apply Functor syntax

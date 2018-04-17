@@ -86,7 +86,7 @@ resolvePythonModules q = do
 --
 -- If the list of symbols is empty copy everything to the calling environment.
 data Import a = Import { importFrom :: QualifiedName, importSymbols :: ![(Name, Name)] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
@@ -114,7 +114,7 @@ instance Evaluatable Import where
 
 
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: QualifiedName }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 QualifiedImport where liftEq = genericLiftEq
 instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
@@ -140,7 +140,7 @@ instance Evaluatable QualifiedImport where
         makeNamespace name addr []
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedName, qualifiedAliasedImportAlias :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 QualifiedAliasedImport where liftEq = genericLiftEq
 instance Ord1 QualifiedAliasedImport where liftCompare = genericLiftCompare
@@ -165,7 +165,7 @@ instance Evaluatable QualifiedAliasedImport where
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Ellipsis where liftEq = genericLiftEq
 instance Ord1 Ellipsis where liftCompare = genericLiftCompare
@@ -176,7 +176,7 @@ instance Evaluatable Ellipsis
 
 
 data Redirect a = Redirect !a !a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Redirect where liftEq = genericLiftEq
 instance Ord1 Redirect where liftCompare = genericLiftCompare

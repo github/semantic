@@ -24,7 +24,7 @@ graph :: (Members '[Distribute WrappedTask, Files, Task, Exc SomeException, Tele
       -> Eff effs ByteString
 graph maybeRootDir renderer Blob{..}
   | Just (SomeAnalysisParser parser exts preludePath) <- someAnalysisParser
-    (Proxy :: Proxy '[ Analysis.Evaluatable, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) <$> blobLanguage = do
+    (Proxy :: Proxy '[ Analysis.Evaluatable, Analysis.Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) <$> blobLanguage = do
     let rootDir = fromMaybe (takeDirectory blobPath) maybeRootDir
     paths <- filter (/= blobPath) <$> listFiles rootDir exts
     prelude <- traverse (parseModule parser Nothing) preludePath

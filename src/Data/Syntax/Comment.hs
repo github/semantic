@@ -7,7 +7,7 @@ import Diffing.Algorithm
 
 -- | An unnested comment (line or block).
 newtype Comment a = Comment { commentContent :: ByteString }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Comment where liftEq = genericLiftEq
 instance Ord1 Comment where liftCompare = genericLiftCompare

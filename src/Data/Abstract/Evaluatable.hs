@@ -23,6 +23,7 @@ module Data.Abstract.Evaluatable
 , pushOrigin
 ) where
 
+import Data.Abstract.Declarations as X
 import           Control.Abstract.Addressable as X
 import           Control.Abstract.Analysis as X
 import           Data.Abstract.Address
@@ -43,6 +44,7 @@ import           Prologue
 type MonadEvaluatable location term value m =
   ( Evaluatable (Base term)
   , FreeVariables term
+  , Declarations term
   , MonadAddressable location m
   , MonadAnalysis location term value m
   , MonadThrow (Unspecialized value) m
