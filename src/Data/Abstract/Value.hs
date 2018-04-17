@@ -9,7 +9,7 @@ import qualified Data.Abstract.Number as Number
 import Data.Scientific (Scientific)
 import qualified Data.Set as Set
 import Prologue hiding (TypeError)
-import Prelude hiding (Float, Integer, String, Rational, fail)
+import Prelude hiding (Float, Integer, String, Rational)
 import qualified Prelude
 
 type ValueConstructors location
