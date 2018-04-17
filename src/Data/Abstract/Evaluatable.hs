@@ -33,6 +33,7 @@ import           Data.Abstract.Module
 import           Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Origin (SomeOrigin, packageOrigin)
 import           Data.Abstract.Package as Package
+import           Data.Scientific (Scientific)
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
 import           Data.Semigroup.Reducer hiding (unit)
@@ -85,6 +86,11 @@ data EvalError value resume where
   -- Indicates we weren't able to dereference a name from the evaluated environment.
   FreeVariableError :: Name -> EvalError value value
   FreeVariablesError :: [Name] -> EvalError value Name
+  -- Indicates that our evaluator wasn't able to make sense of these literals.
+  IntegerFormatError  :: ByteString -> EvalError value Integer
+  FloatFormatError    :: ByteString -> EvalError value Scientific
+  RationalFormatError :: ByteString -> EvalError value Rational
+
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: MonadEvaluatable location term value m => Name -> m value

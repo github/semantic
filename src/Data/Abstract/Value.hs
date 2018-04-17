@@ -9,7 +9,7 @@ import qualified Data.Abstract.Number as Number
 import Data.Scientific (Scientific)
 import qualified Data.Set as Set
 import Prologue hiding (TypeError)
-import Prelude hiding (Float, Integer, String, Rational, fail)
+import Prelude hiding (Float, Integer, String, Rational)
 import qualified Prelude
 
 type ValueConstructors location
@@ -245,9 +245,9 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
 
   liftNumeric f arg
     | Just (Integer (Number.Integer i)) <- prjValue arg = integer $ f i
-    | Just (Float (Number.Decimal d))          <- prjValue arg = float   $ f d
-    | Just (Rational (Number.Ratio r))         <- prjValue arg = rational $ f r
-    | otherwise = fail ("Invalid operand to liftNumeric: " <> show arg)
+    | Just (Float (Number.Decimal d))   <- prjValue arg = float   $ f d
+    | Just (Rational (Number.Ratio r))  <- prjValue arg = rational $ f r
+    | otherwise = throwValueError (NumericError arg)
 
   liftNumeric2 f left right
     | Just (Integer  i, Integer j)  <- prjPair pair = f i j & specialize
