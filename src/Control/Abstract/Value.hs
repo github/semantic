@@ -195,6 +195,9 @@ data ValueError location value resume where
   CallError              :: value          -> ValueError location value value
   BoolError              :: value          -> ValueError location value Bool
   Numeric2Error          :: value          -> value -> ValueError location value value
+  ComparisonError        :: value          -> value -> ValueError location value value
+  BitwiseError           :: value -> ValueError location value value
+  Bitwise2Error          :: value -> value -> ValueError location value value
   KeyValueError          :: value          -> ValueError location value (value, value)
 
 instance Eq value => Eq1 (ValueError location value) where
@@ -204,6 +207,9 @@ instance Eq value => Eq1 (ValueError location value) where
   liftEq _ (CallError a) (CallError b)                           = a == b
   liftEq _ (BoolError a) (BoolError c)                           = a == c
   liftEq _ (Numeric2Error a b) (Numeric2Error c d)               = (a == c) && (b == d)
+  liftEq _ (ComparisonError a b) (ComparisonError c d)           = (a == c) && (b == d)
+  liftEq _ (Bitwise2Error a b) (Bitwise2Error c d)               = (a == c) && (b == d)
+  liftEq _ (BitwiseError a) (BitwiseError b)                     = a == b
   liftEq _ _             _                                       = False
 
 deriving instance (Show value) => Show (ValueError location value resume)

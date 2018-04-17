@@ -32,11 +32,14 @@ instance ( Effectful m
           (ScopedEnvironmentError _) -> do
             env <- getEnv
             yield (Env.push env)
-          (CallError val) -> yield val
-          (StringError val) -> yield (pack $ show val)
-          BoolError{} -> yield True
-          Numeric2Error{} -> unit >>= yield
-          NamespaceError{} -> getEnv >>= yield
+          (CallError val)            -> yield val
+          (StringError val)          -> yield (pack $ show val)
+          BoolError{}                -> yield True
+          Numeric2Error{}            -> unit >>= yield
+          ComparisonError{}          -> unit >>= yield
+          BitwiseError{}             -> unit >>= yield
+          Bitwise2Error{}            -> unit >>= yield
+          NamespaceError{}           -> getEnv >>= yield
           KeyValueError{} -> unit >>= \x -> yield (x, x)
           )
 
