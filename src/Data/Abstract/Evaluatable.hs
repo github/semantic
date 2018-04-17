@@ -209,11 +209,11 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= eva
       LoadStack{..} <- getLoadStack
       if mPath `elem` unLoadStack
         then do -- Circular load, don't keep evaluating.
-          v <- unit
+          v <- trace ("load (skip evaluating, circular load): " <> show mPath) unit
           pure (mempty, v)
         else do
           modifyLoadStack (loadStackPush mPath)
-          v <- evaluateModule x
+          v <- trace ("load (evaluating): " <> show mPath) $ evaluateModule x
           modifyLoadStack loadStackPop
           env <- filterEnv <$> getExports <*> getEnv
           modifyModuleTable (ModuleTable.insert name (env, v))
