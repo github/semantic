@@ -32,14 +32,16 @@ instance ( Effectful m
           (ScopedEnvironmentError _) -> do
             env <- getEnv
             yield (Env.push env)
-          CallError val    -> yield val
-          StringError val  -> yield (pack $ show val)
-          BoolError{}      -> yield True
-          Numeric2Error{}  -> unit >>= yield
-          NamespaceError{} -> getEnv >>= yield
-          BitwiseError{}   -> unit >>= yield
-          Bitwise2Error{}  -> unit >>= yield
-          KeyValueError{}  -> unit >>= \x -> yield (x, x)
+          CallError val     -> yield val
+          StringError val   -> yield (pack $ show val)
+          BoolError{}       -> yield True
+          NumericError{}    -> unit >>= yield
+          Numeric2Error{}   -> unit >>= yield
+          ComparisonError{} -> unit >>= yield
+          NamespaceError{}  -> getEnv >>= yield
+          BitwiseError{}    -> unit >>= yield
+          Bitwise2Error{}   -> unit >>= yield
+          KeyValueError{}   -> unit >>= \x -> yield (x, x)
           )
 
   analyzeModule = liftAnalyze analyzeModule

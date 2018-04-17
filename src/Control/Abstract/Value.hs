@@ -194,6 +194,7 @@ data ValueError location value resume where
   ScopedEnvironmentError :: Prelude.String -> ValueError location value (Environment location value)
   CallError              :: value          -> ValueError location value value
   BoolError              :: value          -> ValueError location value Bool
+  NumericError           :: value          -> ValueError location value value
   Numeric2Error          :: value          -> value -> ValueError location value value
   ComparisonError        :: value          -> value -> ValueError location value value
   BitwiseError           :: value -> ValueError location value value

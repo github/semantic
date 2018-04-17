@@ -247,7 +247,7 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
     | Just (Integer (Number.Integer i)) <- prjValue arg = integer $ f i
     | Just (Float (Number.Decimal d))          <- prjValue arg = float   $ f d
     | Just (Rational (Number.Ratio r))         <- prjValue arg = rational $ f r
-    | otherwise = fail ("Invalid operand to liftNumeric: " <> show arg)
+    | otherwise = throwValueError (NumericError f)
 
   liftNumeric2 f left right
     | Just (Integer  i, Integer j)  <- prjPair pair = f i j & specialize
