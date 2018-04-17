@@ -15,6 +15,7 @@ import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Resumable
 import Control.Monad.Effect.State
 import Control.Monad.Effect.Writer
+import Data.Empty as E
 import Data.Semigroup.Reducer
 import Prologue
 
@@ -47,9 +48,9 @@ class RunEffect f a where
   runEffect :: Eff (f ': fs) a -> Eff fs (Result f a)
 
 -- | 'State' effects with 'Monoid'al states are interpreted starting from the 'mempty' state value into a pair of result value and final state.
-instance Monoid b => RunEffect (State b) a where
+instance E.Empty b => RunEffect (State b) a where
   type Result (State b) a = (a, b)
-  runEffect = flip runState mempty
+  runEffect = flip runState E.empty
 
 -- | 'Reader' effects with 'Monoid'al environments are interpreted starting from the 'mempty' environment value.
 instance Monoid b => RunEffect (Reader b) a where
