@@ -663,15 +663,25 @@ instance Ord1 ClassHeritage where liftCompare = genericLiftCompare
 instance Show1 ClassHeritage where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable ClassHeritage
 
-data AbstractClass a = AbstractClass { abstractClassIdentifier :: !a,  _abstractClassTypeParameters :: !a, _classHeritage :: ![a], _classBody :: !a }
+data AbstractClass a = AbstractClass { abstractClassIdentifier :: !a,  _abstractClassTypeParameters :: !a, classHeritage :: ![a], classBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 AbstractClass where liftEq = genericLiftEq
 instance Ord1 AbstractClass where liftCompare = genericLiftCompare
 instance Show1 AbstractClass where liftShowsPrec = genericLiftShowsPrec
-instance Evaluatable AbstractClass
 instance Declarations a => Declarations (AbstractClass a) where
   declaredName AbstractClass{..} = declaredName abstractClassIdentifier
+
+instance Evaluatable AbstractClass where
+  eval AbstractClass{..} = do
+    name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm abstractClassIdentifier)
+    supers <- traverse subtermValue classHeritage
+    (v, addr) <- letrec name $ do
+      void $ subtermValue classBody
+      classEnv <- Env.head <$> getEnv
+      klass name supers classEnv
+    v <$ modifyEnv (Env.insert name addr)
+
 
 data JsxElement a = JsxElement { _jsxOpeningElement :: !a,  _jsxElements :: ![a], _jsxClosingElement :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
