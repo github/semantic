@@ -9,7 +9,7 @@ import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString as B
 import           Data.Abstract.Module (ModulePath, ModuleInfo(..))
 import           Diffing.Algorithm
-import           Prelude hiding (fail)
+import           Prelude
 import           Prologue
 import           System.FilePath.Posix
 
