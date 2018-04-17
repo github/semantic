@@ -29,18 +29,19 @@ instance ( Effectful m
 
   analyzeTerm eval term = resumeException @(ValueError location value) (liftAnalyze analyzeTerm eval term) (
         \yield error -> case error of
-          (ScopedEnvironmentError _) -> do
+          ScopedEnvironmentError{} -> do
             env <- getEnv
             yield (Env.push env)
-          (CallError val)            -> yield val
-          (StringError val)          -> yield (pack $ show val)
+          CallError val              -> yield val
+          StringError val            -> yield (pack $ show val)
           BoolError{}                -> yield True
+          NumericError{}             -> unit >>= yield
           Numeric2Error{}            -> unit >>= yield
           ComparisonError{}          -> unit >>= yield
+          NamespaceError{}           -> getEnv >>= yield
           BitwiseError{}             -> unit >>= yield
           Bitwise2Error{}            -> unit >>= yield
-          NamespaceError{}           -> getEnv >>= yield
-          KeyValueError{} -> unit >>= \x -> yield (x, x)
+          KeyValueError{}            -> unit >>= \x -> yield (x, x)
           )
 
   analyzeModule = liftAnalyze analyzeModule

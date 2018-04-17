@@ -45,6 +45,9 @@ freeVariable term = case freeVariables term of
   [n] -> Right n
   xs -> Left xs
 
+instance (FreeVariables t) => FreeVariables (Subterm t a) where
+  freeVariables = freeVariables . subterm
+
 instance (FreeVariables1 syntax, Functor syntax) => FreeVariables (Term syntax ann) where
   freeVariables = cata (liftFreeVariables id)
 

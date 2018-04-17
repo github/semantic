@@ -26,6 +26,7 @@ module Data.Abstract.Evaluatable
 import           Control.Abstract.Addressable as X
 import           Control.Abstract.Analysis as X
 import           Data.Abstract.Address
+import           Data.Abstract.Declarations as X
 import           Data.Abstract.Environment as X
 import qualified Data.Abstract.Exports as Exports
 import           Data.Abstract.FreeVariables as X
@@ -33,6 +34,7 @@ import           Data.Abstract.Module
 import           Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Origin (SomeOrigin, packageOrigin)
 import           Data.Abstract.Package as Package
+import           Data.Scientific (Scientific)
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
 import           Data.Semigroup.Reducer hiding (unit)
@@ -42,6 +44,7 @@ import           Prologue
 type MonadEvaluatable location term value m =
   ( Evaluatable (Base term)
   , FreeVariables term
+  , Declarations term
   , MonadAddressable location m
   , MonadAnalysis location term value m
   , MonadThrow (Unspecialized value) m
@@ -65,9 +68,9 @@ deriving instance Show (ResolutionError a b)
 instance Show1 (ResolutionError value) where
   liftShowsPrec _ _ = showsPrec
 instance Eq1 (ResolutionError value) where
-  liftEq _ (RubyError a) (RubyError b) = a == b
+  liftEq _ (RubyError a) (RubyError b)             = a == b
   liftEq _ (TypeScriptError a) (TypeScriptError b) = a == b
-  liftEq _ _ _ = False
+  liftEq _ _ _                                     = False
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
 data LoadError term value resume where
@@ -85,6 +88,12 @@ data EvalError value resume where
   -- Indicates we weren't able to dereference a name from the evaluated environment.
   FreeVariableError :: Name -> EvalError value value
   FreeVariablesError :: [Name] -> EvalError value Name
+  -- Indicates that our evaluator wasn't able to make sense of these literals.
+  IntegerFormatError  :: ByteString -> EvalError value Integer
+  FloatFormatError    :: ByteString -> EvalError value Scientific
+  RationalFormatError :: ByteString -> EvalError value Rational
+  DefaultExportError  :: EvalError value ()
+
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: MonadEvaluatable location term value m => Name -> m value
@@ -95,9 +104,10 @@ deriving instance Show (EvalError a b)
 instance Show1 (EvalError value) where
   liftShowsPrec _ _ = showsPrec
 instance Eq1 (EvalError term) where
-  liftEq _ (FreeVariableError a) (FreeVariableError b) = a == b
+  liftEq _ (FreeVariableError a) (FreeVariableError b)   = a == b
   liftEq _ (FreeVariablesError a) (FreeVariablesError b) = a == b
-  liftEq _ _ _ = False
+  liftEq _ DefaultExportError DefaultExportError         = True
+  liftEq _ _ _                                           = False
 
 
 throwValueError :: MonadEvaluatable location term value m => ValueError location value resume -> m resume
