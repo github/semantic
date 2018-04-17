@@ -294,11 +294,11 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
 
   liftBitwise operator target
     | Just (Integer (Number.Integer i)) <- prjValue target = integer $ operator i
-    | otherwise = fail ("Type error: invalid unary bitwise operation on " <> show target)
+    | otherwise = throwValueError (BitwiseError target)
 
   liftBitwise2 operator left right
     | Just (Integer (Number.Integer i), Integer (Number.Integer j)) <- prjPair pair = integer $ operator i j
-    | otherwise = fail ("Type error: invalid binary bitwise operation on " <> show pair)
+    | otherwise = throwValueError (Bitwise2Error left right)
       where pair = (left, right)
 
   lambda names (Subterm body _) = do
@@ -314,6 +314,6 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
           assign a v
           Env.insert name a <$> rest) (pure env) (zip names params)
         localEnv (mappend bindings) (goto label >>= evaluateTerm)
-      Nothing -> throwException @(ValueError location (Value location)) (CallError op)
+      Nothing -> throwValueError (CallError op)
 
   loop = fix
