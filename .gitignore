@@ -18,6 +18,7 @@ bin/
 *.pyc
 
 /test.*
+/*.html
 
 .bundle/
 .licenses/vendor/gems
