@@ -191,9 +191,6 @@ instance Evaluatable QualifiedExportFrom where
       let address = Env.lookup name importedEnv
       maybe (throwEvalError $ ExportError modulePath name) (addExport name alias . Just) address
     unit
-    where
-      cannotExport moduleName name = fail $
-        "module " <> show moduleName <> " does not export " <> show (unName name)
 
 newtype DefaultExport a = DefaultExport { defaultExport :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
