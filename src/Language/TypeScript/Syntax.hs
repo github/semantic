@@ -201,9 +201,15 @@ instance Ord1 DefaultExport where liftCompare = genericLiftCompare
 instance Show1 DefaultExport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DefaultExport where
-  eval (DefaultExport exportedTerm) = do
-    name <- either (throwException) pure (declaredName exportedTerm)
-    addExport name name Nothing
+  eval (DefaultExport term) = do
+    v <- subtermValue term
+    case declaredName term of
+      Just name -> do
+        addr <- lookupOrAlloc name
+        assign addr v
+        addExport name name Nothing
+        void $ modifyEnv (Env.insert name addr)
+      Nothing -> throwEvalError DefaultExportError
     unit
 
 

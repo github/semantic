@@ -23,10 +23,10 @@ module Data.Abstract.Evaluatable
 , pushOrigin
 ) where
 
-import Data.Abstract.Declarations as X
 import           Control.Abstract.Addressable as X
 import           Control.Abstract.Analysis as X
 import           Data.Abstract.Address
+import           Data.Abstract.Declarations as X
 import           Data.Abstract.Environment as X
 import qualified Data.Abstract.Exports as Exports
 import           Data.Abstract.FreeVariables as X
@@ -68,9 +68,9 @@ deriving instance Show (ResolutionError a b)
 instance Show1 (ResolutionError value) where
   liftShowsPrec _ _ = showsPrec
 instance Eq1 (ResolutionError value) where
-  liftEq _ (RubyError a) (RubyError b) = a == b
+  liftEq _ (RubyError a) (RubyError b)             = a == b
   liftEq _ (TypeScriptError a) (TypeScriptError b) = a == b
-  liftEq _ _ _ = False
+  liftEq _ _ _                                     = False
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
 data LoadError term value resume where
@@ -92,6 +92,7 @@ data EvalError value resume where
   IntegerFormatError  :: ByteString -> EvalError value Integer
   FloatFormatError    :: ByteString -> EvalError value Scientific
   RationalFormatError :: ByteString -> EvalError value Rational
+  DefaultExportError  :: EvalError value ()
 
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
@@ -103,9 +104,10 @@ deriving instance Show (EvalError a b)
 instance Show1 (EvalError value) where
   liftShowsPrec _ _ = showsPrec
 instance Eq1 (EvalError term) where
-  liftEq _ (FreeVariableError a) (FreeVariableError b) = a == b
+  liftEq _ (FreeVariableError a) (FreeVariableError b)   = a == b
   liftEq _ (FreeVariablesError a) (FreeVariablesError b) = a == b
-  liftEq _ _ _ = False
+  liftEq _ DefaultExportError DefaultExportError         = True
+  liftEq _ _ _                                           = False
 
 
 throwValueError :: MonadEvaluatable location term value m => ValueError location value resume -> m resume
