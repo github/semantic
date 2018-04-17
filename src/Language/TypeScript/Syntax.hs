@@ -48,8 +48,7 @@ resolveRelativePath relImportPath exts = do
   let path = normalise (relRootDir </> normalise relImportPath)
   resolveTSModule path exts >>= either notFound pure
   where
-    notFound _ = throwException @(ResolutionError value) $ RubyError relImportPath
-    -- notFound xs = fail $ "Unable to resolve relative module import: " <> show relImportPath <> ", looked for it in: " <> show xs
+    notFound _ = throwException @(ResolutionError value) $ TypeScriptError relImportPath
 
 -- | Resolve a non-relative TypeScript import to a known 'ModuleName' or fail.
 --
@@ -74,13 +73,11 @@ resolveNonRelativePath name exts = do
         Left xs | parentDir <- takeDirectory path , root /= parentDir -> go root parentDir (searched <> xs)
                 | otherwise -> notFound (searched <> xs)
         Right m -> pure m
-    -- notFound xs = fail $ "Unable to resolve non-relative module import: " <> show name <> ", looked for it in: " <> show xs
-    notFound _ = throwException @(ResolutionError value) $ RubyError name
+    notFound _ = throwException @(ResolutionError value) $ TypeScriptError name
 
 resolveTSModule :: MonadEvaluatable location term value m => FilePath -> [String] -> m (Either [FilePath] ModulePath)
 resolveTSModule path exts = maybe (Left searchPaths) Right <$> resolve searchPaths
-  where -- exts = ["ts", "tsx", "d.ts"]
-        searchPaths =
+  where searchPaths =
           ((path <.>) <$> exts)
           -- TODO: Requires parsing package.json, getting the path of the
           --       "types" property and adding that value to the search Paths.
@@ -92,6 +89,13 @@ typescriptExtensions = ["ts", "tsx", "d.ts"]
 
 javascriptExtensions :: [String]
 javascriptExtensions = ["js"]
+
+evalRequire :: MonadEvaluatable location term value m => ModulePath -> Name -> m value
+evalRequire modulePath alias = letrec' alias $ \addr -> do
+  (importedEnv, _) <- isolate (require modulePath)
+  modifyEnv (mappend importedEnv)
+  void $ makeNamespace alias addr []
+  unit
 
 data Import a = Import { importSymbols :: ![(Name, Name)], importFrom :: ImportPath }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -122,11 +126,8 @@ instance Evaluatable JavaScriptRequire where
   eval (JavaScriptRequire aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath javascriptExtensions
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
-    letrec' alias $ \addr -> do
-      (importedEnv, _) <- isolate (require modulePath)
-      modifyEnv (mappend importedEnv)
-      void $ makeNamespace alias addr []
-      unit
+    evalRequire modulePath alias
+
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportAlias :: !a, qualifiedAliasedImportFrom :: ImportPath }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
@@ -139,11 +140,7 @@ instance Evaluatable QualifiedAliasedImport where
   eval (QualifiedAliasedImport aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
-    letrec' alias $ \addr -> do
-      (importedEnv, _) <- isolate (require modulePath)
-      modifyEnv (mappend importedEnv)
-      void $ makeNamespace alias addr []
-      unit
+    evalRequire modulePath alias
 
 newtype SideEffectImport a = SideEffectImport { sideEffectImportFrom :: ImportPath }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
