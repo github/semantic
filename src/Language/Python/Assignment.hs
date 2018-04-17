@@ -313,7 +313,7 @@ booleanOperator = makeTerm' <$> symbol BooleanOperator <*> children (infixTerm e
   ])
 
 assignment' :: Assignment
-assignment' =  makeTerm  <$> symbol Assignment <*> children (Statement.Assignment [] <$> term expressionList <*> term rvalue)
+assignment' =  makeAssignment <$> symbol Assignment <*> children ((,,) <$> term expressionList <*> optional (symbol Type *> children (term expression)) <*> term rvalue)
            <|> makeTerm' <$> symbol AugmentedAssignment <*> children (infixTerm expressionList (term rvalue)
                   [ assign Expression.Plus      <$ symbol AnonPlusEqual
                   , assign Expression.Minus     <$ symbol AnonMinusEqual
@@ -329,6 +329,7 @@ assignment' =  makeTerm  <$> symbol Assignment <*> children (Statement.Assignmen
                   , assign Expression.BXOr      <$ symbol AnonCaretEqual
                   ])
   where rvalue = expressionList <|> assignment' <|> yield
+        makeAssignment loc (lhs, maybeType, rhs) = makeTerm loc (Statement.Assignment (maybeToList maybeType) lhs rhs)
         assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
         assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
 
