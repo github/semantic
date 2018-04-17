@@ -29,10 +29,6 @@ resolveRubyPath path = do
   modulePath <- resolve [name']
   maybe (throwException @(ResolutionError value) $ RubyError name') pure modulePath
 
-maybeFailNotFound :: MonadFail m => String -> Maybe a -> m a
-maybeFailNotFound name = maybeFail notFound
-  where notFound = "Unable to resolve: " <> name
-
 cleanNameOrPath :: ByteString -> String
 cleanNameOrPath = BC.unpack . dropRelativePrefix . stripQuotes
 
