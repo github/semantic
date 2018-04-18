@@ -55,3 +55,14 @@ instance Eq1 EnumDeclaration where liftEq = genericLiftEq
 instance Ord1 EnumDeclaration where liftCompare = genericLiftCompare
 instance Show1 EnumDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable EnumDeclaration
+
+
+data Variable a = Variable { variableName :: !a, variableType :: !a}
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 Variable where liftEq = genericLiftEq
+instance Ord1 Variable where liftCompare = genericLiftCompare
+instance Show1 Variable where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for Variable
+instance Evaluatable Variable

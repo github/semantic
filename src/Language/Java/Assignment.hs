@@ -39,6 +39,7 @@ type Syntax =
    , Java.Syntax.Import
    , Java.Syntax.Module
    , Java.Syntax.Package
+   , Java.Syntax.Variable
    , Literal.Array
    , Literal.Boolean
    , Literal.Integer
@@ -52,6 +53,7 @@ type Syntax =
    , Statement.Continue
    , Statement.DoWhile
    , Statement.Finally
+   , Statement.For
    , Statement.If
    , Statement.Match
    , Statement.Pattern
@@ -84,6 +86,13 @@ assignment = handleError $ makeTerm <$> symbol Grammar.Program <*> children (Syn
 manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
 manyTerm term = many (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
 
+-- | Match a series of terms or comments until a delimiter is matched
+manyTermsTill :: Assignment.Assignment [] Grammar Term
+              -> Assignment.Assignment [] Grammar b
+              -> Assignment.Assignment [] Grammar [Term]
+manyTermsTill step end = manyTill (step <|> comment) end
+-- used in cases where the rules overlap, ie., step <|> comment and end can overlap
+
 someTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
 someTerm term = some (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
 
@@ -112,6 +121,7 @@ expressionChoices =
   -- , constantDeclaration
   , doWhile
   , float
+  , for
   , enum
   -- , hexadecimal
   , if'
@@ -148,12 +158,14 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 -- constantDeclaration = makeTerm <$> symbol ConstantDeclaration <*>
 
 localVariableDeclaration :: Assignment
-localVariableDeclaration = makeDecl <$> symbol LocalVariableDeclaration <*> children ((,) <$> some type' <*> vDeclList)
+localVariableDeclaration = makeDecl <$> symbol LocalVariableDeclaration <*> children ((,) <$> type' <*> vDeclList)
   where
-    makeSingleDecl loc types (target, value) = makeTerm loc (Statement.Assignment types target value)
-    makeDecl loc (types, decls) = makeTerm loc $ fmap (makeSingleDecl loc types) decls
+    makeSingleDecl type' (target, Nothing) = makeTerm1 (Java.Syntax.Variable target type')
+    makeSingleDecl type' (target, Just value) = makeTerm1 (Statement.Assignment [] (makeTerm1 (Java.Syntax.Variable target type')) value)
+    makeDecl loc (type', decls) = makeTerm'' loc $ fmap (makeSingleDecl type') decls -- we need loc here because it's the outermost node that comprises the list of all things
     vDeclList = symbol VariableDeclaratorList *> children (some variableDeclarator)
-    variableDeclarator = symbol VariableDeclarator *> children ((,) <$> variable_declarator_id <*> expression)
+    variableDeclarator = symbol VariableDeclarator *> children ((,) <$> variable_declarator_id <*> optional expression)
+-- function arg
 
 localVariableDeclarationStatement :: Assignment
 localVariableDeclarationStatement = symbol LocalVariableDeclarationStatement *> children localVariableDeclaration
@@ -306,9 +318,19 @@ try = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> term expr
     append (Just a) Nothing = a
     append (Just a) (Just b) = a <> [b]
 
--- for :: Assignment
--- for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> (makeTerm <$> location <*> manyTermsTill expression (symbol In)) <*> inClause <*> expressions)
---   where inClause = symbol In *> children expression
+for :: Assignment
+for = makeTerm <$> symbol ForStatement <*> children (Statement.For <$ token AnonFor <* token AnonLParen <*> (token AnonSemicolon *> emptyTerm <|> forInit <* token AnonSemicolon) <*> (token AnonSemicolon *> emptyTerm <|> term expression <* token AnonSemicolon) <*> forStep <*> term expression)
+  where
+    forInit = symbol ForInit *> children (term expression)
+    forStep = makeTerm <$> location <*> manyTermsTill expression (token AnonRParen)
+-- don't have symbol to match against for forStep because we don't know what that would be, but we need to still provide an annotation and location
+-- location rule = for when you need to provide a location without matching any nodes
+-- don't need to make a term here because term sion already produces a term
+-- makeTerm is used when the data constructor (syntax) field has an element, not a list
+-- Statement.For = data constructor that takes three statements and produces a piece of syntax
+-- don't need to produce syntax with term expression (already produces a term) so don't need to makeTerm
+-- dont wanna do manyTerm because it'll greedily match any of the expressions it can which means it'll match the for loop body, which would fail...
+-- because it would've already matched it and consumed it and the whole rule would fail because it wouldn't be available
 
 -- expression
 
