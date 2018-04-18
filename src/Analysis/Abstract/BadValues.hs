@@ -4,7 +4,6 @@ module Analysis.Abstract.BadValues where
 import Control.Abstract.Analysis
 import Data.Abstract.Evaluatable
 import Analysis.Abstract.Evaluating
-import Data.Abstract.Environment as Env
 import Prologue
 import Data.ByteString.Char8 (pack)
 
@@ -31,16 +30,14 @@ instance ( Effectful m
         \yield error -> do
           traceM ("ValueError" <> show error)
           case error of
-            ScopedEnvironmentError{} -> do
-              env <- getEnv
-              yield (Env.push env)
+            ScopedEnvironmentError{}   -> unit >>= yield
             CallError val              -> yield val
             StringError val            -> yield (pack $ show val)
             BoolError{}                -> yield True
             NumericError{}             -> unit >>= yield
             Numeric2Error{}            -> unit >>= yield
             ComparisonError{}          -> unit >>= yield
-            NamespaceError{}           -> getEnv >>= yield
+            NamespaceError{}           -> unit >>= yield
             BitwiseError{}             -> unit >>= yield
             Bitwise2Error{}            -> unit >>= yield
             KeyValueError{}            -> unit >>= \x -> yield (x, x)

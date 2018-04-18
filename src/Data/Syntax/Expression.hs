@@ -193,8 +193,9 @@ instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable MemberAccess where
   eval (fmap subtermValue -> MemberAccess mem acc) = do
-    lhs <- mem >>= scopedEnvironment
-    localEnv (mappend lhs) acc
+    mem' <- mem
+    lhs <- scopedEnvironment mem'
+    maybe (throwValueError . ScopedEnvironmentError $ pure mem') (flip localEnv acc . mappend) lhs
 
 -- | Subscript (e.g a[1])
 data Subscript a

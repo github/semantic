@@ -1,4 +1,4 @@
-{-# LANGUAGE FunctionalDependencies, GADTs, Rank2Types, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FunctionalDependencies, GADTs, Rank2Types, TypeFamilies, TypeOperators, UndecidableInstances, ScopedTypeVariables #-}
 module Control.Abstract.Value
 ( MonadValue(..)
 , Comparator(..)
@@ -123,7 +123,7 @@ class (Monad m, Show value) => MonadValue location value m | m value -> location
             -> m value
 
   -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
-  scopedEnvironment :: value -> m (Environment location value)
+  scopedEnvironment :: value -> m (Maybe (Environment location value))
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
   lambda :: (FreeVariables term, MonadControl term m) => [Name] -> Subterm term (m value) -> m value
@@ -164,7 +164,8 @@ doWhile body cond = loop $ \ continue -> body *> do
   this <- cond
   ifthenelse this continue unit
 
-makeNamespace :: ( MonadValue location value m
+makeNamespace :: forall value location m. ( MonadValue location value m
+                 , MonadThrow (ValueError location value) m
                  , MonadEnvironment location value m
                  , MonadHeap location value m
                  , Ord location
@@ -176,9 +177,12 @@ makeNamespace :: ( MonadValue location value m
               -> m value
 makeNamespace name addr supers = do
   superEnv <- mconcat <$> traverse scopedEnvironment supers
-  namespaceEnv <- Env.head <$> getEnv
-  v <- namespace name (Env.mergeNewer superEnv namespaceEnv)
-  v <$ assign addr v
+  case superEnv of
+    Just superEnv' -> do
+      namespaceEnv <- Env.head <$> getEnv
+      v <- namespace name (Env.mergeNewer superEnv' namespaceEnv)
+      v <$ assign addr v
+    Nothing -> throwException @(ValueError location value) $ NamespaceError (show name)
 
 
 -- | Value types, e.g. closures, which can root a set of addresses.
@@ -191,8 +195,8 @@ class ValueRoots location value where
 data ValueError location value resume where
   StringError            :: value          -> ValueError location value ByteString
   BoolError              :: value          -> ValueError location value Bool
-  NamespaceError         :: Prelude.String -> ValueError location value (Environment location value)
-  ScopedEnvironmentError :: Prelude.String -> ValueError location value (Environment location value)
+  NamespaceError         :: Prelude.String -> ValueError location value value
+  ScopedEnvironmentError :: [value]          -> ValueError location value value
   CallError              :: value          -> ValueError location value value
   NumericError           :: value          -> ValueError location value value
   Numeric2Error          :: value -> value -> ValueError location value value
