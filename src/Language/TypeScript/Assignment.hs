@@ -243,6 +243,7 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
   , assign Expression.BXOr <$ symbol AnonCaretEqual
   , assign Expression.BAnd <$ symbol AnonAmpersandEqual
   , assign Expression.RShift <$ symbol AnonRAngleRAngleEqual
+  , assign Expression.LShift <$ symbol AnonLAngleLAngleEqual
   , assign Expression.UnsignedRShift <$ symbol AnonRAngleRAngleRAngleEqual
   , assign Expression.BOr <$ symbol AnonPipeEqual ])
   where assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
