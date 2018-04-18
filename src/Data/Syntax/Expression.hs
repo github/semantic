@@ -2,10 +2,9 @@
 module Data.Syntax.Expression where
 
 import Data.Abstract.Evaluatable
-import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent)
+import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
 import Data.Fixed
 import Diffing.Algorithm
-import Prelude
 import Prologue
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
@@ -50,6 +49,7 @@ data Arithmetic a
   | Minus !a !a
   | Times !a !a
   | DividedBy !a !a
+  | FloorDivision !a !a
   | Modulo !a !a
   | Power !a !a
   | Negate !a
@@ -61,13 +61,14 @@ instance Show1 Arithmetic where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Arithmetic where
   eval = traverse subtermValue >=> go where
-    go (Plus a b)      = liftNumeric2 add a b  where add    = liftReal (+)
-    go (Minus a b)     = liftNumeric2 sub a b  where sub    = liftReal (-)
-    go (Times a b)     = liftNumeric2 mul a b  where mul    = liftReal (*)
-    go (DividedBy a b) = liftNumeric2 div' a b where div'   = liftIntegralFrac div (/)
-    go (Modulo a b)    = liftNumeric2 mod'' a b where mod'' = liftIntegralFrac mod mod'
-    go (Power a b)     = liftNumeric2 liftedExponent a b
-    go (Negate a)      = liftNumeric negate a
+    go (Plus a b)          = liftNumeric2 add a b  where add    = liftReal (+)
+    go (Minus a b)         = liftNumeric2 sub a b  where sub    = liftReal (-)
+    go (Times a b)         = liftNumeric2 mul a b  where mul    = liftReal (*)
+    go (DividedBy a b)     = liftNumeric2 div' a b where div'   = liftIntegralFrac div (/)
+    go (Modulo a b)        = liftNumeric2 mod'' a b where mod'' = liftIntegralFrac mod mod'
+    go (Power a b)         = liftNumeric2 liftedExponent a b
+    go (Negate a)          = liftNumeric negate a
+    go (FloorDivision a b) = liftNumeric2 liftedFloorDiv a b
 
 -- | Regex matching operators (Ruby's =~ and ~!)
 data Match a
