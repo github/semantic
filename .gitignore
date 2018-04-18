@@ -10,8 +10,9 @@ dist-newstyle
 .ghc.environment.*
 
 tmp/
-
 bin/
+
+/test/fixtures/*/examples
 
 *.hp
 *.prof
