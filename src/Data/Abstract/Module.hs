@@ -11,7 +11,7 @@ import System.FilePath.Posix
 
 type ModulePath = FilePath
 
-data ModuleInfo = ModuleInfo { modulePath :: FilePath, moduleRoot :: FilePath }
+newtype ModuleInfo = ModuleInfo { modulePath :: FilePath }
   deriving (Eq, Ord, Show)
 
 data Module term = Module { moduleInfo :: ModuleInfo, moduleBody :: term }
@@ -27,7 +27,5 @@ moduleForBlob :: Maybe FilePath -- ^ The root directory relative to which the mo
               -> term           -- ^ The @term@ representing the body of the module.
               -> Module term    -- ^ A 'Module' named appropriate for the 'Blob', holding the @term@, and constructed relative to the root 'FilePath', if any.
 moduleForBlob rootDir Blob{..} = Module info
-  where
-    root = fromMaybe (takeDirectory blobPath) rootDir
-    modulePath = maybe takeFileName makeRelative rootDir
-    info = ModuleInfo (modulePath blobPath) root
+  where root = fromMaybe (takeDirectory blobPath) rootDir
+        info = ModuleInfo (makeRelative root blobPath)

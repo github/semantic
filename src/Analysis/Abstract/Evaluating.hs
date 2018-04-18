@@ -49,6 +49,7 @@ data EvaluatingState location term value = EvaluatingState
   { environment :: Environment location value
   , heap        :: Heap location value
   , modules     :: ModuleTable (Environment location value, value)
+  , loadStack   :: LoadStack
   , exports     :: Exports location value
   , jumps       :: IntMap.IntMap term
   , origin      :: SomeOrigin term
@@ -58,8 +59,11 @@ deriving instance (Eq (Cell location value), Eq location, Eq term, Eq value, Eq 
 deriving instance (Ord (Cell location value), Ord location, Ord term, Ord value, Ord (Base term ())) => Ord (EvaluatingState location term value)
 deriving instance (Show (Cell location value), Show location, Show term, Show value, Show (Base term ())) => Show (EvaluatingState location term value)
 
+instance (Ord location, Semigroup (Cell location value)) => Semigroup (EvaluatingState location term value) where
+  EvaluatingState e1 h1 m1 l1 x1 j1 o1 <> EvaluatingState e2 h2 m2 l2 x2 j2 o2 = EvaluatingState (e1 <> e2) (h1 <> h2) (m1 <> m2) (l1 <> l2) (x1 <> x2) (j1 <> j2) (o1 <> o2)
+
 instance (Ord location, Semigroup (Cell location value)) => Empty (EvaluatingState location term value) where
-  empty = EvaluatingState mempty mempty mempty mempty mempty mempty
+  empty = EvaluatingState mempty mempty mempty mempty mempty mempty mempty
 
 _environment :: Lens' (EvaluatingState location term value) (Environment location value)
 _environment = lens environment (\ s e -> s {environment = e})
@@ -69,6 +73,9 @@ _heap = lens heap (\ s h -> s {heap = h})
 
 _modules :: Lens' (EvaluatingState location term value) (ModuleTable (Environment location value, value))
 _modules = lens modules (\ s m -> s {modules = m})
+
+_loadStack :: Lens' (EvaluatingState location term value) LoadStack
+_loadStack = lens loadStack (\ s l -> s {loadStack = l})
 
 _exports :: Lens' (EvaluatingState location term value) (Exports location value)
 _exports = lens exports (\ s e -> s {exports = e})
@@ -139,6 +146,9 @@ instance Members '[ Reader (ModuleTable [Module term])
 
   askModuleTable = raise ask
   localModuleTable f a = raise (local f (lower a))
+
+  getLoadStack = view _loadStack
+  putLoadStack = (_loadStack .=)
 
   currentModule = do
     o <- raise ask

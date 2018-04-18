@@ -2,6 +2,7 @@
 module Analysis.TypeScript.Spec (spec) where
 
 import SpecHelpers
+import Data.Abstract.Evaluatable
 
 
 spec :: Spec
@@ -29,7 +30,7 @@ spec = parallel $ do
 
     it "fails exporting symbols not defined in the module" $ do
       v <- fst <$> evaluate "bad-export.ts"
-      v `shouldBe` Left "module \"foo.ts\" does not export \"pip\""
+      v `shouldBe` Right (Right (Right (Right (Right (Left (SomeExc $ ExportError "foo.ts" (Name "pip")))))))
 
   where
     fixtures = "test/fixtures/typescript/analysis/"

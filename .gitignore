@@ -17,7 +17,8 @@ bin/
 *.prof
 *.pyc
 
-test.rb
+/test.*
+/*.html
 
 .bundle/
 .licenses/vendor/gems

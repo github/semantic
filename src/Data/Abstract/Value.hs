@@ -9,7 +9,7 @@ import qualified Data.Abstract.Number as Number
 import Data.Scientific (Scientific)
 import qualified Data.Set as Set
 import Prologue hiding (TypeError)
-import Prelude hiding (Float, Integer, String, Rational, fail)
+import Prelude hiding (Float, Integer, String, Rational)
 import qualified Prelude
 
 type ValueConstructors location
@@ -206,9 +206,9 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
 
   null     = pure . injValue $ Null
 
-  asPair k
-    | Just (KVPair k v) <- prjValue k = pure (k, v)
-    | otherwise = fail ("expected key-value pair, got " <> show k)
+  asPair val
+    | Just (KVPair k v) <- prjValue val = pure (k, v)
+    | otherwise = throwException @(ValueError location (Value location)) $ KeyValueError val
 
   hash = pure . injValue . Hash . fmap (injValue . uncurry KVPair)
 
@@ -245,9 +245,9 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
 
   liftNumeric f arg
     | Just (Integer (Number.Integer i)) <- prjValue arg = integer $ f i
-    | Just (Float (Number.Decimal d))          <- prjValue arg = float   $ f d
-    | Just (Rational (Number.Ratio r))         <- prjValue arg = rational $ f r
-    | otherwise = fail ("Invalid operand to liftNumeric: " <> show arg)
+    | Just (Float (Number.Decimal d))   <- prjValue arg = float   $ f d
+    | Just (Rational (Number.Ratio r))  <- prjValue arg = rational $ f r
+    | otherwise = throwValueError (NumericError arg)
 
   liftNumeric2 f left right
     | Just (Integer  i, Integer j)  <- prjPair pair = f i j & specialize
@@ -276,7 +276,7 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
     | Just (String  i,                  String  j)                  <- prjPair pair = go i j
     | Just (Boolean i,                  Boolean j)                  <- prjPair pair = go i j
     | Just (Unit,                       Unit)                       <- prjPair pair = boolean True
-    | otherwise = fail ("Type error: invalid arguments to liftComparison: " <> show pair)
+    | otherwise = throwValueError (ComparisonError left right)
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
@@ -294,11 +294,11 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
 
   liftBitwise operator target
     | Just (Integer (Number.Integer i)) <- prjValue target = integer $ operator i
-    | otherwise = fail ("Type error: invalid unary bitwise operation on " <> show target)
+    | otherwise = throwValueError (BitwiseError target)
 
   liftBitwise2 operator left right
     | Just (Integer (Number.Integer i), Integer (Number.Integer j)) <- prjPair pair = integer $ operator i j
-    | otherwise = fail ("Type error: invalid binary bitwise operation on " <> show pair)
+    | otherwise = throwValueError (Bitwise2Error left right)
       where pair = (left, right)
 
   lambda names (Subterm body _) = do
@@ -314,6 +314,6 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
           assign a v
           Env.insert name a <$> rest) (pure env) (zip names params)
         localEnv (mappend bindings) (goto label >>= evaluateTerm)
-      Nothing -> throwException @(ValueError location (Value location)) (CallError op)
+      Nothing -> throwValueError (CallError op)
 
   loop = fix

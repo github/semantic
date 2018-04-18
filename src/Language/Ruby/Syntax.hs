@@ -29,15 +29,11 @@ resolveRubyPath path = do
   modulePath <- resolve [name']
   maybe (throwException @(ResolutionError value) $ RubyError name') pure modulePath
 
-maybeFailNotFound :: MonadFail m => String -> Maybe a -> m a
-maybeFailNotFound name = maybeFail notFound
-  where notFound = "Unable to resolve: " <> name
-
 cleanNameOrPath :: ByteString -> String
 cleanNameOrPath = BC.unpack . dropRelativePrefix . stripQuotes
 
 data Send a = Send { sendReceiver :: Maybe a, sendSelector :: Maybe a, sendArgs :: [a], sendBlock :: Maybe a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Send where liftEq = genericLiftEq
 instance Ord1 Send where liftCompare = genericLiftCompare
@@ -58,7 +54,7 @@ instance Evaluatable Send where
     call func (map subtermValue sendArgs) -- TODO pass through sendBlock
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Require where liftEq = genericLiftEq
 instance Ord1 Require where liftCompare = genericLiftCompare
@@ -68,7 +64,7 @@ instance Evaluatable Require where
   eval (Require _ x) = do
     name <- subtermValue x >>= asString
     path <- resolveRubyName name
-    (importedEnv, v) <- isolate (doRequire path)
+    (importedEnv, v) <- traceResolve name path $ isolate (doRequire path)
     modifyEnv (`mergeNewer` importedEnv)
     pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
@@ -83,7 +79,7 @@ doRequire name = do
 
 
 newtype Load a = Load { loadArgs :: [a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Load where liftEq = genericLiftEq
 instance Ord1 Load where liftCompare = genericLiftCompare
@@ -102,14 +98,14 @@ instance Evaluatable Load where
 doLoad :: MonadEvaluatable location term value m => ByteString -> Bool -> m value
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
-  (importedEnv, _) <- isolate (load path')
+  (importedEnv, _) <- traceResolve path path' $ isolate (load path')
   unless shouldWrap $ modifyEnv (mappend importedEnv)
   boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 
 -- TODO: autoload
 
 data Class a = Class { classIdentifier :: !a, classSuperClasses :: ![a], classBody :: !a }
-  deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Diffable Class where
   equivalentBySubterm = Just . classIdentifier
@@ -126,7 +122,7 @@ instance Evaluatable Class where
       subtermValue classBody <* makeNamespace name addr supers
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Module where liftEq = genericLiftEq
 instance Ord1 Module where liftCompare = genericLiftCompare
@@ -141,7 +137,7 @@ instance Evaluatable Module where
 data LowPrecedenceBoolean a
   = LowAnd !a !a
   | LowOr !a !a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Evaluatable LowPrecedenceBoolean where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands

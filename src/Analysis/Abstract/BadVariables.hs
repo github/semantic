@@ -28,7 +28,12 @@ instance ( Effectful m
 
   analyzeTerm eval term = resumeException @(EvalError value) (liftAnalyze analyzeTerm eval term) (
         \yield err -> case err of
-          (FreeVariableError name) -> raise (modify' (name :)) >> unit >>= yield
-          (FreeVariablesError names) -> raise (modify' (names <>)) >> yield (last names) )
+          DefaultExportError{}     -> yield ()
+          ExportError{}            -> yield ()
+          IntegerFormatError{}     -> yield 0
+          FloatFormatError{}       -> yield 0
+          RationalFormatError{}    -> yield 0
+          FreeVariableError name   -> raise (modify' (name :)) >> unit >>= yield
+          FreeVariablesError names -> raise (modify' (names <>)) >> yield (fromMaybeLast "unknown" names))
 
   analyzeModule = liftAnalyze analyzeModule

@@ -66,6 +66,7 @@ type Syntax = '[
   , Statement.Break
   , Statement.Catch
   , Statement.Continue
+  , Statement.DoWhile
   , Statement.Else
   , Statement.Finally
   , Statement.For
@@ -78,11 +79,10 @@ type Syntax = '[
   , Statement.Return
   , Statement.ScopeEntry
   , Statement.ScopeExit
+  , Statement.Throw
   , Statement.Try
   , Statement.While
   , Statement.Yield
-  , Statement.Throw
-  , Statement.DoWhile
   , Syntax.AccessibilityModifier
   , Syntax.Empty
   , Syntax.Error
@@ -166,6 +166,7 @@ type Syntax = '[
   , TypeScript.Syntax.DefaultExport
   , TypeScript.Syntax.QualifiedExport
   , TypeScript.Syntax.QualifiedExportFrom
+  , TypeScript.Syntax.JavaScriptRequire
   , []
   ]
 
@@ -482,8 +483,9 @@ function :: Assignment
 function = makeFunction <$> (symbol Grammar.Function <|> symbol Grammar.GeneratorFunction) <*> children ((,,) <$> term (identifier <|> emptyTerm) <*> callSignatureParts <*> term statementBlock)
   where makeFunction loc (id, (typeParams, params, annotation), statements) = makeTerm loc (Declaration.Function [typeParams, annotation] id params statements)
 
+-- TODO: FunctionSignatures can, but don't have to be ambient functions.
 ambientFunction :: Assignment
-ambientFunction = makeAmbientFunction <$> symbol Grammar.AmbientFunction <*> children ((,) <$> term identifier <*> callSignatureParts)
+ambientFunction = makeAmbientFunction <$> symbol Grammar.FunctionSignature <*> children ((,) <$> term identifier <*> callSignatureParts)
   where makeAmbientFunction loc (id, (typeParams, params, annotation)) = makeTerm loc (TypeScript.Syntax.AmbientFunction [typeParams, annotation] id params)
 
 ty :: Assignment
@@ -785,8 +787,18 @@ variableDeclaration :: Assignment
 variableDeclaration = makeTerm <$> (symbol Grammar.VariableDeclaration <|> symbol Grammar.LexicalDeclaration) <*> children (Declaration.VariableDeclaration <$> manyTerm variableDeclarator)
 
 variableDeclarator :: Assignment
-variableDeclarator = makeVarDecl <$> symbol VariableDeclarator <*> children ((,,) <$> term (identifier <|> destructuringPattern) <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
-  where makeVarDecl loc (subject, annotations, value) = makeTerm loc (Statement.Assignment [annotations] subject value)
+variableDeclarator =
+      makeTerm <$> symbol VariableDeclarator <*> children (TypeScript.Syntax.JavaScriptRequire <$> identifier <*> requireCall)
+  <|> makeVarDecl <$> symbol VariableDeclarator <*> children ((,,) <$> term (identifier <|> destructuringPattern) <*> (term typeAnnotation' <|> emptyTerm) <*> (term expression <|> emptyTerm))
+  where
+    makeVarDecl loc (subject, annotations, value) = makeTerm loc (Statement.Assignment [annotations] subject value)
+
+    requireCall = symbol CallExpression *> children ((symbol Identifier <|> symbol Identifier') *> do
+      s <- source
+      guard (s == "require")
+      symbol Arguments *> children (symbol Grammar.String *> (TypeScript.Syntax.importPath <$> source))
+      )
+
 
 parenthesizedExpression :: Assignment
 parenthesizedExpression = makeTerm <$> symbol ParenthesizedExpression <*> (Syntax.Paren <$> children (term expressions))

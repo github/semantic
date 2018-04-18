@@ -34,8 +34,8 @@ runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Ta
 runParse :: SomeRenderer TermRenderer -> Either Handle [(FilePath, Maybe Language)] -> Task.TaskEff ByteString
 runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
 
-runGraph :: SomeRenderer GraphRenderer -> (FilePath, Maybe Language) -> Task.TaskEff ByteString
-runGraph (SomeRenderer r) = Semantic.graph r <=< Task.readBlob
+runGraph :: SomeRenderer GraphRenderer -> Maybe FilePath -> (FilePath, Maybe Language) -> Task.TaskEff ByteString
+runGraph (SomeRenderer r) rootDir = Semantic.graph rootDir r <=< Task.readBlob
 
 -- | A parser for the application's command-line arguments.
 --
@@ -94,6 +94,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       <$> (   flag (SomeRenderer DOTGraphRenderer) (SomeRenderer DOTGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
           <|> flag'                                (SomeRenderer JSONGraphRenderer) (long "json" <> help "Output JSON graph")
           )
+      <*> optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file's directory." <> metavar "DIRECTORY"))
       <*> argument filePathReader (metavar "ENTRY_FILE")
 
     filePathReader = eitherReader parseFilePath

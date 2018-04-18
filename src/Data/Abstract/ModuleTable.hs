@@ -7,8 +7,12 @@ module Data.Abstract.ModuleTable
 , member
 , modulePathsInDir
 , insert
+, keys
 , fromModules
 , toPairs
+, LoadStack (..)
+, loadStackPush
+, loadStackPop
 ) where
 
 import Data.Abstract.Module
@@ -37,11 +41,25 @@ member k = Map.member k . unModuleTable
 insert :: ModulePath -> a -> ModuleTable a -> ModuleTable a
 insert k v = ModuleTable . Map.insert k v . unModuleTable
 
+keys :: ModuleTable a -> [ModulePath]
+keys = Map.keys . unModuleTable
 
 -- | Construct a 'ModuleTable' from a list of 'Module's.
 fromModules :: [Module term] -> ModuleTable [Module term]
-fromModules modules = let x = ModuleTable (Map.fromListWith (<>) (map toEntry modules)) in traceShow x x
+fromModules modules = ModuleTable (Map.fromListWith (<>) (map toEntry modules))
   where toEntry m = (modulePath (moduleInfo m), [m])
 
 toPairs :: ModuleTable a -> [(ModulePath, a)]
 toPairs = Map.toList . unModuleTable
+
+
+-- | Stack of module paths used to help break circular loads/imports.
+newtype LoadStack = LoadStack { unLoadStack :: [ModulePath] }
+  deriving (Eq, Ord, Show, Monoid, Semigroup)
+
+loadStackPush :: ModulePath -> LoadStack -> LoadStack
+loadStackPush x LoadStack{..} = LoadStack (x : unLoadStack)
+
+loadStackPop :: LoadStack -> LoadStack
+loadStackPop (LoadStack []) = LoadStack []
+loadStackPop (LoadStack (_:xs)) = LoadStack xs

@@ -4,6 +4,8 @@ module Prologue
   , foldMapA
   , maybeM
   , maybeFail
+  , maybeLast
+  , fromMaybeLast
   ) where
 
 
@@ -60,6 +62,13 @@ import GHC.Stack as X
 -- | Fold a collection by mapping each element onto an 'Alternative' action.
 foldMapA :: (Alternative m, Foldable t) => (b -> m a) -> t b -> m a
 foldMapA f = getAlt . foldMap (Alt . f)
+
+
+maybeLast :: Foldable t => b -> (a -> b) -> t a -> b
+maybeLast b f = maybe b f . getLast . foldMap (Last . Just)
+
+fromMaybeLast :: Foldable t => a -> t a -> a
+fromMaybeLast b = fromMaybe b . getLast . foldMap (Last . Just)
 
 -- | Extract the 'Just' of a 'Maybe' in an 'Applicative' context or, given 'Nothing', run the provided action.
 maybeM :: Applicative f => f a -> Maybe a -> f a

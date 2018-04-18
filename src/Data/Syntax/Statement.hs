@@ -9,7 +9,7 @@ import Prologue
 
 -- | Conditional. This must have an else block, which can be filled with some default value when omitted in the source, e.g. 'pure ()' for C-style if-without-else or 'pure Nothing' for Ruby-style, in both cases assuming some appropriate Applicative context into which the If will be lifted.
 data If a = If { ifCondition :: !a, ifThenBody :: !a, ifElseBody :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 If where liftEq = genericLiftEq
 instance Ord1 If where liftCompare = genericLiftCompare
@@ -22,7 +22,7 @@ instance Evaluatable If where
 
 -- | Else statement. The else condition is any term, that upon successful completion, continues evaluation to the elseBody, e.g. `for ... else` in Python.
 data Else a = Else { elseCondition :: !a, elseBody :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Else where liftEq = genericLiftEq
 instance Ord1 Else where liftCompare = genericLiftCompare
@@ -35,7 +35,7 @@ instance Evaluatable Else
 
 -- | Goto statement (e.g. `goto a` in Go).
 newtype Goto a = Goto { gotoLocation :: a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Goto where liftEq = genericLiftEq
 instance Ord1 Goto where liftCompare = genericLiftCompare
@@ -47,7 +47,7 @@ instance Evaluatable Goto
 
 -- | A pattern-matching or computed jump control-flow statement, like 'switch' in C or JavaScript, or 'case' in Ruby or Haskell.
 data Match a = Match { matchSubject :: !a, matchPatterns :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Match where liftEq = genericLiftEq
 instance Ord1 Match where liftCompare = genericLiftCompare
@@ -59,7 +59,7 @@ instance Evaluatable Match
 
 -- | A pattern in a pattern-matching or computed jump control-flow statement, like 'case' in C or JavaScript, 'when' in Ruby, or the left-hand side of '->' in the body of Haskell 'case' expressions.
 data Pattern a = Pattern { _pattern :: !a, patternBody :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Pattern where liftEq = genericLiftEq
 instance Ord1 Pattern where liftCompare = genericLiftCompare
@@ -71,7 +71,7 @@ instance Evaluatable Pattern
 
 -- | A let statement or local binding, like 'a as b' or 'let a = b'.
 data Let a  = Let { letVariable :: !a, letValue :: !a, letBody :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Let where liftEq = genericLiftEq
 instance Ord1 Let where liftCompare = genericLiftCompare
@@ -88,7 +88,7 @@ instance Evaluatable Let where
 
 -- | Assignment to a variable or other lvalue.
 data Assignment a = Assignment { assignmentContext :: ![a], assignmentTarget :: !a, assignmentValue :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Assignment where liftEq = genericLiftEq
 instance Ord1 Assignment where liftCompare = genericLiftCompare
@@ -108,7 +108,7 @@ instance Evaluatable Assignment where
 
 -- | Post increment operator (e.g. 1++ in Go, or i++ in C).
 newtype PostIncrement a = PostIncrement a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 PostIncrement where liftEq = genericLiftEq
 instance Ord1 PostIncrement where liftCompare = genericLiftCompare
@@ -120,7 +120,7 @@ instance Evaluatable PostIncrement
 
 -- | Post decrement operator (e.g. 1-- in Go, or i-- in C).
 newtype PostDecrement a = PostDecrement a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 PostDecrement where liftEq = genericLiftEq
 instance Ord1 PostDecrement where liftCompare = genericLiftCompare
@@ -133,7 +133,7 @@ instance Evaluatable PostDecrement
 -- Returns
 
 newtype Return a = Return a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Return where liftEq = genericLiftEq
 instance Ord1 Return where liftCompare = genericLiftCompare
@@ -143,7 +143,7 @@ instance Evaluatable Return where
   eval (Return x) = subtermValue x
 
 newtype Yield a = Yield a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Yield where liftEq = genericLiftEq
 instance Ord1 Yield where liftCompare = genericLiftCompare
@@ -154,7 +154,7 @@ instance Evaluatable Yield
 
 
 newtype Break a = Break a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Break where liftEq = genericLiftEq
 instance Ord1 Break where liftCompare = genericLiftCompare
@@ -165,7 +165,7 @@ instance Evaluatable Break
 
 
 newtype Continue a = Continue a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Continue where liftEq = genericLiftEq
 instance Ord1 Continue where liftCompare = genericLiftCompare
@@ -176,7 +176,7 @@ instance Evaluatable Continue
 
 
 newtype Retry a = Retry a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Retry where liftEq = genericLiftEq
 instance Ord1 Retry where liftCompare = genericLiftCompare
@@ -187,7 +187,7 @@ instance Evaluatable Retry
 
 
 newtype NoOp a = NoOp a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 NoOp where liftEq = genericLiftEq
 instance Ord1 NoOp where liftCompare = genericLiftCompare
@@ -199,7 +199,7 @@ instance Evaluatable NoOp where
 -- Loops
 
 data For a = For { forBefore :: !a, forCondition :: !a, forStep :: !a, forBody :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 For where liftEq = genericLiftEq
 instance Ord1 For where liftCompare = genericLiftCompare
@@ -210,7 +210,7 @@ instance Evaluatable For where
 
 
 data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 ForEach where liftEq = genericLiftEq
 instance Ord1 ForEach where liftCompare = genericLiftCompare
@@ -221,7 +221,7 @@ instance Evaluatable ForEach
 
 
 data While a = While { whileCondition :: !a, whileBody :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 While where liftEq = genericLiftEq
 instance Ord1 While where liftCompare = genericLiftCompare
@@ -231,7 +231,7 @@ instance Evaluatable While where
   eval While{..} = while (subtermValue whileCondition)  (subtermValue whileBody)
 
 data DoWhile a = DoWhile { doWhileCondition :: !a, doWhileBody :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 DoWhile where liftEq = genericLiftEq
 instance Ord1 DoWhile where liftCompare = genericLiftCompare
@@ -243,7 +243,7 @@ instance Evaluatable DoWhile where
 -- Exception handling
 
 newtype Throw a = Throw a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Throw where liftEq = genericLiftEq
 instance Ord1 Throw where liftCompare = genericLiftCompare
@@ -254,7 +254,7 @@ instance Evaluatable Throw
 
 
 data Try a = Try { tryBody :: !a, tryCatch :: ![a] }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Try where liftEq = genericLiftEq
 instance Ord1 Try where liftCompare = genericLiftCompare
@@ -265,7 +265,7 @@ instance Evaluatable Try
 
 
 data Catch a = Catch { catchException :: !a, catchBody :: !a }
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Catch where liftEq = genericLiftEq
 instance Ord1 Catch where liftCompare = genericLiftCompare
@@ -276,7 +276,7 @@ instance Evaluatable Catch
 
 
 newtype Finally a = Finally a
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 Finally where liftEq = genericLiftEq
 instance Ord1 Finally where liftCompare = genericLiftCompare
@@ -290,7 +290,7 @@ instance Evaluatable Finally
 
 -- | ScopeEntry (e.g. `BEGIN {}` block in Ruby or Perl).
 newtype ScopeEntry a = ScopeEntry [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 ScopeEntry where liftEq = genericLiftEq
 instance Ord1 ScopeEntry where liftCompare = genericLiftCompare
@@ -302,7 +302,7 @@ instance Evaluatable ScopeEntry
 
 -- | ScopeExit (e.g. `END {}` block in Ruby or Perl).
 newtype ScopeExit a = ScopeExit [a]
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 ScopeExit where liftEq = genericLiftEq
 instance Ord1 ScopeExit where liftCompare = genericLiftCompare
@@ -313,7 +313,7 @@ instance Evaluatable ScopeExit
 
 -- | HashBang line (e.g. `#!/usr/bin/env node`)
 newtype HashBang a = HashBang ByteString
-  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Eq1 HashBang where liftEq = genericLiftEq
 instance Ord1 HashBang where liftCompare = genericLiftCompare

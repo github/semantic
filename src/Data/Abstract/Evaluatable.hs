@@ -17,6 +17,7 @@ module Data.Abstract.Evaluatable
 , throwEvalError
 , throwValueError
 , resolve
+, traceResolve
 , listModulesInDir
 , require
 , load
@@ -26,6 +27,7 @@ module Data.Abstract.Evaluatable
 import           Control.Abstract.Addressable as X
 import           Control.Abstract.Analysis as X
 import           Data.Abstract.Address
+import           Data.Abstract.Declarations as X
 import           Data.Abstract.Environment as X
 import qualified Data.Abstract.Exports as Exports
 import           Data.Abstract.FreeVariables as X
@@ -33,6 +35,7 @@ import           Data.Abstract.Module
 import           Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Origin (SomeOrigin, packageOrigin)
 import           Data.Abstract.Package as Package
+import           Data.Scientific (Scientific)
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
 import           Data.Semigroup.Reducer hiding (unit)
@@ -42,6 +45,7 @@ import           Prologue
 type MonadEvaluatable location term value m =
   ( Evaluatable (Base term)
   , FreeVariables term
+  , Declarations term
   , MonadAddressable location m
   , MonadAnalysis location term value m
   , MonadThrow (Unspecialized value) m
@@ -58,13 +62,16 @@ type MonadEvaluatable location term value m =
 -- | An error thrown when we can't resolve a module from a qualified name.
 data ResolutionError value resume where
   RubyError :: String -> ResolutionError value ModulePath
+  TypeScriptError :: String -> ResolutionError value ModulePath
 
 deriving instance Eq (ResolutionError a b)
 deriving instance Show (ResolutionError a b)
 instance Show1 (ResolutionError value) where
   liftShowsPrec _ _ = showsPrec
 instance Eq1 (ResolutionError value) where
-  liftEq _ (RubyError a) (RubyError b) = a == b
+  liftEq _ (RubyError a) (RubyError b)             = a == b
+  liftEq _ (TypeScriptError a) (TypeScriptError b) = a == b
+  liftEq _ _ _                                     = False
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
 data LoadError term value resume where
@@ -82,6 +89,13 @@ data EvalError value resume where
   -- Indicates we weren't able to dereference a name from the evaluated environment.
   FreeVariableError :: Name -> EvalError value value
   FreeVariablesError :: [Name] -> EvalError value Name
+  -- Indicates that our evaluator wasn't able to make sense of these literals.
+  IntegerFormatError  :: ByteString -> EvalError value Integer
+  FloatFormatError    :: ByteString -> EvalError value Scientific
+  RationalFormatError :: ByteString -> EvalError value Rational
+  DefaultExportError  :: EvalError value ()
+  ExportError         :: ModulePath -> Name -> EvalError value ()
+
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: MonadEvaluatable location term value m => Name -> m value
@@ -92,9 +106,14 @@ deriving instance Show (EvalError a b)
 instance Show1 (EvalError value) where
   liftShowsPrec _ _ = showsPrec
 instance Eq1 (EvalError term) where
-  liftEq _ (FreeVariableError a) (FreeVariableError b) = a == b
-  liftEq _ (FreeVariablesError a) (FreeVariablesError b) = a == b
-  liftEq _ _ _ = False
+  liftEq _ (FreeVariableError a) (FreeVariableError b)     = a == b
+  liftEq _ (FreeVariablesError a) (FreeVariablesError b)   = a == b
+  liftEq _ DefaultExportError DefaultExportError           = True
+  liftEq _ (ExportError a b) (ExportError c d)             = (a == c) && (b == d)
+  liftEq _ (IntegerFormatError a) (IntegerFormatError b)   = a == b
+  liftEq _ (FloatFormatError a) (FloatFormatError b)       = a == b
+  liftEq _ (RationalFormatError a) (RationalFormatError b) = a == b
+  liftEq _ _ _                                             = False
 
 
 throwValueError :: MonadEvaluatable location term value m => ValueError location value resume -> m resume
@@ -152,6 +171,9 @@ resolve names = do
   tbl <- askModuleTable
   pure $ find (`ModuleTable.member` tbl) names
 
+traceResolve :: (Show a, Show b) => a -> b -> c -> c
+traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
+
 listModulesInDir :: MonadEvaluatable location term value m
         => FilePath
         -> m [ModulePath]
@@ -183,10 +205,19 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= eva
       pure (env <> env', v')
 
     evalAndCache' x = do
-      v <- evaluateModule x
-      env <- filterEnv <$> getExports <*> getEnv
-      modifyModuleTable (ModuleTable.insert name (env, v))
-      pure (env, v)
+      let mPath = modulePath (moduleInfo x)
+      LoadStack{..} <- getLoadStack
+      if mPath `elem` unLoadStack
+        then do -- Circular load, don't keep evaluating.
+          v <- trace ("load (skip evaluating, circular load): " <> show mPath) unit
+          pure (mempty, v)
+        else do
+          modifyLoadStack (loadStackPush mPath)
+          v <- trace ("load (evaluating): " <> show mPath) $ evaluateModule x
+          modifyLoadStack loadStackPop
+          env <- filterEnv <$> getExports <*> getEnv
+          modifyModuleTable (ModuleTable.insert name (env, v))
+          pure (env, v)
 
     -- TODO: If the set of exports is empty because no exports have been
     -- defined, do we export all terms, or no terms? This behavior varies across
