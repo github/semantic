@@ -1,6 +1,3 @@
-[submodule "test/repos/js-test"]
-	path = test/repos/js-test
-	url = https://github.com/rewinfrey/js-test.git
 [submodule "vendor/hspec-expectations-pretty-diff"]
 	path = vendor/hspec-expectations-pretty-diff
 	url = https://github.com/rewinfrey/hspec-expectations-pretty-diff
