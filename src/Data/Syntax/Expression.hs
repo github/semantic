@@ -5,7 +5,6 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
 import Data.Fixed
 import Diffing.Algorithm
-import Prelude hiding (floor)
 import Prologue
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
