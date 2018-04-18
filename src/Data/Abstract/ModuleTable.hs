@@ -23,7 +23,6 @@ import System.FilePath.Posix
 import GHC.Generics (Generic1)
 import Prelude hiding (lookup)
 
-
 newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModulePath a }
   deriving (Eq, Foldable, Functor, Generic1, Monoid, Ord, Semigroup, Show, Traversable)
 
