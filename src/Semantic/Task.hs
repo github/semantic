@@ -229,11 +229,13 @@ runParser blob@Blob{..} parser = case parser of
     time "parse.tree_sitter_ast_parse" languageTag $
       IO.rethrowing (parseToAST language blob)
   AssignmentParser parser assignment -> do
+    traceM ("Parsing" <> blobPath)
     ast <- runParser blob parser `catchError` \ (SomeException err) -> do
       writeStat (Stat.increment "parse.parse_failures" languageTag)
       writeLog Error "failed parsing" (("task", "parse") : blobFields)
       throwError (toException err)
     options <- ask
+    traceM ("Assigning" <> blobPath)
     time "parse.assign" languageTag $
       case Assignment.assign blobSource assignment ast of
         Left err -> do

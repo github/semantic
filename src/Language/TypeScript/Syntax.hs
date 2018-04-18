@@ -108,6 +108,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
   -- http://www.typescriptlang.org/docs/handbook/module-resolution.html
 instance Evaluatable Import where
   eval (Import symbols importPath) = do
+    traceM ("Evaluating Import" <> show importPath)
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     (importedEnv, _) <- isolate (require modulePath)
     modifyEnv (mappend (renamed importedEnv)) *> unit
@@ -125,6 +126,7 @@ instance Show1 JavaScriptRequire where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable JavaScriptRequire where
   eval (JavaScriptRequire aliasTerm importPath) = do
+    traceM ("Evaluating Require:" <> show importPath)
     modulePath <- resolveWithNodejsStrategy importPath javascriptExtensions
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
     evalRequire modulePath alias
@@ -139,6 +141,7 @@ instance Show1 QualifiedAliasedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedAliasedImport where
   eval (QualifiedAliasedImport aliasTerm importPath) = do
+    traceM ("Evaluating Aliased Import:" <> show importPath)
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
     evalRequire modulePath alias
@@ -152,6 +155,7 @@ instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable SideEffectImport where
   eval (SideEffectImport importPath) = do
+    traceM ("Evaluating SideEffect Import:" <> show importPath)
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     void $ isolate (require modulePath)
     unit
@@ -167,6 +171,7 @@ instance Show1 QualifiedExport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedExport where
   eval (QualifiedExport exportSymbols) = do
+    traceM ("Evaluating QualifiedExport:" <> show exportSymbols)
     -- Insert the aliases with no addresses.
     for_ exportSymbols $ \(name, alias) ->
       addExport name alias Nothing
