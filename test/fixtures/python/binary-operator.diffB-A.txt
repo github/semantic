@@ -29,10 +29,10 @@
 { (Power
   {-(Identifier)-}
   {-(Identifier)-})
-->(DividedBy
+->(FloorDivision
   {+(Identifier)+}
   {+(Identifier)+}) }
-{ (DividedBy
+{ (FloorDivision
   {-(Identifier)-}
   {-(Identifier)-})
 ->(Power
