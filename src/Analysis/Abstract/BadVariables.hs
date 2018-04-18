@@ -27,13 +27,15 @@ instance ( Effectful m
   type Effects location term value (BadVariables m effects) = State [Name] ': Effects location term value (m effects)
 
   analyzeTerm eval term = resumeException @(EvalError value) (liftAnalyze analyzeTerm eval term) (
-        \yield err -> case err of
-          DefaultExportError{}     -> yield ()
-          ExportError{}            -> yield ()
-          IntegerFormatError{}     -> yield 0
-          FloatFormatError{}       -> yield 0
-          RationalFormatError{}    -> yield 0
-          FreeVariableError name   -> raise (modify' (name :)) >> unit >>= yield
-          FreeVariablesError names -> raise (modify' (names <>)) >> yield (fromMaybeLast "unknown" names))
+        \yield err -> do
+          traceM ("EvalError" <> show err)
+          case err of
+            DefaultExportError{}     -> yield ()
+            ExportError{}            -> yield ()
+            IntegerFormatError{}     -> yield 0
+            FloatFormatError{}       -> yield 0
+            RationalFormatError{}    -> yield 0
+            FreeVariableError name   -> raise (modify' (name :)) >> unit >>= yield
+            FreeVariablesError names -> raise (modify' (names <>)) >> yield (fromMaybeLast "unknown" names))
 
   analyzeModule = liftAnalyze analyzeModule

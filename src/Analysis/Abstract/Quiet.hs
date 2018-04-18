@@ -31,6 +31,7 @@ instance ( Effectful m
       => MonadAnalysis location term value (Quietly m effects) where
   type Effects location term value (Quietly m effects) = Effects location term value (m effects)
 
-  analyzeTerm eval term = resumeException @(Unspecialized value) (liftAnalyze analyzeTerm eval term) (\yield (Unspecialized _) -> unit >>= yield)
+  analyzeTerm eval term = resumeException @(Unspecialized value) (liftAnalyze analyzeTerm eval term) (\yield err@(Unspecialized _) ->
+          traceM ("Unspecialized:" <> show err) >> unit >>= yield)
 
   analyzeModule = liftAnalyze analyzeModule

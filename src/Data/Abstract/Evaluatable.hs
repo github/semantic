@@ -215,6 +215,7 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= eva
           modifyLoadStack (loadStackPush mPath)
           v <- trace ("load (evaluating): " <> show mPath) $ evaluateModule x
           modifyLoadStack loadStackPop
+          traceM ("load done:" <> show mPath)
           env <- filterEnv <$> getExports <*> getEnv
           modifyModuleTable (ModuleTable.insert name (env, v))
           pure (env, v)
