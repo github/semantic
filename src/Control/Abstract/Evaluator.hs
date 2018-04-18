@@ -148,9 +148,9 @@ class Monad m => MonadModuleTable location term value m | m -> location, m -> te
   -- | Run an action with a locally-modified table of unevaluated modules.
   localModuleTable :: (ModuleTable [Module term] -> ModuleTable [Module term]) -> m a -> m a
 
-  -- | Retrieve the module loack stack
+  -- | Retrieve the module load stack
   getLoadStack :: m LoadStack
-  -- | Set the module loack stack
+  -- | Set the module load stack
   putLoadStack :: LoadStack -> m ()
 
   -- | Get the currently evaluating 'ModuleInfo'.
