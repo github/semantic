@@ -15,6 +15,7 @@ library
   hs-source-dirs:      src
   exposed-modules:
                      -- Analyses & term annotations
+                       Analysis.Abstract.BadAddresses
                        Analysis.Abstract.BadVariables
                        Analysis.Abstract.BadValues
                        Analysis.Abstract.BadModuleResolutions

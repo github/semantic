@@ -234,8 +234,8 @@ assignmentExpression :: Assignment
 assignmentExpression = makeTerm <$> symbol AssignmentExpression <*> children (Statement.Assignment [] <$> term (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) <*> expression)
 
 augmentedAssignmentExpression :: Assignment
-augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpression <*> children (infixTerm (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) expression [
-  assign Expression.Plus <$ symbol AnonPlusEqual
+augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpression <*> children (infixTerm (memberExpression <|> subscriptExpression <|> identifier <|> destructuringPattern) (term expression) [
+    assign Expression.Plus <$ symbol AnonPlusEqual
   , assign Expression.Minus <$ symbol AnonMinusEqual
   , assign Expression.Times <$ symbol AnonStarEqual
   , assign Expression.DividedBy <$ symbol AnonSlashEqual
@@ -245,6 +245,7 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
   , assign Expression.RShift <$ symbol AnonRAngleRAngleEqual
   , assign Expression.LShift <$ symbol AnonLAngleLAngleEqual
   , assign Expression.UnsignedRShift <$ symbol AnonRAngleRAngleRAngleEqual
+  , assign Expression.LShift <$ symbol AnonLAngleLAngleEqual
   , assign Expression.BOr <$ symbol AnonPipeEqual ])
   where assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
         assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
