@@ -28,6 +28,7 @@ type ValueConstructors location
     , Symbol
     , Tuple
     , Unit
+    , Hole
     ]
 
 -- | Open union of primitive values that terms can be evaluated to.
@@ -66,6 +67,13 @@ data Unit value = Unit
 instance Eq1 Unit where liftEq = genericLiftEq
 instance Ord1 Unit where liftCompare = genericLiftCompare
 instance Show1 Unit where liftShowsPrec = genericLiftShowsPrec
+
+data Hole value = Hole
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Hole where liftEq = genericLiftEq
+instance Ord1 Hole where liftCompare = genericLiftCompare
+instance Show1 Hole where liftShowsPrec = genericLiftShowsPrec
 
 -- | Boolean values.
 newtype Boolean value = Boolean Prelude.Bool
@@ -191,6 +199,7 @@ instance Ord location => ValueRoots location (Value location) where
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance forall location term m. (Monad m, MonadEvaluatable location term (Value location) m) => MonadValue location (Value location) m where
+  hole     = pure . injValue $ Hole
   unit     = pure . injValue $ Unit
   integer  = pure . injValue . Integer . Number.Integer
   boolean  = pure . injValue . Boolean
@@ -240,12 +249,18 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
     | otherwise                     = throwException @(ValueError location (Value location)) $ StringError v
 
   ifthenelse cond if' else' = do
-    bool <- asBool cond
-    if bool then if' else else'
+    isHole <- isHole cond
+    if isHole then do
+      bool <- asBool cond
+      if bool then if' else else'
+    else
+      hole
 
   asBool val
     | Just (Boolean b) <- prjValue val = pure b
     | otherwise = throwException @(ValueError location (Value location)) $ BoolError val
+
+  isHole val = pure (prjValue val == Just Hole)
 
 
   liftNumeric f arg

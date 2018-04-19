@@ -32,6 +32,6 @@ instance ( Effectful m
   type Effects location term value (Quietly m effects) = Effects location term value (m effects)
 
   analyzeTerm eval term = resumeException @(Unspecialized value) (liftAnalyze analyzeTerm eval term) (\yield err@(Unspecialized _) ->
-          traceM ("Unspecialized:" <> show err) >> unit >>= yield)
+          traceM ("Unspecialized:" <> show err) >> hole >>= yield)
 
   analyzeModule = liftAnalyze analyzeModule

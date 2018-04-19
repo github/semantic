@@ -30,17 +30,17 @@ instance ( Effectful m
         \yield error -> do
           traceM ("ValueError" <> show error)
           case error of
-            ScopedEnvironmentError{}   -> unit >>= yield
+            ScopedEnvironmentError{}   -> hole >>= yield
             CallError val              -> yield val
             StringError val            -> yield (pack $ show val)
-            BoolError{}                -> yield True
-            NumericError{}             -> unit >>= yield
-            Numeric2Error{}            -> unit >>= yield
-            ComparisonError{}          -> unit >>= yield
-            NamespaceError{}           -> unit >>= yield
-            BitwiseError{}             -> unit >>= yield
-            Bitwise2Error{}            -> unit >>= yield
-            KeyValueError{}            -> unit >>= \x -> yield (x, x)
+            BoolError{}                -> yield False
+            NumericError{}             -> hole >>= yield
+            Numeric2Error{}            -> hole >>= yield
+            ComparisonError{}          -> hole >>= yield
+            NamespaceError{}           -> hole >>= yield
+            BitwiseError{}             -> hole >>= yield
+            Bitwise2Error{}            -> hole >>= yield
+            KeyValueError{}            -> hole >>= \x -> yield (x, x)
           )
 
   analyzeModule = liftAnalyze analyzeModule

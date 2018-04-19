@@ -39,6 +39,9 @@ class (Monad m, Show value) => MonadValue location value m | m value -> location
   --   TODO: This might be the same as the empty tuple for some value types
   unit :: m value
 
+  -- | Construct an abstract hole.
+  hole :: m value
+
   -- | Construct an abstract integral value.
   integer :: Prelude.Integer -> m value
 
@@ -108,6 +111,8 @@ class (Monad m, Show value) => MonadValue location value m | m value -> location
 
   -- | Construct the nil/null datatype.
   null :: m value
+
+  isHole :: value -> m Bool
 
   -- | Build a class value from a name and environment.
   klass :: Name                       -- ^ The new class's identifier

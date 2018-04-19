@@ -35,7 +35,7 @@ instance ( Effectful m
             IntegerFormatError{}     -> yield 0
             FloatFormatError{}       -> yield 0
             RationalFormatError{}    -> yield 0
-            FreeVariableError name   -> raise (modify' (name :)) >> unit >>= yield
+            FreeVariableError name   -> raise (modify' (name :)) >> hole >>= yield
             FreeVariablesError names -> raise (modify' (names <>)) >> yield (fromMaybeLast "unknown" names))
 
   analyzeModule = liftAnalyze analyzeModule
