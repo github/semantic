@@ -57,7 +57,7 @@ instance Show1 EnumDeclaration where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable EnumDeclaration
 
 
-data Variable a = Variable { variableName :: !a, variableType :: !a}
+data Variable a = Variable { variableModifiers :: ![a], variableType :: !a, variableName :: !a}
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
 
 instance Eq1 Variable where liftEq = genericLiftEq

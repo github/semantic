@@ -34,6 +34,10 @@ type Syntax =
    , Declaration.InterfaceDeclaration
    , Declaration.Method
    , Declaration.VariableDeclaration
+   , Expression.Arithmetic
+   , Expression.Comparison
+   , Expression.Bitwise
+   , Expression.Boolean
    , Java.Syntax.ArrayType
    , Java.Syntax.EnumDeclaration
    , Java.Syntax.Import
@@ -54,9 +58,14 @@ type Syntax =
    , Statement.DoWhile
    , Statement.Finally
    , Statement.For
+   , Statement.ForEach
    , Statement.If
    , Statement.Match
    , Statement.Pattern
+   , Statement.PostIncrement
+   , Statement.PostDecrement
+   , Statement.PreIncrement
+   , Statement.PreDecrement
    , Statement.While
    , Statement.Throw
    , Statement.Try
@@ -112,7 +121,9 @@ expressionChoices :: [Assignment.Assignment [] Grammar Term]
 expressionChoices =
   [
     arrayInitializer
+  , assignment'
   , block
+  , binary
   , boolean
   , break
   , char
@@ -138,6 +149,8 @@ expressionChoices =
   , switch
   , throw
   , try
+  , unary
+  , update
   , localVariableDeclaration
   , localVariableDeclarationStatement
   , while
@@ -158,13 +171,13 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 -- constantDeclaration = makeTerm <$> symbol ConstantDeclaration <*>
 
 localVariableDeclaration :: Assignment
-localVariableDeclaration = makeDecl <$> symbol LocalVariableDeclaration <*> children ((,) <$> type' <*> vDeclList)
+localVariableDeclaration = makeDecl <$> symbol LocalVariableDeclaration <*> children ((,,) <$> manyTerm modifier <*> type' <*> vDeclList)
   where
-    makeSingleDecl type' (target, Nothing) = makeTerm1 (Java.Syntax.Variable target type')
-    makeSingleDecl type' (target, Just value) = makeTerm1 (Statement.Assignment [] (makeTerm1 (Java.Syntax.Variable target type')) value)
-    makeDecl loc (type', decls) = makeTerm'' loc $ fmap (makeSingleDecl type') decls -- we need loc here because it's the outermost node that comprises the list of all things
+    makeSingleDecl modifiers type' (target, Nothing) = makeTerm1 (Java.Syntax.Variable modifiers type' target)
+    makeSingleDecl modifiers type' (target, Just value) = makeTerm1 (Statement.Assignment [] (makeTerm1 (Java.Syntax.Variable modifiers type' target)) value)
+    makeDecl loc (modifiers, type', decls) = makeTerm'' loc $ fmap (makeSingleDecl modifiers type') decls -- we need loc here because it's the outermost node that comprises the list of all things
     vDeclList = symbol VariableDeclaratorList *> children (some variableDeclarator)
-    variableDeclarator = symbol VariableDeclarator *> children ((,) <$> variable_declarator_id <*> optional expression)
+    variableDeclarator = symbol VariableDeclarator *> children ((,) <$> variableDeclaratorId <*> optional expression)
 -- function arg
 
 localVariableDeclarationStatement :: Assignment
@@ -173,8 +186,8 @@ localVariableDeclarationStatement = symbol LocalVariableDeclarationStatement *> 
 unannotatedType :: Assignment
 unannotatedType = makeTerm <$> symbol Grammar.ArrayType <*> (Java.Syntax.ArrayType <$> source)
 
-variable_declarator_id :: Assignment
-variable_declarator_id = symbol VariableDeclaratorId *> children identifier
+variableDeclaratorId :: Assignment
+variableDeclaratorId = symbol VariableDeclaratorId *> children identifier
 
 -- Literals
 
@@ -319,7 +332,11 @@ try = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> term expr
     append (Just a) (Just b) = a <> [b]
 
 for :: Assignment
-for = makeTerm <$> symbol ForStatement <*> children (Statement.For <$ token AnonFor <* token AnonLParen <*> (token AnonSemicolon *> emptyTerm <|> forInit <* token AnonSemicolon) <*> (token AnonSemicolon *> emptyTerm <|> term expression <* token AnonSemicolon) <*> forStep <*> term expression)
+for = symbol ForStatement *> children (basicFor <|> enhancedFor)
+-- dropping so *>
+
+basicFor :: Assignment
+basicFor = makeTerm <$> symbol BasicForStatement <*> children (Statement.For <$ token AnonFor <* token AnonLParen <*> (token AnonSemicolon *> emptyTerm <|> forInit <* token AnonSemicolon) <*> (token AnonSemicolon *> emptyTerm <|> term expression <* token AnonSemicolon) <*> forStep <*> term expression)
   where
     forInit = symbol ForInit *> children (term expression)
     forStep = makeTerm <$> location <*> manyTermsTill expression (token AnonRParen)
@@ -332,7 +349,96 @@ for = makeTerm <$> symbol ForStatement <*> children (Statement.For <$ token Anon
 -- dont wanna do manyTerm because it'll greedily match any of the expressions it can which means it'll match the for loop body, which would fail...
 -- because it would've already matched it and consumed it and the whole rule would fail because it wouldn't be available
 
--- expression
+enhancedFor :: Assignment
+enhancedFor = makeTerm <$> symbol EnhancedForStatement <*> children (Statement.ForEach <$> (variable <$> manyTerm modifier <*> type' <*> variableDeclaratorId) <*> term expression <*> term expression)
+  where variable modifiers type' variableDeclaratorId = makeTerm1 (Java.Syntax.Variable modifiers type' variableDeclaratorId)
+-- variableDeclaratorId takes name and then type' so that's the order we give it, but variable takes type' first and variableDeclaratorId
+-- going to populate binding field with a new term which should be a variable
+-- binding = variable
+-- subject = thing being iterated over
+-- body
+
+-- TODO: instanceOf
+binary :: Assignment
+binary = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression expression
+  [ (inj .) . Expression.LessThan         <$ symbol AnonLAngle
+  , (inj .) . Expression.GreaterThan      <$ symbol AnonRAngle
+  , (inj .) . Expression.Equal            <$ symbol AnonEqualEqual
+  , (inj .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
+  , (inj .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
+  , (inj .) . invert Expression.Equal     <$ symbol AnonBangEqual
+  , (inj .) . Expression.And              <$ symbol AnonAmpersandAmpersand
+  , (inj .) . Expression.Or               <$ symbol AnonPipePipe
+  , (inj .) . Expression.BAnd             <$ symbol AnonAmpersand
+  , (inj .) . Expression.BOr              <$ symbol AnonPipe
+  , (inj .) . Expression.BXOr             <$ symbol AnonCaret
+  , (inj .) . Expression.Modulo           <$ symbol AnonPercent
+  , (inj .) . Expression.LShift           <$ symbol AnonLAngleLAngle
+  , (inj .) . Expression.RShift           <$ symbol AnonRAngleRAngle
+  , (inj .) . Expression.UnsignedRShift   <$ symbol AnonRAngleRAngleRAngle
+  , (inj .) . Expression.Plus             <$ symbol AnonPlus
+  , (inj .) . Expression.Minus            <$ symbol AnonMinus
+  , (inj .) . Expression.Times            <$ symbol AnonStar
+  , (inj .) . Expression.DividedBy        <$ symbol AnonSlash
+  ])
+  where invert cons a b = Expression.Not (makeTerm1 (cons a b))
+
+-- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
+infixTerm :: HasCallStack
+          => Assignment
+          -> Assignment
+          -> [Assignment.Assignment [] Grammar (Term -> Term -> Union Syntax Term)]
+          -> Assignment.Assignment [] Grammar (Union Syntax Term)
+infixTerm = infixContext comment
+
+assignment' :: Assignment
+assignment' = makeTerm' <$> symbol AssignmentExpression <*> children (infixTerm lhs expression
+                [ (inj .) . Statement.Assignment [] <$ symbol AnonEqual
+                , assign Expression.Plus            <$ symbol AnonPlusEqual
+                , assign Expression.Minus           <$ symbol AnonMinusEqual
+                , assign Expression.Times           <$ symbol AnonStarEqual
+                , assign Expression.DividedBy       <$ symbol AnonSlashEqual
+                , assign Expression.BOr             <$ symbol AnonPipeEqual
+                , assign Expression.BAnd            <$ symbol AnonAmpersandEqual
+                , assign Expression.Modulo          <$ symbol AnonPercentEqual
+                , assign Expression.RShift          <$ symbol AnonRAngleRAngleEqual
+                , assign Expression.UnsignedRShift  <$ symbol AnonRAngleRAngleRAngleEqual
+                , assign Expression.LShift          <$ symbol AnonLAngleLAngleEqual
+                , assign Expression.BXOr            <$ symbol AnonCaretEqual
+                ])
+  where
+    assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
+    assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
+    lhs = symbol Lhs *> children (term expression)
+
+data UnaryType
+  = UPlus
+  | UMinus
+  | UBang
+  | UTilde
+
+unary :: Assignment
+unary = make <$> symbol UnaryExpression <*> children ((,) <$> operator <*> term expression)
+  where
+    make _ (UPlus, operand) = operand
+    make loc (UMinus, operand) = makeTerm loc (Expression.Negate operand)
+    make loc (UBang, operand) = makeTerm loc (Expression.Not operand)
+    make loc (UTilde, operand) = makeTerm loc (Expression.Complement operand)
+    operator = token AnonPlus  $> UPlus
+           <|> token AnonMinus $> UMinus
+           <|> token AnonBang  $> UBang
+           <|> token AnonTilde $> UTilde
+  -- had to use make because we didn't always make a term
+
+update :: Assignment
+update = makeTerm' <$> symbol UpdateExpression <*> children (
+      inj . Statement.PreIncrement  <$ token AnonPlusPlus <*> term expression
+  <|> inj . Statement.PreDecrement  <$ token AnonMinusMinus <*> term expression
+  <|> inj . Statement.PostIncrement <$> term expression <* token AnonPlusPlus
+  <|> inj . Statement.PostDecrement <$> term expression <* token AnonMinusMinus)
+-- makterm' so need inj .
+-- tries them in order; true of alternations, order matters; (if-else)
+-- but choice doesn't have this property (order doesn't matter) because it constructs a jump table (switch)
 
 -- infix operators
 -- binary :: Assignment

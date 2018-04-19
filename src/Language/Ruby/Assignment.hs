@@ -353,7 +353,7 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
                 , assign Expression.Times     <$ symbol AnonStarEqual
                 , assign Expression.Power     <$ symbol AnonStarStarEqual
                 , assign Expression.DividedBy <$ symbol AnonSlashEqual
-                , assign Expression.And       <$ symbol AnonPipePipeEqual
+                , assign Expression.Or        <$ symbol AnonPipePipeEqual
                 , assign Expression.BOr       <$ symbol AnonPipeEqual
                 , assign Expression.And       <$ symbol AnonAmpersandAmpersandEqual
                 , assign Expression.BAnd      <$ symbol AnonAmpersandEqual

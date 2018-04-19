@@ -122,6 +122,29 @@ instance Show1 PostDecrement where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for PostDecrement
 instance Evaluatable PostDecrement
 
+-- | Pre increment operator (e.g. ++1 in C or Java).
+newtype PreIncrement a = PreIncrement a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 PreIncrement where liftEq = genericLiftEq
+instance Ord1 PreIncrement where liftCompare = genericLiftCompare
+instance Show1 PreIncrement where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for PreIncrement
+instance Evaluatable PreIncrement
+
+
+-- | Pre decrement operator (e.g. --1 in C or Java).
+newtype PreDecrement a = PreDecrement a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 PreDecrement where liftEq = genericLiftEq
+instance Ord1 PreDecrement where liftCompare = genericLiftCompare
+instance Show1 PreDecrement where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for PreDecrement
+instance Evaluatable PreDecrement
+
 
 -- Returns
 
