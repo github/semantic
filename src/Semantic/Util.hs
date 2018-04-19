@@ -46,44 +46,44 @@ import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 
--- Ruby
-evalRubyProject = runEvaluatingWithPrelude rubyParser ["rb"]
-evalRubyFile path = runEvaluating <$> (withPrelude <$> parsePrelude rubyParser <*> (evaluateModule <$> parseFile rubyParser Nothing path))
-
-evalRubyProjectGraph path = runAnalysis @(ImportGraphing (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise Ruby.Term) Ruby.Term (Value (Located Precise Ruby.Term)))))))) <$> (withPrelude <$> parsePrelude rubyParser <*> (evaluatePackageBody <$> parseProject rubyParser ["rb"] path))
-
-evalRubyImportGraph paths = runAnalysis @(ImportGraphing (Evaluating (Located Precise Ruby.Term) Ruby.Term (Value (Located Precise Ruby.Term)))) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
-
-evalRubyBadVariables paths = runAnalysis @(BadVariables (Evaluating Precise Ruby.Term (Value Precise))) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
-
--- Go
-evalGoProject path = runEvaluating . evaluatePackageBody <$> parseProject goParser ["go"] path
-evalGoFile path = runEvaluating . evaluateModule <$> parseFile goParser Nothing path
-
-typecheckGoFile path = runAnalysis @(Caching (Evaluating Monovariant Go.Term Type)) . evaluateModule <$> parseFile goParser Nothing path
-
--- Python
-evalPythonProject = runEvaluatingWithPrelude pythonParser ["py"]
-evalPythonFile path = runEvaluating <$> (withPrelude <$> parsePrelude pythonParser <*> (evaluateModule <$> parseFile pythonParser Nothing path))
-evalPythonProjectGraph path = runAnalysis @(ImportGraphing (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise Python.Term) Python.Term (Value (Located Precise Python.Term)))))))) <$> (withPrelude <$> parsePrelude pythonParser <*> (evaluatePackageBody <$> parseProject pythonParser ["py"] path))
-
-typecheckPythonFile path = runAnalysis @(Caching (Evaluating Monovariant Python.Term Type)) . evaluateModule <$> parseFile pythonParser Nothing path
-tracePythonFile path = runAnalysis @(Tracing [] (Evaluating Precise Python.Term (Value Precise))) . evaluateModule <$> parseFile pythonParser Nothing path
-evalDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] (Evaluating Precise Python.Term (Value Precise)))) . evaluateModule <$> parseFile pythonParser Nothing path
-
--- PHP
-evalPHPProject path = runEvaluating . evaluatePackageBody <$> parseProject phpParser ["php"] path
-evalPHPFile path = runEvaluating . evaluateModule <$> parseFile phpParser Nothing path
-
--- TypeScript
-evalTypeScriptProject path = runEvaluating . evaluatePackageBody <$> parseProject typescriptParser ["ts", "tsx"] path
-evalTypeScriptFile path = runEvaluating . evaluateModule <$> parseFile typescriptParser Nothing path
-typecheckTypeScriptFile path = runAnalysis @(Caching (Evaluating Monovariant TypeScript.Term Type)) . evaluateModule <$> parseFile typescriptParser Nothing path
+-- -- Ruby
+-- evalRubyProject = runEvaluatingWithPrelude rubyParser ["rb"]
+-- evalRubyFile path = runEvaluating <$> (withPrelude <$> parsePrelude rubyParser <*> (evaluateModule <$> parseFile rubyParser Nothing path))
+--
+-- evalRubyProjectGraph path = runAnalysis @(ImportGraphing (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise Ruby.Term) Ruby.Term (Value (Located Precise Ruby.Term)))))))) <$> (withPrelude <$> parsePrelude rubyParser <*> (evaluatePackageBody <$> parseProject rubyParser ["rb"] path))
+--
+-- evalRubyImportGraph paths = runAnalysis @(ImportGraphing (Evaluating (Located Precise Ruby.Term) Ruby.Term (Value (Located Precise Ruby.Term)))) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
+--
+-- evalRubyBadVariables paths = runAnalysis @(BadVariables (Evaluating Precise Ruby.Term (Value Precise))) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
+--
+-- -- Go
+-- evalGoProject path = runEvaluating . evaluatePackageBody <$> parseProject goParser ["go"] path
+-- evalGoFile path = runEvaluating . evaluateModule <$> parseFile goParser Nothing path
+--
+-- typecheckGoFile path = runAnalysis @(Caching (Evaluating Monovariant Go.Term Type)) . evaluateModule <$> parseFile goParser Nothing path
+--
+-- -- Python
+-- evalPythonProject = runEvaluatingWithPrelude pythonParser ["py"]
+-- evalPythonFile path = runEvaluating <$> (withPrelude <$> parsePrelude pythonParser <*> (evaluateModule <$> parseFile pythonParser Nothing path))
+-- evalPythonProjectGraph path = runAnalysis @(ImportGraphing (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise Python.Term) Python.Term (Value (Located Precise Python.Term)))))))) <$> (withPrelude <$> parsePrelude pythonParser <*> (evaluatePackageBody <$> parseProject pythonParser ["py"] path))
+--
+-- typecheckPythonFile path = runAnalysis @(Caching (Evaluating Monovariant Python.Term Type)) . evaluateModule <$> parseFile pythonParser Nothing path
+-- tracePythonFile path = runAnalysis @(Tracing [] (Evaluating Precise Python.Term (Value Precise))) . evaluateModule <$> parseFile pythonParser Nothing path
+-- evalDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] (Evaluating Precise Python.Term (Value Precise)))) . evaluateModule <$> parseFile pythonParser Nothing path
+--
+-- -- PHP
+-- evalPHPProject path = runEvaluating . evaluatePackageBody <$> parseProject phpParser ["php"] path
+-- evalPHPFile path = runEvaluating . evaluateModule <$> parseFile phpParser Nothing path
+--
+-- -- TypeScript
+-- evalTypeScriptProject path = runEvaluating . evaluatePackageBody <$> parseProject typescriptParser ["ts", "tsx"] path
+-- evalTypeScriptFile path = runEvaluating . evaluateModule <$> parseFile typescriptParser Nothing path
+-- typecheckTypeScriptFile path = runAnalysis @(Caching (Evaluating Monovariant TypeScript.Term Type)) . evaluateModule <$> parseFile typescriptParser Nothing path
 
 -- JavaScript
 evalJavaScriptProject path = runAnalysis @(EvaluatingWithHoles TypeScript.Term) . evaluatePackageBody <$> parseProject typescriptParser ["js"] path
 
-runEvaluatingWithPrelude parser exts path = runEvaluating <$> (withPrelude <$> parsePrelude parser <*> (evaluatePackageBody <$> parseProject parser exts path))
+-- runEvaluatingWithPrelude parser exts path = runEvaluating <$> (withPrelude <$> parsePrelude parser <*> (evaluatePackageBody <$> parseProject parser exts path))
 
 type EvaluatingWithHoles term = BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term))))))
 type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
@@ -129,8 +129,8 @@ parseFile parser rootDir path = runTask $ do
 parseFiles :: Parser term -> FilePath -> [FilePath] -> IO [Module term]
 parseFiles parser rootDir = traverse (parseFile parser (Just rootDir))
 
-parsePackage :: PackageName -> Parser term -> FilePath -> [FilePath] -> IO (Package term)
-parsePackage name parser rootDir = runTask . Task.parsePackage name parser rootDir
+-- parsePackage :: PackageName -> Parser term -> FilePath -> [FilePath] -> IO (Package term)
+-- parsePackage name parser rootDir = runTask . Task.parsePackage name parser rootDir
 
 
 -- Read a file from the filesystem into a Blob.
