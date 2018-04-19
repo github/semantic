@@ -192,9 +192,8 @@ instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedName where
   eval (fmap subtermValue -> QualifiedName name iden) = do
-    name' <- name
-    lhs <- scopedEnvironment name'
-    maybe (throwValueError . ScopedEnvironmentError $ pure name') (flip localEnv iden . mappend) lhs
+    lhs <- name >>= scopedEnvironment
+    localEnv (mappend lhs) iden
 
 
 newtype NamespaceName a = NamespaceName (NonEmpty a)
@@ -208,9 +207,8 @@ instance Evaluatable NamespaceName where
   eval (NamespaceName xs) = foldl1 f $ fmap subtermValue xs
     where
       f ns nam = do
-        ns' <- ns
-        env <- scopedEnvironment ns'
-        maybe (throwValueError . ScopedEnvironmentError $ pure ns') (flip localEnv nam . mappend) env
+        env <- ns >>= scopedEnvironment
+        localEnv (mappend env) nam
 
 newtype ConstDeclaration a = ConstDeclaration [a]
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

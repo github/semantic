@@ -103,9 +103,8 @@ instance Evaluatable Assignment where
         assign addr v
         modifyEnv (Env.insert name addr) $> v
       _ -> do
-        target' <- subtermValue assignmentTarget
-        lhs <- scopedEnvironment target'
-        maybe (throwValueError . ScopedEnvironmentError $ pure target') (flip localEnv (subtermValue assignmentValue) . mappend) lhs
+        lhs <- subtermValue assignmentTarget >>= scopedEnvironment
+        localEnv (mappend lhs) (subtermValue assignmentValue)
 
 -- | Post increment operator (e.g. 1++ in Go, or i++ in C).
 newtype PostIncrement a = PostIncrement a

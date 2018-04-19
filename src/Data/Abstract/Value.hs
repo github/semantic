@@ -224,25 +224,20 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
   klass n [] env = pure . injValue $ Class n env
   klass n supers env = do
     product <- mconcat <$> traverse scopedEnvironment supers
-    case product of
-      Just product' -> pure . injValue $ Class n (Env.push product' <> env)
-      Nothing -> throwValueError $ ScopedEnvironmentError supers
-
+    pure . injValue $ Class n (Env.push product <> env)
 
   namespace n env = do
     maybeAddr <- lookupEnv n
-    case maybeAddr of
-      Just address -> do
-        maybeVal <- prjValue <$> deref address
-        case maybeVal of
-          Just Namespace{..} -> pure (injValue (Namespace n (Env.mergeNewer namespaceScope env)))
-          val -> throwValueError $ NamespaceError ("expected " <> show val <> " to be a namespace")
-      Nothing -> Prologue.fail $ "expected address: " <> show n <> "to be in the environment"
+    env' <- maybe (pure mempty) (asNamespaceEnv <=< deref) maybeAddr
+    pure (injValue (Namespace n (Env.mergeNewer env' env)))
+    where asNamespaceEnv v
+            | Just (Namespace _ env') <- prjValue v = pure env'
+            | otherwise                             = throwException $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
   scopedEnvironment o
-    | Just (Class _ env) <- prjValue o = pure (Just env)
-    | Just (Namespace _ env) <- prjValue o = pure (Just env)
-    | otherwise = throwValueError (ScopedEnvironmentError $ pure o) >> pure Nothing
+    | Just (Class _ env) <- prjValue o = pure env
+    | Just (Namespace _ env) <- prjValue o = pure env
+    | otherwise = throwException $ ScopedEnvironmentError ("object type passed to scopedEnvironment doesn't have an environment: " <> show o)
 
   asString v
     | Just (String n) <- prjValue v = pure n
@@ -271,7 +266,7 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
 
   liftNumeric2 f left right
     | Just (Integer  i, Integer j)  <- prjPair pair = f i j & specialize
-      | Just (Integer  i, Rational j) <- prjPair pair = f i j & specialize
+    | Just (Integer  i, Rational j) <- prjPair pair = f i j & specialize
     | Just (Integer  i, Float j)    <- prjPair pair = f i j & specialize
     | Just (Rational i, Integer j)  <- prjPair pair = f i j & specialize
     | Just (Rational i, Rational j) <- prjPair pair = f i j & specialize

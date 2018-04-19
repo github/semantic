@@ -47,9 +47,8 @@ instance Evaluatable Send where
 
     func <- case sendReceiver of
       Just recv -> do
-        val <- subtermValue recv
-        recvEnv <- scopedEnvironment val
-        maybe (throwValueError . ScopedEnvironmentError $ pure val) (flip localEnv sel . mappend) recvEnv
+        recvEnv <- subtermValue recv >>= scopedEnvironment
+        localEnv (mappend recvEnv) sel
       Nothing -> sel -- TODO Does this require `localize` so we don't leak terms when resolving `sendSelector`?
 
     call func (map subtermValue sendArgs) -- TODO pass through sendBlock

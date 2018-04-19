@@ -32,12 +32,12 @@ deriving instance Member NonDet effects => Alternative (Evaluating location term
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects location term value
-  = '[ Resumable (AddressError location value)
-     , Resumable (EvalError value)
+  = '[ Resumable (EvalError value)
      , Resumable (ResolutionError value)
      , Resumable (LoadError term value)
      , Resumable (ValueError location value)
      , Resumable (Unspecialized value)
+     , Resumable (AddressError location value)
      , Fail                                         -- Failure with an error message
      , Fresh                                        -- For allocating new addresses and/or type variables.
      , Reader (SomeOrigin term)                     -- The current term’s origin.
