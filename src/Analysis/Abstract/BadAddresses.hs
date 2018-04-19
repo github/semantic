@@ -2,7 +2,6 @@
 module Analysis.Abstract.BadAddresses where
 
 import Control.Abstract.Analysis
-import Data.Abstract.Evaluatable
 import Analysis.Abstract.Evaluating
 import Prologue
 
@@ -29,6 +28,6 @@ instance ( Effectful m
         \yield error -> do
           traceM ("AddressError:" <> show error)
           case error of
-            (UninitializedAddress address) -> hole >>= yield)
+            (UninitializedAddress _) -> hole >>= yield)
 
   analyzeModule = liftAnalyze analyzeModule
