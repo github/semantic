@@ -245,11 +245,11 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
 
   ifthenelse cond if' else' = do
     isHole <- isHole cond
-    if isHole then do
+    if isHole then
+      hole
+    else do
       bool <- asBool cond
       if bool then if' else else'
-    else
-      hole
 
   asBool val
     | Just (Boolean b) <- prjValue val = pure b
