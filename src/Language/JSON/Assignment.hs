@@ -23,10 +23,8 @@ type Syntax =
   , Literal.Float
   , Literal.KeyValue
   , Literal.Null
-  , Literal.String
   , Literal.TextElement
   , Syntax.Error
-  , []
   ]
 
 type Term = Term.Term (Union Syntax) (Record Location)
