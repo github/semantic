@@ -28,20 +28,22 @@ instance ( Effectful m
   type Effects location term value (BadValues m effects) = State [Name] ': Effects location term value (m effects)
 
   analyzeTerm eval term = resumeException @(ValueError location value) (liftAnalyze analyzeTerm eval term) (
-        \yield error -> case error of
-          ScopedEnvironmentError{} -> do
-            env <- getEnv
-            yield (Env.push env)
-          CallError val              -> yield val
-          StringError val            -> yield (pack $ show val)
-          BoolError{}                -> yield True
-          NumericError{}             -> unit >>= yield
-          Numeric2Error{}            -> unit >>= yield
-          ComparisonError{}          -> unit >>= yield
-          NamespaceError{}           -> getEnv >>= yield
-          BitwiseError{}             -> unit >>= yield
-          Bitwise2Error{}            -> unit >>= yield
-          KeyValueError{}            -> unit >>= \x -> yield (x, x)
+        \yield error -> do
+          traceM ("ValueError" <> show error)
+          case error of
+            ScopedEnvironmentError{} -> do
+              env <- getEnv
+              yield (Env.push env)
+            CallError val              -> yield val
+            StringError val            -> yield (pack $ show val)
+            BoolError{}                -> yield True
+            NumericError{}             -> hole >>= yield
+            Numeric2Error{}            -> hole >>= yield
+            ComparisonError{}          -> hole >>= yield
+            NamespaceError{}           -> getEnv >>= yield
+            BitwiseError{}             -> hole >>= yield
+            Bitwise2Error{}            -> hole >>= yield
+            KeyValueError{}            -> hole >>= \x -> yield (x, x)
           )
 
   analyzeModule = liftAnalyze analyzeModule

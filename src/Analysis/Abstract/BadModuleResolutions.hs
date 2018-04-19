@@ -26,8 +26,10 @@ instance ( Effectful m
   type Effects location term value (BadModuleResolutions m effects) = State [Name] ': Effects location term value (m effects)
 
   analyzeTerm eval term = resumeException @(ResolutionError value) (liftAnalyze analyzeTerm eval term) (
-        \yield error -> case error of
-          (RubyError nameToResolve) -> yield nameToResolve
-          (TypeScriptError nameToResolve) -> yield nameToResolve)
+        \yield error -> do
+          traceM ("ResolutionError:" <> show error)
+          case error of
+            (RubyError nameToResolve) -> yield nameToResolve
+            (TypeScriptError nameToResolve) -> yield nameToResolve)
 
   analyzeModule = liftAnalyze analyzeModule

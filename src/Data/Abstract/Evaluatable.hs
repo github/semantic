@@ -53,6 +53,7 @@ type MonadEvaluatable location term value m =
   , MonadThrow (LoadError term value) m
   , MonadThrow (EvalError value) m
   , MonadThrow (ResolutionError value) m
+  , MonadThrow (AddressError location value) m
   , MonadValue location value m
   , Recursive term
   , Reducer value (Cell location value)
@@ -215,6 +216,7 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= eva
           modifyLoadStack (loadStackPush mPath)
           v <- trace ("load (evaluating): " <> show mPath) $ evaluateModule x
           modifyLoadStack loadStackPop
+          traceM ("load done:" <> show mPath)
           env <- filterEnv <$> getExports <*> getEnv
           modifyModuleTable (ModuleTable.insert name (env, v))
           pure (env, v)
