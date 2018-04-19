@@ -297,7 +297,7 @@ binaryOperator = makeTerm' <$> symbol BinaryOperator <*> children (infixTerm exp
   , (inj .) . Expression.Times     <$ symbol AnonStar
   , (inj .) . Expression.Times     <$ symbol AnonAt -- Matrix multiplication, TODO: May not want to assign to Expression.Times.
   , (inj .) . Expression.DividedBy <$ symbol AnonSlash
-  , (inj .) . Expression.DividedBy <$ symbol AnonSlashSlash
+  , (inj .) . Expression.FloorDivision <$ symbol AnonSlashSlash
   , (inj .) . Expression.Modulo    <$ symbol AnonPercent
   , (inj .) . Expression.Power     <$ symbol AnonStarStar
   , (inj .) . Expression.BOr       <$ symbol AnonPipe
