@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE TypeFamilies, UndecidableInstances, GADTs #-}
 module Control.Abstract.Addressable where
 
 import Control.Abstract.Evaluator
@@ -65,8 +65,8 @@ instance (Alternative m, MonadFresh m) => MonadAddressable Monovariant m where
   allocLoc = pure . Monovariant
 
 -- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
-deref :: (MonadFail m, MonadAddressable location m, MonadHeap location value m, Show location) => Address location value -> m value
-deref addr = lookupHeap addr >>= maybe (uninitializedAddress addr) (derefCell addr)
+deref :: (MonadThrow (AddressError location value) m, MonadAddressable location m, MonadHeap location value m) => Address location value -> m value
+deref addr = lookupHeap addr >>= maybe (throwAddressError $ UninitializedAddress addr) (derefCell addr)
 
 alloc :: MonadAddressable location m => Name -> m (Address location value)
 alloc = fmap Address . allocLoc
@@ -74,3 +74,18 @@ alloc = fmap Address . allocLoc
 -- | Fail with a message denoting an uninitialized address (i.e. one which was 'alloc'ated, but never 'assign'ed a value before being 'deref'erenced).
 uninitializedAddress :: (MonadFail m, Show location) => Address location value -> m a
 uninitializedAddress addr = fail $ "uninitialized address: " <> show addr
+
+data AddressError location value resume where
+  UninitializedAddress :: Address location value -> AddressError location value value
+
+deriving instance Eq location => Eq (AddressError location value resume)
+deriving instance Show location => Show (AddressError location value resume)
+instance Show location => Show1 (AddressError location value) where
+  liftShowsPrec _ _ = showsPrec
+instance Eq location => Eq1 (AddressError location value) where
+  liftEq _ (UninitializedAddress a) (UninitializedAddress b)     = a == b
+
+
+throwAddressError :: (MonadThrow (AddressError location value) m) => AddressError location value resume -> m resume
+throwAddressError = throwException
+

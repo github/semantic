@@ -47,6 +47,7 @@ module Semantic.Task
 , Telemetry
 ) where
 
+import           Analysis.Abstract.BadAddresses
 import           Analysis.Abstract.BadModuleResolutions
 import           Analysis.Abstract.BadValues
 import           Analysis.Abstract.BadVariables
@@ -139,7 +140,7 @@ render renderer = send . Render renderer
 
 type ImportGraphAnalysis term effects value =
   Abstract.ImportGraphing
-    (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term)))))))
+    (BadAddresses (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term))))))))
     effects
     value
 
@@ -167,7 +168,7 @@ graphImports prelude package = analyze (Analysis.SomeAnalysis (withPrelude prelu
     asAnalysisForTypeOfPackage = const
 
     extractGraph result = case result of
-      (Right (Right (Right (Right (Right (Right ((((_, graph), _), _), _)))))), _) -> pure $! graph
+      (Right (Right (Right (Right (Right (Right (Right ((((_, graph), _), _), _))))))), _) -> pure $! graph
       _ -> throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
 
     withPrelude Nothing a = a

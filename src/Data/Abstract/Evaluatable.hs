@@ -53,6 +53,7 @@ type MonadEvaluatable location term value m =
   , MonadThrow (LoadError term value) m
   , MonadThrow (EvalError value) m
   , MonadThrow (ResolutionError value) m
+  , MonadThrow (AddressError location value) m
   , MonadValue location value m
   , Recursive term
   , Reducer value (Cell location value)
