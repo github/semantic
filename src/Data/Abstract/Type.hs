@@ -27,6 +27,7 @@ data Type
   | Hash [(Type, Type)] -- ^ Heterogenous key-value maps.
   | Object              -- ^ Objects. Once we have some notion of inheritance we'll need to store a superclass.
   | Null                -- ^ The null type. Unlike 'Unit', this unifies with any other type.
+  | Hole                -- ^ The hole type.
   deriving (Eq, Ord, Show)
 
 -- TODO: À la carte representation of types.
@@ -70,6 +71,7 @@ instance ( Alternative m
     ret <- localEnv (mappend env) body
     pure (Product tvars :-> ret)
 
+  hole       = pure Hole
   unit       = pure Unit
   integer _  = pure Int
   boolean _  = pure Bool
@@ -92,6 +94,8 @@ instance ( Alternative m
   asString _ = fail "Must evaluate to Value to use asString"
   asPair _   = fail "Must evaluate to Value to use asPair"
   asBool _ = fail "Must evaluate to Value to use asBool"
+
+  isHole ty = pure (ty == Hole)
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 
