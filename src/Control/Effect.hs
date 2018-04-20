@@ -8,16 +8,17 @@ module Control.Effect
 , mergeEither
 ) where
 
-import Control.Monad.Effect as Effect
-import Control.Monad.Effect.Fail
-import Control.Monad.Effect.NonDet
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.Resumable
-import Control.Monad.Effect.State
-import Control.Monad.Effect.Writer
-import Data.Empty as E
-import Data.Semigroup.Reducer
-import Prologue
+import           Control.Monad.Effect           as Effect
+import           Control.Monad.Effect.Exception as Exception
+import           Control.Monad.Effect.Fail
+import           Control.Monad.Effect.NonDet
+import           Control.Monad.Effect.Reader
+import           Control.Monad.Effect.Resumable as Resumable
+import           Control.Monad.Effect.State
+import           Control.Monad.Effect.Writer
+import           Data.Empty                     as E
+import           Data.Semigroup.Reducer
+import           Prologue
 
 -- | Run an 'Effectful' computation to completion, interpreting each effect with some sensible defaults, and return the 'Final' result.
 run :: (Effectful m, RunEffects effects a) => m effects a -> Final effects a
@@ -74,7 +75,11 @@ instance Ord a => RunEffect NonDet a where
 -- | 'Resumable' effects are interpreted into 'Either' s.t. failures are in 'Left' and successful results are in 'Right'.
 instance RunEffect (Resumable exc) a where
   type Result (Resumable exc) a = Either (SomeExc exc) a
-  runEffect = runError
+  runEffect = Resumable.runError
+
+instance RunEffect (Exc exc) a where
+  type Result (Exc exc) a = Either exc a
+  runEffect = Exception.runError
 
 resume :: (Resumable exc :< e, Effectful m) => m e a -> (forall v . (v -> m e a) -> exc v -> m e a) -> m e a
 resume m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
