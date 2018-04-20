@@ -16,7 +16,7 @@ import qualified Paths_semantic as Library (version)
 import           Prologue
 import           Rendering.Renderer
 import qualified Semantic.Diff as Semantic (diffBlobPairs)
-import qualified Semantic.Graph as Semantic (graph)
+import qualified Semantic.Graph as Semantic (graph, graphPackage)
 import           Semantic.IO (languageForFilePath)
 import qualified Semantic.Log as Log
 import qualified Semantic.Parse as Semantic (parseBlobs)
@@ -88,9 +88,9 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     graphArgumentsParser = do
       renderer <- flag (SomeRenderer DOTGraphRenderer) (SomeRenderer DOTGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
               <|> flag'                                (SomeRenderer JSONGraphRenderer) (long "json" <> help "Output JSON graph")
-      rootDir <- optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file's directory." <> metavar "DIRECTORY"))
-      entryPoint <- argument filePathReader (metavar "ENTRY_FILE")
-      pure $ runGraph renderer rootDir entryPoint
+      rootDir <- strOption (long "root" <> help "Root directory of project." <> metavar "DIRECTORY")
+      language <- strOption (long "language" <> help "The language of the project." <> metavar "LANGUAGE")
+      pure $ Semantic.graphPackage renderer rootDir language
 
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of
