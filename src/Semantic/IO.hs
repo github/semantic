@@ -11,7 +11,6 @@ module Semantic.IO
 , NoLanguageForBlob(..)
 , readBlob
 , readProject
-, listFiles
 , readBlobs
 , readBlobPairs
 , writeToOutput
@@ -153,12 +152,6 @@ newtype NoLanguageForBlob = NoLanguageForBlob FilePath
 readBlob :: Member Files effs => File -> Eff effs Blob.Blob
 readBlob = send . ReadBlob
 
-readProject :: Member Files effs => Maybe FilePath -> NonEmpty File -> Eff effs Project
-readProject dir files = send (ReadProject dir files)
-
-listFiles :: Member Files effs => FilePath -> [String] -> Eff effs [FilePath]
-listFiles dir exts = send (ListFiles dir exts)
-
 -- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
 readBlobs :: Member Files effs => Either Handle [File] -> Eff effs [Blob.Blob]
 readBlobs = send . ReadBlobs
@@ -166,6 +159,9 @@ readBlobs = send . ReadBlobs
 -- | A task which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
 readBlobPairs :: Member Files effs => Either Handle [Both File] -> Eff effs [Blob.BlobPair]
 readBlobPairs = send . ReadBlobPairs
+
+readProject :: Member Files effs => Maybe FilePath -> NonEmpty File -> Eff effs Project
+readProject dir files = send (ReadProject dir files)
 
 -- | A task which writes a 'B.ByteString' to a 'Handle' or a 'FilePath'.
 writeToOutput :: Member Files effs => Either Handle FilePath -> B.ByteString -> Eff effs ()
@@ -175,24 +171,20 @@ writeToOutput path = send . WriteToOutput path
 -- | An effect to read/write 'Blob.Blob's from 'Handle's or 'FilePath's.
 data Files out where
   ReadBlob      :: File -> Files Blob.Blob
-  ReadProject   :: Maybe FilePath -> NonEmpty File -> Files Project
-  ListFiles     :: FilePath -> [String] -> Files [FilePath]
-
   ReadBlobs     :: Either Handle [File] -> Files [Blob.Blob]
   ReadBlobPairs :: Either Handle [Both File] -> Files [Blob.BlobPair]
+  ReadProject   :: Maybe FilePath -> NonEmpty File -> Files Project
   WriteToOutput :: Either Handle FilePath -> B.ByteString -> Files ()
 
 -- | Run a 'Files' effect in 'IO'.
 runFiles :: Members '[Exc SomeException, IO] effs => Eff (Files ': effs) a -> Eff effs a
 runFiles = interpret $ \ files -> case files of
   ReadBlob path -> rethrowing (readBlobFromPath path)
-  ReadProject dir files -> rethrowing (readProjectFromPaths dir files)
-  ListFiles directory exts -> liftIO $ fmap fold (globDir (compile . mappend "**/*." <$> exts) directory)
-
   ReadBlobs (Left handle) -> rethrowing (readBlobsFromHandle handle)
   ReadBlobs (Right paths@[File path Nothing]) -> rethrowing (isDirectory path >>= bool (readBlobsFromPaths paths) (readBlobsFromDir path))
   ReadBlobs (Right paths) -> rethrowing (readBlobsFromPaths paths)
   ReadBlobPairs source -> rethrowing (either readBlobPairsFromHandle (traverse (runBothWith readFilePair)) source)
+  ReadProject dir files -> rethrowing (readProjectFromPaths dir files)
   WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents)
 
 

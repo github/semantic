@@ -7,11 +7,10 @@ module Semantic.Task
 , RAlgebra
 , Differ
 -- * I/O
-, IO.listFiles
-, IO.readProject
 , IO.readBlob
 , IO.readBlobs
 , IO.readBlobPairs
+, IO.readProject
 , IO.writeToOutput
 -- * Telemetry
 , writeLog
