@@ -168,7 +168,7 @@ graphImports prelude package = analyze (Analysis.SomeAnalysis (withPrelude prelu
     asAnalysisForTypeOfPackage = const
 
     extractGraph result = case result of
-      (Right (Right (Right (Right (Right (Right (Right ((((_, graph), _), _), _))))))), _) -> pure $! graph
+      (Right (Right (Right (Right (Right (Right (Right (Right ((((_, graph), _), _), _)))))))), _) -> pure $! graph
       _ -> throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
 
     withPrelude Nothing a = a

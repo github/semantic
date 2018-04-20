@@ -243,6 +243,7 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
   , assign Expression.BXOr <$ symbol AnonCaretEqual
   , assign Expression.BAnd <$ symbol AnonAmpersandEqual
   , assign Expression.RShift <$ symbol AnonRAngleRAngleEqual
+  , assign Expression.LShift <$ symbol AnonLAngleLAngleEqual
   , assign Expression.UnsignedRShift <$ symbol AnonRAngleRAngleRAngleEqual
   , assign Expression.LShift <$ symbol AnonLAngleLAngleEqual
   , assign Expression.BOr <$ symbol AnonPipeEqual ])
