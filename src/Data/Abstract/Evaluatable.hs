@@ -10,7 +10,6 @@ module Data.Abstract.Evaluatable
 , variable
 , evaluateTerm
 , evaluateModule
-, evaluateModules
 , evaluatePackage
 , evaluatePackageBody
 , throwLoadError
@@ -243,12 +242,6 @@ evaluateModule :: MonadEvaluatable location term value m
                => Module term
                -> m value
 evaluateModule m = analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evaluateTerm) m)
-
--- | Evaluate with a list of modules in scope, taking the head module as the entry point.
-evaluateModules :: MonadEvaluatable location term value m
-                => [Module term]
-                -> m value
-evaluateModules = fmap Prelude.head . evaluatePackageBody . Package.fromModules
 
 -- | Evaluate a given package.
 evaluatePackage :: ( Effectful m
