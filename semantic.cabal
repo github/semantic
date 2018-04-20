@@ -183,6 +183,7 @@ library
                      , optparse-applicative
                      , parallel
                      , parsers
+                     , path
                      , recursion-schemes
                      , reducers
                      , scientific
