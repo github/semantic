@@ -7,6 +7,7 @@ module Data.Abstract.Evaluatable
 , LoadError(..)
 , EvalError(..)
 , ResolutionError(..)
+, ControlThrow(..)
 , variable
 , evaluateTerm
 , evaluateModule
@@ -54,11 +55,23 @@ type MonadEvaluatable location term value m =
   , MonadThrow (EvalError value) m
   , MonadThrow (ResolutionError value) m
   , MonadThrow (AddressError location value) m
+  , MonadThrow (ControlThrow value) m
   , MonadValue location value m
   , Recursive term
   , Reducer value (Cell location value)
   , Show location
   )
+
+data ControlThrow value resume where
+  Ret :: value -> ControlThrow value resume
+
+deriving instance Show value => Show (ControlThrow value resume)
+instance Show value => Show1 (ControlThrow value) where
+  liftShowsPrec _ _ = showsPrec
+
+deriving instance Eq value => Eq (ControlThrow value resume)
+instance Eq value => Eq1 (ControlThrow value) where
+  liftEq _ (Ret a) (Ret b) = a == b
 
 -- | An error thrown when we can't resolve a module from a qualified name.
 data ResolutionError value resume where

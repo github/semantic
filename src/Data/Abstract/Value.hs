@@ -328,7 +328,13 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
           a <- alloc name
           assign a v
           Env.insert name a <$> rest) (pure env) (zip names params)
-        localEnv (mappend bindings) (goto label >>= evaluateTerm)
+        localEnv (mappend bindings) (evalClosure label)
       Nothing -> throwValueError (CallError op)
+    where
+      evalClosure :: Label -> m (Value location)
+      evalClosure lab = catchException (goto lab >>= evaluateTerm) handleReturn
+
+      handleReturn :: ControlThrow (Value location) r -> m (Value location)
+      handleReturn (Ret v) = pure v
 
   loop = fix
