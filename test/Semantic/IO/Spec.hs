@@ -12,7 +12,7 @@ spec :: Spec
 spec = parallel $ do
   describe "readFile" $ do
     it "returns a blob for extant files" $ do
-      Just blob <- readFile "semantic.cabal" Nothing
+      Just blob <- readFile (File "semantic.cabal" Nothing)
       blobPath blob `shouldBe` "semantic.cabal"
 
     it "throws for absent files" $ do

@@ -17,6 +17,7 @@ import Data.Abstract.FreeVariables as X hiding (dropExtension)
 import Data.Abstract.Heap as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
 import Data.Blob as X
+import Data.File as X
 import Data.Functor.Listable as X
 import Data.Language as X
 import Data.Output as X
@@ -55,11 +56,11 @@ diffFilePaths paths = readFilePair paths >>= runTask . diffBlobPair SExpressionD
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFilePath :: FilePath -> IO ByteString
-parseFilePath path = (fromJust <$> IO.readFile path (IO.languageForFilePath path)) >>= runTask . parseBlob SExpressionTermRenderer
+parseFilePath path = (fromJust <$> IO.readFile (fileDetectingLanguage path)) >>= runTask . parseBlob SExpressionTermRenderer
 
 -- | Read two files to a BlobPair.
 readFilePair :: Both FilePath -> IO BlobPair
-readFilePair paths = let paths' = fmap (\p -> (p, IO.languageForFilePath p)) paths in
+readFilePair paths = let paths' = fmap fileDetectingLanguage paths in
                      runBothWith IO.readFilePair paths'
 
 readFileVerbatim :: FilePath -> IO Verbatim
