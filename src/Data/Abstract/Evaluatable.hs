@@ -113,7 +113,7 @@ data EvalError value resume where
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: MonadEvaluatable location term value m => Name -> m value
-variable name = lookupWith deref name >>= maybeM (throwException (FreeVariableError name))
+variable name = lookupWith deref name >>= maybeM (throwResumable (FreeVariableError name))
 
 deriving instance Eq (EvalError a b)
 deriving instance Show (EvalError a b)
@@ -131,13 +131,13 @@ instance Eq1 (EvalError term) where
 
 
 throwValueError :: MonadEvaluatable location term value m => ValueError location value resume -> m resume
-throwValueError = throwException
+throwValueError = throwResumable
 
 throwLoadError :: MonadEvaluatable location term value m => LoadError term value resume -> m resume
-throwLoadError = throwException
+throwLoadError = throwResumable
 
 throwEvalError :: MonadEvaluatable location term value m => EvalError value resume -> m resume
-throwEvalError = throwException
+throwEvalError = throwResumable
 
 data Unspecialized a b where
   Unspecialized :: { getUnspecialized :: Prelude.String } -> Unspecialized value value
@@ -155,7 +155,7 @@ class Evaluatable constr where
   eval :: MonadEvaluatable location term value m
        => SubtermAlgebra constr term (m value)
   default eval :: (MonadThrow (Unspecialized value) m, Show1 constr) => SubtermAlgebra constr term (m value)
-  eval expr = throwException (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
+  eval expr = throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 
 -- Instances

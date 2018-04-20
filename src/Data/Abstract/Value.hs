@@ -217,7 +217,7 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
 
   asPair val
     | Just (KVPair k v) <- prjValue val = pure (k, v)
-    | otherwise = throwException @(ValueError location (Value location)) $ KeyValueError val
+    | otherwise = throwResumable @(ValueError location (Value location)) $ KeyValueError val
 
   hash = pure . injValue . Hash . fmap (injValue . uncurry KVPair)
 
@@ -232,16 +232,16 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
     pure (injValue (Namespace n (Env.mergeNewer env' env)))
     where asNamespaceEnv v
             | Just (Namespace _ env') <- prjValue v = pure env'
-            | otherwise                             = throwException $ NamespaceError ("expected " <> show v <> " to be a namespace")
+            | otherwise                             = throwResumable $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
   scopedEnvironment o
     | Just (Class _ env) <- prjValue o = pure env
     | Just (Namespace _ env) <- prjValue o = pure env
-    | otherwise = throwException $ ScopedEnvironmentError ("object type passed to scopedEnvironment doesn't have an environment: " <> show o)
+    | otherwise = throwResumable $ ScopedEnvironmentError ("object type passed to scopedEnvironment doesn't have an environment: " <> show o)
 
   asString v
     | Just (String n) <- prjValue v = pure n
-    | otherwise                     = throwException @(ValueError location (Value location)) $ StringError v
+    | otherwise                     = throwResumable @(ValueError location (Value location)) $ StringError v
 
   ifthenelse cond if' else' = do
     isHole <- isHole cond
@@ -253,7 +253,7 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
 
   asBool val
     | Just (Boolean b) <- prjValue val = pure b
-    | otherwise = throwException @(ValueError location (Value location)) $ BoolError val
+    | otherwise = throwResumable @(ValueError location (Value location)) $ BoolError val
 
   isHole val = pure (prjValue val == Just Hole)
 
@@ -332,7 +332,7 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
       Nothing -> throwValueError (CallError op)
     where
       evalClosure :: Label -> m (Value location)
-      evalClosure lab = catchException (goto lab >>= evaluateTerm) handleReturn
+      evalClosure lab = catchResumable (goto lab >>= evaluateTerm) handleReturn
 
       handleReturn :: ControlThrow (Value location) r -> m (Value location)
       handleReturn (Ret v) = pure v

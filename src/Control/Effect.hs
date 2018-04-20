@@ -4,7 +4,7 @@ module Control.Effect
 , RunEffects(..)
 , RunEffect(..)
 , Effectful(..)
-, resumeException
+, resume
 , mergeEither
 ) where
 
@@ -76,8 +76,8 @@ instance RunEffect (Resumable exc) a where
   type Result (Resumable exc) a = Either (SomeExc exc) a
   runEffect = runError
 
-resumeException :: (Resumable exc :< e, Effectful m) => m e a -> (forall v . (v -> m e a) -> exc v -> m e a) -> m e a
-resumeException m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
+resume :: (Resumable exc :< e, Effectful m) => m e a -> (forall v . (v -> m e a) -> exc v -> m e a) -> m e a
+resume m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
 
 -- | Reassociate 'Either's, combining errors into 'Left' values and successes in a single level of 'Right'.
 mergeEither :: Either a (Either b c) -> Either (Either a b) c

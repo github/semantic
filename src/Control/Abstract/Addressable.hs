@@ -87,5 +87,5 @@ instance Eq location => Eq1 (AddressError location value) where
 
 
 throwAddressError :: (MonadThrow (AddressError location value) m) => AddressError location value resume -> m resume
-throwAddressError = throwException
+throwAddressError = throwResumable
 

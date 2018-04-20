@@ -181,9 +181,9 @@ class Monad m => MonadControl term m where
 
 -- | 'Monad's which can throw exceptions of type @exc v@ which can be resumed with a value of type @v@.
 class Monad m => MonadThrow exc m where
-  throwException :: exc v -> m v
-  catchException :: m v -> (forall v1. exc v1 -> m v) -> m v
+  throwResumable :: exc v -> m v
+  catchResumable :: m v -> (forall v1. exc v1 -> m v) -> m v
 
 instance (Effectful m1, Member (Resumable exc) effects, Monad (m1 effects)) => MonadThrow exc (m1 effects) where
-  throwException = raise . throwError
-  catchException c f = raise (Resumable.catchError (lower c) (lower . f))
+  throwResumable = raise . Resumable.throwError
+  catchResumable c f = raise (Resumable.catchError (lower c) (lower . f))
