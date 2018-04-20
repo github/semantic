@@ -31,7 +31,7 @@ import Data.Abstract.Heap
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Semigroup.Reducer
-import Prologue hiding (throwError)
+import Prologue
 
 -- | A 'Monad' providing the basic essentials for evaluation.
 --
