@@ -33,7 +33,7 @@ graph :: (Members '[Distribute WrappedTask, Files, Task, Exc SomeException, Tele
 graph renderer project
   | Just (SomeAnalysisParser parser prelude) <- someAnalysisParser
     (Proxy :: Proxy '[ Analysis.Evaluatable, Analysis.Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) <$> projectLanguage project = do
-    parsePackage parser project prelude >>= graphImports >>= case renderer of
+    parsePackage parser prelude project >>= graphImports >>= case renderer of
       JSONGraphRenderer -> pure . toOutput
       DOTGraphRenderer -> pure . Abstract.renderImportGraph
 
@@ -42,10 +42,10 @@ graph renderer project
 -- | Parse a list of files into a 'Package'.
 parsePackage :: Members '[Distribute WrappedTask, Files, Task] effs
              => Parser term       -- ^ A parser.
-             -> Project           -- ^ Project to parse into a package.
              -> Maybe File        -- ^ Prelude (optional).
+             -> Project           -- ^ Project to parse into a package.
              -> Eff effs (Package term)
-parsePackage parser project@Project{..} preludeFile = do
+parsePackage parser preludeFile project@Project{..} = do
   prelude <- traverse (parseModule parser Nothing) preludeFile
   Package.fromModules n Nothing prelude <$> parseModules parser project
   where
