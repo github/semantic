@@ -13,9 +13,6 @@ data File = File
   }
   deriving (Eq, Ord, Show)
 
-instance IsString File where
-  fromString = fileDetectingLanguage
-
 fileDetectingLanguage :: FilePath -> File
 fileDetectingLanguage path = File path (languageForFilePath path)
   where languageForFilePath = languageForType . takeExtension
