@@ -3,7 +3,7 @@ module Language.Java.Syntax where
 
 import Data.Abstract.Evaluatable hiding (Label)
 import Diffing.Algorithm
-import Prologue
+import Prologue hiding (Constructor)
 
 newtype Import a = Import [a]
   deriving (Diffable, Eq, FreeVariables1, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -66,3 +66,34 @@ instance Show1 Synchronized where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Synchronized
 instance Evaluatable Synchronized
+
+data New a = New { newType :: !a, newArgs :: ![a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 New where liftEq = genericLiftEq
+instance Ord1 New where liftCompare = genericLiftCompare
+instance Show1 New where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for New
+instance Evaluatable New
+
+data Asterisk a = Asterisk
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 Asterisk where liftEq = genericLiftEq
+instance Ord1 Asterisk where liftCompare = genericLiftCompare
+instance Show1 Asterisk where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for New
+instance Evaluatable Asterisk
+
+
+data Constructor a = Constructor { constructorModifiers :: ![a], constructorTypeParams :: ![a], constructorIdentifier :: !a, constructorParams :: ![a], constructorThrows :: ![a], constructorBody :: a}
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 Constructor where liftEq = genericLiftEq
+instance Ord1 Constructor where liftCompare = genericLiftCompare
+instance Show1 Constructor where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for Constructor
+instance Evaluatable Constructor

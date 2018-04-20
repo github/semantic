@@ -8,7 +8,7 @@ module Language.Java.Assignment
 
 import Assigning.Assignment hiding (Assignment, Error, while, try)
 import Data.Abstract.FreeVariables
-import Data.Functor (void, ($>))
+import Data.Functor (($>))
 import Data.List.NonEmpty (some1)
 import Data.Record
 import Data.Semigroup
@@ -35,12 +35,20 @@ type Syntax =
    , Declaration.Method
    , Declaration.VariableDeclaration
    , Expression.Arithmetic
+   , Expression.Call
    , Expression.Comparison
    , Expression.Bitwise
    , Expression.Boolean
+   , Expression.InstanceOf
+   , Expression.MemberAccess
+   , Expression.Super
+   , Expression.This
+   , Java.Syntax.Asterisk
+   , Java.Syntax.Constructor
    , Java.Syntax.EnumDeclaration
    , Java.Syntax.Import
    , Java.Syntax.Module
+   , Java.Syntax.New
    , Java.Syntax.Package
    , Java.Syntax.Synchronized
    , Java.Syntax.Variable
@@ -129,7 +137,9 @@ expressionChoices =
   , break
   , char
   , class'
+  , classInstance
   , continue
+  , constructorDeclaration
   -- , constantDeclaration
   , doWhile
   , float
@@ -142,14 +152,18 @@ expressionChoices =
   , import'
   , integer
   , method
+  , methodInvocation
   , module'
   , null'
   , package
   , return'
+  , scopedIdentifier
   , string
+  , super
   , switch
   , synchronized
   , ternary
+  , this
   , throw
   , try
   , unary
@@ -222,22 +236,32 @@ class' = makeTerm <$> symbol ClassDeclaration <*> children (Declaration.Class <$
 
 -- consolidated with scopedIdentifier
 identifier :: Assignment
-identifier = makeTerm <$> (symbol Identifier <|> symbol ScopedIdentifier <|> symbol TypeIdentifier) <*> (Syntax.Identifier . name <$> source)
+identifier = makeTerm <$> (symbol Identifier <|> symbol TypeIdentifier) <*> (Syntax.Identifier . name <$> source)
+
+scopedIdentifier :: Assignment
+scopedIdentifier = makeTerm <$> symbol ScopedIdentifier <*> children (Expression.MemberAccess <$> term expression <*> term expression)
 
 method :: Assignment
 method = makeTerm <$> symbol MethodDeclaration <*> children (
-             (makeMethod <$> many modifier <* symbol MethodHeader <*> emptyTerm <*> children ((,) <$> type' <* symbol MethodDeclarator <*> children ( (,) <$> identifier <*> manyTerm parameter)) )
+             (makeMethod <$> many modifier <* symbol MethodHeader <*> emptyTerm <*> children ((,) <$> type' <* symbol MethodDeclarator <*> children ( (,) <$> identifier <*> formalParameters)) )
           <* symbol MethodBody <*> children (makeTerm <$> symbol Block <*> children (manyTerm expression))
           )
   where makeMethod modifiers receiver (returnType, (name, params)) body = Declaration.Method (returnType : modifiers) receiver name params body
-        parameter = makeTerm <$> symbol FormalParameter <*> children (flip Type.Annotation <$> type' <* symbol VariableDeclaratorId <*> children identifier)
+
 -- TODO: re-introduce makeTerm later; matching types as part of the type rule for now.
+
+methodInvocation :: Assignment
+methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (Expression.Call [] <$> (callFunction <$> term expression <*> optional (token AnonDot *> term expression)) <*> argumentList <*> emptyTerm)
+  where
+    callFunction a (Just b) = makeTerm1 (Expression.MemberAccess a b)
+    callFunction a Nothing = a
 
 module' :: Assignment
 module' = makeTerm <$> symbol ModuleDeclaration <*> children (Java.Syntax.Module <$> expression <*> many expression)
 
 import' :: Assignment
-import' = makeTerm <$> symbol ImportDeclaration <*> children (Java.Syntax.Import <$> some identifier)
+import' = makeTerm <$> symbol ImportDeclaration <*> children (Java.Syntax.Import <$> someTerm (expression <|> asterisk))
+  where asterisk = makeTerm <$> token Grammar.Asterisk <*> pure Java.Syntax.Asterisk
 
 interface :: Assignment
 interface = makeTerm <$> symbol InterfaceDeclaration <*> children (normal <|> annotationType)
@@ -248,7 +272,7 @@ interface = makeTerm <$> symbol InterfaceDeclaration <*> children (normal <|> an
     annotationTypeBody = makeTerm <$> symbol AnnotationTypeBody <*> children (many expression)
 
 package :: Assignment
-package = makeTerm <$> symbol PackageDeclaration <*> children (Java.Syntax.Package <$> some identifier)
+package = makeTerm <$> symbol PackageDeclaration <*> children (Java.Syntax.Package <$> someTerm expression)
 
 enum :: Assignment
 enum = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Java.Syntax.EnumDeclaration <$> term identifier <*> manyTerm enumConstant)
@@ -385,6 +409,7 @@ binary = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expressio
   , (inj .) . Expression.Minus            <$ symbol AnonMinus
   , (inj .) . Expression.Times            <$ symbol AnonStar
   , (inj .) . Expression.DividedBy        <$ symbol AnonSlash
+  , (inj .) . Expression.InstanceOf       <$ symbol AnonInstanceof
   ])
   where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
@@ -447,13 +472,47 @@ update = makeTerm' <$> symbol UpdateExpression <*> children (
 
 ternary :: Assignment
 ternary = makeTerm <$> symbol TernaryExpression <*> children (Statement.If <$> term expression <*> term expression <*> term expression)
-
 -- delimiter, if optional, need
 -- token vs. symbol -- whether we want to skip past the node or not; token skips past the node; symbol does not
 -- need token or symbol to mention any token/symbol because they take a token and produce a grammar rule
 -- infix operators
--- binary :: Assignment
--- binary = makeTerm
 
 synchronized :: Assignment
 synchronized = makeTerm <$> symbol SynchronizedStatement <*> children (Java.Syntax.Synchronized <$> term expression <*> term expression)
+
+classInstance :: Assignment
+classInstance = makeTerm <$> symbol ClassInstanceCreationExpression <*> children unqualified
+  where
+    unqualified = symbol UnqualifiedClassInstanceCreationExpression *> children (Java.Syntax.New <$> type' <*> (argumentList <|> pure []))
+
+argumentList :: Assignment.Assignment [] Grammar [Term]
+argumentList = symbol ArgumentList *> children (manyTerm expression)
+
+super :: Assignment
+super = makeTerm <$> token Super <*> pure Expression.Super
+-- not a rule so using pure to lift value into an assignment
+
+this :: Assignment
+this = makeTerm <$> token This <*> pure Expression.This
+
+constructorDeclaration :: Assignment
+constructorDeclaration = makeTerm <$> symbol ConstructorDeclaration <*> children (
+  constructor <$> manyTerm modifier <*> constructorDeclarator <*> (throws <|> pure []) <*> constructorBody)
+    where
+      constructorDeclarator = symbol ConstructorDeclarator *> children ((,,) <$> (typeParameters <|> pure []) <*> term identifier <*> formalParameters)
+      constructorBody = makeTerm <$> symbol ConstructorBody <*> children (manyTerm expression) -- wrapping list of terms up in single node
+      constructor modifiers (typeParameters, identifier, formalParameters) = Java.Syntax.Constructor modifiers typeParameters identifier formalParameters -- let partial application do its thing
+
+typeParameters :: Assignment.Assignment [] Grammar [Term]
+typeParameters = symbol TypeParameters *> children (pure [])
+-- stubbing in so deals with empty list
+-- come back and populate this
+
+throws :: Assignment.Assignment [] Grammar [Term]
+throws = symbol Throws *> children (pure [])
+-- TODO: come back and assign
+
+formalParameters :: Assignment.Assignment [] Grammar [Term]
+formalParameters = manyTerm parameter
+  where
+    parameter = makeTerm <$> symbol FormalParameter <*> children (flip Type.Annotation <$> type' <* symbol VariableDeclaratorId <*> children identifier)
