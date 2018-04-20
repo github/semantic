@@ -1,6 +1,7 @@
 -- MonoLocalBinds is to silence a warning about a simplifiable constraint.
 {-# LANGUAGE DataKinds, MonoLocalBinds, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
+{-# OPTIONS_GHC -Wno-unused-imports #-}
 module Semantic.Util where
 
 import Analysis.Abstract.BadVariables
@@ -39,6 +40,7 @@ import Prologue
 import Semantic.Diff (diffTermPair)
 import Semantic.IO as IO
 import Semantic.Task
+import Semantic.Graph
 import qualified Semantic.Task as Task
 import System.FilePath.Posix
 
@@ -86,6 +88,21 @@ import qualified Language.TypeScript.Assignment as TypeScript
 -- evalJavaScriptProject path = parsePackage Nothing typescriptParser (takeDirectory path)
 
 -- runEvaluatingWithPrelude parser exts path = runEvaluating <$> (withPrelude <$> parsePrelude parser <*> (evaluatePackageBody <$> parseProject parser exts path))
+
+-- evalProject path = runTask $ do
+--   project <- readProject Nothing (fileDetectingLanguage path :| [])
+--   let Just (SomeAnalysisParser parser prelude) = someAnalysisParser (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) <$> projectLanguage project
+--   package <- parsePackage parser project prelude
+--   analyze @(EvaluatingWithHoles TypeScript.Term) (evaluatePackage package)
+  -- where
+  --   asAnalysisForTypeOfPackage :: ImportGraphAnalysis term effs value
+  --                              -> Package term
+  --                              -> ImportGraphAnalysis term effs value
+  --   asAnalysisForTypeOfPackage = const
+
+  --
+  -- package <- parsePackage typescriptParser project prelude
+  -- runAnalysis @(EvaluatingWithHoles TypeScript.Term) package
 
 type EvaluatingWithHoles term = BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term))))))
 type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
