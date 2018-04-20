@@ -15,7 +15,7 @@ module Control.Abstract.Evaluator
   , modifyModuleTable
   , modifyLoadStack
   , MonadControl(..)
-  , MonadThrow(..)
+  , MonadResume(..)
   ) where
 
 import Control.Effect
@@ -180,10 +180,10 @@ class Monad m => MonadControl term m where
 
 
 -- | 'Monad's which can throw exceptions of type @exc v@ which can be resumed with a value of type @v@.
-class Monad m => MonadThrow exc m where
+class Monad m => MonadResume exc m where
   throwResumable :: exc v -> m v
   catchResumable :: m v -> (forall v1. exc v1 -> m v) -> m v
 
-instance (Effectful m1, Member (Resumable exc) effects, Monad (m1 effects)) => MonadThrow exc (m1 effects) where
+instance (Effectful m1, Member (Resumable exc) effects, Monad (m1 effects)) => MonadResume exc (m1 effects) where
   throwResumable = raise . Resumable.throwError
   catchResumable c f = raise (Resumable.catchError (lower c) (lower . f))

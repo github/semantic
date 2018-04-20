@@ -49,13 +49,13 @@ type MonadEvaluatable location term value m =
   , Declarations term
   , MonadAddressable location m
   , MonadAnalysis location term value m
-  , MonadThrow (Unspecialized value) m
-  , MonadThrow (ValueError location value) m
-  , MonadThrow (LoadError term value) m
-  , MonadThrow (EvalError value) m
-  , MonadThrow (ResolutionError value) m
-  , MonadThrow (AddressError location value) m
-  , MonadThrow (ControlThrow value) m
+  , MonadResume (Unspecialized value) m
+  , MonadResume (ValueError location value) m
+  , MonadResume (LoadError term value) m
+  , MonadResume (EvalError value) m
+  , MonadResume (ResolutionError value) m
+  , MonadResume (AddressError location value) m
+  , MonadResume (ControlThrow value) m
   , MonadValue location value m
   , Recursive term
   , Reducer value (Cell location value)
@@ -154,7 +154,7 @@ instance Show1 (Unspecialized a) where
 class Evaluatable constr where
   eval :: MonadEvaluatable location term value m
        => SubtermAlgebra constr term (m value)
-  default eval :: (MonadThrow (Unspecialized value) m, Show1 constr) => SubtermAlgebra constr term (m value)
+  default eval :: (MonadResume (Unspecialized value) m, Show1 constr) => SubtermAlgebra constr term (m value)
   eval expr = throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 
