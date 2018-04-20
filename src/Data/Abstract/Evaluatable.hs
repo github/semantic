@@ -263,11 +263,16 @@ evaluatePackage p = pushOrigin (packageOrigin p) (evaluatePackageBody (packageBo
 evaluatePackageBody :: MonadEvaluatable location term value m
                     => PackageBody term
                     -> m [value]
-evaluatePackageBody body = localModuleTable (<> packageModules body)
-  (traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints body)))
-  where evaluateEntryPoint (m, sym) = do
-          (_, v) <- require m
-          maybe (pure v) ((`call` []) <=< variable) sym
+evaluatePackageBody body = withPrelude (packagePrelude body) $
+  localModuleTable (<> packageModules body) (traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints body)))
+  where
+    evaluateEntryPoint (m, sym) = do
+      (_, v) <- require m
+      maybe (pure v) ((`call` []) <=< variable) sym
+    withPrelude Nothing a = a
+    withPrelude (Just prelude) a = do
+      preludeEnv <- evaluateModule prelude *> getEnv
+      withDefaultEnvironment preludeEnv a
 
 -- | Push a 'SomeOrigin' onto the stack. This should be used to contextualize execution with information about the originating term, module, or package.
 pushOrigin :: ( Effectful m

@@ -8,6 +8,7 @@ module Semantic.CLI
 
 import Prologue
 import Data.Language
+import Data.File
 import Data.List (intercalate)
 import Data.List.Split (splitWhen)
 import Data.Version (showVersion)
@@ -35,7 +36,7 @@ runParse :: SomeRenderer TermRenderer -> Either Handle [(FilePath, Maybe Languag
 runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
 
 runGraph :: SomeRenderer GraphRenderer -> Maybe FilePath -> (FilePath, Maybe Language) -> Task.TaskEff ByteString
-runGraph (SomeRenderer r) rootDir = Semantic.graph rootDir r <=< Task.readBlob
+runGraph (SomeRenderer r) rootDir (p, l) = Semantic.graph rootDir r (File p l)
 
 -- | A parser for the application's command-line arguments.
 --

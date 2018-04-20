@@ -18,6 +18,7 @@ newtype Version = Version { versionString :: String }
 
 data PackageBody term = PackageBody
   { packageModules     :: ModuleTable [Module term]
+  , packagePrelude     :: Maybe (Module term)
   , packageEntryPoints :: ModuleTable (Maybe Name)
   }
   deriving (Eq, Functor, Ord, Show)
@@ -30,11 +31,12 @@ data Package term = Package
   }
   deriving (Eq, Functor, Ord, Show)
 
-fromModules :: [Module term] -> PackageBody term
-fromModules []     = PackageBody mempty mempty
-fromModules (m:ms) = fromModulesWithEntryPoint (m : ms) (modulePath (moduleInfo m))
-
-fromModulesWithEntryPoint :: [Module term] -> FilePath -> PackageBody term
-fromModulesWithEntryPoint ms path = PackageBody (ModuleTable.fromModules ms) entryPoints
-  where entryPoints = ModuleTable.singleton path Nothing
-
+fromModules :: PackageName -> Maybe Version -> Maybe (Module term) -> [Module term] -> Package term
+fromModules name version prelude = Package (PackageInfo name version) . go prelude
+  where
+    go :: Maybe (Module term) -> [Module term] -> PackageBody term
+    go p []     = PackageBody mempty p mempty
+    go p (m:ms) = PackageBody (ModuleTable.fromModules (m : ms)) p entryPoints
+      where
+        entryPoints = ModuleTable.singleton path Nothing
+        path = modulePath (moduleInfo m)
