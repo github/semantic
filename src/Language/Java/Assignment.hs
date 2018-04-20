@@ -147,6 +147,7 @@ expressionChoices =
   , return'
   , string
   , switch
+  , ternary
   , throw
   , try
   , unary
@@ -440,6 +441,12 @@ update = makeTerm' <$> symbol UpdateExpression <*> children (
 -- tries them in order; true of alternations, order matters; (if-else)
 -- but choice doesn't have this property (order doesn't matter) because it constructs a jump table (switch)
 
+ternary :: Assignment
+ternary = makeTerm <$> symbol TernaryExpression <*> children (Statement.If <$> term expression <*> term expression <*> term expression)
+
+-- delimiter, if optional, need
+-- token vs. symbol -- whether we want to skip past the node or not; token skips past the node; symbol does not
+-- need token or symbol to mention any token/symbol because they take a token and produce a grammar rule
 -- infix operators
 -- binary :: Assignment
 -- binary = makeTerm
