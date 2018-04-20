@@ -47,6 +47,7 @@ import System.FilePath.Posix
 import qualified Language.Go.Assignment as Go
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
+import qualified Language.PHP.Assignment as PHP
 import qualified Language.TypeScript.Assignment as TypeScript
 
 -- -- Ruby
@@ -89,21 +90,43 @@ import qualified Language.TypeScript.Assignment as TypeScript
 
 -- runEvaluatingWithPrelude parser exts path = runEvaluating <$> (withPrelude <$> parsePrelude parser <*> (evaluatePackageBody <$> parseProject parser exts path))
 
+evalGoProject path = runAnalysis @(JustEvaluating Go.Term) <$> evaluateProject goParser path
+evalRubyProject path = runAnalysis @(JustEvaluating Ruby.Term) <$> evaluateProject rubyParser path
+evalPHPProject path = runAnalysis @(JustEvaluating PHP.Term) <$> evaluateProject phpParser path
+evalPythonProject path = runAnalysis @(JustEvaluating Python.Term) <$> evaluateProject pythonParser path
+evalTypeScriptProject path = runAnalysis @(EvaluatingWithHoles TypeScript.Term) <$> evaluateProject typescriptParser path
+evaluateProject parser path = evaluatePackage <$> runTask (readProject Nothing (fileDetectingLanguage path :| []) >>= parsePackage parser Nothing)
+-- evaluateProject path = evaluatePackage <$> runTask (do
+--   project <- readProject Nothing (fileDetectingLanguage path :| [])
+--   case someAnalysisParser (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) <$> projectLanguage project of
+--     Just (SomeAnalysisParser parser prelude) -> parsePackage parser prelude project
+--     Nothing -> undefined)
+
+
+-- evalJavaScriptProject = evalProject @(JustEvaluating TypeScript.Term)
+
+-- evalProject :: forall term effects a.
+--                ( Members '[Exc SomeException, Task] effects
+--                , Members (EvaluatingEffects (Located Precise term) term (Value (Located Precise term))) effects
+--                )
+-- evalProject :: FilePath ->  IO (Final effs (JustEvaluating term effects a))
+-- evalProject :: forall effs a. FilePath -> IO (Final effs a)
+-- evalProject :: forall m location term value effects. ( MonadAnalysis location term value m, Members (EvaluatingEffects location term value) effects )
+--             => FilePath -> IO (Final effects value)
 -- evalProject path = runTask $ do
 --   project <- readProject Nothing (fileDetectingLanguage path :| [])
---   let Just (SomeAnalysisParser parser prelude) = someAnalysisParser (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) <$> projectLanguage project
---   package <- parsePackage parser project prelude
---   analyze @(EvaluatingWithHoles TypeScript.Term) (evaluatePackage package)
-  -- where
-  --   asAnalysisForTypeOfPackage :: ImportGraphAnalysis term effs value
-  --                              -> Package term
-  --                              -> ImportGraphAnalysis term effs value
-  --   asAnalysisForTypeOfPackage = const
-
-  --
+--   case someAnalysisParser (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) <$> projectLanguage project of
+--     Just (SomeAnalysisParser parser prelude) -> do
+--       package <- parsePackage typescriptParser prelude project
+--       analyze (SomeAnalysis (evaluatePackage @(JustEvaluating TypeScript.Term) package))
+--     Nothing -> Task.throwError (SomeException (NoLanguageForBlob (filePath (projectEntryPoint project))))
+--
+--
   -- package <- parsePackage typescriptParser project prelude
   -- runAnalysis @(EvaluatingWithHoles TypeScript.Term) package
 
+
+type JustEvaluating term = Evaluating (Located Precise term) term (Value (Located Precise term))
 type EvaluatingWithHoles term = BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term))))))
 type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
 
