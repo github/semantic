@@ -161,13 +161,13 @@ type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
 --
 -- getPaths exts = fmap fold . globDir (compile . mappend "**/*." <$> exts)
 --
---
--- -- Read and parse a file.
--- parseFile :: Parser term -> Maybe FilePath -> FilePath -> IO (Module term)
--- parseFile parser rootDir path = runTask $ do
---   blob <- file path
---   moduleForBlob rootDir blob <$> parse parser blob
---
+
+-- Read and parse a file.
+parseFile :: Parser term -> Maybe FilePath -> FilePath -> IO (Module term)
+parseFile parser rootDir path = runTask $ do
+  blob <- file path
+  moduleForBlob rootDir blob <$> parse parser blob
+
 -- parseFiles :: Parser term -> FilePath -> [FilePath] -> IO [Module term]
 -- parseFiles parser rootDir = traverse (parseFile parser (Just rootDir))
 

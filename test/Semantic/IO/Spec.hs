@@ -16,7 +16,7 @@ spec = parallel $ do
       blobPath blob `shouldBe` "semantic.cabal"
 
     it "throws for absent files" $ do
-      readFile "this file should not exist" Nothing `shouldThrow` anyIOException
+      readFile (File "this file should not exist" Nothing) `shouldThrow` anyIOException
 
   describe "readBlobPairsFromHandle" $ do
     let a = sourceBlob "method.rb" (Just Ruby) "def foo; end"
