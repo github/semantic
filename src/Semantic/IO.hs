@@ -9,8 +9,9 @@ module Semantic.IO
 , readBlobsFromDir
 , languageForFilePath
 , NoLanguageForBlob(..)
-, listFiles
 , readBlob
+, readProject
+, listFiles
 , readBlobs
 , readBlobPairs
 , writeToOutput
@@ -27,10 +28,12 @@ import           Control.Monad.IO.Class
 import           Data.Aeson
 import qualified Data.Blob as Blob
 import           Data.Bool
+import           Data.File
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import           Data.Language
 import           Data.Source
+import qualified Data.List.NonEmpty as NonEmpty
 import           Prelude hiding (readFile)
 import           Prologue hiding (MonadError (..), fail)
 import           System.Directory (doesDirectoryExist)
@@ -41,16 +44,16 @@ import           System.IO (Handle)
 import           Text.Read
 
 -- | Read a utf8-encoded file to a 'Blob'.
-readFile :: forall m. MonadIO m => FilePath -> Maybe Language -> m (Maybe Blob.Blob)
-readFile "/dev/null" _ = pure Nothing
-readFile path language = do
+readFile :: forall m. MonadIO m => File -> m (Maybe Blob.Blob)
+readFile (File "/dev/null" _) = pure Nothing
+readFile (File path language) = do
   raw <- liftIO (Just <$> B.readFile path)
   pure $ Blob.sourceBlob path language . fromBytes <$> raw
 
-readFilePair :: forall m. MonadIO m => (FilePath, Maybe Language) -> (FilePath, Maybe Language) -> m Blob.BlobPair
+readFilePair :: forall m. MonadIO m => File -> File -> m Blob.BlobPair
 readFilePair a b = do
-  before <- uncurry readFile a
-  after <- uncurry readFile b
+  before <- readFile a
+  after <- readFile b
   case (before, after) of
     (Just a, Nothing) -> pure (Join (This a))
     (Nothing, Just b) -> pure (Join (That b))
@@ -77,19 +80,30 @@ readBlobsFromHandle :: MonadIO m => Handle -> m [Blob.Blob]
 readBlobsFromHandle = fmap toBlobs . readFromHandle
   where toBlobs BlobParse{..} = fmap toBlob blobs
 
-readBlobFromPath :: MonadIO m => (FilePath, Maybe Language) -> m Blob.Blob
+readBlobFromPath :: MonadIO m => File -> m Blob.Blob
 readBlobFromPath file = do
-  maybeFile <- uncurry readFile file
+  maybeFile <- readFile file
   maybe (fail ("cannot read '" <> show file <> "', file not found or language not supported.")) pure maybeFile
 
-readBlobsFromPaths :: MonadIO m => [(FilePath, Maybe Language)] -> m [Blob.Blob]
-readBlobsFromPaths files = catMaybes <$> traverse (uncurry readFile) files
+readBlobsFromPaths :: MonadIO m => [File] -> m [Blob.Blob]
+readBlobsFromPaths files = catMaybes <$> traverse readFile files
+
+readProjectFromPaths :: MonadIO m => Maybe FilePath -> NonEmpty File -> m Project
+readProjectFromPaths root files = do
+  paths <- liftIO $ filter (/= entryPointPath) <$> fmap fold (globDir (compile . mappend "**/*." <$> exts) rootDir)
+  pure $ Project files rootDir (toFile <$> paths)
+  where
+    toFile path = File path (languageForFilePath path)
+    exts = extensionsForLanguage (fileLanguage entryPoint)
+    entryPoint = NonEmpty.head files
+    entryPointPath = filePath entryPoint
+    rootDir = fromMaybe (takeDirectory entryPointPath) root
 
 readBlobsFromDir :: MonadIO m => FilePath -> m [Blob.Blob]
 readBlobsFromDir path = do
   paths <- liftIO (globDir1 (compile "[^vendor]**/*[.rb|.js|.tsx|.go|.py]") path)
-  let paths' = catMaybes $ fmap (\p -> (p,) . Just <$> languageForFilePath p) paths
-  blobs <- traverse (uncurry readFile) paths'
+  let paths' = catMaybes $ fmap (\p -> File p . Just <$> languageForFilePath p) paths
+  blobs <- traverse readFile paths'
   pure (catMaybes blobs)
 
 readFromHandle :: (FromJSON a, MonadIO m) => Handle -> m a
@@ -136,18 +150,21 @@ instance FromJSON BlobPair where
 newtype NoLanguageForBlob = NoLanguageForBlob FilePath
   deriving (Eq, Exception, Ord, Show, Typeable)
 
+readBlob :: Member Files effs => File -> Eff effs Blob.Blob
+readBlob = send . ReadBlob
+
+readProject :: Member Files effs => Maybe FilePath -> NonEmpty File -> Eff effs Project
+readProject dir files = send (ReadProject dir files)
+
 listFiles :: Member Files effs => FilePath -> [String] -> Eff effs [FilePath]
 listFiles dir exts = send (ListFiles dir exts)
 
-readBlob :: Member Files effs => (FilePath, Maybe Language) -> Eff effs Blob.Blob
-readBlob = send . ReadBlob
-
 -- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
-readBlobs :: Member Files effs => Either Handle [(FilePath, Maybe Language)] -> Eff effs [Blob.Blob]
+readBlobs :: Member Files effs => Either Handle [File] -> Eff effs [Blob.Blob]
 readBlobs = send . ReadBlobs
 
 -- | A task which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
-readBlobPairs :: Member Files effs => Either Handle [Both (FilePath, Maybe Language)] -> Eff effs [Blob.BlobPair]
+readBlobPairs :: Member Files effs => Either Handle [Both File] -> Eff effs [Blob.BlobPair]
 readBlobPairs = send . ReadBlobPairs
 
 -- | A task which writes a 'B.ByteString' to a 'Handle' or a 'FilePath'.
@@ -157,21 +174,23 @@ writeToOutput path = send . WriteToOutput path
 
 -- | An effect to read/write 'Blob.Blob's from 'Handle's or 'FilePath's.
 data Files out where
-  ReadBlob      :: (FilePath, Maybe Language) -> Files Blob.Blob
+  ReadBlob      :: File -> Files Blob.Blob
+  ReadProject   :: Maybe FilePath -> NonEmpty File -> Files Project
   ListFiles     :: FilePath -> [String] -> Files [FilePath]
 
-  ReadBlobs     :: Either Handle [(FilePath, Maybe Language)] -> Files [Blob.Blob]
-  ReadBlobPairs :: Either Handle [Both (FilePath, Maybe Language)] -> Files [Blob.BlobPair]
+  ReadBlobs     :: Either Handle [File] -> Files [Blob.Blob]
+  ReadBlobPairs :: Either Handle [Both File] -> Files [Blob.BlobPair]
   WriteToOutput :: Either Handle FilePath -> B.ByteString -> Files ()
 
 -- | Run a 'Files' effect in 'IO'.
 runFiles :: Members '[Exc SomeException, IO] effs => Eff (Files ': effs) a -> Eff effs a
 runFiles = interpret $ \ files -> case files of
   ReadBlob path -> rethrowing (readBlobFromPath path)
+  ReadProject dir files -> rethrowing (readProjectFromPaths dir files)
   ListFiles directory exts -> liftIO $ fmap fold (globDir (compile . mappend "**/*." <$> exts) directory)
 
   ReadBlobs (Left handle) -> rethrowing (readBlobsFromHandle handle)
-  ReadBlobs (Right paths@[(path, Nothing)]) -> rethrowing (isDirectory path >>= bool (readBlobsFromPaths paths) (readBlobsFromDir path))
+  ReadBlobs (Right paths@[File path Nothing]) -> rethrowing (isDirectory path >>= bool (readBlobsFromPaths paths) (readBlobsFromDir path))
   ReadBlobs (Right paths) -> rethrowing (readBlobsFromPaths paths)
   ReadBlobPairs source -> rethrowing (either readBlobPairsFromHandle (traverse (runBothWith readFilePair)) source)
   WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents)

@@ -30,43 +30,38 @@ import           Semantic.Task
 import           System.FilePath.Posix
 
 graph :: (Members '[Distribute WrappedTask, Files, Task, Exc SomeException, Telemetry] effs)
-      => Maybe FilePath
-      -> GraphRenderer output
-      -> File
+      => GraphRenderer output
+      -> Project
       -> Eff effs ByteString
-graph root renderer file@File{..}
+graph renderer project
   | Just (SomeAnalysisParser parser exts preludePath) <- someAnalysisParser
-    (Proxy :: Proxy '[ Analysis.Evaluatable, Analysis.Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) <$> fileLanguage = do
-    parsePackage parser exts preludePath root file >>= graphImports >>= case renderer of
+    (Proxy :: Proxy '[ Analysis.Evaluatable, Analysis.Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) <$> projectLanguage project = do
+    parsePackage parser project preludePath >>= graphImports >>= case renderer of
       JSONGraphRenderer -> pure . toOutput
       DOTGraphRenderer -> pure . Abstract.renderImportGraph
 
-  | otherwise = throwError (SomeException (NoLanguageForBlob filePath))
+  | otherwise = throwError (SomeException (NoLanguageForBlob (filePath (projectEntryPoint project))))
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: Members '[Distribute WrappedTask, Files, Task] effs
              => Parser term       -- ^ A parser
-             -> [String]          -- ^ List of file extensions
-             -> Maybe FilePath    -- ^ Prelude (optional).
-             -> Maybe FilePath    -- ^ Root directory of this package. If you pass 'Nothing' it will be the parent directory of the entry point.
-             -> File              -- ^ Entry point
+             -> Project
+             -> Maybe File        -- ^ Prelude (optional).
              -> Eff effs (Package term)
-parsePackage parser exts preludePath root File{..} = do
-  paths <- filter (/= filePath) <$> listFiles rootDir exts
-  prelude <- traverse (parseModule parser Nothing) preludePath
-  Package.fromModules (nameFromRoot rootDir) Nothing prelude <$> parseModules parser rootDir paths
-  where
-    rootDir = fromMaybe (takeDirectory filePath) root
-    nameFromRoot = name . BC.pack . dropExtensions . takeFileName
+parsePackage parser project@Project{..} preludeFile = do
+  prelude <- traverse (parseModule parser Nothing) preludeFile
+  Package.fromModules n Nothing prelude <$> parseModules parser project
+  where n = name (projectName project)
 
 -- | Parse a list of files into 'Module's.
-parseModules :: Members '[Distribute WrappedTask, Files, Task] effs => Parser term -> FilePath -> [FilePath] -> Eff effs [Module term]
-parseModules parser rootDir paths = distributeFor paths (WrapTask . parseModule parser (Just rootDir))
+parseModules :: Members '[Distribute WrappedTask, Files, Task] effs => Parser term -> Project -> Eff effs [Module term]
+parseModules parser project@Project{..} = distributeFor allFiles (WrapTask . parseModule parser (Just projectRootDir))
+  where allFiles = projectAllFiles project
 
 -- | Parse a file into a 'Module'.
-parseModule :: Members '[Files, Task] effs => Parser term -> Maybe FilePath -> FilePath -> Eff effs (Module term)
-parseModule parser rootDir path = do
-  blob <- readBlob (path, IO.languageForFilePath path)
+parseModule :: Members '[Files, Task] effs => Parser term -> Maybe FilePath -> File -> Eff effs (Module term)
+parseModule parser rootDir file = do
+  blob <- readBlob file
   moduleForBlob rootDir blob <$> parse parser blob
 
 

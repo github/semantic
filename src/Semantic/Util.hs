@@ -23,6 +23,7 @@ import Data.Abstract.Package as Package
 import Data.Abstract.Type
 import Data.Abstract.Value
 import Data.Blob
+import Data.File
 import Data.Diff
 import Data.Range
 import Data.Record
@@ -81,7 +82,8 @@ import qualified Language.TypeScript.Assignment as TypeScript
 -- typecheckTypeScriptFile path = runAnalysis @(Caching (Evaluating Monovariant TypeScript.Term Type)) . evaluateModule <$> parseFile typescriptParser Nothing path
 
 -- JavaScript
-evalJavaScriptProject path = runAnalysis @(EvaluatingWithHoles TypeScript.Term) . evaluatePackageBody <$> parseProject typescriptParser ["js"] path
+-- evalJavaScriptProject path = runAnalysis @(EvaluatingWithHoles TypeScript.Term) . evaluatePackageBody <$> parseProject typescriptParser ["js"] path
+-- evalJavaScriptProject path = parsePackage Nothing typescriptParser (takeDirectory path)
 
 -- runEvaluatingWithPrelude parser exts path = runEvaluating <$> (withPrelude <$> parsePrelude parser <*> (evaluatePackageBody <$> parseProject parser exts path))
 
@@ -89,45 +91,45 @@ type EvaluatingWithHoles term = BadModuleResolutions (BadVariables (BadValues (Q
 type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
 
 
--- TODO: Remove this by exporting EvaluatingEffects
-runEvaluating :: forall term effects a.
-                 ( Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects) ~ effects
-                 , Corecursive term
-                 , Recursive term )
-              => Evaluating Precise term (Value Precise) effects a
-              -> Final effects a
-runEvaluating = runAnalysis @(Evaluating Precise term (Value Precise))
+-- -- TODO: Remove this by exporting EvaluatingEffects
+-- runEvaluating :: forall term effects a.
+--                  ( Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects) ~ effects
+--                  , Corecursive term
+--                  , Recursive term )
+--               => Evaluating Precise term (Value Precise) effects a
+--               -> Final effects a
+-- runEvaluating = runAnalysis @(Evaluating Precise term (Value Precise))
+--
+-- parsePrelude :: forall term. TypeLevel.KnownSymbol (PreludePath term) => Parser term -> IO (Module term)
+-- parsePrelude parser = do
+--   let preludePath = TypeLevel.symbolVal (Proxy :: Proxy (PreludePath term))
+--   parseFile parser Nothing preludePath
 
-parsePrelude :: forall term. TypeLevel.KnownSymbol (PreludePath term) => Parser term -> IO (Module term)
-parsePrelude parser = do
-  let preludePath = TypeLevel.symbolVal (Proxy :: Proxy (PreludePath term))
-  parseFile parser Nothing preludePath
-
-parseProject :: Parser term
-                -> [Prelude.String]
-                -> FilePath
-                -> IO (PackageBody term)
-parseProject parser exts entryPoint = do
-  let rootDir = takeDirectory entryPoint
-  paths <- getPaths exts rootDir
-  modules <- parseFiles parser rootDir paths
-  pure $ fromModulesWithEntryPoint modules (takeFileName entryPoint)
-
-withPrelude prelude a = do
-  preludeEnv <- evaluateModule prelude *> getEnv
-  withDefaultEnvironment preludeEnv a
-
-getPaths exts = fmap fold . globDir (compile . mappend "**/*." <$> exts)
-
-
--- Read and parse a file.
-parseFile :: Parser term -> Maybe FilePath -> FilePath -> IO (Module term)
-parseFile parser rootDir path = runTask $ do
-  blob <- file path
-  moduleForBlob rootDir blob <$> parse parser blob
-
-parseFiles :: Parser term -> FilePath -> [FilePath] -> IO [Module term]
-parseFiles parser rootDir = traverse (parseFile parser (Just rootDir))
+-- parseProject :: Parser term
+--                 -> [Prelude.String]
+--                 -> FilePath
+--                 -> IO (PackageBody term)
+-- parseProject parser exts entryPoint = do
+--   let rootDir = takeDirectory entryPoint
+--   paths <- getPaths exts rootDir
+--   modules <- parseFiles parser rootDir paths
+--   pure $ fromModulesWithEntryPoint modules (takeFileName entryPoint)
+--
+-- withPrelude prelude a = do
+--   preludeEnv <- evaluateModule prelude *> getEnv
+--   withDefaultEnvironment preludeEnv a
+--
+-- getPaths exts = fmap fold . globDir (compile . mappend "**/*." <$> exts)
+--
+--
+-- -- Read and parse a file.
+-- parseFile :: Parser term -> Maybe FilePath -> FilePath -> IO (Module term)
+-- parseFile parser rootDir path = runTask $ do
+--   blob <- file path
+--   moduleForBlob rootDir blob <$> parse parser blob
+--
+-- parseFiles :: Parser term -> FilePath -> [FilePath] -> IO [Module term]
+-- parseFiles parser rootDir = traverse (parseFile parser (Just rootDir))
 
 -- parsePackage :: PackageName -> Parser term -> FilePath -> [FilePath] -> IO (Package term)
 -- parsePackage name parser rootDir = runTask . Task.parsePackage name parser rootDir
@@ -135,7 +137,7 @@ parseFiles parser rootDir = traverse (parseFile parser (Just rootDir))
 
 -- Read a file from the filesystem into a Blob.
 file :: MonadIO m => FilePath -> m Blob
-file path = fromJust <$> IO.readFile path (languageForFilePath path)
+file path = fromJust <$> IO.readFile (fileDetectingLanguage path)
 
 -- Diff helpers
 diffWithParser :: ( HasField fields Data.Span.Span

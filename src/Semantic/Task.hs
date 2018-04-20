@@ -8,6 +8,7 @@ module Semantic.Task
 , Differ
 -- * I/O
 , IO.listFiles
+, IO.readProject
 , IO.readBlob
 , IO.readBlobs
 , IO.readBlobPairs

@@ -7,10 +7,10 @@ module Semantic.CLI
 ) where
 
 import Prologue
-import Data.Language
 import Data.File
 import Data.List (intercalate)
 import Data.List.Split (splitWhen)
+import qualified Data.List.NonEmpty as NonEmpty
 import Data.Version (showVersion)
 import Development.GitRev
 import Options.Applicative
@@ -29,14 +29,14 @@ import Text.Read
 main :: IO ()
 main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskWithOptions
 
-runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both (FilePath, Maybe Language)] -> Task.TaskEff ByteString
+runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both File] -> Task.TaskEff ByteString
 runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Task.readBlobPairs
 
-runParse :: SomeRenderer TermRenderer -> Either Handle [(FilePath, Maybe Language)] -> Task.TaskEff ByteString
+runParse :: SomeRenderer TermRenderer -> Either Handle [File] -> Task.TaskEff ByteString
 runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
 
-runGraph :: SomeRenderer GraphRenderer -> Maybe FilePath -> (FilePath, Maybe Language) -> Task.TaskEff ByteString
-runGraph (SomeRenderer r) rootDir (p, l) = Semantic.graph rootDir r (File p l)
+runGraph :: SomeRenderer GraphRenderer -> Maybe FilePath -> NonEmpty File -> Task.TaskEff ByteString
+runGraph (SomeRenderer r) dir = Semantic.graph r <=< Task.readProject dir
 
 -- | A parser for the application's command-line arguments.
 --
@@ -95,14 +95,14 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       <$> (   flag (SomeRenderer DOTGraphRenderer) (SomeRenderer DOTGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
           <|> flag'                                (SomeRenderer JSONGraphRenderer) (long "json" <> help "Output JSON graph")
           )
-      <*> optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file's directory." <> metavar "DIRECTORY"))
-      <*> argument filePathReader (metavar "ENTRY_FILE")
+      <*> optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to first entry file's directory." <> metavar "DIRECTORY"))
+      <*> NonEmpty.some1 (argument filePathReader (metavar "FILES..." <> help "Entry point(s)"))
 
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of
-        [a, b] | Just lang <- readMaybe a -> Right (b, Just lang)
-               | Just lang <- readMaybe b -> Right (a, Just lang)
-        [path] -> Right (path, languageForFilePath path)
+        [a, b] | Just lang <- readMaybe a -> Right (File b (Just lang))
+               | Just lang <- readMaybe b -> Right (File a (Just lang))
+        [path] -> Right (File path (languageForFilePath path))
         _ -> Left ("cannot parse `" <> arg <> "`\nexpecting LANGUAGE:FILE or just FILE")
 
     optionsReader options = eitherReader $ \ str -> maybe (Left ("expected one of: " <> intercalate ", " (fmap fst options))) (Right . snd) (find ((== str) . fst) options)
