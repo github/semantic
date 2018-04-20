@@ -38,11 +38,11 @@ type Syntax =
    , Expression.Comparison
    , Expression.Bitwise
    , Expression.Boolean
-   , Java.Syntax.ArrayType
    , Java.Syntax.EnumDeclaration
    , Java.Syntax.Import
    , Java.Syntax.Module
    , Java.Syntax.Package
+   , Java.Syntax.Synchronized
    , Java.Syntax.Variable
    , Literal.Array
    , Literal.Boolean
@@ -75,6 +75,7 @@ type Syntax =
    , Syntax.Identifier
    , Syntax.AccessibilityModifier
    , Syntax.Program
+   , Type.Array
    , Type.Bool
    , Type.Int
    , Type.Void
@@ -147,6 +148,7 @@ expressionChoices =
   , return'
   , string
   , switch
+  , synchronized
   , ternary
   , throw
   , try
@@ -183,9 +185,6 @@ localVariableDeclaration = makeDecl <$> symbol LocalVariableDeclaration <*> chil
 
 localVariableDeclarationStatement :: Assignment
 localVariableDeclarationStatement = symbol LocalVariableDeclarationStatement *> children localVariableDeclaration
-
-unannotatedType :: Assignment
-unannotatedType = makeTerm <$> symbol Grammar.ArrayType <*> (Java.Syntax.ArrayType <$> source)
 
 variableDeclaratorId :: Assignment
 variableDeclaratorId = symbol VariableDeclaratorId *> children identifier
@@ -273,15 +272,20 @@ return' = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children
 -- if you f <$> (g <$> a) == f . g <$> a (fusion law)
 --   if you have two nested fmaps, same as composing
 
+dims :: Assignment.Assignment [] Grammar [Term]
+dims = symbol Dims *> children (many (emptyTerm <* token AnonLBracket <* token AnonRBracket))
+
 type' :: Assignment
 type' =  choice [
        makeTerm <$> token VoidType <*> pure Type.Void
      , makeTerm <$> token IntegralType <*> pure Type.Int
      , makeTerm <$> token FloatingPointType <*> pure Type.Float
      , makeTerm <$> token BooleanType <*> pure Type.Bool
+     , symbol ArrayType *> children (array <$> type' <*> dims)
      , symbol CatchType *> children (term type')
      , identifier
     ]
+    where array type' = foldl (\into each -> makeTerm1 (Type.Array (Just each) into)) type'
      -- <|> makeTerm <$> symbol FloatingPointType <*> children (token AnonFloat $> Type.Float <|> token AnonDouble $> Type.Double)
      -- we had to say token with the first 4 because pure don't advance past the first nodes; implies no effect, just produces value
      -- if we want to match a node and consume that node (which we have to do) we need to use token because it has that behavior
@@ -450,3 +454,6 @@ ternary = makeTerm <$> symbol TernaryExpression <*> children (Statement.If <$> t
 -- infix operators
 -- binary :: Assignment
 -- binary = makeTerm
+
+synchronized :: Assignment
+synchronized = makeTerm <$> symbol SynchronizedStatement <*> children (Java.Syntax.Synchronized <$> term expression <*> term expression)

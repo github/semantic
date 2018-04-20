@@ -5,16 +5,6 @@ import Data.Abstract.Evaluatable hiding (Label)
 import Diffing.Algorithm
 import Prologue
 
-newtype ArrayType a = ArrayType ByteString
-  deriving (Diffable, Eq, FreeVariables1, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
-
-instance Eq1 ArrayType where liftEq = genericLiftEq
-instance Ord1 ArrayType where liftCompare = genericLiftCompare
-instance Show1 ArrayType where liftShowsPrec = genericLiftShowsPrec
-
--- TODO: Implement Eval instance for ArrayType
-instance Evaluatable ArrayType
-
 newtype Import a = Import [a]
   deriving (Diffable, Eq, FreeVariables1, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
@@ -66,3 +56,13 @@ instance Show1 Variable where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Variable
 instance Evaluatable Variable
+
+data Synchronized a = Synchronized { synchronizedSubject :: !a, synchronizedBody :: !a}
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 Synchronized where liftEq = genericLiftEq
+instance Ord1 Synchronized where liftCompare = genericLiftCompare
+instance Show1 Synchronized where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for Synchronized
+instance Evaluatable Synchronized
