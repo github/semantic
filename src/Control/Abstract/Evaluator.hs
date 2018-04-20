@@ -16,9 +16,11 @@ module Control.Abstract.Evaluator
   , modifyLoadStack
   , MonadControl(..)
   , MonadResume(..)
+  , MonadExc(..)
   ) where
 
 import Control.Effect
+import Control.Monad.Effect.Exception as Exception
 import Control.Monad.Effect.Resumable as Resumable
 import Data.Abstract.Address
 import Data.Abstract.Configuration
@@ -187,3 +189,11 @@ class Monad m => MonadResume exc m where
 instance (Effectful m1, Member (Resumable exc) effects, Monad (m1 effects)) => MonadResume exc (m1 effects) where
   throwResumable = raise . Resumable.throwError
   catchResumable c f = raise (Resumable.catchError (lower c) (lower . f))
+
+class Monad m => MonadExc exc m where
+  throwException :: exc -> m v
+  catchException :: m v -> (exc -> m v) -> m v
+
+instance (Effectful m1, Member (Exc exc) effects, Monad (m1 effects)) => MonadExc exc (m1 effects) where
+  throwException = raise . Exception.throwError
+  catchException c f = raise (Exception.catchError (lower c) (lower . f))

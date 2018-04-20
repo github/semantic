@@ -55,23 +55,18 @@ type MonadEvaluatable location term value m =
   , MonadResume (EvalError value) m
   , MonadResume (ResolutionError value) m
   , MonadResume (AddressError location value) m
-  , MonadResume (ControlThrow value) m
+  , MonadExc (ControlThrow value) m
   , MonadValue location value m
   , Recursive term
   , Reducer value (Cell location value)
   , Show location
   )
 
-data ControlThrow value resume where
-  Ret :: value -> ControlThrow value resume
+data ControlThrow value where
+  Ret :: value -> ControlThrow value
 
-deriving instance Show value => Show (ControlThrow value resume)
-instance Show value => Show1 (ControlThrow value) where
-  liftShowsPrec _ _ = showsPrec
-
-deriving instance Eq value => Eq (ControlThrow value resume)
-instance Eq value => Eq1 (ControlThrow value) where
-  liftEq _ (Ret a) (Ret b) = a == b
+deriving instance Show value => Show (ControlThrow value)
+deriving instance Eq value => Eq (ControlThrow value)
 
 -- | An error thrown when we can't resolve a module from a qualified name.
 data ResolutionError value resume where
