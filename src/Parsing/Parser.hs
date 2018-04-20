@@ -55,7 +55,6 @@ data SomeAnalysisParser typeclasses ann where
   SomeAnalysisParser :: ( Member Syntax.Identifier fs
                         , ApplyAll' typeclasses fs)
                      => Parser (Term (Union fs) ann) -- ^ A parser.
-                     -> [String]                     -- ^ List of valid file extensions to be used for module resolution.
                      -> Maybe File                   -- ^ Maybe path to prelude.
                      -> SomeAnalysisParser typeclasses ann
 
@@ -69,12 +68,12 @@ someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
                    => proxy typeclasses                                -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
                    -> Language                                         -- ^ The 'Language' to select.
                    -> SomeAnalysisParser typeclasses (Record Location) -- ^ A 'SomeAnalysisParser abstracting the syntax type to be produced.
-someAnalysisParser _ Go         = SomeAnalysisParser goParser ["go"] Nothing
-someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser ["js"] Nothing
-someAnalysisParser _ PHP        = SomeAnalysisParser phpParser ["php"] Nothing
-someAnalysisParser _ Python     = SomeAnalysisParser pythonParser ["py"] $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Python))
-someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser ["rb"] $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Ruby))
-someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser ["ts", "tsx", "d.tsx"] Nothing
+someAnalysisParser _ Go         = SomeAnalysisParser goParser Nothing
+someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser Nothing
+someAnalysisParser _ PHP        = SomeAnalysisParser phpParser Nothing
+someAnalysisParser _ Python     = SomeAnalysisParser pythonParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Python))
+someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Ruby))
+someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser Nothing
 someAnalysisParser _ l          = error $ "Analysis not supported for: " <> show l
 
 

@@ -2,6 +2,7 @@ module Data.File where
 
 import Prologue
 import Data.Language
+import Data.String
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.ByteString.Char8 as BC (pack)
 import           System.FilePath.Posix
@@ -11,6 +12,9 @@ data File = File
   , fileLanguage :: Maybe Language
   }
   deriving (Eq, Ord, Show)
+
+instance IsString File where
+  fromString = fileDetectingLanguage
 
 fileDetectingLanguage :: FilePath -> File
 fileDetectingLanguage path = File path (languageForFilePath path)
