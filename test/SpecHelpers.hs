@@ -49,6 +49,8 @@ import Test.LeanCheck as X
 import qualified Data.ByteString as B
 import qualified Semantic.IO as IO
 import Data.Abstract.Value
+import Analysis.Abstract.Evaluating
+-- import qualified Language.Ruby.Assignment as Ruby
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO ByteString
@@ -56,15 +58,17 @@ diffFilePaths paths = readFilePair paths >>= runTask . diffBlobPair SExpressionD
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFilePath :: FilePath -> IO ByteString
-parseFilePath path = (fromJust <$> IO.readFile (fileDetectingLanguage path)) >>= runTask . parseBlob SExpressionTermRenderer
+parseFilePath path = (fromJust <$> IO.readFile (file path)) >>= runTask . parseBlob SExpressionTermRenderer
 
 -- | Read two files to a BlobPair.
 readFilePair :: Both FilePath -> IO BlobPair
-readFilePair paths = let paths' = fmap fileDetectingLanguage paths in
+readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
 readFileVerbatim :: FilePath -> IO Verbatim
 readFileVerbatim = fmap verbatim . B.readFile
+
+type TestEvaluating term = Evaluating Precise term (Value Precise)
 
 ns n = Just . Latest . Just . injValue . Namespace n
 addr = Address . Precise

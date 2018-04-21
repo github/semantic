@@ -1,9 +1,10 @@
 {-# LANGUAGE OverloadedLists #-}
 module Analysis.TypeScript.Spec (spec) where
 
-import SpecHelpers
 import Data.Abstract.Evaluatable
+import qualified Language.TypeScript.Assignment as TypeScript
 
+import SpecHelpers
 
 spec :: Spec
 spec = parallel $ do
@@ -35,3 +36,4 @@ spec = parallel $ do
   where
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate entry = evalTypeScriptProject (fixtures <> entry)
+    evalTypeScriptProject path = runAnalysis @(TestEvaluating TypeScript.Term) <$> evaluateProject typescriptParser path
