@@ -1,10 +1,9 @@
 module Data.File where
 
-import Prologue
-import Data.Language
-import Data.String
-import qualified Data.List.NonEmpty as NonEmpty
 import           Data.ByteString.Char8 as BC (pack)
+import           Data.Language
+import qualified Data.List.NonEmpty as NonEmpty
+import           Prologue
 import           System.FilePath.Posix
 
 data File = File
@@ -13,8 +12,8 @@ data File = File
   }
   deriving (Eq, Ord, Show)
 
-fileDetectingLanguage :: FilePath -> File
-fileDetectingLanguage path = File path (languageForFilePath path)
+file :: FilePath -> File
+file path = File path (languageForFilePath path)
   where languageForFilePath = languageForType . takeExtension
 
 data Project = Project

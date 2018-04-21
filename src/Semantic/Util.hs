@@ -91,13 +91,13 @@ import qualified Language.TypeScript.Assignment as TypeScript
 -- runEvaluatingWithPrelude parser exts path = runEvaluating <$> (withPrelude <$> parsePrelude parser <*> (evaluatePackageBody <$> parseProject parser exts path))
 
 evalGoProject path = runAnalysis @(JustEvaluating Go.Term) <$> evaluateProject goParser path
-evalRubyProject path = runAnalysis @(JustEvaluating Ruby.Term) <$> evaluateProject rubyParser path
+evalRubyProject path = runAnalysis @(TestEvaluating Ruby.Term) <$> evaluateProject rubyParser path
 evalPHPProject path = runAnalysis @(JustEvaluating PHP.Term) <$> evaluateProject phpParser path
 evalPythonProject path = runAnalysis @(JustEvaluating Python.Term) <$> evaluateProject pythonParser path
 evalTypeScriptProject path = runAnalysis @(EvaluatingWithHoles TypeScript.Term) <$> evaluateProject typescriptParser path
-evaluateProject parser path = evaluatePackage <$> runTask (readProject Nothing (fileDetectingLanguage path :| []) >>= parsePackage parser Nothing)
+evaluateProject parser path = evaluatePackage <$> runTask (readProject Nothing (file path :| []) >>= parsePackage parser Nothing)
 -- evaluateProject path = evaluatePackage <$> runTask (do
---   project <- readProject Nothing (fileDetectingLanguage path :| [])
+--   project <- readProject Nothing (file path :| [])
 --   case someAnalysisParser (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) <$> projectLanguage project of
 --     Just (SomeAnalysisParser parser prelude) -> parsePackage parser prelude project
 --     Nothing -> undefined)
@@ -114,7 +114,7 @@ evaluateProject parser path = evaluatePackage <$> runTask (readProject Nothing (
 -- evalProject :: forall m location term value effects. ( MonadAnalysis location term value m, Members (EvaluatingEffects location term value) effects )
 --             => FilePath -> IO (Final effects value)
 -- evalProject path = runTask $ do
---   project <- readProject Nothing (fileDetectingLanguage path :| [])
+--   project <- readProject Nothing (file path :| [])
 --   case someAnalysisParser (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) <$> projectLanguage project of
 --     Just (SomeAnalysisParser parser prelude) -> do
 --       package <- parsePackage typescriptParser prelude project
@@ -126,6 +126,7 @@ evaluateProject parser path = evaluatePackage <$> runTask (readProject Nothing (
   -- runAnalysis @(EvaluatingWithHoles TypeScript.Term) package
 
 
+type TestEvaluating term = Evaluating Precise term (Value Precise)
 type JustEvaluating term = Evaluating (Located Precise term) term (Value (Located Precise term))
 type EvaluatingWithHoles term = BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term))))))
 type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
@@ -165,7 +166,7 @@ type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
 -- Read and parse a file.
 parseFile :: Parser term -> Maybe FilePath -> FilePath -> IO (Module term)
 parseFile parser rootDir path = runTask $ do
-  blob <- file path
+  blob <- readBlob (file path)
   moduleForBlob rootDir blob <$> parse parser blob
 
 -- parseFiles :: Parser term -> FilePath -> [FilePath] -> IO [Module term]
@@ -176,8 +177,8 @@ parseFile parser rootDir path = runTask $ do
 
 
 -- Read a file from the filesystem into a Blob.
-file :: MonadIO m => FilePath -> m Blob
-file path = fromJust <$> IO.readFile (fileDetectingLanguage path)
+-- readBlob :: MonadIO m => FilePath -> m Blob
+-- readBlob path = fromJust <$> IO.readFile (file path)
 
 -- Diff helpers
 diffWithParser :: ( HasField fields Data.Span.Span
