@@ -9,6 +9,7 @@ module SpecHelpers (
 , ns
 , verbatim
 , Verbatim(..)
+, TestEvaluating
 , ) where
 
 import Analysis.Abstract.Evaluating as X (EvaluatingState(..))
@@ -50,7 +51,6 @@ import qualified Data.ByteString as B
 import qualified Semantic.IO as IO
 import Data.Abstract.Value
 import Analysis.Abstract.Evaluating
--- import qualified Language.Ruby.Assignment as Ruby
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO ByteString

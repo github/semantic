@@ -31,4 +31,4 @@ spec = parallel $ do
   where
     fixtures = "test/fixtures/go/analysis/"
     evaluate entry = evalGoProject (fixtures <> entry)
-    evalGoProject path = runAnalysis @(TestEvaluating Go.Term) <$> evaluateProject goParser path
+    evalGoProject path = runAnalysis @(TestEvaluating Go.Term) <$> evaluateProject goParser Nothing path

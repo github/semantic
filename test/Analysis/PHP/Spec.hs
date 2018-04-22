@@ -35,4 +35,4 @@ spec = parallel $ do
   where
     fixtures = "test/fixtures/php/analysis/"
     evaluate entry = evalPHPProject (fixtures <> entry)
-    evalPHPProject path = runAnalysis @(TestEvaluating PHP.Term) <$> evaluateProject phpParser path
+    evalPHPProject path = runAnalysis @(TestEvaluating PHP.Term) <$> evaluateProject phpParser Nothing path

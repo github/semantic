@@ -50,4 +50,4 @@ spec = parallel $ do
     addr = Address . Precise
     fixtures = "test/fixtures/python/analysis/"
     evaluate entry = evalPythonProject (fixtures <> entry)
-    evalPythonProject path = runAnalysis @(TestEvaluating Python.Term) <$> evaluateProject pythonParser path
+    evalPythonProject path = runAnalysis @(TestEvaluating Python.Term) <$> evaluateProject pythonParser pythonPrelude path

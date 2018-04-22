@@ -2,7 +2,7 @@
 
 module Analysis.Ruby.Spec (spec) where
 
-import Data.Abstract.Evaluatable (EvalError(..), runAnalysis)
+import Data.Abstract.Evaluatable
 import Data.Abstract.Value
 import Control.Monad.Effect (SomeExc(..))
 import Data.List.NonEmpty (NonEmpty(..))
@@ -58,4 +58,4 @@ spec = parallel $ do
     addr = Address . Precise
     fixtures = "test/fixtures/ruby/analysis/"
     evaluate entry = evalRubyProject (fixtures <> entry)
-    evalRubyProject path = runAnalysis @(TestEvaluating Ruby.Term) <$> evaluateProject rubyParser path
+    evalRubyProject path = runAnalysis @(TestEvaluating Ruby.Term) <$> evaluateProject rubyParser rubyPrelude path

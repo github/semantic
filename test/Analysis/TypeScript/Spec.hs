@@ -36,4 +36,4 @@ spec = parallel $ do
   where
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate entry = evalTypeScriptProject (fixtures <> entry)
-    evalTypeScriptProject path = runAnalysis @(TestEvaluating TypeScript.Term) <$> evaluateProject typescriptParser path
+    evalTypeScriptProject path = runAnalysis @(TestEvaluating TypeScript.Term) <$> evaluateProject typescriptParser Nothing path

@@ -30,11 +30,11 @@ loopMatcher = target <* go where
 spec :: Spec
 spec = describe "matching/go" $ do
   it "extracts integers" $ do
-    parsed <- moduleBody <$> parseFile goParser Nothing "test/fixtures/go/matching/integers.go"
+    parsed <- parseFile goParser "test/fixtures/go/matching/integers.go"
     let matched = runMatcher integerMatcher parsed
     sort matched `shouldBe` ["1", "2", "3"]
 
   it "counts for loops" $ do
-    parsed <- moduleBody <$> parseFile goParser Nothing "test/fixtures/go/matching/for.go"
+    parsed <- parseFile goParser "test/fixtures/go/matching/for.go"
     let matched = runMatcher @[] loopMatcher parsed
     length matched `shouldBe` 2
