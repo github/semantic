@@ -16,7 +16,7 @@ import Analysis.Abstract.Tracing
 import Analysis.Declaration
 import Control.Abstract.Analysis
 import Control.Monad.IO.Class
-import Data.Abstract.Evaluatable hiding (head)
+import Data.Abstract.Evaluatable
 import Data.Abstract.Address
 import Data.Abstract.Located
 import Data.Abstract.Module
