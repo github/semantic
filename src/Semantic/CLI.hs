@@ -12,8 +12,10 @@ import           Data.List.Split (splitWhen)
 import           Data.Version (showVersion)
 import           Development.GitRev
 import           Options.Applicative
+import           Options.Applicative.Types (readerAsk)
 import qualified Paths_semantic as Library (version)
-import           Prologue
+import           Prologue hiding (catch)
+import Control.Monad.Catch (MonadThrow(..))
 import           Rendering.Renderer
 import qualified Semantic.Diff as Semantic (diffBlobPairs)
 import qualified Semantic.Graph as Semantic (graph, graphPackage)
@@ -23,7 +25,8 @@ import qualified Semantic.Parse as Semantic (parseBlobs)
 import qualified Semantic.Task as Task
 import           System.IO (Handle, stdin, stdout)
 import           Text.Read
-
+import Path
+import Control.Monad.IO.Class
 
 main :: IO ()
 main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskWithOptions
@@ -36,6 +39,12 @@ runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRendere
 
 runGraph :: SomeRenderer GraphRenderer -> Maybe FilePath -> (FilePath, Maybe Language) -> Task.TaskEff ByteString
 runGraph (SomeRenderer r) rootDir = Semantic.graph rootDir r <=< Task.readBlob
+
+runGraphPackage :: SomeRenderer GraphRenderer -> Path Abs Dir -> Language -> Task.TaskEff ByteString
+runGraphPackage (SomeRenderer r) = Semantic.graphPackage r
+
+instance MonadThrow ReadM where
+  throwM e = readerError (show e)
 
 -- | A parser for the application's command-line arguments.
 --
@@ -88,10 +97,11 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     graphArgumentsParser = do
       renderer <- flag (SomeRenderer DOTGraphRenderer) (SomeRenderer DOTGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
               <|> flag'                                (SomeRenderer JSONGraphRenderer) (long "json" <> help "Output JSON graph")
-      rootDir <- strOption (long "root" <> help "Root directory of project." <> metavar "DIRECTORY")
-      language <- strOption (long "language" <> help "The language of the project." <> metavar "LANGUAGE")
-      pure $ Semantic.graphPackage renderer rootDir language
+      rootDir <- argument absPathReader (metavar "DIRECTORY")
+      language <- argument (maybeReader readMaybe :: ReadM Language) (metavar "LANGUAGE")
+      pure $ runGraphPackage renderer rootDir language
 
+    absPathReader = readerAsk >>= parseAbsDir
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of
         [a, b] | Just lang <- readMaybe a -> Right (b, Just lang)
