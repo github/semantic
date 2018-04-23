@@ -4,7 +4,7 @@ module Data.Abstract.Evaluatable
 , MonadEvaluatable
 , Evaluatable(..)
 , Unspecialized(..)
-, ControlThrow(..)
+, ReturnThrow(..)
 , EvalError(..)
 , LoadError(..)
 , LoopThrow(..)
@@ -56,7 +56,7 @@ type MonadEvaluatable location term value m =
   , MonadResume (EvalError value) m
   , MonadResume (ResolutionError value) m
   , MonadResume (AddressError location value) m
-  , MonadExc (ControlThrow value) m
+  , MonadExc (ReturnThrow value) m
   , MonadExc (LoopThrow value) m
   , MonadValue location value m
   , Recursive term
@@ -64,7 +64,7 @@ type MonadEvaluatable location term value m =
   , Show location
   )
 
-newtype ControlThrow value
+newtype ReturnThrow value
   = Ret value
     deriving (Eq, Show)
 

@@ -334,7 +334,7 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
       evalClosure :: Label -> m (Value location)
       evalClosure lab = catchException (goto lab >>= evaluateTerm) handleReturn
 
-      handleReturn :: ControlThrow (Value location) -> m (Value location)
+      handleReturn :: ReturnThrow (Value location) -> m (Value location)
       handleReturn (Ret v) = pure v
 
   loop x = catchException (fix x) handleLoop where

@@ -32,7 +32,7 @@ deriving instance Member NonDet effects => Alternative (Evaluating location term
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects location term value
-  = '[ Exc (ControlThrow value)
+  = '[ Exc (ReturnThrow value)
      , Exc (LoopThrow value)
      , Resumable (EvalError value)
      , Resumable (ResolutionError value)
