@@ -65,7 +65,7 @@ type MonadEvaluatable location term value m =
   , Show location
   )
 
-data ControlThrow value
+newtype ControlThrow value
   = Ret value
     deriving (Eq, Show)
 
