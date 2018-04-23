@@ -33,7 +33,7 @@ spec = parallel $ do
 
     it "evaluates subclass" $ do
       res <- evaluate "subclass.rb"
-      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (Right (pure $ injValue (String "\"<bar>\"")))))))))
+      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (Right (Right (pure $ injValue (String "\"<bar>\""))))))))))
       environment (snd res) `shouldBe` [ ("Bar", addr 6)
                                        , ("Foo", addr 3)
                                        , ("Object", addr 0) ]
@@ -45,17 +45,17 @@ spec = parallel $ do
 
     it "evaluates modules" $ do
       res <- evaluate "modules.rb"
-      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (Right (pure $ injValue (String "\"<hello>\"")))))))))
+      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (Right (Right (pure $ injValue (String "\"<hello>\""))))))))))
       environment (snd res) `shouldBe` [ ("Object", addr 0)
                                        , ("Bar", addr 3) ]
 
     it "evaluates early return statements" $ do
       res <- evaluate "early-return.rb"
-      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (Right (pure $ injValue (Value.Integer (Number.Integer 123))))))))))
+      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (Right (Right (pure $ injValue (Value.Integer (Number.Integer 123)))))))))))
 
     it "has prelude" $ do
       res <- fst <$> evaluate "preluded.rb"
-      res `shouldBe` Right (Right (Right (Right (Right (Right (Right (Right (pure $ injValue (String "\"<foo>\"")))))))))
+      res `shouldBe` Right (Right (Right (Right (Right (Right (Right (Right (Right (pure $ injValue (String "\"<foo>\""))))))))))
 
   where
     ns n = Just . Latest . Just . injValue . Namespace n
