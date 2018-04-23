@@ -1,4 +1,3 @@
-{-# LANGUAGE Safe #-}
 {-# OPTIONS_GHC -fno-warn-orphans -funbox-strict-fields #-}
 module Data.Functor.Both
 ( Both
