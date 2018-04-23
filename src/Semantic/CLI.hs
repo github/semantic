@@ -6,45 +6,38 @@ module Semantic.CLI
 , runParse
 ) where
 
-import           Data.Language
+import           Data.File
 import           Data.List (intercalate)
+import qualified Data.List.NonEmpty as NonEmpty
 import           Data.List.Split (splitWhen)
 import           Data.Version (showVersion)
 import           Development.GitRev
 import           Options.Applicative
 import           Options.Applicative.Types (readerAsk)
 import qualified Paths_semantic as Library (version)
-import           Prologue hiding (catch)
-import Control.Monad.Catch (MonadThrow(..))
+import           Prologue
 import           Rendering.Renderer
 import qualified Semantic.Diff as Semantic (diffBlobPairs)
-import qualified Semantic.Graph as Semantic (graph, graphPackage)
+import qualified Semantic.Graph as Semantic (graph)
 import           Semantic.IO (languageForFilePath)
 import qualified Semantic.Log as Log
 import qualified Semantic.Parse as Semantic (parseBlobs)
 import qualified Semantic.Task as Task
 import           System.IO (Handle, stdin, stdout)
 import           Text.Read
-import Path
-import Control.Monad.IO.Class
+import Data.Language
 
 main :: IO ()
 main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskWithOptions
 
-runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both (FilePath, Maybe Language)] -> Task.TaskEff ByteString
+runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both File] -> Task.TaskEff ByteString
 runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Task.readBlobPairs
 
-runParse :: SomeRenderer TermRenderer -> Either Handle [(FilePath, Maybe Language)] -> Task.TaskEff ByteString
+runParse :: SomeRenderer TermRenderer -> Either Handle [File] -> Task.TaskEff ByteString
 runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
 
-runGraph :: SomeRenderer GraphRenderer -> Maybe FilePath -> (FilePath, Maybe Language) -> Task.TaskEff ByteString
-runGraph (SomeRenderer r) rootDir = Semantic.graph rootDir r <=< Task.readBlob
-
-runGraphPackage :: SomeRenderer GraphRenderer -> Path Abs Dir -> Language -> Task.TaskEff ByteString
-runGraphPackage (SomeRenderer r) = Semantic.graphPackage r
-
-instance MonadThrow ReadM where
-  throwM e = readerError (show e)
+runGraph :: SomeRenderer GraphRenderer -> FilePath -> Language -> Task.TaskEff ByteString
+runGraph (SomeRenderer r) dir = Semantic.graph r <=< Task.readProject dir
 
 -- | A parser for the application's command-line arguments.
 --
@@ -97,16 +90,15 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     graphArgumentsParser = do
       renderer <- flag (SomeRenderer DOTGraphRenderer) (SomeRenderer DOTGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
               <|> flag'                                (SomeRenderer JSONGraphRenderer) (long "json" <> help "Output JSON graph")
-      rootDir <- argument absPathReader (metavar "DIRECTORY")
+      rootDir <- argument (maybeReader readMaybe) (metavar "DIRECTORY")
       language <- argument (maybeReader readMaybe :: ReadM Language) (metavar "LANGUAGE")
-      pure $ runGraphPackage renderer rootDir language
+      pure $ runGraph renderer rootDir language
 
-    absPathReader = readerAsk >>= parseAbsDir
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of
-        [a, b] | Just lang <- readMaybe a -> Right (b, Just lang)
-               | Just lang <- readMaybe b -> Right (a, Just lang)
-        [path] -> Right (path, languageForFilePath path)
+        [a, b] | Just lang <- readMaybe a -> Right (File b lang)
+               | Just lang <- readMaybe b -> Right (File a lang)
+        [path] -> maybe (Left $ "Cannot identify language for path:" <> path) (Right . File path) (languageForFilePath path)
         _ -> Left ("cannot parse `" <> arg <> "`\nexpecting LANGUAGE:FILE or just FILE")
 
     optionsReader options = eitherReader $ \ str -> maybe (Left ("expected one of: " <> intercalate ", " (fmap fst options))) (Right . snd) (find ((== str) . fst) options)

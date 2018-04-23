@@ -19,9 +19,8 @@
         (Empty)))
     (
       (DoWhile
-        (Paren
-        { (Identifier)
-        ->(Identifier) })
+      { (Identifier)
+      ->(Identifier) }
         (
           (Call
             (Identifier)

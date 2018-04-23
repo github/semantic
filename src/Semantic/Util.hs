@@ -3,139 +3,60 @@
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.Util where
 
-import Analysis.Abstract.BadVariables
-import Analysis.Abstract.BadModuleResolutions
-import Analysis.Abstract.BadValues
-import Analysis.Abstract.Caching
-import Analysis.Abstract.Quiet
-import Analysis.Abstract.Dead
-import Analysis.Abstract.Evaluating as X
-import Analysis.Abstract.ImportGraph
-import Analysis.Abstract.Tracing
-import Analysis.Declaration
-import Control.Abstract.Analysis
-import Control.Monad.IO.Class
-import Data.Abstract.Evaluatable hiding (head)
-import Data.Abstract.Address
-import Data.Abstract.Located
-import Data.Abstract.Module
-import Data.Abstract.Package as Package
-import Data.Abstract.Type
-import Data.Abstract.Value
-import Data.Blob
-import Data.Diff
-import Data.Range
-import Data.Record
-import Data.Span
-import Data.Term
-import Diffing.Algorithm
-import Diffing.Interpreter
-import System.FilePath.Glob
+import           Analysis.Abstract.BadModuleResolutions
+import           Analysis.Abstract.BadValues
+import           Analysis.Abstract.BadVariables
+import           Analysis.Abstract.Evaluating as X
+import           Analysis.Abstract.ImportGraph
+import           Analysis.Abstract.Quiet
+import           Analysis.Declaration
+import           Control.Abstract.Analysis
+import           Data.Abstract.Address
+import           Data.Abstract.Evaluatable
+import           Data.Abstract.Located
+import           Data.Abstract.Value
+import           Data.Blob
+import           Data.Diff
+import           Data.File
+import qualified Data.Language as Language
+import           Data.Range
+import           Data.Record
+import           Data.Span
+import           Data.Term
+import           Diffing.Algorithm
+import           Diffing.Interpreter
 import qualified GHC.TypeLits as TypeLevel
-import Language.Preluded
-import Parsing.Parser
-import Prologue
-import Semantic.Diff (diffTermPair)
-import Semantic.IO as IO
-import Semantic.Task
-import qualified Semantic.Task as Task
-import System.FilePath.Posix
+import           Language.Preluded
+import           Parsing.Parser
+import           Prologue
+import           Semantic.Diff (diffTermPair)
+import           Semantic.Graph
+import           Semantic.IO as IO
+import           Semantic.Task
 
 import qualified Language.Go.Assignment as Go
+import qualified Language.PHP.Assignment as PHP
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 
--- Ruby
-evalRubyProject = runEvaluatingWithPrelude rubyParser ["rb"]
-evalRubyFile path = runEvaluating <$> (withPrelude <$> parsePrelude rubyParser <*> (evaluateModule <$> parseFile rubyParser Nothing path))
 
-evalRubyProjectGraph path = runAnalysis @(ImportGraphing (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise Ruby.Term) Ruby.Term (Value (Located Precise Ruby.Term)))))))) <$> (withPrelude <$> parsePrelude rubyParser <*> (evaluatePackageBody <$> parseProject rubyParser ["rb"] path))
-
-evalRubyImportGraph paths = runAnalysis @(ImportGraphing (Evaluating (Located Precise Ruby.Term) Ruby.Term (Value (Located Precise Ruby.Term)))) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
-
-evalRubyBadVariables paths = runAnalysis @(BadVariables (Evaluating Precise Ruby.Term (Value Precise))) . evaluateModules <$> parseFiles rubyParser (dropFileName (head paths)) paths
-
--- Go
-evalGoProject path = runEvaluating . evaluatePackageBody <$> parseProject goParser ["go"] path
-evalGoFile path = runEvaluating . evaluateModule <$> parseFile goParser Nothing path
-
-typecheckGoFile path = runAnalysis @(Caching (Evaluating Monovariant Go.Term Type)) . evaluateModule <$> parseFile goParser Nothing path
-
--- Python
-evalPythonProject = runEvaluatingWithPrelude pythonParser ["py"]
-evalPythonFile path = runEvaluating <$> (withPrelude <$> parsePrelude pythonParser <*> (evaluateModule <$> parseFile pythonParser Nothing path))
-evalPythonProjectGraph path = runAnalysis @(ImportGraphing (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise Python.Term) Python.Term (Value (Located Precise Python.Term)))))))) <$> (withPrelude <$> parsePrelude pythonParser <*> (evaluatePackageBody <$> parseProject pythonParser ["py"] path))
-
-typecheckPythonFile path = runAnalysis @(Caching (Evaluating Monovariant Python.Term Type)) . evaluateModule <$> parseFile pythonParser Nothing path
-tracePythonFile path = runAnalysis @(Tracing [] (Evaluating Precise Python.Term (Value Precise))) . evaluateModule <$> parseFile pythonParser Nothing path
-evalDeadTracePythonFile path = runAnalysis @(DeadCode (Tracing [] (Evaluating Precise Python.Term (Value Precise)))) . evaluateModule <$> parseFile pythonParser Nothing path
-
--- PHP
-evalPHPProject path = runEvaluating . evaluatePackageBody <$> parseProject phpParser ["php"] path
-evalPHPFile path = runEvaluating . evaluateModule <$> parseFile phpParser Nothing path
-
--- TypeScript
-evalTypeScriptProject path = runEvaluating . evaluatePackageBody <$> parseProject typescriptParser ["ts", "tsx"] path
-evalTypeScriptFile path = runEvaluating . evaluateModule <$> parseFile typescriptParser Nothing path
-typecheckTypeScriptFile path = runAnalysis @(Caching (Evaluating Monovariant TypeScript.Term Type)) . evaluateModule <$> parseFile typescriptParser Nothing path
-
--- JavaScript
-evalJavaScriptProject path = runAnalysis @(EvaluatingWithHoles TypeScript.Term) . evaluatePackageBody <$> parseProject typescriptParser ["js"] path
-
-runEvaluatingWithPrelude parser exts path = runEvaluating <$> (withPrelude <$> parsePrelude parser <*> (evaluatePackageBody <$> parseProject parser exts path))
-
+-- type TestEvaluating term = Evaluating Precise term (Value Precise)
+type JustEvaluating term = Evaluating (Located Precise term) term (Value (Located Precise term))
 type EvaluatingWithHoles term = BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term))))))
 type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
 
+evalGoProject path = runAnalysis @(JustEvaluating Go.Term) <$> evaluateProject goParser Language.Go Nothing path
+evalRubyProject path = runAnalysis @(JustEvaluating Ruby.Term) <$> evaluateProject rubyParser Language.Ruby rubyPrelude path
+evalPHPProject path = runAnalysis @(JustEvaluating PHP.Term) <$> evaluateProject phpParser Language.PHP Nothing path
+evalPythonProject path = runAnalysis @(JustEvaluating Python.Term) <$> evaluateProject pythonParser Language.Python pythonPrelude path
+evalTypeScriptProject path = runAnalysis @(EvaluatingWithHoles TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
 
--- TODO: Remove this by exporting EvaluatingEffects
-runEvaluating :: forall term effects a.
-                 ( Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects) ~ effects
-                 , Corecursive term
-                 , Recursive term )
-              => Evaluating Precise term (Value Precise) effects a
-              -> Final effects a
-runEvaluating = runAnalysis @(Evaluating Precise term (Value Precise))
+rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) Language.Ruby
+pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) Language.Python
 
-parsePrelude :: forall term. TypeLevel.KnownSymbol (PreludePath term) => Parser term -> IO (Module term)
-parsePrelude parser = do
-  let preludePath = TypeLevel.symbolVal (Proxy :: Proxy (PreludePath term))
-  parseFile parser Nothing preludePath
-
-parseProject :: Parser term
-                -> [Prelude.String]
-                -> FilePath
-                -> IO (PackageBody term)
-parseProject parser exts entryPoint = do
-  let rootDir = takeDirectory entryPoint
-  paths <- getPaths exts rootDir
-  modules <- parseFiles parser rootDir paths
-  pure $ fromModulesWithEntryPoint modules [takeFileName entryPoint]
-
-withPrelude prelude a = do
-  preludeEnv <- evaluateModule prelude *> getEnv
-  withDefaultEnvironment preludeEnv a
-
-getPaths exts = fmap fold . globDir (compile . mappend "**/*." <$> exts)
-
-
--- Read and parse a file.
-parseFile :: Parser term -> Maybe FilePath -> FilePath -> IO (Module term)
-parseFile parser rootDir path = runTask $ do
-  blob <- file path
-  moduleForBlob rootDir blob <$> parse parser blob
-
-parseFiles :: Parser term -> FilePath -> [FilePath] -> IO [Module term]
-parseFiles parser rootDir = traverse (parseFile parser (Just rootDir))
-
-parsePackage :: PackageName -> Parser term -> FilePath -> [FilePath] -> IO (Package term)
-parsePackage name parser rootDir = runTask . Task.parsePackage name parser rootDir
-
-
--- Read a file from the filesystem into a Blob.
-file :: MonadIO m => FilePath -> m Blob
-file path = fromJust <$> IO.readFile path (languageForFilePath path)
+-- Evaluate a project, starting at a single entrypoint.
+evaluateProject parser lang prelude path = evaluatePackage <$> runTask (readProject path lang >>= parsePackage parser prelude)
 
 -- Diff helpers
 diffWithParser :: ( HasField fields Data.Span.Span

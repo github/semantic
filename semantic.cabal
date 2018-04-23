@@ -74,6 +74,7 @@ library
                      , Data.Diff
                      , Data.Empty
                      , Data.Error
+                     , Data.File
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
                      , Data.JSON.Fields

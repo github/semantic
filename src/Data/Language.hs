@@ -32,3 +32,13 @@ languageForType mediaType = case mediaType of
     ".php" -> Just PHP
     ".phpt" -> Just PHP
     _ -> Nothing
+
+extensionsForLanguage :: Language -> [String]
+extensionsForLanguage language = case language of
+  Go -> ["go"]
+  JavaScript -> ["js"]
+  PHP -> ["php"]
+  Python -> ["py"]
+  Ruby -> ["rb"]
+  TypeScript -> ["ts", "tsx", "d.tsx"]
+  _ -> []

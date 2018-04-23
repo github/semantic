@@ -27,7 +27,7 @@ instance ( Effectful m
       => MonadAnalysis location term value (BadValues m effects) where
   type Effects location term value (BadValues m effects) = State [Name] ': Effects location term value (m effects)
 
-  analyzeTerm eval term = resumeException @(ValueError location value) (liftAnalyze analyzeTerm eval term) (
+  analyzeTerm eval term = resume @(ValueError location value) (liftAnalyze analyzeTerm eval term) (
         \yield error -> do
           traceM ("ValueError" <> show error)
           case error of
