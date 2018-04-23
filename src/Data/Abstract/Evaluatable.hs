@@ -12,7 +12,6 @@ module Data.Abstract.Evaluatable
 , variable
 , evaluateTerm
 , evaluateModule
-, evaluateModules
 , evaluatePackage
 , evaluatePackageBody
 , throwLoadError
@@ -261,12 +260,6 @@ evaluateModule :: MonadEvaluatable location term value m
                -> m value
 evaluateModule m = analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evaluateTerm) m)
 
--- | Evaluate with a list of modules in scope, taking the head module as the entry point.
-evaluateModules :: MonadEvaluatable location term value m
-                => [Module term]
-                -> m value
-evaluateModules = fmap Prelude.head . evaluatePackageBody . Package.fromModules
-
 -- | Evaluate a given package.
 evaluatePackage :: ( Effectful m
                    , Member (Reader (SomeOrigin term)) effects
@@ -280,11 +273,16 @@ evaluatePackage p = pushOrigin (packageOrigin p) (evaluatePackageBody (packageBo
 evaluatePackageBody :: MonadEvaluatable location term value m
                     => PackageBody term
                     -> m [value]
-evaluatePackageBody body = localModuleTable (<> packageModules body)
-  (traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints body)))
-  where evaluateEntryPoint (m, sym) = do
-          (_, v) <- require m
-          maybe (pure v) ((`call` []) <=< variable) sym
+evaluatePackageBody body = withPrelude (packagePrelude body) $
+  localModuleTable (<> packageModules body) (traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints body)))
+  where
+    evaluateEntryPoint (m, sym) = do
+      (_, v) <- require m
+      maybe (pure v) ((`call` []) <=< variable) sym
+    withPrelude Nothing a = a
+    withPrelude (Just prelude) a = do
+      preludeEnv <- evaluateModule prelude *> getEnv
+      withDefaultEnvironment preludeEnv a
 
 -- | Push a 'SomeOrigin' onto the stack. This should be used to contextualize execution with information about the originating term, module, or package.
 pushOrigin :: ( Effectful m

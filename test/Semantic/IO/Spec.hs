@@ -12,11 +12,11 @@ spec :: Spec
 spec = parallel $ do
   describe "readFile" $ do
     it "returns a blob for extant files" $ do
-      Just blob <- readFile "semantic.cabal" Nothing
+      Just blob <- readFile (File "semantic.cabal" Nothing)
       blobPath blob `shouldBe` "semantic.cabal"
 
     it "throws for absent files" $ do
-      readFile "this file should not exist" Nothing `shouldThrow` anyIOException
+      readFile (File "this file should not exist" Nothing) `shouldThrow` anyIOException
 
   describe "readBlobPairsFromHandle" $ do
     let a = sourceBlob "method.rb" (Just Ruby) "def foo; end"
