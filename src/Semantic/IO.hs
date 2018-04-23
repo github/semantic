@@ -89,7 +89,7 @@ readBlobsFromPaths files = catMaybes <$> traverse readFile files
 
 readProjectFromPaths :: MonadIO m => Maybe FilePath -> NonEmpty File -> m Project
 readProjectFromPaths root files = do
-  paths <- liftIO $ filter (/= entryPointPath) <$> fmap fold (globDir (compile . mappend "**/*." <$> exts) rootDir)
+  paths <- liftIO $ filter (/= entryPointPath) <$> fmap fold (globDir (compile . mappend "[^vendor]**/*." <$> exts) rootDir)
   pure $ Project files rootDir (toFile <$> paths)
   where
     toFile path = File path (languageForFilePath path)
