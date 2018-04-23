@@ -39,11 +39,11 @@ spec = parallel $ do
 
     it "subclasses" $ do
       v <- fst <$> evaluate "subclass.py"
-      v `shouldBe` Right (Right (Right (Right (Right (Right (Right (Right (pure (injValue (String "\"bar\""))))))))))
+      v `shouldBe` Right (Right (Right (Right (Right (Right (Right (Right (Right (pure (injValue (String "\"bar\"")))))))))))
 
     it "handles multiple inheritance left-to-right" $ do
       v <- fst <$> evaluate "multiple_inheritance.py"
-      v `shouldBe` Right (Right (Right (Right (Right (Right (Right (Right (pure (injValue (String "\"foo!\""))))))))))
+      v `shouldBe` Right (Right (Right (Right (Right (Right (Right (Right (Right (pure (injValue (String "\"foo!\"")))))))))))
 
   where
     ns n = Just . Latest . Just . injValue . Namespace n
