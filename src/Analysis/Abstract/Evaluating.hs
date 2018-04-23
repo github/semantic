@@ -2,7 +2,6 @@
 module Analysis.Abstract.Evaluating
 ( Evaluating
 , EvaluatingState(..)
-, EvaluatingEffects
 , State
 ) where
 
