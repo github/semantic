@@ -1,8 +1,7 @@
 (Program
   (While
-    (Paren
-    { (Identifier)
-    ->(Identifier) })
+  { (Identifier)
+  ->(Identifier) }
     (
       (Call
       { (Identifier)

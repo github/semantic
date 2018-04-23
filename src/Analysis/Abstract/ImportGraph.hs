@@ -83,7 +83,7 @@ instance ( Effectful m
         moduleInclusion (Variable (unName name))
         variableDefinition name
       _ -> pure ()
-    resumeException
+    resume
       @(LoadError term value)
       (liftAnalyze analyzeTerm eval term)
       (\yield (LoadError name) -> moduleInclusion (Module (BC.pack name)) >> yield [])

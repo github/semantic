@@ -79,7 +79,6 @@ type Syntax =
    , Syntax.Empty
    , Syntax.Error
    , Syntax.Identifier
-   , Syntax.Paren
    , Syntax.Program
    , Type.Annotation
    , []
@@ -191,7 +190,7 @@ keywordArgument :: Assignment
 keywordArgument = makeTerm <$> symbol KeywordArgument <*> children (Statement.Assignment [] <$> term expression <*> term expression)
 
 parenthesizedExpression :: Assignment
-parenthesizedExpression = makeTerm <$> symbol ParenthesizedExpression <*> (Syntax.Paren <$> children expressions)
+parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 
 parameter :: Assignment
 parameter =  makeTerm <$> symbol DefaultParameter <*> children (Statement.Assignment [] <$> term expression <*> term expression)

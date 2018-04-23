@@ -18,10 +18,9 @@
           (SendChannel
           { (Identifier)
           ->(Identifier) })
-          (Paren
-            (Minus
-              (Identifier)
-              (Identifier))))
+          (Minus
+            (Identifier)
+            (Identifier)))
         (Empty))
       (Call
         (Identifier)

@@ -1,4 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE ApplicativeDo, TemplateHaskell #-}
 module Semantic.CLI
 ( main
 -- Testing
@@ -6,24 +6,24 @@ module Semantic.CLI
 , runParse
 ) where
 
-import Prologue
-import Data.File
-import Data.List (intercalate)
-import Data.List.Split (splitWhen)
+import           Data.File
+import           Data.List (intercalate)
 import qualified Data.List.NonEmpty as NonEmpty
-import Data.Version (showVersion)
-import Development.GitRev
-import Options.Applicative
-import Rendering.Renderer
+import           Data.List.Split (splitWhen)
+import           Data.Version (showVersion)
+import           Development.GitRev
+import           Options.Applicative
 import qualified Paths_semantic as Library (version)
-import Semantic.IO (languageForFilePath)
+import           Prologue
+import           Rendering.Renderer
 import qualified Semantic.Diff as Semantic (diffBlobPairs)
+import qualified Semantic.Graph as Semantic (graph)
+import           Semantic.IO (languageForFilePath)
 import qualified Semantic.Log as Log
 import qualified Semantic.Parse as Semantic (parseBlobs)
-import qualified Semantic.Graph as Semantic (graph)
 import qualified Semantic.Task as Task
-import System.IO (Handle, stdin, stdout)
-import Text.Read
+import           System.IO (Handle, stdin, stdout)
+import           Text.Read
 
 
 main :: IO ()
@@ -48,55 +48,50 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     versionString = "semantic version " <> showVersion Library.version <> " (" <> $(gitHash) <> ")"
     description = fullDesc <> header "semantic -- Parse and diff semantically"
 
-    optionsParser = Log.Options
-      <$> (not <$> switch (long "disable-colour" <> long "disable-color" <> help "Disable ANSI colors in log messages even if the terminal is a TTY."))
-      <*> options [("error", Just Log.Error), ("warning", Just Log.Warning), ("info", Just Log.Info), ("debug", Just Log.Debug), ("none", Nothing)]
-            (long "log-level" <> value (Just Log.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
-      <*> optional (strOption (long "request-id" <> help "A string to use as the request identifier for any logged messages." <> metavar "id"))
-      -- The rest of the logging options are set automatically at runtime.
-      <*> pure False -- IsTerminal
-      <*> pure False -- PrintSource
-      <*> pure Log.logfmtFormatter -- Formatter
-      <*> pure 0 -- ProcessID
-      <*> switch (long "fail-on-warning" <> help "Fail on assignment warnings.")
-    argumentsParser = (. Task.writeToOutput) . (>>=)
-      <$> hsubparser (diffCommand <> parseCommand <> graphCommand)
-      <*> (   Right <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout")
-          <|> pure (Left stdout) )
+    optionsParser = do
+      disableColour <- not <$> switch (long "disable-colour" <> long "disable-color" <> help "Disable ANSI colors in log messages even if the terminal is a TTY.")
+      logLevel <- options [ ("error", Just Log.Error) , ("warning", Just Log.Warning) , ("info", Just Log.Info) , ("debug", Just Log.Debug) , ("none", Nothing)]
+                          (long "log-level" <> value (Just Log.Warning) <> help "Log messages at or above this level, or disable logging entirely.")
+      requestId <- optional (strOption $ long "request-id" <> help "A string to use as the request identifier for any logged messages." <> metavar "id")
+      failOnWarning <- switch (long "fail-on-warning" <> help "Fail on assignment warnings.")
+      pure $ Log.Options disableColour logLevel requestId False False Log.logfmtFormatter 0 failOnWarning
+
+    argumentsParser = do
+      subparser <- hsubparser (diffCommand <> parseCommand <> graphCommand)
+      output <- Right <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (Left stdout)
+      pure $ subparser >>= Task.writeToOutput output
 
     diffCommand = command "diff" (info diffArgumentsParser (progDesc "Show changes between commits or paths"))
-    diffArgumentsParser = runDiff
-      <$> (   flag  (SomeRenderer SExpressionDiffRenderer) (SomeRenderer SExpressionDiffRenderer) (long "sexpression" <> help "Output s-expression diff tree")
-          <|> flag'                                        (SomeRenderer JSONDiffRenderer)        (long "json" <> help "Output JSON diff trees")
-          <|> flag'                                        (SomeRenderer ToCDiffRenderer)         (long "toc" <> help "Output JSON table of contents diff summary")
-          <|> flag'                                        (SomeRenderer DOTDiffRenderer)         (long "dot" <> help "Output the diff as a DOT graph"))
-      <*> (   Right <$> some (both
-          <$> argument filePathReader (metavar "FILE_A")
-          <*> argument filePathReader (metavar "FILE_B"))
-          <|> pure (Left stdin) )
+    diffArgumentsParser = do
+      renderer <- flag  (SomeRenderer SExpressionDiffRenderer) (SomeRenderer SExpressionDiffRenderer) (long "sexpression" <> help "Output s-expression diff tree")
+              <|> flag'                                        (SomeRenderer JSONDiffRenderer)        (long "json" <> help "Output JSON diff trees")
+              <|> flag'                                        (SomeRenderer ToCDiffRenderer)         (long "toc" <> help "Output JSON table of contents diff summary")
+              <|> flag'                                        (SomeRenderer DOTDiffRenderer)         (long "dot" <> help "Output the diff as a DOT graph")
+      filesOrStdin <- Right <$> some (both <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
+      pure $ runDiff renderer filesOrStdin
 
     parseCommand = command "parse" (info parseArgumentsParser (progDesc "Print parse trees for path(s)"))
-    parseArgumentsParser = runParse
-      <$> (   flag  (SomeRenderer SExpressionTermRenderer) (SomeRenderer SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
-          <|> flag'                                        (SomeRenderer JSONTermRenderer)        (long "json" <> help "Output JSON parse trees")
-          <|> flag'                                        (SomeRenderer TagsTermRenderer)        (long "tags" <> help "Output JSON tags")
-          <|> flag'                                        (SomeRenderer . SymbolsTermRenderer)   (long "symbols" <> help "Output JSON symbol list")
-              <*> (   option symbolFieldsReader (  long "fields"
-                                                <> help "Comma delimited list of specific fields to return (symbols output only)."
-                                                <> metavar "FIELDS")
+    parseArgumentsParser = do
+      renderer <- flag  (SomeRenderer SExpressionTermRenderer) (SomeRenderer SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
+              <|> flag'                                        (SomeRenderer JSONTermRenderer)        (long "json" <> help "Output JSON parse trees")
+              <|> flag'                                        (SomeRenderer TagsTermRenderer)        (long "tags" <> help "Output JSON tags")
+              <|> flag'                                        (SomeRenderer . SymbolsTermRenderer)   (long "symbols" <> help "Output JSON symbol list")
+                   <*> (option symbolFieldsReader (  long "fields"
+                                                 <> help "Comma delimited list of specific fields to return (symbols output only)."
+                                                 <> metavar "FIELDS")
                   <|> pure defaultSymbolFields)
-          <|> flag'                                        (SomeRenderer ImportsTermRenderer)     (long "import-graph" <> help "Output JSON import graph")
-          <|> flag'                                        (SomeRenderer DOTTermRenderer)         (long "dot" <> help "Output DOT graph parse trees"))
-      <*> (   Right <$> some (argument filePathReader (metavar "FILES..."))
-          <|> pure (Left stdin) )
+              <|> flag'                                        (SomeRenderer ImportsTermRenderer)     (long "import-graph" <> help "Output JSON import graph")
+              <|> flag'                                        (SomeRenderer DOTTermRenderer)         (long "dot" <> help "Output DOT graph parse trees")
+      filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
+      pure $ runParse renderer filesOrStdin
 
     graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute import/call graph for an entry point"))
-    graphArgumentsParser = runGraph
-      <$> (   flag (SomeRenderer DOTGraphRenderer) (SomeRenderer DOTGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
-          <|> flag'                                (SomeRenderer JSONGraphRenderer) (long "json" <> help "Output JSON graph")
-          )
-      <*> optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to first entry file's directory." <> metavar "DIRECTORY"))
-      <*> NonEmpty.some1 (argument filePathReader (metavar "FILES..." <> help "Entry point(s)"))
+    graphArgumentsParser = do
+      renderer <- flag (SomeRenderer DOTGraphRenderer) (SomeRenderer DOTGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
+              <|> flag'                                (SomeRenderer JSONGraphRenderer) (long "json" <> help "Output JSON graph")
+      rootDir <- optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file's directory." <> metavar "DIRECTORY"))
+      entryPoints <- NonEmpty.some1 (argument filePathReader (metavar "FILES..." <> help "Entry point(s)"))
+      pure $ runGraph renderer rootDir entryPoints
 
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of

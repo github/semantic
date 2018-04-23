@@ -4,14 +4,13 @@
   {+(Hash
     {+(KeyValue
       {+(Identifier)+}
-      {+(Paren
+      {+(SequenceExpression
+        {+(Float)+}
         {+(SequenceExpression
-          {+(Float)+}
-          {+(SequenceExpression
-            {+(Plus
-              {+(Float)+}
-              {+(Float)+})+}
-            {+(Float)+})+})+})+})+})+})+}
+          {+(Plus
+            {+(Float)+}
+            {+(Float)+})+}
+          {+(Float)+})+})+})+})+})+}
 {-(SequenceExpression
   {-(Assignment
     {-(Identifier)-}

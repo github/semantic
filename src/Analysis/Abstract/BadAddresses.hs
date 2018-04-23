@@ -24,7 +24,7 @@ instance ( Effectful m
       => MonadAnalysis location term value (BadAddresses m effects) where
   type Effects location term value (BadAddresses m effects) = Effects location term value (m effects)
 
-  analyzeTerm eval term = resumeException @(AddressError location value) (liftAnalyze analyzeTerm eval term) (
+  analyzeTerm eval term = resume @(AddressError location value) (liftAnalyze analyzeTerm eval term) (
         \yield error -> do
           traceM ("AddressError:" <> show error)
           case error of

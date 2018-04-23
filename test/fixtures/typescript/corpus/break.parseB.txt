@@ -10,10 +10,9 @@
       (Identifier))
     (
       (If
-        (Paren
-          (Equal
-            (Identifier)
-            (Float)))
+        (Equal
+          (Identifier)
+          (Float))
         (
           (Continue
             (Empty)))

@@ -1,7 +1,6 @@
 (Program
   (While
-    (Paren
-      (Identifier))
+    (Identifier)
     (
       (Call
         (Identifier)
