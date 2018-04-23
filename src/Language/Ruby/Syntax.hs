@@ -7,6 +7,7 @@ import           Data.Abstract.Module (ModulePath)
 import           Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Path
 import qualified Data.ByteString.Char8 as BC
+import qualified Data.Language as Language
 import           Diffing.Algorithm
 import           Prelude hiding (fail)
 import           Prologue
@@ -20,14 +21,14 @@ resolveRubyName :: forall value term location m. MonadEvaluatable location term 
 resolveRubyName name = do
   let name' = cleanNameOrPath name
   modulePath <- resolve [name' <.> "rb"]
-  maybe (throwResumable @(ResolutionError value) $ RubyError name') pure modulePath
+  maybe (throwResumable @(ResolutionError value) $ NotFoundError name' Language.Ruby) pure modulePath
 
 -- load "/root/src/file.rb"
 resolveRubyPath :: forall value term location m. MonadEvaluatable location term value m => ByteString -> m ModulePath
 resolveRubyPath path = do
   let name' = cleanNameOrPath path
   modulePath <- resolve [name']
-  maybe (throwResumable @(ResolutionError value) $ RubyError name') pure modulePath
+  maybe (throwResumable @(ResolutionError value) $ NotFoundError name' Language.Ruby) pure modulePath
 
 cleanNameOrPath :: ByteString -> String
 cleanNameOrPath = BC.unpack . dropRelativePrefix . stripQuotes
