@@ -1,8 +1,10 @@
+{-# LANGUAGE TupleSections #-}
 module Data.Abstract.Package where
 
 import Data.Abstract.FreeVariables
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
+import qualified Data.Map as Map
 
 type PackageName = Name
 
@@ -32,9 +34,9 @@ data Package term = Package
 
 fromModules :: [Module term] -> PackageBody term
 fromModules []     = PackageBody mempty mempty
-fromModules (m:ms) = fromModulesWithEntryPoint (m : ms) (modulePath (moduleInfo m))
+fromModules (m:ms) = fromModulesWithEntryPoint (m : ms) (modulePath . moduleInfo <$> (m : ms))
 
-fromModulesWithEntryPoint :: [Module term] -> FilePath -> PackageBody term
-fromModulesWithEntryPoint ms path = PackageBody (ModuleTable.fromModules ms) entryPoints
-  where entryPoints = ModuleTable.singleton path Nothing
+fromModulesWithEntryPoint :: [Module term] -> [FilePath] -> PackageBody term
+fromModulesWithEntryPoint ms paths = PackageBody (ModuleTable.fromModules ms) entryPoints
+  where entryPoints = ModuleTable . Map.fromList $ (,Nothing) <$> paths
 
