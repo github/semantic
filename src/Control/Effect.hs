@@ -77,6 +77,7 @@ instance RunEffect (Resumable exc) a where
   type Result (Resumable exc) a = Either (SomeExc exc) a
   runEffect = Resumable.runError
 
+-- | Standard (non-resumable) exceptions, as above, are rendered into 'Left's and 'Right's.
 instance RunEffect (Exc exc) a where
   type Result (Exc exc) a = Either exc a
   runEffect = Exception.runError
