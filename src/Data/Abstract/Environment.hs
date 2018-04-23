@@ -21,6 +21,7 @@ import           Data.Abstract.Address
 import           Data.Abstract.FreeVariables
 import           Data.Abstract.Live
 import           Data.Align
+import           Data.Empty as Empty
 import qualified Data.Map as Map
 import           Data.Semigroup.Reducer
 import           GHC.Exts (IsList (..))
@@ -49,6 +50,9 @@ instance IsList (Environment l a) where
   fromList xs                   = Environment (Map.fromList xs :| [])
   toList (Environment (x :| _)) = Map.toList x
 
+instance Empty (Environment l a) where
+  empty = Environment (Empty.empty :| [])
+
 -- TODO: property-check me
 instance Semigroup (Environment l a) where
   Environment (a :| as) <> Environment (b :| bs) =
@@ -68,7 +72,7 @@ push (Environment (a :| as)) = Environment (mempty :| a : as)
 
 -- | Remove the frontmost scope.
 pop :: Environment l a -> Environment l a
-pop (Environment (_ :| []))     = mempty
+pop (Environment (_ :| []))     = Empty.empty
 pop (Environment (_ :| a : as)) = Environment (a :| as)
 
 -- | Drop all scopes save for the frontmost one.
