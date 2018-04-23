@@ -11,6 +11,7 @@ module Data.Abstract.Environment
   , names
   , overwrite
   , pairs
+  , unpairs
   , pop
   , push
   , roots
@@ -95,6 +96,9 @@ mergeNewer (Environment a) (Environment b) =
 -- [(Name {unName = "foo"},Address {unAddress = Precise {unPrecise = 1}})]
 pairs :: Environment l a -> [(Name, Address l a)]
 pairs = Map.toList . fold . unEnvironment
+
+unpairs :: [(Name, Address l a)] -> Environment l a
+unpairs = fromList
 
 -- | Lookup a 'Name' in the environment.
 --
