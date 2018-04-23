@@ -156,6 +156,10 @@ instance Members '[ Reader (ModuleTable [Module term])
     o <- raise ask
     maybeFail "unable to get currentModule" $ withSomeOrigin (originModule @term) o
 
+  currentPackage = do
+    o <- raise ask
+    maybeFail "unable to get currentPackage" $ withSomeOrigin (originPackage @term) o
+
 instance Members (EvaluatingEffects location term value) effects
       => MonadEvaluator location term value (Evaluating location term value effects) where
   getConfiguration term = Configuration term mempty <$> getEnv <*> getHeap

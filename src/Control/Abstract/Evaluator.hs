@@ -30,6 +30,7 @@ import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
+import Data.Abstract.Package
 import Data.Semigroup.Reducer
 import Prologue
 
@@ -157,6 +158,8 @@ class Monad m => MonadModuleTable location term value m | m -> location, m -> te
 
   -- | Get the currently evaluating 'ModuleInfo'.
   currentModule :: m ModuleInfo
+  -- | Get the currently evaluating 'PackageInfo'.
+  currentPackage :: m PackageInfo
 
 -- | Update the evaluated module table.
 modifyModuleTable :: MonadModuleTable location term value m => (ModuleTable (Environment location value, value) -> ModuleTable (Environment location value, value)) -> m ()
