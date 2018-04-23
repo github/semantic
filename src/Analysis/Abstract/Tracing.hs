@@ -16,21 +16,21 @@ import Prologue
 newtype Tracing (trace :: * -> *) m (effects :: [* -> *]) a = Tracing (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
-deriving instance MonadControl term (m effects)                    => MonadControl term (Tracing trace m effects)
-deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (Tracing trace m effects)
-deriving instance MonadHeap location value (m effects)             => MonadHeap location value (Tracing trace m effects)
-deriving instance MonadModuleTable location term value (m effects) => MonadModuleTable location term value (Tracing trace m effects)
-deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (Tracing trace m effects)
+deriving instance MonadControl term effects m                    => MonadControl term effects (Tracing trace m)
+deriving instance MonadEnvironment location value effects m      => MonadEnvironment location value effects (Tracing trace m)
+deriving instance MonadHeap location value effects m             => MonadHeap location value effects (Tracing trace m)
+deriving instance MonadModuleTable location term value effects m => MonadModuleTable location term value effects (Tracing trace m)
+deriving instance MonadEvaluator location term value effects m   => MonadEvaluator location term value effects (Tracing trace m)
 
 instance ( Corecursive term
          , Effectful m
          , Member (Writer (trace (Configuration location term value))) effects
-         , MonadAnalysis location term value (m effects)
+         , MonadAnalysis location term value effects m
          , Ord location
          , Reducer (Configuration location term value) (trace (Configuration location term value))
          )
-      => MonadAnalysis location term value (Tracing trace m effects) where
-  type Effects location term value (Tracing trace m effects) = Writer (trace (Configuration location term value)) ': Effects location term value (m effects)
+      => MonadAnalysis location term value effects (Tracing trace m) where
+  type Effects location term value (Tracing trace m) = Writer (trace (Configuration location term value)) ': Effects location term value m
 
   analyzeTerm recur term = do
     config <- getConfiguration (embedSubterm term)

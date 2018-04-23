@@ -91,7 +91,7 @@ type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
 
 -- TODO: Remove this by exporting EvaluatingEffects
 runEvaluating :: forall term effects a.
-                 ( Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise) effects) ~ effects
+                 ( Effects Precise term (Value Precise) (Evaluating Precise term (Value Precise)) ~ effects
                  , Corecursive term
                  , Recursive term )
               => Evaluating Precise term (Value Precise) effects a

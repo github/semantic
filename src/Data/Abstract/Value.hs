@@ -198,7 +198,7 @@ instance Ord location => ValueRoots location (Value location) where
 
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance forall location term m. (Monad m, MonadEvaluatable location term (Value location) m) => MonadValue location (Value location) m where
+instance (Monad (m effects), MonadEvaluatable location term (Value location) effects m) => MonadValue location (Value location) effects m where
   hole     = pure . injValue $ Hole
   unit     = pure . injValue $ Unit
   integer  = pure . injValue . Integer . Number.Integer
@@ -277,7 +277,7 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
     | otherwise = throwValueError (Numeric2Error left right)
       where
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: MonadValue location value m => Number.SomeNumber -> m value
+        specialize :: MonadValue location value effects m => Number.SomeNumber -> m effects value
         specialize (Number.SomeNumber (Number.Integer i)) = integer i
         specialize (Number.SomeNumber (Number.Ratio r))          = rational r
         specialize (Number.SomeNumber (Number.Decimal d))        = float d
@@ -295,7 +295,7 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: (Ord a, MonadValue location value m) => a -> a -> m value
+        go :: (Ord a, MonadValue location value effects m) => a -> a -> m effects value
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
           Generalized -> integer (orderingToInt (compare l r))
@@ -331,10 +331,10 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
         localEnv (mappend bindings) (evalClosure label)
       Nothing -> throwValueError (CallError op)
     where
-      evalClosure :: Label -> m (Value location)
+      evalClosure :: Label -> m effects (Value location)
       evalClosure lab = catchException (goto lab >>= evaluateTerm) handleReturn
 
-      handleReturn :: ControlThrow (Value location) -> m (Value location)
+      handleReturn :: ControlThrow (Value location) -> m effects (Value location)
       handleReturn (Ret v) = pure v
 
   loop = fix

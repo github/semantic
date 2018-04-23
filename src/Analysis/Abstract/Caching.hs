@@ -22,36 +22,36 @@ type CachingEffects location term value effects
 newtype Caching m (effects :: [* -> *]) a = Caching (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
-deriving instance MonadControl term (m effects)                    => MonadControl term (Caching m effects)
-deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (Caching m effects)
-deriving instance MonadHeap location value (m effects)             => MonadHeap location value (Caching m effects)
-deriving instance MonadModuleTable location term value (m effects) => MonadModuleTable location term value (Caching m effects)
-deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (Caching m effects)
+deriving instance MonadControl term effects m                    => MonadControl term effects (Caching m)
+deriving instance MonadEnvironment location value effects m      => MonadEnvironment location value effects (Caching m)
+deriving instance MonadHeap location value effects m             => MonadHeap location value effects (Caching m)
+deriving instance MonadModuleTable location term value effects m => MonadModuleTable location term value effects (Caching m)
+deriving instance MonadEvaluator location term value effects m   => MonadEvaluator location term value effects (Caching m)
 
 -- | Functionality used to perform caching analysis. This is not exported, and exists primarily for organizational reasons.
-class MonadEvaluator location term value m => MonadCaching location term value m where
+class MonadEvaluator location term value effects m => MonadCaching location term value effects m where
   -- | Look up the set of values for a given configuration in the in-cache.
-  consultOracle :: Configuration location term value -> m (Set (value, Heap location value))
+  consultOracle :: Configuration location term value -> m effects (Set (value, Heap location value))
   -- | Run an action with the given in-cache.
-  withOracle :: Cache location term value -> m a -> m a
+  withOracle :: Cache location term value -> m effects a -> m effects a
 
   -- | Look up the set of values for a given configuration in the out-cache.
-  lookupCache :: Configuration location term value -> m (Maybe (Set (value, Heap location value)))
+  lookupCache :: Configuration location term value -> m effects (Maybe (Set (value, Heap location value)))
   -- | Run an action, caching its result and 'Heap' under the given configuration.
-  caching :: Configuration location term value -> Set (value, Heap location value) -> m value -> m value
+  caching :: Configuration location term value -> Set (value, Heap location value) -> m effects value -> m effects value
 
   -- | Run an action starting from an empty out-cache, and return the out-cache afterwards.
-  isolateCache :: m a -> m (Cache location term value)
+  isolateCache :: m effects a -> m effects (Cache location term value)
 
 instance ( Effectful m
          , Members (CachingEffects location term value '[]) effects
-         , MonadEvaluator location term value (m effects)
+         , MonadEvaluator location term value effects m
          , Ord (Cell location value)
          , Ord location
          , Ord term
          , Ord value
          )
-         => MonadCaching location term value (Caching m effects) where
+         => MonadCaching location term value effects (Caching m) where
   consultOracle configuration = raise (fromMaybe mempty . cacheLookup configuration <$> ask)
   withOracle cache = raise . local (const cache) . lower
 
@@ -69,16 +69,16 @@ instance ( Alternative (m effects)
          , Corecursive term
          , Effectful m
          , Members (CachingEffects location term value '[]) effects
-         , MonadAnalysis location term value (m effects)
+         , MonadAnalysis location term value effects m
          , MonadFresh (m effects)
          , Ord (Cell location value)
          , Ord location
          , Ord term
          , Ord value
          )
-      => MonadAnalysis location term value (Caching m effects) where
+      => MonadAnalysis location term value effects (Caching m) where
   -- We require the 'CachingEffects' in addition to the underlying analysis’ 'Effects'.
-  type Effects location term value (Caching m effects) = CachingEffects location term value (Effects location term value (m effects))
+  type Effects location term value (Caching m) = CachingEffects location term value (Effects location term value m)
 
   -- Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
   analyzeTerm recur e = do
@@ -121,5 +121,5 @@ converge f = loop
             loop x'
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Alternative m, Foldable t, MonadEvaluator location term value m) => t (a, Heap location value) -> m a
+scatter :: (Alternative (m effects), Foldable t, MonadEvaluator location term value effects m) => t (a, Heap location value) -> m effects a
 scatter = foldMapA (\ (value, heap') -> putHeap heap' $> value)

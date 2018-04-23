@@ -11,20 +11,20 @@ import Prologue
 newtype BadVariables m (effects :: [* -> *]) a = BadVariables (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
-deriving instance MonadControl term (m effects)                    => MonadControl term (BadVariables m effects)
-deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (BadVariables m effects)
-deriving instance MonadHeap location value (m effects)             => MonadHeap location value (BadVariables m effects)
-deriving instance MonadModuleTable location term value (m effects) => MonadModuleTable location term value (BadVariables m effects)
-deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (BadVariables m effects)
+deriving instance MonadControl term effects m                    => MonadControl term effects (BadVariables m)
+deriving instance MonadEnvironment location value effects m      => MonadEnvironment location value effects (BadVariables m)
+deriving instance MonadHeap location value effects m             => MonadHeap location value effects (BadVariables m)
+deriving instance MonadModuleTable location term value effects m => MonadModuleTable location term value effects (BadVariables m)
+deriving instance MonadEvaluator location term value effects m   => MonadEvaluator location term value effects (BadVariables m)
 
 instance ( Effectful m
          , Member (Resumable (EvalError value)) effects
          , Member (State [Name]) effects
-         , MonadAnalysis location term value (m effects)
-         , MonadValue location value (BadVariables m effects)
+         , MonadAnalysis location term value effects m
+         , MonadValue location value effects (BadVariables m)
          )
-      => MonadAnalysis location term value (BadVariables m effects) where
-  type Effects location term value (BadVariables m effects) = State [Name] ': Effects location term value (m effects)
+      => MonadAnalysis location term value effects (BadVariables m) where
+  type Effects location term value (BadVariables m) = State [Name] ': Effects location term value m
 
   analyzeTerm eval term = resume @(EvalError value) (liftAnalyze analyzeTerm eval term) (
         \yield err -> do

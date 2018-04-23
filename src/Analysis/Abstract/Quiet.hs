@@ -17,19 +17,19 @@ import Prologue
 newtype Quietly m (effects :: [* -> *]) a = Quietly (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
-deriving instance MonadControl term (m effects)                    => MonadControl term (Quietly m effects)
-deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (Quietly m effects)
-deriving instance MonadHeap location value (m effects)             => MonadHeap location value (Quietly m effects)
-deriving instance MonadModuleTable location term value (m effects) => MonadModuleTable location term value (Quietly m effects)
-deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (Quietly m effects)
+deriving instance MonadControl term effects m                    => MonadControl term effects (Quietly m)
+deriving instance MonadEnvironment location value effects m      => MonadEnvironment location value effects (Quietly m)
+deriving instance MonadHeap location value effects m             => MonadHeap location value effects (Quietly m)
+deriving instance MonadModuleTable location term value effects m => MonadModuleTable location term value effects (Quietly m)
+deriving instance MonadEvaluator location term value effects m   => MonadEvaluator location term value effects (Quietly m)
 
 instance ( Effectful m
          , Member (Resumable (Unspecialized value)) effects
-         , MonadAnalysis location term value (m effects)
-         , MonadValue location value (Quietly m effects)
+         , MonadAnalysis location term value effects m
+         , MonadValue location value effects (Quietly m)
          )
-      => MonadAnalysis location term value (Quietly m effects) where
-  type Effects location term value (Quietly m effects) = Effects location term value (m effects)
+      => MonadAnalysis location term value effects (Quietly m) where
+  type Effects location term value (Quietly m) = Effects location term value m
 
   analyzeTerm eval term = resume @(Unspecialized value) (liftAnalyze analyzeTerm eval term) (\yield err@(Unspecialized _) ->
           traceM ("Unspecialized:" <> show err) >> hole >>= yield)

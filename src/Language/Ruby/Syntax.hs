@@ -16,14 +16,14 @@ import           System.FilePath.Posix
 -- TODO: Fully sort out ruby require/load mechanics
 --
 -- require "json"
-resolveRubyName :: forall value term location m. MonadEvaluatable location term value m => ByteString -> m ModulePath
+resolveRubyName :: forall value term location effects m. MonadEvaluatable location term value effects m => ByteString -> m effects ModulePath
 resolveRubyName name = do
   let name' = cleanNameOrPath name
   modulePath <- resolve [name' <.> "rb"]
   maybe (throwResumable @(ResolutionError value) $ RubyError name') pure modulePath
 
 -- load "/root/src/file.rb"
-resolveRubyPath :: forall value term location m. MonadEvaluatable location term value m => ByteString -> m ModulePath
+resolveRubyPath :: forall value term location effects m. MonadEvaluatable location term value effects m => ByteString -> m effects ModulePath
 resolveRubyPath path = do
   let name' = cleanNameOrPath path
   modulePath <- resolve [name']
@@ -68,9 +68,9 @@ instance Evaluatable Require where
     modifyEnv (`mergeNewer` importedEnv)
     pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
-doRequire :: MonadEvaluatable location term value m
+doRequire :: MonadEvaluatable location term value effects m
           => ModulePath
-          -> m (Environment location value, value)
+          -> m effects (Environment location value, value)
 doRequire name = do
   moduleTable <- getModuleTable
   case ModuleTable.lookup name moduleTable of
@@ -95,7 +95,7 @@ instance Evaluatable Load where
     doLoad path shouldWrap
   eval (Load _) = fail "invalid argument supplied to load, path is required"
 
-doLoad :: MonadEvaluatable location term value m => ByteString -> Bool -> m value
+doLoad :: MonadEvaluatable location term value effects m => ByteString -> Bool -> m effects value
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   (importedEnv, _) <- traceResolve path path' $ isolate (load path')

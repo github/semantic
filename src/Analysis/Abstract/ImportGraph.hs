@@ -57,11 +57,11 @@ style = (defaultStyle vertexName)
 newtype ImportGraphing m (effects :: [* -> *]) a = ImportGraphing (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
-deriving instance MonadControl term (m effects)                    => MonadControl term (ImportGraphing m effects)
-deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (ImportGraphing m effects)
-deriving instance MonadHeap location value (m effects)             => MonadHeap location value (ImportGraphing m effects)
-deriving instance MonadModuleTable location term value (m effects) => MonadModuleTable location term value (ImportGraphing m effects)
-deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (ImportGraphing m effects)
+deriving instance MonadControl term effects m                    => MonadControl term effects (ImportGraphing m)
+deriving instance MonadEnvironment location value effects m      => MonadEnvironment location value effects (ImportGraphing m)
+deriving instance MonadHeap location value effects m             => MonadHeap location value effects (ImportGraphing m)
+deriving instance MonadModuleTable location term value effects m => MonadModuleTable location term value effects (ImportGraphing m)
+deriving instance MonadEvaluator location term value effects m   => MonadEvaluator location term value effects (ImportGraphing m)
 
 
 instance ( Effectful m
@@ -69,12 +69,12 @@ instance ( Effectful m
          , Member (Resumable (LoadError term value)) effects
          , Member (State ImportGraph) effects
          , Member Syntax.Identifier syntax
-         , MonadAnalysis (Located location term) term value (m effects)
+         , MonadAnalysis (Located location term) term value effects m
          , term ~ Term (Union syntax) ann
          , Show ann
          )
-      => MonadAnalysis (Located location term) term value (ImportGraphing m effects) where
-  type Effects (Located location term) term value (ImportGraphing m effects) = State ImportGraph ': Effects (Located location term) term value (m effects)
+      => MonadAnalysis (Located location term) term value effects (ImportGraphing m) where
+  type Effects (Located location term) term value (ImportGraphing m) = State ImportGraph ': Effects (Located location term) term value m
 
   analyzeTerm eval term@(In ann syntax) = do
     traceShowM ann
@@ -102,10 +102,9 @@ moduleGraph = maybe empty (vertex . Module . BC.pack . modulePath) . withSomeOri
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: forall m location term value effects
-                 .  ( Effectful m
-                    , Member (Reader (SomeOrigin term)) effects
+                 .  ( Member (Reader (SomeOrigin term)) effects
                     , Member (State ImportGraph) effects
-                    , MonadEvaluator location term value (m effects)
+                    , MonadEvaluator location term value effects m
                     )
                  => Vertex
                  -> ImportGraphing m effects ()
@@ -115,10 +114,9 @@ packageInclusion v = do
 
 -- | Add an edge from the current module to the passed vertex.
 moduleInclusion :: forall m location term value effects
-                .  ( Effectful m
-                   , Member (Reader (SomeOrigin term)) effects
+                .  ( Member (Reader (SomeOrigin term)) effects
                    , Member (State ImportGraph) effects
-                   , MonadEvaluator location term value (m effects)
+                   , MonadEvaluator location term value effects m
                    )
                 => Vertex
                 -> ImportGraphing m effects ()
@@ -127,10 +125,11 @@ moduleInclusion v = do
   appendGraph (moduleGraph @term o `connect` vertex v)
 
 -- | Add an edge from the passed variable name to the module it originated within.
-variableDefinition :: ( Effectful m
-              , Member (State ImportGraph) effects
-              , MonadEvaluator (Located location term) term value (m effects)
-              ) => Name -> ImportGraphing m effects ()
+variableDefinition :: ( Member (State ImportGraph) effects
+                      , MonadEvaluator (Located location term) term value effects m
+                      )
+                   => Name
+                   -> ImportGraphing m effects ()
 variableDefinition name = do
   graph <- maybe empty (moduleGraph . origin . unAddress) <$> lookupEnv name
   appendGraph (vertex (Variable (unName name)) `connect` graph)

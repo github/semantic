@@ -52,15 +52,15 @@ instance Ord location => ValueRoots location Type where
 
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance ( Alternative m
-         , MonadAddressable location m
-         , MonadEnvironment location Type m
-         , MonadFail m
-         , MonadFresh m
-         , MonadHeap location Type m
+instance ( Alternative (m effects)
+         , MonadAddressable location effects m
+         , MonadEnvironment location Type effects m
+         , MonadFail (m effects)
+         , MonadFresh (m effects)
+         , MonadHeap location Type effects m
          , Reducer Type (Cell location Type)
          )
-      => MonadValue location Type m where
+      => MonadValue location Type effects m where
   lambda names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name

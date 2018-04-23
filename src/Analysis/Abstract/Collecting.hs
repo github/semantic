@@ -13,30 +13,30 @@ import Prologue
 newtype Collecting m (effects :: [* -> *]) a = Collecting (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
-deriving instance MonadControl term (m effects)                    => MonadControl term (Collecting m effects)
-deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (Collecting m effects)
-deriving instance MonadHeap location value (m effects)             => MonadHeap location value (Collecting m effects)
-deriving instance MonadModuleTable location term value (m effects) => MonadModuleTable location term value (Collecting m effects)
+deriving instance MonadControl term effects m                    => MonadControl term effects (Collecting m)
+deriving instance MonadEnvironment location value effects m      => MonadEnvironment location value effects (Collecting m)
+deriving instance MonadHeap location value effects m             => MonadHeap location value effects (Collecting m)
+deriving instance MonadModuleTable location term value effects m => MonadModuleTable location term value effects (Collecting m)
 
 instance ( Effectful m
          , Member (Reader (Live location value)) effects
-         , MonadEvaluator location term value (m effects)
+         , MonadEvaluator location term value effects m
          )
-      => MonadEvaluator location term value (Collecting m effects) where
+      => MonadEvaluator location term value effects (Collecting m) where
   getConfiguration term = Configuration term <$> askRoots <*> getEnv <*> getHeap
 
 
 instance ( Effectful m
          , Foldable (Cell location)
          , Member (Reader (Live location value)) effects
-         , MonadAnalysis location term value (m effects)
+         , MonadAnalysis location term value effects m
          , Ord location
          , ValueRoots location value
          )
-      => MonadAnalysis location term value (Collecting m effects) where
-  type Effects location term value (Collecting m effects)
+      => MonadAnalysis location term value effects (Collecting m) where
+  type Effects location term value (Collecting m)
     = Reader (Live location value)
-   ': Effects location term value (m effects)
+   ': Effects location term value m
 
   -- Small-step evaluation which garbage-collects any non-rooted addresses after evaluating each term.
   analyzeTerm recur term = do

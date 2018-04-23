@@ -8,21 +8,21 @@ import Prologue
 newtype BadAddresses m (effects :: [* -> *]) a = BadAddresses (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
-deriving instance MonadControl term (m effects)                    => MonadControl term (BadAddresses m effects)
-deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (BadAddresses m effects)
-deriving instance MonadHeap location value (m effects)             => MonadHeap location value (BadAddresses m effects)
-deriving instance MonadModuleTable location term value (m effects) => MonadModuleTable location term value (BadAddresses m effects)
-deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (BadAddresses m effects)
+deriving instance MonadControl term effects m                    => MonadControl term effects (BadAddresses m)
+deriving instance MonadEnvironment location value effects m      => MonadEnvironment location value effects (BadAddresses m)
+deriving instance MonadHeap location value effects m             => MonadHeap location value effects (BadAddresses m)
+deriving instance MonadModuleTable location term value effects m => MonadModuleTable location term value effects (BadAddresses m)
+deriving instance MonadEvaluator location term value effects m   => MonadEvaluator location term value effects (BadAddresses m)
 
 instance ( Effectful m
          , Member (Resumable (AddressError location value)) effects
          , Member (State (EvaluatingState location term value)) effects
-         , MonadAnalysis location term value (m effects)
-         , MonadValue location value (BadAddresses m effects)
+         , MonadAnalysis location term value effects m
+         , MonadValue location value effects (BadAddresses m)
          , Show location
          )
-      => MonadAnalysis location term value (BadAddresses m effects) where
-  type Effects location term value (BadAddresses m effects) = Effects location term value (m effects)
+      => MonadAnalysis location term value effects (BadAddresses m) where
+  type Effects location term value (BadAddresses m) = Effects location term value m
 
   analyzeTerm eval term = resume @(AddressError location value) (liftAnalyze analyzeTerm eval term) (
         \yield error -> do

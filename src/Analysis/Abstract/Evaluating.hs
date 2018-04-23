@@ -103,7 +103,7 @@ localEvaluatingState lens f action = do
   v <$ lens .= original
 
 
-instance Members '[Fail, State (EvaluatingState location term value)] effects => MonadControl term (Evaluating location term value effects) where
+instance Members '[Fail, State (EvaluatingState location term value)] effects => MonadControl term effects (Evaluating location term value) where
   label term = do
     m <- view _jumps
     let i = IntMap.size m
@@ -115,7 +115,7 @@ instance Members '[Fail, State (EvaluatingState location term value)] effects =>
 instance Members '[ State (EvaluatingState location term value)
                   , Reader (Environment location value)
                   ] effects
-      => MonadEnvironment location value (Evaluating location term value effects) where
+      => MonadEnvironment location value effects (Evaluating location term value) where
   getEnv = view _environment
   putEnv = (_environment .=)
   withEnv s = localEvaluatingState _environment (const s)
@@ -133,7 +133,7 @@ instance Members '[ State (EvaluatingState location term value)
     result <$ modifyEnv Env.pop
 
 instance Member (State (EvaluatingState location term value)) effects
-      => MonadHeap location value (Evaluating location term value effects) where
+      => MonadHeap location value effects (Evaluating location term value) where
   getHeap = view _heap
   putHeap = (_heap .=)
 
@@ -142,7 +142,7 @@ instance Members '[ Reader (ModuleTable [Module term])
                   , Reader (SomeOrigin term)
                   , Fail
                   ] effects
-      => MonadModuleTable location term value (Evaluating location term value effects) where
+      => MonadModuleTable location term value effects (Evaluating location term value) where
   getModuleTable = view _modules
   putModuleTable = (_modules .=)
 
@@ -157,15 +157,15 @@ instance Members '[ Reader (ModuleTable [Module term])
     maybeFail "unable to get currentModule" $ withSomeOrigin (originModule @term) o
 
 instance Members (EvaluatingEffects location term value) effects
-      => MonadEvaluator location term value (Evaluating location term value effects) where
+      => MonadEvaluator location term value effects (Evaluating location term value) where
   getConfiguration term = Configuration term mempty <$> getEnv <*> getHeap
 
 instance ( Corecursive term
          , Members (EvaluatingEffects location term value) effects
          , Recursive term
          )
-      => MonadAnalysis location term value (Evaluating location term value effects) where
-  type Effects location term value (Evaluating location term value effects) = EvaluatingEffects location term value
+      => MonadAnalysis location term value effects (Evaluating location term value) where
+  type Effects location term value (Evaluating location term value) = EvaluatingEffects location term value
 
   analyzeTerm eval term = pushOrigin (termOrigin (embedSubterm term)) (eval term)
 

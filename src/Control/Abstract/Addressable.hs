@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, UndecidableInstances, GADTs #-}
+{-# LANGUAGE GADTs, TypeFamilies, UndecidableInstances #-}
 module Control.Abstract.Addressable where
 
 import Control.Abstract.Evaluator
@@ -12,28 +12,28 @@ import Prelude hiding (fail)
 import Prologue
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Heap.
-class (MonadFresh m, Ord location) => MonadAddressable location m where
-  derefCell :: Address location value -> Cell location value -> m value
+class (MonadFresh (m effects), Ord location) => MonadAddressable location (effects :: [* -> *]) m where
+  derefCell :: Address location value -> Cell location value -> m effects value
 
-  allocLoc :: Name -> m location
+  allocLoc :: Name -> m effects location
 
 -- | Look up or allocate an address for a 'Name'.
-lookupOrAlloc :: ( MonadAddressable location m
-                 , MonadEnvironment location value m
+lookupOrAlloc :: ( MonadAddressable location effects m
+                 , MonadEnvironment location value effects m
                  )
               => Name
-              -> m (Address location value)
+              -> m effects (Address location value)
 lookupOrAlloc name = lookupEnv name >>= maybe (alloc name) pure
 
 
-letrec :: ( MonadAddressable location m
-          , MonadEnvironment location value m
-          , MonadHeap location value m
+letrec :: ( MonadAddressable location effects m
+          , MonadEnvironment location value effects m
+          , MonadHeap location value effects m
           , Reducer value (Cell location value)
           )
        => Name
-       -> m value
-       -> m (value, Address location value)
+       -> m effects value
+       -> m effects (value, Address location value)
 letrec name body = do
   addr <- lookupOrAlloc name
   v <- localEnv (insert name addr) body
@@ -41,12 +41,12 @@ letrec name body = do
   pure (v, addr)
 
 -- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
-letrec' :: ( MonadAddressable location m
-           , MonadEnvironment location value m
+letrec' :: ( MonadAddressable location effects m
+           , MonadEnvironment location value effects m
            )
         => Name
-        -> (Address location value -> m value)
-        -> m value
+        -> (Address location value -> m effects value)
+        -> m effects value
 letrec' name body = do
   addr <- lookupOrAlloc name
   v <- localEnv id (body addr)
@@ -55,20 +55,20 @@ letrec' name body = do
 -- Instances
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
-instance (MonadFail m, MonadFresh m) => MonadAddressable Precise m where
+instance (MonadFail (m effects), MonadFresh (m effects)) => MonadAddressable Precise effects m where
   derefCell addr = maybeM (uninitializedAddress addr) . unLatest
   allocLoc _ = Precise <$> fresh
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
-instance (Alternative m, MonadFresh m) => MonadAddressable Monovariant m where
+instance (Alternative (m effects), MonadFresh (m effects)) => MonadAddressable Monovariant effects m where
   derefCell _ = foldMapA pure
   allocLoc = pure . Monovariant
 
 -- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
-deref :: (MonadResume (AddressError location value) m, MonadAddressable location m, MonadHeap location value m) => Address location value -> m value
+deref :: (MonadResume (AddressError location value) effects m, MonadAddressable location effects m, MonadHeap location value effects m) => Address location value -> m effects value
 deref addr = lookupHeap addr >>= maybe (throwAddressError $ UninitializedAddress addr) (derefCell addr)
 
-alloc :: MonadAddressable location m => Name -> m (Address location value)
+alloc :: MonadAddressable location effects m => Name -> m effects (Address location value)
 alloc = fmap Address . allocLoc
 
 -- | Fail with a message denoting an uninitialized address (i.e. one which was 'alloc'ated, but never 'assign'ed a value before being 'deref'erenced).
@@ -86,6 +86,5 @@ instance Eq location => Eq1 (AddressError location value) where
   liftEq _ (UninitializedAddress a) (UninitializedAddress b)     = a == b
 
 
-throwAddressError :: (MonadResume (AddressError location value) m) => AddressError location value resume -> m resume
+throwAddressError :: (MonadResume (AddressError location value) effects m) => AddressError location value resume -> m effects resume
 throwAddressError = throwResumable
-

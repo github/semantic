@@ -51,7 +51,7 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (BC.unpack prefix) (J
 -- Subsequent imports of `parent.two` or `parent.three` will execute
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
-resolvePythonModules :: MonadEvaluatable location term value m => QualifiedName -> m (NonEmpty ModulePath)
+resolvePythonModules :: MonadEvaluatable location term value effects m => QualifiedName -> m effects (NonEmpty ModulePath)
 resolvePythonModules q = do
   relRootDir <- rootDir q <$> currentModule
   for (moduleNames q) $ \name -> do
