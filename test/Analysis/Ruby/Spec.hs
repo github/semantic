@@ -49,6 +49,14 @@ spec = parallel $ do
       environment (snd res) `shouldBe` [ ("Object", addr 0)
                                        , ("Bar", addr 3) ]
 
+    it "handles break correctly" $ do
+      res <- evaluate "break.rb"
+      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (Right (Right (pure $ injValue (Value.Integer (Number.Integer 3)))))))))))
+
+    it "handles break correctly" $ do
+      res <- evaluate "next.rb"
+      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (Right (Right (pure $ injValue (Value.Integer (Number.Integer 8)))))))))))
+
     it "evaluates early return statements" $ do
       res <- evaluate "early-return.rb"
       fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (Right (Right (pure $ injValue (Value.Integer (Number.Integer 123)))))))))))
