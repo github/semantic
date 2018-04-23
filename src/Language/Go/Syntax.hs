@@ -8,7 +8,6 @@ import qualified Data.Abstract.Package as Package
 import           Data.Abstract.Path
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
-import qualified Data.Language as Language
 import           Diffing.Algorithm
 import           Prologue
 import           System.FilePath.Posix
