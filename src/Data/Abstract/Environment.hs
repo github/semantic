@@ -131,7 +131,7 @@ bind names env = fromList (mapMaybe lookupName (Prologue.toList names))
 names :: Environment l a -> [Name]
 names = fmap fst . pairs
 
--- | Overwrite a set of key-value bindings in the provided environment.
+-- | Lookup and alias name-value bindings from an environment.
 overwrite :: [(Name, Name)] -> Environment l a -> Environment l a
 overwrite pairs env = fromList $ mapMaybe lookupAndAlias pairs
   where
