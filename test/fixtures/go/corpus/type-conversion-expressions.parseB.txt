@@ -12,9 +12,8 @@
           (Identifier)
           (Empty)))
       (Call
-        (Paren
-          (Pointer
-            (Identifier)))
+        (Pointer
+          (Identifier))
         (Identifier)
         (Empty))
       (TypeConversion
@@ -72,9 +71,8 @@
         (Identifier)
         (Empty))
       (Call
-        (Paren
-          (MemberAccess
-            (Identifier)
-            (Identifier)))
+        (MemberAccess
+          (Identifier)
+          (Identifier))
         (Identifier)
         (Empty)))))

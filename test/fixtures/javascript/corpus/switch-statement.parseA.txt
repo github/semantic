@@ -1,7 +1,6 @@
 (Program
   (Match
-    (Paren
-      (Float))
+    (Float)
     (
       (Pattern
         (Float)

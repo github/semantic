@@ -1,7 +1,6 @@
 (Program
   (DoWhile
-    (Paren
-      (Boolean))
+    (Boolean)
     (
       (Call
         (MemberAccess

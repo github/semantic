@@ -87,7 +87,6 @@ type Syntax = '[
   , Syntax.Empty
   , Syntax.Error
   , Syntax.Identifier
-  , Syntax.Paren
   , Syntax.Program
   , Syntax.Context
   , Type.Readonly
@@ -803,7 +802,7 @@ variableDeclarator =
 
 
 parenthesizedExpression :: Assignment
-parenthesizedExpression = makeTerm <$> symbol ParenthesizedExpression <*> (Syntax.Paren <$> children (term expressions))
+parenthesizedExpression = symbol ParenthesizedExpression *> children (term expressions)
 
 switchStatement :: Assignment
 switchStatement = makeTerm <$> symbol SwitchStatement <*> children (Statement.Match <$> term parenthesizedExpression <*> term switchBody)
