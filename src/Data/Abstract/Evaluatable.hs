@@ -4,10 +4,11 @@ module Data.Abstract.Evaluatable
 , MonadEvaluatable
 , Evaluatable(..)
 , Unspecialized(..)
-, LoadError(..)
-, EvalError(..)
-, ResolutionError(..)
 , ControlThrow(..)
+, EvalError(..)
+, LoadError(..)
+, LoopThrow(..)
+, ResolutionError(..)
 , variable
 , evaluateTerm
 , evaluateModule
@@ -15,6 +16,7 @@ module Data.Abstract.Evaluatable
 , evaluatePackage
 , evaluatePackageBody
 , throwLoadError
+, throwLoop
 , throwEvalError
 , throwValueError
 , resolve
@@ -56,17 +58,21 @@ type MonadEvaluatable location term value m =
   , MonadResume (ResolutionError value) m
   , MonadResume (AddressError location value) m
   , MonadExc (ControlThrow value) m
+  , MonadExc (LoopThrow value) m
   , MonadValue location value m
   , Recursive term
   , Reducer value (Cell location value)
   , Show location
   )
 
-data ControlThrow value where
-  Ret :: value -> ControlThrow value
+data ControlThrow value
+  = Ret value
+    deriving (Eq, Show)
 
-deriving instance Show value => Show (ControlThrow value)
-deriving instance Eq value => Eq (ControlThrow value)
+data LoopThrow value
+  = Brk value
+  | Con
+    deriving (Eq, Show)
 
 -- | An error thrown when we can't resolve a module from a qualified name.
 data ResolutionError value resume where
@@ -133,6 +139,9 @@ throwLoadError = throwResumable
 
 throwEvalError :: MonadEvaluatable location term value m => EvalError value resume -> m resume
 throwEvalError = throwResumable
+
+throwLoop :: MonadEvaluatable location term value m => LoopThrow value -> m a
+throwLoop = throwException
 
 data Unspecialized a b where
   Unspecialized :: { getUnspecialized :: Prelude.String } -> Unspecialized value value

@@ -160,9 +160,8 @@ instance Eq1 Break where liftEq = genericLiftEq
 instance Ord1 Break where liftCompare = genericLiftCompare
 instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Break
-instance Evaluatable Break
-
+instance Evaluatable Break where
+  eval (Break x) = throwLoop =<< Brk <$> subtermValue x
 
 newtype Continue a = Continue a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -171,9 +170,9 @@ instance Eq1 Continue where liftEq = genericLiftEq
 instance Ord1 Continue where liftCompare = genericLiftCompare
 instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Continue
-instance Evaluatable Continue
-
+instance Evaluatable Continue where
+  -- TODO: figure out what to do with the datum inside Continue. what can it represent?
+  eval (Continue _) = throwLoop Con
 
 newtype Retry a = Retry a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
