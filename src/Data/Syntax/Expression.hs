@@ -6,7 +6,6 @@ import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedF
 import Data.Fixed
 import Diffing.Algorithm
 import Prologue
-import System.IO.Unsafe (unsafePerformIO)
 
 -- | Typical prefix function application, like `f(x)` in many languages, or `f x` in Haskell.
 data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a], callBlock :: !a }
@@ -61,7 +60,7 @@ instance Ord1 Arithmetic where liftCompare = genericLiftCompare
 instance Show1 Arithmetic where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Arithmetic where
-  eval = traverse subtermValue >=> (\term -> unsafePerformIO (catch (pure $ go term) (\(_ :: ArithException) -> pure hole))) where
+  eval = traverse subtermValue >=> go where
     go (Plus a b)          = liftNumeric2 add a b  where add    = liftReal (+)
     go (Minus a b)         = liftNumeric2 sub a b  where sub    = liftReal (-)
     go (Times a b)         = liftNumeric2 mul a b  where mul    = liftReal (*)
