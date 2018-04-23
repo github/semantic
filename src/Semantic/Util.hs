@@ -1,54 +1,43 @@
 -- MonoLocalBinds is to silence a warning about a simplifiable constraint.
 {-# LANGUAGE DataKinds, MonoLocalBinds, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
-{-# OPTIONS_GHC -Wno-unused-imports #-}
 module Semantic.Util where
 
-import Analysis.Abstract.BadVariables
-import Analysis.Abstract.BadModuleResolutions
-import Analysis.Abstract.BadValues
-import Analysis.Abstract.Caching
-import Analysis.Abstract.Quiet
-import Analysis.Abstract.Dead
-import Analysis.Abstract.Evaluating as X
-import Analysis.Abstract.ImportGraph
-import Analysis.Abstract.Tracing
-import Analysis.Declaration
-import Control.Abstract.Analysis
-import Control.Monad.IO.Class
-import Data.Abstract.Evaluatable
-import Data.Abstract.Address
-import Data.Abstract.Located
-import Data.Abstract.Module
-import Data.Abstract.Package as Package
-import Data.Abstract.Type
-import Data.Abstract.Value
-import Data.Blob
-import Data.File
-import Data.Diff
-import Data.Range
-import Data.Record
+import           Analysis.Abstract.BadModuleResolutions
+import           Analysis.Abstract.BadValues
+import           Analysis.Abstract.BadVariables
+import           Analysis.Abstract.Evaluating as X
+import           Analysis.Abstract.ImportGraph
+import           Analysis.Abstract.Quiet
+import           Analysis.Declaration
+import           Control.Abstract.Analysis
+import           Data.Abstract.Address
+import           Data.Abstract.Evaluatable
+import           Data.Abstract.Located
+import           Data.Abstract.Value
+import           Data.Blob
+import           Data.Diff
+import           Data.File
 import qualified Data.Language as Language
-import Data.Span
-import Data.Term
-import Diffing.Algorithm
-import Diffing.Interpreter
-import System.FilePath.Glob
+import           Data.Range
+import           Data.Record
+import           Data.Span
+import           Data.Term
+import           Diffing.Algorithm
+import           Diffing.Interpreter
 import qualified GHC.TypeLits as TypeLevel
-import Language.Preluded
-import Parsing.Parser
-import Prologue
-import Semantic.Diff (diffTermPair)
-import Semantic.IO as IO
-import Semantic.Task
-import Semantic.Graph
-import qualified Semantic.Task as Task
-import System.FilePath.Posix
+import           Language.Preluded
+import           Parsing.Parser
+import           Prologue
+import           Semantic.Diff (diffTermPair)
+import           Semantic.Graph
+import           Semantic.IO as IO
+import           Semantic.Task
 
 import qualified Language.Go.Assignment as Go
+import qualified Language.PHP.Assignment as PHP
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
-import qualified Language.PHP.Assignment as PHP
 import qualified Language.TypeScript.Assignment as TypeScript
 
 
@@ -62,10 +51,13 @@ evalRubyProject path = runAnalysis @(JustEvaluating Ruby.Term) <$> evaluateProje
 evalPHPProject path = runAnalysis @(JustEvaluating PHP.Term) <$> evaluateProject phpParser Nothing path
 evalPythonProject path = runAnalysis @(JustEvaluating Python.Term) <$> evaluateProject pythonParser pythonPrelude path
 evalTypeScriptProject path = runAnalysis @(EvaluatingWithHoles TypeScript.Term) <$> evaluateProject typescriptParser Nothing path
-evaluateProject parser prelude path = evaluatePackage <$> runTask (readProject Nothing (file path :| []) >>= parsePackage parser prelude)
 
 rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Language.Ruby)
 pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Language.Python)
+
+-- Evaluate a project, starting at a single entrypoint.
+evaluateProject parser prelude path = evaluatePackage <$> runTask (readProject Nothing (file path :| []) >>= parsePackage parser prelude)
+
 
 -- Read and parse a file.
 parseFile :: Parser term -> FilePath -> IO term
