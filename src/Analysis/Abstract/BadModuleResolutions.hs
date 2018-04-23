@@ -29,6 +29,7 @@ instance ( Effectful m
         \yield error -> do
           traceM ("ResolutionError:" <> show error)
           case error of
-            (NotFoundError nameToResolve _ _) -> yield nameToResolve)
+            (NotFoundError nameToResolve _ _) -> yield nameToResolve
+            (GoImportError pathToResolve) -> yield [pathToResolve])
 
   analyzeModule = liftAnalyze analyzeModule
