@@ -5,6 +5,7 @@ import Data.Abstract.Evaluatable
 import qualified Language.TypeScript.Assignment as TypeScript
 import Data.Abstract.Value as Value
 import Data.Abstract.Number as Number
+import qualified Data.Language as Language
 
 import SpecHelpers
 
@@ -42,4 +43,4 @@ spec = parallel $ do
   where
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate entry = evalTypeScriptProject (fixtures <> entry)
-    evalTypeScriptProject path = runAnalysis @(TestEvaluating TypeScript.Term) <$> evaluateProject typescriptParser Nothing path
+    evalTypeScriptProject path = runAnalysis @(TestEvaluating TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path

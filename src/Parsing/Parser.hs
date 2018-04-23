@@ -71,8 +71,8 @@ someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
 someAnalysisParser _ Go         = SomeAnalysisParser goParser Nothing
 someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser Nothing
 someAnalysisParser _ PHP        = SomeAnalysisParser phpParser Nothing
-someAnalysisParser _ Python     = SomeAnalysisParser pythonParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) Python)
-someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) Ruby)
+someAnalysisParser _ Python     = SomeAnalysisParser pythonParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Python))
+someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Ruby))
 someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser Nothing
 someAnalysisParser _ l          = error $ "Analysis not supported for: " <> show l
 

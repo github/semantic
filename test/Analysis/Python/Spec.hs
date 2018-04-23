@@ -5,6 +5,7 @@ import Data.Abstract.Evaluatable (EvalError(..), runAnalysis)
 import Data.Abstract.Value
 import Data.Map
 import qualified Language.Python.Assignment as Python
+import qualified Data.Language as Language
 
 import SpecHelpers
 
@@ -50,4 +51,4 @@ spec = parallel $ do
     addr = Address . Precise
     fixtures = "test/fixtures/python/analysis/"
     evaluate entry = evalPythonProject (fixtures <> entry)
-    evalPythonProject path = runAnalysis @(TestEvaluating Python.Term) <$> evaluateProject pythonParser pythonPrelude path
+    evalPythonProject path = runAnalysis @(TestEvaluating Python.Term) <$> evaluateProject pythonParser Language.Python pythonPrelude path

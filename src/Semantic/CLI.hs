@@ -7,13 +7,12 @@ module Semantic.CLI
 ) where
 
 import           Data.File
+import           Data.Language
 import           Data.List (intercalate)
-import qualified Data.List.NonEmpty as NonEmpty
 import           Data.List.Split (splitWhen)
 import           Data.Version (showVersion)
 import           Development.GitRev
 import           Options.Applicative
-import           Options.Applicative.Types (readerAsk)
 import qualified Paths_semantic as Library (version)
 import           Prologue
 import           Rendering.Renderer
@@ -25,7 +24,6 @@ import qualified Semantic.Parse as Semantic (parseBlobs)
 import qualified Semantic.Task as Task
 import           System.IO (Handle, stdin, stdout)
 import           Text.Read
-import Data.Language
 
 main :: IO ()
 main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskWithOptions
@@ -90,7 +88,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     graphArgumentsParser = do
       renderer <- flag (SomeRenderer DOTGraphRenderer) (SomeRenderer DOTGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
               <|> flag'                                (SomeRenderer JSONGraphRenderer) (long "json" <> help "Output JSON graph")
-      rootDir <- argument (maybeReader readMaybe) (metavar "DIRECTORY")
+      rootDir <- argument (maybeReader readMaybe :: ReadM FilePath) (metavar "DIRECTORY")
       language <- argument (maybeReader readMaybe :: ReadM Language) (metavar "LANGUAGE")
       pure $ runGraph renderer rootDir language
 
@@ -98,7 +96,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     parseFilePath arg = case splitWhen (== ':') arg of
         [a, b] | Just lang <- readMaybe a -> Right (File b lang)
                | Just lang <- readMaybe b -> Right (File a lang)
-        [path] -> maybe (Left $ "Cannot identify language for path:" <> path) (Right . File path) (languageForFilePath path)
+        [path] -> maybe (Left $ "Cannot identify language for path:" <> path) (Right . File path . Just) (languageForFilePath path)
         _ -> Left ("cannot parse `" <> arg <> "`\nexpecting LANGUAGE:FILE or just FILE")
 
     optionsReader options = eitherReader $ \ str -> maybe (Left ("expected one of: " <> intercalate ", " (fmap fst options))) (Right . snd) (find ((== str) . fst) options)

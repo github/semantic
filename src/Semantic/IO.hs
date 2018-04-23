@@ -32,7 +32,6 @@ import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import           Data.Language
 import           Data.Source
-import qualified Data.List.NonEmpty as NonEmpty
 import           Prelude hiding (readFile)
 import           Prologue hiding (MonadError (..), fail)
 import           System.Directory (doesDirectoryExist)
@@ -47,7 +46,7 @@ readFile :: forall m. MonadIO m => File -> m (Maybe Blob.Blob)
 readFile (File "/dev/null" _) = pure Nothing
 readFile (File path language) = do
   raw <- liftIO (Just <$> B.readFile path)
-  pure $ Blob.sourceBlob path (Just language) . fromBytes <$> raw
+  pure $ Blob.sourceBlob path language . fromBytes <$> raw
 
 readFilePair :: forall m. MonadIO m => File -> File -> m Blob.BlobPair
 readFilePair a b = do
@@ -92,13 +91,13 @@ readProjectFromPaths rootDir lang = do
   paths <- liftIO $ fmap fold (globDir (compile . mappend "**/*." <$> exts) rootDir)
   pure $ Project  rootDir (toFile <$> paths) lang
   where
-    toFile path = File path lang
+    toFile path = File path (Just lang)
     exts = extensionsForLanguage lang
 
 readBlobsFromDir :: MonadIO m => FilePath -> m [Blob.Blob]
 readBlobsFromDir path = do
   paths <- liftIO (globDir1 (compile "[^vendor]**/*[.rb|.js|.tsx|.go|.py]") path)
-  let paths' = catMaybes $ fmap (\p -> File p <$> languageForFilePath p) paths
+  let paths' = catMaybes $ fmap (\p -> File p . Just <$> languageForFilePath p) paths
   blobs <- traverse readFile paths'
   pure (catMaybes blobs)
 
