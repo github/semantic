@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables #-}
 module Language.Python.Syntax where
 
 import           Data.Abstract.Environment as Env
@@ -8,7 +8,8 @@ import           Data.Abstract.Module
 import           Data.Align.Generic
 import qualified Data.ByteString.Char8 as BC
 import           Data.Functor.Classes.Generic
-import           Data.List (intercalate)
+import qualified Data.Language as Language
+-- import           Data.List (intercalate)
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Mergeable
 import           Diffing.Algorithm
@@ -51,7 +52,7 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (BC.unpack prefix) (J
 -- Subsequent imports of `parent.two` or `parent.three` will execute
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
-resolvePythonModules :: MonadEvaluatable location term value m => QualifiedName -> m (NonEmpty ModulePath)
+resolvePythonModules :: forall value term location m. MonadEvaluatable location term value m => QualifiedName -> m (NonEmpty ModulePath)
 resolvePythonModules q = do
   relRootDir <- rootDir q <$> currentModule
   for (moduleNames q) $ \name -> do
@@ -68,17 +69,17 @@ resolvePythonModules q = do
     moduleNames (RelativeQualifiedName x Nothing)      = error $ "importing from '" <> show x <> "' is not implemented"
     moduleNames (RelativeQualifiedName _ (Just paths)) = moduleNames paths
 
-    notFound xs = "Unable to resolve module import: " <> friendlyName q <> ", searched: " <> show xs
+    -- notFound xs = "Unable to resolve module import: " <> friendlyName q <> ", searched: " <> show xs
     search rootDir x = do
       let path = normalise (rootDir </> normalise x)
       let searchPaths = [ path </> "__init__.py"
                         , path <.> ".py"
                         ]
-      resolve searchPaths >>= maybeFail (notFound searchPaths)
-
-    friendlyName :: QualifiedName -> String
-    friendlyName (QualifiedName xs)                = intercalate "." (NonEmpty.toList xs)
-    friendlyName (RelativeQualifiedName prefix qn) = prefix <> maybe "" friendlyName qn
+      modulePath <- resolve searchPaths -- >>= maybeFail (notFound searchPaths)
+      maybe (throwResumable @(ResolutionError value) $ NotFoundError path Language.Python) pure modulePath
+    -- friendlyName :: QualifiedName -> String
+    -- friendlyName (QualifiedName xs)                = intercalate "." (NonEmpty.toList xs)
+    -- friendlyName (RelativeQualifiedName prefix qn) = prefix <> maybe "" friendlyName qn
 
 
 -- | Import declarations (symbols are added directly to the calling environment).
