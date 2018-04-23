@@ -1,10 +1,9 @@
 (Program
   (If
-    (Paren
-    { (MemberAccess
-      {-(Identifier)-}
-      {-(Identifier)-})
-    ->(Identifier) })
+  { (MemberAccess
+    {-(Identifier)-}
+    {-(Identifier)-})
+  ->(Identifier) }
     (
       (Call
         (Identifier)

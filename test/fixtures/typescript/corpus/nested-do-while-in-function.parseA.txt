@@ -19,8 +19,7 @@
         (Empty)))
     (
       (DoWhile
-        (Paren
-          (Identifier))
+        (Identifier)
         (
           (Call
             (Identifier)

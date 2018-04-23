@@ -7,8 +7,7 @@
   {-(Identifier)-}
     (Identifier)
   {+(Identifier)+})
-{+(Paren
-  {+(Identifier)+})+}
+{+(Identifier)+}
 {-(Tuple
   {-(Identifier)-}
   {-(Identifier)-}

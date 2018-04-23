@@ -72,7 +72,6 @@ type Syntax = '[
   , Syntax.Empty
   , Syntax.Error
   , Syntax.Identifier
-  , Syntax.Paren
   , Syntax.Program
   , Ruby.Syntax.Send
   , Ruby.Syntax.Class
@@ -144,7 +143,7 @@ expressions :: Assignment
 expressions = makeTerm'' <$> location <*> many expression
 
 parenthesizedExpressions :: Assignment
-parenthesizedExpressions = makeTerm'' <$> symbol ParenthesizedStatements <*> children (Syntax.Paren <$> expressions)
+parenthesizedExpressions = makeTerm'' <$> symbol ParenthesizedStatements <*> children (many expression)
 
 withExtendedScope :: Assignment' a -> Assignment' a
 withExtendedScope inner = do

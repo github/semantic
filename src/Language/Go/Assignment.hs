@@ -89,7 +89,6 @@ type Syntax =
    , Syntax.Error
    , Syntax.Empty
    , Syntax.Identifier
-   , Syntax.Paren
    , Syntax.Program
    , Type.Annotation
    , Type.Array
@@ -429,7 +428,7 @@ parameterDeclaration :: Assignment
 parameterDeclaration = makeTerm <$> symbol ParameterDeclaration <*> children (manyTerm expression)
 
 parenthesizedExpression :: Assignment
-parenthesizedExpression = makeTerm <$> symbol ParenthesizedExpression <*> (Syntax.Paren <$> children expressions)
+parenthesizedExpression = symbol ParenthesizedExpression *> children expressions
 
 selectorExpression :: Assignment
 selectorExpression = makeTerm <$> symbol SelectorExpression <*> children (Expression.MemberAccess <$> expression <*> expression)
