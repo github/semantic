@@ -59,7 +59,7 @@ resolvePythonModules q = do
     x <- search relRootDir name
     traceResolve name x $ pure x
   where
-    rootDir (QualifiedName _) ModuleInfo{..}           = takeDirectory modulePath
+    rootDir (QualifiedName _) ModuleInfo{..}           = mempty -- overall rootDir of the Package.
     rootDir (RelativeQualifiedName n _) ModuleInfo{..} = upDir numDots (takeDirectory modulePath)
       where numDots = pred (length n)
             upDir n dir | n <= 0 = dir
@@ -70,11 +70,12 @@ resolvePythonModules q = do
     moduleNames (RelativeQualifiedName _ (Just paths)) = moduleNames paths
 
     search rootDir x = do
+      traceM ("searching for " <> show x <> " in " <> show rootDir)
       let path = normalise (rootDir </> normalise x)
       let searchPaths = [ path </> "__init__.py"
                         , path <.> ".py"
                         ]
-      modulePath <- resolve searchPaths -- >>= maybeFail (notFound searchPaths)
+      modulePath <- resolve searchPaths
       maybe (throwResumable @(ResolutionError value) $ NotFoundError path searchPaths Language.Python) pure modulePath
 
 
