@@ -65,7 +65,7 @@ instance (Alternative m, MonadFresh m) => MonadAddressable Monovariant m where
   allocLoc = pure . Monovariant
 
 -- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
-deref :: (MonadThrow (AddressError location value) m, MonadAddressable location m, MonadHeap location value m) => Address location value -> m value
+deref :: (MonadResume (AddressError location value) m, MonadAddressable location m, MonadHeap location value m) => Address location value -> m value
 deref addr = lookupHeap addr >>= maybe (throwAddressError $ UninitializedAddress addr) (derefCell addr)
 
 alloc :: MonadAddressable location m => Name -> m (Address location value)
@@ -86,6 +86,6 @@ instance Eq location => Eq1 (AddressError location value) where
   liftEq _ (UninitializedAddress a) (UninitializedAddress b)     = a == b
 
 
-throwAddressError :: (MonadThrow (AddressError location value) m) => AddressError location value resume -> m resume
-throwAddressError = throwException
+throwAddressError :: (MonadResume (AddressError location value) m) => AddressError location value resume -> m resume
+throwAddressError = throwResumable
 

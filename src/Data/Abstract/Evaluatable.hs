@@ -49,29 +49,24 @@ type MonadEvaluatable location term value m =
   , Declarations term
   , MonadAddressable location m
   , MonadAnalysis location term value m
-  , MonadThrow (Unspecialized value) m
-  , MonadThrow (ValueError location value) m
-  , MonadThrow (LoadError term value) m
-  , MonadThrow (EvalError value) m
-  , MonadThrow (ResolutionError value) m
-  , MonadThrow (AddressError location value) m
-  , MonadThrow (ControlThrow value) m
+  , MonadResume (Unspecialized value) m
+  , MonadResume (ValueError location value) m
+  , MonadResume (LoadError term value) m
+  , MonadResume (EvalError value) m
+  , MonadResume (ResolutionError value) m
+  , MonadResume (AddressError location value) m
+  , MonadExc (ControlThrow value) m
   , MonadValue location value m
   , Recursive term
   , Reducer value (Cell location value)
   , Show location
   )
 
-data ControlThrow value resume where
-  Ret :: value -> ControlThrow value resume
+data ControlThrow value where
+  Ret :: value -> ControlThrow value
 
-deriving instance Show value => Show (ControlThrow value resume)
-instance Show value => Show1 (ControlThrow value) where
-  liftShowsPrec _ _ = showsPrec
-
-deriving instance Eq value => Eq (ControlThrow value resume)
-instance Eq value => Eq1 (ControlThrow value) where
-  liftEq _ (Ret a) (Ret b) = a == b
+deriving instance Show value => Show (ControlThrow value)
+deriving instance Eq value => Eq (ControlThrow value)
 
 -- | An error thrown when we can't resolve a module from a qualified name.
 data ResolutionError value resume where
@@ -113,7 +108,7 @@ data EvalError value resume where
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: MonadEvaluatable location term value m => Name -> m value
-variable name = lookupWith deref name >>= maybeM (throwException (FreeVariableError name))
+variable name = lookupWith deref name >>= maybeM (throwResumable (FreeVariableError name))
 
 deriving instance Eq (EvalError a b)
 deriving instance Show (EvalError a b)
@@ -131,13 +126,13 @@ instance Eq1 (EvalError term) where
 
 
 throwValueError :: MonadEvaluatable location term value m => ValueError location value resume -> m resume
-throwValueError = throwException
+throwValueError = throwResumable
 
 throwLoadError :: MonadEvaluatable location term value m => LoadError term value resume -> m resume
-throwLoadError = throwException
+throwLoadError = throwResumable
 
 throwEvalError :: MonadEvaluatable location term value m => EvalError value resume -> m resume
-throwEvalError = throwException
+throwEvalError = throwResumable
 
 data Unspecialized a b where
   Unspecialized :: { getUnspecialized :: Prelude.String } -> Unspecialized value value
@@ -154,8 +149,8 @@ instance Show1 (Unspecialized a) where
 class Evaluatable constr where
   eval :: MonadEvaluatable location term value m
        => SubtermAlgebra constr term (m value)
-  default eval :: (MonadThrow (Unspecialized value) m, Show1 constr) => SubtermAlgebra constr term (m value)
-  eval expr = throwException (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
+  default eval :: (MonadResume (Unspecialized value) m, Show1 constr) => SubtermAlgebra constr term (m value)
+  eval expr = throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 
 -- Instances

@@ -15,10 +15,12 @@ module Control.Abstract.Evaluator
   , modifyModuleTable
   , modifyLoadStack
   , MonadControl(..)
-  , MonadThrow(..)
+  , MonadResume(..)
+  , MonadExc(..)
   ) where
 
 import Control.Effect
+import Control.Monad.Effect.Exception as Exception
 import Control.Monad.Effect.Resumable as Resumable
 import Data.Abstract.Address
 import Data.Abstract.Configuration
@@ -29,7 +31,7 @@ import Data.Abstract.Heap
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Semigroup.Reducer
-import Prologue hiding (throwError)
+import Prologue
 
 -- | A 'Monad' providing the basic essentials for evaluation.
 --
@@ -180,10 +182,18 @@ class Monad m => MonadControl term m where
 
 
 -- | 'Monad's which can throw exceptions of type @exc v@ which can be resumed with a value of type @v@.
-class Monad m => MonadThrow exc m where
-  throwException :: exc v -> m v
-  catchException :: m v -> (forall v1. exc v1 -> m v) -> m v
+class Monad m => MonadResume exc m where
+  throwResumable :: exc v -> m v
+  catchResumable :: m v -> (forall v1. exc v1 -> m v) -> m v
 
-instance (Effectful m1, Member (Resumable exc) effects, Monad (m1 effects)) => MonadThrow exc (m1 effects) where
-  throwException = raise . throwError
-  catchException c f = raise (Resumable.catchError (lower c) (lower . f))
+instance (Effectful m1, Member (Resumable exc) effects, Monad (m1 effects)) => MonadResume exc (m1 effects) where
+  throwResumable = raise . Resumable.throwError
+  catchResumable c f = raise (Resumable.catchError (lower c) (lower . f))
+
+class Monad m => MonadExc exc m where
+  throwException :: exc -> m v
+  catchException :: m v -> (exc -> m v) -> m v
+
+instance (Effectful m1, Member (Exc exc) effects, Monad (m1 effects)) => MonadExc exc (m1 effects) where
+  throwException = raise . Exception.throwError
+  catchException c f = raise (Exception.catchError (lower c) (lower . f))
