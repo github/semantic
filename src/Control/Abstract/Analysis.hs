@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, PolyKinds, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
+{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For runAnalysis
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
