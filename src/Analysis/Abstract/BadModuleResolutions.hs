@@ -25,7 +25,7 @@ instance ( Effectful m
       => MonadAnalysis location term value (BadModuleResolutions m effects) where
   type Effects location term value (BadModuleResolutions m effects) = State [Name] ': Effects location term value (m effects)
 
-  analyzeTerm eval term = resumeException @(ResolutionError value) (liftAnalyze analyzeTerm eval term) (
+  analyzeTerm eval term = resume @(ResolutionError value) (liftAnalyze analyzeTerm eval term) (
         \yield error -> do
           traceM ("ResolutionError:" <> show error)
           case error of
