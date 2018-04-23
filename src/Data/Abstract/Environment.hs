@@ -119,8 +119,9 @@ trim (Environment (a :| as)) = Environment (a :| filtered)
   where filtered = filter (not . Map.null) as
 
 bind :: Foldable t => t Name -> Environment l a -> Environment l a
-bind names env = foldMap envForName names
-  where envForName name = maybe mempty (curry unit name) (lookup name env)
+bind names env = fromList (mapMaybe lookupName (Prologue.toList names))
+  where
+    lookupName name = (,) name <$> lookup name env
 
 -- | Get all bound 'Name's in an environment.
 names :: Environment l a -> [Name]
@@ -128,10 +129,9 @@ names = fmap fst . pairs
 
 -- | Overwrite a set of key-value bindings in the provided environment.
 overwrite :: [(Name, Name)] -> Environment l a -> Environment l a
-overwrite pairs env = foldMap go pairs where
-  go (k, v) = case lookup k env of
-    Nothing   -> mempty
-    Just addr -> unit (v, addr)
+overwrite pairs env = fromList $ mapMaybe lookupAndAlias pairs
+  where
+    lookupAndAlias (oldName, newName) = (,) newName <$> lookup oldName env
 
 -- | Retrieve the 'Live' set of addresses to which the given free variable names are bound.
 --
