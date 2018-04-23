@@ -76,8 +76,7 @@ instance ( Effectful m
       => MonadAnalysis (Located location term) term value (ImportGraphing m effects) where
   type Effects (Located location term) term value (ImportGraphing m effects) = State ImportGraph ': Effects (Located location term) term value (m effects)
 
-  analyzeTerm eval term@(In ann syntax) = do
-    traceShowM ann
+  analyzeTerm eval term@(In _ syntax) = do
     case prj syntax of
       Just (Syntax.Identifier name) -> do
         moduleInclusion (Variable (unName name))
