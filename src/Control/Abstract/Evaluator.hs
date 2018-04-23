@@ -15,8 +15,9 @@ module Control.Abstract.Evaluator
   , modifyModuleTable
   , modifyLoadStack
   , MonadControl(..)
-  , MonadResume(..)
-  , MonadExc(..)
+  , throwResumable
+  , throwException
+  , catchException
   ) where
 
 import Control.Effect
@@ -181,19 +182,11 @@ class Monad (m effects) => MonadControl term (effects :: [* -> *]) m where
   goto :: Label -> m effects term
 
 
--- | 'Monad's which can throw exceptions of type @exc v@ which can be resumed with a value of type @v@.
-class Monad (m effects) => MonadResume exc (effects :: [* -> *]) m where
-  throwResumable :: exc v -> m effects v
-  catchResumable :: m effects v -> (forall v1. exc v1 -> m effects v) -> m effects v
+throwResumable :: (Member (Resumable exc) effects, Effectful m) => exc v -> m effects v
+throwResumable = raise . Resumable.throwError
 
-instance (Effectful m1, Member (Resumable exc) effects, Monad (m1 effects)) => MonadResume exc effects m1 where
-  throwResumable = raise . Resumable.throwError
-  catchResumable c f = raise (Resumable.catchError (lower c) (lower . f))
+throwException :: (Member (Exc exc) effects, Effectful m) => exc -> m effects a
+throwException = raise . Exception.throwError
 
-class Monad (m effects) => MonadExc exc (effects :: [* -> *]) m where
-  throwException :: exc -> m effects v
-  catchException :: m effects v -> (exc -> m effects v) -> m effects v
-
-instance (Effectful m1, Member (Exc exc) effects, Monad (m1 effects)) => MonadExc exc effects m1 where
-  throwException = raise . Exception.throwError
-  catchException c f = raise (Exception.catchError (lower c) (lower . f))
+catchException :: (Member (Exc exc) effects, Effectful m) => m effects v -> (exc -> m effects v) -> m effects v
+catchException action handler = raise (lower action `Exception.catchError` (lower . handler))

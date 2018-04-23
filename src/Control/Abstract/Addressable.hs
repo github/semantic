@@ -3,7 +3,9 @@ module Control.Abstract.Addressable where
 
 import Control.Abstract.Evaluator
 import Control.Applicative
+import Control.Effect
 import Control.Effect.Fresh
+import Control.Monad.Effect.Resumable as Eff
 import Data.Abstract.Address
 import Data.Abstract.Environment (insert)
 import Data.Abstract.FreeVariables
@@ -65,8 +67,8 @@ instance (Alternative (m effects), MonadFresh (m effects)) => MonadAddressable M
   allocLoc = pure . Monovariant
 
 -- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
-deref :: (MonadResume (AddressError location value) effects m, MonadAddressable location effects m, MonadHeap location value effects m) => Address location value -> m effects value
-deref addr = lookupHeap addr >>= maybe (throwAddressError $ UninitializedAddress addr) (derefCell addr)
+deref :: (Effectful m, Member (Resumable (AddressError location value)) effects, MonadAddressable location effects m, MonadHeap location value effects m) => Address location value -> m effects value
+deref addr = lookupHeap addr >>= maybe (throwAddressError (UninitializedAddress addr)) (derefCell addr)
 
 alloc :: MonadAddressable location effects m => Name -> m effects (Address location value)
 alloc = fmap Address . allocLoc
@@ -86,5 +88,5 @@ instance Eq location => Eq1 (AddressError location value) where
   liftEq _ (UninitializedAddress a) (UninitializedAddress b)     = a == b
 
 
-throwAddressError :: (MonadResume (AddressError location value) effects m) => AddressError location value resume -> m effects resume
-throwAddressError = throwResumable
+throwAddressError :: (Effectful m, Member (Resumable (AddressError location value)) effects) => AddressError location value resume -> m effects resume
+throwAddressError = raise . Eff.throwError

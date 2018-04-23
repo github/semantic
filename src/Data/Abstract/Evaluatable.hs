@@ -152,7 +152,7 @@ instance Show1 (Unspecialized a) where
 class Evaluatable constr where
   eval :: MonadEvaluatable location term value effects m
        => SubtermAlgebra constr term (m effects value)
-  default eval :: (MonadResume (Unspecialized value) (effects :: [* -> *]) m, Show1 constr) => SubtermAlgebra constr term (m effects value)
+  default eval :: (MonadEvaluatable location term value effects m, Show1 constr) => SubtermAlgebra constr term (m effects value)
   eval expr = throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 
