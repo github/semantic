@@ -69,17 +69,13 @@ resolvePythonModules q = do
     moduleNames (RelativeQualifiedName x Nothing)      = error $ "importing from '" <> show x <> "' is not implemented"
     moduleNames (RelativeQualifiedName _ (Just paths)) = moduleNames paths
 
-    -- notFound xs = "Unable to resolve module import: " <> friendlyName q <> ", searched: " <> show xs
     search rootDir x = do
       let path = normalise (rootDir </> normalise x)
       let searchPaths = [ path </> "__init__.py"
                         , path <.> ".py"
                         ]
       modulePath <- resolve searchPaths -- >>= maybeFail (notFound searchPaths)
-      maybe (throwResumable @(ResolutionError value) $ NotFoundError path Language.Python) pure modulePath
-    -- friendlyName :: QualifiedName -> String
-    -- friendlyName (QualifiedName xs)                = intercalate "." (NonEmpty.toList xs)
-    -- friendlyName (RelativeQualifiedName prefix qn) = prefix <> maybe "" friendlyName qn
+      maybe (throwResumable @(ResolutionError value) $ NotFoundError path searchPaths Language.Python) pure modulePath
 
 
 -- | Import declarations (symbols are added directly to the calling environment).

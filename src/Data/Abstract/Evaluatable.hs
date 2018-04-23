@@ -70,14 +70,15 @@ deriving instance Eq value => Eq (ControlThrow value)
 
 -- | An error thrown when we can't resolve a module from a qualified name.
 data ResolutionError value resume where
-  NotFoundError :: String   -- ^ The path that was not found
-                -> Language -- ^ Language
+  NotFoundError :: String   -- ^ The path that was not found.
+                -> [String] -- ^ List of paths searched that shows where semantic looked for this module.
+                -> Language -- ^ Language.
                 -> ResolutionError value ModulePath
 
 deriving instance Eq (ResolutionError a b)
 deriving instance Show (ResolutionError a b)
 instance Show1 (ResolutionError value) where liftShowsPrec _ _ = showsPrec
-instance Eq1 (ResolutionError value) where liftEq _ (NotFoundError a l1) (NotFoundError b l2) = a == b && l1 == l2
+instance Eq1 (ResolutionError value) where liftEq _ (NotFoundError a _ l1) (NotFoundError b _ l2) = a == b && l1 == l2
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
 data LoadError term value resume where

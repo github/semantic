@@ -50,7 +50,7 @@ resolveRelativePath relImportPath exts = do
   let path = joinPaths relRootDir relImportPath
   resolveTSModule path exts >>= either notFound (\x -> traceResolve relImportPath x (pure x))
   where
-    notFound _ = throwResumable @(ResolutionError value) $ NotFoundError relImportPath Language.TypeScript
+    notFound xs = throwResumable @(ResolutionError value) $ NotFoundError relImportPath xs Language.TypeScript
 
 -- | Resolve a non-relative TypeScript import to a known 'ModuleName' or fail.
 --
@@ -75,7 +75,7 @@ resolveNonRelativePath name exts = do
         Left xs | parentDir <- takeDirectory path , root /= parentDir -> go root parentDir (searched <> xs)
                 | otherwise -> notFound (searched <> xs)
         Right m -> traceResolve name m $ pure m
-    notFound _ = throwResumable @(ResolutionError value) $ NotFoundError name Language.TypeScript
+    notFound xs = throwResumable @(ResolutionError value) $ NotFoundError name xs Language.TypeScript
 
 resolveTSModule :: MonadEvaluatable location term value m => FilePath -> [String] -> m (Either [FilePath] ModulePath)
 resolveTSModule path exts = maybe (Left searchPaths) Right <$> resolve searchPaths
