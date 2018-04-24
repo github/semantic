@@ -2,7 +2,6 @@
 module Analysis.Abstract.BadAddresses where
 
 import Control.Abstract.Analysis
-import Analysis.Abstract.Evaluating
 import Prologue
 
 newtype BadAddresses m (effects :: [* -> *]) a = BadAddresses (m effects a)
@@ -16,7 +15,6 @@ deriving instance MonadEvaluator location term value effects m   => MonadEvaluat
 
 instance ( Effectful m
          , Member (Resumable (AddressError location value)) effects
-         , Member (State (EvaluatingState location term value)) effects
          , MonadAnalysis location term value effects m
          , MonadValue location value effects (BadAddresses m)
          , Show location

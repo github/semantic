@@ -3,7 +3,6 @@ module Analysis.Abstract.BadModuleResolutions where
 
 import Control.Abstract.Analysis
 import Data.Abstract.Evaluatable
-import Analysis.Abstract.Evaluating
 import Prologue
 
 newtype BadModuleResolutions m (effects :: [* -> *]) a = BadModuleResolutions (m effects a)
@@ -17,7 +16,6 @@ deriving instance MonadEvaluator location term value effects m   => MonadEvaluat
 
 instance ( Effectful m
          , Member (Resumable (ResolutionError value)) effects
-         , Member (State (EvaluatingState location term value)) effects
          , Member (State [Name]) effects
          , MonadAnalysis location term value effects m
          , MonadValue location value effects (BadModuleResolutions m)
