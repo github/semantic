@@ -82,7 +82,7 @@ class ( Effectful m
       , Member (State (EvaluatorState location term value)) effects
       , Monad (m effects)
       )
-   => MonadEvaluator location term value (effects :: [* -> *]) m | m effects -> location term value where
+   => MonadEvaluator location term value effects m | m effects -> location term value where
   -- | Get the current 'Configuration' with a passed-in term.
   getConfiguration :: Ord location => term -> m effects (Configuration location term value)
 
