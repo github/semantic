@@ -12,7 +12,7 @@ module SpecHelpers (
 , TestEvaluating
 , ) where
 
-import Analysis.Abstract.Evaluating as X (EvaluatingState(..))
+import Control.Abstract.Evaluator as X (EvaluatorState(..))
 import Data.Abstract.Address as X
 import Data.Abstract.FreeVariables as X hiding (dropExtension)
 import Data.Abstract.Heap as X

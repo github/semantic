@@ -11,17 +11,13 @@ data Fresh a where
   -- | Request a fresh variable name.
   Fresh :: Fresh Int
 
--- | 'Monad's offering a (resettable) sequence of guaranteed-fresh type variables.
-class Monad m => MonadFresh m where
-  -- | Get a fresh variable name, guaranteed unused (since the last 'reset').
-  fresh :: m Int
+-- | Get a fresh variable name, guaranteed unused (since the last 'reset').
+fresh :: (Effectful m, Member Fresh effects) => m effects Int
+fresh = raise (send Fresh)
 
-  -- | Reset the sequence of variable names. Useful to avoid complicated alpha-equivalence comparisons when iteratively recomputing the results of an analysis til convergence.
-  reset :: Int -> m ()
-
-instance (Fresh :< fs) => MonadFresh (Eff fs) where
-  fresh = send Fresh
-  reset = send . Reset
+-- | Reset the sequence of variable names. Useful to avoid complicated alpha-equivalence comparisons when iteratively recomputing the results of an analysis til convergence.
+reset :: (Effectful m, Member Fresh effects) => Int -> m effects ()
+reset = raise . send . Reset
 
 
 -- | 'Fresh' effects are interpreted starting from 0, incrementing the current name with each request for a fresh name, and overwriting the counter on reset.

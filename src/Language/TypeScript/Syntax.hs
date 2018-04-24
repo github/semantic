@@ -31,7 +31,7 @@ toName = FV.name . BC.pack . unPath
 
 -- Node.js resolution algorithm: https://nodejs.org/api/modules.html#modules_all_together
 -- TypeScript has a couple of different strategies, but the main one mimics Node.js.
-resolveWithNodejsStrategy :: forall value term location m. MonadEvaluatable location term value m => ImportPath -> [String] -> m ModulePath
+resolveWithNodejsStrategy :: MonadEvaluatable location term value effects m => ImportPath -> [String] -> m effects ModulePath
 resolveWithNodejsStrategy (ImportPath path Relative)    exts = resolveRelativePath path exts
 resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativePath path exts
 
@@ -42,7 +42,7 @@ resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativ
 -- /root/src/moduleB.ts
 -- /root/src/moduleB/package.json (if it specifies a "types" property)
 -- /root/src/moduleB/index.ts
-resolveRelativePath :: forall value term location m. MonadEvaluatable location term value m => FilePath -> [String] -> m ModulePath
+resolveRelativePath :: forall value term location effects m. MonadEvaluatable location term value effects m => FilePath -> [String] -> m effects ModulePath
 resolveRelativePath relImportPath exts = do
   ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory modulePath
@@ -61,7 +61,7 @@ resolveRelativePath relImportPath exts = do
 --
 -- /root/node_modules/moduleB.ts, etc
 -- /node_modules/moduleB.ts, etc
-resolveNonRelativePath :: forall value term location m. MonadEvaluatable location term value m => FilePath -> [String] -> m ModulePath
+resolveNonRelativePath :: forall value term location effects m. MonadEvaluatable location term value effects m => FilePath -> [String] -> m effects ModulePath
 resolveNonRelativePath name exts = do
   ModuleInfo{..} <- currentModule
   go "." modulePath mempty
@@ -76,7 +76,7 @@ resolveNonRelativePath name exts = do
         Right m -> traceResolve name m $ pure m
     notFound _ = throwResumable @(ResolutionError value) $ TypeScriptError name
 
-resolveTSModule :: MonadEvaluatable location term value m => FilePath -> [String] -> m (Either [FilePath] ModulePath)
+resolveTSModule :: MonadEvaluatable location term value effects m => FilePath -> [String] -> m effects (Either [FilePath] ModulePath)
 resolveTSModule path exts = maybe (Left searchPaths) Right <$> resolve searchPaths
   where searchPaths =
           ((path <.>) <$> exts)
@@ -91,7 +91,7 @@ typescriptExtensions = ["ts", "tsx", "d.ts"]
 javascriptExtensions :: [String]
 javascriptExtensions = ["js"]
 
-evalRequire :: MonadEvaluatable location term value m => ModulePath -> Name -> m value
+evalRequire :: MonadEvaluatable location term value effects m => ModulePath -> Name -> m effects value
 evalRequire modulePath alias = letrec' alias $ \addr -> do
   (importedEnv, _) <- isolate (require modulePath)
   modifyEnv (mappend importedEnv)
