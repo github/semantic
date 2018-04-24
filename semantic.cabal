@@ -22,6 +22,7 @@ library
                      , Analysis.Abstract.Caching
                      , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
+                     , Analysis.Abstract.Erroring
                      , Analysis.Abstract.Evaluating
                      , Analysis.Abstract.ImportGraph
                      , Analysis.Abstract.Quiet
