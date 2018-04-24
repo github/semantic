@@ -1,4 +1,5 @@
 {-# LANGUAGE GADTs, TypeFamilies, UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the MonadValue instance, which requires MonadEvaluator to resolve its functional dependency.
 module Data.Abstract.Type
   ( Type (..)
   , TypeError (..)
@@ -58,7 +59,7 @@ instance Eq1 TypeError where
   liftEq _ _ _                                           = False
 
 -- | Unify two 'Type's.
-unify :: MonadResume TypeError m => Type -> Type -> m Type
+unify :: (Effectful m, Applicative (m effects), Member (Resumable TypeError) effects) => Type -> Type -> m effects Type
 unify (a1 :-> b1) (a2 :-> b2) = (:->) <$> unify a1 a2 <*> unify b1 b2
 unify a Null = pure a
 unify Null b = pure b
@@ -70,22 +71,18 @@ unify t1 t2
   | t1 == t2  = pure t2
   | otherwise = throwResumable (UnificationError t1 t2)
 
-
 instance Ord location => ValueRoots location Type where
   valueRoots _ = mempty
 
-
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
-instance ( Alternative m
-         , MonadAddressable location m
-         , MonadEnvironment location Type m
-         , MonadFail m
-         , MonadFresh m
-         , MonadHeap location Type m
-         , MonadResume TypeError m
+instance ( Alternative (m effects)
+         , Member Fresh effects
+         , Member (Resumable TypeError) effects
+         , MonadAddressable location effects m
+         , MonadEvaluator location term Type effects m
          , Reducer Type (Cell location Type)
          )
-      => MonadValue location Type m where
+      => MonadValue location Type effects m where
   lambda names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
@@ -151,7 +148,9 @@ instance ( Alternative m
   call op params = do
     tvar <- fresh
     paramTypes <- sequenceA params
-    _ :-> ret <- op `unify` (Product paramTypes :-> Var tvar)
-    pure ret
+    unified <- op `unify` (Product paramTypes :-> Var tvar)
+    case unified of
+      _ :-> ret -> pure ret
+      _         -> raise (fail "unification with a function produced something other than a function")
 
   loop f = f empty

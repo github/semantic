@@ -3,7 +3,6 @@ module Prologue
   ( module X
   , foldMapA
   , maybeM
-  , maybeFail
   , maybeLast
   , fromMaybeLast
   ) where
@@ -73,7 +72,3 @@ fromMaybeLast b = fromMaybe b . getLast . foldMap (Last . Just)
 -- | Extract the 'Just' of a 'Maybe' in an 'Applicative' context or, given 'Nothing', run the provided action.
 maybeM :: Applicative f => f a -> Maybe a -> f a
 maybeM f = maybe f pure
-
--- | Either extract the 'Just' of a 'Maybe' or invoke 'fail' with the provided string.
-maybeFail :: MonadFail m => String -> Maybe a -> m a
-maybeFail s = maybeM (X.fail s)

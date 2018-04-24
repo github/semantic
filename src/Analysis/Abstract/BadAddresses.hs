@@ -2,32 +2,29 @@
 module Analysis.Abstract.BadAddresses where
 
 import Control.Abstract.Analysis
-import Analysis.Abstract.Evaluating
+import Data.Abstract.Address
 import Prologue
 
 newtype BadAddresses m (effects :: [* -> *]) a = BadAddresses (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
+  deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
-deriving instance MonadControl term (m effects)                    => MonadControl term (BadAddresses m effects)
-deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (BadAddresses m effects)
-deriving instance MonadHeap location value (m effects)             => MonadHeap location value (BadAddresses m effects)
-deriving instance MonadModuleTable location term value (m effects) => MonadModuleTable location term value (BadAddresses m effects)
-deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (BadAddresses m effects)
+deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadAddresses m)
 
 instance ( Effectful m
          , Member (Resumable (AddressError location value)) effects
-         , Member (State (EvaluatingState location term value)) effects
-         , MonadAnalysis location term value (m effects)
-         , MonadValue location value (BadAddresses m effects)
+         , MonadAnalysis location term value effects m
+         , MonadValue location value effects (BadAddresses m)
+         , Monoid (Cell location value)
          , Show location
          )
-      => MonadAnalysis location term value (BadAddresses m effects) where
-  type Effects location term value (BadAddresses m effects) = Effects location term value (m effects)
+      => MonadAnalysis location term value effects (BadAddresses m) where
+  type Effects location term value (BadAddresses m) = Effects location term value m
 
   analyzeTerm eval term = resume @(AddressError location value) (liftAnalyze analyzeTerm eval term) (
         \yield error -> do
           traceM ("AddressError:" <> show error)
           case error of
-            (UninitializedAddress _) -> hole >>= yield)
+            UnallocatedAddress _ -> yield mempty
+            UninitializedAddress _ -> hole >>= yield)
 
   analyzeModule = liftAnalyze analyzeModule
