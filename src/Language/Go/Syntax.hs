@@ -41,7 +41,7 @@ resolveGoImport (ImportPath path NonRelative) = do
   case splitDirectories path of
     -- Import an absolute path that's defined in this package being analyized.
     -- First two are source, next is package name, remaining are path to package
-    -- (e.g. github.com/golang/<package/path...).
+    -- (e.g. github.com/golang/<package>/path...).
     (_ : _ : p : xs) | p == package -> listModulesInDir (joinPath xs)
     _ -> throwResumable @(ResolutionError value) $ GoImportError path
 
