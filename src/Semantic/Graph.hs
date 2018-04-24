@@ -49,13 +49,13 @@ parsePackage :: Members '[Distribute WrappedTask, Files, Task] effs
              -> Eff effs (Package term)
 parsePackage parser preludeFile project@Project{..} = do
   prelude <- traverse (parseModule parser Nothing) preludeFile
-  Package.fromModules n Nothing prelude <$> parseModules parser project
+  Package.fromModules n Nothing prelude (length projectEntryPoints) <$> parseModules parser project
   where
     n = name (projectName project)
 
     -- | Parse all files in a project into 'Module's.
     parseModules :: Members '[Distribute WrappedTask, Files, Task] effs => Parser term -> Project -> Eff effs [Module term]
-    parseModules parser project@Project{..} = distributeFor projectFiles (WrapTask . parseModule parser (Just projectRootDir))
+    parseModules parser project@Project{..} = distributeFor (projectEntryPoints <> projectFiles) (WrapTask . parseModule parser (Just projectRootDir))
 
     -- | Parse a file into a 'Module'.
     parseModule :: Members '[Files, Task] effs => Parser term -> Maybe FilePath -> File -> Eff effs (Module term)

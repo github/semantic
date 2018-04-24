@@ -90,7 +90,7 @@ readBlobsFromPaths files = catMaybes <$> traverse readFile files
 readProjectFromPaths :: MonadIO m => FilePath -> Language -> m Project
 readProjectFromPaths rootDir lang = do
   paths <- liftIO $ fmap fold (globDir (compile . mappend "**/*." <$> exts) rootDir)
-  pure $ Project  rootDir (toFile <$> paths) lang
+  pure $ Project  rootDir (toFile <$> paths) lang []
   where
     toFile path = File path (Just lang)
     exts = extensionsForLanguage lang
@@ -98,7 +98,7 @@ readProjectFromPaths rootDir lang = do
 readProjectEntryFromPath :: MonadIO m => FilePath -> Language -> m Project
 readProjectEntryFromPath path lang = do
   paths <- liftIO $ filter (/= path) <$> fmap fold (globDir (compile . mappend "**/*." <$> exts) rootDir)
-  pure $ Project rootDir (toFile <$> (path : paths)) lang
+  pure $ Project rootDir (toFile <$> (path : paths)) lang [toFile path]
   where
     rootDir = takeDirectory path
     toFile path = File path (Just lang)
