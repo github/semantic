@@ -4,6 +4,7 @@ module Analysis.Abstract.BadVariables
 ) where
 
 import Control.Abstract.Analysis
+import Control.Monad.Effect.Internal hiding (interpret)
 import Data.Abstract.Evaluatable
 import Prologue
 
@@ -35,3 +36,21 @@ instance ( Effectful m
             FreeVariablesError names -> raise (modify' (names <>)) >> yield (fromMaybeLast "unknown" names))
 
   analyzeModule = liftAnalyze analyzeModule
+
+instance ( Interpreter effects (result, [Name]) rest m
+         , MonadValue location value (State [Name] ': effects) m
+         )
+      => Interpreter (Resumable (EvalError value) ': State [Name] ': effects) result rest (BadVariables m) where
+  interpret
+    = interpret
+    . raise @m
+    . flip runState []
+    . relay pure (\ (Resumable err) yield -> case err of
+      DefaultExportError{}     -> yield ()
+      ExportError{}            -> yield ()
+      IntegerFormatError{}     -> yield 0
+      FloatFormatError{}       -> yield 0
+      RationalFormatError{}    -> yield 0
+      FreeVariableError name   -> modify' (name :) >> lower @m hole >>= yield
+      FreeVariablesError names -> modify' (names <>) >> yield (fromMaybeLast "unknown" names))
+    . lower
