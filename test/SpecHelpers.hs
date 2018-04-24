@@ -9,6 +9,7 @@ module SpecHelpers (
 , ns
 , verbatim
 , Verbatim(..)
+, TestEvaluating
 , ) where
 
 import Analysis.Abstract.Evaluating as X (EvaluatingState(..))
@@ -17,6 +18,7 @@ import Data.Abstract.FreeVariables as X hiding (dropExtension)
 import Data.Abstract.Heap as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
 import Data.Blob as X
+import Data.File as X
 import Data.Functor.Listable as X
 import Data.Language as X
 import Data.Output as X
@@ -48,6 +50,7 @@ import Test.LeanCheck as X
 import qualified Data.ByteString as B
 import qualified Semantic.IO as IO
 import Data.Abstract.Value
+import Analysis.Abstract.Evaluating
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO ByteString
@@ -55,15 +58,17 @@ diffFilePaths paths = readFilePair paths >>= runTask . diffBlobPair SExpressionD
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFilePath :: FilePath -> IO ByteString
-parseFilePath path = (fromJust <$> IO.readFile path (IO.languageForFilePath path)) >>= runTask . parseBlob SExpressionTermRenderer
+parseFilePath path = (fromJust <$> IO.readFile (file path)) >>= runTask . parseBlob SExpressionTermRenderer
 
 -- | Read two files to a BlobPair.
 readFilePair :: Both FilePath -> IO BlobPair
-readFilePair paths = let paths' = fmap (\p -> (p, IO.languageForFilePath p)) paths in
+readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
 readFileVerbatim :: FilePath -> IO Verbatim
 readFileVerbatim = fmap verbatim . B.readFile
+
+type TestEvaluating term = Evaluating Precise term (Value Precise)
 
 ns n = Just . Latest . Just . injValue . Namespace n
 addr = Address . Precise

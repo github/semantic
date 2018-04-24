@@ -26,17 +26,17 @@ spec = parallel $ do
       when (actual /= expected) $ print actual
       actual `shouldBe` expected
 
-parseFixtures :: [(SomeRenderer TermRenderer, Either Handle [(FilePath, Maybe Language)], ByteString)]
+parseFixtures :: [(SomeRenderer TermRenderer, Either Handle [File], ByteString)]
 parseFixtures =
   [ (SomeRenderer SExpressionTermRenderer, pathMode, sExpressionParseTreeOutput)
   , (SomeRenderer JSONTermRenderer, pathMode, jsonParseTreeOutput)
   , (SomeRenderer JSONTermRenderer, pathMode', jsonParseTreeOutput')
   , (SomeRenderer JSONTermRenderer, Right [], emptyJsonParseTreeOutput)
-  , (SomeRenderer (SymbolsTermRenderer defaultSymbolFields), Right [("test/fixtures/ruby/corpus/method-declaration.A.rb", Just Ruby)], symbolsOutput)
-  , (SomeRenderer TagsTermRenderer, Right [("test/fixtures/ruby/corpus/method-declaration.A.rb", Just Ruby)], tagsOutput)
+  , (SomeRenderer (SymbolsTermRenderer defaultSymbolFields), Right [File "test/fixtures/ruby/corpus/method-declaration.A.rb" (Just Ruby)], symbolsOutput)
+  , (SomeRenderer TagsTermRenderer, Right [File "test/fixtures/ruby/corpus/method-declaration.A.rb" (Just Ruby)], tagsOutput)
   ]
-  where pathMode = Right [("test/fixtures/ruby/corpus/and-or.A.rb", Just Ruby)]
-        pathMode' = Right [("test/fixtures/ruby/corpus/and-or.A.rb", Just Ruby), ("test/fixtures/ruby/corpus/and-or.B.rb", Just Ruby)]
+  where pathMode = Right [File "test/fixtures/ruby/corpus/and-or.A.rb" (Just Ruby)]
+        pathMode' = Right [File "test/fixtures/ruby/corpus/and-or.A.rb" (Just Ruby), File "test/fixtures/ruby/corpus/and-or.B.rb" (Just Ruby)]
 
         sExpressionParseTreeOutput = "(Program\n  (LowAnd\n    (Send\n      (Identifier))\n    (Send\n      (Identifier))))\n"
         jsonParseTreeOutput = "{\"trees\":[{\"path\":\"test/fixtures/ruby/corpus/and-or.A.rb\",\"programNode\":{\"category\":\"Program\",\"children\":[{\"category\":\"LowAnd\",\"children\":[{\"category\":\"Send\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"name\":\"foo\",\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}}],\"sourceRange\":[0,3],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,4]}},{\"category\":\"Send\",\"children\":[{\"category\":\"Identifier\",\"children\":[],\"name\":\"bar\",\"sourceRange\":[8,11],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,12]}}],\"sourceRange\":[8,11],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,12]}}],\"sourceRange\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,12]}}],\"sourceRange\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,1]}},\"language\":\"Ruby\"}]}\n"
@@ -46,13 +46,13 @@ parseFixtures =
         tagsOutput = "[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"path\":\"test/fixtures/ruby/corpus/method-declaration.A.rb\",\"kind\":\"Method\",\"symbol\":\"foo\",\"line\":\"def foo\",\"language\":\"Ruby\"}]\n"
 
 
-diffFixtures :: [(SomeRenderer DiffRenderer, Either Handle [Both (FilePath, Maybe Language)], ByteString)]
+diffFixtures :: [(SomeRenderer DiffRenderer, Either Handle [Both File], ByteString)]
 diffFixtures =
   [ (SomeRenderer JSONDiffRenderer, pathMode, jsonOutput)
   , (SomeRenderer SExpressionDiffRenderer, pathMode, sExpressionOutput)
   , (SomeRenderer ToCDiffRenderer, pathMode, tocOutput)
   ]
-  where pathMode = Right [both ("test/fixtures/ruby/corpus/method-declaration.A.rb", Just Ruby) ("test/fixtures/ruby/corpus/method-declaration.B.rb", Just Ruby)]
+  where pathMode = Right [both (File "test/fixtures/ruby/corpus/method-declaration.A.rb" (Just Ruby)) (File "test/fixtures/ruby/corpus/method-declaration.B.rb"  (Just Ruby))]
 
         jsonOutput =  "{\"diffs\":[{\"diff\":{\"merge\":{\"after\":{\"category\":\"Program\",\"sourceRange\":[0,21],\"sourceSpan\":{\"start\":[1,1],\"end\":[4,1]}},\"children\":[{\"merge\":{\"after\":{\"category\":\"Method\",\"sourceRange\":[0,20],\"sourceSpan\":{\"start\":[1,1],\"end\":[3,4]}},\"children\":[{\"merge\":{\"after\":{\"category\":\"Empty\",\"sourceRange\":[0,0],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,1]}},\"children\":[],\"before\":{\"category\":\"Empty\",\"sourceRange\":[0,0],\"sourceSpan\":{\"start\":[1,1],\"end\":[1,1]}}}},{\"patch\":{\"replace\":[{\"category\":\"Identifier\",\"children\":[],\"name\":\"foo\",\"sourceRange\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}},{\"category\":\"Identifier\",\"children\":[],\"name\":\"bar\",\"sourceRange\":[4,7],\"sourceSpan\":{\"start\":[1,5],\"end\":[1,8]}}]}},{\"patch\":{\"insert\":{\"category\":\"Identifier\",\"children\":[],\"name\":\"a\",\"sourceRange\":[8,9],\"sourceSpan\":{\"start\":[1,9],\"end\":[1,10]}}}},{\"merge\":{\"after\":{\"category\":\"\",\"sourceRange\":[13,16],\"sourceSpan\":{\"start\":[2,3],\"end\":[2,6]}},\"children\":[{\"patch\":{\"insert\":{\"category\":\"Send\",\"children\":[{\"patch\":{\"insert\":{\"category\":\"Identifier\",\"children\":[],\"name\":\"baz\",\"sourceRange\":[13,16],\"sourceSpan\":{\"start\":[2,3],\"end\":[2,6]}}}}],\"sourceRange\":[13,16],\"sourceSpan\":{\"start\":[2,3],\"end\":[2,6]}}}}],\"before\":{\"category\":\"[]\",\"sourceRange\":[8,11],\"sourceSpan\":{\"start\":[2,1],\"end\":[2,4]}}}}],\"before\":{\"category\":\"Method\",\"sourceRange\":[0,11],\"sourceSpan\":{\"start\":[1,1],\"end\":[2,4]}}}}],\"before\":{\"category\":\"Program\",\"sourceRange\":[0,12],\"sourceSpan\":{\"start\":[1,1],\"end\":[3,1]}}}},\"stat\":{\"replace\":[{\"path\":\"test/fixtures/ruby/corpus/method-declaration.A.rb\",\"language\":\"Ruby\"},{\"path\":\"test/fixtures/ruby/corpus/method-declaration.B.rb\",\"language\":\"Ruby\"}],\"path\":\"test/fixtures/ruby/corpus/method-declaration.A.rb -> test/fixtures/ruby/corpus/method-declaration.B.rb\"}}]}\n"
         sExpressionOutput = "(Program\n  (Method\n    (Empty)\n  { (Identifier)\n  ->(Identifier) }\n  {+(Identifier)+}\n    (\n    {+(Send\n      {+(Identifier)+})+})))\n"

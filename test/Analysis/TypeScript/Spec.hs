@@ -1,10 +1,12 @@
 {-# LANGUAGE OverloadedLists #-}
 module Analysis.TypeScript.Spec (spec) where
 
-import SpecHelpers
 import Data.Abstract.Evaluatable
+import qualified Language.TypeScript.Assignment as TypeScript
 import Data.Abstract.Value as Value
 import Data.Abstract.Number as Number
+
+import SpecHelpers
 
 spec :: Spec
 spec = parallel $ do
@@ -35,8 +37,9 @@ spec = parallel $ do
 
     it "evaluates early return statements" $ do
       res <- evaluate "early-return.ts"
-      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (Right (pure $ injValue (Value.Float (Number.Decimal 123.0))))))))))
+      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (Right (Right (pure $ injValue (Value.Float (Number.Decimal 123.0)))))))))))
 
   where
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate entry = evalTypeScriptProject (fixtures <> entry)
+    evalTypeScriptProject path = runAnalysis @(TestEvaluating TypeScript.Term) <$> evaluateProject typescriptParser Nothing path

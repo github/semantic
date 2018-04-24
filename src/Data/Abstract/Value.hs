@@ -334,7 +334,10 @@ instance (Monad (m effects), MonadEvaluatable location term (Value location) eff
       evalClosure :: Label -> m effects (Value location)
       evalClosure lab = catchException (goto lab >>= evaluateTerm) handleReturn
 
-      handleReturn :: ControlThrow (Value location) -> m effects (Value location)
+      handleReturn :: ReturnThrow (Value location) -> m effects (Value location)
       handleReturn (Ret v) = pure v
 
-  loop = fix
+  loop x = catchException (fix x) handleLoop where
+    handleLoop :: LoopThrow (Value location) -> m effects (Value location)
+    handleLoop (Brk v) = pure v
+    handleLoop Con     = loop x

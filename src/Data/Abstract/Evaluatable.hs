@@ -4,17 +4,18 @@ module Data.Abstract.Evaluatable
 , MonadEvaluatable
 , Evaluatable(..)
 , Unspecialized(..)
-, LoadError(..)
+, ReturnThrow(..)
 , EvalError(..)
+, LoadError(..)
+, LoopThrow(..)
 , ResolutionError(..)
-, ControlThrow(..)
 , variable
 , evaluateTerm
 , evaluateModule
-, evaluateModules
 , evaluatePackage
 , evaluatePackageBody
 , throwLoadError
+, throwLoop
 , throwEvalError
 , throwValueError
 , resolve
@@ -49,7 +50,8 @@ type MonadEvaluatable location term value (effects :: [* -> *]) m =
   , Effectful m
   , Evaluatable (Base term)
   , FreeVariables term
-  , Member (Exc.Exc (ControlThrow value)) effects
+  , Member (Exc.Exc (ReturnThrow value)) effects
+  , Member (Exc.Exc (LoopThrow value)) effects
   , Member Fail effects
   , Member (Resumable (Unspecialized value)) effects
   , Member (Resumable (ValueError location value)) effects
@@ -65,11 +67,14 @@ type MonadEvaluatable location term value (effects :: [* -> *]) m =
   , Show location
   )
 
-data ControlThrow value where
-  Ret :: value -> ControlThrow value
+newtype ReturnThrow value
+  = Ret value
+    deriving (Eq, Show)
 
-deriving instance Show value => Show (ControlThrow value)
-deriving instance Eq value => Eq (ControlThrow value)
+data LoopThrow value
+  = Brk value
+  | Con
+    deriving (Eq, Show)
 
 -- | An error thrown when we can't resolve a module from a qualified name.
 data ResolutionError value resume where
@@ -136,6 +141,9 @@ throwLoadError = throwResumable
 
 throwEvalError :: MonadEvaluatable location term value effects m => EvalError value resume -> m effects resume
 throwEvalError = throwResumable
+
+throwLoop :: MonadEvaluatable location term value effects m => LoopThrow value -> m effects a
+throwLoop = throwException
 
 data Unspecialized a b where
   Unspecialized :: { getUnspecialized :: Prelude.String } -> Unspecialized value value
@@ -255,12 +263,6 @@ evaluateModule :: MonadEvaluatable location term value effects m
                -> m effects value
 evaluateModule m = analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evaluateTerm) m)
 
--- | Evaluate with a list of modules in scope, taking the head module as the entry point.
-evaluateModules :: MonadEvaluatable location term value effects m
-                => [Module term]
-                -> m effects value
-evaluateModules = fmap Prelude.head . evaluatePackageBody . Package.fromModules
-
 -- | Evaluate a given package.
 evaluatePackage :: MonadEvaluatable location term value effects m
                 => Package term
@@ -271,11 +273,16 @@ evaluatePackage p = pushOrigin (packageOrigin p) (evaluatePackageBody (packageBo
 evaluatePackageBody :: MonadEvaluatable location term value effects m
                     => PackageBody term
                     -> m effects [value]
-evaluatePackageBody body = localModuleTable (<> packageModules body)
-  (traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints body)))
-  where evaluateEntryPoint (m, sym) = do
-          (_, v) <- require m
-          maybe (pure v) ((`call` []) <=< variable) sym
+evaluatePackageBody body = withPrelude (packagePrelude body) $
+  localModuleTable (<> packageModules body) (traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints body)))
+  where
+    evaluateEntryPoint (m, sym) = do
+      (_, v) <- require m
+      maybe (pure v) ((`call` []) <=< variable) sym
+    withPrelude Nothing a = a
+    withPrelude (Just prelude) a = do
+      preludeEnv <- evaluateModule prelude *> getEnv
+      withDefaultEnvironment preludeEnv a
 
 -- | Push a 'SomeOrigin' onto the stack. This should be used to contextualize execution with information about the originating term, module, or package.
 pushOrigin :: ( Effectful m
