@@ -31,3 +31,7 @@ instance ( Effectful m
           traceM ("Unspecialized:" <> show err) >> hole >>= yield)
 
   analyzeModule = liftAnalyze analyzeModule
+
+instance Interpreter effects result rest m
+      => Interpreter effects result rest (Quietly m) where
+  interpret (Quietly m) = interpret m
