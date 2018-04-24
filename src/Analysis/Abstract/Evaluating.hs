@@ -1,8 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
 module Analysis.Abstract.Evaluating
 ( Evaluating
-, EvaluatorState(..)
-, State
 ) where
 
 import Control.Abstract.Analysis
