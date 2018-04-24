@@ -366,10 +366,10 @@ instance Evaluatable Namespace where
       go [] = raise (fail "expected at least one free variable in namespaceName, found none")
       -- The last name creates a closure over the namespace body.
       go [name] = letrec' name $ \addr ->
-        subtermValue namespaceBody *> makeNamespace name addr []
+        subtermValue namespaceBody *> makeNamespace name addr Nothing
       -- Each namespace name creates a closure over the subsequent namespace closures
       go (name:xs) = letrec' name $ \addr ->
-        go xs <* makeNamespace name addr []
+        go xs <* makeNamespace name addr Nothing
 
 data TraitDeclaration a = TraitDeclaration { traitName :: a, traitStatements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

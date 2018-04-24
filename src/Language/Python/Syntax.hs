@@ -127,13 +127,13 @@ instance Evaluatable QualifiedImport where
       go ((name, path) :| []) = letrec' name $ \addr -> do
         (importedEnv, _) <- isolate (require path)
         modifyEnv (mappend importedEnv)
-        void $ makeNamespace name addr []
+        void $ makeNamespace name addr Nothing
         unit
       -- Evaluate each parent module, creating a just namespace
       go ((name, path) :| xs) = letrec' name $ \addr -> do
         void $ isolate (require path)
         void $ go (NonEmpty.fromList xs)
-        makeNamespace name addr []
+        makeNamespace name addr Nothing
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedName, qualifiedAliasedImportAlias :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -156,7 +156,7 @@ instance Evaluatable QualifiedAliasedImport where
       let path = NonEmpty.last modulePaths
       (importedEnv, _) <- isolate (require path)
       modifyEnv (mappend importedEnv)
-      void $ makeNamespace alias addr []
+      void $ makeNamespace alias addr Nothing
       unit
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)

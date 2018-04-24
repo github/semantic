@@ -96,7 +96,7 @@ evalRequire :: MonadEvaluatable location term value effects m => ModulePath -> N
 evalRequire modulePath alias = letrec' alias $ \addr -> do
   (importedEnv, _) <- isolate (require modulePath)
   modifyEnv (mappend importedEnv)
-  void $ makeNamespace alias addr []
+  void $ makeNamespace alias addr Nothing
   unit
 
 data Import a = Import { importSymbols :: ![(Name, Name)], importFrom :: ImportPath }
@@ -609,7 +609,7 @@ instance Evaluatable Module where
   eval (Module iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
     letrec' name $ \addr ->
-      eval xs <* makeNamespace name addr []
+      eval xs <* makeNamespace name addr Nothing
 
 
 
@@ -624,7 +624,7 @@ instance Evaluatable InternalModule where
   eval (InternalModule iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
     letrec' name $ \addr ->
-      eval xs <* makeNamespace name addr []
+      eval xs <* makeNamespace name addr Nothing
 
 instance Declarations a => Declarations (InternalModule a) where
   declaredName InternalModule{..} = declaredName internalModuleIdentifier

@@ -17,6 +17,7 @@ import Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables
 import Data.Abstract.Live (Live)
 import Data.Abstract.Number as Number
+import Data.Empty as Empty
 import Data.Scientific (Scientific)
 import Data.Semigroup.Reducer hiding (unit)
 import Prelude
@@ -177,10 +178,10 @@ makeNamespace :: ( MonadValue location value effects m
                  )
               => Name
               -> Address location value
-              -> [value]
+              -> Maybe value
               -> m effects value
-makeNamespace name addr supers = do
-  superEnv <- mconcat <$> traverse scopedEnvironment supers
+makeNamespace name addr super = do
+  superEnv <- maybe (pure Empty.empty) scopedEnvironment super
   namespaceEnv <- Env.head <$> getEnv
   v <- namespace name (Env.mergeNewer superEnv namespaceEnv)
   v <$ assign addr v

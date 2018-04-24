@@ -83,7 +83,7 @@ instance Evaluatable QualifiedImport where
         (importedEnv, _) <- traceResolve (unPath importPath) path $ isolate (require path)
         modifyEnv (mappend importedEnv)
 
-      makeNamespace alias addr []
+      makeNamespace alias addr Nothing
     unit
 
 -- | Side effect only imports (no symbols made available to the calling environment).

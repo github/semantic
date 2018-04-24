@@ -118,10 +118,10 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
   eval Class{..} = do
-    supers <- traverse subtermValue (toList classSuperClass)
+    super <- traverse subtermValue classSuperClass
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm classIdentifier)
     letrec' name $ \addr ->
-      subtermValue classBody <* makeNamespace name addr supers
+      subtermValue classBody <* makeNamespace name addr super
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -134,7 +134,7 @@ instance Evaluatable Module where
   eval (Module iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
     letrec' name $ \addr ->
-      eval xs <* makeNamespace name addr []
+      eval xs <* makeNamespace name addr Nothing
 
 data LowPrecedenceBoolean a
   = LowAnd !a !a
