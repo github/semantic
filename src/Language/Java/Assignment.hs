@@ -107,24 +107,22 @@ assignment = handleError $ makeTerm <$> symbol Grammar.Program <*> children (Syn
 manyTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
 manyTerm term = many (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
 
--- | Match a series of terms or comments until a delimiter is matched
+-- | Match a series of terms or comments until a delimiter is matched.
 manyTermsTill :: Assignment.Assignment [] Grammar Term
               -> Assignment.Assignment [] Grammar b
               -> Assignment.Assignment [] Grammar [Term]
 manyTermsTill step end = manyTill (step <|> comment) end
--- used in cases where the rules overlap, ie., step <|> comment and end can overlap
 
 someTerm :: Assignment -> Assignment.Assignment [] Grammar [Term]
 someTerm term = some (contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm))
 
+-- | Match comments before and after the node.
 term :: Assignment -> Assignment
 term term = contextualize comment (postContextualize comment term)
--- matches comments before and after the node
 
+-- | Match
 expression :: Assignment
 expression = handleError (choice expressionChoices)
--- <?> "expression"
--- choice walks the expressionChoices and inserts <|> (notionally but not really lol)
 
 expressions :: Assignment
 expressions = makeTerm'' <$> location <*> many expression
@@ -181,32 +179,6 @@ modifier = make <$> symbol Modifier <*> children(Left <$> annotation <|> Right .
   where
     make loc (Right modifier) = makeTerm loc modifier
     make _ (Left annotation) = annotation
--- if we don't match the annotation we will match the token
--- don't do this if you have more than one word possible
--- left fmap
--- right - composing the right function after wrapping the bytestring of source in the accessibilityModifier syntax, then compose that with right function
--- this enables us to have the same type in both places (either term (syntax.accessibilityModifier term))
--- whack error∷/Users/aymannadeem/github/semantic-diff/src/Language/Java/Assignment.hs:180:69: error:
---     • Couldn't match type ‘Syntax.AccessibilityModifier a0’
---                      with ‘Term.Term (Union Syntax) (Record Location)’
---       Expected type: Control.Monad.Free.Freer.Freer
---                        (Assigning.Assignment.Tracing
---                           (Assigning.Assignment.AssignmentF [] Grammar))
---                        Term
---         Actual type: Control.Monad.Free.Freer.Freer
---                        (Assigning.Assignment.Tracing
---                           (Assigning.Assignment.AssignmentF [] Grammar))
---                        (Syntax.AccessibilityModifier a0)
---     • In the second argument of ‘(<|>)’, namely
---         ‘Syntax.AccessibilityModifier <$> source’
---       In the first argument of ‘children’, namely
---         ‘(annotation <|> Syntax.AccessibilityModifier <$> source)’
---       In the second argument of ‘(<*>)’, namely
---         ‘children (annotation <|> Syntax.AccessibilityModifier <$> source)’
---     |
--- 180 | modifier = makeTerm <$> symbol Modifier <*> children(annotation <|> Syntax.AccessibilityModifier <$> source)
---     |                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
--- Failed, 118 modules loaded.
 
 arrayInitializer :: Assignment
 arrayInitializer = makeTerm <$> symbol ArrayInitializer <*> (Literal.Array <$> many expression)
@@ -233,20 +205,15 @@ variableDeclaratorId :: Assignment
 variableDeclaratorId = symbol VariableDeclaratorId *> children identifier
 
 -- Literals
-
--- TODO: Need to disaggregate true/false in treesitter
 boolean :: Assignment
 boolean =  makeTerm <$> symbol BooleanLiteral <*> children
           (token Grammar.True $> Literal.true
           <|> token Grammar.False $> Literal.false)
 
--- *> pure = $>
-
 null' :: Assignment
 null' = makeTerm <$> symbol NullLiteral <*> (Literal.Null <$ source)
--- why is this <$?
 
--- Supports all integer and floating point literals (hex, octal, binary)
+-- Integer supports all integer and floating point literals (hex, octal, binary)
 integer :: Assignment
 integer = makeTerm <$> symbol IntegerLiteral <*> children (Literal.Integer <$> source)
 
@@ -259,6 +226,14 @@ string = makeTerm <$> symbol StringLiteral <*> (Literal.TextElement <$> source)
 char :: Assignment
 char = makeTerm <$> symbol CharacterLiteral <*> (Literal.TextElement <$> source)
 
+-- Identifiers
+identifier :: Assignment
+identifier = makeTerm <$> (symbol Identifier <|> symbol TypeIdentifier) <*> (Syntax.Identifier . name <$> source)
+
+scopedIdentifier :: Assignment
+scopedIdentifier = makeTerm <$> symbol ScopedIdentifier <*> children (Expression.MemberAccess <$> term expression <*> term expression)
+
+-- Declarations
 class' :: Assignment
 class' = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> many modifier <*> term identifier <*> (typeParameters <|> pure []) <*> emptyTerm <*> classBody)
   where
@@ -267,33 +242,13 @@ class' = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> many m
 -- might wanna come back and change to maybe superClass
 -- TODO: superclass -- need to match the superclass node when it exists (which will be a rule, similar to how the type params rule matches the typeparams node when it exists)
 
--- consolidated with scopedIdentifier
-identifier :: Assignment
-identifier = makeTerm <$> (symbol Identifier <|> symbol TypeIdentifier) <*> (Syntax.Identifier . name <$> source)
-
-scopedIdentifier :: Assignment
-scopedIdentifier = makeTerm <$> symbol ScopedIdentifier <*> children (Expression.MemberAccess <$> term expression <*> term expression)
-
--- refactor method declaration to have clearly understandable top-level rule + sub-rules broken out in the where so it's easier to reason about
 method :: Assignment
 method = makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> many modifier <*> emptyTerm <*> methodHeader <*> methodBody)
--- makeMethod is a wrapper that takes the arguments in the structure they occur in the grammar and rearranges them to satisfy the structure required for our syntax types
   where
     methodBody = symbol MethodBody *> children (term expression)
     methodDeclarator = symbol MethodDeclarator *> children ( (,) <$> identifier <*> formalParameters)
     methodHeader = symbol MethodHeader *> children ((,,,,) <$> (typeParameters <|> pure []) <*> manyTerm annotation <*> type' <*> methodDeclarator <*> (throws <|> pure []))
     makeMethod modifiers receiver (typeParams, annotations, returnType, (name, params), throws) body = Declaration.Method (returnType : modifiers ++ typeParams ++ annotations ++ throws) receiver name params body
--- emptyTerm can be inserted at any position; if you have an optional term, you can use a maybe, but if you have for ex. an else statement,
--- where we wanna assume the else position always exists, emptyTerm allows us to keep the semantics for if-else really simple because we can
--- just provide it emptyTerm
--- emptyTerm just pattern matches; always produces a term.
--- current location will be the methodHeader node.
--- TODO: re-introduce makeTerm later; matching types as part of the type rule for now.
--- full apply vs. half, what we want to retain
--- before we had a left-associative chain where we were discarding the
--- ((a + b) + c)
--- a + bc
--- bc = (b + c)
 
 -- TODO: add genericType
 
@@ -324,25 +279,11 @@ package = makeTerm <$> symbol PackageDeclaration <*> children (Java.Syntax.Packa
 enum :: Assignment
 enum = makeTerm <$> symbol Grammar.EnumDeclaration <*> children (Java.Syntax.EnumDeclaration <$> term identifier <*> manyTerm enumConstant)
     where enumConstant = symbol EnumConstant *> children (term identifier)
--- list of 0 or more
--- Java.Syntax.EnumDeclaration is taking something that has been matched and applying a function over it
--- makeTerm (a function) is not matching, but rather mapping over a matched term
--- makeTerm is lifted into the <$> functor, which is applied to the result of its child assignments
--- <*> apply is used when you've got a function built up on the LHS
--- we don't have a makeTerm, so we don't have a function on the LHS to apply <*>, hence we just match on the symbol EnumConstant, and use it as a marker to descend into children
--- we want the effect, not the result, of symbol because we want to match the EnumConstant node without caring about its range or span
--- we don't care about the range and span because the identifier rule produces a term which already has a range and span
--- show only has one argument, so we don't need to <*> because when we fmap it over a list, it's fully applied
--- term = also accounts for preceding comments
--- (+) <$> [1,2,3] :: Num a => [a -> a] -- it is a function that takes one number and returns another number of the same type
 
 return' :: Assignment
 return' = makeTerm <$> symbol ReturnStatement <*> (Statement.Return <$> children (expression))
--- can move the children into or out of the fmap rule because the children expression returns the result of a child
--- so if you fmap over the result of RHS it's equivalent
--- if you f <$> (g <$> a) == f . g <$> a (fusion law)
---   if you have two nested fmaps, same as composing
 
+-- method expressions
 dims :: Assignment.Assignment [] Grammar [Term]
 dims = symbol Dims *> children (many (emptyTerm <* token AnonLBracket <* token AnonRBracket))
 
@@ -358,11 +299,6 @@ type' =  choice [
      , identifier
     ]
     where array type' = foldl (\into each -> makeTerm1 (Type.Array (Just each) into)) type'
-     -- <|> makeTerm <$> symbol FloatingPointType <*> children (token AnonFloat $> Type.Float <|> token AnonDouble $> Type.Double)
-     -- we had to say token with the first 4 because pure don't advance past the first nodes; implies no effect, just produces value
-     -- if we want to match a node and consume that node (which we have to do) we need to use token because it has that behavior
-
--- method expressions
 
 if' :: Assignment
 if' = makeTerm <$> symbol IfThenElseStatement <*> children (Statement.If <$> term expression <*> term expression <*> (term expression <|> emptyTerm))
@@ -375,19 +311,15 @@ while = makeTerm <$> symbol WhileStatement <*> children (Statement.While <$> ter
 
 doWhile :: Assignment
 doWhile = makeTerm <$> symbol DoStatement <*> children (flip Statement.DoWhile <$> term expression <*> term expression)
--- flipping so when we match body it goes into second field and when we match condition it goes into the first field
 
 switch :: Assignment
 switch = makeTerm <$> symbol SwitchStatement <*> children (Statement.Match <$> term expression <*> switchBlock)
   where
     switchBlock = makeTerm <$> symbol SwitchBlock <*> children (manyTerm switchLabel)
     switchLabel = makeTerm <$> symbol SwitchLabel <*> (Statement.Pattern <$> children (term expression <|> emptyTerm) <*> expressions)
--- not identifier, expression
 
 break :: Assignment
 break = makeTerm <$> symbol BreakStatement <*> children (Statement.Break <$> (term expression <|> emptyTerm))
--- manyTerm matches 0 or more and also produces a list
--- term expression <|> emptyTerm accounts for an expression or nothing at all
 
 continue :: Assignment
 continue = makeTerm <$> symbol ContinueStatement <*> children (Statement.Continue <$> (term expression <|> emptyTerm))
@@ -410,30 +342,16 @@ try = makeTerm <$> symbol TryStatement <*> children (Statement.Try <$> term expr
 
 for :: Assignment
 for = symbol ForStatement *> children (basicFor <|> enhancedFor)
--- dropping so *>
 
 basicFor :: Assignment
 basicFor = makeTerm <$> symbol BasicForStatement <*> children (Statement.For <$ token AnonFor <* token AnonLParen <*> (token AnonSemicolon *> emptyTerm <|> forInit <* token AnonSemicolon) <*> (token AnonSemicolon *> emptyTerm <|> term expression <* token AnonSemicolon) <*> forStep <*> term expression)
   where
     forInit = symbol ForInit *> children (term expression)
     forStep = makeTerm <$> location <*> manyTermsTill expression (token AnonRParen)
--- don't have symbol to match against for forStep because we don't know what that would be, but we need to still provide an annotation and location
--- location rule = for when you need to provide a location without matching any nodes
--- don't need to make a term here because term sion already produces a term
--- makeTerm is used when the data constructor (syntax) field has an element, not a list
--- Statement.For = data constructor that takes three statements and produces a piece of syntax
--- don't need to produce syntax with term expression (already produces a term) so don't need to makeTerm
--- dont wanna do manyTerm because it'll greedily match any of the expressions it can which means it'll match the for loop body, which would fail...
--- because it would've already matched it and consumed it and the whole rule would fail because it wouldn't be available
 
 enhancedFor :: Assignment
 enhancedFor = makeTerm <$> symbol EnhancedForStatement <*> children (Statement.ForEach <$> (variable <$> manyTerm modifier <*> type' <*> variableDeclaratorId) <*> term expression <*> term expression)
   where variable modifiers type' variableDeclaratorId = makeTerm1 (Java.Syntax.Variable modifiers type' variableDeclaratorId)
--- variableDeclaratorId takes name and then type' so that's the order we give it, but variable takes type' first and variableDeclaratorId
--- going to populate binding field with a new term which should be a variable
--- binding = variable
--- subject = thing being iterated over
--- body
 
 -- TODO: instanceOf
 binary :: Assignment
@@ -514,16 +432,9 @@ update = makeTerm' <$> symbol UpdateExpression <*> children (
   <|> inj . Statement.PreDecrement  <$ token AnonMinusMinus <*> term expression
   <|> inj . Statement.PostIncrement <$> term expression <* token AnonPlusPlus
   <|> inj . Statement.PostDecrement <$> term expression <* token AnonMinusMinus)
--- makterm' so need inj .
--- tries them in order; true of alternations, order matters; (if-else)
--- but choice doesn't have this property (order doesn't matter) because it constructs a jump table (switch)
 
 ternary :: Assignment
 ternary = makeTerm <$> symbol TernaryExpression <*> children (Statement.If <$> term expression <*> term expression <*> term expression)
--- delimiter, if optional, need
--- token vs. symbol -- whether we want to skip past the node or not; token skips past the node; symbol does not
--- need token or symbol to mention any token/symbol because they take a token and produce a grammar rule
--- infix operators
 
 synchronized :: Assignment
 synchronized = makeTerm <$> symbol SynchronizedStatement <*> children (Java.Syntax.Synchronized <$> term expression <*> term expression)
@@ -538,7 +449,6 @@ argumentList = symbol ArgumentList *> children (manyTerm expression)
 
 super :: Assignment
 super = makeTerm <$> token Super <*> pure Expression.Super
--- not a rule so using pure to lift value into an assignment
 
 this :: Assignment
 this = makeTerm <$> token This <*> pure Expression.This
@@ -556,10 +466,6 @@ typeParameters = symbol TypeParameters *> children (manyTerm typeParam) -- this 
   where
     typeParam = makeTerm <$> symbol Grammar.TypeParameter <*> children (Java.Syntax.TypeParameter <$> manyTerm annotation <*> term identifier <*> (typeBound <|> pure [])) -- wrapping up all three of those fields so we need to makeTerm (producing a term here)
     typeBound = symbol TypeBound *> children (manyTerm type')
--- stubbing in so deals with empty list
--- come back and populate this
--- optional combinator produces type Maybe
--- instead of optional and maybe, we have that arg as a list now and we say we either produce the list or an empty list via pure []
 
 annotation :: Assignment
 annotation = makeTerm <$> symbol NormalAnnotation <*> children (Java.Syntax.Annotation <$> term expression <*> (elementValuePairList <|> pure []))
@@ -569,14 +475,9 @@ annotation = makeTerm <$> symbol NormalAnnotation <*> children (Java.Syntax.Anno
            elementValuePairList = symbol ElementValuePairList *> children (manyTerm elementValuePair)
            elementValuePair = makeTerm <$> symbol ElementValuePair <*> children (Java.Syntax.AnnotationField <$> term expression <*> term elementValue)
            elementValue = symbol ElementValue *> children (term expression)
--- pure over lists can produce single element lists; wrapping the expression in a list
--- elementValue, we don't have syntax to construct; we only construct syntax when we're making a node
 
 throws :: Assignment.Assignment [] Grammar [Term]
 throws = symbol Throws *> children (symbol ExceptionTypeList *> children(manyTerm type'))
--- discard the symbol and get the result of rule
--- match a throws node, and apply the rest of the to its children
--- we are matching the structure in the grammar
 
 formalParameters :: Assignment.Assignment [] Grammar [Term]
 formalParameters = manyTerm parameter
