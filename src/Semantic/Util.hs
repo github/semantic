@@ -42,24 +42,24 @@ import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 
 -- | An analysis that fails on errors.
-newtype Erroring m (effects :: [* -> *]) a = Erroring (m effects a)
+newtype Erroring (exc :: * -> *) m (effects :: [* -> *]) a = Erroring (m effects a)
   deriving (Alternative, Applicative, Effectful, Functor, Monad)
 
-deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Erroring m)
+deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Erroring exc m)
 instance MonadAnalysis location term value effects m
-      => MonadAnalysis location term value effects (Erroring m) where
-  type Effects location term value (Erroring m)
-    = Resumable (AddressError location value)
-   ': Resumable (EvalError value)
-   ': Resumable (ResolutionError value)
-   ': Resumable (ValueError location value)
-   ': Effects location term value m
+      => MonadAnalysis location term value effects (Erroring exc m) where
+  type Effects location term value (Erroring exc m) = Resumable exc ': Effects location term value m
 
   analyzeTerm = liftAnalyze analyzeTerm
   analyzeModule = liftAnalyze analyzeModule
 
 -- type TestEvaluating term = Evaluating Precise term (Value Precise)
-type JustEvaluating term = Erroring (Evaluating (Located Precise term) term (Value (Located Precise term)))
+type JustEvaluating term
+  = Erroring (AddressError (Located Precise term) (Value (Located Precise term)))
+    (Erroring (EvalError (Value (Located Precise term)))
+    (Erroring (ResolutionError (Value (Located Precise term)))
+    (Erroring (ValueError (Located Precise term) (Value (Located Precise term)))
+    (Evaluating (Located Precise term) term (Value (Located Precise term))))))
 type EvaluatingWithHoles term = BadAddresses (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term)))))))
 type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
 
