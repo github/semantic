@@ -169,3 +169,8 @@ vertexToType :: Vertex -> Text
 vertexToType Package{}  = "package"
 vertexToType Module{}   = "module"
 vertexToType Variable{} = "variable"
+
+
+instance Interpreter effects (result, ImportGraph) rest m
+      => Interpreter (State ImportGraph ': effects) result rest (ImportGraphing m) where
+  interpret = interpret . raise @m . flip runState mempty . lower
