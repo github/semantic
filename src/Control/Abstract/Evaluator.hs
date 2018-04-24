@@ -119,7 +119,7 @@ view lens = raise (gets (^. lens))
 
 
 -- | A 'Monad' abstracting local and global environments.
-class Monad (m effects) => MonadEnvironment location value (effects :: [* -> *]) m | m effects -> value, m -> location where
+class Monad (m effects) => MonadEnvironment location value (effects :: [* -> *]) m | m effects -> location value where
   -- | Retrieve the environment.
   getEnv :: m effects (Environment location value)
   -- | Set the environment.
