@@ -9,11 +9,13 @@ import           Analysis.Abstract.BadVariables
 import           Analysis.Abstract.Evaluating as X
 import           Analysis.Abstract.ImportGraph
 import           Analysis.Abstract.Quiet
+import           Analysis.Abstract.TypeChecking
 import           Analysis.Declaration
 import           Control.Abstract.Analysis
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Located
+import           Data.Abstract.Type
 import           Data.Abstract.Value
 import           Data.Blob
 import           Data.Diff
@@ -45,12 +47,15 @@ import qualified Language.TypeScript.Assignment as TypeScript
 type JustEvaluating term = Evaluating (Located Precise term) term (Value (Located Precise term))
 type EvaluatingWithHoles term = BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term))))))
 type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
+type Checking term = TypeChecking (EvaluatingWithHoles term)
 
 evalGoProject path = runAnalysis @(JustEvaluating Go.Term) <$> evaluateProject goParser Nothing path
 evalRubyProject path = runAnalysis @(JustEvaluating Ruby.Term) <$> evaluateProject rubyParser rubyPrelude path
 evalPHPProject path = runAnalysis @(JustEvaluating PHP.Term) <$> evaluateProject phpParser Nothing path
 evalPythonProject path = runAnalysis @(JustEvaluating Python.Term) <$> evaluateProject pythonParser pythonPrelude path
 evalTypeScriptProject path = runAnalysis @(EvaluatingWithHoles TypeScript.Term) <$> evaluateProject typescriptParser Nothing path
+
+typecheckPythonFile path = runAnalysis @(Checking Python.Term) <$> evaluateProject pythonParser Nothing path
 
 rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Language.Ruby)
 pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Language.Python)
