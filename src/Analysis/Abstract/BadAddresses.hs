@@ -2,6 +2,7 @@
 module Analysis.Abstract.BadAddresses where
 
 import Control.Abstract.Analysis
+import Data.Abstract.Address
 import Prologue
 
 newtype BadAddresses m (effects :: [* -> *]) a = BadAddresses (m effects a)
@@ -13,6 +14,7 @@ instance ( Effectful m
          , Member (Resumable (AddressError location value)) effects
          , MonadAnalysis location term value effects m
          , MonadValue location value effects (BadAddresses m)
+         , Monoid (Cell location value)
          , Show location
          )
       => MonadAnalysis location term value effects (BadAddresses m) where
@@ -22,6 +24,7 @@ instance ( Effectful m
         \yield error -> do
           traceM ("AddressError:" <> show error)
           case error of
-            (UninitializedAddress _) -> hole >>= yield)
+            UnallocatedAddress _ -> yield mempty
+            UninitializedAddress _ -> hole >>= yield)
 
   analyzeModule = liftAnalyze analyzeModule

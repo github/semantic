@@ -10,12 +10,11 @@ import Data.Abstract.Address
 import Data.Abstract.Environment (insert)
 import Data.Abstract.FreeVariables
 import Data.Semigroup.Reducer
-import Prelude hiding (fail)
 import Prologue
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Heap.
 class (Effectful m, Member Fresh effects, Monad (m effects), Ord location) => MonadAddressable location (effects :: [* -> *]) m where
-  derefCell :: Address location value -> Cell location value -> m effects value
+  derefCell :: Address location value -> Cell location value -> m effects (Maybe value)
 
   allocLoc :: Name -> m effects location
 
@@ -56,27 +55,28 @@ letrec' name body = do
 -- Instances
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
-instance (Effectful m, Member Fresh effects, MonadFail (m effects)) => MonadAddressable Precise effects m where
-  derefCell addr = maybeM (uninitializedAddress addr) . unLatest
+instance (Effectful m, Member Fresh effects, Monad (m effects)) => MonadAddressable Precise effects m where
+  derefCell _ = pure . unLatest
   allocLoc _ = Precise <$> fresh
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
 instance (Alternative (m effects), Effectful m, Member Fresh effects, Monad (m effects)) => MonadAddressable Monovariant effects m where
-  derefCell _ = foldMapA pure
+  derefCell _ cell | null cell = pure Nothing
+                   | otherwise = Just <$> foldMapA pure cell
   allocLoc = pure . Monovariant
 
 -- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
 deref :: (Member (Resumable (AddressError location value)) effects, MonadAddressable location effects m, MonadEvaluator location term value effects m) => Address location value -> m effects value
-deref addr = lookupHeap addr >>= maybe (throwAddressError (UninitializedAddress addr)) (derefCell addr)
+deref addr = do
+  cell <- lookupHeap addr >>= maybeM (throwAddressError (UnallocatedAddress addr))
+  derefed <- derefCell addr cell
+  maybeM (throwAddressError (UninitializedAddress addr)) derefed
 
 alloc :: MonadAddressable location effects m => Name -> m effects (Address location value)
 alloc = fmap Address . allocLoc
 
--- | Fail with a message denoting an uninitialized address (i.e. one which was 'alloc'ated, but never 'assign'ed a value before being 'deref'erenced).
-uninitializedAddress :: (MonadFail m, Show location) => Address location value -> m a
-uninitializedAddress addr = fail $ "uninitialized address: " <> show addr
-
 data AddressError location value resume where
+  UnallocatedAddress :: Address location value -> AddressError location value (Cell location value)
   UninitializedAddress :: Address location value -> AddressError location value value
 
 deriving instance Eq location => Eq (AddressError location value resume)
@@ -84,7 +84,9 @@ deriving instance Show location => Show (AddressError location value resume)
 instance Show location => Show1 (AddressError location value) where
   liftShowsPrec _ _ = showsPrec
 instance Eq location => Eq1 (AddressError location value) where
-  liftEq _ (UninitializedAddress a) (UninitializedAddress b)     = a == b
+  liftEq _ (UninitializedAddress a) (UninitializedAddress b) = a == b
+  liftEq _ (UnallocatedAddress a)   (UnallocatedAddress b)   = a == b
+  liftEq _ _                        _                        = False
 
 
 throwAddressError :: (Effectful m, Member (Resumable (AddressError location value)) effects) => AddressError location value resume -> m effects resume
