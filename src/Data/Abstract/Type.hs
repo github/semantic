@@ -36,7 +36,6 @@ data Type
 
 -- TODO: À la carte representation of types.
 
--- TODO: specialize these to type
 data TypeError resume where
   NoValueError     :: Type -> a -> TypeError a
   NumOpError       :: Type -> Type -> TypeError Type
@@ -52,11 +51,11 @@ instance Show1 TypeError where
   liftShowsPrec _ _ _ (UnificationError l r) = showString "UnificationError " . shows [l, r]
 
 instance Eq1 TypeError where
-  liftEq _ (NoValueError a _) (NoValueError b _)                       = a == b
-  -- liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
-  -- liftEq _ (ScopedEnvironmentError a) (ScopedEnvironmentError b) = a == b
-  -- liftEq _ (CallError a) (CallError b)                           = a == b
-  liftEq _ _             _                                       = False
+  liftEq _ (NoValueError a _) (NoValueError b _)         = a == b
+  liftEq _ (BitOpError a b) (BitOpError c d)             = a == c && b == d
+  liftEq _ (NumOpError a b) (NumOpError c d)             = a == c && b == d
+  liftEq _ (UnificationError a b) (UnificationError c d) = a == c && b == d
+  liftEq _ _ _                                           = False
 
 -- | Unify two 'Type's.
 unify :: MonadResume TypeError m => Type -> Type -> m Type

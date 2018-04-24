@@ -48,6 +48,8 @@ import qualified Language.TypeScript.Assignment as TypeScript
 type JustEvaluating term = Evaluating (Located Precise term) term (Value (Located Precise term))
 type EvaluatingWithHoles term = BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term))))))
 type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
+-- The order is significant here: Caching has to come on the outside, or the RunEffect instance for NonDet
+-- will expect the TypeError exception type to have an Ord instance, which is wrong.
 type Checking term = Caching (TypeChecking (Evaluating Monovariant term Type))
 
 evalGoProject path = runAnalysis @(JustEvaluating Go.Term) <$> evaluateProject goParser Nothing path
