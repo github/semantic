@@ -2,7 +2,6 @@
 module Analysis.Abstract.BadValues where
 
 import Control.Abstract.Analysis
-import Data.Abstract.Evaluatable
 import Data.Abstract.Environment as Env
 import Prologue
 import Data.ByteString.Char8 (pack)
@@ -14,12 +13,11 @@ deriving instance MonadEvaluator location term value effects m   => MonadEvaluat
 
 instance ( Effectful m
          , Member (Resumable (ValueError location value)) effects
-         , Member (State [Name]) effects
          , MonadAnalysis location term value effects m
          , MonadValue location value effects (BadValues m)
          )
       => MonadAnalysis location term value effects (BadValues m) where
-  type Effects location term value (BadValues m) = State [Name] ': Resumable (ValueError location value) ': Effects location term value m
+  type Effects location term value (BadValues m) = Resumable (ValueError location value) ': Effects location term value m
 
   analyzeTerm eval term = resume @(ValueError location value) (liftAnalyze analyzeTerm eval term) (
         \yield error -> do
