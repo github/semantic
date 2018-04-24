@@ -46,6 +46,7 @@ newtype Erroring (exc :: * -> *) m (effects :: [* -> *]) a = Erroring (m effects
   deriving (Alternative, Applicative, Effectful, Functor, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Erroring exc m)
+
 instance MonadAnalysis location term value effects m
       => MonadAnalysis location term value effects (Erroring exc m) where
   type Effects location term value (Erroring exc m) = Resumable exc ': Effects location term value m
