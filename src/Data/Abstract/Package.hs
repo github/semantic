@@ -37,4 +37,4 @@ fromModules :: PackageName -> Maybe Version -> Maybe (Module term) -> Int -> [Mo
 fromModules name version prelude entryPoints modules =
   Package (PackageInfo name version) (PackageBody (ModuleTable.fromModules modules) prelude entryPoints')
   where
-    entryPoints' = ModuleTable . Map.fromList $ (,Nothing) . modulePath . moduleInfo <$> if entryPoints == 0 then modules else (take entryPoints modules)
+    entryPoints' = ModuleTable . Map.fromList $ (,Nothing) . modulePath . moduleInfo <$> if entryPoints == 0 then modules else take entryPoints modules
