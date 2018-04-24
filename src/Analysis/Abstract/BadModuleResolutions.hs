@@ -23,7 +23,7 @@ instance ( Effectful m
         \yield error -> do
           traceM ("ResolutionError:" <> show error)
           case error of
-            (RubyError nameToResolve) -> yield nameToResolve
-            (TypeScriptError nameToResolve) -> yield nameToResolve)
+            RubyError nameToResolve -> yield nameToResolve
+            TypeScriptError nameToResolve -> yield nameToResolve)
 
   analyzeModule = liftAnalyze analyzeModule
