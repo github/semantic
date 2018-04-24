@@ -142,7 +142,7 @@ class (Monad (m effects), Show value) => MonadValue location value (effects :: [
 
 
 -- | Attempt to extract a 'Prelude.Bool' from a given value.
-forLoop :: (MonadEnvironment location value effects m, MonadValue location value effects m)
+forLoop :: (MonadEvaluator location term value effects m, MonadValue location value effects m)
         => m effects value -- ^ Initial statement
         -> m effects value -- ^ Condition
         -> m effects value -- ^ Increment/stepper
@@ -170,7 +170,6 @@ doWhile body cond = loop $ \ continue -> body *> do
   ifthenelse this continue unit
 
 makeNamespace :: ( MonadValue location value effects m
-                 , MonadEnvironment location value effects m
                  , MonadEvaluator location term value effects m
                  , Ord location
                  , Reducer value (Cell location value)

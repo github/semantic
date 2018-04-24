@@ -10,16 +10,27 @@ module Control.Abstract.Evaluator
   , _exports
   , _jumps
   , _origin
-  , MonadEnvironment(..)
+  -- Environment
+  , getEnv
+  , putEnv
   , modifyEnv
+  , withEnv
+  , defaultEnvironment
+  , withDefaultEnvironment
+  , fullEnvironment
+  , getExports
+  , putExports
   , modifyExports
   , addExport
-  , fullEnvironment
+  , withExports
+  , localEnv
+  , localize
+  , lookupEnv
+  , lookupWith
   -- Heap
   , getHeap
   , putHeap
   , modifyHeap
-  , localize
   , lookupHeap
   , assign
   -- Module tables
@@ -136,83 +147,84 @@ localEvaluatorState lens f action = do
   v <$ lens .= original
 
 
--- | A 'Monad' abstracting local and global environments.
-class Monad (m effects) => MonadEnvironment location value (effects :: [* -> *]) m | m effects -> location value where
-  -- | Retrieve the environment.
-  getEnv :: m effects (Environment location value)
-  -- | Set the environment.
-  putEnv :: Environment location value -> m effects ()
-  -- | Sets the environment for the lifetime of the given action.
-  withEnv :: Environment location value -> m effects a -> m effects a
+-- | Retrieve the environment.
+getEnv :: MonadEvaluator location term value effects m => m effects (Environment location value)
+getEnv = view _environment
 
-  -- | Retrieve the default environment.
-  defaultEnvironment :: m effects (Environment location value)
-
-  -- | Set the default environment for the lifetime of an action.
-  --   Usually only invoked in a top-level evaluation function.
-  withDefaultEnvironment :: Environment location value -> m effects a -> m effects a
-
-  -- | Get the global export state.
-  getExports :: m effects (Exports location value)
-  -- | Set the global export state.
-  putExports :: Exports location value -> m effects ()
-  -- | Sets the global export state for the lifetime of the given action.
-  withExports :: Exports location value -> m effects a -> m effects a
-
-  -- | Run an action with a locally-modified environment.
-  localEnv :: (Environment location value -> Environment location value) -> m effects a -> m effects a
-
-  -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
-  lookupEnv :: Name -> m effects (Maybe (Address location value))
-  lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
-
-  -- | Look up a 'Name' in the environment, running an action with the resolved address (if any).
-  lookupWith :: (Address location value -> m effects a) -> Name -> m effects (Maybe a)
-  lookupWith with name = do
-    addr <- lookupEnv name
-    maybe (pure Nothing) (fmap Just . with) addr
-
-instance (Monad (m effects), MonadEvaluator location term value effects m) => MonadEnvironment location value effects m where
-  getEnv = view _environment
-  putEnv = (_environment .=)
-  withEnv s = localEvaluatorState _environment (const s)
-
-  defaultEnvironment = raise ask
-  withDefaultEnvironment e = raise . local (const e) . lower
-
-  getExports = view _exports
-  putExports = (_exports .=)
-  withExports s = localEvaluatorState _exports (const s)
-
-  localEnv f a = do
-    modifyEnv (f . Env.push)
-    result <- a
-    result <$ modifyEnv Env.pop
-
--- | Run a computation in a new local environment.
-localize :: MonadEnvironment location value effects m => m effects a -> m effects a
-localize = localEnv id
+-- | Set the environment.
+putEnv :: MonadEvaluator location term value effects m => Environment location value -> m effects ()
+putEnv = (_environment .=)
 
 -- | Update the global environment.
-modifyEnv :: MonadEnvironment location value effects m => (Environment location value -> Environment location value) -> m effects ()
+modifyEnv :: MonadEvaluator location term value effects m => (Environment location value -> Environment location value) -> m effects ()
 modifyEnv f = do
   env <- getEnv
   putEnv $! f env
 
+-- | Sets the environment for the lifetime of the given action.
+withEnv :: MonadEvaluator location term value effects m => Environment location value -> m effects a -> m effects a
+withEnv s = localEvaluatorState _environment (const s)
+
+
+-- | Retrieve the default environment.
+defaultEnvironment :: MonadEvaluator location term value effects m => m effects (Environment location value)
+defaultEnvironment = raise ask
+
+-- | Set the default environment for the lifetime of an action.
+--   Usually only invoked in a top-level evaluation function.
+withDefaultEnvironment :: MonadEvaluator location term value effects m => Environment location value -> m effects a -> m effects a
+withDefaultEnvironment e = raise . local (const e) . lower
+
+-- | Obtain an environment that is the composition of the current and default environments.
+--   Useful for debugging.
+fullEnvironment :: MonadEvaluator location term value effects m => m effects (Environment location value)
+fullEnvironment = mappend <$> getEnv <*> defaultEnvironment
+
+
+-- | Get the global export state.
+getExports :: MonadEvaluator location term value effects m => m effects (Exports location value)
+getExports = view _exports
+
+-- | Set the global export state.
+putExports :: MonadEvaluator location term value effects m => Exports location value -> m effects ()
+putExports = (_exports .=)
+
 -- | Update the global export state.
-modifyExports :: MonadEnvironment location value effects m => (Exports location value -> Exports location value) -> m effects ()
+modifyExports :: MonadEvaluator location term value effects m => (Exports location value -> Exports location value) -> m effects ()
 modifyExports f = do
   exports <- getExports
   putExports $! f exports
 
 -- | Add an export to the global export state.
-addExport :: MonadEnvironment location value effects m => Name -> Name -> Maybe (Address location value) -> m effects ()
+addExport :: MonadEvaluator location term value effects m => Name -> Name -> Maybe (Address location value) -> m effects ()
 addExport name alias = modifyExports . Export.insert name alias
 
--- | Obtain an environment that is the composition of the current and default environments.
---   Useful for debugging.
-fullEnvironment :: MonadEnvironment location value effects m => m effects (Environment location value)
-fullEnvironment = mappend <$> getEnv <*> defaultEnvironment
+-- | Sets the global export state for the lifetime of the given action.
+withExports :: MonadEvaluator location term value effects m => Exports location value -> m effects a -> m effects a
+withExports s = localEvaluatorState _exports (const s)
+
+
+-- | Run an action with a locally-modified environment.
+localEnv :: MonadEvaluator location term value effects m => (Environment location value -> Environment location value) -> m effects a -> m effects a
+localEnv f a = do
+  modifyEnv (f . Env.push)
+  result <- a
+  result <$ modifyEnv Env.pop
+
+-- | Run a computation in a new local environment.
+localize :: MonadEvaluator location term value effects m => m effects a -> m effects a
+localize = localEnv id
+
+-- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
+lookupEnv :: MonadEvaluator location term value effects m => Name -> m effects (Maybe (Address location value))
+lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
+
+-- | Look up a 'Name' in the environment, running an action with the resolved address (if any).
+lookupWith :: MonadEvaluator location term value effects m => (Address location value -> m effects a) -> Name -> m effects (Maybe a)
+lookupWith with name = do
+  addr <- lookupEnv name
+  maybe (pure Nothing) (fmap Just . with) addr
+
 
 -- | Retrieve the heap.
 getHeap :: MonadEvaluator location term value effects m => m effects (Heap location value)

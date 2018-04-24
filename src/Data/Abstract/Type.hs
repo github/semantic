@@ -1,4 +1,5 @@
 {-# LANGUAGE TypeFamilies, UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the MonadValue instance, which requires MonadEvaluator to resolve its functional dependency.
 module Data.Abstract.Type where
 
 import Control.Abstract.Analysis
@@ -54,7 +55,7 @@ instance Ord location => ValueRoots location Type where
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
 instance ( Alternative (m effects)
          , MonadAddressable location effects m
-         , MonadEnvironment location Type effects m
+         , MonadEvaluator location term Type effects m
          , MonadFail (m effects)
          , MonadFresh (m effects)
          , Reducer Type (Cell location Type)

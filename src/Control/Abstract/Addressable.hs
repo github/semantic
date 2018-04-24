@@ -21,7 +21,7 @@ class (MonadFresh (m effects), Ord location) => MonadAddressable location (effec
 
 -- | Look up or allocate an address for a 'Name'.
 lookupOrAlloc :: ( MonadAddressable location effects m
-                 , MonadEnvironment location value effects m
+                 , MonadEvaluator location term value effects m
                  )
               => Name
               -> m effects (Address location value)
@@ -29,7 +29,6 @@ lookupOrAlloc name = lookupEnv name >>= maybe (alloc name) pure
 
 
 letrec :: ( MonadAddressable location effects m
-          , MonadEnvironment location value effects m
           , MonadEvaluator location term value effects m
           , Reducer value (Cell location value)
           )
@@ -44,7 +43,7 @@ letrec name body = do
 
 -- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
 letrec' :: ( MonadAddressable location effects m
-           , MonadEnvironment location value effects m
+           , MonadEvaluator location term value effects m
            )
         => Name
         -> (Address location value -> m effects value)
