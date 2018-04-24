@@ -30,23 +30,26 @@ module Control.Abstract.Evaluator
   , catchException
   ) where
 
-import           Control.Effect
-import           Control.Monad.Effect.Exception as Exception
-import           Control.Monad.Effect.Resumable as Resumable
-import           Data.Abstract.Address
-import           Data.Abstract.Configuration
-import           Data.Abstract.Environment as Env
-import           Data.Abstract.Exports as Export
-import           Data.Abstract.FreeVariables
-import           Data.Abstract.Heap
-import           Data.Abstract.Module
-import           Data.Abstract.ModuleTable
-import           Data.Abstract.Origin
-import           Data.Empty
+import Control.Effect
+import Control.Monad.Effect.Exception as Exception
+import Control.Monad.Effect.Fail
+import Control.Monad.Effect.Resumable as Resumable
+import Control.Monad.Effect.State
+import Data.Abstract.Address
+import Data.Abstract.Configuration
+import Data.Abstract.Environment as Env
+import Data.Abstract.Exports as Export
+import Data.Abstract.FreeVariables
+import Data.Abstract.Heap
+import Data.Abstract.Module
+import Data.Abstract.ModuleTable
+import Data.Abstract.Origin
+import Data.Empty
 import qualified Data.IntMap as IntMap
-import           Data.Semigroup.Reducer
-import           Lens.Micro
-import           Prologue
+import Data.Semigroup.Reducer
+import Lens.Micro
+import Prelude hiding (fail)
+import Prologue
 
 -- | A 'Monad' providing the basic essentials for evaluation.
 --
@@ -55,7 +58,9 @@ import           Prologue
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
 class ( Effectful m
-      , MonadControl term effects m
+      , Member Fail effects
+      , Member (State (EvaluatorState location term value)) effects
+      , Monad (m effects)
       , MonadEnvironment location value effects m
       , MonadModuleTable location term value effects m
       , MonadHeap location value effects m
@@ -104,6 +109,13 @@ _jumps = lens jumps (\ s j -> s {jumps = j})
 
 _origin :: Lens' (EvaluatorState location term value) (SomeOrigin term)
 _origin = lens origin (\ s o -> s {origin = o})
+
+
+(.=) :: MonadEvaluator location term value effects m => ASetter (EvaluatorState location term value) (EvaluatorState location term value) a b -> b -> m effects ()
+lens .= val = raise (modify' (lens .~ val))
+
+view :: MonadEvaluator location term value effects m => Getting a (EvaluatorState location term value) a -> m effects a
+view lens = raise (gets (^. lens))
 
 
 -- | A 'Monad' abstracting local and global environments.
@@ -236,6 +248,15 @@ class Monad (m effects) => MonadControl term (effects :: [* -> *]) m where
   label :: term -> m effects Label
   -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
   goto :: Label -> m effects term
+
+instance (Monad (m effects), MonadEvaluator location term value effects m) => MonadControl term effects m where
+  label term = do
+    m <- view _jumps
+    let i = IntMap.size m
+    _jumps .= IntMap.insert i term m
+    pure i
+
+  goto label = IntMap.lookup label <$> view _jumps >>= maybe (raise (fail ("unknown label: " <> show label))) pure
 
 
 throwResumable :: (Member (Resumable exc) effects, Effectful m) => exc v -> m effects v

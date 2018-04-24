@@ -8,7 +8,6 @@ import Prologue
 newtype BadModuleResolutions m (effects :: [* -> *]) a = BadModuleResolutions (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
-deriving instance MonadControl term effects m                    => MonadControl term effects (BadModuleResolutions m)
 deriving instance MonadEnvironment location value effects m      => MonadEnvironment location value effects (BadModuleResolutions m)
 deriving instance MonadHeap location value effects m             => MonadHeap location value effects (BadModuleResolutions m)
 deriving instance MonadModuleTable location term value effects m => MonadModuleTable location term value effects (BadModuleResolutions m)

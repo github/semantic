@@ -13,7 +13,6 @@ import Prologue
 newtype Collecting m (effects :: [* -> *]) a = Collecting (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
-deriving instance MonadControl term effects m                    => MonadControl term effects (Collecting m)
 deriving instance MonadEnvironment location value effects m      => MonadEnvironment location value effects (Collecting m)
 deriving instance MonadHeap location value effects m             => MonadHeap location value effects (Collecting m)
 deriving instance MonadModuleTable location term value effects m => MonadModuleTable location term value effects (Collecting m)

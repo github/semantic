@@ -5,18 +5,16 @@ module Analysis.Abstract.Evaluating
 , State
 ) where
 
-import           Control.Abstract.Analysis
-import           Control.Monad.Effect
-import           Data.Abstract.Configuration
-import           Data.Abstract.Environment as Env
-import           Data.Abstract.Evaluatable
-import           Data.Abstract.Module
-import           Data.Abstract.ModuleTable
-import           Data.Abstract.Origin
-import qualified Data.IntMap as IntMap
-import           Lens.Micro
-import           Prelude hiding (fail)
-import           Prologue
+import Control.Abstract.Analysis
+import Control.Monad.Effect
+import Data.Abstract.Configuration
+import Data.Abstract.Environment as Env
+import Data.Abstract.Evaluatable
+import Data.Abstract.Module
+import Data.Abstract.ModuleTable
+import Data.Abstract.Origin
+import Lens.Micro
+import Prologue
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
 newtype Evaluating location term value effects a = Evaluating (Eff effects a)
@@ -56,15 +54,6 @@ localEvaluatorState lens f action = do
   v <- action
   v <$ lens .= original
 
-
-instance Members '[Fail, State (EvaluatorState location term value)] effects => MonadControl term effects (Evaluating location term value) where
-  label term = do
-    m <- view _jumps
-    let i = IntMap.size m
-    _jumps .= IntMap.insert i term m
-    pure i
-
-  goto label = IntMap.lookup label <$> view _jumps >>= maybe (fail ("unknown label: " <> show label)) pure
 
 instance Members '[ State (EvaluatorState location term value)
                   , Reader (Environment location value)
