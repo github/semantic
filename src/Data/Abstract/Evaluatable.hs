@@ -262,9 +262,7 @@ evaluateModules :: MonadEvaluatable location term value effects m
 evaluateModules = fmap Prelude.head . evaluatePackageBody . Package.fromModules
 
 -- | Evaluate a given package.
-evaluatePackage :: ( Member (Reader (SomeOrigin term)) effects
-                   , MonadEvaluatable location term value effects m
-                   )
+evaluatePackage :: MonadEvaluatable location term value effects m
                 => Package term
                 -> m effects [value]
 evaluatePackage p = pushOrigin (packageOrigin p) (evaluatePackageBody (packageBody p))

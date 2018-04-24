@@ -10,7 +10,6 @@ import Data.ByteString.Char8 (pack)
 newtype BadValues m (effects :: [* -> *]) a = BadValues (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
-deriving instance MonadModuleTable location term value effects m => MonadModuleTable location term value effects (BadValues m)
 deriving instance MonadEvaluator location term value effects m   => MonadEvaluator location term value effects (BadValues m)
 
 instance ( Effectful m

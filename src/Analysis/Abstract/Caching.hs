@@ -22,7 +22,6 @@ type CachingEffects location term value effects
 newtype Caching m (effects :: [* -> *]) a = Caching (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
-deriving instance MonadModuleTable location term value effects m => MonadModuleTable location term value effects (Caching m)
 deriving instance MonadEvaluator location term value effects m   => MonadEvaluator location term value effects (Caching m)
 
 -- | Functionality used to perform caching analysis. This is not exported, and exists primarily for organizational reasons.

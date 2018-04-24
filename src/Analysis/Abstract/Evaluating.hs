@@ -48,25 +48,6 @@ view :: Member (State (EvaluatorState location term value)) effects => Getting a
 view lens = raise (gets (^. lens))
 
 
-instance Members '[ Reader (ModuleTable [Module term])
-                  , State (EvaluatorState location term value)
-                  , Reader (SomeOrigin term)
-                  , Fail
-                  ] effects
-      => MonadModuleTable location term value effects (Evaluating location term value) where
-  getModuleTable = view _modules
-  putModuleTable = (_modules .=)
-
-  askModuleTable = raise ask
-  localModuleTable f a = raise (local f (lower a))
-
-  getLoadStack = view _loadStack
-  putLoadStack = (_loadStack .=)
-
-  currentModule = do
-    o <- raise ask
-    maybeFail "unable to get currentModule" $ withSomeOrigin (originModule @term) o
-
 instance Members (EvaluatingEffects location term value) effects
       => MonadEvaluator location term value effects (Evaluating location term value) where
   getConfiguration term = Configuration term mempty <$> getEnv <*> getHeap

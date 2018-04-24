@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstrainedClassMethods, FunctionalDependencies, RankNTypes, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE ConstrainedClassMethods, FunctionalDependencies, RankNTypes, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
 module Control.Abstract.Evaluator
   ( MonadEvaluator(..)
   -- State
@@ -61,9 +61,10 @@ import Prologue
 class ( Effectful m
       , Member Fail effects
       , Member (Reader (Environment location value)) effects
+      , Member (Reader (ModuleTable [Module term])) effects
+      , Member (Reader (SomeOrigin term)) effects
       , Member (State (EvaluatorState location term value)) effects
-      , Monad (m effects)
-      , MonadModuleTable location term value effects m
+      , MonadFail (m effects)
       )
    => MonadEvaluator location term value (effects :: [* -> *]) m | m effects -> location term value where
   -- | Get the current 'Configuration' with a passed-in term.
@@ -255,6 +256,20 @@ class Monad (m effects) => MonadModuleTable location term value (effects :: [* -
   -- | Get the currently evaluating 'ModuleInfo'.
   currentModule :: m effects ModuleInfo
 
+instance (Monad (m effects), MonadEvaluator location term value effects m) => MonadModuleTable location term value effects m where
+  getModuleTable = view _modules
+  putModuleTable = (_modules .=)
+
+  askModuleTable = raise ask
+  localModuleTable f a = raise (local f (lower a))
+
+  getLoadStack = view _loadStack
+  putLoadStack = (_loadStack .=)
+
+  currentModule = do
+    o <- raise ask
+    maybeFail "unable to get currentModule" $ withSomeOrigin (originModule @term) o
+
 -- | Update the evaluated module table.
 modifyModuleTable :: MonadModuleTable location term value effects m => (ModuleTable (Environment location value, value) -> ModuleTable (Environment location value, value)) -> m effects ()
 modifyModuleTable f = do
@@ -284,7 +299,7 @@ instance (Monad (m effects), MonadEvaluator location term value effects m) => Mo
     _jumps .= IntMap.insert i term m
     pure i
 
-  goto label = IntMap.lookup label <$> view _jumps >>= maybe (raise (fail ("unknown label: " <> show label))) pure
+  goto label = IntMap.lookup label <$> view _jumps >>= maybe (fail ("unknown label: " <> show label)) pure
 
 
 throwResumable :: (Member (Resumable exc) effects, Effectful m) => exc v -> m effects v

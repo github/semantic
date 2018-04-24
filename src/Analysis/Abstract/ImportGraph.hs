@@ -57,7 +57,6 @@ style = (defaultStyle vertexName)
 newtype ImportGraphing m (effects :: [* -> *]) a = ImportGraphing (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
-deriving instance MonadModuleTable location term value effects m => MonadModuleTable location term value effects (ImportGraphing m)
 deriving instance MonadEvaluator location term value effects m   => MonadEvaluator location term value effects (ImportGraphing m)
 
 

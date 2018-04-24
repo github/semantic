@@ -11,7 +11,6 @@ import Prologue
 newtype BadVariables m (effects :: [* -> *]) a = BadVariables (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
-deriving instance MonadModuleTable location term value effects m => MonadModuleTable location term value effects (BadVariables m)
 deriving instance MonadEvaluator location term value effects m   => MonadEvaluator location term value effects (BadVariables m)
 
 instance ( Effectful m

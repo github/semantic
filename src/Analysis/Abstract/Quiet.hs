@@ -17,7 +17,6 @@ import Prologue
 newtype Quietly m (effects :: [* -> *]) a = Quietly (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
-deriving instance MonadModuleTable location term value effects m => MonadModuleTable location term value effects (Quietly m)
 deriving instance MonadEvaluator location term value effects m   => MonadEvaluator location term value effects (Quietly m)
 
 instance ( Effectful m
