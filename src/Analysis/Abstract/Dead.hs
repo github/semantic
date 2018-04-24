@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Dead
 ( DeadCode
 ) where
@@ -52,3 +52,9 @@ instance ( Corecursive term
   analyzeModule recur m = do
     killAll (subterms (subterm (moduleBody m)))
     liftAnalyze analyzeModule recur m
+
+instance ( Interpreter effects (result, Dead term) rest m
+         , Ord term
+         )
+      => Interpreter (State (Dead term) ': effects) result rest (DeadCode m) where
+  interpret = interpret . raise @m . flip runState mempty . lower
