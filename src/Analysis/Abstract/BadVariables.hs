@@ -20,7 +20,7 @@ instance ( Effectful m
          , MonadValue location value effects (BadVariables m)
          )
       => MonadAnalysis location term value effects (BadVariables m) where
-  type Effects location term value (BadVariables m) = State [Name] ': Effects location term value m
+  type Effects location term value (BadVariables m) = State [Name] ': Resumable (EvalError value) ': Effects location term value m
 
   analyzeTerm eval term = resume @(EvalError value) (liftAnalyze analyzeTerm eval term) (
         \yield err -> do

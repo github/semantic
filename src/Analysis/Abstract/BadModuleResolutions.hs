@@ -17,7 +17,7 @@ instance ( Effectful m
          , MonadValue location value effects (BadModuleResolutions m)
          )
       => MonadAnalysis location term value effects (BadModuleResolutions m) where
-  type Effects location term value (BadModuleResolutions m) = State [Name] ': Effects location term value m
+  type Effects location term value (BadModuleResolutions m) = State [Name] ': Resumable (ResolutionError value) ': Effects location term value m
 
   analyzeTerm eval term = resume @(ResolutionError value) (liftAnalyze analyzeTerm eval term) (
         \yield error -> do

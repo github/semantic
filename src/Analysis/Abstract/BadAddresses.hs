@@ -18,7 +18,7 @@ instance ( Effectful m
          , Show location
          )
       => MonadAnalysis location term value effects (BadAddresses m) where
-  type Effects location term value (BadAddresses m) = Effects location term value m
+  type Effects location term value (BadAddresses m) = Resumable (AddressError location value) ': Effects location term value m
 
   analyzeTerm eval term = resume @(AddressError location value) (liftAnalyze analyzeTerm eval term) (
         \yield error -> do
