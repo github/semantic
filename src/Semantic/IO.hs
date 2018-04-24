@@ -98,7 +98,7 @@ readProjectFromPaths rootDir lang = do
 readProjectEntryFromPath :: MonadIO m => FilePath -> Language -> m Project
 readProjectEntryFromPath path lang = do
   paths <- liftIO $ filter (/= path) <$> fmap fold (globDir (compile . mappend "**/*." <$> exts) rootDir)
-  pure $ Project rootDir (toFile <$> (path : paths)) lang [toFile path]
+  pure $ Project rootDir (toFile <$> paths) lang [toFile path]
   where
     rootDir = takeDirectory path
     toFile path = File path (Just lang)
