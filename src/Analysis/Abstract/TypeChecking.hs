@@ -9,26 +9,21 @@ import Data.Abstract.Type
 import Prologue hiding (TypeError)
 
 newtype TypeChecking m (effects :: [* -> *]) a = TypeChecking (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
+  deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
-deriving instance MonadControl term (m effects)                    => MonadControl term (TypeChecking m effects)
-deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (TypeChecking m effects)
-deriving instance MonadHeap location value (m effects)             => MonadHeap location value (TypeChecking m effects)
-deriving instance MonadModuleTable location term value (m effects) => MonadModuleTable location term value (TypeChecking m effects)
-deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (TypeChecking m effects)
+deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (TypeChecking m)
 
 instance ( Effectful m
          , Alternative (m effects)
-         , MonadAnalysis location term value (m effects)
+         , MonadAnalysis location term value effects m
          , Member (Resumable TypeError) effects
          , Member NonDet effects
-         , Member Fail effects
-         , MonadValue location value (TypeChecking m effects)
+         , MonadValue location value effects (TypeChecking m)
          , value ~ Type
          )
-      => MonadAnalysis location term value (TypeChecking m effects) where
+      => MonadAnalysis location term value effects (TypeChecking m) where
 
-  type Effects location term value (TypeChecking m effects) = Resumable TypeError ': Effects location term value (m effects)
+  type Effects location term value (TypeChecking m) = Resumable TypeError ': Effects location term value m
 
   analyzeTerm eval term =
     resume @TypeError (liftAnalyze analyzeTerm eval term) (

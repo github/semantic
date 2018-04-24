@@ -148,9 +148,10 @@ instance ( Alternative (m effects)
   call op params = do
     tvar <- fresh
     paramTypes <- sequenceA params
-    unified <- op `unify` (Product paramTypes :-> Var tvar)
+    let needed = Product paramTypes :-> Var tvar
+    unified <- op `unify` needed
     case unified of
       _ :-> ret -> pure ret
-      _         -> raise (fail "unification with a function produced something other than a function")
+      gotten    -> throwResumable (UnificationError needed gotten)
 
   loop f = f empty
