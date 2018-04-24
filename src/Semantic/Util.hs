@@ -54,6 +54,10 @@ instance MonadAnalysis location term value effects m
   analyzeTerm = liftAnalyze analyzeTerm
   analyzeModule = liftAnalyze analyzeModule
 
+instance Interpreter                   effects  (Either (SomeExc exc) result) rest               m
+      => Interpreter (Resumable exc ': effects)                       result  rest (Erroring exc m) where
+  interpret = interpret . raise @m . runError . lower
+
 -- type TestEvaluating term = Evaluating Precise term (Value Precise)
 type JustEvaluating term
   = Erroring (AddressError (Located Precise term) (Value (Located Precise term)))
