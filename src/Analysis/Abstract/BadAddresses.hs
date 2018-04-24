@@ -2,7 +2,6 @@
 module Analysis.Abstract.BadAddresses where
 
 import Control.Abstract.Analysis
-import Control.Monad.Effect.Internal hiding (interpret)
 import Data.Abstract.Address
 import Prologue
 

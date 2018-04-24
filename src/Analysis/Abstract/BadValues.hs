@@ -2,7 +2,6 @@
 module Analysis.Abstract.BadValues where
 
 import Control.Abstract.Analysis
-import Control.Monad.Effect.Internal hiding (interpret)
 import Data.Abstract.Environment as Env
 import Data.ByteString.Char8 (pack)
 import Prologue

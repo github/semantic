@@ -18,6 +18,7 @@ import Control.Abstract.Value as X
 import Control.Effect as X
 import Control.Effect.Fresh as X
 import Control.Monad.Effect.Fail as X
+import Control.Monad.Effect.Internal as X (relay)
 import Control.Monad.Effect.NonDet as X
 import Control.Monad.Effect.Reader as X
 import Control.Monad.Effect.State as X
