@@ -51,7 +51,7 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (BC.unpack prefix) (J
 -- Subsequent imports of `parent.two` or `parent.three` will execute
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
-resolvePythonModules :: MonadEvaluatable location term value m => QualifiedName -> m (NonEmpty ModulePath)
+resolvePythonModules :: MonadEvaluatable location term value effects m => QualifiedName -> m effects (NonEmpty ModulePath)
 resolvePythonModules q = do
   relRootDir <- rootDir q <$> currentModule
   for (moduleNames q) $ \name -> do
@@ -74,7 +74,7 @@ resolvePythonModules q = do
       let searchPaths = [ path </> "__init__.py"
                         , path <.> ".py"
                         ]
-      resolve searchPaths >>= maybeFail (notFound searchPaths)
+      resolve searchPaths >>= maybeM (raise (fail (notFound searchPaths)))
 
     friendlyName :: QualifiedName -> String
     friendlyName (QualifiedName xs)                = intercalate "." (NonEmpty.toList xs)
@@ -121,7 +121,7 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 -- import a.b.c
 instance Evaluatable QualifiedImport where
-  eval (QualifiedImport (RelativeQualifiedName _ _))        = fail "technically this is not allowed in python"
+  eval (QualifiedImport (RelativeQualifiedName _ _))        = raise (fail "technically this is not allowed in python")
   eval (QualifiedImport name@(QualifiedName qualifiedName)) = do
     modulePaths <- resolvePythonModules name
     go (NonEmpty.zip (FV.name . BC.pack <$> qualifiedName) modulePaths)

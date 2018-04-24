@@ -19,10 +19,10 @@ instance (Location location, Ord (Base term ())) => Location (Located location t
 
 instance ( Effectful m
          , Member (Reader (SomeOrigin term)) effects
-         , MonadAddressable location (m effects)
+         , MonadAddressable location effects m
          , Ord (Base term ())
          )
-      => MonadAddressable (Located location term) (m effects) where
+      => MonadAddressable (Located location term) effects m where
   derefCell (Address (Located loc _)) = derefCell (Address loc)
 
   allocLoc name = Located <$> allocLoc name <*> raise ask
