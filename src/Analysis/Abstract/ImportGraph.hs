@@ -9,7 +9,7 @@ module Analysis.Abstract.ImportGraph
 import qualified Algebra.Graph as G
 import           Algebra.Graph.Class hiding (Vertex)
 import           Algebra.Graph.Export.Dot hiding (vertexName)
-import           Control.Abstract.Analysis
+import           Control.Abstract.Analysis hiding (origin)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable (LoadError (..))
 import           Data.Abstract.FreeVariables
