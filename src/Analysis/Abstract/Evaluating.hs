@@ -40,12 +40,21 @@ type EvaluatingEffects location term value
      , State  (EvaluatorState location term value) -- Environment, heap, modules, exports, and jumps.
      ]
 
-instance Members (EvaluatingEffects location term value) effects
+instance ( Member Fail effects
+         , Member (Reader (Environment location value)) effects
+         , Member (Reader (ModuleTable [Module term])) effects
+         , Member (Reader (SomeOrigin term)) effects
+         , Member (State (EvaluatorState location term value)) effects
+         )
       => MonadEvaluator location term value effects (Evaluating location term value) where
   getConfiguration term = Configuration term mempty <$> getEnv <*> getHeap
 
 instance ( Corecursive term
-         , Members (EvaluatingEffects location term value) effects
+         , Member Fail effects
+         , Member (Reader (Environment location value)) effects
+         , Member (Reader (ModuleTable [Module term])) effects
+         , Member (Reader (SomeOrigin term)) effects
+         , Member (State (EvaluatorState location term value)) effects
          , Recursive term
          )
       => MonadAnalysis location term value effects (Evaluating location term value) where
