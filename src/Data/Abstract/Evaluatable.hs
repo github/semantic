@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, KindSignatures, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , MonadEvaluatable
@@ -45,7 +45,7 @@ import           Data.Semigroup.Reducer hiding (unit)
 import           Data.Term
 import           Prologue
 
-type MonadEvaluatable location term value (effects :: [* -> *]) m =
+type MonadEvaluatable location term value effects m =
   ( Declarations term
   , Effectful m
   , Evaluatable (Base term)
