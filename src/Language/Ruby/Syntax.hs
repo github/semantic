@@ -106,7 +106,7 @@ doLoad path shouldWrap = do
 
 -- TODO: autoload
 
-data Class a = Class { classIdentifier :: !a, classSuperClasses :: ![a], classBody :: !a }
+data Class a = Class { classIdentifier :: !a, classSuperClass :: !(Maybe a), classBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Diffable Class where
@@ -118,7 +118,7 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
   eval Class{..} = do
-    supers <- traverse subtermValue classSuperClasses
+    supers <- traverse subtermValue (toList classSuperClass)
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm classIdentifier)
     letrec' name $ \addr ->
       subtermValue classBody <* makeNamespace name addr supers
