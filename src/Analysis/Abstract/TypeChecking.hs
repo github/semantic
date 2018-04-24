@@ -18,14 +18,30 @@ deriving instance MonadModuleTable location term value (m effects) => MonadModul
 deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (TypeChecking m effects)
 
 instance ( Effectful m
-         , MonadAnalysis location term Type (m effects)
-         , Member (Resumable (TypeError Type)) effects
-         , MonadValue location Type (TypeChecking m effects)
+         , Alternative (m effects)
+         , MonadAnalysis location term value (m effects)
+         , Member (Resumable TypeError) effects
+         , Member NonDet effects
+         , Member Fail effects
+         , MonadValue location value (TypeChecking m effects)
+         , value ~ Type
          )
-      => MonadAnalysis location term Type (TypeChecking m effects) where
+      => MonadAnalysis location term value (TypeChecking m effects) where
 
-  type Effects location term Type (TypeChecking m effects) = Resumable (TypeError Type) ': NonDet ': Effects location term Type (m effects)
+  type Effects location term value (TypeChecking m effects) = Resumable TypeError ': Effects location term value (m effects)
 
-  analyzeTerm eval term = resume @(TypeError Type) (liftAnalyze analyzeTerm eval term) (
-      \yield err -> case err of
-        NoValueError v -> yield "")
+  analyzeTerm eval term =
+    resume @TypeError (liftAnalyze analyzeTerm eval term) (
+        \yield err -> case err of
+          NoValueError _ a -> yield a
+          -- TODO: These should all yield both sides of the exception,
+          -- but something is mysteriously busted in the innards of typechecking,
+          -- so doing that just yields an empty list in the result type, which isn't
+          -- extraordinarily helpful. Better for now to just die with an error and
+          -- tackle this issue in a separate PR.
+          BitOpError{}       -> throwResumable err
+          NumOpError{}       -> throwResumable err
+          UnificationError{} -> throwResumable err
+        )
+
+  analyzeModule = liftAnalyze analyzeModule

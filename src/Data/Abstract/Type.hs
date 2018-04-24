@@ -36,14 +36,30 @@ data Type
 
 -- TODO: À la carte representation of types.
 
-data TypeError value resume where
-  NoValueError     :: value -> TypeError value resume
-  NumOpError       :: value -> value -> TypeError value resume
-  BitOpError       :: value -> value -> TypeError value resume
-  UnificationError :: value -> value -> TypeError value resume
+-- TODO: specialize these to type
+data TypeError resume where
+  NoValueError     :: Type -> a -> TypeError a
+  NumOpError       :: Type -> Type -> TypeError Type
+  BitOpError       :: Type -> Type -> TypeError Type
+  UnificationError :: Type -> Type -> TypeError Type
+
+deriving instance Show resume => Show (TypeError resume)
+
+instance Show1 TypeError where
+  liftShowsPrec _ _ _ (NoValueError v _)     = showString "NoValueError " . shows v
+  liftShowsPrec _ _ _ (NumOpError l r)       = showString "NumOpError " . shows [l, r]
+  liftShowsPrec _ _ _ (BitOpError l r)       = showString "BitOpError " . shows [l, r]
+  liftShowsPrec _ _ _ (UnificationError l r) = showString "UnificationError " . shows [l, r]
+
+instance Eq1 TypeError where
+  liftEq _ (NoValueError a _) (NoValueError b _)                       = a == b
+  -- liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
+  -- liftEq _ (ScopedEnvironmentError a) (ScopedEnvironmentError b) = a == b
+  -- liftEq _ (CallError a) (CallError b)                           = a == b
+  liftEq _ _             _                                       = False
 
 -- | Unify two 'Type's.
-unify :: MonadResume (TypeError Type) m => Type -> Type -> m Type
+unify :: MonadResume TypeError m => Type -> Type -> m Type
 unify (a1 :-> b1) (a2 :-> b2) = (:->) <$> unify a1 a2 <*> unify b1 b2
 unify a Null = pure a
 unify Null b = pure b
@@ -67,7 +83,7 @@ instance ( Alternative m
          , MonadFail m
          , MonadFresh m
          , MonadHeap location Type m
-         , MonadResume (TypeError Type) m
+         , MonadResume TypeError m
          , Reducer Type (Cell location Type)
          )
       => MonadValue location Type m where
@@ -101,9 +117,9 @@ instance ( Alternative m
 
   scopedEnvironment _ = pure mempty
 
-  asString _ = throwResumable (NoValueError String)
-  asPair _   = throwResumable (NoValueError (Product []))
-  asBool _   = throwResumable (NoValueError Bool)
+  asString _ = throwResumable (NoValueError String "")
+  asPair _   = throwResumable (NoValueError (Product []) (Hole, Hole))
+  asBool _   = throwResumable (NoValueError Bool True)
 
   isHole ty = pure (ty == Hole)
 
