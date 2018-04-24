@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, TypeFamilies, TypeOperators, UndecidableInstances, ScopedTypeVariables #-}
+{-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value where
 
 import Control.Abstract.Analysis
