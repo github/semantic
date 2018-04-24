@@ -169,7 +169,6 @@ library
                      , directory
                      , effects
                      , filepath
-                     , path
                      , free
                      , freer-cofreer
                      , ghc-prim
@@ -188,8 +187,6 @@ library
                      , recursion-schemes
                      , reducers
                      , scientific
-                     , safe-exceptions
-                     , exceptions
                      , semigroupoids
                      , split
                      , stm-chans
@@ -271,7 +268,6 @@ test-suite test
                      , comonad
                      , effects
                      , filepath
-                     , path
                      , free
                      , Glob
                      , haskell-tree-sitter

@@ -25,7 +25,6 @@ import           Prologue hiding (MonadError (..))
 import           Rendering.Renderer
 import           Semantic.IO (Files, NoLanguageForBlob (..))
 import           Semantic.Task
-import Path hiding (File)
 import Data.Language (Language)
 import qualified Data.Abstract.ModuleTable as ModuleTable
 import qualified Data.ByteString.Char8 as B
