@@ -13,7 +13,6 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Origin
-import Lens.Micro
 import Prologue
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
@@ -40,13 +39,6 @@ type EvaluatingEffects location term value
      , Reader (Environment location value)         -- Default environment used as a fallback in lookupEnv
      , State  (EvaluatorState location term value) -- Environment, heap, modules, exports, and jumps.
      ]
-
-(.=) :: Member (State (EvaluatorState location term value)) effects => ASetter (EvaluatorState location term value) (EvaluatorState location term value) a b -> b -> Evaluating location term value effects ()
-lens .= val = raise (modify' (lens .~ val))
-
-view :: Member (State (EvaluatorState location term value)) effects => Getting a (EvaluatorState location term value) a -> Evaluating location term value effects a
-view lens = raise (gets (^. lens))
-
 
 instance Members (EvaluatingEffects location term value) effects
       => MonadEvaluator location term value effects (Evaluating location term value) where
