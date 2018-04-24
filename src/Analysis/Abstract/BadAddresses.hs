@@ -2,6 +2,7 @@
 module Analysis.Abstract.BadAddresses where
 
 import Control.Abstract.Analysis
+import Control.Monad.Effect.Internal hiding (interpret)
 import Data.Abstract.Address
 import Prologue
 
@@ -28,3 +29,12 @@ instance ( Effectful m
             UninitializedAddress _ -> hole >>= yield)
 
   analyzeModule = liftAnalyze analyzeModule
+
+instance ( Interpreter effects result rest m
+         , MonadValue location value effects m
+         , Monoid (Cell location value)
+         )
+      => Interpreter (Resumable (AddressError location value) ': effects) result rest (BadAddresses m) where
+  interpret = interpret . raise @m . relay pure (\ (Resumable err) yield -> case err of
+    UnallocatedAddress _ -> yield mempty
+    UninitializedAddress _ -> lower @m hole >>= yield) . lower
