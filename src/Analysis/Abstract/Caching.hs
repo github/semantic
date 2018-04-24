@@ -119,3 +119,19 @@ converge f = loop
 -- | Nondeterministically write each of a collection of stores & return their associated results.
 scatter :: (Alternative (m effects), Foldable t, MonadEvaluator location term value effects m) => t (a, Heap location value) -> m effects a
 scatter = foldMapA (\ (value, heap') -> putHeap heap' $> value)
+
+
+instance ( Interpreter effects ([result], Cache location term value) rest m
+         , Ord (Cell location value)
+         , Ord location
+         , Ord term
+         , Ord value
+         )
+      => Interpreter (NonDet ': Reader (Cache location term value) ': State (Cache location term value) ': effects) result rest (Caching m) where
+  interpret
+    = interpret
+    . raise @m
+    . flip runState mempty
+    . flip runReader mempty
+    . makeChoiceA @[]
+    . lower
