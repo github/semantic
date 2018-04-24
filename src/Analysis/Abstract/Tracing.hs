@@ -34,3 +34,9 @@ instance ( Corecursive term
     liftAnalyze analyzeTerm recur term
 
   analyzeModule = liftAnalyze analyzeModule
+
+instance ( Interpreter effects (result, trace (Configuration location term value)) rest m
+         , Monoid (trace (Configuration location term value))
+         )
+      => Interpreter (Writer (trace (Configuration location term value)) ': effects) result rest (Tracing trace m) where
+  interpret = interpret . raise @m . runWriter  . lower
