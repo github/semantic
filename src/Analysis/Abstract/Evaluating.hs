@@ -47,33 +47,6 @@ lens .= val = raise (modify' (lens .~ val))
 view :: Member (State (EvaluatorState location term value)) effects => Getting a (EvaluatorState location term value) a -> Evaluating location term value effects a
 view lens = raise (gets (^. lens))
 
-localEvaluatorState :: Member (State (EvaluatorState location term value)) effects => Lens' (EvaluatorState location term value) prj -> (prj -> prj) -> Evaluating location term value effects a -> Evaluating location term value effects a
-localEvaluatorState lens f action = do
-  original <- view lens
-  lens .= f original
-  v <- action
-  v <$ lens .= original
-
-
-instance Members '[ State (EvaluatorState location term value)
-                  , Reader (Environment location value)
-                  ] effects
-      => MonadEnvironment location value effects (Evaluating location term value) where
-  getEnv = view _environment
-  putEnv = (_environment .=)
-  withEnv s = localEvaluatorState _environment (const s)
-
-  defaultEnvironment = raise ask
-  withDefaultEnvironment e = raise . local (const e) . lower
-
-  getExports = view _exports
-  putExports = (_exports .=)
-  withExports s = localEvaluatorState _exports (const s)
-
-  localEnv f a = do
-    modifyEnv (f . Env.push)
-    result <- a
-    result <$ modifyEnv Env.pop
 
 instance Member (State (EvaluatorState location term value)) effects
       => MonadHeap location value effects (Evaluating location term value) where

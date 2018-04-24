@@ -33,6 +33,7 @@ module Control.Abstract.Evaluator
 import Control.Effect
 import Control.Monad.Effect.Exception as Exception
 import Control.Monad.Effect.Fail
+import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Resumable as Resumable
 import Control.Monad.Effect.State
 import Data.Abstract.Address
@@ -59,9 +60,9 @@ import Prologue
 --   - tables of modules available for import
 class ( Effectful m
       , Member Fail effects
+      , Member (Reader (Environment location value)) effects
       , Member (State (EvaluatorState location term value)) effects
       , Monad (m effects)
-      , MonadEnvironment location value effects m
       , MonadModuleTable location term value effects m
       , MonadHeap location value effects m
       )
@@ -117,6 +118,13 @@ lens .= val = raise (modify' (lens .~ val))
 view :: MonadEvaluator location term value effects m => Getting a (EvaluatorState location term value) a -> m effects a
 view lens = raise (gets (^. lens))
 
+localEvaluatorState :: MonadEvaluator location term value effects m => Lens' (EvaluatorState location term value) prj -> (prj -> prj) -> m effects a -> m effects a
+localEvaluatorState lens f action = do
+  original <- view lens
+  lens .= f original
+  v <- action
+  v <$ lens .= original
+
 
 -- | A 'Monad' abstracting local and global environments.
 class Monad (m effects) => MonadEnvironment location value (effects :: [* -> *]) m | m effects -> location value where
@@ -153,6 +161,23 @@ class Monad (m effects) => MonadEnvironment location value (effects :: [* -> *])
   lookupWith with name = do
     addr <- lookupEnv name
     maybe (pure Nothing) (fmap Just . with) addr
+
+instance (Monad (m effects), MonadEvaluator location term value effects m) => MonadEnvironment location value effects m where
+  getEnv = view _environment
+  putEnv = (_environment .=)
+  withEnv s = localEvaluatorState _environment (const s)
+
+  defaultEnvironment = raise ask
+  withDefaultEnvironment e = raise . local (const e) . lower
+
+  getExports = view _exports
+  putExports = (_exports .=)
+  withExports s = localEvaluatorState _exports (const s)
+
+  localEnv f a = do
+    modifyEnv (f . Env.push)
+    result <- a
+    result <$ modifyEnv Env.pop
 
 -- | Run a computation in a new local environment.
 localize :: MonadEnvironment location value effects m => m effects a -> m effects a
