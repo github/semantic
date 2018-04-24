@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, RankNTypes, TypeFamilies, UndecidableInstances, ScopedTypeVariables #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
 module Analysis.Abstract.Evaluating
 ( Evaluating
 , EvaluatorState(..)
