@@ -9,7 +9,6 @@ import           Data.Align.Generic
 import qualified Data.ByteString.Char8 as BC
 import           Data.Functor.Classes.Generic
 import qualified Data.Language as Language
--- import           Data.List (intercalate)
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Mergeable
 import           Diffing.Algorithm
@@ -52,7 +51,7 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (BC.unpack prefix) (J
 -- Subsequent imports of `parent.two` or `parent.three` will execute
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
-resolvePythonModules :: forall value term location m. MonadEvaluatable location term value m => QualifiedName -> m (NonEmpty ModulePath)
+resolvePythonModules :: forall value term location effects m. MonadEvaluatable location term value effects m => QualifiedName -> m effects (NonEmpty ModulePath)
 resolvePythonModules q = do
   relRootDir <- rootDir q <$> currentModule
   for (moduleNames q) $ \name -> do
@@ -119,7 +118,7 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 -- import a.b.c
 instance Evaluatable QualifiedImport where
-  eval (QualifiedImport (RelativeQualifiedName _ _))        = fail "technically this is not allowed in python"
+  eval (QualifiedImport (RelativeQualifiedName _ _))        = raise (fail "technically this is not allowed in python")
   eval (QualifiedImport name@(QualifiedName qualifiedName)) = do
     modulePaths <- resolvePythonModules name
     go (NonEmpty.zip (FV.name . BC.pack <$> qualifiedName) modulePaths)

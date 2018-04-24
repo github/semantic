@@ -35,17 +35,17 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
-resolvePHPName :: forall value location term m. MonadEvaluatable location term value m => ByteString -> m ModulePath
+resolvePHPName :: forall value location term effects m. MonadEvaluatable location term value effects m => ByteString -> m effects ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]
   maybe (throwResumable @(ResolutionError value) $ NotFoundError name [name] Language.PHP) pure modulePath
   where name = toName n
         toName = BC.unpack . dropRelativePrefix . stripQuotes
 
-include :: MonadEvaluatable location term value m
-        => Subterm t (m value)
-        -> (ModulePath -> m (Environment location value, value))
-        -> m value
+include :: MonadEvaluatable location term value effects m
+        => Subterm t (m effects value)
+        -> (ModulePath -> m effects (Environment location value, value))
+        -> m effects value
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
@@ -363,7 +363,7 @@ instance Evaluatable Namespace where
   eval Namespace{..} = go names
     where
       names = freeVariables (subterm namespaceName)
-      go [] = fail "expected at least one free variable in namespaceName, found none"
+      go [] = raise (fail "expected at least one free variable in namespaceName, found none")
       -- The last name creates a closure over the namespace body.
       go [name] = letrec' name $ \addr ->
         subtermValue namespaceBody *> makeNamespace name addr []

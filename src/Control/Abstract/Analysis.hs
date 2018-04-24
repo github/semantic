@@ -29,20 +29,20 @@ import Prologue
 -- | A 'Monad' in which one can evaluate some specific term type to some specific value type.
 --
 --   This typeclass is left intentionally unconstrained to avoid circular dependencies between it and other typeclasses.
-class MonadEvaluator location term value m => MonadAnalysis location term value m where
+class MonadEvaluator location term value effects m => MonadAnalysis location term value effects m where
   -- | The effects necessary to run the analysis. Analyses which are composed on top of (wrap) other analyses should include the inner analyses 'Effects' in their own list.
   type family Effects location term value m :: [* -> *]
 
   -- | Analyze a term using the semantics of the current analysis.
-  analyzeTerm :: (Base term (Subterm term (outer value)) -> m value)
-              -> (Base term (Subterm term (outer value)) -> m value)
+  analyzeTerm :: (Base term (Subterm term (outer effects value)) -> m effects value)
+              -> (Base term (Subterm term (outer effects value)) -> m effects value)
 
   -- | Analyze a module using the semantics of the current analysis. This should generally only be called by 'evaluateModule' and by definitions of 'analyzeModule' in instances for composite analyses.
-  analyzeModule :: (Module (Subterm term (outer value)) -> m value)
-                -> (Module (Subterm term (outer value)) -> m value)
+  analyzeModule :: (Module (Subterm term (outer effects value)) -> m effects value)
+                -> (Module (Subterm term (outer effects value)) -> m effects value)
 
   -- | Isolate the given action with an empty global environment and exports.
-  isolate :: m a -> m a
+  isolate :: m effects a -> m effects a
   isolate = withEnv mempty . withExports mempty
 
 
@@ -57,8 +57,8 @@ liftAnalyze analyze recur term = coerce (analyze (coerceWith (sym Coercion) . r
 --
 --   This enables us to refer to the analysis type as e.g. @Analysis1 (Analysis2 Evaluating) Term Value@ without explicitly mentioning its effects (which are inferred to be simply its 'Effects').
 runAnalysis :: ( Effectful m
-               , Effects location term value (m effects) ~ effects
-               , MonadAnalysis location term value (m effects)
+               , Effects location term value m ~ effects
+               , MonadAnalysis location term value effects m
                , RunEffects effects a
                )
             => m effects a
@@ -69,8 +69,8 @@ runAnalysis = X.run
 -- | An abstraction over analyses.
 data SomeAnalysis m result where
   SomeAnalysis :: ( Effectful m
-                  , effects ~ Effects location term value (m effects)
-                  , MonadAnalysis location term value (m effects)
+                  , effects ~ Effects location term value m
+                  , MonadAnalysis location term value effects m
                   , RunEffects effects a
                   )
                => m effects a
