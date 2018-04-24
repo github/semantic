@@ -23,11 +23,8 @@ import           Data.Output
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
 import           Rendering.Renderer
-import           Semantic.IO (Files, NoLanguageForBlob (..))
+import           Semantic.IO (Files)
 import           Semantic.Task
-import Data.Language (Language)
-import qualified Data.Abstract.ModuleTable as ModuleTable
-import qualified Data.ByteString.Char8 as B
 
 graph :: (Members '[Distribute WrappedTask, Files, Task, Exc SomeException, Telemetry] effs)
       => GraphRenderer output
@@ -54,7 +51,7 @@ parsePackage parser preludeFile project@Project{..} = do
 
     -- | Parse all files in a project into 'Module's.
     parseModules :: Members '[Distribute WrappedTask, Files, Task] effs => Parser term -> Project -> Eff effs [Module term]
-    parseModules parser project@Project{..} = distributeFor (projectEntryPoints <> projectFiles) (WrapTask . parseModule parser (Just projectRootDir))
+    parseModules parser Project{..} = distributeFor (projectEntryPoints <> projectFiles) (WrapTask . parseModule parser (Just projectRootDir))
 
     -- | Parse a file into a 'Module'.
     parseModule :: Members '[Files, Task] effs => Parser term -> Maybe FilePath -> File -> Eff effs (Module term)
