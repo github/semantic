@@ -1,13 +1,17 @@
-{-# LANGUAGE TypeFamilies, UndecidableInstances #-}
-module Data.Abstract.Type where
+{-# LANGUAGE GADTs, TypeFamilies, UndecidableInstances #-}
+module Data.Abstract.Type
+  ( Type (..)
+  , TypeError (..)
+  , unify
+  ) where
 
 import Control.Abstract.Analysis
 import Data.Abstract.Address
 import Data.Abstract.Environment as Env
 import Data.Align (alignWith)
 import Data.Semigroup.Reducer (Reducer)
-import Prelude hiding (fail)
-import Prologue
+import Prelude
+import Prologue hiding (TypeError)
 
 type TName = Int
 
@@ -32,9 +36,14 @@ data Type
 
 -- TODO: À la carte representation of types.
 
+data TypeError value resume where
+  NoValueError     :: value -> TypeError value resume
+  NumOpError       :: value -> value -> TypeError value resume
+  BitOpError       :: value -> value -> TypeError value resume
+  UnificationError :: value -> value -> TypeError value resume
 
 -- | Unify two 'Type's.
-unify :: MonadFail m => Type -> Type -> m Type
+unify :: MonadResume (TypeError Type) m => Type -> Type -> m Type
 unify (a1 :-> b1) (a2 :-> b2) = (:->) <$> unify a1 a2 <*> unify b1 b2
 unify a Null = pure a
 unify Null b = pure b
@@ -44,7 +53,7 @@ unify a (Var _) = pure a
 unify (Product as) (Product bs) = Product <$> sequenceA (alignWith (these pure pure unify) as bs)
 unify t1 t2
   | t1 == t2  = pure t2
-  | otherwise = fail ("cannot unify " ++ show t1 ++ " with " ++ show t2)
+  | otherwise = throwResumable (UnificationError t1 t2)
 
 
 instance Ord location => ValueRoots location Type where
@@ -58,6 +67,7 @@ instance ( Alternative m
          , MonadFail m
          , MonadFresh m
          , MonadHeap location Type m
+         , MonadResume (TypeError Type) m
          , Reducer Type (Cell location Type)
          )
       => MonadValue location Type m where
@@ -91,28 +101,28 @@ instance ( Alternative m
 
   scopedEnvironment _ = pure mempty
 
-  asString _ = fail "Must evaluate to Value to use asString"
-  asPair _   = fail "Must evaluate to Value to use asPair"
-  asBool _ = fail "Must evaluate to Value to use asBool"
+  asString _ = throwResumable (NoValueError String)
+  asPair _   = throwResumable (NoValueError (Product []))
+  asBool _   = throwResumable (NoValueError Bool)
 
   isHole ty = pure (ty == Hole)
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 
-  liftNumeric _ Float = pure Float
+  liftNumeric _ Float      = pure Float
   liftNumeric _ Int        = pure Int
-  liftNumeric _ _          = fail "Invalid type in unary numeric operation"
+  liftNumeric _ t          = throwResumable (NumOpError t Hole)
 
   liftNumeric2 _ left right = case (left, right) of
     (Float, Int) -> pure Float
     (Int, Float) -> pure Float
-    _                 -> unify left right
+    _            -> unify left right
 
   liftBitwise _ Int = pure Int
-  liftBitwise _ t   = fail ("Invalid type passed to unary bitwise operation: " <> show t)
+  liftBitwise _ t   = throwResumable (BitOpError t Hole)
 
   liftBitwise2 _ Int Int = pure Int
-  liftBitwise2 _ t1 t2   = fail ("Invalid types passed to binary bitwise operation: " <> show (t1, t2))
+  liftBitwise2 _ t1 t2   = throwResumable (BitOpError t1 t2)
 
   liftComparison (Concrete _) left right = case (left, right) of
     (Float, Int) ->                     pure Bool
