@@ -260,8 +260,12 @@ char :: Assignment
 char = makeTerm <$> symbol CharacterLiteral <*> (Literal.TextElement <$> source)
 
 class' :: Assignment
-class' = makeTerm <$> symbol ClassDeclaration <*> children (Declaration.Class <$> many modifier <*> term identifier <*> pure [] <*> classBody)
-  where classBody = makeTerm <$> symbol ClassBody <*> children (manyTerm expression)
+class' = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> many modifier <*> term identifier <*> (typeParameters <|> pure []) <*> emptyTerm <*> classBody)
+  where
+    makeClass modifiers identifier typeParams superClass classBody = Declaration.Class (modifiers ++ typeParams) identifier [superClass] classBody -- not doing an assignment, just straight up function
+    classBody = makeTerm <$> symbol ClassBody <*> children (manyTerm expression)
+-- might wanna come back and change to maybe superClass
+-- TODO: superclass -- need to match the superclass node when it exists (which will be a rule, similar to how the type params rule matches the typeparams node when it exists)
 
 -- consolidated with scopedIdentifier
 identifier :: Assignment
@@ -272,13 +276,13 @@ scopedIdentifier = makeTerm <$> symbol ScopedIdentifier <*> children (Expression
 
 -- refactor method declaration to have clearly understandable top-level rule + sub-rules broken out in the where so it's easier to reason about
 method :: Assignment
-method = makeTerm <$> symbol MethodDeclaration <*> children (
-         makeMethod <$> many modifier <*> emptyTerm <*> methodHeader <*> methodBody)
+method = makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> many modifier <*> emptyTerm <*> methodHeader <*> methodBody)
+-- makeMethod is a wrapper that takes the arguments in the structure they occur in the grammar and rearranges them to satisfy the structure required for our syntax types
   where
     methodBody = symbol MethodBody *> children (term expression)
     methodDeclarator = symbol MethodDeclarator *> children ( (,) <$> identifier <*> formalParameters)
-    methodHeader = symbol MethodHeader *> children ((,) <$> type' <*> methodDeclarator)
-    makeMethod modifiers receiver (returnType, (name, params)) body = Declaration.Method (returnType : modifiers) receiver name params body
+    methodHeader = symbol MethodHeader *> children ((,,,,) <$> (typeParameters <|> pure []) <*> manyTerm annotation <*> type' <*> methodDeclarator <*> (throws <|> pure []))
+    makeMethod modifiers receiver (typeParams, annotations, returnType, (name, params), throws) body = Declaration.Method (returnType : modifiers ++ typeParams ++ annotations ++ throws) receiver name params body
 -- emptyTerm can be inserted at any position; if you have an optional term, you can use a maybe, but if you have for ex. an else statement,
 -- where we wanna assume the else position always exists, emptyTerm allows us to keep the semantics for if-else really simple because we can
 -- just provide it emptyTerm
@@ -290,6 +294,8 @@ method = makeTerm <$> symbol MethodDeclaration <*> children (
 -- ((a + b) + c)
 -- a + bc
 -- bc = (b + c)
+
+-- TODO: add genericType
 
 methodInvocation :: Assignment
 methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (Expression.Call [] <$> (callFunction <$> term expression <*> optional (token AnonDot *> term expression)) <*> argumentList <*> emptyTerm)
