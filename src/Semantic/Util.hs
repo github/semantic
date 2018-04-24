@@ -3,6 +3,7 @@
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.Util where
 
+import           Analysis.Abstract.BadAddresses
 import           Analysis.Abstract.BadModuleResolutions
 import           Analysis.Abstract.BadValues
 import           Analysis.Abstract.BadVariables
@@ -59,7 +60,7 @@ instance MonadAnalysis location term value effects m
 
 -- type TestEvaluating term = Evaluating Precise term (Value Precise)
 type JustEvaluating term = Evaluating (Located Precise term) term (Value (Located Precise term))
-type EvaluatingWithHoles term = BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term))))))
+type EvaluatingWithHoles term = BadAddresses (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term)))))))
 type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
 
 evalGoProject path = runAnalysis @(JustEvaluating Go.Term) <$> evaluateProject goParser Nothing path
