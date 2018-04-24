@@ -18,7 +18,7 @@ import Control.Abstract.Value as X
 import Control.Effect as X
 import Control.Effect.Fresh as X
 import Control.Monad.Effect.Fail as X
-import Control.Monad.Effect.Internal as X (relay)
+import Control.Monad.Effect.Internal as X (Eff, relay)
 import Control.Monad.Effect.NonDet as X
 import Control.Monad.Effect.Reader as X
 import Control.Monad.Effect.State as X
@@ -49,6 +49,9 @@ class MonadEvaluator location term value effects m => MonadAnalysis location ter
 
 class Effectful m => Interpreter effects result function m | m effects result -> function where
   interpret :: m effects result -> function
+
+instance Interpreter '[] result result Eff where
+  interpret = X.run
 
 
 -- | Lift a 'SubtermAlgebra' for an underlying analysis into a containing analysis. Use this when defining an analysis which can be composed onto other analyses to ensure that a call to 'analyzeTerm' occurs in the inner analysis and not the outer one.
