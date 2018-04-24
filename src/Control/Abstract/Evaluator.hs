@@ -18,15 +18,16 @@ module Control.Abstract.Evaluator
   , defaultEnvironment
   , withDefaultEnvironment
   , fullEnvironment
+  , localEnv
+  , localize
+  , lookupEnv
+  , lookupWith
+  -- Exports
   , getExports
   , putExports
   , modifyExports
   , addExport
   , withExports
-  , localEnv
-  , localize
-  , lookupEnv
-  , lookupWith
   -- Heap
   , getHeap
   , putHeap
@@ -91,6 +92,9 @@ class ( Effectful m
   -- | Get the current 'Configuration' with a passed-in term.
   getConfiguration :: Ord location => term -> m effects (Configuration location term value)
 
+
+-- State
+
 data EvaluatorState location term value = EvaluatorState
   { environment :: Environment location value
   , heap        :: Heap location value
@@ -110,6 +114,9 @@ instance (Ord location, Semigroup (Cell location value)) => Semigroup (Evaluator
 
 instance (Ord location, Semigroup (Cell location value)) => Empty (EvaluatorState location term value) where
   empty = EvaluatorState mempty mempty mempty mempty mempty mempty mempty
+
+
+-- Lenses
 
 _environment :: Lens' (EvaluatorState location term value) (Environment location value)
 _environment = lens environment (\ s e -> s {environment = e})
@@ -147,6 +154,8 @@ localEvaluatorState lens f action = do
   v <$ lens .= original
 
 
+-- Environment
+
 -- | Retrieve the environment.
 getEnv :: MonadEvaluator location term value effects m => m effects (Environment location value)
 getEnv = view _environment
@@ -180,6 +189,29 @@ withDefaultEnvironment e = raise . local (const e) . lower
 fullEnvironment :: MonadEvaluator location term value effects m => m effects (Environment location value)
 fullEnvironment = mappend <$> getEnv <*> defaultEnvironment
 
+-- | Run an action with a locally-modified environment.
+localEnv :: MonadEvaluator location term value effects m => (Environment location value -> Environment location value) -> m effects a -> m effects a
+localEnv f a = do
+  modifyEnv (f . Env.push)
+  result <- a
+  result <$ modifyEnv Env.pop
+
+-- | Run a computation in a new local environment.
+localize :: MonadEvaluator location term value effects m => m effects a -> m effects a
+localize = localEnv id
+
+-- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
+lookupEnv :: MonadEvaluator location term value effects m => Name -> m effects (Maybe (Address location value))
+lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
+
+-- | Look up a 'Name' in the environment, running an action with the resolved address (if any).
+lookupWith :: MonadEvaluator location term value effects m => (Address location value -> m effects a) -> Name -> m effects (Maybe a)
+lookupWith with name = do
+  addr <- lookupEnv name
+  maybe (pure Nothing) (fmap Just . with) addr
+
+
+-- Exports
 
 -- | Get the global export state.
 getExports :: MonadEvaluator location term value effects m => m effects (Exports location value)
@@ -204,27 +236,7 @@ withExports :: MonadEvaluator location term value effects m => Exports location 
 withExports s = localEvaluatorState _exports (const s)
 
 
--- | Run an action with a locally-modified environment.
-localEnv :: MonadEvaluator location term value effects m => (Environment location value -> Environment location value) -> m effects a -> m effects a
-localEnv f a = do
-  modifyEnv (f . Env.push)
-  result <- a
-  result <$ modifyEnv Env.pop
-
--- | Run a computation in a new local environment.
-localize :: MonadEvaluator location term value effects m => m effects a -> m effects a
-localize = localEnv id
-
--- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
-lookupEnv :: MonadEvaluator location term value effects m => Name -> m effects (Maybe (Address location value))
-lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
-
--- | Look up a 'Name' in the environment, running an action with the resolved address (if any).
-lookupWith :: MonadEvaluator location term value effects m => (Address location value -> m effects a) -> Name -> m effects (Maybe a)
-lookupWith with name = do
-  addr <- lookupEnv name
-  maybe (pure Nothing) (fmap Just . with) addr
-
+-- Heap
 
 -- | Retrieve the heap.
 getHeap :: MonadEvaluator location term value effects m => m effects (Heap location value)
@@ -254,6 +266,8 @@ assign :: ( Ord location
        -> m effects ()
 assign address = modifyHeap . heapInsert address
 
+
+-- Module table
 
 -- | Retrieve the table of evaluated modules.
 getModuleTable :: MonadEvaluator location term value effects m => m effects (ModuleTable (Environment location value, value))
@@ -301,6 +315,8 @@ currentModule = do
   maybeFail "unable to get currentModule" $ withSomeOrigin (originModule @term) o
 
 
+-- Control
+
 -- | Allocate a 'Label' for the given @term@.
 --
 --   Labels must be allocated before being jumped to with 'goto', but are suitable for nonlocal jumps; thus, they can be used to implement coroutines, exception handling, call with current continuation, and other esoteric control mechanisms.
@@ -315,6 +331,8 @@ label term = do
 goto :: MonadEvaluator location term value effects m => Label -> m effects term
 goto label = IntMap.lookup label <$> view _jumps >>= maybe (fail ("unknown label: " <> show label)) pure
 
+
+-- Exceptions
 
 throwResumable :: (Member (Resumable exc) effects, Effectful m) => exc v -> m effects v
 throwResumable = raise . Resumable.throwError
