@@ -48,11 +48,6 @@ view :: Member (State (EvaluatorState location term value)) effects => Getting a
 view lens = raise (gets (^. lens))
 
 
-instance Member (State (EvaluatorState location term value)) effects
-      => MonadHeap location value effects (Evaluating location term value) where
-  getHeap = view _heap
-  putHeap = (_heap .=)
-
 instance Members '[ Reader (ModuleTable [Module term])
                   , State (EvaluatorState location term value)
                   , Reader (SomeOrigin term)

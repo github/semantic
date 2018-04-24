@@ -13,7 +13,6 @@ import Prologue
 newtype DeadCode m (effects :: [* -> *]) a = DeadCode (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
-deriving instance MonadHeap location value effects m             => MonadHeap location value effects (DeadCode m)
 deriving instance MonadModuleTable location term value effects m => MonadModuleTable location term value effects (DeadCode m)
 deriving instance MonadEvaluator location term value effects m   => MonadEvaluator location term value effects (DeadCode m)
 

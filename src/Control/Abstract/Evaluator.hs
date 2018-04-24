@@ -64,7 +64,6 @@ class ( Effectful m
       , Member (State (EvaluatorState location term value)) effects
       , Monad (m effects)
       , MonadModuleTable location term value effects m
-      , MonadHeap location value effects m
       )
    => MonadEvaluator location term value (effects :: [* -> *]) m | m effects -> location term value where
   -- | Get the current 'Configuration' with a passed-in term.
@@ -210,6 +209,10 @@ class Monad (m effects) => MonadHeap location value (effects :: [* -> *]) m | m 
   getHeap :: m effects (Heap location value)
   -- | Set the heap.
   putHeap :: Heap location value -> m effects ()
+
+instance (Monad (m effects), MonadEvaluator location term value effects m) => MonadHeap location value effects m where
+  getHeap = view _heap
+  putHeap = (_heap .=)
 
 -- | Update the heap.
 modifyHeap :: MonadHeap location value effects m => (Heap location value -> Heap location value) -> m effects ()

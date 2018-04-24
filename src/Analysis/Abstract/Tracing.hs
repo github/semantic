@@ -16,7 +16,6 @@ import Prologue
 newtype Tracing (trace :: * -> *) m (effects :: [* -> *]) a = Tracing (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
 
-deriving instance MonadHeap location value effects m             => MonadHeap location value effects (Tracing trace m)
 deriving instance MonadModuleTable location term value effects m => MonadModuleTable location term value effects (Tracing trace m)
 deriving instance MonadEvaluator location term value effects m   => MonadEvaluator location term value effects (Tracing trace m)
 
