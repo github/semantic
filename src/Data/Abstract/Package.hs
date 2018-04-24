@@ -34,10 +34,7 @@ data Package term = Package
   deriving (Eq, Functor, Ord, Show)
 
 fromModules :: PackageName -> Maybe Version -> Maybe (Module term) -> Int -> [Module term] -> Package term
-fromModules name version prelude entryPoints = Package (PackageInfo name version) . go prelude
+fromModules name version prelude entryPoints modules =
+  Package (PackageInfo name version) (PackageBody (ModuleTable.fromModules modules) prelude entryPoints')
   where
-    go :: Maybe (Module term) -> [Module term] -> PackageBody term
-    go p []     = PackageBody mempty p mempty
-    go p modules = PackageBody (ModuleTable.fromModules modules) p entryPoints'
-      where
-        entryPoints' = ModuleTable . Map.fromList $ (,Nothing) . modulePath . moduleInfo <$> if entryPoints == 0 then modules else (take entryPoints modules)
+    entryPoints' = ModuleTable . Map.fromList $ (,Nothing) . modulePath . moduleInfo <$> if entryPoints == 0 then modules else (take entryPoints modules)
