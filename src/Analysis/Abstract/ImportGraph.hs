@@ -55,7 +55,7 @@ style = (defaultStyle vertexName)
         edgeAttributes _          _          = []
 
 newtype ImportGraphing m (effects :: [* -> *]) a = ImportGraphing (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail)
+  deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (ImportGraphing m)
 

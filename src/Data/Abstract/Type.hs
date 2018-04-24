@@ -35,7 +35,7 @@ data Type
 
 
 -- | Unify two 'Type's.
-unify :: MonadFail m => Type -> Type -> m Type
+unify :: (Effectful m, Applicative (m effects), Member Fail effects) => Type -> Type -> m effects Type
 unify (a1 :-> b1) (a2 :-> b2) = (:->) <$> unify a1 a2 <*> unify b1 b2
 unify a Null = pure a
 unify Null b = pure b
@@ -45,7 +45,7 @@ unify a (Var _) = pure a
 unify (Product as) (Product bs) = Product <$> sequenceA (alignWith (these pure pure unify) as bs)
 unify t1 t2
   | t1 == t2  = pure t2
-  | otherwise = fail ("cannot unify " ++ show t1 ++ " with " ++ show t2)
+  | otherwise = raise (fail ("cannot unify " ++ show t1 ++ " with " ++ show t2))
 
 
 instance Ord location => ValueRoots location Type where
@@ -54,10 +54,10 @@ instance Ord location => ValueRoots location Type where
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
 instance ( Alternative (m effects)
+         , Member Fail effects
          , Member Fresh effects
          , MonadAddressable location effects m
          , MonadEvaluator location term Type effects m
-         , MonadFail (m effects)
          , Reducer Type (Cell location Type)
          )
       => MonadValue location Type effects m where
@@ -91,9 +91,9 @@ instance ( Alternative (m effects)
 
   scopedEnvironment _ = pure mempty
 
-  asString _ = fail "Must evaluate to Value to use asString"
-  asPair _   = fail "Must evaluate to Value to use asPair"
-  asBool _ = fail "Must evaluate to Value to use asBool"
+  asString _ = raise (fail "Must evaluate to Value to use asString")
+  asPair _   = raise (fail "Must evaluate to Value to use asPair")
+  asBool _ = raise (fail "Must evaluate to Value to use asBool")
 
   isHole ty = pure (ty == Hole)
 
@@ -101,7 +101,7 @@ instance ( Alternative (m effects)
 
   liftNumeric _ Float = pure Float
   liftNumeric _ Int        = pure Int
-  liftNumeric _ _          = fail "Invalid type in unary numeric operation"
+  liftNumeric _ _          = raise (fail "Invalid type in unary numeric operation")
 
   liftNumeric2 _ left right = case (left, right) of
     (Float, Int) -> pure Float
@@ -109,10 +109,10 @@ instance ( Alternative (m effects)
     _                 -> unify left right
 
   liftBitwise _ Int = pure Int
-  liftBitwise _ t   = fail ("Invalid type passed to unary bitwise operation: " <> show t)
+  liftBitwise _ t   = raise (fail ("Invalid type passed to unary bitwise operation: " <> show t))
 
   liftBitwise2 _ Int Int = pure Int
-  liftBitwise2 _ t1 t2   = fail ("Invalid types passed to binary bitwise operation: " <> show (t1, t2))
+  liftBitwise2 _ t1 t2   = raise (fail ("Invalid types passed to binary bitwise operation: " <> show (t1, t2)))
 
   liftComparison (Concrete _) left right = case (left, right) of
     (Float, Int) ->                     pure Bool
@@ -126,7 +126,9 @@ instance ( Alternative (m effects)
   call op params = do
     tvar <- fresh
     paramTypes <- sequenceA params
-    _ :-> ret <- op `unify` (Product paramTypes :-> Var tvar)
-    pure ret
+    unified <- op `unify` (Product paramTypes :-> Var tvar)
+    case unified of
+      _ :-> ret -> pure ret
+      _         -> raise (fail "unification with a function produced something other than a function")
 
   loop f = f empty

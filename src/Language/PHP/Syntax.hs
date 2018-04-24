@@ -35,7 +35,7 @@ instance Evaluatable VariableName
 -- were defined inside that function.
 
 resolvePHPName :: MonadEvaluatable location term value effects m => ByteString -> m effects ModulePath
-resolvePHPName n = resolve [name] >>= maybeFail notFound
+resolvePHPName n = resolve [name] >>= maybeM (raise (fail notFound))
   where name = toName n
         notFound = "Unable to resolve: " <> name
         toName = BC.unpack . dropRelativePrefix . stripQuotes
@@ -366,7 +366,7 @@ instance Evaluatable Namespace where
   eval Namespace{..} = go names
     where
       names = freeVariables (subterm namespaceName)
-      go [] = fail "expected at least one free variable in namespaceName, found none"
+      go [] = raise (fail "expected at least one free variable in namespaceName, found none")
       -- The last name creates a closure over the namespace body.
       go [name] = letrec' name $ \addr ->
         subtermValue namespaceBody *> makeNamespace name addr []

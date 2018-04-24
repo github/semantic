@@ -19,7 +19,6 @@ import Prologue
 newtype Evaluating location term value effects a = Evaluating (Eff effects a)
   deriving (Applicative, Functor, Effectful, Monad)
 
-deriving instance Member Fail   effects => MonadFail   (Evaluating location term value effects)
 deriving instance Member NonDet effects => Alternative (Evaluating location term value effects)
 
 -- | Effects necessary for evaluating (whether concrete or abstract).

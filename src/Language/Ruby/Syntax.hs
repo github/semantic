@@ -93,7 +93,7 @@ instance Evaluatable Load where
     path <- subtermValue x >>= asString
     shouldWrap <- subtermValue wrap >>= asBool
     doLoad path shouldWrap
-  eval (Load _) = fail "invalid argument supplied to load, path is required"
+  eval (Load _) = raise (fail "invalid argument supplied to load, path is required")
 
 doLoad :: MonadEvaluatable location term value effects m => ByteString -> Bool -> m effects value
 doLoad path shouldWrap = do

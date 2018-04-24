@@ -6,7 +6,7 @@ import Data.Abstract.Evaluatable
 import Prologue
 
 newtype BadModuleResolutions m (effects :: [* -> *]) a = BadModuleResolutions (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail)
+  deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadModuleResolutions m)
 

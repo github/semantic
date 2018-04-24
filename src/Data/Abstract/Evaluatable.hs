@@ -50,6 +50,7 @@ type MonadEvaluatable location term value (effects :: [* -> *]) m =
   , Evaluatable (Base term)
   , FreeVariables term
   , Member (Exc.Exc (ControlThrow value)) effects
+  , Member Fail effects
   , Member (Resumable (Unspecialized value)) effects
   , Member (Resumable (ValueError location value)) effects
   , Member (Resumable (LoadError term value)) effects
@@ -58,7 +59,6 @@ type MonadEvaluatable location term value (effects :: [* -> *]) m =
   , Member (Resumable (AddressError location value)) effects
   , MonadAddressable location effects m
   , MonadAnalysis location term value effects m
-  , MonadFail (m effects)
   , MonadValue location value effects m
   , Recursive term
   , Reducer value (Cell location value)
