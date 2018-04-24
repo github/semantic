@@ -26,7 +26,6 @@ type EvaluatingEffects location term value
   = '[ Exc (ReturnThrow value)
      , Exc (LoopThrow value)
      , Resumable (LoadError term value)
-     , Resumable (Unspecialized value)
      , Fail                                        -- Failure with an error message
      , Fresh                                       -- For allocating new addresses and/or type variables.
      , Reader (SomeOrigin term)                    -- The current term’s origin.
@@ -66,11 +65,10 @@ instance ( Ord location
       => Interpreter
           (EvaluatingEffects location term value) result
           (  Either String
-            (Either (SomeExc (Unspecialized value))
             (Either (SomeExc (LoadError term value))
             (Either (LoopThrow value)
             (Either (ReturnThrow value)
-            result))))
+            result)))
           , EvaluatorState location term value)
           (Evaluating location term value) where
   interpret
@@ -81,7 +79,6 @@ instance ( Ord location
     . flip runReader mempty -- Reader (SomeOrigin term)
     . runEffect
     . runFail
-    . Res.runError
     . Res.runError
     . Exc.runError
     . Exc.runError

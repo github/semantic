@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeApplications, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Quiet
 ( Quietly
 ) where
@@ -25,13 +25,20 @@ instance ( Effectful m
          , MonadValue location value effects (Quietly m)
          )
       => MonadAnalysis location term value effects (Quietly m) where
-  type Effects location term value (Quietly m) = Effects location term value m
+  type Effects location term value (Quietly m) = Resumable (Unspecialized value) ': Effects location term value m
 
   analyzeTerm eval term = resume @(Unspecialized value) (liftAnalyze analyzeTerm eval term) (\yield err@(Unspecialized _) ->
           traceM ("Unspecialized:" <> show err) >> hole >>= yield)
 
   analyzeModule = liftAnalyze analyzeModule
 
-instance Interpreter effects result rest m
-      => Interpreter effects result rest (Quietly m) where
-  interpret (Quietly m) = interpret m
+instance ( Interpreter effects result rest m
+         , MonadValue location value effects m
+         )
+      => Interpreter (Resumable (Unspecialized value) ': effects) result rest (Quietly m) where
+  interpret
+    = interpret
+    . raise @m
+    . relay pure (\ (Resumable err) yield -> case err of
+      Unspecialized _ -> lower @m hole >>= yield)
+    . lower

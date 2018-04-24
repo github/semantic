@@ -47,8 +47,9 @@ type JustEvaluating term
   = Erroring (AddressError (Located Precise term) (Value (Located Precise term)))
   ( Erroring (EvalError (Value (Located Precise term)))
   ( Erroring (ResolutionError (Value (Located Precise term)))
+  ( Erroring (Unspecialized (Value (Located Precise term)))
   ( Erroring (ValueError (Located Precise term) (Value (Located Precise term)))
-  ( Evaluating (Located Precise term) term (Value (Located Precise term))))))
+  ( Evaluating (Located Precise term) term (Value (Located Precise term)))))))
 type EvaluatingWithHoles term = BadAddresses (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term)))))))
 type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
 
