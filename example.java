@@ -1,5 +1,6 @@
-public final class Exceptions {
-  private Exceptions() {
-      throw new IllegalStateException("No instances!");
+@Override
+class Quack {
+  <@Hello(foo = "hi") T>Bird() {
+
   }
 }

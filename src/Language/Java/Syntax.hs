@@ -97,3 +97,33 @@ instance Show1 Constructor where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Constructor
 instance Evaluatable Constructor
+
+data TypeParameter a = TypeParameter { typeParamAnnotation :: ![a], typeParamIdentifier :: !a, typeParamTypeBound :: ![a]}
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 TypeParameter where liftEq = genericLiftEq
+instance Ord1 TypeParameter where liftCompare = genericLiftCompare
+instance Show1 TypeParameter where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for TypeParameter
+instance Evaluatable TypeParameter
+
+data Annotation a = Annotation { annotationName :: !a, annotationField :: [a]}
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 Annotation where liftEq = genericLiftEq
+instance Ord1 Annotation where liftCompare = genericLiftCompare
+instance Show1 Annotation where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for Annotation
+instance Evaluatable Annotation
+
+data AnnotationField a = AnnotationField { annotationFieldName :: a, annotationFieldValue :: a }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 AnnotationField where liftEq = genericLiftEq
+instance Ord1 AnnotationField where liftCompare = genericLiftCompare
+instance Show1 AnnotationField where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for AnnotationField
+instance Evaluatable AnnotationField

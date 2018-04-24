@@ -43,6 +43,8 @@ type Syntax =
    , Expression.MemberAccess
    , Expression.Super
    , Expression.This
+   , Java.Syntax.Annotation
+   , Java.Syntax.AnnotationField
    , Java.Syntax.Asterisk
    , Java.Syntax.Constructor
    , Java.Syntax.EnumDeclaration
@@ -51,6 +53,7 @@ type Syntax =
    , Java.Syntax.New
    , Java.Syntax.Package
    , Java.Syntax.Synchronized
+   , Java.Syntax.TypeParameter
    , Java.Syntax.Variable
    , Literal.Array
    , Literal.Boolean
@@ -172,11 +175,38 @@ expressionChoices =
   , localVariableDeclarationStatement
   , while
   ]
-  -- adding something to expressionChoices list is useful because expression (above) uses expressionChoices, and so
-  -- it is available to form assignments when we encounter any of those terms
 
 modifier :: Assignment
-modifier = makeTerm <$> symbol Modifier <*> (Syntax.AccessibilityModifier <$> source)
+modifier = make <$> symbol Modifier <*> children(Left <$> annotation <|> Right . Syntax.AccessibilityModifier <$> source)
+  where
+    make loc (Right modifier) = makeTerm loc modifier
+    make _ (Left annotation) = annotation
+-- if we don't match the annotation we will match the token
+-- don't do this if you have more than one word possible
+-- left fmap
+-- right - composing the right function after wrapping the bytestring of source in the accessibilityModifier syntax, then compose that with right function
+-- this enables us to have the same type in both places (either term (syntax.accessibilityModifier term))
+-- whack error∷/Users/aymannadeem/github/semantic-diff/src/Language/Java/Assignment.hs:180:69: error:
+--     • Couldn't match type ‘Syntax.AccessibilityModifier a0’
+--                      with ‘Term.Term (Union Syntax) (Record Location)’
+--       Expected type: Control.Monad.Free.Freer.Freer
+--                        (Assigning.Assignment.Tracing
+--                           (Assigning.Assignment.AssignmentF [] Grammar))
+--                        Term
+--         Actual type: Control.Monad.Free.Freer.Freer
+--                        (Assigning.Assignment.Tracing
+--                           (Assigning.Assignment.AssignmentF [] Grammar))
+--                        (Syntax.AccessibilityModifier a0)
+--     • In the second argument of ‘(<|>)’, namely
+--         ‘Syntax.AccessibilityModifier <$> source’
+--       In the first argument of ‘children’, namely
+--         ‘(annotation <|> Syntax.AccessibilityModifier <$> source)’
+--       In the second argument of ‘(<*>)’, namely
+--         ‘children (annotation <|> Syntax.AccessibilityModifier <$> source)’
+--     |
+-- 180 | modifier = makeTerm <$> symbol Modifier <*> children(annotation <|> Syntax.AccessibilityModifier <$> source)
+--     |                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-- Failed, 118 modules loaded.
 
 arrayInitializer :: Assignment
 arrayInitializer = makeTerm <$> symbol ArrayInitializer <*> (Literal.Array <$> many expression)
@@ -195,7 +225,6 @@ localVariableDeclaration = makeDecl <$> symbol LocalVariableDeclaration <*> chil
     makeDecl loc (modifiers, type', decls) = makeTerm'' loc $ fmap (makeSingleDecl modifiers type') decls -- we need loc here because it's the outermost node that comprises the list of all things
     vDeclList = symbol VariableDeclaratorList *> children (some variableDeclarator)
     variableDeclarator = symbol VariableDeclarator *> children ((,) <$> variableDeclaratorId <*> optional expression)
--- function arg
 
 localVariableDeclarationStatement :: Assignment
 localVariableDeclarationStatement = symbol LocalVariableDeclarationStatement *> children localVariableDeclaration
@@ -307,6 +336,7 @@ type' =  choice [
      , makeTerm <$> token BooleanType <*> pure Type.Bool
      , symbol ArrayType *> children (array <$> type' <*> dims)
      , symbol CatchType *> children (term type')
+     , symbol ExceptionType *> children (term type')
      , identifier
     ]
     where array type' = foldl (\into each -> makeTerm1 (Type.Array (Just each) into)) type'
@@ -504,13 +534,31 @@ constructorDeclaration = makeTerm <$> symbol ConstructorDeclaration <*> children
       constructor modifiers (typeParameters, identifier, formalParameters) = Java.Syntax.Constructor modifiers typeParameters identifier formalParameters -- let partial application do its thing
 
 typeParameters :: Assignment.Assignment [] Grammar [Term]
-typeParameters = symbol TypeParameters *> children (pure [])
+typeParameters = symbol TypeParameters *> children (manyTerm typeParam) -- this produces a list, which is what we need to return given by the type definition
+  where
+    typeParam = makeTerm <$> symbol Grammar.TypeParameter <*> children (Java.Syntax.TypeParameter <$> manyTerm annotation <*> term identifier <*> (typeBound <|> pure [])) -- wrapping up all three of those fields so we need to makeTerm (producing a term here)
+    typeBound = symbol TypeBound *> children (manyTerm type')
 -- stubbing in so deals with empty list
 -- come back and populate this
+-- optional combinator produces type Maybe
+-- instead of optional and maybe, we have that arg as a list now and we say we either produce the list or an empty list via pure []
+
+annotation :: Assignment
+annotation = makeTerm <$> symbol NormalAnnotation <*> children (Java.Syntax.Annotation <$> term expression <*> (elementValuePairList <|> pure []))
+         <|> makeTerm <$> symbol MarkerAnnotation <*> children (Java.Syntax.Annotation <$> term expression <*> pure [])
+         <|> makeTerm <$> symbol SingleElementAnnotation <*> children (Java.Syntax.Annotation <$> term expression <*> (pure <$> term elementValue))
+         where
+           elementValuePairList = symbol ElementValuePairList *> children (manyTerm elementValuePair)
+           elementValuePair = makeTerm <$> symbol ElementValuePair <*> children (Java.Syntax.AnnotationField <$> term expression <*> term elementValue)
+           elementValue = symbol ElementValue *> children (term expression)
+-- pure over lists can produce single element lists; wrapping the expression in a list
+-- elementValue, we don't have syntax to construct; we only construct syntax when we're making a node
 
 throws :: Assignment.Assignment [] Grammar [Term]
-throws = symbol Throws *> children (pure [])
--- TODO: come back and assign
+throws = symbol Throws *> children (symbol ExceptionTypeList *> children(manyTerm type'))
+-- discard the symbol and get the result of rule
+-- match a throws node, and apply the rest of the to its children
+-- we are matching the structure in the grammar
 
 formalParameters :: Assignment.Assignment [] Grammar [Term]
 formalParameters = manyTerm parameter
