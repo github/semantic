@@ -15,6 +15,7 @@ module Control.Abstract.Evaluator
   , modifyModuleTable
   , modifyLoadStack
   , MonadControl(..)
+  -- Exceptions
   , throwResumable
   , throwException
   , catchException
