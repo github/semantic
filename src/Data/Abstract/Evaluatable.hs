@@ -49,13 +49,13 @@ type MonadEvaluatable location term value (effects :: [* -> *]) m =
   , Effectful m
   , Evaluatable (Base term)
   , FreeVariables term
+  , Member (Exc.Exc (ControlThrow value)) effects
   , Member (Resumable (Unspecialized value)) effects
   , Member (Resumable (ValueError location value)) effects
   , Member (Resumable (LoadError term value)) effects
   , Member (Resumable (EvalError value)) effects
   , Member (Resumable (ResolutionError value)) effects
   , Member (Resumable (AddressError location value)) effects
-  , Member (Exc.Exc (ControlThrow value)) effects
   , MonadAddressable location effects m
   , MonadAnalysis location term value effects m
   , MonadFail (m effects)
