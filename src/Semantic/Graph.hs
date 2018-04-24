@@ -81,9 +81,8 @@ graphImports :: ( Show ann
                 , Apply Show1 syntax
                 , Member Syntax.Identifier syntax
                 , Members '[Exc SomeException, Task] effs
-                , term ~ Term (Union syntax) ann
                 )
-             => Package term -> Eff effs Abstract.ImportGraph
+             => Package (Term (Union syntax) ann) -> Eff effs Abstract.ImportGraph
 graphImports package = analyze (Analysis.SomeAnalysis (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package)) >>= extractGraph
   where
     asAnalysisForTypeOfPackage :: ImportGraphAnalysis term effs value
