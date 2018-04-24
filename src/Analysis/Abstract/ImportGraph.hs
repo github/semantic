@@ -98,8 +98,7 @@ moduleGraph = maybe empty (vertex . Module . BC.pack . modulePath) . withSomeOri
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: forall m location term value effects
-                 .  ( Member (Reader (SomeOrigin term)) effects
-                    , Member (State ImportGraph) effects
+                 .  ( Member (State ImportGraph) effects
                     , MonadEvaluator location term value effects m
                     )
                  => Vertex
@@ -110,8 +109,7 @@ packageInclusion v = do
 
 -- | Add an edge from the current module to the passed vertex.
 moduleInclusion :: forall m location term value effects
-                .  ( Member (Reader (SomeOrigin term)) effects
-                   , Member (State ImportGraph) effects
+                .  ( Member (State ImportGraph) effects
                    , MonadEvaluator location term value effects m
                    )
                 => Vertex
