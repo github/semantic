@@ -59,7 +59,6 @@ import Prologue
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
 class ( Effectful m
-      , Member Fail effects
       , Member (Reader (Environment location value)) effects
       , Member (Reader (ModuleTable [Module term])) effects
       , Member (Reader (SomeOrigin term)) effects
