@@ -1,6 +1,5 @@
-@Override
 class Quack {
-  <@Hello(foo = "hi") T>Bird() {
-
+  void hello() {
+    "woooo";
   }
 }

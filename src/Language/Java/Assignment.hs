@@ -270,14 +270,26 @@ identifier = makeTerm <$> (symbol Identifier <|> symbol TypeIdentifier) <*> (Syn
 scopedIdentifier :: Assignment
 scopedIdentifier = makeTerm <$> symbol ScopedIdentifier <*> children (Expression.MemberAccess <$> term expression <*> term expression)
 
+-- refactor method declaration to have clearly understandable top-level rule + sub-rules broken out in the where so it's easier to reason about
 method :: Assignment
 method = makeTerm <$> symbol MethodDeclaration <*> children (
-             (makeMethod <$> many modifier <* symbol MethodHeader <*> emptyTerm <*> children ((,) <$> type' <* symbol MethodDeclarator <*> children ( (,) <$> identifier <*> formalParameters)) )
-          <* symbol MethodBody <*> children (makeTerm <$> symbol Block <*> children (manyTerm expression))
-          )
-  where makeMethod modifiers receiver (returnType, (name, params)) body = Declaration.Method (returnType : modifiers) receiver name params body
-
+         makeMethod <$> many modifier <*> emptyTerm <*> methodHeader <*> methodBody)
+  where
+    methodBody = symbol MethodBody *> children (term expression)
+    methodDeclarator = symbol MethodDeclarator *> children ( (,) <$> identifier <*> formalParameters)
+    methodHeader = symbol MethodHeader *> children ((,) <$> type' <*> methodDeclarator)
+    makeMethod modifiers receiver (returnType, (name, params)) body = Declaration.Method (returnType : modifiers) receiver name params body
+-- emptyTerm can be inserted at any position; if you have an optional term, you can use a maybe, but if you have for ex. an else statement,
+-- where we wanna assume the else position always exists, emptyTerm allows us to keep the semantics for if-else really simple because we can
+-- just provide it emptyTerm
+-- emptyTerm just pattern matches; always produces a term.
+-- current location will be the methodHeader node.
 -- TODO: re-introduce makeTerm later; matching types as part of the type rule for now.
+-- full apply vs. half, what we want to retain
+-- before we had a left-associative chain where we were discarding the
+-- ((a + b) + c)
+-- a + bc
+-- bc = (b + c)
 
 methodInvocation :: Assignment
 methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (Expression.Call [] <$> (callFunction <$> term expression <*> optional (token AnonDot *> term expression)) <*> argumentList <*> emptyTerm)
