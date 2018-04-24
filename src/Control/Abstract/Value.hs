@@ -171,7 +171,7 @@ doWhile body cond = loop $ \ continue -> body *> do
 
 makeNamespace :: ( MonadValue location value effects m
                  , MonadEnvironment location value effects m
-                 , MonadHeap location value effects m
+                 , MonadEvaluator location term value effects m
                  , Ord location
                  , Reducer value (Cell location value)
                  )

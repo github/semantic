@@ -30,7 +30,7 @@ lookupOrAlloc name = lookupEnv name >>= maybe (alloc name) pure
 
 letrec :: ( MonadAddressable location effects m
           , MonadEnvironment location value effects m
-          , MonadHeap location value effects m
+          , MonadEvaluator location term value effects m
           , Reducer value (Cell location value)
           )
        => Name
@@ -67,7 +67,7 @@ instance (Alternative (m effects), MonadFresh (m effects)) => MonadAddressable M
   allocLoc = pure . Monovariant
 
 -- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
-deref :: (Effectful m, Member (Resumable (AddressError location value)) effects, MonadAddressable location effects m, MonadHeap location value effects m) => Address location value -> m effects value
+deref :: (Member (Resumable (AddressError location value)) effects, MonadAddressable location effects m, MonadEvaluator location term value effects m) => Address location value -> m effects value
 deref addr = lookupHeap addr >>= maybe (throwAddressError (UninitializedAddress addr)) (derefCell addr)
 
 alloc :: MonadAddressable location effects m => Name -> m effects (Address location value)

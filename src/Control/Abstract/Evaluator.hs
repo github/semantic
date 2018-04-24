@@ -15,7 +15,9 @@ module Control.Abstract.Evaluator
   , modifyExports
   , addExport
   , fullEnvironment
-  , MonadHeap(..)
+  -- Heap
+  , getHeap
+  , putHeap
   , modifyHeap
   , localize
   , lookupHeap
@@ -212,30 +214,27 @@ addExport name alias = modifyExports . Export.insert name alias
 fullEnvironment :: MonadEnvironment location value effects m => m effects (Environment location value)
 fullEnvironment = mappend <$> getEnv <*> defaultEnvironment
 
--- | A 'Monad' abstracting a heap of values.
-class Monad (m effects) => MonadHeap location value (effects :: [* -> *]) m | m effects -> location value where
-  -- | Retrieve the heap.
-  getHeap :: m effects (Heap location value)
-  -- | Set the heap.
-  putHeap :: Heap location value -> m effects ()
+-- | Retrieve the heap.
+getHeap :: MonadEvaluator location term value effects m => m effects (Heap location value)
+getHeap = view _heap
 
-instance (Monad (m effects), MonadEvaluator location term value effects m) => MonadHeap location value effects m where
-  getHeap = view _heap
-  putHeap = (_heap .=)
+-- | Set the heap.
+putHeap :: MonadEvaluator location term value effects m => Heap location value -> m effects ()
+putHeap = (_heap .=)
 
 -- | Update the heap.
-modifyHeap :: MonadHeap location value effects m => (Heap location value -> Heap location value) -> m effects ()
+modifyHeap :: MonadEvaluator location term value effects m => (Heap location value -> Heap location value) -> m effects ()
 modifyHeap f = do
   s <- getHeap
   putHeap $! f s
 
 -- | Look up the cell for the given 'Address' in the 'Heap'.
-lookupHeap :: (MonadHeap location value effects m, Ord location) => Address location value -> m effects (Maybe (Cell location value))
+lookupHeap :: (MonadEvaluator location term value effects m, Ord location) => Address location value -> m effects (Maybe (Cell location value))
 lookupHeap = flip fmap getHeap . heapLookup
 
 -- | Write a value to the given 'Address' in the 'Store'.
 assign :: ( Ord location
-          , MonadHeap location value effects m
+          , MonadEvaluator location term value effects m
           , Reducer value (Cell location value)
           )
        => Address location value

@@ -57,7 +57,6 @@ instance ( Alternative (m effects)
          , MonadEnvironment location Type effects m
          , MonadFail (m effects)
          , MonadFresh (m effects)
-         , MonadHeap location Type effects m
          , Reducer Type (Cell location Type)
          )
       => MonadValue location Type effects m where
