@@ -20,7 +20,7 @@ type CachingEffects location term value effects
 
 -- | A (coinductively-)cached analysis suitable for guaranteeing termination of (suitably finitized) analyses over recursive programs.
 newtype Caching m (effects :: [* -> *]) a = Caching (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
+  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail)
 
 deriving instance MonadEvaluator location term value effects m   => MonadEvaluator location term value effects (Caching m)
 
@@ -64,9 +64,9 @@ instance ( Effectful m
 instance ( Alternative (m effects)
          , Corecursive term
          , Effectful m
+         , Member Fresh effects
          , Members (CachingEffects location term value '[]) effects
          , MonadAnalysis location term value effects m
-         , MonadFresh (m effects)
          , Ord (Cell location value)
          , Ord location
          , Ord term

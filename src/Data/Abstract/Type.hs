@@ -54,10 +54,10 @@ instance Ord location => ValueRoots location Type where
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
 instance ( Alternative (m effects)
+         , Member Fresh effects
          , MonadAddressable location effects m
          , MonadEvaluator location term Type effects m
          , MonadFail (m effects)
-         , MonadFresh (m effects)
          , Reducer Type (Cell location Type)
          )
       => MonadValue location Type effects m where

@@ -5,7 +5,7 @@ import Control.Abstract.Analysis
 import Prologue
 
 newtype BadAddresses m (effects :: [* -> *]) a = BadAddresses (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
+  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail)
 
 deriving instance MonadEvaluator location term value effects m   => MonadEvaluator location term value effects (BadAddresses m)
 

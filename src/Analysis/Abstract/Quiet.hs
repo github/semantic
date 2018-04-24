@@ -15,7 +15,7 @@ import Prologue
 --
 --   Note that exceptions thrown by other analyses may not be caught if 'Quietly' doesn’t know about them, i.e. if they’re not part of the generic 'MonadValue', 'MonadAddressable', etc. machinery.
 newtype Quietly m (effects :: [* -> *]) a = Quietly (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
+  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail)
 
 deriving instance MonadEvaluator location term value effects m   => MonadEvaluator location term value effects (Quietly m)
 

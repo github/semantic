@@ -14,7 +14,7 @@ import Prelude hiding (fail)
 import Prologue
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Heap.
-class (MonadFresh (m effects), Ord location) => MonadAddressable location (effects :: [* -> *]) m where
+class (Effectful m, Member Fresh effects, Monad (m effects), Ord location) => MonadAddressable location (effects :: [* -> *]) m where
   derefCell :: Address location value -> Cell location value -> m effects value
 
   allocLoc :: Name -> m effects location
@@ -56,12 +56,12 @@ letrec' name body = do
 -- Instances
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
-instance (MonadFail (m effects), MonadFresh (m effects)) => MonadAddressable Precise effects m where
+instance (Effectful m, Member Fresh effects, MonadFail (m effects)) => MonadAddressable Precise effects m where
   derefCell addr = maybeM (uninitializedAddress addr) . unLatest
   allocLoc _ = Precise <$> fresh
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
-instance (Alternative (m effects), MonadFresh (m effects)) => MonadAddressable Monovariant effects m where
+instance (Alternative (m effects), Effectful m, Member Fresh effects, Monad (m effects)) => MonadAddressable Monovariant effects m where
   derefCell _ = foldMapA pure
   allocLoc = pure . Monovariant
 
