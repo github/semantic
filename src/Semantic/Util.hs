@@ -1,5 +1,5 @@
 -- MonoLocalBinds is to silence a warning about a simplifiable constraint.
-{-# LANGUAGE MonoLocalBinds, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, MonoLocalBinds, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.Util where
 
@@ -40,6 +40,22 @@ import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 
+-- | An analysis that fails on errors.
+newtype Erroring m (effects :: [* -> *]) a = Erroring (m effects a)
+  deriving (Alternative, Applicative, Effectful, Functor, Monad)
+
+deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Erroring m)
+instance MonadAnalysis location term value effects m
+      => MonadAnalysis location term value effects (Erroring m) where
+  type Effects location term value (Erroring m)
+    = Resumable (AddressError location value)
+   ': Resumable (EvalError value)
+   ': Resumable (ResolutionError value)
+   ': Resumable (ValueError location value)
+   ': Effects location term value m
+
+  analyzeTerm = liftAnalyze analyzeTerm
+  analyzeModule = liftAnalyze analyzeModule
 
 -- type TestEvaluating term = Evaluating Precise term (Value Precise)
 type JustEvaluating term = Evaluating (Located Precise term) term (Value (Located Precise term))
