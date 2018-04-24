@@ -50,13 +50,15 @@ evalGoProject path = runAnalysis @(JustEvaluating Go.Term) <$> evaluateProject g
 evalRubyProject path = runAnalysis @(JustEvaluating Ruby.Term) <$> evaluateProject rubyParser Language.Ruby rubyPrelude path
 evalPHPProject path = runAnalysis @(JustEvaluating PHP.Term) <$> evaluateProject phpParser Language.PHP Nothing path
 evalPythonProject path = runAnalysis @(JustEvaluating Python.Term) <$> evaluateProject pythonParser Language.Python pythonPrelude path
-evalTypeScriptProject path = runAnalysis @(EvaluatingWithHoles TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
+evalTypeScriptProjectQuietly path = runAnalysis @(EvaluatingWithHoles TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
+evalTypeScriptProject path = runAnalysis @(JustEvaluating TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
 
 rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Language.Ruby)
 pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Language.Python)
 
 -- Evaluate a project, starting at a single entrypoint.
 evaluateProject parser lang prelude path = evaluatePackage <$> runTask (readProject path lang >>= parsePackage parser prelude)
+evaluateProjectEntry parser lang prelude path = evaluatePackage <$> runTask (readProjectEntry path lang >>= parsePackage parser prelude)
 
 parseFile :: Parser term -> FilePath -> IO term
 parseFile parser = runTask . (parse parser <=< readBlob . file)
