@@ -20,9 +20,16 @@ module Control.Abstract.Evaluator
   , localize
   , lookupHeap
   , assign
-  , MonadModuleTable(..)
+  -- Module tables
+  , getModuleTable
+  , putModuleTable
   , modifyModuleTable
+  , askModuleTable
+  , localModuleTable
+  , getLoadStack
+  , putLoadStack
   , modifyLoadStack
+  , currentModule
   -- Control
   , label
   , goto
@@ -237,51 +244,50 @@ assign :: ( Ord location
 assign address = modifyHeap . heapInsert address
 
 
--- | A 'Monad' abstracting tables of modules available for import.
-class Monad (m effects) => MonadModuleTable location term value (effects :: [* -> *]) m | m effects -> location term value where
-  -- | Retrieve the table of evaluated modules.
-  getModuleTable :: m effects (ModuleTable (Environment location value, value))
-  -- | Set the table of evaluated modules.
-  putModuleTable :: ModuleTable (Environment location value, value) -> m effects ()
+-- | Retrieve the table of evaluated modules.
+getModuleTable :: MonadEvaluator location term value effects m => m effects (ModuleTable (Environment location value, value))
+getModuleTable = view _modules
 
-  -- | Retrieve the table of unevaluated modules.
-  askModuleTable :: m effects (ModuleTable [Module term])
-  -- | Run an action with a locally-modified table of unevaluated modules.
-  localModuleTable :: (ModuleTable [Module term] -> ModuleTable [Module term]) -> m effects a -> m effects a
-
-  -- | Retrieve the module load stack
-  getLoadStack :: m effects LoadStack
-  -- | Set the module load stack
-  putLoadStack :: LoadStack -> m effects ()
-
-  -- | Get the currently evaluating 'ModuleInfo'.
-  currentModule :: m effects ModuleInfo
-
-instance (Monad (m effects), MonadEvaluator location term value effects m) => MonadModuleTable location term value effects m where
-  getModuleTable = view _modules
-  putModuleTable = (_modules .=)
-
-  askModuleTable = raise ask
-  localModuleTable f a = raise (local f (lower a))
-
-  getLoadStack = view _loadStack
-  putLoadStack = (_loadStack .=)
-
-  currentModule = do
-    o <- raise ask
-    maybeFail "unable to get currentModule" $ withSomeOrigin (originModule @term) o
+-- | Set the table of evaluated modules.
+putModuleTable :: MonadEvaluator location term value effects m => ModuleTable (Environment location value, value) -> m effects ()
+putModuleTable = (_modules .=)
 
 -- | Update the evaluated module table.
-modifyModuleTable :: MonadModuleTable location term value effects m => (ModuleTable (Environment location value, value) -> ModuleTable (Environment location value, value)) -> m effects ()
+modifyModuleTable :: MonadEvaluator location term value effects m => (ModuleTable (Environment location value, value) -> ModuleTable (Environment location value, value)) -> m effects ()
 modifyModuleTable f = do
   table <- getModuleTable
   putModuleTable $! f table
 
+
+-- | Retrieve the table of unevaluated modules.
+askModuleTable :: MonadEvaluator location term value effects m => m effects (ModuleTable [Module term])
+askModuleTable = raise ask
+
+-- | Run an action with a locally-modified table of unevaluated modules.
+localModuleTable :: MonadEvaluator location term value effects m => (ModuleTable [Module term] -> ModuleTable [Module term]) -> m effects a -> m effects a
+localModuleTable f a = raise (local f (lower a))
+
+
+-- | Retrieve the module load stack
+getLoadStack :: MonadEvaluator location term value effects m => m effects LoadStack
+getLoadStack = view _loadStack
+
+-- | Set the module load stack
+putLoadStack :: MonadEvaluator location term value effects m => LoadStack -> m effects ()
+putLoadStack = (_loadStack .=)
+
 -- | Update the module load stack.
-modifyLoadStack :: MonadModuleTable location term value effects m => (LoadStack -> LoadStack) -> m effects ()
+modifyLoadStack :: MonadEvaluator location term value effects m => (LoadStack -> LoadStack) -> m effects ()
 modifyLoadStack f = do
   stack <- getLoadStack
   putLoadStack $! f stack
+
+
+-- | Get the currently evaluating 'ModuleInfo'.
+currentModule :: forall location term value effects m . MonadEvaluator location term value effects m => m effects ModuleInfo
+currentModule = do
+  o <- raise ask
+  maybeFail "unable to get currentModule" $ withSomeOrigin (originModule @term) o
 
 
 -- | Allocate a 'Label' for the given @term@.
