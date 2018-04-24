@@ -10,7 +10,7 @@ import Data.Abstract.Address
 import Data.Abstract.Environment as Env
 import Data.Align (alignWith)
 import Data.Semigroup.Reducer (Reducer)
-import Prelude hiding (fail)
+import Prelude
 import Prologue hiding (TypeError)
 
 type TName = Int
