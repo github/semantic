@@ -70,8 +70,7 @@ type ImportGraphAnalysis term effects value =
     value
 
 -- | Render the import graph for a given 'Package'.
-graphImports :: (
-                  Show ann
+graphImports :: ( Show ann
                 , Ord ann
                 , Apply Analysis.Declarations1 syntax
                 , Apply Analysis.Evaluatable syntax
