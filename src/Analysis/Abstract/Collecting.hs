@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Collecting
 ( Collecting
 ) where
@@ -76,3 +76,10 @@ reachable roots heap = go mempty roots
           Just (a, as) -> go (liveInsert a seen) (case heapLookupAll a heap of
             Just values -> liveDifference (foldr ((<>) . valueRoots) mempty values <> as) seen
             _           -> seen)
+
+
+instance ( Interpreter effects result rest m
+         , Ord location
+         )
+      => Interpreter (Reader (Live location value) ': effects) result rest (Collecting m) where
+  interpret = interpret . raise @m . flip runReader mempty . lower
