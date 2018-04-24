@@ -13,7 +13,6 @@ import Data.Abstract.Address
 import Data.Abstract.Environment (Environment, unpairs)
 import Data.Abstract.FreeVariables
 import qualified Data.Map as Map
-import Data.Semigroup.Reducer
 
 -- | A map of export names to an alias & address tuple.
 newtype Exports l a = Exports { unExports :: Map.Map Name (Name, Maybe (Address l a)) }
