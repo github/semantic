@@ -4,9 +4,11 @@ module Analysis.Abstract.Evaluating
 ) where
 
 import Control.Abstract.Analysis
-import Control.Monad.Effect
+import Control.Monad.Effect.Exception as Exc
+import Control.Monad.Effect.Resumable as Res
+import Data.Abstract.Address
 import Data.Abstract.Configuration
-import Data.Abstract.Environment as Env
+import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
@@ -56,3 +58,31 @@ instance ( Corecursive term
   analyzeTerm eval term = pushOrigin (termOrigin (embedSubterm term)) (eval term)
 
   analyzeModule eval m = pushOrigin (moduleOrigin (subterm <$> m)) (eval m)
+
+
+instance ( Ord location
+         , Semigroup (Cell location value)
+         )
+      => Interpreter
+          (EvaluatingEffects location term value) result
+          (  Either String
+            (Either (SomeExc (Unspecialized value))
+            (Either (SomeExc (LoadError term value))
+            (Either (LoopThrow value)
+            (Either (ReturnThrow value)
+            result))))
+          , EvaluatorState location term value)
+          (Evaluating location term value) where
+  interpret
+    = interpret
+    . flip runState (EvaluatorState mempty mempty mempty mempty mempty mempty mempty)
+    . flip runReader mempty -- Reader (Environment location value)
+    . flip runReader mempty -- Reader (ModuleTable [Module term])
+    . flip runReader mempty -- Reader (SomeOrigin term)
+    . runEffect
+    . runFail
+    . Res.runError
+    . Res.runError
+    . Exc.runError
+    . Exc.runError
+    . lower
