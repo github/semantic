@@ -1,4 +1,4 @@
-{-# LANGUAGE FunctionalDependencies, GADTs, Rank2Types, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FunctionalDependencies, GADTs, KindSignatures, Rank2Types #-}
 module Control.Abstract.Value
 ( MonadValue(..)
 , Comparator(..)
