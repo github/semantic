@@ -23,7 +23,9 @@ module Control.Abstract.Evaluator
   , MonadModuleTable(..)
   , modifyModuleTable
   , modifyLoadStack
-  , MonadControl(..)
+  -- Control
+  , label
+  , goto
   -- Exceptions
   , throwResumable
   , throwException
@@ -282,23 +284,19 @@ modifyLoadStack f = do
   putLoadStack $! f stack
 
 
--- | A 'Monad' abstracting jumps in imperative control.
-class Monad (m effects) => MonadControl term (effects :: [* -> *]) m where
-  -- | Allocate a 'Label' for the given @term@.
-  --
-  --   Labels must be allocated before being jumped to with 'goto', but are suitable for nonlocal jumps; thus, they can be used to implement coroutines, exception handling, call with current continuation, and other esoteric control mechanisms.
-  label :: term -> m effects Label
-  -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
-  goto :: Label -> m effects term
+-- | Allocate a 'Label' for the given @term@.
+--
+--   Labels must be allocated before being jumped to with 'goto', but are suitable for nonlocal jumps; thus, they can be used to implement coroutines, exception handling, call with current continuation, and other esoteric control mechanisms.
+label :: MonadEvaluator location term value effects m => term -> m effects Label
+label term = do
+  m <- view _jumps
+  let i = IntMap.size m
+  _jumps .= IntMap.insert i term m
+  pure i
 
-instance (Monad (m effects), MonadEvaluator location term value effects m) => MonadControl term effects m where
-  label term = do
-    m <- view _jumps
-    let i = IntMap.size m
-    _jumps .= IntMap.insert i term m
-    pure i
-
-  goto label = IntMap.lookup label <$> view _jumps >>= maybe (fail ("unknown label: " <> show label)) pure
+-- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
+goto :: MonadEvaluator location term value effects m => Label -> m effects term
+goto label = IntMap.lookup label <$> view _jumps >>= maybe (fail ("unknown label: " <> show label)) pure
 
 
 throwResumable :: (Member (Resumable exc) effects, Effectful m) => exc v -> m effects v

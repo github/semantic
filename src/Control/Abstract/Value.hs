@@ -131,7 +131,7 @@ class (Monad (m effects), Show value) => MonadValue location value (effects :: [
   scopedEnvironment :: value -> m effects (Environment location value)
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
-  lambda :: (FreeVariables term, MonadControl term effects m) => [Name] -> Subterm term (m effects value) -> m effects value
+  lambda :: (FreeVariables term, MonadEvaluator location term value effects m) => [Name] -> Subterm term (m effects value) -> m effects value
   -- | Evaluate an application (like a function call).
   call :: value -> [m effects value] -> m effects value
 
