@@ -3,13 +3,6 @@ module Control.Abstract.Evaluator
   ( MonadEvaluator(..)
   -- State
   , EvaluatorState(..)
-  , _environment
-  , _heap
-  , _modules
-  , _loadStack
-  , _exports
-  , _jumps
-  , _origin
   -- Environment
   , getEnv
   , putEnv
