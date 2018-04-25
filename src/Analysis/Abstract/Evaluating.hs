@@ -77,7 +77,7 @@ instance ( Ord location
     . flip runReader mempty -- Reader (Environment location value)
     . flip runReader mempty -- Reader (ModuleTable [Module term])
     . flip runReader mempty -- Reader (SomeOrigin term)
-    . runFresh
+    . flip runFresh' 0
     . runFail
     . Res.runError
     . Exc.runError

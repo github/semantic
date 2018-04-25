@@ -67,7 +67,7 @@ instance ( Alternative (m effects)
   lambda names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
-      tvar <- Var <$> fresh
+      tvar <- Var <$> raise fresh
       assign a tvar
       (env, tvars) <- rest
       pure (Env.insert name a env, tvar : tvars)) (pure mempty) names
@@ -126,7 +126,7 @@ instance ( Alternative (m effects)
     _                 -> unify left right $> Bool
 
   call op params = do
-    tvar <- fresh
+    tvar <- raise fresh
     paramTypes <- sequenceA params
     unified <- op `unify` (Product paramTypes :-> Var tvar)
     case unified of

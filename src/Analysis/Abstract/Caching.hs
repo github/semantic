@@ -5,6 +5,7 @@ module Analysis.Abstract.Caching
 ) where
 
 import Control.Abstract.Analysis
+import Control.Monad.Effect hiding (interpret)
 import Data.Abstract.Address
 import Data.Abstract.Cache
 import Data.Abstract.Configuration
@@ -93,14 +94,17 @@ instance ( Alternative (m effects)
     cache <- converge (\ prevCache -> isolateCache $ do
       putHeap (configurationHeap c)
       -- We need to reset fresh generation so that this invocation converges.
-      reset 0
+      reset 0 $
       -- This is subtle: though the calling context supports nondeterminism, we want
       -- to corral all the nondeterminism that happens in this @eval@ invocation, so
       -- that it doesn't "leak" to the calling context and diverge (otherwise this
       -- would never complete). We don’t need to use the values, so we 'gather' the
       -- nondeterministic values into @()@.
-      withOracle prevCache (raise (gather (const ()) (lower (liftAnalyze analyzeModule recur m))))) mempty
+        withOracle prevCache (raise (gather (const ()) (lower (liftAnalyze analyzeModule recur m))))) mempty
     maybe empty scatter (cacheLookup c cache)
+
+reset :: (Effectful m, Member Fresh effects) => Int -> m effects a -> m effects a
+reset start = raise . interposeState start (const pure) (\ counter Fresh yield -> (yield $! succ counter) counter) . lower
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
 --

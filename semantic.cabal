@@ -45,8 +45,6 @@ library
                      , Control.Abstract.Value
                      -- Control flow
                      , Control.Effect
-                     -- Effects used for program analysis
-                     , Control.Effect.Fresh
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
                      , Data.Abstract.Cache
