@@ -26,7 +26,7 @@ instance Effectful Eff where
   raise = id
   lower = id
 
-raiseHandler :: Effectful m => (Eff (effect ': effects) a -> Eff effects b) -> m (effect ': effects) a -> m effects b
+raiseHandler :: Effectful m => (Eff effectsA a -> Eff effectsB b) -> m effectsA a -> m effectsB b
 raiseHandler handler = raise . handler . lower
 
 
