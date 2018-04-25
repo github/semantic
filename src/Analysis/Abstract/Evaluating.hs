@@ -6,7 +6,6 @@ module Analysis.Abstract.Evaluating
 import Control.Abstract.Analysis hiding (lower)
 import Control.Monad.Effect.Exception as Exc
 import Control.Monad.Effect.Resumable as Res
-import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Evaluatable hiding (lower)
 import Data.Abstract.Module
@@ -54,10 +53,7 @@ instance ( Corecursive term
   analyzeModule eval m = pushOrigin (moduleOrigin (subterm <$> m)) (eval m)
 
 
-instance ( Ord location
-         , Semigroup (Cell location value)
-         )
-      => Interpreter
+instance Interpreter
           (EvaluatingEffects location term value)
           result
           ( Either String

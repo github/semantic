@@ -102,3 +102,5 @@ instance Semigroup (SomeOrigin term) where
 instance Monoid (SomeOrigin term) where
   mempty = SomeOrigin Unknown
   mappend = (<>)
+
+instance Lower (SomeOrigin term) where lower = SomeOrigin lower

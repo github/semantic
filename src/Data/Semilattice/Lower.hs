@@ -1,7 +1,12 @@
-{-# LANGUAGE DefaultSignatures, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures #-}
 module Data.Semilattice.Lower
 ( Lower (..)
 ) where
+
+import Data.IntMap as IntMap
+import Data.IntSet as IntSet
+import Data.Map as Map
+import Data.Set as Set
 
 class Lower s where
   -- | The greatest lower bound of @s@.
@@ -23,6 +28,13 @@ class Lower s where
   default lower :: Bounded s => s
   lower = minBound
 
---- | Every Monoid has a Lower instance.
-instance {-# OVERLAPS #-} Monoid a => Lower a where
-  lower = mempty
+instance Lower b => Lower (a -> b) where lower = const lower
+
+instance Lower (Maybe a) where lower = Nothing
+instance Lower [a] where lower = []
+
+-- containers
+instance Lower (IntMap a) where lower = IntMap.empty
+instance Lower IntSet where lower = IntSet.empty
+instance Lower (Map k a) where lower = Map.empty
+instance Lower (Set a) where lower = Set.empty

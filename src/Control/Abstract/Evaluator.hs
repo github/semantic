@@ -105,7 +105,7 @@ deriving instance (Show (Cell location value), Show location, Show term, Show va
 instance (Ord location, Semigroup (Cell location value)) => Semigroup (EvaluatorState location term value) where
   EvaluatorState e1 h1 m1 l1 x1 j1 o1 <> EvaluatorState e2 h2 m2 l2 x2 j2 o2 = EvaluatorState (e1 <> e2) (h1 <> h2) (m1 <> m2) (l1 <> l2) (x1 <> x2) (j1 <> j2) (o1 <> o2)
 
-instance  (Ord location, Semigroup (Cell location value)) => Lower (EvaluatorState location term value) where
+instance Lower (EvaluatorState location term value) where
   lower = EvaluatorState lower lower lower lower lower lower lower
 
 

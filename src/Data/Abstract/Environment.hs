@@ -23,6 +23,7 @@ import           Data.Abstract.Live
 import           Data.Align
 import qualified Data.Map as Map
 import           Data.Semigroup.Reducer
+import           Data.Semilattice.Lower
 import           GHC.Exts (IsList (..))
 import           Prologue
 import qualified Data.List.NonEmpty as NonEmpty
@@ -137,3 +138,6 @@ roots env = foldMap (maybe mempty liveSingleton . flip lookup env)
 
 addresses :: Ord l => Environment l a -> Live l a
 addresses = Live . fromList . fmap snd . pairs
+
+
+instance Lower (Environment location value) where lower = Environment (lower:|[])

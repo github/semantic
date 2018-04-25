@@ -11,6 +11,7 @@ module Data.Map.Monoidal
 
 import qualified Data.Map as Map
 import Data.Semigroup.Reducer as Reducer
+import Data.Semilattice.Lower
 import Prelude hiding (lookup)
 import Prologue hiding (Map)
 
@@ -42,3 +43,5 @@ instance (Ord key, Reducer a value) => Reducer (key, a) (Map key value) where
   unit (key, a) = Map (Map.singleton key (unit a))
   cons (key, a) (Map m) = Map (Map.insertWith (<>) key (unit a) m)
   snoc (Map m) (key, a) = Map (Map.insertWith (flip (<>)) key (unit a) m)
+
+instance Lower (Map key value) where lower = Map lower
