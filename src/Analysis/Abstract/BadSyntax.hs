@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.BadSyntax
 ( BadSyntax
@@ -21,11 +21,12 @@ newtype BadSyntax m (effects :: [* -> *]) a = BadSyntax { runBadSyntax :: m effe
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadSyntax m)
 deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadSyntax m)
 
-instance ( Interpreter effects result rest m
+instance ( Interpreter effects m
          , MonadEvaluator location term value effects m
          , AbstractHole value
          )
-      => Interpreter (Resumable (Unspecialized value) ': effects) result rest (BadSyntax m) where
+      => Interpreter (Resumable (Unspecialized value) ': effects) (BadSyntax m) where
+  type Result (Resumable (Unspecialized value) ': effects) (BadSyntax m) result = Result effects m result
   interpret
     = interpret
     . runBadSyntax

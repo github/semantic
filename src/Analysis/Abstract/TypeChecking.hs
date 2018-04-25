@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 
 module Analysis.Abstract.TypeChecking
 ( TypeChecking
@@ -14,10 +14,9 @@ newtype TypeChecking m (effects :: [* -> *]) a = TypeChecking { runTypeChecking 
 deriving instance MonadEvaluator location term Type effects m => MonadEvaluator location term Type effects (TypeChecking m)
 deriving instance MonadAnalysis location term Type effects m => MonadAnalysis location term Type effects (TypeChecking m)
 
-instance ( Interpreter effects (Either (SomeExc TypeError) result) rest m
-         , MonadEvaluator location term Type effects m
-         )
-      => Interpreter (Resumable TypeError ': effects) result rest (TypeChecking m) where
+instance Interpreter effects m
+      => Interpreter (Resumable TypeError ': effects) (TypeChecking m) where
+  type Result (Resumable TypeError ': effects) (TypeChecking m) result = Result effects m (Either (SomeExc TypeError) result)
   interpret
     = interpret
     . runTypeChecking

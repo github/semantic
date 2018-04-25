@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies #-}
 module Analysis.Abstract.Evaluating
 ( Evaluating
 ) where
@@ -53,16 +53,14 @@ instance ( Corecursive term
   analyzeModule eval m = pushOrigin (moduleOrigin (subterm <$> m)) (eval m)
 
 
-instance Interpreter
-          (EvaluatingEffects location term value)
-          result
-          ( Either String
-          ( Either (SomeExc (LoadError term value))
-          ( Either (LoopThrow value)
-          ( Either (ReturnThrow value)
-           result)))
-          , EvaluatorState location term value)
-          (Evaluating location term value) where
+instance Interpreter (EvaluatingEffects location term value) (Evaluating location term value) where
+  type Result (EvaluatingEffects location term value) (Evaluating location term value) result
+    = ( Either String
+      ( Either (SomeExc (LoadError term value))
+      ( Either (LoopThrow value)
+      ( Either (ReturnThrow value)
+        result)))
+      , EvaluatorState location term value)
   interpret
     = interpret
     . runEvaluating

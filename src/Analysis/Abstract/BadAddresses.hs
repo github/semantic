@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.BadAddresses where
 
@@ -12,13 +12,14 @@ newtype BadAddresses m (effects :: [* -> *]) a = BadAddresses { runBadAddresses 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadAddresses m)
 deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadAddresses m)
 
-instance ( Interpreter effects result rest m
+instance ( Interpreter effects m
          , MonadEvaluator location term value effects m
          , AbstractHole value
          , Monoid (Cell location value)
          , Show location
          )
-      => Interpreter (Resumable (AddressError location value) ': effects) result rest (BadAddresses m) where
+      => Interpreter (Resumable (AddressError location value) ': effects) (BadAddresses m) where
+  type Result (Resumable (AddressError location value) ': effects) (BadAddresses m) result = Result effects m result
   interpret
     = interpret
     . runBadAddresses

@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, KindSignatures, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Erroring
 ( Erroring
 ) where
@@ -13,6 +13,7 @@ newtype Erroring (exc :: * -> *) m (effects :: [* -> *]) a = Erroring { runError
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Erroring exc m)
 deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (Erroring exc m)
 
-instance Interpreter                   effects  (Either (SomeExc exc) result) rest               m
-      => Interpreter (Resumable exc ': effects)                       result  rest (Erroring exc m) where
+instance Interpreter                   effects                m
+      => Interpreter (Resumable exc ': effects) (Erroring exc m) where
+  type Result (Resumable exc ': effects) (Erroring exc m) result = Result effects m (Either (SomeExc exc) result)
   interpret = interpret . runErroring . raiseHandler runError

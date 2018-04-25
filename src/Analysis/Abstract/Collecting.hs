@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, KindSignatures, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.Collecting
 ( Collecting
@@ -62,11 +62,12 @@ reachable roots heap = go mempty roots
             _           -> seen)
 
 
-instance ( Interpreter effects result rest m
+instance ( Interpreter effects m
          , MonadEvaluator location term value effects m
          , Ord location
          )
-      => Interpreter (Reader (Live location value) ': effects) result rest (Collecting m) where
+      => Interpreter (Reader (Live location value) ': effects) (Collecting m) where
+  type Result (Reader (Live location value) ': effects) (Collecting m) result = Result effects m result
   interpret = interpret . runCollecting . raiseHandler (`runReader` mempty)
 
 
@@ -77,9 +78,10 @@ newtype Retaining m (effects :: [* -> *]) a = Retaining { runRetaining :: m effe
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Retaining m)
 deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (Retaining m)
 
-instance ( Interpreter effects result rest m
+instance ( Interpreter effects m
          , MonadEvaluator location term value effects m
          , Ord location
          )
-      => Interpreter (Reader (Live location value) ': effects) result rest (Retaining m) where
+      => Interpreter (Reader (Live location value) ': effects) (Retaining m) where
+  type Result (Reader (Live location value) ': effects) (Retaining m) result = Result effects m result
   interpret = interpret . runRetaining . raiseHandler (`runReader` mempty)

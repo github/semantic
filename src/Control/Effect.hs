@@ -1,4 +1,4 @@
-{-# LANGUAGE FunctionalDependencies, RankNTypes, TypeOperators #-}
+{-# LANGUAGE FunctionalDependencies, RankNTypes, TypeFamilies, TypeOperators #-}
 module Control.Effect
 ( Effectful(..)
 , raiseHandler
@@ -46,8 +46,10 @@ raiseHandler handler = raise . handler . lower
 -- | Interpreters determine and interpret a list of effects, optionally taking extra arguments.
 --
 --   Instances will generally be defined recursively in terms of underlying interpreters, bottoming out with the instance for 'Eff' which uses 'Effect.run' to produce a final value.
-class Effectful m => Interpreter effects result function m | m -> effects, m result -> function where
-  interpret :: m effects result -> function
+class Effectful m => Interpreter effects m | m -> effects where
+  type Result effects m result
+  type instance Result effects m result = result
+  interpret :: m effects result -> Result effects m result
 
-instance Interpreter '[] result result Eff where
+instance Interpreter '[] Eff where
   interpret = Effect.run

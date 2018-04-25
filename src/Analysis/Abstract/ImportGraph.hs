@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.ImportGraph
 ( ImportGraph(..)
 , renderImportGraph
@@ -16,7 +16,7 @@ import           Data.Abstract.Located
 import           Data.Abstract.Module hiding (Module)
 import           Data.Abstract.Origin hiding (Module, Package)
 import           Data.Abstract.Package hiding (Package)
-import           Data.Aeson
+import           Data.Aeson hiding (Result)
 import qualified Data.ByteString.Char8 as BC
 import           Data.ByteString.Lazy (toStrict)
 import           Data.Output
@@ -168,6 +168,7 @@ vertexToType Module{}   = "module"
 vertexToType Variable{} = "variable"
 
 
-instance Interpreter effects (result, ImportGraph) rest m
-      => Interpreter (State ImportGraph ': effects) result rest (ImportGraphing m) where
+instance Interpreter effects m
+      => Interpreter (State ImportGraph ': effects) (ImportGraphing m) where
+  type Result (State ImportGraph ': effects) (ImportGraphing m) result = Result effects m (result, ImportGraph)
   interpret = interpret . runImportGraphing . raiseHandler (`runState` mempty)

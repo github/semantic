@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.BadValues where
 
 import Control.Abstract.Analysis
@@ -12,12 +12,13 @@ newtype BadValues m (effects :: [* -> *]) a = BadValues { runBadValues :: m effe
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadValues m)
 deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadValues m)
 
-instance ( Interpreter effects result rest m
+instance ( Interpreter effects m
          , MonadEvaluator location term value effects m
          , AbstractHole value
          , Show value
          )
-      => Interpreter (Resumable (ValueError location value) ': effects) result rest (BadValues m) where
+      => Interpreter (Resumable (ValueError location value) ': effects) (BadValues m) where
+  type Result (Resumable (ValueError location value) ': effects) (BadValues m) result = Result effects m result
   interpret
     = interpret
     . runBadValues
