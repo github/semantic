@@ -3,7 +3,6 @@ module Control.Effect
 ( Effectful(..)
 , Interpreter(..)
 , resume
-, mergeEither
 ) where
 
 import Control.Monad.Effect           as Effect
@@ -11,10 +10,6 @@ import Control.Monad.Effect.Resumable as Resumable
 
 resume :: (Member (Resumable exc) e, Effectful m) => m e a -> (forall v . (v -> m e a) -> exc v -> m e a) -> m e a
 resume m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
-
--- | Reassociate 'Either's, combining errors into 'Left' values and successes in a single level of 'Right'.
-mergeEither :: Either a (Either b c) -> Either (Either a b) c
-mergeEither = either (Left . Left) (either (Left . Right) Right)
 
 
 -- | Types wrapping 'Eff' actions.
