@@ -26,6 +26,9 @@ instance Effectful Eff where
   lower = id
 
 
+-- | Interpreters determine and interpret a list of effects, optionally taking extra arguments.
+--
+--   Instances will generally be defined recursively in terms of underlying interpreters, bottoming out with the instance for 'Eff' which uses 'Effect.run' to produce a final value.
 class Effectful m => Interpreter effects result function m | m -> effects, m result -> function where
   interpret :: m effects result -> function
 
