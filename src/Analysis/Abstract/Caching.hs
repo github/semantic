@@ -35,7 +35,6 @@ class MonadEvaluator location term value effects m => MonadCaching location term
   isolateCache :: m effects a -> m effects (Cache location term value)
 
 instance ( Effectful m
-         , Member NonDet effects
          , Member (Reader (Cache location term value)) effects
          , Member (State  (Cache location term value)) effects
          , MonadEvaluator location term value effects m
