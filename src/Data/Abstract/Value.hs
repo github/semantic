@@ -287,7 +287,7 @@ instance ( Monad (m effects)
         tentative x i j = attemptUnsafeArithmetic (x i j)
 
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: (Member (Resumable (ValueError location value)) effects, MonadEvaluatable location term value effects m) => Either ArithException Number.SomeNumber -> m effects value
+        specialize :: Either ArithException Number.SomeNumber -> m effects (Value location)
         specialize (Left exc) = throwValueError (ArithmeticError exc)
         specialize (Right (Number.SomeNumber (Number.Integer i))) = integer i
         specialize (Right (Number.SomeNumber (Number.Ratio r)))   = rational r
