@@ -30,7 +30,7 @@ spec = parallel $ do
 
     it "evaluates load with wrapper" $ do
       res <- evaluate "load-wrap.rb"
-      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Left (SomeExc (FreeVariableError "foo"))))))))
+      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (Left (SomeExc (FreeVariableError "foo")))))))))
       environment (snd res) `shouldBe` [ ("Object", addr 0) ]
 
     it "evaluates subclass" $ do
