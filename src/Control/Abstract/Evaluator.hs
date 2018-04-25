@@ -1,6 +1,6 @@
 {-# LANGUAGE ConstrainedClassMethods, FunctionalDependencies, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
 module Control.Abstract.Evaluator
-  ( MonadEvaluator(..)
+  ( MonadEvaluator
   -- State
   , EvaluatorState(..)
   -- Environment
@@ -30,6 +30,8 @@ module Control.Abstract.Evaluator
   -- Roots
   , askRoots
   , extraRoots
+  -- Configuration
+  , getConfiguration
   -- Module tables
   , getModuleTable
   , putModuleTable
@@ -88,9 +90,7 @@ class ( Effectful m
       , Member (State (EvaluatorState location term value)) effects
       , Monad (m effects)
       )
-   => MonadEvaluator location term value effects m | m effects -> location term value where
-  -- | Get the current 'Configuration' with a passed-in term.
-  getConfiguration :: Ord location => term -> m effects (Configuration location term value)
+   => MonadEvaluator location term value effects m | m effects -> location term value
 
 
 -- State
@@ -276,6 +276,13 @@ askRoots = raise ask
 -- | Run a computation with the given 'Live' set added to the local root set.
 extraRoots :: (Effectful m, Member (Reader (Live location value)) effects, Ord location) => Live location value -> m effects a -> m effects a
 extraRoots roots = raiseHandler (local (<> roots))
+
+
+-- Configuration
+
+-- | Get the current 'Configuration' with a passed-in term.
+getConfiguration :: (Member (Reader (Live location value)) effects, MonadEvaluator location term value effects m) => term -> m effects (Configuration location term value)
+getConfiguration term = Configuration term <$> askRoots <*> getEnv <*> getHeap
 
 
 -- Module table

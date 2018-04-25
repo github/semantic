@@ -7,7 +7,6 @@ import Control.Abstract.Analysis
 import Control.Monad.Effect.Exception as Exc
 import Control.Monad.Effect.Resumable as Res
 import Data.Abstract.Address
-import Data.Abstract.Configuration
 import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Data.Abstract.Module
@@ -41,8 +40,7 @@ instance ( Member Fail effects
          , Member (Reader (SomeOrigin term)) effects
          , Member (State (EvaluatorState location term value)) effects
          )
-      => MonadEvaluator location term value effects (Evaluating location term value) where
-  getConfiguration term = Configuration term mempty <$> getEnv <*> getHeap
+      => MonadEvaluator location term value effects (Evaluating location term value)
 
 instance ( Corecursive term
          , Member Fail effects

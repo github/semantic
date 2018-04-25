@@ -10,6 +10,7 @@ import Data.Abstract.Address
 import Data.Abstract.Cache
 import Data.Abstract.Configuration
 import Data.Abstract.Heap
+import Data.Abstract.Live
 import Data.Abstract.Module
 import Prologue
 
@@ -63,6 +64,7 @@ instance ( Alternative (m effects)
          , Member Fresh effects
          , Member NonDet effects
          , Member (Reader (Cache location term value)) effects
+         , Member (Reader (Live location value)) effects
          , Member (State  (Cache location term value)) effects
          , MonadAnalysis location term value effects m
          , Ord (Cell location value)

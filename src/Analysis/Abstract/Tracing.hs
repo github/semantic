@@ -7,6 +7,7 @@ module Analysis.Abstract.Tracing
 import Control.Abstract.Analysis
 import Control.Monad.Effect.Writer
 import Data.Abstract.Configuration
+import Data.Abstract.Live
 import Data.Semigroup.Reducer as Reducer
 import Data.Union
 import Prologue
@@ -21,6 +22,7 @@ deriving instance MonadEvaluator location term value effects m => MonadEvaluator
 
 instance ( Corecursive term
          , Effectful m
+         , Member (Reader (Live location value)) effects
          , Member (Writer (trace (Configuration location term value))) effects
          , MonadAnalysis location term value effects m
          , Ord location

@@ -9,6 +9,7 @@ import           Analysis.Abstract.BadSyntax
 import           Analysis.Abstract.BadValues
 import           Analysis.Abstract.BadVariables
 import           Analysis.Abstract.Caching
+import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Erroring
 import           Analysis.Abstract.Evaluating as X
 import           Analysis.Abstract.ImportGraph
@@ -64,7 +65,8 @@ type Checking term
   ( Erroring (EvalError Type)
   ( Erroring (ResolutionError Type)
   ( Erroring (Unspecialized Type)
-  ( Evaluating Monovariant term Type))))))
+  ( Retaining
+  ( Evaluating Monovariant term Type)))))))
 
 evalGoProject path = runAnalysis @(JustEvaluating Go.Term) <$> evaluateProject goParser Language.Go Nothing path
 evalRubyProject path = runAnalysis @(JustEvaluating Ruby.Term) <$> evaluateProject rubyParser Language.Ruby rubyPrelude path

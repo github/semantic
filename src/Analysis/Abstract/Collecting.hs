@@ -7,7 +7,6 @@ module Analysis.Abstract.Collecting
 
 import Control.Abstract.Analysis
 import Data.Abstract.Address
-import Data.Abstract.Configuration
 import Data.Abstract.Heap
 import Data.Abstract.Live
 import Prologue
@@ -16,12 +15,7 @@ import Prologue
 newtype Collecting m (effects :: [* -> *]) a = Collecting { runCollecting :: m effects a }
   deriving (Alternative, Applicative, Effectful, Functor, Monad)
 
-instance ( Effectful m
-         , Member (Reader (Live location value)) effects
-         , MonadEvaluator location term value effects m
-         )
-      => MonadEvaluator location term value effects (Collecting m) where
-  getConfiguration term = Configuration term <$> askRoots <*> getEnv <*> getHeap
+deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Collecting m)
 
 
 instance ( Effectful m
