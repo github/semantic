@@ -45,7 +45,8 @@ parsePackage :: Members '[Distribute WrappedTask, Files, Task] effs
              -> Eff effs (Package term)
 parsePackage parser preludeFile project@Project{..} = do
   prelude <- traverse (parseModule parser Nothing) preludeFile
-  Package.fromModules n Nothing prelude (length projectEntryPoints) <$> parseModules parser project
+  p <- parseModules parser project
+  trace ("project: " <> show p) $ pure (Package.fromModules n Nothing prelude (length projectEntryPoints) p)
   where
     n = name (projectName project)
 

@@ -1,10 +1,11 @@
-{-# LANGUAGE DeriveAnyClass, ViewPatterns #-}
+{-# LANGUAGE DeriveAnyClass, ViewPatterns, ScopedTypeVariables #-}
 module Language.PHP.Syntax where
 
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import           Data.Abstract.Path
 import qualified Data.ByteString.Char8 as BC
+import qualified Data.Language as Language
 import           Diffing.Algorithm
 import           Prelude hiding (fail)
 import           Prologue hiding (Text)
@@ -34,25 +35,21 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
-resolvePHPName :: MonadEvaluatable location term value effects m => ByteString -> m effects ModulePath
-resolvePHPName n = resolve [name] >>= maybeM (raise (fail notFound))
+resolvePHPName :: forall value location term effects m. MonadEvaluatable location term value effects m => ByteString -> m effects ModulePath
+resolvePHPName n = do
+  modulePath <- resolve [name]
+  maybe (throwResumable @(ResolutionError value) $ NotFoundError name [name] Language.PHP) pure modulePath
   where name = toName n
-        notFound = "Unable to resolve: " <> name
         toName = BC.unpack . dropRelativePrefix . stripQuotes
 
-doInclude :: MonadEvaluatable location term value effects m => Subterm t (m effects value) -> m effects value
-doInclude pathTerm = do
+include :: MonadEvaluatable location term value effects m
+        => Subterm t (m effects value)
+        -> (ModulePath -> m effects (Environment location value, value))
+        -> m effects value
+include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
-  (importedEnv, v) <- traceResolve name path $ isolate (load path)
-  modifyEnv (mappend importedEnv)
-  pure v
-
-doIncludeOnce :: MonadEvaluatable location term value effects m => Subterm t (m effects value) -> m effects value
-doIncludeOnce pathTerm = do
-  name <- subtermValue pathTerm >>= asString
-  path <- resolvePHPName name
-  (importedEnv, v) <- traceResolve name path $ isolate (require path)
+  (importedEnv, v) <- traceResolve name path $ isolate (f path)
   modifyEnv (mappend importedEnv)
   pure v
 
@@ -64,7 +61,7 @@ instance Ord1 Require where liftCompare    = genericLiftCompare
 instance Show1 Require where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Require where
-  eval (Require path) = doInclude path
+  eval (Require path) = include path load
 
 
 newtype RequireOnce a = RequireOnce a
@@ -75,7 +72,7 @@ instance Ord1 RequireOnce where liftCompare = genericLiftCompare
 instance Show1 RequireOnce where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable RequireOnce where
-  eval (RequireOnce path) = doIncludeOnce path
+  eval (RequireOnce path) = include path require
 
 
 newtype Include a = Include a
@@ -86,7 +83,7 @@ instance Ord1 Include where liftCompare    = genericLiftCompare
 instance Show1 Include where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Include where
-  eval (Include path) = doInclude path
+  eval (Include path) = include path load
 
 
 newtype IncludeOnce a = IncludeOnce a
@@ -97,7 +94,7 @@ instance Ord1 IncludeOnce where liftCompare    = genericLiftCompare
 instance Show1 IncludeOnce where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable IncludeOnce where
-  eval (IncludeOnce path) = doIncludeOnce path
+  eval (IncludeOnce path) = include path require
 
 
 newtype ArrayElement a = ArrayElement a

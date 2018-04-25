@@ -1,32 +1,49 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, ScopedTypeVariables #-}
 module Language.Go.Syntax where
 
-import Data.Abstract.Evaluatable hiding (Label)
-import Data.Abstract.Module
-import Data.Abstract.Path
-import Data.Abstract.FreeVariables (name)
-import Diffing.Algorithm
-import qualified Data.ByteString.Char8 as BC
+import           Data.Abstract.Evaluatable hiding (Label)
+import           Data.Abstract.FreeVariables (Name (..), name)
+import           Data.Abstract.Module
+import qualified Data.Abstract.Package as Package
+import           Data.Abstract.Path
 import qualified Data.ByteString as B
-import System.FilePath.Posix
-import Prologue
+import qualified Data.ByteString.Char8 as BC
+import           Diffing.Algorithm
+import           Prologue
+import           System.FilePath.Posix
 
-newtype ImportPath = ImportPath { unPath :: FilePath }
+data Relative = Relative | NonRelative
+  deriving (Eq, Ord, Show)
+
+data ImportPath = ImportPath { unPath :: FilePath, pathIsRelative :: Relative }
   deriving (Eq, Ord, Show)
 
 importPath :: ByteString -> ImportPath
-importPath str = let path = stripQuotes str in ImportPath (BC.unpack path)
-  where stripQuotes = B.filter (`B.notElem` "\'\"")
+importPath str = let path = stripQuotes str in ImportPath (BC.unpack path) (pathType path)
+  where
+    stripQuotes = B.filter (`B.notElem` "\'\"")
+    pathType xs | not (B.null xs), BC.head xs == '.' = Relative
+                | otherwise = NonRelative
 
 defaultAlias :: ImportPath -> Name
 defaultAlias = name . BC.pack . takeFileName . unPath
 
--- TODO: need to delineate between relative and absolute Go imports
-resolveGoImport :: MonadEvaluatable location term value effects m => FilePath -> m effects [ModulePath]
-resolveGoImport relImportPath = do
+resolveGoImport :: forall value term location effects m. MonadEvaluatable location term value effects m => ImportPath -> m effects [ModulePath]
+resolveGoImport (ImportPath path Relative) = do
   ModuleInfo{..} <- currentModule
-  let relRootDir = takeDirectory modulePath
-  listModulesInDir (joinPaths relRootDir relImportPath)
+  paths <- listModulesInDir (joinPaths (takeDirectory modulePath) path)
+  case paths of
+    [] -> throwResumable @(ResolutionError value) $ GoImportError path
+    _ -> pure paths
+resolveGoImport (ImportPath path NonRelative) = do
+  package <- BC.unpack . unName . Package.packageName <$> currentPackage
+  traceM ("attempting to resolve " <> show path <> " for package " <> package)
+  case splitDirectories path of
+    -- Import an absolute path that's defined in this package being analyized.
+    -- First two are source, next is package name, remaining are path to package
+    -- (e.g. github.com/golang/<package>/path...).
+    (_ : _ : p : xs) | p == package -> listModulesInDir (joinPath xs)
+    _ -> throwResumable @(ResolutionError value) $ GoImportError path
 
 -- | Import declarations (symbols are added directly to the calling environment).
 --
@@ -39,10 +56,10 @@ instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Import where
-  eval (Import (ImportPath name) _) = do
-    paths <- resolveGoImport name
+  eval (Import importPath _) = do
+    paths <- resolveGoImport importPath
     for_ paths $ \path -> do
-      (importedEnv, _) <- traceResolve name path $ isolate (require path)
+      (importedEnv, _) <- traceResolve (unPath importPath) path $ isolate (require path)
       modifyEnv (mappend importedEnv)
     unit
 
@@ -58,12 +75,12 @@ instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
 instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedImport where
-  eval (QualifiedImport (ImportPath name) aliasTerm) = do
-    paths <- resolveGoImport name
+  eval (QualifiedImport importPath aliasTerm) = do
+    paths <- resolveGoImport importPath
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
     void $ letrec' alias $ \addr -> do
       for_ paths $ \path -> do
-        (importedEnv, _) <- traceResolve name path $ isolate (require path)
+        (importedEnv, _) <- traceResolve (unPath importPath) path $ isolate (require path)
         modifyEnv (mappend importedEnv)
 
       makeNamespace alias addr []
@@ -78,9 +95,9 @@ instance Ord1 SideEffectImport where liftCompare = genericLiftCompare
 instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable SideEffectImport where
-  eval (SideEffectImport (ImportPath name) _) = do
-    paths <- resolveGoImport name
-    for_ paths $ \path -> traceResolve name path $ isolate (require path)
+  eval (SideEffectImport importPath _) = do
+    paths <- resolveGoImport importPath
+    for_ paths $ \path -> traceResolve (unPath importPath) path $ isolate (require path)
     unit
 
 -- A composite literal in Go

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses #-}
+{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables #-}
 module Language.Python.Syntax where
 
 import           Data.Abstract.Environment as Env
@@ -8,7 +8,7 @@ import           Data.Abstract.Module
 import           Data.Align.Generic
 import qualified Data.ByteString.Char8 as BC
 import           Data.Functor.Classes.Generic
-import           Data.List (intercalate)
+import qualified Data.Language as Language
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Mergeable
 import           Diffing.Algorithm
@@ -51,14 +51,14 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (BC.unpack prefix) (J
 -- Subsequent imports of `parent.two` or `parent.three` will execute
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
-resolvePythonModules :: MonadEvaluatable location term value effects m => QualifiedName -> m effects (NonEmpty ModulePath)
+resolvePythonModules :: forall value term location effects m. MonadEvaluatable location term value effects m => QualifiedName -> m effects (NonEmpty ModulePath)
 resolvePythonModules q = do
   relRootDir <- rootDir q <$> currentModule
   for (moduleNames q) $ \name -> do
     x <- search relRootDir name
     traceResolve name x $ pure x
   where
-    rootDir (QualifiedName _) ModuleInfo{..}           = takeDirectory modulePath
+    rootDir (QualifiedName _) ModuleInfo{..}           = mempty -- overall rootDir of the Package.
     rootDir (RelativeQualifiedName n _) ModuleInfo{..} = upDir numDots (takeDirectory modulePath)
       where numDots = pred (length n)
             upDir n dir | n <= 0 = dir
@@ -68,17 +68,14 @@ resolvePythonModules q = do
     moduleNames (RelativeQualifiedName x Nothing)      = error $ "importing from '" <> show x <> "' is not implemented"
     moduleNames (RelativeQualifiedName _ (Just paths)) = moduleNames paths
 
-    notFound xs = "Unable to resolve module import: " <> friendlyName q <> ", searched: " <> show xs
     search rootDir x = do
+      traceM ("searching for " <> show x <> " in " <> show rootDir)
       let path = normalise (rootDir </> normalise x)
       let searchPaths = [ path </> "__init__.py"
                         , path <.> ".py"
                         ]
-      resolve searchPaths >>= maybeM (raise (fail (notFound searchPaths)))
-
-    friendlyName :: QualifiedName -> String
-    friendlyName (QualifiedName xs)                = intercalate "." (NonEmpty.toList xs)
-    friendlyName (RelativeQualifiedName prefix qn) = prefix <> maybe "" friendlyName qn
+      modulePath <- resolve searchPaths
+      maybe (throwResumable @(ResolutionError value) $ NotFoundError path searchPaths Language.Python) pure modulePath
 
 
 -- | Import declarations (symbols are added directly to the calling environment).

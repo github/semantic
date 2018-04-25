@@ -37,6 +37,7 @@ module Control.Abstract.Evaluator
   , putLoadStack
   , modifyLoadStack
   , currentModule
+  , currentPackage
   -- Control
   , label
   , goto
@@ -60,6 +61,7 @@ import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
+import Data.Abstract.Package
 import Data.Abstract.Origin
 import Data.Empty
 import qualified Data.IntMap as IntMap
@@ -307,6 +309,12 @@ currentModule :: forall location term value effects m . MonadEvaluator location 
 currentModule = do
   o <- raise ask
   maybeM (raise (fail "unable to get currentModule")) $ withSomeOrigin (originModule @term) o
+
+-- | Get the currently evaluating 'PackageInfo'.
+currentPackage :: forall location term value effects m . MonadEvaluator location term value effects m => m effects PackageInfo
+currentPackage = do
+  o <- raise ask
+  maybeM (raise (fail "unable to get currentPackage")) $ withSomeOrigin (originPackage @term) o
 
 
 -- Control
