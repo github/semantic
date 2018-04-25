@@ -13,7 +13,8 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Origin
-import Prologue
+import Data.Empty
+import Prologue hiding (empty)
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
 newtype Evaluating location term value effects a = Evaluating (Eff effects a)
@@ -71,10 +72,10 @@ instance ( Ord location
           (Evaluating location term value) where
   interpret
     = interpret
-    . flip runState (EvaluatorState mempty mempty mempty mempty mempty mempty mempty)
-    . flip runReader mempty -- Reader (Environment location value)
-    . flip runReader mempty -- Reader (ModuleTable [Module term])
-    . flip runReader mempty -- Reader (SomeOrigin term)
+    . flip runState (EvaluatorState empty empty empty empty empty empty empty)
+    . flip runReader empty -- Reader (Environment location value)
+    . flip runReader empty -- Reader (ModuleTable [Module term])
+    . flip runReader empty -- Reader (SomeOrigin term)
     . flip runFresh' 0
     . runFail
     . Res.runError
