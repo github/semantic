@@ -5,8 +5,6 @@ module Control.Abstract.Analysis
 , liftAnalyze
 , runAnalysis
 , module X
-, Subterm(..)
-, SubtermAlgebra
 ) where
 
 import Control.Abstract.Addressable as X
