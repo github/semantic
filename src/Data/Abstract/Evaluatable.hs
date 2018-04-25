@@ -64,7 +64,6 @@ type MonadEvaluatable location term value effects m =
   , MonadValue location value effects m
   , Recursive term
   , Reducer value (Cell location value)
-  , Show location
   )
 
 newtype ReturnThrow value

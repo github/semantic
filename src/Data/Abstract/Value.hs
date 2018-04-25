@@ -205,6 +205,7 @@ instance AbstractHole (Value location) where
 instance ( Monad (m effects)
          , Member (Resumable (ValueError location (Value location))) effects
          , MonadEvaluatable location term (Value location) effects m
+         , Show location
          )
       => MonadValue location (Value location) effects m where
   unit     = pure . injValue $ Unit
