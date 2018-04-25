@@ -306,7 +306,7 @@ instance ( Monad (m effects)
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: (Ord a, MonadValue location value effects m) => a -> a -> m effects value
+        go :: Ord a => a -> a -> m effects (Value location)
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
           Generalized -> integer (orderingToInt (compare l r))
