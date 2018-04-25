@@ -61,9 +61,17 @@ parsePackage parser preludeFile project@Project{..} = do
       moduleForBlob rootDir blob <$> parse parser blob
 
 
-type ImportGraphAnalysis term =
-  ImportGraphing
-    (BadAddresses (BadModuleResolutions (BadVariables (BadValues (BadSyntax (Evaluating (Located Precise term) term (Value (Located Precise term))))))))
+type ImportGraphAnalysis term
+  = ImportGraphing
+  ( BadAddresses
+  ( BadModuleResolutions
+  ( BadVariables
+  ( BadValues
+  ( BadSyntax
+  ( Evaluating
+    (Located Precise term)
+    term
+    (Value (Located Precise term))))))))
 
 -- | Render the import graph for a given 'Package'.
 graphImports :: ( Show ann
