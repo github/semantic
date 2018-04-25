@@ -11,7 +11,7 @@ import Data.Abstract.Heap
 import Data.Abstract.Live
 import Prologue
 
-newtype Collecting m (effects :: [* -> *]) a = Collecting (m effects a)
+newtype Collecting m (effects :: [* -> *]) a = Collecting { runCollecting :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 instance ( Effectful m
@@ -80,4 +80,4 @@ instance ( Interpreter effects result rest m
          , Ord location
          )
       => Interpreter (Reader (Live location value) ': effects) result rest (Collecting m) where
-  interpret = interpret . raise @m . flip runReader mempty . lower
+  interpret = interpret . runCollecting . raiseHandler (flip runReader mempty)

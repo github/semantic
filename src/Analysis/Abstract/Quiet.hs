@@ -15,7 +15,7 @@ import Prologue
 --   > runAnalysis @(Quietly (Evaluating term value)) (…)
 --
 --   Note that exceptions thrown by other analyses may not be caught if 'Quietly' doesn’t know about them, i.e. if they’re not part of the generic 'MonadValue', 'MonadAddressable', etc. machinery.
-newtype Quietly m (effects :: [* -> *]) a = Quietly (m effects a)
+newtype Quietly m (effects :: [* -> *]) a = Quietly { runQuietly :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Quietly m)
@@ -38,7 +38,5 @@ instance ( Interpreter effects result rest m
       => Interpreter (Resumable (Unspecialized value) ': effects) result rest (Quietly m) where
   interpret
     = interpret
-    . raise @m
-    . relay pure (\ (Resumable err) yield -> case err of
-      Unspecialized _ -> lower @m hole >>= yield)
-    . lower
+    . runQuietly
+    . raiseHandler (relay pure (\ (Resumable (Unspecialized _)) yield -> lower @m hole >>= yield))

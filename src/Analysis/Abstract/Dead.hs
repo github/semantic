@@ -11,7 +11,7 @@ import Data.Set (delete)
 import Prologue
 
 -- | An analysis tracking dead (unreachable) code.
-newtype DeadCode m (effects :: [* -> *]) a = DeadCode (m effects a)
+newtype DeadCode m (effects :: [* -> *]) a = DeadCode { runDeadCode :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (DeadCode m)
@@ -57,4 +57,4 @@ instance ( Interpreter effects (result, Dead term) rest m
          , Ord term
          )
       => Interpreter (State (Dead term) ': effects) result rest (DeadCode m) where
-  interpret = interpret . raise @m . flip runState mempty . lower
+  interpret = interpret . runDeadCode . raiseHandler (flip runState mempty)

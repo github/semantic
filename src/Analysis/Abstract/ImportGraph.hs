@@ -53,7 +53,7 @@ style = (defaultStyle vertexName)
         edgeAttributes Variable{} Module{}   = [ "color" := "blue" ]
         edgeAttributes _          _          = []
 
-newtype ImportGraphing m (effects :: [* -> *]) a = ImportGraphing (m effects a)
+newtype ImportGraphing m (effects :: [* -> *]) a = ImportGraphing { runImportGraphing :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (ImportGraphing m)
@@ -171,4 +171,4 @@ vertexToType Variable{} = "variable"
 
 instance Interpreter effects (result, ImportGraph) rest m
       => Interpreter (State ImportGraph ': effects) result rest (ImportGraphing m) where
-  interpret = interpret . raise @m . flip runState mempty . lower
+  interpret = interpret . runImportGraphing . raiseHandler (flip runState mempty)

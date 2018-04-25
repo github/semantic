@@ -17,7 +17,7 @@ import Data.Empty
 import Prologue hiding (empty)
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
-newtype Evaluating location term value effects a = Evaluating (Eff effects a)
+newtype Evaluating location term value effects a = Evaluating { runEvaluating :: Eff effects a }
   deriving (Applicative, Functor, Effectful, Monad)
 
 deriving instance Member NonDet effects => Alternative (Evaluating location term value effects)
@@ -72,13 +72,14 @@ instance ( Ord location
           (Evaluating location term value) where
   interpret
     = interpret
-    . flip runState (EvaluatorState empty empty empty empty empty empty empty)
-    . flip runReader empty -- Reader (Environment location value)
-    . flip runReader empty -- Reader (ModuleTable [Module term])
-    . flip runReader empty -- Reader (SomeOrigin term)
-    . flip runFresh' 0
-    . runFail
-    . Res.runError
-    . Exc.runError
-    . Exc.runError
-    . lower
+    . runEvaluating
+    . raiseHandler
+      ( flip runState (EvaluatorState empty empty empty empty empty empty empty)
+      . flip runReader empty -- Reader (Environment location value)
+      . flip runReader empty -- Reader (ModuleTable [Module term])
+      . flip runReader empty -- Reader (SomeOrigin term)
+      . flip runFresh' 0
+      . runFail
+      . Res.runError
+      . Exc.runError
+      . Exc.runError)

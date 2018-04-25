@@ -14,7 +14,7 @@ import Prologue
 -- | Trace analysis.
 --
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
-newtype Tracing (trace :: * -> *) m (effects :: [* -> *]) a = Tracing (m effects a)
+newtype Tracing (trace :: * -> *) m (effects :: [* -> *]) a = Tracing { runTracing :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Tracing trace m)
@@ -39,4 +39,4 @@ instance ( Interpreter effects (result, trace (Configuration location term value
          , Monoid (trace (Configuration location term value))
          )
       => Interpreter (Writer (trace (Configuration location term value)) ': effects) result rest (Tracing trace m) where
-  interpret = interpret . raise @m . runWriter  . lower
+  interpret = interpret . runTracing . raiseHandler runWriter

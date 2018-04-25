@@ -6,7 +6,7 @@ import Control.Abstract.Analysis
 import Data.Abstract.Evaluatable
 import Prologue
 
-newtype BadModuleResolutions m (effects :: [* -> *]) a = BadModuleResolutions (m effects a)
+newtype BadModuleResolutions m (effects :: [* -> *]) a = BadModuleResolutions { runBadModuleResolutions :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadModuleResolutions m)
@@ -30,6 +30,9 @@ instance ( Interpreter effects result rest m
          , MonadEvaluator location term value effects m
          )
       => Interpreter (Resumable (ResolutionError value) ': effects) result rest (BadModuleResolutions m) where
-  interpret = interpret . raise @m . relay pure (\ (Resumable err) yield -> case err of
-    RubyError nameToResolve -> yield nameToResolve
-    TypeScriptError nameToResolve -> yield nameToResolve) . lower
+  interpret
+    = interpret
+    . runBadModuleResolutions
+    . raiseHandler (relay pure (\ (Resumable err) yield -> case err of
+      RubyError nameToResolve -> yield nameToResolve
+      TypeScriptError nameToResolve -> yield nameToResolve))

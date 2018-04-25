@@ -21,7 +21,7 @@ type CachingEffects location term value effects
  ': effects
 
 -- | A (coinductively-)cached analysis suitable for guaranteeing termination of (suitably finitized) analyses over recursive programs.
-newtype Caching m (effects :: [* -> *]) a = Caching (m effects a)
+newtype Caching m (effects :: [* -> *]) a = Caching { runCaching :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Caching m)
@@ -101,7 +101,7 @@ instance ( Alternative (m effects)
     maybe empty scatter (cacheLookup c cache)
 
 reset :: (Effectful m, Member Fresh effects) => Int -> m effects a -> m effects a
-reset start = raise . interposeState start (const pure) (\ counter Fresh yield -> (yield $! succ counter) counter) . lower
+reset start = raiseHandler (interposeState start (const pure) (\ counter Fresh yield -> (yield $! succ counter) counter))
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
 --
@@ -133,8 +133,8 @@ instance ( Interpreter effects ([result], Cache location term value) rest m
       => Interpreter (NonDet ': Reader (Cache location term value) ': State (Cache location term value) ': effects) result rest (Caching m) where
   interpret
     = interpret
-    . raise @m
-    . flip runState mempty
-    . flip runReader mempty
-    . makeChoiceA @[]
-    . lower
+    . runCaching
+    . raiseHandler
+      ( flip runState mempty
+      . flip runReader mempty
+      . makeChoiceA @[])

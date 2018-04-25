@@ -7,7 +7,7 @@ import Control.Abstract.Analysis
 import Prologue
 
 -- | An analysis that fails on errors.
-newtype Erroring (exc :: * -> *) m (effects :: [* -> *]) a = Erroring (m effects a)
+newtype Erroring (exc :: * -> *) m (effects :: [* -> *]) a = Erroring { runErroring :: m effects a }
   deriving (Alternative, Applicative, Effectful, Functor, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Erroring exc m)
@@ -19,4 +19,4 @@ instance MonadAnalysis location term value effects m
 
 instance Interpreter                   effects  (Either (SomeExc exc) result) rest               m
       => Interpreter (Resumable exc ': effects)                       result  rest (Erroring exc m) where
-  interpret = interpret . raise @m . runError . lower
+  interpret = interpret . runErroring . raiseHandler runError
