@@ -74,7 +74,7 @@ instance ( Ord location
     = interpret
     . runEvaluating
     . raiseHandler
-      ( flip runState (EvaluatorState empty empty empty empty empty empty empty)
+      ( flip runState  empty -- State (EvaluatorState location term value)
       . flip runReader empty -- Reader (Environment location value)
       . flip runReader empty -- Reader (ModuleTable [Module term])
       . flip runReader empty -- Reader (SomeOrigin term)
