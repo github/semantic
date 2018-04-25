@@ -3,14 +3,27 @@ module Control.Effect
 ( Effectful(..)
 , raiseHandler
 , Interpreter(..)
+, throwResumable
 , resume
+, throwException
+, catchException
 ) where
 
 import Control.Monad.Effect           as Effect
+import Control.Monad.Effect.Exception as Exception
 import Control.Monad.Effect.Resumable as Resumable
+
+throwResumable :: (Member (Resumable exc) effects, Effectful m) => exc v -> m effects v
+throwResumable = raise . Resumable.throwError
 
 resume :: (Member (Resumable exc) e, Effectful m) => m e a -> (forall v . (v -> m e a) -> exc v -> m e a) -> m e a
 resume m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
+
+throwException :: (Member (Exc exc) effects, Effectful m) => exc -> m effects a
+throwException = raise . Exception.throwError
+
+catchException :: (Member (Exc exc) effects, Effectful m) => m effects v -> (exc -> m effects v) -> m effects v
+catchException action handler = raise (lower action `Exception.catchError` (lower . handler))
 
 
 -- | Types wrapping 'Eff' actions.

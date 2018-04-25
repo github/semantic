@@ -46,10 +46,6 @@ module Control.Abstract.Evaluator
   -- Control
   , label
   , goto
-  -- Exceptions
-  , throwResumable
-  , throwException
-  , catchException
   ) where
 
 import Control.Effect
@@ -353,15 +349,3 @@ label term = do
 -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
 goto :: (Member Fail effects, MonadEvaluator location term value effects m) => Label -> m effects term
 goto label = IntMap.lookup label <$> view _jumps >>= maybe (raise (fail ("unknown label: " <> show label))) pure
-
-
--- Exceptions
-
-throwResumable :: (Member (Resumable exc) effects, Effectful m) => exc v -> m effects v
-throwResumable = raise . Resumable.throwError
-
-throwException :: (Member (Exc exc) effects, Effectful m) => exc -> m effects a
-throwException = raise . Exception.throwError
-
-catchException :: (Member (Exc exc) effects, Effectful m) => m effects v -> (exc -> m effects v) -> m effects v
-catchException action handler = raise (lower action `Exception.catchError` (lower . handler))
