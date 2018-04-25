@@ -41,7 +41,6 @@ import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 
 
--- type TestEvaluating term = Evaluating Precise term (Value Precise)
 type JustEvaluating term = Evaluating (Located Precise term) term (Value (Located Precise term))
 type EvaluatingWithHoles term = BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term))))))
 type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
@@ -57,6 +56,9 @@ pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Py
 
 -- Evaluate a project, starting at a single entrypoint.
 evaluateProject parser prelude path = evaluatePackage <$> runTask (readProject Nothing (file path :| []) >>= parsePackage parser prelude)
+
+evalRubyFile path = runAnalysis @(JustEvaluating Ruby.Term) <$> evaluateFile rubyParser path
+evaluateFile parser path = evaluateModule <$> runTask (parseModule parser Nothing (file path))
 
 
 -- Read and parse a file.

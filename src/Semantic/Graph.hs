@@ -56,11 +56,11 @@ parsePackage parser preludeFile project@Project{..} = do
     parseModules parser project@Project{..} = distributeFor allFiles (WrapTask . parseModule parser (Just projectRootDir))
       where allFiles = projectAllFiles project
 
-    -- | Parse a file into a 'Module'.
-    parseModule :: Members '[Files, Task] effs => Parser term -> Maybe FilePath -> File -> Eff effs (Module term)
-    parseModule parser rootDir file = do
-      blob <- readBlob file
-      moduleForBlob rootDir blob <$> parse parser blob
+-- | Parse a file into a 'Module'.
+parseModule :: Members '[Files, Task] effs => Parser term -> Maybe FilePath -> File -> Eff effs (Module term)
+parseModule parser rootDir file = do
+  blob <- readBlob file
+  moduleForBlob rootDir blob <$> parse parser blob
 
 
 type ImportGraphAnalysis term effects value =
