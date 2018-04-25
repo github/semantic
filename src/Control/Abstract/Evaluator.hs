@@ -181,7 +181,7 @@ defaultEnvironment = raise ask
 -- | Set the default environment for the lifetime of an action.
 --   Usually only invoked in a top-level evaluation function.
 withDefaultEnvironment :: MonadEvaluator location term value effects m => Environment location value -> m effects a -> m effects a
-withDefaultEnvironment e = raise . local (const e) . lower
+withDefaultEnvironment e = raiseHandler (local (const e))
 
 -- | Obtain an environment that is the composition of the current and default environments.
 --   Useful for debugging.
@@ -307,7 +307,7 @@ askModuleTable = raise ask
 
 -- | Run an action with a locally-modified table of unevaluated modules.
 localModuleTable :: MonadEvaluator location term value effects m => (ModuleTable [Module term] -> ModuleTable [Module term]) -> m effects a -> m effects a
-localModuleTable f a = raise (local f (lower a))
+localModuleTable f = raiseHandler (local f)
 
 
 -- | Retrieve the module load stack
