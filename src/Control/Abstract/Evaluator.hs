@@ -74,7 +74,7 @@ import qualified Data.IntMap as IntMap
 import Data.Semigroup.Reducer
 import Lens.Micro
 import Prelude hiding (fail)
-import Prologue
+import Prologue hiding (empty)
 
 -- | A 'Monad' providing the basic essentials for evaluation.
 --
@@ -112,7 +112,7 @@ instance (Ord location, Semigroup (Cell location value)) => Semigroup (Evaluator
   EvaluatorState e1 h1 m1 l1 x1 j1 o1 <> EvaluatorState e2 h2 m2 l2 x2 j2 o2 = EvaluatorState (e1 <> e2) (h1 <> h2) (m1 <> m2) (l1 <> l2) (x1 <> x2) (j1 <> j2) (o1 <> o2)
 
 instance (Ord location, Semigroup (Cell location value)) => Empty (EvaluatorState location term value) where
-  empty = EvaluatorState mempty mempty mempty mempty mempty mempty mempty
+  empty = EvaluatorState empty empty empty empty empty empty empty
 
 
 -- Lenses
