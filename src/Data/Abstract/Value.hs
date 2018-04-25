@@ -197,9 +197,11 @@ instance Ord location => ValueRoots location (Value location) where
     | otherwise                            = mempty
 
 
+instance Monad (m effects) => MonadHole (Value location) effects m where
+  hole = pure (injValue Hole)
+
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance (Monad (m effects), MonadEvaluatable location term (Value location) effects m) => MonadValue location (Value location) effects m where
-  hole     = pure . injValue $ Hole
   unit     = pure . injValue $ Unit
   integer  = pure . injValue . Integer . Number.Integer
   boolean  = pure . injValue . Boolean

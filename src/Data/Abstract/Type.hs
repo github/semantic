@@ -52,6 +52,9 @@ instance Ord location => ValueRoots location Type where
   valueRoots _ = mempty
 
 
+instance Monad (m effects) => MonadHole Type effects m where
+  hole = pure Hole
+
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
 instance ( Alternative (m effects)
          , Member Fail effects
@@ -71,7 +74,6 @@ instance ( Alternative (m effects)
     ret <- localEnv (mappend env) body
     pure (Product tvars :-> ret)
 
-  hole       = pure Hole
   unit       = pure Unit
   integer _  = pure Int
   boolean _  = pure Bool

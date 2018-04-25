@@ -22,7 +22,7 @@ deriving instance MonadEvaluator location term value effects m => MonadEvaluator
 instance ( Effectful m
          , Member (Resumable (Unspecialized value)) effects
          , MonadAnalysis location term value effects m
-         , MonadValue location value effects (Quietly m)
+         , MonadHole value effects (Quietly m)
          )
       => MonadAnalysis location term value effects (Quietly m) where
   type Effects location term value (Quietly m) = Resumable (Unspecialized value) ': Effects location term value m
@@ -33,7 +33,7 @@ instance ( Effectful m
   analyzeModule = liftAnalyze analyzeModule
 
 instance ( Interpreter effects result rest m
-         , MonadValue location value effects m
+         , MonadHole value effects m
          )
       => Interpreter (Resumable (Unspecialized value) ': effects) result rest (Quietly m) where
   interpret

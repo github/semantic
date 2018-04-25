@@ -13,7 +13,7 @@ deriving instance MonadEvaluator location term value effects m => MonadEvaluator
 instance ( Effectful m
          , Member (Resumable (AddressError location value)) effects
          , MonadAnalysis location term value effects m
-         , MonadValue location value effects (BadAddresses m)
+         , MonadHole value effects (BadAddresses m)
          , Monoid (Cell location value)
          , Show location
          )
@@ -30,7 +30,7 @@ instance ( Effectful m
   analyzeModule = liftAnalyze analyzeModule
 
 instance ( Interpreter effects result rest m
-         , MonadValue location value effects m
+         , MonadHole value effects m
          , Monoid (Cell location value)
          )
       => Interpreter (Resumable (AddressError location value) ': effects) result rest (BadAddresses m) where

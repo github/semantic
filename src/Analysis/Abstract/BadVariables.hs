@@ -17,7 +17,7 @@ instance ( Effectful m
          , Member (Resumable (EvalError value)) effects
          , Member (State [Name]) effects
          , MonadAnalysis location term value effects m
-         , MonadValue location value effects (BadVariables m)
+         , MonadHole value effects (BadVariables m)
          )
       => MonadAnalysis location term value effects (BadVariables m) where
   type Effects location term value (BadVariables m) = Resumable (EvalError value) ': State [Name] ': Effects location term value m
@@ -37,7 +37,7 @@ instance ( Effectful m
   analyzeModule = liftAnalyze analyzeModule
 
 instance ( Interpreter effects (result, [Name]) rest m
-         , MonadValue location value (State [Name] ': effects) m
+         , MonadHole value (State [Name] ': effects) m
          )
       => Interpreter (Resumable (EvalError value) ': State [Name] ': effects) result rest (BadVariables m) where
   interpret

@@ -14,7 +14,8 @@ deriving instance MonadEvaluator location term value effects m   => MonadEvaluat
 instance ( Effectful m
          , Member (Resumable (ValueError location value)) effects
          , MonadAnalysis location term value effects m
-         , MonadValue location value effects (BadValues m)
+         , MonadHole value effects (BadValues m)
+         , Show value
          )
       => MonadAnalysis location term value effects (BadValues m) where
   type Effects location term value (BadValues m) = Resumable (ValueError location value) ': Effects location term value m
@@ -42,7 +43,7 @@ instance ( Effectful m
 
 instance ( Interpreter effects result rest m
          , MonadEvaluator location term value effects m
-         , MonadValue location value effects m
+         , MonadHole value effects m
          , Show value
          )
       => Interpreter (Resumable (ValueError location value) ': effects) result rest (BadValues m) where
