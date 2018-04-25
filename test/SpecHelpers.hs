@@ -12,6 +12,8 @@ module SpecHelpers (
 , TestEvaluating
 , ) where
 
+import Analysis.Abstract.Erroring
+import Analysis.Abstract.Evaluating
 import Control.Abstract.Evaluator as X (EvaluatorState(..))
 import Data.Abstract.Address as X
 import Data.Abstract.FreeVariables as X hiding (dropExtension)
@@ -50,7 +52,6 @@ import Test.LeanCheck as X
 import qualified Data.ByteString as B
 import qualified Semantic.IO as IO
 import Data.Abstract.Value
-import Analysis.Abstract.Evaluating
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO ByteString
