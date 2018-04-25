@@ -45,7 +45,7 @@ instance ( Effectful m
          )
          => MonadCaching location term value effects (Caching m) where
   consultOracle configuration = raise (fromMaybe mempty . cacheLookup configuration <$> ask)
-  withOracle cache = raise . local (const cache) . lower
+  withOracle cache = raiseHandler (local (const cache))
 
   lookupCache configuration = raise (cacheLookup configuration <$> get)
   caching configuration values action = do
