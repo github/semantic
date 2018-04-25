@@ -35,10 +35,10 @@ languageForType mediaType = case mediaType of
 
 extensionsForLanguage :: Language -> [String]
 extensionsForLanguage language = case language of
-  Go -> ["go"]
-  JavaScript -> ["js"]
-  PHP -> ["php"]
-  Python -> ["py"]
-  Ruby -> ["rb"]
-  TypeScript -> ["ts", "tsx", "d.tsx"]
+  Go -> [".go"]
+  JavaScript -> [".js"]
+  PHP -> [".php"]
+  Python -> [".py"]
+  Ruby -> [".rb"]
+  TypeScript -> [".ts", ".tsx", ".d.tsx"]
   _ -> []
