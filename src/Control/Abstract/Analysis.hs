@@ -47,7 +47,7 @@ class MonadEvaluator location term value effects m => MonadAnalysis location ter
   isolate :: m effects a -> m effects a
   isolate = withEnv mempty . withExports mempty
 
-class Effectful m => Interpreter effects result function m | m effects result -> function where
+class Effectful m => Interpreter effects result function m | m -> effects, m result -> function where
   interpret :: m effects result -> function
 
 instance Interpreter '[] result result Eff where

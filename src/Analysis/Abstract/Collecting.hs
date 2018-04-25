@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.Collecting
 ( Collecting
 ) where
@@ -79,6 +80,7 @@ reachable roots heap = go mempty roots
 
 
 instance ( Interpreter effects result rest m
+         , MonadEvaluator location term value effects m
          , Ord location
          )
       => Interpreter (Reader (Live location value) ': effects) result rest (Collecting m) where

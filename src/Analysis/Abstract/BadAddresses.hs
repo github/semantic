@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.BadAddresses where
 
 import Control.Abstract.Analysis
@@ -30,6 +31,7 @@ instance ( Effectful m
   analyzeModule = liftAnalyze analyzeModule
 
 instance ( Interpreter effects result rest m
+         , MonadEvaluator location term value effects m
          , MonadHole value effects m
          , Monoid (Cell location value)
          )

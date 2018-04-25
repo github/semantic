@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.BadModuleResolutions where
 
 import Control.Abstract.Analysis
@@ -27,7 +28,9 @@ instance ( Effectful m
 
   analyzeModule = liftAnalyze analyzeModule
 
-instance Interpreter                                       effects  result rest                       m
+instance ( Interpreter effects result rest m
+         , MonadEvaluator location term value effects m
+         )
       => Interpreter (Resumable (ResolutionError value) ': effects) result rest (BadModuleResolutions m) where
   interpret = interpret . raise @m . relay pure (\ (Resumable err) yield -> case err of
     RubyError nameToResolve -> yield nameToResolve

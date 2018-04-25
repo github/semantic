@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.Dead
 ( DeadCode
 ) where
@@ -54,6 +55,7 @@ instance ( Corecursive term
     liftAnalyze analyzeModule recur m
 
 instance ( Interpreter effects (result, Dead term) rest m
+         , MonadEvaluator location term value effects m
          , Ord term
          )
       => Interpreter (State (Dead term) ': effects) result rest (DeadCode m) where

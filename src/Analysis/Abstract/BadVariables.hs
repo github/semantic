@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.BadVariables
 ( BadVariables
 ) where
@@ -37,6 +38,7 @@ instance ( Effectful m
   analyzeModule = liftAnalyze analyzeModule
 
 instance ( Interpreter effects (result, [Name]) rest m
+         , MonadEvaluator location term value effects m
          , MonadHole value (State [Name] ': effects) m
          )
       => Interpreter (Resumable (EvalError value) ': State [Name] ': effects) result rest (BadVariables m) where
