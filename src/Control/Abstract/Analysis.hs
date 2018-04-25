@@ -4,8 +4,6 @@ module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , liftAnalyze
 , runAnalysis
-, SomeAnalysis(..)
-, runSomeAnalysis
 , module X
 , Subterm(..)
 , SubtermAlgebra
@@ -60,16 +58,3 @@ runAnalysis :: ( Effectful m
             => m effects a
             -> function
 runAnalysis = interpret
-
-
--- | An abstraction over analyses.
-data SomeAnalysis m result where
-  SomeAnalysis :: ( Effectful m
-                  , Interpreter effects a function m
-                  )
-               => m effects a
-               -> SomeAnalysis m function
-
--- | Run an abstracted analysis.
-runSomeAnalysis :: SomeAnalysis m result -> result
-runSomeAnalysis (SomeAnalysis a) = interpret a
