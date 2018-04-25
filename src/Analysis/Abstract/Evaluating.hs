@@ -3,17 +3,17 @@ module Analysis.Abstract.Evaluating
 ( Evaluating
 ) where
 
-import Control.Abstract.Analysis
+import Control.Abstract.Analysis hiding (lower)
 import Control.Monad.Effect.Exception as Exc
 import Control.Monad.Effect.Resumable as Res
 import Data.Abstract.Address
 import Data.Abstract.Environment
-import Data.Abstract.Evaluatable
+import Data.Abstract.Evaluatable hiding (lower)
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Origin
-import Data.Empty
-import Prologue hiding (empty)
+import Data.Semilattice.Lower
+import Prologue
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
 newtype Evaluating location term value effects a = Evaluating { runEvaluating :: Eff effects a }
@@ -71,10 +71,10 @@ instance ( Ord location
     = interpret
     . runEvaluating
     . raiseHandler
-      ( flip runState  empty -- State (EvaluatorState location term value)
-      . flip runReader empty -- Reader (Environment location value)
-      . flip runReader empty -- Reader (ModuleTable [Module term])
-      . flip runReader empty -- Reader (SomeOrigin term)
+      ( flip runState  lower -- State (EvaluatorState location term value)
+      . flip runReader lower -- Reader (Environment location value)
+      . flip runReader lower -- Reader (ModuleTable [Module term])
+      . flip runReader lower -- Reader (SomeOrigin term)
       . flip runFresh' 0
       . runFail
       . Res.runError
