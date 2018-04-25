@@ -278,7 +278,6 @@ instance (Monad (m effects), MonadEvaluatable location term (Value location) eff
     | otherwise = throwValueError (Numeric2Error left right)
       where
         tentative x i j = attemptUnsafeArithmetic (x i j)
-        {-# NOINLINE tentative #-}
 
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
         specialize :: MonadEvaluatable location term value effects m => Either ArithException Number.SomeNumber -> m effects value
