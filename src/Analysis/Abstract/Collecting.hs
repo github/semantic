@@ -11,6 +11,7 @@ import Data.Abstract.Heap
 import Data.Abstract.Live
 import Prologue
 
+-- | An analysis performing GC after every instruction.
 newtype Collecting m (effects :: [* -> *]) a = Collecting { runCollecting :: m effects a }
   deriving (Alternative, Applicative, Effectful, Functor, Monad)
 
