@@ -52,11 +52,12 @@ type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
 -- will expect the TypeError exception type to have an Ord instance, which is wrong.
 type Checking term = Caching (TypeChecking (Evaluating Monovariant term Type))
 
-evalGoProject path = runAnalysis @(JustEvaluating Go.Term) <$> evaluateProject goParser Nothing path
-evalRubyProject path = runAnalysis @(JustEvaluating Ruby.Term) <$> evaluateProject rubyParser rubyPrelude path
-evalPHPProject path = runAnalysis @(JustEvaluating PHP.Term) <$> evaluateProject phpParser Nothing path
-evalPythonProject path = runAnalysis @(JustEvaluating Python.Term) <$> evaluateProject pythonParser pythonPrelude path
-evalTypeScriptProject path = runAnalysis @(EvaluatingWithHoles TypeScript.Term) <$> evaluateProject typescriptParser Nothing path
+evalGoProject path = runAnalysis @(JustEvaluating Go.Term) <$> evaluateProject goParser Language.Go Nothing path
+evalRubyProject path = runAnalysis @(JustEvaluating Ruby.Term) <$> evaluateProject rubyParser Language.Ruby rubyPrelude path
+evalPHPProject path = runAnalysis @(JustEvaluating PHP.Term) <$> evaluateProject phpParser Language.PHP Nothing path
+evalPythonProject path = runAnalysis @(JustEvaluating Python.Term) <$> evaluateProject pythonParser Language.Python pythonPrelude path
+evalTypeScriptProjectQuietly path = runAnalysis @(EvaluatingWithHoles TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
+evalTypeScriptProject path = runAnalysis @(JustEvaluating TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
 
 typecheckGoFile path = runAnalysis @(Checking Go.Term) <$> evaluateProject goParser Nothing path
 
@@ -64,14 +65,11 @@ rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby
 pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Language.Python)
 
 -- Evaluate a project, starting at a single entrypoint.
-evaluateProject parser prelude path = evaluatePackage <$> runTask (readProject Nothing (file path :| []) >>= parsePackage parser prelude)
+evaluateProject parser lang prelude path = evaluatePackage <$> runTask (readProject path lang >>= parsePackage parser prelude)
 
-
--- Read and parse a file.
 parseFile :: Parser term -> FilePath -> IO term
 parseFile parser = runTask . (parse parser <=< readBlob . file)
 
--- Read a file from the filesystem into a Blob.
 blob :: FilePath -> IO Blob
 blob = runTask . readBlob . file
 
