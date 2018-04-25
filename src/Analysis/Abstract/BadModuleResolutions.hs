@@ -10,21 +10,7 @@ newtype BadModuleResolutions m (effects :: [* -> *]) a = BadModuleResolutions { 
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadModuleResolutions m)
-
-instance ( Effectful m
-         , Member (Resumable (ResolutionError value)) effects
-         , MonadAnalysis location term value effects m
-         , MonadValue location value effects (BadModuleResolutions m)
-         )
-      => MonadAnalysis location term value effects (BadModuleResolutions m) where
-  analyzeTerm eval term = resume @(ResolutionError value) (liftAnalyze analyzeTerm eval term) (
-        \yield error -> do
-          traceM ("ResolutionError:" <> show error)
-          case error of
-            RubyError nameToResolve -> yield nameToResolve
-            TypeScriptError nameToResolve -> yield nameToResolve)
-
-  analyzeModule = liftAnalyze analyzeModule
+deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadModuleResolutions m)
 
 instance ( Interpreter effects result rest m
          , MonadEvaluator location term value effects m
@@ -33,6 +19,6 @@ instance ( Interpreter effects result rest m
   interpret
     = interpret
     . runBadModuleResolutions
-    . raiseHandler (relay pure (\ (Resumable err) yield -> case err of
-      RubyError nameToResolve -> yield nameToResolve
+    . raiseHandler (relay pure (\ (Resumable err) yield -> traceM ("ResolutionError:" <> show err) *> case err of
+      RubyError       nameToResolve -> yield nameToResolve
       TypeScriptError nameToResolve -> yield nameToResolve))

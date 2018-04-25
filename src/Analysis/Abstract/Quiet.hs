@@ -19,17 +19,7 @@ newtype Quietly m (effects :: [* -> *]) a = Quietly { runQuietly :: m effects a 
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Quietly m)
-
-instance ( Effectful m
-         , Member (Resumable (Unspecialized value)) effects
-         , MonadAnalysis location term value effects m
-         , AbstractHole value
-         )
-      => MonadAnalysis location term value effects (Quietly m) where
-  analyzeTerm eval term = resume @(Unspecialized value) (liftAnalyze analyzeTerm eval term) (\yield err@(Unspecialized _) ->
-          traceM ("Unspecialized:" <> show err) >> yield hole)
-
-  analyzeModule = liftAnalyze analyzeModule
+deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (Quietly m)
 
 instance ( Interpreter effects result rest m
          , MonadEvaluator location term value effects m
@@ -39,4 +29,4 @@ instance ( Interpreter effects result rest m
   interpret
     = interpret
     . runQuietly
-    . raiseHandler (relay pure (\ (Resumable (Unspecialized _)) yield -> yield hole))
+    . raiseHandler (relay pure (\ (Resumable err@(Unspecialized _)) yield -> traceM ("Unspecialized:" <> show err) *> yield hole))

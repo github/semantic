@@ -10,33 +10,18 @@ newtype BadAddresses m (effects :: [* -> *]) a = BadAddresses { runBadAddresses 
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadAddresses m)
-
-instance ( Effectful m
-         , Member (Resumable (AddressError location value)) effects
-         , MonadAnalysis location term value effects m
-         , AbstractHole value
-         , Monoid (Cell location value)
-         , Show location
-         )
-      => MonadAnalysis location term value effects (BadAddresses m) where
-  analyzeTerm eval term = resume @(AddressError location value) (liftAnalyze analyzeTerm eval term) (
-        \yield error -> do
-          traceM ("AddressError:" <> show error)
-          case error of
-            UnallocatedAddress _ -> yield mempty
-            UninitializedAddress _ -> yield hole)
-
-  analyzeModule = liftAnalyze analyzeModule
+deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadAddresses m)
 
 instance ( Interpreter effects result rest m
          , MonadEvaluator location term value effects m
          , AbstractHole value
          , Monoid (Cell location value)
+         , Show location
          )
       => Interpreter (Resumable (AddressError location value) ': effects) result rest (BadAddresses m) where
   interpret
     = interpret
     . runBadAddresses
-    . raiseHandler (relay pure (\ (Resumable err) yield -> case err of
-      UnallocatedAddress _ -> yield mempty
+    . raiseHandler (relay pure (\ (Resumable err) yield -> traceM ("AddressError:" <> show err) *> case err of
+      UnallocatedAddress _   -> yield mempty
       UninitializedAddress _ -> yield hole))
