@@ -5,12 +5,12 @@ module Semantic.Util where
 
 import           Analysis.Abstract.BadAddresses
 import           Analysis.Abstract.BadModuleResolutions
+import           Analysis.Abstract.BadSyntax
 import           Analysis.Abstract.BadValues
 import           Analysis.Abstract.BadVariables
 import           Analysis.Abstract.Erroring
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.ImportGraph
-import           Analysis.Abstract.Quiet
 import           Analysis.Declaration
 import           Control.Abstract.Analysis
 import           Data.Abstract.Address
@@ -50,7 +50,7 @@ type JustEvaluating term
   ( Erroring (Unspecialized (Value (Located Precise term)))
   ( Erroring (ValueError (Located Precise term) (Value (Located Precise term)))
   ( Evaluating (Located Precise term) term (Value (Located Precise term)))))))
-type EvaluatingWithHoles term = BadAddresses (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term)))))))
+type EvaluatingWithHoles term = BadAddresses (BadModuleResolutions (BadVariables (BadValues (BadSyntax (Evaluating (Located Precise term) term (Value (Located Precise term)))))))
 type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
 
 evalGoProject path = runAnalysis @(JustEvaluating Go.Term) <$> evaluateProject goParser Nothing path

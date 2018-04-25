@@ -1,7 +1,7 @@
 {-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
-module Analysis.Abstract.Quiet
-( Quietly
+module Analysis.Abstract.BadSyntax
+( BadSyntax
 ) where
 
 import Control.Abstract.Analysis
@@ -12,21 +12,21 @@ import Prologue
 --
 --   Use it by composing it onto an analysis:
 --
---   > runAnalysis @(Quietly (Evaluating term value)) (…)
+--   > runAnalysis @(BadSyntax (Evaluating term value)) (…)
 --
---   Note that exceptions thrown by other analyses may not be caught if 'Quietly' doesn’t know about them, i.e. if they’re not part of the generic 'MonadValue', 'MonadAddressable', etc. machinery.
-newtype Quietly m (effects :: [* -> *]) a = Quietly { runQuietly :: m effects a }
+--   Note that exceptions thrown by other analyses may not be caught if 'BadSyntax' doesn’t know about them, i.e. if they’re not part of the generic 'MonadValue', 'MonadAddressable', etc. machinery.
+newtype BadSyntax m (effects :: [* -> *]) a = BadSyntax { runBadSyntax :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
-deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Quietly m)
-deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (Quietly m)
+deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadSyntax m)
+deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadSyntax m)
 
 instance ( Interpreter effects result rest m
          , MonadEvaluator location term value effects m
          , AbstractHole value
          )
-      => Interpreter (Resumable (Unspecialized value) ': effects) result rest (Quietly m) where
+      => Interpreter (Resumable (Unspecialized value) ': effects) result rest (BadSyntax m) where
   interpret
     = interpret
-    . runQuietly
+    . runBadSyntax
     . raiseHandler (relay pure (\ (Resumable err@(Unspecialized _)) yield -> traceM ("Unspecialized:" <> show err) *> yield hole))

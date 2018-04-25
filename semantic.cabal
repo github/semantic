@@ -16,16 +16,16 @@ library
   exposed-modules:
                      -- Analyses & term annotations
                        Analysis.Abstract.BadAddresses
-                       Analysis.Abstract.BadVariables
-                       Analysis.Abstract.BadValues
-                       Analysis.Abstract.BadModuleResolutions
+                     , Analysis.Abstract.BadSyntax
+                     , Analysis.Abstract.BadModuleResolutions
+                     , Analysis.Abstract.BadVariables
+                     , Analysis.Abstract.BadValues
                      , Analysis.Abstract.Caching
                      , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Erroring
                      , Analysis.Abstract.Evaluating
                      , Analysis.Abstract.ImportGraph
-                     , Analysis.Abstract.Quiet
                      , Analysis.Abstract.Tracing
                      , Analysis.CallGraph
                      , Analysis.ConstructorName
@@ -49,11 +49,11 @@ library
                      , Data.Abstract.Address
                      , Data.Abstract.Cache
                      , Data.Abstract.Configuration
+                     , Data.Abstract.Declarations
                      , Data.Abstract.Environment
                      , Data.Abstract.Evaluatable
                      , Data.Abstract.Exports
                      , Data.Abstract.FreeVariables
-                     , Data.Abstract.Declarations
                      , Data.Abstract.Heap
                      , Data.Abstract.Live
                      , Data.Abstract.Located
