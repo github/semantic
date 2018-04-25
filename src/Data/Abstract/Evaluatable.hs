@@ -23,7 +23,6 @@ module Data.Abstract.Evaluatable
 , listModulesInDir
 , require
 , load
-, pushOrigin
 ) where
 
 import           Control.Abstract.Addressable as X
@@ -36,7 +35,7 @@ import qualified Data.Abstract.Exports as Exports
 import           Data.Abstract.FreeVariables as X
 import           Data.Abstract.Module
 import           Data.Abstract.ModuleTable as ModuleTable
-import           Data.Abstract.Origin (SomeOrigin, packageOrigin)
+import           Data.Abstract.Origin (packageOrigin)
 import           Data.Abstract.Package as Package
 import           Data.Language
 import           Data.Scientific (Scientific)
