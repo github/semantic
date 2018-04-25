@@ -13,13 +13,6 @@ import Data.Abstract.Heap
 import Data.Abstract.Module
 import Prologue
 
--- | The effects necessary for caching analyses.
-type CachingEffects location term value effects
-  = NonDet                             -- For 'Alternative' and 'gather'.
- ': Reader (Cache location term value) -- The in-cache used as an oracle while converging on a result.
- ': State  (Cache location term value) -- The out-cache used to record results in each iteration of convergence.
- ': effects
-
 -- | A (coinductively-)cached analysis suitable for guaranteeing termination of (suitably finitized) analyses over recursive programs.
 newtype Caching m (effects :: [* -> *]) a = Caching { runCaching :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
@@ -42,7 +35,9 @@ class MonadEvaluator location term value effects m => MonadCaching location term
   isolateCache :: m effects a -> m effects (Cache location term value)
 
 instance ( Effectful m
-         , Members (CachingEffects location term value '[]) effects
+         , Member NonDet effects
+         , Member (Reader (Cache location term value)) effects
+         , Member (State  (Cache location term value)) effects
          , MonadEvaluator location term value effects m
          , Ord (Cell location value)
          , Ord location
@@ -67,7 +62,9 @@ instance ( Alternative (m effects)
          , Corecursive term
          , Effectful m
          , Member Fresh effects
-         , Members (CachingEffects location term value '[]) effects
+         , Member NonDet effects
+         , Member (Reader (Cache location term value)) effects
+         , Member (State  (Cache location term value)) effects
          , MonadAnalysis location term value effects m
          , Ord (Cell location value)
          , Ord location
