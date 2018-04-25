@@ -46,17 +46,22 @@ instance ( Interpreter effects result rest m
          , Show value
          )
       => Interpreter (Resumable (ValueError location value) ': effects) result rest (BadValues m) where
-  interpret = interpret . raise @m . relay pure (\ (Resumable err) yield -> case err of
-    ScopedEnvironmentError{} -> do
-      env <- lower @m getEnv
-      yield (Env.push env)
-    CallError val              -> yield val
-    StringError val            -> yield (pack (show val))
-    BoolError{}                -> yield True
-    NumericError{}             -> lower @m hole >>= yield
-    Numeric2Error{}            -> lower @m hole >>= yield
-    ComparisonError{}          -> lower @m hole >>= yield
-    NamespaceError{}           -> lower @m getEnv >>= yield
-    BitwiseError{}             -> lower @m hole >>= yield
-    Bitwise2Error{}            -> lower @m hole >>= yield
-    KeyValueError{}            -> lower @m hole >>= \x -> yield (x, x)) . lower
+  interpret
+    = interpret
+    . raise @m
+    . relay pure (\ (Resumable err) yield -> case err of
+      ScopedEnvironmentError{} -> do
+        env <- lower @m getEnv
+        yield (Env.push env)
+      CallError val              -> yield val
+      StringError val            -> yield (pack (show val))
+      BoolError{}                -> yield True
+      NumericError{}             -> lower @m hole >>= yield
+      Numeric2Error{}            -> lower @m hole >>= yield
+      ComparisonError{}          -> lower @m hole >>= yield
+      NamespaceError{}           -> lower @m getEnv >>= yield
+      BitwiseError{}             -> lower @m hole >>= yield
+      Bitwise2Error{}            -> lower @m hole >>= yield
+      KeyValueError{}            -> lower @m hole >>= \x -> yield (x, x)
+      ArithmeticError{}          -> lower @m hole >>= yield)
+    . lower
