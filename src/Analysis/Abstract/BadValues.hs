@@ -14,7 +14,7 @@ deriving instance MonadEvaluator location term value effects m => MonadEvaluator
 instance ( Effectful m
          , Member (Resumable (ValueError location value)) effects
          , MonadAnalysis location term value effects m
-         , MonadHole value effects (BadValues m)
+         , AbstractHole value
          , Show value
          )
       => MonadAnalysis location term value effects (BadValues m) where
@@ -25,24 +25,24 @@ instance ( Effectful m
             ScopedEnvironmentError{} -> do
               env <- getEnv
               yield (Env.push env)
-            CallError val              -> yield val
-            StringError val            -> yield (pack (show val))
-            BoolError{}                -> yield True
-            NumericError{}             -> hole >>= yield
-            Numeric2Error{}            -> hole >>= yield
-            ComparisonError{}          -> hole >>= yield
-            NamespaceError{}           -> getEnv >>= yield
-            BitwiseError{}             -> hole >>= yield
-            Bitwise2Error{}            -> hole >>= yield
-            KeyValueError{}            -> hole >>= \x -> yield (x, x)
-            ArithmeticError{}          -> hole >>= yield
+            CallError val     -> yield val
+            StringError val   -> yield (pack (show val))
+            BoolError{}       -> yield True
+            NumericError{}    -> yield hole
+            Numeric2Error{}   -> yield hole
+            ComparisonError{} -> yield hole
+            NamespaceError{}  -> getEnv >>= yield
+            BitwiseError{}    -> yield hole
+            Bitwise2Error{}   -> yield hole
+            KeyValueError{}   -> yield (hole, hole)
+            ArithmeticError{} -> yield hole
           )
 
   analyzeModule = liftAnalyze analyzeModule
 
 instance ( Interpreter effects result rest m
          , MonadEvaluator location term value effects m
-         , MonadHole value effects m
+         , AbstractHole value
          , Show value
          )
       => Interpreter (Resumable (ValueError location value) ': effects) result rest (BadValues m) where
@@ -53,14 +53,14 @@ instance ( Interpreter effects result rest m
       ScopedEnvironmentError{} -> do
         env <- lower @m getEnv
         yield (Env.push env)
-      CallError val              -> yield val
-      StringError val            -> yield (pack (show val))
-      BoolError{}                -> yield True
-      NumericError{}             -> lower @m hole >>= yield
-      Numeric2Error{}            -> lower @m hole >>= yield
-      ComparisonError{}          -> lower @m hole >>= yield
-      NamespaceError{}           -> lower @m getEnv >>= yield
-      BitwiseError{}             -> lower @m hole >>= yield
-      Bitwise2Error{}            -> lower @m hole >>= yield
-      KeyValueError{}            -> lower @m hole >>= \x -> yield (x, x)
-      ArithmeticError{}          -> lower @m hole >>= yield))
+      CallError val     -> yield val
+      StringError val   -> yield (pack (show val))
+      BoolError{}       -> yield True
+      NumericError{}    -> yield hole
+      Numeric2Error{}   -> yield hole
+      ComparisonError{} -> yield hole
+      NamespaceError{}  -> lower @m getEnv >>= yield
+      BitwiseError{}    -> yield hole
+      Bitwise2Error{}   -> yield hole
+      KeyValueError{}   -> yield (hole, hole)
+      ArithmeticError{} -> yield hole))

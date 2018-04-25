@@ -18,7 +18,7 @@ instance ( Effectful m
          , Member (Resumable (EvalError value)) effects
          , Member (State [Name]) effects
          , MonadAnalysis location term value effects m
-         , MonadHole value effects (BadVariables m)
+         , AbstractHole value
          )
       => MonadAnalysis location term value effects (BadVariables m) where
   analyzeTerm eval term = resume @(EvalError value) (liftAnalyze analyzeTerm eval term) (
@@ -30,14 +30,14 @@ instance ( Effectful m
             IntegerFormatError{}     -> yield 0
             FloatFormatError{}       -> yield 0
             RationalFormatError{}    -> yield 0
-            FreeVariableError name   -> raise (modify' (name :)) >> hole >>= yield
+            FreeVariableError name   -> raise (modify' (name :)) >> yield hole
             FreeVariablesError names -> raise (modify' (names <>)) >> yield (fromMaybeLast "unknown" names))
 
   analyzeModule = liftAnalyze analyzeModule
 
 instance ( Interpreter effects (result, [Name]) rest m
          , MonadEvaluator location term value effects m
-         , MonadHole value (State [Name] ': effects) m
+         , AbstractHole value
          )
       => Interpreter (Resumable (EvalError value) ': State [Name] ': effects) result rest (BadVariables m) where
   interpret
@@ -51,5 +51,5 @@ instance ( Interpreter effects (result, [Name]) rest m
         IntegerFormatError{}     -> yield 0
         FloatFormatError{}       -> yield 0
         RationalFormatError{}    -> yield 0
-        FreeVariableError name   -> modify' (name :) >> lower @m hole >>= yield
+        FreeVariableError name   -> modify' (name :) >> yield hole
         FreeVariablesError names -> modify' (names <>) >> yield (fromMaybeLast "unknown" names)))

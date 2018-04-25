@@ -14,7 +14,7 @@ deriving instance MonadEvaluator location term value effects m => MonadEvaluator
 instance ( Effectful m
          , Member (Resumable (AddressError location value)) effects
          , MonadAnalysis location term value effects m
-         , MonadHole value effects (BadAddresses m)
+         , AbstractHole value
          , Monoid (Cell location value)
          , Show location
          )
@@ -24,13 +24,13 @@ instance ( Effectful m
           traceM ("AddressError:" <> show error)
           case error of
             UnallocatedAddress _ -> yield mempty
-            UninitializedAddress _ -> hole >>= yield)
+            UninitializedAddress _ -> yield hole)
 
   analyzeModule = liftAnalyze analyzeModule
 
 instance ( Interpreter effects result rest m
          , MonadEvaluator location term value effects m
-         , MonadHole value effects m
+         , AbstractHole value
          , Monoid (Cell location value)
          )
       => Interpreter (Resumable (AddressError location value) ': effects) result rest (BadAddresses m) where
@@ -39,4 +39,4 @@ instance ( Interpreter effects result rest m
     . runBadAddresses
     . raiseHandler (relay pure (\ (Resumable err) yield -> case err of
       UnallocatedAddress _ -> yield mempty
-      UninitializedAddress _ -> lower @m hole >>= yield))
+      UninitializedAddress _ -> yield hole))

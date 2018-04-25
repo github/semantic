@@ -198,8 +198,8 @@ instance Ord location => ValueRoots location (Value location) where
     | otherwise                            = mempty
 
 
-instance Monad (m effects) => MonadHole (Value location) effects m where
-  hole = pure (injValue Hole)
+instance AbstractHole (Value location) where
+  hole = injValue Hole
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance (Monad (m effects), MonadEvaluatable location term (Value location) effects m) => MonadValue location (Value location) effects m where
@@ -249,7 +249,7 @@ instance (Monad (m effects), MonadEvaluatable location term (Value location) eff
   ifthenelse cond if' else' = do
     isHole <- isHole cond
     if isHole then
-      hole
+      pure hole
     else do
       bool <- asBool cond
       if bool then if' else else'

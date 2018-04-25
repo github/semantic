@@ -1,7 +1,7 @@
 {-# LANGUAGE FunctionalDependencies, GADTs, KindSignatures, Rank2Types #-}
 module Control.Abstract.Value
 ( MonadValue(..)
-, MonadHole(..)
+, AbstractHole(..)
 , Comparator(..)
 , while
 , doWhile
@@ -32,8 +32,8 @@ data Comparator
   = Concrete (forall a . Ord a => a -> a -> Bool)
   | Generalized
 
-class Monad (m effects) => MonadHole value (effects :: [* -> *]) m where
-  hole :: m effects value
+class AbstractHole value where
+  hole :: value
 
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --

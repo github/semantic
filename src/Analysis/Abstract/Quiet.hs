@@ -23,20 +23,20 @@ deriving instance MonadEvaluator location term value effects m => MonadEvaluator
 instance ( Effectful m
          , Member (Resumable (Unspecialized value)) effects
          , MonadAnalysis location term value effects m
-         , MonadHole value effects (Quietly m)
+         , AbstractHole value
          )
       => MonadAnalysis location term value effects (Quietly m) where
   analyzeTerm eval term = resume @(Unspecialized value) (liftAnalyze analyzeTerm eval term) (\yield err@(Unspecialized _) ->
-          traceM ("Unspecialized:" <> show err) >> hole >>= yield)
+          traceM ("Unspecialized:" <> show err) >> yield hole)
 
   analyzeModule = liftAnalyze analyzeModule
 
 instance ( Interpreter effects result rest m
          , MonadEvaluator location term value effects m
-         , MonadHole value effects m
+         , AbstractHole value
          )
       => Interpreter (Resumable (Unspecialized value) ': effects) result rest (Quietly m) where
   interpret
     = interpret
     . runQuietly
-    . raiseHandler (relay pure (\ (Resumable (Unspecialized _)) yield -> lower @m hole >>= yield))
+    . raiseHandler (relay pure (\ (Resumable (Unspecialized _)) yield -> yield hole))

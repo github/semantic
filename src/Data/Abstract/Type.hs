@@ -52,8 +52,8 @@ instance Ord location => ValueRoots location Type where
   valueRoots _ = mempty
 
 
-instance Monad (m effects) => MonadHole Type effects m where
-  hole = pure Hole
+instance AbstractHole Type where
+  hole = Hole
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
 instance ( Alternative (m effects)
