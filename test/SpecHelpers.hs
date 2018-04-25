@@ -68,7 +68,13 @@ readFilePair paths = let paths' = fmap file paths in
 readFileVerbatim :: FilePath -> IO Verbatim
 readFileVerbatim = fmap verbatim . B.readFile
 
-type TestEvaluating term = Evaluating Precise term (Value Precise)
+type TestEvaluating term
+  = Erroring (AddressError Precise (Value Precise))
+  ( Erroring (EvalError (Value Precise))
+  ( Erroring (ResolutionError (Value Precise))
+  ( Erroring (Unspecialized (Value Precise))
+  ( Erroring (ValueError Precise (Value Precise))
+  ( Evaluating Precise term (Value Precise))))))
 
 ns n = Just . Latest . Just . injValue . Namespace n
 addr = Address . Precise
