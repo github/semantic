@@ -6,6 +6,7 @@ module Rendering.Renderer
 , SomeRenderer(..)
 , renderSExpressionDiff
 , renderSExpressionTerm
+, renderSExpressionAST
 , renderJSONDiff
 , renderJSONDiffs
 , renderJSONTerm

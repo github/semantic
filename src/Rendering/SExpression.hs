@@ -2,6 +2,7 @@
 module Rendering.SExpression
 ( renderSExpressionDiff
 , renderSExpressionTerm
+, renderSExpressionAST
 ) where
 
 import Prologue
@@ -9,6 +10,7 @@ import Data.ByteString.Char8
 import Data.Diff
 import Data.Patch
 import Data.Record
+import Data.AST
 import Data.Term
 import Prelude hiding (replicate)
 
@@ -19,6 +21,10 @@ renderSExpressionDiff diff = cata printDiffF diff 0 <> "\n"
 -- | Returns a ByteString SExpression formatted term.
 renderSExpressionTerm :: (ConstrainAll Show fields, Foldable syntax, Functor syntax) => Term syntax (Record fields) -> ByteString
 renderSExpressionTerm term = cata (\ term n -> nl n <> replicate (2 * n) ' ' <> printTermF term n) term 0 <> "\n"
+
+-- renderSExpressionAST :: (Bounded grammar) => Node grammar -> ByteString
+renderSExpressionAST term = undefined
+
 
 printDiffF :: (ConstrainAll Show fields, Foldable syntax) => DiffF syntax (Record fields) (Record fields) (Int -> ByteString) -> Int -> ByteString
 printDiffF diff n = case diff of

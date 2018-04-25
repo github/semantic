@@ -34,3 +34,18 @@ parseBlob renderer blob@Blob{..}
     SymbolsTermRenderer fields -> decorate (declarationAlgebra blob)                     >=> render (renderToSymbols fields blob)
     DOTTermRenderer            ->                                                            render (renderDOTTerm blob)
   | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
+
+
+parseBlobs' :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Output output) => TermRenderer output -> [Blob] -> Eff effs ByteString
+parseBlobs' renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . parseBlob' renderer) blobs
+  where toOutput' = case renderer of
+          JSONTermRenderer -> toOutput . renderJSONTerms
+          _ -> toOutput
+
+parseBlob' :: Members '[Task, Exc SomeException] effs => TermRenderer output -> Blob -> Eff effs output
+parseBlob' renderer blob@Blob{..}
+  | Just parser <- astParser <$> blobLanguage
+  = parse parser blob >>= case renderer of
+    SExpressionTermRenderer    -> render renderSExpressionAST
+    _                          -> undefined --decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)
+  | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))

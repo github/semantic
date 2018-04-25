@@ -4,6 +4,7 @@ module Parsing.Parser
 , SomeParser(..)
 , SomeAnalysisParser(..)
 , someParser
+, astParser
 , someAnalysisParser
 , ApplyAll
 , ApplyAll'
@@ -147,3 +148,15 @@ typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScrip
 
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
+
+
+astParser :: (Bounded grammar, Enum grammar) => Language -> Parser (AST [] grammar)
+astParser Go         = ASTParser tree_sitter_go
+astParser JavaScript = ASTParser tree_sitter_typescript
+astParser JSON       = ASTParser tree_sitter_json
+astParser JSX        = ASTParser tree_sitter_typescript
+astParser Python     = ASTParser tree_sitter_python
+astParser Ruby       = ASTParser tree_sitter_ruby
+astParser TypeScript = ASTParser tree_sitter_typescript
+astParser PHP        = ASTParser tree_sitter_php
+astParser l          = error $ "tree-sitter not supported for: " <> show l
