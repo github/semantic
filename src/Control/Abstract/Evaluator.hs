@@ -83,7 +83,6 @@ import Prologue
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
 class ( Effectful m
-      , Member Fail effects
       , Member (Reader (Environment location value)) effects
       , Member (Reader (ModuleTable [Module term])) effects
       , Member (Reader (SomeOrigin term)) effects
@@ -327,13 +326,13 @@ modifyLoadStack f = do
 
 
 -- | Get the currently evaluating 'ModuleInfo'.
-currentModule :: forall location term value effects m . MonadEvaluator location term value effects m => m effects ModuleInfo
+currentModule :: forall location term value effects m . (Member Fail effects, MonadEvaluator location term value effects m) => m effects ModuleInfo
 currentModule = do
   o <- raise ask
   maybeM (raise (fail "unable to get currentModule")) $ withSomeOrigin (originModule @term) o
 
 -- | Get the currently evaluating 'PackageInfo'.
-currentPackage :: forall location term value effects m . MonadEvaluator location term value effects m => m effects PackageInfo
+currentPackage :: forall location term value effects m . (Member Fail effects, MonadEvaluator location term value effects m) => m effects PackageInfo
 currentPackage = do
   o <- raise ask
   maybeM (raise (fail "unable to get currentPackage")) $ withSomeOrigin (originPackage @term) o
@@ -352,7 +351,7 @@ label term = do
   pure i
 
 -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
-goto :: MonadEvaluator location term value effects m => Label -> m effects term
+goto :: (Member Fail effects, MonadEvaluator location term value effects m) => Label -> m effects term
 goto label = IntMap.lookup label <$> view _jumps >>= maybe (raise (fail ("unknown label: " <> show label))) pure
 
 
