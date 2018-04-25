@@ -27,6 +27,9 @@ module Control.Abstract.Evaluator
   , modifyHeap
   , lookupHeap
   , assign
+  -- Roots
+  , askRoots
+  , extraRoots
   -- Module tables
   , getModuleTable
   , putModuleTable
@@ -59,6 +62,7 @@ import Data.Abstract.Environment as Env
 import Data.Abstract.Exports as Export
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
+import Data.Abstract.Live
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Package
@@ -261,6 +265,17 @@ assign :: ( Ord location
        -> value
        -> m effects ()
 assign address = modifyHeap . heapInsert address
+
+
+-- Roots
+
+-- | Retrieve the local 'Live' set.
+askRoots :: (Effectful m, Member (Reader (Live location value)) effects) => m effects (Live location value)
+askRoots = raise ask
+
+-- | Run a computation with the given 'Live' set added to the local root set.
+extraRoots :: (Effectful m, Member (Reader (Live location value)) effects, Ord location) => Live location value -> m effects a -> m effects a
+extraRoots roots = raiseHandler (local (<> roots))
 
 
 -- Module table

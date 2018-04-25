@@ -42,15 +42,6 @@ instance ( Effectful m
   analyzeModule = liftAnalyze analyzeModule
 
 
--- | Retrieve the local 'Live' set.
-askRoots :: (Effectful m, Member (Reader (Live location value)) effects) => m effects (Live location value)
-askRoots = raise ask
-
--- | Run a computation with the given 'Live' set added to the local root set.
--- extraRoots :: (Effectful m, Member (Reader (Live location value)) effects, Ord location) => Live location value -> m effects a -> m effects a
--- extraRoots roots = raise . local (<> roots) . lower
-
-
 -- | Collect any addresses in the heap not rooted in or reachable from the given 'Live' set.
 gc :: ( Ord location
       , Foldable (Cell location)
