@@ -1,6 +1,7 @@
-{-# LANGUAGE FunctionalDependencies, RankNTypes #-}
+{-# LANGUAGE FunctionalDependencies, RankNTypes, TypeOperators #-}
 module Control.Effect
 ( Effectful(..)
+, raiseHandler
 , Interpreter(..)
 , resume
 ) where
@@ -24,6 +25,9 @@ class Effectful m where
 instance Effectful Eff where
   raise = id
   lower = id
+
+raiseHandler :: Effectful m => (Eff (effect ': effects) a -> Eff effects b) -> m (effect ': effects) a -> m effects b
+raiseHandler handler = raise . handler . lower
 
 
 -- | Interpreters determine and interpret a list of effects, optionally taking extra arguments.
