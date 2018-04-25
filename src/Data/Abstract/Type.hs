@@ -1,14 +1,18 @@
-{-# LANGUAGE TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE GADTs, TypeFamilies, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the MonadValue instance, which requires MonadEvaluator to resolve its functional dependency.
-module Data.Abstract.Type where
+module Data.Abstract.Type
+  ( Type (..)
+  , TypeError (..)
+  , unify
+  ) where
 
 import Control.Abstract.Analysis
 import Data.Abstract.Address
 import Data.Abstract.Environment as Env
 import Data.Align (alignWith)
 import Data.Semigroup.Reducer (Reducer)
-import Prelude hiding (fail)
-import Prologue
+import Prelude
+import Prologue hiding (TypeError)
 
 type TName = Int
 
@@ -33,9 +37,29 @@ data Type
 
 -- TODO: À la carte representation of types.
 
+data TypeError resume where
+  NoValueError     :: Type -> a -> TypeError a
+  NumOpError       :: Type -> Type -> TypeError Type
+  BitOpError       :: Type -> Type -> TypeError Type
+  UnificationError :: Type -> Type -> TypeError Type
+
+deriving instance Show resume => Show (TypeError resume)
+
+instance Show1 TypeError where
+  liftShowsPrec _ _ _ (NoValueError v _)     = showString "NoValueError " . shows v
+  liftShowsPrec _ _ _ (NumOpError l r)       = showString "NumOpError " . shows [l, r]
+  liftShowsPrec _ _ _ (BitOpError l r)       = showString "BitOpError " . shows [l, r]
+  liftShowsPrec _ _ _ (UnificationError l r) = showString "UnificationError " . shows [l, r]
+
+instance Eq1 TypeError where
+  liftEq _ (NoValueError a _) (NoValueError b _)         = a == b
+  liftEq _ (BitOpError a b) (BitOpError c d)             = a == c && b == d
+  liftEq _ (NumOpError a b) (NumOpError c d)             = a == c && b == d
+  liftEq _ (UnificationError a b) (UnificationError c d) = a == c && b == d
+  liftEq _ _ _                                           = False
 
 -- | Unify two 'Type's.
-unify :: (Effectful m, Applicative (m effects), Member Fail effects) => Type -> Type -> m effects Type
+unify :: (Effectful m, Applicative (m effects), Member (Resumable TypeError) effects) => Type -> Type -> m effects Type
 unify (a1 :-> b1) (a2 :-> b2) = (:->) <$> unify a1 a2 <*> unify b1 b2
 unify a Null = pure a
 unify Null b = pure b
@@ -45,17 +69,15 @@ unify a (Var _) = pure a
 unify (Product as) (Product bs) = Product <$> sequenceA (alignWith (these pure pure unify) as bs)
 unify t1 t2
   | t1 == t2  = pure t2
-  | otherwise = raise (fail ("cannot unify " ++ show t1 ++ " with " ++ show t2))
-
+  | otherwise = throwResumable (UnificationError t1 t2)
 
 instance Ord location => ValueRoots location Type where
   valueRoots _ = mempty
 
-
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
 instance ( Alternative (m effects)
-         , Member Fail effects
          , Member Fresh effects
+         , Member (Resumable TypeError) effects
          , MonadAddressable location effects m
          , MonadEvaluator location term Type effects m
          , Reducer Type (Cell location Type)
@@ -91,28 +113,28 @@ instance ( Alternative (m effects)
 
   scopedEnvironment _ = pure mempty
 
-  asString _ = raise (fail "Must evaluate to Value to use asString")
-  asPair _   = raise (fail "Must evaluate to Value to use asPair")
-  asBool _ = raise (fail "Must evaluate to Value to use asBool")
+  asString _ = throwResumable (NoValueError String "")
+  asPair _   = throwResumable (NoValueError (Product []) (Hole, Hole))
+  asBool _   = throwResumable (NoValueError Bool True)
 
   isHole ty = pure (ty == Hole)
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 
-  liftNumeric _ Float = pure Float
+  liftNumeric _ Float      = pure Float
   liftNumeric _ Int        = pure Int
-  liftNumeric _ _          = raise (fail "Invalid type in unary numeric operation")
+  liftNumeric _ t          = throwResumable (NumOpError t Hole)
 
   liftNumeric2 _ left right = case (left, right) of
     (Float, Int) -> pure Float
     (Int, Float) -> pure Float
-    _                 -> unify left right
+    _            -> unify left right
 
   liftBitwise _ Int = pure Int
-  liftBitwise _ t   = raise (fail ("Invalid type passed to unary bitwise operation: " <> show t))
+  liftBitwise _ t   = throwResumable (BitOpError t Hole)
 
   liftBitwise2 _ Int Int = pure Int
-  liftBitwise2 _ t1 t2   = raise (fail ("Invalid types passed to binary bitwise operation: " <> show (t1, t2)))
+  liftBitwise2 _ t1 t2   = throwResumable (BitOpError t1 t2)
 
   liftComparison (Concrete _) left right = case (left, right) of
     (Float, Int) ->                     pure Bool
@@ -126,9 +148,10 @@ instance ( Alternative (m effects)
   call op params = do
     tvar <- fresh
     paramTypes <- sequenceA params
-    unified <- op `unify` (Product paramTypes :-> Var tvar)
+    let needed = Product paramTypes :-> Var tvar
+    unified <- op `unify` needed
     case unified of
       _ :-> ret -> pure ret
-      _         -> raise (fail "unification with a function produced something other than a function")
+      gotten    -> throwResumable (UnificationError needed gotten)
 
   loop f = f empty

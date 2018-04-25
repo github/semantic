@@ -7,8 +7,8 @@ module Semantic.CLI
 ) where
 
 import           Data.File
+import           Data.Language
 import           Data.List (intercalate)
-import qualified Data.List.NonEmpty as NonEmpty
 import           Data.List.Split (splitWhen)
 import           Data.Version (showVersion)
 import           Development.GitRev
@@ -25,7 +25,6 @@ import qualified Semantic.Task as Task
 import           System.IO (Handle, stdin, stdout)
 import           Text.Read
 
-
 main :: IO ()
 main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskWithOptions
 
@@ -35,8 +34,8 @@ runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Ta
 runParse :: SomeRenderer TermRenderer -> Either Handle [File] -> Task.TaskEff ByteString
 runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
 
-runGraph :: SomeRenderer GraphRenderer -> Maybe FilePath -> NonEmpty File -> Task.TaskEff ByteString
-runGraph (SomeRenderer r) dir = Semantic.graph r <=< Task.readProject dir
+runGraph :: SomeRenderer GraphRenderer -> Maybe FilePath -> FilePath -> Language -> [FilePath] -> Task.TaskEff ByteString
+runGraph (SomeRenderer r) rootDir dir excludeDirs = Semantic.graph r <=< Task.readProject rootDir dir excludeDirs
 
 -- | A parser for the application's command-line arguments.
 --
@@ -85,20 +84,21 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
       pure $ runParse renderer filesOrStdin
 
-    graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute import/call graph for an entry point"))
+    graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute an import graph a directory or entry point"))
     graphArgumentsParser = do
       renderer <- flag (SomeRenderer DOTGraphRenderer) (SomeRenderer DOTGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
               <|> flag'                                (SomeRenderer JSONGraphRenderer) (long "json" <> help "Output JSON graph")
-      rootDir <- optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file's directory." <> metavar "DIRECTORY"))
-      entryPoints <- NonEmpty.some1 (argument filePathReader (metavar "FILES..." <> help "Entry point(s)"))
-      pure $ runGraph renderer rootDir entryPoints
+      rootDir <- optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIRECTORY"))
+      excludeDirs <- many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)"))
+      File{..} <- argument filePathReader (metavar "DIRECTORY:LANGUAGE")
+      pure $ runGraph renderer rootDir filePath (fromJust fileLanguage) excludeDirs
 
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of
-        [a, b] | Just lang <- readMaybe a -> Right (File b (Just lang))
-               | Just lang <- readMaybe b -> Right (File a (Just lang))
-        [path] -> Right (File path (languageForFilePath path))
-        _ -> Left ("cannot parse `" <> arg <> "`\nexpecting LANGUAGE:FILE or just FILE")
+        [a, b] | lang <- readMaybe b -> Right (File a lang)
+               | lang <- readMaybe a -> Right (File b lang)
+        [path] -> maybe (Left $ "Cannot identify language for path: " <> path) (Right . File path . Just) (languageForFilePath path)
+        args -> Left ("cannot parse `" <> join args <> "`\nexpecting FILE:LANGUAGE or just FILE")
 
     optionsReader options = eitherReader $ \ str -> maybe (Left ("expected one of: " <> intercalate ", " (fmap fst options))) (Right . snd) (find ((== str) . fst) options)
     options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options) <> metavar (intercalate "|" (fmap fst options)))

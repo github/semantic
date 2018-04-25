@@ -204,6 +204,8 @@ data ValueError location value resume where
   BitwiseError           :: value          -> ValueError location value value
   Bitwise2Error          :: value -> value -> ValueError location value value
   KeyValueError          :: value          -> ValueError location value (value, value)
+  -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
+  ArithmeticError :: ArithException -> ValueError location value value
 
 instance Eq value => Eq1 (ValueError location value) where
   liftEq _ (StringError a) (StringError b)                       = a == b
