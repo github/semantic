@@ -23,7 +23,3 @@ runFresh :: Eff (Fresh ': effects) a -> Eff effects a
 runFresh = relayState (0 :: Int) (const pure) (\ s action k -> case action of
   Fresh -> k (succ s) s
   Reset s' -> k s' ())
-
--- | 'Fresh' effects are interpreted starting from 0, incrementing the current name with each request for a fresh name, and overwriting the counter on reset.
-instance RunEffect Fresh a where
-  runEffect = runFresh
