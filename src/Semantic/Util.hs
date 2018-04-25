@@ -56,7 +56,7 @@ type JustEvaluating term
   ( Evaluating (Located Precise term) term (Value (Located Precise term)))))))
 type EvaluatingWithHoles term = BadAddresses (BadModuleResolutions (BadVariables (BadValues (BadSyntax (Evaluating (Located Precise term) term (Value (Located Precise term)))))))
 type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
--- The order is significant here: Caching has to come on the outside, or the RunEffect instance for NonDet
+-- The order is significant here: Caching has to come on the outside, or its Interpreter instance
 -- will expect the TypeError exception type to have an Ord instance, which is wrong.
 type Checking term
   = Caching
