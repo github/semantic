@@ -38,6 +38,7 @@ instance ( Effectful m
             BitwiseError{}             -> hole >>= yield
             Bitwise2Error{}            -> hole >>= yield
             KeyValueError{}            -> hole >>= \x -> yield (x, x)
+            ArithmeticError{}          -> hole >>= yield
           )
 
   analyzeModule = liftAnalyze analyzeModule
