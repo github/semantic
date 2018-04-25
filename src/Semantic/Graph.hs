@@ -1,7 +1,7 @@
 {-# LANGUAGE GADTs #-}
 module Semantic.Graph where
 
-import qualified Analysis.Abstract.ImportGraph as Abstract
+import           Analysis.Abstract.ImportGraph
 import qualified Data.Abstract.Evaluatable as Analysis
 import           Data.Abstract.FreeVariables
 import           Data.Abstract.Package as Package
@@ -35,7 +35,7 @@ graph renderer project
     (Proxy :: Proxy '[ Analysis.Evaluatable, Analysis.Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
     parsePackage parser prelude project >>= graphImports >>= case renderer of
       JSONGraphRenderer -> pure . toOutput
-      DOTGraphRenderer -> pure . Abstract.renderImportGraph
+      DOTGraphRenderer -> pure . renderImportGraph
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: Members '[Distribute WrappedTask, Files, Task] effs
@@ -62,7 +62,7 @@ parsePackage parser preludeFile project@Project{..} = do
 
 
 type ImportGraphAnalysis term =
-  Abstract.ImportGraphing
+  ImportGraphing
     (BadAddresses (BadModuleResolutions (BadVariables (BadValues (BadSyntax (Evaluating (Located Precise term) term (Value (Located Precise term))))))))
 
 -- | Render the import graph for a given 'Package'.
@@ -78,7 +78,7 @@ graphImports :: ( Show ann
                 , Member Syntax.Identifier syntax
                 , Members '[Exc SomeException, Task] effs
                 )
-             => Package (Term (Union syntax) ann) -> Eff effs Abstract.ImportGraph
+             => Package (Term (Union syntax) ann) -> Eff effs ImportGraph
 graphImports package = analyze (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package) >>= extractGraph
   where
     asAnalysisForTypeOfPackage :: ImportGraphAnalysis term effs value
