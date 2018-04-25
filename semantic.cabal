@@ -167,6 +167,7 @@ library
                      , cmark-gfm
                      , containers
                      , directory
+                     , directory-tree
                      , effects
                      , filepath
                      , free

@@ -56,8 +56,7 @@ rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby
 pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Language.Python)
 
 -- Evaluate a project, starting at a single entrypoint.
-evaluateProject parser prelude path = evaluatePackage <$> runTask (readProject Nothing (file path :| []) >>= parsePackage parser prelude)
-
+evaluateProject parser prelude path = evaluatePackage <$> runTask (readProject Nothing (file path :| []) [] >>= parsePackage parser prelude)
 
 -- Read and parse a file.
 parseFile :: Parser term -> FilePath -> IO term
