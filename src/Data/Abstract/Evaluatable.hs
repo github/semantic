@@ -137,7 +137,9 @@ instance Eq1 (EvalError term) where
   liftEq _ _ _                                             = False
 
 
-throwValueError :: MonadEvaluatable location term value effects m => ValueError location value resume -> m effects resume
+throwValueError :: (Member (Resumable (ValueError location value)) effects, MonadEvaluator location term value effects m)
+                => ValueError location value resume
+                -> m effects resume
 throwValueError = throwResumable
 
 throwLoadError :: MonadEvaluatable location term value effects m => LoadError term value resume -> m effects resume
