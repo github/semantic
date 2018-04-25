@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE GADTs, UndecidableInstances #-}
 module Control.Abstract.Addressable where
 
 import Control.Abstract.Evaluator
