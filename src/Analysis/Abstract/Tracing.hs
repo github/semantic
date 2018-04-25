@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.Tracing
 ( Tracing
@@ -27,8 +27,6 @@ instance ( Corecursive term
          , Reducer (Configuration location term value) (trace (Configuration location term value))
          )
       => MonadAnalysis location term value effects (Tracing trace m) where
-  type Effects location term value (Tracing trace m) = Writer (trace (Configuration location term value)) ': Effects location term value m
-
   analyzeTerm recur term = do
     config <- getConfiguration (embedSubterm term)
     raise (tell @(trace (Configuration location term value)) (Reducer.unit config))

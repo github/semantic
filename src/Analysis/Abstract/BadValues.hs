@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.BadValues where
 
 import Control.Abstract.Analysis
@@ -18,8 +18,6 @@ instance ( Effectful m
          , Show value
          )
       => MonadAnalysis location term value effects (BadValues m) where
-  type Effects location term value (BadValues m) = Resumable (ValueError location value) ': Effects location term value m
-
   analyzeTerm eval term = resume @(ValueError location value) (liftAnalyze analyzeTerm eval term) (
         \yield error -> do
           traceM ("ValueError" <> show error)

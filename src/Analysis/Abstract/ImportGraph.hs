@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.ImportGraph
 ( ImportGraph(..)
 , renderImportGraph
@@ -65,12 +65,10 @@ instance ( Effectful m
          , Member (State ImportGraph) effects
          , Member Syntax.Identifier syntax
          , MonadAnalysis (Located location term) term value effects m
-         , term ~ Term (Union syntax) ann
          , Show ann
+         , term ~ Term (Union syntax) ann
          )
       => MonadAnalysis (Located location term) term value effects (ImportGraphing m) where
-  type Effects (Located location term) term value (ImportGraphing m) = State ImportGraph ': Effects (Located location term) term value m
-
   analyzeTerm eval term@(In ann syntax) = do
     traceShowM ann
     case prj syntax of

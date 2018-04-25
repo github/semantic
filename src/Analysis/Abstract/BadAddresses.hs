@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.BadAddresses where
 
@@ -19,8 +19,6 @@ instance ( Effectful m
          , Show location
          )
       => MonadAnalysis location term value effects (BadAddresses m) where
-  type Effects location term value (BadAddresses m) = Resumable (AddressError location value) ': Effects location term value m
-
   analyzeTerm eval term = resume @(AddressError location value) (liftAnalyze analyzeTerm eval term) (
         \yield error -> do
           traceM ("AddressError:" <> show error)

@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.Caching
 ( Caching
@@ -75,9 +75,6 @@ instance ( Alternative (m effects)
          , Ord value
          )
       => MonadAnalysis location term value effects (Caching m) where
-  -- We require the 'CachingEffects' in addition to the underlying analysis’ 'Effects'.
-  type Effects location term value (Caching m) = CachingEffects location term value (Effects location term value m)
-
   -- Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
   analyzeTerm recur e = do
     c <- getConfiguration (embedSubterm e)

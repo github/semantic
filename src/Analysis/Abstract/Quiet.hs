@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.Quiet
 ( Quietly
@@ -26,8 +26,6 @@ instance ( Effectful m
          , MonadHole value effects (Quietly m)
          )
       => MonadAnalysis location term value effects (Quietly m) where
-  type Effects location term value (Quietly m) = Resumable (Unspecialized value) ': Effects location term value m
-
   analyzeTerm eval term = resume @(Unspecialized value) (liftAnalyze analyzeTerm eval term) (\yield err@(Unspecialized _) ->
           traceM ("Unspecialized:" <> show err) >> hole >>= yield)
 

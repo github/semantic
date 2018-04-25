@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Erroring
 ( Erroring
 ) where
@@ -14,8 +14,6 @@ deriving instance MonadEvaluator location term value effects m => MonadEvaluator
 
 instance MonadAnalysis location term value effects m
       => MonadAnalysis location term value effects (Erroring exc m) where
-  type Effects location term value (Erroring exc m) = Resumable exc ': Effects location term value m
-
   analyzeTerm = liftAnalyze analyzeTerm
   analyzeModule = liftAnalyze analyzeModule
 

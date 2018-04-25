@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
+{-# LANGUAGE GADTs, KindSignatures, RankNTypes, ScopedTypeVariables #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For runAnalysis
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
@@ -31,9 +31,6 @@ import Prologue
 --
 --   This typeclass is left intentionally unconstrained to avoid circular dependencies between it and other typeclasses.
 class MonadEvaluator location term value effects m => MonadAnalysis location term value effects m where
-  -- | The effects necessary to run the analysis. Analyses which are composed on top of (wrap) other analyses should include the inner analyses 'Effects' in their own list.
-  type family Effects location term value m :: [* -> *]
-
   -- | Analyze a term using the semantics of the current analysis.
   analyzeTerm :: (Base term (Subterm term (outer effects value)) -> m effects value)
               -> (Base term (Subterm term (outer effects value)) -> m effects value)

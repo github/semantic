@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.Dead
 ( DeadCode
@@ -44,8 +44,6 @@ instance ( Corecursive term
          , Recursive term
          )
       => MonadAnalysis location term value effects (DeadCode m) where
-  type Effects location term value (DeadCode m) = State (Dead term) ': Effects location term value m
-
   analyzeTerm recur term = do
     revive (embedSubterm term)
     liftAnalyze analyzeTerm recur term

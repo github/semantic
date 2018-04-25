@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, KindSignatures, RankNTypes, ScopedTypeVariables #-}
 module Analysis.Abstract.Evaluating
 ( Evaluating
 ) where
@@ -52,8 +52,6 @@ instance ( Corecursive term
          , Recursive term
          )
       => MonadAnalysis location term value effects (Evaluating location term value) where
-  type Effects location term value (Evaluating location term value) = EvaluatingEffects location term value
-
   analyzeTerm eval term = pushOrigin (termOrigin (embedSubterm term)) (eval term)
 
   analyzeModule eval m = pushOrigin (moduleOrigin (subterm <$> m)) (eval m)

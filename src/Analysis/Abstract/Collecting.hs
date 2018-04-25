@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.Collecting
 ( Collecting
@@ -30,10 +30,6 @@ instance ( Effectful m
          , ValueRoots location value
          )
       => MonadAnalysis location term value effects (Collecting m) where
-  type Effects location term value (Collecting m)
-    = Reader (Live location value)
-   ': Effects location term value m
-
   -- Small-step evaluation which garbage-collects any non-rooted addresses after evaluating each term.
   analyzeTerm recur term = do
     roots <- askRoots
