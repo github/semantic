@@ -69,8 +69,7 @@ instance ( Effectful m
          , term ~ Term (Union syntax) ann
          )
       => MonadAnalysis (Located location term) term value effects (ImportGraphing m) where
-  analyzeTerm eval term@(In ann syntax) = do
-    traceShowM ann
+  analyzeTerm eval term@(In _ syntax) = do
     case prj syntax of
       Just (Syntax.Identifier name) -> do
         moduleInclusion (Variable (unName name))

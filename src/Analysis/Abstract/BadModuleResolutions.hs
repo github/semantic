@@ -20,5 +20,5 @@ instance ( Interpreter effects result rest m
     = interpret
     . runBadModuleResolutions
     . raiseHandler (relay pure (\ (Resumable err) yield -> traceM ("ResolutionError:" <> show err) *> case err of
-      RubyError       nameToResolve -> yield nameToResolve
-      TypeScriptError nameToResolve -> yield nameToResolve))
+      NotFoundError nameToResolve _ _ -> yield  nameToResolve
+      GoImportError pathToResolve     -> yield [pathToResolve]))

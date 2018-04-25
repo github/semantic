@@ -27,6 +27,7 @@ library
                      , Analysis.Abstract.Evaluating
                      , Analysis.Abstract.ImportGraph
                      , Analysis.Abstract.Tracing
+                     , Analysis.Abstract.TypeChecking
                      , Analysis.CallGraph
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
@@ -166,6 +167,7 @@ library
                      , cmark-gfm
                      , containers
                      , directory
+                     , directory-tree
                      , effects
                      , filepath
                      , free

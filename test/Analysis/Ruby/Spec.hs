@@ -10,6 +10,7 @@ import Data.List.NonEmpty (NonEmpty(..))
 import Data.Map
 import Data.Map.Monoidal as Map
 import qualified Language.Ruby.Assignment as Ruby
+import qualified Data.Language as Language
 
 import SpecHelpers
 
@@ -71,4 +72,4 @@ spec = parallel $ do
     addr = Address . Precise
     fixtures = "test/fixtures/ruby/analysis/"
     evaluate entry = evalRubyProject (fixtures <> entry)
-    evalRubyProject path = runAnalysis @(TestEvaluating Ruby.Term) <$> evaluateProject rubyParser rubyPrelude path
+    evalRubyProject path = runAnalysis @(TestEvaluating Ruby.Term) <$> evaluateProject rubyParser Language.Ruby rubyPrelude path
