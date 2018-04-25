@@ -2,6 +2,7 @@
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.Collecting
 ( Collecting
+, Retaining
 ) where
 
 import Control.Abstract.Analysis
@@ -82,3 +83,18 @@ instance ( Interpreter effects result rest m
          )
       => Interpreter (Reader (Live location value) ': effects) result rest (Collecting m) where
   interpret = interpret . runCollecting . raiseHandler (`runReader` mempty)
+
+
+-- | An analysis providing a 'Live' set, but never performing GC.
+newtype Retaining m (effects :: [* -> *]) a = Retaining { runRetaining :: m effects a }
+  deriving (Alternative, Applicative, Effectful, Functor, Monad)
+
+deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Retaining m)
+deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (Retaining m)
+
+instance ( Interpreter effects result rest m
+         , MonadEvaluator location term value effects m
+         , Ord location
+         )
+      => Interpreter (Reader (Live location value) ': effects) result rest (Retaining m) where
+  interpret = interpret . runRetaining . raiseHandler (`runReader` mempty)
