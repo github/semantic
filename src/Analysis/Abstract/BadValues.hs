@@ -27,7 +27,7 @@ instance ( Effectful m
               env <- getEnv
               yield (Env.push env)
             CallError val              -> yield val
-            StringError val            -> yield (pack $ show val)
+            StringError val            -> yield (pack (show val))
             BoolError{}                -> yield True
             NumericError{}             -> hole >>= yield
             Numeric2Error{}            -> hole >>= yield
