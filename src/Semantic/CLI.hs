@@ -34,8 +34,8 @@ runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Ta
 runParse :: SomeRenderer TermRenderer -> Either Handle [File] -> Task.TaskEff ByteString
 runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
 
-runGraph :: SomeRenderer GraphRenderer -> FilePath -> Language -> [FilePath] -> Task.TaskEff ByteString
-runGraph (SomeRenderer r) dir excludeDirs = Semantic.graph r <=< Task.readProject dir excludeDirs
+runGraph :: SomeRenderer GraphRenderer -> Maybe FilePath -> FilePath -> Language -> [FilePath] -> Task.TaskEff ByteString
+runGraph (SomeRenderer r) rootDir dir excludeDirs = Semantic.graph r <=< Task.readProject rootDir dir excludeDirs
 
 -- | A parser for the application's command-line arguments.
 --
@@ -88,11 +88,10 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     graphArgumentsParser = do
       renderer <- flag (SomeRenderer DOTGraphRenderer) (SomeRenderer DOTGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
               <|> flag'                                (SomeRenderer JSONGraphRenderer) (long "json" <> help "Output JSON graph")
-      -- TODO
-      -- rootDir <- optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file's directory." <> metavar "DIRECTORY"))
+      rootDir <- optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIRECTORY"))
       excludeDirs <- many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)"))
       File{..} <- argument filePathReader (metavar "DIRECTORY:LANGUAGE")
-      pure $ runGraph renderer filePath (fromJust fileLanguage) excludeDirs
+      pure $ runGraph renderer rootDir filePath (fromJust fileLanguage) excludeDirs
 
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of
