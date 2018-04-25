@@ -59,7 +59,7 @@ evalPythonProject path = runAnalysis @(JustEvaluating Python.Term) <$> evaluateP
 evalTypeScriptProjectQuietly path = runAnalysis @(EvaluatingWithHoles TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
 evalTypeScriptProject path = runAnalysis @(JustEvaluating TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
 
-typecheckGoFile path = runAnalysis @(Checking Go.Term) <$> evaluateProject goParser Nothing path
+typecheckGoFile path = runAnalysis @(Checking Go.Term) <$> evaluateProject goParser Language.Go Nothing path
 
 rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Language.Ruby)
 pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Language.Python)
