@@ -1,9 +1,10 @@
-{-# LANGUAGE RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE FunctionalDependencies, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Control.Effect
 ( Control.Effect.run
 , RunEffects(..)
 , RunEffect(..)
 , Effectful(..)
+, Interpreter(..)
 , resume
 , mergeEither
 ) where
@@ -102,3 +103,10 @@ class Effectful (m :: [* -> *] -> * -> *) where
 instance Effectful Eff where
   raise = id
   lower = id
+
+
+class Effectful m => Interpreter effects result function m | m -> effects, m result -> function where
+  interpret :: m effects result -> function
+
+instance Interpreter '[] result result Eff where
+  interpret = Effect.run

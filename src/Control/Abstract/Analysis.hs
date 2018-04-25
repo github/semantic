@@ -1,8 +1,7 @@
-{-# LANGUAGE FunctionalDependencies, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
+{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For runAnalysis
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
-, Interpreter(..)
 , liftAnalyze
 , runAnalysis
 , SomeAnalysis(..)
@@ -46,12 +45,6 @@ class MonadEvaluator location term value effects m => MonadAnalysis location ter
   -- | Isolate the given action with an empty global environment and exports.
   isolate :: m effects a -> m effects a
   isolate = withEnv mempty . withExports mempty
-
-class Effectful m => Interpreter effects result function m | m -> effects, m result -> function where
-  interpret :: m effects result -> function
-
-instance Interpreter '[] result result Eff where
-  interpret = X.run
 
 
 -- | Lift a 'SubtermAlgebra' for an underlying analysis into a containing analysis. Use this when defining an analysis which can be composed onto other analyses to ensure that a call to 'analyzeTerm' occurs in the inner analysis and not the outer one.
