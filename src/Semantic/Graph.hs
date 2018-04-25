@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, ScopedTypeVariables #-}
+{-# LANGUAGE GADTs #-}
 module Semantic.Graph where
 
 import qualified Analysis.Abstract.ImportGraph as Abstract
