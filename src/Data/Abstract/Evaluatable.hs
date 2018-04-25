@@ -115,7 +115,7 @@ data EvalError value resume where
 
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
-variable :: MonadEvaluatable location term value effects m => Name -> m effects value
+variable :: (Member (Resumable (AddressError location value)) effects, Member (Resumable (EvalError value)) effects, MonadAddressable location effects m, MonadEvaluator location term value effects m) => Name -> m effects value
 variable name = lookupWith deref name >>= maybeM (throwResumable (FreeVariableError name))
 
 deriving instance Eq (EvalError a b)
