@@ -65,25 +65,21 @@ liftAnalyze analyze recur term = coerce (analyze (coerceWith (sym Coercion) . r
 --
 --   This enables us to refer to the analysis type as e.g. @Analysis1 (Analysis2 Evaluating) Term Value@ without explicitly mentioning its effects (which are inferred to be simply its 'Effects').
 runAnalysis :: ( Effectful m
-               , Effects location term value m ~ effects
-               , MonadAnalysis location term value effects m
-               , RunEffects effects a
+               , Interpreter effects a function m
                )
             => m effects a
-            -> Final effects a
-runAnalysis = X.run
+            -> function
+runAnalysis = interpret
 
 
 -- | An abstraction over analyses.
 data SomeAnalysis m result where
   SomeAnalysis :: ( Effectful m
-                  , effects ~ Effects location term value m
-                  , MonadAnalysis location term value effects m
-                  , RunEffects effects a
+                  , Interpreter effects a function m
                   )
                => m effects a
-               -> SomeAnalysis m (Final effects a)
+               -> SomeAnalysis m function
 
 -- | Run an abstracted analysis.
 runSomeAnalysis :: SomeAnalysis m result -> result
-runSomeAnalysis (SomeAnalysis a) = X.run a
+runSomeAnalysis (SomeAnalysis a) = interpret a
