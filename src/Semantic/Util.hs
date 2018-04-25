@@ -58,7 +58,6 @@ pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Py
 
 -- Evaluate a project, starting at a single entrypoint.
 evaluateProject parser lang prelude path = evaluatePackage <$> runTask (readProject path lang >>= parsePackage parser prelude)
-evaluateProjectEntry parser lang prelude path = evaluatePackage <$> runTask (readProjectEntry path lang >>= parsePackage parser prelude)
 
 parseFile :: Parser term -> FilePath -> IO term
 parseFile parser = runTask . (parse parser <=< readBlob . file)

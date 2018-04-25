@@ -11,7 +11,6 @@ module Semantic.IO
 , NoLanguageForBlob(..)
 , readBlob
 , readProject
-, readProjectEntry
 , readBlobs
 , readBlobPairs
 , writeToOutput
@@ -98,17 +97,6 @@ readProjectFromPaths path lang = do
     toFile path = File path (Just lang)
     exts = extensionsForLanguage lang
 
-readProjectEntryFromPath :: MonadIO m => FilePath -> Language -> m Project
-readProjectEntryFromPath path lang = do
-  isDir <- isDirectory path
-  let (filterFun, entryPoints) = if isDir then (id, []) else (filter (/= path), [toFile path])
-  paths <- liftIO $ filterFun <$> fmap fold (globDir (compile . mappend "**/*." <$> exts) rootDir)
-  pure $ Project rootDir (toFile <$> paths) lang entryPoints
-  where
-    rootDir = takeDirectory path
-    toFile path = File path (Just lang)
-    exts = extensionsForLanguage lang
-
 readBlobsFromDir :: MonadIO m => FilePath -> m [Blob.Blob]
 readBlobsFromDir path = do
   paths <- liftIO (globDir1 (compile "[^vendor]**/*[.rb|.js|.tsx|.go|.py]") path)
@@ -174,9 +162,6 @@ readBlobPairs = send . ReadBlobPairs
 readProject :: Member Files effs => FilePath -> Language -> Eff effs Project
 readProject dir = send . ReadProject dir
 
-readProjectEntry :: Member Files effs => FilePath -> Language -> Eff effs Project
-readProjectEntry file = send . ReadProjectEntry file
-
 -- | A task which writes a 'B.ByteString' to a 'Handle' or a 'FilePath'.
 writeToOutput :: Member Files effs => Either Handle FilePath -> B.ByteString -> Eff effs ()
 writeToOutput path = send . WriteToOutput path
@@ -188,7 +173,6 @@ data Files out where
   ReadBlobs     :: Either Handle [File] -> Files [Blob.Blob]
   ReadBlobPairs :: Either Handle [Both File] -> Files [Blob.BlobPair]
   ReadProject   :: FilePath -> Language -> Files Project
-  ReadProjectEntry   :: FilePath -> Language -> Files Project
   WriteToOutput :: Either Handle FilePath -> B.ByteString -> Files ()
 
 -- | Run a 'Files' effect in 'IO'.
@@ -200,7 +184,6 @@ runFiles = interpret $ \ files -> case files of
   ReadBlobs (Right paths) -> rethrowing (readBlobsFromPaths paths)
   ReadBlobPairs source -> rethrowing (either readBlobPairsFromHandle (traverse (runBothWith readFilePair)) source)
   ReadProject dir language -> rethrowing (readProjectFromPaths dir language)
-  ReadProjectEntry file language -> rethrowing (readProjectEntryFromPath file language)
   WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents)
 
 
