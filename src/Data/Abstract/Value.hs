@@ -5,7 +5,6 @@ import Control.Abstract.Analysis
 import Data.Abstract.Environment (Environment)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
-import Data.Abstract.Origin
 import qualified Data.Abstract.Number as Number
 import Data.Scientific (Scientific)
 import Data.Scientific.Exts
