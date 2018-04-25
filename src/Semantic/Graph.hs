@@ -15,10 +15,10 @@ import           Data.Abstract.Located
 import           Data.Abstract.Address
 import           Analysis.Abstract.BadAddresses
 import           Analysis.Abstract.BadModuleResolutions
+import           Analysis.Abstract.BadSyntax
 import           Analysis.Abstract.BadValues
 import           Analysis.Abstract.BadVariables
 import           Analysis.Abstract.Evaluating
-import           Analysis.Abstract.Quiet
 import           Data.Output
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
@@ -65,7 +65,7 @@ parsePackage parser preludeFile project@Project{..} = do
 
 type ImportGraphAnalysis term effects value =
   Abstract.ImportGraphing
-    (BadAddresses (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term))))))))
+    (BadAddresses (BadModuleResolutions (BadVariables (BadValues (BadSyntax (Evaluating (Located Precise term) term (Value (Located Precise term))))))))
     effects
     value
 
