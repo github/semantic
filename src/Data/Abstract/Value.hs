@@ -7,6 +7,7 @@ import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import qualified Data.Abstract.Number as Number
 import Data.Scientific (Scientific)
+import Data.Scientific.Exts
 import qualified Data.Set as Set
 import Prologue hiding (TypeError)
 import Prelude hiding (Float, Integer, String, Rational)
@@ -267,22 +268,25 @@ instance (Monad (m effects), MonadEvaluatable location term (Value location) eff
     | otherwise = throwValueError (NumericError arg)
 
   liftNumeric2 f left right
-    | Just (Integer  i, Integer j)  <- prjPair pair = f i j & specialize
-    | Just (Integer  i, Rational j) <- prjPair pair = f i j & specialize
-    | Just (Integer  i, Float j)    <- prjPair pair = f i j & specialize
-    | Just (Rational i, Integer j)  <- prjPair pair = f i j & specialize
-    | Just (Rational i, Rational j) <- prjPair pair = f i j & specialize
-    | Just (Rational i, Float j)    <- prjPair pair = f i j & specialize
-    | Just (Float    i, Integer j)  <- prjPair pair = f i j & specialize
-    | Just (Float    i, Rational j) <- prjPair pair = f i j & specialize
-    | Just (Float    i, Float j)    <- prjPair pair = f i j & specialize
+    | Just (Integer  i, Integer j)  <- prjPair pair = tentative f i j & specialize
+    | Just (Integer  i, Rational j) <- prjPair pair = tentative f i j & specialize
+    | Just (Integer  i, Float j)    <- prjPair pair = tentative f i j & specialize
+    | Just (Rational i, Integer j)  <- prjPair pair = tentative f i j & specialize
+    | Just (Rational i, Rational j) <- prjPair pair = tentative f i j & specialize
+    | Just (Rational i, Float j)    <- prjPair pair = tentative f i j & specialize
+    | Just (Float    i, Integer j)  <- prjPair pair = tentative f i j & specialize
+    | Just (Float    i, Rational j) <- prjPair pair = tentative f i j & specialize
+    | Just (Float    i, Float j)    <- prjPair pair = tentative f i j & specialize
     | otherwise = throwValueError (Numeric2Error left right)
       where
+        tentative x i j = attemptUnsafeArithmetic (x i j)
+
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: MonadValue location value effects m => Number.SomeNumber -> m effects value
-        specialize (Number.SomeNumber (Number.Integer i)) = integer i
-        specialize (Number.SomeNumber (Number.Ratio r))          = rational r
-        specialize (Number.SomeNumber (Number.Decimal d))        = float d
+        specialize :: MonadEvaluatable location term value effects m => Either ArithException Number.SomeNumber -> m effects value
+        specialize (Left exc) = throwValueError (ArithmeticError exc)
+        specialize (Right (Number.SomeNumber (Number.Integer i))) = integer i
+        specialize (Right (Number.SomeNumber (Number.Ratio r)))   = rational r
+        specialize (Right (Number.SomeNumber (Number.Decimal d))) = float d
         pair = (left, right)
 
   liftComparison comparator left right

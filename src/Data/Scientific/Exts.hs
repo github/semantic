@@ -1,9 +1,11 @@
 module Data.Scientific.Exts
     ( module Data.Scientific
+    , attemptUnsafeArithmetic
     , parseScientific
     ) where
 
 import Control.Applicative
+import Control.Exception as Exc (evaluate, try)
 import Control.Monad hiding (fail)
 import Data.Attoparsec.ByteString.Char8
 import Data.ByteString.Char8 hiding (readInt, takeWhile)
@@ -13,6 +15,7 @@ import Numeric
 import Prelude hiding (fail, filter, null, takeWhile)
 import Prologue hiding (null)
 import Text.Read (readMaybe)
+import System.IO.Unsafe
 
 parseScientific :: ByteString -> Either String Scientific
 parseScientific = parseOnly parser
@@ -96,3 +99,10 @@ parser = signed (choice [hex, oct, bin, dec]) where
     let trail = if null trailings then "0" else trailings
 
     attempt (unpack (leads <> "." <> trail <> exponent))
+
+-- | Attempt to evaluate the given term into WHNF. If doing so raises an 'ArithException', such as
+-- 'ZeroDivisionError' or 'RatioZeroDenominator', 'Left' will be returned.
+-- Hooray for uncatchable exceptions that bubble up from third-party code.
+attemptUnsafeArithmetic :: a -> Either ArithException a
+attemptUnsafeArithmetic = unsafePerformIO . Exc.try . evaluate
+{-# NOINLINE attemptUnsafeArithmetic #-}
