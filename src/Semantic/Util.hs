@@ -6,14 +6,17 @@ module Semantic.Util where
 import           Analysis.Abstract.BadModuleResolutions
 import           Analysis.Abstract.BadValues
 import           Analysis.Abstract.BadVariables
+import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Evaluating as X
 import           Analysis.Abstract.ImportGraph
 import           Analysis.Abstract.Quiet
+import           Analysis.Abstract.TypeChecking
 import           Analysis.Declaration
 import           Control.Abstract.Analysis
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Located
+import           Data.Abstract.Type
 import           Data.Abstract.Value
 import           Data.Blob
 import           Data.Diff
@@ -45,6 +48,9 @@ import qualified Language.TypeScript.Assignment as TypeScript
 type JustEvaluating term = Evaluating (Located Precise term) term (Value (Located Precise term))
 type EvaluatingWithHoles term = BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term))))))
 type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
+-- The order is significant here: Caching has to come on the outside, or the RunEffect instance for NonDet
+-- will expect the TypeError exception type to have an Ord instance, which is wrong.
+type Checking term = Caching (TypeChecking (Evaluating Monovariant term Type))
 
 evalGoProject path = runAnalysis @(JustEvaluating Go.Term) <$> evaluateProject goParser Language.Go Nothing path
 evalRubyProject path = runAnalysis @(JustEvaluating Ruby.Term) <$> evaluateProject rubyParser Language.Ruby rubyPrelude path
@@ -52,6 +58,8 @@ evalPHPProject path = runAnalysis @(JustEvaluating PHP.Term) <$> evaluateProject
 evalPythonProject path = runAnalysis @(JustEvaluating Python.Term) <$> evaluateProject pythonParser Language.Python pythonPrelude path
 evalTypeScriptProjectQuietly path = runAnalysis @(EvaluatingWithHoles TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
 evalTypeScriptProject path = runAnalysis @(JustEvaluating TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
+
+typecheckGoFile path = runAnalysis @(Checking Go.Term) <$> evaluateProject goParser Language.Go Nothing path
 
 rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Language.Ruby)
 pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Language.Python)
