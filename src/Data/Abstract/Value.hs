@@ -5,6 +5,7 @@ import Control.Abstract.Analysis
 import Data.Abstract.Environment (Environment)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
+import Data.Abstract.Origin
 import qualified Data.Abstract.Number as Number
 import Data.Scientific (Scientific)
 import Data.Scientific.Exts
@@ -327,16 +328,17 @@ instance (Monad (m effects), MonadEvaluatable location term (Value location) eff
   call op params = do
     case prjValue op of
       Just (Closure names label env) -> do
-        bindings <- foldr (\ (name, param) rest -> do
-          v <- param
-          a <- alloc name
-          assign a v
-          Env.insert name a <$> rest) (pure env) (zip names params)
-        localEnv (mappend bindings) (evalClosure label)
+        goto label $ \body -> do
+          bindings <- foldr (\ (name', param) rest -> do
+            v <- param
+            a <- alloc name'
+            assign a v
+            Env.insert name' a <$> rest) (pure env) (zip names params)
+          localEnv (mappend bindings) (evalClosure body)
       Nothing -> throwValueError (CallError op)
     where
-      evalClosure :: Label -> m effects (Value location)
-      evalClosure lab = catchException (goto lab >>= evaluateTerm) handleReturn
+      evalClosure :: term -> m effects (Value location)
+      evalClosure term = catchException (evaluateTerm term) handleReturn
 
       handleReturn :: ReturnThrow (Value location) -> m effects (Value location)
       handleReturn (Ret v) = pure v

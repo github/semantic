@@ -45,6 +45,8 @@ module Control.Abstract.Evaluator
   , throwResumable
   , throwException
   , catchException
+  -- Origin
+  , pushOrigin
   ) where
 
 import Control.Effect
@@ -97,7 +99,7 @@ data EvaluatorState location term value = EvaluatorState
   , modules     :: ModuleTable (Environment location value, value)
   , loadStack   :: LoadStack
   , exports     :: Exports location value
-  , jumps       :: IntMap.IntMap term
+  , jumps       :: IntMap.IntMap (SomeOrigin term, term)
   , origin      :: SomeOrigin term
   }
 
@@ -129,7 +131,7 @@ _loadStack = lens loadStack (\ s l -> s {loadStack = l})
 _exports :: Lens' (EvaluatorState location term value) (Exports location value)
 _exports = lens exports (\ s e -> s {exports = e})
 
-_jumps :: Lens' (EvaluatorState location term value) (IntMap.IntMap term)
+_jumps :: Lens' (EvaluatorState location term value) (IntMap.IntMap (SomeOrigin term, term))
 _jumps = lens jumps (\ s j -> s {jumps = j})
 
 _origin :: Lens' (EvaluatorState location term value) (SomeOrigin term)
@@ -325,13 +327,18 @@ currentPackage = do
 label :: MonadEvaluator location term value effects m => term -> m effects Label
 label term = do
   m <- view _jumps
+  origin <- raise ask
   let i = IntMap.size m
-  _jumps .= IntMap.insert i term m
+  _jumps .= IntMap.insert i (origin, term) m
   pure i
 
 -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
-goto :: MonadEvaluator location term value effects m => Label -> m effects term
-goto label = IntMap.lookup label <$> view _jumps >>= maybe (raise (fail ("unknown label: " <> show label))) pure
+goto :: (Recursive term, MonadEvaluator location term value effects m) => Label -> (term -> m effects a) -> m effects a
+goto label comp = do
+  maybeTerm <- IntMap.lookup label <$> view _jumps
+  case maybeTerm of
+    Just (origin, term) -> pushOrigin (origin <> termOrigin term) (comp term)
+    Nothing -> raise (fail ("unknown label: " <> show label))
 
 
 -- Exceptions
@@ -344,3 +351,12 @@ throwException = raise . Exception.throwError
 
 catchException :: (Member (Exc exc) effects, Effectful m) => m effects v -> (exc -> m effects v) -> m effects v
 catchException action handler = raise (lower action `Exception.catchError` (lower . handler))
+
+-- | Push a 'SomeOrigin' onto the stack. This should be used to contextualize execution with information about the originating term, module, or package.
+pushOrigin :: ( Effectful m
+              , Member (Reader (SomeOrigin term)) effects
+              )
+           => SomeOrigin term
+           -> m effects a
+           -> m effects a
+pushOrigin o = raise . local (<> o) . lower

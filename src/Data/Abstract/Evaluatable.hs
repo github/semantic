@@ -287,12 +287,3 @@ evaluatePackageBody body = withPrelude (packagePrelude body) $
     withPrelude (Just prelude) a = do
       preludeEnv <- evaluateModule prelude *> getEnv
       withDefaultEnvironment preludeEnv a
-
--- | Push a 'SomeOrigin' onto the stack. This should be used to contextualize execution with information about the originating term, module, or package.
-pushOrigin :: ( Effectful m
-              , Member (Reader (SomeOrigin term)) effects
-              )
-           => SomeOrigin term
-           -> m effects a
-           -> m effects a
-pushOrigin o = raise . local (<> o) . lower
