@@ -1,6 +1,5 @@
 (Program
-  (Send
-    (Identifier))
+  (FileDirective)
   (Send
     (Identifier))
   (Send
