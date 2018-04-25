@@ -59,11 +59,11 @@ instance ( Ord location
          )
       => Interpreter
           (EvaluatingEffects location term value) result
-          (  Either String
-            (Either (SomeExc (LoadError term value))
-            (Either (LoopThrow value)
-            (Either (ReturnThrow value)
-            result)))
+          ( Either String
+          ( Either (SomeExc (LoadError term value))
+          ( Either (LoopThrow value)
+          ( Either (ReturnThrow value)
+           result)))
           , EvaluatorState location term value)
           (Evaluating location term value) where
   interpret
