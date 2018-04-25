@@ -3,7 +3,7 @@ module Language.Ruby.Syntax where
 
 import           Control.Monad (unless)
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.Module (ModulePath)
+import           Data.Abstract.Module (ModulePath, ModuleInfo(..))
 import           Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Path
 import qualified Data.ByteString.Char8 as BC
@@ -103,6 +103,17 @@ doLoad path shouldWrap = do
   boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 
 -- TODO: autoload
+
+newtype FileDirective a = FileDirective ByteString
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+
+instance Eq1 FileDirective where liftEq = genericLiftEq
+instance Ord1 FileDirective where liftCompare = genericLiftCompare
+instance Show1 FileDirective where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable FileDirective where
+  eval (FileDirective _) = currentModule >>= string . BC.pack . modulePath
+
 
 data Class a = Class { classIdentifier :: !a, classSuperClasses :: ![a], classBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)

@@ -73,12 +73,13 @@ type Syntax = '[
   , Syntax.Error
   , Syntax.Identifier
   , Syntax.Program
-  , Ruby.Syntax.Send
   , Ruby.Syntax.Class
+  , Ruby.Syntax.FileDirective
   , Ruby.Syntax.Load
   , Ruby.Syntax.LowPrecedenceBoolean
   , Ruby.Syntax.Module
   , Ruby.Syntax.Require
+  , Ruby.Syntax.Send
   , []
   ]
 
@@ -177,10 +178,13 @@ identifier =
     mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
     vcallOrLocal = do
       (loc, ident, locals) <- identWithLocals
-      let identTerm = makeTerm loc (Syntax.Identifier (name ident))
-      if ident `elem` locals
-        then pure identTerm
-        else pure $ makeTerm loc (Ruby.Syntax.Send Nothing (Just identTerm) [] Nothing)
+      case ident of
+        "__FILE__" -> pure $ makeTerm loc (Ruby.Syntax.FileDirective ident)
+        _ -> do
+          let identTerm = makeTerm loc (Syntax.Identifier (name ident))
+          if ident `elem` locals
+            then pure identTerm
+            else pure $ makeTerm loc (Ruby.Syntax.Send Nothing (Just identTerm) [] Nothing)
 
 -- TODO: Handle interpolation in all literals that support it (strings, regexes, symbols, subshells, etc).
 literal :: Assignment
