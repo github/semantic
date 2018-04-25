@@ -14,8 +14,11 @@ module SpecHelpers (
 
 import Analysis.Abstract.Erroring
 import Analysis.Abstract.Evaluating
+import Control.Abstract.Addressable
 import Control.Abstract.Evaluator as X (EvaluatorState(..))
+import Control.Abstract.Value
 import Data.Abstract.Address as X
+import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables as X hiding (dropExtension)
 import Data.Abstract.Heap as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
