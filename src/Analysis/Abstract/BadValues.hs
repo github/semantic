@@ -9,7 +9,7 @@ import Prologue
 newtype BadValues m (effects :: [* -> *]) a = BadValues (m effects a)
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
-deriving instance MonadEvaluator location term value effects m   => MonadEvaluator location term value effects (BadValues m)
+deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadValues m)
 
 instance ( Effectful m
          , Member (Resumable (ValueError location value)) effects
