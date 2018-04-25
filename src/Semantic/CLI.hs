@@ -88,16 +88,15 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     graphArgumentsParser = do
       renderer <- flag (SomeRenderer DOTGraphRenderer) (SomeRenderer DOTGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
               <|> flag'                                (SomeRenderer JSONGraphRenderer) (long "json" <> help "Output JSON graph")
-      rootDir <- argument (maybeReader readMaybe :: ReadM FilePath) (metavar "DIRECTORY")
-      language <- argument (maybeReader readMaybe :: ReadM Language) (metavar "LANGUAGE")
-      pure $ runGraph renderer rootDir language
+      File{..} <- argument filePathReader (metavar "DIRECTORY:LANGUAGE")
+      pure $ runGraph renderer filePath (fromJust fileLanguage)
 
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of
-        [a, b] | Just lang <- readMaybe a -> Right (File b lang)
-               | Just lang <- readMaybe b -> Right (File a lang)
-        [path] -> maybe (Left $ "Cannot identify language for path:" <> path) (Right . File path . Just) (languageForFilePath path)
-        _ -> Left ("cannot parse `" <> arg <> "`\nexpecting LANGUAGE:FILE or just FILE")
+        [a, b] | lang <- readMaybe b -> Right (File a lang)
+               | lang <- readMaybe a -> Right (File b lang)
+        [path] -> maybe (Left $ "Cannot identify language for path: " <> path) (Right . File path . Just) (languageForFilePath path)
+        args -> Left ("cannot parse `" <> join args <> "`\nexpecting FILE:LANGUAGE or just FILE")
 
     optionsReader options = eitherReader $ \ str -> maybe (Left ("expected one of: " <> intercalate ", " (fmap fst options))) (Right . snd) (find ((== str) . fst) options)
     options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options) <> metavar (intercalate "|" (fmap fst options)))

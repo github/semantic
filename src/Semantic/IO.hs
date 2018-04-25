@@ -88,17 +88,22 @@ readBlobsFromPaths :: MonadIO m => [File] -> m [Blob.Blob]
 readBlobsFromPaths files = catMaybes <$> traverse readFile files
 
 readProjectFromPaths :: MonadIO m => FilePath -> Language -> m Project
-readProjectFromPaths rootDir lang = do
-  paths <- liftIO $ fmap fold (globDir (compile . mappend "**/*." <$> exts) rootDir)
-  pure $ Project  rootDir (toFile <$> paths) lang []
+readProjectFromPaths path lang = do
+  isDir <- isDirectory path
+  let (filterFun, entryPoints, rootDir) = if isDir then (id, [], path) else (filter (/= path), [toFile path], takeDirectory path)
+
+  paths <- liftIO $ filterFun <$> fmap fold (globDir (compile . mappend "**/*." <$> exts) rootDir)
+  pure $ Project rootDir (toFile <$> paths) lang entryPoints
   where
     toFile path = File path (Just lang)
     exts = extensionsForLanguage lang
 
 readProjectEntryFromPath :: MonadIO m => FilePath -> Language -> m Project
 readProjectEntryFromPath path lang = do
-  paths <- liftIO $ filter (/= path) <$> fmap fold (globDir (compile . mappend "**/*." <$> exts) rootDir)
-  pure $ Project rootDir (toFile <$> paths) lang [toFile path]
+  isDir <- isDirectory path
+  let (filterFun, entryPoints) = if isDir then (id, []) else (filter (/= path), [toFile path])
+  paths <- liftIO $ filterFun <$> fmap fold (globDir (compile . mappend "**/*." <$> exts) rootDir)
+  pure $ Project rootDir (toFile <$> paths) lang entryPoints
   where
     rootDir = takeDirectory path
     toFile path = File path (Just lang)
