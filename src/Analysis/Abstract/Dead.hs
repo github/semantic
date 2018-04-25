@@ -57,4 +57,4 @@ instance ( Interpreter effects (result, Dead term) rest m
          , Ord term
          )
       => Interpreter (State (Dead term) ': effects) result rest (DeadCode m) where
-  interpret = interpret . runDeadCode . raiseHandler (flip runState mempty)
+  interpret = interpret . runDeadCode . raiseHandler (`runState` mempty)

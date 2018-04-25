@@ -170,4 +170,4 @@ vertexToType Variable{} = "variable"
 
 instance Interpreter effects (result, ImportGraph) rest m
       => Interpreter (State ImportGraph ': effects) result rest (ImportGraphing m) where
-  interpret = interpret . runImportGraphing . raiseHandler (flip runState mempty)
+  interpret = interpret . runImportGraphing . raiseHandler (`runState` mempty)

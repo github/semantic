@@ -80,4 +80,4 @@ instance ( Interpreter effects result rest m
          , Ord location
          )
       => Interpreter (Reader (Live location value) ': effects) result rest (Collecting m) where
-  interpret = interpret . runCollecting . raiseHandler (flip runReader mempty)
+  interpret = interpret . runCollecting . raiseHandler (`runReader` mempty)
