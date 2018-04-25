@@ -33,9 +33,8 @@ languageForType mediaType = case mediaType of
     ".phpt" -> Just PHP
     _ -> Nothing
 
-extensionsForLanguage :: Maybe Language -> [String]
-extensionsForLanguage Nothing         = []
-extensionsForLanguage (Just language) = case language of
+extensionsForLanguage :: Language -> [String]
+extensionsForLanguage language = case language of
   Go -> [".go"]
   JavaScript -> [".js"]
   PHP -> [".php"]

@@ -1,8 +1,10 @@
+{-# LANGUAGE TupleSections #-}
 module Data.Abstract.Package where
 
 import Data.Abstract.FreeVariables
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
+import qualified Data.Map as Map
 
 type PackageName = Name
 
@@ -31,12 +33,8 @@ data Package term = Package
   }
   deriving (Eq, Functor, Ord, Show)
 
-fromModules :: PackageName -> Maybe Version -> Maybe (Module term) -> [Module term] -> Package term
-fromModules name version prelude = Package (PackageInfo name version) . go prelude
+fromModules :: PackageName -> Maybe Version -> Maybe (Module term) -> Int -> [Module term] -> Package term
+fromModules name version prelude entryPoints modules =
+  Package (PackageInfo name version) (PackageBody (ModuleTable.fromModules modules) prelude entryPoints')
   where
-    go :: Maybe (Module term) -> [Module term] -> PackageBody term
-    go p []     = PackageBody mempty p mempty
-    go p (m:ms) = PackageBody (ModuleTable.fromModules (m : ms)) p entryPoints
-      where
-        entryPoints = ModuleTable.singleton path Nothing
-        path = modulePath (moduleInfo m)
+    entryPoints' = ModuleTable . Map.fromList $ (,Nothing) . modulePath . moduleInfo <$> if entryPoints == 0 then modules else take entryPoints modules

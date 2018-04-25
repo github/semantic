@@ -23,7 +23,7 @@ import           Data.Output
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
 import           Rendering.Renderer
-import           Semantic.IO (Files, NoLanguageForBlob (..))
+import           Semantic.IO (Files)
 import           Semantic.Task
 
 graph :: (Members '[Distribute WrappedTask, Files, Task, Exc SomeException, Telemetry] effs)
@@ -31,13 +31,11 @@ graph :: (Members '[Distribute WrappedTask, Files, Task, Exc SomeException, Tele
       -> Project
       -> Eff effs ByteString
 graph renderer project
-  | Just (SomeAnalysisParser parser prelude) <- someAnalysisParser
-    (Proxy :: Proxy '[ Analysis.Evaluatable, Analysis.Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) <$> projectLanguage project = do
+  | SomeAnalysisParser parser prelude <- someAnalysisParser
+    (Proxy :: Proxy '[ Analysis.Evaluatable, Analysis.Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
     parsePackage parser prelude project >>= graphImports >>= case renderer of
       JSONGraphRenderer -> pure . toOutput
       DOTGraphRenderer -> pure . Abstract.renderImportGraph
-
-  | otherwise = throwError (SomeException (NoLanguageForBlob (filePath (projectEntryPoint project))))
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: Members '[Distribute WrappedTask, Files, Task] effs
@@ -47,15 +45,14 @@ parsePackage :: Members '[Distribute WrappedTask, Files, Task] effs
              -> Eff effs (Package term)
 parsePackage parser preludeFile project@Project{..} = do
   prelude <- traverse (parseModule parser Nothing) preludeFile
-  project <- parseModules parser project
-  trace ("project: " <> show project) $ pure (Package.fromModules n Nothing prelude project)
+  p <- parseModules parser project
+  trace ("project: " <> show p) $ pure (Package.fromModules n Nothing prelude (length projectEntryPoints) p)
   where
     n = name (projectName project)
 
     -- | Parse all files in a project into 'Module's.
     parseModules :: Members '[Distribute WrappedTask, Files, Task] effs => Parser term -> Project -> Eff effs [Module term]
-    parseModules parser project@Project{..} = distributeFor allFiles (WrapTask . parseModule parser (Just projectRootDir))
-      where allFiles = projectAllFiles project
+    parseModules parser Project{..} = distributeFor (projectEntryPoints <> projectFiles) (WrapTask . parseModule parser (Just projectRootDir))
 
     -- | Parse a file into a 'Module'.
     parseModule :: Members '[Files, Task] effs => Parser term -> Maybe FilePath -> File -> Eff effs (Module term)

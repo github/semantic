@@ -33,7 +33,6 @@ import qualified Data.ByteString as B
 import qualified Data.ByteString.Lazy as BL
 import           Data.Language
 import           Data.Source
-import qualified Data.List.NonEmpty as NonEmpty
 import           Prelude hiding (readFile)
 import           Prologue hiding (MonadError (..), fail)
 import           System.Directory (doesDirectoryExist)
@@ -90,16 +89,16 @@ readBlobFromPath file = do
 readBlobsFromPaths :: MonadIO m => [File] -> m [Blob.Blob]
 readBlobsFromPaths files = catMaybes <$> traverse readFile files
 
-readProjectFromPaths :: MonadIO m => Maybe FilePath -> NonEmpty File -> [FilePath] -> m Project
-readProjectFromPaths root files excludeDirs = do
-  paths <- liftIO $ filter (/= entryPointPath) <$> findFiles rootDir exts excludeDirs
-  pure $ Project files rootDir (toFile <$> paths)
+readProjectFromPaths :: MonadIO m => FilePath -> Language -> [FilePath] -> m Project
+readProjectFromPaths path lang excludeDirs = do
+  isDir <- isDirectory path
+  let (filterFun, entryPoints, rootDir) = if isDir then (id, [], path) else (filter (/= path), [toFile path], takeDirectory path)
+
+  paths <- liftIO $ filterFun <$> findFiles rootDir exts excludeDirs
+  pure $ Project rootDir (toFile <$> paths) lang entryPoints
   where
-    toFile path = File path (languageForFilePath path)
-    exts = extensionsForLanguage (fileLanguage entryPoint)
-    entryPoint = NonEmpty.head files
-    entryPointPath = filePath entryPoint
-    rootDir = fromMaybe (takeDirectory entryPointPath) root
+    toFile path = File path (Just lang)
+    exts = extensionsForLanguage lang
 
 -- Recursively find files in a directory.
 findFiles :: forall m. MonadIO m => FilePath -> [String] -> [FilePath] -> m [FilePath]
@@ -187,8 +186,8 @@ readBlobs = send . ReadBlobs
 readBlobPairs :: Member Files effs => Either Handle [Both File] -> Eff effs [Blob.BlobPair]
 readBlobPairs = send . ReadBlobPairs
 
-readProject :: Member Files effs => Maybe FilePath -> NonEmpty File -> [FilePath] -> Eff effs Project
-readProject dir files excludeDirs = send (ReadProject dir files excludeDirs)
+readProject :: Member Files effs => FilePath -> Language -> [FilePath] -> Eff effs Project
+readProject dir excludeDirs = send . ReadProject dir excludeDirs
 
 -- | A task which writes a 'B.ByteString' to a 'Handle' or a 'FilePath'.
 writeToOutput :: Member Files effs => Either Handle FilePath -> B.ByteString -> Eff effs ()
@@ -200,7 +199,7 @@ data Files out where
   ReadBlob      :: File -> Files Blob.Blob
   ReadBlobs     :: Either Handle [File] -> Files [Blob.Blob]
   ReadBlobPairs :: Either Handle [Both File] -> Files [Blob.BlobPair]
-  ReadProject   :: Maybe FilePath -> NonEmpty File -> [FilePath] -> Files Project
+  ReadProject   :: FilePath -> Language -> [FilePath] -> Files Project
   WriteToOutput :: Either Handle FilePath -> B.ByteString -> Files ()
 
 -- | Run a 'Files' effect in 'IO'.
@@ -208,10 +207,10 @@ runFiles :: Members '[Exc SomeException, IO] effs => Eff (Files ': effs) a -> Ef
 runFiles = interpret $ \ files -> case files of
   ReadBlob path -> rethrowing (readBlobFromPath path)
   ReadBlobs (Left handle) -> rethrowing (readBlobsFromHandle handle)
-  ReadBlobs (Right paths@[File path Nothing]) -> rethrowing (isDirectory path >>= bool (readBlobsFromPaths paths) (readBlobsFromDir path))
+  ReadBlobs (Right paths@[File path _]) -> rethrowing (isDirectory path >>= bool (readBlobsFromPaths paths) (readBlobsFromDir path))
   ReadBlobs (Right paths) -> rethrowing (readBlobsFromPaths paths)
   ReadBlobPairs source -> rethrowing (either readBlobPairsFromHandle (traverse (runBothWith readFilePair)) source)
-  ReadProject dir files excludeDirs -> rethrowing (readProjectFromPaths dir files excludeDirs)
+  ReadProject dir language excludeDirs -> rethrowing (readProjectFromPaths dir language excludeDirs)
   WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents)
 
 
