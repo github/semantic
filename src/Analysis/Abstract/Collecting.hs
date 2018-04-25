@@ -12,7 +12,7 @@ import Data.Abstract.Live
 import Prologue
 
 newtype Collecting m (effects :: [* -> *]) a = Collecting { runCollecting :: m effects a }
-  deriving (Alternative, Applicative, Functor, Effectful, Monad)
+  deriving (Alternative, Applicative, Effectful, Functor, Monad)
 
 instance ( Effectful m
          , Member (Reader (Live location value)) effects
