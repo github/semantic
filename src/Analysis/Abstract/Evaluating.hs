@@ -58,7 +58,8 @@ instance ( Ord location
          , Semigroup (Cell location value)
          )
       => Interpreter
-          (EvaluatingEffects location term value) result
+          (EvaluatingEffects location term value)
+          result
           ( Either String
           ( Either (SomeExc (LoadError term value))
           ( Either (LoopThrow value)
