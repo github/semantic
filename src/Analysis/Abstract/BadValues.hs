@@ -6,7 +6,7 @@ import Data.Abstract.Environment as Env
 import Data.ByteString.Char8 (pack)
 import Prologue
 
-newtype BadValues m (effects :: [* -> *]) a = BadValues (m effects a)
+newtype BadValues m (effects :: [* -> *]) a = BadValues { runBadValues :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadValues m)
@@ -48,8 +48,8 @@ instance ( Interpreter effects result rest m
       => Interpreter (Resumable (ValueError location value) ': effects) result rest (BadValues m) where
   interpret
     = interpret
-    . raise @m
-    . relay pure (\ (Resumable err) yield -> case err of
+    . runBadValues
+    . raiseHandler (relay pure (\ (Resumable err) yield -> case err of
       ScopedEnvironmentError{} -> do
         env <- lower @m getEnv
         yield (Env.push env)
@@ -63,5 +63,4 @@ instance ( Interpreter effects result rest m
       BitwiseError{}             -> lower @m hole >>= yield
       Bitwise2Error{}            -> lower @m hole >>= yield
       KeyValueError{}            -> lower @m hole >>= \x -> yield (x, x)
-      ArithmeticError{}          -> lower @m hole >>= yield)
-    . lower
+      ArithmeticError{}          -> lower @m hole >>= yield))
