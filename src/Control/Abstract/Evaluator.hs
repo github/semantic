@@ -47,6 +47,8 @@ module Control.Abstract.Evaluator
   , label
   , goto
   , Eval(..)
+  -- Origin
+  , pushOrigin
   ) where
 
 import Control.Effect hiding (lower)
@@ -351,3 +353,13 @@ goto label = IntMap.lookup label <$> view _jumps >>= maybe (raise (fail ("unknow
 
 data Eval term value resume where
   Eval :: term -> Eval term value value
+
+
+-- | Push a 'SomeOrigin' onto the stack. This should be used to contextualize execution with information about the originating term, module, or package.
+pushOrigin :: ( Effectful m
+              , Member (Reader (SomeOrigin term)) effects
+              )
+           => SomeOrigin term
+           -> m effects a
+           -> m effects a
+pushOrigin o = raiseHandler (local (<> o))
