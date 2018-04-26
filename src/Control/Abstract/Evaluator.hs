@@ -100,7 +100,6 @@ data EvaluatorState location term value = EvaluatorState
   , loadStack   :: LoadStack
   , exports     :: Exports location value
   , jumps       :: IntMap.IntMap term
-  , origin      :: SomeOrigin term
   }
 
 deriving instance (Eq (Cell location value), Eq location, Eq term, Eq value, Eq (Base term ())) => Eq (EvaluatorState location term value)
@@ -108,10 +107,10 @@ deriving instance (Ord (Cell location value), Ord location, Ord term, Ord value,
 deriving instance (Show (Cell location value), Show location, Show term, Show value, Show (Base term ())) => Show (EvaluatorState location term value)
 
 instance (Ord location, Semigroup (Cell location value)) => Semigroup (EvaluatorState location term value) where
-  EvaluatorState e1 h1 m1 l1 x1 j1 o1 <> EvaluatorState e2 h2 m2 l2 x2 j2 o2 = EvaluatorState (e1 <> e2) (h1 <> h2) (m1 <> m2) (l1 <> l2) (x1 <> x2) (j1 <> j2) (o1 <> o2)
+  EvaluatorState e1 h1 m1 l1 x1 j1 <> EvaluatorState e2 h2 m2 l2 x2 j2 = EvaluatorState (e1 <> e2) (h1 <> h2) (m1 <> m2) (l1 <> l2) (x1 <> x2) (j1 <> j2)
 
 instance Lower (EvaluatorState location term value) where
-  lower = EvaluatorState lower lower lower lower lower lower lower
+  lower = EvaluatorState lower lower lower lower lower lower
 
 
 -- Lenses
@@ -133,9 +132,6 @@ _exports = lens exports (\ s e -> s {exports = e})
 
 _jumps :: Lens' (EvaluatorState location term value) (IntMap.IntMap term)
 _jumps = lens jumps (\ s j -> s {jumps = j})
-
-_origin :: Lens' (EvaluatorState location term value) (SomeOrigin term)
-_origin = lens origin (\ s o -> s {origin = o})
 
 
 (.=) :: MonadEvaluator location term value effects m => ASetter (EvaluatorState location term value) (EvaluatorState location term value) a b -> b -> m effects ()
