@@ -52,8 +52,8 @@ type MonadEvaluatable location term value effects m =
   ( Declarations term
   , Evaluatable (Base term)
   , FreeVariables term
-  , Member (Exc.Exc (ReturnThrow value)) effects
   , Member (Exc.Exc (LoopThrow value)) effects
+  , Member (Exc.Exc (ReturnThrow value)) effects
   , Member Fail effects
   , Member (Resumable (Unspecialized value)) effects
   , Member (Resumable (LoadError term value)) effects
