@@ -47,6 +47,8 @@ module Control.Abstract.Evaluator
   , label
   , goto
   , Eval(..)
+  , ReturnThrow(..)
+  , LoopThrow(..)
   -- Origin
   , pushOrigin
   ) where
@@ -353,6 +355,15 @@ goto label = IntMap.lookup label <$> view _jumps >>= maybe (raise (fail ("unknow
 
 data Eval term value resume where
   Eval :: term -> Eval term value value
+
+newtype ReturnThrow value
+  = Ret value
+    deriving (Eq, Show)
+
+data LoopThrow value
+  = Brk value
+  | Con
+    deriving (Eq, Show)
 
 
 -- | Push a 'SomeOrigin' onto the stack. This should be used to contextualize execution with information about the originating term, module, or package.

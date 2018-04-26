@@ -4,10 +4,8 @@ module Data.Abstract.Evaluatable
 , MonadEvaluatable
 , Evaluatable(..)
 , Unspecialized(..)
-, ReturnThrow(..)
 , EvalError(..)
 , LoadError(..)
-, LoopThrow(..)
 , ResolutionError(..)
 , variable
 , evaluateTerm
@@ -63,15 +61,6 @@ type MonadEvaluatable location term value effects m =
   , Recursive term
   , Reducer value (Cell location value)
   )
-
-newtype ReturnThrow value
-  = Ret value
-    deriving (Eq, Show)
-
-data LoopThrow value
-  = Brk value
-  | Con
-    deriving (Eq, Show)
 
 -- | An error thrown when we can't resolve a module from a qualified name.
 data ResolutionError value resume where

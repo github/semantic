@@ -6,7 +6,6 @@ module Analysis.Abstract.Evaluating
 import Control.Abstract.Analysis hiding (lower)
 import Control.Monad.Effect.Exception as Exc
 import Data.Abstract.Environment
-import Data.Abstract.Evaluatable hiding (lower)
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Origin
