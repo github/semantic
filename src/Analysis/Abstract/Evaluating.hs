@@ -1,20 +1,23 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Analysis.Abstract.Evaluating
 ( Evaluating
 ) where
 
 import Control.Abstract.Analysis
-import Control.Monad.Effect
+import Control.Monad.Effect.Exception as Exc
+import Control.Monad.Effect.Resumable as Res
+import Data.Abstract.Address
 import Data.Abstract.Configuration
-import Data.Abstract.Environment as Env
+import Data.Abstract.Environment
 import Data.Abstract.Evaluatable
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Origin
-import Prologue
+import Data.Empty
+import Prologue hiding (empty)
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
-newtype Evaluating location term value effects a = Evaluating (Eff effects a)
+newtype Evaluating location term value effects a = Evaluating { runEvaluating :: Eff effects a }
   deriving (Applicative, Functor, Effectful, Monad)
 
 deriving instance Member NonDet effects => Alternative (Evaluating location term value effects)
@@ -23,12 +26,7 @@ deriving instance Member NonDet effects => Alternative (Evaluating location term
 type EvaluatingEffects location term value
   = '[ Exc (ReturnThrow value)
      , Exc (LoopThrow value)
-     , Resumable (EvalError value)
-     , Resumable (ResolutionError value)
      , Resumable (LoadError term value)
-     , Resumable (ValueError location value)
-     , Resumable (Unspecialized value)
-     , Resumable (AddressError location value)
      , Fail                                        -- Failure with an error message
      , Fresh                                       -- For allocating new addresses and/or type variables.
      , Reader (SomeOrigin term)                    -- The current term’s origin.
@@ -55,8 +53,33 @@ instance ( Corecursive term
          , Recursive term
          )
       => MonadAnalysis location term value effects (Evaluating location term value) where
-  type Effects location term value (Evaluating location term value) = EvaluatingEffects location term value
-
   analyzeTerm eval term = pushOrigin (termOrigin (embedSubterm term)) (eval term)
 
   analyzeModule eval m = pushOrigin (moduleOrigin (subterm <$> m)) (eval m)
+
+
+instance ( Ord location
+         , Semigroup (Cell location value)
+         )
+      => Interpreter
+          (EvaluatingEffects location term value) result
+          (  Either String
+            (Either (SomeExc (LoadError term value))
+            (Either (LoopThrow value)
+            (Either (ReturnThrow value)
+            result)))
+          , EvaluatorState location term value)
+          (Evaluating location term value) where
+  interpret
+    = interpret
+    . runEvaluating
+    . raiseHandler
+      ( flip runState  empty -- State (EvaluatorState location term value)
+      . flip runReader empty -- Reader (Environment location value)
+      . flip runReader empty -- Reader (ModuleTable [Module term])
+      . flip runReader empty -- Reader (SomeOrigin term)
+      . flip runFresh' 0
+      . runFail
+      . Res.runError
+      . Exc.runError
+      . Exc.runError)

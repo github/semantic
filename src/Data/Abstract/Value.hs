@@ -198,9 +198,15 @@ instance Ord location => ValueRoots location (Value location) where
     | otherwise                            = mempty
 
 
+instance AbstractHole (Value location) where
+  hole = injValue Hole
+
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance (Monad (m effects), MonadEvaluatable location term (Value location) effects m) => MonadValue location (Value location) effects m where
-  hole     = pure . injValue $ Hole
+instance ( Monad (m effects)
+         , Member (Resumable (ValueError location (Value location))) effects
+         , MonadEvaluatable location term (Value location) effects m
+         )
+      => MonadValue location (Value location) effects m where
   unit     = pure . injValue $ Unit
   integer  = pure . injValue . Integer . Number.Integer
   boolean  = pure . injValue . Boolean
@@ -247,7 +253,7 @@ instance (Monad (m effects), MonadEvaluatable location term (Value location) eff
   ifthenelse cond if' else' = do
     isHole <- isHole cond
     if isHole then
-      hole
+      pure hole
     else do
       bool <- asBool cond
       if bool then if' else else'
@@ -280,7 +286,7 @@ instance (Monad (m effects), MonadEvaluatable location term (Value location) eff
         tentative x i j = attemptUnsafeArithmetic (x i j)
 
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: MonadEvaluatable location term value effects m => Either ArithException Number.SomeNumber -> m effects value
+        specialize :: (Member (Resumable (ValueError location value)) effects, MonadEvaluatable location term value effects m) => Either ArithException Number.SomeNumber -> m effects value
         specialize (Left exc) = throwValueError (ArithmeticError exc)
         specialize (Right (Number.SomeNumber (Number.Integer i))) = integer i
         specialize (Right (Number.SomeNumber (Number.Ratio r)))   = rational r

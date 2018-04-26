@@ -1,9 +1,11 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.Caching
 ( Caching
 ) where
 
 import Control.Abstract.Analysis
+import Control.Monad.Effect hiding (interpret)
 import Data.Abstract.Address
 import Data.Abstract.Cache
 import Data.Abstract.Configuration
@@ -19,7 +21,7 @@ type CachingEffects location term value effects
  ': effects
 
 -- | A (coinductively-)cached analysis suitable for guaranteeing termination of (suitably finitized) analyses over recursive programs.
-newtype Caching m (effects :: [* -> *]) a = Caching (m effects a)
+newtype Caching m (effects :: [* -> *]) a = Caching { runCaching :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Caching m)
@@ -73,9 +75,6 @@ instance ( Alternative (m effects)
          , Ord value
          )
       => MonadAnalysis location term value effects (Caching m) where
-  -- We require the 'CachingEffects' in addition to the underlying analysis’ 'Effects'.
-  type Effects location term value (Caching m) = CachingEffects location term value (Effects location term value m)
-
   -- Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
   analyzeTerm recur e = do
     c <- getConfiguration (embedSubterm e)
@@ -92,14 +91,17 @@ instance ( Alternative (m effects)
     cache <- converge (\ prevCache -> isolateCache $ do
       putHeap (configurationHeap c)
       -- We need to reset fresh generation so that this invocation converges.
-      reset 0
+      reset 0 $
       -- This is subtle: though the calling context supports nondeterminism, we want
       -- to corral all the nondeterminism that happens in this @eval@ invocation, so
       -- that it doesn't "leak" to the calling context and diverge (otherwise this
       -- would never complete). We don’t need to use the values, so we 'gather' the
       -- nondeterministic values into @()@.
-      withOracle prevCache (raise (gather (const ()) (lower (liftAnalyze analyzeModule recur m))))) mempty
+        withOracle prevCache (raise (gather (const ()) (lower (liftAnalyze analyzeModule recur m))))) mempty
     maybe empty scatter (cacheLookup c cache)
+
+reset :: (Effectful m, Member Fresh effects) => Int -> m effects a -> m effects a
+reset start = raiseHandler (interposeState start (const pure) (\ counter Fresh yield -> (yield $! succ counter) counter))
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
 --
@@ -119,3 +121,20 @@ converge f = loop
 -- | Nondeterministically write each of a collection of stores & return their associated results.
 scatter :: (Alternative (m effects), Foldable t, MonadEvaluator location term value effects m) => t (a, Heap location value) -> m effects a
 scatter = foldMapA (\ (value, heap') -> putHeap heap' $> value)
+
+
+instance ( Interpreter effects ([result], Cache location term value) rest m
+         , MonadEvaluator location term value effects m
+         , Ord (Cell location value)
+         , Ord location
+         , Ord term
+         , Ord value
+         )
+      => Interpreter (NonDet ': Reader (Cache location term value) ': State (Cache location term value) ': effects) result rest (Caching m) where
+  interpret
+    = interpret
+    . runCaching
+    . raiseHandler
+      ( flip runState mempty
+      . flip runReader mempty
+      . makeChoiceA @[])
