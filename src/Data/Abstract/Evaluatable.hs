@@ -48,7 +48,6 @@ import           Prologue
 
 type MonadEvaluatable location term value effects m =
   ( Declarations term
-  , Effectful m
   , Evaluatable (Base term)
   , FreeVariables term
   , Member (Exc.Exc (ReturnThrow value)) effects
