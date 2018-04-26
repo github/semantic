@@ -45,7 +45,6 @@ import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 
--- type TestEvaluating term = Evaluating Precise term (Value Precise)
 type JustEvaluating term
   = Erroring (AddressError (Located Precise term) (Value (Located Precise term)))
   ( Erroring (EvalError (Value (Located Precise term)))
