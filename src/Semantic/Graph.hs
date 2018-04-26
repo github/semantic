@@ -2,6 +2,7 @@
 module Semantic.Graph where
 
 import           Analysis.Abstract.ImportGraph
+import           Analysis.Abstract.Erroring
 import qualified Data.Abstract.Evaluatable as Analysis
 import           Data.Abstract.FreeVariables
 import           Data.Abstract.Package as Package
@@ -68,10 +69,11 @@ type ImportGraphAnalysis term
   ( BadVariables
   ( BadValues
   ( BadSyntax
+  ( Erroring (Analysis.LoadError term (Value (Located Precise term)))
   ( Evaluating
     (Located Precise term)
     term
-    (Value (Located Precise term))))))))
+    (Value (Located Precise term)))))))))
 
 -- | Render the import graph for a given 'Package'.
 graphImports :: ( Show ann

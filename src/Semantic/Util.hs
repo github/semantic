@@ -53,9 +53,20 @@ type JustEvaluating term
   ( Erroring (ResolutionError (Value (Located Precise term)))
   ( Erroring (Unspecialized (Value (Located Precise term)))
   ( Erroring (ValueError (Located Precise term) (Value (Located Precise term)))
-  ( Evaluating (Located Precise term) term (Value (Located Precise term)))))))
-type EvaluatingWithHoles term = BadAddresses (BadModuleResolutions (BadVariables (BadValues (BadSyntax (Evaluating (Located Precise term) term (Value (Located Precise term)))))))
+  ( Erroring (LoadError term (Value (Located Precise term)))
+  ( Evaluating (Located Precise term) term (Value (Located Precise term))))))))
+
+type EvaluatingWithHoles term
+  = BadAddresses
+  ( BadModuleResolutions
+  ( BadVariables
+  ( BadValues
+  ( BadSyntax
+  ( Erroring (LoadError term (Value (Located Precise term)))
+  ( Evaluating (Located Precise term) term (Value (Located Precise term))))))))
+
 type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
+
 -- The order is significant here: Caching has to come on the outside, or its Interpreter instance
 -- will expect the TypeError exception type to have an Ord instance, which is wrong.
 type Checking term
@@ -65,8 +76,9 @@ type Checking term
   ( Erroring (EvalError Type)
   ( Erroring (ResolutionError Type)
   ( Erroring (Unspecialized Type)
+  ( Erroring (LoadError term Type)
   ( Retaining
-  ( Evaluating Monovariant term Type)))))))
+  ( Evaluating Monovariant term Type))))))))
 
 evalGoProject path = runAnalysis @(JustEvaluating Go.Term) <$> evaluateProject goParser Language.Go Nothing path
 evalRubyProject path = runAnalysis @(JustEvaluating Ruby.Term) <$> evaluateProject rubyParser Language.Ruby rubyPrelude path

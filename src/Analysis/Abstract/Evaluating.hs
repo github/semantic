@@ -5,7 +5,6 @@ module Analysis.Abstract.Evaluating
 
 import Control.Abstract.Analysis hiding (lower)
 import Control.Monad.Effect.Exception as Exc
-import Control.Monad.Effect.Resumable as Res
 import Data.Abstract.Environment
 import Data.Abstract.Evaluatable hiding (lower)
 import Data.Abstract.Module
@@ -24,7 +23,6 @@ deriving instance Member NonDet effects => Alternative (Evaluating location term
 type EvaluatingEffects location term value
   = '[ Exc (ReturnThrow value)
      , Exc (LoopThrow value)
-     , Resumable (LoadError term value)
      , Fail                                        -- Failure with an error message
      , Fresh                                       -- For allocating new addresses and/or type variables.
      , Reader (SomeOrigin term)                    -- The current term’s origin.
@@ -56,10 +54,9 @@ instance ( Corecursive term
 instance Interpreter (EvaluatingEffects location term value) (Evaluating location term value) where
   type Result (EvaluatingEffects location term value) (Evaluating location term value) result
     = ( Either String
-      ( Either (SomeExc (LoadError term value))
       ( Either (LoopThrow value)
       ( Either (ReturnThrow value)
-        result)))
+        result))
       , EvaluatorState location term value)
   interpret
     = interpret
@@ -71,6 +68,6 @@ instance Interpreter (EvaluatingEffects location term value) (Evaluating locatio
       . flip runReader lower -- Reader (SomeOrigin term)
       . flip runFresh' 0
       . runFail
-      . Res.runError
       . Exc.runError
       . Exc.runError)
+ 
