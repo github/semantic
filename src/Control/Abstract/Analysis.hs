@@ -1,5 +1,4 @@
-{-# LANGUAGE KindSignatures #-}
-{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For runAnalysis
+{-# LANGUAGE KindSignatures, ScopedTypeVariables #-}
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , liftAnalyze
@@ -50,9 +49,8 @@ liftAnalyze analyze recur term = coerce (analyze (coerceWith (sym Coercion) . r
 -- | Run an analysis, performing its effects and returning the result alongside any state.
 --
 --   This enables us to refer to the analysis type as e.g. @Analysis1 (Analysis2 Evaluating) Term Value@ without explicitly mentioning its effects (which are inferred to be simply its 'Effects').
-runAnalysis :: ( Effectful m
-               , Interpreter effects m
-               )
+runAnalysis :: forall m effects a
+            .  Interpreter effects m
             => m effects a
             -> Result effects m a
 runAnalysis = interpret
