@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstrainedClassMethods, FunctionalDependencies, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
+{-# LANGUAGE ConstrainedClassMethods, FunctionalDependencies, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
 module Control.Abstract.Evaluator
   ( MonadEvaluator
   -- State
@@ -46,6 +46,7 @@ module Control.Abstract.Evaluator
   -- Control
   , label
   , goto
+  , Eval(..)
   ) where
 
 import Control.Effect hiding (lower)
@@ -347,3 +348,6 @@ label term = do
 -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
 goto :: (Member Fail effects, MonadEvaluator location term value effects m) => Label -> m effects term
 goto label = IntMap.lookup label <$> view _jumps >>= maybe (raise (fail ("unknown label: " <> show label))) pure
+
+data Eval term value resume where
+  Eval :: term -> Eval term value value
