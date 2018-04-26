@@ -1,9 +1,8 @@
-{-# LANGUAGE ExistentialQuantification, FunctionalDependencies, RankNTypes, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE FunctionalDependencies, RankNTypes, TypeFamilies, TypeOperators #-}
 module Control.Effect
 ( Effectful(..)
 , raiseHandler
 , Interpreter(..)
-, Evaluator(..)
 , throwResumable
 , resume
 , throwException
@@ -54,6 +53,3 @@ class Effectful m => Interpreter effects m | m -> effects where
 
 instance Interpreter '[] Eff where
   interpret = Effect.run
-
-
-data Evaluator m a = forall effects . Evaluator { runEvaluator :: Interpreter effects m => m effects a }
