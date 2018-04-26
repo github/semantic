@@ -95,7 +95,7 @@ javascriptExtensions = ["js"]
 evalRequire :: MonadEvaluatable location term value effects m => ModulePath -> Name -> m effects value
 evalRequire modulePath alias = letrec' alias $ \addr -> do
   (importedEnv, _) <- isolate (require modulePath)
-  modifyEnv (mappend importedEnv)
+  modifyEnv (mergeEnvs importedEnv)
   void $ makeNamespace alias addr Nothing
   unit
 
@@ -111,7 +111,7 @@ instance Evaluatable Import where
   eval (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     (importedEnv, _) <- isolate (require modulePath)
-    modifyEnv (mappend (renamed importedEnv)) *> unit
+    modifyEnv (mergeEnvs (renamed importedEnv)) *> unit
     where
       renamed importedEnv
         | Prologue.null symbols = importedEnv

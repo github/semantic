@@ -60,7 +60,7 @@ instance Evaluatable Import where
     paths <- resolveGoImport importPath
     for_ paths $ \path -> do
       (importedEnv, _) <- traceResolve (unPath importPath) path $ isolate (require path)
-      modifyEnv (mappend importedEnv)
+      modifyEnv (mergeEnvs importedEnv)
     unit
 
 
@@ -81,7 +81,7 @@ instance Evaluatable QualifiedImport where
     void $ letrec' alias $ \addr -> do
       for_ paths $ \path -> do
         (importedEnv, _) <- traceResolve (unPath importPath) path $ isolate (require path)
-        modifyEnv (mappend importedEnv)
+        modifyEnv (mergeEnvs importedEnv)
 
       makeNamespace alias addr Nothing
     unit

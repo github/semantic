@@ -6,6 +6,7 @@ module Data.Abstract.Environment
   , delete
   , head
   , emptyEnv
+  , mergeEnvs
   , mergeNewer
   , insert
   , lookup
@@ -54,10 +55,9 @@ instance IsList (Environment l a) where
 instance Empty (Environment l a) where
   empty = emptyEnv
 
--- TODO: property-check me
-instance Semigroup (Environment l a) where
-  Environment (a :| as) <> Environment (b :| bs) =
-    Environment ((a <> b) :| alignWith (mergeThese (<>)) as bs)
+mergeEnvs :: Environment l a -> Environment l a -> Environment l a
+mergeEnvs (Environment (a :| as)) (Environment (b :| bs)) =
+  Environment ((<>) a b :| alignWith (mergeThese (<>)) as bs)
 
 emptyEnv :: Environment l a
 emptyEnv = Environment (Empty.empty :| [])

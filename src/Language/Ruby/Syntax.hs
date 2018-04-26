@@ -50,7 +50,7 @@ instance Evaluatable Send where
     func <- case sendReceiver of
       Just recv -> do
         recvEnv <- subtermValue recv >>= scopedEnvironment
-        localEnv (mappend recvEnv) sel
+        localEnv (mergeEnvs recvEnv) sel
       Nothing -> sel -- TODO Does this require `localize` so we don't leak terms when resolving `sendSelector`?
 
     call func (map subtermValue sendArgs) -- TODO pass through sendBlock
@@ -101,7 +101,7 @@ doLoad :: MonadEvaluatable location term value effects m => ByteString -> Bool -
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   (importedEnv, _) <- traceResolve path path' $ isolate (load path')
-  unless shouldWrap $ modifyEnv (mappend importedEnv)
+  unless shouldWrap $ modifyEnv (mergeEnvs importedEnv)
   boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 
 -- TODO: autoload

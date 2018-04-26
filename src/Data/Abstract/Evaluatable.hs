@@ -226,7 +226,7 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= eva
     evalAndCache (x:xs) = do
       (env, _) <- evalAndCache' x
       (env', v') <- evalAndCache xs
-      pure (env <> env', v')
+      pure (mergeEnvs env env', v')
 
     evalAndCache' x = do
       let mPath = modulePath (moduleInfo x)
@@ -250,7 +250,7 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= eva
     filterEnv :: Exports.Exports l a -> Environment l a -> Environment l a
     filterEnv ports env
       | Exports.null ports = env
-      | otherwise = Exports.toEnvironment ports <> overwrite (Exports.aliases ports) env
+      | otherwise = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
 
 
 -- | Evaluate a term to a value using the semantics of the current analysis.

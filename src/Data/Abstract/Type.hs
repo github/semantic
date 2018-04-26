@@ -92,7 +92,7 @@ instance ( Alternative (m effects)
       assign a tvar
       (env, tvars) <- rest
       pure (Env.insert name a env, tvar : tvars)) (pure (Empty.empty, Empty.empty)) names
-    ret <- localEnv (mappend env) body
+    ret <- localEnv (mergeEnvs env) body
     pure (Product tvars :-> ret)
 
   unit       = pure Unit
