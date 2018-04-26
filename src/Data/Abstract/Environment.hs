@@ -24,7 +24,6 @@ import           Data.Abstract.Live
 import           Data.Align
 import           Data.Empty as Empty
 import qualified Data.Map as Map
-import           Data.Semigroup.Reducer
 import           GHC.Exts (IsList (..))
 import           Prologue
 import qualified Data.List.NonEmpty as NonEmpty
@@ -58,9 +57,6 @@ instance Empty (Environment l a) where
 instance Semigroup (Environment l a) where
   Environment (a :| as) <> Environment (b :| bs) =
     Environment ((a <> b) :| alignWith (mergeThese (<>)) as bs)
-
-instance Reducer (Name, Address l a) (Environment l a) where
-  unit a = Environment (unit a :| [])
 
 -- | This instance is possibly unlawful. If this breaks, you get to keep both pieces.
 instance Monoid (Environment l a) where
