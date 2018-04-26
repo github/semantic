@@ -3,7 +3,7 @@ module Language.Ruby.Syntax where
 
 import           Control.Monad (unless)
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.Module (ModulePath, ModuleInfo(..))
+import           Data.Abstract.Module (ModulePath)
 import           Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Path
 import qualified Data.ByteString.Char8 as BC
