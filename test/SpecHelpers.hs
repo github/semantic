@@ -78,7 +78,8 @@ type TestEvaluating term
   ( Erroring (ResolutionError (Value Precise))
   ( Erroring (Unspecialized (Value Precise))
   ( Erroring (ValueError Precise (Value Precise))
-  ( Evaluating Precise term (Value Precise))))))
+  ( Erroring (LoadError term (Value Precise))
+  ( Evaluating Precise term (Value Precise)))))))
 
 ns n = Just . Latest . Just . injValue . Namespace n
 addr = Address . Precise
