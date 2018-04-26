@@ -36,10 +36,10 @@ instance ( Corecursive term
 
   analyzeModule = liftAnalyze analyzeModule
 
-instance ( Interpreter effects m
+instance ( Interpreter m effects
          , MonadEvaluator location term value effects m
          , Monoid (trace (Configuration location term value))
          )
-      => Interpreter (Writer (trace (Configuration location term value)) ': effects) (Tracing trace m) where
-  type Result (Writer (trace (Configuration location term value)) ': effects) (Tracing trace m) result = Result effects m (result, trace (Configuration location term value))
+      => Interpreter (Tracing trace m) (Writer (trace (Configuration location term value)) ': effects) where
+  type Result (Tracing trace m) (Writer (trace (Configuration location term value)) ': effects) result = Result m effects (result, trace (Configuration location term value))
   interpret = interpret . runTracing . raiseHandler runWriter

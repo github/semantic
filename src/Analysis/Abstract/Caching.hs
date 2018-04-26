@@ -121,15 +121,15 @@ scatter :: (Alternative (m effects), Foldable t, MonadEvaluator location term va
 scatter = foldMapA (\ (value, heap') -> putHeap heap' $> value)
 
 
-instance ( Interpreter effects m
+instance ( Interpreter m effects
          , MonadEvaluator location term value effects m
          , Ord (Cell location value)
          , Ord location
          , Ord term
          , Ord value
          )
-      => Interpreter (NonDet ': Reader (Cache location term value) ': State (Cache location term value) ': effects) (Caching m) where
-  type Result (NonDet ': Reader (Cache location term value) ': State (Cache location term value) ': effects) (Caching m) result = Result effects m ([result], Cache location term value)
+      => Interpreter (Caching m) (NonDet ': Reader (Cache location term value) ': State (Cache location term value) ': effects) where
+  type Result (Caching m) (NonDet ': Reader (Cache location term value) ': State (Cache location term value) ': effects) result = Result m effects ([result], Cache location term value)
   interpret
     = interpret
     . runCaching

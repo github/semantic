@@ -13,7 +13,7 @@ newtype Erroring (exc :: * -> *) m (effects :: [* -> *]) a = Erroring { runError
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Erroring exc m)
 deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (Erroring exc m)
 
-instance Interpreter                   effects                m
-      => Interpreter (Resumable exc ': effects) (Erroring exc m) where
-  type Result (Resumable exc ': effects) (Erroring exc m) result = Result effects m (Either (SomeExc exc) result)
+instance Interpreter               m                    effects
+      => Interpreter (Erroring exc m) (Resumable exc ': effects) where
+  type Result (Erroring exc m) (Resumable exc ': effects) result = Result m effects (Either (SomeExc exc) result)
   interpret = interpret . runErroring . raiseHandler runError

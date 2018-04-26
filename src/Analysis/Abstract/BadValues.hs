@@ -12,13 +12,13 @@ newtype BadValues m (effects :: [* -> *]) a = BadValues { runBadValues :: m effe
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadValues m)
 deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadValues m)
 
-instance ( Interpreter effects m
+instance ( Interpreter m effects
          , MonadEvaluator location term value effects m
          , AbstractHole value
          , Show value
          )
-      => Interpreter (Resumable (ValueError location value) ': effects) (BadValues m) where
-  type Result (Resumable (ValueError location value) ': effects) (BadValues m) result = Result effects m result
+      => Interpreter (BadValues m) (Resumable (ValueError location value) ': effects) where
+  type Result (BadValues m) (Resumable (ValueError location value) ': effects) result = Result m effects result
   interpret
     = interpret
     . runBadValues

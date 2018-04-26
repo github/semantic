@@ -21,12 +21,12 @@ newtype BadSyntax m (effects :: [* -> *]) a = BadSyntax { runBadSyntax :: m effe
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadSyntax m)
 deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadSyntax m)
 
-instance ( Interpreter effects m
+instance ( Interpreter m effects
          , MonadEvaluator location term value effects m
          , AbstractHole value
          )
-      => Interpreter (Resumable (Unspecialized value) ': effects) (BadSyntax m) where
-  type Result (Resumable (Unspecialized value) ': effects) (BadSyntax m) result = Result effects m result
+      => Interpreter (BadSyntax m) (Resumable (Unspecialized value) ': effects) where
+  type Result (BadSyntax m) (Resumable (Unspecialized value) ': effects) result = Result m effects result
   interpret
     = interpret
     . runBadSyntax

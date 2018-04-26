@@ -46,10 +46,10 @@ raiseHandler handler = raise . handler . lower
 -- | Interpreters determine and interpret a list of effects, optionally taking extra arguments.
 --
 --   Instances will generally be defined recursively in terms of underlying interpreters, bottoming out with the instance for 'Eff' which uses 'Effect.run' to produce a final value.
-class Effectful m => Interpreter effects m | m -> effects where
-  type Result effects m result
-  type instance Result effects m result = result
-  interpret :: m effects result -> Result effects m result
+class Effectful m => Interpreter m effects | m -> effects where
+  type Result m effects result
+  type instance Result m effects result = result
+  interpret :: m effects result -> Result m effects result
 
-instance Interpreter '[] Eff where
+instance Interpreter Eff '[] where
   interpret = Effect.run

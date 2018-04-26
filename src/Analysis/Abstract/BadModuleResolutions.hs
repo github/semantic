@@ -12,11 +12,11 @@ newtype BadModuleResolutions m (effects :: [* -> *]) a = BadModuleResolutions { 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadModuleResolutions m)
 deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadModuleResolutions m)
 
-instance ( Interpreter effects m
+instance ( Interpreter m effects
          , MonadEvaluator location term value effects m
          )
-      => Interpreter (Resumable (ResolutionError value) ': effects) (BadModuleResolutions m) where
-  type Result (Resumable (ResolutionError value) ': effects) (BadModuleResolutions m) result = Result effects m result
+      => Interpreter (BadModuleResolutions m) (Resumable (ResolutionError value) ': effects) where
+  type Result (BadModuleResolutions m) (Resumable (ResolutionError value) ': effects) result = Result m effects result
   interpret
     = interpret
     . runBadModuleResolutions

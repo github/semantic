@@ -52,10 +52,10 @@ instance ( Corecursive term
     killAll (subterms (subterm (moduleBody m)))
     liftAnalyze analyzeModule recur m
 
-instance ( Interpreter effects m
+instance ( Interpreter m effects
          , MonadEvaluator location term value effects m
          , Ord term
          )
-      => Interpreter (State (Dead term) ': effects) (DeadCode m) where
-  type Result (State (Dead term) ': effects) (DeadCode m) result = Result effects m (result, Dead term)
+      => Interpreter (DeadCode m) (State (Dead term) ': effects) where
+  type Result (DeadCode m) (State (Dead term) ': effects) result = Result m effects (result, Dead term)
   interpret = interpret . runDeadCode . raiseHandler (`runState` mempty)

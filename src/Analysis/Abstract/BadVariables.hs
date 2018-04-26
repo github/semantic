@@ -15,12 +15,12 @@ newtype BadVariables m (effects :: [* -> *]) a = BadVariables { runBadVariables 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadVariables m)
 deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadVariables m)
 
-instance ( Interpreter effects m
+instance ( Interpreter m effects
          , MonadEvaluator location term value effects m
          , AbstractHole value
          )
-      => Interpreter (Resumable (EvalError value) ': State [Name] ': effects) (BadVariables m) where
-  type Result (Resumable (EvalError value) ': State [Name] ': effects) (BadVariables m) result = Result effects m (result, [Name])
+      => Interpreter (BadVariables m) (Resumable (EvalError value) ': State [Name] ': effects) where
+  type Result (BadVariables m) (Resumable (EvalError value) ': State [Name] ': effects) result = Result m effects (result, [Name])
   interpret
     = interpret
     . runBadVariables

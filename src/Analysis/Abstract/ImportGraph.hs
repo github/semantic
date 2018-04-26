@@ -168,7 +168,7 @@ vertexToType Module{}   = "module"
 vertexToType Variable{} = "variable"
 
 
-instance Interpreter effects m
-      => Interpreter (State ImportGraph ': effects) (ImportGraphing m) where
-  type Result (State ImportGraph ': effects) (ImportGraphing m) result = Result effects m (result, ImportGraph)
+instance Interpreter m effects
+      => Interpreter (ImportGraphing m) (State ImportGraph ': effects) where
+  type Result (ImportGraphing m) (State ImportGraph ': effects) result = Result m effects (result, ImportGraph)
   interpret = interpret . runImportGraphing . raiseHandler (`runState` mempty)

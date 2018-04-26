@@ -62,12 +62,12 @@ reachable roots heap = go mempty roots
             _           -> seen)
 
 
-instance ( Interpreter effects m
+instance ( Interpreter m effects
          , MonadEvaluator location term value effects m
          , Ord location
          )
-      => Interpreter (Reader (Live location value) ': effects) (Collecting m) where
-  type Result (Reader (Live location value) ': effects) (Collecting m) result = Result effects m result
+      => Interpreter (Collecting m) (Reader (Live location value) ': effects) where
+  type Result (Collecting m) (Reader (Live location value) ': effects) result = Result m effects result
   interpret = interpret . runCollecting . raiseHandler (`runReader` mempty)
 
 
@@ -78,10 +78,10 @@ newtype Retaining m (effects :: [* -> *]) a = Retaining { runRetaining :: m effe
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Retaining m)
 deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (Retaining m)
 
-instance ( Interpreter effects m
+instance ( Interpreter m effects
          , MonadEvaluator location term value effects m
          , Ord location
          )
-      => Interpreter (Reader (Live location value) ': effects) (Retaining m) where
-  type Result (Reader (Live location value) ': effects) (Retaining m) result = Result effects m result
+      => Interpreter (Retaining m) (Reader (Live location value) ': effects) where
+  type Result (Retaining m) (Reader (Live location value) ': effects) result = Result m effects result
   interpret = interpret . runRetaining . raiseHandler (`runReader` mempty)

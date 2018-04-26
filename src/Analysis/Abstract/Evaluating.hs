@@ -51,8 +51,8 @@ instance ( Corecursive term
   analyzeModule eval m = pushOrigin (moduleOrigin (subterm <$> m)) (eval m)
 
 
-instance Interpreter (EvaluatingEffects location term value) (Evaluating location term value) where
-  type Result (EvaluatingEffects location term value) (Evaluating location term value) result
+instance Interpreter (Evaluating location term value) (EvaluatingEffects location term value) where
+  type Result (Evaluating location term value) (EvaluatingEffects location term value) result
     = ( Either String
       ( Either (LoopThrow value)
       ( Either (ReturnThrow value)
