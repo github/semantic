@@ -1,5 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
+{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , MonadEvaluatable
@@ -30,7 +29,6 @@ module Data.Abstract.Evaluatable
 import           Control.Abstract.Addressable as X
 import           Control.Abstract.Analysis as X
 import qualified Control.Monad.Effect.Exception as Exc
-import qualified Control.Monad.Effect.Internal as Eff
 import           Data.Abstract.Address
 import           Data.Abstract.Declarations as X
 import           Data.Abstract.Environment as X
@@ -301,22 +299,3 @@ pushOrigin :: ( Effectful m
            -> m effects a
            -> m effects a
 pushOrigin o = raise . local (<> o) . lower
-
-
-newtype Evaluator m (effects :: [* -> *]) a = Evaluator { runEvaluator :: m effects a }
-  deriving (Applicative, Effectful, Functor, Monad)
-
-instance ( Interpreter m effects
-         , MonadEvaluatable location term value (Eval term value ': effects) m
-         , MonadEvaluator location term value effects m
-         )
-      => Interpreter (Evaluator m) (Eval term value ': effects) where
-  type Result (Evaluator m) (Eval term value ': effects) result = Result m effects result
-  interpret = interpret . runEval
-
-runEval :: forall m location term value effects result
-        .  MonadEvaluatable location term value (Eval term value ': effects) m
-        => Evaluator m (Eval term value ': effects) result
-        -> m effects result
-runEval = runEvaluator . raiseHandler (Eff.interpret (\ (Eval term) ->
-  lower (runEval @m (Evaluator (foldSubterms (analyzeTerm @location @term @value eval) term)))))
