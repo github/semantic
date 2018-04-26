@@ -10,7 +10,6 @@ import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Erroring
 import           Analysis.Abstract.Evaluating as X
-import           Analysis.Abstract.ImportGraph
 import           Analysis.Abstract.TypeChecking
 import           Control.Abstract.Analysis
 import           Data.Abstract.Address
@@ -53,8 +52,6 @@ type EvaluatingWithHoles term
   ( BadSyntax
   ( Erroring (LoadError term (Value (Located Precise term)))
   ( Evaluating (Located Precise term) term (Value (Located Precise term))))))))
-
-type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
 
 -- The order is significant here: Caching has to come on the outside, or its Interpreter instance
 -- will expect the TypeError exception type to have an Ord instance, which is wrong.
