@@ -70,4 +70,3 @@ instance Interpreter (EvaluatingEffects location term value) (Evaluating locatio
       . runFail
       . Exc.runError
       . Exc.runError)
- 
