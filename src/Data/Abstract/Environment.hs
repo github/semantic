@@ -5,6 +5,7 @@ module Data.Abstract.Environment
   , bind
   , delete
   , head
+  , emptyEnv
   , mergeNewer
   , insert
   , lookup
@@ -51,17 +52,15 @@ instance IsList (Environment l a) where
   toList (Environment (x :| _)) = Map.toList x
 
 instance Empty (Environment l a) where
-  empty = Environment (Empty.empty :| [])
+  empty = emptyEnv
 
 -- TODO: property-check me
 instance Semigroup (Environment l a) where
   Environment (a :| as) <> Environment (b :| bs) =
     Environment ((a <> b) :| alignWith (mergeThese (<>)) as bs)
 
--- | This instance is possibly unlawful. If this breaks, you get to keep both pieces.
-instance Monoid (Environment l a) where
-  mappend = (<>)
-  mempty  = Environment (mempty :| [])
+emptyEnv :: Environment l a
+emptyEnv = Environment (Empty.empty :| [])
 
 -- | Make and enter a new empty scope in the given environment.
 push :: Environment l a -> Environment l a

@@ -235,7 +235,7 @@ instance ( Monad (m effects)
 
   namespace n env = do
     maybeAddr <- lookupEnv n
-    env' <- maybe (pure mempty) (asNamespaceEnv <=< deref) maybeAddr
+    env' <- maybe (pure emptyEnv) (asNamespaceEnv <=< deref) maybeAddr
     pure (injValue (Namespace n (Env.mergeNewer env' env)))
     where asNamespaceEnv v
             | Just (Namespace _ env') <- prjValue v = pure env'
