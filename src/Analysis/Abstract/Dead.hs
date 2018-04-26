@@ -1,4 +1,5 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, KindSignatures, TypeOperators, UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.Dead
 ( DeadCode
 ) where
@@ -10,7 +11,7 @@ import Data.Set (delete)
 import Prologue
 
 -- | An analysis tracking dead (unreachable) code.
-newtype DeadCode m (effects :: [* -> *]) a = DeadCode (m effects a)
+newtype DeadCode m (effects :: [* -> *]) a = DeadCode { runDeadCode :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (DeadCode m)
@@ -43,8 +44,6 @@ instance ( Corecursive term
          , Recursive term
          )
       => MonadAnalysis location term value effects (DeadCode m) where
-  type Effects location term value (DeadCode m) = State (Dead term) ': Effects location term value m
-
   analyzeTerm recur term = do
     revive (embedSubterm term)
     liftAnalyze analyzeTerm recur term
@@ -52,3 +51,10 @@ instance ( Corecursive term
   analyzeModule recur m = do
     killAll (subterms (subterm (moduleBody m)))
     liftAnalyze analyzeModule recur m
+
+instance ( Interpreter effects (result, Dead term) rest m
+         , MonadEvaluator location term value effects m
+         , Ord term
+         )
+      => Interpreter (State (Dead term) ': effects) result rest (DeadCode m) where
+  interpret = interpret . runDeadCode . raiseHandler (`runState` mempty)

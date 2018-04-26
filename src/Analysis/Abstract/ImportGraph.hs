@@ -1,5 +1,4 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, ScopedTypeVariables, StandaloneDeriving,
-             TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.ImportGraph
 ( ImportGraph(..)
 , renderImportGraph
@@ -54,7 +53,7 @@ style = (defaultStyle vertexName)
         edgeAttributes Variable{} Module{}   = [ "color" := "blue" ]
         edgeAttributes _          _          = []
 
-newtype ImportGraphing m (effects :: [* -> *]) a = ImportGraphing (m effects a)
+newtype ImportGraphing m (effects :: [* -> *]) a = ImportGraphing { runImportGraphing :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (ImportGraphing m)
@@ -66,12 +65,10 @@ instance ( Effectful m
          , Member (State ImportGraph) effects
          , Member Syntax.Identifier syntax
          , MonadAnalysis (Located location term) term value effects m
-         , term ~ Term (Union syntax) ann
          , Show ann
+         , term ~ Term (Union syntax) ann
          )
       => MonadAnalysis (Located location term) term value effects (ImportGraphing m) where
-  type Effects (Located location term) term value (ImportGraphing m) = State ImportGraph ': Effects (Located location term) term value m
-
   analyzeTerm eval term@(In _ syntax) = do
     case prj syntax of
       Just (Syntax.Identifier name) -> do
@@ -169,3 +166,8 @@ vertexToType :: Vertex -> Text
 vertexToType Package{}  = "package"
 vertexToType Module{}   = "module"
 vertexToType Variable{} = "variable"
+
+
+instance Interpreter effects (result, ImportGraph) rest m
+      => Interpreter (State ImportGraph ': effects) result rest (ImportGraphing m) where
+  interpret = interpret . runImportGraphing . raiseHandler (`runState` mempty)

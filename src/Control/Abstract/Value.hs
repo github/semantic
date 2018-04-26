@@ -1,6 +1,7 @@
 {-# LANGUAGE FunctionalDependencies, GADTs, KindSignatures, Rank2Types #-}
 module Control.Abstract.Value
 ( MonadValue(..)
+, AbstractHole(..)
 , Comparator(..)
 , while
 , doWhile
@@ -31,6 +32,9 @@ data Comparator
   = Concrete (forall a . Ord a => a -> a -> Bool)
   | Generalized
 
+class AbstractHole value where
+  hole :: value
+
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
@@ -38,9 +42,6 @@ class (Monad (m effects), Show value) => MonadValue location value (effects :: [
   -- | Construct an abstract unit value.
   --   TODO: This might be the same as the empty tuple for some value types
   unit :: m effects value
-
-  -- | Construct an abstract hole.
-  hole :: m effects value
 
   -- | Construct an abstract integral value.
   integer :: Prelude.Integer -> m effects value

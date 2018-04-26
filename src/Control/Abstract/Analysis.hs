@@ -1,22 +1,19 @@
-{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
+{-# LANGUAGE KindSignatures #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For runAnalysis
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , liftAnalyze
 , runAnalysis
-, SomeAnalysis(..)
-, runSomeAnalysis
 , module X
-, Subterm(..)
-, SubtermAlgebra
 ) where
 
 import Control.Abstract.Addressable as X
 import Control.Abstract.Evaluator as X
 import Control.Abstract.Value as X
 import Control.Effect as X
-import Control.Effect.Fresh as X
 import Control.Monad.Effect.Fail as X
+import Control.Monad.Effect.Fresh as X
+import Control.Monad.Effect.Internal as X (Eff, relay)
 import Control.Monad.Effect.NonDet as X
 import Control.Monad.Effect.Reader as X
 import Control.Monad.Effect.State as X
@@ -30,9 +27,6 @@ import Prologue
 --
 --   This typeclass is left intentionally unconstrained to avoid circular dependencies between it and other typeclasses.
 class MonadEvaluator location term value effects m => MonadAnalysis location term value effects m where
-  -- | The effects necessary to run the analysis. Analyses which are composed on top of (wrap) other analyses should include the inner analyses 'Effects' in their own list.
-  type family Effects location term value m :: [* -> *]
-
   -- | Analyze a term using the semantics of the current analysis.
   analyzeTerm :: (Base term (Subterm term (outer effects value)) -> m effects value)
               -> (Base term (Subterm term (outer effects value)) -> m effects value)
@@ -57,25 +51,8 @@ liftAnalyze analyze recur term = coerce (analyze (coerceWith (sym Coercion) . r
 --
 --   This enables us to refer to the analysis type as e.g. @Analysis1 (Analysis2 Evaluating) Term Value@ without explicitly mentioning its effects (which are inferred to be simply its 'Effects').
 runAnalysis :: ( Effectful m
-               , Effects location term value m ~ effects
-               , MonadAnalysis location term value effects m
-               , RunEffects effects a
+               , Interpreter effects a function m
                )
             => m effects a
-            -> Final effects a
-runAnalysis = X.run
-
-
--- | An abstraction over analyses.
-data SomeAnalysis m result where
-  SomeAnalysis :: ( Effectful m
-                  , effects ~ Effects location term value m
-                  , MonadAnalysis location term value effects m
-                  , RunEffects effects a
-                  )
-               => m effects a
-               -> SomeAnalysis m (Final effects a)
-
--- | Run an abstracted analysis.
-runSomeAnalysis :: SomeAnalysis m result -> result
-runSomeAnalysis (SomeAnalysis a) = X.run a
+            -> function
+runAnalysis = interpret

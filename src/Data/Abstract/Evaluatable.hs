@@ -55,7 +55,6 @@ type MonadEvaluatable location term value effects m =
   , Member (Exc.Exc (LoopThrow value)) effects
   , Member Fail effects
   , Member (Resumable (Unspecialized value)) effects
-  , Member (Resumable (ValueError location value)) effects
   , Member (Resumable (LoadError term value)) effects
   , Member (Resumable (EvalError value)) effects
   , Member (Resumable (ResolutionError value)) effects
@@ -119,7 +118,7 @@ data EvalError value resume where
 
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
-variable :: MonadEvaluatable location term value effects m => Name -> m effects value
+variable :: (Member (Resumable (AddressError location value)) effects, Member (Resumable (EvalError value)) effects, MonadAddressable location effects m, MonadEvaluator location term value effects m) => Name -> m effects value
 variable name = lookupWith deref name >>= maybeM (throwResumable (FreeVariableError name))
 
 deriving instance Eq (EvalError a b)
@@ -137,13 +136,13 @@ instance Eq1 (EvalError term) where
   liftEq _ _ _                                             = False
 
 
-throwValueError :: MonadEvaluatable location term value effects m => ValueError location value resume -> m effects resume
+throwValueError :: (Member (Resumable (ValueError location value)) effects, MonadEvaluator location term value effects m) => ValueError location value resume -> m effects resume
 throwValueError = throwResumable
 
-throwLoadError :: MonadEvaluatable location term value effects m => LoadError term value resume -> m effects resume
+throwLoadError :: (Member (Resumable (LoadError term value)) effects, MonadEvaluator location term value effects m) => LoadError term value resume -> m effects resume
 throwLoadError = throwResumable
 
-throwEvalError :: MonadEvaluatable location term value effects m => EvalError value resume -> m effects resume
+throwEvalError :: (Member (Resumable (EvalError value)) effects, MonadEvaluator location term value effects m) => EvalError value resume -> m effects resume
 throwEvalError = throwResumable
 
 throwLoop :: MonadEvaluatable location term value effects m => LoopThrow value -> m effects a

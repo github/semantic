@@ -1,15 +1,17 @@
 -- MonoLocalBinds is to silence a warning about a simplifiable constraint.
-{-# LANGUAGE MonoLocalBinds, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE MonoLocalBinds, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.Util where
 
+import           Analysis.Abstract.BadAddresses
 import           Analysis.Abstract.BadModuleResolutions
+import           Analysis.Abstract.BadSyntax
 import           Analysis.Abstract.BadValues
 import           Analysis.Abstract.BadVariables
 import           Analysis.Abstract.Caching
+import           Analysis.Abstract.Erroring
 import           Analysis.Abstract.Evaluating as X
 import           Analysis.Abstract.ImportGraph
-import           Analysis.Abstract.Quiet
 import           Analysis.Abstract.TypeChecking
 import           Analysis.Declaration
 import           Control.Abstract.Analysis
@@ -43,13 +45,26 @@ import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 
-
-type JustEvaluating term = Evaluating (Located Precise term) term (Value (Located Precise term))
-type EvaluatingWithHoles term = BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term))))))
+-- type TestEvaluating term = Evaluating Precise term (Value Precise)
+type JustEvaluating term
+  = Erroring (AddressError (Located Precise term) (Value (Located Precise term)))
+  ( Erroring (EvalError (Value (Located Precise term)))
+  ( Erroring (ResolutionError (Value (Located Precise term)))
+  ( Erroring (Unspecialized (Value (Located Precise term)))
+  ( Erroring (ValueError (Located Precise term) (Value (Located Precise term)))
+  ( Evaluating (Located Precise term) term (Value (Located Precise term)))))))
+type EvaluatingWithHoles term = BadAddresses (BadModuleResolutions (BadVariables (BadValues (BadSyntax (Evaluating (Located Precise term) term (Value (Located Precise term)))))))
 type ImportGraphingWithHoles term = ImportGraphing (EvaluatingWithHoles term)
 -- The order is significant here: Caching has to come on the outside, or the RunEffect instance for NonDet
 -- will expect the TypeError exception type to have an Ord instance, which is wrong.
-type Checking term = Caching (TypeChecking (Evaluating Monovariant term Type))
+type Checking term
+  = Caching
+  ( TypeChecking
+  ( Erroring (AddressError Monovariant Type)
+  ( Erroring (EvalError Type)
+  ( Erroring (ResolutionError Type)
+  ( Erroring (Unspecialized Type)
+  ( Evaluating Monovariant term Type))))))
 
 evalGoProject path = runAnalysis @(JustEvaluating Go.Term) <$> evaluateProject goParser Language.Go Nothing path
 evalRubyProject path = runAnalysis @(JustEvaluating Ruby.Term) <$> evaluateProject rubyParser Language.Ruby rubyPrelude path

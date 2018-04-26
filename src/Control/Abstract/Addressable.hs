@@ -1,10 +1,10 @@
-{-# LANGUAGE GADTs, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE GADTs, UndecidableInstances #-}
 module Control.Abstract.Addressable where
 
 import Control.Abstract.Evaluator
 import Control.Applicative
 import Control.Effect
-import Control.Effect.Fresh
+import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.Resumable as Eff
 import Data.Abstract.Address
 import Data.Abstract.Environment (insert)
@@ -57,7 +57,7 @@ letrec' name body = do
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
 instance (Effectful m, Member Fresh effects, Monad (m effects)) => MonadAddressable Precise effects m where
   derefCell _ = pure . unLatest
-  allocLoc _ = Precise <$> fresh
+  allocLoc _ = Precise <$> raise fresh
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
 instance (Alternative (m effects), Effectful m, Member Fresh effects, Monad (m effects)) => MonadAddressable Monovariant effects m where
