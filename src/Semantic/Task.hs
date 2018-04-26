@@ -140,7 +140,7 @@ data Task output where
 runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, IO] effs => Eff (Task ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
   Parse parser blob -> runParser blob parser
-  Analyze analysis -> pure (Analysis.runAnalysis analysis)
+  Analyze analysis -> pure (Analysis.interpret analysis)
   Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
   Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
   Render renderer input -> pure (renderer input)

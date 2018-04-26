@@ -12,7 +12,7 @@ import Prologue
 --
 --   Use it by composing it onto an analysis:
 --
---   > runAnalysis @(BadSyntax (Evaluating term value)) (…)
+--   > interpret @(BadSyntax (Evaluating term value)) (…)
 --
 --   Note that exceptions thrown by other analyses may not be caught if 'BadSyntax' doesn’t know about them, i.e. if they’re not part of the generic 'MonadValue', 'MonadAddressable', etc. machinery.
 newtype BadSyntax m (effects :: [* -> *]) a = BadSyntax { runBadSyntax :: m effects a }

@@ -72,4 +72,4 @@ spec = parallel $ do
     addr = Address . Precise
     fixtures = "test/fixtures/ruby/analysis/"
     evaluate entry = evalRubyProject (fixtures <> entry)
-    evalRubyProject path = runAnalysis @(TestEvaluating Ruby.Term) <$> evaluateProject rubyParser Language.Ruby rubyPrelude path
+    evalRubyProject path = interpret @(TestEvaluating Ruby.Term) <$> evaluateProject rubyParser Language.Ruby rubyPrelude path

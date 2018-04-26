@@ -2,7 +2,6 @@
 module Control.Abstract.Analysis
 ( MonadAnalysis(..)
 , liftAnalyze
-, runAnalysis
 , module X
 ) where
 
@@ -44,12 +43,3 @@ liftAnalyze :: Coercible (  m effects value) (t m (effects :: [* -> *]) value)
             => ((base (Subterm term (outer value)) ->   m effects value) -> (base (Subterm term (outer value)) ->   m effects value))
             -> ((base (Subterm term (outer value)) -> t m effects value) -> (base (Subterm term (outer value)) -> t m effects value))
 liftAnalyze analyze recur term = coerce (analyze (coerceWith (sym Coercion) . recur) term)
-
-
--- | Run an analysis, performing its effects and returning the result alongside any state.
---
---   This enables us to refer to the analysis type as e.g. @Analysis1 (Analysis2 Evaluating) Term Value@ without explicitly mentioning its effects (which are inferred to be simply its 'Effects').
-runAnalysis :: Interpreter m effects
-            => m effects a
-            -> Result m effects a
-runAnalysis = interpret
