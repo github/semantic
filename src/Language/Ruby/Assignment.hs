@@ -17,6 +17,7 @@ import qualified Assigning.Assignment as Assignment
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
+import qualified Data.Syntax.Directive as Directive
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
@@ -28,6 +29,7 @@ type Syntax = '[
     Comment.Comment
   , Declaration.Function
   , Declaration.Method
+  , Directive.FileDirective
   , Expression.Arithmetic
   , Expression.Bitwise
   , Expression.Boolean
@@ -74,7 +76,6 @@ type Syntax = '[
   , Syntax.Identifier
   , Syntax.Program
   , Ruby.Syntax.Class
-  , Ruby.Syntax.FileDirective
   , Ruby.Syntax.Load
   , Ruby.Syntax.LowPrecedenceBoolean
   , Ruby.Syntax.Module
@@ -179,7 +180,7 @@ identifier =
     vcallOrLocal = do
       (loc, ident, locals) <- identWithLocals
       case ident of
-        "__FILE__" -> pure $ makeTerm loc (Ruby.Syntax.FileDirective ident)
+        "__FILE__" -> pure $ makeTerm loc Directive.FileDirective
         _ -> do
           let identTerm = makeTerm loc (Syntax.Identifier (name ident))
           if ident `elem` locals
