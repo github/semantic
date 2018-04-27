@@ -29,7 +29,7 @@ type Syntax = '[
     Comment.Comment
   , Declaration.Function
   , Declaration.Method
-  , Directive.FileDirective
+  , Directive.File
   , Expression.Arithmetic
   , Expression.Bitwise
   , Expression.Boolean
@@ -180,7 +180,7 @@ identifier =
     vcallOrLocal = do
       (loc, ident, locals) <- identWithLocals
       case ident of
-        "__FILE__" -> pure $ makeTerm loc Directive.FileDirective
+        "__FILE__" -> pure $ makeTerm loc Directive.File
         _ -> do
           let identTerm = makeTerm loc (Syntax.Identifier (name ident))
           if ident `elem` locals

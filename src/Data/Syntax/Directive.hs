@@ -7,12 +7,13 @@ import qualified Data.ByteString.Char8 as BC
 import           Diffing.Algorithm
 import           Prologue
 
-data FileDirective a = FileDirective
+-- A file directive like the Ruby constant `__FILE__`.
+data File a = File
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
-instance Eq1 FileDirective where liftEq = genericLiftEq
-instance Ord1 FileDirective where liftCompare = genericLiftCompare
-instance Show1 FileDirective where liftShowsPrec = genericLiftShowsPrec
+instance Eq1 File where liftEq = genericLiftEq
+instance Ord1 File where liftCompare = genericLiftCompare
+instance Show1 File where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable FileDirective where
-  eval FileDirective{} = currentModule >>= string . BC.pack . modulePath
+instance Evaluatable File where
+  eval File = currentModule >>= string . BC.pack . modulePath
