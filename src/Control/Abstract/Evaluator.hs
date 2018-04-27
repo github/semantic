@@ -378,6 +378,7 @@ catchReturn :: (Effectful m, Member (Return value) effects) => m effects a -> (f
 catchReturn action handler = raiseHandler (Eff.interpose pure (\ ret _ -> Effect.lower (handler ret))) action
 
 
+-- | Effects for control flow around loops (breaking and continuing).
 data LoopControl value resume where
   Break :: value -> LoopControl value value
   Continue :: LoopControl value value
