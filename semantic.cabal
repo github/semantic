@@ -94,6 +94,7 @@ library
                      , Data.Syntax
                      , Data.Syntax.Comment
                      , Data.Syntax.Declaration
+                     , Data.Syntax.Directive
                      , Data.Syntax.Expression
                      , Data.Syntax.Literal
                      , Data.Syntax.Statement
