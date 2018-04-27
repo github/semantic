@@ -63,7 +63,7 @@ import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Package
 import Data.Abstract.Origin
-import Data.Empty
+import Data.Empty as Empty
 import qualified Data.IntMap as IntMap
 import Data.Semigroup.Reducer
 import Lens.Micro
@@ -109,7 +109,7 @@ instance (Ord location, Semigroup (Cell location value)) => Semigroup (Evaluator
   EvaluatorState e1 h1 m1 l1 x1 j1 o1 <> EvaluatorState e2 h2 m2 l2 x2 j2 o2 = EvaluatorState (mergeEnvs e1 e2) (h1 <> h2) (m1 <> m2) (l1 <> l2) (x1 <> x2) (j1 <> j2) (o1 <> o2)
 
 instance (Ord location, Semigroup (Cell location value)) => Empty (EvaluatorState location term value) where
-  empty = EvaluatorState emptyEnv mempty mempty mempty mempty mempty mempty
+  empty = EvaluatorState Empty.empty mempty mempty mempty mempty mempty mempty
 
 
 -- Lenses
