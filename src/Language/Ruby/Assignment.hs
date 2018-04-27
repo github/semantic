@@ -218,11 +218,13 @@ endBlock :: Assignment
 endBlock = makeTerm <$> symbol EndBlock <*> children (Statement.ScopeExit <$> many expression)
 
 class' :: Assignment
-class' = makeTerm <$> symbol Class <*> (withNewScope . children) (Ruby.Syntax.Class <$> expression <*> (superclass <|> pure []) <*> expressions)
-  where superclass = pure <$ symbol Superclass <*> children expression
+class' = makeTerm <$> symbol Class <*> (withNewScope . children) (Ruby.Syntax.Class <$> expression <*> optional superclass <*> expressions)
+  where
+    superclass :: Assignment
+    superclass = symbol Superclass *> children expression
 
 singletonClass :: Assignment
-singletonClass = makeTerm <$> symbol SingletonClass <*> (withNewScope . children) (Ruby.Syntax.Class <$> expression <*> pure [] <*> expressions)
+singletonClass = makeTerm <$> symbol SingletonClass <*> (withNewScope . children) (Ruby.Syntax.Class <$> expression <*> pure Nothing <*> expressions)
 
 module' :: Assignment
 module' = makeTerm <$> symbol Module <*> (withNewScope . children) (Ruby.Syntax.Module <$> expression <*> many expression)

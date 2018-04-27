@@ -10,10 +10,9 @@ module Data.Abstract.Exports
 import Prelude hiding (null)
 import Prologue hiding (null)
 import Data.Abstract.Address
-import Data.Abstract.Environment (Environment)
+import Data.Abstract.Environment (Environment, unpairs)
 import Data.Abstract.FreeVariables
 import qualified Data.Map as Map
-import Data.Semigroup.Reducer
 
 -- | A map of export names to an alias & address tuple.
 newtype Exports l a = Exports { unExports :: Map.Map Name (Name, Maybe (Address l a)) }
@@ -23,9 +22,10 @@ null :: Exports l a -> Bool
 null = Map.null . unExports
 
 toEnvironment :: Exports l a -> Environment l a
-toEnvironment = Map.foldMapWithKey buildEnv . unExports where
-  buildEnv _ (_, Nothing) = mempty
-  buildEnv _ (n, Just a)  = unit (n, a)
+toEnvironment exports = unpairs (mapMaybe collectExport (toList (unExports exports)))
+  where
+    collectExport (_, Nothing) = Nothing
+    collectExport (n, Just a)  = Just (n, a)
 
 insert :: Name -> Name -> Maybe (Address l a) -> Exports l a -> Exports l a
 insert name alias address = Exports . Map.insert name (alias, address) . unExports

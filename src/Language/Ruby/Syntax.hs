@@ -50,7 +50,7 @@ instance Evaluatable Send where
     func <- case sendReceiver of
       Just recv -> do
         recvEnv <- subtermValue recv >>= scopedEnvironment
-        localEnv (mappend recvEnv) sel
+        localEnv (mergeEnvs recvEnv) sel
       Nothing -> sel -- TODO Does this require `localize` so we don't leak terms when resolving `sendSelector`?
 
     call func (map subtermValue sendArgs) -- TODO pass through sendBlock
@@ -101,13 +101,12 @@ doLoad :: MonadEvaluatable location term value effects m => ByteString -> Bool -
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   (importedEnv, _) <- traceResolve path path' $ isolate (load path')
-  unless shouldWrap $ modifyEnv (mappend importedEnv)
+  unless shouldWrap $ modifyEnv (mergeEnvs importedEnv)
   boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 
 -- TODO: autoload
 
-
-data Class a = Class { classIdentifier :: !a, classSuperClasses :: ![a], classBody :: !a }
+data Class a = Class { classIdentifier :: !a, classSuperClass :: !(Maybe a), classBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
 instance Diffable Class where
@@ -119,10 +118,10 @@ instance Show1 Class where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Class where
   eval Class{..} = do
-    supers <- traverse subtermValue classSuperClasses
+    super <- traverse subtermValue classSuperClass
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm classIdentifier)
     letrec' name $ \addr ->
-      subtermValue classBody <* makeNamespace name addr supers
+      subtermValue classBody <* makeNamespace name addr super
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -135,7 +134,7 @@ instance Evaluatable Module where
   eval (Module iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
     letrec' name $ \addr ->
-      eval xs <* makeNamespace name addr []
+      eval xs <* makeNamespace name addr Nothing
 
 data LowPrecedenceBoolean a
   = LowAnd !a !a

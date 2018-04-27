@@ -63,7 +63,7 @@ import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Package
 import Data.Abstract.Origin
-import Data.Empty
+import Data.Empty as Empty
 import qualified Data.IntMap as IntMap
 import Data.Semigroup.Reducer
 import Lens.Micro
@@ -106,10 +106,10 @@ deriving instance (Ord (Cell location value), Ord location, Ord term, Ord value,
 deriving instance (Show (Cell location value), Show location, Show term, Show value, Show (Base term ())) => Show (EvaluatorState location term value)
 
 instance (Ord location, Semigroup (Cell location value)) => Semigroup (EvaluatorState location term value) where
-  EvaluatorState e1 h1 m1 l1 x1 j1 o1 <> EvaluatorState e2 h2 m2 l2 x2 j2 o2 = EvaluatorState (e1 <> e2) (h1 <> h2) (m1 <> m2) (l1 <> l2) (x1 <> x2) (j1 <> j2) (o1 <> o2)
+  EvaluatorState e1 h1 m1 l1 x1 j1 o1 <> EvaluatorState e2 h2 m2 l2 x2 j2 o2 = EvaluatorState (mergeEnvs e1 e2) (h1 <> h2) (m1 <> m2) (l1 <> l2) (x1 <> x2) (j1 <> j2) (o1 <> o2)
 
 instance (Ord location, Semigroup (Cell location value)) => Empty (EvaluatorState location term value) where
-  empty = EvaluatorState mempty mempty mempty mempty mempty mempty mempty
+  empty = EvaluatorState Empty.empty mempty mempty mempty mempty mempty mempty
 
 
 -- Lenses
@@ -183,7 +183,7 @@ withDefaultEnvironment e = raise . local (const e) . lower
 -- | Obtain an environment that is the composition of the current and default environments.
 --   Useful for debugging.
 fullEnvironment :: MonadEvaluator location term value effects m => m effects (Environment location value)
-fullEnvironment = mappend <$> getEnv <*> defaultEnvironment
+fullEnvironment = mergeEnvs <$> getEnv <*> defaultEnvironment
 
 -- | Run an action with a locally-modified environment.
 localEnv :: MonadEvaluator location term value effects m => (Environment location value -> Environment location value) -> m effects a -> m effects a
