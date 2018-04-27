@@ -22,6 +22,7 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables as X hiding (dropExtension)
 import Data.Abstract.Heap as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
+import Data.Abstract.Value (Namespace(..), Value, ValueError, injValue)
 import Data.Blob as X
 import Data.File as X
 import Data.Functor.Listable as X
@@ -54,7 +55,6 @@ import Test.LeanCheck as X
 
 import qualified Data.ByteString as B
 import qualified Semantic.IO as IO
-import Data.Abstract.Value
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO ByteString

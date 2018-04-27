@@ -14,7 +14,6 @@ module Data.Abstract.Evaluatable
 , evaluatePackageBody
 , throwLoadError
 , throwEvalError
-, throwValueError
 , resolve
 , traceResolve
 , listModulesInDir
@@ -126,9 +125,6 @@ instance Eq1 (EvalError term) where
   liftEq _ (RationalFormatError a) (RationalFormatError b) = a == b
   liftEq _ _ _                                             = False
 
-
-throwValueError :: (Member (Resumable (ValueError location value)) effects, MonadEvaluator location term value effects m) => ValueError location value resume -> m effects resume
-throwValueError = throwResumable
 
 throwLoadError :: (Member (Resumable (LoadError term value)) effects, MonadEvaluator location term value effects m) => LoadError term value resume -> m effects resume
 throwLoadError = throwResumable

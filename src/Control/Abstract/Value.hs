@@ -8,7 +8,6 @@ module Control.Abstract.Value
 , forLoop
 , makeNamespace
 , ValueRoots(..)
-, ValueError(..)
 ) where
 
 import Control.Abstract.Evaluator
@@ -190,37 +189,3 @@ makeNamespace name addr supers = do
 class ValueRoots location value where
   -- | Compute the set of addresses rooted by a given value.
   valueRoots :: value -> Live location value
-
-
--- The type of exceptions that can be thrown when constructing values in `MonadValue`.
-data ValueError location value resume where
-  StringError            :: value          -> ValueError location value ByteString
-  BoolError              :: value          -> ValueError location value Bool
-  NamespaceError         :: Prelude.String -> ValueError location value (Environment location value)
-  ScopedEnvironmentError :: Prelude.String -> ValueError location value (Environment location value)
-  CallError              :: value          -> ValueError location value value
-  NumericError           :: value          -> ValueError location value value
-  Numeric2Error          :: value -> value -> ValueError location value value
-  ComparisonError        :: value -> value -> ValueError location value value
-  BitwiseError           :: value          -> ValueError location value value
-  Bitwise2Error          :: value -> value -> ValueError location value value
-  KeyValueError          :: value          -> ValueError location value (value, value)
-  -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
-  ArithmeticError :: ArithException -> ValueError location value value
-
-instance Eq value => Eq1 (ValueError location value) where
-  liftEq _ (StringError a) (StringError b)                       = a == b
-  liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
-  liftEq _ (ScopedEnvironmentError a) (ScopedEnvironmentError b) = a == b
-  liftEq _ (CallError a) (CallError b)                           = a == b
-  liftEq _ (BoolError a) (BoolError c)                           = a == c
-  liftEq _ (Numeric2Error a b) (Numeric2Error c d)               = (a == c) && (b == d)
-  liftEq _ (ComparisonError a b) (ComparisonError c d)           = (a == c) && (b == d)
-  liftEq _ (Bitwise2Error a b) (Bitwise2Error c d)               = (a == c) && (b == d)
-  liftEq _ (BitwiseError a) (BitwiseError b)                     = a == b
-  liftEq _ (KeyValueError a) (KeyValueError b)                   = a == b
-  liftEq _ _             _                                       = False
-
-deriving instance (Show value) => Show (ValueError location value resume)
-instance (Show value) => Show1 (ValueError location value) where
-  liftShowsPrec _ _ = showsPrec
