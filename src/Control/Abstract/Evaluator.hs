@@ -51,6 +51,9 @@ module Control.Abstract.Evaluator
   , Return(..)
   , throwReturn
   , catchReturn
+  , Continue(..)
+  , throwContinue
+  , catchContinue
   , LoopThrow(..)
   -- Origin
   , pushOrigin
@@ -371,6 +374,20 @@ throwReturn = raise . Eff.send . Return
 
 catchReturn :: (Effectful m, Member (Return value) effects) => m effects a -> (forall x . Return value x -> m effects a) -> m effects a
 catchReturn action handler = raiseHandler (Eff.interpose pure (\ ret _ -> Effect.lower (handler ret))) action
+
+
+data Continue value resume where
+  Continue :: Continue value value
+
+deriving instance Eq (Continue value a)
+deriving instance Show (Continue value a)
+
+throwContinue :: (Effectful m, Member (Continue value) effects) => m effects value
+throwContinue = raise (Eff.send Continue)
+
+catchContinue :: (Effectful m, Member (Continue value) effects) => m effects a -> (forall x . Continue value x -> m effects a) -> m effects a
+catchContinue action handler = raiseHandler (Eff.interpose pure (\ continue _ -> Effect.lower (handler continue))) action
+
 
 data LoopThrow value
   = Brk value

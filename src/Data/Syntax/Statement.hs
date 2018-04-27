@@ -172,7 +172,7 @@ instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Continue where
   -- TODO: figure out what to do with the datum inside Continue. what can it represent?
-  eval (Continue _) = throwLoop Con
+  eval (Continue _) = throwContinue
 
 newtype Retry a = Retry a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
