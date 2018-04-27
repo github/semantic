@@ -68,4 +68,5 @@ instance Interpreter (Evaluating location term value) (EvaluatingEffects locatio
       . flip runFresh' 0
       . runFail
       . Exc.runError
+      -- NB: We should never have a 'Return' at this point in execution; the function being returned from should have intercepted the effect. This handler will therefore only be invoked if we issue a 'Return' outside of such a scope, and unfortunately if this happens it will handle it by resuming the scope being returned from. While it would be _slightly_ more correct to instead exit with the value being returned, we aren’t able to do that here since 'Interpreter'’s type is parametric in the value being returned—we don’t know that we’re returning a @value@ (because we very well may not be). On the balance, I felt the strange behaviour in error cases is worth the improved behaviour in the common case—we get to lose a layer of 'Either' in the result.
       . Eff.interpret (\ (Return value) -> pure value))
