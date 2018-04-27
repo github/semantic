@@ -31,7 +31,7 @@ import           Prologue
 import qualified Data.List.NonEmpty as NonEmpty
 
 -- $setup
--- >>> let bright = push (insert (name "foo") (Address (Precise 0)) mempty)
+-- >>> let bright = push (insert (name "foo") (Address (Precise 0)) emptyEnv)
 -- >>> let shadowed = insert (name "foo") (Address (Precise 1)) bright
 
 -- | A LIFO stack of maps of names to addresses, representing a lexically-scoped evaluation environment.
