@@ -95,8 +95,8 @@ javascriptExtensions = ["js"]
 evalRequire :: MonadEvaluatable location term value effects m => ModulePath -> Name -> m effects value
 evalRequire modulePath alias = letrec' alias $ \addr -> do
   (importedEnv, _) <- isolate (require modulePath)
-  modifyEnv (mappend importedEnv)
-  void $ makeNamespace alias addr []
+  modifyEnv (mergeEnvs importedEnv)
+  void $ makeNamespace alias addr Nothing
   unit
 
 data Import a = Import { importSymbols :: ![(Name, Name)], importFrom :: ImportPath }
@@ -111,7 +111,7 @@ instance Evaluatable Import where
   eval (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     (importedEnv, _) <- isolate (require modulePath)
-    modifyEnv (mappend (renamed importedEnv)) *> unit
+    modifyEnv (mergeEnvs (renamed importedEnv)) *> unit
     where
       renamed importedEnv
         | Prologue.null symbols = importedEnv
@@ -609,7 +609,7 @@ instance Evaluatable Module where
   eval (Module iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
     letrec' name $ \addr ->
-      eval xs <* makeNamespace name addr []
+      eval xs <* makeNamespace name addr Nothing
 
 
 
@@ -624,7 +624,7 @@ instance Evaluatable InternalModule where
   eval (InternalModule iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
     letrec' name $ \addr ->
-      eval xs <* makeNamespace name addr []
+      eval xs <* makeNamespace name addr Nothing
 
 instance Declarations a => Declarations (InternalModule a) where
   declaredName InternalModule{..} = declaredName internalModuleIdentifier

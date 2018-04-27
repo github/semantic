@@ -230,12 +230,12 @@ instance ( Monad (m effects)
 
   klass n [] env = pure . injValue $ Class n env
   klass n supers env = do
-    product <- mconcat <$> traverse scopedEnvironment supers
-    pure . injValue $ Class n (Env.push product <> env)
+    product <- foldl mergeEnvs emptyEnv <$> traverse scopedEnvironment supers
+    pure . injValue $ Class n (mergeEnvs (Env.push product) env)
 
   namespace n env = do
     maybeAddr <- lookupEnv n
-    env' <- maybe (pure mempty) (asNamespaceEnv <=< deref) maybeAddr
+    env' <- maybe (pure emptyEnv) (asNamespaceEnv <=< deref) maybeAddr
     pure (injValue (Namespace n (Env.mergeNewer env' env)))
     where asNamespaceEnv v
             | Just (Namespace _ env') <- prjValue v = pure env'
@@ -338,7 +338,7 @@ instance ( Monad (m effects)
           a <- alloc name
           assign a v
           Env.insert name a <$> rest) (pure env) (zip names params)
-        localEnv (mappend bindings) (evalClosure label)
+        localEnv (mergeEnvs bindings) (evalClosure label)
       Nothing -> throwValueError (CallError op)
     where
       evalClosure :: Label -> m effects (Value location)

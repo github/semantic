@@ -39,6 +39,7 @@ import           Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Origin (SomeOrigin, packageOrigin)
 import           Data.Abstract.Package as Package
 import           Data.Language
+import           Data.Empty as Empty
 import           Data.Scientific (Scientific)
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
@@ -220,12 +221,12 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= eva
   where
     notFound = throwLoadError (LoadError name)
 
-    evalAndCache []     = (,) mempty <$> unit
+    evalAndCache []     = (,) Empty.empty <$> unit
     evalAndCache [x]    = evalAndCache' x
     evalAndCache (x:xs) = do
       (env, _) <- evalAndCache' x
       (env', v') <- evalAndCache xs
-      pure (env <> env', v')
+      pure (mergeEnvs env env', v')
 
     evalAndCache' x = do
       let mPath = modulePath (moduleInfo x)
@@ -233,7 +234,7 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= eva
       if mPath `elem` unLoadStack
         then do -- Circular load, don't keep evaluating.
           v <- trace ("load (skip evaluating, circular load): " <> show mPath) unit
-          pure (mempty, v)
+          pure (Empty.empty, v)
         else do
           modifyLoadStack (loadStackPush mPath)
           v <- trace ("load (evaluating): " <> show mPath) $ evaluateModule x
@@ -249,7 +250,7 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= eva
     filterEnv :: Exports.Exports l a -> Environment l a -> Environment l a
     filterEnv ports env
       | Exports.null ports = env
-      | otherwise = Exports.toEnvironment ports <> overwrite (Exports.aliases ports) env
+      | otherwise = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
 
 
 -- | Evaluate a term to a value using the semantics of the current analysis.
