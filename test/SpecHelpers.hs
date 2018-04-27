@@ -1,6 +1,6 @@
 {-# LANGUAGE GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
-module SpecHelpers (
-  module X
+module SpecHelpers
+( module X
 , diffFilePaths
 , parseFilePath
 , readFilePair
@@ -9,7 +9,7 @@ module SpecHelpers (
 , verbatim
 , Verbatim(..)
 , TestEvaluating
-, ) where
+) where
 
 import Analysis.Abstract.Erroring
 import Analysis.Abstract.Evaluating
