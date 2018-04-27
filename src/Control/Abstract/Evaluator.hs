@@ -51,10 +51,10 @@ module Control.Abstract.Evaluator
   , Return(..)
   , throwReturn
   , catchReturn
-  , Continue(..)
+  , LoopControl(..)
+  , throwBreak
   , throwContinue
-  , catchContinue
-  , LoopThrow(..)
+  , catchLoopControl
   -- Origin
   , pushOrigin
   ) where
@@ -376,23 +376,21 @@ catchReturn :: (Effectful m, Member (Return value) effects) => m effects a -> (f
 catchReturn action handler = raiseHandler (Eff.interpose pure (\ ret _ -> Effect.lower (handler ret))) action
 
 
-data Continue value resume where
-  Continue :: Continue value value
+data LoopControl value resume where
+  Break :: value -> LoopControl value value
+  Continue :: LoopControl value value
 
-deriving instance Eq (Continue value a)
-deriving instance Show (Continue value a)
+deriving instance Eq value => Eq (LoopControl value a)
+deriving instance Show value => Show (LoopControl value a)
 
-throwContinue :: (Effectful m, Member (Continue value) effects) => m effects value
+throwBreak :: (Effectful m, Member (LoopControl value) effects) => value -> m effects value
+throwBreak = raise . Eff.send . Break
+
+throwContinue :: (Effectful m, Member (LoopControl value) effects) => m effects value
 throwContinue = raise (Eff.send Continue)
 
-catchContinue :: (Effectful m, Member (Continue value) effects) => m effects a -> (forall x . Continue value x -> m effects a) -> m effects a
-catchContinue action handler = raiseHandler (Eff.interpose pure (\ continue _ -> Effect.lower (handler continue))) action
-
-
-data LoopThrow value
-  = Brk value
-  | Con
-    deriving (Eq, Show)
+catchLoopControl :: (Effectful m, Member (LoopControl value) effects) => m effects a -> (forall x . LoopControl value x -> m effects a) -> m effects a
+catchLoopControl action handler = raiseHandler (Eff.interpose pure (\ control _ -> Effect.lower (handler control))) action
 
 
 -- | Push a 'SomeOrigin' onto the stack. This should be used to contextualize execution with information about the originating term, module, or package.

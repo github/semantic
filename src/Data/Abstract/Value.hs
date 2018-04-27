@@ -345,7 +345,6 @@ instance ( Monad (m effects)
       evalClosure :: Label -> m effects (Value location)
       evalClosure lab = catchReturn @m @(Value location) (goto lab >>= evaluateTerm) (\ (Return value) -> pure value)
 
-  loop x = catchContinue @m @(Value location) (catchException (fix x) handleLoop) (\ Continue -> unit) where
-    handleLoop :: LoopThrow (Value location) -> m effects (Value location)
-    handleLoop (Brk v) = pure v
-    handleLoop Con     = loop x
+  loop x = catchLoopControl @m @(Value location) (fix x) (\ control -> case control of
+    Break value -> pure value
+    Continue    -> loop x)
