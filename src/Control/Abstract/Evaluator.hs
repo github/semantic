@@ -47,13 +47,17 @@ module Control.Abstract.Evaluator
   , label
   , goto
   , Eval(..)
-  , ReturnThrow(..)
+  , Return(..)
+  , throwReturn
+  , catchReturn
   , LoopThrow(..)
   -- Origin
   , pushOrigin
   ) where
 
 import Control.Effect hiding (lower)
+import qualified Control.Effect as Effect
+import qualified Control.Monad.Effect as Eff
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.State
@@ -352,9 +356,17 @@ goto label = IntMap.lookup label <$> view _jumps >>= maybe (raise (fail ("unknow
 data Eval term value resume where
   Eval :: term -> Eval term value value
 
-newtype ReturnThrow value
-  = Ret value
-    deriving (Eq, Show)
+data Return value resume where
+  Return :: value -> Return value value
+
+deriving instance Eq value => Eq (Return value a)
+deriving instance Show value => Show (Return value a)
+
+throwReturn :: (Effectful m, Member (Return value) effects) => value -> m effects value
+throwReturn = raise . Eff.send . Return
+
+catchReturn :: (Effectful m, Member (Return value) effects) => m effects a -> (forall x . Return value x -> m effects a) -> m effects a
+catchReturn action handler = raiseHandler (Eff.interpose pure (\ ret _ -> Effect.lower (handler ret))) action
 
 data LoopThrow value
   = Brk value

@@ -97,5 +97,5 @@ graphImports package = analyze (Analysis.evaluatePackage package `asAnalysisForT
     asAnalysisForTypeOfPackage = const
 
     extractGraph result = case result of
-      (Right (Right (Right (Right ((_, graph), _)))), _) -> pure graph
+      (Right (Right (Right ((_, graph), _))), _) -> pure graph
       _ -> throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))

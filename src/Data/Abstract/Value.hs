@@ -343,10 +343,7 @@ instance ( Monad (m effects)
       Nothing -> throwValueError (CallError op)
     where
       evalClosure :: Label -> m effects (Value location)
-      evalClosure lab = catchException (goto lab >>= evaluateTerm) handleReturn
-
-      handleReturn :: ReturnThrow (Value location) -> m effects (Value location)
-      handleReturn (Ret v) = pure v
+      evalClosure lab = catchReturn @m @(Value location) (goto lab >>= evaluateTerm) (\ (Return value) -> pure value)
 
   loop x = catchException (fix x) handleLoop where
     handleLoop :: LoopThrow (Value location) -> m effects (Value location)

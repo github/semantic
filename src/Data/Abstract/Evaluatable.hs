@@ -24,7 +24,8 @@ module Data.Abstract.Evaluatable
 ) where
 
 import           Control.Abstract.Addressable as X
-import           Control.Abstract.Analysis as X
+import           Control.Abstract.Analysis as X hiding (Return(..))
+import           Control.Abstract.Analysis (Return)
 import qualified Control.Monad.Effect.Exception as Exc
 import           Data.Abstract.Address
 import           Data.Abstract.Declarations as X
@@ -48,13 +49,13 @@ type MonadEvaluatable location term value effects m =
   , Evaluatable (Base term)
   , FreeVariables term
   , Member (Exc.Exc (LoopThrow value)) effects
-  , Member (Exc.Exc (ReturnThrow value)) effects
   , Member Fail effects
   , Member (Resumable (Unspecialized value)) effects
   , Member (Resumable (LoadError term value)) effects
   , Member (Resumable (EvalError value)) effects
   , Member (Resumable (ResolutionError value)) effects
   , Member (Resumable (AddressError location value)) effects
+  , Member (Return value) effects
   , MonadAddressable location effects m
   , MonadAnalysis location term value effects m
   , MonadValue location value effects m

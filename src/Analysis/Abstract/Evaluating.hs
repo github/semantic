@@ -4,6 +4,7 @@ module Analysis.Abstract.Evaluating
 ) where
 
 import Control.Abstract.Analysis hiding (lower)
+import qualified Control.Monad.Effect as Eff
 import Control.Monad.Effect.Exception as Exc
 import Data.Abstract.Environment
 import Data.Abstract.Module
@@ -20,7 +21,7 @@ deriving instance Member NonDet effects => Alternative (Evaluating location term
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects location term value
-  = '[ Exc (ReturnThrow value)
+  = '[ Return value
      , Exc (LoopThrow value)
      , Fail                                        -- Failure with an error message
      , Fresh                                       -- For allocating new addresses and/or type variables.
@@ -54,8 +55,7 @@ instance Interpreter (Evaluating location term value) (EvaluatingEffects locatio
   type Result (Evaluating location term value) (EvaluatingEffects location term value) result
     = ( Either String
       ( Either (LoopThrow value)
-      ( Either (ReturnThrow value)
-        result))
+        result)
       , EvaluatorState location term value)
   interpret
     = interpret
@@ -68,4 +68,4 @@ instance Interpreter (Evaluating location term value) (EvaluatingEffects locatio
       . flip runFresh' 0
       . runFail
       . Exc.runError
-      . Exc.runError)
+      . Eff.interpret (\ (Return value) -> pure value))
