@@ -239,6 +239,7 @@ class' = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> many m
   where
     makeClass modifiers identifier typeParams superClass classBody = Declaration.Class (modifiers ++ typeParams) identifier [superClass] classBody -- not doing an assignment, just straight up function
     classBody = makeTerm <$> symbol ClassBody <*> children (manyTerm expression)
+    -- superClass = makeTerm <$> symbol SuperClass <*>
 -- might wanna come back and change to maybe superClass
 -- TODO: superclass -- need to match the superclass node when it exists (which will be a rule, similar to how the type params rule matches the typeparams node when it exists)
 
@@ -424,7 +425,6 @@ unary = make <$> symbol UnaryExpression <*> children ((,) <$> operator <*> term 
            <|> token AnonMinus $> UMinus
            <|> token AnonBang  $> UBang
            <|> token AnonTilde $> UTilde
-  -- had to use make because we didn't always make a term
 
 update :: Assignment
 update = makeTerm' <$> symbol UpdateExpression <*> children (

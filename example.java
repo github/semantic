@@ -1,4 +1,6 @@
-class someClass <T> {
-  public static <S> void anotherMethod(S arg) {
+class Hello {
+  class someClass extends Hello <T> {
+    public static <S> void anotherMethod(S arg) {
+    }
   }
 }
