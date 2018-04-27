@@ -4,7 +4,6 @@ module SpecHelpers (
 , diffFilePaths
 , parseFilePath
 , readFilePair
-, readFileVerbatim
 , addr
 , ns
 , verbatim
@@ -68,9 +67,6 @@ parseFilePath path = (fromJust <$> IO.readFile (file path)) >>= runTask . parseB
 readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
-
-readFileVerbatim :: FilePath -> IO Verbatim
-readFileVerbatim = fmap verbatim . B.readFile
 
 type TestEvaluating term
   = Erroring (AddressError Precise (Value Precise))
