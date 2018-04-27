@@ -363,6 +363,8 @@ goto label = IntMap.lookup label <$> view _jumps >>= maybe (raise (fail ("unknow
 data Eval term value resume where
   Eval :: term -> Eval term value value
 
+
+-- | An effect for explicitly returning out of a function/method body.
 data Return value resume where
   Return :: value -> Return value value
 
