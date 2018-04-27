@@ -10,6 +10,7 @@ import Control.Abstract.Analysis
 import Data.Abstract.Address
 import Data.Abstract.Environment as Env
 import Data.Align (alignWith)
+import qualified Data.Empty as Empty
 import Data.Semigroup.Reducer (Reducer)
 import Prelude
 import Prologue hiding (TypeError)
@@ -38,21 +39,18 @@ data Type
 -- TODO: À la carte representation of types.
 
 data TypeError resume where
-  NoValueError     :: Type -> a -> TypeError a
   NumOpError       :: Type -> Type -> TypeError Type
   BitOpError       :: Type -> Type -> TypeError Type
   UnificationError :: Type -> Type -> TypeError Type
 
-deriving instance Show resume => Show (TypeError resume)
+deriving instance Show (TypeError resume)
 
 instance Show1 TypeError where
-  liftShowsPrec _ _ _ (NoValueError v _)     = showString "NoValueError " . shows v
   liftShowsPrec _ _ _ (NumOpError l r)       = showString "NumOpError " . shows [l, r]
   liftShowsPrec _ _ _ (BitOpError l r)       = showString "BitOpError " . shows [l, r]
   liftShowsPrec _ _ _ (UnificationError l r) = showString "UnificationError " . shows [l, r]
 
 instance Eq1 TypeError where
-  liftEq _ (NoValueError a _) (NoValueError b _)         = a == b
   liftEq _ (BitOpError a b) (BitOpError c d)             = a == c && b == d
   liftEq _ (NumOpError a b) (NumOpError c d)             = a == c && b == d
   liftEq _ (UnificationError a b) (UnificationError c d) = a == c && b == d
@@ -74,6 +72,10 @@ unify t1 t2
 instance Ord location => ValueRoots location Type where
   valueRoots _ = mempty
 
+
+instance AbstractHole Type where
+  hole = Hole
+
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
 instance ( Alternative (m effects)
          , Member Fresh effects
@@ -86,14 +88,13 @@ instance ( Alternative (m effects)
   lambda names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
-      tvar <- Var <$> fresh
+      tvar <- Var <$> raise fresh
       assign a tvar
       (env, tvars) <- rest
-      pure (Env.insert name a env, tvar : tvars)) (pure mempty) names
-    ret <- localEnv (mappend env) body
+      pure (Env.insert name a env, tvar : tvars)) (pure (Empty.empty, Empty.empty)) names
+    ret <- localEnv (mergeEnvs env) body
     pure (Product tvars :-> ret)
 
-  hole       = pure Hole
   unit       = pure Unit
   integer _  = pure Int
   boolean _  = pure Bool
@@ -111,11 +112,14 @@ instance ( Alternative (m effects)
   klass _ _ _   = pure Object
   namespace _ _ = pure Unit
 
-  scopedEnvironment _ = pure mempty
+  scopedEnvironment _ = pure Empty.empty
 
-  asString _ = throwResumable (NoValueError String "")
-  asPair _   = throwResumable (NoValueError (Product []) (Hole, Hole))
-  asBool _   = throwResumable (NoValueError Bool True)
+  asString t = unify t String $> ""
+  asPair t   = do
+    t1 <- raise fresh
+    t2 <- raise fresh
+    unify t (Product [Var t1, Var t2]) $> (Var t1, Var t2)
+  asBool t   = unify t Bool *> (pure True <|> pure False)
 
   isHole ty = pure (ty == Hole)
 
@@ -146,7 +150,7 @@ instance ( Alternative (m effects)
     _                 -> unify left right $> Bool
 
   call op params = do
-    tvar <- fresh
+    tvar <- raise fresh
     paramTypes <- sequenceA params
     let needed = Product paramTypes :-> Var tvar
     unified <- op `unify` needed

@@ -38,6 +38,7 @@ import           Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Origin (packageOrigin)
 import           Data.Abstract.Package as Package
 import           Data.Language
+import           Data.Empty as Empty
 import           Data.Scientific (Scientific)
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
@@ -54,7 +55,6 @@ type MonadEvaluatable location term value effects m =
   , Member (Exc.Exc (LoopThrow value)) effects
   , Member Fail effects
   , Member (Resumable (Unspecialized value)) effects
-  , Member (Resumable (ValueError location value)) effects
   , Member (Resumable (LoadError term value)) effects
   , Member (Resumable (EvalError value)) effects
   , Member (Resumable (ResolutionError value)) effects
@@ -118,7 +118,7 @@ data EvalError value resume where
 
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
-variable :: MonadEvaluatable location term value effects m => Name -> m effects value
+variable :: (Member (Resumable (AddressError location value)) effects, Member (Resumable (EvalError value)) effects, MonadAddressable location effects m, MonadEvaluator location term value effects m) => Name -> m effects value
 variable name = lookupWith deref name >>= maybeM (throwResumable (FreeVariableError name))
 
 deriving instance Eq (EvalError a b)
@@ -136,15 +136,13 @@ instance Eq1 (EvalError term) where
   liftEq _ _ _                                             = False
 
 
-throwValueError :: (Member (Resumable (ValueError location value)) effects, MonadEvaluator location term value effects m)
-                => ValueError location value resume
-                -> m effects resume
+throwValueError :: (Member (Resumable (ValueError location value)) effects, MonadEvaluator location term value effects m) => ValueError location value resume -> m effects resume
 throwValueError = throwResumable
 
-throwLoadError :: MonadEvaluatable location term value effects m => LoadError term value resume -> m effects resume
+throwLoadError :: (Member (Resumable (LoadError term value)) effects, MonadEvaluator location term value effects m) => LoadError term value resume -> m effects resume
 throwLoadError = throwResumable
 
-throwEvalError :: MonadEvaluatable location term value effects m => EvalError value resume -> m effects resume
+throwEvalError :: (Member (Resumable (EvalError value)) effects, MonadEvaluator location term value effects m) => EvalError value resume -> m effects resume
 throwEvalError = throwResumable
 
 throwLoop :: MonadEvaluatable location term value effects m => LoopThrow value -> m effects a
@@ -222,12 +220,12 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= eva
   where
     notFound = throwLoadError (LoadError name)
 
-    evalAndCache []     = (,) mempty <$> unit
+    evalAndCache []     = (,) Empty.empty <$> unit
     evalAndCache [x]    = evalAndCache' x
     evalAndCache (x:xs) = do
       (env, _) <- evalAndCache' x
       (env', v') <- evalAndCache xs
-      pure (env <> env', v')
+      pure (mergeEnvs env env', v')
 
     evalAndCache' x = do
       let mPath = modulePath (moduleInfo x)
@@ -235,7 +233,7 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= eva
       if mPath `elem` unLoadStack
         then do -- Circular load, don't keep evaluating.
           v <- trace ("load (skip evaluating, circular load): " <> show mPath) unit
-          pure (mempty, v)
+          pure (Empty.empty, v)
         else do
           modifyLoadStack (loadStackPush mPath)
           v <- trace ("load (evaluating): " <> show mPath) $ evaluateModule x
@@ -251,7 +249,7 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= eva
     filterEnv :: Exports.Exports l a -> Environment l a -> Environment l a
     filterEnv ports env
       | Exports.null ports = env
-      | otherwise = Exports.toEnvironment ports <> overwrite (Exports.aliases ports) env
+      | otherwise = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
 
 
 -- | Evaluate a term to a value using the semantics of the current analysis.

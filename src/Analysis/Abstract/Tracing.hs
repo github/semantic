@@ -1,4 +1,5 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.Tracing
 ( Tracing
 ) where
@@ -13,7 +14,7 @@ import Prologue
 -- | Trace analysis.
 --
 --   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
-newtype Tracing (trace :: * -> *) m (effects :: [* -> *]) a = Tracing (m effects a)
+newtype Tracing (trace :: * -> *) m (effects :: [* -> *]) a = Tracing { runTracing :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Tracing trace m)
@@ -26,11 +27,16 @@ instance ( Corecursive term
          , Reducer (Configuration location term value) (trace (Configuration location term value))
          )
       => MonadAnalysis location term value effects (Tracing trace m) where
-  type Effects location term value (Tracing trace m) = Writer (trace (Configuration location term value)) ': Effects location term value m
-
   analyzeTerm recur term = do
     config <- getConfiguration (embedSubterm term)
     raise (tell @(trace (Configuration location term value)) (Reducer.unit config))
     liftAnalyze analyzeTerm recur term
 
   analyzeModule = liftAnalyze analyzeModule
+
+instance ( Interpreter effects (result, trace (Configuration location term value)) rest m
+         , MonadEvaluator location term value effects m
+         , Monoid (trace (Configuration location term value))
+         )
+      => Interpreter (Writer (trace (Configuration location term value)) ': effects) result rest (Tracing trace m) where
+  interpret = interpret . runTracing . raiseHandler runWriter

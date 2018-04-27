@@ -198,9 +198,15 @@ instance Ord location => ValueRoots location (Value location) where
     | otherwise                            = mempty
 
 
+instance AbstractHole (Value location) where
+  hole = injValue Hole
+
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance (Monad (m effects), MonadEvaluatable location term (Value location) effects m) => MonadValue location (Value location) effects m where
-  hole     = pure . injValue $ Hole
+instance ( Monad (m effects)
+         , Member (Resumable (ValueError location (Value location))) effects
+         , MonadEvaluatable location term (Value location) effects m
+         )
+      => MonadValue location (Value location) effects m where
   unit     = pure . injValue $ Unit
   integer  = pure . injValue . Integer . Number.Integer
   boolean  = pure . injValue . Boolean
@@ -224,12 +230,12 @@ instance (Monad (m effects), MonadEvaluatable location term (Value location) eff
 
   klass n [] env = pure . injValue $ Class n env
   klass n supers env = do
-    product <- mconcat <$> traverse scopedEnvironment supers
-    pure . injValue $ Class n (Env.push product <> env)
+    product <- foldl mergeEnvs emptyEnv <$> traverse scopedEnvironment supers
+    pure . injValue $ Class n (mergeEnvs (Env.push product) env)
 
   namespace n env = do
     maybeAddr <- lookupEnv n
-    env' <- maybe (pure mempty) (asNamespaceEnv <=< deref) maybeAddr
+    env' <- maybe (pure emptyEnv) (asNamespaceEnv <=< deref) maybeAddr
     pure (injValue (Namespace n (Env.mergeNewer env' env)))
     where asNamespaceEnv v
             | Just (Namespace _ env') <- prjValue v = pure env'
@@ -247,7 +253,7 @@ instance (Monad (m effects), MonadEvaluatable location term (Value location) eff
   ifthenelse cond if' else' = do
     isHole <- isHole cond
     if isHole then
-      hole
+      pure hole
     else do
       bool <- asBool cond
       if bool then if' else else'
@@ -280,7 +286,7 @@ instance (Monad (m effects), MonadEvaluatable location term (Value location) eff
         tentative x i j = attemptUnsafeArithmetic (x i j)
 
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: MonadEvaluatable location term value effects m => Either ArithException Number.SomeNumber -> m effects value
+        specialize :: (Member (Resumable (ValueError location value)) effects, MonadEvaluatable location term value effects m) => Either ArithException Number.SomeNumber -> m effects value
         specialize (Left exc) = throwValueError (ArithmeticError exc)
         specialize (Right (Number.SomeNumber (Number.Integer i))) = integer i
         specialize (Right (Number.SomeNumber (Number.Ratio r)))   = rational r
@@ -328,12 +334,12 @@ instance (Monad (m effects), MonadEvaluatable location term (Value location) eff
     case prjValue op of
       Just (Closure names label env) -> do
         goto label $ \body -> do
-          bindings <- foldr (\ (name', param) rest -> do
+          bindings <- foldr (\ (name, param) rest -> do
             v <- param
-            a <- alloc name'
+            a <- alloc name
             assign a v
-            Env.insert name' a <$> rest) (pure env) (zip names params)
-          localEnv (mappend bindings) (evalClosure body)
+            Env.insert name a <$> rest) (pure env) (zip names params)
+          localEnv (mergeEnvs bindings) (evalClosure body)
       Nothing -> throwValueError (CallError op)
     where
       evalClosure :: term -> m effects (Value location)

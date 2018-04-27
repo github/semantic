@@ -1,44 +1,38 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.BadValues where
 
 import Control.Abstract.Analysis
-import Data.Abstract.Evaluatable
 import Data.Abstract.Environment as Env
-import Prologue
 import Data.ByteString.Char8 (pack)
+import Prologue
 
-newtype BadValues m (effects :: [* -> *]) a = BadValues (m effects a)
+newtype BadValues m (effects :: [* -> *]) a = BadValues { runBadValues :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
-deriving instance MonadEvaluator location term value effects m   => MonadEvaluator location term value effects (BadValues m)
+deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadValues m)
+deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadValues m)
 
-instance ( Effectful m
-         , Member (Resumable (ValueError location value)) effects
-         , Member (State [Name]) effects
-         , MonadAnalysis location term value effects m
-         , MonadValue location value effects (BadValues m)
+instance ( Interpreter effects result rest m
+         , MonadEvaluator location term value effects m
+         , AbstractHole value
+         , Show value
          )
-      => MonadAnalysis location term value effects (BadValues m) where
-  type Effects location term value (BadValues m) = State [Name] ': Effects location term value m
-
-  analyzeTerm eval term = resume @(ValueError location value) (liftAnalyze analyzeTerm eval term) (
-        \yield error -> do
-          traceM ("ValueError" <> show error)
-          case error of
-            ScopedEnvironmentError{} -> do
-              env <- getEnv
-              yield (Env.push env)
-            CallError val              -> yield val
-            StringError val            -> yield (pack $ show val)
-            BoolError{}                -> yield True
-            NumericError{}             -> hole >>= yield
-            Numeric2Error{}            -> hole >>= yield
-            ComparisonError{}          -> hole >>= yield
-            NamespaceError{}           -> getEnv >>= yield
-            BitwiseError{}             -> hole >>= yield
-            Bitwise2Error{}            -> hole >>= yield
-            KeyValueError{}            -> hole >>= \x -> yield (x, x)
-            ArithmeticError{}          -> hole >>= yield
-          )
-
-  analyzeModule = liftAnalyze analyzeModule
+      => Interpreter (Resumable (ValueError location value) ': effects) result rest (BadValues m) where
+  interpret
+    = interpret
+    . runBadValues
+    . raiseHandler (relay pure (\ (Resumable err) yield -> traceM ("ValueError" <> show err) *> case err of
+      ScopedEnvironmentError{} -> do
+        env <- lower @m getEnv
+        yield (Env.push env)
+      CallError val     -> yield val
+      StringError val   -> yield (pack (show val))
+      BoolError{}       -> yield True
+      NumericError{}    -> yield hole
+      Numeric2Error{}   -> yield hole
+      ComparisonError{} -> yield hole
+      NamespaceError{}  -> lower @m getEnv >>= yield
+      BitwiseError{}    -> yield hole
+      Bitwise2Error{}   -> yield hole
+      KeyValueError{}   -> yield (hole, hole)
+      ArithmeticError{} -> yield hole))

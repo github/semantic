@@ -101,7 +101,7 @@ instance Evaluatable Import where
     -- Last module path is the one we want to import
     let path = NonEmpty.last modulePaths
     (importedEnv, _) <- isolate (require path)
-    modifyEnv (mappend (select importedEnv))
+    modifyEnv (mergeEnvs (select importedEnv))
     unit
     where
       select importedEnv
@@ -126,14 +126,14 @@ instance Evaluatable QualifiedImport where
       -- Evaluate and import the last module, updating the environment
       go ((name, path) :| []) = letrec' name $ \addr -> do
         (importedEnv, _) <- isolate (require path)
-        modifyEnv (mappend importedEnv)
-        void $ makeNamespace name addr []
+        modifyEnv (mergeEnvs importedEnv)
+        void $ makeNamespace name addr Nothing
         unit
       -- Evaluate each parent module, creating a just namespace
       go ((name, path) :| xs) = letrec' name $ \addr -> do
         void $ isolate (require path)
         void $ go (NonEmpty.fromList xs)
-        makeNamespace name addr []
+        makeNamespace name addr Nothing
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedName, qualifiedAliasedImportAlias :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -155,8 +155,8 @@ instance Evaluatable QualifiedAliasedImport where
     letrec' alias $ \addr -> do
       let path = NonEmpty.last modulePaths
       (importedEnv, _) <- isolate (require path)
-      modifyEnv (mappend importedEnv)
-      void $ makeNamespace alias addr []
+      modifyEnv (mergeEnvs importedEnv)
+      void $ makeNamespace alias addr Nothing
       unit
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)

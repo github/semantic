@@ -1,4 +1,5 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, KindSignatures, TypeOperators, UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.Collecting
 ( Collecting
 ) where
@@ -10,7 +11,7 @@ import Data.Abstract.Heap
 import Data.Abstract.Live
 import Prologue
 
-newtype Collecting m (effects :: [* -> *]) a = Collecting (m effects a)
+newtype Collecting m (effects :: [* -> *]) a = Collecting { runCollecting :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 instance ( Effectful m
@@ -29,10 +30,6 @@ instance ( Effectful m
          , ValueRoots location value
          )
       => MonadAnalysis location term value effects (Collecting m) where
-  type Effects location term value (Collecting m)
-    = Reader (Live location value)
-   ': Effects location term value m
-
   -- Small-step evaluation which garbage-collects any non-rooted addresses after evaluating each term.
   analyzeTerm recur term = do
     roots <- askRoots
@@ -76,3 +73,11 @@ reachable roots heap = go mempty roots
           Just (a, as) -> go (liveInsert a seen) (case heapLookupAll a heap of
             Just values -> liveDifference (foldr ((<>) . valueRoots) mempty values <> as) seen
             _           -> seen)
+
+
+instance ( Interpreter effects result rest m
+         , MonadEvaluator location term value effects m
+         , Ord location
+         )
+      => Interpreter (Reader (Live location value) ': effects) result rest (Collecting m) where
+  interpret = interpret . runCollecting . raiseHandler (`runReader` mempty)

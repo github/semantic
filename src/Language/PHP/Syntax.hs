@@ -50,7 +50,7 @@ include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
   (importedEnv, v) <- traceResolve name path $ isolate (f path)
-  modifyEnv (mappend importedEnv)
+  modifyEnv (mergeEnvs importedEnv)
   pure v
 
 newtype Require a = Require a
@@ -190,7 +190,7 @@ instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedName where
   eval (fmap subtermValue -> QualifiedName name iden) = do
     lhs <- name >>= scopedEnvironment
-    localEnv (mappend lhs) iden
+    localEnv (mergeEnvs lhs) iden
 
 
 newtype NamespaceName a = NamespaceName (NonEmpty a)
@@ -205,7 +205,7 @@ instance Evaluatable NamespaceName where
     where
       f ns nam = do
         env <- ns >>= scopedEnvironment
-        localEnv (mappend env) nam
+        localEnv (mergeEnvs env) nam
 
 newtype ConstDeclaration a = ConstDeclaration [a]
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -366,10 +366,10 @@ instance Evaluatable Namespace where
       go [] = raise (fail "expected at least one free variable in namespaceName, found none")
       -- The last name creates a closure over the namespace body.
       go [name] = letrec' name $ \addr ->
-        subtermValue namespaceBody *> makeNamespace name addr []
+        subtermValue namespaceBody *> makeNamespace name addr Nothing
       -- Each namespace name creates a closure over the subsequent namespace closures
       go (name:xs) = letrec' name $ \addr ->
-        go xs <* makeNamespace name addr []
+        go xs <* makeNamespace name addr Nothing
 
 data TraitDeclaration a = TraitDeclaration { traitName :: a, traitStatements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, ScopedTypeVariables #-}
+{-# LANGUAGE GADTs #-}
 module Semantic.Graph where
 
 import qualified Analysis.Abstract.ImportGraph as Abstract
@@ -15,10 +15,10 @@ import           Data.Abstract.Located
 import           Data.Abstract.Address
 import           Analysis.Abstract.BadAddresses
 import           Analysis.Abstract.BadModuleResolutions
+import           Analysis.Abstract.BadSyntax
 import           Analysis.Abstract.BadValues
 import           Analysis.Abstract.BadVariables
 import           Analysis.Abstract.Evaluating
-import           Analysis.Abstract.Quiet
 import           Data.Output
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
@@ -63,13 +63,12 @@ parsePackage parser preludeFile project@Project{..} = do
 
 type ImportGraphAnalysis term effects value =
   Abstract.ImportGraphing
-    (BadAddresses (BadModuleResolutions (BadVariables (BadValues (Quietly (Evaluating (Located Precise term) term (Value (Located Precise term))))))))
+    (BadAddresses (BadModuleResolutions (BadVariables (BadValues (BadSyntax (Evaluating (Located Precise term) term (Value (Located Precise term))))))))
     effects
     value
 
 -- | Render the import graph for a given 'Package'.
-graphImports :: (
-                  Show ann
+graphImports :: ( Show ann
                 , Ord ann
                 , Apply Analysis.Declarations1 syntax
                 , Apply Analysis.Evaluatable syntax
@@ -80,10 +79,9 @@ graphImports :: (
                 , Apply Show1 syntax
                 , Member Syntax.Identifier syntax
                 , Members '[Exc SomeException, Task] effs
-                , term ~ Term (Union syntax) ann
                 )
-             => Package term -> Eff effs Abstract.ImportGraph
-graphImports package = analyze (Analysis.SomeAnalysis (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package)) >>= extractGraph
+             => Package (Term (Union syntax) ann) -> Eff effs Abstract.ImportGraph
+graphImports package = analyze (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package) >>= extractGraph
   where
     asAnalysisForTypeOfPackage :: ImportGraphAnalysis term effs value
                                -> Package term
@@ -91,5 +89,5 @@ graphImports package = analyze (Analysis.SomeAnalysis (Analysis.evaluatePackage 
     asAnalysisForTypeOfPackage = const
 
     extractGraph result = case result of
-      (Right (Right (Right (Right (Right (Right (Right (Right (Right ((((_, graph), _), _), _))))))))), _) -> pure $! graph
+      (Right (Right (Right (Right ((_, graph), _)))), _) -> pure graph
       _ -> throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))

@@ -12,8 +12,13 @@ module SpecHelpers (
 , TestEvaluating
 , ) where
 
+import Analysis.Abstract.Erroring
+import Analysis.Abstract.Evaluating
+import Control.Abstract.Addressable
 import Control.Abstract.Evaluator as X (EvaluatorState(..))
+import Control.Abstract.Value
 import Data.Abstract.Address as X
+import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables as X hiding (dropExtension)
 import Data.Abstract.Heap as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
@@ -50,7 +55,6 @@ import Test.LeanCheck as X
 import qualified Data.ByteString as B
 import qualified Semantic.IO as IO
 import Data.Abstract.Value
-import Analysis.Abstract.Evaluating
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO ByteString
@@ -68,7 +72,13 @@ readFilePair paths = let paths' = fmap file paths in
 readFileVerbatim :: FilePath -> IO Verbatim
 readFileVerbatim = fmap verbatim . B.readFile
 
-type TestEvaluating term = Evaluating Precise term (Value Precise)
+type TestEvaluating term
+  = Erroring (AddressError Precise (Value Precise))
+  ( Erroring (EvalError (Value Precise))
+  ( Erroring (ResolutionError (Value Precise))
+  ( Erroring (Unspecialized (Value Precise))
+  ( Erroring (ValueError Precise (Value Precise))
+  ( Evaluating Precise term (Value Precise))))))
 
 ns n = Just . Latest . Just . injValue . Namespace n
 addr = Address . Precise

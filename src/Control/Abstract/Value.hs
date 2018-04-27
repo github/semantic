@@ -1,6 +1,7 @@
 {-# LANGUAGE FunctionalDependencies, GADTs, KindSignatures, Rank2Types #-}
 module Control.Abstract.Value
 ( MonadValue(..)
+, AbstractHole(..)
 , Comparator(..)
 , while
 , doWhile
@@ -16,6 +17,7 @@ import Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables
 import Data.Abstract.Live (Live)
 import Data.Abstract.Number as Number
+import Data.Empty as Empty
 import Data.Scientific (Scientific)
 import Data.Semigroup.Reducer hiding (unit)
 import Prelude
@@ -31,6 +33,9 @@ data Comparator
   = Concrete (forall a . Ord a => a -> a -> Bool)
   | Generalized
 
+class AbstractHole value where
+  hole :: value
+
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
@@ -38,9 +43,6 @@ class (Monad (m effects), Show value) => MonadValue location value (effects :: [
   -- | Construct an abstract unit value.
   --   TODO: This might be the same as the empty tuple for some value types
   unit :: m effects value
-
-  -- | Construct an abstract hole.
-  hole :: m effects value
 
   -- | Construct an abstract integral value.
   integer :: Prelude.Integer -> m effects value
@@ -176,10 +178,10 @@ makeNamespace :: ( MonadValue location value effects m
                  )
               => Name
               -> Address location value
-              -> [value]
+              -> Maybe value
               -> m effects value
-makeNamespace name addr supers = do
-  superEnv <- mconcat <$> traverse scopedEnvironment supers
+makeNamespace name addr super = do
+  superEnv <- maybe (pure Empty.empty) scopedEnvironment super
   namespaceEnv <- Env.head <$> getEnv
   v <- namespace name (Env.mergeNewer superEnv namespaceEnv)
   v <$ assign addr v
