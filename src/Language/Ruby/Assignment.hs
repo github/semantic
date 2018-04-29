@@ -17,6 +17,7 @@ import qualified Assigning.Assignment as Assignment
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
+import qualified Data.Syntax.Directive as Directive
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
@@ -28,6 +29,7 @@ type Syntax = '[
     Comment.Comment
   , Declaration.Function
   , Declaration.Method
+  , Directive.File
   , Expression.Arithmetic
   , Expression.Bitwise
   , Expression.Boolean
@@ -73,12 +75,12 @@ type Syntax = '[
   , Syntax.Error
   , Syntax.Identifier
   , Syntax.Program
-  , Ruby.Syntax.Send
   , Ruby.Syntax.Class
   , Ruby.Syntax.Load
   , Ruby.Syntax.LowPrecedenceBoolean
   , Ruby.Syntax.Module
   , Ruby.Syntax.Require
+  , Ruby.Syntax.Send
   , []
   ]
 
@@ -177,10 +179,13 @@ identifier =
     mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
     vcallOrLocal = do
       (loc, ident, locals) <- identWithLocals
-      let identTerm = makeTerm loc (Syntax.Identifier (name ident))
-      if ident `elem` locals
-        then pure identTerm
-        else pure $ makeTerm loc (Ruby.Syntax.Send Nothing (Just identTerm) [] Nothing)
+      case ident of
+        "__FILE__" -> pure $ makeTerm loc Directive.File
+        _ -> do
+          let identTerm = makeTerm loc (Syntax.Identifier (name ident))
+          if ident `elem` locals
+            then pure identTerm
+            else pure $ makeTerm loc (Ruby.Syntax.Send Nothing (Just identTerm) [] Nothing)
 
 -- TODO: Handle interpolation in all literals that support it (strings, regexes, symbols, subshells, etc).
 literal :: Assignment
