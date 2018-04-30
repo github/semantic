@@ -114,7 +114,7 @@ instance ( Alternative (m effects)
   klass _ _ _   = pure Object
   namespace _ _ = pure Unit
 
-  scopedEnvironment _ = pure Empty.empty
+  scopedEnvironment _ = pure (Just Empty.empty)
 
   asString t = unify t String $> ""
   asPair t   = do

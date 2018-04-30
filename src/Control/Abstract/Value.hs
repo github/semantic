@@ -134,7 +134,7 @@ class (Monad (m effects), Show value) => MonadValue location value (effects :: [
             -> m effects value
 
   -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
-  scopedEnvironment :: value -> m effects (Environment location value)
+  scopedEnvironment :: value -> m effects (Maybe (Environment location value))
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
   lambda :: (FreeVariables term, MonadEvaluator location term value effects m) => [Name] -> Subterm term (m effects value) -> m effects value
@@ -185,9 +185,10 @@ makeNamespace :: ( MonadValue location value effects m
               -> Maybe value
               -> m effects value
 makeNamespace name addr super = do
-  superEnv <- maybe (pure Empty.empty) scopedEnvironment super
+  superEnv <- maybe (pure (Just Empty.empty)) scopedEnvironment super
+  let env' = fromMaybe Empty.empty superEnv
   namespaceEnv <- Env.head <$> getEnv
-  v <- namespace name (Env.mergeNewer superEnv namespaceEnv)
+  v <- namespace name (Env.mergeNewer env' namespaceEnv)
   v <$ assign addr v
 
 
@@ -203,7 +204,6 @@ data ValueError location value resume where
   BoolError              :: value          -> ValueError location value Bool
   IndexError             :: value -> value -> ValueError location value value
   NamespaceError         :: Prelude.String -> ValueError location value (Environment location value)
-  ScopedEnvironmentError :: Prelude.String -> ValueError location value (Environment location value)
   CallError              :: value          -> ValueError location value value
   NumericError           :: value          -> ValueError location value value
   Numeric2Error          :: value -> value -> ValueError location value value
@@ -221,7 +221,6 @@ data ValueError location value resume where
 instance Eq value => Eq1 (ValueError location value) where
   liftEq _ (StringError a) (StringError b)                       = a == b
   liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
-  liftEq _ (ScopedEnvironmentError a) (ScopedEnvironmentError b) = a == b
   liftEq _ (CallError a) (CallError b)                           = a == b
   liftEq _ (BoolError a) (BoolError c)                           = a == c
   liftEq _ (IndexError a b) (IndexError c d)                     = (a == c) && (b == d)

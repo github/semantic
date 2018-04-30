@@ -188,10 +188,7 @@ instance Ord1 QualifiedName where liftCompare = genericLiftCompare
 instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedName where
-  eval (fmap subtermValue -> QualifiedName name iden) = do
-    lhs <- name >>= scopedEnvironment
-    localEnv (mergeEnvs lhs) iden
-
+  eval (fmap subtermValue -> QualifiedName name iden) = evaluateInScopedEnv name iden
 
 newtype NamespaceName a = NamespaceName (NonEmpty a)
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -201,11 +198,7 @@ instance Ord1 NamespaceName where liftCompare = genericLiftCompare
 instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable NamespaceName where
-  eval (NamespaceName xs) = foldl1 f $ fmap subtermValue xs
-    where
-      f ns nam = do
-        env <- ns >>= scopedEnvironment
-        localEnv (mergeEnvs env) nam
+  eval (NamespaceName xs) = foldl1 evaluateInScopedEnv $ fmap subtermValue xs
 
 newtype ConstDeclaration a = ConstDeclaration [a]
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

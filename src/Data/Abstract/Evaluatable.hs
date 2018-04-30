@@ -10,6 +10,7 @@ module Data.Abstract.Evaluatable
 , LoopThrow(..)
 , ResolutionError(..)
 , variable
+, evaluateInScopedEnv
 , evaluateTerm
 , evaluateModule
 , evaluatePackage
@@ -115,17 +116,28 @@ data EvalError value resume where
   RationalFormatError :: ByteString -> EvalError value Rational
   DefaultExportError  :: EvalError value ()
   ExportError         :: ModulePath -> Name -> EvalError value ()
+  EnvironmentLookupError :: value -> EvalError value value
 
+-- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
+--   Throws an 'EnvironmentLookupError' if 'scopedEnvTerm' does not have an environment.
+evaluateInScopedEnv :: (MonadEvaluatable location term value effects m)
+                    => m effects value
+                    -> m effects value
+                    -> m effects value
+evaluateInScopedEnv scopedEnvTerm term = do
+  value <- scopedEnvTerm
+  scopedEnv <- scopedEnvironment value
+  maybe (throwEvalError $ EnvironmentLookupError value) (flip localEnv term . mergeEnvs) scopedEnv
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: (Member (Resumable (AddressError location value)) effects, Member (Resumable (EvalError value)) effects, MonadAddressable location effects m, MonadEvaluator location term value effects m) => Name -> m effects value
 variable name = lookupWith deref name >>= maybeM (throwResumable (FreeVariableError name))
 
-deriving instance Eq (EvalError a b)
-deriving instance Show (EvalError a b)
-instance Show1 (EvalError value) where
+deriving instance Eq a => Eq (EvalError a b)
+deriving instance Show a => Show (EvalError a b)
+instance Show value => Show1 (EvalError value) where
   liftShowsPrec _ _ = showsPrec
-instance Eq1 (EvalError term) where
+instance Eq term => Eq1 (EvalError term) where
   liftEq _ (FreeVariableError a) (FreeVariableError b)     = a == b
   liftEq _ (FreeVariablesError a) (FreeVariablesError b)   = a == b
   liftEq _ DefaultExportError DefaultExportError           = True
@@ -133,6 +145,7 @@ instance Eq1 (EvalError term) where
   liftEq _ (IntegerFormatError a) (IntegerFormatError b)   = a == b
   liftEq _ (FloatFormatError a) (FloatFormatError b)       = a == b
   liftEq _ (RationalFormatError a) (RationalFormatError b) = a == b
+  liftEq _ (EnvironmentLookupError a) (EnvironmentLookupError b) = a == b
   liftEq _ _ _                                             = False
 
 

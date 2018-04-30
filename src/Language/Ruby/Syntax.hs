@@ -46,13 +46,7 @@ instance Evaluatable Send where
     let sel = case sendSelector of
           Just sel -> subtermValue sel
           Nothing -> variable (name "call")
-
-    func <- case sendReceiver of
-      Just recv -> do
-        recvEnv <- subtermValue recv >>= scopedEnvironment
-        localEnv (mergeEnvs recvEnv) sel
-      Nothing -> sel -- TODO Does this require `localize` so we don't leak terms when resolving `sendSelector`?
-
+    func <- maybe sel (flip evaluateInScopedEnv sel . subtermValue) sendReceiver
     call func (map subtermValue sendArgs) -- TODO pass through sendBlock
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
