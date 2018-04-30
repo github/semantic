@@ -210,8 +210,8 @@ instance Show1 Subscript where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Implement Eval instance for Subscript
 instance Evaluatable Subscript where
   eval (Subscript l [r]) = join (index <$> subtermValue l <*> subtermValue r)
-  eval (Subscript _ _)   = throwResumable (Unspecialized ("Eval unspecialized for subscript with slices"))
-  eval (Member _ _)      = throwResumable (Unspecialized ("Eval unspecialized for member access"))
+  eval (Subscript _ _)   = throwResumable (Unspecialized "Eval unspecialized for subscript with slices")
+  eval (Member _ _)      = throwResumable (Unspecialized "Eval unspecialized for member access")
 
 
 -- | Enumeration (e.g. a[1:10:1] in Python (start at index 1, stop at index 10, step 1 element from start to stop))
