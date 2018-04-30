@@ -123,6 +123,9 @@ instance ( Alternative (m effects)
 
   isHole ty = pure (ty == Hole)
 
+  index (Array (mem:_)) Int = pure mem
+  index _ _                 = pure Hole
+
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 
   liftNumeric _ Float      = pure Float
