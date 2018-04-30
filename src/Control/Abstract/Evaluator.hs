@@ -113,9 +113,6 @@ deriving instance (Eq (Cell location value), Eq location, Eq term, Eq value, Eq 
 deriving instance (Ord (Cell location value), Ord location, Ord term, Ord value, Ord (Base term ())) => Ord (EvaluatorState location term value)
 deriving instance (Show (Cell location value), Show location, Show term, Show value, Show (Base term ())) => Show (EvaluatorState location term value)
 
-instance (Ord location, Semigroup (Cell location value)) => Semigroup (EvaluatorState location term value) where
-  EvaluatorState e1 h1 m1 l1 x1 j1 <> EvaluatorState e2 h2 m2 l2 x2 j2 = EvaluatorState (mergeEnvs e1 e2) (h1 <> h2) (m1 <> m2) (l1 <> l2) (x1 <> x2) (j1 <> j2)
-
 instance Lower (EvaluatorState location term value) where
   lowerBound = EvaluatorState lowerBound lowerBound lowerBound lowerBound lowerBound lowerBound
 
