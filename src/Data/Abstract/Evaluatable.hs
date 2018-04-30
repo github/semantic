@@ -126,9 +126,6 @@ instance Eq1 (EvalError term) where
   liftEq _ _ _                                             = False
 
 
-throwLoadError :: (Member (Resumable (LoadError term)) effects, MonadEvaluator location term value effects m) => LoadError term resume -> m effects resume
-throwLoadError = throwResumable
-
 throwEvalError :: (Member (Resumable (EvalError value)) effects, MonadEvaluator location term value effects m) => EvalError value resume -> m effects resume
 throwEvalError = throwResumable
 
@@ -229,7 +226,7 @@ loadWith :: ( Member (Resumable (LoadError term)) effects
          -> m effects (Environment location value, value)
 loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= evalAndCache
   where
-    notFound = throwLoadError (LoadError name)
+    notFound = throwResumable (LoadError name)
 
     evalAndCache []     = (,) emptyEnv <$> unit
     evalAndCache [x]    = evalAndCache' x
