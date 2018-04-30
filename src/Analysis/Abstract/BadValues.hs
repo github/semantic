@@ -30,6 +30,8 @@ instance ( Interpreter m effects
       CallError val     -> yield val
       StringError val   -> yield (pack (show val))
       BoolError{}       -> yield True
+      BoundsError{}     -> yield hole
+      IndexError{}      -> yield hole
       NumericError{}    -> yield hole
       Numeric2Error{}   -> yield hole
       ComparisonError{} -> yield hole

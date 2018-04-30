@@ -113,6 +113,10 @@ class (Monad (m effects), Show value) => MonadValue location value (effects :: [
   -- | Construct the nil/null datatype.
   null :: m effects value
 
+  -- | @index x i@ computes @x[i]@, with zero-indexing.
+  index :: value -> value -> m effects value
+
+  -- | Determine whether the given datum is a 'Hole'.
   isHole :: value -> m effects Bool
 
   -- | Build a class value from a name and environment.

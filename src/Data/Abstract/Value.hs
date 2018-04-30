@@ -12,6 +12,7 @@ import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables
 import qualified Data.Abstract.Number as Number
+import Data.List (genericIndex, genericLength)
 import Data.Scientific (Scientific)
 import Data.Scientific.Exts
 import Data.Semigroup.Reducer
@@ -280,6 +281,14 @@ instance ( Member (EvalClosure term (Value location)) effects
 
   isHole val = pure (prjValue val == Just Hole)
 
+  index = go where
+    tryIdx list ii
+      | ii > genericLength list = throwValueError (BoundsError list ii)
+      | otherwise               = pure (genericIndex list ii)
+    go arr idx
+      | (Just (Array arr, Integer (Number.Integer i))) <- prjPair (arr, idx) = tryIdx arr i
+      | (Just (Tuple tup, Integer (Number.Integer i))) <- prjPair (arr, idx) = tryIdx tup i
+      | otherwise = throwValueError (IndexError arr idx)
 
   liftNumeric f arg
     | Just (Integer (Number.Integer i)) <- prjValue arg = integer $ f i
@@ -367,10 +376,11 @@ instance ( Member (EvalClosure term (Value location)) effects
     Continue    -> loop x)
 
 
--- The type of exceptions that can be thrown when constructing values in `MonadValue`.
+-- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
 data ValueError location value resume where
   StringError            :: value          -> ValueError location value ByteString
   BoolError              :: value          -> ValueError location value Bool
+  IndexError             :: value -> value -> ValueError location value value
   NamespaceError         :: Prelude.String -> ValueError location value (Environment location value)
   ScopedEnvironmentError :: Prelude.String -> ValueError location value (Environment location value)
   CallError              :: value          -> ValueError location value value
@@ -382,6 +392,9 @@ data ValueError location value resume where
   KeyValueError          :: value          -> ValueError location value (value, value)
   -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
   ArithmeticError :: ArithException -> ValueError location value value
+  -- Out-of-bounds error
+  BoundsError :: [value] -> Prelude.Integer -> ValueError location value value
+
 
 instance Eq value => Eq1 (ValueError location value) where
   liftEq _ (StringError a) (StringError b)                       = a == b
@@ -389,11 +402,13 @@ instance Eq value => Eq1 (ValueError location value) where
   liftEq _ (ScopedEnvironmentError a) (ScopedEnvironmentError b) = a == b
   liftEq _ (CallError a) (CallError b)                           = a == b
   liftEq _ (BoolError a) (BoolError c)                           = a == c
+  liftEq _ (IndexError a b) (IndexError c d)                     = (a == c) && (b == d)
   liftEq _ (Numeric2Error a b) (Numeric2Error c d)               = (a == c) && (b == d)
   liftEq _ (ComparisonError a b) (ComparisonError c d)           = (a == c) && (b == d)
   liftEq _ (Bitwise2Error a b) (Bitwise2Error c d)               = (a == c) && (b == d)
   liftEq _ (BitwiseError a) (BitwiseError b)                     = a == b
   liftEq _ (KeyValueError a) (KeyValueError b)                   = a == b
+  liftEq _ (BoundsError a b) (BoundsError c d)                   = (a == c) && (b == d)
   liftEq _ _             _                                       = False
 
 deriving instance (Show value) => Show (ValueError location value resume)
