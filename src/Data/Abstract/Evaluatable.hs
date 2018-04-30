@@ -196,7 +196,10 @@ require :: MonadEvaluatable location term value effects m
         -> m effects (Environment location value, value)
 require = requireWith evaluateModule
 
-requireWith :: MonadEvaluatable location term value effects m
+requireWith :: ( Member (Resumable (LoadError term value)) effects
+               , MonadEvaluator location term value effects m
+               , MonadValue location value effects m
+               )
             => (Module term -> m effects value)
             -> ModulePath
             -> m effects (Environment location value, value)
@@ -210,7 +213,10 @@ load :: MonadEvaluatable location term value effects m
      -> m effects (Environment location value, value)
 load = loadWith evaluateModule
 
-loadWith :: MonadEvaluatable location term value effects m
+loadWith :: ( Member (Resumable (LoadError term value)) effects
+            , MonadEvaluator location term value effects m
+            , MonadValue location value effects m
+            )
          => (Module term -> m effects value)
          -> ModulePath
          -> m effects (Environment location value, value)
