@@ -79,7 +79,7 @@ instance Eq1 (ResolutionError value) where
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
 data LoadError term resume where
-  LoadError :: ModulePath -> LoadError term [Module term]
+  LoadError :: ModulePath -> LoadError term (NonEmpty (Module term))
 
 deriving instance Eq (LoadError term resume)
 deriving instance Show (LoadError term resume)
@@ -224,16 +224,9 @@ loadWith :: ( Member (Resumable (LoadError term)) effects
          => (Module term -> m effects value)
          -> ModulePath
          -> m effects (Environment location value, value)
-loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= evalAndCache
+loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= runMerging . foldMap1 (Merging . evalAndCache')
   where
     notFound = throwResumable (LoadError name)
-
-    evalAndCache []     = (,) emptyEnv <$> unit
-    evalAndCache [x]    = evalAndCache' x
-    evalAndCache (x:xs) = do
-      (env, _) <- evalAndCache' x
-      (env', v') <- evalAndCache xs
-      pure (mergeEnvs env env', v')
 
     evalAndCache' x = do
       let mPath = modulePath (moduleInfo x)
@@ -259,6 +252,11 @@ loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup nam
       | Exports.null ports = env
       | otherwise = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
 
+newtype Merging m location value = Merging { runMerging :: m (Environment location value, value) }
+
+instance Applicative m => Semigroup (Merging m location value) where
+  Merging a <> Merging b = Merging (merging <$> a <*> b)
+    where merging (env1, _) (env2, v) = (mergeEnvs env1 env2, v)
 
 -- | Evaluate a (root-level) term to a value using the semantics of the current analysis.
 evalModule :: forall location term value effects m

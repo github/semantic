@@ -94,7 +94,7 @@ import Prologue
 --   - tables of modules available for import
 class ( Effectful m
       , Member (Reader (Environment location value)) effects
-      , Member (Reader (ModuleTable [Module term])) effects
+      , Member (Reader (ModuleTable (NonEmpty (Module term)))) effects
       , Member (Reader (SomeOrigin term)) effects
       , Member (State (EvaluatorState location term value)) effects
       , Monad (m effects)
@@ -309,11 +309,11 @@ modifyModuleTable f = do
 
 
 -- | Retrieve the table of unevaluated modules.
-askModuleTable :: MonadEvaluator location term value effects m => m effects (ModuleTable [Module term])
+askModuleTable :: MonadEvaluator location term value effects m => m effects (ModuleTable (NonEmpty (Module term)))
 askModuleTable = raise ask
 
 -- | Run an action with a locally-modified table of unevaluated modules.
-localModuleTable :: MonadEvaluator location term value effects m => (ModuleTable [Module term] -> ModuleTable [Module term]) -> m effects a -> m effects a
+localModuleTable :: MonadEvaluator location term value effects m => (ModuleTable (NonEmpty (Module term)) -> ModuleTable (NonEmpty (Module term))) -> m effects a -> m effects a
 localModuleTable f = raiseHandler (local f)
 
 

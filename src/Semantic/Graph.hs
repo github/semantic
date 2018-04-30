@@ -19,6 +19,7 @@ import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value)
 import           Data.File
 import           Data.Output
+import           Data.Semilattice.Lower
 import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Parsing.Parser
@@ -76,8 +77,9 @@ type ImportGraphAnalysis term
     (Value (Located Precise term)))))))))
 
 -- | Render the import graph for a given 'Package'.
-graphImports :: ( Show ann
+graphImports :: ( Lower ann
                 , Ord ann
+                , Show ann
                 , Apply Analysis.Declarations1 syntax
                 , Apply Analysis.Evaluatable syntax
                 , Apply FreeVariables1 syntax
@@ -85,6 +87,7 @@ graphImports :: ( Show ann
                 , Apply Ord1 syntax
                 , Apply Eq1 syntax
                 , Apply Show1 syntax
+                , Member Syntax.Empty syntax
                 , Member Syntax.Identifier syntax
                 , Members '[Exc SomeException, Task] effs
                 )

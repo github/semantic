@@ -24,16 +24,16 @@ type EvaluatingEffects location term value
      , EvalModule term value
      , Return value
      , LoopControl value
-     , Fail                                        -- Failure with an error message
-     , Fresh                                       -- For allocating new addresses and/or type variables.
-     , Reader (SomeOrigin term)                    -- The current term’s origin.
-     , Reader (ModuleTable [Module term])          -- Cache of unevaluated modules
-     , Reader (Environment location value)         -- Default environment used as a fallback in lookupEnv
-     , State  (EvaluatorState location term value) -- Environment, heap, modules, exports, and jumps.
+     , Fail                                          -- Failure with an error message
+     , Fresh                                         -- For allocating new addresses and/or type variables.
+     , Reader (SomeOrigin term)                      -- The current term’s origin.
+     , Reader (ModuleTable (NonEmpty (Module term))) -- Cache of unevaluated modules
+     , Reader (Environment location value)           -- Default environment used as a fallback in lookupEnv
+     , State  (EvaluatorState location term value)   -- Environment, heap, modules, exports, and jumps.
      ]
 
 instance ( Member (Reader (Environment location value)) effects
-         , Member (Reader (ModuleTable [Module term])) effects
+         , Member (Reader (ModuleTable (NonEmpty (Module term)))) effects
          , Member (Reader (SomeOrigin term)) effects
          , Member (State (EvaluatorState location term value)) effects
          )
@@ -41,7 +41,7 @@ instance ( Member (Reader (Environment location value)) effects
 
 instance ( Corecursive term
          , Member (Reader (Environment location value)) effects
-         , Member (Reader (ModuleTable [Module term])) effects
+         , Member (Reader (ModuleTable (NonEmpty (Module term)))) effects
          , Member (Reader (SomeOrigin term)) effects
          , Member (State (EvaluatorState location term value)) effects
          , Recursive term
