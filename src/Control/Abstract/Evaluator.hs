@@ -1,9 +1,9 @@
 {-# LANGUAGE ConstrainedClassMethods, FunctionalDependencies, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
 module Control.Abstract.Evaluator
   ( MonadEvaluator
-  -- State
+  -- * State
   , EvaluatorState(..)
-  -- Environment
+  -- * Environment
   , getEnv
   , putEnv
   , modifyEnv
@@ -15,25 +15,25 @@ module Control.Abstract.Evaluator
   , localize
   , lookupEnv
   , lookupWith
-  -- Exports
+  -- * Exports
   , getExports
   , putExports
   , modifyExports
   , addExport
   , withExports
   , isolate
-  -- Heap
+  -- * Heap
   , getHeap
   , putHeap
   , modifyHeap
   , lookupHeap
   , assign
-  -- Roots
+  -- * Roots
   , askRoots
   , extraRoots
-  -- Configuration
+  -- * Configuration
   , getConfiguration
-  -- Module tables
+  -- * Module tables
   , getModuleTable
   , putModuleTable
   , modifyModuleTable
@@ -44,10 +44,10 @@ module Control.Abstract.Evaluator
   , modifyLoadStack
   , currentModule
   , currentPackage
-  -- Control
+  -- * Control
   , label
   , goto
-  -- Effects
+  -- * Effects
   , EvalClosure(..)
   , evaluateClosureBody
   , EvalModule(..)
@@ -59,7 +59,7 @@ module Control.Abstract.Evaluator
   , throwBreak
   , throwContinue
   , catchLoopControl
-  -- | Origin
+  -- * Origin
   , pushOrigin
   ) where
 
