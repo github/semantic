@@ -10,6 +10,7 @@ module Data.Abstract.Evaluatable
 , LoopThrow(..)
 , ResolutionError(..)
 , variable
+, evaluateInScopedEnv
 , evaluateTerm
 , evaluateModule
 , evaluatePackage
@@ -117,6 +118,16 @@ data EvalError value resume where
   ExportError         :: ModulePath -> Name -> EvalError value ()
   EnvironmentLookupError :: value -> EvalError value value
 
+-- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
+--   Throws an 'EnvironmentLookupError' if 'scopedEnvTerm' does not have an environment.
+evaluateInScopedEnv :: (MonadEvaluatable location term value effects m)
+                    => m effects value
+                    -> m effects value
+                    -> m effects value
+evaluateInScopedEnv scopedEnvTerm term = do
+  value <- scopedEnvTerm
+  scopedEnv <- scopedEnvironment value
+  maybe (throwEvalError $ EnvironmentLookupError value) (flip localEnv term . mergeEnvs) scopedEnv
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: (Member (Resumable (AddressError location value)) effects, Member (Resumable (EvalError value)) effects, MonadAddressable location effects m, MonadEvaluator location term value effects m) => Name -> m effects value
