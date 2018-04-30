@@ -140,7 +140,7 @@ instance Ord1 Return where liftCompare = genericLiftCompare
 instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Return where
-  eval (Return x) = subtermValue x >>= throwReturn
+  eval (Return x) = subtermValue x >>= earlyReturn
 
 newtype Yield a = Yield a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)

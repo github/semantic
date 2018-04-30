@@ -49,7 +49,7 @@ module Control.Abstract.Evaluator
   -- Effects
   , Eval(..)
   , Return(..)
-  , throwReturn
+  , earlyReturn
   , catchReturn
   , LoopControl(..)
   , throwBreak
@@ -372,8 +372,8 @@ data Return value resume where
 deriving instance Eq value => Eq (Return value a)
 deriving instance Show value => Show (Return value a)
 
-throwReturn :: (Effectful m, Member (Return value) effects) => value -> m effects value
-throwReturn = raise . Eff.send . Return
+earlyReturn :: (Effectful m, Member (Return value) effects) => value -> m effects value
+earlyReturn = raise . Eff.send . Return
 
 catchReturn :: (Effectful m, Member (Return value) effects) => m effects a -> (forall x . Return value x -> m effects a) -> m effects a
 catchReturn action handler = raiseHandler (Eff.interpose pure (\ ret _ -> lower (handler ret))) action
