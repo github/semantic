@@ -125,8 +125,9 @@ instance ( Alternative (m effects)
 
   isHole ty = pure (ty == Hole)
 
-  index (Array (mem:_)) Int = pure mem
-  index a b                 = throwResumable (SubscriptError a b)
+  index (Array (mem:_)) Int   = pure mem
+  index (Product (mem:_)) Int = pure mem
+  index a b                   = throwResumable (SubscriptError a b)
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 
