@@ -231,12 +231,12 @@ instance ( Monad (m effects)
 
   klass n [] env = pure . injValue $ Class n env
   klass n supers env = do
-    product <- mconcat <$> traverse scopedEnvironment supers
-    pure . injValue $ Class n (Env.push product <> env)
+    product <- foldl mergeEnvs emptyEnv <$> traverse scopedEnvironment supers
+    pure . injValue $ Class n (mergeEnvs (Env.push product) env)
 
   namespace n env = do
     maybeAddr <- lookupEnv n
-    env' <- maybe (pure mempty) (asNamespaceEnv <=< deref) maybeAddr
+    env' <- maybe (pure emptyEnv) (asNamespaceEnv <=< deref) maybeAddr
     pure (injValue (Namespace n (Env.mergeNewer env' env)))
     where asNamespaceEnv v
             | Just (Namespace _ env') <- prjValue v = pure env'
@@ -334,16 +334,18 @@ instance ( Monad (m effects)
   call op params = do
     case prjValue op of
       Just (Closure names label env) -> do
-        bindings <- foldr (\ (name, param) rest -> do
-          v <- param
-          a <- alloc name
-          assign a v
-          Env.insert name a <$> rest) (pure env) (zip names params)
-        localEnv (mappend bindings) (evalClosure label)
+        -- Evaluate the bindings and the body within a `goto` in order to
+        -- charge their origins to the closure's origin.
+        goto label $ \body -> do
+          bindings <- foldr (\ (name, param) rest -> do
+            v <- param
+            a <- alloc name
+            assign a v
+            Env.insert name a <$> rest) (pure env) (zip names params)
+          localEnv (mergeEnvs bindings) (evalClosure body)
       Nothing -> throwValueError (CallError op)
     where
-      evalClosure :: Label -> m effects (Value location)
-      evalClosure lab = catchReturn @m @(Value location) (goto lab >>= evaluateTerm) (\ (Return value) -> pure value)
+      evalClosure term = catchReturn @m @(Value location) (evaluateTerm term) (\ (Return value) -> pure value)
 
   loop x = catchLoopControl @m @(Value location) (fix x) (\ control -> case control of
     Break value -> pure value

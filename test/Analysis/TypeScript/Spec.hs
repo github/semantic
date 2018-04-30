@@ -30,7 +30,7 @@ spec = parallel $ do
 
     it "side effect only imports" $ do
       env <- environment . snd <$> evaluate "main2.ts"
-      env `shouldBe` mempty
+      env `shouldBe` emptyEnv
 
     it "fails exporting symbols not defined in the module" $ do
       v <- fst <$> evaluate "bad-export.ts"

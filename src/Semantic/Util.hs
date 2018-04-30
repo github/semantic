@@ -34,7 +34,6 @@ import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
 
--- type TestEvaluating term = Evaluating Precise term (Value Precise)
 type JustEvaluating term
   = Erroring (AddressError (Located Precise term) (Value (Located Precise term)))
   ( Erroring (EvalError (Value (Located Precise term)))
@@ -80,6 +79,10 @@ pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Py
 
 -- Evaluate a project, starting at a single entrypoint.
 evaluateProject parser lang prelude path = evaluatePackage <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
+
+evalRubyFile path = interpret @(JustEvaluating Ruby.Term) <$> evaluateFile rubyParser path
+evaluateFile parser path = evaluateModule <$> runTask (parseModule parser Nothing (file path))
+
 
 parseFile :: Parser term -> FilePath -> IO term
 parseFile parser = runTask . (parse parser <=< readBlob . file)

@@ -90,8 +90,8 @@ instance ( Alternative (m effects)
       tvar <- Var <$> raise fresh
       assign a tvar
       (env, tvars) <- rest
-      pure (Env.insert name a env, tvar : tvars)) (pure mempty) names
-    ret <- localEnv (mappend env) body
+      pure (Env.insert name a env, tvar : tvars)) (pure (emptyEnv, [])) names
+    ret <- localEnv (mergeEnvs env) body
     pure (Product tvars :-> ret)
 
   unit       = pure Unit
@@ -111,7 +111,7 @@ instance ( Alternative (m effects)
   klass _ _ _   = pure Object
   namespace _ _ = pure Unit
 
-  scopedEnvironment _ = pure mempty
+  scopedEnvironment _ = pure emptyEnv
 
   asString t = unify t String $> ""
   asPair t   = do

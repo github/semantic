@@ -55,7 +55,7 @@ module Control.Abstract.Evaluator
   , throwBreak
   , throwContinue
   , catchLoopControl
-  -- Origin
+  -- | Origin
   , pushOrigin
   ) where
 
@@ -106,7 +106,7 @@ data EvaluatorState location term value = EvaluatorState
   , modules     :: ModuleTable (Environment location value, value)
   , loadStack   :: LoadStack
   , exports     :: Exports location value
-  , jumps       :: IntMap.IntMap term
+  , jumps       :: IntMap.IntMap (SomeOrigin term, term)
   }
 
 deriving instance (Eq (Cell location value), Eq location, Eq term, Eq value, Eq (Base term ())) => Eq (EvaluatorState location term value)
@@ -114,7 +114,7 @@ deriving instance (Ord (Cell location value), Ord location, Ord term, Ord value,
 deriving instance (Show (Cell location value), Show location, Show term, Show value, Show (Base term ())) => Show (EvaluatorState location term value)
 
 instance (Ord location, Semigroup (Cell location value)) => Semigroup (EvaluatorState location term value) where
-  EvaluatorState e1 h1 m1 l1 x1 j1 <> EvaluatorState e2 h2 m2 l2 x2 j2 = EvaluatorState (e1 <> e2) (h1 <> h2) (m1 <> m2) (l1 <> l2) (x1 <> x2) (j1 <> j2)
+  EvaluatorState e1 h1 m1 l1 x1 j1 <> EvaluatorState e2 h2 m2 l2 x2 j2 = EvaluatorState (mergeEnvs e1 e2) (h1 <> h2) (m1 <> m2) (l1 <> l2) (x1 <> x2) (j1 <> j2)
 
 instance Lower (EvaluatorState location term value) where
   lowerBound = EvaluatorState lowerBound lowerBound lowerBound lowerBound lowerBound lowerBound
@@ -137,7 +137,7 @@ _loadStack = lens loadStack (\ s l -> s {loadStack = l})
 _exports :: Lens' (EvaluatorState location term value) (Exports location value)
 _exports = lens exports (\ s e -> s {exports = e})
 
-_jumps :: Lens' (EvaluatorState location term value) (IntMap.IntMap term)
+_jumps :: Lens' (EvaluatorState location term value) (IntMap.IntMap (SomeOrigin term, term))
 _jumps = lens jumps (\ s j -> s {jumps = j})
 
 
@@ -188,7 +188,7 @@ withDefaultEnvironment e = raiseHandler (local (const e))
 -- | Obtain an environment that is the composition of the current and default environments.
 --   Useful for debugging.
 fullEnvironment :: MonadEvaluator location term value effects m => m effects (Environment location value)
-fullEnvironment = mappend <$> getEnv <*> defaultEnvironment
+fullEnvironment = mergeEnvs <$> getEnv <*> defaultEnvironment
 
 -- | Run an action with a locally-modified environment.
 localEnv :: MonadEvaluator location term value effects m => (Environment location value -> Environment location value) -> m effects a -> m effects a
@@ -348,13 +348,18 @@ currentPackage = do
 label :: MonadEvaluator location term value effects m => term -> m effects Label
 label term = do
   m <- view _jumps
+  origin <- raise ask
   let i = IntMap.size m
-  _jumps .= IntMap.insert i term m
+  _jumps .= IntMap.insert i (origin, term) m
   pure i
 
 -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
-goto :: (Member Fail effects, MonadEvaluator location term value effects m) => Label -> m effects term
-goto label = IntMap.lookup label <$> view _jumps >>= maybe (raise (fail ("unknown label: " <> show label))) pure
+goto :: (Recursive term, Member Fail effects, MonadEvaluator location term value effects m) => Label -> (term -> m effects a) -> m effects a
+goto label comp = do
+  maybeTerm <- IntMap.lookup label <$> view _jumps
+  case maybeTerm of
+    Just (origin, term) -> pushOrigin (origin <> termOrigin term) (comp term)
+    Nothing -> raise (fail ("unknown label: " <> show label))
 
 
 -- Effects
