@@ -59,6 +59,10 @@ spec = parallel $ do
       res <- evaluate "next.rb"
       fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (pure (injValue (Value.Integer (Number.Integer 8))))))))))
 
+    it "calls functions with arguments" $ do
+      res <- evaluate "call.rb"
+      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (pure (injValue (Value.Integer (Number.Integer 579))))))))))
+
     it "evaluates early return statements" $ do
       res <- evaluate "early-return.rb"
       fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (pure (injValue (Value.Integer (Number.Integer 123))))))))))
