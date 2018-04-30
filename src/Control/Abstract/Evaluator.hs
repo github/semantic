@@ -49,6 +49,8 @@ module Control.Abstract.Evaluator
   -- Effects
   , EvalClosure(..)
   , evaluateClosureBody
+  , EvalModule(..)
+  , evaluateModule
   , Return(..)
   , earlyReturn
   , catchReturn
@@ -368,6 +370,14 @@ data EvalClosure term value resume where
 
 evaluateClosureBody :: (Effectful m, Member (EvalClosure term value) effects) => term -> m effects value
 evaluateClosureBody = raise . Eff.send . EvalClosure
+
+
+-- | An effect to evaluate a module.
+data EvalModule term value resume where
+  EvalModule :: Module term -> EvalModule term value value
+
+evaluateModule :: (Effectful m, Member (EvalModule term value) effects) => Module term -> m effects value
+evaluateModule = raise . Eff.send . EvalModule
 
 
 -- | An effect for explicitly returning out of a function/method body.

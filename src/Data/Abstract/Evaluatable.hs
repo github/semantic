@@ -8,7 +8,6 @@ module Data.Abstract.Evaluatable
 , LoadError(..)
 , ResolutionError(..)
 , variable
-, evaluateModule
 , evaluatePackage
 , evaluatePackageBody
 , throwLoadError
@@ -46,6 +45,7 @@ type MonadEvaluatable location term value effects m =
   , Evaluatable (Base term)
   , FreeVariables term
   , Member (EvalClosure term value) effects
+  , Member (EvalModule term value) effects
   , Member Fail effects
   , Member (LoopControl value) effects
   , Member (Resumable (Unspecialized value)) effects
@@ -194,7 +194,13 @@ listModulesInDir dir = ModuleTable.modulePathsInDir dir <$> askModuleTable
 require :: MonadEvaluatable location term value effects m
         => ModulePath
         -> m effects (Environment location value, value)
-require name = getModuleTable >>= maybeM (load name) . ModuleTable.lookup name
+require = requireWith evaluateModule
+
+requireWith :: MonadEvaluatable location term value effects m
+            => (Module term -> m effects value)
+            -> ModulePath
+            -> m effects (Environment location value, value)
+requireWith with name = getModuleTable >>= maybeM (loadWith with name) . ModuleTable.lookup name
 
 -- | Load another module by name and return it's environment and value.
 --
@@ -202,7 +208,13 @@ require name = getModuleTable >>= maybeM (load name) . ModuleTable.lookup name
 load :: MonadEvaluatable location term value effects m
      => ModulePath
      -> m effects (Environment location value, value)
-load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= evalAndCache
+load = loadWith evaluateModule
+
+loadWith :: MonadEvaluatable location term value effects m
+         => (Module term -> m effects value)
+         -> ModulePath
+         -> m effects (Environment location value, value)
+loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= evalAndCache
   where
     notFound = throwLoadError (LoadError name)
 
@@ -222,7 +234,7 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= eva
           pure (emptyEnv, v)
         else do
           modifyLoadStack (loadStackPush mPath)
-          v <- trace ("load (evaluating): " <> show mPath) $ evaluateModule x
+          v <- trace ("load (evaluating): " <> show mPath) $ with x
           modifyLoadStack loadStackPop
           traceM ("load done:" <> show mPath)
           env <- filterEnv <$> getExports <*> getEnv
@@ -238,12 +250,14 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= eva
       | otherwise = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
 
 
--- | Evaluate a (root-level) term to a value using the semantics of the current analysis. This should be used to evaluate single-term programs, or (via 'evaluateModules') the entry point of multi-term programs.
-evaluateModule :: forall location term value effects m
-               .  MonadEvaluatable location term value effects m
-               => Module term
-               -> m effects value
-evaluateModule m = analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evalTerm) m)
+-- | Evaluate a (root-level) term to a value using the semantics of the current analysis.
+evalModule :: forall location term value effects m
+           .  MonadEvaluatable location term value effects m
+           => Module term
+           -> m effects value
+evalModule m = raiseHandler
+  (interpose @(EvalModule term value) pure (\ (EvalModule m) yield -> lower @m (evalModule m) >>= yield))
+  (analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evalTerm) m))
   where evalTerm term = catchReturn @m @value
           (raiseHandler
             (interpose @(EvalClosure term value) pure (\ (EvalClosure term) yield -> lower (evalTerm term) >>= yield))
@@ -264,9 +278,9 @@ evaluatePackageBody body = withPrelude (packagePrelude body) $
   localModuleTable (<> packageModules body) (traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints body)))
   where
     evaluateEntryPoint (m, sym) = do
-      (_, v) <- require m
+      (_, v) <- requireWith evalModule m
       maybe (pure v) ((`call` []) <=< variable) sym
     withPrelude Nothing a = a
     withPrelude (Just prelude) a = do
-      preludeEnv <- evaluateModule prelude *> getEnv
+      preludeEnv <- evalModule prelude *> getEnv
       withDefaultEnvironment preludeEnv a
