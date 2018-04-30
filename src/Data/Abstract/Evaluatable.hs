@@ -115,17 +115,18 @@ data EvalError value resume where
   RationalFormatError :: ByteString -> EvalError value Rational
   DefaultExportError  :: EvalError value ()
   ExportError         :: ModulePath -> Name -> EvalError value ()
+  EnvironmentLookupError :: value -> EvalError value value
 
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
 variable :: (Member (Resumable (AddressError location value)) effects, Member (Resumable (EvalError value)) effects, MonadAddressable location effects m, MonadEvaluator location term value effects m) => Name -> m effects value
 variable name = lookupWith deref name >>= maybeM (throwResumable (FreeVariableError name))
 
-deriving instance Eq (EvalError a b)
-deriving instance Show (EvalError a b)
-instance Show1 (EvalError value) where
+deriving instance Eq a => Eq (EvalError a b)
+deriving instance Show a => Show (EvalError a b)
+instance Show value => Show1 (EvalError value) where
   liftShowsPrec _ _ = showsPrec
-instance Eq1 (EvalError term) where
+instance Eq term => Eq1 (EvalError term) where
   liftEq _ (FreeVariableError a) (FreeVariableError b)     = a == b
   liftEq _ (FreeVariablesError a) (FreeVariablesError b)   = a == b
   liftEq _ DefaultExportError DefaultExportError           = True
@@ -133,6 +134,7 @@ instance Eq1 (EvalError term) where
   liftEq _ (IntegerFormatError a) (IntegerFormatError b)   = a == b
   liftEq _ (FloatFormatError a) (FloatFormatError b)       = a == b
   liftEq _ (RationalFormatError a) (RationalFormatError b) = a == b
+  liftEq _ (EnvironmentLookupError a) (EnvironmentLookupError b) = a == b
   liftEq _ _ _                                             = False
 
 

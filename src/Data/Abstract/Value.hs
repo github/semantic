@@ -230,8 +230,8 @@ instance ( Monad (m effects)
 
   klass n [] env = pure . injValue $ Class n env
   klass n supers env = do
-    product <- foldl mergeEnvs emptyEnv <$> traverse scopedEnvironment supers
-    pure . injValue $ Class n (mergeEnvs (Env.push product) env)
+    product <- foldl mergeEnvs emptyEnv . catMaybes <$> (traverse scopedEnvironment supers)
+    pure . injValue $ Class n (mergeEnvs product env)
 
   namespace n env = do
     maybeAddr <- lookupEnv n
@@ -242,9 +242,9 @@ instance ( Monad (m effects)
             | otherwise                             = throwResumable $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
   scopedEnvironment o
-    | Just (Class _ env) <- prjValue o = pure env
-    | Just (Namespace _ env) <- prjValue o = pure env
-    | otherwise = throwResumable $ ScopedEnvironmentError ("object type passed to scopedEnvironment doesn't have an environment: " <> show o)
+    | Just (Class _ env) <- prjValue o = pure (Just env)
+    | Just (Namespace _ env) <- prjValue o = pure (Just env)
+    | otherwise = pure Nothing
 
   asString v
     | Just (String n) <- prjValue v = pure n
