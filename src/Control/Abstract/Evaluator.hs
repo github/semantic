@@ -47,7 +47,7 @@ module Control.Abstract.Evaluator
   , label
   , goto
   -- Effects
-  , Eval(..)
+  , EvalClosure(..)
   , evaluateClosureBody
   , Return(..)
   , earlyReturn
@@ -362,11 +362,11 @@ goto label comp = do
 
 -- Effects
 
-data Eval term value resume where
-  Eval :: term -> Eval term value value
+data EvalClosure term value resume where
+  EvalClosure :: term -> EvalClosure term value value
 
-evaluateClosureBody :: (Effectful m, Member (Eval term value) effects) => term -> m effects value
-evaluateClosureBody = raise . Eff.send . Eval
+evaluateClosureBody :: (Effectful m, Member (EvalClosure term value) effects) => term -> m effects value
+evaluateClosureBody = raise . Eff.send . EvalClosure
 
 
 -- | An effect for explicitly returning out of a function/method body.

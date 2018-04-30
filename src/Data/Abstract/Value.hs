@@ -209,7 +209,7 @@ instance AbstractHole (Value location) where
   hole = injValue Hole
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Member (Eval term (Value location)) effects
+instance ( Member (EvalClosure term (Value location)) effects
          , Member Fail effects
          , Member (LoopControl (Value location)) effects
          , Member (Resumable (AddressError location (Value location))) effects

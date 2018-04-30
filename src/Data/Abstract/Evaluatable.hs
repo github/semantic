@@ -45,7 +45,7 @@ type MonadEvaluatable location term value effects m =
   ( Declarations term
   , Evaluatable (Base term)
   , FreeVariables term
-  , Member (Eval term value) effects
+  , Member (EvalClosure term value) effects
   , Member Fail effects
   , Member (LoopControl value) effects
   , Member (Resumable (Unspecialized value)) effects
@@ -246,7 +246,7 @@ evaluateModule :: forall location term value effects m
 evaluateModule m = analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evalTerm) m)
   where evalTerm term = catchReturn @m @value
           (raiseHandler
-            (interpose @(Eval term value) pure (\ (Eval term) yield -> lower (evalTerm term) >>= yield))
+            (interpose @(EvalClosure term value) pure (\ (EvalClosure term) yield -> lower (evalTerm term) >>= yield))
             (foldSubterms (analyzeTerm eval) term))
           (\ (Return value) -> pure value)
 
