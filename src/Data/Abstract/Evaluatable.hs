@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , MonadEvaluatable
@@ -8,7 +8,6 @@ module Data.Abstract.Evaluatable
 , LoadError(..)
 , ResolutionError(..)
 , variable
-, evaluateTerm
 , evaluateModule
 , evaluatePackage
 , evaluatePackageBody
@@ -23,7 +22,8 @@ module Data.Abstract.Evaluatable
 
 import           Control.Abstract.Addressable as X
 import           Control.Abstract.Analysis as X hiding (LoopControl(..), Return(..))
-import           Control.Abstract.Analysis (LoopControl, Return)
+import           Control.Abstract.Analysis (LoopControl, Return(..))
+import           Control.Monad.Effect as Eff
 import           Data.Abstract.Address
 import           Data.Abstract.Declarations as X
 import           Data.Abstract.Environment as X
@@ -45,6 +45,7 @@ type MonadEvaluatable location term value effects m =
   ( Declarations term
   , Evaluatable (Base term)
   , FreeVariables term
+  , Member (Eval term value) effects
   , Member Fail effects
   , Member (LoopControl value) effects
   , Member (Resumable (Unspecialized value)) effects
@@ -237,19 +238,17 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= eva
       | otherwise = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
 
 
--- | Evaluate a term to a value using the semantics of the current analysis.
---
---   This should always be called when e.g. evaluating the bodies of closures instead of explicitly folding either 'eval' or 'analyzeTerm' over subterms, except in 'MonadAnalysis' instances themselves. On the other hand, top-level evaluation should be performed using 'evaluateModule'.
-evaluateTerm :: MonadEvaluatable location term value effects m
-             => term
-             -> m effects value
-evaluateTerm = foldSubterms (analyzeTerm eval)
-
 -- | Evaluate a (root-level) term to a value using the semantics of the current analysis. This should be used to evaluate single-term programs, or (via 'evaluateModules') the entry point of multi-term programs.
-evaluateModule :: MonadEvaluatable location term value effects m
+evaluateModule :: forall location term value effects m
+               .  MonadEvaluatable location term value effects m
                => Module term
                -> m effects value
-evaluateModule m = analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evaluateTerm) m)
+evaluateModule m = analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evalTerm) m)
+  where evalTerm term = catchReturn @m @value
+          (raiseHandler
+            (interpose @(Eval term value) pure (\ (Eval term) yield -> lower (evalTerm term) >>= yield))
+            (foldSubterms (analyzeTerm eval) term))
+          (\ (Return value) -> pure value)
 
 -- | Evaluate a given package.
 evaluatePackage :: MonadEvaluatable location term value effects m

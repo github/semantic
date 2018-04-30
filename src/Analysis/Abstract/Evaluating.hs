@@ -20,7 +20,8 @@ deriving instance Member NonDet effects => Alternative (Evaluating location term
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects location term value
-  = '[ Return value
+  = '[ Eval term value
+     , Return value
      , LoopControl value
      , Fail                                        -- Failure with an error message
      , Fresh                                       -- For allocating new addresses and/or type variables.
@@ -50,7 +51,7 @@ instance ( Corecursive term
   analyzeModule eval m = pushOrigin (moduleOrigin (subterm <$> m)) (eval m)
 
 
-instance (AbstractHole value, Show value) => Interpreter (Evaluating location term value) (EvaluatingEffects location term value) where
+instance (AbstractHole value, Show term, Show value) => Interpreter (Evaluating location term value) (EvaluatingEffects location term value) where
   type Result (Evaluating location term value) (EvaluatingEffects location term value) result
     = ( Either String result
       , EvaluatorState location term value)
@@ -68,4 +69,5 @@ instance (AbstractHole value, Show value) => Interpreter (Evaluating location te
       . Eff.interpret (\ control -> case control of
         Break value -> traceM ("Evaluating.interpret: resuming uncaught break with " <> show value) $> value
         Continue    -> traceM ("Evaluating.interpret: resuming uncaught continue with hole") $> hole)
-      . Eff.interpret (\ (Return value) -> traceM ("Evaluating.interpret: resuming uncaught return with " <> show value) $> value))
+      . Eff.interpret (\ (Return value) -> traceM ("Evaluating.interpret: resuming uncaught return with " <> show value) $> value)
+      . Eff.interpret (\ (Eval term) -> traceM ("Evaluating.interpret: resuming uncaught Eval of " <> show term <> " with hole") $> hole))

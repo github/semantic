@@ -48,6 +48,7 @@ module Control.Abstract.Evaluator
   , goto
   -- Effects
   , Eval(..)
+  , evaluateTerm
   , Return(..)
   , earlyReturn
   , catchReturn
@@ -363,6 +364,9 @@ goto label comp = do
 
 data Eval term value resume where
   Eval :: term -> Eval term value value
+
+evaluateTerm :: (Effectful m, Member (Eval term value) effects) => term -> m effects value
+evaluateTerm = raise . Eff.send . Eval
 
 
 -- | An effect for explicitly returning out of a function/method body.
