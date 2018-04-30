@@ -27,12 +27,12 @@ import Prologue
 --   This typeclass is left intentionally unconstrained to avoid circular dependencies between it and other typeclasses.
 class MonadEvaluator location term value effects m => MonadAnalysis location term value effects m where
   -- | Analyze a term using the semantics of the current analysis.
-  analyzeTerm :: (Base term (Subterm term (outer effects value)) -> m effects value)
-              -> (Base term (Subterm term (outer effects value)) -> m effects value)
+  analyzeTerm :: (Base term (Subterm term (outer value)) -> m effects value)
+              -> (Base term (Subterm term (outer value)) -> m effects value)
 
   -- | Analyze a module using the semantics of the current analysis. This should generally only be called by 'evaluateModule' and by definitions of 'analyzeModule' in instances for composite analyses.
-  analyzeModule :: (Module (Subterm term (outer effects value)) -> m effects value)
-                -> (Module (Subterm term (outer effects value)) -> m effects value)
+  analyzeModule :: (Module (Subterm term (outer value)) -> m effects value)
+                -> (Module (Subterm term (outer value)) -> m effects value)
 
   -- | Isolate the given action with an empty global environment and exports.
   isolate :: m effects a -> m effects a
