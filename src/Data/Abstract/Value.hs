@@ -230,7 +230,7 @@ instance ( Monad (m effects)
 
   klass n [] env = pure . injValue $ Class n env
   klass n supers env = do
-    product <- foldl mergeEnvs emptyEnv . catMaybes <$> (traverse scopedEnvironment supers)
+    product <- foldl mergeEnvs emptyEnv . catMaybes <$> traverse scopedEnvironment supers
     pure . injValue $ Class n (mergeEnvs product env)
 
   namespace n env = do
