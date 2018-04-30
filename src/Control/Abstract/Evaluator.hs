@@ -45,7 +45,7 @@ module Control.Abstract.Evaluator
   , throwResumable
   , throwException
   , catchException
-  -- Origin
+  -- | Origin
   , pushOrigin
   ) where
 
