@@ -362,6 +362,7 @@ goto label comp = do
 
 -- Effects
 
+-- | An effect to evaluate a closure’s body.
 data EvalClosure term value resume where
   EvalClosure :: term -> EvalClosure term value value
 
