@@ -10,7 +10,6 @@ module Data.Abstract.Evaluatable
 , variable
 , evaluatePackage
 , evaluatePackageBody
-, throwLoadError
 , throwEvalError
 , resolve
 , traceResolve
