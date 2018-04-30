@@ -21,6 +21,7 @@ module Control.Abstract.Evaluator
   , modifyExports
   , addExport
   , withExports
+  , isolate
   -- Heap
   , getHeap
   , putHeap
@@ -235,6 +236,10 @@ addExport name alias = modifyExports . Export.insert name alias
 -- | Sets the global export state for the lifetime of the given action.
 withExports :: MonadEvaluator location term value effects m => Exports location value -> m effects a -> m effects a
 withExports s = localEvaluatorState _exports (const s)
+
+-- | Isolate the given action with an empty global environment and exports.
+isolate :: MonadEvaluator location term value effects m => m effects a -> m effects a
+isolate = withEnv lowerBound . withExports lowerBound
 
 
 -- Heap
