@@ -270,7 +270,7 @@ instance ( Monad (m effects)
       | ii > genericLength list = throwResumable @(ValueError location (Value location)) (BoundsError list ii)
       | otherwise               = pure (genericIndex list ii)
     go arr idx
-      | (Just (Array arr, Integer (Number.Integer i)))   <- prjPair (arr, idx) = tryIdx arr i
+      | (Just (Array arr, Integer (Number.Integer i))) <- prjPair (arr, idx) = tryIdx arr i
       | (Just (Tuple tup, Integer (Number.Integer i))) <- prjPair (arr, idx) = tryIdx tup i
       | otherwise = throwResumable @(ValueError location (Value location)) (IndexError arr idx)
 
