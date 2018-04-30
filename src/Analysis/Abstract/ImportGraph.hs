@@ -60,12 +60,10 @@ deriving instance MonadEvaluator location term value effects m => MonadEvaluator
 
 
 instance ( Effectful m
-         , Member (Reader (SomeOrigin term)) effects
          , Member (Resumable (LoadError term value)) effects
          , Member (State ImportGraph) effects
          , Member Syntax.Identifier syntax
          , MonadAnalysis (Located location term) term value effects m
-         , Show ann
          , term ~ Term (Union syntax) ann
          )
       => MonadAnalysis (Located location term) term value effects (ImportGraphing m) where
