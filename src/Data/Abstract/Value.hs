@@ -1,13 +1,20 @@
 {-# LANGUAGE GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value where
 
-import Control.Abstract.Analysis
-import Data.Abstract.Environment (Environment)
+import Control.Abstract.Addressable
+import Control.Abstract.Evaluator
+import Control.Abstract.Value
+import Control.Effect
+import Control.Monad.Effect.Fail
+import Control.Monad.Effect.Resumable
+import Data.Abstract.Address
+import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
-import Data.Abstract.Evaluatable
+import Data.Abstract.FreeVariables
 import qualified Data.Abstract.Number as Number
 import Data.Scientific (Scientific)
 import Data.Scientific.Exts
+import Data.Semigroup.Reducer
 import qualified Data.Set as Set
 import Prologue hiding (TypeError)
 import Prelude hiding (Float, Integer, String, Rational)
@@ -202,9 +209,17 @@ instance AbstractHole (Value location) where
   hole = injValue Hole
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Monad (m effects)
+instance ( Member (Eval term (Value location)) effects
+         , Member Fail effects
+         , Member (LoopControl (Value location)) effects
+         , Member (Resumable (AddressError location (Value location))) effects
          , Member (Resumable (ValueError location (Value location))) effects
-         , MonadEvaluatable location term (Value location) effects m
+         , Member (Return (Value location)) effects
+         , Monad (m effects)
+         , MonadAddressable location effects m
+         , MonadEvaluator location term (Value location) effects m
+         , Recursive term
+         , Reducer (Value location) (Cell location (Value location))
          , Show location
          )
       => MonadValue location (Value location) effects m where
