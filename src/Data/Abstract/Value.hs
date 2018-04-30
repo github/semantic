@@ -333,16 +333,19 @@ instance ( Monad (m effects)
   call op params = do
     case prjValue op of
       Just (Closure names label env) -> do
-        bindings <- foldr (\ (name, param) rest -> do
-          v <- param
-          a <- alloc name
-          assign a v
-          Env.insert name a <$> rest) (pure env) (zip names params)
-        localEnv (mergeEnvs bindings) (evalClosure label)
+        -- Evaluate the bindings and the body within a `goto` in order to
+        -- charge their origins to the closure's origin.
+        goto label $ \body -> do
+          bindings <- foldr (\ (name, param) rest -> do
+            v <- param
+            a <- alloc name
+            assign a v
+            Env.insert name a <$> rest) (pure env) (zip names params)
+          localEnv (mergeEnvs bindings) (evalClosure body)
       Nothing -> throwValueError (CallError op)
     where
-      evalClosure :: Label -> m effects (Value location)
-      evalClosure lab = catchException (goto lab >>= evaluateTerm) handleReturn
+      evalClosure :: term -> m effects (Value location)
+      evalClosure term = catchException (evaluateTerm term) handleReturn
 
       handleReturn :: ReturnThrow (Value location) -> m effects (Value location)
       handleReturn (Ret v) = pure v
