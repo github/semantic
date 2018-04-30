@@ -345,7 +345,7 @@ instance ( Monad (m effects)
           localEnv (mergeEnvs bindings) (evalClosure body)
       Nothing -> throwValueError (CallError op)
     where
-      evalClosure term = catchReturn @m @(Value location) (evaluateTerm term) (\ (Return value) -> pure value)
+      evalClosure term = catchReturn @m @(Value location) (evaluateClosureBody term) (\ (Return value) -> pure value)
 
   loop x = catchLoopControl @m @(Value location) (fix x) (\ control -> case control of
     Break value -> pure value
