@@ -59,8 +59,7 @@ module Control.Abstract.Evaluator
   , pushOrigin
   ) where
 
-import Control.Effect hiding (lower)
-import qualified Control.Effect as Effect
+import Control.Effect
 import qualified Control.Monad.Effect as Eff
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
@@ -118,7 +117,7 @@ instance (Ord location, Semigroup (Cell location value)) => Semigroup (Evaluator
   EvaluatorState e1 h1 m1 l1 x1 j1 <> EvaluatorState e2 h2 m2 l2 x2 j2 = EvaluatorState (e1 <> e2) (h1 <> h2) (m1 <> m2) (l1 <> l2) (x1 <> x2) (j1 <> j2)
 
 instance Lower (EvaluatorState location term value) where
-  lower = EvaluatorState lower lower lower lower lower lower
+  lowerBound = EvaluatorState lowerBound lowerBound lowerBound lowerBound lowerBound lowerBound
 
 
 -- Lenses
@@ -375,7 +374,7 @@ throwReturn :: (Effectful m, Member (Return value) effects) => value -> m effect
 throwReturn = raise . Eff.send . Return
 
 catchReturn :: (Effectful m, Member (Return value) effects) => m effects a -> (forall x . Return value x -> m effects a) -> m effects a
-catchReturn action handler = raiseHandler (Eff.interpose pure (\ ret _ -> Effect.lower (handler ret))) action
+catchReturn action handler = raiseHandler (Eff.interpose pure (\ ret _ -> lower (handler ret))) action
 
 
 -- | Effects for control flow around loops (breaking and continuing).
@@ -393,7 +392,7 @@ throwContinue :: (Effectful m, Member (LoopControl value) effects) => m effects 
 throwContinue = raise (Eff.send Continue)
 
 catchLoopControl :: (Effectful m, Member (LoopControl value) effects) => m effects a -> (forall x . LoopControl value x -> m effects a) -> m effects a
-catchLoopControl action handler = raiseHandler (Eff.interpose pure (\ control _ -> Effect.lower (handler control))) action
+catchLoopControl action handler = raiseHandler (Eff.interpose pure (\ control _ -> lower (handler control))) action
 
 
 -- | Push a 'SomeOrigin' onto the stack. This should be used to contextualize execution with information about the originating term, module, or package.

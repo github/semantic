@@ -44,4 +44,4 @@ instance (Ord key, Reducer a value) => Reducer (key, a) (Map key value) where
   cons (key, a) (Map m) = Map (Map.insertWith (<>) key (unit a) m)
   snoc (Map m) (key, a) = Map (Map.insertWith (flip (<>)) key (unit a) m)
 
-instance Lower (Map key value) where lower = Map lower
+instance Lower (Map key value) where lowerBound = Map lowerBound

@@ -13,28 +13,28 @@ class Lower s where
   --
   --   Laws:
   --
-  --   If @s@ is 'Bounded', we require 'lower' and 'minBound' to agree:
+  --   If @s@ is 'Bounded', we require 'lowerBound' and 'minBound' to agree:
   --
-  --   > lower = minBound
+  --   > lowerBound = minBound
   --
-  --   If @s@ is a 'Join' semilattice, 'lower' must be the identity of '(\/)':
+  --   If @s@ is a 'Join' semilattice, 'lowerBound' must be the identity of '(\/)':
   --
-  --   > lower \/ a = a
+  --   > lowerBound \/ a = a
   --
-  --   If @s@ is 'Ord'ered, 'lower' must be at least as small as every terminating value:
+  --   If @s@ is 'Ord'ered, 'lowerBound' must be at least as small as every terminating value:
   --
-  --   > compare lower a /= GT
-  lower :: s
-  default lower :: Bounded s => s
-  lower = minBound
+  --   > compare lowerBound a /= GT
+  lowerBound :: s
+  default lowerBound :: Bounded s => s
+  lowerBound = minBound
 
-instance Lower b => Lower (a -> b) where lower = const lower
+instance Lower b => Lower (a -> b) where lowerBound = const lowerBound
 
-instance Lower (Maybe a) where lower = Nothing
-instance Lower [a] where lower = []
+instance Lower (Maybe a) where lowerBound = Nothing
+instance Lower [a] where lowerBound = []
 
 -- containers
-instance Lower (IntMap a) where lower = IntMap.empty
-instance Lower IntSet where lower = IntSet.empty
-instance Lower (Map k a) where lower = Map.empty
-instance Lower (Set a) where lower = Set.empty
+instance Lower (IntMap a) where lowerBound = IntMap.empty
+instance Lower IntSet where lowerBound = IntSet.empty
+instance Lower (Map k a) where lowerBound = Map.empty
+instance Lower (Set a) where lowerBound = Set.empty

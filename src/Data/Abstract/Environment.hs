@@ -140,4 +140,4 @@ addresses :: Ord l => Environment l a -> Live l a
 addresses = Live . fromList . fmap snd . pairs
 
 
-instance Lower (Environment location value) where lower = Environment (lower:|[])
+instance Lower (Environment location value) where lowerBound = Environment (lowerBound:|[])
