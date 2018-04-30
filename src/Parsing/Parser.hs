@@ -52,8 +52,7 @@ type family ApplyAll' (typeclasses :: [(* -> *) -> Constraint]) (fs :: [* -> *])
 
 -- | A parser, suitable for program analysis, for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
 data SomeAnalysisParser typeclasses ann where
-  SomeAnalysisParser :: ( Member Syntax.Empty fs
-                        , Member Syntax.Identifier fs
+  SomeAnalysisParser :: ( Member Syntax.Identifier fs
                         , ApplyAll' typeclasses fs)
                      => Parser (Term (Union fs) ann) -- ^ A parser.
                      -> Maybe File                   -- ^ Maybe path to prelude.

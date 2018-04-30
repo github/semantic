@@ -13,14 +13,13 @@ import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable (LoadError (..))
 import           Data.Abstract.FreeVariables
 import           Data.Abstract.Located
-import qualified Data.Abstract.Module as Module
+import           Data.Abstract.Module hiding (Module)
 import           Data.Abstract.Origin hiding (Module, Package)
 import           Data.Abstract.Package hiding (Package)
 import           Data.Aeson hiding (Result)
 import qualified Data.ByteString.Char8 as BC
 import           Data.ByteString.Lazy (toStrict)
 import           Data.Output
-import           Data.Semilattice.Lower
 import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Data.Text.Encoding as T
@@ -61,10 +60,8 @@ deriving instance MonadEvaluator location term value effects m => MonadEvaluator
 
 
 instance ( Effectful m
-         , Lower ann
          , Member (Resumable (LoadError term)) effects
          , Member (State ImportGraph) effects
-         , Member Syntax.Empty syntax
          , Member Syntax.Identifier syntax
          , MonadAnalysis (Located location term) term value effects m
          , term ~ Term (Union syntax) ann
@@ -79,10 +76,10 @@ instance ( Effectful m
     resume
       @(LoadError term)
       (liftAnalyze analyzeTerm eval term)
-      (\yield (LoadError name) -> moduleInclusion (Module (BC.pack name)) *> yield (Module.Module (Module.ModuleInfo name) (termIn lowerBound (inj Syntax.Empty)) :|[]))
+      (\yield (LoadError name) -> moduleInclusion (Module (BC.pack name)) >> yield [])
 
   analyzeModule recur m = do
-    let name = BC.pack (Module.modulePath (Module.moduleInfo m))
+    let name = BC.pack (modulePath (moduleInfo m))
     packageInclusion (Module name)
     moduleInclusion (Module name)
     liftAnalyze analyzeModule recur m
@@ -91,7 +88,7 @@ packageGraph :: SomeOrigin term -> ImportGraph
 packageGraph = maybe empty (vertex . Package . unName . packageName) . withSomeOrigin originPackage
 
 moduleGraph :: SomeOrigin term -> ImportGraph
-moduleGraph = maybe empty (vertex . Module . BC.pack . Module.modulePath) . withSomeOrigin originModule
+moduleGraph = maybe empty (vertex . Module . BC.pack . modulePath) . withSomeOrigin originModule
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: forall m location term value effects
