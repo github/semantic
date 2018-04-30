@@ -48,7 +48,7 @@ type MonadEvaluatable location term value effects m =
   , Member Fail effects
   , Member (LoopControl value) effects
   , Member (Resumable (Unspecialized value)) effects
-  , Member (Resumable (LoadError term value)) effects
+  , Member (Resumable (LoadError term)) effects
   , Member (Resumable (EvalError value)) effects
   , Member (Resumable (ResolutionError value)) effects
   , Member (Resumable (AddressError location value)) effects
@@ -78,14 +78,14 @@ instance Eq1 (ResolutionError value) where
   liftEq _ _ _ = False
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
-data LoadError term value resume where
-  LoadError :: ModulePath -> LoadError term value [Module term]
+data LoadError term resume where
+  LoadError :: ModulePath -> LoadError term [Module term]
 
-deriving instance Eq (LoadError term a b)
-deriving instance Show (LoadError term a b)
-instance Show1 (LoadError term value) where
+deriving instance Eq (LoadError term resume)
+deriving instance Show (LoadError term resume)
+instance Show1 (LoadError term) where
   liftShowsPrec _ _ = showsPrec
-instance Eq1 (LoadError term a) where
+instance Eq1 (LoadError term) where
   liftEq _ (LoadError a) (LoadError b) = a == b
 
 -- | The type of error thrown when failing to evaluate a term.
@@ -126,7 +126,7 @@ instance Eq1 (EvalError term) where
   liftEq _ _ _                                             = False
 
 
-throwLoadError :: (Member (Resumable (LoadError term value)) effects, MonadEvaluator location term value effects m) => LoadError term value resume -> m effects resume
+throwLoadError :: (Member (Resumable (LoadError term)) effects, MonadEvaluator location term value effects m) => LoadError term resume -> m effects resume
 throwLoadError = throwResumable
 
 throwEvalError :: (Member (Resumable (EvalError value)) effects, MonadEvaluator location term value effects m) => EvalError value resume -> m effects resume
@@ -191,7 +191,7 @@ listModulesInDir dir = ModuleTable.modulePathsInDir dir <$> askModuleTable
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
 require :: ( Member (EvalModule term value) effects
-           , Member (Resumable (LoadError term value)) effects
+           , Member (Resumable (LoadError term)) effects
            , MonadEvaluator location term value effects m
            , MonadValue location value effects m
            )
@@ -199,7 +199,7 @@ require :: ( Member (EvalModule term value) effects
         -> m effects (Environment location value, value)
 require = requireWith evaluateModule
 
-requireWith :: ( Member (Resumable (LoadError term value)) effects
+requireWith :: ( Member (Resumable (LoadError term)) effects
                , MonadEvaluator location term value effects m
                , MonadValue location value effects m
                )
@@ -212,7 +212,7 @@ requireWith with name = getModuleTable >>= maybeM (loadWith with name) . ModuleT
 --
 -- Always loads/evaluates.
 load :: ( Member (EvalModule term value) effects
-        , Member (Resumable (LoadError term value)) effects
+        , Member (Resumable (LoadError term)) effects
         , MonadEvaluator location term value effects m
         , MonadValue location value effects m
         )
@@ -220,7 +220,7 @@ load :: ( Member (EvalModule term value) effects
      -> m effects (Environment location value, value)
 load = loadWith evaluateModule
 
-loadWith :: ( Member (Resumable (LoadError term value)) effects
+loadWith :: ( Member (Resumable (LoadError term)) effects
             , MonadEvaluator location term value effects m
             , MonadValue location value effects m
             )

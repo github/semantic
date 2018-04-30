@@ -60,7 +60,7 @@ deriving instance MonadEvaluator location term value effects m => MonadEvaluator
 
 
 instance ( Effectful m
-         , Member (Resumable (LoadError term value)) effects
+         , Member (Resumable (LoadError term)) effects
          , Member (State ImportGraph) effects
          , Member Syntax.Identifier syntax
          , MonadAnalysis (Located location term) term value effects m
@@ -74,7 +74,7 @@ instance ( Effectful m
         variableDefinition name
       _ -> pure ()
     resume
-      @(LoadError term value)
+      @(LoadError term)
       (liftAnalyze analyzeTerm eval term)
       (\yield (LoadError name) -> moduleInclusion (Module (BC.pack name)) >> yield [])
 

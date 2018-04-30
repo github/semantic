@@ -69,7 +69,7 @@ type ImportGraphAnalysis term
   ( BadVariables
   ( BadValues
   ( BadSyntax
-  ( Erroring (Analysis.LoadError term (Value (Located Precise term)))
+  ( Erroring (Analysis.LoadError term)
   ( Evaluating
     (Located Precise term)
     term

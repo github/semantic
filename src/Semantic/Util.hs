@@ -40,7 +40,7 @@ type JustEvaluating term
   ( Erroring (ResolutionError (Value (Located Precise term)))
   ( Erroring (Unspecialized (Value (Located Precise term)))
   ( Erroring (ValueError (Located Precise term) (Value (Located Precise term)))
-  ( Erroring (LoadError term (Value (Located Precise term)))
+  ( Erroring (LoadError term)
   ( Evaluating (Located Precise term) term (Value (Located Precise term))))))))
 
 type EvaluatingWithHoles term
@@ -49,7 +49,7 @@ type EvaluatingWithHoles term
   ( BadVariables
   ( BadValues
   ( BadSyntax
-  ( Erroring (LoadError term (Value (Located Precise term)))
+  ( Erroring (LoadError term)
   ( Evaluating (Located Precise term) term (Value (Located Precise term))))))))
 
 -- The order is significant here: Caching has to come on the outside, or its Interpreter instance
@@ -61,7 +61,7 @@ type Checking term
   ( Erroring (EvalError Type)
   ( Erroring (ResolutionError Type)
   ( Erroring (Unspecialized Type)
-  ( Erroring (LoadError term Type)
+  ( Erroring (LoadError term)
   ( Retaining
   ( Evaluating Monovariant term Type))))))))
 
