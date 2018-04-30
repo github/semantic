@@ -191,7 +191,11 @@ listModulesInDir dir = ModuleTable.modulePathsInDir dir <$> askModuleTable
 -- | Require/import another module by name and return it's environment and value.
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
-require :: MonadEvaluatable location term value effects m
+require :: ( Member (EvalModule term value) effects
+           , Member (Resumable (LoadError term value)) effects
+           , MonadEvaluator location term value effects m
+           , MonadValue location value effects m
+           )
         => ModulePath
         -> m effects (Environment location value, value)
 require = requireWith evaluateModule
@@ -208,7 +212,11 @@ requireWith with name = getModuleTable >>= maybeM (loadWith with name) . ModuleT
 -- | Load another module by name and return it's environment and value.
 --
 -- Always loads/evaluates.
-load :: MonadEvaluatable location term value effects m
+load :: ( Member (EvalModule term value) effects
+        , Member (Resumable (LoadError term value)) effects
+        , MonadEvaluator location term value effects m
+        , MonadValue location value effects m
+        )
      => ModulePath
      -> m effects (Environment location value, value)
 load = loadWith evaluateModule
