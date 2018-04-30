@@ -6,6 +6,7 @@ import Data.Abstract.Environment (Environment)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import qualified Data.Abstract.Number as Number
+import Data.List (genericIndex, genericLength)
 import Data.Scientific (Scientific)
 import Data.Scientific.Exts
 import qualified Data.Set as Set
@@ -264,6 +265,14 @@ instance ( Monad (m effects)
 
   isHole val = pure (prjValue val == Just Hole)
 
+  index = go where
+    tryIdx list ii
+      | ii > genericLength list = throwValueError (BoundsError list ii)
+      | otherwise               = pure (genericIndex list ii)
+    go arr idx
+      | (Just (Array arr, Integer (Number.Integer i))) <- prjPair (arr, idx) = tryIdx arr i
+      | (Just (Tuple tup, Integer (Number.Integer i))) <- prjPair (arr, idx) = tryIdx tup i
+      | otherwise = throwValueError (IndexError arr idx)
 
   liftNumeric f arg
     | Just (Integer (Number.Integer i)) <- prjValue arg = integer $ f i
