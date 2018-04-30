@@ -333,6 +333,8 @@ instance ( Monad (m effects)
   call op params = do
     case prjValue op of
       Just (Closure names label env) -> do
+        -- Evaluate the bindings and the body within a `goto` in order to
+        -- charge their origins to the closure's origin.
         goto label $ \body -> do
           bindings <- foldr (\ (name, param) rest -> do
             v <- param
