@@ -55,7 +55,7 @@ type MonadEvaluatable location term value effects m =
   , Member (Resumable (AddressError location value)) effects
   , Member (Return value) effects
   , MonadAddressable location effects m
-  , MonadAnalysis location term value effects m
+  , MonadEvaluator location term value effects m
   , MonadValue location value effects m
   , Recursive term
   , Reducer value (Cell location value)
@@ -266,7 +266,9 @@ loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup nam
 
 -- | Evaluate a (root-level) term to a value using the semantics of the current analysis.
 evalModule :: forall location term value effects m
-           .  MonadEvaluatable location term value effects m
+           .  ( MonadAnalysis location term value effects m
+              , MonadEvaluatable location term value effects m
+              )
            => Module term
            -> m effects value
 evalModule m = raiseHandler
@@ -279,13 +281,17 @@ evalModule m = raiseHandler
           (\ (Return value) -> pure value)
 
 -- | Evaluate a given package.
-evaluatePackage :: MonadEvaluatable location term value effects m
+evaluatePackage :: ( MonadAnalysis location term value effects m
+                   , MonadEvaluatable location term value effects m
+                   )
                 => Package term
                 -> m effects [value]
 evaluatePackage p = pushOrigin (packageOrigin p) (evaluatePackageBody (packageBody p))
 
 -- | Evaluate a given package body (module table and entry points).
-evaluatePackageBody :: MonadEvaluatable location term value effects m
+evaluatePackageBody :: ( MonadAnalysis location term value effects m
+                       , MonadEvaluatable location term value effects m
+                       )
                     => PackageBody term
                     -> m effects [value]
 evaluatePackageBody body = withPrelude (packagePrelude body) $
