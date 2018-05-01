@@ -86,10 +86,10 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
 
     importGraphCommand = command "import-graph" (info importGraphArgumentsParser (progDesc "Compute an import graph for a directory or entry point"))
     importGraphArgumentsParser = do
-      renderer <- flag (SomeRenderer DOTCallGraphRenderer) (SomeRenderer DOTCallGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
-              <|> flag'                                (SomeRenderer JSONCallGraphRenderer) (long "json" <> help "Output JSON graph")
-      rootDir <- optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIRECTORY"))
-      excludeDirs <- many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)"))
+      renderer <- flag (SomeRenderer DOTImportGraphRenderer) (SomeRenderer DOTImportGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
+              <|> flag'                                (SomeRenderer JSONImportGraphRenderer) (long "json" <> help "Output JSON graph")
+      rootDir <- rootDirectoryOption
+      excludeDirs <- excludeDirsOption
       File{..} <- argument filePathReader (metavar "DIRECTORY:LANGUAGE")
       pure $ runGraph renderer rootDir filePath (fromJust fileLanguage) excludeDirs
 
@@ -97,11 +97,13 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     callGraphArgumentsParser = do
       renderer <- flag (SomeRenderer DOTCallGraphRenderer) (SomeRenderer DOTCallGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
               <|> flag'                                (SomeRenderer JSONCallGraphRenderer) (long "json" <> help "Output JSON graph")
-      rootDir <- optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIRECTORY"))
+      rootDir <- rootDirectoryOption
       excludeDirs <- many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)"))
       File{..} <- argument filePathReader (metavar "DIRECTORY:LANGUAGE")
       pure $ runGraph renderer rootDir filePath (fromJust fileLanguage) excludeDirs
 
+    rootDirectoryOption = optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIRECTORY"))
+    excludeDirsOption = many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)"))
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of
         [a, b] | lang <- readMaybe b -> Right (File a lang)
