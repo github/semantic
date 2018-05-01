@@ -6,8 +6,6 @@ module Analysis.Abstract.Evaluating
 import Control.Abstract.Analysis
 import qualified Control.Monad.Effect as Eff
 import Data.Abstract.Environment
-import Data.Abstract.Module
-import Data.Abstract.ModuleTable
 import Data.Abstract.Origin
 import Data.Semilattice.Lower
 import Prologue
@@ -39,7 +37,6 @@ instance ( Member (Reader (Environment location value)) effects
 
 instance ( Corecursive term
          , Member (Reader (Environment location value)) effects
-         , Member (Reader (ModuleTable [Module term])) effects
          , Member (Reader (SomeOrigin term)) effects
          , Member (State (EvaluatorState location term value)) effects
          , Recursive term
