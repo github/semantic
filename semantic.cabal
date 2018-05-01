@@ -25,6 +25,7 @@ library
                      , Analysis.Abstract.Dead
                      , Analysis.Abstract.Erroring
                      , Analysis.Abstract.Evaluating
+                     , Analysis.Abstract.CallGraph
                      , Analysis.Abstract.ImportGraph
                      , Analysis.Abstract.Tracing
                      , Analysis.Abstract.TypeChecking
