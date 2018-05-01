@@ -1,0 +1,29 @@
+(Program
+  (Function
+    (Empty)
+    (Empty)
+    (Identifier)
+    (RequiredParameter
+      (Empty)
+      (Empty)
+      (Empty)
+      (Assignment
+        (Identifier)
+        (Empty)))
+    (RequiredParameter
+      (Empty)
+      (Empty)
+      (Empty)
+      (Assignment
+        (Identifier)
+        (Empty)))
+    (
+      (DoWhile
+      { (Identifier)
+      ->(Identifier) }
+        (
+          (Call
+            (Identifier)
+          { (Identifier)
+          ->(Identifier) }
+            (Empty)))))))

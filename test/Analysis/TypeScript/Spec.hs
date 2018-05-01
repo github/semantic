@@ -1,8 +1,13 @@
 {-# LANGUAGE OverloadedLists #-}
 module Analysis.TypeScript.Spec (spec) where
 
-import SpecHelpers
+import Data.Abstract.Evaluatable
+import qualified Language.TypeScript.Assignment as TypeScript
+import Data.Abstract.Value as Value
+import Data.Abstract.Number as Number
+import qualified Data.Language as Language
 
+import SpecHelpers
 
 spec :: Spec
 spec = parallel $ do
@@ -25,12 +30,17 @@ spec = parallel $ do
 
     it "side effect only imports" $ do
       env <- environment . snd <$> evaluate "main2.ts"
-      env `shouldBe` mempty
+      env `shouldBe` emptyEnv
 
     it "fails exporting symbols not defined in the module" $ do
       v <- fst <$> evaluate "bad-export.ts"
-      v `shouldBe` Left "module \"foo.ts\" does not export \"pip\""
+      v `shouldBe` Right (Right (Right (Right (Right (Left (SomeExc (ExportError "foo.ts" (Name "pip"))))))))
+
+    it "evaluates early return statements" $ do
+      res <- evaluate "early-return.ts"
+      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (pure (injValue (Value.Float (Number.Decimal 123.0))))))))))
 
   where
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate entry = evalTypeScriptProject (fixtures <> entry)
+    evalTypeScriptProject path = interpret @(TestEvaluating TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path

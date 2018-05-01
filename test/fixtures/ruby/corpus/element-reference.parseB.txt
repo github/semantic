@@ -1,0 +1,9 @@
+(Program
+  (Subscript
+    (Send
+      (Identifier))
+    (TextElement))
+  (Subscript
+    (Send
+      (Identifier))
+    (Symbol)))

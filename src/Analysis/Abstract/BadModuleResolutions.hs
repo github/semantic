@@ -1,32 +1,25 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.BadModuleResolutions where
 
 import Control.Abstract.Analysis
 import Data.Abstract.Evaluatable
-import Analysis.Abstract.Evaluating
 import Prologue
 
-newtype BadModuleResolutions m (effects :: [* -> *]) a = BadModuleResolutions (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
+newtype BadModuleResolutions m (effects :: [* -> *]) a = BadModuleResolutions { runBadModuleResolutions :: m effects a }
+  deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
-deriving instance MonadControl term (m effects)                    => MonadControl term (BadModuleResolutions m effects)
-deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (BadModuleResolutions m effects)
-deriving instance MonadHeap location value (m effects)             => MonadHeap location value (BadModuleResolutions m effects)
-deriving instance MonadModuleTable location term value (m effects) => MonadModuleTable location term value (BadModuleResolutions m effects)
-deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (BadModuleResolutions m effects)
+deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadModuleResolutions m)
+deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadModuleResolutions m)
 
-instance ( Effectful m
-         , Member (Resumable (ResolutionError value)) effects
-         , Member (State (EvaluatingState location term value)) effects
-         , Member (State [Name]) effects
-         , MonadAnalysis location term value (m effects)
-         , MonadValue location value (BadModuleResolutions m effects)
+instance ( Interpreter m effects
+         , MonadEvaluator location term value effects m
          )
-      => MonadAnalysis location term value (BadModuleResolutions m effects) where
-  type Effects location term value (BadModuleResolutions m effects) = State [Name] ': Effects location term value (m effects)
-
-  analyzeTerm eval term = resumeException @(ResolutionError value) (liftAnalyze analyzeTerm eval term) (
-        \yield error -> case error of
-          (RubyError nameToResolve) -> yield nameToResolve)
-
-  analyzeModule = liftAnalyze analyzeModule
+      => Interpreter (BadModuleResolutions m) (Resumable (ResolutionError value) ': effects) where
+  type Result (BadModuleResolutions m) (Resumable (ResolutionError value) ': effects) result = Result m effects result
+  interpret
+    = interpret
+    . runBadModuleResolutions
+    . raiseHandler (relay pure (\ (Resumable err) yield -> traceM ("ResolutionError:" <> show err) *> case err of
+      NotFoundError nameToResolve _ _ -> yield  nameToResolve
+      GoImportError pathToResolve     -> yield [pathToResolve]))

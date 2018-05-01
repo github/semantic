@@ -1,9 +1,0 @@
-(Program
-  (Try
-    (
-      (Identifier)
-      (Catch
-        (
-          (
-            (Identifier)))
-        (Identifier)))))

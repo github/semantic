@@ -1,0 +1,23 @@
+(Program
+  (For
+    (Assignment
+      (Identifier)
+      (Float))
+    (LessThan
+      (Identifier)
+      (Float))
+    (Update
+      (Identifier))
+    (
+      (If
+        (Equal
+          (Identifier)
+          (Float))
+        (
+        {+(Continue
+          {+(Empty)+})+}
+        {-(Break
+          {-(Empty)-})-})
+        (Empty))
+      (Empty)
+      (Identifier))))

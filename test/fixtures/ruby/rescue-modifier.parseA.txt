@@ -1,6 +1,0 @@
-(Program
-  (Try
-    (Identifier)
-    (Catch
-      (Null)
-      (Empty))))

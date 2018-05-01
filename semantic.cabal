@@ -15,16 +15,19 @@ library
   hs-source-dirs:      src
   exposed-modules:
                      -- Analyses & term annotations
-                       Analysis.Abstract.BadVariables
-                       Analysis.Abstract.BadValues
-                       Analysis.Abstract.BadModuleResolutions
+                       Analysis.Abstract.BadAddresses
+                     , Analysis.Abstract.BadSyntax
+                     , Analysis.Abstract.BadModuleResolutions
+                     , Analysis.Abstract.BadVariables
+                     , Analysis.Abstract.BadValues
                      , Analysis.Abstract.Caching
                      , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
+                     , Analysis.Abstract.Erroring
                      , Analysis.Abstract.Evaluating
                      , Analysis.Abstract.ImportGraph
-                     , Analysis.Abstract.Quiet
                      , Analysis.Abstract.Tracing
+                     , Analysis.Abstract.TypeChecking
                      , Analysis.CallGraph
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
@@ -43,12 +46,11 @@ library
                      , Control.Abstract.Value
                      -- Control flow
                      , Control.Effect
-                     -- Effects used for program analysis
-                     , Control.Effect.Fresh
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
                      , Data.Abstract.Cache
                      , Data.Abstract.Configuration
+                     , Data.Abstract.Declarations
                      , Data.Abstract.Environment
                      , Data.Abstract.Evaluatable
                      , Data.Abstract.Exports
@@ -71,6 +73,7 @@ library
                      , Data.Blob
                      , Data.Diff
                      , Data.Error
+                     , Data.File
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
                      , Data.JSON.Fields
@@ -82,6 +85,7 @@ library
                      , Data.Range
                      , Data.Record
                      , Data.Semigroup.App
+                     , Data.Semilattice.Lower
                      , Data.Scientific.Exts
                      , Data.Source
                      , Data.Span
@@ -90,6 +94,7 @@ library
                      , Data.Syntax
                      , Data.Syntax.Comment
                      , Data.Syntax.Declaration
+                     , Data.Syntax.Directive
                      , Data.Syntax.Expression
                      , Data.Syntax.Literal
                      , Data.Syntax.Statement
@@ -143,6 +148,7 @@ library
                      , Semantic.CLI
                      , Semantic.Diff
                      , Semantic.Distribute
+                     , Semantic.Graph
                      , Semantic.IO
                      , Semantic.Log
                      , Semantic.Parse
@@ -165,6 +171,7 @@ library
                      , cmark-gfm
                      , containers
                      , directory
+                     , directory-tree
                      , effects
                      , filepath
                      , free
@@ -240,6 +247,7 @@ test-suite test
                      , Analysis.Ruby.Spec
                      , Analysis.TypeScript.Spec
                      , Data.Diff.Spec
+                     , Data.Abstract.Path.Spec
                      , Data.Functor.Classes.Generic.Spec
                      , Data.Functor.Listable
                      , Data.Mergeable.Spec

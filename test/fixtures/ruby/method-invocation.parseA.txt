@@ -1,6 +1,0 @@
-(Program
-  (Identifier)
-  (Send
-    (Identifier)
-    (Identifier))
-  (Identifier))

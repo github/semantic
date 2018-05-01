@@ -5,11 +5,12 @@ import Data.Abstract.Address
 import Data.Abstract.Live
 import qualified Data.Map.Monoidal as Monoidal
 import Data.Semigroup.Reducer
+import Data.Semilattice.Lower
 import Prologue
 
 -- | A map of addresses onto cells holding their values.
 newtype Heap l a = Heap { unHeap :: Monoidal.Map l (Cell l a) }
-  deriving (Generic1)
+  deriving (Generic1, Lower)
 
 deriving instance (Eq l, Eq (Cell l a)) => Eq (Heap l a)
 deriving instance (Ord l, Ord (Cell l a)) => Ord (Heap l a)

@@ -1,0 +1,32 @@
+(Program
+{ (Comparison
+  {-(Send
+    {-(Identifier)-})-}
+  {-(Send
+    {-(Identifier)-})-})
+->(Equal
+  {+(Send
+    {+(Identifier)+})+}
+  {+(Send
+    {+(Identifier)+})+}) }
+{+(Not
+  {+(Equal
+    {+(Send
+      {+(Identifier)+})+}
+    {+(Send
+      {+(Identifier)+})+})+})+}
+{+(Equal
+  {+(Send
+    {+(Identifier)+})+}
+  {+(Send
+    {+(Identifier)+})+})+}
+{-(Matches
+  {-(Send
+    {-(Identifier)-})-}
+  {-(Send
+    {-(Identifier)-})-})-}
+{-(Assignment
+  {-(Identifier)-}
+  {-(Not
+    {-(Send
+      {-(Identifier)-})-})-})-})

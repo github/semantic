@@ -1,0 +1,10 @@
+(Program
+  (DoWhile
+    (Boolean)
+    (
+      (Call
+        (MemberAccess
+          (Identifier)
+          (Identifier))
+        (Identifier)
+        (Empty)))))

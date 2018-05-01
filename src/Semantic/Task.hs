@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.Task
 ( Task
 , TaskEff
@@ -7,8 +7,10 @@ module Semantic.Task
 , RAlgebra
 , Differ
 -- * I/O
+, IO.readBlob
 , IO.readBlobs
 , IO.readBlobPairs
+, IO.readProject
 , IO.writeToOutput
 -- * Telemetry
 , writeLog
@@ -16,14 +18,10 @@ module Semantic.Task
 , time
 -- * High-level flow
 , parse
-, parseModule
-, parseModules
-, parsePackage
 , analyze
 , decorate
 , diff
 , render
-, graphImports
 -- * Concurrency
 , distribute
 , distributeFor
@@ -45,26 +43,15 @@ module Semantic.Task
 , Telemetry
 ) where
 
-import qualified Analysis.Abstract.ImportGraph as Abstract
-import           Analysis.Abstract.Evaluating
 import           Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
 import qualified Control.Abstract.Analysis as Analysis
-import qualified Control.Exception as Exc
 import           Control.Monad
 import           Control.Monad.Effect.Exception
 import           Control.Monad.Effect.Internal as Eff hiding (run)
 import           Control.Monad.Effect.Reader
 import           Control.Monad.Effect.Run as Run
-import           Data.Abstract.Address
-import qualified Data.Abstract.Evaluatable as Analysis
-import           Data.Abstract.FreeVariables
-import           Data.Abstract.Located
-import           Data.Abstract.Module
-import           Data.Abstract.Package as Package
-import           Data.Abstract.Value (Value)
 import           Data.Blob
-import qualified Data.ByteString as B
 import           Data.Diff
 import qualified Data.Error as Error
 import           Data.Record
@@ -73,7 +60,7 @@ import           Data.Term
 import           Parsing.CMark
 import           Parsing.Parser
 import           Parsing.TreeSitter
-import           Prologue hiding (MonadError(..))
+import           Prologue hiding (MonadError (..))
 import           Semantic.Distribute
 import qualified Semantic.IO as IO
 import           Semantic.Log
@@ -100,23 +87,8 @@ type Renderer i o = i -> o
 parse :: Member Task effs => Parser term -> Blob -> Eff effs term
 parse parser = send . Parse parser
 
--- | Parse a file into a 'Module'.
-parseModule :: Members '[IO.Files, Task] effs => Parser term -> Maybe FilePath -> FilePath -> Eff effs (Module term)
-parseModule parser rootDir path = do
-  blob <- head <$> IO.readBlobs (Right [(path, IO.languageForFilePath path)])
-  moduleForBlob rootDir blob <$> parse parser blob
-
--- | Parse a list of files into 'Module's.
-parseModules :: Members '[IO.Files, Task] effs => Parser term -> FilePath -> [FilePath] -> Eff effs [Module term]
-parseModules parser rootDir = traverse (parseModule parser (Just rootDir))
-
--- | Parse a list of files into a 'Package'.
-parsePackage :: Members '[IO.Files, Task] effs => PackageName -> Parser term -> FilePath -> [FilePath] -> Eff effs (Package term)
-parsePackage name parser rootDir paths = Package (PackageInfo name Nothing) . Package.fromModules <$> parseModules parser rootDir paths
-
-
 -- | A task running some 'Analysis.MonadAnalysis' to completion.
-analyze :: Member Task effs => Analysis.SomeAnalysis m result -> Eff effs result
+analyze :: (Analysis.Interpreter m analysisEffects, Member Task effs) => m analysisEffects result -> Eff effs (Analysis.Result m analysisEffects result)
 analyze = send . Analyze
 
 -- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
@@ -130,18 +102,6 @@ diff differ term1 term2 = send (Semantic.Task.Diff differ term1 term2)
 -- | A task which renders some input using the supplied 'Renderer' function.
 render :: Member Task effs => Renderer input output -> input -> Eff effs output
 render renderer = send . Render renderer
-
-
--- | Render and serialize the import graph for a given 'Package'.
-graphImports :: (Apply Eq1 syntax, Apply Analysis.Evaluatable syntax, Apply FreeVariables1 syntax, Apply Functor syntax, Apply Ord1 syntax, Apply Show1 syntax, Member Syntax.Identifier syntax, Members '[Exc SomeException, Task] effs, Ord ann, Show ann) => Package (Term (Union syntax) ann) -> Eff effs B.ByteString
-graphImports package = analyze (Analysis.SomeAnalysis (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package)) >>= renderGraph
-  where asAnalysisForTypeOfPackage :: Abstract.ImportGraphing (Evaluating (Located Precise term) term (Value (Located Precise term))) effects value -> Package term -> Abstract.ImportGraphing (Evaluating (Located Precise term) term (Value (Located Precise term))) effects value
-        asAnalysisForTypeOfPackage = const
-
-        renderGraph result = case result of
-          (Right (Right (Right (Right (Right (Right (_, graph)))))), _) -> pure $! Abstract.renderImportGraph graph
-          _ -> throwError (toException (Exc.ErrorCall "graphImports: import graph rendering failed"))
-
 
 -- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
 --
@@ -171,7 +131,7 @@ runTaskWithOptions options task = do
 -- | An effect describing high-level tasks to be performed.
 data Task output where
   Parse    :: Parser term -> Blob -> Task term
-  Analyze  :: Analysis.SomeAnalysis m result -> Task result
+  Analyze  :: Analysis.Interpreter m effects => m effects result -> Task (Analysis.Result m effects result)
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
   Diff     :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
   Render   :: Renderer input output -> input -> Task output
@@ -180,7 +140,7 @@ data Task output where
 runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, IO] effs => Eff (Task ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
   Parse parser blob -> runParser blob parser
-  Analyze analysis -> pure (Analysis.runSomeAnalysis analysis)
+  Analyze analysis -> pure (Analysis.interpret analysis)
   Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
   Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
   Render renderer input -> pure (renderer input)
@@ -197,11 +157,13 @@ runParser blob@Blob{..} parser = case parser of
     time "parse.tree_sitter_ast_parse" languageTag $
       IO.rethrowing (parseToAST language blob)
   AssignmentParser parser assignment -> do
+    traceM ("Parsing " <> blobPath)
     ast <- runParser blob parser `catchError` \ (SomeException err) -> do
       writeStat (Stat.increment "parse.parse_failures" languageTag)
       writeLog Error "failed parsing" (("task", "parse") : blobFields)
       throwError (toException err)
     options <- ask
+    traceM ("Assigning " <> blobPath)
     time "parse.assign" languageTag $
       case Assignment.assign blobSource assignment ast of
         Left err -> do

@@ -2,8 +2,11 @@
 module Parsing.Parser
 ( Parser(..)
 , SomeParser(..)
+, SomeAnalysisParser(..)
 , someParser
+, someAnalysisParser
 , ApplyAll
+, ApplyAll'
 -- À la carte parsers
 , goParser
 , javaParser
@@ -15,32 +18,69 @@ module Parsing.Parser
 , phpParser
 ) where
 
-import Prologue
-import Assigning.Assignment
+import           Assigning.Assignment
 import qualified CMarkGFM
-import Data.AST
-import Data.Kind
-import Data.Language
-import Data.Record
+import           Data.AST
+import           Data.Kind
+import           Data.Language
+import           Data.Record
 import qualified Data.Syntax as Syntax
-import Data.Term
-import Foreign.Ptr
+import           Data.Term
+import           Data.File
+import           Foreign.Ptr
+import qualified GHC.TypeLits as TypeLevel
 import qualified Language.Go.Assignment as Go
 import qualified Language.Java.Assignment as Java
 import qualified Language.JSON.Assignment as JSON
 import qualified Language.Markdown.Assignment as Markdown
+import qualified Language.PHP.Assignment as PHP
+import           Language.Preluded
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.TypeScript.Assignment as TypeScript
-import qualified Language.PHP.Assignment as PHP
+import           Prologue
+import           TreeSitter.Go
+import           TreeSitter.JSON
 import qualified TreeSitter.Language as TS (Language, Symbol)
-import TreeSitter.Go
-import TreeSitter.JSON
-import TreeSitter.Java
-import TreeSitter.PHP
-import TreeSitter.Python
-import TreeSitter.Ruby
-import TreeSitter.TypeScript
+import           TreeSitter.Java
+import           TreeSitter.PHP
+import           TreeSitter.Python
+import           TreeSitter.Ruby
+import           TreeSitter.TypeScript
+
+
+type family ApplyAll' (typeclasses :: [(* -> *) -> Constraint]) (fs :: [* -> *]) :: Constraint where
+  ApplyAll' (typeclass ': typeclasses) fs = (Apply typeclass fs, ApplyAll' typeclasses fs)
+  ApplyAll' '[] fs = ()
+
+-- | A parser, suitable for program analysis, for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
+data SomeAnalysisParser typeclasses ann where
+  SomeAnalysisParser :: ( Member Syntax.Identifier fs
+                        , ApplyAll' typeclasses fs)
+                     => Parser (Term (Union fs) ann) -- ^ A parser.
+                     -> Maybe File                   -- ^ Maybe path to prelude.
+                     -> SomeAnalysisParser typeclasses ann
+
+-- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
+someAnalysisParser :: ( ApplyAll' typeclasses Go.Syntax
+                      , ApplyAll' typeclasses Java.Syntax
+                      , ApplyAll' typeclasses PHP.Syntax
+                      , ApplyAll' typeclasses Python.Syntax
+                      , ApplyAll' typeclasses Ruby.Syntax
+                      , ApplyAll' typeclasses TypeScript.Syntax
+                      )
+                   => proxy typeclasses                                -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
+                   -> Language                                         -- ^ The 'Language' to select.
+                   -> SomeAnalysisParser typeclasses (Record Location) -- ^ A 'SomeAnalysisParser abstracting the syntax type to be produced.
+someAnalysisParser _ Go         = SomeAnalysisParser goParser Nothing
+someAnalysisParser _ Java       = SomeAnalysisParser javaParser Nothing
+someAnalysisParser _ JavaScript = SomeAnalysisParser typescriptParser Nothing
+someAnalysisParser _ PHP        = SomeAnalysisParser phpParser Nothing
+someAnalysisParser _ Python     = SomeAnalysisParser pythonParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Python))
+someAnalysisParser _ Ruby       = SomeAnalysisParser rubyParser $ Just (File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Ruby))
+someAnalysisParser _ TypeScript = SomeAnalysisParser typescriptParser Nothing
+someAnalysisParser _ l          = error $ "Analysis not supported for: " <> show l
+
 
 -- | A parser from 'Source' onto some term type.
 data Parser term where

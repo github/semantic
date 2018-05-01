@@ -1,15 +1,24 @@
-{-# LANGUAGE DataKinds, TypeFamilies, TypeOperators, UndecidableInstances, ScopedTypeVariables #-}
+{-# LANGUAGE GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value where
 
-import Control.Abstract.Analysis
-import Data.Abstract.Environment (Environment)
+import Control.Abstract.Addressable
+import Control.Abstract.Evaluator
+import Control.Abstract.Value
+import Control.Effect
+import Control.Monad.Effect.Fail
+import Control.Monad.Effect.Resumable
+import Data.Abstract.Address
+import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
-import Data.Abstract.Evaluatable
+import Data.Abstract.FreeVariables
 import qualified Data.Abstract.Number as Number
+import Data.List (genericIndex, genericLength)
 import Data.Scientific (Scientific)
+import Data.Scientific.Exts
+import Data.Semigroup.Reducer
 import qualified Data.Set as Set
 import Prologue hiding (TypeError)
-import Prelude hiding (Float, Integer, String, Rational, fail)
+import Prelude hiding (Float, Integer, String, Rational)
 import qualified Prelude
 
 type ValueConstructors location
@@ -28,6 +37,7 @@ type ValueConstructors location
     , Symbol
     , Tuple
     , Unit
+    , Hole
     ]
 
 -- | Open union of primitive values that terms can be evaluated to.
@@ -66,6 +76,13 @@ data Unit value = Unit
 instance Eq1 Unit where liftEq = genericLiftEq
 instance Ord1 Unit where liftCompare = genericLiftCompare
 instance Show1 Unit where liftShowsPrec = genericLiftShowsPrec
+
+data Hole value = Hole
+  deriving (Eq, Generic1, Ord, Show)
+
+instance Eq1 Hole where liftEq = genericLiftEq
+instance Ord1 Hole where liftCompare = genericLiftCompare
+instance Show1 Hole where liftShowsPrec = genericLiftShowsPrec
 
 -- | Boolean values.
 newtype Boolean value = Boolean Prelude.Bool
@@ -189,8 +206,24 @@ instance Ord location => ValueRoots location (Value location) where
     | otherwise                            = mempty
 
 
+instance AbstractHole (Value location) where
+  hole = injValue Hole
+
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance forall location term m. (Monad m, MonadEvaluatable location term (Value location) m) => MonadValue location (Value location) m where
+instance ( Member (EvalClosure term (Value location)) effects
+         , Member Fail effects
+         , Member (LoopControl (Value location)) effects
+         , Member (Resumable (AddressError location (Value location))) effects
+         , Member (Resumable (ValueError location (Value location))) effects
+         , Member (Return (Value location)) effects
+         , Monad (m effects)
+         , MonadAddressable location effects m
+         , MonadEvaluator location term (Value location) effects m
+         , Recursive term
+         , Reducer (Value location) (Cell location (Value location))
+         , Show location
+         )
+      => MonadValue location (Value location) effects m where
   unit     = pure . injValue $ Unit
   integer  = pure . injValue . Integer . Number.Integer
   boolean  = pure . injValue . Boolean
@@ -206,66 +239,83 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
 
   null     = pure . injValue $ Null
 
-  asPair k
-    | Just (KVPair k v) <- prjValue k = pure (k, v)
-    | otherwise = fail ("expected key-value pair, got " <> show k)
+  asPair val
+    | Just (KVPair k v) <- prjValue val = pure (k, v)
+    | otherwise = throwResumable @(ValueError location (Value location)) $ KeyValueError val
 
   hash = pure . injValue . Hash . fmap (injValue . uncurry KVPair)
 
   klass n [] env = pure . injValue $ Class n env
   klass n supers env = do
-    product <- mconcat <$> traverse scopedEnvironment supers
-    pure . injValue $ Class n (Env.push product <> env)
+    product <- foldl mergeEnvs emptyEnv . catMaybes <$> traverse scopedEnvironment supers
+    pure . injValue $ Class n (mergeEnvs product env)
 
   namespace n env = do
     maybeAddr <- lookupEnv n
-    env' <- maybe (pure mempty) (asNamespaceEnv <=< deref) maybeAddr
+    env' <- maybe (pure emptyEnv) (asNamespaceEnv <=< deref) maybeAddr
     pure (injValue (Namespace n (Env.mergeNewer env' env)))
     where asNamespaceEnv v
             | Just (Namespace _ env') <- prjValue v = pure env'
-            | otherwise                             = throwException $ NamespaceError ("expected " <> show v <> " to be a namespace")
+            | otherwise                             = throwResumable $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
   scopedEnvironment o
-    | Just (Class _ env) <- prjValue o = pure env
-    | Just (Namespace _ env) <- prjValue o = pure env
-    | otherwise = throwException $ ScopedEnvironmentError ("object type passed to scopedEnvironment doesn't have an environment: " <> show o)
+    | Just (Class _ env) <- prjValue o = pure (Just env)
+    | Just (Namespace _ env) <- prjValue o = pure (Just env)
+    | otherwise = pure Nothing
 
   asString v
     | Just (String n) <- prjValue v = pure n
-    | otherwise                     = throwException @(ValueError location (Value location)) $ StringError v
+    | otherwise                     = throwResumable @(ValueError location (Value location)) $ StringError v
 
   ifthenelse cond if' else' = do
-    bool <- asBool cond
-    if bool then if' else else'
+    isHole <- isHole cond
+    if isHole then
+      pure hole
+    else do
+      bool <- asBool cond
+      if bool then if' else else'
 
   asBool val
     | Just (Boolean b) <- prjValue val = pure b
-    | otherwise = throwException @(ValueError location (Value location)) $ BoolError val
+    | otherwise = throwResumable @(ValueError location (Value location)) $ BoolError val
 
+  isHole val = pure (prjValue val == Just Hole)
+
+  index = go where
+    tryIdx list ii
+      | ii > genericLength list = throwValueError (BoundsError list ii)
+      | otherwise               = pure (genericIndex list ii)
+    go arr idx
+      | (Just (Array arr, Integer (Number.Integer i))) <- prjPair (arr, idx) = tryIdx arr i
+      | (Just (Tuple tup, Integer (Number.Integer i))) <- prjPair (arr, idx) = tryIdx tup i
+      | otherwise = throwValueError (IndexError arr idx)
 
   liftNumeric f arg
     | Just (Integer (Number.Integer i)) <- prjValue arg = integer $ f i
-    | Just (Float (Number.Decimal d))          <- prjValue arg = float   $ f d
-    | Just (Rational (Number.Ratio r))         <- prjValue arg = rational $ f r
-    | otherwise = fail ("Invalid operand to liftNumeric: " <> show arg)
+    | Just (Float (Number.Decimal d))   <- prjValue arg = float   $ f d
+    | Just (Rational (Number.Ratio r))  <- prjValue arg = rational $ f r
+    | otherwise = throwValueError (NumericError arg)
 
   liftNumeric2 f left right
-    | Just (Integer  i, Integer j)  <- prjPair pair = f i j & specialize
-    | Just (Integer  i, Rational j) <- prjPair pair = f i j & specialize
-    | Just (Integer  i, Float j)    <- prjPair pair = f i j & specialize
-    | Just (Rational i, Integer j)  <- prjPair pair = f i j & specialize
-    | Just (Rational i, Rational j) <- prjPair pair = f i j & specialize
-    | Just (Rational i, Float j)    <- prjPair pair = f i j & specialize
-    | Just (Float    i, Integer j)  <- prjPair pair = f i j & specialize
-    | Just (Float    i, Rational j) <- prjPair pair = f i j & specialize
-    | Just (Float    i, Float j)    <- prjPair pair = f i j & specialize
+    | Just (Integer  i, Integer j)  <- prjPair pair = tentative f i j & specialize
+    | Just (Integer  i, Rational j) <- prjPair pair = tentative f i j & specialize
+    | Just (Integer  i, Float j)    <- prjPair pair = tentative f i j & specialize
+    | Just (Rational i, Integer j)  <- prjPair pair = tentative f i j & specialize
+    | Just (Rational i, Rational j) <- prjPair pair = tentative f i j & specialize
+    | Just (Rational i, Float j)    <- prjPair pair = tentative f i j & specialize
+    | Just (Float    i, Integer j)  <- prjPair pair = tentative f i j & specialize
+    | Just (Float    i, Rational j) <- prjPair pair = tentative f i j & specialize
+    | Just (Float    i, Float j)    <- prjPair pair = tentative f i j & specialize
     | otherwise = throwValueError (Numeric2Error left right)
       where
+        tentative x i j = attemptUnsafeArithmetic (x i j)
+
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: MonadValue location value m => Number.SomeNumber -> m value
-        specialize (Number.SomeNumber (Number.Integer i)) = integer i
-        specialize (Number.SomeNumber (Number.Ratio r))          = rational r
-        specialize (Number.SomeNumber (Number.Decimal d))        = float d
+        specialize :: Either ArithException Number.SomeNumber -> m effects (Value location)
+        specialize (Left exc) = throwValueError (ArithmeticError exc)
+        specialize (Right (Number.SomeNumber (Number.Integer i))) = integer i
+        specialize (Right (Number.SomeNumber (Number.Ratio r)))   = rational r
+        specialize (Right (Number.SomeNumber (Number.Decimal d))) = float d
         pair = (left, right)
 
   liftComparison comparator left right
@@ -276,11 +326,11 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
     | Just (String  i,                  String  j)                  <- prjPair pair = go i j
     | Just (Boolean i,                  Boolean j)                  <- prjPair pair = go i j
     | Just (Unit,                       Unit)                       <- prjPair pair = boolean True
-    | otherwise = fail ("Type error: invalid arguments to liftComparison: " <> show pair)
+    | otherwise = throwValueError (ComparisonError left right)
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: (Ord a, MonadValue location value m) => a -> a -> m value
+        go :: Ord a => a -> a -> m effects (Value location)
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
           Generalized -> integer (orderingToInt (compare l r))
@@ -294,11 +344,11 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
 
   liftBitwise operator target
     | Just (Integer (Number.Integer i)) <- prjValue target = integer $ operator i
-    | otherwise = fail ("Type error: invalid unary bitwise operation on " <> show target)
+    | otherwise = throwValueError (BitwiseError target)
 
   liftBitwise2 operator left right
     | Just (Integer (Number.Integer i), Integer (Number.Integer j)) <- prjPair pair = integer $ operator i j
-    | otherwise = fail ("Type error: invalid binary bitwise operation on " <> show pair)
+    | otherwise = throwValueError (Bitwise2Error left right)
       where pair = (left, right)
 
   lambda names (Subterm body _) = do
@@ -308,12 +358,61 @@ instance forall location term m. (Monad m, MonadEvaluatable location term (Value
   call op params = do
     case prjValue op of
       Just (Closure names label env) -> do
-        bindings <- foldr (\ (name, param) rest -> do
-          v <- param
-          a <- alloc name
-          assign a v
-          Env.insert name a <$> rest) (pure env) (zip names params)
-        localEnv (mappend bindings) (goto label >>= evaluateTerm)
-      Nothing -> throwException @(ValueError location (Value location)) (CallError op)
+        -- Evaluate the bindings and the body within a `goto` in order to
+        -- charge their origins to the closure's origin.
+        goto label $ \body -> do
+          bindings <- foldr (\ (name, param) rest -> do
+            v <- param
+            a <- alloc name
+            assign a v
+            Env.insert name a <$> rest) (pure env) (zip names params)
+          localEnv (mergeEnvs bindings) (evalClosure body)
+      Nothing -> throwValueError (CallError op)
+    where
+      evalClosure term = catchReturn @m @(Value location) (evaluateClosureBody term) (\ (Return value) -> pure value)
 
-  loop = fix
+  loop x = catchLoopControl @m @(Value location) (fix x) (\ control -> case control of
+    Break value -> pure value
+    Continue    -> loop x)
+
+
+-- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
+data ValueError location value resume where
+  StringError            :: value          -> ValueError location value ByteString
+  BoolError              :: value          -> ValueError location value Bool
+  IndexError             :: value -> value -> ValueError location value value
+  NamespaceError         :: Prelude.String -> ValueError location value (Environment location value)
+  CallError              :: value          -> ValueError location value value
+  NumericError           :: value          -> ValueError location value value
+  Numeric2Error          :: value -> value -> ValueError location value value
+  ComparisonError        :: value -> value -> ValueError location value value
+  BitwiseError           :: value          -> ValueError location value value
+  Bitwise2Error          :: value -> value -> ValueError location value value
+  KeyValueError          :: value          -> ValueError location value (value, value)
+  -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
+  ArithmeticError :: ArithException -> ValueError location value value
+  -- Out-of-bounds error
+  BoundsError :: [value] -> Prelude.Integer -> ValueError location value value
+
+
+
+instance Eq value => Eq1 (ValueError location value) where
+  liftEq _ (StringError a) (StringError b)                       = a == b
+  liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
+  liftEq _ (CallError a) (CallError b)                           = a == b
+  liftEq _ (BoolError a) (BoolError c)                           = a == c
+  liftEq _ (IndexError a b) (IndexError c d)                     = (a == c) && (b == d)
+  liftEq _ (Numeric2Error a b) (Numeric2Error c d)               = (a == c) && (b == d)
+  liftEq _ (ComparisonError a b) (ComparisonError c d)           = (a == c) && (b == d)
+  liftEq _ (Bitwise2Error a b) (Bitwise2Error c d)               = (a == c) && (b == d)
+  liftEq _ (BitwiseError a) (BitwiseError b)                     = a == b
+  liftEq _ (KeyValueError a) (KeyValueError b)                   = a == b
+  liftEq _ (BoundsError a b) (BoundsError c d)                   = (a == c) && (b == d)
+  liftEq _ _             _                                       = False
+
+deriving instance (Show value) => Show (ValueError location value resume)
+instance (Show value) => Show1 (ValueError location value) where
+  liftShowsPrec _ _ = showsPrec
+
+throwValueError :: (Member (Resumable (ValueError location value)) effects, MonadEvaluator location term value effects m) => ValueError location value resume -> m effects resume
+throwValueError = throwResumable

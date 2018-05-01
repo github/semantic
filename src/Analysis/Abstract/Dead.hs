@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.Dead
 ( DeadCode
 ) where
@@ -10,14 +11,10 @@ import Data.Set (delete)
 import Prologue
 
 -- | An analysis tracking dead (unreachable) code.
-newtype DeadCode m (effects :: [* -> *]) a = DeadCode (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
+newtype DeadCode m (effects :: [* -> *]) a = DeadCode { runDeadCode :: m effects a }
+  deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
-deriving instance MonadControl term (m effects)                    => MonadControl term (DeadCode m effects)
-deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (DeadCode m effects)
-deriving instance MonadHeap location value (m effects)             => MonadHeap location value (DeadCode m effects)
-deriving instance MonadModuleTable location term value (m effects) => MonadModuleTable location term value (DeadCode m effects)
-deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (DeadCode m effects)
+deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (DeadCode m)
 
 -- | A set of “dead” (unreachable) terms.
 newtype Dead term = Dead { unDead :: Set term }
@@ -42,13 +39,11 @@ instance ( Corecursive term
          , Effectful m
          , Foldable (Base term)
          , Member (State (Dead term)) effects
-         , MonadAnalysis location term value (m effects)
+         , MonadAnalysis location term value effects m
          , Ord term
          , Recursive term
          )
-      => MonadAnalysis location term value (DeadCode m effects) where
-  type Effects location term value (DeadCode m effects) = State (Dead term) ': Effects location term value (m effects)
-
+      => MonadAnalysis location term value effects (DeadCode m) where
   analyzeTerm recur term = do
     revive (embedSubterm term)
     liftAnalyze analyzeTerm recur term
@@ -56,3 +51,11 @@ instance ( Corecursive term
   analyzeModule recur m = do
     killAll (subterms (subterm (moduleBody m)))
     liftAnalyze analyzeModule recur m
+
+instance ( Interpreter m effects
+         , MonadEvaluator location term value effects m
+         , Ord term
+         )
+      => Interpreter (DeadCode m) (State (Dead term) ': effects) where
+  type Result (DeadCode m) (State (Dead term) ': effects) result = Result m effects (result, Dead term)
+  interpret = interpret . runDeadCode . raiseHandler (`runState` mempty)

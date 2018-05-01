@@ -1,0 +1,10 @@
+(Program
+  (While
+  { (Identifier)
+  ->(Identifier) }
+    (
+      (Call
+      { (Identifier)
+      ->(Identifier) }
+        (Empty))))
+  (Empty))

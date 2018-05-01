@@ -1,0 +1,17 @@
+(Program
+  (Match
+    (Float)
+    (
+      (Pattern
+        (Float)
+        (
+          (Float)))
+      (Pattern
+        (Float)
+        (
+          (Float)))
+      (Pattern
+        (Float)
+        (
+          (Float)))))
+  (Empty))

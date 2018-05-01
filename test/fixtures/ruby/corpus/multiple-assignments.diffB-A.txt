@@ -1,0 +1,60 @@
+(Program
+  (Assignment
+    (
+      (Identifier)
+    { (Identifier)
+    ->(Identifier) }
+    {+(Identifier)+})
+    (Array
+      (Integer)
+      (Integer)
+      (Integer)))
+{+(Assignment
+  {+(
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(Array
+    {+(Integer)+}
+    {+(Integer)+})+})+}
+{+(Assignment
+  {+(
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(Array
+    {+(Integer)+}
+    {+(Integer)+})+})+}
+{+(Assignment
+  {+(
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(Array
+    {+(Integer)+}
+    {+(Integer)+})+})+}
+{+(Assignment
+  {+(
+    {+(Identifier)+}
+    {+(Identifier)+})+}
+  {+(Identifier)+})+}
+{+(Assignment
+  {+(
+    {+(Send
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+    {+(Send
+      {+(Identifier)+}
+      {+(Identifier)+})+})+}
+  {+(
+    {+(Send
+      {+(Send
+        {+(Identifier)+})+}
+      {+(Identifier)+})+}
+    {+(Send
+      {+(Send
+        {+(Identifier)+})+}
+      {+(Identifier)+})+})+})+}
+{+(Assignment
+  {+(
+    {+(
+      {+(Identifier)+}
+      {+(Identifier)+})+})+}
+  {+(Identifier)+})+})

@@ -1,42 +1,38 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.BadValues where
 
 import Control.Abstract.Analysis
-import Data.Abstract.Evaluatable
-import Analysis.Abstract.Evaluating
-import Data.Abstract.Environment as Env
-import Prologue
+import Data.Abstract.Value (ValueError(..))
 import Data.ByteString.Char8 (pack)
+import Prologue
 
-newtype BadValues m (effects :: [* -> *]) a = BadValues (m effects a)
-  deriving (Alternative, Applicative, Functor, Effectful, Monad, MonadFail, MonadFresh)
+newtype BadValues m (effects :: [* -> *]) a = BadValues { runBadValues :: m effects a }
+  deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
-deriving instance MonadControl term (m effects)                    => MonadControl term (BadValues m effects)
-deriving instance MonadEnvironment location value (m effects)      => MonadEnvironment location value (BadValues m effects)
-deriving instance MonadHeap location value (m effects)             => MonadHeap location value (BadValues m effects)
-deriving instance MonadModuleTable location term value (m effects) => MonadModuleTable location term value (BadValues m effects)
-deriving instance MonadEvaluator location term value (m effects)   => MonadEvaluator location term value (BadValues m effects)
+deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadValues m)
+deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadValues m)
 
-instance ( Effectful m
-         , Member (Resumable (ValueError location value)) effects
-         , Member (State (EvaluatingState location term value)) effects
-         , Member (State [Name]) effects
-         , MonadAnalysis location term value (m effects)
-         , MonadValue location value (BadValues m effects)
+instance ( Interpreter m effects
+         , MonadEvaluator location term value effects m
+         , AbstractHole value
+         , Show value
          )
-      => MonadAnalysis location term value (BadValues m effects) where
-  type Effects location term value (BadValues m effects) = State [Name] ': Effects location term value (m effects)
-
-  analyzeTerm eval term = resumeException @(ValueError location value) (liftAnalyze analyzeTerm eval term) (
-        \yield error -> case error of
-          (ScopedEnvironmentError _) -> do
-            env <- getEnv
-            yield (Env.push env)
-          (CallError val) -> yield val
-          (StringError val) -> yield (pack $ show val)
-          BoolError{} -> yield True
-          Numeric2Error{} -> unit >>= yield
-          NamespaceError{} -> getEnv >>= yield
-          )
-
-  analyzeModule = liftAnalyze analyzeModule
+      => Interpreter (BadValues m) (Resumable (ValueError location value) ': effects) where
+  type Result (BadValues m) (Resumable (ValueError location value) ': effects) result = Result m effects result
+  interpret
+    = interpret
+    . runBadValues
+    . raiseHandler (relay pure (\ (Resumable err) yield -> traceM ("ValueError" <> show err) *> case err of
+      CallError val     -> yield val
+      StringError val   -> yield (pack (show val))
+      BoolError{}       -> yield True
+      BoundsError{}     -> yield hole
+      IndexError{}      -> yield hole
+      NumericError{}    -> yield hole
+      Numeric2Error{}   -> yield hole
+      ComparisonError{} -> yield hole
+      NamespaceError{}  -> lower @m getEnv >>= yield
+      BitwiseError{}    -> yield hole
+      Bitwise2Error{}   -> yield hole
+      KeyValueError{}   -> yield (hole, hole)
+      ArithmeticError{} -> yield hole))

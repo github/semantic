@@ -1,0 +1,19 @@
+(Program
+  (Annotation
+    (Function
+      (Identifier)
+      (Identifier))
+    (Empty))
+  (Annotation
+    (Function
+      (Identifier)
+      (Identifier)
+      (Identifier)
+      (Identifier))
+    (Empty))
+  (Annotation
+    (Function
+      (Identifier)
+      (Identifier)
+      (Identifier))
+    (Empty)))

@@ -1,0 +1,17 @@
+(Program
+  (Equal
+    (Send
+      (Identifier))
+    (Send
+      (Identifier)))
+  (Not
+    (Equal
+      (Send
+        (Identifier))
+      (Send
+        (Identifier))))
+  (Equal
+    (Send
+      (Identifier))
+    (Send
+      (Identifier))))

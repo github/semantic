@@ -1,0 +1,17 @@
+(Program
+  (Subscript
+    (Send
+      (Identifier))
+    (Send
+      (Identifier)))
+  (Subscript
+    (Send
+      (Identifier))
+    (Symbol))
+  (Assignment
+    (Subscript
+      (Send
+        (Identifier))
+      (Send
+        (Identifier)))
+    (Integer)))

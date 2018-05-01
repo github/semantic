@@ -26,7 +26,7 @@ languageForType mediaType = case mediaType of
     ".md" -> Just Markdown
     ".rb" -> Just Ruby
     ".go" -> Just Go
-    ".js" -> Just TypeScript
+    ".js" -> Just JavaScript
     ".ts" -> Just TypeScript
     ".tsx" -> Just TypeScript
     ".jsx" -> Just JSX
@@ -34,3 +34,13 @@ languageForType mediaType = case mediaType of
     ".php" -> Just PHP
     ".phpt" -> Just PHP
     _ -> Nothing
+
+extensionsForLanguage :: Language -> [String]
+extensionsForLanguage language = case language of
+  Go -> [".go"]
+  JavaScript -> [".js"]
+  PHP -> [".php"]
+  Python -> [".py"]
+  Ruby -> [".rb"]
+  TypeScript -> [".ts", ".tsx", ".d.tsx"]
+  _ -> []

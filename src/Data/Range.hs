@@ -7,9 +7,10 @@ module Data.Range
 , subtractRange
 ) where
 
-import Prologue
 import Data.Aeson
 import Data.JSON.Fields
+import Data.Semilattice.Lower
+import Prologue
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: {-# UNPACK #-} !Int, end :: {-# UNPACK #-} !Int }
@@ -51,3 +52,6 @@ instance Ord Range where
 
 instance ToJSONFields Range where
   toJSONFields Range{..} = ["sourceRange" .= [ start, end ]]
+
+instance Lower Range where
+  lowerBound = Range 0 0

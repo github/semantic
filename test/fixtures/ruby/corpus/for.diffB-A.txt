@@ -1,0 +1,48 @@
+(Program
+{+(ForEach
+  {+(
+    {+(Send
+      {+(Identifier)+})+})+}
+  {+(Send
+    {+(Identifier)+})+}
+  {+(Send
+    {+(Identifier)+})+})+}
+{+(ForEach
+  {+(
+    {+(Send
+      {+(Identifier)+})+}
+    {+(Send
+      {+(Identifier)+})+})+}
+  {+(Send
+    {+(Identifier)+})+}
+  {+(Send
+    {+(Identifier)+})+})+}
+  (ForEach
+    (
+      (Send
+      { (Identifier)
+      ->(Identifier) }))
+  { (Array
+    {-(Integer)-}
+    {-(Integer)-}
+    {-(Integer)-})
+  ->(Enumeration
+    {+(Integer)+}
+    {+(Integer)+}
+    {+(Empty)+}) }
+  { (Send
+    {-(Identifier)-}
+    {-(Send
+      {-(Identifier)-})-})
+  ->(Boolean) })
+{+(ForEach
+  {+(
+    {+(Send
+      {+(Identifier)+})+}
+    {+(Send
+      {+(Identifier)+})+})+}
+  {+(Enumeration
+    {+(Integer)+}
+    {+(Integer)+}
+    {+(Empty)+})+}
+  {+(Boolean)+})+})

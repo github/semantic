@@ -1,9 +1,0 @@
-(Program
-  (LowOr
-    (Identifier)
-    (Identifier))
-  (LowAnd
-    (LowOr
-      (Identifier)
-      (Identifier))
-    (Identifier)))

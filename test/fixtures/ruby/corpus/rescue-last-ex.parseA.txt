@@ -1,0 +1,13 @@
+(Program
+  (Try
+    (
+      (Send
+        (Identifier))
+      (Catch
+        (
+          (
+            (Identifier))
+          (
+            (Send
+              (Identifier))))
+        ([])))))

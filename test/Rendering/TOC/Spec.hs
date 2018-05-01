@@ -1,16 +1,24 @@
-{-# LANGUAGE DataKinds, TypeOperators #-}
+{-# LANGUAGE DataKinds, MonoLocalBinds, TypeOperators #-}
 module Rendering.TOC.Spec (spec) where
 
 import Analysis.Declaration
 import Data.Aeson
+import Data.Align.Generic
 import Data.Bifunctor
+import Data.Bifunctor.Join
 import Data.Diff
+import Data.Functor.Classes
 import Data.Patch
+import Data.Range
+import Data.Record
+import Data.Span
+import Data.Term
 import Data.Text (Text)
 import Data.Text.Encoding (encodeUtf8)
 import Data.Union
+import Diffing.Algorithm
 import Diffing.Interpreter
-import Prelude hiding (readFile)
+import Prelude
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import Rendering.TOC
@@ -44,7 +52,7 @@ spec = parallel $ do
       diffTOC blankDiff `shouldBe` [ ]
 
     it "summarizes changed methods" $ do
-      sourceBlobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
+      sourceBlobs <- blobsForPaths (both "ruby/toc/methods.A.rb" "ruby/toc/methods.B.rb")
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Method" "self.foo" (Span (Pos 1 1) (Pos 2 4)) "added"
@@ -53,7 +61,7 @@ spec = parallel $ do
         ]
 
     it "summarizes changed classes" $ do
-      sourceBlobs <- blobsForPaths (both "ruby/classes.A.rb" "ruby/classes.B.rb")
+      sourceBlobs <- blobsForPaths (both "ruby/toc/classes.A.rb" "ruby/toc/classes.B.rb")
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Class" "Baz" (Span (Pos 1 1) (Pos 2 4)) "removed"
@@ -62,37 +70,37 @@ spec = parallel $ do
         ]
 
     it "dedupes changes in same parent method" $ do
-      sourceBlobs <- blobsForPaths (both "javascript/duplicate-parent.A.js" "javascript/duplicate-parent.B.js")
+      sourceBlobs <- blobsForPaths (both "javascript/toc/duplicate-parent.A.js" "javascript/toc/duplicate-parent.B.js")
       diff <- runTask $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Function" "myFunction" (Span (Pos 1 1) (Pos 6 2)) "modified" ]
 
     it "dedupes similar methods" $ do
-      sourceBlobs <- blobsForPaths (both "javascript/erroneous-duplicate-method.A.js" "javascript/erroneous-duplicate-method.B.js")
+      sourceBlobs <- blobsForPaths (both "javascript/toc/erroneous-duplicate-method.A.js" "javascript/toc/erroneous-duplicate-method.B.js")
       diff <- runTask $ diffWithParser typescriptParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Function" "performHealthCheck" (Span (Pos 8 1) (Pos 29 2)) "modified" ]
 
     it "summarizes Go methods with receivers with special formatting" $ do
-      sourceBlobs <- blobsForPaths (both "go/method-with-receiver.A.go" "go/method-with-receiver.B.go")
+      sourceBlobs <- blobsForPaths (both "go/toc/method-with-receiver.A.go" "go/toc/method-with-receiver.B.go")
       diff <- runTask $ diffWithParser goParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Method" "(*apiClient) CheckAuth" (Span (Pos 3 1) (Pos 3 101)) "added" ]
 
     it "summarizes Ruby methods that start with two identifiers" $ do
-      sourceBlobs <- blobsForPaths (both "ruby/method-starts-with-two-identifiers.A.rb" "ruby/method-starts-with-two-identifiers.B.rb")
+      sourceBlobs <- blobsForPaths (both "ruby/toc/method-starts-with-two-identifiers.A.rb" "ruby/toc/method-starts-with-two-identifiers.B.rb")
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Method" "foo" (Span (Pos 1 1) (Pos 4 4)) "modified" ]
 
     it "handles unicode characters in file" $ do
-      sourceBlobs <- blobsForPaths (both "ruby/unicode.A.rb" "ruby/unicode.B.rb")
+      sourceBlobs <- blobsForPaths (both "ruby/toc/unicode.A.rb" "ruby/toc/unicode.B.rb")
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe`
         [ TOCSummary "Method" "foo" (Span (Pos 6 1) (Pos 7 4)) "added" ]
 
     it "properly slices source blob that starts with a newline and has multi-byte chars" $ do
-      sourceBlobs <- blobsForPaths (both "javascript/starts-with-newline.js" "javascript/starts-with-newline.js")
+      sourceBlobs <- blobsForPaths (both "javascript/toc/starts-with-newline.js" "javascript/toc/starts-with-newline.js")
       diff <- runTask $ diffWithParser rubyParser sourceBlobs
       diffTOC diff `shouldBe` []
 
@@ -135,24 +143,24 @@ spec = parallel $ do
 
   describe "diff with ToCDiffRenderer'" $ do
     it "produces JSON output" $ do
-      blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.B.rb")
+      blobs <- blobsForPaths (both "ruby/toc/methods.A.rb" "ruby/toc/methods.B.rb")
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}\n" :: ByteString)
+      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}\n" :: ByteString)
 
     it "produces JSON output if there are parse errors" $ do
-      blobs <- blobsForPaths (both "ruby/methods.A.rb" "ruby/methods.X.rb")
+      blobs <- blobsForPaths (both "ruby/toc/methods.A.rb" "ruby/toc/methods.X.rb")
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"removed\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/toc/ruby/methods.A.rb -> test/fixtures/toc/ruby/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"expected end of input nodes, but got ParseError\",\"language\":\"Ruby\"}]}}\n" :: ByteString)
+      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"removed\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"expected end of input nodes, but got ParseError\",\"language\":\"Ruby\"}]}}\n" :: ByteString)
 
     it "ignores anonymous functions" $ do
-      blobs <- blobsForPaths (both "ruby/lambda.A.rb" "ruby/lambda.B.rb")
+      blobs <- blobsForPaths (both "ruby/toc/lambda.A.rb" "ruby/toc/lambda.B.rb")
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
       toOutput output `shouldBe` ("{\"changes\":{},\"errors\":{}}\n" :: ByteString)
 
     it "summarizes Markdown headings" $ do
-      blobs <- blobsForPaths (both "markdown/headings.A.md" "markdown/headings.B.md")
+      blobs <- blobsForPaths (both "markdown/toc/headings.A.md" "markdown/toc/headings.B.md")
       output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/toc/markdown/headings.A.md -> test/fixtures/toc/markdown/headings.B.md\":[{\"span\":{\"start\":[1,1],\"end\":[3,16]},\"category\":\"Heading 1\",\"term\":\"Introduction\",\"changeType\":\"removed\"},{\"span\":{\"start\":[5,1],\"end\":[7,4]},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"modified\"},{\"span\":{\"start\":[9,1],\"end\":[11,10]},\"category\":\"Heading 3\",\"term\":\"This heading is new\",\"changeType\":\"added\"},{\"span\":{\"start\":[13,1],\"end\":[14,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
+      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/markdown/toc/headings.A.md -> test/fixtures/markdown/toc/headings.B.md\":[{\"span\":{\"start\":[1,1],\"end\":[3,16]},\"category\":\"Heading 1\",\"term\":\"Introduction\",\"changeType\":\"removed\"},{\"span\":{\"start\":[5,1],\"end\":[7,4]},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"modified\"},{\"span\":{\"start\":[9,1],\"end\":[11,10]},\"category\":\"Heading 3\",\"term\":\"This heading is new\",\"changeType\":\"added\"},{\"span\":{\"start\":[13,1],\"end\":[14,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
 
 
 type Diff' = Diff ListableSyntax (Record '[Maybe Declaration, Range, Span]) (Record '[Maybe Declaration, Range, Span])
@@ -215,10 +223,26 @@ isMethodOrFunction a
   | otherwise                                      = False
 
 blobsForPaths :: Both FilePath -> IO BlobPair
-blobsForPaths = readFilePair . fmap ("test/fixtures/toc/" <>)
+blobsForPaths = readFilePair . fmap ("test/fixtures" </>)
 
 blankDiff :: Diff'
 blankDiff = merge (arrayInfo, arrayInfo) (inj [ inserting (termIn literalInfo (inj (Syntax.Identifier (name "\"a\"")))) ])
   where
     arrayInfo = Nothing :. Range 0 3 :. Span (Pos 1 1) (Pos 1 5) :. Nil
     literalInfo = Nothing :. Range 1 2 :. Span (Pos 1 2) (Pos 1 4) :. Nil
+
+-- Diff helpers
+diffWithParser :: ( HasField fields Data.Span.Span
+                  , HasField fields Range
+                  , Eq1 syntax
+                  , Show1 syntax
+                  , Traversable syntax
+                  , Diffable syntax
+                  , GAlign syntax
+                  , HasDeclaration syntax
+                  , Members '[Distribute WrappedTask, Task] effs
+                  )
+               => Parser (Term syntax (Record fields))
+               -> BlobPair
+               -> Eff effs (Diff syntax (Record (Maybe Declaration ': fields)) (Record (Maybe Declaration ': fields)))
+diffWithParser parser blobs = distributeFor blobs (\ blob -> WrapTask $ parse parser blob >>= decorate (declarationAlgebra blob)) >>= diffTermPair diffTerms . runJoin

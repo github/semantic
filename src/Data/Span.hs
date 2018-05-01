@@ -9,10 +9,11 @@ module Data.Span
 , emptySpan
 ) where
 
-import Prologue
 import Data.Aeson ((.=), (.:))
 import qualified Data.Aeson as A
 import Data.JSON.Fields
+import Data.Semilattice.Lower
+import Prologue
 
 -- | Source position information
 data Pos = Pos
@@ -56,3 +57,6 @@ instance A.FromJSON Span where
 
 instance ToJSONFields Span where
   toJSONFields sourceSpan = [ "sourceSpan" .= sourceSpan ]
+
+instance Lower Span where
+  lowerBound = Span (Pos 1 1) (Pos 1 1)

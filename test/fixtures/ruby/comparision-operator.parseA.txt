@@ -1,7 +1,0 @@
-(Program
-  (LessThan
-    (Identifier)
-    (Identifier))
-  (GreaterThan
-    (Identifier)
-    (Identifier)))

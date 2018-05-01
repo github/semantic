@@ -3,7 +3,8 @@ module Prologue
   ( module X
   , foldMapA
   , maybeM
-  , maybeFail
+  , maybeLast
+  , fromMaybeLast
   ) where
 
 
@@ -61,10 +62,13 @@ import GHC.Stack as X
 foldMapA :: (Alternative m, Foldable t) => (b -> m a) -> t b -> m a
 foldMapA f = getAlt . foldMap (Alt . f)
 
+
+maybeLast :: Foldable t => b -> (a -> b) -> t a -> b
+maybeLast b f = maybe b f . getLast . foldMap (Last . Just)
+
+fromMaybeLast :: Foldable t => a -> t a -> a
+fromMaybeLast b = fromMaybe b . getLast . foldMap (Last . Just)
+
 -- | Extract the 'Just' of a 'Maybe' in an 'Applicative' context or, given 'Nothing', run the provided action.
 maybeM :: Applicative f => f a -> Maybe a -> f a
 maybeM f = maybe f pure
-
--- | Either extract the 'Just' of a 'Maybe' or invoke 'fail' with the provided string.
-maybeFail :: MonadFail m => String -> Maybe a -> m a
-maybeFail s = maybeM (X.fail s)

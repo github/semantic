@@ -1,6 +1,10 @@
 {-# LANGUAGE OverloadedLists #-}
 module Analysis.Go.Spec (spec) where
 
+import Data.Abstract.Evaluatable (EvalError(..), interpret)
+import qualified Language.Go.Assignment as Go
+import qualified Data.Language as Language
+
 import SpecHelpers
 
 
@@ -28,3 +32,4 @@ spec = parallel $ do
   where
     fixtures = "test/fixtures/go/analysis/"
     evaluate entry = evalGoProject (fixtures <> entry)
+    evalGoProject path = interpret @(TestEvaluating Go.Term) <$> evaluateProject goParser Language.Go Nothing path

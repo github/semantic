@@ -1,0 +1,17 @@
+(Program
+{+(LowOr
+  {+(Send
+    {+(Identifier)+})+}
+  {+(Send
+    {+(Identifier)+})+})+}
+  (LowAnd
+  { (Send
+    {-(Identifier)-})
+  ->(LowOr
+    {+(Send
+      {+(Identifier)+})+}
+    {+(Send
+      {+(Identifier)+})+}) }
+    (Send
+    { (Identifier)
+    ->(Identifier) })))

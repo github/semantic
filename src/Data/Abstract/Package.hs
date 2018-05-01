@@ -1,8 +1,10 @@
+{-# LANGUAGE TupleSections #-}
 module Data.Abstract.Package where
 
 import Data.Abstract.FreeVariables
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
+import qualified Data.Map as Map
 
 type PackageName = Name
 
@@ -18,6 +20,7 @@ newtype Version = Version { versionString :: String }
 
 data PackageBody term = PackageBody
   { packageModules     :: ModuleTable [Module term]
+  , packagePrelude     :: Maybe (Module term)
   , packageEntryPoints :: ModuleTable (Maybe Name)
   }
   deriving (Eq, Functor, Ord, Show)
@@ -30,11 +33,8 @@ data Package term = Package
   }
   deriving (Eq, Functor, Ord, Show)
 
-fromModules :: [Module term] -> PackageBody term
-fromModules []     = PackageBody mempty mempty
-fromModules (m:ms) = fromModulesWithEntryPoint (m : ms) (modulePath (moduleInfo m))
-
-fromModulesWithEntryPoint :: [Module term] -> FilePath -> PackageBody term
-fromModulesWithEntryPoint ms path = PackageBody (ModuleTable.fromModules ms) entryPoints
-  where entryPoints = ModuleTable.singleton path Nothing
-
+fromModules :: PackageName -> Maybe Version -> Maybe (Module term) -> Int -> [Module term] -> Package term
+fromModules name version prelude entryPoints modules =
+  Package (PackageInfo name version) (PackageBody (ModuleTable.fromModules modules) prelude entryPoints')
+  where
+    entryPoints' = ModuleTable . Map.fromList $ (,Nothing) . modulePath . moduleInfo <$> if entryPoints == 0 then modules else take entryPoints modules

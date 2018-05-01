@@ -17,6 +17,7 @@ import qualified Assigning.Assignment as Assignment
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
+import qualified Data.Syntax.Directive as Directive
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
@@ -28,6 +29,7 @@ type Syntax = '[
     Comment.Comment
   , Declaration.Function
   , Declaration.Method
+  , Directive.File
   , Expression.Arithmetic
   , Expression.Bitwise
   , Expression.Boolean
@@ -72,14 +74,13 @@ type Syntax = '[
   , Syntax.Empty
   , Syntax.Error
   , Syntax.Identifier
-  , Syntax.Paren
   , Syntax.Program
-  , Ruby.Syntax.Send
   , Ruby.Syntax.Class
   , Ruby.Syntax.Load
   , Ruby.Syntax.LowPrecedenceBoolean
   , Ruby.Syntax.Module
   , Ruby.Syntax.Require
+  , Ruby.Syntax.Send
   , []
   ]
 
@@ -144,12 +145,24 @@ expressions :: Assignment
 expressions = makeTerm'' <$> location <*> many expression
 
 parenthesizedExpressions :: Assignment
-parenthesizedExpressions = makeTerm'' <$> symbol ParenthesizedStatements <*> children (Syntax.Paren <$> expressions)
+parenthesizedExpressions = makeTerm'' <$> symbol ParenthesizedStatements <*> children (many expression)
 
+withExtendedScope :: Assignment' a -> Assignment' a
+withExtendedScope inner = do
+  locals <- getRubyLocals
+  result <- inner
+  putRubyLocals locals
+  pure result
+
+withNewScope :: Assignment' a -> Assignment' a
+withNewScope inner = withExtendedScope $ do
+  putRubyLocals []
+  inner
+
+-- Looks up identifiers in the list of locals to determine vcall vs. local identifier.
 identifier :: Assignment
 identifier =
-      mk Identifier
-  <|> mk Identifier'
+      vcallOrLocal
   <|> mk Constant
   <|> mk InstanceVariable
   <|> mk ClassVariable
@@ -162,7 +175,17 @@ identifier =
   <|> mk HashSplatArgument
   <|> mk BlockArgument
   <|> mk Uninterpreted
-  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
+  where
+    mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
+    vcallOrLocal = do
+      (loc, ident, locals) <- identWithLocals
+      case ident of
+        "__FILE__" -> pure $ makeTerm loc Directive.File
+        _ -> do
+          let identTerm = makeTerm loc (Syntax.Identifier (name ident))
+          if ident `elem` locals
+            then pure identTerm
+            else pure $ makeTerm loc (Ruby.Syntax.Send Nothing (Just identTerm) [] Nothing)
 
 -- TODO: Handle interpolation in all literals that support it (strings, regexes, symbols, subshells, etc).
 literal :: Assignment
@@ -182,7 +205,7 @@ literal =
   <|> makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
   <|> makeTerm <$> symbol ChainedString <*> children (many (makeTerm <$> symbol String <*> (Literal.TextElement <$> source)))
   <|> makeTerm <$> symbol Regex <*> (Literal.Regex <$> source)
-  <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
+  <|> makeTerm <$> (symbol Symbol <|> symbol Symbol') <*> (Literal.Symbol <$> source)
 
 heredoc :: Assignment
 heredoc =  makeTerm <$> symbol HeredocBeginning <*> (Literal.TextElement <$> source)
@@ -195,48 +218,65 @@ endBlock :: Assignment
 endBlock = makeTerm <$> symbol EndBlock <*> children (Statement.ScopeExit <$> many expression)
 
 class' :: Assignment
-class' = makeTerm <$> symbol Class <*> children (Ruby.Syntax.Class <$> expression <*> (superclass <|> pure []) <*> expressions)
-  where superclass = pure <$ symbol Superclass <*> children expression
+class' = makeTerm <$> symbol Class <*> (withNewScope . children) (Ruby.Syntax.Class <$> expression <*> optional superclass <*> expressions)
+  where
+    superclass :: Assignment
+    superclass = symbol Superclass *> children expression
 
 singletonClass :: Assignment
-singletonClass = makeTerm <$> symbol SingletonClass <*> children (Ruby.Syntax.Class <$> expression <*> pure [] <*> expressions)
+singletonClass = makeTerm <$> symbol SingletonClass <*> (withNewScope . children) (Ruby.Syntax.Class <$> expression <*> pure Nothing <*> expressions)
 
 module' :: Assignment
-module' = makeTerm <$> symbol Module <*> children (Ruby.Syntax.Module <$> expression <*> many expression)
+module' = makeTerm <$> symbol Module <*> (withNewScope . children) (Ruby.Syntax.Module <$> expression <*> many expression)
 
 scopeResolution :: Assignment
 scopeResolution = makeTerm <$> symbol ScopeResolution <*> children (Expression.ScopeResolution <$> many expression)
 
 parameter :: Assignment
-parameter =
-      mk SplatParameter
-  <|> mk HashSplatParameter
-  <|> mk BlockParameter
-  <|> mk KeywordParameter
-  <|> mk OptionalParameter
-  <|> makeTerm <$> symbol DestructuredParameter <*> children (many parameter)
-  <|> expression
-  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
+parameter = postContextualize comment (term uncontextualizedParameter)
+  where
+    uncontextualizedParameter =
+          lhsIdent
+      <|> splatParameter
+      <|> hashSplatParameter
+      <|> blockParameter
+      <|> keywordParameter
+      <|> optionalParameter
+      <|> makeTerm <$> symbol DestructuredParameter <*> children (many parameter)
+    -- splat and hash splat arguments can be unnamed. we don't currently
+    -- support unnamed arguments in the term syntax, so the use of emptyTerm
+    -- here is a huge hack. what we should be able to do is return a Nothing
+    -- for the argument name for splats and hash splats. TODO fix me:
+    mkSplat s = symbol s *> children (lhsIdent <|> emptyTerm)
+    splatParameter = mkSplat SplatParameter
+    hashSplatParameter = mkSplat HashSplatParameter
+    blockParameter = symbol BlockParameter *> children lhsIdent
+    -- we don't yet care about default expressions for optional (including
+    -- keyword) parameters, but we need to match on them to prevent errors:
+    keywordParameter = symbol KeywordParameter *> children (lhsIdent <* optional expression)
+    optionalParameter = symbol OptionalParameter *> children (lhsIdent <* expression)
 
 method :: Assignment
-method = makeTerm <$> symbol Method <*> children (Declaration.Method [] <$> emptyTerm <*> expression <*> params <*> expressions')
+method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method <$> pure [] <*> emptyTerm <*> methodSelector <*> params <*> expressions')
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
         expressions' = makeTerm <$> location <*> many expression
 
 singletonMethod :: Assignment
-singletonMethod = makeTerm <$> symbol SingletonMethod <*> children (Declaration.Method <$> pure [] <*> expression <*> expression <*> params <*> expressions)
+singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withNewScope . children) (Declaration.Method <$> pure [] <*> expression <*> methodSelector <*> params <*> expressions)
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
 
 lambda :: Assignment
-lambda = makeTerm <$> symbol Lambda <*> children (
+lambda = makeTerm <$> symbol Lambda <*> (withExtendedScope . children) (
   Declaration.Function [] <$> emptyTerm
                           <*> ((symbol BlockParameters <|> symbol LambdaParameters) *> children (many parameter) <|> pure [])
                           <*> expressions)
 
 block :: Assignment
-block =  makeTerm <$> symbol DoBlock <*> children (Declaration.Function <$> pure [] <*> emptyTerm <*> params <*> expressions)
-     <|> makeTerm <$> symbol Block <*> children (Declaration.Function <$> pure [] <*> emptyTerm <*> params <*> expressions)
-  where params = symbol BlockParameters *> children (many parameter) <|> pure []
+block =  makeTerm <$> symbol DoBlock <*> scopedBlockChildren
+     <|> makeTerm <$> symbol Block <*> scopedBlockChildren
+  where scopedBlockChildren = withExtendedScope blockChildren
+        blockChildren = children (Declaration.Function <$> pure [] <*> emptyTerm <*> params <*> expressions)
+        params = symbol BlockParameters *> children (many parameter) <|> pure []
 
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
@@ -306,7 +346,7 @@ methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> 
     dotCall = symbol Call *> children (Ruby.Syntax.Send <$> (Just <$> term expression) <*> pure Nothing <*> args)
 
     selector = Just <$> term methodSelector
-    require = inj <$> ((symbol Identifier <|> symbol Identifier') *> do
+    require = inj <$> (symbol Identifier *> do
       s <- source
       guard (s `elem` ["require", "require_relative"])
       Ruby.Syntax.Require (s == "require_relative") <$> nameExpression)
@@ -321,9 +361,9 @@ methodSelector :: Assignment
 methodSelector = makeTerm <$> symbols <*> (Syntax.Identifier <$> (name <$> source))
   where
     symbols = symbol Identifier
-          <|> symbol Identifier'
           <|> symbol Constant
           <|> symbol Operator
+          <|> symbol Setter
           <|> symbol Super -- TODO(@charliesome): super calls are *not* method calls and need to be assigned into their own syntax terms
 
 call :: Assignment
@@ -370,7 +410,22 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
     rhs  = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr
     expr = makeTerm <$> symbol RestAssignment      <*> (Syntax.Identifier . name <$> source)
        <|> makeTerm <$> symbol DestructuredLeftAssignment <*> children (many expr)
+       <|> lhsIdent
        <|> expression
+
+identWithLocals :: Assignment' (Record Location, ByteString, [ByteString])
+identWithLocals = do
+  loc <- symbol Identifier
+  -- source advances, so it's important we call getRubyLocals first
+  locals <- getRubyLocals
+  ident <- source
+  pure (loc, ident, locals)
+
+lhsIdent :: Assignment
+lhsIdent = do
+  (loc, ident, locals) <- identWithLocals
+  putRubyLocals (ident : locals)
+  pure $ makeTerm loc (Syntax.Identifier (name ident))
 
 unary :: Assignment
 unary = symbol Unary >>= \ location ->

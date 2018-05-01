@@ -68,7 +68,7 @@ terminalFormatter :: Options -> Message -> String
 terminalFormatter Options{..} (Message level message pairs time) =
     showChar '[' . showTime time . showString "] "
   . showLevel level . showChar ' '
-  . showString (printf "%-20s" message)
+  . showString (printf "%-20s " message)
   . showPairs pairs
   . showChar '\n' $ ""
   where

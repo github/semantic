@@ -1,0 +1,40 @@
+(Program
+  (Hash
+    (KeyValue
+    { (Symbol)
+    ->(Symbol) }
+    { (TextElement)
+    ->(TextElement) })
+    (KeyValue
+    { (Symbol)
+    ->(Symbol) }
+    { (Integer)
+    ->(Integer) })
+    (KeyValue
+    { (TextElement)
+    ->(Symbol) }
+    { (Boolean)
+    ->(Boolean) })
+  {-(KeyValue
+    {-(Symbol)-}
+    {-(Integer)-})-})
+{-(Hash)-}
+{-(Hash
+  {-(Context
+    {-(Comment)-}
+    {-(KeyValue
+      {-(Symbol)-}
+      {-(Integer)-})-})-}
+  {-(Context
+    {-(Comment)-}
+    {-(Comment)-}
+    {-(KeyValue
+      {-(TextElement)-}
+      {-(Integer)-})-})-}
+  {-(Context
+    {-(Comment)-}
+    {-(Empty)-})-})-}
+{-(Hash
+  {-(Context
+    {-(Comment)-}
+    {-(Empty)-})-})-})
