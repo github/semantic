@@ -348,11 +348,22 @@ evaluatePackageBody :: ( inner ~ (Reader (ModuleTable [Module term]) ': effects)
 evaluatePackageBody body
   = withUnevaluatedModules (packageModules body)
   . withPrelude (packagePrelude body)
-  $ traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints body))
-  where
-    evaluateEntryPoint (m, sym) = do
-      v <- maybe unit (pure . snd) <$> requireWith evalModule m
-      maybe v ((`call` []) <=< variable) sym
+  $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
+
+evaluateEntryPoint :: ( Evaluatable (Base term)
+                      , Member (EvalModule term value) effects
+                      , Member Fail effects
+                      , Member (Reader PackageInfo) effects
+                      , MonadAnalysis location term value effects m
+                      , MonadEvaluatable location term value effects m
+                      , Recursive term
+                      )
+                   => ModulePath
+                   -> Maybe Name
+                   -> m effects value
+evaluateEntryPoint m sym = do
+  v <- maybe unit (pure . snd) <$> requireWith evalModule m
+  maybe v ((`call` []) <=< variable) sym
 
 withPrelude :: ( Evaluatable (Base term)
                , Member (EvalModule term value) effects
