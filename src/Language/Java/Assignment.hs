@@ -239,11 +239,14 @@ identifier = makeTerm <$> (symbol Identifier <|> symbol TypeIdentifier) <*> (Syn
 scopedIdentifier :: Assignment
 scopedIdentifier = makeTerm <$> symbol ScopedIdentifier <*> children (Expression.MemberAccess <$> term expression <*> term expression)
 
+superInterfaces :: Assignment.Assignment [] Grammar [Term]
+superInterfaces = symbol SuperInterfaces *> children (symbol InterfaceTypeList *> children(manyTerm type'))
+
 -- Declarations
 class' :: Assignment
-class' = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> many modifier <*> term identifier <*> (typeParameters <|> pure []) <*> optional superClass <*> classBody)
+class' = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> many modifier <*> term identifier <*> (typeParameters <|> pure []) <*> optional superClass <*> (superInterfaces <|> pure []) <*> classBody)
   where
-    makeClass modifiers identifier typeParams superClass classBody = Declaration.Class (modifiers ++ typeParams) identifier (maybeToList superClass) classBody -- not doing an assignment, just straight up function
+    makeClass modifiers identifier typeParams superClass superInterfaces classBody = Declaration.Class (modifiers ++ typeParams) identifier (maybeToList superClass ++ superInterfaces) classBody -- not doing an assignment, just straight up function
     classBody = makeTerm <$> symbol ClassBody <*> children (manyTerm expression)
     superClass = symbol Superclass *> children type'
     -- matching term expression won't work since there is no node for that; it's AnonExtends
@@ -488,6 +491,8 @@ typeParameters = symbol TypeParameters *> children (manyTerm typeParam) -- this 
   where
     typeParam = makeTerm <$> symbol Grammar.TypeParameter <*> children (Java.Syntax.TypeParameter <$> manyTerm annotation <*> term identifier <*> (typeBound <|> pure [])) -- wrapping up all three of those fields so we need to makeTerm (producing a term here)
     typeBound = symbol TypeBound *> children (manyTerm type')
+    -- manyTerm typeParam made sense because each type Parameter was wrapped up into a Grammar.TypeParameter node, dissimilar
+    -- to superInterfaces
 
 annotation :: Assignment
 annotation = makeTerm <$> symbol NormalAnnotation <*> children (Java.Syntax.Annotation <$> term expression <*> (elementValuePairList <|> pure []))
