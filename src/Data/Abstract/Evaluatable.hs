@@ -30,7 +30,6 @@ import qualified Data.Abstract.Exports as Exports
 import           Data.Abstract.FreeVariables as X
 import           Data.Abstract.Module
 import           Data.Abstract.ModuleTable as ModuleTable
-import           Data.Abstract.Origin (SomeOrigin, packageOrigin)
 import           Data.Abstract.Package as Package
 import           Data.Language
 import           Data.Scientific (Scientific)
@@ -155,6 +154,7 @@ instance Show1 (Unspecialized a) where
 class Evaluatable constr where
   eval :: ( Member (EvalModule term value) effects
           , Member Fail effects
+          , Member (Reader PackageInfo) effects
           , MonadEvaluatable location term value effects m
           )
        => SubtermAlgebra constr term (m effects value)
@@ -289,6 +289,7 @@ evalModule :: forall location term value effects m
            .  ( Evaluatable (Base term)
               , Member (EvalModule term value) effects
               , Member Fail effects
+              , Member (Reader PackageInfo) effects
               , MonadAnalysis location term value effects m
               , MonadEvaluatable location term value effects m
               , Recursive term
@@ -304,18 +305,21 @@ evalModule m = raiseHandler
             (foldSubterms (analyzeTerm eval) term))
           (\ (Return value) -> pure value)
 
+withPackageInfo :: Effectful m => PackageInfo -> m (Reader PackageInfo ': effects) a -> m effects a
+withPackageInfo = raiseHandler . flip runReader
+
 -- | Evaluate a given package.
-evaluatePackage :: ( Evaluatable (Base term)
-                   , Member (EvalModule term value) (Reader (ModuleTable [Module term]) ': effects)
-                   , Member Fail (Reader (ModuleTable [Module term]) ': effects)
-                   , Member (Reader (SomeOrigin term)) effects
-                   , MonadAnalysis location term value (Reader (ModuleTable [Module term]) ': effects) m
-                   , MonadEvaluatable location term value (Reader (ModuleTable [Module term]) ': effects) m
+evaluatePackage :: ( inner ~ (Reader (ModuleTable [Module term]) ': Reader PackageInfo ': effects)
+                   , Evaluatable (Base term)
+                   , Member (EvalModule term value) inner
+                   , Member Fail inner
+                   , MonadAnalysis location term value inner m
+                   , MonadEvaluatable location term value inner m
                    , Recursive term
                    )
                 => Package term
                 -> m effects [value]
-evaluatePackage p = pushOrigin (packageOrigin p) (evaluatePackageBody (packageBody p))
+evaluatePackage p = withPackageInfo (packageInfo p) (evaluatePackageBody (packageBody p))
 
 withUnevaluatedModules :: Effectful m => ModuleTable [Module term] -> m (Reader (ModuleTable [Module term]) ': effects) a -> m effects a
 withUnevaluatedModules = raiseHandler . flip runReader
@@ -325,6 +329,7 @@ evaluatePackageBody :: forall location term value effects m
                     .  ( Evaluatable (Base term)
                        , Member (EvalModule term value) (Reader (ModuleTable [Module term]) ': effects)
                        , Member Fail (Reader (ModuleTable [Module term]) ': effects)
+                       , Member (Reader PackageInfo) (Reader (ModuleTable [Module term]) ': effects)
                        , MonadAnalysis location term value (Reader (ModuleTable [Module term]) ': effects) m
                        , MonadEvaluatable location term value (Reader (ModuleTable [Module term]) ': effects) m
                        , Recursive term
@@ -343,6 +348,7 @@ evaluatePackageBody body
 withPrelude :: ( Evaluatable (Base term)
                , Member (EvalModule term value) effects
                , Member Fail effects
+               , Member (Reader PackageInfo) effects
                , MonadAnalysis location term value effects m
                , MonadEvaluatable location term value effects m
                , Recursive term

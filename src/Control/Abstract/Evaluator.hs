@@ -327,10 +327,8 @@ currentModule = do
   maybeM (raise (fail "unable to get currentModule")) $ withSomeOrigin (originModule @term) o
 
 -- | Get the currently evaluating 'PackageInfo'.
-currentPackage :: forall location term value effects m . (Member Fail effects, MonadEvaluator location term value effects m) => m effects PackageInfo
-currentPackage = do
-  o <- raise ask
-  maybeM (raise (fail "unable to get currentPackage")) $ withSomeOrigin (originPackage @term) o
+currentPackage :: (Effectful m, Member (Reader PackageInfo) effects) => m effects PackageInfo
+currentPackage = raise ask
 
 
 -- Control
