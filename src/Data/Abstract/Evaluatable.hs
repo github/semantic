@@ -55,7 +55,6 @@ type MonadEvaluatable location term value effects m =
   , MonadAddressable location effects m
   , MonadEvaluator location term value effects m
   , MonadValue location value effects m
-  , Recursive term
   , Reducer value (Cell location value)
   )
 
@@ -292,6 +291,7 @@ evalModule :: forall location term value effects m
               , Member Fail effects
               , MonadAnalysis location term value effects m
               , MonadEvaluatable location term value effects m
+              , Recursive term
               )
            => Module term
            -> m effects value
@@ -311,6 +311,7 @@ evaluatePackage :: ( Evaluatable (Base term)
                    , Member (Reader (SomeOrigin term)) effects
                    , MonadAnalysis location term value (Reader (ModuleTable [Module term]) ': effects) m
                    , MonadEvaluatable location term value (Reader (ModuleTable [Module term]) ': effects) m
+                   , Recursive term
                    )
                 => Package term
                 -> m effects [value]
@@ -326,6 +327,7 @@ evaluatePackageBody :: forall location term value effects m
                        , Member Fail (Reader (ModuleTable [Module term]) ': effects)
                        , MonadAnalysis location term value (Reader (ModuleTable [Module term]) ': effects) m
                        , MonadEvaluatable location term value (Reader (ModuleTable [Module term]) ': effects) m
+                       , Recursive term
                        )
                     => PackageBody term
                     -> m effects [value]
@@ -343,6 +345,7 @@ withPrelude :: ( Evaluatable (Base term)
                , Member Fail effects
                , MonadAnalysis location term value effects m
                , MonadEvaluatable location term value effects m
+               , Recursive term
                )
             => Maybe (Module term)
             -> m effects a
