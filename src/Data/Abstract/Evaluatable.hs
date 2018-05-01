@@ -325,8 +325,7 @@ withUnevaluatedModules :: Effectful m => ModuleTable [Module term] -> m (Reader 
 withUnevaluatedModules = raiseHandler . flip runReader
 
 -- | Evaluate a given package body (module table and entry points).
-evaluatePackageBody :: forall location term value effects m
-                    .  ( Evaluatable (Base term)
+evaluatePackageBody :: ( Evaluatable (Base term)
                        , Member (EvalModule term value) (Reader (ModuleTable [Module term]) ': effects)
                        , Member Fail (Reader (ModuleTable [Module term]) ': effects)
                        , Member (Reader PackageInfo) (Reader (ModuleTable [Module term]) ': effects)
