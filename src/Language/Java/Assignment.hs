@@ -257,11 +257,19 @@ class' = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> many m
     -- what's the difference between using tokens: AnonExtends GenericType?
     -- optional: when something can or can't exist and you want to produce a Maybe
 -- TODO: superclass -- need to match the superclass node when it exists (which will be a rule, similar to how the type params rule matches the typeparams node when it exists)
+-- optional, when we have a single term
+-- superInterfaces is also optional but since it produces a list, lists already have an empty value so we don't need to wrap it up in a maybe to get an empty value
+
+-- define this at the top level, we may change TS grammar so that if someone wants to write a Java snippet we could assign
+-- it correctly; fieldDeclaration is standalone (compared to a type, which doesn't say anything by itself)
+fieldDeclaration :: Assignment
+fieldDeclaration = makeTerm <$> symbol FieldDeclaration <*> children ((,) <$> manyTerm modifier <*> type' <**> variableDeclaratorList)
+
 
 method :: Assignment
 method = makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> many modifier <*> emptyTerm <*> methodHeader <*> methodBody)
   where
-    methodBody = symbol MethodBody *> children (term expression)
+    methodBody = symbol MethodBody *> children (term expression <|> emptyTerm)
     methodDeclarator = symbol MethodDeclarator *> children ( (,) <$> identifier <*> formalParameters)
     methodHeader = symbol MethodHeader *> children ((,,,,) <$> (typeParameters <|> pure []) <*> manyTerm annotation <*> type' <*> methodDeclarator <*> (throws <|> pure []))
     makeMethod modifiers receiver (typeParams, annotations, returnType, (name, params), throws) body = Declaration.Method (returnType : modifiers ++ typeParams ++ annotations ++ throws) receiver name params body
