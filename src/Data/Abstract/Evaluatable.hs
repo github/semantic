@@ -30,7 +30,7 @@ import qualified Data.Abstract.Exports as Exports
 import           Data.Abstract.FreeVariables as X
 import           Data.Abstract.Module
 import           Data.Abstract.ModuleTable as ModuleTable
-import           Data.Abstract.Origin (packageOrigin)
+import           Data.Abstract.Origin (SomeOrigin, packageOrigin)
 import           Data.Abstract.Package as Package
 import           Data.Language
 import           Data.Scientific (Scientific)
@@ -46,6 +46,7 @@ type MonadEvaluatable location term value effects m =
   , FreeVariables term
   , Member (EvalClosure term value) effects
   , Member (LoopControl value) effects
+  , Member (Reader (ModuleTable [Module term])) effects
   , Member (Resumable (Unspecialized value)) effects
   , Member (Resumable (LoadError term)) effects
   , Member (Resumable (EvalError value)) effects
@@ -182,6 +183,13 @@ instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
   eval = maybe unit (runApp . foldMap1 (App . subtermValue)) . nonEmpty
 
+-- | Retrieve the table of unevaluated modules.
+askModuleTable :: ( Member (Reader (ModuleTable [Module term])) effects
+                  , MonadEvaluator location term value effects m
+                  )
+               => m effects (ModuleTable [Module term])
+askModuleTable = raise ask
+
 -- Resolve a list of module paths to a possible module table entry.
 resolve :: MonadEvaluatable location term value effects m
         => [FilePath]
@@ -202,6 +210,7 @@ listModulesInDir dir = ModuleTable.modulePathsInDir dir <$> askModuleTable
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
 require :: ( Member (EvalModule term value) effects
+           , Member (Reader (ModuleTable [Module term])) effects
            , Member (Resumable (LoadError term)) effects
            , MonadEvaluator location term value effects m
            , MonadValue location value effects m
@@ -210,7 +219,8 @@ require :: ( Member (EvalModule term value) effects
         -> m effects (Environment location value, value)
 require = requireWith evaluateModule
 
-requireWith :: ( Member (Resumable (LoadError term)) effects
+requireWith :: ( Member (Reader (ModuleTable [Module term])) effects
+               , Member (Resumable (LoadError term)) effects
                , MonadEvaluator location term value effects m
                , MonadValue location value effects m
                )
@@ -223,6 +233,7 @@ requireWith with name = getModuleTable >>= maybeM (loadWith with name) . ModuleT
 --
 -- Always loads/evaluates.
 load :: ( Member (EvalModule term value) effects
+        , Member (Reader (ModuleTable [Module term])) effects
         , Member (Resumable (LoadError term)) effects
         , MonadEvaluator location term value effects m
         , MonadValue location value effects m
@@ -231,7 +242,8 @@ load :: ( Member (EvalModule term value) effects
      -> m effects (Environment location value, value)
 load = loadWith evaluateModule
 
-loadWith :: ( Member (Resumable (LoadError term)) effects
+loadWith :: ( Member (Reader (ModuleTable [Module term])) effects
+            , Member (Resumable (LoadError term)) effects
             , MonadEvaluator location term value effects m
             , MonadValue location value effects m
             )
@@ -293,25 +305,32 @@ evalModule m = raiseHandler
           (\ (Return value) -> pure value)
 
 -- | Evaluate a given package.
-evaluatePackage :: ( Member (EvalModule term value) effects
-                   , Member Fail effects
-                   , MonadAnalysis location term value effects m
-                   , MonadEvaluatable location term value effects m
+evaluatePackage :: ( Member (EvalModule term value) (Reader (ModuleTable [Module term]) ': effects)
+                   , Member Fail (Reader (ModuleTable [Module term]) ': effects)
+                   , Member (Reader (SomeOrigin term)) effects
+                   , MonadAnalysis location term value (Reader (ModuleTable [Module term]) ': effects) m
+                   , MonadEvaluatable location term value (Reader (ModuleTable [Module term]) ': effects) m
                    )
                 => Package term
                 -> m effects [value]
 evaluatePackage p = pushOrigin (packageOrigin p) (evaluatePackageBody (packageBody p))
 
+withUnevaluatedModules :: Effectful m => ModuleTable [Module term] -> m (Reader (ModuleTable [Module term]) ': effects) a -> m effects a
+withUnevaluatedModules = raiseHandler . flip runReader
+
 -- | Evaluate a given package body (module table and entry points).
-evaluatePackageBody :: ( Member (EvalModule term value) effects
-                       , Member Fail effects
-                       , MonadAnalysis location term value effects m
-                       , MonadEvaluatable location term value effects m
+evaluatePackageBody :: forall location term value effects m
+                    .  ( Member (EvalModule term value) (Reader (ModuleTable [Module term]) ': effects)
+                       , Member Fail (Reader (ModuleTable [Module term]) ': effects)
+                       , MonadAnalysis location term value (Reader (ModuleTable [Module term]) ': effects) m
+                       , MonadEvaluatable location term value (Reader (ModuleTable [Module term]) ': effects) m
                        )
                     => PackageBody term
                     -> m effects [value]
-evaluatePackageBody body = withPrelude (packagePrelude body) $
-  localModuleTable (<> packageModules body) (traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints body)))
+evaluatePackageBody body
+  = withUnevaluatedModules (packageModules body)
+  . withPrelude (packagePrelude body)
+  $ traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints body))
   where
     evaluateEntryPoint (m, sym) = do
       (_, v) <- requireWith evalModule m

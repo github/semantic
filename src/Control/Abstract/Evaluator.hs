@@ -37,8 +37,6 @@ module Control.Abstract.Evaluator
   , getModuleTable
   , putModuleTable
   , modifyModuleTable
-  , askModuleTable
-  , localModuleTable
   , getLoadStack
   , putLoadStack
   , modifyLoadStack
@@ -94,7 +92,6 @@ import Prologue
 --   - tables of modules available for import
 class ( Effectful m
       , Member (Reader (Environment location value)) effects
-      , Member (Reader (ModuleTable [Module term])) effects
       , Member (Reader (SomeOrigin term)) effects
       , Member (State (EvaluatorState location term value)) effects
       , Monad (m effects)
@@ -306,15 +303,6 @@ modifyModuleTable :: MonadEvaluator location term value effects m => (ModuleTabl
 modifyModuleTable f = do
   table <- getModuleTable
   putModuleTable $! f table
-
-
--- | Retrieve the table of unevaluated modules.
-askModuleTable :: MonadEvaluator location term value effects m => m effects (ModuleTable [Module term])
-askModuleTable = raise ask
-
--- | Run an action with a locally-modified table of unevaluated modules.
-localModuleTable :: (Effectful m, Member (Reader (ModuleTable [Module term])) effects) => (ModuleTable [Module term] -> ModuleTable [Module term]) -> m effects a -> m effects a
-localModuleTable f = raiseHandler (local f)
 
 
 -- | Retrieve the module load stack
