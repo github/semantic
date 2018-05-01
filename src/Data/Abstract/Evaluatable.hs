@@ -325,12 +325,13 @@ withUnevaluatedModules :: Effectful m => ModuleTable [Module term] -> m (Reader 
 withUnevaluatedModules = raiseHandler . flip runReader
 
 -- | Evaluate a given package body (module table and entry points).
-evaluatePackageBody :: ( Evaluatable (Base term)
-                       , Member (EvalModule term value) (Reader (ModuleTable [Module term]) ': effects)
-                       , Member Fail (Reader (ModuleTable [Module term]) ': effects)
-                       , Member (Reader PackageInfo) (Reader (ModuleTable [Module term]) ': effects)
-                       , MonadAnalysis location term value (Reader (ModuleTable [Module term]) ': effects) m
-                       , MonadEvaluatable location term value (Reader (ModuleTable [Module term]) ': effects) m
+evaluatePackageBody :: ( inner ~ (Reader (ModuleTable [Module term]) ': effects)
+                       , Evaluatable (Base term)
+                       , Member (EvalModule term value) inner
+                       , Member Fail inner
+                       , Member (Reader PackageInfo) inner
+                       , MonadAnalysis location term value inner m
+                       , MonadEvaluatable location term value inner m
                        , Recursive term
                        )
                     => PackageBody term
