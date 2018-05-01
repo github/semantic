@@ -36,16 +36,18 @@ parseBlob renderer blob@Blob{..}
   | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
 
 
-parseBlobs' :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Output output) => TermRenderer output -> [Blob] -> Eff effs ByteString
-parseBlobs' renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . parseBlob' renderer) blobs
-  where toOutput' = case renderer of
-          JSONTermRenderer -> toOutput . renderJSONTerms
-          _ -> toOutput
+astParseBlobs :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Output output) => TermRenderer output -> [Blob] -> Eff effs ByteString
+astParseBlobs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . astParseBlob renderer) blobs
+  where
+    toOutput' = case renderer of
+      JSONTermRenderer -> toOutput . renderJSONTerms
+      _ -> toOutput
 
-parseBlob' :: Members '[Task, Exc SomeException] effs => TermRenderer output -> Blob -> Eff effs output
-parseBlob' renderer blob@Blob{..}
-  | Just (SomeASTParser parser) <- someASTParser <$> blobLanguage
-  = parse parser blob >>= case renderer of
-    SExpressionTermRenderer    -> render renderSExpressionAST
-    _                          -> undefined --decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)
-  | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
+    astParseBlob :: Members '[Task, Exc SomeException] effs => TermRenderer output -> Blob -> Eff effs output
+    astParseBlob renderer blob@Blob{..}
+      | Just (SomeASTParser parser) <- someASTParser <$> blobLanguage
+      = parse parser blob >>= case renderer of
+        SExpressionTermRenderer    -> render renderSExpressionAST
+        JSONTermRenderer           -> render (renderJSONTerm' blob)
+        _                          -> Prelude.fail "Only SExpression and JSON output supported for tree-sitter ASTs."
+      | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
