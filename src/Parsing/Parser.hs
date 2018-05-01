@@ -3,8 +3,9 @@ module Parsing.Parser
 ( Parser(..)
 , SomeParser(..)
 , SomeAnalysisParser(..)
+, SomeASTParser(..)
 , someParser
-, astParser
+, someASTParser
 , someAnalysisParser
 , ApplyAll
 , ApplyAll'
@@ -150,13 +151,16 @@ markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
 
-astParser :: (Bounded grammar, Enum grammar) => Language -> Parser (AST [] grammar)
-astParser Go         = ASTParser tree_sitter_go
-astParser JavaScript = ASTParser tree_sitter_typescript
-astParser JSON       = ASTParser tree_sitter_json
-astParser JSX        = ASTParser tree_sitter_typescript
-astParser Python     = ASTParser tree_sitter_python
-astParser Ruby       = ASTParser tree_sitter_ruby
-astParser TypeScript = ASTParser tree_sitter_typescript
-astParser PHP        = ASTParser tree_sitter_php
-astParser l          = error $ "tree-sitter not supported for: " <> show l
+data SomeASTParser where
+  SomeASTParser :: forall grammar. (Bounded grammar, Enum grammar, Show grammar) => Parser (AST [] grammar) -> SomeASTParser
+
+someASTParser :: Language -> SomeASTParser
+someASTParser Go         = SomeASTParser (ASTParser tree_sitter_go :: Parser (AST [] Go.Grammar))
+someASTParser JavaScript = SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar))
+someASTParser JSON       = SomeASTParser (ASTParser tree_sitter_json :: Parser (AST [] JSON.Grammar))
+someASTParser JSX        = SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar))
+someASTParser Python     = SomeASTParser (ASTParser tree_sitter_python :: Parser (AST [] Python.Grammar))
+someASTParser Ruby       = SomeASTParser (ASTParser tree_sitter_ruby :: Parser (AST [] Ruby.Grammar))
+someASTParser TypeScript = SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar))
+someASTParser PHP        = SomeASTParser (ASTParser tree_sitter_php :: Parser (AST [] PHP.Grammar))
+someASTParser l          = error $ "Tree-Sitter AST parsing not supported for: " <> show l

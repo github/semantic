@@ -44,7 +44,7 @@ parseBlobs' renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . parseBl
 
 parseBlob' :: Members '[Task, Exc SomeException] effs => TermRenderer output -> Blob -> Eff effs output
 parseBlob' renderer blob@Blob{..}
-  | Just parser <- astParser <$> blobLanguage
+  | Just (SomeASTParser parser) <- someASTParser <$> blobLanguage
   = parse parser blob >>= case renderer of
     SExpressionTermRenderer    -> render renderSExpressionAST
     _                          -> undefined --decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)

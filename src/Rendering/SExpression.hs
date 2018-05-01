@@ -22,8 +22,8 @@ renderSExpressionDiff diff = cata printDiffF diff 0 <> "\n"
 renderSExpressionTerm :: (ConstrainAll Show fields, Foldable syntax, Functor syntax) => Term syntax (Record fields) -> ByteString
 renderSExpressionTerm term = cata (\ term n -> nl n <> replicate (2 * n) ' ' <> printTermF term n) term 0 <> "\n"
 
--- renderSExpressionAST :: (Bounded grammar) => Node grammar -> ByteString
-renderSExpressionAST term = undefined
+renderSExpressionAST :: Show grammar => AST [] grammar -> ByteString
+renderSExpressionAST term = pack (show term)
 
 
 printDiffF :: (ConstrainAll Show fields, Foldable syntax) => DiffF syntax (Record fields) (Record fields) (Int -> ByteString) -> Int -> ByteString
