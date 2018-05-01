@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstrainedClassMethods, FunctionalDependencies, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
+{-# LANGUAGE FunctionalDependencies, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
 module Control.Abstract.Evaluator
   ( MonadEvaluator
   -- * State
