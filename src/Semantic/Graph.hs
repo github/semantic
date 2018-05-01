@@ -9,6 +9,7 @@ import           Analysis.Abstract.BadVariables
 import           Analysis.Abstract.Erroring
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.ImportGraph
+import           Analysis.Abstract.Graph (Graph, renderGraph)
 import qualified Control.Exception as Exc
 import           Data.Abstract.Address
 import qualified Data.Abstract.Evaluatable as Analysis
@@ -36,7 +37,7 @@ graph renderer project
     (Proxy :: Proxy '[ Analysis.Evaluatable, Analysis.Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
     parsePackage parser prelude project >>= graphImports >>= case renderer of
       JSONGraphRenderer -> pure . toOutput
-      DOTGraphRenderer  -> pure . renderImportGraph
+      DOTGraphRenderer  -> pure . renderGraph
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: Members '[Distribute WrappedTask, Files, Task] effs
@@ -85,10 +86,9 @@ graphImports :: ( Show ann
                 , Apply Ord1 syntax
                 , Apply Eq1 syntax
                 , Apply Show1 syntax
-                , Member Syntax.Identifier syntax
                 , Members '[Exc SomeException, Task] effs
                 )
-             => Package (Term (Union syntax) ann) -> Eff effs ImportGraph
+             => Package (Term (Union syntax) ann) -> Eff effs Graph
 graphImports package = analyze (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package) >>= extractGraph
   where
     asAnalysisForTypeOfPackage :: ImportGraphAnalysis term effs value
