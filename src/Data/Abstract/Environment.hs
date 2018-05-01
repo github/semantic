@@ -24,8 +24,8 @@ import           Data.Abstract.Address
 import           Data.Abstract.FreeVariables
 import           Data.Abstract.Live
 import           Data.Align
-import           Data.Empty as Empty
 import qualified Data.Map as Map
+import           Data.Semilattice.Lower
 import           GHC.Exts (IsList (..))
 import           Prologue
 import qualified Data.List.NonEmpty as NonEmpty
@@ -52,15 +52,12 @@ instance IsList (Environment l a) where
   fromList xs                   = Environment (Map.fromList xs :| [])
   toList (Environment (x :| _)) = Map.toList x
 
-instance Empty (Environment l a) where
-  empty = emptyEnv
-
 mergeEnvs :: Environment l a -> Environment l a -> Environment l a
 mergeEnvs (Environment (a :| as)) (Environment (b :| bs)) =
   Environment ((<>) a b :| alignWith (mergeThese (<>)) as bs)
 
 emptyEnv :: Environment l a
-emptyEnv = Environment (Empty.empty :| [])
+emptyEnv = Environment (lowerBound :| [])
 
 -- | Make and enter a new empty scope in the given environment.
 push :: Environment l a -> Environment l a
@@ -68,7 +65,7 @@ push (Environment (a :| as)) = Environment (mempty :| a : as)
 
 -- | Remove the frontmost scope.
 pop :: Environment l a -> Environment l a
-pop (Environment (_ :| []))     = Empty.empty
+pop (Environment (_ :| []))     = emptyEnv
 pop (Environment (_ :| a : as)) = Environment (a :| as)
 
 -- | Drop all scopes save for the frontmost one.
@@ -140,3 +137,6 @@ roots env = foldMap (maybe mempty liveSingleton . flip lookup env)
 
 addresses :: Ord l => Environment l a -> Live l a
 addresses = Live . fromList . fmap snd . pairs
+
+
+instance Lower (Environment location value) where lowerBound = emptyEnv

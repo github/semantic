@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedLists #-}
 module Analysis.PHP.Spec (spec) where
 
-import Data.Abstract.Evaluatable (EvalError(..), runAnalysis)
+import Data.Abstract.Evaluatable (EvalError(..), interpret)
 import qualified Language.PHP.Assignment as PHP
 import qualified Data.Language as Language
 
@@ -36,4 +36,4 @@ spec = parallel $ do
   where
     fixtures = "test/fixtures/php/analysis/"
     evaluate entry = evalPHPProject (fixtures <> entry)
-    evalPHPProject path = runAnalysis @(TestEvaluating PHP.Term) <$> evaluateProject phpParser Language.PHP Nothing path
+    evalPHPProject path = interpret @(TestEvaluating PHP.Term) <$> evaluateProject phpParser Language.PHP Nothing path

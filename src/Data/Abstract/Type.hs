@@ -10,7 +10,6 @@ import Control.Abstract.Analysis
 import Data.Abstract.Address
 import Data.Abstract.Environment as Env
 import Data.Align (alignWith)
-import qualified Data.Empty as Empty
 import Data.Semigroup.Reducer (Reducer)
 import Prelude
 import Prologue hiding (TypeError)
@@ -93,7 +92,7 @@ instance ( Alternative (m effects)
       tvar <- Var <$> raise fresh
       assign a tvar
       (env, tvars) <- rest
-      pure (Env.insert name a env, tvar : tvars)) (pure (Empty.empty, Empty.empty)) names
+      pure (Env.insert name a env, tvar : tvars)) (pure (emptyEnv, [])) names
     ret <- localEnv (mergeEnvs env) body
     pure (Product tvars :-> ret)
 
@@ -114,7 +113,7 @@ instance ( Alternative (m effects)
   klass _ _ _   = pure Object
   namespace _ _ = pure Unit
 
-  scopedEnvironment _ = pure (Just Empty.empty)
+  scopedEnvironment _ = pure (Just emptyEnv)
 
   asString t = unify t String $> ""
   asPair t   = do

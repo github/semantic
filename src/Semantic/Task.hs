@@ -88,7 +88,7 @@ parse :: Member Task effs => Parser term -> Blob -> Eff effs term
 parse parser = send . Parse parser
 
 -- | A task running some 'Analysis.MonadAnalysis' to completion.
-analyze :: (Analysis.Interpreter analysisEffects result function m, Member Task effs) => m analysisEffects result -> Eff effs function
+analyze :: (Analysis.Interpreter m analysisEffects, Member Task effs) => m analysisEffects result -> Eff effs (Analysis.Result m analysisEffects result)
 analyze = send . Analyze
 
 -- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
@@ -131,7 +131,7 @@ runTaskWithOptions options task = do
 -- | An effect describing high-level tasks to be performed.
 data Task output where
   Parse    :: Parser term -> Blob -> Task term
-  Analyze  :: Analysis.Interpreter effects result function m => m effects result -> Task function
+  Analyze  :: Analysis.Interpreter m effects => m effects result -> Task (Analysis.Result m effects result)
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
   Diff     :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
   Render   :: Renderer input output -> input -> Task output
@@ -140,7 +140,7 @@ data Task output where
 runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, IO] effs => Eff (Task ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
   Parse parser blob -> runParser blob parser
-  Analyze analysis -> pure (Analysis.runAnalysis analysis)
+  Analyze analysis -> pure (Analysis.interpret analysis)
   Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
   Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
   Render renderer input -> pure (renderer input)

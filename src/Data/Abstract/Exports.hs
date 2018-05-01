@@ -13,10 +13,11 @@ import Data.Abstract.Address
 import Data.Abstract.Environment (Environment, unpairs)
 import Data.Abstract.FreeVariables
 import qualified Data.Map as Map
+import Data.Semilattice.Lower
 
 -- | A map of export names to an alias & address tuple.
 newtype Exports l a = Exports { unExports :: Map.Map Name (Name, Maybe (Address l a)) }
-  deriving (Eq, Foldable, Functor, Generic1, Monoid, Ord, Semigroup, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Generic1, Lower, Monoid, Ord, Semigroup, Show, Traversable)
 
 null :: Exports l a -> Bool
 null = Map.null . unExports

@@ -138,7 +138,7 @@ instance Ord1 Return where liftCompare = genericLiftCompare
 instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Return where
-  eval (Return x) = throwException =<< Ret <$> subtermValue x
+  eval (Return x) = subtermValue x >>= earlyReturn
 
 newtype Yield a = Yield a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -159,7 +159,7 @@ instance Ord1 Break where liftCompare = genericLiftCompare
 instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Break where
-  eval (Break x) = throwLoop =<< Brk <$> subtermValue x
+  eval (Break x) = subtermValue x >>= throwBreak
 
 newtype Continue a = Continue a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -170,7 +170,7 @@ instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Continue where
   -- TODO: figure out what to do with the datum inside Continue. what can it represent?
-  eval (Continue _) = throwLoop Con
+  eval (Continue _) = throwContinue
 
 newtype Retry a = Retry a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)

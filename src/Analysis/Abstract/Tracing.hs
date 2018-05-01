@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.Tracing
 ( Tracing
@@ -7,6 +7,7 @@ module Analysis.Abstract.Tracing
 import Control.Abstract.Analysis
 import Control.Monad.Effect.Writer
 import Data.Abstract.Configuration
+import Data.Abstract.Live
 import Data.Semigroup.Reducer as Reducer
 import Data.Union
 import Prologue
@@ -21,6 +22,7 @@ deriving instance MonadEvaluator location term value effects m => MonadEvaluator
 
 instance ( Corecursive term
          , Effectful m
+         , Member (Reader (Live location value)) effects
          , Member (Writer (trace (Configuration location term value))) effects
          , MonadAnalysis location term value effects m
          , Ord location
@@ -34,9 +36,10 @@ instance ( Corecursive term
 
   analyzeModule = liftAnalyze analyzeModule
 
-instance ( Interpreter effects (result, trace (Configuration location term value)) rest m
+instance ( Interpreter m effects
          , MonadEvaluator location term value effects m
          , Monoid (trace (Configuration location term value))
          )
-      => Interpreter (Writer (trace (Configuration location term value)) ': effects) result rest (Tracing trace m) where
+      => Interpreter (Tracing trace m) (Writer (trace (Configuration location term value)) ': effects) where
+  type Result (Tracing trace m) (Writer (trace (Configuration location term value)) ': effects) result = Result m effects (result, trace (Configuration location term value))
   interpret = interpret . runTracing . raiseHandler runWriter

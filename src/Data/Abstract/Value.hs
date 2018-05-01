@@ -1,14 +1,21 @@
-{-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value where
 
-import Control.Abstract.Analysis
-import Data.Abstract.Environment (Environment)
+import Control.Abstract.Addressable
+import Control.Abstract.Evaluator
+import Control.Abstract.Value
+import Control.Effect
+import Control.Monad.Effect.Fail
+import Control.Monad.Effect.Resumable
+import Data.Abstract.Address
+import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
-import Data.Abstract.Evaluatable
+import Data.Abstract.FreeVariables
 import qualified Data.Abstract.Number as Number
 import Data.List (genericIndex, genericLength)
 import Data.Scientific (Scientific)
 import Data.Scientific.Exts
+import Data.Semigroup.Reducer
 import qualified Data.Set as Set
 import Prologue hiding (TypeError)
 import Prelude hiding (Float, Integer, String, Rational)
@@ -203,9 +210,18 @@ instance AbstractHole (Value location) where
   hole = injValue Hole
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Monad (m effects)
+instance ( Member (EvalClosure term (Value location)) effects
+         , Member Fail effects
+         , Member (LoopControl (Value location)) effects
+         , Member (Resumable (AddressError location (Value location))) effects
          , Member (Resumable (ValueError location (Value location))) effects
-         , MonadEvaluatable location term (Value location) effects m
+         , Member (Return (Value location)) effects
+         , Monad (m effects)
+         , MonadAddressable location effects m
+         , MonadEvaluator location term (Value location) effects m
+         , Recursive term
+         , Reducer (Value location) (Cell location (Value location))
+         , Show location
          )
       => MonadValue location (Value location) effects m where
   unit     = pure . injValue $ Unit
@@ -295,7 +311,7 @@ instance ( Monad (m effects)
         tentative x i j = attemptUnsafeArithmetic (x i j)
 
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: (Member (Resumable (ValueError location value)) effects, MonadEvaluatable location term value effects m) => Either ArithException Number.SomeNumber -> m effects value
+        specialize :: Either ArithException Number.SomeNumber -> m effects (Value location)
         specialize (Left exc) = throwValueError (ArithmeticError exc)
         specialize (Right (Number.SomeNumber (Number.Integer i))) = integer i
         specialize (Right (Number.SomeNumber (Number.Ratio r)))   = rational r
@@ -314,7 +330,7 @@ instance ( Monad (m effects)
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: (Ord a, MonadValue location value effects m) => a -> a -> m effects value
+        go :: Ord a => a -> a -> m effects (Value location)
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
           Generalized -> integer (orderingToInt (compare l r))
@@ -353,13 +369,50 @@ instance ( Monad (m effects)
           localEnv (mergeEnvs bindings) (evalClosure body)
       Nothing -> throwValueError (CallError op)
     where
-      evalClosure :: term -> m effects (Value location)
-      evalClosure term = catchException (evaluateTerm term) handleReturn
+      evalClosure term = catchReturn @m @(Value location) (evaluateClosureBody term) (\ (Return value) -> pure value)
 
-      handleReturn :: ReturnThrow (Value location) -> m effects (Value location)
-      handleReturn (Ret v) = pure v
+  loop x = catchLoopControl @m @(Value location) (fix x) (\ control -> case control of
+    Break value -> pure value
+    Continue    -> loop x)
 
-  loop x = catchException (fix x) handleLoop where
-    handleLoop :: LoopThrow (Value location) -> m effects (Value location)
-    handleLoop (Brk v) = pure v
-    handleLoop Con     = loop x
+
+-- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
+data ValueError location value resume where
+  StringError            :: value          -> ValueError location value ByteString
+  BoolError              :: value          -> ValueError location value Bool
+  IndexError             :: value -> value -> ValueError location value value
+  NamespaceError         :: Prelude.String -> ValueError location value (Environment location value)
+  CallError              :: value          -> ValueError location value value
+  NumericError           :: value          -> ValueError location value value
+  Numeric2Error          :: value -> value -> ValueError location value value
+  ComparisonError        :: value -> value -> ValueError location value value
+  BitwiseError           :: value          -> ValueError location value value
+  Bitwise2Error          :: value -> value -> ValueError location value value
+  KeyValueError          :: value          -> ValueError location value (value, value)
+  -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
+  ArithmeticError :: ArithException -> ValueError location value value
+  -- Out-of-bounds error
+  BoundsError :: [value] -> Prelude.Integer -> ValueError location value value
+
+
+
+instance Eq value => Eq1 (ValueError location value) where
+  liftEq _ (StringError a) (StringError b)                       = a == b
+  liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
+  liftEq _ (CallError a) (CallError b)                           = a == b
+  liftEq _ (BoolError a) (BoolError c)                           = a == c
+  liftEq _ (IndexError a b) (IndexError c d)                     = (a == c) && (b == d)
+  liftEq _ (Numeric2Error a b) (Numeric2Error c d)               = (a == c) && (b == d)
+  liftEq _ (ComparisonError a b) (ComparisonError c d)           = (a == c) && (b == d)
+  liftEq _ (Bitwise2Error a b) (Bitwise2Error c d)               = (a == c) && (b == d)
+  liftEq _ (BitwiseError a) (BitwiseError b)                     = a == b
+  liftEq _ (KeyValueError a) (KeyValueError b)                   = a == b
+  liftEq _ (BoundsError a b) (BoundsError c d)                   = (a == c) && (b == d)
+  liftEq _ _             _                                       = False
+
+deriving instance (Show value) => Show (ValueError location value resume)
+instance (Show value) => Show1 (ValueError location value) where
+  liftShowsPrec _ _ = showsPrec
+
+throwValueError :: (Member (Resumable (ValueError location value)) effects, MonadEvaluator location term value effects m) => ValueError location value resume -> m effects resume
+throwValueError = throwResumable

@@ -1,9 +1,9 @@
-{-# LANGUAGE ConstrainedClassMethods, FunctionalDependencies, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
+{-# LANGUAGE ConstrainedClassMethods, FunctionalDependencies, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
 module Control.Abstract.Evaluator
-  ( MonadEvaluator(..)
-  -- State
+  ( MonadEvaluator
+  -- * State
   , EvaluatorState(..)
-  -- Environment
+  -- * Environment
   , getEnv
   , putEnv
   , modifyEnv
@@ -15,19 +15,25 @@ module Control.Abstract.Evaluator
   , localize
   , lookupEnv
   , lookupWith
-  -- Exports
+  -- * Exports
   , getExports
   , putExports
   , modifyExports
   , addExport
   , withExports
-  -- Heap
+  , isolate
+  -- * Heap
   , getHeap
   , putHeap
   , modifyHeap
   , lookupHeap
   , assign
-  -- Module tables
+  -- * Roots
+  , askRoots
+  , extraRoots
+  -- * Configuration
+  , getConfiguration
+  -- * Module tables
   , getModuleTable
   , putModuleTable
   , modifyModuleTable
@@ -38,22 +44,29 @@ module Control.Abstract.Evaluator
   , modifyLoadStack
   , currentModule
   , currentPackage
-  -- Control
+  -- * Control
   , label
   , goto
-  -- Exceptions
-  , throwResumable
-  , throwException
-  , catchException
-  -- | Origin
+  -- * Effects
+  , EvalClosure(..)
+  , evaluateClosureBody
+  , EvalModule(..)
+  , evaluateModule
+  , Return(..)
+  , earlyReturn
+  , catchReturn
+  , LoopControl(..)
+  , throwBreak
+  , throwContinue
+  , catchLoopControl
+  -- * Origin
   , pushOrigin
   ) where
 
 import Control.Effect
-import Control.Monad.Effect.Exception as Exception
+import qualified Control.Monad.Effect as Eff
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Reader
-import Control.Monad.Effect.Resumable as Resumable
 import Control.Monad.Effect.State
 import Data.Abstract.Address
 import Data.Abstract.Configuration
@@ -61,13 +74,14 @@ import Data.Abstract.Environment as Env
 import Data.Abstract.Exports as Export
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
+import Data.Abstract.Live
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Package
 import Data.Abstract.Origin
-import Data.Empty as Empty
 import qualified Data.IntMap as IntMap
 import Data.Semigroup.Reducer
+import Data.Semilattice.Lower
 import Lens.Micro
 import Prelude hiding (fail)
 import Prologue
@@ -79,16 +93,13 @@ import Prologue
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
 class ( Effectful m
-      , Member Fail effects
       , Member (Reader (Environment location value)) effects
       , Member (Reader (ModuleTable [Module term])) effects
       , Member (Reader (SomeOrigin term)) effects
       , Member (State (EvaluatorState location term value)) effects
       , Monad (m effects)
       )
-   => MonadEvaluator location term value effects m | m effects -> location term value where
-  -- | Get the current 'Configuration' with a passed-in term.
-  getConfiguration :: Ord location => term -> m effects (Configuration location term value)
+   => MonadEvaluator location term value effects m | m effects -> location term value
 
 
 -- State
@@ -100,18 +111,14 @@ data EvaluatorState location term value = EvaluatorState
   , loadStack   :: LoadStack
   , exports     :: Exports location value
   , jumps       :: IntMap.IntMap (SomeOrigin term, term)
-  , origin      :: SomeOrigin term
   }
 
 deriving instance (Eq (Cell location value), Eq location, Eq term, Eq value, Eq (Base term ())) => Eq (EvaluatorState location term value)
 deriving instance (Ord (Cell location value), Ord location, Ord term, Ord value, Ord (Base term ())) => Ord (EvaluatorState location term value)
 deriving instance (Show (Cell location value), Show location, Show term, Show value, Show (Base term ())) => Show (EvaluatorState location term value)
 
-instance (Ord location, Semigroup (Cell location value)) => Semigroup (EvaluatorState location term value) where
-  EvaluatorState e1 h1 m1 l1 x1 j1 o1 <> EvaluatorState e2 h2 m2 l2 x2 j2 o2 = EvaluatorState (mergeEnvs e1 e2) (h1 <> h2) (m1 <> m2) (l1 <> l2) (x1 <> x2) (j1 <> j2) (o1 <> o2)
-
-instance (Ord location, Semigroup (Cell location value)) => Empty (EvaluatorState location term value) where
-  empty = EvaluatorState Empty.empty mempty mempty mempty mempty mempty mempty
+instance Lower (EvaluatorState location term value) where
+  lowerBound = EvaluatorState lowerBound lowerBound lowerBound lowerBound lowerBound lowerBound
 
 
 -- Lenses
@@ -133,9 +140,6 @@ _exports = lens exports (\ s e -> s {exports = e})
 
 _jumps :: Lens' (EvaluatorState location term value) (IntMap.IntMap (SomeOrigin term, term))
 _jumps = lens jumps (\ s j -> s {jumps = j})
-
-_origin :: Lens' (EvaluatorState location term value) (SomeOrigin term)
-_origin = lens origin (\ s o -> s {origin = o})
 
 
 (.=) :: MonadEvaluator location term value effects m => ASetter (EvaluatorState location term value) (EvaluatorState location term value) a b -> b -> m effects ()
@@ -180,7 +184,7 @@ defaultEnvironment = raise ask
 -- | Set the default environment for the lifetime of an action.
 --   Usually only invoked in a top-level evaluation function.
 withDefaultEnvironment :: MonadEvaluator location term value effects m => Environment location value -> m effects a -> m effects a
-withDefaultEnvironment e = raise . local (const e) . lower
+withDefaultEnvironment e = raiseHandler (local (const e))
 
 -- | Obtain an environment that is the composition of the current and default environments.
 --   Useful for debugging.
@@ -233,6 +237,10 @@ addExport name alias = modifyExports . Export.insert name alias
 withExports :: MonadEvaluator location term value effects m => Exports location value -> m effects a -> m effects a
 withExports s = localEvaluatorState _exports (const s)
 
+-- | Isolate the given action with an empty global environment and exports.
+isolate :: MonadEvaluator location term value effects m => m effects a -> m effects a
+isolate = withEnv lowerBound . withExports lowerBound
+
 
 -- Heap
 
@@ -265,6 +273,24 @@ assign :: ( Ord location
 assign address = modifyHeap . heapInsert address
 
 
+-- Roots
+
+-- | Retrieve the local 'Live' set.
+askRoots :: (Effectful m, Member (Reader (Live location value)) effects) => m effects (Live location value)
+askRoots = raise ask
+
+-- | Run a computation with the given 'Live' set added to the local root set.
+extraRoots :: (Effectful m, Member (Reader (Live location value)) effects, Ord location) => Live location value -> m effects a -> m effects a
+extraRoots roots = raiseHandler (local (<> roots))
+
+
+-- Configuration
+
+-- | Get the current 'Configuration' with a passed-in term.
+getConfiguration :: (Member (Reader (Live location value)) effects, MonadEvaluator location term value effects m) => term -> m effects (Configuration location term value)
+getConfiguration term = Configuration term <$> askRoots <*> getEnv <*> getHeap
+
+
 -- Module table
 
 -- | Retrieve the table of evaluated modules.
@@ -288,7 +314,7 @@ askModuleTable = raise ask
 
 -- | Run an action with a locally-modified table of unevaluated modules.
 localModuleTable :: MonadEvaluator location term value effects m => (ModuleTable [Module term] -> ModuleTable [Module term]) -> m effects a -> m effects a
-localModuleTable f a = raise (local f (lower a))
+localModuleTable f = raiseHandler (local f)
 
 
 -- | Retrieve the module load stack
@@ -307,13 +333,13 @@ modifyLoadStack f = do
 
 
 -- | Get the currently evaluating 'ModuleInfo'.
-currentModule :: forall location term value effects m . MonadEvaluator location term value effects m => m effects ModuleInfo
+currentModule :: forall location term value effects m . (Member Fail effects, MonadEvaluator location term value effects m) => m effects ModuleInfo
 currentModule = do
   o <- raise ask
   maybeM (raise (fail "unable to get currentModule")) $ withSomeOrigin (originModule @term) o
 
 -- | Get the currently evaluating 'PackageInfo'.
-currentPackage :: forall location term value effects m . MonadEvaluator location term value effects m => m effects PackageInfo
+currentPackage :: forall location term value effects m . (Member Fail effects, MonadEvaluator location term value effects m) => m effects PackageInfo
 currentPackage = do
   o <- raise ask
   maybeM (raise (fail "unable to get currentPackage")) $ withSomeOrigin (originPackage @term) o
@@ -333,7 +359,7 @@ label term = do
   pure i
 
 -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
-goto :: (Recursive term, MonadEvaluator location term value effects m) => Label -> (term -> m effects a) -> m effects a
+goto :: (Recursive term, Member Fail effects, MonadEvaluator location term value effects m) => Label -> (term -> m effects a) -> m effects a
 goto label comp = do
   maybeTerm <- IntMap.lookup label <$> view _jumps
   case maybeTerm of
@@ -341,16 +367,55 @@ goto label comp = do
     Nothing -> raise (fail ("unknown label: " <> show label))
 
 
--- Exceptions
+-- Effects
 
-throwResumable :: (Member (Resumable exc) effects, Effectful m) => exc v -> m effects v
-throwResumable = raise . Resumable.throwError
+-- | An effect to evaluate a closure’s body.
+data EvalClosure term value resume where
+  EvalClosure :: term -> EvalClosure term value value
 
-throwException :: (Member (Exc exc) effects, Effectful m) => exc -> m effects a
-throwException = raise . Exception.throwError
+evaluateClosureBody :: (Effectful m, Member (EvalClosure term value) effects) => term -> m effects value
+evaluateClosureBody = raise . Eff.send . EvalClosure
 
-catchException :: (Member (Exc exc) effects, Effectful m) => m effects v -> (exc -> m effects v) -> m effects v
-catchException action handler = raise (lower action `Exception.catchError` (lower . handler))
+
+-- | An effect to evaluate a module.
+data EvalModule term value resume where
+  EvalModule :: Module term -> EvalModule term value value
+
+evaluateModule :: (Effectful m, Member (EvalModule term value) effects) => Module term -> m effects value
+evaluateModule = raise . Eff.send . EvalModule
+
+
+-- | An effect for explicitly returning out of a function/method body.
+data Return value resume where
+  Return :: value -> Return value value
+
+deriving instance Eq value => Eq (Return value a)
+deriving instance Show value => Show (Return value a)
+
+earlyReturn :: (Effectful m, Member (Return value) effects) => value -> m effects value
+earlyReturn = raise . Eff.send . Return
+
+catchReturn :: (Effectful m, Member (Return value) effects) => m effects a -> (forall x . Return value x -> m effects a) -> m effects a
+catchReturn action handler = raiseHandler (Eff.interpose pure (\ ret _ -> lower (handler ret))) action
+
+
+-- | Effects for control flow around loops (breaking and continuing).
+data LoopControl value resume where
+  Break :: value -> LoopControl value value
+  Continue :: LoopControl value value
+
+deriving instance Eq value => Eq (LoopControl value a)
+deriving instance Show value => Show (LoopControl value a)
+
+throwBreak :: (Effectful m, Member (LoopControl value) effects) => value -> m effects value
+throwBreak = raise . Eff.send . Break
+
+throwContinue :: (Effectful m, Member (LoopControl value) effects) => m effects value
+throwContinue = raise (Eff.send Continue)
+
+catchLoopControl :: (Effectful m, Member (LoopControl value) effects) => m effects a -> (forall x . LoopControl value x -> m effects a) -> m effects a
+catchLoopControl action handler = raiseHandler (Eff.interpose pure (\ control _ -> lower (handler control))) action
+
 
 -- | Push a 'SomeOrigin' onto the stack. This should be used to contextualize execution with information about the originating term, module, or package.
 pushOrigin :: ( Effectful m
@@ -359,4 +424,4 @@ pushOrigin :: ( Effectful m
            => SomeOrigin term
            -> m effects a
            -> m effects a
-pushOrigin o = raise . local (<> o) . lower
+pushOrigin o = raiseHandler (local (<> o))

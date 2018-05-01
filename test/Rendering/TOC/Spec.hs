@@ -1,14 +1,22 @@
-{-# LANGUAGE DataKinds, TypeOperators #-}
-  module Rendering.TOC.Spec (spec) where
+{-# LANGUAGE DataKinds, MonoLocalBinds, TypeOperators #-}
+module Rendering.TOC.Spec (spec) where
 
 import Analysis.Declaration
 import Data.Aeson
+import Data.Align.Generic
 import Data.Bifunctor
+import Data.Bifunctor.Join
 import Data.Diff
+import Data.Functor.Classes
 import Data.Patch
+import Data.Range
+import Data.Record
+import Data.Span
+import Data.Term
 import Data.Text (Text)
 import Data.Text.Encoding (encodeUtf8)
 import Data.Union
+import Diffing.Algorithm
 import Diffing.Interpreter
 import Prelude
 import qualified Data.Syntax as Syntax
@@ -222,3 +230,19 @@ blankDiff = merge (arrayInfo, arrayInfo) (inj [ inserting (termIn literalInfo (i
   where
     arrayInfo = Nothing :. Range 0 3 :. Span (Pos 1 1) (Pos 1 5) :. Nil
     literalInfo = Nothing :. Range 1 2 :. Span (Pos 1 2) (Pos 1 4) :. Nil
+
+-- Diff helpers
+diffWithParser :: ( HasField fields Data.Span.Span
+                  , HasField fields Range
+                  , Eq1 syntax
+                  , Show1 syntax
+                  , Traversable syntax
+                  , Diffable syntax
+                  , GAlign syntax
+                  , HasDeclaration syntax
+                  , Members '[Distribute WrappedTask, Task] effs
+                  )
+               => Parser (Term syntax (Record fields))
+               -> BlobPair
+               -> Eff effs (Diff syntax (Record (Maybe Declaration ': fields)) (Record (Maybe Declaration ': fields)))
+diffWithParser parser blobs = distributeFor blobs (\ blob -> WrapTask $ parse parser blob >>= decorate (declarationAlgebra blob)) >>= diffTermPair diffTerms . runJoin

@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.ImportGraph
 ( ImportGraph(..)
 , renderImportGraph
@@ -8,7 +8,7 @@ module Analysis.Abstract.ImportGraph
 import qualified Algebra.Graph as G
 import           Algebra.Graph.Class hiding (Vertex)
 import           Algebra.Graph.Export.Dot hiding (vertexName)
-import           Control.Abstract.Analysis hiding (origin)
+import           Control.Abstract.Analysis
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable (LoadError (..))
 import           Data.Abstract.FreeVariables
@@ -16,7 +16,7 @@ import           Data.Abstract.Located
 import           Data.Abstract.Module hiding (Module)
 import           Data.Abstract.Origin hiding (Module, Package)
 import           Data.Abstract.Package hiding (Package)
-import           Data.Aeson
+import           Data.Aeson hiding (Result)
 import qualified Data.ByteString.Char8 as BC
 import           Data.ByteString.Lazy (toStrict)
 import           Data.Output
@@ -60,12 +60,10 @@ deriving instance MonadEvaluator location term value effects m => MonadEvaluator
 
 
 instance ( Effectful m
-         , Member (Reader (SomeOrigin term)) effects
-         , Member (Resumable (LoadError term value)) effects
+         , Member (Resumable (LoadError term)) effects
          , Member (State ImportGraph) effects
          , Member Syntax.Identifier syntax
          , MonadAnalysis (Located location term) term value effects m
-         , Show ann
          , term ~ Term (Union syntax) ann
          )
       => MonadAnalysis (Located location term) term value effects (ImportGraphing m) where
@@ -76,7 +74,7 @@ instance ( Effectful m
         variableDefinition name
       _ -> pure ()
     resume
-      @(LoadError term value)
+      @(LoadError term)
       (liftAnalyze analyzeTerm eval term)
       (\yield (LoadError name) -> moduleInclusion (Module (BC.pack name)) >> yield [])
 
@@ -168,6 +166,7 @@ vertexToType Module{}   = "module"
 vertexToType Variable{} = "variable"
 
 
-instance Interpreter effects (result, ImportGraph) rest m
-      => Interpreter (State ImportGraph ': effects) result rest (ImportGraphing m) where
+instance Interpreter m effects
+      => Interpreter (ImportGraphing m) (State ImportGraph ': effects) where
+  type Result (ImportGraphing m) (State ImportGraph ': effects) result = Result m effects (result, ImportGraph)
   interpret = interpret . runImportGraphing . raiseHandler (`runState` mempty)

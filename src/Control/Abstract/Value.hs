@@ -8,7 +8,6 @@ module Control.Abstract.Value
 , forLoop
 , makeNamespace
 , ValueRoots(..)
-, ValueError(..)
 ) where
 
 import Control.Abstract.Evaluator
@@ -17,9 +16,9 @@ import Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables
 import Data.Abstract.Live (Live)
 import Data.Abstract.Number as Number
-import Data.Empty as Empty
 import Data.Scientific (Scientific)
 import Data.Semigroup.Reducer hiding (unit)
+import Data.Semilattice.Lower
 import Prelude
 import Prologue hiding (TypeError)
 
@@ -185,8 +184,8 @@ makeNamespace :: ( MonadValue location value effects m
               -> Maybe value
               -> m effects value
 makeNamespace name addr super = do
-  superEnv <- maybe (pure (Just Empty.empty)) scopedEnvironment super
-  let env' = fromMaybe Empty.empty superEnv
+  superEnv <- maybe (pure (Just lowerBound)) scopedEnvironment super
+  let env' = fromMaybe lowerBound superEnv
   namespaceEnv <- Env.head <$> getEnv
   v <- namespace name (Env.mergeNewer env' namespaceEnv)
   v <$ assign addr v
@@ -196,42 +195,3 @@ makeNamespace name addr super = do
 class ValueRoots location value where
   -- | Compute the set of addresses rooted by a given value.
   valueRoots :: value -> Live location value
-
-
--- The type of exceptions that can be thrown when constructing values in `MonadValue`.
-data ValueError location value resume where
-  StringError            :: value          -> ValueError location value ByteString
-  BoolError              :: value          -> ValueError location value Bool
-  IndexError             :: value -> value -> ValueError location value value
-  NamespaceError         :: Prelude.String -> ValueError location value (Environment location value)
-  CallError              :: value          -> ValueError location value value
-  NumericError           :: value          -> ValueError location value value
-  Numeric2Error          :: value -> value -> ValueError location value value
-  ComparisonError        :: value -> value -> ValueError location value value
-  BitwiseError           :: value          -> ValueError location value value
-  Bitwise2Error          :: value -> value -> ValueError location value value
-  KeyValueError          :: value          -> ValueError location value (value, value)
-  -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
-  ArithmeticError :: ArithException -> ValueError location value value
-  -- Out-of-bounds error
-  BoundsError :: [value] -> Integer -> ValueError location value value
-
-
-
-instance Eq value => Eq1 (ValueError location value) where
-  liftEq _ (StringError a) (StringError b)                       = a == b
-  liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
-  liftEq _ (CallError a) (CallError b)                           = a == b
-  liftEq _ (BoolError a) (BoolError c)                           = a == c
-  liftEq _ (IndexError a b) (IndexError c d)                     = (a == c) && (b == d)
-  liftEq _ (Numeric2Error a b) (Numeric2Error c d)               = (a == c) && (b == d)
-  liftEq _ (ComparisonError a b) (ComparisonError c d)           = (a == c) && (b == d)
-  liftEq _ (Bitwise2Error a b) (Bitwise2Error c d)               = (a == c) && (b == d)
-  liftEq _ (BitwiseError a) (BitwiseError b)                     = a == b
-  liftEq _ (KeyValueError a) (KeyValueError b)                   = a == b
-  liftEq _ (BoundsError a b) (BoundsError c d)                   = (a == c) && (b == d)
-  liftEq _ _             _                                       = False
-
-deriving instance (Show value) => Show (ValueError location value resume)
-instance (Show value) => Show1 (ValueError location value) where
-  liftShowsPrec _ _ = showsPrec

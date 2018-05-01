@@ -1,24 +1,17 @@
-{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , MonadEvaluatable
 , Evaluatable(..)
 , Unspecialized(..)
-, ReturnThrow(..)
 , EvalError(..)
 , LoadError(..)
-, LoopThrow(..)
 , ResolutionError(..)
 , variable
 , evaluateInScopedEnv
-, evaluateTerm
-, evaluateModule
 , evaluatePackage
 , evaluatePackageBody
-, throwLoadError
-, throwLoop
 , throwEvalError
-, throwValueError
 , resolve
 , traceResolve
 , listModulesInDir
@@ -27,8 +20,9 @@ module Data.Abstract.Evaluatable
 ) where
 
 import           Control.Abstract.Addressable as X
-import           Control.Abstract.Analysis as X
-import qualified Control.Monad.Effect.Exception as Exc
+import           Control.Abstract.Analysis as X hiding (LoopControl(..), Return(..))
+import           Control.Abstract.Analysis (LoopControl, Return(..))
+import           Control.Monad.Effect as Eff
 import           Data.Abstract.Address
 import           Data.Abstract.Declarations as X
 import           Data.Abstract.Environment as X
@@ -39,7 +33,6 @@ import           Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Origin (packageOrigin)
 import           Data.Abstract.Package as Package
 import           Data.Language
-import           Data.Empty as Empty
 import           Data.Scientific (Scientific)
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
@@ -49,33 +42,24 @@ import           Prologue
 
 type MonadEvaluatable location term value effects m =
   ( Declarations term
-  , Effectful m
   , Evaluatable (Base term)
   , FreeVariables term
-  , Member (Exc.Exc (ReturnThrow value)) effects
-  , Member (Exc.Exc (LoopThrow value)) effects
+  , Member (EvalClosure term value) effects
+  , Member (EvalModule term value) effects
   , Member Fail effects
+  , Member (LoopControl value) effects
   , Member (Resumable (Unspecialized value)) effects
-  , Member (Resumable (LoadError term value)) effects
+  , Member (Resumable (LoadError term)) effects
   , Member (Resumable (EvalError value)) effects
   , Member (Resumable (ResolutionError value)) effects
   , Member (Resumable (AddressError location value)) effects
+  , Member (Return value) effects
   , MonadAddressable location effects m
-  , MonadAnalysis location term value effects m
+  , MonadEvaluator location term value effects m
   , MonadValue location value effects m
   , Recursive term
   , Reducer value (Cell location value)
-  , Show location
   )
-
-newtype ReturnThrow value
-  = Ret value
-    deriving (Eq, Show)
-
-data LoopThrow value
-  = Brk value
-  | Con
-    deriving (Eq, Show)
 
 -- | An error thrown when we can't resolve a module from a qualified name.
 data ResolutionError value resume where
@@ -95,14 +79,14 @@ instance Eq1 (ResolutionError value) where
   liftEq _ _ _ = False
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
-data LoadError term value resume where
-  LoadError :: ModulePath -> LoadError term value [Module term]
+data LoadError term resume where
+  LoadError :: ModulePath -> LoadError term [Module term]
 
-deriving instance Eq (LoadError term a b)
-deriving instance Show (LoadError term a b)
-instance Show1 (LoadError term value) where
+deriving instance Eq (LoadError term resume)
+deriving instance Show (LoadError term resume)
+instance Show1 (LoadError term) where
   liftShowsPrec _ _ = showsPrec
-instance Eq1 (LoadError term a) where
+instance Eq1 (LoadError term) where
   liftEq _ (LoadError a) (LoadError b) = a == b
 
 -- | The type of error thrown when failing to evaluate a term.
@@ -119,18 +103,24 @@ data EvalError value resume where
   EnvironmentLookupError :: value -> EvalError value value
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
---   Throws an 'EnvironmentLookupError' if 'scopedEnvTerm' does not have an environment.
-evaluateInScopedEnv :: (MonadEvaluatable location term value effects m)
+--   Throws an 'EnvironmentLookupError' if @scopedEnvTerm@ does not have an environment.
+evaluateInScopedEnv :: MonadEvaluatable location term value effects m
                     => m effects value
                     -> m effects value
                     -> m effects value
 evaluateInScopedEnv scopedEnvTerm term = do
   value <- scopedEnvTerm
   scopedEnv <- scopedEnvironment value
-  maybe (throwEvalError $ EnvironmentLookupError value) (flip localEnv term . mergeEnvs) scopedEnv
+  maybe (throwEvalError (EnvironmentLookupError value)) (flip localEnv term . mergeEnvs) scopedEnv
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
-variable :: (Member (Resumable (AddressError location value)) effects, Member (Resumable (EvalError value)) effects, MonadAddressable location effects m, MonadEvaluator location term value effects m) => Name -> m effects value
+variable :: ( Member (Resumable (AddressError location value)) effects
+            , Member (Resumable (EvalError value)) effects
+            , MonadAddressable location effects m
+            , MonadEvaluator location term value effects m
+            )
+         => Name
+         -> m effects value
 variable name = lookupWith deref name >>= maybeM (throwResumable (FreeVariableError name))
 
 deriving instance Eq a => Eq (EvalError a b)
@@ -149,17 +139,9 @@ instance Eq term => Eq1 (EvalError term) where
   liftEq _ _ _                                             = False
 
 
-throwValueError :: (Member (Resumable (ValueError location value)) effects, MonadEvaluator location term value effects m) => ValueError location value resume -> m effects resume
-throwValueError = throwResumable
-
-throwLoadError :: (Member (Resumable (LoadError term value)) effects, MonadEvaluator location term value effects m) => LoadError term value resume -> m effects resume
-throwLoadError = throwResumable
-
 throwEvalError :: (Member (Resumable (EvalError value)) effects, MonadEvaluator location term value effects m) => EvalError value resume -> m effects resume
 throwEvalError = throwResumable
 
-throwLoop :: MonadEvaluatable location term value effects m => LoopThrow value -> m effects a
-throwLoop = throwException
 
 data Unspecialized a b where
   Unspecialized :: { getUnspecialized :: Prelude.String } -> Unspecialized value value
@@ -218,22 +200,48 @@ listModulesInDir dir = ModuleTable.modulePathsInDir dir <$> askModuleTable
 -- | Require/import another module by name and return it's environment and value.
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
-require :: MonadEvaluatable location term value effects m
+require :: ( Member (EvalModule term value) effects
+           , Member (Resumable (LoadError term)) effects
+           , MonadEvaluator location term value effects m
+           , MonadValue location value effects m
+           )
         => ModulePath
         -> m effects (Environment location value, value)
-require name = getModuleTable >>= maybeM (load name) . ModuleTable.lookup name
+require = requireWith evaluateModule
+
+requireWith :: ( Member (Resumable (LoadError term)) effects
+               , MonadEvaluator location term value effects m
+               , MonadValue location value effects m
+               )
+            => (Module term -> m effects value)
+            -> ModulePath
+            -> m effects (Environment location value, value)
+requireWith with name = getModuleTable >>= maybeM (loadWith with name) . ModuleTable.lookup name
 
 -- | Load another module by name and return it's environment and value.
 --
 -- Always loads/evaluates.
-load :: MonadEvaluatable location term value effects m
+load :: ( Member (EvalModule term value) effects
+        , Member (Resumable (LoadError term)) effects
+        , MonadEvaluator location term value effects m
+        , MonadValue location value effects m
+        )
      => ModulePath
      -> m effects (Environment location value, value)
-load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= evalAndCache
-  where
-    notFound = throwLoadError (LoadError name)
+load = loadWith evaluateModule
 
-    evalAndCache []     = (,) Empty.empty <$> unit
+loadWith :: ( Member (Resumable (LoadError term)) effects
+            , MonadEvaluator location term value effects m
+            , MonadValue location value effects m
+            )
+         => (Module term -> m effects value)
+         -> ModulePath
+         -> m effects (Environment location value, value)
+loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= evalAndCache
+  where
+    notFound = throwResumable (LoadError name)
+
+    evalAndCache []     = (,) emptyEnv <$> unit
     evalAndCache [x]    = evalAndCache' x
     evalAndCache (x:xs) = do
       (env, _) <- evalAndCache' x
@@ -246,10 +254,10 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= eva
       if mPath `elem` unLoadStack
         then do -- Circular load, don't keep evaluating.
           v <- trace ("load (skip evaluating, circular load): " <> show mPath) unit
-          pure (Empty.empty, v)
+          pure (emptyEnv, v)
         else do
           modifyLoadStack (loadStackPush mPath)
-          v <- trace ("load (evaluating): " <> show mPath) $ evaluateModule x
+          v <- trace ("load (evaluating): " <> show mPath) $ with x
           modifyLoadStack loadStackPop
           traceM ("load done:" <> show mPath)
           env <- filterEnv <$> getExports <*> getEnv
@@ -265,37 +273,43 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= eva
       | otherwise = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
 
 
--- | Evaluate a term to a value using the semantics of the current analysis.
---
---   This should always be called when e.g. evaluating the bodies of closures instead of explicitly folding either 'eval' or 'analyzeTerm' over subterms, except in 'MonadAnalysis' instances themselves. On the other hand, top-level evaluation should be performed using 'evaluateModule'.
-evaluateTerm :: MonadEvaluatable location term value effects m
-             => term
-             -> m effects value
-evaluateTerm = foldSubterms (analyzeTerm eval)
-
--- | Evaluate a (root-level) term to a value using the semantics of the current analysis. This should be used to evaluate single-term programs, or (via 'evaluateModules') the entry point of multi-term programs.
-evaluateModule :: MonadEvaluatable location term value effects m
-               => Module term
-               -> m effects value
-evaluateModule m = analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evaluateTerm) m)
+-- | Evaluate a (root-level) term to a value using the semantics of the current analysis.
+evalModule :: forall location term value effects m
+           .  ( MonadAnalysis location term value effects m
+              , MonadEvaluatable location term value effects m
+              )
+           => Module term
+           -> m effects value
+evalModule m = raiseHandler
+  (interpose @(EvalModule term value) pure (\ (EvalModule m) yield -> lower @m (evalModule m) >>= yield))
+  (analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evalTerm) m))
+  where evalTerm term = catchReturn @m @value
+          (raiseHandler
+            (interpose @(EvalClosure term value) pure (\ (EvalClosure term) yield -> lower (evalTerm term) >>= yield))
+            (foldSubterms (analyzeTerm eval) term))
+          (\ (Return value) -> pure value)
 
 -- | Evaluate a given package.
-evaluatePackage :: MonadEvaluatable location term value effects m
+evaluatePackage :: ( MonadAnalysis location term value effects m
+                   , MonadEvaluatable location term value effects m
+                   )
                 => Package term
                 -> m effects [value]
 evaluatePackage p = pushOrigin (packageOrigin p) (evaluatePackageBody (packageBody p))
 
 -- | Evaluate a given package body (module table and entry points).
-evaluatePackageBody :: MonadEvaluatable location term value effects m
+evaluatePackageBody :: ( MonadAnalysis location term value effects m
+                       , MonadEvaluatable location term value effects m
+                       )
                     => PackageBody term
                     -> m effects [value]
 evaluatePackageBody body = withPrelude (packagePrelude body) $
   localModuleTable (<> packageModules body) (traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints body)))
   where
     evaluateEntryPoint (m, sym) = do
-      (_, v) <- require m
+      (_, v) <- requireWith evalModule m
       maybe (pure v) ((`call` []) <=< variable) sym
     withPrelude Nothing a = a
     withPrelude (Just prelude) a = do
-      preludeEnv <- evaluateModule prelude *> getEnv
+      preludeEnv <- evalModule prelude *> getEnv
       withDefaultEnvironment preludeEnv a

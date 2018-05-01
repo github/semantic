@@ -1,16 +1,15 @@
 {-# LANGUAGE GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
-module SpecHelpers (
-  module X
+module SpecHelpers
+( module X
 , diffFilePaths
 , parseFilePath
 , readFilePair
-, readFileVerbatim
 , addr
 , ns
 , verbatim
 , Verbatim(..)
 , TestEvaluating
-, ) where
+) where
 
 import Analysis.Abstract.Erroring
 import Analysis.Abstract.Evaluating
@@ -22,6 +21,7 @@ import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables as X hiding (dropExtension)
 import Data.Abstract.Heap as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
+import Data.Abstract.Value (Namespace(..), Value, ValueError, injValue)
 import Data.Blob as X
 import Data.File as X
 import Data.Functor.Listable as X
@@ -54,7 +54,6 @@ import Test.LeanCheck as X
 
 import qualified Data.ByteString as B
 import qualified Semantic.IO as IO
-import Data.Abstract.Value
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO ByteString
@@ -69,16 +68,14 @@ readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
-readFileVerbatim :: FilePath -> IO Verbatim
-readFileVerbatim = fmap verbatim . B.readFile
-
 type TestEvaluating term
   = Erroring (AddressError Precise (Value Precise))
   ( Erroring (EvalError (Value Precise))
   ( Erroring (ResolutionError (Value Precise))
   ( Erroring (Unspecialized (Value Precise))
   ( Erroring (ValueError Precise (Value Precise))
-  ( Evaluating Precise term (Value Precise))))))
+  ( Erroring (LoadError term)
+  ( Evaluating Precise term (Value Precise)))))))
 
 ns n = Just . Latest . Just . injValue . Namespace n
 addr = Address . Precise

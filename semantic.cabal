@@ -72,7 +72,6 @@ library
                      , Data.AST
                      , Data.Blob
                      , Data.Diff
-                     , Data.Empty
                      , Data.Error
                      , Data.File
                      , Data.Functor.Both
@@ -86,6 +85,7 @@ library
                      , Data.Range
                      , Data.Record
                      , Data.Semigroup.App
+                     , Data.Semilattice.Lower
                      , Data.Scientific.Exts
                      , Data.Source
                      , Data.Span

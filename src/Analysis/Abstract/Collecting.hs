@@ -1,25 +1,21 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, KindSignatures, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.Collecting
 ( Collecting
+, Retaining
 ) where
 
 import Control.Abstract.Analysis
 import Data.Abstract.Address
-import Data.Abstract.Configuration
 import Data.Abstract.Heap
 import Data.Abstract.Live
 import Prologue
 
+-- | An analysis performing GC after every instruction.
 newtype Collecting m (effects :: [* -> *]) a = Collecting { runCollecting :: m effects a }
-  deriving (Alternative, Applicative, Functor, Effectful, Monad)
+  deriving (Alternative, Applicative, Effectful, Functor, Monad)
 
-instance ( Effectful m
-         , Member (Reader (Live location value)) effects
-         , MonadEvaluator location term value effects m
-         )
-      => MonadEvaluator location term value effects (Collecting m) where
-  getConfiguration term = Configuration term <$> askRoots <*> getEnv <*> getHeap
+deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Collecting m)
 
 
 instance ( Effectful m
@@ -38,15 +34,6 @@ instance ( Effectful m
     pure v
 
   analyzeModule = liftAnalyze analyzeModule
-
-
--- | Retrieve the local 'Live' set.
-askRoots :: (Effectful m, Member (Reader (Live location value)) effects) => m effects (Live location value)
-askRoots = raise ask
-
--- | Run a computation with the given 'Live' set added to the local root set.
--- extraRoots :: (Effectful m, Member (Reader (Live location value)) effects, Ord location) => Live location value -> m effects a -> m effects a
--- extraRoots roots = raise . local (<> roots) . lower
 
 
 -- | Collect any addresses in the heap not rooted in or reachable from the given 'Live' set.
@@ -75,9 +62,26 @@ reachable roots heap = go mempty roots
             _           -> seen)
 
 
-instance ( Interpreter effects result rest m
+instance ( Interpreter m effects
          , MonadEvaluator location term value effects m
          , Ord location
          )
-      => Interpreter (Reader (Live location value) ': effects) result rest (Collecting m) where
+      => Interpreter (Collecting m) (Reader (Live location value) ': effects) where
+  type Result (Collecting m) (Reader (Live location value) ': effects) result = Result m effects result
   interpret = interpret . runCollecting . raiseHandler (`runReader` mempty)
+
+
+-- | An analysis providing a 'Live' set, but never performing GC.
+newtype Retaining m (effects :: [* -> *]) a = Retaining { runRetaining :: m effects a }
+  deriving (Alternative, Applicative, Effectful, Functor, Monad)
+
+deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Retaining m)
+deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (Retaining m)
+
+instance ( Interpreter m effects
+         , MonadEvaluator location term value effects m
+         , Ord location
+         )
+      => Interpreter (Retaining m) (Reader (Live location value) ': effects) where
+  type Result (Retaining m) (Reader (Live location value) ': effects) result = Result m effects result
+  interpret = interpret . runRetaining . raiseHandler (`runReader` mempty)

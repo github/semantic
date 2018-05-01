@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.BadSyntax
 ( BadSyntax
@@ -12,7 +12,7 @@ import Prologue
 --
 --   Use it by composing it onto an analysis:
 --
---   > runAnalysis @(BadSyntax (Evaluating term value)) (…)
+--   > interpret @(BadSyntax (Evaluating term value)) (…)
 --
 --   Note that exceptions thrown by other analyses may not be caught if 'BadSyntax' doesn’t know about them, i.e. if they’re not part of the generic 'MonadValue', 'MonadAddressable', etc. machinery.
 newtype BadSyntax m (effects :: [* -> *]) a = BadSyntax { runBadSyntax :: m effects a }
@@ -21,11 +21,12 @@ newtype BadSyntax m (effects :: [* -> *]) a = BadSyntax { runBadSyntax :: m effe
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadSyntax m)
 deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadSyntax m)
 
-instance ( Interpreter effects result rest m
+instance ( Interpreter m effects
          , MonadEvaluator location term value effects m
          , AbstractHole value
          )
-      => Interpreter (Resumable (Unspecialized value) ': effects) result rest (BadSyntax m) where
+      => Interpreter (BadSyntax m) (Resumable (Unspecialized value) ': effects) where
+  type Result (BadSyntax m) (Resumable (Unspecialized value) ': effects) result = Result m effects result
   interpret
     = interpret
     . runBadSyntax

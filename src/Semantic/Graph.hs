@@ -1,32 +1,33 @@
 {-# LANGUAGE GADTs #-}
 module Semantic.Graph where
 
-import qualified Analysis.Abstract.ImportGraph as Abstract
-import qualified Data.Abstract.Evaluatable as Analysis
-import           Data.Abstract.FreeVariables
-import           Data.Abstract.Package as Package
-import qualified Control.Exception as Exc
-import           Data.Abstract.Module
-import           Data.File
-import           Data.Term
-import qualified Data.Syntax as Syntax
-import           Data.Abstract.Value (Value)
-import           Data.Abstract.Located
-import           Data.Abstract.Address
 import           Analysis.Abstract.BadAddresses
 import           Analysis.Abstract.BadModuleResolutions
 import           Analysis.Abstract.BadSyntax
 import           Analysis.Abstract.BadValues
 import           Analysis.Abstract.BadVariables
+import           Analysis.Abstract.Erroring
 import           Analysis.Abstract.Evaluating
+import           Analysis.Abstract.ImportGraph
+import qualified Control.Exception as Exc
+import           Data.Abstract.Address
+import qualified Data.Abstract.Evaluatable as Analysis
+import           Data.Abstract.FreeVariables
+import           Data.Abstract.Located
+import           Data.Abstract.Module
+import           Data.Abstract.Package as Package
+import           Data.Abstract.Value (Value)
+import           Data.File
 import           Data.Output
+import qualified Data.Syntax as Syntax
+import           Data.Term
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
 import           Rendering.Renderer
 import           Semantic.IO (Files)
 import           Semantic.Task
 
-graph :: (Members '[Distribute WrappedTask, Files, Task, Exc SomeException, Telemetry] effs)
+graph :: Members '[Distribute WrappedTask, Files, Task, Exc SomeException, Telemetry] effs
       => GraphRenderer output
       -> Project
       -> Eff effs ByteString
@@ -35,7 +36,7 @@ graph renderer project
     (Proxy :: Proxy '[ Analysis.Evaluatable, Analysis.Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
     parsePackage parser prelude project >>= graphImports >>= case renderer of
       JSONGraphRenderer -> pure . toOutput
-      DOTGraphRenderer -> pure . Abstract.renderImportGraph
+      DOTGraphRenderer  -> pure . renderImportGraph
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: Members '[Distribute WrappedTask, Files, Task] effs
@@ -61,11 +62,18 @@ parseModule parser rootDir file = do
   moduleForBlob rootDir blob <$> parse parser blob
 
 
-type ImportGraphAnalysis term effects value =
-  Abstract.ImportGraphing
-    (BadAddresses (BadModuleResolutions (BadVariables (BadValues (BadSyntax (Evaluating (Located Precise term) term (Value (Located Precise term))))))))
-    effects
-    value
+type ImportGraphAnalysis term
+  = ImportGraphing
+  ( BadAddresses
+  ( BadModuleResolutions
+  ( BadVariables
+  ( BadValues
+  ( BadSyntax
+  ( Erroring (Analysis.LoadError term)
+  ( Evaluating
+    (Located Precise term)
+    term
+    (Value (Located Precise term)))))))))
 
 -- | Render the import graph for a given 'Package'.
 graphImports :: ( Show ann
@@ -80,7 +88,7 @@ graphImports :: ( Show ann
                 , Member Syntax.Identifier syntax
                 , Members '[Exc SomeException, Task] effs
                 )
-             => Package (Term (Union syntax) ann) -> Eff effs Abstract.ImportGraph
+             => Package (Term (Union syntax) ann) -> Eff effs ImportGraph
 graphImports package = analyze (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package) >>= extractGraph
   where
     asAnalysisForTypeOfPackage :: ImportGraphAnalysis term effs value
@@ -89,5 +97,5 @@ graphImports package = analyze (Analysis.evaluatePackage package `asAnalysisForT
     asAnalysisForTypeOfPackage = const
 
     extractGraph result = case result of
-      (Right (Right (Right (Right ((_, graph), _)))), _) -> pure graph
+      (Right (Right ((_, graph), _)), _) -> pure graph
       _ -> throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))

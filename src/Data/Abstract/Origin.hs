@@ -3,6 +3,7 @@ module Data.Abstract.Origin where
 
 import qualified Data.Abstract.Module as M
 import qualified Data.Abstract.Package as P
+import Data.Semilattice.Lower
 import Prologue
 
 -- | An 'Origin' encapsulates the location at which a name is bound or allocated.
@@ -52,6 +53,9 @@ liftCompareOrigins c (Term m1 t1)   (Term m2 t2)   = liftCompareOrigins c m1 m2 
 instance Ord (Base term ()) => Ord (Origin term ty) where
   compare = liftCompareOrigins compare
 
+instance Lower (Origin term ty) where lowerBound = Unknown
+
+
 -- | An existential abstraction over 'Origin's of different types.
 data SomeOrigin term where
   SomeOrigin :: Origin term ty -> SomeOrigin term
@@ -98,3 +102,5 @@ instance Semigroup (SomeOrigin term) where
 instance Monoid (SomeOrigin term) where
   mempty = SomeOrigin Unknown
   mappend = (<>)
+
+instance Lower (SomeOrigin term) where lowerBound = SomeOrigin lowerBound

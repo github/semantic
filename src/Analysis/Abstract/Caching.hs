@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
 module Analysis.Abstract.Caching
 ( Caching
@@ -10,15 +10,9 @@ import Data.Abstract.Address
 import Data.Abstract.Cache
 import Data.Abstract.Configuration
 import Data.Abstract.Heap
+import Data.Abstract.Live
 import Data.Abstract.Module
 import Prologue
-
--- | The effects necessary for caching analyses.
-type CachingEffects location term value effects
-  = NonDet                             -- For 'Alternative' and 'gather'.
- ': Reader (Cache location term value) -- The in-cache used as an oracle while converging on a result.
- ': State  (Cache location term value) -- The out-cache used to record results in each iteration of convergence.
- ': effects
 
 -- | A (coinductively-)cached analysis suitable for guaranteeing termination of (suitably finitized) analyses over recursive programs.
 newtype Caching m (effects :: [* -> *]) a = Caching { runCaching :: m effects a }
@@ -42,7 +36,8 @@ class MonadEvaluator location term value effects m => MonadCaching location term
   isolateCache :: m effects a -> m effects (Cache location term value)
 
 instance ( Effectful m
-         , Members (CachingEffects location term value '[]) effects
+         , Member (Reader (Cache location term value)) effects
+         , Member (State  (Cache location term value)) effects
          , MonadEvaluator location term value effects m
          , Ord (Cell location value)
          , Ord location
@@ -51,7 +46,7 @@ instance ( Effectful m
          )
          => MonadCaching location term value effects (Caching m) where
   consultOracle configuration = raise (fromMaybe mempty . cacheLookup configuration <$> ask)
-  withOracle cache = raise . local (const cache) . lower
+  withOracle cache = raiseHandler (local (const cache))
 
   lookupCache configuration = raise (cacheLookup configuration <$> get)
   caching configuration values action = do
@@ -67,7 +62,10 @@ instance ( Alternative (m effects)
          , Corecursive term
          , Effectful m
          , Member Fresh effects
-         , Members (CachingEffects location term value '[]) effects
+         , Member NonDet effects
+         , Member (Reader (Cache location term value)) effects
+         , Member (Reader (Live location value)) effects
+         , Member (State  (Cache location term value)) effects
          , MonadAnalysis location term value effects m
          , Ord (Cell location value)
          , Ord location
@@ -123,14 +121,15 @@ scatter :: (Alternative (m effects), Foldable t, MonadEvaluator location term va
 scatter = foldMapA (\ (value, heap') -> putHeap heap' $> value)
 
 
-instance ( Interpreter effects ([result], Cache location term value) rest m
+instance ( Interpreter m effects
          , MonadEvaluator location term value effects m
          , Ord (Cell location value)
          , Ord location
          , Ord term
          , Ord value
          )
-      => Interpreter (NonDet ': Reader (Cache location term value) ': State (Cache location term value) ': effects) result rest (Caching m) where
+      => Interpreter (Caching m) (NonDet ': Reader (Cache location term value) ': State (Cache location term value) ': effects) where
+  type Result (Caching m) (NonDet ': Reader (Cache location term value) ': State (Cache location term value) ': effects) result = Result m effects ([result], Cache location term value)
   interpret
     = interpret
     . runCaching
