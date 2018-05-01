@@ -9,6 +9,7 @@ import           Analysis.Abstract.BadVariables
 import           Analysis.Abstract.Erroring
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.ImportGraph
+import           Analysis.Abstract.CallGraph
 import           Analysis.Abstract.Graph (Graph, renderGraph)
 import qualified Control.Exception as Exc
 import           Data.Abstract.Address
@@ -35,9 +36,15 @@ graph :: Members '[Distribute WrappedTask, Files, Task, Exc SomeException, Telem
 graph renderer project
   | SomeAnalysisParser parser prelude <- someAnalysisParser
     (Proxy :: Proxy '[ Analysis.Evaluatable, Analysis.Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
-    parsePackage parser prelude project >>= graphImports >>= case renderer of
-      JSONGraphRenderer -> pure . toOutput
-      DOTGraphRenderer  -> pure . renderGraph
+    package <- parsePackage parser prelude project
+    let graph = case renderer of
+          JSONCallGraphRenderer -> graphCalls
+          DOTCallGraphRenderer  -> graphCalls
+          _                     -> graphImports
+    graph package >>= case renderer of
+      JSONCallGraphRenderer   -> pure . toOutput
+      JSONImportGraphRenderer -> pure . toOutput
+      _                       -> pure . renderGraph
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: Members '[Distribute WrappedTask, Files, Task] effs
@@ -94,6 +101,44 @@ graphImports package = analyze (Analysis.evaluatePackage package `asAnalysisForT
     asAnalysisForTypeOfPackage :: ImportGraphAnalysis term effs value
                                -> Package term
                                -> ImportGraphAnalysis term effs value
+    asAnalysisForTypeOfPackage = const
+
+    extractGraph result = case result of
+      (Right (Right ((_, graph), _)), _) -> pure graph
+      _ -> throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
+
+type CallGraphAnalysis term
+  = CallGraphing
+  ( BadAddresses
+  ( BadModuleResolutions
+  ( BadVariables
+  ( BadValues
+  ( BadSyntax
+  ( Erroring (Analysis.LoadError term)
+  ( Evaluating
+    (Located Precise term)
+    term
+    (Value (Located Precise term)))))))))
+
+-- | Render the call graph for a given 'Package'.
+graphCalls :: ( Show ann
+                , Ord ann
+                , Apply Analysis.Declarations1 syntax
+                , Apply Analysis.Evaluatable syntax
+                , Apply FreeVariables1 syntax
+                , Apply Functor syntax
+                , Apply Ord1 syntax
+                , Apply Eq1 syntax
+                , Apply Show1 syntax
+                , Member Syntax.Identifier syntax
+                , Members '[Exc SomeException, Task] effs
+                )
+             => Package (Term (Union syntax) ann) -> Eff effs Graph
+graphCalls package = analyze (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package) >>= extractGraph
+  where
+    asAnalysisForTypeOfPackage :: CallGraphAnalysis term effs value
+                               -> Package term
+                               -> CallGraphAnalysis term effs value
     asAnalysisForTypeOfPackage = const
 
     extractGraph result = case result of

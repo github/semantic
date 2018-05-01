@@ -56,7 +56,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       pure $ Log.Options disableColour logLevel requestId False False Log.logfmtFormatter 0 failOnWarning
 
     argumentsParser = do
-      subparser <- hsubparser (diffCommand <> parseCommand <> graphCommand)
+      subparser <- hsubparser (diffCommand <> parseCommand <> importGraphCommand <> callGraphCommand)
       output <- Right <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (Left stdout)
       pure $ subparser >>= Task.writeToOutput output
 
@@ -84,10 +84,19 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
       pure $ runParse renderer filesOrStdin
 
-    graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute an import graph a directory or entry point"))
-    graphArgumentsParser = do
-      renderer <- flag (SomeRenderer DOTGraphRenderer) (SomeRenderer DOTGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
-              <|> flag'                                (SomeRenderer JSONGraphRenderer) (long "json" <> help "Output JSON graph")
+    importGraphCommand = command "import-graph" (info importGraphArgumentsParser (progDesc "Compute an import graph for a directory or entry point"))
+    importGraphArgumentsParser = do
+      renderer <- flag (SomeRenderer DOTCallGraphRenderer) (SomeRenderer DOTCallGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
+              <|> flag'                                (SomeRenderer JSONCallGraphRenderer) (long "json" <> help "Output JSON graph")
+      rootDir <- optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIRECTORY"))
+      excludeDirs <- many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)"))
+      File{..} <- argument filePathReader (metavar "DIRECTORY:LANGUAGE")
+      pure $ runGraph renderer rootDir filePath (fromJust fileLanguage) excludeDirs
+
+    callGraphCommand = command "call-graph" (info callGraphArgumentsParser (progDesc "Compute a call graph for a directory or entry point"))
+    callGraphArgumentsParser = do
+      renderer <- flag (SomeRenderer DOTCallGraphRenderer) (SomeRenderer DOTCallGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
+              <|> flag'                                (SomeRenderer JSONCallGraphRenderer) (long "json" <> help "Output JSON graph")
       rootDir <- optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIRECTORY"))
       excludeDirs <- many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)"))
       File{..} <- argument filePathReader (metavar "DIRECTORY:LANGUAGE")

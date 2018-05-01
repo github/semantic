@@ -68,11 +68,20 @@ deriving instance Show (TermRenderer output)
 
 -- | Specification of renderers for graph analysis, producing output in the parameter type.
 data GraphRenderer output where
-  JSONGraphRenderer :: GraphRenderer ByteString
-  DOTGraphRenderer :: GraphRenderer ByteString
+  JSONImportGraphRenderer :: GraphRenderer ByteString
+  DOTImportGraphRenderer :: GraphRenderer ByteString
+  JSONCallGraphRenderer :: GraphRenderer ByteString
+  DOTCallGraphRenderer :: GraphRenderer ByteString
 
 deriving instance Eq (GraphRenderer output)
 deriving instance Show (GraphRenderer output)
+
+data GraphType graph where
+  ImportGraph :: GraphType ByteString
+  CallGraph :: GraphType ByteString
+
+deriving instance Eq (GraphType output)
+deriving instance Show (GraphType output)
 
 -- | Abstraction of some renderer to some 'Monoid'al output which can be serialized to a 'ByteString'.
 --
