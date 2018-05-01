@@ -45,7 +45,6 @@ type MonadEvaluatable location term value effects m =
   , Evaluatable (Base term)
   , FreeVariables term
   , Member (EvalClosure term value) effects
-  , Member Fail effects
   , Member (LoopControl value) effects
   , Member (Resumable (Unspecialized value)) effects
   , Member (Resumable (LoadError term)) effects
@@ -156,6 +155,7 @@ instance Show1 (Unspecialized a) where
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
   eval :: ( Member (EvalModule term value) effects
+          , Member Fail effects
           , MonadEvaluatable location term value effects m
           )
        => SubtermAlgebra constr term (m effects value)
@@ -277,6 +277,7 @@ loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup nam
 -- | Evaluate a (root-level) term to a value using the semantics of the current analysis.
 evalModule :: forall location term value effects m
            .  ( Member (EvalModule term value) effects
+              , Member Fail effects
               , MonadAnalysis location term value effects m
               , MonadEvaluatable location term value effects m
               )
@@ -293,6 +294,7 @@ evalModule m = raiseHandler
 
 -- | Evaluate a given package.
 evaluatePackage :: ( Member (EvalModule term value) effects
+                   , Member Fail effects
                    , MonadAnalysis location term value effects m
                    , MonadEvaluatable location term value effects m
                    )
@@ -302,6 +304,7 @@ evaluatePackage p = pushOrigin (packageOrigin p) (evaluatePackageBody (packageBo
 
 -- | Evaluate a given package body (module table and entry points).
 evaluatePackageBody :: ( Member (EvalModule term value) effects
+                       , Member Fail effects
                        , MonadAnalysis location term value effects m
                        , MonadEvaluatable location term value effects m
                        )
