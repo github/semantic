@@ -92,7 +92,7 @@ typescriptExtensions = ["ts", "tsx", "d.ts"]
 javascriptExtensions :: [String]
 javascriptExtensions = ["js"]
 
-evalRequire :: MonadEvaluatable location term value effects m => ModulePath -> Name -> m effects value
+evalRequire :: (Member (EvalModule term value) effects, MonadEvaluatable location term value effects m) => ModulePath -> Name -> m effects value
 evalRequire modulePath alias = letrec' alias $ \addr -> do
   (importedEnv, _) <- isolate (require modulePath)
   modifyEnv (mergeEnvs importedEnv)
