@@ -56,6 +56,7 @@ type Syntax =
    , Java.Syntax.Package
    , Java.Syntax.Synchronized
    , Java.Syntax.TypeParameter
+   , Java.Syntax.TypeWithModifiers
    , Java.Syntax.Variable
    , Literal.Array
    , Literal.Boolean
@@ -500,4 +501,10 @@ throws = symbol Throws *> children (symbol ExceptionTypeList *> children(manyTer
 formalParameters :: Assignment.Assignment [] Grammar [Term]
 formalParameters = manyTerm parameter
   where
-    parameter = makeTerm <$> symbol FormalParameter <*> children (flip Type.Annotation <$> type' <* symbol VariableDeclaratorId <*> children identifier)
+    parameter = makeTerm <$> symbol FormalParameter <*> children (makeAnnotation <$> manyTerm modifier <*> type' <* symbol VariableDeclaratorId <*> children identifier)
+    makeAnnotation [] type' variableName = Type.Annotation variableName type'
+    makeAnnotation modifiers type' variableName = Type.Annotation variableName (makeTerm1 (Java.Syntax.TypeWithModifiers modifiers type'))
+-- know when we are in a functor context and fmap is all gravy
+-- we're just wrapping stuff up in data, we aren't building a pattern (assignment) so we aren't in an applicative context
+-- when in an applicative context, we're also in a functor context (ie., defining how fmap will work over it)
+-- sometimes it is nice to be able to say you're in an applicative context without refering to any particular applicative instance

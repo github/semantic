@@ -133,3 +133,13 @@ instance Show1 GenericType where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for GenericType
 instance Evaluatable GenericType
+
+data TypeWithModifiers a = TypeWithModifiers [a] a
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+
+instance Eq1 TypeWithModifiers where liftEq = genericLiftEq
+instance Ord1 TypeWithModifiers where liftCompare = genericLiftCompare
+instance Show1 TypeWithModifiers where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for TypeWithModifiers
+instance Evaluatable TypeWithModifiers
