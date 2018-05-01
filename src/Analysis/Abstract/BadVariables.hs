@@ -18,6 +18,7 @@ deriving instance MonadAnalysis location term value effects m => MonadAnalysis l
 instance ( Interpreter m effects
          , MonadEvaluator location term value effects m
          , AbstractHole value
+         , Show value
          )
       => Interpreter (BadVariables m) (Resumable (EvalError value) ': State [Name] ': effects) where
   type Result (BadVariables m) (Resumable (EvalError value) ': State [Name] ': effects) result = Result m effects (result, [Name])
@@ -27,6 +28,7 @@ instance ( Interpreter m effects
     . raiseHandler
       ( flip runState []
       . relay pure (\ (Resumable err) yield -> traceM ("EvalError" <> show err) *> case err of
+        EnvironmentLookupError{}     -> yield hole
         DefaultExportError{}     -> yield ()
         ExportError{}            -> yield ()
         IntegerFormatError{}     -> yield 0

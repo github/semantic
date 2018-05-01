@@ -193,9 +193,7 @@ instance Ord1 MemberAccess where liftCompare = genericLiftCompare
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable MemberAccess where
-  eval (fmap subtermValue -> MemberAccess mem acc) = do
-    lhs <- mem >>= scopedEnvironment
-    localEnv (mergeEnvs lhs) acc
+  eval (fmap subtermValue -> MemberAccess mem acc) = evaluateInScopedEnv mem acc
 
 -- | Subscript (e.g a[1])
 data Subscript a

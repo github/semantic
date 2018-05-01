@@ -102,9 +102,7 @@ instance Evaluatable Assignment where
         addr <- lookupOrAlloc name
         assign addr v
         modifyEnv (Env.insert name addr) $> v
-      _ -> do
-        lhs <- subtermValue assignmentTarget >>= scopedEnvironment
-        localEnv (mergeEnvs lhs) (subtermValue assignmentValue)
+      _ -> evaluateInScopedEnv (subtermValue assignmentTarget) (subtermValue assignmentValue)
 
 -- | Post increment operator (e.g. 1++ in Go, or i++ in C).
 newtype PostIncrement a = PostIncrement a

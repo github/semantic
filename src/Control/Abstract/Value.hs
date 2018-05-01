@@ -133,7 +133,7 @@ class (Monad (m effects), Show value) => MonadValue location value (effects :: [
             -> m effects value
 
   -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
-  scopedEnvironment :: value -> m effects (Environment location value)
+  scopedEnvironment :: value -> m effects (Maybe (Environment location value))
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
   lambda :: (FreeVariables term, MonadEvaluator location term value effects m) => [Name] -> Subterm term (m effects value) -> m effects value
@@ -184,9 +184,10 @@ makeNamespace :: ( MonadValue location value effects m
               -> Maybe value
               -> m effects value
 makeNamespace name addr super = do
-  superEnv <- maybe (pure lowerBound) scopedEnvironment super
+  superEnv <- maybe (pure (Just lowerBound)) scopedEnvironment super
+  let env' = fromMaybe lowerBound superEnv
   namespaceEnv <- Env.head <$> getEnv
-  v <- namespace name (Env.mergeNewer superEnv namespaceEnv)
+  v <- namespace name (Env.mergeNewer env' namespaceEnv)
   v <$ assign addr v
 
 

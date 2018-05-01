@@ -2,7 +2,6 @@
 module Analysis.Abstract.BadValues where
 
 import Control.Abstract.Analysis
-import Data.Abstract.Environment as Env
 import Data.Abstract.Value (ValueError(..))
 import Data.ByteString.Char8 (pack)
 import Prologue
@@ -24,9 +23,6 @@ instance ( Interpreter m effects
     = interpret
     . runBadValues
     . raiseHandler (relay pure (\ (Resumable err) yield -> traceM ("ValueError" <> show err) *> case err of
-      ScopedEnvironmentError{} -> do
-        env <- lower @m getEnv
-        yield (Env.push env)
       CallError val     -> yield val
       StringError val   -> yield (pack (show val))
       BoolError{}       -> yield True

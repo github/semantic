@@ -247,8 +247,8 @@ instance ( Member (EvalClosure term (Value location)) effects
 
   klass n [] env = pure . injValue $ Class n env
   klass n supers env = do
-    product <- foldl mergeEnvs emptyEnv <$> traverse scopedEnvironment supers
-    pure . injValue $ Class n (mergeEnvs (Env.push product) env)
+    product <- foldl mergeEnvs emptyEnv . catMaybes <$> traverse scopedEnvironment supers
+    pure . injValue $ Class n (mergeEnvs product env)
 
   namespace n env = do
     maybeAddr <- lookupEnv n
@@ -259,9 +259,9 @@ instance ( Member (EvalClosure term (Value location)) effects
             | otherwise                             = throwResumable $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
   scopedEnvironment o
-    | Just (Class _ env) <- prjValue o = pure env
-    | Just (Namespace _ env) <- prjValue o = pure env
-    | otherwise = throwResumable $ ScopedEnvironmentError ("object type passed to scopedEnvironment doesn't have an environment: " <> show o)
+    | Just (Class _ env) <- prjValue o = pure (Just env)
+    | Just (Namespace _ env) <- prjValue o = pure (Just env)
+    | otherwise = pure Nothing
 
   asString v
     | Just (String n) <- prjValue v = pure n
@@ -382,7 +382,6 @@ data ValueError location value resume where
   BoolError              :: value          -> ValueError location value Bool
   IndexError             :: value -> value -> ValueError location value value
   NamespaceError         :: Prelude.String -> ValueError location value (Environment location value)
-  ScopedEnvironmentError :: Prelude.String -> ValueError location value (Environment location value)
   CallError              :: value          -> ValueError location value value
   NumericError           :: value          -> ValueError location value value
   Numeric2Error          :: value -> value -> ValueError location value value
@@ -396,10 +395,10 @@ data ValueError location value resume where
   BoundsError :: [value] -> Prelude.Integer -> ValueError location value value
 
 
+
 instance Eq value => Eq1 (ValueError location value) where
   liftEq _ (StringError a) (StringError b)                       = a == b
   liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
-  liftEq _ (ScopedEnvironmentError a) (ScopedEnvironmentError b) = a == b
   liftEq _ (CallError a) (CallError b)                           = a == b
   liftEq _ (BoolError a) (BoolError c)                           = a == c
   liftEq _ (IndexError a b) (IndexError c d)                     = (a == c) && (b == d)
