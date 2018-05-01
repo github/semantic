@@ -127,3 +127,13 @@ instance Show1 AnnotationField where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for AnnotationField
 instance Evaluatable AnnotationField
+
+data GenericType a = GenericType { genericTypeIdentifier :: a, genericTypeArguments :: [a] }
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1)
+
+instance Eq1 GenericType where liftEq = genericLiftEq
+instance Ord1 GenericType where liftCompare = genericLiftCompare
+instance Show1 GenericType where liftShowsPrec = genericLiftShowsPrec
+
+-- TODO: Implement Eval instance for GenericType
+instance Evaluatable GenericType

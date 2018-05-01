@@ -27,6 +27,7 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import Prelude hiding (break)
+import Prologue hiding (for, try, This)
 
 type Syntax =
   '[ Comment.Comment
@@ -48,6 +49,7 @@ type Syntax =
    , Java.Syntax.Asterisk
    , Java.Syntax.Constructor
    , Java.Syntax.EnumDeclaration
+   , Java.Syntax.GenericType
    , Java.Syntax.Import
    , Java.Syntax.Module
    , Java.Syntax.New
@@ -235,12 +237,18 @@ scopedIdentifier = makeTerm <$> symbol ScopedIdentifier <*> children (Expression
 
 -- Declarations
 class' :: Assignment
-class' = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> many modifier <*> term identifier <*> (typeParameters <|> pure []) <*> emptyTerm <*> classBody)
+class' = makeTerm <$> symbol ClassDeclaration <*> children (makeClass <$> many modifier <*> term identifier <*> (typeParameters <|> pure []) <*> optional superClass <*> classBody)
   where
-    makeClass modifiers identifier typeParams superClass classBody = Declaration.Class (modifiers ++ typeParams) identifier [superClass] classBody -- not doing an assignment, just straight up function
+    makeClass modifiers identifier typeParams superClass classBody = Declaration.Class (modifiers ++ typeParams) identifier (maybeToList superClass) classBody -- not doing an assignment, just straight up function
     classBody = makeTerm <$> symbol ClassBody <*> children (manyTerm expression)
-    -- superClass = makeTerm <$> symbol SuperClass <*>
--- might wanna come back and change to maybe superClass
+    superClass = symbol Superclass *> children type'
+    -- matching term expression won't work since there is no node for that; it's AnonExtends
+    -- superClass = makeTerm <$> symbol SuperClass <*> children (Java.Syntax.SuperClass <$> term expression <*> type')
+    -- We'd still like to match the SuperClass node, but we don't need to create a syntax to make a term
+    -- Do you lose info by omitting the superclass term? No...
+    -- Don't need to make a term since we're not using syntax
+    -- what's the difference between using tokens: AnonExtends GenericType?
+    -- optional: when something can or can't exist and you want to produce a Maybe
 -- TODO: superclass -- need to match the superclass node when it exists (which will be a rule, similar to how the type params rule matches the typeparams node when it exists)
 
 method :: Assignment
@@ -252,6 +260,13 @@ method = makeTerm <$> symbol MethodDeclaration <*> children (makeMethod <$> many
     makeMethod modifiers receiver (typeParams, annotations, returnType, (name, params), throws) body = Declaration.Method (returnType : modifiers ++ typeParams ++ annotations ++ throws) receiver name params body
 
 -- TODO: add genericType
+-- Question: should this genericType be part of type or not? Its own type because it's different structurally
+
+generic :: Assignment
+generic = makeTerm <$> symbol Grammar.GenericType <*> children(Java.Syntax.GenericType <$> term type' <*> manyTerm type')
+-- when do we make a term again? - if we want to wrap something in a syntax constructor, because each piece of syntax
+-- will be populated by further terms inside it. in this case, we wrap two terms in a piece of syntax.
+-- Q to help decide: do we lose anything by omitting the term?
 
 methodInvocation :: Assignment
 methodInvocation = makeTerm <$> symbol MethodInvocation <*> children (Expression.Call [] <$> (callFunction <$> term expression <*> optional (token AnonDot *> term expression)) <*> argumentList <*> emptyTerm)
@@ -294,10 +309,13 @@ type' =  choice [
      , makeTerm <$> token IntegralType <*> pure Type.Int
      , makeTerm <$> token FloatingPointType <*> pure Type.Float
      , makeTerm <$> token BooleanType <*> pure Type.Bool
-     , symbol ArrayType *> children (array <$> type' <*> dims)
+     , symbol ArrayType *> children (array <$> type' <*> dims) -- type rule recurs into itself
      , symbol CatchType *> children (term type')
      , symbol ExceptionType *> children (term type')
+     , symbol TypeArgument *> children (term type')
+     -- , symbol WildCard *> children (term type')
      , identifier
+     , generic
     ]
     where array type' = foldl (\into each -> makeTerm1 (Type.Array (Just each) into)) type'
 
