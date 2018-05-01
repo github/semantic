@@ -299,10 +299,13 @@ import' = makeTerm <$> symbol ImportDeclaration <*> children (Java.Syntax.Import
 interface :: Assignment
 interface = makeTerm <$> symbol InterfaceDeclaration <*> children (normal <|> annotationType)
   where
-    interfaceBody = makeTerm <$> symbol InterfaceBody <*> children (many expression)
-    normal = symbol NormalInterfaceDeclaration *> children (Declaration.InterfaceDeclaration [] <$> identifier <*> interfaceBody)
+    interfaceBody = makeTerm <$> symbol InterfaceBody <*> children (manyTerm interfaceMemberDeclaration)
+    normal = symbol NormalInterfaceDeclaration *> children (makeInterface <$> manyTerm modifier <*> identifier <*> (typeParameters <|> pure []) <*> interfaceBody)
+    makeInterface modifiers identifier typeParams interfaceBody = Declaration.InterfaceDeclaration (modifiers ++ typeParams) identifier interfaceBody
     annotationType = symbol AnnotationTypeDeclaration *> children (Declaration.InterfaceDeclaration [] <$> identifier <*> annotationTypeBody)
     annotationTypeBody = makeTerm <$> symbol AnnotationTypeBody <*> children (many expression)
+    interfaceMemberDeclaration = symbol InterfaceMemberDeclaration *> children (term expression)
+    -- we won't make a term because we have a choice of a bunch of things
 
 package :: Assignment
 package = makeTerm <$> symbol PackageDeclaration <*> children (Java.Syntax.Package <$> someTerm expression)
