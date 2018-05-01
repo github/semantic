@@ -67,6 +67,7 @@ instance (AbstractHole value, Show term, Show value) => Interpreter (Evaluating 
       . flip runFresh' 0
       . runFail
       -- NB: We should never have a 'Return', 'Break', or 'Continue' at this point in execution; the scope being returned from/broken from/continued should have intercepted the effect. This handler will therefore only be invoked if we issue a 'Return', 'Break', or 'Continue' outside of such a scope, and unfortunately if this happens it will handle it by resuming the scope being returned from. While it would be _slightly_ more correct to instead exit with the value being returned, we aren’t able to do that here since 'Interpreter'’s type is parametric in the value being returned—we don’t know that we’re returning a @value@ (because we very well may not be). On the balance, I felt the strange behaviour in error cases is worth the improved behaviour in the common case—we get to lose a layer of 'Either' in the result for each.
+      -- In general, it’s expected that none of the following effects will remain by the time 'interpret' is called—they should have been handled by local 'interpose's—but if they do, we’ll at least trace.
       . Eff.interpret (\ control -> case control of
         Break value -> traceM ("Evaluating.interpret: resuming uncaught break with " <> show value) $> value
         Continue    -> traceM "Evaluating.interpret: resuming uncaught continue with hole" $> hole)
