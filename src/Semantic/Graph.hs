@@ -69,10 +69,8 @@ parseModule parser rootDir file = do
   blob <- readBlob file
   moduleForBlob rootDir blob <$> parse parser blob
 
-
-type ImportGraphAnalysis term
-  = ImportGraphing
-  ( BadAddresses
+type GraphAnalysis term
+  = BadAddresses
   ( BadModuleResolutions
   ( BadVariables
   ( BadValues
@@ -81,7 +79,7 @@ type ImportGraphAnalysis term
   ( Evaluating
     (Located Precise term)
     term
-    (Value (Located Precise term)))))))))
+    (Value (Located Precise term))))))))
 
 -- | Render the import graph for a given 'Package'.
 graphImports :: ( Show ann
@@ -98,27 +96,10 @@ graphImports :: ( Show ann
              => Package (Term (Union syntax) ann) -> Eff effs Graph
 graphImports package = analyze (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package) >>= extractGraph
   where
-    asAnalysisForTypeOfPackage :: ImportGraphAnalysis term effs value
+    asAnalysisForTypeOfPackage :: ImportGraphing (GraphAnalysis term) effs value
                                -> Package term
-                               -> ImportGraphAnalysis term effs value
+                               -> ImportGraphing (GraphAnalysis term) effs value
     asAnalysisForTypeOfPackage = const
-
-    extractGraph result = case result of
-      (Right (Right ((_, graph), _)), _) -> pure graph
-      _ -> throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
-
-type CallGraphAnalysis term
-  = CallGraphing
-  ( BadAddresses
-  ( BadModuleResolutions
-  ( BadVariables
-  ( BadValues
-  ( BadSyntax
-  ( Erroring (Analysis.LoadError term)
-  ( Evaluating
-    (Located Precise term)
-    term
-    (Value (Located Precise term)))))))))
 
 -- | Render the call graph for a given 'Package'.
 graphCalls :: ( Show ann
@@ -136,11 +117,14 @@ graphCalls :: ( Show ann
              => Package (Term (Union syntax) ann) -> Eff effs Graph
 graphCalls package = analyze (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package) >>= extractGraph
   where
-    asAnalysisForTypeOfPackage :: CallGraphAnalysis term effs value
+    asAnalysisForTypeOfPackage :: CallGraphing (GraphAnalysis term) effs value
                                -> Package term
-                               -> CallGraphAnalysis term effs value
+                               -> CallGraphing (GraphAnalysis term) effs value
     asAnalysisForTypeOfPackage = const
 
-    extractGraph result = case result of
-      (Right (Right ((_, graph), _)), _) -> pure graph
-      _ -> throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
+extractGraph :: (Show b2, Show a4, Show a3, Show b1, Show a2, Show a1, Member (Exc SomeException) e)
+             => (Either a4 (Either a3 ((a1, a2), b1)), b2)
+             -> Eff e a2
+extractGraph result = case result of
+  (Right (Right ((_, graph), _)), _) -> pure graph
+  _ -> throwError (toException (Exc.ErrorCall ("extractGraph: graph rendering failed " <> show result)))
