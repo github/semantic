@@ -76,13 +76,6 @@ data GraphRenderer output where
 deriving instance Eq (GraphRenderer output)
 deriving instance Show (GraphRenderer output)
 
-data GraphType graph where
-  ImportGraph :: GraphType ByteString
-  CallGraph :: GraphType ByteString
-
-deriving instance Eq (GraphType output)
-deriving instance Show (GraphType output)
-
 -- | Abstraction of some renderer to some 'Monoid'al output which can be serialized to a 'ByteString'.
 --
 --   This type abstracts the type indices of 'DiffRenderer', 'TermRenderer', and 'GraphRenderer' s.t. multiple renderers can be present in a single list, alternation, etc., while retaining the ability to render and serialize. (Without 'SomeRenderer', the different output types of individual term/diff renderers prevent them from being used in a homogeneously typed setting.)
