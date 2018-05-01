@@ -42,7 +42,6 @@ import           Prologue
 
 type MonadEvaluatable location term value effects m =
   ( Declarations term
-  , Evaluatable (Base term)
   , FreeVariables term
   , Member (EvalClosure term value) effects
   , Member (LoopControl value) effects
@@ -288,7 +287,8 @@ loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup nam
 
 -- | Evaluate a (root-level) term to a value using the semantics of the current analysis.
 evalModule :: forall location term value effects m
-           .  ( Member (EvalModule term value) effects
+           .  ( Evaluatable (Base term)
+              , Member (EvalModule term value) effects
               , Member Fail effects
               , MonadAnalysis location term value effects m
               , MonadEvaluatable location term value effects m
@@ -305,7 +305,8 @@ evalModule m = raiseHandler
           (\ (Return value) -> pure value)
 
 -- | Evaluate a given package.
-evaluatePackage :: ( Member (EvalModule term value) (Reader (ModuleTable [Module term]) ': effects)
+evaluatePackage :: ( Evaluatable (Base term)
+                   , Member (EvalModule term value) (Reader (ModuleTable [Module term]) ': effects)
                    , Member Fail (Reader (ModuleTable [Module term]) ': effects)
                    , Member (Reader (SomeOrigin term)) effects
                    , MonadAnalysis location term value (Reader (ModuleTable [Module term]) ': effects) m
@@ -320,7 +321,8 @@ withUnevaluatedModules = raiseHandler . flip runReader
 
 -- | Evaluate a given package body (module table and entry points).
 evaluatePackageBody :: forall location term value effects m
-                    .  ( Member (EvalModule term value) (Reader (ModuleTable [Module term]) ': effects)
+                    .  ( Evaluatable (Base term)
+                       , Member (EvalModule term value) (Reader (ModuleTable [Module term]) ': effects)
                        , Member Fail (Reader (ModuleTable [Module term]) ': effects)
                        , MonadAnalysis location term value (Reader (ModuleTable [Module term]) ': effects) m
                        , MonadEvaluatable location term value (Reader (ModuleTable [Module term]) ': effects) m
@@ -336,7 +338,8 @@ evaluatePackageBody body
       (_, v) <- requireWith evalModule m
       maybe (pure v) ((`call` []) <=< variable) sym
 
-withPrelude :: ( Member (EvalModule term value) effects
+withPrelude :: ( Evaluatable (Base term)
+               , Member (EvalModule term value) effects
                , Member Fail effects
                , MonadAnalysis location term value effects m
                , MonadEvaluatable location term value effects m
