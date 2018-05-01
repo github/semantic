@@ -316,7 +316,16 @@ evaluatePackageBody body = withPrelude (packagePrelude body) $
     evaluateEntryPoint (m, sym) = do
       (_, v) <- requireWith evalModule m
       maybe (pure v) ((`call` []) <=< variable) sym
-    withPrelude Nothing a = a
-    withPrelude (Just prelude) a = do
-      preludeEnv <- evalModule prelude *> getEnv
-      withDefaultEnvironment preludeEnv a
+
+withPrelude :: ( Member (EvalModule term value) effects
+               , Member Fail effects
+               , MonadAnalysis location term value effects m
+               , MonadEvaluatable location term value effects m
+               )
+            => Maybe (Module term)
+            -> m effects a
+            -> m effects a
+withPrelude Nothing a = a
+withPrelude (Just prelude) a = do
+  preludeEnv <- evalModule prelude *> getEnv
+  withDefaultEnvironment preludeEnv a
