@@ -74,3 +74,4 @@ instance (AbstractHole value, Show term, Show value) => Interpreter (Evaluating 
       . Eff.interpret (\ (Return value) -> traceM ("Evaluating.interpret: resuming uncaught return with " <> show value) $> value)
       . Eff.interpret (\ (EvalModule m) -> traceM ("Evaluating.interpret: resuming uncaught EvalModule of " <> show m <> " with hole") $> hole)
       . Eff.interpret (\ (EvalClosure term) -> traceM ("Evaluating.interpret: resuming uncaught EvalClosure of " <> show term <> " with hole") $> hole))
+      -- TODO: Replace 'traceM's with e.g. 'Telemetry'.
