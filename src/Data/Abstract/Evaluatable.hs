@@ -299,11 +299,23 @@ evalModule :: forall location term value effects m
 evalModule m = raiseHandler
   (interpose @(EvalModule term value) pure (\ (EvalModule m) yield -> lower @m (evalModule m) >>= yield))
   (analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evalTerm) m))
-  where evalTerm term = catchReturn @m @value
-          (raiseHandler
-            (interpose @(EvalClosure term value) pure (\ (EvalClosure term) yield -> lower (evalTerm term) >>= yield))
-            (foldSubterms (analyzeTerm eval) term))
-          (\ (Return value) -> pure value)
+
+evalTerm :: forall location term value effects m
+         .  ( Evaluatable (Base term)
+            , Member (EvalModule term value) effects
+            , Member Fail effects
+            , Member (Reader PackageInfo) effects
+            , MonadAnalysis location term value effects m
+            , MonadEvaluatable location term value effects m
+            , Recursive term
+            )
+         => term
+         -> m effects value
+evalTerm term = catchReturn @m @value
+  (raiseHandler
+    (interpose @(EvalClosure term value) pure (\ (EvalClosure term) yield -> lower @m (evalTerm term) >>= yield))
+    (foldSubterms (analyzeTerm eval) term))
+  (\ (Return value) -> pure value)
 
 withPackageInfo :: Effectful m => PackageInfo -> m (Reader PackageInfo ': effects) a -> m effects a
 withPackageInfo = raiseHandler . flip runReader
