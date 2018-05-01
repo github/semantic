@@ -44,12 +44,12 @@ resolvePHPName n = do
 
 include :: MonadEvaluatable location term value effects m
         => Subterm t (m effects value)
-        -> (ModulePath -> m effects (Environment location value, value))
+        -> (ModulePath -> m effects (Maybe (Environment location value, value)))
         -> m effects value
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
-  (importedEnv, v) <- traceResolve name path $ isolate (f path)
+  (importedEnv, v) <- traceResolve name path (isolate (f path)) >>= maybeM ((,) emptyEnv <$> unit)
   modifyEnv (mergeEnvs importedEnv)
   pure v
 

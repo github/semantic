@@ -100,7 +100,7 @@ instance Evaluatable Import where
 
     -- Last module path is the one we want to import
     let path = NonEmpty.last modulePaths
-    (importedEnv, _) <- isolate (require path)
+    importedEnv <- maybe emptyEnv fst <$> isolate (require path)
     modifyEnv (mergeEnvs (select importedEnv))
     unit
     where
@@ -125,7 +125,7 @@ instance Evaluatable QualifiedImport where
     where
       -- Evaluate and import the last module, updating the environment
       go ((name, path) :| []) = letrec' name $ \addr -> do
-        (importedEnv, _) <- isolate (require path)
+        importedEnv <- maybe emptyEnv fst <$> isolate (require path)
         modifyEnv (mergeEnvs importedEnv)
         void $ makeNamespace name addr Nothing
         unit
@@ -154,7 +154,7 @@ instance Evaluatable QualifiedAliasedImport where
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
     letrec' alias $ \addr -> do
       let path = NonEmpty.last modulePaths
-      (importedEnv, _) <- isolate (require path)
+      importedEnv <- maybe emptyEnv fst <$> isolate (require path)
       modifyEnv (mergeEnvs importedEnv)
       void $ makeNamespace alias addr Nothing
       unit

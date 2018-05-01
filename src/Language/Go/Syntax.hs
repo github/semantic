@@ -59,7 +59,7 @@ instance Evaluatable Import where
   eval (Import importPath _) = do
     paths <- resolveGoImport importPath
     for_ paths $ \path -> do
-      (importedEnv, _) <- traceResolve (unPath importPath) path $ isolate (require path)
+      importedEnv <- maybe emptyEnv fst <$> traceResolve (unPath importPath) path (isolate (require path))
       modifyEnv (mergeEnvs importedEnv)
     unit
 
@@ -80,7 +80,7 @@ instance Evaluatable QualifiedImport where
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
     void $ letrec' alias $ \addr -> do
       for_ paths $ \path -> do
-        (importedEnv, _) <- traceResolve (unPath importPath) path $ isolate (require path)
+        importedEnv <- maybe emptyEnv fst <$> traceResolve (unPath importPath) path (isolate (require path))
         modifyEnv (mergeEnvs importedEnv)
 
       makeNamespace alias addr Nothing

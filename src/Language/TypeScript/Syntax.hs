@@ -94,7 +94,7 @@ javascriptExtensions = ["js"]
 
 evalRequire :: (Member (EvalModule term value) effects, MonadEvaluatable location term value effects m) => ModulePath -> Name -> m effects value
 evalRequire modulePath alias = letrec' alias $ \addr -> do
-  (importedEnv, _) <- isolate (require modulePath)
+  importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
   modifyEnv (mergeEnvs importedEnv)
   void $ makeNamespace alias addr Nothing
   unit
@@ -110,7 +110,7 @@ instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Import where
   eval (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    (importedEnv, _) <- isolate (require modulePath)
+    importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
     modifyEnv (mergeEnvs (renamed importedEnv)) *> unit
     where
       renamed importedEnv
@@ -185,7 +185,7 @@ instance Show1 QualifiedExportFrom where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable QualifiedExportFrom where
   eval (QualifiedExportFrom importPath exportSymbols) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
-    (importedEnv, _) <- isolate (require modulePath)
+    importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
     -- Look up addresses in importedEnv and insert the aliases with addresses into the exports.
     for_ exportSymbols $ \(name, alias) -> do
       let address = Env.lookup name importedEnv

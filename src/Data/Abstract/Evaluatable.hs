@@ -211,21 +211,19 @@ require :: ( Member (EvalModule term value) effects
            , Member (Reader (ModuleTable [Module term])) effects
            , Member (Resumable (LoadError term)) effects
            , MonadEvaluator location term value effects m
-           , MonadValue location value effects m
            )
         => ModulePath
-        -> m effects (Environment location value, value)
+        -> m effects (Maybe (Environment location value, value))
 require = requireWith evaluateModule
 
 requireWith :: ( Member (Reader (ModuleTable [Module term])) effects
                , Member (Resumable (LoadError term)) effects
                , MonadEvaluator location term value effects m
-               , MonadValue location value effects m
                )
             => (Module term -> m effects value)
             -> ModulePath
-            -> m effects (Environment location value, value)
-requireWith with name = getModuleTable >>= maybeM (loadWith with name) . ModuleTable.lookup name
+            -> m effects (Maybe (Environment location value, value))
+requireWith with name = getModuleTable >>= maybeM (loadWith with name) . fmap Just . ModuleTable.lookup name
 
 -- | Load another module by name and return it's environment and value.
 --
@@ -234,38 +232,27 @@ load :: ( Member (EvalModule term value) effects
         , Member (Reader (ModuleTable [Module term])) effects
         , Member (Resumable (LoadError term)) effects
         , MonadEvaluator location term value effects m
-        , MonadValue location value effects m
         )
      => ModulePath
-     -> m effects (Environment location value, value)
+     -> m effects (Maybe (Environment location value, value))
 load = loadWith evaluateModule
 
 loadWith :: ( Member (Reader (ModuleTable [Module term])) effects
             , Member (Resumable (LoadError term)) effects
             , MonadEvaluator location term value effects m
-            , MonadValue location value effects m
             )
          => (Module term -> m effects value)
          -> ModulePath
-         -> m effects (Environment location value, value)
-loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= evalAndCache
+         -> m effects (Maybe (Environment location value, value))
+loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= runMerging . foldMap (Merging . evalAndCache)
   where
     notFound = throwResumable (LoadError name)
 
-    evalAndCache []     = (,) emptyEnv <$> unit
-    evalAndCache [x]    = evalAndCache' x
-    evalAndCache (x:xs) = do
-      (env, _) <- evalAndCache' x
-      (env', v') <- evalAndCache xs
-      pure (mergeEnvs env env', v')
-
-    evalAndCache' x = do
+    evalAndCache x = do
       let mPath = modulePath (moduleInfo x)
       LoadStack{..} <- getLoadStack
       if mPath `elem` unLoadStack
-        then do -- Circular load, don't keep evaluating.
-          v <- trace ("load (skip evaluating, circular load): " <> show mPath) unit
-          pure (emptyEnv, v)
+        then trace ("load (skip evaluating, circular load): " <> show mPath) (pure Nothing)
         else do
           modifyLoadStack (loadStackPush mPath)
           v <- trace ("load (evaluating): " <> show mPath) $ with x
@@ -273,7 +260,7 @@ loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup nam
           traceM ("load done:" <> show mPath)
           env <- filterEnv <$> getExports <*> getEnv
           modifyModuleTable (ModuleTable.insert name (env, v))
-          pure (env, v)
+          pure (Just (env, v))
 
     -- TODO: If the set of exports is empty because no exports have been
     -- defined, do we export all terms, or no terms? This behavior varies across
@@ -283,6 +270,16 @@ loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup nam
       | Exports.null ports = env
       | otherwise = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
 
+newtype Merging m location value = Merging { runMerging :: m (Maybe (Environment location value, value)) }
+
+instance Applicative m => Semigroup (Merging m location value) where
+  Merging a <> Merging b = Merging (merge <$> a <*> b)
+    where merge a b = mergeJusts <$> a <*> b <|> a <|> b
+          mergeJusts (env1, _) (env2, v) = (mergeEnvs env1 env2, v)
+
+instance Applicative m => Monoid (Merging m location value) where
+  mappend = (<>)
+  mempty = Merging (pure Nothing)
 
 -- | Evaluate a (root-level) term to a value using the semantics of the current analysis.
 evalModule :: forall location term value effects m
@@ -354,8 +351,8 @@ evaluatePackageBody body
   $ traverse evaluateEntryPoint (ModuleTable.toPairs (packageEntryPoints body))
   where
     evaluateEntryPoint (m, sym) = do
-      (_, v) <- requireWith evalModule m
-      maybe (pure v) ((`call` []) <=< variable) sym
+      v <- maybe unit (pure . snd) <$> requireWith evalModule m
+      maybe v ((`call` []) <=< variable) sym
 
 withPrelude :: ( Evaluatable (Base term)
                , Member (EvalModule term value) effects
