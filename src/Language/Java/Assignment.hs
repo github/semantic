@@ -146,6 +146,7 @@ expressionChoices =
   , constructorDeclaration
   -- , constantDeclaration
   , doWhile
+  , fieldDeclaration
   , float
   , for
   , enum
@@ -193,13 +194,15 @@ comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 -- constantDeclaration = makeTerm <$> symbol ConstantDeclaration <*>
 
 localVariableDeclaration :: Assignment
-localVariableDeclaration = makeDecl <$> symbol LocalVariableDeclaration <*> children ((,,) <$> manyTerm modifier <*> type' <*> vDeclList)
+localVariableDeclaration = makeTerm <$> symbol LocalVariableDeclaration <*> children ((,) <$> manyTerm modifier <*> type' <**> variableDeclaratorList)
+
+variableDeclaratorList :: Assignment.Assignment [] Grammar (([Term], Term) -> [Term])
+variableDeclaratorList = symbol VariableDeclaratorList *> children (makeDecl <$> some variableDeclarator)
   where
+    variableDeclarator = symbol VariableDeclarator *> children ((,) <$> variableDeclaratorId <*> optional expression)
+    makeDecl decls (modifiers, type') = map (makeSingleDecl modifiers type') decls
     makeSingleDecl modifiers type' (target, Nothing) = makeTerm1 (Java.Syntax.Variable modifiers type' target)
     makeSingleDecl modifiers type' (target, Just value) = makeTerm1 (Statement.Assignment [] (makeTerm1 (Java.Syntax.Variable modifiers type' target)) value)
-    makeDecl loc (modifiers, type', decls) = makeTerm'' loc $ fmap (makeSingleDecl modifiers type') decls -- we need loc here because it's the outermost node that comprises the list of all things
-    vDeclList = symbol VariableDeclaratorList *> children (some variableDeclarator)
-    variableDeclarator = symbol VariableDeclarator *> children ((,) <$> variableDeclaratorId <*> optional expression)
 
 localVariableDeclarationStatement :: Assignment
 localVariableDeclarationStatement = symbol LocalVariableDeclarationStatement *> children localVariableDeclaration
