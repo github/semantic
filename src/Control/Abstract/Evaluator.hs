@@ -313,7 +313,7 @@ askModuleTable :: MonadEvaluator location term value effects m => m effects (Mod
 askModuleTable = raise ask
 
 -- | Run an action with a locally-modified table of unevaluated modules.
-localModuleTable :: MonadEvaluator location term value effects m => (ModuleTable [Module term] -> ModuleTable [Module term]) -> m effects a -> m effects a
+localModuleTable :: (Effectful m, Member (Reader (ModuleTable [Module term])) effects) => (ModuleTable [Module term] -> ModuleTable [Module term]) -> m effects a -> m effects a
 localModuleTable f = raiseHandler (local f)
 
 
