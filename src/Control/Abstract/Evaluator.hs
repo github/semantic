@@ -1,6 +1,7 @@
 {-# LANGUAGE FunctionalDependencies, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
 module Control.Abstract.Evaluator
-  ( MonadEvaluator
+  ( Evaluator
+  , MonadEvaluator
   -- * Environment
   , getEnv
   , putEnv
@@ -80,6 +81,8 @@ import Data.Semigroup.Reducer
 import Data.Semilattice.Lower
 import Prelude hiding (fail)
 import Prologue
+
+class Effectful m => Evaluator location term value m | m -> location term value
 
 -- | A 'Monad' providing the basic essentials for evaluation.
 --
