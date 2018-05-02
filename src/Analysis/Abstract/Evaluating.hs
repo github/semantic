@@ -19,7 +19,6 @@ deriving instance Member NonDet effects => Alternative (Evaluating location term
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects location term value
   = '[ EvalClosure term value
-     , EvalModule term value
      , Return value
      , LoopControl value
      , Fail                                        -- Failure with an error message
@@ -66,6 +65,5 @@ instance (AbstractHole value, Show term, Show value) => Interpreter (Evaluating 
         Break value -> traceM ("Evaluating.interpret: resuming uncaught break with " <> show value) $> value
         Continue    -> traceM "Evaluating.interpret: resuming uncaught continue with hole" $> hole)
       . Eff.interpret (\ (Return value) -> traceM ("Evaluating.interpret: resuming uncaught return with " <> show value) $> value)
-      . Eff.interpret (\ (EvalModule m) -> traceM ("Evaluating.interpret: resuming uncaught EvalModule of " <> show m <> " with hole") $> hole)
       . Eff.interpret (\ (EvalClosure term) -> traceM ("Evaluating.interpret: resuming uncaught EvalClosure of " <> show term <> " with hole") $> hole))
       -- TODO: Replace 'traceM's with e.g. 'Telemetry'.
