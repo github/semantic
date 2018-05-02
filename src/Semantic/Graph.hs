@@ -123,9 +123,9 @@ graphCalls package = analyze (Analysis.evaluatePackage package `asAnalysisForTyp
                                -> CallGraphing (GraphAnalysis term) effs value
     asAnalysisForTypeOfPackage = const
 
-extractGraph :: (Show err, Show aux, Member (Exc SomeException) e)
+extractGraph :: (Show a, Show b, Show result, Show c, Show err, Show aux, Member (Exc SomeException) e)
              => (Either err (Either a ((b, result), c)), aux)
              -> Eff e result
 extractGraph result = case result of
   (Right (Right ((_, graph), _)), _) -> pure graph
-  (Left err, aux) -> throwError (toException (Exc.ErrorCall ("extractGraph: graph rendering failed " <> show (err, aux))))
+  err -> throwError (toException (Exc.ErrorCall ("extractGraph: graph rendering failed " <> show err)))
