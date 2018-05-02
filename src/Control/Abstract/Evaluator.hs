@@ -158,7 +158,7 @@ localize :: MonadEvaluator location term value effects m => m effects a -> m eff
 localize = localEnv id
 
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
-lookupEnv :: MonadEvaluator location term value effects m => Name -> m effects (Maybe (Address location value))
+lookupEnv :: (Evaluator location term value m, Members '[Reader (Environment location value), State (Environment location value)] effects, Monad (m effects)) => Name -> m effects (Maybe (Address location value))
 lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
 
 -- | Look up a 'Name' in the environment, running an action with the resolved address (if any).
