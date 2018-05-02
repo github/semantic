@@ -38,7 +38,6 @@ The data constructors of Sum are not exported.
 
 module Data.Sum (
   Sum,
-  decompose,
   weaken,
   inject,
   project,
@@ -101,19 +100,6 @@ project :: forall e r v. (e :< r) => Sum r v -> Maybe (e v)
 project = unsafeProject (unP (elemNo :: P e r))
 {-# INLINE project #-}
 
-
-decompose :: Sum (t ': r) v -> Either (Sum r v) (t v)
-decompose (Sum 0 v) = Right $ unsafeCoerce v
-decompose (Sum n v) = Left  $ Sum (n-1) v
-{-# INLINE [2] decompose #-}
-
-
--- | Specialized version of 'decompose'.
-decompose0 :: Sum '[t] v -> Either (Sum '[] v) (t v)
-decompose0 (Sum _ v) = Right $ unsafeCoerce v
--- No other case is possible
-{-# RULES "decompose/singleton"  decompose = decompose0 #-}
-{-# INLINE decompose0 #-}
 
 weaken :: Sum r w -> Sum (any ': r) w
 weaken (Sum n v) = Sum (n+1) v
