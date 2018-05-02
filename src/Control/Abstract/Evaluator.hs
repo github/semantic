@@ -162,7 +162,7 @@ lookupEnv :: (Evaluator location term value m, Members '[Reader (Environment loc
 lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
 
 -- | Look up a 'Name' in the environment, running an action with the resolved address (if any).
-lookupWith :: MonadEvaluator location term value effects m => (Address location value -> m effects a) -> Name -> m effects (Maybe a)
+lookupWith :: (Evaluator location term value m, Members '[Reader (Environment location value), State (Environment location value)] effects, Monad (m effects)) => (Address location value -> m effects a) -> Name -> m effects (Maybe a)
 lookupWith with name = do
   addr <- lookupEnv name
   maybe (pure Nothing) (fmap Just . with) addr
