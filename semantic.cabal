@@ -91,6 +91,8 @@ library
                      , Data.Span
                      , Data.SplitDiff
                      -- À la carte syntax types
+                     , Data.Sum
+                     , Data.Sum.Templates
                      , Data.Syntax
                      , Data.Syntax.Comment
                      , Data.Syntax.Declaration
@@ -99,8 +101,6 @@ library
                      , Data.Syntax.Literal
                      , Data.Syntax.Statement
                      , Data.Syntax.Type
-                     , Data.Syntax.Union
-                     , Data.Syntax.Union.Templates
                      , Data.Term
                      -- Diffing algorithms & interpretation thereof
                      , Diffing.Algorithm

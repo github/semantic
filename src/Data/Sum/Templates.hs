@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
-module Data.Syntax.Union.Templates
+module Data.Sum.Templates
 ( mkElemIndexTypeFamily
 , mkApplyInstance
 ) where
@@ -42,7 +42,7 @@ mkApplyInstance paramN =
     , PragmaD (InlineP apply Inlinable FunLike AllPhases)
     ]
   where typeParams = VarT . mkName . ('f' :) . show <$> [0..pred paramN]
-        [applyC, apply, f, r, union] = mkName <$> ["Apply", "apply", "f", "r", "Union"]
+        [applyC, apply, f, r, union] = mkName <$> ["Apply", "apply", "f", "r", "Sum"]
         [constraint, a] = VarT . mkName <$> ["constraint", "a"]
         mkClause i nthType = Clause
           [ WildP, VarP f, ConP union [ LitP (IntegerL i), VarP r ] ]
