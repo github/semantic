@@ -63,16 +63,16 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       output <- Right <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (Left stdout)
       pure $ subparser >>= Task.writeToOutput output
 
-    diffCommand = command "diff" (info diffArgumentsParser (progDesc "Show changes between commits or paths"))
+    diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute changes between paths"))
     diffArgumentsParser = do
-      renderer <- flag  (SomeRenderer SExpressionDiffRenderer) (SomeRenderer SExpressionDiffRenderer) (long "sexpression" <> help "Output s-expression diff tree")
+      renderer <- flag  (SomeRenderer SExpressionDiffRenderer) (SomeRenderer SExpressionDiffRenderer) (long "sexpression" <> help "Output s-expression diff tree (default)")
               <|> flag'                                        (SomeRenderer JSONDiffRenderer)        (long "json" <> help "Output JSON diff trees")
               <|> flag'                                        (SomeRenderer ToCDiffRenderer)         (long "toc" <> help "Output JSON table of contents diff summary")
               <|> flag'                                        (SomeRenderer DOTDiffRenderer)         (long "dot" <> help "Output the diff as a DOT graph")
       filesOrStdin <- Right <$> some (both <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
       pure $ runDiff renderer filesOrStdin
 
-    parseCommand = command "parse" (info parseArgumentsParser (progDesc "Print parse trees for path(s)"))
+    parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
     parseArgumentsParser = do
       renderer <- flag  (SomeRenderer SExpressionTermRenderer) (SomeRenderer SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
               <|> flag'                                        (SomeRenderer JSONTermRenderer)        (long "json" <> help "Output JSON parse trees")
@@ -96,17 +96,17 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
 
     graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a graph for a directory or entry point"))
     graphArgumentsParser = do
-      graphType <- flag ImportGraph ImportGraph (long "imports" <> help "Compute an import graph")
+      graphType <- flag ImportGraph ImportGraph (long "imports" <> help "Compute an import graph (default)")
                <|> flag'            CallGraph       (long "calls" <> help "Compute a call graph")
       renderer <- flag (SomeRenderer DOTGraphRenderer) (SomeRenderer DOTGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
               <|> flag'                                      (SomeRenderer JSONGraphRenderer) (long "json" <> help "Output JSON graph")
       rootDir <- rootDirectoryOption
       excludeDirs <- excludeDirsOption
-      File{..} <- argument filePathReader (metavar "DIRECTORY:LANGUAGE")
+      File{..} <- argument filePathReader (metavar "DIR:LANGUAGE | FILE")
       pure $ runGraph graphType renderer rootDir filePath (fromJust fileLanguage) excludeDirs
 
-    rootDirectoryOption = optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIRECTORY"))
-    excludeDirsOption = many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)"))
+    rootDirectoryOption = optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
+    excludeDirsOption = many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of
         [a, b] | lang <- readMaybe b -> Right (File a lang)
