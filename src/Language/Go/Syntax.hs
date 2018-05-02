@@ -28,7 +28,7 @@ importPath str = let path = stripQuotes str in ImportPath (BC.unpack path) (path
 defaultAlias :: ImportPath -> Name
 defaultAlias = name . BC.pack . takeFileName . unPath
 
-resolveGoImport :: forall value term location effects m. (Member Fail effects, Member (Reader Package.PackageInfo) effects, MonadEvaluatable location term value effects m) => ImportPath -> m effects [ModulePath]
+resolveGoImport :: forall value term location effects m. (Member (Reader ModuleInfo) effects, Member (Reader Package.PackageInfo) effects, MonadEvaluatable location term value effects m) => ImportPath -> m effects [ModulePath]
 resolveGoImport (ImportPath path Relative) = do
   ModuleInfo{..} <- currentModule
   paths <- listModulesInDir (joinPaths (takeDirectory modulePath) path)

@@ -321,10 +321,8 @@ modifyLoadStack f = do
 
 
 -- | Get the currently evaluating 'ModuleInfo'.
-currentModule :: forall location term value effects m . (Member Fail effects, MonadEvaluator location term value effects m) => m effects ModuleInfo
-currentModule = do
-  o <- raise ask
-  maybeM (raise (fail "unable to get currentModule")) $ withSomeOrigin (originModule @term) o
+currentModule :: (Effectful m, Member (Reader ModuleInfo) effects) => m effects ModuleInfo
+currentModule = raise ask
 
 -- | Get the currently evaluating 'PackageInfo'.
 currentPackage :: (Effectful m, Member (Reader PackageInfo) effects) => m effects PackageInfo

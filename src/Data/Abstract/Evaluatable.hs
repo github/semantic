@@ -154,6 +154,7 @@ instance Show1 (Unspecialized a) where
 class Evaluatable constr where
   eval :: ( Member (EvalModule term value) effects
           , Member Fail effects
+          , Member (Reader ModuleInfo) effects
           , Member (Reader PackageInfo) effects
           , MonadEvaluatable location term value effects m
           )
@@ -282,25 +283,29 @@ instance Applicative m => Monoid (Merging m location value) where
   mempty = Merging (pure Nothing)
 
 -- | Evaluate a (root-level) term to a value using the semantics of the current analysis.
-evalModule :: forall location term value effects m
-           .  ( Evaluatable (Base term)
+evalModule :: forall location term value effects m inner
+           .  ( inner ~ (Reader ModuleInfo ': effects)
+              , Evaluatable (Base term)
               , Member (EvalModule term value) effects
-              , Member Fail effects
-              , Member (Reader PackageInfo) effects
-              , MonadAnalysis location term value effects m
-              , MonadEvaluatable location term value effects m
+              , Member (EvalModule term value) inner
+              , Member Fail inner
+              , Member (Reader PackageInfo) inner
+              , MonadAnalysis location term value inner m
+              , MonadEvaluatable location term value inner m
               , Recursive term
               )
            => Module term
            -> m effects value
-evalModule m = raiseHandler
-  (interpose @(EvalModule term value) pure (\ (EvalModule m) yield -> lower @m (evalModule m) >>= yield))
-  (analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evalTerm) m))
+evalModule m
+  = raiseHandler (interpose @(EvalModule term value) pure (\ (EvalModule m) yield -> lower @m (evalModule m) >>= yield))
+  . withModuleInfo (moduleInfo m)
+  $ analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evalTerm) m)
 
 evalTerm :: forall location term value effects m
          .  ( Evaluatable (Base term)
             , Member (EvalModule term value) effects
             , Member Fail effects
+            , Member (Reader ModuleInfo) effects
             , Member (Reader PackageInfo) effects
             , MonadAnalysis location term value effects m
             , MonadEvaluatable location term value effects m
@@ -314,16 +319,28 @@ evalTerm term = catchReturn @m @value
     (foldSubterms (analyzeTerm eval) term))
   (\ (Return value) -> pure value)
 
+withModuleInfo :: Effectful m => ModuleInfo -> m (Reader ModuleInfo ': effects) a -> m effects a
+withModuleInfo = raiseHandler . flip runReader
+
 withPackageInfo :: Effectful m => PackageInfo -> m (Reader PackageInfo ': effects) a -> m effects a
 withPackageInfo = raiseHandler . flip runReader
 
 -- | Evaluate a given package.
-evaluatePackage :: ( inner ~ (Reader (ModuleTable [Module term]) ': Reader PackageInfo ': effects)
+evaluatePackage :: ( moduleEffects ~ (Reader ModuleInfo ': packageEffects)
+                   , packageEffects ~ (Reader (ModuleTable [Module term]) ': Reader PackageInfo ': effects)
+                   , Applicative (m packageEffects)
                    , Evaluatable (Base term)
-                   , Member (EvalModule term value) inner
-                   , Member Fail inner
-                   , MonadAnalysis location term value inner m
-                   , MonadEvaluatable location term value inner m
+                   , Member (EvalModule term value) moduleEffects
+                   , Member (EvalModule term value) packageEffects
+                   , Member Fail moduleEffects
+                   , Member (Resumable (AddressError location value)) packageEffects
+                   , Member (Resumable (EvalError value)) packageEffects
+                   , Member (Resumable (LoadError term)) packageEffects
+                   , MonadAddressable location packageEffects m
+                   , MonadAnalysis location term value moduleEffects m
+                   , MonadEvaluatable location term value moduleEffects m
+                   , MonadEvaluator location term value packageEffects m
+                   , MonadValue location value packageEffects m
                    , Recursive term
                    )
                 => Package term
@@ -334,13 +351,22 @@ withUnevaluatedModules :: Effectful m => ModuleTable [Module term] -> m (Reader 
 withUnevaluatedModules = raiseHandler . flip runReader
 
 -- | Evaluate a given package body (module table and entry points).
-evaluatePackageBody :: ( inner ~ (Reader (ModuleTable [Module term]) ': effects)
+evaluatePackageBody :: ( moduleEffects ~ (Reader ModuleInfo ': packageEffects)
+                       , packageEffects ~ (Reader (ModuleTable [Module term]) ': effects)
+                       , Applicative (m packageEffects)
                        , Evaluatable (Base term)
-                       , Member (EvalModule term value) inner
-                       , Member Fail inner
-                       , Member (Reader PackageInfo) inner
-                       , MonadAnalysis location term value inner m
-                       , MonadEvaluatable location term value inner m
+                       , Member (EvalModule term value) moduleEffects
+                       , Member (EvalModule term value) packageEffects
+                       , Member Fail moduleEffects
+                       , Member (Reader PackageInfo) moduleEffects
+                       , Member (Resumable (AddressError location value)) packageEffects
+                       , Member (Resumable (EvalError value)) packageEffects
+                       , Member (Resumable (LoadError term)) packageEffects
+                       , MonadAddressable location packageEffects m
+                       , MonadAnalysis location term value moduleEffects m
+                       , MonadEvaluatable location term value moduleEffects m
+                       , MonadEvaluator location term value packageEffects m
+                       , MonadValue location value packageEffects m
                        , Recursive term
                        )
                     => PackageBody term
@@ -350,12 +376,21 @@ evaluatePackageBody body
   . withPrelude (packagePrelude body)
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
 
-evaluateEntryPoint :: ( Evaluatable (Base term)
+evaluateEntryPoint :: ( inner ~ (Reader ModuleInfo ': effects)
+                      , Evaluatable (Base term)
                       , Member (EvalModule term value) effects
-                      , Member Fail effects
-                      , Member (Reader PackageInfo) effects
-                      , MonadAnalysis location term value effects m
-                      , MonadEvaluatable location term value effects m
+                      , Member (Reader (ModuleTable [Module term])) effects
+                      , Member (Resumable (AddressError location value)) effects
+                      , Member (Resumable (EvalError value)) effects
+                      , Member (Resumable (LoadError term)) effects
+                      , Member (EvalModule term value) inner
+                      , Member Fail inner
+                      , Member (Reader PackageInfo) inner
+                      , MonadAddressable location effects m
+                      , MonadAnalysis location term value inner m
+                      , MonadEvaluatable location term value inner m
+                      , MonadEvaluator location term value effects m
+                      , MonadValue location value effects m
                       , Recursive term
                       )
                    => ModulePath
@@ -365,12 +400,15 @@ evaluateEntryPoint m sym = do
   v <- maybe unit (pure . snd) <$> requireWith evalModule m
   maybe v ((`call` []) <=< variable) sym
 
-withPrelude :: ( Evaluatable (Base term)
+withPrelude :: ( inner ~ (Reader ModuleInfo ': effects)
+               , Evaluatable (Base term)
                , Member (EvalModule term value) effects
-               , Member Fail effects
-               , Member (Reader PackageInfo) effects
-               , MonadAnalysis location term value effects m
-               , MonadEvaluatable location term value effects m
+               , Member (EvalModule term value) inner
+               , Member Fail inner
+               , Member (Reader PackageInfo) inner
+               , MonadAnalysis location term value inner m
+               , MonadEvaluatable location term value inner m
+               , MonadEvaluator location term value effects m
                , Recursive term
                )
             => Maybe (Module term)
