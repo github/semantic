@@ -11,6 +11,7 @@ import Data.Abstract.Cache
 import Data.Abstract.Configuration
 import Data.Abstract.Live
 import Data.Abstract.Module
+import Data.Semilattice.Lower
 import Prologue
 
 -- | A (coinductively-)cached analysis suitable for guaranteeing termination of (suitably finitized) analyses over recursive programs.
@@ -19,42 +20,34 @@ newtype Caching m (effects :: [* -> *]) a = Caching { runCaching :: m effects a 
 
 deriving instance Evaluator location term value m => Evaluator location term value (Caching m)
 
--- | Functionality used to perform caching analysis. This is not exported, and exists primarily for organizational reasons.
-class MonadEvaluator location term value effects m => MonadCaching location term value effects m where
-  -- | Look up the set of values for a given configuration in the in-cache.
-  consultOracle :: Configuration location term value -> m effects (Set (value, Heap location value))
-  -- | Run an action with the given in-cache.
-  withOracle :: Cache location term value -> m effects a -> m effects a
+-- | Look up the set of values for a given configuration in the in-cache.
+consultOracle :: (Cacheable location term value, Effectful m, Member (Reader (Cache location term value)) effects) => Configuration location term value -> m effects (Set (value, Heap location value))
+consultOracle configuration = raise (fromMaybe mempty . cacheLookup configuration <$> ask)
 
-  -- | Look up the set of values for a given configuration in the out-cache.
-  lookupCache :: Configuration location term value -> m effects (Maybe (Set (value, Heap location value)))
-  -- | Run an action, caching its result and 'Heap' under the given configuration.
-  caching :: Configuration location term value -> Set (value, Heap location value) -> m effects value -> m effects value
+-- | Run an action with the given in-cache.
+withOracle :: (Effectful m, Member (Reader (Cache location term value)) effects) => Cache location term value -> m effects a -> m effects a
+withOracle cache = raiseHandler (local (const cache))
 
-  -- | Run an action starting from an empty out-cache, and return the out-cache afterwards.
-  isolateCache :: m effects a -> m effects (Cache location term value)
 
-instance ( Effectful m
-         , Member (Reader (Cache location term value)) effects
-         , Member (State  (Cache location term value)) effects
-         , MonadEvaluator location term value effects m
-         , Ord (Cell location value)
-         , Ord location
-         , Ord term
-         , Ord value
-         )
-         => MonadCaching location term value effects (Caching m) where
-  consultOracle configuration = raise (fromMaybe mempty . cacheLookup configuration <$> ask)
-  withOracle cache = raiseHandler (local (const cache))
+-- | Look up the set of values for a given configuration in the out-cache.
+lookupCache :: (Cacheable location term value, Effectful m, Member (State (Cache location term value)) effects) => Configuration location term value -> m effects (Maybe (Set (value, Heap location value)))
+lookupCache configuration = raise (cacheLookup configuration <$> get)
 
-  lookupCache configuration = raise (cacheLookup configuration <$> get)
-  caching configuration values action = do
-    raise (modify (cacheSet configuration values))
-    result <- (,) <$> action <*> getHeap
-    raise (modify (cacheInsert configuration result))
-    pure (fst result)
+-- | Run an action, caching its result and 'Heap' under the given configuration.
+caching :: (Cacheable location term value, Effectful m, Member (State (Cache location term value)) effects, Member (State (Heap location value)) effects, Monad (m effects)) => Configuration location term value -> Set (value, Heap location value) -> m effects value -> m effects value
+caching configuration values action = do
+  raise (modify (cacheSet configuration values))
+  result <- (,) <$> action <*> raise get
+  raise (modify (cacheInsert configuration result))
+  pure (fst result)
 
-  isolateCache action = raise (put (mempty :: Cache location term value)) *> action *> raise get
+putCache :: (Effectful m, Member (State (Cache location term value)) effects) => Cache location term value -> m effects ()
+putCache = raise . put
+
+-- | Run an action starting from an empty out-cache, and return the out-cache afterwards.
+isolateCache :: forall location term value m effects a . (Applicative (m effects), Effectful m, Member (State (Cache location term value)) effects) => m effects a -> m effects (Cache location term value)
+isolateCache action = putCache @m @location @term @value lowerBound *> action *> raise get
+
 
 -- | This instance coinductively iterates the analysis of a term until the results converge.
 instance ( Alternative (m effects)
