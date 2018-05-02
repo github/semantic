@@ -9,7 +9,6 @@ import Control.Monad.Effect hiding (interpret)
 import Data.Abstract.Address
 import Data.Abstract.Cache
 import Data.Abstract.Configuration
-import Data.Abstract.Heap
 import Data.Abstract.Live
 import Data.Abstract.Module
 import Prologue

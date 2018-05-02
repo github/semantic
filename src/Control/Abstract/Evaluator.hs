@@ -2,6 +2,13 @@
 module Control.Abstract.Evaluator
   ( Evaluator
   , MonadEvaluator
+  -- * State
+  , Environment
+  , Heap
+  , LoadStack
+  , ModuleTable
+  , Exports
+  , JumpTable
   -- * Environment
   , getEnv
   , putEnv
