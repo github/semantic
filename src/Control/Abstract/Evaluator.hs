@@ -107,7 +107,7 @@ class ( Evaluator location term value m
 -- Environment
 
 -- | Retrieve the environment.
-getEnv :: MonadEvaluator location term value effects m => m effects (Environment location value)
+getEnv :: (Member (State (Environment location value)) effects, Evaluator location term value m) => m effects (Environment location value)
 getEnv = raise get
 
 -- | Set the environment.
