@@ -348,7 +348,7 @@ catchLoopControl action handler = raiseHandler (Eff.interpose pure (\ control _ 
 
 
 -- | Retrieve the current 'SomeOrigin'.
-askOrigin :: MonadEvaluator location term value effects m => m effects (SomeOrigin term)
+askOrigin :: (Evaluator location term value m, Member (Reader (SomeOrigin term)) effects) => m effects (SomeOrigin term)
 askOrigin = raise ask
 
 -- | Push a 'SomeOrigin' onto the stack. This should be used to contextualize execution with information about the originating term, module, or package.
