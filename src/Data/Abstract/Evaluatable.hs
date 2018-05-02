@@ -252,13 +252,11 @@ loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup nam
 
     evalAndCache x = do
       let mPath = modulePath (moduleInfo x)
-      LoadStack{..} <- getLoadStack
+      LoadStack{..} <- askLoadStack
       if mPath `elem` unLoadStack
         then trace ("load (skip evaluating, circular load): " <> show mPath) (pure Nothing)
         else do
-          modifyLoadStack (loadStackPush mPath)
-          v <- trace ("load (evaluating): " <> show mPath) $ with x
-          modifyLoadStack loadStackPop
+          v <- localLoadStack (loadStackPush mPath) (trace ("load (evaluating): " <> show mPath) (with x))
           traceM ("load done:" <> show mPath)
           env <- filterEnv <$> getExports <*> getEnv
           modifyModuleTable (ModuleTable.insert name (env, v))

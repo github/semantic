@@ -37,9 +37,8 @@ module Control.Abstract.Evaluator
   , getModuleTable
   , putModuleTable
   , modifyModuleTable
-  , getLoadStack
-  , putLoadStack
-  , modifyLoadStack
+  , askLoadStack
+  , localLoadStack
   , currentModule
   , currentPackage
   -- * Control
@@ -93,6 +92,7 @@ import Prologue
 --   - tables of modules available for import
 class ( Effectful m
       , Member (Reader (Environment location value)) effects
+      , Member (Reader LoadStack) effects
       , Member (Reader (SomeOrigin term)) effects
       , Member (State (EvaluatorState location term value)) effects
       , Monad (m effects)
@@ -106,7 +106,6 @@ data EvaluatorState location term value = EvaluatorState
   { environment :: Environment location value
   , heap        :: Heap location value
   , modules     :: ModuleTable (Environment location value, value)
-  , loadStack   :: LoadStack
   , exports     :: Exports location value
   , jumps       :: IntMap.IntMap (SomeOrigin term, term)
   }
@@ -116,7 +115,7 @@ deriving instance (Ord (Cell location value), Ord location, Ord term, Ord value,
 deriving instance (Show (Cell location value), Show location, Show term, Show value, Show (Base term ())) => Show (EvaluatorState location term value)
 
 instance Lower (EvaluatorState location term value) where
-  lowerBound = EvaluatorState lowerBound lowerBound lowerBound lowerBound lowerBound lowerBound
+  lowerBound = EvaluatorState lowerBound lowerBound lowerBound lowerBound lowerBound
 
 
 -- Lenses
@@ -129,9 +128,6 @@ _heap = lens heap (\ s h -> s {heap = h})
 
 _modules :: Lens' (EvaluatorState location term value) (ModuleTable (Environment location value, value))
 _modules = lens modules (\ s m -> s {modules = m})
-
-_loadStack :: Lens' (EvaluatorState location term value) LoadStack
-_loadStack = lens loadStack (\ s l -> s {loadStack = l})
 
 _exports :: Lens' (EvaluatorState location term value) (Exports location value)
 _exports = lens exports (\ s e -> s {exports = e})
@@ -307,18 +303,12 @@ modifyModuleTable f = do
 
 
 -- | Retrieve the module load stack
-getLoadStack :: MonadEvaluator location term value effects m => m effects LoadStack
-getLoadStack = view _loadStack
+askLoadStack :: MonadEvaluator location term value effects m => m effects LoadStack
+askLoadStack = raise ask
 
--- | Set the module load stack
-putLoadStack :: MonadEvaluator location term value effects m => LoadStack -> m effects ()
-putLoadStack = (_loadStack .=)
-
--- | Update the module load stack.
-modifyLoadStack :: MonadEvaluator location term value effects m => (LoadStack -> LoadStack) -> m effects ()
-modifyLoadStack f = do
-  stack <- getLoadStack
-  putLoadStack $! f stack
+-- | Locally update the module load stack.
+localLoadStack :: MonadEvaluator location term value effects m => (LoadStack -> LoadStack) -> m effects a -> m effects a
+localLoadStack = raiseHandler . local
 
 
 -- | Get the currently evaluating 'ModuleInfo'.

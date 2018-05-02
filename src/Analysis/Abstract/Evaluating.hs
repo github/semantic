@@ -6,6 +6,7 @@ module Analysis.Abstract.Evaluating
 import Control.Abstract.Analysis
 import qualified Control.Monad.Effect as Eff
 import Data.Abstract.Environment
+import Data.Abstract.ModuleTable
 import Data.Abstract.Origin
 import Data.Semilattice.Lower
 import Prologue
@@ -25,10 +26,12 @@ type EvaluatingEffects location term value
      , Fresh                                       -- For allocating new addresses and/or type variables.
      , Reader (SomeOrigin term)                    -- The current term’s origin.
      , Reader (Environment location value)         -- Default environment used as a fallback in lookupEnv
+     , Reader LoadStack
      , State  (EvaluatorState location term value) -- Environment, heap, modules, exports, and jumps.
      ]
 
 instance ( Member (Reader (Environment location value)) effects
+         , Member (Reader LoadStack) effects
          , Member (Reader (SomeOrigin term)) effects
          , Member (State (EvaluatorState location term value)) effects
          )
@@ -36,6 +39,7 @@ instance ( Member (Reader (Environment location value)) effects
 
 instance ( Corecursive term
          , Member (Reader (Environment location value)) effects
+         , Member (Reader LoadStack) effects
          , Member (Reader (SomeOrigin term)) effects
          , Member (State (EvaluatorState location term value)) effects
          , Recursive term
@@ -55,6 +59,7 @@ instance (AbstractHole value, Show term, Show value) => Interpreter (Evaluating 
     . runEvaluating
     . raiseHandler
       ( flip runState  lowerBound -- State (EvaluatorState location term value)
+      . flip runReader lowerBound -- Reader LoadStack
       . flip runReader lowerBound -- Reader (Environment location value)
       . flip runReader lowerBound -- Reader (SomeOrigin term)
       . flip runFresh' 0
