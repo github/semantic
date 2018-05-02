@@ -58,6 +58,7 @@ module Control.Abstract.Evaluator
   , throwContinue
   , catchLoopControl
   -- * Origin
+  , askOrigin
   , pushOrigin
   ) where
 
@@ -400,6 +401,10 @@ throwContinue = raise (Eff.send Continue)
 catchLoopControl :: (Effectful m, Member (LoopControl value) effects) => m effects a -> (forall x . LoopControl value x -> m effects a) -> m effects a
 catchLoopControl action handler = raiseHandler (Eff.interpose pure (\ control _ -> lower (handler control))) action
 
+
+-- | Retrieve the current 'SomeOrigin'.
+askOrigin :: MonadEvaluator location term value effects m => m effects (SomeOrigin term)
+askOrigin = raise ask
 
 -- | Push a 'SomeOrigin' onto the stack. This should be used to contextualize execution with information about the originating term, module, or package.
 pushOrigin :: ( Effectful m

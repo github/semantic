@@ -98,7 +98,7 @@ packageInclusion :: forall m location term value effects
                  => Vertex
                  -> ImportGraphing m effects ()
 packageInclusion v = do
-  o <- raise ask
+  o <- askOrigin
   appendGraph (packageGraph @term o `connect` vertex v)
 
 -- | Add an edge from the current module to the passed vertex.
@@ -109,7 +109,7 @@ moduleInclusion :: forall m location term value effects
                 => Vertex
                 -> ImportGraphing m effects ()
 moduleInclusion v = do
-  o <- raise ask
+  o <- askOrigin
   appendGraph (moduleGraph @term o `connect` vertex v)
 
 -- | Add an edge from the passed variable name to the module it originated within.
