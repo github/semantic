@@ -9,7 +9,6 @@ import Control.Monad.Effect.Writer
 import Data.Abstract.Configuration
 import Data.Abstract.Live
 import Data.Semigroup.Reducer as Reducer
-import Data.Union
 import Prologue
 
 -- | Trace analysis.

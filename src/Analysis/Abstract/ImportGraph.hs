@@ -62,13 +62,13 @@ deriving instance MonadEvaluator location term value effects m => MonadEvaluator
 instance ( Effectful m
          , Member (Resumable (LoadError term)) effects
          , Member (State ImportGraph) effects
-         , Member Syntax.Identifier syntax
+         , Element Syntax.Identifier syntax
          , MonadAnalysis (Located location term) term value effects m
-         , term ~ Term (Union syntax) ann
+         , term ~ Term (Sum syntax) ann
          )
       => MonadAnalysis (Located location term) term value effects (ImportGraphing m) where
   analyzeTerm eval term@(In _ syntax) = do
-    case prj syntax of
+    case projectSum syntax of
       Just (Syntax.Identifier name) -> do
         moduleInclusion (Variable (unName name))
         variableDefinition name

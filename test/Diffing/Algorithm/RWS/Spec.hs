@@ -1,20 +1,17 @@
 {-# LANGUAGE DataKinds #-}
 module Diffing.Algorithm.RWS.Spec where
 
-import Data.Abstract.FreeVariables
 import Analysis.Decorator
-import Data.Array.IArray
 import Data.Bifunctor
 import Data.Diff
 import Data.Functor.Listable (ListableSyntax)
 import Data.Record
+import Data.Sum
 import qualified Data.Syntax as Syntax
 import Data.Term
 import Data.These
-import Data.Union
 import Diffing.Algorithm
 import Diffing.Algorithm.RWS
-import Diffing.Interpreter
 import Test.Hspec
 import Test.Hspec.LeanCheck
 

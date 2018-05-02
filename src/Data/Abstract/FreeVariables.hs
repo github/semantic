@@ -3,6 +3,7 @@ module Data.Abstract.FreeVariables where
 
 import qualified Data.ByteString.Char8 as BC
 import           Data.String
+import           Data.Sum
 import           Data.Term
 import           Prologue
 
@@ -54,7 +55,7 @@ instance (FreeVariables1 syntax, Functor syntax) => FreeVariables (Term syntax a
 instance (FreeVariables1 syntax) => FreeVariables1 (TermF syntax ann) where
   liftFreeVariables f (In _ s) = liftFreeVariables f s
 
-instance (Apply FreeVariables1 fs) => FreeVariables1 (Union fs) where
+instance (Apply FreeVariables1 fs) => FreeVariables1 (Sum fs) where
   liftFreeVariables f = apply (Proxy :: Proxy FreeVariables1) (liftFreeVariables f)
 
 instance FreeVariables1 []

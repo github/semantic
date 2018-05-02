@@ -7,8 +7,8 @@ import Data.Functor (($>))
 import Data.List.NonEmpty (NonEmpty(..))
 import Data.Maybe (fromMaybe)
 import Data.Proxy
+import Data.Sum
 import Data.These
-import Data.Union
 import GHC.Generics
 
 -- | Functors which can be aligned (structure-unioning-ly zipped). The default implementation will operate generically over the constructors in the aligning type.
@@ -37,7 +37,7 @@ instance GAlign [] where
 instance GAlign NonEmpty where
   galignWith f (a1:|as1) (a2:|as2) = (:|) <$> f (These a1 a2) <*> galignWith f as1 as2
 
-instance Apply GAlign fs => GAlign (Union fs) where
+instance Apply GAlign fs => GAlign (Sum fs) where
   galignWith f = (fromMaybe empty .) . apply2' (Proxy :: Proxy GAlign) (\ inj -> (fmap inj .) . galignWith f)
 
 

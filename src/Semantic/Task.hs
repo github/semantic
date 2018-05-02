@@ -47,8 +47,8 @@ import           Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
 import qualified Control.Abstract.Analysis as Analysis
 import           Control.Monad
+import           Control.Monad.Effect as Eff hiding (run)
 import           Control.Monad.Effect.Exception
-import           Control.Monad.Effect.Internal as Eff hiding (run)
 import           Control.Monad.Effect.Reader
 import           Control.Monad.Effect.Run as Run
 import           Data.Blob
@@ -187,9 +187,9 @@ runParser blob@Blob{..} parser = case parser of
       in length term `seq` pure term
   where blobFields = ("path", blobPath) : languageTag
         languageTag = maybe [] (pure . (,) ("language" :: String) . show) blobLanguage
-        errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
+        errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) (Record Assignment.Location) -> [Error.Error String]
         errors = cata $ \ (In a syntax) -> case syntax of
-          _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (getField a) err]
+          _ | Just err@Syntax.Error{} <- projectSum syntax -> [Syntax.unError (getField a) err]
           _ -> fold syntax
 
 

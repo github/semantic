@@ -1,8 +1,9 @@
 {-# LANGUAGE MultiParamTypeClasses, TypeOperators, UndecidableInstances #-}
 module Data.JSON.Fields where
 
-import Prologue
 import Data.Aeson
+import Data.Sum (Apply(..), Sum)
+import Prologue
 
 class ToJSONFields a where
   toJSONFields :: KeyValue kv => a -> [kv]
@@ -23,7 +24,7 @@ instance ToJSON a => ToJSONFields [a] where
 instance ToJSONFields1 [] where
   toJSONFields1 list = [ "children" .= list ]
 
-instance Apply Foldable fs => ToJSONFields1 (Union fs) where
+instance Apply Foldable fs => ToJSONFields1 (Sum fs) where
   toJSONFields1 = apply (Proxy :: Proxy Foldable) (\ r -> [ "children" .= toList r ])
 
 instance (ToJSONFields a, ToJSONFields b) => ToJSONFields (a, b) where

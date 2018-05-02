@@ -1,14 +1,11 @@
 {-# LANGUAGE DataKinds #-}
 module Diffing.Interpreter.Spec where
 
-import Data.Abstract.FreeVariables
 import Data.Diff
-import Data.Functor.Both
-import Data.Functor.Foldable hiding (Nil)
 import Data.Functor.Listable
 import Data.Record
+import Data.Sum
 import Data.Term
-import Data.Union
 import Diffing.Interpreter
 import qualified Data.Syntax as Syntax
 import Test.Hspec (Spec, describe, it, parallel)

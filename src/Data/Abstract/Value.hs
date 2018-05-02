@@ -17,6 +17,7 @@ import Data.Scientific (Scientific)
 import Data.Scientific.Exts
 import Data.Semigroup.Reducer
 import qualified Data.Set as Set
+import Data.Sum
 import Prologue hiding (TypeError)
 import Prelude hiding (Float, Integer, String, Rational)
 import qualified Prelude
@@ -42,16 +43,16 @@ type ValueConstructors location
 
 -- | Open union of primitive values that terms can be evaluated to.
 --   Fix by another name.
-newtype Value location = Value { deValue :: Union (ValueConstructors location) (Value location) }
+newtype Value location = Value { deValue :: Sum (ValueConstructors location) (Value location) }
   deriving (Eq, Show, Ord)
 
 -- | Identical to 'inj', but wraps the resulting sub-entity in a 'Value'.
 injValue :: (f :< ValueConstructors location) => f (Value location) -> Value location
-injValue = Value . inj
+injValue = Value . injectSum
 
 -- | Identical to 'prj', but unwraps the argument out of its 'Value' wrapper.
 prjValue :: (f :< ValueConstructors location) => Value location -> Maybe (f (Value location))
-prjValue = prj . deValue
+prjValue = projectSum . deValue
 
 -- | Convenience function for projecting two values.
 prjPair :: (f :< ValueConstructors location , g :< ValueConstructors location)

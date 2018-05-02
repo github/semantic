@@ -10,6 +10,7 @@ import qualified Algebra.Graph as G
 import Algebra.Graph.Class
 import Algebra.Graph.Export.Dot
 import Data.Abstract.FreeVariables
+import Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import Data.Term
@@ -58,8 +59,8 @@ instance CustomCallGraphAlgebra Syntax.Identifier where
     | name `elem` bound = empty
     | otherwise         = vertex name
 
-instance Apply CallGraphAlgebra syntaxes => CustomCallGraphAlgebra (Union syntaxes) where
-  customCallGraphAlgebra = Prologue.apply (Proxy :: Proxy CallGraphAlgebra) callGraphAlgebra
+instance Apply CallGraphAlgebra syntaxes => CustomCallGraphAlgebra (Sum syntaxes) where
+  customCallGraphAlgebra = apply (Proxy :: Proxy CallGraphAlgebra) callGraphAlgebra
 
 instance CallGraphAlgebra syntax => CustomCallGraphAlgebra (TermF syntax a) where
   customCallGraphAlgebra = callGraphAlgebra . termFOut
@@ -86,7 +87,7 @@ type family CallGraphAlgebraStrategy syntax where
   CallGraphAlgebraStrategy Declaration.Function = 'Custom
   CallGraphAlgebraStrategy Declaration.Method = 'Custom
   CallGraphAlgebraStrategy Syntax.Identifier = 'Custom
-  CallGraphAlgebraStrategy (Union fs) = 'Custom
+  CallGraphAlgebraStrategy (Sum fs) = 'Custom
   CallGraphAlgebraStrategy (TermF f a) = 'Custom
   CallGraphAlgebraStrategy a = 'Default
 

@@ -9,11 +9,10 @@ module Semantic.Telemetry
 , ignoreTelemetry
 ) where
 
-import Control.Monad.Effect.Internal hiding (run)
+import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Run
 import Control.Monad.IO.Class
-import Prologue
 import Semantic.Log
 import Semantic.Queue
 import Semantic.Stat
@@ -52,17 +51,6 @@ ignoreTelemetry :: Eff (Telemetry ': effs) a -> Eff effs a
 ignoreTelemetry = interpret (\ t -> case t of
   WriteStat{} -> pure ()
   WriteLog{}  -> pure ())
-
-
--- | Interpret an effect by replacing it with another effect.
-reinterpret :: (forall x. effect x -> Eff (newEffect ': effs) x)
-            -> Eff (effect ': effs) a
-            -> Eff (newEffect ': effs) a
-reinterpret handle = loop
-  where loop (Val x)  = pure x
-        loop (E u' q) = case decompose u' of
-            Right eff -> handle eff >>=            q >>> loop
-            Left  u   -> E (weaken u) (tsingleton (q >>> loop))
 
 
 instance (Member IO (Reader Queues ': effects), Run (Reader Queues ': effects) result rest) => Run (Telemetry ': effects) result rest where

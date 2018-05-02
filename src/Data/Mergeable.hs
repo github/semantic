@@ -5,7 +5,7 @@ import Control.Applicative
 import Data.Functor.Identity
 import Data.List.NonEmpty
 import Data.Proxy
-import Data.Union
+import Data.Sum
 import GHC.Generics
 
 -- Classes
@@ -46,7 +46,7 @@ instance Mergeable Maybe where
 
 instance Mergeable Identity where merge f = fmap Identity . f . runIdentity
 
-instance (Apply Functor fs, Apply Mergeable fs) => Mergeable (Union fs) where
+instance (Apply Functor fs, Apply Mergeable fs) => Mergeable (Sum fs) where
   merge f = apply' (Proxy :: Proxy Mergeable) (\ reinj g -> reinj <$> merge f g)
 
 
