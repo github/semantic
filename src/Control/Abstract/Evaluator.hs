@@ -229,7 +229,7 @@ extraRoots roots = raiseHandler (local (<> roots))
 -- Configuration
 
 -- | Get the current 'Configuration' with a passed-in term.
-getConfiguration :: (Member (Reader (Live location value)) effects, MonadEvaluator location term value effects m) => term -> m effects (Configuration location term value)
+getConfiguration :: (Applicative (m effects), Member (Reader (Live location value)) effects, Member (State (Environment location value)) effects, Member (State (Heap location value)) effects, Evaluator location term value m) => term -> m effects (Configuration location term value)
 getConfiguration term = Configuration term <$> askRoots <*> getEnv <*> getHeap
 
 
