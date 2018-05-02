@@ -189,7 +189,7 @@ isolate = withEnv lowerBound . withExports lowerBound
 -- Heap
 
 -- | Retrieve the heap.
-getHeap :: MonadEvaluator location term value effects m => m effects (Heap location value)
+getHeap :: (Member (State (Heap location value)) effects, Evaluator location term value m) => m effects (Heap location value)
 getHeap = raise get
 
 -- | Set the heap.
