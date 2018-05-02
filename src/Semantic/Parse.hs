@@ -12,7 +12,7 @@ import Data.Record
 import Parsing.Parser
 import Prologue hiding (MonadError(..))
 import Rendering.Renderer
-import Semantic.IO (NoLanguageForBlob(..))
+import Semantic.IO (NoLanguageForBlob(..), FormatNotSupported(..))
 import Semantic.Task
 
 parseBlobs :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Output output) => TermRenderer output -> [Blob] -> Eff effs ByteString
@@ -49,5 +49,5 @@ astParseBlobs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . astPa
       = parse parser blob >>= case renderer of
         SExpressionTermRenderer    -> render renderSExpressionAST
         JSONTermRenderer           -> render (renderJSONTerm' blob)
-        _                          -> Prelude.fail "Only SExpression and JSON output supported for tree-sitter ASTs."
+        _                          -> pure $ throwError (SomeException (FormatNotSupported "Only SExpression and JSON output supported for tree-sitter ASTs."))
       | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
