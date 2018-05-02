@@ -72,14 +72,14 @@ infixr 5 :<
 data Sum (r :: [ * -> * ]) (v :: *) where
   Sum :: {-# UNPACK #-} !Int -> t v -> Sum r v
 
-{-# INLINE prj' #-}
-{-# INLINE inj' #-}
 inj' :: Int -> t v -> Sum r v
 inj' = Sum
+{-# INLINE inj' #-}
 
 prj' :: Int -> Sum r v -> Maybe (t v)
 prj' n (Sum n' x) | n == n'   = Just (unsafeCoerce x)
-                    | otherwise = Nothing
+                  | otherwise = Nothing
+{-# INLINE prj' #-}
 
 newtype P (t :: * -> *) (r :: [* -> *]) = P { unP :: Int }
 
