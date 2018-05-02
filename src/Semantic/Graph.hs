@@ -29,22 +29,23 @@ import           Rendering.Renderer
 import           Semantic.IO (Files)
 import           Semantic.Task
 
+data GraphType = ImportGraph | CallGraph
+
 graph :: Members '[Distribute WrappedTask, Files, Task, Exc SomeException, Telemetry] effs
-      => GraphRenderer output
+      => GraphType
+      -> GraphRenderer output
       -> Project
       -> Eff effs ByteString
-graph renderer project
+graph graphType renderer project
   | SomeAnalysisParser parser prelude <- someAnalysisParser
     (Proxy :: Proxy '[ Analysis.Evaluatable, Analysis.Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
     package <- parsePackage parser prelude project
-    let graph = case renderer of
-          JSONCallGraphRenderer -> graphCalls
-          DOTCallGraphRenderer  -> graphCalls
-          _                     -> graphImports
+    let graph = case graphType of
+          ImportGraph -> graphImports
+          CallGraph   -> graphCalls
     graph package >>= case renderer of
-      JSONCallGraphRenderer   -> pure . toOutput
-      JSONImportGraphRenderer -> pure . toOutput
-      _                       -> pure . renderGraph
+      JSONGraphRenderer   -> pure . toOutput
+      DOTGraphRenderer    -> pure . renderGraph
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: Members '[Distribute WrappedTask, Files, Task] effs

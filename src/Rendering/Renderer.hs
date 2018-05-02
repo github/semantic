@@ -24,14 +24,14 @@ module Rendering.Renderer
 , defaultSymbolFields
 ) where
 
-import Prologue
 import Data.Aeson (Value)
 import Data.Output
+import Prologue
 import Rendering.DOT as R
+import Rendering.Imports as R
 import Rendering.JSON as R
 import Rendering.SExpression as R
 import Rendering.Symbol as R
-import Rendering.Imports as R
 import Rendering.TOC as R
 
 -- | Specification of renderers for diffs, producing output in the parameter type.
@@ -68,10 +68,8 @@ deriving instance Show (TermRenderer output)
 
 -- | Specification of renderers for graph analysis, producing output in the parameter type.
 data GraphRenderer output where
-  JSONImportGraphRenderer :: GraphRenderer ByteString
-  DOTImportGraphRenderer :: GraphRenderer ByteString
-  JSONCallGraphRenderer :: GraphRenderer ByteString
-  DOTCallGraphRenderer :: GraphRenderer ByteString
+  JSONGraphRenderer :: GraphRenderer ByteString
+  DOTGraphRenderer  :: GraphRenderer ByteString
 
 deriving instance Eq (GraphRenderer output)
 deriving instance Show (GraphRenderer output)
