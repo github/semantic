@@ -206,7 +206,7 @@ putHeap :: (Member (State (Heap location value)) effects, Evaluator location ter
 putHeap = raise . put
 
 -- | Update the heap.
-modifyHeap :: MonadEvaluator location term value effects m => (Heap location value -> Heap location value) -> m effects ()
+modifyHeap :: (Member (State (Heap location value)) effects, Evaluator location term value m) => (Heap location value -> Heap location value) -> m effects ()
 modifyHeap = raise . modify'
 
 -- | Look up the cell for the given 'Address' in the 'Heap'.
