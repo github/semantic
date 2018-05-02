@@ -284,12 +284,13 @@ instance Applicative m => Monoid (Merging m location value) where
   mempty = Merging (pure Nothing)
 
 -- | Evaluate a (root-level) term to a value using the semantics of the current analysis.
-evalModule :: forall location term value effects m
-           .  ( Evaluatable (Base term)
+evalModule :: forall location term value effects m inner
+           .  ( inner ~ (Reader ModuleInfo ': EvalModule term value ': effects)
+              , Evaluatable (Base term)
               , Member Fail effects
               , Member (Reader PackageInfo) effects
-              , MonadAnalysis location term value (Reader ModuleInfo ': EvalModule term value ': effects) m
-              , MonadEvaluatable location term value (Reader ModuleInfo ': EvalModule term value ': effects) m
+              , MonadAnalysis location term value inner m
+              , MonadEvaluatable location term value inner m
               , Recursive term
               )
            => Module term
