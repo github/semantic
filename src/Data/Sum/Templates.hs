@@ -1,4 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
+{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
 module Data.Sum.Templates
 ( mkElemIndexTypeFamily
 , mkApplyInstance
