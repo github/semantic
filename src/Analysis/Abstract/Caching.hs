@@ -95,7 +95,7 @@ instance ( Alternative (m effects)
       -- that it doesn't "leak" to the calling context and diverge (otherwise this
       -- would never complete). We don’t need to use the values, so we 'gather' the
       -- nondeterministic values into @()@.
-        withOracle prevCache (raise (gather (const ()) (lower (liftAnalyze analyzeModule recur m))))) mempty
+        withOracle prevCache (raiseHandler (gather (const ())) (liftAnalyze analyzeModule recur m))) mempty
     maybe empty scatter (cacheLookup c cache)
 
 reset :: (Effectful m, Member Fresh effects) => Int -> m effects a -> m effects a
