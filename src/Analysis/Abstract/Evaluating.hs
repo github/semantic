@@ -1,13 +1,18 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, UndecidableInstances #-}
 module Analysis.Abstract.Evaluating
 ( Evaluating
+, EvaluatingState(..)
 ) where
 
 import Control.Abstract.Analysis
 import qualified Control.Monad.Effect as Eff
+import Data.Abstract.Address
 import Data.Abstract.Environment
+import Data.Abstract.Exports
+import Data.Abstract.Heap
 import Data.Abstract.ModuleTable
 import Data.Abstract.Origin
+import qualified Data.IntMap as IntMap
 import Data.Semilattice.Lower
 import Prologue
 
@@ -16,6 +21,19 @@ newtype Evaluating location term value effects a = Evaluating { runEvaluating ::
   deriving (Applicative, Functor, Effectful, Monad)
 
 deriving instance Member NonDet effects => Alternative (Evaluating location term value effects)
+
+data EvaluatingState location term value = EvaluatingState
+  { environment :: Environment location value
+  , heap        :: Heap location value
+  , modules     :: ModuleTable (Environment location value, value)
+  , exports     :: Exports location value
+  , jumps       :: IntMap.IntMap (SomeOrigin term, term)
+  }
+
+deriving instance (Eq (Cell location value), Eq location, Eq term, Eq value, Eq (Base term ())) => Eq (EvaluatingState location term value)
+deriving instance (Ord (Cell location value), Ord location, Ord term, Ord value, Ord (Base term ())) => Ord (EvaluatingState location term value)
+deriving instance (Show (Cell location value), Show location, Show term, Show value, Show (Base term ())) => Show (EvaluatingState location term value)
+
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects location term value
@@ -27,13 +45,21 @@ type EvaluatingEffects location term value
      , Reader (SomeOrigin term)                    -- The current term’s origin.
      , Reader (Environment location value)         -- Default environment used as a fallback in lookupEnv
      , Reader LoadStack
-     , State  (EvaluatorState location term value) -- Environment, heap, modules, exports, and jumps.
+     , State (Environment location value)
+     , State (Heap location value)
+     , State (ModuleTable (Environment location value, value))
+     , State (Exports location value)
+     , State (IntMap.IntMap (SomeOrigin term, term))
      ]
 
 instance ( Member (Reader (Environment location value)) effects
          , Member (Reader LoadStack) effects
          , Member (Reader (SomeOrigin term)) effects
-         , Member (State (EvaluatorState location term value)) effects
+         , Member (State (Environment location value)) effects
+         , Member (State (Heap location value)) effects
+         , Member (State (ModuleTable (Environment location value, value))) effects
+         , Member (State (Exports location value)) effects
+         , Member (State (IntMap.IntMap (SomeOrigin term, term))) effects
          )
       => MonadEvaluator location term value effects (Evaluating location term value)
 
@@ -41,7 +67,11 @@ instance ( Corecursive term
          , Member (Reader (Environment location value)) effects
          , Member (Reader LoadStack) effects
          , Member (Reader (SomeOrigin term)) effects
-         , Member (State (EvaluatorState location term value)) effects
+         , Member (State (Environment location value)) effects
+         , Member (State (Heap location value)) effects
+         , Member (State (ModuleTable (Environment location value, value))) effects
+         , Member (State (Exports location value)) effects
+         , Member (State (IntMap.IntMap (SomeOrigin term, term))) effects
          , Recursive term
          )
       => MonadAnalysis location term value effects (Evaluating location term value) where
@@ -53,12 +83,17 @@ instance ( Corecursive term
 instance (AbstractHole value, Show term, Show value) => Interpreter (Evaluating location term value) (EvaluatingEffects location term value) where
   type Result (Evaluating location term value) (EvaluatingEffects location term value) result
     = ( Either String result
-      , EvaluatorState location term value)
+      , EvaluatingState location term value)
   interpret
-    = interpret
+    = (\ (((((result, env), heap), modules), exports), jumps) -> (result, EvaluatingState env heap modules exports jumps))
+    . interpret
     . runEvaluating
     . raiseHandler
-      ( flip runState  lowerBound -- State (EvaluatorState location term value)
+      ( flip runState  lowerBound -- State (IntMap.IntMap (SomeOrigin term, term))
+      . flip runState  lowerBound -- State (Exports location value)
+      . flip runState  lowerBound -- State (ModuleTable (Environment location value, value))
+      . flip runState  lowerBound -- State (Heap location value)
+      . flip runState  lowerBound -- State (Environment location value)
       . flip runReader lowerBound -- Reader LoadStack
       . flip runReader lowerBound -- Reader (Environment location value)
       . flip runReader lowerBound -- Reader (SomeOrigin term)

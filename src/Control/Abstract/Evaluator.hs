@@ -1,8 +1,6 @@
 {-# LANGUAGE FunctionalDependencies, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
 module Control.Abstract.Evaluator
   ( MonadEvaluator
-  -- * State
-  , EvaluatorState(..)
   -- * Environment
   , getEnv
   , putEnv
@@ -80,7 +78,6 @@ import Data.Abstract.Origin
 import qualified Data.IntMap as IntMap
 import Data.Semigroup.Reducer
 import Data.Semilattice.Lower
-import Lens.Micro
 import Prelude hiding (fail)
 import Prologue
 
@@ -94,81 +91,33 @@ class ( Effectful m
       , Member (Reader (Environment location value)) effects
       , Member (Reader LoadStack) effects
       , Member (Reader (SomeOrigin term)) effects
-      , Member (State (EvaluatorState location term value)) effects
+      , Member (State (Environment location value)) effects
+      , Member (State (Heap location value)) effects
+      , Member (State (ModuleTable (Environment location value, value))) effects
+      , Member (State (Exports location value)) effects
+      , Member (State (IntMap.IntMap (SomeOrigin term, term))) effects
       , Monad (m effects)
       )
    => MonadEvaluator location term value effects m | m -> location term value
-
-
--- State
-
-data EvaluatorState location term value = EvaluatorState
-  { environment :: Environment location value
-  , heap        :: Heap location value
-  , modules     :: ModuleTable (Environment location value, value)
-  , exports     :: Exports location value
-  , jumps       :: IntMap.IntMap (SomeOrigin term, term)
-  }
-
-deriving instance (Eq (Cell location value), Eq location, Eq term, Eq value, Eq (Base term ())) => Eq (EvaluatorState location term value)
-deriving instance (Ord (Cell location value), Ord location, Ord term, Ord value, Ord (Base term ())) => Ord (EvaluatorState location term value)
-deriving instance (Show (Cell location value), Show location, Show term, Show value, Show (Base term ())) => Show (EvaluatorState location term value)
-
-instance Lower (EvaluatorState location term value) where
-  lowerBound = EvaluatorState lowerBound lowerBound lowerBound lowerBound lowerBound
-
-
--- Lenses
-
-_environment :: Lens' (EvaluatorState location term value) (Environment location value)
-_environment = lens environment (\ s e -> s {environment = e})
-
-_heap :: Lens' (EvaluatorState location term value) (Heap location value)
-_heap = lens heap (\ s h -> s {heap = h})
-
-_modules :: Lens' (EvaluatorState location term value) (ModuleTable (Environment location value, value))
-_modules = lens modules (\ s m -> s {modules = m})
-
-_exports :: Lens' (EvaluatorState location term value) (Exports location value)
-_exports = lens exports (\ s e -> s {exports = e})
-
-_jumps :: Lens' (EvaluatorState location term value) (IntMap.IntMap (SomeOrigin term, term))
-_jumps = lens jumps (\ s j -> s {jumps = j})
-
-
-(.=) :: MonadEvaluator location term value effects m => ASetter (EvaluatorState location term value) (EvaluatorState location term value) a b -> b -> m effects ()
-lens .= val = raise (modify' (lens .~ val))
-
-view :: MonadEvaluator location term value effects m => Getting a (EvaluatorState location term value) a -> m effects a
-view lens = raise (gets (^. lens))
-
-localEvaluatorState :: MonadEvaluator location term value effects m => Lens' (EvaluatorState location term value) prj -> (prj -> prj) -> m effects a -> m effects a
-localEvaluatorState lens f action = do
-  original <- view lens
-  lens .= f original
-  v <- action
-  v <$ lens .= original
 
 
 -- Environment
 
 -- | Retrieve the environment.
 getEnv :: MonadEvaluator location term value effects m => m effects (Environment location value)
-getEnv = view _environment
+getEnv = raise get
 
 -- | Set the environment.
 putEnv :: MonadEvaluator location term value effects m => Environment location value -> m effects ()
-putEnv = (_environment .=)
+putEnv = raise . put
 
 -- | Update the global environment.
 modifyEnv :: MonadEvaluator location term value effects m => (Environment location value -> Environment location value) -> m effects ()
-modifyEnv f = do
-  env <- getEnv
-  putEnv $! f env
+modifyEnv = raise . modify'
 
 -- | Sets the environment for the lifetime of the given action.
 withEnv :: MonadEvaluator location term value effects m => Environment location value -> m effects a -> m effects a
-withEnv s = localEvaluatorState _environment (const s)
+withEnv = raiseHandler . localState . const
 
 
 -- | Retrieve the default environment.
@@ -211,17 +160,15 @@ lookupWith with name = do
 
 -- | Get the global export state.
 getExports :: MonadEvaluator location term value effects m => m effects (Exports location value)
-getExports = view _exports
+getExports = raise get
 
 -- | Set the global export state.
 putExports :: MonadEvaluator location term value effects m => Exports location value -> m effects ()
-putExports = (_exports .=)
+putExports = raise . put
 
 -- | Update the global export state.
 modifyExports :: MonadEvaluator location term value effects m => (Exports location value -> Exports location value) -> m effects ()
-modifyExports f = do
-  exports <- getExports
-  putExports $! f exports
+modifyExports = raise . modify'
 
 -- | Add an export to the global export state.
 addExport :: MonadEvaluator location term value effects m => Name -> Name -> Maybe (Address location value) -> m effects ()
@@ -229,7 +176,7 @@ addExport name alias = modifyExports . Export.insert name alias
 
 -- | Sets the global export state for the lifetime of the given action.
 withExports :: MonadEvaluator location term value effects m => Exports location value -> m effects a -> m effects a
-withExports s = localEvaluatorState _exports (const s)
+withExports = raiseHandler . localState . const
 
 -- | Isolate the given action with an empty global environment and exports.
 isolate :: MonadEvaluator location term value effects m => m effects a -> m effects a
@@ -240,17 +187,15 @@ isolate = withEnv lowerBound . withExports lowerBound
 
 -- | Retrieve the heap.
 getHeap :: MonadEvaluator location term value effects m => m effects (Heap location value)
-getHeap = view _heap
+getHeap = raise get
 
 -- | Set the heap.
 putHeap :: MonadEvaluator location term value effects m => Heap location value -> m effects ()
-putHeap = (_heap .=)
+putHeap = raise . put
 
 -- | Update the heap.
 modifyHeap :: MonadEvaluator location term value effects m => (Heap location value -> Heap location value) -> m effects ()
-modifyHeap f = do
-  s <- getHeap
-  putHeap $! f s
+modifyHeap = raise . modify'
 
 -- | Look up the cell for the given 'Address' in the 'Heap'.
 lookupHeap :: (MonadEvaluator location term value effects m, Ord location) => Address location value -> m effects (Maybe (Cell location value))
@@ -289,17 +234,15 @@ getConfiguration term = Configuration term <$> askRoots <*> getEnv <*> getHeap
 
 -- | Retrieve the table of evaluated modules.
 getModuleTable :: MonadEvaluator location term value effects m => m effects (ModuleTable (Environment location value, value))
-getModuleTable = view _modules
+getModuleTable = raise get
 
 -- | Set the table of evaluated modules.
 putModuleTable :: MonadEvaluator location term value effects m => ModuleTable (Environment location value, value) -> m effects ()
-putModuleTable = (_modules .=)
+putModuleTable = raise . put
 
 -- | Update the evaluated module table.
 modifyModuleTable :: MonadEvaluator location term value effects m => (ModuleTable (Environment location value, value) -> ModuleTable (Environment location value, value)) -> m effects ()
-modifyModuleTable f = do
-  table <- getModuleTable
-  putModuleTable $! f table
+modifyModuleTable = raise . modify'
 
 
 -- | Retrieve the module load stack
@@ -327,16 +270,16 @@ currentPackage = raise ask
 --   Labels must be allocated before being jumped to with 'goto', but are suitable for nonlocal jumps; thus, they can be used to implement coroutines, exception handling, call with current continuation, and other esoteric control mechanisms.
 label :: MonadEvaluator location term value effects m => term -> m effects Label
 label term = do
-  m <- view _jumps
-  origin <- raise ask
+  m <- raise get
+  origin <- askOrigin
   let i = IntMap.size m
-  _jumps .= IntMap.insert i (origin, term) m
+  raise (put (IntMap.insert i (origin, term) m))
   pure i
 
 -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
 goto :: (Recursive term, Member Fail effects, MonadEvaluator location term value effects m) => Label -> (term -> m effects a) -> m effects a
 goto label comp = do
-  maybeTerm <- IntMap.lookup label <$> view _jumps
+  maybeTerm <- IntMap.lookup label <$> raise get
   case maybeTerm of
     Just (origin, term) -> pushOrigin (origin <> termOrigin term) (comp term)
     Nothing -> raise (fail ("unknown label: " <> show label))
