@@ -92,29 +92,36 @@ moduleGraph = maybe empty (vertex . Module . BC.pack . modulePath) . withSomeOri
 
 -- | Add an edge from the current package to the passed vertex.
 packageInclusion :: forall m location term value effects
-                 .  ( Member (State ImportGraph) effects
-                    , MonadEvaluator location term value effects m
+                 .  ( Evaluator location term value m
+                    , Member (Reader (SomeOrigin term)) effects
+                    , Member (State ImportGraph) effects
+                    , Monad (m effects)
                     )
                  => Vertex
-                 -> ImportGraphing m effects ()
+                 -> m effects ()
 packageInclusion v = do
   o <- askOrigin
   appendGraph (packageGraph @term o `connect` vertex v)
 
 -- | Add an edge from the current module to the passed vertex.
 moduleInclusion :: forall m location term value effects
-                .  ( Member (State ImportGraph) effects
-                   , MonadEvaluator location term value effects m
+                .  ( Evaluator location term value m
+                   , Member (Reader (SomeOrigin term)) effects
+                   , Member (State ImportGraph) effects
+                   , Monad (m effects)
                    )
                 => Vertex
-                -> ImportGraphing m effects ()
+                -> m effects ()
 moduleInclusion v = do
   o <- askOrigin
   appendGraph (moduleGraph @term o `connect` vertex v)
 
 -- | Add an edge from the passed variable name to the module it originated within.
-variableDefinition :: ( Member (State ImportGraph) effects
-                      , MonadEvaluator (Located location term) term value effects m
+variableDefinition :: ( Evaluator (Located location term) term value m
+                      , Member (Reader (Environment (Located location term) value)) effects
+                      , Member (State (Environment (Located location term) value)) effects
+                      , Member (State ImportGraph) effects
+                      , Monad (m effects)
                       )
                    => Name
                    -> ImportGraphing m effects ()
@@ -122,7 +129,7 @@ variableDefinition name = do
   graph <- maybe empty (moduleGraph . origin . unAddress) <$> lookupEnv name
   appendGraph (vertex (Variable (unName name)) `connect` graph)
 
-appendGraph :: (Effectful m, Member (State ImportGraph) effects) => ImportGraph -> ImportGraphing m effects ()
+appendGraph :: (Effectful m, Member (State ImportGraph) effects) => ImportGraph -> m effects ()
 appendGraph = raise . modify' . (<>)
 
 
