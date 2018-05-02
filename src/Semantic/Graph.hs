@@ -64,6 +64,25 @@ parsePackage parser preludeFile project@Project{..} = do
     parseModules :: Members '[Distribute WrappedTask, Files, Task] effs => Parser term -> Project -> Eff effs [Module term]
     parseModules parser Project{..} = distributeFor (projectEntryPoints <> projectFiles) (WrapTask . parseModule parser (Just projectRootDir))
 
+
+-- | Parse a list of packages from a python project.
+parsePythonPackage :: Members '[Distribute WrappedTask, Files, Task] effs
+                   => Parser term       -- ^ A parser.
+                   -> Maybe File        -- ^ Prelude (optional).
+                   -> Project           -- ^ Project to parse into a package.
+                   -> Eff effs (Package term)
+parsePythonPackage = undefined
+-- Load the prelude
+-- Find the setup.py file in the list of projectFiles
+-- parse the setup.py module and run it through the PythonPackage analysis that returns a list of files, a call to find_packages, or an error.
+-- If it's the list of packages, select the project files for each of those packages and construct a list of packages.
+-- If it's a call to find_packages, traverse the list of directories looking for __init__.py files and evaluate those as entry points.
+-- Otherwise fail with an error.
+--
+-- Other considerations
+-- If a project has no setup.py file we may need to look for __init__.py files and evaluate those directories as packages. A project may also have standalone files in a project. Should we consider those to be entry points as well?
+-- If a project has no __init__ files we should consider every file to be an entry point and the entire project to be a package.
+
 -- | Parse a file into a 'Module'.
 parseModule :: Members '[Files, Task] effs => Parser term -> Maybe FilePath -> File -> Eff effs (Module term)
 parseModule parser rootDir file = do
