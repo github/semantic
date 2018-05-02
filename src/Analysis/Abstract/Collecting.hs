@@ -15,7 +15,6 @@ import Prologue
 newtype Collecting m (effects :: [* -> *]) a = Collecting { runCollecting :: m effects a }
   deriving (Alternative, Applicative, Effectful, Functor, Monad)
 
-deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Collecting m)
 deriving instance Evaluator location term value m => Evaluator location term value (Collecting m)
 
 
@@ -76,7 +75,6 @@ instance ( Evaluator location term value m
 newtype Retaining m (effects :: [* -> *]) a = Retaining { runRetaining :: m effects a }
   deriving (Alternative, Applicative, Effectful, Functor, Monad)
 
-deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Retaining m)
 deriving instance Evaluator location term value m => Evaluator location term value (Retaining m)
 deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (Retaining m)
 

@@ -14,7 +14,6 @@ import Prologue
 newtype DeadCode m (effects :: [* -> *]) a = DeadCode { runDeadCode :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
-deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (DeadCode m)
 deriving instance Evaluator location term value m => Evaluator location term value (DeadCode m)
 
 -- | A set of “dead” (unreachable) terms.

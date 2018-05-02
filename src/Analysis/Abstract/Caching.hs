@@ -17,7 +17,6 @@ import Prologue
 newtype Caching m (effects :: [* -> *]) a = Caching { runCaching :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
-deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (Caching m)
 deriving instance Evaluator location term value m => Evaluator location term value (Caching m)
 
 -- | Functionality used to perform caching analysis. This is not exported, and exists primarily for organizational reasons.

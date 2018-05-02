@@ -1,4 +1,4 @@
-{-# LANGUAGE FunctionalDependencies, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
+{-# LANGUAGE ConstraintKinds, FunctionalDependencies, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
 module Control.Abstract.Evaluator
   ( Evaluator
   , MonadEvaluator
@@ -97,18 +97,18 @@ class Effectful m => Evaluator location term value m | m -> location term value
 --   - environments binding names to addresses
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
-class ( Evaluator location term value m
-      , Member (Reader (Environment location value)) effects
-      , Member (Reader LoadStack) effects
-      , Member (Reader (SomeOrigin term)) effects
-      , Member (State (Environment location value)) effects
-      , Member (State (Heap location value)) effects
-      , Member (State (ModuleTable (Environment location value, value))) effects
-      , Member (State (Exports location value)) effects
-      , Member (State (JumpTable term)) effects
-      , Monad (m effects)
-      )
-   => MonadEvaluator location term value effects m
+type MonadEvaluator location term value effects m
+  = ( Evaluator location term value m
+    , Member (Reader (Environment location value)) effects
+    , Member (Reader LoadStack) effects
+    , Member (Reader (SomeOrigin term)) effects
+    , Member (State (Environment location value)) effects
+    , Member (State (Heap location value)) effects
+    , Member (State (ModuleTable (Environment location value, value))) effects
+    , Member (State (Exports location value)) effects
+    , Member (State (JumpTable term)) effects
+    , Monad (m effects)
+    )
 
 type JumpTable term = IntMap.IntMap (SomeOrigin term, term)
 

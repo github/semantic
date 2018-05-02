@@ -47,17 +47,6 @@ type EvaluatingEffects location term value
      , State (JumpTable term)
      ]
 
-instance ( Member (Reader (Environment location value)) effects
-         , Member (Reader LoadStack) effects
-         , Member (Reader (SomeOrigin term)) effects
-         , Member (State (Environment location value)) effects
-         , Member (State (Heap location value)) effects
-         , Member (State (ModuleTable (Environment location value, value))) effects
-         , Member (State (Exports location value)) effects
-         , Member (State (JumpTable term)) effects
-         )
-      => MonadEvaluator location term value effects (Evaluating location term value)
-
 instance ( Corecursive term
          , Member (Reader (Environment location value)) effects
          , Member (Reader LoadStack) effects
