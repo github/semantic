@@ -72,14 +72,14 @@ infixr 5 :<
 data Sum (r :: [ * -> * ]) (v :: *) where
   Sum :: {-# UNPACK #-} !Int -> t v -> Sum r v
 
-inj' :: Int -> t v -> Sum r v
-inj' = Sum
-{-# INLINE inj' #-}
+unsafeInject :: Int -> t v -> Sum r v
+unsafeInject = Sum
+{-# INLINE unsafeInject #-}
 
-prj' :: Int -> Sum r v -> Maybe (t v)
-prj' n (Sum n' x) | n == n'   = Just (unsafeCoerce x)
-                  | otherwise = Nothing
-{-# INLINE prj' #-}
+unsafeProject :: Int -> Sum r v -> Maybe (t v)
+unsafeProject n (Sum n' x) | n == n'   = Just (unsafeCoerce x)
+                           | otherwise = Nothing
+{-# INLINE unsafeProject #-}
 
 newtype P (t :: * -> *) (r :: [* -> *]) = P { unP :: Int }
 
@@ -93,12 +93,12 @@ type (ts :<: r) = Elements ts r
 
 -- | Inject a functor into a type-aligned sum.
 inject :: forall e r v. (e :< r) => e v -> Sum r v
-inject = inj' (unP (elemNo :: P e r))
+inject = unsafeInject (unP (elemNo :: P e r))
 {-# INLINE inject #-}
 
 -- | Maybe project a functor out of a type-aligned sum.
 project :: forall e r v. (e :< r) => Sum r v -> Maybe (e v)
-project = prj' (unP (elemNo :: P e r))
+project = unsafeProject (unP (elemNo :: P e r))
 {-# INLINE project #-}
 
 
