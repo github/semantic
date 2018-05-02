@@ -195,7 +195,7 @@ getHeap :: (Member (State (Heap location value)) effects, Evaluator location ter
 getHeap = raise get
 
 -- | Set the heap.
-putHeap :: MonadEvaluator location term value effects m => Heap location value -> m effects ()
+putHeap :: (Member (State (Heap location value)) effects, Evaluator location term value m) => Heap location value -> m effects ()
 putHeap = raise . put
 
 -- | Update the heap.
