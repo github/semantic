@@ -256,7 +256,7 @@ loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup nam
       if moduleInfo x `elem` unLoadStack
         then trace ("load (skip evaluating, circular load): " <> show mPath) (pure Nothing)
         else do
-          v <- localLoadStack (loadStackPush (moduleInfo x)) (trace ("load (evaluating): " <> show mPath) (with x))
+          v <- trace ("load (evaluating): " <> show mPath) (with x)
           traceM ("load done:" <> show mPath)
           env <- filterEnv <$> getExports <*> getEnv
           modifyModuleTable (ModuleTable.insert name (env, v))
@@ -296,6 +296,7 @@ evalModule :: forall location term value effects m inner
 evalModule m
   = evaluatingModulesWith evalModule
   . withModuleInfo (moduleInfo m)
+  . localLoadStack (loadStackPush (moduleInfo m))
   $ analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evalTerm) m)
 
 evalTerm :: forall location term value effects m
