@@ -5,10 +5,12 @@ import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.Heap
 import Data.Map.Monoidal as Monoidal
+import Data.Semilattice.Lower
 import Prologue
 
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Heap's.
 newtype Cache l t v = Cache { unCache :: Monoidal.Map (Configuration l t v) (Set (v, Heap l v)) }
+  deriving (Lower)
 
 type Cacheable location term value = (Ord (Cell location value), Ord location, Ord term, Ord value)
 
