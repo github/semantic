@@ -25,7 +25,7 @@ instance ToJSONFields1 [] where
   toJSONFields1 list = [ "children" .= list ]
 
 instance Apply Foldable fs => ToJSONFields1 (Sum fs) where
-  toJSONFields1 = apply (Proxy :: Proxy Foldable) (\ r -> [ "children" .= toList r ])
+  toJSONFields1 r = [ "children" .= toList r ]
 
 instance (ToJSONFields a, ToJSONFields b) => ToJSONFields (a, b) where
   toJSONFields (a, b) = [ "before" .= JSONFields a, "after" .= JSONFields b ]
