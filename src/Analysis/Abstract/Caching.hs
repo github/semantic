@@ -117,7 +117,7 @@ converge f = loop
             loop x'
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Alternative (m effects), Foldable t, MonadEvaluator location term value effects m) => t (a, Heap location value) -> m effects a
+scatter :: (Alternative (m effects), Evaluator location term value m, Foldable t, Member (State (Heap location value)) effects) => t (a, Heap location value) -> m effects a
 scatter = foldMapA (\ (value, heap') -> putHeap heap' $> value)
 
 
