@@ -55,10 +55,10 @@ toPairs = Map.toList . unModuleTable
 
 
 -- | Stack of module paths used to help break circular loads/imports.
-newtype LoadStack = LoadStack { unLoadStack :: [ModulePath] }
+newtype LoadStack = LoadStack { unLoadStack :: [ModuleInfo] }
   deriving (Eq, Lower, Monoid, Ord, Semigroup, Show)
 
-loadStackPush :: ModulePath -> LoadStack -> LoadStack
+loadStackPush :: ModuleInfo -> LoadStack -> LoadStack
 loadStackPush x LoadStack{..} = LoadStack (x : unLoadStack)
 
 loadStackPop :: LoadStack -> LoadStack
