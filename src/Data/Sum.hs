@@ -40,8 +40,8 @@ module Data.Sum (
   Sum,
   decompose,
   weaken,
-  inj,
-  prj,
+  inject,
+  project,
   type(:<),
   type(:<:),
   Element,
@@ -92,14 +92,14 @@ type family Elements ms r :: Constraint where
 type (ts :<: r) = Elements ts r
 
 -- | Inject a functor into a type-aligned sum.
-inj :: forall e r v. (e :< r) => e v -> Sum r v
-inj = inj' (unP (elemNo :: P e r))
-{-# INLINE inj #-}
+inject :: forall e r v. (e :< r) => e v -> Sum r v
+inject = inj' (unP (elemNo :: P e r))
+{-# INLINE inject #-}
 
 -- | Maybe project a functor out of a type-aligned sum.
-prj :: forall e r v. (e :< r) => Sum r v -> Maybe (e v)
-prj = prj' (unP (elemNo :: P e r))
-{-# INLINE prj #-}
+project :: forall e r v. (e :< r) => Sum r v -> Maybe (e v)
+project = prj' (unP (elemNo :: P e r))
+{-# INLINE project #-}
 
 
 decompose :: Sum (t ': r) v -> Either (Sum r v) (t v)
