@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s Evaluator constraint
 module Analysis.Abstract.BadAddresses where
 
 import Control.Abstract.Analysis
@@ -14,7 +14,7 @@ deriving instance MonadAnalysis location term value effects m => MonadAnalysis l
 deriving instance Evaluator location term value m => Evaluator location term value (BadAddresses m)
 
 instance ( Interpreter m effects
-         , MonadEvaluator location term value effects m
+         , Evaluator location term value m
          , AbstractHole value
          , Monoid (Cell location value)
          , Show location

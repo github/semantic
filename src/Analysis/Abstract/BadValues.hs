@@ -13,9 +13,10 @@ deriving instance MonadEvaluator location term value effects m => MonadEvaluator
 deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadValues m)
 deriving instance Evaluator location term value m => Evaluator location term value (BadValues m)
 
-instance ( Interpreter m effects
-         , MonadEvaluator location term value effects m
-         , AbstractHole value
+instance ( AbstractHole value
+         , Evaluator location term value m
+         , Interpreter m effects
+         , Member (State (Environment location value)) effects
          , Show value
          )
       => Interpreter (BadValues m) (Resumable (ValueError location value) ': effects) where

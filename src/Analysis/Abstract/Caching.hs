@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s Evaluator constraint
 module Analysis.Abstract.Caching
 ( Caching
 ) where
@@ -122,7 +122,7 @@ scatter = foldMapA (\ (value, heap') -> putHeap heap' $> value)
 
 
 instance ( Interpreter m effects
-         , MonadEvaluator location term value effects m
+         , Evaluator location term value m
          , Ord (Cell location value)
          , Ord location
          , Ord term

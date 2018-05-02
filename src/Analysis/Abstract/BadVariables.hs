@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s Evaluator constraint
 module Analysis.Abstract.BadVariables
 ( BadVariables
 ) where
@@ -16,9 +16,9 @@ deriving instance MonadEvaluator location term value effects m => MonadEvaluator
 deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadVariables m)
 deriving instance Evaluator location term value m => Evaluator location term value (BadVariables m)
 
-instance ( Interpreter m effects
-         , MonadEvaluator location term value effects m
-         , AbstractHole value
+instance ( AbstractHole value
+         , Evaluator location term value m
+         , Interpreter m effects
          , Show value
          )
       => Interpreter (BadVariables m) (Resumable (EvalError value) ': State [Name] ': effects) where
@@ -29,7 +29,7 @@ instance ( Interpreter m effects
     . raiseHandler
       ( flip runState []
       . relay pure (\ (Resumable err) yield -> traceM ("EvalError" <> show err) *> case err of
-        EnvironmentLookupError{}     -> yield hole
+        EnvironmentLookupError{} -> yield hole
         DefaultExportError{}     -> yield ()
         ExportError{}            -> yield ()
         IntegerFormatError{}     -> yield 0

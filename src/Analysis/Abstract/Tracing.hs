@@ -1,5 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
+{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s Evaluator constraint
 module Analysis.Abstract.Tracing
 ( Tracing
 ) where
@@ -36,8 +36,8 @@ instance ( Corecursive term
 
   analyzeModule = liftAnalyze analyzeModule
 
-instance ( Interpreter m effects
-         , MonadEvaluator location term value effects m
+instance ( Evaluator location term value m
+         , Interpreter m effects
          , Monoid (trace (Configuration location term value))
          )
       => Interpreter (Tracing trace m) (Writer (trace (Configuration location term value)) ': effects) where
