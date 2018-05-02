@@ -38,7 +38,7 @@ The data constructors of Sum are not exported.
 
 module Data.Sum (
   Sum,
-  weaken,
+  weakenSum,
   injectSum,
   projectSum,
   type(:<),
@@ -101,8 +101,8 @@ projectSum = unsafeProject (unP (elemNo :: P e r))
 {-# INLINE projectSum #-}
 
 
-weaken :: Sum r w -> Sum (any ': r) w
-weaken (Sum n v) = Sum (n+1) v
+weakenSum :: Sum r w -> Sum (any ': r) w
+weakenSum (Sum n v) = Sum (n+1) v
 
 type (Element t r) = KnownNat (ElemIndex t r)
 type (t :< r) = Element t r
