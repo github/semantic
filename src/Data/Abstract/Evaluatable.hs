@@ -281,9 +281,11 @@ instance Applicative m => Monoid (Merging m location value) where
   mappend = (<>)
   mempty = Merging (pure Nothing)
 
+type ModuleEffects term value effects = Reader ModuleInfo ': EvalModule term value ': effects
+
 -- | Evaluate a (root-level) term to a value using the semantics of the current analysis.
 evalModule :: forall location term value effects m inner
-           .  ( inner ~ (Reader ModuleInfo ': EvalModule term value ': effects)
+           .  ( inner ~ ModuleEffects term value effects
               , Evaluatable (Base term)
               , Member Fail effects
               , Member (Reader PackageInfo) effects
@@ -324,7 +326,7 @@ withReader :: Effectful m => info -> m (Reader info ': effects) a -> m effects a
 withReader = raiseHandler . flip runReader
 
 -- | Evaluate a given package.
-evaluatePackage :: ( moduleEffects ~ (Reader ModuleInfo ': EvalModule term value ': packageEffects)
+evaluatePackage :: ( moduleEffects ~ ModuleEffects term value packageEffects
                    , packageEffects ~ (Reader (ModuleTable [Module term]) ': Reader PackageInfo ': effects)
                    , Evaluatable (Base term)
                    , Member Fail effects
@@ -343,7 +345,7 @@ evaluatePackage :: ( moduleEffects ~ (Reader ModuleInfo ': EvalModule term value
 evaluatePackage p = withReader (packageInfo p) (evaluatePackageBody (packageBody p))
 
 -- | Evaluate a given package body (module table and entry points).
-evaluatePackageBody :: ( moduleEffects ~ (Reader ModuleInfo ': EvalModule term value ': packageEffects)
+evaluatePackageBody :: ( moduleEffects ~ ModuleEffects term value packageEffects
                        , packageEffects ~ (Reader (ModuleTable [Module term]) ': effects)
                        , Evaluatable (Base term)
                        , Member Fail effects
@@ -365,7 +367,7 @@ evaluatePackageBody body
   . withPrelude (packagePrelude body)
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
 
-evaluateEntryPoint :: ( inner ~ (Reader ModuleInfo ': EvalModule term value ': effects)
+evaluateEntryPoint :: ( inner ~ ModuleEffects term value effects
                       , Evaluatable (Base term)
                       , Member (Reader (ModuleTable [Module term])) effects
                       , Member (Resumable (AddressError location value)) effects
@@ -388,7 +390,7 @@ evaluateEntryPoint m sym = do
   maybe v ((`call` []) <=< variable) sym
 
 withPrelude :: forall location term value effects m a inner
-            .  ( inner ~ (Reader ModuleInfo ': EvalModule term value ': effects)
+            .  ( inner ~ ModuleEffects term value effects
                , Evaluatable (Base term)
                , Member Fail effects
                , Member (Reader PackageInfo) effects
