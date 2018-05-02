@@ -52,7 +52,7 @@ module Control.Abstract.Evaluator
   , evaluateModule
   , Return(..)
   , earlyReturn
-  , catchReturn
+  , handleReturn
   , LoopControl(..)
   , throwBreak
   , throwContinue
@@ -379,8 +379,8 @@ deriving instance Show value => Show (Return value a)
 earlyReturn :: (Effectful m, Member (Return value) effects) => value -> m effects value
 earlyReturn = raise . Eff.send . Return
 
-catchReturn :: (Effectful m, Member (Return value) effects) => m effects a -> (forall x . Return value x -> m effects a) -> m effects a
-catchReturn action handler = raiseHandler (Eff.interpose pure (\ ret _ -> lower (handler ret))) action
+handleReturn :: (Effectful m, Member (Return value) effects) => (forall x . Return value x -> m effects a) -> m effects a -> m effects a
+handleReturn handler action = raiseHandler (Eff.interpose pure (\ ret _ -> lower (handler ret))) action
 
 
 -- | Effects for control flow around loops (breaking and continuing).

@@ -312,11 +312,11 @@ evalTerm :: forall location term value effects m
             )
          => term
          -> m effects value
-evalTerm term = catchReturn @m @value
-  (raiseHandler
-    (interpose @(EvalClosure term value) pure (\ (EvalClosure term) yield -> lower @m (evalTerm term) >>= yield))
-    (foldSubterms (analyzeTerm eval) term))
-  (\ (Return value) -> pure value)
+evalTerm
+  = handleReturn @m @value (\ (Return value) -> pure value)
+  . raiseHandler (interpose @(EvalClosure term value) pure (\ (EvalClosure term) yield -> lower @m (evalTerm term) >>= yield))
+  . foldSubterms (analyzeTerm eval)
+
 
 evaluatingModulesWith :: Effectful m => (Module term -> m effects value) -> m (EvalModule term value ': effects) a -> m effects a
 evaluatingModulesWith evalModule = raiseHandler (relay pure (\ (EvalModule m) yield -> lower (evalModule m) >>= yield))
