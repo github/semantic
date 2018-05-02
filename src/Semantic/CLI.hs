@@ -17,7 +17,7 @@ import qualified Paths_semantic as Library (version)
 import           Prologue
 import           Rendering.Renderer
 import qualified Semantic.Diff as Semantic (diffBlobPairs)
-import qualified Semantic.Graph as Semantic (graph)
+import           Semantic.Graph as Semantic (graph, GraphType(..))
 import           Semantic.IO (languageForFilePath)
 import qualified Semantic.Log as Log
 import qualified Semantic.Parse as Semantic (parseBlobs)
@@ -34,8 +34,8 @@ runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Ta
 runParse :: SomeRenderer TermRenderer -> Either Handle [File] -> Task.TaskEff ByteString
 runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
 
-runGraph :: SomeRenderer GraphRenderer -> Maybe FilePath -> FilePath -> Language -> [FilePath] -> Task.TaskEff ByteString
-runGraph (SomeRenderer r) rootDir dir excludeDirs = Semantic.graph r <=< Task.readProject rootDir dir excludeDirs
+runGraph :: Semantic.GraphType -> SomeRenderer GraphRenderer -> Maybe FilePath -> FilePath -> Language -> [FilePath] -> Task.TaskEff ByteString
+runGraph graphType (SomeRenderer r) rootDir dir excludeDirs = Semantic.graph graphType r <=< Task.readProject rootDir dir excludeDirs
 
 -- | A parser for the application's command-line arguments.
 --
@@ -84,15 +84,19 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
       pure $ runParse renderer filesOrStdin
 
-    graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute an import graph a directory or entry point"))
+    graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a graph for a directory or entry point"))
     graphArgumentsParser = do
+      graphType <- flag ImportGraph ImportGraph (long "imports" <> help "Compute an import graph")
+               <|> flag'            CallGraph       (long "calls" <> help "Compute a call graph")
       renderer <- flag (SomeRenderer DOTGraphRenderer) (SomeRenderer DOTGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
-              <|> flag'                                (SomeRenderer JSONGraphRenderer) (long "json" <> help "Output JSON graph")
-      rootDir <- optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIRECTORY"))
-      excludeDirs <- many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)"))
+              <|> flag'                                      (SomeRenderer JSONGraphRenderer) (long "json" <> help "Output JSON graph")
+      rootDir <- rootDirectoryOption
+      excludeDirs <- excludeDirsOption
       File{..} <- argument filePathReader (metavar "DIRECTORY:LANGUAGE")
-      pure $ runGraph renderer rootDir filePath (fromJust fileLanguage) excludeDirs
+      pure $ runGraph graphType renderer rootDir filePath (fromJust fileLanguage) excludeDirs
 
+    rootDirectoryOption = optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIRECTORY"))
+    excludeDirsOption = many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)"))
     filePathReader = eitherReader parseFilePath
     parseFilePath arg = case splitWhen (== ':') arg of
         [a, b] | lang <- readMaybe b -> Right (File a lang)

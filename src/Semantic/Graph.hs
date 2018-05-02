@@ -9,6 +9,8 @@ import           Analysis.Abstract.BadVariables
 import           Analysis.Abstract.Erroring
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.ImportGraph
+import           Analysis.Abstract.CallGraph
+import           Analysis.Abstract.Graph (Graph, renderGraph)
 import qualified Control.Exception as Exc
 import           Data.Abstract.Address
 import qualified Data.Abstract.Evaluatable as Analysis
@@ -27,16 +29,23 @@ import           Rendering.Renderer
 import           Semantic.IO (Files)
 import           Semantic.Task
 
+data GraphType = ImportGraph | CallGraph
+
 graph :: Members '[Distribute WrappedTask, Files, Task, Exc SomeException, Telemetry] effs
-      => GraphRenderer output
+      => GraphType
+      -> GraphRenderer output
       -> Project
       -> Eff effs ByteString
-graph renderer project
+graph graphType renderer project
   | SomeAnalysisParser parser prelude <- someAnalysisParser
     (Proxy :: Proxy '[ Analysis.Evaluatable, Analysis.Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
-    parsePackage parser prelude project >>= graphImports >>= case renderer of
-      JSONGraphRenderer -> pure . toOutput
-      DOTGraphRenderer  -> pure . renderImportGraph
+    package <- parsePackage parser prelude project
+    let graph = case graphType of
+          ImportGraph -> graphImports
+          CallGraph   -> graphCalls
+    graph package >>= case renderer of
+      JSONGraphRenderer   -> pure . toOutput
+      DOTGraphRenderer    -> pure . renderGraph
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: Members '[Distribute WrappedTask, Files, Task] effs
@@ -61,10 +70,8 @@ parseModule parser rootDir file = do
   blob <- readBlob file
   moduleForBlob rootDir blob <$> parse parser blob
 
-
-type ImportGraphAnalysis term
-  = ImportGraphing
-  ( BadAddresses
+type GraphAnalysis term
+  = BadAddresses
   ( BadModuleResolutions
   ( BadVariables
   ( BadValues
@@ -73,7 +80,7 @@ type ImportGraphAnalysis term
   ( Evaluating
     (Located Precise term)
     term
-    (Value (Located Precise term)))))))))
+    (Value (Located Precise term))))))))
 
 -- | Render the import graph for a given 'Package'.
 graphImports :: ( Show ann
@@ -85,17 +92,40 @@ graphImports :: ( Show ann
                 , Apply Ord1 syntax
                 , Apply Eq1 syntax
                 , Apply Show1 syntax
+                , Members '[Exc SomeException, Task] effs
+                )
+             => Package (Term (Union syntax) ann) -> Eff effs Graph
+graphImports package = analyze (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package) >>= extractGraph
+  where
+    asAnalysisForTypeOfPackage :: ImportGraphing (GraphAnalysis term) effs value
+                               -> Package term
+                               -> ImportGraphing (GraphAnalysis term) effs value
+    asAnalysisForTypeOfPackage = const
+
+-- | Render the call graph for a given 'Package'.
+graphCalls :: ( Show ann
+                , Ord ann
+                , Apply Analysis.Declarations1 syntax
+                , Apply Analysis.Evaluatable syntax
+                , Apply FreeVariables1 syntax
+                , Apply Functor syntax
+                , Apply Ord1 syntax
+                , Apply Eq1 syntax
+                , Apply Show1 syntax
                 , Member Syntax.Identifier syntax
                 , Members '[Exc SomeException, Task] effs
                 )
-             => Package (Term (Union syntax) ann) -> Eff effs ImportGraph
-graphImports package = analyze (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package) >>= extractGraph
+             => Package (Term (Union syntax) ann) -> Eff effs Graph
+graphCalls package = analyze (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package) >>= extractGraph
   where
-    asAnalysisForTypeOfPackage :: ImportGraphAnalysis term effs value
+    asAnalysisForTypeOfPackage :: CallGraphing (GraphAnalysis term) effs value
                                -> Package term
-                               -> ImportGraphAnalysis term effs value
+                               -> CallGraphing (GraphAnalysis term) effs value
     asAnalysisForTypeOfPackage = const
 
-    extractGraph result = case result of
-      (Right (Right ((_, graph), _)), _) -> pure graph
-      _ -> throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
+extractGraph :: (Show a, Show b, Show result, Show c, Show err, Show aux, Member (Exc SomeException) e)
+             => (Either err (Either a ((b, result), c)), aux)
+             -> Eff e result
+extractGraph result = case result of
+  (Right (Right ((_, graph), _)), _) -> pure graph
+  err -> throwError (toException (Exc.ErrorCall ("extractGraph: graph rendering failed " <> show err)))
