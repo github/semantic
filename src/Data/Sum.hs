@@ -11,7 +11,7 @@
 
 {-|
 Module      : Data.Sum
-Description : Open unions (type-indexed co-products) for extensible effects.
+Description : Open sums (type-indexed co-products) for extensible effects.
 Copyright   : Allele Dev 2015
 License     : BSD-3
 Maintainer  : allele.dev@gmail.com
@@ -29,7 +29,7 @@ strict apartness condition.
 This implementation is very similar to OpenUnion1.hs, but without
 the annoying Typeable constraint. We sort of emulate it:
 
-Our list r of open union components is a small Universe.
+Our list r of open sum components is a small Universe.
 Therefore, we can use the Typeable-like evidence in that
 universe.
 
@@ -65,7 +65,7 @@ pure [mkElemIndexTypeFamily 150]
 
 infixr 5 :<
 
--- Strong Sum (Existential with the evidence) is an open union
+-- Strong Sum (Existential with the evidence) is an open sum
 -- t is can be a GADT and hence not necessarily a Functor.
 -- Int is the index of t in the list r; that is, the index of t in the
 -- universe r.
@@ -84,19 +84,19 @@ prj' n (Sum n' x) | n == n'   = Just (unsafeCoerce x)
 newtype P (t :: * -> *) (r :: [* -> *]) = P { unP :: Int }
 
 infixr 5 :<:
--- | Find a list of members 'ms' in an open union 'r'.
+-- | Find a list of members 'ms' in an open sum 'r'.
 type family Elements ms r :: Constraint where
   Elements (t ': cs) r = (Element t r, Elements cs r)
   Elements '[] r = ()
 
 type (ts :<: r) = Elements ts r
 
--- | Inject a functor into a type-aligned union.
+-- | Inject a functor into a type-aligned sum.
 inj :: forall e r v. (e :< r) => e v -> Sum r v
 inj = inj' (unP (elemNo :: P e r))
 {-# INLINE inj #-}
 
--- | Maybe project a functor out of a type-aligned union.
+-- | Maybe project a functor out of a type-aligned sum.
 prj :: forall e r v. (e :< r) => Sum r v -> Maybe (e v)
 prj = prj' (unP (elemNo :: P e r))
 {-# INLINE prj #-}
