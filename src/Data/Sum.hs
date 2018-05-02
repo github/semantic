@@ -142,7 +142,7 @@ apply2 proxy f u@(Sum n1 _) (Sum n2 r2)
 
 apply2' :: Apply c fs => proxy c -> (forall g . c g => (forall x. g x -> Sum fs x) -> g a -> g b -> d) -> Sum fs a -> Sum fs b -> Maybe d
 apply2' proxy f u@(Sum n1 _) (Sum n2 r2)
-  | n1 == n2  = Just (apply' proxy (\ reinj r1 -> f reinj r1 (unsafeCoerce r2)) u)
+  | n1 == n2  = Just (apply' proxy (\ reinject r1 -> f reinject r1 (unsafeCoerce r2)) u)
   | otherwise = Nothing
 {-# INLINABLE apply2' #-}
 
@@ -166,17 +166,17 @@ instance Apply Foldable fs => Foldable (Sum fs) where
   {-# INLINABLE length #-}
 
 instance Apply Functor fs => Functor (Sum fs) where
-  fmap f = apply' (Proxy :: Proxy Functor) (\ reinj a -> reinj (fmap f a))
+  fmap f = apply' (Proxy :: Proxy Functor) (\ reinject a -> reinject (fmap f a))
   {-# INLINABLE fmap #-}
 
-  (<$) v = apply' (Proxy :: Proxy Functor) (\ reinj a -> reinj (v <$ a))
+  (<$) v = apply' (Proxy :: Proxy Functor) (\ reinject a -> reinject (v <$ a))
   {-# INLINABLE (<$) #-}
 
 instance (Apply Foldable fs, Apply Functor fs, Apply Traversable fs) => Traversable (Sum fs) where
-  traverse f = apply' (Proxy :: Proxy Traversable) (\ reinj a -> reinj <$> traverse f a)
+  traverse f = apply' (Proxy :: Proxy Traversable) (\ reinject a -> reinject <$> traverse f a)
   {-# INLINABLE traverse #-}
 
-  sequenceA = apply' (Proxy :: Proxy Traversable) (\ reinj a -> reinj <$> sequenceA a)
+  sequenceA = apply' (Proxy :: Proxy Traversable) (\ reinject a -> reinject <$> sequenceA a)
   {-# INLINABLE sequenceA #-}
 
 
