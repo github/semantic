@@ -36,7 +36,7 @@ import           Data.Scientific (Scientific)
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
 import           Data.Semigroup.Reducer hiding (unit)
-import           Data.Sum hiding (Member)
+import           Data.Sum
 import           Data.Term
 import           Prologue
 
@@ -168,7 +168,7 @@ class Evaluatable constr where
 
 -- | If we can evaluate any syntax which can occur in a 'Sum', we can evaluate the 'Sum'.
 instance Apply Evaluatable fs => Evaluatable (Sum fs) where
-  eval = apply (Proxy :: Proxy Evaluatable) eval
+  eval = apply @Evaluatable eval
 
 -- | Evaluating a 'TermF' ignores its annotation, evaluating the underlying syntax.
 instance Evaluatable s => Evaluatable (TermF s a) where

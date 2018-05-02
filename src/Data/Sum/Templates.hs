@@ -46,7 +46,7 @@ mkApplyInstance paramN =
         [applyC, apply, f, r, union] = mkName <$> ["Apply", "apply", "f", "r", "Sum"]
         [constraint, a] = VarT . mkName <$> ["constraint", "a"]
         mkClause i nthType = Clause
-          [ WildP, VarP f, ConP union [ LitP (IntegerL i), VarP r ] ]
+          [ VarP f, ConP union [ LitP (IntegerL i), VarP r ] ]
           (NormalB (AppE (VarE f) (SigE (AppE (VarE 'unsafeCoerce) (VarE r)) (AppT nthType a))))
           []
 

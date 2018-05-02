@@ -1,3 +1,4 @@
+{-# LANGUAGE AllowAmbiguousTypes, TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE TypeFamilies #-}
@@ -53,7 +54,6 @@ module Data.Sum (
 
 import Data.Functor.Classes (Eq1(..), eq1, Ord1(..), compare1, Show1(..), showsPrec1)
 import Data.Maybe (fromMaybe)
-import Data.Proxy
 import Data.Sum.Templates
 import GHC.Exts (Constraint)
 import GHC.Prim (Proxy#, proxy#)
@@ -114,21 +114,21 @@ elemNo = P (fromIntegral (natVal' (proxy# :: Proxy# (ElemIndex t r))))
 
 -- | Helper to apply a function to a functor of the nth type in a type list.
 class Apply (c :: (* -> *) -> Constraint) (fs :: [* -> *]) where
-  apply :: proxy c -> (forall g . c g => g a -> b) -> Sum fs a -> b
+  apply :: (forall g . c g => g a -> b) -> Sum fs a -> b
 
-apply' :: Apply c fs => proxy c -> (forall g . c g => (forall x. g x -> Sum fs x) -> g a -> b) -> Sum fs a -> b
-apply' proxy f u@(Sum n _) = apply proxy (f (Sum n)) u
+apply' :: forall c fs a b . Apply c fs => (forall g . c g => (forall x. g x -> Sum fs x) -> g a -> b) -> Sum fs a -> b
+apply' f u@(Sum n _) = apply @c (f (Sum n)) u
 {-# INLINABLE apply' #-}
 
-apply2 :: Apply c fs => proxy c -> (forall g . c g => g a -> g b -> d) -> Sum fs a -> Sum fs b -> Maybe d
-apply2 proxy f u@(Sum n1 _) (Sum n2 r2)
-  | n1 == n2  = Just (apply proxy (\ r1 -> f r1 (unsafeCoerce r2)) u)
+apply2 :: forall c fs a b d . Apply c fs => (forall g . c g => g a -> g b -> d) -> Sum fs a -> Sum fs b -> Maybe d
+apply2 f u@(Sum n1 _) (Sum n2 r2)
+  | n1 == n2  = Just (apply @c (\ r1 -> f r1 (unsafeCoerce r2)) u)
   | otherwise = Nothing
 {-# INLINABLE apply2 #-}
 
-apply2' :: Apply c fs => proxy c -> (forall g . c g => (forall x. g x -> Sum fs x) -> g a -> g b -> d) -> Sum fs a -> Sum fs b -> Maybe d
-apply2' proxy f u@(Sum n1 _) (Sum n2 r2)
-  | n1 == n2  = Just (apply' proxy (\ reinject r1 -> f reinject r1 (unsafeCoerce r2)) u)
+apply2' :: forall c fs a b d . Apply c fs => (forall g . c g => (forall x. g x -> Sum fs x) -> g a -> g b -> d) -> Sum fs a -> Sum fs b -> Maybe d
+apply2' f u@(Sum n1 _) (Sum n2 r2)
+  | n1 == n2  = Just (apply' @c (\ reinject r1 -> f reinject r1 (unsafeCoerce r2)) u)
   | otherwise = Nothing
 {-# INLINABLE apply2' #-}
 
@@ -136,38 +136,38 @@ pure (mkApplyInstance <$> [1..150])
 
 
 instance Apply Foldable fs => Foldable (Sum fs) where
-  foldMap f = apply (Proxy :: Proxy Foldable) (foldMap f)
+  foldMap f = apply @Foldable (foldMap f)
   {-# INLINABLE foldMap #-}
 
-  foldr combine seed = apply (Proxy :: Proxy Foldable) (foldr combine seed)
+  foldr combine seed = apply @Foldable (foldr combine seed)
   {-# INLINABLE foldr #-}
 
-  foldl combine seed = apply (Proxy :: Proxy Foldable) (foldl combine seed)
+  foldl combine seed = apply @Foldable (foldl combine seed)
   {-# INLINABLE foldl #-}
 
-  null = apply (Proxy :: Proxy Foldable) null
+  null = apply @Foldable null
   {-# INLINABLE null #-}
 
-  length = apply (Proxy :: Proxy Foldable) length
+  length = apply @Foldable length
   {-# INLINABLE length #-}
 
 instance Apply Functor fs => Functor (Sum fs) where
-  fmap f = apply' (Proxy :: Proxy Functor) (\ reinject a -> reinject (fmap f a))
+  fmap f = apply' @Functor (\ reinject a -> reinject (fmap f a))
   {-# INLINABLE fmap #-}
 
-  (<$) v = apply' (Proxy :: Proxy Functor) (\ reinject a -> reinject (v <$ a))
+  (<$) v = apply' @Functor (\ reinject a -> reinject (v <$ a))
   {-# INLINABLE (<$) #-}
 
 instance (Apply Foldable fs, Apply Functor fs, Apply Traversable fs) => Traversable (Sum fs) where
-  traverse f = apply' (Proxy :: Proxy Traversable) (\ reinject a -> reinject <$> traverse f a)
+  traverse f = apply' @Traversable (\ reinject a -> reinject <$> traverse f a)
   {-# INLINABLE traverse #-}
 
-  sequenceA = apply' (Proxy :: Proxy Traversable) (\ reinject a -> reinject <$> sequenceA a)
+  sequenceA = apply' @Traversable (\ reinject a -> reinject <$> sequenceA a)
   {-# INLINABLE sequenceA #-}
 
 
 instance Apply Eq1 fs => Eq1 (Sum fs) where
-  liftEq eq u1 u2 = fromMaybe False (apply2 (Proxy :: Proxy Eq1) (liftEq eq) u1 u2)
+  liftEq eq u1 u2 = fromMaybe False (apply2 @Eq1 (liftEq eq) u1 u2)
   {-# INLINABLE liftEq #-}
 
 instance (Apply Eq1 fs, Eq a) => Eq (Sum fs a) where
@@ -176,7 +176,7 @@ instance (Apply Eq1 fs, Eq a) => Eq (Sum fs a) where
 
 
 instance (Apply Eq1 fs, Apply Ord1 fs) => Ord1 (Sum fs) where
-  liftCompare compareA u1@(Sum n1 _) u2@(Sum n2 _) = fromMaybe (compare n1 n2) (apply2 (Proxy :: Proxy Ord1) (liftCompare compareA) u1 u2)
+  liftCompare compareA u1@(Sum n1 _) u2@(Sum n2 _) = fromMaybe (compare n1 n2) (apply2 @Ord1 (liftCompare compareA) u1 u2)
   {-# INLINABLE liftCompare #-}
 
 instance (Apply Eq1 fs, Apply Ord1 fs, Ord a) => Ord (Sum fs a) where
@@ -185,7 +185,7 @@ instance (Apply Eq1 fs, Apply Ord1 fs, Ord a) => Ord (Sum fs a) where
 
 
 instance Apply Show1 fs => Show1 (Sum fs) where
-  liftShowsPrec sp sl d = apply (Proxy :: Proxy Show1) (liftShowsPrec sp sl d)
+  liftShowsPrec sp sl d = apply @Show1 (liftShowsPrec sp sl d)
   {-# INLINABLE liftShowsPrec #-}
 
 instance (Apply Show1 fs, Show a) => Show (Sum fs a) where

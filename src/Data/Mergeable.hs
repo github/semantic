@@ -4,7 +4,6 @@ module Data.Mergeable where
 import Control.Applicative
 import Data.Functor.Identity
 import Data.List.NonEmpty
-import Data.Proxy
 import Data.Sum
 import GHC.Generics
 
@@ -47,7 +46,7 @@ instance Mergeable Maybe where
 instance Mergeable Identity where merge f = fmap Identity . f . runIdentity
 
 instance (Apply Functor fs, Apply Mergeable fs) => Mergeable (Sum fs) where
-  merge f = apply' (Proxy :: Proxy Mergeable) (\ reinj g -> reinj <$> merge f g)
+  merge f = apply' @Mergeable (\ reinj g -> reinj <$> merge f g)
 
 
 -- Generics

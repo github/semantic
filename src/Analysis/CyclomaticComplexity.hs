@@ -74,7 +74,7 @@ instance CustomHasCyclomaticComplexity Statement.While
 
 -- | Produce a 'CyclomaticComplexity' for 'Sum's using the 'HasCyclomaticComplexity' instance & therefore using a 'CustomHasCyclomaticComplexity' instance when one exists & the type is listed in 'CyclomaticComplexityStrategy'.
 instance Apply HasCyclomaticComplexity fs => CustomHasCyclomaticComplexity (Sum fs) where
-  customToCyclomaticComplexity = apply (Proxy :: Proxy HasCyclomaticComplexity) toCyclomaticComplexity
+  customToCyclomaticComplexity = apply @HasCyclomaticComplexity toCyclomaticComplexity
 
 
 -- | A strategy for defining a 'HasCyclomaticComplexity' instance. Intended to be promoted to the kind level using @-XDataKinds@.

@@ -56,6 +56,6 @@ instance (FreeVariables1 syntax) => FreeVariables1 (TermF syntax ann) where
   liftFreeVariables f (In _ s) = liftFreeVariables f s
 
 instance (Apply FreeVariables1 fs) => FreeVariables1 (Sum fs) where
-  liftFreeVariables f = apply (Proxy :: Proxy FreeVariables1) (liftFreeVariables f)
+  liftFreeVariables f = apply @FreeVariables1 (liftFreeVariables f)
 
 instance FreeVariables1 []

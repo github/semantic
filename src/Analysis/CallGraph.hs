@@ -60,7 +60,7 @@ instance CustomCallGraphAlgebra Syntax.Identifier where
     | otherwise         = vertex name
 
 instance Apply CallGraphAlgebra syntaxes => CustomCallGraphAlgebra (Sum syntaxes) where
-  customCallGraphAlgebra = apply (Proxy :: Proxy CallGraphAlgebra) callGraphAlgebra
+  customCallGraphAlgebra = apply @CallGraphAlgebra callGraphAlgebra
 
 instance CallGraphAlgebra syntax => CustomCallGraphAlgebra (TermF syntax a) where
   customCallGraphAlgebra = callGraphAlgebra . termFOut

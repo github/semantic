@@ -141,7 +141,7 @@ instance (Syntax.Identifier :< fs, Expression.MemberAccess :< fs) => CustomHasDe
 
 -- | Produce a 'Declaration' for 'Sum's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
 instance Apply (HasDeclaration' whole) fs => CustomHasDeclaration whole (Sum fs) where
-  customToDeclaration blob ann = apply (Proxy :: Proxy (HasDeclaration' whole)) (toDeclaration' blob ann)
+  customToDeclaration blob ann = apply @(HasDeclaration' whole) (toDeclaration' blob ann)
 
 
 -- | A strategy for defining a 'HasDeclaration' instance. Intended to be promoted to the kind level using @-XDataKinds@.

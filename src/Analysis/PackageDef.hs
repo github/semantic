@@ -62,7 +62,7 @@ instance CustomHasPackageDef Language.Go.Syntax.Package where
 
 -- | Produce a 'PackageDef' for 'Sum's using the 'HasPackageDef' instance & therefore using a 'CustomHasPackageDef' instance when one exists & the type is listed in 'PackageDefStrategy'.
 instance Apply HasPackageDef fs => CustomHasPackageDef (Sum fs) where
-  customToPackageDef blob ann = apply (Proxy :: Proxy HasPackageDef) (toPackageDef blob ann)
+  customToPackageDef blob ann = apply @HasPackageDef (toPackageDef blob ann)
 
 
 -- | A strategy for defining a 'HasPackageDef' instance. Intended to be promoted to the kind level using @-XDataKinds@.

@@ -188,15 +188,14 @@ genericComparableTo a1 a2 = gcomparableTo (from1 a1) (from1 a2)
 
 -- | 'Diffable' for 'Sum's of syntax functors is defined in general by straightforward lifting of each method into the functors in the 'Sum'.
 instance Apply Diffable fs => Diffable (Sum fs) where
-  algorithmFor u1 u2 = fromMaybe empty (apply2' (Proxy :: Proxy Diffable) (\ inj f1 f2 -> inj <$> algorithmFor f1 f2) u1 u2)
+  algorithmFor u1 u2 = fromMaybe empty (apply2' @Diffable (\ inj f1 f2 -> inj <$> algorithmFor f1 f2) u1 u2)
 
-  subalgorithmFor blur focus = apply' (Proxy :: Proxy Diffable) (\ inj f -> inj <$> subalgorithmFor blur focus f)
+  subalgorithmFor blur focus = apply' @Diffable (\ inj f -> inj <$> subalgorithmFor blur focus f)
 
-  equivalentBySubterm = apply (Proxy :: Proxy Diffable) equivalentBySubterm
+  equivalentBySubterm = apply @Diffable equivalentBySubterm
 
   -- | Comparability on 'Sum's is defined first by comparability of their contained functors (when they’re the same), falling back to using 'subalgorithmFor' to opt substructurally-diffable syntax into comparisons (e.g. to allow annotating nodes to be compared against the kind of nodes they annotate).
-  comparableTo u1 u2 = fromMaybe False (apply2 proxy comparableTo u1 u2 <|> True <$ subalgorithmFor pure pure u1 <|> True <$ subalgorithmFor pure pure u2)
-    where proxy = Proxy :: Proxy Diffable
+  comparableTo u1 u2 = fromMaybe False (apply2 @Diffable comparableTo u1 u2 <|> True <$ subalgorithmFor pure pure u1 <|> True <$ subalgorithmFor pure pure u2)
 
 -- | Diff two 'Maybe's.
 instance Diffable Maybe where

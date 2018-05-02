@@ -38,7 +38,7 @@ class CustomIdentifierName syntax where
   customIdentifierName :: syntax a -> Maybe ByteString
 
 instance Apply IdentifierName fs => CustomIdentifierName (Sum fs) where
-  customIdentifierName = apply (Proxy :: Proxy IdentifierName) identifierName
+  customIdentifierName = apply @IdentifierName identifierName
 
 instance CustomIdentifierName Data.Syntax.Identifier where
   customIdentifierName (Data.Syntax.Identifier (Name name)) = Just name

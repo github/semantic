@@ -6,7 +6,6 @@ import Control.Monad
 import Data.Functor (($>))
 import Data.List.NonEmpty (NonEmpty(..))
 import Data.Maybe (fromMaybe)
-import Data.Proxy
 import Data.Sum
 import Data.These
 import GHC.Generics
@@ -38,7 +37,7 @@ instance GAlign NonEmpty where
   galignWith f (a1:|as1) (a2:|as2) = (:|) <$> f (These a1 a2) <*> galignWith f as1 as2
 
 instance Apply GAlign fs => GAlign (Sum fs) where
-  galignWith f = (fromMaybe empty .) . apply2' (Proxy :: Proxy GAlign) (\ inj -> (fmap inj .) . galignWith f)
+  galignWith f = (fromMaybe empty .) . apply2' @GAlign (\ inj -> (fmap inj .) . galignWith f)
 
 
 -- Generics

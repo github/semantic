@@ -40,7 +40,7 @@ class CustomConstructorName syntax where
   customConstructorName :: syntax a -> String
 
 instance Apply ConstructorName fs => CustomConstructorName (Sum fs) where
-  customConstructorName = apply (Proxy :: Proxy ConstructorName) constructorName
+  customConstructorName = apply @ConstructorName constructorName
 
 instance CustomConstructorName [] where
   customConstructorName [] = "[]"

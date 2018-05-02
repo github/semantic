@@ -22,6 +22,6 @@ instance (FreeVariables1 syntax, Declarations1 syntax, Functor syntax) => Declar
   declaredName = liftDeclaredName freeVariables . termOut
 
 instance (Apply Declarations1 fs) => Declarations1 (Sum fs) where
-  liftDeclaredName f = apply (Proxy :: Proxy Declarations1) (liftDeclaredName f)
+  liftDeclaredName f = apply @Declarations1 (liftDeclaredName f)
 
 instance Declarations1 []
