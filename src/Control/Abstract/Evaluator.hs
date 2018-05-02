@@ -98,10 +98,12 @@ class ( Evaluator location term value m
       , Member (State (Heap location value)) effects
       , Member (State (ModuleTable (Environment location value, value))) effects
       , Member (State (Exports location value)) effects
-      , Member (State (IntMap.IntMap (SomeOrigin term, term))) effects
+      , Member (State (JumpTable term)) effects
       , Monad (m effects)
       )
    => MonadEvaluator location term value effects m
+
+type JumpTable term = IntMap.IntMap (SomeOrigin term, term)
 
 
 -- Environment
