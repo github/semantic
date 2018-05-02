@@ -15,6 +15,7 @@ newtype DeadCode m (effects :: [* -> *]) a = DeadCode { runDeadCode :: m effects
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (DeadCode m)
+deriving instance Evaluator location term value m => Evaluator location term value (DeadCode m)
 
 -- | A set of “dead” (unreachable) terms.
 newtype Dead term = Dead { unDead :: Set term }

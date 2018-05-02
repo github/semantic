@@ -12,6 +12,7 @@ newtype TypeChecking m (effects :: [* -> *]) a = TypeChecking { runTypeChecking 
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance MonadEvaluator location term Type effects m => MonadEvaluator location term Type effects (TypeChecking m)
+deriving instance Evaluator location term value m => Evaluator location term value (TypeChecking m)
 deriving instance MonadAnalysis location term Type effects m => MonadAnalysis location term Type effects (TypeChecking m)
 
 instance Interpreter m effects

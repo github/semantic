@@ -20,6 +20,7 @@ newtype BadSyntax m (effects :: [* -> *]) a = BadSyntax { runBadSyntax :: m effe
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadSyntax m)
 deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadSyntax m)
+deriving instance Evaluator location term value m => Evaluator location term value (BadSyntax m)
 
 instance ( Interpreter m effects
          , MonadEvaluator location term value effects m

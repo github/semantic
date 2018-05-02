@@ -18,7 +18,7 @@ import Prologue
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
 newtype Evaluating location term value effects a = Evaluating { runEvaluating :: Eff effects a }
-  deriving (Applicative, Functor, Effectful, Monad)
+  deriving (Applicative, Functor, Effectful, Evaluator location term value, Monad)
 
 deriving instance Member NonDet effects => Alternative (Evaluating location term value effects)
 

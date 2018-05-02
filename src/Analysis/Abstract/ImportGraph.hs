@@ -57,6 +57,7 @@ newtype ImportGraphing m (effects :: [* -> *]) a = ImportGraphing { runImportGra
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (ImportGraphing m)
+deriving instance Evaluator location term value m => Evaluator location term value (ImportGraphing m)
 
 
 instance ( Effectful m

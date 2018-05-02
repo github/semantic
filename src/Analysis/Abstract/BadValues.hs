@@ -11,6 +11,7 @@ newtype BadValues m (effects :: [* -> *]) a = BadValues { runBadValues :: m effe
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (BadValues m)
 deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadValues m)
+deriving instance Evaluator location term value m => Evaluator location term value (BadValues m)
 
 instance ( Interpreter m effects
          , MonadEvaluator location term value effects m

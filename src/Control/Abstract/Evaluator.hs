@@ -90,7 +90,7 @@ class Effectful m => Evaluator location term value m | m -> location term value
 --   - environments binding names to addresses
 --   - a heap mapping addresses to (possibly sets of) values
 --   - tables of modules available for import
-class ( Effectful m
+class ( Evaluator location term value m
       , Member (Reader (Environment location value)) effects
       , Member (Reader LoadStack) effects
       , Member (Reader (SomeOrigin term)) effects
@@ -101,7 +101,7 @@ class ( Effectful m
       , Member (State (IntMap.IntMap (SomeOrigin term, term))) effects
       , Monad (m effects)
       )
-   => MonadEvaluator location term value effects m | m -> location term value
+   => MonadEvaluator location term value effects m
 
 
 -- Environment
