@@ -295,7 +295,7 @@ evalModule :: forall location term value effects m inner
            -> m effects value
 evalModule m
   = evaluatingModulesWith evalModule
-  . withModuleInfo (moduleInfo m)
+  . withReader (moduleInfo m)
   . localLoadStack (loadStackPush (moduleInfo m))
   $ analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evalTerm) m)
 
@@ -320,11 +320,8 @@ evalTerm
 evaluatingModulesWith :: Effectful m => (Module term -> m effects value) -> m (EvalModule term value ': effects) a -> m effects a
 evaluatingModulesWith evalModule = raiseHandler (relay pure (\ (EvalModule m) yield -> lower (evalModule m) >>= yield))
 
-withModuleInfo :: Effectful m => ModuleInfo -> m (Reader ModuleInfo ': effects) a -> m effects a
-withModuleInfo = raiseHandler . flip runReader
-
-withPackageInfo :: Effectful m => PackageInfo -> m (Reader PackageInfo ': effects) a -> m effects a
-withPackageInfo = raiseHandler . flip runReader
+withReader :: Effectful m => info -> m (Reader info ': effects) a -> m effects a
+withReader = raiseHandler . flip runReader
 
 -- | Evaluate a given package.
 evaluatePackage :: ( moduleEffects ~ (Reader ModuleInfo ': EvalModule term value ': packageEffects)
@@ -343,10 +340,7 @@ evaluatePackage :: ( moduleEffects ~ (Reader ModuleInfo ': EvalModule term value
                    )
                 => Package term
                 -> m effects [value]
-evaluatePackage p = withPackageInfo (packageInfo p) (evaluatePackageBody (packageBody p))
-
-withUnevaluatedModules :: Effectful m => ModuleTable [Module term] -> m (Reader (ModuleTable [Module term]) ': effects) a -> m effects a
-withUnevaluatedModules = raiseHandler . flip runReader
+evaluatePackage p = withReader (packageInfo p) (evaluatePackageBody (packageBody p))
 
 -- | Evaluate a given package body (module table and entry points).
 evaluatePackageBody :: ( moduleEffects ~ (Reader ModuleInfo ': EvalModule term value ': packageEffects)
@@ -367,7 +361,7 @@ evaluatePackageBody :: ( moduleEffects ~ (Reader ModuleInfo ': EvalModule term v
                     => PackageBody term
                     -> m effects [value]
 evaluatePackageBody body
-  = withUnevaluatedModules (packageModules body)
+  = withReader (packageModules body)
   . withPrelude (packagePrelude body)
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
 
