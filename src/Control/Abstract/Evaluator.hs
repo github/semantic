@@ -133,7 +133,7 @@ withEnv = raiseHandler . localState . const
 
 
 -- | Retrieve the default environment.
-defaultEnvironment :: MonadEvaluator location term value effects m => m effects (Environment location value)
+defaultEnvironment :: (Evaluator location term value m, Member (Reader (Environment location value)) effects) => m effects (Environment location value)
 defaultEnvironment = raise ask
 
 -- | Set the default environment for the lifetime of an action.
