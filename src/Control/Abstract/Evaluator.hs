@@ -96,7 +96,7 @@ class ( Effectful m
       , Member (State (EvaluatorState location term value)) effects
       , Monad (m effects)
       )
-   => MonadEvaluator location term value effects m | m effects -> location term value
+   => MonadEvaluator location term value effects m | m -> location term value
 
 
 -- State
