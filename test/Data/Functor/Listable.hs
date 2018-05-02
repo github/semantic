@@ -40,7 +40,7 @@ import Data.List.NonEmpty
 import Data.Patch
 import Data.Range
 import Data.Record
-import Data.Semigroup
+import Data.Semigroup (Semigroup(..))
 import Data.Source
 import Data.Span
 import qualified Data.Syntax as Syntax
