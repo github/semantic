@@ -12,7 +12,7 @@ import Data.Record
 import Parsing.Parser
 import Prologue hiding (MonadError(..))
 import Rendering.Renderer
-import Semantic.IO (NoLanguageForBlob(..))
+import Semantic.IO (NoLanguageForBlob(..), FormatNotSupported(..))
 import Semantic.Task
 
 parseBlobs :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Output output) => TermRenderer output -> [Blob] -> Eff effs ByteString
@@ -34,3 +34,20 @@ parseBlob renderer blob@Blob{..}
     SymbolsTermRenderer fields -> decorate (declarationAlgebra blob)                     >=> render (renderToSymbols fields blob)
     DOTTermRenderer            ->                                                            render (renderDOTTerm blob)
   | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
+
+
+astParseBlobs :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Output output) => TermRenderer output -> [Blob] -> Eff effs ByteString
+astParseBlobs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . astParseBlob renderer) blobs
+  where
+    toOutput' = case renderer of
+      JSONTermRenderer -> toOutput . renderJSONTerms
+      _ -> toOutput
+
+    astParseBlob :: Members '[Task, Exc SomeException] effs => TermRenderer output -> Blob -> Eff effs output
+    astParseBlob renderer blob@Blob{..}
+      | Just (SomeASTParser parser) <- someASTParser <$> blobLanguage
+      = parse parser blob >>= case renderer of
+        SExpressionTermRenderer    -> render renderSExpressionAST
+        JSONTermRenderer           -> render (renderJSONTerm' blob)
+        _                          -> pure $ throwError (SomeException (FormatNotSupported "Only SExpression and JSON output supported for tree-sitter ASTs."))
+      | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))

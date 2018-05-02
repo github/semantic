@@ -11,6 +11,7 @@ module Semantic.IO
 , findFiles
 , languageForFilePath
 , NoLanguageForBlob(..)
+, FormatNotSupported(..)
 , readBlob
 , readProject
 , readBlobs
@@ -176,6 +177,10 @@ instance FromJSON BlobPair where
 
 -- | An exception indicating that we’ve tried to diff or parse a blob of unknown language.
 newtype NoLanguageForBlob = NoLanguageForBlob FilePath
+  deriving (Eq, Exception, Ord, Show, Typeable)
+
+-- | An exception indicating that the output format is not supported
+newtype FormatNotSupported = FormatNotSupported String
   deriving (Eq, Exception, Ord, Show, Typeable)
 
 readBlob :: Member Files effs => File -> Eff effs Blob.Blob

@@ -20,7 +20,7 @@ import qualified Semantic.Diff as Semantic (diffBlobPairs)
 import           Semantic.Graph as Semantic (graph, GraphType(..))
 import           Semantic.IO (languageForFilePath)
 import qualified Semantic.Log as Log
-import qualified Semantic.Parse as Semantic (parseBlobs)
+import qualified Semantic.Parse as Semantic (parseBlobs, astParseBlobs)
 import qualified Semantic.Task as Task
 import           System.IO (Handle, stdin, stdout)
 import           Text.Read
@@ -33,6 +33,9 @@ runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Ta
 
 runParse :: SomeRenderer TermRenderer -> Either Handle [File] -> Task.TaskEff ByteString
 runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
+
+runASTParse :: SomeRenderer TermRenderer -> Either Handle [File] -> Task.TaskEff ByteString
+runASTParse (SomeRenderer parseTreeRenderer) = Semantic.astParseBlobs parseTreeRenderer <=< Task.readBlobs
 
 runGraph :: Semantic.GraphType -> SomeRenderer GraphRenderer -> Maybe FilePath -> FilePath -> Language -> [FilePath] -> Task.TaskEff ByteString
 runGraph graphType (SomeRenderer r) rootDir dir excludeDirs = Semantic.graph graphType r <=< Task.readProject rootDir dir excludeDirs
@@ -56,7 +59,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       pure $ Log.Options disableColour logLevel requestId False False Log.logfmtFormatter 0 failOnWarning
 
     argumentsParser = do
-      subparser <- hsubparser (diffCommand <> parseCommand <> graphCommand)
+      subparser <- hsubparser (diffCommand <> parseCommand <>  tsParseCommand <> graphCommand)
       output <- Right <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (Left stdout)
       pure $ subparser >>= Task.writeToOutput output
 
@@ -83,6 +86,13 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
               <|> flag'                                        (SomeRenderer DOTTermRenderer)         (long "dot" <> help "Output DOT graph parse trees")
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
       pure $ runParse renderer filesOrStdin
+
+    tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Print specialized tree-sitter ASTs for path(s)"))
+    tsParseArgumentsParser = do
+      renderer <- flag  (SomeRenderer SExpressionTermRenderer) (SomeRenderer SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression ASTs (default)")
+              <|> flag'                                        (SomeRenderer JSONTermRenderer)        (long "json" <> help "Output JSON ASTs")
+      filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
+      pure $ runASTParse renderer filesOrStdin
 
     graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a graph for a directory or entry point"))
     graphArgumentsParser = do

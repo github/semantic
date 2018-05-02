@@ -2,6 +2,7 @@ module Rendering.JSON
 ( renderJSONDiff
 , renderJSONDiffs
 , renderJSONTerm
+, renderJSONTerm'
 , renderJSONTerms
 ) where
 
@@ -28,6 +29,9 @@ renderJSONDiffs = Map.singleton "diffs" . toJSON
 -- | Render a term to a value representing its JSON.
 renderJSONTerm :: ToJSON a => Blob -> a -> [Value]
 renderJSONTerm blob content = pure $ toJSON (object ("programNode" .= content : toJSONFields blob))
+
+renderJSONTerm' :: (ToJSON a) => Blob -> a -> [Value]
+renderJSONTerm' blob content = pure $ toJSON (object ("ast" .= content : toJSONFields blob))
 
 renderJSONTerms :: [Value] -> Map.Map Text Value
 renderJSONTerms = Map.singleton "trees" . toJSON
