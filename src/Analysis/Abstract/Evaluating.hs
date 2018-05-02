@@ -7,12 +7,7 @@ module Analysis.Abstract.Evaluating
 import Control.Abstract.Analysis
 import qualified Control.Monad.Effect as Eff
 import Data.Abstract.Address
-import Data.Abstract.Environment
-import Data.Abstract.Exports
-import Data.Abstract.Heap
-import Data.Abstract.ModuleTable
 import Data.Abstract.Origin
-import qualified Data.IntMap as IntMap
 import Data.Semilattice.Lower
 import Prologue
 
@@ -27,7 +22,7 @@ data EvaluatingState location term value = EvaluatingState
   , heap        :: Heap location value
   , modules     :: ModuleTable (Environment location value, value)
   , exports     :: Exports location value
-  , jumps       :: IntMap.IntMap (SomeOrigin term, term)
+  , jumps       :: JumpTable term
   }
 
 deriving instance (Eq (Cell location value), Eq location, Eq term, Eq value, Eq (Base term ())) => Eq (EvaluatingState location term value)
@@ -49,7 +44,7 @@ type EvaluatingEffects location term value
      , State (Heap location value)
      , State (ModuleTable (Environment location value, value))
      , State (Exports location value)
-     , State (IntMap.IntMap (SomeOrigin term, term))
+     , State (JumpTable term)
      ]
 
 instance ( Member (Reader (Environment location value)) effects
@@ -59,7 +54,7 @@ instance ( Member (Reader (Environment location value)) effects
          , Member (State (Heap location value)) effects
          , Member (State (ModuleTable (Environment location value, value))) effects
          , Member (State (Exports location value)) effects
-         , Member (State (IntMap.IntMap (SomeOrigin term, term))) effects
+         , Member (State (JumpTable term)) effects
          )
       => MonadEvaluator location term value effects (Evaluating location term value)
 
@@ -71,7 +66,7 @@ instance ( Corecursive term
          , Member (State (Heap location value)) effects
          , Member (State (ModuleTable (Environment location value, value))) effects
          , Member (State (Exports location value)) effects
-         , Member (State (IntMap.IntMap (SomeOrigin term, term))) effects
+         , Member (State (JumpTable term)) effects
          , Recursive term
          )
       => MonadAnalysis location term value effects (Evaluating location term value) where
@@ -89,7 +84,7 @@ instance (AbstractHole value, Show term, Show value) => Interpreter (Evaluating 
     . interpret
     . runEvaluating
     . raiseHandler
-      ( flip runState  lowerBound -- State (IntMap.IntMap (SomeOrigin term, term))
+      ( flip runState  lowerBound -- State (JumpTable term)
       . flip runState  lowerBound -- State (Exports location value)
       . flip runState  lowerBound -- State (ModuleTable (Environment location value, value))
       . flip runState  lowerBound -- State (Heap location value)
