@@ -44,8 +44,8 @@ module Data.Sum (
   prj,
   type(:<),
   type(:<:),
-  Member,
-  Members,
+  Element,
+  Elements,
   Apply(..),
   apply',
   apply2,
@@ -85,11 +85,11 @@ newtype P (t :: * -> *) (r :: [* -> *]) = P { unP :: Int }
 
 infixr 5 :<:
 -- | Find a list of members 'ms' in an open union 'r'.
-type family Members ms r :: Constraint where
-  Members (t ': cs) r = (Member t r, Members cs r)
-  Members '[] r = ()
+type family Elements ms r :: Constraint where
+  Elements (t ': cs) r = (Element t r, Elements cs r)
+  Elements '[] r = ()
 
-type (ts :<: r) = Members ts r
+type (ts :<: r) = Elements ts r
 
 -- | Inject a functor into a type-aligned union.
 inj :: forall e r v. (e :< r) => e v -> Sum r v
@@ -118,8 +118,8 @@ decompose0 (Sum _ v) = Right $ unsafeCoerce v
 weaken :: Sum r w -> Sum (any ': r) w
 weaken (Sum n v) = Sum (n+1) v
 
-type (Member t r) = KnownNat (ElemIndex t r)
-type (t :< r) = Member t r
+type (Element t r) = KnownNat (ElemIndex t r)
+type (t :< r) = Element t r
 
 -- Find an index of an element in an `r'.
 -- The element must exist, so this is essentially a compile-time computation.
