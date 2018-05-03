@@ -7,11 +7,13 @@ module Control.Effect
 , resume
 -- * Handlers
 , handleReader
+, handleState
 ) where
 
 import Control.Monad.Effect           as Effect
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Resumable as Resumable
+import Control.Monad.Effect.State
 
 throwResumable :: (Member (Resumable exc) effects, Effectful m) => exc v -> m effects v
 throwResumable = raise . throwError
@@ -54,3 +56,7 @@ instance Interpreter Eff '[] where
 -- | Run a 'Reader' effect in an 'Effectful' context.
 handleReader :: Effectful m => info -> m (Reader info ': effects) a -> m effects a
 handleReader = raiseHandler . flip runReader
+
+-- | Run a 'State' effect in an 'Effectful' context.
+handleState :: Effectful m => info -> m (Reader info ': effects) a -> m effects a
+handleState = raiseHandler . flip runState
