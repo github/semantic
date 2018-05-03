@@ -33,18 +33,18 @@ instance ( Effectful m
          , MonadAddressable location effects m
          )
       => MonadAnalysis location term value effects (PythonPackaging m) where
-  analyzeTerm eval term = liftAnalyze analyzeTerm eval term
+  analyzeTerm eval term = raiseHandler (interpose @(EvalClosure term value) pure $ \(EvalClosure term) yield -> do
+    traceM "In PythonPackaging"
+    lower @m (do
+      -- Guard on setup call
+      value <- variable (name "packages")
+      as <- asArray value
+      as' <- traverse asString as
+      raise (put (Packages as'))
+      evaluateClosureBody term) >>= yield
+    ) (liftAnalyze analyzeTerm eval term)
 
-  analyzeModule recur m = raiseHandler (interpose @(EvalClosure term value) pure $ \(EvalClosure term) yield -> lower @m (do
-        -- Guard on setup call
-        value <- variable (name "packages")
-        as <- asArray value
-        as' <- traverse asString as
-        raise (put (Packages as'))
-        evaluateClosureBody term) >>= yield
-        -- Lookup packages in env
-
-        ) (liftAnalyze analyzeModule recur m)
+  analyzeModule recur m = liftAnalyze analyzeModule recur m
 
 instance Interpreter m effects
       => Interpreter (PythonPackaging m) (State Strategy ': effects) where
