@@ -1,11 +1,11 @@
 {-# LANGUAGE FunctionalDependencies, RankNTypes, TypeFamilies, TypeOperators #-}
 module Control.Effect
 ( Effectful(..)
-, raiseHandler
 , Interpreter(..)
 , throwResumable
 , resume
 -- * Handlers
+, raiseHandler
 , handleReader
 , handleState
 ) where
@@ -35,9 +35,6 @@ instance Effectful Eff where
   raise = id
   lower = id
 
-raiseHandler :: Effectful m => (Eff effectsA a -> Eff effectsB b) -> m effectsA a -> m effectsB b
-raiseHandler handler = raise . handler . lower
-
 
 -- | Interpreters determine and interpret a list of effects, optionally taking extra arguments.
 --
@@ -52,6 +49,9 @@ instance Interpreter Eff '[] where
 
 
 -- Handlers
+
+raiseHandler :: Effectful m => (Eff effectsA a -> Eff effectsB b) -> m effectsA a -> m effectsB b
+raiseHandler handler = raise . handler . lower
 
 -- | Run a 'Reader' effect in an 'Effectful' context.
 handleReader :: Effectful m => info -> m (Reader info ': effects) a -> m effects a
