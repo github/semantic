@@ -9,6 +9,7 @@ module Data.Abstract.Evaluatable
 , ResolutionError(..)
 , variable
 , evaluateInScopedEnv
+, evalModule
 , evaluatePackage
 , evaluatePackageBody
 , throwEvalError
