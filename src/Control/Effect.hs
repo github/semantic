@@ -4,6 +4,9 @@ module Control.Effect
 , Interpreter(..)
 , throwResumable
 , resume
+-- * Effects
+, Reader
+, State
 -- * Handlers
 , raiseHandler
 , handleReader
