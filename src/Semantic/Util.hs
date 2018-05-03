@@ -5,6 +5,7 @@ import           Analysis.Abstract.BadAddresses
 import           Analysis.Abstract.BadModuleResolutions
 import           Analysis.Abstract.BadSyntax
 import           Analysis.Abstract.BadValues
+import           Analysis.Abstract.BadLoads
 import           Analysis.Abstract.BadVariables
 import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
@@ -50,7 +51,7 @@ type EvaluatingWithHoles term
   ( BadVariables
   ( BadValues
   ( BadSyntax
-  ( Erroring (LoadError term)
+  ( BadLoads
   ( Evaluating (Located Precise term) term (Value (Located Precise term))))))))
 
 -- The order is significant here: Caching has to come on the outside, or its Interpreter instance
