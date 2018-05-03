@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, FunctionalDependencies, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies #-}
+{-# LANGUAGE ConstraintKinds, FunctionalDependencies, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Control.Abstract.Evaluator
   ( Evaluator
   , MonadEvaluator
@@ -53,6 +53,7 @@ module Control.Abstract.Evaluator
   -- * Effects
   , EvalClosure(..)
   , evaluateClosureBody
+  , handleClosuresWith
   , EvalModule(..)
   , evaluateModule
   , Return(..)
@@ -305,6 +306,9 @@ data EvalClosure term value resume where
 
 evaluateClosureBody :: (Effectful m, Member (EvalClosure term value) effects) => term -> m effects value
 evaluateClosureBody = raise . Eff.send . EvalClosure
+
+handleClosuresWith :: Effectful m => (term -> m effects value) -> m (EvalClosure term value ': effects) a -> m effects a
+handleClosuresWith evalClosure = raiseHandler (relay pure (\ (EvalClosure term) yield -> lower (evalClosure term) >>= yield))
 
 
 -- | An effect to evaluate a module.
