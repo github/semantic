@@ -29,6 +29,7 @@ import           Prologue hiding (MonadError (..))
 import           Rendering.Renderer
 import           Semantic.IO (Files)
 import           Semantic.Task
+import System.FilePath.Posix
 
 data GraphType = ImportGraph | CallGraph
 
@@ -70,16 +71,17 @@ parsePackage parser preludeFile project@Project{..} = do
 parsePythonPackage :: (Show ann
                     , Apply Show1 syntax
                     , (Term (Union syntax) ann) ~ term
-                    , Members '[(Analysis.EvalModule term Strategy), Exc SomeException, Distribute WrappedTask, Files, Task] effs)
+                    , Members '[Exc SomeException, Distribute WrappedTask, Files, Task] effs)
                    => Parser term       -- ^ A parser.
                    -> Maybe File        -- ^ Prelude (optional).
                    -> Project           -- ^ Project to parse into a package.
                    -> Eff effs (Package term)
 parsePythonPackage parser preludeFile Project{..} = do
   prelude <- traverse (parseModule parser Nothing) preludeFile
-  setupFile <- maybe (error "no setup.py found in project") pure (find ((== "setup.py") . filePath) projectFiles)
+  setupFile <- maybe (error "no setup.py found in project") pure (find ((== (projectRootDir </> "setup.py")) . filePath) projectFiles)
   setupModule <- parseModule parser (Just projectRootDir) setupFile
   strat <- extractStrategy setupModule
+  traceShowM strat
   undefined
 
 extractStrategy :: ( Show ann
