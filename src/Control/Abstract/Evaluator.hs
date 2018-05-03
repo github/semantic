@@ -56,6 +56,7 @@ module Control.Abstract.Evaluator
   , handleClosuresWith
   , EvalModule(..)
   , evaluateModule
+  , handleModulesWith
   , Return(..)
   , earlyReturn
   , handleReturn
@@ -317,6 +318,9 @@ data EvalModule term value resume where
 
 evaluateModule :: (Effectful m, Member (EvalModule term value) effects) => Module term -> m effects value
 evaluateModule = raise . Eff.send . EvalModule
+
+handleModulesWith :: Effectful m => (Module term -> m effects value) -> m (EvalModule term value ': effects) a -> m effects a
+handleModulesWith evalModule = raiseHandler (relay pure (\ (EvalModule m) yield -> lower (evalModule m) >>= yield))
 
 
 -- | An effect for explicitly returning out of a function/method body.
