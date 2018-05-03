@@ -59,5 +59,5 @@ handleReader :: Effectful m => info -> m (Reader info ': effects) a -> m effects
 handleReader = raiseHandler . flip runReader
 
 -- | Run a 'State' effect in an 'Effectful' context.
-handleState :: Effectful m => info -> m (State info ': effects) a -> m effects a
+handleState :: Effectful m => state -> m (State state ': effects) a -> m effects (a, state)
 handleState = raiseHandler . flip runState
