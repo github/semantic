@@ -62,9 +62,9 @@ parsePackage parser preludeFile project@Project{..} = do
   where
     n = name (projectName project)
 
-    -- | Parse all files in a project into 'Module's.
-    parseModules :: Members '[Distribute WrappedTask, Files, Task] effs => Parser term -> Project -> Eff effs [Module term]
-    parseModules parser Project{..} = distributeFor (projectEntryPoints <> projectFiles) (WrapTask . parseModule parser (Just projectRootDir))
+-- | Parse all files in a project into 'Module's.
+parseModules :: Members '[Distribute WrappedTask, Files, Task] effs => Parser term -> Project -> Eff effs [Module term]
+parseModules parser Project{..} = distributeFor (projectEntryPoints <> projectFiles) (WrapTask . parseModule parser (Just projectRootDir))
 
 
 -- | Parse a list of packages from a python project.
@@ -76,13 +76,18 @@ parsePythonPackage :: (Show ann
                    -> Maybe File        -- ^ Prelude (optional).
                    -> Project           -- ^ Project to parse into a package.
                    -> Eff effs (Package term)
-parsePythonPackage parser preludeFile Project{..} = do
+parsePythonPackage parser preludeFile project@Project{..} = do
   prelude <- traverse (parseModule parser Nothing) preludeFile
   setupFile <- maybe (error "no setup.py found in project") pure (find ((== (projectRootDir </> "setup.py")) . filePath) projectFiles)
   setupModule <- parseModule parser (Just projectRootDir) setupFile
   strat <- extractStrategy setupModule
-  traceShowM strat
-  undefined
+  case strat of
+    Unknown -> do
+      p <- parseModules parser project
+      pure (Package.fromModules n Nothing prelude (length projectEntryPoints) p)
+    _ -> undefined
+  where
+    n = name (projectName project)
 
 extractStrategy :: ( Show ann
                    , Apply Show1 syntax

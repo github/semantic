@@ -1,6 +1,6 @@
 {-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.PythonPackage
-( PythonPackaging, Strategy ) where
+( PythonPackaging, Strategy(..) ) where
 
 import Analysis.Abstract.Graph
 import           Control.Abstract.Analysis
