@@ -279,6 +279,11 @@ instance ( Member (EvalClosure term (Value location)) effects
     | Just (Boolean b) <- prjValue val = pure b
     | otherwise = throwResumable @(ValueError location (Value location)) $ BoolError val
 
+  asArray val
+    | Just (Array as) <- prjValue val = pure as
+    | otherwise = error ("ArrayError: " <> show val)
+
+
   isHole val = pure (prjValue val == Just Hole)
 
   index = go where

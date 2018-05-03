@@ -30,6 +30,7 @@ library
                      , Analysis.Abstract.ImportGraph
                      , Analysis.Abstract.Tracing
                      , Analysis.Abstract.TypeChecking
+                     , Analysis.Abstract.PythonPackage
                      , Analysis.CallGraph
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity

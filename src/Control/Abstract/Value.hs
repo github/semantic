@@ -92,6 +92,8 @@ class (Monad (m effects), Show value) => MonadValue location value (effects :: [
   -- | Construct an array of zero or more values.
   array :: [value] -> m effects value
 
+  asArray :: value -> m effects [value]
+
   -- | Construct a key-value pair for use in a hash.
   kvPair :: value -> value -> m effects value
 

@@ -9,6 +9,7 @@ import           Analysis.Abstract.BadVariables
 import           Analysis.Abstract.Erroring
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.ImportGraph
+import           Analysis.Abstract.PythonPackage
 import           Analysis.Abstract.CallGraph
 import           Analysis.Abstract.Graph (Graph, renderGraph)
 import qualified Control.Exception as Exc
@@ -66,15 +67,62 @@ parsePackage parser preludeFile project@Project{..} = do
 
 
 -- | Parse a list of packages from a python project.
-parsePythonPackage :: Members '[Distribute WrappedTask, Files, Task] effs
+parsePythonPackage :: (Ord ann, Show ann, Apply Show1 syntax
+                    , Apply Analysis.Declarations1 syntax
+                    , Apply Analysis.Evaluatable syntax
+                    , Apply FreeVariables1 syntax
+                    , Apply Functor syntax
+                    , Apply Ord1 syntax
+                    , Apply Eq1 syntax
+                    , Member Syntax.Identifier syntax
+                    , Apply Show1 syntax, (Term (Union syntax) ann) ~ term , Members '[(Analysis.EvalModule term Strategy), Exc SomeException, Distribute WrappedTask, Files, Task] effs)
                    => Parser term       -- ^ A parser.
                    -> Maybe File        -- ^ Prelude (optional).
                    -> Project           -- ^ Project to parse into a package.
                    -> Eff effs (Package term)
-parsePythonPackage = undefined
+parsePythonPackage parser preludeFile Project{..} = do
+  prelude <- traverse (parseModule parser Nothing) preludeFile
+  setupFile <- maybe (error "no setup.py found in project") pure (find ((== "setup.py") . filePath) projectFiles)
+  setupModule <- parseModule parser (Just projectRootDir) setupFile
+  strat <- extractStrategy setupModule
+  undefined
+
+extractStrategy :: ( Show ann
+                   , Ord ann
+                   , Apply Analysis.Declarations1 syntax
+                   , Apply Analysis.Evaluatable syntax
+                   , Apply FreeVariables1 syntax
+                   , Apply Functor syntax
+                   , Apply Ord1 syntax
+                   , Apply Eq1 syntax
+                   , Apply Show1 syntax
+                   , Member Syntax.Identifier syntax
+                   , Members '[Exc SomeException, Task] effs
+                   )
+                => Module (Term (Union syntax) ann) -> Eff effs Strategy
+extractStrategy setupModule = analyze (Analysis.evaluateModule setupModule `asAnalysisForTypeOfModule` setupModule) >>= extractResult
+  where
+    asAnalysisForTypeOfModule :: PythonAnalysis term effs (Value Precise)
+                               -> Module term
+                               -> PythonAnalysis term effs (Value Precise)
+    asAnalysisForTypeOfModule = const
+
+type PythonAnalysis term
+  = PythonPackaging
+  ( BadAddresses
+  ( BadModuleResolutions
+  ( BadVariables
+  ( BadValues
+  ( BadSyntax
+  ( Erroring (Analysis.LoadError term)
+  ( Evaluating
+    Precise
+    term
+    (Value Precise))))))))
+
 -- Load the prelude
 -- Find the setup.py file in the list of projectFiles
--- parse the setup.py module and run it through the PythonPackage analysis that returns a list of files, a call to find_packages, or an error.
+-- parse the setup.py module and run it through the PythonPackage analysis that returns a list of files, a call to find_packages, or an unknown..
 -- If it's the list of packages, select the project files for each of those packages and construct a list of packages.
 -- If it's a call to find_packages, traverse the list of directories looking for __init__.py files and evaluate those as entry points.
 -- Otherwise fail with an error.
@@ -114,7 +162,7 @@ graphImports :: ( Show ann
                 , Members '[Exc SomeException, Task] effs
                 )
              => Package (Term (Union syntax) ann) -> Eff effs Graph
-graphImports package = analyze (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package) >>= extractGraph
+graphImports package = analyze (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package) >>= extractResult
   where
     asAnalysisForTypeOfPackage :: ImportGraphing (GraphAnalysis term) effs value
                                -> Package term
@@ -135,16 +183,16 @@ graphCalls :: ( Show ann
                 , Members '[Exc SomeException, Task] effs
                 )
              => Package (Term (Union syntax) ann) -> Eff effs Graph
-graphCalls package = analyze (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package) >>= extractGraph
+graphCalls package = analyze (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package) >>= extractResult
   where
     asAnalysisForTypeOfPackage :: CallGraphing (GraphAnalysis term) effs value
                                -> Package term
                                -> CallGraphing (GraphAnalysis term) effs value
     asAnalysisForTypeOfPackage = const
 
-extractGraph :: (Show a, Show b, Show result, Show c, Show err, Show aux, Member (Exc SomeException) e)
+extractResult :: (Show a, Show b, Show c, Show result, Show err, Show aux, Member (Exc SomeException) e)
              => (Either err (Either a ((b, result), c)), aux)
              -> Eff e result
-extractGraph result = case result of
+extractResult result = case result of
   (Right (Right ((_, graph), _)), _) -> pure graph
-  err -> throwError (toException (Exc.ErrorCall ("extractGraph: graph rendering failed " <> show err)))
+  err -> throwError (toException (Exc.ErrorCall ("extractResult: graph rendering failed " <> show err)))
