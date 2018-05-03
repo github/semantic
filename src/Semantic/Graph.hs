@@ -67,15 +67,10 @@ parsePackage parser preludeFile project@Project{..} = do
 
 
 -- | Parse a list of packages from a python project.
-parsePythonPackage :: (Ord ann, Show ann, Apply Show1 syntax
-                    , Apply Analysis.Declarations1 syntax
-                    , Apply Analysis.Evaluatable syntax
-                    , Apply FreeVariables1 syntax
-                    , Apply Functor syntax
-                    , Apply Ord1 syntax
-                    , Apply Eq1 syntax
-                    , Member Syntax.Identifier syntax
-                    , Apply Show1 syntax, (Term (Union syntax) ann) ~ term , Members '[(Analysis.EvalModule term Strategy), Exc SomeException, Distribute WrappedTask, Files, Task] effs)
+parsePythonPackage :: (Show ann
+                    , Apply Show1 syntax
+                    , (Term (Union syntax) ann) ~ term
+                    , Members '[(Analysis.EvalModule term Strategy), Exc SomeException, Distribute WrappedTask, Files, Task] effs)
                    => Parser term       -- ^ A parser.
                    -> Maybe File        -- ^ Prelude (optional).
                    -> Project           -- ^ Project to parse into a package.
@@ -88,15 +83,7 @@ parsePythonPackage parser preludeFile Project{..} = do
   undefined
 
 extractStrategy :: ( Show ann
-                   , Ord ann
-                   , Apply Analysis.Declarations1 syntax
-                   , Apply Analysis.Evaluatable syntax
-                   , Apply FreeVariables1 syntax
-                   , Apply Functor syntax
-                   , Apply Ord1 syntax
-                   , Apply Eq1 syntax
                    , Apply Show1 syntax
-                   , Member Syntax.Identifier syntax
                    , Members '[Exc SomeException, Task] effs
                    )
                 => Module (Term (Union syntax) ann) -> Eff effs Strategy
