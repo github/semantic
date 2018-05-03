@@ -17,6 +17,7 @@ library
                      -- Analyses & term annotations
                        Analysis.Abstract.BadAddresses
                      , Analysis.Abstract.BadModuleResolutions
+                     , Analysis.Abstract.BadLoads
                      , Analysis.Abstract.BadSyntax
                      , Analysis.Abstract.BadValues
                      , Analysis.Abstract.BadVariables
