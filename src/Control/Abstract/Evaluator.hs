@@ -334,7 +334,7 @@ earlyReturn :: (Effectful m, Member (Return value) effects) => value -> m effect
 earlyReturn = raise . Eff.send . Return
 
 handleReturn :: (Effectful m, Member (Return value) effects) => (forall x . Return value x -> m effects a) -> m effects a -> m effects a
-handleReturn handler action = raiseHandler (Eff.interpose pure (\ ret _ -> lower (handler ret))) action
+handleReturn handler = raiseHandler (Eff.interpose pure (\ ret _ -> lower (handler ret)))
 
 
 -- | Effects for control flow around loops (breaking and continuing).
