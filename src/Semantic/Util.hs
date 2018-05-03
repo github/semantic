@@ -11,6 +11,7 @@ import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Erroring
 import           Analysis.Abstract.Evaluating as X
 import           Analysis.Abstract.TypeChecking
+import           Analysis.Abstract.PythonPackage
 import           Control.Abstract.Analysis
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
@@ -68,7 +69,7 @@ type Checking term
 evalGoProject path = interpret @(JustEvaluating Go.Term) <$> evaluateProject goParser Language.Go Nothing path
 evalRubyProject path = interpret @(JustEvaluating Ruby.Term) <$> evaluateProject rubyParser Language.Ruby rubyPrelude path
 evalPHPProject path = interpret @(JustEvaluating PHP.Term) <$> evaluateProject phpParser Language.PHP Nothing path
-evalPythonProject path = interpret @(JustEvaluating Python.Term) <$> evaluateProject pythonParser Language.Python pythonPrelude path
+evalPythonProject path = interpret @(PythonPackaging (EvaluatingWithHoles Python.Term)) <$> evaluatePythonProject pythonParser Language.Python pythonPrelude path
 evalTypeScriptProjectQuietly path = interpret @(EvaluatingWithHoles TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
 evalTypeScriptProject path = interpret @(JustEvaluating TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
 
@@ -79,6 +80,7 @@ pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Py
 
 -- Evaluate a project, starting at a single entrypoint.
 evaluateProject parser lang prelude path = evaluatePackage <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
+evaluatePythonProject parser lang prelude path = evaluatePackage <$> runTask (readProject Nothing path lang [] >>= parsePythonPackage parser prelude)
 
 evalRubyFile path = interpret @(JustEvaluating Ruby.Term) <$> evaluateFile rubyParser path
 evaluateFile parser path = evaluateModule <$> runTask (parseModule parser Nothing (file path))
