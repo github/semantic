@@ -5,9 +5,12 @@ module Control.Effect
 , Interpreter(..)
 , throwResumable
 , resume
+-- * Handlers
+, handleReader
 ) where
 
 import Control.Monad.Effect           as Effect
+import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Resumable as Resumable
 
 throwResumable :: (Member (Resumable exc) effects, Effectful m) => exc v -> m effects v
@@ -44,3 +47,10 @@ class Effectful m => Interpreter m effects | m -> effects where
 
 instance Interpreter Eff '[] where
   interpret = Effect.run
+
+
+-- Handlers
+
+-- | Run a 'Reader' effect in an 'Effectful' context.
+handleReader :: Effectful m => info -> m (Reader info ': effects) a -> m effects a
+handleReader = raiseHandler . flip runReader
