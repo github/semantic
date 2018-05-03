@@ -69,7 +69,13 @@ parseModules parser Project{..} = distributeFor (projectEntryPoints <> projectFi
 
 -- | Parse a list of packages from a python project.
 parsePythonPackage :: (Show ann
-                    , Apply Show1 syntax
+                   , Apply Analysis.Declarations1 syntax
+                   , Apply Analysis.Evaluatable syntax
+                   , Apply FreeVariables1 syntax
+                   , Apply Functor syntax
+                   , Apply Ord1 syntax
+                   , Apply Eq1 syntax
+                   , Apply Show1 syntax
                     , (Term (Union syntax) ann) ~ term
                     , Members '[Exc SomeException, Distribute WrappedTask, Files, Task] effs)
                    => Parser term       -- ^ A parser.
@@ -90,11 +96,17 @@ parsePythonPackage parser preludeFile project@Project{..} = do
     n = name (projectName project)
 
 extractStrategy :: ( Show ann
+                   , Apply Analysis.Declarations1 syntax
+                   , Apply Analysis.Evaluatable syntax
+                   , Apply FreeVariables1 syntax
+                   , Apply Functor syntax
+                   , Apply Ord1 syntax
+                   , Apply Eq1 syntax
                    , Apply Show1 syntax
                    , Members '[Exc SomeException, Task] effs
                    )
                 => Module (Term (Union syntax) ann) -> Eff effs Strategy
-extractStrategy setupModule = analyze (Analysis.evaluateModule setupModule `asAnalysisForTypeOfModule` setupModule) >>= extractResult
+extractStrategy setupModule = analyze (Analysis.evalModule setupModule `asAnalysisForTypeOfModule` setupModule) >>= extractResult
   where
     asAnalysisForTypeOfModule :: PythonAnalysis term effs (Value Precise)
                                -> Module term
