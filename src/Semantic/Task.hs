@@ -11,7 +11,10 @@ module Semantic.Task
 , IO.readBlobs
 , IO.readBlobPairs
 , IO.readProject
+, IO.findFiles
 , IO.writeToOutput
+-- * Module Resolution
+, nodeResolution
 -- * Telemetry
 , writeLog
 , writeStat
@@ -63,6 +66,7 @@ import           Parsing.TreeSitter
 import           Prologue hiding (MonadError (..))
 import           Semantic.Distribute
 import qualified Semantic.IO as IO
+import           Semantic.Resolution
 import           Semantic.Log
 import           Semantic.Queue
 import           Semantic.Stat as Stat
@@ -71,7 +75,7 @@ import           System.Exit (die)
 import           System.IO (stderr)
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
-type TaskEff = Eff '[Distribute WrappedTask, Task, IO.Files, Reader Options, Telemetry, Exc SomeException, IO]
+type TaskEff = Eff '[Distribute WrappedTask, Task, Resolution, IO.Files, Reader Options, Telemetry, Exc SomeException, IO]
 
 -- | A wrapper for a 'Task', to embed in other effects.
 newtype WrappedTask a = WrapTask { unwrapTask :: TaskEff a }

@@ -13,9 +13,10 @@ module Semantic.IO
 , NoLanguageForBlob(..)
 , FormatNotSupported(..)
 , readBlob
-, readProject
 , readBlobs
 , readBlobPairs
+, readProject
+, findFilesInDir
 , writeToOutput
 , Files
 , runFiles
@@ -98,15 +99,15 @@ readProjectFromPaths maybeRoot path lang excludeDirs = do
       then (id, [], fromMaybe path maybeRoot)
       else (filter (/= path), [toFile path], fromMaybe (takeDirectory path) maybeRoot)
 
-  paths <- liftIO $ filterFun <$> findFiles rootDir exts excludeDirs
+  paths <- liftIO $ filterFun <$> findFilesInDir rootDir exts excludeDirs
   pure $ Project rootDir (toFile <$> paths) lang entryPoints
   where
     toFile path = File path (Just lang)
     exts = extensionsForLanguage lang
 
 -- Recursively find files in a directory.
-findFiles :: forall m. MonadIO m => FilePath -> [String] -> [FilePath] -> m [FilePath]
-findFiles path exts excludeDirs = do
+findFilesInDir :: forall m. MonadIO m => FilePath -> [String] -> [FilePath] -> m [FilePath]
+findFilesInDir path exts excludeDirs = do
   _:/dir <- liftIO $ Tree.build path
   pure $ (onlyFiles . Tree.filterDir (withExtensions exts) . Tree.filterDir (notIn excludeDirs)) dir
   where
@@ -197,6 +198,9 @@ readBlobPairs = send . ReadBlobPairs
 readProject :: Member Files effs => Maybe FilePath -> FilePath -> Language -> [FilePath] -> Eff effs Project
 readProject rootDir dir excludeDirs = send . ReadProject rootDir dir excludeDirs
 
+findFiles :: Member Files effs => FilePath -> [String] -> [FilePath] -> Eff effs [FilePath]
+findFiles dir exts = send . FindFiles dir exts
+
 -- | A task which writes a 'B.ByteString' to a 'Handle' or a 'FilePath'.
 writeToOutput :: Member Files effs => Either Handle FilePath -> B.ByteString -> Eff effs ()
 writeToOutput path = send . WriteToOutput path
@@ -208,6 +212,7 @@ data Files out where
   ReadBlobs     :: Either Handle [File] -> Files [Blob.Blob]
   ReadBlobPairs :: Either Handle [Both File] -> Files [Blob.BlobPair]
   ReadProject   :: Maybe FilePath -> FilePath -> Language -> [FilePath] -> Files Project
+  FindFiles     :: FilePath -> [String] -> [FilePath] -> Files [FilePath]
   WriteToOutput :: Either Handle FilePath -> B.ByteString -> Files ()
 
 -- | Run a 'Files' effect in 'IO'.
@@ -219,6 +224,7 @@ runFiles = interpret $ \ files -> case files of
   ReadBlobs (Right paths) -> rethrowing (readBlobsFromPaths paths)
   ReadBlobPairs source -> rethrowing (either readBlobPairsFromHandle (traverse (runBothWith readFilePair)) source)
   ReadProject rootDir dir language excludeDirs -> rethrowing (readProjectFromPaths rootDir dir language excludeDirs)
+  FindFiles dir exts excludeDirs -> rethrowing (findFilesInDir dir exts excludeDirs)
   WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents)
 
 
