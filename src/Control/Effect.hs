@@ -50,6 +50,7 @@ instance Interpreter Eff '[] where
 
 -- Handlers
 
+-- | Raise a handler on 'Eff' to a handler on some 'Effectful' @m@.
 raiseHandler :: Effectful m => (Eff effectsA a -> Eff effectsB b) -> m effectsA a -> m effectsB b
 raiseHandler handler = raise . handler . lower
 
