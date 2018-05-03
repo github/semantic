@@ -309,7 +309,7 @@ evaluateClosureBody :: (Effectful m, Member (EvalClosure term value) effects) =>
 evaluateClosureBody = raise . Eff.send . EvalClosure
 
 handleClosuresWith :: Effectful m => (term -> m effects value) -> m (EvalClosure term value ': effects) a -> m effects a
-handleClosuresWith evalClosure = raiseHandler (relay pure (\ (EvalClosure term) yield -> lower (evalClosure term) >>= yield))
+handleClosuresWith evalClosure = raiseHandler (Eff.relay pure (\ (EvalClosure term) yield -> lower (evalClosure term) >>= yield))
 
 
 -- | An effect to evaluate a module.
@@ -320,7 +320,7 @@ evaluateModule :: (Effectful m, Member (EvalModule term value) effects) => Modul
 evaluateModule = raise . Eff.send . EvalModule
 
 handleModulesWith :: Effectful m => (Module term -> m effects value) -> m (EvalModule term value ': effects) a -> m effects a
-handleModulesWith evalModule = raiseHandler (relay pure (\ (EvalModule m) yield -> lower (evalModule m) >>= yield))
+handleModulesWith evalModule = raiseHandler (Eff.relay pure (\ (EvalModule m) yield -> lower (evalModule m) >>= yield))
 
 
 -- | An effect for explicitly returning out of a function/method body.
