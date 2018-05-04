@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , MonadEvaluatable
@@ -9,8 +9,8 @@ module Data.Abstract.Evaluatable
 , ResolutionError(..)
 , variable
 , evaluateInScopedEnv
-, evaluatePackage
-, evaluatePackageBody
+, evaluatePackageWith
+, evaluatePackageBodyWith
 , throwEvalError
 , resolve
 , traceResolve
@@ -20,8 +20,9 @@ module Data.Abstract.Evaluatable
 ) where
 
 import           Control.Abstract.Addressable as X
-import           Control.Abstract.Analysis as X hiding (LoopControl(..), Return(..))
-import           Control.Abstract.Analysis (LoopControl, Return(..))
+import           Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..))
+import           Control.Abstract.Evaluator (LoopControl, Return(..))
+import           Control.Abstract.Value as X
 import           Control.Monad.Effect as Eff
 import           Data.Abstract.Address
 import           Data.Abstract.Declarations as X
@@ -40,24 +41,30 @@ import           Data.Sum
 import           Data.Term
 import           Prologue
 
-type MonadEvaluatable location term value effects m =
-  ( Declarations term
+type MonadEvaluatable location term value effects =
+  ( AbstractValue location term value effects
+  , Addressable location effects
+  , Declarations term
   , FreeVariables term
-  , Member (EvalClosure term value) effects
-  , Member (EvalModule term value) effects
-  , Member (LoopControl value) effects
-  , Member (Reader ModuleInfo) effects
-  , Member (Reader (ModuleTable [Module term])) effects
-  , Member (Reader PackageInfo) effects
-  , Member (Resumable (Unspecialized value)) effects
-  , Member (Resumable (LoadError term)) effects
-  , Member (Resumable (EvalError value)) effects
-  , Member (Resumable (ResolutionError value)) effects
-  , Member (Resumable (AddressError location value)) effects
-  , Member (Return value) effects
-  , MonadAddressable location effects m
-  , MonadEvaluator location term value effects m
-  , MonadValue location value effects m
+  , Members '[ EvalClosure term value
+             , EvalModule term value
+             , LoopControl value
+             , Reader (Environment location value)
+             , Reader LoadStack
+             , Reader ModuleInfo
+             , Reader (ModuleTable [Module term])
+             , Reader PackageInfo
+             , Resumable (AddressError location value)
+             , Resumable (EvalError value)
+             , Resumable (LoadError term)
+             , Resumable (ResolutionError value)
+             , Resumable (Unspecialized value)
+             , Return value
+             , State (Environment location value)
+             , State (Exports location value)
+             , State (Heap location value)
+             , State (ModuleTable (Environment location value, value))
+             ] effects
   , Reducer value (Cell location value)
   )
 
@@ -104,23 +111,26 @@ data EvalError value resume where
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
 --   Throws an 'EnvironmentLookupError' if @scopedEnvTerm@ does not have an environment.
-evaluateInScopedEnv :: MonadEvaluatable location term value effects m
-                    => m effects value
-                    -> m effects value
-                    -> m effects value
+evaluateInScopedEnv :: MonadEvaluatable location term value effects
+                    => Evaluator location term value effects value
+                    -> Evaluator location term value effects value
+                    -> Evaluator location term value effects value
 evaluateInScopedEnv scopedEnvTerm term = do
   value <- scopedEnvTerm
   scopedEnv <- scopedEnvironment value
   maybe (throwEvalError (EnvironmentLookupError value)) (flip localEnv term . mergeEnvs) scopedEnv
 
 -- | Look up and dereference the given 'Name', throwing an exception for free variables.
-variable :: ( Member (Resumable (AddressError location value)) effects
-            , Member (Resumable (EvalError value)) effects
-            , MonadAddressable location effects m
-            , MonadEvaluator location term value effects m
+variable :: ( Addressable location effects
+            , Members '[ Reader (Environment location value)
+                       , Resumable (AddressError location value)
+                       , Resumable (EvalError value)
+                       , State (Environment location value)
+                       , State (Heap location value)
+                       ] effects
             )
          => Name
-         -> m effects value
+         -> Evaluator location term value effects value
 variable name = lookupWith deref name >>= maybeM (throwResumable (FreeVariableError name))
 
 deriving instance Eq a => Eq (EvalError a b)
@@ -139,7 +149,7 @@ instance Eq term => Eq1 (EvalError term) where
   liftEq _ _ _                                             = False
 
 
-throwEvalError :: (Member (Resumable (EvalError value)) effects, MonadEvaluator location term value effects m) => EvalError value resume -> m effects resume
+throwEvalError :: Member (Resumable (EvalError value)) effects => EvalError value resume -> Evaluator location term value effects resume
 throwEvalError = throwResumable
 
 
@@ -157,10 +167,10 @@ instance Show1 (Unspecialized a) where
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
   eval :: ( Member Fail effects
-          , MonadEvaluatable location term value effects m
+          , MonadEvaluatable location term value effects
           )
-       => SubtermAlgebra constr term (m effects value)
-  default eval :: (MonadEvaluatable location term value effects m, Show1 constr) => SubtermAlgebra constr term (m effects value)
+       => SubtermAlgebra constr term (Evaluator location term value effects value)
+  default eval :: (MonadEvaluatable location term value effects, Show1 constr) => SubtermAlgebra constr term (Evaluator location term value effects value)
   eval expr = throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 
@@ -184,16 +194,14 @@ instance Evaluatable [] where
   eval = maybe unit (runApp . foldMap1 (App . subtermValue)) . nonEmpty
 
 -- | Retrieve the table of unevaluated modules.
-askModuleTable :: ( Member (Reader (ModuleTable [Module term])) effects
-                  , MonadEvaluator location term value effects m
-                  )
-               => m effects (ModuleTable [Module term])
+askModuleTable :: Member (Reader (ModuleTable [Module term])) effects
+               => Evaluator location term value effects (ModuleTable [Module term])
 askModuleTable = raise ask
 
 -- Resolve a list of module paths to a possible module table entry.
-resolve :: MonadEvaluatable location term value effects m
+resolve :: MonadEvaluatable location term value effects
         => [FilePath]
-        -> m effects (Maybe ModulePath)
+        -> Evaluator location term value effects (Maybe ModulePath)
 resolve names = do
   tbl <- askModuleTable
   pure $ find (`ModuleTable.member` tbl) names
@@ -201,51 +209,63 @@ resolve names = do
 traceResolve :: (Show a, Show b) => a -> b -> c -> c
 traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 
-listModulesInDir :: MonadEvaluatable location term value effects m
+listModulesInDir :: MonadEvaluatable location term value effects
         => FilePath
-        -> m effects [ModulePath]
+        -> Evaluator location term value effects [ModulePath]
 listModulesInDir dir = ModuleTable.modulePathsInDir dir <$> askModuleTable
 
 -- | Require/import another module by name and return it's environment and value.
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
-require :: ( Member (EvalModule term value) effects
-           , Member (Reader (ModuleTable [Module term])) effects
-           , Member (Resumable (LoadError term)) effects
-           , MonadEvaluator location term value effects m
-           )
+require :: Members '[ EvalModule term value
+                    , Reader (ModuleTable [Module term])
+                    , Reader LoadStack
+                    , Resumable (LoadError term)
+                    , State (Environment location value)
+                    , State (Exports location value)
+                    , State (ModuleTable (Environment location value, value))
+                    ] effects
         => ModulePath
-        -> m effects (Maybe (Environment location value, value))
+        -> Evaluator location term value effects (Maybe (Environment location value, value))
 require = requireWith evaluateModule
 
-requireWith :: ( Member (Reader (ModuleTable [Module term])) effects
-               , Member (Resumable (LoadError term)) effects
-               , MonadEvaluator location term value effects m
-               )
-            => (Module term -> m effects value)
+requireWith :: Members '[ Reader (ModuleTable [Module term])
+                        , Reader LoadStack
+                        , Resumable (LoadError term)
+                        , State (Environment location value)
+                        , State (Exports location value)
+                        , State (ModuleTable (Environment location value, value))
+                        ] effects
+            => (Module term -> Evaluator location term value effects value)
             -> ModulePath
-            -> m effects (Maybe (Environment location value, value))
+            -> Evaluator location term value effects (Maybe (Environment location value, value))
 requireWith with name = getModuleTable >>= maybeM (loadWith with name) . fmap Just . ModuleTable.lookup name
 
 -- | Load another module by name and return it's environment and value.
 --
 -- Always loads/evaluates.
-load :: ( Member (EvalModule term value) effects
-        , Member (Reader (ModuleTable [Module term])) effects
-        , Member (Resumable (LoadError term)) effects
-        , MonadEvaluator location term value effects m
-        )
+load :: Members '[ EvalModule term value
+                 , Reader (ModuleTable [Module term])
+                 , Reader LoadStack
+                 , Resumable (LoadError term)
+                 , State (Environment location value)
+                 , State (Exports location value)
+                 , State (ModuleTable (Environment location value, value))
+                 ] effects
      => ModulePath
-     -> m effects (Maybe (Environment location value, value))
+     -> Evaluator location term value effects (Maybe (Environment location value, value))
 load = loadWith evaluateModule
 
-loadWith :: ( Member (Reader (ModuleTable [Module term])) effects
-            , Member (Resumable (LoadError term)) effects
-            , MonadEvaluator location term value effects m
-            )
-         => (Module term -> m effects value)
+loadWith :: Members '[ Reader (ModuleTable [Module term])
+                     , Reader LoadStack
+                     , Resumable (LoadError term)
+                     , State (Environment location value)
+                     , State (Exports location value)
+                     , State (ModuleTable (Environment location value, value))
+                     ] effects
+         => (Module term -> Evaluator location term value effects value)
          -> ModulePath
-         -> m effects (Maybe (Environment location value, value))
+         -> Evaluator location term value effects (Maybe (Environment location value, value))
 loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= runMerging . foldMap (Merging . evalAndCache)
   where
     notFound = throwResumable (LoadError name)
@@ -281,112 +301,125 @@ instance Applicative m => Monoid (Merging m location value) where
   mappend = (<>)
   mempty = Merging (pure Nothing)
 
-evalModule :: forall location term value inner outer m
-           .  ( AnalyzeModule location term value inner (EvalModule term value ': outer) m
-              , Member (EvalClosure term value) outer
-              )
-           => Module term
-           -> m outer value
-evalModule
-  = evaluatingModules
-  . analyzeModule (subtermValue . moduleBody)
+evalModuleWith :: Member (EvalClosure term value) packageEffects
+               => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value (EvalModule term value ': packageEffects) value))
+               -> Module term
+               -> Evaluator location term value packageEffects value
+evalModuleWith perModule
+  = evaluatingModulesWith perModule
+  . perModule (subtermValue . moduleBody)
   . fmap (Subterm <*> evaluateClosureBody)
 
-evaluatingModules :: forall location term value inner outer m a
-                  .  ( AnalyzeModule location term value inner (EvalModule term value ': outer) m
-                     , Member (EvalClosure term value) outer
-                     )
-                  => m (EvalModule term value ': outer) a
-                  -> m outer a
-evaluatingModules = raiseHandler (relay pure (\ (EvalModule m) yield -> lower @m (evalModule m) >>= yield))
+evaluatingModulesWith :: Member (EvalClosure term value) packageEffects
+                      => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value (EvalModule term value ': packageEffects) value))
+                      -> Evaluator location term value (EvalModule term value ': packageEffects) a
+                      -> Evaluator location term value packageEffects a
+evaluatingModulesWith perModule = raiseHandler (relay pure (\ (EvalModule m) yield -> lower (evalModuleWith perModule m) >>= yield))
 
-evalTerm :: forall location term value inner outer m
-           .  ( AnalyzeTerm location term value inner (EvalClosure term value ': outer) m
-              , Evaluatable (Base term)
-              , Member Fail inner
-              , MonadEvaluatable location term value inner m
-              , Recursive term
-              )
-           => term
-           -> m outer value
-evalTerm
-  = evaluatingClosures
-  . foldSubterms (analyzeTerm eval)
+evalTermWith :: ( Evaluatable (Base term)
+                , Member Fail termEffects
+                , MonadEvaluatable location term value termEffects
+                , Recursive term
+                )
+             => (SubtermAlgebra (Base term) term (Evaluator location term value termEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value (EvalClosure term value ': moduleEffects) value))
+             -> term
+             -> Evaluator location term value moduleEffects value
+evalTermWith perTerm
+  = evaluatingClosuresWith perTerm
+  . foldSubterms (perTerm eval)
 
-evaluatingClosures :: forall location term value inner outer m a
-                   .  ( AnalyzeTerm location term value inner (EvalClosure term value ': outer) m
-                      , Evaluatable (Base term)
-                      , Member Fail inner
-                      , MonadEvaluatable location term value inner m
-                      , Recursive term
-                      )
-                   => m (EvalClosure term value ': outer) a
-                   -> m outer a
-evaluatingClosures = raiseHandler (relay pure (\ (EvalClosure m) yield -> lower @m (evalTerm m) >>= yield))
+evaluatingClosuresWith :: ( Evaluatable (Base term)
+                          , Member Fail termEffects
+                          , MonadEvaluatable location term value termEffects
+                          , Recursive term
+                          )
+                       => (SubtermAlgebra (Base term) term (Evaluator location term value termEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value (EvalClosure term value ': moduleEffects) value))
+                       -> Evaluator location term value (EvalClosure term value ': moduleEffects) a
+                       -> Evaluator location term value moduleEffects a
+evaluatingClosuresWith perTerm = raiseHandler (relay pure (\ (EvalClosure m) yield -> lower (evalTermWith perTerm m) >>= yield))
 
 -- | Evaluate a given package.
-evaluatePackage :: ( AnalyzeModule location term value inner (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': Reader PackageInfo ': outer) m
-                   , AnalyzeTerm location term value inner (EvalClosure term value ': Reader (ModuleTable [Module term]) ': Reader PackageInfo ': outer) m
-                   , Evaluatable (Base term)
-                   , Member Fail inner
-                   , Member (Resumable (AddressError location value)) outer
-                   , Member (Resumable (EvalError value)) outer
-                   , Member (Resumable (LoadError term)) outer
-                   , MonadAddressable location (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': Reader PackageInfo ': outer) m
-                   , MonadEvaluatable location term value inner m
-                   , MonadEvaluator location term value (Reader PackageInfo ': outer) m
-                   , MonadValue location value (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': Reader PackageInfo ': outer) m
-                   , Recursive term
-                   )
-                => Package term
-                -> m outer [value]
-evaluatePackage = handleReader . packageInfo <*> evaluatePackageBody . packageBody
-
--- | Evaluate a given package body (module table and entry points).
-evaluatePackageBody :: ( AnalyzeModule location term value inner (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': outer) m
-                       , AnalyzeTerm location term value inner (EvalClosure term value ': Reader (ModuleTable [Module term]) ': outer) m
+evaluatePackageWith :: ( AbstractValue location term value (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': Reader PackageInfo ': effects)
+                       , Addressable location (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': Reader PackageInfo ': effects)
                        , Evaluatable (Base term)
-                       , Member Fail inner
-                       , Member (Resumable (AddressError location value)) outer
-                       , Member (Resumable (EvalError value)) outer
-                       , Member (Resumable (LoadError term)) outer
-                       , MonadAddressable location (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': outer) m
-                       , MonadEvaluatable location term value inner m
-                       , MonadEvaluator location term value outer m
-                       , MonadValue location value (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': outer) m
+                       , Member Fail termEffects
+                       , Members '[ Reader (Environment location value)
+                                  , Reader LoadStack
+                                  , Resumable (AddressError location value)
+                                  , Resumable (EvalError value)
+                                  , Resumable (LoadError term)
+                                  , State (Environment location value)
+                                  , State (Exports location value)
+                                  , State (Heap location value)
+                                  , State (ModuleTable (Environment location value, value))
+                                  ] effects
+                       , MonadEvaluatable location term value termEffects
                        , Recursive term
                        )
-                    => PackageBody term
-                    -> m outer [value]
-evaluatePackageBody body
+                    => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': Reader PackageInfo ': effects) value))
+                    -> (SubtermAlgebra (Base term) term (Evaluator location term value termEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value (EvalClosure term value ': Reader (ModuleTable [Module term]) ': Reader PackageInfo ': effects) value))
+                    -> Package term
+                    -> Evaluator location term value effects [value]
+evaluatePackageWith perModule perTerm = handleReader . packageInfo <*> evaluatePackageBodyWith perModule perTerm . packageBody
+
+-- | Evaluate a given package body (module table and entry points).
+evaluatePackageBodyWith :: ( AbstractValue location term value (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': effects)
+                           , Addressable location (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': effects)
+                           , Evaluatable (Base term)
+                           , Member Fail termEffects
+                           , Members '[ Reader (Environment location value)
+                                      , Reader LoadStack
+                                      , Resumable (AddressError location value)
+                                      , Resumable (EvalError value)
+                                      , Resumable (LoadError term)
+                                      , State (Environment location value)
+                                      , State (Exports location value)
+                                      , State (Heap location value)
+                                      , State (ModuleTable (Environment location value, value))
+                                      ] effects
+                           , MonadEvaluatable location term value termEffects
+                           , Recursive term
+                           )
+                        => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': effects) value))
+                        -> (SubtermAlgebra (Base term) term (Evaluator location term value termEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value (EvalClosure term value ': Reader (ModuleTable [Module term]) ': effects) value))
+                        -> PackageBody term
+                        -> Evaluator location term value effects [value]
+evaluatePackageBodyWith perModule perTerm body
   = handleReader (packageModules body)
-  . evaluatingClosures
-  . evaluatingModules
+  . evaluatingClosuresWith perTerm
+  . evaluatingModulesWith perModule
   . withPrelude (packagePrelude body)
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
 
-evaluateEntryPoint :: ( Member (EvalModule term value) effects
-                      , Member (Reader (ModuleTable [Module term])) effects
-                      , Member (Resumable (AddressError location value)) effects
-                      , Member (Resumable (EvalError value)) effects
-                      , Member (Resumable (LoadError term)) effects
-                      , MonadAddressable location effects m
-                      , MonadEvaluator location term value effects m
-                      , MonadValue location value effects m
+evaluateEntryPoint :: ( AbstractValue location term value effects
+                      , Addressable location effects
+                      , Members '[ EvalModule term value
+                                 , Reader (Environment location value)
+                                 , Reader LoadStack
+                                 , Reader (ModuleTable [Module term])
+                                 , Resumable (AddressError location value)
+                                 , Resumable (EvalError value)
+                                 , Resumable (LoadError term)
+                                 , State (Environment location value)
+                                 , State (Exports location value)
+                                 , State (Heap location value)
+                                 , State (ModuleTable (Environment location value, value))
+                                 ] effects
                       )
                    => ModulePath
                    -> Maybe Name
-                   -> m effects value
+                   -> Evaluator location term value effects value
 evaluateEntryPoint m sym = do
   v <- maybe unit (pure . snd) <$> require m
   maybe v ((`call` []) <=< variable) sym
 
-withPrelude :: ( Member (EvalModule term value) effects
-               , MonadEvaluator location term value effects m
-               )
+withPrelude :: Members '[ EvalModule term value
+                        , Reader (Environment location value)
+                        , State (Environment location value)
+                        ] effects
             => Maybe (Module term)
-            -> m effects a
-            -> m effects a
+            -> Evaluator location term value effects a
+            -> Evaluator location term value effects a
 withPrelude Nothing a = a
 withPrelude (Just prelude) a = do
   preludeEnv <- evaluateModule prelude *> getEnv

@@ -35,17 +35,17 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
-resolvePHPName :: forall value location term effects m. MonadEvaluatable location term value effects m => ByteString -> m effects ModulePath
+resolvePHPName :: forall value location term effects. MonadEvaluatable location term value effects => ByteString -> Evaluator location term value effects ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]
   maybe (throwResumable @(ResolutionError value) $ NotFoundError name [name] Language.PHP) pure modulePath
   where name = toName n
         toName = BC.unpack . dropRelativePrefix . stripQuotes
 
-include :: MonadEvaluatable location term value effects m
-        => Subterm t (m effects value)
-        -> (ModulePath -> m effects (Maybe (Environment location value, value)))
-        -> m effects value
+include :: MonadEvaluatable location term value effects
+        => Subterm term (Evaluator location term value effects value)
+        -> (ModulePath -> Evaluator location term value effects (Maybe (Environment location value, value)))
+        -> Evaluator location term value effects value
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
