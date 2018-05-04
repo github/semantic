@@ -35,10 +35,10 @@ deriving instance (Show (Cell location value), Show location, Show term, Show va
 type EvaluatingEffects location term value
   = '[ Return value
      , LoopControl value
-     , Fail                                        -- Failure with an error message
-     , Fresh                                       -- For allocating new addresses and/or type variables.
-     , Reader (SomeOrigin term)                    -- The current term’s origin.
-     , Reader (Environment location value)         -- Default environment used as a fallback in lookupEnv
+     , Fail                                -- Failure with an error message
+     , Fresh                               -- For allocating new addresses and/or type variables.
+     , Reader (SomeOrigin term)            -- The current term’s origin.
+     , Reader (Environment location value) -- Default environment used as a fallback in lookupEnv
      , Reader LoadStack
      , State (Environment location value)
      , State (Heap location value)
