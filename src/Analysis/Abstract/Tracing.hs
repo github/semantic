@@ -1,5 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s Evaluator constraint
+{-# LANGUAGE TypeOperators #-}
 module Analysis.Abstract.Tracing
 ( tracingTerms
 , tracing
@@ -21,7 +20,6 @@ tracingTerms :: ( Corecursive term
                            , State (Heap location value)
                            , Writer (trace (Configuration location term value))
                            ] effects
-                , Ord location
                 , Reducer (Configuration location term value) (trace (Configuration location term value))
                 )
              => trace (Configuration location term value)
