@@ -12,8 +12,9 @@ import Prologue
 newtype BadVariables m (effects :: [* -> *]) a = BadVariables { runBadVariables :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
-deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadVariables m)
 deriving instance Evaluator location term value m => Evaluator location term value (BadVariables m)
+deriving instance AnalyzeModule location term value inner outer m => AnalyzeModule location term value inner outer (BadVariables m)
+deriving instance AnalyzeTerm location term value inner outer m => AnalyzeTerm location term value inner outer (BadVariables m)
 
 instance ( AbstractHole value
          , Evaluator location term value m

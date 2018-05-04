@@ -18,22 +18,23 @@ newtype Tracing (trace :: * -> *) m (effects :: [* -> *]) a = Tracing { runTraci
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance Evaluator location term value m => Evaluator location term value (Tracing trace m)
+deriving instance AnalyzeModule location term value inner outer m => AnalyzeModule location term value inner outer (Tracing trace m)
 
 instance ( Corecursive term
          , Effectful m
-         , Member (Reader (Live location value)) effects
-         , Member (Writer (trace (Configuration location term value))) effects
-         , MonadAnalysis location term value effects m
+         , Member (Reader (Live location value)) effectsOut
+         , Member (Writer (trace (Configuration location term value))) effectsOut
+         , AnalyzeTerm location term value effectsIn effectsOut m
+         , Evaluator location term value m
+         , MonadEvaluator location term value effectsOut m
          , Ord location
          , Reducer (Configuration location term value) (trace (Configuration location term value))
          )
-      => MonadAnalysis location term value effects (Tracing trace m) where
+      => AnalyzeTerm location term value effectsIn effectsOut (Tracing trace m) where
   analyzeTerm recur term = do
     config <- getConfiguration (embedSubterm term)
     raise (tell @(trace (Configuration location term value)) (Reducer.unit config))
-    liftAnalyze analyzeTerm recur term
-
-  analyzeModule = liftAnalyze analyzeModule
+    Tracing (analyzeTerm (runTracing . recur) term)
 
 instance ( Evaluator location term value m
          , Interpreter m effects

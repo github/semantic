@@ -281,128 +281,113 @@ instance Applicative m => Monoid (Merging m location value) where
   mappend = (<>)
   mempty = Merging (pure Nothing)
 
-type ModuleEffects term value effects = Reader ModuleInfo ': EvalModule term value ': effects
+evalModule :: forall location term value inner outer m
+           .  ( AnalyzeModule location term value inner (EvalModule term value ': outer) m
+              , Member (EvalClosure term value) outer
+              )
+           => Module term
+           -> m outer value
+evalModule
+  = evaluatingModules
+  . analyzeModule (subtermValue . moduleBody)
+  . fmap (Subterm <*> evaluateClosureBody)
 
--- | Evaluate a (root-level) term to a value using the semantics of the current analysis.
-evalModule :: forall location term value effects m inner
-           .  ( inner ~ ModuleEffects term value effects
+evaluatingModules :: forall location term value inner outer m a
+                  .  ( AnalyzeModule location term value inner (EvalModule term value ': outer) m
+                     , Member (EvalClosure term value) outer
+                     )
+                  => m (EvalModule term value ': outer) a
+                  -> m outer a
+evaluatingModules = raiseHandler (relay pure (\ (EvalModule m) yield -> lower @m (evalModule m) >>= yield))
+
+evalTerm :: forall location term value inner outer m
+           .  ( AnalyzeTerm location term value inner (EvalClosure term value ': outer) m
               , Evaluatable (Base term)
-              , Member Fail effects
-              , Member (Reader PackageInfo) effects
-              , MonadAnalysis location term value inner m
+              , Member Fail inner
               , MonadEvaluatable location term value inner m
               , Recursive term
               )
-           => Module term
-           -> m effects value
-evalModule m
-  = evaluatingModulesWith evalModule
-  . withReader (moduleInfo m)
-  . localLoadStack (loadStackPush (moduleInfo m))
-  $ analyzeModule (subtermValue . moduleBody) (fmap (Subterm <*> evalTerm) m)
-
-evalTerm :: forall location term value effects m
-         .  ( Evaluatable (Base term)
-            , Member (EvalModule term value) effects
-            , Member Fail effects
-            , Member (Reader ModuleInfo) effects
-            , Member (Reader PackageInfo) effects
-            , MonadAnalysis location term value effects m
-            , MonadEvaluatable location term value effects m
-            , Recursive term
-            )
-         => term
-         -> m effects value
+           => term
+           -> m outer value
 evalTerm
-  = handleReturn @m @value (\ (Return value) -> pure value)
-  . raiseHandler (interpose @(EvalClosure term value) pure (\ (EvalClosure term) yield -> lower @m (evalTerm term) >>= yield))
+  = evaluatingClosures
   . foldSubterms (analyzeTerm eval)
 
-
-evaluatingModulesWith :: Effectful m => (Module term -> m effects value) -> m (EvalModule term value ': effects) a -> m effects a
-evaluatingModulesWith evalModule = raiseHandler (relay pure (\ (EvalModule m) yield -> lower (evalModule m) >>= yield))
-
-withReader :: Effectful m => info -> m (Reader info ': effects) a -> m effects a
-withReader = raiseHandler . flip runReader
+evaluatingClosures :: forall location term value inner outer m a
+                   .  ( AnalyzeTerm location term value inner (EvalClosure term value ': outer) m
+                      , Evaluatable (Base term)
+                      , Member Fail inner
+                      , MonadEvaluatable location term value inner m
+                      , Recursive term
+                      )
+                   => m (EvalClosure term value ': outer) a
+                   -> m outer a
+evaluatingClosures = raiseHandler (relay pure (\ (EvalClosure m) yield -> lower @m (evalTerm m) >>= yield))
 
 -- | Evaluate a given package.
-evaluatePackage :: ( moduleEffects ~ ModuleEffects term value packageEffects
-                   , packageEffects ~ (Reader (ModuleTable [Module term]) ': Reader PackageInfo ': effects)
+evaluatePackage :: ( AnalyzeModule location term value inner (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': Reader PackageInfo ': outer) m
+                   , AnalyzeTerm location term value inner (EvalClosure term value ': Reader (ModuleTable [Module term]) ': Reader PackageInfo ': outer) m
                    , Evaluatable (Base term)
-                   , Member Fail effects
-                   , Member (Resumable (AddressError location value)) effects
-                   , Member (Resumable (EvalError value)) effects
-                   , Member (Resumable (LoadError term)) effects
-                   , MonadAddressable location packageEffects m
-                   , MonadAnalysis location term value moduleEffects m
-                   , MonadEvaluatable location term value moduleEffects m
-                   , MonadEvaluator location term value packageEffects m
-                   , MonadValue location value packageEffects m
+                   , Member Fail inner
+                   , Member (Resumable (AddressError location value)) outer
+                   , Member (Resumable (EvalError value)) outer
+                   , Member (Resumable (LoadError term)) outer
+                   , MonadAddressable location (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': Reader PackageInfo ': outer) m
+                   , MonadEvaluatable location term value inner m
+                   , MonadEvaluator location term value (Reader PackageInfo ': outer) m
+                   , MonadValue location value (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': Reader PackageInfo ': outer) m
                    , Recursive term
                    )
                 => Package term
-                -> m effects [value]
-evaluatePackage p = withReader (packageInfo p) (evaluatePackageBody (packageBody p))
+                -> m outer [value]
+evaluatePackage = handleReader . packageInfo <*> evaluatePackageBody . packageBody
 
 -- | Evaluate a given package body (module table and entry points).
-evaluatePackageBody :: ( moduleEffects ~ ModuleEffects term value packageEffects
-                       , packageEffects ~ (Reader (ModuleTable [Module term]) ': effects)
+evaluatePackageBody :: ( AnalyzeModule location term value inner (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': outer) m
+                       , AnalyzeTerm location term value inner (EvalClosure term value ': Reader (ModuleTable [Module term]) ': outer) m
                        , Evaluatable (Base term)
-                       , Member Fail effects
-                       , Member (Reader PackageInfo) effects
-                       , Member (Resumable (AddressError location value)) effects
-                       , Member (Resumable (EvalError value)) effects
-                       , Member (Resumable (LoadError term)) effects
-                       , MonadAddressable location packageEffects m
-                       , MonadAnalysis location term value moduleEffects m
-                       , MonadEvaluatable location term value moduleEffects m
-                       , MonadEvaluator location term value packageEffects m
-                       , MonadValue location value packageEffects m
+                       , Member Fail inner
+                       , Member (Resumable (AddressError location value)) outer
+                       , Member (Resumable (EvalError value)) outer
+                       , Member (Resumable (LoadError term)) outer
+                       , MonadAddressable location (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': outer) m
+                       , MonadEvaluatable location term value inner m
+                       , MonadEvaluator location term value outer m
+                       , MonadValue location value (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': outer) m
                        , Recursive term
                        )
                     => PackageBody term
-                    -> m effects [value]
+                    -> m outer [value]
 evaluatePackageBody body
-  = withReader (packageModules body)
+  = handleReader (packageModules body)
+  . evaluatingClosures
+  . evaluatingModules
   . withPrelude (packagePrelude body)
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
 
-evaluateEntryPoint :: ( inner ~ ModuleEffects term value effects
-                      , Evaluatable (Base term)
+evaluateEntryPoint :: ( Member (EvalModule term value) effects
                       , Member (Reader (ModuleTable [Module term])) effects
                       , Member (Resumable (AddressError location value)) effects
                       , Member (Resumable (EvalError value)) effects
                       , Member (Resumable (LoadError term)) effects
-                      , Member Fail effects
-                      , Member (Reader PackageInfo) effects
                       , MonadAddressable location effects m
-                      , MonadAnalysis location term value inner m
-                      , MonadEvaluatable location term value inner m
                       , MonadEvaluator location term value effects m
                       , MonadValue location value effects m
-                      , Recursive term
                       )
                    => ModulePath
                    -> Maybe Name
                    -> m effects value
 evaluateEntryPoint m sym = do
-  v <- maybe unit (pure . snd) <$> requireWith evalModule m
+  v <- maybe unit (pure . snd) <$> require m
   maybe v ((`call` []) <=< variable) sym
 
-withPrelude :: forall location term value effects m a inner
-            .  ( inner ~ ModuleEffects term value effects
-               , Evaluatable (Base term)
-               , Member Fail effects
-               , Member (Reader PackageInfo) effects
-               , MonadAnalysis location term value inner m
-               , MonadEvaluatable location term value inner m
+withPrelude :: ( Member (EvalModule term value) effects
                , MonadEvaluator location term value effects m
-               , Recursive term
                )
             => Maybe (Module term)
             -> m effects a
             -> m effects a
 withPrelude Nothing a = a
 withPrelude (Just prelude) a = do
-  preludeEnv <- evalModule @location @term @value prelude *> getEnv
+  preludeEnv <- evaluateModule prelude *> getEnv
   withDefaultEnvironment preludeEnv a

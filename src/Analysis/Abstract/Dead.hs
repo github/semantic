@@ -38,19 +38,28 @@ subterms term = term `cons` para (foldMap (uncurry cons)) term
 instance ( Corecursive term
          , Effectful m
          , Foldable (Base term)
-         , Member (State (Dead term)) effects
-         , MonadAnalysis location term value effects m
+         , Member (State (Dead term)) outer
+         , AnalyzeTerm location term value inner outer m
          , Ord term
          , Recursive term
          )
-      => MonadAnalysis location term value effects (DeadCode m) where
+      => AnalyzeTerm location term value inner outer (DeadCode m) where
   analyzeTerm recur term = do
     revive (embedSubterm term)
-    liftAnalyze analyzeTerm recur term
+    DeadCode (analyzeTerm (runDeadCode . recur) term)
 
+instance ( Corecursive term
+         , Effectful m
+         , Foldable (Base term)
+         , Member (State (Dead term)) outer
+         , AnalyzeModule location term value inner outer m
+         , Ord term
+         , Recursive term
+         )
+      => AnalyzeModule location term value inner outer (DeadCode m) where
   analyzeModule recur m = do
     killAll (subterms (subterm (moduleBody m)))
-    liftAnalyze analyzeModule recur m
+    DeadCode (analyzeModule (runDeadCode . recur) m)
 
 instance ( Evaluator location term value m
          , Interpreter m effects

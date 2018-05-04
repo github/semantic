@@ -48,23 +48,20 @@ putCache = raise . put
 isolateCache :: forall location term value m effects a . (Applicative (m effects), Effectful m, Member (State (Cache location term value)) effects) => m effects a -> m effects (Cache location term value)
 isolateCache action = putCache @m @location @term @value lowerBound *> action *> raise get
 
-
--- | This instance coinductively iterates the analysis of a term until the results converge.
-instance ( Alternative (m effects)
+instance ( Alternative (m outer)
+         , AnalyzeTerm location term value inner outer m
+         , Cacheable location term value
          , Corecursive term
          , Effectful m
-         , Member Fresh effects
-         , Member NonDet effects
-         , Member (Reader (Cache location term value)) effects
-         , Member (Reader (Live location value)) effects
-         , Member (State  (Cache location term value)) effects
-         , MonadAnalysis location term value effects m
-         , Ord (Cell location value)
-         , Ord location
-         , Ord term
-         , Ord value
+         , Member Fresh outer
+         , Member NonDet outer
+         , Member (Reader (Cache location term value)) outer
+         , Member (Reader (Live location value)) outer
+         , Member (State (Cache location term value)) outer
+         , Member (State (Environment location value)) outer
+         , Member (State (Heap location value)) outer
          )
-      => MonadAnalysis location term value effects (Caching m) where
+      => AnalyzeTerm location term value inner outer (Caching m) where
   -- Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
   analyzeTerm recur e = do
     c <- getConfiguration (embedSubterm e)
@@ -73,8 +70,22 @@ instance ( Alternative (m effects)
       Just pairs -> scatter pairs
       Nothing -> do
         pairs <- consultOracle c
-        caching c pairs (liftAnalyze analyzeTerm recur e)
+        caching c pairs (Caching (analyzeTerm (runCaching . recur) e))
 
+instance ( Alternative (m outer)
+         , AnalyzeModule location term value inner outer m
+         , Cacheable location term value
+         , Corecursive term
+         , Effectful m
+         , Member Fresh outer
+         , Member NonDet outer
+         , Member (Reader (Cache location term value)) outer
+         , Member (Reader (Live location value)) outer
+         , Member (State (Cache location term value)) outer
+         , Member (State (Environment location value)) outer
+         , Member (State (Heap location value)) outer
+         )
+      => AnalyzeModule location term value inner outer (Caching m) where
   analyzeModule recur m = do
     c <- getConfiguration (subterm (moduleBody m))
     -- Convergence here is predicated upon an Eq instance, not α-equivalence
@@ -87,8 +98,9 @@ instance ( Alternative (m effects)
       -- that it doesn't "leak" to the calling context and diverge (otherwise this
       -- would never complete). We don’t need to use the values, so we 'gather' the
       -- nondeterministic values into @()@.
-        withOracle prevCache (raiseHandler (gather (const ())) (liftAnalyze analyzeModule recur m))) mempty
+        withOracle prevCache (raiseHandler  (gather (const ())) (Caching (analyzeModule (runCaching . recur) m)))) mempty
     maybe empty scatter (cacheLookup c cache)
+
 
 reset :: (Effectful m, Member Fresh effects) => Int -> m effects a -> m effects a
 reset start = raiseHandler (interposeState start (const pure) (\ counter Fresh yield -> (yield $! succ counter) counter))

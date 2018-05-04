@@ -58,16 +58,18 @@ newtype ImportGraphing m (effects :: [* -> *]) a = ImportGraphing { runImportGra
 
 deriving instance Evaluator location term value m => Evaluator location term value (ImportGraphing m)
 
-
-instance ( Effectful m
-         , Member (Resumable (LoadError term)) effects
-         , Member (State ImportGraph) effects
+instance ( Member (Reader (Environment (Located location term) value)) outer
+         , Member (Reader (SomeOrigin term)) outer
+         , Member (Resumable (LoadError term)) outer
+         , Member (State (Environment (Located location term) value)) outer
+         , Member (State ImportGraph) outer
          , Element Syntax.Identifier syntax
-         , MonadAnalysis (Located location term) term value effects m
+         , Evaluator (Located location term) term value m
+         , AnalyzeTerm (Located location term) term value inner outer m
          , term ~ Term (Sum syntax) ann
          )
-      => MonadAnalysis (Located location term) term value effects (ImportGraphing m) where
-  analyzeTerm eval term@(In _ syntax) = do
+      => AnalyzeTerm (Located location term) term value inner outer (ImportGraphing m) where
+  analyzeTerm recur term@(In _ syntax) = do
     case projectSum syntax of
       Just (Syntax.Identifier name) -> do
         moduleInclusion (Variable (unName name))
@@ -75,14 +77,22 @@ instance ( Effectful m
       _ -> pure ()
     resume
       @(LoadError term)
-      (liftAnalyze analyzeTerm eval term)
-      (\yield (LoadError name) -> moduleInclusion (Module (BC.pack name)) >> yield [])
+      (ImportGraphing (analyzeTerm (runImportGraphing . recur) term))
+      (\yield (LoadError name) -> moduleInclusion (Module (BC.pack name)) *> yield [])
 
+instance ( Member (Reader (SomeOrigin term)) outer
+         , Member (State ImportGraph) outer
+         , Evaluator (Located location term) term value m
+         , AnalyzeModule (Located location term) term value inner outer m
+         , term ~ Term (Sum syntax) ann
+         )
+      => AnalyzeModule (Located location term) term value inner outer (ImportGraphing m) where
   analyzeModule recur m = do
     let name = BC.pack (modulePath (moduleInfo m))
     packageInclusion (Module name)
     moduleInclusion (Module name)
-    liftAnalyze analyzeModule recur m
+    ImportGraphing (analyzeModule (runImportGraphing . recur) m)
+
 
 packageGraph :: SomeOrigin term -> ImportGraph
 packageGraph = maybe empty (vertex . Package . unName . packageName) . withSomeOrigin originPackage
@@ -176,4 +186,4 @@ vertexToType Variable{} = "variable"
 instance Interpreter m effects
       => Interpreter (ImportGraphing m) (State ImportGraph ': effects) where
   type Result (ImportGraphing m) (State ImportGraph ': effects) result = Result m effects (result, ImportGraph)
-  interpret = interpret . runImportGraphing . raiseHandler (`runState` mempty)
+  interpret = interpret . runImportGraphing . handleState mempty

@@ -9,6 +9,7 @@ import Control.Abstract.Analysis
 import Data.Abstract.Address
 import Data.Abstract.Heap
 import Data.Abstract.Live
+import Data.Semilattice.Lower
 import Prologue
 
 -- | An analysis performing GC after every instruction.
@@ -16,24 +17,22 @@ newtype Collecting m (effects :: [* -> *]) a = Collecting { runCollecting :: m e
   deriving (Alternative, Applicative, Effectful, Functor, Monad)
 
 deriving instance Evaluator location term value m => Evaluator location term value (Collecting m)
-
+deriving instance AnalyzeModule location term value inner outer m => AnalyzeModule location term value inner outer (Collecting m)
 
 instance ( Effectful m
          , Foldable (Cell location)
-         , Member (Reader (Live location value)) effects
-         , MonadAnalysis location term value effects m
+         , Member (Reader (Live location value)) outer
+         , Member (State (Heap location value)) outer
+         , AnalyzeTerm location term value inner outer m
          , Ord location
          , ValueRoots location value
          )
-      => MonadAnalysis location term value effects (Collecting m) where
-  -- Small-step evaluation which garbage-collects any non-rooted addresses after evaluating each term.
+      => AnalyzeTerm location term value inner outer (Collecting m) where
   analyzeTerm recur term = do
     roots <- askRoots
-    v <- liftAnalyze analyzeTerm recur term
+    v <- Collecting (analyzeTerm (runCollecting . recur) term)
     modifyHeap (gc (roots <> valueRoots v))
     pure v
-
-  analyzeModule = liftAnalyze analyzeModule
 
 
 -- | Collect any addresses in the heap not rooted in or reachable from the given 'Live' set.
@@ -64,11 +63,10 @@ reachable roots heap = go mempty roots
 
 instance ( Evaluator location term value m
          , Interpreter m effects
-         , Ord location
          )
       => Interpreter (Collecting m) (Reader (Live location value) ': effects) where
   type Result (Collecting m) (Reader (Live location value) ': effects) result = Result m effects result
-  interpret = interpret . runCollecting . raiseHandler (`runReader` mempty)
+  interpret = interpret . runCollecting . handleReader lowerBound
 
 
 -- | An analysis providing a 'Live' set, but never performing GC.
@@ -76,12 +74,12 @@ newtype Retaining m (effects :: [* -> *]) a = Retaining { runRetaining :: m effe
   deriving (Alternative, Applicative, Effectful, Functor, Monad)
 
 deriving instance Evaluator location term value m => Evaluator location term value (Retaining m)
-deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (Retaining m)
+deriving instance AnalyzeModule location term value inner outer m => AnalyzeModule location term value inner outer (Retaining m)
+deriving instance AnalyzeTerm location term value inner outer m => AnalyzeTerm location term value inner outer (Retaining m)
 
 instance ( Evaluator location term value m
          , Interpreter m effects
-         , Ord location
          )
       => Interpreter (Retaining m) (Reader (Live location value) ': effects) where
   type Result (Retaining m) (Reader (Live location value) ': effects) result = Result m effects result
-  interpret = interpret . runRetaining . raiseHandler (`runReader` mempty)
+  interpret = interpret . runRetaining . handleReader lowerBound

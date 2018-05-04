@@ -1,5 +1,4 @@
 {-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
-
 module Analysis.Abstract.TypeChecking
 ( TypeChecking
 ) where
@@ -12,7 +11,8 @@ newtype TypeChecking m (effects :: [* -> *]) a = TypeChecking { runTypeChecking 
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
 deriving instance Evaluator location term value m => Evaluator location term value (TypeChecking m)
-deriving instance MonadAnalysis location term Type effects m => MonadAnalysis location term Type effects (TypeChecking m)
+deriving instance AnalyzeModule location term value inner outer m => AnalyzeModule location term value inner outer (TypeChecking m)
+deriving instance AnalyzeTerm location term value inner outer m => AnalyzeTerm location term value inner outer (TypeChecking m)
 
 instance Interpreter m effects
       => Interpreter (TypeChecking m) (Resumable TypeError ': effects) where

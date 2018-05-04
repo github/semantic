@@ -11,7 +11,8 @@ newtype Erroring (exc :: * -> *) m (effects :: [* -> *]) a = Erroring { runError
   deriving (Alternative, Applicative, Effectful, Functor, Monad)
 
 deriving instance Evaluator location term value m => Evaluator location term value (Erroring exc m)
-deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (Erroring exc m)
+deriving instance AnalyzeModule location term value inner outer m => AnalyzeModule location term value inner outer (Erroring exc m)
+deriving instance AnalyzeTerm location term value inner outer m => AnalyzeTerm location term value inner outer (Erroring exc m)
 
 instance Interpreter               m                    effects
       => Interpreter (Erroring exc m) (Resumable exc ': effects) where

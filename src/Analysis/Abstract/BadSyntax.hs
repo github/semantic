@@ -18,8 +18,9 @@ import Prologue
 newtype BadSyntax m (effects :: [* -> *]) a = BadSyntax { runBadSyntax :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
 
-deriving instance MonadAnalysis location term value effects m => MonadAnalysis location term value effects (BadSyntax m)
 deriving instance Evaluator location term value m => Evaluator location term value (BadSyntax m)
+deriving instance AnalyzeModule location term value inner outer m => AnalyzeModule location term value inner outer (BadSyntax m)
+deriving instance AnalyzeTerm location term value inner outer m => AnalyzeTerm location term value inner outer (BadSyntax m)
 
 instance ( AbstractHole value
          , Evaluator location term value m
