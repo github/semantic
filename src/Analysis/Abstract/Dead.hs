@@ -1,5 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s Evaluator constraint
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeOperators #-}
 module Analysis.Abstract.Dead
 ( Dead(..)
 , revivingTerms
@@ -36,7 +35,6 @@ subterms term = term `cons` para (foldMap (uncurry cons)) term
 revivingTerms :: ( Corecursive term
                  , Member (State (Dead term)) effects
                  , Ord term
-                 , Recursive term
                  )
               => SubtermAlgebra (Base term) term (Evaluator location term value effects a)
               -> SubtermAlgebra (Base term) term (Evaluator location term value effects a)
