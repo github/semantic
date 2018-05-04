@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE ScopedTypeVariables, TypeOperators #-}
 module Analysis.Abstract.Erroring
 ( erroring
 ) where
@@ -6,5 +6,5 @@ module Analysis.Abstract.Erroring
 import Control.Effect
 import Control.Monad.Effect.Resumable
 
-erroring :: Effectful m => m (Resumable exc ': effects) result -> m effects (Either (SomeExc exc) result)
+erroring :: forall exc m effects result . Effectful m => m (Resumable exc ': effects) result -> m effects (Either (SomeExc exc) result)
 erroring = raiseHandler runError
