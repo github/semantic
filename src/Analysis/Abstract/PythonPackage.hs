@@ -7,6 +7,7 @@ import           Control.Abstract.Analysis
 import Control.Monad.Effect.Internal (interpose)
 import           Data.Abstract.Evaluatable (EvalError, LoadError (..), variable)
 import           Data.Abstract.FreeVariables (name)
+import           Data.Abstract.Path (stripQuotes)
 import           Data.Abstract.Value (Value)
 import           Control.Abstract.Value
 import           Data.Abstract.Located
@@ -40,7 +41,7 @@ instance ( Effectful m
       value <- variable (name "packages")
       as <- asArray value
       as' <- traverse asString as
-      raise (put (Packages as'))
+      raise (put (Packages (stripQuotes <$> as')))
       evaluateClosureBody term) >>= yield
     ) (liftAnalyze analyzeTerm eval term)
 
