@@ -65,18 +65,19 @@ parseModule parser rootDir file = do
 
 importGraphAnalysis :: forall term syntax ann a
                     .  ( Element Syntax.Identifier syntax
+                       , Show (Base term ())
                        )
-                    => Evaluator (Located Precise term) term (Value Precise)
+                    => Evaluator (Located Precise term) term (Value (Located Precise term))
                       (  State (ImportGraph (Term (Sum syntax) ann))
-                      ': Resumable (AddressError (Located Precise term) (Value Precise))
-                      ': Resumable (ResolutionError (Value Precise))
-                      ': Resumable (EvalError (Value Precise))
+                      ': Resumable (AddressError (Located Precise term) (Value (Located Precise term)))
+                      ': Resumable (ResolutionError (Value (Located Precise term)))
+                      ': Resumable (EvalError (Value (Located Precise term)))
                       ': State [Name]
-                      ': Resumable (ValueError (Located Precise term) (Value Precise))
-                      ': Resumable (Unspecialized (Value Precise))
+                      ': Resumable (ValueError (Located Precise term) (Value (Located Precise term)))
+                      ': Resumable (Unspecialized (Value (Located Precise term)))
                       ': Resumable (LoadError term)
-                      ': EvaluatingEffects (Located Precise term) term (Value Precise)) a
-                    -> (Either String (Either (SomeExc (LoadError term)) ((a, ImportGraph (Term (Sum syntax) ann)), [Name])), EvaluatingState (Located Precise term) term (Value Precise))
+                      ': EvaluatingEffects (Located Precise term) term (Value (Located Precise term))) a
+                    -> (Either String (Either (SomeExc (LoadError term)) ((a, ImportGraph (Term (Sum syntax) ann)), [Name])), EvaluatingState (Located Precise term) term (Value (Located Precise term)))
 importGraphAnalysis
   = evaluating
   . erroring @(LoadError term)
