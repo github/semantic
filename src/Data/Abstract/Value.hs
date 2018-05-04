@@ -5,8 +5,6 @@ import Control.Abstract.Addressable
 import Control.Abstract.Evaluator
 import Control.Abstract.Value
 import Control.Effect
-import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Resumable
 import Data.Abstract.Address
 import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env

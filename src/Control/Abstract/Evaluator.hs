@@ -64,6 +64,12 @@ module Control.Abstract.Evaluator
   , throwBreak
   , throwContinue
   , catchLoopControl
+  , Fail
+  , Fresh
+  , NonDet
+  , Reader
+  , Resumable
+  , State
   -- * Origin
   , askOrigin
   , pushOrigin
@@ -71,9 +77,12 @@ module Control.Abstract.Evaluator
 
 import Control.Effect
 import qualified Control.Monad.Effect as Eff
-import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.State
+import Control.Monad.Effect.Fail (Fail)
+import Control.Monad.Effect.Fresh (Fresh)
+import Control.Monad.Effect.NonDet (NonDet)
+import Control.Monad.Effect.Reader (Reader, ask, local)
+import Control.Monad.Effect.Resumable (Resumable)
+import Control.Monad.Effect.State (State, get, localState, modify', put)
 import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.Environment as Env
