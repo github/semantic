@@ -7,6 +7,7 @@ module Analysis.Abstract.Dead
 import Control.Abstract.Analysis
 import Data.Abstract.Module
 import Data.Semigroup.Reducer as Reducer
+import Data.Semilattice.Lower
 import Data.Set (delete)
 import Prologue
 
@@ -18,7 +19,7 @@ deriving instance Evaluator location term value m => Evaluator location term val
 
 -- | A set of “dead” (unreachable) terms.
 newtype Dead term = Dead { unDead :: Set term }
-  deriving (Eq, Foldable, Semigroup, Monoid, Ord, Show)
+  deriving (Eq, Foldable, Lower, Monoid, Ord, Semigroup, Show)
 
 deriving instance Ord term => Reducer term (Dead term)
 
