@@ -17,12 +17,11 @@ deriving instance (Show location, Show (Base term ())) => Show (Located location
 instance (Location location, Ord (Base term ())) => Location (Located location term) where
   type Cell (Located location term) = Cell location
 
-instance ( Effectful m
+instance ( Addressable location effects
          , Member (Reader (SomeOrigin term)) effects
-         , MonadAddressable location effects m
          , Ord (Base term ())
          )
-      => MonadAddressable (Located location term) effects m where
-  derefCell (Address (Located loc _)) = derefCell (Address loc)
+      => Addressable (Located location term) effects where
+  derefCell (Address (Located loc _)) = raise . lower . derefCell (Address loc)
 
-  allocLoc name = Located <$> allocLoc name <*> raise ask
+  allocLoc name = raise (lower (Located <$> allocLoc name <*> raise ask))
