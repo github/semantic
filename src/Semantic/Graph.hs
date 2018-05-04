@@ -103,7 +103,7 @@ graphImports :: ( Show ann
                 )
              => Package (Term (Sum syntax) ann)
              -> Eff effs (ImportGraph (Term (Sum syntax) ann))
-graphImports package = analyze importGraphAnalysis (evaluatePackageWith _ _ package) >>= extractGraph
+graphImports package = analyze importGraphAnalysis (evaluatePackageWith (providingCurrentModule . graphingModules) (providingCurrentTerm . graphingTerms) package) >>= extractGraph
   where
     extractGraph result = case result of
       (Right (Right ((_, graph), _)), _) -> pure graph
