@@ -11,7 +11,7 @@ import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Erroring
 import           Analysis.Abstract.Evaluating as X
 import           Analysis.Abstract.TypeChecking
-import           Control.Abstract.Analysis
+import           Control.Abstract.Evaluator
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Located

@@ -45,7 +45,7 @@ module Semantic.Task
 
 import           Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
-import qualified Control.Abstract.Analysis as Analysis
+import qualified Control.Abstract.Evaluator as Analysis
 import           Control.Monad
 import           Control.Monad.Effect as Eff hiding (run)
 import           Control.Monad.Effect.Exception
