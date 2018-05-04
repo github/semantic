@@ -316,7 +316,7 @@ handleClosuresWith evalClosure = raiseHandler (Eff.relay pure (\ (EvalClosure te
 data EvalModule term value resume where
   EvalModule :: Module term -> EvalModule term value value
 
-evaluateModule :: (Effectful m, Member (EvalModule term value) effects) => Module term -> m effects value
+evaluateModule :: (Evaluator location term value m, Member (EvalModule term value) effects) => Module term -> m effects value
 evaluateModule = raise . Eff.send . EvalModule
 
 handleModulesWith :: Effectful m => (Module term -> m effects value) -> m (EvalModule term value ': effects) a -> m effects a
