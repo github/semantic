@@ -46,7 +46,7 @@ type MonadEvaluatable location term value effects m =
   , Evaluatable (Base term)
   , FreeVariables term
   , Member (EvalClosure term value) effects
-  , Member (Call term value) effects
+  , Member (Call value) effects
   , Member (EvalModule term value) effects
   , Member Fail effects
   , Member (LoopControl value) effects

@@ -15,6 +15,7 @@ import           Data.Abstract.Module hiding (Module)
 import qualified Data.ByteString.Char8 as BC
 import           Data.Term
 import           Prologue
+import qualified Data.Map as Map
 
 newtype PythonPackaging m (effects :: [* -> *]) a = PythonPackaging { runPythonPackaging :: m effects a }
   deriving (Alternative, Applicative, Functor, Effectful, Monad)
@@ -26,7 +27,7 @@ data Strategy = Unknown | Packages [ByteString] | FindPackages
 
 instance ( Effectful m
          , Member (State Strategy) effects
-         , Member (EvalClosure term value) effects
+         , Member (Call value) effects
          , Member (Resumable (AddressError location value)) effects
          , Member (Resumable (EvalError value)) effects
          , MonadAnalysis location term value effects m
@@ -34,15 +35,18 @@ instance ( Effectful m
          , MonadAddressable location effects m
          )
       => MonadAnalysis location term value effects (PythonPackaging m) where
-  analyzeTerm eval term = raiseHandler (interpose @(EvalClosure term value) pure $ \(EvalClosure term) yield -> do
+  analyzeTerm eval term = raiseHandler (interpose @(Call value) pure $ \(Call params) yield -> do
     traceM "In PythonPackaging"
     lower @m (do
+      traceShowM params
       -- Guard on setup call
-      value <- variable (name "packages")
-      as <- asArray value
-      as' <- traverse asString as
-      raise (put (Packages (stripQuotes <$> as')))
-      evaluateClosureBody term) >>= yield
+      case Map.lookup (name "packages") params of
+        Just value -> do
+          as <- asArray value
+          as' <- traverse asString as
+          raise (put (Packages (stripQuotes <$> as')))
+          evaluateCall params
+        Nothing -> evaluateCall params) >>= yield
     ) (liftAnalyze analyzeTerm eval term)
 
   analyzeModule recur m = liftAnalyze analyzeModule recur m

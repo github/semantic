@@ -20,6 +20,7 @@ import qualified Data.Set as Set
 import Prologue hiding (TypeError)
 import Prelude hiding (Float, Integer, String, Rational)
 import qualified Prelude
+import qualified Data.Map as Map
 
 type ValueConstructors location
   = '[Array
@@ -211,6 +212,7 @@ instance AbstractHole (Value location) where
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Member (EvalClosure term (Value location)) effects
+         , Member (Call (Value location)) effects
          , Member Fail effects
          , Member (LoopControl (Value location)) effects
          , Member (Resumable (AddressError location (Value location))) effects
@@ -366,11 +368,13 @@ instance ( Member (EvalClosure term (Value location)) effects
         -- Evaluate the bindings and the body within a `goto` in order to
         -- charge their origins to the closure's origin.
         goto label $ \body -> do
-          bindings <- foldr (\ (name, param) rest -> do
+          (values, bindings) <- foldr (\ (name, param) rest -> do
+            (vals, env) <- rest
             v <- param
             a <- alloc name
             assign a v
-            Env.insert name a <$> rest) (pure env) (zip names params)
+            pure (v : vals, Env.insert name a env)) (pure ([], env)) (zip names params)
+          void $ evaluateCall (Map.fromList $ zip names values)
           localEnv (mergeEnvs bindings) (evalClosure body)
       Nothing -> throwValueError (CallError op)
     where
