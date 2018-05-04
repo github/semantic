@@ -1,20 +1,10 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE TypeOperators #-}
 module Analysis.Abstract.Erroring
-( Erroring
+( erroring
 ) where
 
-import Control.Abstract.Analysis
-import Prologue
+import Control.Effect
+import Control.Monad.Effect.Resumable
 
--- | An analysis that fails on errors.
-newtype Erroring (exc :: * -> *) m (effects :: [* -> *]) a = Erroring { runErroring :: m effects a }
-  deriving (Alternative, Applicative, Effectful, Functor, Monad)
-
-deriving instance Evaluator location term value m => Evaluator location term value (Erroring exc m)
-deriving instance AnalyzeModule location term value inner outer m => AnalyzeModule location term value inner outer (Erroring exc m)
-deriving instance AnalyzeTerm location term value inner outer m => AnalyzeTerm location term value inner outer (Erroring exc m)
-
-instance Interpreter               m                    effects
-      => Interpreter (Erroring exc m) (Resumable exc ': effects) where
-  type Result (Erroring exc m) (Resumable exc ': effects) result = Result m effects (Either (SomeExc exc) result)
-  interpret = interpret . runErroring . raiseHandler runError
+erroring :: Effectful m => m (Resumable exc ': effects) result -> m effects (Either (SomeExc exc) result)
+erroring = raiseHandler runError
