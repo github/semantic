@@ -6,7 +6,7 @@ import Analysis.Abstract.Graph
 import           Control.Abstract.Analysis
 import Control.Monad.Effect.Internal (interpose)
 import           Data.Abstract.Evaluatable (EvalError, LoadError (..), variable)
-import           Data.Abstract.FreeVariables (name)
+import           Data.Abstract.FreeVariables (name, Name(..))
 import           Data.Abstract.Path (stripQuotes)
 import           Data.Abstract.Value (Value)
 import           Control.Abstract.Value
@@ -22,7 +22,7 @@ newtype PythonPackaging m (effects :: [* -> *]) a = PythonPackaging { runPythonP
 
 deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (PythonPackaging m)
 
-data Strategy = Unknown | Packages [ByteString] | FindPackages
+data Strategy = Unknown | Packages [ByteString] | FindPackages [ByteString]
   deriving (Show)
 
 instance ( Effectful m
@@ -35,18 +35,26 @@ instance ( Effectful m
          , MonadAddressable location effects m
          )
       => MonadAnalysis location term value effects (PythonPackaging m) where
-  analyzeTerm eval term = raiseHandler (interpose @(Call value) pure $ \(Call params) yield -> do
+  analyzeTerm eval term = raiseHandler (interpose @(Call value) pure $ \(Call callName params) yield -> do
     traceM "In PythonPackaging"
     lower @m (do
-      traceShowM params
-      -- Guard on setup call
-      case Map.lookup (name "packages") params of
-        Just value -> do
-          as <- asArray value
-          as' <- traverse asString as
-          raise (put (Packages (stripQuotes <$> as')))
-          evaluateCall params
-        Nothing -> evaluateCall params) >>= yield
+      case unName callName of
+        "find_packages" -> do
+          case Map.lookup (name "exclude") params of
+            Just value -> do
+              as <- asArray value
+              as' <- traverse asString as
+              raise (put (FindPackages (stripQuotes <$> as')))
+            Nothing -> pure ()
+        "setup" -> do
+          case Map.lookup (name "packages") params of
+            Just value -> do
+              as <- asArray value
+              as' <- traverse asString as
+              raise (put (Packages (stripQuotes <$> as')))
+            Nothing -> pure ()
+        _ -> raise (put Unknown)
+      evaluateCall callName params) >>= yield
     ) (liftAnalyze analyzeTerm eval term)
 
   analyzeModule recur m = liftAnalyze analyzeModule recur m

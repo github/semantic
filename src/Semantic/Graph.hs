@@ -104,7 +104,7 @@ parsePythonPackage parser preludeFile project = do
         let n = name (projectName p)
         p' <- parseModules parser p
         pure (Package.fromModules n Nothing prelude (length (projectEntryPoints p)) p')
-    FindPackages -> undefined
+    FindPackages excludeDirs -> undefined
 
 extractStrategy :: ( Show ann
                    , Apply Analysis.Declarations1 syntax

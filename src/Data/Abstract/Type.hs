@@ -86,7 +86,7 @@ instance ( Alternative (m effects)
          , Reducer Type (Cell location Type)
          )
       => MonadValue location Type effects m where
-  lambda names (Subterm _ body) = do
+  lambda name names (Subterm _ body) = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
       tvar <- Var <$> raise fresh

@@ -63,7 +63,7 @@ prjPair = bitraverse prjValue prjValue
 -- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
 
 -- | A function value consisting of a list of parameter 'Name's, a 'Label' to jump to the body of the function, and an 'Environment' of bindings captured by the body.
-data Closure location value = Closure [Name] Label (Environment location value)
+data Closure location value = Closure Name [Name] Label (Environment location value)
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq location => Eq1 (Closure location) where liftEq = genericLiftEq
@@ -203,7 +203,7 @@ instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
 instance Ord location => ValueRoots location (Value location) where
   valueRoots v
-    | Just (Closure _ _ env) <- prjValue v = Env.addresses env
+    | Just (Closure _ _ _ env) <- prjValue v = Env.addresses env
     | otherwise                            = mempty
 
 
@@ -358,13 +358,13 @@ instance ( Member (EvalClosure term (Value location)) effects
     | otherwise = throwValueError (Bitwise2Error left right)
       where pair = (left, right)
 
-  lambda names (Subterm body _) = do
+  lambda name names (Subterm body _) = do
     l <- label body
-    injValue . Closure names l . Env.bind (foldr Set.delete (Set.fromList (freeVariables body)) names) <$> getEnv
+    injValue . Closure name names l . Env.bind (foldr Set.delete (Set.fromList (freeVariables body)) names) <$> getEnv
 
   evalCall op params = do
     case prjValue op of
-      Just (Closure names label env) -> do
+      Just (Closure name names label env) -> do
         -- Evaluate the bindings and the body within a `goto` in order to
         -- charge their origins to the closure's origin.
         goto label $ \body -> do
@@ -374,7 +374,7 @@ instance ( Member (EvalClosure term (Value location)) effects
             a <- alloc name
             assign a v
             pure (v : vals, Env.insert name a env)) (pure ([], env)) (zip names params)
-          void $ evaluateCall (Map.fromList $ zip names values)
+          void $ evaluateCall name (Map.fromList $ zip names values)
           localEnv (mergeEnvs bindings) (evalClosure body)
       Nothing -> throwValueError (CallError op)
     where

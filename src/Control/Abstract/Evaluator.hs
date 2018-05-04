@@ -380,10 +380,10 @@ evaluateClosureBody = raise . Eff.send . EvalClosure
 
 -- | An effect to evaluate a call.
 data Call value resume where
-  Call :: Map Name value -> Call value value
+  Call :: Name -> Map Name value -> Call value value
 
-evaluateCall :: (Effectful m, Member (Call value) effects) => Map Name value -> m effects value
-evaluateCall = raise . Eff.send . Call
+evaluateCall :: (Effectful m, Member (Call value) effects) => Name -> Map Name value -> m effects value
+evaluateCall name = raise . Eff.send . Call name
 
 
 -- | An effect to evaluate a module.
