@@ -4,7 +4,6 @@ module Data.Abstract.Value where
 import Control.Abstract.Addressable
 import Control.Abstract.Evaluator
 import Control.Abstract.Value
-import Control.Effect
 import Data.Abstract.Address
 import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
@@ -182,7 +181,7 @@ instance Show1 KVPair where liftShowsPrec = genericLiftShowsPrec
 -- You would be incorrect, as we can't derive a Generic1 instance for the above,
 -- and in addition a 'Map' representation would lose information given hash literals
 -- that assigned multiple values to one given key. Instead, this holds KVPair
--- values. The smart constructor for hashes in MonadValue ensures that these are
+-- values. The smart constructor for hashes in 'AbstractValue' ensures that these are
 -- only populated with pairs.
 newtype Hash value = Hash [value]
   deriving (Eq, Generic1, Ord, Show)
@@ -209,20 +208,24 @@ instance AbstractHole (Value location) where
   hole = injValue Hole
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Member (EvalClosure term (Value location)) effects
-         , Member Fail effects
-         , Member (LoopControl (Value location)) effects
-         , Member (Resumable (AddressError location (Value location))) effects
-         , Member (Resumable (ValueError location (Value location))) effects
-         , Member (Return (Value location)) effects
-         , Monad (m effects)
-         , MonadAddressable location effects m
-         , MonadEvaluator location term (Value location) effects m
+instance ( Addressable location effects
+         , Members '[ EvalClosure term (Value location)
+                    , Fail
+                    , LoopControl (Value location)
+                    , Reader (Environment location (Value location))
+                    , Reader (SomeOrigin term)
+                    , Resumable (AddressError location (Value location))
+                    , Resumable (ValueError location (Value location))
+                    , Return (Value location)
+                    , State (Environment location (Value location))
+                    , State (Heap location (Value location))
+                    , State (JumpTable term)
+                    ] effects
          , Recursive term
          , Reducer (Value location) (Cell location (Value location))
          , Show location
          )
-      => MonadValue location (Value location) effects m where
+      => AbstractValue location term (Value location) effects where
   unit     = pure . injValue $ Unit
   integer  = pure . injValue . Integer . Number.Integer
   boolean  = pure . injValue . Boolean
@@ -310,7 +313,7 @@ instance ( Member (EvalClosure term (Value location)) effects
         tentative x i j = attemptUnsafeArithmetic (x i j)
 
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: Either ArithException Number.SomeNumber -> m effects (Value location)
+        specialize :: Either ArithException Number.SomeNumber -> Evaluator location term (Value location) effects (Value location)
         specialize (Left exc) = throwValueError (ArithmeticError exc)
         specialize (Right (Number.SomeNumber (Number.Integer i))) = integer i
         specialize (Right (Number.SomeNumber (Number.Ratio r)))   = rational r
@@ -329,7 +332,7 @@ instance ( Member (EvalClosure term (Value location)) effects
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: Ord a => a -> a -> m effects (Value location)
+        go :: Ord a => a -> a -> Evaluator location term (Value location) effects (Value location)
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
           Generalized -> integer (orderingToInt (compare l r))
@@ -368,9 +371,9 @@ instance ( Member (EvalClosure term (Value location)) effects
           localEnv (mergeEnvs bindings) (evalClosure body)
       Nothing -> throwValueError (CallError op)
     where
-      evalClosure term = handleReturn @m @(Value location) (\ (Return value) -> pure value) (evaluateClosureBody term)
+      evalClosure term = handleReturn @(Value location) (\ (Return value) -> pure value) (evaluateClosureBody term)
 
-  loop x = catchLoopControl @m @(Value location) (fix x) (\ control -> case control of
+  loop x = catchLoopControl @(Value location) (fix x) (\ control -> case control of
     Break value -> pure value
     Continue    -> loop x)
 
@@ -413,5 +416,5 @@ deriving instance (Show value) => Show (ValueError location value resume)
 instance (Show value) => Show1 (ValueError location value) where
   liftShowsPrec _ _ = showsPrec
 
-throwValueError :: (Member (Resumable (ValueError location value)) effects, MonadEvaluator location term value effects m) => ValueError location value resume -> m effects resume
+throwValueError :: Member (Resumable (ValueError location value)) effects => ValueError location value resume -> Evaluator location term value effects resume
 throwValueError = throwResumable
