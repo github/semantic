@@ -38,8 +38,8 @@ revivingTerms :: ( Corecursive term
                  , Ord term
                  , Recursive term
                  )
-              => SubtermAlgebra (Base term) term (Evaluator located term value effects a)
-              -> SubtermAlgebra (Base term) term (Evaluator located term value effects a)
+              => SubtermAlgebra (Base term) term (Evaluator location term value effects a)
+              -> SubtermAlgebra (Base term) term (Evaluator location term value effects a)
 revivingTerms recur term = revive (embedSubterm term) *> recur term
 
 killingModules :: ( Foldable (Base term)
