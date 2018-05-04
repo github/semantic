@@ -1,5 +1,7 @@
 {-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
-module Analysis.Abstract.BadValues where
+module Analysis.Abstract.BadValues
+( BadValues
+) where
 
 import Control.Abstract.Analysis
 import Data.Abstract.Value (ValueError(..))
