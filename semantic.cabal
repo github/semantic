@@ -40,7 +40,6 @@ library
                      , Assigning.Assignment.Table
                      -- Control structures & interfaces for abstract interpretation
                      , Control.Abstract.Addressable
-                     , Control.Abstract.Analysis
                      , Control.Abstract.Evaluator
                      , Control.Abstract.Matching
                      , Control.Abstract.Value
