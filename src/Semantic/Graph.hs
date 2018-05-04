@@ -30,6 +30,8 @@ import           Rendering.Renderer
 import           Semantic.IO (Files)
 import           Semantic.Task
 import System.FilePath.Posix
+import qualified Data.ByteString.Char8 as B
+import Data.List (isPrefixOf)
 
 data GraphType = ImportGraph | CallGraph
 
@@ -81,19 +83,28 @@ parsePythonPackage :: (Show ann
                    => Parser term       -- ^ A parser.
                    -> Maybe File        -- ^ Prelude (optional).
                    -> Project           -- ^ Project to parse into a package.
-                   -> Eff effs (Package term)
-parsePythonPackage parser preludeFile project@Project{..} = do
+                   -> Eff effs [Package term]
+parsePythonPackage parser preludeFile project = do
   prelude <- traverse (parseModule parser Nothing) preludeFile
-  setupFile <- maybe (error "no setup.py found in project") pure (find ((== (projectRootDir </> "setup.py")) . filePath) projectFiles)
-  setupModule <- parseModule parser (Just projectRootDir) setupFile
+
+  setupFile <- maybe (error "no setup.py found in project") pure (find ((== ((projectRootDir project) </> "setup.py")) . filePath) (projectFiles project))
+  setupModule <- parseModule parser (Just (projectRootDir project)) setupFile
+
   strat <- extractStrategy setupModule
   case strat of
     Unknown -> do
       p <- parseModules parser project
-      pure (Package.fromModules n Nothing prelude (length projectEntryPoints) p)
-    _ -> undefined
-  where
-    n = name (projectName project)
+      let n = name (projectName project)
+      pure [Package.fromModules n Nothing prelude (length (projectEntryPoints project)) p]
+    Packages dirs -> do
+      for dirs $ \dir -> do
+        let packageDir = (projectRootDir project) </> (B.unpack dir)
+        let files' = filter ((packageDir `isPrefixOf`) . filePath) (projectFiles project)
+        let p = Project packageDir [] (projectLanguage project) files'
+        let n = name (projectName p)
+        p' <- parseModules parser p
+        pure (Package.fromModules n Nothing prelude (length (projectEntryPoints p)) p')
+    FindPackages -> undefined
 
 extractStrategy :: ( Show ann
                    , Apply Analysis.Declarations1 syntax
