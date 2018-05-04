@@ -1,7 +1,6 @@
-{-# LANGUAGE ConstraintKinds, FunctionalDependencies, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Control.Abstract.Evaluator
-  ( Evaluator
-  , MonadEvaluator
+  ( Evaluator(..)
   -- * State
   , Environment
   , Heap
@@ -9,6 +8,7 @@ module Control.Abstract.Evaluator
   , ModuleTable
   , Exports
   , JumpTable
+  , SomeOrigin
   -- * Environment
   , getEnv
   , putEnv
@@ -64,12 +64,14 @@ module Control.Abstract.Evaluator
   , throwBreak
   , throwContinue
   , catchLoopControl
-  , Fail
-  , Fresh
-  , NonDet
-  , Reader
-  , Resumable
-  , State
+  , module Control.Effect
+  , module Control.Monad.Effect.Fail
+  , module Control.Monad.Effect.Fresh
+  , module Control.Monad.Effect.NonDet
+  , module Control.Monad.Effect.Reader
+  , module Control.Monad.Effect.Resumable
+  , module Control.Monad.Effect.State
+  , Eff.relay
   -- * Origin
   , askOrigin
   , pushOrigin
@@ -77,12 +79,12 @@ module Control.Abstract.Evaluator
 
 import Control.Effect
 import qualified Control.Monad.Effect as Eff
-import Control.Monad.Effect.Fail (Fail)
-import Control.Monad.Effect.Fresh (Fresh)
-import Control.Monad.Effect.NonDet (NonDet)
-import Control.Monad.Effect.Reader (Reader, ask, local)
-import Control.Monad.Effect.Resumable (Resumable)
-import Control.Monad.Effect.State (State, get, localState, modify', put)
+import Control.Monad.Effect.Fail
+import Control.Monad.Effect.Fresh
+import Control.Monad.Effect.NonDet
+import Control.Monad.Effect.Reader
+import Control.Monad.Effect.Resumable
+import Control.Monad.Effect.State
 import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.Environment as Env
@@ -100,26 +102,10 @@ import Data.Semilattice.Lower
 import Prelude hiding (fail)
 import Prologue
 
-class Effectful m => Evaluator location term value m | m -> location term value
+newtype Evaluator location term value effects a = Evaluator { runEvaluator :: Eff.Eff effects a }
+  deriving (Applicative, Effectful, Functor, Monad)
 
--- | A 'Monad' providing the basic essentials for evaluation.
---
---   These presently include:
---   - environments binding names to addresses
---   - a heap mapping addresses to (possibly sets of) values
---   - tables of modules available for import
-type MonadEvaluator location term value effects m
-  = ( Evaluator location term value m
-    , Member (Reader (Environment location value)) effects
-    , Member (Reader LoadStack) effects
-    , Member (Reader (SomeOrigin term)) effects
-    , Member (State (Environment location value)) effects
-    , Member (State (Heap location value)) effects
-    , Member (State (ModuleTable (Environment location value, value))) effects
-    , Member (State (Exports location value)) effects
-    , Member (State (JumpTable term)) effects
-    , Monad (m effects)
-    )
+deriving instance Member NonDet effects => Alternative (Evaluator location term value effects)
 
 type JumpTable term = IntMap.IntMap (SomeOrigin term, term)
 
@@ -127,53 +113,53 @@ type JumpTable term = IntMap.IntMap (SomeOrigin term, term)
 -- Environment
 
 -- | Retrieve the environment.
-getEnv :: (Member (State (Environment location value)) effects, Evaluator location term value m) => m effects (Environment location value)
+getEnv :: Member (State (Environment location value)) effects => Evaluator location term value effects (Environment location value)
 getEnv = raise get
 
 -- | Set the environment.
-putEnv :: MonadEvaluator location term value effects m => Environment location value -> m effects ()
+putEnv :: Member (State (Environment location value)) effects => Environment location value -> Evaluator location term value effects ()
 putEnv = raise . put
 
 -- | Update the global environment.
-modifyEnv :: MonadEvaluator location term value effects m => (Environment location value -> Environment location value) -> m effects ()
+modifyEnv :: Member (State (Environment location value)) effects => (Environment location value -> Environment location value) -> Evaluator location term value effects ()
 modifyEnv = raise . modify'
 
 -- | Sets the environment for the lifetime of the given action.
-withEnv :: MonadEvaluator location term value effects m => Environment location value -> m effects a -> m effects a
+withEnv :: Member (State (Environment location value)) effects => Environment location value -> Evaluator location term value effects a -> Evaluator location term value effects a
 withEnv = raiseHandler . localState . const
 
 
 -- | Retrieve the default environment.
-defaultEnvironment :: (Evaluator location term value m, Member (Reader (Environment location value)) effects) => m effects (Environment location value)
+defaultEnvironment :: Member (Reader (Environment location value)) effects => Evaluator location term value effects (Environment location value)
 defaultEnvironment = raise ask
 
 -- | Set the default environment for the lifetime of an action.
 --   Usually only invoked in a top-level evaluation function.
-withDefaultEnvironment :: MonadEvaluator location term value effects m => Environment location value -> m effects a -> m effects a
+withDefaultEnvironment :: Member (Reader (Environment location value)) effects => Environment location value -> Evaluator location term value effects a -> Evaluator location term value effects a
 withDefaultEnvironment e = raiseHandler (local (const e))
 
 -- | Obtain an environment that is the composition of the current and default environments.
 --   Useful for debugging.
-fullEnvironment :: MonadEvaluator location term value effects m => m effects (Environment location value)
+fullEnvironment :: Members '[Reader (Environment location value), State (Environment location value)] effects => Evaluator location term value effects (Environment location value)
 fullEnvironment = mergeEnvs <$> getEnv <*> defaultEnvironment
 
 -- | Run an action with a locally-modified environment.
-localEnv :: MonadEvaluator location term value effects m => (Environment location value -> Environment location value) -> m effects a -> m effects a
+localEnv :: Member (State (Environment location value)) effects => (Environment location value -> Environment location value) -> Evaluator location term value effects a -> Evaluator location term value effects a
 localEnv f a = do
   modifyEnv (f . Env.push)
   result <- a
   result <$ modifyEnv Env.pop
 
 -- | Run a computation in a new local environment.
-localize :: MonadEvaluator location term value effects m => m effects a -> m effects a
+localize :: Member (State (Environment location value)) effects => Evaluator location term value effects a -> Evaluator location term value effects a
 localize = localEnv id
 
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
-lookupEnv :: (Evaluator location term value m, Members '[Reader (Environment location value), State (Environment location value)] effects, Monad (m effects)) => Name -> m effects (Maybe (Address location value))
+lookupEnv :: Members '[Reader (Environment location value), State (Environment location value)] effects => Name -> Evaluator location term value effects (Maybe (Address location value))
 lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
 
 -- | Look up a 'Name' in the environment, running an action with the resolved address (if any).
-lookupWith :: (Evaluator location term value m, Members '[Reader (Environment location value), State (Environment location value)] effects, Monad (m effects)) => (Address location value -> m effects a) -> Name -> m effects (Maybe a)
+lookupWith :: Members '[Reader (Environment location value), State (Environment location value)] effects => (Address location value -> Evaluator location term value effects a) -> Name -> Evaluator location term value effects (Maybe a)
 lookupWith with name = do
   addr <- lookupEnv name
   maybe (pure Nothing) (fmap Just . with) addr
@@ -182,107 +168,107 @@ lookupWith with name = do
 -- Exports
 
 -- | Get the global export state.
-getExports :: MonadEvaluator location term value effects m => m effects (Exports location value)
+getExports :: Member (State (Exports location value)) effects => Evaluator location term value effects (Exports location value)
 getExports = raise get
 
 -- | Set the global export state.
-putExports :: MonadEvaluator location term value effects m => Exports location value -> m effects ()
+putExports :: Member (State (Exports location value)) effects => Exports location value -> Evaluator location term value effects ()
 putExports = raise . put
 
 -- | Update the global export state.
-modifyExports :: MonadEvaluator location term value effects m => (Exports location value -> Exports location value) -> m effects ()
+modifyExports :: Member (State (Exports location value)) effects => (Exports location value -> Exports location value) -> Evaluator location term value effects ()
 modifyExports = raise . modify'
 
 -- | Add an export to the global export state.
-addExport :: MonadEvaluator location term value effects m => Name -> Name -> Maybe (Address location value) -> m effects ()
+addExport :: Member (State (Exports location value)) effects => Name -> Name -> Maybe (Address location value) -> Evaluator location term value effects ()
 addExport name alias = modifyExports . Export.insert name alias
 
 -- | Sets the global export state for the lifetime of the given action.
-withExports :: MonadEvaluator location term value effects m => Exports location value -> m effects a -> m effects a
+withExports :: Member (State (Exports location value)) effects => Exports location value -> Evaluator location term value effects a -> Evaluator location term value effects a
 withExports = raiseHandler . localState . const
 
 -- | Isolate the given action with an empty global environment and exports.
-isolate :: MonadEvaluator location term value effects m => m effects a -> m effects a
+isolate :: Members '[State (Environment location value), State (Exports location value)] effects => Evaluator location term value effects a -> Evaluator location term value effects a
 isolate = withEnv lowerBound . withExports lowerBound
 
 
 -- Heap
 
 -- | Retrieve the heap.
-getHeap :: (Member (State (Heap location value)) effects, Evaluator location term value m) => m effects (Heap location value)
+getHeap :: Member (State (Heap location value)) effects => Evaluator location term value effects (Heap location value)
 getHeap = raise get
 
 -- | Set the heap.
-putHeap :: (Member (State (Heap location value)) effects, Evaluator location term value m) => Heap location value -> m effects ()
+putHeap :: Member (State (Heap location value)) effects => Heap location value -> Evaluator location term value effects ()
 putHeap = raise . put
 
 -- | Update the heap.
-modifyHeap :: (Member (State (Heap location value)) effects, Evaluator location term value m) => (Heap location value -> Heap location value) -> m effects ()
+modifyHeap :: Member (State (Heap location value)) effects => (Heap location value -> Heap location value) -> Evaluator location term value effects ()
 modifyHeap = raise . modify'
 
 -- | Look up the cell for the given 'Address' in the 'Heap'.
-lookupHeap :: (MonadEvaluator location term value effects m, Ord location) => Address location value -> m effects (Maybe (Cell location value))
+lookupHeap :: (Member (State (Heap location value)) effects, Ord location) => Address location value -> Evaluator location term value effects (Maybe (Cell location value))
 lookupHeap = flip fmap getHeap . heapLookup
 
 -- | Write a value to the given 'Address' in the 'Store'.
-assign :: ( Ord location
-          , MonadEvaluator location term value effects m
+assign :: ( Member (State (Heap location value)) effects
+          , Ord location
           , Reducer value (Cell location value)
           )
        => Address location value
        -> value
-       -> m effects ()
+       -> Evaluator location term value effects ()
 assign address = modifyHeap . heapInsert address
 
 
 -- Roots
 
 -- | Retrieve the local 'Live' set.
-askRoots :: (Effectful m, Member (Reader (Live location value)) effects) => m effects (Live location value)
+askRoots :: Member (Reader (Live location value)) effects => Evaluator location term value effects (Live location value)
 askRoots = raise ask
 
 -- | Run a computation with the given 'Live' set added to the local root set.
-extraRoots :: (Effectful m, Member (Reader (Live location value)) effects, Ord location) => Live location value -> m effects a -> m effects a
+extraRoots :: (Member (Reader (Live location value)) effects, Ord location) => Live location value -> Evaluator location term value effects a -> Evaluator location term value effects a
 extraRoots roots = raiseHandler (local (<> roots))
 
 
 -- Configuration
 
 -- | Get the current 'Configuration' with a passed-in term.
-getConfiguration :: (Applicative (m effects), Member (Reader (Live location value)) effects, Member (State (Environment location value)) effects, Member (State (Heap location value)) effects, Evaluator location term value m) => term -> m effects (Configuration location term value)
+getConfiguration :: Members '[Reader (Live location value), State (Environment location value), State (Heap location value)] effects => term -> Evaluator location term value effects (Configuration location term value)
 getConfiguration term = Configuration term <$> askRoots <*> getEnv <*> getHeap
 
 
 -- Module table
 
 -- | Retrieve the table of evaluated modules.
-getModuleTable :: MonadEvaluator location term value effects m => m effects (ModuleTable (Environment location value, value))
+getModuleTable :: Member (State (ModuleTable (Environment location value, value))) effects => Evaluator location term value effects (ModuleTable (Environment location value, value))
 getModuleTable = raise get
 
 -- | Set the table of evaluated modules.
-putModuleTable :: MonadEvaluator location term value effects m => ModuleTable (Environment location value, value) -> m effects ()
+putModuleTable :: Member (State (ModuleTable (Environment location value, value))) effects => ModuleTable (Environment location value, value) -> Evaluator location term value effects ()
 putModuleTable = raise . put
 
 -- | Update the evaluated module table.
-modifyModuleTable :: MonadEvaluator location term value effects m => (ModuleTable (Environment location value, value) -> ModuleTable (Environment location value, value)) -> m effects ()
+modifyModuleTable :: Member (State (ModuleTable (Environment location value, value))) effects => (ModuleTable (Environment location value, value) -> ModuleTable (Environment location value, value)) -> Evaluator location term value effects ()
 modifyModuleTable = raise . modify'
 
 
 -- | Retrieve the module load stack
-askLoadStack :: MonadEvaluator location term value effects m => m effects LoadStack
+askLoadStack :: Member (Reader LoadStack) effects => Evaluator location term value effects LoadStack
 askLoadStack = raise ask
 
 -- | Locally update the module load stack.
-localLoadStack :: MonadEvaluator location term value effects m => (LoadStack -> LoadStack) -> m effects a -> m effects a
+localLoadStack :: Member (Reader LoadStack) effects => (LoadStack -> LoadStack) -> Evaluator location term value effects a -> Evaluator location term value effects a
 localLoadStack = raiseHandler . local
 
 
 -- | Get the currently evaluating 'ModuleInfo'.
-currentModule :: (Effectful m, Member (Reader ModuleInfo) effects) => m effects ModuleInfo
+currentModule :: Member (Reader ModuleInfo) effects => Evaluator location term value effects ModuleInfo
 currentModule = raise ask
 
 -- | Get the currently evaluating 'PackageInfo'.
-currentPackage :: (Effectful m, Member (Reader PackageInfo) effects) => m effects PackageInfo
+currentPackage :: Member (Reader PackageInfo) effects => Evaluator location term value effects PackageInfo
 currentPackage = raise ask
 
 
@@ -291,7 +277,7 @@ currentPackage = raise ask
 -- | Allocate a 'Label' for the given @term@.
 --
 --   Labels must be allocated before being jumped to with 'goto', but are suitable for nonlocal jumps; thus, they can be used to implement coroutines, exception handling, call with current continuation, and other esoteric control mechanisms.
-label :: MonadEvaluator location term value effects m => term -> m effects Label
+label :: Members '[Reader (SomeOrigin term), State (JumpTable term)] effects => term -> Evaluator location term value effects Label
 label term = do
   m <- raise get
   origin <- askOrigin
@@ -300,7 +286,7 @@ label term = do
   pure i
 
 -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
-goto :: (Recursive term, Member Fail effects, MonadEvaluator location term value effects m) => Label -> (term -> m effects a) -> m effects a
+goto :: (Members '[Fail, Reader (SomeOrigin term), State (JumpTable term)] effects, Recursive term) => Label -> (term -> Evaluator location term value effects a) -> Evaluator location term value effects a
 goto label comp = do
   maybeTerm <- IntMap.lookup label <$> raise get
   case maybeTerm of
@@ -314,10 +300,10 @@ goto label comp = do
 data EvalClosure term value resume where
   EvalClosure :: term -> EvalClosure term value value
 
-evaluateClosureBody :: (Effectful m, Member (EvalClosure term value) effects) => term -> m effects value
+evaluateClosureBody :: Member (EvalClosure term value) effects => term -> Evaluator location term value effects value
 evaluateClosureBody = raise . Eff.send . EvalClosure
 
-handleClosuresWith :: Effectful m => (term -> m effects value) -> m (EvalClosure term value ': effects) a -> m effects a
+handleClosuresWith :: (term -> Evaluator location term value effects value) -> Evaluator location term value (EvalClosure term value ': effects) a -> Evaluator location term value effects a
 handleClosuresWith evalClosure = raiseHandler (Eff.relay pure (\ (EvalClosure term) yield -> lower (evalClosure term) >>= yield))
 
 
@@ -325,10 +311,10 @@ handleClosuresWith evalClosure = raiseHandler (Eff.relay pure (\ (EvalClosure te
 data EvalModule term value resume where
   EvalModule :: Module term -> EvalModule term value value
 
-evaluateModule :: (Evaluator location term value m, Member (EvalModule term value) effects) => Module term -> m effects value
+evaluateModule :: Member (EvalModule term value) effects => Module term -> Evaluator location term value effects value
 evaluateModule = raise . Eff.send . EvalModule
 
-handleModulesWith :: Effectful m => (Module term -> m effects value) -> m (EvalModule term value ': effects) a -> m effects a
+handleModulesWith :: (Module term -> Evaluator location term value effects value) -> Evaluator location term value (EvalModule term value ': effects) a -> Evaluator location term value effects a
 handleModulesWith evalModule = raiseHandler (Eff.relay pure (\ (EvalModule m) yield -> lower (evalModule m) >>= yield))
 
 
@@ -339,10 +325,10 @@ data Return value resume where
 deriving instance Eq value => Eq (Return value a)
 deriving instance Show value => Show (Return value a)
 
-earlyReturn :: (Effectful m, Member (Return value) effects) => value -> m effects value
+earlyReturn :: Member (Return value) effects => value -> Evaluator location term value effects value
 earlyReturn = raise . Eff.send . Return
 
-handleReturn :: (Effectful m, Member (Return value) effects) => (forall x . Return value x -> m effects a) -> m effects a -> m effects a
+handleReturn :: Member (Return value) effects => (forall x . Return value x -> Evaluator location term value effects a) -> Evaluator location term value effects a -> Evaluator location term value effects a
 handleReturn handler = raiseHandler (Eff.interpose pure (\ ret _ -> lower (handler ret)))
 
 
@@ -354,25 +340,23 @@ data LoopControl value resume where
 deriving instance Eq value => Eq (LoopControl value a)
 deriving instance Show value => Show (LoopControl value a)
 
-throwBreak :: (Effectful m, Member (LoopControl value) effects) => value -> m effects value
+throwBreak :: Member (LoopControl value) effects => value -> Evaluator location term value effects value
 throwBreak = raise . Eff.send . Break
 
-throwContinue :: (Effectful m, Member (LoopControl value) effects) => m effects value
+throwContinue :: Member (LoopControl value) effects => Evaluator location term value effects value
 throwContinue = raise (Eff.send Continue)
 
-catchLoopControl :: (Effectful m, Member (LoopControl value) effects) => m effects a -> (forall x . LoopControl value x -> m effects a) -> m effects a
+catchLoopControl :: Member (LoopControl value) effects => Evaluator location term value effects a -> (forall x . LoopControl value x -> Evaluator location term value effects a) -> Evaluator location term value effects a
 catchLoopControl action handler = raiseHandler (Eff.interpose pure (\ control _ -> lower (handler control))) action
 
 
 -- | Retrieve the current 'SomeOrigin'.
-askOrigin :: (Evaluator location term value m, Member (Reader (SomeOrigin term)) effects) => m effects (SomeOrigin term)
+askOrigin :: Member (Reader (SomeOrigin term)) effects => Evaluator location term value effects (SomeOrigin term)
 askOrigin = raise ask
 
 -- | Push a 'SomeOrigin' onto the stack. This should be used to contextualize execution with information about the originating term, module, or package.
-pushOrigin :: ( Effectful m
-              , Member (Reader (SomeOrigin term)) effects
-              )
+pushOrigin :: Member (Reader (SomeOrigin term)) effects
            => SomeOrigin term
-           -> m effects a
-           -> m effects a
+           -> Evaluator location term value effects a
+           -> Evaluator location term value effects a
 pushOrigin o = raiseHandler (local (<> o))
