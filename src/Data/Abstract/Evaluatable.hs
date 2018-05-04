@@ -46,6 +46,7 @@ type MonadEvaluatable location term value effects m =
   , Evaluatable (Base term)
   , FreeVariables term
   , Member (EvalClosure term value) effects
+  , Member (Call term value) effects
   , Member (EvalModule term value) effects
   , Member Fail effects
   , Member (LoopControl value) effects
@@ -309,7 +310,7 @@ evaluatePackageBody body = withPrelude (packagePrelude body) $
   where
     evaluateEntryPoint (m, sym) = do
       (_, v) <- requireWith evalModule m
-      maybe (pure v) ((`call` []) <=< variable) sym
+      maybe (pure v) ((`evalCall` []) <=< variable) sym
     withPrelude Nothing a = a
     withPrelude (Just prelude) a = do
       preludeEnv <- evalModule prelude *> getEnv

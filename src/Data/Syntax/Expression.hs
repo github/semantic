@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, ViewPatterns #-}
 module Data.Syntax.Expression where
 
-import Data.Abstract.Evaluatable
+import Data.Abstract.Evaluatable hiding (Call)
 import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
 import Data.Fixed
 import Diffing.Algorithm
@@ -18,7 +18,7 @@ instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Call where
   eval Call{..} = do
     op <- subtermValue callFunction
-    call op (map subtermValue callParams)
+    evalCall op (map subtermValue callParams)
 
 data Comparison a
   = LessThan !a !a

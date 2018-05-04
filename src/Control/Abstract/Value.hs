@@ -140,7 +140,7 @@ class (Monad (m effects), Show value) => MonadValue location value (effects :: [
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
   lambda :: (FreeVariables term, MonadEvaluator location term value effects m) => [Name] -> Subterm term (m effects value) -> m effects value
   -- | Evaluate an application (like a function call).
-  call :: value -> [m effects value] -> m effects value
+  evalCall :: value -> [m effects value] -> m effects value
 
   -- | Primitive looping combinator, approximately equivalent to 'fix'. This should be used in place of direct recursion, as it allows abstraction over recursion.
   --

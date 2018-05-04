@@ -154,7 +154,7 @@ instance ( Alternative (m effects)
     (Int, Float) ->                     pure Int
     _                 -> unify left right $> Bool
 
-  call op params = do
+  evalCall op params = do
     tvar <- raise fresh
     paramTypes <- sequenceA params
     let needed = Product paramTypes :-> Var tvar

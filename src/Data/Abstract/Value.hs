@@ -360,7 +360,7 @@ instance ( Member (EvalClosure term (Value location)) effects
     l <- label body
     injValue . Closure names l . Env.bind (foldr Set.delete (Set.fromList (freeVariables body)) names) <$> getEnv
 
-  call op params = do
+  evalCall op params = do
     case prjValue op of
       Just (Closure names label env) -> do
         -- Evaluate the bindings and the body within a `goto` in order to
