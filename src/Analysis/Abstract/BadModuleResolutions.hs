@@ -1,6 +1,8 @@
 {-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 {-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s Evaluator constraint
-module Analysis.Abstract.BadModuleResolutions where
+module Analysis.Abstract.BadModuleResolutions
+( BadModuleResolutions
+) where
 
 import Control.Abstract.Analysis
 import Data.Abstract.Evaluatable
