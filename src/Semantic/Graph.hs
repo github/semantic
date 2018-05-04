@@ -63,24 +63,20 @@ parseModule parser rootDir file = do
   moduleForBlob rootDir blob <$> parse parser blob
 
 
-importGraphAnalysis :: forall location term value syntax ann a
-                    .  ( AbstractHole value
-                       , Element Syntax.Identifier syntax
-                       , Lower (Cell location value)
-                       , Show location
-                       , Show value
+importGraphAnalysis :: forall term syntax ann a
+                    .  ( Element Syntax.Identifier syntax
                        )
-                    => Evaluator location term value
+                    => Evaluator (Located Precise term) term (Value Precise)
                       (  State (ImportGraph (Term (Sum syntax) ann))
-                      ': Resumable (AddressError location value)
-                      ': Resumable (ResolutionError value)
-                      ': Resumable (EvalError value)
+                      ': Resumable (AddressError (Located Precise term) (Value Precise))
+                      ': Resumable (ResolutionError (Value Precise))
+                      ': Resumable (EvalError (Value Precise))
                       ': State [Name]
-                      ': Resumable (ValueError location value)
-                      ': Resumable (Unspecialized value)
+                      ': Resumable (ValueError (Located Precise term) (Value Precise))
+                      ': Resumable (Unspecialized (Value Precise))
                       ': Resumable (LoadError term)
-                      ': EvaluatingEffects location term value) a
-                    -> (Either String (Either (SomeExc (LoadError term)) ((a, ImportGraph (Term (Sum syntax) ann)), [Name])), EvaluatingState location term value)
+                      ': EvaluatingEffects (Located Precise term) term (Value Precise)) a
+                    -> (Either String (Either (SomeExc (LoadError term)) ((a, ImportGraph (Term (Sum syntax) ann)), [Name])), EvaluatingState (Located Precise term) term (Value Precise))
 importGraphAnalysis
   = evaluating
   . erroring @(LoadError term)
@@ -106,7 +102,7 @@ graphImports :: ( Show ann
                 )
              => Package (Term (Sum syntax) ann)
              -> Eff effs (ImportGraph (Term (Sum syntax) ann))
-graphImports package = analyze importGraphAnalysis (evaluatePackageWith package) >>= extractGraph
+graphImports package = analyze importGraphAnalysis (evaluatePackageWith _ _ package) >>= extractGraph
   where
     extractGraph result = case result of
       (Right (Right ((_, graph), _)), _) -> pure graph
