@@ -8,6 +8,7 @@ module Data.Abstract.Evaluatable
 , EvalError(..)
 , runEvalError
 , runEvalErrorWith
+, subtermValue
 , evaluateInScopedEnv
 , evaluatePackageWith
 , throwEvalError
@@ -135,12 +136,14 @@ deriving instance Show (Unspecialized a b)
 instance Show1 (Unspecialized a) where
   liftShowsPrec _ _ = showsPrec
 
+subtermValue :: Subterm t a -> a
+subtermValue = subtermRef
+
 runUnspecialized :: Evaluator location value (Resumable (Unspecialized value) ': effects) a -> Evaluator location value effects (Either (SomeExc (Unspecialized value)) a)
 runUnspecialized = runResumable
 
 runUnspecializedWith :: (forall resume . Unspecialized value resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (Unspecialized value) ': effects) a -> Evaluator location value effects a
 runUnspecializedWith = runResumableWith
-
 
 -- Instances
 
@@ -159,7 +162,7 @@ instance Evaluatable s => Evaluatable (TermF s a) where
 ---   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval = maybe unit (runApp . foldMap1 (App . subtermValue)) . nonEmpty
+  eval = maybe unit (runApp . foldMap1 (App . subtermRef)) . nonEmpty
 
 
 traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator location value effects ()

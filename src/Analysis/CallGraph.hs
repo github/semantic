@@ -9,7 +9,7 @@ module Analysis.CallGraph
 import qualified Algebra.Graph as G
 import Algebra.Graph.Class
 import Algebra.Graph.Export.Dot
-import Data.Abstract.FreeVariables
+import Data.Abstract.Evaluatable
 import Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
@@ -47,11 +47,11 @@ class CustomCallGraphAlgebra syntax where
 
 -- | 'Declaration.Function's produce a vertex for their name, with edges to any free variables in their body.
 instance CustomCallGraphAlgebra Declaration.Function where
-  customCallGraphAlgebra Declaration.Function{..} bound = foldMap vertex (freeVariables (subterm functionName)) `connect` subtermValue functionBody (foldMap (freeVariables . subterm) functionParameters <> bound)
+  customCallGraphAlgebra Declaration.Function{..} bound = foldMap vertex (freeVariables (subterm functionName)) `connect` subtermRef functionBody (foldMap (freeVariables . subterm) functionParameters <> bound)
 
 -- | 'Declaration.Method's produce a vertex for their name, with edges to any free variables in their body.
 instance CustomCallGraphAlgebra Declaration.Method where
-  customCallGraphAlgebra Declaration.Method{..} bound = foldMap vertex (freeVariables (subterm methodName)) `connect` subtermValue methodBody (foldMap (freeVariables . subterm) methodParameters <> bound)
+  customCallGraphAlgebra Declaration.Method{..} bound = foldMap vertex (freeVariables (subterm methodName)) `connect` subtermRef methodBody (foldMap (freeVariables . subterm) methodParameters <> bound)
 
 -- | 'Syntax.Identifier's produce a vertex iff it’s unbound in the 'Set'.
 instance CustomCallGraphAlgebra Syntax.Identifier where
@@ -72,7 +72,7 @@ class CallGraphAlgebraWithStrategy (strategy :: Strategy) syntax where
 
 -- | The 'Default' definition of 'callGraphAlgebra' combines all of the 'CallGraph's within the @syntax@ 'Monoid'ally.
 instance Foldable syntax => CallGraphAlgebraWithStrategy 'Default syntax where
-  callGraphAlgebraWithStrategy _ = foldMap subtermValue
+  callGraphAlgebraWithStrategy _ = foldMap subtermRef
 
 -- | The 'Custom' strategy calls out to the 'customCallGraphAlgebra' method.
 instance CustomCallGraphAlgebra syntax => CallGraphAlgebraWithStrategy 'Custom syntax where
