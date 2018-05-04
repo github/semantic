@@ -62,18 +62,15 @@ parseModule parser rootDir file = do
   moduleForBlob rootDir blob <$> parse parser blob
 
 
-type ImportGraphAnalysis term
-  = ImportGraphing
-  ( BadAddresses
-  ( BadModuleResolutions
-  ( BadVariables
-  ( BadValues
-  ( BadSyntax
-  ( Erroring (Analysis.LoadError term)
-  ( Evaluating
-    (Located Precise term)
-    term
-    (Value (Located Precise term)))))))))
+importGraphAnalysis
+  = evaluating
+  . erroring @(Analysis.LoadError term)
+  . resumingBadSyntax
+  . resumingBadValues
+  . resumingBadVariables
+  . resumingBadModuleResolutions
+  . resumingBadAddresses
+  . importGraphing
 
 -- | Render the import graph for a given 'Package'.
 graphImports :: ( Show ann
