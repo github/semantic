@@ -1,6 +1,7 @@
 {-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Analysis.Abstract.Evaluating
 ( EvaluatingState(..)
+, EvaluatingEffects
 , providingCurrentTerm
 , providingCurrentModule
 , evaluating
