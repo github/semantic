@@ -1,31 +1,15 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s Evaluator constraint
+{-# LANGUAGE GADTs, TypeOperators #-}
 module Analysis.Abstract.BadAddresses
-( BadAddresses
+( resumingBadAddresses
 ) where
 
-import Control.Abstract.Analysis
+import Control.Abstract.Addressable
+import Control.Abstract.Evaluator
+import Control.Abstract.Value
 import Data.Abstract.Address
 import Prologue
 
-newtype BadAddresses m (effects :: [* -> *]) a = BadAddresses { runBadAddresses :: m effects a }
-  deriving (Alternative, Applicative, Functor, Effectful, Monad)
-
-deriving instance Evaluator location term value m => Evaluator location term value (BadAddresses m)
-deriving instance AnalyzeModule location term value inner outer m => AnalyzeModule location term value inner outer (BadAddresses m)
-deriving instance AnalyzeTerm location term value inner outer m => AnalyzeTerm location term value inner outer (BadAddresses m)
-
-instance ( Interpreter m effects
-         , Evaluator location term value m
-         , AbstractHole value
-         , Monoid (Cell location value)
-         , Show location
-         )
-      => Interpreter (BadAddresses m) (Resumable (AddressError location value) ': effects) where
-  type Result (BadAddresses m) (Resumable (AddressError location value) ': effects) result = Result m effects result
-  interpret
-    = interpret
-    . runBadAddresses
-    . raiseHandler (relay pure (\ (Resumable err) yield -> traceM ("AddressError:" <> show err) *> case err of
-      UnallocatedAddress _   -> yield mempty
-      UninitializedAddress _ -> yield hole))
+resumingBadAddresses :: (AbstractHole value, Monoid (Cell location value), Show location) => Evaluator location term value (Resumable (AddressError location value) ': effects) a -> Evaluator location term value effects a
+resumingBadAddresses = raiseHandler (relay pure (\ (Resumable err) yield -> traceM ("AddressError:" <> show err) *> case err of
+  UnallocatedAddress _   -> yield mempty
+  UninitializedAddress _ -> yield hole))
