@@ -44,8 +44,11 @@ type MonadEvaluatable location term value effects m =
   ( Declarations term
   , FreeVariables term
   , Member (EvalClosure term value) effects
+  , Member (EvalModule term value) effects
   , Member (LoopControl value) effects
+  , Member (Reader ModuleInfo) effects
   , Member (Reader (ModuleTable [Module term])) effects
+  , Member (Reader PackageInfo) effects
   , Member (Resumable (Unspecialized value)) effects
   , Member (Resumable (LoadError term)) effects
   , Member (Resumable (EvalError value)) effects
@@ -153,10 +156,7 @@ instance Show1 (Unspecialized a) where
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
-  eval :: ( Member (EvalModule term value) effects
-          , Member Fail effects
-          , Member (Reader ModuleInfo) effects
-          , Member (Reader PackageInfo) effects
+  eval :: ( Member Fail effects
           , MonadEvaluatable location term value effects m
           )
        => SubtermAlgebra constr term (m effects value)

@@ -32,7 +32,7 @@ toName = FV.name . BC.pack . unPath
 
 -- Node.js resolution algorithm: https://nodejs.org/api/modules.html#modules_all_together
 -- TypeScript has a couple of different strategies, but the main one mimics Node.js.
-resolveWithNodejsStrategy :: (Member (Reader ModuleInfo) effects, MonadEvaluatable location term value effects m) => ImportPath -> [String] -> m effects ModulePath
+resolveWithNodejsStrategy :: MonadEvaluatable location term value effects m => ImportPath -> [String] -> m effects ModulePath
 resolveWithNodejsStrategy (ImportPath path Relative)    exts = resolveRelativePath path exts
 resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativePath path exts
 
@@ -43,7 +43,7 @@ resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativ
 -- /root/src/moduleB.ts
 -- /root/src/moduleB/package.json (if it specifies a "types" property)
 -- /root/src/moduleB/index.ts
-resolveRelativePath :: forall value term location effects m. (Member (Reader ModuleInfo) effects, MonadEvaluatable location term value effects m) => FilePath -> [String] -> m effects ModulePath
+resolveRelativePath :: forall value term location effects m. MonadEvaluatable location term value effects m => FilePath -> [String] -> m effects ModulePath
 resolveRelativePath relImportPath exts = do
   ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory modulePath
@@ -62,7 +62,7 @@ resolveRelativePath relImportPath exts = do
 --
 -- /root/node_modules/moduleB.ts, etc
 -- /node_modules/moduleB.ts, etc
-resolveNonRelativePath :: forall value term location effects m. (Member (Reader ModuleInfo) effects, MonadEvaluatable location term value effects m) => FilePath -> [String] -> m effects ModulePath
+resolveNonRelativePath :: forall value term location effects m. MonadEvaluatable location term value effects m => FilePath -> [String] -> m effects ModulePath
 resolveNonRelativePath name exts = do
   ModuleInfo{..} <- currentModule
   go "." modulePath mempty
@@ -92,7 +92,7 @@ typescriptExtensions = ["ts", "tsx", "d.ts"]
 javascriptExtensions :: [String]
 javascriptExtensions = ["js"]
 
-evalRequire :: (Member (EvalModule term value) effects, MonadEvaluatable location term value effects m) => ModulePath -> Name -> m effects value
+evalRequire :: MonadEvaluatable location term value effects m => ModulePath -> Name -> m effects value
 evalRequire modulePath alias = letrec' alias $ \addr -> do
   importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
   modifyEnv (mergeEnvs importedEnv)
