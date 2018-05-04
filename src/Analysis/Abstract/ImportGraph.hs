@@ -2,18 +2,20 @@
 module Analysis.Abstract.ImportGraph
 ( ImportGraph(..)
 , renderImportGraph
-, ImportGraphing
+, graphingTerms
+, graphingModules
+, importGraphing
 ) where
 
 import qualified Algebra.Graph as G
 import           Algebra.Graph.Class hiding (Vertex)
 import           Algebra.Graph.Export.Dot hiding (vertexName)
-import           Control.Abstract.Analysis
+import           Control.Abstract.Evaluator
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable (LoadError (..))
 import           Data.Abstract.FreeVariables
 import           Data.Abstract.Located
-import           Data.Abstract.Module hiding (Module)
+import           Data.Abstract.Module (Module(moduleInfo), ModuleInfo(..))
 import           Data.Abstract.Origin hiding (Module, Package)
 import           Data.Abstract.Package hiding (Package)
 import           Data.Aeson hiding (Result)
@@ -26,21 +28,21 @@ import           Data.Text.Encoding as T
 import           Prologue hiding (empty, packageName)
 
 -- | The graph of function variableDefinitions to symbols used in a given program.
-newtype ImportGraph = ImportGraph { unImportGraph :: G.Graph Vertex }
+newtype ImportGraph term = ImportGraph { unImportGraph :: G.Graph (Vertex term) }
   deriving (Eq, Graph, Show)
 
 -- | A vertex of some specific type.
-data Vertex
+data Vertex term
   = Package  { vertexName :: ByteString }
   | Module   { vertexName :: ByteString }
   | Variable { vertexName :: ByteString }
   deriving (Eq, Ord, Show)
 
 -- | Render a 'ImportGraph' to a 'ByteString' in DOT notation.
-renderImportGraph :: ImportGraph -> ByteString
+renderImportGraph :: ImportGraph term -> ByteString
 renderImportGraph = export style . unImportGraph
 
-style :: Style Vertex ByteString
+style :: Style (Vertex term) ByteString
 style = (defaultStyle vertexName)
   { vertexAttributes = vertexAttributes
   , edgeAttributes   = edgeAttributes
@@ -53,104 +55,90 @@ style = (defaultStyle vertexName)
         edgeAttributes Variable{} Module{}   = [ "color" := "blue" ]
         edgeAttributes _          _          = []
 
-newtype ImportGraphing m (effects :: [* -> *]) a = ImportGraphing { runImportGraphing :: m effects a }
-  deriving (Alternative, Applicative, Functor, Effectful, Monad)
+graphingTerms :: forall location term value effects syntax ann a
+              .  ( Element Syntax.Identifier syntax
+                 , Members '[ Reader (Environment (Located location term) value)
+                            , Reader (SomeOrigin term)
+                            , Resumable (LoadError term)
+                            , State (Environment (Located location term) value)
+                            , State (ImportGraph term)
+                            ] effects
+                 , term ~ Term (Sum syntax) ann
+                 )
+              => SubtermAlgebra (Base term) term (Evaluator (Located location term) term value effects a)
+              -> SubtermAlgebra (Base term) term (Evaluator (Located location term) term value effects a)
+graphingTerms recur term@(In _ syntax) = do
+  case projectSum syntax of
+    Just (Syntax.Identifier name) -> do
+      moduleInclusion (Variable (unName name))
+      variableDefinition name
+    _ -> pure ()
+  resume
+    @(LoadError term)
+    (recur term)
+    (\yield (LoadError name) -> moduleInclusion (Module (BC.pack name)) *> yield [])
 
-deriving instance Evaluator location term value m => Evaluator location term value (ImportGraphing m)
-
-instance ( Member (Reader (Environment (Located location term) value)) outer
-         , Member (Reader (SomeOrigin term)) outer
-         , Member (Resumable (LoadError term)) outer
-         , Member (State (Environment (Located location term) value)) outer
-         , Member (State ImportGraph) outer
-         , Element Syntax.Identifier syntax
-         , Evaluator (Located location term) term value m
-         , AnalyzeTerm (Located location term) term value inner outer m
-         , term ~ Term (Sum syntax) ann
-         )
-      => AnalyzeTerm (Located location term) term value inner outer (ImportGraphing m) where
-  analyzeTerm recur term@(In _ syntax) = do
-    case projectSum syntax of
-      Just (Syntax.Identifier name) -> do
-        moduleInclusion (Variable (unName name))
-        variableDefinition name
-      _ -> pure ()
-    resume
-      @(LoadError term)
-      (ImportGraphing (analyzeTerm (runImportGraphing . recur) term))
-      (\yield (LoadError name) -> moduleInclusion (Module (BC.pack name)) *> yield [])
-
-instance ( Member (Reader (SomeOrigin term)) outer
-         , Member (State ImportGraph) outer
-         , Evaluator (Located location term) term value m
-         , AnalyzeModule (Located location term) term value inner outer m
-         , term ~ Term (Sum syntax) ann
-         )
-      => AnalyzeModule (Located location term) term value inner outer (ImportGraphing m) where
-  analyzeModule recur m = do
-    let name = BC.pack (modulePath (moduleInfo m))
-    packageInclusion (Module name)
-    moduleInclusion (Module name)
-    ImportGraphing (analyzeModule (runImportGraphing . recur) m)
+graphingModules :: Members '[ Reader (SomeOrigin term)
+                            , State (ImportGraph term)
+                            ] effects
+               => SubtermAlgebra Module term (Evaluator location term value effects a)
+               -> SubtermAlgebra Module term (Evaluator location term value effects a)
+graphingModules recur m = do
+  let name = BC.pack (modulePath (moduleInfo m))
+  packageInclusion (Module name)
+  moduleInclusion (Module name)
+  recur m
 
 
-packageGraph :: SomeOrigin term -> ImportGraph
+packageGraph :: SomeOrigin term -> ImportGraph term
 packageGraph = maybe empty (vertex . Package . unName . packageName) . withSomeOrigin originPackage
 
-moduleGraph :: SomeOrigin term -> ImportGraph
+moduleGraph :: SomeOrigin term -> ImportGraph term
 moduleGraph = maybe empty (vertex . Module . BC.pack . modulePath) . withSomeOrigin originModule
 
 -- | Add an edge from the current package to the passed vertex.
-packageInclusion :: forall m location term value effects
-                 .  ( Evaluator location term value m
-                    , Member (Reader (SomeOrigin term)) effects
-                    , Member (State ImportGraph) effects
-                    , Monad (m effects)
+packageInclusion :: ( Member (Reader (SomeOrigin term)) effects
+                    , Member (State (ImportGraph term)) effects
                     )
-                 => Vertex
-                 -> m effects ()
+                 => Vertex term
+                 -> Evaluator location term value effects ()
 packageInclusion v = do
   o <- askOrigin
-  appendGraph (packageGraph @term o `connect` vertex v)
+  appendGraph (packageGraph o `connect` vertex v)
 
 -- | Add an edge from the current module to the passed vertex.
-moduleInclusion :: forall m location term value effects
-                .  ( Evaluator location term value m
-                   , Member (Reader (SomeOrigin term)) effects
-                   , Member (State ImportGraph) effects
-                   , Monad (m effects)
+moduleInclusion :: ( Member (Reader (SomeOrigin term)) effects
+                   , Member (State (ImportGraph term)) effects
                    )
-                => Vertex
-                -> m effects ()
+                => Vertex term
+                -> Evaluator location term value effects ()
 moduleInclusion v = do
   o <- askOrigin
-  appendGraph (moduleGraph @term o `connect` vertex v)
+  appendGraph (moduleGraph o `connect` vertex v)
 
 -- | Add an edge from the passed variable name to the module it originated within.
-variableDefinition :: ( Evaluator (Located location term) term value m
-                      , Member (Reader (Environment (Located location term) value)) effects
+variableDefinition :: ( Member (Reader (Environment (Located location term) value)) effects
                       , Member (State (Environment (Located location term) value)) effects
-                      , Member (State ImportGraph) effects
-                      , Monad (m effects)
+                      , Member (State (ImportGraph term)) effects
                       )
                    => Name
-                   -> ImportGraphing m effects ()
+                   -> Evaluator (Located location term) term value effects ()
 variableDefinition name = do
   graph <- maybe empty (moduleGraph . origin . unAddress) <$> lookupEnv name
   appendGraph (vertex (Variable (unName name)) `connect` graph)
 
-appendGraph :: (Effectful m, Member (State ImportGraph) effects) => ImportGraph -> m effects ()
+appendGraph :: Member (State (ImportGraph term)) effects => ImportGraph term -> Evaluator location term value effects ()
 appendGraph = raise . modify' . (<>)
 
 
-instance Semigroup ImportGraph where
+instance Semigroup (ImportGraph term) where
   (<>) = overlay
 
-instance Monoid ImportGraph where
+instance Monoid (ImportGraph term) where
   mempty = empty
   mappend = (<>)
 
-instance Ord ImportGraph where
+instance Ord (ImportGraph term) where
   compare (ImportGraph G.Empty)           (ImportGraph G.Empty)           = EQ
   compare (ImportGraph G.Empty)           _                               = LT
   compare _                               (ImportGraph G.Empty)           = GT
@@ -162,28 +150,26 @@ instance Ord ImportGraph where
   compare _                               (ImportGraph (G.Overlay _ _))   = GT
   compare (ImportGraph (G.Connect a1 a2)) (ImportGraph (G.Connect b1 b2)) = (compare `on` ImportGraph) a1 b1 <> (compare `on` ImportGraph) a2 b2
 
-instance Output ImportGraph where
+instance Output (ImportGraph term) where
   toOutput = toStrict . (<> "\n") . encode
 
-instance ToJSON ImportGraph where
+instance ToJSON (ImportGraph term) where
   toJSON ImportGraph{..} = object [ "vertices" .= vertices, "edges" .= edges ]
     where
       vertices = toJSON (G.vertexList unImportGraph)
       edges = fmap (\(a, b) -> object [ "source" .= vertexToText a, "target" .= vertexToText b ]) (G.edgeList unImportGraph)
 
-instance ToJSON Vertex where
+instance ToJSON (Vertex term) where
   toJSON v = object [ "name" .= vertexToText v, "type" .= vertexToType v ]
 
-vertexToText :: Vertex -> Text
+vertexToText :: Vertex termt -> Text
 vertexToText = decodeUtf8 . vertexName
 
-vertexToType :: Vertex -> Text
+vertexToType :: Vertex termt -> Text
 vertexToType Package{}  = "package"
 vertexToType Module{}   = "module"
 vertexToType Variable{} = "variable"
 
 
-instance Interpreter m effects
-      => Interpreter (ImportGraphing m) (State ImportGraph ': effects) where
-  type Result (ImportGraphing m) (State ImportGraph ': effects) result = Result m effects (result, ImportGraph)
-  interpret = interpret . runImportGraphing . handleState mempty
+importGraphing :: Effectful m => m (State (ImportGraph term) ': effects) result -> m effects (result, ImportGraph term)
+importGraphing = handleState mempty
