@@ -52,7 +52,10 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (BC.unpack prefix) (J
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
 resolvePythonModules :: forall value term location effects
-                     .  MonadEvaluatable location term value effects
+                     .  Members '[ Reader ModuleInfo
+                                 , Reader (ModuleTable [Module term])
+                                 , Resumable (ResolutionError value)
+                                 ] effects
                      => QualifiedName
                      -> Evaluator location term value effects (NonEmpty ModulePath)
 resolvePythonModules q = do
