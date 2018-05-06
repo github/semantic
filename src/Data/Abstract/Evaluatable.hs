@@ -199,7 +199,7 @@ askModuleTable :: Member (Reader (ModuleTable [Module term])) effects
 askModuleTable = raise ask
 
 -- Resolve a list of module paths to a possible module table entry.
-resolve :: MonadEvaluatable location term value effects
+resolve :: Member (Reader (ModuleTable [Module term])) effects
         => [FilePath]
         -> Evaluator location term value effects (Maybe ModulePath)
 resolve names = do
