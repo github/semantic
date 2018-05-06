@@ -3,6 +3,7 @@ module Analysis.Abstract.ImportGraph
 ( ImportGraph(..)
 , renderImportGraph
 , graphingTerms
+, graphingLoadErrors
 , graphingModules
 , importGraphing
 ) where
@@ -54,12 +55,10 @@ style = (defaultStyle vertexName)
         edgeAttributes Variable{} Module{}   = [ "color" := "blue" ]
         edgeAttributes _          _          = []
 
-graphingTerms :: forall location term value effects syntax ann a
-              .  ( Element Syntax.Identifier syntax
+graphingTerms :: ( Element Syntax.Identifier syntax
                  , Members '[ Reader (Environment (Located location) value)
                             , Reader ModuleInfo
                             , Reader PackageInfo
-                            , Resumable (LoadError term)
                             , State (Environment (Located location) value)
                             , State (ImportGraph term)
                             ] effects
@@ -73,10 +72,18 @@ graphingTerms recur term@(In _ syntax) = do
       moduleInclusion (Variable (unName name))
       variableDefinition name
     _ -> pure ()
-  resume
-    @(LoadError term)
-    (recur term)
-    (\ (LoadError name) -> moduleInclusion (Module (BC.pack name)) *> pure [])
+  (recur term)
+
+graphingLoadErrors :: forall location term value effects a
+                   .  Members '[ Reader ModuleInfo
+                               , Resumable (LoadError term)
+                               , State (ImportGraph term)
+                               ] effects
+                   => SubtermAlgebra (Base term) term (Evaluator location term value effects a)
+                   -> SubtermAlgebra (Base term) term (Evaluator location term value effects a)
+graphingLoadErrors recur term = resume @(LoadError term)
+  (recur term)
+  (\ (LoadError name) -> moduleInclusion (Module (BC.pack name)) *> pure [])
 
 graphingModules :: Members '[ Reader ModuleInfo
                             , Reader PackageInfo
