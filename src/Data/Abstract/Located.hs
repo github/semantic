@@ -2,23 +2,25 @@
 module Data.Abstract.Located where
 
 import Control.Abstract.Addressable
-import Control.Effect
-import Control.Monad.Effect.Reader
+import Control.Abstract.Evaluator
 import Data.Abstract.Address
-import Data.Abstract.Origin
+import Data.Abstract.Module (ModuleInfo)
+import Data.Abstract.Package (PackageInfo)
 import Prologue
 
-data Located location term = Located { location :: location, origin :: !(SomeOrigin term) }
+data Located location termInfo = Located { location :: location, origin :: !(Origin termInfo) }
   deriving (Eq, Ord, Show)
 
-instance (Location location, Ord term) => Location (Located location term) where
-  type Cell (Located location term) = Cell location
+instance (Location location, Ord termInfo) => Location (Located location termInfo) where
+  type Cell (Located location termInfo) = Cell location
 
 instance ( Addressable location effects
-         , Member (Reader (SomeOrigin term)) effects
-         , Ord term
+         , Members '[ Reader ModuleInfo
+                    , Reader PackageInfo
+                    ] effects
+         , Ord termInfo
          )
-      => Addressable (Located location term) effects where
+      => Addressable (Located location termInfo) effects where
   derefCell (Address (Located loc _)) = raise . lower . derefCell (Address loc)
 
-  allocLoc name = raise (lower (Located <$> allocLoc name <*> raise ask))
+  allocLoc name = raise (lower (Located <$> allocLoc name <*> askOrigin))

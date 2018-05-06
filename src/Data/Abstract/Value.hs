@@ -8,7 +8,9 @@ import Data.Abstract.Address
 import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables
+import Data.Abstract.Module (ModuleInfo)
 import qualified Data.Abstract.Number as Number
+import Data.Abstract.Package (PackageInfo)
 import Data.List (genericIndex, genericLength)
 import Data.Scientific (Scientific)
 import Data.Scientific.Exts
@@ -213,7 +215,8 @@ instance ( Addressable location effects
                     , Fail
                     , LoopControl (Value location)
                     , Reader (Environment location (Value location))
-                    , Reader (SomeOrigin (Base term ()))
+                    , Reader ModuleInfo
+                    , Reader PackageInfo
                     , Resumable (AddressError location (Value location))
                     , Resumable (ValueError location (Value location))
                     , Return (Value location)

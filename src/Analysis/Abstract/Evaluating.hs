@@ -32,7 +32,6 @@ type EvaluatingEffects location term value
      , LoopControl value
      , Fail                                -- Failure with an error message
      , Fresh                               -- For allocating new addresses and/or type variables.
-     , Reader (SomeOrigin (Base term ()))  -- The current term’s origin.
      , Reader (Environment location value) -- Default environment used as a fallback in lookupEnv
      , Reader LoadStack
      , State (Environment location value)
@@ -55,7 +54,6 @@ evaluating
   . handleState lowerBound -- State (Environment location value)
   . handleReader lowerBound -- Reader LoadStack
   . handleReader lowerBound -- Reader (Environment location value)
-  . handleReader lowerBound -- Reader (SomeOrigin (Base term ()))
   . raiseHandler
     ( flip runFresh' 0
     . runFail

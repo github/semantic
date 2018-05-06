@@ -16,8 +16,8 @@ import           Data.Abstract.Evaluatable (LoadError (..))
 import           Data.Abstract.FreeVariables
 import           Data.Abstract.Located
 import           Data.Abstract.Module (Module(moduleInfo), ModuleInfo(..))
-import           Data.Abstract.Origin hiding (Module, Package)
-import           Data.Abstract.Package hiding (Package)
+import           Data.Abstract.Origin
+import           Data.Abstract.Package (PackageInfo(..))
 import           Data.Aeson hiding (Result)
 import qualified Data.ByteString.Char8 as BC
 import           Data.ByteString.Lazy (toStrict)
@@ -58,7 +58,8 @@ style = (defaultStyle vertexName)
 graphingTerms :: forall location term value effects syntax ann a
               .  ( Element Syntax.Identifier syntax
                  , Members '[ Reader (Environment (Located location (Base term ())) value)
-                            , Reader (SomeOrigin (Base term ()))
+                            , Reader ModuleInfo
+                            , Reader PackageInfo
                             , Resumable (LoadError term)
                             , State (Environment (Located location (Base term ())) value)
                             , State (ImportGraph term)
@@ -78,7 +79,8 @@ graphingTerms recur term@(In _ syntax) = do
     (recur term)
     (\yield (LoadError name) -> moduleInclusion (Module (BC.pack name)) *> yield [])
 
-graphingModules :: Members '[ Reader (SomeOrigin (Base term ()))
+graphingModules :: Members '[ Reader ModuleInfo
+                            , Reader PackageInfo
                             , State (ImportGraph term)
                             ] effects
                => SubtermAlgebra Module term (Evaluator location term value effects a)
@@ -90,16 +92,17 @@ graphingModules recur m = do
   recur m
 
 
-packageGraph :: SomeOrigin (Base term ()) -> ImportGraph term
-packageGraph = maybe empty (vertex . Package . unName . packageName) . withSomeOrigin originPackage
+packageGraph :: Origin (Base term ()) -> ImportGraph term
+packageGraph = vertex . Package . unName . packageName . originPackage
 
-moduleGraph :: SomeOrigin (Base term ()) -> ImportGraph term
-moduleGraph = maybe empty (vertex . Module . BC.pack . modulePath) . withSomeOrigin originModule
+moduleGraph :: Origin (Base term ()) -> ImportGraph term
+moduleGraph = vertex . Module . BC.pack . modulePath . originModule
 
 -- | Add an edge from the current package to the passed vertex.
-packageInclusion :: ( Member (Reader (SomeOrigin (Base term ()))) effects
-                    , Member (State (ImportGraph term)) effects
-                    )
+packageInclusion :: Members '[ Reader ModuleInfo
+                             , Reader PackageInfo
+                             , State (ImportGraph term)
+                             ] effects
                  => Vertex term
                  -> Evaluator location term value effects ()
 packageInclusion v = do
@@ -107,9 +110,10 @@ packageInclusion v = do
   appendGraph (packageGraph o `connect` vertex v)
 
 -- | Add an edge from the current module to the passed vertex.
-moduleInclusion :: ( Member (Reader (SomeOrigin (Base term ()))) effects
-                   , Member (State (ImportGraph term)) effects
-                   )
+moduleInclusion :: Members '[ Reader ModuleInfo
+                            , Reader PackageInfo
+                            , State (ImportGraph term)
+                            ] effects
                 => Vertex term
                 -> Evaluator location term value effects ()
 moduleInclusion v = do
