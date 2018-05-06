@@ -76,7 +76,7 @@ graphingTerms recur term@(In _ syntax) = do
   resume
     @(LoadError term)
     (recur term)
-    (\yield (LoadError name) -> moduleInclusion (Module (BC.pack name)) *> yield [])
+    (\ (LoadError name) -> moduleInclusion (Module (BC.pack name)) *> pure [])
 
 graphingModules :: Members '[ Reader ModuleInfo
                             , Reader PackageInfo

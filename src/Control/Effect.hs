@@ -67,5 +67,5 @@ runState = raiseHandler . flip Eff.runState
 runFresh :: Effectful m => Int -> m (Fresh ': effects) a -> m effects a
 runFresh = raiseHandler . flip runFresh'
 
-resume :: (Member (Resumable exc) e, Effectful m) => m e a -> (forall v . (v -> m e a) -> exc v -> m e a) -> m e a
-resume m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
+resume :: (Member (Resumable exc) effects, Effectful m) => m effects a -> (forall v . exc v -> m effects v) -> m effects a
+resume m handle = raise (resumeError (lower m) (\yield -> (>>= yield) . lower . handle))
