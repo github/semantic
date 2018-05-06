@@ -77,7 +77,12 @@ importGraphAnalysis :: forall term syntax ann a
                       ': Resumable (Unspecialized (Value (Located Precise term)))
                       ': Resumable (LoadError term)
                       ': EvaluatingEffects (Located Precise term) term (Value (Located Precise term))) a
-                    -> (Either String (Either (SomeExc (LoadError term)) ((a, ImportGraph (Term (Sum syntax) ann)), [Name])), EvaluatingState (Located Precise term) term (Value (Located Precise term)))
+                    -> (   Either String                                                             -- 'fail' calls
+                         ( Either (SomeExc (LoadError term))                                         -- Unhandled LoadErrors
+                         ( ( a                                                                       -- the result value
+                           , ImportGraph (Term (Sum syntax) ann))                                    -- the import graph
+                         , [Name]))                                                                  -- the list of bad names
+                       , EvaluatingState (Located Precise term) term (Value (Located Precise term))) -- the final state
 importGraphAnalysis
   = evaluating
   . erroring @(LoadError term)
