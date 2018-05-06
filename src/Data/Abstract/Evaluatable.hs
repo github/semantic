@@ -209,9 +209,9 @@ resolve names = do
 traceResolve :: (Show a, Show b) => a -> b -> c -> c
 traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 
-listModulesInDir :: MonadEvaluatable location term value effects
-        => FilePath
-        -> Evaluator location term value effects [ModulePath]
+listModulesInDir :: Member (Reader (ModuleTable [Module term])) effects
+                 => FilePath
+                 -> Evaluator location term value effects [ModulePath]
 listModulesInDir dir = ModuleTable.modulePathsInDir dir <$> askModuleTable
 
 -- | Require/import another module by name and return it's environment and value.
