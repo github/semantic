@@ -42,14 +42,14 @@ import           Prologue
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
-  eval :: ( Member Fail effects
-          , MonadEvaluatable location term value effects
+  eval :: ( EvaluatableConstraints location term value effects
+          , Member Fail effects
           )
        => SubtermAlgebra constr term (Evaluator location term value effects value)
   default eval :: (Member (Resumable (Unspecialized value)) effects, Show1 constr) => SubtermAlgebra constr term (Evaluator location term value effects value)
   eval expr = throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
-type MonadEvaluatable location term value effects =
+type EvaluatableConstraints location term value effects =
   ( AbstractValue location term value effects
   , Addressable location effects
   , Declarations term
@@ -307,11 +307,11 @@ instance Applicative m => Monoid (Merging m location value) where
 
 -- | Evaluate a given package.
 evaluatePackageWith :: ( Evaluatable (Base term)
+                       , EvaluatableConstraints location term value termEffects
                        , Members '[ Fail
                                   , Reader (Environment location value)
                                   , State (Environment location value)
                                   ] effects
-                       , MonadEvaluatable location term value termEffects
                        , Recursive term
                        , termEffects ~ (EvalClosure term value ': moduleEffects)
                        , moduleEffects ~ (EvalModule term value ': packageBodyEffects)
@@ -327,11 +327,11 @@ evaluatePackageWith perModule perTerm = handleReader . packageInfo <*> evaluateP
 -- | Evaluate a given package body (module table and entry points).
 evaluatePackageBodyWith :: forall location term value effects termEffects moduleEffects packageBodyEffects
                         .  ( Evaluatable (Base term)
+                           , EvaluatableConstraints location term value termEffects
                            , Members '[ Fail
                                       , Reader (Environment location value)
                                       , State (Environment location value)
                                       ] effects
-                           , MonadEvaluatable location term value termEffects
                            , Recursive term
                            , termEffects ~ (EvalClosure term value ': moduleEffects)
                            , moduleEffects ~ (EvalModule term value ': packageBodyEffects)
