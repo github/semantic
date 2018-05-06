@@ -49,7 +49,7 @@ module Control.Abstract.Evaluator
   -- * Effects
   , EvalClosure(..)
   , evaluateClosureBody
-  , handleClosuresWith
+  , runEvalClosure
   , EvalModule(..)
   , evaluateModule
   , handleModulesWith
@@ -292,8 +292,8 @@ data EvalClosure term value resume where
 evaluateClosureBody :: Member (EvalClosure term value) effects => term -> Evaluator location term value effects value
 evaluateClosureBody = raise . Eff.send . EvalClosure
 
-handleClosuresWith :: (term -> Evaluator location term value effects value) -> Evaluator location term value (EvalClosure term value ': effects) a -> Evaluator location term value effects a
-handleClosuresWith evalClosure = raiseHandler (Eff.relay pure (\ (EvalClosure term) yield -> lower (evalClosure term) >>= yield))
+runEvalClosure :: (term -> Evaluator location term value effects value) -> Evaluator location term value (EvalClosure term value ': effects) a -> Evaluator location term value effects a
+runEvalClosure evalClosure = raiseHandler (Eff.relay pure (\ (EvalClosure term) yield -> lower (evalClosure term) >>= yield))
 
 
 -- | An effect to evaluate a module.
