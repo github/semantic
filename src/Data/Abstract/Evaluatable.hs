@@ -355,25 +355,25 @@ evaluatePackageBodyWith :: forall location term value effects termEffects module
 evaluatePackageBodyWith perModule perTerm body
   = handleReader (packageModules body)
   . handleReader lowerBound
-  . handleEvalModules
+  . runEvalModule
   . withPrelude (packagePrelude body)
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
-  where handleEvalModules :: Evaluator location term value (EvalModule term value ': packageBodyEffects) a -> Evaluator location term value packageBodyEffects a
-        handleEvalModules = raiseHandler (relay pure (\ (EvalModule m) yield -> lower (evalModule m) >>= yield))
+  where runEvalModule :: Evaluator location term value (EvalModule term value ': packageBodyEffects) a -> Evaluator location term value packageBodyEffects a
+        runEvalModule = raiseHandler (relay pure (\ (EvalModule m) yield -> lower (evalModule m) >>= yield))
         evalModule m
-          = handleEvalModules
+          = runEvalModule
           . handleReader (moduleInfo m)
           . perModule (subtermValue . moduleBody)
           . fmap (Subterm <*> evalTerm)
           $ m
-        handleEvalClosures = raiseHandler (relay pure (\ (EvalClosure term) yield -> lower (evalTerm term) >>= yield))
+        runEvalClosure = raiseHandler (relay pure (\ (EvalClosure term) yield -> lower (evalTerm term) >>= yield))
         evalTerm
-          = handleEvalClosures
+          = runEvalClosure
           . runReturn
           . runLoopControl
           . foldSubterms (perTerm eval)
 
-        evaluateEntryPoint m sym = handleReader (ModuleInfo m) . handleEvalClosures . runReturn . runLoopControl $ do
+        evaluateEntryPoint m sym = handleReader (ModuleInfo m) . runEvalClosure . runReturn . runLoopControl $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
 
