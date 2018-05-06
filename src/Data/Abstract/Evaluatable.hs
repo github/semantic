@@ -41,6 +41,15 @@ import           Data.Sum
 import           Data.Term
 import           Prologue
 
+-- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
+class Evaluatable constr where
+  eval :: ( Member Fail effects
+          , MonadEvaluatable location term value effects
+          )
+       => SubtermAlgebra constr term (Evaluator location term value effects value)
+  default eval :: (MonadEvaluatable location term value effects, Show1 constr) => SubtermAlgebra constr term (Evaluator location term value effects value)
+  eval expr = throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
+
 type MonadEvaluatable location term value effects =
   ( AbstractValue location term value effects
   , Addressable location effects
@@ -163,15 +172,6 @@ deriving instance Eq (Unspecialized a b)
 deriving instance Show (Unspecialized a b)
 instance Show1 (Unspecialized a) where
   liftShowsPrec _ _ = showsPrec
-
--- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
-class Evaluatable constr where
-  eval :: ( Member Fail effects
-          , MonadEvaluatable location term value effects
-          )
-       => SubtermAlgebra constr term (Evaluator location term value effects value)
-  default eval :: (MonadEvaluatable location term value effects, Show1 constr) => SubtermAlgebra constr term (Evaluator location term value effects value)
-  eval expr = throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 
 -- Instances
