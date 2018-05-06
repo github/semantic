@@ -364,14 +364,7 @@ evaluatePackageBodyWith perModule perTerm body
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
 
-withPrelude :: Members '[ EvalModule term value
-                        , Reader (Environment location value)
-                        , State (Environment location value)
-                        ] effects
-            => Maybe (Module term)
-            -> Evaluator location term value effects a
-            -> Evaluator location term value effects a
-withPrelude Nothing a = a
-withPrelude (Just prelude) a = do
-  preludeEnv <- evaluateModule prelude *> getEnv
-  withDefaultEnvironment preludeEnv a
+        withPrelude Nothing a = a
+        withPrelude (Just prelude) a = do
+          preludeEnv <- evaluateModule prelude *> getEnv
+          withDefaultEnvironment preludeEnv a
