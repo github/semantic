@@ -27,7 +27,6 @@ library
                      , Analysis.Abstract.Evaluating
                      , Analysis.Abstract.ImportGraph
                      , Analysis.Abstract.Tracing
-                     , Analysis.Abstract.TypeChecking
                      , Analysis.CallGraph
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
