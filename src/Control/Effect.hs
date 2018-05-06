@@ -1,12 +1,11 @@
 {-# LANGUAGE FunctionalDependencies, RankNTypes, TypeFamilies, TypeOperators #-}
 module Control.Effect
 ( Effectful(..)
-, throwResumable
-, resume
 -- * Effects
 , Eff.Reader
 , Eff.State
 , Fresh
+, throwResumable
 -- * Handlers
 , run
 , runEffect
@@ -14,6 +13,7 @@ module Control.Effect
 , runReader
 , runState
 , runFresh
+, resume
 ) where
 
 import qualified Control.Monad.Effect as Eff
@@ -22,13 +22,6 @@ import qualified Control.Monad.Effect.Reader as Eff
 import Control.Monad.Effect.Resumable
 import qualified Control.Monad.Effect.State as Eff
 import Prologue hiding (throwError)
-
-throwResumable :: (Member (Resumable exc) effects, Effectful m) => exc v -> m effects v
-throwResumable = raise . throwError
-
-resume :: (Member (Resumable exc) e, Effectful m) => m e a -> (forall v . (v -> m e a) -> exc v -> m e a) -> m e a
-resume m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
-
 
 -- | Types wrapping 'Eff.Eff' actions.
 --
@@ -42,6 +35,12 @@ class Effectful m where
 instance Effectful Eff.Eff where
   raise = id
   lower = id
+
+
+-- Effects
+
+throwResumable :: (Member (Resumable exc) effects, Effectful m) => exc v -> m effects v
+throwResumable = raise . throwError
 
 
 -- Handlers
@@ -67,3 +66,6 @@ runState = raiseHandler . flip Eff.runState
 -- | Run a 'Fresh' effect in an 'Effectful' context.
 runFresh :: Effectful m => Int -> m (Fresh ': effects) a -> m effects a
 runFresh = raiseHandler . flip runFresh'
+
+resume :: (Member (Resumable exc) e, Effectful m) => m e a -> (forall v . (v -> m e a) -> exc v -> m e a) -> m e a
+resume m handle = raise (resumeError (lower m) (\yield -> lower . handle (raise . yield)))
