@@ -9,7 +9,6 @@ import Control.Abstract.Evaluator
 import qualified Control.Monad.Effect.Internal as Eff
 import Data.Abstract.Address
 import Data.Semilattice.Lower
-import Prologue
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
 data EvaluatingState location term value = EvaluatingState
@@ -20,9 +19,9 @@ data EvaluatingState location term value = EvaluatingState
   , jumps       :: JumpTable term
   }
 
-deriving instance (Eq (Cell location value), Eq location, Eq term, Eq value, Eq (Base term ())) => Eq (EvaluatingState location term value)
-deriving instance (Ord (Cell location value), Ord location, Ord term, Ord value, Ord (Base term ())) => Ord (EvaluatingState location term value)
-deriving instance (Show (Cell location value), Show location, Show term, Show value, Show (Base term ())) => Show (EvaluatingState location term value)
+deriving instance (Eq (Cell location value), Eq location, Eq term, Eq value) => Eq (EvaluatingState location term value)
+deriving instance (Ord (Cell location value), Ord location, Ord term, Ord value) => Ord (EvaluatingState location term value)
+deriving instance (Show (Cell location value), Show location, Show term, Show value) => Show (EvaluatingState location term value)
 
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
