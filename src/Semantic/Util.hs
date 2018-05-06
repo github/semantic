@@ -37,7 +37,7 @@ justEvaluating
 evaluatingWithHoles
   = run
   . evaluating
-  . runLoadError
+  . resumingLoadError
   . resumingUnspecialized
   . resumingValueError
   . resumingEvalError

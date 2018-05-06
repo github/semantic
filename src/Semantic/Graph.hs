@@ -76,16 +76,15 @@ importGraphAnalysis :: forall term syntax ann a
                         , State (Exports (Located Precise) (Value (Located Precise)))
                         , State (JumpTable term)
                         ] a
-                    -> (   Either String                                                   -- 'fail' calls
-                         ( Either (SomeExc (LoadError term))                               -- Unhandled LoadErrors
+                    -> ( Either String                                                     -- 'fail' calls
                          ( ( a                                                             -- the result value
                            , ImportGraph (Term (Sum syntax) ann))                          -- the import graph
-                         , [Name]))                                                        -- the list of bad names
+                         , [Name])                                                         -- the list of bad names
                        , EvaluatingState (Located Precise) term (Value (Located Precise))) -- the final state
 importGraphAnalysis
   = run
   . evaluating
-  . runLoadError
+  . resumingLoadError
   . resumingUnspecialized
   . resumingValueError
   . resumingEvalError
@@ -97,6 +96,9 @@ resumingResolutionError :: (Applicative (m effects), Effectful m) => m (Resumabl
 resumingResolutionError = runResolutionErrorWith (\ err -> traceM ("ResolutionError:" <> show err) *> case err of
   NotFoundError nameToResolve _ _ -> pure  nameToResolve
   GoImportError pathToResolve     -> pure [pathToResolve])
+
+resumingLoadError :: Evaluator location term value (Resumable (LoadError term) ': effects) a -> Evaluator location term value effects a
+resumingLoadError = runLoadErrorWith (\ (LoadError _) -> pure [])
 
 resumingEvalError :: (AbstractHole value, Show value) => Evaluator location term value (Resumable (EvalError value) ': State [Name] ': effects) a -> Evaluator location term value effects (a, [Name])
 resumingEvalError
@@ -150,5 +152,5 @@ graphImports :: ( Show ann
 graphImports package = analyze importGraphAnalysis (evaluatePackageWith graphingModules (graphingLoadErrors . graphingTerms) package) >>= extractGraph
   where
     extractGraph result = case result of
-      (Right (Right ((_, graph), _)), _) -> pure graph
+      (Right ((_, graph), _), _) -> pure graph
       _ -> Task.throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
