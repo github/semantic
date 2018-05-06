@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass #-}
 module Language.TypeScript.Syntax where
 
 import qualified Data.Abstract.Environment as Env

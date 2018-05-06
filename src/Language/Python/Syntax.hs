@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass #-}
 module Language.Python.Syntax where
 
 import           Data.Abstract.Environment as Env
@@ -51,8 +51,7 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (BC.unpack prefix) (J
 -- Subsequent imports of `parent.two` or `parent.three` will execute
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
-resolvePythonModules :: forall value term location effects
-                     .  Members '[ Reader ModuleInfo
+resolvePythonModules :: Members '[ Reader ModuleInfo
                                  , Reader (ModuleTable [Module term])
                                  , Resumable ResolutionError
                                  ] effects

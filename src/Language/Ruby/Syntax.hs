@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass #-}
 module Language.Ruby.Syntax where
 
 import           Control.Monad (unless)
@@ -17,7 +17,7 @@ import           System.FilePath.Posix
 -- TODO: Fully sort out ruby require/load mechanics
 --
 -- require "json"
-resolveRubyName :: forall value term location effects. MonadEvaluatable location term value effects => ByteString -> Evaluator location term value effects ModulePath
+resolveRubyName :: MonadEvaluatable location term value effects => ByteString -> Evaluator location term value effects ModulePath
 resolveRubyName name = do
   let name' = cleanNameOrPath name
   let paths = [name' <.> "rb"]
@@ -25,7 +25,7 @@ resolveRubyName name = do
   maybe (throwResumable $ NotFoundError name' paths Language.Ruby) pure modulePath
 
 -- load "/root/src/file.rb"
-resolveRubyPath :: forall value term location effects. MonadEvaluatable location term value effects => ByteString -> Evaluator location term value effects ModulePath
+resolveRubyPath :: MonadEvaluatable location term value effects => ByteString -> Evaluator location term value effects ModulePath
 resolveRubyPath path = do
   let name' = cleanNameOrPath path
   modulePath <- resolve [name']

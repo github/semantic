@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass #-}
 module Language.Go.Syntax where
 
 import           Data.Abstract.Evaluatable hiding (Label)
@@ -28,7 +28,7 @@ importPath str = let path = stripQuotes str in ImportPath (BC.unpack path) (path
 defaultAlias :: ImportPath -> Name
 defaultAlias = name . BC.pack . takeFileName . unPath
 
-resolveGoImport :: forall value term location effects. MonadEvaluatable location term value effects => ImportPath -> Evaluator location term value effects [ModulePath]
+resolveGoImport :: MonadEvaluatable location term value effects => ImportPath -> Evaluator location term value effects [ModulePath]
 resolveGoImport (ImportPath path Relative) = do
   ModuleInfo{..} <- currentModule
   paths <- listModulesInDir (joinPaths (takeDirectory modulePath) path)

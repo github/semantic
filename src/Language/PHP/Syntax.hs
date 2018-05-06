@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, ViewPatterns, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass, ViewPatterns #-}
 module Language.PHP.Syntax where
 
 import           Data.Abstract.Evaluatable
@@ -35,7 +35,7 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
-resolvePHPName :: forall value location term effects. MonadEvaluatable location term value effects => ByteString -> Evaluator location term value effects ModulePath
+resolvePHPName :: MonadEvaluatable location term value effects => ByteString -> Evaluator location term value effects ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]
   maybe (throwResumable $ NotFoundError name [name] Language.PHP) pure modulePath
