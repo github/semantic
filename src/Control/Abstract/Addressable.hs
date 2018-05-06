@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Addressable where
 
 import Control.Abstract.Evaluator
@@ -98,3 +98,6 @@ throwAddressError = raise . Eff.throwError
 
 runAddressError :: Evaluator location term value (Resumable (AddressError location value) ': effects) a -> Evaluator location term value effects (Either (SomeExc (AddressError location value)) a)
 runAddressError = raiseHandler runError
+
+runAddressErrorWith :: (forall resume . AddressError location value resume -> Evaluator location term value effects resume) -> Evaluator location term value (Resumable (AddressError location value) ': effects) a -> Evaluator location term value effects a
+runAddressErrorWith = runResumableWith

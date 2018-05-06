@@ -11,6 +11,6 @@ import Data.Semilattice.Lower
 import Prologue
 
 resumingBadAddresses :: (AbstractHole value, Lower (Cell location value), Show location) => Evaluator location term value (Resumable (AddressError location value) ': effects) a -> Evaluator location term value effects a
-resumingBadAddresses = raiseHandler (relay pure (\ (Resumable err) yield -> traceM ("AddressError:" <> show err) *> case err of
-  UnallocatedAddress _   -> yield lowerBound
-  UninitializedAddress _ -> yield hole))
+resumingBadAddresses = runAddressErrorWith (\ err -> traceM ("AddressError:" <> show err) *> case err of
+  UnallocatedAddress _   -> pure lowerBound
+  UninitializedAddress _ -> pure hole)
