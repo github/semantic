@@ -23,19 +23,18 @@ deriving instance (Show (Cell location value), Show location, Show term, Show va
 
 
 evaluating :: Evaluator location term value
-                '[ Fail
-                 , Fresh
-                 , Reader (Environment location value)
-                 , State (Environment location value)
-                 , State (Heap location value)
-                 , State (ModuleTable (Environment location value, value))
-                 , State (Exports location value)
-                 , State (JumpTable term)
-                 ] result
-           -> (Either String result, EvaluatingState location term value)
+                (  Fail
+                ': Fresh
+                ': Reader (Environment location value)
+                ': State (Environment location value)
+                ': State (Heap location value)
+                ': State (ModuleTable (Environment location value, value))
+                ': State (Exports location value)
+                ': State (JumpTable term)
+                ': effects) result
+           -> Evaluator location term value effects (Either String result, EvaluatingState location term value)
 evaluating
-  = (\ (((((result, env), heap), modules), exports), jumps) -> (result, EvaluatingState env heap modules exports jumps))
-  . run
+  = fmap (\ (((((result, env), heap), modules), exports), jumps) -> (result, EvaluatingState env heap modules exports jumps))
   . runState lowerBound -- State (JumpTable term)
   . runState lowerBound -- State (Exports location value)
   . runState lowerBound -- State (ModuleTable (Environment location value, value))

@@ -87,7 +87,8 @@ importGraphAnalysis :: forall term syntax ann a
                          , [Name]))                                                        -- the list of bad names
                        , EvaluatingState (Located Precise) term (Value (Located Precise))) -- the final state
 importGraphAnalysis
-  = evaluating
+  = run
+  . evaluating
   . erroring @(LoadError term)
   . resumingBadSyntax
   . resumingBadValues
