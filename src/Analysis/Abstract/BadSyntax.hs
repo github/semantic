@@ -13,4 +13,4 @@ import Prologue
 --
 --   > resumingBadSyntax . …
 resumingBadSyntax :: AbstractHole value => Evaluator location term value (Resumable (Unspecialized value) ': effects) a -> Evaluator location term value effects a
-resumingBadSyntax = raiseHandler (relay pure (\ (Resumable err@(Unspecialized _)) yield -> traceM ("Unspecialized:" <> show err) *> yield hole))
+resumingBadSyntax = runUnspecializedWith (\ err@(Unspecialized _) -> traceM ("Unspecialized:" <> show err) *> pure hole)

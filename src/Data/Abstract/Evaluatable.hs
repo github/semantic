@@ -4,6 +4,7 @@ module Data.Abstract.Evaluatable
 , Evaluatable(..)
 , Unspecialized(..)
 , runUnspecialized
+, runUnspecializedWith
 , EvalError(..)
 , runEvalError
 , runEvalErrorWith
@@ -202,6 +203,9 @@ instance Show1 (Unspecialized a) where
 
 runUnspecialized :: Evaluator location term value (Resumable (Unspecialized value) ': effects) a -> Evaluator location term value effects (Either (SomeExc (Unspecialized value)) a)
 runUnspecialized = raiseHandler runError
+
+runUnspecializedWith :: (forall resume . Unspecialized value resume -> Evaluator location term value effects resume) -> Evaluator location term value (Resumable (Unspecialized value) ': effects) a -> Evaluator location term value effects a
+runUnspecializedWith = runResumableWith
 
 
 -- Instances
