@@ -2,7 +2,6 @@
 module Semantic.Graph where
 
 import           Analysis.Abstract.BadAddresses
-import           Analysis.Abstract.BadModuleResolutions
 import           Analysis.Abstract.BadSyntax
 import           Analysis.Abstract.BadValues
 import           Analysis.Abstract.BadVariables
@@ -92,9 +91,14 @@ importGraphAnalysis
   . resumingBadSyntax
   . resumingBadValues
   . resumingBadVariables
-  . resumingBadModuleResolutions
+  . resumingResolutionErrors
   . resumingBadAddresses
   . importGraphing
+
+resumingResolutionErrors :: (Applicative (m effects), Effectful m) => m (Resumable ResolutionError ': effects) a -> m effects a
+resumingResolutionErrors = runResolutionErrorWith (\ err -> traceM ("ResolutionError:" <> show err) *> case err of
+  NotFoundError nameToResolve _ _ -> pure  nameToResolve
+  GoImportError pathToResolve     -> pure [pathToResolve])
 
 -- | Render the import graph for a given 'Package'.
 graphImports :: ( Show ann
