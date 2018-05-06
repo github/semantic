@@ -56,6 +56,7 @@ module Control.Abstract.Evaluator
   , Return(..)
   , earlyReturn
   , handleReturn
+  , runReturn
   , LoopControl(..)
   , throwBreak
   , throwContinue
@@ -317,6 +318,9 @@ earlyReturn = raise . Eff.send . Return
 
 handleReturn :: Member (Return value) effects => (forall x . Return value x -> Evaluator location term value effects a) -> Evaluator location term value effects a -> Evaluator location term value effects a
 handleReturn handler = raiseHandler (Eff.interpose pure (\ ret _ -> lower (handler ret)))
+
+runReturn :: Evaluator location term value (Return value ': effects) value -> Evaluator location term value effects value
+runReturn = raiseHandler (Eff.relay pure (\ (Return value) _ -> pure value))
 
 
 -- | Effects for control flow around loops (breaking and continuing).
