@@ -39,7 +39,7 @@ justEvaluating
   . erroring @(Unspecialized (Value Precise))
   . erroring @ResolutionError
   . erroring @(EvalError (Value Precise))
-  . erroring @(AddressError Precise (Value Precise))
+  . runAddressError
 
 evaluatingWithHoles
   = run
@@ -60,7 +60,7 @@ checking
   . erroring @(Unspecialized (Type Monovariant))
   . erroring @ResolutionError
   . erroring @(EvalError (Type Monovariant))
-  . erroring @(AddressError Monovariant (Type Monovariant))
+  . runAddressError
   . typeChecking
   . caching @[]
 
