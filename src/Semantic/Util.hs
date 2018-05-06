@@ -3,7 +3,6 @@
 module Semantic.Util where
 
 import           Analysis.Abstract.BadAddresses
-import           Analysis.Abstract.BadSyntax
 import           Analysis.Abstract.BadValues
 import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
@@ -41,7 +40,7 @@ evaluatingWithHoles
   = run
   . evaluating
   . runLoadError
-  . resumingBadSyntax @(Value Precise)
+  . resumingUnspecialized
   . resumingBadValues @(Value Precise)
   . resumingEvalError
   . resumingResolutionError

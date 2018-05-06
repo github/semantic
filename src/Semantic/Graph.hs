@@ -2,7 +2,6 @@
 module Semantic.Graph where
 
 import           Analysis.Abstract.BadAddresses
-import           Analysis.Abstract.BadSyntax
 import           Analysis.Abstract.BadValues
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.ImportGraph
@@ -87,7 +86,7 @@ importGraphAnalysis
   = run
   . evaluating
   . runLoadError
-  . resumingBadSyntax
+  . resumingUnspecialized
   . resumingBadValues
   . resumingEvalError
   . resumingResolutionError
@@ -111,6 +110,9 @@ resumingEvalError
     RationalFormatError{}    -> pure 0
     FreeVariableError name   -> raise (modify' (name :)) *> pure hole
     FreeVariablesError names -> raise (modify' (names <>)) *> pure (fromMaybeLast "unknown" names))
+
+resumingUnspecialized :: AbstractHole value => Evaluator location term value (Resumable (Unspecialized value) ': effects) a -> Evaluator location term value effects a
+resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> traceM ("Unspecialized:" <> show err) *> pure hole)
 
 -- | Render the import graph for a given 'Package'.
 graphImports :: ( Show ann
