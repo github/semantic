@@ -14,7 +14,7 @@ module Control.Effect
 
 import Control.Monad.Effect.Internal
 import Control.Monad.Effect.Reader
-import Control.Monad.Effect.Resumable as Resumable
+import Control.Monad.Effect.Resumable
 import Control.Monad.Effect.State
 
 throwResumable :: (Member (Resumable exc) effects, Effectful m) => exc v -> m effects v
