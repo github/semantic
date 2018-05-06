@@ -89,8 +89,6 @@ library
                      , Data.Span
                      , Data.SplitDiff
                      -- À la carte syntax types
-                     , Data.Sum
-                     , Data.Sum.Templates
                      , Data.Syntax
                      , Data.Syntax.Comment
                      , Data.Syntax.Declaration
@@ -170,6 +168,7 @@ library
                      , directory
                      , directory-tree
                      , effects
+                     , fastsum
                      , filepath
                      , free
                      , freer-cofreer
