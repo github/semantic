@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedLists #-}
 module Analysis.PHP.Spec (spec) where
 
-import Data.Abstract.Evaluatable (EvalError(..), interpret)
+import Data.Abstract.Evaluatable (EvalError(..))
 import qualified Language.PHP.Assignment as PHP
 import qualified Data.Language as Language
 
