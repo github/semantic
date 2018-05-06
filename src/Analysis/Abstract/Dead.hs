@@ -50,4 +50,4 @@ killingModules :: ( Foldable (Base term)
 killingModules recur m = killAll (subterms (subterm (moduleBody m))) *> recur m
 
 providingDeadSet :: Evaluator location term value (State (Dead term) ': effects) a -> Evaluator location term value effects (a, Dead term)
-providingDeadSet = handleState lowerBound
+providingDeadSet = runState lowerBound

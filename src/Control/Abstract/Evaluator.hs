@@ -79,7 +79,7 @@ import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader hiding (runReader)
 import Control.Monad.Effect.Resumable
-import Control.Monad.Effect.State
+import Control.Monad.Effect.State hiding (runState)
 import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.Environment as Env

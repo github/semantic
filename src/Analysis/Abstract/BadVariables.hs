@@ -9,7 +9,7 @@ import Prologue
 
 resumingBadVariables :: (AbstractHole value, Effectful m, Show value) => m (Resumable (EvalError value) ': State [Name] ': effects) a -> m effects (a, [Name])
 resumingBadVariables
-  = handleState []
+  = runState []
   . raiseHandler (relay pure (\ (Resumable err) yield -> traceM ("EvalError" <> show err) *> case err of
     EnvironmentLookupError{} -> yield hole
     DefaultExportError{}     -> yield ()

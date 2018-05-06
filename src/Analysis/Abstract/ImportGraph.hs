@@ -173,4 +173,4 @@ vertexToType Variable{} = "variable"
 
 
 importGraphing :: Effectful m => m (State (ImportGraph term) ': effects) result -> m effects (result, ImportGraph term)
-importGraphing = handleState mempty
+importGraphing = runState mempty

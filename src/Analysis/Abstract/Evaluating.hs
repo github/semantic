@@ -43,11 +43,11 @@ evaluating
   = (\ (((((result, env), heap), modules), exports), jumps) -> (result, EvaluatingState env heap modules exports jumps))
   . Eff.run
   . lower
-  . handleState lowerBound -- State (JumpTable term)
-  . handleState lowerBound -- State (Exports location value)
-  . handleState lowerBound -- State (ModuleTable (Environment location value, value))
-  . handleState lowerBound -- State (Heap location value)
-  . handleState lowerBound -- State (Environment location value)
+  . runState lowerBound -- State (JumpTable term)
+  . runState lowerBound -- State (Exports location value)
+  . runState lowerBound -- State (ModuleTable (Environment location value, value))
+  . runState lowerBound -- State (Heap location value)
+  . runState lowerBound -- State (Environment location value)
   . runReader lowerBound -- Reader (Environment location value)
   . raiseHandler
     ( flip runFresh' 0
