@@ -355,7 +355,6 @@ evaluatePackageBodyWith perModule perTerm body
           . fmap (Subterm <*> evalTerm)
           $ m
         handleEvalClosures = raiseHandler (relay pure (\ (EvalClosure term) yield -> lower (evalTerm term) >>= yield))
-        evalTerm :: term -> Evaluator location term value moduleEffects value
         evalTerm
           = handleEvalClosures
           . foldSubterms (perTerm eval)
