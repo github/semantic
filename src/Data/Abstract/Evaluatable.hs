@@ -76,6 +76,7 @@ type MonadEvaluatable location term value effects =
   , Reducer value (Cell location value)
   )
 
+
 -- | An error thrown when we can't resolve a module from a qualified name.
 data ResolutionError resume where
   NotFoundError :: String   -- ^ The path that was not found.
