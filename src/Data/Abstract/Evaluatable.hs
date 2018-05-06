@@ -104,7 +104,7 @@ runResolutionError :: Effectful m => m (Resumable ResolutionError ': effects) a 
 runResolutionError = raiseHandler runError
 
 runResolutionErrorWith :: Effectful m => (forall resume . ResolutionError resume -> m effects resume) -> m (Resumable ResolutionError ': effects) a -> m effects a
-runResolutionErrorWith handler = raiseHandler (relay pure (\ (Resumable err) -> (lower (handler err) >>=)))
+runResolutionErrorWith = runResumableWith
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
 data LoadError term resume where
