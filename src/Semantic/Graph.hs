@@ -12,14 +12,12 @@ import           Analysis.Abstract.ImportGraph
 import qualified Control.Exception as Exc
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.FreeVariables
 import           Data.Abstract.Located
 import           Data.Abstract.Module
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value, ValueError)
 import           Data.File
 import           Data.Output
-import           Data.Semilattice.Lower
 import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Parsing.Parser
