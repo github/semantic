@@ -41,6 +41,7 @@ module Control.Abstract.Evaluator
   , getModuleTable
   , putModuleTable
   , modifyModuleTable
+  -- * Context
   , currentModule
   , currentPackage
   -- * Control
@@ -247,6 +248,8 @@ putModuleTable = raise . put
 modifyModuleTable :: Member (State (ModuleTable (Environment location value, value))) effects => (ModuleTable (Environment location value, value) -> ModuleTable (Environment location value, value)) -> Evaluator location term value effects ()
 modifyModuleTable = raise . modify'
 
+
+-- Context
 
 -- | Get the currently evaluating 'ModuleInfo'.
 currentModule :: Member (Reader ModuleInfo) effects => Evaluator location term value effects ModuleInfo
