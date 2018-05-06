@@ -64,9 +64,7 @@ parseModule parser rootDir file = do
 
 
 importGraphAnalysis :: forall term syntax ann a
-                    .  ( Element Syntax.Identifier syntax
-                       , Show (Base term ())
-                       )
+                    .  Show (Base term ())
                     => Evaluator (Located Precise term) term (Value (Located Precise term))
                       (  State (ImportGraph (Term (Sum syntax) ann))
                       ': Resumable (AddressError (Located Precise term) (Value (Located Precise term)))
