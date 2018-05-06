@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.Util where
 
@@ -14,7 +15,6 @@ import           Analysis.Abstract.TypeChecking
 import           Control.Abstract.Evaluator
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.Located
 import           Data.Abstract.Type
 import           Data.Abstract.Value
 import           Data.Blob
@@ -28,60 +28,57 @@ import           Semantic.Graph
 import           Semantic.IO as IO
 import           Semantic.Task
 
-import qualified Language.Go.Assignment as Go
-import qualified Language.PHP.Assignment as PHP
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
-import qualified Language.TypeScript.Assignment as TypeScript
 
-type JustEvaluating term
-  = Erroring (AddressError (Located Precise term) (Value (Located Precise term)))
-  ( Erroring (EvalError (Value (Located Precise term)))
-  ( Erroring (ResolutionError (Value (Located Precise term)))
-  ( Erroring (Unspecialized (Value (Located Precise term)))
-  ( Erroring (ValueError (Located Precise term) (Value (Located Precise term)))
-  ( Erroring (LoadError term)
-  ( Evaluating (Located Precise term) term (Value (Located Precise term))))))))
+justEvaluating
+  = evaluating @(Value Precise)
+  . failingOnLoadErrors
+  . erroring @(ValueError Precise (Value Precise))
+  . erroring @(Unspecialized (Value Precise))
+  . erroring @ResolutionError
+  . erroring @(EvalError (Value Precise))
+  . erroring @(AddressError Precise (Value Precise))
 
-type EvaluatingWithHoles term
-  = BadAddresses
-  ( BadModuleResolutions
-  ( BadVariables
-  ( BadValues
-  ( BadSyntax
-  ( Erroring (LoadError term)
-  ( Evaluating (Located Precise term) term (Value (Located Precise term))))))))
+evaluatingWithHoles
+  = evaluating @(Value Precise)
+  . failingOnLoadErrors
+  . resumingBadSyntax @(Value Precise)
+  . resumingBadValues @(Value Precise)
+  . resumingBadVariables @(Value Precise)
+  . resumingBadModuleResolutions
+  . resumingBadAddresses @(Value Precise)
 
 -- The order is significant here: Caching has to come on the outside, or its Interpreter instance
 -- will expect the TypeError exception type to have an Ord instance, which is wrong.
-type Checking term
-  = Caching
-  ( TypeChecking
-  ( Erroring (AddressError Monovariant Type)
-  ( Erroring (EvalError Type)
-  ( Erroring (ResolutionError Type)
-  ( Erroring (Unspecialized Type)
-  ( Erroring (LoadError term)
-  ( Retaining
-  ( Evaluating Monovariant term Type))))))))
+checking
+  = evaluating @(Type Monovariant)
+  . providingLiveSet
+  . failingOnLoadErrors
+  . erroring @(Unspecialized (Type Monovariant))
+  . erroring @ResolutionError
+  . erroring @(EvalError (Type Monovariant))
+  . erroring @(AddressError Monovariant (Type Monovariant))
+  . typeChecking
+  . caching @[]
 
-evalGoProject path = interpret @(JustEvaluating Go.Term) <$> evaluateProject goParser Language.Go Nothing path
-evalRubyProject path = interpret @(JustEvaluating Ruby.Term) <$> evaluateProject rubyParser Language.Ruby rubyPrelude path
-evalPHPProject path = interpret @(JustEvaluating PHP.Term) <$> evaluateProject phpParser Language.PHP Nothing path
-evalPythonProject path = interpret @(JustEvaluating Python.Term) <$> evaluateProject pythonParser Language.Python pythonPrelude path
-evalTypeScriptProjectQuietly path = interpret @(EvaluatingWithHoles TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
-evalTypeScriptProject path = interpret @(JustEvaluating TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
+failingOnLoadErrors :: Evaluator location term value (Resumable (LoadError term) ': effects) a -> Evaluator location term value effects (Either (SomeExc (LoadError term)) a)
+failingOnLoadErrors = erroring
 
-typecheckGoFile path = interpret @(Checking Go.Term) <$> evaluateProject goParser Language.Go Nothing path
+evalGoProject path = justEvaluating <$> evaluateProject goParser Language.Go Nothing path
+evalRubyProject path = justEvaluating <$> evaluateProject rubyParser Language.Ruby rubyPrelude path
+evalPHPProject path = justEvaluating <$> evaluateProject phpParser Language.PHP Nothing path
+evalPythonProject path = justEvaluating <$> evaluateProject pythonParser Language.Python pythonPrelude path
+evalTypeScriptProjectQuietly path = evaluatingWithHoles <$> evaluateProject typescriptParser Language.TypeScript Nothing path
+evalTypeScriptProject path = justEvaluating <$> evaluateProject typescriptParser Language.TypeScript Nothing path
+
+typecheckGoFile path = checking <$> evaluateProject goParser Language.Go Nothing path
 
 rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Language.Ruby)
 pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Language.Python)
 
 -- Evaluate a project, starting at a single entrypoint.
-evaluateProject parser lang prelude path = evaluatePackage <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
-
-evalRubyFile path = interpret @(JustEvaluating Ruby.Term) <$> evaluateFile rubyParser path
-evaluateFile parser path = evaluateModule <$> runTask (parseModule parser Nothing (file path))
+evaluateProject parser lang prelude path = evaluatePackageWith id id <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
 
 
 parseFile :: Parser term -> FilePath -> IO term
