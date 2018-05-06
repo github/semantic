@@ -1,7 +1,6 @@
 {-# LANGUAGE GADTs, ScopedTypeVariables, TypeOperators #-}
 module Semantic.Graph where
 
-import           Analysis.Abstract.BadAddresses
 import           Analysis.Abstract.BadValues
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.ImportGraph
@@ -14,6 +13,7 @@ import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value, ValueError)
 import           Data.File
 import           Data.Output
+import           Data.Semilattice.Lower
 import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Parsing.Parser
@@ -90,7 +90,7 @@ importGraphAnalysis
   . resumingBadValues
   . resumingEvalError
   . resumingResolutionError
-  . resumingBadAddresses
+  . resumingAddressError
   . importGraphing
 
 resumingResolutionError :: (Applicative (m effects), Effectful m) => m (Resumable ResolutionError ': effects) a -> m effects a
@@ -113,6 +113,11 @@ resumingEvalError
 
 resumingUnspecialized :: AbstractHole value => Evaluator location term value (Resumable (Unspecialized value) ': effects) a -> Evaluator location term value effects a
 resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> traceM ("Unspecialized:" <> show err) *> pure hole)
+
+resumingAddressError :: (AbstractHole value, Lower (Cell location value), Show location) => Evaluator location term value (Resumable (AddressError location value) ': effects) a -> Evaluator location term value effects a
+resumingAddressError = runAddressErrorWith (\ err -> traceM ("AddressError:" <> show err) *> case err of
+  UnallocatedAddress _   -> pure lowerBound
+  UninitializedAddress _ -> pure hole)
 
 -- | Render the import graph for a given 'Package'.
 graphImports :: ( Show ann
