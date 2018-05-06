@@ -314,7 +314,7 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                                   ] effects
                        , Recursive term
                        , termEffects ~ (EvalClosure term value ': moduleEffects)
-                       , moduleEffects ~ (EvalModule term value ': packageBodyEffects)
+                       , moduleEffects ~ (Reader ModuleInfo ': EvalModule term value ': packageBodyEffects)
                        , packageBodyEffects ~ (Reader (ModuleTable [Module term]) ': packageEffects)
                        , packageEffects ~ (Reader PackageInfo ': effects)
                        )
@@ -334,7 +334,7 @@ evaluatePackageBodyWith :: forall location term value effects termEffects module
                                       ] effects
                            , Recursive term
                            , termEffects ~ (EvalClosure term value ': moduleEffects)
-                           , moduleEffects ~ (EvalModule term value ': packageBodyEffects)
+                           , moduleEffects ~ (Reader ModuleInfo ': EvalModule term value ': packageBodyEffects)
                            , packageBodyEffects ~ (Reader (ModuleTable [Module term]) ': effects)
                            )
                         => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value moduleEffects value))
@@ -345,19 +345,22 @@ evaluatePackageBodyWith perModule perTerm body
   = handleReader (packageModules body)
   . handleEvalModules
   . withPrelude (packagePrelude body)
-  $ traverse (handleEvalClosures . uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
-  where handleEvalModules :: Evaluator location term value moduleEffects a -> Evaluator location term value packageBodyEffects a
+  $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
+  where handleEvalModules :: Evaluator location term value (EvalModule term value ': packageBodyEffects) a -> Evaluator location term value packageBodyEffects a
         handleEvalModules = raiseHandler (relay pure (\ (EvalModule m) yield -> lower (evalModule m) >>= yield))
-        evalModule
+        evalModule m
           = handleEvalModules
+          . handleReader (moduleInfo m)
           . perModule (subtermValue . moduleBody)
           . fmap (Subterm <*> evalTerm)
+          $ m
         handleEvalClosures = raiseHandler (relay pure (\ (EvalClosure term) yield -> lower (evalTerm term) >>= yield))
+        evalTerm :: term -> Evaluator location term value moduleEffects value
         evalTerm
           = handleEvalClosures
           . foldSubterms (perTerm eval)
 
-        evaluateEntryPoint m sym = do
+        evaluateEntryPoint m sym = handleReader (ModuleInfo m) . handleEvalClosures $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
 
