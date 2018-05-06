@@ -301,28 +301,6 @@ instance Applicative m => Monoid (Merging m location value) where
   mappend = (<>)
   mempty = Merging (pure Nothing)
 
-evaluatingModulesWith :: forall location term value effects a termEffects moduleEffects
-                      .  ( Evaluatable (Base term)
-                         , Member Fail effects
-                         , MonadEvaluatable location term value termEffects
-                         , Recursive term
-                         , termEffects ~ (EvalClosure term value ': moduleEffects)
-                         , moduleEffects ~ (EvalModule term value ': effects)
-                         )
-                      => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value moduleEffects value))
-                      -> (SubtermAlgebra (Base term) term (Evaluator location term value termEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value termEffects value))
-                      -> Evaluator location term value (EvalModule term value ': effects) a
-                      -> Evaluator location term value effects a
-evaluatingModulesWith perModule perTerm = handleEvalModules
-  where handleEvalModules :: forall a . Evaluator location term value (EvalModule term value ': effects) a -> Evaluator location term value effects a
-        handleEvalModules = raiseHandler (relay pure (\ (EvalModule m) yield -> lower (evalModule m) >>= yield))
-        evalModule
-          = handleEvalModules
-          . perModule (subtermValue . moduleBody)
-          . fmap (Subterm <*> evalTerm)
-        evalTerm
-          = raiseHandler (relay pure (\ (EvalClosure term) yield -> lower (evalTerm term) >>= yield))
-          . foldSubterms (perTerm eval)
 
 -- | Evaluate a given package.
 evaluatePackageWith :: ( AbstractValue location term value moduleEffects
@@ -353,7 +331,8 @@ evaluatePackageWith :: ( AbstractValue location term value moduleEffects
 evaluatePackageWith perModule perTerm = handleReader . packageInfo <*> evaluatePackageBodyWith perModule perTerm . packageBody
 
 -- | Evaluate a given package body (module table and entry points).
-evaluatePackageBodyWith :: ( AbstractValue location term value moduleEffects
+evaluatePackageBodyWith :: forall location term value effects termEffects moduleEffects packageBodyEffects
+                        .  ( AbstractValue location term value moduleEffects
                            , Addressable location moduleEffects
                            , Evaluatable (Base term)
                            , Member Fail effects
@@ -379,9 +358,18 @@ evaluatePackageBodyWith :: ( AbstractValue location term value moduleEffects
                         -> Evaluator location term value effects [value]
 evaluatePackageBodyWith perModule perTerm body
   = handleReader (packageModules body)
-  . evaluatingModulesWith perModule perTerm
+  . handleEvalModules
   . withPrelude (packagePrelude body)
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
+  where handleEvalModules :: Evaluator location term value moduleEffects a -> Evaluator location term value packageBodyEffects a
+        handleEvalModules = raiseHandler (relay pure (\ (EvalModule m) yield -> lower (evalModule m) >>= yield))
+        evalModule
+          = handleEvalModules
+          . perModule (subtermValue . moduleBody)
+          . fmap (Subterm <*> evalTerm)
+        evalTerm
+          = raiseHandler (relay pure (\ (EvalClosure term) yield -> lower (evalTerm term) >>= yield))
+          . foldSubterms (perTerm eval)
 
 evaluateEntryPoint :: ( AbstractValue location term value effects
                       , Addressable location effects
