@@ -3,7 +3,7 @@ module Language.Ruby.Syntax where
 
 import           Control.Monad (unless)
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.Module (ModulePath)
+import qualified Data.Abstract.Module as M
 import           Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Path
 import qualified Data.ByteString.Char8 as BC
@@ -17,7 +17,11 @@ import           System.FilePath.Posix
 -- TODO: Fully sort out ruby require/load mechanics
 --
 -- require "json"
-resolveRubyName :: MonadEvaluatable location term value effects => ByteString -> Evaluator location term value effects ModulePath
+resolveRubyName :: Members '[ Reader (ModuleTable [M.Module term])
+                            , Resumable ResolutionError
+                            ] effects
+                => ByteString
+                -> Evaluator location term value effects M.ModulePath
 resolveRubyName name = do
   let name' = cleanNameOrPath name
   let paths = [name' <.> "rb"]
@@ -25,7 +29,11 @@ resolveRubyName name = do
   maybe (throwResumable $ NotFoundError name' paths Language.Ruby) pure modulePath
 
 -- load "/root/src/file.rb"
-resolveRubyPath :: MonadEvaluatable location term value effects => ByteString -> Evaluator location term value effects ModulePath
+resolveRubyPath :: Members '[ Reader (ModuleTable [M.Module term])
+                            , Resumable ResolutionError
+                            ] effects
+                => ByteString
+                -> Evaluator location term value effects M.ModulePath
 resolveRubyPath path = do
   let name' = cleanNameOrPath path
   modulePath <- resolve [name']
@@ -64,8 +72,18 @@ instance Evaluatable Require where
     modifyEnv (`mergeNewer` importedEnv)
     pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
-doRequire :: MonadEvaluatable location term value effects
-          => ModulePath
+doRequire :: ( AbstractValue location term value effects
+             , Members '[ EvalModule term value
+                        , Reader LoadStack
+                        , Reader (ModuleTable [M.Module term])
+                        , Resumable (LoadError term)
+                        , Resumable ResolutionError
+                        , State (Environment location value)
+                        , State (Exports location value)
+                        , State (ModuleTable (Environment location value, value))
+                        ] effects
+             )
+          => M.ModulePath
           -> Evaluator location term value effects (Environment location value, value)
 doRequire name = do
   moduleTable <- getModuleTable
@@ -91,7 +109,20 @@ instance Evaluatable Load where
     doLoad path shouldWrap
   eval (Load _) = raise (fail "invalid argument supplied to load, path is required")
 
-doLoad :: MonadEvaluatable location term value effects => ByteString -> Bool -> Evaluator location term value effects value
+doLoad :: ( AbstractValue location term value effects
+          , Members '[ EvalModule term value
+                     , Reader LoadStack
+                     , Reader (ModuleTable [M.Module term])
+                     , Resumable (LoadError term)
+                     , Resumable ResolutionError
+                     , State (Environment location value)
+                     , State (Exports location value)
+                     , State (ModuleTable (Environment location value, value))
+                     ] effects
+          )
+       => ByteString
+       -> Bool
+       -> Evaluator location term value effects value
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   importedEnv <- maybe emptyEnv fst <$> traceResolve path path' (isolate (load path'))
