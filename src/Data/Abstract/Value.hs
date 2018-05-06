@@ -378,7 +378,8 @@ instance ( Addressable location effects
 
   loop x = catchLoopControl @(Value location) (fix x) (\ control -> case control of
     Break value -> pure value
-    Continue    -> loop x)
+    -- FIXME: Figure out how to deal with this. Ruby treats this as the result of the current block iteration, while PHP specifies a breakout level and TypeScript appears to take a label.
+    Continue _  -> loop x)
 
 
 -- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.

@@ -325,8 +325,8 @@ runReturn = raiseHandler (Eff.relay pure (\ (Return value) _ -> pure value))
 
 -- | Effects for control flow around loops (breaking and continuing).
 data LoopControl value resume where
-  Break :: value -> LoopControl value value
-  Continue :: LoopControl value value
+  Break    :: value -> LoopControl value value
+  Continue :: value -> LoopControl value value
 
 deriving instance Eq value => Eq (LoopControl value a)
 deriving instance Show value => Show (LoopControl value a)
@@ -334,8 +334,8 @@ deriving instance Show value => Show (LoopControl value a)
 throwBreak :: Member (LoopControl value) effects => value -> Evaluator location term value effects value
 throwBreak = raise . Eff.send . Break
 
-throwContinue :: Member (LoopControl value) effects => Evaluator location term value effects value
-throwContinue = raise (Eff.send Continue)
+throwContinue :: Member (LoopControl value) effects => value -> Evaluator location term value effects value
+throwContinue = raise . Eff.send . Continue
 
 catchLoopControl :: Member (LoopControl value) effects => Evaluator location term value effects a -> (forall x . LoopControl value x -> Evaluator location term value effects a) -> Evaluator location term value effects a
 catchLoopControl action handler = raiseHandler (Eff.interpose pure (\ control _ -> lower (handler control))) action
