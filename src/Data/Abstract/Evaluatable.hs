@@ -36,6 +36,7 @@ import           Data.Scientific (Scientific)
 import           Data.Semigroup.App
 import           Data.Semigroup.Foldable
 import           Data.Semigroup.Reducer hiding (unit)
+import           Data.Semilattice.Lower
 import           Data.Sum
 import           Data.Term
 import           Prologue
@@ -315,7 +316,7 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                        , Recursive term
                        , termEffects ~ (EvalClosure term value ': moduleEffects)
                        , moduleEffects ~ (Reader ModuleInfo ': EvalModule term value ': packageBodyEffects)
-                       , packageBodyEffects ~ (Reader (ModuleTable [Module term]) ': packageEffects)
+                       , packageBodyEffects ~ (Reader LoadStack ': Reader (ModuleTable [Module term]) ': packageEffects)
                        , packageEffects ~ (Reader PackageInfo ': effects)
                        )
                     => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value moduleEffects value))
@@ -335,7 +336,7 @@ evaluatePackageBodyWith :: forall location term value effects termEffects module
                            , Recursive term
                            , termEffects ~ (EvalClosure term value ': moduleEffects)
                            , moduleEffects ~ (Reader ModuleInfo ': EvalModule term value ': packageBodyEffects)
-                           , packageBodyEffects ~ (Reader (ModuleTable [Module term]) ': effects)
+                           , packageBodyEffects ~ (Reader LoadStack ': Reader (ModuleTable [Module term]) ': effects)
                            )
                         => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value moduleEffects value))
                         -> (SubtermAlgebra (Base term) term (Evaluator location term value termEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value termEffects value))
@@ -343,6 +344,7 @@ evaluatePackageBodyWith :: forall location term value effects termEffects module
                         -> Evaluator location term value effects [value]
 evaluatePackageBodyWith perModule perTerm body
   = handleReader (packageModules body)
+  . handleReader lowerBound
   . handleEvalModules
   . withPrelude (packagePrelude body)
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))

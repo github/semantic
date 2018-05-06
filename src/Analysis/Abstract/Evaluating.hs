@@ -33,7 +33,6 @@ type EvaluatingEffects location term value
      , Fail                                -- Failure with an error message
      , Fresh                               -- For allocating new addresses and/or type variables.
      , Reader (Environment location value) -- Default environment used as a fallback in lookupEnv
-     , Reader LoadStack
      , State (Environment location value)
      , State (Heap location value)
      , State (ModuleTable (Environment location value, value))
@@ -52,7 +51,6 @@ evaluating
   . handleState lowerBound -- State (ModuleTable (Environment location value, value))
   . handleState lowerBound -- State (Heap location value)
   . handleState lowerBound -- State (Environment location value)
-  . handleReader lowerBound -- Reader LoadStack
   . handleReader lowerBound -- Reader (Environment location value)
   . raiseHandler
     ( flip runFresh' 0
