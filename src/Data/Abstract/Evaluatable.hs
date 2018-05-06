@@ -357,27 +357,9 @@ evaluatePackageBodyWith perModule perTerm body
           = handleEvalClosures
           . foldSubterms (perTerm eval)
 
-evaluateEntryPoint :: ( AbstractValue location term value effects
-                      , Addressable location effects
-                      , Members '[ EvalModule term value
-                                 , Reader (Environment location value)
-                                 , Reader LoadStack
-                                 , Reader (ModuleTable [Module term])
-                                 , Resumable (AddressError location value)
-                                 , Resumable (EvalError value)
-                                 , Resumable (LoadError term)
-                                 , State (Environment location value)
-                                 , State (Exports location value)
-                                 , State (Heap location value)
-                                 , State (ModuleTable (Environment location value, value))
-                                 ] effects
-                      )
-                   => ModulePath
-                   -> Maybe Name
-                   -> Evaluator location term value effects value
-evaluateEntryPoint m sym = do
-  v <- maybe unit (pure . snd) <$> require m
-  maybe v ((`call` []) <=< variable) sym
+        evaluateEntryPoint m sym = do
+          v <- maybe unit (pure . snd) <$> require m
+          maybe v ((`call` []) <=< variable) sym
 
 withPrelude :: Members '[ EvalModule term value
                         , Reader (Environment location value)
