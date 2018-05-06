@@ -14,6 +14,7 @@ module Control.Effect
 , runState
 , runFresh
 , resume
+, runResumableWith
 ) where
 
 import qualified Control.Monad.Effect as Eff
@@ -69,3 +70,7 @@ runFresh = raiseHandler . flip runFresh'
 
 resume :: (Member (Resumable exc) effects, Effectful m) => m effects a -> (forall v . exc v -> m effects v) -> m effects a
 resume m handle = raise (resumeError (lower m) (\yield -> yield <=< lower . handle))
+
+-- | Run a 'Resumable' effect in an 'Effectful' context, using a handler to resume computation.
+runResumableWith :: Effectful m => (forall resume . exc resume -> m effects resume) -> m (Resumable exc ': effects) a -> m effects a
+runResumableWith handler = raiseHandler (Eff.relay pure (\ (Resumable err) -> (lower (handler err) >>=)))
