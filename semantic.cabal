@@ -261,6 +261,7 @@ test-suite test
                      , bytestring
                      , comonad
                      , effects
+                     , fastsum
                      , filepath
                      , free
                      , Glob
