@@ -6,7 +6,6 @@ import           Analysis.Abstract.BadModuleResolutions
 import           Analysis.Abstract.BadSyntax
 import           Analysis.Abstract.BadValues
 import           Analysis.Abstract.BadVariables
-import           Analysis.Abstract.Erroring
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.ImportGraph
 import qualified Control.Exception as Exc
@@ -89,7 +88,7 @@ importGraphAnalysis :: forall term syntax ann a
 importGraphAnalysis
   = run
   . evaluating
-  . erroring @(LoadError term)
+  . runLoadError
   . resumingBadSyntax
   . resumingBadValues
   . resumingBadVariables

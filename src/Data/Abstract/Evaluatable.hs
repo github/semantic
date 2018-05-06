@@ -5,6 +5,7 @@ module Data.Abstract.Evaluatable
 , Unspecialized(..)
 , EvalError(..)
 , LoadError(..)
+, runLoadError
 , ResolutionError(..)
 , variable
 , evaluateInScopedEnv
@@ -105,6 +106,10 @@ instance Show1 (LoadError term) where
   liftShowsPrec _ _ = showsPrec
 instance Eq1 (LoadError term) where
   liftEq _ (LoadError a) (LoadError b) = a == b
+
+runLoadError :: Evaluator location term value (Resumable (LoadError term) ': effects) a -> Evaluator location term value effects (Either (SomeExc (LoadError term)) a)
+runLoadError = raiseHandler runError
+
 
 -- | The type of error thrown when failing to evaluate a term.
 data EvalError value resume where

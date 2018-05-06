@@ -34,7 +34,7 @@ import qualified Language.Ruby.Assignment as Ruby
 justEvaluating
   = run
   . evaluating
-  . failingOnLoadErrors
+  . runLoadError
   . erroring @(ValueError Precise (Value Precise))
   . erroring @(Unspecialized (Value Precise))
   . erroring @ResolutionError
@@ -44,7 +44,7 @@ justEvaluating
 evaluatingWithHoles
   = run
   . evaluating
-  . failingOnLoadErrors
+  . runLoadError
   . resumingBadSyntax @(Value Precise)
   . resumingBadValues @(Value Precise)
   . resumingBadVariables @(Value Precise)
@@ -56,16 +56,13 @@ checking
   = run
   . evaluating
   . providingLiveSet
-  . failingOnLoadErrors
+  . runLoadError
   . erroring @(Unspecialized (Type Monovariant))
   . erroring @ResolutionError
   . erroring @(EvalError (Type Monovariant))
   . runAddressError
   . typeChecking
   . caching @[]
-
-failingOnLoadErrors :: Evaluator location term value (Resumable (LoadError term) ': effects) a -> Evaluator location term value effects (Either (SomeExc (LoadError term)) a)
-failingOnLoadErrors = erroring
 
 evalGoProject path = justEvaluating <$> evaluateProject goParser Language.Go Nothing path
 evalRubyProject path = justEvaluating <$> evaluateProject rubyParser Language.Ruby rubyPrelude path
