@@ -320,9 +320,8 @@ evaluatingModulesWith perModule perTerm = handleEvalModules
           = handleEvalModules
           . perModule (subtermValue . moduleBody)
           . fmap (Subterm <*> evalTerm)
-        handleEvalClosures = raiseHandler (relay pure (\ (EvalClosure term) yield -> lower (evalTerm term) >>= yield))
         evalTerm
-          = handleEvalClosures
+          = raiseHandler (relay pure (\ (EvalClosure term) yield -> lower (evalTerm term) >>= yield))
           . foldSubterms (perTerm eval)
 
 -- | Evaluate a given package.
