@@ -301,14 +301,16 @@ instance Applicative m => Monoid (Merging m location value) where
   mappend = (<>)
   mempty = Merging (pure Nothing)
 
-evaluatingModulesWith :: forall location term value effects a
+evaluatingModulesWith :: forall location term value effects a termEffects moduleEffects
                       .  ( Evaluatable (Base term)
                          , Member Fail effects
-                         , MonadEvaluatable location term value (EvalClosure term value ': EvalModule term value ': effects)
+                         , MonadEvaluatable location term value termEffects
                          , Recursive term
+                         , termEffects ~ (EvalClosure term value ': moduleEffects)
+                         , moduleEffects ~ (EvalModule term value ': effects)
                          )
-                      => (SubtermAlgebra Module term (Evaluator location term value (EvalModule term value ': effects) value) -> SubtermAlgebra Module term (Evaluator location term value (EvalModule term value ': effects) value))
-                      -> (SubtermAlgebra (Base term) term (Evaluator location term value (EvalClosure term value ': EvalModule term value ': effects) value) -> SubtermAlgebra (Base term) term (Evaluator location term value (EvalClosure term value ': EvalModule term value ': effects) value))
+                      => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value moduleEffects value))
+                      -> (SubtermAlgebra (Base term) term (Evaluator location term value termEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value termEffects value))
                       -> Evaluator location term value (EvalModule term value ': effects) a
                       -> Evaluator location term value effects a
 evaluatingModulesWith perModule perTerm = handleEvalModules
