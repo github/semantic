@@ -54,8 +54,7 @@ type MonadEvaluatable location term value effects =
   , Addressable location effects
   , Declarations term
   , FreeVariables term
-  , Members '[ EvalClosure term value
-             , EvalModule term value
+  , Members '[ EvalModule term value
              , LoopControl value
              , Reader (Environment location value)
              , Reader LoadStack
