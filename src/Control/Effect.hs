@@ -12,7 +12,7 @@ module Control.Effect
 , handleState
 ) where
 
-import Control.Monad.Effect.Internal
+import Control.Monad.Effect
 import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Resumable
 import Control.Monad.Effect.State
