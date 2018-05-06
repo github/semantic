@@ -60,7 +60,6 @@ library
                      , Data.Abstract.Module
                      , Data.Abstract.ModuleTable
                      , Data.Abstract.Number
-                     , Data.Abstract.Origin
                      , Data.Abstract.Package
                      , Data.Abstract.Path
                      , Data.Abstract.Type

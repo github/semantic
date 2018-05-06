@@ -16,7 +16,6 @@ import           Data.Abstract.Evaluatable (LoadError (..))
 import           Data.Abstract.FreeVariables
 import           Data.Abstract.Located
 import           Data.Abstract.Module (Module(moduleInfo), ModuleInfo(..))
-import           Data.Abstract.Origin
 import           Data.Abstract.Package (PackageInfo(..))
 import           Data.Aeson hiding (Result)
 import qualified Data.ByteString.Char8 as BC
@@ -126,7 +125,7 @@ variableDefinition :: ( Member (Reader (Environment (Located location (Base term
                    => Name
                    -> Evaluator (Located location (Base term ())) term value effects ()
 variableDefinition name = do
-  graph <- maybe empty (moduleGraph . originModule . origin . unAddress) <$> lookupEnv name
+  graph <- maybe empty (moduleGraph . locationModule . unAddress) <$> lookupEnv name
   appendGraph (vertex (Variable (unName name)) `connect` graph)
 
 appendGraph :: Member (State (ImportGraph term)) effects => ImportGraph term -> Evaluator location term value effects ()

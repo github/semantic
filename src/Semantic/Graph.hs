@@ -62,8 +62,7 @@ parseModule parser rootDir file = do
 
 
 importGraphAnalysis :: forall term syntax ann a
-                    .  Show (Base term ())
-                    => Evaluator (Located Precise (Base term ())) term (Value (Located Precise (Base term ())))
+                    .  Evaluator (Located Precise (Base term ())) term (Value (Located Precise (Base term ())))
                       (  State (ImportGraph (Term (Sum syntax) ann))
                       ': Resumable (AddressError (Located Precise (Base term ())) (Value (Located Precise (Base term ()))))
                       ': Resumable ResolutionError
@@ -91,13 +90,10 @@ importGraphAnalysis
 
 -- | Render the import graph for a given 'Package'.
 graphImports :: ( Show ann
-                , Ord ann
                 , Apply Declarations1 syntax
                 , Apply Evaluatable syntax
                 , Apply FreeVariables1 syntax
                 , Apply Functor syntax
-                , Apply Ord1 syntax
-                , Apply Eq1 syntax
                 , Apply Show1 syntax
                 , Element Syntax.Identifier syntax
                 , Members '[Exc SomeException, Task] effs
