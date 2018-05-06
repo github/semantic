@@ -355,25 +355,22 @@ evaluatePackageBodyWith :: forall location term value effects termEffects module
 evaluatePackageBodyWith perModule perTerm body
   = runReader (packageModules body)
   . runReader lowerBound
-  . runEvalModule
+  . runEvalModule evalModule
   . withPrelude (packagePrelude body)
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
-  where runEvalModule :: Evaluator location term value (EvalModule term value ': packageBodyEffects) a -> Evaluator location term value packageBodyEffects a
-        runEvalModule = raiseHandler (relay pure (\ (EvalModule m) yield -> lower (evalModule m) >>= yield))
-        evalModule m
-          = runEvalModule
+  where evalModule m
+          = runEvalModule evalModule
           . runReader (moduleInfo m)
           . perModule (subtermValue . moduleBody)
           . fmap (Subterm <*> evalTerm)
           $ m
-        runEvalClosure = raiseHandler (relay pure (\ (EvalClosure term) yield -> lower (evalTerm term) >>= yield))
         evalTerm
-          = runEvalClosure
+          = runEvalClosure evalTerm
           . runReturn
           . runLoopControl
           . foldSubterms (perTerm eval)
 
-        evaluateEntryPoint m sym = runReader (ModuleInfo m) . runEvalClosure . runReturn . runLoopControl $ do
+        evaluateEntryPoint m sym = runReader (ModuleInfo m) . runEvalClosure evalTerm . runReturn . runLoopControl $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
 
