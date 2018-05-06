@@ -1,7 +1,6 @@
 {-# LANGUAGE GADTs, ScopedTypeVariables, TypeOperators #-}
 module Semantic.Graph where
 
-import           Analysis.Abstract.BadValues
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.ImportGraph
 import qualified Control.Exception as Exc
@@ -10,7 +9,8 @@ import           Data.Abstract.Evaluatable
 import           Data.Abstract.Located
 import           Data.Abstract.Module
 import           Data.Abstract.Package as Package
-import           Data.Abstract.Value (Value, ValueError)
+import           Data.Abstract.Value (Value, ValueError(..), runValueErrorWith)
+import           Data.ByteString.Char8 (pack)
 import           Data.File
 import           Data.Output
 import           Data.Semilattice.Lower
@@ -87,7 +87,7 @@ importGraphAnalysis
   . evaluating
   . runLoadError
   . resumingUnspecialized
-  . resumingBadValues
+  . resumingValueError
   . resumingEvalError
   . resumingResolutionError
   . resumingAddressError
@@ -118,6 +118,22 @@ resumingAddressError :: (AbstractHole value, Lower (Cell location value), Show l
 resumingAddressError = runAddressErrorWith (\ err -> traceM ("AddressError:" <> show err) *> case err of
   UnallocatedAddress _   -> pure lowerBound
   UninitializedAddress _ -> pure hole)
+
+resumingValueError :: (AbstractHole value, Member (State (Environment location value)) effects, Show value) => Evaluator location term value (Resumable (ValueError location value) ': effects) a -> Evaluator location term value effects a
+resumingValueError = runValueErrorWith (\ err -> traceM ("ValueError" <> show err) *> case err of
+  CallError val     -> pure val
+  StringError val   -> pure (pack (show val))
+  BoolError{}       -> pure True
+  BoundsError{}     -> pure hole
+  IndexError{}      -> pure hole
+  NumericError{}    -> pure hole
+  Numeric2Error{}   -> pure hole
+  ComparisonError{} -> pure hole
+  NamespaceError{}  -> getEnv
+  BitwiseError{}    -> pure hole
+  Bitwise2Error{}   -> pure hole
+  KeyValueError{}   -> pure (hole, hole)
+  ArithmeticError{} -> pure hole)
 
 -- | Render the import graph for a given 'Package'.
 graphImports :: ( Show ann
