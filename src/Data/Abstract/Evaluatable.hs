@@ -1,7 +1,6 @@
 {-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
-, MonadEvaluatable
 , Evaluatable(..)
 , Unspecialized(..)
 , EvalError(..)
