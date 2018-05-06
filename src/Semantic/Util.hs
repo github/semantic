@@ -49,8 +49,7 @@ evaluatingWithHoles
   . resumingBadModuleResolutions
   . resumingBadAddresses @(Value Precise)
 
--- The order is significant here: Caching has to come on the outside, or its Interpreter instance
--- will expect the TypeError exception type to have an Ord instance, which is wrong.
+-- The order is significant here: caching has to run before typeChecking, or else we’ll nondeterministically produce TypeErrors as part of the result set. While this is probably actually correct, it will require us to have an Ord instance for TypeError, which we don’t have yet.
 checking
   = evaluating @(Type Monovariant)
   . providingLiveSet
