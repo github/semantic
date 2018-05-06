@@ -43,7 +43,7 @@ type EvaluatingEffects location term value
      ]
 
 
-evaluating :: (AbstractHole value, Effectful m, Show value) => m (EvaluatingEffects location term value) result -> (Either String result, EvaluatingState location term value)
+evaluating :: (AbstractHole value, Show value) => Evaluator location term value (EvaluatingEffects location term value) result -> (Either String result, EvaluatingState location term value)
 evaluating
   = (\ (((((result, env), heap), modules), exports), jumps) -> (result, EvaluatingState env heap modules exports jumps))
   . Eff.run
