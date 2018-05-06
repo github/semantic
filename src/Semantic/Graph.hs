@@ -63,15 +63,23 @@ parseModule parser rootDir file = do
 
 importGraphAnalysis :: forall term syntax ann a
                     .  Evaluator (Located Precise) term (Value (Located Precise))
-                      (  State (ImportGraph (Term (Sum syntax) ann))
-                      ': Resumable (AddressError (Located Precise) (Value (Located Precise)))
-                      ': Resumable ResolutionError
-                      ': Resumable (EvalError (Value (Located Precise)))
-                      ': State [Name]
-                      ': Resumable (ValueError (Located Precise) (Value (Located Precise)))
-                      ': Resumable (Unspecialized (Value (Located Precise)))
-                      ': Resumable (LoadError term)
-                      ': EvaluatingEffects (Located Precise) term (Value (Located Precise))) a
+                       '[ State (ImportGraph (Term (Sum syntax) ann))
+                        , Resumable (AddressError (Located Precise) (Value (Located Precise)))
+                        , Resumable ResolutionError
+                        , Resumable (EvalError (Value (Located Precise)))
+                        , State [Name]
+                        , Resumable (ValueError (Located Precise) (Value (Located Precise)))
+                        , Resumable (Unspecialized (Value (Located Precise)))
+                        , Resumable (LoadError term)
+                        , Fail
+                        , Fresh
+                        , Reader (Environment (Located Precise) (Value (Located Precise)))
+                        , State (Environment (Located Precise) (Value (Located Precise)))
+                        , State (Heap (Located Precise) (Value (Located Precise)))
+                        , State (ModuleTable (Environment (Located Precise) (Value (Located Precise)), Value (Located Precise)))
+                        , State (Exports (Located Precise) (Value (Located Precise)))
+                        , State (JumpTable term)
+                        ] a
                     -> (   Either String                                                   -- 'fail' calls
                          ( Either (SomeExc (LoadError term))                               -- Unhandled LoadErrors
                          ( ( a                                                             -- the result value
