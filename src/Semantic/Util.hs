@@ -71,13 +71,14 @@ evalPythonProject path = justEvaluating <$> evaluateProject pythonParser Languag
 evalTypeScriptProjectQuietly path = evaluatingWithHoles <$> evaluateProject typescriptParser Language.TypeScript Nothing path
 evalTypeScriptProject path = justEvaluating <$> evaluateProject typescriptParser Language.TypeScript Nothing path
 
-typecheckGoFile path = checking <$> evaluateProject goParser Language.Go Nothing path
+typecheckGoFile path = checking <$> evaluateProjectWithCaching goParser Language.Go Nothing path
 
 rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Language.Ruby)
 pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Language.Python)
 
 -- Evaluate a project, starting at a single entrypoint.
 evaluateProject parser lang prelude path = evaluatePackageWith id id <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
+evaluateProjectWithCaching parser lang prelude path = evaluatePackageWith convergingModules cachingTerms <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
 
 
 parseFile :: Parser term -> FilePath -> IO term
