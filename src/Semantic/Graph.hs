@@ -63,22 +63,22 @@ parseModule parser rootDir file = do
 
 importGraphAnalysis :: forall term syntax ann a
                     .  Show (Base term ())
-                    => Evaluator (Located Precise term) term (Value (Located Precise term))
+                    => Evaluator (Located Precise (Base term ())) term (Value (Located Precise (Base term ())))
                       (  State (ImportGraph (Term (Sum syntax) ann))
-                      ': Resumable (AddressError (Located Precise term) (Value (Located Precise term)))
+                      ': Resumable (AddressError (Located Precise (Base term ())) (Value (Located Precise (Base term ()))))
                       ': Resumable ResolutionError
-                      ': Resumable (EvalError (Value (Located Precise term)))
+                      ': Resumable (EvalError (Value (Located Precise (Base term ()))))
                       ': State [Name]
-                      ': Resumable (ValueError (Located Precise term) (Value (Located Precise term)))
-                      ': Resumable (Unspecialized (Value (Located Precise term)))
+                      ': Resumable (ValueError (Located Precise (Base term ())) (Value (Located Precise (Base term ()))))
+                      ': Resumable (Unspecialized (Value (Located Precise (Base term ()))))
                       ': Resumable (LoadError term)
-                      ': EvaluatingEffects (Located Precise term) term (Value (Located Precise term))) a
-                    -> (   Either String                                                             -- 'fail' calls
-                         ( Either (SomeExc (LoadError term))                                         -- Unhandled LoadErrors
-                         ( ( a                                                                       -- the result value
-                           , ImportGraph (Term (Sum syntax) ann))                                    -- the import graph
-                         , [Name]))                                                                  -- the list of bad names
-                       , EvaluatingState (Located Precise term) term (Value (Located Precise term))) -- the final state
+                      ': EvaluatingEffects (Located Precise (Base term ())) term (Value (Located Precise (Base term ())))) a
+                    -> (   Either String                                                                                 -- 'fail' calls
+                         ( Either (SomeExc (LoadError term))                                                             -- Unhandled LoadErrors
+                         ( ( a                                                                                           -- the result value
+                           , ImportGraph (Term (Sum syntax) ann))                                                        -- the import graph
+                         , [Name]))                                                                                      -- the list of bad names
+                       , EvaluatingState (Located Precise (Base term ())) term (Value (Located Precise (Base term ())))) -- the final state
 importGraphAnalysis
   = evaluating
   . erroring @(LoadError term)

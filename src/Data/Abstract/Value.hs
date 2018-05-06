@@ -213,7 +213,7 @@ instance ( Addressable location effects
                     , Fail
                     , LoopControl (Value location)
                     , Reader (Environment location (Value location))
-                    , Reader (SomeOrigin term)
+                    , Reader (SomeOrigin (Base term ()))
                     , Resumable (AddressError location (Value location))
                     , Resumable (ValueError location (Value location))
                     , Return (Value location)

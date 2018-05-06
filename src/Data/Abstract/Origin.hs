@@ -15,7 +15,7 @@ data Origin term ty where
   -- | We know the module, and possibly package.
   Module  :: Origin term 'P -> M.ModuleInfo  -> Origin term 'M
   -- | We know the term, and possibly module and package.
-  Term    :: Origin term 'M -> Base term ()  -> Origin term 'T
+  Term    :: Origin term 'M -> term          -> Origin term 'T
 
 -- | A type index indicating the finest grain of information available in a given 'Origin'.
 data OriginType = P | M | T
@@ -34,11 +34,11 @@ originPackage (Module o _) = originPackage o
 originPackage (Package p)  = Just p
 originPackage _            = Nothing
 
-deriving instance Eq (Base term ()) => Eq (Origin term ty)
-deriving instance Show (Base term ()) => Show (Origin term ty)
+deriving instance Eq term => Eq (Origin term ty)
+deriving instance Show term => Show (Origin term ty)
 
 -- | Compare two origins with arbitrary type indices using a function to compare term functors.
-liftCompareOrigins :: (Base term () -> Base term () -> Ordering) -> Origin term ty1 -> Origin term ty2 -> Ordering
+liftCompareOrigins :: (term -> term -> Ordering) -> Origin term ty1 -> Origin term ty2 -> Ordering
 liftCompareOrigins _ Unknown        Unknown        = EQ
 liftCompareOrigins _ Unknown        _              = LT
 liftCompareOrigins _ _              Unknown        = GT
@@ -50,7 +50,7 @@ liftCompareOrigins _ (Module _ _)   _              = LT
 liftCompareOrigins _ _              (Module _ _)   = GT
 liftCompareOrigins c (Term m1 t1)   (Term m2 t2)   = liftCompareOrigins c m1 m2 <> c t1 t2
 
-instance Ord (Base term ()) => Ord (Origin term ty) where
+instance Ord term => Ord (Origin term ty) where
   compare = liftCompareOrigins compare
 
 instance Lower (Origin term ty) where lowerBound = Unknown
@@ -68,21 +68,21 @@ packageOrigin = SomeOrigin . Package . P.packageInfo
 moduleOrigin :: M.Module term -> SomeOrigin term
 moduleOrigin = SomeOrigin . Module Unknown . M.moduleInfo
 
--- | Construct a 'SomeOrigin' from a recursive term type.
-termOrigin :: Recursive term => term -> SomeOrigin term
-termOrigin = SomeOrigin . Term Unknown . (() <$) . project
+-- | Construct a 'SomeOrigin' from a term type.
+termOrigin :: term -> SomeOrigin term
+termOrigin = SomeOrigin . Term Unknown
 
 -- | Project information out of a 'SomeOrigin' using a helper function.
 withSomeOrigin :: (forall ty . Origin term ty -> b) -> SomeOrigin term -> b
 withSomeOrigin with (SomeOrigin o) = with o
 
-instance Eq (Base term ()) => Eq (SomeOrigin term) where
+instance Eq term => Eq (SomeOrigin term) where
   SomeOrigin o1 == SomeOrigin o2 = liftCompareOrigins (\ t1 t2 -> if t1 == t2 then EQ else LT) o1 o2 == EQ
 
-instance Ord (Base term ()) => Ord (SomeOrigin term) where
+instance Ord term => Ord (SomeOrigin term) where
   compare (SomeOrigin o1) (SomeOrigin o2) = liftCompareOrigins compare o1 o2
 
-deriving instance Show (Base term ()) => Show (SomeOrigin term)
+deriving instance Show term => Show (SomeOrigin term)
 
 
 -- | Merge two 'Origin's of possibly differing type indices into a 'SomeOrigin' containing as much information as is available in either side, with ties broken in favour of the right-hand argument.

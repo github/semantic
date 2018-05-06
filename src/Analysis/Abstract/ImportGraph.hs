@@ -57,16 +57,16 @@ style = (defaultStyle vertexName)
 
 graphingTerms :: forall location term value effects syntax ann a
               .  ( Element Syntax.Identifier syntax
-                 , Members '[ Reader (Environment (Located location term) value)
-                            , Reader (SomeOrigin term)
+                 , Members '[ Reader (Environment (Located location (Base term ())) value)
+                            , Reader (SomeOrigin (Base term ()))
                             , Resumable (LoadError term)
-                            , State (Environment (Located location term) value)
+                            , State (Environment (Located location (Base term ())) value)
                             , State (ImportGraph term)
                             ] effects
                  , term ~ Term (Sum syntax) ann
                  )
-              => SubtermAlgebra (Base term) term (Evaluator (Located location term) term value effects a)
-              -> SubtermAlgebra (Base term) term (Evaluator (Located location term) term value effects a)
+              => SubtermAlgebra (Base term) term (Evaluator (Located location (Base term ())) term value effects a)
+              -> SubtermAlgebra (Base term) term (Evaluator (Located location (Base term ())) term value effects a)
 graphingTerms recur term@(In _ syntax) = do
   case projectSum syntax of
     Just (Syntax.Identifier name) -> do
@@ -78,7 +78,7 @@ graphingTerms recur term@(In _ syntax) = do
     (recur term)
     (\yield (LoadError name) -> moduleInclusion (Module (BC.pack name)) *> yield [])
 
-graphingModules :: Members '[ Reader (SomeOrigin term)
+graphingModules :: Members '[ Reader (SomeOrigin (Base term ()))
                             , State (ImportGraph term)
                             ] effects
                => SubtermAlgebra Module term (Evaluator location term value effects a)
@@ -90,14 +90,14 @@ graphingModules recur m = do
   recur m
 
 
-packageGraph :: SomeOrigin term -> ImportGraph term
+packageGraph :: SomeOrigin (Base term ()) -> ImportGraph term
 packageGraph = maybe empty (vertex . Package . unName . packageName) . withSomeOrigin originPackage
 
-moduleGraph :: SomeOrigin term -> ImportGraph term
+moduleGraph :: SomeOrigin (Base term ()) -> ImportGraph term
 moduleGraph = maybe empty (vertex . Module . BC.pack . modulePath) . withSomeOrigin originModule
 
 -- | Add an edge from the current package to the passed vertex.
-packageInclusion :: ( Member (Reader (SomeOrigin term)) effects
+packageInclusion :: ( Member (Reader (SomeOrigin (Base term ()))) effects
                     , Member (State (ImportGraph term)) effects
                     )
                  => Vertex term
@@ -107,7 +107,7 @@ packageInclusion v = do
   appendGraph (packageGraph o `connect` vertex v)
 
 -- | Add an edge from the current module to the passed vertex.
-moduleInclusion :: ( Member (Reader (SomeOrigin term)) effects
+moduleInclusion :: ( Member (Reader (SomeOrigin (Base term ()))) effects
                    , Member (State (ImportGraph term)) effects
                    )
                 => Vertex term
@@ -117,12 +117,12 @@ moduleInclusion v = do
   appendGraph (moduleGraph o `connect` vertex v)
 
 -- | Add an edge from the passed variable name to the module it originated within.
-variableDefinition :: ( Member (Reader (Environment (Located location term) value)) effects
-                      , Member (State (Environment (Located location term) value)) effects
+variableDefinition :: ( Member (Reader (Environment (Located location (Base term ())) value)) effects
+                      , Member (State (Environment (Located location (Base term ())) value)) effects
                       , Member (State (ImportGraph term)) effects
                       )
                    => Name
-                   -> Evaluator (Located location term) term value effects ()
+                   -> Evaluator (Located location (Base term ())) term value effects ()
 variableDefinition name = do
   graph <- maybe empty (moduleGraph . origin . unAddress) <$> lookupEnv name
   appendGraph (vertex (Variable (unName name)) `connect` graph)

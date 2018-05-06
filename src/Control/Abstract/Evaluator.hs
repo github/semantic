@@ -107,7 +107,7 @@ newtype Evaluator location term value effects a = Evaluator { runEvaluator :: Ef
 
 deriving instance Member NonDet effects => Alternative (Evaluator location term value effects)
 
-type JumpTable term = IntMap.IntMap (SomeOrigin term, term)
+type JumpTable term = IntMap.IntMap (SomeOrigin (Base term ()), term)
 
 
 -- Environment
@@ -277,7 +277,7 @@ currentPackage = raise ask
 -- | Allocate a 'Label' for the given @term@.
 --
 --   Labels must be allocated before being jumped to with 'goto', but are suitable for nonlocal jumps; thus, they can be used to implement coroutines, exception handling, call with current continuation, and other esoteric control mechanisms.
-label :: Members '[Reader (SomeOrigin term), State (JumpTable term)] effects => term -> Evaluator location term value effects Label
+label :: Members '[Reader (SomeOrigin (Base term ())), State (JumpTable term)] effects => term -> Evaluator location term value effects Label
 label term = do
   m <- raise get
   origin <- askOrigin
@@ -286,11 +286,11 @@ label term = do
   pure i
 
 -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
-goto :: (Members '[Fail, Reader (SomeOrigin term), State (JumpTable term)] effects, Recursive term) => Label -> (term -> Evaluator location term value effects a) -> Evaluator location term value effects a
+goto :: (Members '[Fail, Reader (SomeOrigin (Base term ())), State (JumpTable term)] effects, Recursive term) => Label -> (term -> Evaluator location term value effects a) -> Evaluator location term value effects a
 goto label comp = do
   maybeTerm <- IntMap.lookup label <$> raise get
   case maybeTerm of
-    Just (origin, term) -> pushOrigin (origin <> termOrigin term) (comp term)
+    Just (origin, term) -> pushOrigin (origin <> termOrigin (() <$ project term)) (comp term)
     Nothing -> raise (fail ("unknown label: " <> show label))
 
 
@@ -351,12 +351,12 @@ catchLoopControl action handler = raiseHandler (Eff.interpose pure (\ control _ 
 
 
 -- | Retrieve the current 'SomeOrigin'.
-askOrigin :: Member (Reader (SomeOrigin term)) effects => Evaluator location term value effects (SomeOrigin term)
+askOrigin :: Member (Reader (SomeOrigin (Base term ()))) effects => Evaluator location term value effects (SomeOrigin (Base term ()))
 askOrigin = raise ask
 
 -- | Push a 'SomeOrigin' onto the stack. This should be used to contextualize execution with information about the originating term, module, or package.
-pushOrigin :: Member (Reader (SomeOrigin term)) effects
-           => SomeOrigin term
+pushOrigin :: Member (Reader (SomeOrigin (Base term ()))) effects
+           => SomeOrigin (Base term ())
            -> Evaluator location term value effects a
            -> Evaluator location term value effects a
 pushOrigin o = raiseHandler (local (<> o))
