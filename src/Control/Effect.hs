@@ -6,14 +6,17 @@ module Control.Effect
 -- * Effects
 , Eff.Reader
 , Eff.State
+, Fresh
 -- * Handlers
 , run
 , raiseHandler
 , runReader
 , runState
+, runFresh
 ) where
 
 import qualified Control.Monad.Effect as Eff
+import Control.Monad.Effect.Fresh
 import qualified Control.Monad.Effect.Reader as Eff
 import Control.Monad.Effect.Resumable
 import qualified Control.Monad.Effect.State as Eff
@@ -56,3 +59,7 @@ runReader = raiseHandler . flip Eff.runReader
 -- | Run a 'State' effect in an 'Effectful' context.
 runState :: Effectful m => state -> m (Eff.State state ': effects) a -> m effects (a, state)
 runState = raiseHandler . flip Eff.runState
+
+-- | Run a 'Fresh' effect in an 'Effectful' context.
+runFresh :: Effectful m => Int -> m (Fresh ': effects) a -> m effects a
+runFresh = raiseHandler . flip runFresh'

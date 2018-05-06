@@ -46,6 +46,5 @@ evaluating
   . runState lowerBound -- State (Heap location value)
   . runState lowerBound -- State (Environment location value)
   . runReader lowerBound -- Reader (Environment location value)
-  . raiseHandler
-    ( flip runFresh' 0
-    . runFail)
+  . runFresh 0
+  . raiseHandler runFail
