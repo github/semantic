@@ -120,7 +120,11 @@ data EvalError value resume where
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
 --   Throws an 'EnvironmentLookupError' if @scopedEnvTerm@ does not have an environment.
-evaluateInScopedEnv :: MonadEvaluatable location term value effects
+evaluateInScopedEnv :: ( AbstractValue location term value effects
+                       , Members '[ Resumable (EvalError value)
+                                  , State (Environment location value)
+                                  ] effects
+                       )
                     => Evaluator location term value effects value
                     -> Evaluator location term value effects value
                     -> Evaluator location term value effects value
