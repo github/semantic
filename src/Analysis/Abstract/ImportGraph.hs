@@ -92,33 +92,31 @@ graphingModules recur m = do
   recur m
 
 
-packageGraph :: Origin (Base term ()) -> ImportGraph term
-packageGraph = vertex . Package . unName . packageName . originPackage
+packageGraph :: PackageInfo -> ImportGraph term
+packageGraph = vertex . Package . unName . packageName
 
-moduleGraph :: Origin (Base term ()) -> ImportGraph term
-moduleGraph = vertex . Module . BC.pack . modulePath . originModule
+moduleGraph :: ModuleInfo -> ImportGraph term
+moduleGraph = vertex . Module . BC.pack . modulePath
 
 -- | Add an edge from the current package to the passed vertex.
-packageInclusion :: Members '[ Reader ModuleInfo
-                             , Reader PackageInfo
+packageInclusion :: Members '[ Reader PackageInfo
                              , State (ImportGraph term)
                              ] effects
                  => Vertex term
                  -> Evaluator location term value effects ()
 packageInclusion v = do
-  o <- askOrigin
-  appendGraph (packageGraph o `connect` vertex v)
+  p <- currentPackage
+  appendGraph (packageGraph p `connect` vertex v)
 
 -- | Add an edge from the current module to the passed vertex.
 moduleInclusion :: Members '[ Reader ModuleInfo
-                            , Reader PackageInfo
                             , State (ImportGraph term)
                             ] effects
                 => Vertex term
                 -> Evaluator location term value effects ()
 moduleInclusion v = do
-  o <- askOrigin
-  appendGraph (moduleGraph o `connect` vertex v)
+  m <- currentModule
+  appendGraph (moduleGraph m `connect` vertex v)
 
 -- | Add an edge from the passed variable name to the module it originated within.
 variableDefinition :: ( Member (Reader (Environment (Located location (Base term ())) value)) effects
@@ -128,7 +126,7 @@ variableDefinition :: ( Member (Reader (Environment (Located location (Base term
                    => Name
                    -> Evaluator (Located location (Base term ())) term value effects ()
 variableDefinition name = do
-  graph <- maybe empty (moduleGraph . origin . unAddress) <$> lookupEnv name
+  graph <- maybe empty (moduleGraph . originModule . origin . unAddress) <$> lookupEnv name
   appendGraph (vertex (Variable (unName name)) `connect` graph)
 
 appendGraph :: Member (State (ImportGraph term)) effects => ImportGraph term -> Evaluator location term value effects ()

@@ -8,7 +8,7 @@ import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Package (PackageInfo)
 import Prologue
 
-data Located location termInfo = Located { location :: location, origin :: !(Origin termInfo) }
+data Located location termInfo = Located { location :: location, origin :: !(Origin (Maybe termInfo)) }
   deriving (Eq, Ord, Show)
 
 instance (Location location, Ord termInfo) => Location (Located location termInfo) where

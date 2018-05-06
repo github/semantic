@@ -74,7 +74,6 @@ module Control.Abstract.Evaluator
   , Eff.relay
   -- * Origin
   , askOrigin
-  , withOrigin
   ) where
 
 import Control.Effect
@@ -107,7 +106,7 @@ newtype Evaluator location term value effects a = Evaluator { runEvaluator :: Ef
 
 deriving instance Member NonDet effects => Alternative (Evaluator location term value effects)
 
-type JumpTable term = IntMap.IntMap (PackageInfo, ModuleInfo, term)
+type JumpTable term = IntMap.IntMap (Origin term)
 
 
 -- Environment
@@ -283,15 +282,15 @@ label term = do
   moduleInfo <- currentModule
   packageInfo <- currentPackage
   let i = IntMap.size m
-  raise (put (IntMap.insert i (packageInfo, moduleInfo, term) m))
+  raise (put (IntMap.insert i (Origin packageInfo moduleInfo term) m))
   pure i
 
 -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
-goto :: (Members '[Fail, Reader ModuleInfo, Reader PackageInfo, State (JumpTable term)] effects, Recursive term) => Label -> (term -> Evaluator location term value effects a) -> Evaluator location term value effects a
+goto :: Members '[Fail, Reader ModuleInfo, Reader PackageInfo, State (JumpTable term)] effects => Label -> (term -> Evaluator location term value effects a) -> Evaluator location term value effects a
 goto label comp = do
   maybeTerm <- IntMap.lookup label <$> raise get
   case maybeTerm of
-    Just (packageInfo, moduleInfo, term) -> withOrigin (Origin packageInfo moduleInfo (Just (() <$ project term))) (comp term)
+    Just (Origin packageInfo moduleInfo term) -> raiseHandler (local (const packageInfo)) (raiseHandler (local (const moduleInfo)) (comp term))
     Nothing -> raise (fail ("unknown label: " <> show label))
 
 
@@ -352,8 +351,5 @@ catchLoopControl action handler = raiseHandler (Eff.interpose pure (\ control _ 
 
 
 -- | Retrieve the current 'Origin'.
-askOrigin :: Members '[Reader ModuleInfo, Reader PackageInfo] effects => Evaluator location term value effects (Origin termInfo)
+askOrigin :: Members '[Reader ModuleInfo, Reader PackageInfo] effects => Evaluator location term value effects (Origin (Maybe termInfo))
 askOrigin = Origin <$> raise ask <*> raise ask <*> pure Nothing
-
-withOrigin :: Members '[Reader ModuleInfo, Reader PackageInfo] effects => Origin termInfo -> Evaluator location term value effects a -> Evaluator location term value effects a
-withOrigin (Origin p m _) = raiseHandler (local (const p)) . raiseHandler (local (const m))
