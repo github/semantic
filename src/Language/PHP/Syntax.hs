@@ -38,7 +38,7 @@ instance Evaluatable VariableName
 resolvePHPName :: forall value location term effects. MonadEvaluatable location term value effects => ByteString -> Evaluator location term value effects ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]
-  maybe (throwResumable @(ResolutionError value) $ NotFoundError name [name] Language.PHP) pure modulePath
+  maybe (throwResumable $ NotFoundError name [name] Language.PHP) pure modulePath
   where name = toName n
         toName = BC.unpack . dropRelativePrefix . stripQuotes
 

@@ -43,14 +43,14 @@ resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativ
 -- /root/src/moduleB.ts
 -- /root/src/moduleB/package.json (if it specifies a "types" property)
 -- /root/src/moduleB/index.ts
-resolveRelativePath :: forall value term location effects. MonadEvaluatable location term value effects => FilePath -> [String] -> Evaluator location term value effects ModulePath
+resolveRelativePath :: MonadEvaluatable location term value effects => FilePath -> [String] -> Evaluator location term value effects ModulePath
 resolveRelativePath relImportPath exts = do
   ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory modulePath
   let path = joinPaths relRootDir relImportPath
   resolveTSModule path exts >>= either notFound (\x -> traceResolve relImportPath x (pure x))
   where
-    notFound xs = throwResumable @(ResolutionError value) $ NotFoundError relImportPath xs Language.TypeScript
+    notFound xs = throwResumable $ NotFoundError relImportPath xs Language.TypeScript
 
 -- | Resolve a non-relative TypeScript import to a known 'ModuleName' or fail.
 --
@@ -62,7 +62,7 @@ resolveRelativePath relImportPath exts = do
 --
 -- /root/node_modules/moduleB.ts, etc
 -- /node_modules/moduleB.ts, etc
-resolveNonRelativePath :: forall value term location effects. MonadEvaluatable location term value effects => FilePath -> [String] -> Evaluator location term value effects ModulePath
+resolveNonRelativePath :: MonadEvaluatable location term value effects => FilePath -> [String] -> Evaluator location term value effects ModulePath
 resolveNonRelativePath name exts = do
   ModuleInfo{..} <- currentModule
   go "." modulePath mempty
@@ -75,7 +75,7 @@ resolveNonRelativePath name exts = do
         Left xs | parentDir <- takeDirectory path , root /= parentDir -> go root parentDir (searched <> xs)
                 | otherwise -> notFound (searched <> xs)
         Right m -> traceResolve name m $ pure m
-    notFound xs = throwResumable @(ResolutionError value) $ NotFoundError name xs Language.TypeScript
+    notFound xs = throwResumable $ NotFoundError name xs Language.TypeScript
 
 resolveTSModule :: MonadEvaluatable location term value effects => FilePath -> [String] -> Evaluator location term value effects (Either [FilePath] ModulePath)
 resolveTSModule path exts = maybe (Left searchPaths) Right <$> resolve searchPaths

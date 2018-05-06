@@ -22,14 +22,14 @@ resolveRubyName name = do
   let name' = cleanNameOrPath name
   let paths = [name' <.> "rb"]
   modulePath <- resolve paths
-  maybe (throwResumable @(ResolutionError value) $ NotFoundError name' paths Language.Ruby) pure modulePath
+  maybe (throwResumable $ NotFoundError name' paths Language.Ruby) pure modulePath
 
 -- load "/root/src/file.rb"
 resolveRubyPath :: forall value term location effects. MonadEvaluatable location term value effects => ByteString -> Evaluator location term value effects ModulePath
 resolveRubyPath path = do
   let name' = cleanNameOrPath path
   modulePath <- resolve [name']
-  maybe (throwResumable @(ResolutionError value) $ NotFoundError name' [name'] Language.Ruby) pure modulePath
+  maybe (throwResumable $ NotFoundError name' [name'] Language.Ruby) pure modulePath
 
 cleanNameOrPath :: ByteString -> String
 cleanNameOrPath = BC.unpack . dropRelativePrefix . stripQuotes

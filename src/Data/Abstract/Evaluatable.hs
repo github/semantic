@@ -66,7 +66,7 @@ type MonadEvaluatable location term value effects =
              , Resumable (AddressError location value)
              , Resumable (EvalError value)
              , Resumable (LoadError term)
-             , Resumable (ResolutionError value)
+             , Resumable ResolutionError
              , Resumable (Unspecialized value)
              , Return value
              , State (Environment location value)
@@ -78,18 +78,18 @@ type MonadEvaluatable location term value effects =
   )
 
 -- | An error thrown when we can't resolve a module from a qualified name.
-data ResolutionError value resume where
+data ResolutionError resume where
   NotFoundError :: String   -- ^ The path that was not found.
                 -> [String] -- ^ List of paths searched that shows where semantic looked for this module.
                 -> Language -- ^ Language.
-                -> ResolutionError value ModulePath
+                -> ResolutionError ModulePath
 
-  GoImportError :: FilePath -> ResolutionError value [ModulePath]
+  GoImportError :: FilePath -> ResolutionError [ModulePath]
 
-deriving instance Eq (ResolutionError a b)
-deriving instance Show (ResolutionError a b)
-instance Show1 (ResolutionError value) where liftShowsPrec _ _ = showsPrec
-instance Eq1 (ResolutionError value) where
+deriving instance Eq (ResolutionError b)
+deriving instance Show (ResolutionError b)
+instance Show1 ResolutionError where liftShowsPrec _ _ = showsPrec
+instance Eq1 ResolutionError where
   liftEq _ (NotFoundError a _ l1) (NotFoundError b _ l2) = a == b && l1 == l2
   liftEq _ (GoImportError a) (GoImportError b) = a == b
   liftEq _ _ _ = False

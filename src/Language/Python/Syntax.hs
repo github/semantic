@@ -54,7 +54,7 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (BC.unpack prefix) (J
 resolvePythonModules :: forall value term location effects
                      .  Members '[ Reader ModuleInfo
                                  , Reader (ModuleTable [Module term])
-                                 , Resumable (ResolutionError value)
+                                 , Resumable ResolutionError
                                  ] effects
                      => QualifiedName
                      -> Evaluator location term value effects (NonEmpty ModulePath)
@@ -81,7 +81,7 @@ resolvePythonModules q = do
                         , path <.> ".py"
                         ]
       modulePath <- resolve searchPaths
-      maybe (throwResumable @(ResolutionError value) $ NotFoundError path searchPaths Language.Python) pure modulePath
+      maybe (throwResumable $ NotFoundError path searchPaths Language.Python) pure modulePath
 
 
 -- | Import declarations (symbols are added directly to the calling environment).

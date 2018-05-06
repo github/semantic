@@ -70,7 +70,7 @@ importGraphAnalysis :: forall term syntax ann a
                     => Evaluator (Located Precise term) term (Value (Located Precise term))
                       (  State (ImportGraph (Term (Sum syntax) ann))
                       ': Resumable (AddressError (Located Precise term) (Value (Located Precise term)))
-                      ': Resumable (ResolutionError (Value (Located Precise term)))
+                      ': Resumable ResolutionError
                       ': Resumable (EvalError (Value (Located Precise term)))
                       ': State [Name]
                       ': Resumable (ValueError (Located Precise term) (Value (Located Precise term)))
