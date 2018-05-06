@@ -91,12 +91,12 @@ importGraphAnalysis
   . resumingBadSyntax
   . resumingBadValues
   . resumingBadVariables
-  . resumingResolutionErrors
+  . resumingResolutionError
   . resumingBadAddresses
   . importGraphing
 
-resumingResolutionErrors :: (Applicative (m effects), Effectful m) => m (Resumable ResolutionError ': effects) a -> m effects a
-resumingResolutionErrors = runResolutionErrorWith (\ err -> traceM ("ResolutionError:" <> show err) *> case err of
+resumingResolutionError :: (Applicative (m effects), Effectful m) => m (Resumable ResolutionError ': effects) a -> m effects a
+resumingResolutionError = runResolutionErrorWith (\ err -> traceM ("ResolutionError:" <> show err) *> case err of
   NotFoundError nameToResolve _ _ -> pure  nameToResolve
   GoImportError pathToResolve     -> pure [pathToResolve])
 
