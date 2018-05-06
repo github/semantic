@@ -47,7 +47,7 @@ class Evaluatable constr where
           , MonadEvaluatable location term value effects
           )
        => SubtermAlgebra constr term (Evaluator location term value effects value)
-  default eval :: (MonadEvaluatable location term value effects, Show1 constr) => SubtermAlgebra constr term (Evaluator location term value effects value)
+  default eval :: (Member (Resumable (Unspecialized value)) effects, Show1 constr) => SubtermAlgebra constr term (Evaluator location term value effects value)
   eval expr = throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 type MonadEvaluatable location term value effects =
