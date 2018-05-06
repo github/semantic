@@ -32,7 +32,7 @@ import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 
 justEvaluating
-  = evaluating @(Value Precise)
+  = evaluating
   . failingOnLoadErrors
   . erroring @(ValueError Precise (Value Precise))
   . erroring @(Unspecialized (Value Precise))
@@ -41,7 +41,7 @@ justEvaluating
   . erroring @(AddressError Precise (Value Precise))
 
 evaluatingWithHoles
-  = evaluating @(Value Precise)
+  = evaluating
   . failingOnLoadErrors
   . resumingBadSyntax @(Value Precise)
   . resumingBadValues @(Value Precise)
@@ -51,7 +51,7 @@ evaluatingWithHoles
 
 -- The order is significant here: caching has to run before typeChecking, or else we’ll nondeterministically produce TypeErrors as part of the result set. While this is probably actually correct, it will require us to have an Ord instance for TypeError, which we don’t have yet.
 checking
-  = evaluating @(Type Monovariant)
+  = evaluating
   . providingLiveSet
   . failingOnLoadErrors
   . erroring @(Unspecialized (Type Monovariant))
