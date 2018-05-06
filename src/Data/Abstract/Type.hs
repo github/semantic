@@ -1,7 +1,8 @@
-{-# LANGUAGE GADTs, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE GADTs, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Type
   ( Type (..)
   , TypeError (..)
+  , runTypeError
   , unify
   ) where
 
@@ -58,6 +59,9 @@ instance Eq1 TypeError where
   liftEq eq (NumOpError a b) (NumOpError c d)             = a `eq` c && b `eq` d
   liftEq eq (UnificationError a b) (UnificationError c d) = a `eq` c && b `eq` d
   liftEq _ _ _                                           = False
+
+runTypeError :: Evaluator location term value (Resumable TypeError ': effects) a -> Evaluator location term value effects (Either (SomeExc TypeError) a)
+runTypeError = raiseHandler runError
 
 -- | Unify two 'Type's.
 unify :: (Effectful m, Applicative (m effects), Member (Resumable TypeError) effects) => Type location -> Type location -> m effects (Type location)

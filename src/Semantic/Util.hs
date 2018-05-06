@@ -11,11 +11,11 @@ import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Erroring
 import           Analysis.Abstract.Evaluating as X
-import           Analysis.Abstract.TypeChecking
 import           Control.Abstract.Evaluator
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Value
+import           Data.Abstract.Type
 import           Data.Blob
 import           Data.File
 import qualified Data.Language as Language
@@ -60,7 +60,7 @@ checking
   . runResolutionError
   . runEvalError
   . runAddressError
-  . typeChecking
+  . runTypeError
   . caching @[]
 
 evalGoProject path = justEvaluating <$> evaluateProject goParser Language.Go Nothing path
