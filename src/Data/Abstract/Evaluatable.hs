@@ -301,48 +301,33 @@ instance Applicative m => Monoid (Merging m location value) where
   mappend = (<>)
   mempty = Merging (pure Nothing)
 
-evalModuleWith :: Member (EvalClosure term value) packageEffects
-               => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value (EvalModule term value ': packageEffects) value))
-               -> Module term
-               -> Evaluator location term value packageEffects value
-evalModuleWith perModule
-  = evaluatingModulesWith perModule
-  . perModule (subtermValue . moduleBody)
-  . fmap (Subterm <*> evaluateClosureBody)
-
-evaluatingModulesWith :: Member (EvalClosure term value) packageEffects
-                      => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value (EvalModule term value ': packageEffects) value))
-                      -> Evaluator location term value (EvalModule term value ': packageEffects) a
-                      -> Evaluator location term value packageEffects a
-evaluatingModulesWith perModule = raiseHandler (relay pure (\ (EvalModule m) yield -> lower (evalModuleWith perModule m) >>= yield))
-
-evalTermWith :: ( Evaluatable (Base term)
-                , Member Fail termEffects
-                , MonadEvaluatable location term value termEffects
-                , Recursive term
-                )
-             => (SubtermAlgebra (Base term) term (Evaluator location term value termEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value (EvalClosure term value ': moduleEffects) value))
-             -> term
-             -> Evaluator location term value moduleEffects value
-evalTermWith perTerm
-  = evaluatingClosuresWith perTerm
-  . foldSubterms (perTerm eval)
-
-evaluatingClosuresWith :: ( Evaluatable (Base term)
-                          , Member Fail termEffects
-                          , MonadEvaluatable location term value termEffects
-                          , Recursive term
-                          )
-                       => (SubtermAlgebra (Base term) term (Evaluator location term value termEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value (EvalClosure term value ': moduleEffects) value))
-                       -> Evaluator location term value (EvalClosure term value ': moduleEffects) a
-                       -> Evaluator location term value moduleEffects a
-evaluatingClosuresWith perTerm = raiseHandler (relay pure (\ (EvalClosure m) yield -> lower (evalTermWith perTerm m) >>= yield))
+evaluatingModulesWith :: forall location term value effects a
+                      .  ( Evaluatable (Base term)
+                         , Member Fail effects
+                         , MonadEvaluatable location term value (EvalClosure term value ': EvalModule term value ': effects)
+                         , Recursive term
+                         )
+                      => (SubtermAlgebra Module term (Evaluator location term value (EvalModule term value ': effects) value) -> SubtermAlgebra Module term (Evaluator location term value (EvalModule term value ': effects) value))
+                      -> (SubtermAlgebra (Base term) term (Evaluator location term value (EvalClosure term value ': EvalModule term value ': effects) value) -> SubtermAlgebra (Base term) term (Evaluator location term value (EvalClosure term value ': EvalModule term value ': effects) value))
+                      -> Evaluator location term value (EvalModule term value ': effects) a
+                      -> Evaluator location term value effects a
+evaluatingModulesWith perModule perTerm = handleEvalModules
+  where handleEvalModules :: forall a . Evaluator location term value (EvalModule term value ': effects) a -> Evaluator location term value effects a
+        handleEvalModules = raiseHandler (relay pure (\ (EvalModule m) yield -> lower (evalModule m) >>= yield))
+        evalModule
+          = handleEvalModules
+          . perModule (subtermValue . moduleBody)
+          . fmap (Subterm <*> evalTerm)
+        handleEvalClosures = raiseHandler (relay pure (\ (EvalClosure term) yield -> lower (evalTerm term) >>= yield))
+        evalTerm
+          = handleEvalClosures
+          . foldSubterms (perTerm eval)
 
 -- | Evaluate a given package.
-evaluatePackageWith :: ( AbstractValue location term value (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': Reader PackageInfo ': effects)
-                       , Addressable location (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': Reader PackageInfo ': effects)
+evaluatePackageWith :: ( AbstractValue location term value moduleEffects
+                       , Addressable location moduleEffects
                        , Evaluatable (Base term)
-                       , Member Fail termEffects
+                       , Member Fail effects
                        , Members '[ Reader (Environment location value)
                                   , Reader LoadStack
                                   , Resumable (AddressError location value)
@@ -355,18 +340,22 @@ evaluatePackageWith :: ( AbstractValue location term value (EvalModule term valu
                                   ] effects
                        , MonadEvaluatable location term value termEffects
                        , Recursive term
+                       , termEffects ~ (EvalClosure term value ': moduleEffects)
+                       , moduleEffects ~ (EvalModule term value ': packageBodyEffects)
+                       , packageBodyEffects ~ (Reader (ModuleTable [Module term]) ': packageEffects)
+                       , packageEffects ~ (Reader PackageInfo ': effects)
                        )
-                    => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': Reader PackageInfo ': effects) value))
-                    -> (SubtermAlgebra (Base term) term (Evaluator location term value termEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value (EvalClosure term value ': Reader (ModuleTable [Module term]) ': Reader PackageInfo ': effects) value))
+                    => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value moduleEffects value))
+                    -> (SubtermAlgebra (Base term) term (Evaluator location term value termEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value termEffects value))
                     -> Package term
                     -> Evaluator location term value effects [value]
 evaluatePackageWith perModule perTerm = handleReader . packageInfo <*> evaluatePackageBodyWith perModule perTerm . packageBody
 
 -- | Evaluate a given package body (module table and entry points).
-evaluatePackageBodyWith :: ( AbstractValue location term value (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': effects)
-                           , Addressable location (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': effects)
+evaluatePackageBodyWith :: ( AbstractValue location term value moduleEffects
+                           , Addressable location moduleEffects
                            , Evaluatable (Base term)
-                           , Member Fail termEffects
+                           , Member Fail effects
                            , Members '[ Reader (Environment location value)
                                       , Reader LoadStack
                                       , Resumable (AddressError location value)
@@ -379,15 +368,17 @@ evaluatePackageBodyWith :: ( AbstractValue location term value (EvalModule term 
                                       ] effects
                            , MonadEvaluatable location term value termEffects
                            , Recursive term
+                           , termEffects ~ (EvalClosure term value ': moduleEffects)
+                           , moduleEffects ~ (EvalModule term value ': packageBodyEffects)
+                           , packageBodyEffects ~ (Reader (ModuleTable [Module term]) ': effects)
                            )
-                        => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value (EvalModule term value ': EvalClosure term value ': Reader (ModuleTable [Module term]) ': effects) value))
-                        -> (SubtermAlgebra (Base term) term (Evaluator location term value termEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value (EvalClosure term value ': Reader (ModuleTable [Module term]) ': effects) value))
+                        => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value moduleEffects value))
+                        -> (SubtermAlgebra (Base term) term (Evaluator location term value termEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value termEffects value))
                         -> PackageBody term
                         -> Evaluator location term value effects [value]
 evaluatePackageBodyWith perModule perTerm body
   = handleReader (packageModules body)
-  . evaluatingClosuresWith perTerm
-  . evaluatingModulesWith perModule
+  . evaluatingModulesWith perModule perTerm
   . withPrelude (packagePrelude body)
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
 
