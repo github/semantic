@@ -10,6 +10,7 @@ module Data.Abstract.Evaluatable
 , runEvalErrorWith
 , LoadError(..)
 , runLoadError
+, runLoadErrorWith
 , ResolutionError(..)
 , runResolutionError
 , runResolutionErrorWith
@@ -121,6 +122,9 @@ instance Eq1 (LoadError term) where
 
 runLoadError :: Evaluator location term value (Resumable (LoadError term) ': effects) a -> Evaluator location term value effects (Either (SomeExc (LoadError term)) a)
 runLoadError = raiseHandler runError
+
+runLoadErrorWith :: (forall resume . LoadError term resume -> Evaluator location term value effects resume) -> Evaluator location term value (Resumable (LoadError term) ': effects) a -> Evaluator location term value effects a
+runLoadErrorWith = runResumableWith
 
 
 -- | The type of error thrown when failing to evaluate a term.
