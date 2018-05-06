@@ -28,14 +28,14 @@ lookupCache :: (Cacheable location term value, Member (State (Cache location ter
 lookupCache configuration = raise (cacheLookup configuration <$> get)
 
 -- | Run an action, caching its result and 'Heap' under the given configuration.
-cachingConfiguration :: (Cacheable location term value, Member (State (Cache location term value)) effects, Member (State (Heap location value)) effects, Monad (Evaluator location term value effects)) => Configuration location term value -> Set (value, Heap location value) -> Evaluator location term value effects value -> Evaluator location term value effects value
+cachingConfiguration :: (Cacheable location term value, Members '[State (Cache location term value), State (Heap location value)] effects) => Configuration location term value -> Set (value, Heap location value) -> Evaluator location term value effects value -> Evaluator location term value effects value
 cachingConfiguration configuration values action = do
   raise (modify (cacheSet configuration values))
   result <- (,) <$> action <*> raise get
   raise (modify (cacheInsert configuration result))
   pure (fst result)
 
-putCache :: (Member (State (Cache location term value)) effects) => Cache location term value -> Evaluator location term value effects ()
+putCache :: Member (State (Cache location term value)) effects => Cache location term value -> Evaluator location term value effects ()
 putCache = raise . put
 
 -- | Run an action starting from an empty out-cache, and return the out-cache afterwards.
