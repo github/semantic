@@ -15,7 +15,6 @@ import           Analysis.Abstract.TypeChecking
 import           Control.Abstract.Evaluator
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.Type
 import           Data.Abstract.Value
 import           Data.Blob
 import           Data.File
@@ -38,7 +37,7 @@ justEvaluating
   . erroring @(ValueError Precise (Value Precise))
   . runUnspecialized
   . runResolutionError
-  . erroring @(EvalError (Value Precise))
+  . runEvalError
   . runAddressError
 
 evaluatingWithHoles
@@ -59,7 +58,7 @@ checking
   . runLoadError
   . runUnspecialized
   . runResolutionError
-  . erroring @(EvalError (Type Monovariant))
+  . runEvalError
   . runAddressError
   . typeChecking
   . caching @[]

@@ -5,6 +5,7 @@ module Data.Abstract.Evaluatable
 , Unspecialized(..)
 , runUnspecialized
 , EvalError(..)
+, runEvalError
 , LoadError(..)
 , runLoadError
 , ResolutionError(..)
@@ -128,6 +129,9 @@ data EvalError value resume where
   DefaultExportError  :: EvalError value ()
   ExportError         :: ModulePath -> Name -> EvalError value ()
   EnvironmentLookupError :: value -> EvalError value value
+
+runEvalError :: Evaluator location term value (Resumable (EvalError value) ': effects) a -> Evaluator location term value effects (Either (SomeExc (EvalError value)) a)
+runEvalError = raiseHandler runError
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
 --   Throws an 'EnvironmentLookupError' if @scopedEnvTerm@ does not have an environment.
