@@ -3,6 +3,7 @@ module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
 , Unspecialized(..)
+, runUnspecialized
 , EvalError(..)
 , LoadError(..)
 , runLoadError
@@ -182,6 +183,9 @@ deriving instance Eq (Unspecialized a b)
 deriving instance Show (Unspecialized a b)
 instance Show1 (Unspecialized a) where
   liftShowsPrec _ _ = showsPrec
+
+runUnspecialized :: Evaluator location term value (Resumable (Unspecialized value) ': effects) a -> Evaluator location term value effects (Either (SomeExc (Unspecialized value)) a)
+runUnspecialized = raiseHandler runError
 
 
 -- Instances
