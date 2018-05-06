@@ -8,6 +8,7 @@ module Data.Abstract.Evaluatable
 , LoadError(..)
 , runLoadError
 , ResolutionError(..)
+, runResolutionError
 , variable
 , evaluateInScopedEnv
 , evaluatePackageWith
@@ -96,6 +97,9 @@ instance Eq1 ResolutionError where
   liftEq _ (NotFoundError a _ l1) (NotFoundError b _ l2) = a == b && l1 == l2
   liftEq _ (GoImportError a) (GoImportError b) = a == b
   liftEq _ _ _ = False
+
+runResolutionError :: Evaluator location term value (Resumable ResolutionError ': effects) a -> Evaluator location term value effects (Either (SomeExc ResolutionError) a)
+runResolutionError = raiseHandler runError
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
 data LoadError term resume where

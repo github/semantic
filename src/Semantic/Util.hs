@@ -37,7 +37,7 @@ justEvaluating
   . runLoadError
   . erroring @(ValueError Precise (Value Precise))
   . runUnspecialized
-  . erroring @ResolutionError
+  . runResolutionError
   . erroring @(EvalError (Value Precise))
   . runAddressError
 
@@ -58,7 +58,7 @@ checking
   . providingLiveSet
   . runLoadError
   . runUnspecialized
-  . erroring @ResolutionError
+  . runResolutionError
   . erroring @(EvalError (Type Monovariant))
   . runAddressError
   . typeChecking
