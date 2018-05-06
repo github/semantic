@@ -61,6 +61,7 @@ module Control.Abstract.Evaluator
   , throwBreak
   , throwContinue
   , catchLoopControl
+  , runLoopControl
   , module Control.Effect
   , module Control.Monad.Effect.Fail
   , module Control.Monad.Effect.Fresh
@@ -339,3 +340,8 @@ throwContinue = raise . Eff.send . Continue
 
 catchLoopControl :: Member (LoopControl value) effects => Evaluator location term value effects a -> (forall x . LoopControl value x -> Evaluator location term value effects a) -> Evaluator location term value effects a
 catchLoopControl action handler = raiseHandler (Eff.interpose pure (\ control _ -> lower (handler control))) action
+
+runLoopControl :: Evaluator location term value (LoopControl value ': effects) value -> Evaluator location term value effects value
+runLoopControl = raiseHandler (Eff.relay pure (\ eff _ -> case eff of
+  Break    value -> pure value
+  Continue value -> pure value))
