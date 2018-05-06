@@ -68,7 +68,8 @@ readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
 testEvaluating
-  = evaluating
+  = run
+  . evaluating
   . runLoadError
   . runValueError
   . runUnspecialized
