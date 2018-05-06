@@ -16,6 +16,7 @@ module Data.Abstract.Evaluatable
 , listModulesInDir
 , require
 , load
+, LoadStack
 ) where
 
 import           Control.Abstract.Addressable as X
@@ -202,6 +203,15 @@ askModuleTable :: Member (Reader (ModuleTable [Module term])) effects
                => Evaluator location term value effects (ModuleTable [Module term])
 askModuleTable = raise ask
 
+-- | Retrieve the module load stack
+askLoadStack :: Member (Reader LoadStack) effects => Evaluator location term value effects LoadStack
+askLoadStack = raise ask
+
+-- | Locally update the module load stack.
+localLoadStack :: Member (Reader LoadStack) effects => (LoadStack -> LoadStack) -> Evaluator location term value effects a -> Evaluator location term value effects a
+localLoadStack = raiseHandler . local
+
+
 -- Resolve a list of module paths to a possible module table entry.
 resolve :: Member (Reader (ModuleTable [Module term])) effects
         => [FilePath]
@@ -280,7 +290,7 @@ loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup nam
       if moduleInfo x `elem` unLoadStack
         then trace ("load (skip evaluating, circular load): " <> show mPath) (pure Nothing)
         else do
-          v <- trace ("load (evaluating): " <> show mPath) (with x)
+          v <- localLoadStack (loadStackPush (moduleInfo x)) (trace ("load (evaluating): " <> show mPath) (with x))
           traceM ("load done:" <> show mPath)
           env <- filterEnv <$> getExports <*> getEnv
           modifyModuleTable (ModuleTable.insert name (env, v))

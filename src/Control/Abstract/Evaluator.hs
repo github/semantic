@@ -4,7 +4,6 @@ module Control.Abstract.Evaluator
   -- * State
   , Environment
   , Heap
-  , LoadStack
   , ModuleTable
   , Exports
   , JumpTable
@@ -42,8 +41,6 @@ module Control.Abstract.Evaluator
   , getModuleTable
   , putModuleTable
   , modifyModuleTable
-  , askLoadStack
-  , localLoadStack
   , currentModule
   , currentPackage
   -- * Control
@@ -247,15 +244,6 @@ putModuleTable = raise . put
 -- | Update the evaluated module table.
 modifyModuleTable :: Member (State (ModuleTable (Environment location value, value))) effects => (ModuleTable (Environment location value, value) -> ModuleTable (Environment location value, value)) -> Evaluator location term value effects ()
 modifyModuleTable = raise . modify'
-
-
--- | Retrieve the module load stack
-askLoadStack :: Member (Reader LoadStack) effects => Evaluator location term value effects LoadStack
-askLoadStack = raise ask
-
--- | Locally update the module load stack.
-localLoadStack :: Member (Reader LoadStack) effects => (LoadStack -> LoadStack) -> Evaluator location term value effects a -> Evaluator location term value effects a
-localLoadStack = raiseHandler . local
 
 
 -- | Get the currently evaluating 'ModuleInfo'.
