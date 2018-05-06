@@ -1,7 +1,6 @@
 {-# LANGUAGE FunctionalDependencies, RankNTypes, TypeFamilies, TypeOperators #-}
 module Control.Effect
 ( Effectful(..)
-, Interpreter(..)
 , throwResumable
 , resume
 -- * Effects
@@ -37,18 +36,6 @@ class Effectful m where
 instance Effectful Eff where
   raise = id
   lower = id
-
-
--- | Interpreters determine and interpret a list of effects, optionally taking extra arguments.
---
---   Instances will generally be defined recursively in terms of underlying interpreters, bottoming out with the instance for 'Eff' which uses 'run' to produce a final value.
-class Effectful m => Interpreter m effects | m -> effects where
-  type Result m effects result
-  type instance Result m effects result = result
-  interpret :: m effects result -> Result m effects result
-
-instance Interpreter Eff '[] where
-  interpret = run
 
 
 -- Handlers
