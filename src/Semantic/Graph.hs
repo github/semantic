@@ -4,7 +4,6 @@ module Semantic.Graph where
 import           Analysis.Abstract.BadAddresses
 import           Analysis.Abstract.BadSyntax
 import           Analysis.Abstract.BadValues
-import           Analysis.Abstract.BadVariables
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.ImportGraph
 import qualified Control.Exception as Exc
@@ -90,7 +89,7 @@ importGraphAnalysis
   . runLoadError
   . resumingBadSyntax
   . resumingBadValues
-  . resumingBadVariables
+  . resumingEvalError
   . resumingResolutionError
   . resumingBadAddresses
   . importGraphing
@@ -99,6 +98,19 @@ resumingResolutionError :: (Applicative (m effects), Effectful m) => m (Resumabl
 resumingResolutionError = runResolutionErrorWith (\ err -> traceM ("ResolutionError:" <> show err) *> case err of
   NotFoundError nameToResolve _ _ -> pure  nameToResolve
   GoImportError pathToResolve     -> pure [pathToResolve])
+
+resumingEvalError :: (AbstractHole value, Show value) => Evaluator location term value (Resumable (EvalError value) ': State [Name] ': effects) a -> Evaluator location term value effects (a, [Name])
+resumingEvalError
+  = runState []
+  . runEvalErrorWith (\ err -> traceM ("EvalError" <> show err) *> case err of
+    EnvironmentLookupError{} -> pure hole
+    DefaultExportError{}     -> pure ()
+    ExportError{}            -> pure ()
+    IntegerFormatError{}     -> pure 0
+    FloatFormatError{}       -> pure 0
+    RationalFormatError{}    -> pure 0
+    FreeVariableError name   -> raise (modify' (name :)) *> pure hole
+    FreeVariablesError names -> raise (modify' (names <>)) *> pure (fromMaybeLast "unknown" names))
 
 -- | Render the import graph for a given 'Package'.
 graphImports :: ( Show ann
