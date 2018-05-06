@@ -1,14 +1,16 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.TypeScript.Syntax where
 
+import           Data.Abstract.Address
 import qualified Data.Abstract.Environment as Env
 import qualified Data.Abstract.FreeVariables as FV
 import           Data.Abstract.Evaluatable
+import qualified Data.Abstract.Module as M
 import           Data.Abstract.Path
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString as B
-import           Data.Abstract.Module (ModulePath, ModuleInfo(..))
 import qualified Data.Language as Language
+import           Data.Semigroup.Reducer (Reducer)
 import           Diffing.Algorithm
 import           Prelude
 import           Prologue
@@ -32,7 +34,13 @@ toName = FV.name . BC.pack . unPath
 
 -- Node.js resolution algorithm: https://nodejs.org/api/modules.html#modules_all_together
 -- TypeScript has a couple of different strategies, but the main one mimics Node.js.
-resolveWithNodejsStrategy :: MonadEvaluatable location term value effects => ImportPath -> [String] -> Evaluator location term value effects ModulePath
+resolveWithNodejsStrategy :: Members '[ Reader M.ModuleInfo
+                                      , Reader (ModuleTable [M.Module term])
+                                      , Resumable ResolutionError
+                                      ] effects
+                          => ImportPath
+                          -> [String]
+                          -> Evaluator location term value effects M.ModulePath
 resolveWithNodejsStrategy (ImportPath path Relative)    exts = resolveRelativePath path exts
 resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativePath path exts
 
@@ -43,9 +51,15 @@ resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativ
 -- /root/src/moduleB.ts
 -- /root/src/moduleB/package.json (if it specifies a "types" property)
 -- /root/src/moduleB/index.ts
-resolveRelativePath :: MonadEvaluatable location term value effects => FilePath -> [String] -> Evaluator location term value effects ModulePath
+resolveRelativePath :: Members '[ Reader M.ModuleInfo
+                                , Reader (ModuleTable [M.Module term])
+                                , Resumable ResolutionError
+                                ] effects
+                    => FilePath
+                    -> [String]
+                    -> Evaluator location term value effects M.ModulePath
 resolveRelativePath relImportPath exts = do
-  ModuleInfo{..} <- currentModule
+  M.ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory modulePath
   let path = joinPaths relRootDir relImportPath
   resolveTSModule path exts >>= either notFound (\x -> traceResolve relImportPath x (pure x))
@@ -62,9 +76,15 @@ resolveRelativePath relImportPath exts = do
 --
 -- /root/node_modules/moduleB.ts, etc
 -- /node_modules/moduleB.ts, etc
-resolveNonRelativePath :: MonadEvaluatable location term value effects => FilePath -> [String] -> Evaluator location term value effects ModulePath
+resolveNonRelativePath :: Members '[ Reader M.ModuleInfo
+                                   , Reader (ModuleTable [M.Module term])
+                                   , Resumable ResolutionError
+                                   ] effects
+                       => FilePath
+                       -> [String]
+                       -> Evaluator location term value effects M.ModulePath
 resolveNonRelativePath name exts = do
-  ModuleInfo{..} <- currentModule
+  M.ModuleInfo{..} <- currentModule
   go "." modulePath mempty
   where
     nodeModulesPath dir = takeDirectory dir </> "node_modules" </> name
@@ -77,7 +97,10 @@ resolveNonRelativePath name exts = do
         Right m -> traceResolve name m $ pure m
     notFound xs = throwResumable $ NotFoundError name xs Language.TypeScript
 
-resolveTSModule :: MonadEvaluatable location term value effects => FilePath -> [String] -> Evaluator location term value effects (Either [FilePath] ModulePath)
+resolveTSModule :: Members '[ Reader (ModuleTable [M.Module term]) ] effects
+                => FilePath
+                -> [String]
+                -> Evaluator location term value effects (Either [FilePath] M.ModulePath)
 resolveTSModule path exts = maybe (Left searchPaths) Right <$> resolve searchPaths
   where searchPaths =
           ((path <.>) <$> exts)
@@ -92,7 +115,23 @@ typescriptExtensions = ["ts", "tsx", "d.ts"]
 javascriptExtensions :: [String]
 javascriptExtensions = ["js"]
 
-evalRequire :: MonadEvaluatable location term value effects => ModulePath -> Name -> Evaluator location term value effects value
+evalRequire :: ( AbstractValue location term value effects
+               , Addressable location effects
+               , Members '[ EvalModule term value
+                          , Reader (Environment location value)
+                          , Reader LoadStack
+                          , Reader (ModuleTable [M.Module term])
+                          , Resumable (LoadError term)
+                          , State (Environment location value)
+                          , State (Exports location value)
+                          , State (Heap location value)
+                          , State (ModuleTable (Environment location value, value))
+                          ] effects
+               , Reducer value (Cell location value)
+               )
+            => M.ModulePath
+            -> Name
+            -> Evaluator location term value effects value
 evalRequire modulePath alias = letrec' alias $ \addr -> do
   importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
   modifyEnv (mergeEnvs importedEnv)
