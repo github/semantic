@@ -1,4 +1,4 @@
-{-# LANGUAGE FunctionalDependencies, RankNTypes, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE RankNTypes, TypeOperators #-}
 module Control.Effect
 ( Effectful(..)
 -- * Effects

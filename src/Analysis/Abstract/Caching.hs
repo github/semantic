@@ -6,7 +6,7 @@ module Analysis.Abstract.Caching
 ) where
 
 import Control.Abstract.Evaluator
-import Control.Monad.Effect hiding (interpret)
+import Control.Monad.Effect
 import Data.Abstract.Cache
 import Data.Abstract.Configuration
 import Data.Abstract.Live

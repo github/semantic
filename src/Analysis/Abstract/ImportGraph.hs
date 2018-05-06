@@ -83,7 +83,7 @@ graphingLoadErrors :: forall location term value effects a
                    -> SubtermAlgebra (Base term) term (Evaluator location term value effects a)
 graphingLoadErrors recur term = resume @(LoadError term)
   (recur term)
-  (\ (LoadError name) -> moduleInclusion (Module (BC.pack name)) *> pure [])
+  (\ (LoadError name) -> moduleInclusion (Module (BC.pack name)) $> [])
 
 graphingModules :: Members '[ Reader ModuleInfo
                             , Reader PackageInfo
