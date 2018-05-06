@@ -296,7 +296,7 @@ evaluateClosureBody :: Member (EvalClosure term value) effects => term -> Evalua
 evaluateClosureBody = raise . Eff.send . EvalClosure
 
 runEvalClosure :: (term -> Evaluator location term value effects value) -> Evaluator location term value (EvalClosure term value ': effects) a -> Evaluator location term value effects a
-runEvalClosure evalClosure = raiseHandler (Eff.relay pure (\ (EvalClosure term) yield -> lower (evalClosure term) >>= yield))
+runEvalClosure evalClosure = runEffect (\ (EvalClosure term) yield -> evalClosure term >>= yield)
 
 
 -- | An effect to evaluate a module.
@@ -307,7 +307,7 @@ evaluateModule :: Member (EvalModule term value) effects => Module term -> Evalu
 evaluateModule = raise . Eff.send . EvalModule
 
 runEvalModule :: (Module term -> Evaluator location term value effects value) -> Evaluator location term value (EvalModule term value ': effects) a -> Evaluator location term value effects a
-runEvalModule evalModule = raiseHandler (Eff.relay pure (\ (EvalModule m) yield -> lower (evalModule m) >>= yield))
+runEvalModule evalModule = runEffect (\ (EvalModule m) yield -> evalModule m >>= yield)
 
 
 -- | An effect for explicitly returning out of a function/method body.
@@ -324,7 +324,7 @@ catchReturn :: Member (Return value) effects => (forall x . Return value x -> Ev
 catchReturn handler = raiseHandler (Eff.interpose pure (\ ret _ -> lower (handler ret)))
 
 runReturn :: Evaluator location term value (Return value ': effects) value -> Evaluator location term value effects value
-runReturn = raiseHandler (Eff.relay pure (\ (Return value) _ -> pure value))
+runReturn = runEffect (\ (Return value) _ -> pure value)
 
 
 -- | Effects for control flow around loops (breaking and continuing).
@@ -345,6 +345,6 @@ catchLoopControl :: Member (LoopControl value) effects => Evaluator location ter
 catchLoopControl action handler = raiseHandler (Eff.interpose pure (\ control _ -> lower (handler control))) action
 
 runLoopControl :: Evaluator location term value (LoopControl value ': effects) value -> Evaluator location term value effects value
-runLoopControl = raiseHandler (Eff.relay pure (\ eff _ -> case eff of
+runLoopControl = runEffect (\ eff _ -> case eff of
   Break    value -> pure value
-  Continue value -> pure value))
+  Continue value -> pure value)

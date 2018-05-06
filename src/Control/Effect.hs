@@ -9,6 +9,7 @@ module Control.Effect
 , Fresh
 -- * Handlers
 , run
+, runEffect
 , raiseHandler
 , runReader
 , runState
@@ -47,6 +48,9 @@ instance Effectful Eff.Eff where
 
 run :: Effectful m => m '[] a -> a
 run = Eff.run . lower
+
+runEffect :: Effectful m => (forall v . effect v -> (v -> m effects a) -> m effects a) -> m (effect ': effects) a -> m effects a
+runEffect handler = raiseHandler (Eff.relay pure (\ effect yield -> lower (handler effect (raise . yield))))
 
 -- | Raise a handler on 'Eff.Eff' to a handler on some 'Effectful' @m@.
 raiseHandler :: Effectful m => (Eff.Eff effectsA a -> Eff.Eff effectsB b) -> m effectsA a -> m effectsB b
