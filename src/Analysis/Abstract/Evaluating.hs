@@ -2,8 +2,6 @@
 module Analysis.Abstract.Evaluating
 ( EvaluatingState(..)
 , EvaluatingEffects
-, providingCurrentTerm
-, providingCurrentModule
 , evaluating
 ) where
 
@@ -11,7 +9,6 @@ import Control.Abstract.Evaluator
 import Control.Abstract.Value
 import qualified Control.Monad.Effect.Internal as Eff
 import Data.Abstract.Address
-import Data.Abstract.Module
 import Data.Semilattice.Lower
 import Prologue
 
@@ -44,16 +41,6 @@ type EvaluatingEffects location term value
      , State (Exports location value)
      , State (JumpTable term)
      ]
-
-providingCurrentTerm :: (Effectful m, Functor (Base term))
-                     => SubtermAlgebra (Base term) term (m (Reader (Base term ()) ': effects) a)
-                     -> SubtermAlgebra (Base term) term (m effects a)
-providingCurrentTerm recur term = liftHandlerOverSubtermAlgebra (handleReader (() <$ term)) recur term
-
-providingCurrentModule :: Effectful m
-                       => SubtermAlgebra Module term (m (Reader ModuleInfo ': effects) a)
-                       -> SubtermAlgebra Module term (m effects a)
-providingCurrentModule recur m = liftHandlerOverSubtermAlgebra (handleReader (moduleInfo m)) recur m
 
 
 evaluating :: (AbstractHole value, Effectful m, Show value) => m (EvaluatingEffects location term value) result -> (Either String result, EvaluatingState location term value)
