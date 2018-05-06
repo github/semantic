@@ -99,7 +99,7 @@ instance Eq1 ResolutionError where
   liftEq _ (GoImportError a) (GoImportError b) = a == b
   liftEq _ _ _ = False
 
-runResolutionError :: Evaluator location term value (Resumable ResolutionError ': effects) a -> Evaluator location term value effects (Either (SomeExc ResolutionError) a)
+runResolutionError :: Effectful m => m (Resumable ResolutionError ': effects) a -> m effects (Either (SomeExc ResolutionError) a)
 runResolutionError = raiseHandler runError
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
