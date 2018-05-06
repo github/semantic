@@ -8,7 +8,11 @@ import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Package (PackageInfo)
 import Prologue
 
-data Located location = Located { location :: location, locationPackage :: {-# UNPACK #-} !PackageInfo, locationModule :: {-# UNPACK #-} !ModuleInfo }
+data Located location = Located
+  { location        :: location
+  , locationPackage :: {-# UNPACK #-} !PackageInfo
+  , locationModule  :: {-# UNPACK #-} !ModuleInfo
+  }
   deriving (Eq, Ord, Show)
 
 instance Location location => Location (Located location) where
