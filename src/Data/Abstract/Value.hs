@@ -422,3 +422,6 @@ instance (Show value) => Show1 (ValueError location value) where
 
 throwValueError :: Member (Resumable (ValueError location value)) effects => ValueError location value resume -> Evaluator location term value effects resume
 throwValueError = throwResumable
+
+runValueError :: Evaluator location term value (Resumable (ValueError location value) ': effects) a -> Evaluator location term value effects (Either (SomeExc (ValueError location value)) a)
+runValueError = raiseHandler runError

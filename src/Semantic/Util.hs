@@ -9,7 +9,6 @@ import           Analysis.Abstract.BadValues
 import           Analysis.Abstract.BadVariables
 import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
-import           Analysis.Abstract.Erroring
 import           Analysis.Abstract.Evaluating as X
 import           Control.Abstract.Evaluator
 import           Data.Abstract.Address
@@ -34,7 +33,7 @@ justEvaluating
   = run
   . evaluating
   . runLoadError
-  . erroring @(ValueError Precise (Value Precise))
+  . runValueError
   . runUnspecialized
   . runResolutionError
   . runEvalError
