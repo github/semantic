@@ -324,7 +324,7 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                                   , State (Environment location value)
                                   ] effects
                        , Recursive term
-                       , termEffects ~ (EvalClosure term value ': moduleEffects)
+                       , termEffects ~ (Return value ': EvalClosure term value ': moduleEffects)
                        , moduleEffects ~ (Reader ModuleInfo ': EvalModule term value ': packageBodyEffects)
                        , packageBodyEffects ~ (Reader LoadStack ': Reader (ModuleTable [Module term]) ': packageEffects)
                        , packageEffects ~ (Reader PackageInfo ': effects)
@@ -344,7 +344,7 @@ evaluatePackageBodyWith :: forall location term value effects termEffects module
                                       , State (Environment location value)
                                       ] effects
                            , Recursive term
-                           , termEffects ~ (EvalClosure term value ': moduleEffects)
+                           , termEffects ~ (Return value ': EvalClosure term value ': moduleEffects)
                            , moduleEffects ~ (Reader ModuleInfo ': EvalModule term value ': packageBodyEffects)
                            , packageBodyEffects ~ (Reader LoadStack ': Reader (ModuleTable [Module term]) ': effects)
                            )
@@ -369,9 +369,10 @@ evaluatePackageBodyWith perModule perTerm body
         handleEvalClosures = raiseHandler (relay pure (\ (EvalClosure term) yield -> lower (evalTerm term) >>= yield))
         evalTerm
           = handleEvalClosures
+          . runReturn
           . foldSubterms (perTerm eval)
 
-        evaluateEntryPoint m sym = handleReader (ModuleInfo m) . handleEvalClosures $ do
+        evaluateEntryPoint m sym = handleReader (ModuleInfo m) . handleEvalClosures . runReturn $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
 

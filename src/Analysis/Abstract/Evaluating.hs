@@ -28,8 +28,7 @@ deriving instance (Show (Cell location value), Show location, Show term, Show va
 
 -- | Effects necessary for evaluating (whether concrete or abstract).
 type EvaluatingEffects location term value
-  = '[ Return value
-     , LoopControl value
+  = '[ LoopControl value
      , Fail                                -- Failure with an error message
      , Fresh                               -- For allocating new addresses and/or type variables.
      , Reader (Environment location value) -- Default environment used as a fallback in lookupEnv
@@ -59,6 +58,5 @@ evaluating
     -- In general, it’s expected that none of the following effects will remain by the time 'interpret' is called—they should have been handled by local 'interpose's—but if they do, we’ll at least trace.
     . Eff.interpret (\ control -> case control of
       Break value -> traceM ("Evaluating.interpret: resuming uncaught break with " <> show value) $> value
-      Continue    -> traceM "Evaluating.interpret: resuming uncaught continue with hole" $> hole)
-    . Eff.interpret (\ (Return value) -> traceM ("Evaluating.interpret: resuming uncaught return with " <> show value) $> value))
+      Continue    -> traceM "Evaluating.interpret: resuming uncaught continue with hole" $> hole))
     -- TODO: Replace 'traceM's with e.g. 'Telemetry'.
