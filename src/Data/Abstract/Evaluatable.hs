@@ -10,6 +10,7 @@ module Data.Abstract.Evaluatable
 , runLoadError
 , ResolutionError(..)
 , runResolutionError
+, runResolutionErrorWith
 , variable
 , evaluateInScopedEnv
 , evaluatePackageWith
@@ -101,6 +102,9 @@ instance Eq1 ResolutionError where
 
 runResolutionError :: Effectful m => m (Resumable ResolutionError ': effects) a -> m effects (Either (SomeExc ResolutionError) a)
 runResolutionError = raiseHandler runError
+
+runResolutionErrorWith :: Effectful m => (forall resume . ResolutionError resume -> m effects resume) -> m (Resumable ResolutionError ': effects) a -> m effects a
+runResolutionErrorWith handler = raiseHandler (relay pure (\ (Resumable err) -> (lower (handler err) >>=)))
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
 data LoadError term resume where
