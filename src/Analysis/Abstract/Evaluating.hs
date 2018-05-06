@@ -48,7 +48,7 @@ evaluating
   . handleState lowerBound -- State (ModuleTable (Environment location value, value))
   . handleState lowerBound -- State (Heap location value)
   . handleState lowerBound -- State (Environment location value)
-  . handleReader lowerBound -- Reader (Environment location value)
+  . runReader lowerBound -- Reader (Environment location value)
   . raiseHandler
     ( flip runFresh' 0
     . runFail)

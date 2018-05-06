@@ -333,7 +333,7 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                     -> (SubtermAlgebra (Base term) term (Evaluator location term value termEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value termEffects value))
                     -> Package term
                     -> Evaluator location term value effects [value]
-evaluatePackageWith perModule perTerm = handleReader . packageInfo <*> evaluatePackageBodyWith perModule perTerm . packageBody
+evaluatePackageWith perModule perTerm = runReader . packageInfo <*> evaluatePackageBodyWith perModule perTerm . packageBody
 
 -- | Evaluate a given package body (module table and entry points).
 evaluatePackageBodyWith :: forall location term value effects termEffects moduleEffects packageBodyEffects
@@ -353,8 +353,8 @@ evaluatePackageBodyWith :: forall location term value effects termEffects module
                         -> PackageBody term
                         -> Evaluator location term value effects [value]
 evaluatePackageBodyWith perModule perTerm body
-  = handleReader (packageModules body)
-  . handleReader lowerBound
+  = runReader (packageModules body)
+  . runReader lowerBound
   . runEvalModule
   . withPrelude (packagePrelude body)
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
@@ -362,7 +362,7 @@ evaluatePackageBodyWith perModule perTerm body
         runEvalModule = raiseHandler (relay pure (\ (EvalModule m) yield -> lower (evalModule m) >>= yield))
         evalModule m
           = runEvalModule
-          . handleReader (moduleInfo m)
+          . runReader (moduleInfo m)
           . perModule (subtermValue . moduleBody)
           . fmap (Subterm <*> evalTerm)
           $ m
@@ -373,7 +373,7 @@ evaluatePackageBodyWith perModule perTerm body
           . runLoopControl
           . foldSubterms (perTerm eval)
 
-        evaluateEntryPoint m sym = handleReader (ModuleInfo m) . runEvalClosure . runReturn . runLoopControl $ do
+        evaluateEntryPoint m sym = runReader (ModuleInfo m) . runEvalClosure . runReturn . runLoopControl $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
 

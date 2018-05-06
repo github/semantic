@@ -54,4 +54,4 @@ reachable roots heap = go mempty roots
 
 
 providingLiveSet :: Evaluator location term value (Reader (Live location value) ': effects) a -> Evaluator location term value effects a
-providingLiveSet = handleReader lowerBound
+providingLiveSet = runReader lowerBound

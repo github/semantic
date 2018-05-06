@@ -120,5 +120,5 @@ scatter = foldMapA (\ (value, heap') -> putHeap heap' $> value)
 caching :: Alternative f => Evaluator location term value (NonDet ': Reader (Cache location term value) ': State (Cache location term value) ': effects) a -> Evaluator location term value effects (f a, Cache location term value)
 caching
   = handleState lowerBound
-  . handleReader lowerBound
+  . runReader lowerBound
   . raiseHandler makeChoiceA

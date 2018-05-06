@@ -77,7 +77,7 @@ import qualified Control.Monad.Effect as Eff
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDet
-import Control.Monad.Effect.Reader
+import Control.Monad.Effect.Reader hiding (runReader)
 import Control.Monad.Effect.Resumable
 import Control.Monad.Effect.State
 import Data.Abstract.Address

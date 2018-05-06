@@ -4,16 +4,16 @@ module Control.Effect
 , throwResumable
 , resume
 -- * Effects
-, Reader
+, Eff.Reader
 , State
 -- * Handlers
 , raiseHandler
-, handleReader
+, runReader
 , handleState
 ) where
 
 import qualified Control.Monad.Effect as Eff
-import Control.Monad.Effect.Reader
+import qualified Control.Monad.Effect.Reader as Eff
 import Control.Monad.Effect.Resumable
 import Control.Monad.Effect.State
 import Prologue hiding (throwError)
@@ -46,8 +46,8 @@ raiseHandler :: Effectful m => (Eff.Eff effectsA a -> Eff.Eff effectsB b) -> m e
 raiseHandler handler = raise . handler . lower
 
 -- | Run a 'Reader' effect in an 'Effectful' context.
-handleReader :: Effectful m => info -> m (Reader info ': effects) a -> m effects a
-handleReader = raiseHandler . flip runReader
+runReader :: Effectful m => info -> m (Eff.Reader info ': effects) a -> m effects a
+runReader = raiseHandler . flip Eff.runReader
 
 -- | Run a 'State' effect in an 'Effectful' context.
 handleState :: Effectful m => state -> m (State state ': effects) a -> m effects (a, state)
