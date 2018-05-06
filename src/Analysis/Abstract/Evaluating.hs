@@ -6,7 +6,6 @@ module Analysis.Abstract.Evaluating
 ) where
 
 import Control.Abstract.Evaluator
-import qualified Control.Monad.Effect.Internal as Eff
 import Data.Abstract.Address
 import Data.Semilattice.Lower
 
@@ -40,8 +39,7 @@ type EvaluatingEffects location term value
 evaluating :: Evaluator location term value (EvaluatingEffects location term value) result -> (Either String result, EvaluatingState location term value)
 evaluating
   = (\ (((((result, env), heap), modules), exports), jumps) -> (result, EvaluatingState env heap modules exports jumps))
-  . Eff.run
-  . lower
+  . run
   . runState lowerBound -- State (JumpTable term)
   . runState lowerBound -- State (Exports location value)
   . runState lowerBound -- State (ModuleTable (Environment location value, value))

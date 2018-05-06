@@ -7,6 +7,7 @@ module Control.Effect
 , Eff.Reader
 , Eff.State
 -- * Handlers
+, run
 , raiseHandler
 , runReader
 , runState
@@ -40,6 +41,9 @@ instance Effectful Eff.Eff where
 
 
 -- Handlers
+
+run :: Effectful m => m '[] a -> a
+run = Eff.run . lower
 
 -- | Raise a handler on 'Eff.Eff' to a handler on some 'Effectful' @m@.
 raiseHandler :: Effectful m => (Eff.Eff effectsA a -> Eff.Eff effectsB b) -> m effectsA a -> m effectsB b
