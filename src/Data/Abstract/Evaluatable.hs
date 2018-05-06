@@ -306,19 +306,10 @@ instance Applicative m => Monoid (Merging m location value) where
 
 
 -- | Evaluate a given package.
-evaluatePackageWith :: ( AbstractValue location term value moduleEffects
-                       , Addressable location moduleEffects
-                       , Evaluatable (Base term)
-                       , Member Fail effects
-                       , Members '[ Reader (Environment location value)
-                                  , Reader LoadStack
-                                  , Resumable (AddressError location value)
-                                  , Resumable (EvalError value)
-                                  , Resumable (LoadError term)
+evaluatePackageWith :: ( Evaluatable (Base term)
+                       , Members '[ Fail
+                                  , Reader (Environment location value)
                                   , State (Environment location value)
-                                  , State (Exports location value)
-                                  , State (Heap location value)
-                                  , State (ModuleTable (Environment location value, value))
                                   ] effects
                        , MonadEvaluatable location term value termEffects
                        , Recursive term
@@ -335,19 +326,10 @@ evaluatePackageWith perModule perTerm = handleReader . packageInfo <*> evaluateP
 
 -- | Evaluate a given package body (module table and entry points).
 evaluatePackageBodyWith :: forall location term value effects termEffects moduleEffects packageBodyEffects
-                        .  ( AbstractValue location term value moduleEffects
-                           , Addressable location moduleEffects
-                           , Evaluatable (Base term)
-                           , Member Fail effects
-                           , Members '[ Reader (Environment location value)
-                                      , Reader LoadStack
-                                      , Resumable (AddressError location value)
-                                      , Resumable (EvalError value)
-                                      , Resumable (LoadError term)
+                        .  ( Evaluatable (Base term)
+                           , Members '[ Fail
+                                      , Reader (Environment location value)
                                       , State (Environment location value)
-                                      , State (Exports location value)
-                                      , State (Heap location value)
-                                      , State (ModuleTable (Environment location value, value))
                                       ] effects
                            , MonadEvaluatable location term value termEffects
                            , Recursive term
@@ -363,15 +345,16 @@ evaluatePackageBodyWith perModule perTerm body
   = handleReader (packageModules body)
   . handleEvalModules
   . withPrelude (packagePrelude body)
-  $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
+  $ traverse (handleEvalClosures . uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
   where handleEvalModules :: Evaluator location term value moduleEffects a -> Evaluator location term value packageBodyEffects a
         handleEvalModules = raiseHandler (relay pure (\ (EvalModule m) yield -> lower (evalModule m) >>= yield))
         evalModule
           = handleEvalModules
           . perModule (subtermValue . moduleBody)
           . fmap (Subterm <*> evalTerm)
+        handleEvalClosures = raiseHandler (relay pure (\ (EvalClosure term) yield -> lower (evalTerm term) >>= yield))
         evalTerm
-          = raiseHandler (relay pure (\ (EvalClosure term) yield -> lower (evalTerm term) >>= yield))
+          = handleEvalClosures
           . foldSubterms (perTerm eval)
 
 evaluateEntryPoint :: ( AbstractValue location term value effects
