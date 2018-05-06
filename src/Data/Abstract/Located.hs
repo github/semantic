@@ -11,7 +11,7 @@ import Prologue
 data Located location = Located
   { location        :: location
   , locationPackage :: {-# UNPACK #-} !PackageInfo
-  , locationModule  :: {-# UNPACK #-} !ModuleInfo
+  , locationModule  :: !ModuleInfo
   }
   deriving (Eq, Ord, Show)
 
