@@ -35,9 +35,7 @@ import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader hiding (runReader)
 import Control.Monad.Effect.Resumable
 import Control.Monad.Effect.State hiding (runState)
-import Data.Abstract.Environment as Env
 import Data.Abstract.Module
-import Data.Abstract.ModuleTable
 import Prelude hiding (fail)
 import Prologue
 
