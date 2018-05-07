@@ -1,12 +1,6 @@
 {-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Control.Abstract.Evaluator
   ( Evaluator(..)
-  -- * State
-  , ModuleTable
-  -- * Module tables
-  , getModuleTable
-  , putModuleTable
-  , modifyModuleTable
   -- * Effects
   , EvalClosure(..)
   , evaluateClosureBody
@@ -51,21 +45,6 @@ newtype Evaluator location term value effects a = Evaluator { runEvaluator :: Ef
   deriving (Applicative, Effectful, Functor, Monad)
 
 deriving instance Member NonDet effects => Alternative (Evaluator location term value effects)
-
-
--- Module table
-
--- | Retrieve the table of evaluated modules.
-getModuleTable :: Member (State (ModuleTable (Environment location value, value))) effects => Evaluator location term value effects (ModuleTable (Environment location value, value))
-getModuleTable = raise get
-
--- | Set the table of evaluated modules.
-putModuleTable :: Member (State (ModuleTable (Environment location value, value))) effects => ModuleTable (Environment location value, value) -> Evaluator location term value effects ()
-putModuleTable = raise . put
-
--- | Update the evaluated module table.
-modifyModuleTable :: Member (State (ModuleTable (Environment location value, value))) effects => (ModuleTable (Environment location value, value) -> ModuleTable (Environment location value, value)) -> Evaluator location term value effects ()
-modifyModuleTable = raise . modify'
 
 
 -- Effects

@@ -42,6 +42,7 @@ library
                      , Control.Abstract.Heap
                      , Control.Abstract.Label
                      , Control.Abstract.Matching
+                     , Control.Abstract.ModuleTable
                      , Control.Abstract.Roots
                      , Control.Abstract.Value
                      -- Control flow
