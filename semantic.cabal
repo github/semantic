@@ -35,6 +35,7 @@ library
                      , Control.Abstract
                      , Control.Abstract.Addressable
                      , Control.Abstract.Configuration
+                     , Control.Abstract.Context
                      , Control.Abstract.Evaluator
                      , Control.Abstract.Exports
                      , Control.Abstract.Heap

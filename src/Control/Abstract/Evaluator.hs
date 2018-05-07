@@ -20,9 +20,6 @@ module Control.Abstract.Evaluator
   , getModuleTable
   , putModuleTable
   , modifyModuleTable
-  -- * Context
-  , currentModule
-  , currentPackage
   -- * Effects
   , EvalClosure(..)
   , evaluateClosureBody
@@ -62,7 +59,6 @@ import Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
-import Data.Abstract.Package
 import Prelude hiding (fail)
 import Prologue
 
@@ -140,17 +136,6 @@ putModuleTable = raise . put
 -- | Update the evaluated module table.
 modifyModuleTable :: Member (State (ModuleTable (Environment location value, value))) effects => (ModuleTable (Environment location value, value) -> ModuleTable (Environment location value, value)) -> Evaluator location term value effects ()
 modifyModuleTable = raise . modify'
-
-
--- Context
-
--- | Get the currently evaluating 'ModuleInfo'.
-currentModule :: (Effectful m, Member (Reader ModuleInfo) effects) => m effects ModuleInfo
-currentModule = raise ask
-
--- | Get the currently evaluating 'PackageInfo'.
-currentPackage :: (Effectful m, Member (Reader PackageInfo) effects) => m effects PackageInfo
-currentPackage = raise ask
 
 
 -- Effects

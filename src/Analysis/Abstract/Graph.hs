@@ -18,7 +18,7 @@ import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Class as GC
 import           Algebra.Graph.Class hiding (Graph, Vertex)
 import           Algebra.Graph.Export.Dot hiding (vertexName)
-import           Control.Abstract.Evaluator
+import           Control.Abstract
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable (LoadError (..))
 import           Data.Abstract.FreeVariables

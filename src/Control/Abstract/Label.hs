@@ -5,9 +5,8 @@ module Control.Abstract.Label
 , goto
 ) where
 
+import           Control.Abstract.Context
 import           Control.Abstract.Evaluator
-import           Data.Abstract.Module
-import           Data.Abstract.Package
 import qualified Data.IntMap as IntMap
 import           Prelude hiding (fail)
 import           Prologue
