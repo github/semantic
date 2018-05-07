@@ -4,6 +4,7 @@ module Semantic.Graph where
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph
 import qualified Control.Exception as Exc
+import           Control.Monad.Effect (relayState)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Located
@@ -123,3 +124,6 @@ resumingValueError = runValueErrorWith (\ err -> traceM ("ValueError" <> show er
   Bitwise2Error{}   -> pure hole
   KeyValueError{}   -> pure (hole, hole)
   ArithmeticError{} -> pure hole)
+
+resumingEnvironmentError :: AbstractHole value => Evaluator location term value (Resumable (EnvironmentError value) ': effects) a -> Evaluator location term value effects (a, [Name])
+resumingEnvironmentError = raiseHandler (relayState [] (fmap pure . flip (,)) (\ names (Resumable (FreeVariable name)) yield -> yield (name : names) hole))
