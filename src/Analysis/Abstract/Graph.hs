@@ -80,7 +80,7 @@ graphingTerms recur term@(In _ syntax) = do
       moduleInclusion (Variable (unName name))
       variableDefinition name
     _ -> pure ()
-  (recur term)
+  recur term
 
 graphingLoadErrors :: forall location term value effects a
                    .  Members '[ Reader ModuleInfo
