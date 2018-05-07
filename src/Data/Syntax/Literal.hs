@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, DeriveAnyClass, DeriveGeneric, MultiParamTypeClasses, ViewPatterns #-}
 module Data.Syntax.Literal where
 
-import Control.Arrow ((>>>))
 import Data.Abstract.Evaluatable
 import Data.ByteString.Char8 (readInteger, unpack)
 import qualified Data.ByteString.Char8 as B
@@ -27,7 +26,7 @@ instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Boolean where
-  eval (Boolean x) = boolean x
+  eval (Boolean x) = Rval <$> boolean x
 
 
 -- Numeric
@@ -43,7 +42,7 @@ instance Show1 Data.Syntax.Literal.Integer where liftShowsPrec = genericLiftShow
 instance Evaluatable Data.Syntax.Literal.Integer where
   -- TODO: This instance probably shouldn't have readInteger?
   eval (Data.Syntax.Literal.Integer x) =
-    integer =<< maybeM (throwEvalError (IntegerFormatError x)) (fst <$> readInteger x)
+    Rval <$> (integer =<< maybeM (throwEvalError (IntegerFormatError x)) (fst <$> readInteger x))
 
 
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
@@ -60,7 +59,7 @@ instance Show1 Data.Syntax.Literal.Float where liftShowsPrec = genericLiftShowsP
 
 instance Evaluatable Data.Syntax.Literal.Float where
   eval (Float s) =
-    float =<< either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s)
+    Rval <$> (float =<< either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s))
 
 -- Rational literals e.g. `2/3r`
 newtype Rational a = Rational ByteString
@@ -75,7 +74,7 @@ instance Evaluatable Data.Syntax.Literal.Rational where
     let
       trimmed = B.takeWhile (/= 'r') r
       parsed = readMaybe @Prelude.Integer (unpack trimmed)
-    in rational =<< maybe (throwEvalError (RationalFormatError r)) (pure . toRational) parsed
+    in Rval <$> (rational =<< maybe (throwEvalError (RationalFormatError r)) (pure . toRational) parsed)
 
 
 -- Complex literals e.g. `3 + 2i`
@@ -125,7 +124,7 @@ instance Ord1 TextElement where liftCompare = genericLiftCompare
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable TextElement where
-  eval (TextElement x) = string x
+  eval (TextElement x) = Rval <$> string x
 
 data Null a = Null
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -134,7 +133,7 @@ instance Eq1 Null where liftEq = genericLiftEq
 instance Ord1 Null where liftCompare = genericLiftCompare
 instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable Null where eval = const null
+instance Evaluatable Null where eval _ = Rval <$> null
 
 newtype Symbol a = Symbol { symbolContent :: ByteString }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -144,7 +143,7 @@ instance Ord1 Symbol where liftCompare = genericLiftCompare
 instance Show1 Symbol where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Symbol where
-  eval (Symbol s) = symbol s
+  eval (Symbol s) = Rval <$> symbol s
 
 newtype Regex a = Regex { regexContent :: ByteString }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -170,7 +169,7 @@ instance Ord1 Array where liftCompare = genericLiftCompare
 instance Show1 Array where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Array where
-  eval (Array a) = array =<< traverse subtermValue a
+  eval (Array a) = Rval <$> (array =<< traverse subtermValue a)
 
 newtype Hash a = Hash { hashElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -180,7 +179,7 @@ instance Ord1 Hash where liftCompare = genericLiftCompare
 instance Show1 Hash where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Hash where
-  eval = hashElements >>> traverse (subtermValue >=> asPair) >=> hash
+  eval t = Rval <$> (traverse (subtermValue >=> asPair) (hashElements t) >>= hash)
 
 data KeyValue a = KeyValue { key :: !a, value :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -191,7 +190,7 @@ instance Show1 KeyValue where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable KeyValue where
   eval (fmap subtermValue -> KeyValue{..}) =
-    join (kvPair <$> key <*> value)
+    Rval <$> join (kvPair <$> key <*> value)
 
 newtype Tuple a = Tuple { tupleContents :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -201,7 +200,7 @@ instance Ord1 Tuple where liftCompare = genericLiftCompare
 instance Show1 Tuple where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Tuple where
-  eval (Tuple cs) = multiple =<< traverse subtermValue cs
+  eval (Tuple cs) = Rval <$> (multiple =<< traverse subtermValue cs)
 
 newtype Set a = Set { setElements :: [a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)

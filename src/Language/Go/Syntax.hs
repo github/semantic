@@ -69,7 +69,7 @@ instance Evaluatable Import where
       traceResolve (unPath importPath) path
       importedEnv <- maybe emptyEnv fst <$> isolate (require path)
       modifyEnv (mergeEnvs importedEnv)
-    unit
+    Rval <$> unit
 
 
 -- | Qualified Import declarations (symbols are qualified in calling environment).
@@ -92,7 +92,7 @@ instance Evaluatable QualifiedImport where
         importedEnv <- maybe emptyEnv fst <$> isolate (require p)
         modifyEnv (mergeEnvs importedEnv)
       makeNamespace alias addr Nothing
-    unit
+    Rval <$> unit
 
 -- | Side effect only imports (no symbols made available to the calling environment).
 data SideEffectImport a = SideEffectImport { sideEffectImportFrom :: !ImportPath, sideEffectImportToken :: !a }
@@ -107,7 +107,7 @@ instance Evaluatable SideEffectImport where
     paths <- resolveGoImport importPath
     traceResolve (unPath importPath) paths
     for_ paths $ \path -> isolate (require path)
-    unit
+    Rval <$> unit
 
 -- A composite literal in Go
 data Composite a = Composite { compositeType :: !a, compositeElement :: !a }

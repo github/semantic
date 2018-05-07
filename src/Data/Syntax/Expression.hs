@@ -18,7 +18,7 @@ instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Call where
   eval Call{..} = do
     op <- subtermValue callFunction
-    call op (map subtermValue callParams)
+    Rval <$> call op (map subtermValue callParams)
 
 data Comparison a
   = LessThan !a !a
@@ -34,7 +34,7 @@ instance Ord1 Comparison where liftCompare = genericLiftCompare
 instance Show1 Comparison where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Comparison where
-  eval = traverse subtermValue >=> go where
+  eval t = Rval <$> (traverse subtermValue t >>= go) where
     go x = case x of
       (LessThan a b)         -> liftComparison (Concrete (<)) a b
       (LessThanEqual a b)    -> liftComparison (Concrete (<=)) a b
@@ -60,7 +60,7 @@ instance Ord1 Arithmetic where liftCompare = genericLiftCompare
 instance Show1 Arithmetic where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Arithmetic where
-  eval = traverse subtermValue >=> go where
+  eval t = Rval <$> (traverse subtermValue t >>= go) where
     go (Plus a b)          = liftNumeric2 add a b  where add    = liftReal (+)
     go (Minus a b)         = liftNumeric2 sub a b  where sub    = liftReal (-)
     go (Times a b)         = liftNumeric2 mul a b  where mul    = liftReal (*)
@@ -97,7 +97,7 @@ instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Boolean where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
-  eval = go . fmap subtermValue where
+  eval t = Rval <$> go (fmap subtermValue t) where
     go (And a b) = do
       cond <- a
       ifthenelse cond b (pure cond)
@@ -171,7 +171,7 @@ instance Ord1 Bitwise where liftCompare = genericLiftCompare
 instance Show1 Bitwise where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Bitwise where
-  eval = traverse subtermValue >=> go where
+  eval t = Rval <$> (traverse subtermValue t >>= go) where
     genLShift x y = shiftL x (fromIntegral y)
     genRShift x y = shiftR x (fromIntegral y)
     go x = case x of
@@ -192,8 +192,9 @@ instance Eq1 MemberAccess where liftEq = genericLiftEq
 instance Ord1 MemberAccess where liftCompare = genericLiftCompare
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO return LvalMember:
 instance Evaluatable MemberAccess where
-  eval (fmap subtermValue -> MemberAccess mem acc) = evaluateInScopedEnv mem acc
+  eval (fmap subtermValue -> MemberAccess mem acc) = Rval <$> evaluateInScopedEnv mem acc
 
 -- | Subscript (e.g a[1])
 data Subscript a
@@ -206,8 +207,9 @@ instance Ord1 Subscript where liftCompare = genericLiftCompare
 instance Show1 Subscript where liftShowsPrec = genericLiftShowsPrec
 
 -- TODO: Implement Eval instance for Subscript
+-- TODO return a special LvalSubscript instance here
 instance Evaluatable Subscript where
-  eval (Subscript l [r]) = join (index <$> subtermValue l <*> subtermValue r)
+  eval (Subscript l [r]) = Rval <$> join (index <$> subtermValue l <*> subtermValue r)
   eval (Subscript _ _)   = throwResumable (Unspecialized "Eval unspecialized for subscript with slices")
   eval (Member _ _)      = throwResumable (Unspecialized "Eval unspecialized for member access")
 

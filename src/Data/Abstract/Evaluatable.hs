@@ -8,6 +8,7 @@ module Data.Abstract.Evaluatable
 , EvalError(..)
 , runEvalError
 , runEvalErrorWith
+, value
 , subtermValue
 , evaluateInScopedEnv
 , evaluatePackageWith
@@ -162,9 +163,9 @@ subtermValue :: ( Addressable location effects
                            , State (Heap location (Cell location) value)
                            ] effects
                 )
-             => Subterm t (ValueRef value)
+             => Subterm term (Evaluator location value effects (ValueRef value))
              -> Evaluator location value effects value
-subtermValue = value . subtermRef
+subtermValue = value <=< subtermRef
 
 runUnspecialized :: Evaluator location value (Resumable (Unspecialized value) ': effects) a -> Evaluator location value effects (Either (SomeExc (Unspecialized value)) a)
 runUnspecialized = runResumable

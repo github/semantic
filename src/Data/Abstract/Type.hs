@@ -8,6 +8,7 @@ module Data.Abstract.Type
 
 import Control.Abstract
 import Data.Abstract.Environment as Env
+import Data.Abstract.Evaluatable
 import Data.Align (alignWith)
 import Data.Semigroup.Reducer (Reducer)
 import Prelude
@@ -83,6 +84,9 @@ instance AbstractHole (Type location) where
 instance ( Addressable location effects
          , Members '[ Fresh
                     , NonDet
+                    , Reader (Environment location (Type location))
+                    , Resumable (AddressError location (Type location))
+                    , Resumable (EvalError (Type location))
                     , Resumable TypeError
                     , State (Environment location (Type location))
                     , State (Heap location (Cell location) (Type location))

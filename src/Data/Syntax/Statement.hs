@@ -18,7 +18,7 @@ instance Show1 If where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable If where
   eval (If cond if' else') = do
     bool <- subtermValue cond
-    ifthenelse bool (subtermValue if') (subtermValue else')
+    Rval <$> (ifthenelse bool (subtermValue if') (subtermValue else'))
 
 -- | Else statement. The else condition is any term, that upon successful completion, continues evaluation to the elseBody, e.g. `for ... else` in Python.
 data Else a = Else { elseCondition :: !a, elseBody :: !a }
@@ -81,7 +81,7 @@ instance Evaluatable Let where
   eval Let{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm letVariable)
     addr <- snd <$> letrec name (subtermValue letValue)
-    localEnv (Env.insert name addr) (subtermValue letBody)
+    Rval <$> (localEnv (Env.insert name addr) (subtermValue letBody))
 
 
 -- Assignment
@@ -94,6 +94,7 @@ instance Eq1 Assignment where liftEq = genericLiftEq
 instance Ord1 Assignment where liftCompare = genericLiftCompare
 instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
+-- TODO fix this to look at Lvals/Rvals
 instance Evaluatable Assignment where
   eval Assignment{..} = do
     case freeVariables (subterm assignmentTarget) of
@@ -101,8 +102,8 @@ instance Evaluatable Assignment where
         v <- subtermValue assignmentValue
         addr <- lookupOrAlloc name
         assign addr v
-        modifyEnv (Env.insert name addr) $> v
-      _ -> evaluateInScopedEnv (subtermValue assignmentTarget) (subtermValue assignmentValue)
+        Rval <$> (modifyEnv (Env.insert name addr) $> v)
+      _ -> Rval <$> (evaluateInScopedEnv (subtermValue assignmentTarget) (subtermValue assignmentValue))
 
 -- | Post increment operator (e.g. 1++ in Go, or i++ in C).
 newtype PostIncrement a = PostIncrement a
@@ -138,7 +139,7 @@ instance Ord1 Return where liftCompare = genericLiftCompare
 instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Return where
-  eval (Return x) = subtermValue x >>= earlyReturn
+  eval (Return x) = Rval <$> (subtermValue x >>= earlyReturn)
 
 newtype Yield a = Yield a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -159,7 +160,7 @@ instance Ord1 Break where liftCompare = genericLiftCompare
 instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Break where
-  eval (Break x) = subtermValue x >>= throwBreak
+  eval (Break x) = Rval <$> (subtermValue x >>= throwBreak)
 
 newtype Continue a = Continue a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -169,7 +170,7 @@ instance Ord1 Continue where liftCompare = genericLiftCompare
 instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Continue where
-  eval (Continue a) = subtermValue a >>= throwContinue
+  eval (Continue a) = Rval <$> (subtermValue a >>= throwContinue)
 
 newtype Retry a = Retry a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -190,7 +191,7 @@ instance Ord1 NoOp where liftCompare = genericLiftCompare
 instance Show1 NoOp where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable NoOp where
-  eval _ = unit
+  eval _ = Rval <$> unit
 
 -- Loops
 
@@ -202,7 +203,7 @@ instance Ord1 For where liftCompare = genericLiftCompare
 instance Show1 For where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable For where
-  eval (fmap subtermValue -> For before cond step body) = forLoop before cond step body
+  eval (fmap subtermValue -> For before cond step body) = Rval <$> forLoop before cond step body
 
 
 data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }
@@ -224,7 +225,7 @@ instance Ord1 While where liftCompare = genericLiftCompare
 instance Show1 While where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable While where
-  eval While{..} = while (subtermValue whileCondition)  (subtermValue whileBody)
+  eval While{..} = Rval <$> (while (subtermValue whileCondition)  (subtermValue whileBody))
 
 data DoWhile a = DoWhile { doWhileCondition :: !a, doWhileBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -234,7 +235,7 @@ instance Ord1 DoWhile where liftCompare = genericLiftCompare
 instance Show1 DoWhile where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DoWhile where
-  eval DoWhile{..} = doWhile (subtermValue doWhileBody) (subtermValue doWhileCondition)
+  eval DoWhile{..} = Rval <$> (doWhile (subtermValue doWhileBody) (subtermValue doWhileCondition))
 
 -- Exception handling
 

@@ -149,7 +149,7 @@ instance Evaluatable Import where
   eval (Import symbols importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
-    modifyEnv (mergeEnvs (renamed importedEnv)) *> unit
+    modifyEnv (mergeEnvs (renamed importedEnv)) *> (Rval <$> unit)
     where
       renamed importedEnv
         | Prologue.null symbols = importedEnv
@@ -166,7 +166,7 @@ instance Evaluatable JavaScriptRequire where
   eval (JavaScriptRequire aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath javascriptExtensions
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
-    evalRequire modulePath alias
+    Rval <$> evalRequire modulePath alias
 
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportAlias :: !a, qualifiedAliasedImportFrom :: ImportPath }
@@ -180,7 +180,7 @@ instance Evaluatable QualifiedAliasedImport where
   eval (QualifiedAliasedImport aliasTerm importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
-    evalRequire modulePath alias
+    Rval <$> evalRequire modulePath alias
 
 newtype SideEffectImport a = SideEffectImport { sideEffectImportFrom :: ImportPath }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -193,7 +193,7 @@ instance Evaluatable SideEffectImport where
   eval (SideEffectImport importPath) = do
     modulePath <- resolveWithNodejsStrategy importPath typescriptExtensions
     void $ isolate (require modulePath)
-    unit
+    Rval <$> unit
 
 
 -- | Qualified Export declarations
@@ -209,7 +209,7 @@ instance Evaluatable QualifiedExport where
     -- Insert the aliases with no addresses.
     for_ exportSymbols $ \(name, alias) ->
       addExport name alias Nothing
-    unit
+    Rval <$> unit
 
 
 -- | Qualified Export declarations that export from another module.
@@ -228,7 +228,7 @@ instance Evaluatable QualifiedExportFrom where
     for_ exportSymbols $ \(name, alias) -> do
       let address = Env.lookup name importedEnv
       maybe (throwEvalError $ ExportError modulePath name) (addExport name alias . Just) address
-    unit
+    Rval <$> unit
 
 newtype DefaultExport a = DefaultExport { defaultExport :: a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -247,7 +247,7 @@ instance Evaluatable DefaultExport where
         addExport name name Nothing
         void $ modifyEnv (Env.insert name addr)
       Nothing -> throwEvalError DefaultExportError
-    unit
+    Rval <$> unit
 
 
 -- | Lookup type for a type-level key in a typescript map.
@@ -470,7 +470,7 @@ instance Ord1 AmbientDeclaration where liftCompare = genericLiftCompare
 instance Show1 AmbientDeclaration where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable AmbientDeclaration where
-  eval (AmbientDeclaration body) = subtermValue body
+  eval (AmbientDeclaration body) = subtermRef body
 
 data EnumDeclaration a = EnumDeclaration { enumDeclarationIdentifier :: !a, _enumDeclarationBody :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -646,8 +646,8 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Module where
   eval (Module iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
-    letrec' name $ \addr ->
-      eval xs <* makeNamespace name addr Nothing
+    Rval <$> (letrec' name $ \addr ->
+      value =<< (eval xs <* makeNamespace name addr Nothing))
 
 
 
@@ -661,8 +661,8 @@ instance Show1 InternalModule where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable InternalModule where
   eval (InternalModule iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
-    letrec' name $ \addr ->
-      eval xs <* makeNamespace name addr Nothing
+    Rval <$> (letrec' name $ \addr ->
+      value =<< (eval xs <* makeNamespace name addr Nothing))
 
 instance Declarations a => Declarations (InternalModule a) where
   declaredName InternalModule{..} = declaredName internalModuleIdentifier
@@ -717,7 +717,7 @@ instance Evaluatable AbstractClass where
       void $ subtermValue classBody
       classEnv <- Env.head <$> getEnv
       klass name supers classEnv
-    v <$ modifyEnv (Env.insert name addr)
+    Rval <$> (v <$ modifyEnv (Env.insert name addr))
 
 
 data JsxElement a = JsxElement { _jsxOpeningElement :: !a,  _jsxElements :: ![a], _jsxClosingElement :: !a }

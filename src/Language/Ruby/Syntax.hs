@@ -54,7 +54,7 @@ instance Evaluatable Send where
           Just sel -> subtermValue sel
           Nothing -> variable (name "call")
     func <- maybe sel (flip evaluateInScopedEnv sel . subtermValue) sendReceiver
-    call func (map subtermValue sendArgs) -- TODO pass through sendBlock
+    Rval <$> call func (map subtermValue sendArgs) -- TODO pass through sendBlock
 
 data Require a = Require { requireRelative :: Bool, requirePath :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -70,7 +70,7 @@ instance Evaluatable Require where
     traceResolve name path
     (importedEnv, v) <- isolate (doRequire path)
     modifyEnv (`mergeNewer` importedEnv)
-    pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
+    pure (Rval v) -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
 doRequire :: ( AbstractValue location value effects
              , Member (Modules location value) effects
@@ -94,11 +94,11 @@ instance Show1 Load where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Load where
   eval (Load [x]) = do
     path <- subtermValue x >>= asString
-    doLoad path False
+    Rval <$> doLoad path False
   eval (Load [x, wrap]) = do
     path <- subtermValue x >>= asString
     shouldWrap <- subtermValue wrap >>= asBool
-    doLoad path shouldWrap
+    Rval <$> doLoad path shouldWrap
   eval (Load _) = raiseEff (fail "invalid argument supplied to load, path is required")
 
 doLoad :: ( AbstractValue location value effects
@@ -135,8 +135,8 @@ instance Evaluatable Class where
   eval Class{..} = do
     super <- traverse subtermValue classSuperClass
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm classIdentifier)
-    letrec' name $ \addr ->
-      subtermValue classBody <* makeNamespace name addr super
+    Rval <$> (letrec' name $ \addr ->
+      subtermValue classBody <* makeNamespace name addr super)
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -148,8 +148,8 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Module where
   eval (Module iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
-    letrec' name $ \addr ->
-      eval xs <* makeNamespace name addr Nothing
+    Rval <$> (letrec' name $ \addr ->
+      value =<< (eval xs <* makeNamespace name addr Nothing))
 
 data LowPrecedenceBoolean a
   = LowAnd !a !a
@@ -158,7 +158,7 @@ data LowPrecedenceBoolean a
 
 instance Evaluatable LowPrecedenceBoolean where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
-  eval = go . fmap subtermValue where
+  eval t = Rval <$> go (fmap subtermValue t) where
     go (LowAnd a b) = do
       cond <- a
       ifthenelse cond b (pure cond)
