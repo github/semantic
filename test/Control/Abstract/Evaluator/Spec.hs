@@ -9,7 +9,12 @@ import qualified Data.Abstract.Value as Value
 import SpecHelpers hiding (Term)
 
 spec :: Spec
-spec = parallel $ pure ()
+spec = parallel $ do
+  it "constructs integers" $ do
+    let expected = evaluate (integer 123)
+    let actual = Right (Right (Right (Value.injValue (Value.Integer (Number.Integer 123)))))
+    fst expected `shouldBe` actual
+  pure ()
 
 evaluate
   = run
