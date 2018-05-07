@@ -8,9 +8,6 @@ module Data.Abstract.Evaluatable
 , EvalError(..)
 , runEvalError
 , runEvalErrorWith
-, ResolutionError(..)
-, runResolutionError
-, runResolutionErrorWith
 , variable
 , evaluateInScopedEnv
 , evaluatePackageWith
@@ -31,7 +28,6 @@ import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Package as Package
-import Data.Language
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
@@ -75,30 +71,6 @@ type EvaluatableConstraints location term value effects =
              ] effects
   , Reducer value (Cell location value)
   )
-
-
--- | An error thrown when we can't resolve a module from a qualified name.
-data ResolutionError resume where
-  NotFoundError :: String   -- ^ The path that was not found.
-                -> [String] -- ^ List of paths searched that shows where semantic looked for this module.
-                -> Language -- ^ Language.
-                -> ResolutionError ModulePath
-
-  GoImportError :: FilePath -> ResolutionError [ModulePath]
-
-deriving instance Eq (ResolutionError b)
-deriving instance Show (ResolutionError b)
-instance Show1 ResolutionError where liftShowsPrec _ _ = showsPrec
-instance Eq1 ResolutionError where
-  liftEq _ (NotFoundError a _ l1) (NotFoundError b _ l2) = a == b && l1 == l2
-  liftEq _ (GoImportError a) (GoImportError b) = a == b
-  liftEq _ _ _ = False
-
-runResolutionError :: Effectful m => m (Resumable ResolutionError ': effects) a -> m effects (Either (SomeExc ResolutionError) a)
-runResolutionError = raiseHandler runError
-
-runResolutionErrorWith :: Effectful m => (forall resume . ResolutionError resume -> m effects resume) -> m (Resumable ResolutionError ': effects) a -> m effects a
-runResolutionErrorWith = runResumableWith
 
 
 -- | The type of error thrown when failing to evaluate a term.
