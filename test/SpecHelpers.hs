@@ -1,4 +1,3 @@
-{-# LANGUAGE GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module SpecHelpers
 ( module X
 , diffFilePaths
