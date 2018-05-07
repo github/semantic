@@ -6,8 +6,8 @@ module Control.Abstract.Configuration
 
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
+import Control.Abstract.Roots
 import Data.Abstract.Configuration
-import Data.Abstract.Live
 import Prologue
 
 -- | Get the current 'Configuration' with a passed-in term.

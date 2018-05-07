@@ -25,9 +25,6 @@ module Control.Abstract.Evaluator
   , addExport
   , withExports
   , isolate
-  -- * Roots
-  , askRoots
-  , extraRoots
   -- * Module tables
   , getModuleTable
   , putModuleTable
@@ -76,7 +73,6 @@ import Data.Abstract.Address
 import Data.Abstract.Environment as Env
 import Data.Abstract.Exports as Export
 import Data.Abstract.FreeVariables
-import Data.Abstract.Live
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Package
@@ -173,18 +169,6 @@ withExports = raiseHandler . localState . const
 -- | Isolate the given action with an empty global environment and exports.
 isolate :: Members '[State (Environment location value), State (Exports location value)] effects => Evaluator location term value effects a -> Evaluator location term value effects a
 isolate = withEnv lowerBound . withExports lowerBound
-
-
-
--- Roots
-
--- | Retrieve the local 'Live' set.
-askRoots :: Member (Reader (Live location value)) effects => Evaluator location term value effects (Live location value)
-askRoots = raise ask
-
--- | Run a computation with the given 'Live' set added to the local root set.
-extraRoots :: (Member (Reader (Live location value)) effects, Ord location) => Live location value -> Evaluator location term value effects a -> Evaluator location term value effects a
-extraRoots roots = raiseHandler (local (<> roots))
 
 
 -- Module table
