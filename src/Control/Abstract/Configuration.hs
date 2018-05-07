@@ -4,6 +4,7 @@ module Control.Abstract.Configuration
 , getConfiguration
 ) where
 
+import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Control.Abstract.Roots

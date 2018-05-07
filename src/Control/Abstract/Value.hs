@@ -10,6 +10,7 @@ module Control.Abstract.Value
 , ValueRoots(..)
 ) where
 
+import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Data.Abstract.Address (Address, Cell)
