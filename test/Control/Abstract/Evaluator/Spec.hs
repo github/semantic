@@ -7,6 +7,7 @@ import Data.Abstract.Module
 import qualified Data.Abstract.Number as Number
 import Data.Abstract.Package
 import qualified Data.Abstract.Value as Value
+import Data.Algebra
 import SpecHelpers hiding (Term)
 
 spec :: Spec
@@ -30,6 +31,9 @@ runValue = runEvalClosure (runValue . runTerm) . runReturn . runLoopControl
 
 constrainTerm :: Evaluator location Term value effects a -> Evaluator location Term value effects a
 constrainTerm = id
+
+term :: TermEvaluator Value -> Subterm Term (TermEvaluator Value)
+term eval = Subterm (Term eval) eval
 
 type TermEffects
   = '[ LoopControl Value
