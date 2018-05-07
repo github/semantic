@@ -4,9 +4,6 @@ module Control.Abstract.ModuleTable
 , getModuleTable
 , putModuleTable
 , modifyModuleTable
-, askModuleTable
-, askLoadStack
-, localLoadStack
 , resolve
 , listModulesInDir
 , require
