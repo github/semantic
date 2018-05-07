@@ -24,7 +24,6 @@ module Control.Abstract.Evaluator
   , modifyExports
   , addExport
   , withExports
-  , isolate
   -- * Module tables
   , getModuleTable
   , putModuleTable
@@ -77,7 +76,6 @@ import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Package
 import qualified Data.IntMap as IntMap
-import Data.Semilattice.Lower
 import Prelude hiding (fail)
 import Prologue
 
@@ -165,10 +163,6 @@ addExport name alias = modifyExports . Export.insert name alias
 -- | Sets the global export state for the lifetime of the given action.
 withExports :: Member (State (Exports location value)) effects => Exports location value -> Evaluator location term value effects a -> Evaluator location term value effects a
 withExports = raiseHandler . localState . const
-
--- | Isolate the given action with an empty global environment and exports.
-isolate :: Members '[State (Environment location value), State (Exports location value)] effects => Evaluator location term value effects a -> Evaluator location term value effects a
-isolate = withEnv lowerBound . withExports lowerBound
 
 
 -- Module table

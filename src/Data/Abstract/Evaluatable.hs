@@ -25,6 +25,7 @@ module Data.Abstract.Evaluatable
 , require
 , load
 , LoadStack
+, isolate
 ) where
 
 import           Control.Abstract as X hiding (LoopControl(..), Return(..))
@@ -384,3 +385,7 @@ evaluatePackageBodyWith perModule perTerm body
         withPrelude (Just prelude) a = do
           preludeEnv <- evaluateModule prelude *> getEnv
           withDefaultEnvironment preludeEnv a
+
+-- | Isolate the given action with an empty global environment and exports.
+isolate :: Members '[State (Environment location value), State (Exports location value)] effects => Evaluator location term value effects a -> Evaluator location term value effects a
+isolate = withEnv lowerBound . withExports lowerBound
