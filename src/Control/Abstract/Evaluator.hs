@@ -127,10 +127,10 @@ modifyEnv = raise . modify'
 withEnv :: Member (State (Environment location value)) effects => Environment location value -> Evaluator location term value effects a -> Evaluator location term value effects a
 withEnv = raiseHandler . localState . const
 
--- TODO: move and generalize
+-- | Trace into the current context.
+-- TODO: Someday we can generalize this to work for Task and Graph.
 traceE :: Member Trace effects => String -> Evaluator location term value effects ()
 traceE = raise . trace
-
 
 -- | Retrieve the default environment.
 defaultEnvironment :: Member (Reader (Environment location value)) effects => Evaluator location term value effects (Environment location value)
