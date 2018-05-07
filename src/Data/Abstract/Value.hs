@@ -222,7 +222,6 @@ instance ( Addressable location effects
                     , State (Heap location (Value location))
                     , State (JumpTable term)
                     ] effects
-         , Recursive term
          , Reducer (Value location) (Cell location (Value location))
          , Show location
          )
