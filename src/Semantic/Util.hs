@@ -62,13 +62,13 @@ checking
   . runAddressError
   . runTypeError
   . caching @[]
-  . constrainedToValueMonovariant
+  . constrainedToTypeMonovariant
 
 constrainedToValuePrecise :: Evaluator Precise term (Value Precise) effects a -> Evaluator Precise term (Value Precise) effects a
 constrainedToValuePrecise = id
 
-constrainedToValueMonovariant :: Evaluator Monovariant term (Type Monovariant) effects a -> Evaluator Monovariant term (Type Monovariant) effects a
-constrainedToValueMonovariant = id
+constrainedToTypeMonovariant :: Evaluator Monovariant term (Type Monovariant) effects a -> Evaluator Monovariant term (Type Monovariant) effects a
+constrainedToTypeMonovariant = id
 
 evalGoProject path = justEvaluating =<< evaluateProject goParser Language.Go Nothing path
 evalRubyProject path = justEvaluating =<< evaluateProject rubyParser Language.Ruby rubyPrelude path
