@@ -20,6 +20,7 @@ import Data.Abstract.FreeVariables as X hiding (dropExtension)
 import Data.Abstract.Heap as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
 import Data.Abstract.Value (Namespace(..), Value, ValueError, injValue, runValueError)
+import Data.Bifunctor (first)
 import Data.Blob as X
 import Data.File as X
 import Data.Functor.Listable as X
@@ -68,6 +69,7 @@ readFilePair paths = let paths' = fmap file paths in
 
 testEvaluating
   = run
+  . fmap (first reassociate)
   . evaluating
   . runLoadError
   . runValueError
