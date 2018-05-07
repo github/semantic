@@ -39,6 +39,11 @@ import Data.Abstract.Module
 import Prelude hiding (fail)
 import Prologue
 
+-- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the location, term, and value types.
+--
+--   These parameters enable us to constrain the types of effects using them s.t. we can avoid both ambiguous types when they aren’t mentioned outside of the context, and lengthy, redundant annotations on the use sites of functions employing these effects.
+--
+--   These effects will typically include the environment, heap, module table, etc. effects necessary for evaluation of modules and terms, but may also include any other effects so long as they’re eventually handled.
 newtype Evaluator location term value effects a = Evaluator { runEvaluator :: Eff effects a }
   deriving (Applicative, Effectful, Functor, Monad)
 
