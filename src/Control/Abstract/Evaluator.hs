@@ -4,7 +4,6 @@ module Control.Abstract.Evaluator
   -- * State
   , Environment
   , ModuleTable
-  , JumpTable
   -- * Environment
   , getEnv
   , putEnv
@@ -24,9 +23,6 @@ module Control.Abstract.Evaluator
   -- * Context
   , currentModule
   , currentPackage
-  -- * Control
-  , label
-  , goto
   -- * Effects
   , EvalClosure(..)
   , evaluateClosureBody
@@ -67,7 +63,6 @@ import Data.Abstract.FreeVariables
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Package
-import qualified Data.IntMap as IntMap
 import Prelude hiding (fail)
 import Prologue
 
@@ -75,8 +70,6 @@ newtype Evaluator location term value effects a = Evaluator { runEvaluator :: Ef
   deriving (Applicative, Effectful, Functor, Monad)
 
 deriving instance Member NonDet effects => Alternative (Evaluator location term value effects)
-
-type JumpTable term = IntMap.IntMap (PackageInfo, ModuleInfo, term)
 
 
 -- Environment
@@ -158,32 +151,6 @@ currentModule = raise ask
 -- | Get the currently evaluating 'PackageInfo'.
 currentPackage :: (Effectful m, Member (Reader PackageInfo) effects) => m effects PackageInfo
 currentPackage = raise ask
-
-
--- Control
-
-getJumpTable :: Member (State (JumpTable term)) effects => Evaluator location term vlaue effects (JumpTable term)
-getJumpTable = raise get
-
--- | Allocate a 'Label' for the given @term@.
---
---   Labels must be allocated before being jumped to with 'goto', but are suitable for nonlocal jumps; thus, they can be used to implement coroutines, exception handling, call with current continuation, and other esoteric control mechanisms.
-label :: Members '[Reader ModuleInfo, Reader PackageInfo, State (JumpTable term)] effects => term -> Evaluator location term value effects Label
-label term = do
-  m <- getJumpTable
-  moduleInfo <- currentModule
-  packageInfo <- currentPackage
-  let i = IntMap.size m
-  raise (put (IntMap.insert i (packageInfo, moduleInfo, term) m))
-  pure i
-
--- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
-goto :: Members '[Fail, Reader ModuleInfo, Reader PackageInfo, State (JumpTable term)] effects => Label -> (term -> Evaluator location term value effects a) -> Evaluator location term value effects a
-goto label comp = do
-  maybeTerm <- IntMap.lookup label <$> getJumpTable
-  case maybeTerm of
-    Just (packageInfo, moduleInfo, term) -> raiseHandler (local (const packageInfo)) (raiseHandler (local (const moduleInfo)) (comp term))
-    Nothing -> raise (fail ("unknown label: " <> show label))
 
 
 -- Effects

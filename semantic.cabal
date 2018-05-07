@@ -38,6 +38,7 @@ library
                      , Control.Abstract.Evaluator
                      , Control.Abstract.Exports
                      , Control.Abstract.Heap
+                     , Control.Abstract.Label
                      , Control.Abstract.Matching
                      , Control.Abstract.Roots
                      , Control.Abstract.Value
