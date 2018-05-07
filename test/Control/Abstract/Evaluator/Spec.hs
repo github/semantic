@@ -2,6 +2,7 @@ module Control.Abstract.Evaluator.Spec where
 
 import Analysis.Abstract.Evaluating (evaluating)
 import Control.Abstract
+import Control.Monad.Effect (runM)
 import Data.Abstract.Module
 import qualified Data.Abstract.Number as Number
 import Data.Abstract.Package
@@ -11,13 +12,13 @@ import SpecHelpers hiding (Term)
 spec :: Spec
 spec = parallel $ do
   it "constructs integers" $ do
-    let expected = evaluate (integer 123)
-    let actual = Right (Right (Right (Value.injValue (Value.Integer (Number.Integer 123)))))
-    fst expected `shouldBe` actual
+    (expected, _) <- evaluate (integer 123)
+    expected `shouldBe` Right (Right (Right (Value.injValue (Value.Integer (Number.Integer 123)))))
   pure ()
 
 evaluate
-  = run
+  = runM
+  . lower
   . evaluating
   . runReader (PackageInfo (name "test") Nothing)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
@@ -46,6 +47,7 @@ type TermEffects
      , State (ModuleTable (Environment Precise Value, Value))
      , State (Exports Precise Value)
      , State (JumpTable Term)
+     , IO
      ]
 
 type Value = Value.Value Precise
