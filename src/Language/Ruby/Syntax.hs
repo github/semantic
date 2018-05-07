@@ -129,7 +129,7 @@ doLoad :: ( AbstractValue location term value effects
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   traceResolve path path'
-  importedEnv <- maybe emptyEnv fst <$> (isolate (load path'))
+  importedEnv <- maybe emptyEnv fst <$> isolate (load path')
   unless shouldWrap $ modifyEnv (mergeEnvs importedEnv)
   boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 
