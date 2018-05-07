@@ -63,6 +63,7 @@ style = (defaultStyle vertexName)
         edgeAttributes _          _          = []
 
 
+-- | Add vertices to the graph for evaluated identifiers.
 graphingTerms :: ( Element Syntax.Identifier syntax
                  , Members '[ Reader (Environment (Located location) value)
                             , Reader ModuleInfo
@@ -82,6 +83,7 @@ graphingTerms recur term@(In _ syntax) = do
     _ -> pure ()
   recur term
 
+-- | Add vertices to the graph for 'LoadError's.
 graphingLoadErrors :: forall location term value effects a
                    .  Members '[ Reader ModuleInfo
                                , Resumable (LoadError term)
@@ -93,6 +95,7 @@ graphingLoadErrors recur term = resume @(LoadError term)
   (recur term)
   (\ (LoadError name) -> moduleInclusion (Module (BC.pack name)) $> [])
 
+-- | Add vertices to the graph for evaluated modules and the packages containing them.
 graphingModules :: Members '[ Reader ModuleInfo
                             , Reader PackageInfo
                             , State Graph
