@@ -32,9 +32,9 @@ graph graphType renderer project
     (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
     package <- parsePackage parser prelude project
     let graph package = case graphType of
-          ImportGraph -> analyze runGraphAnalysis (evaluatePackageWith graphingModules  graphingLoadErrors                  package) >>= extractGraph
-          CallGraph   -> analyze runGraphAnalysis (evaluatePackageWith graphingModules (graphingLoadErrors . graphingTerms) package) >>= extractGraph
-    graph package >>= case renderer of
+          ImportGraph -> analyze runGraphAnalysis (evaluatePackageWith graphingModules  graphingLoadErrors                  package)
+          CallGraph   -> analyze runGraphAnalysis (evaluatePackageWith graphingModules (graphingLoadErrors . graphingTerms) package)
+    graph package >>= extractGraph >>= case renderer of
       JSONGraphRenderer -> pure . toOutput
       DOTGraphRenderer  -> pure . renderGraph
 
