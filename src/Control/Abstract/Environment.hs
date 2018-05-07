@@ -1,3 +1,4 @@
+{-# LANGUAGE GADTs, RankNTypes, TypeOperators #-}
 module Control.Abstract.Environment
 ( Environment
 , getEnv
@@ -11,6 +12,9 @@ module Control.Abstract.Environment
 , localize
 , lookupEnv
 , lookupWith
+, EnvironmentError(..)
+, runEnvironmentError
+, runEnvironmentErrorWith
 ) where
 
 import Control.Abstract.Evaluator
@@ -70,3 +74,18 @@ lookupWith :: Members '[Reader (Environment location value), State (Environment 
 lookupWith with name = do
   addr <- lookupEnv name
   maybe (pure Nothing) (fmap Just . with) addr
+
+
+data EnvironmentError value return where
+  FreeVariable :: Name -> EnvironmentError value value
+
+deriving instance Eq (EnvironmentError value return)
+deriving instance Show (EnvironmentError value return)
+instance Show1 (EnvironmentError value) where liftShowsPrec _ _ = showsPrec
+instance Eq1 (EnvironmentError value) where liftEq _ (FreeVariable n1) (FreeVariable n2) = n1 == n2
+
+runEnvironmentError :: Evaluator location term value (Resumable (EnvironmentError value) ': effects) a -> Evaluator location term value effects (Either (SomeExc (EnvironmentError value)) a)
+runEnvironmentError = raiseHandler runError
+
+runEnvironmentErrorWith :: (forall resume . EnvironmentError value resume -> Evaluator location term value effects resume) -> Evaluator location term value (Resumable (EnvironmentError value) ': effects) a -> Evaluator location term value effects a
+runEnvironmentErrorWith = runResumableWith
