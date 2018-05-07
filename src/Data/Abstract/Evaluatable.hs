@@ -8,7 +8,6 @@ module Data.Abstract.Evaluatable
 , EvalError(..)
 , runEvalError
 , runEvalErrorWith
-, variable
 , evaluateInScopedEnv
 , evaluatePackageWith
 , evaluatePackageBodyWith
@@ -105,19 +104,6 @@ evaluateInScopedEnv scopedEnvTerm term = do
   value <- scopedEnvTerm
   scopedEnv <- scopedEnvironment value
   maybe (throwEvalError (EnvironmentLookupError value)) (flip localEnv term . mergeEnvs) scopedEnv
-
--- | Look up and dereference the given 'Name', throwing an exception for free variables.
-variable :: ( Addressable location effects
-            , Members '[ Reader (Environment location value)
-                       , Resumable (AddressError location value)
-                       , Resumable (EnvironmentError value)
-                       , State (Environment location value)
-                       , State (Heap location value)
-                       ] effects
-            )
-         => Name
-         -> Evaluator location term value effects value
-variable name = lookupWith deref name >>= maybeM (freeVariableError name)
 
 deriving instance Eq a => Eq (EvalError a b)
 deriving instance Show a => Show (EvalError a b)

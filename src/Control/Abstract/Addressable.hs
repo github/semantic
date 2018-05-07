@@ -58,6 +58,21 @@ letrec' name body = do
   v <- localEnv id (body addr)
   v <$ modifyEnv (insert name addr)
 
+
+-- | Look up and dereference the given 'Name', throwing an exception for free variables.
+variable :: ( Addressable location effects
+            , Members '[ Reader (Environment location value)
+                       , Resumable (AddressError location value)
+                       , Resumable (EnvironmentError value)
+                       , State (Environment location value)
+                       , State (Heap location value)
+                       ] effects
+            )
+         => Name
+         -> Evaluator location term value effects value
+variable name = lookupWith deref name >>= maybeM (freeVariableError name)
+
+
 -- Instances
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
