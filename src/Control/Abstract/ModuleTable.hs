@@ -3,10 +3,14 @@ module Control.Abstract.ModuleTable
 , getModuleTable
 , putModuleTable
 , modifyModuleTable
+, askModuleTable
+, askLoadStack
+, localLoadStack
 ) where
 
 import Control.Abstract.Evaluator
 import Data.Abstract.Environment
+import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Prologue
 
@@ -21,3 +25,18 @@ putModuleTable = raise . put
 -- | Update the evaluated module table.
 modifyModuleTable :: Member (State (ModuleTable (Environment location value, value))) effects => (ModuleTable (Environment location value, value) -> ModuleTable (Environment location value, value)) -> Evaluator location term value effects ()
 modifyModuleTable = raise . modify'
+
+
+-- | Retrieve the table of unevaluated modules.
+askModuleTable :: Member (Reader (ModuleTable [Module term])) effects
+               => Evaluator location term value effects (ModuleTable [Module term])
+askModuleTable = raise ask
+
+
+-- | Retrieve the module load stack
+askLoadStack :: Member (Reader LoadStack) effects => Evaluator location term value effects LoadStack
+askLoadStack = raise ask
+
+-- | Locally update the module load stack.
+localLoadStack :: Member (Reader LoadStack) effects => (LoadStack -> LoadStack) -> Evaluator location term value effects a -> Evaluator location term value effects a
+localLoadStack = raiseHandler . local

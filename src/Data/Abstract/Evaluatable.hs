@@ -230,19 +230,6 @@ instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
   eval = maybe unit (runApp . foldMap1 (App . subtermValue)) . nonEmpty
 
--- | Retrieve the table of unevaluated modules.
-askModuleTable :: Member (Reader (ModuleTable [Module term])) effects
-               => Evaluator location term value effects (ModuleTable [Module term])
-askModuleTable = raise ask
-
--- | Retrieve the module load stack
-askLoadStack :: Member (Reader LoadStack) effects => Evaluator location term value effects LoadStack
-askLoadStack = raise ask
-
--- | Locally update the module load stack.
-localLoadStack :: Member (Reader LoadStack) effects => (LoadStack -> LoadStack) -> Evaluator location term value effects a -> Evaluator location term value effects a
-localLoadStack = raiseHandler . local
-
 
 -- Resolve a list of module paths to a possible module table entry.
 resolve :: Member (Reader (ModuleTable [Module term])) effects
