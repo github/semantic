@@ -35,6 +35,7 @@ justEvaluating
   . runResolutionError
   . runEvalError
   . runAddressError
+  . constrainedToValuePrecise
 
 evaluatingWithHoles
   = runM . lower
@@ -46,6 +47,7 @@ evaluatingWithHoles
   . resumingEvalError
   . resumingResolutionError
   . resumingAddressError @(Value Precise)
+  . constrainedToValuePrecise
 
 -- The order is significant here: caching has to run before typeChecking, or else we’ll nondeterministically produce TypeErrors as part of the result set. While this is probably actually correct, it will require us to have an Ord instance for TypeError, which we don’t have yet.
 checking
@@ -60,6 +62,13 @@ checking
   . runAddressError
   . runTypeError
   . caching @[]
+  . constrainedToValueMonovariant
+
+constrainedToValuePrecise :: Evaluator Precise term (Value Precise) effects a -> Evaluator Precise term (Value Precise) effects a
+constrainedToValuePrecise = id
+
+constrainedToValueMonovariant :: Evaluator Monovariant term (Type Monovariant) effects a -> Evaluator Monovariant term (Type Monovariant) effects a
+constrainedToValueMonovariant = id
 
 evalGoProject path = justEvaluating =<< evaluateProject goParser Language.Go Nothing path
 evalRubyProject path = justEvaluating =<< evaluateProject rubyParser Language.Ruby rubyPrelude path
