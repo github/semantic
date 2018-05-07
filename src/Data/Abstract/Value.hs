@@ -209,6 +209,7 @@ instance AbstractHole (Value location) where
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Addressable location effects
+         , FreeVariables term
          , Members '[ EvalClosure term (Value location)
                     , Fail
                     , LoopControl (Value location)
