@@ -73,6 +73,7 @@ testEvaluating
   . runValueError
   . runUnspecialized
   . runResolutionError
+  . runEnvironmentError
   . runEvalError
   . runAddressError
   . constrainedToValuePrecise

@@ -59,6 +59,7 @@ type EvaluatableConstraints location term value effects =
              , Reader (ModuleTable [Module term])
              , Reader PackageInfo
              , Resumable (AddressError location value)
+             , Resumable (EnvironmentError value)
              , Resumable (EvalError value)
              , Resumable (LoadError term)
              , Resumable ResolutionError
@@ -75,8 +76,6 @@ type EvaluatableConstraints location term value effects =
 
 -- | The type of error thrown when failing to evaluate a term.
 data EvalError value resume where
-  -- Indicates we weren't able to dereference a name from the evaluated environment.
-  FreeVariableError :: Name -> EvalError value value
   FreeVariablesError :: [Name] -> EvalError value Name
   -- Indicates that our evaluator wasn't able to make sense of these literals.
   IntegerFormatError  :: ByteString -> EvalError value Integer
@@ -111,21 +110,20 @@ evaluateInScopedEnv scopedEnvTerm term = do
 variable :: ( Addressable location effects
             , Members '[ Reader (Environment location value)
                        , Resumable (AddressError location value)
-                       , Resumable (EvalError value)
+                       , Resumable (EnvironmentError value)
                        , State (Environment location value)
                        , State (Heap location value)
                        ] effects
             )
          => Name
          -> Evaluator location term value effects value
-variable name = lookupWith deref name >>= maybeM (throwResumable (FreeVariableError name))
+variable name = lookupWith deref name >>= maybeM (freeVariableError name)
 
 deriving instance Eq a => Eq (EvalError a b)
 deriving instance Show a => Show (EvalError a b)
 instance Show value => Show1 (EvalError value) where
   liftShowsPrec _ _ = showsPrec
 instance Eq term => Eq1 (EvalError term) where
-  liftEq _ (FreeVariableError a) (FreeVariableError b)     = a == b
   liftEq _ (FreeVariablesError a) (FreeVariablesError b)   = a == b
   liftEq _ DefaultExportError DefaultExportError           = True
   liftEq _ (ExportError a b) (ExportError c d)             = (a == c) && (b == d)

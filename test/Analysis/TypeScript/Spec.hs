@@ -34,11 +34,11 @@ spec = parallel $ do
 
     it "fails exporting symbols not defined in the module" $ do
       v <- fst <$> evaluate "bad-export.ts"
-      v `shouldBe` Right (Right (Right (Right (Right (Left (SomeExc (ExportError "foo.ts" (Name "pip"))))))))
+      v `shouldBe` Right (Right (Right (Right (Right (Right (Left (SomeExc (ExportError "foo.ts" (Name "pip")))))))))
 
     it "evaluates early return statements" $ do
       res <- evaluate "early-return.ts"
-      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (pure (injValue (Value.Float (Number.Decimal 123.0))))))))))
+      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (Right (pure (injValue (Value.Float (Number.Decimal 123.0)))))))))))
 
   where
     fixtures = "test/fixtures/typescript/analysis/"

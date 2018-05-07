@@ -31,6 +31,7 @@ justEvaluating
   . runValueError
   . runUnspecialized
   . runResolutionError
+  . runEnvironmentError
   . runEvalError
   . runAddressError
 
@@ -40,6 +41,7 @@ evaluatingWithHoles
   . resumingLoadError
   . resumingUnspecialized
   . resumingValueError
+  . resumingEnvironmentError
   . resumingEvalError
   . resumingResolutionError
   . resumingAddressError @(Value Precise) @Precise
@@ -52,6 +54,7 @@ checking
   . runLoadError
   . runUnspecialized
   . runResolutionError
+  . runEnvironmentError
   . runEvalError
   . runAddressError
   . runTypeError
