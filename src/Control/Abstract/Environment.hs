@@ -70,6 +70,7 @@ lookupEnv :: Members '[Reader (Environment location value), State (Environment l
 lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
 
 
+-- | Errors involving the environment.
 data EnvironmentError value return where
   FreeVariable :: Name -> EnvironmentError value value
 
