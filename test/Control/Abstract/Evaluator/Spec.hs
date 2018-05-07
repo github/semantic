@@ -16,6 +16,12 @@ spec = parallel $ do
     (expected, _) <- evaluate (integer 123)
     expected `shouldBe` Right (Right (Right (Right (Value.injValue (Value.Integer (Number.Integer 123))))))
 
+  it "calls functions" $ do
+    (expected, _) <- evaluate $ do
+      identity <- lambda [name "x"] (term (variable (name "x")))
+      call identity [integer 123]
+    expected `shouldBe` Right (Right (Right (Right (Value.injValue (Value.Integer (Number.Integer 123))))))
+
 evaluate
   = runM
   . lower
