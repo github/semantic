@@ -1,33 +1,30 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-redundant-constraints #-} -- For the Interpreter instance’s MonadEvaluator constraint
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeOperators #-}
 module Analysis.Abstract.Dead
-( DeadCode
+( Dead(..)
+, revivingTerms
+, killingModules
+, providingDeadSet
 ) where
 
-import Control.Abstract.Analysis
+import Control.Abstract.Evaluator
 import Data.Abstract.Module
 import Data.Semigroup.Reducer as Reducer
+import Data.Semilattice.Lower
 import Data.Set (delete)
 import Prologue
 
--- | An analysis tracking dead (unreachable) code.
-newtype DeadCode m (effects :: [* -> *]) a = DeadCode { runDeadCode :: m effects a }
-  deriving (Alternative, Applicative, Functor, Effectful, Monad)
-
-deriving instance MonadEvaluator location term value effects m => MonadEvaluator location term value effects (DeadCode m)
-
 -- | A set of “dead” (unreachable) terms.
 newtype Dead term = Dead { unDead :: Set term }
-  deriving (Eq, Foldable, Semigroup, Monoid, Ord, Show)
+  deriving (Eq, Foldable, Lower, Monoid, Ord, Semigroup, Show)
 
 deriving instance Ord term => Reducer term (Dead term)
 
 -- | Update the current 'Dead' set.
-killAll :: (Effectful m, Member (State (Dead term)) effects) => Dead term -> DeadCode m effects ()
+killAll :: Member (State (Dead term)) effects => Dead term -> Evaluator location term value effects ()
 killAll = raise . put
 
 -- | Revive a single term, removing it from the current 'Dead' set.
-revive :: (Effectful m, Member (State (Dead term)) effects) => Ord term => term -> DeadCode m effects ()
+revive :: (Member (State (Dead term)) effects, Ord term) => term -> Evaluator location term value effects ()
 revive t = raise (modify (Dead . delete t . unDead))
 
 -- | Compute the set of all subterms recursively.
@@ -35,27 +32,22 @@ subterms :: (Ord term, Recursive term, Foldable (Base term)) => term -> Dead ter
 subterms term = term `cons` para (foldMap (uncurry cons)) term
 
 
-instance ( Corecursive term
-         , Effectful m
-         , Foldable (Base term)
-         , Member (State (Dead term)) effects
-         , MonadAnalysis location term value effects m
-         , Ord term
-         , Recursive term
-         )
-      => MonadAnalysis location term value effects (DeadCode m) where
-  analyzeTerm recur term = do
-    revive (embedSubterm term)
-    liftAnalyze analyzeTerm recur term
+revivingTerms :: ( Corecursive term
+                 , Member (State (Dead term)) effects
+                 , Ord term
+                 )
+              => SubtermAlgebra (Base term) term (Evaluator location term value effects a)
+              -> SubtermAlgebra (Base term) term (Evaluator location term value effects a)
+revivingTerms recur term = revive (embedSubterm term) *> recur term
 
-  analyzeModule recur m = do
-    killAll (subterms (subterm (moduleBody m)))
-    liftAnalyze analyzeModule recur m
+killingModules :: ( Foldable (Base term)
+                  , Member (State (Dead term)) effects
+                  , Ord term
+                  , Recursive term
+                  )
+               => SubtermAlgebra Module term (Evaluator location term value effects a)
+               -> SubtermAlgebra Module term (Evaluator location term value effects a)
+killingModules recur m = killAll (subterms (subterm (moduleBody m))) *> recur m
 
-instance ( Interpreter m effects
-         , MonadEvaluator location term value effects m
-         , Ord term
-         )
-      => Interpreter (DeadCode m) (State (Dead term) ': effects) where
-  type Result (DeadCode m) (State (Dead term) ': effects) result = Result m effects (result, Dead term)
-  interpret = interpret . runDeadCode . raiseHandler (`runState` mempty)
+providingDeadSet :: Evaluator location term value (State (Dead term) ': effects) a -> Evaluator location term value effects (a, Dead term)
+providingDeadSet = runState lowerBound

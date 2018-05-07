@@ -8,6 +8,7 @@ module Analysis.IdentifierName
 import           Data.Abstract.FreeVariables (Name (..))
 import           Data.Aeson
 import           Data.JSON.Fields
+import           Data.Sum
 import qualified Data.Syntax
 import           Data.Term
 import           Data.Text.Encoding (decodeUtf8)
@@ -36,8 +37,8 @@ instance (IdentifierNameStrategy syntax ~ strategy, IdentifierNameWithStrategy s
 class CustomIdentifierName syntax where
   customIdentifierName :: syntax a -> Maybe ByteString
 
-instance Apply IdentifierName fs => CustomIdentifierName (Union fs) where
-  customIdentifierName = apply (Proxy :: Proxy IdentifierName) identifierName
+instance Apply IdentifierName fs => CustomIdentifierName (Sum fs) where
+  customIdentifierName = apply @IdentifierName identifierName
 
 instance CustomIdentifierName Data.Syntax.Identifier where
   customIdentifierName (Data.Syntax.Identifier (Name name)) = Just name
@@ -45,7 +46,7 @@ instance CustomIdentifierName Data.Syntax.Identifier where
 data Strategy = Default | Custom
 
 type family IdentifierNameStrategy syntax where
-  IdentifierNameStrategy (Union _) = 'Custom
+  IdentifierNameStrategy (Sum _) = 'Custom
   IdentifierNameStrategy Data.Syntax.Identifier = 'Custom
   IdentifierNameStrategy syntax = 'Default
 

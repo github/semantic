@@ -1,32 +1,36 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, UndecidableInstances #-}
 module Data.Abstract.Cache where
 
 import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.Heap
 import Data.Map.Monoidal as Monoidal
+import Data.Semilattice.Lower
 import Prologue
 
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Heap's.
 newtype Cache l t v = Cache { unCache :: Monoidal.Map (Configuration l t v) (Set (v, Heap l v)) }
+  deriving (Lower)
+
+type Cacheable location term value = (Ord (Cell location value), Ord location, Ord term, Ord value)
 
 deriving instance (Eq l, Eq t, Eq v, Eq (Cell l v)) => Eq (Cache l t v)
-deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Ord (Cache l t v)
+deriving instance Cacheable l t v => Ord (Cache l t v)
 deriving instance (Show l, Show t, Show v, Show (Cell l v)) => Show (Cache l t v)
-deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Semigroup (Cache l t v)
-deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Monoid (Cache l t v)
-deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Reducer (Configuration l t v, (v, Heap l v)) (Cache l t v)
+deriving instance Cacheable l t v => Semigroup (Cache l t v)
+deriving instance Cacheable l t v => Monoid (Cache l t v)
+deriving instance Cacheable l t v => Reducer (Configuration l t v, (v, Heap l v)) (Cache l t v)
 
 -- | Look up the resulting value & 'Heap' for a given 'Configuration'.
-cacheLookup :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> Cache l t v -> Maybe (Set (v, Heap l v))
+cacheLookup :: Cacheable l t v => Configuration l t v -> Cache l t v -> Maybe (Set (v, Heap l v))
 cacheLookup key = Monoidal.lookup key . unCache
 
 -- | Set the resulting value & 'Heap' for a given 'Configuration', overwriting any previous entry.
-cacheSet :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> Set (v, Heap l v) -> Cache l t v -> Cache l t v
+cacheSet :: Cacheable l t v => Configuration l t v -> Set (v, Heap l v) -> Cache l t v -> Cache l t v
 cacheSet key value = Cache . Monoidal.insert key value . unCache
 
 -- | Insert the resulting value & 'Heap' for a given 'Configuration', appending onto any previous entry.
-cacheInsert :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> (v, Heap l v) -> Cache l t v -> Cache l t v
+cacheInsert :: Cacheable l t v => Configuration l t v -> (v, Heap l v) -> Cache l t v -> Cache l t v
 cacheInsert = curry cons
 
 

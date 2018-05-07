@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedLists, OverloadedStrings #-}
 module Analysis.Python.Spec (spec) where
 
-import Data.Abstract.Evaluatable (EvalError(..), interpret)
+import Data.Abstract.Evaluatable (EvalError(..))
 import Data.Abstract.Value
 import Data.Map
 import qualified Language.Python.Assignment as Python
@@ -51,4 +51,4 @@ spec = parallel $ do
     addr = Address . Precise
     fixtures = "test/fixtures/python/analysis/"
     evaluate entry = evalPythonProject (fixtures <> entry)
-    evalPythonProject path = interpret @(TestEvaluating Python.Term) <$> evaluateProject pythonParser Language.Python pythonPrelude path
+    evalPythonProject path = testEvaluating <$> evaluateProject pythonParser Language.Python pythonPrelude path

@@ -11,7 +11,7 @@ import System.FilePath.Posix
 
 type ModulePath = FilePath
 
-newtype ModuleInfo = ModuleInfo { modulePath :: FilePath }
+newtype ModuleInfo = ModuleInfo { modulePath :: ModulePath }
   deriving (Eq, Ord, Show)
 
 data Module term = Module { moduleInfo :: ModuleInfo, moduleBody :: term }

@@ -45,10 +45,10 @@ module Semantic.Task
 
 import           Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
-import qualified Control.Abstract.Analysis as Analysis
+import qualified Control.Abstract.Evaluator as Analysis
 import           Control.Monad
+import           Control.Monad.Effect as Eff hiding (run)
 import           Control.Monad.Effect.Exception
-import           Control.Monad.Effect.Internal as Eff hiding (run)
 import           Control.Monad.Effect.Reader
 import           Control.Monad.Effect.Run as Run
 import           Data.Blob
@@ -88,8 +88,8 @@ parse :: Member Task effs => Parser term -> Blob -> Eff effs term
 parse parser = send . Parse parser
 
 -- | A task running some 'Analysis.MonadAnalysis' to completion.
-analyze :: (Analysis.Interpreter m analysisEffects, Member Task effs) => m analysisEffects result -> Eff effs (Analysis.Result m analysisEffects result)
-analyze = send . Analyze
+analyze :: Member Task effs => (Analysis.Evaluator location term value effects a -> result) -> Analysis.Evaluator location term value effects a -> Eff effs result
+analyze interpret analysis = send (Analyze interpret analysis)
 
 -- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
 decorate :: (Functor f, Member Task effs) => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Eff effs (Term f (Record (field ': fields)))
@@ -131,7 +131,7 @@ runTaskWithOptions options task = do
 -- | An effect describing high-level tasks to be performed.
 data Task output where
   Parse    :: Parser term -> Blob -> Task term
-  Analyze  :: Analysis.Interpreter m effects => m effects result -> Task (Analysis.Result m effects result)
+  Analyze  :: (Analysis.Evaluator location term value effects a -> result) -> Analysis.Evaluator location term value effects a -> Task result
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
   Diff     :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
   Render   :: Renderer input output -> input -> Task output
@@ -140,7 +140,7 @@ data Task output where
 runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, IO] effs => Eff (Task ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
   Parse parser blob -> runParser blob parser
-  Analyze analysis -> pure (Analysis.interpret analysis)
+  Analyze interpret analysis -> pure (interpret analysis)
   Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
   Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
   Render renderer input -> pure (renderer input)
@@ -187,9 +187,9 @@ runParser blob@Blob{..} parser = case parser of
       in length term `seq` pure term
   where blobFields = ("path", blobPath) : languageTag
         languageTag = maybe [] (pure . (,) ("language" :: String) . show) blobLanguage
-        errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
+        errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) (Record Assignment.Location) -> [Error.Error String]
         errors = cata $ \ (In a syntax) -> case syntax of
-          _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (getField a) err]
+          _ | Just err@Syntax.Error{} <- projectSum syntax -> [Syntax.unError (getField a) err]
           _ -> fold syntax
 
 

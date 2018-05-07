@@ -1,33 +1,24 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GADTs, TypeOperators #-}
 module Semantic.Graph where
 
-import           Analysis.Abstract.BadAddresses
-import           Analysis.Abstract.BadModuleResolutions
-import           Analysis.Abstract.BadSyntax
-import           Analysis.Abstract.BadValues
-import           Analysis.Abstract.BadVariables
-import           Analysis.Abstract.Erroring
 import           Analysis.Abstract.Evaluating
-import           Analysis.Abstract.ImportGraph
-import           Analysis.Abstract.CallGraph
-import           Analysis.Abstract.Graph (Graph, renderGraph)
+import           Analysis.Abstract.Graph
 import qualified Control.Exception as Exc
 import           Data.Abstract.Address
-import qualified Data.Abstract.Evaluatable as Analysis
-import           Data.Abstract.FreeVariables
+import           Data.Abstract.Evaluatable
 import           Data.Abstract.Located
 import           Data.Abstract.Module
 import           Data.Abstract.Package as Package
-import           Data.Abstract.Value (Value)
+import           Data.Abstract.Value (Value, ValueError(..), runValueErrorWith)
+import           Data.ByteString.Char8 (pack)
 import           Data.File
 import           Data.Output
-import qualified Data.Syntax as Syntax
-import           Data.Term
+import           Data.Semilattice.Lower
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
 import           Rendering.Renderer
 import           Semantic.IO (Files)
-import           Semantic.Task
+import           Semantic.Task as Task
 
 data GraphType = ImportGraph | CallGraph
 
@@ -38,20 +29,37 @@ graph :: Members '[Distribute WrappedTask, Files, Task, Exc SomeException, Telem
       -> Eff effs ByteString
 graph graphType renderer project
   | SomeAnalysisParser parser prelude <- someAnalysisParser
-    (Proxy :: Proxy '[ Analysis.Evaluatable, Analysis.Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
+    (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
     package <- parsePackage parser prelude project
-    let graph = case graphType of
-          ImportGraph -> graphImports
-          CallGraph   -> graphCalls
-    graph package >>= case renderer of
-      JSONGraphRenderer   -> pure . toOutput
-      DOTGraphRenderer    -> pure . renderGraph
+    let perTerm = case graphType of
+          ImportGraph -> graphingLoadErrors
+          CallGraph   -> graphingLoadErrors . graphingTerms
+    analyze runGraphAnalysis (evaluatePackageWith graphingModules perTerm package) >>= extractGraph >>= case renderer of
+      JSONGraphRenderer -> pure . toOutput
+      DOTGraphRenderer  -> pure . renderGraph
+    where extractGraph result = case result of
+            (Right ((_, graph), _), _) -> pure graph
+            _ -> Task.throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
+          runGraphAnalysis
+            = run
+            . evaluating
+            . resumingLoadError
+            . resumingUnspecialized
+            . resumingValueError
+            . resumingEvalError
+            . resumingResolutionError
+            . resumingAddressError
+            . graphing
+            . constrainingTypes
+
+          constrainingTypes :: Evaluator (Located Precise) term (Value (Located Precise)) effects a -> Evaluator (Located Precise) term (Value (Located Precise)) effects a
+          constrainingTypes = id
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: Members '[Distribute WrappedTask, Files, Task] effs
-             => Parser term       -- ^ A parser.
-             -> Maybe File        -- ^ Prelude (optional).
-             -> Project           -- ^ Project to parse into a package.
+             => Parser term -- ^ A parser.
+             -> Maybe File  -- ^ Prelude (optional).
+             -> Project     -- ^ Project to parse into a package.
              -> Eff effs (Package term)
 parsePackage parser preludeFile project@Project{..} = do
   prelude <- traverse (parseModule parser Nothing) preludeFile
@@ -70,62 +78,48 @@ parseModule parser rootDir file = do
   blob <- readBlob file
   moduleForBlob rootDir blob <$> parse parser blob
 
-type GraphAnalysis term
-  = BadAddresses
-  ( BadModuleResolutions
-  ( BadVariables
-  ( BadValues
-  ( BadSyntax
-  ( Erroring (Analysis.LoadError term)
-  ( Evaluating
-    (Located Precise term)
-    term
-    (Value (Located Precise term))))))))
 
--- | Render the import graph for a given 'Package'.
-graphImports :: ( Show ann
-                , Ord ann
-                , Apply Analysis.Declarations1 syntax
-                , Apply Analysis.Evaluatable syntax
-                , Apply FreeVariables1 syntax
-                , Apply Functor syntax
-                , Apply Ord1 syntax
-                , Apply Eq1 syntax
-                , Apply Show1 syntax
-                , Members '[Exc SomeException, Task] effs
-                )
-             => Package (Term (Union syntax) ann) -> Eff effs Graph
-graphImports package = analyze (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package) >>= extractGraph
-  where
-    asAnalysisForTypeOfPackage :: ImportGraphing (GraphAnalysis term) effs value
-                               -> Package term
-                               -> ImportGraphing (GraphAnalysis term) effs value
-    asAnalysisForTypeOfPackage = const
+resumingResolutionError :: (Applicative (m effects), Effectful m) => m (Resumable ResolutionError ': effects) a -> m effects a
+resumingResolutionError = runResolutionErrorWith (\ err -> traceM ("ResolutionError:" <> show err) *> case err of
+  NotFoundError nameToResolve _ _ -> pure  nameToResolve
+  GoImportError pathToResolve     -> pure [pathToResolve])
 
--- | Render the call graph for a given 'Package'.
-graphCalls :: ( Show ann
-                , Ord ann
-                , Apply Analysis.Declarations1 syntax
-                , Apply Analysis.Evaluatable syntax
-                , Apply FreeVariables1 syntax
-                , Apply Functor syntax
-                , Apply Ord1 syntax
-                , Apply Eq1 syntax
-                , Apply Show1 syntax
-                , Member Syntax.Identifier syntax
-                , Members '[Exc SomeException, Task] effs
-                )
-             => Package (Term (Union syntax) ann) -> Eff effs Graph
-graphCalls package = analyze (Analysis.evaluatePackage package `asAnalysisForTypeOfPackage` package) >>= extractGraph
-  where
-    asAnalysisForTypeOfPackage :: CallGraphing (GraphAnalysis term) effs value
-                               -> Package term
-                               -> CallGraphing (GraphAnalysis term) effs value
-    asAnalysisForTypeOfPackage = const
+resumingLoadError :: Evaluator location term value (Resumable (LoadError term) ': effects) a -> Evaluator location term value effects a
+resumingLoadError = runLoadErrorWith (\ (LoadError _) -> pure [])
 
-extractGraph :: (Show a, Show b, Show result, Show c, Show err, Show aux, Member (Exc SomeException) e)
-             => (Either err (Either a ((b, result), c)), aux)
-             -> Eff e result
-extractGraph result = case result of
-  (Right (Right ((_, graph), _)), _) -> pure graph
-  err -> throwError (toException (Exc.ErrorCall ("extractGraph: graph rendering failed " <> show err)))
+resumingEvalError :: (AbstractHole value, Show value) => Evaluator location term value (Resumable (EvalError value) ': State [Name] ': effects) a -> Evaluator location term value effects (a, [Name])
+resumingEvalError
+  = runState []
+  . runEvalErrorWith (\ err -> traceM ("EvalError" <> show err) *> case err of
+    EnvironmentLookupError{} -> pure hole
+    DefaultExportError{}     -> pure ()
+    ExportError{}            -> pure ()
+    IntegerFormatError{}     -> pure 0
+    FloatFormatError{}       -> pure 0
+    RationalFormatError{}    -> pure 0
+    FreeVariableError name   -> raise (modify' (name :)) $> hole
+    FreeVariablesError names -> raise (modify' (names <>)) $> fromMaybeLast "unknown" names)
+
+resumingUnspecialized :: AbstractHole value => Evaluator location term value (Resumable (Unspecialized value) ': effects) a -> Evaluator location term value effects a
+resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> traceM ("Unspecialized:" <> show err) $> hole)
+
+resumingAddressError :: (AbstractHole value, Lower (Cell location value), Show location) => Evaluator location term value (Resumable (AddressError location value) ': effects) a -> Evaluator location term value effects a
+resumingAddressError = runAddressErrorWith (\ err -> traceM ("AddressError:" <> show err) *> case err of
+  UnallocatedAddress _   -> pure lowerBound
+  UninitializedAddress _ -> pure hole)
+
+resumingValueError :: (AbstractHole value, Member (State (Environment location value)) effects, Show value) => Evaluator location term value (Resumable (ValueError location value) ': effects) a -> Evaluator location term value effects a
+resumingValueError = runValueErrorWith (\ err -> traceM ("ValueError" <> show err) *> case err of
+  CallError val     -> pure val
+  StringError val   -> pure (pack (show val))
+  BoolError{}       -> pure True
+  BoundsError{}     -> pure hole
+  IndexError{}      -> pure hole
+  NumericError{}    -> pure hole
+  Numeric2Error{}   -> pure hole
+  ComparisonError{} -> pure hole
+  NamespaceError{}  -> getEnv
+  BitwiseError{}    -> pure hole
+  Bitwise2Error{}   -> pure hole
+  KeyValueError{}   -> pure (hole, hole)
+  ArithmeticError{} -> pure hole)

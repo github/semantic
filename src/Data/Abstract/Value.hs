@@ -1,22 +1,22 @@
-{-# LANGUAGE GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value where
 
 import Control.Abstract.Addressable
 import Control.Abstract.Evaluator
 import Control.Abstract.Value
-import Control.Effect
-import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Resumable
 import Data.Abstract.Address
 import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables
+import Data.Abstract.Module (ModuleInfo)
 import qualified Data.Abstract.Number as Number
+import Data.Abstract.Package (PackageInfo)
 import Data.List (genericIndex, genericLength)
 import Data.Scientific (Scientific)
 import Data.Scientific.Exts
 import Data.Semigroup.Reducer
 import qualified Data.Set as Set
+import Data.Sum
 import Prologue hiding (TypeError)
 import Prelude hiding (Float, Integer, String, Rational)
 import qualified Prelude
@@ -42,16 +42,16 @@ type ValueConstructors location
 
 -- | Open union of primitive values that terms can be evaluated to.
 --   Fix by another name.
-newtype Value location = Value { deValue :: Union (ValueConstructors location) (Value location) }
+newtype Value location = Value { deValue :: Sum (ValueConstructors location) (Value location) }
   deriving (Eq, Show, Ord)
 
 -- | Identical to 'inj', but wraps the resulting sub-entity in a 'Value'.
 injValue :: (f :< ValueConstructors location) => f (Value location) -> Value location
-injValue = Value . inj
+injValue = Value . injectSum
 
 -- | Identical to 'prj', but unwraps the argument out of its 'Value' wrapper.
 prjValue :: (f :< ValueConstructors location) => Value location -> Maybe (f (Value location))
-prjValue = prj . deValue
+prjValue = projectSum . deValue
 
 -- | Convenience function for projecting two values.
 prjPair :: (f :< ValueConstructors location , g :< ValueConstructors location)
@@ -183,7 +183,7 @@ instance Show1 KVPair where liftShowsPrec = genericLiftShowsPrec
 -- You would be incorrect, as we can't derive a Generic1 instance for the above,
 -- and in addition a 'Map' representation would lose information given hash literals
 -- that assigned multiple values to one given key. Instead, this holds KVPair
--- values. The smart constructor for hashes in MonadValue ensures that these are
+-- values. The smart constructor for hashes in 'AbstractValue' ensures that these are
 -- only populated with pairs.
 newtype Hash value = Hash [value]
   deriving (Eq, Generic1, Ord, Show)
@@ -210,20 +210,25 @@ instance AbstractHole (Value location) where
   hole = injValue Hole
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Member (EvalClosure term (Value location)) effects
-         , Member Fail effects
-         , Member (LoopControl (Value location)) effects
-         , Member (Resumable (AddressError location (Value location))) effects
-         , Member (Resumable (ValueError location (Value location))) effects
-         , Member (Return (Value location)) effects
-         , Monad (m effects)
-         , MonadAddressable location effects m
-         , MonadEvaluator location term (Value location) effects m
+instance ( Addressable location effects
+         , Members '[ EvalClosure term (Value location)
+                    , Fail
+                    , LoopControl (Value location)
+                    , Reader (Environment location (Value location))
+                    , Reader ModuleInfo
+                    , Reader PackageInfo
+                    , Resumable (AddressError location (Value location))
+                    , Resumable (ValueError location (Value location))
+                    , Return (Value location)
+                    , State (Environment location (Value location))
+                    , State (Heap location (Value location))
+                    , State (JumpTable term)
+                    ] effects
          , Recursive term
          , Reducer (Value location) (Cell location (Value location))
          , Show location
          )
-      => MonadValue location (Value location) effects m where
+      => AbstractValue location term (Value location) effects where
   unit     = pure . injValue $ Unit
   integer  = pure . injValue . Integer . Number.Integer
   boolean  = pure . injValue . Boolean
@@ -311,7 +316,7 @@ instance ( Member (EvalClosure term (Value location)) effects
         tentative x i j = attemptUnsafeArithmetic (x i j)
 
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: Either ArithException Number.SomeNumber -> m effects (Value location)
+        specialize :: Either ArithException Number.SomeNumber -> Evaluator location term (Value location) effects (Value location)
         specialize (Left exc) = throwValueError (ArithmeticError exc)
         specialize (Right (Number.SomeNumber (Number.Integer i))) = integer i
         specialize (Right (Number.SomeNumber (Number.Ratio r)))   = rational r
@@ -330,7 +335,7 @@ instance ( Member (EvalClosure term (Value location)) effects
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: Ord a => a -> a -> m effects (Value location)
+        go :: Ord a => a -> a -> Evaluator location term (Value location) effects (Value location)
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
           Generalized -> integer (orderingToInt (compare l r))
@@ -369,11 +374,12 @@ instance ( Member (EvalClosure term (Value location)) effects
           localEnv (mergeEnvs bindings) (evalClosure body)
       Nothing -> throwValueError (CallError op)
     where
-      evalClosure term = catchReturn @m @(Value location) (evaluateClosureBody term) (\ (Return value) -> pure value)
+      evalClosure term = catchReturn @(Value location) (\ (Return value) -> pure value) (evaluateClosureBody term)
 
-  loop x = catchLoopControl @m @(Value location) (fix x) (\ control -> case control of
+  loop x = catchLoopControl @(Value location) (fix x) (\ control -> case control of
     Break value -> pure value
-    Continue    -> loop x)
+    -- FIXME: Figure out how to deal with this. Ruby treats this as the result of the current block iteration, while PHP specifies a breakout level and TypeScript appears to take a label.
+    Continue _  -> loop x)
 
 
 -- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
@@ -414,5 +420,11 @@ deriving instance (Show value) => Show (ValueError location value resume)
 instance (Show value) => Show1 (ValueError location value) where
   liftShowsPrec _ _ = showsPrec
 
-throwValueError :: (Member (Resumable (ValueError location value)) effects, MonadEvaluator location term value effects m) => ValueError location value resume -> m effects resume
+throwValueError :: Member (Resumable (ValueError location value)) effects => ValueError location value resume -> Evaluator location term value effects resume
 throwValueError = throwResumable
+
+runValueError :: Evaluator location term value (Resumable (ValueError location value) ': effects) a -> Evaluator location term value effects (Either (SomeExc (ValueError location value)) a)
+runValueError = raiseHandler runError
+
+runValueErrorWith :: (forall resume . ValueError location value resume -> Evaluator location term value effects resume) -> Evaluator location term value (Resumable (ValueError location value) ': effects) a -> Evaluator location term value effects a
+runValueErrorWith = runResumableWith

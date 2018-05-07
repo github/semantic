@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass #-}
 module Language.Python.Syntax where
 
 import           Data.Abstract.Environment as Env
@@ -51,7 +51,12 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (BC.unpack prefix) (J
 -- Subsequent imports of `parent.two` or `parent.three` will execute
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
-resolvePythonModules :: forall value term location effects m. MonadEvaluatable location term value effects m => QualifiedName -> m effects (NonEmpty ModulePath)
+resolvePythonModules :: Members '[ Reader ModuleInfo
+                                 , Reader (ModuleTable [Module term])
+                                 , Resumable ResolutionError
+                                 ] effects
+                     => QualifiedName
+                     -> Evaluator location term value effects (NonEmpty ModulePath)
 resolvePythonModules q = do
   relRootDir <- rootDir q <$> currentModule
   for (moduleNames q) $ \name -> do
@@ -75,7 +80,7 @@ resolvePythonModules q = do
                         , path <.> ".py"
                         ]
       modulePath <- resolve searchPaths
-      maybe (throwResumable @(ResolutionError value) $ NotFoundError path searchPaths Language.Python) pure modulePath
+      maybe (throwResumable $ NotFoundError path searchPaths Language.Python) pure modulePath
 
 
 -- | Import declarations (symbols are added directly to the calling environment).
@@ -100,7 +105,7 @@ instance Evaluatable Import where
 
     -- Last module path is the one we want to import
     let path = NonEmpty.last modulePaths
-    (importedEnv, _) <- isolate (require path)
+    importedEnv <- maybe emptyEnv fst <$> isolate (require path)
     modifyEnv (mergeEnvs (select importedEnv))
     unit
     where
@@ -125,7 +130,7 @@ instance Evaluatable QualifiedImport where
     where
       -- Evaluate and import the last module, updating the environment
       go ((name, path) :| []) = letrec' name $ \addr -> do
-        (importedEnv, _) <- isolate (require path)
+        importedEnv <- maybe emptyEnv fst <$> isolate (require path)
         modifyEnv (mergeEnvs importedEnv)
         void $ makeNamespace name addr Nothing
         unit
@@ -154,7 +159,7 @@ instance Evaluatable QualifiedAliasedImport where
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
     letrec' alias $ \addr -> do
       let path = NonEmpty.last modulePaths
-      (importedEnv, _) <- isolate (require path)
+      importedEnv <- maybe emptyEnv fst <$> isolate (require path)
       modifyEnv (mergeEnvs importedEnv)
       void $ makeNamespace alias addr Nothing
       unit

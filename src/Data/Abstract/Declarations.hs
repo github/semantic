@@ -2,6 +2,7 @@
 module Data.Abstract.Declarations  where
 
 import Data.Abstract.FreeVariables
+import Data.Sum
 import Data.Term
 import Prologue
 
@@ -20,7 +21,7 @@ instance Declarations t => Declarations (Subterm t a) where
 instance (FreeVariables1 syntax, Declarations1 syntax, Functor syntax) => Declarations (Term syntax ann) where
   declaredName = liftDeclaredName freeVariables . termOut
 
-instance (Apply Declarations1 fs) => Declarations1 (Union fs) where
-  liftDeclaredName f = apply (Proxy :: Proxy Declarations1) (liftDeclaredName f)
+instance (Apply Declarations1 fs) => Declarations1 (Sum fs) where
+  liftDeclaredName f = apply @Declarations1 (liftDeclaredName f)
 
 instance Declarations1 []
