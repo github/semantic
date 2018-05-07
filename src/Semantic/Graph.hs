@@ -40,7 +40,20 @@ graph graphType renderer project
     where extractGraph result = case result of
             (Right ((_, graph), _), _) -> pure graph
             _ -> Task.throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
+          runGraphAnalysis
+            = run
+            . evaluating
+            . resumingLoadError
+            . resumingUnspecialized
+            . resumingValueError
+            . resumingEvalError
+            . resumingResolutionError
+            . resumingAddressError
+            . graphing
+            . constrainingTypes
 
+          constrainingTypes :: Evaluator (Located Precise) term (Value (Located Precise)) effects a -> Evaluator (Located Precise) term (Value (Located Precise)) effects a
+          constrainingTypes = id
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: Members '[Distribute WrappedTask, Files, Task] effs
@@ -65,40 +78,6 @@ parseModule parser rootDir file = do
   blob <- readBlob file
   moduleForBlob rootDir blob <$> parse parser blob
 
-
-runGraphAnalysis :: Evaluator (Located Precise) term (Value (Located Precise))
-                      '[ State Graph
-                       , Resumable (AddressError (Located Precise) (Value (Located Precise)))
-                       , Resumable ResolutionError
-                       , Resumable (EvalError (Value (Located Precise)))
-                       , State [Name]
-                       , Resumable (ValueError (Located Precise) (Value (Located Precise)))
-                       , Resumable (Unspecialized (Value (Located Precise)))
-                       , Resumable (LoadError term)
-                       , Fail
-                       , Fresh
-                       , Reader (Environment (Located Precise) (Value (Located Precise)))
-                       , State (Environment (Located Precise) (Value (Located Precise)))
-                       , State (Heap (Located Precise) (Value (Located Precise)))
-                       , State (ModuleTable (Environment (Located Precise) (Value (Located Precise)), Value (Located Precise)))
-                       , State (Exports (Located Precise) (Value (Located Precise)))
-                       , State (JumpTable term)
-                       ] a
-                 -> ( Either String                                                     -- 'fail' calls
-                      ( ( a                                                             -- the result value
-                        , Graph)                                                        -- the import graph
-                      , [Name])                                                         -- the list of bad names
-                    , EvaluatingState (Located Precise) term (Value (Located Precise))) -- the final state
-runGraphAnalysis
-  = run
-  . evaluating
-  . resumingLoadError
-  . resumingUnspecialized
-  . resumingValueError
-  . resumingEvalError
-  . resumingResolutionError
-  . resumingAddressError
-  . graphing
 
 resumingResolutionError :: (Applicative (m effects), Effectful m) => m (Resumable ResolutionError ': effects) a -> m effects a
 resumingResolutionError = runResolutionErrorWith (\ err -> traceM ("ResolutionError:" <> show err) *> case err of
