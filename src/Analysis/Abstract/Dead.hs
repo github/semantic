@@ -23,7 +23,7 @@ deriving instance Ord term => Reducer term (Dead term)
 killAll :: Member (State (Dead term)) effects => Dead term -> Evaluator location term value effects ()
 killAll = raise . put
 
--- -- | Revive a single term, removing it from the current 'Dead' set.
+-- | Revive a single term, removing it from the current 'Dead' set.
 revive :: (Member (State (Dead term)) effects, Ord term) => term -> Evaluator location term value effects ()
 revive t = raise (modify (Dead . delete t . unDead))
 
