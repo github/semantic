@@ -27,12 +27,8 @@ module Data.Abstract.Evaluatable
 , LoadStack
 ) where
 
-import           Control.Abstract.Addressable as X
-import           Control.Abstract.Configuration as X
-import           Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..))
-import           Control.Abstract.Heap as X
+import           Control.Abstract as X hiding (LoopControl(..), Return(..))
 import           Control.Abstract.Evaluator (LoopControl, Return(..))
-import           Control.Abstract.Value as X
 import           Control.Monad.Effect as Eff
 import           Data.Abstract.Address
 import           Data.Abstract.Declarations as X
