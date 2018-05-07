@@ -345,8 +345,7 @@ evaluatePackageWith :: ( Evaluatable (Base term)
 evaluatePackageWith perModule perTerm = runReader . packageInfo <*> evaluatePackageBodyWith perModule perTerm . packageBody
 
 -- | Evaluate a given package body (module table and entry points).
-evaluatePackageBodyWith :: forall location term value effects termEffects moduleEffects packageBodyEffects
-                        .  ( Evaluatable (Base term)
+evaluatePackageBodyWith :: ( Evaluatable (Base term)
                            , EvaluatableConstraints location term value termEffects
                            , Members '[ Fail
                                       , Reader (Environment location value)
