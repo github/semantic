@@ -242,6 +242,7 @@ test-suite test
                      , Analysis.Ruby.Spec
                      , Analysis.TypeScript.Spec
                      , Assigning.Assignment.Spec
+                     , Control.Abstract.Evaluator.Spec
                      , Data.Diff.Spec
                      , Data.Abstract.Path.Spec
                      , Data.Functor.Classes.Generic.Spec
