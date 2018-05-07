@@ -5,6 +5,7 @@ module Analysis.Abstract.Collecting
 ) where
 
 import Control.Abstract.Evaluator
+import Control.Abstract.Heap
 import Control.Abstract.Value
 import Data.Abstract.Address
 import Data.Abstract.Heap

@@ -35,6 +35,7 @@ library
                      , Control.Abstract.Addressable
                      , Control.Abstract.Configuration
                      , Control.Abstract.Evaluator
+                     , Control.Abstract.Heap
                      , Control.Abstract.Matching
                      , Control.Abstract.Value
                      -- Control flow

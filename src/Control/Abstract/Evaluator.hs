@@ -3,7 +3,6 @@ module Control.Abstract.Evaluator
   ( Evaluator(..)
   -- * State
   , Environment
-  , Heap
   , ModuleTable
   , Exports
   , JumpTable
@@ -26,12 +25,6 @@ module Control.Abstract.Evaluator
   , addExport
   , withExports
   , isolate
-  -- * Heap
-  , getHeap
-  , putHeap
-  , modifyHeap
-  , lookupHeap
-  , assign
   -- * Roots
   , askRoots
   , extraRoots
@@ -83,13 +76,11 @@ import Data.Abstract.Address
 import Data.Abstract.Environment as Env
 import Data.Abstract.Exports as Export
 import Data.Abstract.FreeVariables
-import Data.Abstract.Heap
 import Data.Abstract.Live
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
 import Data.Abstract.Package
 import qualified Data.IntMap as IntMap
-import Data.Semigroup.Reducer
 import Data.Semilattice.Lower
 import Prelude hiding (fail)
 import Prologue
@@ -184,34 +175,6 @@ isolate :: Members '[State (Environment location value), State (Exports location
 isolate = withEnv lowerBound . withExports lowerBound
 
 
--- Heap
-
--- | Retrieve the heap.
-getHeap :: Member (State (Heap location value)) effects => Evaluator location term value effects (Heap location value)
-getHeap = raise get
-
--- | Set the heap.
-putHeap :: Member (State (Heap location value)) effects => Heap location value -> Evaluator location term value effects ()
-putHeap = raise . put
-
--- | Update the heap.
-modifyHeap :: Member (State (Heap location value)) effects => (Heap location value -> Heap location value) -> Evaluator location term value effects ()
-modifyHeap = raise . modify'
-
--- | Look up the cell for the given 'Address' in the 'Heap'.
-lookupHeap :: (Member (State (Heap location value)) effects, Ord location) => Address location value -> Evaluator location term value effects (Maybe (Cell location value))
-lookupHeap = flip fmap getHeap . heapLookup
-
--- | Write a value to the given 'Address' in the 'Store'.
-assign :: ( Member (State (Heap location value)) effects
-          , Ord location
-          , Reducer value (Cell location value)
-          )
-       => Address location value
-       -> value
-       -> Evaluator location term value effects ()
-assign address = modifyHeap . heapInsert address
-
 
 -- Roots
 
@@ -222,13 +185,6 @@ askRoots = raise ask
 -- | Run a computation with the given 'Live' set added to the local root set.
 extraRoots :: (Member (Reader (Live location value)) effects, Ord location) => Live location value -> Evaluator location term value effects a -> Evaluator location term value effects a
 extraRoots roots = raiseHandler (local (<> roots))
-
-
--- Configuration
-
--- | Get the current 'Configuration' with a passed-in term.
-getConfiguration :: Members '[Reader (Live location value), State (Environment location value), State (Heap location value)] effects => term -> Evaluator location term value effects (Configuration location term value)
-getConfiguration term = Configuration term <$> askRoots <*> getEnv <*> getHeap
 
 
 -- Module table

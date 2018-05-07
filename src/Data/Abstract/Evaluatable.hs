@@ -30,6 +30,7 @@ module Data.Abstract.Evaluatable
 import           Control.Abstract.Addressable as X
 import           Control.Abstract.Configuration as X
 import           Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..))
+import           Control.Abstract.Heap as X
 import           Control.Abstract.Evaluator (LoopControl, Return(..))
 import           Control.Abstract.Value as X
 import           Control.Monad.Effect as Eff

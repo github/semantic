@@ -8,6 +8,7 @@ module Data.Abstract.Type
 
 import Control.Abstract.Addressable
 import Control.Abstract.Evaluator
+import Control.Abstract.Heap
 import Control.Abstract.Value
 import Control.Effect (Effectful(..), throwResumable)
 import Data.Abstract.Address

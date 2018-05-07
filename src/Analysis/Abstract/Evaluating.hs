@@ -5,6 +5,7 @@ module Analysis.Abstract.Evaluating
 ) where
 
 import Control.Abstract.Evaluator
+import Control.Abstract.Heap
 import Data.Abstract.Address
 import Data.Semilattice.Lower
 
