@@ -4,7 +4,6 @@ module Control.Abstract.Evaluator
   -- * State
   , Environment
   , ModuleTable
-  , Exports
   , JumpTable
   -- * Environment
   , getEnv
@@ -18,12 +17,6 @@ module Control.Abstract.Evaluator
   , localize
   , lookupEnv
   , lookupWith
-  -- * Exports
-  , getExports
-  , putExports
-  , modifyExports
-  , addExport
-  , withExports
   -- * Module tables
   , getModuleTable
   , putModuleTable
@@ -70,7 +63,6 @@ import Control.Monad.Effect.Resumable
 import Control.Monad.Effect.State hiding (runState)
 import Data.Abstract.Address
 import Data.Abstract.Environment as Env
-import Data.Abstract.Exports as Export
 import Data.Abstract.FreeVariables
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable
@@ -140,29 +132,6 @@ lookupWith :: Members '[Reader (Environment location value), State (Environment 
 lookupWith with name = do
   addr <- lookupEnv name
   maybe (pure Nothing) (fmap Just . with) addr
-
-
--- Exports
-
--- | Get the global export state.
-getExports :: Member (State (Exports location value)) effects => Evaluator location term value effects (Exports location value)
-getExports = raise get
-
--- | Set the global export state.
-putExports :: Member (State (Exports location value)) effects => Exports location value -> Evaluator location term value effects ()
-putExports = raise . put
-
--- | Update the global export state.
-modifyExports :: Member (State (Exports location value)) effects => (Exports location value -> Exports location value) -> Evaluator location term value effects ()
-modifyExports = raise . modify'
-
--- | Add an export to the global export state.
-addExport :: Member (State (Exports location value)) effects => Name -> Name -> Maybe (Address location value) -> Evaluator location term value effects ()
-addExport name alias = modifyExports . Export.insert name alias
-
--- | Sets the global export state for the lifetime of the given action.
-withExports :: Member (State (Exports location value)) effects => Exports location value -> Evaluator location term value effects a -> Evaluator location term value effects a
-withExports = raiseHandler . localState . const
 
 
 -- Module table

@@ -36,6 +36,7 @@ library
                      , Control.Abstract.Addressable
                      , Control.Abstract.Configuration
                      , Control.Abstract.Evaluator
+                     , Control.Abstract.Exports
                      , Control.Abstract.Heap
                      , Control.Abstract.Matching
                      , Control.Abstract.Roots
