@@ -19,9 +19,7 @@ module Data.Abstract.Evaluatable
 , evaluatePackageWith
 , evaluatePackageBodyWith
 , throwEvalError
-, resolve
 , traceResolve
-, listModulesInDir
 , require
 , load
 , LoadStack
@@ -231,21 +229,8 @@ instance Evaluatable [] where
   eval = maybe unit (runApp . foldMap1 (App . subtermValue)) . nonEmpty
 
 
--- Resolve a list of module paths to a possible module table entry.
-resolve :: Member (Reader (ModuleTable [Module term])) effects
-        => [FilePath]
-        -> Evaluator location term value effects (Maybe ModulePath)
-resolve names = do
-  tbl <- askModuleTable
-  pure $ find (`ModuleTable.member` tbl) names
-
 traceResolve :: (Show a, Show b) => a -> b -> c -> c
 traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
-
-listModulesInDir :: Member (Reader (ModuleTable [Module term])) effects
-                 => FilePath
-                 -> Evaluator location term value effects [ModulePath]
-listModulesInDir dir = ModuleTable.modulePathsInDir dir <$> askModuleTable
 
 -- | Require/import another module by name and return it's environment and value.
 --

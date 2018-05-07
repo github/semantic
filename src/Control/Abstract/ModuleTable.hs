@@ -6,12 +6,14 @@ module Control.Abstract.ModuleTable
 , askModuleTable
 , askLoadStack
 , localLoadStack
+, resolve
+, listModulesInDir
 ) where
 
 import Control.Abstract.Evaluator
 import Data.Abstract.Environment
 import Data.Abstract.Module
-import Data.Abstract.ModuleTable
+import Data.Abstract.ModuleTable as ModuleTable
 import Prologue
 
 -- | Retrieve the table of evaluated modules.
@@ -40,3 +42,17 @@ askLoadStack = raise ask
 -- | Locally update the module load stack.
 localLoadStack :: Member (Reader LoadStack) effects => (LoadStack -> LoadStack) -> Evaluator location term value effects a -> Evaluator location term value effects a
 localLoadStack = raiseHandler . local
+
+
+-- Resolve a list of module paths to a possible module table entry.
+resolve :: Member (Reader (ModuleTable [Module term])) effects
+        => [FilePath]
+        -> Evaluator location term value effects (Maybe ModulePath)
+resolve names = do
+  tbl <- askModuleTable
+  pure $ find (`ModuleTable.member` tbl) names
+
+listModulesInDir :: Member (Reader (ModuleTable [Module term])) effects
+                 => FilePath
+                 -> Evaluator location term value effects [ModulePath]
+listModulesInDir dir = modulePathsInDir dir <$> askModuleTable
