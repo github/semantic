@@ -8,9 +8,6 @@ module Data.Abstract.Evaluatable
 , EvalError(..)
 , runEvalError
 , runEvalErrorWith
-, LoadError(..)
-, runLoadError
-, runLoadErrorWith
 , ResolutionError(..)
 , runResolutionError
 , runResolutionErrorWith
@@ -20,32 +17,29 @@ module Data.Abstract.Evaluatable
 , evaluatePackageBodyWith
 , throwEvalError
 , traceResolve
-, require
-, load
 , LoadStack
 , isolate
 ) where
 
-import           Control.Abstract as X hiding (LoopControl(..), Return(..))
-import           Control.Abstract.Evaluator (LoopControl, Return(..))
-import           Control.Monad.Effect as Eff
-import           Data.Abstract.Address
-import           Data.Abstract.Declarations as X
-import           Data.Abstract.Environment as X
-import qualified Data.Abstract.Exports as Exports
-import           Data.Abstract.FreeVariables as X
-import           Data.Abstract.Module
-import           Data.Abstract.ModuleTable as ModuleTable
-import           Data.Abstract.Package as Package
-import           Data.Language
-import           Data.Scientific (Scientific)
-import           Data.Semigroup.App
-import           Data.Semigroup.Foldable
-import           Data.Semigroup.Reducer hiding (unit)
-import           Data.Semilattice.Lower
-import           Data.Sum
-import           Data.Term
-import           Prologue
+import Control.Abstract as X hiding (LoopControl(..), Return(..))
+import Control.Abstract.Evaluator (LoopControl, Return(..))
+import Control.Monad.Effect as Eff
+import Data.Abstract.Address
+import Data.Abstract.Declarations as X
+import Data.Abstract.Environment as X
+import Data.Abstract.FreeVariables as X
+import Data.Abstract.Module
+import Data.Abstract.ModuleTable as ModuleTable
+import Data.Abstract.Package as Package
+import Data.Language
+import Data.Scientific (Scientific)
+import Data.Semigroup.App
+import Data.Semigroup.Foldable
+import Data.Semigroup.Reducer hiding (unit)
+import Data.Semilattice.Lower
+import Data.Sum
+import Data.Term
+import Prologue
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
@@ -105,23 +99,6 @@ runResolutionError = raiseHandler runError
 
 runResolutionErrorWith :: Effectful m => (forall resume . ResolutionError resume -> m effects resume) -> m (Resumable ResolutionError ': effects) a -> m effects a
 runResolutionErrorWith = runResumableWith
-
--- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
-data LoadError term resume where
-  LoadError :: ModulePath -> LoadError term [Module term]
-
-deriving instance Eq (LoadError term resume)
-deriving instance Show (LoadError term resume)
-instance Show1 (LoadError term) where
-  liftShowsPrec _ _ = showsPrec
-instance Eq1 (LoadError term) where
-  liftEq _ (LoadError a) (LoadError b) = a == b
-
-runLoadError :: Evaluator location term value (Resumable (LoadError term) ': effects) a -> Evaluator location term value effects (Either (SomeExc (LoadError term)) a)
-runLoadError = raiseHandler runError
-
-runLoadErrorWith :: (forall resume . LoadError term resume -> Evaluator location term value effects resume) -> Evaluator location term value (Resumable (LoadError term) ': effects) a -> Evaluator location term value effects a
-runLoadErrorWith = runResumableWith
 
 
 -- | The type of error thrown when failing to evaluate a term.
@@ -231,69 +208,6 @@ instance Evaluatable [] where
 
 traceResolve :: (Show a, Show b) => a -> b -> c -> c
 traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
-
--- | Require/import another module by name and return it's environment and value.
---
--- Looks up the term's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
-require :: Members '[ EvalModule term value
-                    , Reader (ModuleTable [Module term])
-                    , Reader LoadStack
-                    , Resumable (LoadError term)
-                    , State (Environment location value)
-                    , State (Exports location value)
-                    , State (ModuleTable (Environment location value, value))
-                    ] effects
-        => ModulePath
-        -> Evaluator location term value effects (Maybe (Environment location value, value))
-require name = getModuleTable >>= maybeM (load name) . fmap Just . ModuleTable.lookup name
-
--- | Load another module by name and return it's environment and value.
---
--- Always loads/evaluates.
-load :: Members '[ EvalModule term value
-                 , Reader (ModuleTable [Module term])
-                 , Reader LoadStack
-                 , Resumable (LoadError term)
-                 , State (Environment location value)
-                 , State (Exports location value)
-                 , State (ModuleTable (Environment location value, value))
-                 ] effects
-     => ModulePath
-     -> Evaluator location term value effects (Maybe (Environment location value, value))
-load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= runMerging . foldMap (Merging . evalAndCache)
-  where
-    notFound = throwResumable (LoadError name)
-
-    evalAndCache x = do
-      let mPath = modulePath (moduleInfo x)
-      LoadStack{..} <- askLoadStack
-      if moduleInfo x `elem` unLoadStack
-        then trace ("load (skip evaluating, circular load): " <> show mPath) (pure Nothing)
-        else do
-          v <- localLoadStack (loadStackPush (moduleInfo x)) (trace ("load (evaluating): " <> show mPath) (evaluateModule x))
-          traceM ("load done:" <> show mPath)
-          env <- filterEnv <$> getExports <*> getEnv
-          modifyModuleTable (ModuleTable.insert name (env, v))
-          pure (Just (env, v))
-
-    -- TODO: If the set of exports is empty because no exports have been
-    -- defined, do we export all terms, or no terms? This behavior varies across
-    -- languages. We need better semantics rather than doing it ad-hoc.
-    filterEnv :: Exports.Exports l a -> Environment l a -> Environment l a
-    filterEnv ports env
-      | Exports.null ports = env
-      | otherwise = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
-
-newtype Merging m location value = Merging { runMerging :: m (Maybe (Environment location value, value)) }
-
-instance Applicative m => Semigroup (Merging m location value) where
-  Merging a <> Merging b = Merging (merge <$> a <*> b)
-    where merge a b = mergeJusts <$> a <*> b <|> a <|> b
-          mergeJusts (env1, _) (env2, v) = (mergeEnvs env1 env2, v)
-
-instance Applicative m => Monoid (Merging m location value) where
-  mappend = (<>)
-  mempty = Merging (pure Nothing)
 
 
 -- | Evaluate a given package.
