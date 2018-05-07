@@ -3,6 +3,7 @@ module Data.Abstract.Exports
     ( Exports
     , aliases
     , insert
+    , null
     , toEnvironment
     ) where
 
@@ -17,6 +18,9 @@ import Data.Semilattice.Lower
 -- | A map of export names to an alias & address tuple.
 newtype Exports l a = Exports { unExports :: Map.Map Name (Name, Maybe (Address l a)) }
   deriving (Eq, Foldable, Functor, Generic1, Lower, Monoid, Ord, Semigroup, Show, Traversable)
+
+null :: Exports l a -> Bool
+null = Map.null . unExports
 
 toEnvironment :: Exports l a -> Environment l a
 toEnvironment exports = unpairs (mapMaybe collectExport (toList (unExports exports)))

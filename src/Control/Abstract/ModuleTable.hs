@@ -117,8 +117,8 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= run
     -- languages. We need better semantics rather than doing it ad-hoc.
     filterEnv :: Exports.Exports l a -> Environment l a -> Environment l a
     filterEnv ports env
-      | null ports = env
-      | otherwise  = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
+      | Exports.null ports = env
+      | otherwise = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
 
 newtype Merging m location value = Merging { runMerging :: m (Maybe (Environment location value, value)) }
 
