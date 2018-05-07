@@ -56,3 +56,5 @@ type Value = Value.Value Precise
 newtype Term = Term { runTerm :: TermEvaluator Value }
 
 instance Show Term where showsPrec d _ = showParen (d > 10) $ showString "Term _"
+
+instance FreeVariables Term where freeVariables _ = []
