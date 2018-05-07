@@ -13,6 +13,7 @@ module Control.Abstract.Environment
 , lookupEnv
 , lookupWith
 , EnvironmentError(..)
+, freeVariableError
 , runEnvironmentError
 , runEnvironmentErrorWith
 ) where
@@ -83,6 +84,9 @@ deriving instance Eq (EnvironmentError value return)
 deriving instance Show (EnvironmentError value return)
 instance Show1 (EnvironmentError value) where liftShowsPrec _ _ = showsPrec
 instance Eq1 (EnvironmentError value) where liftEq _ (FreeVariable n1) (FreeVariable n2) = n1 == n2
+
+freeVariableError :: Member (Resumable (EnvironmentError value)) effects => Name -> Evaluator location term value effects value
+freeVariableError = throwResumable . FreeVariable
 
 runEnvironmentError :: Evaluator location term value (Resumable (EnvironmentError value) ': effects) a -> Evaluator location term value effects (Either (SomeExc (EnvironmentError value)) a)
 runEnvironmentError = raiseHandler runError
