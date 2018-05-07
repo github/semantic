@@ -15,7 +15,6 @@ spec = parallel $ do
   it "constructs integers" $ do
     (expected, _) <- evaluate (integer 123)
     expected `shouldBe` Right (Right (Right (Value.injValue (Value.Integer (Number.Integer 123)))))
-  pure ()
 
 evaluate
   = runM
