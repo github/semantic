@@ -6,6 +6,7 @@ import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Evaluating as X
 import           Control.Abstract.Evaluator
+import           Control.Effect (runPrintingTraces)
 import           Control.Monad.Effect (runM)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
@@ -28,7 +29,7 @@ import qualified Language.Ruby.Assignment as Ruby
 justEvaluating
   = runM . lower
   . evaluating
-  . printingTraces
+  . runPrintingTraces
   . runLoadError
   . runValueError
   . runUnspecialized
@@ -40,7 +41,7 @@ justEvaluating
 evaluatingWithHoles
   = runM . lower
   . evaluating
-  . printingTraces
+  . runPrintingTraces
   . resumingLoadError
   . resumingUnspecialized
   . resumingValueError
@@ -53,7 +54,7 @@ evaluatingWithHoles
 checking
   = runM . lower
   . evaluating
-  . printingTraces
+  . runPrintingTraces
   . providingLiveSet
   . runLoadError
   . runUnspecialized

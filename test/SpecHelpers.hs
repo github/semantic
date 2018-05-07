@@ -15,6 +15,7 @@ import Analysis.Abstract.Evaluating
 import Analysis.Abstract.Evaluating as X (EvaluatingState(..))
 import Control.Abstract.Addressable
 import Control.Abstract.Value
+import Control.Effect as X (runIgnoringTraces)
 import Data.Abstract.Address as X
 import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables as X hiding (dropExtension)
@@ -34,7 +35,6 @@ import Data.Term as X
 import Parsing.Parser as X
 import Rendering.Renderer as X
 import Semantic.Diff as X
-import Semantic.Graph as X (ignoringTraces)
 import Semantic.Parse as X
 import Semantic.Task as X hiding (parsePackage)
 import Semantic.Util as X
@@ -71,7 +71,7 @@ readFilePair paths = let paths' = fmap file paths in
 testEvaluating
   = run
   . evaluating
-  . ignoringTraces
+  . runIgnoringTraces
   . runLoadError
   . runValueError
   . runUnspecialized

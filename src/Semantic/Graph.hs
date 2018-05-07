@@ -3,6 +3,7 @@ module Semantic.Graph where
 
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph
+import           Control.Effect (runIgnoringTraces)
 import qualified Control.Exception as Exc
 import           Control.Monad.Effect (relayState, send)
 import           Data.Abstract.Address
@@ -44,7 +45,7 @@ graph graphType renderer project
           runGraphAnalysis
             = run
             . evaluating
-            . ignoringTraces
+            . runIgnoringTraces
             . resumingLoadError
             . resumingUnspecialized
             . resumingValueError
@@ -56,15 +57,6 @@ graph graphType renderer project
 
           constrainingTypes :: Evaluator (Located Precise) term (Value (Located Precise)) effects a -> Evaluator (Located Precise) term (Value (Located Precise)) effects a
           constrainingTypes = id
-
-ignoringTraces :: Effectful m => m (Trace ': effects) a -> m effects a
-ignoringTraces = runEffect (\(Trace _) yield -> yield ())
-
-printingTraces :: (Member IO effects, Effectful m) => m (Trace ': effects) a -> m effects a
-printingTraces = raiseHandler (relay pure (\(Trace s) yield -> send (putStrLn s) >>= yield))
-
-returningTraces :: (Functor (m effects), Effectful m) => m (Trace ': effects) a -> m effects (a, [String])
-returningTraces e = fmap reverse <$> raiseHandler (relayState [] (\ts a -> pure (a, ts)) (\ts (Trace s) yield -> yield (s : ts) ())) e
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: Members '[Distribute WrappedTask, Files, Task] effs

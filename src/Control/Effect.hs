@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, TypeOperators #-}
+{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
 module Control.Effect
 ( Effectful(..)
 -- * Effects
@@ -15,14 +15,18 @@ module Control.Effect
 , runFresh
 , resume
 , runResumableWith
+, runIgnoringTraces
+, runPrintingTraces
+, runReturningTraces
 ) where
 
 import qualified Control.Monad.Effect as Eff
-import Control.Monad.Effect.Fresh
+import           Control.Monad.Effect.Fresh
 import qualified Control.Monad.Effect.Reader as Eff
-import Control.Monad.Effect.Resumable
+import           Control.Monad.Effect.Resumable
 import qualified Control.Monad.Effect.State as Eff
-import Prologue hiding (throwError)
+import           Control.Monad.Effect.Trace
+import           Prologue hiding (throwError)
 
 -- | Types wrapping 'Eff.Eff' actions.
 --
@@ -74,3 +78,15 @@ resume m handle = raise (resumeError (lower m) (\yield -> yield <=< lower . hand
 -- | Run a 'Resumable' effect in an 'Effectful' context, using a handler to resume computation.
 runResumableWith :: Effectful m => (forall resume . exc resume -> m effects resume) -> m (Resumable exc ': effects) a -> m effects a
 runResumableWith handler = raiseHandler (Eff.relay pure (\ (Resumable err) -> (lower (handler err) >>=)))
+
+-- | Run a 'Trace' effect, discarding the traced values.
+runIgnoringTraces :: Effectful m => m (Trace ': effects) a -> m effects a
+runIgnoringTraces = runEffect (\(Trace _) yield -> yield ())
+
+-- | Run a 'Trace' effect, printing the traced values to stdout.
+runPrintingTraces :: (Member IO effects, Effectful m) => m (Trace ': effects) a -> m effects a
+runPrintingTraces = raiseHandler (Eff.relay pure (\(Trace s) yield -> Eff.send (putStrLn s) >>= yield))
+
+-- | Run a 'Trace' effect, accumulating the traced values into a list.
+runReturningTraces :: (Functor (m effects), Effectful m) => m (Trace ': effects) a -> m effects (a, [String])
+runReturningTraces e = fmap reverse <$> raiseHandler (Eff.relayState [] (\ts a -> pure (a, ts)) (\ts (Trace s) yield -> yield (s : ts) ())) e
