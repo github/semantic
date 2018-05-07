@@ -6,6 +6,7 @@ import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Evaluating as X
 import           Control.Abstract.Evaluator
+import           Control.Monad.Effect (runM)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Value
@@ -25,8 +26,9 @@ import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 
 justEvaluating
-  = run
+  = runM . lower
   . evaluating
+  . printingTraces
   . runLoadError
   . runValueError
   . runUnspecialized
@@ -35,8 +37,9 @@ justEvaluating
   . runAddressError
 
 evaluatingWithHoles
-  = run
+  = runM . lower
   . evaluating
+  . printingTraces
   . resumingLoadError
   . resumingUnspecialized
   . resumingValueError
@@ -46,8 +49,9 @@ evaluatingWithHoles
 
 -- The order is significant here: caching has to run before typeChecking, or else we’ll nondeterministically produce TypeErrors as part of the result set. While this is probably actually correct, it will require us to have an Ord instance for TypeError, which we don’t have yet.
 checking
-  = run
+  = runM . lower
   . evaluating
+  . printingTraces
   . providingLiveSet
   . runLoadError
   . runUnspecialized
@@ -57,14 +61,14 @@ checking
   . runTypeError
   . caching @[]
 
-evalGoProject path = justEvaluating <$> evaluateProject goParser Language.Go Nothing path
-evalRubyProject path = justEvaluating <$> evaluateProject rubyParser Language.Ruby rubyPrelude path
-evalPHPProject path = justEvaluating <$> evaluateProject phpParser Language.PHP Nothing path
-evalPythonProject path = justEvaluating <$> evaluateProject pythonParser Language.Python pythonPrelude path
-evalTypeScriptProjectQuietly path = evaluatingWithHoles <$> evaluateProject typescriptParser Language.TypeScript Nothing path
-evalTypeScriptProject path = justEvaluating <$> evaluateProject typescriptParser Language.TypeScript Nothing path
+evalGoProject path = justEvaluating =<< evaluateProject goParser Language.Go Nothing path
+evalRubyProject path = justEvaluating =<< evaluateProject rubyParser Language.Ruby rubyPrelude path
+evalPHPProject path = justEvaluating =<< evaluateProject phpParser Language.PHP Nothing path
+evalPythonProject path = justEvaluating =<< evaluateProject pythonParser Language.Python pythonPrelude path
+evalTypeScriptProjectQuietly path = evaluatingWithHoles =<< evaluateProject typescriptParser Language.TypeScript Nothing path
+evalTypeScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.TypeScript Nothing path
 
-typecheckGoFile path = checking <$> evaluateProjectWithCaching goParser Language.Go Nothing path
+typecheckGoFile path = checking =<< evaluateProjectWithCaching goParser Language.Go Nothing path
 
 rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Language.Ruby)
 pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Language.Python)

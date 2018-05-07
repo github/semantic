@@ -32,6 +32,7 @@ resolveGoImport :: Members '[ Reader ModuleInfo
                             , Reader (ModuleTable [Module term])
                             , Reader Package.PackageInfo
                             , Resumable ResolutionError
+                            , Trace
                             ] effects
                 => ImportPath
                 -> Evaluator location term value effects [ModulePath]
@@ -43,9 +44,9 @@ resolveGoImport (ImportPath path Relative) = do
     _ -> pure paths
 resolveGoImport (ImportPath path NonRelative) = do
   package <- BC.unpack . unName . Package.packageName <$> currentPackage
-  traceM ("attempting to resolve " <> show path <> " for package " <> package)
+  traceE ("attempting to resolve " <> show path <> " for package " <> package)
   case splitDirectories path of
-    -- Import an absolute path that's defined in this package being analyized.
+    -- Import an absolute path that's defined in this package being analyzed.
     -- First two are source, next is package name, remaining are path to package
     -- (e.g. github.com/golang/<package>/path...).
     (_ : _ : p : xs) | p == package -> listModulesInDir (joinPath xs)
@@ -65,7 +66,8 @@ instance Evaluatable Import where
   eval (Import importPath _) = do
     paths <- resolveGoImport importPath
     for_ paths $ \path -> do
-      importedEnv <- maybe emptyEnv fst <$> traceResolve (unPath importPath) path (isolate (require path))
+      traceResolve (unPath importPath) path
+      importedEnv <- maybe emptyEnv fst <$> isolate (require path)
       modifyEnv (mergeEnvs importedEnv)
     unit
 
@@ -86,9 +88,9 @@ instance Evaluatable QualifiedImport where
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
     void $ letrec' alias $ \addr -> do
       for_ paths $ \path -> do
-        importedEnv <- maybe emptyEnv fst <$> traceResolve (unPath importPath) path (isolate (require path))
+        traceResolve (unPath importPath) path
+        importedEnv <- maybe emptyEnv fst <$> isolate (require path)
         modifyEnv (mergeEnvs importedEnv)
-
       makeNamespace alias addr Nothing
     unit
 
@@ -103,7 +105,8 @@ instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable SideEffectImport where
   eval (SideEffectImport importPath _) = do
     paths <- resolveGoImport importPath
-    for_ paths $ \path -> traceResolve (unPath importPath) path $ isolate (require path)
+    traceResolve (unPath importPath) paths
+    for_ paths $ \path -> isolate (require path)
     unit
 
 -- A composite literal in Go

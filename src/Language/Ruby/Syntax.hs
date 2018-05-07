@@ -68,7 +68,8 @@ instance Evaluatable Require where
   eval (Require _ x) = do
     name <- subtermValue x >>= asString
     path <- resolveRubyName name
-    (importedEnv, v) <- traceResolve name path (isolate (doRequire path))
+    traceResolve name path
+    (importedEnv, v) <- isolate (doRequire path)
     modifyEnv (`mergeNewer` importedEnv)
     pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
@@ -81,6 +82,7 @@ doRequire :: ( AbstractValue location term value effects
                         , State (Environment location value)
                         , State (Exports location value)
                         , State (ModuleTable (Environment location value, value))
+                        , Trace
                         ] effects
              )
           => M.ModulePath
@@ -118,6 +120,7 @@ doLoad :: ( AbstractValue location term value effects
                      , State (Environment location value)
                      , State (Exports location value)
                      , State (ModuleTable (Environment location value, value))
+                     , Trace
                      ] effects
           )
        => ByteString
@@ -125,7 +128,8 @@ doLoad :: ( AbstractValue location term value effects
        -> Evaluator location term value effects value
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
-  importedEnv <- maybe emptyEnv fst <$> traceResolve path path' (isolate (load path'))
+  traceResolve path path'
+  importedEnv <- maybe emptyEnv fst <$> (isolate (load path'))
   unless shouldWrap $ modifyEnv (mergeEnvs importedEnv)
   boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 
