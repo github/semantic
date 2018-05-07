@@ -11,7 +11,6 @@ module Control.Abstract.Environment
 , localEnv
 , localize
 , lookupEnv
-, lookupWith
 , EnvironmentError(..)
 , freeVariableError
 , runEnvironmentError
@@ -69,12 +68,6 @@ localize = localEnv id
 -- | Look a 'Name' up in the current environment, trying the default environment if no value is found.
 lookupEnv :: Members '[Reader (Environment location value), State (Environment location value)] effects => Name -> Evaluator location term value effects (Maybe (Address location value))
 lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
-
--- | Look up a 'Name' in the environment, running an action with the resolved address (if any).
-lookupWith :: Members '[Reader (Environment location value), State (Environment location value)] effects => (Address location value -> Evaluator location term value effects a) -> Name -> Evaluator location term value effects (Maybe a)
-lookupWith with name = do
-  addr <- lookupEnv name
-  maybe (pure Nothing) (fmap Just . with) addr
 
 
 data EnvironmentError value return where

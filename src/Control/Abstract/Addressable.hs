@@ -70,7 +70,7 @@ variable :: ( Addressable location effects
             )
          => Name
          -> Evaluator location term value effects value
-variable name = lookupWith deref name >>= maybeM (freeVariableError name)
+variable name = lookupEnv name >>= maybe (freeVariableError name) deref
 
 
 -- Instances
