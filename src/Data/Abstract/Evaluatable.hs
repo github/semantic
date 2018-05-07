@@ -274,19 +274,7 @@ require :: Members '[ EvalModule term value
                     ] effects
         => ModulePath
         -> Evaluator location term value effects (Maybe (Environment location value, value))
-require = requireWith evaluateModule
-
-requireWith :: Members '[ Reader (ModuleTable [Module term])
-                        , Reader LoadStack
-                        , Resumable (LoadError term)
-                        , State (Environment location value)
-                        , State (Exports location value)
-                        , State (ModuleTable (Environment location value, value))
-                        ] effects
-            => (Module term -> Evaluator location term value effects value)
-            -> ModulePath
-            -> Evaluator location term value effects (Maybe (Environment location value, value))
-requireWith with name = getModuleTable >>= maybeM (loadWith with name) . fmap Just . ModuleTable.lookup name
+require name = getModuleTable >>= maybeM (load name) . fmap Just . ModuleTable.lookup name
 
 -- | Load another module by name and return it's environment and value.
 --
@@ -301,19 +289,7 @@ load :: Members '[ EvalModule term value
                  ] effects
      => ModulePath
      -> Evaluator location term value effects (Maybe (Environment location value, value))
-load = loadWith evaluateModule
-
-loadWith :: Members '[ Reader (ModuleTable [Module term])
-                     , Reader LoadStack
-                     , Resumable (LoadError term)
-                     , State (Environment location value)
-                     , State (Exports location value)
-                     , State (ModuleTable (Environment location value, value))
-                     ] effects
-         => (Module term -> Evaluator location term value effects value)
-         -> ModulePath
-         -> Evaluator location term value effects (Maybe (Environment location value, value))
-loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= runMerging . foldMap (Merging . evalAndCache)
+load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= runMerging . foldMap (Merging . evalAndCache)
   where
     notFound = throwResumable (LoadError name)
 
@@ -323,7 +299,7 @@ loadWith with name = askModuleTable >>= maybeM notFound . ModuleTable.lookup nam
       if moduleInfo x `elem` unLoadStack
         then trace ("load (skip evaluating, circular load): " <> show mPath) (pure Nothing)
         else do
-          v <- localLoadStack (loadStackPush (moduleInfo x)) (trace ("load (evaluating): " <> show mPath) (with x))
+          v <- localLoadStack (loadStackPush (moduleInfo x)) (trace ("load (evaluating): " <> show mPath) (evaluateModule x))
           traceM ("load done:" <> show mPath)
           env <- filterEnv <$> getExports <*> getEnv
           modifyModuleTable (ModuleTable.insert name (env, v))
