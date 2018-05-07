@@ -88,7 +88,7 @@ instance Evaluatable QualifiedImport where
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
     void $ letrec' alias $ \addr -> do
       for_ paths $ \p -> do
-        traceResolve (unPath importPath) path
+        traceResolve (unPath importPath) p
         importedEnv <- maybe emptyEnv fst <$> isolate (require p)
         modifyEnv (mergeEnvs importedEnv)
       makeNamespace alias addr Nothing
