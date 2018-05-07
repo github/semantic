@@ -25,12 +25,8 @@ evaluate
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
   . Value.runValueError
   . runAddressError
-  . constrainTerm
   . runValue
 runValue = runEvalClosure (runValue . runTerm) . runReturn . runLoopControl
-
-constrainTerm :: Evaluator location Term value effects a -> Evaluator location Term value effects a
-constrainTerm = id
 
 term :: TermEvaluator Value -> Subterm Term (TermEvaluator Value)
 term eval = Subterm (Term eval) eval
