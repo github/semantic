@@ -5,9 +5,7 @@ module Analysis.Abstract.Caching
 , caching
 ) where
 
-import Control.Abstract.Evaluator
-import Control.Abstract.Configuration
-import Control.Abstract.Heap
+import Control.Abstract
 import Control.Monad.Effect
 import Data.Abstract.Cache
 import Data.Abstract.Module

@@ -1,8 +1,7 @@
 {-# LANGUAGE TypeFamilies, UndecidableInstances #-}
 module Data.Abstract.Located where
 
-import Control.Abstract.Addressable
-import Control.Abstract.Evaluator
+import Control.Abstract
 import Data.Abstract.Address
 import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Package (PackageInfo)
