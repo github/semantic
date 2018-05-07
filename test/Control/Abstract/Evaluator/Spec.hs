@@ -14,7 +14,7 @@ spec :: Spec
 spec = parallel $ do
   it "constructs integers" $ do
     (expected, _) <- evaluate (integer 123)
-    expected `shouldBe` Right (Right (Right (Value.injValue (Value.Integer (Number.Integer 123)))))
+    expected `shouldBe` Right (Right (Right (Right (Value.injValue (Value.Integer (Number.Integer 123))))))
 
 evaluate
   = runM
@@ -23,6 +23,7 @@ evaluate
   . runReader (PackageInfo (name "test") Nothing)
   . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
   . Value.runValueError
+  . runEnvironmentError
   . runAddressError
   . runValue
 runValue = runEvalClosure (runValue . runTerm) . runReturn . runLoopControl
@@ -35,6 +36,7 @@ type TermEffects
      , Return Value
      , EvalClosure Term Value
      , Resumable (AddressError Precise Value)
+     , Resumable (EnvironmentError Value)
      , Resumable (Value.ValueError Precise Value)
      , Reader ModuleInfo
      , Reader PackageInfo
