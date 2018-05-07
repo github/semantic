@@ -6,10 +6,9 @@ module Analysis.Abstract.Caching
 ) where
 
 import Control.Abstract.Evaluator
+import Control.Abstract.Configuration
 import Control.Monad.Effect
 import Data.Abstract.Cache
-import Data.Abstract.Configuration
-import Data.Abstract.Live
 import Data.Abstract.Module
 import Data.Semilattice.Lower
 import Prologue

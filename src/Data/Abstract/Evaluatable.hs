@@ -28,6 +28,7 @@ module Data.Abstract.Evaluatable
 ) where
 
 import           Control.Abstract.Addressable as X
+import           Control.Abstract.Configuration as X
 import           Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..))
 import           Control.Abstract.Evaluator (LoopControl, Return(..))
 import           Control.Abstract.Value as X

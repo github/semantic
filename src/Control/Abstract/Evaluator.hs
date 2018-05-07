@@ -35,8 +35,6 @@ module Control.Abstract.Evaluator
   -- * Roots
   , askRoots
   , extraRoots
-  -- * Configuration
-  , getConfiguration
   -- * Module tables
   , getModuleTable
   , putModuleTable
@@ -82,7 +80,6 @@ import Control.Monad.Effect.Reader hiding (runReader)
 import Control.Monad.Effect.Resumable
 import Control.Monad.Effect.State hiding (runState)
 import Data.Abstract.Address
-import Data.Abstract.Configuration
 import Data.Abstract.Environment as Env
 import Data.Abstract.Exports as Export
 import Data.Abstract.FreeVariables

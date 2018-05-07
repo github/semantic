@@ -5,9 +5,8 @@ module Analysis.Abstract.Tracing
 ) where
 
 import Control.Abstract.Evaluator
+import Control.Abstract.Configuration
 import Control.Monad.Effect.Writer
-import Data.Abstract.Configuration
-import Data.Abstract.Live
 import Data.Semigroup.Reducer as Reducer
 import Prologue hiding (trace)
 
