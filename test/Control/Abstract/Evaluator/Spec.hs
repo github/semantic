@@ -50,7 +50,9 @@ type TermEffects
      , IO
      ]
 
+type TermEvaluator = Evaluator Precise Term Value TermEffects
+
 type Value = Value.Value Precise
-newtype Term = Term { runTerm :: Evaluator Precise Term Value TermEffects Value }
+newtype Term = Term { runTerm :: TermEvaluator Value }
 
 instance Show Term where showsPrec d _ = showParen (d > 10) $ showString "Term _"
