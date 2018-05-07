@@ -252,11 +252,11 @@ modifyModuleTable = raise . modify'
 -- Context
 
 -- | Get the currently evaluating 'ModuleInfo'.
-currentModule :: Member (Reader ModuleInfo) effects => Evaluator location term value effects ModuleInfo
+currentModule :: (Effectful m, Member (Reader ModuleInfo) effects) => m effects ModuleInfo
 currentModule = raise ask
 
 -- | Get the currently evaluating 'PackageInfo'.
-currentPackage :: Member (Reader PackageInfo) effects => Evaluator location term value effects PackageInfo
+currentPackage :: (Effectful m, Member (Reader PackageInfo) effects) => m effects PackageInfo
 currentPackage = raise ask
 
 

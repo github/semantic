@@ -3,7 +3,9 @@ module Parsing.Parser
 ( Parser(..)
 , SomeParser(..)
 , SomeAnalysisParser(..)
+, SomeASTParser(..)
 , someParser
+, someASTParser
 , someAnalysisParser
 , ApplyAll
 , ApplyAll'
@@ -148,3 +150,21 @@ typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScrip
 
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
+
+
+-- | A parser for producing specialized (tree-sitter) ASTs.
+data SomeASTParser where
+  SomeASTParser :: forall grammar. (Bounded grammar, Enum grammar, Show grammar)
+                => Parser (AST [] grammar)
+                -> SomeASTParser
+
+someASTParser :: Language -> SomeASTParser
+someASTParser Go         = SomeASTParser (ASTParser tree_sitter_go :: Parser (AST [] Go.Grammar))
+someASTParser JavaScript = SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar))
+someASTParser JSON       = SomeASTParser (ASTParser tree_sitter_json :: Parser (AST [] JSON.Grammar))
+someASTParser JSX        = SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar))
+someASTParser Python     = SomeASTParser (ASTParser tree_sitter_python :: Parser (AST [] Python.Grammar))
+someASTParser Ruby       = SomeASTParser (ASTParser tree_sitter_ruby :: Parser (AST [] Ruby.Grammar))
+someASTParser TypeScript = SomeASTParser (ASTParser tree_sitter_typescript :: Parser (AST [] TypeScript.Grammar))
+someASTParser PHP        = SomeASTParser (ASTParser tree_sitter_php :: Parser (AST [] PHP.Grammar))
+someASTParser l          = error $ "Tree-Sitter AST parsing not supported for: " <> show l

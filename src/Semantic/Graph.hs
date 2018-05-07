@@ -1,8 +1,8 @@
-{-# LANGUAGE GADTs, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE GADTs, TypeOperators #-}
 module Semantic.Graph where
 
 import           Analysis.Abstract.Evaluating
-import           Analysis.Abstract.ImportGraph
+import           Analysis.Abstract.Graph
 import qualified Control.Exception as Exc
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
@@ -14,30 +14,35 @@ import           Data.ByteString.Char8 (pack)
 import           Data.File
 import           Data.Output
 import           Data.Semilattice.Lower
-import qualified Data.Syntax as Syntax
-import           Data.Term
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
 import           Rendering.Renderer
 import           Semantic.IO (Files)
 import           Semantic.Task as Task
 
+data GraphType = ImportGraph | CallGraph
+
 graph :: Members '[Distribute WrappedTask, Files, Task, Exc SomeException, Telemetry] effs
-      => GraphRenderer output
+      => GraphType
+      -> GraphRenderer output
       -> Project
       -> Eff effs ByteString
-graph renderer project
+graph graphType renderer project
   | SomeAnalysisParser parser prelude <- someAnalysisParser
     (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
-    parsePackage parser prelude project >>= graphImports >>= case renderer of
+    package <- parsePackage parser prelude project
+    let graph package = case graphType of
+          ImportGraph -> analyze runGraphAnalysis (evaluatePackageWith graphingModules  graphingLoadErrors                  package) >>= extractGraph
+          CallGraph   -> analyze runGraphAnalysis (evaluatePackageWith graphingModules (graphingLoadErrors . graphingTerms) package) >>= extractGraph
+    graph package >>= case renderer of
       JSONGraphRenderer -> pure . toOutput
-      DOTGraphRenderer  -> pure . renderImportGraph
+      DOTGraphRenderer  -> pure . renderGraph
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: Members '[Distribute WrappedTask, Files, Task] effs
-             => Parser term       -- ^ A parser.
-             -> Maybe File        -- ^ Prelude (optional).
-             -> Project           -- ^ Project to parse into a package.
+             => Parser term -- ^ A parser.
+             -> Maybe File  -- ^ Prelude (optional).
+             -> Project     -- ^ Project to parse into a package.
              -> Eff effs (Package term)
 parsePackage parser preludeFile project@Project{..} = do
   prelude <- traverse (parseModule parser Nothing) preludeFile
@@ -57,31 +62,30 @@ parseModule parser rootDir file = do
   moduleForBlob rootDir blob <$> parse parser blob
 
 
-importGraphAnalysis :: forall term syntax ann a
-                    .  Evaluator (Located Precise) term (Value (Located Precise))
-                       '[ State (ImportGraph (Term (Sum syntax) ann))
-                        , Resumable (AddressError (Located Precise) (Value (Located Precise)))
-                        , Resumable ResolutionError
-                        , Resumable (EvalError (Value (Located Precise)))
-                        , State [Name]
-                        , Resumable (ValueError (Located Precise) (Value (Located Precise)))
-                        , Resumable (Unspecialized (Value (Located Precise)))
-                        , Resumable (LoadError term)
-                        , Fail
-                        , Fresh
-                        , Reader (Environment (Located Precise) (Value (Located Precise)))
-                        , State (Environment (Located Precise) (Value (Located Precise)))
-                        , State (Heap (Located Precise) (Value (Located Precise)))
-                        , State (ModuleTable (Environment (Located Precise) (Value (Located Precise)), Value (Located Precise)))
-                        , State (Exports (Located Precise) (Value (Located Precise)))
-                        , State (JumpTable term)
-                        ] a
-                    -> ( Either String                                                     -- 'fail' calls
-                         ( ( a                                                             -- the result value
-                           , ImportGraph (Term (Sum syntax) ann))                          -- the import graph
-                         , [Name])                                                         -- the list of bad names
-                       , EvaluatingState (Located Precise) term (Value (Located Precise))) -- the final state
-importGraphAnalysis
+runGraphAnalysis :: Evaluator (Located Precise) term (Value (Located Precise))
+                      '[ State Graph
+                       , Resumable (AddressError (Located Precise) (Value (Located Precise)))
+                       , Resumable ResolutionError
+                       , Resumable (EvalError (Value (Located Precise)))
+                       , State [Name]
+                       , Resumable (ValueError (Located Precise) (Value (Located Precise)))
+                       , Resumable (Unspecialized (Value (Located Precise)))
+                       , Resumable (LoadError term)
+                       , Fail
+                       , Fresh
+                       , Reader (Environment (Located Precise) (Value (Located Precise)))
+                       , State (Environment (Located Precise) (Value (Located Precise)))
+                       , State (Heap (Located Precise) (Value (Located Precise)))
+                       , State (ModuleTable (Environment (Located Precise) (Value (Located Precise)), Value (Located Precise)))
+                       , State (Exports (Located Precise) (Value (Located Precise)))
+                       , State (JumpTable term)
+                       ] a
+                 -> ( Either String                                                     -- 'fail' calls
+                      ( ( a                                                             -- the result value
+                        , Graph)                                                        -- the import graph
+                      , [Name])                                                         -- the list of bad names
+                    , EvaluatingState (Located Precise) term (Value (Located Precise))) -- the final state
+runGraphAnalysis
   = run
   . evaluating
   . resumingLoadError
@@ -90,7 +94,7 @@ importGraphAnalysis
   . resumingEvalError
   . resumingResolutionError
   . resumingAddressError
-  . importGraphing
+  . graphing
 
 resumingResolutionError :: (Applicative (m effects), Effectful m) => m (Resumable ResolutionError ': effects) a -> m effects a
 resumingResolutionError = runResolutionErrorWith (\ err -> traceM ("ResolutionError:" <> show err) *> case err of
@@ -137,20 +141,7 @@ resumingValueError = runValueErrorWith (\ err -> traceM ("ValueError" <> show er
   KeyValueError{}   -> pure (hole, hole)
   ArithmeticError{} -> pure hole)
 
--- | Render the import graph for a given 'Package'.
-graphImports :: ( Show ann
-                , Apply Declarations1 syntax
-                , Apply Evaluatable syntax
-                , Apply FreeVariables1 syntax
-                , Apply Functor syntax
-                , Apply Show1 syntax
-                , Element Syntax.Identifier syntax
-                , Members '[Exc SomeException, Task] effs
-                )
-             => Package (Term (Sum syntax) ann)
-             -> Eff effs (ImportGraph (Term (Sum syntax) ann))
-graphImports package = analyze importGraphAnalysis (evaluatePackageWith graphingModules (graphingLoadErrors . graphingTerms) package) >>= extractGraph
-  where
-    extractGraph result = case result of
-      (Right ((_, graph), _), _) -> pure graph
-      _ -> Task.throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
+extractGraph :: (Member (Exc SomeException) effects, Show result, Show state) => (Either String ((result, Graph), [Name]), state) -> Eff effects Graph
+extractGraph result = case result of
+  (Right ((_, graph), _), _) -> pure graph
+  _ -> Task.throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
