@@ -98,7 +98,7 @@ resumingEvalError
     FloatFormatError{}       -> pure 0
     RationalFormatError{}    -> pure 0
     FreeVariableError name   -> raise (modify' (name :)) $> hole
-    FreeVariablesError names -> raise (modify' (names <>)) $> (fromMaybeLast "unknown" names))
+    FreeVariablesError names -> raise (modify' (names <>)) $> fromMaybeLast "unknown" names)
 
 resumingUnspecialized :: AbstractHole value => Evaluator location term value (Resumable (Unspecialized value) ': effects) a -> Evaluator location term value effects a
 resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> traceM ("Unspecialized:" <> show err) $> hole)
