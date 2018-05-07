@@ -34,6 +34,7 @@ import Data.Term as X
 import Parsing.Parser as X
 import Rendering.Renderer as X
 import Semantic.Diff as X
+import Semantic.Graph as X (ignoringTraces)
 import Semantic.Parse as X
 import Semantic.Task as X hiding (parsePackage)
 import Semantic.Util as X
@@ -70,6 +71,7 @@ readFilePair paths = let paths' = fmap file paths in
 testEvaluating
   = run
   . evaluating
+  . ignoringTraces
   . runLoadError
   . runValueError
   . runUnspecialized
