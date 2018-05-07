@@ -1,5 +1,6 @@
 module Control.Abstract.Evaluator.Spec where
 
+import Analysis.Abstract.Evaluating (evaluating)
 import Control.Abstract
 import Data.Abstract.Module
 import qualified Data.Abstract.Number as Number
@@ -9,6 +10,20 @@ import SpecHelpers hiding (Term)
 
 spec :: Spec
 spec = parallel $ pure ()
+
+evaluate
+  = run
+  . evaluating
+  . runReader (PackageInfo (name "test") Nothing)
+  . runReader (ModuleInfo "test/Control/Abstract/Evaluator/Spec.hs")
+  . Value.runValueError
+  . runAddressError
+  . constrainTerm
+  . runValue
+runValue = runEvalClosure (runValue . runTerm) . runReturn . runLoopControl
+
+constrainTerm :: Evaluator location Term value effects a -> Evaluator location Term value effects a
+constrainTerm = id
 
 type TermEffects
   = '[ LoopControl Value
