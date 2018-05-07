@@ -26,6 +26,7 @@ import qualified Language.Ruby.Assignment as Ruby
 
 justEvaluating
   = run
+  . fmap (first reassociate)
   . evaluating
   . runLoadError
   . runValueError
@@ -49,6 +50,7 @@ evaluatingWithHoles
 -- The order is significant here: caching has to run before typeChecking, or else we’ll nondeterministically produce TypeErrors as part of the result set. While this is probably actually correct, it will require us to have an Ord instance for TypeError, which we don’t have yet.
 checking
   = run
+  . fmap (first reassociate)
   . evaluating
   . providingLiveSet
   . runLoadError
@@ -82,3 +84,12 @@ parseFile parser = runTask . (parse parser <=< readBlob . file)
 
 blob :: FilePath -> IO Blob
 blob = runTask . readBlob . file
+
+
+injectConst :: a -> SomeExc (Sum '[Const a])
+injectConst = SomeExc . injectSum . Const
+
+mergeExcs :: Either (SomeExc (Sum excs)) (Either (SomeExc exc) result) -> Either (SomeExc (Sum (exc ': excs))) result
+mergeExcs = either (\ (SomeExc sum) -> Left (SomeExc (weakenSum sum))) (either (\ (SomeExc exc) -> Left (SomeExc (injectSum exc))) Right)
+
+reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . first injectConst
