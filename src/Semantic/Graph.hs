@@ -37,6 +37,10 @@ graph graphType renderer project
     analyze runGraphAnalysis (evaluatePackageWith graphingModules perTerm package) >>= extractGraph >>= case renderer of
       JSONGraphRenderer -> pure . toOutput
       DOTGraphRenderer  -> pure . renderGraph
+    where extractGraph result = case result of
+            (Right ((_, graph), _), _) -> pure graph
+            _ -> Task.throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
+
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: Members '[Distribute WrappedTask, Files, Task] effs
@@ -140,8 +144,3 @@ resumingValueError = runValueErrorWith (\ err -> traceM ("ValueError" <> show er
   Bitwise2Error{}   -> pure hole
   KeyValueError{}   -> pure (hole, hole)
   ArithmeticError{} -> pure hole)
-
-extractGraph :: (Member (Exc SomeException) effects, Show result, Show state) => (Either String ((result, Graph), [Name]), state) -> Eff effects Graph
-extractGraph result = case result of
-  (Right ((_, graph), _), _) -> pure graph
-  _ -> Task.throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
