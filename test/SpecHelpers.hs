@@ -80,9 +80,6 @@ testEvaluating
   . runAddressError
   . constrainedToValuePrecise
 
-constrainedToValuePrecise :: Evaluator Precise term (Value Precise) effects a -> Evaluator Precise term (Value Precise) effects a
-constrainedToValuePrecise = id
-
 ns n = Just . Latest . Just . injValue . Namespace n
 addr = Address . Precise
 
