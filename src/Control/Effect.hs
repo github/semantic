@@ -8,6 +8,7 @@ module Control.Effect
 , throwResumable
 -- * Handlers
 , run
+, runM
 , runEffect
 , raiseHandler
 , runReader
@@ -52,6 +53,9 @@ throwResumable = raise . throwError
 
 run :: Effectful m => m '[] a -> a
 run = Eff.run . lower
+
+runM :: (Effectful m, Monad f) => m '[f] a -> f a
+runM = Eff.runM . lower
 
 runEffect :: Effectful m => (forall v . effect v -> (v -> m effects a) -> m effects a) -> m (effect ': effects) a -> m effects a
 runEffect handler = raiseHandler (Eff.relay pure (\ effect yield -> lower (handler effect (raise . yield))))

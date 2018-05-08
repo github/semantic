@@ -7,7 +7,6 @@ import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Evaluating as X
 import           Control.Abstract.Evaluator
 import           Control.Effect (runPrintingTraces)
-import           Control.Monad.Effect (runM)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Value
@@ -27,7 +26,7 @@ import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 
 justEvaluating
-  = runM . lower
+  = runM
   . fmap (first reassociate)
   . evaluating
   . runPrintingTraces
@@ -41,7 +40,7 @@ justEvaluating
   . constrainedToValuePrecise
 
 evaluatingWithHoles
-  = runM . lower
+  = runM
   . evaluating
   . runPrintingTraces
   . resumingLoadError
@@ -55,7 +54,7 @@ evaluatingWithHoles
 
 -- The order is significant here: caching has to run before typeChecking, or else we’ll nondeterministically produce TypeErrors as part of the result set. While this is probably actually correct, it will require us to have an Ord instance for TypeError, which we don’t have yet.
 checking
-  = runM . lower
+  = runM
   . fmap (first reassociate)
   . evaluating
   . runPrintingTraces
