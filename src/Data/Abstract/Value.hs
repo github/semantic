@@ -371,9 +371,9 @@ instance ( Addressable location effects
           localEnv (mergeEnvs bindings) (evalClosure body)
       Nothing -> throwValueError (CallError op)
     where
-      evalClosure term = catchReturn @(Value location) (\ (Return value) -> pure value) (evaluateClosureBody term)
+      evalClosure term = catchReturn (\ (Return value) -> pure value) (evaluateClosureBody term)
 
-  loop x = catchLoopControl @(Value location) (fix x) (\ control -> case control of
+  loop x = catchLoopControl (fix x) (\ control -> case control of
     Break value -> pure value
     -- FIXME: Figure out how to deal with this. Ruby treats this as the result of the current block iteration, while PHP specifies a breakout level and TypeScript appears to take a label.
     Continue _  -> loop x)
