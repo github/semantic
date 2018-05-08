@@ -5,6 +5,7 @@ module Control.Effect
 , Eff.Reader
 , Eff.State
 , Fresh
+, send
 , throwResumable
 -- * Handlers
 , run
@@ -39,6 +40,9 @@ instance Effectful Eff.Eff where
 
 
 -- Effects
+
+send :: (Effectful m, Member effect effects) => effect result -> m effects result
+send = raise . Eff.send
 
 throwResumable :: (Member (Resumable exc) effects, Effectful m) => exc v -> m effects v
 throwResumable = raise . throwError

@@ -28,7 +28,7 @@ module Control.Abstract.Evaluator
   ) where
 
 import Control.Effect
-import Control.Monad.Effect
+import Control.Monad.Effect (Eff, interpose, relay)
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDet
@@ -56,7 +56,7 @@ data EvalClosure term value resume where
   EvalClosure :: term -> EvalClosure term value value
 
 evaluateClosureBody :: Member (EvalClosure term value) effects => term -> Evaluator location term value effects value
-evaluateClosureBody = raise . send . EvalClosure
+evaluateClosureBody = send . EvalClosure
 
 runEvalClosure :: (term -> Evaluator location term value effects value) -> Evaluator location term value (EvalClosure term value ': effects) a -> Evaluator location term value effects a
 runEvalClosure evalClosure = runEffect (\ (EvalClosure term) yield -> evalClosure term >>= yield)
@@ -67,7 +67,7 @@ data EvalModule term value resume where
   EvalModule :: Module term -> EvalModule term value value
 
 evaluateModule :: Member (EvalModule term value) effects => Module term -> Evaluator location term value effects value
-evaluateModule = raise . send . EvalModule
+evaluateModule = send . EvalModule
 
 runEvalModule :: (Module term -> Evaluator location term value effects value) -> Evaluator location term value (EvalModule term value ': effects) a -> Evaluator location term value effects a
 runEvalModule evalModule = runEffect (\ (EvalModule m) yield -> evalModule m >>= yield)
@@ -81,7 +81,7 @@ deriving instance Eq value => Eq (Return value a)
 deriving instance Show value => Show (Return value a)
 
 earlyReturn :: Member (Return value) effects => value -> Evaluator location term value effects value
-earlyReturn = raise . send . Return
+earlyReturn = send . Return
 
 catchReturn :: Member (Return value) effects => (forall x . Return value x -> Evaluator location term value effects a) -> Evaluator location term value effects a -> Evaluator location term value effects a
 catchReturn handler = raiseHandler (interpose pure (\ ret _ -> lower (handler ret)))
@@ -99,10 +99,10 @@ deriving instance Eq value => Eq (LoopControl value a)
 deriving instance Show value => Show (LoopControl value a)
 
 throwBreak :: Member (LoopControl value) effects => value -> Evaluator location term value effects value
-throwBreak = raise . send . Break
+throwBreak = send . Break
 
 throwContinue :: Member (LoopControl value) effects => value -> Evaluator location term value effects value
-throwContinue = raise . send . Continue
+throwContinue = send . Continue
 
 catchLoopControl :: Member (LoopControl value) effects => Evaluator location term value effects a -> (forall x . LoopControl value x -> Evaluator location term value effects a) -> Evaluator location term value effects a
 catchLoopControl action handler = raiseHandler (interpose pure (\ control _ -> lower (handler control))) action
