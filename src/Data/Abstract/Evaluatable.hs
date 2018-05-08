@@ -170,7 +170,7 @@ traceResolve name path = traceE ("resolved " <> show name <> " -> " <> show path
 
 -- | Evaluate a given package.
 evaluatePackageWith :: ( Evaluatable (Base term)
-                       , EvaluatableConstraints location term value gotoEffects
+                       , EvaluatableConstraints location term value inner
                        , Members '[ Fail
                                   , Reader (Environment location value)
                                   , Resumable (AddressError location value)
@@ -181,23 +181,20 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                                   , State (Heap location value)
                                   , State (ModuleTable (Environment location value, value))
                                   , Trace
-                                  ] effects
+                                  ] outer
                        , Recursive term
-                       , gotoEffects ~ (Goto termEffects value ': termEffects)
-                       , termEffects ~ (LoopControl value ': Return value ': Reader ModuleInfo ': moduleEffects)
-                       , moduleEffects ~ (EvalModule term value ': packageBodyEffects)
-                       , packageBodyEffects ~ (Reader LoadStack ': Reader (ModuleTable [Module term]) ': packageEffects)
-                       , packageEffects ~ (Reader PackageInfo ': effects)
+                       , inner ~ (Goto inner' value ': inner')
+                       , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': EvalModule term value ': Reader LoadStack ': Reader (ModuleTable [Module term]) ': Reader PackageInfo ': outer)
                        )
-                    => (SubtermAlgebra Module term (Evaluator location term value gotoEffects value) -> SubtermAlgebra Module term (Evaluator location term value gotoEffects value))
-                    -> (SubtermAlgebra (Base term) term (Evaluator location term value gotoEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value gotoEffects value))
+                    => (SubtermAlgebra Module term (Evaluator location term value inner value) -> SubtermAlgebra Module term (Evaluator location term value inner value))
+                    -> (SubtermAlgebra (Base term) term (Evaluator location term value inner value) -> SubtermAlgebra (Base term) term (Evaluator location term value inner value))
                     -> Package term
-                    -> Evaluator location term value effects [value]
+                    -> Evaluator location term value outer [value]
 evaluatePackageWith perModule perTerm = runReader . packageInfo <*> evaluatePackageBodyWith perModule perTerm . packageBody
 
 -- | Evaluate a given package body (module table and entry points).
 evaluatePackageBodyWith :: ( Evaluatable (Base term)
-                           , EvaluatableConstraints location term value gotoEffects
+                           , EvaluatableConstraints location term value inner
                            , Members '[ Fail
                                       , Reader (Environment location value)
                                       , Resumable (AddressError location value)
@@ -208,17 +205,15 @@ evaluatePackageBodyWith :: ( Evaluatable (Base term)
                                       , State (Heap location value)
                                       , State (ModuleTable (Environment location value, value))
                                       , Trace
-                                      ] effects
+                                      ] outer
                            , Recursive term
-                           , gotoEffects ~ (Goto termEffects value ': termEffects)
-                           , termEffects ~ (LoopControl value ': Return value ': Reader ModuleInfo ': moduleEffects)
-                           , moduleEffects ~ (EvalModule term value ': packageBodyEffects)
-                           , packageBodyEffects ~ (Reader LoadStack ': Reader (ModuleTable [Module term]) ': effects)
+                           , inner ~ (Goto inner' value ': inner')
+                           , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': EvalModule term value ': Reader LoadStack ': Reader (ModuleTable [Module term]) ': outer)
                            )
-                        => (SubtermAlgebra Module term (Evaluator location term value gotoEffects value) -> SubtermAlgebra Module term (Evaluator location term value gotoEffects value))
-                        -> (SubtermAlgebra (Base term) term (Evaluator location term value gotoEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value gotoEffects value))
+                        => (SubtermAlgebra Module term (Evaluator location term value inner value) -> SubtermAlgebra Module term (Evaluator location term value inner value))
+                        -> (SubtermAlgebra (Base term) term (Evaluator location term value inner value) -> SubtermAlgebra (Base term) term (Evaluator location term value inner value))
                         -> PackageBody term
-                        -> Evaluator location term value effects [value]
+                        -> Evaluator location term value outer [value]
 evaluatePackageBodyWith perModule perTerm body
   = runReader (packageModules body)
   . runReader lowerBound
