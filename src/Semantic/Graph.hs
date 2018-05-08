@@ -3,6 +3,7 @@ module Semantic.Graph where
 
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph
+import           Control.Effect (runIgnoringTraces)
 import qualified Control.Exception as Exc
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
@@ -43,6 +44,7 @@ graph graphType renderer project
           runGraphAnalysis
             = run
             . evaluating
+            . runIgnoringTraces
             . resumingLoadError
             . resumingUnspecialized
             . resumingValueError

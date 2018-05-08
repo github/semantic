@@ -81,6 +81,7 @@ type EvaluatableConstraints location term value effects =
              , State (Exports location value)
              , State (Heap location value)
              , State (ModuleTable (Environment location value, value))
+             , Trace
              ] effects
   , Reducer value (Cell location value)
   )
@@ -253,8 +254,8 @@ resolve names = do
   tbl <- askModuleTable
   pure $ find (`ModuleTable.member` tbl) names
 
-traceResolve :: (Show a, Show b) => a -> b -> c -> c
-traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
+traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator location term value effects ()
+traceResolve name path = traceE ("resolved " <> show name <> " -> " <> show path)
 
 listModulesInDir :: Member (Reader (ModuleTable [Module term])) effects
                  => FilePath
@@ -271,6 +272,7 @@ require :: Members '[ EvalModule term value
                     , State (Environment location value)
                     , State (Exports location value)
                     , State (ModuleTable (Environment location value, value))
+                    , Trace
                     ] effects
         => ModulePath
         -> Evaluator location term value effects (Maybe (Environment location value, value))
@@ -286,6 +288,7 @@ load :: Members '[ EvalModule term value
                  , State (Environment location value)
                  , State (Exports location value)
                  , State (ModuleTable (Environment location value, value))
+                 , Trace
                  ] effects
      => ModulePath
      -> Evaluator location term value effects (Maybe (Environment location value, value))
@@ -300,7 +303,7 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= run
         then trace ("load (skip evaluating, circular load): " <> show mPath) (pure Nothing)
         else do
           v <- localLoadStack (loadStackPush (moduleInfo x)) (trace ("load (evaluating): " <> show mPath) (evaluateModule x))
-          traceM ("load done:" <> show mPath)
+          traceE ("load done:" <> show mPath)
           env <- filterEnv <$> getExports <*> getEnv
           modifyModuleTable (ModuleTable.insert name (env, v))
           pure (Just (env, v))
@@ -331,6 +334,7 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                        , Members '[ Fail
                                   , Reader (Environment location value)
                                   , State (Environment location value)
+                                  , Trace
                                   ] effects
                        , Recursive term
                        , termEffects ~ (LoopControl value ': Return value ': EvalClosure term value ': moduleEffects)
@@ -350,6 +354,7 @@ evaluatePackageBodyWith :: ( Evaluatable (Base term)
                            , Members '[ Fail
                                       , Reader (Environment location value)
                                       , State (Environment location value)
+                                      , Trace
                                       ] effects
                            , Recursive term
                            , termEffects ~ (LoopControl value ': Return value ': EvalClosure term value ': moduleEffects)

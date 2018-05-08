@@ -7,6 +7,8 @@ module Control.Abstract.Evaluator
   , ModuleTable
   , Exports
   , JumpTable
+  -- * Trace
+  , traceE
   -- * Environment
   , getEnv
   , putEnv
@@ -70,6 +72,7 @@ module Control.Abstract.Evaluator
   , module Control.Monad.Effect.Reader
   , module Control.Monad.Effect.Resumable
   , module Control.Monad.Effect.State
+  , Trace (..)
   , Eff.relay
   ) where
 
@@ -81,6 +84,7 @@ import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader hiding (runReader)
 import Control.Monad.Effect.Resumable
 import Control.Monad.Effect.State hiding (runState)
+import Control.Monad.Effect.Trace
 import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.Environment as Env
@@ -95,7 +99,7 @@ import qualified Data.IntMap as IntMap
 import Data.Semigroup.Reducer
 import Data.Semilattice.Lower
 import Prelude hiding (fail)
-import Prologue
+import Prologue hiding (trace)
 
 newtype Evaluator location term value effects a = Evaluator { runEvaluator :: Eff.Eff effects a }
   deriving (Applicative, Effectful, Functor, Monad)
@@ -123,6 +127,10 @@ modifyEnv = raise . modify'
 withEnv :: Member (State (Environment location value)) effects => Environment location value -> Evaluator location term value effects a -> Evaluator location term value effects a
 withEnv = raiseHandler . localState . const
 
+-- | Trace into the current context.
+-- TODO: Someday we can generalize this to work for Task and Graph.
+traceE :: Member Trace effects => String -> Evaluator location term value effects ()
+traceE = raise . trace
 
 -- | Retrieve the default environment.
 defaultEnvironment :: Member (Reader (Environment location value)) effects => Evaluator location term value effects (Environment location value)
