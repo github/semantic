@@ -37,6 +37,7 @@ evaluate
   . runAddressError
   . runReturn
   . runLoopControl
+  . fmap fst
   . runGoto lowerBound
   . constraining
 

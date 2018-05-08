@@ -229,11 +229,12 @@ evaluatePackageBodyWith perModule perTerm body
         evalTerm
           = runReturn
           . runLoopControl
+          . fmap fst
           . runGoto lowerBound
           . foldSubterms (perTerm eval)
 
         evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location term value (EvalModule term value ': packageBodyEffects) value
-        evaluateEntryPoint m sym = runReader (ModuleInfo m) . runReturn . runLoopControl . runGoto lowerBound $ do
+        evaluateEntryPoint m sym = runReader (ModuleInfo m) . runReturn . runLoopControl . fmap fst . runGoto lowerBound $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
 
