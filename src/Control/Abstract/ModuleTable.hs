@@ -99,8 +99,7 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= run
       if loading
         then traceE ("load (skip evaluating, circular load): " <> show mPath) $> Nothing
         else do
-          v <- traceE ("load (evaluating): " <> show mPath) *> evaluateModule x
-          traceE ("load done:" <> show mPath)
+          v <- traceE ("load (evaluating): " <> show mPath) *> evaluateModule x <* traceE ("load done:" <> show mPath)
           env <- filterEnv <$> getExports <*> getEnv
           cacheModule name (Just (env, v))
           pure (Just (env, v))
