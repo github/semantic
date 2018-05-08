@@ -22,7 +22,7 @@ spec = parallel $ do
 
   it "calls functions" $ do
     (expected, _) <- evaluate $ do
-      identity <- lambda [name "x"] lowerBound (variable (name "x"))
+      identity <- closure [name "x"] lowerBound (variable (name "x"))
       call identity [integer 123]
     expected `shouldBe` Right (Value.injValue (Value.Integer (Number.Integer 123)))
 

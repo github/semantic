@@ -92,7 +92,7 @@ instance ( Addressable location effects
          , Reducer (Type location) (Cell location (Type location))
          )
       => AbstractValue location (Type location) effects where
-  lambda names _ body = do
+  closure names _ body = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
       tvar <- Var <$> raise fresh

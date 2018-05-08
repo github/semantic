@@ -23,7 +23,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Function where
   eval Function{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm functionName)
-    (v, addr) <- letrec name (lambda (paramNames functionParameters) (Set.fromList (freeVariables functionBody)) (subtermValue functionBody))
+    (v, addr) <- letrec name (closure (paramNames functionParameters) (Set.fromList (freeVariables functionBody)) (subtermValue functionBody))
     modifyEnv (Env.insert name addr)
     pure v
     where paramNames = foldMap (freeVariables . subterm)
@@ -47,7 +47,7 @@ instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Method where
   eval Method{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm methodName)
-    (v, addr) <- letrec name (lambda (paramNames methodParameters) (Set.fromList (freeVariables methodBody)) (subtermValue methodBody))
+    (v, addr) <- letrec name (closure (paramNames methodParameters) (Set.fromList (freeVariables methodBody)) (subtermValue methodBody))
     modifyEnv (Env.insert name addr)
     pure v
     where paramNames = foldMap (freeVariables . subterm)

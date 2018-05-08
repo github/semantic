@@ -349,7 +349,7 @@ instance ( Addressable location (Goto effects (Value location) ': effects)
     | otherwise = throwValueError (Bitwise2Error left right)
       where pair = (left, right)
 
-  lambda parameters freeVariables body = do
+  closure parameters freeVariables body = do
     l <- label body
     injValue . Closure parameters l . Env.bind (foldr Set.delete freeVariables parameters) <$> getEnv
 
