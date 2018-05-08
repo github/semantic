@@ -398,7 +398,6 @@ data ValueError location value resume where
   BoundsError :: [value] -> Prelude.Integer -> ValueError location value value
 
 
-
 instance Eq value => Eq1 (ValueError location value) where
   liftEq _ (StringError a) (StringError b)                       = a == b
   liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
