@@ -52,7 +52,7 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (BC.unpack prefix) (J
 --     `parent/two/__init__.py` and
 --     `parent/three/__init__.py` respectively.
 resolvePythonModules :: Members '[ Reader ModuleInfo
-                                 , Reader (ModuleTable [Module term])
+                                 , Reader (UnevaluatedModules term)
                                  , Resumable ResolutionError
                                  , Trace
                                  ] effects

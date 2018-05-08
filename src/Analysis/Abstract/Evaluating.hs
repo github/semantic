@@ -12,7 +12,7 @@ import Data.Semilattice.Lower
 data EvaluatingState location value = EvaluatingState
   { environment :: Environment location value
   , heap        :: Heap location value
-  , modules     :: ModuleTable (Environment location value, value)
+  , modules     :: EvaluatedModules location value
   , exports     :: Exports location value
   }
 
@@ -27,14 +27,14 @@ evaluating :: Evaluator location term value
                 ': Reader (Environment location value)
                 ': State (Environment location value)
                 ': State (Heap location value)
-                ': State (ModuleTable (Environment location value, value))
+                ': State (EvaluatedModules location value)
                 ': State (Exports location value)
                 ': effects) result
            -> Evaluator location term value effects (Either String result, EvaluatingState location value)
 evaluating
   = fmap (\ ((((result, env), heap), modules), exports) -> (result, EvaluatingState env heap modules exports))
   . runState lowerBound -- State (Exports location value)
-  . runState lowerBound -- State (ModuleTable (Environment location value, value))
+  . runState lowerBound -- State (EvaluatedModules locaiton value)
   . runState lowerBound -- State (Heap location value)
   . runState lowerBound -- State (Environment location value)
   . runReader lowerBound -- Reader (Environment location value)

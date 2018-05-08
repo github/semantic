@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeOperators #-}
 module Control.Abstract.ModuleTable
-( ModuleTable
+( UnevaluatedModules
+, EvaluatedModules
 , getModuleTable
 , resolve
 , listModulesInDir
@@ -24,6 +25,9 @@ import Data.Abstract.ModuleTable as ModuleTable
 import Data.Language
 import Prologue
 
+type UnevaluatedModules term = ModuleTable [Module term]
+type EvaluatedModules location value = ModuleTable (Environment location value, value)
+
 -- | Retrieve the table of evaluated modules.
 getModuleTable :: Member (State (ModuleTable (Environment location value, value))) effects => Evaluator location term value effects (ModuleTable (Environment location value, value))
 getModuleTable = raise get
@@ -34,7 +38,7 @@ modifyModuleTable = raise . modify'
 
 
 -- | Retrieve the table of unevaluated modules.
-askModuleTable :: Member (Reader (ModuleTable [Module term])) effects
+askModuleTable :: Member (Reader (UnevaluatedModules term)) effects
                => Evaluator location term value effects (ModuleTable [Module term])
 askModuleTable = raise ask
 
@@ -49,14 +53,14 @@ localLoadStack = raiseHandler . local
 
 
 -- Resolve a list of module paths to a possible module table entry.
-resolve :: Member (Reader (ModuleTable [Module term])) effects
+resolve :: Member (Reader (UnevaluatedModules term)) effects
         => [FilePath]
         -> Evaluator location term value effects (Maybe ModulePath)
 resolve names = do
   tbl <- askModuleTable
   pure $ find (`ModuleTable.member` tbl) names
 
-listModulesInDir :: Member (Reader (ModuleTable [Module term])) effects
+listModulesInDir :: Member (Reader (UnevaluatedModules term)) effects
                  => FilePath
                  -> Evaluator location term value effects [ModulePath]
 listModulesInDir dir = modulePathsInDir dir <$> askModuleTable
@@ -66,7 +70,7 @@ listModulesInDir dir = modulePathsInDir dir <$> askModuleTable
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
 require :: Members '[ EvalModule term value
-                    , Reader (ModuleTable [Module term])
+                    , Reader (UnevaluatedModules term)
                     , Reader LoadStack
                     , Resumable (LoadError term)
                     , State (Environment location value)
@@ -82,7 +86,7 @@ require name = getModuleTable >>= maybeM (load name) . fmap Just . ModuleTable.l
 --
 -- Always loads/evaluates.
 load :: Members '[ EvalModule term value
-                 , Reader (ModuleTable [Module term])
+                 , Reader (UnevaluatedModules term)
                  , Reader LoadStack
                  , Resumable (LoadError term)
                  , State (Environment location value)

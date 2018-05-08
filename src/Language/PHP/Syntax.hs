@@ -35,7 +35,7 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
-resolvePHPName :: Members '[ Reader (ModuleTable [Module term])
+resolvePHPName :: Members '[ Reader (UnevaluatedModules term)
                            , Resumable ResolutionError
                            ] effects
                => ByteString
@@ -47,7 +47,7 @@ resolvePHPName n = do
         toName = BC.unpack . dropRelativePrefix . stripQuotes
 
 include :: ( AbstractValue location value effects
-           , Members '[ Reader (ModuleTable [Module term])
+           , Members '[ Reader (UnevaluatedModules term)
                       , Resumable ResolutionError
                       , State (Environment location value)
                       , State (Exports location value)

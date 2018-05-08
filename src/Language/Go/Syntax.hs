@@ -29,7 +29,7 @@ defaultAlias :: ImportPath -> Name
 defaultAlias = name . BC.pack . takeFileName . unPath
 
 resolveGoImport :: Members '[ Reader ModuleInfo
-                            , Reader (ModuleTable [Module term])
+                            , Reader (UnevaluatedModules term)
                             , Reader Package.PackageInfo
                             , Resumable ResolutionError
                             , Trace

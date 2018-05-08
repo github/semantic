@@ -56,7 +56,7 @@ type EvaluatableConstraints location term value effects =
              , Reader (Environment location value)
              , Reader LoadStack
              , Reader ModuleInfo
-             , Reader (ModuleTable [Module term])
+             , Reader (UnevaluatedModules term)
              , Reader PackageInfo
              , Resumable (AddressError location value)
              , Resumable (EnvironmentError value)
@@ -178,7 +178,7 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                                   ] outer
                        , Recursive term
                        , inner ~ (Goto inner' value ': inner')
-                       , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': EvalModule term value ': Reader LoadStack ': Reader (ModuleTable [Module term]) ': Reader PackageInfo ': outer)
+                       , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': EvalModule term value ': Reader LoadStack ': Reader (UnevaluatedModules term) ': Reader PackageInfo ': outer)
                        )
                     => (SubtermAlgebra Module term (Evaluator location term value inner value) -> SubtermAlgebra Module term (Evaluator location term value inner value))
                     -> (SubtermAlgebra (Base term) term (Evaluator location term value inner value) -> SubtermAlgebra (Base term) term (Evaluator location term value inner value))
@@ -197,7 +197,7 @@ evaluatePackageBodyWith :: forall location term value inner inner' outer
                                       ] outer
                            , Recursive term
                            , inner ~ (Goto inner' value ': inner')
-                           , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': EvalModule term value ': Reader LoadStack ': Reader (ModuleTable [Module term]) ': outer)
+                           , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': EvalModule term value ': Reader LoadStack ': Reader (UnevaluatedModules term) ': outer)
                            )
                         => (SubtermAlgebra Module term (Evaluator location term value inner value) -> SubtermAlgebra Module term (Evaluator location term value inner value))
                         -> (SubtermAlgebra (Base term) term (Evaluator location term value inner value) -> SubtermAlgebra (Base term) term (Evaluator location term value inner value))
