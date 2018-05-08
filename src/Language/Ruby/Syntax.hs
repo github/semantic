@@ -78,7 +78,6 @@ doRequire :: ( AbstractValue location value effects
                         , Loaded location value
                         , Reader (UnevaluatedModules term)
                         , Resumable (LoadError term)
-                        , Resumable ResolutionError
                         , State (Environment location value)
                         , State (Exports location value)
                         , Trace
