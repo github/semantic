@@ -1,6 +1,6 @@
 {-# LANGUAGE GADTs, TypeOperators #-}
 module Control.Abstract.Goto
-( JumpTable
+( GotoTable
 , Instruction
 , Label
 , label
@@ -16,7 +16,7 @@ import qualified Data.IntMap as IntMap
 import           Prelude hiding (fail)
 import           Prologue
 
-type JumpTable effects value = IntMap.IntMap (Instruction effects value)
+type GotoTable effects value = IntMap.IntMap (Instruction effects value)
 type Instruction effects value = (PackageInfo, ModuleInfo, Eff effects value)
 
 -- | The type of labels.
@@ -44,7 +44,7 @@ data Goto effects value return where
   Label :: PackageInfo -> ModuleInfo -> Eff (Goto effects value ': effects) value -> Goto effects value Label
   Goto  :: Label -> Goto effects value (PackageInfo, ModuleInfo, Eff (Goto effects value ': effects) value)
 
-runGoto :: Member Fail effects => JumpTable (Goto effects value ': effects) value -> Evaluator location term value (Goto effects value ': effects) a -> Evaluator location term value effects a
+runGoto :: Member Fail effects => GotoTable (Goto effects value ': effects) value -> Evaluator location term value (Goto effects value ': effects) a -> Evaluator location term value effects a
 runGoto initial = raiseHandler (relayState (IntMap.size initial, initial) (const pure) (\ (supremum, table) goto yield -> case goto of
   Label packageInfo moduleInfo action -> yield (succ supremum, IntMap.insert supremum (packageInfo, moduleInfo, action) table) supremum
   Goto label                          -> case IntMap.lookup label table of
