@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeOperators #-}
-module Control.Abstract.ModuleTable
+module Control.Abstract.Modules
 ( lookupModule
 , resolve
 , listModulesInDir

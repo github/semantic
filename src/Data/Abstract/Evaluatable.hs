@@ -20,7 +20,7 @@ module Data.Abstract.Evaluatable
 import Control.Abstract as X hiding (Goto(..), LoopControl(..), Modules(..), Return(..))
 import Control.Abstract.Evaluator (LoopControl, Return(..))
 import Control.Abstract.Goto (Goto(..))
-import Control.Abstract.ModuleTable (Modules(..))
+import Control.Abstract.Modules (Modules(..))
 import Control.Monad.Effect as Eff
 import Data.Abstract.Address
 import Data.Abstract.Declarations as X
