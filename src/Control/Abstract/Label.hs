@@ -45,7 +45,7 @@ data Goto effects value return where
   Goto  :: Label -> Goto effects value (PackageInfo, ModuleInfo, Eff (Goto effects value ': effects) value)
 
 runGoto :: Member Fail effects => JumpTable (Goto effects value ': effects) value -> Evaluator location term value (Goto effects value ': effects) a -> Evaluator location term value effects a
-runGoto initial = raiseHandler (relayState (IntMap.size initial, initial) (\ _ -> pure) (\ (supremum, table) goto yield -> case goto of
+runGoto initial = raiseHandler (relayState (IntMap.size initial, initial) (const pure) (\ (supremum, table) goto yield -> case goto of
   Label packageInfo moduleInfo action -> yield (succ supremum, IntMap.insert supremum (packageInfo, moduleInfo, action) table) supremum
   Goto label                          -> case IntMap.lookup label table of
     Just (packageInfo, moduleInfo, action) -> yield (supremum, table) (packageInfo, moduleInfo, action)
