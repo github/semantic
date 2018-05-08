@@ -39,6 +39,4 @@ data Goto effects value return where
 runGoto :: Member Fail effects => GotoTable (Goto effects value ': effects) value -> Evaluator location term value (Goto effects value ': effects) a -> Evaluator location term value effects (a, GotoTable (Goto effects value ': effects) value)
 runGoto initial = raiseHandler (relayState (IntMap.size initial, initial) (\ (_, table) a -> pure (a, table)) (\ (supremum, table) goto yield -> case goto of
   Label action -> yield (succ supremum, IntMap.insert supremum action table) supremum
-  Goto label   -> case IntMap.lookup label table of
-    Just action -> yield (supremum, table) action
-    Nothing     -> fail ("unknown label: " <> show label)))
+  Goto label   -> maybe (fail ("unknown label: " <> show label)) (yield (supremum, table)) (IntMap.lookup label table)))
