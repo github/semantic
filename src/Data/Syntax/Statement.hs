@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, ViewPatterns #-}
 module Data.Syntax.Statement where
 
+import Control.Abstract.Evaluator (ValueRef(..))
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Diffing.Algorithm
@@ -94,16 +95,24 @@ instance Eq1 Assignment where liftEq = genericLiftEq
 instance Ord1 Assignment where liftCompare = genericLiftCompare
 instance Show1 Assignment where liftShowsPrec = genericLiftShowsPrec
 
--- TODO fix this to look at Lvals/Rvals
 instance Evaluatable Assignment where
   eval Assignment{..} = do
-    case freeVariables (subterm assignmentTarget) of
-      [name] -> do
-        v <- subtermValue assignmentValue
-        addr <- lookupOrAlloc name
-        assign addr v
-        Rval <$> (modifyEnv (Env.insert name addr) $> v)
-      _ -> Rval <$> (evaluateInScopedEnv (subtermValue assignmentTarget) (subtermValue assignmentValue))
+    lhs <- subtermRef assignmentTarget
+    rhs <- subtermValue assignmentValue
+
+    case lhs of
+      LvalLocal nam -> do
+        addr <- lookupOrAlloc nam
+        assign addr rhs
+        modifyEnv (Env.insert nam addr)
+      LvalMember _ _ ->
+        -- we don't yet support mutable object properties:
+        pure ()
+      Rval _ ->
+        -- the left hand side of the assignment expression is invalid:
+        pure ()
+
+    pure (Rval rhs)
 
 -- | Post increment operator (e.g. 1++ in Go, or i++ in C).
 newtype PostIncrement a = PostIncrement a
