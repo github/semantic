@@ -2,7 +2,6 @@
 module Control.Abstract.ModuleTable
 ( ModuleTable
 , getModuleTable
-, modifyModuleTable
 , resolve
 , listModulesInDir
 , require
