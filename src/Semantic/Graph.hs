@@ -94,8 +94,8 @@ resumingResolutionError = runResolutionErrorWith (\ err -> raise (trace ("Resolu
 resumingLoadError :: Evaluator location term value (Resumable (LoadError term) ': effects) a -> Evaluator location term value effects a
 resumingLoadError = runLoadErrorWith (\ (LoadError _) -> pure [])
 
-resumingEvalError :: (AbstractHole value, Show value) => Evaluator location term value (Resumable (EvalError value) ': effects) a -> Evaluator location term value effects a
-resumingEvalError = runEvalErrorWith (\ err -> traceM ("EvalError" <> show err) *> case err of
+resumingEvalError :: (AbstractHole value, Member Trace effects, Show value) => Evaluator location term value (Resumable (EvalError value) ': effects) a -> Evaluator location term value effects a
+resumingEvalError = runEvalErrorWith (\ err -> traceE ("EvalError" <> show err) *> case err of
   EnvironmentLookupError{} -> pure hole
   DefaultExportError{}     -> pure ()
   ExportError{}            -> pure ()

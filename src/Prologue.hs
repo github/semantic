@@ -26,8 +26,6 @@ import Data.Text as X (Text)
 import Data.These as X
 import Data.Union as X
 
-import Debug.Trace as X hiding (trace)
-
 import Control.Exception as X hiding (Handler (..), assert, evaluate, throw, throwIO, throwTo)
 
 -- Typeclasses
