@@ -1,5 +1,6 @@
 module Control.Abstract.Label
 ( JumpTable
+, Instruction
 , Label
 , label
 , goto
@@ -11,7 +12,8 @@ import qualified Data.IntMap as IntMap
 import           Prelude hiding (fail)
 import           Prologue
 
-type JumpTable term = IntMap.IntMap (PackageInfo, ModuleInfo, term)
+type JumpTable term = IntMap.IntMap (Instruction term)
+type Instruction term = (PackageInfo, ModuleInfo, term)
 
 -- | The type of labels.
 --   TODO: This should be rolled into 'Name' and tracked in the environment, both so that we can abstract over labels like any other location, and so that we can garbage collect unreachable labels.
