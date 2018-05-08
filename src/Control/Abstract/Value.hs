@@ -40,7 +40,7 @@ class AbstractHole value where
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class Show value => AbstractValue location term value effects where
+class Show value => AbstractValue location value effects where
   -- | Construct an abstract unit value.
   --   TODO: This might be the same as the empty tuple for some value types
   unit :: Evaluator location term value effects value
@@ -149,7 +149,7 @@ class Show value => AbstractValue location term value effects where
 
 
 -- | Attempt to extract a 'Prelude.Bool' from a given value.
-forLoop :: ( AbstractValue location term value effects
+forLoop :: ( AbstractValue location value effects
            , Member (State (Environment location value)) effects
            )
         => Evaluator location term value effects value -- ^ Initial statement
@@ -161,7 +161,7 @@ forLoop initial cond step body =
   localize (initial *> while cond (body *> step))
 
 -- | The fundamental looping primitive, built on top of ifthenelse.
-while :: AbstractValue location term value effects
+while :: AbstractValue location value effects
       => Evaluator location term value effects value
       -> Evaluator location term value effects value
       -> Evaluator location term value effects value
@@ -170,7 +170,7 @@ while cond body = loop $ \ continue -> do
   ifthenelse this (body *> continue) unit
 
 -- | Do-while loop, built on top of while.
-doWhile :: AbstractValue location term value effects
+doWhile :: AbstractValue location value effects
         => Evaluator location term value effects value
         -> Evaluator location term value effects value
         -> Evaluator location term value effects value
@@ -178,7 +178,7 @@ doWhile body cond = loop $ \ continue -> body *> do
   this <- cond
   ifthenelse this continue unit
 
-makeNamespace :: ( AbstractValue location term value effects
+makeNamespace :: ( AbstractValue location value effects
                  , Member (State (Environment location value)) effects
                  , Member (State (Heap location value)) effects
                  , Ord location

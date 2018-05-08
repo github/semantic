@@ -47,7 +47,7 @@ class Evaluatable constr where
   eval expr = throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 type EvaluatableConstraints location term value effects =
-  ( AbstractValue location term value effects
+  ( AbstractValue location value effects
   , Addressable location effects
   , Declarations term
   , FreeVariables term
@@ -93,7 +93,7 @@ runEvalErrorWith = runResumableWith
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
 --   Throws an 'EnvironmentLookupError' if @scopedEnvTerm@ does not have an environment.
-evaluateInScopedEnv :: ( AbstractValue location term value effects
+evaluateInScopedEnv :: ( AbstractValue location value effects
                        , Members '[ Resumable (EvalError value)
                                   , State (Environment location value)
                                   ] effects

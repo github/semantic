@@ -46,7 +46,7 @@ resolvePHPName n = do
   where name = toName n
         toName = BC.unpack . dropRelativePrefix . stripQuotes
 
-include :: ( AbstractValue location term value effects
+include :: ( AbstractValue location value effects
            , Members '[ Reader (ModuleTable [Module term])
                       , Resumable ResolutionError
                       , State (Environment location value)

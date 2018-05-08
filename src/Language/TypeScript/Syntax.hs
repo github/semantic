@@ -115,7 +115,7 @@ typescriptExtensions = ["ts", "tsx", "d.ts"]
 javascriptExtensions :: [String]
 javascriptExtensions = ["js"]
 
-evalRequire :: ( AbstractValue location term value effects
+evalRequire :: ( AbstractValue location value effects
                , Addressable location effects
                , Members '[ EvalModule term value
                           , Reader (Environment location value)

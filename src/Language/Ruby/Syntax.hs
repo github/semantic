@@ -72,7 +72,7 @@ instance Evaluatable Require where
     modifyEnv (`mergeNewer` importedEnv)
     pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
-doRequire :: ( AbstractValue location term value effects
+doRequire :: ( AbstractValue location value effects
              , Members '[ EvalModule term value
                         , Reader LoadStack
                         , Reader (ModuleTable [M.Module term])
@@ -109,7 +109,7 @@ instance Evaluatable Load where
     doLoad path shouldWrap
   eval (Load _) = raise (fail "invalid argument supplied to load, path is required")
 
-doLoad :: ( AbstractValue location term value effects
+doLoad :: ( AbstractValue location value effects
           , Members '[ EvalModule term value
                      , Reader LoadStack
                      , Reader (ModuleTable [M.Module term])
