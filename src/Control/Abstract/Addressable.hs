@@ -1,7 +1,9 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Addressable where
 
+import Control.Abstract.Environment
 import Control.Abstract.Evaluator
+import Control.Abstract.Heap
 import Control.Monad.Effect.Resumable as Eff
 import Data.Abstract.Address
 import Data.Abstract.Environment (insert)

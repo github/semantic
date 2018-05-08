@@ -4,7 +4,7 @@ module Analysis.Abstract.Evaluating
 , evaluating
 ) where
 
-import Control.Abstract.Evaluator
+import Control.Abstract
 import Data.Abstract.Address
 import Data.Semilattice.Lower
 
