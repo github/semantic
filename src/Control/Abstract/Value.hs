@@ -137,8 +137,11 @@ class Show value => AbstractValue location value effects where
   -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
   scopedEnvironment :: value -> Evaluator location term value effects (Maybe (Environment location value))
 
-  -- | Evaluate an abstraction (a binder like a lambda or method definition).
-  lambda :: FreeVariables term => [Name] -> Subterm term (Evaluator location term value effects value) -> Evaluator location term value effects value
+  -- | Build a closure (a binder like a lambda or method definition).
+  lambda :: [Name]                                      -- ^ The parameter names.
+         -> Set Name                                    -- ^ The set of free variables to close over.
+         -> Evaluator location term value effects value -- ^ The evaluator for the body of the closure.
+         -> Evaluator location term value effects value
   -- | Evaluate an application (like a function call).
   call :: value -> [Evaluator location term value effects value] -> Evaluator location term value effects value
 

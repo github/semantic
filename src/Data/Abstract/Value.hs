@@ -349,9 +349,9 @@ instance ( Addressable location (Goto effects (Value location) ': effects)
     | otherwise = throwValueError (Bitwise2Error left right)
       where pair = (left, right)
 
-  lambda names (Subterm body bodyValue) = do
-    l <- label bodyValue
-    injValue . Closure names l . Env.bind (foldr Set.delete (Set.fromList (freeVariables body)) names) <$> getEnv
+  lambda parameters freeVariables body = do
+    l <- label body
+    injValue . Closure parameters l . Env.bind (foldr Set.delete freeVariables parameters) <$> getEnv
 
   call op params = do
     case prjValue op of

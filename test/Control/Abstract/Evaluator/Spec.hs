@@ -22,7 +22,7 @@ spec = parallel $ do
 
   it "calls functions" $ do
     (expected, _) <- evaluate $ do
-      identity <- lambda [name "x"] (term (variable (name "x")))
+      identity <- lambda [name "x"] lowerBound (variable (name "x"))
       call identity [integer 123]
     expected `shouldBe` Right (Value.injValue (Value.Integer (Number.Integer 123)))
 
@@ -46,9 +46,6 @@ constraining = id
 reassociate :: Either String (Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) result))) -> Either (SomeExc (Sum '[Const String, exc1, exc2, exc3])) result
 reassociate (Left s) = Left (SomeExc (injectSum (Const s)))
 reassociate (Right (Right (Right (Right a)))) = Right a
-
-term :: TermEvaluator Value -> Subterm Term (TermEvaluator Value)
-term eval = Subterm (Term eval) eval
 
 type TermEffects = Goto GotoEffects Value ': GotoEffects
 type GotoEffects
