@@ -138,7 +138,7 @@ class Show value => AbstractValue location term value effects where
   scopedEnvironment :: value -> Evaluator location term value effects (Maybe (Environment location value))
 
   -- | Evaluate an abstraction (a binder like a lambda or method definition).
-  lambda :: [Name] -> Subterm term (Evaluator location term value effects value) -> Evaluator location term value effects value
+  lambda :: FreeVariables term => [Name] -> Subterm term (Evaluator location term value effects value) -> Evaluator location term value effects value
   -- | Evaluate an application (like a function call).
   call :: value -> [Evaluator location term value effects value] -> Evaluator location term value effects value
 
