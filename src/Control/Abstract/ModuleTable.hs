@@ -32,9 +32,9 @@ type EvaluatedModules location value = ModuleTable (Maybe (Environment location 
 getModuleTable :: Member (State (EvaluatedModules location value)) effects => Evaluator location term value effects (EvaluatedModules location value)
 getModuleTable = raise get
 
--- | Update the evaluated module table.
-modifyModuleTable :: Member (State (EvaluatedModules location value)) effects => (EvaluatedModules location value -> EvaluatedModules location value) -> Evaluator location term value effects ()
-modifyModuleTable = raise . modify'
+-- | Cache a result in the evaluated module table.
+cacheModule :: Member (State (EvaluatedModules location value)) effects => ModulePath -> Maybe (Environment location value, value) -> Evaluator location term value effects ()
+cacheModule path result = raise (modify' (ModuleTable.insert path result))
 
 
 -- | Retrieve the table of unevaluated modules.
@@ -109,7 +109,7 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= run
           v <- localLoadStack (loadStackPush (moduleInfo x)) (traceE ("load (evaluating): " <> show mPath) *> evaluateModule x)
           traceE ("load done:" <> show mPath)
           env <- filterEnv <$> getExports <*> getEnv
-          modifyModuleTable (ModuleTable.insert name (Just (env, v)))
+          cacheModule name (Just (env, v))
           pure (Just (env, v))
 
     -- TODO: If the set of exports is empty because no exports have been
