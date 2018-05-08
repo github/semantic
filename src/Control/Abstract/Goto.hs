@@ -49,4 +49,4 @@ runGoto initial = raiseHandler (relayState (IntMap.size initial, initial) (const
   Label packageInfo moduleInfo action -> yield (succ supremum, IntMap.insert supremum (packageInfo, moduleInfo, action) table) supremum
   Goto label                          -> case IntMap.lookup label table of
     Just (packageInfo, moduleInfo, action) -> yield (supremum, table) (packageInfo, moduleInfo, action)
-    Nothing                                -> raise (fail ("unknown label: " <> show label))))
+    Nothing                                -> fail ("unknown label: " <> show label)))
