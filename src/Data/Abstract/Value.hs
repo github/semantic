@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value where
 
 import Control.Abstract
@@ -313,7 +313,7 @@ instance ( Addressable location effects
         tentative x i j = attemptUnsafeArithmetic (x i j)
 
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: Either ArithException Number.SomeNumber -> Evaluator location term (Value location) effects (Value location)
+        specialize :: (AbstractValue location term (Value location) effects, Member (Resumable (ValueError location)) effects) => Either ArithException Number.SomeNumber -> Evaluator location term (Value location) effects (Value location)
         specialize (Left exc) = throwValueError (ArithmeticError exc)
         specialize (Right (Number.SomeNumber (Number.Integer i))) = integer i
         specialize (Right (Number.SomeNumber (Number.Ratio r)))   = rational r
@@ -332,7 +332,7 @@ instance ( Addressable location effects
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: Ord a => a -> a -> Evaluator location term (Value location) effects (Value location)
+        go :: (AbstractValue location term (Value location) effects, Ord a) => a -> a -> Evaluator location term (Value location) effects (Value location)
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
           Generalized -> integer (orderingToInt (compare l r))
