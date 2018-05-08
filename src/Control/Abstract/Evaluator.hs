@@ -5,9 +5,6 @@ module Control.Abstract.Evaluator
   , EvalClosure(..)
   , evaluateClosureBody
   , runEvalClosure
-  , EvalModule(..)
-  , evaluateModule
-  , runEvalModule
   , Return(..)
   , earlyReturn
   , catchReturn
@@ -35,7 +32,6 @@ import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader hiding (runReader)
 import Control.Monad.Effect.Resumable
 import Control.Monad.Effect.State hiding (runState)
-import Data.Abstract.Module
 import Prologue
 
 -- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the location, term, and value types.
@@ -60,17 +56,6 @@ evaluateClosureBody = send . EvalClosure
 
 runEvalClosure :: (term -> Evaluator location term value effects value) -> Evaluator location term value (EvalClosure term value ': effects) a -> Evaluator location term value effects a
 runEvalClosure evalClosure = runEffect (\ (EvalClosure term) yield -> evalClosure term >>= yield)
-
-
--- | An effect to evaluate a module.
-data EvalModule term value resume where
-  EvalModule :: Module term -> EvalModule term value value
-
-evaluateModule :: Member (EvalModule term value) effects => Module term -> Evaluator location term value effects value
-evaluateModule = send . EvalModule
-
-runEvalModule :: (Module term -> Evaluator location term value effects value) -> Evaluator location term value (EvalModule term value ': effects) a -> Evaluator location term value effects a
-runEvalModule evalModule = runEffect (\ (EvalModule m) yield -> evalModule m >>= yield)
 
 
 -- | An effect for explicitly returning out of a function/method body.
