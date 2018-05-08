@@ -206,9 +206,8 @@ instance AbstractHole (Value location) where
   hole = injValue Hole
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Addressable location effects
-         , Members '[ EvalClosure term (Value location)
-                    , Fail
+instance ( Addressable location (Goto effects (Value location) ': effects)
+         , Members '[ Fail
                     , LoopControl (Value location)
                     , Reader (Environment location (Value location))
                     , Reader ModuleInfo
@@ -218,12 +217,11 @@ instance ( Addressable location effects
                     , Return (Value location)
                     , State (Environment location (Value location))
                     , State (Heap location (Value location))
-                    , State (JumpTable term)
                     ] effects
          , Reducer (Value location) (Cell location (Value location))
          , Show location
          )
-      => AbstractValue location term (Value location) effects where
+      => AbstractValue location term (Value location) (Goto effects (Value location) ': effects) where
   unit     = pure . injValue $ Unit
   integer  = pure . injValue . Integer . Number.Integer
   boolean  = pure . injValue . Boolean
@@ -351,8 +349,8 @@ instance ( Addressable location effects
     | otherwise = throwValueError (Bitwise2Error left right)
       where pair = (left, right)
 
-  lambda names (Subterm body _) = do
-    l <- label body
+  lambda names (Subterm body bodyValue) = do
+    l <- label bodyValue
     injValue . Closure names l . Env.bind (foldr Set.delete (Set.fromList (freeVariables body)) names) <$> getEnv
 
   call op params = do
@@ -366,10 +364,8 @@ instance ( Addressable location effects
             a <- alloc name
             assign a v
             Env.insert name a <$> rest) (pure env) (zip names params)
-          localEnv (mergeEnvs bindings) (evalClosure body)
+          localEnv (mergeEnvs bindings) (catchReturn body (\ (Return value) -> pure value))
       Nothing -> throwValueError (CallError op)
-    where
-      evalClosure term = catchReturn (evaluateClosureBody term) (\ (Return value) -> pure value)
 
   loop x = catchLoopControl (fix x) (\ control -> case control of
     Break value -> pure value

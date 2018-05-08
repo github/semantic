@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
@@ -19,6 +19,7 @@ module Data.Abstract.Evaluatable
 
 import Control.Abstract as X hiding (LoopControl(..), Return(..), Goto(..))
 import Control.Abstract.Evaluator (LoopControl, Return(..))
+import Control.Abstract.Label (Goto(..))
 import Control.Monad.Effect as Eff
 import Data.Abstract.Address
 import Data.Abstract.Declarations as X
@@ -168,43 +169,50 @@ traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 
 -- | Evaluate a given package.
 evaluatePackageWith :: ( Evaluatable (Base term)
-                       , EvaluatableConstraints location term value termEffects
+                       , EvaluatableConstraints location term value gotoEffects
                        , Members '[ Fail
                                   , Reader (Environment location value)
                                   , State (Environment location value)
+                                  , State (Exports location value)
+                                  , State (Heap location value)
+                                  , State (ModuleTable (Environment location value, value))
                                   ] effects
                        , Recursive term
-                       , termEffects ~ (LoopControl value ': Return value ': EvalClosure term value ': moduleEffects)
+                       , gotoEffects ~ (Goto termEffects value ': termEffects)
+                       , termEffects ~ (LoopControl value ': Return value ': moduleEffects)
                        , moduleEffects ~ (Reader ModuleInfo ': EvalModule term value ': packageBodyEffects)
-                       , packageBodyEffects ~ (Reader LoadStack ': State (JumpTable term) ': Reader (ModuleTable [Module term]) ': packageEffects)
+                       , packageBodyEffects ~ (Reader LoadStack ': Reader (ModuleTable [Module term]) ': packageEffects)
                        , packageEffects ~ (Reader PackageInfo ': effects)
                        )
                     => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value moduleEffects value))
-                    -> (SubtermAlgebra (Base term) term (Evaluator location term value termEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value termEffects value))
+                    -> (SubtermAlgebra (Base term) term (Evaluator location term value gotoEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value gotoEffects value))
                     -> Package term
                     -> Evaluator location term value effects [value]
 evaluatePackageWith perModule perTerm = runReader . packageInfo <*> evaluatePackageBodyWith perModule perTerm . packageBody
 
 -- | Evaluate a given package body (module table and entry points).
-evaluatePackageBodyWith :: ( Evaluatable (Base term)
-                           , EvaluatableConstraints location term value termEffects
+evaluatePackageBodyWith :: forall location term value gotoEffects termEffects moduleEffects packageBodyEffects effects
+                        .  ( Evaluatable (Base term)
+                           , EvaluatableConstraints location term value gotoEffects
                            , Members '[ Fail
                                       , Reader (Environment location value)
                                       , State (Environment location value)
+                                      , State (Exports location value)
+                                      , State (Heap location value)
+                                      , State (ModuleTable (Environment location value, value))
                                       ] effects
                            , Recursive term
-                           , termEffects ~ (LoopControl value ': Return value ': EvalClosure term value ': moduleEffects)
+                           , gotoEffects ~ (Goto termEffects value ': termEffects)
+                           , termEffects ~ (LoopControl value ': Return value ': moduleEffects)
                            , moduleEffects ~ (Reader ModuleInfo ': EvalModule term value ': packageBodyEffects)
-                           , packageBodyEffects ~ (Reader LoadStack ': State (JumpTable term) ': Reader (ModuleTable [Module term]) ': effects)
+                           , packageBodyEffects ~ (Reader LoadStack ': Reader (ModuleTable [Module term]) ': effects)
                            )
                         => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value moduleEffects value))
-                        -> (SubtermAlgebra (Base term) term (Evaluator location term value termEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value termEffects value))
+                        -> (SubtermAlgebra (Base term) term (Evaluator location term value gotoEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value gotoEffects value))
                         -> PackageBody term
                         -> Evaluator location term value effects [value]
 evaluatePackageBodyWith perModule perTerm body
   = runReader (packageModules body)
-  . fmap fst
-  . runState lowerBound
   . runReader lowerBound
   . runEvalModule evalModule
   . withPrelude (packagePrelude body)
@@ -216,12 +224,13 @@ evaluatePackageBodyWith perModule perTerm body
           . fmap (Subterm <*> evalTerm)
           $ m
         evalTerm
-          = runEvalClosure evalTerm
-          . runReturn
+          = runReturn
           . runLoopControl
+          . runGoto lowerBound
           . foldSubterms (perTerm eval)
 
-        evaluateEntryPoint m sym = runReader (ModuleInfo m) . runEvalClosure evalTerm . runReturn . runLoopControl $ do
+        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location term value (EvalModule term value ': packageBodyEffects) value
+        evaluateEntryPoint m sym = runReader (ModuleInfo m) . runReturn . runLoopControl . runGoto lowerBound $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
 
