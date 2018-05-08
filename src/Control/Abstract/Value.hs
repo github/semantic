@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, Rank2Types #-}
+{-# LANGUAGE Rank2Types #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractHole(..)
