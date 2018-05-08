@@ -1,5 +1,5 @@
 {-# LANGUAGE GADTs, TypeOperators #-}
-module Control.Abstract.Label
+module Control.Abstract.Goto
 ( JumpTable
 , Instruction
 , Label
