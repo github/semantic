@@ -1,9 +1,11 @@
+{-# LANGUAGE GADTs, TypeOperators #-}
 module Control.Abstract.Label
 ( JumpTable
 , Instruction
 , Label
 , label
 , goto
+, Goto(..)
 ) where
 
 import           Control.Abstract.Context
@@ -42,3 +44,8 @@ goto label comp = do
   case maybeTerm of
     Just (packageInfo, moduleInfo, term) -> raiseHandler (local (const packageInfo)) (raiseHandler (local (const moduleInfo)) (comp term))
     Nothing -> raise (fail ("unknown label: " <> show label))
+
+
+data Goto effects value return where
+  Label :: PackageInfo -> ModuleInfo -> Eff (Goto effects value ': effects) value -> Goto effects value Label
+  Goto  :: Label -> Goto effects value (PackageInfo, ModuleInfo, Eff (Goto effects value ': effects) value)

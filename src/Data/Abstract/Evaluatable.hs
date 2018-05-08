@@ -17,7 +17,7 @@ module Data.Abstract.Evaluatable
 , isolate
 ) where
 
-import Control.Abstract as X hiding (LoopControl(..), Return(..))
+import Control.Abstract as X hiding (LoopControl(..), Return(..), Goto(..))
 import Control.Abstract.Evaluator (LoopControl, Return(..))
 import Control.Monad.Effect as Eff
 import Data.Abstract.Address
