@@ -62,7 +62,7 @@ type GotoEffects
      , Reader (Environment Precise Value)
      , State (Environment Precise Value)
      , State (Heap Precise Value)
-     , State (ModuleTable (Environment Precise Value, Value))
+     , State (ModuleTable (Maybe (Environment Precise Value, Value)))
      , State (Exports Precise Value)
      , IO
      ]
