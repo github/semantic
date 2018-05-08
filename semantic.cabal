@@ -236,12 +236,13 @@ test-suite test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       Assigning.Assignment.Spec
-                     , Analysis.Go.Spec
+  other-modules:       Analysis.Go.Spec
                      , Analysis.PHP.Spec
                      , Analysis.Python.Spec
                      , Analysis.Ruby.Spec
                      , Analysis.TypeScript.Spec
+                     , Assigning.Assignment.Spec
+                     , Control.Abstract.Evaluator.Spec
                      , Data.Diff.Spec
                      , Data.Abstract.Path.Spec
                      , Data.Functor.Classes.Generic.Spec

@@ -1,3 +1,4 @@
+{-# LANGUAGE GADTs, RankNTypes, TypeOperators #-}
 module Control.Abstract.Environment
 ( Environment
 , getEnv
@@ -10,7 +11,10 @@ module Control.Abstract.Environment
 , localEnv
 , localize
 , lookupEnv
-, lookupWith
+, EnvironmentError(..)
+, freeVariableError
+, runEnvironmentError
+, runEnvironmentErrorWith
 ) where
 
 import Control.Abstract.Evaluator
@@ -65,8 +69,21 @@ localize = localEnv id
 lookupEnv :: Members '[Reader (Environment location value), State (Environment location value)] effects => Name -> Evaluator location term value effects (Maybe (Address location value))
 lookupEnv name = (<|>) <$> (Env.lookup name <$> getEnv) <*> (Env.lookup name <$> defaultEnvironment)
 
--- | Look up a 'Name' in the environment, running an action with the resolved address (if any).
-lookupWith :: Members '[Reader (Environment location value), State (Environment location value)] effects => (Address location value -> Evaluator location term value effects a) -> Name -> Evaluator location term value effects (Maybe a)
-lookupWith with name = do
-  addr <- lookupEnv name
-  maybe (pure Nothing) (fmap Just . with) addr
+
+-- | Errors involving the environment.
+data EnvironmentError value return where
+  FreeVariable :: Name -> EnvironmentError value value
+
+deriving instance Eq (EnvironmentError value return)
+deriving instance Show (EnvironmentError value return)
+instance Show1 (EnvironmentError value) where liftShowsPrec _ _ = showsPrec
+instance Eq1 (EnvironmentError value) where liftEq _ (FreeVariable n1) (FreeVariable n2) = n1 == n2
+
+freeVariableError :: Member (Resumable (EnvironmentError value)) effects => Name -> Evaluator location term value effects value
+freeVariableError = throwResumable . FreeVariable
+
+runEnvironmentError :: Evaluator location term value (Resumable (EnvironmentError value) ': effects) a -> Evaluator location term value effects (Either (SomeExc (EnvironmentError value)) a)
+runEnvironmentError = raiseHandler runError
+
+runEnvironmentErrorWith :: (forall resume . EnvironmentError value resume -> Evaluator location term value effects resume) -> Evaluator location term value (Resumable (EnvironmentError value) ': effects) a -> Evaluator location term value effects a
+runEnvironmentErrorWith = runResumableWith
