@@ -51,7 +51,7 @@ type TermEffects
      , EvalClosure Term Value
      , Resumable (AddressError Precise Value)
      , Resumable (EnvironmentError Value)
-     , Resumable (Value.ValueError Precise Value)
+     , Resumable (Value.ValueError Precise)
      , Reader ModuleInfo
      , Reader PackageInfo
      , Fail

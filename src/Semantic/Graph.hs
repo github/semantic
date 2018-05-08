@@ -107,7 +107,7 @@ resumingAddressError = runAddressErrorWith (\ err -> traceM ("AddressError:" <> 
   UnallocatedAddress _   -> pure lowerBound
   UninitializedAddress _ -> pure hole)
 
-resumingValueError :: (AbstractHole value, Member (State (Environment location value)) effects, Show value) => Evaluator location term value (Resumable (ValueError location value) ': effects) a -> Evaluator location term value effects a
+resumingValueError :: (Member (State (Environment location (Value location))) effects, Show location) => Evaluator location term (Value location) (Resumable (ValueError location) ': effects) a -> Evaluator location term (Value location) effects a
 resumingValueError = runValueErrorWith (\ err -> traceM ("ValueError" <> show err) *> case err of
   CallError val     -> pure val
   StringError val   -> pure (pack (show val))

@@ -216,7 +216,7 @@ instance ( Addressable location effects
                     , Reader ModuleInfo
                     , Reader PackageInfo
                     , Resumable (AddressError location (Value location))
-                    , Resumable (ValueError location (Value location))
+                    , Resumable (ValueError location)
                     , Return (Value location)
                     , State (Environment location (Value location))
                     , State (Heap location (Value location))
@@ -380,25 +380,25 @@ instance ( Addressable location effects
 
 
 -- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
-data ValueError location value resume where
-  StringError            :: value          -> ValueError location value ByteString
-  BoolError              :: value          -> ValueError location value Bool
-  IndexError             :: value -> value -> ValueError location value value
-  NamespaceError         :: Prelude.String -> ValueError location value (Environment location value)
-  CallError              :: value          -> ValueError location value value
-  NumericError           :: value          -> ValueError location value value
-  Numeric2Error          :: value -> value -> ValueError location value value
-  ComparisonError        :: value -> value -> ValueError location value value
-  BitwiseError           :: value          -> ValueError location value value
-  Bitwise2Error          :: value -> value -> ValueError location value value
-  KeyValueError          :: value          -> ValueError location value (value, value)
+data ValueError location resume where
+  StringError            :: Value location                   -> ValueError location ByteString
+  BoolError              :: Value location                   -> ValueError location Bool
+  IndexError             :: Value location -> Value location -> ValueError location (Value location)
+  NamespaceError         :: Prelude.String                   -> ValueError location (Environment location (Value location))
+  CallError              :: Value location                   -> ValueError location (Value location)
+  NumericError           :: Value location                   -> ValueError location (Value location)
+  Numeric2Error          :: Value location -> Value location -> ValueError location (Value location)
+  ComparisonError        :: Value location -> Value location -> ValueError location (Value location)
+  BitwiseError           :: Value location                   -> ValueError location (Value location)
+  Bitwise2Error          :: Value location -> Value location -> ValueError location (Value location)
+  KeyValueError          :: Value location                   -> ValueError location (Value location, Value location)
   -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
-  ArithmeticError :: ArithException -> ValueError location value value
+  ArithmeticError        :: ArithException                   -> ValueError location (Value location)
   -- Out-of-bounds error
-  BoundsError :: [value] -> Prelude.Integer -> ValueError location value value
+  BoundsError            :: [Value location] -> Prelude.Integer -> ValueError location (Value location)
 
 
-instance Eq value => Eq1 (ValueError location value) where
+instance Eq location => Eq1 (ValueError location) where
   liftEq _ (StringError a) (StringError b)                       = a == b
   liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
   liftEq _ (CallError a) (CallError b)                           = a == b
@@ -412,15 +412,15 @@ instance Eq value => Eq1 (ValueError location value) where
   liftEq _ (BoundsError a b) (BoundsError c d)                   = (a == c) && (b == d)
   liftEq _ _             _                                       = False
 
-deriving instance (Show value) => Show (ValueError location value resume)
-instance (Show value) => Show1 (ValueError location value) where
+deriving instance Show location => Show (ValueError location resume)
+instance Show location => Show1 (ValueError location) where
   liftShowsPrec _ _ = showsPrec
 
-throwValueError :: Member (Resumable (ValueError location value)) effects => ValueError location value resume -> Evaluator location term value effects resume
+throwValueError :: Member (Resumable (ValueError location)) effects => ValueError location resume -> Evaluator location term value effects resume
 throwValueError = throwResumable
 
-runValueError :: Evaluator location term value (Resumable (ValueError location value) ': effects) a -> Evaluator location term value effects (Either (SomeExc (ValueError location value)) a)
+runValueError :: Evaluator location term value (Resumable (ValueError location) ': effects) a -> Evaluator location term value effects (Either (SomeExc (ValueError location)) a)
 runValueError = raiseHandler runError
 
-runValueErrorWith :: (forall resume . ValueError location value resume -> Evaluator location term value effects resume) -> Evaluator location term value (Resumable (ValueError location value) ': effects) a -> Evaluator location term value effects a
+runValueErrorWith :: (forall resume . ValueError location resume -> Evaluator location term value effects resume) -> Evaluator location term value (Resumable (ValueError location) ': effects) a -> Evaluator location term value effects a
 runValueErrorWith = runResumableWith
