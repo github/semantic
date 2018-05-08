@@ -243,7 +243,7 @@ instance ( Addressable location effects
 
   asPair val
     | Just (KVPair k v) <- prjValue val = pure (k, v)
-    | otherwise = throwResumable @(ValueError location (Value location)) $ KeyValueError val
+    | otherwise = throwValueError $ KeyValueError val
 
   hash = pure . injValue . Hash . fmap (injValue . uncurry KVPair)
 
@@ -258,7 +258,7 @@ instance ( Addressable location effects
     pure (injValue (Namespace n (Env.mergeNewer env' env)))
     where asNamespaceEnv v
             | Just (Namespace _ env') <- prjValue v = pure env'
-            | otherwise                             = throwResumable $ NamespaceError ("expected " <> show v <> " to be a namespace")
+            | otherwise                             = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
   scopedEnvironment o
     | Just (Class _ env) <- prjValue o = pure (Just env)
@@ -267,7 +267,7 @@ instance ( Addressable location effects
 
   asString v
     | Just (String n) <- prjValue v = pure n
-    | otherwise                     = throwResumable @(ValueError location (Value location)) $ StringError v
+    | otherwise                     = throwValueError $ StringError v
 
   ifthenelse cond if' else' = do
     isHole <- isHole cond
@@ -279,7 +279,7 @@ instance ( Addressable location effects
 
   asBool val
     | Just (Boolean b) <- prjValue val = pure b
-    | otherwise = throwResumable @(ValueError location (Value location)) $ BoolError val
+    | otherwise = throwValueError $ BoolError val
 
   isHole val = pure (prjValue val == Just Hole)
 
