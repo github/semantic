@@ -369,7 +369,7 @@ instance ( Addressable location effects
           localEnv (mergeEnvs bindings) (evalClosure body)
       Nothing -> throwValueError (CallError op)
     where
-      evalClosure term = catchReturn (\ (Return value) -> pure value) (evaluateClosureBody term)
+      evalClosure term = catchReturn (evaluateClosureBody term) (\ (Return value) -> pure value)
 
   loop x = catchLoopControl (fix x) (\ control -> case control of
     Break value -> pure value

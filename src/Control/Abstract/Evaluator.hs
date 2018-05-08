@@ -83,8 +83,8 @@ deriving instance Show value => Show (Return value a)
 earlyReturn :: Member (Return value) effects => value -> Evaluator location term value effects value
 earlyReturn = send . Return
 
-catchReturn :: Member (Return value) effects => (forall x . Return value x -> Evaluator location term value effects a) -> Evaluator location term value effects a -> Evaluator location term value effects a
-catchReturn handler = raiseHandler (interpose pure (\ ret _ -> lower (handler ret)))
+catchReturn :: Member (Return value) effects => Evaluator location term value effects a -> (forall x . Return value x -> Evaluator location term value effects a) -> Evaluator location term value effects a
+catchReturn action handler = raiseHandler (interpose pure (\ ret _ -> lower (handler ret))) action
 
 runReturn :: Evaluator location term value (Return value ': effects) value -> Evaluator location term value effects value
 runReturn = runEffect (\ (Return value) _ -> pure value)
