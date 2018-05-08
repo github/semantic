@@ -32,6 +32,9 @@ type EvaluatedModules location value = ModuleTable (Maybe (Environment location 
 lookupModule :: Member (State (EvaluatedModules location value)) effects => ModulePath -> Evaluator location term value effects (Maybe (Maybe (Environment location value, value)))
 lookupModule path = ModuleTable.lookup path <$> raise get
 
+loadingModule :: Member (State (EvaluatedModules location value)) effects => ModulePath -> Evaluator location term value effects Bool
+loadingModule path = isJust <$> lookupModule path
+
 -- | Cache a result in the evaluated module table.
 cacheModule :: Member (State (EvaluatedModules location value)) effects => ModulePath -> Maybe (Environment location value, value) -> Evaluator location term value effects ()
 cacheModule path result = raise (modify' (ModuleTable.insert path result))
@@ -103,8 +106,9 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= run
     evalAndCache x = do
       let mPath = modulePath (moduleInfo x)
       LoadStack{..} <- askLoadStack
+      loading <- loadingModule mPath
       cacheModule name Nothing
-      if moduleInfo x `elem` unLoadStack
+      if loading
         then traceE ("load (skip evaluating, circular load): " <> show mPath) $> Nothing
         else do
           v <- localLoadStack (loadStackPush (moduleInfo x)) (traceE ("load (evaluating): " <> show mPath) *> evaluateModule x)
