@@ -176,7 +176,7 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                        , Recursive term
                        , termEffects ~ (LoopControl value ': Return value ': EvalClosure term value ': moduleEffects)
                        , moduleEffects ~ (Reader ModuleInfo ': EvalModule term value ': packageBodyEffects)
-                       , packageBodyEffects ~ (Reader LoadStack ': Reader (ModuleTable [Module term]) ': packageEffects)
+                       , packageBodyEffects ~ (Reader LoadStack ': State (JumpTable term) ': Reader (ModuleTable [Module term]) ': packageEffects)
                        , packageEffects ~ (Reader PackageInfo ': effects)
                        )
                     => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value moduleEffects value))
@@ -195,7 +195,7 @@ evaluatePackageBodyWith :: ( Evaluatable (Base term)
                            , Recursive term
                            , termEffects ~ (LoopControl value ': Return value ': EvalClosure term value ': moduleEffects)
                            , moduleEffects ~ (Reader ModuleInfo ': EvalModule term value ': packageBodyEffects)
-                           , packageBodyEffects ~ (Reader LoadStack ': Reader (ModuleTable [Module term]) ': effects)
+                           , packageBodyEffects ~ (Reader LoadStack ': State (JumpTable term) ': Reader (ModuleTable [Module term]) ': effects)
                            )
                         => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value moduleEffects value))
                         -> (SubtermAlgebra (Base term) term (Evaluator location term value termEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value termEffects value))
@@ -203,6 +203,8 @@ evaluatePackageBodyWith :: ( Evaluatable (Base term)
                         -> Evaluator location term value effects [value]
 evaluatePackageBodyWith perModule perTerm body
   = runReader (packageModules body)
+  . fmap fst
+  . runState lowerBound
   . runReader lowerBound
   . runEvalModule evalModule
   . withPrelude (packagePrelude body)
