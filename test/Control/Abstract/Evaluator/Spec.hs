@@ -2,7 +2,6 @@ module Control.Abstract.Evaluator.Spec where
 
 import Analysis.Abstract.Evaluating (evaluating)
 import Control.Abstract
-import Control.Monad.Effect (runM)
 import Data.Abstract.Module
 import qualified Data.Abstract.Number as Number
 import Data.Abstract.Package
@@ -27,7 +26,6 @@ spec = parallel $ do
 
 evaluate
   = runM
-  . lower
   . fmap (first reassociate)
   . evaluating
   . runReader (PackageInfo (name "test") Nothing)
