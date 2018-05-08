@@ -4,7 +4,6 @@ module Language.Ruby.Syntax where
 import           Control.Monad (unless)
 import           Data.Abstract.Evaluatable
 import qualified Data.Abstract.Module as M
-import           Data.Abstract.ModuleTable as ModuleTable
 import           Data.Abstract.Path
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.Language as Language
@@ -17,7 +16,7 @@ import           System.FilePath.Posix
 -- TODO: Fully sort out ruby require/load mechanics
 --
 -- require "json"
-resolveRubyName :: Members '[ Reader (ModuleTable [M.Module term])
+resolveRubyName :: Members '[ Modules location value
                             , Resumable ResolutionError
                             ] effects
                 => ByteString
@@ -29,7 +28,7 @@ resolveRubyName name = do
   maybe (throwResumable $ NotFoundError name' paths Language.Ruby) pure modulePath
 
 -- load "/root/src/file.rb"
-resolveRubyPath :: Members '[ Reader (ModuleTable [M.Module term])
+resolveRubyPath :: Members '[ Modules location value
                             , Resumable ResolutionError
                             ] effects
                 => ByteString
@@ -74,14 +73,7 @@ instance Evaluatable Require where
     pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
 doRequire :: ( AbstractValue location value effects
-             , Members '[ EvalModule term value
-                        , Loaded location value
-                        , Reader (UnevaluatedModules term)
-                        , Resumable (LoadError term)
-                        , State (Environment location value)
-                        , State (Exports location value)
-                        , Trace
-                        ] effects
+             , Member (Modules location value) effects
              )
           => M.ModulePath
           -> Evaluator location term value effects (Environment location value, value)
@@ -110,10 +102,7 @@ instance Evaluatable Load where
   eval (Load _) = raise (fail "invalid argument supplied to load, path is required")
 
 doLoad :: ( AbstractValue location value effects
-          , Members '[ EvalModule term value
-                     , Loaded location value
-                     , Reader (UnevaluatedModules term)
-                     , Resumable (LoadError term)
+          , Members '[ Modules location value
                      , Resumable ResolutionError
                      , State (Environment location value)
                      , State (Exports location value)

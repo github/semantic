@@ -14,11 +14,13 @@ module Data.Abstract.Evaluatable
 , throwEvalError
 , traceResolve
 , isolate
+, Modules
 ) where
 
-import Control.Abstract as X hiding (LoopControl(..), Return(..), Goto(..))
+import Control.Abstract as X hiding (Goto(..), LoopControl(..), Modules(..), Return(..))
 import Control.Abstract.Evaluator (LoopControl, Return(..))
 import Control.Abstract.Goto (Goto(..))
+import Control.Abstract.ModuleTable (Modules(..))
 import Control.Monad.Effect as Eff
 import Data.Abstract.Address
 import Data.Abstract.Declarations as X
@@ -50,17 +52,14 @@ type EvaluatableConstraints location term value effects =
   , Addressable location effects
   , Declarations term
   , FreeVariables term
-  , Members '[ EvalModule term value
-             , Loaded location value
-             , LoopControl value
+  , Members '[ LoopControl value
+             , Modules location value
              , Reader (Environment location value)
              , Reader ModuleInfo
-             , Reader (UnevaluatedModules term)
              , Reader PackageInfo
              , Resumable (AddressError location value)
              , Resumable (EnvironmentError value)
              , Resumable (EvalError value)
-             , Resumable (LoadError term)
              , Resumable ResolutionError
              , Resumable (Unspecialized value)
              , Return value
@@ -171,13 +170,15 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                        , EvaluatableConstraints location term value inner
                        , Members '[ Fail
                                   , Reader (Environment location value)
+                                  , Resumable (LoadError term)
                                   , State (Environment location value)
-                                  , State (EvaluatedModules location value)
+                                  , State (Exports location value)
+                                  , State (ModuleTable (Maybe (Environment location value, value)))
                                   , Trace
                                   ] outer
                        , Recursive term
                        , inner ~ (Goto inner' value ': inner')
-                       , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': EvalModule term value ': Loaded location value ': Reader (UnevaluatedModules term) ': Reader PackageInfo ': outer)
+                       , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': Modules location value ': Reader PackageInfo ': outer)
                        )
                     => (SubtermAlgebra Module term (Evaluator location term value inner value) -> SubtermAlgebra Module term (Evaluator location term value inner value))
                     -> (SubtermAlgebra (Base term) term (Evaluator location term value inner value) -> SubtermAlgebra (Base term) term (Evaluator location term value inner value))
@@ -191,13 +192,15 @@ evaluatePackageBodyWith :: forall location term value inner inner' outer
                            , EvaluatableConstraints location term value inner
                            , Members '[ Fail
                                       , Reader (Environment location value)
+                                      , Resumable (LoadError term)
                                       , State (Environment location value)
-                                      , State (EvaluatedModules location value)
+                                      , State (Exports location value)
+                                      , State (ModuleTable (Maybe (Environment location value, value)))
                                       , Trace
                                       ] outer
                            , Recursive term
                            , inner ~ (Goto inner' value ': inner')
-                           , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': EvalModule term value ': Loaded location value ': Reader (UnevaluatedModules term) ': outer)
+                           , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': Modules location value ': outer)
                            )
                         => (SubtermAlgebra Module term (Evaluator location term value inner value) -> SubtermAlgebra Module term (Evaluator location term value inner value))
                         -> (SubtermAlgebra (Base term) term (Evaluator location term value inner value) -> SubtermAlgebra (Base term) term (Evaluator location term value inner value))
@@ -205,12 +208,11 @@ evaluatePackageBodyWith :: forall location term value inner inner' outer
                         -> Evaluator location term value outer [value]
 evaluatePackageBodyWith perModule perTerm body
   = runReader (packageModules body)
-  . runLoaded
-  . runEvalModule evalModule
   . withPrelude (packagePrelude body)
+  . runModules evalModule
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
   where evalModule m
-          = runEvalModule evalModule
+          = runModules evalModule
           . runInModule (moduleInfo m)
           . perModule (subtermValue . moduleBody)
           . fmap (Subterm <*> foldSubterms (perTerm eval))
@@ -222,14 +224,14 @@ evaluatePackageBodyWith perModule perTerm body
           . fmap fst
           . runGoto lowerBound
 
-        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location term value (EvalModule term value ': Loaded location value ': Reader (UnevaluatedModules term) ': outer) value
+        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location term value (Modules location value ': outer) value
         evaluateEntryPoint m sym = runInModule (ModuleInfo m) $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
 
         withPrelude Nothing a = a
         withPrelude (Just prelude) a = do
-          preludeEnv <- evaluateModule prelude *> getEnv
+          preludeEnv <- evalModule prelude *> getEnv
           withDefaultEnvironment preludeEnv a
 
 -- | Isolate the given action with an empty global environment and exports.

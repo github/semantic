@@ -34,8 +34,8 @@ toName = FV.name . BC.pack . unPath
 
 -- Node.js resolution algorithm: https://nodejs.org/api/modules.html#modules_all_together
 -- TypeScript has a couple of different strategies, but the main one mimics Node.js.
-resolveWithNodejsStrategy :: Members '[ Reader M.ModuleInfo
-                                      , Reader (UnevaluatedModules term)
+resolveWithNodejsStrategy :: Members '[ Modules location value
+                                      , Reader M.ModuleInfo
                                       , Resumable ResolutionError
                                       , Trace
                                       ] effects
@@ -52,8 +52,8 @@ resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativ
 -- /root/src/moduleB.ts
 -- /root/src/moduleB/package.json (if it specifies a "types" property)
 -- /root/src/moduleB/index.ts
-resolveRelativePath :: Members '[ Reader M.ModuleInfo
-                                , Reader (UnevaluatedModules term)
+resolveRelativePath :: Members '[ Modules location value
+                                , Reader M.ModuleInfo
                                 , Resumable ResolutionError
                                 , Trace
                                 ] effects
@@ -78,8 +78,8 @@ resolveRelativePath relImportPath exts = do
 --
 -- /root/node_modules/moduleB.ts, etc
 -- /node_modules/moduleB.ts, etc
-resolveNonRelativePath :: Members '[ Reader M.ModuleInfo
-                                   , Reader (UnevaluatedModules term)
+resolveNonRelativePath :: Members '[ Modules location value
+                                   , Reader M.ModuleInfo
                                    , Resumable ResolutionError
                                    , Trace
                                    ] effects
@@ -100,7 +100,7 @@ resolveNonRelativePath name exts = do
         Right m -> m <$ traceResolve name m
     notFound xs = throwResumable $ NotFoundError name xs Language.TypeScript
 
-resolveTSModule :: Members '[ Reader (UnevaluatedModules term) ] effects
+resolveTSModule :: Member (Modules location value) effects
                 => FilePath
                 -> [String]
                 -> Evaluator location term value effects (Either [FilePath] M.ModulePath)
@@ -120,11 +120,8 @@ javascriptExtensions = ["js"]
 
 evalRequire :: ( AbstractValue location value effects
                , Addressable location effects
-               , Members '[ EvalModule term value
-                          , Loaded location value
+               , Members '[ Modules location value
                           , Reader (Environment location value)
-                          , Reader (UnevaluatedModules term)
-                          , Resumable (LoadError term)
                           , State (Environment location value)
                           , State (Exports location value)
                           , State (Heap location value)

@@ -28,8 +28,8 @@ importPath str = let path = stripQuotes str in ImportPath (BC.unpack path) (path
 defaultAlias :: ImportPath -> Name
 defaultAlias = name . BC.pack . takeFileName . unPath
 
-resolveGoImport :: Members '[ Reader ModuleInfo
-                            , Reader (UnevaluatedModules term)
+resolveGoImport :: Members '[ Modules location value
+                            , Reader ModuleInfo
                             , Reader Package.PackageInfo
                             , Resumable ResolutionError
                             , Trace

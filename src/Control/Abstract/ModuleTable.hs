@@ -1,26 +1,24 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeOperators #-}
 module Control.Abstract.ModuleTable
-( UnevaluatedModules
-, EvaluatedModules
-, Loaded(..)
-, runLoaded
-, lookupModule
+( lookupModule
 , resolve
 , listModulesInDir
 , require
 , load
+, Modules(..)
+, runModules
 , LoadError(..)
 , runLoadError
 , runLoadErrorWith
 , ResolutionError(..)
 , runResolutionError
 , runResolutionErrorWith
+, ModuleTable
 ) where
 
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Exports
-import Control.Monad.Effect (interpret)
 import Data.Abstract.Environment
 import Data.Abstract.Exports as Exports
 import Data.Abstract.Module
@@ -28,92 +26,92 @@ import Data.Abstract.ModuleTable as ModuleTable
 import Data.Language
 import Prologue
 
-type UnevaluatedModules term = ModuleTable [Module term]
-type EvaluatedModules location value = ModuleTable (Maybe (Environment location value, value))
-
 -- | Retrieve an evaluated module, if any. The outer 'Maybe' indicates whether we’ve begun loading the module or not, while the inner 'Maybe' indicates whether we’ve completed loading it or not. Thus, @Nothing@ means we’ve never tried to load it, @Just Nothing@ means we’ve started but haven’t yet finished loading it, and @Just (Just (env, value))@ indicates the result of a completed load.
-lookupModule :: Member (Loaded location value) effects => ModulePath -> Evaluator location term value effects (Maybe (Maybe (Environment location value, value)))
+lookupModule :: Member (Modules location value) effects => ModulePath -> Evaluator location term value effects (Maybe (Maybe (Environment location value, value)))
 lookupModule = send . Lookup
 
-loadingModule :: Member (Loaded location value) effects => ModulePath -> Evaluator location term value effects Bool
-loadingModule path = isJust <$> lookupModule path
-
--- | Cache a result in the evaluated module table.
-cacheModule :: Member (Loaded location value) effects => ModulePath -> Maybe (Environment location value, value) -> Evaluator location term value effects ()
-cacheModule path result = send (Cache path result)
-
-
--- | Retrieve the table of unevaluated modules.
-askModuleTable :: Member (Reader (UnevaluatedModules term)) effects
-               => Evaluator location term value effects (ModuleTable [Module term])
-askModuleTable = raise ask
-
-
 -- Resolve a list of module paths to a possible module table entry.
-resolve :: Member (Reader (UnevaluatedModules term)) effects
-        => [FilePath]
-        -> Evaluator location term value effects (Maybe ModulePath)
-resolve names = do
-  tbl <- askModuleTable
-  pure $ find (`ModuleTable.member` tbl) names
+resolve :: Member (Modules location value) effects => [FilePath] -> Evaluator location term value effects (Maybe ModulePath)
+resolve = sendModules . Resolve
 
-listModulesInDir :: Member (Reader (UnevaluatedModules term)) effects
-                 => FilePath
-                 -> Evaluator location term value effects [ModulePath]
-listModulesInDir dir = modulePathsInDir dir <$> askModuleTable
+listModulesInDir :: Member (Modules location value) effects => FilePath -> Evaluator location term value effects [ModulePath]
+listModulesInDir = sendModules . List
 
 
 -- | Require/import another module by name and return its environment and value.
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
-require :: Members '[ EvalModule term value
-                    , Loaded location value
-                    , Reader (UnevaluatedModules term)
-                    , Resumable (LoadError term)
-                    , State (Environment location value)
-                    , State (Exports location value)
-                    , Trace
-                    ] effects
-        => ModulePath
-        -> Evaluator location term value effects (Maybe (Environment location value, value))
+require :: Member (Modules location value) effects => ModulePath -> Evaluator location term value effects (Maybe (Environment location value, value))
 require path = lookupModule path >>= maybeM (load path)
 
 -- | Load another module by name and return its environment and value.
 --
 -- Always loads/evaluates.
-load :: Members '[ EvalModule term value
-                 , Loaded location value
-                 , Reader (UnevaluatedModules term)
-                 , Resumable (LoadError term)
-                 , State (Environment location value)
-                 , State (Exports location value)
-                 , Trace
-                 ] effects
-     => ModulePath
-     -> Evaluator location term value effects (Maybe (Environment location value, value))
-load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= runMerging . foldMap (Merging . evalAndCache)
-  where
-    notFound = throwResumable (LoadError name)
+load :: Member (Modules location value) effects => ModulePath -> Evaluator location term value effects (Maybe (Environment location value, value))
+load = send . Load
 
-    evalAndCache x = do
-      let mPath = modulePath (moduleInfo x)
-      loading <- loadingModule mPath
-      cacheModule name Nothing
-      if loading
-        then traceE ("load (skip evaluating, circular load): " <> show mPath) $> Nothing
-        else do
-          v <- traceE ("load (evaluating): " <> show mPath) *> evaluateModule x <* traceE ("load done:" <> show mPath)
-          env <- filterEnv <$> getExports <*> getEnv
-          cacheModule name (Just (env, v))
-          pure (Just (env, v))
 
-    -- TODO: If the set of exports is empty because no exports have been
-    -- defined, do we export all terms, or no terms? This behavior varies across
-    -- languages. We need better semantics rather than doing it ad-hoc.
-    filterEnv :: Exports.Exports l a -> Environment l a -> Environment l a
-    filterEnv ports env
-      | Exports.null ports = env
-      | otherwise = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
+data Modules location value return where
+  Load    :: ModulePath -> Modules location value (Maybe (Environment location value, value))
+  Lookup  :: ModulePath -> Modules location value (Maybe (Maybe (Environment location value, value)))
+  Resolve :: [FilePath] -> Modules location value (Maybe ModulePath)
+  List    :: FilePath   -> Modules location value [ModulePath]
+
+sendModules :: Member (Modules location value) effects => Modules location value return -> Evaluator location term value effects return
+sendModules = send
+
+runModules :: Members '[ Resumable (LoadError term)
+                       , State (Environment location value)
+                       , State (Exports location value)
+                       , State (ModuleTable (Maybe (Environment location value, value)))
+                       , Trace
+                       ] effects
+           => (Module term -> Evaluator location term value (Reader (ModuleTable [Module term]) ': effects) value)
+           -> Evaluator location term value (Modules location value ': effects) a
+           -> Evaluator location term value (Reader (ModuleTable [Module term]) ': effects) a
+runModules evaluateModule = reinterpretEffect (\ m -> case m of
+  Load name -> askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= runMerging . foldMap (Merging . evalAndCache)
+    where
+      notFound = throwResumable (LoadError name)
+
+      evalAndCache x = do
+        let mPath = modulePath (moduleInfo x)
+        loading <- loadingModule mPath
+        cacheModule name Nothing
+        if loading
+          then traceE ("load (skip evaluating, circular load): " <> show mPath) $> Nothing
+          else do
+            v <- traceE ("load (evaluating): " <> show mPath) *> evaluateModule x <* traceE ("load done:" <> show mPath)
+            env <- filterEnv <$> getExports <*> getEnv
+            cacheModule name (Just (env, v))
+            pure (Just (env, v))
+
+      -- TODO: If the set of exports is empty because no exports have been
+      -- defined, do we export all terms, or no terms? This behavior varies across
+      -- languages. We need better semantics rather than doing it ad-hoc.
+      filterEnv :: Exports.Exports l a -> Environment l a -> Environment l a
+      filterEnv ports env
+        | Exports.null ports = env
+        | otherwise = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
+  Lookup path -> ModuleTable.lookup path <$> raise get
+  Resolve names -> do
+    isMember <- flip ModuleTable.member <$> askModuleTable
+    pure (find isMember names)
+  List dir -> modulePathsInDir dir <$> askModuleTable)
+
+
+loadingModule :: Member (State (ModuleTable (Maybe (Environment location value, value)))) effects => ModulePath -> Evaluator location term value effects Bool
+loadingModule path = isJust . ModuleTable.lookup path <$> getModuleTable
+
+getModuleTable :: Member (State (ModuleTable (Maybe (Environment location value, value)))) effects => Evaluator location term value effects (ModuleTable (Maybe (Environment location value, value)))
+getModuleTable = raise get
+
+cacheModule :: Member (State (ModuleTable (Maybe (Environment location value, value)))) effects => ModulePath -> Maybe (Environment location value, value) -> Evaluator location term value effects ()
+cacheModule path result = raise (modify' (ModuleTable.insert path result))
+
+askModuleTable :: Member (Reader (ModuleTable [Module term])) effects => Evaluator location term value effects (ModuleTable [Module term])
+askModuleTable = raise ask
+
 
 newtype Merging m location value = Merging { runMerging :: m (Maybe (Environment location value, value)) }
 
@@ -167,12 +165,3 @@ runResolutionError = raiseHandler runError
 
 runResolutionErrorWith :: Effectful m => (forall resume . ResolutionError resume -> m effects resume) -> m (Resumable ResolutionError ': effects) a -> m effects a
 runResolutionErrorWith = runResumableWith
-
-data Loaded location value return where
-  Lookup  :: ModulePath                                              -> Loaded location value (Maybe (Maybe (Environment location value, value)))
-  Cache   :: ModulePath -> Maybe (Environment location value, value) -> Loaded location value ()
-
-runLoaded :: Member (State (EvaluatedModules location value)) effects => Evaluator location term value (Loaded location value ': effects) a -> Evaluator location term value effects a
-runLoaded = raiseHandler (interpret (\ loaded -> case loaded of
-  Lookup path       -> ModuleTable.lookup path <$> get
-  Cache path result -> modify' (ModuleTable.insert path result)))
