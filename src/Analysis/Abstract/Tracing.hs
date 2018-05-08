@@ -7,7 +7,7 @@ module Analysis.Abstract.Tracing
 import Control.Abstract
 import Control.Monad.Effect.Writer
 import Data.Semigroup.Reducer as Reducer
-import Prologue hiding (trace)
+import Prologue
 
 -- | Trace analysis.
 --

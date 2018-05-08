@@ -39,7 +39,7 @@ import Control.Monad.Effect.Resumable
 import Control.Monad.Effect.State hiding (runState)
 import Control.Monad.Effect.Trace
 import Data.Abstract.Module
-import Prologue hiding (trace)
+import Prologue
 
 -- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the location, term, and value types.
 --
