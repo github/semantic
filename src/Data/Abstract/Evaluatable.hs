@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
@@ -173,6 +173,9 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                        , EvaluatableConstraints location term value gotoEffects
                        , Members '[ Fail
                                   , Reader (Environment location value)
+                                  , Resumable (AddressError location value)
+                                  , Resumable (EnvironmentError value)
+                                  , Resumable (LoadError term)
                                   , State (Environment location value)
                                   , State (Exports location value)
                                   , State (Heap location value)
@@ -193,11 +196,13 @@ evaluatePackageWith :: ( Evaluatable (Base term)
 evaluatePackageWith perModule perTerm = runReader . packageInfo <*> evaluatePackageBodyWith perModule perTerm . packageBody
 
 -- | Evaluate a given package body (module table and entry points).
-evaluatePackageBodyWith :: forall location term value gotoEffects termEffects moduleEffects packageBodyEffects effects
-                        .  ( Evaluatable (Base term)
+evaluatePackageBodyWith :: ( Evaluatable (Base term)
                            , EvaluatableConstraints location term value gotoEffects
                            , Members '[ Fail
                                       , Reader (Environment location value)
+                                      , Resumable (AddressError location value)
+                                      , Resumable (EnvironmentError value)
+                                      , Resumable (LoadError term)
                                       , State (Environment location value)
                                       , State (Exports location value)
                                       , State (Heap location value)
@@ -233,7 +238,6 @@ evaluatePackageBodyWith perModule perTerm body
           . fmap fst
           . runGoto lowerBound
 
-        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location term value (EvalModule term value ': packageBodyEffects) value
         evaluateEntryPoint m sym = runInModule (ModuleInfo m) $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
