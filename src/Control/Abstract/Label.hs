@@ -6,10 +6,12 @@ module Control.Abstract.Label
 , label
 , goto
 , Goto(..)
+, runGoto
 ) where
 
 import           Control.Abstract.Context
 import           Control.Abstract.Evaluator
+import           Control.Monad.Effect (Eff, relayState)
 import qualified Data.IntMap as IntMap
 import           Prelude hiding (fail)
 import           Prologue
@@ -49,3 +51,10 @@ goto label comp = do
 data Goto effects value return where
   Label :: PackageInfo -> ModuleInfo -> Eff (Goto effects value ': effects) value -> Goto effects value Label
   Goto  :: Label -> Goto effects value (PackageInfo, ModuleInfo, Eff (Goto effects value ': effects) value)
+
+runGoto :: Member Fail effects => IntMap.IntMap (PackageInfo, ModuleInfo, Eff (Goto effects value ': effects) value) -> Evaluator location term value (Goto effects value ': effects) a -> Evaluator location term value effects a
+runGoto initial = raiseHandler (relayState (IntMap.size initial, initial) (\ _ -> pure) (\ (supremum, table) goto yield -> case goto of
+  Label packageInfo moduleInfo action -> yield (succ supremum, IntMap.insert supremum (packageInfo, moduleInfo, action) table) supremum
+  Goto label                          -> case IntMap.lookup label table of
+    Just (packageInfo, moduleInfo, action) -> yield (supremum, table) (packageInfo, moduleInfo, action)
+    Nothing                                -> raise (fail ("unknown label: " <> show label))))
