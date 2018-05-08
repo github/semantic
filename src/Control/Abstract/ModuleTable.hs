@@ -46,15 +46,6 @@ askModuleTable :: Member (Reader (UnevaluatedModules term)) effects
 askModuleTable = raise ask
 
 
--- | Retrieve the module load stack
-askLoadStack :: Member (Reader LoadStack) effects => Evaluator location term value effects LoadStack
-askLoadStack = raise ask
-
--- | Locally update the module load stack.
-localLoadStack :: Member (Reader LoadStack) effects => (LoadStack -> LoadStack) -> Evaluator location term value effects a -> Evaluator location term value effects a
-localLoadStack = raiseHandler . local
-
-
 -- Resolve a list of module paths to a possible module table entry.
 resolve :: Member (Reader (UnevaluatedModules term)) effects
         => [FilePath]
@@ -74,7 +65,6 @@ listModulesInDir dir = modulePathsInDir dir <$> askModuleTable
 -- Looks up the term's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
 require :: Members '[ EvalModule term value
                     , Reader (UnevaluatedModules term)
-                    , Reader LoadStack
                     , Resumable (LoadError term)
                     , State (Environment location value)
                     , State (Exports location value)
@@ -90,7 +80,6 @@ require path = lookupModule path >>= maybeM (load path)
 -- Always loads/evaluates.
 load :: Members '[ EvalModule term value
                  , Reader (UnevaluatedModules term)
-                 , Reader LoadStack
                  , Resumable (LoadError term)
                  , State (Environment location value)
                  , State (Exports location value)
@@ -105,13 +94,12 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= run
 
     evalAndCache x = do
       let mPath = modulePath (moduleInfo x)
-      LoadStack{..} <- askLoadStack
       loading <- loadingModule mPath
       cacheModule name Nothing
       if loading
         then traceE ("load (skip evaluating, circular load): " <> show mPath) $> Nothing
         else do
-          v <- localLoadStack (loadStackPush (moduleInfo x)) (traceE ("load (evaluating): " <> show mPath) *> evaluateModule x)
+          v <- traceE ("load (evaluating): " <> show mPath) *> evaluateModule x
           traceE ("load done:" <> show mPath)
           env <- filterEnv <$> getExports <*> getEnv
           cacheModule name (Just (env, v))

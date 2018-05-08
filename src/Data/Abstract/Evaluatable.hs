@@ -13,7 +13,6 @@ module Data.Abstract.Evaluatable
 , evaluatePackageBodyWith
 , throwEvalError
 , traceResolve
-, LoadStack
 , isolate
 ) where
 
@@ -54,7 +53,6 @@ type EvaluatableConstraints location term value effects =
   , Members '[ EvalModule term value
              , LoopControl value
              , Reader (Environment location value)
-             , Reader LoadStack
              , Reader ModuleInfo
              , Reader (UnevaluatedModules term)
              , Reader PackageInfo
@@ -178,7 +176,7 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                                   ] outer
                        , Recursive term
                        , inner ~ (Goto inner' value ': inner')
-                       , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': EvalModule term value ': Reader LoadStack ': Reader (UnevaluatedModules term) ': Reader PackageInfo ': outer)
+                       , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': EvalModule term value ': Reader (UnevaluatedModules term) ': Reader PackageInfo ': outer)
                        )
                     => (SubtermAlgebra Module term (Evaluator location term value inner value) -> SubtermAlgebra Module term (Evaluator location term value inner value))
                     -> (SubtermAlgebra (Base term) term (Evaluator location term value inner value) -> SubtermAlgebra (Base term) term (Evaluator location term value inner value))
@@ -197,7 +195,7 @@ evaluatePackageBodyWith :: forall location term value inner inner' outer
                                       ] outer
                            , Recursive term
                            , inner ~ (Goto inner' value ': inner')
-                           , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': EvalModule term value ': Reader LoadStack ': Reader (UnevaluatedModules term) ': outer)
+                           , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': EvalModule term value ': Reader (UnevaluatedModules term) ': outer)
                            )
                         => (SubtermAlgebra Module term (Evaluator location term value inner value) -> SubtermAlgebra Module term (Evaluator location term value inner value))
                         -> (SubtermAlgebra (Base term) term (Evaluator location term value inner value) -> SubtermAlgebra (Base term) term (Evaluator location term value inner value))
@@ -205,7 +203,6 @@ evaluatePackageBodyWith :: forall location term value inner inner' outer
                         -> Evaluator location term value outer [value]
 evaluatePackageBodyWith perModule perTerm body
   = runReader (packageModules body)
-  . runReader lowerBound
   . runEvalModule evalModule
   . withPrelude (packagePrelude body)
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
@@ -222,7 +219,7 @@ evaluatePackageBodyWith perModule perTerm body
           . fmap fst
           . runGoto lowerBound
 
-        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location term value (EvalModule term value ': Reader LoadStack ': Reader (UnevaluatedModules term) ': outer) value
+        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location term value (EvalModule term value ': Reader (UnevaluatedModules term) ': outer) value
         evaluateEntryPoint m sym = runInModule (ModuleInfo m) $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym

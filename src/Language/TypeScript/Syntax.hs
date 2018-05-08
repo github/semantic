@@ -122,7 +122,6 @@ evalRequire :: ( AbstractValue location value effects
                , Addressable location effects
                , Members '[ EvalModule term value
                           , Reader (Environment location value)
-                          , Reader LoadStack
                           , Reader (UnevaluatedModules term)
                           , Resumable (LoadError term)
                           , State (Environment location value)
