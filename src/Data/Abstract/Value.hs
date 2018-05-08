@@ -1,9 +1,7 @@
 {-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value where
 
-import Control.Abstract.Addressable
-import Control.Abstract.Evaluator
-import Control.Abstract.Value
+import Control.Abstract
 import Data.Abstract.Address
 import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
@@ -224,7 +222,6 @@ instance ( Addressable location effects
                     , State (Heap location (Value location))
                     , State (JumpTable term)
                     ] effects
-         , Recursive term
          , Reducer (Value location) (Cell location (Value location))
          , Show location
          )

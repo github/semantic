@@ -8,47 +8,33 @@ module Data.Abstract.Evaluatable
 , EvalError(..)
 , runEvalError
 , runEvalErrorWith
-, LoadError(..)
-, runLoadError
-, runLoadErrorWith
-, ResolutionError(..)
-, runResolutionError
-, runResolutionErrorWith
-, variable
 , evaluateInScopedEnv
 , evaluatePackageWith
 , evaluatePackageBodyWith
 , throwEvalError
-, resolve
 , traceResolve
-, listModulesInDir
-, require
-, load
 , LoadStack
+, isolate
 ) where
 
-import           Control.Abstract.Addressable as X
-import           Control.Abstract.Evaluator as X hiding (LoopControl(..), Return(..))
-import           Control.Abstract.Evaluator (LoopControl, Return(..))
-import           Control.Abstract.Value as X
-import           Control.Monad.Effect as Eff
-import           Data.Abstract.Address
-import           Data.Abstract.Declarations as X
-import           Data.Abstract.Environment as X
-import qualified Data.Abstract.Exports as Exports
-import           Data.Abstract.FreeVariables as X
-import           Data.Abstract.Module
-import           Data.Abstract.ModuleTable as ModuleTable
-import           Data.Abstract.Package as Package
-import           Data.Language
-import           Data.Scientific (Scientific)
-import           Data.Semigroup.App
-import           Data.Semigroup.Foldable
-import           Data.Semigroup.Reducer hiding (unit)
-import           Data.Semilattice.Lower
-import           Data.Sum
-import           Data.Term
-import           Prologue
+import Control.Abstract as X hiding (LoopControl(..), Return(..))
+import Control.Abstract.Evaluator (LoopControl, Return(..))
+import Control.Monad.Effect as Eff
+import Data.Abstract.Address
+import Data.Abstract.Declarations as X
+import Data.Abstract.Environment as X
+import Data.Abstract.FreeVariables as X
+import Data.Abstract.Module
+import Data.Abstract.ModuleTable as ModuleTable
+import Data.Abstract.Package as Package
+import Data.Scientific (Scientific)
+import Data.Semigroup.App
+import Data.Semigroup.Foldable
+import Data.Semigroup.Reducer hiding (unit)
+import Data.Semilattice.Lower
+import Data.Sum
+import Data.Term
+import Prologue
 
 -- | The 'Evaluatable' class defines the necessary interface for a term to be evaluated. While a default definition of 'eval' is given, instances with computational content must implement 'eval' to perform their small-step operational semantics.
 class Evaluatable constr where
@@ -72,6 +58,7 @@ type EvaluatableConstraints location term value effects =
              , Reader (ModuleTable [Module term])
              , Reader PackageInfo
              , Resumable (AddressError location value)
+             , Resumable (EnvironmentError value)
              , Resumable (EvalError value)
              , Resumable (LoadError term)
              , Resumable ResolutionError
@@ -87,51 +74,8 @@ type EvaluatableConstraints location term value effects =
   )
 
 
--- | An error thrown when we can't resolve a module from a qualified name.
-data ResolutionError resume where
-  NotFoundError :: String   -- ^ The path that was not found.
-                -> [String] -- ^ List of paths searched that shows where semantic looked for this module.
-                -> Language -- ^ Language.
-                -> ResolutionError ModulePath
-
-  GoImportError :: FilePath -> ResolutionError [ModulePath]
-
-deriving instance Eq (ResolutionError b)
-deriving instance Show (ResolutionError b)
-instance Show1 ResolutionError where liftShowsPrec _ _ = showsPrec
-instance Eq1 ResolutionError where
-  liftEq _ (NotFoundError a _ l1) (NotFoundError b _ l2) = a == b && l1 == l2
-  liftEq _ (GoImportError a) (GoImportError b) = a == b
-  liftEq _ _ _ = False
-
-runResolutionError :: Effectful m => m (Resumable ResolutionError ': effects) a -> m effects (Either (SomeExc ResolutionError) a)
-runResolutionError = raiseHandler runError
-
-runResolutionErrorWith :: Effectful m => (forall resume . ResolutionError resume -> m effects resume) -> m (Resumable ResolutionError ': effects) a -> m effects a
-runResolutionErrorWith = runResumableWith
-
--- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
-data LoadError term resume where
-  LoadError :: ModulePath -> LoadError term [Module term]
-
-deriving instance Eq (LoadError term resume)
-deriving instance Show (LoadError term resume)
-instance Show1 (LoadError term) where
-  liftShowsPrec _ _ = showsPrec
-instance Eq1 (LoadError term) where
-  liftEq _ (LoadError a) (LoadError b) = a == b
-
-runLoadError :: Evaluator location term value (Resumable (LoadError term) ': effects) a -> Evaluator location term value effects (Either (SomeExc (LoadError term)) a)
-runLoadError = raiseHandler runError
-
-runLoadErrorWith :: (forall resume . LoadError term resume -> Evaluator location term value effects resume) -> Evaluator location term value (Resumable (LoadError term) ': effects) a -> Evaluator location term value effects a
-runLoadErrorWith = runResumableWith
-
-
 -- | The type of error thrown when failing to evaluate a term.
 data EvalError value resume where
-  -- Indicates we weren't able to dereference a name from the evaluated environment.
-  FreeVariableError :: Name -> EvalError value value
   FreeVariablesError :: [Name] -> EvalError value Name
   -- Indicates that our evaluator wasn't able to make sense of these literals.
   IntegerFormatError  :: ByteString -> EvalError value Integer
@@ -162,25 +106,11 @@ evaluateInScopedEnv scopedEnvTerm term = do
   scopedEnv <- scopedEnvironment value
   maybe (throwEvalError (EnvironmentLookupError value)) (flip localEnv term . mergeEnvs) scopedEnv
 
--- | Look up and dereference the given 'Name', throwing an exception for free variables.
-variable :: ( Addressable location effects
-            , Members '[ Reader (Environment location value)
-                       , Resumable (AddressError location value)
-                       , Resumable (EvalError value)
-                       , State (Environment location value)
-                       , State (Heap location value)
-                       ] effects
-            )
-         => Name
-         -> Evaluator location term value effects value
-variable name = lookupWith deref name >>= maybeM (throwResumable (FreeVariableError name))
-
 deriving instance Eq a => Eq (EvalError a b)
 deriving instance Show a => Show (EvalError a b)
 instance Show value => Show1 (EvalError value) where
   liftShowsPrec _ _ = showsPrec
 instance Eq term => Eq1 (EvalError term) where
-  liftEq _ (FreeVariableError a) (FreeVariableError b)     = a == b
   liftEq _ (FreeVariablesError a) (FreeVariablesError b)   = a == b
   liftEq _ DefaultExportError DefaultExportError           = True
   liftEq _ (ExportError a b) (ExportError c d)             = (a == c) && (b == d)
@@ -232,100 +162,9 @@ instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
   eval = maybe unit (runApp . foldMap1 (App . subtermValue)) . nonEmpty
 
--- | Retrieve the table of unevaluated modules.
-askModuleTable :: Member (Reader (ModuleTable [Module term])) effects
-               => Evaluator location term value effects (ModuleTable [Module term])
-askModuleTable = raise ask
-
--- | Retrieve the module load stack
-askLoadStack :: Member (Reader LoadStack) effects => Evaluator location term value effects LoadStack
-askLoadStack = raise ask
-
--- | Locally update the module load stack.
-localLoadStack :: Member (Reader LoadStack) effects => (LoadStack -> LoadStack) -> Evaluator location term value effects a -> Evaluator location term value effects a
-localLoadStack = raiseHandler . local
-
-
--- Resolve a list of module paths to a possible module table entry.
-resolve :: Member (Reader (ModuleTable [Module term])) effects
-        => [FilePath]
-        -> Evaluator location term value effects (Maybe ModulePath)
-resolve names = do
-  tbl <- askModuleTable
-  pure $ find (`ModuleTable.member` tbl) names
 
 traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator location term value effects ()
 traceResolve name path = traceE ("resolved " <> show name <> " -> " <> show path)
-
-listModulesInDir :: Member (Reader (ModuleTable [Module term])) effects
-                 => FilePath
-                 -> Evaluator location term value effects [ModulePath]
-listModulesInDir dir = ModuleTable.modulePathsInDir dir <$> askModuleTable
-
--- | Require/import another module by name and return it's environment and value.
---
--- Looks up the term's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
-require :: Members '[ EvalModule term value
-                    , Reader (ModuleTable [Module term])
-                    , Reader LoadStack
-                    , Resumable (LoadError term)
-                    , State (Environment location value)
-                    , State (Exports location value)
-                    , State (ModuleTable (Environment location value, value))
-                    , Trace
-                    ] effects
-        => ModulePath
-        -> Evaluator location term value effects (Maybe (Environment location value, value))
-require name = getModuleTable >>= maybeM (load name) . fmap Just . ModuleTable.lookup name
-
--- | Load another module by name and return it's environment and value.
---
--- Always loads/evaluates.
-load :: Members '[ EvalModule term value
-                 , Reader (ModuleTable [Module term])
-                 , Reader LoadStack
-                 , Resumable (LoadError term)
-                 , State (Environment location value)
-                 , State (Exports location value)
-                 , State (ModuleTable (Environment location value, value))
-                 , Trace
-                 ] effects
-     => ModulePath
-     -> Evaluator location term value effects (Maybe (Environment location value, value))
-load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= runMerging . foldMap (Merging . evalAndCache)
-  where
-    notFound = throwResumable (LoadError name)
-
-    evalAndCache x = do
-      let mPath = modulePath (moduleInfo x)
-      LoadStack{..} <- askLoadStack
-      if moduleInfo x `elem` unLoadStack
-        then Nothing <$ traceE ("load (skip evaluating, circular load): " <> show mPath)
-        else do
-          v <- localLoadStack (loadStackPush (moduleInfo x)) (traceE ("load (evaluating): " <> show mPath)) *> (evaluateModule x)
-          traceE ("load done:" <> show mPath)
-          env <- filterEnv <$> getExports <*> getEnv
-          modifyModuleTable (ModuleTable.insert name (env, v))
-          pure (Just (env, v))
-
-    -- TODO: If the set of exports is empty because no exports have been
-    -- defined, do we export all terms, or no terms? This behavior varies across
-    -- languages. We need better semantics rather than doing it ad-hoc.
-    filterEnv :: Exports.Exports l a -> Environment l a -> Environment l a
-    filterEnv ports env
-      | Exports.null ports = env
-      | otherwise = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
-
-newtype Merging m location value = Merging { runMerging :: m (Maybe (Environment location value, value)) }
-
-instance Applicative m => Semigroup (Merging m location value) where
-  Merging a <> Merging b = Merging (merge <$> a <*> b)
-    where merge a b = mergeJusts <$> a <*> b <|> a <|> b
-          mergeJusts (env1, _) (env2, v) = (mergeEnvs env1 env2, v)
-
-instance Applicative m => Monoid (Merging m location value) where
-  mappend = (<>)
-  mempty = Merging (pure Nothing)
 
 
 -- | Evaluate a given package.
@@ -391,3 +230,7 @@ evaluatePackageBodyWith perModule perTerm body
         withPrelude (Just prelude) a = do
           preludeEnv <- evaluateModule prelude *> getEnv
           withDefaultEnvironment preludeEnv a
+
+-- | Isolate the given action with an empty global environment and exports.
+isolate :: Members '[State (Environment location value), State (Exports location value)] effects => Evaluator location term value effects a -> Evaluator location term value effects a
+isolate = withEnv lowerBound . withExports lowerBound

@@ -1,7 +1,9 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Addressable where
 
+import Control.Abstract.Environment
 import Control.Abstract.Evaluator
+import Control.Abstract.Heap
 import Control.Monad.Effect.Resumable as Eff
 import Data.Abstract.Address
 import Data.Abstract.Environment (insert)
@@ -55,6 +57,21 @@ letrec' name body = do
   addr <- lookupOrAlloc name
   v <- localEnv id (body addr)
   v <$ modifyEnv (insert name addr)
+
+
+-- | Look up and dereference the given 'Name', throwing an exception for free variables.
+variable :: ( Addressable location effects
+            , Members '[ Reader (Environment location value)
+                       , Resumable (AddressError location value)
+                       , Resumable (EnvironmentError value)
+                       , State (Environment location value)
+                       , State (Heap location value)
+                       ] effects
+            )
+         => Name
+         -> Evaluator location term value effects value
+variable name = lookupEnv name >>= maybe (freeVariableError name) deref
+
 
 -- Instances
 

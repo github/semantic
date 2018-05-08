@@ -4,8 +4,7 @@ module Analysis.Abstract.Collecting
 , providingLiveSet
 ) where
 
-import Control.Abstract.Evaluator
-import Control.Abstract.Value
+import Control.Abstract
 import Data.Abstract.Address
 import Data.Abstract.Heap
 import Data.Abstract.Live

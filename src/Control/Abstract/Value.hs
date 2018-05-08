@@ -1,4 +1,4 @@
-{-# LANGUAGE FunctionalDependencies, GADTs, KindSignatures, Rank2Types #-}
+{-# LANGUAGE GADTs, KindSignatures, Rank2Types #-}
 module Control.Abstract.Value
 ( AbstractValue(..)
 , AbstractHole(..)
@@ -10,7 +10,9 @@ module Control.Abstract.Value
 , ValueRoots(..)
 ) where
 
+import Control.Abstract.Environment
 import Control.Abstract.Evaluator
+import Control.Abstract.Heap
 import Data.Abstract.Address (Address, Cell)
 import Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables
@@ -38,7 +40,7 @@ class AbstractHole value where
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
 --   This allows us to abstract the choice of whether to evaluate under binders for different value types.
-class Show value => AbstractValue location term value (effects :: [* -> *]) | effects value -> location where
+class Show value => AbstractValue location term value (effects :: [* -> *]) where
   -- | Construct an abstract unit value.
   --   TODO: This might be the same as the empty tuple for some value types
   unit :: Evaluator location term value effects value

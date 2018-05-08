@@ -32,9 +32,18 @@ library
                      , Assigning.Assignment
                      , Assigning.Assignment.Table
                      -- Control structures & interfaces for abstract interpretation
+                     , Control.Abstract
                      , Control.Abstract.Addressable
+                     , Control.Abstract.Configuration
+                     , Control.Abstract.Context
+                     , Control.Abstract.Environment
                      , Control.Abstract.Evaluator
+                     , Control.Abstract.Exports
+                     , Control.Abstract.Heap
+                     , Control.Abstract.Label
                      , Control.Abstract.Matching
+                     , Control.Abstract.ModuleTable
+                     , Control.Abstract.Roots
                      , Control.Abstract.Value
                      -- Control flow
                      , Control.Effect
@@ -227,12 +236,13 @@ test-suite test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       Assigning.Assignment.Spec
-                     , Analysis.Go.Spec
+  other-modules:       Analysis.Go.Spec
                      , Analysis.PHP.Spec
                      , Analysis.Python.Spec
                      , Analysis.Ruby.Spec
                      , Analysis.TypeScript.Spec
+                     , Assigning.Assignment.Spec
+                     , Control.Abstract.Evaluator.Spec
                      , Data.Diff.Spec
                      , Data.Abstract.Path.Spec
                      , Data.Functor.Classes.Generic.Spec

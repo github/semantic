@@ -7,7 +7,6 @@ import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Evaluating as X
 import           Control.Abstract.Evaluator
 import           Control.Effect (runPrintingTraces)
-import           Control.Monad.Effect (runM)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Value
@@ -27,38 +26,43 @@ import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 
 justEvaluating
-  = runM . lower
+  = runM
+  . fmap (first reassociate)
   . evaluating
   . runPrintingTraces
   . runLoadError
   . runValueError
   . runUnspecialized
   . runResolutionError
+  . runEnvironmentError
   . runEvalError
   . runAddressError
   . constrainedToValuePrecise
 
 evaluatingWithHoles
-  = runM . lower
+  = runM
   . evaluating
   . runPrintingTraces
   . resumingLoadError
   . resumingUnspecialized
   . resumingValueError
+  . resumingEnvironmentError
   . resumingEvalError
   . resumingResolutionError
-  . resumingAddressError @(Value Precise)
+  . resumingAddressError @(Value Precise) @Precise
   . constrainedToValuePrecise
 
 -- The order is significant here: caching has to run before typeChecking, or else we’ll nondeterministically produce TypeErrors as part of the result set. While this is probably actually correct, it will require us to have an Ord instance for TypeError, which we don’t have yet.
 checking
-  = runM . lower
+  = runM
+  . fmap (first reassociate)
   . evaluating
   . runPrintingTraces
   . providingLiveSet
   . runLoadError
   . runUnspecialized
   . runResolutionError
+  . runEnvironmentError
   . runEvalError
   . runAddressError
   . runTypeError
@@ -93,3 +97,12 @@ parseFile parser = runTask . (parse parser <=< readBlob . file)
 
 blob :: FilePath -> IO Blob
 blob = runTask . readBlob . file
+
+
+injectConst :: a -> SomeExc (Sum '[Const a])
+injectConst = SomeExc . injectSum . Const
+
+mergeExcs :: Either (SomeExc (Sum excs)) (Either (SomeExc exc) result) -> Either (SomeExc (Sum (exc ': excs))) result
+mergeExcs = either (\ (SomeExc sum) -> Left (SomeExc (weakenSum sum))) (either (\ (SomeExc exc) -> Left (SomeExc (injectSum exc))) Right)
+
+reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . first injectConst
