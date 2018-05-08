@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value where
 
 import Control.Abstract
