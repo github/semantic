@@ -5,7 +5,7 @@ import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph
 import           Control.Effect (runIgnoringTraces)
 import qualified Control.Exception as Exc
-import           Control.Monad.Effect (relayState)
+import           Control.Monad.Effect (reinterpret)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Located
@@ -126,4 +126,6 @@ resumingValueError = runValueErrorWith (\ err -> traceM ("ValueError" <> show er
   ArithmeticError{} -> pure hole)
 
 resumingEnvironmentError :: AbstractHole value => Evaluator location term value (Resumable (EnvironmentError value) ': effects) a -> Evaluator location term value effects (a, [Name])
-resumingEnvironmentError = raiseHandler (relayState [] (fmap pure . flip (,)) (\ names (Resumable (FreeVariable name)) yield -> yield (name : names) hole))
+resumingEnvironmentError
+  = runState []
+  . raiseHandler (reinterpret (\ (Resumable (FreeVariable name)) -> modify' (name :) $> hole))
