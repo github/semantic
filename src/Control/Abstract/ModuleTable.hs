@@ -103,6 +103,7 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= run
     evalAndCache x = do
       let mPath = modulePath (moduleInfo x)
       LoadStack{..} <- askLoadStack
+      cacheModule name Nothing
       if moduleInfo x `elem` unLoadStack
         then traceE ("load (skip evaluating, circular load): " <> show mPath) $> Nothing
         else do
