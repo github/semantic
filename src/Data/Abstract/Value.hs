@@ -57,8 +57,8 @@ prjPair = bitraverse prjValue prjValue
 
 -- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
 
--- | A function value consisting of a list of parameter 'Name's, a 'Label' to jump to the body of the function, and an 'Environment' of bindings captured by the body.
-data Closure location value = Closure [Name] Label (Environment location value)
+-- | A function value consisting of a package & module info, a list of parameter 'Name's, a 'Label' to jump to the body of the function, and an 'Environment' of bindings captured by the body.
+data Closure location value = Closure PackageInfo ModuleInfo [Name] Label (Environment location value)
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq location => Eq1 (Closure location) where liftEq = genericLiftEq
@@ -198,8 +198,8 @@ instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
 instance Ord location => ValueRoots location (Value location) where
   valueRoots v
-    | Just (Closure _ _ env) <- prjValue v = Env.addresses env
-    | otherwise                            = mempty
+    | Just (Closure _ _ _ _ env) <- prjValue v = Env.addresses env
+    | otherwise                                = mempty
 
 
 instance AbstractHole (Value location) where
@@ -350,12 +350,14 @@ instance ( Addressable location (Goto effects (Value location) ': effects)
       where pair = (left, right)
 
   closure parameters freeVariables body = do
+    packageInfo <- currentPackage
+    moduleInfo <- currentModule
     l <- label body
-    injValue . Closure parameters l . Env.bind (foldr Set.delete freeVariables parameters) <$> getEnv
+    injValue . Closure packageInfo moduleInfo parameters l . Env.bind (foldr Set.delete freeVariables parameters) <$> getEnv
 
   call op params = do
     case prjValue op of
-      Just (Closure names label env) -> do
+      Just (Closure _ _ names label env) -> do
         -- Evaluate the bindings and the body within a `goto` in order to
         -- charge their origins to the closure's origin.
         goto label $ \body -> do
