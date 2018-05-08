@@ -5,8 +5,10 @@ module Control.Effect
 , Eff.Reader
 , Eff.State
 , Fresh
+, Trace
 , send
 , throwResumable
+, traceE
 -- * Handlers
 , run
 , runM
@@ -28,7 +30,7 @@ import qualified Control.Monad.Effect.Reader as Eff
 import           Control.Monad.Effect.Resumable
 import qualified Control.Monad.Effect.State as Eff
 import           Control.Monad.Effect.Trace
-import           Prologue hiding (throwError)
+import           Prologue hiding (throwError, trace)
 
 -- | Types wrapping 'Eff.Eff' actions.
 --
@@ -51,6 +53,10 @@ send = raise . Eff.send
 
 throwResumable :: (Member (Resumable exc) effects, Effectful m) => exc v -> m effects v
 throwResumable = raise . throwError
+
+-- | Trace into the current context.
+traceE :: (Effectful m, Member Trace effects) => String -> m effects ()
+traceE = raise . trace
 
 
 -- Handlers

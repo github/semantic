@@ -2,8 +2,6 @@
 module Control.Abstract.Evaluator
   ( Evaluator(..)
   -- * Effects
-  , Trace(..)
-  , traceE
   , EvalClosure(..)
   , evaluateClosureBody
   , runEvalClosure
@@ -37,9 +35,8 @@ import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader hiding (runReader)
 import Control.Monad.Effect.Resumable
 import Control.Monad.Effect.State hiding (runState)
-import Control.Monad.Effect.Trace
 import Data.Abstract.Module
-import Prologue hiding (trace)
+import Prologue
 
 -- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the location, term, and value types.
 --
@@ -53,12 +50,6 @@ deriving instance Member NonDet effects => Alternative (Evaluator location term 
 
 
 -- Effects
-
--- | Trace into the current context.
--- TODO: Someday we can generalize this to work for Task and Graph.
-traceE :: Member Trace effects => String -> Evaluator location term value effects ()
-traceE = raise . trace
-
 
 -- | An effect to evaluate a closure’s body.
 data EvalClosure term value resume where
