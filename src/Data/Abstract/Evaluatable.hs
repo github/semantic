@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
@@ -173,13 +173,7 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                        , EvaluatableConstraints location term value inner
                        , Members '[ Fail
                                   , Reader (Environment location value)
-                                  , Resumable (AddressError location value)
-                                  , Resumable (EnvironmentError value)
-                                  , Resumable (LoadError term)
                                   , State (Environment location value)
-                                  , State (Exports location value)
-                                  , State (Heap location value)
-                                  , State (ModuleTable (Environment location value, value))
                                   , Trace
                                   ] outer
                        , Recursive term
@@ -193,17 +187,12 @@ evaluatePackageWith :: ( Evaluatable (Base term)
 evaluatePackageWith perModule perTerm = runReader . packageInfo <*> evaluatePackageBodyWith perModule perTerm . packageBody
 
 -- | Evaluate a given package body (module table and entry points).
-evaluatePackageBodyWith :: ( Evaluatable (Base term)
+evaluatePackageBodyWith :: forall location term value inner inner' outer
+                        .  ( Evaluatable (Base term)
                            , EvaluatableConstraints location term value inner
                            , Members '[ Fail
                                       , Reader (Environment location value)
-                                      , Resumable (AddressError location value)
-                                      , Resumable (EnvironmentError value)
-                                      , Resumable (LoadError term)
                                       , State (Environment location value)
-                                      , State (Exports location value)
-                                      , State (Heap location value)
-                                      , State (ModuleTable (Environment location value, value))
                                       , Trace
                                       ] outer
                            , Recursive term
@@ -233,6 +222,7 @@ evaluatePackageBodyWith perModule perTerm body
           . fmap fst
           . runGoto lowerBound
 
+        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location term value (EvalModule term value ': Reader LoadStack ': Reader (ModuleTable [Module term]) ': outer) value
         evaluateEntryPoint m sym = runInModule (ModuleInfo m) $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
