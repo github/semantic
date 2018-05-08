@@ -7,12 +7,13 @@ module Analysis.Abstract.Caching
 
 import Control.Abstract
 import Data.Abstract.Cache
+import Data.Abstract.Evaluatable
 import Data.Abstract.Module
 import Data.Semilattice.Lower
 import Prologue
 
 -- | Look up the set of values for a given configuration in the in-cache.
-consultOracle :: (Cacheable term location (Cell location) value, Member (Reader (Cache term location (Cell location) value)) effects) => Configuration term location (Cell location) value -> Evaluator location value effects (Set (value, Heap location (Cell location) value))
+consultOracle :: (Cacheable term location (Cell location) value, Member (Reader (Cache term location (Cell location) value)) effects) => Configuration term location (Cell location) value -> Evaluator location value effects (Set (ValueRef value, Heap location (Cell location) value))
 consultOracle configuration = fromMaybe mempty . cacheLookup configuration <$> ask
 
 -- | Run an action with the given in-cache.
@@ -21,11 +22,11 @@ withOracle cache = local (const cache)
 
 
 -- | Look up the set of values for a given configuration in the out-cache.
-lookupCache :: (Cacheable term location (Cell location) value, Member (State (Cache term location (Cell location) value)) effects) => Configuration term location (Cell location) value -> Evaluator location value effects (Maybe (Set (value, Heap location (Cell location) value)))
+lookupCache :: (Cacheable term location (Cell location) value, Member (State (Cache term location (Cell location) value)) effects) => Configuration term location (Cell location) value -> Evaluator location value effects (Maybe (Set (ValueRef value, Heap location (Cell location) value)))
 lookupCache configuration = cacheLookup configuration <$> get
 
 -- | Run an action, caching its result and 'Heap' under the given configuration.
-cachingConfiguration :: (Cacheable term location (Cell location) value, Members '[State (Cache term location (Cell location) value), State (Heap location (Cell location) value)] effects) => Configuration term location (Cell location) value -> Set (value, Heap location (Cell location) value) -> Evaluator location value effects value -> Evaluator location value effects value
+cachingConfiguration :: (Cacheable term location (Cell location) value, Members '[State (Cache term location (Cell location) value), State (Heap location (Cell location) value)] effects) => Configuration term location (Cell location) value -> Set (ValueRef value, Heap location (Cell location) value) -> Evaluator location value effects (ValueRef value) -> Evaluator location value effects (ValueRef value)
 cachingConfiguration configuration values action = do
   modify' (cacheSet configuration values)
   result <- (,) <$> action <*> get
@@ -51,8 +52,8 @@ cachingTerms :: ( Cacheable term location (Cell location) value
                            , State (Heap location (Cell location) value)
                            ] effects
                 )
-             => SubtermAlgebra (Base term) term (Evaluator location value effects value)
-             -> SubtermAlgebra (Base term) term (Evaluator location value effects value)
+             => SubtermAlgebra (Base term) term (Evaluator location value effects (ValueRef value))
+             -> SubtermAlgebra (Base term) term (Evaluator location value effects (ValueRef value))
 cachingTerms recur term = do
   c <- getConfiguration (embedSubterm term)
   cached <- lookupCache c
@@ -62,11 +63,17 @@ cachingTerms recur term = do
       pairs <- consultOracle c
       cachingConfiguration c pairs (recur term)
 
-convergingModules :: ( Cacheable term location (Cell location) value
+convergingModules :: ( AbstractValue location value effects
+                     , Addressable location effects
+                     , Cacheable term location (Cell location) value
                      , Members '[ Fresh
                                 , NonDet
                                 , Reader (Cache term location (Cell location) value)
+                                , Reader (Environment location value)
                                 , Reader (Live location value)
+                                , Resumable (AddressError location value)
+                                , Resumable (EnvironmentError value)
+                                , Resumable (EvalError value)
                                 , State (Cache term location (Cell location) value)
                                 , State (Environment location value)
                                 , State (Heap location (Cell location) value)
@@ -87,7 +94,7 @@ convergingModules recur m = do
     -- would never complete). We don’t need to use the values, so we 'gather' the
     -- nondeterministic values into @()@.
       withOracle prevCache (gatherM (const ()) (recur m))) lowerBound
-  maybe empty scatter (cacheLookup c cache)
+  value =<< maybe empty scatter (cacheLookup c cache)
 
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
