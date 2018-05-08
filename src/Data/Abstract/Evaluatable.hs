@@ -181,12 +181,12 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                                   ] effects
                        , Recursive term
                        , gotoEffects ~ (Goto termEffects value ': termEffects)
-                       , termEffects ~ (LoopControl value ': Return value ': moduleEffects)
-                       , moduleEffects ~ (Reader ModuleInfo ': EvalModule term value ': packageBodyEffects)
+                       , termEffects ~ (LoopControl value ': Return value ': Reader ModuleInfo ': moduleEffects)
+                       , moduleEffects ~ (EvalModule term value ': packageBodyEffects)
                        , packageBodyEffects ~ (Reader LoadStack ': Reader (ModuleTable [Module term]) ': packageEffects)
                        , packageEffects ~ (Reader PackageInfo ': effects)
                        )
-                    => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value moduleEffects value))
+                    => (SubtermAlgebra Module term (Evaluator location term value gotoEffects value) -> SubtermAlgebra Module term (Evaluator location term value gotoEffects value))
                     -> (SubtermAlgebra (Base term) term (Evaluator location term value gotoEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value gotoEffects value))
                     -> Package term
                     -> Evaluator location term value effects [value]
@@ -206,11 +206,11 @@ evaluatePackageBodyWith :: forall location term value gotoEffects termEffects mo
                                       ] effects
                            , Recursive term
                            , gotoEffects ~ (Goto termEffects value ': termEffects)
-                           , termEffects ~ (LoopControl value ': Return value ': moduleEffects)
-                           , moduleEffects ~ (Reader ModuleInfo ': EvalModule term value ': packageBodyEffects)
+                           , termEffects ~ (LoopControl value ': Return value ': Reader ModuleInfo ': moduleEffects)
+                           , moduleEffects ~ (EvalModule term value ': packageBodyEffects)
                            , packageBodyEffects ~ (Reader LoadStack ': Reader (ModuleTable [Module term]) ': effects)
                            )
-                        => (SubtermAlgebra Module term (Evaluator location term value moduleEffects value) -> SubtermAlgebra Module term (Evaluator location term value moduleEffects value))
+                        => (SubtermAlgebra Module term (Evaluator location term value gotoEffects value) -> SubtermAlgebra Module term (Evaluator location term value gotoEffects value))
                         -> (SubtermAlgebra (Base term) term (Evaluator location term value gotoEffects value) -> SubtermAlgebra (Base term) term (Evaluator location term value gotoEffects value))
                         -> PackageBody term
                         -> Evaluator location term value effects [value]
@@ -222,19 +222,19 @@ evaluatePackageBodyWith perModule perTerm body
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
   where evalModule m
           = runEvalModule evalModule
-          . runReader (moduleInfo m)
+          . runInModule (moduleInfo m)
           . perModule (subtermValue . moduleBody)
-          . fmap (Subterm <*> evalTerm)
+          . fmap (Subterm <*> foldSubterms (perTerm eval))
           $ m
-        evalTerm
-          = runReturn
+        runInModule info
+          = runReader info
+          . runReturn
           . runLoopControl
           . fmap fst
           . runGoto lowerBound
-          . foldSubterms (perTerm eval)
 
         evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location term value (EvalModule term value ': packageBodyEffects) value
-        evaluateEntryPoint m sym = runReader (ModuleInfo m) . runReturn . runLoopControl . fmap fst . runGoto lowerBound $ do
+        evaluateEntryPoint m sym = runInModule (ModuleInfo m) $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
 
