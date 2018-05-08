@@ -2,7 +2,7 @@
 module Control.Abstract.ModuleTable
 ( UnevaluatedModules
 , EvaluatedModules
-, getModuleTable
+, lookupModule
 , resolve
 , listModulesInDir
 , require
@@ -29,8 +29,8 @@ type UnevaluatedModules term = ModuleTable [Module term]
 type EvaluatedModules location value = ModuleTable (Maybe (Environment location value, value))
 
 -- | Retrieve the table of evaluated modules.
-getModuleTable :: Member (State (EvaluatedModules location value)) effects => Evaluator location term value effects (EvaluatedModules location value)
-getModuleTable = raise get
+lookupModule :: Member (State (EvaluatedModules location value)) effects => ModulePath -> Evaluator location term value effects (Maybe (Maybe (Environment location value, value)))
+lookupModule path = ModuleTable.lookup path <$> raise get
 
 -- | Cache a result in the evaluated module table.
 cacheModule :: Member (State (EvaluatedModules location value)) effects => ModulePath -> Maybe (Environment location value, value) -> Evaluator location term value effects ()
@@ -80,7 +80,7 @@ require :: Members '[ EvalModule term value
                     ] effects
         => ModulePath
         -> Evaluator location term value effects (Maybe (Environment location value, value))
-require name = getModuleTable >>= maybeM (load name) . ModuleTable.lookup name
+require path = lookupModule path >>= maybeM (load path)
 
 -- | Load another module by name and return it's environment and value.
 --

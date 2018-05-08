@@ -87,10 +87,10 @@ doRequire :: ( AbstractValue location value effects
              )
           => M.ModulePath
           -> Evaluator location term value effects (Environment location value, value)
-doRequire name = do
-  moduleTable <- getModuleTable
-  case join (ModuleTable.lookup name moduleTable) of
-    Nothing       -> (,) . maybe emptyEnv fst <$> load name <*> boolean True
+doRequire path = do
+  result <- join <$> lookupModule path
+  case result of
+    Nothing       -> (,) . maybe emptyEnv fst <$> load path <*> boolean True
     Just (env, _) -> (,) env                  <$>               boolean False
 
 
