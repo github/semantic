@@ -28,7 +28,7 @@ import Prologue
 type UnevaluatedModules term = ModuleTable [Module term]
 type EvaluatedModules location value = ModuleTable (Maybe (Environment location value, value))
 
--- | Retrieve the table of evaluated modules.
+-- | Retrieve an evaluated module, if any. The outer 'Maybe' indicates whether we’ve begun loading the module or not, while the inner 'Maybe' indicates whether we’ve completed loading it or not. Thus, @Nothing@ means we’ve never tried to load it, @Just Nothing@ means we’ve started but haven’t yet finished loading it, and @Just (Just (env, value))@ indicates the result of a completed load.
 lookupModule :: Member (State (EvaluatedModules location value)) effects => ModulePath -> Evaluator location term value effects (Maybe (Maybe (Environment location value, value)))
 lookupModule path = ModuleTable.lookup path <$> raise get
 
