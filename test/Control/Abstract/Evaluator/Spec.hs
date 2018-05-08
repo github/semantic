@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeOperators #-}
 module Control.Abstract.Evaluator.Spec where
 
 import Analysis.Abstract.Evaluating (evaluating)
@@ -9,6 +10,7 @@ import qualified Data.Abstract.Value as Value
 import Data.Algebra
 import Data.Bifunctor (first)
 import Data.Functor.Const
+import Data.Semilattice.Lower
 import Data.Sum
 import SpecHelpers hiding (Term, reassociate)
 
@@ -20,7 +22,7 @@ spec = parallel $ do
 
   it "calls functions" $ do
     (expected, _) <- evaluate $ do
-      identity <- lambda [name "x"] (term (variable (name "x")))
+      identity <- closure [name "x"] lowerBound (variable (name "x"))
       call identity [integer 123]
     expected `shouldBe` Right (Value.injValue (Value.Integer (Number.Integer 123)))
 
@@ -33,23 +35,26 @@ evaluate
   . Value.runValueError
   . runEnvironmentError
   . runAddressError
-  . runValue
-runValue = runEvalClosure (runValue . runTerm) . runReturn . runLoopControl
+  . runReturn
+  . runLoopControl
+  . fmap fst
+  . runGoto lowerBound
+  . constraining
+
+constraining :: TermEvaluator Value -> TermEvaluator Value
+constraining = id
 
 reassociate :: Either String (Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) result))) -> Either (SomeExc (Sum '[Const String, exc1, exc2, exc3])) result
 reassociate (Left s) = Left (SomeExc (injectSum (Const s)))
 reassociate (Right (Right (Right (Right a)))) = Right a
 
-term :: TermEvaluator Value -> Subterm Term (TermEvaluator Value)
-term eval = Subterm (Term eval) eval
-
-type TermEffects
+type TermEffects = Goto GotoEffects Value ': GotoEffects
+type GotoEffects
   = '[ LoopControl Value
      , Return Value
-     , EvalClosure Term Value
      , Resumable (AddressError Precise Value)
      , Resumable (EnvironmentError Value)
-     , Resumable (Value.ValueError Precise Value)
+     , Resumable (Value.ValueError Precise)
      , Reader ModuleInfo
      , Reader PackageInfo
      , Fail
@@ -59,7 +64,6 @@ type TermEffects
      , State (Heap Precise Value)
      , State (ModuleTable (Environment Precise Value, Value))
      , State (Exports Precise Value)
-     , State (JumpTable Term)
      , IO
      ]
 

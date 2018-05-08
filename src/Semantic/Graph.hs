@@ -3,10 +3,9 @@ module Semantic.Graph where
 
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph
-import           Control.Effect (runIgnoringTraces)
+import           Control.Effect (runIgnoringTraces, traceE)
 import qualified Control.Exception as Exc
-import           Control.Monad.Effect (relayState)
-import           Control.Monad.Effect.Trace (trace)
+import           Control.Monad.Effect (reinterpret)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Located
@@ -70,7 +69,7 @@ parsePackage parser preludeFile project@Project{..} = do
   prelude <- traverse (parseModule parser Nothing) preludeFile
   p <- parseModules parser project
   let pkg = Package.fromModules n Nothing prelude (length projectEntryPoints) p
-  pkg <$ trace ("project: " <> show pkg)
+  pkg <$ traceE ("project: " <> show pkg)
 
   where
     n = name (projectName project)
@@ -87,7 +86,7 @@ parseModule parser rootDir file = do
 
 
 resumingResolutionError :: (Applicative (m effects), Effectful m, Member Trace effects) => m (Resumable ResolutionError ': effects) a -> m effects a
-resumingResolutionError = runResolutionErrorWith (\ err -> raise (trace ("ResolutionError:" <> show err)) *> case err of
+resumingResolutionError = runResolutionErrorWith (\ err -> traceE ("ResolutionError:" <> show err) *> case err of
   NotFoundError nameToResolve _ _ -> pure  nameToResolve
   GoImportError pathToResolve     -> pure [pathToResolve])
 
@@ -112,7 +111,7 @@ resumingAddressError = runAddressErrorWith (\ err -> traceE ("AddressError:" <> 
   UnallocatedAddress _   -> pure lowerBound
   UninitializedAddress _ -> pure hole)
 
-resumingValueError :: (AbstractHole value, Member (State (Environment location value)) effects, Member Trace effects, Show value) => Evaluator location term value (Resumable (ValueError location value) ': effects) a -> Evaluator location term value effects a
+resumingValueError :: (Members '[State (Environment location (Value location)), Trace] effects, Show location) => Evaluator location term (Value location) (Resumable (ValueError location) ': effects) a -> Evaluator location term (Value location) effects a
 resumingValueError = runValueErrorWith (\ err -> traceE ("ValueError" <> show err) *> case err of
   CallError val     -> pure val
   StringError val   -> pure (pack (show val))
@@ -129,4 +128,6 @@ resumingValueError = runValueErrorWith (\ err -> traceE ("ValueError" <> show er
   ArithmeticError{} -> pure hole)
 
 resumingEnvironmentError :: AbstractHole value => Evaluator location term value (Resumable (EnvironmentError value) ': effects) a -> Evaluator location term value effects (a, [Name])
-resumingEnvironmentError = raiseHandler (relayState [] (fmap pure . flip (,)) (\ names (Resumable (FreeVariable name)) yield -> yield (name : names) hole))
+resumingEnvironmentError
+  = runState []
+  . raiseHandler (reinterpret (\ (Resumable (FreeVariable name)) -> modify' (name :) $> hole))

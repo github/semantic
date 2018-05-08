@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Value where
 
 import Control.Abstract
@@ -6,9 +6,7 @@ import Data.Abstract.Address
 import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables
-import Data.Abstract.Module (ModuleInfo)
 import qualified Data.Abstract.Number as Number
-import Data.Abstract.Package (PackageInfo)
 import Data.List (genericIndex, genericLength)
 import Data.Scientific (Scientific)
 import Data.Scientific.Exts
@@ -59,8 +57,8 @@ prjPair = bitraverse prjValue prjValue
 
 -- TODO: Parameterize Value by the set of constructors s.t. each language can have a distinct value union.
 
--- | A function value consisting of a list of parameter 'Name's, a 'Label' to jump to the body of the function, and an 'Environment' of bindings captured by the body.
-data Closure location value = Closure [Name] Label (Environment location value)
+-- | A function value consisting of a package & module info, a list of parameter 'Name's, a 'Label' to jump to the body of the function, and an 'Environment' of bindings captured by the body.
+data Closure location value = Closure PackageInfo ModuleInfo [Name] Label (Environment location value)
   deriving (Eq, Generic1, Ord, Show)
 
 instance Eq location => Eq1 (Closure location) where liftEq = genericLiftEq
@@ -200,32 +198,30 @@ instance Show1 Null where liftShowsPrec = genericLiftShowsPrec
 
 instance Ord location => ValueRoots location (Value location) where
   valueRoots v
-    | Just (Closure _ _ env) <- prjValue v = Env.addresses env
-    | otherwise                            = mempty
+    | Just (Closure _ _ _ _ env) <- prjValue v = Env.addresses env
+    | otherwise                                = mempty
 
 
 instance AbstractHole (Value location) where
   hole = injValue Hole
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
-instance ( Addressable location effects
-         , Members '[ EvalClosure term (Value location)
-                    , Fail
+instance ( Addressable location (Goto effects (Value location) ': effects)
+         , Members '[ Fail
                     , LoopControl (Value location)
                     , Reader (Environment location (Value location))
                     , Reader ModuleInfo
                     , Reader PackageInfo
                     , Resumable (AddressError location (Value location))
-                    , Resumable (ValueError location (Value location))
+                    , Resumable (ValueError location)
                     , Return (Value location)
                     , State (Environment location (Value location))
                     , State (Heap location (Value location))
-                    , State (JumpTable term)
                     ] effects
          , Reducer (Value location) (Cell location (Value location))
          , Show location
          )
-      => AbstractValue location term (Value location) effects where
+      => AbstractValue location (Value location) (Goto effects (Value location) ': effects) where
   unit     = pure . injValue $ Unit
   integer  = pure . injValue . Integer . Number.Integer
   boolean  = pure . injValue . Boolean
@@ -243,7 +239,7 @@ instance ( Addressable location effects
 
   asPair val
     | Just (KVPair k v) <- prjValue val = pure (k, v)
-    | otherwise = throwResumable @(ValueError location (Value location)) $ KeyValueError val
+    | otherwise = throwValueError $ KeyValueError val
 
   hash = pure . injValue . Hash . fmap (injValue . uncurry KVPair)
 
@@ -258,7 +254,7 @@ instance ( Addressable location effects
     pure (injValue (Namespace n (Env.mergeNewer env' env)))
     where asNamespaceEnv v
             | Just (Namespace _ env') <- prjValue v = pure env'
-            | otherwise                             = throwResumable $ NamespaceError ("expected " <> show v <> " to be a namespace")
+            | otherwise                             = throwValueError $ NamespaceError ("expected " <> show v <> " to be a namespace")
 
   scopedEnvironment o
     | Just (Class _ env) <- prjValue o = pure (Just env)
@@ -267,7 +263,7 @@ instance ( Addressable location effects
 
   asString v
     | Just (String n) <- prjValue v = pure n
-    | otherwise                     = throwResumable @(ValueError location (Value location)) $ StringError v
+    | otherwise                     = throwValueError $ StringError v
 
   ifthenelse cond if' else' = do
     isHole <- isHole cond
@@ -279,7 +275,7 @@ instance ( Addressable location effects
 
   asBool val
     | Just (Boolean b) <- prjValue val = pure b
-    | otherwise = throwResumable @(ValueError location (Value location)) $ BoolError val
+    | otherwise = throwValueError $ BoolError val
 
   isHole val = pure (prjValue val == Just Hole)
 
@@ -313,7 +309,7 @@ instance ( Addressable location effects
         tentative x i j = attemptUnsafeArithmetic (x i j)
 
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: Either ArithException Number.SomeNumber -> Evaluator location term (Value location) effects (Value location)
+        specialize :: (AbstractValue location (Value location) effects, Member (Resumable (ValueError location)) effects) => Either ArithException Number.SomeNumber -> Evaluator location term (Value location) effects (Value location)
         specialize (Left exc) = throwValueError (ArithmeticError exc)
         specialize (Right (Number.SomeNumber (Number.Integer i))) = integer i
         specialize (Right (Number.SomeNumber (Number.Ratio r)))   = rational r
@@ -332,7 +328,7 @@ instance ( Addressable location effects
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: Ord a => a -> a -> Evaluator location term (Value location) effects (Value location)
+        go :: (AbstractValue location (Value location) effects, Ord a) => a -> a -> Evaluator location term (Value location) effects (Value location)
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
           Generalized -> integer (orderingToInt (compare l r))
@@ -353,53 +349,53 @@ instance ( Addressable location effects
     | otherwise = throwValueError (Bitwise2Error left right)
       where pair = (left, right)
 
-  lambda names (Subterm body _) = do
+  closure parameters freeVariables body = do
+    packageInfo <- currentPackage
+    moduleInfo <- currentModule
     l <- label body
-    injValue . Closure names l . Env.bind (foldr Set.delete (Set.fromList (freeVariables body)) names) <$> getEnv
+    injValue . Closure packageInfo moduleInfo parameters l . Env.bind (foldr Set.delete freeVariables parameters) <$> getEnv
 
   call op params = do
     case prjValue op of
-      Just (Closure names label env) -> do
-        -- Evaluate the bindings and the body within a `goto` in order to
-        -- charge their origins to the closure's origin.
-        goto label $ \body -> do
+      Just (Closure packageInfo moduleInfo names label env) -> do
+        body <- goto label
+        -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
+        -- charge them to the closure's origin.
+        withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
           bindings <- foldr (\ (name, param) rest -> do
             v <- param
             a <- alloc name
             assign a v
             Env.insert name a <$> rest) (pure env) (zip names params)
-          localEnv (mergeEnvs bindings) (evalClosure body)
+          localEnv (mergeEnvs bindings) (catchReturn body (\ (Return value) -> pure value))
       Nothing -> throwValueError (CallError op)
-    where
-      evalClosure term = catchReturn @(Value location) (\ (Return value) -> pure value) (evaluateClosureBody term)
 
-  loop x = catchLoopControl @(Value location) (fix x) (\ control -> case control of
+  loop x = catchLoopControl (fix x) (\ control -> case control of
     Break value -> pure value
     -- FIXME: Figure out how to deal with this. Ruby treats this as the result of the current block iteration, while PHP specifies a breakout level and TypeScript appears to take a label.
     Continue _  -> loop x)
 
 
 -- | The type of exceptions that can be thrown when constructing values in 'Value'’s 'MonadValue' instance.
-data ValueError location value resume where
-  StringError            :: value          -> ValueError location value ByteString
-  BoolError              :: value          -> ValueError location value Bool
-  IndexError             :: value -> value -> ValueError location value value
-  NamespaceError         :: Prelude.String -> ValueError location value (Environment location value)
-  CallError              :: value          -> ValueError location value value
-  NumericError           :: value          -> ValueError location value value
-  Numeric2Error          :: value -> value -> ValueError location value value
-  ComparisonError        :: value -> value -> ValueError location value value
-  BitwiseError           :: value          -> ValueError location value value
-  Bitwise2Error          :: value -> value -> ValueError location value value
-  KeyValueError          :: value          -> ValueError location value (value, value)
+data ValueError location resume where
+  StringError            :: Value location                   -> ValueError location ByteString
+  BoolError              :: Value location                   -> ValueError location Bool
+  IndexError             :: Value location -> Value location -> ValueError location (Value location)
+  NamespaceError         :: Prelude.String                   -> ValueError location (Environment location (Value location))
+  CallError              :: Value location                   -> ValueError location (Value location)
+  NumericError           :: Value location                   -> ValueError location (Value location)
+  Numeric2Error          :: Value location -> Value location -> ValueError location (Value location)
+  ComparisonError        :: Value location -> Value location -> ValueError location (Value location)
+  BitwiseError           :: Value location                   -> ValueError location (Value location)
+  Bitwise2Error          :: Value location -> Value location -> ValueError location (Value location)
+  KeyValueError          :: Value location                   -> ValueError location (Value location, Value location)
   -- Indicates that we encountered an arithmetic exception inside Haskell-native number crunching.
-  ArithmeticError :: ArithException -> ValueError location value value
+  ArithmeticError        :: ArithException                   -> ValueError location (Value location)
   -- Out-of-bounds error
-  BoundsError :: [value] -> Prelude.Integer -> ValueError location value value
+  BoundsError            :: [Value location] -> Prelude.Integer -> ValueError location (Value location)
 
 
-
-instance Eq value => Eq1 (ValueError location value) where
+instance Eq location => Eq1 (ValueError location) where
   liftEq _ (StringError a) (StringError b)                       = a == b
   liftEq _ (NamespaceError a) (NamespaceError b)                 = a == b
   liftEq _ (CallError a) (CallError b)                           = a == b
@@ -413,15 +409,15 @@ instance Eq value => Eq1 (ValueError location value) where
   liftEq _ (BoundsError a b) (BoundsError c d)                   = (a == c) && (b == d)
   liftEq _ _             _                                       = False
 
-deriving instance (Show value) => Show (ValueError location value resume)
-instance (Show value) => Show1 (ValueError location value) where
+deriving instance Show location => Show (ValueError location resume)
+instance Show location => Show1 (ValueError location) where
   liftShowsPrec _ _ = showsPrec
 
-throwValueError :: Member (Resumable (ValueError location value)) effects => ValueError location value resume -> Evaluator location term value effects resume
+throwValueError :: Member (Resumable (ValueError location)) effects => ValueError location resume -> Evaluator location term value effects resume
 throwValueError = throwResumable
 
-runValueError :: Evaluator location term value (Resumable (ValueError location value) ': effects) a -> Evaluator location term value effects (Either (SomeExc (ValueError location value)) a)
+runValueError :: Evaluator location term value (Resumable (ValueError location) ': effects) a -> Evaluator location term value effects (Either (SomeExc (ValueError location)) a)
 runValueError = raiseHandler runError
 
-runValueErrorWith :: (forall resume . ValueError location value resume -> Evaluator location term value effects resume) -> Evaluator location term value (Resumable (ValueError location value) ': effects) a -> Evaluator location term value effects a
+runValueErrorWith :: (forall resume . ValueError location resume -> Evaluator location term value effects resume) -> Evaluator location term value (Resumable (ValueError location) ': effects) a -> Evaluator location term value effects a
 runValueErrorWith = runResumableWith

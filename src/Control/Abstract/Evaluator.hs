@@ -2,8 +2,6 @@
 module Control.Abstract.Evaluator
   ( Evaluator(..)
   -- * Effects
-  , Trace(..)
-  , traceE
   , EvalClosure(..)
   , evaluateClosureBody
   , runEvalClosure
@@ -30,14 +28,13 @@ module Control.Abstract.Evaluator
   ) where
 
 import Control.Effect
-import Control.Monad.Effect
+import Control.Monad.Effect (Eff, interpose, relay)
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDet
 import Control.Monad.Effect.Reader hiding (runReader)
 import Control.Monad.Effect.Resumable
 import Control.Monad.Effect.State hiding (runState)
-import Control.Monad.Effect.Trace
 import Data.Abstract.Module
 import Prologue
 
@@ -54,18 +51,12 @@ deriving instance Member NonDet effects => Alternative (Evaluator location term 
 
 -- Effects
 
--- | Trace into the current context.
--- TODO: Someday we can generalize this to work for Task and Graph.
-traceE :: Member Trace effects => String -> Evaluator location term value effects ()
-traceE = raise . trace
-
-
 -- | An effect to evaluate a closure’s body.
 data EvalClosure term value resume where
   EvalClosure :: term -> EvalClosure term value value
 
 evaluateClosureBody :: Member (EvalClosure term value) effects => term -> Evaluator location term value effects value
-evaluateClosureBody = raise . send . EvalClosure
+evaluateClosureBody = send . EvalClosure
 
 runEvalClosure :: (term -> Evaluator location term value effects value) -> Evaluator location term value (EvalClosure term value ': effects) a -> Evaluator location term value effects a
 runEvalClosure evalClosure = runEffect (\ (EvalClosure term) yield -> evalClosure term >>= yield)
@@ -76,7 +67,7 @@ data EvalModule term value resume where
   EvalModule :: Module term -> EvalModule term value value
 
 evaluateModule :: Member (EvalModule term value) effects => Module term -> Evaluator location term value effects value
-evaluateModule = raise . send . EvalModule
+evaluateModule = send . EvalModule
 
 runEvalModule :: (Module term -> Evaluator location term value effects value) -> Evaluator location term value (EvalModule term value ': effects) a -> Evaluator location term value effects a
 runEvalModule evalModule = runEffect (\ (EvalModule m) yield -> evalModule m >>= yield)
@@ -90,10 +81,10 @@ deriving instance Eq value => Eq (Return value a)
 deriving instance Show value => Show (Return value a)
 
 earlyReturn :: Member (Return value) effects => value -> Evaluator location term value effects value
-earlyReturn = raise . send . Return
+earlyReturn = send . Return
 
-catchReturn :: Member (Return value) effects => (forall x . Return value x -> Evaluator location term value effects a) -> Evaluator location term value effects a -> Evaluator location term value effects a
-catchReturn handler = raiseHandler (interpose pure (\ ret _ -> lower (handler ret)))
+catchReturn :: Member (Return value) effects => Evaluator location term value effects a -> (forall x . Return value x -> Evaluator location term value effects a) -> Evaluator location term value effects a
+catchReturn action handler = raiseHandler (interpose pure (\ ret _ -> lower (handler ret))) action
 
 runReturn :: Evaluator location term value (Return value ': effects) value -> Evaluator location term value effects value
 runReturn = runEffect (\ (Return value) _ -> pure value)
@@ -108,10 +99,10 @@ deriving instance Eq value => Eq (LoopControl value a)
 deriving instance Show value => Show (LoopControl value a)
 
 throwBreak :: Member (LoopControl value) effects => value -> Evaluator location term value effects value
-throwBreak = raise . send . Break
+throwBreak = send . Break
 
 throwContinue :: Member (LoopControl value) effects => value -> Evaluator location term value effects value
-throwContinue = raise . send . Continue
+throwContinue = send . Continue
 
 catchLoopControl :: Member (LoopControl value) effects => Evaluator location term value effects a -> (forall x . LoopControl value x -> Evaluator location term value effects a) -> Evaluator location term value effects a
 catchLoopControl action handler = raiseHandler (interpose pure (\ control _ -> lower (handler control))) action

@@ -5,7 +5,10 @@ module Control.Effect
 , Eff.Reader
 , Eff.State
 , Fresh
+, Trace
+, send
 , throwResumable
+, traceE
 -- * Handlers
 , run
 , runM
@@ -45,8 +48,15 @@ instance Effectful Eff.Eff where
 
 -- Effects
 
+send :: (Effectful m, Member effect effects) => effect result -> m effects result
+send = raise . Eff.send
+
 throwResumable :: (Member (Resumable exc) effects, Effectful m) => exc v -> m effects v
 throwResumable = raise . throwError
+
+-- | Trace into the current context.
+traceE :: (Effectful m, Member Trace effects) => String -> m effects ()
+traceE = raise . trace
 
 
 -- Handlers

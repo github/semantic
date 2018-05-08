@@ -3,6 +3,7 @@ module Data.Syntax.Declaration where
 
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
+import qualified Data.Set as Set (fromList)
 import Diffing.Algorithm
 import Prologue
 
@@ -22,7 +23,7 @@ instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Function where
   eval Function{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm functionName)
-    (v, addr) <- letrec name (lambda (paramNames functionParameters) functionBody)
+    (v, addr) <- letrec name (closure (paramNames functionParameters) (Set.fromList (freeVariables functionBody)) (subtermValue functionBody))
     modifyEnv (Env.insert name addr)
     pure v
     where paramNames = foldMap (freeVariables . subterm)
@@ -46,7 +47,7 @@ instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Method where
   eval Method{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm methodName)
-    (v, addr) <- letrec name (lambda (paramNames methodParameters) methodBody)
+    (v, addr) <- letrec name (closure (paramNames methodParameters) (Set.fromList (freeVariables methodBody)) (subtermValue methodBody))
     modifyEnv (Env.insert name addr)
     pure v
     where paramNames = foldMap (freeVariables . subterm)
