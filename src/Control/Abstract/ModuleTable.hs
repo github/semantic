@@ -26,14 +26,14 @@ import Data.Language
 import Prologue
 
 type UnevaluatedModules term = ModuleTable [Module term]
-type EvaluatedModules location value = ModuleTable (Environment location value, value)
+type EvaluatedModules location value = ModuleTable (Maybe (Environment location value, value))
 
 -- | Retrieve the table of evaluated modules.
-getModuleTable :: Member (State (ModuleTable (Environment location value, value))) effects => Evaluator location term value effects (ModuleTable (Environment location value, value))
+getModuleTable :: Member (State (EvaluatedModules location value)) effects => Evaluator location term value effects (EvaluatedModules location value)
 getModuleTable = raise get
 
 -- | Update the evaluated module table.
-modifyModuleTable :: Member (State (ModuleTable (Environment location value, value))) effects => (ModuleTable (Environment location value, value) -> ModuleTable (Environment location value, value)) -> Evaluator location term value effects ()
+modifyModuleTable :: Member (State (EvaluatedModules location value)) effects => (EvaluatedModules location value -> EvaluatedModules location value) -> Evaluator location term value effects ()
 modifyModuleTable = raise . modify'
 
 
@@ -75,12 +75,12 @@ require :: Members '[ EvalModule term value
                     , Resumable (LoadError term)
                     , State (Environment location value)
                     , State (Exports location value)
-                    , State (ModuleTable (Environment location value, value))
+                    , State (EvaluatedModules location value)
                     , Trace
                     ] effects
         => ModulePath
         -> Evaluator location term value effects (Maybe (Environment location value, value))
-require name = getModuleTable >>= maybeM (load name) . fmap Just . ModuleTable.lookup name
+require name = getModuleTable >>= maybeM (load name) . ModuleTable.lookup name
 
 -- | Load another module by name and return it's environment and value.
 --
@@ -91,7 +91,7 @@ load :: Members '[ EvalModule term value
                  , Resumable (LoadError term)
                  , State (Environment location value)
                  , State (Exports location value)
-                 , State (ModuleTable (Environment location value, value))
+                 , State (EvaluatedModules location value)
                  , Trace
                  ] effects
      => ModulePath
@@ -109,7 +109,7 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= run
           v <- localLoadStack (loadStackPush (moduleInfo x)) (traceE ("load (evaluating): " <> show mPath) *> evaluateModule x)
           traceE ("load done:" <> show mPath)
           env <- filterEnv <$> getExports <*> getEnv
-          modifyModuleTable (ModuleTable.insert name (env, v))
+          modifyModuleTable (ModuleTable.insert name (Just (env, v)))
           pure (Just (env, v))
 
     -- TODO: If the set of exports is empty because no exports have been

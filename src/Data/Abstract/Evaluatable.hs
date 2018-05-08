@@ -68,7 +68,7 @@ type EvaluatableConstraints location term value effects =
              , State (Environment location value)
              , State (Exports location value)
              , State (Heap location value)
-             , State (ModuleTable (Environment location value, value))
+             , State (EvaluatedModules location value)
              , Trace
              ] effects
   , Reducer value (Cell location value)
@@ -222,7 +222,7 @@ evaluatePackageBodyWith perModule perTerm body
           . fmap fst
           . runGoto lowerBound
 
-        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location term value (EvalModule term value ': Reader LoadStack ': Reader (ModuleTable [Module term]) ': outer) value
+        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location term value (EvalModule term value ': Reader LoadStack ': Reader (UnevaluatedModules term) ': outer) value
         evaluateEntryPoint m sym = runInModule (ModuleInfo m) $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
