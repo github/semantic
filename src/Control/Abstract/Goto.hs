@@ -32,6 +32,15 @@ goto :: Label -> Evaluator location term value (Goto effects value ': effects) (
 goto = fmap raise . send . Goto
 
 
+-- | 'Goto' effects embed an 'Eff' action which can be run in the environment under the 'Goto' itself.
+--
+--   It’s tempting to try to use a 'Member' constraint to require a 'Goto' effect:
+--
+--   @
+--   foo :: Member (Goto effects a) effects => Eff effects a
+--   @
+--
+--   However, using this type would require that the type of the effect list include a reference to itself, which is forbidden by the occurs check: we wouldn’t be able to write a handler for 'Goto' if it could be used at that type. Instead, one can either use a smaller, statically known effect list inside the 'Goto', e.g. @Member (Goto outer) inner@ where @outer@ is a suffix of @inner@ (and with some massaging to raise the @outer@ actions into the @inner@ context), or use 'Goto' when it’s statically known to be the head of the list: @Eff (Goto rest a ': rest) b@. In either case, the 'Eff' actions embedded in the effect are themselves able to contain further 'Goto' effects,
 data Goto effects value return where
   Label :: Eff (Goto effects value ': effects) value -> Goto effects value Label
   Goto  :: Label -> Goto effects value (Eff (Goto effects value ': effects) value)
