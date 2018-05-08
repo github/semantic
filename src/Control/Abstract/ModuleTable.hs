@@ -60,7 +60,7 @@ listModulesInDir :: Member (Reader (UnevaluatedModules term)) effects
 listModulesInDir dir = modulePathsInDir dir <$> askModuleTable
 
 
--- | Require/import another module by name and return it's environment and value.
+-- | Require/import another module by name and return its environment and value.
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
 require :: Members '[ EvalModule term value
@@ -75,7 +75,7 @@ require :: Members '[ EvalModule term value
         -> Evaluator location term value effects (Maybe (Environment location value, value))
 require path = lookupModule path >>= maybeM (load path)
 
--- | Load another module by name and return it's environment and value.
+-- | Load another module by name and return its environment and value.
 --
 -- Always loads/evaluates.
 load :: Members '[ EvalModule term value
