@@ -37,7 +37,7 @@ label action = do
 goto :: Members '[Reader ModuleInfo, Reader PackageInfo] effects => Label -> (Evaluator location term value (Goto effects value ': effects) value -> Evaluator location term value (Goto effects value ': effects) a) -> Evaluator location term value (Goto effects value ': effects) a
 goto label comp = do
   (packageInfo, moduleInfo, action) <- send (Goto label)
-  raiseHandler (local (const packageInfo)) (raiseHandler (local (const moduleInfo)) (comp (raise action)))
+  withCurrentPackage packageInfo (withCurrentModule moduleInfo (comp (raise action)))
 
 
 data Goto effects value return where
