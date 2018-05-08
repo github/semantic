@@ -2,9 +2,6 @@
 module Control.Abstract.Evaluator
   ( Evaluator(..)
   -- * Effects
-  , EvalClosure(..)
-  , evaluateClosureBody
-  , runEvalClosure
   , Return(..)
   , earlyReturn
   , catchReturn
@@ -46,17 +43,6 @@ deriving instance Member NonDet effects => Alternative (Evaluator location term 
 
 
 -- Effects
-
--- | An effect to evaluate a closure’s body.
-data EvalClosure term value resume where
-  EvalClosure :: term -> EvalClosure term value value
-
-evaluateClosureBody :: Member (EvalClosure term value) effects => term -> Evaluator location term value effects value
-evaluateClosureBody = send . EvalClosure
-
-runEvalClosure :: (term -> Evaluator location term value effects value) -> Evaluator location term value (EvalClosure term value ': effects) a -> Evaluator location term value effects a
-runEvalClosure evalClosure = runEffect (\ (EvalClosure term) yield -> evalClosure term >>= yield)
-
 
 -- | An effect for explicitly returning out of a function/method body.
 data Return value resume where
