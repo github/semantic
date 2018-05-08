@@ -6,6 +6,7 @@ import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Evaluating as X
 import           Control.Abstract.Evaluator
+import           Control.Effect (runPrintingTraces)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Value
@@ -25,9 +26,10 @@ import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
 
 justEvaluating
-  = run
+  = runM
   . fmap (first reassociate)
   . evaluating
+  . runPrintingTraces
   . runLoadError
   . runValueError
   . runUnspecialized
@@ -35,10 +37,12 @@ justEvaluating
   . runEnvironmentError
   . runEvalError
   . runAddressError
+  . constrainedToValuePrecise
 
 evaluatingWithHoles
-  = run
+  = runM
   . evaluating
+  . runPrintingTraces
   . resumingLoadError
   . resumingUnspecialized
   . resumingValueError
@@ -46,12 +50,14 @@ evaluatingWithHoles
   . resumingEvalError
   . resumingResolutionError
   . resumingAddressError @(Value Precise) @Precise
+  . constrainedToValuePrecise
 
 -- The order is significant here: caching has to run before typeChecking, or else we’ll nondeterministically produce TypeErrors as part of the result set. While this is probably actually correct, it will require us to have an Ord instance for TypeError, which we don’t have yet.
 checking
-  = run
+  = runM
   . fmap (first reassociate)
   . evaluating
+  . runPrintingTraces
   . providingLiveSet
   . runLoadError
   . runUnspecialized
@@ -61,15 +67,22 @@ checking
   . runAddressError
   . runTypeError
   . caching @[]
+  . constrainedToTypeMonovariant
 
-evalGoProject path = justEvaluating <$> evaluateProject goParser Language.Go Nothing path
-evalRubyProject path = justEvaluating <$> evaluateProject rubyParser Language.Ruby rubyPrelude path
-evalPHPProject path = justEvaluating <$> evaluateProject phpParser Language.PHP Nothing path
-evalPythonProject path = justEvaluating <$> evaluateProject pythonParser Language.Python pythonPrelude path
-evalTypeScriptProjectQuietly path = evaluatingWithHoles <$> evaluateProject typescriptParser Language.TypeScript Nothing path
-evalTypeScriptProject path = justEvaluating <$> evaluateProject typescriptParser Language.TypeScript Nothing path
+constrainedToValuePrecise :: Evaluator Precise term (Value Precise) effects a -> Evaluator Precise term (Value Precise) effects a
+constrainedToValuePrecise = id
 
-typecheckGoFile path = checking <$> evaluateProjectWithCaching goParser Language.Go Nothing path
+constrainedToTypeMonovariant :: Evaluator Monovariant term (Type Monovariant) effects a -> Evaluator Monovariant term (Type Monovariant) effects a
+constrainedToTypeMonovariant = id
+
+evalGoProject path = justEvaluating =<< evaluateProject goParser Language.Go Nothing path
+evalRubyProject path = justEvaluating =<< evaluateProject rubyParser Language.Ruby rubyPrelude path
+evalPHPProject path = justEvaluating =<< evaluateProject phpParser Language.PHP Nothing path
+evalPythonProject path = justEvaluating =<< evaluateProject pythonParser Language.Python pythonPrelude path
+evalTypeScriptProjectQuietly path = evaluatingWithHoles =<< evaluateProject typescriptParser Language.TypeScript Nothing path
+evalTypeScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.TypeScript Nothing path
+
+typecheckGoFile path = checking =<< evaluateProjectWithCaching goParser Language.Go Nothing path
 
 rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Language.Ruby)
 pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Language.Python)

@@ -37,6 +37,7 @@ toName = FV.name . BC.pack . unPath
 resolveWithNodejsStrategy :: Members '[ Reader M.ModuleInfo
                                       , Reader (ModuleTable [M.Module term])
                                       , Resumable ResolutionError
+                                      , Trace
                                       ] effects
                           => ImportPath
                           -> [String]
@@ -54,6 +55,7 @@ resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativ
 resolveRelativePath :: Members '[ Reader M.ModuleInfo
                                 , Reader (ModuleTable [M.Module term])
                                 , Resumable ResolutionError
+                                , Trace
                                 ] effects
                     => FilePath
                     -> [String]
@@ -62,7 +64,7 @@ resolveRelativePath relImportPath exts = do
   M.ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory modulePath
   let path = joinPaths relRootDir relImportPath
-  resolveTSModule path exts >>= either notFound (\x -> traceResolve relImportPath x (pure x))
+  resolveTSModule path exts >>= either notFound (\x -> x <$ traceResolve relImportPath path)
   where
     notFound xs = throwResumable $ NotFoundError relImportPath xs Language.TypeScript
 
@@ -79,6 +81,7 @@ resolveRelativePath relImportPath exts = do
 resolveNonRelativePath :: Members '[ Reader M.ModuleInfo
                                    , Reader (ModuleTable [M.Module term])
                                    , Resumable ResolutionError
+                                   , Trace
                                    ] effects
                        => FilePath
                        -> [String]
@@ -94,7 +97,7 @@ resolveNonRelativePath name exts = do
       case res of
         Left xs | parentDir <- takeDirectory path , root /= parentDir -> go root parentDir (searched <> xs)
                 | otherwise -> notFound (searched <> xs)
-        Right m -> traceResolve name m $ pure m
+        Right m -> m <$ traceResolve name m
     notFound xs = throwResumable $ NotFoundError name xs Language.TypeScript
 
 resolveTSModule :: Members '[ Reader (ModuleTable [M.Module term]) ] effects
@@ -126,6 +129,7 @@ evalRequire :: ( AbstractValue location value effects
                           , State (Exports location value)
                           , State (Heap location value)
                           , State (ModuleTable (Environment location value, value))
+                          , Trace
                           ] effects
                , Reducer value (Cell location value)
                )

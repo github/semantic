@@ -54,6 +54,7 @@ relativeQualifiedName prefix paths = RelativeQualifiedName (BC.unpack prefix) (J
 resolvePythonModules :: Members '[ Reader ModuleInfo
                                  , Reader (ModuleTable [Module term])
                                  , Resumable ResolutionError
+                                 , Trace
                                  ] effects
                      => QualifiedName
                      -> Evaluator location term value effects (NonEmpty ModulePath)
@@ -61,7 +62,7 @@ resolvePythonModules q = do
   relRootDir <- rootDir q <$> currentModule
   for (moduleNames q) $ \name -> do
     x <- search relRootDir name
-    traceResolve name x $ pure x
+    x <$ traceResolve name x
   where
     rootDir (QualifiedName _) ModuleInfo{..}           = mempty -- overall rootDir of the Package.
     rootDir (RelativeQualifiedName n _) ModuleInfo{..} = upDir numDots (takeDirectory modulePath)
@@ -74,7 +75,7 @@ resolvePythonModules q = do
     moduleNames (RelativeQualifiedName _ (Just paths)) = moduleNames paths
 
     search rootDir x = do
-      traceM ("searching for " <> show x <> " in " <> show rootDir)
+      traceE ("searching for " <> show x <> " in " <> show rootDir)
       let path = normalise (rootDir </> normalise x)
       let searchPaths = [ path </> "__init__.py"
                         , path <.> ".py"
