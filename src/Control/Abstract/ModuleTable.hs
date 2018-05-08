@@ -2,6 +2,8 @@
 module Control.Abstract.ModuleTable
 ( UnevaluatedModules
 , EvaluatedModules
+, Loaded(..)
+, runLoaded
 , lookupModule
 , resolve
 , listModulesInDir
@@ -18,6 +20,7 @@ module Control.Abstract.ModuleTable
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Exports
+import Control.Monad.Effect (interpret)
 import Data.Abstract.Environment
 import Data.Abstract.Exports as Exports
 import Data.Abstract.Module
@@ -29,15 +32,15 @@ type UnevaluatedModules term = ModuleTable [Module term]
 type EvaluatedModules location value = ModuleTable (Maybe (Environment location value, value))
 
 -- | Retrieve an evaluated module, if any. The outer 'Maybe' indicates whether we’ve begun loading the module or not, while the inner 'Maybe' indicates whether we’ve completed loading it or not. Thus, @Nothing@ means we’ve never tried to load it, @Just Nothing@ means we’ve started but haven’t yet finished loading it, and @Just (Just (env, value))@ indicates the result of a completed load.
-lookupModule :: Member (State (EvaluatedModules location value)) effects => ModulePath -> Evaluator location term value effects (Maybe (Maybe (Environment location value, value)))
-lookupModule path = ModuleTable.lookup path <$> raise get
+lookupModule :: Member (Loaded location value) effects => ModulePath -> Evaluator location term value effects (Maybe (Maybe (Environment location value, value)))
+lookupModule = send . Lookup
 
-loadingModule :: Member (State (EvaluatedModules location value)) effects => ModulePath -> Evaluator location term value effects Bool
+loadingModule :: Member (Loaded location value) effects => ModulePath -> Evaluator location term value effects Bool
 loadingModule path = isJust <$> lookupModule path
 
 -- | Cache a result in the evaluated module table.
-cacheModule :: Member (State (EvaluatedModules location value)) effects => ModulePath -> Maybe (Environment location value, value) -> Evaluator location term value effects ()
-cacheModule path result = raise (modify' (ModuleTable.insert path result))
+cacheModule :: Member (Loaded location value) effects => ModulePath -> Maybe (Environment location value, value) -> Evaluator location term value effects ()
+cacheModule path result = send (Cache path result)
 
 
 -- | Retrieve the table of unevaluated modules.
@@ -64,11 +67,11 @@ listModulesInDir dir = modulePathsInDir dir <$> askModuleTable
 --
 -- Looks up the term's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
 require :: Members '[ EvalModule term value
+                    , Loaded location value
                     , Reader (UnevaluatedModules term)
                     , Resumable (LoadError term)
                     , State (Environment location value)
                     , State (Exports location value)
-                    , State (EvaluatedModules location value)
                     , Trace
                     ] effects
         => ModulePath
@@ -79,11 +82,11 @@ require path = lookupModule path >>= maybeM (load path)
 --
 -- Always loads/evaluates.
 load :: Members '[ EvalModule term value
+                 , Loaded location value
                  , Reader (UnevaluatedModules term)
                  , Resumable (LoadError term)
                  , State (Environment location value)
                  , State (Exports location value)
-                 , State (EvaluatedModules location value)
                  , Trace
                  ] effects
      => ModulePath
@@ -164,3 +167,12 @@ runResolutionError = raiseHandler runError
 
 runResolutionErrorWith :: Effectful m => (forall resume . ResolutionError resume -> m effects resume) -> m (Resumable ResolutionError ': effects) a -> m effects a
 runResolutionErrorWith = runResumableWith
+
+data Loaded location value return where
+  Lookup  :: ModulePath                                              -> Loaded location value (Maybe (Maybe (Environment location value, value)))
+  Cache   :: ModulePath -> Maybe (Environment location value, value) -> Loaded location value ()
+
+runLoaded :: Member (State (EvaluatedModules location value)) effects => Evaluator location term value (Loaded location value ': effects) a -> Evaluator location term value effects a
+runLoaded = raiseHandler (interpret (\ loaded -> case loaded of
+  Lookup path       -> ModuleTable.lookup path <$> get
+  Cache path result -> modify' (ModuleTable.insert path result)))

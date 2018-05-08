@@ -75,12 +75,12 @@ instance Evaluatable Require where
 
 doRequire :: ( AbstractValue location value effects
              , Members '[ EvalModule term value
+                        , Loaded location value
                         , Reader (UnevaluatedModules term)
                         , Resumable (LoadError term)
                         , Resumable ResolutionError
                         , State (Environment location value)
                         , State (Exports location value)
-                        , State (EvaluatedModules location value)
                         , Trace
                         ] effects
              )
@@ -112,12 +112,12 @@ instance Evaluatable Load where
 
 doLoad :: ( AbstractValue location value effects
           , Members '[ EvalModule term value
+                     , Loaded location value
                      , Reader (UnevaluatedModules term)
                      , Resumable (LoadError term)
                      , Resumable ResolutionError
                      , State (Environment location value)
                      , State (Exports location value)
-                     , State (EvaluatedModules location value)
                      , Trace
                      ] effects
           )

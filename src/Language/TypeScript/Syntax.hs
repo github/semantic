@@ -121,13 +121,13 @@ javascriptExtensions = ["js"]
 evalRequire :: ( AbstractValue location value effects
                , Addressable location effects
                , Members '[ EvalModule term value
+                          , Loaded location value
                           , Reader (Environment location value)
                           , Reader (UnevaluatedModules term)
                           , Resumable (LoadError term)
                           , State (Environment location value)
                           , State (Exports location value)
                           , State (Heap location value)
-                          , State (EvaluatedModules location value)
                           , Trace
                           ] effects
                , Reducer value (Cell location value)
