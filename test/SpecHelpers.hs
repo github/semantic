@@ -14,6 +14,7 @@ import Analysis.Abstract.Evaluating
 import Analysis.Abstract.Evaluating as X (EvaluatingState(..))
 import Control.Abstract.Addressable
 import Control.Abstract.Value
+import Control.Effect as X (runIgnoringTraces)
 import Data.Abstract.Address as X
 import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables as X hiding (dropExtension)
@@ -71,6 +72,7 @@ testEvaluating
   = run
   . fmap (first reassociate)
   . evaluating
+  . runIgnoringTraces
   . runLoadError
   . runValueError
   . runUnspecialized
@@ -79,9 +81,6 @@ testEvaluating
   . runEvalError
   . runAddressError
   . constrainedToValuePrecise
-
-constrainedToValuePrecise :: Evaluator Precise term (Value Precise) effects a -> Evaluator Precise term (Value Precise) effects a
-constrainedToValuePrecise = id
 
 ns n = Just . Latest . Just . injValue . Namespace n
 addr = Address . Precise

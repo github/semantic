@@ -78,6 +78,7 @@ require :: Members '[ EvalModule term value
                     , State (Environment location value)
                     , State (Exports location value)
                     , State (ModuleTable (Environment location value, value))
+                    , Trace
                     ] effects
         => ModulePath
         -> Evaluator location term value effects (Maybe (Environment location value, value))
@@ -93,6 +94,7 @@ load :: Members '[ EvalModule term value
                  , State (Environment location value)
                  , State (Exports location value)
                  , State (ModuleTable (Environment location value, value))
+                 , Trace
                  ] effects
      => ModulePath
      -> Evaluator location term value effects (Maybe (Environment location value, value))
@@ -104,10 +106,10 @@ load name = askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= run
       let mPath = modulePath (moduleInfo x)
       LoadStack{..} <- askLoadStack
       if moduleInfo x `elem` unLoadStack
-        then trace ("load (skip evaluating, circular load): " <> show mPath) (pure Nothing)
+        then traceE ("load (skip evaluating, circular load): " <> show mPath) $> Nothing
         else do
-          v <- localLoadStack (loadStackPush (moduleInfo x)) (trace ("load (evaluating): " <> show mPath) (evaluateModule x))
-          traceM ("load done:" <> show mPath)
+          v <- localLoadStack (loadStackPush (moduleInfo x)) (traceE ("load (evaluating): " <> show mPath) *> evaluateModule x)
+          traceE ("load done:" <> show mPath)
           env <- filterEnv <$> getExports <*> getEnv
           modifyModuleTable (ModuleTable.insert name (env, v))
           pure (Just (env, v))

@@ -51,6 +51,7 @@ include :: ( AbstractValue location term value effects
                       , Resumable ResolutionError
                       , State (Environment location value)
                       , State (Exports location value)
+                      , Trace
                       ] effects
            )
         => Subterm term (Evaluator location term value effects value)
@@ -59,7 +60,8 @@ include :: ( AbstractValue location term value effects
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
-  (importedEnv, v) <- traceResolve name path (isolate (f path)) >>= maybeM ((,) emptyEnv <$> unit)
+  traceResolve name path
+  (importedEnv, v) <- isolate (f path) >>= maybeM ((,) emptyEnv <$> unit)
   modifyEnv (mergeEnvs importedEnv)
   pure v
 

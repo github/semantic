@@ -68,6 +68,7 @@ type EvaluatableConstraints location term value effects =
              , State (Exports location value)
              , State (Heap location value)
              , State (ModuleTable (Environment location value, value))
+             , Trace
              ] effects
   , Reducer value (Cell location value)
   )
@@ -162,8 +163,8 @@ instance Evaluatable [] where
   eval = maybe unit (runApp . foldMap1 (App . subtermValue)) . nonEmpty
 
 
-traceResolve :: (Show a, Show b) => a -> b -> c -> c
-traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
+traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator location term value effects ()
+traceResolve name path = traceE ("resolved " <> show name <> " -> " <> show path)
 
 
 -- | Evaluate a given package.
@@ -172,6 +173,7 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                        , Members '[ Fail
                                   , Reader (Environment location value)
                                   , State (Environment location value)
+                                  , Trace
                                   ] effects
                        , Recursive term
                        , termEffects ~ (LoopControl value ': Return value ': EvalClosure term value ': moduleEffects)
@@ -191,6 +193,7 @@ evaluatePackageBodyWith :: ( Evaluatable (Base term)
                            , Members '[ Fail
                                       , Reader (Environment location value)
                                       , State (Environment location value)
+                                      , Trace
                                       ] effects
                            , Recursive term
                            , termEffects ~ (LoopControl value ': Return value ': EvalClosure term value ': moduleEffects)
