@@ -192,9 +192,13 @@ instance Eq1 MemberAccess where liftEq = genericLiftEq
 instance Ord1 MemberAccess where liftCompare = genericLiftCompare
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
--- TODO return LvalMember:
 instance Evaluatable MemberAccess where
-  eval (fmap subtermValue -> MemberAccess mem acc) = Rval <$> evaluateInScopedEnv mem acc
+  eval (MemberAccess obj prop) = do
+    obj <- subtermValue obj
+    prop <- subtermRef prop
+    case prop of
+      LvalLocal propName -> pure (LvalMember obj propName)
+      _ -> raiseEff (Prologue.fail "Non-Identifier as right hand side of MemberAccess!")
 
 -- | Subscript (e.g a[1])
 data Subscript a
