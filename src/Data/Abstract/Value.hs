@@ -357,10 +357,11 @@ instance ( Addressable location (Goto effects (Value location) ': effects)
 
   call op params = do
     case prjValue op of
-      Just (Closure _ _ names label env) -> do
-        -- Evaluate the bindings and the body within a `goto` in order to
-        -- charge their origins to the closure's origin.
-        goto label $ \body -> do
+      Just (Closure packageInfo moduleInfo names label env) -> do
+        body <- goto label
+        -- Evaluate the bindings and body with the closure’s package/module info in scope in order to
+        -- charge them to the closure's origin.
+        withCurrentPackage packageInfo . withCurrentModule moduleInfo $ do
           bindings <- foldr (\ (name, param) rest -> do
             v <- param
             a <- alloc name
