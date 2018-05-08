@@ -30,7 +30,7 @@ import qualified Control.Monad.Effect.Reader as Eff
 import           Control.Monad.Effect.Resumable
 import qualified Control.Monad.Effect.State as Eff
 import           Control.Monad.Effect.Trace
-import           Prologue hiding (throwError, trace)
+import           Prologue hiding (throwError)
 
 -- | Types wrapping 'Eff.Eff' actions.
 --

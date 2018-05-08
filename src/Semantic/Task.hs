@@ -1,4 +1,5 @@
 {-# LANGUAGE ConstraintKinds, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Semantic.Task
 ( Task
 , TaskEff
@@ -51,6 +52,7 @@ import           Control.Monad.Effect as Eff hiding (run)
 import           Control.Monad.Effect.Exception
 import           Control.Monad.Effect.Reader
 import           Control.Monad.Effect.Run as Run
+import           Control.Monad.Effect.Trace
 import           Data.Blob
 import           Data.Diff
 import qualified Data.Error as Error
@@ -71,7 +73,19 @@ import           System.Exit (die)
 import           System.IO (stderr)
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
-type TaskEff = Eff '[Distribute WrappedTask, Task, IO.Files, Reader Options, Telemetry, Exc SomeException, IO]
+type TaskEff = Eff '[Distribute WrappedTask
+                    , Task
+                    , IO.Files
+                    , Reader Options
+                    , Telemetry
+                    , Exc SomeException
+                    , Trace
+                    , IO]
+
+-- This orphan lets us use Run with Trace.
+-- TODO: kill this once we nuke Run and/or fix Trace
+instance Run.Run '[Trace, IO] result (IO result) where
+  run = Eff.runM . Analysis.runPrintingTraces
 
 -- | A wrapper for a 'Task', to embed in other effects.
 newtype WrappedTask a = WrapTask { unwrapTask :: TaskEff a }
@@ -137,7 +151,7 @@ data Task output where
   Render   :: Renderer input output -> input -> Task output
 
 -- | Run a 'Task' effect by performing the actions in 'IO'.
-runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, IO] effs => Eff (Task ': effs) a -> Eff effs a
+runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, Trace, IO] effs => Eff (Task ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
   Parse parser blob -> runParser blob parser
   Analyze interpret analysis -> pure (interpret analysis)
@@ -151,19 +165,19 @@ logError :: Member Telemetry effs => Options -> Level -> Blob -> Error.Error Str
 logError Options{..} level blob err = writeLog level (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err)
 
 -- | Parse a 'Blob' in 'IO'.
-runParser :: Members '[Reader Options, Telemetry, Exc SomeException, IO] effs => Blob -> Parser term -> Eff effs term
+runParser :: Members '[Reader Options, Telemetry, Exc SomeException, IO, Trace] effs => Blob -> Parser term -> Eff effs term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $
       IO.rethrowing (parseToAST language blob)
   AssignmentParser parser assignment -> do
-    traceM ("Parsing " <> blobPath)
+    trace ("Parsing " <> blobPath)
     ast <- runParser blob parser `catchError` \ (SomeException err) -> do
       writeStat (Stat.increment "parse.parse_failures" languageTag)
       writeLog Error "failed parsing" (("task", "parse") : blobFields)
       throwError (toException err)
     options <- ask
-    traceM ("Assigning " <> blobPath)
+    trace ("Assigning " <> blobPath)
     time "parse.assign" languageTag $
       case Assignment.assign blobSource assignment ast of
         Left err -> do
@@ -193,5 +207,5 @@ runParser blob@Blob{..} parser = case parser of
           _ -> fold syntax
 
 
-instance (Members '[Reader Options, Telemetry, Exc SomeException, IO] effects, Run effects result rest) => Run (Task ': effects) result rest where
+instance (Members '[Reader Options, Telemetry, Exc SomeException, Trace, IO] effects, Run effects result rest) => Run (Task ': effects) result rest where
   run = run . runTaskF
