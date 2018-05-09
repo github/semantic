@@ -33,10 +33,10 @@ graph graphType renderer project
   | SomeAnalysisParser parser prelude <- someAnalysisParser
     (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
     package <- parsePackage parser prelude project
-    let perTerm = case graphType of
+    let analyzeTerm = case graphType of
           ImportGraph -> graphingLoadErrors
           CallGraph   -> graphingLoadErrors . graphingTerms
-    analyze runGraphAnalysis (evaluatePackageWith graphingModules perTerm package) >>= extractGraph >>= case renderer of
+    analyze runGraphAnalysis (evaluatePackageWith graphingModules analyzeTerm package) >>= extractGraph >>= case renderer of
       JSONGraphRenderer -> pure . toOutput
       DOTGraphRenderer  -> pure . renderGraph
     where extractGraph result = case result of
