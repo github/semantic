@@ -42,7 +42,7 @@ listModulesInDir = sendModules . List
 
 -- | Require/import another module by name and return its environment and value.
 --
--- Looks up the term's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
+-- Looks up the module's name in the cache of evaluated modules first, returns if found, otherwise loads/evaluates the module.
 require :: Member (Modules location value) effects => ModulePath -> Evaluator location value effects (Maybe (Environment location value, value))
 require path = lookupModule path >>= maybeM (load path)
 
