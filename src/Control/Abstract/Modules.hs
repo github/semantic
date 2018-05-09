@@ -70,10 +70,8 @@ runModules :: Members '[ Resumable (LoadError location value)
            -> Evaluator location term value (Modules location value ': effects) a
            -> Evaluator location term value (Reader (ModuleTable [Module term]) ': effects) a
 runModules evaluateModule = reinterpretEffect (\ m -> case m of
-  Load name -> askModuleTable >>= maybe notFound (runMerging . foldMap (Merging . evalAndCache)) . ModuleTable.lookup name
+  Load name -> askModuleTable >>= maybe (moduleNotFound name) (runMerging . foldMap (Merging . evalAndCache)) . ModuleTable.lookup name
     where
-      notFound = throwResumable (LoadError name)
-
       evalAndCache x = do
         let mPath = modulePath (moduleInfo x)
         loading <- loadingModule mPath
@@ -135,6 +133,9 @@ instance Show1 (LoadError location value) where
   liftShowsPrec _ _ = showsPrec
 instance Eq1 (LoadError location value) where
   liftEq _ (LoadError a) (LoadError b) = a == b
+
+moduleNotFound :: Member (Resumable (LoadError location value)) effects => ModulePath -> Evaluator location term value effects (Maybe (Environment location value, value))
+moduleNotFound = throwResumable . LoadError
 
 runLoadError :: Evaluator location term value (Resumable (LoadError location value) ': effects) a -> Evaluator location term value effects (Either (SomeExc (LoadError location value)) a)
 runLoadError = raiseHandler runError
