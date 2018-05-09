@@ -60,7 +60,7 @@ data Modules location value return where
 sendModules :: Member (Modules location value) effects => Modules location value return -> Evaluator location term value effects return
 sendModules = send
 
-runModules :: Members '[ Resumable (LoadError term)
+runModules :: Members '[ Resumable (LoadError location value)
                        , State (Environment location value)
                        , State (Exports location value)
                        , State (ModuleTable (Maybe (Environment location value, value)))
@@ -70,7 +70,7 @@ runModules :: Members '[ Resumable (LoadError term)
            -> Evaluator location term value (Modules location value ': effects) a
            -> Evaluator location term value (Reader (ModuleTable [Module term]) ': effects) a
 runModules evaluateModule = reinterpretEffect (\ m -> case m of
-  Load name -> askModuleTable >>= maybeM notFound . ModuleTable.lookup name >>= runMerging . foldMap (Merging . evalAndCache)
+  Load name -> askModuleTable >>= maybe notFound (runMerging . foldMap (Merging . evalAndCache)) . ModuleTable.lookup name
     where
       notFound = throwResumable (LoadError name)
 
@@ -126,20 +126,20 @@ instance Applicative m => Monoid (Merging m location value) where
 
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
-data LoadError term resume where
-  LoadError :: ModulePath -> LoadError term [Module term]
+data LoadError location value resume where
+  LoadError :: ModulePath -> LoadError location value (Maybe (Environment location value, value))
 
-deriving instance Eq (LoadError term resume)
-deriving instance Show (LoadError term resume)
-instance Show1 (LoadError term) where
+deriving instance Eq (LoadError location value resume)
+deriving instance Show (LoadError location value resume)
+instance Show1 (LoadError location value) where
   liftShowsPrec _ _ = showsPrec
-instance Eq1 (LoadError term) where
+instance Eq1 (LoadError location value) where
   liftEq _ (LoadError a) (LoadError b) = a == b
 
-runLoadError :: Evaluator location term value (Resumable (LoadError term) ': effects) a -> Evaluator location term value effects (Either (SomeExc (LoadError term)) a)
+runLoadError :: Evaluator location term value (Resumable (LoadError location value) ': effects) a -> Evaluator location term value effects (Either (SomeExc (LoadError location value)) a)
 runLoadError = raiseHandler runError
 
-runLoadErrorWith :: (forall resume . LoadError term resume -> Evaluator location term value effects resume) -> Evaluator location term value (Resumable (LoadError term) ': effects) a -> Evaluator location term value effects a
+runLoadErrorWith :: (forall resume . LoadError location value resume -> Evaluator location term value effects resume) -> Evaluator location term value (Resumable (LoadError location value) ': effects) a -> Evaluator location term value effects a
 runLoadErrorWith = runResumableWith
 
 

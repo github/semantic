@@ -170,7 +170,7 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                        , EvaluatableConstraints location term value inner
                        , Members '[ Fail
                                   , Reader (Environment location value)
-                                  , Resumable (LoadError term)
+                                  , Resumable (LoadError location value)
                                   , State (Environment location value)
                                   , State (Exports location value)
                                   , State (ModuleTable (Maybe (Environment location value, value)))
@@ -192,7 +192,7 @@ evaluatePackageBodyWith :: forall location term value inner inner' outer
                            , EvaluatableConstraints location term value inner
                            , Members '[ Fail
                                       , Reader (Environment location value)
-                                      , Resumable (LoadError term)
+                                      , Resumable (LoadError location value)
                                       , State (Environment location value)
                                       , State (Exports location value)
                                       , State (ModuleTable (Maybe (Environment location value, value)))
