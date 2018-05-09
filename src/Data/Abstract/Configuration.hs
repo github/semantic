@@ -19,5 +19,3 @@ data Configuration term location value = Configuration
 deriving instance (Eq   term, Eq   location, Eq   value, Eq   (Cell location value)) => Eq   (Configuration term location value)
 deriving instance (Ord  term, Ord  location, Ord  value, Ord  (Cell location value)) => Ord  (Configuration term location value)
 deriving instance (Show term, Show location, Show value, Show (Cell location value)) => Show (Configuration term location value)
-
-deriving instance (Ord location, Foldable (Cell location)) => Foldable (Configuration term location)
