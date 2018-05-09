@@ -184,7 +184,7 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                     -> (SubtermAlgebra (Base term) term (Evaluator location value inner value) -> SubtermAlgebra (Base term) term (Evaluator location value inner value))
                     -> Package term
                     -> Evaluator location value outer [value]
-evaluatePackageWith perModule perTerm = runReader . packageInfo <*> evaluatePackageBodyWith perModule perTerm . packageBody
+evaluatePackageWith analyzeModule analyzeTerm = runReader . packageInfo <*> evaluatePackageBodyWith analyzeModule analyzeTerm . packageBody
 
 -- | Evaluate a given package body (module table and entry points).
 evaluatePackageBodyWith :: forall location term value inner inner' outer
@@ -206,13 +206,13 @@ evaluatePackageBodyWith :: forall location term value inner inner' outer
                         -> (SubtermAlgebra (Base term) term (Evaluator location value inner value) -> SubtermAlgebra (Base term) term (Evaluator location value inner value))
                         -> PackageBody term
                         -> Evaluator location value outer [value]
-evaluatePackageBodyWith perModule perTerm body
+evaluatePackageBodyWith analyzeModule analyzeTerm body
   = runInPackageBody evalModule body
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
   where evalModule m
           = runInModule (moduleInfo m)
-          . perModule (subtermValue . moduleBody)
-          . fmap (Subterm <*> foldSubterms (perTerm eval))
+          . analyzeModule (subtermValue . moduleBody)
+          . fmap (Subterm <*> foldSubterms (analyzeTerm eval))
           $ m
 
         evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location value (Modules location value ': outer) value
