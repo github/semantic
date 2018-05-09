@@ -96,7 +96,7 @@ runModules evaluateModule = go
               -- languages. We need better semantics rather than doing it ad-hoc.
               filterEnv ports env
                 | Exports.null ports = env
-                | otherwise = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
+                | otherwise          = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
           Lookup path -> ModuleTable.lookup path <$> raise get
           Resolve names -> do
             isMember <- flip ModuleTable.member <$> askModuleTable @term
