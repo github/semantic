@@ -1,18 +1,13 @@
 module Data.Abstract.Module
 ( Module(..)
-, ModuleInfo(..)
-, ModulePath
 , moduleForBlob
+, ModulePath
+, ModuleInfo(..)
 ) where
 
 import Data.Blob
 import Prologue
 import System.FilePath.Posix
-
-type ModulePath = FilePath
-
-newtype ModuleInfo = ModuleInfo { modulePath :: ModulePath }
-  deriving (Eq, Ord, Show)
 
 data Module term = Module { moduleInfo :: ModuleInfo, moduleBody :: term }
   deriving (Eq, Foldable, Functor, Ord, Traversable)
@@ -29,3 +24,9 @@ moduleForBlob :: Maybe FilePath -- ^ The root directory relative to which the mo
 moduleForBlob rootDir Blob{..} = Module info
   where root = fromMaybe (takeDirectory blobPath) rootDir
         info = ModuleInfo (makeRelative root blobPath)
+
+
+type ModulePath = FilePath
+
+newtype ModuleInfo = ModuleInfo { modulePath :: ModulePath }
+  deriving (Eq, Ord, Show)
