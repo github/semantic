@@ -183,7 +183,10 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                     -> (SubtermAlgebra (Base term) term (Evaluator location value inner value) -> SubtermAlgebra (Base term) term (Evaluator location value inner value))
                     -> Package term
                     -> Evaluator location value outer [value]
-evaluatePackageWith analyzeModule analyzeTerm = runReader . packageInfo <*> evaluatePackageBodyWith analyzeModule analyzeTerm . packageBody
+evaluatePackageWith analyzeModule analyzeTerm package
+  = runReader (packageInfo package)
+  . evaluatePackageBodyWith analyzeModule analyzeTerm
+  $ packageBody package
 
 -- | Evaluate a given package body (module table and entry points).
 evaluatePackageBodyWith :: forall location term value inner inner' outer
