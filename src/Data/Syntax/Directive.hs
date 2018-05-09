@@ -17,3 +17,14 @@ instance Show1 File where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable File where
   eval File = currentModule >>= string . BC.pack . modulePath
+
+
+-- A line directive like the Ruby constant `__LINE__`.
+data Line a = Line
+  deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+
+instance Eq1 Line where liftEq = genericLiftEq
+instance Ord1 Line where liftCompare = genericLiftCompare
+instance Show1 Line where liftShowsPrec = genericLiftShowsPrec
+
+instance Evaluatable Line
