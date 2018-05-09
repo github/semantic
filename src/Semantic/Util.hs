@@ -14,7 +14,6 @@ import           Data.Abstract.Type
 import           Data.Blob
 import           Data.File
 import qualified Data.Language as Language
-import           Data.Semilattice.Lower
 import qualified GHC.TypeLits as TypeLevel
 import           Language.Preluded
 import           Parsing.Parser
@@ -30,7 +29,6 @@ justEvaluating
   = runM
   . fmap (first reassociate)
   . evaluating
-  . runReader (lowerBound :: Span)
   . runPrintingTraces
   . runLoadError
   . runValueError
@@ -44,7 +42,6 @@ justEvaluating
 evaluatingWithHoles
   = runM
   . evaluating
-  . runReader (lowerBound :: Span)
   . runPrintingTraces
   . resumingLoadError
   . resumingUnspecialized
@@ -60,7 +57,6 @@ checking
   = runM
   . fmap (first reassociate)
   . evaluating
-  . runReader (lowerBound :: Span)
   . runPrintingTraces
   . providingLiveSet
   . runLoadError

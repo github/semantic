@@ -47,7 +47,6 @@ graph graphType renderer project
           runGraphAnalysis
             = run
             . evaluating
-            . runReader (lowerBound :: Span)
             . runIgnoringTraces
             . resumingLoadError
             . resumingUnspecialized
