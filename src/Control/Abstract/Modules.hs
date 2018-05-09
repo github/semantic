@@ -69,36 +69,38 @@ runModules :: forall term location value effects a
                        , State (ModuleTable (Maybe (Environment location value, value)))
                        , Trace
                        ] effects
-           => (Module term -> Evaluator location value (Reader (ModuleTable [Module term]) ': effects) value)
+           => (Module term -> Evaluator location value (Modules location value ': effects) value)
            -> Evaluator location value (Modules location value ': effects) a
            -> Evaluator location value (Reader (ModuleTable [Module term]) ': effects) a
-runModules evaluateModule = reinterpretEffect (\ m -> case m of
-  Load name -> askModuleTable @term >>= maybe (moduleNotFound name) (runMerging . foldMap (Merging . evalAndCache)) . ModuleTable.lookup name
-    where
-      evalAndCache x = do
-        let mPath = modulePath (moduleInfo x)
-        loading <- loadingModule mPath
-        cacheModule name Nothing
-        if loading
-          then traceE ("load (skip evaluating, circular load): " <> show mPath) $> Nothing
-          else do
-            v <- traceE ("load (evaluating): " <> show mPath) *> evaluateModule x <* traceE ("load done:" <> show mPath)
-            env <- filterEnv <$> getExports <*> getEnv
-            cacheModule name (Just (env, v))
-            pure (Just (env, v))
+runModules evaluateModule = go
+  where go :: forall a . Evaluator location value (Modules location value ': effects) a -> Evaluator location value (Reader (ModuleTable [Module term]) ': effects) a
+        go = reinterpretEffect (\ m -> case m of
+          Load name -> askModuleTable @term >>= maybe (moduleNotFound name) (runMerging . foldMap (Merging . evalAndCache)) . ModuleTable.lookup name
+            where
+              evalAndCache x = do
+                let mPath = modulePath (moduleInfo x)
+                loading <- loadingModule mPath
+                cacheModule name Nothing
+                if loading
+                  then traceE ("load (skip evaluating, circular load): " <> show mPath) $> Nothing
+                  else do
+                    v <- traceE ("load (evaluating): " <> show mPath) *> go (evaluateModule x) <* traceE ("load done:" <> show mPath)
+                    env <- filterEnv <$> getExports <*> getEnv
+                    cacheModule name (Just (env, v))
+                    pure (Just (env, v))
 
-      -- TODO: If the set of exports is empty because no exports have been
-      -- defined, do we export all terms, or no terms? This behavior varies across
-      -- languages. We need better semantics rather than doing it ad-hoc.
-      filterEnv :: Exports.Exports location value -> Environment location value -> Environment location value
-      filterEnv ports env
-        | Exports.null ports = env
-        | otherwise = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
-  Lookup path -> ModuleTable.lookup path <$> raise get
-  Resolve names -> do
-    isMember <- flip ModuleTable.member <$> askModuleTable @term
-    pure (find isMember names)
-  List dir -> modulePathsInDir dir <$> askModuleTable @term)
+              -- TODO: If the set of exports is empty because no exports have been
+              -- defined, do we export all terms, or no terms? This behavior varies across
+              -- languages. We need better semantics rather than doing it ad-hoc.
+              filterEnv :: Exports.Exports location value -> Environment location value -> Environment location value
+              filterEnv ports env
+                | Exports.null ports = env
+                | otherwise = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
+          Lookup path -> ModuleTable.lookup path <$> raise get
+          Resolve names -> do
+            isMember <- flip ModuleTable.member <$> askModuleTable @term
+            pure (find isMember names)
+          List dir -> modulePathsInDir dir <$> askModuleTable @term)
 
 
 loadingModule :: Member (State (ModuleTable (Maybe (Environment location value, value)))) effects => ModulePath -> Evaluator location value effects Bool

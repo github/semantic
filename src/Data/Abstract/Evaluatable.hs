@@ -208,6 +208,7 @@ evaluatePackageBodyWith :: forall location term value inner inner' outer
                         -> Evaluator location value outer [value]
 evaluatePackageBodyWith perModule perTerm body
   = runReader (packageModules body)
+  . runModules evalModule
   . withPrelude (packagePrelude body)
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
   where evalModule m
@@ -216,14 +217,13 @@ evaluatePackageBodyWith perModule perTerm body
           . fmap (Subterm <*> foldSubterms (perTerm eval))
           $ m
         runInModule info
-          = runModules evalModule
-          . runReader info
+          = runReader info
           . runReturn
           . runLoopControl
           . fmap fst
           . runGoto lowerBound
 
-        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location value (Reader (ModuleTable [Module term]) ': outer) value
+        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location value (Modules location value ': outer) value
         evaluateEntryPoint m sym = runInModule (ModuleInfo m) $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
