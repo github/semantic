@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Graph
 ( Graph(..)
 , Vertex(..)
@@ -84,16 +84,13 @@ graphingTerms recur term@(In _ syntax) = do
   recur term
 
 -- | Add vertices to the graph for 'LoadError's.
-graphingLoadErrors :: forall location term value effects a
-                   .  Members '[ Reader ModuleInfo
+graphingLoadErrors :: Members '[ Reader ModuleInfo
                                , Resumable (LoadError location value)
                                , State Graph
                                ] effects
                    => SubtermAlgebra (Base term) term (Evaluator location term value effects a)
                    -> SubtermAlgebra (Base term) term (Evaluator location term value effects a)
-graphingLoadErrors recur term = resume @(LoadError location value)
-  (recur term)
-  (\ err@(ModuleNotFound name) -> moduleInclusion (Module (BC.pack name)) *> throwResumable err)
+graphingLoadErrors recur term = recur term `resumeLoadError` (\ (ModuleNotFound name) -> moduleInclusion (Module (BC.pack name)) *> moduleNotFound name)
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
 graphingModules :: Members '[ Reader ModuleInfo
