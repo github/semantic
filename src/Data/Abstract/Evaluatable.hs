@@ -192,8 +192,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
   . withPrelude (packagePrelude (packageBody package))
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints (packageBody package)))
   where evalModule m
-          = (<*> (filterEnv <$> getExports <*> getEnv))
-          . fmap (flip (,))
+          = pairValueWithEnv
           . runInModule (moduleInfo m)
           . analyzeModule (subtermValue . moduleBody)
           $ fmap (Subterm <*> foldSubterms (analyzeTerm eval)) m
@@ -221,6 +220,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
         filterEnv ports env
           | Exports.null ports = env
           | otherwise          = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
+        pairValueWithEnv action = flip (,) <$> action <*> (filterEnv <$> getExports <*> getEnv)
 
 
 -- | Isolate the given action with an empty global environment and exports.
