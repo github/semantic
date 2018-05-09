@@ -17,7 +17,7 @@ import Prologue
 
 -- | Source position information
 data Pos = Pos
-  { posLine :: !Int
+  { posLine   :: !Int
   , posColumn :: !Int
   }
   deriving (Show, Read, Eq, Ord, Generic, Hashable)
@@ -33,7 +33,7 @@ instance A.FromJSON Pos where
 
 data Span = Span
   { spanStart :: Pos
-  , spanEnd :: Pos
+  , spanEnd   :: Pos
   }
   deriving (Show, Read, Eq, Ord, Generic, Hashable)
 
