@@ -36,10 +36,10 @@ import Prologue
 --   These parameters enable us to constrain the types of effects using them s.t. we can avoid both ambiguous types when they aren’t mentioned outside of the context, and lengthy, redundant annotations on the use sites of functions employing these effects.
 --
 --   These effects will typically include the environment, heap, module table, etc. effects necessary for evaluation of modules and terms, but may also include any other effects so long as they’re eventually handled.
-newtype Evaluator location term value effects a = Evaluator { runEvaluator :: Eff effects a }
+newtype Evaluator location value effects a = Evaluator { runEvaluator :: Eff effects a }
   deriving (Applicative, Effectful, Functor, Monad)
 
-deriving instance Member NonDet effects => Alternative (Evaluator location term value effects)
+deriving instance Member NonDet effects => Alternative (Evaluator location value effects)
 
 
 -- Effects
@@ -51,13 +51,13 @@ data Return value resume where
 deriving instance Eq value => Eq (Return value a)
 deriving instance Show value => Show (Return value a)
 
-earlyReturn :: Member (Return value) effects => value -> Evaluator location term value effects value
+earlyReturn :: Member (Return value) effects => value -> Evaluator location value effects value
 earlyReturn = send . Return
 
-catchReturn :: Member (Return value) effects => Evaluator location term value effects a -> (forall x . Return value x -> Evaluator location term value effects a) -> Evaluator location term value effects a
+catchReturn :: Member (Return value) effects => Evaluator location value effects a -> (forall x . Return value x -> Evaluator location value effects a) -> Evaluator location value effects a
 catchReturn action handler = raiseHandler (interpose pure (\ ret _ -> lower (handler ret))) action
 
-runReturn :: Evaluator location term value (Return value ': effects) value -> Evaluator location term value effects value
+runReturn :: Evaluator location value (Return value ': effects) value -> Evaluator location value effects value
 runReturn = runEffect (\ (Return value) _ -> pure value)
 
 
@@ -69,16 +69,16 @@ data LoopControl value resume where
 deriving instance Eq value => Eq (LoopControl value a)
 deriving instance Show value => Show (LoopControl value a)
 
-throwBreak :: Member (LoopControl value) effects => value -> Evaluator location term value effects value
+throwBreak :: Member (LoopControl value) effects => value -> Evaluator location value effects value
 throwBreak = send . Break
 
-throwContinue :: Member (LoopControl value) effects => value -> Evaluator location term value effects value
+throwContinue :: Member (LoopControl value) effects => value -> Evaluator location value effects value
 throwContinue = send . Continue
 
-catchLoopControl :: Member (LoopControl value) effects => Evaluator location term value effects a -> (forall x . LoopControl value x -> Evaluator location term value effects a) -> Evaluator location term value effects a
+catchLoopControl :: Member (LoopControl value) effects => Evaluator location value effects a -> (forall x . LoopControl value x -> Evaluator location value effects a) -> Evaluator location value effects a
 catchLoopControl action handler = raiseHandler (interpose pure (\ control _ -> lower (handler control))) action
 
-runLoopControl :: Evaluator location term value (LoopControl value ': effects) value -> Evaluator location term value effects value
+runLoopControl :: Evaluator location value (LoopControl value ': effects) value -> Evaluator location value effects value
 runLoopControl = runEffect (\ eff _ -> case eff of
   Break    value -> pure value
   Continue value -> pure value)

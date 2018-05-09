@@ -41,7 +41,7 @@ resolveWithNodejsStrategy :: Members '[ Modules location value
                                       ] effects
                           => ImportPath
                           -> [String]
-                          -> Evaluator location term value effects M.ModulePath
+                          -> Evaluator location value effects M.ModulePath
 resolveWithNodejsStrategy (ImportPath path Relative)    exts = resolveRelativePath path exts
 resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativePath path exts
 
@@ -59,7 +59,7 @@ resolveRelativePath :: Members '[ Modules location value
                                 ] effects
                     => FilePath
                     -> [String]
-                    -> Evaluator location term value effects M.ModulePath
+                    -> Evaluator location value effects M.ModulePath
 resolveRelativePath relImportPath exts = do
   M.ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory modulePath
@@ -85,7 +85,7 @@ resolveNonRelativePath :: Members '[ Modules location value
                                    ] effects
                        => FilePath
                        -> [String]
-                       -> Evaluator location term value effects M.ModulePath
+                       -> Evaluator location value effects M.ModulePath
 resolveNonRelativePath name exts = do
   M.ModuleInfo{..} <- currentModule
   go "." modulePath mempty
@@ -103,7 +103,7 @@ resolveNonRelativePath name exts = do
 resolveTSModule :: Member (Modules location value) effects
                 => FilePath
                 -> [String]
-                -> Evaluator location term value effects (Either [FilePath] M.ModulePath)
+                -> Evaluator location value effects (Either [FilePath] M.ModulePath)
 resolveTSModule path exts = maybe (Left searchPaths) Right <$> resolve searchPaths
   where searchPaths =
           ((path <.>) <$> exts)
@@ -131,7 +131,7 @@ evalRequire :: ( AbstractValue location value effects
                )
             => M.ModulePath
             -> Name
-            -> Evaluator location term value effects value
+            -> Evaluator location value effects value
 evalRequire modulePath alias = letrec' alias $ \addr -> do
   importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
   modifyEnv (mergeEnvs importedEnv)

@@ -35,7 +35,7 @@ resolveGoImport :: Members '[ Modules location value
                             , Trace
                             ] effects
                 => ImportPath
-                -> Evaluator location term value effects [ModulePath]
+                -> Evaluator location value effects [ModulePath]
 resolveGoImport (ImportPath path Relative) = do
   ModuleInfo{..} <- currentModule
   paths <- listModulesInDir (joinPaths (takeDirectory modulePath) path)

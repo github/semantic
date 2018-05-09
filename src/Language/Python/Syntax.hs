@@ -57,7 +57,7 @@ resolvePythonModules :: Members '[ Modules location value
                                  , Trace
                                  ] effects
                      => QualifiedName
-                     -> Evaluator location term value effects (NonEmpty ModulePath)
+                     -> Evaluator location value effects (NonEmpty ModulePath)
 resolvePythonModules q = do
   relRootDir <- rootDir q <$> currentModule
   for (moduleNames q) $ \name -> do

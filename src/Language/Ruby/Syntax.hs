@@ -20,7 +20,7 @@ resolveRubyName :: Members '[ Modules location value
                             , Resumable ResolutionError
                             ] effects
                 => ByteString
-                -> Evaluator location term value effects M.ModulePath
+                -> Evaluator location value effects M.ModulePath
 resolveRubyName name = do
   let name' = cleanNameOrPath name
   let paths = [name' <.> "rb"]
@@ -32,7 +32,7 @@ resolveRubyPath :: Members '[ Modules location value
                             , Resumable ResolutionError
                             ] effects
                 => ByteString
-                -> Evaluator location term value effects M.ModulePath
+                -> Evaluator location value effects M.ModulePath
 resolveRubyPath path = do
   let name' = cleanNameOrPath path
   modulePath <- resolve [name']
@@ -76,7 +76,7 @@ doRequire :: ( AbstractValue location value effects
              , Member (Modules location value) effects
              )
           => M.ModulePath
-          -> Evaluator location term value effects (Environment location value, value)
+          -> Evaluator location value effects (Environment location value, value)
 doRequire path = do
   result <- join <$> lookupModule path
   case result of
@@ -111,7 +111,7 @@ doLoad :: ( AbstractValue location value effects
           )
        => ByteString
        -> Bool
-       -> Evaluator location term value effects value
+       -> Evaluator location value effects value
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
   traceResolve path path'

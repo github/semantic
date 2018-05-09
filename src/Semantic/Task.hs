@@ -102,7 +102,7 @@ parse :: Member Task effs => Parser term -> Blob -> Eff effs term
 parse parser = send . Parse parser
 
 -- | A task running some 'Analysis.MonadAnalysis' to completion.
-analyze :: Member Task effs => (Analysis.Evaluator location term value effects a -> result) -> Analysis.Evaluator location term value effects a -> Eff effs result
+analyze :: Member Task effs => (Analysis.Evaluator location value effects a -> result) -> Analysis.Evaluator location value effects a -> Eff effs result
 analyze interpret analysis = send (Analyze interpret analysis)
 
 -- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
@@ -145,7 +145,7 @@ runTaskWithOptions options task = do
 -- | An effect describing high-level tasks to be performed.
 data Task output where
   Parse    :: Parser term -> Blob -> Task term
-  Analyze  :: (Analysis.Evaluator location term value effects a -> result) -> Analysis.Evaluator location term value effects a -> Task result
+  Analyze  :: (Analysis.Evaluator location value effects a -> result) -> Analysis.Evaluator location value effects a -> Task result
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
   Diff     :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
   Render   :: Renderer input output -> input -> Task output

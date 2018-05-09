@@ -67,7 +67,7 @@ type GotoEffects
      , IO
      ]
 
-type TermEvaluator = Evaluator Precise Term Value TermEffects
+type TermEvaluator = Evaluator Precise Value TermEffects
 
 type Value = Value.Value Precise
 newtype Term = Term { runTerm :: TermEvaluator Value }

@@ -43,8 +43,8 @@ class Evaluatable constr where
   eval :: ( EvaluatableConstraints location term value effects
           , Member Fail effects
           )
-       => SubtermAlgebra constr term (Evaluator location term value effects value)
-  default eval :: (Member (Resumable (Unspecialized value)) effects, Show1 constr) => SubtermAlgebra constr term (Evaluator location term value effects value)
+       => SubtermAlgebra constr term (Evaluator location value effects value)
+  default eval :: (Member (Resumable (Unspecialized value)) effects, Show1 constr) => SubtermAlgebra constr term (Evaluator location value effects value)
   eval expr = throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 type EvaluatableConstraints location term value effects =
@@ -83,10 +83,10 @@ data EvalError value resume where
   ExportError         :: ModulePath -> Name -> EvalError value ()
   EnvironmentLookupError :: value -> EvalError value value
 
-runEvalError :: Evaluator location term value (Resumable (EvalError value) ': effects) a -> Evaluator location term value effects (Either (SomeExc (EvalError value)) a)
+runEvalError :: Evaluator location value (Resumable (EvalError value) ': effects) a -> Evaluator location value effects (Either (SomeExc (EvalError value)) a)
 runEvalError = raiseHandler runError
 
-runEvalErrorWith :: (forall resume . EvalError value resume -> Evaluator location term value effects resume) -> Evaluator location term value (Resumable (EvalError value) ': effects) a -> Evaluator location term value effects a
+runEvalErrorWith :: (forall resume . EvalError value resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (EvalError value) ': effects) a -> Evaluator location value effects a
 runEvalErrorWith = runResumableWith
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
@@ -96,9 +96,9 @@ evaluateInScopedEnv :: ( AbstractValue location value effects
                                   , State (Environment location value)
                                   ] effects
                        )
-                    => Evaluator location term value effects value
-                    -> Evaluator location term value effects value
-                    -> Evaluator location term value effects value
+                    => Evaluator location value effects value
+                    -> Evaluator location value effects value
+                    -> Evaluator location value effects value
 evaluateInScopedEnv scopedEnvTerm term = do
   value <- scopedEnvTerm
   scopedEnv <- scopedEnvironment value
@@ -119,7 +119,7 @@ instance Eq term => Eq1 (EvalError term) where
   liftEq _ _ _                                             = False
 
 
-throwEvalError :: Member (Resumable (EvalError value)) effects => EvalError value resume -> Evaluator location term value effects resume
+throwEvalError :: Member (Resumable (EvalError value)) effects => EvalError value resume -> Evaluator location value effects resume
 throwEvalError = throwResumable
 
 
@@ -134,10 +134,10 @@ deriving instance Show (Unspecialized a b)
 instance Show1 (Unspecialized a) where
   liftShowsPrec _ _ = showsPrec
 
-runUnspecialized :: Evaluator location term value (Resumable (Unspecialized value) ': effects) a -> Evaluator location term value effects (Either (SomeExc (Unspecialized value)) a)
+runUnspecialized :: Evaluator location value (Resumable (Unspecialized value) ': effects) a -> Evaluator location value effects (Either (SomeExc (Unspecialized value)) a)
 runUnspecialized = raiseHandler runError
 
-runUnspecializedWith :: (forall resume . Unspecialized value resume -> Evaluator location term value effects resume) -> Evaluator location term value (Resumable (Unspecialized value) ': effects) a -> Evaluator location term value effects a
+runUnspecializedWith :: (forall resume . Unspecialized value resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (Unspecialized value) ': effects) a -> Evaluator location value effects a
 runUnspecializedWith = runResumableWith
 
 
@@ -161,7 +161,7 @@ instance Evaluatable [] where
   eval = maybe unit (runApp . foldMap1 (App . subtermValue)) . nonEmpty
 
 
-traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator location term value effects ()
+traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator location value effects ()
 traceResolve name path = traceE ("resolved " <> show name <> " -> " <> show path)
 
 
@@ -180,10 +180,10 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                        , inner ~ (Goto inner' value ': inner')
                        , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': Modules location value ': Reader PackageInfo ': outer)
                        )
-                    => (SubtermAlgebra Module term (Evaluator location term value inner value) -> SubtermAlgebra Module term (Evaluator location term value inner value))
-                    -> (SubtermAlgebra (Base term) term (Evaluator location term value inner value) -> SubtermAlgebra (Base term) term (Evaluator location term value inner value))
+                    => (SubtermAlgebra Module term (Evaluator location value inner value) -> SubtermAlgebra Module term (Evaluator location value inner value))
+                    -> (SubtermAlgebra (Base term) term (Evaluator location value inner value) -> SubtermAlgebra (Base term) term (Evaluator location value inner value))
                     -> Package term
-                    -> Evaluator location term value outer [value]
+                    -> Evaluator location value outer [value]
 evaluatePackageWith perModule perTerm = runReader . packageInfo <*> evaluatePackageBodyWith perModule perTerm . packageBody
 
 -- | Evaluate a given package body (module table and entry points).
@@ -202,10 +202,10 @@ evaluatePackageBodyWith :: forall location term value inner inner' outer
                            , inner ~ (Goto inner' value ': inner')
                            , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': Modules location value ': outer)
                            )
-                        => (SubtermAlgebra Module term (Evaluator location term value inner value) -> SubtermAlgebra Module term (Evaluator location term value inner value))
-                        -> (SubtermAlgebra (Base term) term (Evaluator location term value inner value) -> SubtermAlgebra (Base term) term (Evaluator location term value inner value))
+                        => (SubtermAlgebra Module term (Evaluator location value inner value) -> SubtermAlgebra Module term (Evaluator location value inner value))
+                        -> (SubtermAlgebra (Base term) term (Evaluator location value inner value) -> SubtermAlgebra (Base term) term (Evaluator location value inner value))
                         -> PackageBody term
-                        -> Evaluator location term value outer [value]
+                        -> Evaluator location value outer [value]
 evaluatePackageBodyWith perModule perTerm body
   = runReader (packageModules body)
   . withPrelude (packagePrelude body)
@@ -223,7 +223,7 @@ evaluatePackageBodyWith perModule perTerm body
           . fmap fst
           . runGoto lowerBound
 
-        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location term value (Reader (ModuleTable [Module term]) ': outer) value
+        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location value (Reader (ModuleTable [Module term]) ': outer) value
         evaluateEntryPoint m sym = runInModule (ModuleInfo m) $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
@@ -234,5 +234,5 @@ evaluatePackageBodyWith perModule perTerm body
           withDefaultEnvironment preludeEnv a
 
 -- | Isolate the given action with an empty global environment and exports.
-isolate :: Members '[State (Environment location value), State (Exports location value)] effects => Evaluator location term value effects a -> Evaluator location term value effects a
+isolate :: Members '[State (Environment location value), State (Exports location value)] effects => Evaluator location value effects a -> Evaluator location value effects a
 isolate = withEnv lowerBound . withExports lowerBound

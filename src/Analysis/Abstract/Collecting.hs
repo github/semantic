@@ -19,8 +19,8 @@ collectingTerms :: ( Foldable (Cell location)
                    , Ord location
                    , ValueRoots location value
                    )
-                => SubtermAlgebra (Base term) term (Evaluator location term value effects value)
-                -> SubtermAlgebra (Base term) term (Evaluator location term value effects value)
+                => SubtermAlgebra (Base term) term (Evaluator location value effects value)
+                -> SubtermAlgebra (Base term) term (Evaluator location value effects value)
 collectingTerms recur term = do
   roots <- askRoots
   v <- recur term
@@ -52,5 +52,5 @@ reachable roots heap = go mempty roots
             _           -> seen)
 
 
-providingLiveSet :: Evaluator location term value (Reader (Live location value) ': effects) a -> Evaluator location term value effects a
+providingLiveSet :: Evaluator location value (Reader (Live location value) ': effects) a -> Evaluator location value effects a
 providingLiveSet = runReader lowerBound

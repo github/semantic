@@ -39,7 +39,7 @@ resolvePHPName :: Members '[ Modules location value
                            , Resumable ResolutionError
                            ] effects
                => ByteString
-               -> Evaluator location term value effects ModulePath
+               -> Evaluator location value effects ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]
   maybe (throwResumable $ NotFoundError name [name] Language.PHP) pure modulePath
@@ -54,9 +54,9 @@ include :: ( AbstractValue location value effects
                       , Trace
                       ] effects
            )
-        => Subterm term (Evaluator location term value effects value)
-        -> (ModulePath -> Evaluator location term value effects (Maybe (Environment location value, value)))
-        -> Evaluator location term value effects value
+        => Subterm term (Evaluator location value effects value)
+        -> (ModulePath -> Evaluator location value effects (Maybe (Environment location value, value)))
+        -> Evaluator location value effects value
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name

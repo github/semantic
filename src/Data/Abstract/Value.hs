@@ -309,7 +309,7 @@ instance ( Addressable location (Goto effects (Value location) ': effects)
         tentative x i j = attemptUnsafeArithmetic (x i j)
 
         -- Dispatch whatever's contained inside a 'Number.SomeNumber' to its appropriate 'MonadValue' ctor
-        specialize :: (AbstractValue location (Value location) effects, Member (Resumable (ValueError location)) effects) => Either ArithException Number.SomeNumber -> Evaluator location term (Value location) effects (Value location)
+        specialize :: (AbstractValue location (Value location) effects, Member (Resumable (ValueError location)) effects) => Either ArithException Number.SomeNumber -> Evaluator location (Value location) effects (Value location)
         specialize (Left exc) = throwValueError (ArithmeticError exc)
         specialize (Right (Number.SomeNumber (Number.Integer i))) = integer i
         specialize (Right (Number.SomeNumber (Number.Ratio r)))   = rational r
@@ -328,7 +328,7 @@ instance ( Addressable location (Goto effects (Value location) ': effects)
       where
         -- Explicit type signature is necessary here because we're passing all sorts of things
         -- to these comparison functions.
-        go :: (AbstractValue location (Value location) effects, Ord a) => a -> a -> Evaluator location term (Value location) effects (Value location)
+        go :: (AbstractValue location (Value location) effects, Ord a) => a -> a -> Evaluator location (Value location) effects (Value location)
         go l r = case comparator of
           Concrete f  -> boolean (f l r)
           Generalized -> integer (orderingToInt (compare l r))
@@ -413,11 +413,11 @@ deriving instance Show location => Show (ValueError location resume)
 instance Show location => Show1 (ValueError location) where
   liftShowsPrec _ _ = showsPrec
 
-throwValueError :: Member (Resumable (ValueError location)) effects => ValueError location resume -> Evaluator location term value effects resume
+throwValueError :: Member (Resumable (ValueError location)) effects => ValueError location resume -> Evaluator location value effects resume
 throwValueError = throwResumable
 
-runValueError :: Evaluator location term value (Resumable (ValueError location) ': effects) a -> Evaluator location term value effects (Either (SomeExc (ValueError location)) a)
+runValueError :: Evaluator location value (Resumable (ValueError location) ': effects) a -> Evaluator location value effects (Either (SomeExc (ValueError location)) a)
 runValueError = raiseHandler runError
 
-runValueErrorWith :: (forall resume . ValueError location resume -> Evaluator location term value effects resume) -> Evaluator location term value (Resumable (ValueError location) ': effects) a -> Evaluator location term value effects a
+runValueErrorWith :: (forall resume . ValueError location resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (ValueError location) ': effects) a -> Evaluator location value effects a
 runValueErrorWith = runResumableWith

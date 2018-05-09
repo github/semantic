@@ -43,140 +43,140 @@ class AbstractHole value where
 class Show value => AbstractValue location value effects where
   -- | Construct an abstract unit value.
   --   TODO: This might be the same as the empty tuple for some value types
-  unit :: Evaluator location term value effects value
+  unit :: Evaluator location value effects value
 
   -- | Construct an abstract integral value.
-  integer :: Prelude.Integer -> Evaluator location term value effects value
+  integer :: Prelude.Integer -> Evaluator location value effects value
 
   -- | Lift a unary operator over a 'Num' to a function on 'value's.
   liftNumeric  :: (forall a . Num a => a -> a)
-               -> (value -> Evaluator location term value effects value)
+               -> (value -> Evaluator location value effects value)
 
   -- | Lift a pair of binary operators to a function on 'value's.
   --   You usually pass the same operator as both arguments, except in the cases where
   --   Haskell provides different functions for integral and fractional operations, such
   --   as division, exponentiation, and modulus.
   liftNumeric2 :: (forall a b. Number a -> Number b -> SomeNumber)
-               -> (value -> value -> Evaluator location term value effects value)
+               -> (value -> value -> Evaluator location value effects value)
 
   -- | Lift a Comparator (usually wrapping a function like == or <=) to a function on values.
-  liftComparison :: Comparator -> (value -> value -> Evaluator location term value effects value)
+  liftComparison :: Comparator -> (value -> value -> Evaluator location value effects value)
 
   -- | Lift a unary bitwise operator to values. This is usually 'complement'.
   liftBitwise :: (forall a . Bits a => a -> a)
-              -> (value -> Evaluator location term value effects value)
+              -> (value -> Evaluator location value effects value)
 
   -- | Lift a binary bitwise operator to values. The Integral constraint is
   --   necessary to satisfy implementation details of Haskell left/right shift,
   --   but it's fine, since these are only ever operating on integral values.
   liftBitwise2 :: (forall a . (Integral a, Bits a) => a -> a -> a)
-               -> (value -> value -> Evaluator location term value effects value)
+               -> (value -> value -> Evaluator location value effects value)
 
   -- | Construct an abstract boolean value.
-  boolean :: Bool -> Evaluator location term value effects value
+  boolean :: Bool -> Evaluator location value effects value
 
   -- | Construct an abstract string value.
-  string :: ByteString -> Evaluator location term value effects value
+  string :: ByteString -> Evaluator location value effects value
 
   -- | Construct a self-evaluating symbol value.
   --   TODO: Should these be interned in some table to provide stronger uniqueness guarantees?
-  symbol :: ByteString -> Evaluator location term value effects value
+  symbol :: ByteString -> Evaluator location value effects value
 
   -- | Construct a floating-point value.
-  float :: Scientific -> Evaluator location term value effects value
+  float :: Scientific -> Evaluator location value effects value
 
   -- | Construct a rational value.
-  rational :: Prelude.Rational -> Evaluator location term value effects value
+  rational :: Prelude.Rational -> Evaluator location value effects value
 
   -- | Construct an N-ary tuple of multiple (possibly-disjoint) values
-  multiple :: [value] -> Evaluator location term value effects value
+  multiple :: [value] -> Evaluator location value effects value
 
   -- | Construct an array of zero or more values.
-  array :: [value] -> Evaluator location term value effects value
+  array :: [value] -> Evaluator location value effects value
 
   -- | Construct a key-value pair for use in a hash.
-  kvPair :: value -> value -> Evaluator location term value effects value
+  kvPair :: value -> value -> Evaluator location value effects value
 
   -- | Extract the contents of a key-value pair as a tuple.
-  asPair :: value -> Evaluator location term value effects (value, value)
+  asPair :: value -> Evaluator location value effects (value, value)
 
   -- | Construct a hash out of pairs.
-  hash :: [(value, value)] -> Evaluator location term value effects value
+  hash :: [(value, value)] -> Evaluator location value effects value
 
   -- | Extract a 'ByteString' from a given value.
-  asString :: value -> Evaluator location term value effects ByteString
+  asString :: value -> Evaluator location value effects ByteString
 
   -- | Eliminate boolean values. TODO: s/boolean/truthy
-  ifthenelse :: value -> Evaluator location term value effects value -> Evaluator location term value effects value -> Evaluator location term value effects value
+  ifthenelse :: value -> Evaluator location value effects value -> Evaluator location value effects value -> Evaluator location value effects value
 
   -- | Extract a 'Bool' from a given value.
-  asBool :: value -> Evaluator location term value effects Bool
+  asBool :: value -> Evaluator location value effects Bool
 
   -- | Construct the nil/null datatype.
-  null :: Evaluator location term value effects value
+  null :: Evaluator location value effects value
 
   -- | @index x i@ computes @x[i]@, with zero-indexing.
-  index :: value -> value -> Evaluator location term value effects value
+  index :: value -> value -> Evaluator location value effects value
 
   -- | Determine whether the given datum is a 'Hole'.
-  isHole :: value -> Evaluator location term value effects Bool
+  isHole :: value -> Evaluator location value effects Bool
 
   -- | Build a class value from a name and environment.
   klass :: Name                       -- ^ The new class's identifier
         -> [value]                    -- ^ A list of superclasses
         -> Environment location value -- ^ The environment to capture
-        -> Evaluator location term value effects value
+        -> Evaluator location value effects value
 
   -- | Build a namespace value from a name and environment stack
   --
   -- Namespaces model closures with monoidal environments.
   namespace :: Name                       -- ^ The namespace's identifier
             -> Environment location value -- ^ The environment to mappend
-            -> Evaluator location term value effects value
+            -> Evaluator location value effects value
 
   -- | Extract the environment from any scoped object (e.g. classes, namespaces, etc).
-  scopedEnvironment :: value -> Evaluator location term value effects (Maybe (Environment location value))
+  scopedEnvironment :: value -> Evaluator location value effects (Maybe (Environment location value))
 
   -- | Build a closure (a binder like a lambda or method definition).
   closure :: [Name]                                      -- ^ The parameter names.
           -> Set Name                                    -- ^ The set of free variables to close over.
-          -> Evaluator location term value effects value -- ^ The evaluator for the body of the closure.
-          -> Evaluator location term value effects value
+          -> Evaluator location value effects value -- ^ The evaluator for the body of the closure.
+          -> Evaluator location value effects value
   -- | Evaluate an application (like a function call).
-  call :: value -> [Evaluator location term value effects value] -> Evaluator location term value effects value
+  call :: value -> [Evaluator location value effects value] -> Evaluator location value effects value
 
   -- | Primitive looping combinator, approximately equivalent to 'fix'. This should be used in place of direct recursion, as it allows abstraction over recursion.
   --
   --   The function argument takes an action which recurs through the loop.
-  loop :: (Evaluator location term value effects value -> Evaluator location term value effects value) -> Evaluator location term value effects value
+  loop :: (Evaluator location value effects value -> Evaluator location value effects value) -> Evaluator location value effects value
 
 
 -- | Attempt to extract a 'Prelude.Bool' from a given value.
 forLoop :: ( AbstractValue location value effects
            , Member (State (Environment location value)) effects
            )
-        => Evaluator location term value effects value -- ^ Initial statement
-        -> Evaluator location term value effects value -- ^ Condition
-        -> Evaluator location term value effects value -- ^ Increment/stepper
-        -> Evaluator location term value effects value -- ^ Body
-        -> Evaluator location term value effects value
+        => Evaluator location value effects value -- ^ Initial statement
+        -> Evaluator location value effects value -- ^ Condition
+        -> Evaluator location value effects value -- ^ Increment/stepper
+        -> Evaluator location value effects value -- ^ Body
+        -> Evaluator location value effects value
 forLoop initial cond step body =
   localize (initial *> while cond (body *> step))
 
 -- | The fundamental looping primitive, built on top of ifthenelse.
 while :: AbstractValue location value effects
-      => Evaluator location term value effects value
-      -> Evaluator location term value effects value
-      -> Evaluator location term value effects value
+      => Evaluator location value effects value
+      -> Evaluator location value effects value
+      -> Evaluator location value effects value
 while cond body = loop $ \ continue -> do
   this <- cond
   ifthenelse this (body *> continue) unit
 
 -- | Do-while loop, built on top of while.
 doWhile :: AbstractValue location value effects
-        => Evaluator location term value effects value
-        -> Evaluator location term value effects value
-        -> Evaluator location term value effects value
+        => Evaluator location value effects value
+        -> Evaluator location value effects value
+        -> Evaluator location value effects value
 doWhile body cond = loop $ \ continue -> body *> do
   this <- cond
   ifthenelse this continue unit
@@ -190,7 +190,7 @@ makeNamespace :: ( AbstractValue location value effects
               => Name
               -> Address location value
               -> Maybe value
-              -> Evaluator location term value effects value
+              -> Evaluator location value effects value
 makeNamespace name addr super = do
   superEnv <- maybe (pure (Just lowerBound)) scopedEnvironment super
   let env' = fromMaybe lowerBound superEnv

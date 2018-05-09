@@ -21,12 +21,12 @@ tracingTerms :: ( Corecursive term
                 , Reducer (Configuration location term value) (trace (Configuration location term value))
                 )
              => trace (Configuration location term value)
-             -> SubtermAlgebra (Base term) term (Evaluator location term value effects a)
-             -> SubtermAlgebra (Base term) term (Evaluator location term value effects a)
+             -> SubtermAlgebra (Base term) term (Evaluator location value effects a)
+             -> SubtermAlgebra (Base term) term (Evaluator location value effects a)
 tracingTerms proxy recur term = getConfiguration (embedSubterm term) >>= trace . (`asTypeOf` proxy) . Reducer.unit >> recur term
 
-trace :: Member (Writer (trace (Configuration location term value))) effects => trace (Configuration location term value) -> Evaluator location term value effects ()
+trace :: Member (Writer (trace (Configuration location term value))) effects => trace (Configuration location term value) -> Evaluator location value effects ()
 trace = raise . tell
 
-tracing :: Monoid (trace (Configuration location term value)) => Evaluator location term value (Writer (trace (Configuration location term value)) ': effects) a -> Evaluator location term value effects (a, trace (Configuration location term value))
+tracing :: Monoid (trace (Configuration location term value)) => Evaluator location value (Writer (trace (Configuration location term value)) ': effects) a -> Evaluator location value effects (a, trace (Configuration location term value))
 tracing = raiseHandler runWriter

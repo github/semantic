@@ -21,7 +21,7 @@ deriving instance (Ord (Cell location value), Ord location, Ord value) => Ord (E
 deriving instance (Show (Cell location value), Show location, Show value) => Show (EvaluatingState location value)
 
 
-evaluating :: Evaluator location term value
+evaluating :: Evaluator location value
                 (  Fail
                 ': Fresh
                 ': Reader (Environment location value)
@@ -30,7 +30,7 @@ evaluating :: Evaluator location term value
                 ': State (ModuleTable (Maybe (Environment location value, value)))
                 ': State (Exports location value)
                 ': effects) result
-           -> Evaluator location term value effects (Either String result, EvaluatingState location value)
+           -> Evaluator location value effects (Either String result, EvaluatingState location value)
 evaluating
   = fmap (\ ((((result, env), heap), modules), exports) -> (result, EvaluatingState env heap modules exports))
   . runState lowerBound -- State (Exports location value)

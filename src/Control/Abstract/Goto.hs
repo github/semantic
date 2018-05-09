@@ -24,11 +24,11 @@ type Label = Int
 -- | Allocate a 'Label' for the given @term@.
 --
 --   Labels must be allocated before being jumped to with 'goto', but are suitable for nonlocal jumps; thus, they can be used to implement coroutines, exception handling, call with current continuation, and other esoteric control mechanisms.
-label :: Evaluator location term value (Goto effects value ': effects) value -> Evaluator location term value (Goto effects value ': effects) Label
+label :: Evaluator location value (Goto effects value ': effects) value -> Evaluator location value (Goto effects value ': effects) Label
 label = send . Label . lower
 
 -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
-goto :: Label -> Evaluator location term value (Goto effects value ': effects) (Evaluator location term value (Goto effects value ': effects) value)
+goto :: Label -> Evaluator location value (Goto effects value ': effects) (Evaluator location value (Goto effects value ': effects) value)
 goto = fmap raise . send . Goto
 
 
@@ -45,7 +45,7 @@ data Goto effects value return where
   Label :: Eff (Goto effects value ': effects) value -> Goto effects value Label
   Goto  :: Label -> Goto effects value (Eff (Goto effects value ': effects) value)
 
-runGoto :: Member Fail effects => GotoTable (Goto effects value ': effects) value -> Evaluator location term value (Goto effects value ': effects) a -> Evaluator location term value effects (a, GotoTable (Goto effects value ': effects) value)
+runGoto :: Member Fail effects => GotoTable (Goto effects value ': effects) value -> Evaluator location value (Goto effects value ': effects) a -> Evaluator location value effects (a, GotoTable (Goto effects value ': effects) value)
 runGoto initial = raiseHandler (relayState (IntMap.size initial, initial) (\ (_, table) a -> pure (a, table)) (\ (supremum, table) goto yield -> case goto of
   Label action -> yield (succ supremum, IntMap.insert supremum action table) supremum
   Goto label   -> maybe (fail ("unknown label: " <> show label)) (yield (supremum, table)) (IntMap.lookup label table)))
