@@ -89,6 +89,8 @@ runModules evaluateModule = go
                     cacheModule name (Just (env, v))
                     pure (Just (env, v))
 
+              loadingModule path = isJust . ModuleTable.lookup path <$> getModuleTable
+
               -- TODO: If the set of exports is empty because no exports have been
               -- defined, do we export all terms, or no terms? This behavior varies across
               -- languages. We need better semantics rather than doing it ad-hoc.
@@ -101,10 +103,6 @@ runModules evaluateModule = go
             isMember <- flip ModuleTable.member <$> askModuleTable @term
             pure (find isMember names)
           List dir -> modulePathsInDir dir <$> askModuleTable @term)
-
-
-loadingModule :: Member (State (ModuleTable (Maybe (Environment location value, value)))) effects => ModulePath -> Evaluator location value effects Bool
-loadingModule path = isJust . ModuleTable.lookup path <$> getModuleTable
 
 getModuleTable :: Member (State (ModuleTable (Maybe (Environment location value, value)))) effects => Evaluator location value effects (ModuleTable (Maybe (Environment location value, value)))
 getModuleTable = raise get
