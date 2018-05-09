@@ -180,7 +180,7 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                        , inner ~ (Goto inner' value ': inner')
                        , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': Modules location value ': Reader PackageInfo ': outer)
                        )
-                    => (SubtermAlgebra Module term (Evaluator location value inner value) -> SubtermAlgebra Module term (Evaluator location value inner value))
+                    => (SubtermAlgebra Module      term (Evaluator location value inner value) -> SubtermAlgebra Module      term (Evaluator location value inner value))
                     -> (SubtermAlgebra (Base term) term (Evaluator location value inner value) -> SubtermAlgebra (Base term) term (Evaluator location value inner value))
                     -> Package term
                     -> Evaluator location value outer [value]
@@ -202,7 +202,7 @@ evaluatePackageBodyWith :: forall location term value inner inner' outer
                            , inner ~ (Goto inner' value ': inner')
                            , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': Modules location value ': outer)
                            )
-                        => (SubtermAlgebra Module term (Evaluator location value inner value) -> SubtermAlgebra Module term (Evaluator location value inner value))
+                        => (SubtermAlgebra Module      term (Evaluator location value inner value) -> SubtermAlgebra Module      term (Evaluator location value inner value))
                         -> (SubtermAlgebra (Base term) term (Evaluator location value inner value) -> SubtermAlgebra (Base term) term (Evaluator location value inner value))
                         -> PackageBody term
                         -> Evaluator location value outer [value]
