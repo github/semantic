@@ -7,3 +7,7 @@ class Object
     return "<object>"
   end
 end
+
+def puts(obj)
+  __builtin_print(obj)
+end
