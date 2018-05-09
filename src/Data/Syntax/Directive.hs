@@ -4,6 +4,7 @@ module Data.Syntax.Directive where
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module (ModuleInfo(..))
 import qualified Data.ByteString.Char8 as BC
+import           Data.Span
 import           Diffing.Algorithm
 import           Prologue
 
@@ -27,4 +28,5 @@ instance Eq1 Line where liftEq = genericLiftEq
 instance Ord1 Line where liftCompare = genericLiftCompare
 instance Show1 Line where liftShowsPrec = genericLiftShowsPrec
 
-instance Evaluatable Line
+instance Evaluatable Line where
+  eval Line = currentSpan >>= integer . fromIntegral . posLine . spanStart
