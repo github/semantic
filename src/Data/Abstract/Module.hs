@@ -4,6 +4,7 @@ module Data.Abstract.Module
 , ModulePath
 , ModuleInfo(..)
 , moduleInfoFromSrcLoc
+, moduleInfoFromCallStack
 ) where
 
 import Data.Blob
@@ -35,3 +36,6 @@ newtype ModuleInfo = ModuleInfo { modulePath :: ModulePath }
 
 moduleInfoFromSrcLoc :: SrcLoc -> ModuleInfo
 moduleInfoFromSrcLoc = ModuleInfo . srcLocModule
+
+moduleInfoFromCallStack :: HasCallStack => ModuleInfo
+moduleInfoFromCallStack = maybe (ModuleInfo "?") (moduleInfoFromSrcLoc . snd) (listToMaybe (getCallStack callStack))
