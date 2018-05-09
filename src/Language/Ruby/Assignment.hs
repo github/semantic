@@ -31,6 +31,7 @@ type Syntax = '[
   , Declaration.Function
   , Declaration.Method
   , Directive.File
+  , Directive.Line
   , Expression.Arithmetic
   , Expression.Bitwise
   , Expression.Boolean
@@ -182,6 +183,7 @@ identifier =
       (loc, ident, locals) <- identWithLocals
       case ident of
         "__FILE__" -> pure $ makeTerm loc Directive.File
+        "__LINE__" -> pure $ makeTerm loc Directive.Line
         _ -> do
           let identTerm = makeTerm loc (Syntax.Identifier (name ident))
           if ident `elem` locals
