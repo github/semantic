@@ -30,7 +30,7 @@ import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Package as Package
-import Data.ByteString.Char8 (pack)
+import Data.ByteString.Char8 (pack, unpack)
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
@@ -231,6 +231,9 @@ evaluatePackageWith analyzeModule analyzeTerm package
 
         withPrelude Nothing a = a
         withPrelude (Just prelude) a = do
+          _ <- runInModule moduleInfoFromCallStack $ do
+            builtin "print" (closure ["s"] lowerBound (variable "s" >>= asString >>= traceE . unpack >> unit))
+            unit
           preludeEnv <- fst <$> evalModule prelude
           withDefaultEnvironment preludeEnv a
 
