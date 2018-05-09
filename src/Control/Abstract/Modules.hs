@@ -80,10 +80,10 @@ runModules evaluateModule = go
               evalAndCache x = do
                 let mPath = modulePath (moduleInfo x)
                 loading <- loadingModule mPath
-                cacheModule name Nothing
                 if loading
                   then traceE ("load (skip evaluating, circular load): " <> show mPath) $> Nothing
                   else do
+                    cacheModule name Nothing
                     v <- traceE ("load (evaluating): " <> show mPath) *> go (evaluateModule x) <* traceE ("load done:" <> show mPath)
                     env <- filterEnv <$> getExports <*> getEnv
                     cacheModule name (Just (env, v))
