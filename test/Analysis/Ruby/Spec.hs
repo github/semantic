@@ -72,6 +72,10 @@ spec = parallel $ do
       res <- fst <$> evaluate "preluded.rb"
       res `shouldBe` Right [injValue (String "\"<foo>\"")]
 
+    it "evaluates __LINE__" $ do
+      res <- fst <$> evaluate "line.rb"
+      res `shouldBe` Right [injValue (Value.Integer (Number.Integer 4))]
+
   where
     ns n = Just . Latest . Just . injValue . Namespace n
     addr = Address . Precise
