@@ -10,7 +10,6 @@ module Data.Abstract.Evaluatable
 , runEvalErrorWith
 , evaluateInScopedEnv
 , evaluatePackageWith
-, evaluatePackageBodyWith
 , throwEvalError
 , traceResolve
 , isolate
