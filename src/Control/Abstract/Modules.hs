@@ -94,7 +94,6 @@ runModules evaluateModule = go
               -- TODO: If the set of exports is empty because no exports have been
               -- defined, do we export all terms, or no terms? This behavior varies across
               -- languages. We need better semantics rather than doing it ad-hoc.
-              filterEnv :: Exports.Exports location value -> Environment location value -> Environment location value
               filterEnv ports env
                 | Exports.null ports = env
                 | otherwise = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
