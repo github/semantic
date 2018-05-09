@@ -214,24 +214,18 @@ evaluatePackageBodyWith analyzeModule analyzeTerm body
           . analyzeModule (subtermValue . moduleBody)
           . fmap (Subterm <*> foldSubterms (analyzeTerm eval))
           $ m
+        runInModule info
+          = runReader info
+          . runReturn
+          . runLoopControl
+          . fmap fst
+          . runGoto lowerBound
 
         evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location value (Modules location value ': outer) value
         evaluateEntryPoint m sym = runInModule (ModuleInfo m) $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
 
-runInModule :: ( Member Fail outer
-               , inner ~ (LoopControl value ': Return value ': Reader ModuleInfo ': outer)
-               )
-            => ModuleInfo
-            -> Evaluator location value (Goto inner value ': inner) value
-            -> Evaluator location value outer value
-runInModule info
-  = runReader info
-  . runReturn
-  . runLoopControl
-  . fmap fst
-  . runGoto lowerBound
 
 runInPackageBody :: Members '[ Fail
                              , Reader (Environment location value)
