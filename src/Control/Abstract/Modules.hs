@@ -8,6 +8,7 @@ module Control.Abstract.Modules
 , Modules(..)
 , runModules
 , LoadError(..)
+, moduleNotFound
 , runLoadError
 , runLoadErrorWith
 , ResolutionError(..)
