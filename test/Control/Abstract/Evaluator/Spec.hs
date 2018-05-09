@@ -14,7 +14,7 @@ import Data.Bifunctor (first)
 import Data.Functor.Const
 import Data.Semilattice.Lower
 import Data.Sum
-import SpecHelpers hiding (Term, reassociate)
+import SpecHelpers hiding (reassociate)
 
 spec :: Spec
 spec = parallel $ do
@@ -50,8 +50,7 @@ reassociate :: Either String (Either (SomeExc exc1) (Either (SomeExc exc2) (Eith
 reassociate (Left s) = Left (SomeExc (injectSum (Const s)))
 reassociate (Right (Right (Right (Right a)))) = Right a
 
-type TermEffects = Goto GotoEffects Value ': GotoEffects
-type GotoEffects
+type TermEffects
   = '[ LoopControl Value
      , Return Value
      , Resumable (AddressError Precise Value)
@@ -69,11 +68,6 @@ type GotoEffects
      , IO
      ]
 
-type TermEvaluator = Evaluator Precise Value TermEffects
+type TermEvaluator = Evaluator Precise Value (Goto TermEffects Value ': TermEffects)
 
 type Value = Value.Value Precise
-newtype Term = Term { runTerm :: TermEvaluator Value }
-
-instance Show Term where showsPrec d _ = showParen (d > 10) $ showString "Term _"
-
-instance FreeVariables Term where freeVariables _ = []
