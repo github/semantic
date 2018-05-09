@@ -29,6 +29,24 @@ import qualified Data.Term as Term
 import Prelude hiding (break)
 import Prologue hiding (for, try, This)
 
+-- [1,2,3::Int]
+-- We have types and values -- two worlds that don't really intersect, they're not compatible
+-- We have a way to blur these distinctions
+-- We can take these values and put them into their type signatures
+-- data Vec a (len :: Nat) -- this is a type level natural number, which allows us to track the length of vectors
+-- "promote to the kind level" - taking something we usually think about as a value and putting into the world of types
+-- '[] - type-level list, if we didn't do this it would be a value list of types, which wouldn't make sense
+-- This is not like casting; it's not doing any computation at runtime, just at compile time.
+-- ':k' - what the type of this type is
+-- `:k Int` is * (fully saturated)
+-- maybe takes an arg on type level whereas int takes an argument on val level
+-- :k can only be applied to Monad (typeclasses)
+-- :k type-level lists
+-- '[]' - you can give it a list of statements as a valid syntax terms
+-- `[]` - is treated as an imperative sequence of statements
+-- In JSON there's no notion of `[]` because there's no notion of imperative computation
+-- Taking this out `[]` makes a lot of stuff fail like block
+
 type Syntax =
   '[ Comment.Comment
    , Declaration.Class
@@ -190,9 +208,6 @@ arrayInitializer = makeTerm <$> symbol ArrayInitializer <*> (Literal.Array <$> m
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
--- constantDeclaration :: Assignment
--- constantDeclaration = makeTerm <$> symbol ConstantDeclaration <*>
-
 localVariableDeclaration :: Assignment
 localVariableDeclaration = makeTerm <$> symbol LocalVariableDeclaration <*> children ((,) <$> manyTerm modifier <*> type' <**> variableDeclaratorList)
 
@@ -215,6 +230,26 @@ boolean :: Assignment
 boolean =  makeTerm <$> symbol BooleanLiteral <*> children
           (token Grammar.True $> Literal.true
           <|> token Grammar.False $> Literal.false)
+
+
+
+-- ($>)
+-- (<$)
+-- value <$ action
+-- 'q' <$ getLine
+-- `q` is pure value, getLine is an impure action
+-- we want to run the source action because it updates our location info, but source returns a bytestring, which isn't interesting because we
+-- already know we're in a true case, so we return Literal.True
+-- if we're looking for a float, we need a bytestring
+-- but in this context, since we're looking at something that's true, we know source is going to return the literal string true
+-- <$ is not half fmap, it just means evaluate the RHS for its side-effects and return the LHS without
+-- source is being thrown away, but we need to evaluate it for its side-effect because it'll advance where we are in the location
+-- but to have <$ you need a functor context
+-- for string or whatever you need source, but null or true or false you can throw it away
+-- <$ - not function, just value
+-- can implement monad and apply
+-- `ap` function
+-- `ap` and <*> are the same, but `ap` is expressed in terms of the same capabilities of the monad
 
 null' :: Assignment
 null' = makeTerm <$> symbol NullLiteral <*> (Literal.Null <$ source)
@@ -241,6 +276,17 @@ scopedIdentifier = makeTerm <$> symbol ScopedIdentifier <*> children (Expression
 
 superInterfaces :: Assignment.Assignment [] Grammar [Term]
 superInterfaces = symbol SuperInterfaces *> children (symbol InterfaceTypeList *> children(manyTerm type'))
+-- a *> b
+-- both of these are impure
+-- getLine *> getLine
+-- in half apply, they're both monadic impure actions
+-- :t (<$)
+-- :t (*>)
+
+-- what does it mean to say monadic action? more precise term: sequence-able
+-- a sequence of applicative actions can be executed left to right
+-- applicative computations can't do branch and control flow; applicative computations can only compute in a direct line, monadic can compute arbitrary branches
+
 
 -- Declarations
 class' :: Assignment
@@ -497,6 +543,8 @@ constructorDeclaration = makeTerm <$> symbol ConstructorDeclaration <*> children
       constructorBody = makeTerm <$> symbol ConstructorBody <*> children (manyTerm expression) -- wrapping list of terms up in single node
       constructor modifiers (typeParameters, identifier, formalParameters) = Java.Syntax.Constructor modifiers typeParameters identifier formalParameters -- let partial application do its thing
 
+-- when we wrap a list of values in a term, the list nature disappears
+-- but in this case, our assignment ensures we return something that's explicitly a list
 typeParameters :: Assignment.Assignment [] Grammar [Term]
 typeParameters = symbol TypeParameters *> children (manyTerm typeParam) -- this produces a list, which is what we need to return given by the type definition
   where
@@ -527,3 +575,6 @@ formalParameters = manyTerm parameter
 -- we're just wrapping stuff up in data, we aren't building a pattern (assignment) so we aren't in an applicative context
 -- when in an applicative context, we're also in a functor context (ie., defining how fmap will work over it)
 -- sometimes it is nice to be able to say you're in an applicative context without refering to any particular applicative instance
+
+-- constantDeclaration :: Assignment
+-- constantDeclaration = makeTerm <$> symbol ConstantDeclaration <*>
