@@ -5,12 +5,15 @@ module Control.Abstract.Context
 , withCurrentModule
 , currentPackage
 , withCurrentPackage
+, currentSpan
+, withCurrentSpan
 ) where
 
 import Control.Effect
 import Control.Monad.Effect.Reader
 import Data.Abstract.Module
 import Data.Abstract.Package
+import Data.Span
 import Prologue
 
 -- | Get the currently evaluating 'ModuleInfo'.
@@ -28,3 +31,11 @@ currentPackage = raise ask
 -- | Run an action with a locally-replaced 'PackageInfo'.
 withCurrentPackage :: (Effectful m, Member (Reader PackageInfo) effects) => PackageInfo -> m effects a -> m effects a
 withCurrentPackage = raiseHandler . local . const
+
+-- | Get the 'Span' of the currently-evaluating term (if any).
+currentSpan :: (Effectful m, Member (Reader Span) effects) => m effects Span
+currentSpan = raise ask
+
+-- | Run an action with a locally-replaced 'Span'.
+withCurrentSpan :: (Effectful m, Member (Reader Span) effects) => Span -> m effects a -> m effects a
+withCurrentSpan = raiseHandler . local . const
