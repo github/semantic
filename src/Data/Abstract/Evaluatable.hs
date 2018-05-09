@@ -186,7 +186,9 @@ evaluatePackageWith :: forall location term value inner inner' outer
                     -> Evaluator location value outer [value]
 evaluatePackageWith analyzeModule analyzeTerm package
   = runReader (packageInfo package)
-  . runInPackageBody evalModule (packageBody package)
+  . runReader (packageModules (packageBody package))
+  . runModules evalModule
+  . withPrelude (packagePrelude (packageBody package))
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints (packageBody package)))
   where evalModule m
           = runInModule (moduleInfo m)
@@ -205,24 +207,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
 
-
-runInPackageBody :: Members '[ Fail
-                             , Reader (Environment location value)
-                             , Resumable (LoadError location value)
-                             , State (Environment location value)
-                             , State (Exports location value)
-                             , State (ModuleTable (Maybe (Environment location value, value)))
-                             , Trace
-                             ] outer
-                 => (Module term -> Evaluator location value (Modules location value ': outer) value)
-                 -> PackageBody term
-                 -> Evaluator location value (Modules location value ': outer) a
-                 -> Evaluator location value outer a
-runInPackageBody evalModule body
-  = runReader (packageModules body)
-  . runModules evalModule
-  . withPrelude (packagePrelude body)
-  where withPrelude Nothing a = a
+        withPrelude Nothing a = a
         withPrelude (Just prelude) a = do
           preludeEnv <- evalModule prelude *> getEnv
           withDefaultEnvironment preludeEnv a
