@@ -207,9 +207,7 @@ evaluatePackageBodyWith :: forall location term value inner inner' outer
                         -> PackageBody term
                         -> Evaluator location value outer [value]
 evaluatePackageBodyWith perModule perTerm body
-  = runReader (packageModules body)
-  . runModules evalModule
-  . withPrelude (packagePrelude body)
+  = runInPackageBody evalModule body
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
   where evalModule m
           = runInModule (moduleInfo m)
@@ -221,11 +219,6 @@ evaluatePackageBodyWith perModule perTerm body
         evaluateEntryPoint m sym = runInModule (ModuleInfo m) $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
-
-        withPrelude Nothing a = a
-        withPrelude (Just prelude) a = do
-          preludeEnv <- evalModule prelude *> getEnv
-          withDefaultEnvironment preludeEnv a
 
 runInModule :: ( Member Fail outer
                , inner ~ (LoopControl value ': Return value ': Reader ModuleInfo ': outer)
@@ -239,6 +232,28 @@ runInModule info
   . runLoopControl
   . fmap fst
   . runGoto lowerBound
+
+runInPackageBody :: Members '[ Fail
+                             , Reader (Environment location value)
+                             , Resumable (LoadError location value)
+                             , State (Environment location value)
+                             , State (Exports location value)
+                             , State (ModuleTable (Maybe (Environment location value, value)))
+                             , Trace
+                             ] outer
+                 => (Module term -> Evaluator location value (Modules location value ': outer) value)
+                 -> PackageBody term
+                 -> Evaluator location value (Modules location value ': outer) a
+                 -> Evaluator location value outer a
+runInPackageBody evalModule body
+  = runReader (packageModules body)
+  . runModules evalModule
+  . withPrelude (packagePrelude body)
+  where withPrelude Nothing a = a
+        withPrelude (Just prelude) a = do
+          preludeEnv <- evalModule prelude *> getEnv
+          withDefaultEnvironment preludeEnv a
+
 
 -- | Isolate the given action with an empty global environment and exports.
 isolate :: Members '[State (Environment location value), State (Exports location value)] effects => Evaluator location value effects a -> Evaluator location value effects a
