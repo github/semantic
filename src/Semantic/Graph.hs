@@ -91,7 +91,7 @@ resumingResolutionError = runResolutionErrorWith (\ err -> traceE ("ResolutionEr
   GoImportError pathToResolve     -> pure [pathToResolve])
 
 resumingLoadError :: Member Trace effects => Evaluator location term value (Resumable (LoadError location value) ': effects) a -> Evaluator location term value effects a
-resumingLoadError = runLoadErrorWith (\ (LoadError path) -> traceE ("LoadError: " <> path) $> Nothing)
+resumingLoadError = runLoadErrorWith (\ (ModuleNotFound path) -> traceE ("LoadError: " <> path) $> Nothing)
 
 resumingEvalError :: (AbstractHole value, Member Trace effects, Show value) => Evaluator location term value (Resumable (EvalError value) ': effects) a -> Evaluator location term value effects a
 resumingEvalError = runEvalErrorWith (\ err -> traceE ("EvalError" <> show err) *> case err of

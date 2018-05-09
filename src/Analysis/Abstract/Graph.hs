@@ -93,7 +93,7 @@ graphingLoadErrors :: forall location term value effects a
                    -> SubtermAlgebra (Base term) term (Evaluator location term value effects a)
 graphingLoadErrors recur term = resume @(LoadError location value)
   (recur term)
-  (\ err@(LoadError name) -> moduleInclusion (Module (BC.pack name)) *> throwResumable err)
+  (\ err@(ModuleNotFound name) -> moduleInclusion (Module (BC.pack name)) *> throwResumable err)
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
 graphingModules :: Members '[ Reader ModuleInfo

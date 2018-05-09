@@ -125,17 +125,17 @@ instance Applicative m => Monoid (Merging m location value) where
 
 -- | An error thrown when loading a module from the list of provided modules. Indicates we weren't able to find a module with the given name.
 data LoadError location value resume where
-  LoadError :: ModulePath -> LoadError location value (Maybe (Environment location value, value))
+  ModuleNotFound :: ModulePath -> LoadError location value (Maybe (Environment location value, value))
 
 deriving instance Eq (LoadError location value resume)
 deriving instance Show (LoadError location value resume)
 instance Show1 (LoadError location value) where
   liftShowsPrec _ _ = showsPrec
 instance Eq1 (LoadError location value) where
-  liftEq _ (LoadError a) (LoadError b) = a == b
+  liftEq _ (ModuleNotFound a) (ModuleNotFound b) = a == b
 
 moduleNotFound :: Member (Resumable (LoadError location value)) effects => ModulePath -> Evaluator location term value effects (Maybe (Environment location value, value))
-moduleNotFound = throwResumable . LoadError
+moduleNotFound = throwResumable . ModuleNotFound
 
 runLoadError :: Evaluator location term value (Resumable (LoadError location value) ': effects) a -> Evaluator location term value effects (Either (SomeExc (LoadError location value)) a)
 runLoadError = raiseHandler runError
