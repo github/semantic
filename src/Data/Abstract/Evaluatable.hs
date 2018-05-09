@@ -24,6 +24,7 @@ import Control.Monad.Effect as Eff
 import Data.Abstract.Address
 import Data.Abstract.Declarations as X
 import Data.Abstract.Environment as X
+import Data.Abstract.Exports as Exports
 import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
@@ -191,7 +192,8 @@ evaluatePackageWith analyzeModule analyzeTerm package
   . withPrelude (packagePrelude (packageBody package))
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints (packageBody package)))
   where evalModule m
-          = runInModule (moduleInfo m)
+          = ((,) <$> (filterEnv <$> getExports <*> getEnv) <*>)
+          . runInModule (moduleInfo m)
           . analyzeModule (subtermValue . moduleBody)
           $ fmap (Subterm <*> foldSubterms (analyzeTerm eval)) m
 
@@ -209,8 +211,15 @@ evaluatePackageWith analyzeModule analyzeTerm package
 
         withPrelude Nothing a = a
         withPrelude (Just prelude) a = do
-          preludeEnv <- evalModule prelude *> getEnv
+          preludeEnv <- fst <$> evalModule prelude
           withDefaultEnvironment preludeEnv a
+
+        -- TODO: If the set of exports is empty because no exports have been
+        -- defined, do we export all terms, or no terms? This behavior varies across
+        -- languages. We need better semantics rather than doing it ad-hoc.
+        filterEnv ports env
+          | Exports.null ports = env
+          | otherwise          = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
 
 
 -- | Isolate the given action with an empty global environment and exports.

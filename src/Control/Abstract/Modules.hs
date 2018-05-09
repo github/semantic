@@ -18,11 +18,8 @@ module Control.Abstract.Modules
 , ModuleTable
 ) where
 
-import Control.Abstract.Environment
 import Control.Abstract.Evaluator
-import Control.Abstract.Exports
 import Data.Abstract.Environment
-import Data.Abstract.Exports as Exports
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Language
@@ -64,12 +61,10 @@ sendModules = send
 
 runModules :: forall term location value effects a
            .  Members '[ Resumable (LoadError location value)
-                       , State (Environment location value)
-                       , State (Exports location value)
                        , State (ModuleTable (Maybe (Environment location value, value)))
                        , Trace
                        ] effects
-           => (Module term -> Evaluator location value (Modules location value ': effects) value)
+           => (Module term -> Evaluator location value (Modules location value ': effects) (Environment location value, value))
            -> Evaluator location value (Modules location value ': effects) a
            -> Evaluator location value (Reader (ModuleTable [Module term]) ': effects) a
 runModules evaluateModule = go
@@ -84,18 +79,10 @@ runModules evaluateModule = go
                   then traceE ("load (skip evaluating, circular load): " <> show mPath) $> Nothing
                   else do
                     _ <- cacheModule name Nothing
-                    v <- traceE ("load (evaluating): " <> show mPath) *> go (evaluateModule x) <* traceE ("load done:" <> show mPath)
-                    env <- filterEnv <$> getExports <*> getEnv
-                    cacheModule name (Just (env, v))
+                    result <- traceE ("load (evaluating): " <> show mPath) *> go (evaluateModule x) <* traceE ("load done:" <> show mPath)
+                    cacheModule name (Just result)
 
               loadingModule path = isJust . ModuleTable.lookup path <$> getModuleTable
-
-              -- TODO: If the set of exports is empty because no exports have been
-              -- defined, do we export all terms, or no terms? This behavior varies across
-              -- languages. We need better semantics rather than doing it ad-hoc.
-              filterEnv ports env
-                | Exports.null ports = env
-                | otherwise          = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
           Lookup path -> ModuleTable.lookup path <$> raise get
           Resolve names -> do
             isMember <- flip ModuleTable.member <$> askModuleTable @term
