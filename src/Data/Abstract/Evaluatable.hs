@@ -165,7 +165,8 @@ traceResolve name path = traceE ("resolved " <> show name <> " -> " <> show path
 
 
 -- | Evaluate a given package.
-evaluatePackageWith :: ( Evaluatable (Base term)
+evaluatePackageWith :: forall location term value inner inner' outer
+                    .  ( Evaluatable (Base term)
                        , EvaluatableConstraints location term value inner
                        , Members '[ Fail
                                   , Reader (Environment location value)
@@ -185,32 +186,8 @@ evaluatePackageWith :: ( Evaluatable (Base term)
                     -> Evaluator location value outer [value]
 evaluatePackageWith analyzeModule analyzeTerm package
   = runReader (packageInfo package)
-  . evaluatePackageBodyWith analyzeModule analyzeTerm
-  $ packageBody package
-
--- | Evaluate a given package body (module table and entry points).
-evaluatePackageBodyWith :: forall location term value inner inner' outer
-                        .  ( Evaluatable (Base term)
-                           , EvaluatableConstraints location term value inner
-                           , Members '[ Fail
-                                      , Reader (Environment location value)
-                                      , Resumable (LoadError location value)
-                                      , State (Environment location value)
-                                      , State (Exports location value)
-                                      , State (ModuleTable (Maybe (Environment location value, value)))
-                                      , Trace
-                                      ] outer
-                           , Recursive term
-                           , inner ~ (Goto inner' value ': inner')
-                           , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': Modules location value ': outer)
-                           )
-                        => (SubtermAlgebra Module      term (Evaluator location value inner value) -> SubtermAlgebra Module      term (Evaluator location value inner value))
-                        -> (SubtermAlgebra (Base term) term (Evaluator location value inner value) -> SubtermAlgebra (Base term) term (Evaluator location value inner value))
-                        -> PackageBody term
-                        -> Evaluator location value outer [value]
-evaluatePackageBodyWith analyzeModule analyzeTerm body
-  = runInPackageBody evalModule body
-  $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints body))
+  . runInPackageBody evalModule (packageBody package)
+  $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints (packageBody package)))
   where evalModule m
           = runInModule (moduleInfo m)
           . analyzeModule (subtermValue . moduleBody)
@@ -223,7 +200,7 @@ evaluatePackageBodyWith analyzeModule analyzeTerm body
           . fmap fst
           . runGoto lowerBound
 
-        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location value (Modules location value ': outer) value
+        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location value (Modules location value ': Reader PackageInfo ': outer) value
         evaluateEntryPoint m sym = runInModule (ModuleInfo m) $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
