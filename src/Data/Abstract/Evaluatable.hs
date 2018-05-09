@@ -12,6 +12,7 @@ module Data.Abstract.Evaluatable
 , evaluatePackageWith
 , throwEvalError
 , traceResolve
+, builtin
 , isolate
 , Modules
 ) where
@@ -29,6 +30,7 @@ import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Package as Package
+import Data.ByteString.Char8 (pack)
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
@@ -165,6 +167,22 @@ instance Evaluatable [] where
 traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator location value effects ()
 traceResolve name path = traceE ("resolved " <> show name <> " -> " <> show path)
 
+
+builtin :: ( Addressable location effects
+           , Members '[ Reader (Environment location value)
+                      , Reader ModuleInfo
+                      , Reader Span
+                      , State (Environment location value)
+                      , State (Heap location value)
+                      ] effects
+           , Reducer value (Cell location value)
+           )
+        => String
+        -> Evaluator location value effects value
+        -> Evaluator location value effects ()
+builtin n def = do
+  addr <- alloc (name ("__builtin_" <> pack n))
+  def >>= assign addr
 
 -- | Evaluate a given package.
 evaluatePackageWith :: forall location term value inner inner' outer
