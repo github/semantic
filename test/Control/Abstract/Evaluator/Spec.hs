@@ -1,5 +1,7 @@
 {-# LANGUAGE TypeOperators #-}
-module Control.Abstract.Evaluator.Spec where
+module Control.Abstract.Evaluator.Spec
+( spec
+) where
 
 import Analysis.Abstract.Evaluating (evaluating)
 import Control.Abstract
