@@ -192,7 +192,8 @@ evaluatePackageWith analyzeModule analyzeTerm package
   . withPrelude (packagePrelude (packageBody package))
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints (packageBody package)))
   where evalModule m
-          = ((,) <$> (filterEnv <$> getExports <*> getEnv) <*>)
+          = (<*> (filterEnv <$> getExports <*> getEnv))
+          . fmap (flip (,))
           . runInModule (moduleInfo m)
           . analyzeModule (subtermValue . moduleBody)
           $ fmap (Subterm <*> foldSubterms (analyzeTerm eval)) m
