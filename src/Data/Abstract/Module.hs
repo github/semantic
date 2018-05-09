@@ -3,9 +3,11 @@ module Data.Abstract.Module
 , moduleForBlob
 , ModulePath
 , ModuleInfo(..)
+, moduleInfoFromSrcLoc
 ) where
 
 import Data.Blob
+import GHC.Stack
 import Prologue
 import System.FilePath.Posix
 
@@ -30,3 +32,6 @@ type ModulePath = FilePath
 
 newtype ModuleInfo = ModuleInfo { modulePath :: ModulePath }
   deriving (Eq, Ord, Show)
+
+moduleInfoFromSrcLoc :: SrcLoc -> ModuleInfo
+moduleInfoFromSrcLoc = ModuleInfo . srcLocModule
