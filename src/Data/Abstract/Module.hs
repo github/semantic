@@ -37,5 +37,6 @@ newtype ModuleInfo = ModuleInfo { modulePath :: ModulePath }
 moduleInfoFromSrcLoc :: SrcLoc -> ModuleInfo
 moduleInfoFromSrcLoc = ModuleInfo . srcLocModule
 
+-- | Produce 'ModuleInfo' from the top location on the Haskell call stack (i.e. the file where the call to 'moduleInfoFromCallStack' was made).
 moduleInfoFromCallStack :: HasCallStack => ModuleInfo
 moduleInfoFromCallStack = maybe (ModuleInfo "?") (moduleInfoFromSrcLoc . snd) (listToMaybe (getCallStack callStack))
