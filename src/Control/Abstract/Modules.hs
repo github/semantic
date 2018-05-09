@@ -83,11 +83,10 @@ runModules evaluateModule = go
                 if loading
                   then traceE ("load (skip evaluating, circular load): " <> show mPath) $> Nothing
                   else do
-                    cacheModule name Nothing
+                    _ <- cacheModule name Nothing
                     v <- traceE ("load (evaluating): " <> show mPath) *> go (evaluateModule x) <* traceE ("load done:" <> show mPath)
                     env <- filterEnv <$> getExports <*> getEnv
                     cacheModule name (Just (env, v))
-                    pure (Just (env, v))
 
               loadingModule path = isJust . ModuleTable.lookup path <$> getModuleTable
 
@@ -106,8 +105,8 @@ runModules evaluateModule = go
 getModuleTable :: Member (State (ModuleTable (Maybe (Environment location value, value)))) effects => Evaluator location value effects (ModuleTable (Maybe (Environment location value, value)))
 getModuleTable = raise get
 
-cacheModule :: Member (State (ModuleTable (Maybe (Environment location value, value)))) effects => ModulePath -> Maybe (Environment location value, value) -> Evaluator location value effects ()
-cacheModule path result = raise (modify' (ModuleTable.insert path result))
+cacheModule :: Member (State (ModuleTable (Maybe (Environment location value, value)))) effects => ModulePath -> Maybe (Environment location value, value) -> Evaluator location value effects (Maybe (Environment location value, value))
+cacheModule path result = raise (modify' (ModuleTable.insert path result)) $> result
 
 askModuleTable :: Member (Reader (ModuleTable [Module term])) effects => Evaluator location value effects (ModuleTable [Module term])
 askModuleTable = raise ask
