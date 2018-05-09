@@ -16,17 +16,17 @@ tracingTerms :: ( Corecursive term
                 , Members '[ Reader (Live location value)
                            , State (Environment location value)
                            , State (Heap location value)
-                           , Writer (trace (Configuration location term value))
+                           , Writer (trace (Configuration term location value))
                            ] effects
-                , Reducer (Configuration location term value) (trace (Configuration location term value))
+                , Reducer (Configuration term location value) (trace (Configuration term location value))
                 )
-             => trace (Configuration location term value)
+             => trace (Configuration term location value)
              -> SubtermAlgebra (Base term) term (Evaluator location value effects a)
              -> SubtermAlgebra (Base term) term (Evaluator location value effects a)
 tracingTerms proxy recur term = getConfiguration (embedSubterm term) >>= trace . (`asTypeOf` proxy) . Reducer.unit >> recur term
 
-trace :: Member (Writer (trace (Configuration location term value))) effects => trace (Configuration location term value) -> Evaluator location value effects ()
+trace :: Member (Writer (trace (Configuration term location value))) effects => trace (Configuration term location value) -> Evaluator location value effects ()
 trace = raise . tell
 
-tracing :: Monoid (trace (Configuration location term value)) => Evaluator location value (Writer (trace (Configuration location term value)) ': effects) a -> Evaluator location value effects (a, trace (Configuration location term value))
+tracing :: Monoid (trace (Configuration term location value)) => Evaluator location value (Writer (trace (Configuration term location value)) ': effects) a -> Evaluator location value effects (a, trace (Configuration term location value))
 tracing = raiseHandler runWriter

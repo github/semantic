@@ -9,39 +9,39 @@ import Data.Semilattice.Lower
 import Prologue
 
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Heap's.
-newtype Cache location term value = Cache { unCache :: Monoidal.Map (Configuration location term value) (Set (value, Heap location value)) }
+newtype Cache term location value = Cache { unCache :: Monoidal.Map (Configuration term location value) (Set (value, Heap location value)) }
   deriving (Lower)
 
-type Cacheable location term value = (Ord (Cell location value), Ord location, Ord term, Ord value)
+type Cacheable term location value = (Ord (Cell location value), Ord location, Ord term, Ord value)
 
-deriving instance (Eq   location, Eq   term, Eq   value, Eq   (Cell location value)) => Eq   (Cache location term value)
-deriving instance (Ord  location, Ord  term, Ord  value, Ord  (Cell location value)) => Ord  (Cache location term value)
-deriving instance (Show location, Show term, Show value, Show (Cell location value)) => Show (Cache location term value)
+deriving instance (Eq   term, Eq   location, Eq   value, Eq   (Cell location value)) => Eq   (Cache term location value)
+deriving instance (Ord  term, Ord  location, Ord  value, Ord  (Cell location value)) => Ord  (Cache term location value)
+deriving instance (Show term, Show location, Show value, Show (Cell location value)) => Show (Cache term location value)
 
-deriving instance Cacheable location term value => Semigroup (Cache location term value)
-deriving instance Cacheable location term value => Monoid    (Cache location term value)
-deriving instance Cacheable location term value => Reducer (Configuration location term value, (value, Heap location value)) (Cache location term value)
+deriving instance Cacheable term location value => Semigroup (Cache term location value)
+deriving instance Cacheable term location value => Monoid    (Cache term location value)
+deriving instance Cacheable term location value => Reducer (Configuration term location value, (value, Heap location value)) (Cache term location value)
 
 -- | Look up the resulting value & 'Heap' for a given 'Configuration'.
-cacheLookup :: Cacheable location term value => Configuration location term value -> Cache location term value -> Maybe (Set (value, Heap location value))
+cacheLookup :: Cacheable term location value => Configuration term location value -> Cache term location value -> Maybe (Set (value, Heap location value))
 cacheLookup key = Monoidal.lookup key . unCache
 
 -- | Set the resulting value & 'Heap' for a given 'Configuration', overwriting any previous entry.
-cacheSet :: Cacheable location term value => Configuration location term value -> Set (value, Heap location value) -> Cache location term value -> Cache location term value
+cacheSet :: Cacheable term location value => Configuration term location value -> Set (value, Heap location value) -> Cache term location value -> Cache term location value
 cacheSet key value = Cache . Monoidal.insert key value . unCache
 
 -- | Insert the resulting value & 'Heap' for a given 'Configuration', appending onto any previous entry.
-cacheInsert :: Cacheable location term value => Configuration location term value -> (value, Heap location value) -> Cache location term value -> Cache location term value
+cacheInsert :: Cacheable term location value => Configuration term location value -> (value, Heap location value) -> Cache term location value -> Cache term location value
 cacheInsert = curry cons
 
 
-instance (Eq location, Eq term, Eq1 (Cell location)) => Eq1 (Cache location term) where
+instance (Eq   term, Eq   location, Eq1   (Cell location)) => Eq1   (Cache term location) where
   liftEq eqV (Cache c1) (Cache c2) = liftEq2 (liftEq eqV) (liftEq (liftEq2 eqV (liftEq eqV))) c1 c2
 
-instance (Ord location, Ord term, Ord1 (Cell location)) => Ord1 (Cache location term) where
+instance (Ord  term, Ord  location, Ord1  (Cell location)) => Ord1  (Cache term location) where
   liftCompare compareV (Cache c1) (Cache c2) = liftCompare2 (liftCompare compareV) (liftCompare (liftCompare2 compareV (liftCompare compareV))) c1 c2
 
-instance (Show location, Show term, Show1 (Cell location)) => Show1 (Cache location term) where
+instance (Show term, Show location, Show1 (Cell location)) => Show1 (Cache term location) where
   liftShowsPrec spV slV d = showsUnaryWith (liftShowsPrec2 spKey slKey (liftShowsPrec spPair slPair) (liftShowList spPair slPair)) "Cache" d . unCache
       where spKey = liftShowsPrec spV slV
             slKey = liftShowList spV slV
