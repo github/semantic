@@ -5,7 +5,6 @@ import Data.Abstract.Address
 import Data.Abstract.Environment
 import Data.Abstract.Heap
 import Data.Abstract.Live
-import Prologue
 
 -- | A single point in a program’s execution.
 data Configuration term location value = Configuration
@@ -14,7 +13,6 @@ data Configuration term location value = Configuration
   , configurationEnvironment :: Environment location value -- ^ The environment binding any free variables in 'configurationTerm'.
   , configurationHeap        :: Heap location value        -- ^ The heap of values.
   }
-  deriving (Generic1)
 
 deriving instance (Eq   term, Eq   location, Eq   value, Eq   (Cell location value)) => Eq   (Configuration term location value)
 deriving instance (Ord  term, Ord  location, Ord  value, Ord  (Cell location value)) => Ord  (Configuration term location value)
