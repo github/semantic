@@ -1,10 +1,11 @@
 module Control.Abstract.Context
 ( ModuleInfo
-, PackageInfo
 , currentModule
 , withCurrentModule
+, PackageInfo
 , currentPackage
 , withCurrentPackage
+, Span
 , currentSpan
 , withCurrentSpan
 ) where
