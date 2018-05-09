@@ -1,4 +1,3 @@
-{-# LANGUAGE DeriveFoldable, DeriveGeneric, FlexibleContexts, StandaloneDeriving, UndecidableInstances #-}
 module Data.Abstract.Configuration where
 
 import Data.Abstract.Address

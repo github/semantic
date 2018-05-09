@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, GeneralizedNewtypeDeriving #-}
 module Data.Abstract.Cache where
 
 import Data.Abstract.Address
