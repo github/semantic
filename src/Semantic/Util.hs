@@ -14,6 +14,7 @@ import           Data.Abstract.Type
 import           Data.Blob
 import           Data.File
 import qualified Data.Language as Language
+import           Data.Semilattice.Lower
 import qualified GHC.TypeLits as TypeLevel
 import           Language.Preluded
 import           Parsing.Parser
@@ -29,6 +30,7 @@ justEvaluating
   = runM
   . fmap (first reassociate)
   . evaluating
+  . runReader (lowerBound :: Span)
   . runPrintingTraces
   . runLoadError
   . runValueError
@@ -42,6 +44,7 @@ justEvaluating
 evaluatingWithHoles
   = runM
   . evaluating
+  . runReader (lowerBound :: Span)
   . runPrintingTraces
   . resumingLoadError
   . resumingUnspecialized
@@ -57,6 +60,7 @@ checking
   = runM
   . fmap (first reassociate)
   . evaluating
+  . runReader (lowerBound :: Span)
   . runPrintingTraces
   . providingLiveSet
   . runLoadError
@@ -88,8 +92,8 @@ rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby
 pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Language.Python)
 
 -- Evaluate a project, starting at a single entrypoint.
-evaluateProject parser lang prelude path = evaluatePackageWith id id <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
-evaluateProjectWithCaching parser lang prelude path = evaluatePackageWith convergingModules cachingTerms <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
+evaluateProject parser lang prelude path = evaluatePackageWith id withTermSpans <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
+evaluateProjectWithCaching parser lang prelude path = evaluatePackageWith convergingModules (withTermSpans . cachingTerms) <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
 
 
 parseFile :: Parser term -> FilePath -> IO term

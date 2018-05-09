@@ -57,6 +57,7 @@ type EvaluatableConstraints location term value effects =
              , Reader (Environment location value)
              , Reader ModuleInfo
              , Reader PackageInfo
+             , Reader Span
              , Resumable (AddressError location value)
              , Resumable (EnvironmentError value)
              , Resumable (EvalError value)
