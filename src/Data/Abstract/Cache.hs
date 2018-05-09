@@ -14,11 +14,12 @@ newtype Cache location term value = Cache { unCache :: Monoidal.Map (Configurati
 
 type Cacheable location term value = (Ord (Cell location value), Ord location, Ord term, Ord value)
 
-deriving instance (Eq location, Eq term, Eq value, Eq (Cell location value)) => Eq (Cache location term value)
-deriving instance Cacheable location term value => Ord (Cache location term value)
+deriving instance (Eq   location, Eq   term, Eq   value, Eq   (Cell location value)) => Eq   (Cache location term value)
+deriving instance (Ord  location, Ord  term, Ord  value, Ord  (Cell location value)) => Ord  (Cache location term value)
 deriving instance (Show location, Show term, Show value, Show (Cell location value)) => Show (Cache location term value)
+
 deriving instance Cacheable location term value => Semigroup (Cache location term value)
-deriving instance Cacheable location term value => Monoid (Cache location term value)
+deriving instance Cacheable location term value => Monoid    (Cache location term value)
 deriving instance Cacheable location term value => Reducer (Configuration location term value, (value, Heap location value)) (Cache location term value)
 
 -- | Look up the resulting value & 'Heap' for a given 'Configuration'.
