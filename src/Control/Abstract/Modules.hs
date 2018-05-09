@@ -9,6 +9,7 @@ module Control.Abstract.Modules
 , runModules
 , LoadError(..)
 , moduleNotFound
+, resumeLoadError
 , runLoadError
 , runLoadErrorWith
 , ResolutionError(..)
@@ -137,6 +138,9 @@ instance Eq1 (LoadError location value) where
 
 moduleNotFound :: Member (Resumable (LoadError location value)) effects => ModulePath -> Evaluator location term value effects (Maybe (Environment location value, value))
 moduleNotFound = throwResumable . ModuleNotFound
+
+resumeLoadError :: Member (Resumable (LoadError location value)) effects => Evaluator location term value effects a -> (forall resume . LoadError location value resume -> Evaluator location term value effects resume) -> Evaluator location term value effects a
+resumeLoadError = resume
 
 runLoadError :: Evaluator location term value (Resumable (LoadError location value) ': effects) a -> Evaluator location term value effects (Either (SomeExc (LoadError location value)) a)
 runLoadError = raiseHandler runError
