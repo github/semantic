@@ -21,7 +21,3 @@ deriving instance (Ord  term, Ord  location, Ord  value, Ord  (Cell location val
 deriving instance (Show term, Show location, Show value, Show (Cell location value)) => Show (Configuration term location value)
 
 deriving instance (Ord location, Foldable (Cell location)) => Foldable (Configuration term location)
-
-instance (Eq   term, Eq   location, Eq1   (Cell location)) => Eq1   (Configuration term location) where liftEq        = genericLiftEq
-instance (Ord  term, Ord  location, Ord1  (Cell location)) => Ord1  (Configuration term location) where liftCompare   = genericLiftCompare
-instance (Show term, Show location, Show1 (Cell location)) => Show1 (Configuration term location) where liftShowsPrec = genericLiftShowsPrec
