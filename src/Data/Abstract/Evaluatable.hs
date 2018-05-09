@@ -216,12 +216,6 @@ evaluatePackageBodyWith perModule perTerm body
           . perModule (subtermValue . moduleBody)
           . fmap (Subterm <*> foldSubterms (perTerm eval))
           $ m
-        runInModule info
-          = runReader info
-          . runReturn
-          . runLoopControl
-          . fmap fst
-          . runGoto lowerBound
 
         evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location value (Modules location value ': outer) value
         evaluateEntryPoint m sym = runInModule (ModuleInfo m) $ do
@@ -232,6 +226,19 @@ evaluatePackageBodyWith perModule perTerm body
         withPrelude (Just prelude) a = do
           preludeEnv <- evalModule prelude *> getEnv
           withDefaultEnvironment preludeEnv a
+
+runInModule :: ( Member Fail outer
+               , inner ~ (LoopControl value ': Return value ': Reader ModuleInfo ': outer)
+               )
+            => ModuleInfo
+            -> Evaluator location value (Goto inner value ': inner) value
+            -> Evaluator location value outer value
+runInModule info
+  = runReader info
+  . runReturn
+  . runLoopControl
+  . fmap fst
+  . runGoto lowerBound
 
 -- | Isolate the given action with an empty global environment and exports.
 isolate :: Members '[State (Environment location value), State (Exports location value)] effects => Evaluator location value effects a -> Evaluator location value effects a
