@@ -193,8 +193,8 @@ evaluatePackageWith analyzeModule analyzeTerm package
   where evalModule m
           = runInModule (moduleInfo m)
           . analyzeModule (subtermValue . moduleBody)
-          . fmap (Subterm <*> foldSubterms (analyzeTerm eval))
-          $ m
+          $ fmap (Subterm <*> foldSubterms (analyzeTerm eval)) m
+
         runInModule info
           = runReader info
           . runReturn
