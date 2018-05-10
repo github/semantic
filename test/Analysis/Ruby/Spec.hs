@@ -31,25 +31,19 @@ spec = parallel $ do
     it "evaluates load with wrapper" $ do
       res <- evaluate "load-wrap.rb"
       fst res `shouldBe` Left (SomeExc (injectSum @(EnvironmentError (Value Precise)) (FreeVariable "foo")))
-      environment (snd res) `shouldBe` [ ("Object", addr 0) ]
+      Env.names (environment (snd res)) `shouldContain` [ "Object" ]
 
     it "evaluates subclass" $ do
       res <- evaluate "subclass.rb"
       fst res `shouldBe` Right [injValue (String "\"<bar>\"")]
-      environment (snd res) `shouldBe` [ ("Bar", addr 6)
-                                       , ("Foo", addr 3)
-                                       , ("Object", addr 0) ]
+      Env.names (environment (snd res)) `shouldContain` [ "Bar", "Foo" ]
 
-      heapLookup (Address (Precise 6)) (heap (snd res))
-        `shouldBe` ns "Bar" [ ("baz", addr 8)
-                            , ("foo", addr 5)
-                            , ("inspect", addr 7) ]
+      (derefQName (heap (snd res)) ("Bar" :| []) (environment (snd res)) >>= deNamespace) `shouldBe` Just ("Bar",  ["baz", "foo", "inspect"])
 
     it "evaluates modules" $ do
       res <- evaluate "modules.rb"
       fst res `shouldBe` Right [injValue (String "\"<hello>\"")]
-      environment (snd res) `shouldBe` [ ("Object", addr 0)
-                                       , ("Bar", addr 3) ]
+      Env.names (environment (snd res)) `shouldContain` [ "Bar" ]
 
     it "handles break correctly" $ do
       res <- evaluate "break.rb"
