@@ -16,7 +16,7 @@ spec = parallel $ do
   describe "evaluates Python" $ do
     it "imports" $ do
       ((_, state), _) <- evaluate "main.py"
-      Env.names (environment state) `shouldBe` [ "a", "b", "print" ]
+      Env.names (environment state) `shouldContain` [ "a", "b" ]
 
       (derefQName (heap state) ("a" :| [])    (environment state) >>= deNamespace) `shouldBe` Just ("a", ["foo"])
       (derefQName (heap state) ("b" :| [])    (environment state) >>= deNamespace) `shouldBe` Just ("b", ["c"])
@@ -24,11 +24,11 @@ spec = parallel $ do
 
     it "imports with aliases" $ do
       env <- environment . snd . fst <$> evaluate "main1.py"
-      Env.names env `shouldBe` [ "b", "e", "print" ]
+      Env.names env `shouldContain` [ "b", "e" ]
 
     it "imports using 'from' syntax" $ do
       env <- environment . snd . fst <$> evaluate "main2.py"
-      Env.names env `shouldBe` [ "bar", "foo", "print" ]
+      Env.names env `shouldContain` [ "bar", "foo" ]
 
     it "subclasses" $ do
       ((res, _), _) <- evaluate "subclass.py"
