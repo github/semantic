@@ -35,6 +35,6 @@ insert name alias address = Exports . Map.insert name (alias, address) . unExpor
 aliases :: Exports location value -> [(Name, Name)]
 aliases = Map.toList . fmap fst . unExports
 
-instance Eq location => Eq1 (Exports location) where liftEq = genericLiftEq
-instance Ord location => Ord1 (Exports location) where liftCompare = genericLiftCompare
+instance Eq   location => Eq1   (Exports location) where liftEq        = genericLiftEq
+instance Ord  location => Ord1  (Exports location) where liftCompare   = genericLiftCompare
 instance Show location => Show1 (Exports location) where liftShowsPrec = genericLiftShowsPrec
