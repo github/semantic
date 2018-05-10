@@ -15,28 +15,28 @@ spec :: Spec
 spec = parallel $ do
   describe "evaluates Python" $ do
     it "imports" $ do
-      res <- snd <$> evaluate "main.py"
-      Env.names (environment res) `shouldBe` [ "a", "b", "print" ]
+      ((_, state), _) <- evaluate "main.py"
+      Env.names (environment state) `shouldBe` [ "a", "b", "print" ]
 
-      (derefQName (heap res) ("a" :| [])    (environment res) >>= deNamespace) `shouldBe` Just ("a", ["foo"])
-      (derefQName (heap res) ("b" :| [])    (environment res) >>= deNamespace) `shouldBe` Just ("b", ["c"])
-      (derefQName (heap res) ("b" :| ["c"]) (environment res) >>= deNamespace) `shouldBe` Just ("c", ["baz"])
+      (derefQName (heap state) ("a" :| [])    (environment state) >>= deNamespace) `shouldBe` Just ("a", ["foo"])
+      (derefQName (heap state) ("b" :| [])    (environment state) >>= deNamespace) `shouldBe` Just ("b", ["c"])
+      (derefQName (heap state) ("b" :| ["c"]) (environment state) >>= deNamespace) `shouldBe` Just ("c", ["baz"])
 
     it "imports with aliases" $ do
-      env <- environment . snd <$> evaluate "main1.py"
+      env <- environment . snd . fst <$> evaluate "main1.py"
       Env.names env `shouldBe` [ "b", "e", "print" ]
 
     it "imports using 'from' syntax" $ do
-      env <- environment . snd <$> evaluate "main2.py"
+      env <- environment . snd . fst <$> evaluate "main2.py"
       Env.names env `shouldBe` [ "bar", "foo", "print" ]
 
     it "subclasses" $ do
-      v <- fst <$> evaluate "subclass.py"
-      v `shouldBe` Right [injValue (String "\"bar\"")]
+      ((res, _), _) <- evaluate "subclass.py"
+      res `shouldBe` Right [injValue (String "\"bar\"")]
 
     it "handles multiple inheritance left-to-right" $ do
-      v <- fst <$> evaluate "multiple_inheritance.py"
-      v `shouldBe` Right [injValue (String "\"foo!\"")]
+      ((res, _), _) <- evaluate "multiple_inheritance.py"
+      res `shouldBe` Right [injValue (String "\"foo!\"")]
 
   where
     ns n = Just . Latest . Just . injValue . Namespace n

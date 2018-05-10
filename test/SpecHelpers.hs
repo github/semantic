@@ -74,9 +74,9 @@ readFilePair paths = let paths' = fmap file paths in
 
 testEvaluating
   = run
+  . runReturningTraces
   . fmap (first reassociate)
   . evaluating
-  . runIgnoringTraces
   . runLoadError
   . runValueError
   . runUnspecialized

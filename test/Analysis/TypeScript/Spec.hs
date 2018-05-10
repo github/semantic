@@ -16,27 +16,27 @@ spec :: Spec
 spec = parallel $ do
   describe "evaluates TypeScript" $ do
     it "imports with aliased symbols" $ do
-      env <- environment . snd <$> evaluate "main.ts"
+      env <- environment . snd . fst <$> evaluate "main.ts"
       Env.names env `shouldBe` [ "bar", "quz" ]
 
     it "imports with qualified names" $ do
-      res <- snd <$> evaluate "main1.ts"
-      Env.names (environment res) `shouldBe` [ "b", "z" ]
+      ((_, state), _) <- evaluate "main1.ts"
+      Env.names (environment state) `shouldBe` [ "b", "z" ]
 
-      (derefQName (heap res) ("b" :| []) (environment res) >>= deNamespace) `shouldBe` Just ("b", [ "baz", "foo" ])
-      (derefQName (heap res) ("z" :| []) (environment res) >>= deNamespace) `shouldBe` Just ("z", [ "baz", "foo" ])
+      (derefQName (heap state) ("b" :| []) (environment state) >>= deNamespace) `shouldBe` Just ("b", [ "baz", "foo" ])
+      (derefQName (heap state) ("z" :| []) (environment state) >>= deNamespace) `shouldBe` Just ("z", [ "baz", "foo" ])
 
     it "side effect only imports" $ do
-      env <- environment . snd <$> evaluate "main2.ts"
+      env <- environment . snd . fst <$> evaluate "main2.ts"
       env `shouldBe` emptyEnv
 
     it "fails exporting symbols not defined in the module" $ do
-      v <- fst <$> evaluate "bad-export.ts"
-      v `shouldBe` Left (SomeExc (injectSum @(EvalError (Value Precise)) (ExportError "foo.ts" (Name "pip"))))
+      ((res, _), _) <- evaluate "bad-export.ts"
+      res `shouldBe` Left (SomeExc (injectSum @(EvalError (Value Precise)) (ExportError "foo.ts" (Name "pip"))))
 
     it "evaluates early return statements" $ do
-      res <- evaluate "early-return.ts"
-      fst res `shouldBe` Right [injValue (Value.Float (Number.Decimal 123.0))]
+      ((res, _), _) <- evaluate "early-return.ts"
+      res `shouldBe` Right [injValue (Value.Float (Number.Decimal 123.0))]
 
   where
     fixtures = "test/fixtures/typescript/analysis/"
