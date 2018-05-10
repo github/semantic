@@ -3,7 +3,7 @@ module Semantic.Graph where
 
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph
-import           Control.Effect (runIgnoringTraces, traceE)
+import           Control.Monad.Effect.Trace
 import qualified Control.Exception as Exc
 import           Control.Monad.Effect (reinterpret)
 import           Data.Abstract.Address
@@ -47,7 +47,7 @@ graph graphType renderer project
           runGraphAnalysis
             = run
             . evaluating
-            . runIgnoringTraces
+            . runIgnoringTrace
             . resumingLoadError
             . resumingUnspecialized
             . resumingValueError
@@ -71,7 +71,7 @@ parsePackage parser preludeFile project@Project{..} = do
   prelude <- traverse (parseModule parser Nothing) preludeFile
   p <- parseModules parser project
   let pkg = Package.fromModules n Nothing prelude (length projectEntryPoints) p
-  pkg <$ traceE ("project: " <> show pkg)
+  pkg <$ trace ("project: " <> show pkg)
 
   where
     n = name (projectName project)
@@ -95,15 +95,15 @@ withTermSpans :: ( HasField fields Span
 withTermSpans recur term = withCurrentSpan (getField (termFAnnotation term)) (recur term)
 
 resumingResolutionError :: (Applicative (m effects), Effectful m, Member Trace effects) => m (Resumable ResolutionError ': effects) a -> m effects a
-resumingResolutionError = runResolutionErrorWith (\ err -> traceE ("ResolutionError:" <> show err) *> case err of
+resumingResolutionError = runResolutionErrorWith (\ err -> trace ("ResolutionError:" <> show err) *> case err of
   NotFoundError nameToResolve _ _ -> pure  nameToResolve
   GoImportError pathToResolve     -> pure [pathToResolve])
 
 resumingLoadError :: Member Trace effects => Evaluator location value (Resumable (LoadError location value) ': effects) a -> Evaluator location value effects a
-resumingLoadError = runLoadErrorWith (\ (ModuleNotFound path) -> traceE ("LoadError: " <> path) $> Nothing)
+resumingLoadError = runLoadErrorWith (\ (ModuleNotFound path) -> trace ("LoadError: " <> path) $> Nothing)
 
 resumingEvalError :: (AbstractHole value, Member Trace effects, Show value) => Evaluator location value (Resumable (EvalError value) ': effects) a -> Evaluator location value effects a
-resumingEvalError = runEvalErrorWith (\ err -> traceE ("EvalError" <> show err) *> case err of
+resumingEvalError = runEvalErrorWith (\ err -> trace ("EvalError" <> show err) *> case err of
   EnvironmentLookupError{} -> pure hole
   DefaultExportError{}     -> pure ()
   ExportError{}            -> pure ()
@@ -113,15 +113,15 @@ resumingEvalError = runEvalErrorWith (\ err -> traceE ("EvalError" <> show err) 
   FreeVariablesError names -> pure (fromMaybeLast "unknown" names))
 
 resumingUnspecialized :: (Member Trace effects, AbstractHole value) => Evaluator location value (Resumable (Unspecialized value) ': effects) a -> Evaluator location value effects a
-resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> traceE ("Unspecialized:" <> show err) $> hole)
+resumingUnspecialized = runUnspecializedWith (\ err@(Unspecialized _) -> trace ("Unspecialized:" <> show err) $> hole)
 
 resumingAddressError :: (AbstractHole value, Lower (Cell location value), Member Trace effects, Show location) => Evaluator location value (Resumable (AddressError location value) ': effects) a -> Evaluator location value effects a
-resumingAddressError = runAddressErrorWith (\ err -> traceE ("AddressError:" <> show err) *> case err of
+resumingAddressError = runAddressErrorWith (\ err -> trace ("AddressError:" <> show err) *> case err of
   UnallocatedAddress _   -> pure lowerBound
   UninitializedAddress _ -> pure hole)
 
 resumingValueError :: (Members '[State (Environment location (Value location)), Trace] effects, Show location) => Evaluator location (Value location) (Resumable (ValueError location) ': effects) a -> Evaluator location (Value location) effects a
-resumingValueError = runValueErrorWith (\ err -> traceE ("ValueError" <> show err) *> case err of
+resumingValueError = runValueErrorWith (\ err -> trace ("ValueError" <> show err) *> case err of
   CallError val     -> pure val
   StringError val   -> pure (pack (show val))
   BoolError{}       -> pure True
@@ -139,4 +139,4 @@ resumingValueError = runValueErrorWith (\ err -> traceE ("ValueError" <> show er
 resumingEnvironmentError :: AbstractHole value => Evaluator location value (Resumable (EnvironmentError value) ': effects) a -> Evaluator location value effects (a, [Name])
 resumingEnvironmentError
   = runState []
-  . raiseHandler (reinterpret (\ (Resumable (FreeVariable name)) -> modify' (name :) $> hole))
+  . reinterpret (\ (Resumable (FreeVariable name)) -> modify' (name :) $> hole)

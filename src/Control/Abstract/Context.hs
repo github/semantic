@@ -11,7 +11,7 @@ module Control.Abstract.Context
 , withCurrentCallStack
 ) where
 
-import Control.Effect
+import Control.Monad.Effect
 import Control.Monad.Effect.Reader
 import Data.Abstract.Module
 import Data.Abstract.Package
@@ -21,27 +21,27 @@ import Prologue
 
 -- | Get the currently evaluating 'ModuleInfo'.
 currentModule :: (Effectful m, Member (Reader ModuleInfo) effects) => m effects ModuleInfo
-currentModule = raise ask
+currentModule = ask
 
 -- | Run an action with a locally-replaced 'ModuleInfo'.
 withCurrentModule :: (Effectful m, Member (Reader ModuleInfo) effects) => ModuleInfo -> m effects a -> m effects a
-withCurrentModule = raiseHandler . local . const
+withCurrentModule = local . const
 
 -- | Get the currently evaluating 'PackageInfo'.
 currentPackage :: (Effectful m, Member (Reader PackageInfo) effects) => m effects PackageInfo
-currentPackage = raise ask
+currentPackage = ask
 
 -- | Run an action with a locally-replaced 'PackageInfo'.
 withCurrentPackage :: (Effectful m, Member (Reader PackageInfo) effects) => PackageInfo -> m effects a -> m effects a
-withCurrentPackage = raiseHandler . local . const
+withCurrentPackage = local . const
 
 -- | Get the 'Span' of the currently-evaluating term (if any).
 currentSpan :: (Effectful m, Member (Reader Span) effects) => m effects Span
-currentSpan = raise ask
+currentSpan = ask
 
 -- | Run an action with a locally-replaced 'Span'.
 withCurrentSpan :: (Effectful m, Member (Reader Span) effects) => Span -> m effects a -> m effects a
-withCurrentSpan = raiseHandler . local . const
+withCurrentSpan = local . const
 
 
 -- | Run an action with locally-replaced 'ModuleInfo' & 'Span' derived from the passed 'SrcLoc'.

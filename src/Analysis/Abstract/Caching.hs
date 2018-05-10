@@ -6,7 +6,6 @@ module Analysis.Abstract.Caching
 ) where
 
 import Control.Abstract
-import Control.Monad.Effect
 import Data.Abstract.Cache
 import Data.Abstract.Module
 import Data.Semilattice.Lower
@@ -14,31 +13,30 @@ import Prologue
 
 -- | Look up the set of values for a given configuration in the in-cache.
 consultOracle :: (Cacheable term (Cell location) location value, Member (Reader (Cache term (Cell location) location value)) effects) => Configuration term (Cell location) location value -> Evaluator location value effects (Set (value, Heap (Cell location) location value))
-consultOracle configuration = raise (fromMaybe mempty . cacheLookup configuration <$> ask)
+consultOracle configuration = fromMaybe mempty . cacheLookup configuration <$> ask
 
 -- | Run an action with the given in-cache.
 withOracle :: Member (Reader (Cache term (Cell location) location value)) effects => Cache term (Cell location) location value -> Evaluator location value effects a -> Evaluator location value effects a
-withOracle cache = raiseHandler (local (const cache))
+withOracle cache = local (const cache)
 
 
 -- | Look up the set of values for a given configuration in the out-cache.
 lookupCache :: (Cacheable term (Cell location) location value, Member (State (Cache term (Cell location) location value)) effects) => Configuration term (Cell location) location value -> Evaluator location value effects (Maybe (Set (value, Heap (Cell location) location value)))
-lookupCache configuration = raise (cacheLookup configuration <$> get)
+lookupCache configuration = cacheLookup configuration <$> get
 
 -- | Run an action, caching its result and 'Heap' under the given configuration.
 cachingConfiguration :: (Cacheable term (Cell location) location value, Members '[State (Cache term (Cell location) location value), State (Heap (Cell location) location value)] effects) => Configuration term (Cell location) location value -> Set (value, Heap (Cell location) location value) -> Evaluator location value effects value -> Evaluator location value effects value
 cachingConfiguration configuration values action = do
-  raise (modify (cacheSet configuration values))
-  result <- (,) <$> action <*> raise get
-  raise (modify (cacheInsert configuration result))
-  pure (fst result)
+  modify' (cacheSet configuration values)
+  result <- (,) <$> action <*> get
+  fst result <$ modify' (cacheInsert configuration result)
 
 putCache :: Member (State (Cache term (Cell location) location value)) effects => Cache term (Cell location) location value -> Evaluator location value effects ()
-putCache = raise . put
+putCache = put
 
 -- | Run an action starting from an empty out-cache, and return the out-cache afterwards.
 isolateCache :: forall term location value effects a . Member (State (Cache term (Cell location) location value)) effects => Evaluator location value effects a -> Evaluator location value effects (Cache term (Cell location) location value)
-isolateCache action = putCache @term lowerBound *> action *> raise get
+isolateCache action = putCache @term lowerBound *> action *> get
 
 
 -- | Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
@@ -82,18 +80,15 @@ convergingModules recur m = do
   cache <- converge (\ prevCache -> isolateCache $ do
     putHeap (configurationHeap c)
     -- We need to reset fresh generation so that this invocation converges.
-    reset 0 $
+    resetFresh 0 $
     -- This is subtle: though the calling context supports nondeterminism, we want
     -- to corral all the nondeterminism that happens in this @eval@ invocation, so
     -- that it doesn't "leak" to the calling context and diverge (otherwise this
     -- would never complete). We don’t need to use the values, so we 'gather' the
     -- nondeterministic values into @()@.
-      withOracle prevCache (raiseHandler (gather (const ())) (recur m))) lowerBound
+      withOracle prevCache (gatherM (const ()) (recur m))) lowerBound
   maybe empty scatter (cacheLookup c cache)
 
-
-reset :: (Effectful m, Member Fresh effects) => Int -> m effects a -> m effects a
-reset start = raiseHandler (interposeState start (const pure) (\ counter Fresh yield -> (yield $! succ counter) counter))
 
 -- | Iterate a monadic action starting from some initial seed until the results converge.
 --
@@ -119,4 +114,4 @@ caching :: Alternative f => Evaluator location value (NonDet ': Reader (Cache te
 caching
   = runState lowerBound
   . runReader lowerBound
-  . raiseHandler makeChoiceA
+  . runNonDetA

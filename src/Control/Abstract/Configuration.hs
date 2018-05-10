@@ -9,7 +9,6 @@ import Control.Abstract.Evaluator
 import Control.Abstract.Heap
 import Control.Abstract.Roots
 import Data.Abstract.Configuration
-import Prologue
 
 -- | Get the current 'Configuration' with a passed-in term.
 getConfiguration :: Members '[Reader (Live location value), State (Environment location value), State (Heap (Cell location) location value)] effects => term -> Evaluator location value effects (Configuration term (Cell location) location value)

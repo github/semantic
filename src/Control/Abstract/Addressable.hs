@@ -4,7 +4,6 @@ module Control.Abstract.Addressable where
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
-import Control.Monad.Effect.Resumable as Eff
 import Data.Abstract.Address
 import Data.Abstract.Environment (insert)
 import Data.Abstract.FreeVariables
@@ -78,7 +77,7 @@ variable name = lookupEnv name >>= maybe (freeVariableError name) deref
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
 instance Member Fresh effects => Addressable Precise effects where
   derefCell _ = pure . unLatest
-  allocLoc _ = Precise <$> raise fresh
+  allocLoc _ = Precise <$> fresh
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
 instance Members '[Fresh, NonDet] effects => Addressable Monovariant effects where
@@ -111,10 +110,10 @@ instance Eq location => Eq1 (AddressError location value) where
 
 
 throwAddressError :: Member (Resumable (AddressError location value)) effects => AddressError location value resume -> Evaluator location value effects resume
-throwAddressError = raise . Eff.throwError
+throwAddressError = throwResumable
 
 runAddressError :: Evaluator location value (Resumable (AddressError location value) ': effects) a -> Evaluator location value effects (Either (SomeExc (AddressError location value)) a)
-runAddressError = raiseHandler runError
+runAddressError = runResumable
 
 runAddressErrorWith :: (forall resume . AddressError location value resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (AddressError location value) ': effects) a -> Evaluator location value effects a
 runAddressErrorWith = runResumableWith

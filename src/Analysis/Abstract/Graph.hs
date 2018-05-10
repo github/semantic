@@ -150,7 +150,7 @@ variableDefinition name = do
   appendGraph (vertex (Variable (unName name)) `connect` graph)
 
 appendGraph :: (Effectful m, Member (State Graph) effects) => Graph -> m effects ()
-appendGraph = raise . modify' . (<>)
+appendGraph = modify' . (<>)
 
 
 instance Semigroup Graph where

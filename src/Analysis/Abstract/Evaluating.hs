@@ -38,4 +38,4 @@ evaluating
   . runState lowerBound -- State (Environment location value)
   . runReader lowerBound -- Reader (Environment location value)
   . runFresh 0
-  . raiseHandler runFail
+  . runFail

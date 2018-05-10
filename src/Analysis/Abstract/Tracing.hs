@@ -4,7 +4,7 @@ module Analysis.Abstract.Tracing
 , tracing
 ) where
 
-import Control.Abstract
+import Control.Abstract hiding (trace)
 import Control.Monad.Effect.Writer
 import Data.Semigroup.Reducer as Reducer
 import Prologue
@@ -26,7 +26,7 @@ tracingTerms :: ( Corecursive term
 tracingTerms proxy recur term = getConfiguration (embedSubterm term) >>= trace . (`asTypeOf` proxy) . Reducer.unit >> recur term
 
 trace :: Member (Writer (trace (Configuration term (Cell location) location value))) effects => trace (Configuration term (Cell location) location value) -> Evaluator location value effects ()
-trace = raise . tell
+trace = tell
 
 tracing :: Monoid (trace (Configuration term (Cell location) location value)) => Evaluator location value (Writer (trace (Configuration term (Cell location) location value)) ': effects) a -> Evaluator location value effects (a, trace (Configuration term (Cell location) location value))
-tracing = raiseHandler runWriter
+tracing = runWriter

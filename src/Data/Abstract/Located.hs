@@ -5,7 +5,6 @@ import Control.Abstract
 import Data.Abstract.Address
 import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Package (PackageInfo)
-import Prologue
 
 data Located location = Located
   { location        :: location
@@ -23,6 +22,6 @@ instance ( Addressable location effects
                     ] effects
          )
       => Addressable (Located location) effects where
-  derefCell (Address (Located loc _ _)) = raise . lower . derefCell (Address loc)
+  derefCell (Address (Located loc _ _)) = raiseEff . lowerEff . derefCell (Address loc)
 
-  allocLoc name = raise (lower (Located <$> allocLoc name <*> currentPackage <*> currentModule))
+  allocLoc name = raiseEff (lowerEff (Located <$> allocLoc name <*> currentPackage <*> currentModule))

@@ -7,7 +7,6 @@ module Data.Abstract.Type
   ) where
 
 import Control.Abstract
-import Control.Effect (Effectful(..), throwResumable)
 import Data.Abstract.Environment as Env
 import Data.Align (alignWith)
 import Data.Semigroup.Reducer (Reducer)
@@ -58,7 +57,7 @@ instance Eq1 TypeError where
   liftEq _ _ _                                           = False
 
 runTypeError :: Evaluator location value (Resumable TypeError ': effects) a -> Evaluator location value effects (Either (SomeExc TypeError) a)
-runTypeError = raiseHandler runError
+runTypeError = runResumable
 
 -- | Unify two 'Type's.
 unify :: (Effectful m, Applicative (m effects), Member (Resumable TypeError) effects) => Type location -> Type location -> m effects (Type location)
@@ -94,7 +93,7 @@ instance ( Addressable location effects
   closure names _ body = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name
-      tvar <- Var <$> raise fresh
+      tvar <- Var <$> fresh
       assign a tvar
       (env, tvars) <- rest
       pure (Env.insert name a env, tvar : tvars)) (pure (emptyEnv, [])) names
@@ -122,8 +121,8 @@ instance ( Addressable location effects
 
   asString t = unify t String $> ""
   asPair t   = do
-    t1 <- raise fresh
-    t2 <- raise fresh
+    t1 <- fresh
+    t2 <- fresh
     unify t (Product [Var t1, Var t2]) $> (Var t1, Var t2)
   asBool t   = unify t Bool *> (pure True <|> pure False)
 
@@ -160,7 +159,7 @@ instance ( Addressable location effects
     _                 -> unify left right $> Bool
 
   call op params = do
-    tvar <- raise fresh
+    tvar <- fresh
     paramTypes <- sequenceA params
     let needed = Product paramTypes :-> Var tvar
     unified <- op `unify` needed

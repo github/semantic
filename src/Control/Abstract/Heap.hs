@@ -12,19 +12,18 @@ import Control.Abstract.Evaluator
 import Data.Abstract.Address
 import Data.Abstract.Heap
 import Data.Semigroup.Reducer
-import Prologue
 
 -- | Retrieve the heap.
 getHeap :: Member (State (Heap (Cell location) location value)) effects => Evaluator location value effects (Heap (Cell location) location value)
-getHeap = raise get
+getHeap = get
 
 -- | Set the heap.
 putHeap :: Member (State (Heap (Cell location) location value)) effects => Heap (Cell location) location value -> Evaluator location value effects ()
-putHeap = raise . put
+putHeap = put
 
 -- | Update the heap.
 modifyHeap :: Member (State (Heap (Cell location) location value)) effects => (Heap (Cell location) location value -> Heap (Cell location) location value) -> Evaluator location value effects ()
-modifyHeap = raise . modify'
+modifyHeap = modify'
 
 -- | Look up the cell for the given 'Address' in the 'Heap'.
 lookupHeap :: (Member (State (Heap (Cell location) location value)) effects, Ord location) => Address location value -> Evaluator location value effects (Maybe (Cell location value))

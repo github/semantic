@@ -11,24 +11,24 @@ module Control.Abstract.Evaluator
   , throwContinue
   , catchLoopControl
   , runLoopControl
-  , module Control.Effect
+  , module Control.Monad.Effect
   , module Control.Monad.Effect.Fail
   , module Control.Monad.Effect.Fresh
   , module Control.Monad.Effect.NonDet
   , module Control.Monad.Effect.Reader
   , module Control.Monad.Effect.Resumable
   , module Control.Monad.Effect.State
-  , relay
+  , module Control.Monad.Effect.Trace
   ) where
 
-import Control.Effect
-import Control.Monad.Effect (Eff, interpose, relay)
+import Control.Monad.Effect
 import Control.Monad.Effect.Fail
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.NonDet
-import Control.Monad.Effect.Reader hiding (runReader)
+import Control.Monad.Effect.Reader
 import Control.Monad.Effect.Resumable
-import Control.Monad.Effect.State hiding (runState)
+import Control.Monad.Effect.State
+import Control.Monad.Effect.Trace
 import Prologue
 
 -- | An 'Evaluator' is a thin wrapper around 'Eff' with (phantom) type parameters for the location, term, and value types.
@@ -55,10 +55,10 @@ earlyReturn :: Member (Return value) effects => value -> Evaluator location valu
 earlyReturn = send . Return
 
 catchReturn :: Member (Return value) effects => Evaluator location value effects a -> (forall x . Return value x -> Evaluator location value effects a) -> Evaluator location value effects a
-catchReturn action handler = raiseHandler (interpose pure (\ ret _ -> lower (handler ret))) action
+catchReturn action handler = interpose pure (\ ret _ -> handler ret) action
 
 runReturn :: Evaluator location value (Return value ': effects) value -> Evaluator location value effects value
-runReturn = runEffect (\ (Return value) _ -> pure value)
+runReturn = interpret (\ (Return value) -> pure value)
 
 
 -- | Effects for control flow around loops (breaking and continuing).
@@ -76,9 +76,9 @@ throwContinue :: Member (LoopControl value) effects => value -> Evaluator locati
 throwContinue = send . Continue
 
 catchLoopControl :: Member (LoopControl value) effects => Evaluator location value effects a -> (forall x . LoopControl value x -> Evaluator location value effects a) -> Evaluator location value effects a
-catchLoopControl action handler = raiseHandler (interpose pure (\ control _ -> lower (handler control))) action
+catchLoopControl action handler = interpose pure (\ control _ -> handler control) action
 
 runLoopControl :: Evaluator location value (LoopControl value ': effects) value -> Evaluator location value effects value
-runLoopControl = runEffect (\ eff _ -> case eff of
+runLoopControl = interpret (\ eff -> case eff of
   Break    value -> pure value
   Continue value -> pure value)
