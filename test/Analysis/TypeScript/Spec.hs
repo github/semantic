@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedLists #-}
 module Analysis.TypeScript.Spec (spec) where
 
+import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import qualified Language.TypeScript.Assignment as TypeScript
 import Data.Abstract.Value as Value
@@ -15,8 +16,7 @@ spec = parallel $ do
   describe "evaluates TypeScript" $ do
     it "imports with aliased symbols" $ do
       env <- environment . snd <$> evaluate "main.ts"
-      env `shouldBe` [ ("bar", addr 0)
-                     , ("quz", addr 3)]
+      Env.names env `shouldBe` [ "bar", "quz" ]
 
     it "imports with qualified names" $ do
       res <- snd <$> evaluate "main1.ts"
