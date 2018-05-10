@@ -181,7 +181,7 @@ builtin :: ( Addressable location effects
         -> Evaluator location value effects value
         -> Evaluator location value effects ()
 builtin n def = do
-  let name = X.name ("__builtin_" <> pack n)
+  let name = X.name ("__semantic_" <> pack n)
   addr <- alloc name
   modifyEnv (X.insert name addr)
   def >>= assign addr

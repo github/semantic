@@ -9,5 +9,5 @@ class Object
 end
 
 def puts(obj)
-  __builtin_print(obj)
+  __semantic_print(obj)
 end
