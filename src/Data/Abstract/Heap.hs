@@ -9,42 +9,42 @@ import Data.Semilattice.Lower
 import Prologue
 
 -- | A map of addresses onto cells holding their values.
-newtype Heap l a = Heap { unHeap :: Monoidal.Map l (Cell l a) }
+newtype Heap location value = Heap { unHeap :: Monoidal.Map location (Cell location value) }
   deriving (Generic1, Lower)
 
-deriving instance (Eq l, Eq (Cell l a)) => Eq (Heap l a)
-deriving instance (Ord l, Ord (Cell l a)) => Ord (Heap l a)
-deriving instance (Show l, Show (Cell l a)) => Show (Heap l a)
-instance (Eq l, Eq1 (Cell l)) => Eq1 (Heap l) where liftEq = genericLiftEq
-instance (Ord l, Ord1 (Cell l)) => Ord1 (Heap l) where liftCompare = genericLiftCompare
-instance (Show l, Show1 (Cell l)) => Show1 (Heap l) where liftShowsPrec = genericLiftShowsPrec
-deriving instance Foldable (Cell l) => Foldable (Heap l)
-deriving instance Functor (Cell l) => Functor (Heap l)
-deriving instance Traversable (Cell l) => Traversable (Heap l)
-deriving instance (Ord l, Semigroup (Cell l a)) => Semigroup (Heap l a)
-deriving instance (Ord l, Semigroup (Cell l a)) => Monoid (Heap l a)
-deriving instance (Ord l, Reducer a (Cell l a)) => Reducer (l, a) (Heap l a)
+deriving instance (Eq location, Eq (Cell location value)) => Eq (Heap location value)
+deriving instance (Ord location, Ord (Cell location value)) => Ord (Heap location value)
+deriving instance (Show location, Show (Cell location value)) => Show (Heap location value)
+instance (Eq location, Eq1 (Cell location)) => Eq1 (Heap location) where liftEq = genericLiftEq
+instance (Ord location, Ord1 (Cell location)) => Ord1 (Heap location) where liftCompare = genericLiftCompare
+instance (Show location, Show1 (Cell location)) => Show1 (Heap location) where liftShowsPrec = genericLiftShowsPrec
+deriving instance Foldable (Cell location) => Foldable (Heap location)
+deriving instance Functor (Cell location) => Functor (Heap location)
+deriving instance Traversable (Cell location) => Traversable (Heap location)
+deriving instance (Ord location, Semigroup (Cell location value)) => Semigroup (Heap location value)
+deriving instance (Ord location, Semigroup (Cell location value)) => Monoid (Heap location value)
+deriving instance (Ord location, Reducer value (Cell location value)) => Reducer (location, value) (Heap location value)
 
 -- | Look up the cell of values for an 'Address' in a 'Heap', if any.
-heapLookup :: Ord l => Address l a -> Heap l a -> Maybe (Cell l a)
+heapLookup :: Ord location => Address location value -> Heap location value -> Maybe (Cell location value)
 heapLookup (Address address) = Monoidal.lookup address . unHeap
 
 -- | Look up the list of values stored for a given address, if any.
-heapLookupAll :: (Ord l, Foldable (Cell l)) => Address l a -> Heap l a -> Maybe [a]
+heapLookupAll :: (Ord location, Foldable (Cell location)) => Address location value -> Heap location value -> Maybe [value]
 heapLookupAll address = fmap toList . heapLookup address
 
 -- | Append a value onto the cell for a given address, inserting a new cell if none existed.
-heapInsert :: (Ord l, Reducer a (Cell l a)) => Address l a -> a -> Heap l a -> Heap l a
+heapInsert :: (Ord location, Reducer value (Cell location value)) => Address location value -> value -> Heap location value -> Heap location value
 heapInsert (Address address) value = flip snoc (address, value)
 
 -- | Manually insert a cell into the heap at a given address.
-heapInit :: Ord l => Address l a -> Cell l a -> Heap l a -> Heap l a
+heapInit :: Ord location => Address location value -> Cell location value -> Heap location value -> Heap location value
 heapInit (Address address) cell (Heap h) = Heap (Monoidal.insert address cell h)
 
 -- | The number of addresses extant in a 'Heap'.
-heapSize :: Heap l a -> Int
+heapSize :: Heap location value -> Int
 heapSize = Monoidal.size . unHeap
 
 -- | Restrict a 'Heap' to only those 'Address'es in the given 'Live' set (in essence garbage collecting the rest).
-heapRestrict :: Ord l => Heap l a -> Live l a -> Heap l a
+heapRestrict :: Ord location => Heap location value -> Live location value -> Heap location value
 heapRestrict (Heap m) roots = Heap (Monoidal.filterWithKey (\ address _ -> Address address `liveMember` roots) m)
