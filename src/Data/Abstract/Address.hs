@@ -10,8 +10,8 @@ import Prologue
 newtype Address location value = Address { unAddress :: location }
   deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
 
-instance Eq location => Eq1 (Address location) where liftEq = genericLiftEq
-instance Ord location => Ord1 (Address location) where liftCompare = genericLiftCompare
+instance Eq   location => Eq1   (Address location) where liftEq        = genericLiftEq
+instance Ord  location => Ord1  (Address location) where liftCompare   = genericLiftCompare
 instance Show location => Show1 (Address location) where liftShowsPrec = genericLiftShowsPrec
 
 
@@ -54,6 +54,6 @@ instance Monoid (Latest value) where
 instance Reducer value (Latest value) where
   unit = Latest . Just
 
-instance Eq1 Latest where liftEq = genericLiftEq
-instance Ord1 Latest where liftCompare = genericLiftCompare
+instance Eq1   Latest where liftEq        = genericLiftEq
+instance Ord1  Latest where liftCompare   = genericLiftCompare
 instance Show1 Latest where liftShowsPrec = genericLiftShowsPrec
