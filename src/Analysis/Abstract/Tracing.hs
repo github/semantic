@@ -15,7 +15,7 @@ import Prologue
 tracingTerms :: ( Corecursive term
                 , Members '[ Reader (Live location value)
                            , State (Environment location value)
-                           , State (Heap location value)
+                           , State (Heap (Cell location) location value)
                            , Writer (trace (Configuration term location value))
                            ] effects
                 , Reducer (Configuration term location value) (trace (Configuration term location value))

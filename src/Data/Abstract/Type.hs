@@ -86,7 +86,7 @@ instance ( Addressable location effects
                     , NonDet
                     , Resumable TypeError
                     , State (Environment location (Type location))
-                    , State (Heap location (Type location))
+                    , State (Heap (Cell location) location (Type location))
                     ] effects
          , Reducer (Type location) (Cell location (Type location))
          )

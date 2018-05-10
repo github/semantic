@@ -67,7 +67,7 @@ type EvaluatableConstraints location term value effects =
              , Return value
              , State (Environment location value)
              , State (Exports location value)
-             , State (Heap location value)
+             , State (Heap (Cell location) location value)
              , Trace
              ] effects
   , Reducer value (Cell location value)
@@ -173,7 +173,7 @@ builtin :: ( Addressable location effects
                       , Reader ModuleInfo
                       , Reader Span
                       , State (Environment location value)
-                      , State (Heap location value)
+                      , State (Heap (Cell location) location value)
                       ] effects
            , Reducer value (Cell location value)
            )
