@@ -56,6 +56,6 @@ instance Generic1 (Live location) where
 instance Ord location => Functor (Live location) where
   fmap _ = Live . unsafeCoerce . unLive
 
-instance Eq location => Eq1 (Live location) where liftEq = genericLiftEq
-instance Ord location => Ord1 (Live location) where liftCompare = genericLiftCompare
+instance Eq   location => Eq1   (Live location) where liftEq        = genericLiftEq
+instance Ord  location => Ord1  (Live location) where liftCompare   = genericLiftCompare
 instance Show location => Show1 (Live location) where liftShowsPrec = genericLiftShowsPrec
