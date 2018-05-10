@@ -23,8 +23,8 @@ spec = parallel $ do
       res <- snd <$> evaluate "main1.ts"
       Env.names (environment res) `shouldBe` [ "b", "z" ]
 
-      (derefName "b" res >>= deNamespace) `shouldBe` Just ("b", [ "baz", "foo" ])
-      (derefName "z" res >>= deNamespace) `shouldBe` Just ("z", [ "baz", "foo" ])
+      (derefQName (heap res) ("b" :| []) (environment res) >>= deNamespace) `shouldBe` Just ("b", [ "baz", "foo" ])
+      (derefQName (heap res) ("z" :| []) (environment res) >>= deNamespace) `shouldBe` Just ("z", [ "baz", "foo" ])
 
     it "side effect only imports" $ do
       env <- environment . snd <$> evaluate "main2.ts"
@@ -42,7 +42,3 @@ spec = parallel $ do
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate entry = evalTypeScriptProject (fixtures <> entry)
     evalTypeScriptProject path = testEvaluating <$> evaluateProject typescriptParser Language.TypeScript Nothing path
-    derefName :: Name -> EvaluatingState Precise (Value Precise) -> Maybe (Value Precise)
-    derefName name res = Env.lookup name (environment res) >>= flip heapLookup (heap res) >>= unLatest
-    deNamespace :: Value Precise -> Maybe (Name, [Name])
-    deNamespace = fmap (namespaceName &&& Env.names . namespaceScope) . (prjValue :: Value Precise -> Maybe (Namespace Precise (Value Precise)))
