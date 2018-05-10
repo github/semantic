@@ -27,7 +27,7 @@ type Label = Int
 label :: Evaluator location value (Goto effects value ': effects) value -> Evaluator location value (Goto effects value ': effects) Label
 label = send . Label . lower
 
--- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
+-- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated.
 goto :: Label -> Evaluator location value (Goto effects value ': effects) (Evaluator location value (Goto effects value ': effects) value)
 goto = fmap raise . send . Goto
 
