@@ -1,5 +1,4 @@
 {-# LANGUAGE ConstraintKinds, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Semantic.Task
 ( Task
 , TaskEff
@@ -81,11 +80,6 @@ type TaskEff = Eff '[Distribute WrappedTask
                     , Telemetry
                     , Exc SomeException
                     , IO]
-
--- This orphan lets us use Run with Trace.
--- TODO: kill this once we nuke Run and/or fix Trace
-instance Run.Run '[Trace, IO] result (IO result) where
-  run = Eff.runM . Analysis.runPrintingTraces
 
 -- | A wrapper for a 'Task', to embed in other effects.
 newtype WrappedTask a = WrapTask { unwrapTask :: TaskEff a }
