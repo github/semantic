@@ -4,7 +4,6 @@ module Semantic.Telemetry
 , writeStat
 , time
 , Telemetry
-, Queues(..)
 , runTelemetry
 , ignoreTelemetry
 ) where
@@ -40,10 +39,12 @@ data Telemetry output where
 data Queues = Queues { logger :: AsyncQueue Message Options, statter :: AsyncQueue Stat StatsClient }
 
 -- | Run a 'Telemetry' effect by expecting a 'Reader' of 'Queue's to write stats and logs to.
-runTelemetry :: Member IO effects => Eff (Telemetry ': effects) a -> Eff (Reader Queues ': effects) a
-runTelemetry = reinterpret (\ t -> case t of
-  WriteStat stat -> asks statter >>= \ statter -> liftIO (queue statter stat)
-  WriteLog level message pairs -> asks logger >>= \ logger -> queueLogMessage logger level message pairs)
+runTelemetry :: Member IO effects => AsyncQueue Message Options -> AsyncQueue Stat StatsClient -> Eff (Telemetry ': effects) a -> Eff effects a
+runTelemetry logQ statQ
+  = flip runReader (Queues logQ statQ)
+  . reinterpret (\ t -> case t of
+    WriteStat stat -> asks @Queues statter >>= \ statter -> liftIO (queue statter stat)
+    WriteLog level message pairs -> asks @Queues logger >>= \ logger -> queueLogMessage logger level message pairs)
 
 -- | Run a 'Telemetry' effect by ignoring statting/logging.
 ignoreTelemetry :: Eff (Telemetry ': effs) a -> Eff effs a
