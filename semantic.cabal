@@ -42,7 +42,7 @@ library
                      , Control.Abstract.Goto
                      , Control.Abstract.Heap
                      , Control.Abstract.Matching
-                     , Control.Abstract.ModuleTable
+                     , Control.Abstract.Modules
                      , Control.Abstract.Roots
                      , Control.Abstract.Value
                      -- Control flow

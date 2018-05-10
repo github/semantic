@@ -58,7 +58,7 @@ instance Eq1 TypeError where
   liftEq eq (UnificationError a b) (UnificationError c d) = a `eq` c && b `eq` d
   liftEq _ _ _                                           = False
 
-runTypeError :: Evaluator location term value (Resumable TypeError ': effects) a -> Evaluator location term value effects (Either (SomeExc TypeError) a)
+runTypeError :: Evaluator location value (Resumable TypeError ': effects) a -> Evaluator location value effects (Either (SomeExc TypeError) a)
 runTypeError = raiseHandler runError
 
 -- | Unify two 'Type's.

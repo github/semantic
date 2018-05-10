@@ -35,11 +35,11 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
-resolvePHPName :: Members '[ Reader (ModuleTable [Module term])
+resolvePHPName :: Members '[ Modules location value
                            , Resumable ResolutionError
                            ] effects
                => ByteString
-               -> Evaluator location term value effects ModulePath
+               -> Evaluator location value effects ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]
   maybe (throwResumable $ NotFoundError name [name] Language.PHP) pure modulePath
@@ -47,16 +47,16 @@ resolvePHPName n = do
         toName = BC.unpack . dropRelativePrefix . stripQuotes
 
 include :: ( AbstractValue location value effects
-           , Members '[ Reader (ModuleTable [Module term])
+           , Members '[ Modules location value
                       , Resumable ResolutionError
                       , State (Environment location value)
                       , State (Exports location value)
                       , Trace
                       ] effects
            )
-        => Subterm term (Evaluator location term value effects value)
-        -> (ModulePath -> Evaluator location term value effects (Maybe (Environment location value, value)))
-        -> Evaluator location term value effects value
+        => Subterm term (Evaluator location value effects value)
+        -> (ModulePath -> Evaluator location value effects (Maybe (Environment location value, value)))
+        -> Evaluator location value effects value
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name

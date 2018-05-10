@@ -13,9 +13,9 @@ import Prologue
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Heap.
 class Ord location => Addressable location effects where
-  derefCell :: Address location value -> Cell location value -> Evaluator location term value effects (Maybe value)
+  derefCell :: Address location value -> Cell location value -> Evaluator location value effects (Maybe value)
 
-  allocLoc :: Name -> Evaluator location term value effects location
+  allocLoc :: Name -> Evaluator location value effects location
 
 -- | Look up or allocate an address for a 'Name'.
 lookupOrAlloc :: ( Addressable location effects
@@ -24,7 +24,7 @@ lookupOrAlloc :: ( Addressable location effects
                             ] effects
                  )
               => Name
-              -> Evaluator location term value effects (Address location value)
+              -> Evaluator location value effects (Address location value)
 lookupOrAlloc name = lookupEnv name >>= maybe (alloc name) pure
 
 
@@ -36,8 +36,8 @@ letrec :: ( Addressable location effects
           , Reducer value (Cell location value)
           )
        => Name
-       -> Evaluator location term value effects value
-       -> Evaluator location term value effects (value, Address location value)
+       -> Evaluator location value effects value
+       -> Evaluator location value effects (value, Address location value)
 letrec name body = do
   addr <- lookupOrAlloc name
   v <- localEnv (insert name addr) body
@@ -51,8 +51,8 @@ letrec' :: ( Addressable location effects
                       ] effects
            )
         => Name
-        -> (Address location value -> Evaluator location term value effects value)
-        -> Evaluator location term value effects value
+        -> (Address location value -> Evaluator location value effects value)
+        -> Evaluator location value effects value
 letrec' name body = do
   addr <- lookupOrAlloc name
   v <- localEnv id (body addr)
@@ -69,7 +69,7 @@ variable :: ( Addressable location effects
                        ] effects
             )
          => Name
-         -> Evaluator location term value effects value
+         -> Evaluator location value effects value
 variable name = lookupEnv name >>= maybe (freeVariableError name) deref
 
 
@@ -87,13 +87,13 @@ instance Members '[Fresh, NonDet] effects => Addressable Monovariant effects whe
   allocLoc = pure . Monovariant
 
 -- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
-deref :: (Addressable location effects, Members '[Resumable (AddressError location value), State (Heap location value)] effects) => Address location value -> Evaluator location term value effects value
+deref :: (Addressable location effects, Members '[Resumable (AddressError location value), State (Heap location value)] effects) => Address location value -> Evaluator location value effects value
 deref addr = do
   cell <- lookupHeap addr >>= maybeM (throwAddressError (UnallocatedAddress addr))
   derefed <- derefCell addr cell
   maybeM (throwAddressError (UninitializedAddress addr)) derefed
 
-alloc :: Addressable location effects => Name -> Evaluator location term value effects (Address location value)
+alloc :: Addressable location effects => Name -> Evaluator location value effects (Address location value)
 alloc = fmap Address . allocLoc
 
 data AddressError location value resume where
@@ -110,11 +110,11 @@ instance Eq location => Eq1 (AddressError location value) where
   liftEq _ _                        _                        = False
 
 
-throwAddressError :: Member (Resumable (AddressError location value)) effects => AddressError location value resume -> Evaluator location term value effects resume
+throwAddressError :: Member (Resumable (AddressError location value)) effects => AddressError location value resume -> Evaluator location value effects resume
 throwAddressError = raise . Eff.throwError
 
-runAddressError :: Evaluator location term value (Resumable (AddressError location value) ': effects) a -> Evaluator location term value effects (Either (SomeExc (AddressError location value)) a)
+runAddressError :: Evaluator location value (Resumable (AddressError location value) ': effects) a -> Evaluator location value effects (Either (SomeExc (AddressError location value)) a)
 runAddressError = raiseHandler runError
 
-runAddressErrorWith :: (forall resume . AddressError location value resume -> Evaluator location term value effects resume) -> Evaluator location term value (Resumable (AddressError location value) ': effects) a -> Evaluator location term value effects a
+runAddressErrorWith :: (forall resume . AddressError location value resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (AddressError location value) ': effects) a -> Evaluator location value effects a
 runAddressErrorWith = runResumableWith

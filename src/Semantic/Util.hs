@@ -69,10 +69,10 @@ checking
   . caching @[]
   . constrainedToTypeMonovariant
 
-constrainedToValuePrecise :: Evaluator Precise term (Value Precise) effects a -> Evaluator Precise term (Value Precise) effects a
+constrainedToValuePrecise :: Evaluator Precise (Value Precise) effects a -> Evaluator Precise (Value Precise) effects a
 constrainedToValuePrecise = id
 
-constrainedToTypeMonovariant :: Evaluator Monovariant term (Type Monovariant) effects a -> Evaluator Monovariant term (Type Monovariant) effects a
+constrainedToTypeMonovariant :: Evaluator Monovariant (Type Monovariant) effects a -> Evaluator Monovariant (Type Monovariant) effects a
 constrainedToTypeMonovariant = id
 
 evalGoProject path = justEvaluating =<< evaluateProject goParser Language.Go Nothing path

@@ -34,14 +34,14 @@ toName = FV.name . BC.pack . unPath
 
 -- Node.js resolution algorithm: https://nodejs.org/api/modules.html#modules_all_together
 -- TypeScript has a couple of different strategies, but the main one mimics Node.js.
-resolveWithNodejsStrategy :: Members '[ Reader M.ModuleInfo
-                                      , Reader (ModuleTable [M.Module term])
+resolveWithNodejsStrategy :: Members '[ Modules location value
+                                      , Reader M.ModuleInfo
                                       , Resumable ResolutionError
                                       , Trace
                                       ] effects
                           => ImportPath
                           -> [String]
-                          -> Evaluator location term value effects M.ModulePath
+                          -> Evaluator location value effects M.ModulePath
 resolveWithNodejsStrategy (ImportPath path Relative)    exts = resolveRelativePath path exts
 resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativePath path exts
 
@@ -52,14 +52,14 @@ resolveWithNodejsStrategy (ImportPath path NonRelative) exts = resolveNonRelativ
 -- /root/src/moduleB.ts
 -- /root/src/moduleB/package.json (if it specifies a "types" property)
 -- /root/src/moduleB/index.ts
-resolveRelativePath :: Members '[ Reader M.ModuleInfo
-                                , Reader (ModuleTable [M.Module term])
+resolveRelativePath :: Members '[ Modules location value
+                                , Reader M.ModuleInfo
                                 , Resumable ResolutionError
                                 , Trace
                                 ] effects
                     => FilePath
                     -> [String]
-                    -> Evaluator location term value effects M.ModulePath
+                    -> Evaluator location value effects M.ModulePath
 resolveRelativePath relImportPath exts = do
   M.ModuleInfo{..} <- currentModule
   let relRootDir = takeDirectory modulePath
@@ -78,14 +78,14 @@ resolveRelativePath relImportPath exts = do
 --
 -- /root/node_modules/moduleB.ts, etc
 -- /node_modules/moduleB.ts, etc
-resolveNonRelativePath :: Members '[ Reader M.ModuleInfo
-                                   , Reader (ModuleTable [M.Module term])
+resolveNonRelativePath :: Members '[ Modules location value
+                                   , Reader M.ModuleInfo
                                    , Resumable ResolutionError
                                    , Trace
                                    ] effects
                        => FilePath
                        -> [String]
-                       -> Evaluator location term value effects M.ModulePath
+                       -> Evaluator location value effects M.ModulePath
 resolveNonRelativePath name exts = do
   M.ModuleInfo{..} <- currentModule
   go "." modulePath mempty
@@ -100,10 +100,10 @@ resolveNonRelativePath name exts = do
         Right m -> m <$ traceResolve name m
     notFound xs = throwResumable $ NotFoundError name xs Language.TypeScript
 
-resolveTSModule :: Members '[ Reader (ModuleTable [M.Module term]) ] effects
+resolveTSModule :: Member (Modules location value) effects
                 => FilePath
                 -> [String]
-                -> Evaluator location term value effects (Either [FilePath] M.ModulePath)
+                -> Evaluator location value effects (Either [FilePath] M.ModulePath)
 resolveTSModule path exts = maybe (Left searchPaths) Right <$> resolve searchPaths
   where searchPaths =
           ((path <.>) <$> exts)
@@ -120,22 +120,18 @@ javascriptExtensions = ["js"]
 
 evalRequire :: ( AbstractValue location value effects
                , Addressable location effects
-               , Members '[ EvalModule term value
+               , Members '[ Modules location value
                           , Reader (Environment location value)
-                          , Reader LoadStack
-                          , Reader (ModuleTable [M.Module term])
-                          , Resumable (LoadError term)
                           , State (Environment location value)
                           , State (Exports location value)
                           , State (Heap location value)
-                          , State (ModuleTable (Environment location value, value))
                           , Trace
                           ] effects
                , Reducer value (Cell location value)
                )
             => M.ModulePath
             -> Name
-            -> Evaluator location term value effects value
+            -> Evaluator location value effects value
 evalRequire modulePath alias = letrec' alias $ \addr -> do
   importedEnv <- maybe emptyEnv fst <$> isolate (require modulePath)
   modifyEnv (mergeEnvs importedEnv)

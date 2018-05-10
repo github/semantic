@@ -13,6 +13,7 @@ module Control.Effect
 , run
 , runM
 , runEffect
+, reinterpretEffect
 , raiseHandler
 , runReader
 , runState
@@ -69,6 +70,9 @@ runM = Eff.runM . lower
 
 runEffect :: Effectful m => (forall v . effect v -> (v -> m effects a) -> m effects a) -> m (effect ': effects) a -> m effects a
 runEffect handler = raiseHandler (Eff.relay pure (\ effect yield -> lower (handler effect (raise . yield))))
+
+reinterpretEffect :: Effectful m => (forall x . effect x -> m (newEffect ': effects) x) -> m (effect ': effects) a -> m (newEffect ': effects) a
+reinterpretEffect handler = raiseHandler (Eff.reinterpret (lower . handler))
 
 -- | Raise a handler on 'Eff.Eff' to a handler on some 'Effectful' @m@.
 raiseHandler :: Effectful m => (Eff.Eff effectsA a -> Eff.Eff effectsB b) -> m effectsA a -> m effectsB b
