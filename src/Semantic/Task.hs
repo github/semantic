@@ -50,7 +50,6 @@ import           Control.Monad
 import           Control.Monad.Effect as Eff hiding (run)
 import           Control.Monad.Effect.Exception
 import           Control.Monad.Effect.Reader
-import           Control.Monad.Effect.Run as Run
 import           Control.Monad.Effect.Trace
 import           Data.Blob
 import           Data.Diff
@@ -202,7 +201,3 @@ runParser blob@Blob{..} parser = case parser of
         errors = cata $ \ (In a syntax) -> case syntax of
           _ | Just err@Syntax.Error{} <- projectSum syntax -> [Syntax.unError (getField a) err]
           _ -> fold syntax
-
-
-instance (Members '[Reader Options, Telemetry, Exc SomeException, Trace, IO] effects, Run effects result rest) => Run (Task ': effects) result rest where
-  run = run . runTaskF

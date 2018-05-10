@@ -11,7 +11,6 @@ module Semantic.Telemetry
 
 import Control.Monad.Effect hiding (run)
 import Control.Monad.Effect.Reader
-import Control.Monad.Effect.Run
 import Control.Monad.IO.Class
 import Semantic.Log
 import Semantic.Queue
@@ -51,7 +50,3 @@ ignoreTelemetry :: Eff (Telemetry ': effs) a -> Eff effs a
 ignoreTelemetry = interpret (\ t -> case t of
   WriteStat{} -> pure ()
   WriteLog{}  -> pure ())
-
-
-instance (Member IO (Reader Queues ': effects), Run (Reader Queues ': effects) result rest) => Run (Telemetry ': effects) result rest where
-  run = run . runTelemetry

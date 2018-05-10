@@ -11,7 +11,6 @@ module Semantic.Distribute
 import qualified Control.Concurrent.Async as Async
 import           Control.Monad.Effect hiding (run)
 import           Control.Monad.Effect.Exception
-import           Control.Monad.Effect.Run
 import           Control.Monad.IO.Class
 import           Control.Parallel.Strategies
 import           Prologue hiding (MonadError (..))
@@ -50,6 +49,3 @@ runDistribute m action = interpret (\ (Distribute tasks) ->
 --
 --   This is necessary because GHC won’t allow us to use a rank-n quantified type in the third parameter to our instance of 'Run', below.
 newtype Action task = Action { runAction :: forall output . task output -> IO (Either SomeException output) }
-
-instance (Members '[Exc SomeException, IO] effects, Run effects result rest) => Run (Distribute task ': effects) result (Action task -> rest) where
-  run = fmap run . runDistribute

@@ -25,7 +25,6 @@ module Semantic.IO
 import qualified Control.Exception as Exc
 import           Control.Monad.Effect hiding (run)
 import           Control.Monad.Effect.Exception
-import           Control.Monad.Effect.Run
 import           Control.Monad.IO.Class
 import           Data.Aeson
 import qualified Data.Blob as Blob
@@ -220,10 +219,6 @@ runFiles = interpret $ \ files -> case files of
   ReadBlobPairs source -> rethrowing (either readBlobPairsFromHandle (traverse (runBothWith readFilePair)) source)
   ReadProject rootDir dir language excludeDirs -> rethrowing (readProjectFromPaths rootDir dir language excludeDirs)
   WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents)
-
-
-instance (Members '[Exc SomeException, IO] effects, Run effects result rest) => Run (Files ': effects) result rest where
-  run = run . runFiles
 
 
 -- | Catch exceptions in 'IO' actions embedded in 'Eff', handling them with the passed function.
