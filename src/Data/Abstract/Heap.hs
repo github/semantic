@@ -12,14 +12,16 @@ import Prologue
 newtype Heap location value = Heap { unHeap :: Monoidal.Map location (Cell location value) }
   deriving (Lower)
 
-deriving instance (Eq location, Eq (Cell location value)) => Eq (Heap location value)
-deriving instance (Ord location, Ord (Cell location value)) => Ord (Heap location value)
+deriving instance (Eq   location, Eq   (Cell location value)) => Eq   (Heap location value)
+deriving instance (Ord  location, Ord  (Cell location value)) => Ord  (Heap location value)
 deriving instance (Show location, Show (Cell location value)) => Show (Heap location value)
-deriving instance Foldable (Cell location) => Foldable (Heap location)
-deriving instance Functor (Cell location) => Functor (Heap location)
+
+deriving instance Foldable    (Cell location) => Foldable    (Heap location)
+deriving instance Functor     (Cell location) => Functor     (Heap location)
 deriving instance Traversable (Cell location) => Traversable (Heap location)
+
 deriving instance (Ord location, Semigroup (Cell location value)) => Semigroup (Heap location value)
-deriving instance (Ord location, Semigroup (Cell location value)) => Monoid (Heap location value)
+deriving instance (Ord location, Semigroup (Cell location value)) => Monoid    (Heap location value)
 deriving instance (Ord location, Reducer value (Cell location value)) => Reducer (location, value) (Heap location value)
 
 -- | Look up the cell of values for an 'Address' in a 'Heap', if any.
