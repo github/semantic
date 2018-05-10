@@ -40,8 +40,8 @@ import qualified Data.List.NonEmpty as NonEmpty
 newtype Environment location value = Environment { unEnvironment :: NonEmpty (Map.Map Name (Address location value)) }
   deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
 
-instance Eq location => Eq1 (Environment location) where liftEq = genericLiftEq
-instance Ord location => Ord1 (Environment location) where liftCompare = genericLiftCompare
+instance Eq   location => Eq1   (Environment location) where liftEq        = genericLiftEq
+instance Ord  location => Ord1  (Environment location) where liftCompare   = genericLiftCompare
 instance Show location => Show1 (Environment location) where liftShowsPrec = genericLiftShowsPrec
 
 -- | The provided list will be put into an Environment with one member, so fromList is total
