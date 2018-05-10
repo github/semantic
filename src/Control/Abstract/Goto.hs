@@ -9,12 +9,12 @@ module Control.Abstract.Goto
 ) where
 
 import           Control.Abstract.Evaluator
-import           Control.Monad.Effect (Eff, relayState)
+import           Control.Monad.Effect (Eff)
 import qualified Data.IntMap as IntMap
 import           Prelude hiding (fail)
 import           Prologue
 
-type GotoTable effects value = IntMap.IntMap (Eff effects value)
+type GotoTable inner value = IntMap.IntMap (Eff (Goto inner value ': inner) value)
 
 -- | The type of labels.
 --   TODO: This should be rolled into 'Name' and tracked in the environment, both so that we can abstract over labels like any other location, and so that we can garbage collect unreachable labels.
@@ -45,7 +45,25 @@ data Goto effects value return where
   Label :: Eff (Goto effects value ': effects) value -> Goto effects value Label
   Goto  :: Label -> Goto effects value (Eff (Goto effects value ': effects) value)
 
-runGoto :: Member Fail effects => GotoTable (Goto effects value ': effects) value -> Evaluator location value (Goto effects value ': effects) a -> Evaluator location value effects (a, GotoTable (Goto effects value ': effects) value)
-runGoto initial = raiseHandler (relayState (IntMap.size initial, initial) (\ (_, table) a -> pure (a, table)) (\ (supremum, table) goto yield -> case goto of
-  Label action -> yield (succ supremum, IntMap.insert supremum action table) supremum
-  Goto label   -> maybe (fail ("unknown label: " <> show label)) (yield (supremum, table)) (IntMap.lookup label table)))
+runGoto :: Members '[ Fail
+                    , Fresh
+                    , State table
+                    ] effects
+        => (GotoTable effects value -> table)
+        -> (table -> GotoTable effects value)
+        -> Evaluator location value (Goto effects value ': effects) a
+        -> Evaluator location value effects a
+runGoto from to = runEffect (\ goto yield -> do
+  table <- to <$> getTable
+  case goto of
+    Label action -> do
+      supremum <- raise fresh
+      putTable (from (IntMap.insert supremum action table))
+      yield supremum
+    Goto label   -> maybe (raise (fail ("unknown label: " <> show label))) yield (IntMap.lookup label table))
+
+getTable :: Member (State table) effects => Evaluator location value effects table
+getTable = raise get
+
+putTable :: Member (State table) effects => table -> Evaluator location value effects ()
+putTable = raise . put
