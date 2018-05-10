@@ -45,6 +45,15 @@ data Goto effects value return where
   Label :: Eff (Goto effects value ': effects) value -> Goto effects value Label
   Goto  :: Label -> Goto effects value (Eff (Goto effects value ': effects) value)
 
+-- | Run a 'Goto' effect in terms of a 'State' effect holding a 'GotoTable', accessed via wrap/unwrap functions.
+--
+--   The wrap/unwrap functions are necessary in order for ghc to be able to typecheck the table, since it necessarily contains references to its own effect list. Since @GotoTable (… ': State (GotoTable … value) ': …) value@ can’t be written, and a recursive type equality constraint won’t typecheck, callers will need to employ a @newtype@ to break the self-reference. The effect list of the table the @newtype@ contains will include all of the effects between the 'Goto' effect and the 'State' effect (including the 'State' but not the 'Goto'). E.g. if the 'State' is the next effect, a valid wrapper would be∷
+--
+--   @
+--   newtype Gotos effects value = Gotos { getGotos :: GotoTable (State (Gotos effects value) ': effects) value }
+--   @
+--
+--   Callers can then evaluate the high-level 'Goto' effect by passing @Gotos@ and @getGotos@ to 'runGoto'.
 runGoto :: Members '[ Fail
                     , Fresh
                     , State table
