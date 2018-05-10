@@ -35,7 +35,7 @@ spec = parallel $ do
 
     it "fails exporting symbols not defined in the module" $ do
       v <- fst <$> evaluate "bad-export.ts"
-      v `shouldBe` Left (SomeExc (injectSum (ExportError "foo.ts" (Name "pip") :: EvalError (Value Precise) ())))
+      v `shouldBe` Left (SomeExc (injectSum @(EvalError (Value Precise)) (ExportError "foo.ts" (Name "pip"))))
 
     it "evaluates early return statements" $ do
       res <- evaluate "early-return.ts"
