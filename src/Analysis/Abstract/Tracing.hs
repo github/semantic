@@ -16,17 +16,17 @@ tracingTerms :: ( Corecursive term
                 , Members '[ Reader (Live location value)
                            , State (Environment location value)
                            , State (Heap (Cell location) location value)
-                           , Writer (trace (Configuration term location value))
+                           , Writer (trace (Configuration term (Cell location) location value))
                            ] effects
-                , Reducer (Configuration term location value) (trace (Configuration term location value))
+                , Reducer (Configuration term (Cell location) location value) (trace (Configuration term (Cell location) location value))
                 )
-             => trace (Configuration term location value)
+             => trace (Configuration term (Cell location) location value)
              -> SubtermAlgebra (Base term) term (Evaluator location value effects a)
              -> SubtermAlgebra (Base term) term (Evaluator location value effects a)
 tracingTerms proxy recur term = getConfiguration (embedSubterm term) >>= trace . (`asTypeOf` proxy) . Reducer.unit >> recur term
 
-trace :: Member (Writer (trace (Configuration term location value))) effects => trace (Configuration term location value) -> Evaluator location value effects ()
+trace :: Member (Writer (trace (Configuration term (Cell location) location value))) effects => trace (Configuration term (Cell location) location value) -> Evaluator location value effects ()
 trace = raise . tell
 
-tracing :: Monoid (trace (Configuration term location value)) => Evaluator location value (Writer (trace (Configuration term location value)) ': effects) a -> Evaluator location value effects (a, trace (Configuration term location value))
+tracing :: Monoid (trace (Configuration term (Cell location) location value)) => Evaluator location value (Writer (trace (Configuration term (Cell location) location value)) ': effects) a -> Evaluator location value effects (a, trace (Configuration term (Cell location) location value))
 tracing = raiseHandler runWriter
