@@ -136,7 +136,7 @@ roots :: (Ord location, Foldable t) => Environment location value -> t Name -> L
 roots env = foldMap (maybe mempty liveSingleton . flip lookup env)
 
 addresses :: Ord location => Environment location value -> Live location value
-addresses = Live . fromList . fmap snd . pairs
+addresses = fromAddresses . map snd . pairs
 
 
 instance Lower (Environment location value) where lowerBound = emptyEnv

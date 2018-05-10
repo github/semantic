@@ -10,6 +10,9 @@ import Prologue
 newtype Live location value = Live { unLive :: Set (Address location value) }
   deriving (Eq, Foldable, Lower, Monoid, Ord, Semigroup, Show)
 
+fromAddresses :: (Foldable t, Ord location) => t (Address location value) -> Live location value
+fromAddresses = Prologue.foldr liveInsert lowerBound
+
 -- | Construct a 'Live' set containing only the given address.
 liveSingleton :: Address location value -> Live location value
 liveSingleton = Live . Set.singleton
