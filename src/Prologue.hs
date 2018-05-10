@@ -21,11 +21,10 @@ import Data.Maybe as X
 import Data.Monoid (Alt (..))
 import Data.Sequence as X (Seq)
 import Data.Set as X (Set)
+import Data.Sum as X
 import Data.Text as X (Text)
 import Data.These as X
 import Data.Union as X
-
-import Debug.Trace as X
 
 import Control.Exception as X hiding (Handler (..), assert, evaluate, throw, throwIO, throwTo)
 

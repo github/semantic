@@ -15,21 +15,12 @@ library
   hs-source-dirs:      src
   exposed-modules:
                      -- Analyses & term annotations
-                       Analysis.Abstract.BadAddresses
-                     , Analysis.Abstract.BadModuleResolutions
-                     , Analysis.Abstract.BadSyntax
-                     , Analysis.Abstract.BadValues
-                     , Analysis.Abstract.BadVariables
-                     , Analysis.Abstract.Caching
-                     , Analysis.Abstract.CallGraph
+                       Analysis.Abstract.Caching
                      , Analysis.Abstract.Collecting
                      , Analysis.Abstract.Dead
-                     , Analysis.Abstract.Erroring
                      , Analysis.Abstract.Evaluating
                      , Analysis.Abstract.Graph
-                     , Analysis.Abstract.ImportGraph
                      , Analysis.Abstract.Tracing
-                     , Analysis.Abstract.TypeChecking
                      , Analysis.CallGraph
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
@@ -41,10 +32,18 @@ library
                      , Assigning.Assignment
                      , Assigning.Assignment.Table
                      -- Control structures & interfaces for abstract interpretation
+                     , Control.Abstract
                      , Control.Abstract.Addressable
-                     , Control.Abstract.Analysis
+                     , Control.Abstract.Configuration
+                     , Control.Abstract.Context
+                     , Control.Abstract.Environment
                      , Control.Abstract.Evaluator
+                     , Control.Abstract.Exports
+                     , Control.Abstract.Goto
+                     , Control.Abstract.Heap
                      , Control.Abstract.Matching
+                     , Control.Abstract.Modules
+                     , Control.Abstract.Roots
                      , Control.Abstract.Value
                      -- Control flow
                      , Control.Effect
@@ -63,7 +62,6 @@ library
                      , Data.Abstract.Module
                      , Data.Abstract.ModuleTable
                      , Data.Abstract.Number
-                     , Data.Abstract.Origin
                      , Data.Abstract.Package
                      , Data.Abstract.Path
                      , Data.Abstract.Type
@@ -173,6 +171,7 @@ library
                      , directory
                      , directory-tree
                      , effects
+                     , fastsum
                      , filepath
                      , free
                      , freer-cofreer
@@ -182,7 +181,6 @@ library
                      , hashable
                      , kdt
                      , mersenne-random-pure64
-                     , microlens
                      , mtl
                      , network
                      , network-uri
@@ -240,12 +238,13 @@ test-suite test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       Assigning.Assignment.Spec
-                     , Analysis.Go.Spec
+  other-modules:       Analysis.Go.Spec
                      , Analysis.PHP.Spec
                      , Analysis.Python.Spec
                      , Analysis.Ruby.Spec
                      , Analysis.TypeScript.Spec
+                     , Assigning.Assignment.Spec
+                     , Control.Abstract.Evaluator.Spec
                      , Data.Diff.Spec
                      , Data.Abstract.Path.Spec
                      , Data.Functor.Classes.Generic.Spec
@@ -273,6 +272,7 @@ test-suite test
                      , bytestring
                      , comonad
                      , effects
+                     , fastsum
                      , filepath
                      , free
                      , Glob

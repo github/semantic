@@ -1,27 +1,27 @@
-{-# LANGUAGE GADTs, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module SpecHelpers
 ( module X
 , diffFilePaths
 , parseFilePath
 , readFilePair
-, addr
+, testEvaluating
 , ns
+, addr
 , verbatim
 , Verbatim(..)
-, TestEvaluating
 ) where
 
-import Analysis.Abstract.Erroring
 import Analysis.Abstract.Evaluating
+import Analysis.Abstract.Evaluating as X (EvaluatingState(..))
 import Control.Abstract.Addressable
-import Control.Abstract.Evaluator as X (EvaluatorState(..))
 import Control.Abstract.Value
+import Control.Effect as X (runIgnoringTraces)
 import Data.Abstract.Address as X
 import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables as X hiding (dropExtension)
 import Data.Abstract.Heap as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
-import Data.Abstract.Value (Namespace(..), Value, ValueError, injValue)
+import Data.Abstract.Value (Namespace(..), Value, ValueError, injValue, runValueError)
+import Data.Bifunctor (first)
 import Data.Blob as X
 import Data.File as X
 import Data.Functor.Listable as X
@@ -68,14 +68,19 @@ readFilePair :: Both FilePath -> IO BlobPair
 readFilePair paths = let paths' = fmap file paths in
                      runBothWith IO.readFilePair paths'
 
-type TestEvaluating term
-  = Erroring (AddressError Precise (Value Precise))
-  ( Erroring (EvalError (Value Precise))
-  ( Erroring (ResolutionError (Value Precise))
-  ( Erroring (Unspecialized (Value Precise))
-  ( Erroring (ValueError Precise (Value Precise))
-  ( Erroring (LoadError term)
-  ( Evaluating Precise term (Value Precise)))))))
+testEvaluating
+  = run
+  . fmap (first reassociate)
+  . evaluating
+  . runIgnoringTraces
+  . runLoadError
+  . runValueError
+  . runUnspecialized
+  . runResolutionError
+  . runEnvironmentError
+  . runEvalError
+  . runAddressError
+  . constrainedToValuePrecise
 
 ns n = Just . Latest . Just . injValue . Namespace n
 addr = Address . Precise

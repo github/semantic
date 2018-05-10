@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, ViewPatterns, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass, ViewPatterns #-}
 module Language.PHP.Syntax where
 
 import           Data.Abstract.Evaluatable
@@ -35,21 +35,33 @@ instance Evaluatable VariableName
 -- file, the complete contents of the included file are treated as though it
 -- were defined inside that function.
 
-resolvePHPName :: forall value location term effects m. MonadEvaluatable location term value effects m => ByteString -> m effects ModulePath
+resolvePHPName :: Members '[ Modules location value
+                           , Resumable ResolutionError
+                           ] effects
+               => ByteString
+               -> Evaluator location value effects ModulePath
 resolvePHPName n = do
   modulePath <- resolve [name]
-  maybe (throwResumable @(ResolutionError value) $ NotFoundError name [name] Language.PHP) pure modulePath
+  maybe (throwResumable $ NotFoundError name [name] Language.PHP) pure modulePath
   where name = toName n
         toName = BC.unpack . dropRelativePrefix . stripQuotes
 
-include :: MonadEvaluatable location term value effects m
-        => Subterm t (m effects value)
-        -> (ModulePath -> m effects (Environment location value, value))
-        -> m effects value
+include :: ( AbstractValue location value effects
+           , Members '[ Modules location value
+                      , Resumable ResolutionError
+                      , State (Environment location value)
+                      , State (Exports location value)
+                      , Trace
+                      ] effects
+           )
+        => Subterm term (Evaluator location value effects value)
+        -> (ModulePath -> Evaluator location value effects (Maybe (Environment location value, value)))
+        -> Evaluator location value effects value
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
-  (importedEnv, v) <- traceResolve name path $ isolate (f path)
+  traceResolve name path
+  (importedEnv, v) <- isolate (f path) >>= maybeM ((,) emptyEnv <$> unit)
   modifyEnv (mergeEnvs importedEnv)
   pure v
 

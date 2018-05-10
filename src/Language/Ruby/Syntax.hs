@@ -1,10 +1,9 @@
-{-# LANGUAGE DeriveAnyClass, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass #-}
 module Language.Ruby.Syntax where
 
 import           Control.Monad (unless)
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.Module (ModulePath)
-import           Data.Abstract.ModuleTable as ModuleTable
+import qualified Data.Abstract.Module as M
 import           Data.Abstract.Path
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.Language as Language
@@ -17,19 +16,27 @@ import           System.FilePath.Posix
 -- TODO: Fully sort out ruby require/load mechanics
 --
 -- require "json"
-resolveRubyName :: forall value term location effects m. MonadEvaluatable location term value effects m => ByteString -> m effects ModulePath
+resolveRubyName :: Members '[ Modules location value
+                            , Resumable ResolutionError
+                            ] effects
+                => ByteString
+                -> Evaluator location value effects M.ModulePath
 resolveRubyName name = do
   let name' = cleanNameOrPath name
   let paths = [name' <.> "rb"]
   modulePath <- resolve paths
-  maybe (throwResumable @(ResolutionError value) $ NotFoundError name' paths Language.Ruby) pure modulePath
+  maybe (throwResumable $ NotFoundError name' paths Language.Ruby) pure modulePath
 
 -- load "/root/src/file.rb"
-resolveRubyPath :: forall value term location effects m. MonadEvaluatable location term value effects m => ByteString -> m effects ModulePath
+resolveRubyPath :: Members '[ Modules location value
+                            , Resumable ResolutionError
+                            ] effects
+                => ByteString
+                -> Evaluator location value effects M.ModulePath
 resolveRubyPath path = do
   let name' = cleanNameOrPath path
   modulePath <- resolve [name']
-  maybe (throwResumable @(ResolutionError value) $ NotFoundError name' [name'] Language.Ruby) pure modulePath
+  maybe (throwResumable $ NotFoundError name' [name'] Language.Ruby) pure modulePath
 
 cleanNameOrPath :: ByteString -> String
 cleanNameOrPath = BC.unpack . dropRelativePrefix . stripQuotes
@@ -60,18 +67,21 @@ instance Evaluatable Require where
   eval (Require _ x) = do
     name <- subtermValue x >>= asString
     path <- resolveRubyName name
-    (importedEnv, v) <- traceResolve name path $ isolate (doRequire path)
+    traceResolve name path
+    (importedEnv, v) <- isolate (doRequire path)
     modifyEnv (`mergeNewer` importedEnv)
     pure v -- Returns True if the file was loaded, False if it was already loaded. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-require
 
-doRequire :: MonadEvaluatable location term value effects m
-          => ModulePath
-          -> m effects (Environment location value, value)
-doRequire name = do
-  moduleTable <- getModuleTable
-  case ModuleTable.lookup name moduleTable of
-    Nothing       -> (,) . fst <$> load name <*> boolean True
-    Just (env, _) -> (,) env   <$>               boolean False
+doRequire :: ( AbstractValue location value effects
+             , Member (Modules location value) effects
+             )
+          => M.ModulePath
+          -> Evaluator location value effects (Environment location value, value)
+doRequire path = do
+  result <- join <$> lookupModule path
+  case result of
+    Nothing       -> (,) . maybe emptyEnv fst <$> load path <*> boolean True
+    Just (env, _) -> (,) env                  <$>               boolean False
 
 
 newtype Load a = Load { loadArgs :: [a] }
@@ -91,10 +101,21 @@ instance Evaluatable Load where
     doLoad path shouldWrap
   eval (Load _) = raise (fail "invalid argument supplied to load, path is required")
 
-doLoad :: MonadEvaluatable location term value effects m => ByteString -> Bool -> m effects value
+doLoad :: ( AbstractValue location value effects
+          , Members '[ Modules location value
+                     , Resumable ResolutionError
+                     , State (Environment location value)
+                     , State (Exports location value)
+                     , Trace
+                     ] effects
+          )
+       => ByteString
+       -> Bool
+       -> Evaluator location value effects value
 doLoad path shouldWrap = do
   path' <- resolveRubyPath path
-  (importedEnv, _) <- traceResolve path path' $ isolate (load path')
+  traceResolve path path'
+  importedEnv <- maybe emptyEnv fst <$> isolate (load path')
   unless shouldWrap $ modifyEnv (mergeEnvs importedEnv)
   boolean Prelude.True -- load always returns true. http://ruby-doc.org/core-2.5.0/Kernel.html#method-i-load
 

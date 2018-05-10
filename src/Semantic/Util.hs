@@ -1,22 +1,16 @@
+{-# LANGUAGE TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.Util where
 
-import           Analysis.Abstract.BadAddresses
-import           Analysis.Abstract.BadModuleResolutions
-import           Analysis.Abstract.BadSyntax
-import           Analysis.Abstract.BadValues
-import           Analysis.Abstract.BadVariables
 import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
-import           Analysis.Abstract.Erroring
 import           Analysis.Abstract.Evaluating as X
-import           Analysis.Abstract.TypeChecking
-import           Control.Abstract.Analysis
+import           Control.Abstract.Evaluator
+import           Control.Effect (runPrintingTraces)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
-import           Data.Abstract.Located
-import           Data.Abstract.Type
 import           Data.Abstract.Value
+import           Data.Abstract.Type
 import           Data.Blob
 import           Data.File
 import qualified Data.Language as Language
@@ -28,60 +22,74 @@ import           Semantic.Graph
 import           Semantic.IO as IO
 import           Semantic.Task
 
-import qualified Language.Go.Assignment as Go
-import qualified Language.PHP.Assignment as PHP
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
-import qualified Language.TypeScript.Assignment as TypeScript
 
-type JustEvaluating term
-  = Erroring (AddressError (Located Precise term) (Value (Located Precise term)))
-  ( Erroring (EvalError (Value (Located Precise term)))
-  ( Erroring (ResolutionError (Value (Located Precise term)))
-  ( Erroring (Unspecialized (Value (Located Precise term)))
-  ( Erroring (ValueError (Located Precise term) (Value (Located Precise term)))
-  ( Erroring (LoadError term)
-  ( Evaluating (Located Precise term) term (Value (Located Precise term))))))))
+justEvaluating
+  = runM
+  . fmap (first reassociate)
+  . evaluating
+  . runPrintingTraces
+  . runLoadError
+  . runValueError
+  . runUnspecialized
+  . runResolutionError
+  . runEnvironmentError
+  . runEvalError
+  . runAddressError
+  . constrainedToValuePrecise
 
-type EvaluatingWithHoles term
-  = BadAddresses
-  ( BadModuleResolutions
-  ( BadVariables
-  ( BadValues
-  ( BadSyntax
-  ( Erroring (LoadError term)
-  ( Evaluating (Located Precise term) term (Value (Located Precise term))))))))
+evaluatingWithHoles
+  = runM
+  . evaluating
+  . runPrintingTraces
+  . resumingLoadError
+  . resumingUnspecialized
+  . resumingValueError
+  . resumingEnvironmentError
+  . resumingEvalError
+  . resumingResolutionError
+  . resumingAddressError @(Value Precise) @Precise
+  . constrainedToValuePrecise
 
--- The order is significant here: Caching has to come on the outside, or its Interpreter instance
--- will expect the TypeError exception type to have an Ord instance, which is wrong.
-type Checking term
-  = Caching
-  ( TypeChecking
-  ( Erroring (AddressError Monovariant Type)
-  ( Erroring (EvalError Type)
-  ( Erroring (ResolutionError Type)
-  ( Erroring (Unspecialized Type)
-  ( Erroring (LoadError term)
-  ( Retaining
-  ( Evaluating Monovariant term Type))))))))
+-- The order is significant here: caching has to run before typeChecking, or else we’ll nondeterministically produce TypeErrors as part of the result set. While this is probably actually correct, it will require us to have an Ord instance for TypeError, which we don’t have yet.
+checking
+  = runM
+  . fmap (first reassociate)
+  . evaluating
+  . runPrintingTraces
+  . providingLiveSet
+  . runLoadError
+  . runUnspecialized
+  . runResolutionError
+  . runEnvironmentError
+  . runEvalError
+  . runAddressError
+  . runTypeError
+  . caching @[]
+  . constrainedToTypeMonovariant
 
-evalGoProject path = interpret @(JustEvaluating Go.Term) <$> evaluateProject goParser Language.Go Nothing path
-evalRubyProject path = interpret @(JustEvaluating Ruby.Term) <$> evaluateProject rubyParser Language.Ruby rubyPrelude path
-evalPHPProject path = interpret @(JustEvaluating PHP.Term) <$> evaluateProject phpParser Language.PHP Nothing path
-evalPythonProject path = interpret @(JustEvaluating Python.Term) <$> evaluateProject pythonParser Language.Python pythonPrelude path
-evalTypeScriptProjectQuietly path = interpret @(EvaluatingWithHoles TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
-evalTypeScriptProject path = interpret @(JustEvaluating TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
+constrainedToValuePrecise :: Evaluator Precise (Value Precise) effects a -> Evaluator Precise (Value Precise) effects a
+constrainedToValuePrecise = id
 
-typecheckGoFile path = interpret @(Checking Go.Term) <$> evaluateProject goParser Language.Go Nothing path
+constrainedToTypeMonovariant :: Evaluator Monovariant (Type Monovariant) effects a -> Evaluator Monovariant (Type Monovariant) effects a
+constrainedToTypeMonovariant = id
+
+evalGoProject path = justEvaluating =<< evaluateProject goParser Language.Go Nothing path
+evalRubyProject path = justEvaluating =<< evaluateProject rubyParser Language.Ruby rubyPrelude path
+evalPHPProject path = justEvaluating =<< evaluateProject phpParser Language.PHP Nothing path
+evalPythonProject path = justEvaluating =<< evaluateProject pythonParser Language.Python pythonPrelude path
+evalTypeScriptProjectQuietly path = evaluatingWithHoles =<< evaluateProject typescriptParser Language.TypeScript Nothing path
+evalTypeScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.TypeScript Nothing path
+
+typecheckGoFile path = checking =<< evaluateProjectWithCaching goParser Language.Go Nothing path
 
 rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Language.Ruby)
 pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Language.Python)
 
 -- Evaluate a project, starting at a single entrypoint.
-evaluateProject parser lang prelude path = evaluatePackage <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
-
-evalRubyFile path = interpret @(JustEvaluating Ruby.Term) <$> evaluateFile rubyParser path
-evaluateFile parser path = evaluateModule <$> runTask (parseModule parser Nothing (file path))
+evaluateProject parser lang prelude path = evaluatePackageWith id withTermSpans <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
+evaluateProjectWithCaching parser lang prelude path = evaluatePackageWith convergingModules (withTermSpans . cachingTerms) <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
 
 
 parseFile :: Parser term -> FilePath -> IO term
@@ -89,3 +97,12 @@ parseFile parser = runTask . (parse parser <=< readBlob . file)
 
 blob :: FilePath -> IO Blob
 blob = runTask . readBlob . file
+
+
+injectConst :: a -> SomeExc (Sum '[Const a])
+injectConst = SomeExc . injectSum . Const
+
+mergeExcs :: Either (SomeExc (Sum excs)) (Either (SomeExc exc) result) -> Either (SomeExc (Sum (exc ': excs))) result
+mergeExcs = either (\ (SomeExc sum) -> Left (SomeExc (weakenSum sum))) (either (\ (SomeExc exc) -> Left (SomeExc (injectSum exc))) Right)
+
+reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . first injectConst

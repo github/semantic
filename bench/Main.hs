@@ -11,10 +11,10 @@ import Control.Monad
 -- project—coercing the result into a string will suffice, though it throws off the
 -- memory allocation results a bit.
 pyEval :: FilePath -> Benchmarkable
-pyEval = whnfIO . fmap show . evaluatePythonFile . ("bench/bench-fixtures/python/" <>)
+pyEval = whnfIO . fmap show . evalPythonProject . ("bench/bench-fixtures/python/" <>)
 
 rbEval :: FilePath -> Benchmarkable
-rbEval = whnfIO . fmap show . evaluateRubyFile . ("bench/bench-fixtures/ruby/" <>)
+rbEval = whnfIO . fmap show . evalRubyProject . ("bench/bench-fixtures/ruby/" <>)
 
 main :: IO ()
 main = defaultMain

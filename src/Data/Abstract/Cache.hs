@@ -1,46 +1,35 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, GeneralizedNewtypeDeriving #-}
 module Data.Abstract.Cache where
 
 import Data.Abstract.Address
 import Data.Abstract.Configuration
 import Data.Abstract.Heap
 import Data.Map.Monoidal as Monoidal
+import Data.Semilattice.Lower
 import Prologue
 
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Heap's.
-newtype Cache l t v = Cache { unCache :: Monoidal.Map (Configuration l t v) (Set (v, Heap l v)) }
+newtype Cache term location value = Cache { unCache :: Monoidal.Map (Configuration term location value) (Set (value, Heap location value)) }
+  deriving (Lower)
 
-deriving instance (Eq l, Eq t, Eq v, Eq (Cell l v)) => Eq (Cache l t v)
-deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Ord (Cache l t v)
-deriving instance (Show l, Show t, Show v, Show (Cell l v)) => Show (Cache l t v)
-deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Semigroup (Cache l t v)
-deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Monoid (Cache l t v)
-deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Reducer (Configuration l t v, (v, Heap l v)) (Cache l t v)
+type Cacheable term location value = (Ord (Cell location value), Ord location, Ord term, Ord value)
+
+deriving instance (Eq   term, Eq   location, Eq   value, Eq   (Cell location value)) => Eq   (Cache term location value)
+deriving instance (Ord  term, Ord  location, Ord  value, Ord  (Cell location value)) => Ord  (Cache term location value)
+deriving instance (Show term, Show location, Show value, Show (Cell location value)) => Show (Cache term location value)
+
+deriving instance Cacheable term location value => Semigroup (Cache term location value)
+deriving instance Cacheable term location value => Monoid    (Cache term location value)
+deriving instance Cacheable term location value => Reducer (Configuration term location value, (value, Heap location value)) (Cache term location value)
 
 -- | Look up the resulting value & 'Heap' for a given 'Configuration'.
-cacheLookup :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> Cache l t v -> Maybe (Set (v, Heap l v))
+cacheLookup :: Cacheable term location value => Configuration term location value -> Cache term location value -> Maybe (Set (value, Heap location value))
 cacheLookup key = Monoidal.lookup key . unCache
 
 -- | Set the resulting value & 'Heap' for a given 'Configuration', overwriting any previous entry.
-cacheSet :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> Set (v, Heap l v) -> Cache l t v -> Cache l t v
+cacheSet :: Cacheable term location value => Configuration term location value -> Set (value, Heap location value) -> Cache term location value -> Cache term location value
 cacheSet key value = Cache . Monoidal.insert key value . unCache
 
 -- | Insert the resulting value & 'Heap' for a given 'Configuration', appending onto any previous entry.
-cacheInsert :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> (v, Heap l v) -> Cache l t v -> Cache l t v
+cacheInsert :: Cacheable term location value => Configuration term location value -> (value, Heap location value) -> Cache term location value -> Cache term location value
 cacheInsert = curry cons
-
-
-instance (Eq l, Eq t, Eq1 (Cell l)) => Eq1 (Cache l t) where
-  liftEq eqV (Cache c1) (Cache c2) = liftEq2 (liftEq eqV) (liftEq (liftEq2 eqV (liftEq eqV))) c1 c2
-
-instance (Ord l, Ord t, Ord1 (Cell l)) => Ord1 (Cache l t) where
-  liftCompare compareV (Cache c1) (Cache c2) = liftCompare2 (liftCompare compareV) (liftCompare (liftCompare2 compareV (liftCompare compareV))) c1 c2
-
-instance (Show l, Show t, Show1 (Cell l)) => Show1 (Cache l t) where
-  liftShowsPrec spV slV d = showsUnaryWith (liftShowsPrec2 spKey slKey (liftShowsPrec spPair slPair) (liftShowList spPair slPair)) "Cache" d . unCache
-      where spKey = liftShowsPrec spV slV
-            slKey = liftShowList spV slV
-            spPair = liftShowsPrec2 spV slV spHeap slHeap
-            slPair = liftShowList2 spV slV spHeap slHeap
-            spHeap = liftShowsPrec spV slV
-            slHeap = liftShowList  spV slV

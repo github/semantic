@@ -1,8 +1,9 @@
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies #-}
 module Data.Abstract.Address where
 
 import Data.Abstract.FreeVariables
 import Data.Semigroup.Reducer
+import Data.Semilattice.Lower
 import Prologue
 
 -- | An abstract address with a location of @l@ pointing to a variable of type @a@.
@@ -39,7 +40,7 @@ instance Location Monovariant where
 --   This is isomorphic to 'Last' from Data.Monoid, but is more convenient
 --   because it has a 'Reducer' instance.
 newtype Latest a = Latest { unLatest :: Maybe a }
-  deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Generic1, Lower, Ord, Show, Traversable)
 
 instance Semigroup (Latest a) where
   a <> Latest Nothing = a

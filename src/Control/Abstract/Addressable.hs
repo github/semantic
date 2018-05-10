@@ -1,10 +1,9 @@
-{-# LANGUAGE GADTs, UndecidableInstances #-}
+{-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Addressable where
 
+import Control.Abstract.Environment
 import Control.Abstract.Evaluator
-import Control.Applicative
-import Control.Effect
-import Control.Monad.Effect.Fresh
+import Control.Abstract.Heap
 import Control.Monad.Effect.Resumable as Eff
 import Data.Abstract.Address
 import Data.Abstract.Environment (insert)
@@ -13,27 +12,32 @@ import Data.Semigroup.Reducer
 import Prologue
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Heap.
-class (Effectful m, Member Fresh effects, Monad (m effects), Ord location) => MonadAddressable location effects m where
-  derefCell :: Address location value -> Cell location value -> m effects (Maybe value)
+class Ord location => Addressable location effects where
+  derefCell :: Address location value -> Cell location value -> Evaluator location value effects (Maybe value)
 
-  allocLoc :: Name -> m effects location
+  allocLoc :: Name -> Evaluator location value effects location
 
 -- | Look up or allocate an address for a 'Name'.
-lookupOrAlloc :: ( MonadAddressable location effects m
-                 , MonadEvaluator location term value effects m
+lookupOrAlloc :: ( Addressable location effects
+                 , Members '[ Reader (Environment location value)
+                            , State (Environment location value)
+                            ] effects
                  )
               => Name
-              -> m effects (Address location value)
+              -> Evaluator location value effects (Address location value)
 lookupOrAlloc name = lookupEnv name >>= maybe (alloc name) pure
 
 
-letrec :: ( MonadAddressable location effects m
-          , MonadEvaluator location term value effects m
+letrec :: ( Addressable location effects
+          , Members '[ Reader (Environment location value)
+                     , State (Environment location value)
+                     , State (Heap location value)
+                     ] effects
           , Reducer value (Cell location value)
           )
        => Name
-       -> m effects value
-       -> m effects (value, Address location value)
+       -> Evaluator location value effects value
+       -> Evaluator location value effects (value, Address location value)
 letrec name body = do
   addr <- lookupOrAlloc name
   v <- localEnv (insert name addr) body
@@ -41,38 +45,55 @@ letrec name body = do
   pure (v, addr)
 
 -- Lookup/alloc a name passing the address to a body evaluated in a new local environment.
-letrec' :: ( MonadAddressable location effects m
-           , MonadEvaluator location term value effects m
+letrec' :: ( Addressable location effects
+           , Members '[ Reader (Environment location value)
+                      , State (Environment location value)
+                      ] effects
            )
         => Name
-        -> (Address location value -> m effects value)
-        -> m effects value
+        -> (Address location value -> Evaluator location value effects value)
+        -> Evaluator location value effects value
 letrec' name body = do
   addr <- lookupOrAlloc name
   v <- localEnv id (body addr)
   v <$ modifyEnv (insert name addr)
 
+
+-- | Look up and dereference the given 'Name', throwing an exception for free variables.
+variable :: ( Addressable location effects
+            , Members '[ Reader (Environment location value)
+                       , Resumable (AddressError location value)
+                       , Resumable (EnvironmentError value)
+                       , State (Environment location value)
+                       , State (Heap location value)
+                       ] effects
+            )
+         => Name
+         -> Evaluator location value effects value
+variable name = lookupEnv name >>= maybe (freeVariableError name) deref
+
+
 -- Instances
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
-instance (Effectful m, Member Fresh effects, Monad (m effects)) => MonadAddressable Precise effects m where
+instance Member Fresh effects => Addressable Precise effects where
   derefCell _ = pure . unLatest
   allocLoc _ = Precise <$> raise fresh
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
-instance (Alternative (m effects), Effectful m, Member Fresh effects, Monad (m effects)) => MonadAddressable Monovariant effects m where
+instance Members '[Fresh, NonDet] effects => Addressable Monovariant effects where
   derefCell _ cell | null cell = pure Nothing
                    | otherwise = Just <$> foldMapA pure cell
   allocLoc = pure . Monovariant
 
 -- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
-deref :: (Member (Resumable (AddressError location value)) effects, MonadAddressable location effects m, MonadEvaluator location term value effects m) => Address location value -> m effects value
+deref :: (Addressable location effects, Members '[Resumable (AddressError location value), State (Heap location value)] effects) => Address location value -> Evaluator location value effects value
 deref addr = do
   cell <- lookupHeap addr >>= maybeM (throwAddressError (UnallocatedAddress addr))
   derefed <- derefCell addr cell
   maybeM (throwAddressError (UninitializedAddress addr)) derefed
 
-alloc :: MonadAddressable location effects m => Name -> m effects (Address location value)
+alloc :: Addressable location effects => Name -> Evaluator location value effects (Address location value)
 alloc = fmap Address . allocLoc
 
 data AddressError location value resume where
@@ -89,5 +110,11 @@ instance Eq location => Eq1 (AddressError location value) where
   liftEq _ _                        _                        = False
 
 
-throwAddressError :: (Effectful m, Member (Resumable (AddressError location value)) effects) => AddressError location value resume -> m effects resume
+throwAddressError :: Member (Resumable (AddressError location value)) effects => AddressError location value resume -> Evaluator location value effects resume
 throwAddressError = raise . Eff.throwError
+
+runAddressError :: Evaluator location value (Resumable (AddressError location value) ': effects) a -> Evaluator location value effects (Either (SomeExc (AddressError location value)) a)
+runAddressError = raiseHandler runError
+
+runAddressErrorWith :: (forall resume . AddressError location value resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (AddressError location value) ': effects) a -> Evaluator location value effects a
+runAddressErrorWith = runResumableWith

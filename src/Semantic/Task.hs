@@ -1,4 +1,5 @@
 {-# LANGUAGE ConstraintKinds, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Semantic.Task
 ( Task
 , TaskEff
@@ -48,12 +49,13 @@ module Semantic.Task
 
 import           Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
-import qualified Control.Abstract.Analysis as Analysis
+import qualified Control.Abstract.Evaluator as Analysis
 import           Control.Monad
+import           Control.Monad.Effect as Eff hiding (run)
 import           Control.Monad.Effect.Exception
-import           Control.Monad.Effect.Internal as Eff hiding (run)
 import           Control.Monad.Effect.Reader
 import           Control.Monad.Effect.Run as Run
+import           Control.Monad.Effect.Trace
 import           Data.Blob
 import           Data.Diff
 import qualified Data.Error as Error
@@ -75,7 +77,20 @@ import           System.Exit (die)
 import           System.IO (stderr)
 
 -- | A high-level task producing some result, e.g. parsing, diffing, rendering. 'Task's can also specify explicit concurrency via 'distribute', 'distributeFor', and 'distributeFoldMap'
-type TaskEff = Eff '[Distribute WrappedTask, Task, Resolution, IO.Files, Reader Options, Telemetry, Exc SomeException, IO]
+type TaskEff = Eff '[Distribute WrappedTask
+                    , Task
+                    , Resolution
+                    , IO.Files
+                    , Reader Options
+                    , Telemetry
+                    , Exc SomeException
+                    , Trace
+                    , IO]
+
+-- This orphan lets us use Run with Trace.
+-- TODO: kill this once we nuke Run and/or fix Trace
+instance Run.Run '[Trace, IO] result (IO result) where
+  run = Eff.runM . Analysis.runPrintingTraces
 
 -- | A wrapper for a 'Task', to embed in other effects.
 newtype WrappedTask a = WrapTask { unwrapTask :: TaskEff a }
@@ -92,8 +107,8 @@ parse :: Member Task effs => Parser term -> Blob -> Eff effs term
 parse parser = send . Parse parser
 
 -- | A task running some 'Analysis.MonadAnalysis' to completion.
-analyze :: (Analysis.Interpreter m analysisEffects, Member Task effs) => m analysisEffects result -> Eff effs (Analysis.Result m analysisEffects result)
-analyze = send . Analyze
+analyze :: Member Task effs => (Analysis.Evaluator location value effects a -> result) -> Analysis.Evaluator location value effects a -> Eff effs result
+analyze interpret analysis = send (Analyze interpret analysis)
 
 -- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
 decorate :: (Functor f, Member Task effs) => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Eff effs (Term f (Record (field ': fields)))
@@ -135,16 +150,16 @@ runTaskWithOptions options task = do
 -- | An effect describing high-level tasks to be performed.
 data Task output where
   Parse    :: Parser term -> Blob -> Task term
-  Analyze  :: Analysis.Interpreter m effects => m effects result -> Task (Analysis.Result m effects result)
+  Analyze  :: (Analysis.Evaluator location value effects a -> result) -> Analysis.Evaluator location value effects a -> Task result
   Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
   Diff     :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
   Render   :: Renderer input output -> input -> Task output
 
 -- | Run a 'Task' effect by performing the actions in 'IO'.
-runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, IO] effs => Eff (Task ': effs) a -> Eff effs a
+runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, Trace, IO] effs => Eff (Task ': effs) a -> Eff effs a
 runTaskF = interpret $ \ task -> case task of
   Parse parser blob -> runParser blob parser
-  Analyze analysis -> pure (Analysis.interpret analysis)
+  Analyze interpret analysis -> pure (interpret analysis)
   Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
   Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
   Render renderer input -> pure (renderer input)
@@ -155,19 +170,19 @@ logError :: Member Telemetry effs => Options -> Level -> Blob -> Error.Error Str
 logError Options{..} level blob err = writeLog level (Error.formatError optionsPrintSource (optionsIsTerminal && optionsEnableColour) blob err)
 
 -- | Parse a 'Blob' in 'IO'.
-runParser :: Members '[Reader Options, Telemetry, Exc SomeException, IO] effs => Blob -> Parser term -> Eff effs term
+runParser :: Members '[Reader Options, Telemetry, Exc SomeException, IO, Trace] effs => Blob -> Parser term -> Eff effs term
 runParser blob@Blob{..} parser = case parser of
   ASTParser language ->
     time "parse.tree_sitter_ast_parse" languageTag $
       IO.rethrowing (parseToAST language blob)
   AssignmentParser parser assignment -> do
-    traceM ("Parsing " <> blobPath)
+    trace ("Parsing " <> blobPath)
     ast <- runParser blob parser `catchError` \ (SomeException err) -> do
       writeStat (Stat.increment "parse.parse_failures" languageTag)
       writeLog Error "failed parsing" (("task", "parse") : blobFields)
       throwError (toException err)
     options <- ask
-    traceM ("Assigning " <> blobPath)
+    trace ("Assigning " <> blobPath)
     time "parse.assign" languageTag $
       case Assignment.assign blobSource assignment ast of
         Left err -> do
@@ -191,11 +206,11 @@ runParser blob@Blob{..} parser = case parser of
       in length term `seq` pure term
   where blobFields = ("path", blobPath) : languageTag
         languageTag = maybe [] (pure . (,) ("language" :: String) . show) blobLanguage
-        errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Union fs) (Record Assignment.Location) -> [Error.Error String]
+        errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) (Record Assignment.Location) -> [Error.Error String]
         errors = cata $ \ (In a syntax) -> case syntax of
-          _ | Just err@Syntax.Error{} <- prj syntax -> [Syntax.unError (getField a) err]
+          _ | Just err@Syntax.Error{} <- projectSum syntax -> [Syntax.unError (getField a) err]
           _ -> fold syntax
 
 
-instance (Members '[Reader Options, Telemetry, Exc SomeException, IO] effects, Run effects result rest) => Run (Task ': effects) result rest where
+instance (Members '[Reader Options, Telemetry, Exc SomeException, Trace, IO] effects, Run effects result rest) => Run (Task ': effects) result rest where
   run = run . runTaskF

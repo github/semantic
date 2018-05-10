@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, ScopedTypeVariables #-}
+{-# LANGUAGE DeriveAnyClass #-}
 module Language.Go.Syntax where
 
 import           Data.Abstract.Evaluatable hiding (Label)
@@ -28,22 +28,29 @@ importPath str = let path = stripQuotes str in ImportPath (BC.unpack path) (path
 defaultAlias :: ImportPath -> Name
 defaultAlias = name . BC.pack . takeFileName . unPath
 
-resolveGoImport :: forall value term location effects m. MonadEvaluatable location term value effects m => ImportPath -> m effects [ModulePath]
+resolveGoImport :: Members '[ Modules location value
+                            , Reader ModuleInfo
+                            , Reader Package.PackageInfo
+                            , Resumable ResolutionError
+                            , Trace
+                            ] effects
+                => ImportPath
+                -> Evaluator location value effects [ModulePath]
 resolveGoImport (ImportPath path Relative) = do
   ModuleInfo{..} <- currentModule
   paths <- listModulesInDir (joinPaths (takeDirectory modulePath) path)
   case paths of
-    [] -> throwResumable @(ResolutionError value) $ GoImportError path
+    [] -> throwResumable $ GoImportError path
     _ -> pure paths
 resolveGoImport (ImportPath path NonRelative) = do
   package <- BC.unpack . unName . Package.packageName <$> currentPackage
-  traceM ("attempting to resolve " <> show path <> " for package " <> package)
+  traceE ("attempting to resolve " <> show path <> " for package " <> package)
   case splitDirectories path of
-    -- Import an absolute path that's defined in this package being analyized.
+    -- Import an absolute path that's defined in this package being analyzed.
     -- First two are source, next is package name, remaining are path to package
     -- (e.g. github.com/golang/<package>/path...).
     (_ : _ : p : xs) | p == package -> listModulesInDir (joinPath xs)
-    _ -> throwResumable @(ResolutionError value) $ GoImportError path
+    _ -> throwResumable $ GoImportError path
 
 -- | Import declarations (symbols are added directly to the calling environment).
 --
@@ -59,7 +66,8 @@ instance Evaluatable Import where
   eval (Import importPath _) = do
     paths <- resolveGoImport importPath
     for_ paths $ \path -> do
-      (importedEnv, _) <- traceResolve (unPath importPath) path $ isolate (require path)
+      traceResolve (unPath importPath) path
+      importedEnv <- maybe emptyEnv fst <$> isolate (require path)
       modifyEnv (mergeEnvs importedEnv)
     unit
 
@@ -79,10 +87,10 @@ instance Evaluatable QualifiedImport where
     paths <- resolveGoImport importPath
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
     void $ letrec' alias $ \addr -> do
-      for_ paths $ \path -> do
-        (importedEnv, _) <- traceResolve (unPath importPath) path $ isolate (require path)
+      for_ paths $ \p -> do
+        traceResolve (unPath importPath) p
+        importedEnv <- maybe emptyEnv fst <$> isolate (require p)
         modifyEnv (mergeEnvs importedEnv)
-
       makeNamespace alias addr Nothing
     unit
 
@@ -97,7 +105,8 @@ instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable SideEffectImport where
   eval (SideEffectImport importPath _) = do
     paths <- resolveGoImport importPath
-    for_ paths $ \path -> traceResolve (unPath importPath) path $ isolate (require path)
+    traceResolve (unPath importPath) paths
+    for_ paths $ \path -> isolate (require path)
     unit
 
 -- A composite literal in Go

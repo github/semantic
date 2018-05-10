@@ -3,6 +3,7 @@ module Data.Abstract.FreeVariables where
 
 import qualified Data.ByteString.Char8 as BC
 import           Data.String
+import           Data.Sum
 import           Data.Term
 import           Prologue
 
@@ -15,10 +16,6 @@ name = Name
 
 instance IsString Name where
   fromString = Name . BC.pack
-
--- | The type of labels.
---   TODO: This should be rolled into 'Name' and tracked in the environment, both so that we can abstract over labels like any other location, and so that we can garbage collect unreachable labels.
-type Label = Int
 
 
 -- | Types which can contain unbound variables.
@@ -54,7 +51,7 @@ instance (FreeVariables1 syntax, Functor syntax) => FreeVariables (Term syntax a
 instance (FreeVariables1 syntax) => FreeVariables1 (TermF syntax ann) where
   liftFreeVariables f (In _ s) = liftFreeVariables f s
 
-instance (Apply FreeVariables1 fs) => FreeVariables1 (Union fs) where
-  liftFreeVariables f = apply (Proxy :: Proxy FreeVariables1) (liftFreeVariables f)
+instance (Apply FreeVariables1 fs) => FreeVariables1 (Sum fs) where
+  liftFreeVariables f = apply @FreeVariables1 (liftFreeVariables f)
 
 instance FreeVariables1 []

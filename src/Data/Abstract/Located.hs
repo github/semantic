@@ -1,28 +1,28 @@
 {-# LANGUAGE TypeFamilies, UndecidableInstances #-}
 module Data.Abstract.Located where
 
-import Control.Abstract.Addressable
-import Control.Effect
-import Control.Monad.Effect.Reader
+import Control.Abstract
 import Data.Abstract.Address
-import Data.Abstract.Origin
+import Data.Abstract.Module (ModuleInfo)
+import Data.Abstract.Package (PackageInfo)
 import Prologue
 
-data Located location term = Located { location :: location, origin :: !(SomeOrigin term) }
+data Located location = Located
+  { location        :: location
+  , locationPackage :: {-# UNPACK #-} !PackageInfo
+  , locationModule  :: !ModuleInfo
+  }
+  deriving (Eq, Ord, Show)
 
-deriving instance (Eq location, Eq (Base term ())) => Eq (Located location term)
-deriving instance (Ord location, Ord (Base term ())) => Ord (Located location term)
-deriving instance (Show location, Show (Base term ())) => Show (Located location term)
+instance Location location => Location (Located location) where
+  type Cell (Located location) = Cell location
 
-instance (Location location, Ord (Base term ())) => Location (Located location term) where
-  type Cell (Located location term) = Cell location
-
-instance ( Effectful m
-         , Member (Reader (SomeOrigin term)) effects
-         , MonadAddressable location effects m
-         , Ord (Base term ())
+instance ( Addressable location effects
+         , Members '[ Reader ModuleInfo
+                    , Reader PackageInfo
+                    ] effects
          )
-      => MonadAddressable (Located location term) effects m where
-  derefCell (Address (Located loc _)) = derefCell (Address loc)
+      => Addressable (Located location) effects where
+  derefCell (Address (Located loc _ _)) = raise . lower . derefCell (Address loc)
 
-  allocLoc name = Located <$> allocLoc name <*> raise ask
+  allocLoc name = raise (lower (Located <$> allocLoc name <*> currentPackage <*> currentModule))

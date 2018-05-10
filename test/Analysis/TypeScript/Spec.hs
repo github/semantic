@@ -6,6 +6,7 @@ import qualified Language.TypeScript.Assignment as TypeScript
 import Data.Abstract.Value as Value
 import Data.Abstract.Number as Number
 import qualified Data.Language as Language
+import Data.Sum
 
 import SpecHelpers
 
@@ -34,13 +35,13 @@ spec = parallel $ do
 
     it "fails exporting symbols not defined in the module" $ do
       v <- fst <$> evaluate "bad-export.ts"
-      v `shouldBe` Right (Right (Right (Right (Right (Left (SomeExc (ExportError "foo.ts" (Name "pip"))))))))
+      v `shouldBe` Left (SomeExc (injectSum (ExportError "foo.ts" (Name "pip") :: EvalError (Value Precise) ())))
 
     it "evaluates early return statements" $ do
       res <- evaluate "early-return.ts"
-      fst res `shouldBe` Right (Right (Right (Right (Right (Right (Right (pure (injValue (Value.Float (Number.Decimal 123.0))))))))))
+      fst res `shouldBe` Right [injValue (Value.Float (Number.Decimal 123.0))]
 
   where
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate entry = evalTypeScriptProject (fixtures <> entry)
-    evalTypeScriptProject path = interpret @(TestEvaluating TypeScript.Term) <$> evaluateProject typescriptParser Language.TypeScript Nothing path
+    evalTypeScriptProject path = testEvaluating <$> evaluateProject typescriptParser Language.TypeScript Nothing path

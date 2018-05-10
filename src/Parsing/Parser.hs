@@ -25,6 +25,7 @@ import           Data.AST
 import           Data.Kind
 import           Data.Language
 import           Data.Record
+import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Data.File
@@ -54,9 +55,9 @@ type family ApplyAll' (typeclasses :: [(* -> *) -> Constraint]) (fs :: [* -> *])
 
 -- | A parser, suitable for program analysis, for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
 data SomeAnalysisParser typeclasses ann where
-  SomeAnalysisParser :: ( Member Syntax.Identifier fs
+  SomeAnalysisParser :: ( Element Syntax.Identifier fs
                         , ApplyAll' typeclasses fs)
-                     => Parser (Term (Union fs) ann) -- ^ A parser.
+                     => Parser (Term (Sum fs) ann) -- ^ A parser.
                      -> Maybe File                   -- ^ Maybe path to prelude.
                      -> SomeAnalysisParser typeclasses ann
 
@@ -86,8 +87,8 @@ data Parser term where
   -- | A parser producing an à la carte term given an 'AST'-producing parser and an 'Assignment' onto 'Term's in some syntax type.
   AssignmentParser :: (Enum grammar, Ix grammar, Show grammar, TS.Symbol grammar, Syntax.Error :< fs, Eq1 ast, Apply Foldable fs, Apply Functor fs, Foldable ast, Functor ast)
                    => Parser (Term ast (Node grammar))                           -- A parser producing AST.
-                   -> Assignment ast grammar (Term (Union fs) (Record Location)) -- An assignment from AST onto 'Term's.
-                   -> Parser (Term (Union fs) (Record Location))                 -- A parser producing 'Term's.
+                   -> Assignment ast grammar (Term (Sum fs) (Record Location)) -- An assignment from AST onto 'Term's.
+                   -> Parser (Term (Sum fs) (Record Location))                 -- A parser producing 'Term's.
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
 
@@ -107,13 +108,13 @@ data SomeParser typeclasses ann where
 --   This can be used to perform operations uniformly over terms produced by blobs with different 'Language's, and which therefore have different types in general. For example, given some 'Blob', we can parse and 'show' the parsed & assigned 'Term' like so:
 --
 --   > case someParser (Proxy :: Proxy '[Show1]) <$> blobLanguage language of { Just (SomeParser parser) -> runTask (parse parser blob) >>= putStrLn . show ; _ -> return () }
-someParser :: ( ApplyAll typeclasses (Union Go.Syntax)
-              , ApplyAll typeclasses (Union JSON.Syntax)
-              , ApplyAll typeclasses (Union Markdown.Syntax)
-              , ApplyAll typeclasses (Union Python.Syntax)
-              , ApplyAll typeclasses (Union Ruby.Syntax)
-              , ApplyAll typeclasses (Union TypeScript.Syntax)
-              , ApplyAll typeclasses (Union PHP.Syntax)
+someParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
+              , ApplyAll typeclasses (Sum JSON.Syntax)
+              , ApplyAll typeclasses (Sum Markdown.Syntax)
+              , ApplyAll typeclasses (Sum Python.Syntax)
+              , ApplyAll typeclasses (Sum Ruby.Syntax)
+              , ApplyAll typeclasses (Sum TypeScript.Syntax)
+              , ApplyAll typeclasses (Sum PHP.Syntax)
               )
            => proxy typeclasses                        -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
            -> Language                                 -- ^ The 'Language' to select.

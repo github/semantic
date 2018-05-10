@@ -10,9 +10,6 @@ module Data.Abstract.ModuleTable
 , keys
 , fromModules
 , toPairs
-, LoadStack (..)
-, loadStackPush
-, loadStackPop
 ) where
 
 import Data.Abstract.Module
@@ -52,15 +49,3 @@ fromModules modules = ModuleTable (Map.fromListWith (<>) (map toEntry modules))
 
 toPairs :: ModuleTable a -> [(ModulePath, a)]
 toPairs = Map.toList . unModuleTable
-
-
--- | Stack of module paths used to help break circular loads/imports.
-newtype LoadStack = LoadStack { unLoadStack :: [ModulePath] }
-  deriving (Eq, Lower, Monoid, Ord, Semigroup, Show)
-
-loadStackPush :: ModulePath -> LoadStack -> LoadStack
-loadStackPush x LoadStack{..} = LoadStack (x : unLoadStack)
-
-loadStackPop :: LoadStack -> LoadStack
-loadStackPop (LoadStack []) = LoadStack []
-loadStackPop (LoadStack (_:xs)) = LoadStack xs
