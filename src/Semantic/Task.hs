@@ -77,9 +77,9 @@ type TaskEff = Eff '[Distribute WrappedTask
                     , Task
                     , IO.Files
                     , Reader Options
+                    , Trace
                     , Telemetry
                     , Exc SomeException
-                    , Trace
                     , IO]
 
 -- This orphan lets us use Run with Trace.
@@ -132,7 +132,7 @@ runTaskWithOptions options task = do
 
   (result, stat) <- withTiming "run" [] $ do
     let run :: TaskEff a -> IO (Either SomeException a)
-        run task = Run.run task (Action (run . unwrapTask)) options (Queues logger statter)
+        run = runM . runError . flip runReader (Queues logger statter) . runTelemetry . runTraceInTelemetry . flip runReader options . IO.runFiles . runTaskF . flip runDistribute (Action (run . unwrapTask))
     run task
   queue statter stat
 
@@ -141,6 +141,8 @@ runTaskWithOptions options task = do
   closeQueue logger
   either (die . displayException) pure result
 
+runTraceInTelemetry :: Member Telemetry effects => Eff (Trace ': effects) a -> Eff effects a
+runTraceInTelemetry = interpret (\ (Trace str) -> writeLog Debug str [])
 
 -- | An effect describing high-level tasks to be performed.
 data Task output where
