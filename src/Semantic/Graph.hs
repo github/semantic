@@ -58,7 +58,7 @@ graph graphType renderer project
             . graphing
             . constrainingTypes
 
-          constrainingTypes :: Evaluator (Located (Precise Latest)) (Value (Located (Precise Latest))) effects a -> Evaluator (Located (Precise Latest)) (Value (Located (Precise Latest))) effects a
+          constrainingTypes :: Evaluator (Located Precise Latest) (Value (Located Precise Latest)) effects a -> Evaluator (Located Precise Latest) (Value (Located Precise Latest)) effects a
           constrainingTypes = id
 
 -- | Parse a list of files into a 'Package'.
