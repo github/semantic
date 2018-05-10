@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses, StandaloneDeriving, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, UndecidableInstances #-}
 module Data.Abstract.Heap where
 
 import Data.Abstract.Address
@@ -10,14 +10,11 @@ import Prologue
 
 -- | A map of addresses onto cells holding their values.
 newtype Heap location value = Heap { unHeap :: Monoidal.Map location (Cell location value) }
-  deriving (Generic1, Lower)
+  deriving (Lower)
 
 deriving instance (Eq location, Eq (Cell location value)) => Eq (Heap location value)
 deriving instance (Ord location, Ord (Cell location value)) => Ord (Heap location value)
 deriving instance (Show location, Show (Cell location value)) => Show (Heap location value)
-instance (Eq location, Eq1 (Cell location)) => Eq1 (Heap location) where liftEq = genericLiftEq
-instance (Ord location, Ord1 (Cell location)) => Ord1 (Heap location) where liftCompare = genericLiftCompare
-instance (Show location, Show1 (Cell location)) => Show1 (Heap location) where liftShowsPrec = genericLiftShowsPrec
 deriving instance Foldable (Cell location) => Foldable (Heap location)
 deriving instance Functor (Cell location) => Functor (Heap location)
 deriving instance Traversable (Cell location) => Traversable (Heap location)
