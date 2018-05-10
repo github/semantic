@@ -13,7 +13,7 @@ data Located location = Located
   }
   deriving (Eq, Ord, Show)
 
-instance Location location => Location (Located location) where
+instance Location (Located location) where
   type Cell (Located location) = Cell location
 
 instance ( Addressable location effects

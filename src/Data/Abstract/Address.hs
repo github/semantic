@@ -15,7 +15,7 @@ instance Ord location => Ord1 (Address location) where liftCompare = genericLift
 instance Show location => Show1 (Address location) where liftShowsPrec = genericLiftShowsPrec
 
 
-class Ord location => Location location where
+class Location location where
   -- | The type into which stored values will be written for a given location type.
   type family Cell location :: * -> *
 
