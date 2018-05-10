@@ -70,6 +70,11 @@ spec = parallel $ do
       ((res, _), _) <- evaluate "line.rb"
       res `shouldBe` Right [injValue (Value.Integer (Number.Integer 4))]
 
+    it "resolves builtins used in the prelude" $ do
+      ((res, _), traces) <- evaluate "puts.rb"
+      res `shouldBe` Right [injValue Unit]
+      traces `shouldContain` [ "\"hello\"" ]
+
   where
     ns n = Just . Latest . Just . injValue . Namespace n
     addr = Address . Precise
