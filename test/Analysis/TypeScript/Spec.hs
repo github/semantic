@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedLists #-}
 module Analysis.TypeScript.Spec (spec) where
 
+import Control.Arrow ((&&&))
 import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import qualified Language.TypeScript.Assignment as TypeScript
@@ -20,14 +21,10 @@ spec = parallel $ do
 
     it "imports with qualified names" $ do
       res <- snd <$> evaluate "main1.ts"
-      environment res `shouldBe` [ ("b", addr 0)
-                                 , ("z", addr 4)
-                                 ]
+      Env.names (environment res) `shouldBe` [ "b", "z" ]
 
-      heapLookup (Address (Precise 0)) (heap res) `shouldBe` ns "b" [ ("baz", addr 1)
-                                                                    , ("foo", addr 3) ]
-      heapLookup (Address (Precise 4)) (heap res) `shouldBe` ns "z" [ ("baz", addr 1)
-                                                                    , ("foo", addr 3) ]
+      (derefName "b" res >>= deNamespace) `shouldBe` Just ("b", [ "baz", "foo" ])
+      (derefName "z" res >>= deNamespace) `shouldBe` Just ("z", [ "baz", "foo" ])
 
     it "side effect only imports" $ do
       env <- environment . snd <$> evaluate "main2.ts"
@@ -45,3 +42,7 @@ spec = parallel $ do
     fixtures = "test/fixtures/typescript/analysis/"
     evaluate entry = evalTypeScriptProject (fixtures <> entry)
     evalTypeScriptProject path = testEvaluating <$> evaluateProject typescriptParser Language.TypeScript Nothing path
+    derefName :: Name -> EvaluatingState Precise (Value Precise) -> Maybe (Value Precise)
+    derefName name res = Env.lookup name (environment res) >>= flip heapLookup (heap res) >>= unLatest
+    deNamespace :: Value Precise -> Maybe (Name, [Name])
+    deNamespace = fmap (namespaceName &&& Env.names . namespaceScope) . (prjValue :: Value Precise -> Maybe (Namespace Precise (Value Precise)))
