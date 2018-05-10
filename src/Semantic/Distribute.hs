@@ -8,7 +8,7 @@ module Semantic.Distribute
 ) where
 
 import qualified Control.Concurrent.Async as Async
-import           Control.Monad.Effect hiding (run)
+import           Control.Monad.Effect
 import           Control.Monad.Effect.Exception
 import           Control.Monad.IO.Class
 import           Control.Parallel.Strategies

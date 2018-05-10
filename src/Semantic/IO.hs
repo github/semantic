@@ -23,7 +23,7 @@ module Semantic.IO
 ) where
 
 import qualified Control.Exception as Exc
-import           Control.Monad.Effect hiding (run)
+import           Control.Monad.Effect
 import           Control.Monad.Effect.Exception
 import           Control.Monad.IO.Class
 import           Data.Aeson

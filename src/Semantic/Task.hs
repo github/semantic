@@ -47,7 +47,7 @@ import           Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
 import qualified Control.Abstract.Evaluator as Analysis
 import           Control.Monad
-import           Control.Monad.Effect as Eff hiding (run)
+import           Control.Monad.Effect
 import           Control.Monad.Effect.Exception
 import           Control.Monad.Effect.Reader
 import           Control.Monad.Effect.Trace
