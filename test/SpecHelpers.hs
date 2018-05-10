@@ -6,6 +6,7 @@ module SpecHelpers
 , testEvaluating
 , ns
 , addr
+, deNamespace
 , derefQName
 , verbatim
 , Verbatim(..)
@@ -15,6 +16,7 @@ import Analysis.Abstract.Evaluating
 import Analysis.Abstract.Evaluating as X (EvaluatingState(..))
 import Control.Abstract.Addressable
 import Control.Abstract.Value
+import Control.Arrow ((&&&))
 import Control.Effect as X (runIgnoringTraces)
 import Control.Monad ((>=>))
 import Data.Abstract.Address as X
@@ -88,6 +90,9 @@ testEvaluating
 
 ns n = Just . Latest . Just . injValue . Namespace n
 addr = Address . Precise
+
+deNamespace :: Value Precise -> Maybe (Name, [Name])
+deNamespace = fmap (namespaceName &&& Env.names . namespaceScope) . prjValue @(Namespace Precise)
 
 derefQName :: Heap Precise (Value Precise) -> NonEmpty Name -> Environment Precise (Value Precise) -> Maybe (Value Precise)
 derefQName heap = go
