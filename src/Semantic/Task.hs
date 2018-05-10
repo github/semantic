@@ -144,6 +144,7 @@ runTaskWithOptions options task = do
 runTraceInTelemetry :: Member Telemetry effects => Eff (Trace ': effects) a -> Eff effects a
 runTraceInTelemetry = interpret (\ (Trace str) -> writeLog Debug str [])
 
+
 -- | An effect describing high-level tasks to be performed.
 data Task output where
   Parse    :: Parser term -> Blob -> Task term
