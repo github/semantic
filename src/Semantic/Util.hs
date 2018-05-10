@@ -49,7 +49,7 @@ evaluatingWithHoles
   . resumingEnvironmentError
   . resumingEvalError
   . resumingResolutionError
-  . resumingAddressError @(Value Precise) @Precise
+  . resumingAddressError @(Value (Precise Latest)) @(Precise Latest)
   . constrainedToValuePrecise
 
 -- The order is significant here: caching has to run before typeChecking, or else we’ll nondeterministically produce TypeErrors as part of the result set. While this is probably actually correct, it will require us to have an Ord instance for TypeError, which we don’t have yet.
@@ -69,7 +69,7 @@ checking
   . caching @[]
   . constrainedToTypeMonovariant
 
-constrainedToValuePrecise :: Evaluator Precise (Value Precise) effects a -> Evaluator Precise (Value Precise) effects a
+constrainedToValuePrecise :: Evaluator (Precise Latest) (Value (Precise Latest)) effects a -> Evaluator (Precise Latest) (Value (Precise Latest)) effects a
 constrainedToValuePrecise = id
 
 constrainedToTypeMonovariant :: Evaluator Monovariant (Type Monovariant) effects a -> Evaluator Monovariant (Type Monovariant) effects a

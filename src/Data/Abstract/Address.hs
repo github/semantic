@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies #-}
+{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeFamilies #-}
 module Data.Abstract.Address where
 
 import Data.Abstract.FreeVariables
@@ -21,11 +21,15 @@ class Location location where
 
 
 -- | 'Precise' models precise store semantics where only the 'Latest' value is taken. Everything gets it's own address (always makes a new allocation) which makes for a larger store.
-newtype Precise = Precise Int
-  deriving (Eq, Ord, Show)
+data Precise cell where
+  Precise :: Int -> Precise Latest
 
-instance Location Precise where
-  type Cell Precise = Latest
+deriving instance Eq   (Precise cell)
+deriving instance Ord  (Precise cell)
+deriving instance Show (Precise cell)
+
+instance Location (Precise cell) where
+  type Cell (Precise cell) = cell
 
 
 -- | 'Monovariant' models using one address for a particular name. It trackes the set of values that a particular address takes and uses it's name to lookup in the store and only allocation if new.
