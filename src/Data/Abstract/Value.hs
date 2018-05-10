@@ -2,7 +2,6 @@
 module Data.Abstract.Value where
 
 import Control.Abstract
-import Data.Abstract.Address
 import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables

@@ -5,7 +5,6 @@ module Analysis.Abstract.Collecting
 ) where
 
 import Control.Abstract
-import Data.Abstract.Address
 import Data.Abstract.Heap
 import Data.Abstract.Live
 import Data.Semilattice.Lower

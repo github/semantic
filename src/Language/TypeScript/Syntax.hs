@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.TypeScript.Syntax where
 
-import           Data.Abstract.Address
 import qualified Data.Abstract.Environment as Env
 import qualified Data.Abstract.FreeVariables as FV
 import           Data.Abstract.Evaluatable

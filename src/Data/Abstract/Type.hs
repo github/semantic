@@ -8,7 +8,6 @@ module Data.Abstract.Type
 
 import Control.Abstract
 import Control.Effect (Effectful(..), throwResumable)
-import Data.Abstract.Address
 import Data.Abstract.Environment as Env
 import Data.Align (alignWith)
 import Data.Semigroup.Reducer (Reducer)

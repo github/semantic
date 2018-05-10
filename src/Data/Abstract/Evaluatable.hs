@@ -22,7 +22,6 @@ import Control.Abstract.Evaluator (LoopControl, Return(..))
 import Control.Abstract.Goto (Goto(..))
 import Control.Abstract.Modules (Modules(..))
 import Control.Monad.Effect as Eff
-import Data.Abstract.Address
 import Data.Abstract.Declarations as X
 import Data.Abstract.Environment as X
 import Data.Abstract.Exports as Exports

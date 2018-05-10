@@ -5,7 +5,6 @@ module Analysis.Abstract.Evaluating
 ) where
 
 import Control.Abstract
-import Data.Abstract.Address
 import Data.Semilattice.Lower
 
 -- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.

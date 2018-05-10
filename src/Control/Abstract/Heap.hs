@@ -1,5 +1,6 @@
 module Control.Abstract.Heap
 ( Heap
+, Cell
 , getHeap
 , putHeap
 , modifyHeap
