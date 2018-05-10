@@ -6,6 +6,7 @@ module SpecHelpers
 , testEvaluating
 , ns
 , addr
+, derefQName
 , verbatim
 , Verbatim(..)
 ) where
@@ -15,17 +16,20 @@ import Analysis.Abstract.Evaluating as X (EvaluatingState(..))
 import Control.Abstract.Addressable
 import Control.Abstract.Value
 import Control.Effect as X (runIgnoringTraces)
+import Control.Monad ((>=>))
 import Data.Abstract.Address as X
+import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Data.Abstract.FreeVariables as X hiding (dropExtension)
 import Data.Abstract.Heap as X
 import Data.Abstract.ModuleTable as X hiding (lookup)
-import Data.Abstract.Value (Namespace(..), Value, ValueError, injValue, runValueError)
+import Data.Abstract.Value (Namespace(..), Value, ValueError, injValue, prjValue, runValueError)
 import Data.Bifunctor (first)
 import Data.Blob as X
 import Data.File as X
 import Data.Functor.Listable as X
 import Data.Language as X
+import Data.List.NonEmpty as X (NonEmpty(..))
 import Data.Output as X
 import Data.Range as X
 import Data.Record as X
@@ -84,6 +88,12 @@ testEvaluating
 
 ns n = Just . Latest . Just . injValue . Namespace n
 addr = Address . Precise
+
+derefQName :: Heap Precise (Value Precise) -> NonEmpty Name -> Environment Precise (Value Precise) -> Maybe (Value Precise)
+derefQName heap = go
+  where go (n1 :| ns) env = Env.lookup n1 env >>= flip heapLookup heap >>= unLatest >>= case ns of
+          []        -> Just
+          (n2 : ns) -> fmap namespaceScope . prjValue @(Namespace Precise) >=> go (n2 :| ns)
 
 newtype Verbatim = Verbatim ByteString
   deriving (Eq)
