@@ -21,8 +21,9 @@ spec :: Spec
 spec = parallel $ do
   describe "Ruby" $ do
     it "evaluates require_relative" $ do
-      env <- environment . snd <$> evaluate "main.rb"
-      Env.names env `shouldContain` ["foo"]
+      (res, state) <- evaluate "main.rb"
+      res `shouldBe` Right [injValue (Value.Integer (Number.Integer 1))]
+      Env.names (environment state) `shouldContain` ["foo"]
 
     it "evaluates load" $ do
       env <- environment . snd <$> evaluate "load.rb"
