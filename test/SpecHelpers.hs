@@ -4,8 +4,6 @@ module SpecHelpers
 , parseFilePath
 , readFilePair
 , testEvaluating
-, ns
-, addr
 , deNamespace
 , derefQName
 , verbatim
@@ -87,9 +85,6 @@ testEvaluating
   . runEvalError
   . runAddressError
   . constrainedToValuePrecise
-
-ns n = Just . Latest . Just . injValue . Namespace n
-addr = Address . Precise
 
 deNamespace :: Value Precise -> Maybe (Name, [Name])
 deNamespace = fmap (namespaceName &&& Env.names . namespaceScope) . prjValue @(Namespace Precise)
