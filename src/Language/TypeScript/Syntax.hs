@@ -123,7 +123,7 @@ evalRequire :: ( AbstractValue location value effects
                           , Reader (Environment location value)
                           , State (Environment location value)
                           , State (Exports location value)
-                          , State (Heap (Cell location) location value)
+                          , State (Heap location (Cell location) value)
                           , Trace
                           ] effects
                , Reducer value (Cell location value)

@@ -30,7 +30,7 @@ lookupOrAlloc name = lookupEnv name >>= maybe (alloc name) pure
 letrec :: ( Addressable location effects
           , Members '[ Reader (Environment location value)
                      , State (Environment location value)
-                     , State (Heap (Cell location) location value)
+                     , State (Heap location (Cell location) value)
                      ] effects
           , Reducer value (Cell location value)
           )
@@ -64,7 +64,7 @@ variable :: ( Addressable location effects
                        , Resumable (AddressError location value)
                        , Resumable (EnvironmentError value)
                        , State (Environment location value)
-                       , State (Heap (Cell location) location value)
+                       , State (Heap location (Cell location) value)
                        ] effects
             )
          => Name
@@ -86,7 +86,7 @@ instance Members '[Fresh, NonDet] effects => Addressable (Monovariant Set) effec
   allocLoc = pure . Monovariant
 
 -- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
-deref :: (Addressable location effects, Members '[Resumable (AddressError location value), State (Heap (Cell location) location value)] effects) => Address location value -> Evaluator location value effects value
+deref :: (Addressable location effects, Members '[Resumable (AddressError location value), State (Heap location (Cell location) value)] effects) => Address location value -> Evaluator location value effects value
 deref addr = do
   cell <- lookupHeap addr >>= maybeM (throwAddressError (UnallocatedAddress addr))
   derefed <- derefCell addr cell

@@ -8,19 +8,19 @@ import Data.Semilattice.Lower
 import Prologue
 
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Heap's.
-newtype Cache term cell location value = Cache { unCache :: Monoidal.Map (Configuration term cell location value) (Set (value, Heap cell location value)) }
-  deriving (Eq, Lower, Monoid, Ord, Reducer (Configuration term cell location value, (value, Heap cell location value)), Show, Semigroup)
+newtype Cache term cell location value = Cache { unCache :: Monoidal.Map (Configuration term cell location value) (Set (value, Heap location cell value)) }
+  deriving (Eq, Lower, Monoid, Ord, Reducer (Configuration term cell location value, (value, Heap location cell value)), Show, Semigroup)
 
 type Cacheable term cell location value = (Ord (cell value), Ord location, Ord term, Ord value)
 
 -- | Look up the resulting value & 'Heap' for a given 'Configuration'.
-cacheLookup :: Cacheable term cell location value => Configuration term cell location value -> Cache term cell location value -> Maybe (Set (value, Heap cell location value))
+cacheLookup :: Cacheable term cell location value => Configuration term cell location value -> Cache term cell location value -> Maybe (Set (value, Heap location cell value))
 cacheLookup key = Monoidal.lookup key . unCache
 
 -- | Set the resulting value & 'Heap' for a given 'Configuration', overwriting any previous entry.
-cacheSet :: Cacheable term cell location value => Configuration term cell location value -> Set (value, Heap cell location value) -> Cache term cell location value -> Cache term cell location value
+cacheSet :: Cacheable term cell location value => Configuration term cell location value -> Set (value, Heap location cell value) -> Cache term cell location value -> Cache term cell location value
 cacheSet key value = Cache . Monoidal.insert key value . unCache
 
 -- | Insert the resulting value & 'Heap' for a given 'Configuration', appending onto any previous entry.
-cacheInsert :: Cacheable term cell location value => Configuration term cell location value -> (value, Heap cell location value) -> Cache term cell location value -> Cache term cell location value
+cacheInsert :: Cacheable term cell location value => Configuration term cell location value -> (value, Heap location cell value) -> Cache term cell location value -> Cache term cell location value
 cacheInsert = curry cons

@@ -215,7 +215,7 @@ instance ( Addressable location (Goto effects (Value location) ': effects)
                     , Resumable (ValueError location)
                     , Return (Value location)
                     , State (Environment location (Value location))
-                    , State (Heap (Cell location) location (Value location))
+                    , State (Heap location (Cell location) (Value location))
                     ] effects
          , Reducer (Value location) (Cell location (Value location))
          , Show location

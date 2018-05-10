@@ -13,7 +13,7 @@ import Prologue
 -- | An analysis performing GC after every instruction.
 collectingTerms :: ( Foldable (Cell location)
                    , Members '[ Reader (Live location value)
-                              , State (Heap (Cell location) location value)
+                              , State (Heap location (Cell location) value)
                               ] effects
                    , Ord location
                    , ValueRoots location value
@@ -31,8 +31,8 @@ gc :: ( Ord location
       , ValueRoots location value
       )
    => Live location value                 -- ^ The set of addresses to consider rooted.
-   -> Heap (Cell location) location value -- ^ A heap to collect unreachable addresses within.
-   -> Heap (Cell location) location value -- ^ A garbage-collected heap.
+   -> Heap location (Cell location) value -- ^ A heap to collect unreachable addresses within.
+   -> Heap location (Cell location) value -- ^ A garbage-collected heap.
 gc roots heap = heapRestrict heap (reachable roots heap)
 
 -- | Compute the set of addresses reachable from a given root set in a given heap.
@@ -41,7 +41,7 @@ reachable :: ( Ord location
              , ValueRoots location value
              )
           => Live location value                 -- ^ The set of root addresses.
-          -> Heap (Cell location) location value -- ^ The heap to trace addresses through.
+          -> Heap location (Cell location) value -- ^ The heap to trace addresses through.
           -> Live location value                 -- ^ The set of addresses reachable from the root set.
 reachable roots heap = go mempty roots
   where go seen set = case liveSplit set of
