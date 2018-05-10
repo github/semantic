@@ -2,6 +2,7 @@
 
 module Analysis.Ruby.Spec (spec) where
 
+import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Data.Abstract.Value as Value
 import Data.Abstract.Number as Number
@@ -21,13 +22,11 @@ spec = parallel $ do
   describe "Ruby" $ do
     it "evaluates require_relative" $ do
       env <- environment . snd <$> evaluate "main.rb"
-      env `shouldBe` [ ("Object", addr 0)
-                     , ("foo", addr 3) ]
+      Env.names env `shouldContain` ["foo"]
 
     it "evaluates load" $ do
       env <- environment . snd <$> evaluate "load.rb"
-      env `shouldBe` [ ("Object", addr 0)
-                     , ("foo", addr 3) ]
+      Env.names env `shouldContain` ["foo"]
 
     it "evaluates load with wrapper" $ do
       res <- evaluate "load-wrap.rb"
