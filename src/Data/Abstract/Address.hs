@@ -33,11 +33,15 @@ instance Location (Precise cell) where
 
 
 -- | 'Monovariant' models using one address for a particular name. It trackes the set of values that a particular address takes and uses it's name to lookup in the store and only allocation if new.
-newtype Monovariant = Monovariant Name
-  deriving (Eq, Ord, Show)
+data Monovariant cell where
+  Monovariant :: Name -> Monovariant Set
 
-instance Location Monovariant where
-  type Cell Monovariant = Set
+deriving instance Eq   (Monovariant cell)
+deriving instance Ord  (Monovariant cell)
+deriving instance Show (Monovariant cell)
+
+instance Location (Monovariant cell) where
+  type Cell (Monovariant cell) = cell
 
 
 -- | A cell holding a single value. Writes will replace any prior value.

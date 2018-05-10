@@ -72,7 +72,7 @@ checking
 constrainedToValuePrecise :: Evaluator (Precise Latest) (Value (Precise Latest)) effects a -> Evaluator (Precise Latest) (Value (Precise Latest)) effects a
 constrainedToValuePrecise = id
 
-constrainedToTypeMonovariant :: Evaluator Monovariant (Type Monovariant) effects a -> Evaluator Monovariant (Type Monovariant) effects a
+constrainedToTypeMonovariant :: Evaluator (Monovariant Set) (Type (Monovariant Set)) effects a -> Evaluator (Monovariant Set) (Type (Monovariant Set)) effects a
 constrainedToTypeMonovariant = id
 
 evalGoProject path = justEvaluating =<< evaluateProject goParser Language.Go Nothing path
