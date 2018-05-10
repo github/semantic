@@ -57,6 +57,7 @@ type EvaluatableConstraints location term value effects =
              , Reader (Environment location value)
              , Reader ModuleInfo
              , Reader PackageInfo
+             , Reader Span
              , Resumable (AddressError location value)
              , Resumable (EnvironmentError value)
              , Resumable (EvalError value)
@@ -179,7 +180,7 @@ evaluatePackageWith :: forall location term value inner inner' outer
                                   ] outer
                        , Recursive term
                        , inner ~ (Goto inner' value ': inner')
-                       , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': Modules location value ': Reader PackageInfo ': outer)
+                       , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': Modules location value ': Reader Span ': Reader PackageInfo ': outer)
                        )
                     => (SubtermAlgebra Module      term (Evaluator location value inner value) -> SubtermAlgebra Module      term (Evaluator location value inner value))
                     -> (SubtermAlgebra (Base term) term (Evaluator location value inner value) -> SubtermAlgebra (Base term) term (Evaluator location value inner value))
@@ -187,6 +188,7 @@ evaluatePackageWith :: forall location term value inner inner' outer
                     -> Evaluator location value outer [value]
 evaluatePackageWith analyzeModule analyzeTerm package
   = runReader (packageInfo package)
+  . runReader lowerBound
   . runReader (packageModules (packageBody package))
   . runModules evalModule
   . withPrelude (packagePrelude (packageBody package))
@@ -204,7 +206,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
           . fmap fst
           . runGoto lowerBound
 
-        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location value (Modules location value ': Reader PackageInfo ': outer) value
+        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location value (Modules location value ': Reader Span ': Reader PackageInfo ': outer) value
         evaluateEntryPoint m sym = runInModule (ModuleInfo m) $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym

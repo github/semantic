@@ -1,6 +1,5 @@
 (Program
   (File)
-  (Send
-    (Identifier))
+  (Line)
   (Send
     (Identifier)))

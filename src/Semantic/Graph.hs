@@ -15,7 +15,9 @@ import           Data.Abstract.Value (Value, ValueError(..), runValueErrorWith)
 import           Data.ByteString.Char8 (pack)
 import           Data.File
 import           Data.Output
+import           Data.Record
 import           Data.Semilattice.Lower
+import           Data.Term
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
 import           Rendering.Renderer
@@ -33,10 +35,10 @@ graph graphType renderer project
   | SomeAnalysisParser parser prelude <- someAnalysisParser
     (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
     package <- parsePackage parser prelude project
-    let perTerm = case graphType of
-          ImportGraph -> graphingLoadErrors
-          CallGraph   -> graphingLoadErrors . graphingTerms
-    analyze runGraphAnalysis (evaluatePackageWith graphingModules perTerm package) >>= extractGraph >>= case renderer of
+    let analyzeTerm = case graphType of
+          ImportGraph -> id
+          CallGraph   -> graphingTerms
+    analyze runGraphAnalysis (evaluatePackageWith graphingModules (withTermSpans . graphingLoadErrors . analyzeTerm) package) >>= extractGraph >>= case renderer of
       JSONGraphRenderer -> pure . toOutput
       DOTGraphRenderer  -> pure . renderGraph
     where extractGraph result = case result of
@@ -84,6 +86,13 @@ parseModule parser rootDir file = do
   blob <- readBlob file
   moduleForBlob rootDir blob <$> parse parser blob
 
+
+withTermSpans :: ( HasField fields Span
+                 , Member (Reader Span) effects
+                 )
+              => SubtermAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Evaluator location value effects a)
+              -> SubtermAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Evaluator location value effects a)
+withTermSpans recur term = withCurrentSpan (getField (termFAnnotation term)) (recur term)
 
 resumingResolutionError :: (Applicative (m effects), Effectful m, Member Trace effects) => m (Resumable ResolutionError ': effects) a -> m effects a
 resumingResolutionError = runResolutionErrorWith (\ err -> traceE ("ResolutionError:" <> show err) *> case err of
