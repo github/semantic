@@ -12,7 +12,7 @@ import Data.Semilattice.Lower
 import Prologue
 
 -- | Look up the set of values for a given configuration in the in-cache.
-consultOracle :: (Cacheable term (Cell location) location value, Member (Reader (Cache term (Cell location) location value)) effects) => Configuration term (Cell location) location value -> Evaluator location value effects (Set (value, Heap location (Cell location) value))
+consultOracle :: (Cacheable term (Cell location) location value, Member (Reader (Cache term (Cell location) location value)) effects) => Configuration term location (Cell location) value -> Evaluator location value effects (Set (value, Heap location (Cell location) value))
 consultOracle configuration = fromMaybe mempty . cacheLookup configuration <$> ask
 
 -- | Run an action with the given in-cache.
@@ -21,11 +21,11 @@ withOracle cache = local (const cache)
 
 
 -- | Look up the set of values for a given configuration in the out-cache.
-lookupCache :: (Cacheable term (Cell location) location value, Member (State (Cache term (Cell location) location value)) effects) => Configuration term (Cell location) location value -> Evaluator location value effects (Maybe (Set (value, Heap location (Cell location) value)))
+lookupCache :: (Cacheable term (Cell location) location value, Member (State (Cache term (Cell location) location value)) effects) => Configuration term location (Cell location) value -> Evaluator location value effects (Maybe (Set (value, Heap location (Cell location) value)))
 lookupCache configuration = cacheLookup configuration <$> get
 
 -- | Run an action, caching its result and 'Heap' under the given configuration.
-cachingConfiguration :: (Cacheable term (Cell location) location value, Members '[State (Cache term (Cell location) location value), State (Heap location (Cell location) value)] effects) => Configuration term (Cell location) location value -> Set (value, Heap location (Cell location) value) -> Evaluator location value effects value -> Evaluator location value effects value
+cachingConfiguration :: (Cacheable term (Cell location) location value, Members '[State (Cache term (Cell location) location value), State (Heap location (Cell location) value)] effects) => Configuration term location (Cell location) value -> Set (value, Heap location (Cell location) value) -> Evaluator location value effects value -> Evaluator location value effects value
 cachingConfiguration configuration values action = do
   modify' (cacheSet configuration values)
   result <- (,) <$> action <*> get
