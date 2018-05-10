@@ -8,7 +8,7 @@ import Prologue
 
 -- | A set of live addresses (whether roots or reachable).
 newtype Live location value = Live { unLive :: Set (Address location value) }
-  deriving (Eq, Foldable, Lower, Monoid, Ord, Semigroup, Show)
+  deriving (Eq, Lower, Monoid, Ord, Semigroup, Show)
 
 fromAddresses :: (Foldable t, Ord location) => t (Address location value) -> Live location value
 fromAddresses = Prologue.foldr liveInsert lowerBound
