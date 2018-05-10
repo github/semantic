@@ -169,6 +169,7 @@ traceResolve name path = traceE ("resolved " <> show name <> " -> " <> show path
 
 
 builtin :: ( Addressable location effects
+           , HasCallStack
            , Members '[ Reader (Environment location value)
                       , Reader ModuleInfo
                       , Reader Span
@@ -180,7 +181,7 @@ builtin :: ( Addressable location effects
         => String
         -> Evaluator location value effects value
         -> Evaluator location value effects ()
-builtin n def = do
+builtin n def = withCurrentCallStack callStack $ do
   let name = X.name ("__semantic_" <> pack n)
   addr <- alloc name
   modifyEnv (X.insert name addr)
