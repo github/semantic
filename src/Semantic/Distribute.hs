@@ -5,7 +5,6 @@ module Semantic.Distribute
 , distributeFoldMap
 , Distribute
 , runDistribute
-, Action(..)
 ) where
 
 import qualified Control.Concurrent.Async as Async
@@ -40,12 +39,6 @@ data Distribute task output where
 
 
 -- | Evaluate a 'Distribute' effect concurrently.
-runDistribute :: Members '[Exc SomeException, IO] effs => Action task -> Eff (Distribute task ': effs) a -> Eff effs a
+runDistribute :: Members '[Exc SomeException, IO] effs => (forall output . task output -> IO (Either SomeException output)) -> Eff (Distribute task ': effs) a -> Eff effs a
 runDistribute action = interpret (\ (Distribute tasks) ->
-  liftIO (Async.mapConcurrently (runAction action) tasks) >>= either throwError pure . sequenceA . withStrategy (parTraversable (parTraversable rseq)))
-
-
--- | An action evaluating @task@s to some output in 'IO', or failing with an exception.
---
---   This is necessary because GHC won’t allow us to use a rank-n quantified type in the third parameter to our instance of 'Run', below.
-newtype Action task = Action { runAction :: forall output . task output -> IO (Either SomeException output) }
+  liftIO (Async.mapConcurrently action tasks) >>= either throwError pure . sequenceA . withStrategy (parTraversable (parTraversable rseq)))
