@@ -51,5 +51,5 @@ withCurrentSrcLoc loc = withCurrentModule (moduleInfoFromSrcLoc loc) . withCurre
 -- | Run ana ction with locally replaced 'ModuleInfo' & 'Span' derived from the Haskell call stack.
 --
 --   This is suitable for contextualizing builtins & other functionality intended for use from client code but defined in Haskell source.
-withCurrentCallStack :: (Effectful m, HasCallStack, Members '[Reader ModuleInfo, Reader Span] effects) => m effects a -> m effects a
-withCurrentCallStack = maybe id (withCurrentSrcLoc . snd) (listToMaybe (getCallStack callStack))
+withCurrentCallStack :: (Effectful m, Members '[Reader ModuleInfo, Reader Span] effects) => CallStack -> m effects a -> m effects a
+withCurrentCallStack = maybe id (withCurrentSrcLoc . snd) . listToMaybe . getCallStack
