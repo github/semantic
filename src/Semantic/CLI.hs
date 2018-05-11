@@ -10,6 +10,7 @@ import           Data.File
 import           Data.Language
 import           Data.List (intercalate)
 import           Data.List.Split (splitWhen)
+import           Data.Output
 import           Data.Version (showVersion)
 import           Development.GitRev
 import           Options.Applicative
@@ -38,7 +39,7 @@ runASTParse :: SomeRenderer TermRenderer -> Either Handle [File] -> Task.TaskEff
 runASTParse (SomeRenderer parseTreeRenderer) = Semantic.astParseBlobs parseTreeRenderer <=< Task.readBlobs
 
 runGraph :: Semantic.GraphType -> SomeRenderer GraphRenderer -> Maybe FilePath -> FilePath -> Language -> [FilePath] -> Task.TaskEff ByteString
-runGraph graphType (SomeRenderer r) rootDir dir excludeDirs = Semantic.graph graphType r <=< Task.readProject rootDir dir excludeDirs
+runGraph graphType (SomeRenderer r) rootDir dir excludeDirs = fmap toOutput . Semantic.graph graphType r <=< Task.readProject rootDir dir excludeDirs
 
 -- | A parser for the application's command-line arguments.
 --

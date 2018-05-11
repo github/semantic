@@ -30,7 +30,7 @@ graph :: Members '[Distribute WrappedTask, Files, Task, Exc SomeException, Telem
       => GraphType
       -> GraphRenderer output
       -> Project
-      -> Eff effs ByteString
+      -> Eff effs output
 graph graphType renderer project
   | SomeAnalysisParser parser prelude <- someAnalysisParser
     (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
