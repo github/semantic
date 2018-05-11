@@ -11,6 +11,7 @@ import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Class as Class
 import Prologue
 
+-- | An algebraic graph with 'Ord', 'Semigroup', and 'Monoid' instances.
 newtype Graph vertex = Graph (G.Graph vertex)
   deriving (Eq, Foldable, Functor, Class.Graph, Show, Class.ToGraph, Traversable)
 
