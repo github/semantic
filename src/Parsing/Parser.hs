@@ -1,7 +1,6 @@
 {-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Parsing.Parser
 ( Parser(..)
-, SomeParser(..)
 , SomeTerm(..)
 , withSomeTerm
 , SomeAnalysisParser(..)
@@ -93,23 +92,19 @@ data Parser term where
                    -> Parser (Term (Sum fs) (Record Location))                 -- A parser producing 'Term's.
   -- | A parser for 'Markdown' using cmark.
   MarkdownParser :: Parser (Term (TermF [] CMarkGFM.NodeType) (Node Markdown.Grammar))
+  -- | An abstraction over parsers when we don’t know the details of the term type.
+  SomeParser :: ApplyAll typeclasses syntax => Parser (Term syntax ann) -> Parser (SomeTerm typeclasses ann)
 
 -- | Apply all of a list of typeclasses to all of a list of functors using 'Apply'. Used by 'someParser' to constrain all of the language-specific syntax types to the typeclasses in question.
 type family ApplyAll (typeclasses :: [(* -> *) -> Constraint]) (syntax :: * -> *) :: Constraint where
   ApplyAll (typeclass ': typeclasses) syntax = (typeclass syntax, ApplyAll typeclasses syntax)
   ApplyAll '[] syntax = ()
 
--- | A parser for some specific language, producing 'Term's whose syntax satisfies a list of typeclass constraints.
---
---   This enables us to abstract over the details of the specific syntax types in cases where we can describe all the requirements on the syntax with a list of typeclasses.
-data SomeParser typeclasses ann where
-  SomeParser :: ApplyAll typeclasses syntax => Parser (Term syntax ann) -> SomeParser typeclasses ann
-
--- | Construct a 'SomeParser' given a proxy for a list of typeclasses and the 'Language' to be parsed, all of which must be satisfied by all of the types in the syntaxes of our supported languages.
+-- | Construct a 'Parser' given a proxy for a list of typeclasses and the 'Language' to be parsed, all of which must be satisfied by all of the types in the syntaxes of our supported languages.
 --
 --   This can be used to perform operations uniformly over terms produced by blobs with different 'Language's, and which therefore have different types in general. For example, given some 'Blob', we can parse and 'show' the parsed & assigned 'Term' like so:
 --
---   > case someParser (Proxy :: Proxy '[Show1]) <$> blobLanguage language of { Just (SomeParser parser) -> runTask (parse parser blob) >>= putStrLn . show ; _ -> return () }
+--   > runTask (parse (someParser @'[Show1] language) blob) >>= putStrLn . withSomeTerm show
 someParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
               , ApplyAll typeclasses (Sum JSON.Syntax)
               , ApplyAll typeclasses (Sum Markdown.Syntax)
@@ -118,8 +113,8 @@ someParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
               , ApplyAll typeclasses (Sum TypeScript.Syntax)
               , ApplyAll typeclasses (Sum PHP.Syntax)
               )
-           => Language                                 -- ^ The 'Language' to select.
-           -> SomeParser typeclasses (Record Location) -- ^ A 'SomeParser' abstracting the syntax type to be produced.
+           => Language                                        -- ^ The 'Language' to select.
+           -> Parser (SomeTerm typeclasses (Record Location)) -- ^ A 'SomeParser' abstracting the syntax type to be produced.
 someParser Go         = SomeParser goParser
 someParser JavaScript = SomeParser typescriptParser
 someParser JSON       = SomeParser jsonParser

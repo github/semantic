@@ -203,6 +203,7 @@ runParser blob@Blob{..} parser = case parser of
     time "parse.cmark_parse" languageTag $
       let term = cmarkParser blobSource
       in length term `seq` pure term
+  SomeParser parser -> SomeTerm <$> runParser blob parser
   where blobFields = ("path", blobPath) : languageTag
         languageTag = maybe [] (pure . (,) ("language" :: String) . show) blobLanguage
         errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) (Record Assignment.Location) -> [Error.Error String]
