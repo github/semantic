@@ -154,7 +154,7 @@ markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
 -- | A parser for producing specialized (tree-sitter) ASTs.
 data SomeASTParser where
-  SomeASTParser :: forall grammar. (Bounded grammar, Enum grammar, Show grammar)
+  SomeASTParser :: (Bounded grammar, Enum grammar, Show grammar)
                 => Parser (AST [] grammar)
                 -> SomeASTParser
 
