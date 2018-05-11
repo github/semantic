@@ -162,7 +162,7 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
         summaryKey = T.pack $ pathKeyForBlobPair blobs
 
 renderRPCToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => BlobPair -> Diff f (Record fields) (Record fields) -> ([TOCSummary], [TOCSummary])
-renderRPCToCDiff blobs = List.partition isValidSummary . diffTOC
+renderRPCToCDiff _ = List.partition isValidSummary . diffTOC
 
 diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [TOCSummary]
 diffTOC = mapMaybe entrySummary . dedupe . filter extraDeclarations . tableOfContentsBy declaration
