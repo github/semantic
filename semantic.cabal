@@ -152,7 +152,9 @@ library
                      , Semantic.Task
                      , Semantic.Telemetry
                      , Semantic.Util
-                    -- Custom Prelude
+                     -- Serialization
+                     , Serializing.Format
+                     -- Custom Prelude
   other-modules:       Prologue
   build-depends:       base >= 4.8 && < 5
                      , aeson
