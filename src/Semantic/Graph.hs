@@ -1,7 +1,6 @@
 {-# LANGUAGE GADTs, TypeOperators #-}
 module Semantic.Graph where
 
-import           Algebra.Graph.Export.Dot
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph
 import           Control.Monad.Effect.Trace
@@ -23,6 +22,7 @@ import           Prologue hiding (MonadError (..))
 import           Rendering.Renderer
 import           Semantic.IO (Files)
 import           Semantic.Task as Task
+import           Serializing.Format
 
 data GraphType = ImportGraph | CallGraph
 
@@ -40,7 +40,7 @@ graph graphType renderer project
           CallGraph   -> graphingTerms
     analyze runGraphAnalysis (evaluatePackageWith graphingModules (withTermSpans . graphingLoadErrors . analyzeTerm) package) >>= extractGraph >>= case renderer of
       JSONGraphRenderer -> pure . toOutput
-      DOTGraphRenderer  -> pure . export style
+      DOTGraphRenderer  -> serialize (DOT style)
     where extractGraph result = case result of
             (Right ((_, graph), _), _) -> pure graph
             _ -> Task.throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))

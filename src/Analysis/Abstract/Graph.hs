@@ -22,6 +22,7 @@ import           Data.Abstract.FreeVariables
 import           Data.Abstract.Module (Module(moduleInfo), ModuleInfo(..))
 import           Data.Abstract.Package (PackageInfo(..))
 import           Data.Aeson hiding (Result)
+import           Data.ByteString.Builder
 import qualified Data.ByteString.Char8 as BC
 import           Data.ByteString.Lazy (toStrict)
 import           Data.Graph
@@ -38,8 +39,8 @@ data Vertex
   | Variable { vertexName :: ByteString }
   deriving (Eq, Ord, Show)
 
-style :: Style Vertex ByteString
-style = (defaultStyle vertexName)
+style :: Style Vertex Builder
+style = (defaultStyle (byteString . vertexName))
   { vertexAttributes = vertexAttributes
   , edgeAttributes   = edgeAttributes
   }
