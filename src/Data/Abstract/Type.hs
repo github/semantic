@@ -61,6 +61,8 @@ zeroOrMoreProduct = maybe Unit oneOrMoreProduct . nonEmpty
 data TypeError resume where
   UnificationError :: Type -> Type -> TypeError Type
 
+deriving instance Eq   (TypeError resume)
+deriving instance Ord  (TypeError resume)
 deriving instance Show (TypeError resume)
 
 instance Show1 TypeError where
