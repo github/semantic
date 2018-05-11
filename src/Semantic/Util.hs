@@ -54,8 +54,8 @@ evaluatingWithHoles
 
 -- The order is significant here: caching has to run before typeChecking, or else we’ll nondeterministically produce TypeErrors as part of the result set. While this is probably actually correct, it will require us to have an Ord instance for TypeError, which we don’t have yet.
 checking
-  = runM
-  . fmap (first reassociate)
+  = runM @(Evaluator Monovariant Type) @IO
+  . fmap (first reassociateTypes)
   . evaluating
   . runPrintingTrace
   . providingLiveSet
@@ -65,8 +65,8 @@ checking
   . runEnvironmentError
   . runEvalError
   . runAddressError
-  . runTypeError
   . caching @[]
+  . runTypeError
   . constrainedToTypeMonovariant
 
 constrainedToValuePrecise :: Evaluator Precise (Value Precise) effects a -> Evaluator Precise (Value Precise) effects a
@@ -106,3 +106,4 @@ mergeExcs :: Either (SomeExc (Sum excs)) (Either (SomeExc exc) result) -> Either
 mergeExcs = either (\ (SomeExc sum) -> Left (SomeExc (weakenSum sum))) (either (\ (SomeExc exc) -> Left (SomeExc (injectSum exc))) Right)
 
 reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . first injectConst
+reassociateTypes = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . first injectConst
