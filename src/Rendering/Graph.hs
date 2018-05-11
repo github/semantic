@@ -11,11 +11,11 @@ import Analysis.ConstructorName
 import Control.Monad.Effect
 import Control.Monad.Effect.Fresh
 import Control.Monad.Effect.Reader
-import qualified Data.ByteString.Char8 as B
 import Data.Diff
 import Data.Graph
 import Data.Patch
 import Data.Semigroup.App
+import Data.String (IsString(..))
 import Data.Term
 import Prologue
 
@@ -34,17 +34,17 @@ termAlgebra tag (In _ syntax) = do
   (parent `connect` root <>) <$> local (const root) (runAppMerge (foldMap AppMerge syntax))
 
 
-style :: String -> (tag -> [Attribute ByteString]) -> Style (Vertex tag) ByteString
-style name tagAttributes = (defaultStyle (B.pack . show . vertexId))
-  { graphName = B.pack (quote name)
+style :: (IsString string, Monoid string) => String -> (tag -> [Attribute string]) -> Style (Vertex tag) string
+style name tagAttributes = (defaultStyle (fromString . show . vertexId))
+  { graphName = fromString (quote name)
   , vertexAttributes = vertexAttributes }
   where quote a = "\"" <> a <> "\""
-        vertexAttributes Vertex{..} = "label" := B.pack vertexName : tagAttributes vertexTag
+        vertexAttributes Vertex{..} = "label" := fromString vertexName : tagAttributes vertexTag
 
-termStyle :: String -> Style (Vertex ()) ByteString
+termStyle :: (IsString string, Monoid string) => String -> Style (Vertex ()) string
 termStyle name = style name (const [])
 
-diffStyle :: String -> Style (Vertex DiffTag) ByteString
+diffStyle :: (IsString string, Monoid string) => String -> Style (Vertex DiffTag) string
 diffStyle name = style name diffTagAttributes
   where diffTagAttributes Deleted  = ["color" := "red"]
         diffTagAttributes Inserted = ["color" := "green"]
