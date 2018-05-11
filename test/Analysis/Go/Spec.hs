@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedLists #-}
 module Analysis.Go.Spec (spec) where
 
+import Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable (EvalError(..))
 import qualified Language.Go.Assignment as Go
 import qualified Data.Language as Language
@@ -12,22 +13,16 @@ spec :: Spec
 spec = parallel $ do
   describe "evaluates Go" $ do
     it "imports and wildcard imports" $ do
-      res <- snd <$> evaluate "main.go"
-      environment res `shouldBe` [ ("foo", addr 0)
-                                 , ("Bar", addr 2)
-                                 , ("Rab", addr 3)
-                                 , ("main", addr 4)
-                                 ]
+      ((_, state), _) <- evaluate "main.go"
+      Env.names (environment state) `shouldBe` [ "Bar", "Rab", "foo", "main" ]
 
-      heapLookup (Address (Precise 0)) (heap res) `shouldBe` ns "foo" [ ("New", addr 1) ]
+      (derefQName (heap state) ("foo" :| []) (environment state) >>= deNamespace) `shouldBe` Just ("foo",  ["New"])
 
     it "imports with aliases (and side effects only)" $ do
-      res <- snd <$> evaluate "main1.go"
-      environment res `shouldBe` [ ("f", addr 0)
-                                 , ("main", addr 4) -- addr 4 is due to side effects of eval'ing `import _ "./bar"` which used addr 2 & 3. f defines New which got addr 1.
-                                 ]
+      ((_, state), _) <- evaluate "main1.go"
+      Env.names (environment state) `shouldBe` [ "f", "main" ]
 
-      heapLookup (Address (Precise 0)) (heap res) `shouldBe` ns "f" [ ("New", addr 1) ]
+      (derefQName (heap state) ("f" :| []) (environment state) >>= deNamespace) `shouldBe` Just ("f",  ["New"])
 
   where
     fixtures = "test/fixtures/go/analysis/"

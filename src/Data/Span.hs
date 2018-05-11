@@ -6,6 +6,7 @@
 module Data.Span
 ( Span(..)
 , Pos(..)
+, spanFromSrcLoc
 , emptySpan
 ) where
 
@@ -13,6 +14,7 @@ import Data.Aeson ((.=), (.:))
 import qualified Data.Aeson as A
 import Data.JSON.Fields
 import Data.Semilattice.Lower
+import GHC.Stack
 import Prologue
 
 -- | Source position information
@@ -36,6 +38,9 @@ data Span = Span
   , spanEnd   :: Pos
   }
   deriving (Show, Read, Eq, Ord, Generic, Hashable)
+
+spanFromSrcLoc :: SrcLoc -> Span
+spanFromSrcLoc = Span . (Pos . srcLocStartLine <*> srcLocStartCol) <*> (Pos . srcLocEndLine <*> srcLocEndCol)
 
 emptySpan :: Span
 emptySpan = Span (Pos 1 1) (Pos 1 1)

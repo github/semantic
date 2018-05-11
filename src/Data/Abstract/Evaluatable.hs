@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, DefaultSignatures, GADTs, GeneralizedNewtypeDeriving, RankNTypes, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Data.Abstract.Evaluatable
 ( module X
 , Evaluatable(..)
@@ -12,6 +12,7 @@ module Data.Abstract.Evaluatable
 , evaluatePackageWith
 , throwEvalError
 , traceResolve
+, builtin
 , isolate
 , Modules
 ) where
@@ -29,6 +30,7 @@ import Data.Abstract.FreeVariables as X
 import Data.Abstract.Module
 import Data.Abstract.ModuleTable as ModuleTable
 import Data.Abstract.Package as Package
+import Data.ByteString.Char8 (pack, unpack)
 import Data.Scientific (Scientific)
 import Data.Semigroup.App
 import Data.Semigroup.Foldable
@@ -166,11 +168,31 @@ traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator lo
 traceResolve name path = traceE ("resolved " <> show name <> " -> " <> show path)
 
 
+builtin :: ( Addressable location effects
+           , HasCallStack
+           , Members '[ Reader (Environment location value)
+                      , Reader ModuleInfo
+                      , Reader Span
+                      , State (Environment location value)
+                      , State (Heap location value)
+                      ] effects
+           , Reducer value (Cell location value)
+           )
+        => String
+        -> Evaluator location value effects value
+        -> Evaluator location value effects ()
+builtin n def = withCurrentCallStack callStack $ do
+  let name = X.name ("__semantic_" <> pack n)
+  addr <- alloc name
+  modifyEnv (X.insert name addr)
+  def >>= assign addr
+
 -- | Evaluate a given package.
 evaluatePackageWith :: forall location term value inner inner' outer
                     .  ( Evaluatable (Base term)
                        , EvaluatableConstraints location term value inner
                        , Members '[ Fail
+                                  , Fresh
                                   , Reader (Environment location value)
                                   , Resumable (LoadError location value)
                                   , State (Environment location value)
@@ -180,7 +202,7 @@ evaluatePackageWith :: forall location term value inner inner' outer
                                   ] outer
                        , Recursive term
                        , inner ~ (Goto inner' value ': inner')
-                       , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': Modules location value ': Reader Span ': Reader PackageInfo ': outer)
+                       , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer)
                        )
                     => (SubtermAlgebra Module      term (Evaluator location value inner value) -> SubtermAlgebra Module      term (Evaluator location value inner value))
                     -> (SubtermAlgebra (Base term) term (Evaluator location value inner value) -> SubtermAlgebra (Base term) term (Evaluator location value inner value))
@@ -189,6 +211,8 @@ evaluatePackageWith :: forall location term value inner inner' outer
 evaluatePackageWith analyzeModule analyzeTerm package
   = runReader (packageInfo package)
   . runReader lowerBound
+  . fmap fst
+  . runState (lowerBound :: Gotos location value (Reader Span ': Reader PackageInfo ': outer))
   . runReader (packageModules (packageBody package))
   . runModules evalModule
   . withPrelude (packagePrelude (packageBody package))
@@ -203,16 +227,18 @@ evaluatePackageWith analyzeModule analyzeTerm package
           = runReader info
           . runReturn
           . runLoopControl
-          . fmap fst
-          . runGoto lowerBound
+          . runGoto Gotos getGotos
 
-        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location value (Modules location value ': Reader Span ': Reader PackageInfo ': outer) value
+        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location value (Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer) value
         evaluateEntryPoint m sym = runInModule (ModuleInfo m) $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
 
         withPrelude Nothing a = a
         withPrelude (Just prelude) a = do
+          _ <- runInModule moduleInfoFromCallStack $ do
+            builtin "print" (closure ["s"] lowerBound (variable "s" >>= asString >>= traceE . unpack >> unit))
+            unit
           preludeEnv <- fst <$> evalModule prelude
           withDefaultEnvironment preludeEnv a
 
@@ -223,6 +249,9 @@ evaluatePackageWith analyzeModule analyzeTerm package
           | Exports.null ports = env
           | otherwise          = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
         pairValueWithEnv action = flip (,) <$> action <*> (filterEnv <$> getExports <*> getEnv)
+
+newtype Gotos location value outer = Gotos { getGotos :: GotoTable (LoopControl value ': Return value ': Reader ModuleInfo ': Modules location value ': State (Gotos location value outer) ': outer) value }
+  deriving (Lower)
 
 
 -- | Isolate the given action with an empty global environment and exports.
