@@ -13,7 +13,6 @@ import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value, ValueError(..), runValueErrorWith)
 import           Data.ByteString.Char8 (pack)
 import           Data.File
-import           Data.Output
 import           Data.Record
 import           Data.Semilattice.Lower
 import           Data.Term
@@ -39,7 +38,7 @@ graph graphType renderer project
           ImportGraph -> id
           CallGraph   -> graphingTerms
     analyze runGraphAnalysis (evaluatePackageWith graphingModules (withTermSpans . graphingLoadErrors . analyzeTerm) package) >>= extractGraph >>= case renderer of
-      JSONGraphRenderer -> pure . toOutput
+      JSONGraphRenderer -> serialize JSON
       DOTGraphRenderer  -> serialize (DOT style)
     where extractGraph result = case result of
             (Right ((_, graph), _), _) -> pure graph

@@ -28,7 +28,6 @@ module Rendering.Renderer
 import Data.Aeson (Value)
 import Data.ByteString.Builder
 import Data.Output
-import Prologue
 import Rendering.Graph as R
 import Rendering.Imports as R
 import Rendering.JSON as R
@@ -70,7 +69,7 @@ deriving instance Show (TermRenderer output)
 
 -- | Specification of renderers for graph analysis, producing output in the parameter type.
 data GraphRenderer output where
-  JSONGraphRenderer :: GraphRenderer ByteString
+  JSONGraphRenderer :: GraphRenderer Builder
   DOTGraphRenderer  :: GraphRenderer Builder
 
 deriving instance Eq (GraphRenderer output)
