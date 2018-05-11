@@ -5,8 +5,7 @@ module Serializing.DOT
 ) where
 
 import Algebra.Graph.Class
-import Algebra.Graph.Export hiding (export, (<+>))
-import qualified Algebra.Graph.Export as E
+import Algebra.Graph.Export hiding ((<+>))
 import Algebra.Graph.Export.Dot hiding (export)
 import Data.List
 import Data.String
@@ -25,7 +24,7 @@ serializeDOT Style {..} g = render $ header <> body <> "}\n"
     body      = ("graph" `with` graphAttributes)
              <> ("node"  `with` defaultVertexAttributes)
              <> ("edge"  `with` defaultEdgeAttributes)
-             <> E.export vDoc eDoc g
+             <> export vDoc eDoc g
     label     = doubleQuotes . literal . vertexName
     vDoc x    = line $ label x <+>                      attributes (vertexAttributes x)
     eDoc x y  = line $ label x <> " -> " <> label y <+> attributes (edgeAttributes x y)

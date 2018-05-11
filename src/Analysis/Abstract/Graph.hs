@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Graph
 ( Graph(..)
 , Vertex(..)
@@ -30,7 +30,7 @@ import           Data.Output
 import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Data.Text.Encoding as T
-import           Prologue hiding (empty, packageName)
+import           Prologue hiding (packageName)
 
 -- | A vertex of some specific type.
 data Vertex
