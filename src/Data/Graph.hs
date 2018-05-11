@@ -4,6 +4,7 @@ module Data.Graph
 , Class.overlay
 , Class.connect
 , Class.vertex
+, Lower(..)
 , simplify
 ) where
 

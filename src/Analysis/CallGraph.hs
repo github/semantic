@@ -9,7 +9,6 @@ module Analysis.CallGraph
 import Algebra.Graph.Export.Dot
 import Data.Abstract.FreeVariables
 import Data.Graph
-import Data.Semilattice.Lower
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import Data.Term
