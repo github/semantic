@@ -65,7 +65,7 @@ deriving instance Eq   (TypeError resume)
 deriving instance Ord  (TypeError resume)
 deriving instance Show (TypeError resume)
 
-instance Eq1 TypeError where liftEq _ (UnificationError a b) (UnificationError c d) = a == c && b == d
+instance Eq1 TypeError where liftEq _ (UnificationError a1 b1) (UnificationError a2 b2) = a1 == a2 && b1 == b2
 
 instance Show1 TypeError where liftShowsPrec _ _ = showsPrec
 
