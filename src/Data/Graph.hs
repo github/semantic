@@ -9,6 +9,7 @@ module Data.Graph
 
 import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Class as Class
+import Data.Semilattice.Lower
 import Prologue
 
 -- | An algebraic graph with 'Ord', 'Semigroup', and 'Monoid' instances.
@@ -19,6 +20,9 @@ newtype Graph vertex = Graph (G.Graph vertex)
 simplify :: Ord vertex => Graph vertex -> Graph vertex
 simplify (Graph graph) = Graph (G.simplify graph)
 
+
+instance Lower (Graph vertex) where
+  lowerBound = Class.empty
 
 instance Semigroup (Graph vertex) where
   (<>) = Class.overlay
