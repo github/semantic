@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, MultiParamTypeClasses, TypeFamilies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies #-}
 module Data.Abstract.Environment
   ( Environment(..)
   , addresses
