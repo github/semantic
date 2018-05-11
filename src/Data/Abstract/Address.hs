@@ -56,7 +56,7 @@ instance Location (Located location) where
 --   This is isomorphic to 'Last' from Data.Monoid, but is more convenient
 --   because it has a 'Reducer' instance.
 newtype Latest value = Latest (Maybe value)
-  deriving (Eq, Foldable, Functor, Generic1, Lower, Ord, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Lower, Ord, Show, Traversable)
 
 unLatest :: Latest value -> Maybe value
 unLatest (Latest value) = value
@@ -72,7 +72,3 @@ instance Monoid (Latest value) where
 
 instance Reducer value (Latest value) where
   unit = Latest . Just
-
-instance Eq1   Latest where liftEq        = genericLiftEq
-instance Ord1  Latest where liftCompare   = genericLiftCompare
-instance Show1 Latest where liftShowsPrec = genericLiftShowsPrec
