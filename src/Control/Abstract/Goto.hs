@@ -9,12 +9,12 @@ module Control.Abstract.Goto
 ) where
 
 import           Control.Abstract.Evaluator
-import           Control.Monad.Effect (Eff, relayState)
+import           Control.Monad.Effect (Eff)
 import qualified Data.IntMap as IntMap
 import           Prelude hiding (fail)
 import           Prologue
 
-type GotoTable effects value = IntMap.IntMap (Eff effects value)
+type GotoTable inner value = IntMap.IntMap (Eff (Goto inner value ': inner) value)
 
 -- | The type of labels.
 --   TODO: This should be rolled into 'Name' and tracked in the environment, both so that we can abstract over labels like any other location, and so that we can garbage collect unreachable labels.
@@ -27,7 +27,7 @@ type Label = Int
 label :: Evaluator location value (Goto effects value ': effects) value -> Evaluator location value (Goto effects value ': effects) Label
 label = send . Label . lower
 
--- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated in e.g. a 'MonadAnalysis' instance).
+-- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated.
 goto :: Label -> Evaluator location value (Goto effects value ': effects) (Evaluator location value (Goto effects value ': effects) value)
 goto = fmap raise . send . Goto
 
@@ -45,7 +45,34 @@ data Goto effects value return where
   Label :: Eff (Goto effects value ': effects) value -> Goto effects value Label
   Goto  :: Label -> Goto effects value (Eff (Goto effects value ': effects) value)
 
-runGoto :: Member Fail effects => GotoTable (Goto effects value ': effects) value -> Evaluator location value (Goto effects value ': effects) a -> Evaluator location value effects (a, GotoTable (Goto effects value ': effects) value)
-runGoto initial = raiseHandler (relayState (IntMap.size initial, initial) (\ (_, table) a -> pure (a, table)) (\ (supremum, table) goto yield -> case goto of
-  Label action -> yield (succ supremum, IntMap.insert supremum action table) supremum
-  Goto label   -> maybe (fail ("unknown label: " <> show label)) (yield (supremum, table)) (IntMap.lookup label table)))
+-- | Run a 'Goto' effect in terms of a 'State' effect holding a 'GotoTable', accessed via wrap/unwrap functions.
+--
+--   The wrap/unwrap functions are necessary in order for ghc to be able to typecheck the table, since it necessarily contains references to its own effect list. Since @GotoTable (… ': State (GotoTable … value) ': …) value@ can’t be written, and a recursive type equality constraint won’t typecheck, callers will need to employ a @newtype@ to break the self-reference. The effect list of the table the @newtype@ contains will include all of the effects between the 'Goto' effect and the 'State' effect (including the 'State' but not the 'Goto'). E.g. if the 'State' is the next effect, a valid wrapper would be∷
+--
+--   @
+--   newtype Gotos effects value = Gotos { getGotos :: GotoTable (State (Gotos effects value) ': effects) value }
+--   @
+--
+--   Callers can then evaluate the high-level 'Goto' effect by passing @Gotos@ and @getGotos@ to 'runGoto'.
+runGoto :: Members '[ Fail
+                    , Fresh
+                    , State table
+                    ] effects
+        => (GotoTable effects value -> table)
+        -> (table -> GotoTable effects value)
+        -> Evaluator location value (Goto effects value ': effects) a
+        -> Evaluator location value effects a
+runGoto from to = runEffect (\ goto yield -> do
+  table <- to <$> getTable
+  case goto of
+    Label action -> do
+      supremum <- raise fresh
+      putTable (from (IntMap.insert supremum action table))
+      yield supremum
+    Goto label   -> maybe (raise (fail ("unknown label: " <> show label))) yield (IntMap.lookup label table))
+
+getTable :: Member (State table) effects => Evaluator location value effects table
+getTable = raise get
+
+putTable :: Member (State table) effects => table -> Evaluator location value effects ()
+putTable = raise . put

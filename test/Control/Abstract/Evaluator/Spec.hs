@@ -40,8 +40,11 @@ evaluate
   . runReturn
   . runLoopControl
   . fmap fst
-  . runGoto lowerBound
+  . runState (Gotos lowerBound)
+  . runGoto Gotos getGotos
   . constraining
+
+newtype Gotos effects = Gotos { getGotos :: GotoTable (State (Gotos effects) ': effects) (Value Precise) }
 
 constraining :: Evaluator Precise (Value Precise) effects a -> Evaluator Precise (Value Precise) effects a
 constraining = id
