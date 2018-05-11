@@ -12,6 +12,9 @@ import Data.List
 import Data.String
 import Prologue
 
+-- | Serialize a graph to DOT format.
+--
+--   This is modified from @algebraic-graphs@’ definition to avoid the need for 'Eq' constraints on @s@, thereby enabling us to efficiently construct bytestrings using Builders.
 serializeDOT :: (IsString s, Monoid s, Ord a, ToGraph g, ToVertex g ~ a) => Style a s -> g -> s
 serializeDOT Style {..} g = render $ header <> body <> "}\n"
   where
