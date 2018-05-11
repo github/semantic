@@ -1,5 +1,20 @@
 {-# LANGUAGE GADTs, TypeOperators #-}
-module Semantic.Graph where
+module Semantic.Graph
+( graph
+, GraphType(..)
+, Graph
+, Vertex
+, style
+, parsePackage
+, withTermSpans
+, resumingResolutionError
+, resumingLoadError
+, resumingEvalError
+, resumingUnspecialized
+, resumingAddressError
+, resumingValueError
+, resumingEnvironmentError
+) where
 
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph
