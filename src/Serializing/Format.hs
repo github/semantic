@@ -3,6 +3,7 @@ module Serializing.Format
 ( Format(..)
 , Builder
 , runSerialize
+, SomeFormat(..)
 ) where
 
 import Algebra.Graph.Class
@@ -25,3 +26,8 @@ runSerialize SExpression = serializeSExpression
 runSerialize Show        = stringUtf8 . show
 
 -- TODO: it would be kinda neat if we could use pretty-show/hscolour for Show output
+
+
+-- | Abstract over a 'Format'’s input type.
+data SomeFormat where
+  SomeFormat :: Format input -> SomeFormat
