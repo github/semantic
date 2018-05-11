@@ -86,14 +86,14 @@ testEvaluating
   . runAddressError
   . constrainedToValuePrecise
 
-deNamespace :: Value (Precise Latest) -> Maybe (Name, [Name])
-deNamespace = fmap (namespaceName &&& Env.names . namespaceScope) . prjValue @(Namespace (Precise Latest))
+deNamespace :: Value Precise -> Maybe (Name, [Name])
+deNamespace = fmap (namespaceName &&& Env.names . namespaceScope) . prjValue @(Namespace Precise)
 
-derefQName :: Heap (Cell (Precise Latest)) (Precise Latest) (Value (Precise Latest)) -> NonEmpty Name -> Environment (Precise Latest) (Value (Precise Latest)) -> Maybe (Value (Precise Latest))
+derefQName :: Heap (Cell Precise) Precise (Value Precise) -> NonEmpty Name -> Environment Precise (Value Precise) -> Maybe (Value Precise)
 derefQName heap = go
   where go (n1 :| ns) env = Env.lookup n1 env >>= flip heapLookup heap >>= unLatest >>= case ns of
           []        -> Just
-          (n2 : ns) -> fmap namespaceScope . prjValue @(Namespace (Precise Latest)) >=> go (n2 :| ns)
+          (n2 : ns) -> fmap namespaceScope . prjValue @(Namespace Precise) >=> go (n2 :| ns)
 
 newtype Verbatim = Verbatim ByteString
   deriving (Eq)

@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeFamilies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies #-}
 module Data.Abstract.Address where
 
 import Data.Abstract.FreeVariables
@@ -23,38 +23,30 @@ class Location location where
 
 
 -- | 'Precise' models precise store semantics where only the 'Latest' value is taken. Everything gets it's own address (always makes a new allocation) which makes for a larger store.
-data Precise cell where
-  Precise :: Int -> Precise Latest
+newtype Precise = Precise Int
+  deriving (Eq, Ord, Show)
 
-deriving instance Eq   (Precise cell)
-deriving instance Ord  (Precise cell)
-deriving instance Show (Precise cell)
-
-instance Location (Precise cell) where
-  type Cell (Precise cell) = cell
+instance Location Precise where
+  type Cell Precise = Latest
 
 
 -- | 'Monovariant' models using one address for a particular name. It trackes the set of values that a particular address takes and uses it's name to lookup in the store and only allocation if new.
-data Monovariant cell where
-  Monovariant :: Name -> Monovariant Set
+newtype Monovariant = Monovariant Name
+  deriving (Eq, Ord, Show)
 
-deriving instance Eq   (Monovariant cell)
-deriving instance Ord  (Monovariant cell)
-deriving instance Show (Monovariant cell)
-
-instance Location (Monovariant cell) where
-  type Cell (Monovariant cell) = cell
+instance Location Monovariant where
+  type Cell Monovariant = Set
 
 
-data Located location (cell :: * -> *) = Located
-  { location        :: location cell
+data Located location = Located
+  { location        :: location
   , locationPackage :: {-# UNPACK #-} !PackageInfo
   , locationModule  :: !ModuleInfo
   }
   deriving (Eq, Ord, Show)
 
-instance Location (Located location cell) where
-  type Cell (Located location cell) = Cell (location cell)
+instance Location (Located location) where
+  type Cell (Located location) = Cell location
 
 
 -- | A cell holding a single value. Writes will replace any prior value.

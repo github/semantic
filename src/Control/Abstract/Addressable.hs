@@ -72,12 +72,12 @@ variable :: ( Addressable location effects
          -> Evaluator location value effects value
 variable name = lookupEnv name >>= maybe (freeVariableError name) deref
 
-instance ( Addressable (location cell) effects
+instance ( Addressable location effects
          , Members '[ Reader ModuleInfo
                     , Reader PackageInfo
                     ] effects
          )
-      => Addressable (Located location cell) effects where
+      => Addressable (Located location) effects where
   derefCell (Address (Located loc _ _)) = raiseEff . lowerEff . derefCell (Address loc)
 
   allocLoc name = raiseEff (lowerEff (Located <$> allocLoc name <*> currentPackage <*> currentModule))
@@ -85,12 +85,12 @@ instance ( Addressable (location cell) effects
 -- Instances
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
-instance Member Fresh effects => Addressable (Precise Latest) effects where
-  derefCell (Address (Precise _)) = pure . unLatest
+instance Member Fresh effects => Addressable Precise effects where
+  derefCell _ = pure . unLatest
   allocLoc _ = Precise <$> fresh
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
-instance Members '[Fresh, NonDet] effects => Addressable (Monovariant Set) effects where
+instance Members '[Fresh, NonDet] effects => Addressable Monovariant effects where
   derefCell _ cell | null cell = pure Nothing
                    | otherwise = foldMapA (pure . Just) cell
   allocLoc = pure . Monovariant

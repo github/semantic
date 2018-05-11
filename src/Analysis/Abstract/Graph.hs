@@ -64,16 +64,16 @@ style = (defaultStyle vertexName)
 
 -- | Add vertices to the graph for evaluated identifiers.
 graphingTerms :: ( Element Syntax.Identifier syntax
-                 , Members '[ Reader (Environment (Located location cell) value)
+                 , Members '[ Reader (Environment (Located location) value)
                             , Reader ModuleInfo
                             , Reader PackageInfo
-                            , State (Environment (Located location cell) value)
+                            , State (Environment (Located location) value)
                             , State Graph
                             ] effects
                  , term ~ Term (Sum syntax) ann
                  )
-              => SubtermAlgebra (Base term) term (Evaluator (Located location cell) value effects a)
-              -> SubtermAlgebra (Base term) term (Evaluator (Located location cell) value effects a)
+              => SubtermAlgebra (Base term) term (Evaluator (Located location) value effects a)
+              -> SubtermAlgebra (Base term) term (Evaluator (Located location) value effects a)
 graphingTerms recur term@(In _ syntax) = do
   case projectSum syntax of
     Just (Syntax.Identifier name) -> do
@@ -138,12 +138,12 @@ moduleInclusion v = do
   appendGraph (moduleGraph m `connect` vertex v)
 
 -- | Add an edge from the passed variable name to the module it originated within.
-variableDefinition :: ( Member (Reader (Environment (Located location cell) value)) effects
-                      , Member (State (Environment (Located location cell) value)) effects
+variableDefinition :: ( Member (Reader (Environment (Located location) value)) effects
+                      , Member (State (Environment (Located location) value)) effects
                       , Member (State Graph) effects
                       )
                    => Name
-                   -> Evaluator (Located location cell) value effects ()
+                   -> Evaluator (Located location) value effects ()
 variableDefinition name = do
   graph <- maybe empty (moduleGraph . locationModule . unAddress) <$> lookupEnv name
   appendGraph (vertex (Variable (unName name)) `connect` graph)

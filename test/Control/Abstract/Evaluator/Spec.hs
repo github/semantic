@@ -44,9 +44,9 @@ evaluate
   . runGoto Gotos getGotos
   . constraining
 
-newtype Gotos effects = Gotos { getGotos :: GotoTable (State (Gotos effects) ': effects) (Value (Precise Latest)) }
+newtype Gotos effects = Gotos { getGotos :: GotoTable (State (Gotos effects) ': effects) (Value Precise) }
 
-constraining :: Evaluator (Precise Latest) (Value (Precise Latest)) effects a -> Evaluator (Precise Latest) (Value (Precise Latest)) effects a
+constraining :: Evaluator Precise (Value Precise) effects a -> Evaluator Precise (Value Precise) effects a
 constraining = id
 
 reassociate :: Either Prelude.String (Either (SomeExc exc1) (Either (SomeExc exc2) (Either (SomeExc exc3) result))) -> Either (SomeExc (Sum '[Const Prelude.String, exc1, exc2, exc3])) result
