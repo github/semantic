@@ -7,22 +7,23 @@ module Semantic.CLI
 ) where
 
 import           Data.File
-import           Data.Language
+import           Data.Language (Language)
 import           Data.List (intercalate)
 import           Data.List.Split (splitWhen)
 import           Data.Output
 import           Data.Version (showVersion)
 import           Development.GitRev
-import           Options.Applicative
+import           Options.Applicative hiding (style)
 import qualified Paths_semantic as Library (version)
 import           Prologue
 import           Rendering.Renderer
 import qualified Semantic.Diff as Semantic (diffBlobPairs)
-import           Semantic.Graph as Semantic (graph, GraphType(..))
+import           Semantic.Graph as Semantic (Graph, GraphType(..), Vertex, graph, style)
 import           Semantic.IO (languageForFilePath)
 import qualified Semantic.Log as Log
 import qualified Semantic.Parse as Semantic (parseBlobs, astParseBlobs)
 import qualified Semantic.Task as Task
+import           Serializing.Format
 import           System.IO (Handle, stdin, stdout)
 import           Text.Read
 
@@ -38,8 +39,8 @@ runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRendere
 runASTParse :: SomeRenderer TermRenderer -> Either Handle [File] -> Task.TaskEff ByteString
 runASTParse (SomeRenderer parseTreeRenderer) = Semantic.astParseBlobs parseTreeRenderer <=< Task.readBlobs
 
-runGraph :: Semantic.GraphType -> SomeRenderer GraphRenderer -> Maybe FilePath -> FilePath -> Language -> [FilePath] -> Task.TaskEff ByteString
-runGraph graphType (SomeRenderer r) rootDir dir excludeDirs = fmap toOutput . Semantic.graph graphType r <=< Task.readProject rootDir dir excludeDirs
+runGraph :: Semantic.GraphType -> Maybe FilePath -> FilePath -> Language -> [FilePath] -> Task.TaskEff (Graph Vertex)
+runGraph graphType rootDir dir excludeDirs = Semantic.graph graphType <=< Task.readProject rootDir dir excludeDirs
 
 -- | A parser for the application's command-line arguments.
 --
@@ -99,12 +100,12 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     graphArgumentsParser = do
       graphType <- flag ImportGraph ImportGraph (long "imports" <> help "Compute an import graph (default)")
                <|> flag'            CallGraph       (long "calls" <> help "Compute a call graph")
-      renderer <- flag (SomeRenderer DOTGraphRenderer) (SomeRenderer DOTGraphRenderer)  (long "dot" <> help "Output in DOT graph format (default)")
-              <|> flag'                                      (SomeRenderer JSONGraphRenderer) (long "json" <> help "Output JSON graph")
+      serializer <- flag (Task.serialize (DOT style)) (Task.serialize (DOT style)) (long "dot"  <> help "Output in DOT graph format (default)")
+                <|> flag'                             (Task.serialize JSON)        (long "json" <> help "Output JSON graph")
       rootDir <- rootDirectoryOption
       excludeDirs <- excludeDirsOption
       File{..} <- argument filePathReader (metavar "DIR:LANGUAGE | FILE")
-      pure $ runGraph graphType renderer rootDir filePath (fromJust fileLanguage) excludeDirs
+      pure $ runGraph graphType rootDir filePath (fromJust fileLanguage) excludeDirs >>= fmap toOutput . serializer
 
     rootDirectoryOption = optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
     excludeDirsOption = many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))

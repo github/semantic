@@ -33,28 +33,23 @@ import           Data.Semilattice.Lower
 import           Data.Term
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
-import           Rendering.Renderer
 import           Semantic.IO (Files)
 import           Semantic.Task as Task
-import           Serializing.Format
 
 data GraphType = ImportGraph | CallGraph
 
 graph :: Members '[Distribute WrappedTask, Files, Task, Exc SomeException, Telemetry, Trace] effs
       => GraphType
-      -> GraphRenderer output
       -> Project
-      -> Eff effs output
-graph graphType renderer project
+      -> Eff effs (Graph Vertex)
+graph graphType project
   | SomeAnalysisParser parser prelude <- someAnalysisParser
     (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
     package <- parsePackage parser prelude project
     let analyzeTerm = case graphType of
           ImportGraph -> id
           CallGraph   -> graphingTerms
-    analyze runGraphAnalysis (evaluatePackageWith graphingModules (withTermSpans . graphingLoadErrors . analyzeTerm) package) >>= extractGraph >>= case renderer of
-      JSONGraphRenderer -> serialize JSON
-      DOTGraphRenderer  -> serialize (DOT style)
+    analyze runGraphAnalysis (evaluatePackageWith graphingModules (withTermSpans . graphingLoadErrors . analyzeTerm) package) >>= extractGraph
     where extractGraph result = case result of
             (Right ((_, graph), _), _) -> pure graph
             _ -> Task.throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))
