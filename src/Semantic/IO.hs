@@ -19,6 +19,7 @@ module Semantic.IO
 , readBlobPairs
 , writeToOutput
 , Handle(..)
+, getHandle
 , IO.IOMode(..)
 , stdin
 , stdout
@@ -218,6 +219,10 @@ writeToOutput dest = send . Write dest
 data Handle mode where
   ReadHandle  :: IO.Handle -> Handle 'IO.ReadMode
   WriteHandle :: IO.Handle -> Handle 'IO.WriteMode
+
+getHandle :: Handle mode -> IO.Handle
+getHandle (ReadHandle  handle) = handle
+getHandle (WriteHandle handle) = handle
 
 stdin :: Handle 'IO.ReadMode
 stdin = ReadHandle IO.stdin
