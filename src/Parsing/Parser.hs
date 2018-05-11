@@ -3,6 +3,7 @@ module Parsing.Parser
 ( Parser(..)
 , SomeParser(..)
 , SomeTerm(..)
+, withSomeTerm
 , SomeAnalysisParser(..)
 , SomeASTParser(..)
 , someParser
@@ -154,6 +155,9 @@ markdownParser = AssignmentParser MarkdownParser Markdown.assignment
 
 data SomeTerm typeclasses ann where
   SomeTerm :: ApplyAll typeclasses syntax => Term syntax ann -> SomeTerm typeclasses ann
+
+withSomeTerm :: (forall syntax . ApplyAll typeclasses syntax => Term syntax ann -> a) -> SomeTerm typeclasses ann -> a
+withSomeTerm with (SomeTerm term) = with term
 
 
 -- | A parser for producing specialized (tree-sitter) ASTs.
