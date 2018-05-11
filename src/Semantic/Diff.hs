@@ -7,7 +7,6 @@ import Analysis.Declaration (HasDeclaration, declarationAlgebra)
 import Data.Blob
 import Data.Diff
 import Data.JSON.Fields
-import Data.Record
 import Data.Term
 import Diffing.Algorithm (Diffable)
 import Diffing.Interpreter
@@ -30,7 +29,7 @@ diffBlobPair renderer blobs
   = case renderer of
     ToCDiffRenderer         -> run (WrapTask . (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob)))                     diffTerms renderToCDiff
     JSONDiffRenderer        -> run (WrapTask . (          parse parser      >=> decorate constructorLabel >=> decorate identifierLabel)) diffTerms renderJSONDiff
-    SExpressionDiffRenderer -> run (WrapTask . (          parse parser      >=> decorate constructorLabel . (Nil <$)))                   diffTerms (const id)              >>= serialize SExpression
+    SExpressionDiffRenderer -> run (WrapTask . (          parse parser))                                                                 diffTerms (const id)              >>= serialize SExpression
     DOTDiffRenderer         -> run (WrapTask .            parse parser)                                                                  diffTerms (const renderTreeGraph) >>= serialize (DOT (diffStyle (pathKeyForBlobPair blobs)))
   | otherwise = noLanguageForBlob effectivePath
   where effectivePath = pathForBlobPair blobs
