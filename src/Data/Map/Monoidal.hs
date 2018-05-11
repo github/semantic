@@ -3,6 +3,7 @@
 module Data.Map.Monoidal
 ( Map
 , lookup
+, singleton
 , size
 , insert
 , filterWithKey
@@ -20,6 +21,10 @@ newtype Map key value = Map (Map.Map key value)
 
 unMap :: Map key value -> Map.Map key value
 unMap (Map map) = map
+
+
+singleton :: key -> value -> Map key value
+singleton k v = Map (Map.singleton k v)
 
 
 lookup :: Ord key => key -> Map key value -> Maybe value
