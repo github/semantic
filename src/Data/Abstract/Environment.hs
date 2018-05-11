@@ -37,12 +37,15 @@ import qualified Data.List.NonEmpty as NonEmpty
 -- | A LIFO stack of maps of names to addresses, representing a lexically-scoped evaluation environment.
 --   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
 --   scope for "a", then the next, and so on.
-newtype Environment location value = Environment { unEnvironment :: NonEmpty (Map.Map Name location) }
+newtype Environment location value = Environment (NonEmpty (Map.Map Name location))
   deriving (Eq, Ord, Show)
 
-instance Eq   location => Eq1   (Environment location) where liftEq          _ a b = unEnvironment a    ==     unEnvironment b
-instance Ord  location => Ord1  (Environment location) where liftCompare     _ a b = unEnvironment a `compare` unEnvironment b
-instance Show location => Show1 (Environment location) where liftShowsPrec _ _     = showsPrec
+unEnvironment :: Environment location value -> NonEmpty (Map.Map Name location)
+unEnvironment (Environment env) = env
+
+instance Eq   location => Eq1   (Environment location) where liftEq      _ (Environment a) (Environment b) = a == b
+instance Ord  location => Ord1  (Environment location) where liftCompare _ (Environment a) (Environment b) = a `compare` b
+instance Show location => Show1 (Environment location) where liftShowsPrec _ _ = showsPrec
 
 -- | The provided list will be put into an Environment with one member, so fromList is total
 --   (despite NonEmpty's instance being partial). Don't pass in multiple Addresses for the
@@ -106,7 +109,7 @@ insert name (Address value) (Environment (a :| as)) = Environment (Map.insert na
 -- | Remove a 'Name' from the environment.
 --
 -- >>> delete (name "foo") shadowed
--- Environment {unEnvironment = fromList [] :| []}
+-- Environment (fromList [] :| [])
 delete :: Name -> Environment location value -> Environment location value
 delete name = trim . Environment . fmap (Map.delete name) . unEnvironment
 
