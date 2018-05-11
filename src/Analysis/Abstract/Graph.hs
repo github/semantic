@@ -22,7 +22,6 @@ import           Control.Abstract
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable (LoadError (..))
 import           Data.Abstract.FreeVariables
-import           Data.Abstract.Located
 import           Data.Abstract.Module (Module(moduleInfo), ModuleInfo(..))
 import           Data.Abstract.Package (PackageInfo(..))
 import           Data.Aeson hiding (Result)

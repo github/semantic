@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Addressable where
 
+import Control.Abstract.Context
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
@@ -71,6 +72,15 @@ variable :: ( Addressable location effects
          -> Evaluator location value effects value
 variable name = lookupEnv name >>= maybe (freeVariableError name) deref
 
+instance ( Addressable (location cell) effects
+         , Members '[ Reader ModuleInfo
+                    , Reader PackageInfo
+                    ] effects
+         )
+      => Addressable (Located location cell) effects where
+  derefCell (Address (Located loc _ _)) = raiseEff . lowerEff . derefCell (Address loc)
+
+  allocLoc name = raiseEff (lowerEff (Located <$> allocLoc name <*> currentPackage <*> currentModule))
 
 -- Instances
 

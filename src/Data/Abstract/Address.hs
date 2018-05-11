@@ -2,6 +2,8 @@
 module Data.Abstract.Address where
 
 import Data.Abstract.FreeVariables
+import Data.Abstract.Module (ModuleInfo)
+import Data.Abstract.Package (PackageInfo)
 import Data.Semigroup.Reducer
 import Data.Semilattice.Lower
 import Prologue
@@ -42,6 +44,17 @@ deriving instance Show (Monovariant cell)
 
 instance Location (Monovariant cell) where
   type Cell (Monovariant cell) = cell
+
+
+data Located location (cell :: * -> *) = Located
+  { location        :: location cell
+  , locationPackage :: {-# UNPACK #-} !PackageInfo
+  , locationModule  :: !ModuleInfo
+  }
+  deriving (Eq, Ord, Show)
+
+instance Location (Located location cell) where
+  type Cell (Located location cell) = Cell (location cell)
 
 
 -- | A cell holding a single value. Writes will replace any prior value.
