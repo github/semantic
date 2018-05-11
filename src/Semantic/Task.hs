@@ -1,5 +1,4 @@
 {-# LANGUAGE ConstraintKinds, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Semantic.Task
 ( Task
 , TaskEff
@@ -48,10 +47,9 @@ import           Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
 import qualified Control.Abstract.Evaluator as Analysis
 import           Control.Monad
-import           Control.Monad.Effect as Eff hiding (run)
+import           Control.Monad.Effect
 import           Control.Monad.Effect.Exception
 import           Control.Monad.Effect.Reader
-import           Control.Monad.Effect.Run as Run
 import           Control.Monad.Effect.Trace
 import           Data.Blob
 import           Data.Diff
@@ -77,15 +75,10 @@ type TaskEff = Eff '[Distribute WrappedTask
                     , Task
                     , IO.Files
                     , Reader Options
+                    , Trace
                     , Telemetry
                     , Exc SomeException
-                    , Trace
                     , IO]
-
--- This orphan lets us use Run with Trace.
--- TODO: kill this once we nuke Run and/or fix Trace
-instance Run.Run '[Trace, IO] result (IO result) where
-  run = Eff.runM . Analysis.runPrintingTraces
 
 -- | A wrapper for a 'Task', to embed in other effects.
 newtype WrappedTask a = WrapTask { unwrapTask :: TaskEff a }
@@ -132,7 +125,7 @@ runTaskWithOptions options task = do
 
   (result, stat) <- withTiming "run" [] $ do
     let run :: TaskEff a -> IO (Either SomeException a)
-        run task = Run.run task (Action (run . unwrapTask)) options (Queues logger statter)
+        run = runM . runError . runTelemetry logger statter . runTraceInTelemetry . flip runReader options . IO.runFiles . runTaskF . runDistribute (run . unwrapTask)
     run task
   queue statter stat
 
@@ -140,6 +133,9 @@ runTaskWithOptions options task = do
   closeStatClient (asyncQueueExtra statter)
   closeQueue logger
   either (die . displayException) pure result
+
+runTraceInTelemetry :: Member Telemetry effects => Eff (Trace ': effects) a -> Eff effects a
+runTraceInTelemetry = interpret (\ (Trace str) -> writeLog Debug str [])
 
 
 -- | An effect describing high-level tasks to be performed.
@@ -205,7 +201,3 @@ runParser blob@Blob{..} parser = case parser of
         errors = cata $ \ (In a syntax) -> case syntax of
           _ | Just err@Syntax.Error{} <- projectSum syntax -> [Syntax.unError (getField a) err]
           _ -> fold syntax
-
-
-instance (Members '[Reader Options, Telemetry, Exc SomeException, Trace, IO] effects, Run effects result rest) => Run (Task ': effects) result rest where
-  run = run . runTaskF
