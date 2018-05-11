@@ -13,7 +13,6 @@ import Data.Aeson (ToJSON, toJSON, object, (.=))
 import Data.Aeson as A
 import Data.JSON.Fields
 import Data.Blob
-import qualified Data.Map as Map
 import Data.ByteString.Lazy (toStrict)
 import qualified Data.Map.Monoidal as Monoidal
 import Data.Output
@@ -32,22 +31,22 @@ instance Output JSONOutput where
 
 
 -- | Render a diff to a value representing its JSON.
-renderJSONDiff :: ToJSON a => BlobPair -> a -> [Value]
-renderJSONDiff blobs diff = pure $
-  toJSON (object [ "diff" .= diff, "stat" .= object (pathKey <> toJSONFields statPatch) ])
+renderJSONDiff :: ToJSON a => BlobPair -> a -> JSONOutput
+renderJSONDiff blobs diff = renderJSONDiffs
+  [ toJSON (object [ "diff" .= diff, "stat" .= object (pathKey <> toJSONFields statPatch) ]) ]
   where statPatch = these Delete Insert Replace (runJoin blobs)
         pathKey = [ "path" .= pathKeyForBlobPair blobs ]
 
-renderJSONDiffs :: [Value] -> Map.Map Text Value
-renderJSONDiffs = Map.singleton "diffs" . toJSON
+renderJSONDiffs :: [Value] -> JSONOutput
+renderJSONDiffs = toJSONOutput "diffs"
 
 
 -- | Render a term to a value representing its JSON.
-renderJSONTerm :: ToJSON a => Blob -> a -> [Value]
-renderJSONTerm blob content = pure $ toJSON (object ("programNode" .= content : toJSONFields blob))
+renderJSONTerm :: ToJSON a => Blob -> a -> JSONOutput
+renderJSONTerm blob content = renderJSONTerms [ toJSON (object ("programNode" .= content : toJSONFields blob)) ]
 
-renderJSONTerm' :: (ToJSON a) => Blob -> a -> [Value]
-renderJSONTerm' blob content = pure $ toJSON (object ("ast" .= content : toJSONFields blob))
+renderJSONTerm' :: ToJSON a => Blob -> a -> JSONOutput
+renderJSONTerm' blob content = renderJSONTerms [ toJSON (object ("ast" .= content : toJSONFields blob)) ]
 
-renderJSONTerms :: [Value] -> Map.Map Text Value
-renderJSONTerms = Map.singleton "trees" . toJSON
+renderJSONTerms :: [Value] -> JSONOutput
+renderJSONTerms = toJSONOutput "trees"

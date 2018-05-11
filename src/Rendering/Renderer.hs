@@ -39,7 +39,7 @@ data DiffRenderer output where
   -- | Compute a table of contents for the diff & encode it as JSON.
   ToCDiffRenderer :: DiffRenderer Summaries
   -- | Render to JSON with the format documented in docs/json-format.md
-  JSONDiffRenderer :: DiffRenderer [Value]
+  JSONDiffRenderer :: DiffRenderer JSONOutput
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
   SExpressionDiffRenderer :: DiffRenderer Builder
   -- | Render to a 'ByteString' formatted as a DOT description of the diff.
@@ -51,7 +51,7 @@ deriving instance Show (DiffRenderer output)
 -- | Specification of renderers for terms, producing output in the parameter type.
 data TermRenderer output where
   -- | Render to JSON with the format documented in docs/json-format.md under “Term.”
-  JSONTermRenderer :: TermRenderer [Value]
+  JSONTermRenderer :: TermRenderer JSONOutput
   -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer Builder
   -- | Render to a list of tags (deprecated).

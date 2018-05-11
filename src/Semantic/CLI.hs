@@ -31,13 +31,13 @@ main :: IO ()
 main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskWithOptions
 
 runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both File] -> Task.TaskEff ByteString
-runDiff (SomeRenderer diffRenderer) = Semantic.diffBlobPairs diffRenderer <=< Task.readBlobPairs
+runDiff (SomeRenderer diffRenderer) = fmap toOutput . Semantic.diffBlobPairs diffRenderer <=< Task.readBlobPairs
 
 runParse :: SomeRenderer TermRenderer -> Either Handle [File] -> Task.TaskEff ByteString
-runParse (SomeRenderer parseTreeRenderer) = Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
+runParse (SomeRenderer parseTreeRenderer) = fmap toOutput . Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
 
 runASTParse :: SomeRenderer TermRenderer -> Either Handle [File] -> Task.TaskEff ByteString
-runASTParse (SomeRenderer parseTreeRenderer) = Semantic.astParseBlobs parseTreeRenderer <=< Task.readBlobs
+runASTParse (SomeRenderer parseTreeRenderer) = fmap toOutput . Semantic.astParseBlobs parseTreeRenderer <=< Task.readBlobs
 
 runGraph :: Semantic.GraphType -> Maybe FilePath -> FilePath -> Language -> [FilePath] -> Task.TaskEff (Graph Vertex)
 runGraph graphType rootDir dir excludeDirs = Semantic.graph graphType <=< Task.readProject rootDir dir excludeDirs

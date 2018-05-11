@@ -7,7 +7,6 @@ import Analysis.Declaration (HasDeclaration, declarationAlgebra)
 import Analysis.PackageDef (HasPackageDef, packageDefAlgebra)
 import Data.Blob
 import Data.JSON.Fields
-import Data.Output
 import Parsing.Parser
 import Prologue hiding (MonadError(..))
 import Rendering.Graph
@@ -16,12 +15,8 @@ import Semantic.IO (NoLanguageForBlob(..), FormatNotSupported(..))
 import Semantic.Task
 import Serializing.Format
 
-parseBlobs :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Output output) => TermRenderer output -> [Blob] -> Eff effs ByteString
-parseBlobs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . parseBlob renderer) blobs
-  where toOutput' = case renderer of
-          JSONTermRenderer -> toOutput . renderJSONTerms
-          SymbolsTermRenderer _ -> toOutput . renderSymbolTerms
-          _ -> toOutput
+parseBlobs :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Monoid output) => TermRenderer output -> [Blob] -> Eff effs output
+parseBlobs renderer blobs = distributeFoldMap (WrapTask . parseBlob renderer) blobs
 
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
 parseBlob :: Members '[Task, Exc SomeException] effs => TermRenderer output -> Blob -> Eff effs output
@@ -37,13 +32,9 @@ parseBlob renderer blob@Blob{..}
   | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
 
 
-astParseBlobs :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Output output) => TermRenderer output -> [Blob] -> Eff effs ByteString
-astParseBlobs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . astParseBlob renderer) blobs
+astParseBlobs :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Monoid output) => TermRenderer output -> [Blob] -> Eff effs output
+astParseBlobs renderer blobs = distributeFoldMap (WrapTask . astParseBlob renderer) blobs
   where
-    toOutput' = case renderer of
-      JSONTermRenderer -> toOutput . renderJSONTerms
-      _ -> toOutput
-
     astParseBlob :: Members '[Task, Exc SomeException] effs => TermRenderer output -> Blob -> Eff effs output
     astParseBlob renderer blob@Blob{..}
       | Just (SomeASTParser parser) <- someASTParser <$> blobLanguage
