@@ -16,3 +16,5 @@ data Format input where
 runSerialize :: Format input -> input -> Builder
 runSerialize (DOT style) graph = serializeDOT style graph
 runSerialize Show        input = stringUtf8 (show input)
+
+-- TODO: it would be kinda neat if we could use pretty-show/hscolour for Show output
