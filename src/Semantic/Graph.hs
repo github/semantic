@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs, TypeOperators #-}
 module Semantic.Graph where
 
+import           Algebra.Graph.Export.Dot
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph
 import           Control.Monad.Effect.Trace
@@ -39,7 +40,7 @@ graph graphType renderer project
           CallGraph   -> graphingTerms
     analyze runGraphAnalysis (evaluatePackageWith graphingModules (withTermSpans . graphingLoadErrors . analyzeTerm) package) >>= extractGraph >>= case renderer of
       JSONGraphRenderer -> pure . toOutput
-      DOTGraphRenderer  -> pure . renderGraph
+      DOTGraphRenderer  -> pure . export style
     where extractGraph result = case result of
             (Right ((_, graph), _), _) -> pure graph
             _ -> Task.throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))

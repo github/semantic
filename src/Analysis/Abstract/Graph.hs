@@ -2,7 +2,7 @@
 module Analysis.Abstract.Graph
 ( Graph(..)
 , Vertex(..)
-, renderGraph
+, style
 , appendGraph
 , variableDefinition
 , moduleInclusion
@@ -37,10 +37,6 @@ data Vertex
   | Module   { vertexName :: ByteString }
   | Variable { vertexName :: ByteString }
   deriving (Eq, Ord, Show)
-
--- | Render a 'Graph' to a 'ByteString' in DOT notation.
-renderGraph :: Graph Vertex -> ByteString
-renderGraph = export style
 
 style :: Style Vertex ByteString
 style = (defaultStyle vertexName)
