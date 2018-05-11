@@ -1,6 +1,7 @@
 {-# LANGUAGE RankNTypes, ScopedTypeVariables #-}
 module Rendering.TOC
 ( renderToCDiff
+, renderRPCToCDiff
 , renderToCTerm
 , diffTOC
 , Summaries(..)
@@ -159,6 +160,9 @@ renderToCDiff blobs = uncurry Summaries . bimap toMap toMap . List.partition isV
   where toMap [] = mempty
         toMap as = Map.singleton summaryKey (toJSON <$> as)
         summaryKey = T.pack $ pathKeyForBlobPair blobs
+
+renderRPCToCDiff :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => BlobPair -> Diff f (Record fields) (Record fields) -> ([TOCSummary], [TOCSummary])
+renderRPCToCDiff blobs = List.partition isValidSummary . diffTOC
 
 diffTOC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Diff f (Record fields) (Record fields) -> [TOCSummary]
 diffTOC = mapMaybe entrySummary . dedupe . filter extraDeclarations . tableOfContentsBy declaration

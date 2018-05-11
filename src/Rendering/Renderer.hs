@@ -12,6 +12,7 @@ module Rendering.Renderer
 , renderJSONTerm
 , renderJSONTerm'
 , renderJSONTerms
+, renderRPCToCDiff
 , renderToCDiff
 , renderToCTerm
 , renderSymbolTerms
@@ -22,6 +23,7 @@ module Rendering.Renderer
 , renderDOTDiff
 , renderDOTTerm
 , Summaries(..)
+, TOCSummary(..)
 , SymbolFields(..)
 , defaultSymbolFields
 ) where
@@ -39,6 +41,7 @@ import Rendering.TOC as R
 -- | Specification of renderers for diffs, producing output in the parameter type.
 data DiffRenderer output where
   -- | Compute a table of contents for the diff & encode it as JSON.
+  RPCToCDiffRenderer :: DiffRenderer ([TOCSummary], [TOCSummary])
   ToCDiffRenderer :: DiffRenderer Summaries
   -- | Render to JSON with the format documented in docs/json-format.md
   JSONDiffRenderer :: DiffRenderer [Value]
