@@ -26,6 +26,7 @@ data Type
   | Type :-> Type       -- ^ Binary function types.
   | Var TName           -- ^ A type variable.
   | Type :* Type        -- ^ Binary products.
+  | Type :+ Type        -- ^ Binary sums.
   | Array Type          -- ^ Arrays.
   | Hash [(Type, Type)] -- ^ Heterogenous key-value maps.
   | Object              -- ^ Objects. Once we have some notion of inheritance we'll need to store a superclass.
@@ -33,6 +34,7 @@ data Type
   | Hole                -- ^ The hole type.
   deriving (Eq, Ord, Show)
 
+infixl 6 :+
 infixl 7 :*
 infixr 0 :->
 
