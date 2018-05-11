@@ -55,8 +55,11 @@ instance Location (Located location) where
 -- | A cell holding a single value. Writes will replace any prior value.
 --   This is isomorphic to 'Last' from Data.Monoid, but is more convenient
 --   because it has a 'Reducer' instance.
-newtype Latest value = Latest { unLatest :: Maybe value }
+newtype Latest value = Latest (Maybe value)
   deriving (Eq, Foldable, Functor, Generic1, Lower, Ord, Show, Traversable)
+
+unLatest :: Latest value -> Maybe value
+unLatest (Latest value) = value
 
 instance Semigroup (Latest value) where
   a <> Latest Nothing = a
