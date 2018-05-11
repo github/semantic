@@ -21,7 +21,7 @@ parseBlobs renderer blobs = distributeFoldMap (WrapTask . parseBlob renderer) bl
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
 parseBlob :: Members '[Task, Exc SomeException] effs => TermRenderer output -> Blob -> Eff effs output
 parseBlob renderer blob@Blob{..}
-  | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[ConstructorName, HasPackageDef, HasDeclaration, IdentifierName, Foldable, Functor, ToJSONFields1]) <$> blobLanguage
+  | Just (SomeParser parser) <- someParser @'[ConstructorName, HasPackageDef, HasDeclaration, IdentifierName, Foldable, Functor, ToJSONFields1] <$> blobLanguage
   = parse parser blob >>= case renderer of
     JSONTermRenderer           -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)
     SExpressionTermRenderer    ->                                                            serialize SExpression

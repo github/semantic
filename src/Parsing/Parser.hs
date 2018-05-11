@@ -1,4 +1,4 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE AllowAmbiguousTypes, ConstraintKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators #-}
 module Parsing.Parser
 ( Parser(..)
 , SomeParser(..)
@@ -116,18 +116,17 @@ someParser :: ( ApplyAll typeclasses (Sum Go.Syntax)
               , ApplyAll typeclasses (Sum TypeScript.Syntax)
               , ApplyAll typeclasses (Sum PHP.Syntax)
               )
-           => proxy typeclasses                        -- ^ A proxy for the list of typeclasses required, e.g. @(Proxy :: Proxy '[Show1])@.
-           -> Language                                 -- ^ The 'Language' to select.
+           => Language                                 -- ^ The 'Language' to select.
            -> SomeParser typeclasses (Record Location) -- ^ A 'SomeParser' abstracting the syntax type to be produced.
-someParser _ Go         = SomeParser goParser
-someParser _ JavaScript = SomeParser typescriptParser
-someParser _ JSON       = SomeParser jsonParser
-someParser _ JSX        = SomeParser typescriptParser
-someParser _ Markdown   = SomeParser markdownParser
-someParser _ Python     = SomeParser pythonParser
-someParser _ Ruby       = SomeParser rubyParser
-someParser _ TypeScript = SomeParser typescriptParser
-someParser _ PHP        = SomeParser phpParser
+someParser Go         = SomeParser goParser
+someParser JavaScript = SomeParser typescriptParser
+someParser JSON       = SomeParser jsonParser
+someParser JSX        = SomeParser typescriptParser
+someParser Markdown   = SomeParser markdownParser
+someParser Python     = SomeParser pythonParser
+someParser Ruby       = SomeParser rubyParser
+someParser TypeScript = SomeParser typescriptParser
+someParser PHP        = SomeParser phpParser
 
 
 goParser :: Parser Go.Term
