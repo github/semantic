@@ -22,6 +22,7 @@ module Semantic.Task
 , decorate
 , diff
 , render
+, serialize
 -- * Concurrency
 , distribute
 , distributeFor
@@ -52,6 +53,7 @@ import           Control.Monad.Effect.Exception
 import           Control.Monad.Effect.Reader
 import           Control.Monad.Effect.Trace
 import           Data.Blob
+import           Data.ByteString.Builder
 import           Data.Diff
 import qualified Data.Error as Error
 import           Data.Record
@@ -67,6 +69,7 @@ import           Semantic.Log
 import           Semantic.Queue
 import           Semantic.Stat as Stat
 import           Semantic.Telemetry
+import           Serializing.Format
 import           System.Exit (die)
 import           System.IO (stderr)
 
@@ -110,6 +113,9 @@ diff differ term1 term2 = send (Semantic.Task.Diff differ term1 term2)
 render :: Member Task effs => Renderer input output -> input -> Eff effs output
 render renderer = send . Render renderer
 
+serialize :: Member Task effs => Format input -> input -> Eff effs Builder
+serialize format = send . Serialize format
+
 -- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
 --
 -- > runTask = runTaskWithOptions defaultOptions
@@ -140,11 +146,12 @@ runTraceInTelemetry = interpret (\ (Trace str) -> writeLog Debug str [])
 
 -- | An effect describing high-level tasks to be performed.
 data Task output where
-  Parse    :: Parser term -> Blob -> Task term
-  Analyze  :: (Analysis.Evaluator location value effects a -> result) -> Analysis.Evaluator location value effects a -> Task result
-  Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
-  Diff     :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
-  Render   :: Renderer input output -> input -> Task output
+  Parse     :: Parser term -> Blob -> Task term
+  Analyze   :: (Analysis.Evaluator location value effects a -> result) -> Analysis.Evaluator location value effects a -> Task result
+  Decorate  :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
+  Diff      :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
+  Render    :: Renderer input output -> input -> Task output
+  Serialize :: Format input -> input -> Task Builder
 
 -- | Run a 'Task' effect by performing the actions in 'IO'.
 runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, Trace, IO] effs => Eff (Task ': effs) a -> Eff effs a
@@ -154,6 +161,7 @@ runTaskF = interpret $ \ task -> case task of
   Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
   Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
   Render renderer input -> pure (renderer input)
+  Serialize format input -> pure (runSerialize format input)
 
 
 -- | Log an 'Error.Error' at the specified 'Level'.
