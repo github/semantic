@@ -58,7 +58,7 @@ catchReturn :: Member (Return value) effects => Evaluator location value effects
 catchReturn action handler = interpose pure (\ ret _ -> handler ret) action
 
 runReturn :: Evaluator location value (Return value ': effects) value -> Evaluator location value effects value
-runReturn = interpret (\ (Return value) -> pure value)
+runReturn = relay pure (\ (Return value) _ -> pure value)
 
 
 -- | Effects for control flow around loops (breaking and continuing).
@@ -79,6 +79,6 @@ catchLoopControl :: Member (LoopControl value) effects => Evaluator location val
 catchLoopControl action handler = interpose pure (\ control _ -> handler control) action
 
 runLoopControl :: Evaluator location value (LoopControl value ': effects) value -> Evaluator location value effects value
-runLoopControl = interpret (\ eff -> case eff of
+runLoopControl = relay pure (\ eff _ -> case eff of
   Break    value -> pure value
   Continue value -> pure value)
