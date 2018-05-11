@@ -10,6 +10,7 @@ module Data.Map.Monoidal
 , module Reducer
 ) where
 
+import Data.Aeson (ToJSON)
 import qualified Data.Map as Map
 import Data.Semigroup.Reducer as Reducer
 import Data.Semilattice.Lower
@@ -17,7 +18,7 @@ import Prelude hiding (lookup)
 import Prologue hiding (Map)
 
 newtype Map key value = Map (Map.Map key value)
-  deriving (Eq, Eq1, Eq2, Foldable, Functor, Ord, Ord1, Ord2, Show, Show1, Show2, Traversable)
+  deriving (Eq, Eq1, Eq2, Foldable, Functor, Ord, Ord1, Ord2, Show, Show1, Show2, ToJSON, Traversable)
 
 unMap :: Map key value -> Map.Map key value
 unMap (Map map) = map
