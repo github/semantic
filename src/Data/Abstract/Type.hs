@@ -64,6 +64,7 @@ unify Null b = pure b
 -- FIXME: this should be constructing a substitution.
 unify (Var _) b = pure b
 unify a (Var _) = pure a
+unify (Array t1) (Array t2) = Array <$> unify t1 t2
 unify (Product as) (Product bs) = Product <$> sequenceA (alignWith (these pure pure unify) as bs)
 unify t1 t2
   | t1 == t2  = pure t2
