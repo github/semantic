@@ -8,7 +8,7 @@ import Prologue
 
 -- | An abstract address with a @location@ pointing to a variable of type @value@.
 newtype Address location value = Address { unAddress :: location }
-  deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
+  deriving (Eq, Generic1, Ord, Show)
 
 instance Eq   location => Eq1   (Address location) where liftEq        = genericLiftEq
 instance Ord  location => Ord1  (Address location) where liftCompare   = genericLiftCompare
