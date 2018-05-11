@@ -16,7 +16,7 @@ spec = parallel $ do
         _ -> False)
 
     it "renders with the specified renderer" $ do
-      output <- runTask $ parseBlob SExpressionTermRenderer methodsBlob
+      output <- fmap toOutput . runTask $ parseBlob SExpressionTermRenderer methodsBlob
       output `shouldBe` "(Program\n  (Method\n    (Empty)\n    (Identifier)\n    ([])))\n"
 
   describe "diffTermPair" $ do
