@@ -27,7 +27,7 @@ data Type
   | Type :-> Type       -- ^ Binary function types.
   | Var TName           -- ^ A type variable.
   | Product [Type]      -- ^ N-ary products.
-  | Array [Type]        -- ^ Arrays. Note that this is heterogenous.
+  | Array Type          -- ^ Arrays.
   | Hash [(Type, Type)] -- ^ Heterogenous key-value maps.
   | Object              -- ^ Objects. Once we have some notion of inheritance we'll need to store a superclass.
   | Null                -- ^ The null type. Unlike 'Unit', this unifies with any other type.
@@ -105,7 +105,9 @@ instance ( Addressable location effects
   symbol _   = pure Symbol
   rational _ = pure Rational
   multiple   = pure . Product
-  array      = pure . Array
+  array fields = do
+    var <- fresh
+    Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fields
   hash       = pure . Hash
   kvPair k v = pure (Product [k, v])
 
@@ -125,7 +127,7 @@ instance ( Addressable location effects
 
   isHole ty = pure (ty == Hole)
 
-  index (Array (mem:_)) Int   = pure mem
+  index (Array mem) Int   = pure mem
   index (Product (mem:_)) Int = pure mem
   index a b                   = throwResumable (SubscriptError a b)
 
