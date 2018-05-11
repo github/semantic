@@ -95,7 +95,7 @@ unpairs = fromList
 -- | Lookup a 'Name' in the environment.
 --
 -- >>> lookup (name "foo") shadowed
--- Just (Address {unAddress = Precise 1})
+-- Just (Address (Precise 1))
 lookup :: Name -> Environment location value -> Maybe (Address location value)
 lookup k = fmap Address . foldMapA (Map.lookup k) . unEnvironment
 
