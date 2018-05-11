@@ -85,7 +85,7 @@ mergeNewer (Environment a) (Environment b) =
 -- | Extract an association list of bindings from an 'Environment'.
 --
 -- >>> pairs shadowed
--- [(Name {unName = "foo"},Address {unAddress = Precise 1)]
+-- [(Name "foo",Address {unAddress = Precise 1)]
 pairs :: Environment location value -> [(Name, Address location value)]
 pairs = map (second Address) . Map.toList . fold . unEnvironment
 
