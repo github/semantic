@@ -17,7 +17,7 @@ module Semantic.IO
 , readProject
 , readBlobs
 , readBlobPairs
-, writeToOutput
+, write
 , Handle(..)
 , getHandle
 , IO.IOMode(..)
@@ -213,8 +213,8 @@ readProject :: Member Files effs => Maybe FilePath -> FilePath -> Language -> [F
 readProject rootDir dir excludeDirs = send . ReadProject rootDir dir excludeDirs
 
 -- | A task which writes a 'B.Builder' to a 'Handle' or a 'FilePath'.
-writeToOutput :: Member Files effs => Destination -> B.Builder -> Eff effs ()
-writeToOutput dest = send . Write dest
+write :: Member Files effs => Destination -> B.Builder -> Eff effs ()
+write dest = send . Write dest
 
 data Handle mode where
   ReadHandle  :: IO.Handle -> Handle 'IO.ReadMode

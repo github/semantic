@@ -11,7 +11,7 @@ module Semantic.Task
 , IO.readBlobs
 , IO.readBlobPairs
 , IO.readProject
-, IO.writeToOutput
+, IO.write
 -- * Telemetry
 , writeLog
 , writeStat

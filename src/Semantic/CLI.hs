@@ -63,7 +63,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     argumentsParser = do
       subparser <- hsubparser (diffCommand <> parseCommand <>  tsParseCommand <> graphCommand)
       output <- ToPath <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (ToHandle stdout)
-      pure $ subparser >>= Task.writeToOutput output
+      pure $ subparser >>= Task.write output
 
     diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute changes between paths"))
     diffArgumentsParser = do
