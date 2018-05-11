@@ -25,6 +25,9 @@ diffBlobPairs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . diffB
           JSONDiffRenderer -> toOutput . renderJSONDiffs
           _ -> toOutput
 
+diffBlobTOCPair :: Members '[Distribute WrappedTask, Task, Telemetry, Exc SomeException, IO] effs => BlobPair -> Eff effs Summaries
+diffBlobTOCPair = diffBlobPair ToCDiffRenderer
+
 -- | A task to parse a pair of 'Blob's, diff them, and render the 'Diff'.
 diffBlobPair :: Members '[Distribute WrappedTask, Task, Telemetry, Exc SomeException, IO] effs => DiffRenderer output -> BlobPair -> Eff effs output
 diffBlobPair renderer blobs
