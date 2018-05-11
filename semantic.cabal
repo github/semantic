@@ -153,6 +153,7 @@ library
                      , Semantic.Telemetry
                      , Semantic.Util
                      -- Serialization
+                     , Serializing.DOT
                      , Serializing.Format
                      -- Custom Prelude
   other-modules:       Prologue
