@@ -1,6 +1,7 @@
 {-# LANGUAGE GADTs #-}
 module Semantic.Parse where
 
+import Algebra.Graph.Export.Dot
 import Analysis.ConstructorName (ConstructorName, constructorLabel)
 import Analysis.IdentifierName (IdentifierName, identifierLabel)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
@@ -11,6 +12,7 @@ import Data.Output
 import Data.Record
 import Parsing.Parser
 import Prologue hiding (MonadError(..))
+import Rendering.Graph
 import Rendering.Renderer
 import Semantic.IO (NoLanguageForBlob(..), FormatNotSupported(..))
 import Semantic.Task
@@ -32,7 +34,7 @@ parseBlob renderer blob@Blob{..}
     TagsTermRenderer           -> decorate (declarationAlgebra blob)                     >=> render (renderToTags blob)
     ImportsTermRenderer        -> decorate (declarationAlgebra blob) >=> decorate (packageDefAlgebra blob) >=> render (renderToImports blob)
     SymbolsTermRenderer fields -> decorate (declarationAlgebra blob)                     >=> render (renderToSymbols fields blob)
-    DOTTermRenderer            ->                                                            render (renderDOTTerm blob)
+    DOTTermRenderer            ->                                                            render (export (termStyle blobPath) . renderTreeGraph)
   | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
 
 

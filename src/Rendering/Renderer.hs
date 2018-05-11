@@ -19,8 +19,7 @@ module Rendering.Renderer
 , ImportSummary(..)
 , renderToImports
 , renderToTags
-, renderDOTDiff
-, renderDOTTerm
+, renderTreeGraph
 , Summaries(..)
 , SymbolFields(..)
 , defaultSymbolFields

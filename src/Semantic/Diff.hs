@@ -1,7 +1,7 @@
 {-# LANGUAGE GADTs #-}
 module Semantic.Diff where
 
-import Prologue hiding (MonadError(..))
+import Algebra.Graph.Export.Dot
 import Analysis.ConstructorName (ConstructorName, constructorLabel)
 import Analysis.IdentifierName (IdentifierName, identifierLabel)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
@@ -14,6 +14,8 @@ import Data.Term
 import Diffing.Algorithm (Diffable)
 import Diffing.Interpreter
 import Parsing.Parser
+import Prologue hiding (MonadError(..))
+import Rendering.Graph
 import Rendering.Renderer
 import Semantic.IO (NoLanguageForBlob(..))
 import Semantic.Stat as Stat
@@ -33,7 +35,7 @@ diffBlobPair renderer blobs
     ToCDiffRenderer         -> run (WrapTask . (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob)))                     diffTerms renderToCDiff
     JSONDiffRenderer        -> run (WrapTask . (          parse parser      >=> decorate constructorLabel >=> decorate identifierLabel)) diffTerms renderJSONDiff
     SExpressionDiffRenderer -> run (WrapTask . (          parse parser      >=> decorate constructorLabel . (Nil <$)))                   diffTerms (const renderSExpressionDiff)
-    DOTDiffRenderer         -> run (WrapTask .            parse parser)                                                                  diffTerms renderDOTDiff
+    DOTDiffRenderer         -> run (WrapTask .            parse parser)                                                                  diffTerms (const (export (diffStyle (pathKeyForBlobPair blobs)) . renderTreeGraph))
   | otherwise = throwError (SomeException (NoLanguageForBlob effectivePath))
   where effectivePath = pathForBlobPair blobs
         effectiveLanguage = languageForBlobPair blobs

@@ -1,55 +1,71 @@
-{-# LANGUAGE MonoLocalBinds #-}
+{-# LANGUAGE FunctionalDependencies, MonoLocalBinds #-}
 module Rendering.Graph
-( renderDOTDiff
-, renderDOTTerm
+( renderTreeGraph
+, termStyle
+, diffStyle
+, ToTreeGraph(..)
 ) where
 
-import Prologue hiding (empty)
-import Algebra.Graph
 import Algebra.Graph.Export.Dot
 import Analysis.ConstructorName
-import Data.Blob
+import Control.Monad.Effect
+import Control.Monad.Effect.Fresh
+import Control.Monad.Effect.Reader
 import qualified Data.ByteString.Char8 as B
-import qualified Data.IntMap as IntMap
 import Data.Diff
+import Data.Graph
 import Data.Patch
+import Data.Semigroup.App
 import Data.Term
+import Prologue
 
-renderDOTDiff :: (ConstructorName syntax, Foldable syntax, Functor syntax) => BlobPair -> Diff syntax ann1 ann2 -> B.ByteString
-renderDOTDiff blobs diff = renderGraph (defaultStyleViaShow { graphName = B.pack (quote (pathKeyForBlobPair blobs)) }) (cata diffAlgebra diff 0 [])
+renderTreeGraph :: (Ord vertex, Recursive t, ToTreeGraph vertex (Base t)) => t -> Graph vertex
+renderTreeGraph = simplify . runGraph . cata toTreeGraph
+
+runGraph :: Eff '[Fresh, Reader (Graph vertex)] (Graph vertex) -> Graph vertex
+runGraph = run . runReader mempty . runFresh 0
+
+
+termAlgebra :: (ConstructorName syntax, Foldable syntax, Members '[Fresh, Reader (Graph (Vertex tag))] effs) => tag -> TermF syntax ann (Eff effs (Graph (Vertex tag))) -> Eff effs (Graph (Vertex tag))
+termAlgebra tag (In _ syntax) = do
+  i <- fresh
+  let root = vertex (Vertex i tag (constructorName syntax))
+  parent <- ask
+  (parent `connect` root <>) <$> local (const root) (runAppMerge (foldMap AppMerge syntax))
+
+
+style :: String -> (tag -> [Attribute ByteString]) -> Style (Vertex tag) ByteString
+style name tagAttributes = (defaultStyle (B.pack . show . vertexId))
+  { graphName = B.pack (quote name)
+  , vertexAttributes = vertexAttributes }
   where quote a = "\"" <> a <> "\""
+        vertexAttributes Vertex{..} = "label" := B.pack vertexName : tagAttributes vertexTag
 
-renderDOTTerm :: (ConstructorName syntax, Foldable syntax, Functor syntax) => Blob -> Term syntax ann -> B.ByteString
-renderDOTTerm Blob{..} term = renderGraph (defaultStyleViaShow { graphName = B.pack (quote blobPath) }) (cata termAlgebra term 0 [])
-  where quote a = "\"" <> a <> "\""
+termStyle :: String -> Style (Vertex ()) ByteString
+termStyle name = style name (const [])
 
-diffAlgebra :: (ConstructorName syntax, Foldable syntax) => DiffF syntax ann1 ann2 (Int -> [Attribute B.ByteString] -> State) -> Int -> [Attribute B.ByteString] -> State
-diffAlgebra d i as = case d of
-  Merge t               -> termAlgebra t  i as
-  Patch (Delete  t1)    -> termAlgebra t1 i ("color" := "red"   : as)
-  Patch (Insert     t2) -> termAlgebra t2 i ("color" := "green" : as)
-  Patch (Replace t1 t2) -> let r1 =  termAlgebra t1 i                         ("color" := "red"   : as)
-                           in  r1 <> termAlgebra t2 (maximum (stateGraph r1)) ("color" := "green" : as)
+diffStyle :: String -> Style (Vertex DiffTag) ByteString
+diffStyle name = style name diffTagAttributes
+  where diffTagAttributes Deleted  = ["color" := "red"]
+        diffTagAttributes Inserted = ["color" := "green"]
+        diffTagAttributes _        = []
 
-termAlgebra :: (ConstructorName syntax, Foldable syntax) => TermF syntax ann (Int -> [Attribute B.ByteString] -> State) -> Int -> [Attribute B.ByteString] -> State
-termAlgebra t i defaultAttrs = State
-  root
-  (root `connect` stateRoots combined `overlay` stateGraph combined)
-  (IntMap.insert (succ i) ("label" := unConstructorLabel (constructorLabel t) : defaultAttrs) (stateVertexAttributes combined))
-  where root = vertex (succ i)
-        combined = foldl' combine (State empty root mempty) t
-        combine prev makeSubgraph = prev <> makeSubgraph (maximum (stateGraph prev)) defaultAttrs
+data Vertex tag = Vertex { vertexId :: Int, vertexTag :: tag, vertexName :: String }
+  deriving (Eq, Ord, Show)
+
+data DiffTag = Deleted | Inserted | Merged
+  deriving (Eq, Ord, Show)
 
 
-data State = State { stateRoots :: Graph Int, stateGraph :: Graph Int, stateVertexAttributes :: IntMap.IntMap [Attribute B.ByteString] }
+class ToTreeGraph vertex t | t -> vertex where
+  toTreeGraph :: Members '[Fresh, Reader (Graph vertex)] effs => t (Eff effs (Graph vertex)) -> Eff effs (Graph vertex)
 
-instance Semigroup State where
-  State r1 g1 v1 <> State r2 g2 v2 = State (r1 `overlay` r2) (g1 `overlay` g2) (v1 <> v2)
+instance (ConstructorName syntax, Foldable syntax) => ToTreeGraph (Vertex ()) (TermF syntax ann) where
+  toTreeGraph = termAlgebra ()
 
-instance Monoid State where
-  mempty = State empty empty mempty
-  mappend = (<>)
-
-
-renderGraph :: Style Int B.ByteString -> State -> B.ByteString
-renderGraph style State{..} = export (style { vertexAttributes = flip (IntMap.findWithDefault []) stateVertexAttributes }) stateGraph
+instance (ConstructorName syntax, Foldable syntax) => ToTreeGraph (Vertex DiffTag) (DiffF syntax ann1 ann2) where
+  toTreeGraph d = case d of
+    Merge t               -> termAlgebra Merged t
+    Patch (Delete  t1)    ->          termAlgebra Deleted t1
+    Patch (Insert     t2) ->                                     termAlgebra Inserted t2
+    Patch (Replace t1 t2) -> (<>) <$> termAlgebra Deleted t1 <*> termAlgebra Inserted t2
