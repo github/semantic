@@ -2,6 +2,7 @@
 module Parsing.Parser
 ( Parser(..)
 , SomeParser(..)
+, SomeTerm(..)
 , SomeAnalysisParser(..)
 , SomeASTParser(..)
 , someParser
@@ -149,6 +150,10 @@ typescriptParser = AssignmentParser (ASTParser tree_sitter_typescript) TypeScrip
 
 markdownParser :: Parser Markdown.Term
 markdownParser = AssignmentParser MarkdownParser Markdown.assignment
+
+
+data SomeTerm typeclasses ann where
+  SomeTerm :: ApplyAll typeclasses syntax => Term syntax ann -> SomeTerm typeclasses ann
 
 
 -- | A parser for producing specialized (tree-sitter) ASTs.
