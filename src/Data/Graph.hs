@@ -1,6 +1,9 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, UndecidableInstances #-}
 module Data.Graph
 ( Graph(..)
+, Class.overlay
+, Class.connect
+, Class.vertex
 ) where
 
 import qualified Algebra.Graph as G
