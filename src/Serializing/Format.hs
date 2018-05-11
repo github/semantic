@@ -6,6 +6,7 @@ module Serializing.Format
 ) where
 
 import Algebra.Graph.Class
+import Data.Aeson (ToJSON(..), fromEncoding)
 import Data.ByteString.Builder
 import Prologue
 import Serializing.DOT
@@ -13,11 +14,13 @@ import Serializing.SExpression
 
 data Format input where
   DOT         :: (Ord vertex, ToGraph graph, ToVertex graph ~ vertex) => Style vertex Builder -> Format graph
+  JSON        :: ToJSON input                                                                 => Format input
   SExpression :: (Recursive input, ToSExpression (Base input))                                => Format input
   Show        :: Show input                                                                   => Format input
 
 runSerialize :: Format input -> input -> Builder
 runSerialize (DOT style) = serializeDOT style
+runSerialize JSON        = fromEncoding . toEncoding
 runSerialize SExpression = serializeSExpression
 runSerialize Show        = stringUtf8 . show
 
