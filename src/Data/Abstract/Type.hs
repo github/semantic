@@ -57,19 +57,15 @@ zeroOrMoreProduct = maybe Unit oneOrMoreProduct . nonEmpty
 -- TODO: À la carte representation of types.
 
 data TypeError resume where
-  NumOpError       :: Type -> Type -> TypeError Type
   UnificationError :: Type -> Type -> TypeError Type
 
 deriving instance Show (TypeError resume)
 
 instance Show1 TypeError where
-  liftShowsPrec _ _ _ (NumOpError l r)       = showString "NumOpError " . shows [l, r]
   liftShowsPrec _ _ _ (UnificationError l r) = showString "UnificationError " . shows [l, r]
 
 instance Eq1 TypeError where
-  liftEq eq (NumOpError a b) (NumOpError c d)             = a `eq` c && b `eq` d
   liftEq eq (UnificationError a b) (UnificationError c d) = a `eq` c && b `eq` d
-  liftEq _ _ _                                           = False
 
 runTypeError :: Evaluator location value (Resumable TypeError ': effects) a -> Evaluator location value effects (Either (SomeExc TypeError) a)
 runTypeError = runResumable
