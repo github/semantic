@@ -45,7 +45,7 @@ data DiffRenderer output where
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
   SExpressionDiffRenderer :: DiffRenderer ByteString
   -- | Render to a 'ByteString' formatted as a DOT description of the diff.
-  DOTDiffRenderer :: DiffRenderer ByteString
+  DOTDiffRenderer :: DiffRenderer Builder
 
 deriving instance Eq (DiffRenderer output)
 deriving instance Show (DiffRenderer output)

@@ -1,7 +1,6 @@
 {-# LANGUAGE GADTs #-}
 module Semantic.Diff where
 
-import Algebra.Graph.Export.Dot
 import Analysis.ConstructorName (ConstructorName, constructorLabel)
 import Analysis.IdentifierName (IdentifierName, identifierLabel)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
@@ -20,6 +19,7 @@ import Rendering.Renderer
 import Semantic.IO (NoLanguageForBlob(..))
 import Semantic.Stat as Stat
 import Semantic.Task as Task
+import Serializing.Format
 
 diffBlobPairs :: (Members '[Distribute WrappedTask, Task, Telemetry, Exc SomeException, IO] effs, Output output) => DiffRenderer output -> [BlobPair] -> Eff effs ByteString
 diffBlobPairs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . diffBlobPair renderer) blobs
@@ -35,7 +35,7 @@ diffBlobPair renderer blobs
     ToCDiffRenderer         -> run (WrapTask . (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob)))                     diffTerms renderToCDiff
     JSONDiffRenderer        -> run (WrapTask . (          parse parser      >=> decorate constructorLabel >=> decorate identifierLabel)) diffTerms renderJSONDiff
     SExpressionDiffRenderer -> run (WrapTask . (          parse parser      >=> decorate constructorLabel . (Nil <$)))                   diffTerms (const renderSExpressionDiff)
-    DOTDiffRenderer         -> run (WrapTask .            parse parser)                                                                  diffTerms (const (export (diffStyle (pathKeyForBlobPair blobs)) . renderTreeGraph))
+    DOTDiffRenderer         -> run (WrapTask .            parse parser)                                                                  diffTerms (const renderTreeGraph) >>= serialize (DOT (diffStyle (pathKeyForBlobPair blobs)))
   | otherwise = throwError (SomeException (NoLanguageForBlob effectivePath))
   where effectivePath = pathForBlobPair blobs
         effectiveLanguage = languageForBlobPair blobs
