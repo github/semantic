@@ -38,11 +38,11 @@ import qualified Data.List.NonEmpty as NonEmpty
 --   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
 --   scope for "a", then the next, and so on.
 newtype Environment location value = Environment { unEnvironment :: NonEmpty (Map.Map Name location) }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Generic1, Ord, Show)
 
-instance Eq   location => Eq1   (Environment location) where liftEq          _ a b = unEnvironment a    ==     unEnvironment b
-instance Ord  location => Ord1  (Environment location) where liftCompare     _ a b = unEnvironment a `compare` unEnvironment b
-instance Show location => Show1 (Environment location) where liftShowsPrec _ _     = showsPrec
+instance Eq   location => Eq1   (Environment location) where liftEq        = genericLiftEq
+instance Ord  location => Ord1  (Environment location) where liftCompare   = genericLiftCompare
+instance Show location => Show1 (Environment location) where liftShowsPrec = genericLiftShowsPrec
 
 -- | The provided list will be put into an Environment with one member, so fromList is total
 --   (despite NonEmpty's instance being partial). Don't pass in multiple Addresses for the
