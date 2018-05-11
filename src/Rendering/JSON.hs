@@ -1,18 +1,28 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Rendering.JSON
-( renderJSONDiff
+( JSONOutput(..)
+, toJSONOutput
+, renderJSONDiff
 , renderJSONDiffs
 , renderJSONTerm
 , renderJSONTerm'
 , renderJSONTerms
 ) where
 
-import Prologue
 import Data.Aeson (ToJSON, toJSON, object, (.=))
 import Data.Aeson as A
 import Data.JSON.Fields
 import Data.Blob
 import qualified Data.Map as Map
+import qualified Data.Map.Monoidal as Monoidal
 import Data.Patch
+import Prologue
+
+newtype JSONOutput = JSONOutput { unJSONOutput :: Monoidal.Map Text [Value] }
+  deriving (Eq, Monoid, Semigroup, Show, ToJSON)
+
+toJSONOutput :: Text -> [Value] -> JSONOutput
+toJSONOutput key = JSONOutput . Monoidal.singleton key
 
 
 -- | Render a diff to a value representing its JSON.
