@@ -8,11 +8,11 @@ import Prologue
 
 -- | An abstract address with a @location@ pointing to a variable of type @value@.
 newtype Address location value = Address { unAddress :: location }
-  deriving (Eq, Generic1, Ord, Show)
+  deriving (Eq, Ord, Show)
 
-instance Eq   location => Eq1   (Address location) where liftEq        = genericLiftEq
-instance Ord  location => Ord1  (Address location) where liftCompare   = genericLiftCompare
-instance Show location => Show1 (Address location) where liftShowsPrec = genericLiftShowsPrec
+instance Eq   location => Eq1   (Address location) where liftEq          _ a b = unAddress a    ==     unAddress b
+instance Ord  location => Ord1  (Address location) where liftCompare     _ a b = unAddress a `compare` unAddress b
+instance Show location => Show1 (Address location) where liftShowsPrec _ _     = showsPrec
 
 
 class Location location where
