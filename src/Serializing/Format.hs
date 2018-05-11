@@ -17,8 +17,8 @@ data Format input where
   Show        :: Show input                                                                   => Format input
 
 runSerialize :: Format input -> input -> Builder
-runSerialize (DOT style) graph = serializeDOT style graph
-runSerialize SExpression input = serializeSExpression input
-runSerialize Show        input = stringUtf8 (show input)
+runSerialize (DOT style) = serializeDOT style
+runSerialize SExpression = serializeSExpression
+runSerialize Show        = stringUtf8 . show
 
 -- TODO: it would be kinda neat if we could use pretty-show/hscolour for Show output
