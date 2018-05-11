@@ -7,7 +7,6 @@ import Analysis.Declaration (HasDeclaration, declarationAlgebra)
 import Data.Blob
 import Data.Diff
 import Data.JSON.Fields
-import Data.Output
 import Data.Record
 import Data.Term
 import Diffing.Algorithm (Diffable)
@@ -21,11 +20,8 @@ import Semantic.Stat as Stat
 import Semantic.Task as Task
 import Serializing.Format
 
-diffBlobPairs :: (Members '[Distribute WrappedTask, Task, Telemetry, Exc SomeException, IO] effs, Output output) => DiffRenderer output -> [BlobPair] -> Eff effs ByteString
-diffBlobPairs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . diffBlobPair renderer) blobs
-  where toOutput' = case renderer of
-          JSONDiffRenderer -> toOutput . renderJSONDiffs
-          _ -> toOutput
+diffBlobPairs :: (Members '[Distribute WrappedTask, Task, Telemetry, Exc SomeException, IO] effs, Monoid output) => DiffRenderer output -> [BlobPair] -> Eff effs output
+diffBlobPairs renderer blobs = distributeFoldMap (WrapTask . diffBlobPair renderer) blobs
 
 -- | A task to parse a pair of 'Blob's, diff them, and render the 'Diff'.
 diffBlobPair :: Members '[Distribute WrappedTask, Task, Telemetry, Exc SomeException, IO] effs => DiffRenderer output -> BlobPair -> Eff effs output

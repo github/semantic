@@ -68,31 +68,31 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute changes between paths"))
     diffArgumentsParser = do
       renderer <- flag  (SomeRenderer SExpressionDiffRenderer) (SomeRenderer SExpressionDiffRenderer) (long "sexpression" <> help "Output s-expression diff tree (default)")
-              <|> flag'                                        (SomeRenderer JSONDiffRenderer)        (long "json" <> help "Output JSON diff trees")
-              <|> flag'                                        (SomeRenderer ToCDiffRenderer)         (long "toc" <> help "Output JSON table of contents diff summary")
-              <|> flag'                                        (SomeRenderer DOTDiffRenderer)         (long "dot" <> help "Output the diff as a DOT graph")
+              <|> flag'                                        (SomeRenderer JSONDiffRenderer)        (long "json"        <> help "Output JSON diff trees")
+              <|> flag'                                        (SomeRenderer ToCDiffRenderer)         (long "toc"         <> help "Output JSON table of contents diff summary")
+              <|> flag'                                        (SomeRenderer DOTDiffRenderer)         (long "dot"         <> help "Output the diff as a DOT graph")
       filesOrStdin <- Right <$> some (both <$> argument filePathReader (metavar "FILE_A") <*> argument filePathReader (metavar "FILE_B")) <|> pure (Left stdin)
       pure $ runDiff renderer filesOrStdin
 
     parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
     parseArgumentsParser = do
       renderer <- flag  (SomeRenderer SExpressionTermRenderer) (SomeRenderer SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
-              <|> flag'                                        (SomeRenderer JSONTermRenderer)        (long "json" <> help "Output JSON parse trees")
-              <|> flag'                                        (SomeRenderer TagsTermRenderer)        (long "tags" <> help "Output JSON tags")
-              <|> flag'                                        (SomeRenderer . SymbolsTermRenderer)   (long "symbols" <> help "Output JSON symbol list")
+              <|> flag'                                        (SomeRenderer JSONTermRenderer)        (long "json"        <> help "Output JSON parse trees")
+              <|> flag'                                        (SomeRenderer TagsTermRenderer)        (long "tags"        <> help "Output JSON tags")
+              <|> flag'                                        (SomeRenderer . SymbolsTermRenderer)   (long "symbols"     <> help "Output JSON symbol list")
                    <*> (option symbolFieldsReader (  long "fields"
                                                  <> help "Comma delimited list of specific fields to return (symbols output only)."
                                                  <> metavar "FIELDS")
                   <|> pure defaultSymbolFields)
               <|> flag'                                        (SomeRenderer ImportsTermRenderer)     (long "import-graph" <> help "Output JSON import graph")
-              <|> flag'                                        (SomeRenderer DOTTermRenderer)         (long "dot" <> help "Output DOT graph parse trees")
+              <|> flag'                                        (SomeRenderer DOTTermRenderer)         (long "dot"          <> help "Output DOT graph parse trees")
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
       pure $ runParse renderer filesOrStdin
 
     tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Print specialized tree-sitter ASTs for path(s)"))
     tsParseArgumentsParser = do
       renderer <- flag  (SomeRenderer SExpressionTermRenderer) (SomeRenderer SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression ASTs (default)")
-              <|> flag'                                        (SomeRenderer JSONTermRenderer)        (long "json" <> help "Output JSON ASTs")
+              <|> flag'                                        (SomeRenderer JSONTermRenderer)        (long "json"        <> help "Output JSON ASTs")
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
       pure $ runASTParse renderer filesOrStdin
 
