@@ -20,24 +20,23 @@ import           Prologue
 import           Rendering.Renderer
 import qualified Semantic.Diff as Semantic (diffBlobPairs)
 import           Semantic.Graph as Semantic (Graph, GraphType(..), Vertex, graph, style)
-import           Semantic.IO (Destination(..), languageForFilePath)
+import           Semantic.IO as IO
 import qualified Semantic.Log as Log
 import qualified Semantic.Parse as Semantic (parseBlobs, astParseBlobs)
 import qualified Semantic.Task as Task
 import           Serializing.Format
-import           System.IO (Handle, stdin, stdout)
 import           Text.Read
 
 main :: IO ()
 main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskWithOptions
 
-runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both File] -> Task.TaskEff Builder
+runDiff :: SomeRenderer DiffRenderer -> Either (Handle 'IO.ReadMode) [Both File] -> Task.TaskEff Builder
 runDiff (SomeRenderer diffRenderer) = fmap toOutput . Semantic.diffBlobPairs diffRenderer <=< Task.readBlobPairs
 
-runParse :: SomeRenderer TermRenderer -> Either Handle [File] -> Task.TaskEff Builder
+runParse :: SomeRenderer TermRenderer -> Either (Handle 'IO.ReadMode) [File] -> Task.TaskEff Builder
 runParse (SomeRenderer parseTreeRenderer) = fmap toOutput . Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
 
-runASTParse :: SomeRenderer TermRenderer -> Either Handle [File] -> Task.TaskEff Builder
+runASTParse :: SomeRenderer TermRenderer -> Either (Handle 'IO.ReadMode) [File] -> Task.TaskEff Builder
 runASTParse (SomeRenderer parseTreeRenderer) = fmap toOutput . Semantic.astParseBlobs parseTreeRenderer <=< Task.readBlobs
 
 runGraph :: Semantic.GraphType -> Maybe FilePath -> FilePath -> Language -> [FilePath] -> Task.TaskEff (Graph Vertex)

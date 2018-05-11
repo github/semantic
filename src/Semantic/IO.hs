@@ -18,6 +18,12 @@ module Semantic.IO
 , readBlobs
 , readBlobPairs
 , writeToOutput
+, Handle
+, IO.IOMode(..)
+, stdin
+, stdout
+, stderr
+, Source(..)
 , Destination(..)
 , Files
 , runFiles
@@ -36,7 +42,7 @@ import qualified Data.ByteString as B
 import qualified Data.ByteString.Builder as B
 import qualified Data.ByteString.Lazy as BL
 import           Data.Language
-import           Data.Source
+import           Data.Source (fromBytes, fromText)
 import           Prelude hiding (readFile)
 import           Prologue hiding (MonadError (..), fail)
 import           System.Directory (doesDirectoryExist)
@@ -45,7 +51,7 @@ import           System.Directory.Tree (AnchoredDirTree(..))
 import           System.Exit
 import           System.FilePath
 import           System.FilePath.Glob
-import           System.IO (Handle, IOMode(..), withBinaryFile)
+import qualified System.IO as IO
 import           Text.Read
 
 -- | Read a utf8-encoded file to a 'Blob'.
@@ -73,7 +79,7 @@ languageForFilePath :: FilePath -> Maybe Language
 languageForFilePath = languageForType . takeExtension
 
 -- | Read JSON encoded blob pairs from a handle.
-readBlobPairsFromHandle :: MonadIO m => Handle -> m [Blob.BlobPair]
+readBlobPairsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [Blob.BlobPair]
 readBlobPairsFromHandle = fmap toBlobPairs . readFromHandle
   where
     toBlobPairs :: BlobDiff -> [Blob.BlobPair]
@@ -81,7 +87,7 @@ readBlobPairsFromHandle = fmap toBlobPairs . readFromHandle
     toBlobPair blobs = toBlob <$> blobs
 
 -- | Read JSON encoded blobs from a handle.
-readBlobsFromHandle :: MonadIO m => Handle -> m [Blob.Blob]
+readBlobsFromHandle :: MonadIO m => Handle 'IO.ReadMode -> m [Blob.Blob]
 readBlobsFromHandle = fmap toBlobs . readFromHandle
   where toBlobs BlobParse{..} = fmap toBlob blobs
 
@@ -137,8 +143,8 @@ readBlobsFromDir path = do
   blobs <- traverse readFile paths'
   pure (catMaybes blobs)
 
-readFromHandle :: (FromJSON a, MonadIO m) => Handle -> m a
-readFromHandle h = do
+readFromHandle :: (FromJSON a, MonadIO m) => Handle 'IO.ReadMode -> m a
+readFromHandle (ReadHandle h) = do
   input <- liftIO $ BL.hGetContents h
   case eitherDecode input of
     Left e  -> liftIO (die (e <> ". Invalid input on " <> show h <> ", expecting JSON"))
@@ -193,11 +199,11 @@ readBlob :: Member Files effs => File -> Eff effs Blob.Blob
 readBlob = send . ReadBlob
 
 -- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
-readBlobs :: Member Files effs => Either Handle [File] -> Eff effs [Blob.Blob]
+readBlobs :: Member Files effs => Either (Handle 'IO.ReadMode) [File] -> Eff effs [Blob.Blob]
 readBlobs = send . ReadBlobs
 
 -- | A task which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
-readBlobPairs :: Member Files effs => Either Handle [Both File] -> Eff effs [Blob.BlobPair]
+readBlobPairs :: Member Files effs => Either (Handle 'IO.ReadMode) [Both File] -> Eff effs [Blob.BlobPair]
 readBlobPairs = send . ReadBlobPairs
 
 readProject :: Member Files effs => Maybe FilePath -> FilePath -> Language -> [FilePath] -> Eff effs Project
@@ -207,13 +213,26 @@ readProject rootDir dir excludeDirs = send . ReadProject rootDir dir excludeDirs
 writeToOutput :: Member Files effs => Destination -> B.Builder -> Eff effs ()
 writeToOutput dest = send . WriteToOutput dest
 
-data Destination = ToPath FilePath | ToHandle Handle
+data Handle mode where
+  ReadHandle  :: IO.Handle -> Handle 'IO.ReadMode
+  WriteHandle :: IO.Handle -> Handle 'IO.WriteMode
+
+stdin :: Handle 'IO.ReadMode
+stdin = ReadHandle IO.stdin
+
+stdout :: Handle 'IO.WriteMode
+stdout = WriteHandle IO.stdout
+
+stderr :: Handle 'IO.WriteMode
+stderr = WriteHandle IO.stderr
+
+data Destination = ToPath FilePath | ToHandle (Handle 'IO.WriteMode)
 
 -- | An effect to read/write 'Blob.Blob's from 'Handle's or 'FilePath's.
 data Files out where
   ReadBlob      :: File -> Files Blob.Blob
-  ReadBlobs     :: Either Handle [File] -> Files [Blob.Blob]
-  ReadBlobPairs :: Either Handle [Both File] -> Files [Blob.BlobPair]
+  ReadBlobs     :: Either (Handle 'IO.ReadMode) [File] -> Files [Blob.Blob]
+  ReadBlobPairs :: Either (Handle 'IO.ReadMode) [Both File] -> Files [Blob.BlobPair]
   ReadProject   :: Maybe FilePath -> FilePath -> Language -> [FilePath] -> Files Project
   WriteToOutput :: Destination -> B.Builder -> Files ()
 
@@ -226,8 +245,8 @@ runFiles = interpret $ \ files -> case files of
   ReadBlobs (Right paths) -> rethrowing (readBlobsFromPaths paths)
   ReadBlobPairs source -> rethrowing (either readBlobPairsFromHandle (traverse (runBothWith readFilePair)) source)
   ReadProject rootDir dir language excludeDirs -> rethrowing (readProjectFromPaths rootDir dir language excludeDirs)
-  WriteToOutput (ToPath path)     builder -> liftIO (withBinaryFile path WriteMode (flip B.hPutBuilder builder))
-  WriteToOutput (ToHandle handle) builder -> liftIO (B.hPutBuilder handle builder)
+  WriteToOutput (ToPath path)                   builder -> liftIO (IO.withBinaryFile path IO.WriteMode (flip B.hPutBuilder builder))
+  WriteToOutput (ToHandle (WriteHandle handle)) builder -> liftIO (B.hPutBuilder handle builder)
 
 
 -- | Catch exceptions in 'IO' actions embedded in 'Eff', handling them with the passed function.
