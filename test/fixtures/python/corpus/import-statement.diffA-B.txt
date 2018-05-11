@@ -1,0 +1,14 @@
+(Program
+  (
+  {+(QualifiedImport)+}
+    (QualifiedImport)
+  {-(QualifiedAliasedImport
+    {-(Identifier)-})-})
+{+(QualifiedAliasedImport
+  {+(Identifier)+})+}
+{+(QualifiedImport)+}
+{-(
+  {-(QualifiedAliasedImport
+    {-(Identifier)-})-}
+  {-(QualifiedImport)-})-}
+{-(QualifiedImport)-})

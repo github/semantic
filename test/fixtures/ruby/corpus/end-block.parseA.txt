@@ -1,0 +1,4 @@
+(Program
+  (ScopeExit
+    (Send
+      (Identifier))))

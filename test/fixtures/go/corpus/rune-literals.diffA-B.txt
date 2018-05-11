@@ -1,0 +1,28 @@
+(Program
+  (Package
+    (Identifier))
+  (
+    (Assignment
+      (Identifier)
+    { (Rune)
+    ->(Rune) })
+    (Assignment
+      (Identifier)
+    { (Rune)
+    ->(Rune) })
+    (Assignment
+      (Identifier)
+    { (Rune)
+    ->(Rune) })
+    (Assignment
+      (Identifier)
+    { (Rune)
+    ->(Rune) })
+    (Assignment
+      (Identifier)
+    { (Rune)
+    ->(Rune) })
+    (Assignment
+      (Identifier)
+    { (Rune)
+    ->(Rune) })))

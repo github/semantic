@@ -1,0 +1,14 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (
+      (Assignment
+        (Identifier)
+        (Integer))
+      (Assignment
+        (Identifier)
+        (Integer)))))

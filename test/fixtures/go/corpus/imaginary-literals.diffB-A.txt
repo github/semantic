@@ -1,0 +1,16 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (
+      (Assignment
+        (Identifier)
+      { (Complex)
+      ->(Complex) })
+      (Assignment
+        (Identifier)
+      { (Complex)
+      ->(Complex) }))))

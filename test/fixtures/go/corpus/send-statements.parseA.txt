@@ -1,0 +1,10 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (Send
+      (Identifier)
+      (Integer))))

@@ -1,0 +1,23 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (Assignment
+      (Identifier)
+      (Reference
+        (Composite
+          (Identifier)
+          (
+            (KeyValue
+            { (Identifier)
+            ->(Identifier) }
+            { (Call
+              {-(Identifier)-}
+              {-(MemberAccess
+                {-(Identifier)-}
+                {-(Identifier)-})-}
+              {-(Empty)-})
+            ->(Identifier) })))))))

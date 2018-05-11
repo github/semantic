@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, DeriveAnyClass, RankNTypes, TupleSections, TypeOperators #-}
+{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
 module Language.Go.Assignment
 ( assignment
 , Syntax
@@ -6,11 +6,14 @@ module Language.Go.Assignment
 , Term
 ) where
 
-import Prologue
 import Assigning.Assignment hiding (Assignment, Error)
-import qualified Assigning.Assignment as Assignment
+import Data.Abstract.FreeVariables (name)
 import Data.Record
 import Data.Syntax (contextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
+import Language.Go.Grammar as Grammar
+import Language.Go.Syntax as Go.Syntax
+import Language.Go.Type as Go.Type
+import qualified Assigning.Assignment as Assignment
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
@@ -18,20 +21,16 @@ import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
+import Data.Sum
 import qualified Data.Term as Term
-import Language.Go.Grammar as Grammar
-import Language.Go.Syntax as Go.Syntax
-import Language.Go.Type as Go.Type
+import Prologue
 
 type Syntax =
   '[ Comment.Comment
    , Declaration.Constructor
    , Declaration.Function
-   , Declaration.Import
-   , Declaration.ImportSymbol
    , Declaration.Method
    , Declaration.MethodSignature
-   , Declaration.Module
    , Declaration.Type
    , Declaration.TypeAlias
    , Expression.Arithmetic
@@ -49,6 +48,7 @@ type Syntax =
    , Go.Syntax.Field
    , Go.Syntax.Go
    , Go.Syntax.Label
+   , Go.Syntax.Package
    , Go.Syntax.Receive
    , Go.Syntax.ReceiveOperator
    , Go.Syntax.Rune
@@ -63,6 +63,9 @@ type Syntax =
    , Go.Type.BidirectionalChannel
    , Go.Type.ReceiveChannel
    , Go.Type.SendChannel
+   , Go.Syntax.Import
+   , Go.Syntax.QualifiedImport
+   , Go.Syntax.SideEffectImport
    , Literal.Array
    , Literal.Complex
    , Literal.Float
@@ -99,7 +102,7 @@ type Syntax =
    , []
    ]
 
-type Term = Term.Term (Union Syntax) (Record Location)
+type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 
@@ -222,13 +225,13 @@ element :: Assignment
 element = symbol Element *> children expression
 
 fieldIdentifier :: Assignment
-fieldIdentifier = makeTerm <$> symbol FieldIdentifier <*> (Syntax.Identifier <$> source)
+fieldIdentifier = makeTerm <$> symbol FieldIdentifier <*> (Syntax.Identifier . name <$> source)
 
 floatLiteral :: Assignment
 floatLiteral = makeTerm <$> symbol FloatLiteral <*> (Literal.Float <$> source)
 
 identifier :: Assignment
-identifier =  makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax.Identifier <$> source)
+identifier =  makeTerm <$> (symbol Identifier <|> symbol Identifier') <*> (Syntax.Identifier . name <$> source)
 
 imaginaryLiteral :: Assignment
 imaginaryLiteral = makeTerm <$> symbol ImaginaryLiteral <*> (Literal.Complex <$> source)
@@ -243,7 +246,7 @@ literalValue :: Assignment
 literalValue = makeTerm <$> symbol LiteralValue <*> children (manyTerm expression)
 
 packageIdentifier :: Assignment
-packageIdentifier = makeTerm <$> symbol PackageIdentifier <*> (Syntax.Identifier <$> source)
+packageIdentifier = makeTerm <$> symbol PackageIdentifier <*> (Syntax.Identifier . name <$> source)
 
 parenthesizedType :: Assignment
 parenthesizedType = makeTerm <$> symbol Grammar.ParenthesizedType <*> children (Type.Parenthesized <$> expression)
@@ -255,7 +258,7 @@ runeLiteral :: Assignment
 runeLiteral = makeTerm <$> symbol Grammar.RuneLiteral <*> (Go.Syntax.Rune <$> source)
 
 typeIdentifier :: Assignment
-typeIdentifier = makeTerm <$> symbol TypeIdentifier <*> (Syntax.Identifier <$> source)
+typeIdentifier = makeTerm <$> symbol TypeIdentifier <*> (Syntax.Identifier . name <$> source)
 
 
 -- Primitive Types
@@ -266,13 +269,13 @@ arrayType = makeTerm <$> symbol ArrayType <*> children (Type.Array . Just <$> ex
 channelType :: Assignment
 channelType =  makeTerm' <$> symbol ChannelType <*> children (mkChannelType <$> optional (token AnonLAngleMinus) <* token AnonChan <*> optional (token AnonLAngleMinus) <*> expression)
   where
-    mkChannelType :: Maybe a -> Maybe a -> b -> Union Syntax b
-    mkChannelType receive send | Just _ <- receive = inj . Go.Type.ReceiveChannel
-                               | Just _ <- send    = inj . Go.Type.SendChannel
-                               | otherwise         = inj . Go.Type.BidirectionalChannel
+    mkChannelType :: Maybe a -> Maybe a -> b -> Sum Syntax b
+    mkChannelType receive send | Just _ <- receive = injectSum . Go.Type.ReceiveChannel
+                               | Just _ <- send    = injectSum . Go.Type.SendChannel
+                               | otherwise         = injectSum . Go.Type.BidirectionalChannel
 
 fieldDeclaration :: Assignment
-fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> (manyTermsTill expression (void (symbol TypeIdentifier)) <|> (manyTerm expression)) <*> optional expression <*> optional expression)
+fieldDeclaration =  mkFieldDeclarationWithTag <$> symbol FieldDeclaration <*> children ((,,) <$> (manyTermsTill expression (void (symbol TypeIdentifier)) <|> manyTerm expression) <*> optional expression <*> optional expression)
   where
     mkFieldDeclarationWithTag loc (fields, type', tag) | Just ty <- type', Just tag' <- tag = makeTerm loc (Go.Syntax.Field [ty, tag'] (makeTerm loc fields))
                                                        | Just ty <- type'                   = makeTerm loc (Go.Syntax.Field [ty] (makeTerm loc fields))
@@ -322,25 +325,25 @@ argumentList = (symbol ArgumentList <|> symbol ArgumentList') *> children expres
 
 binaryExpression :: Assignment
 binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression expression
-  [ (inj .) . Expression.Plus             <$ symbol AnonPlus
-  , (inj .) . Expression.Minus            <$ symbol AnonMinus
-  , (inj .) . Expression.Times            <$ symbol AnonStar
-  , (inj .) . Expression.DividedBy        <$ symbol AnonSlash
-  , (inj .) . Expression.Modulo           <$ symbol AnonPercent
-  , (inj .) . Expression.Or               <$ symbol AnonPipePipe
-  , (inj .) . Expression.And              <$ symbol AnonAmpersandAmpersand
-  , (inj .) . Expression.LessThan         <$ symbol AnonLAngle
-  , (inj .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
-  , (inj .) . Expression.GreaterThan      <$ symbol AnonRAngle
-  , (inj .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
-  , (inj .) . invert Expression.Equal     <$ symbol AnonBangEqual
-  , (inj .) . Expression.Equal            <$ symbol AnonEqualEqual
-  , (inj .) . Expression.BOr              <$ symbol AnonPipe
-  , (inj .) . Expression.BAnd             <$ symbol AnonAmpersand
-  , (inj .) . Expression.BAnd             <$ symbol AnonAmpersandCaret
-  , (inj .) . Expression.BXOr             <$ symbol AnonCaret
-  , (inj .) . Expression.LShift           <$ symbol AnonLAngleLAngle
-  , (inj .) . Expression.RShift           <$ symbol AnonRAngleRAngle
+  [ (injectSum .) . Expression.Plus             <$ symbol AnonPlus
+  , (injectSum .) . Expression.Minus            <$ symbol AnonMinus
+  , (injectSum .) . Expression.Times            <$ symbol AnonStar
+  , (injectSum .) . Expression.DividedBy        <$ symbol AnonSlash
+  , (injectSum .) . Expression.Modulo           <$ symbol AnonPercent
+  , (injectSum .) . Expression.Or               <$ symbol AnonPipePipe
+  , (injectSum .) . Expression.And              <$ symbol AnonAmpersandAmpersand
+  , (injectSum .) . Expression.LessThan         <$ symbol AnonLAngle
+  , (injectSum .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
+  , (injectSum .) . Expression.GreaterThan      <$ symbol AnonRAngle
+  , (injectSum .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
+  , (injectSum .) . invert Expression.Equal     <$ symbol AnonBangEqual
+  , (injectSum .) . Expression.Equal            <$ symbol AnonEqualEqual
+  , (injectSum .) . Expression.BOr              <$ symbol AnonPipe
+  , (injectSum .) . Expression.BAnd             <$ symbol AnonAmpersand
+  , (injectSum .) . Expression.BAnd             <$ symbol AnonAmpersandCaret
+  , (injectSum .) . Expression.BXOr             <$ symbol AnonCaret
+  , (injectSum .) . Expression.LShift           <$ symbol AnonLAngleLAngle
+  , (injectSum .) . Expression.RShift           <$ symbol AnonRAngleRAngle
   ])
   where
     invert cons a b = Expression.Not (makeTerm1 (cons a b))
@@ -370,7 +373,7 @@ expressionSwitchStatement :: Assignment
 expressionSwitchStatement = makeTerm <$> symbol ExpressionSwitchStatement <*> children (Statement.Match <$> (makeTerm <$> location <*> manyTermsTill expression (void (symbol ExpressionCaseClause)) <|> emptyTerm) <*> expressions)
 
 fallThroughStatement :: Assignment
-fallThroughStatement = makeTerm <$> symbol FallthroughStatement <*> (Statement.Pattern <$> (makeTerm <$> location <*> (Syntax.Identifier <$> source)) <*> emptyTerm)
+fallThroughStatement = makeTerm <$> symbol FallthroughStatement <*> (Statement.Pattern <$> (makeTerm <$> location <*> (Syntax.Identifier . name <$> source)) <*> emptyTerm)
 
 functionDeclaration :: Assignment
 functionDeclaration =  makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncLiteral) <*> children (mkFunctionDeclaration <$> (term identifier <|> emptyTerm) <*> manyTerm parameters <*> (term types <|> term identifier <|> term returnParameters <|> emptyTerm) <*> (term block <|> emptyTerm))
@@ -381,16 +384,29 @@ functionDeclaration =  makeTerm <$> (symbol FunctionDeclaration <|> symbol FuncL
 importDeclaration :: Assignment
 importDeclaration = makeTerm'' <$> symbol ImportDeclaration <*> children (manyTerm (importSpec <|> importSpecList))
   where
-    importSpec = makeTerm <$> symbol ImportSpec <*> children (namedImport <|> plainImport)
-    namedImport = flip Declaration.Import <$> expression <*> expression <*> pure []
-    plainImport = Declaration.Import <$> expression <*> emptyTerm <*> pure []
+    -- `import . "lib/Math"`
+    dotImport = injectSum <$> (flip Go.Syntax.Import <$> dot <*> importFromPath)
+    -- `import _ "lib/Math"`
+    sideEffectImport = injectSum <$> (flip Go.Syntax.SideEffectImport <$> underscore <*> importFromPath)
+    -- `import m "lib/Math"`
+    namedImport = injectSum <$> (flip Go.Syntax.QualifiedImport <$> packageIdentifier <*> importFromPath)
+    -- `import "lib/Math"`
+    plainImport = injectSum <$> (symbol InterpretedStringLiteral >>= \loc -> do
+      from <- importPath <$> source
+      let alias = makeTerm loc (Syntax.Identifier (defaultAlias from)) -- Go takes `import "lib/Math"` and uses `Math` as the qualified name (e.g. `Math.Sin()`)
+      Go.Syntax.QualifiedImport <$> pure from <*> pure alias)
+
+    dot = makeTerm <$> symbol Dot <*> (Literal.TextElement <$> source)
+    underscore = makeTerm <$> symbol BlankIdentifier <*> (Literal.TextElement <$> source)
+    importSpec     = makeTerm' <$> symbol ImportSpec <*> children (sideEffectImport <|> dotImport <|> namedImport <|> plainImport)
     importSpecList = makeTerm <$> symbol ImportSpecList <*> children (manyTerm (importSpec <|> comment))
+    importFromPath = symbol InterpretedStringLiteral *> (importPath <$> source)
 
 indexExpression :: Assignment
 indexExpression = makeTerm <$> symbol IndexExpression <*> children (Expression.Subscript <$> expression <*> manyTerm expression)
 
 methodDeclaration :: Assignment
-methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> term fieldIdentifier <*> manyTerm parameters <*> ((makeTerm <$> location <*> (manyTermsTill expression (void (symbol Block)))) <|> emptyTerm) <*> (term block <|> emptyTerm))
+methodDeclaration = makeTerm <$> symbol MethodDeclaration <*> children (mkTypedMethodDeclaration <$> receiver <*> term fieldIdentifier <*> manyTerm parameters <*> ((makeTerm <$> location <*> manyTermsTill expression (void (symbol Block))) <|> emptyTerm) <*> (term block <|> emptyTerm))
   where
     receiver = symbol ParameterList *> children ((symbol ParameterDeclaration *> children expressions) <|> expressions)
     mkTypedMethodDeclaration receiver' name' parameters' type'' body' = Declaration.Method [type''] receiver' name' parameters' body'
@@ -404,7 +420,7 @@ methodSpecList :: Assignment
 methodSpecList = symbol MethodSpecList *> children expressions
 
 packageClause :: Assignment
-packageClause = makeTerm <$> symbol PackageClause <*> children (Declaration.Module <$> expression <*> pure [])
+packageClause = makeTerm <$> symbol PackageClause <*> children (Go.Syntax.Package <$> expression <*> pure [])
 
 parameters :: Assignment
 parameters = symbol ParameterList *> children expressions
@@ -450,13 +466,13 @@ unaryExpression = makeTerm' <$> symbol UnaryExpression <*> (  notExpression
                                                           <|> unaryComplement
                                                           <|> unaryPlus )
   where
-    notExpression   = inj <$> (children (Expression.Not <$ symbol AnonBang <*> expression))
-    unaryAmpersand  = inj <$> (children (Literal.Reference <$ symbol AnonAmpersand <*> expression))
-    unaryComplement = inj <$> (children (Expression.Complement <$ symbol AnonCaret <*> expression))
-    unaryMinus      = inj <$> (children (Expression.Negate <$ symbol AnonMinus <*> expression))
-    unaryPlus       =          children (symbol AnonPlus *> (Term.termOut <$> expression))
-    unaryPointer    = inj <$> (children (Literal.Pointer <$ symbol AnonStar <*> expression))
-    unaryReceive    = inj <$> (children (Go.Syntax.ReceiveOperator <$ symbol AnonLAngleMinus <*> expression))
+    notExpression   = injectSum <$> children (Expression.Not <$ symbol AnonBang <*> expression)
+    unaryAmpersand  = injectSum <$> children (Literal.Reference <$ symbol AnonAmpersand <*> expression)
+    unaryComplement = injectSum <$> children (Expression.Complement <$ symbol AnonCaret <*> expression)
+    unaryMinus      = injectSum <$> children (Expression.Negate <$ symbol AnonMinus <*> expression)
+    unaryPlus       =         children (symbol AnonPlus *> (Term.termOut <$> expression))
+    unaryPointer    = injectSum <$> children (Literal.Pointer <$ symbol AnonStar <*> expression)
+    unaryReceive    = injectSum <$> children (Go.Syntax.ReceiveOperator <$ symbol AnonLAngleMinus <*> expression)
 
 varDeclaration :: Assignment
 varDeclaration = (symbol ConstDeclaration <|> symbol VarDeclaration) *> children expressions
@@ -470,7 +486,7 @@ variadicParameterDeclaration =  makeTerm <$> symbol VariadicParameterDeclaration
 varSpecification :: Assignment
 varSpecification = makeTerm <$> (symbol ConstSpec <|> symbol VarSpec) <*> children (Statement.Assignment <$> pure [] <*> (annotatedLHS <|> identifiers) <*> expressions)
     where
-      annotatedLHS = makeTerm <$> location <*> (Type.Annotation <$> (makeTerm <$> location <*> (manyTermsTill identifier (void (symbol TypeIdentifier)))) <*> expression)
+      annotatedLHS = makeTerm <$> location <*> (Type.Annotation <$> (makeTerm <$> location <*> manyTermsTill identifier (void (symbol TypeIdentifier))) <*> expression)
 
 
 -- Statements
@@ -491,10 +507,10 @@ assignment' =  makeTerm' <$> symbol AssignmentStatement <*> children (infixTerm 
                   , augmentedAssign (invert Expression.BAnd) <$ symbol AnonAmpersandCaretEqual
                   ])
   where
-    assign :: Term -> Term -> Union Syntax Term
-    assign l r = inj (Statement.Assignment [] l r)
+    assign :: Term -> Term -> Sum Syntax Term
+    assign l r = injectSum (Statement.Assignment [] l r)
 
-    augmentedAssign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
+    augmentedAssign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Sum Syntax Term
     augmentedAssign c l r = assign l (makeTerm1 (c l r))
 
     invert cons a b = Expression.Not (makeTerm1 (cons a b))
@@ -525,9 +541,9 @@ emptyStatement = makeTerm <$> token EmptyStatement <*> (Statement.NoOp <$> empty
 forStatement :: Assignment
 forStatement =  makeTerm' <$> symbol ForStatement <*> children (forClause <|> forSimpleClause <|> rangeClause)
   where
-    forClause = inj <$> (symbol ForClause *> children (Statement.For <$> (expression <|> emptyTerm) <*> (expression <|> emptyTerm) <*> (expression <|> emptyTerm)) <*> expression)
-    forSimpleClause = inj <$> (Statement.For <$> emptyTerm <*> (expression <|> emptyTerm) <*> emptyTerm <*> expression)
-    rangeClause = inj <$> (symbol RangeClause *> children (Statement.ForEach <$> (expression <|> emptyTerm) <*> expression) <*> expression)
+    forClause = injectSum <$> (symbol ForClause *> children (Statement.For <$> (expression <|> emptyTerm) <*> (expression <|> emptyTerm) <*> (expression <|> emptyTerm)) <*> expression)
+    forSimpleClause = injectSum <$> (Statement.For <$> emptyTerm <*> (expression <|> emptyTerm) <*> emptyTerm <*> expression)
+    rangeClause = injectSum <$> (symbol RangeClause *> children (Statement.ForEach <$> (expression <|> emptyTerm) <*> expression) <*> expression)
 
 goStatement :: Assignment
 goStatement = makeTerm <$> symbol GoStatement <*> children (Go.Syntax.Go <$> expression)
@@ -548,7 +564,7 @@ keyedElement :: Assignment
 keyedElement = makeTerm <$> symbol KeyedElement <*> children (Literal.KeyValue <$> expression <*> expression)
 
 labelName :: Assignment
-labelName = makeTerm <$> symbol LabelName <*> (Syntax.Identifier <$> source)
+labelName = makeTerm <$> symbol LabelName <*> (Syntax.Identifier . name <$> source)
 
 labeledStatement :: Assignment
 labeledStatement = makeTerm <$> (symbol LabeledStatement <|> symbol LabeledStatement') <*> children (Go.Syntax.Label <$> expression <*> (expression <|> emptyTerm))
@@ -574,13 +590,12 @@ sendStatement = makeTerm <$> symbol SendStatement <*> children (Go.Syntax.Send <
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: Assignment
           -> Assignment
-          -> [Assignment.Assignment [] Grammar (Term -> Term -> Union Syntax Term)]
-          -> Assignment.Assignment [] Grammar (Union Syntax Term)
+          -> [Assignment.Assignment [] Grammar (Term -> Term -> Sum Syntax Term)]
+          -> Assignment.Assignment [] Grammar (Sum Syntax Term)
 infixTerm = infixContext comment
 
 -- | Match a series of terms or comments until a delimiter is matched
-manyTermsTill :: Show b
-              => Assignment.Assignment [] Grammar Term
+manyTermsTill :: Assignment.Assignment [] Grammar Term
               -> Assignment.Assignment [] Grammar b
               -> Assignment.Assignment [] Grammar [Term]
 manyTermsTill step end = manyTill (step <|> comment) end
@@ -592,3 +607,5 @@ manyTerm = many . term
 -- | Match a term and contextualize any comments preceeding or proceeding the term.
 term :: Assignment -> Assignment
 term term' = contextualize comment term' <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
+
+{-# ANN module ("HLint: ignore Eta reduce" :: String) #-}

@@ -1,0 +1,10 @@
+(Program
+  (
+    (QualifiedImport)
+    (QualifiedAliasedImport
+      (Identifier)))
+  (
+    (QualifiedAliasedImport
+      (Identifier))
+    (QualifiedImport))
+  (QualifiedImport))

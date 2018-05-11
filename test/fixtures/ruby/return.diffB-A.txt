@@ -1,4 +1,0 @@
-(Program
-  (Return
-  { (Empty)
-  ->(Identifier) }))

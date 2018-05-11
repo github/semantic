@@ -1,91 +1,41 @@
-{-# LANGUAGE ConstraintKinds, DataKinds, ScopedTypeVariables, TypeApplications, TypeFamilies, TypeOperators, MultiParamTypeClasses #-}
-module Analysis.Abstract.Evaluating where
+{-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+module Analysis.Abstract.Evaluating
+( EvaluatingState(..)
+, evaluating
+) where
 
-import Prologue
-import Control.Effect
-import Control.Monad.Effect (Eff, Members)
-import Control.Monad.Effect.Embedded
-import Control.Monad.Effect.Evaluatable
-import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.State
-import Data.Abstract.Linker
-import Data.Abstract.Store
-import Data.Abstract.Value
-import Data.Abstract.FreeVariables
-import Data.Algebra
-import Data.Blob
-import Prelude hiding (fail)
-import qualified Data.Map as Map
-import System.FilePath.Posix
+import Control.Abstract
+import Data.Semilattice.Lower
 
-import qualified Data.ByteString.Char8 as BC
+-- | An analysis evaluating @term@s to @value@s with a list of @effects@ using 'Evaluatable', and producing incremental results of type @a@.
+data EvaluatingState location value = EvaluatingState
+  { environment :: Environment location value
+  , heap        :: Heap location (Cell location) value
+  , modules     :: ModuleTable (Maybe (Environment location value, value))
+  , exports     :: Exports location value
+  }
 
--- | The effects necessary for concrete interpretation.
-type Evaluating v
-  = '[ Fail
-     , State (Store (LocationFor v) v)
-     , State (EnvironmentFor v)      -- Global (imperative) environment
-     , Reader (EnvironmentFor v)     -- Local environment (e.g. binding over a closure)
-     , Reader (Linker (Evaluator v)) -- Linker effects
-     , State (Linker v)              -- Cache of evaluated modules
-     ]
-
-newtype Evaluator v = Evaluator { runEvaluator :: Eff (Evaluating v) v }
-
--- | Require/import another term/file and return an Effect.
---
--- Looks up the term's name in the cache of evaluated modules first, returns a value if found, otherwise loads/evaluates the module.
-require :: forall v term es.
-        ( Members (Evaluating v) es
-        , FreeVariables term
-        )
-        => term -> Eff es v
-require term = get @(Linker v) >>= maybe (load term) pure . linkerLookup name
-  where name = moduleName term
-
--- | Load another term/file and return an Effect.
---
--- Always loads/evaluates.
-load :: forall v term es.
-        ( Members (Evaluating v) es
-        , FreeVariables term
-        )
-        => term -> Eff es v
-load term = ask @(Linker (Evaluator v)) >>= maybe notFound evalAndCache . linkerLookup name
-  where name = moduleName term
-        notFound = fail ("cannot find " <> show name)
-        evalAndCache e = do
-          v <- raiseEmbedded (runEvaluator e)
-          modify @(Linker v) (linkerInsert name v)
-          pure v
-
--- | Get a module name from a term (expects single free variables).
-moduleName :: FreeVariables term => term -> Prelude.String
-moduleName term = let [n] = toList (freeVariables term) in BC.unpack n
+deriving instance (Eq (Cell location value), Eq location, Eq value) => Eq (EvaluatingState location value)
+deriving instance (Ord (Cell location value), Ord location, Ord value) => Ord (EvaluatingState location value)
+deriving instance (Show (Cell location value), Show location, Show value) => Show (EvaluatingState location value)
 
 
--- | Evaluate a term to a value.
-evaluate :: forall v term.
-         ( Ord v
-         , Ord (LocationFor v)
-         , Evaluatable (Evaluating v) term v (Base term)
-         , Recursive term
-         )
-         => term
-         -> Final (Evaluating v) v
-evaluate = run @(Evaluating v) . foldSubterms eval
-
--- | Evaluate terms and an entry point to a value.
-evaluates :: forall v term.
-          ( Ord v
-          , Ord (LocationFor v)
-          , Evaluatable (Evaluating v) term v (Base term)
-          , Recursive term
-          )
-          => [(Blob, term)] -- List of (blob, term) pairs that make up the program to be evaluated
-          -> (Blob, term)   -- Entrypoint
-          -> Final (Evaluating v) v
-evaluates pairs (Blob{..}, t) = run @(Evaluating v) (local @(Linker (Evaluator v)) (const (Linker (Map.fromList (map toPathActionPair pairs)))) (foldSubterms eval t))
-  where
-    toPathActionPair (Blob{..}, t) = (dropExtensions blobPath, Evaluator (foldSubterms eval t))
+evaluating :: Evaluator location value
+                (  Fail
+                ': Fresh
+                ': Reader (Environment location value)
+                ': State (Environment location value)
+                ': State (Heap location (Cell location) value)
+                ': State (ModuleTable (Maybe (Environment location value, value)))
+                ': State (Exports location value)
+                ': effects) result
+           -> Evaluator location value effects (Either String result, EvaluatingState location value)
+evaluating
+  = fmap (\ ((((result, env), heap), modules), exports) -> (result, EvaluatingState env heap modules exports))
+  . runState lowerBound -- State (Exports location value)
+  . runState lowerBound -- State (ModuleTable (Maybe (Environment location value, value)))
+  . runState lowerBound -- State (Heap location (Cell location) value)
+  . runState lowerBound -- State (Environment location value)
+  . runReader lowerBound -- Reader (Environment location value)
+  . runFresh 0
+  . runFail

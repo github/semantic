@@ -1,0 +1,11 @@
+(Program
+  (LessThanEqual
+    (Send
+      (Identifier))
+    (Send
+      (Identifier)))
+  (GreaterThanEqual
+    (Send
+      (Identifier))
+    (Send
+      (Identifier))))

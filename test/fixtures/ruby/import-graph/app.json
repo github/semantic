@@ -48,7 +48,8 @@
             ]
           },
           "kind": "Method",
-          "name": "foo"
+          "name": "foo",
+          "module": "app"
         }
       ],
       "paths": [

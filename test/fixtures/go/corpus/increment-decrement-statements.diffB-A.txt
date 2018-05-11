@@ -1,0 +1,15 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (
+      (PostIncrement
+      { (Identifier)
+      ->(Identifier) })
+    {+(PostDecrement
+      {+(Identifier)+})+}
+    {-(PostIncrement
+      {-(Identifier)-})-})))

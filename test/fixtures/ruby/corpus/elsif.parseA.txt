@@ -1,0 +1,12 @@
+(Program
+  (If
+    (Send
+      (Identifier))
+    (
+      (Send
+        (Identifier)))
+    (If
+      (Send
+        (Identifier))
+      ([])
+      (Empty))))

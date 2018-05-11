@@ -1,0 +1,23 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (
+    {+(Assignment
+      {+(Identifier)+}
+      {+(Identifier)+})+}
+      (Assignment
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->([]) })
+      (Assignment
+      { (Identifier)
+      ->(Identifier) }
+        ([]))
+    {-(Assignment
+      {-(Identifier)-}
+      {-([])-})-})))

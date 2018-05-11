@@ -1,7 +1,0 @@
-(Program
-  (Try
-    (
-      (Identifier)
-      (Finally
-      { ([])
-      ->(Identifier) }))))

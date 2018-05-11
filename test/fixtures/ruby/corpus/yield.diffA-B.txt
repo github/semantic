@@ -1,0 +1,5 @@
+(Program
+  (Yield
+  { (Send
+    {-(Identifier)-})
+  ->(Empty) }))

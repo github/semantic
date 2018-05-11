@@ -6,36 +6,39 @@ module Language.Ruby.Assignment
 , Term
 ) where
 
-import Prologue hiding (for)
 import Assigning.Assignment hiding (Assignment, Error)
-import Data.Record
 import Data.List (elem)
+import Data.Record
 import Data.Syntax (contextualize, postContextualize, emptyTerm, parseError, handleError, infixContext, makeTerm, makeTerm', makeTerm'', makeTerm1)
+import Language.Ruby.Grammar as Grammar
+import Data.Abstract.FreeVariables (name)
 import qualified Assigning.Assignment as Assignment
+import Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Comment as Comment
 import qualified Data.Syntax.Declaration as Declaration
+import qualified Data.Syntax.Directive as Directive
 import qualified Data.Syntax.Expression as Expression
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Term as Term
-import Language.Ruby.Grammar as Grammar
+import qualified Language.Ruby.Syntax as Ruby.Syntax
+import Prologue hiding (for)
 
 -- | The type of Ruby syntax.
 type Syntax = '[
     Comment.Comment
-  , Declaration.Class
   , Declaration.Function
-  , Declaration.Import
-  , Declaration.ImportSymbol
   , Declaration.Method
-  , Declaration.Module
+  , Directive.File
+  , Directive.Line
   , Expression.Arithmetic
   , Expression.Bitwise
   , Expression.Boolean
   , Expression.Call
   , Expression.Comparison
   , Expression.Enumeration
+  , Expression.Match
   , Expression.MemberAccess
   , Expression.ScopeResolution
   , Expression.Subscript
@@ -74,11 +77,18 @@ type Syntax = '[
   , Syntax.Error
   , Syntax.Identifier
   , Syntax.Program
+  , Ruby.Syntax.Class
+  , Ruby.Syntax.Load
+  , Ruby.Syntax.LowPrecedenceBoolean
+  , Ruby.Syntax.Module
+  , Ruby.Syntax.Require
+  , Ruby.Syntax.Send
   , []
   ]
 
-type Term = Term.Term (Union Syntax) (Record Location)
-type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
+type Term = Term.Term (Sum Syntax) (Record Location)
+type Assignment' a = HasCallStack => Assignment.Assignment [] Grammar a
+type Assignment = Assignment' Term
 
 -- | Assignment from AST in Ruby’s grammar onto a program in Ruby’s syntax.
 assignment :: Assignment
@@ -105,7 +115,6 @@ expressionChoices =
   , heredoc
   , identifier
   , if'
-  , keyword
   , lambda
   , literal
   , method
@@ -118,7 +127,7 @@ expressionChoices =
   , mk Yield Statement.Yield
   , module'
   , pair
-  , parenthesized_expressions
+  , parenthesizedExpressions
   , parseError
   , rescue
   , scopeResolution
@@ -137,13 +146,25 @@ expressionChoices =
 expressions :: Assignment
 expressions = makeTerm'' <$> location <*> many expression
 
-parenthesized_expressions :: Assignment
-parenthesized_expressions = makeTerm'' <$> symbol ParenthesizedStatements <*> children (many expression)
+parenthesizedExpressions :: Assignment
+parenthesizedExpressions = makeTerm'' <$> symbol ParenthesizedStatements <*> children (many expression)
 
+withExtendedScope :: Assignment' a -> Assignment' a
+withExtendedScope inner = do
+  locals <- getRubyLocals
+  result <- inner
+  putRubyLocals locals
+  pure result
+
+withNewScope :: Assignment' a -> Assignment' a
+withNewScope inner = withExtendedScope $ do
+  putRubyLocals []
+  inner
+
+-- Looks up identifiers in the list of locals to determine vcall vs. local identifier.
 identifier :: Assignment
 identifier =
-      mk Identifier
-  <|> mk Identifier'
+      vcallOrLocal
   <|> mk Constant
   <|> mk InstanceVariable
   <|> mk ClassVariable
@@ -155,9 +176,19 @@ identifier =
   <|> mk SplatArgument
   <|> mk HashSplatArgument
   <|> mk BlockArgument
-  <|> mk ReservedIdentifier
   <|> mk Uninterpreted
-  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
+  where
+    mk s = makeTerm <$> symbol s <*> (Syntax.Identifier . name <$> source)
+    vcallOrLocal = do
+      (loc, ident, locals) <- identWithLocals
+      case ident of
+        "__FILE__" -> pure $ makeTerm loc Directive.File
+        "__LINE__" -> pure $ makeTerm loc Directive.Line
+        _ -> do
+          let identTerm = makeTerm loc (Syntax.Identifier (name ident))
+          if ident `elem` locals
+            then pure identTerm
+            else pure $ makeTerm loc (Ruby.Syntax.Send Nothing (Just identTerm) [] Nothing)
 
 -- TODO: Handle interpolation in all literals that support it (strings, regexes, symbols, subshells, etc).
 literal :: Assignment
@@ -177,18 +208,11 @@ literal =
   <|> makeTerm <$> symbol String <*> (Literal.TextElement <$> source)
   <|> makeTerm <$> symbol ChainedString <*> children (many (makeTerm <$> symbol String <*> (Literal.TextElement <$> source)))
   <|> makeTerm <$> symbol Regex <*> (Literal.Regex <$> source)
-  <|> makeTerm <$> symbol Symbol <*> (Literal.Symbol <$> source)
+  <|> makeTerm <$> (symbol Symbol <|> symbol Symbol') <*> (Literal.Symbol <$> source)
 
 heredoc :: Assignment
 heredoc =  makeTerm <$> symbol HeredocBeginning <*> (Literal.TextElement <$> source)
        <|> makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> source)
-
-keyword :: Assignment
-keyword =
-      mk KeywordFILE
-  <|> mk KeywordLINE
-  <|> mk KeywordENCODING
-  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
 
 beginBlock :: Assignment
 beginBlock = makeTerm <$> symbol BeginBlock <*> children (Statement.ScopeEntry <$> many expression)
@@ -197,59 +221,76 @@ endBlock :: Assignment
 endBlock = makeTerm <$> symbol EndBlock <*> children (Statement.ScopeExit <$> many expression)
 
 class' :: Assignment
-class' = makeTerm <$> symbol Class <*> children (Declaration.Class <$> pure [] <*> expression <*> (superclass <|> pure []) <*> expressions)
-  where superclass = pure <$ symbol Superclass <*> children expression
+class' = makeTerm <$> symbol Class <*> (withNewScope . children) (Ruby.Syntax.Class <$> expression <*> optional superclass <*> expressions)
+  where
+    superclass :: Assignment
+    superclass = symbol Superclass *> children expression
 
 singletonClass :: Assignment
-singletonClass = makeTerm <$> symbol SingletonClass <*> children (Declaration.Class <$> pure [] <*> expression <*> pure [] <*> expressions)
+singletonClass = makeTerm <$> symbol SingletonClass <*> (withNewScope . children) (Ruby.Syntax.Class <$> expression <*> pure Nothing <*> expressions)
 
 module' :: Assignment
-module' = makeTerm <$> symbol Module <*> children (Declaration.Module <$> expression <*> many expression)
+module' = makeTerm <$> symbol Module <*> (withNewScope . children) (Ruby.Syntax.Module <$> expression <*> many expression)
 
 scopeResolution :: Assignment
 scopeResolution = makeTerm <$> symbol ScopeResolution <*> children (Expression.ScopeResolution <$> many expression)
 
 parameter :: Assignment
-parameter =
-      mk SplatParameter
-  <|> mk HashSplatParameter
-  <|> mk BlockParameter
-  <|> mk KeywordParameter
-  <|> mk OptionalParameter
-  <|> makeTerm <$> symbol DestructuredParameter <*> children (many parameter)
-  <|> expression
-  where mk s = makeTerm <$> symbol s <*> (Syntax.Identifier <$> source)
+parameter = postContextualize comment (term uncontextualizedParameter)
+  where
+    uncontextualizedParameter =
+          lhsIdent
+      <|> splatParameter
+      <|> hashSplatParameter
+      <|> blockParameter
+      <|> keywordParameter
+      <|> optionalParameter
+      <|> makeTerm <$> symbol DestructuredParameter <*> children (many parameter)
+    -- splat and hash splat arguments can be unnamed. we don't currently
+    -- support unnamed arguments in the term syntax, so the use of emptyTerm
+    -- here is a huge hack. what we should be able to do is return a Nothing
+    -- for the argument name for splats and hash splats. TODO fix me:
+    mkSplat s = symbol s *> children (lhsIdent <|> emptyTerm)
+    splatParameter = mkSplat SplatParameter
+    hashSplatParameter = mkSplat HashSplatParameter
+    blockParameter = symbol BlockParameter *> children lhsIdent
+    -- we don't yet care about default expressions for optional (including
+    -- keyword) parameters, but we need to match on them to prevent errors:
+    keywordParameter = symbol KeywordParameter *> children (lhsIdent <* optional expression)
+    optionalParameter = symbol OptionalParameter *> children (lhsIdent <* expression)
 
 method :: Assignment
-method = makeTerm <$> symbol Method <*> children (Declaration.Method <$> pure [] <*> emptyTerm <*> expression <*> params <*> expressions')
+method = makeTerm <$> symbol Method <*> (withNewScope . children) (Declaration.Method <$> pure [] <*> emptyTerm <*> methodSelector <*> params <*> expressions')
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
         expressions' = makeTerm <$> location <*> many expression
 
 singletonMethod :: Assignment
-singletonMethod = makeTerm <$> symbol SingletonMethod <*> children (Declaration.Method <$> pure [] <*> expression <*> expression <*> params <*> expressions)
+singletonMethod = makeTerm <$> symbol SingletonMethod <*> (withNewScope . children) (Declaration.Method <$> pure [] <*> expression <*> methodSelector <*> params <*> expressions)
   where params = symbol MethodParameters *> children (many parameter) <|> pure []
 
 lambda :: Assignment
-lambda = makeTerm <$> symbol Lambda <*> children (
+lambda = makeTerm <$> symbol Lambda <*> (withExtendedScope . children) (
   Declaration.Function [] <$> emptyTerm
                           <*> ((symbol BlockParameters <|> symbol LambdaParameters) *> children (many parameter) <|> pure [])
                           <*> expressions)
 
 block :: Assignment
-block =  makeTerm <$> symbol DoBlock <*> children (Declaration.Function <$> pure [] <*> emptyTerm <*> params <*> expressions)
-     <|> makeTerm <$> symbol Block <*> children (Declaration.Function <$> pure [] <*> emptyTerm <*> params <*> expressions)
-  where params = (symbol BlockParameters) *> children (many parameter) <|> pure []
+block =  makeTerm <$> symbol DoBlock <*> scopedBlockChildren
+     <|> makeTerm <$> symbol Block <*> scopedBlockChildren
+  where scopedBlockChildren = withExtendedScope blockChildren
+        blockChildren = children (Declaration.Function <$> pure [] <*> emptyTerm <*> params <*> expressions)
+        params = symbol BlockParameters *> children (many parameter) <|> pure []
 
 comment :: Assignment
 comment = makeTerm <$> symbol Comment <*> (Comment.Comment <$> source)
 
 alias :: Assignment
-alias = makeTerm <$> symbol Alias <*> children (Expression.Call <$> pure [] <*> name <*> some expression <*> emptyTerm)
-  where name = makeTerm <$> location <*> (Syntax.Identifier <$> source)
+alias = makeTerm <$> symbol Alias <*> children (Expression.Call <$> pure [] <*> name' <*> some expression <*> emptyTerm)
+  where name' = makeTerm <$> location <*> (Syntax.Identifier . name <$> source)
 
 undef :: Assignment
-undef = makeTerm <$> symbol Undef <*> children (Expression.Call <$> pure [] <*> name <*> some expression <*> emptyTerm)
-  where name = makeTerm <$> location <*> (Syntax.Identifier <$> source)
+undef = makeTerm <$> symbol Undef <*> children (Expression.Call <$> pure [] <*> name' <*> some expression <*> emptyTerm)
+  where name' = makeTerm <$> location <*> (Syntax.Identifier . name <$> source)
 
 if' :: Assignment
 if' =   ifElsif If
@@ -278,14 +319,14 @@ until' =
 
 for :: Assignment
 for = makeTerm <$> symbol For <*> children (Statement.ForEach <$> (makeTerm <$> location <*> manyTermsTill expression (symbol In)) <*> inClause <*> expressions)
-  where inClause = symbol In *> children (expression)
+  where inClause = symbol In *> children expression
 
 case' :: Assignment
 case' = makeTerm <$> symbol Case <*> children (Statement.Match <$> (symbol When *> emptyTerm <|> expression) <*> whens)
   where
     whens = makeTerm <$> location <*> many (when' <|> else' <|> expression)
-    when' = makeTerm <$> symbol When <*> children (Statement.Pattern <$> (makeTerm <$> location <*> some pattern) <*> whens)
-    pattern = postContextualize comment (symbol Pattern *> children ((symbol SplatArgument *> children expression) <|> expression))
+    when' = makeTerm <$> symbol When <*> children (Statement.Pattern <$> (makeTerm <$> location <*> some pattern') <*> whens)
+    pattern' = postContextualize comment (symbol Pattern *> children ((symbol SplatArgument *> children expression) <|> expression))
     else' = postContextualize comment (symbol Else *> children expressions)
 
 subscript :: Assignment
@@ -294,21 +335,44 @@ subscript = makeTerm <$> symbol ElementReference <*> children (Expression.Subscr
 pair :: Assignment
 pair =   makeTerm <$> symbol Pair <*> children (Literal.KeyValue <$> expression <*> (expression <|> emptyTerm))
 
+args :: Assignment' [Term]
+args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> many expression
+
 methodCall :: Assignment
-methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> regularCall)
+methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> send)
   where
-    regularCall = inj <$> (Expression.Call <$> pure [] <*> expression <*> args <*> (block <|> emptyTerm))
-    require = inj <$> (symbol Identifier *> do
+    send = injectSum <$> ((regularCall <|> funcCall <|> scopeCall <|> dotCall) <*> optional block)
+
+    funcCall = Ruby.Syntax.Send Nothing <$> selector <*> args
+    regularCall = symbol Call *> children (Ruby.Syntax.Send <$> (Just <$> postContextualize heredoc expression) <*> selector) <*> args
+    scopeCall = symbol ScopeResolution *> children (Ruby.Syntax.Send <$> (Just <$> expression) <*> selector) <*> args
+    dotCall = symbol Call *> children (Ruby.Syntax.Send <$> (Just <$> term expression) <*> pure Nothing <*> args)
+
+    selector = Just <$> term methodSelector
+    require = injectSum <$> (symbol Identifier *> do
       s <- source
-      guard (elem s ["autoload", "load", "require", "require_relative"])
-      Declaration.Import <$> args' <*> emptyTerm <*> pure [])
-    args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many expression) <|> pure []
-    args' = makeTerm'' <$> (symbol ArgumentList <|> symbol ArgumentListWithParens) <*> children (many expression) <|> emptyTerm
+      guard (s `elem` ["require", "require_relative"])
+      Ruby.Syntax.Require (s == "require_relative") <$> nameExpression)
+    load = injectSum <$> (symbol Identifier *> do
+      s <- source
+      guard (s == "load")
+      Ruby.Syntax.Load <$> loadArgs)
+    loadArgs = (symbol ArgumentList <|> symbol ArgumentListWithParens)  *> children (some expression)
+    nameExpression = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children expression
+
+methodSelector :: Assignment
+methodSelector = makeTerm <$> symbols <*> (Syntax.Identifier <$> (name <$> source))
+  where
+    symbols = symbol Identifier
+          <|> symbol Constant
+          <|> symbol Operator
+          <|> symbol Setter
+          <|> symbol Super -- TODO(@charliesome): super calls are *not* method calls and need to be assigned into their own syntax terms
 
 call :: Assignment
-call = makeTerm <$> symbol Call <*> children (Expression.MemberAccess <$> expression <*> (expression <|> args))
-  where
-    args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (expressions)
+call = makeTerm <$> symbol Call <*> children (
+    (Ruby.Syntax.Send <$> (Just <$> term expression) <*> (Just <$> methodSelector) <*> pure [] <*> pure Nothing) <|>
+    (Ruby.Syntax.Send <$> (Just <$> term expression) <*> pure Nothing <*> args <*> pure Nothing))
 
 rescue :: Assignment
 rescue =  rescue'
@@ -342,48 +406,66 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
                 , assign Expression.BXOr      <$ symbol AnonCaretEqual
                 ])
   where
-    assign :: f :< Syntax => (Term -> Term -> f Term) -> Term -> Term -> Union Syntax Term
-    assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
+    assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Sum Syntax Term
+    assign c l r = injectSum (Statement.Assignment [] l (makeTerm1 (c l r)))
 
     lhs  = makeTerm <$> symbol LeftAssignmentList  <*> children (many expr) <|> expr
     rhs  = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr
-    expr = makeTerm <$> symbol RestAssignment      <*> (Syntax.Identifier <$> source)
+    expr = makeTerm <$> symbol RestAssignment      <*> (Syntax.Identifier . name <$> source)
        <|> makeTerm <$> symbol DestructuredLeftAssignment <*> children (many expr)
+       <|> lhsIdent
        <|> expression
+
+identWithLocals :: Assignment' (Record Location, ByteString, [ByteString])
+identWithLocals = do
+  loc <- symbol Identifier
+  -- source advances, so it's important we call getRubyLocals first
+  locals <- getRubyLocals
+  ident <- source
+  pure (loc, ident, locals)
+
+lhsIdent :: Assignment
+lhsIdent = do
+  (loc, ident, locals) <- identWithLocals
+  putRubyLocals (ident : locals)
+  pure $ makeTerm loc (Syntax.Identifier (name ident))
 
 unary :: Assignment
 unary = symbol Unary >>= \ location ->
       makeTerm location . Expression.Complement <$> children ( symbol AnonTilde *> expression )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonBang *> expression )
   <|> makeTerm location . Expression.Not <$> children ( symbol AnonNot *> expression )
-  <|> makeTerm location <$> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonDefinedQuestion <*> (Syntax.Identifier <$> source)) <*> some expression <*> emptyTerm)
+  <|> makeTerm location <$> children (Expression.Call <$> pure [] <*> (makeTerm <$> symbol AnonDefinedQuestion <*> (Syntax.Identifier . name <$> source)) <*> some expression <*> emptyTerm)
   <|> makeTerm location . Expression.Negate <$> children ( symbol AnonMinus' *> expression )
   <|> children ( symbol AnonPlus *> expression )
 
 -- TODO: Distinguish `===` from `==` ?
--- TODO: Distinuish `=~` and `!~` ?
 binary :: Assignment
 binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expression
-  [ (inj .) . Expression.Plus             <$ symbol AnonPlus
-  , (inj .) . Expression.Minus            <$ symbol AnonMinus'
-  , (inj .) . Expression.Times            <$ symbol AnonStar'
-  , (inj .) . Expression.Power            <$ symbol AnonStarStar
-  , (inj .) . Expression.DividedBy        <$ symbol AnonSlash
-  , (inj .) . Expression.Modulo           <$ symbol AnonPercent
-  , (inj .) . Expression.And              <$ (symbol AnonAnd <|> symbol AnonAmpersandAmpersand)
-  , (inj .) . Expression.BAnd             <$ symbol AnonAmpersand
-  , (inj .) . Expression.Or               <$ (symbol AnonOr <|> symbol AnonPipePipe)
-  , (inj .) . Expression.BOr              <$ symbol AnonPipe
-  , (inj .) . Expression.BXOr             <$ symbol AnonCaret
-  , (inj .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual <|> symbol AnonEqualTilde)
-  , (inj .) . invert Expression.Equal     <$ (symbol AnonBangEqual <|> symbol AnonBangTilde)
-  , (inj .) . Expression.LShift           <$ symbol AnonLAngleLAngle
-  , (inj .) . Expression.RShift           <$ symbol AnonRAngleRAngle
-  , (inj .) . Expression.Comparison       <$ symbol AnonLAngleEqualRAngle
-  , (inj .) . Expression.LessThan         <$ symbol AnonLAngle
-  , (inj .) . Expression.GreaterThan      <$ symbol AnonRAngle
-  , (inj .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
-  , (inj .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
+  [ (injectSum .) . Expression.Plus             <$ symbol AnonPlus
+  , (injectSum .) . Expression.Minus            <$ symbol AnonMinus'
+  , (injectSum .) . Expression.Times            <$ symbol AnonStar'
+  , (injectSum .) . Expression.Power            <$ symbol AnonStarStar
+  , (injectSum .) . Expression.DividedBy        <$ symbol AnonSlash
+  , (injectSum .) . Expression.Modulo           <$ symbol AnonPercent
+  , (injectSum .) . Expression.And              <$ symbol AnonAmpersandAmpersand
+  , (injectSum .) . Ruby.Syntax.LowAnd          <$ symbol AnonAnd
+  , (injectSum .) . Expression.BAnd             <$ symbol AnonAmpersand
+  , (injectSum .) . Expression.Or               <$ symbol AnonPipePipe
+  , (injectSum .) . Ruby.Syntax.LowOr           <$ symbol AnonOr
+  , (injectSum .) . Expression.BOr              <$ symbol AnonPipe
+  , (injectSum .) . Expression.BXOr             <$ symbol AnonCaret
+  , (injectSum .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual)
+  , (injectSum .) . invert Expression.Equal     <$ symbol AnonBangEqual
+  , (injectSum .) . Expression.LShift           <$ symbol AnonLAngleLAngle
+  , (injectSum .) . Expression.RShift           <$ symbol AnonRAngleRAngle
+  , (injectSum .) . Expression.Comparison       <$ symbol AnonLAngleEqualRAngle
+  , (injectSum .) . Expression.LessThan         <$ symbol AnonLAngle
+  , (injectSum .) . Expression.GreaterThan      <$ symbol AnonRAngle
+  , (injectSum .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
+  , (injectSum .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
+  , (injectSum .) . Expression.Matches          <$ symbol AnonEqualTilde
+  , (injectSum .) . Expression.NotMatches       <$ symbol AnonBangTilde
   ])
   where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
@@ -401,16 +483,19 @@ invert term = makeTerm <$> location <*> fmap Expression.Not term
 
 -- | Match a term optionally preceded by comment(s), or a sequence of comments if the term is not present.
 term :: Assignment -> Assignment
-term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 comment <*> emptyTerm)
+term term = contextualize comment term <|> makeTerm1 <$> (Syntax.Context <$> some1 (comment <|> heredocEnd) <*> emptyTerm)
+  where heredocEnd = makeTerm <$> symbol HeredocEnd <*> (Literal.TextElement <$> source)
 
 -- | Match a series of terms or comments until a delimiter is matched.
-manyTermsTill :: Show b => Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
+manyTermsTill :: Assignment.Assignment [] Grammar Term -> Assignment.Assignment [] Grammar b -> Assignment.Assignment [] Grammar [Term]
 manyTermsTill step end = manyTill (step <|> comment) end
 
 -- | Match infix terms separated by any of a list of operators, assigning any comments following each operand.
 infixTerm :: HasCallStack
           => Assignment
           -> Assignment
-          -> [Assignment.Assignment [] Grammar (Term -> Term -> Union Syntax Term)]
-          -> Assignment.Assignment [] Grammar (Union Syntax Term)
+          -> [Assignment.Assignment [] Grammar (Term -> Term -> Sum Syntax Term)]
+          -> Assignment.Assignment [] Grammar (Sum Syntax Term)
 infixTerm = infixContext comment
+
+{-# ANN module ("HLint: ignore Eta reduce" :: String) #-}

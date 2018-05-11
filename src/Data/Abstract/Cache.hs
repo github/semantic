@@ -1,45 +1,26 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, StandaloneDeriving, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, GeneralizedNewtypeDeriving, TypeFamilies #-}
 module Data.Abstract.Cache where
 
-import Prologue
-import Data.Abstract.Address
 import Data.Abstract.Configuration
-import Data.Abstract.Store
-import Data.Map as Map
+import Data.Abstract.Heap
+import Data.Map.Monoidal as Monoidal
+import Data.Semilattice.Lower
+import Prologue
 
--- | A map of 'Configuration's to 'Set's of resulting values & 'Store's.
-newtype Cache l t v = Cache { unCache :: Map.Map (Configuration l t v) (Set (v, Store l v)) }
+-- | A map of 'Configuration's to 'Set's of resulting values & 'Heap's.
+newtype Cache term location cell value = Cache { unCache :: Monoidal.Map (Configuration term location cell value) (Set (value, Heap location cell value)) }
+  deriving (Eq, Lower, Monoid, Ord, Reducer (Configuration term location cell value, (value, Heap location cell value)), Show, Semigroup)
 
-deriving instance (Eq l, Eq t, Eq v, Eq (Cell l v)) => Eq (Cache l t v)
-deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Ord (Cache l t v)
-deriving instance (Show l, Show t, Show v, Show (Cell l v)) => Show (Cache l t v)
-deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Semigroup (Cache l t v)
-deriving instance (Ord l, Ord t, Ord v, Ord (Cell l v)) => Monoid (Cache l t v)
+type Cacheable term location cell value = (Ord (cell value), Ord location, Ord term, Ord value)
 
--- | Look up the resulting value & 'Store' for a given 'Configuration'.
-cacheLookup :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> Cache l t v -> Maybe (Set (v, Store l v))
-cacheLookup key = Map.lookup key . unCache
+-- | Look up the resulting value & 'Heap' for a given 'Configuration'.
+cacheLookup :: Cacheable term location cell value => Configuration term location cell value -> Cache term location cell value -> Maybe (Set (value, Heap location cell value))
+cacheLookup key = Monoidal.lookup key . unCache
 
--- | Set the resulting value & 'Store' for a given 'Configuration', overwriting any previous entry.
-cacheSet :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> Set (v, Store l v) -> Cache l t v -> Cache l t v
-cacheSet key value = Cache . Map.insert key value . unCache
+-- | Set the resulting value & 'Heap' for a given 'Configuration', overwriting any previous entry.
+cacheSet :: Cacheable term location cell value => Configuration term location cell value -> Set (value, Heap location cell value) -> Cache term location cell value -> Cache term location cell value
+cacheSet key value = Cache . Monoidal.insert key value . unCache
 
--- | Insert the resulting value & 'Store' for a given 'Configuration', appending onto any previous entry.
-cacheInsert :: (Ord l, Ord t, Ord v, Ord (Cell l v)) => Configuration l t v -> (v, Store l v) -> Cache l t v -> Cache l t v
-cacheInsert key value = Cache . Map.insertWith (<>) key (point value) . unCache
-
-
-instance (Eq l, Eq t, Eq1 (Cell l)) => Eq1 (Cache l t) where
-  liftEq eqV (Cache c1) (Cache c2) = liftEq2 (liftEq eqV) (liftEq (liftEq2 eqV (liftEq eqV))) c1 c2
-
-instance (Ord l, Ord t, Ord1 (Cell l)) => Ord1 (Cache l t) where
-  liftCompare compareV (Cache c1) (Cache c2) = liftCompare2 (liftCompare compareV) (liftCompare (liftCompare2 compareV (liftCompare compareV))) c1 c2
-
-instance (Show l, Show t, Show1 (Cell l)) => Show1 (Cache l t) where
-  liftShowsPrec spV slV d = showsUnaryWith (liftShowsPrec2 spKey slKey (liftShowsPrec spPair slPair) (liftShowList spPair slPair)) "Cache" d . unCache
-      where spKey = liftShowsPrec spV slV
-            slKey = liftShowList spV slV
-            spPair = liftShowsPrec2 spV slV spStore slStore
-            slPair = liftShowList2 spV slV spStore slStore
-            spStore = liftShowsPrec spV slV
-            slStore = liftShowList  spV slV
+-- | Insert the resulting value & 'Heap' for a given 'Configuration', appending onto any previous entry.
+cacheInsert :: Cacheable term location cell value => Configuration term location cell value -> (value, Heap location cell value) -> Cache term location cell value -> Cache term location cell value
+cacheInsert = curry cons

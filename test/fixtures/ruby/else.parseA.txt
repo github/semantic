@@ -1,9 +1,0 @@
-(Program
-  (Try
-    (
-      (Call
-        (Identifier)
-        (Empty))
-      (Else
-        (Empty)
-        ([])))))

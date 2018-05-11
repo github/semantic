@@ -1,0 +1,6 @@
+(Program
+  (LowAnd
+    (Send
+      (Identifier))
+    (Send
+      (Identifier))))

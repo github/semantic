@@ -1,0 +1,5 @@
+(Program
+  (Return
+  { (Empty)
+  ->(Send
+    {+(Identifier)+}) }))

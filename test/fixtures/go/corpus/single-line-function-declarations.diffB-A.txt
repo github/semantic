@@ -1,0 +1,45 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    ([]))
+  (Function
+    (Empty)
+  { (Identifier)
+  ->(Identifier) }
+    ([])
+    (Call
+      (Identifier)
+      ([])
+      (Empty)))
+  (Function
+    (Empty)
+  { (Identifier)
+  ->(Identifier) }
+    ([])
+    (
+      (Call
+        (Identifier)
+        ([])
+        (Empty))
+      (Call
+        (Identifier)
+        ([])
+        (Empty))))
+  (Function
+    (Empty)
+  { (Identifier)
+  ->(Identifier) }
+    ([])
+    (
+      (Call
+        (Identifier)
+        ([])
+        (Empty))
+      (Call
+        (Identifier)
+        ([])
+        (Empty)))))

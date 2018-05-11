@@ -1,0 +1,18 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (
+      (Type
+        (Identifier)
+        (Constructor
+          (Empty)
+          (Field
+            (Identifier)
+            (
+            { (Identifier)
+            ->(Identifier) }
+            {+(Identifier)+})))))))

@@ -1,81 +1,108 @@
--- MonoLocalBinds is to silence a warning about a simplifiable constraint.
-{-# LANGUAGE DataKinds, MonoLocalBinds, TypeOperators, TypeApplications #-}
+{-# LANGUAGE TypeOperators #-}
+{-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.Util where
 
-import Prologue
-import Analysis.Abstract.Evaluating
-import Analysis.Declaration
-import Control.Monad.IO.Class
-import Data.Abstract.Address
-import Data.Abstract.Store
-import Data.Abstract.Value
-import Data.AST
-import Data.Blob
-import Data.Diff
-import Data.Range
-import Data.Record
-import Data.Span
-import Data.Term
-import Diffing.Algorithm
-import Diffing.Interpreter
-import Parsing.Parser
-import Semantic
-import Semantic.IO as IO
-import Semantic.Task
+import           Analysis.Abstract.Caching
+import           Analysis.Abstract.Collecting
+import           Analysis.Abstract.Evaluating as X
+import           Control.Abstract.Evaluator
+import           Control.Monad.Effect.Trace (runPrintingTrace)
+import           Data.Abstract.Address
+import           Data.Abstract.Evaluatable
+import           Data.Abstract.Value
+import           Data.Abstract.Type
+import           Data.Blob
+import           Data.File
+import qualified Data.Language as Language
+import qualified GHC.TypeLits as TypeLevel
+import           Language.Preluded
+import           Parsing.Parser
+import           Prologue
+import           Semantic.Graph
+import           Semantic.IO as IO
+import           Semantic.Task
 
-import qualified Language.Ruby.Assignment as Ruby
 import qualified Language.Python.Assignment as Python
+import qualified Language.Ruby.Assignment as Ruby
 
-type RubyValue = Value Precise (Term (Union Ruby.Syntax) (Record Location))
-type PythonValue = Value Precise (Term (Union Python.Syntax) (Record Location))
+justEvaluating
+  = runM
+  . fmap (first reassociate)
+  . evaluating
+  . runPrintingTrace
+  . runLoadError
+  . runValueError
+  . runUnspecialized
+  . runResolutionError
+  . runEnvironmentError
+  . runEvalError
+  . runAddressError
+  . constrainedToValuePrecise
 
-file :: MonadIO m => FilePath -> m Blob
-file path = fromJust <$> IO.readFile path (languageForFilePath path)
+evaluatingWithHoles
+  = runM
+  . evaluating
+  . runPrintingTrace
+  . resumingLoadError
+  . resumingUnspecialized
+  . resumingValueError
+  . resumingEnvironmentError
+  . resumingEvalError
+  . resumingResolutionError
+  . resumingAddressError @(Value Precise) @Precise
+  . constrainedToValuePrecise
 
--- Ruby
-evaluateRubyFile path = Prelude.fst . evaluate @RubyValue <$>
-  (file path >>= runTask . parse rubyParser)
+-- The order is significant here: caching has to run before typeChecking, or else we’ll nondeterministically produce TypeErrors as part of the result set. While this is probably actually correct, it will require us to have an Ord instance for TypeError, which we don’t have yet.
+checking
+  = runM
+  . fmap (first reassociate)
+  . evaluating
+  . runPrintingTrace
+  . providingLiveSet
+  . runLoadError
+  . runUnspecialized
+  . runResolutionError
+  . runEnvironmentError
+  . runEvalError
+  . runAddressError
+  . runTypeError
+  . caching @[]
+  . constrainedToTypeMonovariant
 
-evaluateRubyFiles paths = do
-  blobs@(b:bs) <- traverse file paths
-  (t:ts) <- runTask $ traverse (parse rubyParser) blobs
-  pure $ evaluates @RubyValue (zip bs ts) (b, t)
+constrainedToValuePrecise :: Evaluator Precise (Value Precise) effects a -> Evaluator Precise (Value Precise) effects a
+constrainedToValuePrecise = id
+
+constrainedToTypeMonovariant :: Evaluator Monovariant (Type Monovariant) effects a -> Evaluator Monovariant (Type Monovariant) effects a
+constrainedToTypeMonovariant = id
+
+evalGoProject path = justEvaluating =<< evaluateProject goParser Language.Go Nothing path
+evalRubyProject path = justEvaluating =<< evaluateProject rubyParser Language.Ruby rubyPrelude path
+evalPHPProject path = justEvaluating =<< evaluateProject phpParser Language.PHP Nothing path
+evalPythonProject path = justEvaluating =<< evaluateProject pythonParser Language.Python pythonPrelude path
+evalTypeScriptProjectQuietly path = evaluatingWithHoles =<< evaluateProject typescriptParser Language.TypeScript Nothing path
+evalTypeScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.TypeScript Nothing path
+
+typecheckGoFile path = checking =<< evaluateProjectWithCaching goParser Language.Go Nothing path
+
+rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Language.Ruby)
+pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Language.Python)
+
+-- Evaluate a project, starting at a single entrypoint.
+evaluateProject parser lang prelude path = evaluatePackageWith id withTermSpans <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
+evaluateProjectWithCaching parser lang prelude path = evaluatePackageWith convergingModules (withTermSpans . cachingTerms) <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
 
 
--- Python
-evaluatePythonFile path = evaluate @PythonValue <$>
-  (file path >>= runTask . parse pythonParser)
+parseFile :: Parser term -> FilePath -> IO term
+parseFile parser = runTask . (parse parser <=< readBlob . file)
 
-evaluatePythonFiles paths = do
-  blobs@(b:bs) <- traverse file paths
-  (t:ts) <- runTask $ traverse (parse pythonParser) blobs
-  pure $ evaluates @PythonValue (zip bs ts) (b, t)
+blob :: FilePath -> IO Blob
+blob = runTask . readBlob . file
 
 
--- Diff helpers
-diffWithParser :: (HasField fields Data.Span.Span,
-                   HasField fields Range,
-                   Eq1 syntax, Show1 syntax,
-                   Traversable syntax, Functor syntax,
-                   Foldable syntax, Diffable syntax,
-                   GAlign syntax, HasDeclaration syntax)
-                  =>
-                  Parser (Term syntax (Record fields))
-                  -> BlobPair
-                  -> Task (Diff syntax (Record (Maybe Declaration ': fields)) (Record (Maybe Declaration ': fields)))
-diffWithParser parser = run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))
-  where
-    run parse blobs = bidistributeFor (runJoin blobs) parse parse >>= diffTermPair diffTerms
+injectConst :: a -> SomeExc (Sum '[Const a])
+injectConst = SomeExc . injectSum . Const
 
-diffBlobWithParser :: (HasField fields Data.Span.Span,
-                   HasField fields Range,
-                   Eq1 syntax, Show1 syntax,
-                   Traversable syntax, Functor syntax,
-                   Foldable syntax, Diffable syntax,
-                   GAlign syntax, HasDeclaration syntax)
-                  => Parser (Term syntax (Record fields))
-                  -> Blob
-                  -> Task (Term syntax (Record (Maybe Declaration : fields)))
-diffBlobWithParser parser = run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))
-  where
-    run parse = parse
+mergeExcs :: Either (SomeExc (Sum excs)) (Either (SomeExc exc) result) -> Either (SomeExc (Sum (exc ': excs))) result
+mergeExcs = either (\ (SomeExc sum) -> Left (SomeExc (weakenSum sum))) (either (\ (SomeExc exc) -> Left (SomeExc (injectSum exc))) Right)
+
+reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . first injectConst

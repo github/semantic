@@ -1,0 +1,17 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (
+      (Type
+        (Identifier)
+        (Pointer
+          (Identifier)))
+      (Type
+        (Identifier)
+        (Pointer
+          (Pointer
+            (Identifier)))))))

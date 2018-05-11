@@ -6,15 +6,16 @@ module Language.JSON.Assignment
 , Term)
 where
 
-import Prologue
 import Assigning.Assignment hiding (Assignment, Error)
 import qualified Assigning.Assignment as Assignment
 import Data.Record
+import Data.Sum
 import Data.Syntax (makeTerm, parseError)
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Literal as Literal
 import qualified Data.Term as Term
 import Language.JSON.Grammar as Grammar
+import Prologue
 
 type Syntax =
   [ Literal.Array
@@ -23,13 +24,11 @@ type Syntax =
   , Literal.Float
   , Literal.KeyValue
   , Literal.Null
-  , Literal.String
   , Literal.TextElement
   , Syntax.Error
-  , []
   ]
 
-type Term = Term.Term (Union Syntax) (Record Location)
+type Term = Term.Term (Sum Syntax) (Record Location)
 type Assignment = HasCallStack => Assignment.Assignment [] Grammar Term
 
 

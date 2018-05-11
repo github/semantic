@@ -1,0 +1,12 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (
+      (PostIncrement
+        (Identifier))
+      (PostDecrement
+        (Identifier)))))

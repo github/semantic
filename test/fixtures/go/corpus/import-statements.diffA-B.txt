@@ -1,0 +1,16 @@
+(Program
+  (Package
+    (Identifier))
+  (
+    (Comment)
+    (Comment)
+  { (QualifiedImport
+    {-(Identifier)-})
+  ->(QualifiedImport
+    {+(Identifier)+}) }
+    (Comment))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    ([])))

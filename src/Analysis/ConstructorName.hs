@@ -1,16 +1,17 @@
-{-# LANGUAGE DataKinds, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.ConstructorName
 ( ConstructorName(..)
 , ConstructorLabel(..)
 , constructorLabel
 ) where
 
-import Prologue
 import Data.Aeson
 import Data.ByteString.Char8 (ByteString, pack, unpack)
 import Data.JSON.Fields
+import Data.Sum
 import Data.Term
 import Data.Text.Encoding (decodeUtf8)
+import Prologue
 
 -- | Compute a 'ConstructorLabel' label for a 'Term'.
 constructorLabel :: ConstructorName syntax => TermF syntax a b -> ConstructorLabel
@@ -38,8 +39,8 @@ instance (ConstructorNameStrategy syntax ~ strategy, ConstructorNameWithStrategy
 class CustomConstructorName syntax where
   customConstructorName :: syntax a -> String
 
-instance Apply ConstructorName fs => CustomConstructorName (Union fs) where
-  customConstructorName = apply (Proxy :: Proxy ConstructorName) constructorName
+instance Apply ConstructorName fs => CustomConstructorName (Sum fs) where
+  customConstructorName = apply @ConstructorName constructorName
 
 instance CustomConstructorName [] where
   customConstructorName [] = "[]"
@@ -48,9 +49,9 @@ instance CustomConstructorName [] where
 data Strategy = Default | Custom
 
 type family ConstructorNameStrategy syntax where
-  ConstructorNameStrategy (Union _) = 'Custom
-  ConstructorNameStrategy []        = 'Custom
-  ConstructorNameStrategy syntax    = 'Default
+  ConstructorNameStrategy (Sum _) = 'Custom
+  ConstructorNameStrategy []      = 'Custom
+  ConstructorNameStrategy syntax  = 'Default
 
 class ConstructorNameWithStrategy (strategy :: Strategy) syntax where
   constructorNameWithStrategy :: proxy strategy -> syntax a -> String

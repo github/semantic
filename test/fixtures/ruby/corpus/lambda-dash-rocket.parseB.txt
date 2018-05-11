@@ -1,0 +1,7 @@
+(Program
+  (Function
+    (Empty)
+    (Function
+      (Empty)
+      (Send
+        (Identifier)))))

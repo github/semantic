@@ -1,20 +1,22 @@
-{-# LANGUAGE DataKinds, MultiParamTypeClasses, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.IdentifierName
 ( IdentifierName(..)
 , IdentifierLabel(..)
 , identifierLabel
 ) where
 
-import Prologue
-import Data.Aeson
-import Data.JSON.Fields
-import Data.Term
-import Data.Text.Encoding (decodeUtf8)
+import           Data.Abstract.FreeVariables (Name (..))
+import           Data.Aeson
+import           Data.JSON.Fields
+import           Data.Sum
 import qualified Data.Syntax
+import           Data.Term
+import           Data.Text.Encoding (decodeUtf8)
+import           Prologue
 
 -- | Compute a 'IdentifierLabel' label for a 'Term'.
 identifierLabel :: IdentifierName syntax => TermF syntax a b -> Maybe IdentifierLabel
-identifierLabel (In _ s) = IdentifierLabel <$> (identifierName s)
+identifierLabel (In _ s) = IdentifierLabel <$> identifierName s
 
 newtype IdentifierLabel = IdentifierLabel ByteString
   deriving (Show)
@@ -35,16 +37,16 @@ instance (IdentifierNameStrategy syntax ~ strategy, IdentifierNameWithStrategy s
 class CustomIdentifierName syntax where
   customIdentifierName :: syntax a -> Maybe ByteString
 
-instance Apply IdentifierName fs => CustomIdentifierName (Union fs) where
-  customIdentifierName = apply (Proxy :: Proxy IdentifierName) identifierName
+instance Apply IdentifierName fs => CustomIdentifierName (Sum fs) where
+  customIdentifierName = apply @IdentifierName identifierName
 
 instance CustomIdentifierName Data.Syntax.Identifier where
-  customIdentifierName (Data.Syntax.Identifier name) = Just name
+  customIdentifierName (Data.Syntax.Identifier (Name name)) = Just name
 
 data Strategy = Default | Custom
 
 type family IdentifierNameStrategy syntax where
-  IdentifierNameStrategy (Union _) = 'Custom
+  IdentifierNameStrategy (Sum _) = 'Custom
   IdentifierNameStrategy Data.Syntax.Identifier = 'Custom
   IdentifierNameStrategy syntax = 'Default
 

@@ -1,6 +1,9 @@
 package app
 
-import "os"
+import _ "lib/Foo"
+import . "lib/Bar"
+import m "lib/Math"
+import "lib/Math"
 
 import (
 	"net/http"
@@ -9,5 +12,8 @@ import (
 func foo() {}
 
 func main() {
-  foo()
+	foo()
+
+	m.Sin()
+	Math.Sin()
 }

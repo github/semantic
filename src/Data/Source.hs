@@ -61,7 +61,7 @@ totalRange = Range 0 . B.length . sourceBytes
 totalSpan :: Source -> Span
 totalSpan source = Span (Pos 1 1) (Pos (length ranges) (succ (end lastRange - start lastRange)))
   where ranges = sourceLineRanges source
-        Just lastRange = getLast (foldMap (Last . Just) ranges)
+        lastRange = fromMaybe emptyRange (getLast (foldMap (Last . Just) ranges))
 
 
 -- En/decoding
@@ -150,8 +150,8 @@ rangeToSpan source (Range rangeStart rangeEnd) = Span startPos endPos
         firstLine = length before
         (before, rest) = span ((< rangeStart) . end) (sourceLineRanges source)
         (lineRanges, _) = span ((<= rangeEnd) . start) rest
-        Just firstRange = getFirst (foldMap (First . Just) lineRanges)
-        Just lastRange  = getLast  (foldMap (Last  . Just) lineRanges)
+        firstRange = fromMaybe emptyRange (getFirst (foldMap (First . Just) lineRanges))
+        lastRange  = fromMaybe firstRange (getLast (foldMap (Last . Just) lineRanges))
 
 
 -- Instances

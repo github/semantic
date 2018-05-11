@@ -1,0 +1,33 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (
+      (Assignment
+        (Identifier)
+        (Composite
+          (Slice
+            (Identifier))
+          (
+          {+(TextElement)+})))
+      (Assignment
+        (Identifier)
+        (Composite
+          (Slice
+            (Identifier))
+          (
+          { (TextElement)
+          ->(TextElement) })))
+      (Assignment
+        (Identifier)
+        (Composite
+          (Slice
+            (Identifier))
+          (
+          { (TextElement)
+          ->(TextElement) }
+          { (TextElement)
+          ->(TextElement) }))))))

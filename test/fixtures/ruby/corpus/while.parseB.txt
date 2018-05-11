@@ -1,0 +1,6 @@
+(Program
+  (While
+    (Send
+      (Identifier))
+    (Send
+      (Identifier))))

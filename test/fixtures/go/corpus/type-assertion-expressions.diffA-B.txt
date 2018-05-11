@@ -1,0 +1,15 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (TypeAssertion
+    { (Identifier)
+    ->(Identifier) }
+      (MemberAccess
+      { (Identifier)
+      ->(Identifier) }
+      { (Identifier)
+      ->(Identifier) }))))

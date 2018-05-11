@@ -1,7 +1,0 @@
-(Program
-  (Call
-    (Identifier)
-    (KeyValue
-      (Symbol)
-      (Boolean))
-    (Empty)))

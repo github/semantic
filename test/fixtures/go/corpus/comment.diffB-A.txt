@@ -1,0 +1,11 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (Context
+    { (Comment)
+    ->(Comment) }
+      (Empty))))

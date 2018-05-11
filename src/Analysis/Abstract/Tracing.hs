@@ -1,73 +1,32 @@
-{-# LANGUAGE AllowAmbiguousTypes, DataKinds, ScopedTypeVariables, TypeApplications, TypeFamilies #-}
-module Analysis.Abstract.Tracing where
+{-# LANGUAGE TypeOperators #-}
+module Analysis.Abstract.Tracing
+( tracingTerms
+, tracing
+) where
 
-import Prologue
-import Control.Effect
-import Control.Monad.Effect hiding (run)
-import Control.Monad.Effect.Addressable
-import Control.Monad.Effect.Env
-import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.State
-import Control.Monad.Effect.Trace
+import Control.Abstract hiding (trace)
 import Control.Monad.Effect.Writer
-import Data.Abstract.Address
-import Data.Abstract.Configuration
-import Data.Abstract.Environment
-import Data.Abstract.Eval
-import Data.Abstract.Store
-import Data.Abstract.Value
+import Data.Semigroup.Reducer as Reducer
+import Prologue
 
--- | The effects necessary for tracing analyses.
-type Tracing g t v
-  = '[ Writer (g (Configuration (LocationFor v) t v)) -- For 'MonadTrace'.
-     , Fail                                           -- For 'MonadFail'.
-     , State (Store (LocationFor v) v)                -- For 'MonadStore'.
-     , Reader (Environment (LocationFor v) v)         -- For 'MonadEnv'.
-     ]
+-- | Trace analysis.
+--
+--   Instantiating @trace@ to @[]@ yields a linear trace analysis, while @Set@ yields a reachable state analysis.
+tracingTerms :: ( Corecursive term
+                , Members '[ Reader (Live location value)
+                           , State (Environment location value)
+                           , State (Heap location (Cell location) value)
+                           , Writer (trace (Configuration term location (Cell location) value))
+                           ] effects
+                , Reducer (Configuration term location (Cell location) value) (trace (Configuration term location (Cell location) value))
+                )
+             => trace (Configuration term location (Cell location) value)
+             -> SubtermAlgebra (Base term) term (Evaluator location value effects a)
+             -> SubtermAlgebra (Base term) term (Evaluator location value effects a)
+tracingTerms proxy recur term = getConfiguration (embedSubterm term) >>= trace . (`asTypeOf` proxy) . Reducer.unit >> recur term
 
--- | Linear trace analysis.
-evalTrace :: forall v term
-          . ( Ord v, Ord term, Ord (Cell (LocationFor v) v)
-            , Functor (Base term)
-            , Recursive term
-            , Addressable (LocationFor v) (Eff (Tracing [] term v))
-            , MonadGC v (Eff (Tracing [] term v))
-            , Semigroup (Cell (LocationFor v) v)
-            , Eval term v (Eff (Tracing [] term v)) (Base term)
-            )
-          => term -> Final (Tracing [] term v) v
-evalTrace = run @(Tracing [] term v) . fix (evTell @[] (\ recur yield -> eval recur yield . project)) pure
+trace :: Member (Writer (trace (Configuration term location (Cell location) value))) effects => trace (Configuration term location (Cell location) value) -> Evaluator location value effects ()
+trace = tell
 
--- | Reachable configuration analysis.
-evalReach :: forall v term
-          . ( Ord v, Ord term, Ord (LocationFor v), Ord (Cell (LocationFor v) v)
-            , Functor (Base term)
-            , Recursive term
-            , Addressable (LocationFor v) (Eff (Tracing Set term v))
-            , MonadGC v (Eff (Tracing Set term v))
-            , Semigroup (Cell (LocationFor v) v)
-            , Eval term v (Eff (Tracing Set term v)) (Base term)
-            )
-          => term -> Final (Tracing Set term v) v
-evalReach = run @(Tracing Set term v) . fix (evTell @Set (\ recur yield -> eval recur yield . project)) pure
-
-
--- | Small-step evaluation which records every visited configuration.
-evTell :: forall g t m v
-       . ( Monoid (g (Configuration (LocationFor v) t v))
-         , Pointed g
-         , MonadTrace t v g m
-         , MonadEnv v m
-         , MonadStore v m
-         , MonadGC v m
-         )
-       => (((v -> m v) -> t -> m v) -> (v -> m v) -> t -> m v)
-       -> ((v -> m v) -> t -> m v)
-       -> (v -> m v) -> t -> m v
-evTell ev0 ev' yield e = do
-  env <- askEnv
-  store <- getStore
-  roots <- askRoots
-  trace (point (Configuration e roots env store) :: g (Configuration (LocationFor v) t v))
-  ev0 ev' yield e
+tracing :: Monoid (trace (Configuration term location (Cell location) value)) => Evaluator location value (Writer (trace (Configuration term location (Cell location) value)) ': effects) a -> Evaluator location value effects (a, trace (Configuration term location (Cell location) value))
+tracing = runWriter

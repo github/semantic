@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, MultiParamTypeClasses, RankNTypes, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE RankNTypes, TypeFamilies, TypeOperators #-}
 module Data.Term
 ( Term(..)
 , termIn

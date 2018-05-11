@@ -56,7 +56,7 @@ instance Eq1 ThematicBreak where liftEq = genericLiftEq
 instance Ord1 ThematicBreak where liftCompare = genericLiftCompare
 instance Show1 ThematicBreak where liftShowsPrec = genericLiftShowsPrec
 
-data HTMLBlock a = HTMLBlock ByteString
+newtype HTMLBlock a = HTMLBlock ByteString
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance Eq1 HTMLBlock where liftEq = genericLiftEq

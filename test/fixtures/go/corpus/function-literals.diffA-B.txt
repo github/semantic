@@ -1,0 +1,28 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (Assignment
+      (Identifier)
+      (Function
+        (Empty)
+        (Empty)
+        (
+        { (Identifier)
+        ->(Identifier) }
+        { (Identifier)
+        ->(Identifier) })
+        (
+          (
+          { (Identifier)
+          ->(Identifier) })
+          (
+          { (Identifier)
+          ->(Identifier) }))
+        (Return
+          (
+            (Integer)
+            (Integer)))))))

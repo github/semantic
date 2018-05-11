@@ -1,0 +1,14 @@
+(Program
+  (While
+    (Not
+      (Send
+        (Identifier)))
+  { ([])
+  ->(Send
+    {+(Identifier)+}) })
+{-(While
+  {-(Not
+    {-(Send
+      {-(Identifier)-})-})-}
+  {-(Send
+    {-(Identifier)-})-})-})

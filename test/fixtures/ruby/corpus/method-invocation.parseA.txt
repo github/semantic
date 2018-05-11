@@ -1,0 +1,9 @@
+(Program
+  (Send
+    (Identifier))
+  (Send
+    (Send
+      (Identifier))
+    (Identifier))
+  (Send
+    (Identifier)))

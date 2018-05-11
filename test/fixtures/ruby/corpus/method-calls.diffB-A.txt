@@ -1,0 +1,37 @@
+(Program
+  (Send
+  {+(Send
+    {+(Identifier)+})+}
+  { (Identifier)
+  ->(Identifier) })
+{+(Send
+  {+(Identifier)+}
+  {+(Send
+    {+(Identifier)+})+}
+  {+(Send
+    {+(Identifier)+})+}
+  {+(KeyValue
+    {+(Symbol)+}
+    {+(Integer)+})+}
+  {+(KeyValue
+    {+(Symbol)+}
+    {+(Integer)+})+})+}
+{+(Send
+  {+(Identifier)+}
+  {+(Send
+    {+(Identifier)+}
+    {+(Send
+      {+(Identifier)+})+})+})+}
+{+(Send
+  {+(Identifier)+}
+  {+(KeyValue
+    {+(Array)+}
+    {+(Integer)+})+}
+  {+(Identifier)+}
+  {+(Identifier)+}
+  {+(Function
+    {+(Empty)+}
+    {+(Identifier)+}
+    {+(Function
+      {+(Empty)+}
+      {+(Integer)+})+})+})+})

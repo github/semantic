@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, MultiParamTypeClasses, RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Rendering.Imports
 ( renderToImports
 , ImportSummary(..)
@@ -6,7 +6,7 @@ module Rendering.Imports
 
 import Prologue
 import Analysis.Declaration
-import Analysis.ModuleDef
+import Analysis.PackageDef
 import Data.Aeson
 import Data.Blob
 import Data.ByteString.Lazy (toStrict)
@@ -22,9 +22,12 @@ import Rendering.TOC (termTableOfContentsBy, declaration, getDeclaration, toCate
 
 newtype ImportSummary = ImportSummary (Map.Map T.Text Module) deriving (Eq, Show)
 
+instance Semigroup ImportSummary where
+  (<>) (ImportSummary m1) (ImportSummary m2) = ImportSummary (Map.unionWith mappend m1 m2)
+
 instance Monoid ImportSummary where
   mempty = ImportSummary mempty
-  mappend (ImportSummary m1) (ImportSummary m2) = ImportSummary (Map.unionWith mappend m1 m2)
+  mappend = (<>)
 
 instance Output ImportSummary where
   toOutput = toStrict . (<> "\n") . encode
@@ -32,32 +35,32 @@ instance Output ImportSummary where
 instance ToJSON ImportSummary where
   toJSON (ImportSummary m) = object [ "modules" .= m ]
 
-renderToImports :: (HasField fields (Maybe ModuleDef), HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> ImportSummary
+renderToImports :: (HasField fields (Maybe PackageDef), HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> ImportSummary
 renderToImports blob term = ImportSummary $ toMap (termToModule blob term)
   where
     toMap m@Module{..} = Map.singleton moduleName m
-    termToModule :: (HasField fields (Maybe ModuleDef), HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> Module
+    termToModule :: (HasField fields (Maybe PackageDef), HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => Blob -> Term f (Record fields) -> Module
     termToModule blob@Blob{..} term = makeModule detectModuleName blob declarations
       where
         declarations = termTableOfContentsBy declaration term
         defaultModuleName = T.pack (takeBaseName blobPath)
         detectModuleName = case termTableOfContentsBy moduleDef term of
-          x:_ | Just ModuleDef{..} <- getModuleDef x -> moduleDefIdentifier
+          x:_ | Just PackageDef{..} <- getPackageDef x -> moduleDefIdentifier
           _ -> defaultModuleName
 
 makeModule :: (HasField fields Span, HasField fields (Maybe Declaration)) => T.Text -> Blob -> [Record fields] -> Module
-makeModule name Blob{..} ds = Module name [T.pack blobPath] (T.pack . show <$> blobLanguage) (mapMaybe importSummary ds) (mapMaybe declarationSummary ds) (mapMaybe referenceSummary ds)
+makeModule name Blob{..} ds = Module name [T.pack blobPath] (T.pack . show <$> blobLanguage) (mapMaybe importSummary ds) (mapMaybe (declarationSummary name) ds) (mapMaybe referenceSummary ds)
 
 
-getModuleDef :: HasField fields (Maybe ModuleDef) => Record fields -> Maybe ModuleDef
-getModuleDef = getField
+getPackageDef :: HasField fields (Maybe PackageDef) => Record fields -> Maybe PackageDef
+getPackageDef = getField
 
 -- | Produce the annotations of nodes representing moduleDefs.
-moduleDef :: HasField fields (Maybe ModuleDef) => TermF f (Record fields) a -> Maybe (Record fields)
-moduleDef (In annotation _) = annotation <$ getModuleDef annotation
+moduleDef :: HasField fields (Maybe PackageDef) => TermF f (Record fields) a -> Maybe (Record fields)
+moduleDef (In annotation _) = annotation <$ getPackageDef annotation
 
-declarationSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Maybe SymbolDeclaration
-declarationSummary record = case getDeclaration record of
+declarationSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Text -> Record fields -> Maybe SymbolDeclaration
+declarationSummary module' record = case getDeclaration record of
   Just declaration | FunctionDeclaration{} <- declaration -> Just (makeSymbolDeclaration declaration)
                    | MethodDeclaration{} <- declaration -> Just (makeSymbolDeclaration declaration)
   _ -> Nothing
@@ -65,6 +68,7 @@ declarationSummary record = case getDeclaration record of
           { declarationName = declarationIdentifier declaration
           , declarationKind = toCategoryName declaration
           , declarationSpan = getField record
+          , declarationModule = module'
           }
 
 importSummary :: (HasField fields (Maybe Declaration), HasField fields Span) => Record fields -> Maybe ImportStatement
@@ -86,9 +90,12 @@ data Module = Module
   , moduleCalls :: [CallExpression]
   } deriving (Generic, Eq, Show)
 
+instance Semigroup Module where
+  (<>) (Module n1 p1 l1 i1 d1 r1) (Module _ p2 _ i2 d2 r2) = Module n1 (p1 <> p2) l1 (i1 <> i2) (d1 <> d2) (r1 <> r2)
+
 instance Monoid Module where
   mempty = mempty
-  mappend (Module n1 p1 l1 i1 d1 r1) (Module _ p2 _ i2 d2 r2) = Module n1 (p1 <> p2) l1 (i1 <> i2) (d1 <> d2) (r1 <> r2)
+  mappend = (<>)
 
 instance ToJSON Module where
   toJSON Module{..} = object
@@ -104,6 +111,7 @@ data SymbolDeclaration = SymbolDeclaration
   { declarationName :: T.Text
   , declarationKind :: T.Text
   , declarationSpan :: Span
+  , declarationModule :: T.Text
   } deriving (Generic, Eq, Show)
 
 instance ToJSON SymbolDeclaration where
@@ -111,6 +119,7 @@ instance ToJSON SymbolDeclaration where
     [ "name" .= declarationName
     , "kind" .= declarationKind
     , "span" .= declarationSpan
+    , "module" .= declarationModule
     ]
 
 data ImportStatement = ImportStatement

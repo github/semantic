@@ -1,0 +1,36 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (
+      (Type
+      { (Identifier)
+      ->(Identifier) }
+        (Function
+          (
+          { (Identifier)
+          ->(Identifier) })
+        { (Identifier)
+        ->(Identifier) }))
+      (Type
+      { (Identifier)
+      ->(Identifier) }
+        (Function
+          (
+          {-(
+            {-(Identifier)-})-}
+            (
+              (Identifier))
+          {+(
+            {+(Identifier)+})+})
+          (
+            (
+            {+(Identifier)+}
+            {-(BidirectionalChannel
+              {-(Identifier)-})-})
+            (
+              (Identifier)))
+          (Empty))))))

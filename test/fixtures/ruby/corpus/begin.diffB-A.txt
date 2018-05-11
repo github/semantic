@@ -1,0 +1,10 @@
+(Program
+  (Method
+    (Empty)
+    (Identifier)
+    (
+      (Try
+      { (Send
+        {-(Identifier)-}
+        {-(TextElement)-})
+      ->([]) }))))

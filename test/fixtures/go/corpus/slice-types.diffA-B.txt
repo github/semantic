@@ -1,0 +1,22 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (
+      (
+        (Type
+          (Identifier)
+          (Slice
+          { (Identifier)
+          ->(Slice
+            {+(Identifier)+}) })))
+      (
+        (Type
+          (Identifier)
+          (Slice
+          { (Slice
+            {-(Identifier)-})
+          ->(Identifier) }))))))

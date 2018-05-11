@@ -1,0 +1,22 @@
+(Program
+  (Package
+    (Identifier))
+  (
+    (Assignment
+      (Identifier)
+      (Rune))
+    (Assignment
+      (Identifier)
+      (Rune))
+    (Assignment
+      (Identifier)
+      (Rune))
+    (Assignment
+      (Identifier)
+      (Rune))
+    (Assignment
+      (Identifier)
+      (Rune))
+    (Assignment
+      (Identifier)
+      (Rune))))

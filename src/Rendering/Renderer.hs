@@ -2,12 +2,15 @@
 module Rendering.Renderer
 ( DiffRenderer(..)
 , TermRenderer(..)
+, GraphRenderer(..)
 , SomeRenderer(..)
 , renderSExpressionDiff
 , renderSExpressionTerm
+, renderSExpressionAST
 , renderJSONDiff
 , renderJSONDiffs
 , renderJSONTerm
+, renderJSONTerm'
 , renderJSONTerms
 , renderToCDiff
 , renderToCTerm
@@ -23,14 +26,14 @@ module Rendering.Renderer
 , defaultSymbolFields
 ) where
 
-import Prologue
 import Data.Aeson (Value)
 import Data.Output
+import Prologue
 import Rendering.DOT as R
+import Rendering.Imports as R
 import Rendering.JSON as R
 import Rendering.SExpression as R
 import Rendering.Symbol as R
-import Rendering.Imports as R
 import Rendering.TOC as R
 
 -- | Specification of renderers for diffs, producing output in the parameter type.
@@ -65,10 +68,17 @@ data TermRenderer output where
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)
 
+-- | Specification of renderers for graph analysis, producing output in the parameter type.
+data GraphRenderer output where
+  JSONGraphRenderer :: GraphRenderer ByteString
+  DOTGraphRenderer  :: GraphRenderer ByteString
+
+deriving instance Eq (GraphRenderer output)
+deriving instance Show (GraphRenderer output)
 
 -- | Abstraction of some renderer to some 'Monoid'al output which can be serialized to a 'ByteString'.
 --
---   This type abstracts the type indices of 'DiffRenderer' and 'TermRenderer' s.t. multiple renderers can be present in a single list, alternation, etc., while retaining the ability to render and serialize. (Without 'SomeRenderer', the different output types of individual term/diff renderers prevent them from being used in a homogeneously typed setting.)
+--   This type abstracts the type indices of 'DiffRenderer', 'TermRenderer', and 'GraphRenderer' s.t. multiple renderers can be present in a single list, alternation, etc., while retaining the ability to render and serialize. (Without 'SomeRenderer', the different output types of individual term/diff renderers prevent them from being used in a homogeneously typed setting.)
 data SomeRenderer f where
   SomeRenderer :: (Output output, Show (f output)) => f output -> SomeRenderer f
 

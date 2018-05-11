@@ -11,3 +11,7 @@ import zip = require("../zip");
 function someFunction(arg1, arg2): string { arg2; };
 
 someFunction(arg1, "arg2");
+
+
+defaultMember()
+name.foo()

@@ -1,0 +1,20 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (Assignment
+      (Identifier)
+      (Composite
+        (Map
+          (Identifier)
+          (Identifier))
+        (
+          (KeyValue
+            (TextElement)
+            (TextElement))
+          (KeyValue
+            (TextElement)
+            (TextElement)))))))

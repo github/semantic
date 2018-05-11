@@ -1,0 +1,78 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    ([]))
+  (Function
+    (Empty)
+  { (Identifier)
+  ->(Identifier) }
+    ([])
+    ([]))
+  (Function
+    (Identifier)
+  { (Identifier)
+  ->(Identifier) }
+    (
+      (
+        (Identifier)
+        (Identifier))
+      (
+        (Identifier)
+        (Identifier)
+        (Identifier)
+        (Identifier)))
+    ([]))
+  (Function
+    (Empty)
+  { (Identifier)
+  ->(Identifier) }
+    ([])
+    (
+      (
+        (Identifier))
+      (
+        (Identifier)))
+    ([]))
+  (Function
+    (Empty)
+  { (Identifier)
+  ->(Identifier) }
+    ([])
+    (
+      (
+        (Identifier)
+        (Identifier))
+      (
+        (Identifier)
+        (Identifier)))
+    ([]))
+{+(Function
+  {+(Empty)+}
+  {+(Identifier)+}
+  {+([])+}
+  {+([])+}
+  {+(NoOp
+    {+(Empty)+})+})+}
+  (Function
+  { (Identifier)
+  ->(Identifier) }
+  { (Identifier)
+  ->(Identifier) }
+    ([])
+    (Empty))
+  (Function
+    (Empty)
+  { (Identifier)
+  ->(Identifier) }
+    (
+      (Identifier)
+      (Pointer
+        (Identifier)))
+    (Context
+      (Comment)
+      (Empty))
+    ([])))

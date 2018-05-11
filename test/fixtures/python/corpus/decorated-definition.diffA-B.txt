@@ -1,0 +1,58 @@
+(Program
+  (Decorator
+    (Identifier)
+    (Class
+    { (Identifier)
+    ->(Identifier) }
+      (Decorator
+        (Identifier)
+        ([])
+        (Decorator
+        { (Identifier)
+        ->(Identifier) }
+        {+(Identifier)+}
+        {-(Integer)-}
+          (Decorator
+          { (Identifier)
+          ->(Identifier) }
+          {+(Identifier)+}
+          {-(
+            {-(Integer)-}
+            {-(Integer)-})-}
+            (Decorator
+              (Identifier)
+            {+(
+              {+(Integer)+}
+              {+(Assignment
+                {+(Identifier)+}
+                {+(Boolean)+})+}
+              {+(Identifier)+}
+              {+(Identifier)+})+}
+            {-(Assignment
+              {-(Identifier)-}
+              {-(Boolean)-})-}
+            { (Decorator
+              {-(Identifier)-}
+              {-(Identifier)-}
+              {-(Decorator
+                {-(Identifier)-}
+                {-(Identifier)-}
+                {-(Decorator
+                  {-(Identifier)-}
+                  {-(
+                    {-(Integer)-}
+                    {-(Assignment
+                      {-(Identifier)-}
+                      {-(Boolean)-})-}
+                    {-(Identifier)-}
+                    {-(Identifier)-})-}
+                  {-(Annotation
+                    {-(Function
+                      {-(Identifier)-}
+                      {-(Identifier)-})-}
+                    {-(Empty)-})-})-})-})
+            ->(Annotation
+              {+(Function
+                {+(Identifier)+}
+                {+(Identifier)+})+}
+              {+(Empty)+}) })))))))

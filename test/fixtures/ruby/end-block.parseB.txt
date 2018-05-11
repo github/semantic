@@ -1,4 +1,0 @@
-(Program
-  (Identifier)
-  (ScopeExit
-    (Identifier)))

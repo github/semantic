@@ -1,11 +1,11 @@
-{-# LANGUAGE DataKinds, MultiParamTypeClasses, TypeOperators, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
+{-# LANGUAGE TypeOperators, ScopedTypeVariables, TypeFamilies, UndecidableInstances #-}
 module Analysis.Declaration
 ( Declaration(..)
 , HasDeclaration
 , declarationAlgebra
 ) where
 
-import Prologue
+import Data.Abstract.FreeVariables (Name(..))
 import Data.Blob
 import Data.Error (Error(..), showExpectation)
 import Data.Language as Language
@@ -13,21 +13,25 @@ import Data.Range
 import Data.Record
 import Data.Source as Source
 import Data.Span
-import Data.Term
+import Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Syntax.Declaration as Declaration
 import qualified Data.Syntax.Expression as Expression
+import Data.Term
 import qualified Data.Text as T
+import qualified Data.Text.Encoding as T
 import qualified Language.Markdown.Syntax as Markdown
+import qualified Language.Ruby.Syntax as Ruby.Syntax
+import Prologue
 
 -- | A declaration’s identifier and type.
 data Declaration
   = MethodDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationReceiver :: Maybe T.Text }
   | ClassDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
-  | ImportDeclaration   { declarationIdentifier :: T.Text, declarationAlias :: T.Text, declarationSymbols :: [(T.Text, T.Text)], declarationLanguage :: Maybe Language }
+  | ImportDeclaration   { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationAlias :: T.Text, declarationSymbols :: [(T.Text, T.Text)] }
   | FunctionDeclaration { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   | HeadingDeclaration  { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationLevel :: Int }
-  | CallReference       { declarationIdentifier :: T.Text, declarationImportIdentifier :: [T.Text] }
+  | CallReference       { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language, declarationImportIdentifier :: [T.Text] }
   | ErrorDeclaration    { declarationIdentifier :: T.Text, declarationText :: T.Text, declarationLanguage :: Maybe Language }
   deriving (Eq, Generic, Show)
 
@@ -96,58 +100,48 @@ instance CustomHasDeclaration whole Declaration.Function where
     -- Do not summarize anonymous functions
     | isEmpty identifierAnn = Nothing
     -- Named functions
-    | otherwise             = Just $ FunctionDeclaration (getSource identifierAnn) (getFunctionSource blob (In ann decl)) blobLanguage
-    where getSource = toText . flip Source.slice blobSource . getField
-          isEmpty = (== 0) . rangeLength . getField
+    | otherwise             = Just $ FunctionDeclaration (getSource blobSource identifierAnn) (getFunctionSource blob (In ann decl)) blobLanguage
+    where isEmpty = (== 0) . rangeLength . getField
 
 -- | Produce a 'MethodDeclaration' for 'Declaration.Method' nodes. If the method’s receiver is non-empty (defined as having a non-empty 'Range'), the 'declarationIdentifier' will be formatted as 'receiver.method_name'; otherwise it will be simply 'method_name'.
 instance CustomHasDeclaration whole Declaration.Method where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Method _ (Term (In receiverAnn receiverF), _) (Term (In identifierAnn _), _) _ _)
     -- Methods without a receiver
-    | isEmpty receiverAnn = Just $ MethodDeclaration (getSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage Nothing
+    | isEmpty receiverAnn = Just $ MethodDeclaration (getSource blobSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage Nothing
     -- Methods with a receiver type and an identifier (e.g. (a *Type) in Go).
     | blobLanguage == Just Go
-    , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ MethodDeclaration (getSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage (Just (getSource receiverType))
+    , [ _, Term (In receiverType _) ] <- toList receiverF = Just $ MethodDeclaration (getSource blobSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage (Just (getSource blobSource receiverType))
     -- Methods with a receiver (class methods) are formatted like `receiver.method_name`
-    | otherwise           = Just $ MethodDeclaration (getSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage (Just (getSource receiverAnn))
-    where getSource = toText . flip Source.slice blobSource . getField
-          isEmpty = (== 0) . rangeLength . getField
+    | otherwise           = Just $ MethodDeclaration (getSource blobSource identifierAnn) (getMethodSource blob (In ann decl)) blobLanguage (Just (getSource blobSource receiverAnn))
+    where isEmpty = (== 0) . rangeLength . getField
 
 -- | Produce a 'ClassDeclaration' for 'Declaration.Class' nodes.
 instance CustomHasDeclaration whole Declaration.Class where
   customToDeclaration blob@Blob{..} ann decl@(Declaration.Class _ (Term (In identifierAnn _), _) _ _)
-    -- Classes
-    = Just $ ClassDeclaration (getSource identifierAnn) (getClassSource blob (In ann decl)) blobLanguage
-    where getSource = toText . flip Source.slice blobSource . getField
+    = Just $ ClassDeclaration (getSource blobSource identifierAnn) (getClassSource blob (In ann decl)) blobLanguage
 
-instance (Declaration.ImportSymbol :< fs) => CustomHasDeclaration (Union fs) Declaration.Import where
-  customToDeclaration Blob{..} _ (Declaration.Import (Term (In fromAnn _), _) (Term (In aliasAnn _), _) symbols)
-    = Just $ ImportDeclaration name (getAlias blobLanguage (getSource aliasAnn)) (mapMaybe getSymbol symbols) blobLanguage
-    where
-      name = getSource fromAnn
-      getAlias lang alias | Just TypeScript <- lang, T.null alias = basename name
-                          | Just Go <- lang, T.null alias = basename name
-                          | otherwise = alias
-      basename = last . T.splitOn "/"
-      getSource = T.dropAround (`elem` ['"', '\'']) . toText . flip Source.slice blobSource . getField
-      getSymbol (Term (In _ f), _) | Just (Declaration.ImportSymbol (Term (In nameAnn _)) (Term (In aliasAnn _))) <- prj f
-                                   = Just (getSource nameAnn, getSource aliasAnn)
-                                   | otherwise = Nothing
+instance CustomHasDeclaration whole Ruby.Syntax.Class where
+  customToDeclaration blob@Blob{..} ann decl@(Ruby.Syntax.Class (Term (In identifierAnn _), _) _ _)
+    = Just $ ClassDeclaration (getSource blobSource identifierAnn) (getRubyClassSource blob (In ann decl)) blobLanguage
 
-instance (Expression.MemberAccess :< fs) => CustomHasDeclaration (Union fs) Expression.Call where
+getSource :: HasField fields Range => Source -> Record fields -> Text
+getSource blobSource = toText . flip Source.slice blobSource . getField
+
+instance (Syntax.Identifier :< fs, Expression.MemberAccess :< fs) => CustomHasDeclaration (Sum fs) Expression.Call where
   customToDeclaration Blob{..} _ (Expression.Call _ (Term (In fromAnn fromF), _) _ _)
-    | Just (Expression.MemberAccess (Term (In leftAnn leftF)) (Term (In idenAnn _))) <- prj fromF = Just $ CallReference (getSource idenAnn) (memberAccess leftAnn leftF)
-    | otherwise = Just $ CallReference (getSource fromAnn) []
+    | Just (Expression.MemberAccess (Term (In leftAnn leftF)) (Term (In idenAnn _))) <- projectSum fromF = Just $ CallReference (getSource idenAnn) mempty blobLanguage (memberAccess leftAnn leftF)
+    | Just (Syntax.Identifier (Name name)) <- projectSum fromF = Just $ CallReference (T.decodeUtf8 name) mempty blobLanguage []
+    | otherwise = Just $ CallReference (getSource fromAnn) mempty blobLanguage []
     where
       memberAccess modAnn termFOut
-        | Just (Expression.MemberAccess (Term (In leftAnn leftF)) (Term (In rightAnn rightF))) <- prj termFOut
+        | Just (Expression.MemberAccess (Term (In leftAnn leftF)) (Term (In rightAnn rightF))) <- projectSum termFOut
         = memberAccess leftAnn leftF <> memberAccess rightAnn rightF
         | otherwise = [getSource modAnn]
       getSource = toText . flip Source.slice blobSource . getField
 
--- | Produce a 'Declaration' for 'Union's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
-instance Apply (HasDeclaration' whole) fs => CustomHasDeclaration whole (Union fs) where
-  customToDeclaration blob ann = apply (Proxy :: Proxy (HasDeclaration' whole)) (toDeclaration' blob ann)
+-- | Produce a 'Declaration' for 'Sum's using the 'HasDeclaration' instance & therefore using a 'CustomHasDeclaration' instance when one exists & the type is listed in 'DeclarationStrategy'.
+instance Apply (HasDeclaration' whole) fs => CustomHasDeclaration whole (Sum fs) where
+  customToDeclaration blob ann = apply @(HasDeclaration' whole) (toDeclaration' blob ann)
 
 
 -- | A strategy for defining a 'HasDeclaration' instance. Intended to be promoted to the kind level using @-XDataKinds@.
@@ -167,13 +161,13 @@ class HasDeclarationWithStrategy (strategy :: Strategy) whole syntax where
 --   If you’re seeing errors about missing a 'CustomHasDeclaration' instance for a given type, you’ve probably listed it in here but not defined a 'CustomHasDeclaration' instance for it, or else you’ve listed the wrong type in here. Conversely, if your 'customHasDeclaration' method is never being called, you may have forgotten to list the type in here.
 type family DeclarationStrategy syntax where
   DeclarationStrategy Declaration.Class = 'Custom
+  DeclarationStrategy Ruby.Syntax.Class = 'Custom
   DeclarationStrategy Declaration.Function = 'Custom
-  DeclarationStrategy Declaration.Import = 'Custom
   DeclarationStrategy Declaration.Method = 'Custom
   DeclarationStrategy Markdown.Heading = 'Custom
   DeclarationStrategy Expression.Call = 'Custom
   DeclarationStrategy Syntax.Error = 'Custom
-  DeclarationStrategy (Union fs) = 'Custom
+  DeclarationStrategy (Sum fs) = 'Custom
   DeclarationStrategy a = 'Default
 
 
@@ -205,4 +199,11 @@ getClassSource Blob{..} (In a r)
   = let declRange = getField a
         bodyRange = getField <$> case r of
           Declaration.Class _ _ _ (Term (In a' _), _) -> Just a'
+    in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange
+
+getRubyClassSource :: (HasField fields Range) => Blob -> TermF Ruby.Syntax.Class (Record fields) (Term syntax (Record fields), a) -> T.Text
+getRubyClassSource Blob{..} (In a r)
+  = let declRange = getField a
+        bodyRange = getField <$> case r of
+          Ruby.Syntax.Class _ _ (Term (In a' _), _) -> Just a'
     in maybe mempty (T.stripEnd . toText . flip Source.slice blobSource . subtractRange declRange) bodyRange

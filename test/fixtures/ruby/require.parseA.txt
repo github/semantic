@@ -1,8 +1,0 @@
-(Program
-  (Import
-    (TextElement)
-    (Empty))
-  (Call
-    (Identifier)
-    (Identifier)
-    (Empty)))

@@ -1,9 +1,0 @@
-(Program
-  (Or
-    (Identifier)
-    (Identifier))
-  (And
-    (Or
-      (Identifier)
-      (Identifier))
-    (Identifier)))

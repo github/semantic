@@ -1,10 +1,11 @@
 {-# LANGUAGE ConstraintKinds, DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Data.Record where
 
-import Prologue
 import Data.Aeson
 import Data.JSON.Fields
 import Data.Kind
+import Data.Semilattice.Lower
+import Prologue
 
 -- | A type-safe, extensible record structure.
 -- |
@@ -50,7 +51,7 @@ instance {-# OVERLAPPABLE #-} HasField (field ': fields) field where
 
 
 instance (Show h, Show (Record t)) => Show (Record (h ': t)) where
-  showsPrec n (h :. t) = showParen (n > 0) $ showsPrec 1 h . showString " :. " . showsPrec 0 t
+  showsPrec n (h :. t) = showParen (n > 0) $ showsPrec 1 h . showString " :. " . shows t
 
 instance Show (Record '[]) where
   showsPrec _ Nil = showString "Nil"
@@ -87,3 +88,10 @@ instance ToJSONFields (Record '[]) where
 instance ToJSONFields (Record fs) => ToJSON (Record fs) where
   toJSON = object . toJSONFields
   toEncoding = pairs . mconcat . toJSONFields
+
+
+instance (Lower h, Lower (Record t)) => Lower (Record (h ': t)) where
+  lowerBound = lowerBound :. lowerBound
+
+instance Lower (Record '[]) where
+  lowerBound = Nil

@@ -1,34 +1,22 @@
-{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving, OverloadedStrings #-}
-module Integration.Spec where
+module Integration.Spec (spec) where
 
-import qualified Data.ByteString as B
-import Data.Foldable (find, traverse_)
-import Data.Functor.Both
+import Data.Foldable (find, traverse_, for_)
 import Data.List (union, concat, transpose)
-import Data.Maybe (fromMaybe)
-import Data.Semigroup ((<>))
-import qualified Data.Text as T
-import Data.Text.Encoding (decodeUtf8)
-import System.FilePath
+import qualified Data.ByteString as B
 import System.FilePath.Glob
+import System.FilePath.Posix
+
 import SpecHelpers
-import Test.Hspec (Spec, describe, it, SpecWith, runIO, parallel, pendingWith)
-import Test.Hspec.Expectations.Pretty
+
+languages :: [FilePath]
+languages = ["go", "javascript", "python", "ruby", "typescript"]
 
 spec :: Spec
 spec = parallel $ do
-  it "lists example fixtures" $ do
-    examples "test/fixtures/go/" `shouldNotReturn` []
-    examples "test/fixtures/javascript/" `shouldNotReturn` []
-    examples "test/fixtures/python/" `shouldNotReturn` []
-    examples "test/fixtures/ruby/" `shouldNotReturn` []
-    examples "test/fixtures/typescript/" `shouldNotReturn` []
-
-  describe "go" $ runTestsIn "test/fixtures/go/" []
-  describe "javascript" $ runTestsIn "test/fixtures/javascript/" []
-  describe "python" $ runTestsIn "test/fixtures/python/" []
-  describe "ruby" $ runTestsIn "test/fixtures/ruby/" []
-  describe "typescript" $ runTestsIn "test/fixtures/typescript/" []
+  for_ languages $ \language -> do
+    let dir = "test/fixtures" </> language </> "corpus"
+    it (language <> " corpus exists") $ examples dir `shouldNotReturn` []
+    describe (language <> " corpus") $ runTestsIn dir []
 
   where
     runTestsIn :: FilePath -> [(FilePath, String)] -> SpecWith ()

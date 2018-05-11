@@ -1,0 +1,47 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+  { (Match
+    {-(Empty)-}
+    {-([])-})
+  ->(
+    {+(Match
+      {+([])+}
+      {+(Pattern
+        {+(Identifier)+}
+        {+(Call
+          {+(Identifier)+}
+          {+([])+}
+          {+(Empty)+})+})+})+}
+    {+(Match
+      {+(
+        {+(Identifier)+})+}
+      {+(
+        {+(Pattern
+          {+(
+            {+(Integer)+}
+            {+(Integer)+})+}
+          {+(
+            {+(Call
+              {+(Identifier)+}
+              {+([])+}
+              {+(Empty)+})+}
+            {+(Call
+              {+(Identifier)+}
+              {+([])+}
+              {+(Empty)+})+}
+            {+(Pattern
+              {+(Identifier)+}
+              {+(Empty)+})+})+})+}
+        {+(DefaultPattern
+          {+(
+            {+(Call
+              {+(Identifier)+}
+              {+([])+}
+              {+(Empty)+})+}
+            {+(Break
+              {+(Empty)+})+})+})+})+})+}) }))

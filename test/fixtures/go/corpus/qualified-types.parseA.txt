@@ -1,0 +1,13 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (
+      (Type
+        (Identifier)
+        (MemberAccess
+          (Identifier)
+          (Identifier))))))

@@ -1,0 +1,12 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (TypeAssertion
+      (Identifier)
+      (MemberAccess
+        (Identifier)
+        (Identifier)))))

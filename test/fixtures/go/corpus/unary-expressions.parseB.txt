@@ -1,0 +1,25 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (
+      (Identifier)
+      (Negate
+        (Identifier))
+      (Not
+        (ReceiveOperator
+          (Identifier)))
+      (Pointer
+        (Call
+          (Identifier)
+          ([])
+          (Empty)))
+      (Complement
+        (Identifier))
+      (Reference
+        (Identifier))
+      (ReceiveOperator
+        (Identifier)))))

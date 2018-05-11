@@ -14,7 +14,7 @@ import Diffing.Algorithm
 import Diffing.Algorithm.RWS
 
 -- | Diff two à la carte terms recursively.
-diffTerms :: (Diffable syntax, Eq1 syntax, Foldable syntax, Functor syntax, GAlign syntax, Show1 syntax, Traversable syntax)
+diffTerms :: (Diffable syntax, Eq1 syntax, GAlign syntax, Show1 syntax, Traversable syntax)
           => Term syntax (Record fields1)
           -> Term syntax (Record fields2)
           -> Diff syntax (Record fields1) (Record fields2)

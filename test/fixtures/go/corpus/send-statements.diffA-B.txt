@@ -1,0 +1,12 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (Send
+    { (Identifier)
+    ->(Identifier) }
+    { (Integer)
+    ->(Integer) })))

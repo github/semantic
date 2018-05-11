@@ -1,53 +1,53 @@
-{-# LANGUAGE DataKinds, ScopedTypeVariables, TypeApplications #-}
-module Analysis.Abstract.Dead where
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeOperators #-}
+module Analysis.Abstract.Dead
+( Dead(..)
+, revivingTerms
+, killingModules
+, providingDeadSet
+) where
 
+import Control.Abstract.Evaluator
+import Data.Abstract.Module
+import Data.Semigroup.Reducer as Reducer
+import Data.Semilattice.Lower
+import Data.Set (delete)
 import Prologue
-import Control.Effect
-import Control.Monad.Effect hiding (run)
-import Control.Monad.Effect.Addressable
-import Control.Monad.Effect.Dead
-import Control.Monad.Effect.Fail
-import Control.Monad.Effect.Reader
-import Control.Monad.Effect.State
-import Data.Abstract.Address
-import Data.Abstract.Environment
-import Data.Abstract.Eval
-import Data.Abstract.Store
-import Data.Abstract.Value
 
--- | The effects necessary for dead code analysis.
-type DeadCodeEvaluating t v
-  = '[ State (Dead t)                         -- For 'MonadDead'.
-     , Fail                                   -- For 'MonadFail'.
-     , State (Store (LocationFor v) v)        -- For 'MonadStore'.
-     , Reader (Environment (LocationFor v) v) -- For 'MonadEnv'.
-     ]
+-- | A set of “dead” (unreachable) terms.
+newtype Dead term = Dead { unDead :: Set term }
+  deriving (Eq, Foldable, Lower, Monoid, Ord, Semigroup, Show)
+
+deriving instance Ord term => Reducer term (Dead term)
+
+-- | Update the current 'Dead' set.
+killAll :: Member (State (Dead term)) effects => Dead term -> Evaluator location value effects ()
+killAll = put
+
+-- | Revive a single term, removing it from the current 'Dead' set.
+revive :: (Member (State (Dead term)) effects, Ord term) => term -> Evaluator location value effects ()
+revive t = modify' (Dead . delete t . unDead)
+
+-- | Compute the set of all subterms recursively.
+subterms :: (Ord term, Recursive term, Foldable (Base term)) => term -> Dead term
+subterms term = term `cons` para (foldMap (uncurry cons)) term
 
 
--- | Dead code analysis
-evalDead :: forall v term
-         . ( Ord v
-           , Ord term
-           , Foldable (Base term)
-           , Recursive term
-           , Eval term v (Eff (DeadCodeEvaluating term v)) (Base term)
-           , Addressable (LocationFor v) (Eff (DeadCodeEvaluating term v))
-           , Semigroup (Cell (LocationFor v) v)
-           )
-         => term
-         -> Final (DeadCodeEvaluating term v) v
-evalDead e0 = run @(DeadCodeEvaluating term v) $ do
-  killAll (Dead (subterms e0))
-  fix (evDead (\ recur yield -> eval recur yield . project)) pure e0
-  where
-    subterms :: (Ord a, Recursive a, Foldable (Base a)) => a -> Set a
-    subterms term = para (foldMap (uncurry ((<>) . point))) term <> point term
+revivingTerms :: ( Corecursive term
+                 , Member (State (Dead term)) effects
+                 , Ord term
+                 )
+              => SubtermAlgebra (Base term) term (Evaluator location value effects a)
+              -> SubtermAlgebra (Base term) term (Evaluator location value effects a)
+revivingTerms recur term = revive (embedSubterm term) *> recur term
 
--- | Evaluation which 'revive's each visited term.
-evDead :: (Ord t, MonadDead t m)
-       => (((v -> m v) -> t -> m v) -> (v -> m v) -> t -> m v)
-       -> ((v -> m v) -> t -> m v)
-       -> (v -> m v) -> t -> m v
-evDead ev0 ev' yield e = do
-  revive e
-  ev0 ev' yield e
+killingModules :: ( Foldable (Base term)
+                  , Member (State (Dead term)) effects
+                  , Ord term
+                  , Recursive term
+                  )
+               => SubtermAlgebra Module term (Evaluator location value effects a)
+               -> SubtermAlgebra Module term (Evaluator location value effects a)
+killingModules recur m = killAll (subterms (subterm (moduleBody m))) *> recur m
+
+providingDeadSet :: Evaluator location value (State (Dead term) ': effects) a -> Evaluator location value effects (a, Dead term)
+providingDeadSet = runState lowerBound

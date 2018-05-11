@@ -3,16 +3,12 @@ module Data.Functor.Both
 ( Both
 , both
 , runBothWith
-, fst
-, snd
 , module X
 ) where
 
 import Data.Bifunctor.Join as X
 import Data.Functor.Classes
 import Data.Semigroup
-import Prelude hiding (fst, snd)
-import qualified Prelude
 
 -- | A computation over both sides of a pair.
 type Both = Join (,)
@@ -25,13 +21,6 @@ both = curry Join
 runBothWith :: (a -> a -> b) -> Both a -> b
 runBothWith f = uncurry f . runJoin
 
--- | Runs the left side of a `Both`.
-fst :: Both a -> a
-fst = Prelude.fst . runJoin
-
--- | Runs the right side of a `Both`.
-snd :: Both a -> a
-snd = Prelude.snd . runJoin
 
 instance (Semigroup a, Monoid a) => Monoid (Join (,) a) where
   mempty = pure mempty

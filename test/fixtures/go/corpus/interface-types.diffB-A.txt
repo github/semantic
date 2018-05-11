@@ -1,0 +1,50 @@
+(Program
+  (Package
+    (Identifier))
+  (Function
+    (Empty)
+    (Identifier)
+    ([])
+    (
+      (
+        (Type
+        { (Identifier)
+        ->(Identifier) }
+          (Interface
+            ([]))))
+      (
+        (Type
+        { (Identifier)
+        ->(Identifier) }
+          (Interface
+            (MemberAccess
+              (Identifier)
+              (Identifier)))))
+      (
+        (Type
+        { (Identifier)
+        ->(Identifier) }
+          (Interface
+            (
+              (Identifier)
+              (MemberAccess
+                (Identifier)
+                (Identifier))
+              (MethodSignature
+                (Identifier)
+                (Identifier)
+                (
+                  (Identifier)
+                  (Identifier)))))))
+      (Context
+        (Comment)
+        (
+          (Type
+          { (Identifier)
+          ->(Identifier) }
+            (Interface
+              (MethodSignature
+                (Empty)
+              { (Identifier)
+              ->(Identifier) }
+                ([])))))))))

@@ -1,8 +1,0 @@
-(Program
-  (While
-    (Identifier)
-  { ([])
-  ->(Identifier) })
-{-(While
-  {-(Identifier)-}
-  {-(Identifier)-})-})

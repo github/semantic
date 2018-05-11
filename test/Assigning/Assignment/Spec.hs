@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-module Assigning.Assignment.Spec where
+module Assigning.Assignment.Spec (spec) where
 
 import Assigning.Assignment
 import Data.AST
@@ -188,13 +188,13 @@ spec = do
     it "advances past the current node" $
       snd <$> runAssignment "hi" source (makeState [ node Red 0 2 [] ])
       `shouldBe`
-        Right (State 2 (Pos 1 3) [] [])
+        Right (State 2 (Pos 1 3) [] [] [])
 
   describe "children" $ do
     it "advances past the current node" $
       snd <$> runAssignment "a" (children (pure (Out ""))) (makeState [node Red 0 1 []])
       `shouldBe`
-        Right (State 1 (Pos 1 2) [] [])
+        Right (State 1 (Pos 1 2) [] [] [])
 
     it "matches if its subrule matches" $
       () <$ runAssignment "a" (children red) (makeState [node Blue 0 1 [node Red 0 1 []]])

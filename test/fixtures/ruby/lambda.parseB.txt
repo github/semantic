@@ -1,9 +1,0 @@
-(Program
-  (Call
-    (Identifier)
-    (Function
-      (Empty)
-      (Identifier)
-      (Plus
-        (Identifier)
-        (Integer)))))

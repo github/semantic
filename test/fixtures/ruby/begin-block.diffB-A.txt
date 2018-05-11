@@ -1,6 +1,0 @@
-(Program
-{+(ScopeEntry
-  {+(Identifier)+})+}
-{-(Identifier)-}
-{-(ScopeEntry
-  {-(Identifier)-})-})
