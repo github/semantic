@@ -33,6 +33,9 @@ data Type
   | Hole                -- ^ The hole type.
   deriving (Eq, Ord, Show)
 
+infixl 7 :*
+infixr 0 :->
+
 newtype Product = Product { getProduct :: Type }
 
 instance Semigroup Product where (<>) = fmap Product . ((:*) `on` getProduct)
