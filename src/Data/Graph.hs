@@ -47,7 +47,5 @@ instance Ord vertex => Ord (Graph vertex) where
 
 
 instance (Ord vertex, ToJSON vertex) => ToJSON (Graph vertex) where
-  toJSON (Graph graph) = object [ "vertices" .= vertices, "edges" .= edges ]
-    where
-      vertices = toJSON (G.vertexList graph)
-      edges = fmap (\(a, b) -> object [ "source" .= a, "target" .= b ]) (G.edgeList graph)
+  toJSON (Graph graph) = object [ "vertices" .= G.vertexList graph, "edges" .= (toEdge <$> G.edgeList graph) ]
+    where toEdge (a, b) = object [ "source" .= a, "target" .= b ]
