@@ -10,6 +10,7 @@ module Data.Graph
 
 import qualified Algebra.Graph as G
 import qualified Algebra.Graph.Class as Class
+import Data.Aeson
 import Data.Semilattice.Lower
 import Prologue
 
@@ -43,3 +44,10 @@ instance Ord vertex => Ord (Graph vertex) where
   compare (Graph (G.Overlay _  _))  _                         = LT
   compare _                         (Graph (G.Overlay _ _))   = GT
   compare (Graph (G.Connect a1 a2)) (Graph (G.Connect b1 b2)) = (compare `on` Graph) a1 b1 <> (compare `on` Graph) a2 b2
+
+
+instance (Ord vertex, ToJSON vertex) => ToJSON (Graph vertex) where
+  toJSON (Graph graph) = object [ "vertices" .= vertices, "edges" .= edges ]
+    where
+      vertices = toJSON (G.vertexList graph)
+      edges = fmap (\(a, b) -> object [ "source" .= a, "target" .= b ]) (G.edgeList graph)
