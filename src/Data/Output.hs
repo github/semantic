@@ -1,10 +1,12 @@
-module Data.Output where
+module Data.Output
+( Output(..)
+) where
 
-import Prologue
 import Data.Aeson (Value, encode)
 import Data.ByteString.Lazy (toStrict)
 import Data.Text (Text, intercalate)
 import Data.Text.Encoding (encodeUtf8)
+import Prologue
 
 class Monoid o => Output o where
   toOutput :: o -> ByteString
