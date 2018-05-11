@@ -48,7 +48,7 @@ withCurrentSpan = local . const
 withCurrentSrcLoc :: (Effectful m, Members '[Reader ModuleInfo, Reader Span] effects) => SrcLoc -> m effects a -> m effects a
 withCurrentSrcLoc loc = withCurrentModule (moduleInfoFromSrcLoc loc) . withCurrentSpan (spanFromSrcLoc loc)
 
--- | Run ana ction with locally replaced 'ModuleInfo' & 'Span' derived from the Haskell call stack.
+-- | Run an action with locally replaced 'ModuleInfo' & 'Span' derived from the Haskell call stack.
 --
 --   This is suitable for contextualizing builtins & other functionality intended for use from client code but defined in Haskell source.
 withCurrentCallStack :: (Effectful m, Members '[Reader ModuleInfo, Reader Span] effects) => CallStack -> m effects a -> m effects a
