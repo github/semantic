@@ -21,3 +21,7 @@ simplify (Graph graph) = Graph (G.simplify graph)
 
 instance Semigroup (Graph v) where
   (<>) = Class.overlay
+
+instance Monoid (Graph v) where
+  mempty = Class.empty
+  mappend = (<>)
