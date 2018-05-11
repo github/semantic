@@ -18,7 +18,7 @@ module Semantic.IO
 , readBlobs
 , readBlobPairs
 , writeToOutput
-, Handle
+, Handle(..)
 , IO.IOMode(..)
 , stdin
 , stdout
