@@ -368,7 +368,7 @@ instance Evaluatable Namespace where
   eval Namespace{..} = go names
     where
       names = freeVariables (subterm namespaceName)
-      go [] = raise (fail "expected at least one free variable in namespaceName, found none")
+      go [] = raiseEff (fail "expected at least one free variable in namespaceName, found none")
       -- The last name creates a closure over the namespace body.
       go [name] = letrec' name $ \addr ->
         subtermValue namespaceBody *> makeNamespace name addr Nothing

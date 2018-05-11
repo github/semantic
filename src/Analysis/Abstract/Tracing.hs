@@ -4,7 +4,7 @@ module Analysis.Abstract.Tracing
 , tracing
 ) where
 
-import Control.Abstract
+import Control.Abstract hiding (trace)
 import Control.Monad.Effect.Writer
 import Data.Semigroup.Reducer as Reducer
 import Prologue
@@ -15,18 +15,18 @@ import Prologue
 tracingTerms :: ( Corecursive term
                 , Members '[ Reader (Live location value)
                            , State (Environment location value)
-                           , State (Heap location value)
-                           , Writer (trace (Configuration term location value))
+                           , State (Heap location (Cell location) value)
+                           , Writer (trace (Configuration term location (Cell location) value))
                            ] effects
-                , Reducer (Configuration term location value) (trace (Configuration term location value))
+                , Reducer (Configuration term location (Cell location) value) (trace (Configuration term location (Cell location) value))
                 )
-             => trace (Configuration term location value)
+             => trace (Configuration term location (Cell location) value)
              -> SubtermAlgebra (Base term) term (Evaluator location value effects a)
              -> SubtermAlgebra (Base term) term (Evaluator location value effects a)
 tracingTerms proxy recur term = getConfiguration (embedSubterm term) >>= trace . (`asTypeOf` proxy) . Reducer.unit >> recur term
 
-trace :: Member (Writer (trace (Configuration term location value))) effects => trace (Configuration term location value) -> Evaluator location value effects ()
-trace = raise . tell
+trace :: Member (Writer (trace (Configuration term location (Cell location) value))) effects => trace (Configuration term location (Cell location) value) -> Evaluator location value effects ()
+trace = tell
 
-tracing :: Monoid (trace (Configuration term location value)) => Evaluator location value (Writer (trace (Configuration term location value)) ': effects) a -> Evaluator location value effects (a, trace (Configuration term location value))
-tracing = raiseHandler runWriter
+tracing :: Monoid (trace (Configuration term location (Cell location) value)) => Evaluator location value (Writer (trace (Configuration term location (Cell location) value)) ': effects) a -> Evaluator location value effects (a, trace (Configuration term location (Cell location) value))
+tracing = runWriter

@@ -2,7 +2,6 @@
 module Data.Abstract.Value where
 
 import Control.Abstract
-import Data.Abstract.Address
 import Data.Abstract.Environment (Environment, emptyEnv, mergeEnvs)
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.FreeVariables
@@ -38,7 +37,7 @@ type ValueConstructors location
 
 -- | Open union of primitive values that terms can be evaluated to.
 --   Fix by another name.
-newtype Value location = Value { deValue :: Sum (ValueConstructors location) (Value location) }
+newtype Value location = Value (Sum (ValueConstructors location) (Value location))
   deriving (Eq, Show, Ord)
 
 -- | Identical to 'inj', but wraps the resulting sub-entity in a 'Value'.
@@ -47,7 +46,7 @@ injValue = Value . injectSum
 
 -- | Identical to 'prj', but unwraps the argument out of its 'Value' wrapper.
 prjValue :: (f :< ValueConstructors location) => Value location -> Maybe (f (Value location))
-prjValue = projectSum . deValue
+prjValue (Value v) = projectSum v
 
 -- | Convenience function for projecting two values.
 prjPair :: (f :< ValueConstructors location , g :< ValueConstructors location)
@@ -216,7 +215,7 @@ instance ( Addressable location (Goto effects (Value location) ': effects)
                     , Resumable (ValueError location)
                     , Return (Value location)
                     , State (Environment location (Value location))
-                    , State (Heap location (Value location))
+                    , State (Heap location (Cell location) (Value location))
                     ] effects
          , Reducer (Value location) (Cell location (Value location))
          , Show location
@@ -417,7 +416,7 @@ throwValueError :: Member (Resumable (ValueError location)) effects => ValueErro
 throwValueError = throwResumable
 
 runValueError :: Evaluator location value (Resumable (ValueError location) ': effects) a -> Evaluator location value effects (Either (SomeExc (ValueError location)) a)
-runValueError = raiseHandler runError
+runValueError = runResumable
 
 runValueErrorWith :: (forall resume . ValueError location resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (ValueError location) ': effects) a -> Evaluator location value effects a
 runValueErrorWith = runResumableWith

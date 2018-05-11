@@ -44,7 +44,7 @@ resolveGoImport (ImportPath path Relative) = do
     _ -> pure paths
 resolveGoImport (ImportPath path NonRelative) = do
   package <- BC.unpack . unName . Package.packageName <$> currentPackage
-  traceE ("attempting to resolve " <> show path <> " for package " <> package)
+  trace ("attempting to resolve " <> show path <> " for package " <> package)
   case splitDirectories path of
     -- Import an absolute path that's defined in this package being analyzed.
     -- First two are source, next is package name, remaining are path to package

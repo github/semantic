@@ -25,11 +25,11 @@ type Label = Int
 --
 --   Labels must be allocated before being jumped to with 'goto', but are suitable for nonlocal jumps; thus, they can be used to implement coroutines, exception handling, call with current continuation, and other esoteric control mechanisms.
 label :: Evaluator location value (Goto effects value ': effects) value -> Evaluator location value (Goto effects value ': effects) Label
-label = send . Label . lower
+label = send . Label . lowerEff
 
 -- | “Jump” to a previously-allocated 'Label' (retrieving the @term@ at which it points, which can then be evaluated.
 goto :: Label -> Evaluator location value (Goto effects value ': effects) (Evaluator location value (Goto effects value ': effects) value)
-goto = fmap raise . send . Goto
+goto = fmap raiseEff . send . Goto
 
 
 -- | 'Goto' effects embed an 'Eff' action which can be run in the environment under the 'Goto' itself.
@@ -62,17 +62,16 @@ runGoto :: Members '[ Fail
         -> (table -> GotoTable effects value)
         -> Evaluator location value (Goto effects value ': effects) a
         -> Evaluator location value effects a
-runGoto from to = runEffect (\ goto yield -> do
+runGoto from to = interpret (\ goto -> do
   table <- to <$> getTable
   case goto of
     Label action -> do
-      supremum <- raise fresh
-      putTable (from (IntMap.insert supremum action table))
-      yield supremum
-    Goto label   -> maybe (raise (fail ("unknown label: " <> show label))) yield (IntMap.lookup label table))
+      supremum <- fresh
+      supremum <$ putTable (from (IntMap.insert supremum action table))
+    Goto label   -> maybeM (raiseEff (fail ("unknown label: " <> show label))) (IntMap.lookup label table))
 
 getTable :: Member (State table) effects => Evaluator location value effects table
-getTable = raise get
+getTable = get
 
 putTable :: Member (State table) effects => table -> Evaluator location value effects ()
-putTable = raise . put
+putTable = put

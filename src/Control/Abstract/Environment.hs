@@ -25,29 +25,29 @@ import Prologue
 
 -- | Retrieve the environment.
 getEnv :: Member (State (Environment location value)) effects => Evaluator location value effects (Environment location value)
-getEnv = raise get
+getEnv = get
 
 -- | Set the environment.
 putEnv :: Member (State (Environment location value)) effects => Environment location value -> Evaluator location value effects ()
-putEnv = raise . put
+putEnv = put
 
 -- | Update the global environment.
 modifyEnv :: Member (State (Environment location value)) effects => (Environment location value -> Environment location value) -> Evaluator location value effects ()
-modifyEnv = raise . modify'
+modifyEnv = modify'
 
 -- | Sets the environment for the lifetime of the given action.
 withEnv :: Member (State (Environment location value)) effects => Environment location value -> Evaluator location value effects a -> Evaluator location value effects a
-withEnv = raiseHandler . localState . const
+withEnv = localState . const
 
 
 -- | Retrieve the default environment.
 defaultEnvironment :: Member (Reader (Environment location value)) effects => Evaluator location value effects (Environment location value)
-defaultEnvironment = raise ask
+defaultEnvironment = ask
 
 -- | Set the default environment for the lifetime of an action.
 --   Usually only invoked in a top-level evaluation function.
 withDefaultEnvironment :: Member (Reader (Environment location value)) effects => Environment location value -> Evaluator location value effects a -> Evaluator location value effects a
-withDefaultEnvironment e = raiseHandler (local (const e))
+withDefaultEnvironment e = local (const e)
 
 -- | Obtain an environment that is the composition of the current and default environments.
 --   Useful for debugging.
@@ -83,7 +83,7 @@ freeVariableError :: Member (Resumable (EnvironmentError value)) effects => Name
 freeVariableError = throwResumable . FreeVariable
 
 runEnvironmentError :: Evaluator location value (Resumable (EnvironmentError value) ': effects) a -> Evaluator location value effects (Either (SomeExc (EnvironmentError value)) a)
-runEnvironmentError = raiseHandler runError
+runEnvironmentError = runResumable
 
 runEnvironmentErrorWith :: (forall resume . EnvironmentError value resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (EnvironmentError value) ': effects) a -> Evaluator location value effects a
 runEnvironmentErrorWith = runResumableWith

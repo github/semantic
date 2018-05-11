@@ -21,8 +21,6 @@ import Control.Abstract as X hiding (Goto(..), LoopControl(..), Modules(..), Ret
 import Control.Abstract.Evaluator (LoopControl, Return(..))
 import Control.Abstract.Goto (Goto(..))
 import Control.Abstract.Modules (Modules(..))
-import Control.Monad.Effect as Eff
-import Data.Abstract.Address
 import Data.Abstract.Declarations as X
 import Data.Abstract.Environment as X
 import Data.Abstract.Exports as Exports
@@ -68,7 +66,7 @@ type EvaluatableConstraints location term value effects =
              , Return value
              , State (Environment location value)
              , State (Exports location value)
-             , State (Heap location value)
+             , State (Heap location (Cell location) value)
              , Trace
              ] effects
   , Reducer value (Cell location value)
@@ -87,7 +85,7 @@ data EvalError value resume where
   EnvironmentLookupError :: value -> EvalError value value
 
 runEvalError :: Evaluator location value (Resumable (EvalError value) ': effects) a -> Evaluator location value effects (Either (SomeExc (EvalError value)) a)
-runEvalError = raiseHandler runError
+runEvalError = runResumable
 
 runEvalErrorWith :: (forall resume . EvalError value resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (EvalError value) ': effects) a -> Evaluator location value effects a
 runEvalErrorWith = runResumableWith
@@ -138,7 +136,7 @@ instance Show1 (Unspecialized a) where
   liftShowsPrec _ _ = showsPrec
 
 runUnspecialized :: Evaluator location value (Resumable (Unspecialized value) ': effects) a -> Evaluator location value effects (Either (SomeExc (Unspecialized value)) a)
-runUnspecialized = raiseHandler runError
+runUnspecialized = runResumable
 
 runUnspecializedWith :: (forall resume . Unspecialized value resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (Unspecialized value) ': effects) a -> Evaluator location value effects a
 runUnspecializedWith = runResumableWith
@@ -165,7 +163,7 @@ instance Evaluatable [] where
 
 
 traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator location value effects ()
-traceResolve name path = traceE ("resolved " <> show name <> " -> " <> show path)
+traceResolve name path = trace ("resolved " <> show name <> " -> " <> show path)
 
 
 builtin :: ( Addressable location effects
@@ -174,7 +172,7 @@ builtin :: ( Addressable location effects
                       , Reader ModuleInfo
                       , Reader Span
                       , State (Environment location value)
-                      , State (Heap location value)
+                      , State (Heap location (Cell location) value)
                       ] effects
            , Reducer value (Cell location value)
            )
@@ -237,7 +235,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
         withPrelude Nothing a = a
         withPrelude (Just prelude) a = do
           _ <- runInModule moduleInfoFromCallStack $ do
-            builtin "print" (closure ["s"] lowerBound (variable "s" >>= asString >>= traceE . unpack >> unit))
+            builtin "print" (closure ["s"] lowerBound (variable "s" >>= asString >>= trace . unpack >> unit))
             unit
           preludeEnv <- fst <$> evalModule prelude
           withDefaultEnvironment preludeEnv a

@@ -15,7 +15,7 @@ import Analysis.Abstract.Evaluating as X (EvaluatingState(..))
 import Control.Abstract.Addressable
 import Control.Abstract.Value
 import Control.Arrow ((&&&))
-import Control.Effect as X (runIgnoringTraces)
+import Control.Monad.Effect.Trace as X (runIgnoringTrace, runReturningTrace)
 import Control.Monad ((>=>))
 import Data.Abstract.Address as X
 import Data.Abstract.Environment as Env
@@ -74,7 +74,7 @@ readFilePair paths = let paths' = fmap file paths in
 
 testEvaluating
   = run
-  . runReturningTraces
+  . runReturningTrace
   . fmap (first reassociate)
   . evaluating
   . runLoadError
@@ -89,7 +89,7 @@ testEvaluating
 deNamespace :: Value Precise -> Maybe (Name, [Name])
 deNamespace = fmap (namespaceName &&& Env.names . namespaceScope) . prjValue @(Namespace Precise)
 
-derefQName :: Heap Precise (Value Precise) -> NonEmpty Name -> Environment Precise (Value Precise) -> Maybe (Value Precise)
+derefQName :: Heap Precise (Cell Precise) (Value Precise) -> NonEmpty Name -> Environment Precise (Value Precise) -> Maybe (Value Precise)
 derefQName heap = go
   where go (n1 :| ns) env = Env.lookup n1 env >>= flip heapLookup heap >>= unLatest >>= case ns of
           []        -> Just

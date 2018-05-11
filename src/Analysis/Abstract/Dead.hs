@@ -21,11 +21,11 @@ deriving instance Ord term => Reducer term (Dead term)
 
 -- | Update the current 'Dead' set.
 killAll :: Member (State (Dead term)) effects => Dead term -> Evaluator location value effects ()
-killAll = raise . put
+killAll = put
 
 -- | Revive a single term, removing it from the current 'Dead' set.
 revive :: (Member (State (Dead term)) effects, Ord term) => term -> Evaluator location value effects ()
-revive t = raise (modify (Dead . delete t . unDead))
+revive t = modify' (Dead . delete t . unDead)
 
 -- | Compute the set of all subterms recursively.
 subterms :: (Ord term, Recursive term, Foldable (Base term)) => term -> Dead term

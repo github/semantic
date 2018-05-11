@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Analysis.Abstract.Graph
 ( Graph(..)
 , Vertex(..)
@@ -22,7 +22,6 @@ import           Control.Abstract
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable (LoadError (..))
 import           Data.Abstract.FreeVariables
-import           Data.Abstract.Located
 import           Data.Abstract.Module (Module(moduleInfo), ModuleInfo(..))
 import           Data.Abstract.Package (PackageInfo(..))
 import           Data.Aeson hiding (Result)
@@ -150,7 +149,7 @@ variableDefinition name = do
   appendGraph (vertex (Variable (unName name)) `connect` graph)
 
 appendGraph :: (Effectful m, Member (State Graph) effects) => Graph -> m effects ()
-appendGraph = raise . modify' . (<>)
+appendGraph = modify' . (<>)
 
 
 instance Semigroup Graph where
