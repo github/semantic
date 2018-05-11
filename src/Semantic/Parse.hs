@@ -1,7 +1,6 @@
 {-# LANGUAGE GADTs #-}
 module Semantic.Parse where
 
-import Algebra.Graph.Export.Dot
 import Analysis.ConstructorName (ConstructorName, constructorLabel)
 import Analysis.IdentifierName (IdentifierName, identifierLabel)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
@@ -16,6 +15,7 @@ import Rendering.Graph
 import Rendering.Renderer
 import Semantic.IO (NoLanguageForBlob(..), FormatNotSupported(..))
 import Semantic.Task
+import Serializing.Format
 
 parseBlobs :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Output output) => TermRenderer output -> [Blob] -> Eff effs ByteString
 parseBlobs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . parseBlob renderer) blobs
@@ -34,7 +34,7 @@ parseBlob renderer blob@Blob{..}
     TagsTermRenderer           -> decorate (declarationAlgebra blob)                     >=> render (renderToTags blob)
     ImportsTermRenderer        -> decorate (declarationAlgebra blob) >=> decorate (packageDefAlgebra blob) >=> render (renderToImports blob)
     SymbolsTermRenderer fields -> decorate (declarationAlgebra blob)                     >=> render (renderToSymbols fields blob)
-    DOTTermRenderer            ->                                                            render (export (termStyle blobPath) . renderTreeGraph)
+    DOTTermRenderer            ->                                                            render renderTreeGraph >=> serialize (DOT (termStyle blobPath))
   | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
 
 

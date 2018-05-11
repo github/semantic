@@ -26,6 +26,7 @@ module Rendering.Renderer
 ) where
 
 import Data.Aeson (Value)
+import Data.ByteString.Builder
 import Data.Output
 import Prologue
 import Rendering.Graph as R
@@ -62,7 +63,7 @@ data TermRenderer output where
   -- | Render to a list of modules that represent the import graph.
   ImportsTermRenderer :: TermRenderer ImportSummary
   -- | Render to a 'ByteString' formatted as a DOT description of the term.
-  DOTTermRenderer :: TermRenderer ByteString
+  DOTTermRenderer :: TermRenderer Builder
 
 deriving instance Eq (TermRenderer output)
 deriving instance Show (TermRenderer output)
