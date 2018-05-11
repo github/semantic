@@ -15,18 +15,18 @@ newtype Graph vertex = Graph (G.Graph vertex)
   deriving (Eq, Foldable, Functor, Class.Graph, Show, Class.ToGraph, Traversable)
 
 
-simplify :: Ord v => Graph v -> Graph v
+simplify :: Ord vertex => Graph vertex -> Graph vertex
 simplify (Graph graph) = Graph (G.simplify graph)
 
 
-instance Semigroup (Graph v) where
+instance Semigroup (Graph vertex) where
   (<>) = Class.overlay
 
-instance Monoid (Graph v) where
+instance Monoid (Graph vertex) where
   mempty = Class.empty
   mappend = (<>)
 
-instance Ord v => Ord (Graph v) where
+instance Ord vertex => Ord (Graph vertex) where
   compare (Graph G.Empty)           (Graph G.Empty)           = EQ
   compare (Graph G.Empty)           _                         = LT
   compare _                         (Graph G.Empty)           = GT
