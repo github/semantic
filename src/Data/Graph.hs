@@ -47,5 +47,11 @@ instance Ord vertex => Ord (Graph vertex) where
 
 
 instance (Ord vertex, ToJSON vertex) => ToJSON (Graph vertex) where
-  toJSON (Graph graph) = object [ "vertices" .= G.vertexList graph, "edges" .= (toEdge <$> G.edgeList graph) ]
-    where toEdge (a, b) = object [ "source" .= a, "target" .= b ]
+  toJSON     (Graph graph) = object ["vertices" .= G.vertexList graph,   "edges" .= (JSONEdge <$> G.edgeList graph)]
+  toEncoding (Graph graph) = pairs  ("vertices" .= G.vertexList graph <> "edges" .= (JSONEdge <$> G.edgeList graph))
+
+newtype JSONEdge vertex = JSONEdge (vertex, vertex)
+
+instance ToJSON vertex => ToJSON (JSONEdge vertex) where
+  toJSON     (JSONEdge (a, b)) = object ["source" .= a,   "target" .= b]
+  toEncoding (JSONEdge (a, b)) = pairs  ("source" .= a <> "target" .= b)
