@@ -20,7 +20,7 @@ import           Prologue
 import           Rendering.Renderer
 import qualified Semantic.Diff as Semantic (diffBlobPairs)
 import           Semantic.Graph as Semantic (Graph, GraphType(..), Vertex, graph, style)
-import           Semantic.IO (languageForFilePath)
+import           Semantic.IO (Destination(..), languageForFilePath)
 import qualified Semantic.Log as Log
 import qualified Semantic.Parse as Semantic (parseBlobs, astParseBlobs)
 import qualified Semantic.Task as Task
@@ -63,7 +63,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
 
     argumentsParser = do
       subparser <- hsubparser (diffCommand <> parseCommand <>  tsParseCommand <> graphCommand)
-      output <- Right <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (Left stdout)
+      output <- ToPath <$> strOption (long "output" <> short 'o' <> help "Output path, defaults to stdout") <|> pure (ToHandle stdout)
       pure $ subparser >>= Task.writeToOutput output
 
     diffCommand = command "diff" (info diffArgumentsParser (progDesc "Compute changes between paths"))

@@ -18,6 +18,7 @@ module Semantic.IO
 , readBlobs
 , readBlobPairs
 , writeToOutput
+, Destination(..)
 , Files
 , runFiles
 , rethrowing
@@ -203,9 +204,10 @@ readProject :: Member Files effs => Maybe FilePath -> FilePath -> Language -> [F
 readProject rootDir dir excludeDirs = send . ReadProject rootDir dir excludeDirs
 
 -- | A task which writes a 'B.Builder' to a 'Handle' or a 'FilePath'.
-writeToOutput :: Member Files effs => Either Handle FilePath -> B.Builder -> Eff effs ()
-writeToOutput path = send . WriteToOutput path
+writeToOutput :: Member Files effs => Destination -> B.Builder -> Eff effs ()
+writeToOutput dest = send . WriteToOutput dest
 
+data Destination = ToPath FilePath | ToHandle Handle
 
 -- | An effect to read/write 'Blob.Blob's from 'Handle's or 'FilePath's.
 data Files out where
@@ -213,7 +215,7 @@ data Files out where
   ReadBlobs     :: Either Handle [File] -> Files [Blob.Blob]
   ReadBlobPairs :: Either Handle [Both File] -> Files [Blob.BlobPair]
   ReadProject   :: Maybe FilePath -> FilePath -> Language -> [FilePath] -> Files Project
-  WriteToOutput :: Either Handle FilePath -> B.Builder -> Files ()
+  WriteToOutput :: Destination -> B.Builder -> Files ()
 
 -- | Run a 'Files' effect in 'IO'.
 runFiles :: Members '[Exc SomeException, IO] effs => Eff (Files ': effs) a -> Eff effs a
@@ -224,7 +226,7 @@ runFiles = interpret $ \ files -> case files of
   ReadBlobs (Right paths) -> rethrowing (readBlobsFromPaths paths)
   ReadBlobPairs source -> rethrowing (either readBlobPairsFromHandle (traverse (runBothWith readFilePair)) source)
   ReadProject rootDir dir language excludeDirs -> rethrowing (readProjectFromPaths rootDir dir language excludeDirs)
-  WriteToOutput destination contents -> liftIO (either B.hPutBuilder (\ path -> withBinaryFile path WriteMode . flip B.hPutBuilder) destination contents)
+  WriteToOutput (ToPath path) builder -> liftIO (withBinaryFile path WriteMode (flip B.hPutBuilder builder))
 
 
 -- | Catch exceptions in 'IO' actions embedded in 'Eff', handling them with the passed function.
