@@ -54,9 +54,9 @@ evaluatingWithHoles
 
 checking
   = runM @(Evaluator Monovariant Type) @IO
-  . fmap (first reassociateTypes)
   . evaluating
   . runPrintingTrace
+  . caching @[]
   . providingLiveSet
   . runLoadError
   . runUnspecialized
@@ -64,7 +64,6 @@ checking
   . runEnvironmentError
   . runEvalError
   . runAddressError
-  . caching @[]
   . runTypeError
   . constrainedToTypeMonovariant
 
