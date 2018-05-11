@@ -83,6 +83,8 @@ unify Null b = pure b
 unify (Var _) b = pure b
 unify a (Var _) = pure a
 unify (Array t1) (Array t2) = Array <$> unify t1 t2
+-- FIXME: unifying with sums should distribute nondeterministically.
+-- FIXME: ordering shouldn’t be significant for undiscriminated sums.
 unify (a1 :+ b1) (a2 :+ b2) = (:+) <$> unify a1 a2 <*> unify b1 b2
 unify (a1 :* b1) (a2 :* b2) = (:*) <$> unify a1 a2 <*> unify b1 b2
 unify t1 t2
