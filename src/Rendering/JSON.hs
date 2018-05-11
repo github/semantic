@@ -7,6 +7,7 @@ module Rendering.JSON
 , renderJSONTerm
 , renderJSONTerm'
 , renderJSONTerms
+, renderSymbolTerms
 ) where
 
 import Data.Aeson (ToJSON, toJSON, object, (.=))
@@ -50,3 +51,8 @@ renderJSONTerm' blob content = renderJSONTerms [ toJSON (object ("ast" .= conten
 
 renderJSONTerms :: [Value] -> JSONOutput
 renderJSONTerms = toJSONOutput "trees"
+
+
+-- | Render terms to final JSON structure.
+renderSymbolTerms :: [Value] -> JSONOutput
+renderSymbolTerms = toJSONOutput "files"

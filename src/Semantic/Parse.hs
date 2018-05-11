@@ -27,7 +27,7 @@ parseBlob renderer blob@Blob{..}
     SExpressionTermRenderer    ->                                                            serialize SExpression
     TagsTermRenderer           -> decorate (declarationAlgebra blob)                     >=> render (renderToTags blob)
     ImportsTermRenderer        -> decorate (declarationAlgebra blob) >=> decorate (packageDefAlgebra blob) >=> render (renderToImports blob)
-    SymbolsTermRenderer fields -> decorate (declarationAlgebra blob)                     >=> render (renderToSymbols fields blob)
+    SymbolsTermRenderer fields -> decorate (declarationAlgebra blob)                     >=> render (renderSymbolTerms . renderToSymbols fields blob)
     DOTTermRenderer            ->                                                            render renderTreeGraph >=> serialize (DOT (termStyle blobPath))
   | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
 

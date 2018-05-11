@@ -57,7 +57,7 @@ data TermRenderer output where
   -- | Render to a list of tags (deprecated).
   TagsTermRenderer :: TermRenderer [Value]
   -- | Render to a list of symbols.
-  SymbolsTermRenderer :: SymbolFields -> TermRenderer [Value]
+  SymbolsTermRenderer :: SymbolFields -> TermRenderer JSONOutput
   -- | Render to a list of modules that represent the import graph.
   ImportsTermRenderer :: TermRenderer ImportSummary
   -- | Render to a 'ByteString' formatted as a DOT description of the term.
