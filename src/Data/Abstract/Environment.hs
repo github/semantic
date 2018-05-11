@@ -38,7 +38,7 @@ import qualified Data.List.NonEmpty as NonEmpty
 --   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
 --   scope for "a", then the next, and so on.
 newtype Environment location value = Environment { unEnvironment :: NonEmpty (Map.Map Name (Address location value)) }
-  deriving (Eq, Foldable, Functor, Generic1, Ord, Show, Traversable)
+  deriving (Eq, Generic1, Ord, Show)
 
 instance Eq   location => Eq1   (Environment location) where liftEq        = genericLiftEq
 instance Ord  location => Ord1  (Environment location) where liftCompare   = genericLiftCompare
