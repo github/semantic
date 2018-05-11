@@ -38,7 +38,6 @@ data Type
 
 data TypeError resume where
   NumOpError       :: Type -> Type -> TypeError Type
-  BitOpError       :: Type -> Type -> TypeError Type
   UnificationError :: Type -> Type -> TypeError Type
   SubscriptError   :: Type -> Type -> TypeError Type
 
@@ -46,12 +45,10 @@ deriving instance Show (TypeError resume)
 
 instance Show1 TypeError where
   liftShowsPrec _ _ _ (NumOpError l r)       = showString "NumOpError " . shows [l, r]
-  liftShowsPrec _ _ _ (BitOpError l r)       = showString "BitOpError " . shows [l, r]
   liftShowsPrec _ _ _ (UnificationError l r) = showString "UnificationError " . shows [l, r]
   liftShowsPrec _ _ _ (SubscriptError l r)   = showString "SubscriptError " . shows [l, r]
 
 instance Eq1 TypeError where
-  liftEq eq (BitOpError a b) (BitOpError c d)             = a `eq` c && b `eq` d
   liftEq eq (NumOpError a b) (NumOpError c d)             = a `eq` c && b `eq` d
   liftEq eq (UnificationError a b) (UnificationError c d) = a `eq` c && b `eq` d
   liftEq _ _ _                                           = False
