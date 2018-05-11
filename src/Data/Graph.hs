@@ -25,3 +25,15 @@ instance Semigroup (Graph v) where
 instance Monoid (Graph v) where
   mempty = Class.empty
   mappend = (<>)
+
+instance Ord v => Ord (Graph v) where
+  compare (Graph G.Empty)           (Graph G.Empty)           = EQ
+  compare (Graph G.Empty)           _                         = LT
+  compare _                         (Graph G.Empty)           = GT
+  compare (Graph (G.Vertex a))      (Graph (G.Vertex b))      = compare a b
+  compare (Graph (G.Vertex _))      _                         = LT
+  compare _                         (Graph (G.Vertex _))      = GT
+  compare (Graph (G.Overlay a1 a2)) (Graph (G.Overlay b1 b2)) = (compare `on` Graph) a1 b1 <> (compare `on` Graph) a2 b2
+  compare (Graph (G.Overlay _  _))  _                         = LT
+  compare _                         (Graph (G.Overlay _ _))   = GT
+  compare (Graph (G.Connect a1 a2)) (Graph (G.Connect b1 b2)) = (compare `on` Graph) a1 b1 <> (compare `on` Graph) a2 b2
