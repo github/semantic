@@ -226,7 +226,8 @@ runFiles = interpret $ \ files -> case files of
   ReadBlobs (Right paths) -> rethrowing (readBlobsFromPaths paths)
   ReadBlobPairs source -> rethrowing (either readBlobPairsFromHandle (traverse (runBothWith readFilePair)) source)
   ReadProject rootDir dir language excludeDirs -> rethrowing (readProjectFromPaths rootDir dir language excludeDirs)
-  WriteToOutput (ToPath path) builder -> liftIO (withBinaryFile path WriteMode (flip B.hPutBuilder builder))
+  WriteToOutput (ToPath path)     builder -> liftIO (withBinaryFile path WriteMode (flip B.hPutBuilder builder))
+  WriteToOutput (ToHandle handle) builder -> liftIO (B.hPutBuilder handle builder)
 
 
 -- | Catch exceptions in 'IO' actions embedded in 'Eff', handling them with the passed function.
