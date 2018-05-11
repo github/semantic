@@ -41,7 +41,12 @@ infixr 0 :->
 
 newtype Product = Product { getProduct :: Type }
 
-instance Semigroup Product where (<>) = fmap Product . ((:*) `on` getProduct)
+instance Semigroup Product where
+  Product a <> Product b = Product (a :* b)
+
+instance Monoid Product where
+  mempty = Product Unit
+  mappend = (<>)
 
 oneOrMoreProduct :: NonEmpty Type -> Type
 oneOrMoreProduct = getProduct . foldMap1 Product
