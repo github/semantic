@@ -99,7 +99,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
     graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a graph for a directory or entry point"))
     graphArgumentsParser = do
       graphType <- flag ImportGraph ImportGraph (long "imports" <> help "Compute an import graph (default)")
-               <|> flag'            CallGraph       (long "calls" <> help "Compute a call graph")
+               <|> flag'            CallGraph   (long "calls"   <> help "Compute a call graph")
       serializer <- flag (Task.serialize (DOT style)) (Task.serialize (DOT style)) (long "dot"  <> help "Output in DOT graph format (default)")
                 <|> flag'                             (Task.serialize JSON)        (long "json" <> help "Output JSON graph")
       rootDir <- rootDirectoryOption
