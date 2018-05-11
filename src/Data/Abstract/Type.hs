@@ -143,11 +143,8 @@ instance ( Addressable location effects
     (Int, Float) -> pure Float
     _            -> unify left right
 
-  liftBitwise _ Int = pure Int
-  liftBitwise _ t   = throwResumable (BitOpError t Hole)
-
-  liftBitwise2 _ Int Int = pure Int
-  liftBitwise2 _ t1 t2   = throwResumable (BitOpError t1 t2)
+  liftBitwise _ = unify Int
+  liftBitwise2 _ t1 t2   = unify Int t1 >>= flip unify t2
 
   liftComparison (Concrete _) left right = case (left, right) of
     (Float, Int) ->                     pure Bool
