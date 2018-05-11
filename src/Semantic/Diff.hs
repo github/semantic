@@ -34,7 +34,7 @@ diffBlobPair renderer blobs
   = case renderer of
     ToCDiffRenderer         -> run (WrapTask . (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob)))                     diffTerms renderToCDiff
     JSONDiffRenderer        -> run (WrapTask . (          parse parser      >=> decorate constructorLabel >=> decorate identifierLabel)) diffTerms renderJSONDiff
-    SExpressionDiffRenderer -> run (WrapTask . (          parse parser      >=> decorate constructorLabel . (Nil <$)))                   diffTerms (const renderSExpressionDiff)
+    SExpressionDiffRenderer -> run (WrapTask . (          parse parser      >=> decorate constructorLabel . (Nil <$)))                   diffTerms (const id)              >>= serialize SExpression
     DOTDiffRenderer         -> run (WrapTask .            parse parser)                                                                  diffTerms (const renderTreeGraph) >>= serialize (DOT (diffStyle (pathKeyForBlobPair blobs)))
   | otherwise = throwError (SomeException (NoLanguageForBlob effectivePath))
   where effectivePath = pathForBlobPair blobs

@@ -43,7 +43,7 @@ data DiffRenderer output where
   -- | Render to JSON with the format documented in docs/json-format.md
   JSONDiffRenderer :: DiffRenderer [Value]
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
-  SExpressionDiffRenderer :: DiffRenderer ByteString
+  SExpressionDiffRenderer :: DiffRenderer Builder
   -- | Render to a 'ByteString' formatted as a DOT description of the diff.
   DOTDiffRenderer :: DiffRenderer Builder
 
