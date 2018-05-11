@@ -57,6 +57,7 @@ zeroOrMoreProduct = maybe Unit oneOrMoreProduct . nonEmpty
 
 -- TODO: À la carte representation of types.
 
+-- | Errors representing failures in typechecking. Note that we should in general constrain allowable types by 'unify'ing, and thus throwing 'UnificationError's when constraints aren’t met, in order to allow uniform resumption with one or the other parameter type.
 data TypeError resume where
   UnificationError :: Type -> Type -> TypeError Type
 
