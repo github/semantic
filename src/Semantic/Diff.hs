@@ -15,7 +15,7 @@ import Parsing.Parser
 import Prologue hiding (MonadError(..))
 import Rendering.Graph
 import Rendering.Renderer
-import Semantic.IO (NoLanguageForBlob(..))
+import Semantic.IO (noLanguageForBlob)
 import Semantic.Stat as Stat
 import Semantic.Task as Task
 import Serializing.Format
@@ -32,7 +32,7 @@ diffBlobPair renderer blobs
     JSONDiffRenderer        -> run (WrapTask . (          parse parser      >=> decorate constructorLabel >=> decorate identifierLabel)) diffTerms renderJSONDiff
     SExpressionDiffRenderer -> run (WrapTask . (          parse parser      >=> decorate constructorLabel . (Nil <$)))                   diffTerms (const id)              >>= serialize SExpression
     DOTDiffRenderer         -> run (WrapTask .            parse parser)                                                                  diffTerms (const renderTreeGraph) >>= serialize (DOT (diffStyle (pathKeyForBlobPair blobs)))
-  | otherwise = throwError (SomeException (NoLanguageForBlob effectivePath))
+  | otherwise = noLanguageForBlob effectivePath
   where effectivePath = pathForBlobPair blobs
         effectiveLanguage = languageForBlobPair blobs
 

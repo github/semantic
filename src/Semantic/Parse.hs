@@ -11,7 +11,7 @@ import Parsing.Parser
 import Prologue hiding (MonadError(..))
 import Rendering.Graph
 import Rendering.Renderer
-import Semantic.IO (NoLanguageForBlob(..), FormatNotSupported(..))
+import Semantic.IO (noLanguageForBlob, FormatNotSupported(..))
 import Semantic.Task
 import Serializing.Format
 
@@ -29,7 +29,7 @@ parseBlob renderer blob@Blob{..}
     ImportsTermRenderer        -> decorate (declarationAlgebra blob) >=> decorate (packageDefAlgebra blob) >=> render (renderToImports blob)
     SymbolsTermRenderer fields -> decorate (declarationAlgebra blob)                     >=> render (renderSymbolTerms . renderToSymbols fields blob)
     DOTTermRenderer            ->                                                            render renderTreeGraph >=> serialize (DOT (termStyle blobPath))
-  | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
+  | otherwise = noLanguageForBlob blobPath
 
 
 astParseBlobs :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Monoid output) => TermRenderer output -> [Blob] -> Eff effs output
@@ -42,4 +42,4 @@ astParseBlobs renderer blobs = distributeFoldMap (WrapTask . astParseBlob render
         SExpressionTermRenderer    -> serialize SExpression
         JSONTermRenderer           -> render (renderJSONTerm' blob)
         _                          -> pure $ throwError (SomeException (FormatNotSupported "Only SExpression and JSON output supported for tree-sitter ASTs."))
-      | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
+      | otherwise = noLanguageForBlob blobPath
