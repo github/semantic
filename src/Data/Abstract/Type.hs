@@ -27,6 +27,7 @@ data Type
   | Var TName           -- ^ A type variable.
   | Type :* Type        -- ^ Binary products.
   | Type :+ Type        -- ^ Binary sums.
+  | Void                -- ^ Uninhabited void type.
   | Array Type          -- ^ Arrays.
   | Hash [(Type, Type)] -- ^ Heterogenous key-value maps.
   | Object              -- ^ Objects. Once we have some notion of inheritance we'll need to store a superclass.
