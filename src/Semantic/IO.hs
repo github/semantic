@@ -62,14 +62,14 @@ readFile (File path language) = do
   pure $ Blob.sourceBlob path language . fromBytes <$> raw
 
 readFilePair :: forall m. MonadIO m => File -> File -> m Blob.BlobPair
-readFilePair a b = do
-  before <- readFile a
-  after <- readFile b
-  case (before, after) of
-    (Just a, Nothing) -> pure (Join (This a))
-    (Nothing, Just b) -> pure (Join (That b))
-    (Just a, Just b)  -> pure (Join (These a b))
-    _                 -> fail "expected file pair with content on at least one side"
+readFilePair a b = Join <$> join (maybeThese <$> readFile a <*> readFile b)
+
+maybeThese :: Monad m => Maybe a -> Maybe b -> m (These a b)
+maybeThese a b = case (a, b) of
+  (Just a, Nothing) -> pure (This a)
+  (Nothing, Just b) -> pure (That b)
+  (Just a, Just b)  -> pure (These a b)
+  _                 -> fail "expected file pair with content on at least one side"
 
 isDirectory :: MonadIO m => FilePath -> m Bool
 isDirectory path = liftIO (doesDirectoryExist path)
@@ -196,15 +196,17 @@ newtype FormatNotSupported = FormatNotSupported String
   deriving (Eq, Exception, Ord, Show, Typeable)
 
 readBlob :: Member Files effs => File -> Eff effs Blob.Blob
-readBlob = send . ReadBlob
+readBlob = send . Read . FromPath
 
 -- | A task which reads a list of 'Blob's from a 'Handle' or a list of 'FilePath's optionally paired with 'Language's.
 readBlobs :: Member Files effs => Either (Handle 'IO.ReadMode) [File] -> Eff effs [Blob.Blob]
-readBlobs = send . ReadBlobs
+readBlobs (Left handle) = send (Read (FromHandle handle))
+readBlobs (Right paths) = traverse (send . Read . FromPath) paths
 
 -- | A task which reads a list of pairs of 'Blob's from a 'Handle' or a list of pairs of 'FilePath's optionally paired with 'Language's.
 readBlobPairs :: Member Files effs => Either (Handle 'IO.ReadMode) [Both File] -> Eff effs [Blob.BlobPair]
-readBlobPairs = send . ReadBlobPairs
+readBlobPairs (Left handle) = send (Read (FromPairHandle handle))
+readBlobPairs (Right paths) = traverse (send . Read . FromPathPair) paths
 
 readProject :: Member Files effs => Maybe FilePath -> FilePath -> Language -> [FilePath] -> Eff effs Project
 readProject rootDir dir excludeDirs = send . ReadProject rootDir dir excludeDirs
@@ -226,24 +228,27 @@ stdout = WriteHandle IO.stdout
 stderr :: Handle 'IO.WriteMode
 stderr = WriteHandle IO.stderr
 
+data Source blob where
+  FromPath       :: File                -> Source Blob.Blob
+  FromHandle     :: Handle 'IO.ReadMode -> Source [Blob.Blob]
+  FromPathPair   :: Both File           -> Source Blob.BlobPair
+  FromPairHandle :: Handle 'IO.ReadMode -> Source [Blob.BlobPair]
+
 data Destination = ToPath FilePath | ToHandle (Handle 'IO.WriteMode)
 
 -- | An effect to read/write 'Blob.Blob's from 'Handle's or 'FilePath's.
 data Files out where
-  ReadBlob      :: File -> Files Blob.Blob
-  ReadBlobs     :: Either (Handle 'IO.ReadMode) [File] -> Files [Blob.Blob]
-  ReadBlobPairs :: Either (Handle 'IO.ReadMode) [Both File] -> Files [Blob.BlobPair]
-  ReadProject   :: Maybe FilePath -> FilePath -> Language -> [FilePath] -> Files Project
-  Write         :: Destination -> B.Builder -> Files ()
+  Read        :: Source out -> Files out
+  ReadProject :: Maybe FilePath -> FilePath -> Language -> [FilePath] -> Files Project
+  Write       :: Destination -> B.Builder -> Files ()
 
 -- | Run a 'Files' effect in 'IO'.
 runFiles :: Members '[Exc SomeException, IO] effs => Eff (Files ': effs) a -> Eff effs a
 runFiles = interpret $ \ files -> case files of
-  ReadBlob path -> rethrowing (readBlobFromPath path)
-  ReadBlobs (Left handle) -> rethrowing (readBlobsFromHandle handle)
-  ReadBlobs (Right paths@[File path _]) -> rethrowing (isDirectory path >>= bool (readBlobsFromPaths paths) (readBlobsFromDir path))
-  ReadBlobs (Right paths) -> rethrowing (readBlobsFromPaths paths)
-  ReadBlobPairs source -> rethrowing (either readBlobPairsFromHandle (traverse (runBothWith readFilePair)) source)
+  Read (FromPath path)         -> rethrowing (readBlobFromPath path)
+  Read (FromHandle handle)     -> rethrowing (readBlobsFromHandle handle)
+  Read (FromPathPair paths)    -> rethrowing (runBothWith readFilePair paths)
+  Read (FromPairHandle handle) -> rethrowing (readBlobPairsFromHandle handle)
   ReadProject rootDir dir language excludeDirs -> rethrowing (readProjectFromPaths rootDir dir language excludeDirs)
   Write (ToPath path)                   builder -> liftIO (IO.withBinaryFile path IO.WriteMode (flip B.hPutBuilder builder))
   Write (ToHandle (WriteHandle handle)) builder -> liftIO (B.hPutBuilder handle builder)
