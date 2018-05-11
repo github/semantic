@@ -73,6 +73,7 @@ library
                      , Data.File
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
+                     , Data.Graph
                      , Data.JSON.Fields
                      , Data.Language
                      , Data.Map.Monoidal
