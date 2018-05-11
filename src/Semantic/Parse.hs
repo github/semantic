@@ -8,7 +8,6 @@ import Analysis.PackageDef (HasPackageDef, packageDefAlgebra)
 import Data.Blob
 import Data.JSON.Fields
 import Data.Output
-import Data.Record
 import Parsing.Parser
 import Prologue hiding (MonadError(..))
 import Rendering.Graph
@@ -30,7 +29,7 @@ parseBlob renderer blob@Blob{..}
   | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[ConstructorName, HasPackageDef, HasDeclaration, IdentifierName, Foldable, Functor, ToJSONFields1]) <$> blobLanguage
   = parse parser blob >>= case renderer of
     JSONTermRenderer           -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)
-    SExpressionTermRenderer    -> decorate constructorLabel . (Nil <$)                   >=> render renderSExpressionTerm
+    SExpressionTermRenderer    ->                                                            serialize SExpression
     TagsTermRenderer           -> decorate (declarationAlgebra blob)                     >=> render (renderToTags blob)
     ImportsTermRenderer        -> decorate (declarationAlgebra blob) >=> decorate (packageDefAlgebra blob) >=> render (renderToImports blob)
     SymbolsTermRenderer fields -> decorate (declarationAlgebra blob)                     >=> render (renderToSymbols fields blob)
@@ -49,7 +48,7 @@ astParseBlobs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . astPa
     astParseBlob renderer blob@Blob{..}
       | Just (SomeASTParser parser) <- someASTParser <$> blobLanguage
       = parse parser blob >>= case renderer of
-        SExpressionTermRenderer    -> render renderSExpressionAST
+        SExpressionTermRenderer    -> serialize SExpression
         JSONTermRenderer           -> render (renderJSONTerm' blob)
         _                          -> pure $ throwError (SomeException (FormatNotSupported "Only SExpression and JSON output supported for tree-sitter ASTs."))
       | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))

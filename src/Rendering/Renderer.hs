@@ -55,7 +55,7 @@ data TermRenderer output where
   -- | Render to JSON with the format documented in docs/json-format.md under “Term.”
   JSONTermRenderer :: TermRenderer [Value]
   -- | Render to a 'ByteString' formatted as nested s-expressions.
-  SExpressionTermRenderer :: TermRenderer ByteString
+  SExpressionTermRenderer :: TermRenderer Builder
   -- | Render to a list of tags (deprecated).
   TagsTermRenderer :: TermRenderer [Value]
   -- | Render to a list of symbols.
