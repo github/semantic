@@ -8,9 +8,8 @@ module Data.Abstract.Type
 
 import Control.Abstract
 import Data.Abstract.Environment as Env
-import Data.Align (alignWith)
+import Data.Semigroup.Foldable (foldMap1)
 import Data.Semigroup.Reducer (Reducer)
-import Prelude
 import Prologue hiding (TypeError)
 
 type TName = Int
@@ -26,13 +25,23 @@ data Type
   | Rational            -- ^ Rational type.
   | Type :-> Type       -- ^ Binary function types.
   | Var TName           -- ^ A type variable.
-  | Product [Type]      -- ^ N-ary products.
+  | Type :* Type        -- ^ Binary products.
   | Array Type          -- ^ Arrays.
   | Hash [(Type, Type)] -- ^ Heterogenous key-value maps.
   | Object              -- ^ Objects. Once we have some notion of inheritance we'll need to store a superclass.
   | Null                -- ^ The null type. Unlike 'Unit', this unifies with any other type.
   | Hole                -- ^ The hole type.
   deriving (Eq, Ord, Show)
+
+newtype Product = Product { getProduct :: Type }
+
+instance Semigroup Product where (<>) = fmap Product . ((:*) `on` getProduct)
+
+oneOrMoreProduct :: NonEmpty Type -> Type
+oneOrMoreProduct = getProduct . foldMap1 Product
+
+zeroOrMoreProduct :: [Type] -> Type
+zeroOrMoreProduct = maybe Unit oneOrMoreProduct . nonEmpty
 
 -- TODO: À la carte representation of types.
 
@@ -65,7 +74,7 @@ unify Null b = pure b
 unify (Var _) b = pure b
 unify a (Var _) = pure a
 unify (Array t1) (Array t2) = Array <$> unify t1 t2
-unify (Product as) (Product bs) = Product <$> sequenceA (alignWith (these pure pure unify) as bs)
+unify (a1 :* b1) (a2 :* b2) = (:*) <$> unify a1 a2 <*> unify b1 b2
 unify t1 t2
   | t1 == t2  = pure t2
   | otherwise = throwResumable (UnificationError t1 t2)
@@ -96,7 +105,7 @@ instance ( Addressable location effects
       (env, tvars) <- rest
       pure (Env.insert name a env, tvar : tvars)) (pure (emptyEnv, [])) names
     ret <- localEnv (mergeEnvs env) body
-    pure (Product tvars :-> ret)
+    pure (zeroOrMoreProduct tvars :-> ret)
 
   unit       = pure Unit
   integer _  = pure Int
@@ -105,12 +114,12 @@ instance ( Addressable location effects
   float _    = pure Float
   symbol _   = pure Symbol
   rational _ = pure Rational
-  multiple   = pure . Product
+  multiple   = pure . zeroOrMoreProduct
   array fields = do
     var <- fresh
     Array <$> foldr (\ t1 -> (unify t1 =<<)) (pure (Var var)) fields
   hash       = pure . Hash
-  kvPair k v = pure (Product [k, v])
+  kvPair k v = pure (k :* v)
 
   null          = pure Null
 
@@ -123,13 +132,12 @@ instance ( Addressable location effects
   asPair t   = do
     t1 <- fresh
     t2 <- fresh
-    unify t (Product [Var t1, Var t2]) $> (Var t1, Var t2)
+    unify t (Var t1 :* Var t2) $> (Var t1, Var t2)
   asBool t   = unify t Bool *> (pure True <|> pure False)
 
   isHole ty = pure (ty == Hole)
 
   index (Array mem) Int   = pure mem
-  index (Product (mem:_)) Int = pure mem
   index a b                   = throwResumable (SubscriptError a b)
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
@@ -158,7 +166,7 @@ instance ( Addressable location effects
   call op params = do
     tvar <- fresh
     paramTypes <- sequenceA params
-    let needed = Product paramTypes :-> Var tvar
+    let needed = zeroOrMoreProduct paramTypes :-> Var tvar
     unified <- op `unify` needed
     case unified of
       _ :-> ret -> pure ret
