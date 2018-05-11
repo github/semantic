@@ -14,7 +14,6 @@ import Data.Aeson (ToJSON, toJSON, object, (.=))
 import Data.Aeson as A
 import Data.JSON.Fields
 import Data.Blob
-import Data.ByteString.Lazy (toStrict)
 import qualified Data.Map.Monoidal as Monoidal
 import Data.Output
 import Data.Patch
@@ -28,7 +27,7 @@ toJSONOutput key = JSONOutput . Monoidal.singleton key
 
 
 instance Output JSONOutput where
-  toOutput = toStrict . encode . unJSONOutput
+  toOutput = fromEncoding . toEncoding
 
 
 -- | Render a diff to a value representing its JSON.

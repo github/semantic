@@ -6,6 +6,7 @@ module Semantic.CLI
 , runParse
 ) where
 
+import           Data.ByteString.Builder
 import           Data.File
 import           Data.Language (Language)
 import           Data.List (intercalate)
@@ -30,13 +31,13 @@ import           Text.Read
 main :: IO ()
 main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskWithOptions
 
-runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both File] -> Task.TaskEff ByteString
+runDiff :: SomeRenderer DiffRenderer -> Either Handle [Both File] -> Task.TaskEff Builder
 runDiff (SomeRenderer diffRenderer) = fmap toOutput . Semantic.diffBlobPairs diffRenderer <=< Task.readBlobPairs
 
-runParse :: SomeRenderer TermRenderer -> Either Handle [File] -> Task.TaskEff ByteString
+runParse :: SomeRenderer TermRenderer -> Either Handle [File] -> Task.TaskEff Builder
 runParse (SomeRenderer parseTreeRenderer) = fmap toOutput . Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
 
-runASTParse :: SomeRenderer TermRenderer -> Either Handle [File] -> Task.TaskEff ByteString
+runASTParse :: SomeRenderer TermRenderer -> Either Handle [File] -> Task.TaskEff Builder
 runASTParse (SomeRenderer parseTreeRenderer) = fmap toOutput . Semantic.astParseBlobs parseTreeRenderer <=< Task.readBlobs
 
 runGraph :: Semantic.GraphType -> Maybe FilePath -> FilePath -> Language -> [FilePath] -> Task.TaskEff (Graph Vertex)

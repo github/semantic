@@ -21,7 +21,6 @@ import Analysis.Declaration
 import Data.Aeson
 import Data.Align (bicrosswalk)
 import Data.Blob
-import Data.ByteString.Lazy (toStrict)
 import Data.Diff
 import Data.Language as Language
 import Data.List (sortOn)
@@ -45,7 +44,7 @@ instance Monoid Summaries where
   mappend = (<>)
 
 instance Output Summaries where
-  toOutput = toStrict . (<> "\n") . encode
+  toOutput = fromEncoding . toEncoding
 
 instance ToJSON Summaries where
   toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]

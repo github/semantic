@@ -9,7 +9,6 @@ import Analysis.Declaration
 import Analysis.PackageDef
 import Data.Aeson
 import Data.Blob
-import Data.ByteString.Lazy (toStrict)
 import Data.Record
 import Data.Output
 import Data.Span
@@ -30,7 +29,7 @@ instance Monoid ImportSummary where
   mappend = (<>)
 
 instance Output ImportSummary where
-  toOutput = toStrict . (<> "\n") . encode
+  toOutput = fromEncoding . toEncoding
 
 instance ToJSON ImportSummary where
   toJSON (ImportSummary m) = object [ "modules" .= m ]

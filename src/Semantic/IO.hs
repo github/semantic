@@ -31,6 +31,7 @@ import qualified Data.Blob as Blob
 import           Data.Bool
 import           Data.File
 import qualified Data.ByteString as B
+import qualified Data.ByteString.Builder as B
 import qualified Data.ByteString.Lazy as BL
 import           Data.Language
 import           Data.Source
@@ -42,7 +43,7 @@ import           System.Directory.Tree (AnchoredDirTree(..))
 import           System.Exit
 import           System.FilePath
 import           System.FilePath.Glob
-import           System.IO (Handle)
+import           System.IO (Handle, IOMode(..), withBinaryFile)
 import           Text.Read
 
 -- | Read a utf8-encoded file to a 'Blob'.
@@ -196,8 +197,8 @@ readBlobPairs = send . ReadBlobPairs
 readProject :: Member Files effs => Maybe FilePath -> FilePath -> Language -> [FilePath] -> Eff effs Project
 readProject rootDir dir excludeDirs = send . ReadProject rootDir dir excludeDirs
 
--- | A task which writes a 'B.ByteString' to a 'Handle' or a 'FilePath'.
-writeToOutput :: Member Files effs => Either Handle FilePath -> B.ByteString -> Eff effs ()
+-- | A task which writes a 'B.Builder' to a 'Handle' or a 'FilePath'.
+writeToOutput :: Member Files effs => Either Handle FilePath -> B.Builder -> Eff effs ()
 writeToOutput path = send . WriteToOutput path
 
 
@@ -207,7 +208,7 @@ data Files out where
   ReadBlobs     :: Either Handle [File] -> Files [Blob.Blob]
   ReadBlobPairs :: Either Handle [Both File] -> Files [Blob.BlobPair]
   ReadProject   :: Maybe FilePath -> FilePath -> Language -> [FilePath] -> Files Project
-  WriteToOutput :: Either Handle FilePath -> B.ByteString -> Files ()
+  WriteToOutput :: Either Handle FilePath -> B.Builder -> Files ()
 
 -- | Run a 'Files' effect in 'IO'.
 runFiles :: Members '[Exc SomeException, IO] effs => Eff (Files ': effs) a -> Eff effs a
@@ -218,7 +219,7 @@ runFiles = interpret $ \ files -> case files of
   ReadBlobs (Right paths) -> rethrowing (readBlobsFromPaths paths)
   ReadBlobPairs source -> rethrowing (either readBlobPairsFromHandle (traverse (runBothWith readFilePair)) source)
   ReadProject rootDir dir language excludeDirs -> rethrowing (readProjectFromPaths rootDir dir language excludeDirs)
-  WriteToOutput destination contents -> liftIO (either B.hPutStr B.writeFile destination contents)
+  WriteToOutput destination contents -> liftIO (either B.hPutBuilder (\ path -> withBinaryFile path WriteMode . flip B.hPutBuilder) destination contents)
 
 
 -- | Catch exceptions in 'IO' actions embedded in 'Eff', handling them with the passed function.
