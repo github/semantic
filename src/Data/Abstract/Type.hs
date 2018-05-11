@@ -16,31 +16,31 @@ import Prologue hiding (TypeError)
 type TName = Int
 
 -- | A datatype representing primitive types and combinations thereof.
-data Type location
-  = Int                                   -- ^ Primitive int type.
-  | Bool                                  -- ^ Primitive boolean type.
-  | String                                -- ^ Primitive string type.
-  | Symbol                                -- ^ Type of unique symbols.
-  | Unit                                  -- ^ The unit type.
-  | Float                                 -- ^ Floating-point type.
-  | Rational                              -- ^ Rational type.
-  | Type location :-> Type location       -- ^ Binary function types.
-  | Var TName                             -- ^ A type variable.
-  | Product [Type location]               -- ^ N-ary products.
-  | Array [Type location]                 -- ^ Arrays. Note that this is heterogenous.
-  | Hash [(Type location, Type location)] -- ^ Heterogenous key-value maps.
-  | Object                                -- ^ Objects. Once we have some notion of inheritance we'll need to store a superclass.
-  | Null                                  -- ^ The null type. Unlike 'Unit', this unifies with any other type.
-  | Hole                                  -- ^ The hole type.
+data Type
+  = Int                 -- ^ Primitive int type.
+  | Bool                -- ^ Primitive boolean type.
+  | String              -- ^ Primitive string type.
+  | Symbol              -- ^ Type of unique symbols.
+  | Unit                -- ^ The unit type.
+  | Float               -- ^ Floating-point type.
+  | Rational            -- ^ Rational type.
+  | Type :-> Type       -- ^ Binary function types.
+  | Var TName           -- ^ A type variable.
+  | Product [Type]      -- ^ N-ary products.
+  | Array [Type]        -- ^ Arrays. Note that this is heterogenous.
+  | Hash [(Type, Type)] -- ^ Heterogenous key-value maps.
+  | Object              -- ^ Objects. Once we have some notion of inheritance we'll need to store a superclass.
+  | Null                -- ^ The null type. Unlike 'Unit', this unifies with any other type.
+  | Hole                -- ^ The hole type.
   deriving (Eq, Ord, Show)
 
 -- TODO: À la carte representation of types.
 
 data TypeError resume where
-  NumOpError       :: Type location -> Type location -> TypeError (Type location)
-  BitOpError       :: Type location -> Type location -> TypeError (Type location)
-  UnificationError :: Type location -> Type location -> TypeError (Type location)
-  SubscriptError   :: Type location -> Type location -> TypeError (Type location)
+  NumOpError       :: Type -> Type -> TypeError Type
+  BitOpError       :: Type -> Type -> TypeError Type
+  UnificationError :: Type -> Type -> TypeError Type
+  SubscriptError   :: Type -> Type -> TypeError Type
 
 deriving instance Show (TypeError resume)
 
@@ -60,7 +60,7 @@ runTypeError :: Evaluator location value (Resumable TypeError ': effects) a -> E
 runTypeError = runResumable
 
 -- | Unify two 'Type's.
-unify :: (Effectful m, Applicative (m effects), Member (Resumable TypeError) effects) => Type location -> Type location -> m effects (Type location)
+unify :: (Effectful m, Applicative (m effects), Member (Resumable TypeError) effects) => Type -> Type -> m effects Type
 unify (a1 :-> b1) (a2 :-> b2) = (:->) <$> unify a1 a2 <*> unify b1 b2
 unify a Null = pure a
 unify Null b = pure b
@@ -72,11 +72,11 @@ unify t1 t2
   | t1 == t2  = pure t2
   | otherwise = throwResumable (UnificationError t1 t2)
 
-instance Ord location => ValueRoots location (Type location) where
+instance Ord location => ValueRoots location Type where
   valueRoots _ = mempty
 
 
-instance AbstractHole (Type location) where
+instance AbstractHole Type where
   hole = Hole
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
@@ -84,12 +84,12 @@ instance ( Addressable location effects
          , Members '[ Fresh
                     , NonDet
                     , Resumable TypeError
-                    , State (Environment location (Type location))
-                    , State (Heap location (Cell location) (Type location))
+                    , State (Environment location Type)
+                    , State (Heap location (Cell location) Type)
                     ] effects
-         , Reducer (Type location) (Cell location (Type location))
+         , Reducer Type (Cell location Type)
          )
-      => AbstractValue location (Type location) effects where
+      => AbstractValue location Type effects where
   closure names _ body = do
     (env, tvars) <- foldr (\ name rest -> do
       a <- alloc name

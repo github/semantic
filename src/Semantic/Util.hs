@@ -72,7 +72,7 @@ checking
 constrainedToValuePrecise :: Evaluator Precise (Value Precise) effects a -> Evaluator Precise (Value Precise) effects a
 constrainedToValuePrecise = id
 
-constrainedToTypeMonovariant :: Evaluator Monovariant (Type Monovariant) effects a -> Evaluator Monovariant (Type Monovariant) effects a
+constrainedToTypeMonovariant :: Evaluator Monovariant Type effects a -> Evaluator Monovariant Type effects a
 constrainedToTypeMonovariant = id
 
 evalGoProject path = justEvaluating =<< evaluateProject goParser Language.Go Nothing path
