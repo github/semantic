@@ -140,8 +140,10 @@ instance ( Addressable location effects
 
   isHole ty = pure (ty == Hole)
 
-  index (Array mem) Int   = pure mem
-  index a b                   = throwResumable (SubscriptError a b)
+  index arr sub = do
+    _ <- unify sub Int
+    field <- fresh
+    Var field <$ unify (Array (Var field)) arr
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 
