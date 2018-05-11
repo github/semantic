@@ -29,7 +29,7 @@ module Rendering.Renderer
 import Data.Aeson (Value)
 import Data.Output
 import Prologue
-import Rendering.DOT as R
+import Rendering.Graph as R
 import Rendering.Imports as R
 import Rendering.JSON as R
 import Rendering.SExpression as R

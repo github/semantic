@@ -1,5 +1,5 @@
 {-# LANGUAGE MonoLocalBinds #-}
-module Rendering.DOT
+module Rendering.Graph
 ( renderDOTDiff
 , renderDOTTerm
 ) where
