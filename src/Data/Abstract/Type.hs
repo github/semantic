@@ -65,11 +65,11 @@ deriving instance Eq   (TypeError resume)
 deriving instance Ord  (TypeError resume)
 deriving instance Show (TypeError resume)
 
+instance Eq1 TypeError where liftEq _ (UnificationError a b) (UnificationError c d) = a == c && b == d
+
 instance Show1 TypeError where
   liftShowsPrec _ _ _ (UnificationError l r) = showString "UnificationError " . shows [l, r]
 
-instance Eq1 TypeError where
-  liftEq eq (UnificationError a b) (UnificationError c d) = a `eq` c && b `eq` d
 
 runTypeError :: Evaluator location value (Resumable TypeError ': effects) a -> Evaluator location value effects (Either (SomeExc TypeError) a)
 runTypeError = runResumable
