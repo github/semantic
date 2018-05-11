@@ -155,6 +155,7 @@ library
                      -- Serialization
                      , Serializing.DOT
                      , Serializing.Format
+                     , Serializing.SExpression
                      -- Custom Prelude
   other-modules:       Prologue
   build-depends:       base >= 4.8 && < 5
