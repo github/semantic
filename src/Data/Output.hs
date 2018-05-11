@@ -3,6 +3,7 @@ module Data.Output
 ) where
 
 import Data.Aeson (Value, encode)
+import Data.ByteString.Builder (Builder, toLazyByteString)
 import Data.ByteString.Lazy (toStrict)
 import Data.Text (Text, intercalate)
 import Data.Text.Encoding (encodeUtf8)
@@ -22,3 +23,6 @@ instance Output (Map Text Value) where
 
 instance Output [Value] where
   toOutput = toStrict . (<> "\n") . encode
+
+instance Output Builder where
+  toOutput = toStrict . toLazyByteString
