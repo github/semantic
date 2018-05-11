@@ -211,7 +211,7 @@ readProject rootDir dir excludeDirs = send . ReadProject rootDir dir excludeDirs
 
 -- | A task which writes a 'B.Builder' to a 'Handle' or a 'FilePath'.
 writeToOutput :: Member Files effs => Destination -> B.Builder -> Eff effs ()
-writeToOutput dest = send . WriteToOutput dest
+writeToOutput dest = send . Write dest
 
 data Handle mode where
   ReadHandle  :: IO.Handle -> Handle 'IO.ReadMode
@@ -234,7 +234,7 @@ data Files out where
   ReadBlobs     :: Either (Handle 'IO.ReadMode) [File] -> Files [Blob.Blob]
   ReadBlobPairs :: Either (Handle 'IO.ReadMode) [Both File] -> Files [Blob.BlobPair]
   ReadProject   :: Maybe FilePath -> FilePath -> Language -> [FilePath] -> Files Project
-  WriteToOutput :: Destination -> B.Builder -> Files ()
+  Write         :: Destination -> B.Builder -> Files ()
 
 -- | Run a 'Files' effect in 'IO'.
 runFiles :: Members '[Exc SomeException, IO] effs => Eff (Files ': effs) a -> Eff effs a
@@ -245,8 +245,8 @@ runFiles = interpret $ \ files -> case files of
   ReadBlobs (Right paths) -> rethrowing (readBlobsFromPaths paths)
   ReadBlobPairs source -> rethrowing (either readBlobPairsFromHandle (traverse (runBothWith readFilePair)) source)
   ReadProject rootDir dir language excludeDirs -> rethrowing (readProjectFromPaths rootDir dir language excludeDirs)
-  WriteToOutput (ToPath path)                   builder -> liftIO (IO.withBinaryFile path IO.WriteMode (flip B.hPutBuilder builder))
-  WriteToOutput (ToHandle (WriteHandle handle)) builder -> liftIO (B.hPutBuilder handle builder)
+  Write (ToPath path)                   builder -> liftIO (IO.withBinaryFile path IO.WriteMode (flip B.hPutBuilder builder))
+  Write (ToHandle (WriteHandle handle)) builder -> liftIO (B.hPutBuilder handle builder)
 
 
 -- | Catch exceptions in 'IO' actions embedded in 'Eff', handling them with the passed function.
