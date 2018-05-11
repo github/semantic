@@ -37,7 +37,7 @@ type ValueConstructors location
 
 -- | Open union of primitive values that terms can be evaluated to.
 --   Fix by another name.
-newtype Value location = Value { deValue :: Sum (ValueConstructors location) (Value location) }
+newtype Value location = Value (Sum (ValueConstructors location) (Value location))
   deriving (Eq, Show, Ord)
 
 -- | Identical to 'inj', but wraps the resulting sub-entity in a 'Value'.
@@ -46,7 +46,7 @@ injValue = Value . injectSum
 
 -- | Identical to 'prj', but unwraps the argument out of its 'Value' wrapper.
 prjValue :: (f :< ValueConstructors location) => Value location -> Maybe (f (Value location))
-prjValue = projectSum . deValue
+prjValue (Value v) = projectSum v
 
 -- | Convenience function for projecting two values.
 prjPair :: (f :< ValueConstructors location , g :< ValueConstructors location)
