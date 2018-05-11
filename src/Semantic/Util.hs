@@ -52,7 +52,6 @@ evaluatingWithHoles
   . resumingAddressError @(Value Precise) @Precise
   . constrainedToValuePrecise
 
--- The order is significant here: caching has to run before typeChecking, or else we’ll nondeterministically produce TypeErrors as part of the result set. While this is probably actually correct, it will require us to have an Ord instance for TypeError, which we don’t have yet.
 checking
   = runM @(Evaluator Monovariant Type) @IO
   . fmap (first reassociateTypes)
