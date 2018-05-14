@@ -69,7 +69,7 @@ import           Semantic.Log
 import           Semantic.Queue
 import           Semantic.Stat as Stat
 import           Semantic.Telemetry
-import           Serializing.Format
+import           Serializing.Format hiding (Options)
 import           System.Exit (die)
 import           System.IO (stderr)
 

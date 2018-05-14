@@ -26,7 +26,7 @@ parseSomeBlob blob@Blob{..} = maybe (noLanguageForBlob blobPath) (flip parse blo
 renderSomeTerm :: Members '[Task, Exc SomeException] effs => TermRenderer output -> Blob -> SomeTerm '[ConstructorName, HasPackageDef, HasDeclaration, IdentifierName, Foldable, Functor, ToJSONFields1] (Record Location) -> Eff effs output
 renderSomeTerm renderer blob@Blob{..} = withSomeTerm $ case renderer of
   JSONTermRenderer           -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)
-  SExpressionTermRenderer    ->                                                            serialize SExpression
+  SExpressionTermRenderer    ->                                                            serialize (SExpression ByConstructorName)
   TagsTermRenderer           -> decorate (declarationAlgebra blob)                     >=> render (renderToTags blob)
   ImportsTermRenderer        -> decorate (declarationAlgebra blob) >=> decorate (packageDefAlgebra blob) >=> render (renderToImports blob)
   SymbolsTermRenderer fields -> decorate (declarationAlgebra blob)                     >=> render (renderSymbolTerms . renderToSymbols fields blob)
@@ -45,7 +45,7 @@ astParseBlobs renderer = distributeFoldMap (WrapTask . astParseBlob renderer)
     astParseBlob renderer blob@Blob{..}
       | Just (SomeASTParser parser) <- someASTParser <$> blobLanguage
       = parse parser blob >>= case renderer of
-        SExpressionTermRenderer    -> serialize SExpression
+        SExpressionTermRenderer    -> serialize (SExpression ByShow) . fmap nodeSymbol
         JSONTermRenderer           -> render (renderJSONTerm' blob)
         _                          -> pure $ throwError (SomeException (FormatNotSupported "Only SExpression and JSON output supported for tree-sitter ASTs."))
       | otherwise = noLanguageForBlob blobPath

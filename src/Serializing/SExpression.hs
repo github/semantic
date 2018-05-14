@@ -2,6 +2,7 @@
 module Serializing.SExpression
 ( serializeSExpression
 , ToSExpression(..)
+, Options(..)
 ) where
 
 import Analysis.ConstructorName
@@ -12,14 +13,17 @@ import Data.Term
 import Prelude
 import Prologue
 
-serializeSExpression :: (Recursive t, ToSExpression (Base t)) => t -> Builder
-serializeSExpression t = cata toSExpression t 0 <> "\n"
+data Options = ByShow | ByConstructorName
+
+serializeSExpression :: (Recursive t, ToSExpression (Base t)) => Options -> t -> Builder
+serializeSExpression options t = cata (toSExpression options) t 0 <> "\n"
 
 branch :: Foldable syntax => String -> syntax (Int -> Builder) -> Int -> Builder
 branch name syntax n = "(" <> stringUtf8 name <> foldMap ($ (n + 1)) syntax <> ")"
 
-namedBranch :: (ConstructorName syntax, Foldable syntax) => syntax (Int -> Builder) -> Int -> Builder
-namedBranch syntax = branch (constructorName syntax) syntax
+namedBranch :: (ConstructorName syntax, Foldable syntax, Show ann) => Options -> TermF syntax ann (Int -> Builder) -> Int -> Builder
+namedBranch ByShow            (In ann syntax) = branch (show ann) syntax
+namedBranch ByConstructorName (In _   syntax) = branch (constructorName syntax) syntax
 
 nl :: Int -> Builder
 nl n | n <= 0    = ""
@@ -30,15 +34,15 @@ pad n = stringUtf8 (replicate (2 * n) ' ')
 
 
 class ToSExpression base where
-  toSExpression :: base (Int -> Builder) -> (Int -> Builder)
+  toSExpression :: Options -> base (Int -> Builder) -> (Int -> Builder)
 
-instance (ConstructorName syntax, Foldable syntax) => ToSExpression (TermF syntax ann) where
-  toSExpression (In _ syntax) n = nl n <> pad n <> namedBranch syntax n
+instance (ConstructorName syntax, Foldable syntax, Show ann) => ToSExpression (TermF syntax ann) where
+  toSExpression options term n = nl n <> pad n <> namedBranch options term n
 
-instance (ConstructorName syntax, Foldable syntax) => ToSExpression (DiffF syntax ann1 ann2) where
-  toSExpression diff n = case diff of
-    Patch (Delete term) -> nl n <> pad (n - 1) <> "{-" <> namedBranch (termFOut term) n <> "-}"
-    Patch (Insert term) -> nl n <> pad (n - 1) <> "{+" <> namedBranch (termFOut term) n <> "+}"
-    Patch (Replace term1 term2) -> nl n       <> pad (n - 1) <> "{ " <> namedBranch (termFOut term1) n
-                                <> nl (n + 1) <> pad (n - 1) <> "->" <> namedBranch (termFOut term2) n <> " }"
-    Merge term -> nl n <> pad n <> namedBranch (termFOut term) n
+instance (ConstructorName syntax, Foldable syntax, Show ann1, Show ann2) => ToSExpression (DiffF syntax ann1 ann2) where
+  toSExpression options diff n = case diff of
+    Patch (Delete term) -> nl n <> pad (n - 1) <> "{-" <> namedBranch options term n <> "-}"
+    Patch (Insert term) -> nl n <> pad (n - 1) <> "{+" <> namedBranch options term n <> "+}"
+    Patch (Replace term1 term2) -> nl n       <> pad (n - 1) <> "{ " <> namedBranch options term1 n
+                                <> nl (n + 1) <> pad (n - 1) <> "->" <> namedBranch options term2 n <> " }"
+    Merge term -> nl n <> pad n <> namedBranch options term n
