@@ -136,7 +136,6 @@ library
                      , Rendering.Imports
                      , Rendering.JSON
                      , Rendering.Renderer
-                     , Rendering.SExpression
                      , Rendering.Symbol
                      , Rendering.TOC
                      -- High-level flow & operational functionality (logging, stats, etc.)

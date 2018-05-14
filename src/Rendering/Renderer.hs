@@ -3,9 +3,6 @@ module Rendering.Renderer
 ( DiffRenderer(..)
 , TermRenderer(..)
 , SomeRenderer(..)
-, renderSExpressionDiff
-, renderSExpressionTerm
-, renderSExpressionAST
 , renderJSONDiff
 , renderJSONDiffs
 , renderJSONTerm
@@ -30,7 +27,6 @@ import Data.Output
 import Rendering.Graph as R
 import Rendering.Imports as R
 import Rendering.JSON as R
-import Rendering.SExpression as R
 import Rendering.Symbol as R
 import Rendering.TOC as R
 
