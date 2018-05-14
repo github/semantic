@@ -4,7 +4,6 @@ module Rendering.JSON
 , toJSONOutput
 , JSONTermOutput(..)
 , renderJSONDiff
-, renderJSONDiffs
 , renderJSONTerm
 , renderJSONTerm'
 , renderSymbolTerms

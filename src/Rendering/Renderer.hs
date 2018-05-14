@@ -4,7 +4,6 @@ module Rendering.Renderer
 , TermRenderer(..)
 , SomeRenderer(..)
 , renderJSONDiff
-, renderJSONDiffs
 , renderJSONTerm
 , renderJSONTerm'
 , renderToCDiff
