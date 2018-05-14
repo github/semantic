@@ -22,7 +22,7 @@ data Format input where
 
 runSerialize :: Format input -> input -> Builder
 runSerialize (DOT style)        = serializeDOT style
-runSerialize JSON               = fromEncoding . toEncoding
+runSerialize JSON               = (<> "\n") . fromEncoding . toEncoding
 runSerialize (SExpression opts) = serializeSExpression opts
 runSerialize Show               = stringUtf8 . show
 
