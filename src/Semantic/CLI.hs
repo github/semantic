@@ -37,12 +37,6 @@ runDiff (SomeRenderer diffRenderer) = fmap toOutput . Semantic.diffBlobPairs dif
 runParse :: SomeRenderer TermRenderer -> Either (Handle 'IO.ReadMode) [File] -> Task.TaskEff Builder
 runParse (SomeRenderer parseTreeRenderer) = fmap toOutput . Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
 
-
-
--- runASTParse :: Monoid output => (forall grammar . Show grammar => AST [] grammar -> TaskEff output) -> Either (Handle 'IO.ReadMode) [File] -> Task.TaskEff Builder
--- runASTParse = distribute (WrapTask . astParseBlob)
--- runASTParse parseTreeRenderer = fmap toOutput . Semantic.astParseBlobs parseTreeRenderer <=< Task.readBlobs
-
 runGraph :: Semantic.GraphType -> Maybe FilePath -> FilePath -> Language -> [FilePath] -> Task.TaskEff (Graph Vertex)
 runGraph graphType rootDir dir excludeDirs = Semantic.graph graphType <=< Task.readProject rootDir dir excludeDirs
 
