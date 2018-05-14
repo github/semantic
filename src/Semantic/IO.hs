@@ -24,6 +24,7 @@ module Semantic.IO
 , stdin
 , stdout
 , stderr
+, openFileForReading
 , Source(..)
 , Destination(..)
 , Files
@@ -232,6 +233,9 @@ stdout = WriteHandle IO.stdout
 
 stderr :: Handle 'IO.WriteMode
 stderr = WriteHandle IO.stderr
+
+openFileForReading :: FilePath -> IO (Handle 'IO.ReadMode)
+openFileForReading path = ReadHandle <$> IO.openFile path IO.ReadMode
 
 data Source blob where
   FromPath       :: File                -> Source Blob.Blob
