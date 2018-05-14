@@ -103,7 +103,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       rootDir <- rootDirectoryOption
       excludeDirs <- excludeDirsOption
       File{..} <- argument filePathReader (metavar "DIR:LANGUAGE | FILE")
-      pure $ runGraph graphType rootDir filePath (fromJust fileLanguage) excludeDirs >>= fmap toOutput . serializer
+      pure $ runGraph graphType rootDir filePath (fromJust fileLanguage) excludeDirs >>= serializer
 
     rootDirectoryOption = optional (strOption (long "root" <> help "Root directory of project. Optional, defaults to entry file/directory." <> metavar "DIR"))
     excludeDirsOption = many (strOption (long "exclude-dir" <> help "Exclude a directory (e.g. vendor)" <> metavar "DIR"))
