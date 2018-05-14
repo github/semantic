@@ -6,6 +6,7 @@ module Rendering.JSON
 , renderJSONDiff
 , renderJSONTerm
 , renderJSONAST
+, JSONAST(..)
 , renderSymbolTerms
 ) where
 
@@ -50,7 +51,14 @@ renderJSONTerm :: ToJSON a => Blob -> a -> JSONTerms
 renderJSONTerm blob content = JSONTerms [ toJSON (object ("programNode" .= content : toJSONFields blob)) ]
 
 renderJSONAST :: ToJSON a => Blob -> a -> JSONTerms
-renderJSONAST blob content = JSONTerms [ toJSON (object ("ast" .= content : toJSONFields blob)) ]
+renderJSONAST blob content = JSONTerms [ toJSON (JSONAST blob content) ]
+
+data JSONAST a = JSONAST { jsonASTBlob :: Blob, jsonAST :: a }
+  deriving (Eq, Show)
+
+instance ToJSON a => ToJSON (JSONAST a) where
+  toJSON JSONAST{..} = object ("ast" .= jsonAST : toJSONFields jsonASTBlob)
+  toEncoding JSONAST{..} = pairs (fold ("ast" .= jsonAST : toJSONFields jsonASTBlob))
 
 
 -- | Render terms to final JSON structure.
