@@ -3,10 +3,9 @@ module Semantic.AST where
 
 import Data.AST
 import Data.Blob
-import Data.Output
 import Parsing.Parser
 import Prologue hiding (MonadError(..))
-import Rendering.Renderer
+import Rendering.JSON
 import Semantic.IO (noLanguageForBlob)
 import Semantic.Task
 import qualified Serializing.Format as F
@@ -29,4 +28,4 @@ data ASTFormat = SExpression | JSON
 
 runASTParse :: Members '[Distribute WrappedTask, Task, Exc SomeException] effects => ASTFormat -> [Blob] -> Eff effects F.Builder
 runASTParse SExpression = distributeFoldMap (WrapTask . (withSomeAST (serialize (F.SExpression F.ByShow)) <=< astParseBlob))
-runASTParse JSON        = fmap toOutput . distributeFoldMap (\ blob -> WrapTask (withSomeAST (render (renderJSONAST blob)) =<< astParseBlob blob))
+runASTParse JSON        = serialize F.JSON <=< distributeFoldMap (\ blob -> WrapTask (withSomeAST (render (renderJSONAST blob)) =<< astParseBlob blob))
