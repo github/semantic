@@ -3,7 +3,7 @@ module Semantic.CLI.Spec (spec) where
 import Control.Monad (when)
 import Data.Foldable (for_)
 import Semantic.CLI
-import System.IO (Handle)
+import Semantic.IO
 
 import SpecHelpers
 
@@ -26,7 +26,7 @@ spec = parallel $ do
       when (actual /= expected) $ print actual
       actual `shouldBe` expected
 
-parseFixtures :: [(SomeRenderer TermRenderer, Either Handle [File], ByteString)]
+parseFixtures :: [(SomeRenderer TermRenderer, Either (Handle 'ReadMode) [File], ByteString)]
 parseFixtures =
   [ (SomeRenderer SExpressionTermRenderer, pathMode, sExpressionParseTreeOutput)
   , (SomeRenderer JSONTermRenderer, pathMode, jsonParseTreeOutput)
@@ -46,7 +46,7 @@ parseFixtures =
         tagsOutput = "[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"path\":\"test/fixtures/ruby/corpus/method-declaration.A.rb\",\"kind\":\"Method\",\"symbol\":\"foo\",\"line\":\"def foo\",\"language\":\"Ruby\"}]\n"
 
 
-diffFixtures :: [(SomeRenderer DiffRenderer, Either Handle [Both File], ByteString)]
+diffFixtures :: [(SomeRenderer DiffRenderer, Either (Handle 'ReadMode) [Both File], ByteString)]
 diffFixtures =
   [ (SomeRenderer JSONDiffRenderer, pathMode, jsonOutput)
   , (SomeRenderer SExpressionDiffRenderer, pathMode, sExpressionOutput)
