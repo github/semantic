@@ -116,11 +116,9 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
         [path] -> maybe (Left $ "Cannot identify language for path: " <> path) (Right . File path . Just) (languageForFilePath path)
         args -> Left ("cannot parse `" <> join args <> "`\nexpecting FILE:LANGUAGE or just FILE")
 
--- Example: --log-level error|warning|info|debug|none
-options :: Eq a => [(String, a)] -> Mod OptionFields a -> Parser a
-options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options) <> metavar (intercalate "|" (fmap fst options)))
-  where optionsReader options = eitherReader $ \ str -> maybe (Left ("expected one of: " <> intercalate ", " (fmap fst options))) (Right . snd) (find ((== str) . fst) options)
-        findOption options value = maybe "" fst (find ((== value) . snd) options)
+    optionsReader options = eitherReader $ \ str -> maybe (Left ("expected one of: " <> intercalate ", " (fmap fst options))) (Right . snd) (find ((== str) . fst) options)
+    options options fields = option (optionsReader options) (fields <> showDefaultWith (findOption options) <> metavar (intercalate "|" (fmap fst options)))
+    findOption options value = maybe "" fst (find ((== value) . snd) options)
 
 
 -- Example: semantic parse --symbols --fields=symbol,path,language,kind,line,span
