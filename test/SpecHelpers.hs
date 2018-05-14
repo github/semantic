@@ -26,6 +26,8 @@ import Data.Abstract.ModuleTable as X hiding (lookup)
 import Data.Abstract.Value (Namespace(..), Value, ValueError, injValue, prjValue, runValueError)
 import Data.Bifunctor (first)
 import Data.Blob as X
+import Data.ByteString.Builder (toLazyByteString)
+import Data.ByteString.Lazy (toStrict)
 import Data.File as X
 import Data.Functor.Listable as X
 import Data.Language as X
@@ -61,11 +63,11 @@ import qualified Semantic.IO as IO
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO ByteString
-diffFilePaths paths = readFilePair paths >>= fmap toOutput . runTask . diffBlobPair SExpressionDiffRenderer
+diffFilePaths paths = readFilePair paths >>= fmap (toStrict . toLazyByteString . toOutput) . runTask . diffBlobPair SExpressionDiffRenderer
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFilePath :: FilePath -> IO ByteString
-parseFilePath path = (fromJust <$> IO.readFile (file path)) >>= fmap toOutput . runTask . parseBlob SExpressionTermRenderer
+parseFilePath path = (fromJust <$> IO.readFile (file path)) >>= fmap (toStrict . toLazyByteString . toOutput) . runTask . parseBlob SExpressionTermRenderer
 
 -- | Read two files to a BlobPair.
 readFilePair :: Both FilePath -> IO BlobPair
