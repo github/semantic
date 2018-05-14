@@ -25,7 +25,6 @@ import           Data.Aeson hiding (Result)
 import           Data.ByteString.Builder
 import qualified Data.ByteString.Char8 as BC
 import           Data.Graph
-import           Data.Output
 import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Data.Text.Encoding as T
@@ -141,9 +140,6 @@ variableDefinition name = do
 appendGraph :: (Effectful m, Member (State (Graph Vertex)) effects) => Graph Vertex -> m effects ()
 appendGraph = modify' . (<>)
 
-
-instance Output (Graph Vertex) where
-  toOutput = fromEncoding . toEncoding
 
 instance ToJSON Vertex where
   toJSON v = object [ "name" .= vertexToText v, "type" .= vertexToType v ]

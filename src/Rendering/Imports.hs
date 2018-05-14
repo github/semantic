@@ -10,7 +10,6 @@ import Analysis.PackageDef
 import Data.Aeson
 import Data.Blob
 import Data.Record
-import Data.Output
 import Data.Span
 import Data.Term
 import System.FilePath.Posix (takeBaseName)
@@ -27,9 +26,6 @@ instance Semigroup ImportSummary where
 instance Monoid ImportSummary where
   mempty = ImportSummary mempty
   mappend = (<>)
-
-instance Output ImportSummary where
-  toOutput = fromEncoding . toEncoding
 
 instance ToJSON ImportSummary where
   toJSON (ImportSummary m) = object [ "modules" .= m ]

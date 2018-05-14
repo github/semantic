@@ -12,7 +12,6 @@ import Data.Aeson (ToJSON, toJSON, object, (.=))
 import Data.Aeson as A
 import Data.JSON.Fields
 import Data.Blob
-import Data.Output
 import Data.Patch
 import Data.Text (pack)
 import GHC.TypeLits
@@ -24,9 +23,6 @@ newtype JSON (key :: Symbol) a = JSON { unJSON :: [a] }
 instance (KnownSymbol key, ToJSON a) => ToJSON (JSON key a) where
   toJSON (JSON as) = object [ pack (symbolVal @key undefined) .= as ]
   toEncoding (JSON as) = pairs (pack (symbolVal @key undefined) .= as)
-
-instance (KnownSymbol key, ToJSON a) => Output (JSON key a) where
-  toOutput = (<> "\n") . fromEncoding . toEncoding
 
 
 -- | Render a diff to a value representing its JSON.

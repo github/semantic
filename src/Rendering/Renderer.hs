@@ -22,7 +22,6 @@ module Rendering.Renderer
 import Data.Aeson (Value)
 import Data.ByteString.Builder
 import Data.Graph
-import Data.Output
 import Rendering.Graph as R
 import Rendering.Imports as R
 import Rendering.JSON as R
@@ -66,6 +65,6 @@ deriving instance Show (TermRenderer output)
 --
 --   This type abstracts the type indices of 'DiffRenderer', 'TermRenderer', and 'GraphRenderer' s.t. multiple renderers can be present in a single list, alternation, etc., while retaining the ability to render and serialize. (Without 'SomeRenderer', the different output types of individual term/diff renderers prevent them from being used in a homogeneously typed setting.)
 data SomeRenderer f where
-  SomeRenderer :: (Output output, Show (f output)) => f output -> SomeRenderer f
+  SomeRenderer :: Show (f output) => f output -> SomeRenderer f
 
 deriving instance Show (SomeRenderer f)

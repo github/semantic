@@ -78,7 +78,6 @@ library
                      , Data.Language
                      , Data.Map.Monoidal
                      , Data.Mergeable
-                     , Data.Output
                      , Data.Patch
                      , Data.Range
                      , Data.Record
