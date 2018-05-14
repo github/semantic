@@ -10,7 +10,6 @@ import Data.JSON.Fields
 import Data.Record
 import Data.Term
 import Diffing.Algorithm (Diffable)
-import Diffing.Interpreter
 import Parsing.Parser
 import Prologue hiding (MonadError(..))
 import Rendering.Graph
@@ -40,14 +39,8 @@ diffBlobPair renderer blobs
         run parse renderer = do
           terms <- distributeFor blobs (WrapTask . parse)
           time "diff" languageTag $ do
-            diff <- diffTermPair (runJoin terms)
+            diff <- diff (runJoin terms)
             writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
             render (renderer blobs) diff
           where
             languageTag = languageTagForBlobPair blobs
-
--- | A task to diff 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
-diffTermPair :: (Diffable syntax, Eq1 syntax, GAlign syntax, Show1 syntax, Traversable syntax, Member Task effs) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Eff effs (Diff syntax (Record fields1) (Record fields2))
-diffTermPair (This  t1   ) = pure (deleting t1)
-diffTermPair (That     t2) = pure (inserting t2)
-diffTermPair (These t1 t2) = diff diffTerms t1 t2
