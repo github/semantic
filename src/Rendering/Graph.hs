@@ -4,6 +4,8 @@ module Rendering.Graph
 , termStyle
 , diffStyle
 , ToTreeGraph(..)
+, Vertex(..)
+, DiffTag(..)
 ) where
 
 import Algebra.Graph.Export.Dot
