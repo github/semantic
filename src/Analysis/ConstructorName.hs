@@ -36,15 +36,12 @@ class ConstructorName syntax where
 instance (ConstructorNameStrategy syntax ~ strategy, ConstructorNameWithStrategy strategy syntax) => ConstructorName syntax where
   constructorName = constructorNameWithStrategy (Proxy :: Proxy strategy)
 
-class CustomConstructorName syntax where
-  customConstructorName :: syntax a -> String
+instance Apply ConstructorName fs => ConstructorNameWithStrategy 'Custom (Sum fs) where
+  constructorNameWithStrategy _ = apply @ConstructorName constructorName
 
-instance Apply ConstructorName fs => CustomConstructorName (Sum fs) where
-  customConstructorName = apply @ConstructorName constructorName
-
-instance CustomConstructorName [] where
-  customConstructorName [] = "[]"
-  customConstructorName _  = ""
+instance ConstructorNameWithStrategy 'Custom [] where
+  constructorNameWithStrategy _ [] = "[]"
+  constructorNameWithStrategy _ _  = ""
 
 data Strategy = Default | Custom
 
@@ -58,9 +55,6 @@ class ConstructorNameWithStrategy (strategy :: Strategy) syntax where
 
 instance (Generic1 syntax, GConstructorName (Rep1 syntax)) => ConstructorNameWithStrategy 'Default syntax where
   constructorNameWithStrategy _ = gconstructorName . from1
-
-instance CustomConstructorName syntax => ConstructorNameWithStrategy 'Custom syntax where
-  constructorNameWithStrategy _ = customConstructorName
 
 
 class GConstructorName f where
