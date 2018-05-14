@@ -1,12 +1,9 @@
-{-# LANGUAGE GADTs, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DataKinds, GADTs, GeneralizedNewtypeDeriving, KindSignatures, ScopedTypeVariables #-}
 module Rendering.JSON
-( JSONOutput(..)
-, toJSONOutput
-, JSONTrees(..)
+( JSON(..)
 , renderJSONDiff
 , renderJSONTerm
 , renderJSONAST
-, JSONAST(..)
 , renderSymbolTerms
 , SomeJSON(..)
 ) where
@@ -15,46 +12,45 @@ import Data.Aeson (ToJSON, toJSON, object, (.=))
 import Data.Aeson as A
 import Data.JSON.Fields
 import Data.Blob
-import qualified Data.Map.Monoidal as Monoidal
 import Data.Output
 import Data.Patch
+import Data.Text (pack)
+import GHC.TypeLits
 import Prologue
 
-newtype JSONOutput = JSONOutput { unJSONOutput :: Monoidal.Map Text [Value] }
-  deriving (Eq, Monoid, Semigroup, Show, ToJSON)
+newtype JSON (key :: Symbol) a = JSON { unJSON :: [a] }
+  deriving (Eq, Monoid, Semigroup, Show)
 
-toJSONOutput :: Text -> [Value] -> JSONOutput
-toJSONOutput key = JSONOutput . Monoidal.singleton key
+instance (KnownSymbol key, ToJSON a) => ToJSON (JSON key a) where
+  toJSON (JSON as) = object [ pack (symbolVal @key undefined) .= as ]
+  toEncoding (JSON as) = pairs (pack (symbolVal @key undefined) .= as)
 
-instance Output JSONOutput where
+instance (KnownSymbol key, ToJSON a) => Output (JSON key a) where
   toOutput = (<> "\n") . fromEncoding . toEncoding
 
 
 -- | Render a diff to a value representing its JSON.
-renderJSONDiff :: ToJSON a => BlobPair -> a -> JSONOutput
-renderJSONDiff blobs diff = renderJSONDiffs
-  [ toJSON (object [ "diff" .= diff, "stat" .= object (pathKey <> toJSONFields statPatch) ]) ]
-  where statPatch = these Delete Insert Replace (runJoin blobs)
-        pathKey = [ "path" .= pathKeyForBlobPair blobs ]
+renderJSONDiff :: ToJSON a => BlobPair -> a -> JSON "diffs" SomeJSON
+renderJSONDiff blobs diff = JSON [ SomeJSON (JSONDiff (JSONStat blobs) diff) ]
 
-renderJSONDiffs :: [Value] -> JSONOutput
-renderJSONDiffs = toJSONOutput "diffs"
+data JSONDiff a = JSONDiff { jsonDiffStat :: JSONStat, jsonDiff :: a }
+  deriving (Eq, Show)
 
+instance ToJSON a => ToJSON (JSONDiff a) where
+  toJSON JSONDiff{..} = object [ "diff" .= jsonDiff, "stat" .= jsonDiffStat ]
+  toEncoding JSONDiff{..} = pairs ("diff" .= jsonDiff <> "stat" .= jsonDiffStat)
 
-newtype JSONTrees a = JSONTrees { unJSONTrees :: [a] }
-  deriving (Eq, Monoid, Semigroup, Show)
+newtype JSONStat = JSONStat { jsonStatBlobs :: BlobPair }
+  deriving (Eq, Show)
 
-instance ToJSON a => ToJSON (JSONTrees a) where
-  toJSON (JSONTrees terms) = object ["trees" .= terms]
-  toEncoding (JSONTrees terms) = pairs ("trees" .= terms)
-
-instance ToJSON a => Output (JSONTrees a) where
-  toOutput = (<> "\n") . fromEncoding . toEncoding
+instance ToJSON JSONStat where
+  toJSON JSONStat{..} = object ("path" .= pathKeyForBlobPair jsonStatBlobs : toJSONFields (these Delete Insert Replace (runJoin jsonStatBlobs)))
+  toEncoding JSONStat{..} = pairs (fold ("path" .= pathKeyForBlobPair jsonStatBlobs : toJSONFields (these Delete Insert Replace (runJoin jsonStatBlobs))))
 
 
 -- | Render a term to a value representing its JSON.
-renderJSONTerm :: ToJSON a => Blob -> a -> JSONTrees SomeJSON
-renderJSONTerm blob content = JSONTrees [ SomeJSON (JSONTerm blob content) ]
+renderJSONTerm :: ToJSON a => Blob -> a -> JSON "trees" SomeJSON
+renderJSONTerm blob content = JSON [ SomeJSON (JSONTerm blob content) ]
 
 data JSONTerm a = JSONTerm { jsonTermBlob :: Blob, jsonTerm :: a }
   deriving (Eq, Show)
@@ -64,8 +60,8 @@ instance ToJSON a => ToJSON (JSONTerm a) where
   toEncoding JSONTerm{..} = pairs (fold ("ast" .= jsonTerm : toJSONFields jsonTermBlob))
 
 
-renderJSONAST :: ToJSON a => Blob -> a -> JSONTrees SomeJSON
-renderJSONAST blob content = JSONTrees [ SomeJSON (JSONAST blob content) ]
+renderJSONAST :: ToJSON a => Blob -> a -> JSON "trees" SomeJSON
+renderJSONAST blob content = JSON [ SomeJSON (JSONAST blob content) ]
 
 data JSONAST a = JSONAST { jsonASTBlob :: Blob, jsonAST :: a }
   deriving (Eq, Show)
@@ -76,8 +72,8 @@ instance ToJSON a => ToJSON (JSONAST a) where
 
 
 -- | Render terms to final JSON structure.
-renderSymbolTerms :: [Value] -> JSONOutput
-renderSymbolTerms = toJSONOutput "files"
+renderSymbolTerms :: ToJSON a => [a] -> JSON "files" SomeJSON
+renderSymbolTerms = JSON . map SomeJSON
 
 
 data SomeJSON where

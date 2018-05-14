@@ -33,7 +33,7 @@ data DiffRenderer output where
   -- | Compute a table of contents for the diff & encode it as JSON.
   ToCDiffRenderer :: DiffRenderer Summaries
   -- | Render to JSON with the format documented in docs/json-format.md
-  JSONDiffRenderer :: DiffRenderer JSONOutput
+  JSONDiffRenderer :: DiffRenderer (JSON "diffs" SomeJSON)
   -- | Render to a 'ByteString' formatted as nested s-expressions with patches indicated.
   SExpressionDiffRenderer :: DiffRenderer Builder
   -- | Render to a 'ByteString' formatted as a DOT description of the diff.
@@ -45,13 +45,13 @@ deriving instance Show (DiffRenderer output)
 -- | Specification of renderers for terms, producing output in the parameter type.
 data TermRenderer output where
   -- | Render to JSON with the format documented in docs/json-format.md under “Term.”
-  JSONTermRenderer :: TermRenderer (JSONTrees SomeJSON)
+  JSONTermRenderer :: TermRenderer (JSON "trees" SomeJSON)
   -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer Builder
   -- | Render to a list of tags (deprecated).
   TagsTermRenderer :: TermRenderer [Value]
   -- | Render to a list of symbols.
-  SymbolsTermRenderer :: SymbolFields -> TermRenderer JSONOutput
+  SymbolsTermRenderer :: SymbolFields -> TermRenderer (JSON "files" SomeJSON)
   -- | Render to a list of modules that represent the import graph.
   ImportsTermRenderer :: TermRenderer ImportSummary
   -- | Render to a 'ByteString' formatted as a DOT description of the term.
