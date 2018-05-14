@@ -7,7 +7,6 @@ module Rendering.JSON
 , renderJSONDiffs
 , renderJSONTerm
 , renderJSONTerm'
-, renderJSONTerms
 , renderSymbolTerms
 ) where
 
