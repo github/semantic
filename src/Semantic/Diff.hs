@@ -26,7 +26,7 @@ diffBlobPairs renderer = distributeFoldMap (WrapTask . diffBlobPair renderer)
 -- | A task to parse a pair of 'Blob's, diff them, and render the 'Diff'.
 diffBlobPair :: Members '[Distribute WrappedTask, Task, Telemetry, Exc SomeException, IO] effs => DiffRenderer output -> BlobPair -> Eff effs output
 diffBlobPair renderer blobs
-  | Just (SomeParser parser) <- someParser @'[ConstructorName, Diffable, Eq1, GAlign, HasDeclaration, IdentifierName, Show1, ToJSONFields1, Traversable] <$> (languageForBlobPair blobs)
+  | Just (SomeParser parser) <- someParser @'[ConstructorName, Diffable, Eq1, GAlign, HasDeclaration, IdentifierName, Show1, ToJSONFields1, Traversable] <$> languageForBlobPair blobs
   = diffBlobPairWithParser renderer blobs parser
   | otherwise = noLanguageForBlob (pathForBlobPair blobs)
 
