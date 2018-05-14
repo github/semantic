@@ -18,7 +18,7 @@ import Semantic.IO (noLanguageForBlob)
 import Semantic.Task
 import Serializing.Format
 
-runParse :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Monoid output) => TermRenderer output -> [Blob] -> Eff effs Builder
+runParse :: Members '[Distribute WrappedTask, Task, Exc SomeException] effs => TermRenderer output -> [Blob] -> Eff effs Builder
 runParse JSONTermRenderer             = withParsedBlob (\ blob -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)) >=> serialize JSON
 runParse SExpressionTermRenderer      = withParsedBlob (const (serialize (SExpression ByConstructorName)))
 runParse TagsTermRenderer             = withParsedBlob (\ blob -> decorate (declarationAlgebra blob) >=> render (renderToTags blob)) >=> serialize JSON
