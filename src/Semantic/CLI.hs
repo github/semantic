@@ -89,7 +89,7 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
       format <- flag  AST.SExpression AST.SExpression (long "sexpression" <> help "Output s-expression ASTs (default)")
             <|> flag'                 AST.JSON        (long "json"        <> help "Output JSON ASTs")
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
-      pure $ AST.runASTParse format =<< Task.readBlobs filesOrStdin
+      pure $ Task.readBlobs filesOrStdin >>= AST.runASTParse format
 
     graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a graph for a directory or entry point"))
     graphArgumentsParser = do
