@@ -20,7 +20,7 @@ import Semantic.Task as Task
 import Serializing.Format
 
 diffBlobPairs :: (Members '[Distribute WrappedTask, Task, Telemetry, Exc SomeException, IO] effs, Monoid output) => DiffRenderer output -> [BlobPair] -> Eff effs output
-diffBlobPairs renderer blobs = distributeFoldMap (WrapTask . diffBlobPair renderer) blobs
+diffBlobPairs renderer = distributeFoldMap (WrapTask . diffBlobPair renderer)
 
 -- | A task to parse a pair of 'Blob's, diff them, and render the 'Diff'.
 diffBlobPair :: Members '[Distribute WrappedTask, Task, Telemetry, Exc SomeException, IO] effs => DiffRenderer output -> BlobPair -> Eff effs output
@@ -29,7 +29,7 @@ diffBlobPair renderer blobs
   = case renderer of
     ToCDiffRenderer         -> run (WrapTask . (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob)))                     diffTerms renderToCDiff
     JSONDiffRenderer        -> run (WrapTask . (          parse parser      >=> decorate constructorLabel >=> decorate identifierLabel)) diffTerms renderJSONDiff
-    SExpressionDiffRenderer -> run (WrapTask . (          parse parser))                                                                 diffTerms (const id)              >>= serialize SExpression
+    SExpressionDiffRenderer -> run (WrapTask .            parse parser)                                                                  diffTerms (const id)              >>= serialize SExpression
     DOTDiffRenderer         -> run (WrapTask .            parse parser)                                                                  diffTerms (const renderTreeGraph) >>= serialize (DOT (diffStyle (pathKeyForBlobPair blobs)))
   | otherwise = noLanguageForBlob effectivePath
   where effectivePath = pathForBlobPair blobs

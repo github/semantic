@@ -18,7 +18,7 @@ import Semantic.Task
 import Serializing.Format
 
 parseBlobs :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Monoid output) => TermRenderer output -> [Blob] -> Eff effs output
-parseBlobs renderer blobs = distributeFoldMap (WrapTask . parseBlob renderer) blobs
+parseBlobs renderer = distributeFoldMap (WrapTask . parseBlob renderer)
 
 parseSomeBlob :: Members '[Task, Exc SomeException] effs => Blob -> Eff effs (SomeTerm '[ConstructorName, HasPackageDef, HasDeclaration, IdentifierName, Foldable, Functor, ToJSONFields1] (Record Location))
 parseSomeBlob blob@Blob{..} = maybe (noLanguageForBlob blobPath) (flip parse blob . someParser) blobLanguage
@@ -39,7 +39,7 @@ parseBlob renderer blob@Blob{..} = parseSomeBlob blob >>= renderSomeTerm rendere
 
 
 astParseBlobs :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Monoid output) => TermRenderer output -> [Blob] -> Eff effs output
-astParseBlobs renderer blobs = distributeFoldMap (WrapTask . astParseBlob renderer) blobs
+astParseBlobs renderer = distributeFoldMap (WrapTask . astParseBlob renderer)
   where
     astParseBlob :: Members '[Task, Exc SomeException] effs => TermRenderer output -> Blob -> Eff effs output
     astParseBlob renderer blob@Blob{..}
