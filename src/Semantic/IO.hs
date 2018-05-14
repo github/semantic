@@ -221,6 +221,9 @@ data Handle mode where
   ReadHandle  :: IO.Handle -> Handle 'IO.ReadMode
   WriteHandle :: IO.Handle -> Handle 'IO.WriteMode
 
+deriving instance Eq   (Handle mode)
+deriving instance Show (Handle mode)
+
 getHandle :: Handle mode -> IO.Handle
 getHandle (ReadHandle  handle) = handle
 getHandle (WriteHandle handle) = handle
