@@ -2,7 +2,7 @@
 module Rendering.JSON
 ( JSONOutput(..)
 , toJSONOutput
-, JSONTermOutput(..)
+, JSONTerms(..)
 , renderJSONDiff
 , renderJSONTerm
 , renderJSONTerm'
@@ -39,28 +39,18 @@ renderJSONDiffs :: [Value] -> JSONOutput
 renderJSONDiffs = toJSONOutput "diffs"
 
 
-newtype JSONTermOutput = JSONTermOutput { unJSONTermOutput :: Monoidal.Map Text [Value] }
-  deriving (Eq, Semigroup, Show, ToJSON)
+newtype JSONTerms = JSONTerms { unJSONTerms :: [Value] }
+  deriving (Eq, Monoid, Semigroup, Show, ToJSON)
 
-toJSONTermOutput :: Text -> [Value] -> JSONTermOutput
-toJSONTermOutput key = JSONTermOutput . Monoidal.singleton key
-
-instance Monoid JSONTermOutput where
-  mempty = renderJSONTerms []
-  mappend = (<>)
-
-instance Output JSONTermOutput where
-  toOutput = (<> "\n") . fromEncoding . toEncoding
+instance Output JSONTerms where
+  toOutput = (<> "\n") . fromEncoding . toEncoding . Monoidal.singleton ("trees" :: Text) . unJSONTerms
 
 -- | Render a term to a value representing its JSON.
-renderJSONTerm :: ToJSON a => Blob -> a -> JSONTermOutput
-renderJSONTerm blob content = renderJSONTerms [ toJSON (object ("programNode" .= content : toJSONFields blob)) ]
+renderJSONTerm :: ToJSON a => Blob -> a -> JSONTerms
+renderJSONTerm blob content = JSONTerms [ toJSON (object ("programNode" .= content : toJSONFields blob)) ]
 
-renderJSONTerm' :: ToJSON a => Blob -> a -> JSONTermOutput
-renderJSONTerm' blob content = renderJSONTerms [ toJSON (object ("ast" .= content : toJSONFields blob)) ]
-
-renderJSONTerms :: [Value] -> JSONTermOutput
-renderJSONTerms = toJSONTermOutput "trees"
+renderJSONTerm' :: ToJSON a => Blob -> a -> JSONTerms
+renderJSONTerm' blob content = JSONTerms [ toJSON (object ("ast" .= content : toJSONFields blob)) ]
 
 
 -- | Render terms to final JSON structure.
