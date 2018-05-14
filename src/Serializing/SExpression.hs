@@ -18,6 +18,9 @@ serializeSExpression t = cata toSExpression t 0 <> "\n"
 branch :: Foldable syntax => String -> syntax (Int -> Builder) -> Int -> Builder
 branch name syntax n = "(" <> stringUtf8 name <> foldMap ($ (n + 1)) syntax <> ")"
 
+namedBranch :: (ConstructorName syntax, Foldable syntax) => syntax (Int -> Builder) -> Int -> Builder
+namedBranch syntax = branch (constructorName syntax) syntax
+
 nl :: Int -> Builder
 nl n | n <= 0    = ""
      | otherwise = "\n"
@@ -30,12 +33,12 @@ class ToSExpression base where
   toSExpression :: base (Int -> Builder) -> (Int -> Builder)
 
 instance (ConstructorName syntax, Foldable syntax) => ToSExpression (TermF syntax ann) where
-  toSExpression (In _ syntax) n = nl n <> pad n <> branch (constructorName syntax) syntax n
+  toSExpression (In _ syntax) n = nl n <> pad n <> namedBranch syntax n
 
 instance (ConstructorName syntax, Foldable syntax) => ToSExpression (DiffF syntax ann1 ann2) where
   toSExpression diff n = case diff of
-    Patch (Delete term) -> nl n <> pad (n - 1) <> "{-" <> branch (constructorName (termFOut term)) (termFOut term) n <> "-}"
-    Patch (Insert term) -> nl n <> pad (n - 1) <> "{+" <> branch (constructorName (termFOut term)) (termFOut term) n <> "+}"
-    Patch (Replace term1 term2) -> nl n       <> pad (n - 1) <> "{ " <> branch (constructorName (termFOut term1)) (termFOut term1) n
-                                <> nl (n + 1) <> pad (n - 1) <> "->" <> branch (constructorName (termFOut term2)) (termFOut term2) n <> " }"
-    Merge term -> nl n <> pad n <> "(" <> stringUtf8 (constructorName (termFOut term)) <> foldMap ($ (n + 1)) (termFOut term) <> ")"
+    Patch (Delete term) -> nl n <> pad (n - 1) <> "{-" <> namedBranch (termFOut term) n <> "-}"
+    Patch (Insert term) -> nl n <> pad (n - 1) <> "{+" <> namedBranch (termFOut term) n <> "+}"
+    Patch (Replace term1 term2) -> nl n       <> pad (n - 1) <> "{ " <> namedBranch (termFOut term1) n
+                                <> nl (n + 1) <> pad (n - 1) <> "->" <> namedBranch (termFOut term2) n <> " }"
+    Merge term -> nl n <> pad n <> namedBranch (termFOut term) n
