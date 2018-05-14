@@ -19,7 +19,7 @@ import qualified Paths_semantic as Library (version)
 import           Prologue
 import           Rendering.Renderer
 import qualified Semantic.AST as AST
-import qualified Semantic.Diff as Semantic (diffBlobPairs)
+import qualified Semantic.Diff as Diff
 import           Semantic.Graph as Semantic (Graph, GraphType(..), Vertex, graph, style)
 import           Semantic.IO as IO
 import qualified Semantic.Log as Log
@@ -32,7 +32,7 @@ main :: IO ()
 main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTaskWithOptions
 
 runDiff :: SomeRenderer DiffRenderer -> Either (Handle 'IO.ReadMode) [Both File] -> Task.TaskEff Builder
-runDiff (SomeRenderer diffRenderer) = fmap toOutput . Semantic.diffBlobPairs diffRenderer <=< Task.readBlobPairs
+runDiff (SomeRenderer diffRenderer) = fmap toOutput . Diff.diffBlobPairs diffRenderer <=< Task.readBlobPairs
 
 runGraph :: Semantic.GraphType -> Maybe FilePath -> FilePath -> Language -> [FilePath] -> Task.TaskEff (Graph Vertex)
 runGraph graphType rootDir dir excludeDirs = Semantic.graph graphType <=< Task.readProject rootDir dir excludeDirs
