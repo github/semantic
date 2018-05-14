@@ -59,12 +59,12 @@ data TOCSummary
     , summarySpan :: Span
     , summaryChangeType :: T.Text
     }
-  | ErrorSummary { error :: T.Text, errorSpan :: Span, errorLanguage :: Maybe Language }
+  | ErrorSummary { errorText :: T.Text, errorSpan :: Span, errorLanguage :: Maybe Language }
   deriving (Generic, Eq, Show)
 
 instance ToJSON TOCSummary where
   toJSON TOCSummary{..} = object [ "changeType" .= summaryChangeType, "category" .= summaryCategoryName, "term" .= summaryTermName, "span" .= summarySpan ]
-  toJSON ErrorSummary{..} = object [ "error" .= error, "span" .= errorSpan, "language" .= errorLanguage ]
+  toJSON ErrorSummary{..} = object [ "error" .= errorText, "span" .= errorSpan, "language" .= errorLanguage ]
 
 isValidSummary :: TOCSummary -> Bool
 isValidSummary ErrorSummary{} = False
