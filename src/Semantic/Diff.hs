@@ -27,17 +27,17 @@ diffBlobPair :: Members '[Distribute WrappedTask, Task, Telemetry, Exc SomeExcep
 diffBlobPair renderer blobs
   | Just (SomeParser parser) <- someParser @'[ConstructorName, Diffable, Eq1, GAlign, HasDeclaration, IdentifierName, Show1, ToJSONFields1, Traversable] <$> effectiveLanguage
   = case renderer of
-    ToCDiffRenderer         -> run (WrapTask . (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob)))                     diffTerms renderToCDiff
-    JSONDiffRenderer        -> run (WrapTask . (          parse parser      >=> decorate constructorLabel >=> decorate identifierLabel)) diffTerms renderJSONDiff
-    SExpressionDiffRenderer -> run (WrapTask .            parse parser)                                                                  diffTerms (const id)              >>= serialize (SExpression ByConstructorName)
-    DOTDiffRenderer         -> run (WrapTask .            parse parser)                                                                  diffTerms (const renderTreeGraph) >>= serialize (DOT (diffStyle (pathKeyForBlobPair blobs)))
+    ToCDiffRenderer         -> run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))                     diffTerms renderToCDiff
+    JSONDiffRenderer        -> run (          parse parser      >=> decorate constructorLabel >=> decorate identifierLabel) diffTerms renderJSONDiff
+    SExpressionDiffRenderer -> run (          parse parser)                                                                 diffTerms (const id)              >>= serialize (SExpression ByConstructorName)
+    DOTDiffRenderer         -> run (          parse parser)                                                                 diffTerms (const renderTreeGraph) >>= serialize (DOT (diffStyle (pathKeyForBlobPair blobs)))
   | otherwise = noLanguageForBlob effectivePath
   where effectivePath = pathForBlobPair blobs
         effectiveLanguage = languageForBlobPair blobs
 
-        run :: (Foldable syntax, Functor syntax) => Members [Distribute WrappedTask, Task, Telemetry, IO] effs => (Blob -> WrappedTask (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (BlobPair -> Diff syntax ann ann -> output) -> Eff effs output
+        run :: (Foldable syntax, Functor syntax) => Members [Distribute WrappedTask, Task, Telemetry, IO] effs => (Blob -> TaskEff (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (BlobPair -> Diff syntax ann ann -> output) -> Eff effs output
         run parse diff renderer = do
-          terms <- distributeFor blobs parse
+          terms <- distributeFor blobs (WrapTask . parse)
           time "diff" languageTag $ do
             diff <- diffTermPair diff (runJoin terms)
             writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
