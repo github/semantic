@@ -1,6 +1,7 @@
 module SpecHelpers
 ( module X
 , toOutput
+, runBuilder
 , diffFilePaths
 , parseFilePath
 , readFilePair
@@ -62,7 +63,8 @@ import Test.LeanCheck as X
 import qualified Data.ByteString as B
 import qualified Semantic.IO as IO
 
-toOutput = toStrict . toLazyByteString . O.toOutput
+runBuilder = toStrict . toLazyByteString
+toOutput = runBuilder . O.toOutput
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO ByteString
