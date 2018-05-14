@@ -12,7 +12,6 @@ module Semantic.IO
 , languageForFilePath
 , NoLanguageForBlob(..)
 , noLanguageForBlob
-, FormatNotSupported(..)
 , readBlob
 , readProject
 , readBlobs
@@ -192,10 +191,6 @@ newtype NoLanguageForBlob = NoLanguageForBlob FilePath
 noLanguageForBlob :: Member (Exc SomeException) effs => FilePath -> Eff effs a
 noLanguageForBlob blobPath = throwError (SomeException (NoLanguageForBlob blobPath))
 
-
--- | An exception indicating that the output format is not supported
-newtype FormatNotSupported = FormatNotSupported String
-  deriving (Eq, Exception, Ord, Show, Typeable)
 
 readBlob :: Member Files effs => File -> Eff effs Blob.Blob
 readBlob = send . Read . FromPath

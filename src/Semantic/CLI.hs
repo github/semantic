@@ -1,4 +1,4 @@
-{-# LANGUAGE ApplicativeDo, TemplateHaskell #-}
+{-# LANGUAGE ApplicativeDo, RankNTypes, TemplateHaskell #-}
 module Semantic.CLI
 ( main
 -- Testing
@@ -18,11 +18,12 @@ import           Options.Applicative hiding (style)
 import qualified Paths_semantic as Library (version)
 import           Prologue
 import           Rendering.Renderer
+import qualified Semantic.AST as AST
 import qualified Semantic.Diff as Semantic (diffBlobPairs)
 import           Semantic.Graph as Semantic (Graph, GraphType(..), Vertex, graph, style)
 import           Semantic.IO as IO
 import qualified Semantic.Log as Log
-import qualified Semantic.Parse as Semantic (parseBlobs, astParseBlobs)
+import qualified Semantic.Parse as Semantic (parseBlobs)
 import qualified Semantic.Task as Task
 import           Serializing.Format
 import           Text.Read
@@ -36,8 +37,11 @@ runDiff (SomeRenderer diffRenderer) = fmap toOutput . Semantic.diffBlobPairs dif
 runParse :: SomeRenderer TermRenderer -> Either (Handle 'IO.ReadMode) [File] -> Task.TaskEff Builder
 runParse (SomeRenderer parseTreeRenderer) = fmap toOutput . Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
 
-runASTParse :: SomeRenderer TermRenderer -> Either (Handle 'IO.ReadMode) [File] -> Task.TaskEff Builder
-runASTParse (SomeRenderer parseTreeRenderer) = fmap toOutput . Semantic.astParseBlobs parseTreeRenderer <=< Task.readBlobs
+
+
+-- runASTParse :: Monoid output => (forall grammar . Show grammar => AST [] grammar -> TaskEff output) -> Either (Handle 'IO.ReadMode) [File] -> Task.TaskEff Builder
+-- runASTParse = distribute (WrapTask . astParseBlob)
+-- runASTParse parseTreeRenderer = fmap toOutput . Semantic.astParseBlobs parseTreeRenderer <=< Task.readBlobs
 
 runGraph :: Semantic.GraphType -> Maybe FilePath -> FilePath -> Language -> [FilePath] -> Task.TaskEff (Graph Vertex)
 runGraph graphType rootDir dir excludeDirs = Semantic.graph graphType <=< Task.readProject rootDir dir excludeDirs
@@ -91,10 +95,10 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
 
     tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Print specialized tree-sitter ASTs for path(s)"))
     tsParseArgumentsParser = do
-      renderer <- flag  (SomeRenderer SExpressionTermRenderer) (SomeRenderer SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression ASTs (default)")
-              <|> flag'                                        (SomeRenderer JSONTermRenderer)        (long "json"        <> help "Output JSON ASTs")
+      format <- flag  AST.SExpression AST.SExpression (long "sexpression" <> help "Output s-expression ASTs (default)")
+            <|> flag'                 AST.JSON        (long "json"        <> help "Output JSON ASTs")
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
-      pure $ runASTParse renderer filesOrStdin
+      pure $ AST.runASTParse format =<< Task.readBlobs filesOrStdin
 
     graphCommand = command "graph" (info graphArgumentsParser (progDesc "Compute a graph for a directory or entry point"))
     graphArgumentsParser = do

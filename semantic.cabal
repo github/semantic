@@ -139,6 +139,7 @@ library
                      , Rendering.Symbol
                      , Rendering.TOC
                      -- High-level flow & operational functionality (logging, stats, etc.)
+                     , Semantic.AST
                      , Semantic.CLI
                      , Semantic.Diff
                      , Semantic.Distribute

@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GADTs, RankNTypes #-}
 module Semantic.Parse where
 
 import Analysis.ConstructorName (ConstructorName, constructorLabel)
@@ -13,7 +13,7 @@ import Parsing.Parser
 import Prologue hiding (MonadError(..))
 import Rendering.Graph
 import Rendering.Renderer
-import Semantic.IO (noLanguageForBlob, FormatNotSupported(..))
+import Semantic.IO (noLanguageForBlob)
 import Semantic.Task
 import Serializing.Format
 
@@ -36,16 +36,3 @@ renderSomeTerm renderer blob@Blob{..} = withSomeTerm $ case renderer of
 -- | A task to parse a 'Blob' and render the resulting 'Term'.
 parseBlob :: Members '[Task, Exc SomeException] effs => TermRenderer output -> Blob -> Eff effs output
 parseBlob renderer blob@Blob{..} = parseSomeBlob blob >>= renderSomeTerm renderer blob
-
-
-astParseBlobs :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Monoid output) => TermRenderer output -> [Blob] -> Eff effs output
-astParseBlobs renderer = distributeFoldMap (WrapTask . astParseBlob renderer)
-  where
-    astParseBlob :: Members '[Task, Exc SomeException] effs => TermRenderer output -> Blob -> Eff effs output
-    astParseBlob renderer blob@Blob{..}
-      | Just (SomeASTParser parser) <- someASTParser <$> blobLanguage
-      = parse parser blob >>= case renderer of
-        SExpressionTermRenderer    -> serialize (SExpression ByShow) . fmap nodeSymbol
-        JSONTermRenderer           -> render (renderJSONAST blob)
-        _                          -> pure $ throwError (SomeException (FormatNotSupported "Only SExpression and JSON output supported for tree-sitter ASTs."))
-      | otherwise = noLanguageForBlob blobPath
