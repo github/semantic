@@ -145,23 +145,23 @@ spec = parallel $ do
   describe "diff with ToCDiffRenderer'" $ do
     it "produces JSON output" $ do
       blobs <- blobsForPaths (both "ruby/toc/methods.A.rb" "ruby/toc/methods.B.rb")
-      output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}\n" :: ByteString)
+      output <- runTask (runDiff ToCDiffRenderer [blobs])
+      runBuilder output `shouldBe` ("{\"changes\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.B.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"self.foo\",\"changeType\":\"added\"},{\"span\":{\"start\":[4,1],\"end\":[6,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"modified\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{}}\n" :: ByteString)
 
     it "produces JSON output if there are parse errors" $ do
       blobs <- blobsForPaths (both "ruby/toc/methods.A.rb" "ruby/toc/methods.X.rb")
-      output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"removed\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"expected end of input nodes, but got ParseError\",\"language\":\"Ruby\"}]}}\n" :: ByteString)
+      output <- runTask (runDiff ToCDiffRenderer [blobs])
+      runBuilder output `shouldBe` ("{\"changes\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"category\":\"Method\",\"term\":\"bar\",\"changeType\":\"removed\"},{\"span\":{\"start\":[4,1],\"end\":[5,4]},\"category\":\"Method\",\"term\":\"baz\",\"changeType\":\"removed\"}]},\"errors\":{\"test/fixtures/ruby/toc/methods.A.rb -> test/fixtures/ruby/toc/methods.X.rb\":[{\"span\":{\"start\":[1,1],\"end\":[3,1]},\"error\":\"expected end of input nodes, but got ParseError\",\"language\":\"Ruby\"}]}}\n" :: ByteString)
 
     it "ignores anonymous functions" $ do
       blobs <- blobsForPaths (both "ruby/toc/lambda.A.rb" "ruby/toc/lambda.B.rb")
-      output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      toOutput output `shouldBe` ("{\"changes\":{},\"errors\":{}}\n" :: ByteString)
+      output <- runTask (runDiff ToCDiffRenderer [blobs])
+      runBuilder output `shouldBe` ("{\"changes\":{},\"errors\":{}}\n" :: ByteString)
 
     it "summarizes Markdown headings" $ do
       blobs <- blobsForPaths (both "markdown/toc/headings.A.md" "markdown/toc/headings.B.md")
-      output <- runTask (diffBlobPair ToCDiffRenderer blobs)
-      toOutput output `shouldBe` ("{\"changes\":{\"test/fixtures/markdown/toc/headings.A.md -> test/fixtures/markdown/toc/headings.B.md\":[{\"span\":{\"start\":[1,1],\"end\":[3,16]},\"category\":\"Heading 1\",\"term\":\"Introduction\",\"changeType\":\"removed\"},{\"span\":{\"start\":[5,1],\"end\":[7,4]},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"modified\"},{\"span\":{\"start\":[9,1],\"end\":[11,10]},\"category\":\"Heading 3\",\"term\":\"This heading is new\",\"changeType\":\"added\"},{\"span\":{\"start\":[13,1],\"end\":[14,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
+      output <- runTask (runDiff ToCDiffRenderer [blobs])
+      runBuilder output `shouldBe` ("{\"changes\":{\"test/fixtures/markdown/toc/headings.A.md -> test/fixtures/markdown/toc/headings.B.md\":[{\"span\":{\"start\":[1,1],\"end\":[3,16]},\"category\":\"Heading 1\",\"term\":\"Introduction\",\"changeType\":\"removed\"},{\"span\":{\"start\":[5,1],\"end\":[7,4]},\"category\":\"Heading 2\",\"term\":\"Two\",\"changeType\":\"modified\"},{\"span\":{\"start\":[9,1],\"end\":[11,10]},\"category\":\"Heading 3\",\"term\":\"This heading is new\",\"changeType\":\"added\"},{\"span\":{\"start\":[13,1],\"end\":[14,4]},\"category\":\"Heading 1\",\"term\":\"Final\",\"changeType\":\"added\"}]},\"errors\":{}}\n" :: ByteString)
 
 
 type Diff' = Diff ListableSyntax (Record '[Maybe Declaration, Range, Span]) (Record '[Maybe Declaration, Range, Span])

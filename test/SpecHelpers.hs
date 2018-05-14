@@ -1,6 +1,5 @@
 module SpecHelpers
 ( module X
-, toOutput
 , runBuilder
 , diffFilePaths
 , parseFilePath
@@ -34,7 +33,6 @@ import Data.File as X
 import Data.Functor.Listable as X
 import Data.Language as X
 import Data.List.NonEmpty as X (NonEmpty(..))
-import qualified Data.Output as O
 import Data.Range as X
 import Data.Record as X
 import Data.Source as X
@@ -65,16 +63,13 @@ import qualified Semantic.IO as IO
 
 runBuilder = toStrict . toLazyByteString
 
-toOutput :: O.Output o => o -> ByteString
-toOutput = runBuilder . O.toOutput
-
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO ByteString
-diffFilePaths paths = readFilePair paths >>= fmap toOutput . runTask . diffBlobPair SExpressionDiffRenderer
+diffFilePaths paths = readFilePair paths >>= fmap runBuilder . runTask . runDiff SExpressionDiffRenderer . pure
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFilePath :: FilePath -> IO ByteString
-parseFilePath path = (fromJust <$> IO.readFile (file path)) >>= fmap toOutput . runTask . parseBlob SExpressionTermRenderer
+parseFilePath path = (fromJust <$> IO.readFile (file path)) >>= fmap runBuilder . runTask . runParse SExpressionTermRenderer . pure
 
 -- | Read two files to a BlobPair.
 readFilePair :: Both FilePath -> IO BlobPair
