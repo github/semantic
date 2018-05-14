@@ -44,7 +44,7 @@ instance Monoid Summaries where
   mappend = (<>)
 
 instance Output Summaries where
-  toOutput = fromEncoding . toEncoding
+  toOutput = (<> "\n") . fromEncoding . toEncoding
 
 instance ToJSON Summaries where
   toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]

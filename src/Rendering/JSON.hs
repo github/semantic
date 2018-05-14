@@ -27,7 +27,7 @@ toJSONOutput key = JSONOutput . Monoidal.singleton key
 
 
 instance Output JSONOutput where
-  toOutput = fromEncoding . toEncoding
+  toOutput = (<> "\n") . fromEncoding . toEncoding
 
 
 -- | Render a diff to a value representing its JSON.

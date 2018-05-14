@@ -10,7 +10,7 @@ class Monoid o => Output o where
   toOutput :: o -> Builder
 
 instance Output [Value] where
-  toOutput = fromEncoding . toEncoding
+  toOutput = (<> "\n") . fromEncoding . toEncoding
 
 instance Output ByteString where
   toOutput = byteString
