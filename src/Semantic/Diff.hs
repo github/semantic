@@ -7,6 +7,7 @@ import Analysis.Declaration (HasDeclaration, declarationAlgebra)
 import Data.Blob
 import Data.Diff
 import Data.JSON.Fields
+import Data.Record
 import Data.Term
 import Diffing.Algorithm (Diffable)
 import Diffing.Interpreter
@@ -27,26 +28,26 @@ diffBlobPair :: Members '[Distribute WrappedTask, Task, Telemetry, Exc SomeExcep
 diffBlobPair renderer blobs
   | Just (SomeParser parser) <- someParser @'[ConstructorName, Diffable, Eq1, GAlign, HasDeclaration, IdentifierName, Show1, ToJSONFields1, Traversable] <$> effectiveLanguage
   = case renderer of
-    ToCDiffRenderer         -> run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))                     diffTerms renderToCDiff
-    JSONDiffRenderer        -> run (          parse parser      >=> decorate constructorLabel >=> decorate identifierLabel) diffTerms renderJSONDiff
-    SExpressionDiffRenderer -> run (          parse parser)                                                                 diffTerms (const id)              >>= serialize (SExpression ByConstructorName)
-    DOTDiffRenderer         -> run (          parse parser)                                                                 diffTerms (const renderTreeGraph) >>= serialize (DOT (diffStyle (pathKeyForBlobPair blobs)))
+    ToCDiffRenderer         -> run (\ blob -> parse parser blob >>= decorate (declarationAlgebra blob))                     renderToCDiff
+    JSONDiffRenderer        -> run (          parse parser      >=> decorate constructorLabel >=> decorate identifierLabel) renderJSONDiff
+    SExpressionDiffRenderer -> run (          parse parser)                                                                 (const id)              >>= serialize (SExpression ByConstructorName)
+    DOTDiffRenderer         -> run (          parse parser)                                                                 (const renderTreeGraph) >>= serialize (DOT (diffStyle (pathKeyForBlobPair blobs)))
   | otherwise = noLanguageForBlob effectivePath
   where effectivePath = pathForBlobPair blobs
         effectiveLanguage = languageForBlobPair blobs
 
-        run :: (Foldable syntax, Functor syntax) => Members [Distribute WrappedTask, Task, Telemetry, IO] effs => (Blob -> TaskEff (Term syntax ann)) -> (Term syntax ann -> Term syntax ann -> Diff syntax ann ann) -> (BlobPair -> Diff syntax ann ann -> output) -> Eff effs output
-        run parse diff renderer = do
+        run :: (Diffable syntax, Eq1 syntax, GAlign syntax, Show1 syntax, Traversable syntax) => Members [Distribute WrappedTask, Task, Telemetry, IO] effs => (Blob -> TaskEff (Term syntax (Record fields))) -> (BlobPair -> Diff syntax (Record fields) (Record fields) -> output) -> Eff effs output
+        run parse renderer = do
           terms <- distributeFor blobs (WrapTask . parse)
           time "diff" languageTag $ do
-            diff <- diffTermPair diff (runJoin terms)
+            diff <- diffTermPair (runJoin terms)
             writeStat (Stat.count "diff.nodes" (bilength diff) languageTag)
             render (renderer blobs) diff
           where
             languageTag = languageTagForBlobPair blobs
 
 -- | A task to diff 'Term's, producing insertion/deletion 'Patch'es for non-existent 'Blob's.
-diffTermPair :: (Functor syntax, Member Task effs) => Differ syntax ann1 ann2 -> These (Term syntax ann1) (Term syntax ann2) -> Eff effs (Diff syntax ann1 ann2)
-diffTermPair _      (This  t1   ) = pure (deleting t1)
-diffTermPair _      (That     t2) = pure (inserting t2)
-diffTermPair differ (These t1 t2) = diff differ t1 t2
+diffTermPair :: (Diffable syntax, Eq1 syntax, GAlign syntax, Show1 syntax, Traversable syntax, Member Task effs) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Eff effs (Diff syntax (Record fields1) (Record fields2))
+diffTermPair (This  t1   ) = pure (deleting t1)
+diffTermPair (That     t2) = pure (inserting t2)
+diffTermPair (These t1 t2) = diff diffTerms t1 t2
