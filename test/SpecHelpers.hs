@@ -64,6 +64,8 @@ import qualified Data.ByteString as B
 import qualified Semantic.IO as IO
 
 runBuilder = toStrict . toLazyByteString
+
+toOutput :: O.Output o => o -> ByteString
 toOutput = runBuilder . O.toOutput
 
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
