@@ -297,6 +297,7 @@ test-suite test
                      , StandaloneDeriving
                      , TypeApplications
 
+
 test-suite doctests
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
