@@ -3,7 +3,7 @@ module Semantic.CLI
 ( main
 -- Testing
 , runDiff
-, runParse
+, Parse.runParse
 ) where
 
 import           Data.ByteString.Builder
@@ -23,7 +23,7 @@ import qualified Semantic.Diff as Semantic (diffBlobPairs)
 import           Semantic.Graph as Semantic (Graph, GraphType(..), Vertex, graph, style)
 import           Semantic.IO as IO
 import qualified Semantic.Log as Log
-import qualified Semantic.Parse as Semantic (parseBlobs)
+import qualified Semantic.Parse as Parse
 import qualified Semantic.Task as Task
 import           Serializing.Format
 import           Text.Read
@@ -33,9 +33,6 @@ main = customExecParser (prefs showHelpOnEmpty) arguments >>= uncurry Task.runTa
 
 runDiff :: SomeRenderer DiffRenderer -> Either (Handle 'IO.ReadMode) [Both File] -> Task.TaskEff Builder
 runDiff (SomeRenderer diffRenderer) = fmap toOutput . Semantic.diffBlobPairs diffRenderer <=< Task.readBlobPairs
-
-runParse :: SomeRenderer TermRenderer -> Either (Handle 'IO.ReadMode) [File] -> Task.TaskEff Builder
-runParse (SomeRenderer parseTreeRenderer) = fmap toOutput . Semantic.parseBlobs parseTreeRenderer <=< Task.readBlobs
 
 runGraph :: Semantic.GraphType -> Maybe FilePath -> FilePath -> Language -> [FilePath] -> Task.TaskEff (Graph Vertex)
 runGraph graphType rootDir dir excludeDirs = Semantic.graph graphType <=< Task.readProject rootDir dir excludeDirs
@@ -74,18 +71,18 @@ arguments = info (version <*> helper <*> ((,) <$> optionsParser <*> argumentsPar
 
     parseCommand = command "parse" (info parseArgumentsParser (progDesc "Generate parse trees for path(s)"))
     parseArgumentsParser = do
-      renderer <- flag  (SomeRenderer SExpressionTermRenderer) (SomeRenderer SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
-              <|> flag'                                        (SomeRenderer JSONTermRenderer)        (long "json"        <> help "Output JSON parse trees")
-              <|> flag'                                        (SomeRenderer TagsTermRenderer)        (long "tags"        <> help "Output JSON tags")
-              <|> flag'                                        (SomeRenderer . SymbolsTermRenderer)   (long "symbols"     <> help "Output JSON symbol list")
+      renderer <- flag  (Parse.runParse SExpressionTermRenderer) (Parse.runParse SExpressionTermRenderer) (long "sexpression" <> help "Output s-expression parse trees (default)")
+              <|> flag'                                          (Parse.runParse JSONTermRenderer)        (long "json"        <> help "Output JSON parse trees")
+              <|> flag'                                          (Parse.runParse TagsTermRenderer)        (long "tags"        <> help "Output JSON tags")
+              <|> flag'                                          (Parse.runParse . SymbolsTermRenderer)   (long "symbols"     <> help "Output JSON symbol list")
                    <*> (option symbolFieldsReader (  long "fields"
                                                  <> help "Comma delimited list of specific fields to return (symbols output only)."
                                                  <> metavar "FIELDS")
                   <|> pure defaultSymbolFields)
-              <|> flag'                                        (SomeRenderer ImportsTermRenderer)     (long "import-graph" <> help "Output JSON import graph")
-              <|> flag'                                        (SomeRenderer DOTTermRenderer)         (long "dot"          <> help "Output DOT graph parse trees")
+              <|> flag'                                          (Parse.runParse ImportsTermRenderer)     (long "import-graph" <> help "Output JSON import graph")
+              <|> flag'                                          (Parse.runParse DOTTermRenderer)         (long "dot"          <> help "Output DOT graph parse trees")
       filesOrStdin <- Right <$> some (argument filePathReader (metavar "FILES...")) <|> pure (Left stdin)
-      pure $ runParse renderer filesOrStdin
+      pure $ Task.readBlobs filesOrStdin >>= renderer
 
     tsParseCommand = command "ts-parse" (info tsParseArgumentsParser (progDesc "Print specialized tree-sitter ASTs for path(s)"))
     tsParseArgumentsParser = do
