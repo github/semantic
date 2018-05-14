@@ -51,7 +51,7 @@ deriving instance Show (DiffRenderer output)
 -- | Specification of renderers for terms, producing output in the parameter type.
 data TermRenderer output where
   -- | Render to JSON with the format documented in docs/json-format.md under “Term.”
-  JSONTermRenderer :: TermRenderer JSONOutput
+  JSONTermRenderer :: TermRenderer JSONTermOutput
   -- | Render to a 'ByteString' formatted as nested s-expressions.
   SExpressionTermRenderer :: TermRenderer Builder
   -- | Render to a list of tags (deprecated).
