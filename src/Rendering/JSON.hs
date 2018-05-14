@@ -2,7 +2,7 @@
 module Rendering.JSON
 ( JSONOutput(..)
 , toJSONOutput
-, JSONTerms(..)
+, JSONTrees(..)
 , renderJSONDiff
 , renderJSONTerm
 , renderJSONAST
@@ -41,19 +41,20 @@ renderJSONDiffs :: [Value] -> JSONOutput
 renderJSONDiffs = toJSONOutput "diffs"
 
 
-newtype JSONTerms a = JSONTerms { unJSONTerms :: [a] }
+newtype JSONTrees a = JSONTrees { unJSONTrees :: [a] }
   deriving (Eq, Monoid, Semigroup, Show)
 
-instance ToJSON a => ToJSON (JSONTerms a) where
-  toJSON (JSONTerms terms) = object ["trees" .= terms]
-  toEncoding (JSONTerms terms) = pairs ("trees" .= terms)
+instance ToJSON a => ToJSON (JSONTrees a) where
+  toJSON (JSONTrees terms) = object ["trees" .= terms]
+  toEncoding (JSONTrees terms) = pairs ("trees" .= terms)
 
-instance ToJSON a => Output (JSONTerms a) where
+instance ToJSON a => Output (JSONTrees a) where
   toOutput = (<> "\n") . fromEncoding . toEncoding
 
+
 -- | Render a term to a value representing its JSON.
-renderJSONTerm :: ToJSON a => Blob -> a -> JSONTerms SomeJSON
-renderJSONTerm blob content = JSONTerms [ SomeJSON (JSONTerm blob content) ]
+renderJSONTerm :: ToJSON a => Blob -> a -> JSONTrees SomeJSON
+renderJSONTerm blob content = JSONTrees [ SomeJSON (JSONTerm blob content) ]
 
 data JSONTerm a = JSONTerm { jsonTermBlob :: Blob, jsonTerm :: a }
   deriving (Eq, Show)
@@ -63,8 +64,8 @@ instance ToJSON a => ToJSON (JSONTerm a) where
   toEncoding JSONTerm{..} = pairs (fold ("ast" .= jsonTerm : toJSONFields jsonTermBlob))
 
 
-renderJSONAST :: ToJSON a => Blob -> a -> JSONTerms SomeJSON
-renderJSONAST blob content = JSONTerms [ SomeJSON (JSONAST blob content) ]
+renderJSONAST :: ToJSON a => Blob -> a -> JSONTrees SomeJSON
+renderJSONAST blob content = JSONTrees [ SomeJSON (JSONAST blob content) ]
 
 data JSONAST a = JSONAST { jsonASTBlob :: Blob, jsonAST :: a }
   deriving (Eq, Show)
