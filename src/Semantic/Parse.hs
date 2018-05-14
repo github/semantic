@@ -46,6 +46,6 @@ astParseBlobs renderer = distributeFoldMap (WrapTask . astParseBlob renderer)
       | Just (SomeASTParser parser) <- someASTParser <$> blobLanguage
       = parse parser blob >>= case renderer of
         SExpressionTermRenderer    -> serialize (SExpression ByShow) . fmap nodeSymbol
-        JSONTermRenderer           -> render (renderJSONTerm' blob)
+        JSONTermRenderer           -> render (renderJSONAST blob)
         _                          -> pure $ throwError (SomeException (FormatNotSupported "Only SExpression and JSON output supported for tree-sitter ASTs."))
       | otherwise = noLanguageForBlob blobPath

@@ -5,7 +5,7 @@ module Rendering.JSON
 , JSONTerms(..)
 , renderJSONDiff
 , renderJSONTerm
-, renderJSONTerm'
+, renderJSONAST
 , renderSymbolTerms
 ) where
 
@@ -49,8 +49,8 @@ instance Output JSONTerms where
 renderJSONTerm :: ToJSON a => Blob -> a -> JSONTerms
 renderJSONTerm blob content = JSONTerms [ toJSON (object ("programNode" .= content : toJSONFields blob)) ]
 
-renderJSONTerm' :: ToJSON a => Blob -> a -> JSONTerms
-renderJSONTerm' blob content = JSONTerms [ toJSON (object ("ast" .= content : toJSONFields blob)) ]
+renderJSONAST :: ToJSON a => Blob -> a -> JSONTerms
+renderJSONAST blob content = JSONTerms [ toJSON (object ("ast" .= content : toJSONFields blob)) ]
 
 
 -- | Render terms to final JSON structure.

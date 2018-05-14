@@ -5,7 +5,7 @@ module Rendering.Renderer
 , SomeRenderer(..)
 , renderJSONDiff
 , renderJSONTerm
-, renderJSONTerm'
+, renderJSONAST
 , renderToCDiff
 , renderToCTerm
 , renderSymbolTerms
