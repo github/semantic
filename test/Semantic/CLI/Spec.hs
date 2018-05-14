@@ -14,13 +14,13 @@ spec = parallel $ do
     for_ diffFixtures $ \ (diffRenderer, diffMode, expected) ->
       it ("renders to " <> show diffRenderer <> " in mode " <> show diffMode) $ do
         output <- runTask $ runDiff diffRenderer diffMode
-        output `shouldBe'` expected
+        runBuilder output `shouldBe'` expected
 
   describe "runParse" $
     for_ parseFixtures $ \ (parseTreeRenderer, parseMode, expected) ->
       it ("renders to " <> show parseTreeRenderer <> " in mode " <> show parseMode) $ do
         output <- runTask $ runParse parseTreeRenderer parseMode
-        output `shouldBe'` expected
+        runBuilder output `shouldBe'` expected
   where
     shouldBe' actual expected = do
       when (actual /= expected) $ print actual
