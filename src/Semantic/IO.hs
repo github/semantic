@@ -262,7 +262,7 @@ runFiles = interpret $ \ files -> case files of
   Read (FromPathPair paths)    -> rethrowing (runBothWith readFilePair paths)
   Read (FromPairHandle handle) -> rethrowing (readBlobPairsFromHandle handle)
   ReadProject rootDir dir language excludeDirs -> rethrowing (readProjectFromPaths rootDir dir language excludeDirs)
-  Write (ToPath path)                   builder -> liftIO (IO.withBinaryFile path IO.WriteMode (flip B.hPutBuilder builder))
+  Write (ToPath path)                   builder -> liftIO (IO.withBinaryFile path IO.WriteMode (`B.hPutBuilder` builder))
   Write (ToHandle (WriteHandle handle)) builder -> liftIO (B.hPutBuilder handle builder)
 
 
