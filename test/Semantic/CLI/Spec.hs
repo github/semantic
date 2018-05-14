@@ -1,9 +1,11 @@
 module Semantic.CLI.Spec (spec) where
 
 import Control.Monad (when)
+import Data.ByteString.Builder
 import Data.Foldable (for_)
 import Semantic.CLI
 import Semantic.IO
+import Semantic.Task
 
 import SpecHelpers
 
@@ -11,29 +13,29 @@ import SpecHelpers
 spec :: Spec
 spec = parallel $ do
   describe "runDiff" $
-    for_ diffFixtures $ \ (diffRenderer, files, expected) ->
-      it ("renders to " <> show diffRenderer <> " with files " <> show files) $ do
-        output <- runTask $ case diffRenderer of SomeRenderer diffRenderer -> readBlobPairs (Right files) >>= runDiff diffRenderer
+    for_ diffFixtures $ \ (diffRenderer, runDiff, files, expected) ->
+      it ("renders to " <> diffRenderer <> " with files " <> show files) $ do
+        output <- runTask $ readBlobPairs (Right files) >>= runDiff
         runBuilder output `shouldBe'` expected
 
   describe "runParse" $
-    for_ parseFixtures $ \ (parseTreeRenderer, files, expected) ->
-      it ("renders to " <> show parseTreeRenderer <> " with files " <> show files) $ do
-        output <- runTask $ case parseTreeRenderer of SomeRenderer parseTreeRenderer -> readBlobs (Right files) >>= runParse parseTreeRenderer
+    for_ parseFixtures $ \ (parseTreeRenderer, runParse, files, expected) ->
+      it ("renders to " <> parseTreeRenderer <> " with files " <> show files) $ do
+        output <- runTask $ readBlobs (Right files) >>= runParse
         runBuilder output `shouldBe'` expected
   where
     shouldBe' actual expected = do
       when (actual /= expected) $ print actual
       actual `shouldBe` expected
 
-parseFixtures :: [(SomeRenderer TermRenderer, [File], ByteString)]
+parseFixtures :: [(String, [Blob] -> TaskEff Builder, [File], ByteString)]
 parseFixtures =
-  [ (SomeRenderer SExpressionTermRenderer, pathMode, sExpressionParseTreeOutput)
-  , (SomeRenderer JSONTermRenderer, pathMode, jsonParseTreeOutput)
-  , (SomeRenderer JSONTermRenderer, pathMode', jsonParseTreeOutput')
-  , (SomeRenderer JSONTermRenderer, [], emptyJsonParseTreeOutput)
-  , (SomeRenderer (SymbolsTermRenderer defaultSymbolFields), [File "test/fixtures/ruby/corpus/method-declaration.A.rb" (Just Ruby)], symbolsOutput)
-  , (SomeRenderer TagsTermRenderer, [File "test/fixtures/ruby/corpus/method-declaration.A.rb" (Just Ruby)], tagsOutput)
+  [ (show SExpressionTermRenderer, runParse SExpressionTermRenderer, pathMode, sExpressionParseTreeOutput)
+  , (show JSONTermRenderer, runParse JSONTermRenderer, pathMode, jsonParseTreeOutput)
+  , (show JSONTermRenderer, runParse JSONTermRenderer, pathMode', jsonParseTreeOutput')
+  , (show JSONTermRenderer, runParse JSONTermRenderer, [], emptyJsonParseTreeOutput)
+  , (show (SymbolsTermRenderer defaultSymbolFields), runParse (SymbolsTermRenderer defaultSymbolFields), [File "test/fixtures/ruby/corpus/method-declaration.A.rb" (Just Ruby)], symbolsOutput)
+  , (show TagsTermRenderer, runParse TagsTermRenderer, [File "test/fixtures/ruby/corpus/method-declaration.A.rb" (Just Ruby)], tagsOutput)
   ]
   where pathMode = [File "test/fixtures/ruby/corpus/and-or.A.rb" (Just Ruby)]
         pathMode' = [File "test/fixtures/ruby/corpus/and-or.A.rb" (Just Ruby), File "test/fixtures/ruby/corpus/and-or.B.rb" (Just Ruby)]
@@ -46,11 +48,11 @@ parseFixtures =
         tagsOutput = "[{\"span\":{\"start\":[1,1],\"end\":[2,4]},\"path\":\"test/fixtures/ruby/corpus/method-declaration.A.rb\",\"kind\":\"Method\",\"symbol\":\"foo\",\"line\":\"def foo\",\"language\":\"Ruby\"}]\n"
 
 
-diffFixtures :: [(SomeRenderer DiffRenderer, [Both File], ByteString)]
+diffFixtures :: [(String, [BlobPair] -> TaskEff Builder, [Both File], ByteString)]
 diffFixtures =
-  [ (SomeRenderer JSONDiffRenderer, pathMode, jsonOutput)
-  , (SomeRenderer SExpressionDiffRenderer, pathMode, sExpressionOutput)
-  , (SomeRenderer ToCDiffRenderer, pathMode, tocOutput)
+  [ (show JSONDiffRenderer, runDiff JSONDiffRenderer, pathMode, jsonOutput)
+  , (show SExpressionDiffRenderer, runDiff SExpressionDiffRenderer, pathMode, sExpressionOutput)
+  , (show ToCDiffRenderer, runDiff ToCDiffRenderer, pathMode, tocOutput)
   ]
   where pathMode = [both (File "test/fixtures/ruby/corpus/method-declaration.A.rb" (Just Ruby)) (File "test/fixtures/ruby/corpus/method-declaration.B.rb"  (Just Ruby))]
 
