@@ -9,11 +9,8 @@ import Data.Semilattice.Lower
 import Prologue
 
 -- | An abstract address with a @location@ pointing to a variable of type @value@.
-newtype Address location value = Address location
+newtype Address location value = Address { unAddress :: location }
   deriving (Eq, Ord)
-
-unAddress :: Address location value -> location
-unAddress (Address location) = location
 
 instance Eq   location => Eq1   (Address location) where liftEq          _ a b = unAddress a    ==     unAddress b
 instance Ord  location => Ord1  (Address location) where liftCompare     _ a b = unAddress a `compare` unAddress b
