@@ -41,4 +41,4 @@ heapRestrict (Heap m) roots = Heap (Monoidal.filterWithKey (\ address _ -> Addre
 
 
 instance (Show location, Show (cell value)) => Show (Heap location cell value) where
-  showsPrec d (Heap heap) = showsUnaryWith showsPrec "Heap" d (Monoidal.pairs heap)
+  showsPrec d = showsUnaryWith showsPrec "Heap" d . Monoidal.pairs . unHeap
