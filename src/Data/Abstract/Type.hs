@@ -118,10 +118,8 @@ instance ( Addressable location effects
       a <- alloc name
       tvar <- Var <$> fresh
       assign a tvar
-      (env, tvars) <- rest
-      pure (Env.insert name a env, tvar : tvars)) (pure (emptyEnv, [])) names
-    ret <- localEnv (mergeEnvs env) (body `catchReturn` \ (Return value) -> pure value)
-    pure (zeroOrMoreProduct tvars :-> ret)
+      bimap (Env.insert name a) (tvar :) <$> rest) (pure (emptyEnv, [])) names
+    (zeroOrMoreProduct tvars :->) <$> localEnv (mergeEnvs env) (body `catchReturn` \ (Return value) -> pure value)
 
   unit       = pure Unit
   integer _  = pure Int
