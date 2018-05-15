@@ -63,7 +63,7 @@ instance Location (Located location) where
 --   This is isomorphic to 'Last' from Data.Monoid, but is more convenient
 --   because it has a 'Reducer' instance.
 newtype Latest value = Latest { unLatest :: Maybe value }
-  deriving (Eq, Foldable, Functor, Lower, Ord, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Lower, Ord, Traversable)
 
 instance Semigroup (Latest value) where
   a <> Latest Nothing = a
@@ -76,6 +76,9 @@ instance Monoid (Latest value) where
 
 instance Reducer value (Latest value) where
   unit = Latest . Just
+
+instance Show value => Show (Latest value) where
+  showsPrec d = showsPrec d . unLatest
 
 
 newtype All value = All { unAll :: Set value }
