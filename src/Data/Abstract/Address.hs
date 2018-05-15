@@ -10,7 +10,7 @@ import Prologue
 
 -- | An abstract address with a @location@ pointing to a variable of type @value@.
 newtype Address location value = Address location
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
 
 unAddress :: Address location value -> location
 unAddress (Address location) = location
@@ -72,3 +72,7 @@ instance Monoid (Latest value) where
 
 instance Reducer value (Latest value) where
   unit = Latest . Just
+
+
+instance Show location => Show (Address location value) where
+  showsPrec d = showsPrec d . unAddress
