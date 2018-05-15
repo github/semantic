@@ -37,11 +37,8 @@ import qualified Data.List.NonEmpty as NonEmpty
 -- | A LIFO stack of maps of names to addresses, representing a lexically-scoped evaluation environment.
 --   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
 --   scope for "a", then the next, and so on.
-newtype Environment location value = Environment (NonEmpty (Map.Map Name location))
+newtype Environment location value = Environment { unEnvironment :: NonEmpty (Map.Map Name location) }
   deriving (Eq, Ord)
-
-unEnvironment :: Environment location value -> NonEmpty (Map.Map Name location)
-unEnvironment (Environment env) = env
 
 instance Eq   location => Eq1   (Environment location) where liftEq      _ (Environment a) (Environment b) = a == b
 instance Ord  location => Ord1  (Environment location) where liftCompare _ (Environment a) (Environment b) = a `compare` b
