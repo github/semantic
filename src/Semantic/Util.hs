@@ -113,3 +113,6 @@ instance Functor syntax => Corecursive (Quieterm syntax ann) where embed   =   Q
 
 instance Show1 syntax => Show1 (Quieterm syntax) where
   liftShowsPrec _ _ = go where go d = liftShowsPrec go (showListWith (go 0)) d . termFOut . unQuieterm
+
+instance Show1 syntax => Show (Quieterm syntax ann) where
+  showsPrec = liftShowsPrec (const (const id)) (const id)
