@@ -22,7 +22,7 @@ data Pos = Pos
   { posLine   :: !Int
   , posColumn :: !Int
   }
-  deriving (Show, Read, Eq, Ord, Generic, Hashable)
+  deriving (Show, Eq, Ord)
 
 instance A.ToJSON Pos where
   toJSON Pos{..} =
@@ -37,7 +37,7 @@ data Span = Span
   { spanStart :: Pos
   , spanEnd   :: Pos
   }
-  deriving (Show, Read, Eq, Ord, Generic, Hashable)
+  deriving (Show, Eq, Ord)
 
 spanFromSrcLoc :: SrcLoc -> Span
 spanFromSrcLoc = Span . (Pos . srcLocStartLine <*> srcLocStartCol) <*> (Pos . srcLocEndLine <*> srcLocEndCol)
