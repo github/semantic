@@ -122,8 +122,8 @@ instance Eq location => Eq1 (AddressError location value) where
 throwAddressError :: Member (Resumable (AddressError location value)) effects => AddressError location value resume -> Evaluator location value effects resume
 throwAddressError = throwResumable
 
-runAddressError :: Evaluator location value (Resumable (AddressError location value) ': effects) a -> Evaluator location value effects (Either (SomeExc (AddressError location value)) a)
+runAddressError :: Effectful (m location value) => m location value (Resumable (AddressError location value) ': effects) a -> m location value effects (Either (SomeExc (AddressError location value)) a)
 runAddressError = runResumable
 
-runAddressErrorWith :: (forall resume . AddressError location value resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (AddressError location value) ': effects) a -> Evaluator location value effects a
+runAddressErrorWith :: Effectful (m location value) => (forall resume . AddressError location value resume -> m location value effects resume) -> m location value (Resumable (AddressError location value) ': effects) a -> m location value effects a
 runAddressErrorWith = runResumableWith
