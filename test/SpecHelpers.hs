@@ -83,8 +83,7 @@ testEvaluating
   . runEnvironmentError
   . runEvalError
   . runAddressError
-  . constrainedToValuePrecise
-  . runTermEvaluator
+  . runTermEvaluator @_ @Precise
 
 deNamespace :: Value Precise -> Maybe (Name, [Name])
 deNamespace = fmap (namespaceName &&& Env.names . namespaceScope) . prjValue @(Namespace Precise)

@@ -38,8 +38,7 @@ justEvaluating
   . runEnvironmentError
   . runEvalError
   . runAddressError
-  . constrainedToValuePrecise
-  . runTermEvaluator
+  . runTermEvaluator @_ @Precise
 
 evaluatingWithHoles
   = runM
@@ -52,14 +51,13 @@ evaluatingWithHoles
   . resumingEvalError
   . resumingResolutionError
   . resumingAddressError
-  . constrainedToValuePrecise
-  . runTermEvaluator
+  . runTermEvaluator @_ @Precise
 
 checking
   = runM @_ @IO
   . evaluating
   . runPrintingTrace
-  . runTermEvaluator
+  . runTermEvaluator @_ @Monovariant @Type
   . caching @[]
   . providingLiveSet
   . runLoadError
@@ -69,13 +67,6 @@ checking
   . runEvalError
   . runAddressError
   . runTypeError
-  . constrainedToTypeMonovariant
-
-constrainedToValuePrecise :: Evaluator Precise (Value Precise) effects a -> Evaluator Precise (Value Precise) effects a
-constrainedToValuePrecise = id
-
-constrainedToTypeMonovariant :: TermEvaluator term Monovariant Type effects a -> TermEvaluator term Monovariant Type effects a
-constrainedToTypeMonovariant = id
 
 evalGoProject path = justEvaluating =<< evaluateProject goParser Language.Go Nothing path
 evalRubyProject path = justEvaluating =<< evaluateProject rubyParser Language.Ruby rubyPrelude path

@@ -56,11 +56,7 @@ graph graphType renderer project
             . resumingResolutionError
             . resumingAddressError
             . graphing
-            . constrainingTypes
-            . runTermEvaluator
-
-          constrainingTypes :: Evaluator (Located Precise) (Value (Located Precise)) effects a -> Evaluator (Located Precise) (Value (Located Precise)) effects a
-          constrainingTypes = id
+            . runTermEvaluator @_ @_ @(Value (Located Precise))
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: Members '[Distribute WrappedTask, Files, Task, Trace] effs
