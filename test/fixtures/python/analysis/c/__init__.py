@@ -1,3 +1,3 @@
 from . import utils
 
-utils.to_s()
+print(utils.to_s())
