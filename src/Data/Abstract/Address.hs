@@ -60,8 +60,8 @@ instance Location (Located location) where
 
 
 -- | A cell holding a single value. Writes will replace any prior value.
---   This is isomorphic to 'Last' from Data.Monoid, but is more convenient
---   because it has a 'Reducer' instance.
+--
+--   This is equivalent to 'Data.Monoid.Last', but with a 'Show' instance designed to minimize the amount of text we have to scroll past in ghci.
 newtype Latest value = Latest { unLatest :: Maybe value }
   deriving (Eq, Foldable, Functor, Lower, Ord, Traversable)
 
