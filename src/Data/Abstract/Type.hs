@@ -106,6 +106,7 @@ instance ( Addressable location effects
          , Members '[ Fresh
                     , NonDet
                     , Resumable TypeError
+                    , Return Type
                     , State (Environment location Type)
                     , State (Heap location (Cell location) Type)
                     ] effects
@@ -119,7 +120,7 @@ instance ( Addressable location effects
       assign a tvar
       (env, tvars) <- rest
       pure (Env.insert name a env, tvar : tvars)) (pure (emptyEnv, [])) names
-    ret <- localEnv (mergeEnvs env) body
+    ret <- localEnv (mergeEnvs env) (body `catchReturn` \ (Return value) -> pure value)
     pure (zeroOrMoreProduct tvars :-> ret)
 
   unit       = pure Unit
