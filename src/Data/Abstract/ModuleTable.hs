@@ -22,7 +22,7 @@ import GHC.Generics (Generic1)
 import Prelude hiding (lookup)
 
 newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModulePath a }
-  deriving (Eq, Foldable, Functor, Generic1, Lower, Monoid, Ord, Semigroup, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Generic1, Lower, Monoid, Ord, Semigroup, Traversable)
 
 singleton :: ModulePath -> a -> ModuleTable a
 singleton name = ModuleTable . Map.singleton name
@@ -49,3 +49,7 @@ fromModules modules = ModuleTable (Map.fromListWith (<>) (map toEntry modules))
 
 toPairs :: ModuleTable a -> [(ModulePath, a)]
 toPairs = Map.toList . unModuleTable
+
+
+instance Show a => Show (ModuleTable a) where
+  showsPrec d = showsUnaryWith showsPrec "ModuleTable" d . toPairs
