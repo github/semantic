@@ -9,11 +9,8 @@ import Data.Semilattice.Lower
 import Prologue
 
 -- | A map of addresses onto cells holding their values.
-newtype Heap location cell value = Heap (Monoidal.Map location (cell value))
+newtype Heap location cell value = Heap { unHeap :: Monoidal.Map location (cell value) }
   deriving (Eq, Foldable, Functor, Lower, Monoid, Ord, Semigroup, Traversable)
-
-unHeap :: Heap location cell value -> Monoidal.Map location (cell value)
-unHeap (Heap heap) = heap
 
 deriving instance (Ord location, Reducer value (cell value)) => Reducer (location, value) (Heap location cell value)
 
