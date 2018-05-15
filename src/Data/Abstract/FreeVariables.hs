@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures, UndecidableInstances #-}
+{-# LANGUAGE DefaultSignatures, GeneralizedNewtypeDeriving, UndecidableInstances #-}
 module Data.Abstract.FreeVariables where
 
 import qualified Data.ByteString.Char8 as BC
@@ -45,8 +45,7 @@ freeVariable term = case freeVariables term of
 instance (FreeVariables t) => FreeVariables (Subterm t a) where
   freeVariables = freeVariables . subterm
 
-instance (FreeVariables1 syntax, Functor syntax) => FreeVariables (Term syntax ann) where
-  freeVariables = cata (liftFreeVariables id)
+deriving instance FreeVariables1 syntax => FreeVariables (Term syntax ann)
 
 instance (FreeVariables recur, FreeVariables1 syntax) => FreeVariables (TermF syntax ann recur) where
   freeVariables = liftFreeVariables freeVariables
