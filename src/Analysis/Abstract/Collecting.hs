@@ -51,5 +51,5 @@ reachable roots heap = go mempty roots
             _           -> seen)
 
 
-providingLiveSet :: Evaluator location value (Reader (Live location value) ': effects) a -> Evaluator location value effects a
+providingLiveSet :: Effectful (m location value) => m location value (Reader (Live location value) ': effects) a -> m location value effects a
 providingLiveSet = runReader lowerBound
