@@ -22,7 +22,7 @@ data Pos = Pos
   { posLine   :: !Int
   , posColumn :: !Int
   }
-  deriving (Show, Eq, Ord)
+  deriving (Eq, Ord)
 
 instance A.ToJSON Pos where
   toJSON Pos{..} =
@@ -32,6 +32,10 @@ instance A.FromJSON Pos where
   parseJSON arr = do
     [line, col] <- A.parseJSON arr
     pure $ Pos line col
+
+instance Show Pos where
+  showsPrec d Pos{..} = showsBinaryWith showsPrec showsPrec "Pos" d posLine posColumn
+
 
 data Span = Span
   { spanStart :: Pos
