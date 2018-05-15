@@ -77,7 +77,7 @@ convergingModules :: ( Cacheable term location (Cell location) value
 convergingModules recur m = do
   c <- getConfiguration (subterm (moduleBody m))
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
-  cache <- converge (\ prevCache -> isolateCache $ do
+  cache <- converge lowerBound (\ prevCache -> isolateCache $ do
     TermEvaluator (putHeap (configurationHeap c))
     -- We need to reset fresh generation so that this invocation converges.
     resetFresh 0 $
@@ -86,7 +86,7 @@ convergingModules recur m = do
     -- that it doesn't "leak" to the calling context and diverge (otherwise this
     -- would never complete). We don’t need to use the values, so we 'gather' the
     -- nondeterministic values into @()@.
-      withOracle prevCache (gatherM (const ()) (recur m))) lowerBound
+      withOracle prevCache (gatherM (const ()) (recur m)))
   maybe empty scatter (cacheLookup c cache)
 
 
@@ -94,10 +94,10 @@ convergingModules recur m = do
 --
 --   This applies the Kleene fixed-point theorem to finitize a monotone action. cf https://en.wikipedia.org/wiki/Kleene_fixed-point_theorem
 converge :: (Eq a, Monad m)
-         => (a -> m a) -- ^ A monadic action to perform at each iteration, starting from the result of the previous iteration or from the seed value for the first iteration.
-         -> a          -- ^ An initial seed value to iterate from.
+         => a          -- ^ An initial seed value to iterate from.
+         -> (a -> m a) -- ^ A monadic action to perform at each iteration, starting from the result of the previous iteration or from the seed value for the first iteration.
          -> m a        -- ^ A computation producing the least fixed point (the first value at which the actions converge).
-converge f = loop
+converge seed f = loop seed
   where loop x = do
           x' <- f x
           if x' == x then
