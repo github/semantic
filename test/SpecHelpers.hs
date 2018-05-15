@@ -29,6 +29,7 @@ import Data.File as X
 import Data.Functor.Listable as X
 import Data.Language as X
 import Data.List.NonEmpty as X (NonEmpty(..))
+import Data.Monoid as X (Last(..))
 import Data.Output as X
 import Data.Range as X
 import Data.Record as X
@@ -90,7 +91,7 @@ deNamespace = fmap (namespaceName &&& Env.names . namespaceScope) . prjValue @(N
 
 derefQName :: Heap Precise (Cell Precise) (Value Precise) -> NonEmpty Name -> Environment Precise (Value Precise) -> Maybe (Value Precise)
 derefQName heap = go
-  where go (n1 :| ns) env = Env.lookup n1 env >>= flip heapLookup heap >>= unLatest >>= case ns of
+  where go (n1 :| ns) env = Env.lookup n1 env >>= flip heapLookup heap >>= getLast . unLatest >>= case ns of
           []        -> Just
           (n2 : ns) -> fmap namespaceScope . prjValue @(Namespace Precise) >=> go (n2 :| ns)
 
