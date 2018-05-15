@@ -84,10 +84,10 @@ data EvalError value resume where
   ExportError         :: ModulePath -> Name -> EvalError value ()
   EnvironmentLookupError :: value -> EvalError value value
 
-runEvalError :: Evaluator location value (Resumable (EvalError value) ': effects) a -> Evaluator location value effects (Either (SomeExc (EvalError value)) a)
+runEvalError :: Effectful (m location value) => m location value (Resumable (EvalError value) ': effects) a -> m location value effects (Either (SomeExc (EvalError value)) a)
 runEvalError = runResumable
 
-runEvalErrorWith :: (forall resume . EvalError value resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (EvalError value) ': effects) a -> Evaluator location value effects a
+runEvalErrorWith :: Effectful (m location value) => (forall resume . EvalError value resume -> m location value effects resume) -> m location value (Resumable (EvalError value) ': effects) a -> m location value effects a
 runEvalErrorWith = runResumableWith
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
