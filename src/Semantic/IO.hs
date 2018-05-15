@@ -5,7 +5,6 @@ module Semantic.IO
 , isDirectory
 , readBlobPairsFromHandle
 , readBlobsFromHandle
-, readBlobsFromPaths
 , readProjectFromPaths
 , readBlobsFromDir
 , findFiles
@@ -97,9 +96,6 @@ readBlobFromPath :: MonadIO m => File -> m Blob.Blob
 readBlobFromPath file = do
   maybeFile <- readFile file
   maybe (fail ("cannot read '" <> show file <> "', file not found or language not supported.")) pure maybeFile
-
-readBlobsFromPaths :: MonadIO m => [File] -> m [Blob.Blob]
-readBlobsFromPaths files = catMaybes <$> traverse readFile files
 
 readProjectFromPaths :: MonadIO m => Maybe FilePath -> FilePath -> Language -> [FilePath] -> m Project
 readProjectFromPaths maybeRoot path lang excludeDirs = do
