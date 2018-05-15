@@ -8,11 +8,8 @@ import Data.Semilattice.Lower
 import Prologue
 
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Heap's.
-newtype Cache term location cell value = Cache (Monoidal.Map (Configuration term location cell value) (Set (value, Heap location cell value)))
+newtype Cache term location cell value = Cache { unCache :: Monoidal.Map (Configuration term location cell value) (Set (value, Heap location cell value)) }
   deriving (Eq, Lower, Monoid, Ord, Reducer (Configuration term location cell value, (value, Heap location cell value)), Show, Semigroup)
-
-unCache :: Cache term location cell value -> Monoidal.Map (Configuration term location cell value) (Set (value, Heap location cell value))
-unCache (Cache cache) = cache
 
 type Cacheable term location cell value = (Ord (cell value), Ord location, Ord term, Ord value)
 
