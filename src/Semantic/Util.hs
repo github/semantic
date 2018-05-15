@@ -112,6 +112,12 @@ type instance Base (Quieterm syntax ann) = TermF syntax ann
 instance Functor syntax => Recursive   (Quieterm syntax ann) where project = unQuieterm
 instance Functor syntax => Corecursive (Quieterm syntax ann) where embed   =   Quieterm
 
+instance Eq1 syntax => Eq1 (Quieterm syntax) where
+  liftEq eqA = go where go t1 t2 = liftEq2 eqA go (unQuieterm t1) (unQuieterm t2)
+
+instance (Eq1 syntax, Eq ann) => Eq (Quieterm syntax ann) where
+  (==) = eq1
+
 instance Show1 syntax => Show1 (Quieterm syntax) where
   liftShowsPrec _ _ = go where go d = liftShowsPrec go (showListWith (go 0)) d . termFOut . unQuieterm
 
