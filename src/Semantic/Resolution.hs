@@ -1,8 +1,7 @@
 {-# LANGUAGE ConstraintKinds, GADTs, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
 module Semantic.Resolution where
 
-import           Control.Monad.Effect hiding (run)
-import           Control.Monad.Effect.Run
+import           Control.Monad.Effect
 import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
 import           Data.Blob
@@ -41,6 +40,3 @@ data Resolution output where
 runResolution :: Members '[Files] effs => Eff (Resolution ': effs) a -> Eff effs a
 runResolution = interpret $ \ res -> case res of
   NodeJSResolution dir prop excludeDirs -> nodeJSResolutionMap dir prop excludeDirs
-
-instance (Members '[Files] effects, Run effects result rest) => Run (Resolution ': effects) result rest where
-  run = run . runResolution
