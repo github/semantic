@@ -24,6 +24,7 @@ import           Prologue
 import           Semantic.Graph
 import           Semantic.IO as IO
 import           Semantic.Task
+import           Text.Show (showListWith)
 
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
@@ -109,3 +110,6 @@ newtype Quieterm syntax ann = Quieterm { unQuieterm :: TermF syntax ann (Quieter
 type instance Base (Quieterm syntax ann) = TermF syntax ann
 instance Functor syntax => Recursive   (Quieterm syntax ann) where project = unQuieterm
 instance Functor syntax => Corecursive (Quieterm syntax ann) where embed   =   Quieterm
+
+instance Show1 syntax => Show1 (Quieterm syntax) where
+  liftShowsPrec _ _ = go where go d = liftShowsPrec go (showListWith (go 0)) d . termFOut . unQuieterm
