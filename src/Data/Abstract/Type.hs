@@ -159,7 +159,7 @@ instance ( Addressable location effects
 
   ifthenelse cond if' else' = unify cond Bool *> (if' <|> else')
 
-  liftNumeric _ t = unify (Int :+ Float :+ Rational) t
+  liftNumeric _ = unify (Int :+ Float :+ Rational)
   liftNumeric2 _ left right = case (left, right) of
     (Float, Int) -> pure Float
     (Int, Float) -> pure Float
