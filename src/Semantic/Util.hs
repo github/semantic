@@ -15,6 +15,7 @@ import           Data.Abstract.Type
 import           Data.Blob
 import           Data.File
 import qualified Data.Language as Language
+import           Data.Term
 import qualified GHC.TypeLits as TypeLevel
 import           Language.Preluded
 import           Parsing.Parser
@@ -100,3 +101,6 @@ mergeExcs = either (\ (SomeExc sum) -> Left (SomeExc (weakenSum sum))) (either (
 
 reassociate = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . first injectConst
 reassociateTypes = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . first injectConst
+
+
+newtype Quieterm syntax ann = Quieterm { unQuieterm :: TermF syntax ann (Quieterm syntax ann) }
