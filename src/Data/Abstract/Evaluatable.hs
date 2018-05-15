@@ -212,8 +212,8 @@ evaluatePackageWith analyzeModule analyzeTerm package
   . fmap fst
   . runState (lowerBound :: Gotos location value (Reader Span ': Reader PackageInfo ': outer))
   . runReader (packageModules (packageBody package))
-  . runModules evalModule
   . withPrelude (packagePrelude (packageBody package))
+  . runModules evalModule
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints (packageBody package)))
   where evalModule m
           = pairValueWithEnv
@@ -232,12 +232,15 @@ evaluatePackageWith analyzeModule analyzeTerm package
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
 
-        withPrelude Nothing a = a
-        withPrelude (Just prelude) a = do
+        evalPrelude prelude = runModules evalModule $ do
           _ <- runInModule moduleInfoFromCallStack $ do
             builtin "print" (closure ["s"] lowerBound (variable "s" >>= asString >>= trace . unpack >> unit))
             unit
-          preludeEnv <- fst <$> evalModule prelude
+          fst <$> evalModule prelude
+
+        withPrelude Nothing a = a
+        withPrelude (Just prelude) a = do
+          preludeEnv <- evalPrelude prelude
           withDefaultEnvironment preludeEnv a
 
         -- TODO: If the set of exports is empty because no exports have been
