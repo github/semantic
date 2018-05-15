@@ -11,14 +11,17 @@ import Data.Abstract.Module
 import Data.Semilattice.Lower
 import Prologue
 
+type InCache  term location value = Reader (Cache term location (Cell location) value)
+type OutCache term location value = State  (Cache term location (Cell location) value)
+
 -- | Look up the set of values for a given configuration in the in-cache.
-consultOracle :: (Cacheable term location (Cell location) value, Member (Reader (Cache term location (Cell location) value)) effects)
+consultOracle :: (Cacheable term location (Cell location) value, Member (InCache term location value) effects)
               => Configuration term location (Cell location) value
               -> TermEvaluator term location value effects (Set (value, Heap location (Cell location) value))
 consultOracle configuration = fromMaybe mempty . cacheLookup configuration <$> ask
 
 -- | Run an action with the given in-cache.
-withOracle :: Member (Reader (Cache term location (Cell location) value)) effects
+withOracle :: Member (InCache term location value) effects
            => Cache term location (Cell location) value
            -> TermEvaluator term location value effects a
            -> TermEvaluator term location value effects a
@@ -26,13 +29,13 @@ withOracle cache = local (const cache)
 
 
 -- | Look up the set of values for a given configuration in the out-cache.
-lookupCache :: (Cacheable term location (Cell location) value, Member (State (Cache term location (Cell location) value)) effects)
+lookupCache :: (Cacheable term location (Cell location) value, Member (OutCache term location value) effects)
             => Configuration term location (Cell location) value
             -> TermEvaluator term location value effects (Maybe (Set (value, Heap location (Cell location) value)))
 lookupCache configuration = cacheLookup configuration <$> get
 
 -- | Run an action, caching its result and 'Heap' under the given configuration.
-cachingConfiguration :: (Cacheable term location (Cell location) value, Members '[State (Cache term location (Cell location) value), State (Heap location (Cell location) value)] effects)
+cachingConfiguration :: (Cacheable term location (Cell location) value, Members '[OutCache term location value, State (Heap location (Cell location) value)] effects)
                      => Configuration term location (Cell location) value
                      -> Set (value, Heap location (Cell location) value)
                      -> TermEvaluator term location value effects value
@@ -42,13 +45,13 @@ cachingConfiguration configuration values action = do
   result <- (,) <$> action <*> get
   fst result <$ modify' (cacheInsert configuration result)
 
-putCache :: Member (State (Cache term location (Cell location) value)) effects
+putCache :: Member (OutCache term location value) effects
          => Cache term location (Cell location) value
          -> TermEvaluator term location value effects ()
 putCache = put
 
 -- | Run an action starting from an empty out-cache, and return the out-cache afterwards.
-isolateCache :: Member (State (Cache term location (Cell location) value)) effects
+isolateCache :: Member (OutCache term location value) effects
              => TermEvaluator term location value effects a
              -> TermEvaluator term location value effects (Cache term location (Cell location) value)
 isolateCache action = putCache lowerBound *> action *> get
@@ -58,10 +61,10 @@ isolateCache action = putCache lowerBound *> action *> get
 cachingTerms :: ( Cacheable term location (Cell location) value
                 , Corecursive term
                 , Members '[ Fresh
+                           , InCache term location value
                            , NonDet
-                           , Reader (Cache term location (Cell location) value)
+                           , OutCache term location value
                            , Reader (Live location value)
-                           , State (Cache term location (Cell location) value)
                            , State (Environment location value)
                            , State (Heap location (Cell location) value)
                            ] effects
@@ -79,10 +82,10 @@ cachingTerms recur term = do
 
 convergingModules :: ( Cacheable term location (Cell location) value
                      , Members '[ Fresh
+                                , InCache term location value
                                 , NonDet
-                                , Reader (Cache term location (Cell location) value)
+                                , OutCache term location value
                                 , Reader (Live location value)
-                                , State (Cache term location (Cell location) value)
                                 , State (Environment location value)
                                 , State (Heap location (Cell location) value)
                                 ] effects
@@ -125,7 +128,7 @@ scatter :: (Foldable t, Members '[NonDet, State (Heap location (Cell location) v
 scatter = foldMapA (\ (value, heap') -> TermEvaluator (putHeap heap') $> value)
 
 
-caching :: Alternative f => TermEvaluator term location value (NonDet ': Reader (Cache term location (Cell location) value) ': State (Cache term location (Cell location) value) ': effects) a -> TermEvaluator term location value effects (f a, Cache term location (Cell location) value)
+caching :: Alternative f => TermEvaluator term location value (NonDet ': InCache term location value ': OutCache term location value ': effects) a -> TermEvaluator term location value effects (f a, Cache term location (Cell location) value)
 caching
   = runState lowerBound
   . runReader lowerBound
