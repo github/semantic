@@ -21,6 +21,9 @@ instance Declarations t => Declarations (Subterm t a) where
 instance (FreeVariables1 syntax, Declarations1 syntax, Functor syntax) => Declarations (Term syntax ann) where
   declaredName = liftDeclaredName freeVariables . termOut
 
+instance (FreeVariables recur, Declarations1 syntax) => Declarations (TermF syntax ann recur) where
+  declaredName = liftDeclaredName freeVariables . termFOut
+
 instance (Apply Declarations1 fs) => Declarations1 (Sum fs) where
   liftDeclaredName f = apply @Declarations1 (liftDeclaredName f)
 
