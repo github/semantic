@@ -366,7 +366,7 @@ instance ( Addressable location (Goto effects (Value location) ': effects)
             a <- alloc name
             assign a v
             Env.insert name a <$> rest) (pure env) (zip names params)
-          localEnv (mergeEnvs bindings) (catchReturn body (\ (Return value) -> pure value))
+          localEnv (mergeEnvs bindings) (body `catchReturn` \ (Return value) -> pure value)
       Nothing -> throwValueError (CallError op)
 
   loop x = catchLoopControl (fix x) (\ control -> case control of
