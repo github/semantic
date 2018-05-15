@@ -128,10 +128,10 @@ moduleNotFound = throwResumable . ModuleNotFound
 resumeLoadError :: Member (Resumable (LoadError location value)) effects => Evaluator location value effects a -> (forall resume . LoadError location value resume -> Evaluator location value effects resume) -> Evaluator location value effects a
 resumeLoadError = catchResumable
 
-runLoadError :: Evaluator location value (Resumable (LoadError location value) ': effects) a -> Evaluator location value effects (Either (SomeExc (LoadError location value)) a)
+runLoadError :: Effectful (m location value) => m location value (Resumable (LoadError location value) ': effects) a -> m location value effects (Either (SomeExc (LoadError location value)) a)
 runLoadError = runResumable
 
-runLoadErrorWith :: (forall resume . LoadError location value resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (LoadError location value) ': effects) a -> Evaluator location value effects a
+runLoadErrorWith :: Effectful (m location value) => (forall resume . LoadError location value resume -> m location value effects resume) -> m location value (Resumable (LoadError location value) ': effects) a -> m location value effects a
 runLoadErrorWith = runResumableWith
 
 
