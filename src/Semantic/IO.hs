@@ -99,7 +99,7 @@ readProjectFromPaths maybeRoot path lang excludeDirs = do
       else (filter (/= path), [toFile path], fromMaybe (takeDirectory path) maybeRoot)
 
   paths <- liftIO $ filterFun <$> findFilesInDir rootDir exts excludeDirs
-  pure $ Project rootDir (toFile <$> paths) lang entryPoints
+  pure $ Project rootDir (toFile <$> paths) lang entryPoints excludeDirs
   where
     toFile path = File path (Just lang)
     exts = extensionsForLanguage lang

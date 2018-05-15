@@ -14,29 +14,30 @@ import           Semantic.IO
 import           System.FilePath.Posix
 
 
-nodeJSResolutionMap :: Member Files effs => FilePath -> Language -> [FilePath] -> Eff effs (Map FilePath FilePath)
-nodeJSResolutionMap dir lang excludeDirs = do
-  files <- findFiles dir [".json"] excludeDirs -- ["node_modules"]
+nodeJSResolutionMap :: Member Files effs => FilePath -> Text -> [FilePath] -> Eff effs (Map FilePath FilePath)
+nodeJSResolutionMap dir prop excludeDirs = do
+  files <- findFiles dir [".json"] excludeDirs
   let packageFiles = file <$> filter ((==) "package.json" . takeFileName) files
   blobs <- readBlobs (Right packageFiles)
-  pure $ fold (mapMaybe (lookup (propertyNameForLanguage lang)) blobs)
+  pure $ fold (mapMaybe (lookup prop) blobs)
   where
-    -- Entrypoint property name is different for JavaScript vs. TypeScript module resolution.
-    propertyNameForLanguage TypeScript = "types"
-    propertyNameForLanguage _ = "main"
-
     lookup :: Text -> Blob -> Maybe (Map FilePath FilePath)
     lookup k Blob{..} = decodeStrict (sourceBytes blobSource) >>= lookupProp blobPath k
 
     lookupProp :: FilePath -> Text -> Object -> Maybe (Map FilePath FilePath)
     lookupProp path k res = flip parseMaybe res $ \obj -> Map.singleton path <$> obj .: k
 
-nodeResolution :: Member Resolution effs => FilePath -> Language -> [FilePath] -> Eff effs (Map FilePath FilePath)
-nodeResolution dir prop = send . NodeJSResolution dir prop
+resolutionMap :: Member Resolution effs => Project -> Eff effs (Map FilePath FilePath)
+resolutionMap Project{..} = case projectLanguage of
+  TypeScript -> send (NodeJSResolution projectRootDir "types" projectExcludeDirs)
+  JavaScript -> send (NodeJSResolution projectRootDir "main" projectExcludeDirs)
+  _          -> send NoResolution
 
 data Resolution output where
-  NodeJSResolution :: FilePath -> Language -> [FilePath] -> Resolution (Map FilePath FilePath)
+  NodeJSResolution :: FilePath -> Text -> [FilePath] -> Resolution (Map FilePath FilePath)
+  NoResolution :: Resolution (Map FilePath FilePath)
 
 runResolution :: Members '[Files] effs => Eff (Resolution ': effs) a -> Eff effs a
 runResolution = interpret $ \ res -> case res of
   NodeJSResolution dir prop excludeDirs -> nodeJSResolutionMap dir prop excludeDirs
+  NoResolution -> pure Map.empty

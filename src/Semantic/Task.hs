@@ -14,7 +14,8 @@ module Semantic.Task
 , IO.findFiles
 , IO.writeToOutput
 -- * Module Resolution
-, nodeResolution
+, resolutionMap
+, Resolution
 -- * Telemetry
 , writeLog
 , writeStat

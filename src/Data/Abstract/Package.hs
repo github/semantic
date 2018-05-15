@@ -22,6 +22,7 @@ data PackageBody term = PackageBody
   { packageModules     :: ModuleTable [Module term]
   , packagePrelude     :: Maybe (Module term)
   , packageEntryPoints :: ModuleTable (Maybe Name)
+  , packageResolutions :: Map.Map FilePath FilePath
   }
   deriving (Eq, Functor, Ord, Show)
 
@@ -33,8 +34,8 @@ data Package term = Package
   }
   deriving (Eq, Functor, Ord, Show)
 
-fromModules :: PackageName -> Maybe Version -> Maybe (Module term) -> Int -> [Module term] -> Package term
-fromModules name version prelude entryPoints modules =
-  Package (PackageInfo name version) (PackageBody (ModuleTable.fromModules modules) prelude entryPoints')
+fromModules :: PackageName -> Maybe Version -> Maybe (Module term) -> Int -> [Module term] -> Map.Map FilePath FilePath -> Package term
+fromModules name version prelude entryPoints modules resolutions =
+  Package (PackageInfo name version) (PackageBody (ModuleTable.fromModules modules) prelude entryPoints' resolutions)
   where
     entryPoints' = ModuleTable . Map.fromList $ (,Nothing) . modulePath . moduleInfo <$> if entryPoints == 0 then modules else take entryPoints modules

@@ -16,6 +16,7 @@ data Project = Project
   , projectFiles :: [File]
   , projectLanguage :: Language
   , projectEntryPoints :: [File]
+  , projectExcludeDirs :: [FilePath]
   }
   deriving (Eq, Ord, Show)
 
