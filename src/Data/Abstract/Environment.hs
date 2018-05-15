@@ -85,7 +85,7 @@ mergeNewer (Environment a) (Environment b) =
 -- | Extract an association list of bindings from an 'Environment'.
 --
 -- >>> pairs shadowed
--- [(Name {unName = "foo"},Address (Precise 1))]
+-- [(Name {unName = "foo"},Precise 1)]
 pairs :: Environment location value -> [(Name, Address location value)]
 pairs = map (second Address) . Map.toList . fold . unEnvironment
 
@@ -95,7 +95,7 @@ unpairs = fromList
 -- | Lookup a 'Name' in the environment.
 --
 -- >>> lookup (name "foo") shadowed
--- Just (Address (Precise 1))
+-- Just (Precise 1)
 lookup :: Name -> Environment location value -> Maybe (Address location value)
 lookup k = fmap Address . foldMapA (Map.lookup k) . unEnvironment
 
@@ -106,7 +106,7 @@ insert name (Address value) (Environment (a :| as)) = Environment (Map.insert na
 -- | Remove a 'Name' from the environment.
 --
 -- >>> delete (name "foo") shadowed
--- Environment (fromList [] :| [])
+-- Environment []
 delete :: Name -> Environment location value -> Environment location value
 delete name = trim . Environment . fmap (Map.delete name) . unEnvironment
 
