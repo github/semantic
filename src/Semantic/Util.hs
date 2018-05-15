@@ -117,3 +117,6 @@ instance Show1 syntax => Show1 (Quieterm syntax) where
 
 instance Show1 syntax => Show (Quieterm syntax ann) where
   showsPrec = liftShowsPrec (const (const id)) (const id)
+
+quieterm :: (Recursive term, Base term ~ TermF syntax ann) => term -> Quieterm syntax ann
+quieterm = cata Quieterm
