@@ -136,6 +136,22 @@ deriving instance Show (Unspecialized a b)
 instance Show1 (Unspecialized a) where
   liftShowsPrec _ _ = showsPrec
 
+value :: ( Addressable location effects
+         , AbstractValue location value effects
+         , Members '[ Reader (Environment location value)
+                    , Resumable (AddressError location value)
+                    , Resumable (EnvironmentError value)
+                    , Resumable (EvalError value)
+                    , State (Environment location value)
+                    , State (Heap location (Cell location) value)
+                    ] effects
+         )
+      => ValueRef value
+      -> Evaluator location value effects value
+value (LvalLocal var) = variable var
+value (LvalMember obj prop) = evaluateInScopedEnv (pure obj) (variable prop)
+value (Rval val) = pure val
+
 subtermValue :: Subterm t a -> a
 subtermValue = subtermRef
 
