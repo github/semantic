@@ -81,6 +81,9 @@ instance Show value => Show (Latest value) where
   showsPrec d = showsPrec d . unLatest
 
 
+-- | A cell holding all values written to its address.
+--
+--   This is equivalent to 'Set', but with a 'Show' instance designed to minimize the amount of text we have to scroll past in ghci.
 newtype All value = All { unAll :: Set value }
   deriving (Eq, Foldable, Lower, Monoid, Ord, Reducer value, Semigroup)
 
