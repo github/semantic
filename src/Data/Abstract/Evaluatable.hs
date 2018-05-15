@@ -247,20 +247,10 @@ evaluatePackageWith analyzeModule analyzeTerm package
   . withPrelude (packagePrelude (packageBody package))
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints (packageBody package)))
   where
-        evalModule :: Module term
-                   -> Evaluator
-                        location
-                        value
-                        (Modules location value
-                           : State
-                               (Gotos location value (Reader Span : Reader PackageInfo : outer))
-                           : Reader Span : Reader PackageInfo : outer)
-                        (Environment location value, value)
         evalModule m
           = pairValueWithEnv
           . runInModule (moduleInfo m)
           . analyzeModule (subtermRef . moduleBody)
-          -- . fmap (\x -> let () = x in undefined)
           $ evalTerm <$> m
         evalTerm term = Subterm term
           (value =<< foldSubterms (analyzeTerm eval) term)
