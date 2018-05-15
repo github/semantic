@@ -16,11 +16,8 @@ import qualified Data.Map as Map
 import Data.Semilattice.Lower
 
 -- | A map of export names to an alias & address tuple.
-newtype Exports location value = Exports (Map.Map Name (Name, Maybe (Address location value)))
+newtype Exports location value = Exports { unExports :: Map.Map Name (Name, Maybe (Address location value)) }
   deriving (Eq, Lower, Monoid, Ord, Semigroup, Show)
-
-unExports :: Exports location value -> Map.Map Name (Name, Maybe (Address location value))
-unExports (Exports exports) = exports
 
 null :: Exports location value -> Bool
 null = Map.null . unExports
