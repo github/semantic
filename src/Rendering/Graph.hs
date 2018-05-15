@@ -28,7 +28,10 @@ runGraph :: Eff '[Fresh, Reader (Graph vertex)] (Graph vertex) -> Graph vertex
 runGraph = run . runReader mempty . runFresh 0
 
 
-termAlgebra :: (ConstructorName syntax, Foldable syntax, Members '[Fresh, Reader (Graph (Vertex tag))] effs) => tag -> TermF syntax ann (Eff effs (Graph (Vertex tag))) -> Eff effs (Graph (Vertex tag))
+termAlgebra :: (ConstructorName syntax, Foldable syntax, Members '[Fresh, Reader (Graph (Vertex tag))] effs)
+            => tag
+            -> TermF syntax ann (Eff effs (Graph (Vertex tag)))
+            -> Eff effs (Graph (Vertex tag))
 termAlgebra tag (In _ syntax) = do
   i <- fresh
   let root = vertex (Vertex i tag (constructorName syntax))
