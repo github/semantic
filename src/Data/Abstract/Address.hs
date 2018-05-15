@@ -16,6 +16,9 @@ instance Eq   location => Eq1   (Address location) where liftEq          _ a b =
 instance Ord  location => Ord1  (Address location) where liftCompare     _ a b = unAddress a `compare` unAddress b
 instance Show location => Show1 (Address location) where liftShowsPrec _ _     = showsPrec
 
+instance Show location => Show (Address location value) where
+  showsPrec d = showsPrec d . unAddress
+
 
 class Location location where
   -- | The type into which stored values will be written for a given location type.
@@ -72,7 +75,3 @@ instance Monoid (Latest value) where
 
 instance Reducer value (Latest value) where
   unit = Latest . Just
-
-
-instance Show location => Show (Address location value) where
-  showsPrec d = showsPrec d . unAddress
