@@ -82,4 +82,7 @@ instance Reducer value (Latest value) where
 
 
 newtype All value = All { unAll :: Set value }
-  deriving (Eq, Foldable, Lower, Monoid, Ord, Reducer value, Semigroup, Show)
+  deriving (Eq, Foldable, Lower, Monoid, Ord, Reducer value, Semigroup)
+
+instance Show value => Show (All value) where
+  showsPrec d = showsPrec d . Set.toList . unAll
