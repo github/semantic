@@ -10,7 +10,7 @@ import Prologue
 
 -- | A map of addresses onto cells holding their values.
 newtype Heap location cell value = Heap (Monoidal.Map location (cell value))
-  deriving (Eq, Foldable, Functor, Lower, Monoid, Ord, Semigroup, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Lower, Monoid, Ord, Semigroup, Traversable)
 
 unHeap :: Heap location cell value -> Monoidal.Map location (cell value)
 unHeap (Heap heap) = heap
@@ -40,3 +40,8 @@ heapSize = Monoidal.size . unHeap
 -- | Restrict a 'Heap' to only those 'Address'es in the given 'Live' set (in essence garbage collecting the rest).
 heapRestrict :: Ord location => Heap location cell value -> Live location value -> Heap location cell value
 heapRestrict (Heap m) roots = Heap (Monoidal.filterWithKey (\ address _ -> Address address `liveMember` roots) m)
+
+
+
+instance (Show location, Show (cell value)) => Show (Heap location cell value) where
+  showsPrec d (Heap heap) = showsUnaryWith showsPrec "Heap" d (Monoidal.pairs heap)
