@@ -84,10 +84,10 @@ data EvalError value resume where
   ExportError         :: ModulePath -> Name -> EvalError value ()
   EnvironmentLookupError :: value -> EvalError value value
 
-runEvalError :: Effectful (m location value) => m location value (Resumable (EvalError value) ': effects) a -> m location value effects (Either (SomeExc (EvalError value)) a)
+runEvalError :: Effectful (m value) => m value (Resumable (EvalError value) ': effects) a -> m value effects (Either (SomeExc (EvalError value)) a)
 runEvalError = runResumable
 
-runEvalErrorWith :: Effectful (m location value) => (forall resume . EvalError value resume -> m location value effects resume) -> m location value (Resumable (EvalError value) ': effects) a -> m location value effects a
+runEvalErrorWith :: Effectful (m value) => (forall resume . EvalError value resume -> m value effects resume) -> m value (Resumable (EvalError value) ': effects) a -> m value effects a
 runEvalErrorWith = runResumableWith
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
@@ -135,10 +135,10 @@ deriving instance Show (Unspecialized a b)
 instance Show1 (Unspecialized a) where
   liftShowsPrec _ _ = showsPrec
 
-runUnspecialized :: Effectful (m location value) => m location value (Resumable (Unspecialized value) ': effects) a -> m location value effects (Either (SomeExc (Unspecialized value)) a)
+runUnspecialized :: Effectful (m value) => m value (Resumable (Unspecialized value) ': effects) a -> m value effects (Either (SomeExc (Unspecialized value)) a)
 runUnspecialized = runResumable
 
-runUnspecializedWith :: Effectful (m location value) => (forall resume . Unspecialized value resume -> m location value effects resume) -> m location value (Resumable (Unspecialized value) ': effects) a -> m location value effects a
+runUnspecializedWith :: Effectful (m value) => (forall resume . Unspecialized value resume -> m value effects resume) -> m value (Resumable (Unspecialized value) ': effects) a -> m value effects a
 runUnspecializedWith = runResumableWith
 
 
