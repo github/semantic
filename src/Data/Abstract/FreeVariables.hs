@@ -48,6 +48,9 @@ instance (FreeVariables t) => FreeVariables (Subterm t a) where
 instance (FreeVariables1 syntax, Functor syntax) => FreeVariables (Term syntax ann) where
   freeVariables = cata (liftFreeVariables id)
 
+instance (FreeVariables recur, FreeVariables1 syntax) => FreeVariables (TermF syntax ann recur) where
+  freeVariables = liftFreeVariables freeVariables
+
 instance (FreeVariables1 syntax) => FreeVariables1 (TermF syntax ann) where
   liftFreeVariables f (In _ s) = liftFreeVariables f s
 
