@@ -12,7 +12,7 @@ import Data.Semigroup.Reducer
 import Prologue
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Heap.
-class Ord location => Addressable location effects where
+class (Ord location, Show location) => Addressable location effects where
   derefCell :: Address location value -> Cell location value -> Evaluator location value effects (Maybe value)
 
   allocLoc :: Name -> Evaluator location value effects location
