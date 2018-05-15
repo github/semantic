@@ -135,7 +135,7 @@ instance Evaluatable Class where
   eval Class{..} = do
     super <- traverse subtermValue classSuperClass
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm classIdentifier)
-    Rval <$> (letrec' name $ \addr ->
+    Rval <$> letrec' name (\addr ->
       subtermValue classBody <* makeNamespace name addr super)
 
 data Module a = Module { moduleIdentifier :: !a, moduleStatements :: ![a] }
@@ -148,7 +148,7 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Module where
   eval (Module iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
-    Rval <$> (letrec' name $ \addr ->
+    Rval <$> letrec' name (\addr ->
       value =<< (eval xs <* makeNamespace name addr Nothing))
 
 data LowPrecedenceBoolean a

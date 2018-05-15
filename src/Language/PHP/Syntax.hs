@@ -216,7 +216,7 @@ instance Ord1 NamespaceName where liftCompare = genericLiftCompare
 instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable NamespaceName where
-  eval (NamespaceName xs) = Rval <$> (foldl1 evaluateInScopedEnv $ fmap subtermValue xs)
+  eval (NamespaceName xs) = Rval <$> foldl1 evaluateInScopedEnv (fmap subtermValue xs)
 
 newtype ConstDeclaration a = ConstDeclaration [a]
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)

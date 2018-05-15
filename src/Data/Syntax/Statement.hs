@@ -19,7 +19,7 @@ instance Show1 If where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable If where
   eval (If cond if' else') = do
     bool <- subtermValue cond
-    Rval <$> (ifthenelse bool (subtermValue if') (subtermValue else'))
+    Rval <$> ifthenelse bool (subtermValue if') (subtermValue else')
 
 -- | Else statement. The else condition is any term, that upon successful completion, continues evaluation to the elseBody, e.g. `for ... else` in Python.
 data Else a = Else { elseCondition :: !a, elseBody :: !a }
@@ -82,7 +82,7 @@ instance Evaluatable Let where
   eval Let{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm letVariable)
     addr <- snd <$> letrec name (subtermValue letValue)
-    Rval <$> (localEnv (Env.insert name addr) (subtermValue letBody))
+    Rval <$> localEnv (Env.insert name addr) (subtermValue letBody)
 
 
 -- Assignment
@@ -234,7 +234,7 @@ instance Ord1 While where liftCompare = genericLiftCompare
 instance Show1 While where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable While where
-  eval While{..} = Rval <$> (while (subtermValue whileCondition)  (subtermValue whileBody))
+  eval While{..} = Rval <$> while (subtermValue whileCondition) (subtermValue whileBody)
 
 data DoWhile a = DoWhile { doWhileCondition :: !a, doWhileBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -244,7 +244,7 @@ instance Ord1 DoWhile where liftCompare = genericLiftCompare
 instance Show1 DoWhile where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable DoWhile where
-  eval DoWhile{..} = Rval <$> (doWhile (subtermValue doWhileBody) (subtermValue doWhileCondition))
+  eval DoWhile{..} = Rval <$> doWhile (subtermValue doWhileBody) (subtermValue doWhileCondition)
 
 -- Exception handling
 

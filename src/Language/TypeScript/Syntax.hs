@@ -646,7 +646,7 @@ instance Show1 Module where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable Module where
   eval (Module iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
-    Rval <$> (letrec' name $ \addr ->
+    Rval <$> letrec' name (\addr ->
       value =<< (eval xs <* makeNamespace name addr Nothing))
 
 
@@ -661,7 +661,7 @@ instance Show1 InternalModule where liftShowsPrec = genericLiftShowsPrec
 instance Evaluatable InternalModule where
   eval (InternalModule iden xs) = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm iden)
-    Rval <$> (letrec' name $ \addr ->
+    Rval <$> letrec' name (\addr ->
       value =<< (eval xs <* makeNamespace name addr Nothing))
 
 instance Declarations a => Declarations (InternalModule a) where

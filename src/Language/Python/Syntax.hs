@@ -158,7 +158,7 @@ instance Evaluatable QualifiedAliasedImport where
 
     -- Evaluate and import the last module, aliasing and updating the environment
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
-    Rval <$> (letrec' alias $ \addr -> do
+    Rval <$> letrec' alias (\addr -> do
       let path = NonEmpty.last modulePaths
       importedEnv <- maybe emptyEnv fst <$> isolate (require path)
       modifyEnv (mergeEnvs importedEnv)
