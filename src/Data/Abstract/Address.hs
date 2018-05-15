@@ -6,6 +6,7 @@ import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Package (PackageInfo)
 import Data.Semigroup.Reducer
 import Data.Semilattice.Lower
+import Data.Set as Set
 import Prologue
 
 -- | An abstract address with a @location@ pointing to a variable of type @value@.
@@ -41,7 +42,7 @@ newtype Monovariant = Monovariant { unMonovariant :: Name }
   deriving (Eq, Ord)
 
 instance Location Monovariant where
-  type Cell Monovariant = Set
+  type Cell Monovariant = All
 
 instance Show Monovariant where
   showsPrec d = showsUnaryWith showsPrec "Monovariant" d . unName . unMonovariant
@@ -78,3 +79,7 @@ instance Monoid (Latest value) where
 
 instance Reducer value (Latest value) where
   unit = Latest . Just
+
+
+newtype All value = All { unAll :: Set value }
+  deriving (Eq, Foldable, Lower, Monoid, Ord, Reducer value, Semigroup, Show)
