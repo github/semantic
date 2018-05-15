@@ -9,7 +9,7 @@ import Prologue
 
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Heap's.
 newtype Cache term location cell value = Cache { unCache :: Monoidal.Map (Configuration term location cell value) (Set (value, Heap location cell value)) }
-  deriving (Eq, Lower, Monoid, Ord, Reducer (Configuration term location cell value, (value, Heap location cell value)), Show, Semigroup)
+  deriving (Eq, Lower, Monoid, Ord, Reducer (Configuration term location cell value, (value, Heap location cell value)), Semigroup)
 
 type Cacheable term location cell value = (Ord (cell value), Ord location, Ord term, Ord value)
 
@@ -24,3 +24,7 @@ cacheSet key value = Cache . Monoidal.insert key value . unCache
 -- | Insert the resulting value & 'Heap' for a given 'Configuration', appending onto any previous entry.
 cacheInsert :: Cacheable term location cell value => Configuration term location cell value -> (value, Heap location cell value) -> Cache term location cell value -> Cache term location cell value
 cacheInsert = curry cons
+
+
+instance (Show term, Show location, Show (cell value), Show value) => Show (Cache term location cell value) where
+  showsPrec d = showsUnaryWith showsPrec "Cache" d . Monoidal.pairs . unCache
