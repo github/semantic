@@ -412,11 +412,11 @@ deriving instance Show location => Show (ValueError location resume)
 instance Show location => Show1 (ValueError location) where
   liftShowsPrec _ _ = showsPrec
 
-throwValueError :: Member (Resumable (ValueError location)) effects => ValueError location resume -> Evaluator location value effects resume
+throwValueError :: Member (Resumable (ValueError location)) effects => ValueError location resume -> Evaluator location (Value location) effects resume
 throwValueError = throwResumable
 
-runValueError :: Effectful (m location value) => m location value (Resumable (ValueError location) ': effects) a -> m location value effects (Either (SomeExc (ValueError location)) a)
+runValueError :: Effectful (m location (Value location)) => m location (Value location) (Resumable (ValueError location) ': effects) a -> m location (Value location) effects (Either (SomeExc (ValueError location)) a)
 runValueError = runResumable
 
-runValueErrorWith :: Effectful (m location value) => (forall resume . ValueError location resume -> m location value effects resume) -> m location value (Resumable (ValueError location) ': effects) a -> m location value effects a
+runValueErrorWith :: Effectful (m location (Value location)) => (forall resume . ValueError location resume -> m location (Value location) effects resume) -> m location (Value location) (Resumable (ValueError location) ': effects) a -> m location (Value location) effects a
 runValueErrorWith = runResumableWith
