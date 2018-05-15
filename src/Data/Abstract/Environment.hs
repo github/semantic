@@ -38,7 +38,7 @@ import qualified Data.List.NonEmpty as NonEmpty
 --   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
 --   scope for "a", then the next, and so on.
 newtype Environment location value = Environment (NonEmpty (Map.Map Name location))
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Ord)
 
 unEnvironment :: Environment location value -> NonEmpty (Map.Map Name location)
 unEnvironment (Environment env) = env
@@ -143,3 +143,6 @@ addresses = fromAddresses . map snd . pairs
 
 
 instance Lower (Environment location value) where lowerBound = emptyEnv
+
+instance Show location => Show (Environment location value) where
+  showsPrec d = showsUnaryWith showsPrec "Environment" d . pairs
