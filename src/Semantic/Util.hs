@@ -118,6 +118,12 @@ instance Eq1 syntax => Eq1 (Quieterm syntax) where
 instance (Eq1 syntax, Eq ann) => Eq (Quieterm syntax ann) where
   (==) = eq1
 
+instance Ord1 syntax => Ord1 (Quieterm syntax) where
+  liftCompare comp = go where go t1 t2 = liftCompare2 comp go (unQuieterm t1) (unQuieterm t2)
+
+instance (Ord1 syntax, Ord ann) => Ord (Quieterm syntax ann) where
+  compare = compare1
+
 instance Show1 syntax => Show1 (Quieterm syntax) where
   liftShowsPrec _ _ = go where go d = liftShowsPrec go (showListWith (go 0)) d . termFOut . unQuieterm
 
