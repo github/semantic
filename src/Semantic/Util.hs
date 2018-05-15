@@ -51,7 +51,7 @@ evaluatingWithHoles
   . resumingEnvironmentError
   . resumingEvalError
   . resumingResolutionError
-  . resumingAddressError @(Value Precise) @Precise
+  . resumingAddressError
   . constrainedToValuePrecise
   . runTermEvaluator
 
