@@ -26,11 +26,14 @@ class Location location where
 
 
 -- | 'Precise' models precise store semantics where only the 'Latest' value is taken. Everything gets it's own address (always makes a new allocation) which makes for a larger store.
-newtype Precise = Precise Int
-  deriving (Eq, Ord, Show)
+newtype Precise = Precise { unPrecise :: Int }
+  deriving (Eq, Ord)
 
 instance Location Precise where
   type Cell Precise = Latest
+
+instance Show Precise where
+  showsPrec d = showsUnaryWith showsPrec "Precise" d . unPrecise
 
 
 -- | 'Monovariant' models using one address for a particular name. It trackes the set of values that a particular address takes and uses it's name to lookup in the store and only allocation if new.
