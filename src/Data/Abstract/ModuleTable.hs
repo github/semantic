@@ -21,11 +21,8 @@ import System.FilePath.Posix
 import GHC.Generics (Generic1)
 import Prelude hiding (lookup)
 
-newtype ModuleTable a = ModuleTable (Map.Map ModulePath a)
+newtype ModuleTable a = ModuleTable { unModuleTable :: Map.Map ModulePath a }
   deriving (Eq, Foldable, Functor, Generic1, Lower, Monoid, Ord, Semigroup, Show, Traversable)
-
-unModuleTable :: ModuleTable a -> Map.Map ModulePath a
-unModuleTable (ModuleTable table) = table
 
 singleton :: ModulePath -> a -> ModuleTable a
 singleton name = ModuleTable . Map.singleton name
