@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, TypeOperators #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.Util where
 
@@ -106,6 +106,7 @@ reassociateTypes = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . m
 
 
 newtype Quieterm syntax ann = Quieterm { unQuieterm :: TermF syntax ann (Quieterm syntax ann) }
+  deriving (Declarations, FreeVariables)
 
 type instance Base (Quieterm syntax ann) = TermF syntax ann
 instance Functor syntax => Recursive   (Quieterm syntax ann) where project = unQuieterm
