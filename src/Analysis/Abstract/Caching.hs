@@ -12,30 +12,45 @@ import Data.Semilattice.Lower
 import Prologue
 
 -- | Look up the set of values for a given configuration in the in-cache.
-consultOracle :: (Cacheable term location (Cell location) value, Member (Reader (Cache term location (Cell location) value)) effects) => Configuration term location (Cell location) value -> TermEvaluator term location value effects (Set (value, Heap location (Cell location) value))
+consultOracle :: (Cacheable term location (Cell location) value, Member (Reader (Cache term location (Cell location) value)) effects)
+              => Configuration term location (Cell location) value
+              -> TermEvaluator term location value effects (Set (value, Heap location (Cell location) value))
 consultOracle configuration = fromMaybe mempty . cacheLookup configuration <$> ask
 
 -- | Run an action with the given in-cache.
-withOracle :: Member (Reader (Cache term location (Cell location) value)) effects => Cache term location (Cell location) value -> TermEvaluator term location value effects a -> TermEvaluator term location value effects a
+withOracle :: Member (Reader (Cache term location (Cell location) value)) effects
+           => Cache term location (Cell location) value
+           -> TermEvaluator term location value effects a
+           -> TermEvaluator term location value effects a
 withOracle cache = local (const cache)
 
 
 -- | Look up the set of values for a given configuration in the out-cache.
-lookupCache :: (Cacheable term location (Cell location) value, Member (State (Cache term location (Cell location) value)) effects) => Configuration term location (Cell location) value -> TermEvaluator term location value effects (Maybe (Set (value, Heap location (Cell location) value)))
+lookupCache :: (Cacheable term location (Cell location) value, Member (State (Cache term location (Cell location) value)) effects)
+            => Configuration term location (Cell location) value
+            -> TermEvaluator term location value effects (Maybe (Set (value, Heap location (Cell location) value)))
 lookupCache configuration = cacheLookup configuration <$> get
 
 -- | Run an action, caching its result and 'Heap' under the given configuration.
-cachingConfiguration :: (Cacheable term location (Cell location) value, Members '[State (Cache term location (Cell location) value), State (Heap location (Cell location) value)] effects) => Configuration term location (Cell location) value -> Set (value, Heap location (Cell location) value) -> TermEvaluator term location value effects value -> TermEvaluator term location value effects value
+cachingConfiguration :: (Cacheable term location (Cell location) value, Members '[State (Cache term location (Cell location) value), State (Heap location (Cell location) value)] effects)
+                     => Configuration term location (Cell location) value
+                     -> Set (value, Heap location (Cell location) value)
+                     -> TermEvaluator term location value effects value
+                     -> TermEvaluator term location value effects value
 cachingConfiguration configuration values action = do
   modify' (cacheSet configuration values)
   result <- (,) <$> action <*> get
   fst result <$ modify' (cacheInsert configuration result)
 
-putCache :: Member (State (Cache term location (Cell location) value)) effects => Cache term location (Cell location) value -> TermEvaluator term location value effects ()
+putCache :: Member (State (Cache term location (Cell location) value)) effects
+         => Cache term location (Cell location) value
+         -> TermEvaluator term location value effects ()
 putCache = put
 
 -- | Run an action starting from an empty out-cache, and return the out-cache afterwards.
-isolateCache :: Member (State (Cache term location (Cell location) value)) effects => TermEvaluator term location value effects a -> TermEvaluator term location value effects (Cache term location (Cell location) value)
+isolateCache :: Member (State (Cache term location (Cell location) value)) effects
+             => TermEvaluator term location value effects a
+             -> TermEvaluator term location value effects (Cache term location (Cell location) value)
 isolateCache action = putCache lowerBound *> action *> get
 
 
