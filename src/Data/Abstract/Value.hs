@@ -415,8 +415,8 @@ instance Show location => Show1 (ValueError location) where
 throwValueError :: Member (Resumable (ValueError location)) effects => ValueError location resume -> Evaluator location value effects resume
 throwValueError = throwResumable
 
-runValueError :: Evaluator location value (Resumable (ValueError location) ': effects) a -> Evaluator location value effects (Either (SomeExc (ValueError location)) a)
+runValueError :: Effectful (m location value) => m location value (Resumable (ValueError location) ': effects) a -> m location value effects (Either (SomeExc (ValueError location)) a)
 runValueError = runResumable
 
-runValueErrorWith :: (forall resume . ValueError location resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (ValueError location) ': effects) a -> Evaluator location value effects a
+runValueErrorWith :: Effectful (m location value) => (forall resume . ValueError location resume -> m location value effects resume) -> m location value (Resumable (ValueError location) ': effects) a -> m location value effects a
 runValueErrorWith = runResumableWith
