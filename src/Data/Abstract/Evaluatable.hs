@@ -234,7 +234,17 @@ evaluatePackageWith analyzeModule analyzeTerm package
   . runModules evalModule
   . withPrelude (packagePrelude (packageBody package))
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints (packageBody package)))
-  where evalModule m
+  where
+        evalModule :: Module term
+                   -> Evaluator
+                        location
+                        value
+                        (Modules location value
+                           : State
+                               (Gotos location value (Reader Span : Reader PackageInfo : outer))
+                           : Reader Span : Reader PackageInfo : outer)
+                        (Environment location value, value)
+        evalModule m
           = pairValueWithEnv
           . runInModule (moduleInfo m)
           . analyzeModule (subtermValue . moduleBody)
