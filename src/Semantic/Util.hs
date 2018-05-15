@@ -56,7 +56,7 @@ evaluatingWithHoles
   . runTermEvaluator
 
 checking
-  = runM @(Evaluator Monovariant Type) @IO
+  = runM @_ @IO
   . evaluating
   . runPrintingTrace
   . runTermEvaluator
