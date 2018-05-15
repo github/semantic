@@ -17,7 +17,7 @@ module Data.Abstract.Evaluatable
 , Modules
 ) where
 
-import Control.Abstract as X hiding (Goto(..), LoopControl(..), Modules(..), Return(..))
+import Control.Abstract as X hiding (Goto(..), LoopControl(..), Modules(..), Return(..), TermEvaluator(..))
 import Control.Abstract.Evaluator (LoopControl, Return(..))
 import Control.Abstract.Goto (Goto(..))
 import Control.Abstract.Modules (Modules(..))
