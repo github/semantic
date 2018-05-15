@@ -1,5 +1,20 @@
 {-# LANGUAGE GADTs, TypeOperators #-}
-module Semantic.Graph where
+module Semantic.Graph
+( graph
+, GraphType(..)
+, Graph
+, Vertex
+, style
+, parsePackage
+, withTermSpans
+, resumingResolutionError
+, resumingLoadError
+, resumingEvalError
+, resumingUnspecialized
+, resumingAddressError
+, resumingValueError
+, resumingEnvironmentError
+) where
 
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph
@@ -13,13 +28,11 @@ import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value, ValueError(..), runValueErrorWith)
 import           Data.ByteString.Char8 (pack)
 import           Data.File
-import           Data.Output
 import           Data.Record
 import           Data.Semilattice.Lower
 import           Data.Term
 import           Parsing.Parser
 import           Prologue hiding (MonadError (..))
-import           Rendering.Renderer
 import           Semantic.IO (Files)
 import           Semantic.Task as Task
 
@@ -27,19 +40,16 @@ data GraphType = ImportGraph | CallGraph
 
 graph :: Members '[Distribute WrappedTask, Files, Task, Exc SomeException, Telemetry, Trace] effs
       => GraphType
-      -> GraphRenderer output
       -> Project
-      -> Eff effs ByteString
-graph graphType renderer project
+      -> Eff effs (Graph Vertex)
+graph graphType project
   | SomeAnalysisParser parser prelude <- someAnalysisParser
     (Proxy :: Proxy '[ Evaluatable, Declarations1, FreeVariables1, Functor, Eq1, Ord1, Show1 ]) (projectLanguage project) = do
     package <- parsePackage parser prelude project
     let analyzeTerm = case graphType of
           ImportGraph -> id
           CallGraph   -> graphingTerms
-    analyze runGraphAnalysis (evaluatePackageWith graphingModules (withTermSpans . graphingLoadErrors . analyzeTerm) package) >>= extractGraph >>= case renderer of
-      JSONGraphRenderer -> pure . toOutput
-      DOTGraphRenderer  -> pure . renderGraph
+    analyze runGraphAnalysis (evaluatePackageWith graphingModules (withTermSpans . graphingLoadErrors . analyzeTerm) package) >>= extractGraph
     where extractGraph result = case result of
             (Right ((_, graph), _), _) -> pure graph
             _ -> Task.throwError (toException (Exc.ErrorCall ("graphImports: import graph rendering failed " <> show result)))

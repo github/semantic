@@ -6,6 +6,7 @@ import Data.Functor.Listable
 import Data.Record
 import Data.Sum
 import Data.Term
+import Data.These
 import Diffing.Interpreter
 import qualified Data.Syntax as Syntax
 import Test.Hspec (Spec, describe, it, parallel)
@@ -47,3 +48,12 @@ spec = parallel $ do
                  b = wrap [a]
                  c = wrap [a, b] in
         diffTerms (wrap [a, b, c]) (wrap [b, c, a :: Term ListableSyntax (Record '[])]) `shouldBe` merge (Nil, Nil) (injectSum [ deleting a, merging b, merging c, inserting a ])
+
+  describe "diffTermPair" $ do
+    prop "produces an Insert when the first term is missing" $ do
+      \ after -> let diff = diffTermPair (That after) :: Diff ListableSyntax (Record '[]) (Record '[]) in
+        diff `shouldBe` inserting after
+
+    prop "produces a Delete when the second term is missing" $ do
+      \ before -> let diff = diffTermPair (This before) :: Diff ListableSyntax (Record '[]) (Record '[]) in
+        diff `shouldBe` deleting before

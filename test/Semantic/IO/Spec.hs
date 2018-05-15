@@ -3,7 +3,7 @@ module Semantic.IO.Spec (spec) where
 import Prelude hiding (readFile)
 import Semantic.IO
 import System.Exit (ExitCode(..))
-import System.IO (IOMode(..), openFile)
+import System.IO (IOMode(..))
 
 import SpecHelpers
 
@@ -43,7 +43,7 @@ spec = parallel $ do
 
 
     it "returns blobs for unsupported language" $ do
-      h <- openFile "test/fixtures/cli/diff-unsupported-language.json" ReadMode
+      h <- openFileForReading "test/fixtures/cli/diff-unsupported-language.json"
       blobs <- readBlobPairsFromHandle h
       let b' = sourceBlob "test.kt" Nothing "fun main(args: Array<String>) {\nprintln(\"hi\")\n}\n"
       blobs `shouldBe` [blobPairInserting b']
@@ -53,29 +53,29 @@ spec = parallel $ do
       blobs `shouldBe` [blobPairDiffing a b]
 
     it "throws on blank input" $ do
-      h <- openFile "test/fixtures/cli/blank.json" ReadMode
+      h <- openFileForReading "test/fixtures/cli/blank.json"
       readBlobPairsFromHandle h `shouldThrow` (== ExitFailure 1)
 
     it "throws if language field not given" $ do
-      h <- openFile "test/fixtures/cli/diff-no-language.json" ReadMode
+      h <- openFileForReading "test/fixtures/cli/diff-no-language.json"
       readBlobsFromHandle h `shouldThrow` (== ExitFailure 1)
 
     it "throws if null on before and after" $ do
-      h <- openFile "test/fixtures/cli/diff-null-both-sides.json" ReadMode
+      h <- openFileForReading "test/fixtures/cli/diff-null-both-sides.json"
       readBlobPairsFromHandle h `shouldThrow` (== ExitFailure 1)
 
   describe "readBlobsFromHandle" $ do
     it "returns blobs for valid JSON encoded parse input" $ do
-      h <- openFile "test/fixtures/cli/parse.json" ReadMode
+      h <- openFileForReading "test/fixtures/cli/parse.json"
       blobs <- readBlobsFromHandle h
       let a = sourceBlob "method.rb" (Just Ruby) "def foo; end"
       blobs `shouldBe` [a]
 
     it "throws on blank input" $ do
-      h <- openFile "test/fixtures/cli/blank.json" ReadMode
+      h <- openFileForReading "test/fixtures/cli/blank.json"
       readBlobsFromHandle h `shouldThrow` (== ExitFailure 1)
 
   where blobsFromFilePath path = do
-          h <- openFile path ReadMode
+          h <- openFileForReading path
           blobs <- readBlobPairsFromHandle h
           pure blobs
