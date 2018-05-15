@@ -1,4 +1,4 @@
-{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, UndecidableInstances #-}
 module Data.Abstract.Declarations  where
 
 import Data.Abstract.FreeVariables
@@ -18,8 +18,7 @@ class Declarations1 syntax where
 instance Declarations t => Declarations (Subterm t a) where
   declaredName = declaredName . subterm
 
-instance (FreeVariables1 syntax, Declarations1 syntax, Functor syntax) => Declarations (Term syntax ann) where
-  declaredName = liftDeclaredName freeVariables . termOut
+deriving instance (Declarations1 syntax, FreeVariables1 syntax) => Declarations (Term syntax ann)
 
 instance (FreeVariables recur, Declarations1 syntax) => Declarations (TermF syntax ann recur) where
   declaredName = liftDeclaredName freeVariables . termFOut
