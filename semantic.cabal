@@ -45,8 +45,6 @@ library
                      , Control.Abstract.Modules
                      , Control.Abstract.Roots
                      , Control.Abstract.Value
-                     -- Control flow
-                     , Control.Effect
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
                      , Data.Abstract.Cache
@@ -58,7 +56,6 @@ library
                      , Data.Abstract.FreeVariables
                      , Data.Abstract.Heap
                      , Data.Abstract.Live
-                     , Data.Abstract.Located
                      , Data.Abstract.Module
                      , Data.Abstract.ModuleTable
                      , Data.Abstract.Number

@@ -6,7 +6,7 @@ import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Evaluating as X
 import           Control.Abstract.Evaluator
-import           Control.Effect (runPrintingTraces)
+import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Value
@@ -29,7 +29,7 @@ justEvaluating
   = runM
   . fmap (first reassociate)
   . evaluating
-  . runPrintingTraces
+  . runPrintingTrace
   . runLoadError
   . runValueError
   . runUnspecialized
@@ -42,7 +42,7 @@ justEvaluating
 evaluatingWithHoles
   = runM
   . evaluating
-  . runPrintingTraces
+  . runPrintingTrace
   . resumingLoadError
   . resumingUnspecialized
   . resumingValueError
@@ -57,7 +57,7 @@ checking
   = runM
   . fmap (first reassociate)
   . evaluating
-  . runPrintingTraces
+  . runPrintingTrace
   . providingLiveSet
   . runLoadError
   . runUnspecialized

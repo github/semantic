@@ -1,7 +1,6 @@
 {-# LANGUAGE DeriveAnyClass #-}
 module Language.TypeScript.Syntax where
 
-import           Data.Abstract.Address
 import qualified Data.Abstract.Environment as Env
 import qualified Data.Abstract.FreeVariables as FV
 import           Data.Abstract.Evaluatable
@@ -124,7 +123,7 @@ evalRequire :: ( AbstractValue location value effects
                           , Reader (Environment location value)
                           , State (Environment location value)
                           , State (Exports location value)
-                          , State (Heap location value)
+                          , State (Heap location (Cell location) value)
                           , Trace
                           ] effects
                , Reducer value (Cell location value)

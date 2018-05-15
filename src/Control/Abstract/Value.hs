@@ -183,7 +183,7 @@ doWhile body cond = loop $ \ continue -> body *> do
 
 makeNamespace :: ( AbstractValue location value effects
                  , Member (State (Environment location value)) effects
-                 , Member (State (Heap location value)) effects
+                 , Member (State (Heap location (Cell location) value)) effects
                  , Ord location
                  , Reducer value (Cell location value)
                  )

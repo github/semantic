@@ -69,34 +69,34 @@ runModules :: forall term location value effects a
            -> Evaluator location value (Reader (ModuleTable [Module term]) ': effects) a
 runModules evaluateModule = go
   where go :: forall a . Evaluator location value (Modules location value ': effects) a -> Evaluator location value (Reader (ModuleTable [Module term]) ': effects) a
-        go = reinterpretEffect (\ m -> case m of
+        go = reinterpret (\ m -> case m of
           Load name -> askModuleTable @term >>= maybe (moduleNotFound name) (runMerging . foldMap (Merging . evalAndCache)) . ModuleTable.lookup name
             where
               evalAndCache x = do
                 let mPath = modulePath (moduleInfo x)
                 loading <- loadingModule mPath
                 if loading
-                  then traceE ("load (skip evaluating, circular load): " <> show mPath) $> Nothing
+                  then trace ("load (skip evaluating, circular load): " <> show mPath) $> Nothing
                   else do
                     _ <- cacheModule name Nothing
-                    result <- traceE ("load (evaluating): " <> show mPath) *> go (evaluateModule x) <* traceE ("load done:" <> show mPath)
+                    result <- trace ("load (evaluating): " <> show mPath) *> go (evaluateModule x) <* trace ("load done:" <> show mPath)
                     cacheModule name (Just result)
 
               loadingModule path = isJust . ModuleTable.lookup path <$> getModuleTable
-          Lookup path -> ModuleTable.lookup path <$> raise get
+          Lookup path -> ModuleTable.lookup path <$> get
           Resolve names -> do
             isMember <- flip ModuleTable.member <$> askModuleTable @term
             pure (find isMember names)
           List dir -> modulePathsInDir dir <$> askModuleTable @term)
 
 getModuleTable :: Member (State (ModuleTable (Maybe (Environment location value, value)))) effects => Evaluator location value effects (ModuleTable (Maybe (Environment location value, value)))
-getModuleTable = raise get
+getModuleTable = get
 
 cacheModule :: Member (State (ModuleTable (Maybe (Environment location value, value)))) effects => ModulePath -> Maybe (Environment location value, value) -> Evaluator location value effects (Maybe (Environment location value, value))
-cacheModule path result = raise (modify' (ModuleTable.insert path result)) $> result
+cacheModule path result = modify' (ModuleTable.insert path result) $> result
 
 askModuleTable :: Member (Reader (ModuleTable [Module term])) effects => Evaluator location value effects (ModuleTable [Module term])
-askModuleTable = raise ask
+askModuleTable = ask
 
 
 newtype Merging m location value = Merging { runMerging :: m (Maybe (Environment location value, value)) }
@@ -126,10 +126,10 @@ moduleNotFound :: Member (Resumable (LoadError location value)) effects => Modul
 moduleNotFound = throwResumable . ModuleNotFound
 
 resumeLoadError :: Member (Resumable (LoadError location value)) effects => Evaluator location value effects a -> (forall resume . LoadError location value resume -> Evaluator location value effects resume) -> Evaluator location value effects a
-resumeLoadError = resume
+resumeLoadError = catchResumable
 
 runLoadError :: Evaluator location value (Resumable (LoadError location value) ': effects) a -> Evaluator location value effects (Either (SomeExc (LoadError location value)) a)
-runLoadError = raiseHandler runError
+runLoadError = runResumable
 
 runLoadErrorWith :: (forall resume . LoadError location value resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (LoadError location value) ': effects) a -> Evaluator location value effects a
 runLoadErrorWith = runResumableWith
@@ -153,7 +153,7 @@ instance Eq1 ResolutionError where
   liftEq _ _ _ = False
 
 runResolutionError :: Effectful m => m (Resumable ResolutionError ': effects) a -> m effects (Either (SomeExc ResolutionError) a)
-runResolutionError = raiseHandler runError
+runResolutionError = runResumable
 
 runResolutionErrorWith :: Effectful m => (forall resume . ResolutionError resume -> m effects resume) -> m (Resumable ResolutionError ': effects) a -> m effects a
 runResolutionErrorWith = runResumableWith

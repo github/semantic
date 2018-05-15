@@ -1,10 +1,10 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Addressable where
 
+import Control.Abstract.Context
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
-import Control.Monad.Effect.Resumable as Eff
 import Data.Abstract.Address
 import Data.Abstract.Environment (insert)
 import Data.Abstract.FreeVariables
@@ -31,7 +31,7 @@ lookupOrAlloc name = lookupEnv name >>= maybe (alloc name) pure
 letrec :: ( Addressable location effects
           , Members '[ Reader (Environment location value)
                      , State (Environment location value)
-                     , State (Heap location value)
+                     , State (Heap location (Cell location) value)
                      ] effects
           , Reducer value (Cell location value)
           )
@@ -65,29 +65,38 @@ variable :: ( Addressable location effects
                        , Resumable (AddressError location value)
                        , Resumable (EnvironmentError value)
                        , State (Environment location value)
-                       , State (Heap location value)
+                       , State (Heap location (Cell location) value)
                        ] effects
             )
          => Name
          -> Evaluator location value effects value
 variable name = lookupEnv name >>= maybe (freeVariableError name) deref
 
-
 -- Instances
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
 instance Member Fresh effects => Addressable Precise effects where
   derefCell _ = pure . unLatest
-  allocLoc _ = Precise <$> raise fresh
+  allocLoc _ = Precise <$> fresh
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
-instance Members '[Fresh, NonDet] effects => Addressable Monovariant effects where
+instance Member NonDet effects => Addressable Monovariant effects where
   derefCell _ cell | null cell = pure Nothing
-                   | otherwise = Just <$> foldMapA pure cell
+                   | otherwise = foldMapA (pure . Just) cell
   allocLoc = pure . Monovariant
 
+instance ( Addressable location effects
+         , Members '[ Reader ModuleInfo
+                    , Reader PackageInfo
+                    ] effects
+         )
+      => Addressable (Located location) effects where
+  derefCell (Address (Located loc _ _)) = raiseEff . lowerEff . derefCell (Address loc)
+
+  allocLoc name = raiseEff (lowerEff (Located <$> allocLoc name <*> currentPackage <*> currentModule))
+
 -- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
-deref :: (Addressable location effects, Members '[Resumable (AddressError location value), State (Heap location value)] effects) => Address location value -> Evaluator location value effects value
+deref :: (Addressable location effects, Members '[Resumable (AddressError location value), State (Heap location (Cell location) value)] effects) => Address location value -> Evaluator location value effects value
 deref addr = do
   cell <- lookupHeap addr >>= maybeM (throwAddressError (UnallocatedAddress addr))
   derefed <- derefCell addr cell
@@ -111,10 +120,10 @@ instance Eq location => Eq1 (AddressError location value) where
 
 
 throwAddressError :: Member (Resumable (AddressError location value)) effects => AddressError location value resume -> Evaluator location value effects resume
-throwAddressError = raise . Eff.throwError
+throwAddressError = throwResumable
 
 runAddressError :: Evaluator location value (Resumable (AddressError location value) ': effects) a -> Evaluator location value effects (Either (SomeExc (AddressError location value)) a)
-runAddressError = raiseHandler runError
+runAddressError = runResumable
 
 runAddressErrorWith :: (forall resume . AddressError location value resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (AddressError location value) ': effects) a -> Evaluator location value effects a
 runAddressErrorWith = runResumableWith

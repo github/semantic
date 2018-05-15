@@ -99,7 +99,7 @@ instance Evaluatable Load where
     path <- subtermValue x >>= asString
     shouldWrap <- subtermValue wrap >>= asBool
     doLoad path shouldWrap
-  eval (Load _) = raise (fail "invalid argument supplied to load, path is required")
+  eval (Load _) = raiseEff (fail "invalid argument supplied to load, path is required")
 
 doLoad :: ( AbstractValue location value effects
           , Members '[ Modules location value

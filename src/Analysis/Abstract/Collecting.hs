@@ -5,7 +5,6 @@ module Analysis.Abstract.Collecting
 ) where
 
 import Control.Abstract
-import Data.Abstract.Address
 import Data.Abstract.Heap
 import Data.Abstract.Live
 import Data.Semilattice.Lower
@@ -14,7 +13,7 @@ import Prologue
 -- | An analysis performing GC after every instruction.
 collectingTerms :: ( Foldable (Cell location)
                    , Members '[ Reader (Live location value)
-                              , State (Heap location value)
+                              , State (Heap location (Cell location) value)
                               ] effects
                    , Ord location
                    , ValueRoots location value
@@ -31,9 +30,9 @@ gc :: ( Ord location
       , Foldable (Cell location)
       , ValueRoots location value
       )
-   => Live location value -- ^ The set of addresses to consider rooted.
-   -> Heap location value -- ^ A heap to collect unreachable addresses within.
-   -> Heap location value -- ^ A garbage-collected heap.
+   => Live location value                 -- ^ The set of addresses to consider rooted.
+   -> Heap location (Cell location) value -- ^ A heap to collect unreachable addresses within.
+   -> Heap location (Cell location) value -- ^ A garbage-collected heap.
 gc roots heap = heapRestrict heap (reachable roots heap)
 
 -- | Compute the set of addresses reachable from a given root set in a given heap.
@@ -41,9 +40,9 @@ reachable :: ( Ord location
              , Foldable (Cell location)
              , ValueRoots location value
              )
-          => Live location value -- ^ The set of root addresses.
-          -> Heap location value -- ^ The heap to trace addresses through.
-          -> Live location value -- ^ The set of addresses reachable from the root set.
+          => Live location value                 -- ^ The set of root addresses.
+          -> Heap location (Cell location) value -- ^ The heap to trace addresses through.
+          -> Live location value                 -- ^ The set of addresses reachable from the root set.
 reachable roots heap = go mempty roots
   where go seen set = case liveSplit set of
           Nothing -> seen

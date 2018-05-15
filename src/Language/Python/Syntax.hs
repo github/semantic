@@ -75,7 +75,7 @@ resolvePythonModules q = do
     moduleNames (RelativeQualifiedName _ (Just paths)) = moduleNames paths
 
     search rootDir x = do
-      traceE ("searching for " <> show x <> " in " <> show rootDir)
+      trace ("searching for " <> show x <> " in " <> show rootDir)
       let path = normalise (rootDir </> normalise x)
       let searchPaths = [ path </> "__init__.py"
                         , path <.> ".py"
@@ -124,7 +124,7 @@ instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
 
 -- import a.b.c
 instance Evaluatable QualifiedImport where
-  eval (QualifiedImport (RelativeQualifiedName _ _))        = raise (fail "technically this is not allowed in python")
+  eval (QualifiedImport (RelativeQualifiedName _ _))        = raiseEff (fail "technically this is not allowed in python")
   eval (QualifiedImport name@(QualifiedName qualifiedName)) = do
     modulePaths <- resolvePythonModules name
     go (NonEmpty.zip (FV.name . BC.pack <$> qualifiedName) modulePaths)
