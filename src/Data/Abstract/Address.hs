@@ -34,14 +34,14 @@ instance Location Precise where
 
 
 -- | 'Monovariant' models using one address for a particular name. It trackes the set of values that a particular address takes and uses it's name to lookup in the store and only allocation if new.
-newtype Monovariant = Monovariant Name
+newtype Monovariant = Monovariant { unMonovariant :: Name }
   deriving (Eq, Ord)
 
 instance Location Monovariant where
   type Cell Monovariant = Set
 
 instance Show Monovariant where
-  showsPrec d (Monovariant name) = showsUnaryWith showsPrec "Monovariant" d (unName name)
+  showsPrec d = showsUnaryWith showsPrec "Monovariant" d . unName . unMonovariant
 
 
 data Located location = Located
