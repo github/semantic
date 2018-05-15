@@ -87,8 +87,8 @@ parseModule parser rootDir file = do
 withTermSpans :: ( HasField fields Span
                  , Member (Reader Span) effects
                  )
-              => SubtermAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (TermEvaluator term location value effects a)
-              -> SubtermAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (TermEvaluator term location value effects a)
+              => SubtermAlgebra (TermF syntax (Record fields)) term (TermEvaluator term location value effects a)
+              -> SubtermAlgebra (TermF syntax (Record fields)) term (TermEvaluator term location value effects a)
 withTermSpans recur term = withCurrentSpan (getField (termFAnnotation term)) (recur term)
 
 resumingResolutionError :: (Applicative (m effects), Effectful m, Member Trace effects) => m (Resumable ResolutionError ': effects) a -> m effects a
