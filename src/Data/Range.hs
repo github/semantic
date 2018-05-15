@@ -14,7 +14,7 @@ import Prologue
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: {-# UNPACK #-} !Int, end :: {-# UNPACK #-} !Int }
-  deriving (Eq)
+  deriving (Eq, Show)
 
 emptyRange :: Range
 emptyRange = Range 0 0
@@ -55,6 +55,3 @@ instance ToJSONFields Range where
 
 instance Lower Range where
   lowerBound = Range 0 0
-
-instance Show Range where
-  showsPrec d Range{..} = showsBinaryWith showsPrec showsPrec "Range" d start end
