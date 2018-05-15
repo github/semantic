@@ -25,9 +25,8 @@ diffTerms t1 t2 = stripDiff (fromMaybe (replacing t1' t2') (runAlgorithm (diff t
 
 -- | Diff a 'These' of terms.
 diffTermPair :: (Diffable syntax, Eq1 syntax, GAlign syntax, Show1 syntax, Traversable syntax) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Diff syntax (Record fields1) (Record fields2)
-diffTermPair (This  t1   ) = deleting t1
-diffTermPair (That     t2) = inserting t2
-diffTermPair (These t1 t2) = diffTerms t1 t2
+diffTermPair = these deleting inserting diffTerms
+
 
 -- | Run an 'Algorithm' to completion in an 'Alternative' context using the supplied comparability & equivalence relations.
 runAlgorithm :: forall syntax fields1 fields2 m result
