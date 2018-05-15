@@ -1,7 +1,6 @@
 {-# LANGUAGE RankNTypes, ScopedTypeVariables, TypeFamilies, TypeOperators, UndecidableInstances #-}
 module Rendering.Symbol
-( renderSymbolTerms
-, renderToSymbols
+( renderToSymbols
 , renderToTags
 , SymbolFields(..)
 , defaultSymbolFields
@@ -15,7 +14,6 @@ import Data.Record
 import Data.Span
 import Data.Term
 import qualified Data.Text as T
-import qualified Data.Map as Map
 import Rendering.TOC
 
 
@@ -30,10 +28,6 @@ renderToTags Blob{..} = fmap toJSON . termToC blobPath
     termToC :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => FilePath -> Term f (Record fields) -> [Symbol]
     termToC path = mapMaybe (symbolSummary defaultTagSymbolFields path "unchanged") . termTableOfContentsBy declaration
 
-
--- | Render terms to final JSON structure.
-renderSymbolTerms :: [Value] -> Map.Map T.Text Value
-renderSymbolTerms = Map.singleton "files" . toJSON
 
 -- | Render a 'Term' to a list of symbols (See 'Symbol').
 renderToSymbols :: (HasField fields (Maybe Declaration), HasField fields Span, Foldable f, Functor f) => SymbolFields -> Blob -> Term f (Record fields) -> [Value]

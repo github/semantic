@@ -1,17 +1,16 @@
-{-# LANGUAGE ConstraintKinds, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeOperators, UndecidableInstances #-}
+{-# LANGUAGE ConstraintKinds, GADTs, GeneralizedNewtypeDeriving, ScopedTypeVariables, TypeOperators #-}
 module Semantic.Task
 ( Task
 , TaskEff
 , WrappedTask(..)
 , Level(..)
 , RAlgebra
-, Differ
 -- * I/O
 , IO.readBlob
 , IO.readBlobs
 , IO.readBlobPairs
 , IO.readProject
-, IO.writeToOutput
+, IO.write
 -- * Telemetry
 , writeLog
 , writeStat
@@ -22,6 +21,7 @@ module Semantic.Task
 , decorate
 , diff
 , render
+, serialize
 -- * Concurrency
 , distribute
 , distributeFor
@@ -52,11 +52,14 @@ import           Control.Monad.Effect.Exception
 import           Control.Monad.Effect.Reader
 import           Control.Monad.Effect.Trace
 import           Data.Blob
+import           Data.ByteString.Builder
 import           Data.Diff
 import qualified Data.Error as Error
 import           Data.Record
 import qualified Data.Syntax as Syntax
 import           Data.Term
+import           Diffing.Algorithm (Diffable)
+import           Diffing.Interpreter
 import           Parsing.CMark
 import           Parsing.Parser
 import           Parsing.TreeSitter
@@ -67,6 +70,7 @@ import           Semantic.Log
 import           Semantic.Queue
 import           Semantic.Stat as Stat
 import           Semantic.Telemetry
+import           Serializing.Format hiding (Options)
 import           System.Exit (die)
 import           System.IO (stderr)
 
@@ -84,9 +88,6 @@ type TaskEff = Eff '[Distribute WrappedTask
 newtype WrappedTask a = WrapTask { unwrapTask :: TaskEff a }
   deriving (Applicative, Functor, Monad)
 
--- | A function to compute the 'Diff' for a pair of 'Term's with arbitrary syntax functor & annotation types.
-type Differ syntax ann1 ann2 = Term syntax ann1 -> Term syntax ann2 -> Diff syntax ann1 ann2
-
 -- | A function to render terms or diffs.
 type Renderer i o = i -> o
 
@@ -103,12 +104,15 @@ decorate :: (Functor f, Member Task effs) => RAlgebra (TermF f (Record fields)) 
 decorate algebra = send . Decorate algebra
 
 -- | A task which diffs a pair of terms using the supplied 'Differ' function.
-diff :: Member Task effs => Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Eff effs (Diff syntax ann1 ann2)
-diff differ term1 term2 = send (Semantic.Task.Diff differ term1 term2)
+diff :: (Diffable syntax, Eq1 syntax, GAlign syntax, Show1 syntax, Traversable syntax, Member Task effs) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Eff effs (Diff syntax (Record fields1) (Record fields2))
+diff terms = send (Semantic.Task.Diff terms)
 
 -- | A task which renders some input using the supplied 'Renderer' function.
 render :: Member Task effs => Renderer input output -> input -> Eff effs output
 render renderer = send . Render renderer
+
+serialize :: Member Task effs => Format input -> input -> Eff effs Builder
+serialize format = send . Serialize format
 
 -- | Execute a 'Task' with the 'defaultOptions', yielding its result value in 'IO'.
 --
@@ -140,11 +144,12 @@ runTraceInTelemetry = interpret (\ (Trace str) -> writeLog Debug str [])
 
 -- | An effect describing high-level tasks to be performed.
 data Task output where
-  Parse    :: Parser term -> Blob -> Task term
-  Analyze  :: (Analysis.Evaluator location value effects a -> result) -> Analysis.Evaluator location value effects a -> Task result
-  Decorate :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
-  Diff     :: Differ syntax ann1 ann2 -> Term syntax ann1 -> Term syntax ann2 -> Task (Diff syntax ann1 ann2)
-  Render   :: Renderer input output -> input -> Task output
+  Parse     :: Parser term -> Blob -> Task term
+  Analyze   :: (Analysis.Evaluator location value effects a -> result) -> Analysis.Evaluator location value effects a -> Task result
+  Decorate  :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
+  Diff      :: (Diffable syntax, Eq1 syntax, GAlign syntax, Show1 syntax, Traversable syntax) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Task (Diff syntax (Record fields1) (Record fields2))
+  Render    :: Renderer input output -> input -> Task output
+  Serialize :: Format input -> input -> Task Builder
 
 -- | Run a 'Task' effect by performing the actions in 'IO'.
 runTaskF :: Members '[Reader Options, Telemetry, Exc SomeException, Trace, IO] effs => Eff (Task ': effs) a -> Eff effs a
@@ -152,8 +157,9 @@ runTaskF = interpret $ \ task -> case task of
   Parse parser blob -> runParser blob parser
   Analyze interpret analysis -> pure (interpret analysis)
   Decorate algebra term -> pure (decoratorWithAlgebra algebra term)
-  Semantic.Task.Diff differ term1 term2 -> pure (differ term1 term2)
+  Semantic.Task.Diff terms -> pure (diffTermPair terms)
   Render renderer input -> pure (renderer input)
+  Serialize format input -> pure (runSerialize format input)
 
 
 -- | Log an 'Error.Error' at the specified 'Level'.
@@ -193,6 +199,7 @@ runParser blob@Blob{..} parser = case parser of
     time "parse.cmark_parse" languageTag $
       let term = cmarkParser blobSource
       in length term `seq` pure term
+  SomeParser parser -> SomeTerm <$> runParser blob parser
   where blobFields = ("path", blobPath) : languageTag
         languageTag = maybe [] (pure . (,) ("language" :: String) . show) blobLanguage
         errors :: (Syntax.Error :< fs, Apply Foldable fs, Apply Functor fs) => Term (Sum fs) (Record Assignment.Location) -> [Error.Error String]
