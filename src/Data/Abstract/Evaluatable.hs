@@ -135,10 +135,10 @@ deriving instance Show (Unspecialized a b)
 instance Show1 (Unspecialized a) where
   liftShowsPrec _ _ = showsPrec
 
-runUnspecialized :: Evaluator location value (Resumable (Unspecialized value) ': effects) a -> Evaluator location value effects (Either (SomeExc (Unspecialized value)) a)
+runUnspecialized :: Effectful (m location value) => m location value (Resumable (Unspecialized value) ': effects) a -> m location value effects (Either (SomeExc (Unspecialized value)) a)
 runUnspecialized = runResumable
 
-runUnspecializedWith :: (forall resume . Unspecialized value resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (Unspecialized value) ': effects) a -> Evaluator location value effects a
+runUnspecializedWith :: Effectful (m location value) => (forall resume . Unspecialized value resume -> m location value effects resume) -> m location value (Resumable (Unspecialized value) ': effects) a -> m location value effects a
 runUnspecializedWith = runResumableWith
 
 
