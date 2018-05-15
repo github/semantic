@@ -1,53 +1,33 @@
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE GADTs, RankNTypes #-}
 module Semantic.Parse where
 
 import Analysis.ConstructorName (ConstructorName, constructorLabel)
 import Analysis.IdentifierName (IdentifierName, identifierLabel)
 import Analysis.Declaration (HasDeclaration, declarationAlgebra)
 import Analysis.PackageDef (HasPackageDef, packageDefAlgebra)
+import Data.AST
 import Data.Blob
 import Data.JSON.Fields
-import Data.Output
 import Data.Record
+import Data.Term
 import Parsing.Parser
 import Prologue hiding (MonadError(..))
+import Rendering.Graph
 import Rendering.Renderer
-import Semantic.IO (NoLanguageForBlob(..), FormatNotSupported(..))
+import Semantic.IO (noLanguageForBlob)
 import Semantic.Task
+import Serializing.Format
 
-parseBlobs :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Output output) => TermRenderer output -> [Blob] -> Eff effs ByteString
-parseBlobs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . parseBlob renderer) blobs
-  where toOutput' = case renderer of
-          JSONTermRenderer -> toOutput . renderJSONTerms
-          SymbolsTermRenderer _ -> toOutput . renderSymbolTerms
-          _ -> toOutput
+runParse :: Members '[Distribute WrappedTask, Task, Exc SomeException] effs => TermRenderer output -> [Blob] -> Eff effs Builder
+runParse JSONTermRenderer             = withParsedBlobs (\ blob -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)) >=> serialize JSON
+runParse SExpressionTermRenderer      = withParsedBlobs (const (serialize (SExpression ByConstructorName)))
+runParse TagsTermRenderer             = withParsedBlobs (\ blob -> decorate (declarationAlgebra blob) >=> render (renderToTags blob)) >=> serialize JSON
+runParse ImportsTermRenderer          = withParsedBlobs (\ blob -> decorate (declarationAlgebra blob) >=> decorate (packageDefAlgebra blob) >=> render (renderToImports blob)) >=> serialize JSON
+runParse (SymbolsTermRenderer fields) = withParsedBlobs (\ blob -> decorate (declarationAlgebra blob) >=> render (renderSymbolTerms . renderToSymbols fields blob)) >=> serialize JSON
+runParse DOTTermRenderer              = withParsedBlobs (const (render renderTreeGraph)) >=> serialize (DOT (termStyle "terms"))
 
--- | A task to parse a 'Blob' and render the resulting 'Term'.
-parseBlob :: Members '[Task, Exc SomeException] effs => TermRenderer output -> Blob -> Eff effs output
-parseBlob renderer blob@Blob{..}
-  | Just (SomeParser parser) <- someParser (Proxy :: Proxy '[ConstructorName, HasPackageDef, HasDeclaration, IdentifierName, Foldable, Functor, ToJSONFields1]) <$> blobLanguage
-  = parse parser blob >>= case renderer of
-    JSONTermRenderer           -> decorate constructorLabel >=> decorate identifierLabel >=> render (renderJSONTerm blob)
-    SExpressionTermRenderer    -> decorate constructorLabel . (Nil <$)                   >=> render renderSExpressionTerm
-    TagsTermRenderer           -> decorate (declarationAlgebra blob)                     >=> render (renderToTags blob)
-    ImportsTermRenderer        -> decorate (declarationAlgebra blob) >=> decorate (packageDefAlgebra blob) >=> render (renderToImports blob)
-    SymbolsTermRenderer fields -> decorate (declarationAlgebra blob)                     >=> render (renderToSymbols fields blob)
-    DOTTermRenderer            ->                                                            render (renderDOTTerm blob)
-  | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
+withParsedBlobs :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Monoid output) => (forall syntax . (ConstructorName syntax, HasPackageDef syntax, HasDeclaration syntax, IdentifierName syntax, Foldable syntax, Functor syntax, ToJSONFields1 syntax) => Blob -> Term syntax (Record Location) -> TaskEff output) -> [Blob] -> Eff effs output
+withParsedBlobs render = distributeFoldMap (\ blob -> WrapTask (parseSomeBlob blob >>= withSomeTerm (render blob)))
 
-
-astParseBlobs :: (Members '[Distribute WrappedTask, Task, Exc SomeException] effs, Output output) => TermRenderer output -> [Blob] -> Eff effs ByteString
-astParseBlobs renderer blobs = toOutput' <$> distributeFoldMap (WrapTask . astParseBlob renderer) blobs
-  where
-    toOutput' = case renderer of
-      JSONTermRenderer -> toOutput . renderJSONTerms
-      _ -> toOutput
-
-    astParseBlob :: Members '[Task, Exc SomeException] effs => TermRenderer output -> Blob -> Eff effs output
-    astParseBlob renderer blob@Blob{..}
-      | Just (SomeASTParser parser) <- someASTParser <$> blobLanguage
-      = parse parser blob >>= case renderer of
-        SExpressionTermRenderer    -> render renderSExpressionAST
-        JSONTermRenderer           -> render (renderJSONTerm' blob)
-        _                          -> pure $ throwError (SomeException (FormatNotSupported "Only SExpression and JSON output supported for tree-sitter ASTs."))
-      | otherwise = throwError (SomeException (NoLanguageForBlob blobPath))
+parseSomeBlob :: Members '[Task, Exc SomeException] effs => Blob -> Eff effs (SomeTerm '[ConstructorName, HasPackageDef, HasDeclaration, IdentifierName, Foldable, Functor, ToJSONFields1] (Record Location))
+parseSomeBlob blob@Blob{..} = maybe (noLanguageForBlob blobPath) (flip parse blob . someParser) blobLanguage
