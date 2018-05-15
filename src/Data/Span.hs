@@ -41,7 +41,7 @@ data Span = Span
   { spanStart :: Pos
   , spanEnd   :: Pos
   }
-  deriving (Show, Eq, Ord)
+  deriving (Eq, Ord)
 
 spanFromSrcLoc :: SrcLoc -> Span
 spanFromSrcLoc = Span . (Pos . srcLocStartLine <*> srcLocStartCol) <*> (Pos . srcLocEndLine <*> srcLocEndCol)
@@ -69,3 +69,6 @@ instance ToJSONFields Span where
 
 instance Lower Span where
   lowerBound = Span (Pos 1 1) (Pos 1 1)
+
+instance Show Span where
+  showsPrec d Span{..} = showsBinaryWith showsPrec showsPrec "Span" d spanStart spanEnd
