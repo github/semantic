@@ -12,8 +12,7 @@ module SpecHelpers
 
 import Analysis.Abstract.Evaluating
 import Analysis.Abstract.Evaluating as X (EvaluatingState(..))
-import Control.Abstract.Addressable
-import Control.Abstract.Value
+import Control.Abstract
 import Control.Arrow ((&&&))
 import Control.Monad.Effect.Trace as X (runIgnoringTrace, runReturningTrace)
 import Control.Monad ((>=>))
@@ -85,6 +84,7 @@ testEvaluating
   . runEvalError
   . runAddressError
   . constrainedToValuePrecise
+  . runTermEvaluator
 
 deNamespace :: Value Precise -> Maybe (Name, [Name])
 deNamespace = fmap (namespaceName &&& Env.names . namespaceScope) . prjValue @(Namespace Precise)
