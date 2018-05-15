@@ -6,7 +6,7 @@ module Analysis.Abstract.Dead
 , providingDeadSet
 ) where
 
-import Control.Abstract.Evaluator
+import Control.Abstract
 import Data.Abstract.Module
 import Data.Semigroup.Reducer as Reducer
 import Data.Semilattice.Lower
@@ -20,11 +20,11 @@ newtype Dead term = Dead { unDead :: Set term }
 deriving instance Ord term => Reducer term (Dead term)
 
 -- | Update the current 'Dead' set.
-killAll :: Member (State (Dead term)) effects => Dead term -> Evaluator location value effects ()
+killAll :: Member (State (Dead term)) effects => Dead term -> TermEvaluator term location value effects ()
 killAll = put
 
 -- | Revive a single term, removing it from the current 'Dead' set.
-revive :: (Member (State (Dead term)) effects, Ord term) => term -> Evaluator location value effects ()
+revive :: (Member (State (Dead term)) effects, Ord term) => term -> TermEvaluator term location value effects ()
 revive t = modify' (Dead . delete t . unDead)
 
 -- | Compute the set of all subterms recursively.
@@ -36,8 +36,8 @@ revivingTerms :: ( Corecursive term
                  , Member (State (Dead term)) effects
                  , Ord term
                  )
-              => SubtermAlgebra (Base term) term (Evaluator location value effects a)
-              -> SubtermAlgebra (Base term) term (Evaluator location value effects a)
+              => SubtermAlgebra (Base term) term (TermEvaluator term location value effects a)
+              -> SubtermAlgebra (Base term) term (TermEvaluator term location value effects a)
 revivingTerms recur term = revive (embedSubterm term) *> recur term
 
 killingModules :: ( Foldable (Base term)
@@ -45,9 +45,9 @@ killingModules :: ( Foldable (Base term)
                   , Ord term
                   , Recursive term
                   )
-               => SubtermAlgebra Module term (Evaluator location value effects a)
-               -> SubtermAlgebra Module term (Evaluator location value effects a)
+               => SubtermAlgebra Module term (TermEvaluator term location value effects a)
+               -> SubtermAlgebra Module term (TermEvaluator term location value effects a)
 killingModules recur m = killAll (subterms (subterm (moduleBody m))) *> recur m
 
-providingDeadSet :: Evaluator location value (State (Dead term) ': effects) a -> Evaluator location value effects (a, Dead term)
+providingDeadSet :: TermEvaluator term location value (State (Dead term) ': effects) a -> TermEvaluator term location value effects (a, Dead term)
 providingDeadSet = runState lowerBound

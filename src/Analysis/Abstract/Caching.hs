@@ -1,4 +1,4 @@
-{-# LANGUAGE GADTs, ScopedTypeVariables, TypeOperators #-}
+{-# LANGUAGE GADTs, TypeOperators #-}
 module Analysis.Abstract.Caching
 ( cachingTerms
 , convergingModules
@@ -12,31 +12,31 @@ import Data.Semilattice.Lower
 import Prologue
 
 -- | Look up the set of values for a given configuration in the in-cache.
-consultOracle :: (Cacheable term location (Cell location) value, Member (Reader (Cache term location (Cell location) value)) effects) => Configuration term location (Cell location) value -> Evaluator location value effects (Set (value, Heap location (Cell location) value))
+consultOracle :: (Cacheable term location (Cell location) value, Member (Reader (Cache term location (Cell location) value)) effects) => Configuration term location (Cell location) value -> TermEvaluator term location value effects (Set (value, Heap location (Cell location) value))
 consultOracle configuration = fromMaybe mempty . cacheLookup configuration <$> ask
 
 -- | Run an action with the given in-cache.
-withOracle :: Member (Reader (Cache term location (Cell location) value)) effects => Cache term location (Cell location) value -> Evaluator location value effects a -> Evaluator location value effects a
+withOracle :: Member (Reader (Cache term location (Cell location) value)) effects => Cache term location (Cell location) value -> TermEvaluator term location value effects a -> TermEvaluator term location value effects a
 withOracle cache = local (const cache)
 
 
 -- | Look up the set of values for a given configuration in the out-cache.
-lookupCache :: (Cacheable term location (Cell location) value, Member (State (Cache term location (Cell location) value)) effects) => Configuration term location (Cell location) value -> Evaluator location value effects (Maybe (Set (value, Heap location (Cell location) value)))
+lookupCache :: (Cacheable term location (Cell location) value, Member (State (Cache term location (Cell location) value)) effects) => Configuration term location (Cell location) value -> TermEvaluator term location value effects (Maybe (Set (value, Heap location (Cell location) value)))
 lookupCache configuration = cacheLookup configuration <$> get
 
 -- | Run an action, caching its result and 'Heap' under the given configuration.
-cachingConfiguration :: (Cacheable term location (Cell location) value, Members '[State (Cache term location (Cell location) value), State (Heap location (Cell location) value)] effects) => Configuration term location (Cell location) value -> Set (value, Heap location (Cell location) value) -> Evaluator location value effects value -> Evaluator location value effects value
+cachingConfiguration :: (Cacheable term location (Cell location) value, Members '[State (Cache term location (Cell location) value), State (Heap location (Cell location) value)] effects) => Configuration term location (Cell location) value -> Set (value, Heap location (Cell location) value) -> TermEvaluator term location value effects value -> TermEvaluator term location value effects value
 cachingConfiguration configuration values action = do
   modify' (cacheSet configuration values)
   result <- (,) <$> action <*> get
   fst result <$ modify' (cacheInsert configuration result)
 
-putCache :: Member (State (Cache term location (Cell location) value)) effects => Cache term location (Cell location) value -> Evaluator location value effects ()
+putCache :: Member (State (Cache term location (Cell location) value)) effects => Cache term location (Cell location) value -> TermEvaluator term location value effects ()
 putCache = put
 
 -- | Run an action starting from an empty out-cache, and return the out-cache afterwards.
-isolateCache :: forall term location value effects a . Member (State (Cache term location (Cell location) value)) effects => Evaluator location value effects a -> Evaluator location value effects (Cache term location (Cell location) value)
-isolateCache action = putCache @term lowerBound *> action *> get
+isolateCache :: Member (State (Cache term location (Cell location) value)) effects => TermEvaluator term location value effects a -> TermEvaluator term location value effects (Cache term location (Cell location) value)
+isolateCache action = putCache lowerBound *> action *> get
 
 
 -- | Analyze a term using the in-cache as an oracle & storing the results of the analysis in the out-cache.
@@ -51,8 +51,8 @@ cachingTerms :: ( Cacheable term location (Cell location) value
                            , State (Heap location (Cell location) value)
                            ] effects
                 )
-             => SubtermAlgebra (Base term) term (Evaluator location value effects value)
-             -> SubtermAlgebra (Base term) term (Evaluator location value effects value)
+             => SubtermAlgebra (Base term) term (TermEvaluator term location value effects value)
+             -> SubtermAlgebra (Base term) term (TermEvaluator term location value effects value)
 cachingTerms recur term = do
   c <- getConfiguration (embedSubterm term)
   cached <- lookupCache c
@@ -72,13 +72,13 @@ convergingModules :: ( Cacheable term location (Cell location) value
                                 , State (Heap location (Cell location) value)
                                 ] effects
                      )
-                  => SubtermAlgebra Module term (Evaluator location value effects value)
-                  -> SubtermAlgebra Module term (Evaluator location value effects value)
+                  => SubtermAlgebra Module term (TermEvaluator term location value effects value)
+                  -> SubtermAlgebra Module term (TermEvaluator term location value effects value)
 convergingModules recur m = do
   c <- getConfiguration (subterm (moduleBody m))
   -- Convergence here is predicated upon an Eq instance, not α-equivalence
   cache <- converge (\ prevCache -> isolateCache $ do
-    putHeap (configurationHeap c)
+    TermEvaluator (putHeap (configurationHeap c))
     -- We need to reset fresh generation so that this invocation converges.
     resetFresh 0 $
     -- This is subtle: though the calling context supports nondeterminism, we want
@@ -106,11 +106,11 @@ converge f = loop
             loop x'
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
-scatter :: (Foldable t, Members '[NonDet, State (Heap location (Cell location) value)] effects) => t (a, Heap location (Cell location) value) -> Evaluator location value effects a
-scatter = foldMapA (\ (value, heap') -> putHeap heap' $> value)
+scatter :: (Foldable t, Members '[NonDet, State (Heap location (Cell location) value)] effects) => t (a, Heap location (Cell location) value) -> TermEvaluator term location value effects a
+scatter = foldMapA (\ (value, heap') -> TermEvaluator (putHeap heap') $> value)
 
 
-caching :: Alternative f => Evaluator location value (NonDet ': Reader (Cache term location (Cell location) value) ': State (Cache term location (Cell location) value) ': effects) a -> Evaluator location value effects (f a, Cache term location (Cell location) value)
+caching :: Alternative f => TermEvaluator term location value (NonDet ': Reader (Cache term location (Cell location) value) ': State (Cache term location (Cell location) value) ': effects) a -> TermEvaluator term location value effects (f a, Cache term location (Cell location) value)
 caching
   = runState lowerBound
   . runReader lowerBound

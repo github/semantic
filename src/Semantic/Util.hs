@@ -6,6 +6,7 @@ import           Analysis.Abstract.Caching
 import           Analysis.Abstract.Collecting
 import           Analysis.Abstract.Evaluating as X
 import           Control.Abstract.Evaluator
+import           Control.Abstract.TermEvaluator
 import           Control.Monad.Effect.Trace (runPrintingTrace)
 import           Data.Abstract.Address
 import           Data.Abstract.Evaluatable
@@ -38,6 +39,7 @@ justEvaluating
   . runEvalError
   . runAddressError
   . constrainedToValuePrecise
+  . runTermEvaluator
 
 evaluatingWithHoles
   = runM
@@ -51,11 +53,13 @@ evaluatingWithHoles
   . resumingResolutionError
   . resumingAddressError @(Value Precise) @Precise
   . constrainedToValuePrecise
+  . runTermEvaluator
 
 checking
   = runM @(Evaluator Monovariant Type) @IO
   . evaluating
   . runPrintingTrace
+  . runTermEvaluator
   . caching @[]
   . providingLiveSet
   . runLoadError
@@ -70,7 +74,7 @@ checking
 constrainedToValuePrecise :: Evaluator Precise (Value Precise) effects a -> Evaluator Precise (Value Precise) effects a
 constrainedToValuePrecise = id
 
-constrainedToTypeMonovariant :: Evaluator Monovariant Type effects a -> Evaluator Monovariant Type effects a
+constrainedToTypeMonovariant :: TermEvaluator term Monovariant Type effects a -> TermEvaluator term Monovariant Type effects a
 constrainedToTypeMonovariant = id
 
 evalGoProject path = justEvaluating =<< evaluateProject goParser Language.Go Nothing path

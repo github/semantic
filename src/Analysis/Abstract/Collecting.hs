@@ -18,12 +18,12 @@ collectingTerms :: ( Foldable (Cell location)
                    , Ord location
                    , ValueRoots location value
                    )
-                => SubtermAlgebra (Base term) term (Evaluator location value effects value)
-                -> SubtermAlgebra (Base term) term (Evaluator location value effects value)
+                => SubtermAlgebra (Base term) term (TermEvaluator term location value effects value)
+                -> SubtermAlgebra (Base term) term (TermEvaluator term location value effects value)
 collectingTerms recur term = do
-  roots <- askRoots
+  roots <- TermEvaluator askRoots
   v <- recur term
-  v <$ modifyHeap (gc (roots <> valueRoots v))
+  v <$ TermEvaluator (modifyHeap (gc (roots <> valueRoots v)))
 
 -- | Collect any addresses in the heap not rooted in or reachable from the given 'Live' set.
 gc :: ( Ord location

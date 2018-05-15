@@ -4,6 +4,7 @@ module Semantic.Graph where
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph
 import           Control.Monad.Effect.Trace
+import           Control.Abstract
 import qualified Control.Exception as Exc
 import           Control.Monad.Effect (reinterpret)
 import           Data.Abstract.Address
@@ -56,6 +57,7 @@ graph graphType renderer project
             . resumingAddressError
             . graphing
             . constrainingTypes
+            . runTermEvaluator
 
           constrainingTypes :: Evaluator (Located Precise) (Value (Located Precise)) effects a -> Evaluator (Located Precise) (Value (Located Precise)) effects a
           constrainingTypes = id
@@ -89,8 +91,8 @@ parseModule parser rootDir file = do
 withTermSpans :: ( HasField fields Span
                  , Member (Reader Span) effects
                  )
-              => SubtermAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Evaluator location value effects a)
-              -> SubtermAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Evaluator location value effects a)
+              => SubtermAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (TermEvaluator term location value effects a)
+              -> SubtermAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (TermEvaluator term location value effects a)
 withTermSpans recur term = withCurrentSpan (getField (termFAnnotation term)) (recur term)
 
 resumingResolutionError :: (Applicative (m effects), Effectful m, Member Trace effects) => m (Resumable ResolutionError ': effects) a -> m effects a
