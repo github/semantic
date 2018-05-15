@@ -1,6 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Control.Abstract.TermEvaluator
 ( TermEvaluator(..)
+, raiseHandler
 , module X
 ) where
 
@@ -19,3 +20,7 @@ newtype TermEvaluator term location value effects a = TermEvaluator { runTermEva
   deriving (Applicative, Effectful, Functor, Monad)
 
 deriving instance Member NonDet effects => Alternative (TermEvaluator term location value effects)
+
+
+raiseHandler :: (Evaluator location value effects a -> Evaluator location value effects' a') -> (TermEvaluator term location value effects a -> TermEvaluator term location value effects' a')
+raiseHandler f = TermEvaluator . f . runTermEvaluator
