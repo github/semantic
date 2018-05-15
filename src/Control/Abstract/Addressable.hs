@@ -76,7 +76,7 @@ variable name = lookupEnv name >>= maybe (freeVariableError name) deref
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
 instance Member Fresh effects => Addressable Precise effects where
-  derefCell _ = pure . unLatest
+  derefCell _ = pure . getLast . unLatest
   allocLoc _ = Precise <$> fresh
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.

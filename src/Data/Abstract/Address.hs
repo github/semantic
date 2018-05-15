@@ -4,6 +4,7 @@ module Data.Abstract.Address where
 import Data.Abstract.FreeVariables
 import Data.Abstract.Module (ModuleInfo)
 import Data.Abstract.Package (PackageInfo)
+import Data.Monoid (Last(..))
 import Data.Semigroup.Reducer
 import Data.Semilattice.Lower
 import Data.Set as Set
@@ -62,23 +63,14 @@ instance Location (Located location) where
 -- | A cell holding a single value. Writes will replace any prior value.
 --
 --   This is equivalent to 'Data.Monoid.Last', but with a 'Show' instance designed to minimize the amount of text we have to scroll past in ghci.
-newtype Latest value = Latest { unLatest :: Maybe value }
-  deriving (Eq, Foldable, Functor, Lower, Ord, Traversable)
-
-instance Semigroup (Latest value) where
-  a <> Latest Nothing = a
-  _ <> b              = b
-
--- | 'Option' semantics rather than that of 'Maybe', which is broken.
-instance Monoid (Latest value) where
-  mappend = (<>)
-  mempty  = Latest Nothing
+newtype Latest value = Latest { unLatest :: Last value }
+  deriving (Eq, Foldable, Functor, Lower, Monoid, Semigroup, Ord, Traversable)
 
 instance Reducer value (Latest value) where
-  unit = Latest . Just
+  unit = Latest . unit . Just
 
 instance Show value => Show (Latest value) where
-  showsPrec d = showsPrec d . unLatest
+  showsPrec d = showsPrec d . getLast . unLatest
 
 
 -- | A cell holding all values written to its address.
