@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE TypeFamilies, TypeOperators #-}
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 module Semantic.Util where
 
@@ -14,6 +14,7 @@ import           Data.Abstract.Value
 import           Data.Abstract.Type
 import           Data.Blob
 import           Data.File
+import           Data.Functor.Foldable
 import qualified Data.Language as Language
 import           Data.Term
 import qualified GHC.TypeLits as TypeLevel
@@ -104,3 +105,7 @@ reassociateTypes = mergeExcs . mergeExcs . mergeExcs . mergeExcs . mergeExcs . m
 
 
 newtype Quieterm syntax ann = Quieterm { unQuieterm :: TermF syntax ann (Quieterm syntax ann) }
+
+type instance Base (Quieterm syntax ann) = TermF syntax ann
+instance Functor syntax => Recursive   (Quieterm syntax ann) where project = unQuieterm
+instance Functor syntax => Corecursive (Quieterm syntax ann) where embed   =   Quieterm
