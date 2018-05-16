@@ -24,9 +24,9 @@ alloc = fmap Address . allocCell
 -- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
 deref :: (Addressable location effects, Members '[Resumable (AddressError location value), State (Heap location (Cell location) value)] effects) => Address location value -> Evaluator location value effects value
 deref addr = do
-  cell <- heapLookup addr <$> get >>= maybeM (throwAddressError (UnallocatedAddress addr))
+  cell <- heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr))
   derefed <- derefCell addr cell
-  maybeM (throwAddressError (UninitializedAddress addr)) derefed
+  maybeM (throwResumable (UninitializedAddress addr)) derefed
 
 
 -- | Defines allocation and dereferencing of 'Address'es in a 'Heap'.
@@ -71,7 +71,7 @@ data Allocator location value return where
 runAllocator :: (Addressable location effects, Members '[Resumable (AddressError location value), State (Heap location (Cell location) value)] effects) => Evaluator location value (Allocator location value ': effects) a -> Evaluator location value effects a
 runAllocator = interpret (\ eff -> case eff of
   Alloc name -> Address <$> allocCell name
-  Deref addr -> heapLookup addr <$> get >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwAddressError (UninitializedAddress addr)))
+  Deref addr -> heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr)))
 
 
 data AddressError location value resume where
@@ -87,9 +87,6 @@ instance Eq location => Eq1 (AddressError location value) where
   liftEq _ (UnallocatedAddress a)   (UnallocatedAddress b)   = a == b
   liftEq _ _                        _                        = False
 
-
-throwAddressError :: Member (Resumable (AddressError location value)) effects => AddressError location value resume -> Evaluator location value effects resume
-throwAddressError = throwResumable
 
 runAddressError :: Effectful (m location value) => m location value (Resumable (AddressError location value) ': effects) a -> m location value effects (Either (SomeExc (AddressError location value)) a)
 runAddressError = runResumable
