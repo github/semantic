@@ -9,7 +9,7 @@ import           Prologue
 
 -- | The type of variable names.
 newtype Name = Name { unName :: ByteString }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Hashable, Ord, Show)
 
 name :: ByteString -> Name
 name = Name
