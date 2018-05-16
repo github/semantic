@@ -3,6 +3,7 @@ module Data.Syntax.Declaration where
 
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
+import Data.JSON.Fields
 import qualified Data.Set as Set (fromList)
 import Diffing.Algorithm
 import Prologue
@@ -16,6 +17,8 @@ instance Diffable Function where
 instance Eq1 Function where liftEq = genericLiftEq
 instance Ord1 Function where liftCompare = genericLiftCompare
 instance Show1 Function where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Function
 
 -- TODO: Filter the closed-over environment by the free variables in the term.
 -- TODO: How should we represent function types, where applicable?
@@ -35,12 +38,14 @@ instance Declarations a => Declarations (Function a) where
 data Method a = Method { methodContext :: ![a], methodReceiver :: !a, methodName :: !a, methodParameters :: ![a], methodBody :: !a }
   deriving (Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
-instance Diffable Method where
-  equivalentBySubterm = Just . methodName
-
 instance Eq1 Method where liftEq = genericLiftEq
 instance Ord1 Method where liftCompare = genericLiftCompare
 instance Show1 Method where liftShowsPrec = genericLiftShowsPrec
+
+instance Diffable Method where
+  equivalentBySubterm = Just . methodName
+
+instance ToJSONFields1 Method
 
 -- Evaluating a Method creates a closure and makes that value available in the
 -- local environment.
@@ -61,6 +66,8 @@ instance Eq1 MethodSignature where liftEq = genericLiftEq
 instance Ord1 MethodSignature where liftCompare = genericLiftCompare
 instance Show1 MethodSignature where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 MethodSignature
+
 -- TODO: Implement Eval instance for MethodSignature
 instance Evaluatable MethodSignature
 
@@ -72,6 +79,8 @@ instance Eq1 RequiredParameter where liftEq = genericLiftEq
 instance Ord1 RequiredParameter where liftCompare = genericLiftCompare
 instance Show1 RequiredParameter where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 RequiredParameter
+
 -- TODO: Implement Eval instance for RequiredParameter
 instance Evaluatable RequiredParameter
 
@@ -82,6 +91,8 @@ newtype OptionalParameter a = OptionalParameter { optionalParameter :: a }
 instance Eq1 OptionalParameter where liftEq = genericLiftEq
 instance Ord1 OptionalParameter where liftCompare = genericLiftCompare
 instance Show1 OptionalParameter where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 OptionalParameter
 
 -- TODO: Implement Eval instance for OptionalParameter
 instance Evaluatable OptionalParameter
@@ -97,6 +108,8 @@ newtype VariableDeclaration a = VariableDeclaration { variableDeclarations :: [a
 instance Eq1 VariableDeclaration where liftEq = genericLiftEq
 instance Ord1 VariableDeclaration where liftCompare = genericLiftCompare
 instance Show1 VariableDeclaration where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 VariableDeclaration
 
 instance Evaluatable VariableDeclaration where
   eval (VariableDeclaration [])   = Rval <$> unit
@@ -116,6 +129,8 @@ instance Eq1 InterfaceDeclaration where liftEq = genericLiftEq
 instance Ord1 InterfaceDeclaration where liftCompare = genericLiftCompare
 instance Show1 InterfaceDeclaration where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 InterfaceDeclaration
+
 -- TODO: Implement Eval instance for InterfaceDeclaration
 instance Evaluatable InterfaceDeclaration
 
@@ -131,6 +146,8 @@ instance Eq1 PublicFieldDefinition where liftEq = genericLiftEq
 instance Ord1 PublicFieldDefinition where liftCompare = genericLiftCompare
 instance Show1 PublicFieldDefinition where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 PublicFieldDefinition
+
 -- TODO: Implement Eval instance for PublicFieldDefinition
 instance Evaluatable PublicFieldDefinition
 
@@ -142,6 +159,8 @@ instance Eq1 Variable where liftEq = genericLiftEq
 instance Ord1 Variable where liftCompare = genericLiftCompare
 instance Show1 Variable where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Variable
+
 -- TODO: Implement Eval instance for Variable
 instance Evaluatable Variable
 
@@ -150,6 +169,8 @@ data Class a = Class { classContext :: ![a], classIdentifier :: !a, classSupercl
 
 instance Declarations a => Declarations (Class a) where
   declaredName (Class _ name _ _) = declaredName name
+
+instance ToJSONFields1 Class
 
 instance Diffable Class where
   equivalentBySubterm = Just . classIdentifier
@@ -176,6 +197,8 @@ instance Eq1 Decorator where liftEq = genericLiftEq
 instance Ord1 Decorator where liftCompare = genericLiftCompare
 instance Show1 Decorator where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Decorator
+
 -- TODO: Implement Eval instance for Decorator
 instance Evaluatable Decorator
 
@@ -190,6 +213,8 @@ instance Eq1 Data.Syntax.Declaration.Datatype where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Declaration.Datatype where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Declaration.Datatype where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Data.Syntax.Declaration.Datatype
+
 -- TODO: Implement Eval instance for Datatype
 instance Evaluatable Data.Syntax.Declaration.Datatype
 
@@ -201,6 +226,8 @@ data Constructor a = Constructor { constructorName :: !a, constructorFields :: !
 instance Eq1 Data.Syntax.Declaration.Constructor where liftEq = genericLiftEq
 instance Ord1 Data.Syntax.Declaration.Constructor where liftCompare = genericLiftCompare
 instance Show1 Data.Syntax.Declaration.Constructor where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Data.Syntax.Declaration.Constructor
 
 -- TODO: Implement Eval instance for Constructor
 instance Evaluatable Data.Syntax.Declaration.Constructor
@@ -214,6 +241,8 @@ instance Eq1 Comprehension where liftEq = genericLiftEq
 instance Ord1 Comprehension where liftCompare = genericLiftCompare
 instance Show1 Comprehension where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Comprehension
+
 -- TODO: Implement Eval instance for Comprehension
 instance Evaluatable Comprehension
 
@@ -226,6 +255,8 @@ instance Eq1 Type where liftEq = genericLiftEq
 instance Ord1 Type where liftCompare = genericLiftCompare
 instance Show1 Type where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Type
+
 -- TODO: Implement Eval instance for Type
 instance Evaluatable Type
 
@@ -237,6 +268,8 @@ data TypeAlias a = TypeAlias { typeAliasContext :: ![a], typeAliasIdentifier :: 
 instance Eq1 TypeAlias where liftEq = genericLiftEq
 instance Ord1 TypeAlias where liftCompare = genericLiftCompare
 instance Show1 TypeAlias where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 TypeAlias
 
 -- TODO: Implement Eval instance for TypeAlias
 instance Evaluatable TypeAlias where

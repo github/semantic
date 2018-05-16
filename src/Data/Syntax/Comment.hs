@@ -3,6 +3,8 @@ module Data.Syntax.Comment where
 
 import Prologue
 import Data.Abstract.Evaluatable
+import Data.ByteString (unpack)
+import Data.JSON.Fields
 import Diffing.Algorithm
 
 -- | An unnested comment (line or block).
@@ -12,6 +14,9 @@ newtype Comment a = Comment { commentContent :: ByteString }
 instance Eq1 Comment where liftEq = genericLiftEq
 instance Ord1 Comment where liftCompare = genericLiftCompare
 instance Show1 Comment where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Comment where
+  toJSONFields1 f@Comment{..} = withChildren f ["contents" .= unpack commentContent ]
 
 instance Evaluatable Comment where
   eval _ = Rval <$> unit

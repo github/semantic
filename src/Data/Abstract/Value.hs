@@ -366,7 +366,7 @@ instance ( Addressable location (Goto effects (Value location) ': effects)
             a <- alloc name
             assign a v
             Env.insert name a <$> rest) (pure env) (zip names params)
-          localEnv (mergeEnvs bindings) (catchReturn body (\ (Return value) -> pure value))
+          localEnv (mergeEnvs bindings) (body `catchReturn` \ (Return value) -> pure value)
       Nothing -> throwValueError (CallError op)
 
   loop x = catchLoopControl (fix x) (\ control -> case control of
@@ -412,11 +412,11 @@ deriving instance Show location => Show (ValueError location resume)
 instance Show location => Show1 (ValueError location) where
   liftShowsPrec _ _ = showsPrec
 
-throwValueError :: Member (Resumable (ValueError location)) effects => ValueError location resume -> Evaluator location value effects resume
+throwValueError :: Member (Resumable (ValueError location)) effects => ValueError location resume -> Evaluator location (Value location) effects resume
 throwValueError = throwResumable
 
-runValueError :: Evaluator location value (Resumable (ValueError location) ': effects) a -> Evaluator location value effects (Either (SomeExc (ValueError location)) a)
+runValueError :: Effectful (m location (Value location)) => m location (Value location) (Resumable (ValueError location) ': effects) a -> m location (Value location) effects (Either (SomeExc (ValueError location)) a)
 runValueError = runResumable
 
-runValueErrorWith :: (forall resume . ValueError location resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (ValueError location) ': effects) a -> Evaluator location value effects a
+runValueErrorWith :: Effectful (m location (Value location)) => (forall resume . ValueError location resume -> m location (Value location) effects resume) -> m location (Value location) (Resumable (ValueError location) ': effects) a -> m location (Value location) effects a
 runValueErrorWith = runResumableWith

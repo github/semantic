@@ -7,6 +7,7 @@ module Data.Map.Monoidal
 , size
 , insert
 , filterWithKey
+, pairs
 , module Reducer
 ) where
 
@@ -39,6 +40,10 @@ insert key value = Map . Map.insert key value . unMap
 
 filterWithKey :: (key -> value -> Bool) -> Map key value -> Map key value
 filterWithKey f = Map . Map.filterWithKey f . unMap
+
+
+pairs :: Map key value -> [(key, value)]
+pairs = Map.toList . unMap
 
 
 instance (Ord key, Semigroup value) => Semigroup (Map key value) where

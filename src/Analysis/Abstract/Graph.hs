@@ -61,8 +61,8 @@ graphingTerms :: ( Element Syntax.Identifier syntax
                             ] effects
                  , term ~ Term (Sum syntax) ann
                  )
-              => SubtermAlgebra (Base term) term (Evaluator (Located location) value effects a)
-              -> SubtermAlgebra (Base term) term (Evaluator (Located location) value effects a)
+              => SubtermAlgebra (Base term) term (TermEvaluator term (Located location) value effects a)
+              -> SubtermAlgebra (Base term) term (TermEvaluator term (Located location) value effects a)
 graphingTerms recur term@(In _ syntax) = do
   case projectSum syntax of
     Just (Syntax.Identifier name) -> do
@@ -76,17 +76,17 @@ graphingLoadErrors :: Members '[ Reader ModuleInfo
                                , Resumable (LoadError location value)
                                , State (Graph Vertex)
                                ] effects
-                   => SubtermAlgebra (Base term) term (Evaluator location value effects a)
-                   -> SubtermAlgebra (Base term) term (Evaluator location value effects a)
-graphingLoadErrors recur term = recur term `resumeLoadError` (\ (ModuleNotFound name) -> moduleInclusion (Module (BC.pack name)) *> moduleNotFound name)
+                   => SubtermAlgebra (Base term) term (TermEvaluator term location value effects a)
+                   -> SubtermAlgebra (Base term) term (TermEvaluator term location value effects a)
+graphingLoadErrors recur term = TermEvaluator (runTermEvaluator (recur term) `resumeLoadError` (\ (ModuleNotFound name) -> moduleInclusion (Module (BC.pack name)) *> moduleNotFound name))
 
 -- | Add vertices to the graph for evaluated modules and the packages containing them.
 graphingModules :: Members '[ Reader ModuleInfo
                             , Reader PackageInfo
                             , State (Graph Vertex)
                             ] effects
-               => SubtermAlgebra Module term (Evaluator location value effects a)
-               -> SubtermAlgebra Module term (Evaluator location value effects a)
+               => SubtermAlgebra Module term (TermEvaluator term location value effects a)
+               -> SubtermAlgebra Module term (TermEvaluator term location value effects a)
 graphingModules recur m = do
   let name = BC.pack (modulePath (moduleInfo m))
   packageInclusion (Module name)
@@ -132,9 +132,9 @@ variableDefinition :: ( Member (Reader (Environment (Located location) value)) e
                       , Member (State (Graph Vertex)) effects
                       )
                    => Name
-                   -> Evaluator (Located location) value effects ()
+                   -> TermEvaluator term (Located location) value effects ()
 variableDefinition name = do
-  graph <- maybe lowerBound (moduleGraph . locationModule . unAddress) <$> lookupEnv name
+  graph <- maybe lowerBound (moduleGraph . locationModule . unAddress) <$> TermEvaluator (lookupEnv name)
   appendGraph (vertex (Variable (unName name)) `connect` graph)
 
 appendGraph :: (Effectful m, Member (State (Graph Vertex)) effects) => Graph Vertex -> m effects ()

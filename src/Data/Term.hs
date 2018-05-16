@@ -73,7 +73,7 @@ instance (Eq1 f, Eq a) => Eq (Term f a) where
   (==) = eq1
 
 instance Show1 f => Show1 (Term f) where
-  liftShowsPrec spA slA = go where go d = showsUnaryWith (liftShowsPrec2 spA slA go (showListWith (go 0))) "Term" d . unTerm
+  liftShowsPrec spA _ = go where go d (Term (In a f)) = showsBinaryWith spA (liftShowsPrec go (showListWith (go 0))) "Term" d a f
 
 instance (Show1 f, Show a) => Show (Term f a) where
   showsPrec = showsPrec1

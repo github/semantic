@@ -19,10 +19,11 @@ module Data.Abstract.Evaluatable
 , Modules
 ) where
 
-import Control.Abstract as X hiding (Goto(..), LoopControl(..), Modules(..), Return(..))
+import Control.Abstract as X hiding (Goto(..), LoopControl(..), Modules(..), Return(..), TermEvaluator(..))
 import Control.Abstract.Evaluator (LoopControl, Return(..))
 import Control.Abstract.Goto (Goto(..))
 import Control.Abstract.Modules (Modules(..))
+import Control.Abstract.TermEvaluator (TermEvaluator(..))
 import Data.Abstract.Declarations as X
 import Data.Abstract.Environment as X
 import Data.Abstract.Exports as Exports
@@ -86,10 +87,10 @@ data EvalError value resume where
   ExportError         :: ModulePath -> Name -> EvalError value ()
   EnvironmentLookupError :: value -> EvalError value value
 
-runEvalError :: Evaluator location value (Resumable (EvalError value) ': effects) a -> Evaluator location value effects (Either (SomeExc (EvalError value)) a)
+runEvalError :: Effectful (m value) => m value (Resumable (EvalError value) ': effects) a -> m value effects (Either (SomeExc (EvalError value)) a)
 runEvalError = runResumable
 
-runEvalErrorWith :: (forall resume . EvalError value resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (EvalError value) ': effects) a -> Evaluator location value effects a
+runEvalErrorWith :: Effectful (m value) => (forall resume . EvalError value resume -> m value effects resume) -> m value (Resumable (EvalError value) ': effects) a -> m value effects a
 runEvalErrorWith = runResumableWith
 
 -- | Evaluate a term within the context of the scoped environment of 'scopedEnvTerm'.
@@ -167,10 +168,10 @@ subtermValue :: ( Addressable location effects
              -> Evaluator location value effects value
 subtermValue = value <=< subtermRef
 
-runUnspecialized :: Evaluator location value (Resumable (Unspecialized value) ': effects) a -> Evaluator location value effects (Either (SomeExc (Unspecialized value)) a)
+runUnspecialized :: Effectful (m value) => m value (Resumable (Unspecialized value) ': effects) a -> m value effects (Either (SomeExc (Unspecialized value)) a)
 runUnspecialized = runResumable
 
-runUnspecializedWith :: (forall resume . Unspecialized value resume -> Evaluator location value effects resume) -> Evaluator location value (Resumable (Unspecialized value) ': effects) a -> Evaluator location value effects a
+runUnspecializedWith :: Effectful (m value) => (forall resume . Unspecialized value resume -> m value effects resume) -> m value (Resumable (Unspecialized value) ': effects) a -> m value effects a
 runUnspecializedWith = runResumableWith
 
 -- Instances
@@ -233,18 +234,18 @@ evaluatePackageWith :: forall location term value inner inner' outer
                        , inner ~ (Goto inner' value ': inner')
                        , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer)
                        )
-                    => (SubtermAlgebra Module      term (Evaluator location value inner value) -> SubtermAlgebra Module      term (Evaluator location value inner value))
-                    -> (SubtermAlgebra (Base term) term (Evaluator location value inner (ValueRef value)) -> SubtermAlgebra (Base term) term (Evaluator location value inner (ValueRef value)))
+                    => (SubtermAlgebra Module      term (TermEvaluator term location value inner value) -> SubtermAlgebra Module      term (TermEvaluator term location value inner value))
+                    -> (SubtermAlgebra (Base term) term (TermEvaluator term location value inner (ValueRef value)) -> SubtermAlgebra (Base term) term (TermEvaluator term location value inner (ValueRef value)))
                     -> Package term
-                    -> Evaluator location value outer [value]
+                    -> TermEvaluator term location value outer [value]
 evaluatePackageWith analyzeModule analyzeTerm package
   = runReader (packageInfo package)
   . runReader lowerBound
   . fmap fst
   . runState (lowerBound :: Gotos location value (Reader Span ': Reader PackageInfo ': outer))
   . runReader (packageModules (packageBody package))
-  . runModules evalModule
   . withPrelude (packagePrelude (packageBody package))
+  . raiseHandler (runModules (runTermEvaluator . evalModule))
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints (packageBody package)))
   where
         evalModule m
@@ -252,27 +253,29 @@ evaluatePackageWith analyzeModule analyzeTerm package
           . runInModule (moduleInfo m)
           . analyzeModule (subtermRef . moduleBody)
           $ evalTerm <$> m
-        evalTerm term = Subterm term
-          (value =<< foldSubterms (analyzeTerm eval) term)
+        evalTerm term = Subterm term (TermEvaluator (value =<< runTermEvaluator (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term)))
 
         runInModule info
           = runReader info
-          . runReturn
-          . runLoopControl
-          . runGoto Gotos getGotos
+          . raiseHandler runReturn
+          . raiseHandler runLoopControl
+          . raiseHandler (runGoto Gotos getGotos)
 
-        evaluateEntryPoint :: ModulePath -> Maybe Name -> Evaluator location value (Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer) value
-        evaluateEntryPoint m sym = runInModule (ModuleInfo m) $ do
+        evaluateEntryPoint :: ModulePath -> Maybe Name -> TermEvaluator term location value (Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer) value
+        evaluateEntryPoint m sym = runInModule (ModuleInfo m) . TermEvaluator $ do
           v <- maybe unit (pure . snd) <$> require m
           maybe v ((`call` []) <=< variable) sym
 
-        withPrelude Nothing a = a
-        withPrelude (Just prelude) a = do
-          _ <- runInModule moduleInfoFromCallStack $ do
+        evalPrelude prelude = raiseHandler (runModules (runTermEvaluator . evalModule)) $ do
+          _ <- runInModule moduleInfoFromCallStack . TermEvaluator $ do
             builtin "print" (closure ["s"] lowerBound (variable "s" >>= asString >>= trace . unpack >> unit))
             unit
-          preludeEnv <- fst <$> evalModule prelude
-          withDefaultEnvironment preludeEnv a
+          fst <$> evalModule prelude
+
+        withPrelude Nothing a = a
+        withPrelude (Just prelude) a = do
+          preludeEnv <- evalPrelude prelude
+          raiseHandler (withDefaultEnvironment preludeEnv) a
 
         -- TODO: If the set of exports is empty because no exports have been
         -- defined, do we export all terms, or no terms? This behavior varies across
@@ -280,7 +283,7 @@ evaluatePackageWith analyzeModule analyzeTerm package
         filterEnv ports env
           | Exports.null ports = env
           | otherwise          = Exports.toEnvironment ports `mergeEnvs` overwrite (Exports.aliases ports) env
-        pairValueWithEnv action = flip (,) <$> action <*> (filterEnv <$> getExports <*> getEnv)
+        pairValueWithEnv action = flip (,) <$> action <*> (filterEnv <$> TermEvaluator getExports <*> TermEvaluator getEnv)
 
 newtype Gotos location value outer = Gotos { getGotos :: GotoTable (LoopControl value ': Return value ': Reader ModuleInfo ': Modules location value ': State (Gotos location value outer) ': outer) value }
   deriving (Lower)

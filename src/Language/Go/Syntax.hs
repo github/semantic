@@ -8,6 +8,7 @@ import qualified Data.Abstract.Package as Package
 import           Data.Abstract.Path
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as BC
+import           Data.JSON.Fields
 import           Diffing.Algorithm
 import           Prologue
 import           System.FilePath.Posix
@@ -62,6 +63,8 @@ instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Import
+
 instance Evaluatable Import where
   eval (Import importPath _) = do
     paths <- resolveGoImport importPath
@@ -81,6 +84,8 @@ data QualifiedImport a = QualifiedImport { qualifiedImportFrom :: !ImportPath, q
 instance Eq1 QualifiedImport where liftEq = genericLiftEq
 instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
 instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 QualifiedImport
 
 instance Evaluatable QualifiedImport where
   eval (QualifiedImport importPath aliasTerm) = do
@@ -102,6 +107,8 @@ instance Eq1 SideEffectImport where liftEq = genericLiftEq
 instance Ord1 SideEffectImport where liftCompare = genericLiftCompare
 instance Show1 SideEffectImport where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 SideEffectImport
+
 instance Evaluatable SideEffectImport where
   eval (SideEffectImport importPath _) = do
     paths <- resolveGoImport importPath
@@ -117,6 +124,8 @@ instance Eq1 Composite where liftEq = genericLiftEq
 instance Ord1 Composite where liftCompare = genericLiftCompare
 instance Show1 Composite where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Composite
+
 -- TODO: Implement Eval instance for Composite
 instance Evaluatable Composite
 
@@ -127,6 +136,8 @@ newtype DefaultPattern a = DefaultPattern { defaultPatternBody :: a }
 instance Eq1 DefaultPattern where liftEq = genericLiftEq
 instance Ord1 DefaultPattern where liftCompare = genericLiftCompare
 instance Show1 DefaultPattern where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 DefaultPattern
 
 -- TODO: Implement Eval instance for DefaultPattern
 instance Evaluatable DefaultPattern
@@ -139,6 +150,8 @@ instance Eq1 Defer where liftEq = genericLiftEq
 instance Ord1 Defer where liftCompare = genericLiftCompare
 instance Show1 Defer where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Defer
+
 -- TODO: Implement Eval instance for Defer
 instance Evaluatable Defer
 
@@ -149,6 +162,8 @@ newtype Go a = Go { goBody :: a }
 instance Eq1 Go where liftEq = genericLiftEq
 instance Ord1 Go where liftCompare = genericLiftCompare
 instance Show1 Go where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Go
 
 -- TODO: Implement Eval instance for Go
 instance Evaluatable Go
@@ -161,12 +176,16 @@ instance Eq1 Label where liftEq = genericLiftEq
 instance Ord1 Label where liftCompare = genericLiftCompare
 instance Show1 Label where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Label
+
 -- TODO: Implement Eval instance for Label
 instance Evaluatable Label
 
 -- | A rune literal in Go (e.g. `'⌘'`).
 newtype Rune a = Rune { _runeLiteral :: ByteString }
   deriving (Diffable, Eq, FreeVariables1, Declarations1, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance ToJSONFields1 Rune
 
 -- TODO: Implement Eval instance for Rune
 instance Evaluatable Rune
@@ -178,6 +197,8 @@ instance Show1 Rune where liftShowsPrec = genericLiftShowsPrec
 -- | A select statement in Go (e.g. `select { case x := <-c: x() }` where each case is a send or receive operation on channels).
 newtype Select a = Select { selectCases :: a }
   deriving (Diffable, Eq, FreeVariables1, Declarations1, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
+
+instance ToJSONFields1 Select
 
 -- TODO: Implement Eval instance for Select
 instance Evaluatable Select
@@ -194,6 +215,8 @@ instance Eq1 Send where liftEq = genericLiftEq
 instance Ord1 Send where liftCompare = genericLiftCompare
 instance Show1 Send where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Send
+
 -- TODO: Implement Eval instance for Send
 instance Evaluatable Send
 
@@ -204,6 +227,8 @@ data Slice a = Slice { sliceName :: !a, sliceLow :: !a, sliceHigh :: !a, sliceCa
 instance Eq1 Slice where liftEq = genericLiftEq
 instance Ord1 Slice where liftCompare = genericLiftCompare
 instance Show1 Slice where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Slice
 
 -- TODO: Implement Eval instance for Slice
 instance Evaluatable Slice
@@ -216,6 +241,8 @@ instance Eq1 TypeSwitch where liftEq = genericLiftEq
 instance Ord1 TypeSwitch where liftCompare = genericLiftCompare
 instance Show1 TypeSwitch where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 TypeSwitch
+
 -- TODO: Implement Eval instance for TypeSwitch
 instance Evaluatable TypeSwitch
 
@@ -226,6 +253,8 @@ newtype TypeSwitchGuard a = TypeSwitchGuard { typeSwitchGuardSubject :: a }
 instance Eq1 TypeSwitchGuard where liftEq = genericLiftEq
 instance Ord1 TypeSwitchGuard where liftCompare = genericLiftCompare
 instance Show1 TypeSwitchGuard where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 TypeSwitchGuard
 
 -- TODO: Implement Eval instance for TypeSwitchGuard
 instance Evaluatable TypeSwitchGuard
@@ -238,6 +267,8 @@ instance Eq1 Receive where liftEq = genericLiftEq
 instance Ord1 Receive where liftCompare = genericLiftCompare
 instance Show1 Receive where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Receive
+
 -- TODO: Implement Eval instance for Receive
 instance Evaluatable Receive
 
@@ -248,6 +279,8 @@ newtype ReceiveOperator a = ReceiveOperator a
 instance Eq1 ReceiveOperator where liftEq = genericLiftEq
 instance Ord1 ReceiveOperator where liftCompare = genericLiftCompare
 instance Show1 ReceiveOperator where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 ReceiveOperator
 
 -- TODO: Implement Eval instance for ReceiveOperator
 instance Evaluatable ReceiveOperator
@@ -260,6 +293,8 @@ instance Eq1 Field where liftEq = genericLiftEq
 instance Ord1 Field where liftCompare = genericLiftCompare
 instance Show1 Field where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Field
+
 -- TODO: Implement Eval instance for Field
 instance Evaluatable Field
 
@@ -270,6 +305,8 @@ data Package a = Package { packageName :: !a, packageContents :: ![a] }
 instance Eq1 Package where liftEq = genericLiftEq
 instance Ord1 Package where liftCompare = genericLiftCompare
 instance Show1 Package where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Package
 
 instance Evaluatable Package where
   eval (Package _ xs) = eval xs
@@ -283,6 +320,8 @@ instance Eq1 TypeAssertion where liftEq = genericLiftEq
 instance Ord1 TypeAssertion where liftCompare = genericLiftCompare
 instance Show1 TypeAssertion where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 TypeAssertion
+
 -- TODO: Implement Eval instance for TypeAssertion
 instance Evaluatable TypeAssertion
 
@@ -294,6 +333,8 @@ instance Eq1 TypeConversion where liftEq = genericLiftEq
 instance Ord1 TypeConversion where liftCompare = genericLiftCompare
 instance Show1 TypeConversion where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 TypeConversion
+
 -- TODO: Implement Eval instance for TypeConversion
 instance Evaluatable TypeConversion
 
@@ -304,6 +345,8 @@ data Variadic a = Variadic { variadicContext :: [a], variadicIdentifier :: a }
 instance Eq1 Variadic where liftEq = genericLiftEq
 instance Ord1 Variadic where liftCompare = genericLiftCompare
 instance Show1 Variadic where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Variadic
 
 -- TODO: Implement Eval instance for Variadic
 instance Evaluatable Variadic
