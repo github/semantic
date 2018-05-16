@@ -21,15 +21,19 @@
           (Identifier)
           (Identifier))
         (Empty))
+    {+(Call
+      {+(Identifier)+}
+      {+(
+        {+(Identifier)+}
+        {+(Variadic
+          {+(Identifier)+})+})+}
+      {+(Empty)+})+}
       (Call
       { (Identifier)
       ->(Identifier) }
-        (
-          (Identifier)
-          (Variadic
-            (Identifier)))
-        (Empty))
-    {+(Call
-      {+(Identifier)+}
       {+([])+}
-      {+(Empty)+})+})))
+      {-(
+        {-(Identifier)-}
+        {-(Variadic
+          {-(Identifier)-})-})-}
+        (Empty)))))
