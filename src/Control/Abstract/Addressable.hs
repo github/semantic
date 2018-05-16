@@ -109,8 +109,7 @@ instance Member Fresh effects => Addressable Precise effects where
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
 instance Member NonDet effects => Addressable Monovariant effects where
-  derefCell _ cell | null cell = pure Nothing
-                   | otherwise = foldMapA (pure . Just) cell
+  derefCell _ = traverse (foldMapA pure) . nonEmpty . toList
   allocLoc = pure . Monovariant
 
 instance ( Addressable location effects
