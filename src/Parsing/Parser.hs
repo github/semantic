@@ -29,7 +29,7 @@ import           Data.Record
 import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
-import           Data.File
+import           Data.Project
 import           Foreign.Ptr
 import qualified GHC.TypeLits as TypeLevel
 import qualified Language.Go.Assignment as Go

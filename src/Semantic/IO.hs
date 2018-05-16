@@ -38,7 +38,7 @@ import           Control.Monad.IO.Class
 import           Data.Aeson
 import qualified Data.Blob as Blob
 import           Data.Bool
-import           Data.File
+import           Data.Project
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Builder as B
 import qualified Data.ByteString.Lazy as BL

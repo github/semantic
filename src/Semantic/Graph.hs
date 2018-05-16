@@ -27,7 +27,7 @@ import           Data.Abstract.Module
 import           Data.Abstract.Package as Package
 import           Data.Abstract.Value (Value, ValueError(..), runValueErrorWith)
 import           Data.ByteString.Char8 (pack)
-import           Data.File
+import           Data.Project
 import           Data.Record
 import           Data.Semilattice.Lower
 import           Data.Term

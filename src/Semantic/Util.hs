@@ -12,7 +12,7 @@ import           Data.Abstract.Evaluatable
 import           Data.Abstract.Value
 import           Data.Abstract.Type
 import           Data.Blob
-import           Data.File
+import           Data.Project
 import qualified Data.Language as Language
 import qualified GHC.TypeLits as TypeLevel
 import           Language.Preluded

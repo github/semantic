@@ -5,7 +5,7 @@ import           Control.Monad.Effect
 import           Data.Aeson
 import           Data.Aeson.Types (parseMaybe)
 import           Data.Blob
-import           Data.File
+import           Data.Project
 import qualified Data.Map as Map
 import           Data.Source
 import           Data.Language

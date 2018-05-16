@@ -29,7 +29,7 @@ import Data.Bifunctor (first)
 import Data.Blob as X
 import Data.ByteString.Builder (toLazyByteString)
 import Data.ByteString.Lazy (toStrict)
-import Data.File as X
+import Data.Project as X
 import Data.Functor.Listable as X
 import Data.Language as X
 import Data.List.NonEmpty as X (NonEmpty(..))

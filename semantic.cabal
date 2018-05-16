@@ -70,7 +70,6 @@ library
                      , Data.Blob
                      , Data.Diff
                      , Data.Error
-                     , Data.File
                      , Data.Functor.Both
                      , Data.Functor.Classes.Generic
                      , Data.Graph
@@ -79,6 +78,7 @@ library
                      , Data.Map.Monoidal
                      , Data.Mergeable
                      , Data.Patch
+                     , Data.Project
                      , Data.Range
                      , Data.Record
                      , Data.Semigroup.App
