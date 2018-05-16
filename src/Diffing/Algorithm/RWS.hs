@@ -167,4 +167,6 @@ data Label syntax where
 
 instance Hashable1 syntax => Hashable (Label syntax) where hashWithSalt salt (Label syntax) = liftHashWithSalt const salt syntax
 
+instance Eq1 syntax => Eq (Label syntax) where Label a == Label b = liftEq (const (const True)) a b
+
 instance Show1 syntax => Show (Label syntax) where showsPrec d (Label syntax) = liftShowsPrec (const (const id)) (const id) d syntax
