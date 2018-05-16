@@ -40,9 +40,8 @@ runAllocatorMonovariant = interpret (\ eff -> case eff of
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Heap.
 class (Ord location, Show location) => Addressable location effects where
-  derefCell :: Address location value -> Cell location value -> Evaluator location value effects (Maybe value)
-
   allocLoc :: Name -> Evaluator location value effects location
+  derefCell :: Address location value -> Cell location value -> Evaluator location value effects (Maybe value)
 
 -- | Look up or allocate an address for a 'Name'.
 lookupOrAlloc :: ( Addressable location effects
@@ -104,13 +103,13 @@ variable name = lookupEnv name >>= maybe (freeVariableError name) deref
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
 instance Member Fresh effects => Addressable Precise effects where
-  derefCell _ = pure . getLast . unLatest
   allocLoc _ = Precise <$> fresh
+  derefCell _ = pure . getLast . unLatest
 
 -- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
 instance Member NonDet effects => Addressable Monovariant effects where
-  derefCell _ = traverse (foldMapA pure) . nonEmpty . toList
   allocLoc = pure . Monovariant
+  derefCell _ = traverse (foldMapA pure) . nonEmpty . toList
 
 instance ( Addressable location effects
          , Members '[ Reader ModuleInfo
@@ -118,9 +117,8 @@ instance ( Addressable location effects
                     ] effects
          )
       => Addressable (Located location) effects where
-  derefCell (Address (Located loc _ _)) = raiseEff . lowerEff . derefCell (Address loc)
-
   allocLoc name = raiseEff (lowerEff (Located <$> allocLoc name <*> currentPackage <*> currentModule))
+  derefCell (Address (Located loc _ _)) = raiseEff . lowerEff . derefCell (Address loc)
 
 
 -- Errors
