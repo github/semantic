@@ -49,6 +49,7 @@ instance Member NonDet effects => Addressable Monovariant effects where
   allocCell = pure . Monovariant
   derefCell _ = traverse (foldMapA pure) . nonEmpty . toList
 
+-- | 'Located' locations allocate & dereference using the underlying location, contextualizing locations with the current 'PackageInfo' & 'ModuleInfo'.
 instance (Addressable location effects, Members '[Reader ModuleInfo, Reader PackageInfo] effects) => Addressable (Located location) effects where
   type Cell (Located location) = Cell location
 
