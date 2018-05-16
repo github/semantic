@@ -9,7 +9,7 @@ import Prologue
 
 -- | A map of 'Configuration's to 'Set's of resulting values & 'Heap's.
 newtype Cache term location cell value = Cache { unCache :: Monoidal.Map (Configuration term location cell value) (Set (Cached location cell value)) }
-  deriving (Eq, Lower, Monoid, Ord, Reducer (Configuration term location cell value, (Cached location cell value)), Semigroup)
+  deriving (Eq, Lower, Monoid, Ord, Reducer (Configuration term location cell value, Cached location cell value), Semigroup)
 
 type Cached location cell value = (value, Heap location cell value)
 
