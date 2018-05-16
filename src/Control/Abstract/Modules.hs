@@ -29,7 +29,7 @@ import Prologue
 lookupModule :: Member (Modules location value) effects => ModulePath -> Evaluator location value effects (Maybe (Maybe (Environment location value, value)))
 lookupModule = send . Lookup
 
--- Resolve a list of module paths to a possible module table entry.
+-- | Resolve a list of module paths to a possible module table entry.
 resolve :: Member (Modules location value) effects => [FilePath] -> Evaluator location value effects (Maybe ModulePath)
 resolve = sendModules . Resolve
 
