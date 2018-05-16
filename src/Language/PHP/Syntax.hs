@@ -52,24 +52,30 @@ resolvePHPName n = do
   where name = toName n
         toName = BC.unpack . dropRelativePrefix . stripQuotes
 
-include :: ( AbstractValue location value effects
+include :: ( Addressable location effects
+           , AbstractValue location value effects
            , Members '[ Modules location value
+                      , Reader (Environment location value)
                       , Resumable ResolutionError
+                      , Resumable (AddressError location value)
+                      , Resumable (EnvironmentError value)
+                      , Resumable (EvalError value)
                       , State (Environment location value)
                       , State (Exports location value)
+                      , State (Heap location (Cell location) value)
                       , Trace
                       ] effects
            )
-        => Subterm term (Evaluator location value effects value)
+        => Subterm term (Evaluator location value effects (ValueRef value))
         -> (ModulePath -> Evaluator location value effects (Maybe (Environment location value, value)))
-        -> Evaluator location value effects value
+        -> Evaluator location value effects (ValueRef value)
 include pathTerm f = do
   name <- subtermValue pathTerm >>= asString
   path <- resolvePHPName name
   traceResolve name path
   (importedEnv, v) <- isolate (f path) >>= maybeM ((,) emptyEnv <$> unit)
   modifyEnv (mergeEnvs importedEnv)
-  pure v
+  pure (Rval v)
 
 newtype Require a = Require a
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
@@ -236,7 +242,7 @@ instance Ord1 QualifiedName where liftCompare = genericLiftCompare
 instance Show1 QualifiedName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable QualifiedName where
-  eval (fmap subtermValue -> QualifiedName name iden) = evaluateInScopedEnv name iden
+  eval (fmap subtermValue -> QualifiedName name iden) = Rval <$> evaluateInScopedEnv name iden
 
 newtype NamespaceName a = NamespaceName (NonEmpty a)
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -249,7 +255,7 @@ instance Ord1 NamespaceName where liftCompare = genericLiftCompare
 instance Show1 NamespaceName where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable NamespaceName where
-  eval (NamespaceName xs) = foldl1 evaluateInScopedEnv $ fmap subtermValue xs
+  eval (NamespaceName xs) = Rval <$> foldl1 evaluateInScopedEnv (fmap subtermValue xs)
 
 newtype ConstDeclaration a = ConstDeclaration [a]
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable)
@@ -442,7 +448,7 @@ instance Show1 Namespace where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 Namespace
 
 instance Evaluatable Namespace where
-  eval Namespace{..} = go names
+  eval Namespace{..} = Rval <$> go names
     where
       names = freeVariables (subterm namespaceName)
       go [] = raiseEff (fail "expected at least one free variable in namespaceName, found none")

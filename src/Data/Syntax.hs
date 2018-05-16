@@ -112,7 +112,7 @@ instance Show1 Identifier where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 Identifier
 
 instance Evaluatable Identifier where
-  eval (Identifier name) = variable name
+  eval (Identifier name) = pure (LvalLocal name)
 
 instance FreeVariables1 Identifier where
   liftFreeVariables _ (Identifier x) = pure x
@@ -158,7 +158,7 @@ instance Ord1 Empty where liftCompare _ _ _ = EQ
 instance Show1 Empty where liftShowsPrec _ _ _ _ = showString "Empty"
 
 instance Evaluatable Empty where
-  eval _ = unit
+  eval _ = Rval <$> unit
 
 
 -- | Syntax representing a parsing or assignment error.
@@ -232,4 +232,4 @@ instance Ord1 Context where liftCompare = genericLiftCompare
 instance Show1 Context where liftShowsPrec = genericLiftShowsPrec
 
 instance Evaluatable Context where
-  eval Context{..} = subtermValue contextSubject
+  eval Context{..} = subtermRef contextSubject

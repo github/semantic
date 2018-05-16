@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses, ScopedTypeVariables, UndecidableInstances, ViewPatterns #-}
 module Data.Syntax.Statement where
 
+import Control.Abstract.Evaluator (ValueRef(..))
 import qualified Data.Abstract.Environment as Env
 import Data.Abstract.Evaluatable
 import Data.ByteString.Char8 (unpack)
@@ -22,7 +23,7 @@ instance ToJSONFields1 If
 instance Evaluatable If where
   eval (If cond if' else') = do
     bool <- subtermValue cond
-    ifthenelse bool (subtermValue if') (subtermValue else')
+    Rval <$> ifthenelse bool (subtermValue if') (subtermValue else')
 
 -- | Else statement. The else condition is any term, that upon successful completion, continues evaluation to the elseBody, e.g. `for ... else` in Python.
 data Else a = Else { elseCondition :: !a, elseBody :: !a }
@@ -95,7 +96,7 @@ instance Evaluatable Let where
   eval Let{..} = do
     name <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm letVariable)
     addr <- snd <$> letrec name (subtermValue letValue)
-    localEnv (Env.insert name addr) (subtermValue letBody)
+    Rval <$> localEnv (Env.insert name addr) (subtermValue letBody)
 
 
 -- Assignment
@@ -112,13 +113,22 @@ instance ToJSONFields1 Assignment
 
 instance Evaluatable Assignment where
   eval Assignment{..} = do
-    case freeVariables (subterm assignmentTarget) of
-      [name] -> do
-        v <- subtermValue assignmentValue
-        addr <- lookupOrAlloc name
-        assign addr v
-        modifyEnv (Env.insert name addr) $> v
-      _ -> evaluateInScopedEnv (subtermValue assignmentTarget) (subtermValue assignmentValue)
+    lhs <- subtermRef assignmentTarget
+    rhs <- subtermValue assignmentValue
+
+    case lhs of
+      LvalLocal nam -> do
+        addr <- lookupOrAlloc nam
+        assign addr rhs
+        modifyEnv (Env.insert nam addr)
+      LvalMember _ _ ->
+        -- we don't yet support mutable object properties:
+        pure ()
+      Rval _ ->
+        -- the left hand side of the assignment expression is invalid:
+        pure ()
+
+    pure (Rval rhs)
 
 -- | Post increment operator (e.g. 1++ in Go, or i++ in C).
 newtype PostIncrement a = PostIncrement a
@@ -160,7 +170,7 @@ instance Show1 Return where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 Return
 
 instance Evaluatable Return where
-  eval (Return x) = subtermValue x >>= earlyReturn
+  eval (Return x) = Rval <$> (subtermValue x >>= earlyReturn)
 
 newtype Yield a = Yield a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -185,7 +195,7 @@ instance Show1 Break where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 Break
 
 instance Evaluatable Break where
-  eval (Break x) = subtermValue x >>= throwBreak
+  eval (Break x) = Rval <$> (subtermValue x >>= throwBreak)
 
 newtype Continue a = Continue a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -197,7 +207,7 @@ instance Show1 Continue where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 Continue
 
 instance Evaluatable Continue where
-  eval (Continue a) = subtermValue a >>= throwContinue
+  eval (Continue a) = Rval <$> (subtermValue a >>= throwContinue)
 
 newtype Retry a = Retry a
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -222,7 +232,7 @@ instance Show1 NoOp where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 NoOp
 
 instance Evaluatable NoOp where
-  eval _ = unit
+  eval _ = Rval <$> unit
 
 -- Loops
 
@@ -236,7 +246,7 @@ instance Show1 For where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 For
 
 instance Evaluatable For where
-  eval (fmap subtermValue -> For before cond step body) = forLoop before cond step body
+  eval (fmap subtermValue -> For before cond step body) = Rval <$> forLoop before cond step body
 
 
 data ForEach a = ForEach { forEachBinding :: !a, forEachSubject :: !a, forEachBody :: !a }
@@ -262,7 +272,7 @@ instance Show1 While where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 While
 
 instance Evaluatable While where
-  eval While{..} = while (subtermValue whileCondition)  (subtermValue whileBody)
+  eval While{..} = Rval <$> while (subtermValue whileCondition) (subtermValue whileBody)
 
 data DoWhile a = DoWhile { doWhileCondition :: !a, doWhileBody :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Hashable1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
@@ -274,7 +284,7 @@ instance Show1 DoWhile where liftShowsPrec = genericLiftShowsPrec
 instance ToJSONFields1 DoWhile
 
 instance Evaluatable DoWhile where
-  eval DoWhile{..} = doWhile (subtermValue doWhileBody) (subtermValue doWhileCondition)
+  eval DoWhile{..} = Rval <$> doWhile (subtermValue doWhileBody) (subtermValue doWhileCondition)
 
 -- Exception handling
 
