@@ -42,8 +42,8 @@ cachingConfiguration :: (Cacheable term location (Cell location) value, Members 
                      -> TermEvaluator term location value effects value
 cachingConfiguration configuration values action = do
   modify' (cacheSet configuration values)
-  result <- (,) <$> action <*> TermEvaluator getHeap
-  fst result <$ modify' (cacheInsert configuration result)
+  result <- Cached <$> action <*> TermEvaluator getHeap
+  cachedValue result <$ modify' (cacheInsert configuration result)
 
 putCache :: Member (OutCache term location value) effects
          => Cache term location (Cell location) value
@@ -126,7 +126,7 @@ converge seed f = loop seed
 
 -- | Nondeterministically write each of a collection of stores & return their associated results.
 scatter :: (Foldable t, Members '[NonDet, State (Heap location (Cell location) value)] effects) => t (Cached location (Cell location) value) -> TermEvaluator term location value effects value
-scatter = foldMapA (\ (value, heap') -> TermEvaluator (putHeap heap') $> value)
+scatter = foldMapA (\ (Cached value heap') -> TermEvaluator (putHeap heap') $> value)
 
 
 caching :: Alternative f => TermEvaluator term location value (NonDet ': InCache term location value ': OutCache term location value ': effects) a -> TermEvaluator term location value effects (f a, Cache term location (Cell location) value)
