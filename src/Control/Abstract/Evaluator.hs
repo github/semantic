@@ -47,7 +47,7 @@ data ValueRef value where
   Rval :: value -> ValueRef value
   LvalLocal :: Name -> ValueRef value
   LvalMember :: value -> Name -> ValueRef value
-    deriving (Eq, Ord, Show)
+  deriving (Eq, Ord, Show)
 
 -- Effects
 
