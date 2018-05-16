@@ -8,6 +8,8 @@ module Data.Abstract.Evaluatable
 , EvalError(..)
 , runEvalError
 , runEvalErrorWith
+, value
+, subtermValue
 , evaluateInScopedEnv
 , evaluatePackageWith
 , throwEvalError
@@ -44,8 +46,8 @@ class Evaluatable constr where
   eval :: ( EvaluatableConstraints location term value effects
           , Member Fail effects
           )
-       => SubtermAlgebra constr term (Evaluator location value effects value)
-  default eval :: (Member (Resumable (Unspecialized value)) effects, Show1 constr) => SubtermAlgebra constr term (Evaluator location value effects value)
+       => SubtermAlgebra constr term (Evaluator location value effects (ValueRef value))
+  default eval :: (Member (Resumable (Unspecialized value)) effects, Show1 constr) => SubtermAlgebra constr term (Evaluator location value effects (ValueRef value))
   eval expr = throwResumable (Unspecialized ("Eval unspecialized for " ++ liftShowsPrec (const (const id)) (const id) 0 expr ""))
 
 type EvaluatableConstraints location term value effects =
@@ -126,7 +128,7 @@ throwEvalError = throwResumable
 
 
 data Unspecialized a b where
-  Unspecialized :: Prelude.String -> Unspecialized value value
+  Unspecialized :: Prelude.String -> Unspecialized value (ValueRef value)
 
 instance Eq1 (Unspecialized a) where
   liftEq _ (Unspecialized a) (Unspecialized b) = a == b
@@ -136,12 +138,43 @@ deriving instance Show (Unspecialized a b)
 instance Show1 (Unspecialized a) where
   liftShowsPrec _ _ = showsPrec
 
+-- | Evaluates a 'Value' returning the referenced value
+value :: ( Addressable location effects
+         , AbstractValue location value effects
+         , Members '[ Reader (Environment location value)
+                    , Resumable (AddressError location value)
+                    , Resumable (EnvironmentError value)
+                    , Resumable (EvalError value)
+                    , State (Environment location value)
+                    , State (Heap location (Cell location) value)
+                    ] effects
+         )
+      => ValueRef value
+      -> Evaluator location value effects value
+value (LvalLocal var) = variable var
+value (LvalMember obj prop) = evaluateInScopedEnv (pure obj) (variable prop)
+value (Rval val) = pure val
+
+-- | Evaluates a 'Subterm' to its rval
+subtermValue :: ( Addressable location effects
+                , AbstractValue location value effects
+                , Members '[ Reader (Environment location value)
+                           , Resumable (AddressError location value)
+                           , Resumable (EnvironmentError value)
+                           , Resumable (EvalError value)
+                           , State (Environment location value)
+                           , State (Heap location (Cell location) value)
+                           ] effects
+                )
+             => Subterm term (Evaluator location value effects (ValueRef value))
+             -> Evaluator location value effects value
+subtermValue = value <=< subtermRef
+
 runUnspecialized :: Effectful (m value) => m value (Resumable (Unspecialized value) ': effects) a -> m value effects (Either (SomeExc (Unspecialized value)) a)
 runUnspecialized = runResumable
 
 runUnspecializedWith :: Effectful (m value) => (forall resume . Unspecialized value resume -> m value effects resume) -> m value (Resumable (Unspecialized value) ': effects) a -> m value effects a
 runUnspecializedWith = runResumableWith
-
 
 -- Instances
 
@@ -160,7 +193,7 @@ instance Evaluatable s => Evaluatable (TermF s a) where
 ---   3. Only the last statement’s return value is returned.
 instance Evaluatable [] where
   -- 'nonEmpty' and 'foldMap1' enable us to return the last statement’s result instead of 'unit' for non-empty lists.
-  eval = maybe unit (runApp . foldMap1 (App . subtermValue)) . nonEmpty
+  eval = maybe (Rval <$> unit) (runApp . foldMap1 (App . subtermRef)) . nonEmpty
 
 
 traceResolve :: (Show a, Show b, Member Trace effects) => a -> b -> Evaluator location value effects ()
@@ -204,7 +237,7 @@ evaluatePackageWith :: forall location term value inner inner' outer
                        , inner' ~ (LoopControl value ': Return value ': Reader ModuleInfo ': Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer)
                        )
                     => (SubtermAlgebra Module      term (TermEvaluator term location value inner value) -> SubtermAlgebra Module      term (TermEvaluator term location value inner value))
-                    -> (SubtermAlgebra (Base term) term (TermEvaluator term location value inner value) -> SubtermAlgebra (Base term) term (TermEvaluator term location value inner value))
+                    -> (SubtermAlgebra (Base term) term (TermEvaluator term location value inner (ValueRef value)) -> SubtermAlgebra (Base term) term (TermEvaluator term location value inner (ValueRef value)))
                     -> Package term
                     -> TermEvaluator term location value outer [value]
 evaluatePackageWith analyzeModule analyzeTerm package
@@ -216,11 +249,13 @@ evaluatePackageWith analyzeModule analyzeTerm package
   . withPrelude (packagePrelude (packageBody package))
   . raiseHandler (runModules (runTermEvaluator . evalModule))
   $ traverse (uncurry evaluateEntryPoint) (ModuleTable.toPairs (packageEntryPoints (packageBody package)))
-  where evalModule m
+  where
+        evalModule m
           = pairValueWithEnv
           . runInModule (moduleInfo m)
-          . analyzeModule (subtermValue . moduleBody)
-          $ fmap (Subterm <*> foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator)))) m
+          . analyzeModule (subtermRef . moduleBody)
+          $ evalTerm <$> m
+        evalTerm term = Subterm term (TermEvaluator (value =<< runTermEvaluator (foldSubterms (analyzeTerm (TermEvaluator . eval . fmap (second runTermEvaluator))) term)))
 
         runInModule info
           = runReader info
