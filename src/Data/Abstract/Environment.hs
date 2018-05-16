@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies #-}
 module Data.Abstract.Environment
   ( Environment(..)
   , addresses
@@ -37,11 +37,11 @@ import qualified Data.List.NonEmpty as NonEmpty
 -- | A LIFO stack of maps of names to addresses, representing a lexically-scoped evaluation environment.
 --   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
 --   scope for "a", then the next, and so on.
-newtype Environment location value = Environment { unEnvironment :: NonEmpty (Map.Map Name location) }
+newtype Environment location value = Environment { unEnvironment :: NonEmpty (Map.Map Name (Address location value)) }
   deriving (Eq, Ord)
 
-instance Eq   location => Eq1   (Environment location) where liftEq      _ (Environment a) (Environment b) = a == b
-instance Ord  location => Ord1  (Environment location) where liftCompare _ (Environment a) (Environment b) = a `compare` b
+instance Eq location   => Eq1   (Environment location) where liftEq      eq      (Environment a) (Environment b) = liftEq      (liftEq      (liftEq      eq))      a b
+instance Ord location  => Ord1  (Environment location) where liftCompare compare (Environment a) (Environment b) = liftCompare (liftCompare (liftCompare compare)) a b
 instance Show location => Show1 (Environment location) where liftShowsPrec _ _ = showsPrec
 
 -- | The provided list will be put into an Environment with one member, so fromList is total
@@ -49,8 +49,8 @@ instance Show location => Show1 (Environment location) where liftShowsPrec _ _ =
 --   same Name or you violate the axiom that toList . fromList == id.
 instance IsList (Environment location value) where
   type Item (Environment location value) = (Name, Address location value)
-  fromList xs                   = Environment (Map.fromList (second unAddress <$> xs) :| [])
-  toList (Environment (x :| _)) = second Address <$> Map.toList x
+  fromList xs                   = Environment (Map.fromList xs :| [])
+  toList (Environment (x :| _)) = Map.toList x
 
 mergeEnvs :: Environment location value -> Environment location value -> Environment location value
 mergeEnvs (Environment (a :| as)) (Environment (b :| bs)) =
@@ -87,7 +87,7 @@ mergeNewer (Environment a) (Environment b) =
 -- >>> pairs shadowed
 -- [(Name {unName = "foo"},Precise 1)]
 pairs :: Environment location value -> [(Name, Address location value)]
-pairs = map (second Address) . Map.toList . fold . unEnvironment
+pairs = Map.toList . fold . unEnvironment
 
 unpairs :: [(Name, Address location value)] -> Environment location value
 unpairs = fromList
@@ -97,11 +97,11 @@ unpairs = fromList
 -- >>> lookup (name "foo") shadowed
 -- Just (Precise 1)
 lookup :: Name -> Environment location value -> Maybe (Address location value)
-lookup k = fmap Address . foldMapA (Map.lookup k) . unEnvironment
+lookup k = foldMapA (Map.lookup k) . unEnvironment
 
 -- | Insert a 'Name' in the environment.
 insert :: Name -> Address location value -> Environment location value -> Environment location value
-insert name (Address value) (Environment (a :| as)) = Environment (Map.insert name value a :| as)
+insert name address (Environment (a :| as)) = Environment (Map.insert name address a :| as)
 
 -- | Remove a 'Name' from the environment.
 --
