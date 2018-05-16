@@ -119,12 +119,12 @@ featureVectorDecorator = cata (\ (In (label :. rest) functor) ->
 
 -- | Annotates a term with the corresponding p,q-gram at each node.
 pqGramDecorator
-  :: Traversable f
-  => (forall a . f a -> label) -- ^ A function computing the label from syntax. This function can only use the syntax functor’s constructor & constant fields to compute the label, not any recursive values inside the syntax.
+  :: Traversable syntax
+  => (forall a . syntax a -> label) -- ^ A function computing the label from syntax. This function can only use the syntax functor’s constructor & constant fields to compute the label, not any recursive values inside the syntax.
   -> Int -- ^ 'p'; the desired stem length for the grams.
   -> Int -- ^ 'q'; the desired base length for the grams.
-  -> Term f (Record fields) -- ^ The term to decorate.
-  -> Term f (Record (Gram label ': fields)) -- ^ The decorated term.
+  -> Term syntax (Record fields) -- ^ The term to decorate.
+  -> Term syntax (Record (Gram label ': fields)) -- ^ The decorated term.
 pqGramDecorator getLabel p q = cata algebra
   where
     algebra term = let label = getLabel (termFOut term) in
@@ -133,13 +133,13 @@ pqGramDecorator getLabel p q = cata algebra
     assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
 
     assignLabels :: label
-                 -> Term f (Record (Gram label ': fields))
-                 -> State [Maybe label] (Term f (Record (Gram label ': fields)))
+                 -> Term syntax (Record (Gram label ': fields))
+                 -> State [Maybe label] (Term syntax (Record (Gram label ': fields)))
     assignLabels label (Term.Term (In (gram :. rest) functor)) = do
       labels <- get
       put (drop 1 labels)
       pure $! termIn (gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } :. rest) functor
-    siblingLabels :: Traversable f => f (Term f (Record (Gram label ': fields))) -> [Maybe label]
+    siblingLabels :: Traversable syntax => syntax (Term f (Record (Gram label ': fields))) -> [Maybe label]
     siblingLabels = foldMap (base . rhead . termAnnotation)
     padToSize n list = take n (list <> repeat empty)
 
