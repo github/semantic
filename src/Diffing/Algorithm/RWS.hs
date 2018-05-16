@@ -118,13 +118,12 @@ featureVectorDecorator = cata (\ (In (label :. rest) functor) ->
   where addSubtermVector v term = addVectors v (rhead (termAnnotation term))
 
 -- | Annotates a term with the corresponding p,q-gram at each node.
-pqGramDecorator
-  :: Traversable syntax
-  => (forall a . syntax a -> label) -- ^ A function computing the label from syntax. This function can only use the syntax functor’s constructor & constant fields to compute the label, not any recursive values inside the syntax.
-  -> Int -- ^ 'p'; the desired stem length for the grams.
-  -> Int -- ^ 'q'; the desired base length for the grams.
-  -> Term syntax (Record fields) -- ^ The term to decorate.
-  -> Term syntax (Record (Gram label ': fields)) -- ^ The decorated term.
+pqGramDecorator :: Traversable syntax
+                => (forall a . syntax a -> label) -- ^ A function computing the label from syntax. This function can only use the syntax functor’s constructor & constant fields to compute the label, not any recursive values inside the syntax.
+                -> Int -- ^ 'p'; the desired stem length for the grams.
+                -> Int -- ^ 'q'; the desired base length for the grams.
+                -> Term syntax (Record fields) -- ^ The term to decorate.
+                -> Term syntax (Record (Gram label ': fields)) -- ^ The decorated term.
 pqGramDecorator getLabel p q = cata algebra
   where
     algebra term = let label = getLabel (termFOut term) in
