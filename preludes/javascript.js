@@ -1,2 +1,2 @@
 // can't quite define console.log in a way we can evaluate yet, but...
-function log(x) { return __semantic_print(x) }
+// function log(x) { return __semantic_print(x) }
