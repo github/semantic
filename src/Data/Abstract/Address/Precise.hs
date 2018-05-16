@@ -64,4 +64,4 @@ instance Reducer (Precise, value) (Heap value) where
   snoc (Heap heap) (Precise key, a) = Heap (snoc heap (key, a))
 
 instance Show value => Show (Heap value) where
-  showsPrec d = showsUnaryWith showsPrec "Heap" d . map (first Precise) . Monoidal.pairs . unHeap
+  showsPrec d = showsUnaryWith showsPrec "Heap" d . Monoidal.pairs . unHeap
