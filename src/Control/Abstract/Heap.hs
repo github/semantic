@@ -4,7 +4,6 @@ module Control.Abstract.Heap
 , getHeap
 , putHeap
 , modifyHeap
-, lookupHeap
 , assign
 , alloc
 , deref
