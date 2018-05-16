@@ -138,6 +138,7 @@ deriving instance Show (Unspecialized a b)
 instance Show1 (Unspecialized a) where
   liftShowsPrec _ _ = showsPrec
 
+-- | Evaluates a 'Value' returning the referenced value
 value :: ( Addressable location effects
          , AbstractValue location value effects
          , Members '[ Reader (Environment location value)
@@ -154,6 +155,7 @@ value (LvalLocal var) = variable var
 value (LvalMember obj prop) = evaluateInScopedEnv (pure obj) (variable prop)
 value (Rval val) = pure val
 
+-- | Evaluates a 'Subterm' to its rval
 subtermValue :: ( Addressable location effects
                 , AbstractValue location value effects
                 , Members '[ Reader (Environment location value)
