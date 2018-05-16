@@ -1,0 +1,13 @@
+FROM debian:stable-slim
+
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y libgmp10
+
+# Cleanup
+RUN apt-get remove -y curl && \
+    apt-get autoremove -y && \
+    apt-get clean -y && \
+    rm -rf /var/lib/apt/lists/*
+
+ENTRYPOINT ["bash"]
