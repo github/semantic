@@ -44,7 +44,7 @@ heapLookupAll address = fmap toList . heapLookup address
 
 -- | Append a value onto the cell for a given address, inserting a new cell if none existed.
 heapInsert :: Address Precise value -> value -> Heap value -> Heap value
-heapInsert (Address address) value = flip snoc (address, value)
+heapInsert address value = flip snoc (address, value)
 
 -- | Manually insert a cell into the heap at a given address.
 heapInit :: Address Precise value -> Latest value -> Heap value -> Heap value
@@ -59,10 +59,10 @@ heapRestrict :: Heap value -> Live value -> Heap value
 heapRestrict (Heap m) roots = Heap (Monoidal.filterWithKey (\ address _ -> Address (Precise address) `liveMember` roots) m)
 
 
-instance Reducer (Precise, value) (Heap value) where
-  unit = Heap . unit . first unPrecise
-  cons (Precise key, a) (Heap heap) = Heap (cons (key, a) heap)
-  snoc (Heap heap) (Precise key, a) = Heap (snoc heap (key, a))
+instance Reducer (Address Precise value, value) (Heap value) where
+  unit = Heap . unit . first (unPrecise . unAddress)
+  cons (Address (Precise key), a) (Heap heap) = Heap (cons (key, a) heap)
+  snoc (Heap heap) (Address (Precise key), a) = Heap (snoc heap (key, a))
 
 instance Show value => Show (Heap value) where
   showsPrec d = showsUnaryWith showsPrec "Heap" d . map (first Precise) . Monoidal.pairs . unHeap
