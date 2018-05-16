@@ -9,13 +9,15 @@ import           Prologue
 
 -- | The type of variable names.
 newtype Name = Name { unName :: ByteString }
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Hashable, Ord)
 
 name :: ByteString -> Name
 name = Name
 
 instance IsString Name where
   fromString = Name . BC.pack
+
+instance Show Name where showsPrec d (Name str) = showsPrec d str
 
 
 -- | Types which can contain unbound variables.
