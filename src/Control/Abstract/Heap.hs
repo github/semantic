@@ -163,6 +163,11 @@ data Allocator location value return where
   Deref :: Address location value -> Allocator location value value
 
 
+runAllocator :: (Addressable location effects, Members '[Resumable (AddressError location value), State (Heap location (Cell location) value)] effects) => Evaluator location value (Allocator location value ': effects) a -> Evaluator location value effects a
+runAllocator = interpret (\ eff -> case eff of
+  Alloc name -> Address <$> allocCell name
+  Deref addr -> lookupHeap addr >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwAddressError (UninitializedAddress addr)))
+
 runAllocatorPrecise :: Members '[Fresh, Resumable (AddressError Precise value), State (Heap Precise Latest value)] effects => Evaluator Precise value (Allocator Precise value ': effects) a -> Evaluator Precise value effects a
 runAllocatorPrecise = interpret (\ eff -> case eff of
   Alloc _    -> Address . Precise <$> fresh
