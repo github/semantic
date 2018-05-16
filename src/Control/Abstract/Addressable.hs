@@ -14,7 +14,7 @@ alloc = fmap Address . allocCell
 -- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
 deref :: (Addressable location effects, Members '[Resumable (AddressError location value), State (Heap location (Cell location) value)] effects) => Address location value -> Evaluator location value effects value
 deref addr = do
-  cell <- lookupHeap addr >>= maybeM (throwAddressError (UnallocatedAddress addr))
+  cell <- heapLookup addr <$> get >>= maybeM (throwAddressError (UnallocatedAddress addr))
   derefed <- derefCell addr cell
   maybeM (throwAddressError (UninitializedAddress addr)) derefed
 
@@ -62,11 +62,7 @@ data Allocator location value return where
 runAllocator :: (Addressable location effects, Members '[Resumable (AddressError location value), State (Heap location (Cell location) value)] effects) => Evaluator location value (Allocator location value ': effects) a -> Evaluator location value effects a
 runAllocator = interpret (\ eff -> case eff of
   Alloc name -> Address <$> allocCell name
-  Deref addr -> lookupHeap addr >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwAddressError (UninitializedAddress addr)))
-
--- | Look up the cell for the given 'Address' in the 'Heap'.
-lookupHeap :: (Member (State (Heap location (Cell location) value)) effects, Ord location) => Address location value -> Evaluator location value effects (Maybe (Cell location value))
-lookupHeap = flip fmap get . heapLookup
+  Deref addr -> heapLookup addr <$> get >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwAddressError (UninitializedAddress addr)))
 
 
 data AddressError location value resume where
