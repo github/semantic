@@ -25,10 +25,11 @@ import           Data.Aeson hiding (Result)
 import           Data.ByteString.Builder
 import qualified Data.ByteString.Char8 as BC
 import           Data.Graph
+import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Data.Text.Encoding as T
-import           Prologue hiding (packageName)
+import           Prologue hiding (packageName, prj)
 
 -- | A vertex of some specific type.
 data Vertex
@@ -64,7 +65,7 @@ graphingTerms :: ( Element Syntax.Identifier syntax
               => SubtermAlgebra (Base term) term (TermEvaluator term (Located location) value effects a)
               -> SubtermAlgebra (Base term) term (TermEvaluator term (Located location) value effects a)
 graphingTerms recur term@(In _ syntax) = do
-  case projectSum syntax of
+  case prj syntax of
     Just (Syntax.Identifier name) -> do
       moduleInclusion (Variable (unName name))
       variableDefinition name

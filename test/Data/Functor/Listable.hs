@@ -213,10 +213,10 @@ instance (Listable a, Listable b) => Listable (Patch a b) where
 
 
 instance (Listable1 f, Listable1 (Sum (g ': fs))) => Listable1 (Sum (f ': g ': fs)) where
-  liftTiers tiers = (injectSum `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)) \/ (weakenSum `mapT` ((liftTiers :: [Tier a] -> [Tier (Sum (g ': fs) a)]) tiers))
+  liftTiers tiers = (inj `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)) \/ (weaken `mapT` ((liftTiers :: [Tier a] -> [Tier (Sum (g ': fs) a)]) tiers))
 
 instance Listable1 f => Listable1 (Sum '[f]) where
-  liftTiers tiers = injectSum `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)
+  liftTiers tiers = inj `mapT` ((liftTiers :: [Tier a] -> [Tier (f a)]) tiers)
 
 instance (Listable1 (Sum fs), Listable a) => Listable (Sum fs a) where
   tiers = tiers1

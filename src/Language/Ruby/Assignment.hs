@@ -23,7 +23,7 @@ import qualified Data.Syntax.Literal as Literal
 import qualified Data.Syntax.Statement as Statement
 import qualified Data.Term as Term
 import qualified Language.Ruby.Syntax as Ruby.Syntax
-import Prologue hiding (for)
+import Prologue hiding (for, inj)
 
 -- | The type of Ruby syntax.
 type Syntax = '[
@@ -341,7 +341,7 @@ args = (symbol ArgumentList <|> symbol ArgumentListWithParens) *> children (many
 methodCall :: Assignment
 methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> send)
   where
-    send = injectSum <$> ((regularCall <|> funcCall <|> scopeCall <|> dotCall) <*> optional block)
+    send = inj <$> ((regularCall <|> funcCall <|> scopeCall <|> dotCall) <*> optional block)
 
     funcCall = Ruby.Syntax.Send Nothing <$> selector <*> args
     regularCall = symbol Call *> children (Ruby.Syntax.Send <$> (Just <$> postContextualize heredoc expression) <*> selector) <*> args
@@ -349,11 +349,11 @@ methodCall = makeTerm' <$> symbol MethodCall <*> children (require <|> load <|> 
     dotCall = symbol Call *> children (Ruby.Syntax.Send <$> (Just <$> term expression) <*> pure Nothing <*> args)
 
     selector = Just <$> term methodSelector
-    require = injectSum <$> (symbol Identifier *> do
+    require = inj <$> (symbol Identifier *> do
       s <- source
       guard (s `elem` ["require", "require_relative"])
       Ruby.Syntax.Require (s == "require_relative") <$> nameExpression)
-    load = injectSum <$> (symbol Identifier *> do
+    load = inj <$> (symbol Identifier *> do
       s <- source
       guard (s == "load")
       Ruby.Syntax.Load <$> loadArgs)
@@ -407,7 +407,7 @@ assignment' = makeTerm  <$> symbol Assignment         <*> children (Statement.As
                 ])
   where
     assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Sum Syntax Term
-    assign c l r = injectSum (Statement.Assignment [] l (makeTerm1 (c l r)))
+    assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
 
     lhs  = makeTerm <$> symbol LeftAssignmentList  <*> children (many expr) <|> expr
     rhs  = makeTerm <$> symbol RightAssignmentList <*> children (many expr) <|> expr
@@ -442,30 +442,30 @@ unary = symbol Unary >>= \ location ->
 -- TODO: Distinguish `===` from `==` ?
 binary :: Assignment
 binary = makeTerm' <$> symbol Binary <*> children (infixTerm expression expression
-  [ (injectSum .) . Expression.Plus             <$ symbol AnonPlus
-  , (injectSum .) . Expression.Minus            <$ symbol AnonMinus'
-  , (injectSum .) . Expression.Times            <$ symbol AnonStar'
-  , (injectSum .) . Expression.Power            <$ symbol AnonStarStar
-  , (injectSum .) . Expression.DividedBy        <$ symbol AnonSlash
-  , (injectSum .) . Expression.Modulo           <$ symbol AnonPercent
-  , (injectSum .) . Expression.And              <$ symbol AnonAmpersandAmpersand
-  , (injectSum .) . Ruby.Syntax.LowAnd          <$ symbol AnonAnd
-  , (injectSum .) . Expression.BAnd             <$ symbol AnonAmpersand
-  , (injectSum .) . Expression.Or               <$ symbol AnonPipePipe
-  , (injectSum .) . Ruby.Syntax.LowOr           <$ symbol AnonOr
-  , (injectSum .) . Expression.BOr              <$ symbol AnonPipe
-  , (injectSum .) . Expression.BXOr             <$ symbol AnonCaret
-  , (injectSum .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual)
-  , (injectSum .) . invert Expression.Equal     <$ symbol AnonBangEqual
-  , (injectSum .) . Expression.LShift           <$ symbol AnonLAngleLAngle
-  , (injectSum .) . Expression.RShift           <$ symbol AnonRAngleRAngle
-  , (injectSum .) . Expression.Comparison       <$ symbol AnonLAngleEqualRAngle
-  , (injectSum .) . Expression.LessThan         <$ symbol AnonLAngle
-  , (injectSum .) . Expression.GreaterThan      <$ symbol AnonRAngle
-  , (injectSum .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
-  , (injectSum .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
-  , (injectSum .) . Expression.Matches          <$ symbol AnonEqualTilde
-  , (injectSum .) . Expression.NotMatches       <$ symbol AnonBangTilde
+  [ (inj .) . Expression.Plus             <$ symbol AnonPlus
+  , (inj .) . Expression.Minus            <$ symbol AnonMinus'
+  , (inj .) . Expression.Times            <$ symbol AnonStar'
+  , (inj .) . Expression.Power            <$ symbol AnonStarStar
+  , (inj .) . Expression.DividedBy        <$ symbol AnonSlash
+  , (inj .) . Expression.Modulo           <$ symbol AnonPercent
+  , (inj .) . Expression.And              <$ symbol AnonAmpersandAmpersand
+  , (inj .) . Ruby.Syntax.LowAnd          <$ symbol AnonAnd
+  , (inj .) . Expression.BAnd             <$ symbol AnonAmpersand
+  , (inj .) . Expression.Or               <$ symbol AnonPipePipe
+  , (inj .) . Ruby.Syntax.LowOr           <$ symbol AnonOr
+  , (inj .) . Expression.BOr              <$ symbol AnonPipe
+  , (inj .) . Expression.BXOr             <$ symbol AnonCaret
+  , (inj .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual)
+  , (inj .) . invert Expression.Equal     <$ symbol AnonBangEqual
+  , (inj .) . Expression.LShift           <$ symbol AnonLAngleLAngle
+  , (inj .) . Expression.RShift           <$ symbol AnonRAngleRAngle
+  , (inj .) . Expression.Comparison       <$ symbol AnonLAngleEqualRAngle
+  , (inj .) . Expression.LessThan         <$ symbol AnonLAngle
+  , (inj .) . Expression.GreaterThan      <$ symbol AnonRAngle
+  , (inj .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
+  , (inj .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
+  , (inj .) . Expression.Matches          <$ symbol AnonEqualTilde
+  , (inj .) . Expression.NotMatches       <$ symbol AnonBangTilde
   ])
   where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 

@@ -17,7 +17,7 @@ module Control.Abstract.Matching
 import           Data.Algebra
 import           Data.Sum
 import           Data.Term
-import           Prologue
+import           Prologue hiding (prj)
 
 -- | A @Matcher t a@ is a tree automaton that matches some 'Recursive' and 'Corecursive' type @t@, yielding values of type @a@.
 --   Matching operations are implicitly recursive: when you run a 'Matcher', it is applied bottom-up.
@@ -92,11 +92,11 @@ match :: (f :< fs)
       => (f (Term (Sum fs) ann) -> b)
       -> Matcher b a
       -> Matcher (Term (Sum fs) ann) a
-match f = Match (fmap f . projectSum . termOut)
+match f = Match (fmap f . prj . termOut)
 
 -- | @narrow'@ attempts to project a union-type target to a more specific type.
 narrow' :: (f :< fs) => Matcher (Term (Sum fs) ann) (Maybe (f (Term (Sum fs) ann)))
-narrow' = fmap (projectSum . termOut) Target
+narrow' = fmap (prj . termOut) Target
 
 -- | 'narrow' behaves as @narrow'@, but fails if the target cannot be thus projected.
 narrow :: (f :< fs) => Matcher (Term (Sum fs) ann) (f (Term (Sum fs) ann))

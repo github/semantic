@@ -22,7 +22,7 @@ import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import Language.TypeScript.Grammar as Grammar
 import qualified Language.TypeScript.Syntax as TypeScript.Syntax
-import Prologue
+import Prologue hiding (inj)
 
 -- | The type of TypeScript syntax.
 type Syntax = '[
@@ -248,7 +248,7 @@ augmentedAssignmentExpression = makeTerm' <$> symbol AugmentedAssignmentExpressi
   , assign Expression.LShift <$ symbol AnonLAngleLAngleEqual
   , assign Expression.BOr <$ symbol AnonPipeEqual ])
   where assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Sum Syntax Term
-        assign c l r = injectSum (Statement.Assignment [] l (makeTerm1 (c l r)))
+        assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
 
 
 awaitExpression :: Assignment
@@ -645,9 +645,9 @@ importStatement =   makeImportTerm <$> symbol Grammar.ImportStatement <*> childr
                 <|> makeTerm' <$> symbol Grammar.ImportStatement <*> children (requireImport <|> sideEffectImport)
   where
     -- `import foo = require "./foo"`
-    requireImport = injectSum <$> (symbol Grammar.ImportRequireClause *> children (TypeScript.Syntax.QualifiedAliasedImport <$> term identifier <*> fromClause))
+    requireImport = inj <$> (symbol Grammar.ImportRequireClause *> children (TypeScript.Syntax.QualifiedAliasedImport <$> term identifier <*> fromClause))
     -- `import "./foo"`
-    sideEffectImport = injectSum <$> (TypeScript.Syntax.SideEffectImport <$> fromClause)
+    sideEffectImport = inj <$> (TypeScript.Syntax.SideEffectImport <$> fromClause)
     -- `import { bar } from "./foo"`
     namedImport = (,) Nothing <$> (symbol Grammar.NamedImports *> children (many importSymbol))
     -- `import defaultMember from "./foo"`
@@ -832,27 +832,27 @@ tryStatement = makeTry <$> symbol TryStatement <*> children ((,,) <$> term state
 
 binaryExpression  :: Assignment
 binaryExpression = makeTerm' <$> symbol BinaryExpression <*> children (infixTerm expression (term expression)
-  [ (injectSum .) . Expression.Plus             <$ symbol AnonPlus
-  , (injectSum .) . Expression.Minus            <$ symbol AnonMinus
-  , (injectSum .) . Expression.Times            <$ symbol AnonStar
-  , (injectSum .) . Expression.DividedBy        <$ symbol AnonSlash
-  , (injectSum .) . Expression.Modulo           <$ symbol AnonPercent
-  , (injectSum .) . Expression.Member           <$ symbol AnonIn
-  , (injectSum .) . Expression.And              <$ symbol AnonAmpersandAmpersand
-  , (injectSum .) . Expression.BAnd             <$ symbol AnonAmpersand
-  , (injectSum .) . Expression.Or               <$ symbol AnonPipePipe
-  , (injectSum .) . Expression.BOr              <$ symbol AnonPipe
-  , (injectSum .) . Expression.BXOr             <$ symbol AnonCaret
-  , (injectSum .) . Expression.InstanceOf       <$ symbol AnonInstanceof
-  , (injectSum .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual)
-  , (injectSum .) . invert Expression.Equal     <$ (symbol AnonBangEqual <|> symbol AnonBangEqualEqual)
-  , (injectSum .) . Expression.LShift           <$ symbol AnonLAngleLAngle
-  , (injectSum .) . Expression.RShift           <$ symbol AnonRAngleRAngle
-  , (injectSum .) . Expression.UnsignedRShift   <$ symbol AnonRAngleRAngleRAngle
-  , (injectSum .) . Expression.LessThan         <$ symbol AnonLAngle
-  , (injectSum .) . Expression.GreaterThan      <$ symbol AnonRAngle
-  , (injectSum .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
-  , (injectSum .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
+  [ (inj .) . Expression.Plus             <$ symbol AnonPlus
+  , (inj .) . Expression.Minus            <$ symbol AnonMinus
+  , (inj .) . Expression.Times            <$ symbol AnonStar
+  , (inj .) . Expression.DividedBy        <$ symbol AnonSlash
+  , (inj .) . Expression.Modulo           <$ symbol AnonPercent
+  , (inj .) . Expression.Member           <$ symbol AnonIn
+  , (inj .) . Expression.And              <$ symbol AnonAmpersandAmpersand
+  , (inj .) . Expression.BAnd             <$ symbol AnonAmpersand
+  , (inj .) . Expression.Or               <$ symbol AnonPipePipe
+  , (inj .) . Expression.BOr              <$ symbol AnonPipe
+  , (inj .) . Expression.BXOr             <$ symbol AnonCaret
+  , (inj .) . Expression.InstanceOf       <$ symbol AnonInstanceof
+  , (inj .) . Expression.Equal            <$ (symbol AnonEqualEqual <|> symbol AnonEqualEqualEqual)
+  , (inj .) . invert Expression.Equal     <$ (symbol AnonBangEqual <|> symbol AnonBangEqualEqual)
+  , (inj .) . Expression.LShift           <$ symbol AnonLAngleLAngle
+  , (inj .) . Expression.RShift           <$ symbol AnonRAngleRAngle
+  , (inj .) . Expression.UnsignedRShift   <$ symbol AnonRAngleRAngleRAngle
+  , (inj .) . Expression.LessThan         <$ symbol AnonLAngle
+  , (inj .) . Expression.GreaterThan      <$ symbol AnonRAngle
+  , (inj .) . Expression.LessThanEqual    <$ symbol AnonLAngleEqual
+  , (inj .) . Expression.GreaterThanEqual <$ symbol AnonRAngleEqual
   ])
   where invert cons a b = Expression.Not (makeTerm1 (cons a b))
 
