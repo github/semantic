@@ -107,11 +107,10 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
  deriving (Eq, Show)
 
 -- | Annotates a term with a feature vector at each node, using the default values for the p, q, and d parameters.
-defaultFeatureVectorDecorator
- :: (Hashable label, Traversable syntax)
- => Label syntax fields label
- -> Term syntax (Record fields)
- -> Term syntax (Record (FeatureVector ': fields))
+defaultFeatureVectorDecorator :: (Hashable label, Traversable syntax)
+                              => Label syntax fields label
+                              -> Term syntax (Record fields)
+                              -> Term syntax (Record (FeatureVector ': fields))
 defaultFeatureVectorDecorator getLabel = featureVectorDecorator . pqGramDecorator getLabel defaultP defaultQ
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
