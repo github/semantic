@@ -21,7 +21,6 @@ library
                      , Analysis.Abstract.Evaluating
                      , Analysis.Abstract.Graph
                      , Analysis.Abstract.Tracing
-                     , Analysis.CallGraph
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
                      , Analysis.Decorator
