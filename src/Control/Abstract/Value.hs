@@ -138,8 +138,8 @@ class Show value => AbstractValue location value effects where
   scopedEnvironment :: value -> Evaluator location value effects (Maybe (Environment location value))
 
   -- | Build a closure (a binder like a lambda or method definition).
-  closure :: [Name]                                      -- ^ The parameter names.
-          -> Set Name                                    -- ^ The set of free variables to close over.
+  closure :: [Name]                                 -- ^ The parameter names.
+          -> Set Name                               -- ^ The set of free variables to close over.
           -> Evaluator location value effects value -- ^ The evaluator for the body of the closure.
           -> Evaluator location value effects value
   -- | Evaluate an application (like a function call).

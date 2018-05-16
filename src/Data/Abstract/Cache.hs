@@ -1,6 +1,7 @@
 {-# LANGUAGE ConstraintKinds, GeneralizedNewtypeDeriving, TypeFamilies #-}
 module Data.Abstract.Cache where
 
+import Control.Abstract.Evaluator
 import Data.Abstract.Configuration
 import Data.Abstract.Heap
 import Data.Map.Monoidal as Monoidal
@@ -12,7 +13,7 @@ newtype Cache term location cell value = Cache { unCache :: Monoidal.Map (Config
   deriving (Eq, Lower, Monoid, Ord, Reducer (Configuration term location cell value, Cached location cell value), Semigroup)
 
 data Cached location cell value = Cached
-  { cachedValue :: value
+  { cachedValue :: ValueRef value
   , cachedHeap  :: Heap location cell value
   }
   deriving (Eq, Ord, Show)

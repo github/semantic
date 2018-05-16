@@ -120,7 +120,7 @@ instance Evaluatable Import where
     let path = NonEmpty.last modulePaths
     importedEnv <- maybe emptyEnv fst <$> isolate (require path)
     modifyEnv (mergeEnvs (select importedEnv))
-    unit
+    Rval <$> unit
     where
       select importedEnv
         | Prologue.null xs = importedEnv
@@ -159,7 +159,7 @@ instance Evaluatable QualifiedImport where
   eval (QualifiedImport (RelativeQualifiedName _ _))        = raiseEff (fail "technically this is not allowed in python")
   eval (QualifiedImport name@(QualifiedName qualifiedName)) = do
     modulePaths <- resolvePythonModules name
-    go (NonEmpty.zip (FV.name . BC.pack <$> qualifiedName) modulePaths)
+    Rval <$> go (NonEmpty.zip (FV.name . BC.pack <$> qualifiedName) modulePaths)
     where
       -- Evaluate and import the last module, updating the environment
       go ((name, path) :| []) = evalQualifiedImport name path
@@ -188,12 +188,12 @@ instance Evaluatable QualifiedAliasedImport where
 
     -- Evaluate and import the last module, aliasing and updating the environment
     alias <- either (throwEvalError . FreeVariablesError) pure (freeVariable $ subterm aliasTerm)
-    letrec' alias $ \addr -> do
+    Rval <$> letrec' alias (\addr -> do
       let path = NonEmpty.last modulePaths
       importedEnv <- maybe emptyEnv fst <$> isolate (require path)
       modifyEnv (mergeEnvs importedEnv)
       void $ makeNamespace alias addr Nothing
-      unit
+      unit)
 
 -- | Ellipsis (used in splice expressions and alternatively can be used as a fill in expression, like `undefined` in Haskell)
 data Ellipsis a = Ellipsis
