@@ -24,6 +24,7 @@ import           Semantic.Task
 
 import qualified Language.Python.Assignment as Python
 import qualified Language.Ruby.Assignment as Ruby
+import qualified Language.TypeScript.Assignment as TypeScript
 
 justEvaluating
   = runM
@@ -79,7 +80,7 @@ evalGoProject path = justEvaluating =<< evaluateProject goParser Language.Go Not
 evalRubyProject path = justEvaluating =<< evaluateProject rubyParser Language.Ruby rubyPrelude path
 evalPHPProject path = justEvaluating =<< evaluateProject phpParser Language.PHP Nothing path
 evalPythonProject path = justEvaluating =<< evaluateProject pythonParser Language.Python pythonPrelude path
-evalJavaScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.JavaScript Nothing path
+evalJavaScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.JavaScript javaScriptPrelude path
 evalTypeScriptProjectQuietly path = evaluatingWithHoles =<< evaluateProject typescriptParser Language.TypeScript Nothing path
 evalTypeScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.TypeScript Nothing path
 
@@ -87,6 +88,7 @@ typecheckGoFile path = checking =<< evaluateProjectWithCaching goParser Language
 
 rubyPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Ruby.Term))) (Just Language.Ruby)
 pythonPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath Python.Term))) (Just Language.Python)
+javaScriptPrelude = Just $ File (TypeLevel.symbolVal (Proxy :: Proxy (PreludePath TypeScript.Term))) (Just Language.JavaScript)
 
 -- Evaluate a project, starting at a single entrypoint.
 evaluateProject parser lang prelude path = evaluatePackageWith id withTermSpans <$> runTask (readProject Nothing path lang [] >>= parsePackage parser prelude)
