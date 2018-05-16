@@ -79,6 +79,7 @@ evalGoProject path = justEvaluating =<< evaluateProject goParser Language.Go Not
 evalRubyProject path = justEvaluating =<< evaluateProject rubyParser Language.Ruby rubyPrelude path
 evalPHPProject path = justEvaluating =<< evaluateProject phpParser Language.PHP Nothing path
 evalPythonProject path = justEvaluating =<< evaluateProject pythonParser Language.Python pythonPrelude path
+evalJavaScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.JavaScript Nothing path
 evalTypeScriptProjectQuietly path = evaluatingWithHoles =<< evaluateProject typescriptParser Language.TypeScript Nothing path
 evalTypeScriptProject path = justEvaluating =<< evaluateProject typescriptParser Language.TypeScript Nothing path
 
