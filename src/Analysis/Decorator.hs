@@ -1,12 +1,11 @@
 {-# LANGUAGE DataKinds, TypeOperators #-}
 module Analysis.Decorator
 ( decoratorWithAlgebra
-, constructorNameAndConstantFields
 ) where
 
 import Prologue
 import Data.Aeson
-import Data.ByteString.Char8 (ByteString, pack)
+import Data.ByteString.Char8 (ByteString)
 import Data.JSON.Fields
 import Data.Record
 import Data.Term
@@ -25,10 +24,3 @@ newtype Identifier = Identifier ByteString
 
 instance ToJSONFields Identifier where
   toJSONFields (Identifier i) = [ "identifier" .= decodeUtf8 i ]
-
--- | Compute a 'ByteString' label for a 'Show1'able 'Term'.
---
---   This uses 'liftShowsPrec' to produce the 'ByteString', with the effect that
---   constant fields will be included and parametric fields will not be.
-constructorNameAndConstantFields :: Show1 f => f a -> ByteString
-constructorNameAndConstantFields f = pack (liftShowsPrec (const (const id)) (const id) 0 f "")
