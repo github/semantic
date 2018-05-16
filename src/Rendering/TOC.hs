@@ -21,13 +21,11 @@ import Analysis.Declaration
 import Data.Aeson
 import Data.Align (bicrosswalk)
 import Data.Blob
-import Data.ByteString.Lazy (toStrict)
 import Data.Diff
 import Data.Language as Language
 import Data.List (sortOn)
 import qualified Data.List as List
 import qualified Data.Map as Map
-import Data.Output
 import Data.Patch
 import Data.Record
 import Data.Span
@@ -43,9 +41,6 @@ instance Semigroup Summaries where
 instance Monoid Summaries where
   mempty = Summaries mempty mempty
   mappend = (<>)
-
-instance Output Summaries where
-  toOutput = toStrict . (<> "\n") . encode
 
 instance ToJSON Summaries where
   toJSON Summaries{..} = object [ "changes" .= changes, "errors" .= errors ]

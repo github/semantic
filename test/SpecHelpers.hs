@@ -1,5 +1,6 @@
 module SpecHelpers
 ( module X
+, runBuilder
 , diffFilePaths
 , parseFilePath
 , readFilePair
@@ -26,11 +27,12 @@ import Data.Abstract.ModuleTable as X hiding (lookup)
 import Data.Abstract.Value (Namespace(..), Value, ValueError, injValue, prjValue, runValueError)
 import Data.Bifunctor (first)
 import Data.Blob as X
+import Data.ByteString.Builder (toLazyByteString)
+import Data.ByteString.Lazy (toStrict)
 import Data.File as X
 import Data.Functor.Listable as X
 import Data.Language as X
 import Data.List.NonEmpty as X (NonEmpty(..))
-import Data.Output as X
 import Data.Range as X
 import Data.Record as X
 import Data.Source as X
@@ -59,13 +61,15 @@ import Test.LeanCheck as X
 import qualified Data.ByteString as B
 import qualified Semantic.IO as IO
 
+runBuilder = toStrict . toLazyByteString
+
 -- | Returns an s-expression formatted diff for the specified FilePath pair.
 diffFilePaths :: Both FilePath -> IO ByteString
-diffFilePaths paths = readFilePair paths >>= runTask . diffBlobPair SExpressionDiffRenderer
+diffFilePaths paths = readFilePair paths >>= fmap runBuilder . runTask . runDiff SExpressionDiffRenderer . pure
 
 -- | Returns an s-expression parse tree for the specified FilePath.
 parseFilePath :: FilePath -> IO ByteString
-parseFilePath path = (fromJust <$> IO.readFile (file path)) >>= runTask . parseBlob SExpressionTermRenderer
+parseFilePath path = (fromJust <$> IO.readFile (file path)) >>= fmap runBuilder . runTask . runParse SExpressionTermRenderer . pure
 
 -- | Read two files to a BlobPair.
 readFilePair :: Both FilePath -> IO BlobPair
