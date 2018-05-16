@@ -29,3 +29,12 @@ instance Show value => Show (All value) where
 
 type Heap = Heap.Heap Monovariant All
 type Live = Live.Live Monovariant
+
+
+-- | A single point in a program’s execution.
+data Configuration term value = Configuration
+  { configurationTerm  :: term       -- ^ The “instruction,” i.e. the current term to evaluate.
+  , configurationRoots :: Live value -- ^ The set of rooted addresses.
+  , configurationHeap  :: Heap value -- ^ The heap of values.
+  }
+  deriving (Eq, Ord, Show)
