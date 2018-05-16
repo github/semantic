@@ -203,6 +203,7 @@ instance Ord location => ValueRoots location (Value location) where
 
 instance AbstractHole (Value location) where
   hole = injValue Hole
+  isHole = (== Just Hole) . prjValue
 
 -- | Construct a 'Value' wrapping the value arguments (if any).
 instance ( Addressable location (Goto effects (Value location) ': effects)
@@ -265,8 +266,7 @@ instance ( Addressable location (Goto effects (Value location) ': effects)
     | otherwise                     = throwValueError $ StringError v
 
   ifthenelse cond if' else' = do
-    isHole <- isHole cond
-    if isHole then
+    if isHole cond then
       pure hole
     else do
       bool <- asBool cond
@@ -275,8 +275,6 @@ instance ( Addressable location (Goto effects (Value location) ': effects)
   asBool val
     | Just (Boolean b) <- prjValue val = pure b
     | otherwise = throwValueError $ BoolError val
-
-  isHole val = pure (prjValue val == Just Hole)
 
   index = go where
     tryIdx list ii

@@ -101,6 +101,7 @@ instance Ord location => ValueRoots location Type where
 
 instance AbstractHole Type where
   hole = Hole
+  isHole = (== Hole)
 
 -- | Discard the value arguments (if any), constructing a 'Type' instead.
 instance ( Addressable location effects
@@ -152,8 +153,6 @@ instance ( Addressable location effects
     t2 <- fresh
     unify t (Var t1 :* Var t2) $> (Var t1, Var t2)
   asBool t   = unify t Bool *> (pure True <|> pure False)
-
-  isHole ty = pure (ty == Hole)
 
   index arr sub = do
     _ <- unify sub Int

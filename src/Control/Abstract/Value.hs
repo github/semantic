@@ -36,6 +36,7 @@ data Comparator
 
 class AbstractHole value where
   hole :: value
+  isHole :: value -> Bool
 
 -- | A 'Monad' abstracting the evaluation of (and under) binding constructs (functions, methods, etc).
 --
@@ -117,9 +118,6 @@ class Show value => AbstractValue location value effects where
 
   -- | @index x i@ computes @x[i]@, with zero-indexing.
   index :: value -> value -> Evaluator location value effects value
-
-  -- | Determine whether the given datum is a 'Hole'.
-  isHole :: value -> Evaluator location value effects Bool
 
   -- | Build a class value from a name and environment.
   klass :: Name                       -- ^ The new class's identifier
