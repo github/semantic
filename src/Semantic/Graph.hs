@@ -23,7 +23,6 @@ import           Control.Abstract
 import qualified Control.Exception as Exc
 import           Control.Monad.Effect (reinterpret)
 import           Data.Abstract.Address
-import           Data.Abstract.Address.Precise
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Module
 import           Data.Abstract.Package as Package
