@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, TypeFamilies #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Abstract.Environment
   ( Environment(..)
   , addresses
@@ -19,16 +19,15 @@ module Data.Abstract.Environment
   , roots
   ) where
 
-import           Prelude hiding (head, lookup)
 import           Data.Abstract.Address
 import           Data.Abstract.FreeVariables
 import           Data.Abstract.Live
 import           Data.Align
+import qualified Data.List.NonEmpty as NonEmpty
 import qualified Data.Map as Map
 import           Data.Semilattice.Lower
-import           GHC.Exts (IsList (..))
+import           Prelude hiding (head, lookup)
 import           Prologue
-import qualified Data.List.NonEmpty as NonEmpty
 
 -- $setup
 -- >>> let bright = push (insert (name "foo") (Address (Precise 0)) emptyEnv)
@@ -43,14 +42,6 @@ newtype Environment location value = Environment { unEnvironment :: NonEmpty (Ma
 instance Eq location   => Eq1   (Environment location) where liftEq      eq      (Environment a) (Environment b) = liftEq      (liftEq      (liftEq      eq))      a b
 instance Ord location  => Ord1  (Environment location) where liftCompare compare (Environment a) (Environment b) = liftCompare (liftCompare (liftCompare compare)) a b
 instance Show location => Show1 (Environment location) where liftShowsPrec _ _ = showsPrec
-
--- | The provided list will be put into an Environment with one member, so fromList is total
---   (despite NonEmpty's instance being partial). Don't pass in multiple Addresses for the
---   same Name or you violate the axiom that toList . fromList == id.
-instance IsList (Environment location value) where
-  type Item (Environment location value) = (Name, Address location value)
-  fromList xs                   = Environment (Map.fromList xs :| [])
-  toList (Environment (x :| _)) = Map.toList x
 
 mergeEnvs :: Environment location value -> Environment location value -> Environment location value
 mergeEnvs (Environment (a :| as)) (Environment (b :| bs)) =
@@ -90,7 +81,7 @@ pairs :: Environment location value -> [(Name, Address location value)]
 pairs = Map.toList . fold . unEnvironment
 
 unpairs :: [(Name, Address location value)] -> Environment location value
-unpairs = fromList
+unpairs = Environment . pure . Map.fromList
 
 -- | Lookup a 'Name' in the environment.
 --
@@ -115,7 +106,7 @@ trim (Environment (a :| as)) = Environment (a :| filtered)
   where filtered = filter (not . Map.null) as
 
 bind :: Foldable t => t Name -> Environment location value -> Environment location value
-bind names env = fromList (mapMaybe lookupName (Prologue.toList names))
+bind names env = unpairs (mapMaybe lookupName (Prologue.toList names))
   where
     lookupName name = (,) name <$> lookup name env
 
@@ -125,7 +116,7 @@ names = fmap fst . pairs
 
 -- | Lookup and alias name-value bindings from an environment.
 overwrite :: [(Name, Name)] -> Environment location value -> Environment location value
-overwrite pairs env = fromList $ mapMaybe lookupAndAlias pairs
+overwrite pairs env = unpairs $ mapMaybe lookupAndAlias pairs
   where
     lookupAndAlias (oldName, newName) = (,) newName <$> lookup oldName env
 
