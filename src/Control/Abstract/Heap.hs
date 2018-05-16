@@ -4,11 +4,19 @@ module Control.Abstract.Heap
 , getHeap
 , putHeap
 , modifyHeap
+, alloc
+, deref
 , assign
 , lookupOrAlloc
 , letrec
 , letrec'
 , variable
+-- * Effects
+, Allocator(..)
+, runAllocator
+, AddressError(..)
+, runAddressError
+, runAddressErrorWith
 ) where
 
 import Control.Abstract.Addressable
@@ -19,6 +27,7 @@ import Data.Abstract.Environment
 import Data.Abstract.FreeVariables
 import Data.Abstract.Heap
 import Data.Semigroup.Reducer
+import Prologue
 
 -- | Retrieve the heap.
 getHeap :: Member (State (Heap location (Cell location) value)) effects => Evaluator location value effects (Heap location (Cell location) value)
@@ -31,6 +40,14 @@ putHeap = put
 -- | Update the heap.
 modifyHeap :: Member (State (Heap location (Cell location) value)) effects => (Heap location (Cell location) value -> Heap location (Cell location) value) -> Evaluator location value effects ()
 modifyHeap = modify'
+
+
+alloc :: Member (Allocator location value) effects => Name -> Evaluator location value effects (Address location value)
+alloc = send . Alloc
+
+-- | Dereference the given 'Address'in the heap, or fail if the address is uninitialized.
+deref :: Member (Allocator location value) effects => Address location value -> Evaluator location value effects value
+deref = send . Deref
 
 
 -- | Write a value to the given 'Address' in the 'Store'.
@@ -95,3 +112,36 @@ variable :: Members '[ Allocator location value
          => Name
          -> Evaluator location value effects value
 variable name = lookupEnv name >>= maybe (freeVariableError name) deref
+
+
+-- Effects
+
+data Allocator location value return where
+  Alloc :: Name                   -> Allocator location value (Address location value)
+  Deref :: Address location value -> Allocator location value value
+
+runAllocator :: (Addressable location effects, Members '[Resumable (AddressError location value), State (Heap location (Cell location) value)] effects) => Evaluator location value (Allocator location value ': effects) a -> Evaluator location value effects a
+runAllocator = interpret (\ eff -> case eff of
+  Alloc name -> Address <$> allocCell name
+  Deref addr -> heapLookup addr <$> get >>= maybeM (throwResumable (UnallocatedAddress addr)) >>= derefCell addr >>= maybeM (throwResumable (UninitializedAddress addr)))
+
+
+data AddressError location value resume where
+  UnallocatedAddress   :: Address location value -> AddressError location value (Cell location value)
+  UninitializedAddress :: Address location value -> AddressError location value value
+
+deriving instance Eq location => Eq (AddressError location value resume)
+deriving instance Show location => Show (AddressError location value resume)
+instance Show location => Show1 (AddressError location value) where
+  liftShowsPrec _ _ = showsPrec
+instance Eq location => Eq1 (AddressError location value) where
+  liftEq _ (UninitializedAddress a) (UninitializedAddress b) = a == b
+  liftEq _ (UnallocatedAddress a)   (UnallocatedAddress b)   = a == b
+  liftEq _ _                        _                        = False
+
+
+runAddressError :: Effectful (m location value) => m location value (Resumable (AddressError location value) ': effects) a -> m location value effects (Either (SomeExc (AddressError location value)) a)
+runAddressError = runResumable
+
+runAddressErrorWith :: Effectful (m location value) => (forall resume . AddressError location value resume -> m location value effects resume) -> m location value (Resumable (AddressError location value) ': effects) a -> m location value effects a
+runAddressErrorWith = runResumableWith
