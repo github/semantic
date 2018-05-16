@@ -22,9 +22,9 @@ deref addr = do
   maybeM (throwAddressError (UninitializedAddress addr)) derefed
 
 
-data Allocator location return where
-  Alloc :: Name                   -> Allocator location (Address location value)
-  Deref :: Address location value -> Allocator location value
+data Allocator location value return where
+  Alloc :: Name                   -> Allocator location value (Address location value)
+  Deref :: Address location value -> Allocator location value value
 
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Heap.
