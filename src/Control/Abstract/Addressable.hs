@@ -99,6 +99,7 @@ variable :: ( Addressable location effects
          -> Evaluator location value effects value
 variable name = lookupEnv name >>= maybe (freeVariableError name) deref
 
+
 -- Instances
 
 -- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
