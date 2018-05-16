@@ -6,6 +6,7 @@ module Control.Abstract.Addressable
 import Control.Abstract.Context
 import Control.Abstract.Evaluator
 import Data.Abstract.Address
+import Data.Abstract.Address.Precise
 import Data.Abstract.FreeVariables
 import Prologue
 
