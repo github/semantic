@@ -75,7 +75,7 @@ runAllocator = interpret (\ eff -> case eff of
 
 
 data AddressError location value resume where
-  UnallocatedAddress :: Address location value -> AddressError location value (Cell location value)
+  UnallocatedAddress   :: Address location value -> AddressError location value (Cell location value)
   UninitializedAddress :: Address location value -> AddressError location value value
 
 deriving instance Eq location => Eq (AddressError location value resume)
