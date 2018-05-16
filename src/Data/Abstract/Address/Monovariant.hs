@@ -3,6 +3,7 @@ module Data.Abstract.Address.Monovariant where
 
 import Data.Abstract.FreeVariables (Name(..))
 import qualified Data.Abstract.Heap as Heap
+import qualified Data.Abstract.Live as Live
 import Data.Semigroup.Reducer
 import Data.Semilattice.Lower
 import Data.Set as Set
@@ -27,3 +28,4 @@ instance Show value => Show (All value) where
 
 
 type Heap = Heap.Heap Monovariant All
+type Live = Live.Live Monovariant
