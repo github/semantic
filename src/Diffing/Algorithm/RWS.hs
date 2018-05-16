@@ -112,7 +112,7 @@ defaultFeatureVectorDecorator :: (Hashable label, Traversable syntax)
 defaultFeatureVectorDecorator getLabel = featureVectorDecorator . pqGramDecorator getLabel defaultP defaultQ
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
-featureVectorDecorator :: (Foldable f, Functor f, Hashable label) => Term f (Record (label ': fields)) -> Term f (Record (FeatureVector ': fields))
+featureVectorDecorator :: (Foldable syntax, Functor syntax, Hashable label) => Term syntax (Record (label ': fields)) -> Term syntax (Record (FeatureVector ': fields))
 featureVectorDecorator = cata (\ (In (label :. rest) functor) ->
   termIn (foldl' addSubtermVector (unitVector (hash label)) functor :. rest) functor)
   where addSubtermVector v term = addVectors v (rhead (termAnnotation term))
@@ -138,7 +138,7 @@ pqGramDecorator getLabel p q = cata algebra
       labels <- get
       put (drop 1 labels)
       pure $! termIn (gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } :. rest) functor
-    siblingLabels :: Traversable syntax => syntax (Term f (Record (Gram label ': fields))) -> [Maybe label]
+    siblingLabels :: Traversable syntax => syntax (Term syntax (Record (Gram label ': fields))) -> [Maybe label]
     siblingLabels = foldMap (base . rhead . termAnnotation)
     padToSize n list = take n (list <> repeat empty)
 
