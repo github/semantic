@@ -49,7 +49,7 @@ instance Evaluatable Data.Syntax.Literal.Integer where
     integer =<< maybeM (throwEvalError (IntegerFormatError x)) (fst <$> readInteger x)
 
 instance ToJSONFields1 Data.Syntax.Literal.Integer where
-  toJSONFields1 (Integer i) = noChildren ["as_string" .= unpack i]
+  toJSONFields1 (Integer i) = noChildren ["asString" .= unpack i]
 
 
 -- TODO: Should IntegerLiteral hold an Integer instead of a ByteString?
@@ -69,7 +69,7 @@ instance Evaluatable Data.Syntax.Literal.Float where
     float =<< either (const (throwEvalError (FloatFormatError s))) pure (parseScientific s)
 
 instance ToJSONFields1 Float where
-  toJSONFields1 (Float f) = noChildren ["as_string" .= unpack f]
+  toJSONFields1 (Float f) = noChildren ["asString" .= unpack f]
 
 -- Rational literals e.g. `2/3r`
 newtype Rational a = Rational ByteString
@@ -87,7 +87,7 @@ instance Evaluatable Data.Syntax.Literal.Rational where
     in rational =<< maybe (throwEvalError (RationalFormatError r)) (pure . toRational) parsed
 
 instance ToJSONFields1 Data.Syntax.Literal.Rational where
-  toJSONFields1 (Rational r) = noChildren ["as_string" .= unpack r]
+  toJSONFields1 (Rational r) = noChildren ["asString" .= unpack r]
 
 -- Complex literals e.g. `3 + 2i`
 newtype Complex a = Complex ByteString
@@ -101,7 +101,7 @@ instance Show1 Data.Syntax.Literal.Complex where liftShowsPrec = genericLiftShow
 instance Evaluatable Complex
 
 instance ToJSONFields1 Complex where
-  toJSONFields1 (Complex c) = noChildren ["as_string" .= unpack c]
+  toJSONFields1 (Complex c) = noChildren ["asString" .= unpack c]
 
 -- Strings, symbols
 
@@ -141,7 +141,7 @@ instance Ord1 TextElement where liftCompare = genericLiftCompare
 instance Show1 TextElement where liftShowsPrec = genericLiftShowsPrec
 
 instance ToJSONFields1 TextElement where
-  toJSONFields1 (TextElement c) = noChildren ["as_string" .= unpack c]
+  toJSONFields1 (TextElement c) = noChildren ["asString" .= unpack c]
 
 instance Evaluatable TextElement where
   eval (TextElement x) = string x
@@ -180,7 +180,7 @@ instance Show1 Regex where liftShowsPrec = genericLiftShowsPrec
 -- TODO: Character literals.
 
 instance ToJSONFields1 Regex where
-  toJSONFields1 (Regex r) = noChildren ["as_string" .= unpack r]
+  toJSONFields1 (Regex r) = noChildren ["asString" .= unpack r]
 
 
 -- TODO: Implement Eval instance for Regex

@@ -194,9 +194,9 @@ instance ToJSON ErrorStack where
       , "package" .= srcLocPackage
       , "module" .= srcLocModule
       , "file" .= srcLocFile
-      , "start_line" .= srcLocStartLine
-      , "start_col" .= srcLocStartCol
-      , "end_col" .= srcLocEndCol
+      , "startLine" .= srcLocStartLine
+      , "startColumn" .= srcLocStartCol
+      , "endColumn" .= srcLocEndCol
       ]
 
 instance Ord ErrorStack where

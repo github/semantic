@@ -15,7 +15,7 @@ newtype Text a = Text ByteString
   deriving (Diffable, Eq, Foldable, Functor, FreeVariables1, Declarations1, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Text where
-  toJSONFields1 (Text t) = noChildren ["as_string" .= BC.unpack t]
+  toJSONFields1 (Text t) = noChildren ["asString" .= BC.unpack t]
 
 instance Eq1 Text where liftEq = genericLiftEq
 instance Ord1 Text where liftCompare = genericLiftCompare

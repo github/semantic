@@ -25,7 +25,7 @@ withChildren :: (KeyValue kv, ToJSON a, Foldable f) => f a -> [kv] -> [kv]
 withChildren f ks = ("children" .= toList f) : ks
 
 noChildren :: KeyValue kv => [kv] -> [kv]
-noChildren ks = ("children" .= ([] :: String)) : ks
+noChildren ks = ("children" .= ([] :: [Int])) : ks
 
 instance ToJSONFields a => ToJSONFields (Join (,) a) where
   toJSONFields (Join (a, b)) = [ "before" .= object (toJSONFields a), "after" .= object (toJSONFields b) ]

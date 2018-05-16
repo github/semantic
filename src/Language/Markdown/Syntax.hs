@@ -73,7 +73,7 @@ instance Ord1 ThematicBreak where liftCompare = genericLiftCompare
 instance Show1 ThematicBreak where liftShowsPrec = genericLiftShowsPrec
 
 instance ToJSONFields1 HTMLBlock where
-  toJSONFields1 (HTMLBlock b) = noChildren [ "as_string" .= unpack b ]
+  toJSONFields1 (HTMLBlock b) = noChildren [ "asString" .= unpack b ]
 
 newtype HTMLBlock a = HTMLBlock ByteString
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
@@ -134,7 +134,7 @@ newtype Text a = Text ByteString
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable)
 
 instance ToJSONFields1 Text where
-  toJSONFields1 (Text s) = noChildren ["as_string" .= unpack s ]
+  toJSONFields1 (Text s) = noChildren ["asString" .= unpack s ]
 
 instance Eq1 Text where liftEq = genericLiftEq
 instance Ord1 Text where liftCompare = genericLiftCompare
