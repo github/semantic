@@ -169,4 +169,6 @@ instance Hashable1 syntax => Hashable (Label syntax) where hashWithSalt salt (La
 
 instance Eq1 syntax => Eq (Label syntax) where Label a == Label b = liftEq (const (const True)) a b
 
+instance Ord1 syntax => Ord (Label syntax) where Label a `compare` Label b = liftCompare (const (const EQ)) a b
+
 instance Show1 syntax => Show (Label syntax) where showsPrec d (Label syntax) = liftShowsPrec (const (const id)) (const id) d syntax
