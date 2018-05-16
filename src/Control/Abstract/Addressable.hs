@@ -28,9 +28,9 @@ data Allocator location value return where
 
 
 runAllocatorPrecise :: Members '[Fresh, Resumable (AddressError Precise value), State (Heap Precise Latest value)] effects => Evaluator Precise value (Allocator Precise value ': effects) a -> Evaluator Precise value effects a
-runAllocatorPrecise = relay pure (\ eff yield -> case eff of
-  Alloc _    -> Address . Precise <$> fresh >>= yield
-  Deref addr -> lookupHeap addr >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= maybeM (throwAddressError (UninitializedAddress addr)) . getLast . unLatest >>= yield)
+runAllocatorPrecise = interpret (\ eff -> case eff of
+  Alloc _    -> Address . Precise <$> fresh
+  Deref addr -> lookupHeap addr >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= maybeM (throwAddressError (UninitializedAddress addr)) . getLast . unLatest)
 
 
 -- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Heap.
