@@ -123,6 +123,8 @@ instance ( Addressable location effects
   allocLoc name = raiseEff (lowerEff (Located <$> allocLoc name <*> currentPackage <*> currentModule))
 
 
+-- Errors
+
 data AddressError location value resume where
   UnallocatedAddress :: Address location value -> AddressError location value (Cell location value)
   UninitializedAddress :: Address location value -> AddressError location value value
