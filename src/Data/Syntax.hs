@@ -13,7 +13,7 @@ import Data.Sum
 import Data.Term
 import Diffing.Algorithm hiding (Empty)
 import Prelude
-import Prologue hiding (inj)
+import Prologue
 import qualified Assigning.Assignment as Assignment
 import qualified Data.Error as Error
 
@@ -21,7 +21,7 @@ import qualified Data.Error as Error
 
 -- | Lift syntax and an annotation into a term, injecting the syntax into a union & ensuring the annotation encompasses all children.
 makeTerm :: (HasCallStack, f :< fs, Semigroup a, Apply Foldable fs) => a -> f (Term (Sum fs) a) -> Term (Sum fs) a
-makeTerm a = makeTerm' a . inj
+makeTerm a = makeTerm' a . inject
 
 -- | Lift a union and an annotation into a term, ensuring the annotation encompasses all children.
 makeTerm' :: (HasCallStack, Semigroup a, Foldable f) => a -> f (Term f a) -> Term f a
@@ -31,11 +31,11 @@ makeTerm' a f = termIn (sconcat (a :| (termAnnotation <$> toList f))) f
 makeTerm'' :: (HasCallStack, f :< fs, Semigroup a, Apply Foldable fs, Foldable f) => a -> f (Term (Sum fs) a) -> Term (Sum fs) a
 makeTerm'' a children = case toList children of
   [x] -> x
-  _ -> makeTerm' a (inj children)
+  _ -> makeTerm' a (inject children)
 
 -- | Lift non-empty syntax into a term, injecting the syntax into a union & appending all subterms’.annotations to make the new term’s annotation.
 makeTerm1 :: (HasCallStack, f :< fs, Semigroup a, Apply Foldable fs) => f (Term (Sum fs) a) -> Term (Sum fs) a
-makeTerm1 = makeTerm1' . inj
+makeTerm1 = makeTerm1' . inject
 
 -- | Lift a non-empty union into a term, appending all subterms’.annotations to make the new term’s annotation.
 makeTerm1' :: (HasCallStack, Semigroup a, Foldable f) => f (Term f a) -> Term f a

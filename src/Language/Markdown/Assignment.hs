@@ -19,7 +19,7 @@ import Data.Sum
 import qualified Data.Syntax as Syntax
 import qualified Data.Text as Text
 import qualified Language.Markdown.Syntax as Markup
-import Prologue hiding (inj)
+import Prologue
 
 type Syntax =
   '[ Markup.Document
@@ -77,9 +77,9 @@ list :: Assignment
 list = termIn <$> symbol List <*> (makeList . termFAnnotation . termFOut <$> currentNode <*> children (many item))
   where
     makeList (CMarkGFM.LIST CMarkGFM.ListAttributes{..}) = case listType of
-      CMarkGFM.BULLET_LIST -> inj . Markup.UnorderedList
-      CMarkGFM.ORDERED_LIST -> inj . Markup.OrderedList
-    makeList _ = inj . Markup.UnorderedList
+      CMarkGFM.BULLET_LIST -> inject . Markup.UnorderedList
+      CMarkGFM.ORDERED_LIST -> inject . Markup.OrderedList
+    makeList _ = inject . Markup.UnorderedList
 
 item :: Assignment
 item = makeTerm <$> symbol Item <*> children (many blockElement)

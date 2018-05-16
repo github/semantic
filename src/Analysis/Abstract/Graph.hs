@@ -29,7 +29,7 @@ import           Data.Sum
 import qualified Data.Syntax as Syntax
 import           Data.Term
 import           Data.Text.Encoding as T
-import           Prologue hiding (packageName, prj)
+import           Prologue hiding (packageName, project)
 
 -- | A vertex of some specific type.
 data Vertex
@@ -65,7 +65,7 @@ graphingTerms :: ( Element Syntax.Identifier syntax
               => SubtermAlgebra (Base term) term (TermEvaluator term (Located location) value effects a)
               -> SubtermAlgebra (Base term) term (TermEvaluator term (Located location) value effects a)
 graphingTerms recur term@(In _ syntax) = do
-  case prj syntax of
+  case project syntax of
     Just (Syntax.Identifier name) -> do
       moduleInclusion (Variable (unName name))
       variableDefinition name

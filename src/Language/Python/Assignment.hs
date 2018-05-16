@@ -25,7 +25,7 @@ import qualified Data.Syntax.Statement as Statement
 import qualified Data.Syntax.Type as Type
 import qualified Data.Term as Term
 import qualified Data.List.NonEmpty as NonEmpty
-import Prologue hiding (inj)
+import Prologue
 
 
 -- | The type of Python syntax.
@@ -292,25 +292,25 @@ unaryOperator = symbol UnaryOperator >>= \ location -> arithmetic location <|> b
 
 binaryOperator :: Assignment
 binaryOperator = makeTerm' <$> symbol BinaryOperator <*> children (infixTerm expression (term expression)
-  [ (inj .) . Expression.Plus      <$ symbol AnonPlus
-  , (inj .) . Expression.Minus     <$ symbol AnonMinus
-  , (inj .) . Expression.Times     <$ symbol AnonStar
-  , (inj .) . Expression.Times     <$ symbol AnonAt -- Matrix multiplication, TODO: May not want to assign to Expression.Times.
-  , (inj .) . Expression.DividedBy <$ symbol AnonSlash
-  , (inj .) . Expression.FloorDivision <$ symbol AnonSlashSlash
-  , (inj .) . Expression.Modulo    <$ symbol AnonPercent
-  , (inj .) . Expression.Power     <$ symbol AnonStarStar
-  , (inj .) . Expression.BOr       <$ symbol AnonPipe
-  , (inj .) . Expression.BAnd      <$ symbol AnonAmpersand
-  , (inj .) . Expression.BXOr      <$ symbol AnonCaret
-  , (inj .) . Expression.LShift    <$ symbol AnonLAngleLAngle
-  , (inj .) . Expression.RShift    <$ symbol AnonRAngleRAngle
+  [ (inject .) . Expression.Plus      <$ symbol AnonPlus
+  , (inject .) . Expression.Minus     <$ symbol AnonMinus
+  , (inject .) . Expression.Times     <$ symbol AnonStar
+  , (inject .) . Expression.Times     <$ symbol AnonAt -- Matrix multiplication, TODO: May not want to assign to Expression.Times.
+  , (inject .) . Expression.DividedBy <$ symbol AnonSlash
+  , (inject .) . Expression.FloorDivision <$ symbol AnonSlashSlash
+  , (inject .) . Expression.Modulo    <$ symbol AnonPercent
+  , (inject .) . Expression.Power     <$ symbol AnonStarStar
+  , (inject .) . Expression.BOr       <$ symbol AnonPipe
+  , (inject .) . Expression.BAnd      <$ symbol AnonAmpersand
+  , (inject .) . Expression.BXOr      <$ symbol AnonCaret
+  , (inject .) . Expression.LShift    <$ symbol AnonLAngleLAngle
+  , (inject .) . Expression.RShift    <$ symbol AnonRAngleRAngle
   ])
 
 booleanOperator :: Assignment
 booleanOperator = makeTerm' <$> symbol BooleanOperator <*> children (infixTerm expression (term expression)
-  [ (inj .) . Expression.And <$ symbol AnonAnd
-  , (inj .) . Expression.Or  <$ symbol AnonOr
+  [ (inject .) . Expression.And <$ symbol AnonAnd
+  , (inject .) . Expression.Or  <$ symbol AnonOr
   ])
 
 assignment' :: Assignment
@@ -333,7 +333,7 @@ assignment' =  makeAssignment <$> symbol Assignment <*> children ((,,) <$> term 
   where rvalue = expressionList <|> assignment' <|> yield
         makeAssignment loc (lhs, maybeType, rhs) = makeTerm loc (Statement.Assignment (maybeToList maybeType) lhs rhs)
         assign :: (f :< Syntax) => (Term -> Term -> f Term) -> Term -> Term -> Sum Syntax Term
-        assign c l r = inj (Statement.Assignment [] l (makeTerm1 (c l r)))
+        assign c l r = inject (Statement.Assignment [] l (makeTerm1 (c l r)))
 
 yield :: Assignment
 yield = makeTerm <$> symbol Yield <*> (Statement.Yield <$> children (term ( expression <|> emptyTerm )))
@@ -348,7 +348,7 @@ dictionary :: Assignment
 dictionary = makeTerm <$> symbol Dictionary <*> children (Literal.Hash <$> manyTerm expression)
 
 pair :: Assignment
-pair = makeTerm' <$> symbol Pair <*> children (infixTerm expression (term expression) [ (inj .) . Literal.KeyValue <$ symbol AnonColon ])
+pair = makeTerm' <$> symbol Pair <*> children (infixTerm expression (term expression) [ (inject .) . Literal.KeyValue <$ symbol AnonColon ])
 
 list' :: Assignment
 list' = makeTerm <$> symbol List <*> children (Literal.Array <$> manyTerm expression)

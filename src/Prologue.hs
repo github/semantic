@@ -21,7 +21,7 @@ import Data.Maybe as X
 import Data.Monoid (Alt (..))
 import Data.Sequence as X (Seq)
 import Data.Set as X (Set)
-import Data.Sum as X (Sum, Element, Elements, (:<), (:<:), Apply (..))
+import Data.Sum as X (Sum, Element, Elements, (:<), (:<:), Apply (..), inject)
 import Data.Text as X (Text)
 import Data.These as X
 import Data.Union as X
