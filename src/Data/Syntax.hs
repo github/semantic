@@ -199,6 +199,9 @@ instance ToJSON ErrorStack where
       , "endColumn" .= srcLocEndCol
       ]
 
+instance Hashable ErrorStack where
+  hashWithSalt = hashUsing (map (second ((,,,,,,) <$> srcLocPackage <*> srcLocModule <*> srcLocFile <*> srcLocStartLine <*> srcLocStartCol <*> srcLocEndLine <*> srcLocEndCol)) . unErrorStack)
+
 instance Ord ErrorStack where
   compare = liftCompare (liftCompare compareSrcLoc) `on` unErrorStack
     where compareSrcLoc s1 s2 = mconcat
