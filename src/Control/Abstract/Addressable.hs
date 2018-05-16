@@ -1,7 +1,6 @@
 {-# LANGUAGE GADTs, RankNTypes, TypeOperators, UndecidableInstances #-}
 module Control.Abstract.Addressable where
 
-import Control.Abstract.Context
 import Control.Abstract.Environment
 import Control.Abstract.Evaluator
 import Control.Abstract.Heap
@@ -37,11 +36,6 @@ runAllocatorMonovariant = interpret (\ eff -> case eff of
   Alloc name -> pure (Address (Monovariant name))
   Deref addr -> lookupHeap addr >>= maybeM (throwAddressError (UnallocatedAddress addr)) >>= traverse (foldMapA pure) . nonEmpty . toList >>= maybeM (throwAddressError (UninitializedAddress addr)))
 
-
--- | Defines 'alloc'ation and 'deref'erencing of 'Address'es in a Heap.
-class (Ord location, Show location) => Addressable location effects where
-  allocCell :: Name -> Evaluator location value effects location
-  derefCell :: Address location value -> Cell location value -> Evaluator location value effects (Maybe value)
 
 -- | Look up or allocate an address for a 'Name'.
 lookupOrAlloc :: ( Addressable location effects
@@ -97,31 +91,6 @@ variable :: ( Addressable location effects
          => Name
          -> Evaluator location value effects value
 variable name = lookupEnv name >>= maybe (freeVariableError name) deref
-
-
--- Instances
-
--- | 'Precise' locations are always 'alloc'ated a fresh 'Address', and 'deref'erence to the 'Latest' value written.
-instance Member Fresh effects => Addressable Precise effects where
-  allocCell _ = Precise <$> fresh
-  derefCell _ = pure . getLast . unLatest
-
--- | 'Monovariant' locations 'alloc'ate one 'Address' per unique variable name, and 'deref'erence once per stored value, nondeterministically.
-instance Member NonDet effects => Addressable Monovariant effects where
-  allocCell = pure . Monovariant
-  derefCell _ = traverse (foldMapA pure) . nonEmpty . toList
-
-instance ( Addressable location effects
-         , Members '[ Reader ModuleInfo
-                    , Reader PackageInfo
-                    ] effects
-         )
-      => Addressable (Located location) effects where
-  allocCell name = relocate (Located <$> allocCell name <*> currentPackage <*> currentModule)
-  derefCell (Address (Located loc _ _)) = relocate . derefCell (Address loc)
-
-relocate :: Evaluator location value effects a -> Evaluator (Located location) value effects a
-relocate = raiseEff . lowerEff
 
 
 -- Errors
