@@ -25,8 +25,6 @@ import Data.Term as Term
 import Diffing.Algorithm.RWS.FeatureVector
 import Diffing.Algorithm.SES
 
-type Label f fields label = forall b. TermF f (Record fields) b -> label
-
 -- | A relation on 'Term's, guaranteed constant-time in the size of the 'Term' by parametricity.
 --
 --   This is used both to determine whether two root terms can be compared in O(1), and, recursively, to determine whether two nodes are equal in O(n); thus, comparability is defined s.t. two terms are equal if they are recursively comparable subterm-wise.
@@ -108,7 +106,7 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
 
 -- | Annotates a term with a feature vector at each node, using the default values for the p, q, and d parameters.
 defaultFeatureVectorDecorator :: (Hashable label, Traversable syntax)
-                              => Label syntax fields label
+                              => (forall a . syntax a -> label)
                               -> Term syntax (Record fields)
                               -> Term syntax (Record (FeatureVector ': fields))
 defaultFeatureVectorDecorator getLabel = featureVectorDecorator . pqGramDecorator getLabel defaultP defaultQ
@@ -122,14 +120,14 @@ featureVectorDecorator = cata (\ (In (label :. rest) functor) ->
 -- | Annotates a term with the corresponding p,q-gram at each node.
 pqGramDecorator
   :: Traversable f
-  => Label f fields label -- ^ A function computing the label from an arbitrary unpacked term. This function can use the annotation and functor’s constructor, but not any recursive values inside the functor (since they’re held parametric in 'b').
+  => (forall a . f a -> label) -- ^ A function computing the label from syntax. This function can only use the syntax functor’s constructor & constant fields to compute the label, not any recursive values inside the syntax.
   -> Int -- ^ 'p'; the desired stem length for the grams.
   -> Int -- ^ 'q'; the desired base length for the grams.
   -> Term f (Record fields) -- ^ The term to decorate.
   -> Term f (Record (Gram label ': fields)) -- ^ The decorated term.
 pqGramDecorator getLabel p q = cata algebra
   where
-    algebra term = let label = getLabel term in
+    algebra term = let label = getLabel (termFOut term) in
       termIn (gram label :. termFAnnotation term) (assignParentAndSiblingLabels (termFOut term) label)
     gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
     assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
