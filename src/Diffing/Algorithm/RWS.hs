@@ -105,11 +105,10 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
  deriving (Eq, Generic, Hashable, Show)
 
 -- | Annotates a term with a feature vector at each node, using the default values for the p, q, and d parameters.
-defaultFeatureVectorDecorator :: (Hashable label, Traversable syntax)
-                              => (forall a . syntax a -> label)
-                              -> Term syntax (Record fields)
+defaultFeatureVectorDecorator :: (Hashable1 syntax, Traversable syntax)
+                              => Term syntax (Record fields)
                               -> Term syntax (Record (FeatureVector ': fields))
-defaultFeatureVectorDecorator getLabel = featureVectorDecorator . pqGramDecorator getLabel defaultP defaultQ
+defaultFeatureVectorDecorator = featureVectorDecorator . pqGramDecorator defaultP defaultQ
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
 featureVectorDecorator :: (Foldable syntax, Functor syntax, Hashable label) => Term syntax (Record (label ': fields)) -> Term syntax (Record (FeatureVector ': fields))
@@ -119,14 +118,13 @@ featureVectorDecorator = cata (\ (In (label :. rest) functor) ->
 
 -- | Annotates a term with the corresponding p,q-gram at each node.
 pqGramDecorator :: Traversable syntax
-                => (forall a . syntax a -> label) -- ^ A function computing the label from syntax. This function can only use the syntax functor’s constructor & constant fields to compute the label, not any recursive values inside the syntax.
-                -> Int -- ^ 'p'; the desired stem length for the grams.
-                -> Int -- ^ 'q'; the desired base length for the grams.
-                -> Term syntax (Record fields) -- ^ The term to decorate.
-                -> Term syntax (Record (Gram label ': fields)) -- ^ The decorated term.
-pqGramDecorator getLabel p q = cata algebra
+                => Int                                                                          -- ^ 'p'; the desired stem length for the grams.
+                -> Int                                                                          -- ^ 'q'; the desired base length for the grams.
+                -> Term syntax (Record fields)                                                  -- ^ The term to decorate.
+                -> Term syntax (Record (Gram (Label syntax) ': fields)) -- ^ The decorated term.
+pqGramDecorator p q = cata algebra
   where
-    algebra term = let label = getLabel (termFOut term) in
+    algebra term = let label = Label (termFOut term) in
       termIn (gram label :. termFAnnotation term) (assignParentAndSiblingLabels (termFOut term) label)
     gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
     assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
