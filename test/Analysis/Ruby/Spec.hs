@@ -76,7 +76,7 @@ spec = parallel $ do
       traces `shouldContain` [ "\"hello\"" ]
 
   where
-    ns n = Just . Latest . Just . injValue . Namespace n
+    ns n = Just . Latest . Last . Just . injValue . Namespace n
     addr = Address . Precise
     fixtures = "test/fixtures/ruby/analysis/"
     evaluate entry = evalRubyProject (fixtures <> entry)

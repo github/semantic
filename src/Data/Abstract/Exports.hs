@@ -16,11 +16,8 @@ import qualified Data.Map as Map
 import Data.Semilattice.Lower
 
 -- | A map of export names to an alias & address tuple.
-newtype Exports location value = Exports (Map.Map Name (Name, Maybe (Address location value)))
-  deriving (Eq, Lower, Monoid, Ord, Semigroup, Show)
-
-unExports :: Exports location value -> Map.Map Name (Name, Maybe (Address location value))
-unExports (Exports exports) = exports
+newtype Exports location value = Exports { unExports :: Map.Map Name (Name, Maybe (Address location value)) }
+  deriving (Eq, Lower, Monoid, Ord, Semigroup)
 
 null :: Exports location value -> Bool
 null = Map.null . unExports
@@ -37,3 +34,7 @@ insert name alias address = Exports . Map.insert name (alias, address) . unExpor
 -- TODO: Should we filter for duplicates here?
 aliases :: Exports location value -> [(Name, Name)]
 aliases = Map.toList . fmap fst . unExports
+
+
+instance Show location => Show (Exports location value) where
+  showsPrec d = showsUnaryWith showsPrec "Exports" d . Map.toList . unExports

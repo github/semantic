@@ -37,11 +37,8 @@ import qualified Data.List.NonEmpty as NonEmpty
 -- | A LIFO stack of maps of names to addresses, representing a lexically-scoped evaluation environment.
 --   All behaviors can be assumed to be frontmost-biased: looking up "a" will check the most specific
 --   scope for "a", then the next, and so on.
-newtype Environment location value = Environment (NonEmpty (Map.Map Name location))
-  deriving (Eq, Ord, Show)
-
-unEnvironment :: Environment location value -> NonEmpty (Map.Map Name location)
-unEnvironment (Environment env) = env
+newtype Environment location value = Environment { unEnvironment :: NonEmpty (Map.Map Name location) }
+  deriving (Eq, Ord)
 
 instance Eq   location => Eq1   (Environment location) where liftEq      _ (Environment a) (Environment b) = a == b
 instance Ord  location => Ord1  (Environment location) where liftCompare _ (Environment a) (Environment b) = a `compare` b
@@ -88,7 +85,7 @@ mergeNewer (Environment a) (Environment b) =
 -- | Extract an association list of bindings from an 'Environment'.
 --
 -- >>> pairs shadowed
--- [(Name {unName = "foo"},Address (Precise 1))]
+-- [(Name {unName = "foo"},Precise 1)]
 pairs :: Environment location value -> [(Name, Address location value)]
 pairs = map (second Address) . Map.toList . fold . unEnvironment
 
@@ -98,7 +95,7 @@ unpairs = fromList
 -- | Lookup a 'Name' in the environment.
 --
 -- >>> lookup (name "foo") shadowed
--- Just (Address (Precise 1))
+-- Just (Precise 1)
 lookup :: Name -> Environment location value -> Maybe (Address location value)
 lookup k = fmap Address . foldMapA (Map.lookup k) . unEnvironment
 
@@ -109,7 +106,7 @@ insert name (Address value) (Environment (a :| as)) = Environment (Map.insert na
 -- | Remove a 'Name' from the environment.
 --
 -- >>> delete (name "foo") shadowed
--- Environment (fromList [] :| [])
+-- Environment []
 delete :: Name -> Environment location value -> Environment location value
 delete name = trim . Environment . fmap (Map.delete name) . unEnvironment
 
@@ -143,3 +140,6 @@ addresses = fromAddresses . map snd . pairs
 
 
 instance Lower (Environment location value) where lowerBound = emptyEnv
+
+instance Show location => Show (Environment location value) where
+  showsPrec d = showsUnaryWith showsPrec "Environment" d . map (first unName) . pairs

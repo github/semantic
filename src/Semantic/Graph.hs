@@ -19,6 +19,7 @@ module Semantic.Graph
 import           Analysis.Abstract.Evaluating
 import           Analysis.Abstract.Graph
 import           Control.Monad.Effect.Trace
+import           Control.Abstract
 import qualified Control.Exception as Exc
 import           Control.Monad.Effect (reinterpret)
 import           Data.Abstract.Address
@@ -65,10 +66,7 @@ graph graphType project
             . resumingResolutionError
             . resumingAddressError
             . graphing
-            . constrainingTypes
-
-          constrainingTypes :: Evaluator (Located Precise) (Value (Located Precise)) effects a -> Evaluator (Located Precise) (Value (Located Precise)) effects a
-          constrainingTypes = id
+            . runTermEvaluator @_ @_ @(Value (Located Precise))
 
 -- | Parse a list of files into a 'Package'.
 parsePackage :: Members '[Distribute WrappedTask, Files, Task, Trace] effs
@@ -99,8 +97,8 @@ parseModule parser rootDir file = do
 withTermSpans :: ( HasField fields Span
                  , Member (Reader Span) effects
                  )
-              => SubtermAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Evaluator location value effects a)
-              -> SubtermAlgebra (TermF syntax (Record fields)) (Term syntax (Record fields)) (Evaluator location value effects a)
+              => SubtermAlgebra (TermF syntax (Record fields)) term (TermEvaluator term location value effects a)
+              -> SubtermAlgebra (TermF syntax (Record fields)) term (TermEvaluator term location value effects a)
 withTermSpans recur term = withCurrentSpan (getField (termFAnnotation term)) (recur term)
 
 resumingResolutionError :: (Applicative (m effects), Effectful m, Member Trace effects) => m (Resumable ResolutionError ': effects) a -> m effects a

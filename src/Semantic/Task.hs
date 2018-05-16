@@ -45,7 +45,7 @@ module Semantic.Task
 
 import           Analysis.Decorator (decoratorWithAlgebra)
 import qualified Assigning.Assignment as Assignment
-import qualified Control.Abstract.Evaluator as Analysis
+import qualified Control.Abstract as Analysis
 import           Control.Monad
 import           Control.Monad.Effect
 import           Control.Monad.Effect.Exception
@@ -95,8 +95,8 @@ type Renderer i o = i -> o
 parse :: Member Task effs => Parser term -> Blob -> Eff effs term
 parse parser = send . Parse parser
 
--- | A task running some 'Analysis.MonadAnalysis' to completion.
-analyze :: Member Task effs => (Analysis.Evaluator location value effects a -> result) -> Analysis.Evaluator location value effects a -> Eff effs result
+-- | A task running some 'Analysis.TermEvaluator' to completion.
+analyze :: Member Task effs => (Analysis.TermEvaluator term location value effects a -> result) -> Analysis.TermEvaluator term location value effects a -> Eff effs result
 analyze interpret analysis = send (Analyze interpret analysis)
 
 -- | A task which decorates a 'Term' with values computed using the supplied 'RAlgebra' function.
@@ -145,7 +145,7 @@ runTraceInTelemetry = interpret (\ (Trace str) -> writeLog Debug str [])
 -- | An effect describing high-level tasks to be performed.
 data Task output where
   Parse     :: Parser term -> Blob -> Task term
-  Analyze   :: (Analysis.Evaluator location value effects a -> result) -> Analysis.Evaluator location value effects a -> Task result
+  Analyze  :: (Analysis.TermEvaluator term location value effects a -> result) -> Analysis.TermEvaluator term location value effects a -> Task result
   Decorate  :: Functor f => RAlgebra (TermF f (Record fields)) (Term f (Record fields)) field -> Term f (Record fields) -> Task (Term f (Record (field ': fields)))
   Diff      :: (Diffable syntax, Eq1 syntax, GAlign syntax, Show1 syntax, Traversable syntax) => These (Term syntax (Record fields1)) (Term syntax (Record fields2)) -> Task (Diff syntax (Record fields1) (Record fields2))
   Render    :: Renderer input output -> input -> Task output
