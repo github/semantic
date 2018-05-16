@@ -8,7 +8,7 @@ import           Analysis.Abstract.Evaluating as X
 import           Control.Abstract.Evaluator
 import           Control.Abstract.TermEvaluator
 import           Control.Monad.Effect.Trace (runPrintingTrace)
-import           Data.Abstract.Address.Monovariant
+import           Data.Abstract.Address
 import           Data.Abstract.Address.Precise
 import           Data.Abstract.Evaluatable
 import           Data.Abstract.Value
