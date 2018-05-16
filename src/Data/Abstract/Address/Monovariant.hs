@@ -2,7 +2,6 @@
 module Data.Abstract.Address.Monovariant where
 
 import Data.Abstract.FreeVariables (Name(..))
-import qualified Data.Abstract.Heap as Heap
 import Data.Semigroup.Reducer
 import Data.Semilattice.Lower
 import Data.Set as Set
@@ -24,6 +23,3 @@ newtype All value = All { unAll :: Set value }
 
 instance Show value => Show (All value) where
   showsPrec d = showsPrec d . Set.toList . unAll
-
-
-type Heap = Heap.Heap Monovariant All
