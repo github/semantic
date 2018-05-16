@@ -8,6 +8,7 @@ import           Data.Abstract.Module
 import           Data.Align.Generic
 import qualified Data.ByteString.Char8 as BC
 import           Data.Functor.Classes.Generic
+import           Data.JSON.Fields
 import qualified Data.Language as Language
 import qualified Data.List.NonEmpty as NonEmpty
 import           Data.Mergeable
@@ -90,6 +91,8 @@ resolvePythonModules q = do
 data Import a = Import { importFrom :: QualifiedName, importSymbols :: ![(Name, Name)] }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
+instance ToJSONFields1 Import
+
 instance Eq1 Import where liftEq = genericLiftEq
 instance Ord1 Import where liftCompare = genericLiftCompare
 instance Show1 Import where liftShowsPrec = genericLiftShowsPrec
@@ -118,6 +121,8 @@ instance Evaluatable Import where
 newtype QualifiedImport a = QualifiedImport { qualifiedImportFrom :: QualifiedName }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
 
+instance ToJSONFields1 QualifiedImport
+
 instance Eq1 QualifiedImport where liftEq = genericLiftEq
 instance Ord1 QualifiedImport where liftCompare = genericLiftCompare
 instance Show1 QualifiedImport where liftShowsPrec = genericLiftShowsPrec
@@ -143,6 +148,8 @@ instance Evaluatable QualifiedImport where
 
 data QualifiedAliasedImport a = QualifiedAliasedImport { qualifiedAliasedImportFrom :: QualifiedName, qualifiedAliasedImportAlias :: !a }
   deriving (Diffable, Eq, Foldable, Functor, GAlign, Generic1, Mergeable, Ord, Show, Traversable, FreeVariables1, Declarations1)
+
+instance ToJSONFields1 QualifiedAliasedImport
 
 instance Eq1 QualifiedAliasedImport where liftEq = genericLiftEq
 instance Ord1 QualifiedAliasedImport where liftCompare = genericLiftCompare
@@ -173,6 +180,8 @@ instance Eq1 Ellipsis where liftEq = genericLiftEq
 instance Ord1 Ellipsis where liftCompare = genericLiftCompare
 instance Show1 Ellipsis where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Ellipsis
+
 -- TODO: Implement Eval instance for Ellipsis
 instance Evaluatable Ellipsis
 
@@ -183,6 +192,8 @@ data Redirect a = Redirect !a !a
 instance Eq1 Redirect where liftEq = genericLiftEq
 instance Ord1 Redirect where liftCompare = genericLiftCompare
 instance Show1 Redirect where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Redirect
 
 -- TODO: Implement Eval instance for Redirect
 instance Evaluatable Redirect

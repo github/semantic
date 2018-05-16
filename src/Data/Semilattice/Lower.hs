@@ -6,6 +6,7 @@ module Data.Semilattice.Lower
 import Data.IntMap as IntMap
 import Data.IntSet as IntSet
 import Data.Map as Map
+import Data.Monoid as Monoid
 import Data.Set as Set
 
 class Lower s where
@@ -32,6 +33,12 @@ instance Lower b => Lower (a -> b) where lowerBound = const lowerBound
 
 instance Lower (Maybe a) where lowerBound = Nothing
 instance Lower [a] where lowerBound = []
+
+instance (Lower a, Lower b) => Lower (a, b) where lowerBound = (lowerBound, lowerBound)
+
+
+-- Data.Monoid
+instance Lower (Last a) where lowerBound = mempty
 
 -- containers
 instance Lower (IntMap a) where lowerBound = IntMap.empty

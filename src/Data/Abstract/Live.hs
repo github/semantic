@@ -8,7 +8,7 @@ import Prologue
 
 -- | A set of live addresses (whether roots or reachable).
 newtype Live location value = Live { unLive :: Set location }
-  deriving (Eq, Lower, Monoid, Ord, Semigroup, Show)
+  deriving (Eq, Lower, Monoid, Ord, Semigroup)
 
 fromAddresses :: (Foldable t, Ord location) => t (Address location value) -> Live location value
 fromAddresses = Prologue.foldr liveInsert lowerBound
@@ -36,3 +36,7 @@ liveMember addr = Set.member (unAddress addr) . unLive
 -- | Decompose a 'Live' set into a pair of one member address and the remaining set, or 'Nothing' if empty.
 liveSplit :: Live location value -> Maybe (Address location value, Live location value)
 liveSplit = fmap (bimap Address Live) . Set.minView . unLive
+
+
+instance Show location => Show (Live location value) where
+  showsPrec d = showsUnaryWith showsPrec "Live" d . Set.toList . unLive

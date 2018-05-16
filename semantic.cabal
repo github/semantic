@@ -21,7 +21,6 @@ library
                      , Analysis.Abstract.Evaluating
                      , Analysis.Abstract.Graph
                      , Analysis.Abstract.Tracing
-                     , Analysis.CallGraph
                      , Analysis.ConstructorName
                      , Analysis.CyclomaticComplexity
                      , Analysis.Decorator
@@ -44,6 +43,7 @@ library
                      , Control.Abstract.Matching
                      , Control.Abstract.Modules
                      , Control.Abstract.Roots
+                     , Control.Abstract.TermEvaluator
                      , Control.Abstract.Value
                      -- Datatypes for abstract interpretation
                      , Data.Abstract.Address
