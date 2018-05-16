@@ -189,6 +189,7 @@ builtin n def = withCurrentCallStack callStack $ do
 
 -- | Evaluate a given package.
 evaluatePackageWith :: forall location term value inner inner' outer
+                    -- FIXME: It’d be nice if we didn’t have to mention 'Addressable' here at all, but 'Located' locations require knowledge of 'currentModule' to run. Can we fix that? If not, can we factor this effect list out?
                     .  ( Addressable location (Reader ModuleInfo ': Modules location value ': State (Gotos location value (Reader Span ': Reader PackageInfo ': outer)) ': Reader Span ': Reader PackageInfo ': outer)
                        , Evaluatable (Base term)
                        , EvaluatableConstraints location term value inner
