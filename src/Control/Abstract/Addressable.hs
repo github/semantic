@@ -117,8 +117,11 @@ instance ( Addressable location effects
                     ] effects
          )
       => Addressable (Located location) effects where
-  allocCell name = raiseEff (lowerEff (Located <$> allocCell name <*> currentPackage <*> currentModule))
-  derefCell (Address (Located loc _ _)) = raiseEff . lowerEff . derefCell (Address loc)
+  allocCell name = relocate (Located <$> allocCell name <*> currentPackage <*> currentModule)
+  derefCell (Address (Located loc _ _)) = relocate . derefCell (Address loc)
+
+relocate :: Evaluator location value effects a -> Evaluator (Located location) value effects a
+relocate = raiseEff . lowerEff
 
 
 -- Errors
