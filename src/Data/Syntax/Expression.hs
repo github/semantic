@@ -4,6 +4,7 @@ module Data.Syntax.Expression where
 import Data.Abstract.Evaluatable
 import Data.Abstract.Number (liftIntegralFrac, liftReal, liftedExponent, liftedFloorDiv)
 import Data.Fixed
+import Data.JSON.Fields
 import Diffing.Algorithm
 import Prologue hiding (index)
 
@@ -14,6 +15,8 @@ data Call a = Call { callContext :: ![a], callFunction :: !a, callParams :: ![a]
 instance Eq1 Call where liftEq = genericLiftEq
 instance Ord1 Call where liftCompare = genericLiftCompare
 instance Show1 Call where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Call
 
 instance Evaluatable Call where
   eval Call{..} = do
@@ -32,6 +35,8 @@ data Comparison a
 instance Eq1 Comparison where liftEq = genericLiftEq
 instance Ord1 Comparison where liftCompare = genericLiftCompare
 instance Show1 Comparison where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Comparison
 
 instance Evaluatable Comparison where
   eval = traverse subtermValue >=> go where
@@ -59,6 +64,8 @@ instance Eq1 Arithmetic where liftEq = genericLiftEq
 instance Ord1 Arithmetic where liftCompare = genericLiftCompare
 instance Show1 Arithmetic where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Arithmetic
+
 instance Evaluatable Arithmetic where
   eval = traverse subtermValue >=> go where
     go (Plus a b)          = liftNumeric2 add a b  where add    = liftReal (+)
@@ -80,6 +87,8 @@ instance Eq1 Match where liftEq = genericLiftEq
 instance Ord1 Match where liftCompare = genericLiftCompare
 instance Show1 Match where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Match
+
 -- TODO: Implement Eval instance for Match
 instance Evaluatable Match
 
@@ -94,6 +103,8 @@ data Boolean a
 instance Eq1 Boolean where liftEq = genericLiftEq
 instance Ord1 Boolean where liftCompare = genericLiftCompare
 instance Show1 Boolean where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Boolean
 
 instance Evaluatable Boolean where
   -- N.B. we have to use Monad rather than Applicative/Traversable on 'And' and 'Or' so that we don't evaluate both operands
@@ -115,6 +126,8 @@ instance Eq1 Delete where liftEq = genericLiftEq
 instance Ord1 Delete where liftCompare = genericLiftCompare
 instance Show1 Delete where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Delete
+
 -- TODO: Implement Eval instance for Delete
 instance Evaluatable Delete
 
@@ -126,6 +139,8 @@ data SequenceExpression a = SequenceExpression { _firstExpression :: !a, _second
 instance Eq1 SequenceExpression where liftEq = genericLiftEq
 instance Ord1 SequenceExpression where liftCompare = genericLiftCompare
 instance Show1 SequenceExpression where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 SequenceExpression
 
 -- TODO: Implement Eval instance for SequenceExpression
 instance Evaluatable SequenceExpression
@@ -139,6 +154,8 @@ instance Eq1 Void where liftEq = genericLiftEq
 instance Ord1 Void where liftCompare = genericLiftCompare
 instance Show1 Void where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Void
+
 -- TODO: Implement Eval instance for Void
 instance Evaluatable Void
 
@@ -150,6 +167,8 @@ newtype Typeof a = Typeof a
 instance Eq1 Typeof where liftEq = genericLiftEq
 instance Ord1 Typeof where liftCompare = genericLiftCompare
 instance Show1 Typeof where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Typeof
 
 -- TODO: Implement Eval instance for Typeof
 instance Evaluatable Typeof
@@ -169,6 +188,8 @@ data Bitwise a
 instance Eq1 Bitwise where liftEq = genericLiftEq
 instance Ord1 Bitwise where liftCompare = genericLiftCompare
 instance Show1 Bitwise where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Bitwise
 
 instance Evaluatable Bitwise where
   eval = traverse subtermValue >=> go where
@@ -192,6 +213,8 @@ instance Eq1 MemberAccess where liftEq = genericLiftEq
 instance Ord1 MemberAccess where liftCompare = genericLiftCompare
 instance Show1 MemberAccess where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 MemberAccess
+
 instance Evaluatable MemberAccess where
   eval (fmap subtermValue -> MemberAccess mem acc) = evaluateInScopedEnv mem acc
 
@@ -205,7 +228,9 @@ instance Eq1 Subscript where liftEq = genericLiftEq
 instance Ord1 Subscript where liftCompare = genericLiftCompare
 instance Show1 Subscript where liftShowsPrec = genericLiftShowsPrec
 
--- TODO: Implement Eval instance for Subscript
+instance ToJSONFields1 Subscript
+
+-- TODO: Finish Eval instance for Subscript
 instance Evaluatable Subscript where
   eval (Subscript l [r]) = join (index <$> subtermValue l <*> subtermValue r)
   eval (Subscript _ _)   = throwResumable (Unspecialized "Eval unspecialized for subscript with slices")
@@ -220,6 +245,8 @@ instance Eq1 Enumeration where liftEq = genericLiftEq
 instance Ord1 Enumeration where liftCompare = genericLiftCompare
 instance Show1 Enumeration where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Enumeration
+
 -- TODO: Implement Eval instance for Enumeration
 instance Evaluatable Enumeration
 
@@ -231,6 +258,8 @@ data InstanceOf a = InstanceOf { instanceOfSubject :: !a, instanceOfObject :: !a
 instance Eq1 InstanceOf where liftEq = genericLiftEq
 instance Ord1 InstanceOf where liftCompare = genericLiftCompare
 instance Show1 InstanceOf where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 InstanceOf
 
 -- TODO: Implement Eval instance for InstanceOf
 instance Evaluatable InstanceOf
@@ -244,6 +273,8 @@ instance Eq1 ScopeResolution where liftEq = genericLiftEq
 instance Ord1 ScopeResolution where liftCompare = genericLiftCompare
 instance Show1 ScopeResolution where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 ScopeResolution
+
 -- TODO: Implement Eval instance for ScopeResolution
 instance Evaluatable ScopeResolution
 
@@ -255,6 +286,8 @@ newtype NonNullExpression a = NonNullExpression { nonNullExpression :: a }
 instance Eq1 NonNullExpression where liftEq = genericLiftEq
 instance Ord1 NonNullExpression where liftCompare = genericLiftCompare
 instance Show1 NonNullExpression where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 NonNullExpression
 
 -- TODO: Implement Eval instance for NonNullExpression
 instance Evaluatable NonNullExpression
@@ -268,6 +301,8 @@ instance Eq1 Await where liftEq = genericLiftEq
 instance Ord1 Await where liftCompare = genericLiftCompare
 instance Show1 Await where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 Await
+
 -- TODO: Implement Eval instance for Await
 instance Evaluatable Await
 
@@ -280,6 +315,8 @@ instance Eq1 New where liftEq = genericLiftEq
 instance Ord1 New where liftCompare = genericLiftCompare
 instance Show1 New where liftShowsPrec = genericLiftShowsPrec
 
+instance ToJSONFields1 New
+
 -- TODO: Implement Eval instance for New
 instance Evaluatable New
 
@@ -291,6 +328,8 @@ data Cast a =  Cast { castSubject :: !a, castType :: !a }
 instance Eq1 Cast where liftEq = genericLiftEq
 instance Ord1 Cast where liftCompare = genericLiftCompare
 instance Show1 Cast where liftShowsPrec = genericLiftShowsPrec
+
+instance ToJSONFields1 Cast
 
 -- TODO: Implement Eval instance for Cast
 instance Evaluatable Cast
